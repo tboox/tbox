@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		pbuffer.c
+ * @file		scoped_buffer.c
  * @ingroup 	memory
  *
  */
@@ -34,44 +34,44 @@
  */
 // the maximum grow size of value buffer 
 #ifdef __tb_small__
-# 	define TB_PBUFFER_GROW_SIZE 		(64)
+# 	define TB_SCOPED_BUFFER_GROW_SIZE 		(64)
 #else
-# 	define TB_PBUFFER_GROW_SIZE 		(256)
+# 	define TB_SCOPED_BUFFER_GROW_SIZE 		(256)
 #endif
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * init & exit
  */
-tb_bool_t tb_pbuffer_init(tb_pbuffer_t* buffer)
+tb_bool_t tb_scoped_buffer_init(tb_scoped_buffer_t* buffer)
 {
 	tb_assert_and_check_return_val(buffer, tb_false);
-	tb_memset(buffer, 0, sizeof(tb_pbuffer_t));
+	tb_memset(buffer, 0, sizeof(tb_scoped_buffer_t));
 	return tb_true;
 }
-tb_void_t tb_pbuffer_exit(tb_pbuffer_t* buffer)
+tb_void_t tb_scoped_buffer_exit(tb_scoped_buffer_t* buffer)
 {
 	if (buffer)
 	{
 		if (buffer->data) tb_free(buffer->data);
-		tb_memset(buffer, 0, sizeof(tb_pbuffer_t));
+		tb_memset(buffer, 0, sizeof(tb_scoped_buffer_t));
 	}
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * accessors
  */
-tb_byte_t* tb_pbuffer_data(tb_pbuffer_t const* buffer)
+tb_byte_t* tb_scoped_buffer_data(tb_scoped_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, tb_null);
 	return buffer->data;
 }
-tb_size_t tb_pbuffer_size(tb_pbuffer_t const* buffer)
+tb_size_t tb_scoped_buffer_size(tb_scoped_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, 0);
 	return buffer->size;
 }
-tb_size_t tb_pbuffer_maxn(tb_pbuffer_t const* buffer)
+tb_size_t tb_scoped_buffer_maxn(tb_scoped_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, 0);
 	return buffer->maxn;
@@ -80,17 +80,17 @@ tb_size_t tb_pbuffer_maxn(tb_pbuffer_t const* buffer)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * modifiors
  */
-tb_void_t tb_pbuffer_clear(tb_pbuffer_t* buffer)
+tb_void_t tb_scoped_buffer_clear(tb_scoped_buffer_t* buffer)
 {
 	tb_assert_and_check_return(buffer);
 	buffer->size = 0;
 }
-tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_resize(tb_scoped_buffer_t* buffer, tb_size_t n)
 {
 	tb_assert_and_check_return_val(buffer, tb_null);
 
 	// save it
-	tb_pbuffer_t b = *buffer;
+	tb_scoped_buffer_t b = *buffer;
 	
 	// null?
 	if (!buffer->data) 
@@ -100,7 +100,7 @@ tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t n)
 
 		// compute size
 		buffer->size = n;
-		buffer->maxn = tb_align8(n + TB_PBUFFER_GROW_SIZE);
+		buffer->maxn = tb_align8(n + TB_SCOPED_BUFFER_GROW_SIZE);
 		tb_assert_and_check_goto(n < buffer->maxn, fail);
 
 		// alloc data
@@ -116,7 +116,7 @@ tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t n)
 	else
 	{
 		// compute size
-		buffer->maxn = tb_align8(n + TB_PBUFFER_GROW_SIZE);
+		buffer->maxn = tb_align8(n + TB_SCOPED_BUFFER_GROW_SIZE);
 		tb_assert_and_check_goto(n < buffer->maxn, fail);
 
 		// realloc
@@ -139,27 +139,27 @@ fail:
 /* //////////////////////////////////////////////////////////////////////////////////////
  * memset
  */
-tb_byte_t* tb_pbuffer_memset(tb_pbuffer_t* buffer, tb_byte_t b)
+tb_byte_t* tb_scoped_buffer_memset(tb_scoped_buffer_t* buffer, tb_byte_t b)
 {
-	return tb_pbuffer_memnsetp(buffer, 0, b, tb_pbuffer_size(buffer));
+	return tb_scoped_buffer_memnsetp(buffer, 0, b, tb_scoped_buffer_size(buffer));
 }
-tb_byte_t* tb_pbuffer_memsetp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b)
+tb_byte_t* tb_scoped_buffer_memsetp(tb_scoped_buffer_t* buffer, tb_size_t p, tb_byte_t b)
 {
-	return tb_pbuffer_memnsetp(buffer, p, b, tb_pbuffer_size(buffer));
+	return tb_scoped_buffer_memnsetp(buffer, p, b, tb_scoped_buffer_size(buffer));
 }
-tb_byte_t* tb_pbuffer_memnset(tb_pbuffer_t* buffer, tb_byte_t b, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_memnset(tb_scoped_buffer_t* buffer, tb_byte_t b, tb_size_t n)
 {
-	return tb_pbuffer_memnsetp(buffer, 0, b, n);
+	return tb_scoped_buffer_memnsetp(buffer, 0, b, n);
 }
-tb_byte_t* tb_pbuffer_memnsetp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_memnsetp(tb_scoped_buffer_t* buffer, tb_size_t p, tb_byte_t b, tb_size_t n)
 {
 	tb_assert_and_check_return_val(buffer, tb_null);
 	
 	// check
-	tb_check_return_val(n, tb_pbuffer_data(buffer));
+	tb_check_return_val(n, tb_scoped_buffer_data(buffer));
 
 	// resize
-	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_byte_t* d = tb_scoped_buffer_resize(buffer, p + n);
 	tb_assert_and_check_return_val(d, tb_null);
 
 	// memset
@@ -170,28 +170,28 @@ tb_byte_t* tb_pbuffer_memnsetp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b, t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * memcpy
  */
-tb_byte_t* tb_pbuffer_memcpy(tb_pbuffer_t* buffer, tb_pbuffer_t const* b)
+tb_byte_t* tb_scoped_buffer_memcpy(tb_scoped_buffer_t* buffer, tb_scoped_buffer_t const* b)
 {
-	return tb_pbuffer_memncpyp(buffer, 0, tb_pbuffer_data(b), tb_pbuffer_size(b));
+	return tb_scoped_buffer_memncpyp(buffer, 0, tb_scoped_buffer_data(b), tb_scoped_buffer_size(b));
 }
-tb_byte_t* tb_pbuffer_memcpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_pbuffer_t const* b)
+tb_byte_t* tb_scoped_buffer_memcpyp(tb_scoped_buffer_t* buffer, tb_size_t p, tb_scoped_buffer_t const* b)
 {
-	return tb_pbuffer_memncpyp(buffer, p, tb_pbuffer_data(b), tb_pbuffer_size(b));
+	return tb_scoped_buffer_memncpyp(buffer, p, tb_scoped_buffer_data(b), tb_scoped_buffer_size(b));
 }
-tb_byte_t* tb_pbuffer_memncpy(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_memncpy(tb_scoped_buffer_t* buffer, tb_byte_t const* b, tb_size_t n)
 {
-	return tb_pbuffer_memncpyp(buffer, 0, b, n);
+	return tb_scoped_buffer_memncpyp(buffer, 0, b, n);
 }
-tb_byte_t* tb_pbuffer_memncpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_memncpyp(tb_scoped_buffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n)
 {
 	// check
 	tb_assert_and_check_return_val(buffer && b, tb_null);
 	
 	// check
-	tb_check_return_val(n, tb_pbuffer_data(buffer));
+	tb_check_return_val(n, tb_scoped_buffer_data(buffer));
 
 	// resize
-	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_byte_t* d = tb_scoped_buffer_resize(buffer, p + n);
 	tb_assert_and_check_return_val(d, tb_null);
 
 	// safer than memcpy, buffer maybe overlap
@@ -203,37 +203,37 @@ tb_byte_t* tb_pbuffer_memncpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t cons
 /* //////////////////////////////////////////////////////////////////////////////////////
  * memmov
  */
-tb_byte_t* tb_pbuffer_memmov(tb_pbuffer_t* buffer, tb_size_t b)
+tb_byte_t* tb_scoped_buffer_memmov(tb_scoped_buffer_t* buffer, tb_size_t b)
 {
-	tb_assert_and_check_return_val(b <= tb_pbuffer_size(buffer), tb_null);
-	return tb_pbuffer_memnmovp(buffer, 0, b, tb_pbuffer_size(buffer) - b);
+	tb_assert_and_check_return_val(b <= tb_scoped_buffer_size(buffer), tb_null);
+	return tb_scoped_buffer_memnmovp(buffer, 0, b, tb_scoped_buffer_size(buffer) - b);
 }
-tb_byte_t* tb_pbuffer_memmovp(tb_pbuffer_t* buffer, tb_size_t p, tb_size_t b)
+tb_byte_t* tb_scoped_buffer_memmovp(tb_scoped_buffer_t* buffer, tb_size_t p, tb_size_t b)
 {
-	tb_assert_and_check_return_val(b <= tb_pbuffer_size(buffer), tb_null);
-	return tb_pbuffer_memnmovp(buffer, p, b, tb_pbuffer_size(buffer) - b);
+	tb_assert_and_check_return_val(b <= tb_scoped_buffer_size(buffer), tb_null);
+	return tb_scoped_buffer_memnmovp(buffer, p, b, tb_scoped_buffer_size(buffer) - b);
 }
-tb_byte_t* tb_pbuffer_memnmov(tb_pbuffer_t* buffer, tb_size_t b, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_memnmov(tb_scoped_buffer_t* buffer, tb_size_t b, tb_size_t n)
 {
-	return tb_pbuffer_memnmovp(buffer, 0, b, n);
+	return tb_scoped_buffer_memnmovp(buffer, 0, b, n);
 }
-tb_byte_t* tb_pbuffer_memnmovp(tb_pbuffer_t* buffer, tb_size_t p, tb_size_t b, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_memnmovp(tb_scoped_buffer_t* buffer, tb_size_t p, tb_size_t b, tb_size_t n)
 {
 	// check
-	tb_assert_and_check_return_val(buffer && (b + n) <= tb_pbuffer_size(buffer), tb_null);
+	tb_assert_and_check_return_val(buffer && (b + n) <= tb_scoped_buffer_size(buffer), tb_null);
 
 	// clear?
-	if (b == tb_pbuffer_size(buffer)) 
+	if (b == tb_scoped_buffer_size(buffer)) 
 	{
-		tb_pbuffer_clear(buffer);
-		return tb_pbuffer_data(buffer);
+		tb_scoped_buffer_clear(buffer);
+		return tb_scoped_buffer_data(buffer);
 	}
 
 	// check
-	tb_check_return_val(p != b && n, tb_pbuffer_data(buffer));
+	tb_check_return_val(p != b && n, tb_scoped_buffer_data(buffer));
 
 	// resize
-	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_byte_t* d = tb_scoped_buffer_resize(buffer, p + n);
 	tb_assert_and_check_return_val(d, tb_null);
 
 	// memmov
@@ -244,23 +244,23 @@ tb_byte_t* tb_pbuffer_memnmovp(tb_pbuffer_t* buffer, tb_size_t p, tb_size_t b, t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * memcat
  */
-tb_byte_t* tb_pbuffer_memcat(tb_pbuffer_t* buffer, tb_pbuffer_t const* b)
+tb_byte_t* tb_scoped_buffer_memcat(tb_scoped_buffer_t* buffer, tb_scoped_buffer_t const* b)
 {
-	return tb_pbuffer_memncat(buffer, tb_pbuffer_data(b), tb_pbuffer_size(b));
+	return tb_scoped_buffer_memncat(buffer, tb_scoped_buffer_data(b), tb_scoped_buffer_size(b));
 }
-tb_byte_t* tb_pbuffer_memncat(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n)
+tb_byte_t* tb_scoped_buffer_memncat(tb_scoped_buffer_t* buffer, tb_byte_t const* b, tb_size_t n)
 {	
 	tb_assert_and_check_return_val(buffer && b, tb_null);
 	
 	// check
-	tb_check_return_val(n, tb_pbuffer_data(buffer));
+	tb_check_return_val(n, tb_scoped_buffer_data(buffer));
 
 	// is null?
-	tb_size_t p = tb_pbuffer_size(buffer);
-	if (!p) return tb_pbuffer_memncpy(buffer, b, n);
+	tb_size_t p = tb_scoped_buffer_size(buffer);
+	if (!p) return tb_scoped_buffer_memncpy(buffer, b, n);
 
 	// resize
-	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_byte_t* d = tb_scoped_buffer_resize(buffer, p + n);
 	tb_assert_and_check_return_val(d, tb_null);
 
 	// memcat

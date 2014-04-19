@@ -52,7 +52,7 @@ typedef struct __tb_string_t
 	tb_object_t 		base;
 
 	// the pstring
-	tb_pstring_t 		pstr;
+	tb_scoped_string_t 		pstr;
 
 	// the cache data
 	tb_char_t const* 	cdata;
@@ -83,7 +83,7 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 	if (string) 
 	{
 		if (string->cdata) tb_string_cache_del(string->cdata);
-		tb_pstring_exit(&string->pstr);
+		tb_scoped_string_exit(&string->pstr);
 		tb_object_pool_del(tb_object_pool_instance(), object);
 	}
 }
@@ -95,7 +95,7 @@ static tb_void_t tb_string_cler(tb_object_t* object)
 		if (string->cdata) tb_string_cache_del(string->cdata);
 		string->cdata = tb_null;
 		string->csize = 0;
-		tb_pstring_clear(&string->pstr);
+		tb_scoped_string_clear(&string->pstr);
 	}
 }
 static tb_string_t* tb_string_init_base()
@@ -123,7 +123,7 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 	tb_assert_and_check_return_val(string, tb_null);
 
 	// init pstr
-	if (!tb_pstring_init(&string->pstr)) goto fail;
+	if (!tb_scoped_string_init(&string->pstr)) goto fail;
 
 	// copy string
 	if (cstr) 
@@ -140,7 +140,7 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 				// the string size
 				string->csize = size;
 			}
-			else tb_pstring_cstrncpy(&string->pstr, cstr, size);
+			else tb_scoped_string_cstrncpy(&string->pstr, cstr, size);
 		}
 	}
 
@@ -152,29 +152,29 @@ fail:
 	tb_string_exit((tb_object_t*)string);
 	return tb_null;
 }
-tb_object_t* tb_string_init_from_pstr(tb_pstring_t* pstr)
+tb_object_t* tb_string_init_from_pstr(tb_scoped_string_t* pstr)
 {
 	// make
 	tb_string_t* string = tb_string_init_base();
 	tb_assert_and_check_return_val(string, tb_null);
 
 	// init pstr
-	if (!tb_pstring_init(&string->pstr)) goto fail;
+	if (!tb_scoped_string_init(&string->pstr)) goto fail;
 
 	// copy string
 	if (pstr) 
 	{
-		tb_size_t size = tb_pstring_size(&string->pstr);
+		tb_size_t size = tb_scoped_string_size(&string->pstr);
 		if (size < TB_STRING_STRING_CACHE_SIZE) 
 		{
 			// put string to scache
-			string->cdata = tb_string_cache_put(tb_pstring_cstr(pstr));
+			string->cdata = tb_string_cache_put(tb_scoped_string_cstr(pstr));
 			tb_assert_and_check_goto(string->cdata, fail);
 
 			// the string size
 			string->csize = size;
 		}
-		else tb_pstring_strcpy(&string->pstr, pstr);
+		else tb_scoped_string_strcpy(&string->pstr, pstr);
 	}
 
 	// ok
@@ -192,7 +192,7 @@ tb_char_t const* tb_string_cstr(tb_object_t* object)
 	tb_assert_and_check_return_val(string, tb_null);
 
 	// cstr
-	return string->cdata? string->cdata : tb_pstring_cstr(&string->pstr);
+	return string->cdata? string->cdata : tb_scoped_string_cstr(&string->pstr);
 }
 tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 {
@@ -221,8 +221,8 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 			else 
 			{
 				// copy string
-				tb_pstring_cstrncpy(&string->pstr, cstr, size);
-				size = tb_pstring_size(&string->pstr);
+				tb_scoped_string_cstrncpy(&string->pstr, cstr, size);
+				size = tb_scoped_string_size(&string->pstr);
 
 				// remove string from scache
 				if (string->cdata) tb_string_cache_del(string->cdata);
@@ -233,7 +233,7 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 		else
 		{
 			// clear string
-			tb_pstring_clear(&string->pstr);
+			tb_scoped_string_clear(&string->pstr);
 
 			// remove string from scache
 			if (string->cdata) tb_string_cache_del(string->cdata);
@@ -252,6 +252,6 @@ tb_size_t tb_string_size(tb_object_t* object)
 	tb_assert_and_check_return_val(string, 0);
 
 	// size
-	return string->cdata? string->csize : tb_pstring_size(&string->pstr);
+	return string->cdata? string->csize : tb_scoped_string_size(&string->pstr);
 }
 

@@ -114,8 +114,8 @@ TB_DEMO_MAIN_DECL(stream_astream_cache);
 TB_DEMO_MAIN_DECL(stream_astream_charset);
 
 // string
-TB_DEMO_MAIN_DECL(string_pstring);
-TB_DEMO_MAIN_DECL(string_sstring);
+TB_DEMO_MAIN_DECL(string_scoped_string);
+TB_DEMO_MAIN_DECL(string_static_string);
 
 // memory
 TB_DEMO_MAIN_DECL(memory_check);
@@ -127,9 +127,9 @@ TB_DEMO_MAIN_DECL(memory_static_block_pool);
 TB_DEMO_MAIN_DECL(memory_fixed_pool);
 TB_DEMO_MAIN_DECL(memory_memops);
 TB_DEMO_MAIN_DECL(memory_string_cache);
-TB_DEMO_MAIN_DECL(memory_pbuffer);
-TB_DEMO_MAIN_DECL(memory_qbuffer);
-TB_DEMO_MAIN_DECL(memory_sbuffer);
+TB_DEMO_MAIN_DECL(memory_scoped_buffer);
+TB_DEMO_MAIN_DECL(memory_queue_buffer);
+TB_DEMO_MAIN_DECL(memory_static_buffer);
 
 // network
 TB_DEMO_MAIN_DECL(network_dns);

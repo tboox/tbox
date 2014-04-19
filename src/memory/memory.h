@@ -35,9 +35,9 @@
 #include "block_pool.h"
 #include "fixed_pool.h"
 #include "string_cache.h"
-#include "pbuffer.h"
-#include "sbuffer.h"
-#include "qbuffer.h"
+#include "scoped_buffer.h"
+#include "static_buffer.h"
+#include "queue_buffer.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * description

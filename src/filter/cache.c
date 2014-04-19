@@ -108,7 +108,7 @@ tb_filter_t* tb_filter_init_from_cache(tb_size_t size)
 		filter->base.spak = tb_filter_cache_spak;
 
 		// init the cache size
-		if (size) tb_qbuffer_resize(&filter->base.odata, size);
+		if (size) tb_queue_buffer_resize(&filter->base.odata, size);
 
 		// ok
 		ok = tb_true;

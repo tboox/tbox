@@ -47,7 +47,7 @@ tb_object_t* 		tb_string_init_from_cstr(tb_char_t const* cstr);
  *
  * @return 			the string object
  */
-tb_object_t* 		tb_string_init_from_pstr(tb_pstring_t* pstr);
+tb_object_t* 		tb_string_init_from_pstr(tb_scoped_string_t* pstr);
 
 /*! the c-string
  *

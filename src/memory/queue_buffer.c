@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		qbuffer.c
+ * @file		queue_buffer.c
  * @ingroup 	memory
  *
  */
@@ -32,7 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * init & exit
  */
-tb_bool_t tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn)
+tb_bool_t tb_queue_buffer_init(tb_queue_buffer_t* buffer, tb_size_t maxn)
 {
 	// check
 	tb_assert_and_check_return_val(buffer, tb_false);
@@ -46,54 +46,54 @@ tb_bool_t tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn)
 	// ok
 	return tb_true;
 }
-tb_void_t tb_qbuffer_exit(tb_qbuffer_t* buffer)
+tb_void_t tb_queue_buffer_exit(tb_queue_buffer_t* buffer)
 {
 	if (buffer)
 	{
 		if (buffer->data) tb_free(buffer->data);
-		tb_memset(buffer, 0, sizeof(tb_qbuffer_t));
+		tb_memset(buffer, 0, sizeof(tb_queue_buffer_t));
 	}
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * accessors
  */
-tb_byte_t* tb_qbuffer_data(tb_qbuffer_t const* buffer)
+tb_byte_t* tb_queue_buffer_data(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, tb_null);
 	return buffer->data;
 }
-tb_byte_t* tb_qbuffer_head(tb_qbuffer_t const* buffer)
+tb_byte_t* tb_queue_buffer_head(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, tb_null);
 	return buffer->head;
 }
-tb_byte_t* tb_qbuffer_tail(tb_qbuffer_t const* buffer)
+tb_byte_t* tb_queue_buffer_tail(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, tb_null);
 	return buffer->head? buffer->head + buffer->size : tb_null;
 }
-tb_size_t tb_qbuffer_size(tb_qbuffer_t const* buffer)
+tb_size_t tb_queue_buffer_size(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, 0);
 	return buffer->size;
 }
-tb_size_t tb_qbuffer_maxn(tb_qbuffer_t const* buffer)
+tb_size_t tb_queue_buffer_maxn(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, 0);
 	return buffer->maxn;
 }
-tb_size_t tb_qbuffer_left(tb_qbuffer_t const* buffer)
+tb_size_t tb_queue_buffer_left(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer && buffer->size <= buffer->maxn, 0);
 	return buffer->maxn - buffer->size;
 }
-tb_bool_t tb_qbuffer_full(tb_qbuffer_t const* buffer)
+tb_bool_t tb_queue_buffer_full(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, tb_false);
 	return buffer->size == buffer->maxn? tb_true : tb_false;
 }
-tb_bool_t tb_qbuffer_null(tb_qbuffer_t const* buffer)
+tb_bool_t tb_queue_buffer_null(tb_queue_buffer_t const* buffer)
 {
 	tb_assert_and_check_return_val(buffer, tb_false);
 	return buffer->size? tb_false : tb_true;
@@ -102,13 +102,13 @@ tb_bool_t tb_qbuffer_null(tb_qbuffer_t const* buffer)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * modifiors
  */
-tb_void_t tb_qbuffer_clear(tb_qbuffer_t* buffer)
+tb_void_t tb_queue_buffer_clear(tb_queue_buffer_t* buffer)
 {
 	tb_assert_and_check_return(buffer);
 	buffer->size = 0;
 	buffer->head = buffer->data;
 }
-tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
+tb_byte_t* tb_queue_buffer_resize(tb_queue_buffer_t* buffer, tb_size_t maxn)
 {
 	// check
 	tb_assert_and_check_return_val(buffer && maxn && maxn >= buffer->size, tb_null);
@@ -144,7 +144,7 @@ tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 	// ok
 	return buffer->data;
 }
-tb_long_t tb_qbuffer_skip(tb_qbuffer_t* buffer, tb_size_t size)
+tb_long_t tb_queue_buffer_skip(tb_queue_buffer_t* buffer, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(buffer, -1);
@@ -167,7 +167,7 @@ tb_long_t tb_qbuffer_skip(tb_qbuffer_t* buffer, tb_size_t size)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * read & writ
  */
-tb_long_t tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_queue_buffer_read(tb_queue_buffer_t* buffer, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(buffer && data, -1);
@@ -188,7 +188,7 @@ tb_long_t tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
 	// ok
 	return read;
 }
-tb_long_t tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_queue_buffer_writ(tb_queue_buffer_t* buffer, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(buffer && data && buffer->maxn, -1);
@@ -230,7 +230,7 @@ tb_long_t tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t const* data, tb_size_t
  * pull & push
  */
 
-tb_byte_t* tb_qbuffer_pull_init(tb_qbuffer_t* buffer, tb_size_t* size)
+tb_byte_t* tb_queue_buffer_pull_init(tb_queue_buffer_t* buffer, tb_size_t* size)
 {
 	// check
 	tb_assert_and_check_return_val(buffer, tb_null);
@@ -245,7 +245,7 @@ tb_byte_t* tb_qbuffer_pull_init(tb_qbuffer_t* buffer, tb_size_t* size)
 	// ok
 	return buffer->head;
 }
-tb_void_t tb_qbuffer_pull_exit(tb_qbuffer_t* buffer, tb_size_t size)
+tb_void_t tb_queue_buffer_pull_exit(tb_queue_buffer_t* buffer, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return(buffer && buffer->head && size <= buffer->size);
@@ -257,7 +257,7 @@ tb_void_t tb_qbuffer_pull_exit(tb_qbuffer_t* buffer, tb_size_t size)
 	// null? reset head
 	if (!buffer->size) buffer->head = buffer->data;
 }
-tb_byte_t* tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size)
+tb_byte_t* tb_queue_buffer_push_init(tb_queue_buffer_t* buffer, tb_size_t* size)
 {
 	// check
 	tb_assert_and_check_return_val(buffer && buffer->maxn, tb_null);
@@ -292,7 +292,7 @@ tb_byte_t* tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size)
 	// ok
 	return buffer->head + buffer->size;
 }
-tb_void_t tb_qbuffer_push_exit(tb_qbuffer_t* buffer, tb_size_t size)
+tb_void_t tb_queue_buffer_push_exit(tb_queue_buffer_t* buffer, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return(buffer && buffer->head && buffer->size + size <= buffer->maxn);

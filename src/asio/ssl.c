@@ -157,10 +157,10 @@ typedef struct __tb_aicp_ssl_t
 	tb_atomic_t 			bopened;
 
 	// the read data
-	tb_pbuffer_t 			read_data;
+	tb_scoped_buffer_t 			read_data;
 
 	// the writ data
-	tb_pbuffer_t 			writ_data;
+	tb_scoped_buffer_t 			writ_data;
 
 }tb_aicp_ssl_t;
 
@@ -190,8 +190,8 @@ static tb_long_t tb_aicp_ssl_fill_read(tb_aicp_ssl_t* ssl, tb_byte_t* data, tb_s
 		tb_assert_and_check_break(read_real <= size);
 
 		// the data and size
-		tb_byte_t* 	read_data = tb_pbuffer_data(&ssl->read_data);
-		tb_size_t 	read_size = tb_pbuffer_size(&ssl->read_data);
+		tb_byte_t* 	read_data = tb_scoped_buffer_data(&ssl->read_data);
+		tb_size_t 	read_size = tb_scoped_buffer_size(&ssl->read_data);
 		tb_assert_and_check_break(read_data && read_size && size <= read_size);
 
 		// copy data
@@ -495,12 +495,12 @@ static tb_long_t tb_aicp_ssl_post_read(tb_pointer_t priv, tb_byte_t* data, tb_si
 		if (ssl->post.real >= 0) return tb_aicp_ssl_fill_read(ssl, data, size);
 
 		// resize data
-		if (tb_pbuffer_size(&ssl->read_data) < size)
-			tb_pbuffer_resize(&ssl->read_data, size);
+		if (tb_scoped_buffer_size(&ssl->read_data) < size)
+			tb_scoped_buffer_resize(&ssl->read_data, size);
 
 		// the data and size
-		tb_byte_t* 	read_data = tb_pbuffer_data(&ssl->read_data);
-		tb_size_t 	read_size = tb_pbuffer_size(&ssl->read_data);
+		tb_byte_t* 	read_data = tb_scoped_buffer_data(&ssl->read_data);
+		tb_size_t 	read_size = tb_scoped_buffer_size(&ssl->read_data);
 		tb_assert_and_check_break(read_data && read_size && size <= read_size);
 
 		// trace
@@ -542,11 +542,11 @@ static tb_long_t tb_aicp_ssl_post_writ(tb_pointer_t priv, tb_byte_t const* data,
 		if (ssl->post.real >= 0) return tb_aicp_ssl_fill_writ(ssl, data, size);
 
 		// save data
-		tb_pbuffer_memncpy(&ssl->writ_data, data, size);
+		tb_scoped_buffer_memncpy(&ssl->writ_data, data, size);
 
 		// the data and size
-		tb_byte_t* 	writ_data = tb_pbuffer_data(&ssl->writ_data);
-		tb_size_t 	writ_size = tb_pbuffer_size(&ssl->writ_data);
+		tb_byte_t* 	writ_data = tb_scoped_buffer_data(&ssl->writ_data);
+		tb_size_t 	writ_size = tb_scoped_buffer_size(&ssl->writ_data);
 		tb_assert_and_check_break(writ_data && writ_size && size == writ_size);
 
 		// trace
@@ -686,10 +686,10 @@ tb_handle_t tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver)
 		tb_assert_and_check_break(ssl->ssl);
 
 		// init read data
-		if (!tb_pbuffer_init(&ssl->read_data)) break;
+		if (!tb_scoped_buffer_init(&ssl->read_data)) break;
 
 		// init writ data
-		if (!tb_pbuffer_init(&ssl->writ_data)) break;
+		if (!tb_scoped_buffer_init(&ssl->writ_data)) break;
 
 		// ok
 		ok = tb_true;
@@ -743,8 +743,8 @@ tb_void_t tb_aicp_ssl_clos(tb_handle_t handle, tb_bool_t bcalling)
 	ssl->aico = tb_null;
 
 	// clear data
-	tb_pbuffer_clear(&ssl->read_data);
-	tb_pbuffer_clear(&ssl->writ_data);
+	tb_scoped_buffer_clear(&ssl->read_data);
+	tb_scoped_buffer_clear(&ssl->writ_data);
 
 	// clear real
 	ssl->post.real = 0;
@@ -773,8 +773,8 @@ tb_void_t tb_aicp_ssl_exit(tb_handle_t handle, tb_bool_t bcalling)
 	ssl->ssl = tb_null;
 
 	// exit data
-	tb_pbuffer_exit(&ssl->read_data);
-	tb_pbuffer_exit(&ssl->writ_data);
+	tb_scoped_buffer_exit(&ssl->read_data);
+	tb_scoped_buffer_exit(&ssl->writ_data);
 
 	// exit it
 	tb_free(ssl);

@@ -55,15 +55,15 @@ static tb_object_t* tb_object_json_reader_func_null(tb_object_json_reader_t* rea
 	tb_assert_and_check_return_val(reader && reader->stream, tb_null);
 
 	// init data
-	tb_sstring_t 	data;
+	tb_static_string_t 	data;
 	tb_char_t 		buff[256];
-	if (!tb_sstring_init(&data, buff, 256)) return tb_null;
+	if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
 	// init 
 	tb_object_t* null = tb_null;
 
 	// append character
-	tb_sstring_chrcat(&data, type);
+	tb_static_string_chrcat(&data, type);
 
 	// walk
 	while (tb_stream_left(reader->stream)) 
@@ -76,7 +76,7 @@ static tb_object_t* tb_object_json_reader_func_null(tb_object_json_reader_t* rea
 		tb_char_t ch = *p;
 
 		// append character
-		if (tb_isalpha(ch)) tb_sstring_chrcat(&data, ch);
+		if (tb_isalpha(ch)) tb_static_string_chrcat(&data, ch);
 		else break;
 
 		// skip it
@@ -84,18 +84,18 @@ static tb_object_t* tb_object_json_reader_func_null(tb_object_json_reader_t* rea
 	}
 
 	// check
-	tb_assert_and_check_goto(tb_sstring_size(&data), end);
+	tb_assert_and_check_goto(tb_static_string_size(&data), end);
 
 	// trace
-	tb_trace_d("null: %s", tb_sstring_cstr(&data));
+	tb_trace_d("null: %s", tb_static_string_cstr(&data));
 
 	// null?
-	if (!tb_stricmp(tb_sstring_cstr(&data), "null")) null = tb_null_init();
+	if (!tb_stricmp(tb_static_string_cstr(&data), "null")) null = tb_null_init();
 
 end:
 
 	// exit data
-	tb_sstring_exit(&data);
+	tb_static_string_exit(&data);
 
 	// ok?
 	return null;
@@ -156,8 +156,8 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 	tb_assert_and_check_return_val(reader && reader->stream && (type == '\"' || type == '\''), tb_null);
 
 	// init data
-	tb_pstring_t data;
-	if (!tb_pstring_init(&data)) return tb_null;
+	tb_scoped_string_t data;
+	if (!tb_scoped_string_init(&data)) return tb_null;
 
 	// walk
 	tb_char_t ch;
@@ -198,23 +198,23 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 
 				// unicode to utf8
 				tb_long_t utf8_size = tb_charset_conv_bst(TB_CHARSET_TYPE_UCS2 | TB_CHARSET_TYPE_NE, TB_CHARSET_TYPE_UTF8, &unicode_stream, &utf8_stream);
-				if (utf8_size > 0) tb_pstring_cstrncat(&data, utf8_data, utf8_size);
+				if (utf8_size > 0) tb_scoped_string_cstrncat(&data, utf8_data, utf8_size);
 			}
 			// append escaped character
-			else tb_pstring_chrcat(&data, ch);
+			else tb_scoped_string_chrcat(&data, ch);
 		}
 		// append character
-		else tb_pstring_chrcat(&data, ch);
+		else tb_scoped_string_chrcat(&data, ch);
 	}
 
 	// init string
-	tb_object_t* string = tb_string_init_from_cstr(tb_pstring_cstr(&data));
+	tb_object_t* string = tb_string_init_from_cstr(tb_scoped_string_cstr(&data));
 
 	// trace
-	tb_trace_d("string: %s", tb_pstring_cstr(&data));
+	tb_trace_d("string: %s", tb_scoped_string_cstr(&data));
 
 	// exit data
-	tb_pstring_exit(&data);
+	tb_scoped_string_exit(&data);
 
 	// ok?
 	return string;
@@ -225,15 +225,15 @@ static tb_object_t* tb_object_json_reader_func_number(tb_object_json_reader_t* r
 	tb_assert_and_check_return_val(reader && reader->stream, tb_null);
 
 	// init data
-	tb_sstring_t 	data;
+	tb_static_string_t 	data;
 	tb_char_t 		buff[256];
-	if (!tb_sstring_init(&data, buff, 256)) return tb_null;
+	if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
 	// init
 	tb_object_t* number = tb_null;
 
 	// append character
-	tb_sstring_chrcat(&data, type);
+	tb_static_string_chrcat(&data, type);
 
 	// walk
 	tb_bool_t bs = (type == '-')? tb_true : tb_false;
@@ -253,7 +253,7 @@ static tb_object_t* tb_object_json_reader_func_number(tb_object_json_reader_t* r
 
 		// append character
 		if (tb_isdigit10(ch) || ch == '.' || ch == 'e' || ch == 'E' || ch == '-' || ch == '+') 
-			tb_sstring_chrcat(&data, ch);
+			tb_static_string_chrcat(&data, ch);
 		else break;
 
 		// skip it
@@ -261,20 +261,20 @@ static tb_object_t* tb_object_json_reader_func_number(tb_object_json_reader_t* r
 	}
 
 	// check
-	tb_assert_and_check_goto(tb_sstring_size(&data), end);
+	tb_assert_and_check_goto(tb_static_string_size(&data), end);
 
 	// trace
-	tb_trace_d("number: %s", tb_sstring_cstr(&data));
+	tb_trace_d("number: %s", tb_static_string_cstr(&data));
 
 	// init number 
 #ifdef TB_CONFIG_TYPE_FLOAT
-	if (bf) number = tb_number_init_from_float(tb_stof(tb_sstring_cstr(&data)));
+	if (bf) number = tb_number_init_from_float(tb_stof(tb_static_string_cstr(&data)));
 #else
 	if (bf) tb_trace_noimpl();
 #endif
 	else if (bs) 
 	{
-		tb_sint64_t value = tb_stoi64(tb_sstring_cstr(&data));
+		tb_sint64_t value = tb_stoi64(tb_static_string_cstr(&data));
 		tb_size_t 	bytes = tb_object_reader_need_bytes(-value);
 		switch (bytes)
 		{
@@ -288,7 +288,7 @@ static tb_object_t* tb_object_json_reader_func_number(tb_object_json_reader_t* r
 	}
 	else 
 	{
-		tb_uint64_t value = tb_stou64(tb_sstring_cstr(&data));
+		tb_uint64_t value = tb_stou64(tb_static_string_cstr(&data));
 		tb_size_t 	bytes = tb_object_reader_need_bytes(value);
 		switch (bytes)
 		{
@@ -303,7 +303,7 @@ static tb_object_t* tb_object_json_reader_func_number(tb_object_json_reader_t* r
 end:
 
 	// exit data
-	tb_sstring_exit(&data);
+	tb_static_string_exit(&data);
 
 	// ok?
 	return number;
@@ -314,15 +314,15 @@ static tb_object_t* tb_object_json_reader_func_boolean(tb_object_json_reader_t* 
 	tb_assert_and_check_return_val(reader && reader->stream, tb_null);
 
 	// init data
-	tb_sstring_t 	data;
+	tb_static_string_t 	data;
 	tb_char_t 		buff[256];
-	if (!tb_sstring_init(&data, buff, 256)) return tb_null;
+	if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
 	// init 
 	tb_object_t* boolean = tb_null;
 
 	// append character
-	tb_sstring_chrcat(&data, type);
+	tb_static_string_chrcat(&data, type);
 
 	// walk
 	while (tb_stream_left(reader->stream)) 
@@ -335,7 +335,7 @@ static tb_object_t* tb_object_json_reader_func_boolean(tb_object_json_reader_t* 
 		tb_char_t ch = *p;
 
 		// append character
-		if (tb_isalpha(ch)) tb_sstring_chrcat(&data, ch);
+		if (tb_isalpha(ch)) tb_static_string_chrcat(&data, ch);
 		else break;
 
 		// skip it
@@ -343,20 +343,20 @@ static tb_object_t* tb_object_json_reader_func_boolean(tb_object_json_reader_t* 
 	}
 
 	// check
-	tb_assert_and_check_goto(tb_sstring_size(&data), end);
+	tb_assert_and_check_goto(tb_static_string_size(&data), end);
 
 	// trace
-	tb_trace_d("boolean: %s", tb_sstring_cstr(&data));
+	tb_trace_d("boolean: %s", tb_static_string_cstr(&data));
 
 	// true?
-	if (!tb_stricmp(tb_sstring_cstr(&data), "true")) boolean = tb_boolean_init(tb_true);
+	if (!tb_stricmp(tb_static_string_cstr(&data), "true")) boolean = tb_boolean_init(tb_true);
 	// false?
-	else if (!tb_stricmp(tb_sstring_cstr(&data), "false")) boolean = tb_boolean_init(tb_false);
+	else if (!tb_stricmp(tb_static_string_cstr(&data), "false")) boolean = tb_boolean_init(tb_false);
 
 end:
 
 	// exit data
-	tb_sstring_exit(&data);
+	tb_static_string_exit(&data);
 
 	// ok?
 	return boolean;
@@ -367,9 +367,9 @@ static tb_object_t* tb_object_json_reader_func_dictionary(tb_object_json_reader_
 	tb_assert_and_check_return_val(reader && reader->stream && type == '{', tb_null);
 
 	// init key name
-	tb_sstring_t 	kname;
+	tb_static_string_t 	kname;
 	tb_char_t 		kdata[8192];
-	if (!tb_sstring_init(&kname, kdata, 8192)) return tb_null;
+	if (!tb_static_string_init(&kname, kdata, 8192)) return tb_null;
 
 	// init dictionary
 	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT, tb_false);
@@ -398,13 +398,13 @@ static tb_object_t* tb_object_json_reader_func_dictionary(tb_object_json_reader_
 				// is key end?
 				else if (!bstr && ch == ':') bkey = tb_true;
 				// append key
-				else if (bstr) tb_sstring_chrcat(&kname, ch);
+				else if (bstr) tb_static_string_chrcat(&kname, ch);
 			}
 			// key ok? read val
 			else
 			{
 				// trace
-				tb_trace_d("key: %s", tb_sstring_cstr(&kname));
+				tb_trace_d("key: %s", tb_static_string_cstr(&kname));
 
 				// the func
 				tb_object_json_reader_func_t func = tb_object_json_reader_func(ch);
@@ -415,12 +415,12 @@ static tb_object_t* tb_object_json_reader_func_dictionary(tb_object_json_reader_
 				tb_assert_and_check_goto(val, end);
 
 				// set key => val
-				tb_dictionary_set(dictionary, tb_sstring_cstr(&kname), val);
+				tb_dictionary_set(dictionary, tb_static_string_cstr(&kname), val);
 
 				// reset key
 				bstr = 0;
 				bkey = tb_false;
-				tb_sstring_clear(&kname);
+				tb_static_string_clear(&kname);
 			}
 		}
 	}
@@ -438,7 +438,7 @@ end:
 	}
 
 	// exit key name
-	tb_sstring_exit(&kname);
+	tb_static_string_exit(&kname);
 
 	// ok?
 	return dictionary;

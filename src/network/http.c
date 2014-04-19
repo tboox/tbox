@@ -75,7 +75,7 @@ typedef struct __tb_http_t
 	tb_handle_t			pool;
 
 	// the request data
-	tb_pstring_t 		request;
+	tb_scoped_string_t 		request;
 
 }tb_http_t;
 
@@ -163,19 +163,19 @@ static tb_bool_t tb_http_status_init(tb_http_t* http)
 	http->status.version = 1;
 
 	// init content type 
-	if (!tb_pstring_init(&http->status.content_type)) return tb_false;
+	if (!tb_scoped_string_init(&http->status.content_type)) return tb_false;
 
 	// init location
-	if (!tb_pstring_init(&http->status.location)) return tb_false;
+	if (!tb_scoped_string_init(&http->status.location)) return tb_false;
 	return tb_true;
 }
 static tb_void_t tb_http_status_exit(tb_http_t* http)
 {
 	// exit the content type
-	tb_pstring_exit(&http->status.content_type);
+	tb_scoped_string_exit(&http->status.content_type);
 
 	// exit location
-	tb_pstring_exit(&http->status.location);
+	tb_scoped_string_exit(&http->status.location);
 }
 static tb_void_t tb_http_status_cler(tb_http_t* http, tb_bool_t host_changed)
 {
@@ -189,10 +189,10 @@ static tb_void_t tb_http_status_cler(tb_http_t* http, tb_bool_t host_changed)
 	http->status.state = TB_STATE_OK;
 
 	// clear content type
-	tb_pstring_clear(&http->status.content_type);
+	tb_scoped_string_clear(&http->status.content_type);
 
 	// clear location
-	tb_pstring_clear(&http->status.location);
+	tb_scoped_string_clear(&http->status.location);
 
 	// host is changed? clear the alived state
 	if (host_changed)
@@ -213,10 +213,10 @@ static tb_void_t tb_http_status_dump(tb_http_t* http)
 	tb_trace_i("status: ");
 	tb_trace_i("status: code: %d", http->status.code);
 	tb_trace_i("status: version: HTTP/1.%1u", http->status.version);
-	tb_trace_i("status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
+	tb_trace_i("status: content:type: %s", tb_scoped_string_cstr(&http->status.content_type));
 	tb_trace_i("status: content:size: %llu", http->status.content_size);
 	tb_trace_i("status: document:size: %llu", http->status.document_size);
-	tb_trace_i("status: location: %s", tb_pstring_cstr(&http->status.location));
+	tb_trace_i("status: location: %s", tb_scoped_string_cstr(&http->status.location));
 	tb_trace_i("status: bgzip: %s", http->status.bgzip? "true" : "false");
 	tb_trace_i("status: bdeflate: %s", http->status.bdeflate? "true" : "false");
 	tb_trace_i("status: balived: %s", http->status.balived? "true" : "false");
@@ -307,12 +307,12 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 	do
 	{
 		// clear line data
-		tb_pstring_clear(&http->request);
+		tb_scoped_string_clear(&http->request);
 
 		// init the head value
 		tb_char_t  		data[64];
-		tb_sstring_t 	value;
-		if (!tb_sstring_init(&value, data, 64)) break;
+		tb_static_string_t 	value;
+		if (!tb_static_string_init(&value, data, 64)) break;
 
 		// init method
 		tb_assert_and_check_break(http->option.method < tb_arrayn(g_http_methods));
@@ -342,19 +342,19 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 
 		// init range
 		if (http->option.range.bof && http->option.range.eof >= http->option.range.bof)
-			tb_sstring_cstrfcpy(&value, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
+			tb_static_string_cstrfcpy(&value, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
 		else if (http->option.range.bof && !http->option.range.eof)
-			tb_sstring_cstrfcpy(&value, "bytes=%llu-", http->option.range.bof);
+			tb_static_string_cstrfcpy(&value, "bytes=%llu-", http->option.range.bof);
 		else if (!http->option.range.bof && http->option.range.eof)
-			tb_sstring_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
+			tb_static_string_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
 		else if (http->option.range.bof > http->option.range.eof)
 		{
 			http->status.state = TB_STATE_HTTP_RANGE_INVALID;
 			break;
 		}
 
-		if (tb_sstring_size(&value)) 
-			tb_hash_set(http->option.head, "Range", tb_sstring_cstr(&value));
+		if (tb_static_string_size(&value)) 
+			tb_hash_set(http->option.head, "Range", tb_static_string_cstr(&value));
 
 		// init post
 		if (http->option.method == TB_HTTP_METHOD_POST)
@@ -378,8 +378,8 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 				tb_assert_and_check_break(post_size >= 0);
 
 				// append post size
-				tb_sstring_cstrfcpy(&value, "%lld", post_size);
-				tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&value));
+				tb_static_string_cstrfcpy(&value, "%lld", post_size);
+				tb_hash_set(http->option.head, "Content-Length", tb_static_string_cstr(&value));
 
 				// ok
 				post_ok = tb_true;
@@ -398,43 +398,43 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		tb_assert_and_check_break(tb_hash_size(http->option.head));
 
 		// append method
-		tb_pstring_cstrcat(&http->request, method);
+		tb_scoped_string_cstrcat(&http->request, method);
 
 		// append ' '
-		tb_pstring_chrcat(&http->request, ' ');
+		tb_scoped_string_chrcat(&http->request, ' ');
 
 		// append path
-		tb_pstring_cstrcat(&http->request, path);
+		tb_scoped_string_cstrcat(&http->request, path);
 
 		// append args if exists
 		if (args) 
 		{
-			tb_pstring_chrcat(&http->request, '?');
-			tb_pstring_cstrcat(&http->request, args);
+			tb_scoped_string_chrcat(&http->request, '?');
+			tb_scoped_string_cstrcat(&http->request, args);
 		}
 
 		// append ' '
-		tb_pstring_chrcat(&http->request, ' ');
+		tb_scoped_string_chrcat(&http->request, ' ');
 
 		// append version, HTTP/1.1
-		tb_pstring_cstrfcat(&http->request, "HTTP/1.%1u\r\n", http->status.balived? http->status.version : http->option.version);
+		tb_scoped_string_cstrfcat(&http->request, "HTTP/1.%1u\r\n", http->status.balived? http->status.version : http->option.version);
 
 		// append key: value
 		tb_for_all (tb_hash_item_t*, item, http->option.head)
 		{
 			if (item && item->name && item->data) 
-				tb_pstring_cstrfcat(&http->request, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
+				tb_scoped_string_cstrfcat(&http->request, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
 		}
 
 		// append end
-		tb_pstring_cstrcat(&http->request, "\r\n");
+		tb_scoped_string_cstrcat(&http->request, "\r\n");
 
 		// exit the head value
-		tb_sstring_exit(&value);
+		tb_static_string_exit(&value);
 
 		// the head data and size
-		tb_char_t const* 	head_data = tb_pstring_cstr(&http->request);
-		tb_size_t 			head_size = tb_pstring_size(&http->request);
+		tb_char_t const* 	head_data = tb_scoped_string_cstr(&http->request);
+		tb_size_t 			head_size = tb_scoped_string_size(&http->request);
 		tb_assert_and_check_break(head_data && head_size);
 		
 		// trace
@@ -578,8 +578,8 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
 		// parse content type
 		else if (!tb_strnicmp(line, "Content-Type", 12)) 
 		{
-			tb_pstring_cstrcpy(&http->status.content_type, p);
-			tb_assert_and_check_return_val(tb_pstring_size(&http->status.content_type), tb_false);
+			tb_scoped_string_cstrcpy(&http->status.content_type, p);
+			tb_assert_and_check_return_val(tb_scoped_string_size(&http->status.content_type), tb_false);
 		}
 		// parse transfer encoding
 		else if (!tb_strnicmp(line, "Transfer-Encoding", 17))
@@ -599,7 +599,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
 			tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 304, tb_false);
 
 			// save location
-			tb_pstring_cstrcpy(&http->status.location, p);
+			tb_scoped_string_cstrcpy(&http->status.location, p);
 		}
 		// parse connection
 		else if (!tb_strnicmp(line, "Connection", 10))
@@ -721,7 +721,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 
 	// done
 	tb_size_t i = 0;
-	for (i = 0; i < http->option.redirect && tb_pstring_size(&http->status.location); i++)
+	for (i = 0; i < http->option.redirect && tb_scoped_string_size(&http->status.location); i++)
 	{
 		// read the redirect content
 		if (http->status.content_size)
@@ -752,10 +752,10 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 		http->stream = http->sstream;
 
 		// trace
-		tb_trace_d("redirect: %s", tb_pstring_cstr(&http->status.location));
+		tb_trace_d("redirect: %s", tb_scoped_string_cstr(&http->status.location));
 
 		// set url
-		if (!tb_url_set(&http->option.url, tb_pstring_cstr(&http->status.location))) break;
+		if (!tb_url_set(&http->option.url, tb_scoped_string_cstr(&http->status.location))) break;
 
 		// connect it
 		if (!tb_http_connect(http)) break;
@@ -768,7 +768,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 	}
 
 	// ok?
-	return (i < http->option.redirect && tb_pstring_size(&http->status.location))? tb_false : tb_true;
+	return (i < http->option.redirect && tb_scoped_string_size(&http->status.location))? tb_false : tb_true;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -795,7 +795,7 @@ tb_handle_t tb_http_init()
 		tb_assert_and_check_break(http->pool);
 
 		// init line data
-		if (!tb_pstring_init(&http->request)) break;
+		if (!tb_scoped_string_init(&http->request)) break;
 
 		// init option
 		if (!tb_http_option_init(http)) break;
@@ -858,7 +858,7 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 	tb_http_option_exit(http);
 
 	// exit line data
-	tb_pstring_exit(&http->request);
+	tb_scoped_string_exit(&http->request);
 
 	// exit pool
 	if (http->pool) tb_block_pool_exit(http->pool);

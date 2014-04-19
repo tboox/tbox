@@ -80,16 +80,16 @@ typedef struct __tb_url_t
 	tb_ipv4_t 		ipv4;
 
 	// the host
-	tb_sstring_t 	host;
+	tb_static_string_t 	host;
 
 	// the path
-	tb_sstring_t 	path;
+	tb_static_string_t 	path;
 
 	// the urls
-	tb_pstring_t 	urls;
+	tb_scoped_string_t 	urls;
 
 	// the args
-	tb_pstring_t 	args;
+	tb_scoped_string_t 	args;
 
 	// the data
 	tb_char_t 		data[TB_URL_HOST_MAX + TB_URL_PATH_MAX];

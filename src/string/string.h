@@ -28,8 +28,8 @@
  * includes
  */
 #include "prefix.h"
-#include "pstring.h"
-#include "sstring.h"
+#include "scoped_string.h"
+#include "static_string.h"
 
 #endif
 

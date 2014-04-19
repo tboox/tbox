@@ -289,13 +289,13 @@ typedef struct __tb_astream_t
 	} 							wcache_and;
 
 	/// the read cache data
-	tb_pbuffer_t 				rcache_data;
+	tb_scoped_buffer_t 				rcache_data;
 
 	/// the read cache maxn
 	tb_size_t 					rcache_maxn;
 
 	/// the writ cache data
-	tb_pbuffer_t 				wcache_data;
+	tb_scoped_buffer_t 				wcache_data;
 
 	/// the writ cache maxn
 	tb_size_t 					wcache_maxn;
