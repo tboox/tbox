@@ -20,7 +20,7 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_PLATFROM_ARCH_ARM_PREFIX_H
+#ifndef TB_PLATFORM_ARCH_ARM_PREFIX_H
 #define TB_PLATFORM_ARCH_ARM_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////

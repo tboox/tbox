@@ -133,10 +133,12 @@
 # 	endif
 # 	if defined(__SSE2__)
 # 		define TB_ARCH_SSE2
+# 		undef TB_ARCH_STRING_2
 # 		define TB_ARCH_STRING_2 			"_sse2"
 # 	endif
 # 	if defined(__SSE3__)
 # 		define TB_ARCH_SSE3
+# 		undef TB_ARCH_STRING_2
 # 		define TB_ARCH_STRING_2 			"_sse3"
 # 	endif
 #endif

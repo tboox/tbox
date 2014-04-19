@@ -20,8 +20,8 @@
  * @file		syscall.h
  * @ingroup 	platform
  */
-#ifndef TB_PLATFROM_UNIX_SYSCALL_H
-#define TB_PLATFROM_UNIX_SYSCALL_H
+#ifndef TB_PLATFORM_UNIX_SYSCALL_H
+#define TB_PLATFORM_UNIX_SYSCALL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
