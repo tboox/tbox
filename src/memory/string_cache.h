@@ -21,8 +21,8 @@
  * @ingroup 	memory
  *
  */
-#ifndef TB_MEMORY_string_cache_H
-#define TB_MEMORY_string_cache_H
+#ifndef TB_MEMORY_STRING_CACHE_H
+#define TB_MEMORY_STRING_CACHE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -43,10 +43,12 @@
  */
 tb_bool_t 			tb_string_cache_init(tb_size_t align);
 
-/// exit scache
+/*! exit the string cache
+ */
 tb_void_t 			tb_string_cache_exit(tb_noarg_t);
 
-/// clear scache
+/*! clear the string cache
+ */
 tb_void_t 			tb_string_cache_clear(tb_noarg_t);
 
 /*! put string to scache
@@ -63,7 +65,10 @@ tb_char_t const*	tb_string_cache_put(tb_char_t const* data);
  */
 tb_void_t 			tb_string_cache_del(tb_char_t const* data);
 
-/// dump scache
+#ifdef __tb_debug__
+/*! dump the string cache
+ */
 tb_void_t 			tb_string_cache_dump(tb_noarg_t);
+#endif
 
 #endif

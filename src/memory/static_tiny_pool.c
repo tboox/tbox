@@ -128,31 +128,31 @@ typedef struct __tb_tiny_pool_info_t
 typedef struct __tb_tiny_pool_t
 {
 	/// the magic 
-	tb_size_t 			magic 	: 16;
+	tb_size_t 				magic 	: 16;
 
 	/// the align
-	tb_size_t 			align 	: 7;
+	tb_size_t 				align 	: 7;
 
 	/// the step
-	tb_size_t 			step 	: 7;
+	tb_size_t 				step 	: 7;
 
 	/// the full
-	tb_size_t 			full 	: 1;
+	tb_size_t 				full 	: 1;
 
 	/// the body
-	tb_size_t* 			body;
+	tb_size_t* 				body;
 
 	/// the last
-	tb_size_t* 			last;
+	tb_size_t* 				last;
 
 	/// the maxn
-	tb_size_t 			maxn;
+	tb_size_t 				maxn;
 
 	/// the data
-	tb_byte_t* 			data;
+	tb_byte_t* 				data;
 
 	/// the pred
-	tb_size_t 			pred[TB_STATIC_TINY_POOL_BLOCK_MAXN];
+	tb_size_t 				pred[TB_STATIC_TINY_POOL_BLOCK_MAXN];
 
 	/// the info
 #ifdef __tb_debug__

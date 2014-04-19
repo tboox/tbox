@@ -58,40 +58,110 @@
  * interfaces
  */
 
-// init
-tb_handle_t 	tb_block_pool_init(tb_size_t grow, tb_size_t align);
+/*! init the block pool
+ * 
+ * @param grow 		the pool grow size
+ * @param align 	the pool bytes align, using the cpu-aligned if be zero
+ *
+ * @return 			the pool handle
+ */
+tb_handle_t 		tb_block_pool_init(tb_size_t grow, tb_size_t align);
 
-// exit
-tb_void_t 		tb_block_pool_exit(tb_handle_t handle);
+/*! exit the block pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_block_pool_exit(tb_handle_t handle);
 
-// clear
-tb_void_t 		tb_block_pool_clear(tb_handle_t handle);
+/*! clear the block pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_block_pool_clear(tb_handle_t handle);
 
-// malloc
-tb_pointer_t 	tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory
+ *
+ * @param handle 	the pool handle
+ * @param size 		the size
+ *
+ * @return 			the data address
+ */
+tb_pointer_t 		tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
-// malloc0
-tb_pointer_t 	tb_block_pool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory and fill zero 
+ *
+ * @param handle 	the pool handle
+ * @param size 		the size
+ *
+ * @return 			the data address
+ */
+tb_pointer_t 		tb_block_pool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
-// nalloc
-tb_pointer_t  	tb_block_pool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory with the item count
+ *
+ * @param handle 	the pool handle
+ * @param item 		the item count
+ * @param size 		the item size
+ *
+ * @return 			the data address
+ */
+tb_pointer_t  		tb_block_pool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
-// nalloc0
-tb_pointer_t  	tb_block_pool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory with the item count and fill zero
+ *
+ * @param handle 	the pool handle
+ * @param item 		the item count
+ * @param size 		the item size
+ *
+ * @return 			the data address
+ */
+tb_pointer_t  		tb_block_pool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
-// ralloc
-tb_pointer_t 	tb_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+/*! realloc the memory
+ *
+ * @param handle 	the pool handle
+ * @param data 		the data address
+ * @param size 		the data size
+ *
+ * @return 			the new data address
+ */
+tb_pointer_t 		tb_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
-// strdup
-tb_char_t* 		tb_block_pool_strdup_impl(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__);
+/*! duplicate the string memory
+ *
+ * @param handle 	the pool handle
+ * @param data 		the string data address
+ *
+ * @return 			the new string address
+ */
+tb_char_t* 			tb_block_pool_strdup_impl(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__);
 
-// strndup
-tb_char_t* 		tb_block_pool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
+/*! duplicate the string memory with the given size
+ *
+ * @param handle 	the pool handle
+ * @param data 		the string data address
+ * @param size 		the string size
+ *
+ * @return 			the new string address
+ */
+tb_char_t* 			tb_block_pool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
 
-// free
-tb_bool_t 		tb_block_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
+/*! free the memory
+ *
+ * @param handle 	the pool handle
+ * @param data 		the data address
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_block_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
 
-// dump
-tb_void_t 		tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
+#ifdef __tb_debug__
+/*! dump the block pool
+ *
+ * @param handle 	the pool handle
+ * @param prefix 	the trace prefix
+ */
+tb_void_t 			tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
+#endif
 
 #endif

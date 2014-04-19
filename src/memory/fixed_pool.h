@@ -46,7 +46,7 @@
  * interfaces
  */
 
-/*! init regular pool
+/*! init fixed pool
  *
  * @param grow 		the grow
  * @param step 		the step
@@ -56,13 +56,13 @@
  */
 tb_handle_t 		tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align);
 
-/*! exit regular pool
+/*! exit fixed pool
  *
  * @param handle 	the pool handle
  */
 tb_void_t 			tb_fixed_pool_exit(tb_handle_t handle);
 
-/*! the regular pool item count
+/*! the fixed pool item count
  *
  * @param handle 	the pool handle
  *
@@ -70,13 +70,13 @@ tb_void_t 			tb_fixed_pool_exit(tb_handle_t handle);
  */
 tb_size_t 			tb_fixed_pool_size(tb_handle_t handle);
 
-/*! clear regular pool
+/*! clear fixed pool
  *
  * @param handle 	the pool handle
  */
 tb_void_t 			tb_fixed_pool_clear(tb_handle_t handle);
 
-/*! malloc regular pool data
+/*! malloc fixed pool data
  *
  * @param handle 	the pool handle
  * 
@@ -84,7 +84,7 @@ tb_void_t 			tb_fixed_pool_clear(tb_handle_t handle);
  */
 tb_pointer_t 		tb_fixed_pool_malloc(tb_handle_t handle);
 
-/*! malloc regular pool data and clear it
+/*! malloc fixed pool data and clear it
  *
  * @param handle 	the pool handle
  *
@@ -92,7 +92,7 @@ tb_pointer_t 		tb_fixed_pool_malloc(tb_handle_t handle);
  */
 tb_pointer_t 		tb_fixed_pool_malloc0(tb_handle_t handle);
 
-/*! duplicate regular pool data 
+/*! duplicate fixed pool data 
  *
  * @param handle 	the pool handle
  * @param data		the data pointer
@@ -101,7 +101,7 @@ tb_pointer_t 		tb_fixed_pool_malloc0(tb_handle_t handle);
  */
 tb_pointer_t 		tb_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data);
 
-/*! free regular pool data
+/*! free fixed pool data
  *
  * @param handle 	the pool handle
  * @param data 		the pool item data
@@ -110,7 +110,7 @@ tb_pointer_t 		tb_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data);
  */
 tb_bool_t 			tb_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
 
-/*! walk regular pool item
+/*! walk fixed pool item
  *
  * @code
  * tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_pointer_t data)
@@ -134,10 +134,12 @@ tb_bool_t 			tb_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
  */
 tb_void_t 			tb_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data);
 
-/*! dump regular pool
+#ifdef __tb_debug__
+/*! dump fixed pool
  *
  * @param handle 	the pool handle
  */
 tb_void_t 			tb_fixed_pool_dump(tb_handle_t handle);
+#endif
 
 #endif

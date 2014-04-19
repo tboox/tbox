@@ -122,11 +122,13 @@ tb_bool_t 			tb_static_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
  */
 tb_void_t 			tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data);
 
+#ifdef __tb_debug__
 /*! dump pool
  *
  * @param handle 	the pool handle
  */
 tb_void_t 			tb_static_fixed_pool_dump(tb_handle_t handle);
+#endif
 
 
 #endif

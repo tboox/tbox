@@ -47,25 +47,25 @@
 typedef struct __tb_static_block_pool_info_t
 {
 	// the used size
-	tb_size_t 			used;
+	tb_size_t 					used;
 
 	// the peak size
-	tb_size_t 			peak;
+	tb_size_t 					peak;
 
 	// the need size
-	tb_size_t 			need;
+	tb_size_t 					need;
 
 	// the real size
-	tb_size_t 			real;
+	tb_size_t 					real;
 
 	// the fail count
-	tb_size_t 			fail;
+	tb_size_t 					fail;
 
 	// the pred count
-	tb_size_t 			pred;
+	tb_size_t 					pred;
 
 	// the aloc count
-	tb_size_t 			aloc;
+	tb_size_t 					aloc;
 
 }tb_static_block_pool_info_t;
 #endif
@@ -76,30 +76,30 @@ typedef struct __tb_static_block_pool_block_t
 #ifdef __tb_debug__
 
 	/// the magic
-	tb_uint16_t 		magic;
+	tb_uint16_t 				magic;
 
 	/// the line 
-	tb_uint16_t 		line;
+	tb_uint16_t 				line;
 
 	/// the real 
-	tb_uint32_t 		real;
+	tb_uint32_t 				real;
 
 	/// the file
-	tb_char_t const* 	file;
+	tb_char_t const* 			file;
 
 	/// the func
-	tb_char_t const* 	func;
+	tb_char_t const* 			func;
 
 	/// the frames
-	tb_cpointer_t 		frames[16];
+	tb_pointer_t 				frames[16];
 
 #endif
 
 	/// the block size
-	tb_uint32_t 		size 	: 31;
+	tb_uint32_t 				size 	: 31;
 
 	/// is free?
-	tb_uint32_t 		free 	: 1;
+	tb_uint32_t 				free 	: 1;
 
 }tb_static_block_pool_block_t;
 
@@ -114,29 +114,29 @@ typedef struct __tb_static_block_pool_block_t
 typedef struct __tb_static_block_pool_t
 {
 	// the magic 
-	tb_uint16_t 		magic;
+	tb_uint16_t 				magic;
 
 	// the align
-	tb_uint16_t 		align;
+	tb_uint16_t 				align;
 
 	// the nhead
-	tb_uint16_t 		nhead;
+	tb_uint16_t 				nhead;
 
 	// the pred
-	tb_byte_t* 			pred;
+	tb_byte_t* 					pred;
 
 	// the data
-	tb_byte_t* 			data;
+	tb_byte_t* 					data;
 
 	// the size
-	tb_size_t 			size;
+	tb_size_t 					size;
 
 	// the full
-	tb_size_t 			full;
+	tb_size_t 					full;
 	
 	// the info 
 #ifdef __tb_debug__
-	tb_static_block_pool_info_t 	info;
+	tb_static_block_pool_info_t info;
 #endif
 
 }tb_static_block_pool_t;
@@ -995,10 +995,10 @@ tb_void_t tb_static_block_pool_data_dump(tb_handle_t handle, tb_cpointer_t data,
 	tb_check_return(data);
 
 	// is this pool?
-	tb_check_return(data >= (tb_byte_t const*)pool->data + pool->nhead && data < (tb_byte_t const*)pool->data + pool->size);
+	tb_check_return((tb_byte_t*)data >= (tb_byte_t*)pool->data + pool->nhead && (tb_byte_t*)data < (tb_byte_t*)pool->data + pool->size);
 
 	// the data block
-	tb_static_block_pool_block_t const* block = ((tb_static_block_pool_block_t const*)((tb_byte_t const*)data - pool->nhead));
+	tb_static_block_pool_block_t* block = ((tb_static_block_pool_block_t*)((tb_byte_t*)data - pool->nhead));
 
 	// check magic
 	tb_check_return(block->magic == TB_STATIC_BLOCK_POOL_MAGIC && !block->free);
@@ -1015,7 +1015,7 @@ tb_void_t tb_static_block_pool_data_dump(tb_handle_t handle, tb_cpointer_t data,
 
 	// dump backtrace
 	tb_char_t tag[1024] = {0};
-	tb_snprintf(tag, "%s:     ", prefix);
+	tb_snprintf(tag, sizeof(tag) - 1, "%s:     ", prefix);
 	tb_static_block_pool_dump_backtrace(tag, block);
 
 	// dump data
@@ -1090,14 +1090,14 @@ tb_void_t tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 //	tb_trace_i("%s: nhead: %lu", 		prefix, pool->nhead);
 	tb_trace_i("%s: align: %lu", 		prefix, pool->align);
 //	tb_trace_i("%s: head: %lu", 		prefix, pool->data - (tb_byte_t*)pool);
-//	tb_trace_i("%s: data: %p", 		prefix, pool->data);
+//	tb_trace_i("%s: data: %p", 			prefix, pool->data);
 	tb_trace_i("%s: size: %lu", 		prefix, pool->size);
-	tb_trace_i("%s: full: %s", 		prefix, pool->full? "true" : "false");
+	tb_trace_i("%s: full: %s", 			prefix, pool->full? "true" : "false");
 	tb_trace_i("%s: used: %lu", 		prefix, pool->info.used);
 	tb_trace_i("%s: peak: %lu", 		prefix, pool->info.peak);
-	tb_trace_i("%s: wast: %lu%%", 	prefix, (pool->info.real + (pool->data - (tb_byte_t*)pool) - pool->info.need) * 100 / (pool->info.real + (pool->data - (tb_byte_t*)pool)));
+	tb_trace_i("%s: wast: %lu%%", 		prefix, (pool->info.real + (pool->data - (tb_byte_t*)pool) - pool->info.need) * 100 / (pool->info.real + (pool->data - (tb_byte_t*)pool)));
 	tb_trace_i("%s: fail: %lu", 		prefix, pool->info.fail);
-	tb_trace_i("%s: pred: %lu%%", 	prefix, pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
+	tb_trace_i("%s: pred: %lu%%", 		prefix, pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
 	tb_trace_i("%s: frag: %lu", 		prefix, frag);
 }
 #endif
