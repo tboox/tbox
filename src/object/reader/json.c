@@ -70,7 +70,7 @@ static tb_object_t* tb_object_json_reader_func_null(tb_object_json_reader_t* rea
 	{
 		// need one character
 		tb_byte_t* p = tb_null;
-		if (!tb_gstream_need(reader->stream, &p, 1) && p) goto end;
+		if (!tb_basic_stream_need(reader->stream, &p, 1) && p) goto end;
 
 		// the character
 		tb_char_t ch = *p;
@@ -80,7 +80,7 @@ static tb_object_t* tb_object_json_reader_func_null(tb_object_json_reader_t* rea
 		else break;
 
 		// skip it
-		tb_gstream_skip(reader->stream, 1);
+		tb_basic_stream_skip(reader->stream, 1);
 	}
 
 	// check
@@ -115,7 +115,7 @@ static tb_object_t* tb_object_json_reader_func_array(tb_object_json_reader_t* re
 	while (tb_stream_left(reader->stream)) 
 	{
 		// read one character
-		ch = tb_gstream_bread_s8(reader->stream);
+		ch = tb_basic_stream_bread_s8(reader->stream);
 
 		// end?
 		if (ch == ']') break;
@@ -164,7 +164,7 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 	while (tb_stream_left(reader->stream)) 
 	{
 		// read one character
-		ch = tb_gstream_bread_s8(reader->stream);
+		ch = tb_basic_stream_bread_s8(reader->stream);
 
 		// end?
 		if (ch == '\"' || ch == '\'') break;
@@ -172,16 +172,16 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 		else if (ch == '\\')
 		{
 			// read one character
-			ch = tb_gstream_bread_s8(reader->stream);
+			ch = tb_basic_stream_bread_s8(reader->stream);
 			// unicode?
 			if (ch == 'u')
 			{
 				// the unicode string
 				tb_char_t unicode_str[5];
-				unicode_str[0] = tb_gstream_bread_s8(reader->stream);
-				unicode_str[1] = tb_gstream_bread_s8(reader->stream);
-				unicode_str[2] = tb_gstream_bread_s8(reader->stream);
-				unicode_str[3] = tb_gstream_bread_s8(reader->stream);
+				unicode_str[0] = tb_basic_stream_bread_s8(reader->stream);
+				unicode_str[1] = tb_basic_stream_bread_s8(reader->stream);
+				unicode_str[2] = tb_basic_stream_bread_s8(reader->stream);
+				unicode_str[3] = tb_basic_stream_bread_s8(reader->stream);
 				unicode_str[4] = '\0';
 
 				// the unicode value
@@ -189,12 +189,12 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 
 				// the utf8 stream
 				tb_char_t 		utf8_data[16] = {0};
-				tb_bstream_t 	utf8_stream;
-				tb_bstream_init(&utf8_stream, (tb_byte_t*)utf8_data, sizeof(utf8_data));
+				tb_bits_stream_t 	utf8_stream;
+				tb_bits_stream_init(&utf8_stream, (tb_byte_t*)utf8_data, sizeof(utf8_data));
 
 				// the unicode stream
-				tb_bstream_t 	unicode_stream = {0};
-				tb_bstream_init(&unicode_stream, (tb_byte_t*)&unicode_val, 2);
+				tb_bits_stream_t 	unicode_stream = {0};
+				tb_bits_stream_init(&unicode_stream, (tb_byte_t*)&unicode_val, 2);
 
 				// unicode to utf8
 				tb_long_t utf8_size = tb_charset_conv_bst(TB_CHARSET_TYPE_UCS2 | TB_CHARSET_TYPE_NE, TB_CHARSET_TYPE_UTF8, &unicode_stream, &utf8_stream);
@@ -242,7 +242,7 @@ static tb_object_t* tb_object_json_reader_func_number(tb_object_json_reader_t* r
 	{
 		// need one character
 		tb_byte_t* p = tb_null;
-		if (!tb_gstream_need(reader->stream, &p, 1) && p) goto end;
+		if (!tb_basic_stream_need(reader->stream, &p, 1) && p) goto end;
 
 		// the character
 		tb_char_t ch = *p;
@@ -257,7 +257,7 @@ static tb_object_t* tb_object_json_reader_func_number(tb_object_json_reader_t* r
 		else break;
 
 		// skip it
-		tb_gstream_skip(reader->stream, 1);
+		tb_basic_stream_skip(reader->stream, 1);
 	}
 
 	// check
@@ -329,7 +329,7 @@ static tb_object_t* tb_object_json_reader_func_boolean(tb_object_json_reader_t* 
 	{
 		// need one character
 		tb_byte_t* p = tb_null;
-		if (!tb_gstream_need(reader->stream, &p, 1) && p) goto end;
+		if (!tb_basic_stream_need(reader->stream, &p, 1) && p) goto end;
 
 		// the character
 		tb_char_t ch = *p;
@@ -339,7 +339,7 @@ static tb_object_t* tb_object_json_reader_func_boolean(tb_object_json_reader_t* 
 		else break;
 
 		// skip it
-		tb_gstream_skip(reader->stream, 1);
+		tb_basic_stream_skip(reader->stream, 1);
 	}
 
 	// check
@@ -383,7 +383,7 @@ static tb_object_t* tb_object_json_reader_func_dictionary(tb_object_json_reader_
 	while (tb_stream_left(reader->stream)) 
 	{
 		// read one character
-		ch = tb_gstream_bread_s8(reader->stream);
+		ch = tb_basic_stream_bread_s8(reader->stream);
 
 		// end?
 		if (ch == '}') break;
@@ -443,7 +443,7 @@ end:
 	// ok?
 	return dictionary;
 }
-static tb_object_t* tb_object_json_reader_done(tb_gstream_t* stream)
+static tb_object_t* tb_object_json_reader_done(tb_basic_stream_t* stream)
 {
 	// check
 	tb_assert_and_check_return_val(stream, tb_null);
@@ -456,7 +456,7 @@ static tb_object_t* tb_object_json_reader_done(tb_gstream_t* stream)
 	tb_char_t type;
 	while (tb_stream_left(stream)) 
 	{
-		type = tb_gstream_bread_s8(stream);
+		type = tb_basic_stream_bread_s8(stream);
 		if (!tb_isspace(type)) break;
 	}
 
@@ -470,14 +470,14 @@ static tb_object_t* tb_object_json_reader_done(tb_gstream_t* stream)
 	// read it
 	return func(&reader, type);
 }
-static tb_size_t tb_object_json_reader_probe(tb_gstream_t* stream)
+static tb_size_t tb_object_json_reader_probe(tb_basic_stream_t* stream)
 {
 	// check
 	tb_assert_and_check_return_val(stream, 0);
 
 	// need it
 	tb_byte_t* 	p = tb_null;
-	if (!tb_gstream_need(stream, &p, 5)) return 0;
+	if (!tb_basic_stream_need(stream, &p, 5)) return 0;
 	tb_assert_and_check_return_val(p, 0);
 
 	// probe it

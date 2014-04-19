@@ -57,16 +57,16 @@ typedef struct __tb_http_t
 	tb_http_status_t 	status;
 
 	// the stream
-	tb_gstream_t* 		stream;
+	tb_basic_stream_t* 		stream;
 
 	// the sstream for sock
-	tb_gstream_t* 		sstream;
+	tb_basic_stream_t* 		sstream;
 
 	// the cstream for chunked
-	tb_gstream_t* 		cstream;
+	tb_basic_stream_t* 		cstream;
 
 	// the zstream for gzip/deflate
-	tb_gstream_t* 		zstream;
+	tb_basic_stream_t* 		zstream;
 
 	// is opened?
 	tb_bool_t 			bopened;
@@ -262,7 +262,7 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 		tb_http_status_cler(http, host_changed);
 
 		// open stream
-		if (!tb_gstream_open(http->stream)) break;
+		if (!tb_basic_stream_open(http->stream)) break;
 
 		// trace
 		tb_trace_d("connect: ok");
@@ -274,7 +274,7 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 
 
 	// failed? save state
-	if (!ok) http->status.state = tb_gstream_state(http->stream);
+	if (!ok) http->status.state = tb_basic_stream_state(http->stream);
 
 	// ok?
 	return ok;
@@ -302,7 +302,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 
 	// done
 	tb_bool_t 		ok = tb_false;
-	tb_gstream_t* 	pstream = tb_null;
+	tb_basic_stream_t* 	pstream = tb_null;
 	tb_hong_t 		post_size = 0;
 	do
 	{
@@ -366,12 +366,12 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 				// init pstream
 				tb_char_t const* url = tb_url_get(&http->option.post_url);
 				if (http->option.post_data && http->option.post_size)
-					pstream = tb_gstream_init_from_data(http->option.post_data, http->option.post_size);
-				else if (url) pstream = tb_gstream_init_from_url(url);
+					pstream = tb_basic_stream_init_from_data(http->option.post_data, http->option.post_size);
+				else if (url) pstream = tb_basic_stream_init_from_url(url);
 				tb_assert_and_check_break(pstream);
 
 				// open pstream
-				if (!tb_gstream_open(pstream)) break;
+				if (!tb_basic_stream_open(pstream)) break;
 
 				// the post size
 				post_size = tb_stream_size(pstream);
@@ -441,13 +441,13 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		tb_trace_d("request[%lu]:\n%s", head_size, head_data);
 
 		// writ request
-		if (!tb_gstream_bwrit(http->stream, (tb_byte_t const*)head_data, head_size)) break;
+		if (!tb_basic_stream_bwrit(http->stream, (tb_byte_t const*)head_data, head_size)) break;
 
 		// writ post
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
 			// post stream
-			if (tb_tstream_save_gg(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
+			if (tb_transfer_stream_save_gg(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
 			{
 				http->status.state = TB_STATE_HTTP_POST_FAILED;
 				break;
@@ -455,7 +455,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		}
 
 		// sync request
-		if (!tb_gstream_sync(http->stream, tb_false)) break;
+		if (!tb_basic_stream_sync(http->stream, tb_false)) break;
 	
 		// ok
 		ok = tb_true;
@@ -466,7 +466,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 	if (!ok && !http->status.state) http->status.state = TB_STATE_HTTP_REQUEST_FAILED;
 
 	// exit pstream
-	if (pstream) tb_gstream_exit(pstream);
+	if (pstream) tb_basic_stream_exit(pstream);
 	pstream = tb_null;
 
 	// ok?
@@ -628,7 +628,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 		tb_char_t line[8192];
 		tb_long_t real = 0;
 		tb_size_t indx = 0;
-		while ((real = tb_gstream_bread_line(http->stream, line, sizeof(line) - 1)) >= 0)
+		while ((real = tb_basic_stream_bread_line(http->stream, line, sizeof(line) - 1)) >= 0)
 		{
 			// trace
 			tb_trace_d("response: %s", line);
@@ -647,11 +647,11 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 					{
 						if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
 					}
-					else http->cstream = tb_gstream_init_filter_from_chunked(http->stream, tb_true);
+					else http->cstream = tb_basic_stream_init_filter_from_chunked(http->stream, tb_true);
 					tb_assert_and_check_break(http->cstream);
 
 					// open cstream, need not async
-					if (!tb_gstream_open(http->cstream)) break;
+					if (!tb_basic_stream_open(http->cstream)) break;
 
 					// using cstream
 					http->stream = http->cstream;
@@ -668,7 +668,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 					{
 						if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
 					}
-					else http->zstream = tb_gstream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+					else http->zstream = tb_basic_stream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 					tb_assert_and_check_break(http->zstream);
 
 					// the filter
@@ -683,7 +683,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 					if (http->status.content_size) tb_filter_limit(filter, http->status.content_size);
 
 					// open zstream, need not async
-					if (!tb_gstream_open(http->zstream)) break;
+					if (!tb_basic_stream_open(http->zstream)) break;
 
 					// using zstream
 					http->stream = http->zstream;
@@ -726,16 +726,16 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 		// read the redirect content
 		if (http->status.content_size)
 		{
-			tb_byte_t data[TB_GSTREAM_BLOCK_MAXN];
+			tb_byte_t data[TB_BASIC_STREAM_BLOCK_MAXN];
 			tb_hize_t read = 0;
 			tb_hize_t size = http->status.content_size;
 			while (read < size)	
 			{
 				// the need
-				tb_size_t need = tb_min(size - read, TB_GSTREAM_BLOCK_MAXN);
+				tb_size_t need = tb_min(size - read, TB_BASIC_STREAM_BLOCK_MAXN);
 
 				// read it
-				if (!tb_gstream_bread(http->stream, data, need)) break;
+				if (!tb_basic_stream_bread(http->stream, data, need)) break;
 
 				// save size
 				read += need;
@@ -746,7 +746,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 		}
 
 		// close stream
-		if (http->stream && !tb_gstream_clos(http->stream)) break;
+		if (http->stream && !tb_basic_stream_clos(http->stream)) break;
 
 		// switch to sstream
 		http->stream = http->sstream;
@@ -787,7 +787,7 @@ tb_handle_t tb_http_init()
 		tb_assert_and_check_break(http);
 
 		// init stream
-		http->stream = http->sstream = tb_gstream_init_sock();
+		http->stream = http->sstream = tb_basic_stream_init_sock();
 		tb_assert_and_check_break(http->stream);
 
 		// init pool
@@ -837,15 +837,15 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 	tb_http_clos(handle);
 
 	// exit zstream
-	if (http->zstream) tb_gstream_exit(http->zstream);
+	if (http->zstream) tb_basic_stream_exit(http->zstream);
 	http->zstream = tb_null;
 
 	// exit cstream
-	if (http->cstream) tb_gstream_exit(http->cstream);
+	if (http->cstream) tb_basic_stream_exit(http->cstream);
 	http->cstream = tb_null;
 
 	// exit sstream
-	if (http->sstream) tb_gstream_exit(http->sstream);
+	if (http->sstream) tb_basic_stream_exit(http->sstream);
 	http->sstream = tb_null;
 
 	// exit stream
@@ -877,10 +877,10 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout)
 	tb_assert_and_check_return_val(http->bopened, -1);
 
 	// wait it
-	tb_long_t wait = tb_gstream_wait(http->stream, aioe, timeout);
+	tb_long_t wait = tb_basic_stream_wait(http->stream, aioe, timeout);
 
 	// failed? save state
-	if (wait < 0 && !http->status.state) http->status.state = tb_gstream_state(http->stream);
+	if (wait < 0 && !http->status.state) http->status.state = tb_basic_stream_state(http->stream);
 
 	// ok?
 	return wait;
@@ -922,7 +922,7 @@ tb_bool_t tb_http_clos(tb_handle_t handle)
 	tb_check_return_val(http->bopened, tb_true);
 
 	// close stream
-	if (http->stream && !tb_gstream_clos(http->stream)) return tb_false;
+	if (http->stream && !tb_basic_stream_clos(http->stream)) return tb_false;
 
 	// switch to sstream
 	http->stream = http->sstream;
@@ -950,7 +950,7 @@ tb_bool_t tb_http_seek(tb_handle_t handle, tb_hize_t offset)
 	do
 	{
 		// close stream
-		if (http->stream && !tb_gstream_clos(http->stream)) break;
+		if (http->stream && !tb_basic_stream_clos(http->stream)) break;
 
 		// switch to sstream
 		http->stream = http->sstream;
@@ -989,7 +989,7 @@ tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(http->bopened, -1);
 
 	// read
-	return tb_gstream_aread(http->stream, data, size);
+	return tb_basic_stream_aread(http->stream, data, size);
 }
 tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {	
@@ -1005,7 +1005,7 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	while (read < size)
 	{
 		// read data
-		tb_long_t real = tb_gstream_aread(http->stream, data + read, size - read);
+		tb_long_t real = tb_basic_stream_aread(http->stream, data + read, size - read);
 
 		// update size
 		if (real > 0) read += real;

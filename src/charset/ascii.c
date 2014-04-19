@@ -31,17 +31,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_charset_ascii_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ascii_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_ascii_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ascii_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch)
 {
-	*ch = tb_bstream_get_u8(bst);
+	*ch = tb_bits_stream_get_u8(bst);
 	return 1;
 }
 
-tb_long_t tb_charset_ascii_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_ascii_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_ascii_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ascii_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch)
 {
-	if (ch <= 0xff) tb_bstream_set_u8(bst, (tb_uint8_t)ch);
+	if (ch <= 0xff) tb_bits_stream_set_u8(bst, (tb_uint8_t)ch);
 	return 1;
 }
 

@@ -70,16 +70,16 @@ static __tb_inline__ tb_filter_chunked_t* tb_filter_chunked_cast(tb_filter_t* fi
  * ---------------------- ------------------------- ---------
  *        chunk0                  chunk1               end
  */
-static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istream, tb_bstream_t* ostream, tb_long_t sync)
+static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bits_stream_t* istream, tb_bits_stream_t* ostream, tb_long_t sync)
 {
 	// check
 	tb_filter_chunked_t* cfilter = tb_filter_chunked_cast(filter);
 	tb_assert_and_check_return_val(cfilter && istream && ostream, -1);
-	tb_assert_and_check_return_val(tb_bstream_valid(istream) && tb_bstream_valid(ostream), -1);
+	tb_assert_and_check_return_val(tb_bits_stream_valid(istream) && tb_bits_stream_valid(ostream), -1);
 
 	// the idata
-	tb_byte_t const* 	ip = tb_bstream_pos(istream);
-	tb_byte_t const* 	ie = tb_bstream_end(istream);
+	tb_byte_t const* 	ip = tb_bits_stream_pos(istream);
+	tb_byte_t const* 	ie = tb_bits_stream_end(istream);
 
 	// find the eof: '\r\n 0\r\n\r\n'
 	if ( 	!filter->beof
@@ -97,11 +97,11 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 	}
 
 	// trace
-	tb_trace_d("isize: %lu, beof: %d", tb_bstream_size(istream), filter->beof);
+	tb_trace_d("isize: %lu, beof: %d", tb_bits_stream_size(istream), filter->beof);
 
 	// the odata
-	tb_byte_t* 			op = (tb_byte_t*)tb_bstream_pos(ostream);
-	tb_byte_t* 			oe = (tb_byte_t*)tb_bstream_end(ostream);
+	tb_byte_t* 			op = (tb_byte_t*)tb_bits_stream_pos(ostream);
+	tb_byte_t* 			oe = (tb_byte_t*)tb_bits_stream_end(ostream);
 	tb_byte_t* 			ob = op;
 
 	// parse chunked head and chunked tail
@@ -199,11 +199,11 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 end:
 
 	// update stream
-	tb_bstream_goto(istream, (tb_byte_t*)ip);
-	tb_bstream_goto(ostream, (tb_byte_t*)op);
+	tb_bits_stream_goto(istream, (tb_byte_t*)ip);
+	tb_bits_stream_goto(ostream, (tb_byte_t*)op);
 
 	// trace
-	tb_trace_d("read: %lu, beof: %u, ileft: %lu", cfilter->read, filter->beof, tb_bstream_left(istream));
+	tb_trace_d("read: %lu, beof: %u, ileft: %lu", cfilter->read, filter->beof, tb_bits_stream_left(istream));
 
 	// ok
 	return (op - ob);

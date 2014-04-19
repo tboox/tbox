@@ -78,7 +78,7 @@ tb_object_writer_t* tb_object_writer_get(tb_size_t format)
 	// ok
 	return g_writer[format];
 }
-tb_long_t tb_object_writer_done(tb_object_t* object, tb_gstream_t* stream, tb_size_t format)
+tb_long_t tb_object_writer_done(tb_object_t* object, tb_basic_stream_t* stream, tb_size_t format)
 {
 	// check
 	tb_assert_and_check_return_val(object && stream, -1);

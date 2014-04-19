@@ -54,20 +54,20 @@ static __tb_inline__ tb_filter_cache_t* tb_filter_cache_cast(tb_filter_t* filter
 	tb_assert_and_check_return_val(filter && filter->type == TB_FILTER_TYPE_CACHE, tb_null);
 	return (tb_filter_cache_t*)filter;
 }
-static tb_long_t tb_filter_cache_spak(tb_filter_t* filter, tb_bstream_t* istream, tb_bstream_t* ostream, tb_long_t sync)
+static tb_long_t tb_filter_cache_spak(tb_filter_t* filter, tb_bits_stream_t* istream, tb_bits_stream_t* ostream, tb_long_t sync)
 {
 	// check
 	tb_filter_cache_t* cfilter = tb_filter_cache_cast(filter);
 	tb_assert_and_check_return_val(cfilter && istream && ostream, -1);
-	tb_assert_and_check_return_val(tb_bstream_valid(istream) && tb_bstream_valid(ostream), -1);
+	tb_assert_and_check_return_val(tb_bits_stream_valid(istream) && tb_bits_stream_valid(ostream), -1);
 
 	// the idata
-	tb_byte_t const* 	ip = tb_bstream_pos(istream);
-	tb_byte_t const* 	ie = tb_bstream_end(istream);
+	tb_byte_t const* 	ip = tb_bits_stream_pos(istream);
+	tb_byte_t const* 	ie = tb_bits_stream_end(istream);
 
 	// the odata
-	tb_byte_t* 			op = (tb_byte_t*)tb_bstream_pos(ostream);
-	tb_byte_t* 			oe = (tb_byte_t*)tb_bstream_end(ostream);
+	tb_byte_t* 			op = (tb_byte_t*)tb_bits_stream_pos(ostream);
+	tb_byte_t* 			oe = (tb_byte_t*)tb_bits_stream_end(ostream);
 	tb_byte_t* 			ob = op;
 
 	// the need 
@@ -79,11 +79,11 @@ static tb_long_t tb_filter_cache_spak(tb_filter_t* filter, tb_bstream_t* istream
 	op += need;
 
 	// update stream
-	tb_bstream_goto(istream, (tb_byte_t*)ip);
-	tb_bstream_goto(ostream, (tb_byte_t*)op);
+	tb_bits_stream_goto(istream, (tb_byte_t*)ip);
+	tb_bits_stream_goto(ostream, (tb_byte_t*)op);
 
 	// no data and sync end? end
-	if (sync < 0 && op == ob && !tb_bstream_left(istream)) return -1;
+	if (sync < 0 && op == ob && !tb_bits_stream_left(istream)) return -1;
 
 	// ok
 	return (op - ob);

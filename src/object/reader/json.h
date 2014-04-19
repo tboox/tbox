@@ -37,7 +37,7 @@
 typedef struct __tb_object_json_reader_t
 {
 	/// the stream
-	tb_gstream_t* 				stream;
+	tb_basic_stream_t* 				stream;
 
 }tb_object_json_reader_t;
 

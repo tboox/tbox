@@ -99,7 +99,7 @@ tb_pointer_t 		tb_object_getp(tb_object_t* object);
  *
  * @return 			the object
  */
-tb_object_t* 		tb_object_read(tb_gstream_t* stream);
+tb_object_t* 		tb_object_read(tb_basic_stream_t* stream);
 
 /*! read object from url
  *
@@ -126,7 +126,7 @@ tb_object_t* 		tb_object_read_from_data(tb_byte_t const* data, tb_size_t size);
  *
  * @return 			the writed size, failed: -1
  */
-tb_long_t 			tb_object_writ(tb_object_t* object, tb_gstream_t* stream, tb_size_t format);
+tb_long_t 			tb_object_writ(tb_object_t* object, tb_basic_stream_t* stream, tb_size_t format);
 
 /*! writ object to url
  *

@@ -48,7 +48,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
 	// init
 	tb_handle_t 		aicp = tb_null;
 	tb_handle_t 		http = tb_null;
-	tb_astream_t* 		post = tb_null;
+	tb_async_stream_t* 		post = tb_null;
 
 	// init aicp
 	aicp = tb_aicp_init(3);
@@ -95,7 +95,7 @@ end:
 	if (http) tb_aicp_http_exit(http, tb_false);
 
 	// exit post
-	if (post) tb_astream_exit(post, tb_false);
+	if (post) tb_async_stream_exit(post, tb_false);
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);

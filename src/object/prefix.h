@@ -108,10 +108,10 @@ typedef struct __tb_object_reader_t
 	tb_hash_t* 				hooker;
 
 	/// probe format
-	tb_size_t 				(*probe)(tb_gstream_t* stream);
+	tb_size_t 				(*probe)(tb_basic_stream_t* stream);
 
 	/// read it
-	tb_object_t* 			(*read)(tb_gstream_t* stream);
+	tb_object_t* 			(*read)(tb_basic_stream_t* stream);
 
 }tb_object_reader_t;
 
@@ -122,7 +122,7 @@ typedef struct __tb_object_writer_t
 	tb_hash_t* 				hooker;
 
 	/// writ it
-	tb_long_t 				(*writ)(tb_gstream_t* stream, tb_object_t* object, tb_bool_t deflate);
+	tb_long_t 				(*writ)(tb_basic_stream_t* stream, tb_object_t* object, tb_bool_t deflate);
 
 }tb_object_writer_t;
 

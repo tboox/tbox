@@ -153,14 +153,14 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	tb_assert_and_check_return_val(odata && omaxn, -1);
 
 	// init stream
-	tb_bstream_t istream = {0};
-	tb_bstream_t ostream = {0};
+	tb_bits_stream_t istream = {0};
+	tb_bits_stream_t ostream = {0};
 	if (idata && isize) 
 	{
 		// @note istream maybe null for sync the end data
-		if (!tb_bstream_init(&istream, (tb_byte_t*)idata, isize)) return -1;
+		if (!tb_bits_stream_init(&istream, (tb_byte_t*)idata, isize)) return -1;
 	}
-	if (!tb_bstream_init(&ostream, (tb_byte_t*)odata, omaxn)) return -1;
+	if (!tb_bits_stream_init(&ostream, (tb_byte_t*)odata, omaxn)) return -1;
 
 	// spak data
 	tb_long_t osize = filter->spak(filter, &istream, &ostream, sync);
@@ -169,7 +169,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	if (osize < 0) filter->beof = tb_true;
 
 	// no data and eof?
-	if (!osize && !tb_bstream_left(&istream) && filter->beof) osize = -1;
+	if (!osize && !tb_bits_stream_left(&istream) && filter->beof) osize = -1;
 
 	// eof? sync it
 	if (filter->beof) sync = -1;
@@ -178,13 +178,13 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	tb_queue_buffer_push_exit(&filter->odata, osize > 0? osize : 0);
 
 	// have the left idata? 
-	tb_size_t left = tb_bstream_left(&istream);
+	tb_size_t left = tb_bits_stream_left(&istream);
 	if (left) 
 	{
 		// move to the cache head if idata is belong to the cache
-		if (idata != data) tb_scoped_buffer_memnmov(&filter->idata, tb_bstream_offset(&istream), left);
+		if (idata != data) tb_scoped_buffer_memnmov(&filter->idata, tb_bits_stream_offset(&istream), left);
 		// append to the cache if idata is not belong to the cache
-		else tb_scoped_buffer_memncat(&filter->idata, tb_bstream_pos(&istream), left);
+		else tb_scoped_buffer_memncat(&filter->idata, tb_bits_stream_pos(&istream), left);
 	}
 	// clear the cache
 	else tb_scoped_buffer_clear(&filter->idata);

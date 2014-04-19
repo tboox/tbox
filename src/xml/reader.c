@@ -58,9 +58,9 @@ typedef struct __tb_xml_reader_t
 	tb_size_t 				level;
 	
 	// the stream
-	tb_gstream_t* 			istream;
-	tb_gstream_t* 			filter;
-	tb_gstream_t* 			rstream;
+	tb_basic_stream_t* 			istream;
+	tb_basic_stream_t* 			filter;
+	tb_basic_stream_t* 			rstream;
 
 	// the version
 	tb_scoped_string_t 			version;
@@ -94,7 +94,7 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_t* reader)
 	// parse element
 	tb_char_t ch = '\0';
 	tb_size_t in = 0;
-	while (ch = tb_gstream_bread_s8(reader->rstream))
+	while (ch = tb_basic_stream_bread_s8(reader->rstream))
 	{
 		// append element
 		if (!in && ch == '<') in = 1;
@@ -113,14 +113,14 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 
 	// parse text
 	tb_char_t* pc = tb_null;
-	while (tb_gstream_need(reader->rstream, (tb_byte_t**)&pc, 1) && pc)
+	while (tb_basic_stream_need(reader->rstream, (tb_byte_t**)&pc, 1) && pc)
 	{
 		// is end? </ ..>
 		if (pc[0] == '<') return tb_scoped_string_cstr(&reader->text);
 		else
 		{
 			tb_scoped_string_chrcat(&reader->text, *pc);
-			if (!tb_gstream_skip(reader->rstream, 1)) return tb_null;
+			if (!tb_basic_stream_skip(reader->rstream, 1)) return tb_null;
 		}
 	}
 	return tb_null;
@@ -130,7 +130,7 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_xml_reader_init(tb_gstream_t* gst)
+tb_handle_t tb_xml_reader_init(tb_basic_stream_t* gst)
 {
 	// check
 	tb_assert_and_check_return_val(gst, tb_null);
@@ -171,7 +171,7 @@ tb_void_t tb_xml_reader_exit(tb_handle_t reader)
 	if (xreader)
 	{
 		// exit stream
-		if (xreader->filter) tb_gstream_exit(xreader->filter);
+		if (xreader->filter) tb_basic_stream_exit(xreader->filter);
 
 		// exit version
 		tb_scoped_string_exit(&xreader->version);
@@ -210,7 +210,7 @@ tb_void_t tb_xml_reader_clear(tb_handle_t reader)
 	xreader->level = 0;
 
 	// reset stream
-	if (xreader->rstream) tb_gstream_seek(xreader->rstream, 0);
+	if (xreader->rstream) tb_basic_stream_seek(xreader->rstream, 0);
 
 	// clear element
 	tb_scoped_string_clear(&xreader->element);
@@ -230,7 +230,7 @@ tb_void_t tb_xml_reader_clear(tb_handle_t reader)
 		tb_scoped_string_clear(&node->data);
 	}
 }
-tb_gstream_t* tb_xml_reader_stream(tb_handle_t reader)
+tb_basic_stream_t* tb_xml_reader_stream(tb_handle_t reader)
 {
 	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
 	tb_assert_and_check_return_val(xreader, tb_null);
@@ -257,7 +257,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 	{
 		// peek character
 		tb_char_t* pc = tb_null;
-		if (!tb_gstream_need(xreader->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
+		if (!tb_basic_stream_need(xreader->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
 
 		// is element?
 		if (*pc == '<') 
@@ -296,8 +296,8 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					// init transform stream
 					if (charset != TB_CHARSET_TYPE_UTF8)
 					{
-						xreader->filter = tb_gstream_init_filter_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
-						if (xreader->filter && tb_gstream_open(xreader->filter))
+						xreader->filter = tb_basic_stream_init_filter_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
+						if (xreader->filter && tb_basic_stream_open(xreader->filter))
 							xreader->rstream = xreader->filter;
 						tb_scoped_string_cstrcpy(&xreader->charset, "utf-8");
 					}
@@ -333,7 +333,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					// seek to comment end
 					tb_char_t ch = '\0';
 					tb_int_t n = 0;
-					while (ch = tb_gstream_bread_s8(xreader->rstream))
+					while (ch = tb_basic_stream_bread_s8(xreader->rstream))
 					{
 						// -->
 						if (n == 2 && ch == '>') break;
@@ -363,7 +363,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					// seek to cdata end
 					tb_char_t ch = '\0';
 					tb_int_t n = 0;
-					while (ch = tb_gstream_bread_s8(xreader->rstream))
+					while (ch = tb_basic_stream_bread_s8(xreader->rstream))
 					{
 						// ]]>
 						if (n == 2 && ch == '>') break;
@@ -425,7 +425,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 
 	// reset
 	xreader->level = 0;
-	if (!tb_gstream_seek(xreader->rstream, 0)) return tb_false;
+	if (!tb_basic_stream_seek(xreader->rstream, 0)) return tb_false;
 
 	// init
 	tb_static_string_t 	s;
@@ -459,7 +459,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 				tb_static_string_strip(&s, n);
 
 				// restore
-				if (ok) if (!(ok = tb_gstream_seek(xreader->rstream, save))) goto end;
+				if (ok) if (!(ok = tb_basic_stream_seek(xreader->rstream, save))) goto end;
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_BEG: 
@@ -477,7 +477,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 				tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
 				// restore
-				if (ok) if (!(ok = tb_gstream_seek(xreader->rstream, save))) goto end;
+				if (ok) if (!(ok = tb_basic_stream_seek(xreader->rstream, save))) goto end;
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_END: 
@@ -491,7 +491,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 				tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
 				// restore
-				if (ok) if (!(ok = tb_gstream_seek(xreader->rstream, save))) goto end;
+				if (ok) if (!(ok = tb_basic_stream_seek(xreader->rstream, save))) goto end;
 			}
 			break;
 		default:
@@ -505,7 +505,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 end:
 	tb_static_string_exit(&s);
 	xreader->level = 0;
-	if (!ok) tb_gstream_seek(xreader->rstream, 0);
+	if (!ok) tb_basic_stream_seek(xreader->rstream, 0);
 	return ok;
 }
 tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)

@@ -66,21 +66,21 @@ tbox_C_FILES 			+= \
 						charset/gb2312 \
 						charset/iso8859 \
 						stream/stream \
-						stream/bstream \
-						stream/gstream \
-						stream/gstream/http \
-						stream/gstream/file \
-						stream/gstream/data \
-						stream/gstream/sock \
-						stream/gstream/filter \
-						stream/astream \
-						stream/astream/http \
-						stream/astream/file \
-						stream/astream/data \
-						stream/astream/sock \
-						stream/astream/filter \
-						stream/tstream \
-						stream/mstream \
+						stream/bits_stream \
+						stream/basic_stream \
+						stream/basic_stream/http \
+						stream/basic_stream/file \
+						stream/basic_stream/data \
+						stream/basic_stream/sock \
+						stream/basic_stream/filter \
+						stream/async_stream \
+						stream/async_stream/http \
+						stream/async_stream/file \
+						stream/async_stream/data \
+						stream/async_stream/sock \
+						stream/async_stream/filter \
+						stream/transfer_stream \
+						stream/transfer \
 						filter/filter \
 						filter/zip \
 						filter/cache \
@@ -464,10 +464,11 @@ INC_FILES 				= \
 						charset/prefix.h \
 						stream/prefix.h \
 						stream/stream.h \
-						stream/astream.h \
-						stream/bstream.h \
-						stream/gstream.h \
-						stream/tstream.h \
+						stream/transfer.h \
+						stream/bits_stream.h \
+						stream/basic_stream.h \
+						stream/async_stream.h \
+						stream/transfer_stream.h \
 						filter/prefix.h \
 						filter/filter.h \
 						object/prefix.h \
