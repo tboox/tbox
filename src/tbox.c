@@ -153,8 +153,8 @@ tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_handle_t) << 3));
 
 	// check byteorder
-	tb_assert(tb_check_order_word());
-	tb_assert(tb_check_order_double());
+	tb_assert_and_check_return_val(tb_check_order_word(), tb_false);
+	tb_assert_and_check_return_val(tb_check_order_double(), tb_false);
 
 	// init memory
 	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;

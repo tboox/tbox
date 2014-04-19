@@ -70,9 +70,11 @@ CFLAGS 				= \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
 					-Wpointer-arith -Wwrite-strings \
 					-Wundef -Wmissing-prototypes  \
-					-fno-tree-vectorize \
+					-fno-tree-vectorize -Werror=unused-label -Werror=unused-comparison\
 					-Werror=return-type -Werror=unused-variable -Wno-pointer-sign -Wno-pointer-to-int-cast \
-					-Werror=implicit-function-declaration -Werror=missing-prototypes 
+					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=sometimes-uninitialized \
+					-Werror=pointer-arith -Werror=unused-function -Werror=unused-value -Werror=missing-braces \
+					-Werror=tautological-compare
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	= 

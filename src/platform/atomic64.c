@@ -56,7 +56,10 @@ typedef struct __tb_atomic64_lock_t
  */
 
 // the locks
-static tb_atomic64_lock_t 	g_locks[TB_ATOMIC64_LOCK_MAXN] = {TB_SPINLOCK_INIT};
+static tb_atomic64_lock_t 	g_locks[TB_ATOMIC64_LOCK_MAXN] = 
+{
+	{TB_SPINLOCK_INIT, {0}}
+};
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

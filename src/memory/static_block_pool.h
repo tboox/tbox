@@ -32,14 +32,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_static_block_pool_malloc(handle, size) 				tb_static_block_pool_malloc_impl(handle, size __tb_debug_vals__)
-#define tb_static_block_pool_malloc0(handle, size) 				tb_static_block_pool_malloc0_impl(handle, size __tb_debug_vals__)
+#define tb_static_block_pool_malloc(handle, size) 				tb_static_block_pool_malloc_(handle, size __tb_debug_vals__)
+#define tb_static_block_pool_malloc0(handle, size) 				tb_static_block_pool_malloc0_(handle, size __tb_debug_vals__)
 
-#define tb_static_block_pool_nalloc(handle, item, size) 		tb_static_block_pool_nalloc_impl(handle, item, size __tb_debug_vals__)
-#define tb_static_block_pool_nalloc0(handle, item, size) 		tb_static_block_pool_nalloc0_impl(handle, item, size __tb_debug_vals__)
+#define tb_static_block_pool_nalloc(handle, item, size) 		tb_static_block_pool_nalloc_(handle, item, size __tb_debug_vals__)
+#define tb_static_block_pool_nalloc0(handle, item, size) 		tb_static_block_pool_nalloc0_(handle, item, size __tb_debug_vals__)
 
-#define tb_static_block_pool_ralloc(handle, data, size) 		tb_static_block_pool_ralloc_impl(handle, data, size __tb_debug_vals__)
-#define tb_static_block_pool_free(handle, data) 				tb_static_block_pool_free_impl(handle, data __tb_debug_vals__)
+#define tb_static_block_pool_ralloc(handle, data, size) 		tb_static_block_pool_ralloc_(handle, data, size __tb_debug_vals__)
+#define tb_static_block_pool_free(handle, data) 				tb_static_block_pool_free_(handle, data __tb_debug_vals__)
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ tb_void_t 			tb_static_block_pool_clear(tb_handle_t handle);
  *
  * @return 			the data address
  */
-tb_pointer_t 		tb_static_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 		tb_static_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory and fill zero 
  *
@@ -84,7 +84,7 @@ tb_pointer_t 		tb_static_block_pool_malloc_impl(tb_handle_t handle, tb_size_t si
  *
  * @return 			the data address
  */
-tb_pointer_t 		tb_static_block_pool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 		tb_static_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count
  *
@@ -94,7 +94,7 @@ tb_pointer_t 		tb_static_block_pool_malloc0_impl(tb_handle_t handle, tb_size_t s
  *
  * @return 			the data address
  */
-tb_pointer_t  		tb_static_block_pool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  		tb_static_block_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count and fill zero
  *
@@ -104,7 +104,7 @@ tb_pointer_t  		tb_static_block_pool_nalloc_impl(tb_handle_t handle, tb_size_t i
  *
  * @return 			the data address
  */
-tb_pointer_t  		tb_static_block_pool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  		tb_static_block_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! realloc the memory
  *
@@ -114,7 +114,7 @@ tb_pointer_t  		tb_static_block_pool_nalloc0_impl(tb_handle_t handle, tb_size_t 
  *
  * @return 			the new data address
  */
-tb_pointer_t 		tb_static_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 		tb_static_block_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /*! free the memory
  *
@@ -123,7 +123,7 @@ tb_pointer_t 		tb_static_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_static_block_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
+tb_bool_t 			tb_static_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! the memory data size

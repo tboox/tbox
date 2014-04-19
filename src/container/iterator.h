@@ -49,17 +49,17 @@ typedef struct __tb_iterator_t
 	/// the iterator mode
 	tb_size_t 				mode;
 
+	/// the iterator step
+	tb_size_t 				step;
+
+	/// the iterator size
+	tb_size_t 				size;
+
 	/// the iterator data
 	tb_pointer_t 			data;
 
-	/// the iterator size
-	tb_pointer_t 			size;
-
 	/// the iterator priv
 	tb_pointer_t 			priv;
-
-	/// the iterator step
-	tb_size_t 				step;
 
 	/// the iterator head
 	tb_size_t 				(*head)(struct __tb_iterator_t* iterator);

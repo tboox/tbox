@@ -40,7 +40,6 @@ tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
 		tb_basic_stream_exit(ost);
 	}
 	
-end:
 	return 0;
 }
 

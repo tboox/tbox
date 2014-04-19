@@ -31,6 +31,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * head
  */
+#ifdef __tb_debug__
 static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
 	// the comparer 
@@ -54,6 +55,8 @@ static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t 
 	// ok
 	return tb_true;
 }
+#endif
+
 /*!push heap
  *
  * <pre>
@@ -82,6 +85,7 @@ static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t 
  *                  2         8 
  * </pre>
  */
+#if 0
 static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t top, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
 	// check
@@ -104,6 +108,8 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
 	// copy item
 	tb_iterator_copy(iterator, head + hole, item);
 }
+#endif
+
 /*! adjust heap
  *
  * <pre>

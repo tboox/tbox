@@ -305,6 +305,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+#if 0
 static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 {
 	// check
@@ -330,6 +331,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+#endif
 static tb_pointer_t tb_demo_loop_thread(tb_pointer_t data)
 {
 	// aicp

@@ -118,7 +118,7 @@ tb_void_t tb_memory_exit()
 	// exit lock
 	tb_spinlock_exit(&g_lock);
 }
-tb_pointer_t tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_memory_malloc_(tb_size_t size __tb_debug_decl__)
 {
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -127,7 +127,7 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__)
 	tb_handle_t pool = g_pool;
 
 	// malloc
-	tb_pointer_t data = pool? tb_global_pool_malloc_impl(pool, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_malloc_(pool, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -138,7 +138,7 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__)
 	// ok?
 	return data;
 }
-tb_pointer_t tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_memory_malloc0_(tb_size_t size __tb_debug_decl__)
 {
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -147,7 +147,7 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__)
 	tb_handle_t pool = g_pool;
 
 	// malloc0
-	tb_pointer_t data = pool? tb_global_pool_malloc0_impl(pool, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_malloc0_(pool, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -158,7 +158,7 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__)
 	// ok?
 	return data;
 }
-tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_memory_nalloc_(tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -167,7 +167,7 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_dec
 	tb_handle_t pool = g_pool;
 
 	// nalloc
-	tb_pointer_t data = pool? tb_global_pool_nalloc_impl(pool, item, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_nalloc_(pool, item, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -178,7 +178,7 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_dec
 	// ok?
 	return data;
 }
-tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_memory_nalloc0_(tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -187,7 +187,7 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_de
 	tb_handle_t pool = g_pool;
 
 	// nalloc0
-	tb_pointer_t data = pool? tb_global_pool_nalloc0_impl(pool, item, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_nalloc0_(pool, item, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -198,7 +198,7 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_de
 	// ok?
 	return data;
 }
-tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_memory_ralloc_(tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -207,7 +207,7 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_
 	tb_handle_t pool = g_pool;
 
 	// ralloc
-	if (pool) data = tb_global_pool_ralloc_impl(pool, data, size __tb_debug_args__);
+	if (pool) data = tb_global_pool_ralloc_(pool, data, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -218,7 +218,7 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_
 	// ok?
 	return data;
 }
-tb_bool_t tb_memory_free_impl(tb_pointer_t data __tb_debug_decl__)
+tb_bool_t tb_memory_free_(tb_pointer_t data __tb_debug_decl__)
 {
 	// check
 	tb_check_return_val(data, tb_true);
@@ -230,7 +230,7 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data __tb_debug_decl__)
 	tb_handle_t pool = g_pool;
 
 	// free it
-	tb_bool_t ok = pool? tb_global_pool_free_impl(pool, data __tb_debug_args__) : tb_false;
+	tb_bool_t ok = pool? tb_global_pool_free_(pool, data __tb_debug_args__) : tb_false;
 
 	// leave
 	tb_spinlock_leave(&g_lock);

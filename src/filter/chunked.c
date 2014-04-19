@@ -196,8 +196,6 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_t*
 		cfilter->read += size;
 	}
 
-end:
-
 	// update stream
 	tb_static_stream_goto(istream, (tb_byte_t*)ip);
 	tb_static_stream_goto(ostream, (tb_byte_t*)op);

@@ -82,11 +82,11 @@ static tb_pointer_t tb_iterator_ptr_item(tb_iterator_t* iterator, tb_size_t itor
 static tb_void_t tb_iterator_ptr_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	tb_assert_return(itor < iterator->size);
-	((tb_pointer_t*)iterator->data)[itor] = item;
+	((tb_cpointer_t*)iterator->data)[itor] = item;
 }
 static tb_long_t tb_iterator_ptr_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	return ltem - rtem;
+	return ((tb_long_t)ltem > (tb_long_t)rtem? 1 : ((tb_long_t)ltem < (tb_long_t)rtem? -1 : 0));
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * memory
@@ -95,14 +95,6 @@ static tb_pointer_t tb_iterator_mem_item(tb_iterator_t* iterator, tb_size_t itor
 {
 	tb_assert_return_val(itor < iterator->size, tb_null);
 	return (tb_pointer_t)((tb_byte_t*)iterator->data + itor * iterator->step);
-}
-static tb_pointer_t tb_iterator_mem_dupl(tb_iterator_t* iterator, tb_cpointer_t item)
-{
-	return item? tb_memdup(item, iterator->step) : tb_malloc(iterator->step);
-}
-static tb_void_t tb_iterator_mem_free(tb_iterator_t* iterator, tb_cpointer_t item)
-{
-	if (item) tb_free(item);
 }
 static tb_void_t tb_iterator_mem_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
@@ -150,7 +142,7 @@ tb_iterator_t tb_iterator_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase)
 	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
 	itor.data = (tb_pointer_t)data;
 	itor.size = size;
-	itor.priv = (tb_pointer_t)bcase;
+	itor.priv = (tb_pointer_t)(tb_size_t)bcase;
 	itor.step = sizeof(tb_char_t*);
 	itor.head = tb_iterator_int_head;
 	itor.tail = tb_iterator_int_tail;

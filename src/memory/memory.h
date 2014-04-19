@@ -78,7 +78,7 @@ tb_void_t 				tb_memory_exit(tb_noarg_t);
  *
  * @return 				the data address
  */
-tb_pointer_t 			tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__);
+tb_pointer_t 			tb_memory_malloc_(tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory and fill zero 
  *
@@ -86,7 +86,7 @@ tb_pointer_t 			tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__);
  *
  * @return 				the data address
  */
-tb_pointer_t 			tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__);
+tb_pointer_t 			tb_memory_malloc0_(tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count
  *
@@ -95,7 +95,7 @@ tb_pointer_t 			tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__);
  *
  * @return 				the data address
  */
-tb_pointer_t  			tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  			tb_memory_nalloc_(tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count and fill zero
  *
@@ -104,7 +104,7 @@ tb_pointer_t  			tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug
  *
  * @return 				the data address
  */
-tb_pointer_t  			tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  			tb_memory_nalloc0_(tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! realloc the memory
  *
@@ -113,7 +113,7 @@ tb_pointer_t  			tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debu
  *
  * @return 				the new data address
  */
-tb_pointer_t 			tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 			tb_memory_ralloc_(tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /*! free the memory
  *
@@ -121,7 +121,7 @@ tb_pointer_t 			tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_deb
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_memory_free_impl(tb_pointer_t data __tb_debug_decl__);
+tb_bool_t 				tb_memory_free_(tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /// dump memory

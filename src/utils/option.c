@@ -102,8 +102,8 @@ static __tb_inline__ tb_option_item_t const* tb_option_item_find(tb_option_item_
 	tb_assert_and_check_return_val(opts, tb_null);
 
 	// walk
-	tb_bool_t 			ok = tb_false;
-	tb_option_item_t* 	item = opts;
+	tb_bool_t 					ok = tb_false;
+	tb_option_item_t const* 	item = opts;
 	while (item && !ok)
 	{
 		switch (item->mode)
@@ -143,6 +143,7 @@ static __tb_inline__ tb_option_item_t const* tb_option_item_find(tb_option_item_
 	// ok?
 	return ok? item : tb_null;
 }
+#if 0
 static __tb_inline__ tb_bool_t tb_option_check(tb_option_t* option)
 {
 	// check
@@ -176,6 +177,8 @@ static __tb_inline__ tb_bool_t tb_option_check(tb_option_t* option)
 	// ok?
 	return ok;
 }
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */

@@ -92,10 +92,10 @@ typedef tb_bool_t (*tb_flv_spank_func_t)(tb_flv_t* );
 static tb_bool_t tb_flv_sdata_number_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
 static tb_bool_t tb_flv_sdata_boolean_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
 static tb_bool_t tb_flv_sdata_string_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
-static tb_bool_t tb_flv_sdata_movieclip_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
+//static tb_bool_t tb_flv_sdata_movieclip_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
 static tb_bool_t tb_flv_sdata_null_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
 static tb_bool_t tb_flv_sdata_undefined_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
-static tb_bool_t tb_flv_sdata_reference_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
+//static tb_bool_t tb_flv_sdata_reference_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
 static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
 static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
 static tb_bool_t tb_flv_sdata_date_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value);
@@ -150,6 +150,7 @@ static tb_char_t const* tb_flv_sdata_value_to_string(tb_flv_t* flv, tb_flv_sdata
 
 	return tb_scoped_string_cstr(&flv->string);
 }
+#if 0
 static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_value_t const* value)
 {
 	switch (value->type)
@@ -174,6 +175,7 @@ static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_valu
 
 	return 0.;
 }
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
  * spank
@@ -220,10 +222,12 @@ static tb_bool_t tb_flv_sdata_string_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
 	value->u.string.size = size;
 	return tb_true;
 }
+#if 0
 static tb_bool_t tb_flv_sdata_movieclip_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
 	return tb_false;
 }
+#endif
 static tb_bool_t tb_flv_sdata_null_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
 	value->type = TB_FLV_SDATA_TYPE_NONE;
@@ -234,10 +238,12 @@ static tb_bool_t tb_flv_sdata_undefined_spank(tb_flv_t* flv, tb_flv_sdata_value_
 	value->type = TB_FLV_SDATA_TYPE_UNDEFINED;
 	return tb_true;
 }
+#if 0
 static tb_bool_t tb_flv_sdata_reference_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
 	return tb_false;
 }
+#endif
 static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
 	tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 4, tb_false);

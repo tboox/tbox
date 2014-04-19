@@ -32,22 +32,22 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_malloc(size) 			tb_memory_malloc_impl(size __tb_debug_vals__)
-#define tb_malloc0(size) 			tb_memory_malloc0_impl(size __tb_debug_vals__)
-#define tb_nalloc(item, size) 		tb_memory_nalloc_impl(item, size __tb_debug_vals__)
-#define tb_nalloc0(item, size) 		tb_memory_nalloc0_impl(item, size __tb_debug_vals__)
-#define tb_ralloc(data, size) 		tb_memory_ralloc_impl(data, size __tb_debug_vals__)
-#define tb_free(data) 				tb_memory_free_impl(data __tb_debug_vals__)
+#define tb_malloc(size) 			tb_memory_malloc_(size __tb_debug_vals__)
+#define tb_malloc0(size) 			tb_memory_malloc0_(size __tb_debug_vals__)
+#define tb_nalloc(item, size) 		tb_memory_nalloc_(item, size __tb_debug_vals__)
+#define tb_nalloc0(item, size) 		tb_memory_nalloc0_(item, size __tb_debug_vals__)
+#define tb_ralloc(data, size) 		tb_memory_ralloc_(data, size __tb_debug_vals__)
+#define tb_free(data) 				tb_memory_free_(data __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_pointer_t 	tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__);
-tb_pointer_t 	tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__);
-tb_pointer_t  	tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_decl__);
-tb_pointer_t  	tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_decl__);
-tb_pointer_t 	tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_decl__);
-tb_bool_t 		tb_memory_free_impl(tb_pointer_t data __tb_debug_decl__);
+tb_pointer_t 	tb_memory_malloc_(tb_size_t size __tb_debug_decl__);
+tb_pointer_t 	tb_memory_malloc0_(tb_size_t size __tb_debug_decl__);
+tb_pointer_t  	tb_memory_nalloc_(tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  	tb_memory_nalloc0_(tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 	tb_memory_ralloc_(tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_bool_t 		tb_memory_free_(tb_pointer_t data __tb_debug_decl__);
 
 
 #endif

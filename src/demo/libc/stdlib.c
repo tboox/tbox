@@ -22,6 +22,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+#if TB_TEST_ISXXX
 static tb_void_t tb_check_is()
 {
 	tb_int_t i = 0;
@@ -35,7 +36,8 @@ static tb_void_t tb_check_is()
 		if ((tb_isascii(i)? 1 : 0) != (isascii(i)? 1 : 0)) tb_printf("[e] isascii: 0x%02x\n", i);
 	}
 }
-static tb_void_t tb_make_space_table()
+#endif
+static tb_void_t tb_make_isspace_table()
 {
 	tb_int_t i = 0;
 	for (i = 0; i < 256; i++)
@@ -51,6 +53,7 @@ static tb_void_t tb_make_isalpha_table()
 		if (isalpha(i)) tb_printf("0x%02x\n", i);
 	}
 }
+#if TB_TEST_TOUPPER
 static tb_void_t tb_check_toupper()
 {
 	tb_int_t i = 0;
@@ -59,6 +62,8 @@ static tb_void_t tb_check_toupper()
 		if ((tb_toupper(i)? 1 : 0) != (toupper(i)? 1 : 0)) tb_printf("[e] toupper: 0x%02x = 0x%02x\n", i, toupper(i));
 	}
 }
+#endif
+#if TB_TEST_TOLOWER
 static tb_void_t tb_check_tolower()
 {
 	tb_int_t i = 0;
@@ -67,6 +72,7 @@ static tb_void_t tb_check_tolower()
 		if ((tb_tolower(i)? 1 : 0) != (tolower(i)? 1 : 0)) tb_printf("[e] tolower: 0x%02x = 0x%02x\n", i, tolower(i));
 	}
 }
+#endif
 static tb_void_t tb_test_sbtou32(tb_char_t const* s, tb_int_t base, tb_uint32_t val)
 {
 	tb_printf("s%dtou32(%s) = %u [?= %u]\n", base, s, tb_sbtou32(s, base), val);
@@ -91,20 +97,13 @@ static tb_void_t tb_test_stoi32(tb_char_t const* s, tb_int32_t val)
 	tb_printf("stoi32(%s) = %d [?= %d]\n", s, tb_stoi32(s), val);
 }
 
-#ifdef TB_CONFIG_TYPE_FLOAT
-static tb_void_t tb_test_stof(tb_char_t const* s, tb_double_t val)
-{
-	tb_printf("stof(%s) = %lf [?= %lf]\n", s, tb_stof(s), val);
-}
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t tb_demo_libc_stdlib_main(tb_int_t argc, tb_char_t** argv)
 {	
-	//tb_make_isspace_table();
-	//tb_make_isalpha_table();
+	tb_make_isspace_table();
+	tb_make_isalpha_table();
 
 #if TB_TEST_ISXXX
 	tb_printf("===============================\n");

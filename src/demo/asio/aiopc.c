@@ -16,16 +16,21 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
 	// check
 	tb_assert_and_check_return_val(argv[1], 0);
 
+	// init
+	tb_handle_t sock = tb_null;
+	tb_handle_t file = tb_null;
+	tb_byte_t* 	data = tb_null;
+
 	// init sock
-	tb_handle_t sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+	sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
 	tb_assert_and_check_goto(sock, end);
 
 	// init file
-	tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+	file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 	tb_assert_and_check_goto(file, end);
 
 	// init data
-	tb_byte_t* data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN);
+	data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN);
 	tb_assert_and_check_goto(data, end);
 
 	// done conn

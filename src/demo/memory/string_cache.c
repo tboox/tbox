@@ -22,7 +22,7 @@ tb_int_t tb_demo_memory_string_cache_main(tb_int_t argc, tb_char_t** argv)
 	while (n--) 
 	{
 		tb_int_t r = tb_snprintf(s, 256, "%u", tb_rand_uint32(0, 10000)); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 #if 1
 		tb_string_cache_put(s); 
 		if (!(n & 15)) tb_string_cache_del(s);
