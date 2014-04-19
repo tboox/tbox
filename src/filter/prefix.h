@@ -27,7 +27,7 @@
  * includes
  */
 #include "../prefix.h"
-#include "../stream/bits_stream.h"
+#include "../stream/static_stream.h"
 #include "../memory/memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ typedef struct __tb_filter_t
 	tb_queue_buffer_t 	odata;
 
 	/// the spak
-	tb_long_t 		(*spak)(struct __tb_filter_t* filter, tb_bits_stream_t* istream, tb_bits_stream_t* ostream, tb_long_t sync);
+	tb_long_t 		(*spak)(struct __tb_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
 
 	/// the cler
 	tb_void_t 		(*cler)(struct __tb_filter_t* filter);

@@ -52,7 +52,7 @@ static __tb_inline__ tb_filter_zip_t* tb_filter_zip_cast(tb_filter_t* filter)
 	tb_assert_and_check_return_val(filter && filter->type == TB_FILTER_TYPE_ZIP, tb_null);
 	return (tb_filter_zip_t*)filter;
 }
-static tb_long_t tb_filter_zip_spak(tb_filter_t* filter, tb_bits_stream_t* istream, tb_bits_stream_t* ostream, tb_long_t sync)
+static tb_long_t tb_filter_zip_spak(tb_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
 {
 	// check
 	tb_filter_zip_t* zfilter = tb_filter_zip_cast(filter);

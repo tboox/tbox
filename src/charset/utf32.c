@@ -31,15 +31,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_charset_utf32_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf32_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_utf32_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf32_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
 {
 	tb_trace_noimpl();
 	return -1;
 }
 
-tb_long_t tb_charset_utf32_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_utf32_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_utf32_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf32_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
 {
 	tb_trace_noimpl();
 	return -1;

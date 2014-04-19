@@ -90,7 +90,7 @@ typedef struct __tb_charset_t
 	 * 0: 	no character, skip and continue it
 	 * 1: 	ok, continue it
 	 */
-	tb_long_t 			(*get)(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+	tb_long_t 			(*get)(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
 
 	/*! set ucs4 character
 	 *
@@ -100,7 +100,7 @@ typedef struct __tb_charset_t
 	 * 0: 	no character, skip and continue it
 	 * 1: 	ok, continue it
 	 */
-	tb_long_t 			(*set)(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
+	tb_long_t 			(*set)(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
 
 }tb_charset_t;
 
@@ -132,7 +132,7 @@ tb_size_t 			tb_charset_type(tb_char_t const* name);
  */
 tb_charset_t const* tb_charset_find(tb_size_t type);
 
-/*! convert charset from bstream
+/*! convert charset from static stream
  *
  * @param ftype 	the from charset
  * @param ttype 	the to charset
@@ -141,7 +141,7 @@ tb_charset_t const* tb_charset_find(tb_size_t type);
  *
  * @return 			the converted bytes for output or -1
  */
-tb_long_t 			tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bits_stream_t* fst, tb_bits_stream_t* tst);
+tb_long_t 			tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_static_stream_t* fst, tb_static_stream_t* tst);
 
 /*! convert charset from cstr
  *

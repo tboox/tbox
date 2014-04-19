@@ -63,7 +63,7 @@ typedef tb_bool_t 	(*tb_transfer_stream_save_func_t)(tb_size_t state, tb_hize_t 
  * interfaces
  */
 
-/*! save gstream to gstream, block transfer
+/*! save bstream to bstream, block transfer
  *
  * @param istream 	the istream
  * @param ostream 	the ostream
@@ -75,7 +75,7 @@ typedef tb_bool_t 	(*tb_transfer_stream_save_func_t)(tb_size_t state, tb_hize_t 
  */
 tb_hong_t 			tb_transfer_stream_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_stream_save_func_t func, tb_pointer_t priv);
 
-/*! save gstream to url, block transfer
+/*! save bstream to url, block transfer
  *
  * @param istream 	the istream
  * @param ourl 		the output url
@@ -87,7 +87,7 @@ tb_hong_t 			tb_transfer_stream_save_gg(tb_basic_stream_t* istream, tb_basic_str
  */
 tb_hong_t 			tb_transfer_stream_save_gu(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_stream_save_func_t func, tb_pointer_t priv);
 
-/*! save gstream to data, block transfer
+/*! save bstream to data, block transfer
  *
  * @param istream 	the istream
  * @param odata 	the output data
@@ -112,7 +112,7 @@ tb_hong_t 			tb_transfer_stream_save_gd(tb_basic_stream_t* istream, tb_byte_t* o
  */
 tb_hong_t 			tb_transfer_stream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_stream_save_func_t func, tb_pointer_t priv);
 
-/*! save url to gstream, block transfer
+/*! save url to bstream, block transfer
  *
  * @param iurl 		the input url
  * @param ostream 	the ostream
@@ -150,7 +150,7 @@ tb_hong_t 			tb_transfer_stream_save_ud(tb_char_t const* iurl, tb_byte_t* odata,
  */
 tb_hong_t 			tb_transfer_stream_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_stream_save_func_t func, tb_pointer_t priv);
 
-/*! save data to gstream, block transfer
+/*! save data to bstream, block transfer
  *
  * @param idata 	the input data
  * @param isize 	the input size
@@ -173,7 +173,7 @@ tb_hong_t 			tb_transfer_stream_save_dg(tb_byte_t const* idata, tb_size_t isize,
  */
 tb_handle_t 		tb_transfer_stream_init_aa(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_hize_t offset);
 
-/*! init tstream from astream to gstream, async transfer
+/*! init tstream from astream to bstream, async transfer
  *
  * @param istream 	the istream
  * @param ostream 	the ostream

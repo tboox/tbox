@@ -29,16 +29,16 @@
  * details
  */
 
-static tb_void_t tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bits_stream_t* bst)
+static tb_void_t tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_t* sstream)
 {
 	tb_assert(vlc);
 	tb_assert(val && val <= (0x1 << ((tb_zip_vlc_fixed_t*)vlc)->nbits));
-	tb_bits_stream_set_ubits32(bst, val - 1, ((tb_zip_vlc_fixed_t*)vlc)->nbits);
+	tb_static_stream_set_ubits32(sstream, val - 1, ((tb_zip_vlc_fixed_t*)vlc)->nbits);
 }
-static tb_uint32_t tb_zip_vlc_fixed_get(tb_zip_vlc_t* vlc, tb_bits_stream_t const* bst)
+static tb_uint32_t tb_zip_vlc_fixed_get(tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream)
 {
 	tb_assert(vlc);
-	return (tb_bits_stream_get_ubits32(bst, ((tb_zip_vlc_fixed_t*)vlc)->nbits) + 1);
+	return (tb_static_stream_get_ubits32(sstream, ((tb_zip_vlc_fixed_t*)vlc)->nbits) + 1);
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

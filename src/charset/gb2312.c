@@ -68,12 +68,12 @@ static tb_uint32_t tb_charset_gb2312_to_ucs4(tb_uint32_t ch)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_charset_gb2312_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_gb2312_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_gb2312_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_gb2312_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
 {	
 	// init
-	tb_byte_t const* 	p = tb_bits_stream_pos(bst);
-	tb_size_t 			n = tb_bits_stream_left(bst);
+	tb_byte_t const* 	p = tb_static_stream_pos(sstream);
+	tb_size_t 			n = tb_static_stream_left(sstream);
 
 	if (*p <= 0x7f) 
 	{
@@ -81,7 +81,7 @@ tb_long_t tb_charset_gb2312_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t
 		tb_check_return_val(n, -1);
 
 		// get character
-		*ch = tb_bits_stream_get_u8(bst);
+		*ch = tb_static_stream_get_u8(sstream);
 	}
 	else
 	{
@@ -89,18 +89,18 @@ tb_long_t tb_charset_gb2312_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t
 		tb_check_return_val(n > 1, -1);
 
 		// get character
-		*ch = tb_charset_gb2312_to_ucs4(be? tb_bits_stream_get_u16_be(bst) : tb_bits_stream_get_u16_le(bst));
+		*ch = tb_charset_gb2312_to_ucs4(be? tb_static_stream_get_u16_be(sstream) : tb_static_stream_get_u16_le(sstream));
 	}
 
 	// ok
 	return 1;
 }
 
-tb_long_t tb_charset_gb2312_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_gb2312_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_gb2312_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_gb2312_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
 {
 	// init
-	tb_size_t n = tb_bits_stream_left(bst);
+	tb_size_t n = tb_static_stream_left(sstream);
 
 	// character
 	ch = tb_charset_gb2312_from_ucs4(ch);
@@ -110,7 +110,7 @@ tb_long_t tb_charset_gb2312_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t
 		tb_check_return_val(n, -1);
 
 		// set character
-		tb_bits_stream_set_u8(bst, ch & 0xff);
+		tb_static_stream_set_u8(sstream, ch & 0xff);
 	}
 	else
 	{
@@ -118,8 +118,8 @@ tb_long_t tb_charset_gb2312_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t
 		tb_check_return_val(n > 1, 0);
 
 		// set character
-		if (be) tb_bits_stream_set_u16_be(bst, ch & 0xffff);
-		else tb_bits_stream_set_u16_le(bst, ch & 0xffff);
+		if (be) tb_static_stream_set_u16_be(sstream, ch & 0xffff);
+		else tb_static_stream_set_u16_le(sstream, ch & 0xffff);
 	}
 
 	// ok

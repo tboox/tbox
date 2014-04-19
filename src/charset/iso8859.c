@@ -31,10 +31,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_charset_iso8859_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_iso8859_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_iso8859_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_iso8859_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
 {
-	tb_byte_t b = tb_bits_stream_get_u8(bst);
+	tb_byte_t b = tb_static_stream_get_u8(sstream);
 	if (b < 0xa0) *ch = b;
 	else
 	{
@@ -45,10 +45,10 @@ tb_long_t tb_charset_iso8859_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_
 	return 1;
 }
 
-tb_long_t tb_charset_iso8859_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_iso8859_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_iso8859_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_iso8859_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
 {
-	if (ch <= 0xa0) tb_bits_stream_set_u8(bst, (tb_uint8_t)ch);
+	if (ch <= 0xa0) tb_static_stream_set_u8(sstream, (tb_uint8_t)ch);
 	else 
 	{
 		// @note: need lookup characters table

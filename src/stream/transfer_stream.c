@@ -313,7 +313,7 @@ static tb_bool_t tb_transfer_stream_istream_read_func(tb_async_stream_t* astream
 			// writ it
 			if (!tb_async_stream_writ(tstream->ostream, data, real, tb_transfer_stream_ostream_writ_func, tstream)) break;
 		}
-		// for gstream
+		// for bstream
 		else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
 		{
 			// writ it

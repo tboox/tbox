@@ -90,7 +90,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
 	do
 	{
 		// init option
-		option = tb_option_init("gstream", "the gstream demo", g_options);
+		option = tb_option_init("bstream", "the bstream demo", g_options);
 		tb_assert_and_check_break(option);
 	
 		// done option
