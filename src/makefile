@@ -66,7 +66,7 @@ tbox_C_FILES 			+= \
 						charset/gb2312 \
 						charset/iso8859 \
 						stream/stream \
-						stream/bits_stream \
+						stream/static_stream \
 						stream/basic_stream \
 						stream/basic_stream/http \
 						stream/basic_stream/file \
@@ -465,7 +465,7 @@ INC_FILES 				= \
 						stream/prefix.h \
 						stream/stream.h \
 						stream/transfer.h \
-						stream/bits_stream.h \
+						stream/static_stream.h \
 						stream/basic_stream.h \
 						stream/async_stream.h \
 						stream/transfer_stream.h \

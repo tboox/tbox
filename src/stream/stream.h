@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "bits_stream.h"
+#include "static_stream.h"
 #include "basic_stream.h"
 #include "async_stream.h"
 #include "transfer_stream.h"
@@ -42,7 +42,7 @@
  *                                                                   | 
  *                                                                   |                                          - data
  *                                                                 [aioo]                                       |
- *                                                           ----- gstream ------------- gstream ---------------- file
+ *                                                           ----- bstream ------------- bstream ---------------- file
  *                                                           |                   |                              |
  *                                                           |                   |                              - sock 
  *                                                           |                   |                              |
@@ -77,7 +77,7 @@
  *           |                                                                        |      - zip    
  *           |                                                                        |
  *           -----   ...                                                              |
- *                                                                                 bstream - [data, size]
+ *                                                                                 static stream - [data, size]
  *                                                                                  [bits]
  *                         
  * url: 

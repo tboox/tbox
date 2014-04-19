@@ -85,7 +85,7 @@ tb_void_t tb_zip_exit(tb_zip_t* zip)
 	// exit
 	s_exit[zip->algo](zip);
 }
-tb_long_t tb_zip_spak(tb_zip_t* zip, tb_bits_stream_t* ist, tb_bits_stream_t* ost, tb_long_t sync)
+tb_long_t tb_zip_spak(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
 {
 	tb_assert_and_check_return_val(zip && zip->spak && ist && ost, -1);
 	return zip->spak(zip, ist, ost, sync);

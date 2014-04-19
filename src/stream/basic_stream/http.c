@@ -50,14 +50,14 @@ typedef struct __tb_basic_stream_http_t
  */
 static __tb_inline__ tb_basic_stream_http_t* tb_basic_stream_http_cast(tb_handle_t stream)
 {
-	tb_basic_stream_t* gstream = (tb_basic_stream_t*)stream;
-	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
-	return (tb_basic_stream_http_t*)gstream;
+	tb_basic_stream_t* bstream = (tb_basic_stream_t*)stream;
+	tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
+	return (tb_basic_stream_http_t*)bstream;
 }
-static tb_bool_t tb_basic_stream_http_open(tb_handle_t gstream)
+static tb_bool_t tb_basic_stream_http_open(tb_handle_t bstream)
 {
 	// check
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
 	// the http status
@@ -73,29 +73,29 @@ static tb_bool_t tb_basic_stream_http_open(tb_handle_t gstream)
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_basic_stream_http_clos(tb_handle_t gstream)
+static tb_bool_t tb_basic_stream_http_clos(tb_handle_t bstream)
 {
 	// check
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
 	// close it
 	return tb_http_clos(hstream->http);
 }
-static tb_void_t tb_basic_stream_http_exit(tb_handle_t gstream)
+static tb_void_t tb_basic_stream_http_exit(tb_handle_t bstream)
 {
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	if (hstream && hstream->http) tb_http_exit(hstream->http);
 }
-static tb_void_t tb_basic_stream_http_kill(tb_handle_t gstream)
+static tb_void_t tb_basic_stream_http_kill(tb_handle_t bstream)
 {
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	if (hstream && hstream->http) tb_http_kill(hstream->http);
 }
-static tb_long_t tb_basic_stream_http_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_basic_stream_http_read(tb_handle_t bstream, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
 	// the http status
@@ -115,19 +115,19 @@ static tb_long_t tb_basic_stream_http_read(tb_handle_t gstream, tb_byte_t* data,
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_basic_stream_http_seek(tb_handle_t gstream, tb_hize_t offset)
+static tb_bool_t tb_basic_stream_http_seek(tb_handle_t bstream, tb_hize_t offset)
 {
 	// check
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
 	// seek
 	return tb_http_seek(hstream->http, offset);
 }
-static tb_long_t tb_basic_stream_http_wait(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_basic_stream_http_wait(tb_handle_t bstream, tb_size_t wait, tb_long_t timeout)
 {
 	// check
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
 	// the http status
@@ -143,10 +143,10 @@ static tb_long_t tb_basic_stream_http_wait(tb_handle_t gstream, tb_size_t wait, 
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_basic_stream_http_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_basic_stream_http_ctrl(tb_handle_t bstream, tb_size_t ctrl, tb_va_list_t args)
 {
 	// check
-	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(gstream);
+	tb_basic_stream_http_t* hstream = tb_basic_stream_http_cast(bstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
 	// done
@@ -570,27 +570,27 @@ static tb_bool_t tb_basic_stream_http_ctrl(tb_handle_t gstream, tb_size_t ctrl, 
 tb_basic_stream_t* tb_basic_stream_init_http()
 {
 	// make stream
-	tb_basic_stream_http_t* gstream = (tb_basic_stream_http_t*)tb_malloc0(sizeof(tb_basic_stream_http_t));
-	tb_assert_and_check_return_val(gstream, tb_null);
+	tb_basic_stream_http_t* bstream = (tb_basic_stream_http_t*)tb_malloc0(sizeof(tb_basic_stream_http_t));
+	tb_assert_and_check_return_val(bstream, tb_null);
 
 	// init stream
-	if (!tb_basic_stream_init((tb_basic_stream_t*)gstream, TB_STREAM_TYPE_HTTP, 0)) goto fail;
-	gstream->base.open 		= tb_basic_stream_http_open;
-	gstream->base.clos 		= tb_basic_stream_http_clos;
-	gstream->base.read 		= tb_basic_stream_http_read;
-	gstream->base.seek 		= tb_basic_stream_http_seek;
-	gstream->base.wait 		= tb_basic_stream_http_wait;
-	gstream->base.exit 		= tb_basic_stream_http_exit;
-	gstream->base.base.ctrl = tb_basic_stream_http_ctrl;
-	gstream->base.base.kill = tb_basic_stream_http_kill;
-	gstream->http 			= tb_http_init();
-	tb_assert_and_check_goto(gstream->http, fail);
+	if (!tb_basic_stream_init((tb_basic_stream_t*)bstream, TB_STREAM_TYPE_HTTP, 0)) goto fail;
+	bstream->base.open 		= tb_basic_stream_http_open;
+	bstream->base.clos 		= tb_basic_stream_http_clos;
+	bstream->base.read 		= tb_basic_stream_http_read;
+	bstream->base.seek 		= tb_basic_stream_http_seek;
+	bstream->base.wait 		= tb_basic_stream_http_wait;
+	bstream->base.exit 		= tb_basic_stream_http_exit;
+	bstream->base.base.ctrl = tb_basic_stream_http_ctrl;
+	bstream->base.base.kill = tb_basic_stream_http_kill;
+	bstream->http 			= tb_http_init();
+	tb_assert_and_check_goto(bstream->http, fail);
 
 	// ok
-	return (tb_basic_stream_t*)gstream;
+	return (tb_basic_stream_t*)bstream;
 
 fail:
-	if (gstream) tb_basic_stream_exit((tb_basic_stream_t*)gstream);
+	if (bstream) tb_basic_stream_exit((tb_basic_stream_t*)bstream);
 	return tb_null;
 }
 
@@ -600,19 +600,19 @@ tb_basic_stream_t* tb_basic_stream_init_from_http(tb_char_t const* host, tb_size
 	tb_assert_and_check_return_val(host && port && path, tb_null);
 
 	// init http stream
-	tb_basic_stream_t* gstream = tb_basic_stream_init_http();
-	tb_assert_and_check_return_val(gstream, tb_null);
+	tb_basic_stream_t* bstream = tb_basic_stream_init_http();
+	tb_assert_and_check_return_val(bstream, tb_null);
 
 	// ctrl
-	if (!tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_PATH, path)) goto fail;
-	if (!tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_stream_ctrl(bstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_stream_ctrl(bstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_stream_ctrl(bstream, TB_STREAM_CTRL_SET_PATH, path)) goto fail;
+	if (!tb_stream_ctrl(bstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
 	
 	// ok
-	return gstream;
+	return bstream;
 
 fail:
-	if (gstream) tb_basic_stream_exit(gstream);
+	if (bstream) tb_basic_stream_exit(bstream);
 	return tb_null;
 }

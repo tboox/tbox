@@ -31,18 +31,18 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_charset_ucs4_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ucs4_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_ucs4_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ucs4_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
 {
-	*ch = be? tb_bits_stream_get_u32_be(bst) : tb_bits_stream_get_u32_le(bst);
+	*ch = be? tb_static_stream_get_u32_be(sstream) : tb_static_stream_get_u32_le(sstream);
 	return 1;
 }
 
-tb_long_t tb_charset_ucs4_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_ucs4_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_ucs4_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ucs4_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
 {
-	if (be) tb_bits_stream_set_u32_be(bst, ch);
-	else tb_bits_stream_set_u32_le(bst, ch);
+	if (be) tb_static_stream_set_u32_be(sstream, ch);
+	else tb_static_stream_set_u32_le(sstream, ch);
 	return 1;
 }
 

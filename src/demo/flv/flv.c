@@ -88,22 +88,22 @@ static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size
 	};
 
 	// attach data
-	tb_bits_stream_t bst;
-	tb_bits_stream_init(&bst, body_data, body_size);
+	tb_static_stream_t sstream;
+	tb_static_stream_init(&sstream, body_data, body_size);
 	
 	// get object type
-	tb_byte_t object_type = tb_bits_stream_get_ubits32(&bst, 5);
-	if (object_type == 31) object_type = 32 + tb_bits_stream_get_ubits32(&bst, 6);
+	tb_byte_t object_type = tb_static_stream_get_ubits32(&sstream, 5);
+	if (object_type == 31) object_type = 32 + tb_static_stream_get_ubits32(&sstream, 6);
 
 	// get samplerate 
 	tb_size_t samplerate = 0;
-	tb_byte_t rate_index = tb_bits_stream_get_ubits32(&bst, 4);
-	if (rate_index == 0xf) samplerate = tb_bits_stream_get_ubits32(&bst, 24);
+	tb_byte_t rate_index = tb_static_stream_get_ubits32(&sstream, 4);
+	if (rate_index == 0xf) samplerate = tb_static_stream_get_ubits32(&sstream, 24);
 	else if (rate_index < 13) samplerate = samplerate_table[rate_index];
 	else samplerate = (44100 << ((flags & TB_FLV_AUDIO_SAMPLERATE_MASK) >> TB_FLV_AUDIO_SAMPLERATE_OFFSET) >> 3);
 
 	// get channels
-	tb_byte_t channels_idex = tb_bits_stream_get_ubits32(&bst, 4);
+	tb_byte_t channels_idex = tb_static_stream_get_ubits32(&sstream, 4);
 	tb_size_t channels = channels_idex < 8? channels_table[channels_idex] : 2;
 	if (!channels) channels = (flags & TB_FLV_AUDIO_CHANNEL_MASK) == TB_FLV_AUDIO_CHANNEL_STEREO ? 2 : 1;
 	tb_trace_i("samplerate: %u Hz, channels: %u, object_type: %u", samplerate, channels, object_type);
@@ -112,25 +112,25 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 {
 	tb_trace_i("=================================================================================");
 	tb_trace_i("video_config_size: %d %d", head_size, body_size);
-	tb_bits_stream_t 	bst;
-	tb_bits_stream_init(&bst, body_data, body_size);
+	tb_static_stream_t 	sstream;
+	tb_static_stream_init(&sstream, body_data, body_size);
 
-	tb_uint8_t configure_version 		= tb_bits_stream_get_u8(&bst);
-	tb_uint8_t avc_profile_indication 	= tb_bits_stream_get_u8(&bst);
-	tb_uint8_t profile_compatibility 	= tb_bits_stream_get_u8(&bst);
-	tb_uint8_t avc_level_indication 	= tb_bits_stream_get_u8(&bst);
+	tb_uint8_t configure_version 		= tb_static_stream_get_u8(&sstream);
+	tb_uint8_t avc_profile_indication 	= tb_static_stream_get_u8(&sstream);
+	tb_uint8_t profile_compatibility 	= tb_static_stream_get_u8(&sstream);
+	tb_uint8_t avc_level_indication 	= tb_static_stream_get_u8(&sstream);
 	tb_trace_i("version: %x profile: %x compatibility: %x, level: %x", configure_version, avc_profile_indication, profile_compatibility, avc_level_indication);
 
-	tb_uint8_t length_size_minusone 	= tb_bits_stream_get_u8(&bst) & 0x03;
+	tb_uint8_t length_size_minusone 	= tb_static_stream_get_u8(&sstream) & 0x03;
 	tb_trace_i("length_size_minusone: %u", length_size_minusone);
 
-	tb_uint8_t sps_n = tb_bits_stream_get_u8(&bst) & 0x1f;
+	tb_uint8_t sps_n = tb_static_stream_get_u8(&sstream) & 0x1f;
 	tb_trace_i("sps_n: %u", sps_n);
 
 	tb_size_t i = 0;
 	for (i = 0; i < sps_n; ++i)
 	{
-		tb_uint16_t size = tb_bits_stream_get_u16_be(&bst);
+		tb_uint16_t size = tb_static_stream_get_u16_be(&sstream);
 		tb_trace_i("sps_size: %u", size);
 
 		// analyze framerate
@@ -139,7 +139,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 			// get sps data
 			tb_byte_t* data = tb_malloc0(size);
 			tb_assert_return(data);
-			tb_bits_stream_get_data(&bst, data, size);
+			tb_static_stream_get_data(&sstream, data, size);
 
 			// remove emulation bytes
 			size = tb_flv_video_h264_sps_analyze_remove_emulation(data, size);
@@ -153,14 +153,14 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 		}
 	}
 
-	tb_uint8_t pps_n = tb_bits_stream_get_u8(&bst) & 0x1f;
+	tb_uint8_t pps_n = tb_static_stream_get_u8(&sstream) & 0x1f;
 	tb_trace_i("pps_n: %u", pps_n);
 
 	for (i = 0; i < pps_n; ++i)
 	{
-		tb_uint16_t size = tb_bits_stream_get_u16_be(&bst);
+		tb_uint16_t size = tb_static_stream_get_u16_be(&sstream);
 		tb_trace_i("pps_size: %u", size);
-		tb_bits_stream_skip(&bst, size);
+		tb_static_stream_skip(&sstream, size);
 	}
 }
 static tb_bool_t tb_flv_audio_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_size_t dts, tb_pointer_t cb_data)
@@ -183,9 +183,9 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 	info->video_dts_last = dts;
 
 	// set unit data
-	tb_bits_stream_t bst;
-	tb_bits_stream_init(&bst, body_data, body_size);
-	tb_size_t unit_size = tb_bits_stream_get_u32_be(&bst);
+	tb_static_stream_t sstream;
+	tb_static_stream_init(&sstream, body_data, body_size);
+	tb_size_t unit_size = tb_static_stream_get_u32_be(&sstream);
 	tb_size_t read_size = 4;
 	while (read_size + unit_size <= body_size)
 	{
@@ -193,11 +193,11 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 		if (unit_size)
 		{
 			// skip sei unit
-			tb_byte_t unit_type = tb_bits_stream_get_u8(&bst) & 0x1f;
+			tb_byte_t unit_type = tb_static_stream_get_u8(&sstream) & 0x1f;
 			tb_trace_i("unit_type: %u, unit_size: %u", unit_type, unit_size);
 
 			// skip unit
-			tb_bits_stream_skip(&bst, unit_size - 1);
+			tb_static_stream_skip(&sstream, unit_size - 1);
 
 			// update read size
 			read_size += unit_size;
@@ -207,7 +207,7 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 		if (read_size + 4 > body_size) break;
 
 		// read unit_size 
-		unit_size = tb_bits_stream_get_u32_be(&bst);
+		unit_size = tb_static_stream_get_u32_be(&sstream);
 		read_size += 4;
 	}
 
@@ -256,7 +256,7 @@ tb_int_t tb_demo_flv_main(tb_int_t argc, tb_char_t** argv)
 	tb_flv_exit(hflv);
 
 end:
-	// free gstream
+	// free bstream
 	if (gst) tb_basic_stream_exit(gst);
 	return 0;
 }

@@ -40,13 +40,13 @@
  * 0x00200000 - 0x03ffffff:  111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
  * 0x04000000 - 0x7fffffff:  1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
  */
-tb_long_t tb_charset_utf8_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf8_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_utf8_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf8_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
 {
 	// init
-	tb_byte_t const* 	p = tb_bits_stream_pos(bst);
+	tb_byte_t const* 	p = tb_static_stream_pos(sstream);
 	tb_byte_t const* 	q = p;
-	tb_size_t 			n = tb_bits_stream_left(bst);
+	tb_size_t 			n = tb_static_stream_left(sstream);
 
 	// 0x00000000 - 0x0000007f
 	if (!(*p & 0x80))
@@ -113,26 +113,26 @@ tb_long_t tb_charset_utf8_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* 
 		tb_trace_d("invalid utf8 character: %x", *p);
 
 		// skip it
-		tb_bits_stream_skip(bst, 1);
+		tb_static_stream_skip(sstream, 1);
 
 		// no character
 		return 0;
 	}
 
 	// next
-	if (p > q) tb_bits_stream_skip(bst, p - q);
+	if (p > q) tb_static_stream_skip(sstream, p - q);
 
 	// ok?
 	return p > q? 1 : 0;
 }
 
-tb_long_t tb_charset_utf8_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_utf8_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_utf8_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf8_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
 {
 	// init
-	tb_byte_t* 	p = (tb_byte_t*)tb_bits_stream_pos(bst);
+	tb_byte_t* 	p = (tb_byte_t*)tb_static_stream_pos(sstream);
 	tb_byte_t* 	q = p;
-	tb_size_t 	n = tb_bits_stream_left(bst);
+	tb_size_t 	n = tb_static_stream_left(sstream);
 
 	// 0x00000000 - 0x0000007f
 	if (ch <= 0x0000007f) 
@@ -215,7 +215,7 @@ tb_long_t tb_charset_utf8_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t c
 	}
 
 	// next
-	if (p > q) tb_bits_stream_skip(bst, p - q);
+	if (p > q) tb_static_stream_skip(sstream, p - q);
 
 	// ok?
 	return p > q? 1 : 0;

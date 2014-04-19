@@ -189,12 +189,12 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 
 				// the utf8 stream
 				tb_char_t 		utf8_data[16] = {0};
-				tb_bits_stream_t 	utf8_stream;
-				tb_bits_stream_init(&utf8_stream, (tb_byte_t*)utf8_data, sizeof(utf8_data));
+				tb_static_stream_t 	utf8_stream;
+				tb_static_stream_init(&utf8_stream, (tb_byte_t*)utf8_data, sizeof(utf8_data));
 
 				// the unicode stream
-				tb_bits_stream_t 	unicode_stream = {0};
-				tb_bits_stream_init(&unicode_stream, (tb_byte_t*)&unicode_val, 2);
+				tb_static_stream_t 	unicode_stream = {0};
+				tb_static_stream_init(&unicode_stream, (tb_byte_t*)&unicode_val, 2);
 
 				// unicode to utf8
 				tb_long_t utf8_size = tb_charset_conv_bst(TB_CHARSET_TYPE_UCS2 | TB_CHARSET_TYPE_NE, TB_CHARSET_TYPE_UTF8, &unicode_stream, &utf8_stream);

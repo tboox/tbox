@@ -29,7 +29,7 @@
 #include "../prefix.h"
 #include "../ipv4.h"
 #include "../../utils/utils.h"
-#include "../../stream/bits_stream.h"
+#include "../../stream/static_stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -162,15 +162,15 @@ static __tb_inline__ tb_char_t const* tb_dns_decode_name_impl(tb_char_t const* s
 	*pd = q;
 	return p;
 }
-static __tb_inline__ tb_char_t const* tb_dns_decode_name(tb_bits_stream_t* bst, tb_char_t* name)
+static __tb_inline__ tb_char_t const* tb_dns_decode_name(tb_static_stream_t* sstream, tb_char_t* name)
 {
 	tb_char_t* q = name;
-	tb_char_t* p = (tb_char_t*)tb_dns_decode_name_impl((tb_char_t const*)tb_bits_stream_beg(bst), (tb_char_t const*)tb_bits_stream_end(bst), (tb_char_t const*)tb_bits_stream_pos(bst), &q);
+	tb_char_t* p = (tb_char_t*)tb_dns_decode_name_impl((tb_char_t const*)tb_static_stream_beg(sstream), (tb_char_t const*)tb_static_stream_end(sstream), (tb_char_t const*)tb_static_stream_pos(sstream), &q);
 	if (p)
 	{
 		tb_assert(q - name < TB_DNS_NAME_MAXN);
 		if (q > name && *(q - 1) == '.') *--q = '\0';
-		tb_bits_stream_goto(bst, (tb_byte_t*)p);
+		tb_static_stream_goto(sstream, (tb_byte_t*)p);
 		return name;
 	}
 	else return tb_null;

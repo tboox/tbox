@@ -27,7 +27,7 @@
  * includes
  */
 #include "../prefix.h"
-#include "../stream/bits_stream.h"
+#include "../stream/static_stream.h"
 #include "../memory/memory.h"
 #include "vlc.h"
 
@@ -69,7 +69,7 @@ typedef struct __tb_zip_t
 	tb_uint16_t 			action;
 
 	// spak
-	tb_long_t 				(*spak)(struct __tb_zip_t* zip, tb_bits_stream_t* ist, tb_bits_stream_t* ost, tb_long_t sync);
+	tb_long_t 				(*spak)(struct __tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync);
 
 	// the vlc 
 	union __tb_zip_vlc_union_t

@@ -109,13 +109,13 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	tb_long_t rate = -1;
  
 	// format query
-	tb_bits_stream_t 	bst;
+	tb_static_stream_t 	sstream;
 	tb_byte_t 		rpkt[TB_DNS_RPKT_MAXN];
 	tb_size_t 		size = 0;
-	tb_bits_stream_init(&bst, rpkt, TB_DNS_RPKT_MAXN);
+	tb_static_stream_init(&sstream, rpkt, TB_DNS_RPKT_MAXN);
 
 	// identification number
-	tb_bits_stream_set_u16_be(&bst, TB_DNS_HEADER_MAGIC);
+	tb_static_stream_set_u16_be(&sstream, TB_DNS_HEADER_MAGIC);
 
 	/* 0x2104: 0 0000 001 0000 0000
 	 *
@@ -141,19 +141,19 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	 *
 	 */
 #if 1
-	tb_bits_stream_set_u16_be(&bst, 0x0100);
+	tb_static_stream_set_u16_be(&sstream, 0x0100);
 #else
-	tb_bits_stream_set_u1(&bst, 0); 			// this is a query
-	tb_bits_stream_set_ubits32(&bst, 0, 4); 	// this is a standard query
-	tb_bits_stream_set_u1(&bst, 0); 			// not authoritive answer
-	tb_bits_stream_set_u1(&bst, 0); 			// not truncated
-	tb_bits_stream_set_u1(&bst, 1); 			// recursion desired
+	tb_static_stream_set_u1(&sstream, 0); 			// this is a query
+	tb_static_stream_set_ubits32(&sstream, 0, 4); 	// this is a standard query
+	tb_static_stream_set_u1(&sstream, 0); 			// not authoritive answer
+	tb_static_stream_set_u1(&sstream, 0); 			// not truncated
+	tb_static_stream_set_u1(&sstream, 1); 			// recursion desired
 
-	tb_bits_stream_set_u1(&bst, 0); 			// recursion not available! hey we dont have it (lol)
-	tb_bits_stream_set_u1(&bst, 0);
-	tb_bits_stream_set_u1(&bst, 0);
-	tb_bits_stream_set_u1(&bst, 0);
-	tb_bits_stream_set_ubits32(&bst, 0, 4);
+	tb_static_stream_set_u1(&sstream, 0); 			// recursion not available! hey we dont have it (lol)
+	tb_static_stream_set_u1(&sstream, 0);
+	tb_static_stream_set_u1(&sstream, 0);
+	tb_static_stream_set_u1(&sstream, 0);
+	tb_static_stream_set_ubits32(&sstream, 0, 4);
 #endif
 
 	/* we have only one question
@@ -164,35 +164,35 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	 * tb_uint16_t resource;		// number of resource entries
 	 *
 	 */
-	tb_bits_stream_set_u16_be(&bst, 1); 
-	tb_bits_stream_set_u16_be(&bst, 0);
-	tb_bits_stream_set_u16_be(&bst, 0);
-	tb_bits_stream_set_u16_be(&bst, 0);
+	tb_static_stream_set_u16_be(&sstream, 1); 
+	tb_static_stream_set_u16_be(&sstream, 0);
+	tb_static_stream_set_u16_be(&sstream, 0);
+	tb_static_stream_set_u16_be(&sstream, 0);
 
 	// set questions, see as tb_dns_question_t
 	// name + question1 + question2 + ...
-	tb_bits_stream_set_u8(&bst, 3);
-	tb_bits_stream_set_u8(&bst, 'w');
-	tb_bits_stream_set_u8(&bst, 'w');
-	tb_bits_stream_set_u8(&bst, 'w');
-	tb_bits_stream_set_u8(&bst, 5);
-	tb_bits_stream_set_u8(&bst, 't');
-	tb_bits_stream_set_u8(&bst, 'b');
-	tb_bits_stream_set_u8(&bst, 'o');
-	tb_bits_stream_set_u8(&bst, 'o');
-	tb_bits_stream_set_u8(&bst, 'x');
-	tb_bits_stream_set_u8(&bst, 3);
-	tb_bits_stream_set_u8(&bst, 'c');
-	tb_bits_stream_set_u8(&bst, 'o');
-	tb_bits_stream_set_u8(&bst, 'm');
-	tb_bits_stream_set_u8(&bst, '\0');
+	tb_static_stream_set_u8(&sstream, 3);
+	tb_static_stream_set_u8(&sstream, 'w');
+	tb_static_stream_set_u8(&sstream, 'w');
+	tb_static_stream_set_u8(&sstream, 'w');
+	tb_static_stream_set_u8(&sstream, 5);
+	tb_static_stream_set_u8(&sstream, 't');
+	tb_static_stream_set_u8(&sstream, 'b');
+	tb_static_stream_set_u8(&sstream, 'o');
+	tb_static_stream_set_u8(&sstream, 'o');
+	tb_static_stream_set_u8(&sstream, 'x');
+	tb_static_stream_set_u8(&sstream, 3);
+	tb_static_stream_set_u8(&sstream, 'c');
+	tb_static_stream_set_u8(&sstream, 'o');
+	tb_static_stream_set_u8(&sstream, 'm');
+	tb_static_stream_set_u8(&sstream, '\0');
 
 	// only one question now.
-	tb_bits_stream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
-	tb_bits_stream_set_u16_be(&bst, 1); 		// it's internet (lol)
+	tb_static_stream_set_u16_be(&sstream, 1); 		// we are requesting the ipv4 address
+	tb_static_stream_set_u16_be(&sstream, 1); 		// it's internet (lol)
 
 	// size
-	size = tb_bits_stream_offset(&bst);
+	size = tb_static_stream_offset(&sstream);
 	tb_assert_and_check_goto(size, end);
 
 	// init time

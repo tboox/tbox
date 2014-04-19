@@ -41,7 +41,7 @@ static __tb_inline__ tb_zip_zlib_t* tb_zip_zlib_cast(tb_zip_t* zip)
 	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_ZLIB, tb_null);
 	return (tb_zip_zlib_t*)zip;
 }
-static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_bits_stream_t* ist, tb_bits_stream_t* ost, tb_long_t sync)
+static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
 {
 	tb_zip_zlib_t* zlib = tb_zip_zlib_cast(zip);
 	tb_assert_and_check_return_val(zlib && ist && ost, -1);
@@ -78,7 +78,7 @@ static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_bits_stream_t* ist, 
 	// ok?
 	return (ost->p - op);
 }
-static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_t* zip, tb_bits_stream_t* ist, tb_bits_stream_t* ost, tb_long_t sync)
+static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
 {
 	tb_zip_zlib_t* zlib = tb_zip_zlib_cast(zip);
 	tb_assert_and_check_return_val(zlib && ist && ost, -1);
