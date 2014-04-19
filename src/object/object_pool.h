@@ -32,8 +32,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_object_pool_get(pool, size, flag, type) 		tb_object_pool_get_impl(pool, size, flag, type __tb_debug_vals__)
-#define tb_object_pool_del(pool, object) 				tb_object_pool_del_impl(pool, object __tb_debug_vals__)
+#define tb_object_pool_get(pool, size, flag, type) 		tb_object_pool_get_(pool, size, flag, type __tb_debug_vals__)
+#define tb_object_pool_del(pool, object) 				tb_object_pool_del_(pool, object __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -66,14 +66,14 @@ tb_void_t 			tb_object_pool_clear(tb_handle_t pool);
  *
  * @return 			the object pointer
  */
-tb_object_t* 		tb_object_pool_get_impl(tb_handle_t pool, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__);
+tb_object_t* 		tb_object_pool_get_(tb_handle_t pool, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__);
 
 /*! del object from object_pool
  *
  * @param pool 		the object pool
  * @param object 	the object pointer
  */
-tb_void_t 			tb_object_pool_del_impl(tb_handle_t pool, tb_object_t* object __tb_debug_decl__);
+tb_void_t 			tb_object_pool_del_(tb_handle_t pool, tb_object_t* object __tb_debug_decl__);
 
 /*! the object pool singleton instance
  *

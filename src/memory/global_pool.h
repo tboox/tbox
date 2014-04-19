@@ -32,14 +32,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_global_pool_malloc(handle, size) 			tb_global_pool_malloc_impl(handle, size __tb_debug_vals__)
-#define tb_global_pool_malloc0(handle, size) 			tb_global_pool_malloc0_impl(handle, size __tb_debug_vals__)
+#define tb_global_pool_malloc(handle, size) 			tb_global_pool_malloc_(handle, size __tb_debug_vals__)
+#define tb_global_pool_malloc0(handle, size) 			tb_global_pool_malloc0_(handle, size __tb_debug_vals__)
 
-#define tb_global_pool_nalloc(handle, item, size) 		tb_global_pool_nalloc_impl(handle, item, size __tb_debug_vals__)
-#define tb_global_pool_nalloc0(handle, item, size) 		tb_global_pool_nalloc0_impl(handle, item, size __tb_debug_vals__)
+#define tb_global_pool_nalloc(handle, item, size) 		tb_global_pool_nalloc_(handle, item, size __tb_debug_vals__)
+#define tb_global_pool_nalloc0(handle, item, size) 		tb_global_pool_nalloc0_(handle, item, size __tb_debug_vals__)
 
-#define tb_global_pool_ralloc(handle, data, size) 		tb_global_pool_ralloc_impl(handle, data, size __tb_debug_vals__)
-#define tb_global_pool_free(handle, data) 				tb_global_pool_free_impl(handle, data __tb_debug_vals__)
+#define tb_global_pool_ralloc(handle, data, size) 		tb_global_pool_ralloc_(handle, data, size __tb_debug_vals__)
+#define tb_global_pool_free(handle, data) 				tb_global_pool_free_(handle, data __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -55,22 +55,22 @@ tb_void_t 		tb_global_pool_exit(tb_handle_t handle);
 tb_void_t 		tb_global_pool_clear(tb_handle_t handle);
 
 // malloc
-tb_pointer_t 	tb_global_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 	tb_global_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 // malloc0
-tb_pointer_t 	tb_global_pool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 	tb_global_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 // nalloc
-tb_pointer_t  	tb_global_pool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  	tb_global_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 // nalloc0
-tb_pointer_t  	tb_global_pool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  	tb_global_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 // ralloc
-tb_pointer_t 	tb_global_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 	tb_global_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 // free
-tb_bool_t 		tb_global_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
+tb_bool_t 		tb_global_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
 
 // data size
 tb_size_t 		tb_global_pool_data_size(tb_handle_t handle, tb_cpointer_t data);

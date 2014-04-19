@@ -22,8 +22,6 @@ tb_int_t tb_demo_memory_static_fixed_pool_main(tb_int_t argc, tb_char_t** argv)
 	}
 	time = tb_mclock() - time;
 
-end:
-
 	// dump
 #ifdef __tb_debug__
 	tb_static_fixed_pool_dump(fpool);

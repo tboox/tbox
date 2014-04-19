@@ -48,13 +48,13 @@ static tb_pointer_t tb_test_mutx_loop(tb_pointer_t data)
 #elif defined(TB_TEST_LOCK_SPINLOCK)
 		{
 			// enter
-			tb_spinlock_enter(&lock);
+			tb_spinlock_enter((tb_spinlock_t*)&lock);
 
 			// value++
 			g_value++;
 
 			// leave
-			tb_spinlock_leave(&lock);
+			tb_spinlock_leave((tb_spinlock_t*)&lock);
 		}
 #elif defined(TB_TEST_LOCK_ATOMIC)
 		tb_atomic_fetch_and_inc(&g_value);
@@ -64,7 +64,6 @@ static tb_pointer_t tb_test_mutx_loop(tb_pointer_t data)
 #endif
 	}
 
-end:
 	tb_trace_i("[loop: %x]: exit", self);
 	tb_thread_return(tb_null);
 	return tb_null;
@@ -77,14 +76,14 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init lock
 #if defined(TB_TEST_LOCK_MUTEX)
-	tb_handle_t lock = tb_mutex_init();
-	tb_assert_and_check_goto(lock, end);
+	tb_handle_t 	lock = tb_mutex_init();
+	tb_assert_and_check_return_val(lock, 0);
 #elif defined(TB_TEST_LOCK_SPINLOCK)
-	tb_handle_t lock = TB_SPINLOCK_INIT;
+	tb_handle_t 	lock = TB_SPINLOCK_INIT;
 #elif defined(TB_TEST_LOCK_ATOMIC)
-	tb_handle_t lock = tb_null; 
+	tb_handle_t 	lock = tb_null; 
 #else
-	tb_handle_t lock = tb_null; 
+	tb_handle_t 	lock = tb_null; 
 #endif
 
 	// init time
@@ -97,10 +96,9 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
 	for (i = 0; i < n; i++)
 	{
 		loop[i] = tb_thread_init(tb_null, tb_test_mutx_loop, lock, 0);
-		tb_assert_and_check_goto(loop[i], end);
+		tb_assert_and_check_break(loop[i]);
 	}
 
-end:
 	// exit thread
 	for (i = 0; i < TB_TEST_LOOP_MAXN; i++)
 	{
@@ -118,7 +116,7 @@ end:
 		if (lock) tb_mutex_exit(lock);
 		lock = tb_null;
 #elif defined(TB_TEST_LOCK_SPINLOCK)
-		tb_spinlock_exit(&lock);
+		tb_spinlock_exit((tb_spinlock_t*)&lock);
 #elif defined(TB_TEST_LOCK_ATOMIC)
 		lock = tb_null;
 #else

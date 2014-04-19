@@ -13,8 +13,8 @@
 # 	define tb_hash_test_dump(h)
 #endif
 
-#define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen(s); tb_hash_set(h, s, n); } while (0);
-#define tb_hash_test_get_s2i(h, s) 		do {tb_assert(tb_strlen(s) == (tb_size_t)tb_hash_get(h, s)); } while (0);
+#define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen((tb_char_t*)(s)); tb_hash_set(h, (tb_char_t*)(s), n); } while (0);
+#define tb_hash_test_get_s2i(h, s) 		do {tb_assert(tb_strlen((tb_char_t*)s) == (tb_size_t)tb_hash_get(h, (tb_char_t*)(s))); } while (0);
 #define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, s); tb_assert(!tb_hash_get(h, s)); } while (0);
 
 #define tb_hash_test_set_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_hash_set(h, i, s); } while (0);
@@ -26,10 +26,10 @@
 #define tb_hash_test_del_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_hash_del(h, item); tb_assert(!tb_hash_get(h, item)); } while (0);
 
 #define tb_hash_test_set_i2i(h, i) 		do {tb_hash_set(h, i, i); } while (0);
-#define tb_hash_test_get_i2i(h, i) 		do {tb_assert(i == tb_hash_get(h, i)); } while (0);
+#define tb_hash_test_get_i2i(h, i) 		do {tb_assert(i == (tb_size_t)tb_hash_get(h, i)); } while (0);
 #define tb_hash_test_del_i2i(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
 
-#define tb_hash_test_set_i2t(h, i) 		do {tb_hash_set(h, i, tb_true); } while (0);
+#define tb_hash_test_set_i2t(h, i) 		do {tb_hash_set(h, i, (tb_size_t)tb_true); } while (0);
 #define tb_hash_test_get_i2t(h, i) 		do {tb_assert(tb_hash_get(h, i)); } while (0);
 #define tb_hash_test_del_i2t(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
 
@@ -121,13 +121,13 @@ static tb_void_t tb_hash_test_s2i_perf()
 	tb_rand_clear();
 
 	// performance
-	__tb_volatile__ tb_char_t s[256] = {0};
+	tb_char_t s[256] = {0};
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_int_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
-		s[r] == '\0'; 
+		tb_int_t r = tb_snprintf(s, sizeof(s) - 1, "%x", tb_rand_uint32(0, TB_MAXU32)); 
+		s[r] = '\0'; 
 		tb_hash_test_set_s2i(hash, s); 
 		tb_hash_test_get_s2i(hash, s);
 	}
@@ -600,7 +600,7 @@ static tb_void_t tb_hash_test_walk_perf()
 	// performance
 	tb_hong_t t = tb_mclock();
 	__tb_volatile__ tb_hize_t test[3] = {0};
-	tb_hash_walk(hash, tb_hash_test_walk_item, test);
+	tb_hash_walk(hash, tb_hash_test_walk_item, (tb_pointer_t)test);
 	t = tb_mclock() - t;
 	tb_trace_i("name: %llx, data: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], test[2], tb_hash_size(hash), t);
 

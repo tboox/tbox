@@ -87,7 +87,7 @@ static tb_void_t tb_find_str_test()
 	for (i = 0; i < n; i++) 
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%04lu", i); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
@@ -130,7 +130,7 @@ static tb_void_t tb_find_str_test_binary()
 	for (i = 0; i < n; i++) 
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%04lu", i); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 		data[i] = tb_block_pool_strdup(pool, s);
 	}
 

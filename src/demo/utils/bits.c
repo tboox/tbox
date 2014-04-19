@@ -724,7 +724,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_swap_u64();
 #endif
 
-#if 0
+#if 1
 	tb_trace_i("");
 	tb_test_bits_ubits32(0x87654321);
 	tb_test_bits_ubits32(0x12345678);
@@ -788,11 +788,11 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_double_lle(3.1415926);
 
 	tb_trace_i("");
-	tb_test_bits_double_be(3.1415926);
-	tb_test_bits_double_le(3.1415926);
+	tb_test_bits_float_be(3.1415926);
+	tb_test_bits_float_le(3.1415926);
 
-	tb_test_bits_double_be(3.1415926);
-	tb_test_bits_double_le(3.1415926);
+	tb_test_bits_float_be(3.1415926);
+	tb_test_bits_float_le(3.1415926);
 #endif
 #endif
 

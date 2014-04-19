@@ -111,6 +111,7 @@ static __tb_inline__ tb_async_stream_sock_t* tb_async_stream_sock_cast(tb_handle
 	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_SOCK, tb_null);
 	return (tb_async_stream_sock_t*)astream;
 }
+#ifdef TB_SSL_ENABLE
 static tb_bool_t tb_async_stream_sock_sopen_func(tb_handle_t ssl, tb_size_t state, tb_pointer_t priv)
 {
 	// check
@@ -129,6 +130,7 @@ static tb_bool_t tb_async_stream_sock_sopen_func(tb_handle_t ssl, tb_size_t stat
 	// ok
 	return tb_true;
 }
+#endif
 static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
 {
 	// check

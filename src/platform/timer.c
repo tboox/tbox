@@ -123,7 +123,7 @@ static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata
 }
 static tb_long_t tb_timer_comp_by_task(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	return (ltem - rtem);
+	return ((tb_long_t)ltem > (tb_long_t)rtem? 1 : ((tb_long_t)ltem < (tb_long_t)rtem? -1 : 0));
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -64,7 +64,7 @@ end:
 tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init item
-	tb_test_item_t it[TB_TEST_ITEM_MAX] = {0};
+	tb_test_item_t it[TB_TEST_ITEM_MAX] = {{0}};
 
 	// init thread
 	tb_size_t i = 0;

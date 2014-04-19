@@ -11,6 +11,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
+#if !TB_WHOIS_TEST_HOST_WALK
 static tb_void_t tb_whois_test_done(tb_char_t const* name)
 {
 	// init
@@ -37,6 +38,7 @@ static tb_void_t tb_whois_test_done(tb_char_t const* name)
 	// exit
 	tb_basic_stream_exit(bstream);
 }
+#else
 static tb_bool_t tb_whois_test_no_match_com(tb_char_t const* name)
 {
 	// init
@@ -399,6 +401,7 @@ static tb_void_t tb_whois_test_walk_num_6()
 		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
@@ -406,17 +409,17 @@ static tb_void_t tb_whois_test_walk_num_6()
 tb_int_t tb_demo_network_whois_main(tb_int_t argc, tb_char_t** argv)
 {
 #if TB_WHOIS_TEST_HOST_WALK
-//	tb_whois_test_walk_2();
-//	tb_whois_test_walk_3();
-//	tb_whois_test_walk_4();
-//	tb_whois_test_walk_5();
-//	tb_whois_test_walk_6();
-//	tb_whois_test_walk_num_1();
-//	tb_whois_test_walk_num_2();
-//	tb_whois_test_walk_num_3();
-//	tb_whois_test_walk_num_4();
-//	tb_whois_test_walk_num_5();
-//	tb_whois_test_walk_num_6();
+	tb_whois_test_walk_2();
+	tb_whois_test_walk_3();
+	tb_whois_test_walk_4();
+	tb_whois_test_walk_5();
+	tb_whois_test_walk_6();
+	tb_whois_test_walk_num_1();
+	tb_whois_test_walk_num_2();
+	tb_whois_test_walk_num_3();
+	tb_whois_test_walk_num_4();
+	tb_whois_test_walk_num_5();
+	tb_whois_test_walk_num_6();
 	tb_whois_test_walk_ping_2(argv[1]);	
 	tb_whois_test_walk_ping_3(argv[1]);	
 #else

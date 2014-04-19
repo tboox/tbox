@@ -112,7 +112,8 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 		}
 
 		// overlap?
-		if ((s2 >= s1 && s2 < s1 + n) || (s1 >= s2 && s1 < s2 + n))
+		if (((tb_byte_t*)s2 >= (tb_byte_t*)s1 && (tb_byte_t*)s2 < (tb_byte_t*)s1 + n)
+			|| ((tb_byte_t*)s1 >= (tb_byte_t*)s2 && (tb_byte_t*)s1 < (tb_byte_t*)s2 + n))
 		{
 			tb_trace_i("[memcpy]: [overlap]: [%p, %lu] => [%p, %lu]", s2, n, s1, n);
 			tb_backtrace_dump("[memcpy]: [overlap]: ", tb_null, 10);

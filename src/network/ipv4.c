@@ -52,7 +52,7 @@ tb_uint32_t tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip)
 	b0 = tb_stou32(p);
 	tb_check_goto(b0 < 256, fail);
 
-	while (*p && *p != '.') *p++;
+	while (*p && *p != '.') p++;
 	tb_check_goto(*p, fail);
 	p++;
 
@@ -61,7 +61,7 @@ tb_uint32_t tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip)
 	b1 = tb_stou32(p);
 	tb_check_goto(b1 < 256, fail);
 
-	while (*p && *p != '.') *p++;
+	while (*p && *p != '.') p++;
 	tb_check_goto(*p, fail);
 	p++;
 
@@ -70,7 +70,7 @@ tb_uint32_t tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip)
 	b2 = tb_stou32(p);
 	tb_check_goto(b2 < 256, fail);
 
-	while (*p && *p != '.') *p++;
+	while (*p && *p != '.') p++;
 	tb_check_goto(*p, fail);
 	p++;
 

@@ -316,7 +316,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
 	for (i = 0; i < n; i++) 
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
@@ -358,7 +358,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
 	for (i = 0; i < n; i++) 
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
@@ -400,7 +400,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
 	for (i = 0; i < n; i++) 
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
@@ -442,7 +442,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
 	for (i = 0; i < n; i++) 
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
@@ -484,7 +484,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 	for (i = 0; i < n; i++) 
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
-		s[r] == '\0'; 
+		s[r] = '\0'; 
 		data[i] = tb_block_pool_strdup(pool, s);
 	}
 

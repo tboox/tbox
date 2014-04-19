@@ -260,7 +260,7 @@ tb_void_t tb_block_pool_clear(tb_handle_t handle)
 #endif
 
 }
-tb_pointer_t tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_block_pool_t* pool = (tb_block_pool_t*)handle;
@@ -285,7 +285,7 @@ tb_pointer_t tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_d
 		if (vpool) 
 		{
 			// try allocating it
-			tb_pointer_t p = tb_static_block_pool_malloc_impl(vpool, size __tb_debug_args__);
+			tb_pointer_t p = tb_static_block_pool_malloc_(vpool, size __tb_debug_args__);
 
 			// ok
 			if (p) 
@@ -310,7 +310,7 @@ tb_pointer_t tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_d
 			if (vpool) 
 			{
 				// try allocating it
-				tb_pointer_t p = tb_static_block_pool_malloc_impl(vpool, size __tb_debug_args__);
+				tb_pointer_t p = tb_static_block_pool_malloc_(vpool, size __tb_debug_args__);
 
 				// ok
 				if (p) 
@@ -350,7 +350,7 @@ tb_pointer_t tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_d
 		tb_assert_and_check_break(chunk->pool);
 
 		// try allocating it
-		tb_pointer_t p = tb_static_block_pool_malloc_impl(chunk->pool, size __tb_debug_args__);
+		tb_pointer_t p = tb_static_block_pool_malloc_(chunk->pool, size __tb_debug_args__);
 
 		// ok
 		if (p) 
@@ -371,10 +371,10 @@ tb_pointer_t tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_d
 	// fail
 	return tb_null;
 }
-tb_pointer_t tb_block_pool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// malloc
-	tb_byte_t* p = tb_block_pool_malloc_impl(handle, size __tb_debug_args__);
+	tb_byte_t* p = tb_block_pool_malloc_(handle, size __tb_debug_args__);
 
 	// clear
 	if (p && size) tb_memset(p, 0, size);
@@ -382,25 +382,25 @@ tb_pointer_t tb_block_pool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_
 	// ok?
 	return p;
 }
-tb_pointer_t tb_block_pool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_block_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-	return tb_block_pool_malloc_impl(handle, item * size __tb_debug_args__);
+	return tb_block_pool_malloc_(handle, item * size __tb_debug_args__);
 }
 
-tb_pointer_t tb_block_pool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_block_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-	return tb_block_pool_malloc0_impl(handle, item * size __tb_debug_args__);
+	return tb_block_pool_malloc0_(handle, item * size __tb_debug_args__);
 }
 
-tb_pointer_t tb_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_block_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_block_pool_t* pool = (tb_block_pool_t*)handle;
@@ -409,12 +409,12 @@ tb_pointer_t tb_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb
 	// free it if no size
 	if (!size)
 	{
-		tb_block_pool_free_impl(pool, data __tb_debug_args__);
+		tb_block_pool_free_(pool, data __tb_debug_args__);
 		return tb_null;
 	}
 
 	// alloc it if no data?
-	if (!data) return tb_block_pool_malloc_impl(pool, size __tb_debug_args__);
+	if (!data) return tb_block_pool_malloc_(pool, size __tb_debug_args__);
 	
 	// ralloc it with fast mode if enough
 	tb_size_t 		osize = 0;
@@ -423,7 +423,7 @@ tb_pointer_t tb_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb
 	tb_assert_and_check_return_val(osize < size, tb_null);
 
 	// malloc it
-	pdata = tb_block_pool_malloc_impl(pool, size __tb_debug_args__);
+	pdata = tb_block_pool_malloc_(pool, size __tb_debug_args__);
 	tb_check_return_val(pdata, tb_null);
 	tb_assert_and_check_return_val(pdata != data, pdata);
 
@@ -431,18 +431,18 @@ tb_pointer_t tb_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb
 	tb_memcpy(pdata, data, osize);
 	
 	// free it
-	tb_block_pool_free_impl(pool, data __tb_debug_args__);
+	tb_block_pool_free_(pool, data __tb_debug_args__);
 
 	// ok
 	return pdata;
 }
-tb_char_t* tb_block_pool_strdup_impl(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__)
+tb_char_t* tb_block_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(handle && data, tb_null);
 
 	tb_size_t 	n = tb_strlen(data);
-	tb_char_t* 	p = tb_block_pool_malloc_impl(handle, n + 1 __tb_debug_args__);
+	tb_char_t* 	p = tb_block_pool_malloc_(handle, n + 1 __tb_debug_args__);
 	if (p)
 	{
 		tb_memcpy(p, data, n);
@@ -452,13 +452,13 @@ tb_char_t* tb_block_pool_strdup_impl(tb_handle_t handle, tb_char_t const* data _
 	return p;
 }
 
-tb_char_t* tb_block_pool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__)
+tb_char_t* tb_block_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(handle && data, tb_null);
 
 	size = tb_strnlen(data, size);
-	tb_char_t* 	p = tb_block_pool_malloc_impl(handle, size + 1 __tb_debug_args__);
+	tb_char_t* 	p = tb_block_pool_malloc_(handle, size + 1 __tb_debug_args__);
 	if (p)
 	{
 		tb_memcpy(p, data, size);
@@ -467,7 +467,7 @@ tb_char_t* tb_block_pool_strndup_impl(tb_handle_t handle, tb_char_t const* data,
 
 	return p;
 }
-tb_bool_t tb_block_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
+tb_bool_t tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
 {
 	// check 
 	tb_block_pool_t* pool = (tb_block_pool_t*)handle;
@@ -487,7 +487,7 @@ tb_bool_t tb_block_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_deb
 		if (vpool) 
 		{
 			// try allocating it
-			tb_bool_t r = tb_static_block_pool_free_impl(vpool, data __tb_debug_args__);
+			tb_bool_t r = tb_static_block_pool_free_(vpool, data __tb_debug_args__);
 
 			// ok
 			if (r) return r;
@@ -502,7 +502,7 @@ tb_bool_t tb_block_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_deb
 		if (vpool) 
 		{
 			// try free it
-			tb_bool_t r = tb_static_block_pool_free_impl(vpool, data __tb_debug_args__);
+			tb_bool_t r = tb_static_block_pool_free_(vpool, data __tb_debug_args__);
 
 			// ok
 			if (r) 

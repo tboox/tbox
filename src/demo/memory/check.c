@@ -55,7 +55,7 @@ tb_void_t tb_demo_overlap()
 	tb_cpointer_t data = tb_malloc(10);
 	if (data)
 	{
-		tb_memcpy(data, data + 1, 5);
+		tb_memcpy(data, (tb_byte_t const*)data + 1, 5);
 		tb_free(data);
 	}
 }

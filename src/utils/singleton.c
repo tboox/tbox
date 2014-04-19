@@ -58,7 +58,7 @@ typedef struct __tb_singleton_t
  */
 
 // the singletons
-static tb_singleton_t g_singletons[TB_SINGLETON_TYPE_MAXN] = {0};
+static tb_singleton_t g_singletons[TB_SINGLETON_TYPE_MAXN] = {{0}};
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

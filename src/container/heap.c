@@ -110,7 +110,7 @@ typedef struct __tb_heap_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * checker
  */
-#ifdef __tb_debug__
+#if 0//def __tb_debug__
 static tb_void_t tb_heap_check(tb_heap_impl_t* heap)
 {
 	// init

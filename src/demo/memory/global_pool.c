@@ -37,8 +37,6 @@ tb_int_t tb_demo_memory_global_pool_main(tb_int_t argc, tb_char_t** argv)
 	time = tb_mclock() - time;
 #endif
 
-end:
-
 	// dump
 #ifdef __tb_debug__
 //	tb_global_pool_dump(gpool);

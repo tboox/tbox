@@ -96,7 +96,8 @@ CFLAGS 				= \
 					-Wundef -Wmissing-prototypes  \
 					-fno-signed-zeros -fno-tree-vectorize \
 					-Werror=unused-variable -Wtype-limits -Wno-pointer-sign -Wno-pointer-to-int-cast \
-					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=return-type
+					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=return-type \
+					-Werror=unused-label -Werror=unused-comparison -Werror=sometimes-uninitialized
 #					-Werror
 
 # ccflags: .cc/.cpp files

@@ -72,12 +72,16 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 	// check
 	tb_assert_and_check_return_val(argv[1], 0);
 
-	// open socket
-	tb_handle_t sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+	// init
+	tb_handle_t sock = tb_null;
+	tb_aiop_t* 	aiop = tb_null;
+
+	// init sock
+	sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
 	tb_assert_and_check_goto(sock, end);
 
 	// init aiop
-	tb_aiop_t* 	aiop = tb_aiop_init(16);
+	aiop = tb_aiop_init(16);
 	tb_assert_and_check_goto(aiop, end);
 
 	// bind 
@@ -102,7 +106,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 		for (i = 0; i < objn; i++)
 		{
 			// the aioo 
-			tb_aioo_t const* aioo = list[i].aioo;
+			tb_handle_t aioo = list[i].aioo;
 
 			// check
 			tb_assert_and_check_break(aioo && tb_aioo_handle(aioo));

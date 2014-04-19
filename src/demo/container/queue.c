@@ -324,16 +324,11 @@ static tb_void_t tb_queue_perf_test()
  */
 tb_int_t tb_demo_container_queue_main(tb_int_t argc, tb_char_t** argv)
 {
-#if 0
 	tb_queue_int_test();
 	tb_queue_str_test();
 	tb_queue_efm_test();
 	tb_queue_ifm_test();
-#endif
-
-#if 0
 	tb_queue_perf_test();
-#endif
 
 	return 0;
 }

@@ -136,7 +136,7 @@ typedef struct __tb_exception_list_t
  */
 
 #if defined(tb_signal) && defined(tb_sigsetjmp) && defined(tb_siglongjmp)
-static tb_void_t tb_exception_func_impl(tb_int_t sig)
+static __tb_inline__ tb_void_t tb_exception_func_impl(tb_int_t sig)
 {
 	tb_exception_list_t* list = (tb_exception_list_t*)tb_tstore_getp();
 	if (list && list->stack && tb_stack_size(list->stack)) 
@@ -146,7 +146,7 @@ static tb_void_t tb_exception_func_impl(tb_int_t sig)
 	}
 	else tb_trace_e("exception: unknown signal: %d", sig);
 }
-static tb_void_t tb_exception_init_impl()
+static __tb_inline__ tb_void_t tb_exception_init_impl()
 {
 	static tb_atomic_t s_init = 0;
 	if (!tb_atomic_fetch_and_set(&s_init, 1))
@@ -159,7 +159,7 @@ static tb_void_t tb_exception_init_impl()
 //		tb_signal(TB_SIGTRAP, tb_exception_func_impl);
 	}
 }
-static tb_void_t tb_exception_list_free(tb_tstore_data_t* data)
+static __tb_inline__ tb_void_t tb_exception_list_free(tb_tstore_data_t* data)
 {
 	tb_exception_list_t* list = (tb_exception_list_t*)data;
 	if (list)
