@@ -20,8 +20,8 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_PLATFROM_COMPILER_PREFIX_H
-#define TB_PLATFROM_COMPILER_PREFIX_H
+#ifndef TB_PLATFORM_COMPILER_PREFIX_H
+#define TB_PLATFORM_COMPILER_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

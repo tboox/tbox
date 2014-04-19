@@ -20,8 +20,8 @@
  * @file		api.h
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_API_H
-#define TB_PLATFROM_WINDOWS_API_H
+#ifndef TB_PLATFORM_WINDOWS_API_H
+#define TB_PLATFORM_WINDOWS_API_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

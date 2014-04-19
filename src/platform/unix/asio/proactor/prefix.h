@@ -20,8 +20,8 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_PLATFROM_UNIX_ASIO_PROACTOR_PREFIX_H
-#define TB_PLATFROM_UNIX_ASIO_PROACTOR_PREFIX_H
+#ifndef TB_PLATFORM_UNIX_ASIO_PROACTOR_PREFIX_H
+#define TB_PLATFORM_UNIX_ASIO_PROACTOR_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
