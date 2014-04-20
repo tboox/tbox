@@ -39,7 +39,7 @@ tb_char_t* tb_strnirchr(tb_char_t const* s, tb_size_t n, tb_char_t c)
 	// done
 	tb_byte_t const* 	p = s + n - 1;
 	tb_byte_t 			b = tb_tolower((tb_byte_t)c);
-	while (p >= s && *p)
+	while (p >= (tb_byte_t const*)s && *p)
 	{
 		if (tb_tolower(*p) == b) return (tb_char_t*)p;
 		p--;

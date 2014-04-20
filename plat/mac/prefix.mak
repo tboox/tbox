@@ -74,7 +74,7 @@ CFLAGS 				= \
 					-Werror=return-type -Werror=unused-variable -Wno-pointer-sign -Wno-pointer-to-int-cast \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=sometimes-uninitialized \
 					-Werror=pointer-arith -Werror=unused-function -Werror=unused-value -Werror=missing-braces \
-					-Werror=tautological-compare
+					-Werror=tautological-compare -Werror=compare-distinct-pointer-types -Werror=incompatible-pointer-types
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	= 

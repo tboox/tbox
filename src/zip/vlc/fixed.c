@@ -38,7 +38,7 @@ static tb_void_t tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_sta
 static tb_uint32_t tb_zip_vlc_fixed_get(tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream)
 {
 	tb_assert(vlc);
-	return (tb_static_stream_get_ubits32(sstream, ((tb_zip_vlc_fixed_t*)vlc)->nbits) + 1);
+	return (tb_static_stream_get_ubits32((tb_static_stream_t*)sstream, ((tb_zip_vlc_fixed_t*)vlc)->nbits) + 1);
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

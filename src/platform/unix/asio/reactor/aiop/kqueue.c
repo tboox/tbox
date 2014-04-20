@@ -96,11 +96,11 @@ static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_aioo
 	tb_size_t 		oneshot = (code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
 	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) 
 	{
-		EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioo); n++;
+		EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
 	}
 	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN)
 	{
-		EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioo); n++;
+		EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
 	}
 
 	// ok?
@@ -337,7 +337,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_kqueue_init(tb_aiop_t* aiop)
 	return (tb_aiop_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_aiop_reactor_kqueue_exit(rtor);
+	if (rtor) tb_aiop_reactor_kqueue_exit((tb_aiop_reactor_t*)rtor);
 	return tb_null;
 }
 

@@ -40,7 +40,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * init & exit
+ * implementation
  */
 tb_bool_t tb_scoped_string_init(tb_scoped_string_t* string)
 {
@@ -51,14 +51,10 @@ tb_void_t tb_scoped_string_exit(tb_scoped_string_t* string)
 {
 	if (string) tb_scoped_buffer_exit(string);
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * accessors
- */
 tb_char_t const* tb_scoped_string_cstr(tb_scoped_string_t const* string)
 {
 	tb_assert_and_check_return_val(string, tb_null);
-	return (tb_char_t const*)tb_scoped_buffer_data(string);
+	return (tb_char_t const*)tb_scoped_buffer_data((tb_scoped_buffer_t*)string);
 }
 tb_size_t tb_scoped_string_size(tb_scoped_string_t const* string)
 {
@@ -66,11 +62,6 @@ tb_size_t tb_scoped_string_size(tb_scoped_string_t const* string)
 	tb_size_t n = tb_scoped_buffer_size(string);
 	return n > 0? n - 1 : 0;
 }
-
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * modifiors
- */
 tb_void_t tb_scoped_string_clear(tb_scoped_string_t* string)
 {
 	tb_assert_and_check_return(string);
@@ -79,7 +70,7 @@ tb_void_t tb_scoped_string_clear(tb_scoped_string_t* string)
 	tb_scoped_buffer_clear(string);
 
 	// clear string
-	tb_char_t* p = tb_scoped_buffer_data(string);
+	tb_char_t* p = (tb_char_t*)tb_scoped_buffer_data(string);
 	if (p) p[0] = '\0';
 }
 tb_char_t const* tb_scoped_string_strip(tb_scoped_string_t* string, tb_size_t n)
@@ -90,13 +81,10 @@ tb_char_t const* tb_scoped_string_strip(tb_scoped_string_t* string, tb_size_t n)
 	tb_check_return_val(n < tb_scoped_string_size(string), tb_scoped_string_cstr(string));
 
 	// strip
-	tb_char_t* p = tb_scoped_buffer_resize(string, n + 1);
+	tb_char_t* p = (tb_char_t*)tb_scoped_buffer_resize(string, n + 1);
 	if (p) p[n] = '\0';
 	return p;
 }
-/* //////////////////////////////////////////////////////////////////////////////////////
- * strchr
- */
 tb_long_t tb_scoped_string_strchr(tb_scoped_string_t const* string, tb_size_t p, tb_char_t c)
 {
 	tb_char_t const* 	s = tb_scoped_string_cstr(string);
@@ -115,10 +103,6 @@ tb_long_t tb_scoped_string_strichr(tb_scoped_string_t const* string, tb_size_t p
 	tb_char_t* q = tb_strichr(s + p, c);
 	return (q? q - s : -1);
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * strrchr
- */
 tb_long_t tb_scoped_string_strrchr(tb_scoped_string_t const* string, tb_size_t p, tb_char_t c)
 {
 	tb_char_t const* 	s = tb_scoped_string_cstr(string);
@@ -137,17 +121,13 @@ tb_long_t tb_scoped_string_strirchr(tb_scoped_string_t const* string, tb_size_t 
 	tb_char_t* q = tb_strnirchr(s + p, n, c);
 	return (q? q - s : -1);
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * strstr
- */
 tb_long_t tb_scoped_string_strstr(tb_scoped_string_t const* string, tb_size_t p, tb_scoped_string_t const* s)
 {
-	return tb_scoped_string_cstrstr(string, tb_scoped_string_cstr(s), p);
+	return tb_scoped_string_cstrstr(string, p, tb_scoped_string_cstr(s));
 }
 tb_long_t tb_scoped_string_stristr(tb_scoped_string_t const* string, tb_size_t p, tb_scoped_string_t const* s)
 {
-	return tb_scoped_string_cstristr(string, tb_scoped_string_cstr(s), p);
+	return tb_scoped_string_cstristr(string, p, tb_scoped_string_cstr(s));
 }
 tb_long_t tb_scoped_string_cstrstr(tb_scoped_string_t const* string, tb_size_t p, tb_char_t const* s2)
 {
@@ -167,19 +147,14 @@ tb_long_t tb_scoped_string_cstristr(tb_scoped_string_t const* string, tb_size_t 
 	tb_char_t* q = tb_stristr(s + p, s2);
 	return (q? q - s : -1);
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * strrstr
- */
 tb_long_t tb_scoped_string_strrstr(tb_scoped_string_t const* string, tb_size_t p, tb_scoped_string_t const* s)
 {
-	return tb_scoped_string_cstrrstr(string, tb_scoped_string_cstr(s), p);
+	return tb_scoped_string_cstrrstr(string, p, tb_scoped_string_cstr(s));
 }
 tb_long_t tb_scoped_string_strirstr(tb_scoped_string_t const* string, tb_size_t p, tb_scoped_string_t const* s)
 {
-	return tb_scoped_string_cstrirstr(string, tb_scoped_string_cstr(s), p);
+	return tb_scoped_string_cstrirstr(string, p, tb_scoped_string_cstr(s));
 }
-
 tb_long_t tb_scoped_string_cstrrstr(tb_scoped_string_t const* string, tb_size_t p, tb_char_t const* s2)
 {	
 	tb_char_t const* 	s = tb_scoped_string_cstr(string);
@@ -198,10 +173,6 @@ tb_long_t tb_scoped_string_cstrirstr(tb_scoped_string_t const* string, tb_size_t
 	tb_char_t* q = tb_strnirstr(s + p, n, s2);
 	return (q? q - s : -1);
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * strcpy
- */
 tb_char_t const* tb_scoped_string_strcpy(tb_scoped_string_t* string, tb_scoped_string_t const* s)
 {
 	// check
@@ -226,7 +197,7 @@ tb_char_t const* tb_scoped_string_cstrncpy(tb_scoped_string_t* string, tb_char_t
 	// check
 	tb_assert_and_check_return_val(string && s && n, tb_null);
 
-	tb_char_t* p = tb_scoped_buffer_memncpy(string, s, n + 1);
+	tb_char_t* p = (tb_char_t*)tb_scoped_buffer_memncpy(string, (tb_byte_t const*)s, n + 1);
 	if (p) p[tb_scoped_string_size(string)] = '\0';
 	return p;
 }
@@ -251,7 +222,7 @@ tb_char_t const* tb_scoped_string_chrcat(tb_scoped_string_t* string, tb_char_t c
 	// check
 	tb_assert_and_check_return_val(string, tb_null);
 	
-	tb_char_t* p = tb_scoped_buffer_memnsetp(string, tb_scoped_string_size(string), c, 2);
+	tb_char_t* p = (tb_char_t*)tb_scoped_buffer_memnsetp(string, tb_scoped_string_size(string), c, 2);
 	if (p) p[tb_scoped_string_size(string)] = '\0';
 	return p;
 }
@@ -260,7 +231,7 @@ tb_char_t const* tb_scoped_string_chrncat(tb_scoped_string_t* string, tb_char_t 
 	// check
 	tb_assert_and_check_return_val(string, tb_null);
 
-	tb_char_t* p = tb_scoped_buffer_memnsetp(string, tb_scoped_string_size(string), c, n + 1);
+	tb_char_t* p = (tb_char_t*)tb_scoped_buffer_memnsetp(string, tb_scoped_string_size(string), c, n + 1);
 	if (p) p[tb_scoped_string_size(string)] = '\0';
 	return p;
 }
@@ -283,7 +254,7 @@ tb_char_t const* tb_scoped_string_cstrncat(tb_scoped_string_t* string, tb_char_t
 {
 	// check
 	tb_assert_and_check_return_val(string && s && n, tb_null);
-	tb_char_t* p = tb_scoped_buffer_memncpyp(string, tb_scoped_string_size(string), s, n + 1);
+	tb_char_t* p = (tb_char_t*)tb_scoped_buffer_memncpyp(string, tb_scoped_string_size(string), (tb_byte_t const*)s, n + 1);
 	if (p) p[tb_scoped_string_size(string)] = '\0';
 	return p;
 }
@@ -300,10 +271,6 @@ tb_char_t const* tb_scoped_string_cstrfcat(tb_scoped_string_t* string, tb_char_t
 	
 	return tb_scoped_string_cstrncat(string, p, n);
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * strcmp
- */
 tb_long_t tb_scoped_string_strcmp(tb_scoped_string_t* string, tb_scoped_string_t const* s)
 {
 	// check

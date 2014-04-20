@@ -110,8 +110,8 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
  
 	// format query
 	tb_static_stream_t 	sstream;
-	tb_byte_t 		rpkt[TB_DNS_RPKT_MAXN];
-	tb_size_t 		size = 0;
+	tb_byte_t 			rpkt[TB_DNS_RPKT_MAXN];
+	tb_size_t 			size = 0;
 	tb_static_stream_init(&sstream, rpkt, TB_DNS_RPKT_MAXN);
 
 	// identification number

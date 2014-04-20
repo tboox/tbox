@@ -70,28 +70,28 @@ typedef struct __tb_dns_looker_t
 	tb_static_buffer_t 		rpkt;
 	
 	// the size for recv & send packet
-	tb_size_t 			size;
+	tb_size_t 				size;
 
 	// the iterator
-	tb_size_t 			itor;
+	tb_size_t 				itor;
 
 	// the step
-	tb_size_t 			step;
+	tb_size_t 				step;
 
 	// the tryn
-	tb_size_t 			tryn;
+	tb_size_t 				tryn;
 
 	// the socket
-	tb_handle_t 		sock;
+	tb_handle_t 			sock;
 
 	// the server list
-	tb_ipv4_t 			list[2];
+	tb_ipv4_t 				list[2];
 
 	// the server maxn
-	tb_size_t 			maxn;
+	tb_size_t 				maxn;
 
 	// the data
-	tb_byte_t 			data[TB_DNS_NAME_MAXN + TB_DNS_RPKT_MAXN];
+	tb_byte_t 				data[TB_DNS_NAME_MAXN + TB_DNS_RPKT_MAXN];
 
 }tb_dns_looker_t;
 
@@ -312,7 +312,7 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		answer.res.size 	= tb_static_stream_get_u16_be(&sstream);
 		tb_trace_d("response: type: %d", 	answer.res.type);
 		tb_trace_d("response: class: %d", 	answer.res.class_);
-		tb_trace_d("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_d("response: ttl: %d", 	answer.res.ttl);
 		tb_trace_d("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
@@ -368,12 +368,12 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 
 		// decode resource
 		answer.res.type = 	tb_static_stream_get_u16_be(&sstream);
-		answer.res.class_ = 	tb_static_stream_get_u16_be(&sstream);
+		answer.res.class_ = tb_static_stream_get_u16_be(&sstream);
 		answer.res.ttl = 	tb_static_stream_get_u32_be(&sstream);
 		answer.res.size = 	tb_static_stream_get_u16_be(&sstream);
 		tb_trace_d("response: type: %d", 	answer.res.type);
 		tb_trace_d("response: class: %d", 	answer.res.class_);
-		tb_trace_d("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_d("response: ttl: %d", 	answer.res.ttl);
 		tb_trace_d("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
@@ -406,12 +406,12 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 
 		// decode resource
 		answer.res.type = 	tb_static_stream_get_u16_be(&sstream);
-		answer.res.class_ = 	tb_static_stream_get_u16_be(&sstream);
+		answer.res.class_ = tb_static_stream_get_u16_be(&sstream);
 		answer.res.ttl = 	tb_static_stream_get_u32_be(&sstream);
 		answer.res.size = 	tb_static_stream_get_u16_be(&sstream);
 		tb_trace_d("response: type: %d", 	answer.res.type);
 		tb_trace_d("response: class: %d", 	answer.res.class_);
-		tb_trace_d("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_d("response: ttl: %d", 	answer.res.ttl);
 		tb_trace_d("response: size: %d", 	answer.res.size);
 
 		// is ipv4?

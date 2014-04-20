@@ -350,7 +350,7 @@ tb_pointer_t tb_tiny_pool_ralloc_fast(tb_tiny_pool_t* pool, tb_pointer_t data, t
 
 	// check data
 	tb_check_return_val(data, tb_null);
-	tb_check_return_val(data >= pool->data && data < pool->data + pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
+	tb_check_return_val((tb_byte_t*)data >= pool->data && (tb_byte_t*)data < pool->data + pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
 	tb_check_return_val(!(((tb_size_t)data) & (pool->align - 1)), tb_null);
 	tb_check_return_val(!(((tb_byte_t*)data - pool->data) % pool->step), tb_null);
 
@@ -397,7 +397,7 @@ tb_handle_t tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	tb_memset(data, 0, size);
 
 	// init pool
-	tb_tiny_pool_t* pool = data;
+	tb_tiny_pool_t* pool = (tb_tiny_pool_t*)data;
 
 	// init magic
 	pool->magic = TB_STATIC_TINY_POOL_MAGIC;
@@ -650,7 +650,7 @@ tb_bool_t tb_tiny_pool_free(tb_handle_t handle, tb_pointer_t data)
 	tb_check_return_val(data, tb_true);
 
 	// check data
-	tb_check_return_val(data >= pool->data && data < pool->data + pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_false);
+	tb_check_return_val((tb_byte_t*)data >= pool->data && (tb_byte_t*)data < pool->data + pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_false);
 	tb_check_return_val(!(((tb_size_t)data) & (pool->align - 1)), tb_false);
 	tb_check_return_val(!(((tb_byte_t*)data - pool->data) % pool->step), tb_false);
 

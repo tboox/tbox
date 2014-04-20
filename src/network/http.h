@@ -235,10 +235,10 @@ typedef struct __tb_http_status_t
 	tb_hize_t 			content_size;
 
 	/// the content type
-	tb_scoped_string_t 		content_type;
+	tb_scoped_string_t 	content_type;
 
 	/// the location
-	tb_scoped_string_t 		location;
+	tb_scoped_string_t 	location;
 
 }tb_http_status_t;
 

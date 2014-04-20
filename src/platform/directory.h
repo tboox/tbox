@@ -83,7 +83,7 @@ tb_size_t 				tb_directory_curt(tb_char_t* path, tb_size_t maxn);
  * @param data 			the callback data
  * 
  */
-tb_void_t 				tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t data);
+tb_void_t 				tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_pointer_t data);
 
 /*! copy directory
  * 
