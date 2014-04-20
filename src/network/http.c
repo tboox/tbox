@@ -57,16 +57,16 @@ typedef struct __tb_http_t
 	tb_http_status_t 	status;
 
 	// the stream
-	tb_basic_stream_t* 		stream;
+	tb_basic_stream_t* 	stream;
 
 	// the sstream for sock
-	tb_basic_stream_t* 		sstream;
+	tb_basic_stream_t* 	sstream;
 
 	// the cstream for chunked
-	tb_basic_stream_t* 		cstream;
+	tb_basic_stream_t* 	cstream;
 
 	// the zstream for gzip/deflate
-	tb_basic_stream_t* 		zstream;
+	tb_basic_stream_t* 	zstream;
 
 	// is opened?
 	tb_bool_t 			bopened;
@@ -75,7 +75,7 @@ typedef struct __tb_http_t
 	tb_handle_t			pool;
 
 	// the request data
-	tb_scoped_string_t 		request;
+	tb_scoped_string_t 	request;
 
 }tb_http_t;
 
@@ -140,12 +140,12 @@ static tb_void_t tb_http_option_dump(tb_http_t* http)
 	// dump option
 	tb_trace_i("======================================================================");
 	tb_trace_i("option: ");
-	tb_trace_i("option: url: %s", tb_url_get(&http->option.url));
-	tb_trace_i("option: version: HTTP/1.%1u", http->option.version);
-	tb_trace_i("option: method: %s", http->option.method < tb_arrayn(g_http_methods)? g_http_methods[http->option.method] : "none");
-	tb_trace_i("option: redirect: %d", http->option.redirect);
-	tb_trace_i("option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
-	tb_trace_i("option: bunzip: %s", http->option.bunzip? "true" : "false");
+	tb_trace_i("option: url: %s", 				tb_url_get(&http->option.url));
+	tb_trace_i("option: version: HTTP/1.%1u", 	http->option.version);
+	tb_trace_i("option: method: %s", 			http->option.method < tb_arrayn(g_http_methods)? g_http_methods[http->option.method] : "none");
+	tb_trace_i("option: redirect: %d", 			http->option.redirect);
+	tb_trace_i("option: range: %llu-%llu", 		http->option.range.bof, http->option.range.eof);
+	tb_trace_i("option: bunzip: %s", 			http->option.bunzip? "true" : "false");
 
 	// dump head 
 	tb_for_all (tb_hash_item_t*, item, http->option.head)

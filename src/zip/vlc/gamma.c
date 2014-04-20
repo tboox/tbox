@@ -55,13 +55,13 @@ static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_static_stream_t co
 
 	// get q
 	tb_uint32_t q = 0;
-	while (tb_static_stream_get_u1(sstream)) q++;
+	while (tb_static_stream_get_u1((tb_static_stream_t*)sstream)) q++;
 	tb_assert(q < 32);
 
 	// get r
 	tb_uint32_t i = 0;
 	tb_uint32_t r = 0;
-	for (i = 0; i < q; i++) r |= tb_static_stream_get_u1(sstream) << i;
+	for (i = 0; i < q; i++) r |= tb_static_stream_get_u1((tb_static_stream_t*)sstream) << i;
 
 	//tb_trace_d("x: %d, q: %d, r: %d", r + (1 << q), q, r);
 

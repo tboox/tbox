@@ -84,7 +84,7 @@ typedef struct __tb_static_stream_t
 {
 	tb_byte_t* 			p; 	// the pointer to the current position
 	tb_size_t 			b; 	// the bit offset < 8
-	tb_byte_t const* 	e; 	// the pointer to the end
+	tb_byte_t* 			e; 	// the pointer to the end
 	tb_size_t 			n; 	// the data size
 
 }tb_static_stream_t;

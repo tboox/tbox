@@ -62,22 +62,22 @@ typedef enum __tb_url_proto_t
 typedef struct __tb_url_t
 {
 	// the protocol 
-	tb_uint16_t 	poto: 	6;
+	tb_uint16_t 		poto: 	6;
 
 	// is ssl?
-	tb_uint16_t 	bssl: 	1;
+	tb_uint16_t 		bssl: 	1;
 
 	// is win?
-	tb_uint16_t 	bwin: 	1;
+	tb_uint16_t 		bwin: 	1;
 
 	// the windows prefix 
-	tb_uint16_t 	pwin: 	8;
+	tb_uint16_t 		pwin: 	8;
 
 	// the port
-	tb_uint16_t 	port;
+	tb_uint16_t 		port;
 
 	// the ipv4
-	tb_ipv4_t 		ipv4;
+	tb_ipv4_t 			ipv4;
 
 	// the host
 	tb_static_string_t 	host;
@@ -92,7 +92,7 @@ typedef struct __tb_url_t
 	tb_scoped_string_t 	args;
 
 	// the data
-	tb_char_t 		data[TB_URL_HOST_MAX + TB_URL_PATH_MAX];
+	tb_char_t 			data[TB_URL_HOST_MAX + TB_URL_PATH_MAX];
 
 }tb_url_t;
 

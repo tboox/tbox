@@ -157,10 +157,10 @@ typedef struct __tb_aicp_ssl_t
 	tb_atomic_t 			bopened;
 
 	// the read data
-	tb_scoped_buffer_t 			read_data;
+	tb_scoped_buffer_t 		read_data;
 
 	// the writ data
-	tb_scoped_buffer_t 			writ_data;
+	tb_scoped_buffer_t 		writ_data;
 
 }tb_aicp_ssl_t;
 

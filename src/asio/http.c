@@ -83,16 +83,16 @@ typedef struct __tb_aicp_http_t
 	tb_http_status_t 				status;
 
 	// the stream
-	tb_async_stream_t* 					stream;
+	tb_async_stream_t* 				stream;
 
 	// the sstream for sock
-	tb_async_stream_t* 					sstream;
+	tb_async_stream_t* 				sstream;
 
 	// the cstream for chunked
-	tb_async_stream_t* 					cstream;
+	tb_async_stream_t* 				cstream;
 
 	// the zstream for gzip/deflate
-	tb_async_stream_t* 					zstream;
+	tb_async_stream_t* 				zstream;
 
 	// the tstream for post
 	tb_handle_t 					tstream;
@@ -104,13 +104,13 @@ typedef struct __tb_aicp_http_t
 	tb_handle_t 					post_file;
 
 	// the line data
-	tb_scoped_string_t 					line_data;
+	tb_scoped_string_t 				line_data;
 
 	// the line size
 	tb_size_t 						line_size;
 
 	// the cache data
-	tb_scoped_buffer_t 					cache_data;
+	tb_scoped_buffer_t 				cache_data;
 
 	// the cache read
 	tb_size_t 						cache_read;
@@ -281,17 +281,17 @@ static tb_void_t tb_aicp_http_status_dump(tb_aicp_http_t* http)
 	// dump status
 	tb_trace_i("======================================================================");
 	tb_trace_i("status: ");
-	tb_trace_i("status: code: %d", http->status.code);
-	tb_trace_i("status: version: HTTP/1.%1u", http->status.version);
-	tb_trace_i("status: content:type: %s", tb_scoped_string_cstr(&http->status.content_type));
-	tb_trace_i("status: content:size: %llu", http->status.content_size);
-	tb_trace_i("status: document:size: %llu", http->status.document_size);
-	tb_trace_i("status: location: %s", tb_scoped_string_cstr(&http->status.location));
-	tb_trace_i("status: bgzip: %s", http->status.bgzip? "true" : "false");
-	tb_trace_i("status: bdeflate: %s", http->status.bdeflate? "true" : "false");
-	tb_trace_i("status: balived: %s", http->status.balived? "true" : "false");
-	tb_trace_i("status: bseeked: %s", http->status.bseeked? "true" : "false");
-	tb_trace_i("status: bchunked: %s", http->status.bchunked? "true" : "false");
+	tb_trace_i("status: code: %d", 				http->status.code);
+	tb_trace_i("status: version: HTTP/1.%1u", 	http->status.version);
+	tb_trace_i("status: content:type: %s", 		tb_scoped_string_cstr(&http->status.content_type));
+	tb_trace_i("status: content:size: %llu", 	http->status.content_size);
+	tb_trace_i("status: document:size: %llu", 	http->status.document_size);
+	tb_trace_i("status: location: %s", 			tb_scoped_string_cstr(&http->status.location));
+	tb_trace_i("status: bgzip: %s", 			http->status.bgzip? "true" : "false");
+	tb_trace_i("status: bdeflate: %s", 			http->status.bdeflate? "true" : "false");
+	tb_trace_i("status: balived: %s", 			http->status.balived? "true" : "false");
+	tb_trace_i("status: bseeked: %s", 			http->status.bseeked? "true" : "false");
+	tb_trace_i("status: bchunked: %s", 			http->status.bchunked? "true" : "false");
 
 	// dump end
 	tb_trace_i("");

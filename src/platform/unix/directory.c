@@ -101,7 +101,7 @@ static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
 		break;
 	}
 }
-static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t data)
+static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return(path && func);
@@ -231,7 +231,7 @@ tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
 	// ok?
 	return size;
 }
-tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t data)
+tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return(path && func);

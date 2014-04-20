@@ -200,11 +200,11 @@ tb_zip_t* tb_zip_rlc_init(tb_size_t action)
 
 	// open vlc
 #if TB_ZIP_RLC_VLC_TYPE_GOLOMB
-	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_golomb_open(&(zip->vlc), 4);
+	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_golomb_open((tb_zip_vlc_golomb_t*)&(zip->vlc), 4);
 #elif TB_ZIP_RLC_VLC_TYPE_GAMMA
-	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_gamma_open(&(zip->vlc));
+	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_gamma_open((tb_zip_vlc_gamma_t*)&(zip->vlc));
 #else
-	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_fixed_open(&(zip->vlc), 16);
+	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_fixed_open((tb_zip_vlc_fixed_t*)&(zip->vlc), 16);
 #endif
 
 	// check vlc

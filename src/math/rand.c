@@ -20,6 +20,7 @@
  * @file		rand.c
  *
  */
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -55,7 +56,7 @@ static __tb_inline__ tb_uint32_t tb_rand_linear_next_uint32(tb_rand_linear_t* ra
 tb_bool_t tb_rand_init()
 {
 	tb_spinlock_enter(&g_lock);
-	if (!g_rand) g_rand = tb_rand_linear_init(TB_RAND_LINEAR_SEED);
+	if (!g_rand) g_rand = (tb_rand_t*)tb_rand_linear_init(TB_RAND_LINEAR_SEED);
 	tb_spinlock_leave(&g_lock);
 
 	return g_rand? tb_true : tb_false;
@@ -65,7 +66,7 @@ tb_void_t tb_rand_exit()
 	tb_spinlock_enter(&g_lock);
 	if (g_rand)
 	{
-		tb_rand_linear_exit(g_rand);
+		tb_rand_linear_exit((tb_rand_linear_t*)g_rand);
 		g_rand = tb_null;
 	}
 	tb_spinlock_leave(&g_lock);
@@ -79,7 +80,7 @@ tb_void_t tb_rand_seed(tb_uint32_t seed)
 	tb_spinlock_enter(&g_lock);
 
 	// seed
-	tb_rand_linear_seed(g_rand, seed);
+	tb_rand_linear_seed((tb_rand_linear_t*)g_rand, seed);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -93,7 +94,7 @@ tb_void_t tb_rand_clear()
 	tb_spinlock_enter(&g_lock);
 	
 	// clear
-	tb_rand_linear_clear(g_rand);
+	tb_rand_linear_clear((tb_rand_linear_t*)g_rand);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -108,7 +109,7 @@ tb_uint32_t tb_rand_uint32(tb_uint32_t b, tb_uint32_t e)
 	tb_spinlock_enter(&g_lock);
 	
 	// rand
-	rand = tb_rand_linear_uint32(g_rand, b, e);
+	rand = tb_rand_linear_uint32((tb_rand_linear_t*)g_rand, b, e);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -126,7 +127,7 @@ tb_sint32_t tb_rand_sint32(tb_sint32_t b, tb_sint32_t e)
 	tb_spinlock_enter(&g_lock);
 	
 	// rand
-	rand = tb_rand_linear_sint32(g_rand, b, e);
+	rand = tb_rand_linear_sint32((tb_rand_linear_t*)g_rand, b, e);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -146,7 +147,7 @@ tb_float_t tb_rand_float(tb_float_t b, tb_float_t e)
 	tb_spinlock_enter(&g_lock);
 	
 	// rand
-	rand = tb_rand_linear_float(g_rand, b, e);
+	rand = tb_rand_linear_float((tb_rand_linear_t*)g_rand, b, e);
 
 	// leave
 	tb_spinlock_leave(&g_lock);

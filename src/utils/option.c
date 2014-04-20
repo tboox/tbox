@@ -46,7 +46,7 @@ typedef struct tb_option_t
 	tb_char_t 					name[64];
 
 	// the command help
-	tb_scoped_string_t 				help;
+	tb_scoped_string_t 			help;
 
 	// the options
 	tb_option_item_t const* 	opts;
@@ -242,10 +242,10 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 	tb_assert_and_check_return_val(option && option->list && option->opts, tb_false);
 
 	// walk arguments
-	tb_size_t 			i = 0;
-	tb_size_t 			more = 0;
-	tb_option_item_t* 	item = option->opts;
-	tb_option_item_t* 	last = tb_null;
+	tb_size_t 				i = 0;
+	tb_size_t 				more = 0;
+	tb_option_item_t const* item = option->opts;
+	tb_option_item_t const* last = tb_null;
 	for (i = 0; i < argc; i++)
 	{
 		// the argument
@@ -571,8 +571,8 @@ tb_void_t tb_option_help(tb_handle_t handle)
 	tb_printf("[usage]: %s", option->name);
 
 	// dump usage item
-	tb_bool_t 			bopt = tb_false;
-	tb_option_item_t* 	item = option->opts;
+	tb_bool_t 				bopt = tb_false;
+	tb_option_item_t const* item = option->opts;
 	while (item)
 	{
 		// dump options
