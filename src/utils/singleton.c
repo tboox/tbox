@@ -136,7 +136,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
 		g_singletons[type].kill = kill;
 
 		// register instance 
-		tb_atomic_set(&g_singletons[type].instance, (tb_hong_t)instance);
+		tb_atomic_set(&g_singletons[type].instance, (tb_long_t)instance);
 	}
 	// initing? wait it
 	else

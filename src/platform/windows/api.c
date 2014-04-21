@@ -163,7 +163,7 @@ tb_api_CancelIoEx_t tb_api_CancelIoEx()
 			pCancelIoEx = GetProcAddress(module, "CancelIoEx");
 
 			// save it
-			tb_atomic_set(&s_pCancelIoEx, pCancelIoEx);
+			tb_atomic_set(&s_pCancelIoEx, (tb_long_t)pCancelIoEx);
 		}
 	}
 
@@ -189,7 +189,7 @@ tb_api_GetQueuedCompletionStatusEx_t tb_api_GetQueuedCompletionStatusEx()
 			pGetQueuedCompletionStatusEx = GetProcAddress(module, "GetQueuedCompletionStatusEx");
 
 			// save it
-			tb_atomic_set(&s_pGetQueuedCompletionStatusEx, pGetQueuedCompletionStatusEx);
+			tb_atomic_set(&s_pGetQueuedCompletionStatusEx, (tb_long_t)pGetQueuedCompletionStatusEx);
 		}
 	}
 
@@ -212,10 +212,10 @@ tb_api_CaptureStackBackTrace_t tb_api_CaptureStackBackTrace()
 		if (module) 
 		{
 			// get it
-			pCaptureStackBackTrace = GetProcAddress(module, "CaptureStackBackTrace");
+			pCaptureStackBackTrace = (tb_api_CaptureStackBackTrace_t)GetProcAddress(module, "CaptureStackBackTrace");
 
 			// save it
-			tb_atomic_set(&s_pCaptureStackBackTrace, pCaptureStackBackTrace);
+			tb_atomic_set(&s_pCaptureStackBackTrace, (tb_long_t)pCaptureStackBackTrace);
 		}
 	}
 
@@ -241,7 +241,7 @@ tb_api_GetFileSizeEx_t tb_api_GetFileSizeEx()
 			pGetFileSizeEx = GetProcAddress(module, "GetFileSizeEx");
 
 			// save it
-			tb_atomic_set(&s_pGetFileSizeEx, pGetFileSizeEx);
+			tb_atomic_set(&s_pGetFileSizeEx, (tb_long_t)pGetFileSizeEx);
 		}
 	}
 
@@ -267,7 +267,7 @@ tb_api_SymInitialize_t tb_api_SymInitialize()
 			pSymInitialize = GetProcAddress(module, "SymInitialize");
 
 			// save it
-			tb_atomic_set(&s_pSymInitialize, pSymInitialize);
+			tb_atomic_set(&s_pSymInitialize, (tb_long_t)pSymInitialize);
 		}
 	}
 
@@ -290,10 +290,10 @@ tb_api_GetNetworkParams_t tb_api_GetNetworkParams()
 		if (module) 
 		{
 			// get it
-			pGetNetworkParams = GetProcAddress(module, "GetNetworkParams");
+			pGetNetworkParams = (tb_api_GetNetworkParams_t)GetProcAddress(module, "GetNetworkParams");
 
 			// save it
-			tb_atomic_set(&s_pGetNetworkParams, pGetNetworkParams);
+			tb_atomic_set(&s_pGetNetworkParams, (tb_long_t)pGetNetworkParams);
 		}
 	}
 

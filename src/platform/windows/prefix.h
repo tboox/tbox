@@ -38,14 +38,14 @@
 // FILETIME => tb_time_t
 static __tb_inline__ tb_time_t tb_filetime_to_time(FILETIME ft)
 {
-	ULARGE_INTEGER 	ui = {0};  
+	ULARGE_INTEGER 	ui = {{0}};  
 	ui.LowPart 		= ft.dwLowDateTime;  
 	ui.HighPart 	= ft.dwHighDateTime;  
 	return (tb_time_t)((LONGLONG)(ui.QuadPart - 116444736000000000) / 10000000);  
 }
 
 // the path full for wchar
-static tb_wchar_t const* tb_path_full_w(tb_char_t const* path, tb_wchar_t* full, tb_size_t maxn)
+static __tb_inline__ tb_wchar_t const* tb_path_full_w(tb_char_t const* path, tb_wchar_t* full, tb_size_t maxn)
 {
 	// the path full
 	tb_char_t full_a[TB_PATH_MAXN] = {0};

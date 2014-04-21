@@ -161,7 +161,7 @@ static tb_wchar_t* tb_printf_string(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
 static tb_wchar_t* tb_printf_int64(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_entry_t e, tb_uint64_t num)
 {
 	// digits table
-	static tb_wchar_t const* digits_table = L"0123456789ABCDEF";
+	static tb_wchar_t const* digits_table = (tb_wchar_t const*)L"0123456789ABCDEF";
 
 	// max: 64-bit binary decimal
 	tb_wchar_t 	digits[64] = {0};
@@ -303,7 +303,7 @@ static tb_wchar_t* tb_printf_int64(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_ent
 static tb_wchar_t* tb_printf_int32(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_entry_t e, tb_uint32_t num)
 {
 	// digits table
-	static tb_wchar_t const* digits_table = L"0123456789ABCDEF";
+	static tb_wchar_t const* digits_table = (tb_wchar_t const*)L"0123456789ABCDEF";
 
 	// max: 64-bit binary decimal
 	tb_wchar_t 	digits[64] = {0};

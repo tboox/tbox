@@ -43,7 +43,7 @@ static tb_void_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
 	// remvoe directory
 	else if (info->type == TB_FILE_TYPE_DIRECTORY)
 	{
-		tb_char_t temp[TB_PATH_MAXN] = {0};
+		tb_wchar_t temp[TB_PATH_MAXN] = {0};
 		if (tb_atow(temp, path, TB_PATH_MAXN))
 			RemoveDirectoryW(temp);
 	}
@@ -158,7 +158,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 
 	// the full path
 	tb_wchar_t full[TB_PATH_MAXN];
-	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_null;
+	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
 
 	// make it
 	tb_bool_t ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;

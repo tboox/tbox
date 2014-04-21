@@ -43,7 +43,7 @@ do \
     __tb_ret = tb_vsnprintf(s, (n), format, __tb_varg_list); \
     tb_va_end(__tb_varg_list); \
 	if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
-	if (r) *r = __tb_ret > 0? __tb_ret : 0; \
+	*r = __tb_ret > 0? __tb_ret : 0; \
  \
 } while (0) 
 
@@ -57,7 +57,7 @@ do \
     __tb_ret = tb_vswprintf(s, (n), format, __tb_varg_list); \
     tb_va_end(__tb_varg_list); \
 	if (__tb_ret >= 0) s[__tb_ret] = L'\0'; \
-	if (r) *r = __tb_ret > 0? __tb_ret : 0; \
+	*r = __tb_ret > 0? __tb_ret : 0; \
  \
 } while (0) 
 

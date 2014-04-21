@@ -339,8 +339,8 @@ tb_hong_t tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode)
 	tb_assert_and_check_return_val(file, -1);
 
 	// seek
-	LARGE_INTEGER o = {0};
-	LARGE_INTEGER p = {0};
+	LARGE_INTEGER o = {{0}};
+	LARGE_INTEGER p = {{0}};
 	o.QuadPart = (LONGLONG)offset;
 	return SetFilePointerEx(file, o, &p, mode)? (tb_hong_t)p.QuadPart : -1;
 }
@@ -362,7 +362,7 @@ tb_hize_t tb_file_size(tb_handle_t file)
 	tb_assert_and_check_return_val(pGetFileSizeEx, 0);
 
 	// the file size
-	LARGE_INTEGER p = {0};
+	LARGE_INTEGER p = {{0}};
 	return pGetFileSizeEx(file, &p)? (tb_hong_t)p.QuadPart : 0;
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)

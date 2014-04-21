@@ -36,35 +36,30 @@ tb_void_t tb_usleep(tb_size_t us)
 {
 	Sleep(1);
 }
-
 tb_void_t tb_msleep(tb_size_t ms)
 {
 	Sleep(ms);
 }
-
 tb_void_t tb_sleep(tb_size_t s)
 {
 	Sleep(s * 1000);
 }
-
 tb_hong_t tb_mclock()
 {
 	return (tb_hong_t)GetTickCount();
 }
-
 tb_hong_t tb_uclock()
 {
-	LARGE_INTEGER f = {0};
+	LARGE_INTEGER f = {{0}};
     if (!QueryPerformanceFrequency(&f)) return 0;
 	tb_assert_and_check_return_val(f.QuadPart, 0);
 
-	LARGE_INTEGER t = {0};
+	LARGE_INTEGER t = {{0}};
 	if (!QueryPerformanceCounter(&t)) return 0;
 	tb_assert_and_check_return_val(t.QuadPart, 0);
 	
 	return (t.QuadPart * 1000000) / f.QuadPart;
 }
-
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
 	union 
