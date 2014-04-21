@@ -40,6 +40,8 @@
 	|| defined (__x86_64__) \
 	|| defined (__amd64) \
 	|| defined (__amd64__) \
+	|| defined (__arm64) \
+	|| defined (__arm64__) \
 	|| (__WORDSIZE == 64)
 # 	define TB_CPU_BITSIZE 		(64)
 # 	define TB_CPU_BITBYTE 		(8)

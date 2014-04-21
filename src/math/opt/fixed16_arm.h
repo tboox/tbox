@@ -45,7 +45,7 @@
  * interfaces
  */
 
-#if defined(TB_CONFIG_ASSEMBLER_GAS)
+#if defined(TB_CONFIG_ASSEMBLER_GAS) && !defined(TB_ARCH_ARM64)
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_asm(tb_fixed16_t x, tb_fixed16_t y)
 {
 	__tb_register__ tb_fixed16_t t;

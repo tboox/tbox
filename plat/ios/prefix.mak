@@ -46,13 +46,12 @@ CPU_CXFLAGS 		= -mcpu=cortex-a8
 endif
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
+CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g 
-CXFLAGS 			= -arch $(ARCH) -c -Wall  \
-					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
-					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
-					-pipe -Wno-trigraphs -fpascal-strings \
-					--sysroot=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk
+CXFLAGS 			= \
+					-arch $(ARCH) -c -Wall -mthumb $(CPU_CXFLAGS) \
+					-Werror -Wno-error=deprecated-declarations -Qunused-arguments \
+					-fmessage-length=0 -pipe -fpascal-strings
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -74,16 +73,15 @@ CCFLAGS_DEBUG 		=
 CCFLAGS 			= 
 
 # mxflags: .m/.mm files
-MXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
+MXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g 
-MXFLAGS 			= -arch $(ARCH) -c -Wall  \
-					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
-					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
-					-pipe -Wno-trigraphs -fpascal-strings \
+MXFLAGS 			= \
+					-arch $(ARCH) -c -Wall -mthumb $(CPU_CXFLAGS) \
+					-Werror -Wno-error=deprecated-declarations -Qunused-arguments \
+					-fmessage-length=0 -pipe -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \
 					"-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \
-					"-DIBAction=void)__attribute__((ibaction)" \
-					--sysroot=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk
+					"-DIBAction=void)__attribute__((ibaction)"
 MXFLAGS-I 			= -I
 MXFLAGS-o 			= -o
 

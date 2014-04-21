@@ -42,10 +42,12 @@ tb_wchar_t* tb_wcsncat(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 #else
 tb_wchar_t* tb_wcsncat(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
+	// done
 	__tb_register__ tb_wchar_t* s = s1;
-	while (*s++); --s;
+	while (*s) s++; --s;
 	while (n-- && !(*s++ = *s2++));
 	return s1;
 }

@@ -83,6 +83,12 @@
 #define POLARSSL_KEY_EXCHANGE__SOME__PSK_ENABLED
 #endif
 
+#if defined(POLARSSL_KEY_EXCHANGE_ECDHE_RSA_ENABLED) ||                     \
+    defined(POLARSSL_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED) ||                   \
+    defined(POLARSSL_KEY_EXCHANGE_ECDHE_PSK_ENABLED)
+#define POLARSSL_KEY_EXCHANGE__SOME__ECDHE_ENABLED
+#endif
+
 #if defined(_MSC_VER) && !defined(inline)
 #define inline _inline
 #else
@@ -131,8 +137,9 @@
 #define POLARSSL_ERR_SSL_BAD_HS_NEW_SESSION_TICKET         -0x6E00  /**< Processing of the NewSessionTicket handshake message failed. */
 #define POLARSSL_ERR_SSL_SESSION_TICKET_EXPIRED            -0x6D80  /**< Session ticket has expired. */
 #define POLARSSL_ERR_SSL_PK_TYPE_MISMATCH                  -0x6D00  /**< Public key type mismatch (eg, asked for RSA key exchange and presented EC key) */
-#define POLARSSL_ERR_SSL_UNKNOWN_IDENTITY                  -0x6C80  /**< Unkown identity received (eg, PSK identity) */
+#define POLARSSL_ERR_SSL_UNKNOWN_IDENTITY                  -0x6C80  /**< Unknown identity received (eg, PSK identity) */
 #define POLARSSL_ERR_SSL_INTERNAL_ERROR                    -0x6C00  /**< Internal error (eg, unexpected failure in lower-level module) */
+#define POLARSSL_ERR_SSL_COUNTER_WRAPPING                  -0x6B80  /**< A counter would wrap (eg, too many messages exchanged). */
 
 /*
  * Various constants
@@ -313,6 +320,7 @@
 #define SSL_ALERT_MSG_UNSUPPORTED_EXT      110  /* 0x6E */
 #define SSL_ALERT_MSG_UNRECOGNIZED_NAME    112  /* 0x70 */
 #define SSL_ALERT_MSG_UNKNOWN_PSK_IDENTITY 115  /* 0x73 */
+#define SSL_ALERT_MSG_NO_APPLICATION_PROTOCOL 120 /* 0x78 */
 
 #define SSL_HS_HELLO_REQUEST            0
 #define SSL_HS_CLIENT_HELLO             1
@@ -340,6 +348,8 @@
 #define TLS_EXT_SUPPORTED_POINT_FORMATS     11
 
 #define TLS_EXT_SIG_ALG                     13
+
+#define TLS_EXT_ALPN                        16
 
 #define TLS_EXT_SESSION_TICKET              35
 
@@ -721,6 +731,9 @@ struct _ssl_context
     int disable_renegotiation;          /*!<  enable/disable renegotiation   */
     int allow_legacy_renegotiation;     /*!<  allow legacy renegotiation     */
     const int *ciphersuite_list[4];     /*!<  allowed ciphersuites / version */
+#if defined(POLARSSL_SSL_SET_CURVES)
+    const ecp_group_id *curve_list;     /*!<  allowed curves                 */
+#endif
 #if defined(POLARSSL_SSL_TRUNCATED_HMAC)
     int trunc_hmac;                     /*!<  negotiate truncated hmac?      */
 #endif
@@ -750,6 +763,14 @@ struct _ssl_context
      */
     unsigned char *hostname;
     size_t         hostname_len;
+#endif
+
+#if defined(POLARSSL_SSL_ALPN)
+    /*
+     * ALPN extension
+     */
+    const char **alpn_list;     /*!<  ordered list of supported protocols   */
+    const char *alpn_chosen;    /*!<  negotiated protocol                   */
 #endif
 
     /*
@@ -859,6 +880,12 @@ void ssl_set_endpoint( ssl_context *ssl, int endpoint );
  *
  *  SSL_VERIFY_REQUIRED:  peer *must* present a valid certificate,
  *                        handshake is aborted if verification failed.
+ *
+ * \note On client, SSL_VERIFY_REQUIRED is the recommended mode.
+ * With SSL_VERIFY_OPTIONAL, the user needs to call ssl_get_verify_result() at
+ * the right time(s), which may not be obvious, while REQUIRED always perform
+ * the verification as soon as possible. For example, REQUIRED was protecting
+ * against the "triple handshake" attack even before it was found.
  */
 void ssl_set_authmode( ssl_context *ssl, int authmode );
 
@@ -1043,6 +1070,9 @@ int ssl_set_own_cert( ssl_context *ssl, x509_crt *own_cert,
  *                 up your certificate chain. The top certificate (self-signed)
  *                 can be omitted.
  *
+ * \warning        This backwards-compatibility function is deprecated!
+ *                 Please use \c ssl_set_own_cert() instead.
+ *
  * \param ssl      SSL context
  * \param own_cert own public certificate chain
  * \param rsa_key  own private RSA key
@@ -1064,6 +1094,10 @@ int ssl_set_own_cert_rsa( ssl_context *ssl, x509_crt *own_cert,
  *                 Note: own_cert should contain IN order from the bottom
  *                 up your certificate chain. The top certificate (self-signed)
  *                 can be omitted.
+ *
+ * \warning        This backwards-compatibility function is deprecated!
+ *                 Please use \c pk_init_ctx_rsa_alt()
+ *                 and \c ssl_set_own_cert() instead.
  *
  * \param ssl      SSL context
  * \param own_cert own public certificate chain
@@ -1102,7 +1136,7 @@ int ssl_set_psk( ssl_context *ssl, const unsigned char *psk, size_t psk_len,
  *
  *                 If set, the PSK callback is called for each
  *                 handshake where a PSK ciphersuite was negotiated.
- *                 The callback provides the identity received and wants to
+ *                 The caller provides the identity received and wants to
  *                 receive the actual PSK data and length.
  *
  *                 The callback has the following parameters: (void *parameter,
@@ -1149,6 +1183,28 @@ int ssl_set_dh_param( ssl_context *ssl, const char *dhm_P, const char *dhm_G );
 int ssl_set_dh_param_ctx( ssl_context *ssl, dhm_context *dhm_ctx );
 #endif
 
+#if defined(POLARSSL_SSL_SET_CURVES)
+/**
+ * \brief          Set the allowed curves in order of preference.
+ *                 (Default: all defined curves.)
+ *
+ *                 On server: this only affects selection of the ECDHE curve;
+ *                 the curves used for ECDH and ECDSA are determined by the
+ *                 list of available certificates instead.
+ *
+ *                 On client: this affects the list of curves offered for any
+ *                 use. The server can override our preference order.
+ *
+ *                 Both sides: limits the set of curves used by peer to the
+ *                 listed curves for any use (ECDH(E), certificates).
+ *
+ * \param ssl      SSL context
+ * \param curves   Ordered list of allowed curves,
+ *                 terminated by POLARSSL_ECP_DP_NONE.
+ */
+void ssl_set_curves( ssl_context *ssl, const ecp_group_id *curves );
+#endif
+
 #if defined(POLARSSL_SSL_SERVER_NAME_INDICATION)
 /**
  * \brief          Set hostname for ServerName TLS extension
@@ -1186,6 +1242,30 @@ void ssl_set_sni( ssl_context *ssl,
                                size_t),
                   void *p_sni );
 #endif /* POLARSSL_SSL_SERVER_NAME_INDICATION */
+
+#if defined(POLARSSL_SSL_ALPN)
+/**
+ * \brief          Set the supported Application Layer Protocols.
+ *
+ * \param ssl      SSL context
+ * \param protos   NULL-terminated list of supported protocols,
+ *                 in decreasing preference order.
+ *
+ * \return         0 on success, or POLARSSL_ERR_SSL_BAD_INPUT_DATA.
+ */
+int ssl_set_alpn_protocols( ssl_context *ssl, const char **protos );
+
+/**
+ * \brief          Get the name of the negotiated Application Layer Protocol.
+ *                 This function should be called after the handshake is
+ *                 completed.
+ *
+ * \param ssl      SSL context
+ *
+ * \return         Protcol name, or NULL if no protocol was negotiated.
+ */
+const char *ssl_get_alpn_protocol( const ssl_context *ssl );
+#endif /* POLARSSL_SSL_ALPN */
 
 /**
  * \brief          Set the maximum supported version sent from the client side
@@ -1561,6 +1641,10 @@ pk_type_t ssl_pk_alg_from_sig( unsigned char sig );
 
 md_type_t ssl_md_alg_from_hash( unsigned char hash );
 
+#if defined(POLARSSL_SSL_SET_CURVES)
+int ssl_curve_is_acceptable( const ssl_context *ssl, ecp_group_id grp_id );
+#endif
+
 #if defined(POLARSSL_X509_CRT_PARSE_C)
 static inline pk_context *ssl_own_key( ssl_context *ssl )
 {
@@ -1573,6 +1657,19 @@ static inline x509_crt *ssl_own_cert( ssl_context *ssl )
     return( ssl->handshake->key_cert == NULL ? NULL
             : ssl->handshake->key_cert->cert );
 }
+
+/*
+ * Check usage of a certificate wrt extensions:
+ * keyUsage, extendedKeyUsage (later), and nSCertType (later).
+ *
+ * Warning: cert_endpoint is the endpoint of the cert (ie, of our peer when we
+ * check a cert we received from them)!
+ *
+ * Return 0 if everything is OK, -1 if not.
+ */
+int ssl_check_cert_usage( const x509_crt *cert,
+                          const ssl_ciphersuite_t *ciphersuite,
+                          int cert_endpoint );
 #endif /* POLARSSL_X509_CRT_PARSE_C */
 
 /* constant-time buffer comparison */

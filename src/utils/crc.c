@@ -49,7 +49,7 @@ tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* 
 	if (mode == TB_CRC_MODE_32_IEEE_LE)
 # 	endif
 	{
-		crc = tb_crc32_encode(crc, ib, in, &g_crc_table[mode]);
+		crc = tb_crc32_encode(crc, ib, in, (tb_uint32_t const*)&g_crc_table[mode]);
 	}
 	else
 	{
@@ -79,7 +79,7 @@ tb_uint32_t tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t co
 	if (mode == TB_CRC_MODE_32_IEEE_LE)
 # 	endif
 	{
-		crc = tb_crc32_encode(crc, cstr, tb_strlen(cstr), &g_crc_table[mode]);
+		crc = tb_crc32_encode(crc, (tb_byte_t const*)cstr, tb_strlen(cstr), (tb_uint32_t const*)&g_crc_table[mode]);
 	}
 	else
 	{

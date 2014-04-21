@@ -39,6 +39,7 @@
 #define POLARSSL_ERR_ECP_MALLOC_FAILED                     -0x4D80  /**< Memory allocation failed. */
 #define POLARSSL_ERR_ECP_RANDOM_FAILED                     -0x4D00  /**< Generation of random value, such as (ephemeral) key, failed. */
 #define POLARSSL_ERR_ECP_INVALID_KEY                       -0x4C80  /**< Invalid private or public key. */
+#define POLARSSL_ERR_ECP_SIG_LEN_MISMATCH                  -0x4C00  /**< Signature is valid but shorter than the user-supplied length. */
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,9 +69,9 @@ typedef enum
     POLARSSL_ECP_DP_M255,           /*!< Curve25519               */
     POLARSSL_ECP_DP_M383,           /*!< (not implemented yet)    */
     POLARSSL_ECP_DP_M511,           /*!< (not implemented yet)    */
-    POLARSSL_ECP_DP_SECP192K1,      /*!< (not implemented yet)    */
-    POLARSSL_ECP_DP_SECP224K1,      /*!< (not implemented yet)    */
-    POLARSSL_ECP_DP_SECP256K1,      /*!< 256-bits Koblitz curve   */
+    POLARSSL_ECP_DP_SECP192K1,      /*!< 192-bits "Koblitz" curve */
+    POLARSSL_ECP_DP_SECP224K1,      /*!< 224-bits "Koblitz" curve */
+    POLARSSL_ECP_DP_SECP256K1,      /*!< 256-bits "Koblitz" curve */
 } ecp_group_id;
 
 /**
@@ -118,8 +119,11 @@ ecp_point;
  * short weierstrass, this subgroup is actually the whole curve, and its
  * cardinal is denoted by N.
  *
+ * In the case of Short Weierstrass curves, our code requires that N is an odd
+ * prime. (Use odd in ecp_mul() and prime in ecdsa_sign() for blinding.)
+ *
  * In the case of Montgomery curves, we don't store A but (A + 2) / 4 which is
- * the quantity actualy used in the formulas. Also, nbits is not the size of N
+ * the quantity actually used in the formulas. Also, nbits is not the size of N
  * but the required size for private keys.
  *
  * If modp is NULL, reduction modulo P is done using a generic algorithm.
@@ -222,11 +226,21 @@ ecp_keypair;
 #define POLARSSL_ECP_TLS_NAMED_CURVE    3   /**< ECCurveType's named_curve */
 
 /**
- * \brief           Return the list of supported curves with associated info
+ * \brief           Get the list of supported curves in order of preferrence
+ *                  (full information)
  *
  * \return          A statically allocated array, the last entry is 0.
  */
 const ecp_curve_info *ecp_curve_list( void );
+
+/**
+ * \brief           Get the list of supported curves in order of preferrence
+ *                  (grp_id only)
+ *
+ * \return          A statically allocated array,
+ *                  terminated with POLARSSL_ECP_DP_NONE.
+ */
+const ecp_group_id *ecp_grp_id_list( void );
 
 /**
  * \brief           Get curve information from an internal group identifier
@@ -366,8 +380,10 @@ int ecp_point_write_binary( const ecp_group *grp, const ecp_point *P,
  * \param ilen      Actual length of input
  *
  * \return          0 if successful,
- *                  POLARSSL_ERR_ECP_BAD_INPUT_DATA if input is invalid
- *                  POLARSSL_ERR_MPI_MALLOC_FAILED if memory allocation failed
+ *                  POLARSSL_ERR_ECP_BAD_INPUT_DATA if input is invalid,
+ *                  POLARSSL_ERR_MPI_MALLOC_FAILED if memory allocation failed,
+ *                  POLARSSL_ERR_ECP_FEATURE_UNAVAILABLE if the point format
+ *                  is not implemented.
  *
  * \note            This function does NOT check that the point actually
  *                  belongs to the given group, see ecp_check_pubkey() for
@@ -527,7 +543,7 @@ int ecp_sub( const ecp_group *grp, ecp_point *R,
  *
  * \note            If f_rng is not NULL, it is used to randomize intermediate
  *                  results in order to prevent potential timing attacks
- *                  targetting these results. It is recommended to always
+ *                  targeting these results. It is recommended to always
  *                  provide a non-NULL f_rng (the overhead is negligible).
  */
 int ecp_mul( ecp_group *grp, ecp_point *R,
@@ -606,12 +622,14 @@ int ecp_gen_keypair( ecp_group *grp, mpi *d, ecp_point *Q,
 int ecp_gen_key( ecp_group_id grp_id, ecp_keypair *key,
                 int (*f_rng)(void *, unsigned char *, size_t), void *p_rng );
 
+#if defined(POLARSSL_SELF_TEST)
 /**
  * \brief          Checkup routine
  *
- * \return         0 if successful, or 1 if the test failed
+ * \return         0 if successful, or 1 if a test failed
  */
 int ecp_self_test( int verbose );
+#endif
 
 #ifdef __cplusplus
 }

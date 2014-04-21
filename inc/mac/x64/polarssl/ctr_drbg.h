@@ -43,7 +43,7 @@
                                             /**< The seed length (counter + AES key)            */
 
 #if !defined(POLARSSL_CONFIG_OPTIONS)
-#if defined(POLARSSL_SHA512_C)
+#if defined(POLARSSL_SHA512_C) && !defined(POLARSSL_ENTROPY_FORCE_SHA256)
 #define CTR_DRBG_ENTROPY_LEN        48      /**< Amount of entropy used per seed by default (48 with SHA-512, 32 with SHA-256) */
 #else
 #define CTR_DRBG_ENTROPY_LEN        32      /**< Amount of entropy used per seed by default (48 with SHA-512, 32 with SHA-256) */
@@ -204,7 +204,8 @@ int ctr_drbg_random( void *p_rng,
  * \param ctx           CTR_DRBG context
  * \param path          Name of the file
  *
- * \return              0 if successful, 1 on file error, or
+ * \return              0 if successful,
+ *                      POLARSSL_ERR_CTR_DRBG_FILE_IO_ERROR on file error, or
  *                      POLARSSL_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED
  */
 int ctr_drbg_write_seed_file( ctr_drbg_context *ctx, const char *path );
@@ -216,7 +217,8 @@ int ctr_drbg_write_seed_file( ctr_drbg_context *ctx, const char *path );
  * \param ctx           CTR_DRBG context
  * \param path          Name of the file
  *
- * \return              0 if successful, 1 on file error,
+ * \return              0 if successful,
+ *                      POLARSSL_ERR_CTR_DRBG_FILE_IO_ERROR on file error,
  *                      POLARSSL_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED or
  *                      POLARSSL_ERR_CTR_DRBG_INPUT_TOO_BIG
  */

@@ -29,6 +29,13 @@
 #include <math.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+#ifdef TB_CONFIG_LIBM_HAVE_SINCOS
+extern tb_void_t sincos(tb_double_t x, tb_double_t* s, tb_double_t* c);
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_void_t tb_sincos(tb_double_t x, tb_double_t* s, tb_double_t* c)

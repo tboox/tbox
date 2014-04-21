@@ -57,6 +57,7 @@
 #define POLARSSL_ERR_PK_INVALID_ALG         -0x2A80  /**< The algorithm tag or value is invalid. */
 #define POLARSSL_ERR_PK_UNKNOWN_NAMED_CURVE -0x2A00  /**< Elliptic curve is unsupported (only NIST curves are supported). */
 #define POLARSSL_ERR_PK_FEATURE_UNAVAILABLE -0x2980  /**< Unavailable feature, e.g. RSA disabled for RSA key. */
+#define POLARSSL_ERR_PK_SIG_LEN_MISMATCH    -0x2000  /**< The signature is valid but its length is less than expected. */
 
 
 #if defined(POLARSSL_RSA_C)
@@ -234,7 +235,7 @@ int pk_init_ctx( pk_context *ctx, const pk_info_t *info );
  * \param key       RSA key pointer
  * \param decrypt_func  Decryption function
  * \param sign_func     Signing function
- * \param key_len_func  Function returning key length
+ * \param key_len_func  Function returning key length in bytes
  *
  * \return          0 on success, or POLARSSL_ERR_PK_BAD_INPUT_DATA if the
  *                  context wasn't already initialized as RSA_ALT.
@@ -288,6 +289,8 @@ int pk_can_do( pk_context *ctx, pk_type_t type );
  * \param sig_len   Signature length
  *
  * \return          0 on success (signature is valid),
+ *                  POLARSSL_ERR_PK_SIG_LEN_MISMATCH if the signature is
+ *                  valid but its actual length is less than sig_len,
  *                  or a specific error code.
  *
  * \note            If hash_len is 0, then the length associated with md_alg
@@ -400,6 +403,12 @@ pk_type_t pk_get_type( const pk_context *ctx );
  * \param pwd       password for decryption (optional)
  * \param pwdlen    size of the password
  *
+ * \note            On entry, ctx must be empty, either freshly initialised
+ *                  with pk_init() or reset with pk_free(). If you need a
+ *                  specific key type, check the result with pk_can_do().
+ *
+ * \note            The key is also checked for correctness.
+ *
  * \return          0 if successful, or a specific PK or PEM error code
  */
 int pk_parse_key( pk_context *ctx,
@@ -413,6 +422,12 @@ int pk_parse_key( pk_context *ctx,
  * \param ctx       key to be initialized
  * \param key       input buffer
  * \param keylen    size of the buffer
+ *
+ * \note            On entry, ctx must be empty, either freshly initialised
+ *                  with pk_init() or reset with pk_free(). If you need a
+ *                  specific key type, check the result with pk_can_do().
+ *
+ * \note            The key is also checked for correctness.
  *
  * \return          0 if successful, or a specific PK or PEM error code
  */
@@ -428,6 +443,12 @@ int pk_parse_public_key( pk_context *ctx,
  * \param path      filename to read the private key from
  * \param password  password to decrypt the file (can be NULL)
  *
+ * \note            On entry, ctx must be empty, either freshly initialised
+ *                  with pk_init() or reset with pk_free(). If you need a
+ *                  specific key type, check the result with pk_can_do().
+ *
+ * \note            The key is also checked for correctness.
+ *
  * \return          0 if successful, or a specific PK or PEM error code
  */
 int pk_parse_keyfile( pk_context *ctx,
@@ -439,6 +460,12 @@ int pk_parse_keyfile( pk_context *ctx,
  *
  * \param ctx       key to be initialized
  * \param path      filename to read the private key from
+ *
+ * \note            On entry, ctx must be empty, either freshly initialised
+ *                  with pk_init() or reset with pk_free(). If you need a
+ *                  specific key type, check the result with pk_can_do().
+ *
+ * \note            The key is also checked for correctness.
  *
  * \return          0 if successful, or a specific PK or PEM error code
  */

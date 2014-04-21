@@ -120,7 +120,7 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_aioo
 	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
 	// spak it
-	if (aiop->spak[0] && code) tb_socket_send(aiop->spak[0], "p", 1);
+	if (aiop->spak[0] && code) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
 
 	// ok?
 	return ok;
@@ -155,7 +155,7 @@ static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_aioo
 	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 
 	// spak it
-	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], "p", 1);
+	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
 
 	// ok
 	return tb_true;
@@ -201,7 +201,7 @@ static tb_bool_t tb_aiop_reactor_select_post(tb_aiop_reactor_t* reactor, tb_aioe
 	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
 	// spak it
-	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], "p", 1);
+	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
 
 	// ok
 	return tb_true;
@@ -269,7 +269,7 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 				{
 					// read spak
 					tb_char_t spak = '\0';
-					if (1 != tb_socket_recv(aiop->spak[1], &spak, 1)) wait = -1;
+					if (1 != tb_socket_recv(aiop->spak[1], (tb_byte_t*)&spak, 1)) wait = -1;
 
 					// killed?
 					if (spak == 'k') wait = -1;
@@ -393,7 +393,7 @@ static tb_void_t tb_aiop_reactor_select_cler(tb_aiop_reactor_t* reactor)
 		if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 
 		// spak it
-		if (reactor->aiop && reactor->aiop->spak[0]) tb_socket_send(reactor->aiop->spak[0], "p", 1);
+		if (reactor->aiop && reactor->aiop->spak[0]) tb_socket_send(reactor->aiop->spak[0], (tb_byte_t const*)"p", 1);
 	}
 }
 static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
@@ -435,7 +435,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 	return (tb_aiop_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_aiop_reactor_select_exit(rtor);
+	if (rtor) tb_aiop_reactor_select_exit((tb_aiop_reactor_t*)rtor);
 	return tb_null;
 }
 
