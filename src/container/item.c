@@ -885,7 +885,7 @@ tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t spool)
 
 	return func;
 }
-tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv)
+tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_cpointer_t priv)
 {
 	tb_item_func_t func = {0};
 	func.type = TB_ITEM_TYPE_PTR;
@@ -907,7 +907,7 @@ tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv)
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
-	func.priv = priv;
+	func.priv = (tb_pointer_t)priv;
 
 	return func;
 }
@@ -963,7 +963,7 @@ tb_item_func_t tb_item_func_efm(tb_size_t size, tb_handle_t rpool)
 
 	return func;
 }
-tb_item_func_t tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_pointer_t priv)
+tb_item_func_t tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_cpointer_t priv)
 {
 	tb_item_func_t func = {0};
 	func.type = TB_ITEM_TYPE_IFM;
@@ -985,7 +985,7 @@ tb_item_func_t tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_poi
 	func.ncopy = tb_item_func_ifm_ncopy;
 
 	func.size = size;
-	func.priv = priv;
+	func.priv = (tb_pointer_t)priv;
 
 	return func;
 }

@@ -36,8 +36,8 @@
 #define tb_malloc0(size) 			tb_memory_malloc0_(size __tb_debug_vals__)
 #define tb_nalloc(item, size) 		tb_memory_nalloc_(item, size __tb_debug_vals__)
 #define tb_nalloc0(item, size) 		tb_memory_nalloc0_(item, size __tb_debug_vals__)
-#define tb_ralloc(data, size) 		tb_memory_ralloc_(data, size __tb_debug_vals__)
-#define tb_free(data) 				tb_memory_free_(data __tb_debug_vals__)
+#define tb_ralloc(data, size) 		tb_memory_ralloc_((tb_pointer_t)data, size __tb_debug_vals__)
+#define tb_free(data) 				tb_memory_free_((tb_pointer_t)data __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration

@@ -134,7 +134,7 @@ tb_void_t 			tb_ltimer_loop(tb_handle_t handle);
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_ltimer_task_run(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_ltimer_task_run(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
 
 /*! run timer task at the absolute time and will be auto-remove it after be expired
  *
@@ -146,7 +146,7 @@ tb_void_t 			tb_ltimer_task_run(tb_handle_t handle, tb_size_t delay, tb_bool_t r
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
 
 /*! run timer task after the relative time and will be auto-remove it after be expired
  *
@@ -158,7 +158,7 @@ tb_void_t 			tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
 
 /*! add and run timer task after delay and need remove it manually
  *
@@ -170,7 +170,7 @@ tb_void_t 			tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_si
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_add(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_ltimer_task_add(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
 
 /*! add and run timer task at the absolute time and need remove it manually
  *
@@ -183,7 +183,7 @@ tb_handle_t 		tb_ltimer_task_add(tb_handle_t handle, tb_size_t delay, tb_bool_t 
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
 
 /*! add and run timer task after the relative time and need remove it manually
  *
@@ -196,7 +196,7 @@ tb_handle_t 		tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
 
 /*! del timer task, the task will be not called if have been not called
  *

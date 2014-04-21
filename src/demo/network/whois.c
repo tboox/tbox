@@ -57,7 +57,7 @@ static tb_bool_t tb_whois_test_no_match_com(tb_char_t const* name)
 	{
 		tb_basic_stream_printf(bstream, "%s \r\n", name);
 		tb_basic_stream_sync(bstream, tb_true);
-		tb_basic_stream_bread(bstream, data, 250);
+		tb_basic_stream_bread(bstream, (tb_byte_t*)data, 250);
 		if (tb_strstr(data + 150, "No match")) return tb_true;
 	}
 
@@ -83,7 +83,7 @@ static tb_bool_t tb_whois_test_no_match_cn(tb_char_t const* name)
 	{
 		tb_basic_stream_printf(bstream, "%s \r\n", name);
 		tb_basic_stream_sync(bstream, tb_true);
-		tb_basic_stream_bread(bstream, data, 20);
+		tb_basic_stream_bread(bstream, (tb_byte_t*)data, 20);
 		if (tb_strstr(data, "no matching")) return tb_true;
 	}
 
@@ -205,7 +205,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 	tb_assert_and_check_return_val(bstream, tb_false);
 
 	// init ping
-	tb_char_t const* ping = tb_malloc0(1000 * 16);
+	tb_char_t* ping = tb_malloc0(1000 * 16);
 	tb_assert_and_check_return_val(bstream, tb_false);
 
 	// open
@@ -243,7 +243,7 @@ static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 	tb_assert_and_check_return_val(bstream, tb_false);
 
 	// init ping
-	tb_char_t const* ping = tb_malloc0(1000 * 16);
+	tb_char_t* ping = tb_malloc0(1000 * 16);
 	tb_assert_and_check_return_val(bstream, tb_false);
 
 	// open

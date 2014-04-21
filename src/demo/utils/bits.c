@@ -50,7 +50,7 @@ static tb_void_t tb_test_bits_ubits32(tb_uint32_t x)
 		tb_trace_i("[bitops]: ubits32 b: %d x: %x", b, x);
 		for (n = 0; n <= 32; ++n)
 		{
-			__tb_volatile__ tb_byte_t 	p[256] = {0};
+			tb_byte_t 					p[256] = {0};
 			__tb_volatile__ tb_size_t 	n1 = 1000000;
 			__tb_volatile__ tb_size_t 	n2 = 1000000;
 			__tb_volatile__ tb_uint32_t y = 0;
@@ -87,7 +87,7 @@ static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 		tb_trace_i("[bitops]: sbits32 b: %d x: %d", b, x);
 		for (n = 2; n <= 32; ++n)
 		{
-			__tb_volatile__ tb_byte_t 	p[256] = {0};
+			tb_byte_t 					p[256] = {0};
 			__tb_volatile__ tb_size_t 	n1 = 1000000;
 			__tb_volatile__ tb_size_t 	n2 = 1000000;
 			__tb_volatile__ tb_sint32_t y = 0;
@@ -115,7 +115,7 @@ static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 }
 static tb_void_t tb_test_bits_u32_be(tb_uint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -137,7 +137,7 @@ static tb_void_t tb_test_bits_u32_be(tb_uint32_t x)
 }
 static tb_void_t tb_test_bits_u32_le(tb_uint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -159,7 +159,7 @@ static tb_void_t tb_test_bits_u32_le(tb_uint32_t x)
 }
 static tb_void_t tb_test_bits_u24_be(tb_uint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -181,7 +181,7 @@ static tb_void_t tb_test_bits_u24_be(tb_uint32_t x)
 }
 static tb_void_t tb_test_bits_u24_le(tb_uint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -203,7 +203,7 @@ static tb_void_t tb_test_bits_u24_le(tb_uint32_t x)
 }
 static tb_void_t tb_test_bits_u16_be(tb_uint16_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_uint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -225,7 +225,7 @@ static tb_void_t tb_test_bits_u16_be(tb_uint16_t x)
 }
 static tb_void_t tb_test_bits_u16_le(tb_uint16_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_uint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -248,7 +248,7 @@ static tb_void_t tb_test_bits_u16_le(tb_uint16_t x)
 
 static tb_void_t tb_test_bits_s32_be(tb_sint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -270,7 +270,7 @@ static tb_void_t tb_test_bits_s32_be(tb_sint32_t x)
 }
 static tb_void_t tb_test_bits_s32_le(tb_sint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -292,7 +292,7 @@ static tb_void_t tb_test_bits_s32_le(tb_sint32_t x)
 }
 static tb_void_t tb_test_bits_s24_be(tb_sint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -314,7 +314,7 @@ static tb_void_t tb_test_bits_s24_be(tb_sint32_t x)
 }
 static tb_void_t tb_test_bits_s24_le(tb_sint32_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -336,7 +336,7 @@ static tb_void_t tb_test_bits_s24_le(tb_sint32_t x)
 }
 static tb_void_t tb_test_bits_s16_be(tb_sint16_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_sint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -358,7 +358,7 @@ static tb_void_t tb_test_bits_s16_be(tb_sint16_t x)
 }
 static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_sint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -381,8 +381,8 @@ static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 #ifdef TB_CONFIG_TYPE_FLOAT
 static tb_void_t tb_test_bits_double_bbe(tb_double_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
-	__tb_volatile__ tb_double_t 	y = 0;
+	tb_byte_t 					p[8] = {0};
+	__tb_volatile__ tb_double_t	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
 	__tb_volatile__ tb_hong_t 	ts = 0;
@@ -403,8 +403,8 @@ static tb_void_t tb_test_bits_double_bbe(tb_double_t x)
 }
 static tb_void_t tb_test_bits_double_ble(tb_double_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
-	__tb_volatile__ tb_double_t 	y = 0;
+	tb_byte_t 					p[8] = {0};
+	__tb_volatile__ tb_double_t	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
 	__tb_volatile__ tb_hong_t 	ts = 0;
@@ -425,8 +425,8 @@ static tb_void_t tb_test_bits_double_ble(tb_double_t x)
 }
 static tb_void_t tb_test_bits_double_lbe(tb_double_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
-	__tb_volatile__ tb_double_t 	y = 0;
+	tb_byte_t 					p[8] = {0};
+	__tb_volatile__ tb_double_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
 	__tb_volatile__ tb_hong_t 	ts = 0;
@@ -447,8 +447,8 @@ static tb_void_t tb_test_bits_double_lbe(tb_double_t x)
 }
 static tb_void_t tb_test_bits_double_lle(tb_double_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
-	__tb_volatile__ tb_double_t 	y = 0;
+	tb_byte_t 					p[8] = {0};
+	__tb_volatile__ tb_double_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
 	__tb_volatile__ tb_hong_t 	ts = 0;
@@ -469,7 +469,7 @@ static tb_void_t tb_test_bits_double_lle(tb_double_t x)
 }
 static tb_void_t tb_test_bits_float_be(tb_float_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
@@ -491,7 +491,7 @@ static tb_void_t tb_test_bits_float_be(tb_float_t x)
 }
 static tb_void_t tb_test_bits_float_le(tb_float_t x)
 {
-	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	tb_byte_t 					p[8] = {0};
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;

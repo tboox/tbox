@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_pointer_t data)
+static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t data)
 {
 	// get the time
 	tb_timeval_t tv = {0};

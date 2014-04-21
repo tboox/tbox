@@ -134,10 +134,6 @@ ARFLAGS 			= -cr
 # share ldflags
 SHFLAGS 			= -m$(BITS) -shared -Wl,-soname
 
-# pathes
-INC_DIR 			+= /usr/local/include
-LIB_DIR 			+= /usr/local/lib
-
 # include sub-config
 include 			$(PLAT_DIR)/config.mak
 

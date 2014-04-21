@@ -30,7 +30,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp)
 {
 	// check

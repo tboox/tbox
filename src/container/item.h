@@ -170,7 +170,7 @@ tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool);
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv);
+tb_item_func_t 		tb_item_func_ptr(tb_item_func_free_t free, tb_cpointer_t priv);
 
 /*! the object item function 
  *
@@ -202,7 +202,7 @@ tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_handle_t rpool);
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_pointer_t priv);
+tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_cpointer_t priv);
 
 /*! the string item function for scache
  *

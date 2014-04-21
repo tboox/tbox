@@ -6,15 +6,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-tb_cpointer_t tb_exception_test(tb_cpointer_t data);
-tb_cpointer_t tb_exception_test(tb_cpointer_t data)
+tb_pointer_t tb_exception_test(tb_pointer_t data);
+tb_pointer_t tb_exception_test(tb_pointer_t data)
 {
 	// self
 	tb_size_t self = tb_thread_self();
 	
 	// trace
 	tb_trace_i("thread[%lu]: init", self);
- 
+
 	// try0
 //	tb_size_t i = 0; // FIXME: maybe restored after exception, will leak memory if i is handle
 	__tb_volatile__ tb_size_t i = 0;

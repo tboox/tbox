@@ -61,14 +61,15 @@ static tb_bool_t check_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t siz
  */ 
 tb_int_t tb_demo_memory_memops_main(tb_int_t argc, tb_char_t** argv)
 {
+	// init 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_hong_t dt = 0;
 
-	__tb_volatile__ tb_size_t 	size = 15 * 1024 * 1024;
-	__tb_volatile__ tb_byte_t* 	data = tb_malloc(size);
+	tb_size_t 	size = 15 * 1024 * 1024;
+	tb_byte_t* 	data = tb_malloc(size);
 
-	__tb_volatile__ tb_size_t 	size2 = 15 * 1024 * 1024;
-	__tb_volatile__ tb_byte_t* 	data2 = tb_malloc(size2);
+	tb_size_t 	size2 = 15 * 1024 * 1024;
+	tb_byte_t* 	data2 = tb_malloc(size2);
 
 	// test: u8 x 1024
 	memset(data, 0, size);
