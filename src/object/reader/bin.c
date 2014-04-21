@@ -77,7 +77,7 @@ static tb_object_t* tb_object_bin_reader_func_data(tb_object_bin_reader_t* reade
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// read data
-	if (!tb_basic_stream_bread(reader->stream, data, (tb_size_t)size)) 
+	if (!tb_basic_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size)) 
 	{
 		tb_free(data);
 		return tb_null;
@@ -85,8 +85,8 @@ static tb_object_t* tb_object_bin_reader_func_data(tb_object_bin_reader_t* reade
 
 	// decode data
 	{
-		tb_byte_t* 	pb = data;
-		tb_byte_t* 	pe = data + size;
+		tb_byte_t* 	pb = (tb_byte_t*)data;
+		tb_byte_t* 	pe = (tb_byte_t*)data + size;
 		tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
 		for (; pb < pe; pb++, xb++) *pb ^= xb;
 	}
@@ -184,7 +184,7 @@ static tb_object_t* tb_object_bin_reader_func_string(tb_object_bin_reader_t* rea
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// read data
-	if (!tb_basic_stream_bread(reader->stream, data, (tb_size_t)size)) 
+	if (!tb_basic_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size)) 
 	{
 		tb_free(data);
 		return tb_null;
@@ -192,8 +192,8 @@ static tb_object_t* tb_object_bin_reader_func_string(tb_object_bin_reader_t* rea
 
 	// decode string
 	{
-		tb_byte_t* 	pb = data;
-		tb_byte_t* 	pe = data + size;
+		tb_byte_t* 	pb = (tb_byte_t*)data;
+		tb_byte_t* 	pe = (tb_byte_t*)data + size;
 		tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
 		for (; pb < pe; pb++, xb++) *pb ^= xb;
 	}
@@ -408,7 +408,7 @@ static tb_object_t* tb_object_bin_reader_done(tb_basic_stream_t* stream)
 	if (!tb_basic_stream_bread(stream, data, 5)) return tb_null;
 
 	// check 
-	if (tb_strnicmp(data, "tbo00", 5)) return tb_null;
+	if (tb_strnicmp((tb_char_t const*)data, "tbo00", 5)) return tb_null;
 
 	// init
 	tb_object_t* 			object = tb_null;
@@ -453,7 +453,7 @@ static tb_size_t tb_object_bin_reader_probe(tb_basic_stream_t* stream)
 	tb_assert_and_check_return_val(p, 0);
 
 	// ok?
-	return !tb_strnicmp(p, "tbo", 3)? 80 : 0;
+	return !tb_strnicmp((tb_char_t const*)p, "tbo", 3)? 80 : 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

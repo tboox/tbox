@@ -92,7 +92,7 @@
 #define TB_CONFIG_HAVE_ZLIB					
 
 // openssl
-//#define TB_CONFIG_HAVE_OPENSSL	
+#define TB_CONFIG_HAVE_OPENSSL	
 
 // polarssl
 //#define TB_CONFIG_HAVE_POLARSSL	

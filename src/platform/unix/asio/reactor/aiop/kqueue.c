@@ -246,7 +246,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
 		{
 			// read spak
 			tb_char_t spak = '\0';
-			if (1 != tb_socket_recv(aiop->spak[1], &spak, 1)) return -1;
+			if (1 != tb_socket_recv(aiop->spak[1], (tb_byte_t*)&spak, 1)) return -1;
 
 			// killed?
 			if (spak == 'k') return -1;
@@ -273,7 +273,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
 			aioe->code |= TB_AIOE_CODE_SEND;
 			if (aioo->code & TB_AIOE_CODE_CONN) aioe->code |= TB_AIOE_CODE_CONN;
 		}
-		if ((e->flags & EV_ERROR) && !(aioe->code & TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND)) 
+		if ((e->flags & EV_ERROR) && !(aioe->code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
 			aioe->code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 
 		// oneshot? clear it

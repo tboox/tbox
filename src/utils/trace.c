@@ -233,7 +233,7 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 			while (writ < size)
 			{
 				// writ it
-				tb_long_t real = tb_file_writ(g_file, g_line + writ, size - writ);
+				tb_long_t real = tb_file_writ(g_file, (tb_byte_t const*)g_line + writ, size - writ);
 				tb_check_break(real > 0);
 
 				// save size
@@ -287,7 +287,7 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
 			while (writ < size)
 			{
 				// writ it
-				tb_long_t real = tb_file_writ(g_file, g_line + writ, size - writ);
+				tb_long_t real = tb_file_writ(g_file, (tb_byte_t const*)g_line + writ, size - writ);
 				tb_check_break(real > 0);
 
 				// save size

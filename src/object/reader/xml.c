@@ -67,7 +67,7 @@ static tb_object_t* tb_object_xml_reader_func_date(tb_object_xml_reader_t* reade
 
 	// walk
 	tb_object_t* date = tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -163,7 +163,7 @@ static tb_object_t* tb_object_xml_reader_func_data(tb_object_xml_reader_t* reade
 	// walk
 	tb_char_t* 		base64 	= tb_null;
 	tb_object_t* 	data 	= tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -306,7 +306,7 @@ static tb_object_t* tb_object_xml_reader_func_string(tb_object_xml_reader_t* rea
 
 	// walk
 	tb_object_t* string = tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -358,7 +358,7 @@ static tb_object_t* tb_object_xml_reader_func_number(tb_object_xml_reader_t* rea
 
 	// walk
 	tb_object_t* number = tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -586,7 +586,7 @@ static tb_size_t tb_object_xml_reader_probe(tb_basic_stream_t* stream)
 	tb_assert_and_check_return_val(p, 0);
 
 	// ok?
-	return !tb_strnicmp(p, "<?xml", 5)? 50 : 0;
+	return !tb_strnicmp((tb_char_t const*)p, "<?xml", 5)? 50 : 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

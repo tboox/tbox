@@ -54,7 +54,7 @@ tb_int_t tb_demo_utils_base64_main(tb_int_t argc, tb_char_t** argv)
 			table[i] = table[j];
 			table[j] = t;
 			tb_char_t ob[64];
-			tb_base64_encode_test("<?xml version=", 14, ob, 64, table);
+			tb_base64_encode_test((tb_byte_t const*)"<?xml version=", 14, ob, 64, table);
 			if (!tb_strncmp(ob, "zfgPAH1dqbbo3RKRmIIc", 18))
 			{
 				tb_trace_i("%s", table);

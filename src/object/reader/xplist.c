@@ -59,7 +59,7 @@ static tb_object_t* tb_object_xplist_reader_func_date(tb_object_xplist_reader_t*
 
 	// walk
 	tb_object_t* date = tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -155,7 +155,7 @@ static tb_object_t* tb_object_xplist_reader_func_data(tb_object_xplist_reader_t*
 	// walk
 	tb_char_t* 		base64 	= tb_null;
 	tb_object_t* 	data 	= tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -298,7 +298,7 @@ static tb_object_t* tb_object_xplist_reader_func_string(tb_object_xplist_reader_
 
 	// walk
 	tb_object_t* string = tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -350,7 +350,7 @@ static tb_object_t* tb_object_xplist_reader_func_number(tb_object_xplist_reader_
 
 	// walk
 	tb_object_t* number = tb_null;
-	while (event = tb_xml_reader_next(reader->reader))
+	while ((event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
@@ -582,14 +582,14 @@ static tb_size_t tb_object_xplist_reader_probe(tb_basic_stream_t* stream)
 	tb_assert_and_check_return_val(p, 0);
 
 	// is xml data?
-	if (!tb_strnicmp(p, "<?xml", 5)) 
+	if (!tb_strnicmp((tb_char_t const*)p, "<?xml", 5)) 
 	{
 		// need more data
 		if (!tb_basic_stream_need(stream, &p, 256)) return 5;
 		tb_assert_and_check_return_val(p, 5);
 
 		// is xplist?
-		return tb_stristr(p, "DOCTYPE plist")? 80 : 10;
+		return tb_stristr((tb_char_t const*)p, "DOCTYPE plist")? 80 : 10;
 	}
 
 	// ok?

@@ -37,7 +37,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
-
 // the ssl type
 typedef struct __tb_ssl_t
 {
@@ -90,7 +89,7 @@ static tb_int_t 		tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t siz
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
-static BIO_METHOD const g_ssl_bio_method =
+static BIO_METHOD g_ssl_bio_method =
 {
 	BIO_TYPE_SOURCE_SINK | 100
 ,	"ssl_bio"
