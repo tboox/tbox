@@ -63,11 +63,11 @@ static tb_void_t tb_item_func_true_nfree(tb_item_func_t* func, tb_pointer_t item
 }
 static tb_void_t tb_item_func_true_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
-	tb_assert((tb_bool_t)data == tb_true);
+	tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
 }
 static tb_void_t tb_item_func_true_nrepl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
-	tb_assert((tb_bool_t)data == tb_true);
+	tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ static tb_void_t tb_item_func_long_nrepl(tb_item_func_t* func, tb_pointer_t item
 {
 	tb_assert_and_check_return(func && item);
 
-	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)data, size);
+	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)(tb_size_t)data, size);
 	else while (size--) ((tb_long_t*)item)[size] = (tb_long_t)data;
 }
 
@@ -149,7 +149,7 @@ static tb_void_t tb_item_func_size_nrepl(tb_item_func_t* func, tb_pointer_t item
 {
 	tb_assert_and_check_return(func && item);
 
-	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)data, size);
+	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)(tb_size_t)data, size);
 	else while (size--) ((tb_size_t*)item)[size] = (tb_size_t)data;
 }
 
@@ -248,7 +248,7 @@ static tb_size_t tb_item_func_uint32_hash(tb_item_func_t* func, tb_cpointer_t da
 }
 static tb_long_t tb_item_func_uint32_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return ((tb_uint32_t)ldata > (tb_uint32_t)rdata? 1 : ((tb_uint32_t)ldata < (tb_uint32_t)rdata? -1 : 0));
+	return ((tb_uint32_t)(tb_size_t)ldata > (tb_uint32_t)(tb_size_t)rdata? 1 : ((tb_uint32_t)(tb_size_t)ldata < (tb_uint32_t)(tb_size_t)rdata? -1 : 0));
 	//return (ldata - rdata); //!< maybe overflow for int32
 }
 static tb_pointer_t tb_item_func_uint32_data(tb_item_func_t* func, tb_cpointer_t item)
@@ -259,7 +259,7 @@ static tb_pointer_t tb_item_func_uint32_data(tb_item_func_t* func, tb_cpointer_t
 static tb_char_t const* tb_item_func_uint32_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(func && cstr, "");
-	tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint32_t)data);
+	tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint32_t)(tb_size_t)data);
 	if (n > 0) cstr[n] = '\0';
 	return (tb_char_t const*)cstr;
 }
@@ -271,12 +271,12 @@ static tb_void_t tb_item_func_uint32_free(tb_item_func_t* func, tb_pointer_t ite
 static tb_void_t tb_item_func_uint32_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(func && item);
-	*((tb_uint32_t*)item) = (tb_uint32_t)data;
+	*((tb_uint32_t*)item) = (tb_uint32_t)(tb_size_t)data;
 }
 static tb_void_t tb_item_func_uint32_nrepl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return(func && item);
-	tb_memset_u32(item, (tb_uint32_t)data, size);
+	tb_memset_u32(item, (tb_uint32_t)(tb_size_t)data, size);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -416,7 +416,7 @@ static tb_void_t tb_item_func_ptr_ndupl(tb_item_func_t* func, tb_pointer_t item,
 	tb_assert_and_check_return(func && item);
 
 	// dupl items
-	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)data, size);
+	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)(tb_size_t)data, size);
 	else while (size--) ((tb_cpointer_t*)item)[size] = data;
 }
 static tb_void_t tb_item_func_ptr_nrepl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
@@ -432,7 +432,7 @@ static tb_void_t tb_item_func_ptr_nrepl(tb_item_func_t* func, tb_pointer_t item,
 	}
 
 	// copy items
-	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)data, size);
+	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)(tb_size_t)data, size);
 	else while (size--) ((tb_cpointer_t*)item)[size] = data;
 }
 static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
@@ -441,7 +441,7 @@ static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	tb_assert_and_check_return(func && item);
 
 	// copy items
-	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)data, size);
+	if (func->size == 4) tb_memset_u32(item, (tb_uint32_t)(tb_size_t)data, size);
 	else while (size--) ((tb_cpointer_t*)item)[size] = data;
 }
 

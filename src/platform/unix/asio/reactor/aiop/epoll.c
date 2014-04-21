@@ -195,7 +195,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		{
 			// read spak
 			tb_char_t spak = '\0';
-			if (1 != tb_socket_recv(aiop->spak[1], &spak, 1)) return -1;
+			if (1 != tb_socket_recv(aiop->spak[1], (tb_byte_t*)&spak, 1)) return -1;
 
 			// killed?
 			if (spak == 'k') return -1;
@@ -211,7 +211,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		tb_aioe_t* aioe = &list[wait++];
 		aioe->code = TB_AIOE_CODE_NONE;
 		aioe->data = aioo->data;
-		aioe->aioo = aioo;
+		aioe->aioo = (tb_aioo_t*)aioo;
 		if (events & EPOLLIN) 
 		{
 			aioe->code |= TB_AIOE_CODE_RECV;
@@ -286,7 +286,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 	return (tb_aiop_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_aiop_reactor_epoll_exit(rtor);
+	if (rtor) tb_aiop_reactor_epoll_exit((tb_aiop_reactor_t*)rtor);
 	return tb_null;
 }
 
