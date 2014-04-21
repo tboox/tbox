@@ -40,7 +40,7 @@ PWD 				= pwd
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g  
-CXFLAGS 			= -m$(BITS) -c -Wall -mssse3 -Werror -D__tb_padding__
+CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -75,10 +75,11 @@ CCFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # mxflags: .m/.mm files
-MXFLAGS_RELEASE 	= -fno-bounds-check -fvisibility=hidden
+MXFLAGS_RELEASE 	= -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g  
-MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) \
-					-Werror -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings \
+MXFLAGS 			= \
+					-m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments \
+					-mssse3 $(ARCH_CXFLAGS) -fmessage-length=0 -pipe -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \
 					"-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \
 					"-DIBAction=void)__attribute__((ibaction)" 

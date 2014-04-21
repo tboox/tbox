@@ -31,7 +31,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_crc32_encode(crc, ib, in, table) 	tb_crc32_encode_asm(crc, ib, in, table)
+#ifndef TB_ARCH_ARM64
+# 	define tb_crc32_encode(crc, ib, in, table) 	tb_crc32_encode_asm(crc, ib, in, table)
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

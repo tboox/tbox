@@ -3,7 +3,7 @@
  *
  * \brief Configuration options (set of defines)
  *
- *  Copyright (C) 2006-2013, Brainspark B.V.
+ *  Copyright (C) 2006-2014, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -113,6 +113,42 @@
  * Comment if your system does not support the IPv6 socket interface
  */
 #define POLARSSL_HAVE_IPV6
+
+/**
+ * \def POLARSSL_PLATFORM_MEMORY
+ *
+ * Enable the memory allocation layer.
+ *
+ * By default PolarSSL uses the system-provided malloc() and free().
+ * This allows different allocators (self-implemented or provided) to be
+ * provided to the platform abstraction layer.
+ *
+ * Enabling POLARSSL_PLATFORM_MEMORY will provide "platform_set_malloc_free()"
+ * to allow you to set an alternative malloc() and free() function pointer.
+ *
+ * Requires: POLARSSL_PLATFORM_C
+ *
+ * Enable this layer to allow use of alternative memory allocators.
+ */
+//#define POLARSSL_PLATFORM_MEMORY
+
+/**
+ * \def POLARSSL_PLATFORM_XXX_ALT
+ *
+ * Uncomment a macro to let PolarSSL support the function in the platform
+ * abstraction layer.
+ *
+ * Example: In case you uncomment POLARSSL_PLATFORM_PRINTF_ALT, PolarSSL will
+ * provide a function "platform_set_printf()" that allows you to set an
+ * alternative printf function pointer.
+ *
+ * All these define require POLARSSL_PLATFORM_C to be defined!
+ *
+ * Uncomment a macro to enable alternate implementation of specific base
+ * platform function
+ */
+//#define POLARSSL_PLATFORM_PRINTF_ALT
+//#define POLARSSL_PLATFORM_FPRINTF_ALT
 /* \} name SECTION: System support */
 
 /**
@@ -122,6 +158,19 @@
  * within the modules that are enabled.
  * \{
  */
+
+/**
+ * \def POLARSSL_TIMING_ALT
+ *
+ * Uncomment to provide your own alternate implementation for hardclock(),
+ * get_timer(), set_alarm() and m_sleep().
+ *
+ * Only works if you have POLARSSL_TIMING_C enabled.
+ *
+ * You will need to provide a header "timing_alt.h" and an implementation at
+ * compile time.
+ */
+//#define POLARSSL_TIMING_ALT
 
 /**
  * \def POLARSSL_XXX_ALT
@@ -290,7 +339,7 @@
  * may result in a compromise of the long-term signing key. This is avoided by
  * the deterministic variant.
  *
- * Requires: POLARSSL_MD_C
+ * Requires: POLARSSL_HMAC_DRBG_C
  *
  * Comment this macro to disable deterministic ECDSA.
  */
@@ -539,6 +588,20 @@
 #define POLARSSL_KEY_EXCHANGE_ECDH_RSA_ENABLED
 
 /**
+ * \def POLARSSL_PK_PARSE_EC_EXTENDED
+ *
+ * Enhance support for reading EC keys using variants of SEC1 not allowed by
+ * RFC 5915 and RFC 5480.
+ *
+ * Currently this means parsing the SpecifiedECDomain choice of EC
+ * parameters (only known groups are supported, not arbitrary domains, to
+ * avoid validation issues).
+ *
+ * Disable if you only need to support RFC 5915 + 5480 key formats.
+ */
+#define POLARSSL_PK_PARSE_EC_EXTENDED
+
+/**
  * \def POLARSSL_ERROR_STRERROR_BC
  *
  * Make available the backward compatible error_strerror() next to the
@@ -582,7 +645,7 @@
  * Do not add default entropy sources. These are the platform specific,
  * hardclock and HAVEGE based poll functions.
  *
- * This is useful to have more control over the added entropy sources in an 
+ * This is useful to have more control over the added entropy sources in an
  * application.
  *
  * Uncomment this macro to prevent loading of default entropy functions.
@@ -601,6 +664,22 @@
 //#define POLARSSL_NO_PLATFORM_ENTROPY
 
 /**
+ * \def POLARSSL_ENTROPY_FORCE_SHA256
+ *
+ * Force the entropy accumulator to use a SHA-256 accumulator instead of the
+ * default SHA-512 based one (if both are available).
+ *
+ * Requires: POLARSSL_SHA256_C
+ *
+ * On 32-bit systems SHA-256 can be much faster than SHA-512. Use this option
+ * if you have performance concerns.
+ *
+ * This option is only useful if both POLARSSL_SHA256_C and
+ * POLARSSL_SHA512_C are defined. Otherwise the available hash module is used.
+ */
+//#define POLARSSL_ENTROPY_FORCE_SHA256
+
+/**
  * \def POLARSSL_MEMORY_DEBUG
  *
  * Enable debugging of buffer allocator memory issues. Automatically prints
@@ -608,7 +687,6 @@
  * function for 'debug output' of allocated memory.
  *
  * Requires: POLARSSL_MEMORY_BUFFER_ALLOC_C
- *           fprintf()
  *
  * Uncomment this macro to let the buffer allocator print out error messages.
  */
@@ -783,6 +861,16 @@
 #define POLARSSL_SSL_PROTO_TLS1_2
 
 /**
+ * \def POLARSSL_SSL_ALPN
+ *
+ * Enable support for Application Layer Protocol Negotiation.
+ * draft-ietf-tls-applayerprotoneg-05
+ *
+ * Comment this macro to disable support for ALPN.
+ */
+#define POLARSSL_SSL_ALPN
+
+/**
  * \def POLARSSL_SSL_SESSION_TICKETS
  *
  * Enable support for RFC 5077 session tickets in SSL.
@@ -812,6 +900,20 @@
  * Comment this macro to disable support for truncated HMAC in SSL
  */
 #define POLARSSL_SSL_TRUNCATED_HMAC
+
+/**
+ * \def POLARSSL_SSL_SET_CURVES
+ *
+ * Enable ssl_set_curves().
+ *
+ * This is disabled by default since it breaks binary compatibility with the
+ * 1.3.x line. If you choose to enable it, you will need to rebuild your
+ * application against the new header files, relinking will not be enough.
+ * It will be enabled by default, or no longer an option, in the 1.4 branch.
+ *
+ * Uncomment to make ssl_set_curves() available.
+ */
+//#define POLARSSL_SSL_SET_CURVES
 
 /**
  * \def POLARSSL_THREADING_ALT
@@ -856,10 +958,41 @@
 //#define POLARSSL_X509_ALLOW_UNSUPPORTED_CRITICAL_EXTENSION
 
 /**
+ * \def POLARSSL_X509_CHECK_KEY_USAGE
+ *
+ * Enable verification of the keyUsage extension (CA and leaf certificates).
+ *
+ * Disabling this avoids problems with mis-issued and/or misused
+ * (intermediate) CA and leaf certificates.
+ *
+ * \warning Depending on your PKI use, disabling this can be a security risk!
+ *
+ * Comment to skip keyUsage checking for both CA and leaf certificates.
+ */
+#define POLARSSL_X509_CHECK_KEY_USAGE
+
+/**
+ * \def POLARSSL_X509_CHECK_EXTENDED_KEY_USAGE
+ *
+ * Enable verification of the extendedKeyUsage extension (leaf certificates).
+ *
+ * Disabling this avoids problems with mis-issued and/or misused certificates.
+ *
+ * \warning Depending on your PKI use, disabling this can be a security risk!
+ *
+ * Comment to skip extendedKeyUsage checking for certificates.
+ */
+#define POLARSSL_X509_CHECK_EXTENDED_KEY_USAGE
+
+/**
  * \def POLARSSL_ZLIB_SUPPORT
  *
  * If set, the SSL/TLS module uses ZLIB to support compression and
  * decompression of packet data.
+ *
+ * \warning TLS-level compression MAY REDUCE SECURITY! See for example the
+ * CRIME attack. Before enabling this option, you should examine with care if
+ * CRIME or similar exploits may be a applicable to your use case.
  *
  * Used in: library/ssl_tls.c
  *          library/ssl_cli.c
@@ -1256,7 +1389,7 @@
  * Module:  library/entropy.c
  * Caller:
  *
- * Requires: POLARSSL_SHA512_C
+ * Requires: POLARSSL_SHA512_C or POLARSSL_SHA256_C
  *
  * This module provides a generic entropy pool
  */
@@ -1270,7 +1403,7 @@
  * Module:  library/error.c
  * Caller:
  *
- * This module enables err_strerror().
+ * This module enables polarssl_strerror().
  */
 #define POLARSSL_ERROR_C
 
@@ -1310,6 +1443,20 @@
  * Uncomment to enable the HAVEGE random generator.
  */
 //#define POLARSSL_HAVEGE_C
+
+/**
+ * \def POLARSSL_HMAC_DRBG_C
+ *
+ * Enable the HMAC_DRBG random generator.
+ *
+ * Module:  library/hmac_drbg.c
+ * Caller:
+ *
+ * Requires: POLARSSL_MD_C
+ *
+ * Uncomment to enable the HMAC_DRBG random number geerator.
+ */
+#define POLARSSL_HMAC_DRBG_C
 
 /**
  * \def POLARSSL_MD_C
@@ -1364,15 +1511,7 @@
 
 /**
  * \def POLARSSL_MEMORY_C
- *
- * Enable the memory allocation layer.
- * By default PolarSSL uses the system-provided malloc() and free().
- * (As long as POLARSSL_MEMORY_STDMALLOC and POLARSSL_MEMORY_STDFREE
- * are defined and unmodified)
- *
- * This allows different allocators (self-implemented or provided)
- *
- * Enable this layer to allow use of alternative memory allocators.
+ * Deprecated since 1.3.5. Please use POLARSSL_PLATFORM_MEMORY instead.
  */
 //#define POLARSSL_MEMORY_C
 
@@ -1385,7 +1524,8 @@
  *
  * Module:  library/memory_buffer_alloc.c
  *
- * Requires: POLARSSL_MEMORY_C
+ * Requires: POLARSSL_PLATFORM_C
+ *           POLARSSL_PLATFORM_MEMORY (to use it within PolarSSL)
  *
  * Enable this module to enable the buffer memory allocator.
  */
@@ -1575,6 +1715,19 @@
  * This module enables PKCS#12 functions.
  */
 #define POLARSSL_PKCS12_C
+
+/**
+ * \def POLARSSL_PLATFORM_C
+ *
+ * Enable the platform abstraction layer that allows you to re-assign
+ * functions like malloc(), free(), printf(), fprintf()
+ *
+ * Module:  library/platform.c
+ * Caller:  Most other .c files
+ *
+ * This module enables abstraction of common (libc) functions.
+ */
+#define POLARSSL_PLATFORM_C
 
 /**
  * \def POLARSSL_RIPEMD160_C
@@ -1902,6 +2055,13 @@
 #define CTR_DRBG_MAX_REQUEST             1024 /**< Maximum number of requested bytes per call */
 #define CTR_DRBG_MAX_SEED_INPUT           384 /**< Maximum size of (re)seed buffer */
 
+// HMAC_DRBG options
+//
+#define POLARSSL_HMAC_DRBG_RESEED_INTERVAL   10000 /**< Interval before reseed is performed by default */
+#define POLARSSL_HMAC_DRBG_MAX_INPUT           256 /**< Maximum number of additional input bytes */
+#define POLARSSL_HMAC_DRBG_MAX_REQUEST        1024 /**< Maximum number of requested bytes per call */
+#define POLARSSL_HMAC_DRBG_MAX_SEED_INPUT      384 /**< Maximum size of (re)seed buffer */
+
 // ECP options
 //
 #define POLARSSL_ECP_MAX_BITS             521 /**< Maximum bit size of groups */
@@ -1913,10 +2073,16 @@
 #define ENTROPY_MAX_SOURCES                20 /**< Maximum number of sources supported */
 #define ENTROPY_MAX_GATHER                128 /**< Maximum amount requested from entropy sources */
 
-// Memory options
+// Memory buffer allocator options
 #define MEMORY_ALIGN_MULTIPLE               4 /**< Align on multiples of this value */
-#define POLARSSL_MEMORY_STDMALLOC      malloc /**< Default allocator to use, can be undefined */
-#define POLARSSL_MEMORY_STDFREE          free /**< Default free to use, can be undefined */
+
+// Platform options
+//
+#define POLARSSL_PLATFORM_STD_MEM_HDR <stdlib.h> /**< Header to include for default allocator. Don't define if no header is needed. */
+#define POLARSSL_PLATFORM_STD_MALLOC   malloc /**< Default allocator to use, can be undefined */
+#define POLARSSL_PLATFORM_STD_FREE       free /**< Default free to use, can be undefined */
+#define POLARSSL_PLATFORM_STD_PRINTF   printf /**< Default printf to use, can be undefined */
+#define POLARSSL_PLATFORM_STD_FPRINTF fprintf /**< Default fprintf to use, can be undefined */
 
 // SSL Cache options
 //
@@ -1962,7 +2128,7 @@
 #error "POLARSSL_ECDSA_C defined, but not all prerequisites"
 #endif
 
-#if defined(POLARSSL_ECDSA_DETERMINISTIC) && !defined(POLARSSL_MD_C)
+#if defined(POLARSSL_ECDSA_DETERMINISTIC) && !defined(POLARSSL_HMAC_DRBG_C)
 #error "POLARSSL_ECDSA_DETERMINISTIC defined, but not all prerequisites"
 #endif
 
@@ -1974,7 +2140,11 @@
     !defined(POLARSSL_ECP_DP_SECP521R1_ENABLED) &&                  \
     !defined(POLARSSL_ECP_DP_BP256R1_ENABLED)   &&                  \
     !defined(POLARSSL_ECP_DP_BP384R1_ENABLED)   &&                  \
-    !defined(POLARSSL_ECP_DP_BP512R1_ENABLED) ) )
+    !defined(POLARSSL_ECP_DP_BP512R1_ENABLED)   &&                  \
+    !defined(POLARSSL_ECP_DP_M255_ENABLED)      &&                  \
+    !defined(POLARSSL_ECP_DP_SECP192K1_ENABLED) &&                  \
+    !defined(POLARSSL_ECP_DP_SECP224K1_ENABLED) &&                  \
+    !defined(POLARSSL_ECP_DP_SECP256K1_ENABLED) ) )
 #error "POLARSSL_ECP_C defined, but not all prerequisites"
 #endif
 
@@ -1986,9 +2156,14 @@
     defined(POLARSSL_CONFIG_OPTIONS) && (CTR_DRBG_ENTROPY_LEN > 64)
 #error "CTR_DRBG_ENTROPY_LEN value too high"
 #endif
-#if defined(POLARSSL_ENTROPY_C) && !defined(POLARSSL_SHA512_C) &&        \
-    defined(POLARSSL_CONFIG_OPTIONS) && (CTR_DRBG_ENTROPY_LEN > 32)
+#if defined(POLARSSL_ENTROPY_C) &&                                            \
+    ( !defined(POLARSSL_SHA512_C) || defined(POLARSSL_ENTROPY_FORCE_SHA256) ) \
+    && defined(POLARSSL_CONFIG_OPTIONS) && (CTR_DRBG_ENTROPY_LEN > 32)
 #error "CTR_DRBG_ENTROPY_LEN value too high"
+#endif
+#if defined(POLARSSL_ENTROPY_C) && \
+    defined(POLARSSL_ENTROPY_FORCE_SHA256) && !defined(POLARSSL_SHA256_C)
+#error "POLARSSL_ENTROPY_FORCE_SHA256 defined, but not all prerequisites"
 #endif
 
 #if defined(POLARSSL_GCM_C) && (                                        \
@@ -1998,6 +2173,10 @@
 
 #if defined(POLARSSL_HAVEGE_C) && !defined(POLARSSL_TIMING_C)
 #error "POLARSSL_HAVEGE_C defined, but not all prerequisites"
+#endif
+
+#if defined(POLARSSL_HMAC_DRBG) && !defined(POLARSSL_MD_C)
+#error "POLARSSL_HMAC_DRBG_C defined, but not all prerequisites"
 #endif
 
 #if defined(POLARSSL_KEY_EXCHANGE_ECDH_ECDSA_ENABLED) &&                 \
@@ -2049,7 +2228,8 @@
 #error "POLARSSL_KEY_EXCHANGE_RSA_ENABLED defined, but not all prerequisites"
 #endif
 
-#if defined(POLARSSL_MEMORY_BUFFER_ALLOC_C) && !defined(POLARSSL_MEMORY_C)
+#if defined(POLARSSL_MEMORY_BUFFER_ALLOC_C) &&                          \
+    ( !defined(POLARSSL_PLATFORM_C) || !defined(POLARSSL_PLATFORM_MEMORY) )
 #error "POLARSSL_MEMORY_BUFFER_ALLOC_C defined, but not all prerequisites"
 #endif
 
@@ -2145,6 +2325,11 @@
     ( !defined(POLARSSL_AES_C) || !defined(POLARSSL_SHA256_C) ||            \
       !defined(POLARSSL_CIPHER_MODE_CBC) )
 #error "POLARSSL_SSL_SESSION_TICKETS_C defined, but not all prerequisites"
+#endif
+
+#if defined(POLARSSL_SSL_SERVER_NAME_INDICATION) && \
+        !defined(POLARSSL_X509_CRT_PARSE_C)
+#error "POLARSSL_SSL_SERVER_NAME_INDICATION defined, but not all prerequisites"
 #endif
 
 #if defined(POLARSSL_THREADING_PTHREAD)

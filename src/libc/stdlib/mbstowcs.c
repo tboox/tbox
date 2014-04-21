@@ -49,7 +49,7 @@ tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 
 	// init
 	tb_size_t e = (sizeof(tb_wchar_t) == 4)? TB_CHARSET_TYPE_UCS4 : TB_CHARSET_TYPE_UCS2;
-	tb_long_t r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UTF8, e | TB_CHARSET_TYPE_LE, s2, s1, n * sizeof(tb_wchar_t));
+	tb_long_t r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UTF8, e | TB_CHARSET_TYPE_LE, s2, (tb_byte_t*)s1, n * sizeof(tb_wchar_t));
 	if (r > 0) r /= sizeof(tb_wchar_t);
 	
 	// strip

@@ -54,7 +54,7 @@ tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 	if (l) 
 	{
 		tb_size_t e = (sizeof(tb_wchar_t) == 4)? TB_CHARSET_TYPE_UCS4 : TB_CHARSET_TYPE_UCS2;
-		r = tb_charset_conv_data(e | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, s2, l * sizeof(tb_wchar_t), s1, n);
+		r = tb_charset_conv_data(e | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, (tb_byte_t const*)s2, l * sizeof(tb_wchar_t), (tb_byte_t*)s1, n);
 	}
 
 	// strip

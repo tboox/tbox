@@ -47,7 +47,7 @@ tb_void_t tb_print(tb_char_t const* string)
 	__android_log_print(ANDROID_LOG_DEBUG, TB_TRACE_PREFIX? TB_TRACE_PREFIX : "tbox", "%s", string);
 #elif defined(TB_CONFIG_OS_IOS)
 	// print to the ios device log
-	asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, string);
+	asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s", string);
 #endif
 
 	// print to the stdout

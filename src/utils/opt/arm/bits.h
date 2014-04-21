@@ -32,7 +32,7 @@
  * macros
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#if defined(TB_CONFIG_ASSEMBLER_GAS) && !defined(TB_ARCH_ARM64)
 
 // swap
 #if TB_ARCH_ARM_VERSION >= 6
@@ -53,11 +53,10 @@
  * interfaces
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
-
+#if defined(TB_CONFIG_ASSEMBLER_GAS) && !defined(TB_ARCH_ARM64)
 
 // swap
-#if TB_ARCH_ARM_VERSION >= 6 
+#if (TB_ARCH_ARM_VERSION >= 6)
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 {
 	__tb_asm__ __tb_volatile__("rev16 %0, %0" : "+r"(x));
@@ -67,7 +66,7 @@ static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 
 static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 {
-#if TB_ARCH_ARM_VERSION >= 6 
+#if (TB_ARCH_ARM_VERSION >= 6)
 	__tb_asm__("rev %0, %0" : "+r"(x));
 #else
 	__tb_register__ tb_uint32_t t;

@@ -50,7 +50,7 @@
  * arch
  */
 
-#if defined(TB_ARCH_ARM_NEON) || defined(TB_ARCH_ARM_v7A)
+#if defined(TB_ARCH_ARM_v7A)
  		.arch armv7-a
 #elif defined(TB_ARCH_ARM_v7)
  		.arch armv7
@@ -66,7 +66,7 @@
  * fpu
  */
 
-#if defined(TB_ARCH_ARM_NEON) 
+#if defined(TB_ARCH_ARM_NEON) && !defined(TB_ARCH_ARM64)
  		.fpu neon
 #elif defined(TB_ARCH_VFP)
  		.fpu vfp
@@ -75,7 +75,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * syntax
  */
+#ifndef TB_ARCH_ARM64
  		.syntax unified
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * thumb

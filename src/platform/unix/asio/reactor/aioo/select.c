@@ -82,7 +82,7 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code,
 
 	// error?
 	tb_int_t o = 0;
-	tb_int_t n = sizeof(tb_int_t);
+	socklen_t n = sizeof(socklen_t);
 	getsockopt(fd, SOL_SOCKET, SO_ERROR, &o, &n);
 	if (o) return -1;
 
