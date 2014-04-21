@@ -720,12 +720,12 @@ tb_char_t* tb_static_stream_set_string(tb_static_stream_t* sstream, tb_char_t co
 	tb_static_stream_sync(sstream);
 
 	// set string
-	tb_char_t* 			b = sstream->p;
-	tb_char_t* 			p = sstream->p;
-	tb_char_t const* 	e = sstream->e - 1;
+	tb_char_t* 			b = (tb_char_t*)sstream->p;
+	tb_char_t* 			p = (tb_char_t*)sstream->p;
+	tb_char_t const* 	e = (tb_char_t const*)sstream->e - 1;
 	while (*s && p < e) *p++ = *s++;
 	*p++ = '\0';
-	sstream->p = p;
+	sstream->p = (tb_byte_t*)p;
 
 	// ok?
 	return b;

@@ -47,7 +47,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
-
 // the xml reader type
 typedef struct __tb_xml_reader_t
 {
@@ -94,7 +93,7 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_t* reader)
 	// parse element
 	tb_char_t ch = '\0';
 	tb_size_t in = 0;
-	while (ch = tb_basic_stream_bread_s8(reader->rstream))
+	while ((ch = tb_basic_stream_bread_s8(reader->rstream)))
 	{
 		// append element
 		if (!in && ch == '<') in = 1;
@@ -333,7 +332,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					// seek to comment end
 					tb_char_t ch = '\0';
 					tb_int_t n = 0;
-					while (ch = tb_basic_stream_bread_s8(xreader->rstream))
+					while ((ch = tb_basic_stream_bread_s8(xreader->rstream)))
 					{
 						// -->
 						if (n == 2 && ch == '>') break;
@@ -363,7 +362,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					// seek to cdata end
 					tb_char_t ch = '\0';
 					tb_int_t n = 0;
-					while (ch = tb_basic_stream_bread_s8(xreader->rstream))
+					while ((ch = tb_basic_stream_bread_s8(xreader->rstream)))
 					{
 						// ]]>
 						if (n == 2 && ch == '>') break;
@@ -517,7 +516,7 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
 	
 	// walk
 	tb_size_t e = TB_XML_READER_EVENT_NONE;
-	while (e = tb_xml_reader_next(reader))
+	while ((e = tb_xml_reader_next(reader)))
 	{
 		// init document node
 		if (!node)

@@ -113,11 +113,11 @@ static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursi
 	// init info
 	tb_char_t 		temp[4096] = {0};
 	DIR* 			directory = tb_null;
-	if (directory = opendir(path))
+	if ((directory = opendir(path)))
 	{
 		// walk
 		struct dirent* item = tb_null;
-		while (item = readdir(directory))
+		while ((item = readdir(directory)))
 		{
 			// check
 			tb_assert_and_check_continue(item->d_name && item->d_reclen);

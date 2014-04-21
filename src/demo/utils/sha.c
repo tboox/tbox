@@ -6,7 +6,7 @@
 static tb_void_t tb_test_sha(tb_size_t mode, tb_char_t const* data)
 {
 	tb_byte_t ob[32];
-	tb_size_t on = tb_sha_encode(mode, data, tb_strlen(data), ob, 32);
+	tb_size_t on = tb_sha_encode(mode, (tb_byte_t const*)data, tb_strlen(data), ob, 32);
 	tb_assert_and_check_return((on << 3) == mode);
 
 	tb_size_t i = 0;

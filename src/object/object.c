@@ -261,8 +261,8 @@ tb_object_t* tb_object_dump(tb_object_t* object)
 		tb_size_t 			size = tb_data_size(odata);
 		if (data && size)
 		{
-			tb_char_t const* 	p = tb_strstr(data, "?>");
-			tb_char_t const* 	e = data + size;
+			tb_char_t const* 	p = tb_strstr((tb_char_t const*)data, "?>");
+			tb_char_t const* 	e = (tb_char_t const*)data + size;
 			tb_char_t 			b[4096 + 1];
 			if (p && p + 2 < e)
 			{

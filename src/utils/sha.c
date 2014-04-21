@@ -307,10 +307,10 @@ tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
 {
 	tb_hize_t count = tb_bits_be_to_ne_u64(sha->count << 3);
 
-	tb_sha_spak(sha, "\200", 1);
+	tb_sha_spak(sha, (tb_byte_t const*)"\200", 1);
 
 	while ((sha->count & 63) != 56)
-		tb_sha_spak(sha, "", 1);
+		tb_sha_spak(sha, (tb_byte_t const*)"", 1);
 
 	tb_sha_spak(sha, (tb_byte_t*)&count, 8);
 

@@ -8,8 +8,8 @@
  */ 
 tb_int_t tb_demo_utils_crc_main(tb_int_t argc, tb_char_t** argv)
 {
-	tb_byte_t* 	p = argv[1];
-	tb_size_t 	n = tb_strlen(p);
+	tb_byte_t* 	p = (tb_byte_t*)argv[1];
+	tb_size_t 	n = tb_strlen((tb_char_t const*)p);
 
 #ifndef __tb_small__
 	tb_printf("[crc]: TB_CRC_MODE_8_ATM = %x\n", tb_crc_encode(TB_CRC_MODE_8_ATM, 0, p, n));

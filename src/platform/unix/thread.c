@@ -80,7 +80,7 @@ tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// wait
 	tb_long_t ok = -1;
-	if (ok = pthread_join(((pthread_t)handle), tb_null))
+	if ((ok = pthread_join(((pthread_t)handle), tb_null)))
 	{
 		// trace
 		tb_trace_e("thread[%p]: wait failed: %ld, errno: %d", handle, ok, errno);
