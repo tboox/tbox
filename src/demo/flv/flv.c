@@ -3,7 +3,7 @@
  */
 #include "libflv.h"
 
-/* /////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -14,8 +14,8 @@ typedef struct __tb_flv_info_t
 
 }tb_flv_info_t;
 
-/* /////////////////////////////////////////////////////////
- * callback
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
  */
 static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value_t const* value, tb_pointer_t cb_data)
 {
@@ -89,7 +89,7 @@ static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size
 
 	// attach data
 	tb_static_stream_t sstream;
-	tb_static_stream_init(&sstream, body_data, body_size);
+	tb_static_stream_init(&sstream, (tb_byte_t*)body_data, body_size);
 	
 	// get object type
 	tb_byte_t object_type = tb_static_stream_get_ubits32(&sstream, 5);
@@ -113,7 +113,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 	tb_trace_i("=================================================================================");
 	tb_trace_i("video_config_size: %d %d", head_size, body_size);
 	tb_static_stream_t 	sstream;
-	tb_static_stream_init(&sstream, body_data, body_size);
+	tb_static_stream_init(&sstream, (tb_byte_t*)body_data, body_size);
 
 	tb_uint8_t configure_version 		= tb_static_stream_get_u8(&sstream);
 	tb_uint8_t avc_profile_indication 	= tb_static_stream_get_u8(&sstream);
@@ -184,7 +184,7 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 
 	// set unit data
 	tb_static_stream_t sstream;
-	tb_static_stream_init(&sstream, body_data, body_size);
+	tb_static_stream_init(&sstream, (tb_byte_t*)body_data, body_size);
 	tb_size_t unit_size = tb_static_stream_get_u32_be(&sstream);
 	tb_size_t read_size = 4;
 	while (read_size + unit_size <= body_size)
@@ -216,7 +216,7 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 }
 
 
-/* /////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t tb_demo_flv_main(tb_int_t argc, tb_char_t** argv)

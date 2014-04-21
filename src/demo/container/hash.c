@@ -13,25 +13,25 @@
 # 	define tb_hash_test_dump(h)
 #endif
 
-#define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen((tb_char_t*)(s)); tb_hash_set(h, (tb_char_t*)(s), n); } while (0);
+#define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen((tb_char_t*)(s)); tb_hash_set(h, (tb_char_t*)(s), (tb_pointer_t)n); } while (0);
 #define tb_hash_test_get_s2i(h, s) 		do {tb_assert(tb_strlen((tb_char_t*)s) == (tb_size_t)tb_hash_get(h, (tb_char_t*)(s))); } while (0);
 #define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, s); tb_assert(!tb_hash_get(h, s)); } while (0);
 
-#define tb_hash_test_set_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_hash_set(h, i, s); } while (0);
-#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_assert(!tb_strcmp(s, tb_hash_get(h, i))); } while (0);
-#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
+#define tb_hash_test_set_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_hash_set(h, (tb_pointer_t)i, s); } while (0);
+#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_assert(!tb_strcmp(s, tb_hash_get(h, (tb_pointer_t)i))); } while (0);
+#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, (tb_pointer_t)i); tb_assert(!tb_hash_get(h, (tb_pointer_t)i)); } while (0);
 
 #define tb_hash_test_set_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_hash_set(h, item, item); } while (0);
 #define tb_hash_test_get_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_assert(!tb_memcmp(item, tb_hash_get(h, item), step)); } while (0);
 #define tb_hash_test_del_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_hash_del(h, item); tb_assert(!tb_hash_get(h, item)); } while (0);
 
-#define tb_hash_test_set_i2i(h, i) 		do {tb_hash_set(h, i, i); } while (0);
-#define tb_hash_test_get_i2i(h, i) 		do {tb_assert(i == (tb_size_t)tb_hash_get(h, i)); } while (0);
-#define tb_hash_test_del_i2i(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
+#define tb_hash_test_set_i2i(h, i) 		do {tb_hash_set(h, (tb_pointer_t)i, (tb_pointer_t)i); } while (0);
+#define tb_hash_test_get_i2i(h, i) 		do {tb_assert(i == (tb_size_t)tb_hash_get(h, (tb_pointer_t)i)); } while (0);
+#define tb_hash_test_del_i2i(h, i) 		do {tb_hash_del(h, (tb_pointer_t)i); tb_assert(!tb_hash_get(h, (tb_pointer_t)i)); } while (0);
 
-#define tb_hash_test_set_i2t(h, i) 		do {tb_hash_set(h, i, (tb_size_t)tb_true); } while (0);
-#define tb_hash_test_get_i2t(h, i) 		do {tb_assert(tb_hash_get(h, i)); } while (0);
-#define tb_hash_test_del_i2t(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
+#define tb_hash_test_set_i2t(h, i) 		do {tb_hash_set(h, (tb_pointer_t)i, (tb_pointer_t)(tb_size_t)tb_true); } while (0);
+#define tb_hash_test_get_i2t(h, i) 		do {tb_assert(tb_hash_get(h, (tb_pointer_t)i)); } while (0);
+#define tb_hash_test_del_i2t(h, i) 		do {tb_hash_del(h, (tb_pointer_t)i); tb_assert(!tb_hash_get(h, (tb_pointer_t)i)); } while (0);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * details

@@ -73,7 +73,7 @@ CFLAGS 				= \
 					-fno-tree-vectorize -Werror=unused-label -Werror=unused-comparison\
 					-Werror=return-type -Werror=unused-variable -Wno-pointer-sign -Wno-pointer-to-int-cast \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=sometimes-uninitialized \
-					-Werror=pointer-arith -Werror=unused-function -Werror=unused-value -Werror=missing-braces \
+					-Werror=pointer-arith -Werror=unused-function -Werror=unused-value -Werror=missing-braces -Werror=int-conversion \
 					-Werror=tautological-compare -Werror=compare-distinct-pointer-types -Werror=incompatible-pointer-types
 
 # ccflags: .cc/.cpp files
@@ -147,10 +147,6 @@ ARFLAGS 			= -cr
 
 # share ldflags
 SHFLAGS 			= $(ARCH_LDFLAGS) -dynamiclib
-
-# pathes
-INC_DIR 			+= /usr/local/include
-LIB_DIR 			+= /usr/local/lib
 
 # config
 include 			$(PLAT_DIR)/config.mak

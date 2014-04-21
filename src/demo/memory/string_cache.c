@@ -16,9 +16,9 @@ tb_int_t tb_demo_memory_string_cache_main(tb_int_t argc, tb_char_t** argv)
 	tb_rand_clear();
 
 	// performance
-	__tb_volatile__ tb_char_t s[256] = {0};
-	__tb_volatile__ tb_size_t n = 1000000;
+	tb_char_t s[256] = {0};
 	tb_hong_t t = tb_mclock();
+	__tb_volatile__ tb_size_t n = 1000000;
 	while (n--) 
 	{
 		tb_int_t r = tb_snprintf(s, 256, "%u", tb_rand_uint32(0, 10000)); 

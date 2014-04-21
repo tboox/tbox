@@ -9,7 +9,7 @@
 tb_void_t tb_demo_overflow(tb_noarg_t);
 tb_void_t tb_demo_overflow()
 {
-	tb_cpointer_t data = tb_malloc0(10);
+	tb_pointer_t data = tb_malloc0(10);
 	if (data)
 	{
 		tb_memset(data, 0, 11);
@@ -30,7 +30,7 @@ tb_void_t tb_demo_cstring()
 tb_void_t tb_demo_free2(tb_noarg_t);
 tb_void_t tb_demo_free2()
 {
-	tb_cpointer_t data = tb_malloc0(10);
+	tb_pointer_t data = tb_malloc0(10);
 	if (data)
 	{
 		tb_free(data);
@@ -40,19 +40,19 @@ tb_void_t tb_demo_free2()
 tb_void_t tb_demo_leak(tb_noarg_t);
 tb_void_t tb_demo_leak()
 {
-	tb_cpointer_t data = tb_malloc0(10);
+	tb_pointer_t data = tb_malloc0(10);
 	tb_used(data);
 }
 tb_void_t tb_demo_stack(tb_noarg_t);
 tb_void_t tb_demo_stack()
 {
 	__tb_volatile__ tb_size_t data[10] = {0};
-	data[11] = 0;
+	*(data + 11) = 0;
 }
 tb_void_t tb_demo_overlap(tb_noarg_t);
 tb_void_t tb_demo_overlap()
 {
-	tb_cpointer_t data = tb_malloc(10);
+	tb_pointer_t data = tb_malloc(10);
 	if (data)
 	{
 		tb_memcpy(data, (tb_byte_t const*)data + 1, 5);

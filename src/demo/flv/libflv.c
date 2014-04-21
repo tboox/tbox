@@ -13,7 +13,6 @@
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
  * types
  */
-
 // the flv type
 typedef struct __tb_flv_t
 {
@@ -211,7 +210,7 @@ static tb_bool_t tb_flv_sdata_string_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
 	else
 	{
 		// read data
-		if (size != tb_static_stream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
+		if (size != tb_static_stream_get_data(&flv->sdata_bst, (tb_byte_t*)value->u.string.data, size)) return tb_false;
 		if (size)
 		{
 			value->u.string.data[size] = '\0';
@@ -366,7 +365,7 @@ static tb_bool_t tb_flv_sdata_longstring_spank(tb_flv_t* flv, tb_flv_sdata_value
 	else
 	{
 		// read data
-		if (size != tb_static_stream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
+		if (size != tb_static_stream_get_data(&flv->sdata_bst, (tb_byte_t*)value->u.string.data, size)) return tb_false;
 		if (size)
 		{
 			value->u.string.data[size] = '\0';
@@ -535,7 +534,7 @@ tb_void_t tb_flv_exit(tb_handle_t hflv)
 
 		// free script data
 		if (tb_static_stream_valid(&flv->sdata_bst) && tb_static_stream_beg(&flv->sdata_bst))
-			tb_free(tb_static_stream_beg(&flv->sdata_bst));
+			tb_free((tb_pointer_t)tb_static_stream_beg(&flv->sdata_bst));
 
 		// free string
 		tb_scoped_string_exit(&flv->string);

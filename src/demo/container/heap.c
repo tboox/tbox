@@ -30,7 +30,7 @@ static tb_void_t tb_test_heap_min_func()
 //		tb_trace_i("heap_min: put: %u", val);
 
 		// put it
-		tb_heap_put(heap, val);
+		tb_heap_put(heap, (tb_pointer_t)(tb_size_t)val);
 	}
 
 	// trace
@@ -67,7 +67,7 @@ static tb_void_t tb_test_heap_min_perf()
 	// walk
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
-	for (i = 0; i < n; i++) tb_heap_put(heap, tb_rand_uint32(0, TB_MAXU32));
+	for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_rand_uint32(0, TB_MAXU32));
 	for (i = 0; i < n; i++) tb_heap_pop(heap);
 
 	// exit time
@@ -102,7 +102,7 @@ static tb_void_t tb_test_heap_max_func()
 //		tb_trace_i("heap_max: put: %u", val);
 
 		// put it
-		tb_heap_put(heap, val);
+		tb_heap_put(heap, (tb_pointer_t)(tb_size_t)val);
 	}
 
 	// trace
@@ -142,7 +142,7 @@ static tb_void_t tb_test_heap_max_perf()
 	// walk
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
-	for (i = 0; i < n; i++) tb_heap_put(heap, tb_rand_uint32(0, TB_MAXU32));
+	for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_rand_uint32(0, TB_MAXU32));
 	for (i = 0; i < n; i++) tb_heap_pop(heap);
 
 	// exit time

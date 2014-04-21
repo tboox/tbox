@@ -4,7 +4,7 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 static tb_size_t tb_queue_put_and_pop_test()
 {
@@ -12,16 +12,16 @@ static tb_size_t tb_queue_put_and_pop_test()
 	tb_queue_t* queue = tb_queue_init(10, tb_item_func_long());
 	tb_assert_and_check_return_val(queue, 0);
 
-	tb_queue_put(queue, 0);
-	tb_queue_put(queue, 1);
-	tb_queue_put(queue, 2);
-	tb_queue_put(queue, 3);
-	tb_queue_put(queue, 4);
-	tb_queue_put(queue, 5);
-	tb_queue_put(queue, 6);
-	tb_queue_put(queue, 7);
-	tb_queue_put(queue, 8);
-	tb_queue_put(queue, 9);
+	tb_queue_put(queue, (tb_pointer_t)0);
+	tb_queue_put(queue, (tb_pointer_t)1);
+	tb_queue_put(queue, (tb_pointer_t)2);
+	tb_queue_put(queue, (tb_pointer_t)3);
+	tb_queue_put(queue, (tb_pointer_t)4);
+	tb_queue_put(queue, (tb_pointer_t)5);
+	tb_queue_put(queue, (tb_pointer_t)6);
+	tb_queue_put(queue, (tb_pointer_t)7);
+	tb_queue_put(queue, (tb_pointer_t)8);
+	tb_queue_put(queue, (tb_pointer_t)9);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
@@ -29,7 +29,7 @@ static tb_size_t tb_queue_put_and_pop_test()
 	for (i = 0; i < n; i++) 
 	{
 		tb_queue_pop(queue);
-		tb_queue_put(queue, 0xf);
+		tb_queue_put(queue, (tb_pointer_t)0xf);
 	}
 	t = tb_mclock() - t;
 
@@ -38,8 +38,8 @@ static tb_size_t tb_queue_put_and_pop_test()
 
 	// check
 	tb_assert(tb_queue_size(queue) == 10);
-	tb_assert(tb_queue_head(queue) == 0xf);
-	tb_assert(tb_queue_last(queue) == 0xf);
+	tb_assert(tb_queue_head(queue) == (tb_pointer_t)0xf);
+	tb_assert(tb_queue_last(queue) == (tb_pointer_t)0xf);
 
 	// clear it
 	tb_queue_clear(queue);
@@ -58,7 +58,7 @@ static tb_size_t tb_queue_iterator_next_test()
 	tb_queue_t* queue = tb_queue_init(n, tb_item_func_long());
 	tb_assert_and_check_return_val(queue, 0);
 
-	while (n--) tb_queue_put(queue, 0xf);
+	while (n--) tb_queue_put(queue, (tb_pointer_t)0xf);
 	tb_hong_t t = tb_mclock();
 	tb_for_all (tb_char_t*, item, queue) tb_used(item);
 	t = tb_mclock() - t;
@@ -78,7 +78,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 	tb_queue_t* queue = tb_queue_init(n, tb_item_func_long());
 	tb_assert_and_check_return_val(queue, 0);
 
-	while (n--) tb_queue_put(queue, 0xf);
+	while (n--) tb_queue_put(queue, (tb_pointer_t)0xf);
 	tb_hong_t t = tb_mclock();
 	tb_rfor_all (tb_char_t*, item, queue) tb_used(item);
 	t = tb_mclock() - t;
@@ -106,16 +106,16 @@ static tb_void_t tb_queue_int_test()
 
 	tb_trace_i("=============================================================");
 	tb_trace_i("put:");
-	tb_queue_put(queue, 0);
-	tb_queue_put(queue, 1);
-	tb_queue_put(queue, 2);
-	tb_queue_put(queue, 3);
-	tb_queue_put(queue, 4);
-	tb_queue_put(queue, 5);
-	tb_queue_put(queue, 6);
-	tb_queue_put(queue, 7);
-	tb_queue_put(queue, 8);
-	tb_queue_put(queue, 9);
+	tb_queue_put(queue, (tb_pointer_t)0);
+	tb_queue_put(queue, (tb_pointer_t)1);
+	tb_queue_put(queue, (tb_pointer_t)2);
+	tb_queue_put(queue, (tb_pointer_t)3);
+	tb_queue_put(queue, (tb_pointer_t)4);
+	tb_queue_put(queue, (tb_pointer_t)5);
+	tb_queue_put(queue, (tb_pointer_t)6);
+	tb_queue_put(queue, (tb_pointer_t)7);
+	tb_queue_put(queue, (tb_pointer_t)8);
+	tb_queue_put(queue, (tb_pointer_t)9);
 	tb_queue_int_dump(queue);
 
 	tb_trace_i("=============================================================");
@@ -129,11 +129,11 @@ static tb_void_t tb_queue_int_test()
 
 	tb_trace_i("=============================================================");
 	tb_trace_i("put:");
-	tb_queue_put(queue, 0);
-	tb_queue_put(queue, 1);
-	tb_queue_put(queue, 2);
-	tb_queue_put(queue, 3);
-	tb_queue_put(queue, 4);
+	tb_queue_put(queue, (tb_pointer_t)0);
+	tb_queue_put(queue, (tb_pointer_t)1);
+	tb_queue_put(queue, (tb_pointer_t)2);
+	tb_queue_put(queue, (tb_pointer_t)3);
+	tb_queue_put(queue, (tb_pointer_t)4);
 	tb_queue_int_dump(queue);
 
 	tb_trace_i("=============================================================");
