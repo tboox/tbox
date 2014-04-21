@@ -243,6 +243,8 @@ config : .null
 	@echo "config: prof:     " 							$(PROF)
 	@echo "config: debug:    " 							$(DEBUG)
 	@echo "config: small:    " 							$(SMALL)
+	@echo "config: ccache:   " 							$(CCACHE)
+	@echo "config: distcc:   " 							$(DISTCC)
 	@echo "config: prefix:   " 							$(PREFIX)
 	@echo "config: bin:      " 							$(BIN)
 	@echo "config: pre:      " 							$(PRE)

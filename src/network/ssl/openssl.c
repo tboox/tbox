@@ -110,6 +110,7 @@ static tb_int_t tb_ssl_verify(tb_int_t ok, X509_STORE_CTX* ctx)
 {
 	return 1;
 }
+#ifdef __tb_debug__
 static tb_char_t const* tb_ssl_error(tb_long_t error)
 {
 	// done
@@ -138,6 +139,7 @@ static tb_char_t const* tb_ssl_error(tb_long_t error)
 	}
 	return "";
 }
+#endif
 static tb_long_t tb_ssl_sock_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t size)
 {
 	// check
