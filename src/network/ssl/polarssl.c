@@ -33,6 +33,7 @@
 #include <polarssl/error.h>
 #include <polarssl/entropy.h>
 #include <polarssl/ctr_drbg.h>
+#include "../../asio/asio.h"
 #include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -114,15 +115,14 @@ static tb_long_t tb_ssl_sock_wait(tb_pointer_t priv, tb_size_t code, tb_long_t t
 	// wait it
 	return tb_aioo_wait((tb_handle_t)priv, code, timeout);
 }
-static tb_int_t tb_ssl_func_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t size)
+static tb_int_t tb_ssl_func_read(tb_pointer_t priv, tb_byte_t* data, size_t size)
 {
 	// check
 	tb_ssl_t* ssl = (tb_ssl_t*)priv;
 	tb_assert_and_check_return_val(ssl && ssl->read, -1);
-	tb_assert_static(sizeof(tb_size_t) == sizeof(size_t));
 
 	// recv it
-	tb_long_t real = ssl->read(ssl->priv, data, size);
+	tb_long_t real = ssl->read(ssl->priv, data, (tb_size_t)size);
 
 	// trace 
 	tb_trace_d("read: %ld", real);
@@ -139,15 +139,14 @@ static tb_int_t tb_ssl_func_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t s
 	// ok?
 	return (tb_int_t)real;
 }
-static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, tb_size_t size)
+static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, size_t size)
 {
 	// check
 	tb_ssl_t* ssl = (tb_ssl_t*)priv;
 	tb_assert_and_check_return_val(ssl && ssl->writ, -1);
-	tb_assert_static(sizeof(tb_size_t) == sizeof(size_t));
 
 	// send it
-	tb_long_t real = ssl->writ(ssl->priv, data, size);
+	tb_long_t real = ssl->writ(ssl->priv, data, (tb_size_t)size);
 
 	// trace 
 	tb_trace_d("writ: %ld", real);

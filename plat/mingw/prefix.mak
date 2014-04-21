@@ -40,15 +40,16 @@ MAKE 				= make
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden 
+CXFLAGS_RELEASE 	= -freg-struct-return -fvisibility=hidden 
 CXFLAGS_DEBUG 		= -g 
-ifeq ($(HOST),mac)
-CXFLAGS 			= -m$(BITS) -c -Wall 
-else
-CXFLAGS 			= -m$(BITS) -c -Wall -mssse3 
-endif
+CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
+
+# sse
+ifneq ($(HOST),mac)
+CXFLAGS 			+= -mssse3 
+endif
 
 # opti
 ifeq ($(SMALL),y)
@@ -68,26 +69,9 @@ endif
 # cflags: .c files
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
-ifeq ($(HOST),mac)
 CFLAGS 				= \
 					-std=c99 \
-					-D_GNU_SOURCE=1 -D_REENTRANT \
-					-Wno-parentheses \
-					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
-					-Wpointer-arith -Wredundant-decls -Wwrite-strings \
-					-Wundef -Wmissing-prototypes -Wstrict-prototypes -fno-math-errno
-					
-else
-CFLAGS 				= \
-					-std=c99 \
-					-D_GNU_SOURCE=1 -D_REENTRANT \
-					-Wno-parentheses \
-					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
-					-Wpointer-arith -Wredundant-decls -Wno-pointer-sign -Wwrite-strings \
-					-Wtype-limits -Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
-					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
-					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=return-type -Werror=unused-variable
-endif
+					-D_GNU_SOURCE=1 -D_REENTRANT -fno-math-errno
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	=

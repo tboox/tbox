@@ -139,7 +139,7 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 #ifdef SO_REUSEADDR
 		{
 			tb_int_t reuseaddr = 1;
-			if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+			if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0) 
 				break; 
 		}
 #endif
@@ -162,7 +162,7 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 		tb_assert_and_check_break(sock1 != INVALID_SOCKET);
 
 		// connect it
-		if (connect(sock1, &d, sizeof(d)) == SOCKET_ERROR) break;
+		if (connect(sock1, (struct sockaddr const*)&d, sizeof(d)) == SOCKET_ERROR) break;
 
 		// accept it
 		sock2 = accept(listener, tb_null, tb_null);
@@ -277,7 +277,7 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
 	//if (addr && addr->u32)
 	{
 		tb_int_t reuseaddr = 1;
-		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0) 
 			tb_trace_d("reuseaddr: failed");
 	}
 #endif
@@ -287,7 +287,7 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
 	if (port)
 	{
 		tb_int_t reuseport = 1;
-		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
+		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_char_t*)&reuseport, sizeof(reuseport)) < 0) 
 			tb_trace_d("reuseport: %lu failed", port);
 	}
 #endif
@@ -332,7 +332,7 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	if (ioctlsocket(r, FIONBIO, &nb) == SOCKET_ERROR) goto fail;
 
 	// ok
-	return r + 1;
+	return (tb_handle_t)(r + 1);
 
 fail: 
 	if (r >= 0) closesocket(r);
@@ -378,7 +378,7 @@ tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t real = recv((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0);
+	tb_long_t real = recv((SOCKET)((tb_long_t)handle - 1), (tb_char_t*)data, (tb_int_t)size, 0);
 
 	// ok?
 	if (real >= 0) return real;
@@ -399,7 +399,7 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t const* data, tb_size_t si
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t real = send((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0);
+	tb_long_t real = send((SOCKET)((tb_long_t)handle - 1), (tb_char_t const*)data, (tb_int_t)size, 0);
 
 	// ok?
 	if (real >= 0) return real;
@@ -528,7 +528,7 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t p
 
 	// recv
 	tb_int_t 	n = sizeof(d);
-	tb_long_t 	r = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
+	tb_long_t 	r = recvfrom((SOCKET)((tb_long_t)handle - 1), (tb_char_t*)data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
 	// ok?
 	if (r >= 0) return r;
@@ -552,7 +552,7 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t p
 	d.sin_addr.S_un.S_addr = addr->u32;
 
 	// send
-	tb_long_t r = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
+	tb_long_t r = sendto((SOCKET)((tb_long_t)handle - 1), (tb_char_t const*)data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
 
 	// ok?
 	if (r >= 0) return r;
@@ -586,7 +586,7 @@ tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t 
 		tb_check_break(data && need);
 
 		// read it
-		tb_long_t real = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&d, &n);
+		tb_long_t real = recvfrom((SOCKET)((tb_long_t)handle - 1), (tb_char_t*)data, (tb_int_t)need, 0, (struct sockaddr*)&d, &n);
 
 		// full? next it
 		if (real == need)
@@ -630,7 +630,7 @@ tb_long_t tb_socket_usendv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t 
 		tb_check_break(data && need);
 
 		// writ it
-		tb_long_t real = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&d, sizeof(d));
+		tb_long_t real = sendto((SOCKET)((tb_long_t)handle - 1), (tb_char_t const*)data, (tb_int_t)need, 0, (struct sockaddr*)&d, sizeof(d));
 
 		// full? next it
 		if (real == need)

@@ -265,7 +265,7 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
 	tb_assert_and_check_return_val(align <= TB_STATIC_FIXED_POOL_ALIGN_MAXN, tb_null);
 
 	// align data
-	tb_size_t byte = (tb_size_t)((tb_hize_t)tb_align((tb_hize_t)data, align) - (tb_hize_t)data);
+	tb_size_t byte = (tb_size_t)((tb_hize_t)tb_align((tb_hize_t)(tb_size_t)data, align) - (tb_hize_t)(tb_size_t)data);
 	tb_assert_and_check_return_val(size >= byte, tb_null);
 	size -= byte;
 	data += byte;
@@ -287,7 +287,7 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
 	pool->step = tb_align(step, pool->align);
 
 	// init used
-	pool->used = (tb_byte_t*)tb_align((tb_hize_t)&pool[1], (tb_hize_t)pool->align);
+	pool->used = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)&pool[1], (tb_hize_t)pool->align);
 	tb_assert_and_check_return_val(data + size > pool->used, tb_null);
 
 	/* init maxn
@@ -304,7 +304,7 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
 	tb_assert_and_check_return_val(pool->maxn, tb_null);
 
 	// init data
-	pool->data = (tb_byte_t*)tb_align((tb_hize_t)pool->used + (tb_align8(pool->maxn) >> 3), (tb_hize_t)pool->align);
+	pool->data = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)pool->used + (tb_align8(pool->maxn) >> 3), (tb_hize_t)pool->align);
 	tb_assert_and_check_return_val(data + size > pool->data, tb_null);
 	tb_assert_and_check_return_val(pool->maxn * pool->step <= (data + size - pool->data), tb_null);
 

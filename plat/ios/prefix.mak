@@ -108,9 +108,7 @@ MMFLAGS 			=
 # ldflags
 LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= 
-LDFLAGS 			= -arch $(ARCH) \
-					-isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk \
-					--sysroot=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk
+LDFLAGS 			= -arch $(ARCH) 
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o

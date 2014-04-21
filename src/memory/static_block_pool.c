@@ -709,7 +709,7 @@ tb_handle_t tb_static_block_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
 	align = tb_max(align, TB_CPU_BITBYTE);
 
 	// align data
-	tb_size_t byte = (tb_size_t)((tb_hize_t)tb_align((tb_hize_t)data, (tb_hize_t)align) - (tb_hize_t)data);
+	tb_size_t byte = (tb_size_t)((tb_hize_t)tb_align((tb_hize_t)(tb_size_t)data, (tb_hize_t)align) - (tb_hize_t)(tb_size_t)data);
 	tb_assert_and_check_return_val(size >= byte, tb_null);
 	size -= byte;
 	data += byte;
@@ -730,7 +730,7 @@ tb_handle_t tb_static_block_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
 	pool->nhead = tb_align(sizeof(tb_static_block_pool_block_t), pool->align);
 
 	// init data
-	pool->data = (tb_byte_t*)tb_align((tb_hize_t)&pool[1], (tb_hize_t)pool->align);
+	pool->data = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)&pool[1], (tb_hize_t)pool->align);
 	tb_assert_and_check_return_val(data + size > pool->data, tb_null);
 
 	// init size

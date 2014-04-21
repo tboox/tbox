@@ -123,7 +123,7 @@ typedef struct __tb_iocp_aico_t
 typedef struct __tb_iocp_loop_t
 {
 	// the self
-	tb_handle_t 							self;
+	tb_size_t 								self;
 
 	// the olap list
 	OVERLAPPED_ENTRY 						list[TB_IOCP_OLAP_LIST_MAXN];
@@ -136,8 +136,8 @@ typedef struct __tb_iocp_loop_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_pointer_t data);
-static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_pointer_t data);
+static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_cpointer_t data);
+static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t data);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * timer 
@@ -181,7 +181,6 @@ static tb_pointer_t tb_iocp_timer_loop(tb_pointer_t data)
 		if (!tb_ltimer_spak(ptor->ltimer)) break;
 	}
 
-end:
 	// trace
 	tb_trace_d("loop: exit");
 
@@ -200,7 +199,7 @@ static tb_void_t tb_iocp_post_timeout(tb_aicp_proactor_t* proactor, tb_iocp_aico
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->ltimer && aico && !aico->task, tb_false);
+	tb_assert_and_check_return(ptor && ptor->ltimer && aico && !aico->task);
 	
 	// only for sock
 	tb_check_return(aico->base.type == TB_AICO_TYPE_SOCK);
@@ -242,7 +241,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 		// init aice, hack: sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1)
 		aico->olap.aice 				= *aice;
 		aico->olap.aice.u.acpt.sock 	= tb_socket_open(TB_SOCKET_TYPE_TCP);
-		aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_aico_pool_malloc0(aico, ((sizeof(SOCKADDR_IN) + 16) << 1));
+		aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_aico_pool_malloc0((tb_aico_t*)aico, ((sizeof(SOCKADDR_IN) + 16) << 1));
 		tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv));
 		tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.sock);
 		init_ok = tb_true;
@@ -256,13 +255,13 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 									, 	sizeof(SOCKADDR_IN) + 16
 									, 	sizeof(SOCKADDR_IN) + 16
 									, 	&real
-									, 	&aico->olap)? tb_true : tb_false;
+									, 	(LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
 		tb_trace_d("AcceptEx: %d, error: %d", AcceptEx_ok, WSAGetLastError());
 		tb_check_break(AcceptEx_ok);
 
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
-		if (!PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) break;
+		if (!PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) break;
 
 		// ok
 		ok = tb_true;
@@ -286,7 +285,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 		{
 			// post failed
 			aico->olap.aice.state = TB_STATE_FAILED;
-			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) ok = tb_true;
+			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) ok = tb_true;
 
 			// trace
 			tb_trace_d("AcceptEx: unknown error: %d", WSAGetLastError());
@@ -297,7 +296,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 	if (!ok)
 	{
 		// exit data
-		if (aico->olap.aice.u.acpt.priv[0]) tb_aico_pool_free(aico, aico->olap.aice.u.acpt.priv[0]);
+		if (aico->olap.aice.u.acpt.priv[0]) tb_aico_pool_free((tb_aico_t*)aico, aico->olap.aice.u.acpt.priv[0]);
 		aico->olap.aice.u.acpt.priv[0] = tb_null;
 
 		// exit sock
@@ -357,13 +356,13 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 										, 	tb_null
 										, 	0
 										, 	&real
-										, 	&aico->olap)? tb_true : tb_false;
+										, 	(LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
 		tb_trace_d("ConnectEx: %d, error: %d", ConnectEx_ok, WSAGetLastError());
 		tb_check_break(ConnectEx_ok);
 
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
-		if (!PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) break;
+		if (!PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) break;
 
 		// ok
 		ok = tb_true;
@@ -387,7 +386,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 		{
 			// post failed
 			aico->olap.aice.state = TB_STATE_FAILED;
-			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) ok = tb_true;
+			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) ok = tb_true;
 
 			// trace
 			tb_trace_d("ConnectEx: unknown error: %d", WSAGetLastError());
@@ -419,7 +418,7 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// done recv
 	DWORD 		flag = 0;
-	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.recv, 1, tb_null, &flag, &aico->olap, tb_null);
+	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.recv, 1, tb_null, &flag, (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSARecv: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -450,7 +449,7 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -477,7 +476,7 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 	aico->olap.aice = *aice;
 
 	// done send
-	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.send, 1, tb_null, 0, &aico->olap, tb_null);
+	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.send, 1, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSASend: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -508,7 +507,7 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -544,7 +543,7 @@ static tb_bool_t tb_iocp_post_urecv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// done recv
 	DWORD 		flag = 0;
 	tb_int_t 	size = sizeof(addr);
-	tb_long_t 	ok = WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.urecv, 1, tb_null, &flag, &addr, &size, &aico->olap, tb_null);
+	tb_long_t 	ok = WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.urecv, 1, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSARecv: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -575,7 +574,7 @@ static tb_bool_t tb_iocp_post_urecv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -609,7 +608,7 @@ static tb_bool_t tb_iocp_post_usend(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	addr.sin_addr.S_un.S_addr 	= aice->u.usend.addr.u32;
 
 	// done send
-	tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, &addr, sizeof(addr), &aico->olap, tb_null);
+	tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSASend: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -640,7 +639,7 @@ static tb_bool_t tb_iocp_post_usend(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -668,7 +667,7 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// done recv
 	DWORD 		flag = 0;
-	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.recvv.list, (DWORD)aico->olap.aice.u.recvv.size, tb_null, &flag, &aico->olap, tb_null);
+	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.recvv.list, (DWORD)aico->olap.aice.u.recvv.size, tb_null, &flag, (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSARecv: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -699,7 +698,7 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -726,7 +725,7 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	aico->olap.aice = *aice;
 
 	// done send
-	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, &aico->olap, tb_null);
+	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSASend: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -757,7 +756,7 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -793,7 +792,7 @@ static tb_bool_t tb_iocp_post_urecvv(tb_aicp_proactor_t* proactor, tb_aice_t con
 	// done recv
 	DWORD 		flag = 0;
 	tb_int_t 	size = sizeof(addr);
-	tb_long_t 	ok = WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.urecvv.list, (DWORD)aico->olap.aice.u.urecvv.size, tb_null, &flag, &addr, &size, &aico->olap, tb_null);
+	tb_long_t 	ok = WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.urecvv.list, (DWORD)aico->olap.aice.u.urecvv.size, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSARecvFrom: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -824,7 +823,7 @@ static tb_bool_t tb_iocp_post_urecvv(tb_aicp_proactor_t* proactor, tb_aice_t con
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -858,7 +857,7 @@ static tb_bool_t tb_iocp_post_usendv(tb_aicp_proactor_t* proactor, tb_aice_t con
 	addr.sin_addr.S_un.S_addr 	= aice->u.urecv.addr.u32;
 
 	// done send
-	tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, &addr, sizeof(addr), &aico->olap, tb_null);
+	tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
 	tb_trace_d("WSASendTo: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
@@ -889,7 +888,7 @@ static tb_bool_t tb_iocp_post_usendv(tb_aicp_proactor_t* proactor, tb_aice_t con
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -921,11 +920,11 @@ static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	{
 		// post not supported
 		aico->olap.aice.state = TB_STATE_NOT_SUPPORTED;
-		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
 	}
 
 	// done send
-	tb_long_t real = ptor->TransmitFile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendf.file, (DWORD)aice->u.sendf.size, (1 << 16), &aico->olap, tb_null, 0);
+	tb_long_t real = ptor->TransmitFile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendf.file, (DWORD)aice->u.sendf.size, (1 << 16), (LPOVERLAPPED)&aico->olap, tb_null, 0);
 	tb_trace_d("sendf: %ld, error: %d", real, WSAGetLastError());
 
 	// pending? continue it
@@ -944,7 +943,7 @@ static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
 		aico->olap.aice.u.sendf.real = real;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 	else
 	{
@@ -963,7 +962,7 @@ static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		}
 
 		// post closed or failed
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -992,7 +991,7 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// done read
 	DWORD 		real = 0;
-	BOOL 		ok = ReadFile((HANDLE)aico->base.handle, aice->u.read.data, (DWORD)aice->u.read.size, &real, &aico->olap);
+	BOOL 		ok = ReadFile((HANDLE)aico->base.handle, aice->u.read.data, (DWORD)aice->u.read.size, &real, (LPOVERLAPPED)&aico->olap);
 	tb_trace_d("ReadFile: real: %u, size: %lu, error: %d", real, aice->u.read.size, GetLastError());
 
 	// pending? continue it
@@ -1011,13 +1010,13 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
 		aico->olap.aice.u.read.real = real;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 	else 
 	{
 		// post failed
 		aico->olap.aice.state = TB_STATE_FAILED;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -1046,7 +1045,7 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// done writ
 	DWORD 		real = 0;
-	BOOL 		ok = WriteFile((HANDLE)aico->base.handle, aice->u.writ.data, (DWORD)aice->u.writ.size, &real, &aico->olap);
+	BOOL 		ok = WriteFile((HANDLE)aico->base.handle, aice->u.writ.data, (DWORD)aice->u.writ.size, &real, (LPOVERLAPPED)&aico->olap);
 	tb_trace_d("WriteFile: real: %u, size: %lu, error: %d", real, aice->u.writ.size, GetLastError());
 
 	// pending? continue it
@@ -1065,13 +1064,13 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
 		aico->olap.aice.u.writ.real = real;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 	else
 	{
 		// post failed
 		aico->olap.aice.state = TB_STATE_FAILED;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -1100,7 +1099,7 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// done read
 	DWORD 		real = 0;
-	BOOL 		ok = ReadFile((HANDLE)aico->base.handle, aice->u.readv.list[0].data, (DWORD)aice->u.readv.list[0].size, &real, &aico->olap);
+	BOOL 		ok = ReadFile((HANDLE)aico->base.handle, aice->u.readv.list[0].data, (DWORD)aice->u.readv.list[0].size, &real, (LPOVERLAPPED)&aico->olap);
 	tb_trace_d("ReadFile: %u, error: %d", real, GetLastError());
 
 	// pending? continue it
@@ -1119,13 +1118,13 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
 		aico->olap.aice.u.readv.real = real;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 	else 
 	{
 		// post failed
 		aico->olap.aice.state = TB_STATE_FAILED;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -1154,7 +1153,7 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// done writ
 	DWORD 		real = 0;
-	BOOL 		ok = WriteFile((HANDLE)aico->base.handle, aice->u.writv.list[0].data, (DWORD)aice->u.writv.list[0].size, &real, &aico->olap);
+	BOOL 		ok = WriteFile((HANDLE)aico->base.handle, aice->u.writv.list[0].data, (DWORD)aice->u.writv.list[0].size, &real, (LPOVERLAPPED)&aico->olap);
 	tb_trace_d("WriteFile: %u, error: %d", real, GetLastError());
 
 	// pending? continue it
@@ -1173,13 +1172,13 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
 		aico->olap.aice.u.writv.real = real;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 	else
 	{
 		// post failed
 		aico->olap.aice.state = TB_STATE_FAILED;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 
 	// failed
@@ -1206,7 +1205,7 @@ static tb_bool_t tb_iocp_post_fsync(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// post ok
 	aico->olap.aice.state = TB_STATE_OK;
-	if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+	if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 
 	// failed
 	return tb_false;
@@ -1243,7 +1242,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 
 		// post ok
 		aico->olap.aice.state = TB_STATE_OK;
-		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 	}
 	else
 	{
@@ -1283,7 +1282,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 /* //////////////////////////////////////////////////////////////////////////////////////
  * spak 
  */
-static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_pointer_t data)
+static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_cpointer_t data)
 {
 	// the aico
 	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)data;
@@ -1315,7 +1314,7 @@ static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_pointer_t data)
 				HANDLE handle = aico->base.type == TB_AICO_TYPE_SOCK? (HANDLE)((SOCKET)aico->base.handle - 1) : aico->base.handle;
 
 				// CancelIoEx it
-				if (!ptor->CancelIoEx(handle, &aico->olap))
+				if (!ptor->CancelIoEx(handle, (LPOVERLAPPED)&aico->olap))
 				{
 					tb_trace_d("cancel: failed: %u", GetLastError());
 				}
@@ -1332,7 +1331,7 @@ static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_pointer_t data)
 		break;
 	}
 }
-static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_pointer_t data)
+static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t data)
 {
 	// the aico
 	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)data;
@@ -1347,7 +1346,7 @@ static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_pointer_t dat
 
 	// post ok
 	aico->olap.aice.state = killed? TB_STATE_KILLED : TB_STATE_OK;
-	PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap);
+	PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap);
 }
 static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
 {
@@ -1399,7 +1398,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	}
 
 	// exit data
-	if (resp->u.acpt.priv[0]) tb_aico_pool_free(resp->aico, resp->u.acpt.priv[0]);
+	if (resp->u.acpt.priv[0]) tb_aico_pool_free((tb_aico_t*)resp->aico, resp->u.acpt.priv[0]);
 	resp->u.acpt.priv[0] = tb_null;
 
 	// ok
@@ -1627,7 +1626,7 @@ static tb_long_t tb_iocp_spak_done(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	}
 
 	// init spak
-	static tb_bool_t (*s_spak[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_size_t , tb_size_t ) = 
+	static tb_long_t (*s_spak[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_size_t , tb_size_t ) = 
 	{
 		tb_null
 	,	tb_iocp_spak_acpt
@@ -1672,7 +1671,7 @@ static tb_bool_t tb_aicp_proactor_iocp_addo(tb_aicp_proactor_t* proactor, tb_aic
 			tb_assert_and_check_return_val(ptor->port && aico->handle, tb_false);
 
 			// add aico to port
-			HANDLE port = CreateIoCompletionPort((HANDLE)((SOCKET)aico->handle - 1), ptor->port, (ULONG*)aico, 0);
+			HANDLE port = CreateIoCompletionPort((HANDLE)((SOCKET)aico->handle - 1), ptor->port, (ULONG_PTR)aico, 0);
 			tb_assert_and_check_return_val(port == ptor->port, tb_false);
 		}
 		break;
@@ -1682,7 +1681,7 @@ static tb_bool_t tb_aicp_proactor_iocp_addo(tb_aicp_proactor_t* proactor, tb_aic
 			tb_assert_and_check_return_val(ptor->port && aico->handle, tb_false);
 
 			// add aico to port
-			HANDLE port = CreateIoCompletionPort((HANDLE)aico->handle, ptor->port, (ULONG*)aico, 0);
+			HANDLE port = CreateIoCompletionPort((HANDLE)aico->handle, ptor->port, (ULONG_PTR)aico, 0);
 			tb_assert_and_check_return_val(port == ptor->port, tb_false);
 		}
 		break;
@@ -1769,7 +1768,7 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	if (aice->state != TB_STATE_PENDING)
 	{
 		aico->olap.aice = *aice;
-		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;  
 	}
 	
 	// killed?
@@ -1778,7 +1777,7 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 		// post the killed state
 		aico->olap.aice = *aice;
 		aico->olap.aice.state = TB_STATE_KILLED;
-		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;  
 	}
 
 	// init post
@@ -1897,7 +1896,7 @@ static tb_void_t tb_aicp_proactor_iocp_loop_exit(tb_aicp_proactor_t* proactor, t
 	loop->spak = tb_null;
 
 	// exit self
-	loop->self = tb_null;
+	loop->self = 0;
 
 	// exit loop
 	tb_free(loop);
@@ -2043,7 +2042,7 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 		DWORD 				real = 0;
 		tb_iocp_aico_t* 	aico = tb_null;
 		tb_iocp_olap_t* 	olap = tb_null;
-		BOOL 				wait = GetQueuedCompletionStatus(ptor->port, (LPDWORD)&real, (LPDWORD)&aico, &olap, timeout < 0? INFINITE : timeout);
+		BOOL 				wait = GetQueuedCompletionStatus(ptor->port, (LPDWORD)&real, (LPDWORD)&aico, (LPOVERLAPPED*)&olap, timeout < 0? INFINITE : timeout);
 
 		// the last error
 		tb_size_t 			error = (tb_size_t)GetLastError();
@@ -2100,8 +2099,8 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 
 	// check iovec
 	tb_assert_static(sizeof(tb_iovec_t) == sizeof(WSABUF));
-	tb_assert_and_check_return_val(tb_memberof_eq(tb_iovec_t, data, WSABUF, buf), -1);
-	tb_assert_and_check_return_val(tb_memberof_eq(tb_iovec_t, size, WSABUF, len), -1);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_iovec_t, data, WSABUF, buf), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_iovec_t, size, WSABUF, len), tb_null);
 
 	// alloc proactor
 	tb_aicp_proactor_iocp_t* ptor = tb_malloc0(sizeof(tb_aicp_proactor_iocp_t));
@@ -2152,7 +2151,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	return (tb_aicp_proactor_t*)ptor;
 
 fail:
-	if (ptor) tb_aicp_proactor_iocp_exit(ptor);
+	if (ptor) tb_aicp_proactor_iocp_exit((tb_aicp_proactor_t*)ptor);
 	return tb_null;
 }
 

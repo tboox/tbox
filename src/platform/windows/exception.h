@@ -46,11 +46,11 @@
 		do \
 		{ \
 			/* init */ \
-			tb_exception_handler_t __h = {0}; \
+			tb_exception_handler_t __h = {{0}}; \
 			tb_exception_registration_t __r = {0}; \
 			\
 			/* init handler */ \
-			__r.handler = tb_exception_func_impl; \
+			__r.handler = (tb_exception_func_t)tb_exception_func_impl; \
 			__r.exception_handler = &__h; \
 			/* push seh */ \
 			__tb_asm__ __tb_volatile__ ("movl %%fs:0, %0" : "=r" (__r.prev)); \
@@ -58,7 +58,7 @@
 			\
 			/* save jmpbuf */ \
 			tb_int_t __j = tb_setjmp(__h.jmpbuf); \
-			if(!__j) \
+			if (!__j) \
 			{
 
 		// except
@@ -210,7 +210,7 @@ typedef struct __tb_exception_handler_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * handler
  */
-static tb_int_t tb_exception_func_impl(tb_pointer_t record, tb_exception_registration_t* reg, tb_pointer_t context, tb_pointer_t record2)
+static __tb_inline__ tb_int_t tb_exception_func_impl(tb_pointer_t record, tb_exception_registration_t* reg, tb_pointer_t context, tb_pointer_t record2)
 {
 	tb_assert(reg && reg->exception_handler && context && record);
 	if (context) tb_memcpy(&reg->exception_handler->context, context, sizeof(tb_exception_context_t));

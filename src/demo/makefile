@@ -110,10 +110,11 @@ demo_C_FILES 							+= \
 										algorithm/sort 
 
 # libs
-demo_LIBS 								+= tbox $(TB_CONFIG_DEMO_LIBS)
-demo_LIBS-$(TB_CONFIG_HAVE_ZLIB) 		+= z
+demo_LIBS 								+= tbox 
 demo_LIBS-$(TB_CONFIG_HAVE_OPENSSL) 	+= ssl crypto
 demo_LIBS-$(TB_CONFIG_HAVE_POLARSSL) 	+= polarssl
+demo_LIBS-$(TB_CONFIG_HAVE_ZLIB) 		+= z
+demo_LIBS-y 							+= $(TB_CONFIG_DEMO_LIBS)
 
 # path
 demo_LIB_DIR 							+= ..

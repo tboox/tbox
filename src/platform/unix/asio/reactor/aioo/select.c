@@ -28,6 +28,13 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+#ifdef TB_CONFIG_OS_WINDOWS
+typedef tb_int_t 	socklen_t;
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
@@ -83,7 +90,7 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code,
 	// error?
 	tb_int_t o = 0;
 	socklen_t n = sizeof(socklen_t);
-	getsockopt(fd, SOL_SOCKET, SO_ERROR, &o, &n);
+	getsockopt(fd, SOL_SOCKET, SO_ERROR, (tb_char_t*)&o, &n);
 	if (o) return -1;
 
 	// ok

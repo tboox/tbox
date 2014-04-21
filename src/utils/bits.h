@@ -693,7 +693,7 @@ static __tb_inline__ tb_size_t tb_bits_cb1_u32_inline(tb_uint32_t x)
 	x = (x + (x >> 4) & 0x0f0f0f0f) % 255;
 #else
 	x = x - ((x >> 1) & 0x77777777) - ((x >> 2) & 0x33333333) - ((x >> 3) & 0x11111111);
-	x = (x + (x >> 4) & 0x0f0f0f0f);
+	x = (x + (x >> 4)) & 0x0f0f0f0f;
 	x = (x * 0x01010101) >> 24;
 #endif
 
@@ -713,7 +713,7 @@ static __tb_inline__ tb_size_t tb_bits_cb1_u64_inline(tb_uint64_t x)
 	x &= 0x7f;
 #else
 	x = x - ((x >> 1) & 0x7777777777777777ULL) - ((x >> 2) & 0x3333333333333333ULL) - ((x >> 3) & 0x1111111111111111ULL);
-	x = (x + (x >> 4) & 0x0f0f0f0f0f0f0f0fULL);
+	x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0fULL;
 	x = (x * 0x0101010101010101ULL) >> 56;
 #endif
 

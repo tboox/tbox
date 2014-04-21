@@ -164,7 +164,7 @@ static tb_size_t tb_item_func_uint8_hash(tb_item_func_t* func, tb_cpointer_t dat
 }
 static tb_long_t tb_item_func_uint8_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return ((tb_uint8_t)ldata > (tb_uint8_t)rdata? 1 : ((tb_uint8_t)ldata < (tb_uint8_t)rdata? -1 : 0));
+	return ((tb_uint8_t)(tb_size_t)ldata > (tb_uint8_t)(tb_size_t)rdata? 1 : ((tb_uint8_t)(tb_size_t)ldata < (tb_uint8_t)(tb_size_t)rdata? -1 : 0));
 	//return (ldata - rdata); //!< maybe overflow for int32
 }
 static tb_pointer_t tb_item_func_uint8_data(tb_item_func_t* func, tb_cpointer_t item)
@@ -175,7 +175,7 @@ static tb_pointer_t tb_item_func_uint8_data(tb_item_func_t* func, tb_cpointer_t 
 static tb_char_t const* tb_item_func_uint8_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(func && cstr, "");
-	tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint8_t)data);
+	tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint8_t)(tb_size_t)data);
 	if (n > 0) cstr[n] = '\0';
 	return (tb_char_t const*)cstr;
 }
@@ -187,12 +187,12 @@ static tb_void_t tb_item_func_uint8_free(tb_item_func_t* func, tb_pointer_t item
 static tb_void_t tb_item_func_uint8_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(func && item);
-	*((tb_uint8_t*)item) = (tb_uint8_t)data;
+	*((tb_uint8_t*)item) = (tb_uint8_t)(tb_size_t)data;
 }
 static tb_void_t tb_item_func_uint8_nrepl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return(func && item);
-	tb_memset(item, (tb_byte_t)data, size);
+	tb_memset(item, (tb_uint8_t)(tb_size_t)data, size);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +206,7 @@ static tb_size_t tb_item_func_uint16_hash(tb_item_func_t* func, tb_cpointer_t da
 }
 static tb_long_t tb_item_func_uint16_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return ((tb_uint16_t)ldata > (tb_uint16_t)rdata? 1 : ((tb_uint16_t)ldata < (tb_uint16_t)rdata? -1 : 0));
+	return ((tb_uint16_t)(tb_size_t)ldata > (tb_uint16_t)(tb_size_t)rdata? 1 : ((tb_uint16_t)(tb_size_t)ldata < (tb_uint16_t)(tb_size_t)rdata? -1 : 0));
 	//return (ldata - rdata); //!< maybe overflow for int32
 }
 static tb_pointer_t tb_item_func_uint16_data(tb_item_func_t* func, tb_cpointer_t item)
@@ -217,7 +217,7 @@ static tb_pointer_t tb_item_func_uint16_data(tb_item_func_t* func, tb_cpointer_t
 static tb_char_t const* tb_item_func_uint16_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(func && cstr, "");
-	tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint16_t)data);
+	tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint16_t)(tb_size_t)data);
 	if (n > 0) cstr[n] = '\0';
 	return (tb_char_t const*)cstr;
 }
@@ -229,12 +229,12 @@ static tb_void_t tb_item_func_uint16_free(tb_item_func_t* func, tb_pointer_t ite
 static tb_void_t tb_item_func_uint16_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(func && item);
-	*((tb_uint16_t*)item) = (tb_uint16_t)data;
+	*((tb_uint16_t*)item) = (tb_uint16_t)(tb_size_t)data;
 }
 static tb_void_t tb_item_func_uint16_nrepl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return(func && item);
-	tb_memset_u16(item, (tb_uint16_t)data, size);
+	tb_memset_u16(item, (tb_uint16_t)(tb_size_t)data, size);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

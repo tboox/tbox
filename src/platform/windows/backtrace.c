@@ -155,7 +155,7 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
 	tb_check_return_val(symbols && symbols->pSymFromAddr && symbols->symbol && frames && nframe && iframe < nframe, tb_null);
 
 	// done symbol
-	if (!symbols->pSymFromAddr(GetCurrentProcess(), (DWORD64)(frames[iframe]), 0, symbols->symbol)) return tb_null;
+	if (!symbols->pSymFromAddr(GetCurrentProcess(), (DWORD64)(tb_size_t)(frames[iframe]), 0, symbols->symbol)) return tb_null;
 	
 	// the symbol name
 	return symbols->symbol->Name;
