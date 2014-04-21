@@ -8,7 +8,7 @@
  */
 static tb_long_t tb_test_heap_max_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return ((tb_uint32_t)ldata < (tb_uint32_t)rdata? 1 : ((tb_uint32_t)ldata > (tb_uint32_t)rdata? -1 : 0));
+	return ((tb_uint32_t)(tb_size_t)ldata < (tb_uint32_t)(tb_size_t)rdata? 1 : ((tb_uint32_t)(tb_size_t)ldata > (tb_uint32_t)(tb_size_t)rdata? -1 : 0));
 }
 static tb_void_t tb_test_heap_min_func()
 {
@@ -40,7 +40,7 @@ static tb_void_t tb_test_heap_min_func()
 	for (i = 0; i < 100; i++) 
 	{
 		// put it
-		tb_uint32_t val = (tb_uint32_t)tb_heap_top(heap);
+		tb_uint32_t val = (tb_uint32_t)(tb_size_t)tb_heap_top(heap);
 
 		// trace
 		tb_trace_i("heap_min: pop: %u", val);
@@ -112,7 +112,7 @@ static tb_void_t tb_test_heap_max_func()
 	for (i = 0; i < 100; i++) 
 	{
 		// put it
-		tb_uint32_t val = (tb_uint32_t)tb_heap_top(heap);
+		tb_uint32_t val = (tb_uint32_t)(tb_size_t)tb_heap_top(heap);
 
 		// trace
 		tb_trace_i("heap_max: pop: %u", val);

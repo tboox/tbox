@@ -96,6 +96,6 @@
 //#define TB_CONFIG_HAVE_OPENSSL	
 
 // polarssl
-//#define TB_CONFIG_HAVE_POLARSSL	
+#define TB_CONFIG_HAVE_POLARSSL	
 
 #endif

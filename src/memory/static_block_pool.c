@@ -1034,14 +1034,12 @@ tb_void_t tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 	tb_trace_i("======================================================================");
 
 	// walk
-	tb_size_t 			i = 0;
-	tb_byte_t* 			pb = pool->data;
-	tb_byte_t* 			pe = pb + pool->size;
-	tb_size_t 			nhead = pool->nhead;
+	tb_byte_t* 						pb = pool->data;
+	tb_byte_t* 						pe = pb + pool->size;
+	tb_size_t 						nhead = pool->nhead;
 	tb_static_block_pool_block_t* 	prev = tb_null;
-	tb_size_t 			prev_i = 0;
-	tb_bool_t 			ok = tb_true;
-	tb_size_t 			frag = 0;
+	tb_bool_t 						ok = tb_true;
+	tb_size_t 						frag = 0;
 	while (pb + nhead < pe)
 	{
 		// the block
@@ -1080,7 +1078,6 @@ tb_void_t tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 		// next
 		pb += nhead + block->size;
 		prev = block;
-		prev_i = i - 1;
 		frag++;
 	}
 

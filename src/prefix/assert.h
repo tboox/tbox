@@ -93,8 +93,7 @@
 # 	define tb_assert_and_check_continue(x)					tb_check_continue(x)
 #endif
 
-#define tb_assert_static(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
-
+#define tb_assert_static(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; __tb_volatile__ __tb_static_assert__ __a; tb_used(__a); } while(0)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
