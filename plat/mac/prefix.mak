@@ -38,9 +38,9 @@ MAKE 				= make
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -fno-bounds-check -fvisibility=hidden
+CXFLAGS_RELEASE 	= -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g  
-CXFLAGS 			= -m$(BITS) -c -Wall -mssse3 -mmacosx-version-min=$(SDK)
+CXFLAGS 			= -m$(BITS) -c -Wall -mssse3 -Werror -D__tb_padding__
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -65,16 +65,7 @@ CFLAGS_DEBUG 		=
 CFLAGS 				= \
 					-std=c99 \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
-					-fno-math-errno \
-					-Werror=parentheses -Wstrict-prototypes \
-					-Werror=switch -Werror=format-zero-length -Wdisabled-optimization \
-					-Wpointer-arith -Wwrite-strings \
-					-Wundef -Wmissing-prototypes  \
-					-fno-tree-vectorize -Werror=unused-label -Werror=unused-comparison\
-					-Werror=return-type -Werror=unused-variable -Werror=pointer-sign -Werror=pointer-to-int-cast \
-					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=sometimes-uninitialized \
-					-Werror=pointer-arith -Werror=unused-function -Werror=unused-value -Werror=missing-braces -Werror=int-conversion \
-					-Werror=tautological-compare -Werror=compare-distinct-pointer-types -Werror=incompatible-pointer-types
+					-fno-math-errno -fno-tree-vectorize 
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	= 
@@ -86,9 +77,8 @@ CCFLAGS 			= \
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -fno-bounds-check -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g  
-MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) -mmacosx-version-min=$(SDK) \
-					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
-					-pipe -Wno-trigraphs -fpascal-strings \
+MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) \
+					-Werror -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \
 					"-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \
 					"-DIBAction=void)__attribute__((ibaction)" 

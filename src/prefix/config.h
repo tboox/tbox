@@ -27,10 +27,9 @@
  * includes
  */
 #include "../config.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
+#ifdef __tb_padding__
+# 	include "padding.h"
+#endif
 
 
 #endif
