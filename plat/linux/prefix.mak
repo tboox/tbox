@@ -57,9 +57,9 @@ MAKE 				= make
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+CXFLAGS_RELEASE 	= -freg-struct-return -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g 
-CXFLAGS 			= -m$(BITS) -c -Wall -mssse3
+CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -89,16 +89,7 @@ CFLAGS_DEBUG 		=
 CFLAGS 				= \
 					-std=c99 \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
-					-fno-math-errno \
-					-Wno-parentheses -Wstrict-prototypes -Wno-unused-function \
-					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
-					-Wpointer-arith -Wwrite-strings \
-					-Wundef -Wmissing-prototypes  \
-					-fno-signed-zeros -fno-tree-vectorize \
-					-Werror=unused-variable -Wtype-limits -Wno-pointer-sign -Wno-pointer-to-int-cast \
-					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=return-type \
-					-Werror=unused-label -Werror=unused-comparison -Werror=sometimes-uninitialized
-#					-Werror
+					-fno-math-errno -fno-signed-zeros -fno-tree-vectorize
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	= -fno-rtti
