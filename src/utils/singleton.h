@@ -42,8 +42,11 @@ typedef enum __tb_singleton_type_e
 	/// the thread pool type
 ,	TB_SINGLETON_TYPE_THREAD_POOL 	= 1
 
+	/// the string pool type
+,	TB_SINGLETON_TYPE_STRING_POOL 	= 2
+
 	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 			= 2
+,	TB_SINGLETON_TYPE_USER 			= 3
 
 	/// the max count of the singleton type
 #ifdef __tb_small__

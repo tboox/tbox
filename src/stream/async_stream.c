@@ -562,7 +562,7 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_t* astream)
 	// ok?
 	return ok;
 }
-tb_bool_t tb_async_stream_open_impl(tb_async_stream_t* astream, tb_async_stream_open_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_open_(tb_async_stream_t* astream, tb_async_stream_open_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->open && func, tb_false);
@@ -590,17 +590,17 @@ tb_bool_t tb_async_stream_open_impl(tb_async_stream_t* astream, tb_async_stream_
 	// ok?
 	return ok;
 }
-tb_bool_t tb_async_stream_read_impl(tb_async_stream_t* astream, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_read_(tb_async_stream_t* astream, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// read it
-	return tb_async_stream_read_after_impl(astream, 0, size, func, priv __tb_debug_args__);
+	return tb_async_stream_read_after_(astream, 0, size, func, priv __tb_debug_args__);
 }
-tb_bool_t tb_async_stream_writ_impl(tb_async_stream_t* astream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_writ_(tb_async_stream_t* astream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// writ it
-	return tb_async_stream_writ_after_impl(astream, 0, data, size, func, priv __tb_debug_args__);
+	return tb_async_stream_writ_after_(astream, 0, data, size, func, priv __tb_debug_args__);
 }
-tb_bool_t tb_async_stream_seek_impl(tb_async_stream_t* astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_seek_(tb_async_stream_t* astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->seek && func, tb_false);
@@ -623,7 +623,7 @@ tb_bool_t tb_async_stream_seek_impl(tb_async_stream_t* astream, tb_hize_t offset
 		astream->sync_and.seek.func = func;
 		astream->sync_and.seek.priv = priv;
 		astream->sync_and.seek.offset = offset;
-		return tb_async_stream_sync_impl(astream, tb_false, tb_async_stream_sseek_func, &astream->sync_and.seek __tb_debug_args__);
+		return tb_async_stream_sync_(astream, tb_false, tb_async_stream_sseek_func, &astream->sync_and.seek __tb_debug_args__);
 	}
 
 	// offset be not modified?
@@ -636,7 +636,7 @@ tb_bool_t tb_async_stream_seek_impl(tb_async_stream_t* astream, tb_hize_t offset
 	// seek it
 	return astream->seek(astream, offset, func, priv);
 }
-tb_bool_t tb_async_stream_sync_impl(tb_async_stream_t* astream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_sync_(tb_async_stream_t* astream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->sync && func, tb_false);
@@ -675,7 +675,7 @@ tb_bool_t tb_async_stream_sync_impl(tb_async_stream_t* astream, tb_bool_t bclosi
 	// ok?
 	return ok;
 }
-tb_bool_t tb_async_stream_task_impl(tb_async_stream_t* astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_task_(tb_async_stream_t* astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->task && func, tb_false);
@@ -694,7 +694,7 @@ tb_bool_t tb_async_stream_task_impl(tb_async_stream_t* astream, tb_size_t delay,
 	// task it
 	return astream->task(astream, delay, func, priv);
 }
-tb_bool_t tb_async_stream_oread_impl(tb_async_stream_t* astream, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_oread_(tb_async_stream_t* astream, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->open && astream->read && func, tb_false);
@@ -706,13 +706,13 @@ tb_bool_t tb_async_stream_oread_impl(tb_async_stream_t* astream, tb_size_t size,
 		astream->open_and.read.func = func;
 		astream->open_and.read.priv = priv;
 		astream->open_and.read.size = size;
-		return tb_async_stream_open_impl(astream, tb_async_stream_oread_func, &astream->open_and.read __tb_debug_args__);
+		return tb_async_stream_open_(astream, tb_async_stream_oread_func, &astream->open_and.read __tb_debug_args__);
 	}
 
 	// read it
-	return tb_async_stream_read_impl(astream, size, func, priv __tb_debug_args__);
+	return tb_async_stream_read_(astream, size, func, priv __tb_debug_args__);
 }
-tb_bool_t tb_async_stream_owrit_impl(tb_async_stream_t* astream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_owrit_(tb_async_stream_t* astream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->open && astream->writ && data && size && func, tb_false);
@@ -725,13 +725,13 @@ tb_bool_t tb_async_stream_owrit_impl(tb_async_stream_t* astream, tb_byte_t const
 		astream->open_and.writ.priv = priv;
 		astream->open_and.writ.data = data;
 		astream->open_and.writ.size = size;
-		return tb_async_stream_open_impl(astream, tb_async_stream_owrit_func, &astream->open_and.writ __tb_debug_args__);
+		return tb_async_stream_open_(astream, tb_async_stream_owrit_func, &astream->open_and.writ __tb_debug_args__);
 	}
 
 	// writ it
-	return tb_async_stream_writ_impl(astream, data, size, func, priv __tb_debug_args__);
+	return tb_async_stream_writ_(astream, data, size, func, priv __tb_debug_args__);
 }
-tb_bool_t tb_async_stream_oseek_impl(tb_async_stream_t* astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_oseek_(tb_async_stream_t* astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->open && astream->seek && func, tb_false);
@@ -743,13 +743,13 @@ tb_bool_t tb_async_stream_oseek_impl(tb_async_stream_t* astream, tb_hize_t offse
 		astream->open_and.seek.func = func;
 		astream->open_and.seek.priv = priv;
 		astream->open_and.seek.offset = offset;
-		return tb_async_stream_open_impl(astream, tb_async_stream_oseek_func, &astream->open_and.seek __tb_debug_args__);
+		return tb_async_stream_open_(astream, tb_async_stream_oseek_func, &astream->open_and.seek __tb_debug_args__);
 	}
 
 	// seek it
-	return tb_async_stream_seek_impl(astream, offset, func, priv __tb_debug_args__);
+	return tb_async_stream_seek_(astream, offset, func, priv __tb_debug_args__);
 }
-tb_bool_t tb_async_stream_read_after_impl(tb_async_stream_t* astream, tb_size_t delay, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_read_after_(tb_async_stream_t* astream, tb_size_t delay, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->read && func, tb_false);
@@ -772,13 +772,13 @@ tb_bool_t tb_async_stream_read_after_impl(tb_async_stream_t* astream, tb_size_t 
 		astream->sync_and.read.func = func;
 		astream->sync_and.read.priv = priv;
 		astream->sync_and.read.size = size;
-		return tb_async_stream_sync_impl(astream, tb_false, tb_async_stream_sread_func, &astream->sync_and.read __tb_debug_args__);
+		return tb_async_stream_sync_(astream, tb_false, tb_async_stream_sread_func, &astream->sync_and.read __tb_debug_args__);
 	}
 
 	// read it
 	return tb_async_stream_cread_done(astream, delay, size, func, priv);
 }
-tb_bool_t tb_async_stream_writ_after_impl(tb_async_stream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_async_stream_writ_after_(tb_async_stream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->writ && data && size && func, tb_false);

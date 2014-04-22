@@ -71,9 +71,6 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 			if (!tb_native_memory_init()) break;
 		}
 
-		// init scache
-		if (!tb_string_cache_init(align)) break;
-
 		// ok
 		ok = tb_true;
 
@@ -87,9 +84,6 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 }
 tb_void_t tb_memory_exit()
 {
-	// exit scache
-	tb_string_cache_exit();
-
 	// enter
 	tb_spinlock_enter(&g_lock);
 

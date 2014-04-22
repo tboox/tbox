@@ -76,6 +76,36 @@
 // check the offset and size of member for struct or union
 #define tb_memberof_eq(ls, lm, rs, rm) 	((tb_offsetof(ls, lm) == tb_offsetof(rs, rm)) && (tb_memsizeof(ls, lm) == tb_memsizeof(rs, rm)))
 
+// pointer to bool
+#define tb_p2b(x) 						((tb_bool_t)(tb_size_t)(x))
+
+// pointer to u8
+#define tb_p2u8(x) 						((tb_uint8_t)(tb_size_t)(x))
+
+// pointer to u16
+#define tb_p2u16(x) 					((tb_uint16_t)(tb_size_t)(x))
+
+// pointer to u32
+#define tb_p2u32(x) 					((tb_uint32_t)(tb_size_t)(x))
+
+// pointer to s8
+#define tb_p2s8(x) 						((tb_sint8_t)(tb_long_t)(x))
+
+// pointer to s16
+#define tb_p2s16(x) 					((tb_sint16_t)(tb_long_t)(x))
+
+// pointer to s32
+#define tb_p2s32(x) 					((tb_sint32_t)(tb_long_t)(x))
+
+// bool to pointer
+#define tb_b2p(x) 						((tb_pointer_t)(tb_size_t)(x))
+
+// unsigned integer to pointer
+#define tb_u2p(x) 						((tb_pointer_t)(tb_size_t)(x))
+
+// integer to pointer
+#define tb_i2p(x) 						((tb_pointer_t)(tb_long_t)(x))
+
 #endif
 
 

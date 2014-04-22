@@ -100,7 +100,7 @@ typedef struct __tb_block_pool_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_pointer_t tb_static_block_pool_ralloc_fast(tb_pointer_t vpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
+tb_pointer_t tb_static_block_pool_ralloc_fast(tb_pointer_t bpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -123,11 +123,11 @@ static tb_pointer_t tb_block_pool_ralloc_fast(tb_block_pool_t* pool, tb_pointer_
 		tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
 
 		// the predicted pool
-		tb_handle_t vpool = pool->pools[pool->pred - 1].pool;
-		if (vpool) 
+		tb_handle_t bpool = pool->pools[pool->pred - 1].pool;
+		if (bpool) 
 		{
 			// try reallocating it
-			tb_pointer_t p = tb_static_block_pool_ralloc_fast(vpool, data, size, osize);
+			tb_pointer_t p = tb_static_block_pool_ralloc_fast(bpool, data, size, osize);
 
 			// ok?
 			tb_check_return_val(!p, p);
@@ -144,11 +144,11 @@ static tb_pointer_t tb_block_pool_ralloc_fast(tb_block_pool_t* pool, tb_pointer_
 		tb_size_t n = pool->pooln;
 		while (n--)
 		{
-			tb_handle_t vpool = pool->pools[n].pool;
-			if (vpool) 
+			tb_handle_t bpool = pool->pools[n].pool;
+			if (bpool) 
 			{
 				// try reallocating it
-				tb_pointer_t p = tb_static_block_pool_ralloc_fast(vpool, data, size, osize);
+				tb_pointer_t p = tb_static_block_pool_ralloc_fast(bpool, data, size, osize);
 
 				// ok?
 				tb_check_return_val(!p, p);
@@ -281,11 +281,11 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
 		tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
 
 		// the predicted pool
-		tb_handle_t vpool = pool->pools[pool->pred - 1].pool;
-		if (vpool) 
+		tb_handle_t bpool = pool->pools[pool->pred - 1].pool;
+		if (bpool) 
 		{
 			// try allocating it
-			tb_pointer_t p = tb_static_block_pool_malloc_(vpool, size __tb_debug_args__);
+			tb_pointer_t p = tb_static_block_pool_malloc_(bpool, size __tb_debug_args__);
 
 			// ok
 			if (p) 
@@ -306,11 +306,11 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
 		tb_size_t n = pool->pooln;
 		while (n--)
 		{
-			tb_handle_t vpool = pool->pools[n].pool;
-			if (vpool) 
+			tb_handle_t bpool = pool->pools[n].pool;
+			if (bpool) 
 			{
 				// try allocating it
-				tb_pointer_t p = tb_static_block_pool_malloc_(vpool, size __tb_debug_args__);
+				tb_pointer_t p = tb_static_block_pool_malloc_(bpool, size __tb_debug_args__);
 
 				// ok
 				if (p) 
@@ -483,11 +483,11 @@ tb_bool_t tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_d
 		tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_false);
 
 		// the predicted pool
-		tb_handle_t vpool = pool->pools[pool->pred - 1].pool;
-		if (vpool) 
+		tb_handle_t bpool = pool->pools[pool->pred - 1].pool;
+		if (bpool) 
 		{
 			// try allocating it
-			tb_bool_t r = tb_static_block_pool_free_(vpool, data __tb_debug_args__);
+			tb_bool_t r = tb_static_block_pool_free_(bpool, data __tb_debug_args__);
 
 			// ok
 			if (r) return r;
@@ -498,11 +498,11 @@ tb_bool_t tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_d
 	tb_size_t n = pool->pooln;
 	while (n--)
 	{
-		tb_handle_t vpool = pool->pools[n].pool;
-		if (vpool) 
+		tb_handle_t bpool = pool->pools[n].pool;
+		if (bpool) 
 		{
 			// try free it
-			tb_bool_t r = tb_static_block_pool_free_(vpool, data __tb_debug_args__);
+			tb_bool_t r = tb_static_block_pool_free_(bpool, data __tb_debug_args__);
 
 			// ok
 			if (r) 
@@ -543,8 +543,8 @@ tb_void_t tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 	tb_size_t n = pool->pooln;
 	for (i = 0; i < n; i++)
 	{
-		tb_handle_t vpool = pool->pools[i].pool;
-		if (vpool) tb_static_block_pool_dump(vpool, prefix);
+		tb_handle_t bpool = pool->pools[i].pool;
+		if (bpool) tb_static_block_pool_dump(bpool, prefix);
 	}
 }
 #endif

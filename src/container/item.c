@@ -116,7 +116,6 @@ static tb_size_t tb_item_func_size_hash(tb_item_func_t* func, tb_cpointer_t data
 static tb_long_t tb_item_func_size_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
 	return ((tb_size_t)ldata > (tb_size_t)rdata? 1 : ((tb_size_t)ldata < (tb_size_t)rdata? -1 : 0));
-	//return (ldata - rdata); //!< maybe overflow for int32
 }
 static tb_pointer_t tb_item_func_size_data(tb_item_func_t* func, tb_cpointer_t item)
 {
@@ -164,8 +163,7 @@ static tb_size_t tb_item_func_uint8_hash(tb_item_func_t* func, tb_cpointer_t dat
 }
 static tb_long_t tb_item_func_uint8_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return ((tb_uint8_t)(tb_size_t)ldata > (tb_uint8_t)(tb_size_t)rdata? 1 : ((tb_uint8_t)(tb_size_t)ldata < (tb_uint8_t)(tb_size_t)rdata? -1 : 0));
-	//return (ldata - rdata); //!< maybe overflow for int32
+	return (tb_p2u8(ldata) > tb_p2u8(rdata)? 1 : (tb_p2u8(ldata) < tb_p2u8(rdata)? -1 : 0));
 }
 static tb_pointer_t tb_item_func_uint8_data(tb_item_func_t* func, tb_cpointer_t item)
 {
@@ -206,8 +204,7 @@ static tb_size_t tb_item_func_uint16_hash(tb_item_func_t* func, tb_cpointer_t da
 }
 static tb_long_t tb_item_func_uint16_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return ((tb_uint16_t)(tb_size_t)ldata > (tb_uint16_t)(tb_size_t)rdata? 1 : ((tb_uint16_t)(tb_size_t)ldata < (tb_uint16_t)(tb_size_t)rdata? -1 : 0));
-	//return (ldata - rdata); //!< maybe overflow for int32
+	return (tb_p2u16(ldata) > tb_p2u16(rdata)? 1 : (tb_p2u16(ldata) < tb_p2u16(rdata)? -1 : 0));
 }
 static tb_pointer_t tb_item_func_uint16_data(tb_item_func_t* func, tb_cpointer_t item)
 {
@@ -248,8 +245,7 @@ static tb_size_t tb_item_func_uint32_hash(tb_item_func_t* func, tb_cpointer_t da
 }
 static tb_long_t tb_item_func_uint32_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return ((tb_uint32_t)(tb_size_t)ldata > (tb_uint32_t)(tb_size_t)rdata? 1 : ((tb_uint32_t)(tb_size_t)ldata < (tb_uint32_t)(tb_size_t)rdata? -1 : 0));
-	//return (ldata - rdata); //!< maybe overflow for int32
+	return (tb_p2u32(ldata) > tb_p2u32(rdata)? 1 : (tb_p2u32(ldata) < tb_p2u32(rdata)? -1 : 0));
 }
 static tb_pointer_t tb_item_func_uint32_data(tb_item_func_t* func, tb_cpointer_t item)
 {
@@ -676,28 +672,28 @@ static tb_void_t tb_item_func_ifm_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	// copy item
 	if (func->ndupl) func->ndupl(func, item, data, size);
 }
-// the string for scache 
-static tb_void_t tb_item_func_string_cache_free(tb_item_func_t* func, tb_pointer_t item)
+// the string for string pool 
+static tb_void_t tb_item_func_string_pool_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	// check
-	tb_assert_and_check_return(func && item);
-	if (*((tb_pointer_t*)item)) tb_string_cache_del(*((tb_pointer_t*)item));
+	tb_assert_and_check_return(func && func->pool && item);
+	if (*((tb_pointer_t*)item)) tb_string_pool_del(func->pool, *((tb_pointer_t*)item));
 }
-static tb_void_t tb_item_func_string_cache_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_string_pool_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	// check
-	tb_assert_and_check_return(func && item);
+	tb_assert_and_check_return(func && func->pool && item);
 
-	if (data) *((tb_cpointer_t*)item) = tb_string_cache_put(data);
+	if (data) *((tb_cpointer_t*)item) = tb_string_pool_put(func->pool, data);
 	else *((tb_pointer_t*)item) = tb_null;
 }
-static tb_void_t tb_item_func_string_cache_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_string_pool_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	// check
-	tb_assert_and_check_return(func && item);
+	tb_assert_and_check_return(func && func->pool && item);
 
 	// copy it, refn++
-	tb_cpointer_t copy = data? tb_string_cache_put(data) : tb_null;
+	tb_cpointer_t copy = data? tb_string_pool_put(func->pool, data) : tb_null;
 
 	// free it, refn--
 	if (func->free) func->free(func, item);
@@ -859,7 +855,7 @@ tb_item_func_t tb_item_func_uint32()
 
 	return func;
 }
-tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t spool)
+tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t bpool)
 {
 	tb_item_func_t func = {0};
 	func.type = TB_ITEM_TYPE_STR;
@@ -880,8 +876,8 @@ tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t spool)
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
-	func.pool = spool;
-	func.priv = (tb_pointer_t)(tb_size_t)bcase;
+	func.pool = bpool;
+	func.priv = tb_b2p(bcase);
 
 	return func;
 }
@@ -936,7 +932,7 @@ tb_item_func_t tb_item_func_obj()
 
 	return func;
 }
-tb_item_func_t tb_item_func_efm(tb_size_t size, tb_handle_t rpool)
+tb_item_func_t tb_item_func_efm(tb_size_t size, tb_handle_t fpool)
 {
 	tb_item_func_t func = {0};
 	func.type = TB_ITEM_TYPE_EFM;
@@ -958,7 +954,7 @@ tb_item_func_t tb_item_func_efm(tb_size_t size, tb_handle_t rpool)
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
-	func.pool = rpool;
+	func.pool = fpool;
 	func.priv = (tb_pointer_t)size;
 
 	return func;
@@ -989,19 +985,19 @@ tb_item_func_t tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_cpo
 
 	return func;
 }
-tb_item_func_t tb_item_func_string_cache(tb_bool_t bcase)
+tb_item_func_t tb_item_func_string_pool(tb_handle_t spool)
 {
 	tb_item_func_t func = {0};
-	func.type = TB_ITEM_TYPE_SCACHE;
+	func.type = TB_ITEM_TYPE_SPOOL;
 	func.hash = tb_item_func_str_hash;
 	func.comp = tb_item_func_str_comp;
 
 	func.data = tb_item_func_ptr_data;
 	func.cstr = tb_item_func_str_cstr;
 
-	func.free = tb_item_func_string_cache_free;
-	func.dupl = tb_item_func_string_cache_dupl;
-	func.repl = tb_item_func_string_cache_repl;
+	func.free = tb_item_func_string_pool_free;
+	func.dupl = tb_item_func_string_pool_dupl;
+	func.repl = tb_item_func_string_pool_repl;
 	func.copy = tb_item_func_ptr_copy;
 
 	func.nfree = tb_item_func_efm_nfree;
@@ -1010,7 +1006,8 @@ tb_item_func_t tb_item_func_string_cache(tb_bool_t bcase)
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
-	func.priv = (tb_pointer_t)(tb_size_t)bcase;
+	func.pool = spool;
+	tb_assert(spool);
 
 	return func;
 }
