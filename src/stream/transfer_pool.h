@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		transfer.h
+ * @file		transfer_pool_pool.h
  * @ingroup 	stream
  *
  */
-#ifndef TB_STREAM_TRANSFER_H
-#define TB_STREAM_TRANSFER_H
+#ifndef TB_STREAM_TRANSFER_POOL_H
+#define TB_STREAM_TRANSFER_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -35,39 +35,43 @@
  * interfaces
  */
 
-/*! init mstream
- *
- * the multi-stream for the stream transfer
+/*! init transfer pool
  *
  * @param aicp 			the aicp, will make it if be null
  * @param conc 			the concurrent transfer count, no limit if be zero
  * @param timeout 		the timeout, using the default timeout if be zero 
  *
- * @return 				the mstream 
+ * @return 				the transfer pool 
  */
-tb_handle_t 			tb_transfer_init(tb_aicp_t* aicp, tb_size_t conc, tb_long_t timeout);
+tb_handle_t 			tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t conc, tb_long_t timeout);
 
-/*! exit mstream
+/*! exit transfer pool
  *
- * @param mstream 		the mstream 
+ * @param pool 			the transfer pool 
  */
-tb_void_t 				tb_transfer_exit(tb_handle_t mstream);
+tb_void_t 				tb_transfer_pool_exit(tb_handle_t pool);
 
-/*! kill mstream
+/*! kill transfer pool
  *
- * @param mstream 		the mstream 
+ * @param pool 			the transfer pool 
  */
-tb_void_t 				tb_transfer_kill(tb_handle_t mstream);
+tb_void_t 				tb_transfer_pool_kill(tb_handle_t pool);
 
-/*! the mstream size
+/*! the transfer pool size
  *
- * @param mstream 		the mstream 
+ * @param pool 			the transfer pool 
  */
-tb_size_t 				tb_transfer_size(tb_handle_t mstream);
+tb_size_t 				tb_transfer_pool_size(tb_handle_t pool);
+
+/*! the transfer pool instance
+ *
+ * @return 				the transfer pool instance
+ */
+tb_handle_t 			tb_transfer_pool_instance(tb_noarg_t);
 
 /*! done transfer from iurl to ourl
  *
- * @param mstream 		the mstream 
+ * @param pool 			the transfer pool 
  * @param iurl 			the input url
  * @param ourl 			the output url
  * @param offset 		the offset
@@ -76,6 +80,6 @@ tb_size_t 				tb_transfer_size(tb_handle_t mstream);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_transfer_done(tb_handle_t mstream, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_stream_save_func_t func, tb_pointer_t priv);
+tb_bool_t 				tb_transfer_pool_done(tb_handle_t pool, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_stream_save_func_t func, tb_pointer_t priv);
 
 #endif
