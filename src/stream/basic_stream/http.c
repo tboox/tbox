@@ -107,7 +107,7 @@ static tb_long_t tb_basic_stream_http_read(tb_handle_t bstream, tb_byte_t* data,
 	tb_check_return_val(size, 0);
 
 	// read data
-	tb_long_t ok = tb_http_aread(hstream->http, data, size);
+	tb_long_t ok = tb_http_read(hstream->http, data, size);
 
 	// save state
 	hstream->base.state = ok >= 0? TB_STATE_OK : status->state;

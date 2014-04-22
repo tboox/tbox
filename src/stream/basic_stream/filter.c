@@ -163,7 +163,7 @@ static tb_long_t tb_basic_stream_filter_read(tb_handle_t bstream, tb_byte_t* dat
 	tb_assert_and_check_return_val(fstream && fstream->bstream, -1);
 
 	// read 
-	tb_long_t real = tb_basic_stream_aread(fstream->bstream, data, size);
+	tb_long_t real = tb_basic_stream_read(fstream->bstream, data, size);
 
 	// done filter
 	if (fstream->filter)
@@ -226,7 +226,7 @@ static tb_long_t tb_basic_stream_filter_writ(tb_handle_t bstream, tb_byte_t cons
 	}
 
 	// writ 
-	return tb_basic_stream_awrit(fstream->bstream, data, size);
+	return tb_basic_stream_writ(fstream->bstream, data, size);
 }
 static tb_bool_t tb_basic_stream_filter_sync(tb_handle_t bstream, tb_bool_t bclosing)
 {

@@ -979,7 +979,7 @@ tb_bool_t tb_http_seek(tb_handle_t handle, tb_hize_t offset)
 	// ok?
 	return ok;
 }
-tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_http_t* http = (tb_http_t*)handle;
@@ -989,7 +989,7 @@ tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(http->bopened, -1);
 
 	// read
-	return tb_basic_stream_aread(http->stream, data, size);
+	return tb_basic_stream_read(http->stream, data, size);
 }
 tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {	
@@ -1005,7 +1005,7 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	while (read < size)
 	{
 		// read data
-		tb_long_t real = tb_basic_stream_aread(http->stream, data + read, size - read);
+		tb_long_t real = tb_basic_stream_read(http->stream, data + read, size - read);
 
 		// update size
 		if (real > 0) read += real;

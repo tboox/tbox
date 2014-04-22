@@ -302,7 +302,7 @@ tb_bool_t 				tb_http_clos(tb_handle_t handle);
  */
 tb_bool_t 				tb_http_seek(tb_handle_t handle, tb_hize_t offset);
 
-/*! async read
+/*! read data, non-blocking
  *
  * @param handle 		the http handle
  * @param data 			the data
@@ -310,9 +310,9 @@ tb_bool_t 				tb_http_seek(tb_handle_t handle, tb_hize_t offset);
  *
  * @return 				ok: real size, continue: 0, fail: -1
  */
-tb_long_t 				tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_long_t 				tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
-/*! block read
+/*! read data, blocking
  *
  * @param handle 		the http handle
  * @param data 			the data
