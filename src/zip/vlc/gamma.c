@@ -44,9 +44,9 @@ static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_sta
 
 	// store
 	tb_int_t i = 0;
-	for (i = 0; i < q; i++) tb_static_stream_set_u1(sstream, 1);
-	tb_static_stream_set_u1(sstream, 0);
-	for (i = 0; i < q; i++, r >>= 1) tb_static_stream_set_u1(sstream, r & 0x1);
+	for (i = 0; i < q; i++) tb_static_stream_writ_u1(sstream, 1);
+	tb_static_stream_writ_u1(sstream, 0);
+	for (i = 0; i < q; i++, r >>= 1) tb_static_stream_writ_u1(sstream, r & 0x1);
 #endif
 }
 static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream)
@@ -55,13 +55,13 @@ static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_static_stream_t co
 
 	// get q
 	tb_uint32_t q = 0;
-	while (tb_static_stream_get_u1((tb_static_stream_t*)sstream)) q++;
+	while (tb_static_stream_read_u1((tb_static_stream_t*)sstream)) q++;
 	tb_assert(q < 32);
 
 	// get r
 	tb_uint32_t i = 0;
 	tb_uint32_t r = 0;
-	for (i = 0; i < q; i++) r |= tb_static_stream_get_u1((tb_static_stream_t*)sstream) << i;
+	for (i = 0; i < q; i++) r |= tb_static_stream_read_u1((tb_static_stream_t*)sstream) << i;
 
 	//tb_trace_d("x: %d, q: %d, r: %d", r + (1 << q), q, r);
 
@@ -113,15 +113,15 @@ tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
 		if ((q << 1) + 1 > 16) break;
 
 		tb_static_stream_init(&sstream, d, 4);
-		for (i = 0; i < q; i++) tb_static_stream_set_u1(&sstream, 1);
-		tb_static_stream_set_u1(&sstream, 0);
-		for (i = 0; i < q; i++, r >>= 1) tb_static_stream_set_u1(&sstream, r & 0x1);
+		for (i = 0; i < q; i++) tb_static_stream_writ_u1(&sstream, 1);
+		tb_static_stream_writ_u1(&sstream, 0);
+		for (i = 0; i < q; i++, r >>= 1) tb_static_stream_writ_u1(&sstream, r & 0x1);
 
 		tb_printf("x = 0x%04x, q = %d: ", x, q);
 		tb_static_stream_init(&sstream, d, 4);
-		for (q = 0; tb_static_stream_get_u1(&sstream); q++) tb_printf("1");
+		for (q = 0; tb_static_stream_read_u1(&sstream); q++) tb_printf("1");
 		tb_printf("0 ");
-		for (i = 0; i < q; i++) tb_printf("%d", tb_static_stream_get_u1(&sstream));
+		for (i = 0; i < q; i++) tb_printf("%d", tb_static_stream_read_u1(&sstream));
 		tb_printf("\n");
 	}
 

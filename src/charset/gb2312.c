@@ -81,7 +81,7 @@ tb_long_t tb_charset_gb2312_get(tb_static_stream_t* sstream, tb_bool_t be, tb_ui
 		tb_check_return_val(n, -1);
 
 		// get character
-		*ch = tb_static_stream_get_u8(sstream);
+		*ch = tb_static_stream_read_u8(sstream);
 	}
 	else
 	{
@@ -89,7 +89,7 @@ tb_long_t tb_charset_gb2312_get(tb_static_stream_t* sstream, tb_bool_t be, tb_ui
 		tb_check_return_val(n > 1, -1);
 
 		// get character
-		*ch = tb_charset_gb2312_to_ucs4(be? tb_static_stream_get_u16_be(sstream) : tb_static_stream_get_u16_le(sstream));
+		*ch = tb_charset_gb2312_to_ucs4(be? tb_static_stream_read_u16_be(sstream) : tb_static_stream_read_u16_le(sstream));
 	}
 
 	// ok
@@ -110,7 +110,7 @@ tb_long_t tb_charset_gb2312_set(tb_static_stream_t* sstream, tb_bool_t be, tb_ui
 		tb_check_return_val(n, -1);
 
 		// set character
-		tb_static_stream_set_u8(sstream, ch & 0xff);
+		tb_static_stream_writ_u8(sstream, ch & 0xff);
 	}
 	else
 	{
@@ -118,8 +118,8 @@ tb_long_t tb_charset_gb2312_set(tb_static_stream_t* sstream, tb_bool_t be, tb_ui
 		tb_check_return_val(n > 1, 0);
 
 		// set character
-		if (be) tb_static_stream_set_u16_be(sstream, ch & 0xffff);
-		else tb_static_stream_set_u16_le(sstream, ch & 0xffff);
+		if (be) tb_static_stream_writ_u16_be(sstream, ch & 0xffff);
+		else tb_static_stream_writ_u16_le(sstream, ch & 0xffff);
 	}
 
 	// ok

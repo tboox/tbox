@@ -50,7 +50,7 @@ typedef struct __tb_filter_chunked_t
 	tb_size_t 				read;
 
 	// the cache line
-	tb_scoped_string_t 			line;
+	tb_scoped_string_t 		line;
 
 }tb_filter_chunked_t;
 

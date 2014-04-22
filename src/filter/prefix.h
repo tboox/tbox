@@ -49,16 +49,16 @@ typedef enum __tb_filter_type_e
 typedef struct __tb_filter_t
 {
 	/// the type
-	tb_size_t 		type;
+	tb_size_t 			type;
 
 	/// the input is eof?
-	tb_bool_t 		beof;
+	tb_bool_t 			beof;
 
 	/// the input limit size 
-	tb_hong_t 		limit;
-
+	tb_hong_t 			limit;
+	
 	/// the input offset 
-	tb_hize_t 		offset;
+	tb_hize_t 			offset;
 
 	/// the input data
 	tb_scoped_buffer_t 	idata;
@@ -67,13 +67,13 @@ typedef struct __tb_filter_t
 	tb_queue_buffer_t 	odata;
 
 	/// the spak
-	tb_long_t 		(*spak)(struct __tb_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
+	tb_long_t 			(*spak)(struct __tb_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
 
 	/// the cler
-	tb_void_t 		(*cler)(struct __tb_filter_t* filter);
+	tb_void_t 			(*cler)(struct __tb_filter_t* filter);
 
 	/// the exit
-	tb_void_t 		(*exit)(struct __tb_filter_t* filter);
+	tb_void_t 			(*exit)(struct __tb_filter_t* filter);
 
 }tb_filter_t;
 
