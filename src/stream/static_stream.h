@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "basic_stream.h"
+#include "static_stream.h"
 #include "../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,42 +36,42 @@
  */
 
 #ifdef TB_WORDS_BIGENDIAN
-# 	define tb_static_stream_get_u16_ne(sstream) 			tb_static_stream_get_u16_be(sstream)
-# 	define tb_static_stream_get_s16_ne(sstream) 			tb_static_stream_get_s16_be(sstream)
-# 	define tb_static_stream_get_u24_ne(sstream) 			tb_static_stream_get_u24_be(sstream)
-# 	define tb_static_stream_get_s24_ne(sstream) 			tb_static_stream_get_s24_be(sstream)
-# 	define tb_static_stream_get_u32_ne(sstream) 			tb_static_stream_get_u32_be(sstream)
-# 	define tb_static_stream_get_s32_ne(sstream) 			tb_static_stream_get_s32_be(sstream)
-# 	define tb_static_stream_get_u64_ne(sstream) 			tb_static_stream_get_u64_be(sstream)
-# 	define tb_static_stream_get_s64_ne(sstream) 			tb_static_stream_get_s64_be(sstream)
+# 	define tb_static_stream_read_u16_ne(stream) 			tb_static_stream_read_u16_be(stream)
+# 	define tb_static_stream_read_s16_ne(stream) 			tb_static_stream_read_s16_be(stream)
+# 	define tb_static_stream_read_u24_ne(stream) 			tb_static_stream_read_u24_be(stream)
+# 	define tb_static_stream_read_s24_ne(stream) 			tb_static_stream_read_s24_be(stream)
+# 	define tb_static_stream_read_u32_ne(stream) 			tb_static_stream_read_u32_be(stream)
+# 	define tb_static_stream_read_s32_ne(stream) 			tb_static_stream_read_s32_be(stream)
+# 	define tb_static_stream_read_u64_ne(stream) 			tb_static_stream_read_u64_be(stream)
+# 	define tb_static_stream_read_s64_ne(stream) 			tb_static_stream_read_s64_be(stream)
 
-# 	define tb_static_stream_set_u16_ne(sstream, val) 		tb_static_stream_set_u16_be(sstream, val)
-# 	define tb_static_stream_set_s16_ne(sstream, val)		tb_static_stream_set_s16_be(sstream, val)
-# 	define tb_static_stream_set_u24_ne(sstream, val) 		tb_static_stream_set_u24_be(sstream, val)
-# 	define tb_static_stream_set_s24_ne(sstream, val)		tb_static_stream_set_s24_be(sstream, val)
-# 	define tb_static_stream_set_u32_ne(sstream, val)		tb_static_stream_set_u32_be(sstream, val)
-# 	define tb_static_stream_set_s32_ne(sstream, val) 		tb_static_stream_set_s32_be(sstream, val)
-# 	define tb_static_stream_set_u64_ne(sstream, val)		tb_static_stream_set_u64_be(sstream, val)
-# 	define tb_static_stream_set_s64_ne(sstream, val) 		tb_static_stream_set_s64_be(sstream, val)
+# 	define tb_static_stream_writ_u16_ne(stream, val) 		tb_static_stream_writ_u16_be(stream, val)
+# 	define tb_static_stream_writ_s16_ne(stream, val)		tb_static_stream_writ_s16_be(stream, val)
+# 	define tb_static_stream_writ_u24_ne(stream, val) 		tb_static_stream_writ_u24_be(stream, val)
+# 	define tb_static_stream_writ_s24_ne(stream, val)		tb_static_stream_writ_s24_be(stream, val)
+# 	define tb_static_stream_writ_u32_ne(stream, val)		tb_static_stream_writ_u32_be(stream, val)
+# 	define tb_static_stream_writ_s32_ne(stream, val) 		tb_static_stream_writ_s32_be(stream, val)
+# 	define tb_static_stream_writ_u64_ne(stream, val)		tb_static_stream_writ_u64_be(stream, val)
+# 	define tb_static_stream_writ_s64_ne(stream, val) 		tb_static_stream_writ_s64_be(stream, val)
 
 #else
-# 	define tb_static_stream_get_u16_ne(sstream) 			tb_static_stream_get_u16_le(sstream)
-# 	define tb_static_stream_get_s16_ne(sstream) 			tb_static_stream_get_s16_le(sstream)
-# 	define tb_static_stream_get_u24_ne(sstream) 			tb_static_stream_get_u24_le(sstream)
-# 	define tb_static_stream_get_s24_ne(sstream) 			tb_static_stream_get_s24_le(sstream)
-# 	define tb_static_stream_get_u32_ne(sstream) 			tb_static_stream_get_u32_le(sstream)
-# 	define tb_static_stream_get_s32_ne(sstream) 			tb_static_stream_get_s32_le(sstream)
-# 	define tb_static_stream_get_u64_ne(sstream) 			tb_static_stream_get_u64_le(sstream)
-# 	define tb_static_stream_get_s64_ne(sstream) 			tb_static_stream_get_s64_le(sstream)
+# 	define tb_static_stream_read_u16_ne(stream) 			tb_static_stream_read_u16_le(stream)
+# 	define tb_static_stream_read_s16_ne(stream) 			tb_static_stream_read_s16_le(stream)
+# 	define tb_static_stream_read_u24_ne(stream) 			tb_static_stream_read_u24_le(stream)
+# 	define tb_static_stream_read_s24_ne(stream) 			tb_static_stream_read_s24_le(stream)
+# 	define tb_static_stream_read_u32_ne(stream) 			tb_static_stream_read_u32_le(stream)
+# 	define tb_static_stream_read_s32_ne(stream) 			tb_static_stream_read_s32_le(stream)
+# 	define tb_static_stream_read_u64_ne(stream) 			tb_static_stream_read_u64_le(stream)
+# 	define tb_static_stream_read_s64_ne(stream) 			tb_static_stream_read_s64_le(stream)
 
-# 	define tb_static_stream_set_u16_ne(sstream, val) 		tb_static_stream_set_u16_le(sstream, val)
-# 	define tb_static_stream_set_s16_ne(sstream, val)		tb_static_stream_set_s16_le(sstream, val)
-# 	define tb_static_stream_set_u24_ne(sstream, val) 		tb_static_stream_set_u24_le(sstream, val)
-# 	define tb_static_stream_set_s24_ne(sstream, val)		tb_static_stream_set_s24_le(sstream, val)
-# 	define tb_static_stream_set_u32_ne(sstream, val)		tb_static_stream_set_u32_le(sstream, val)
-# 	define tb_static_stream_set_s32_ne(sstream, val) 		tb_static_stream_set_s32_le(sstream, val)
-# 	define tb_static_stream_set_u64_ne(sstream, val)		tb_static_stream_set_u64_le(sstream, val)
-# 	define tb_static_stream_set_s64_ne(sstream, val) 		tb_static_stream_set_s64_le(sstream, val)
+# 	define tb_static_stream_writ_u16_ne(stream, val) 		tb_static_stream_writ_u16_le(stream, val)
+# 	define tb_static_stream_writ_s16_ne(stream, val)		tb_static_stream_writ_s16_le(stream, val)
+# 	define tb_static_stream_writ_u24_ne(stream, val) 		tb_static_stream_writ_u24_le(stream, val)
+# 	define tb_static_stream_writ_s24_ne(stream, val)		tb_static_stream_writ_s24_le(stream, val)
+# 	define tb_static_stream_writ_u32_ne(stream, val)		tb_static_stream_writ_u32_le(stream, val)
+# 	define tb_static_stream_writ_s32_ne(stream, val) 		tb_static_stream_writ_s32_le(stream, val)
+# 	define tb_static_stream_writ_u64_ne(stream, val)		tb_static_stream_writ_u64_le(stream, val)
+# 	define tb_static_stream_writ_s64_ne(stream, val) 		tb_static_stream_writ_s64_le(stream, val)
 
 #endif
 
@@ -79,13 +79,20 @@
  * types
  */
 
-// the bits stream type
+/// the static stream type
 typedef struct __tb_static_stream_t
 {
-	tb_byte_t* 			p; 	// the pointer to the current position
-	tb_size_t 			b; 	// the bit offset < 8
-	tb_byte_t* 			e; 	// the pointer to the end
-	tb_size_t 			n; 	// the data size
+	/// the pointer to the current position
+	tb_byte_t* 			p;
+
+	/// the bit offset < 8
+	tb_size_t 			b;
+
+	/// the pointer to the end
+	tb_byte_t* 			e;
+
+	/// the data size
+	tb_size_t 			n;
 
 }tb_static_stream_t;
 
@@ -94,139 +101,705 @@ typedef struct __tb_static_stream_t
  * interfaces
  */
 
-// init
-tb_bool_t 			tb_static_stream_init(tb_static_stream_t* sstream, tb_byte_t* data, tb_size_t size);
+/*! init the static stream
+ *
+ * @param stream 	the stream
+ * @param data 		the data address
+ * @param size 		the data size
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_static_stream_init(tb_static_stream_t* stream, tb_byte_t* data, tb_size_t size);
 
-// modifior
-tb_void_t 			tb_static_stream_goto(tb_static_stream_t* sstream, tb_byte_t* data);
-tb_void_t 			tb_static_stream_sync(tb_static_stream_t* sstream);
+/*! goto the new data address for updating the stream position
+ *
+ * @param stream 	the stream
+ * @param data 		the data address
+ */
+tb_void_t 			tb_static_stream_goto(tb_static_stream_t* stream, tb_byte_t* data);
 
-// position
-tb_byte_t const* 	tb_static_stream_beg(tb_static_stream_t* sstream);
-tb_byte_t const* 	tb_static_stream_pos(tb_static_stream_t* sstream);
-tb_byte_t const* 	tb_static_stream_end(tb_static_stream_t* sstream);
+/*! sync the stream position if update some bits offset
+ *
+ * @param stream 	the stream
+ */
+tb_void_t 			tb_static_stream_sync(tb_static_stream_t* stream);
 
-// attributes
-tb_size_t 			tb_static_stream_offset(tb_static_stream_t* sstream);
-tb_size_t 			tb_static_stream_size(tb_static_stream_t* sstream);
-tb_size_t 			tb_static_stream_left(tb_static_stream_t* sstream);
-tb_size_t 			tb_static_stream_left_bits(tb_static_stream_t* sstream);
-tb_bool_t 			tb_static_stream_valid(tb_static_stream_t* sstream);
+/*! the stream start data address
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the start data address
+ */
+tb_byte_t const* 	tb_static_stream_beg(tb_static_stream_t* stream);
 
-// skip
-tb_void_t 			tb_static_stream_skip(tb_static_stream_t* sstream, tb_size_t size);
-tb_void_t 			tb_static_stream_skip_bits(tb_static_stream_t* sstream, tb_size_t nbits);
-tb_char_t const* 	tb_static_stream_skip_string(tb_static_stream_t* sstream);
+/*! the stream current data address
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the current data address
+ */
+tb_byte_t const* 	tb_static_stream_pos(tb_static_stream_t* stream);
 
-// get
-tb_uint8_t 			tb_static_stream_get_u1(tb_static_stream_t* sstream);
+/*! the stream end data address
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the end data address
+ */
+tb_byte_t const* 	tb_static_stream_end(tb_static_stream_t* stream);
 
-tb_uint8_t 			tb_static_stream_get_u8(tb_static_stream_t* sstream);
-tb_sint8_t 			tb_static_stream_get_s8(tb_static_stream_t* sstream);
+/*! the stream offset
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the offset
+ */
+tb_size_t 			tb_static_stream_offset(tb_static_stream_t* stream);
 
-tb_uint16_t 		tb_static_stream_get_u16_le(tb_static_stream_t* sstream);
-tb_sint16_t 		tb_static_stream_get_s16_le(tb_static_stream_t* sstream);
+/*! the stream data size
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the data size
+ */
+tb_size_t 			tb_static_stream_size(tb_static_stream_t* stream);
 
-tb_uint32_t 		tb_static_stream_get_u24_le(tb_static_stream_t* sstream);
-tb_sint32_t 		tb_static_stream_get_s24_le(tb_static_stream_t* sstream);
+/*! the stream left size
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the left size
+ */
+tb_size_t 			tb_static_stream_left(tb_static_stream_t* stream);
 
-tb_uint32_t 		tb_static_stream_get_u32_le(tb_static_stream_t* sstream);
-tb_sint32_t 		tb_static_stream_get_s32_le(tb_static_stream_t* sstream);
+/*! the stream left bits
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the left bits
+ */
+tb_size_t 			tb_static_stream_left_bits(tb_static_stream_t* stream);
 
-tb_uint64_t 		tb_static_stream_get_u64_le(tb_static_stream_t* sstream);
-tb_sint64_t 		tb_static_stream_get_s64_le(tb_static_stream_t* sstream);
+/*! the stream is valid?
+ *
+ * @param stream 	the stream
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_static_stream_valid(tb_static_stream_t* stream);
 
-tb_uint16_t 		tb_static_stream_get_u16_be(tb_static_stream_t* sstream);
-tb_sint16_t 		tb_static_stream_get_s16_be(tb_static_stream_t* sstream);
+/*! skip the given size 
+ *
+ * @param stream 	the stream
+ * @param size 		the skiped size
+ */
+tb_void_t 			tb_static_stream_skip(tb_static_stream_t* stream, tb_size_t size);
 
-tb_uint32_t 		tb_static_stream_get_u24_be(tb_static_stream_t* sstream);
-tb_sint32_t 		tb_static_stream_get_s24_be(tb_static_stream_t* sstream);
+/*! skip the given bits 
+ *
+ * @param stream 	the stream
+ * @param nbits 	the skiped bits count
+ */
+tb_void_t 			tb_static_stream_skip_bits(tb_static_stream_t* stream, tb_size_t nbits);
 
-tb_uint32_t 		tb_static_stream_get_u32_be(tb_static_stream_t* sstream);
-tb_sint32_t 		tb_static_stream_get_s32_be(tb_static_stream_t* sstream);
+/*! skip the given c-string 
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the skiped c-string
+ */
+tb_char_t const* 	tb_static_stream_skip_cstr(tb_static_stream_t* stream);
 
-tb_uint64_t 		tb_static_stream_get_u64_be(tb_static_stream_t* sstream);
-tb_sint64_t 		tb_static_stream_get_s64_be(tb_static_stream_t* sstream);
+/*! peek ubits value for uint32
+ *
+ * @param stream 	the stream
+ * @param nbits 	the bits count
+ *
+ * @return 			the ubits value
+ */
+tb_uint32_t 		tb_static_stream_peek_ubits32(tb_static_stream_t* stream, tb_size_t nbits);
+
+/*! peek sbits value for sint32
+ *
+ * @param stream 	the stream
+ * @param nbits 	the bits count
+ *
+ * @return 			the sbits value
+ */
+tb_sint32_t 		tb_static_stream_peek_sbits32(tb_static_stream_t* stream, tb_size_t nbits);
+
+/*! read c-string
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the c-string
+ */
+tb_char_t const* 	tb_static_stream_read_cstr(tb_static_stream_t* stream);
+
+/*! read data
+ *
+ * @param stream 	the stream
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the data real size
+ */
+tb_size_t 			tb_static_stream_read_data(tb_static_stream_t* stream, tb_byte_t* data, tb_size_t size);
+
+/*! read ubits value for uint32
+ *
+ * @param stream 	the stream
+ * @param nbits 	the bits count
+ *
+ * @return 			the ubits value
+ */
+tb_uint32_t 		tb_static_stream_read_ubits32(tb_static_stream_t* stream, tb_size_t nbits);
+
+/*! read sbits value for sint32
+ *
+ * @param stream 	the stream
+ * @param nbits 	the bits count
+ *
+ * @return 			the sbits value
+ */
+tb_sint32_t 		tb_static_stream_read_sbits32(tb_static_stream_t* stream, tb_size_t nbits);
+
+/*! read ubits1 value
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the ubits1 value
+ */
+tb_uint8_t 			tb_static_stream_read_u1(tb_static_stream_t* stream);
+
+/*! read uint8 integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint8 integer
+ */
+tb_uint8_t 			tb_static_stream_read_u8(tb_static_stream_t* stream);
+
+/*! read sint8 integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint8 integer
+ */
+tb_sint8_t 			tb_static_stream_read_s8(tb_static_stream_t* stream);
+
+/*! read uint16-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint16-le integer
+ */
+tb_uint16_t 		tb_static_stream_read_u16_le(tb_static_stream_t* stream);
+
+/*! read sint16-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint16-le integer
+ */
+tb_sint16_t 		tb_static_stream_read_s16_le(tb_static_stream_t* stream);
+
+/*! read uint24-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint24-le integer
+ */
+tb_uint32_t 		tb_static_stream_read_u24_le(tb_static_stream_t* stream);
+
+/*! read sint24-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint24-le integer
+ */
+tb_sint32_t 		tb_static_stream_read_s24_le(tb_static_stream_t* stream);
+
+/*! read uint32-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint32-le integer
+ */
+tb_uint32_t 		tb_static_stream_read_u32_le(tb_static_stream_t* stream);
+
+/*! read sint32-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint32-le integer
+ */
+tb_sint32_t 		tb_static_stream_read_s32_le(tb_static_stream_t* stream);
+
+/*! read uint64-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint64-le integer
+ */
+tb_uint64_t 		tb_static_stream_read_u64_le(tb_static_stream_t* stream);
+
+/*! read sint64-le integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint64-le integer
+ */
+tb_sint64_t 		tb_static_stream_read_s64_le(tb_static_stream_t* stream);
+
+/*! read uint16-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint16-be integer
+ */
+tb_uint16_t 		tb_static_stream_read_u16_be(tb_static_stream_t* stream);
+
+/*! read sint16-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint16-be integer
+ */
+tb_sint16_t 		tb_static_stream_read_s16_be(tb_static_stream_t* stream);
+
+/*! read uint24-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint24-be integer
+ */
+tb_uint32_t 		tb_static_stream_read_u24_be(tb_static_stream_t* stream);
+
+/*! read sint24-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint24-be integer
+ */
+tb_sint32_t 		tb_static_stream_read_s24_be(tb_static_stream_t* stream);
+
+/*! read uint32-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint32-be integer
+ */
+tb_uint32_t 		tb_static_stream_read_u32_be(tb_static_stream_t* stream);
+
+/*! read sint32-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint32-be integer
+ */
+tb_sint32_t 		tb_static_stream_read_s32_be(tb_static_stream_t* stream);
+
+/*! read uint64-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the uint64-be integer
+ */
+tb_uint64_t 		tb_static_stream_read_u64_be(tb_static_stream_t* stream);
+
+/*! read sint64-be integer
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the sint64-be integer
+ */
+tb_sint64_t 		tb_static_stream_read_s64_be(tb_static_stream_t* stream);
+
+/*! writ c-string
+ *
+ * @param stream 	the stream
+ * @param cstr 		the c-string
+ *
+ * @return 			the writed c-string address
+ */
+tb_char_t*			tb_static_stream_writ_cstr(tb_static_stream_t* stream, tb_char_t const* cstr);
+
+/*! writ data
+ *
+ * @param stream 	the stream
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the writed data size
+ */
+tb_size_t 			tb_static_stream_writ_data(tb_static_stream_t* stream, tb_byte_t const* data, tb_size_t size);
+
+/*! writ ubits for uint32
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ * @param nbits 	the bits count
+ */
+tb_void_t 			tb_static_stream_writ_ubits32(tb_static_stream_t* stream, tb_uint32_t val, tb_size_t nbits);
+
+/*! writ sbits for sint32
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ * @param nbits 	the bits count
+ */
+tb_void_t 			tb_static_stream_writ_sbits32(tb_static_stream_t* stream, tb_sint32_t val, tb_size_t nbits);
+
+/*! writ ubits1 value
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_u1(tb_static_stream_t* stream, tb_uint8_t val);
+
+/*! writ uint8 integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t			tb_static_stream_writ_u8(tb_static_stream_t* stream, tb_uint8_t val);
+
+/*! writ sint8 integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s8(tb_static_stream_t* stream, tb_sint8_t val);
+
+/*! writ uint16-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u16_le(tb_static_stream_t* stream, tb_uint16_t val);
+
+/*! writ sint16-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s16_le(tb_static_stream_t* stream, tb_sint16_t val);
+
+/*! writ uint24-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u24_le(tb_static_stream_t* stream, tb_uint32_t val);
+
+/*! writ sint24-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s24_le(tb_static_stream_t* stream, tb_sint32_t val);
+
+/*! writ uint32-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u32_le(tb_static_stream_t* stream, tb_uint32_t val);
+
+/*! writ sint32-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s32_le(tb_static_stream_t* stream, tb_sint32_t val);
+
+/*! writ uint64-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u64_le(tb_static_stream_t* stream, tb_uint64_t val);
+
+/*! writ sint64-le integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s64_le(tb_static_stream_t* stream, tb_sint64_t val);
+
+/*! writ uint16-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u16_be(tb_static_stream_t* stream, tb_uint16_t val);
+
+/*! writ sint16-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s16_be(tb_static_stream_t* stream, tb_sint16_t val);
+
+/*! writ uint24-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u24_be(tb_static_stream_t* stream, tb_uint32_t val);
+
+/*! writ sint24-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s24_be(tb_static_stream_t* stream, tb_sint32_t val);
+
+/*! writ uint32-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u32_be(tb_static_stream_t* stream, tb_uint32_t val);
+
+/*! writ sint32-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s32_be(tb_static_stream_t* stream, tb_sint32_t val);
+
+/*! writ uint64-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_u64_be(tb_static_stream_t* stream, tb_uint64_t val);
+
+/*! writ sint64-be integer
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_static_stream_writ_s64_be(tb_static_stream_t* stream, tb_sint64_t val);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_double_t 		tb_static_stream_get_double_le(tb_static_stream_t* sstream);
-tb_double_t 		tb_static_stream_get_double_be(tb_static_stream_t* sstream);
 
-tb_double_t 		tb_static_stream_get_double_ble(tb_static_stream_t* sstream);
-tb_double_t 		tb_static_stream_get_double_bbe(tb_static_stream_t* sstream);
-tb_double_t 		tb_static_stream_get_double_bne(tb_static_stream_t* sstream);
+/*! read float-le number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the float-le number
+ */
+tb_float_t 			tb_static_stream_read_float_le(tb_static_stream_t* stream);
 
-tb_double_t 		tb_static_stream_get_double_lle(tb_static_stream_t* sstream);
-tb_double_t 		tb_static_stream_get_double_lbe(tb_static_stream_t* sstream);
-tb_double_t 		tb_static_stream_get_double_lne(tb_static_stream_t* sstream);
+/*! read float-be number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the float-be number
+ */
+tb_float_t 			tb_static_stream_read_float_be(tb_static_stream_t* stream);
 
-tb_double_t 		tb_static_stream_get_double_nle(tb_static_stream_t* sstream);
-tb_double_t 		tb_static_stream_get_double_nbe(tb_static_stream_t* sstream);
-tb_double_t 		tb_static_stream_get_double_nne(tb_static_stream_t* sstream);
+/*! read float-ne number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the float-be number
+ */
+tb_float_t 			tb_static_stream_read_float_ne(tb_static_stream_t* stream);
+
+/*! read double-ble number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-ble number
+ */
+tb_double_t 		tb_static_stream_read_double_ble(tb_static_stream_t* stream);
+
+/*! read double-bbe number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-bbe number
+ */
+tb_double_t 		tb_static_stream_read_double_bbe(tb_static_stream_t* stream);
+
+/*! read double-bne number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-bne number
+ */
+tb_double_t 		tb_static_stream_read_double_bne(tb_static_stream_t* stream);
+
+/*! read double-lle number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-lle number
+ */
+tb_double_t 		tb_static_stream_read_double_lle(tb_static_stream_t* stream);
+
+/*! read double-lbe number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-lbe number
+ */
+tb_double_t 		tb_static_stream_read_double_lbe(tb_static_stream_t* stream);
+
+/*! read double-lne number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-lne number
+ */
+tb_double_t 		tb_static_stream_read_double_lne(tb_static_stream_t* stream);
+
+/*! read double-nle number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-nle number
+ */
+tb_double_t 		tb_static_stream_read_double_nle(tb_static_stream_t* stream);
+
+/*! read double-nbe number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-nbe number
+ */
+tb_double_t 		tb_static_stream_read_double_nbe(tb_static_stream_t* stream);
+
+/*! read double-nne number
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the double-nne number
+ */
+tb_double_t 		tb_static_stream_read_double_nne(tb_static_stream_t* stream);
+
+/*! writ float-le number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_float_le(tb_static_stream_t* stream, tb_float_t val);
+
+/*! writ float-be number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_float_be(tb_static_stream_t* stream, tb_float_t val);
+
+/*! writ float-ne number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_float_ne(tb_static_stream_t* stream, tb_float_t val);
+
+/*! writ double-ble number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_ble(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-bbe number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_bbe(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-bne number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_bne(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-lle number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_lle(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-lbe number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_lbe(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-lne number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_lne(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-nle number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_nle(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-nbe number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_nbe(tb_static_stream_t* stream, tb_double_t val);
+
+/*! writ double-nne number
+ *
+ * @param stream 	the stream
+ * @param val 		the value
+ */
+tb_void_t 			tb_static_stream_writ_double_nne(tb_static_stream_t* stream, tb_double_t val);
 #endif
-
-tb_uint32_t 		tb_static_stream_get_ubits32(tb_static_stream_t* sstream, tb_size_t nbits);
-tb_sint32_t 		tb_static_stream_get_sbits32(tb_static_stream_t* sstream, tb_size_t nbits);
-
-tb_char_t const* 	tb_static_stream_get_string(tb_static_stream_t* sstream);
-tb_size_t 			tb_static_stream_get_data(tb_static_stream_t* sstream, tb_byte_t* data, tb_size_t size);
-
-// set
-tb_void_t 			tb_static_stream_set_u1(tb_static_stream_t* sstream, tb_uint8_t val);
-
-tb_void_t 			tb_static_stream_set_u8(tb_static_stream_t* sstream, tb_uint8_t val);
-tb_void_t 			tb_static_stream_set_s8(tb_static_stream_t* sstream, tb_sint8_t val);
-
-tb_void_t 			tb_static_stream_set_u16_le(tb_static_stream_t* sstream, tb_uint16_t val);
-tb_void_t 			tb_static_stream_set_s16_le(tb_static_stream_t* sstream, tb_sint16_t val);
-
-tb_void_t 			tb_static_stream_set_u24_le(tb_static_stream_t* sstream, tb_uint32_t val);
-tb_void_t 			tb_static_stream_set_s24_le(tb_static_stream_t* sstream, tb_sint32_t val);
-
-tb_void_t 			tb_static_stream_set_u32_le(tb_static_stream_t* sstream, tb_uint32_t val);
-tb_void_t 			tb_static_stream_set_s32_le(tb_static_stream_t* sstream, tb_sint32_t val);
-
-tb_void_t 			tb_static_stream_set_u64_le(tb_static_stream_t* sstream, tb_uint64_t val);
-tb_void_t 			tb_static_stream_set_s64_le(tb_static_stream_t* sstream, tb_sint64_t val);
-
-tb_void_t 			tb_static_stream_set_u16_be(tb_static_stream_t* sstream, tb_uint16_t val);
-tb_void_t 			tb_static_stream_set_s16_be(tb_static_stream_t* sstream, tb_sint16_t val);
-
-tb_void_t 			tb_static_stream_set_u24_be(tb_static_stream_t* sstream, tb_uint32_t val);
-tb_void_t 			tb_static_stream_set_s24_be(tb_static_stream_t* sstream, tb_sint32_t val);
-
-tb_void_t 			tb_static_stream_set_u32_be(tb_static_stream_t* sstream, tb_uint32_t val);
-tb_void_t 			tb_static_stream_set_s32_be(tb_static_stream_t* sstream, tb_sint32_t val);
-
-tb_void_t 			tb_static_stream_set_u64_be(tb_static_stream_t* sstream, tb_uint64_t val);
-tb_void_t 			tb_static_stream_set_s64_be(tb_static_stream_t* sstream, tb_sint64_t val);
-
-tb_void_t 			tb_static_stream_set_ubits32(tb_static_stream_t* sstream, tb_uint32_t val, tb_size_t nbits);
-tb_void_t 			tb_static_stream_set_sbits32(tb_static_stream_t* sstream, tb_sint32_t val, tb_size_t nbits);
-
-tb_size_t 			tb_static_stream_set_data(tb_static_stream_t* sstream, tb_byte_t const* data, tb_size_t size);
-tb_char_t*			tb_static_stream_set_string(tb_static_stream_t* sstream, tb_char_t const* s);
-
-#ifdef TB_CONFIG_TYPE_FLOAT
-tb_void_t 			tb_static_stream_set_double_le(tb_static_stream_t* sstream, tb_double_t val);
-tb_void_t 			tb_static_stream_set_double_be(tb_static_stream_t* sstream, tb_double_t val);
-
-tb_void_t 			tb_static_stream_set_double_ble(tb_static_stream_t* sstream, tb_double_t val);
-tb_void_t 			tb_static_stream_set_double_bbe(tb_static_stream_t* sstream, tb_double_t val);
-tb_void_t 			tb_static_stream_set_double_bne(tb_static_stream_t* sstream, tb_double_t val);
-
-tb_void_t 			tb_static_stream_set_double_lle(tb_static_stream_t* sstream, tb_double_t val);
-tb_void_t 			tb_static_stream_set_double_lbe(tb_static_stream_t* sstream, tb_double_t val);
-tb_void_t 			tb_static_stream_set_double_lne(tb_static_stream_t* sstream, tb_double_t val);
-
-tb_void_t 			tb_static_stream_set_double_nle(tb_static_stream_t* sstream, tb_double_t val);
-tb_void_t 			tb_static_stream_set_double_nbe(tb_static_stream_t* sstream, tb_double_t val);
-tb_void_t 			tb_static_stream_set_double_nne(tb_static_stream_t* sstream, tb_double_t val);
-#endif
-
-// peek
-tb_uint32_t 		tb_static_stream_peek_ubits32(tb_static_stream_t* sstream, tb_size_t nbits);
-tb_sint32_t 		tb_static_stream_peek_sbits32(tb_static_stream_t* sstream, tb_size_t nbits);
 
 
 #endif

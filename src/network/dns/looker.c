@@ -117,7 +117,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 		tb_static_stream_init(&sstream, rpkt, TB_DNS_RPKT_MAXN);
 
 		// identification number
-		tb_static_stream_set_u16_be(&sstream, TB_DNS_HEADER_MAGIC);
+		tb_static_stream_writ_u16_be(&sstream, TB_DNS_HEADER_MAGIC);
 
 		/* 0x2104: 0 0000 001 0000 0000
 		 *
@@ -143,19 +143,19 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 		 *
 		 */
 #if 1
-		tb_static_stream_set_u16_be(&sstream, 0x0100);
+		tb_static_stream_writ_u16_be(&sstream, 0x0100);
 #else
-		tb_static_stream_set_u1(&sstream, 0); 			// this is a query
-		tb_static_stream_set_ubits32(&sstream, 0, 4); 	// this is a standard query
-		tb_static_stream_set_u1(&sstream, 0); 			// not authoritive answer
-		tb_static_stream_set_u1(&sstream, 0); 			// not truncated
-		tb_static_stream_set_u1(&sstream, 1); 			// recursion desired
+		tb_static_stream_writ_u1(&sstream, 0); 			// this is a query
+		tb_static_stream_writ_ubits32(&sstream, 0, 4); 	// this is a standard query
+		tb_static_stream_writ_u1(&sstream, 0); 			// not authoritive answer
+		tb_static_stream_writ_u1(&sstream, 0); 			// not truncated
+		tb_static_stream_writ_u1(&sstream, 1); 			// recursion desired
 
-		tb_static_stream_set_u1(&sstream, 0); 			// recursion not available! hey we dont have it (lol)
-		tb_static_stream_set_u1(&sstream, 0);
-		tb_static_stream_set_u1(&sstream, 0);
-		tb_static_stream_set_u1(&sstream, 0);
-		tb_static_stream_set_ubits32(&sstream, 0, 4);
+		tb_static_stream_writ_u1(&sstream, 0); 			// recursion not available! hey we dont have it (lol)
+		tb_static_stream_writ_u1(&sstream, 0);
+		tb_static_stream_writ_u1(&sstream, 0);
+		tb_static_stream_writ_u1(&sstream, 0);
+		tb_static_stream_writ_ubits32(&sstream, 0, 4);
 #endif
 
 		/* we have only one question
@@ -166,19 +166,19 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 		 * tb_uint16_t resource;		// number of resource entries
 		 *
 		 */
-		tb_static_stream_set_u16_be(&sstream, 1); 
-		tb_static_stream_set_u16_be(&sstream, 0);
-		tb_static_stream_set_u16_be(&sstream, 0);
-		tb_static_stream_set_u16_be(&sstream, 0);
+		tb_static_stream_writ_u16_be(&sstream, 1); 
+		tb_static_stream_writ_u16_be(&sstream, 0);
+		tb_static_stream_writ_u16_be(&sstream, 0);
+		tb_static_stream_writ_u16_be(&sstream, 0);
 
 		// set questions, see as tb_dns_question_t
 		// name + question1 + question2 + ...
-		tb_static_stream_set_u8(&sstream, '.');
-		p = (tb_byte_t*)tb_static_stream_set_string(&sstream, tb_static_string_cstr(&looker->name));
+		tb_static_stream_writ_u8(&sstream, '.');
+		p = (tb_byte_t*)tb_static_stream_writ_cstr(&sstream, tb_static_string_cstr(&looker->name));
 
 		// only one question now.
-		tb_static_stream_set_u16_be(&sstream, 1); 		// we are requesting the ipv4 address
-		tb_static_stream_set_u16_be(&sstream, 1); 		// it's internet (lol)
+		tb_static_stream_writ_u16_be(&sstream, 1); 		// we are requesting the ipv4 address
+		tb_static_stream_writ_u16_be(&sstream, 1); 		// it's internet (lol)
 
 		// encode dns name
 		if (!p || !tb_dns_encode_name((tb_char_t*)p - 1)) return -1;
@@ -261,12 +261,12 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 	tb_static_stream_t 	sstream;
 	tb_dns_header_t header;
 	tb_static_stream_init(&sstream, (tb_byte_t*)rpkt, size);
-	header.id = tb_static_stream_get_u16_be(&sstream);
+	header.id = tb_static_stream_read_u16_be(&sstream);
 	tb_static_stream_skip(&sstream, 2);
-	header.question 	= tb_static_stream_get_u16_be(&sstream);
-	header.answer 		= tb_static_stream_get_u16_be(&sstream);
-	header.authority 	= tb_static_stream_get_u16_be(&sstream);
-	header.resource 	= tb_static_stream_get_u16_be(&sstream);
+	header.question 	= tb_static_stream_read_u16_be(&sstream);
+	header.answer 		= tb_static_stream_read_u16_be(&sstream);
+	header.authority 	= tb_static_stream_read_u16_be(&sstream);
+	header.resource 	= tb_static_stream_read_u16_be(&sstream);
 	tb_trace_d("response: size: %u", 		size);
 	tb_trace_d("response: id: 0x%04x", 		header.id);
 	tb_trace_d("response: question: %d", 	header.question);
@@ -282,10 +282,10 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 	// name + question1 + question2 + ...
 	tb_assert_and_check_return_val(header.question == 1, tb_false);
 #if 1
-	tb_static_stream_skip_string(&sstream);
+	tb_static_stream_skip_cstr(&sstream);
 	tb_static_stream_skip(&sstream, 4);
 #else
-	tb_char_t* name = tb_static_stream_get_string(&sstream);
+	tb_char_t* name = tb_static_stream_read_cstr(&sstream);
 	//name = tb_dns_decode_name(name);
 	tb_assert_and_check_return_val(name, tb_false);
 	tb_static_stream_skip(&sstream, 4);
@@ -306,10 +306,10 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		tb_trace_d("response: name: %s", name);
 
 		// decode resource
-		answer.res.type 	= tb_static_stream_get_u16_be(&sstream);
-		answer.res.class_ 	= tb_static_stream_get_u16_be(&sstream);
-		answer.res.ttl 		= tb_static_stream_get_u32_be(&sstream);
-		answer.res.size 	= tb_static_stream_get_u16_be(&sstream);
+		answer.res.type 	= tb_static_stream_read_u16_be(&sstream);
+		answer.res.class_ 	= tb_static_stream_read_u16_be(&sstream);
+		answer.res.ttl 		= tb_static_stream_read_u32_be(&sstream);
+		answer.res.size 	= tb_static_stream_read_u16_be(&sstream);
 		tb_trace_d("response: type: %d", 	answer.res.type);
 		tb_trace_d("response: class: %d", 	answer.res.class_);
 		tb_trace_d("response: ttl: %d", 	answer.res.ttl);
@@ -318,10 +318,10 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		// is ipv4?
 		if (answer.res.type == 1)
 		{
-			tb_byte_t b1 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b2 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b3 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b4 = tb_static_stream_get_u8(&sstream);
+			tb_byte_t b1 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b2 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b3 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b4 = tb_static_stream_read_u8(&sstream);
 			tb_trace_d("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 
 			// save the first ip
@@ -367,10 +367,10 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		tb_trace_d("response: name: %s", name? name : "");
 
 		// decode resource
-		answer.res.type = 	tb_static_stream_get_u16_be(&sstream);
-		answer.res.class_ = tb_static_stream_get_u16_be(&sstream);
-		answer.res.ttl = 	tb_static_stream_get_u32_be(&sstream);
-		answer.res.size = 	tb_static_stream_get_u16_be(&sstream);
+		answer.res.type = 	tb_static_stream_read_u16_be(&sstream);
+		answer.res.class_ = tb_static_stream_read_u16_be(&sstream);
+		answer.res.ttl = 	tb_static_stream_read_u32_be(&sstream);
+		answer.res.size = 	tb_static_stream_read_u16_be(&sstream);
 		tb_trace_d("response: type: %d", 	answer.res.type);
 		tb_trace_d("response: class: %d", 	answer.res.class_);
 		tb_trace_d("response: ttl: %d", 	answer.res.ttl);
@@ -379,10 +379,10 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		// is ipv4?
 		if (answer.res.type == 1)
 		{
-			tb_byte_t b1 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b2 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b3 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b4 = tb_static_stream_get_u8(&sstream);
+			tb_byte_t b1 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b2 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b3 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b4 = tb_static_stream_read_u8(&sstream);
 			tb_trace_d("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 		}
 		else
@@ -405,10 +405,10 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		tb_trace_d("response: name: %s", name? name : "");
 
 		// decode resource
-		answer.res.type = 	tb_static_stream_get_u16_be(&sstream);
-		answer.res.class_ = tb_static_stream_get_u16_be(&sstream);
-		answer.res.ttl = 	tb_static_stream_get_u32_be(&sstream);
-		answer.res.size = 	tb_static_stream_get_u16_be(&sstream);
+		answer.res.type = 	tb_static_stream_read_u16_be(&sstream);
+		answer.res.class_ = tb_static_stream_read_u16_be(&sstream);
+		answer.res.ttl = 	tb_static_stream_read_u32_be(&sstream);
+		answer.res.size = 	tb_static_stream_read_u16_be(&sstream);
 		tb_trace_d("response: type: %d", 	answer.res.type);
 		tb_trace_d("response: class: %d", 	answer.res.class_);
 		tb_trace_d("response: ttl: %d", 	answer.res.ttl);
@@ -417,10 +417,10 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		// is ipv4?
 		if (answer.res.type == 1)
 		{
-			tb_byte_t b1 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b2 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b3 = tb_static_stream_get_u8(&sstream);
-			tb_byte_t b4 = tb_static_stream_get_u8(&sstream);
+			tb_byte_t b1 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b2 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b3 = tb_static_stream_read_u8(&sstream);
+			tb_byte_t b4 = tb_static_stream_read_u8(&sstream);
 			tb_trace_d("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 		}
 		else

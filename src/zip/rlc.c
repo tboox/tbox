@@ -82,13 +82,13 @@ static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_static_stream_t* ist,
 				if (repeat > 1)
 				{
 					// set flag
-					tb_static_stream_set_u1(ost, 1);
+					tb_static_stream_writ_u1(ost, 1);
 
 					// set repeat
 					vlc_set(vlc, repeat, ost);
 					
 					// set value
-					tb_static_stream_set_ubits32(ost, last, 8);
+					tb_static_stream_writ_ubits32(ost, last, 8);
 
 					//tb_trace_d("repeat(0x%02x): %d", last, repeat);
 				}
@@ -97,10 +97,10 @@ static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_static_stream_t* ist,
 					tb_assert(repeat == 1);
 
 					// set flag
-					tb_static_stream_set_u1(ost, 0);
+					tb_static_stream_writ_u1(ost, 0);
 
 					// set value
-					tb_static_stream_set_ubits32(ost, last, 8);
+					tb_static_stream_writ_ubits32(ost, last, 8);
 				}
 			}
 
@@ -157,13 +157,13 @@ static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_static_stream_t* ist,
 	while (tb_static_stream_left_bits(ist) > 32 && op < oe)
 	{
 		// get flag
-		if (tb_static_stream_get_u1(ist))
+		if (tb_static_stream_read_u1(ist))
 		{
 			// get repeat
 			repeat = vlc_get(vlc, ist);
 
 			// get value
-			last = tb_static_stream_get_ubits32(ist, 8);
+			last = tb_static_stream_read_ubits32(ist, 8);
 
 			//tb_trace_d("repeat(0x%02x): %d", last, repeat);
 
@@ -171,7 +171,7 @@ static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_static_stream_t* ist,
 			while (repeat-- > 0 && op < oe) *op++ = last;
 	
 		}
-		else if (op < oe) *op++ = tb_static_stream_get_ubits32(ist, 8);
+		else if (op < oe) *op++ = tb_static_stream_read_ubits32(ist, 8);
 	}
 
 	// update 
