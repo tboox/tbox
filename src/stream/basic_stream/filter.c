@@ -40,22 +40,22 @@ typedef struct __tb_basic_stream_filter_t
 	tb_basic_stream_t 		base;
 
 	// the filter 
-	tb_filter_t* 		filter;
+	tb_filter_t* 			filter;
 
 	// the filter is referenced? need not exit it
-	tb_bool_t 			bref;
+	tb_bool_t 				bref;
 
 	// is eof?
-	tb_bool_t 			beof;
+	tb_bool_t 				beof;
 
 	// is wait?
-	tb_bool_t 			wait;
+	tb_bool_t 				wait;
 
 	// the last
-	tb_long_t 			last;
+	tb_long_t 				last;
 
 	// the mode, none: 0, read: 1, writ: -1
-	tb_long_t 			mode;
+	tb_long_t 				mode;
 
 	// the bstream
 	tb_basic_stream_t* 		bstream;

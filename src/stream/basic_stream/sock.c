@@ -24,7 +24,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"bstream_sock"
+#define TB_TRACE_MODULE_NAME 			"basic_stream_sock"
 #define TB_TRACE_MODULE_DEBUG 			(0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -58,34 +58,34 @@ typedef struct __tb_basic_stream_sock_t
 	tb_basic_stream_t 		base;
 
 	// the sock handle
-	tb_handle_t 		sock;
+	tb_handle_t 			sock;
 
 #ifdef TB_SSL_ENABLE
 	// the ssl handle
-	tb_handle_t 		hssl;
+	tb_handle_t 			hssl;
 #endif
 
 	// the sock type
-	tb_uint32_t 		type 	: 22;
+	tb_uint32_t 			type 	: 22;
 
 	// the try number
-	tb_uint32_t 		tryn 	: 8;
+	tb_uint32_t 			tryn 	: 8;
 
 	// the sock bref
-	tb_uint32_t 		bref 	: 1;
+	tb_uint32_t 			bref 	: 1;
 
 	// keep alive after being closed?
-	tb_uint32_t 		balived : 1;
+	tb_uint32_t 			balived : 1;
 
 	// the wait event
-	tb_long_t 			wait;
+	tb_long_t 				wait;
 
-	// the read & writ
-	tb_size_t 			read;
-	tb_size_t 			writ;
+	// the read and writ
+	tb_size_t 				read;
+	tb_size_t 				writ;
 	
 	// the host address
-	tb_ipv4_t 			addr;
+	tb_ipv4_t 				addr;
 
 }tb_basic_stream_sock_t;
 

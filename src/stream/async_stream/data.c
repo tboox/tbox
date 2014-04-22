@@ -24,7 +24,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 				"astream_data"
+#define TB_TRACE_MODULE_NAME 				"async_stream_data"
 #define TB_TRACE_MODULE_DEBUG 				(0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -42,13 +42,13 @@
 typedef struct __tb_async_stream_data_read_t
 {
 	// the func
-	tb_async_stream_read_func_t 		func;
+	tb_async_stream_read_func_t			func;
 
 	// the size
-	tb_size_t 					size;
+	tb_size_t 							size;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_pointer_t 						priv;
 
 }tb_async_stream_data_read_t;
 
@@ -56,16 +56,16 @@ typedef struct __tb_async_stream_data_read_t
 typedef struct __tb_async_stream_data_writ_t
 {
 	// the func
-	tb_async_stream_writ_func_t 		func;
+	tb_async_stream_writ_func_t			func;
 
 	// the data
-	tb_byte_t const* 			data;
+	tb_byte_t const* 					data;
 
 	// the size
-	tb_size_t 					size;
+	tb_size_t 							size;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_pointer_t 						priv;
 
 }tb_async_stream_data_writ_t;
 
@@ -73,10 +73,10 @@ typedef struct __tb_async_stream_data_writ_t
 typedef struct __tb_async_stream_data_task_t
 {
 	// the func
-	tb_async_stream_task_func_t 		func;
+	tb_async_stream_task_func_t			func;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_pointer_t 						priv;
 
 }tb_async_stream_data_task_t;
 
@@ -84,25 +84,25 @@ typedef struct __tb_async_stream_data_task_t
 typedef struct __tb_async_stream_data_t
 {
 	// the base
-	tb_async_stream_t 				base;
+	tb_async_stream_t 					base;
 
 	// the aico for task
-	tb_handle_t 				aico;
+	tb_handle_t 						aico;
 
 	// the data
-	tb_byte_t* 					data;
+	tb_byte_t* 							data;
 
 	// the head
-	tb_byte_t* 					head;
+	tb_byte_t* 							head;
 
 	// the size
-	tb_size_t 					size;
+	tb_size_t 							size;
 
 	// the data is referenced?
-	tb_bool_t 					bref;
+	tb_bool_t 							bref;
 
 	// the offset
-	tb_atomic64_t 				offset;
+	tb_atomic64_t 						offset;
 
 	// the func
 	union
@@ -111,7 +111,7 @@ typedef struct __tb_async_stream_data_t
 		tb_async_stream_data_writ_t 	writ;
 		tb_async_stream_data_task_t 	task;
 
-	} 							func;
+	} 									func;
 
 }tb_async_stream_data_t;
 
