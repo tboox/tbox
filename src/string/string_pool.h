@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		string_cache.h
+ * @file		string_pool.h
  * @ingroup 	memory
  *
  */
-#ifndef TB_MEMORY_STRING_CACHE_H
-#define TB_MEMORY_STRING_CACHE_H
+#ifndef TB_MEMORY_STRING_POOL_H
+#define TB_MEMORY_STRING_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -33,42 +33,57 @@
  * interfaces
  */
 
-/*! init string cache for small, readonly and repeat strings
+/*! init string pool for small, readonly and repeat strings
  *
  * readonly, strip repeat strings and decrease memory fragmens
  *
+ * @param bcase 	is case?
  * @param align 	the cpu align bytes
  *
- * @return 			tb_true or tb_false
+ * @return 			the string pool
  */
-tb_bool_t 			tb_string_cache_init(tb_size_t align);
+tb_handle_t 		tb_string_pool_init(tb_bool_t bcase, tb_size_t align);
 
-/*! exit the string cache
- */
-tb_void_t 			tb_string_cache_exit(tb_noarg_t);
-
-/*! clear the string cache
- */
-tb_void_t 			tb_string_cache_clear(tb_noarg_t);
-
-/*! put string to scache
+/*! exit the string pool
  *
+ * @param pool 		the string pool
+ */
+tb_void_t 			tb_string_pool_exit(tb_handle_t pool);
+
+/*! clear the string pool
+ *
+ * @param pool 		the string pool
+ */
+tb_void_t 			tb_string_pool_clear(tb_handle_t pool);
+
+/*! put string to the pool and increase the reference count
+ *
+ * @param pool 		the string pool
  * @param data 		the string data
  *
  * @return 			the string data
  */
-tb_char_t const*	tb_string_cache_put(tb_char_t const* data);
+tb_char_t const*	tb_string_pool_put(tb_handle_t pool, tb_char_t const* data);
 
-/*! del string from scache
+/*! remove string from the pool if the reference count be zero
  *
+ * @param pool 		the string pool
  * @param data 		the string data
  */
-tb_void_t 			tb_string_cache_del(tb_char_t const* data);
+tb_void_t 			tb_string_pool_del(tb_handle_t pool, tb_char_t const* data);
+
+/*! the string pool instance
+ *
+ * @return pool 	the string pool instance
+ */
+tb_handle_t 		tb_string_pool_instance(tb_noarg_t);
 
 #ifdef __tb_debug__
-/*! dump the string cache
+/*! dump the string pool
+ *
+ * @param pool 		the string pool
  */
-tb_void_t 			tb_string_cache_dump(tb_noarg_t);
+tb_void_t 			tb_string_pool_dump(tb_handle_t pool);
 #endif
 
 #endif

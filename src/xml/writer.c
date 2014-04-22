@@ -52,13 +52,13 @@
 typedef struct __tb_xml_writer_t
 {
 	// stream
-	tb_basic_stream_t* 			wstream;
+	tb_basic_stream_t* 		wstream;
 
 	// is format?
 	tb_bool_t 				bformat;
 	
-	// spool
-	tb_handle_t 			spool;
+	// the block pool
+	tb_handle_t 			pool;
 
 	// stack
 	tb_stack_t* 			elements;
@@ -71,38 +71,51 @@ typedef struct __tb_xml_writer_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
 {
 	// check
 	tb_assert_and_check_return_val(wstream, tb_null);
 
-	// alloc
-	tb_xml_writer_t* writer = tb_malloc0(sizeof(tb_xml_writer_t));
-	tb_assert_and_check_return_val(writer, tb_null);
+	// done
+	tb_bool_t 			ok = tb_false;
+	tb_xml_writer_t* 	writer = tb_null;
+	do
+	{
+		// make writer
+		writer = tb_malloc0(sizeof(tb_xml_writer_t));
+		tb_assert_and_check_break(writer);
 
-	// init
-	writer->wstream 	= wstream;
-	writer->bformat 	= bformat;
+		// init writer
+		writer->wstream 	= wstream;
+		writer->bformat 	= bformat;
 
-	// init spool
-	writer->spool 		= tb_block_pool_init(TB_BLOCK_POOL_GROW_SMALL, 0);
-	tb_assert_and_check_goto(writer->spool, fail);
-	
-	// init elements
-	writer->elements 	= tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false, writer->spool));
-	tb_assert_and_check_goto(writer->elements, fail);
+		// init pool
+		writer->pool 		= tb_block_pool_init(TB_BLOCK_POOL_GROW_SMALL, 0);
+		tb_assert_and_check_break(writer->pool);
+		
+		// init elements
+		writer->elements 	= tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false, writer->pool));
+		tb_assert_and_check_break(writer->elements);
 
-	// init attributes
-	writer->attributes 	= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, writer->spool), tb_item_func_str(tb_false, writer->spool));
-	tb_assert_and_check_goto(writer->attributes, fail);
+		// init attributes
+		writer->attributes 	= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, writer->pool), tb_item_func_str(tb_false, writer->pool));
+		tb_assert_and_check_break(writer->attributes);
 
-	// ok
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// exit it
+		if (writer) tb_xml_writer_exit(writer);
+		writer = tb_null;
+	}
+
+	// ok?
 	return writer;
-
-fail:
-	if (writer) tb_xml_writer_exit(writer);
-	return tb_null;
 }
 tb_void_t tb_xml_writer_exit(tb_handle_t writer)
 {
@@ -111,12 +124,15 @@ tb_void_t tb_xml_writer_exit(tb_handle_t writer)
 	{
 		// exit attributes
 		if (xwriter->attributes) tb_hash_exit(xwriter->attributes);
+		xwriter->attributes = tb_null;
 
 		// exit elements
 		if (xwriter->elements) tb_stack_exit(xwriter->elements);
+		xwriter->elements = tb_null;
 
-		// exit spool
-		if (xwriter->spool) tb_block_pool_exit(xwriter->spool);
+		// exit pool
+		if (xwriter->pool) tb_block_pool_exit(xwriter->pool);
+		xwriter->pool = tb_null;
 
 		// free it
 		tb_free(xwriter);
@@ -124,7 +140,10 @@ tb_void_t tb_xml_writer_exit(tb_handle_t writer)
 }
 tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
 {
+	// check
 	tb_assert_and_check_return(writer && node);
+
+	// done
 	switch (node->type)
 	{
 	case TB_XML_NODE_TYPE_DOCUMENT:
@@ -203,6 +222,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
 }
 tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* charset)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream);
 
@@ -211,6 +231,7 @@ tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, t
 }
 tb_void_t tb_xml_writer_document_type(tb_handle_t writer, tb_char_t const* type)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream);
 
@@ -219,6 +240,7 @@ tb_void_t tb_xml_writer_document_type(tb_handle_t writer, tb_char_t const* type)
 }
 tb_void_t tb_xml_writer_cdata(tb_handle_t writer, tb_char_t const* data)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream && data);
 
@@ -234,6 +256,7 @@ tb_void_t tb_xml_writer_cdata(tb_handle_t writer, tb_char_t const* data)
 }
 tb_void_t tb_xml_writer_text(tb_handle_t writer, tb_char_t const* text)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream && text);
 
@@ -249,6 +272,7 @@ tb_void_t tb_xml_writer_text(tb_handle_t writer, tb_char_t const* text)
 }
 tb_void_t tb_xml_writer_comment(tb_handle_t writer, tb_char_t const* comment)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream && comment);
 
@@ -264,6 +288,7 @@ tb_void_t tb_xml_writer_comment(tb_handle_t writer, tb_char_t const* comment)
 }
 tb_void_t tb_xml_writer_element_empty(tb_handle_t writer, tb_char_t const* name)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->attributes && name);
 
@@ -294,6 +319,7 @@ tb_void_t tb_xml_writer_element_empty(tb_handle_t writer, tb_char_t const* name)
 }
 tb_void_t tb_xml_writer_element_enter(tb_handle_t writer, tb_char_t const* name)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->elements && xwriter->attributes && name);
 
@@ -327,6 +353,7 @@ tb_void_t tb_xml_writer_element_enter(tb_handle_t writer, tb_char_t const* name)
 }
 tb_void_t tb_xml_writer_element_leave(tb_handle_t writer)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->elements && xwriter->attributes);
 
@@ -350,6 +377,7 @@ tb_void_t tb_xml_writer_element_leave(tb_handle_t writer)
 }
 tb_void_t tb_xml_writer_attributes_long(tb_handle_t writer, tb_char_t const* name, tb_long_t value)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
 
@@ -359,6 +387,7 @@ tb_void_t tb_xml_writer_attributes_long(tb_handle_t writer, tb_char_t const* nam
 }
 tb_void_t tb_xml_writer_attributes_bool(tb_handle_t writer, tb_char_t const* name, tb_bool_t value)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
 
@@ -368,6 +397,7 @@ tb_void_t tb_xml_writer_attributes_bool(tb_handle_t writer, tb_char_t const* nam
 }
 tb_void_t tb_xml_writer_attributes_cstr(tb_handle_t writer, tb_char_t const* name, tb_char_t const* value)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->attributes && name && value);
 
@@ -375,6 +405,7 @@ tb_void_t tb_xml_writer_attributes_cstr(tb_handle_t writer, tb_char_t const* nam
 }
 tb_void_t tb_xml_writer_attributes_format(tb_handle_t writer, tb_char_t const* name, tb_char_t const* format, ...)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->attributes && name && format);
 
@@ -386,6 +417,7 @@ tb_void_t tb_xml_writer_attributes_format(tb_handle_t writer, tb_char_t const* n
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_xml_writer_attributes_float(tb_handle_t writer, tb_char_t const* name, tb_float_t value)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
 
@@ -395,6 +427,7 @@ tb_void_t tb_xml_writer_attributes_float(tb_handle_t writer, tb_char_t const* na
 }
 tb_void_t tb_xml_writer_attributes_double(tb_handle_t writer, tb_char_t const* name, tb_double_t value)
 {
+	// check
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
 

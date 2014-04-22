@@ -118,9 +118,9 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 	{
 		// post it	
 #ifdef __tb_debug__
-		if (!tb_aicp_post_impl(aicp, posted_aice, aice->aico->func, aice->aico->line, aice->aico->file))
+		if (!tb_aicp_post_(aicp, posted_aice, aice->aico->func, aice->aico->line, aice->aico->file))
 #else
-		if (!tb_aicp_post_impl(aicp, posted_aice))
+		if (!tb_aicp_post_(aicp, posted_aice))
 #endif
 		{
 			// not posted
@@ -309,7 +309,7 @@ tb_void_t tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico)
 		aicp->ptor->kilo(aicp->ptor, aico);
 	}
 }
-tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__)
+tb_bool_t tb_aicp_post_(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
@@ -344,7 +344,7 @@ tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_de
 	// post aice
 	return aicp->ptor->post(aicp->ptor, aice);
 }
-tb_bool_t tb_aicp_post_after_impl(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__)
+tb_bool_t tb_aicp_post_after_(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
@@ -354,7 +354,7 @@ tb_bool_t tb_aicp_post_after_impl(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t co
 	tb_check_return_val(!tb_atomic_get(&aicp->kill), tb_false);
 
 	// no delay?
-	if (!delay) return tb_aicp_post_impl(aicp, aice __tb_debug_args__);
+	if (!delay) return tb_aicp_post_(aicp, aice __tb_debug_args__);
 
 	// make the posted aice
 	tb_aice_t* posted_aice = (tb_aice_t*)tb_aico_pool_malloc0(aice->aico, sizeof(tb_aice_t));
@@ -364,7 +364,7 @@ tb_bool_t tb_aicp_post_after_impl(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t co
 	*posted_aice = *aice;
 
 	// run the delay task
-	return tb_aico_task_run_impl(aice->aico, delay, tb_aicp_post_after_func, posted_aice __tb_debug_args__);
+	return tb_aico_task_run_(aice->aico, delay, tb_aicp_post_after_func, posted_aice __tb_debug_args__);
 }
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {

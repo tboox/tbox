@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "string_pool.h"
 #include "scoped_string.h"
 #include "static_string.h"
 

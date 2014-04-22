@@ -155,7 +155,7 @@ tb_void_t tb_object_pool_dump(tb_handle_t handle)
 	tb_spinlock_enter(&pool->lock);
 
 	// dump
-	if (pool->pool) tb_block_pool_dump(pool->pool, "object_pool");
+	if (pool->pool) tb_block_pool_dump(pool->pool, "[object_pool]");
 
 	// leave
 	tb_spinlock_leave(&pool->lock);

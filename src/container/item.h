@@ -65,8 +65,8 @@ typedef enum __tb_item_type_t
 ,	TB_ITEM_TYPE_EFM 		= 8 	//!< external fixed memory
 ,	TB_ITEM_TYPE_IFM 		= 9 	//!< internal fixed memory
 ,	TB_ITEM_TYPE_OBJ 		= 10 	//!< object
-,	TB_ITEM_TYPE_SCACHE 	= 11 	//!< scache
-,	TB_ITEM_TYPE_TRUE 		= 12 	//!< true
+,	TB_ITEM_TYPE_TRUE 		= 11 	//!< true
+,	TB_ITEM_TYPE_SPOOL 		= 12 	//!< string pool
 ,	TB_ITEM_TYPE_OTR 		= 13 	//!< other
 
 }tb_item_type_t;
@@ -143,23 +143,17 @@ tb_item_func_t 		tb_item_func_uint16(tb_noarg_t);
  */
 tb_item_func_t 		tb_item_func_uint32(tb_noarg_t);
 
-/*! the integer item function for tb_uint64_t
- *
- * @return 			the item func
- */
-tb_item_func_t 		tb_item_func_uint64(tb_noarg_t);
-
 /*! the string item function
  *
- * using tb_strdup if the spool is null, 
- * using tb_block_pool_strdup if the spool exists
+ * using tb_strdup if the bpool is null, 
+ * using tb_block_pool_strdup if the bpool exists
  *
  * @param bcase 	is case?
- * @param spool 	the string pool
+ * @param bpool 	the block pool
 
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool); 
+tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t bpool); 
 
 /*! the pointer item function
  *
@@ -182,15 +176,15 @@ tb_item_func_t 		tb_item_func_obj(tb_noarg_t);
  *
  * storing the index value in the internal item of the container
  *
- * using tb_malloc if the rpool is null, 
- * using tb_fixed_pool_malloc if the rpool exists
+ * using tb_malloc if the fpool is null, 
+ * using tb_fixed_pool_malloc if the fpool exists
  *
  * @param size 		the item size
  * @param rpool 	the item rpool
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_handle_t rpool);
+tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_handle_t fpool);
 
 /*! the internal fixed memory item function
  *
@@ -210,7 +204,7 @@ tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_c
 
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_string_cache(tb_bool_t bcase); 
+tb_item_func_t 		tb_item_func_string_pool(tb_handle_t spool); 
 
 #endif
 

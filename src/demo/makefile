@@ -61,17 +61,17 @@ demo_C_FILES 							+= \
 										stream/async_stream/null \
 										stream/async_stream/cache \
 										stream/async_stream/charset \
+										string/string_pool \
 										string/scoped_string \
 										string/static_string \
 										memory/check \
-										memory/static_fixed_pool \
-										memory/global_pool \
-										memory/static_block_pool \
-										memory/block_pool \
 										memory/fixed_pool \
+										memory/block_pool \
+										memory/global_pool \
+										memory/static_fixed_pool \
+										memory/static_block_pool \
 										memory/static_tiny_pool \
 										memory/memops \
-										memory/string_cache \
 										memory/queue_buffer \
 										memory/scoped_buffer \
 										memory/static_buffer \

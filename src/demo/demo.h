@@ -114,6 +114,7 @@ TB_DEMO_MAIN_DECL(stream_async_stream_cache);
 TB_DEMO_MAIN_DECL(stream_async_stream_charset);
 
 // string
+TB_DEMO_MAIN_DECL(string_pool);
 TB_DEMO_MAIN_DECL(string_scoped_string);
 TB_DEMO_MAIN_DECL(string_static_string);
 
@@ -126,7 +127,6 @@ TB_DEMO_MAIN_DECL(memory_tiny_pool);
 TB_DEMO_MAIN_DECL(memory_static_block_pool);
 TB_DEMO_MAIN_DECL(memory_fixed_pool);
 TB_DEMO_MAIN_DECL(memory_memops);
-TB_DEMO_MAIN_DECL(memory_string_cache);
 TB_DEMO_MAIN_DECL(memory_scoped_buffer);
 TB_DEMO_MAIN_DECL(memory_queue_buffer);
 TB_DEMO_MAIN_DECL(memory_static_buffer);
