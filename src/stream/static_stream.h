@@ -79,29 +79,35 @@
 # 	ifdef TB_FLOAT_BIGENDIAN
 # 		define tb_static_stream_read_double_nbe(stream) 		tb_static_stream_read_double_bbe(stream)
 # 		define tb_static_stream_read_double_nle(stream) 		tb_static_stream_read_double_ble(stream)
+
 # 		define tb_static_stream_writ_double_nbe(stream, val) 	tb_static_stream_writ_double_bbe(stream, val)
 # 		define tb_static_stream_writ_double_nle(stream, val) 	tb_static_stream_writ_double_ble(stream, val)
 # 	else
 # 		define tb_static_stream_read_double_nbe(stream) 		tb_static_stream_read_double_lbe(stream)
 # 		define tb_static_stream_read_double_nle(stream) 		tb_static_stream_read_double_lle(stream)
+
 # 		define tb_static_stream_writ_double_nbe(stream, val) 	tb_static_stream_writ_double_lbe(stream, val)
 # 		define tb_static_stream_writ_double_nle(stream, val) 	tb_static_stream_writ_double_lle(stream, val)
 # 	endif
 # 	ifdef TB_WORDS_BIGENDIAN
 # 		define tb_static_stream_read_float_ne(stream) 			tb_static_stream_read_float_be(stream)
 # 		define tb_static_stream_writ_float_ne(stream, val) 		tb_static_stream_writ_float_be(stream, val)
+
 # 		define tb_static_stream_read_double_nne(stream) 		tb_static_stream_read_double_nbe(stream)
 # 		define tb_static_stream_read_double_bne(stream) 		tb_static_stream_read_double_bbe(stream)
 # 		define tb_static_stream_read_double_lne(stream) 		tb_static_stream_read_double_lbe(stream)
+
 # 		define tb_static_stream_writ_double_nne(stream, val) 	tb_static_stream_writ_double_nbe(stream, val)
 # 		define tb_static_stream_writ_double_bne(stream, val) 	tb_static_stream_writ_double_bbe(stream, val)
 # 		define tb_static_stream_writ_double_lne(stream, val) 	tb_static_stream_writ_double_lbe(stream, val)
 # 	else
 # 		define tb_static_stream_read_float_ne(stream) 			tb_static_stream_read_float_le(stream)
 # 		define tb_static_stream_writ_float_ne(stream, val) 		tb_static_stream_writ_float_le(stream, val)
+
 # 		define tb_static_stream_read_double_nne(stream) 		tb_static_stream_read_double_nle(stream)
 # 		define tb_static_stream_read_double_bne(stream) 		tb_static_stream_read_double_ble(stream)
 # 		define tb_static_stream_read_double_lne(stream) 		tb_static_stream_read_double_lle(stream)
+
 # 		define tb_static_stream_writ_double_nne(stream, val) 	tb_static_stream_writ_double_nle(stream, val)
 # 		define tb_static_stream_writ_double_bne(stream, val) 	tb_static_stream_writ_double_ble(stream, val)
 # 		define tb_static_stream_writ_double_lne(stream, val) 	tb_static_stream_writ_double_lle(stream, val)
