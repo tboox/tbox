@@ -50,26 +50,36 @@ tb_bool_t tb_static_stream_init(tb_static_stream_t* stream, tb_byte_t* data, tb_
 	// ok
 	return tb_true;
 }
-tb_void_t tb_static_stream_goto(tb_static_stream_t* stream, tb_byte_t* data)
+tb_bool_t tb_static_stream_goto(tb_static_stream_t* stream, tb_byte_t* data)
 {
 	// check
-	tb_assert_and_check_return(stream && data <= stream->e);
+	tb_assert_and_check_return_val(stream && data <= stream->e, tb_false);
 
 	// goto
 	stream->b = 0;
 	if (data <= stream->e) stream->p = data;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_sync(tb_static_stream_t* stream)
+tb_bool_t tb_static_stream_sync(tb_static_stream_t* stream)
 {
 	// check
-	tb_assert_and_check_return(stream);
+	tb_assert_and_check_return_val(stream, tb_false);
 
 	// sync
 	if (stream->b) 
 	{
+		// check
+		tb_assert_and_check_return_val(stream->p + 1 <= stream->e, tb_false);
+
+		// p++
 		stream->p++;
 		stream->b = 0;
 	}
+
+	// ok
+	return tb_true;
 }
 tb_byte_t const* tb_static_stream_beg(tb_static_stream_t* stream)
 {
@@ -138,32 +148,57 @@ tb_size_t tb_static_stream_left_bits(tb_static_stream_t* stream)
 }
 tb_bool_t tb_static_stream_valid(tb_static_stream_t* stream)
 {
+	// null?
 	if (!stream) return tb_false;
+
+	// out of range?
 	if (stream->p && stream->p > stream->e) return tb_false;
+	if (stream->p == stream->e && stream->b) return tb_false;
+
+	// ok
 	return tb_true;
 }
-tb_void_t tb_static_stream_skip(tb_static_stream_t* stream, tb_size_t size)
+tb_bool_t tb_static_stream_skip(tb_static_stream_t* stream, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return(stream && stream->p <= stream->e);
+	tb_assert_and_check_return_val(stream, tb_false);
 
-	// sync
-	tb_static_stream_sync(stream);
+	// sync it first
+	if (!tb_static_stream_sync(stream)) return tb_false;
+
+	// check
+	tb_assert_and_check_return_val(stream->p + size <= stream->e, tb_false);
 
 	// skip
 	stream->p += size;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_skip_bits(tb_static_stream_t* stream, tb_size_t nbits)
+tb_bool_t tb_static_stream_skip_bits(tb_static_stream_t* stream, tb_size_t nbits)
 {
 	// check
-	tb_assert_and_check_return(stream && stream->p <= stream->e);
+	tb_assert_and_check_return_val(stream && stream->p <= stream->e, tb_false);
 
-	stream->p += (stream->b + nbits) >> 3;
-	stream->b = (stream->b + nbits) & 0x07;
+	// the new position
+	tb_byte_t* 	p = stream->p + ((stream->b + nbits) >> 3);
+	tb_size_t 	b = (stream->b + nbits) & 0x07;
+	tb_assert_and_check_return_val(p <= stream->e && (p < stream->e || !b), tb_false);
+
+	// skip it
+	stream->p = p;
+	stream->b = b;
+
+	// ok
+	return tb_true;
 }
-tb_char_t const* tb_static_stream_skip_cstr(tb_static_stream_t* stream)
+tb_bool_t tb_static_stream_skip_cstr(tb_static_stream_t* stream)
 {
-	return tb_static_stream_read_cstr(stream);
+	// read it
+	tb_static_stream_read_cstr(stream);
+
+	// ok?
+	return tb_static_stream_valid(stream);
 }
 tb_uint32_t tb_static_stream_peek_ubits32(tb_static_stream_t* stream, tb_size_t nbits)
 {
@@ -173,14 +208,14 @@ tb_uint32_t tb_static_stream_peek_ubits32(tb_static_stream_t* stream, tb_size_t 
 	// no nbits?
 	tb_check_return_val(nbits, 0);
 
-	// save status
+	// save 
 	tb_byte_t* 	p = stream->p;
 	tb_size_t 	b = stream->b;
 
 	// peek value
 	tb_uint32_t val = tb_static_stream_read_ubits32(stream, nbits);
 
-	// restore status
+	// restore 
 	stream->p = p;
 	stream->b = b;
 
@@ -195,187 +230,46 @@ tb_sint32_t tb_static_stream_peek_sbits32(tb_static_stream_t* stream, tb_size_t 
 	// no nbits?
 	tb_check_return_val(nbits, 0);
 
-	// save status
+	// save 
 	tb_byte_t* 	p = stream->p;
 	tb_size_t 	b = stream->b;
 
 	// peek value
 	tb_sint32_t val = tb_static_stream_read_sbits32(stream, nbits);
 
-	// restore status
+	// restore 
 	stream->p = p;
 	stream->b = b;
 
 	// ok?
 	return val;
 }
-tb_uint8_t tb_static_stream_read_u1(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream, 0);
-	tb_uint8_t val = ((*stream->p) >> (7 - stream->b)) & 1;
-	stream->b++;
-	if (stream->b >= 8) 
-	{
-		stream->p++;
-		stream->b = 0;
-	}
-	return val;
-}
-tb_uint8_t tb_static_stream_read_u8(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	return *(stream->p++);
-}
-tb_sint8_t tb_static_stream_read_s8(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	return *(stream->p++);
-}
-tb_uint16_t tb_static_stream_read_u16_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint16_t val = tb_bits_get_u16_be(stream->p);
-	stream->p += 2;
-	return val;
-	
-}
-tb_sint16_t tb_static_stream_read_s16_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint16_t val = tb_bits_get_s16_be(stream->p);
-	stream->p += 2;
-	return val;
-	
-}
-tb_uint16_t tb_static_stream_read_u16_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint16_t val = tb_bits_get_u16_le(stream->p);
-	stream->p += 2;
-	return val;
-	
-}
-tb_sint16_t tb_static_stream_read_s16_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint16_t val = tb_bits_get_s16_le(stream->p);
-	stream->p += 2;
-	return val;
-	
-}
-tb_uint32_t tb_static_stream_read_u24_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint32_t val = tb_bits_get_u24_be(stream->p);
-	stream->p += 3;
-	return val;
-	
-}
-tb_sint32_t tb_static_stream_read_s24_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint32_t val = tb_bits_get_s24_be(stream->p);
-	stream->p += 3;
-	return val;
-	
-}
-tb_uint32_t tb_static_stream_read_u32_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint32_t val = tb_bits_get_u32_be(stream->p);;
-	stream->p += 4;
-	return val;
-	
-}
-tb_sint32_t tb_static_stream_read_s32_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint32_t val = tb_bits_get_s32_be(stream->p);
-	stream->p += 4;
-	return val;
-	
-}
-tb_uint64_t tb_static_stream_read_u64_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint64_t val = tb_bits_get_u64_be(stream->p);;
-	stream->p += 8;
-	return val;
-	
-}
-tb_sint64_t tb_static_stream_read_s64_be(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint64_t val = tb_bits_get_s64_be(stream->p);
-	stream->p += 8;
-	return val;
-	
-}
-tb_uint32_t tb_static_stream_read_u24_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint32_t val = tb_bits_get_u24_le(stream->p);
-	stream->p += 3;
-	return val;
-}
-tb_sint32_t tb_static_stream_read_s24_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint32_t val = tb_bits_get_s24_le(stream->p);
-	stream->p += 3;
-	return val;
-	
-}
-tb_uint32_t tb_static_stream_read_u32_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint32_t val = tb_bits_get_u32_le(stream->p);
-	stream->p += 4;
-	return val;
-	
-}
-tb_sint32_t tb_static_stream_read_s32_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint32_t val = tb_bits_get_s32_le(stream->p);
-	stream->p += 4;
-	return val;
-	
-}
-tb_uint64_t tb_static_stream_read_u64_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_uint64_t val = tb_bits_get_u64_le(stream->p);
-	stream->p += 8;
-	return val;
-	
-}
-tb_sint64_t tb_static_stream_read_s64_le(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_sint64_t val = tb_bits_get_s64_le(stream->p);
-	stream->p += 8;
-	return val;
-	
-}
 tb_uint32_t tb_static_stream_read_ubits32(tb_static_stream_t* stream, tb_size_t nbits)
 {
-	if (!nbits || !stream) return 0;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && nbits, 0);
 
+	// read value
 	tb_uint32_t val = tb_bits_get_ubits32(stream->p, stream->b, nbits);
-	stream->p += (stream->b + nbits) >> 3;
-	stream->b = (stream->b + nbits) & 0x07;
 
+	// skip bits
+	if (!tb_static_stream_skip_bits(stream, nbits)) return 0;
+
+	// ok?
 	return val;
 }
 tb_sint32_t tb_static_stream_read_sbits32(tb_static_stream_t* stream, tb_size_t nbits)
 {
-	if (!nbits || !stream) return 0;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && nbits, 0);
 
+	// read value
 	tb_sint32_t val = tb_bits_get_sbits32(stream->p, stream->b, nbits);
-	stream->p += (stream->b + nbits) >> 3;
-	stream->b = (stream->b + nbits) & 0x07;
 
+	// skip bits
+	if (!tb_static_stream_skip_bits(stream, nbits)) return 0;
+
+	// ok?
 	return val;
 }
 tb_char_t const* tb_static_stream_read_cstr(tb_static_stream_t* stream)
@@ -383,378 +277,712 @@ tb_char_t const* tb_static_stream_read_cstr(tb_static_stream_t* stream)
 	// check
 	tb_assert_and_check_return_val(stream && stream->p <= stream->e, tb_null);
 
-	// sync
-	tb_static_stream_sync(stream);
+	// sync it first
+	if (!tb_static_stream_sync(stream)) return tb_null;
 
-	// find '\0'
-	tb_byte_t const* p = stream->p;
-	while (*p && p < stream->e) p++;
+	// the string data
+	tb_char_t const* data = (tb_char_t const*)stream->p;
 
-	// is string with '\0' ?
-	if ((*p)) return tb_null;
+	// the string size
+	tb_size_t size = tb_strnlen(data, stream->e - stream->p);
 
-	tb_char_t const* s = (tb_char_t const*)stream->p;
-	stream->p += p - stream->p + 1;
+	// skip bytes
+	if (!tb_static_stream_skip(stream, size + 1)) return tb_null;
 
-	return s;
+	// ok
+	return data;
 }
 tb_size_t tb_static_stream_read_data(tb_static_stream_t* stream, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(stream->e >= stream->p, 0);
-
-	// sync
-	tb_static_stream_sync(stream);
+	tb_assert_and_check_return_val(stream && stream->p <= stream->e && data, 0);
 	
-	// the need
+	// no size?
+	tb_check_return_val(size, 0);
+
+	// sync it first
+	if (!tb_static_stream_sync(stream)) return 0;
+	
+	// the need size
 	tb_size_t need = size;
 	if (stream->e - stream->p < need) need = stream->e - stream->p;
-
-	// copy data
-	if (need)
+	if (need) 
 	{
+		// copy it
 		tb_memcpy(data, stream->p, need);
-		stream->p += need;
+
+		// skip it
+		if (!tb_static_stream_skip(stream, need)) return 0;
 	}
 
 	// ok?
 	return need;
 }
-tb_void_t tb_static_stream_writ_u1(tb_static_stream_t* stream, tb_uint8_t val)
+tb_uint8_t tb_static_stream_read_u1(tb_static_stream_t* stream)
 {
 	// check
-	tb_assert_and_check_return(stream);
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e, 0);
 
-	// set
-	*(stream->p) &= ~(0x1 << (7 - stream->b));
-	*(stream->p) |= ((val & 0x1) << (7 - stream->b));
+	// the value
+	tb_uint8_t val = ((*stream->p) >> (7 - stream->b)) & 1;
 
-	// next
+	// update position
 	stream->b++;
 	if (stream->b >= 8) 
 	{
+		// check
+		tb_assert_and_check_return_val(stream->p <= stream->e, 0);
+
+		// update
 		stream->p++;
 		stream->b = 0;
 	}
+
+	// ok?
+	return val;
 }
-tb_void_t tb_static_stream_writ_u8(tb_static_stream_t* stream, tb_uint8_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	*(stream->p++) = val;
-}
-tb_void_t tb_static_stream_writ_s8(tb_static_stream_t* stream, tb_sint8_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	*(stream->p++) = val;
-}
-tb_void_t tb_static_stream_writ_u16_le(tb_static_stream_t* stream, tb_uint16_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_u16_le(stream->p, val);
-	stream->p += 2;
-}
-tb_void_t tb_static_stream_writ_s16_le(tb_static_stream_t* stream, tb_sint16_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_s16_le(stream->p, val);
-	stream->p += 2;
-}
-tb_void_t tb_static_stream_writ_u32_le(tb_static_stream_t* stream, tb_uint32_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_u32_le(stream->p, val);
-	stream->p += 4;
-}
-tb_void_t tb_static_stream_writ_s32_le(tb_static_stream_t* stream, tb_sint32_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_s32_le(stream->p, val);
-	stream->p += 4;
-}
-tb_void_t tb_static_stream_writ_u64_le(tb_static_stream_t* stream, tb_uint64_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_u64_le(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_s64_le(tb_static_stream_t* stream, tb_sint64_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_s64_le(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_u16_be(tb_static_stream_t* stream, tb_uint16_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_u16_be(stream->p, val);
-	stream->p += 2;
-}
-tb_void_t tb_static_stream_writ_s16_be(tb_static_stream_t* stream, tb_sint16_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_s16_be(stream->p, val);
-	stream->p += 2;
-}
-tb_void_t tb_static_stream_writ_u24_be(tb_static_stream_t* stream, tb_uint32_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_u24_be(stream->p, val);
-	stream->p += 3;
-}
-tb_void_t tb_static_stream_writ_s24_be(tb_static_stream_t* stream, tb_sint32_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_s24_be(stream->p, val);
-	stream->p += 3;
-}
-tb_void_t tb_static_stream_writ_u32_be(tb_static_stream_t* stream, tb_uint32_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_u32_be(stream->p, val);
-	stream->p += 4;
-}
-tb_void_t tb_static_stream_writ_s32_be(tb_static_stream_t* stream, tb_sint32_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_s32_be(stream->p, val);
-	stream->p += 4;
-}
-tb_void_t tb_static_stream_writ_u64_be(tb_static_stream_t* stream, tb_uint64_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_u64_be(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_s64_be(tb_static_stream_t* stream, tb_sint64_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_s64_be(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_ubits32(tb_static_stream_t* stream, tb_uint32_t val, tb_size_t nbits)
+tb_uint8_t tb_static_stream_read_u8(tb_static_stream_t* stream)
 {
 	// check
-	tb_assert_and_check_return(stream);
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && !stream->b, 0);
 
-	// no nbits?
-	tb_check_return(nbits);
+	// read it
+	return *(stream->p++);
+}
+tb_sint8_t tb_static_stream_read_s8(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && !stream->b, 0);
 
-	// set bits
+	// read it
+	return *(stream->p++);
+}
+tb_uint16_t tb_static_stream_read_u16_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint16_t val = tb_bits_get_u16_be(stream->p); stream->p += 2;
+
+	// ok?
+	return val;
+}
+tb_sint16_t tb_static_stream_read_s16_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint16_t val = tb_bits_get_s16_be(stream->p); stream->p += 2;
+
+	// ok?
+	return val;
+}
+tb_uint16_t tb_static_stream_read_u16_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint16_t val = tb_bits_get_u16_le(stream->p); stream->p += 2;
+
+	// ok?
+	return val;
+}
+tb_sint16_t tb_static_stream_read_s16_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint16_t val = tb_bits_get_s16_le(stream->p); stream->p += 2;
+
+	// ok?
+	return val;
+}
+tb_uint32_t tb_static_stream_read_u24_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint32_t val = tb_bits_get_u24_be(stream->p); stream->p += 3;
+
+	// ok?
+	return val;
+}
+tb_sint32_t tb_static_stream_read_s24_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint32_t val = tb_bits_get_s24_be(stream->p); stream->p += 3;
+
+	// ok?
+	return val;
+}
+tb_uint32_t tb_static_stream_read_u24_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint32_t val = tb_bits_get_u24_le(stream->p); stream->p += 3;
+
+	// ok?
+	return val;
+}
+tb_sint32_t tb_static_stream_read_s24_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint32_t val = tb_bits_get_s24_le(stream->p); stream->p += 3;
+
+	// ok?
+	return val;
+}
+tb_uint32_t tb_static_stream_read_u32_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint32_t val = tb_bits_get_u32_be(stream->p); stream->p += 4;
+
+	// ok?
+	return val;
+}
+tb_sint32_t tb_static_stream_read_s32_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint32_t val = tb_bits_get_s32_be(stream->p); stream->p += 4;
+
+	// ok?
+	return val;
+}
+tb_uint32_t tb_static_stream_read_u32_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint32_t val = tb_bits_get_u32_le(stream->p); stream->p += 4;
+
+	// ok?
+	return val;
+}
+tb_sint32_t tb_static_stream_read_s32_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint32_t val = tb_bits_get_s32_le(stream->p); stream->p += 4;
+
+	// ok?
+	return val;
+}
+tb_uint64_t tb_static_stream_read_u64_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint64_t val = tb_bits_get_u64_be(stream->p); stream->p += 8;
+
+	// ok?
+	return val;
+}
+tb_sint64_t tb_static_stream_read_s64_be(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint64_t val = tb_bits_get_s64_be(stream->p); stream->p += 8;
+
+	// ok?
+	return val;
+}
+tb_uint64_t tb_static_stream_read_u64_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_uint64_t val = tb_bits_get_u64_le(stream->p); stream->p += 8;
+
+	// ok?
+	return val;
+}
+tb_sint64_t tb_static_stream_read_s64_le(tb_static_stream_t* stream)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_sint64_t val = tb_bits_get_s64_le(stream->p); stream->p += 8;
+
+	// ok?
+	return val;
+}
+tb_bool_t tb_static_stream_writ_ubits32(tb_static_stream_t* stream, tb_uint32_t val, tb_size_t nbits)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && nbits, 0);
+
+	// writ bits
 	tb_bits_set_ubits32(stream->p, stream->b, val, nbits);
-	stream->p += (stream->b + nbits) >> 3;
-	stream->b = (stream->b + nbits) & 0x07;
-}
 
-tb_void_t tb_static_stream_writ_sbits32(tb_static_stream_t* stream, tb_sint32_t val, tb_size_t nbits)
+	// skip bits
+	return tb_static_stream_skip_bits(stream, nbits);
+}
+tb_bool_t tb_static_stream_writ_sbits32(tb_static_stream_t* stream, tb_sint32_t val, tb_size_t nbits)
 {
 	// check
-	tb_assert_and_check_return(stream);
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && nbits, 0);
 
-	// no nbits?
-	tb_check_return(nbits);
-
-	// set bits
+	// writ bits
 	tb_bits_set_sbits32(stream->p, stream->b, val, nbits);
-	stream->p += (stream->b + nbits) >> 3;
-	stream->b = (stream->b + nbits) & 0x07;
+
+	// skip bits
+	return tb_static_stream_skip_bits(stream, nbits);
 }
 tb_size_t tb_static_stream_writ_data(tb_static_stream_t* stream, tb_byte_t const* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(stream && stream->p && stream->e >= stream->p && data, 0);
+	tb_assert_and_check_return_val(stream && stream->p && stream->p <= stream->e && data, 0);
 
 	// no size?
 	tb_check_return_val(size, 0);
 
-	// sync
-	tb_static_stream_sync(stream);
+	// sync it first
+	if (!tb_static_stream_sync(stream)) return 0;
 
-	// set data
-	tb_size_t set_n = size;
-	if (stream->e - stream->p < set_n) set_n = stream->e - stream->p;
-	if (set_n)
+	// the need size
+	tb_size_t need = size;
+	if (stream->e - stream->p < need) need = stream->e - stream->p;
+	if (need)
 	{
-		tb_memcpy(stream->p, data, set_n);
-		stream->p += set_n;
-	}
-	return (set_n > 0? set_n : 0);
-}
+		// copy it
+		tb_memcpy(stream->p, data, need);
 
-tb_char_t* tb_static_stream_writ_cstr(tb_static_stream_t* stream, tb_char_t const* s)
+		// skip it
+		if (!tb_static_stream_skip(stream, need)) return 0;
+	}
+
+	// ok?
+	return need;
+}
+tb_char_t* tb_static_stream_writ_cstr(tb_static_stream_t* stream, tb_char_t const* cstr)
 {
 	// check
-	tb_assert_and_check_return_val(stream && stream->p && stream->e >= stream->p && s, tb_null);
+	tb_assert_and_check_return_val(stream && stream->p && stream->p <= stream->e && cstr, tb_null);
 
-	// sync
-	tb_static_stream_sync(stream);
+	// sync it first
+	if (!tb_static_stream_sync(stream)) return tb_null;
 
-	// set string
+	// writ string
 	tb_char_t* 			b = (tb_char_t*)stream->p;
 	tb_char_t* 			p = (tb_char_t*)stream->p;
 	tb_char_t const* 	e = (tb_char_t const*)stream->e - 1;
-	while (*s && p < e) *p++ = *s++;
+	while (*cstr && p < e) *p++ = *cstr++;
 	*p++ = '\0';
+
+	// check
+	tb_assert_and_check_return_val(!*cstr, tb_null);
+
+	// update position
 	stream->p = (tb_byte_t*)p;
 
-	// ok?
+	// ok
 	return b;
 }
+tb_bool_t tb_static_stream_writ_u1(tb_static_stream_t* stream, tb_uint8_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e, tb_false);
+
+	// writ bits
+	*(stream->p) &= ~(0x1 << (7 - stream->b));
+	*(stream->p) |= ((val & 0x1) << (7 - stream->b));
+
+	// update position
+	stream->b++;
+	if (stream->b >= 8) 
+	{
+		// check
+		tb_assert_and_check_return_val(stream->p <= stream->e, 0);
+
+		// update
+		stream->p++;
+		stream->b = 0;
+	}
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u8(tb_static_stream_t* stream, tb_uint8_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && !stream->b, tb_false);
+
+	// writ it
+	*(stream->p++) = val;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s8(tb_static_stream_t* stream, tb_sint8_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && !stream->b, tb_false);
+
+	// writ it
+	*(stream->p++) = val;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u16_be(tb_static_stream_t* stream, tb_uint16_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u16_be(stream->p, val); stream->p += 2;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s16_be(tb_static_stream_t* stream, tb_sint16_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s16_be(stream->p, val);
+	stream->p += 2;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u16_le(tb_static_stream_t* stream, tb_uint16_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u16_le(stream->p, val); stream->p += 2;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s16_le(tb_static_stream_t* stream, tb_sint16_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 1 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s16_le(stream->p, val); stream->p += 2;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u24_be(tb_static_stream_t* stream, tb_uint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u24_be(stream->p, val); stream->p += 3;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s24_be(tb_static_stream_t* stream, tb_sint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s24_be(stream->p, val); stream->p += 3;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u24_le(tb_static_stream_t* stream, tb_uint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u24_le(stream->p, val); stream->p += 3;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s24_le(tb_static_stream_t* stream, tb_sint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 2 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s24_le(stream->p, val); stream->p += 3;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u32_be(tb_static_stream_t* stream, tb_uint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u32_be(stream->p, val); stream->p += 4;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s32_be(tb_static_stream_t* stream, tb_sint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s32_be(stream->p, val); stream->p += 4;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u32_le(tb_static_stream_t* stream, tb_uint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u32_le(stream->p, val); stream->p += 4;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s32_le(tb_static_stream_t* stream, tb_sint32_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s32_le(stream->p, val); stream->p += 4;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u64_be(tb_static_stream_t* stream, tb_uint64_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u64_be(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s64_be(tb_static_stream_t* stream, tb_sint64_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s64_be(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_u64_le(tb_static_stream_t* stream, tb_uint64_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_u64_le(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_static_stream_writ_s64_le(tb_static_stream_t* stream, tb_sint64_t val)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_s64_le(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
+}
+
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_static_stream_read_float_le(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_float_t val = tb_bits_get_float_le(stream->p);
-	stream->p += 4;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_float_t val = tb_bits_get_float_le(stream->p); stream->p += 4;
+
+	// ok?
 	return val;
 }
 tb_float_t tb_static_stream_read_float_be(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_float_t val = tb_bits_get_float_be(stream->p);
-	stream->p += 4;
-	return val;
-}
-tb_float_t tb_static_stream_read_float_ne(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_float_t val = tb_bits_get_float_ne(stream->p);
-	stream->p += 4;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_float_t val = tb_bits_get_float_be(stream->p); stream->p += 4;
+
+	// ok?
 	return val;
 }
 tb_double_t tb_static_stream_read_double_ble(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_ble(stream->p);
-	stream->p += 8;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_double_t val = tb_bits_get_double_ble(stream->p); stream->p += 8;
+
+	// ok?
 	return val;
 }
 tb_double_t tb_static_stream_read_double_bbe(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_bbe(stream->p);
-	stream->p += 8;
-	return val;
-}
-tb_double_t tb_static_stream_read_double_bne(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_bne(stream->p);
-	stream->p += 8;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_double_t val = tb_bits_get_double_bbe(stream->p); stream->p += 8;
+
+	// ok?
 	return val;
 }
 tb_double_t tb_static_stream_read_double_lle(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_lle(stream->p);
-	stream->p += 8;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_double_t val = tb_bits_get_double_lle(stream->p); stream->p += 8;
+
+	// ok?
 	return val;
 }
 tb_double_t tb_static_stream_read_double_lbe(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_lbe(stream->p);
-	stream->p += 8;
-	return val;
-}
-tb_double_t tb_static_stream_read_double_lne(tb_static_stream_t* stream)
-{
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_lne(stream->p);
-	stream->p += 8;
-	return val;
-}
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
 
+	// read it
+	tb_double_t val = tb_bits_get_double_lbe(stream->p); stream->p += 8;
+
+	// ok?
+	return val;
+}
 tb_double_t tb_static_stream_read_double_nle(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_nle(stream->p);
-	stream->p += 8;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_double_t val = tb_bits_get_double_nle(stream->p); stream->p += 8;
+
+	// ok?
 	return val;
 }
 tb_double_t tb_static_stream_read_double_nbe(tb_static_stream_t* stream)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_nbe(stream->p);
-	stream->p += 8;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
+
+	// read it
+	tb_double_t val = tb_bits_get_double_nbe(stream->p); stream->p += 8;
+
+	// ok?
 	return val;
 }
-tb_double_t tb_static_stream_read_double_nne(tb_static_stream_t* stream)
+tb_bool_t tb_static_stream_writ_float_le(tb_static_stream_t* stream, tb_float_t val)
 {
-	tb_assert_and_check_return_val(stream && !stream->b, 0);
-	tb_double_t val = tb_bits_get_double_nne(stream->p);
-	stream->p += 8;
-	return val;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_float_le(stream->p, val); stream->p += 4;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_writ_float_le(tb_static_stream_t* stream, tb_float_t val)
+tb_bool_t tb_static_stream_writ_float_be(tb_static_stream_t* stream, tb_float_t val)
 {
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_float_le(stream->p, val);
-	stream->p += 4;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 3 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_float_be(stream->p, val); stream->p += 4;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_writ_float_be(tb_static_stream_t* stream, tb_float_t val)
+tb_bool_t tb_static_stream_writ_double_ble(tb_static_stream_t* stream, tb_double_t val)
 {
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_float_be(stream->p, val);
-	stream->p += 4;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_double_ble(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_writ_float_ne(tb_static_stream_t* stream, tb_float_t val)
+tb_bool_t tb_static_stream_writ_double_bbe(tb_static_stream_t* stream, tb_double_t val)
 {
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_float_ne(stream->p, val);
-	stream->p += 4;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_double_bbe(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_writ_double_ble(tb_static_stream_t* stream, tb_double_t val)
+tb_bool_t tb_static_stream_writ_double_lle(tb_static_stream_t* stream, tb_double_t val)
 {
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_ble(stream->p, val);
-	stream->p += 8;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_double_lle(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_writ_double_bbe(tb_static_stream_t* stream, tb_double_t val)
+tb_bool_t tb_static_stream_writ_double_lbe(tb_static_stream_t* stream, tb_double_t val)
 {
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_bbe(stream->p, val);
-	stream->p += 8;
+	// check
+	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, tb_false);
+
+	// writ it
+	tb_bits_set_double_lbe(stream->p, val); stream->p += 8;
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_static_stream_writ_double_bne(tb_static_stream_t* stream, tb_double_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_bne(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_double_lle(tb_static_stream_t* stream, tb_double_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_lle(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_double_lbe(tb_static_stream_t* stream, tb_double_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_lbe(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_double_lne(tb_static_stream_t* stream, tb_double_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_lne(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_double_nle(tb_static_stream_t* stream, tb_double_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_nle(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_double_nbe(tb_static_stream_t* stream, tb_double_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_nbe(stream->p, val);
-	stream->p += 8;
-}
-tb_void_t tb_static_stream_writ_double_nne(tb_static_stream_t* stream, tb_double_t val)
-{
-	tb_assert_and_check_return(stream && !stream->b);
-	tb_bits_set_double_nne(stream->p, val);
-	stream->p += 8;
-}
+
 #endif
