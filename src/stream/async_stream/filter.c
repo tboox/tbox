@@ -24,7 +24,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 				"astream_filter"
+#define TB_TRACE_MODULE_NAME 				"async_stream_filter"
 #define TB_TRACE_MODULE_DEBUG 				(0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -42,28 +42,28 @@
 typedef struct __tb_async_stream_filter_t
 {
 	// the base
-	tb_async_stream_t 				base;
+	tb_async_stream_t 					base;
 
 	// the filter 
-	tb_filter_t* 				filter;
+	tb_filter_t* 						filter;
 
 	// the filter is referenced? need not exit it
-	tb_uint32_t 				bref 	: 1;
+	tb_uint32_t 						bref 	: 1;
 
 	// is reading now?
-	tb_uint32_t 				bread 	: 1;
+	tb_uint32_t 						bread 	: 1;
 
 	// the astream
-	tb_async_stream_t* 				astream;
+	tb_async_stream_t* 					astream;
 
 	// the read size
-	tb_size_t 					size;
+	tb_size_t 							size;
 
 	// the offset
-	tb_atomic64_t 				offset;
+	tb_atomic64_t 						offset;
 
 	// is closing for sync
-	tb_bool_t 					bclosing;
+	tb_bool_t 							bclosing;
 
 	// the func
 	union
@@ -74,10 +74,10 @@ typedef struct __tb_async_stream_filter_t
 		tb_async_stream_sync_func_t 	sync;
 		tb_async_stream_task_func_t 	task;
 
-	} 							func;
+	} 									func;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_pointer_t 						priv;
 
 }tb_async_stream_filter_t;
 

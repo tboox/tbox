@@ -40,16 +40,16 @@ typedef struct __tb_basic_stream_data_t
 	tb_basic_stream_t 		base;
 
 	// the data
-	tb_byte_t* 			data;
+	tb_byte_t* 				data;
 
 	// the head
-	tb_byte_t* 			head;
+	tb_byte_t* 				head;
 
 	// the size
-	tb_size_t 			size;
+	tb_size_t 				size;
 
 	// the data is referenced?
-	tb_bool_t 			bref;
+	tb_bool_t 				bref;
 
 }tb_basic_stream_data_t;
 

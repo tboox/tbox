@@ -41,7 +41,7 @@ typedef struct __tb_basic_stream_http_t
 	tb_basic_stream_t 		base;
 
 	// the http 
-	tb_handle_t 		http;
+	tb_handle_t 			http;
 
 }tb_basic_stream_http_t;
 

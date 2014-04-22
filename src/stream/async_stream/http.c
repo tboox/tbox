@@ -24,7 +24,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 				"astream_http"
+#define TB_TRACE_MODULE_NAME 				"async_stream_http"
 #define TB_TRACE_MODULE_DEBUG 				(0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -43,16 +43,16 @@
 typedef struct __tb_async_stream_http_t
 {
 	// the base
-	tb_async_stream_t 				base;
+	tb_async_stream_t 					base;
 
 	// the http 
-	tb_handle_t 				http;
+	tb_handle_t 						http;
 
 	// the size
-	tb_atomic64_t 				size;
+	tb_atomic64_t 						size;
 
 	// the offset
-	tb_atomic64_t 				offset;
+	tb_atomic64_t 						offset;
 
 	// the func
 	union
@@ -63,10 +63,10 @@ typedef struct __tb_async_stream_http_t
 		tb_async_stream_sync_func_t 	sync;
 		tb_async_stream_task_func_t 	task;
 
-	} 							func;
+	} 									func;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_pointer_t 						priv;
 
 }tb_async_stream_http_t;
 
