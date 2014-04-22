@@ -49,7 +49,7 @@ demo_C_FILES 							+= \
 										object/dump \
 										spider/spider \
 										spider/queue \
-										stream/transfer \
+										stream/transfer_pool \
 										stream/transfer_stream \
 										stream/async_stream \
 										stream/basic_stream \

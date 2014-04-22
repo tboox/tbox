@@ -65,33 +65,24 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 {
 #if TB_DEMO_TEST_AICP
 	// done
-	tb_handle_t 	mstream = tb_null;
 	do
 	{
 		// init event
 		g_event = tb_event_init();
 		tb_assert_and_check_break(g_event);
 
-		// init mstream
-		mstream = tb_transfer_init(tb_null, 3, 0);
-		tb_assert_and_check_break(mstream);
-
 		// init tasks
 		tb_char_t** p = &argv[2];
 		for (; p && *p; p++)
 		{
-			// done mstream
-			if (!tb_transfer_done(mstream, argv[1], *p, 0, tb_demo_transfer_stream_save_func, *p)) break;
+			// done transfer
+			if (!tb_transfer_pool_done(tb_transfer_pool_instance(), argv[1], *p, 0, tb_demo_transfer_stream_save_func, *p)) break;
 		}
 
 	} while (0);
 
-	// wait mstream
-	while (g_event && tb_transfer_size(mstream) && tb_event_wait(g_event, -1) > 0);
-
-	// exit mstream
-	if (mstream) tb_transfer_exit(mstream);
-	mstream = tb_null;
+	// wait transfer
+	while (g_event && tb_transfer_pool_size(tb_transfer_pool_instance()) && tb_event_wait(g_event, -1) > 0);
 
 	// exit event
 	if (g_event) tb_event_exit(g_event);

@@ -18,9 +18,9 @@ tbox_C_FILES 			+= \
 						memory/static_block_pool \
 						memory/static_fixed_pool \
 						memory/static_tiny_pool \
-						memory/global_pool \
 						memory/block_pool \
 						memory/fixed_pool \
+						memory/global_pool \
 						memory/memory \
 						memory/scoped_buffer \
 						memory/static_buffer \
@@ -79,8 +79,8 @@ tbox_C_FILES 			+= \
 						stream/async_stream/data \
 						stream/async_stream/sock \
 						stream/async_stream/filter \
+						stream/transfer_pool \
 						stream/transfer_stream \
-						stream/transfer \
 						filter/filter \
 						filter/zip \
 						filter/cache \
@@ -464,10 +464,10 @@ INC_FILES 				= \
 						charset/prefix.h \
 						stream/prefix.h \
 						stream/stream.h \
-						stream/transfer.h \
-						stream/static_stream.h \
 						stream/basic_stream.h \
 						stream/async_stream.h \
+						stream/static_stream.h \
+						stream/transfer_pool.h \
 						stream/transfer_stream.h \
 						filter/prefix.h \
 						filter/filter.h \
