@@ -896,28 +896,6 @@ tb_double_t tb_static_stream_read_double_lbe(tb_static_stream_t* stream)
 	// ok?
 	return val;
 }
-tb_double_t tb_static_stream_read_double_nle(tb_static_stream_t* stream)
-{
-	// check
-	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
-
-	// read it
-	tb_double_t val = tb_bits_get_double_nle(stream->p); stream->p += 8;
-
-	// ok?
-	return val;
-}
-tb_double_t tb_static_stream_read_double_nbe(tb_static_stream_t* stream)
-{
-	// check
-	tb_assert_and_check_return_val(stream && stream->p && stream->p + 7 < stream->e && !stream->b, 0);
-
-	// read it
-	tb_double_t val = tb_bits_get_double_nbe(stream->p); stream->p += 8;
-
-	// ok?
-	return val;
-}
 tb_bool_t tb_static_stream_writ_float_le(tb_static_stream_t* stream, tb_float_t val)
 {
 	// check
