@@ -97,7 +97,7 @@ tb_void_t tb_dump_data_from_stream(tb_basic_stream_t* gst)
 		while (read < 0x20)
 		{
 			// read data
-			tb_long_t real = tb_basic_stream_aread(gst, line + read, 0x20 - read);
+			tb_long_t real = tb_basic_stream_read(gst, line + read, 0x20 - read);
 			// has data?
 			if (real > 0) read += real;
 			// no data?

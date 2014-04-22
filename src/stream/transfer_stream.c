@@ -612,7 +612,7 @@ tb_hong_t tb_transfer_stream_save_gg(tb_basic_stream_t* istream, tb_basic_stream
 		tb_size_t need = lrate? tb_min(lrate, TB_BASIC_STREAM_BLOCK_MAXN) : TB_BASIC_STREAM_BLOCK_MAXN;
 
 		// read data
-		tb_long_t real = tb_basic_stream_aread(istream, data, need);
+		tb_long_t real = tb_basic_stream_read(istream, data, need);
 		if (real > 0)
 		{
 			// writ data

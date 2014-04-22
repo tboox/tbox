@@ -90,7 +90,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	do
 	{
 		// read data
-		tb_long_t real = tb_http_aread(http, data, 8192);
+		tb_long_t real = tb_http_read(http, data, 8192);
 		tb_trace_i("read: %d", real);
 		if (real > 0)
 		{
