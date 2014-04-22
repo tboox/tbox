@@ -116,7 +116,7 @@
 #define tb_bits_set_u64_ne_impl(p, x) 		do { *((tb_uint64_t*)(p)) = (tb_uint64_t)(x); } while (0)
 #define tb_bits_set_s64_ne_impl(p, x) 		tb_bits_set_u64_ne_impl(p, x)
 
-// double
+// float
 #ifdef TB_CONFIG_TYPE_FLOAT
 
 # 	define tb_bits_get_float_le(p) 			tb_bits_get_float_le_inline(p)
