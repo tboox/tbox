@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include <string.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -47,8 +48,9 @@ static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
-static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 	if (!n) return s;
 
@@ -149,8 +151,9 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
-static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
 	// align by 2-bytes 
@@ -158,7 +161,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
+	tb_memset_u16_impl_opt_v1(s, c, n);
 # 	else
 # 		error
 # 	endif
@@ -270,8 +273,9 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v3(tb_uint32_t* s, tb_uint
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
-static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
 	// align by 4-bytes 
@@ -279,7 +283,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
+	tb_memset_u32_impl_opt_v1(s, c, n);
 # 	else
 # 		error
 # 	endif

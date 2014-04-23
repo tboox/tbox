@@ -687,92 +687,11 @@ static tb_void_t tb_dlist_str_test()
 	tb_dlist_exit(dlist);
 	tb_block_pool_exit(bpool);
 }
-static tb_void_t tb_dlist_efm_dump(tb_dlist_t const* dlist)
-{
-	tb_trace_i("efm size: %d, maxn: %d", tb_dlist_size(dlist), tb_dlist_maxn(dlist));
-	tb_for_all (tb_char_t*, item, dlist)
-	{
-		tb_trace_i("efm at[%lx]: %s", item_itor, item);
-	}
-}
-static tb_void_t tb_dlist_efm_test()
-{
-	tb_handle_t fpool = tb_fixed_pool_init(256, 11, 0);
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_efm(11, fpool));
-	tb_assert_and_check_return(dlist);
-
-	tb_size_t 			i = 0;
-	tb_size_t 			j = 0;
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("insert:");
-	tb_dlist_ninsert_head(dlist, "HHHHHHHHHH", 10);
-	i = tb_dlist_ninsert_tail(dlist, "TTTTTTTTTT", 10);
-	j = tb_dlist_insert_prev(dlist, i, "0000000000");
-	tb_dlist_insert_prev(dlist, i, "1111111111");
-	tb_dlist_insert_prev(dlist, i, "2222222222");
-	tb_dlist_insert_prev(dlist, i, "3333333333");
-	tb_dlist_insert_prev(dlist, i, "4444444444");
-	tb_dlist_insert_prev(dlist, i, "5555555555");
-	tb_dlist_insert_prev(dlist, i, "6666666666");
-	tb_dlist_insert_prev(dlist, i, "7777777777");
-	tb_dlist_insert_prev(dlist, i, "8888888888");
-	tb_dlist_insert_prev(dlist, i, "9999999999");
-	tb_dlist_insert_head(dlist, "4444444444");
-	tb_dlist_insert_head(dlist, "3333333333");
-	tb_dlist_insert_head(dlist, "2222222222");
-	tb_dlist_insert_head(dlist, "1111111111");
-	tb_dlist_insert_head(dlist, "0000000000");
-	tb_dlist_insert_tail(dlist, "5555555555");
-	tb_dlist_insert_tail(dlist, "6666666666");
-	tb_dlist_insert_tail(dlist, "7777777777");
-	tb_dlist_insert_tail(dlist, "8888888888");
-	tb_dlist_insert_tail(dlist, "9999999999");
-	tb_dlist_efm_dump(dlist);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("remove:");
-	tb_dlist_nremove_head(dlist, 5);
-	tb_dlist_nremove_last(dlist, 5);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);
-	j = tb_dlist_remove(dlist, j);	
-	tb_dlist_efm_dump(dlist);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("replace:");
-	tb_dlist_nreplace_head(dlist, "TTTTTTTTTT", 10);
-	tb_dlist_nreplace_last(dlist, "HHHHHHHHHH", 10);
-	tb_dlist_replace_head(dlist, "OOOOOOOOOO");
-	tb_dlist_replace_last(dlist, "IIIIIIIIII");
-	tb_dlist_efm_dump(dlist);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("moveto:");
-	tb_dlist_moveto_head(dlist, tb_iterator_last(dlist));
-	tb_dlist_moveto_tail(dlist, tb_iterator_next(dlist, tb_iterator_head(dlist)));
-	tb_dlist_efm_dump(dlist);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("clear:");
-	tb_dlist_clear(dlist);
-	tb_dlist_efm_dump(dlist);
-
-	tb_dlist_exit(dlist);
-	tb_fixed_pool_exit(fpool);
-}
-static tb_void_t tb_dlist_ifm_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_void_t tb_dlist_mem_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	tb_trace_i("ifm free: %s, priv: %s", item, func->priv);
 }
-static tb_void_t tb_dlist_ifm_dump(tb_dlist_t const* dlist)
+static tb_void_t tb_dlist_mem_dump(tb_dlist_t const* dlist)
 {
 	tb_trace_i("ifm size: %d, maxn: %d", tb_dlist_size(dlist), tb_dlist_maxn(dlist));
 	tb_for_all (tb_char_t*, item, dlist)
@@ -780,9 +699,9 @@ static tb_void_t tb_dlist_ifm_dump(tb_dlist_t const* dlist)
 		tb_trace_i("ifm at[%lx]: %s", item_itor, item);
 	}
 }
-static tb_void_t tb_dlist_ifm_test()
+static tb_void_t tb_dlist_mem_test()
 {
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_ifm(11, tb_dlist_ifm_free, "ifm"));
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_mem(11, tb_dlist_mem_free, "ifm"));
 	tb_assert_and_check_return(dlist);
 
 	tb_size_t 			i = 0;
@@ -812,7 +731,7 @@ static tb_void_t tb_dlist_ifm_test()
 	tb_dlist_insert_tail(dlist, "7777777777");
 	tb_dlist_insert_tail(dlist, "8888888888");
 	tb_dlist_insert_tail(dlist, "9999999999");
-	tb_dlist_ifm_dump(dlist);
+	tb_dlist_mem_dump(dlist);
 
 	tb_trace_i("=============================================================");
 	tb_trace_i("remove:");
@@ -828,7 +747,7 @@ static tb_void_t tb_dlist_ifm_test()
 	j = tb_dlist_remove(dlist, j);
 	j = tb_dlist_remove(dlist, j);
 	j = tb_dlist_remove(dlist, j);	
-	tb_dlist_ifm_dump(dlist);
+	tb_dlist_mem_dump(dlist);
 
 	tb_trace_i("=============================================================");
 	tb_trace_i("replace:");
@@ -836,18 +755,18 @@ static tb_void_t tb_dlist_ifm_test()
 	tb_dlist_nreplace_last(dlist, "HHHHHHHHHH", 10);
 	tb_dlist_replace_head(dlist, "OOOOOOOOOO");
 	tb_dlist_replace_last(dlist, "IIIIIIIIII");
-	tb_dlist_ifm_dump(dlist);
+	tb_dlist_mem_dump(dlist);
 
 	tb_trace_i("=============================================================");
 	tb_trace_i("moveto:");
 	tb_dlist_moveto_head(dlist, tb_iterator_last(dlist));
 	tb_dlist_moveto_tail(dlist, tb_iterator_next(dlist, tb_iterator_head(dlist)));
-	tb_dlist_ifm_dump(dlist);
+	tb_dlist_mem_dump(dlist);
 
 	tb_trace_i("=============================================================");
 	tb_trace_i("clear:");
 	tb_dlist_clear(dlist);
-	tb_dlist_ifm_dump(dlist);
+	tb_dlist_mem_dump(dlist);
 
 	tb_dlist_exit(dlist);
 }
@@ -993,8 +912,7 @@ tb_int_t tb_demo_container_dlist_main(tb_int_t argc, tb_char_t** argv)
 #if 1
 	tb_dlist_int_test();
 	tb_dlist_str_test();
-	tb_dlist_efm_test();
-	tb_dlist_ifm_test();
+	tb_dlist_mem_test();
 #endif
 
 #if 1

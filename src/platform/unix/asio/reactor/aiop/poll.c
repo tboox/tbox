@@ -409,11 +409,11 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
 	tb_assert_and_check_goto(rtor->mutx.pfds && rtor->mutx.hash, fail);
 
 	// init pfds
-	rtor->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), tb_null, tb_null));
+	rtor->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
 	tb_assert_and_check_goto(rtor->pfds, fail);
 
 	// init cfds
-	rtor->cfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), tb_null, tb_null));
+	rtor->cfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
 	tb_assert_and_check_goto(rtor->cfds, fail);
 
 	// init hash

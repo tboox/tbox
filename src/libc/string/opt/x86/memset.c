@@ -101,15 +101,15 @@ static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v2(tb_byte_t* s, tb_byte_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
-static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-	tb_memset_impl_u8_opt_v1(s, (tb_byte_t)c, n);
+	tb_memset_impl_u8_opt_v1(s, c, n);
 # 	elif defined(TB_ARCH_SSE2)
-	tb_memset_impl_u8_opt_v2(s, (tb_byte_t)c, n);
+	tb_memset_impl_u8_opt_v2(s, c, n);
 # 	else
 # 		error
 # 	endif
@@ -134,7 +134,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint
 		"cld\n\t" 							// clear the direction bit, s++, not s--
 		"rep stosw" 						// *s++ = ax
 		: 									// no output registers
-		: "c" (n), "a" (c), "D" (s) 	// ecx = n, eax = c, edi = s
+		: "c" (n), "a" (c), "D" (s) 		// ecx = n, eax = c, edi = s
 	);
 }
 #endif
@@ -169,8 +169,9 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
-static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
 	// align by 2-bytes 
@@ -179,12 +180,12 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 # 	if (defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32) && \
 		defined(TB_ARCH_SSE2)
-	if (n < 2049) tb_memset_u16_impl_opt_v2(s, (tb_uint16_t)c, n);
-	else tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
+	if (n < 2049) tb_memset_u16_impl_opt_v2(s, c, n);
+	else tb_memset_u16_impl_opt_v1(s, c, n);
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-	tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
+	tb_memset_u16_impl_opt_v1(s, c, n);
 # 	elif defined(TB_ARCH_SSE2)
-	tb_memset_u16_impl_opt_v2(s, (tb_uint16_t)c, n);
+	tb_memset_u16_impl_opt_v2(s, c, n);
 # 	else
 # 		error
 # 	endif
@@ -201,7 +202,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint
 		"cld\n\t" 							// clear the direction bit, s++, not s--
 		"rep stosl" 						// *s++ = eax
 		: 									// no output registers
-		: "c" (n), "a" (c), "D" (s) 	// ecx = n, eax = c, edi = s
+		: "c" (n), "a" (c), "D" (s) 		// ecx = n, eax = c, edi = s
 	);
 }
 #endif
@@ -236,8 +237,9 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
-static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
 	// align by 4-bytes 
@@ -246,12 +248,12 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 # 	if (defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32) && \
 	defined(TB_ARCH_SSE2)
-	if (n < 2049) tb_memset_u32_impl_opt_v2(s, (tb_uint32_t)c, n);
-	else tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
+	if (n < 2049) tb_memset_u32_impl_opt_v2(s, c, n);
+	else tb_memset_u32_impl_opt_v1(s, c, n);
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-	tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
+	tb_memset_u32_impl_opt_v1(s, c, n);
 # 	elif defined(TB_ARCH_SSE2)
-	tb_memset_u32_impl_opt_v2(s, (tb_uint32_t)c, n);
+	tb_memset_u32_impl_opt_v2(s, c, n);
 # 	else
 # 		error
 # 	endif

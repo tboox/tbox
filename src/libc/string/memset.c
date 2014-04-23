@@ -45,83 +45,94 @@
  * implementation 
  */
 #if defined(TB_CONFIG_LIBC_HAVE_MEMSET)
-static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 	return memset(s, c, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMSET_U8)
-static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
 	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
-	__tb_register__ tb_byte_t* p = s;
-	if (!n) return s;
+	// no size?
+	tb_check_return_val(n, s);
 
-	tb_byte_t b = (tb_byte_t)c;
+	// init
+	__tb_register__ tb_byte_t* p = s;
+
+	// done
 #ifdef __tb_small__
-	while (n--) *p++ = b;
+	while (n--) *p++ = c;
 #else
 	tb_size_t l = n & 0x3; n = (n - l) >> 2;
 	while (n--)
 	{
-		p[0] = b;
-		p[1] = b;
-		p[2] = b;
-		p[3] = b;
+		p[0] = c;
+		p[1] = c;
+		p[2] = c;
+		p[3] = c;
 		p += 4;
 	}
 
-	while (l--) *p++ = b;
+	while (l--) *p++ = c;
 #endif
 	return s;
 }
 #endif
 
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U16
-static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
 	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
-	// align by 2-bytes 
+	// no size?
+	tb_check_return_val(n, s);
+
+	// must be aligned by 2-bytes 
 	tb_assert(!(((tb_size_t)s) & 0x1));
 
+	// init
 	__tb_register__ tb_uint16_t* p = s;
-	if (!n) return s;
 
-	tb_uint16_t b = (tb_uint16_t)c;
-
+	// done
 #ifdef __tb_small__
-	while (n--) *p++ = b;
+	while (n--) *p++ = c;
 #else
 	tb_size_t l = n & 0x3; n = (n - l) >> 2;
 	while (n--)
 	{
-		p[0] = b;
-		p[1] = b;
-		p[2] = b;
-		p[3] = b;
+		p[0] = c;
+		p[1] = c;
+		p[2] = c;
+		p[3] = c;
 		p += 4;
 	}
 
-	while (l--) *p++ = b;
+	while (l--) *p++ = c;
 #endif
+
+	// ok?
 	return s;
 }
 #endif
 
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U24
-static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
 	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
-	__tb_register__ tb_byte_t* p = s;
-	if (!n) return s;
+	// no size?
+	tb_check_return_val(n, s);
 
-	tb_byte_t* e = p + (n * 3);
+	// init
+	__tb_register__ tb_byte_t* p = s;
+	__tb_register__ tb_byte_t* e = p + (n * 3);
+
+	// done
 #ifdef __tb_small__
 	for (; p < e; p += 3) tb_bits_set_u24_ne(p, c);
 #else
@@ -141,46 +152,89 @@ static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		p += 3;
 	}
 #endif
+
+	// ok?
 	return s;
 }
 #endif
 
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U32
-static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
 	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
-	// align by 4-bytes 
+	// no size?
+	tb_check_return_val(n, s);
+
+	// must be aligned by 4-bytes 
 	tb_assert(!(((tb_size_t)s) & 0x3));
 
+	// init 
 	__tb_register__ tb_uint32_t* p = s;
-	if (!n) return s;
 
-	tb_uint32_t b = (tb_uint32_t)c;
+	// done
 #ifdef __tb_small__
-	while (n--) *p++ = b;
+	while (n--) *p++ = c;
 #else
 	tb_size_t l = n & 0x3; n = (n - l) >> 2;
 	while (n--)
 	{
-		p[0] = b;
-		p[1] = b;
-		p[2] = b;
-		p[3] = b;
+		p[0] = c;
+		p[1] = c;
+		p[2] = c;
+		p[3] = c;
 		p += 4;
 	}
 
-	while (l--) *p++ = b;
+	while (l--) *p++ = c;
 #endif
+
+	// ok?
 	return s;
 }
 #endif
 
+#ifndef TB_LIBC_STRING_OPT_MEMSET_U64
+static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
+{
+	// check
+	tb_assert_and_check_return_val(s, tb_null);
+
+	// no size?
+	tb_check_return_val(n, s);
+
+	// must be aligned by 8-bytes 
+	tb_assert(!(((tb_size_t)s) & 0x7));
+
+	// init
+	__tb_register__ tb_uint64_t* p = s;
+
+	// done
+#ifdef __tb_small__
+	while (n--) *p++ = c;
+#else
+	tb_size_t l = n & 0x3; n = (n - l) >> 2;
+	while (n--)
+	{
+		p[0] = c;
+		p[1] = c;
+		p[2] = c;
+		p[3] = c;
+		p += 4;
+	}
+
+	while (l--) *p++ = c;
+#endif
+
+	// ok?
+	return s;
+}
+#endif
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
 	// check
 #ifdef __tb_debug__
@@ -189,7 +243,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_memory_data_size(s);
 		if (size && n > size)
 		{
-			tb_trace_i("[memset]: [overflow]: [%#lx x %lu] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset]: [overflow]: [%#x x %lu] => [%p, %lu]", c, n, s, size);
 			tb_backtrace_dump("[memset]: [overflow]: ", tb_null, 10);
 			tb_memory_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
@@ -200,7 +254,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	// done
 	return tb_memset_impl(s, c, n);
 }
-tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
 	// check
 #ifdef __tb_debug__
@@ -209,7 +263,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_memory_data_size(s);
 		if (size && (n << 1) > size)
 		{
-			tb_trace_i("[memset_u16]: [overflow]: [%#lx x %lu x 2] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset_u16]: [overflow]: [%#x x %lu x 2] => [%p, %lu]", c, n, s, size);
 			tb_backtrace_dump("[memset_u16]: [overflow]: ", tb_null, 10);
 			tb_memory_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
@@ -220,7 +274,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	// done
 	return tb_memset_u16_impl(s, c, n);
 }
-tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
 	// check
 #ifdef __tb_debug__
@@ -229,7 +283,7 @@ tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_memory_data_size(s);
 		if (size && (n * 3) > size)
 		{
-			tb_trace_i("[memset_u24]: [overflow]: [%#lx x %lu x 3] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset_u24]: [overflow]: [%#x x %lu x 3] => [%p, %lu]", c, n, s, size);
 			tb_memory_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
 		}
@@ -239,7 +293,7 @@ tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	// done
 	return tb_memset_u24_impl(s, c, n);
 }
-tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
 	// check
 #ifdef __tb_debug__
@@ -248,7 +302,7 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_memory_data_size(s);
 		if (size && (n << 2) > size)
 		{
-			tb_trace_i("[memset_u32]: [overflow]: [%#lx x %lu x 4] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset_u32]: [overflow]: [%#x x %lu x 4] => [%p, %lu]", c, n, s, size);
 			tb_backtrace_dump("[memset_u32]: [overflow]: ", tb_null, 10);
 			tb_memory_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
@@ -258,4 +312,24 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 	// done
 	return tb_memset_u32_impl(s, c, n);
+}
+tb_pointer_t tb_memset_u64(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
+{
+	// check
+#ifdef __tb_debug__
+	{
+		// overflow?
+		tb_size_t size = tb_memory_data_size(s);
+		if (size && (n << 3) > size)
+		{
+			tb_trace_i("[memset_u64]: [overflow]: [%#llx x %lu x 4] => [%p, %lu]", c, n, s, size);
+			tb_backtrace_dump("[memset_u64]: [overflow]: ", tb_null, 10);
+			tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+			tb_abort();
+		}
+	}
+#endif
+
+	// done
+	return tb_memset_u64_impl(s, c, n);
 }

@@ -93,58 +93,6 @@ static tb_size_t tb_stack_iterator_prev_test()
 
 	return n / ((tb_uint32_t)(t) + 1);
 }
-
-static tb_void_t tb_stack_efm_dump(tb_stack_t const* stack)
-{
-	tb_trace_i("efm size: %lu, maxn: %lu", tb_stack_size(stack), tb_stack_maxn(stack));
-	tb_for_all (tb_char_t*, item, stack)
-		tb_trace_i("efm at[%lu]: %s", item_itor, item);
-}
-static tb_void_t tb_stack_efm_test()
-{	
-	tb_stack_t* stack = tb_stack_init(10, tb_item_func_efm(11, tb_null));
-	tb_assert_and_check_return(stack);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("put:");
-	tb_stack_put(stack, "0000000000");
-	tb_stack_put(stack, "1111111111");
-	tb_stack_put(stack, "2222222222");
-	tb_stack_put(stack, "3333333333");
-	tb_stack_put(stack, "4444444444");
-	tb_stack_put(stack, "5555555555");
-	tb_stack_put(stack, "6666666666");
-	tb_stack_put(stack, "7777777777");
-	tb_stack_put(stack, "8888888888");
-	tb_stack_put(stack, "9999999999");
-	tb_stack_efm_dump(stack);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("pop:");
-	tb_stack_pop(stack);
-	tb_stack_pop(stack);
-	tb_stack_pop(stack);
-	tb_stack_pop(stack);
-	tb_stack_pop(stack);
-	tb_stack_efm_dump(stack);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("put:");
-	tb_stack_put(stack, "0000000000");
-	tb_stack_put(stack, "1111111111");
-	tb_stack_put(stack, "2222222222");
-	tb_stack_put(stack, "3333333333");
-	tb_stack_put(stack, "4444444444");
-	tb_stack_efm_dump(stack);
-
-	tb_trace_i("=============================================================");
-	tb_trace_i("clear:");
-	tb_stack_clear(stack);
-	tb_stack_efm_dump(stack);
-
-	tb_stack_exit(stack);
-}
-
 static tb_void_t tb_stack_perf_test()
 {
 	tb_size_t score = 0;
@@ -166,7 +114,6 @@ static tb_void_t tb_stack_perf_test()
  */
 tb_int_t tb_demo_container_stack_main(tb_int_t argc, tb_char_t** argv)
 {
-	tb_stack_efm_test();
 	tb_stack_perf_test();
 
 	return 0;

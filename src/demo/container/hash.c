@@ -236,8 +236,7 @@ static tb_void_t tb_hash_test_m2m_func()
 	// init hash
 	tb_size_t const	step = 256;
 	tb_byte_t 		item[step];
-	tb_hash_t* 		hash = tb_hash_init(8, tb_item_func_efm(step, tb_null), tb_item_func_efm(step, tb_null));
-	//tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
+	tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_mem(step, tb_null, tb_null), tb_item_func_mem(step, tb_null, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -349,8 +348,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_size_t const	step = 12;
 	tb_byte_t 		item[step];
 	tb_handle_t 	pool = tb_fixed_pool_init(256, step, 0);
-	//tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
+	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_mem(step, tb_null, tb_null), tb_item_func_mem(step, tb_null, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// clear rand
