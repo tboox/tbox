@@ -39,7 +39,6 @@ tbox_C_FILES 			+= \
 						algorithm/walk \
 						algorithm/rwalk \
 						algorithm/count \
-						container/item \
 						container/hash \
 						container/heap \
 						container/queue \
@@ -48,6 +47,17 @@ tbox_C_FILES 			+= \
 						container/dlist \
 						container/vector \
 						container/iterator \
+						container/item/str \
+						container/item/obj \
+						container/item/ptr \
+						container/item/mem \
+						container/item/true \
+						container/item/long \
+						container/item/size \
+						container/item/uint8 \
+						container/item/uint16 \
+						container/item/uint32 \
+						container/item/string_pool \
 						network/network \
 						network/dns/cache \
 						network/dns/server \

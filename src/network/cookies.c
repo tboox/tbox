@@ -527,11 +527,11 @@ tb_cookies_t* tb_cookies_init()
 	tb_assert_and_check_goto(cookies->hmutex, fail);
 
 	// init spool
-	cookies->spool = tb_slist_init(TB_COOKIES_BLOCK_POOL_GROW, tb_item_func_ifm(sizeof(tb_cookie_string_t), tb_cookies_block_pool_free, tb_null));
+	cookies->spool = tb_slist_init(TB_COOKIES_BLOCK_POOL_GROW, tb_item_func_mem(sizeof(tb_cookie_string_t), tb_cookies_block_pool_free, tb_null));
 	tb_assert_and_check_goto(cookies->spool, fail);
 
 	// init cpool
-	cookies->cpool = tb_vector_init(TB_COOKIES_CPOOL_GROW, tb_item_func_ifm(sizeof(tb_cookie_t), tb_null, tb_null));
+	cookies->cpool = tb_vector_init(TB_COOKIES_CPOOL_GROW, tb_item_func_mem(sizeof(tb_cookie_t), tb_null, tb_null));
 	tb_assert_and_check_goto(cookies->cpool, fail);
 
 	return cookies;

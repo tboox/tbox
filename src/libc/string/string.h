@@ -30,14 +30,26 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// memset_ptr
+#if TB_CPU_BIT64
+# 	define 		tb_memset_ptr(s, p, n) 		tb_memset_u64(s, (tb_uint64_t)(p), n)
+#else 
+# 	define 		tb_memset_ptr(s, p, n) 		tb_memset_u32(s, (tb_uint32_t)(p), n)
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 // memset
-tb_pointer_t 	tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n);
-tb_pointer_t 	tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n);
-tb_pointer_t 	tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n);
-tb_pointer_t 	tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n);
+tb_pointer_t 	tb_memset(tb_pointer_t s, tb_byte_t c, tb_size_t n);
+tb_pointer_t 	tb_memset_u16(tb_pointer_t s, tb_uint16_t c, tb_size_t n);
+tb_pointer_t 	tb_memset_u24(tb_pointer_t s, tb_uint32_t c, tb_size_t n);
+tb_pointer_t 	tb_memset_u32(tb_pointer_t s, tb_uint32_t c, tb_size_t n);
+tb_pointer_t 	tb_memset_u64(tb_pointer_t s, tb_uint64_t c, tb_size_t n);
 
 // memdup
 tb_pointer_t 	tb_memdup(tb_cpointer_t s, tb_size_t n);

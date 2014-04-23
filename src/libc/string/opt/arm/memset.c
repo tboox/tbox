@@ -78,17 +78,17 @@ static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
-static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 	if (!n) return s;
 
 	// align: 3 + cache: 16
-	if (n > 19) tb_memset_impl_u8_opt_v1(s, (tb_byte_t)c, n);
+	if (n > 19) tb_memset_impl_u8_opt_v1(s, c, n);
 	else
 	{
 		__tb_register__ tb_byte_t* 	p = s;
-		__tb_register__	tb_byte_t 	b = (tb_byte_t)c;
+		__tb_register__	tb_byte_t 	b = c;
 		while (n--) *p++ = b;
 	}
 
@@ -157,7 +157,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
-static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -165,11 +165,11 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	tb_assert(!(((tb_size_t)s) & 0x1));
 	if (!n) return s;
 
-	if (n > 8) tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
+	if (n > 8) tb_memset_u16_impl_opt_v1(s, c, n);
 	else
 	{
 		__tb_register__ tb_uint16_t* 	p = s;
-		__tb_register__	tb_uint16_t 	b = (tb_uint16_t)c;
+		__tb_register__	tb_uint16_t 	b = c;
 		while (n--) *p++ = b;
 	}
 
@@ -226,7 +226,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
-static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -234,11 +234,11 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	tb_assert(!(((tb_size_t)s) & 0x3));
 	if (!n) return s;
 
-	if (n > 4) tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
+	if (n > 4) tb_memset_u32_impl_opt_v1(s, c, n);
 	else
 	{
 		__tb_register__ tb_uint32_t* 	p = s;
-		__tb_register__	tb_uint32_t 	b = (tb_uint32_t)c;
+		__tb_register__	tb_uint32_t 	b = c;
 		while (n--) *p++ = b;
 	}
 

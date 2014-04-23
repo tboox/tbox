@@ -1586,8 +1586,8 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->aiop, fail);
 
 	// init spak
-	ptor->spak[0] = tb_queue_init(aicp->maxn + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
-	ptor->spak[1] = tb_queue_init(aicp->maxn + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
+	ptor->spak[0] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
+	ptor->spak[1] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
 	tb_assert_and_check_goto(ptor->spak[0] && ptor->spak[1], fail);
 
 	// init file

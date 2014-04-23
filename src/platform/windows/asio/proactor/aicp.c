@@ -1918,7 +1918,7 @@ static tb_handle_t tb_aicp_proactor_iocp_loop_init(tb_aicp_proactor_t* proactor)
 	// init spak
 	if (ptor->GetQueuedCompletionStatusEx)
 	{
-		loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_ifm(sizeof(OVERLAPPED_ENTRY), tb_null, tb_null));
+		loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_mem(sizeof(OVERLAPPED_ENTRY), tb_null, tb_null));
 		tb_assert_and_check_goto(loop->spak, fail);
 	}
 
