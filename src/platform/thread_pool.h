@@ -42,6 +42,9 @@ typedef tb_void_t 						(*tb_thread_pool_task_exit_func_t)(tb_pointer_t priv);
 /// the thread pool task type
 typedef struct __tb_thread_pool_task_t
 {
+	/// the task name
+	tb_char_t const* 					name;
+
 	/// the task done func
 	tb_thread_pool_task_done_func_t 	done;
 
@@ -49,7 +52,7 @@ typedef struct __tb_thread_pool_task_t
 	tb_thread_pool_task_exit_func_t 	exit;
 
 	/// the task private data
-	tb_pointer_t 						priv;
+	tb_cpointer_t 						priv;
 
 	/// is urgent task?
 	tb_bool_t 							urgent;
@@ -100,6 +103,7 @@ tb_size_t 				tb_thread_pool_task_size(tb_handle_t pool);
 /*! post one task
  *
  * @param pool 			the thread pool handle
+ * @param name 			the task name, optional
  * @param done 			the task done func
  * @param exit 			the task exit func, optional
  * @param priv 			the task private data
@@ -107,7 +111,7 @@ tb_size_t 				tb_thread_pool_task_size(tb_handle_t pool);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_thread_pool_task_post(tb_handle_t pool, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent);
+tb_bool_t 				tb_thread_pool_task_post(tb_handle_t pool, tb_char_t const* name, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_cpointer_t priv, tb_bool_t urgent);
 
 /*! post task list
  *
@@ -115,13 +119,14 @@ tb_bool_t 				tb_thread_pool_task_post(tb_handle_t pool, tb_thread_pool_task_don
  * @param list 			the task list
  * @param size 			the task count
  *
- * @return 				tb_true or tb_false
+ * @return 				the real posted task count
  */
-tb_bool_t 				tb_thread_pool_task_post_list(tb_handle_t pool, tb_thread_pool_task_t const* list, tb_size_t size);
+tb_size_t 				tb_thread_pool_task_post_list(tb_handle_t pool, tb_thread_pool_task_t const* list, tb_size_t size);
 
 /*! init one task
  *
  * @param pool 			the thread pool handle
+ * @param name 			the task name, optional
  * @param done 			the task done func
  * @param exit 			the task exit func, optional
  * @param priv 			the task private data
@@ -129,7 +134,7 @@ tb_bool_t 				tb_thread_pool_task_post_list(tb_handle_t pool, tb_thread_pool_tas
  *
  * @return 				the task handle
  */
-tb_handle_t 			tb_thread_pool_task_init(tb_handle_t pool, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent);
+tb_handle_t 			tb_thread_pool_task_init(tb_handle_t pool, tb_char_t const* name, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_cpointer_t priv, tb_bool_t urgent);
 
 /*! cancel the waiting task
  *

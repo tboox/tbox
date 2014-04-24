@@ -142,7 +142,7 @@ static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t da
 /* //////////////////////////////////////////////////////////////////////////////////////
  * timer 
  */
-static tb_pointer_t tb_iocp_timer_loop(tb_pointer_t data)
+static tb_pointer_t tb_iocp_timer_loop(tb_cpointer_t data)
 {
 	// check
 	tb_aicp_proactor_iocp_t* 	ptor = (tb_aicp_proactor_iocp_t*)data;

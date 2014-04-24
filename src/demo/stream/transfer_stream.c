@@ -19,7 +19,7 @@ static tb_bool_t tb_demo_transfer_stream_save_func(tb_size_t state, tb_hize_t of
 	// ok
 	return tb_true;
 }
-static tb_pointer_t tb_demo_transfer_stream_loop(tb_pointer_t data)
+static tb_pointer_t tb_demo_transfer_stream_loop(tb_cpointer_t data)
 {
 	// the aicp
 	tb_aicp_t* aicp = (tb_aicp_t*)data;

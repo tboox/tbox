@@ -19,7 +19,7 @@ static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t data)
 		tb_trace_i("task[%s]: %lld ms, killed: %d", (tb_char_t const*)data, val, killed);
 	}
 }
-static tb_pointer_t tb_demo_timer_loop(tb_pointer_t data)
+static tb_pointer_t tb_demo_timer_loop(tb_cpointer_t data)
 {
 	// the timer
 	tb_handle_t timer = (tb_handle_t)data;
