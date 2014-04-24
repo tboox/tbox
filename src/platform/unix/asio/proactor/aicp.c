@@ -210,7 +210,7 @@ static tb_void_t tb_aiop_spak_work(tb_aicp_proactor_aiop_t* ptor)
 	// post wait
 	if (value >= 0 && value < work) tb_semaphore_post(ptor->wait, work - value);
 }
-static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
+static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t data)
 {
 	// check
 	tb_aicp_proactor_aiop_t* 	ptor = (tb_aicp_proactor_aiop_t*)data;

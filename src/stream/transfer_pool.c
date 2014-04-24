@@ -256,10 +256,10 @@ static tb_bool_t tb_transfer_waiting_exit(tb_iterator_t* iterator, tb_pointer_t 
 	// ok
 	return tb_true;
 }
-static tb_pointer_t tb_transfer_pool_loop(tb_pointer_t data)
+static tb_pointer_t tb_transfer_pool_loop(tb_cpointer_t data)
 {
 	// aicp
-	tb_handle_t aicp = data;
+	tb_handle_t aicp = (tb_handle_t)data;
 
 	// trace
 	tb_trace_d("loop: init");

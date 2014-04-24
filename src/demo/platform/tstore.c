@@ -10,7 +10,7 @@ static tb_void_t tb_tstore_free(tb_tstore_data_t* data)
 {
 	if (data) tb_free(data);
 }
-static tb_pointer_t tb_tstore_test(tb_pointer_t data)
+static tb_pointer_t tb_tstore_test(tb_cpointer_t data)
 {
 	// self
 	tb_size_t self = tb_thread_self();

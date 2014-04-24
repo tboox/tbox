@@ -31,7 +31,7 @@
  * implementation
  */
 
-tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_pointer_t data, tb_size_t stack)
+tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t data, tb_size_t stack)
 {
 	HANDLE handle = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)data, 0, NULL);
 	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);

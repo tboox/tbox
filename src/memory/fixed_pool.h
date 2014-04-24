@@ -35,7 +35,6 @@
 #define TB_FIXED_POOL_GROW_MICRO 				(128)
 #define TB_FIXED_POOL_GROW_SMALL 				(1024)
 #define TB_FIXED_POOL_GROW_LARGE 				(4096)
-
 #ifdef __tb_small__
 # 	define TB_FIXED_POOL_GROW_DEFAULT 			TB_FIXED_POOL_GROW_SMALL
 #else

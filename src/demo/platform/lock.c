@@ -23,7 +23,7 @@ static __tb_volatile__ tb_atomic_t g_value = 0;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * loop
  */
-static tb_pointer_t tb_test_mutx_loop(tb_pointer_t data)
+static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t data)
 {
 	// check
 	tb_uint32_t self = (tb_uint32_t)tb_thread_self();
