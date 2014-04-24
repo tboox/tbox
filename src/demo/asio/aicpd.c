@@ -422,8 +422,7 @@ end:
 		tb_handle_t* l = loop;
 		for (; *l; l++)
 		{
-			if (!tb_thread_wait(*l, -1))
-				tb_thread_kill(*l);
+			tb_thread_wait(*l, -1);
 			tb_thread_exit(*l);
 		}
 	}

@@ -76,14 +76,6 @@ tb_bool_t 				tb_thread_suspend(tb_handle_t handle);
  */
 tb_bool_t 				tb_thread_resume(tb_handle_t handle);
 
-/*! kill thread
- *
- * @param handle 		the thread handle
- *
- * @return 				tb_true or tb_false
- */
-tb_bool_t 				tb_thread_kill(tb_handle_t handle);
-
 /*! the self thread identifier
  *
  * @return 				the self thread identifier

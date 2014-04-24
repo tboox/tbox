@@ -105,8 +105,7 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
 		// kill thread
 		if (loop[i]) 
 		{
-			if (!tb_thread_wait(loop[i], -1))
-				tb_thread_kill(loop[i]);
+			tb_thread_wait(loop[i], -1);
 			tb_thread_exit(loop[i]);
 			loop[i] = tb_null;
 		}
