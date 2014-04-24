@@ -122,8 +122,7 @@ end:
 		// kill thread
 		if (it[i].t) 
 		{
-			if (!tb_thread_wait(it[i].t, 5000))
-				tb_thread_kill(it[i].t);
+			tb_thread_wait(it[i].t, 5000);
 			tb_thread_exit(it[i].t);
 		}
 

@@ -62,7 +62,7 @@ typedef struct __tb_thread_pool_task_t
 
 /*! init thread pool
  *
- * @param worker_maxn 	the thread worker max count
+ * @param worker_maxn 	the thread worker max count, using the default count
  * @param stack 		the thread stack, using the default stack size if be zero 
  *
  * @return 				the thread pool handle
@@ -149,34 +149,21 @@ tb_bool_t 				tb_thread_pool_task_init_list(tb_handle_t pool, tb_thread_pool_tas
  */
 tb_void_t 				tb_thread_pool_task_kill(tb_handle_t pool, tb_handle_t task);
 
-/*! kill task list
- *
- * @param pool 			the thread pool handle
- * @param tasks 		the task handle list
- * @param size 			the task handle count
- */
-tb_void_t 				tb_thread_pool_task_kill_list(tb_handle_t pool, tb_handle_t* tasks, tb_size_t size);
-
 /*! kill all tasks
  *
  * @param pool 			the thread pool handle
  */
 tb_void_t 				tb_thread_pool_task_kill_all(tb_handle_t pool);
 
-/*! exit one task
+/*! wait one task 
  *
  * @param pool 			the thread pool handle
  * @param task 			the task handle
- */
-tb_void_t 				tb_thread_pool_task_exit(tb_handle_t pool, tb_handle_t task);
-
-/*! exit task list
+ * @param timeout 		the timeout
  *
- * @param pool 			the thread pool handle
- * @param tasks 		the task handle list
- * @param size 			the task handle count
+ * @return 				ok: 1, timeout: 0, error: -1
  */
-tb_void_t 				tb_thread_pool_task_exit_list(tb_handle_t pool, tb_handle_t* tasks, tb_size_t size);
+tb_long_t 				tb_thread_pool_task_wait(tb_handle_t pool, tb_handle_t task, tb_long_t timeout);
 
 /*! the thread pool instance
  *
@@ -185,17 +172,11 @@ tb_void_t 				tb_thread_pool_task_exit_list(tb_handle_t pool, tb_handle_t* tasks
 tb_handle_t 			tb_thread_pool_instance(tb_noarg_t);
 
 #ifdef __tb_debug__
-/*! dump all workers
+/*! dump the thread pool
  *
  * @param pool 			the thread pool handle
  */
-tb_void_t 				tb_thread_pool_worker_dump(tb_handle_t pool);
-
-/*! dump all tasks
- *
- * @param pool 			the thread pool handle
- */
-tb_void_t 				tb_thread_pool_task_dump(tb_handle_t pool);
+tb_void_t 				tb_thread_pool_dump(tb_handle_t pool);
 #endif
 
 #endif

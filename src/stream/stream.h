@@ -44,9 +44,9 @@
  *                                                                 [aioo]                                       |
  *                                                           ----- basic_stream -------- basic_stream ----------- file
  *                                                           |                        |                         |
- *                                                           |                        |                          - sock 
+ *                                                           |                        |                         - sock 
  *                                                           |                        |                         |
- *                                                           |                        |                          - http
+ *                                                           |                        |                         - http
  *                                                           |                        |           - charset
  *                                data -                     |                        |          |
  *                                     |  [istream]          |                        - filter - |- chunked 
@@ -65,9 +65,9 @@
  *                                            |              |     [aico]                                        |
  *                                            |              ----- async_stream -------- async_stream ------------ file
  *                                            |                                       |                          |
- *                                            |                                       |                           - sock
+ *                                            |                                       |                          - sock
  *                            ----------------                                        |                          |
- *                            |                                                       |                           - http
+ *                            |                                                       |                          - http
  *                 -----  transfer_stream --- |                                       |           - charset
  *                |           |           [ostream]                                   |          |
  *                |           ------------ stream                                     - filter - |- chunked 

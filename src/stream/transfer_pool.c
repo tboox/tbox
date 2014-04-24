@@ -438,8 +438,12 @@ tb_void_t tb_transfer_pool_exit(tb_handle_t handle)
 	if (pool->loop)
 	{
 		// wait loop
-		if (!tb_thread_wait(pool->loop, 5000))
-			tb_thread_kill(pool->loop);
+		tb_long_t wait = 0;
+		if ((wait = tb_thread_wait(pool->loop, 5000)) <= 0)
+		{
+			// trace
+			tb_trace_e("loop[%p]: wait failed: %ld!", pool->loop, wait);
+		}
 
 		// exit loop
 		tb_thread_exit(pool->loop);

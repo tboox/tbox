@@ -1406,8 +1406,12 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 		// exit loop
 		if (ptor->loop)
 		{
-			if (!tb_thread_wait(ptor->loop, 5000))
-				tb_thread_kill(ptor->loop);
+			tb_long_t wait = 0;
+			if ((wait = tb_thread_wait(ptor->loop, 5000)) <= 0)
+			{
+				// trace
+				tb_trace_e("loop[%p]: wait failed: %ld!", ptor->loop, wait);
+			}
 			tb_thread_exit(ptor->loop);
 			ptor->loop = tb_null;
 		}

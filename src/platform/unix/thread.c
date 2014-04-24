@@ -91,10 +91,6 @@ tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 	// ok
 	return 1;
 }
-tb_bool_t tb_thread_kill(tb_handle_t handle)
-{
-	return tb_true;
-}
 tb_void_t tb_thread_return(tb_pointer_t value)
 {
 	pthread_exit(value);
