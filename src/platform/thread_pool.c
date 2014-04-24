@@ -353,10 +353,6 @@ tb_handle_t tb_thread_pool_task_init(tb_handle_t handle, tb_thread_pool_task_don
 {
 	return tb_null;
 }
-tb_bool_t tb_thread_pool_task_init_list(tb_handle_t handle, tb_thread_pool_task_t const* list, tb_size_t size, tb_handle_t* tasks)
-{
-	return tb_false;
-}
 tb_void_t tb_thread_pool_task_kill(tb_handle_t handle, tb_handle_t task)
 {
 	// check
@@ -385,6 +381,9 @@ tb_void_t tb_thread_pool_task_kill_all(tb_handle_t handle)
 tb_long_t tb_thread_pool_task_wait(tb_handle_t pool, tb_handle_t task, tb_long_t timeout)
 {
 	return -1;
+}
+tb_void_t tb_thread_pool_task_exit(tb_handle_t pool, tb_handle_t task)
+{
 }
 tb_handle_t tb_thread_pool_instance()
 {

@@ -435,7 +435,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 		if (timeout >= 0) 
 		{
 			// add it
-			aico->task = tb_ltimer_task_add(ptor->ltimer, timeout, tb_false, tb_aiop_spak_wait_timeout, aico);
+			aico->task = tb_ltimer_task_init(ptor->ltimer, timeout, tb_false, tb_aiop_spak_wait_timeout, aico);
 			tb_assert_and_check_break(aico->task);
 			aico->bltimer = 1;
 		}
@@ -1081,7 +1081,7 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 			tb_hize_t top = tb_timer_top(ptor->timer);
 
 			// add task
-			aico->task = tb_timer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
+			aico->task = tb_timer_task_init_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
 			aico->bltimer = 0;
 
 			// the top task is changed? spak aiop
@@ -1090,7 +1090,7 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 		}
 		else
 		{
-			aico->task = tb_ltimer_task_add_at(ptor->ltimer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
+			aico->task = tb_ltimer_task_init_at(ptor->ltimer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
 			aico->bltimer = 1;
 		}
 
@@ -1113,8 +1113,8 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// remove task
 	if (aico->task) 
 	{
-		if (aico->bltimer) tb_ltimer_task_del(ptor->ltimer, aico->task);
-		else tb_timer_task_del(ptor->timer, aico->task);
+		if (aico->bltimer) tb_ltimer_task_exit(ptor->ltimer, aico->task);
+		else tb_timer_task_exit(ptor->timer, aico->task);
 		aico->bltimer = 0;
 	}
 	aico->task = tb_null;
@@ -1245,8 +1245,8 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// exit the timeout task
 	if (aiop_aico->task) 
 	{
-		if (aiop_aico->bltimer) tb_ltimer_task_del(ptor->ltimer, aiop_aico->task);
-		else tb_timer_task_del(ptor->timer, aiop_aico->task);
+		if (aiop_aico->bltimer) tb_ltimer_task_exit(ptor->ltimer, aiop_aico->task);
+		else tb_timer_task_exit(ptor->timer, aiop_aico->task);
 		aiop_aico->bltimer = 0;
 	}
 	aiop_aico->task = tb_null;
@@ -1296,8 +1296,8 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
 	// kill the task
 	if (((tb_aiop_aico_t*)aico)->task) 
 	{
-		if (((tb_aiop_aico_t*)aico)->bltimer) tb_ltimer_task_kil(ptor->ltimer, ((tb_aiop_aico_t*)aico)->task);
-		else tb_timer_task_kil(ptor->timer, ((tb_aiop_aico_t*)aico)->task);
+		if (((tb_aiop_aico_t*)aico)->bltimer) tb_ltimer_task_kill(ptor->ltimer, ((tb_aiop_aico_t*)aico)->task);
+		else tb_timer_task_kill(ptor->timer, ((tb_aiop_aico_t*)aico)->task);
 	}
 
 	// kill sock
