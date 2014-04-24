@@ -131,25 +131,14 @@ tb_bool_t 				tb_thread_pool_task_post_list(tb_handle_t pool, tb_thread_pool_tas
  */
 tb_handle_t 			tb_thread_pool_task_init(tb_handle_t pool, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent);
 
-/*! init task list
- *
- * @param pool 			the thread pool handle
- * @param list 			the task list
- * @param size 			the task count
- * @param tasks 		the task handle list
- *
- * @return 				tb_true or tb_false
- */
-tb_bool_t 				tb_thread_pool_task_init_list(tb_handle_t pool, tb_thread_pool_task_t const* list, tb_size_t size, tb_handle_t* tasks);
-
-/*! kill one task
+/*! cancel the waiting task
  *
  * @param pool 			the thread pool handle
  * @param task 			the task handle
  */
 tb_void_t 				tb_thread_pool_task_kill(tb_handle_t pool, tb_handle_t task);
 
-/*! kill all tasks
+/*!cancel all waiting task
  *
  * @param pool 			the thread pool handle
  */
@@ -164,6 +153,13 @@ tb_void_t 				tb_thread_pool_task_kill_all(tb_handle_t pool);
  * @return 				ok: 1, timeout: 0, error: -1
  */
 tb_long_t 				tb_thread_pool_task_wait(tb_handle_t pool, tb_handle_t task, tb_long_t timeout);
+
+/*! exit the task
+ *
+ * @param pool 			the thread pool handle
+ * @param task 			the task handle
+ */
+tb_void_t 				tb_thread_pool_task_exit(tb_handle_t pool, tb_handle_t task);
 
 /*! the thread pool instance
  *
