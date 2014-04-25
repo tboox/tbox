@@ -34,10 +34,10 @@
  */
 
 /// the thread pool task done func type
-typedef tb_void_t 						(*tb_thread_pool_task_done_func_t)(tb_pointer_t priv);
+typedef tb_void_t 						(*tb_thread_pool_task_done_func_t)(tb_cpointer_t priv);
 
 /// the thread pool task exit func type
-typedef tb_void_t 						(*tb_thread_pool_task_exit_func_t)(tb_pointer_t priv);
+typedef tb_void_t 						(*tb_thread_pool_task_exit_func_t)(tb_cpointer_t priv);
 
 /// the thread pool task type
 typedef struct __tb_thread_pool_task_t

@@ -24,11 +24,11 @@ TB_CONFIG_API_MEMORY 			= libc
 TB_CONFIG_TYPE_FLOAT 			= y
 
 # zlib
-TB_CONFIG_HAVE_ZLIB 			= y
+TB_CONFIG_HAVE_ZLIB 			= n
 
 # openssl
 TB_CONFIG_HAVE_OPENSSL 			= n
 
 # polarssl
-TB_CONFIG_HAVE_POLARSSL 		= y
+TB_CONFIG_HAVE_POLARSSL 		= n
 

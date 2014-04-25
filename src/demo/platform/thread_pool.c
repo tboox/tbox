@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */ 
-static tb_void_t tb_demo_task_60s_done(tb_pointer_t priv)
+static tb_void_t tb_demo_task_60s_done(tb_cpointer_t priv)
 {
 	// trace
 	tb_trace_i("done: 60s");
@@ -14,7 +14,7 @@ static tb_void_t tb_demo_task_60s_done(tb_pointer_t priv)
 	// wait some time
 	tb_sleep(60);
 }
-static tb_void_t tb_demo_task_10s_done(tb_pointer_t priv)
+static tb_void_t tb_demo_task_10s_done(tb_cpointer_t priv)
 {
 	// trace
 	tb_trace_i("done: 10s");
@@ -22,7 +22,7 @@ static tb_void_t tb_demo_task_10s_done(tb_pointer_t priv)
 	// wait some time
 	tb_sleep(10);
 }
-static tb_void_t tb_demo_task_1s_done(tb_pointer_t priv)
+static tb_void_t tb_demo_task_1s_done(tb_cpointer_t priv)
 {
 	// trace
 	tb_trace_i("done: 1s");
@@ -30,7 +30,7 @@ static tb_void_t tb_demo_task_1s_done(tb_pointer_t priv)
 	// wait some time
 	tb_sleep(1);
 }
-static tb_void_t tb_demo_task_time_done(tb_pointer_t priv)
+static tb_void_t tb_demo_task_time_done(tb_cpointer_t priv)
 {
 	// trace
 	tb_trace_i("done: %u ms", tb_p2u32(priv));
@@ -38,7 +38,7 @@ static tb_void_t tb_demo_task_time_done(tb_pointer_t priv)
 	// wait some time
 	tb_msleep(tb_p2u32(priv));
 }
-static tb_void_t tb_demo_task_time_exit(tb_pointer_t priv)
+static tb_void_t tb_demo_task_time_exit(tb_cpointer_t priv)
 {
 	// trace
 	tb_trace_i("exit: %u ms", tb_p2u32(priv));
@@ -58,6 +58,7 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 	// post task: 1s
 	tb_thread_pool_task_post(tb_thread_pool_instance(), "1s", tb_demo_task_1s_done, tb_null, tb_null, tb_false);
 
+	getchar();
 	// done
 	tb_size_t count = tb_rand_uint32(1, 16);
 	tb_size_t total = count;

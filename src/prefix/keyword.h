@@ -113,6 +113,13 @@
 # 	define __tb_newline__ 						"\n"
 #endif
 
+// the string only for the large mode
+#ifdef __tb_small__
+# 	define __tb_lstring__(x) 					tb_null
+#else
+# 	define __tb_lstring__(x) 					x
+#endif
+
 // macros
 #define __tb_mstring__(x) 									#x
 #define __tb_mstring_ex__(x) 								__tb_mstring__(x)

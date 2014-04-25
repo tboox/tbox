@@ -87,12 +87,12 @@
 //#define TB_CONFIG_LIBM_HAVE_LOG2F
 
 // zlib
-#define TB_CONFIG_HAVE_ZLIB					
+//#define TB_CONFIG_HAVE_ZLIB					
 
 // openssl
 //#define TB_CONFIG_HAVE_OPENSSL	
 
 // polarssl
-#define TB_CONFIG_HAVE_POLARSSL	
+//#define TB_CONFIG_HAVE_POLARSSL	
 
 #endif
