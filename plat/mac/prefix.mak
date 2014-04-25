@@ -20,14 +20,30 @@ BITS 				:= $(if $(findstring x64,$(ARCH)),64,)
 BITS 				:= $(if $(findstring x86,$(ARCH)),32,)
 BITS 				:= $(if $(BITS),$(BITS),$(shell getconf LONG_BIT))
 
+# prefix
+PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),xcrun -sdk macosx )
+
+# cc
+CC 					= $(PRE_)clang
+ifeq ($(CXFLAGS_CHECK),)
+CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
+export CXFLAGS_CHECK
+endif
+
+# ld
+LD 					= $(PRE_)clang
+ifeq ($(LDFLAGS_CHECK),)
+LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) #-fsanitize=thread
+export LDFLAGS_CHECK
+endif
+
 # tool
-PRE 				= xcrun -sdk macosx 
-CC 					= $(PRE)clang
-MM 					= $(PRE)clang
-LD 					= $(PRE)clang
-AR 					= $(PRE)ar
-STRIP 				= $(PRE)strip
-RANLIB 				= $(PRE)ranlib
+MM 					= $(PRE_)clang
+AR 					= $(PRE_)ar
+STRIP 				= $(PRE_)strip
+RANLIB 				= $(PRE_)ranlib
 AS					= yasm
 RM 					= rm -f
 RMDIR 				= rm -rf
@@ -56,7 +72,7 @@ ifeq ($(PROF),y)
 CXFLAGS 			+= -g -fno-omit-frame-pointer 
 else
 CXFLAGS_RELEASE 	+= -fomit-frame-pointer 
-CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer -ftrapv
+CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer $(CXFLAGS_CHECK)
 endif
 
 # cflags: .c files
@@ -98,7 +114,7 @@ ifeq ($(PROF),y)
 MXFLAGS 			+= -g -fno-omit-frame-pointer 
 else
 MXFLAGS_RELEASE 	+= -fomit-frame-pointer 
-MXFLAGS_DEBUG 		+= -fno-omit-frame-pointer -ftrapv
+MXFLAGS_DEBUG 		+= -fno-omit-frame-pointer $(LDFLAGS_CHECK)
 endif
 
 # mflags: .m files
@@ -113,7 +129,7 @@ MMFLAGS 			=
 
 # ldflags
 LDFLAGS_RELEASE 	= 
-LDFLAGS_DEBUG 		= -rdynamic 
+LDFLAGS_DEBUG 		=  
 LDFLAGS 			= -m$(BITS)
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l

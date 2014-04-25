@@ -33,6 +33,7 @@
  */
 #include "string_pool.h"
 #include "../libc/libc.h"
+#include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../platform/platform.h"
 #include "../container/container.h"

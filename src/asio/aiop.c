@@ -183,7 +183,7 @@ tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
 tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_false);
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_null);
 
 	// done
 	tb_bool_t 	ok = tb_false;

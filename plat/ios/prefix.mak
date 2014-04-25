@@ -46,7 +46,7 @@ CPU_CXFLAGS 		= -mcpu=cortex-a8
 endif
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fvisibility=hidden
+CXFLAGS_RELEASE 	= -fomit-frame-pointer -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g 
 CXFLAGS 			= \
 					-arch $(ARCH) -c -Wall -mthumb $(CPU_CXFLAGS) \
@@ -73,7 +73,7 @@ CCFLAGS_DEBUG 		=
 CCFLAGS 			= 
 
 # mxflags: .m/.mm files
-MXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fvisibility=hidden
+MXFLAGS_RELEASE 	= -fomit-frame-pointer -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g 
 MXFLAGS 			= \
 					-arch $(ARCH) -c -Wall -mthumb $(CPU_CXFLAGS) \
