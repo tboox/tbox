@@ -21,6 +21,13 @@
  * @ingroup 	container
  *
  */
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"dlist"
+#define TB_TRACE_MODULE_DEBUG 				(0)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -658,6 +665,9 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* dlist,
 	tb_size_t 	step = dlist->func.size;
 	tb_assert_and_check_return(step);
 
+	// check
+	tb_assert_and_check_return((tb_fixed_pool_size(pool) && dlist->head) || !tb_fixed_pool_size(pool));
+
 	// walk
 	tb_size_t 	base = -1;
 	tb_size_t 	prev = 0;
@@ -694,40 +704,43 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* dlist,
 			// free item
 			tb_fixed_pool_free(pool, (tb_pointer_t)itor);
 		}
-		
+			
+		// trace
+		tb_trace_d("prev: %p, itor: %p, next: %p, base: %p, head: %p, last: %p, bdel: %u", prev, itor, next, base, dlist->head, dlist->last, bdel);
+
 		// remove items?
 		if (!bdel || !next || stop)
 		{
-			// has deleted items?
+			// have removed items?
 			if (base != -1)
 			{
-				// remove part
+				// the body
+				tb_size_t body = bdel? next : itor;
+
+				// remove body
 				if (base)
 				{
-					// get the base data
+					// the base data
 					tb_dlist_item_t* pbase = (tb_dlist_item_t*)base;
 
-					// base => next
-					pbase->next = next;
+					// base => body
+					pbase->next = body;
 
-					// has next
-					if (next) 
-					{
-						// next => base
-						((tb_dlist_item_t*)next)->prev = base;
-					}
-					// tail
-					else 
-					{
-						// update last
-						dlist->last = base;
-					}
+					// prev => base
+					if (body) ((tb_dlist_item_t*)body)->prev = base;
+					// update last
+					else dlist->last = base;
 				}
-				// remove all
+				// remove head
 				else
 				{
-					dlist->head = 0;
-					dlist->last = 0;
+					// head => body
+					dlist->head = body;
+
+					// prev => 0
+					if (body) ((tb_dlist_item_t*)body)->prev = 0;
+					// update last
+					else dlist->last = 0;
 				}
 			}
 

@@ -66,7 +66,7 @@ static tb_object_t* tb_date_copy(tb_object_t* object)
 }
 static tb_void_t tb_date_exit(tb_object_t* object)
 {
-	if (object) tb_object_pool_del(tb_object_pool_instance(), object);
+	if (object) tb_object_pool_del(tb_object_pool(), object);
 }
 static tb_void_t tb_date_cler(tb_object_t* object)
 {
@@ -76,7 +76,7 @@ static tb_void_t tb_date_cler(tb_object_t* object)
 static tb_date_t* tb_date_init_base()
 {
 	// make
-	tb_date_t* date = (tb_date_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_date_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE);
+	tb_date_t* date = (tb_date_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_date_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE);
 	tb_assert_and_check_return_val(date, tb_null);
 
 	// init base

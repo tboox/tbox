@@ -96,7 +96,7 @@ static tb_void_t tb_array_exit(tb_object_t* object)
 	array->vector = tb_null;
 
 	// exit it
-	tb_object_pool_del(tb_object_pool_instance(), object);
+	tb_object_pool_del(tb_object_pool(), object);
 }
 static tb_void_t tb_array_cler(tb_object_t* object)
 {
@@ -109,7 +109,7 @@ static tb_void_t tb_array_cler(tb_object_t* object)
 static tb_array_t* tb_array_init_base()
 {
 	// make
-	tb_array_t* array = (tb_array_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_array_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY);
+	tb_array_t* array = (tb_array_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_array_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY);
 	tb_assert_and_check_return_val(array, tb_null);
 
 	// init base

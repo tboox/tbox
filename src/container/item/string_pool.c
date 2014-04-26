@@ -35,7 +35,7 @@ static tb_void_t tb_item_func_string_pool_free(tb_item_func_t* func, tb_pointer_
     tb_assert_and_check_return(func && item);
 
 	// free item
-    if (*((tb_pointer_t*)item)) tb_string_pool_del(tb_string_pool_instance(), *((tb_pointer_t*)item));
+    if (*((tb_pointer_t*)item)) tb_string_pool_del(tb_string_pool(), *((tb_pointer_t*)item));
 }
 static tb_void_t tb_item_func_string_pool_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
@@ -43,7 +43,7 @@ static tb_void_t tb_item_func_string_pool_dupl(tb_item_func_t* func, tb_pointer_
     tb_assert_and_check_return(func && item);
  
 	// dupl item
-    if (data) *((tb_pointer_t*)item) = (tb_pointer_t)tb_string_pool_put(tb_string_pool_instance(), data);
+    if (data) *((tb_pointer_t*)item) = (tb_pointer_t)tb_string_pool_put(tb_string_pool(), data);
     else *((tb_pointer_t*)item) = tb_null;
 }
 static tb_void_t tb_item_func_string_pool_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
@@ -52,7 +52,7 @@ static tb_void_t tb_item_func_string_pool_repl(tb_item_func_t* func, tb_pointer_
     tb_assert_and_check_return(func && item);
  
     // copy it, refn++
-    tb_pointer_t copy = data? (tb_pointer_t)tb_string_pool_put(tb_string_pool_instance(), data) : tb_null;
+    tb_pointer_t copy = data? (tb_pointer_t)tb_string_pool_put(tb_string_pool(), data) : tb_null;
  
     // free it, refn--
     if (func->free) func->free(func, item);

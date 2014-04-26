@@ -25,6 +25,7 @@
  * includes
  */
 #include "time.h"
+#include "ctime.h"
 #include "atomic.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +85,7 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// init
 	tb_long_t 	r = 0;
-	tb_hong_t 	base = tb_mclock();
+	tb_hong_t 	base = tb_ctime_spak();
 
 	// wait 
 	while (1)
@@ -106,7 +107,7 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 		else if (!post)
 		{
 			// timeout?
-			if (timeout >= 0 && tb_mclock() - base >= timeout) break;
+			if (timeout >= 0 && tb_ctime_spak() - base >= timeout) break;
 			else tb_msleep(200);
 		}
 		// error

@@ -70,7 +70,7 @@ static tb_void_t tb_data_exit(tb_object_t* object)
 	if (data) 
 	{
 		tb_scoped_buffer_exit(&data->buff);
-		tb_object_pool_del(tb_object_pool_instance(), (tb_object_t*)data);
+		tb_object_pool_del(tb_object_pool(), (tb_object_t*)data);
 	}
 }
 static tb_void_t tb_data_cler(tb_object_t* object)
@@ -81,7 +81,7 @@ static tb_void_t tb_data_cler(tb_object_t* object)
 static tb_data_t* tb_data_init_base()
 {
 	// make
-	tb_data_t* data = (tb_data_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_data_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA);
+	tb_data_t* data = (tb_data_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_data_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA);
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// init base

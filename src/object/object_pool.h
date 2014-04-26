@@ -39,6 +39,12 @@
  * interfaces
  */
 
+/*! the object pool instance
+ *
+ * @return 			the object pool
+ */
+tb_handle_t 		tb_object_pool(tb_noarg_t);
+
 /*! init object pool
  *
  * @return 			the object pool
@@ -74,12 +80,6 @@ tb_object_t* 		tb_object_pool_get_(tb_handle_t pool, tb_size_t size, tb_size_t f
  * @param object 	the object pointer
  */
 tb_void_t 			tb_object_pool_del_(tb_handle_t pool, tb_object_t* object __tb_debug_decl__);
-
-/*! the object pool singleton instance
- *
- * @return 			the object pool
- */
-tb_handle_t 		tb_object_pool_instance(tb_noarg_t);
 
 #ifdef __tb_debug__
 /*! dump object pool

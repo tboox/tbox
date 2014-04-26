@@ -587,7 +587,7 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
 	// ok?
 	return ok;
 }
-tb_handle_t tb_transfer_pool_instance()
+tb_handle_t tb_transfer_pool()
 {
 	return tb_singleton_instance(TB_SINGLETON_TYPE_TRANSFER_POOL, tb_transfer_pool_instance_init, tb_transfer_pool_exit, tb_transfer_pool_kill);
 }

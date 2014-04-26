@@ -44,14 +44,6 @@ tb_bool_t 			tb_dns_cache_init(tb_noarg_t);
 /// exit the cache list
 tb_void_t 			tb_dns_cache_exit(tb_noarg_t);
 
-/*! enable ctime?
- *
- * @param enabled	enable ctime? 
- * 					will be lower precision and faster if be enabled
- * 					and need spak it using tb_ctime_spak
- */
-tb_void_t 			tb_dns_cache_ctime(tb_bool_t enabled);
-
 /*! get addr from cache 
  *
  * @param name 		the host name 
