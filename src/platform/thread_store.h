@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		tstore.h
+ * @file		thread_store.h
  * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFORM_TSTORE_H
-#define TB_PLATFORM_TSTORE_H
+#ifndef TB_PLATFORM_THREAD_STORE_H
+#define TB_PLATFORM_THREAD_STORE_H
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -34,49 +34,49 @@
  * types
  */
 
-// the tstore data type enum
-typedef enum __tb_tstore_data_type_e
+// the thread store data type enum
+typedef enum __tb_thread_store_data_type_e
 {
-	TB_TSTORE_DATA_TYPE_NONE 		= 0
-,	TB_TSTORE_DATA_TYPE_EXCEPTION 	= 1
-,	TB_TSTORE_DATA_TYPE_USER 		= 2
+	TB_THREAD_STORE_DATA_TYPE_NONE 			= 0
+,	TB_THREAD_STORE_DATA_TYPE_EXCEPTION 	= 1
+,	TB_THREAD_STORE_DATA_TYPE_USER 			= 2
 
-}tb_tstore_data_type_e;
+}tb_thread_store_data_type_e;
 
-// the tstore data type
-typedef struct __tb_tstore_data_t
+// the thread store data type
+typedef struct __tb_thread_store_data_t
 {
 	// the data type
 	tb_size_t 		type;
 
 	// the free func
-	tb_void_t 		(*free)(struct __tb_tstore_data_t* data);
+	tb_void_t 		(*free)(struct __tb_thread_store_data_t* data);
 
-}tb_tstore_data_t;
+}tb_thread_store_data_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init tstore for thread store
+/*! init thread store for thread store
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_tstore_init(tb_noarg_t);
+tb_bool_t 				tb_thread_store_init(tb_noarg_t);
 
-/// exit tstore
-tb_void_t 				tb_tstore_exit(tb_noarg_t);
+/// exit thread store
+tb_void_t 				tb_thread_store_exit(tb_noarg_t);
 
-/*! set tstore data
+/*! set thread store data
  *
- * @param data 			the tstore data
+ * @param data 			the thread store data
  */
-tb_void_t 				tb_tstore_setp(tb_tstore_data_t const* data);
+tb_void_t 				tb_thread_store_setp(tb_thread_store_data_t const* data);
 
-/*! get tstore data
+/*! get thread store data
  *
- * @return 				the tstore data
+ * @return 				the thread store data
  */
-tb_tstore_data_t* 		tb_tstore_getp(tb_noarg_t);
+tb_thread_store_data_t*	tb_thread_store_getp(tb_noarg_t);
 
 #endif

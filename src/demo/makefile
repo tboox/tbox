@@ -88,7 +88,6 @@ demo_C_FILES 							+= \
 										platform/event \
 										platform/utils \
 										platform/timer \
-										platform/tstore \
 										platform/ltimer \
 										platform/atomic \
 										platform/process \
@@ -99,6 +98,7 @@ demo_C_FILES 							+= \
 										platform/exception \
 										platform/semaphore \
 										platform/thread_pool \
+										platform/thread_store \
 										container/heap \
 										container/hash \
 										container/dlist \
