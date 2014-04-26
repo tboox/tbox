@@ -76,13 +76,13 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 		for (; p && *p; p++)
 		{
 			// done transfer
-			if (!tb_transfer_pool_done(tb_transfer_pool_instance(), argv[1], *p, 0, tb_demo_transfer_stream_save_func, *p)) break;
+			if (!tb_transfer_pool_done(tb_transfer_pool(), argv[1], *p, 0, tb_demo_transfer_stream_save_func, *p)) break;
 		}
 
 	} while (0);
 
 	// wait transfer
-	while (g_event && tb_transfer_pool_size(tb_transfer_pool_instance()) && tb_event_wait(g_event, -1) > 0);
+	while (g_event && tb_transfer_pool_size(tb_transfer_pool()) && tb_event_wait(g_event, -1) > 0);
 
 	// exit event
 	if (g_event) tb_event_exit(g_event);

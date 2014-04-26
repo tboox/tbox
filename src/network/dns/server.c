@@ -196,7 +196,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	tb_assert_and_check_goto(size, end);
 
 	// init time
-	tb_hong_t time = tb_mclock();
+	tb_hong_t time = tb_ctime_spak();
 
 	// se/nd request
 	tb_long_t writ = 0;
@@ -259,7 +259,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	tb_check_goto(answer > 0, end);
 
 	// rate
-	rate = (tb_long_t)(tb_mclock() - time);
+	rate = (tb_long_t)(tb_ctime_spak() - time);
 
 	// ok
 	tb_trace_d("addr: %u.%u.%u.%u ok, rate: %u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3], rate);

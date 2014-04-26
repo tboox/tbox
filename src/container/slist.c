@@ -21,6 +21,13 @@
  * @ingroup 	container
  *
  */
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"slist"
+#define TB_TRACE_MODULE_DEBUG 				(0)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -45,7 +52,7 @@ typedef struct __tb_slist_item_t
 /*! the single list type
  *
  * <pre>
- * slist: |-----| => |-------------------------------------------------=> |------| => |------| => null
+ * slist: |-----| => |-------------------------------------------------=> |------| => |------| => 0
  *         head                                                                         last      tail
  *
  * head: => the first item
@@ -683,12 +690,16 @@ tb_void_t tb_slist_walk(tb_slist_t* handle, tb_bool_t (*func)(tb_slist_t* slist,
 	tb_size_t 	step = slist->func.size;
 	tb_assert_and_check_return(step);
 
+	// check
+	tb_assert_and_check_return((tb_fixed_pool_size(pool) && slist->head) || !tb_fixed_pool_size(pool));
+
 	// walk
 	tb_size_t 	base = -1;
 	tb_size_t 	prev = 0;
 	tb_bool_t 	bdel = tb_false;
 	tb_size_t 	itor = slist->head;
 	tb_bool_t 	stop = tb_false;
+	tb_assert_abort(itor);
 	while (itor)
 	{
 		// node
@@ -720,26 +731,35 @@ tb_void_t tb_slist_walk(tb_slist_t* handle, tb_bool_t (*func)(tb_slist_t* slist,
 			tb_fixed_pool_free(pool, (tb_pointer_t)itor);
 		}
 		
+		// trace
+		tb_trace_d("prev: %p, itor: %p, next: %p, base: %p, head: %p, last: %p, bdel: %u", prev, itor, next, base, slist->head, slist->last, bdel);
+
 		// remove items?
 		if (!bdel || !next || stop)
 		{
-			// has deleted items?
+			// have removed items?
 			if (base != -1)
 			{
-				// remove part
+				// the body
+				tb_size_t body = bdel? next : itor;
+
+				// remove body
 				if (base)
 				{
-					// base => next
-					((tb_slist_item_t*)base)->next = next;
+					// base => body
+					((tb_slist_item_t*)base)->next = body;
 
 					// update last
-					if (!next) slist->last = base;
+					if (!body) slist->last = base;
 				}
-				// remove all
+				// remove head
 				else
 				{
-					slist->head = 0;
-					slist->last = 0;
+					// head => body
+					slist->head = body;
+
+					// update last
+					if (!body) slist->last = 0;
 				}
 			}
 

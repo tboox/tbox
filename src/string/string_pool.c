@@ -182,9 +182,9 @@ tb_char_t const* tb_string_pool_put(tb_handle_t handle, tb_char_t const* data)
 	if (pool->cache)
 	{
 		// exists?
-		tb_size_t 				itor = 0;
+		tb_size_t 				itor;
 		tb_hash_item_t const* 	item = tb_null;
-		if ((itor = tb_hash_itor(pool->cache, data)) && (item = tb_iterator_item(pool->cache, itor)))
+		if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = tb_iterator_item(pool->cache, itor)))
 		{
 			// refn
 			tb_size_t refn = (tb_size_t)item->data;
@@ -207,7 +207,7 @@ tb_char_t const* tb_string_pool_put(tb_handle_t handle, tb_char_t const* data)
 		if (!item)
 		{
 			// add it
-			if ((itor = tb_hash_set(pool->cache, data, (tb_pointer_t)1)))
+			if ((itor = tb_hash_set(pool->cache, data, (tb_pointer_t)1)) != tb_iterator_tail(pool->cache))
 				item = tb_iterator_item(pool->cache, itor);
 		}
 
@@ -235,8 +235,8 @@ tb_void_t tb_string_pool_del(tb_handle_t handle, tb_char_t const* data)
 	if (pool->cache)
 	{
 		// exists?
-		tb_size_t itor = 0;
-		if ((itor = tb_hash_itor(pool->cache, data)) && (item = tb_iterator_item(pool->cache, itor)))
+		tb_size_t itor;
+		if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = tb_iterator_item(pool->cache, itor)))
 		{
 			// refn
 			tb_size_t refn = (tb_size_t)item->data;
@@ -251,7 +251,7 @@ tb_void_t tb_string_pool_del(tb_handle_t handle, tb_char_t const* data)
 	// leave
 	tb_spinlock_leave(&pool->lock);
 }
-tb_handle_t tb_string_pool_instance()
+tb_handle_t tb_string_pool()
 {
 	return tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_string_pool_instance_init, tb_string_pool_instance_exit, tb_null);
 }

@@ -83,13 +83,13 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 	if (string) 
 	{
 		// exit the cache string
-		if (string->cdata) tb_string_pool_del(tb_string_pool_instance(), string->cdata);
+		if (string->cdata) tb_string_pool_del(tb_string_pool(), string->cdata);
 		
 		// exit the string
 		tb_scoped_string_exit(&string->pstr);
 
 		// exit the object
-		tb_object_pool_del(tb_object_pool_instance(), object);
+		tb_object_pool_del(tb_object_pool(), object);
 	}
 }
 static tb_void_t tb_string_cler(tb_object_t* object)
@@ -98,7 +98,7 @@ static tb_void_t tb_string_cler(tb_object_t* object)
 	if (string) 
 	{
 		// clear the cache string
-		if (string->cdata) tb_string_pool_del(tb_string_pool_instance(), string->cdata);
+		if (string->cdata) tb_string_pool_del(tb_string_pool(), string->cdata);
 		string->cdata = tb_null;
 		string->csize = 0;
 
@@ -109,7 +109,7 @@ static tb_void_t tb_string_cler(tb_object_t* object)
 static tb_string_t* tb_string_init_base()
 {
 	// make
-	tb_string_t* string = (tb_string_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
+	tb_string_t* string = (tb_string_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
 	tb_assert_and_check_return_val(string, tb_null);
 
 	// init base
@@ -142,7 +142,7 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 			if (size < TB_STRING_STRING_CACHE_SIZE) 
 			{
 				// put string to pool
-				string->cdata = tb_string_pool_put(tb_string_pool_instance(), cstr);
+				string->cdata = tb_string_pool_put(tb_string_pool(), cstr);
 				tb_assert_and_check_goto(string->cdata, fail);
 
 				// the string size
@@ -176,7 +176,7 @@ tb_object_t* tb_string_init_from_pstr(tb_scoped_string_t* pstr)
 		if (size < TB_STRING_STRING_CACHE_SIZE) 
 		{
 			// put string to scache
-			string->cdata = tb_string_pool_put(tb_string_pool_instance(), tb_scoped_string_cstr(pstr));
+			string->cdata = tb_string_pool_put(tb_string_pool(), tb_scoped_string_cstr(pstr));
 			tb_assert_and_check_goto(string->cdata, fail);
 
 			// the string size
@@ -217,11 +217,11 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 			if (size < TB_STRING_STRING_CACHE_SIZE) 
 			{
 				// put string to scache
-				tb_char_t const* cdata = tb_string_pool_put(tb_string_pool_instance(), cstr);
+				tb_char_t const* cdata = tb_string_pool_put(tb_string_pool(), cstr);
 				if (cdata)
 				{
 					// save string
-					if (string->cdata) tb_string_pool_del(tb_string_pool_instance(), string->cdata);
+					if (string->cdata) tb_string_pool_del(tb_string_pool(), string->cdata);
 					string->cdata = cdata;
 					string->csize = size;
 				}
@@ -233,7 +233,7 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 				size = tb_scoped_string_size(&string->pstr);
 
 				// remove string from scache
-				if (string->cdata) tb_string_pool_del(tb_string_pool_instance(), string->cdata);
+				if (string->cdata) tb_string_pool_del(tb_string_pool(), string->cdata);
 				string->cdata = tb_null;
 				string->csize = 0;
 			}
@@ -244,7 +244,7 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 			tb_scoped_string_clear(&string->pstr);
 
 			// remove string from scache
-			if (string->cdata) tb_string_pool_del(tb_string_pool_instance(), string->cdata);
+			if (string->cdata) tb_string_pool_del(tb_string_pool(), string->cdata);
 			string->cdata = tb_null;
 			string->csize = 0;
 		}

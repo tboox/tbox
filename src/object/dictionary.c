@@ -104,7 +104,7 @@ static tb_void_t tb_dictionary_exit(tb_object_t* object)
 	dictionary->hash = tb_null;
 
 	// exit it
-	tb_object_pool_del(tb_object_pool_instance(), (tb_object_t*)dictionary);
+	tb_object_pool_del(tb_object_pool(), (tb_object_t*)dictionary);
 }
 static tb_void_t tb_dictionary_cler(tb_object_t* object)
 {
@@ -117,7 +117,7 @@ static tb_void_t tb_dictionary_cler(tb_object_t* object)
 static tb_dictionary_t* tb_dictionary_init_base()
 {
 	// make
-	tb_dictionary_t* dictionary = (tb_dictionary_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_dictionary_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY);
+	tb_dictionary_t* dictionary = (tb_dictionary_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_dictionary_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY);
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
 	// init base
@@ -144,7 +144,7 @@ tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 	dictionary->incr = incr;
 
 	// init hash
-	dictionary->hash = tb_hash_init(size, tb_item_func_string_pool(tb_string_pool_instance()), tb_item_func_obj());
+	dictionary->hash = tb_hash_init(size, tb_item_func_string_pool(tb_string_pool()), tb_item_func_obj());
 	tb_assert_and_check_goto(dictionary->hash, fail);
 
 	// ok

@@ -33,6 +33,12 @@
  * interfaces
  */
 
+/*! the string pool instance
+ *
+ * @return pool 	the string pool instance
+ */
+tb_handle_t 		tb_string_pool(tb_noarg_t);
+
 /*! init string pool for small, readonly and repeat strings
  *
  * readonly, strip repeat strings and decrease memory fragmens
@@ -71,12 +77,6 @@ tb_char_t const*	tb_string_pool_put(tb_handle_t pool, tb_char_t const* data);
  * @param data 		the string data
  */
 tb_void_t 			tb_string_pool_del(tb_handle_t pool, tb_char_t const* data);
-
-/*! the string pool instance
- *
- * @return pool 	the string pool instance
- */
-tb_handle_t 		tb_string_pool_instance(tb_noarg_t);
 
 #ifdef __tb_debug__
 /*! dump the string pool

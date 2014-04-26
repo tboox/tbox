@@ -65,9 +65,6 @@ typedef struct __tb_dns_cache_t
 	// the expired
 	tb_size_t 				expired;
 
-	// using ctime?
-	tb_bool_t 				ctime;
-
 }tb_dns_cache_t;
 
 // the dns cache addr type
@@ -96,8 +93,7 @@ static tb_dns_cache_t 		g_cache = {0};
  */
 static __tb_inline__ tb_size_t tb_dns_cache_now()
 {
-	// using the real time?
-	return (tb_size_t)((g_cache.ctime? tb_ctime_time() : tb_mclock()) / 1000);
+	return (tb_size_t)(tb_ctime_spak() / 1000);
 }
 static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
@@ -191,17 +187,6 @@ tb_void_t tb_dns_cache_exit()
 	// leave
 	tb_spinlock_leave(&g_lock);
 }
-tb_void_t tb_dns_cache_ctime(tb_bool_t enabled)
-{
-	// enter
-	tb_spinlock_enter(&g_lock);
-
-	// enable it?
-	g_cache.ctime = enabled;
-
-	// leave
-	tb_spinlock_leave(&g_lock);
-}
 tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 {
 	// check
@@ -239,13 +224,13 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 
 		// trace
 		tb_trace_d("get: %s => %u.%u.%u.%u, time: %u => %u, size: %u",	name
-																		, 	caddr->ipv4.u8[0]
-																		, 	caddr->ipv4.u8[1]
-																		, 	caddr->ipv4.u8[2]
-																		, 	caddr->ipv4.u8[3]
-																		, 	caddr->time
-																		, 	tb_dns_cache_now()
-																		, 	tb_hash_size(g_cache.hash));
+																	, 	caddr->ipv4.u8[0]
+																	, 	caddr->ipv4.u8[1]
+																	, 	caddr->ipv4.u8[2]
+																	, 	caddr->ipv4.u8[3]
+																	, 	caddr->time
+																	, 	tb_dns_cache_now()
+																	, 	tb_hash_size(g_cache.hash));
 
 		// update time
 		tb_assert_and_check_break(g_cache.times >= caddr->time);

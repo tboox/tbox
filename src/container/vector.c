@@ -21,6 +21,13 @@
  * @ingroup 	container
  *
  */
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"vector"
+#define TB_TRACE_MODULE_DEBUG 				(0)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -612,7 +619,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vec
 		// remove items?
 		if (!bdel || i + 1 == n || stop)
 		{
-			// has deleted items?
+			// has removed items?
 			if (b != -1)
 			{
 				// the removed items end
@@ -622,7 +629,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vec
 					// the items number
 					tb_size_t m = e - b;
 					tb_assert(n >= m);
-//					tb_trace_d("del: b: %u, e: %u, d: %u", b, e, bdel);
+					tb_trace_d("del: b: %u, e: %u, d: %u", b, e, bdel);
 
 					// remove items
 					if (e < n) tb_memmov(d + b * step, d + e * step, (n - e) * step);

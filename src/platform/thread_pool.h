@@ -63,6 +63,12 @@ typedef struct __tb_thread_pool_task_t
  * interfaces
  */
 
+/*! the thread pool instance
+ *
+ * @param pool 			the thread pool handle
+ */
+tb_handle_t 			tb_thread_pool(tb_noarg_t);
+
 /*! init thread pool
  *
  * @param worker_maxn 	the thread worker max count, using the default count
@@ -143,7 +149,7 @@ tb_handle_t 			tb_thread_pool_task_init(tb_handle_t pool, tb_char_t const* name,
  */
 tb_void_t 				tb_thread_pool_task_kill(tb_handle_t pool, tb_handle_t task);
 
-/*!cancel all waiting task
+/*!cancel all waiting tasks
  *
  * @param pool 			the thread pool handle
  */
@@ -159,18 +165,21 @@ tb_void_t 				tb_thread_pool_task_kill_all(tb_handle_t pool);
  */
 tb_long_t 				tb_thread_pool_task_wait(tb_handle_t pool, tb_handle_t task, tb_long_t timeout);
 
+/*! wait all waiting tasks
+ *
+ * @param pool 			the thread pool handle
+ * @param timeout 		the timeout
+ *
+ * @return 				ok: 1, timeout: 0, error: -1
+ */
+tb_long_t 				tb_thread_pool_task_wait_all(tb_handle_t pool, tb_long_t timeout);
+
 /*! exit the task
  *
  * @param pool 			the thread pool handle
  * @param task 			the task handle
  */
 tb_void_t 				tb_thread_pool_task_exit(tb_handle_t pool, tb_handle_t task);
-
-/*! the thread pool instance
- *
- * @param pool 			the thread pool handle
- */
-tb_handle_t 			tb_thread_pool_instance(tb_noarg_t);
 
 #ifdef __tb_debug__
 /*! dump the thread pool

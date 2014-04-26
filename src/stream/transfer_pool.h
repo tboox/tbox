@@ -35,6 +35,12 @@
  * interfaces
  */
 
+/*! the transfer pool instance
+ *
+ * @return 				the transfer pool instance
+ */
+tb_handle_t 			tb_transfer_pool(tb_noarg_t);
+
 /*! init transfer pool
  *
  * @param aicp 			the aicp, will make it if be null
@@ -62,12 +68,6 @@ tb_void_t 				tb_transfer_pool_kill(tb_handle_t pool);
  * @param pool 			the transfer pool 
  */
 tb_size_t 				tb_transfer_pool_size(tb_handle_t pool);
-
-/*! the transfer pool instance
- *
- * @return 				the transfer pool instance
- */
-tb_handle_t 			tb_transfer_pool_instance(tb_noarg_t);
 
 /*! done transfer from iurl to ourl
  *

@@ -50,7 +50,10 @@ tb_hong_t tb_ctime_spak(tb_noarg_t)
 	tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
 	// save it
-	return (tb_hong_t)tb_atomic64_fetch_and_set(&g_time, val);
+	tb_atomic64_set(&g_time, val);
+
+	// ok
+	return val;
 }
 tb_hong_t tb_ctime_time(tb_noarg_t)
 {

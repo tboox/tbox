@@ -37,7 +37,7 @@
  *
  * update the cached time for the external loop thread
  *
- * @return 			the old ctime value
+ * @return 			the now ctime value
  */
 tb_hong_t 			tb_ctime_spak(tb_noarg_t);
 

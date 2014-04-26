@@ -135,7 +135,7 @@ static tb_object_t* tb_number_copy(tb_object_t* object)
 }
 static tb_void_t tb_number_exit(tb_object_t* object)
 {
-	if (object) tb_object_pool_del(tb_object_pool_instance(), object);
+	if (object) tb_object_pool_del(tb_object_pool(), object);
 }
 static tb_void_t tb_number_cler(tb_object_t* object)
 {
@@ -185,7 +185,7 @@ static tb_void_t tb_number_cler(tb_object_t* object)
 static tb_number_t* tb_number_init_base()
 {
 	// make
-	tb_number_t* number = (tb_number_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_number_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_NUMBER);
+	tb_number_t* number = (tb_number_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_number_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_NUMBER);
 	tb_assert_and_check_return_val(number, tb_null);
 
 	// init base
