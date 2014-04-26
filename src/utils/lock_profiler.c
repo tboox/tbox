@@ -23,6 +23,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"lock_profiler"
+#define TB_TRACE_MODULE_DEBUG 				(0)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "lock_profiler.h"
@@ -120,11 +126,10 @@ tb_void_t tb_lock_profiler_dump(tb_handle_t handle)
 			{
 				// trace
 				tb_trace_i("======================================================================");
-				tb_trace_i("lock_profiler:");
 			}
 
 			// dump lock
-			tb_trace_i("    lock: %p, name: %s, occupied: %ld", lock, (tb_char_t const*)tb_atomic_get(&item->name), tb_atomic_get(&item->size));
+			tb_trace_i("lock: %p, name: %s, occupied: %ld", lock, (tb_char_t const*)tb_atomic_get(&item->name), tb_atomic_get(&item->size));
 
 			// count++
 			c++;
