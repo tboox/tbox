@@ -43,7 +43,7 @@
  * interfaces
  */
 
-/*! init spinlock
+/*! init spinlock 
  *
  * @param lock 		the lock
  *
