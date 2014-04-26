@@ -135,6 +135,7 @@ tbox_C_FILES 			+= \
 						utils/base32 \
 						utils/base64 \
 						utils/singleton \
+						utils/lock_profiler \
 						xml/node \
 						xml/reader \
 						xml/writer \

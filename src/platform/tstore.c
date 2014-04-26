@@ -80,6 +80,11 @@ tb_bool_t tb_tstore_init()
 	// leave lock
 	tb_spinlock_leave(&g_lock);
 
+	// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&g_lock, TB_TRACE_MODULE_NAME);
+#endif
+
 	// ok?
 	return g_store? tb_true : tb_false;
 }

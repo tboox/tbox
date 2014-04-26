@@ -45,11 +45,23 @@ static tb_spinlock_t 	g_lock = TB_SPINLOCK_INIT;
  */
 tb_bool_t tb_native_memory_init()
 {	
-	// init heap
+	// enter
+	tb_spinlock_enter_without_profiler(&g_lock);
+
+	// done
 	tb_bool_t ok = tb_false;
-	tb_spinlock_enter(&g_lock);
-	if (!g_heap) g_heap = (tb_handle_t)HeapCreate(0, 0, 0);
-	if (g_heap) ok = tb_true;
+	do
+	{
+		// make heap
+		g_heap = (tb_handle_t)HeapCreate(0, 0, 0);
+		tb_check_break(g_heap);
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// leave
 	tb_spinlock_leave(&g_lock);
 
 	// ok?
@@ -58,7 +70,7 @@ tb_bool_t tb_native_memory_init()
 tb_void_t tb_native_memory_exit()
 {	
 	// enter 
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// exit heap
 	if (g_heap) HeapDestroy(g_heap);
@@ -68,7 +80,7 @@ tb_void_t tb_native_memory_exit()
 	tb_spinlock_leave(&g_lock);
 
 	// exit lock
-	g_lock = 0;
+	tb_spinlock_exit(&g_lock);
 }
 tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 {
@@ -79,7 +91,7 @@ tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 	tb_pointer_t data = tb_null;
 
 	// enter 
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// alloc data
 	if (g_heap) data = HeapAlloc((HANDLE)g_heap, 0, (SIZE_T)size);
@@ -99,7 +111,7 @@ tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 	tb_pointer_t data = tb_null;
 
 	// enter 
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// alloc data
 	if (g_heap) data = HeapAlloc((HANDLE)g_heap, HEAP_ZERO_MEMORY, (SIZE_T)size);
@@ -112,26 +124,35 @@ tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 }
 tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
+	// check
 	tb_check_return_val(item && size, tb_null);	
-	return tb_malloc(item * size);
+
+	// nalloc
+	return tb_native_memory_malloc(item * size);
 }
 tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 {
+	// check
 	tb_check_return_val(item && size, tb_null);		
-	return tb_malloc0(item * size);
+
+	// nalloc0
+	return tb_native_memory_malloc0(item * size);
 }
 tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
+	// no size? free it
 	if (!size) 
 	{
-		tb_free(data);
+		tb_native_memory_free(data);
 		return tb_null;
 	}
-	else if (!data) return tb_malloc(size);
+	// no data? malloc it
+	else if (!data) return tb_native_memory_malloc(size);
+	// realloc it
 	else 
 	{
 		// enter 
-		tb_spinlock_enter(&g_lock);
+		tb_spinlock_enter_without_profiler(&g_lock);
 
 		// realloc
 		if (g_heap) data = (tb_pointer_t)HeapReAlloc((HANDLE)g_heap, 0, data, (SIZE_T)size);
@@ -149,7 +170,7 @@ tb_bool_t tb_native_memory_free(tb_pointer_t data)
 	tb_check_return_val(data, tb_true);
 
 	// enter 
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// free data
 	tb_bool_t ok = tb_false;

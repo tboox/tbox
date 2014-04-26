@@ -209,6 +209,11 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	aicp->pool = tb_fixed_pool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
 	tb_assert_and_check_goto(aicp->pool, fail);
 
+	// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&aicp->lock, TB_TRACE_MODULE_NAME);
+#endif
+
 	// ok
 	return aicp;
 

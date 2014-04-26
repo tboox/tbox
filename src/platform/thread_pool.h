@@ -65,7 +65,7 @@ typedef struct __tb_thread_pool_task_t
 
 /*! the thread pool instance
  *
- * @param pool 			the thread pool handle
+ * @return 				the thread pool handle
  */
 tb_handle_t 			tb_thread_pool(tb_noarg_t);
 

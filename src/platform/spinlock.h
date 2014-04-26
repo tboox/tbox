@@ -30,6 +30,7 @@
 #include "prefix.h"
 #include "sched.h"
 #include "atomic.h"
+#include "../utils/lock_profiler.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -83,14 +84,57 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_t* lock)
 	tb_assert_and_check_return(lock);
 
 	// init tryn
-	__tb_volatile__ tb_size_t tryn = 5;
+	tb_size_t tryn = 5;
+	
+	// init occupied
+#ifdef TB_LOCK_PROFILER_ENABLE
+	tb_bool_t occupied = tb_false;
+#endif
 
 	// lock it
 	while (tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1))
 	{
+#ifdef TB_LOCK_PROFILER_ENABLE
+		// occupied
+		if (!occupied)
+		{
+			occupied = tb_true;
+			tb_lock_profiler_occupied(tb_lock_profiler(), (tb_pointer_t)lock);
+		}
+#endif
+
+		// yield the processor
 		if (!tryn--)
 		{
-			// yield the processor
+			// yield
+			tb_sched_yield();
+//			tb_usleep(1);
+
+			// reset tryn
+			tryn = 5;
+		}
+	}
+}
+
+/*! enter spinlock without the lock profiler
+ *
+ * @param lock 		the lock
+ */
+static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinlock_t* lock)
+{
+	// check
+	tb_assert_and_check_return(lock);
+
+	// init tryn
+	tb_size_t tryn = 5;
+	
+	// lock it
+	while (tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1))
+	{
+		// yield the processor
+		if (!tryn--)
+		{
+			// yield
 			tb_sched_yield();
 //			tb_usleep(1);
 
@@ -111,7 +155,33 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_t* lock)
 	// check
 	tb_assert_and_check_return_val(lock, tb_false);
 
-	// try lock it
+#ifndef TB_LOCK_PROFILER_ENABLE
+	// try locking it
+	return tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
+#else
+	// try locking it
+	tb_bool_t ok = tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
+
+	// occupied?
+	if (!ok) tb_lock_profiler_occupied(tb_lock_profiler(), (tb_pointer_t)lock);
+
+	// ok?
+	return ok;
+#endif
+}
+
+/*! try to enter spinlock without the lock profiler
+ *
+ * @param lock 		the lock
+ *
+ * @return 			tb_true or tb_false
+ */
+static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_spinlock_t* lock)
+{
+	// check
+	tb_assert_and_check_return_val(lock, tb_false);
+
+	// try locking it
 	return tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
 }
 

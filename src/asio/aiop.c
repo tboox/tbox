@@ -23,6 +23,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"aiop"
+#define TB_TRACE_MODULE_DEBUG 				(1)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "aiop.h"
@@ -111,6 +117,11 @@ tb_aiop_t* tb_aiop_init(tb_size_t maxn)
 
 	// addo spak
 	if (!tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null)) goto fail;	
+
+	// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&aiop->lock, TB_TRACE_MODULE_NAME);
+#endif
 
 	// ok
 	return aiop;

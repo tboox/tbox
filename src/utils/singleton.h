@@ -48,8 +48,11 @@ typedef enum __tb_singleton_type_e
 	/// the transfer pool type
 ,	TB_SINGLETON_TYPE_TRANSFER_POOL = 3
 
+	/// the lock profiler type
+,	TB_SINGLETON_TYPE_LOCK_PROFILER = 4
+
 	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 			= 4
+,	TB_SINGLETON_TYPE_USER 			= 5
 
 	/// the max count of the singleton type
 #ifdef __tb_small__
