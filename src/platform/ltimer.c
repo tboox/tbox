@@ -342,6 +342,11 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
 	timer->expired 		= tb_vector_init((maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_goto(timer->expired, fail);
 
+	// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&timer->lock, TB_TRACE_MODULE_NAME);
+#endif
+
 	// ok
 	return (tb_handle_t)timer;
 fail:

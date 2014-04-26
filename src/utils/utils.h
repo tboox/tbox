@@ -24,7 +24,6 @@
 #ifndef TB_UTILS_H
 #define TB_UTILS_H
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -41,5 +40,6 @@
 #include "base64.h"
 #include "option.h"
 #include "singleton.h"
+#include "lock_profiler.h"
 
 #endif

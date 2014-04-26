@@ -153,6 +153,11 @@ tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 	timer->heap 		= tb_heap_init((maxn >> 2) + 16, func);
 	tb_assert_and_check_goto(timer->heap, fail);
 
+	// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&timer->lock, TB_TRACE_MODULE_NAME);
+#endif
+
 	// ok
 	return (tb_handle_t)timer;
 fail:

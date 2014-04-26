@@ -780,6 +780,11 @@ tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
 		pool->semaphore = tb_semaphore_init(0);
 		tb_assert_and_check_break(pool->semaphore);
 
+		// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+		tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&pool->lock, TB_TRACE_MODULE_NAME);
+#endif
+
 		// ok
 		ok = tb_true;
 

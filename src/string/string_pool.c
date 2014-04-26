@@ -103,6 +103,11 @@ tb_handle_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
 		pool->cache = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(bcase, pool->pool), tb_item_func_size());
 		tb_assert_and_check_break(pool->cache);
 
+		// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+		tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&pool->lock, TB_TRACE_MODULE_NAME);
+#endif
+
 		// ok
 		ok = tb_true;
 

@@ -17,10 +17,16 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		pool.c
+ * @file		object_pool.c
  * @ingroup 	object
  *
  */
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"object_pool"
+#define TB_TRACE_MODULE_DEBUG 				(1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -90,6 +96,11 @@ tb_handle_t tb_object_pool_init()
 		// init pool
 		pool->pool = tb_block_pool_init(TB_OBJECT_POOL_GROW, 0);
 		tb_assert_and_check_break(pool->pool);
+
+		// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+		tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&pool->lock, TB_TRACE_MODULE_NAME);
+#endif
 
 		// ok
 		ok = tb_true;

@@ -72,17 +72,23 @@ tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 }
 tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
+	// no size? free it
 	if (!size) 
 	{
 		free(data);
 		return tb_null;
 	}
+	// no data? malloc it
 	else if (!data) return malloc(size);
+	// realloc it
 	else return realloc(data, size);
 }
 tb_bool_t tb_native_memory_free(tb_pointer_t data)
 {
+	// free it
 	if (data) free(data);
+
+	// ok
 	return tb_true;
 }
 

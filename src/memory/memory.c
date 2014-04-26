@@ -23,6 +23,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"memory"
+#define TB_TRACE_MODULE_DEBUG 				(0)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "memory.h"
@@ -46,7 +52,10 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// done
 	tb_bool_t ok = tb_false;
 	do
-	{
+	{	
+		// init the native memory
+		if (!tb_native_memory_init()) break;
+
 		// using pool?
 		if (data && size)
 		{
@@ -64,13 +73,13 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 
 			// check
 			tb_assert_and_check_break(pool);
-		}
-		else
-		{
-			// init the native memory
-			if (!tb_native_memory_init()) break;
-		}
 
+			// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+			tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&g_lock, TB_TRACE_MODULE_NAME);
+#endif
+		}
+		
 		// ok
 		ok = tb_true;
 
@@ -106,11 +115,11 @@ tb_void_t tb_memory_exit()
 	// leave
 	tb_spinlock_leave(&g_lock);
 
-	// exit the native memory
-	if (!pool) tb_native_memory_exit();
-
 	// exit lock
 	tb_spinlock_exit(&g_lock);
+
+	// exit the native memory
+	tb_native_memory_exit();
 }
 tb_pointer_t tb_memory_malloc_(tb_size_t size __tb_debug_decl__)
 {
