@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../thread_store.h"
 #include "../../libc/misc/signal.h"
 #include "../../libc/misc/setjmp.h"
 #include "../../container/container.h"
@@ -41,11 +42,11 @@
 // the exception data type
 typedef struct __tb_exception_list_t
 {
-	// the tstore base
-	tb_tstore_data_t 	base;
+	// the thread store base
+	tb_thread_store_data_t 	base;
 
 	// the stack
-	tb_stack_t* 		stack;
+	tb_stack_t* 			stack;
 
 }tb_exception_list_t;
 
@@ -66,15 +67,15 @@ typedef struct __tb_exception_list_t
 		\
 		/* init exception data */ \
 		tb_exception_list_t* __l = tb_null; \
-		if (!(__l = (tb_exception_list_t*)tb_tstore_getp())) \
+		if (!(__l = (tb_exception_list_t*)tb_thread_store_getp())) \
 		{ \
 			__l = tb_malloc0(sizeof(tb_exception_list_t)); \
 			if (__l) \
 			{ \
-				__l->base.type = TB_TSTORE_DATA_TYPE_EXCEPTION; \
+				__l->base.type = TB_THREAD_STORE_DATA_TYPE_EXCEPTION; \
 				__l->base.free = tb_exception_list_free; \
 				__l->stack = tb_stack_init(16, tb_item_func_mem(sizeof(tb_sigjmpbuf_t), tb_null, tb_null)); \
-				tb_tstore_setp((tb_tstore_data_t const*)__l); \
+				tb_thread_store_setp((tb_thread_store_data_t const*)__l); \
 			} \
 		} \
  		\
@@ -138,7 +139,7 @@ typedef struct __tb_exception_list_t
 #if defined(tb_signal) && defined(tb_sigsetjmp) && defined(tb_siglongjmp)
 static __tb_inline__ tb_void_t tb_exception_func_impl(tb_int_t sig)
 {
-	tb_exception_list_t* list = (tb_exception_list_t*)tb_tstore_getp();
+	tb_exception_list_t* list = (tb_exception_list_t*)tb_thread_store_getp();
 	if (list && list->stack && tb_stack_size(list->stack)) 
 	{
 		tb_sigjmpbuf_t* jmpbuf = (tb_sigjmpbuf_t*)tb_stack_top(list->stack);
@@ -159,7 +160,7 @@ static __tb_inline__ tb_void_t tb_exception_init_impl()
 //		tb_signal(TB_SIGTRAP, tb_exception_func_impl);
 	}
 }
-static __tb_inline__ tb_void_t tb_exception_list_free(tb_tstore_data_t* data)
+static __tb_inline__ tb_void_t tb_exception_list_free(tb_thread_store_data_t* data)
 {
 	tb_exception_list_t* list = (tb_exception_list_t*)data;
 	if (list)

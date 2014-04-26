@@ -138,7 +138,7 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(platform_event)
 ,	TB_DEMO_MAIN_ITEM(platform_utils)
 ,	TB_DEMO_MAIN_ITEM(platform_timer)
-,	TB_DEMO_MAIN_ITEM(platform_tstore)
+,	TB_DEMO_MAIN_ITEM(platform_thread_store)
 ,	TB_DEMO_MAIN_ITEM(platform_ltimer)
 ,	TB_DEMO_MAIN_ITEM(platform_atomic)
 ,	TB_DEMO_MAIN_ITEM(platform_process)

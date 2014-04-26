@@ -39,7 +39,6 @@
 #include "timer.h"
 #include "print.h"
 #include "ltimer.h"
-#include "tstore.h"
 #include "socket.h"
 #include "thread.h"
 #include "atomic.h"
@@ -54,6 +53,7 @@
 #include "directory.h"
 #include "exception.h"
 #include "thread_pool.h"
+#include "thread_store.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

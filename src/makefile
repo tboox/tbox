@@ -280,11 +280,11 @@ tbox_C_FILES 			+= \
 						platform/sched \
 						platform/timer \
 						platform/ltimer \
-						platform/tstore \
 						platform/atomic64 \
 						platform/platform \
 						platform/backtrace \
 						platform/thread_pool \
+						platform/thread_store \
 						platform/$(TB_CONFIG_API_DLL)/dynamic \
 						platform/$(TB_CONFIG_API_FILE)/file \
 						platform/$(TB_CONFIG_API_UTIL)/utils \
@@ -417,7 +417,6 @@ INC_FILES 				= \
 						platform/mutex.h \
 						platform/timer.h \
 						platform/ltimer.h \
-						platform/tstore.h \
 						platform/thread.h \
 						platform/socket.h \
 						platform/event.h \
@@ -433,6 +432,7 @@ INC_FILES 				= \
 						platform/exception.h \
 						platform/backtrace.h \
 						platform/thread_pool.h \
+						platform/thread_store.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/barrier.h \

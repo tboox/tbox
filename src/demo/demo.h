@@ -147,7 +147,7 @@ TB_DEMO_MAIN_DECL(platform_ctime);
 TB_DEMO_MAIN_DECL(platform_event);
 TB_DEMO_MAIN_DECL(platform_utils);
 TB_DEMO_MAIN_DECL(platform_timer);
-TB_DEMO_MAIN_DECL(platform_tstore);
+TB_DEMO_MAIN_DECL(platform_thread_store);
 TB_DEMO_MAIN_DECL(platform_ltimer);
 TB_DEMO_MAIN_DECL(platform_atomic);
 TB_DEMO_MAIN_DECL(platform_process);

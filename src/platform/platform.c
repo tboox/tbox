@@ -38,7 +38,7 @@ tb_bool_t tb_platform_init()
 	if (!tb_socket_init()) return tb_false;
 
 	// init tstore
-	if (!tb_tstore_init()) return tb_false;
+	if (!tb_thread_store_init()) return tb_false;
 
 	// init dns
 	if (!tb_dns_init()) return tb_false;
@@ -55,7 +55,7 @@ tb_void_t tb_platform_exit()
 	tb_dns_exit();
 
 	// exit tstore
-	tb_tstore_exit();
+	tb_thread_store_exit();
 
 	// exit socket
 	tb_socket_exit();
