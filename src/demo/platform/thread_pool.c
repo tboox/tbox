@@ -4,11 +4,6 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * globals
- */ 
-static tb_atomic_t g_stop = 0;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */ 
 static tb_void_t tb_demo_task_time_done(tb_cpointer_t priv)
@@ -17,12 +12,7 @@ static tb_void_t tb_demo_task_time_done(tb_cpointer_t priv)
 	tb_trace_i("done: %u ms", tb_p2u32(priv));
 	
 	// wait some time
-	tb_size_t time = tb_p2u32(priv);
-	tb_size_t count = (time / 500) + 1;
-	while (!tb_atomic_get(&g_stop) && count--)
-	{
-		tb_msleep(500);
-	}
+	tb_msleep(tb_p2u32(priv));
 }
 static tb_void_t tb_demo_task_time_exit(tb_cpointer_t priv)
 {
@@ -56,7 +46,7 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 	while (count-- && total < 1000)
 	{
 		// the time
-		tb_size_t time = tb_rand_uint32(0, 1000);
+		tb_size_t time = tb_rand_uint32(0, 500);
 
 		// trace
 		tb_trace_i("post: %lu ms, total: %lu", time, total);
@@ -68,7 +58,7 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 		if (!count) 
 		{
 			// wait some time
-			tb_msleep(500);
+			tb_msleep(100);
 
 			// update count
 			count = tb_rand_uint32(1, 16);

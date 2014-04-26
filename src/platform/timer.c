@@ -552,6 +552,7 @@ tb_void_t tb_timer_task_exit(tb_handle_t handle, tb_handle_t htask)
 	// enter
 	tb_spinlock_enter(&timer->lock);
 
+	// remove it?
 	if (task->refn > 1)
 	{
 		// refn--
