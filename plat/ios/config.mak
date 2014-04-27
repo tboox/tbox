@@ -32,3 +32,9 @@ TB_CONFIG_HAVE_OPENSSL 			= n
 # polarssl
 TB_CONFIG_HAVE_POLARSSL 		= n
 
+# mysql
+TB_CONFIG_HAVE_MYSQL 			= n
+
+# sqlite3
+TB_CONFIG_HAVE_SQLITE3 			= n
+

@@ -118,6 +118,7 @@ tbox_C_FILES 			+= \
 						object/writer/xplist \
 						object/writer/bplist \
 						object/writer/writer \
+						sql/sql \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \
@@ -536,6 +537,8 @@ INC_FILES 				= \
 						xml/node.h \
 						xml/reader.h \
 						xml/writer.h \
+						sql/prefix.h \
+						sql/sql.h \
 						zip/prefix.h \
 						zip/zip.h \
 						zip/vlc.h \
