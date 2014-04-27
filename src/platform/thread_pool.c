@@ -379,6 +379,18 @@ static tb_bool_t tb_thread_pool_worker_walk_clean(tb_dlist_t* jobs, tb_pointer_t
 	// ok
 	return tb_true;
 }
+static tb_void_t tb_thread_pool_worker_post(tb_thread_pool_t* pool, tb_size_t post)
+{
+	// check
+	tb_assert_and_check_return(pool && pool->semaphore);
+
+	// the semaphore value
+	tb_long_t value = tb_semaphore_value(pool->semaphore);
+
+	// post wait
+	if (value >= 0 && value < post) 
+		tb_semaphore_post(pool->semaphore, post - value);
+}
 static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 {
 	// the worker
@@ -398,7 +410,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 		tb_assert_and_check_break(pool && pool->semaphore);
 
 		// wait some time for leaving the lock
-		tb_msleep(10);
+		tb_msleep((worker->id + 1)* 20);
 
 		// init jobs
 		worker->jobs = tb_vector_init(TB_THREAD_POOL_JOBS_WORKING_GROW, tb_item_func_ptr(tb_null, tb_null));
@@ -909,7 +921,7 @@ tb_void_t tb_thread_pool_kill(tb_handle_t handle)
 	tb_spinlock_leave(&pool->lock);
 
 	// post the workers
-	if (post && pool->semaphore) tb_semaphore_post(pool->semaphore, post);
+	if (post) tb_thread_pool_worker_post(pool, post);
 }
 tb_size_t tb_thread_pool_worker_size(tb_handle_t handle)
 {
@@ -987,7 +999,7 @@ tb_bool_t tb_thread_pool_task_post(tb_handle_t handle, tb_char_t const* name, tb
 	tb_spinlock_leave(&pool->lock);
 
 	// post the workers
-	if (ok && post_size && pool->semaphore) tb_semaphore_post(pool->semaphore, post_size);
+	if (ok && post_size) tb_thread_pool_worker_post(pool, post_size);
 
 	// ok?
 	return ok;
@@ -1020,7 +1032,7 @@ tb_size_t tb_thread_pool_task_post_list(tb_handle_t handle, tb_thread_pool_task_
 	tb_spinlock_leave(&pool->lock);
 
 	// post the workers
-	if (ok && post_size && pool->semaphore) tb_semaphore_post(pool->semaphore, post_size);
+	if (ok && post_size) tb_thread_pool_worker_post(pool, post_size);
 
 	// ok?
 	return ok;
@@ -1069,7 +1081,7 @@ tb_handle_t tb_thread_pool_task_init(tb_handle_t handle, tb_char_t const* name, 
 	tb_spinlock_leave(&pool->lock);
 
 	// post the workers
-	if (ok && post_size && pool->semaphore) tb_semaphore_post(pool->semaphore, post_size);
+	if (ok && post_size) tb_thread_pool_worker_post(pool, post_size);
 	// failed?
 	else if (!ok) job = tb_null;
 

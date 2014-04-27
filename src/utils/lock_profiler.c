@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 				"lock_profiler"
-#define TB_TRACE_MODULE_DEBUG 				(0)
+#define TB_TRACE_MODULE_DEBUG 				(1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -142,6 +142,9 @@ tb_void_t tb_lock_profiler_register(tb_handle_t handle, tb_pointer_t lock, tb_ch
 	tb_lock_profiler_t* profiler = (tb_lock_profiler_t*)handle;
 	tb_assert_and_check_return(profiler && lock);
 
+	// trace
+	tb_trace_d("register: lock: %p, name: %s: ..", lock, name);
+
 	// the lock address
 	tb_size_t addr = (tb_size_t)lock;
 
@@ -161,6 +164,9 @@ tb_void_t tb_lock_profiler_register(tb_handle_t handle, tb_pointer_t lock, tb_ch
 			// init name
 			tb_atomic_set(&item->name, (tb_long_t)name);
 
+			// trace
+			tb_trace_d("register: lock: %p, name: %s, index: %lu: ok", lock, name, addr & (TB_LOCK_PROFILER_MAXN - 1));
+
 			// ok
 			break;
 		}
@@ -170,14 +176,14 @@ tb_void_t tb_lock_profiler_register(tb_handle_t handle, tb_pointer_t lock, tb_ch
 	if (i == 16)
 	{
 		// trace
-		tb_trace_w("lock[%p:%s]: register failed!", lock, name);
+		tb_trace_w("register: lock: %p, name: %s: no", lock, name);
 	}
 }
 tb_void_t tb_lock_profiler_occupied(tb_handle_t handle, tb_pointer_t lock)
 {
 	// check
 	tb_lock_profiler_t* profiler = (tb_lock_profiler_t*)handle;
-	tb_assert_and_check_return(profiler && lock);
+	tb_check_return(profiler && lock);
 
 	// the lock address
 	tb_size_t addr = (tb_size_t)lock;

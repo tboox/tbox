@@ -156,11 +156,11 @@ tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_
 	tb_assert_and_check_return_val(tb_check_order_word(), tb_false);
 	tb_assert_and_check_return_val(tb_check_order_double(), tb_false);
 
-	// init memory
-	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
-
 	// init singleton
 	if (!tb_singleton_init()) return tb_false;
+
+	// init memory
+	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
 
 	// init platform
 	if (!tb_platform_init()) return tb_false;

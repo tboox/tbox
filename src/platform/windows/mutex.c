@@ -25,6 +25,7 @@
  * includes
  */
 #include "../mutex.h"
+#include "../../utils/utils.h"
 #include <windows.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -42,12 +43,28 @@ tb_void_t tb_mutex_exit(tb_handle_t handle)
 }
 tb_bool_t tb_mutex_enter(tb_handle_t handle)
 {
+	// try to enter for profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+	if (tb_mutex_enter_try(handle)) return tb_true;
+#endif
+	
+	// enter
 	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return tb_true;
+
+	// failed
 	return tb_false;
 }
 tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
 {
+	// try to enter
 	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, 0)) return tb_true;
+	
+	// occupied
+#ifdef TB_LOCK_PROFILER_ENABLE
+	tb_lock_profiler_occupied(tb_lock_profiler(), handle);
+#endif
+
+	// failed
 	return tb_false;
 }
 tb_bool_t tb_mutex_leave(tb_handle_t handle)

@@ -168,9 +168,6 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
  */
 tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 {
-	// check
-	tb_assert_and_check_return_val(maxn, tb_null);
-
 	// check iovec
 	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, data, tb_iovec_t, data), tb_null);
 	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, size, tb_iovec_t, size), tb_null);
@@ -190,12 +187,12 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_readv_t, real), tb_null);
 	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writv_t, real), tb_null);
 
-	// alloc aicp
+	// make aicp
 	tb_aicp_t* aicp = tb_malloc0(sizeof(tb_aicp_t));
 	tb_assert_and_check_return_val(aicp, tb_null);
 
 	// init aicp
-	aicp->maxn = maxn;
+	aicp->maxn = maxn? maxn : (1 << 16);
 	aicp->kill = 0;
 
 	// init lock
@@ -206,7 +203,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
 
 	// init aico pool
-	aicp->pool = tb_fixed_pool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
+	aicp->pool = tb_fixed_pool_init((aicp->maxn >> 2) + 16, aicp->ptor->step, 0);
 	tb_assert_and_check_goto(aicp->pool, fail);
 
 	// register lock profiler

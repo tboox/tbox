@@ -192,7 +192,7 @@ typedef struct __tb_aicp_t
 
 /*! init the aicp
  *
- * @param maxn 		the aico maxn
+ * @param maxn 		the aico maxn, using the default maxn if be zero
  *
  * @return 			the aicp
  */

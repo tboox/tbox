@@ -32,6 +32,7 @@
  * includes
  */
 #include "memory.h"
+#include "../utils/utils.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -249,7 +250,7 @@ tb_size_t tb_memory_data_size(tb_cpointer_t data)
 {
 	// try to enter, ensure outside the pool
 	tb_size_t size = 0;
-	if (tb_spinlock_enter_try(&g_lock))
+	if (tb_spinlock_enter_try_without_profiler(&g_lock))
 	{
 		// size
 		size = g_pool? tb_global_pool_data_size(g_pool, data) : 0;
@@ -264,7 +265,7 @@ tb_size_t tb_memory_data_size(tb_cpointer_t data)
 tb_void_t tb_memory_data_dump(tb_cpointer_t data, tb_char_t const* prefix)
 {
 	// try to enter, ensure outside the pool
-	if (tb_spinlock_enter_try(&g_lock))
+	if (tb_spinlock_enter_try_without_profiler(&g_lock))
 	{
 		// dump
 		if (g_pool) tb_global_pool_data_dump(g_pool, data, prefix);
