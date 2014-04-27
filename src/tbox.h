@@ -49,6 +49,7 @@ extern "C" {
 #include "asio/asio.h"
 #include "xml/xml.h"
 #include "zip/zip.h"
+#include "sql/sql.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros

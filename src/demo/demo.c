@@ -35,6 +35,9 @@ static tb_demo_t g_demo[] =
 	// flv
 	TB_DEMO_MAIN_ITEM(flv)
 
+	// sql
+,	TB_DEMO_MAIN_ITEM(sql)
+
 	// xml
 ,	TB_DEMO_MAIN_ITEM(xml_reader)
 ,	TB_DEMO_MAIN_ITEM(xml_writer)

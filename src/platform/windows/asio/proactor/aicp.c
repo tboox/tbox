@@ -32,6 +32,7 @@
  */
 #include "prefix.h"
 #include "winerror.h"
+#include "../../../../utils/utils.h"
 #include "../../../ltimer.h"
 #include "../../../../asio/pool.h"
 

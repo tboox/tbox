@@ -44,6 +44,9 @@
 // flv
 TB_DEMO_MAIN_DECL(flv);
 
+// sql
+TB_DEMO_MAIN_DECL(sql);
+
 // xml
 TB_DEMO_MAIN_DECL(xml_reader);
 TB_DEMO_MAIN_DECL(xml_writer);
