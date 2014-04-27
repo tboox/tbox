@@ -1612,7 +1612,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 
 	// register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&ptor->lock, TB_TRACE_MODULE_NAME);
+	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&ptor->lock, "aicp_aiop");
 #endif
 
 	// init loop

@@ -73,7 +73,7 @@ tb_void_t tb_trace_exit()
 	tb_trace_sync();
 
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// clear mode
 	g_mode = TB_TRACE_MODE_PRINT;
@@ -92,7 +92,7 @@ tb_void_t tb_trace_exit()
 tb_size_t tb_trace_mode()
 {
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// the mode
 	tb_size_t mode = g_mode;
@@ -106,7 +106,7 @@ tb_size_t tb_trace_mode()
 tb_bool_t tb_trace_mode_set(tb_size_t mode)
 {
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// set the mode
 	g_mode = mode;
@@ -120,7 +120,7 @@ tb_bool_t tb_trace_mode_set(tb_size_t mode)
 tb_handle_t tb_trace_file()
 {
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// the file
 	tb_handle_t file = g_file;
@@ -137,7 +137,7 @@ tb_bool_t tb_trace_file_set(tb_handle_t file)
 	tb_check_return_val(file, tb_false);
 
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// exit the previous file
 	if (g_file && !g_bref) tb_file_exit(g_file);
@@ -158,7 +158,7 @@ tb_bool_t tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend)
 	tb_check_return_val(path, tb_false);
 
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// exit the previous file
 	if (g_file && !g_bref) tb_file_exit(g_file);
@@ -182,7 +182,7 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 	tb_check_return(format);
 
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// done
 	do
@@ -255,7 +255,7 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
 	tb_check_return(format);
 
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// done
 	do
@@ -306,7 +306,7 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
 tb_void_t tb_trace_sync()
 {
 	// enter
-	tb_spinlock_enter(&g_lock);
+	tb_spinlock_enter_without_profiler(&g_lock);
 
 	// sync it
 	if (g_mode & TB_TRACE_MODE_PRINT) tb_print_sync();

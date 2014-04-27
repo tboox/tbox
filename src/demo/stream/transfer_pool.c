@@ -61,7 +61,7 @@ static tb_bool_t tb_demo_transfer_stream_save_func(tb_size_t state, tb_hize_t of
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_stream_transfer_pool_main(tb_int_t argc, tb_char_t** argv)
 {
 #if TB_DEMO_TEST_AICP
 	// done
