@@ -101,6 +101,7 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 	case TB_STATE_HTTP_REDIRECT_FAILED: 		return "http: redirect: failed";
 	case TB_STATE_HTTP_POST_FAILED: 			return "http: post: failed";
 	case TB_STATE_HTTP_RANGE_INVALID: 			return "http: range: invalid";
+	case TB_STATE_HTTP_GZIP_NOT_SUPPORTED: 		return "http: gzip: not supported";
 	default: 									return "unknown";
 	}
 

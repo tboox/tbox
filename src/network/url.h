@@ -47,16 +47,17 @@
  */
 
 /// the url protocol type
-typedef enum __tb_url_proto_t
+typedef enum __tb_url_protocol_t
 {
-	TB_URL_PROTO_NONE 	= 0
-,	TB_URL_PROTO_DATA 	= 1 	//!< data://... 
-,	TB_URL_PROTO_FILE 	= 2 	//!< file://... 
-,	TB_URL_PROTO_SOCK 	= 3 	//!< sock://... or socks://...
-,	TB_URL_PROTO_HTTP 	= 4 	//!< http://... or https://...
-,	TB_URL_PROTO_RTSP 	= 5 	//!< rtsp://... 
+	TB_URL_PROTOCOL_NONE 	= 0
+,	TB_URL_PROTOCOL_DATA 	= 1 	//!< data://... 
+,	TB_URL_PROTOCOL_FILE 	= 2 	//!< file://... 
+,	TB_URL_PROTOCOL_SOCK 	= 3 	//!< sock://... or socks://...
+,	TB_URL_PROTOCOL_HTTP 	= 4 	//!< http://... or https://...
+,	TB_URL_PROTOCOL_RTSP 	= 5 	//!< rtsp://... 
+,	TB_URL_PROTOCOL_SQL 	= 6 	//!< sql://... 
 
-}tb_url_proto_t;
+}tb_url_protocol_t;
 
 /// the url type
 typedef struct __tb_url_t
@@ -118,7 +119,7 @@ tb_void_t 			tb_url_exit(tb_url_t* url);
  *
  * @param url 		the url
  */
-tb_void_t 			tb_url_cler(tb_url_t* url);
+tb_void_t 			tb_url_clear(tb_url_t* url);
 
 /*! get the url c-string
  *
@@ -140,9 +141,9 @@ tb_bool_t 			tb_url_set(tb_url_t* url, tb_char_t const* cstr);
 /*! copy the url 
  *
  * @param url 		the url
- * @param cpy 		the copied url
+ * @param copy 		the copied url
  */
-tb_void_t 			tb_url_cpy(tb_url_t* url, tb_url_t const* cpy);
+tb_void_t 			tb_url_copy(tb_url_t* url, tb_url_t const* copy);
 
 /*! is ssl?
  *
@@ -165,14 +166,22 @@ tb_void_t 			tb_url_ssl_set(tb_url_t* url, tb_bool_t bssl);
  *
  * @return 			the url protocol
  */
-tb_size_t 			tb_url_poto_get(tb_url_t const* url);
+tb_size_t 			tb_url_protocol_get(tb_url_t const* url);
 
 /*! set the protocol to the url
  *
  * @param url 		the url
  * @param poto 		the url protocol
  */
-tb_void_t 			tb_url_poto_set(tb_url_t* url, tb_size_t poto);
+tb_void_t 			tb_url_protocol_set(tb_url_t* url, tb_size_t protocol);
+
+/*! the protocol c-string
+ *
+ * @param url 		the url
+ *
+ * @return 			the url protocol c-string
+ */
+tb_char_t const* 	tb_url_protocol_cstr(tb_url_t const* url);
 
 /*! get the port from the url
  *

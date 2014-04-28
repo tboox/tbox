@@ -32,4 +32,41 @@
  * interfaces
  */
 
+/*! init sql
+ *
+ * @param url 		the database url
+ *                  "sql://localhost/?source=mysql&user=xxxx&pwd=xxxx"
+ *                  "sql://localhost:3306/?source=mysql&user=xxxx&pwd=xxxx&database=xxxx"
+ *                  "sql:///home/file.sqlite3?source=sqlite3"
+ *                  "/home/file.sqlite3"
+ *                  "file:///home/file.sqlite3"
+ *                  "C://home/file.sqlite3"
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_handle_t 		tb_sql_init(tb_char_t const* url);
+
+/*! exit sql
+ *
+ * @param sql 		the sql handle
+ */
+tb_void_t 			tb_sql_exit(tb_handle_t sql);
+
+/*! open sql
+ *
+ * @param sql 		the sql handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_sql_open(tb_handle_t sql);
+
+/*! clos sql
+ *
+ * @param sql 		the sql handle
+ */
+tb_void_t 			tb_sql_clos(tb_handle_t sql);
+
+
+
+
 #endif

@@ -10,30 +10,18 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 {
 	tb_url_t u;
 	tb_url_init(&u);
-
 	if (tb_url_set(&u, url))
 	{
-		static tb_char_t const* poto[] = 
-		{
-			tb_null
-		, 	"data"
-		, 	"file"
-		, 	"sock"
-		, 	"http"
-		, 	"rtsp"
-		};
-
 		tb_trace_i("=================================================");
-		tb_trace_i("irl: %s", url);
-		tb_trace_i("orl: %s", tb_url_get(&u));
-		tb_trace_i("poto: %s", poto[tb_url_poto_get(&u)]);
-		tb_trace_i("port: %u", tb_url_port_get(&u));
-		tb_trace_i("host: %s", tb_url_host_get(&u));
-		tb_trace_i("path: %s", tb_url_path_get(&u));
-		tb_trace_i("args: %s", tb_url_args_get(&u));
+		tb_trace_i("irl: %s", 	url);
+		tb_trace_i("orl: %s", 	tb_url_get(&u));
+		tb_trace_i("poto: %s", 	tb_url_protocol_cstr(&u));
+		tb_trace_i("port: %u", 	tb_url_port_get(&u));
+		tb_trace_i("host: %s", 	tb_url_host_get(&u));
+		tb_trace_i("path: %s", 	tb_url_path_get(&u));
+		tb_trace_i("args: %s", 	tb_url_args_get(&u));
 	}
 	else tb_trace_i("invalid url: %s", url);
-
 	tb_url_exit(&u);
 }
 
@@ -79,6 +67,10 @@ tb_int_t tb_demo_network_url_main(tb_int_t argc, tb_char_t** argv)
 	tb_url_test_set("HTTP://127.0.0.1:8080?SSL=TRUE");
 	tb_url_test_set("HTTP://LOCALHOST/RUKI/FILE.TXT?ARG0=11111&ARG1=222222");
 	tb_url_test_set("HTTP://LOCALHOST:8080/RUKI/FILE.TXT?XXXX&SDS");
+
+	tb_url_test_set("sql://localhost/?source=mysql&user=xxxx&pwd=xxxx");
+	tb_url_test_set("sql://localhost:3306/?source=mysql&user=xxxx&pwd=xxxx&database=xxxx");
+	tb_url_test_set("Sql:///home/file.sqlite3?source=sqlite3");
 
 	tb_url_test_set("C:/HOME/RUKI/FILE.TXT");
 	tb_url_test_set("d:/home/ruki/file.txt");
