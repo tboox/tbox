@@ -438,7 +438,7 @@ tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t cons
 	tb_assert_and_check_return_val(aicp && url, tb_null);
 
 	// the init
-	static tb_async_stream_t* (*g_init[])() = 
+	static tb_async_stream_t* (*s_init[])() = 
 	{
 		tb_null
 	,	tb_async_stream_init_file
@@ -449,7 +449,7 @@ tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t cons
 
 	// init
 	tb_char_t const* 	p = url;
-	tb_async_stream_t* 		stream = tb_null;
+	tb_async_stream_t* 	stream = tb_null;
 	tb_size_t 			type = TB_STREAM_TYPE_NONE;
 	if (!tb_strnicmp(p, "http://", 7)) 			type = TB_STREAM_TYPE_HTTP;
 	else if (!tb_strnicmp(p, "sock://", 7)) 	type = TB_STREAM_TYPE_SOCK;
@@ -463,10 +463,10 @@ tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t cons
 		tb_trace_d("[stream]: unknown prefix for url: %s", url);
 		return tb_null;
 	}
-	tb_assert_and_check_goto(type && type < tb_arrayn(g_init) && g_init[type], fail);
+	tb_assert_and_check_goto(type && type < tb_arrayn(s_init) && s_init[type], fail);
 
 	// init stream
-	stream = g_init[type](aicp);
+	stream = s_init[type](aicp);
 	tb_assert_and_check_goto(stream, fail);
 
 	// set url

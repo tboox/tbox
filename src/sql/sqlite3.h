@@ -17,53 +17,35 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		sqlite3.h
  * @ingroup 	sql
- *
  */
-#ifndef TB_SQL_PREFIX_H
-#define TB_SQL_PREFIX_H
+#ifndef TB_SQL_SQLITE3_H
+#define TB_SQL_SQLITE3_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../network/url.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
+ * interfaces
  */
 
-/// the sql database type enum
-typedef enum __tb_sql_database_type_e
-{
-	TB_SQL_DATABASE_TYPE_NONE 		= 0
-,	TB_SQL_DATABASE_TYPE_MYSQL 		= 1
-,	TB_SQL_DATABASE_TYPE_SQLITE3 	= 2
+/* probe sqlite3 from the url
+ *
+ * @param url 		the database url
+ *
+ * @return 			the score
+ */
+tb_size_t 			tb_sql_sqlite3_probe(tb_url_t const* url);
 
-}tb_sql_database_type_e;
-
-/// the sql type
-typedef struct __tb_sql_t
-{
-	/// the database type
-	tb_size_t 			type;
-
-	/// the url
-	tb_url_t 			url;
-
-	/// is opened?
-	tb_bool_t 			bopened;
-
-	/// open
-	tb_bool_t 			(*open)(struct __tb_sql_t* sql);
-
-	/// clos
-	tb_void_t 			(*clos)(struct __tb_sql_t* sql);
-
-	/// exit
-	tb_void_t 			(*exit)(struct __tb_sql_t* sql);
-
-}tb_sql_t;
+/* init sqlite3
+ *
+ * @param url 		the database url
+ *
+ * @return 			the sql handle
+ */
+tb_sql_t* 			tb_sql_sqlite3_init(tb_url_t const* url);
 
 #endif
