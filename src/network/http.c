@@ -663,6 +663,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 				// switch to zstream if gzip or deflate
 				if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
 				{
+#ifdef TB_CONFIG_HAVE_ZLIB
 					// init zstream
 					if (http->zstream)
 					{
@@ -690,6 +691,14 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 
 					// disable seek
 					http->status.bseeked = 0;
+#else
+					// trace
+					tb_trace_w("gzip is not supported now! please enable it from config if you need it.");
+
+					// not supported
+					http->status.state = TB_STATE_HTTP_GZIP_NOT_SUPPORTED;
+					break;
+#endif
 				}
 
 				// trace
@@ -1386,7 +1395,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 			tb_size_t 			size = (tb_size_t)tb_va_arg(args, tb_size_t);
 
 			// clear post url
-			tb_url_cler(&http->option.post_url);
+			tb_url_clear(&http->option.post_url);
 			
 			// set post data
 			http->option.post_data = data;

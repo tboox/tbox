@@ -29,4 +29,19 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_handle_t tb_sql_init(tb_char_t const* url)
+{
+	return tb_null;
+}
+tb_void_t tb_sql_exit(tb_handle_t sql)
+{
+}
+tb_bool_t tb_sql_open(tb_handle_t sql)
+{
+	return tb_false;
+}
+tb_void_t tb_sql_clos(tb_handle_t sql)
+{
+}
+
 
