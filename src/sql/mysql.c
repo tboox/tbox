@@ -17,53 +17,30 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		mysql.c
  * @ingroup 	sql
- *
  */
-#ifndef TB_SQL_PREFIX_H
-#define TB_SQL_PREFIX_H
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 			"mysql"
+#define TB_TRACE_MODULE_DEBUG 			(1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../network/url.h"
+#include "mysql.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
+ * implementation
  */
-
-/// the sql database type enum
-typedef enum __tb_sql_database_type_e
+tb_size_t tb_sql_mysql_probe(tb_url_t const* url)
 {
-	TB_SQL_DATABASE_TYPE_NONE 		= 0
-,	TB_SQL_DATABASE_TYPE_MYSQL 		= 1
-,	TB_SQL_DATABASE_TYPE_SQLITE3 	= 2
-
-}tb_sql_database_type_e;
-
-/// the sql type
-typedef struct __tb_sql_t
+	return 0;
+}
+tb_sql_t* tb_sql_mysql_init(tb_url_t const* url)
 {
-	/// the database type
-	tb_size_t 			type;
+	return tb_null;
+}
 
-	/// the url
-	tb_url_t 			url;
-
-	/// is opened?
-	tb_bool_t 			bopened;
-
-	/// open
-	tb_bool_t 			(*open)(struct __tb_sql_t* sql);
-
-	/// clos
-	tb_void_t 			(*clos)(struct __tb_sql_t* sql);
-
-	/// exit
-	tb_void_t 			(*exit)(struct __tb_sql_t* sql);
-
-}tb_sql_t;
-
-#endif

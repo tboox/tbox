@@ -35,11 +35,11 @@
 /*! init sql
  *
  * @param url 		the database url
- *                  "sql://localhost/?source=mysql&user=xxxx&pwd=xxxx"
- *                  "sql://localhost:3306/?source=mysql&user=xxxx&pwd=xxxx&database=xxxx"
- *                  "sql:///home/file.sqlite3?source=sqlite3"
+ *                  "sql://localhost/?type=mysql&user=xxxx&pwd=xxxx"
+ *                  "sql://localhost:3306/?type=mysql&user=xxxx&pwd=xxxx&database=xxxx"
+ *                  "sql:///home/file.sqlitedb?type=sqlite3"
  *                  "/home/file.sqlite3"
- *                  "file:///home/file.sqlite3"
+ *                  "file:///home/file.sqlitedb"
  *                  "C://home/file.sqlite3"
  *
  * @return 			tb_true or tb_false
@@ -51,6 +51,14 @@ tb_handle_t 		tb_sql_init(tb_char_t const* url);
  * @param sql 		the sql handle
  */
 tb_void_t 			tb_sql_exit(tb_handle_t sql);
+
+/*! the sql type
+ *
+ * @param sql 		the sql handle
+ *
+ * @return 			the sql type
+ */
+tb_size_t 			tb_sql_type(tb_handle_t sql);
 
 /*! open sql
  *

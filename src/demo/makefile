@@ -114,6 +114,7 @@ demo_C_FILES 							+= \
 demo_LIBS 								+= tbox 
 demo_LIBS-$(TB_CONFIG_HAVE_OPENSSL) 	+= ssl crypto
 demo_LIBS-$(TB_CONFIG_HAVE_POLARSSL) 	+= polarssl
+demo_LIBS-$(TB_CONFIG_HAVE_SQLITE3) 	+= sqlite3
 demo_LIBS-$(TB_CONFIG_HAVE_ZLIB) 		+= z
 demo_LIBS-y 							+= $(TB_CONFIG_DEMO_LIBS)
 

@@ -236,6 +236,12 @@ tbox_C_FILES-$(TB_CONFIG_HAVE_POLARSSL) += \
 						asio/ssl \
 						network/ssl/polarssl 
 
+tbox_C_FILES-$(TB_CONFIG_HAVE_MYSQL) += \
+						sql/mysql
+
+tbox_C_FILES-$(TB_CONFIG_HAVE_SQLITE3) += \
+						sql/sqlite3
+
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isin \
 						libm/isinf \
