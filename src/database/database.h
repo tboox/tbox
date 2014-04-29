@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		sql.h
- * @defgroup 	sql
+ * @file		database.h
+ * @defgroup 	database
  */
-#ifndef TB_SQL_H
-#define TB_SQL_H
+#ifndef TB_DATABASE_H
+#define TB_DATABASE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -32,11 +32,11 @@
  * interfaces
  */
 
-/*! init sql
+/*! init database
  *
  * @param url 		the database url
- *                  "sql://localhost/?type=mysql&user=xxxx&pwd=xxxx"
- *                  "sql://localhost:3306/?type=mysql&user=xxxx&pwd=xxxx&database=xxxx"
+ *                  "sql://localhost/?type=mysql&username=xxxx&password=xxxx"
+ *                  "sql://localhost:3306/?type=mysql&username=xxxx&password=xxxx&database=xxxx"
  *                  "sql:///home/file.sqlitedb?type=sqlite3"
  *                  "/home/file.sqlite3"
  *                  "file:///home/file.sqlitedb"
@@ -44,35 +44,45 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_handle_t 		tb_sql_init(tb_char_t const* url);
+tb_handle_t 		tb_database_init(tb_char_t const* url);
 
-/*! exit sql
+/*! exit database
  *
- * @param sql 		the sql handle
+ * @param database 	the database handle
  */
-tb_void_t 			tb_sql_exit(tb_handle_t sql);
+tb_void_t 			tb_database_exit(tb_handle_t database);
 
-/*! the sql type
+/*! the database type
  *
- * @param sql 		the sql handle
+ * @param database 	the database handle
  *
- * @return 			the sql type
+ * @return 			the database type
  */
-tb_size_t 			tb_sql_type(tb_handle_t sql);
+tb_size_t 			tb_database_type(tb_handle_t database);
 
-/*! open sql
+/*! open database
  *
- * @param sql 		the sql handle
+ * @param database 	the database handle
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_sql_open(tb_handle_t sql);
+tb_bool_t 			tb_database_open(tb_handle_t database);
 
-/*! clos sql
+/*! clos database
  *
- * @param sql 		the sql handle
+ * @param database 	the database handle
  */
-tb_void_t 			tb_sql_clos(tb_handle_t sql);
+tb_void_t 			tb_database_clos(tb_handle_t database);
+
+/*! done database
+ *
+ * @param database 	the database handle
+ * @param sql 		the sql command
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_database_done(tb_handle_t database, tb_char_t const* sql);
+
 
 
 

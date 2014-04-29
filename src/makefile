@@ -58,6 +58,7 @@ tbox_C_FILES 			+= \
 						container/item/uint16 \
 						container/item/uint32 \
 						container/item/string_pool \
+						database/database \
 						network/network \
 						network/dns/cache \
 						network/dns/server \
@@ -118,7 +119,6 @@ tbox_C_FILES 			+= \
 						object/writer/xplist \
 						object/writer/bplist \
 						object/writer/writer \
-						sql/sql \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \
@@ -237,10 +237,10 @@ tbox_C_FILES-$(TB_CONFIG_HAVE_POLARSSL) += \
 						network/ssl/polarssl 
 
 tbox_C_FILES-$(TB_CONFIG_HAVE_MYSQL) += \
-						sql/mysql
+						database/mysql
 
 tbox_C_FILES-$(TB_CONFIG_HAVE_SQLITE3) += \
-						sql/sqlite3
+						database/sqlite3
 
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isin \
@@ -544,8 +544,8 @@ INC_FILES 				= \
 						xml/node.h \
 						xml/reader.h \
 						xml/writer.h \
-						sql/prefix.h \
-						sql/sql.h \
+						database/prefix.h \
+						database/database.h \
 						zip/prefix.h \
 						zip/zip.h \
 						zip/vlc.h \

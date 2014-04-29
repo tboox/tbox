@@ -17,48 +17,48 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		sql.c
- * @defgroup 	sql
+ * @file		database.c
+ * @defgroup 	database
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"sql"
+#define TB_TRACE_MODULE_NAME 			"database"
 #define TB_TRACE_MODULE_DEBUG 			(1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "sql.h"
+#include "database.h"
 #include "mysql.h"
 #include "sqlite3.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_sql_init(tb_char_t const* url)
+tb_handle_t tb_database_init(tb_char_t const* url)
 {
 	// check
 	tb_assert_and_check_return_val(url, tb_null);
 
 	// done
-	tb_bool_t 	ok = tb_false;
-	tb_sql_t* 	sql = tb_null;
-	tb_url_t 	sql_url;
+	tb_bool_t 		ok = tb_false;
+	tb_database_t* 	database = tb_null;
+	tb_url_t 		database_url;
 	do
 	{
 		// trace
 		tb_trace_d("init: %s: ..", url);
 
 		// init url
-		if (!tb_url_init(&sql_url)) break;
+		if (!tb_url_init(&database_url)) break;
 
 		// make url
-		if (!tb_url_set(&sql_url, url)) break;
+		if (!tb_url_set(&database_url, url)) break;
 
 		// check protocol
-		tb_size_t protocol = tb_url_protocol_get(&sql_url);
+		tb_size_t protocol = tb_url_protocol_get(&database_url);
 		tb_assert_and_check_break(protocol == TB_URL_PROTOCOL_SQL || protocol == TB_URL_PROTOCOL_FILE);
 
 		// the probe func
@@ -66,26 +66,26 @@ tb_handle_t tb_sql_init(tb_char_t const* url)
 		{
 			tb_null
 #ifdef TB_CONFIG_HAVE_MYSQL
-		,	tb_sql_mysql_probe
+		,	tb_database_mysql_probe
 #endif
 #ifdef TB_CONFIG_HAVE_SQLITE3
-		,	tb_sql_sqlite3_probe
+		,	tb_database_sqlite3_probe
 #endif
 		};
 
 		// the init func
-		static tb_sql_t* (*s_init[])(tb_url_t const*) = 
+		static tb_database_t* (*s_init[])(tb_url_t const*) = 
 		{
 			tb_null
 #ifdef TB_CONFIG_HAVE_MYSQL
-		,	tb_sql_mysql_init
+		,	tb_database_mysql_init
 #endif
 #ifdef TB_CONFIG_HAVE_SQLITE3
-		,	tb_sql_sqlite3_init
+		,	tb_database_sqlite3_init
 #endif
 		};
 
-		// probe the sql type
+		// probe the database type
 		tb_size_t i = 1;
 		tb_size_t n = tb_arrayn(s_probe);
 		tb_size_t s = 0;
@@ -95,7 +95,7 @@ tb_handle_t tb_sql_init(tb_char_t const* url)
 			if (s_probe[i]) 
 			{
 				// probe it
-				tb_size_t score = s_probe[i](&sql_url);
+				tb_size_t score = s_probe[i](&database_url);
 				if (score > s) 
 				{
 					// save the max score
@@ -110,8 +110,8 @@ tb_handle_t tb_sql_init(tb_char_t const* url)
 		tb_check_break(m < n && s_init[m]);
 
 		// init it
-		sql = s_init[m](&sql_url);
-		tb_assert_and_check_break(sql);
+		database = s_init[m](&database_url);
+		tb_assert_and_check_break(database);
 
 		// trace
 		tb_trace_d("init: %s: ok", url);
@@ -122,7 +122,7 @@ tb_handle_t tb_sql_init(tb_char_t const* url)
 	} while (0);
 
 	// exit url
-	tb_url_exit(&sql_url);
+	tb_url_exit(&database_url);
 
 	// failed?
 	if (!ok)
@@ -130,55 +130,55 @@ tb_handle_t tb_sql_init(tb_char_t const* url)
 		// trace
 		tb_trace_d("init: %s: no", url);
 
-		// exit sql
-		tb_sql_exit((tb_handle_t)sql);
-		sql = tb_null;
+		// exit database
+		tb_database_exit((tb_handle_t)database);
+		database = tb_null;
 	}
 
 	// ok?
-	return sql;
+	return database;
 }
-tb_void_t tb_sql_exit(tb_handle_t handle)
+tb_void_t tb_database_exit(tb_handle_t handle)
 {
 	// check
-	tb_sql_t* sql = (tb_sql_t*)handle;
-	tb_assert_and_check_return(sql);
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return(database);
 		
 	// trace
 	tb_trace_d("exit: ..");
 
 	// exit it
-	if (sql->exit) sql->exit(sql);
+	if (database->exit) database->exit(database);
 
 	// trace
 	tb_trace_d("exit: ok");
 }
-tb_size_t tb_sql_type(tb_handle_t handle)
+tb_size_t tb_database_type(tb_handle_t handle)
 {
 	// check
-	tb_sql_t* sql = (tb_sql_t*)handle;
-	tb_assert_and_check_return_val(sql, TB_SQL_DATABASE_TYPE_NONE);
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return_val(database, TB_DATABASE_TYPE_NONE);
 
 	// the database type
-	return sql->type;
+	return database->type;
 }
-tb_bool_t tb_sql_open(tb_handle_t handle)
+tb_bool_t tb_database_open(tb_handle_t handle)
 {
 	// check
-	tb_sql_t* sql = (tb_sql_t*)handle;
-	tb_assert_and_check_return_val(sql, tb_false);
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return_val(database, tb_false);
 	
 	// open it
-	return sql->open(sql);
+	return database->open(database);
 }
-tb_void_t tb_sql_clos(tb_handle_t handle)
+tb_void_t tb_database_clos(tb_handle_t handle)
 {
 	// check
-	tb_sql_t* sql = (tb_sql_t*)handle;
-	tb_assert_and_check_return(sql);
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return(database);
 	
 	// clos it
-	if (sql->clos) sql->clos(sql);
+	if (database->clos) database->clos(database);
 }
 
 

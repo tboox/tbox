@@ -155,6 +155,12 @@ ARFLAGS 			= -cr
 # share ldflags
 SHFLAGS 			= $(ARCH_LDFLAGS) -dynamiclib
 
+# include directory
+INC_DIR 			+= /usr/include /usr/local/include
+
+# library directory
+LIB_DIR 			+= /usr/lib /usr/local/lib
+
 # config
 include 			$(PLAT_DIR)/config.mak
 

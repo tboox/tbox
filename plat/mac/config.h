@@ -98,7 +98,7 @@
 //#define TB_CONFIG_HAVE_POLARSSL	
 
 // mysql
-//#define TB_CONFIG_HAVE_MYSQL
+#define TB_CONFIG_HAVE_MYSQL
 
 // sqlite3
 #define TB_CONFIG_HAVE_SQLITE3

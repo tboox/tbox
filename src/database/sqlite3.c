@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		sqlite3.c
- * @ingroup 	sql
+ * @ingroup 	database
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -40,32 +40,32 @@
  */
 
 // the sqlite3 type
-typedef struct __tb_sql_sqlite3_t
+typedef struct __tb_database_sqlite3_t
 {
 	// the base
-	tb_sql_t 			base;
+	tb_database_t 			base;
 
 	// the database
-	sqlite3* 			database;
+	sqlite3* 				database;
 
-}tb_sql_sqlite3_t;
+}tb_database_sqlite3_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_sql_sqlite3_t* tb_sql_sqlite3_cast(tb_sql_t* sql)
+static __tb_inline__ tb_database_sqlite3_t* tb_database_sqlite3_cast(tb_database_t* database)
 {
 	// check
-	tb_assert_and_check_return_val(sql && sql->type == TB_SQL_DATABASE_TYPE_SQLITE3, tb_null);
+	tb_assert_and_check_return_val(database && database->type == TB_DATABASE_TYPE_SQLITE3, tb_null);
 
 	// cast
-	return (tb_sql_sqlite3_t*)sql;
+	return (tb_database_sqlite3_t*)database;
 }
-static tb_bool_t tb_sql_sqlite3_open(tb_sql_t* sql)
+static tb_bool_t tb_database_sqlite3_open(tb_database_t* database)
 {
 	// check
-	tb_sql_sqlite3_t* sql3 = tb_sql_sqlite3_cast(sql);
-	tb_assert_and_check_return_val(sql3, tb_false);
+	tb_database_sqlite3_t* sqlite3_db = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return_val(sqlite3_db, tb_false);
 
 	// done
 	tb_bool_t 			ok = tb_false;
@@ -73,22 +73,22 @@ static tb_bool_t tb_sql_sqlite3_open(tb_sql_t* sql)
 	do
 	{
 		// opened?
-		tb_check_return_val(!sql->bopened, tb_true);
+		tb_check_return_val(!database->bopened, tb_true);
 
 		// the database path
-		path = tb_url_path_get(&sql->url);
+		path = tb_url_path_get(&database->url);
 		tb_assert_and_check_break(path);
 
 		// open database
-		if (SQLITE_OK != sqlite3_open(path, &sql3->database) || !sql3->database) 
+		if (SQLITE_OK != sqlite3_open(path, &sqlite3_db->database) || !sqlite3_db->database) 
 		{
 			// trace
-			if (sql3->database) tb_trace_e("open: %s failed, error: %s", path, sqlite3_errmsg(sql3->database));
+			if (sqlite3_db->database) tb_trace_e("open: %s failed, error: %s", path, sqlite3_errmsg(sqlite3_db->database));
 			break;
 		}
 
 		// opened
-		sql->bopened = tb_true;
+		database->bopened = tb_true;
 
 		// ok
 		ok = tb_true;
@@ -101,42 +101,42 @@ static tb_bool_t tb_sql_sqlite3_open(tb_sql_t* sql)
 	// ok?
 	return ok;
 }
-static tb_void_t tb_sql_sqlite3_clos(tb_sql_t* sql)
+static tb_void_t tb_database_sqlite3_clos(tb_database_t* database)
 {
 	// check
-	tb_sql_sqlite3_t* sql3 = tb_sql_sqlite3_cast(sql);
-	tb_assert_and_check_return(sql3);
+	tb_database_sqlite3_t* sqlite3_db = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return(sqlite3_db);
 		
 	// opened?
-	tb_check_return(sql->bopened);
+	tb_check_return(database->bopened);
 
 	// close database
-	if (sql3->database) sqlite3_close(sql3->database);
-	sql3->database = tb_null;
+	if (sqlite3_db->database) sqlite3_close(sqlite3_db->database);
+	sqlite3_db->database = tb_null;
 
 	// closed
-	sql->bopened = tb_false;
+	database->bopened = tb_false;
 }
-static tb_void_t tb_sql_sqlite3_exit(tb_sql_t* sql)
+static tb_void_t tb_database_sqlite3_exit(tb_database_t* database)
 {
 	// check
-	tb_sql_sqlite3_t* sql3 = tb_sql_sqlite3_cast(sql);
-	tb_assert_and_check_return(sql3);
+	tb_database_sqlite3_t* sqlite3_db = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return(sqlite3_db);
 
 	// close it first
-	tb_sql_sqlite3_clos(sql);
+	tb_database_sqlite3_clos(database);
 
 	// exit url
-	tb_url_exit(&sql->url);
+	tb_url_exit(&database->url);
 
 	// exit it
-	tb_free(sql3);
+	tb_free(sqlite3_db);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_size_t tb_sql_sqlite3_probe(tb_url_t const* url)
+tb_size_t tb_database_sqlite3_probe(tb_url_t const* url)
 {
 	// check
 	tb_assert_and_check_return_val(url, 0);
@@ -190,31 +190,31 @@ tb_size_t tb_sql_sqlite3_probe(tb_url_t const* url)
 	// ok?
 	return score;
 }
-tb_sql_t* tb_sql_sqlite3_init(tb_url_t const* url)
+tb_database_t* tb_database_sqlite3_init(tb_url_t const* url)
 {
 	// check
 	tb_assert_and_check_return_val(url, tb_null);
 
 	// done
-	tb_bool_t 			ok = tb_false;
-	tb_sql_sqlite3_t* 	sql = tb_null;
+	tb_bool_t 				ok = tb_false;
+	tb_database_sqlite3_t* 	sqlite3_db = tb_null;
 	do
 	{
-		// make sql
-		sql = tb_malloc0(sizeof(tb_sql_sqlite3_t));
-		tb_assert_and_check_break(sql);
+		// make database
+		sqlite3_db = tb_malloc0(sizeof(tb_database_sqlite3_t));
+		tb_assert_and_check_break(sqlite3_db);
 
-		// init sql
-		sql->base.type = TB_SQL_DATABASE_TYPE_SQLITE3;
-		sql->base.open = tb_sql_sqlite3_open;
-		sql->base.clos = tb_sql_sqlite3_clos;
-		sql->base.exit = tb_sql_sqlite3_exit;
+		// init database
+		sqlite3_db->base.type = TB_DATABASE_TYPE_SQLITE3;
+		sqlite3_db->base.open = tb_database_sqlite3_open;
+		sqlite3_db->base.clos = tb_database_sqlite3_clos;
+		sqlite3_db->base.exit = tb_database_sqlite3_exit;
 
 		// init url
-		if (!tb_url_init(&sql->base.url)) break;
+		if (!tb_url_init(&sqlite3_db->base.url)) break;
 
 		// copy url
-		tb_url_copy(&sql->base.url, url);
+		tb_url_copy(&sqlite3_db->base.url, url);
 
 		// ok
 		ok = tb_true;
@@ -224,12 +224,12 @@ tb_sql_t* tb_sql_sqlite3_init(tb_url_t const* url)
 	// failed?
 	if (!ok) 
 	{
-		// exit sql
-		if (sql) tb_sql_sqlite3_exit((tb_sql_t*)sql);
-		sql = tb_null;
+		// exit database
+		if (sqlite3_db) tb_database_sqlite3_exit((tb_database_t*)sqlite3_db);
+		sqlite3_db = tb_null;
 	}
 
 	// ok?
-	return (tb_sql_t*)sql;
+	return (tb_database_t*)sqlite3_db;
 }
 
