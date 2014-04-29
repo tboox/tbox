@@ -203,12 +203,17 @@ typedef struct __tb_thread_pool_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
-static tb_handle_t tb_thread_pool_instance_init()
+static tb_handle_t tb_thread_pool_instance_init(tb_cpointer_t* ppriv)
 {
 	// init it
 	return tb_thread_pool_init(0, 0);
 }
-static tb_void_t tb_thread_pool_instance_kill(tb_handle_t handle)
+static tb_void_t tb_thread_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
+{
+	// exit it
+	tb_thread_pool_exit(handle);
+}
+static tb_void_t tb_thread_pool_instance_kill(tb_handle_t handle, tb_cpointer_t priv)
 {
 	// dump it
 #ifdef __tb_debug__
@@ -738,7 +743,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_t* poo
  */
 tb_handle_t tb_thread_pool()
 {
-	return tb_singleton_instance(TB_SINGLETON_TYPE_THREAD_POOL, tb_thread_pool_instance_init, tb_thread_pool_exit, tb_thread_pool_instance_kill);
+	return tb_singleton_instance(TB_SINGLETON_TYPE_THREAD_POOL, tb_thread_pool_instance_init, tb_thread_pool_instance_exit, tb_thread_pool_instance_kill);
 }
 tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
 {

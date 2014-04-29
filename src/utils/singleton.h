@@ -51,8 +51,11 @@ typedef enum __tb_singleton_type_e
 	/// the lock profiler type
 ,	TB_SINGLETON_TYPE_LOCK_PROFILER = 4
 
+	/// the aicp type
+,	TB_SINGLETON_TYPE_AICP 			= 5
+
 	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 			= 5
+,	TB_SINGLETON_TYPE_USER 			= 6
 
 	/// the max count of the singleton type
 #ifdef __tb_small__
@@ -64,13 +67,13 @@ typedef enum __tb_singleton_type_e
 }tb_singleton_type_e;
 
 /// the singleton init func type
-typedef tb_handle_t (*tb_singleton_init_func_t)();
+typedef tb_handle_t (*tb_singleton_init_func_t)(tb_cpointer_t* ppriv);
 
 /// the singleton exit func type
-typedef tb_void_t 	(*tb_singleton_exit_func_t)(tb_handle_t instance);
+typedef tb_void_t 	(*tb_singleton_exit_func_t)(tb_handle_t instance, tb_cpointer_t priv);
 
 /// the singleton kill func type
-typedef tb_void_t 	(*tb_singleton_kill_func_t)(tb_handle_t instance);
+typedef tb_void_t 	(*tb_singleton_kill_func_t)(tb_handle_t instance, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

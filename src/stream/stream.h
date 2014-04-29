@@ -31,8 +31,8 @@
 #include "basic_stream.h"
 #include "async_stream.h"
 #include "static_stream.h"
+#include "transfer.h"
 #include "transfer_pool.h"
-#include "transfer_stream.h"
 
 /*!architecture
  *
@@ -68,11 +68,11 @@
  *                                            |                                       |                          - sock
  *                            ----------------                                        |                          |
  *                            |                                                       |                          - http
- *                 -----  transfer_stream --- |                                       |           - charset
+ *                 -----  transfer ---------- |                                       |           - charset
  *                |           |           [ostream]                                   |          |
  *                |           ------------ stream                                     - filter - |- chunked 
  *                |                                                                        |     |        
- *  transfer_pool  -----  transfer_stream                                                  |     |- cache
+ *  transfer_pool  -----  transfer                                                         |     |- cache
  *                |                                                                        |     |
  *                |                                                                        |      - zip    
  *                |                                                                        |

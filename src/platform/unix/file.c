@@ -411,7 +411,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 	return ok;
 #else
 	// copy it
-	return tb_transfer_stream_save_uu(path, dest, 0, tb_null, tb_null) >= 0? tb_true : tb_false;
+	return tb_transfer_save_uu(path, dest, 0, tb_null, tb_null) >= 0? tb_true : tb_false;
 #endif
 }
 tb_bool_t tb_file_create(tb_char_t const* path)

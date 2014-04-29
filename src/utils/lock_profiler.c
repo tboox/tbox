@@ -72,11 +72,14 @@ typedef struct __tb_lock_profiler_t
 
 }tb_lock_profiler_t;
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
-static tb_void_t tb_lock_profiler_instance_exit(tb_handle_t handle)
+static tb_handle_t tb_lock_profiler_instance_init(tb_cpointer_t* ppriv)
+{
+	return tb_lock_profiler_init();
+}
+static tb_void_t tb_lock_profiler_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
 	// dump it
 	tb_lock_profiler_dump(handle);
@@ -90,7 +93,7 @@ static tb_void_t tb_lock_profiler_instance_exit(tb_handle_t handle)
  */
 tb_handle_t tb_lock_profiler()
 {
-	return tb_singleton_instance(TB_SINGLETON_TYPE_LOCK_PROFILER, tb_lock_profiler_init, tb_lock_profiler_instance_exit, tb_null);
+	return tb_singleton_instance(TB_SINGLETON_TYPE_LOCK_PROFILER, tb_lock_profiler_instance_init, tb_lock_profiler_instance_exit, tb_null);
 }
 tb_handle_t tb_lock_profiler_init()
 {

@@ -51,7 +51,7 @@ demo_C_FILES 							+= \
 										spider/spider \
 										spider/queue \
 										stream/transfer_pool \
-										stream/transfer_stream \
+										stream/transfer \
 										stream/async_stream \
 										stream/basic_stream \
 										stream/basic_stream/zip \
@@ -111,7 +111,7 @@ demo_C_FILES 							+= \
 										algorithm/sort 
 
 # libs
-demo_LIBS 								+= tbox 
+demo_LIBS 								+= tbox$(DTYPE) 
 demo_LIBS-$(TB_CONFIG_HAVE_OPENSSL) 	+= ssl crypto
 demo_LIBS-$(TB_CONFIG_HAVE_POLARSSL) 	+= polarssl
 demo_LIBS-$(TB_CONFIG_HAVE_SQLITE3) 	+= sqlite3

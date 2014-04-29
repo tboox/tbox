@@ -62,7 +62,11 @@ typedef struct __tb_object_pool_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
-static tb_void_t tb_object_pool_instance_exit(tb_handle_t handle)
+static tb_handle_t tb_object_pool_instance_init(tb_cpointer_t* ppriv)
+{
+	return tb_object_pool_init();
+}
+static tb_void_t tb_object_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
 	if (handle) 
 	{
@@ -79,6 +83,10 @@ static tb_void_t tb_object_pool_instance_exit(tb_handle_t handle)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_handle_t tb_object_pool()
+{
+	return tb_singleton_instance(TB_SINGLETON_TYPE_OBJECT_POOL, tb_object_pool_instance_init, tb_object_pool_instance_exit, tb_null);
+}
 tb_handle_t tb_object_pool_init()
 {
 	// done
@@ -214,9 +222,5 @@ tb_void_t tb_object_pool_del_(tb_handle_t handle, tb_object_t* object __tb_debug
 
 	// leave
 	tb_spinlock_leave(&pool->lock);
-}
-tb_handle_t tb_object_pool()
-{
-	return tb_singleton_instance(TB_SINGLETON_TYPE_OBJECT_POOL, tb_object_pool_init, tb_object_pool_instance_exit, tb_null);
 }
 

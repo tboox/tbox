@@ -35,6 +35,11 @@
  * macros
  */
 
+// the assert debug
+#ifndef TB_ASSERT_DEBUG
+# 	define TB_ASSERT_DEBUG 									(TB_CONFIG_DEBUG)
+#endif
+
 // the assert backtrace prefix
 #define TB_ASSERT_BACKTRACE_PREFIX 							"    "
 
@@ -45,7 +50,7 @@
 #define tb_assert_backtrace_dump() 							tb_backtrace_dump(TB_ASSERT_BACKTRACE_PREFIX, tb_null, TB_ASSERT_BACKTRACE_NFRAME)
 
 // assert
-#ifdef __tb_debug__
+#if TB_ASSERT_DEBUG
 # 	if defined(TB_COMPILER_IS_GCC)
 #		define tb_assert_message(x, fmt, arg...)			do { if (!(x)) {tb_trace_a("expr: %s, msg: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
 # 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
@@ -63,7 +68,7 @@
 # 	endif
 #endif
 
-#ifdef __tb_debug__
+#if TB_ASSERT_DEBUG
 # 	define tb_assert(x)										do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); } } while(0)
 # 	define tb_assert_abort(x)								do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); tb_abort(); } } while(0)
 # 	define tb_assert_return(x)								do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); return ; } } while(0)
@@ -94,6 +99,7 @@
 #endif
 
 #define tb_assert_static(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; __tb_volatile__ __tb_static_assert__ __a; tb_used(__a); } while(0)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */

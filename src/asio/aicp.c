@@ -44,7 +44,7 @@
 tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * aico
+ * aico implementation
  */
 static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
@@ -164,8 +164,94 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * instance implementation
  */
+static tb_pointer_t tb_aicp_instance_loop(tb_cpointer_t data)
+{
+	// aicp
+	tb_handle_t aicp = (tb_handle_t)data;
+
+	// trace
+	tb_trace_d("loop: init");
+
+	// loop aicp
+	if (aicp) tb_aicp_loop(aicp);
+	
+	// trace
+	tb_trace_d("loop: exit");
+
+	// exit
+	tb_thread_return(tb_null);
+	return tb_null;
+}
+static tb_handle_t tb_aicp_instance_init(tb_cpointer_t* ppriv)
+{
+	// check
+	tb_assert_and_check_return_val(ppriv, tb_null);
+
+	// done
+	tb_bool_t 	ok = tb_false;
+	tb_aicp_t* 	aicp = tb_null;
+	do
+	{
+		// init aicp
+		aicp = tb_aicp_init(0);
+		tb_assert_and_check_break(aicp);
+
+		// init loop
+		*ppriv = (tb_cpointer_t)tb_thread_init(tb_null, tb_aicp_instance_loop, aicp, 0);
+		tb_assert_and_check_break(*ppriv);
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// exit aicp
+		if (aicp) tb_aicp_exit(aicp);
+		aicp = tb_null;
+	}
+
+	// ok?
+	return (tb_handle_t)aicp;
+}
+static tb_void_t tb_aicp_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
+{
+	// exit loop
+	tb_handle_t loop = (tb_handle_t)priv;
+	if (loop)
+	{
+		// wait it
+		tb_long_t wait = 0;
+		if (!(wait = tb_thread_wait(loop, 5000)))
+		{
+			// trace
+			tb_trace_e("loop[%p]: wait failed: %ld!", loop, wait);
+		}
+
+		// exit it
+		tb_thread_exit(loop);
+	}
+
+	// exit it
+	tb_aicp_exit((tb_aicp_t*)handle);
+}
+static tb_void_t tb_aicp_instance_kill(tb_handle_t handle, tb_cpointer_t priv)
+{
+	// kill it
+	tb_aicp_kill((tb_aicp_t*)handle);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_aicp_t* tb_aicp()
+{
+	return (tb_aicp_t*)tb_singleton_instance(TB_SINGLETON_TYPE_AICP, tb_aicp_instance_init, tb_aicp_instance_exit, tb_aicp_instance_kill);
+}
 tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 {
 	// check iovec

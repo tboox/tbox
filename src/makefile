@@ -90,7 +90,7 @@ tbox_C_FILES 			+= \
 						stream/async_stream/sock \
 						stream/async_stream/filter \
 						stream/transfer_pool \
-						stream/transfer_stream \
+						stream/transfer \
 						filter/filter \
 						filter/zip \
 						filter/cache \
@@ -486,7 +486,7 @@ INC_FILES 				= \
 						stream/async_stream.h \
 						stream/static_stream.h \
 						stream/transfer_pool.h \
-						stream/transfer_stream.h \
+						stream/transfer.h \
 						filter/prefix.h \
 						filter/filter.h \
 						object/prefix.h \
@@ -528,6 +528,7 @@ INC_FILES 				= \
 						utils/base32.h \
 						utils/base64.h \
 						utils/singleton.h \
+						utils/lock_profiler.h \
 						utils/opt/x86/bits.h \
 						utils/opt/x86/prefix.h \
 						utils/opt/arm/bits.h \
