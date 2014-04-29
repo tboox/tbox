@@ -17,30 +17,35 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		mysql.c
- * @ingroup 	sql
+ * @file		sqlite3.h
+ * @ingroup 	database
  */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME 			"mysql"
-#define TB_TRACE_MODULE_DEBUG 			(1)
+#ifndef TB_DATABASE_SQLITE3_H
+#define TB_DATABASE_SQLITE3_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "mysql.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-tb_size_t tb_sql_mysql_probe(tb_url_t const* url)
-{
-	return 0;
-}
-tb_sql_t* tb_sql_mysql_init(tb_url_t const* url)
-{
-	return tb_null;
-}
 
+/* probe sqlite3 from the url
+ *
+ * @param url 		the database url
+ *
+ * @return 			the score
+ */
+tb_size_t 			tb_database_sqlite3_probe(tb_url_t const* url);
+
+/* init sqlite3
+ *
+ * @param url 		the database url
+ *
+ * @return 			the database handle
+ */
+tb_database_t* 		tb_database_sqlite3_init(tb_url_t const* url);
+
+#endif

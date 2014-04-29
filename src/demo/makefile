@@ -10,7 +10,6 @@ demo_TYPE 								= BIN
 # files
 demo_C_FILES 							+= \
 										demo \
-										sql/sql \
 										flv/flv \
 										flv/libflv \
 										xml/reader \
@@ -100,6 +99,7 @@ demo_C_FILES 							+= \
 										platform/semaphore \
 										platform/thread_pool \
 										platform/thread_store \
+										database/database \
 										container/heap \
 										container/hash \
 										container/dlist \
@@ -114,6 +114,7 @@ demo_C_FILES 							+= \
 demo_LIBS 								+= tbox$(DTYPE) 
 demo_LIBS-$(TB_CONFIG_HAVE_OPENSSL) 	+= ssl crypto
 demo_LIBS-$(TB_CONFIG_HAVE_POLARSSL) 	+= polarssl
+demo_LIBS-$(TB_CONFIG_HAVE_MYSQL) 		+= mysqlclient
 demo_LIBS-$(TB_CONFIG_HAVE_SQLITE3) 	+= sqlite3
 demo_LIBS-$(TB_CONFIG_HAVE_ZLIB) 		+= z
 demo_LIBS-y 							+= $(TB_CONFIG_DEMO_LIBS)

@@ -215,6 +215,9 @@ SPARC :=$(if $(findstring sparc,$(ARCH)),y,n)
 PRO_DIR 	:=${shell pwd}
 PRO_NAME 	:=${shell basename ${shell pwd}}
 
+# flag
+CXFLAG 		:= $(if $(CXFLAG),$(CXFLAG),)
+
 # ccache
 ifeq ($(CCACHE),n)
 CCACHE 		:= 
@@ -243,6 +246,16 @@ config : .null
 	@echo "config: prof:     " 							$(PROF)
 	@echo "config: debug:    " 							$(DEBUG)
 	@echo "config: small:    " 							$(SMALL)
+	@echo "config: cflag:  " 							$(CFLAG)
+	@echo "config: ccflag:  " 							$(CCFLAG)
+	@echo "config: cxflag:  " 							$(CXFLAG)
+	@echo "config: mflag:  " 							$(MFLAG)
+	@echo "config: mmflag:  " 							$(MMFLAG)
+	@echo "config: mxflag:  " 							$(MXFLAG)
+	@echo "config: ldflag:  " 							$(LDFLAG)
+	@echo "config: asflag:  " 							$(ASFLAG)
+	@echo "config: arflag:  " 							$(ARFLAG)
+	@echo "config: shflag:  " 							$(SHFLAG)
 	@echo "config: ccache:   " 							$(CCACHE)
 	@echo "config: distcc:   " 							$(DISTCC)
 	@echo "config: prefix:   " 							$(PREFIX)
@@ -274,6 +287,18 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# host"      		          				>> .config.mak
 	@echo "HOST ="$(HOST) 								>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# flags"      		          				>> .config.mak
+	@echo "CFLAG ="$(CFLAG) 							>> .config.mak
+	@echo "CCFLAG ="$(CCFLAG) 							>> .config.mak
+	@echo "CXFLAG ="$(CXFLAG) 							>> .config.mak
+	@echo "MFLAG ="$(MFLAG) 							>> .config.mak
+	@echo "MMFLAG ="$(MMFLAG) 							>> .config.mak
+	@echo "MXFLAG ="$(MXFLAG) 							>> .config.mak
+	@echo "LDFLAG ="$(LDFLAG) 							>> .config.mak
+	@echo "ASFLAG ="$(ASFLAG) 							>> .config.mak
+	@echo "ARFLAG ="$(ARFLAG) 							>> .config.mak
+	@echo "SHFLAG ="$(SHFLAG) 							>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# platform"      	          				>> .config.mak
 	@echo "PLAT ="$(PLAT) 								>> .config.mak
@@ -319,6 +344,16 @@ config : .null
 	@echo "export NDK" 				 					>> .config.mak
 	@echo "export BIN" 				 					>> .config.mak
 	@echo "export PRE" 				 					>> .config.mak
+	@echo "export CFLAG" 			 					>> .config.mak
+	@echo "export CCFLAG" 			 					>> .config.mak
+	@echo "export CXFLAG" 			 					>> .config.mak
+	@echo "export MFLAG" 			 					>> .config.mak
+	@echo "export MMFLAG" 			 					>> .config.mak
+	@echo "export MXFLAG" 			 					>> .config.mak
+	@echo "export LDFLAG" 			 					>> .config.mak
+	@echo "export ASFLAG" 			 					>> .config.mak
+	@echo "export ARFLAG" 			 					>> .config.mak
+	@echo "export SHFLAG" 			 					>> .config.mak
 	@echo "export CCACHE" 			 					>> .config.mak
 	@echo "export DISTCC" 			 					>> .config.mak
 
