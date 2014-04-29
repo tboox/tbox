@@ -447,7 +447,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
 			// post stream
-			if (tb_transfer_stream_save_gg(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
+			if (tb_transfer_save_gg(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
 			{
 				http->status.state = TB_STATE_HTTP_POST_FAILED;
 				break;

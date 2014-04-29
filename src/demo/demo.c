@@ -95,7 +95,7 @@ static tb_demo_t g_demo[] =
 
 	// stream
 ,	TB_DEMO_MAIN_ITEM(stream_transfer_pool)
-,	TB_DEMO_MAIN_ITEM(stream_transfer_stream)
+,	TB_DEMO_MAIN_ITEM(stream_transfer)
 ,	TB_DEMO_MAIN_ITEM(stream_async_stream)
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream)
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream_zip)

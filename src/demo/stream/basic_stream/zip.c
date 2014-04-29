@@ -33,8 +33,8 @@ tb_int_t tb_demo_stream_basic_stream_zip_main(tb_int_t argc, tb_char_t** argv)
 	{
 		// save it
 		tb_hong_t save = 0;
-		if (iostream == istream) save = tb_transfer_stream_save_gg(fstream, ostream, 0, tb_null, tb_null);
-		else save = tb_transfer_stream_save_gg(istream, fstream, 0, tb_null, tb_null);
+		if (iostream == istream) save = tb_transfer_save_gg(fstream, ostream, 0, tb_null, tb_null);
+		else save = tb_transfer_save_gg(istream, fstream, 0, tb_null, tb_null);
 
 		// trace
 		tb_trace_i("save: %lld bytes, size: %lld bytes", save, tb_stream_size(istream));

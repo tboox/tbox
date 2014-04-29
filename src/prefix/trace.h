@@ -48,6 +48,11 @@
 # 	define TB_TRACE_MODULE_DEBUG 							(1)
 #endif
 
+// the trace debug
+#ifndef TB_TRACE_DEBUG
+# 	define TB_TRACE_DEBUG 									(TB_CONFIG_DEBUG)
+#endif
+
 // trace prefix
 #if defined(TB_COMPILER_IS_GCC)
 #	define tb_trace_p(prefix, fmt, arg ...)				do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt __tb_newline__, ## arg); } while (0)
@@ -109,7 +114,7 @@
  * note: [module]: will be not output if TB_TRACE_MODULE_NAME is not defined
  *
  */
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
+#if TB_TRACE_MODULE_DEBUG && TB_TRACE_DEBUG 
 # 	if defined(TB_COMPILER_IS_GCC)
 # 		define tb_trace_d(fmt, arg ...)					tb_trace_p(TB_TRACE_PREFIX, fmt, ## arg)
 # 		define tb_tracef_d(fmt, arg ...)				tb_tracef_p(TB_TRACE_PREFIX, fmt, ## arg)

@@ -72,6 +72,10 @@ LDFLAGS += $(LDFLAGS_RELEASE)
 ASFLAGS += $(ASFLAGS_RELEASE)
 endif
 
+# suffix
+LIB_SUFFIX := $(DTYPE)$(LIB_SUFFIX)
+DLL_SUFFIX := $(DTYPE)$(DLL_SUFFIX)
+
 # append source files
 define MAKE_DEFINE_FILES
 $(1)_C_FILES += $($(1)_C_FILES-y)

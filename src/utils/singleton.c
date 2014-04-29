@@ -48,6 +48,9 @@ typedef struct __tb_singleton_t
 	// the kill func
 	tb_singleton_kill_func_t 		kill;
 
+	// the priv data
+	tb_cpointer_t 					priv;
+
 	// the instance
 	tb_atomic_t 					instance;
 
@@ -86,7 +89,7 @@ tb_void_t tb_singleton_kill()
 				tb_trace_d("instance: kill: %lu: ..", i);
 
 				// kill it
-				g_singletons[i].kill(instance);
+				g_singletons[i].kill(instance, g_singletons[i].priv);
 			}
 		}
 	}
@@ -106,7 +109,7 @@ tb_void_t tb_singleton_exit()
 				tb_trace_d("instance: exit: %lu: ..", i);
 
 				// exit it
-				g_singletons[i].exit(instance);
+				g_singletons[i].exit(instance, g_singletons[i].priv);
 			}
 		}
 	}
@@ -128,7 +131,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
 		tb_check_return_val(init && exit, tb_null);
 
 		// init it
-		instance = init();
+		instance = init(&g_singletons[type].priv);
 		tb_check_return_val(instance, tb_null);
 
 		// init func

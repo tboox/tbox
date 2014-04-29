@@ -60,11 +60,11 @@ typedef struct __tb_string_pool_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
-static tb_handle_t tb_string_pool_instance_init()
+static tb_handle_t tb_string_pool_instance_init(tb_cpointer_t* ppriv)
 {
 	return tb_string_pool_init(tb_true, 0);
 }
-static tb_void_t tb_string_pool_instance_exit(tb_handle_t handle)
+static tb_void_t tb_string_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
 	if (handle)
 	{
@@ -81,6 +81,10 @@ static tb_void_t tb_string_pool_instance_exit(tb_handle_t handle)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_handle_t tb_string_pool()
+{
+	return tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_string_pool_instance_init, tb_string_pool_instance_exit, tb_null);
+}
 tb_handle_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
 {
 	// done
@@ -255,10 +259,6 @@ tb_void_t tb_string_pool_del(tb_handle_t handle, tb_char_t const* data)
 
 	// leave
 	tb_spinlock_leave(&pool->lock);
-}
-tb_handle_t tb_string_pool()
-{
-	return tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_string_pool_instance_init, tb_string_pool_instance_exit, tb_null);
 }
 #ifdef __tb_debug__
 tb_void_t tb_string_pool_dump(tb_handle_t handle)

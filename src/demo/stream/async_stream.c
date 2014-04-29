@@ -23,13 +23,16 @@ typedef struct __tb_demo_context_t
 	tb_bool_t 				verbose;
 
 	// the istream
-	tb_async_stream_t* 			istream;
+	tb_async_stream_t* 		istream;
 
 	// the ostream
-	tb_async_stream_t* 			ostream;
+	tb_async_stream_t* 		ostream;
 
-	// the tstream
-	tb_handle_t 			tstream;
+	// the transfer
+	tb_handle_t 			transfer;
+
+	// the event
+	tb_handle_t 			event;
 
 }tb_demo_context_t;
 
@@ -49,7 +52,7 @@ static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hi
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_demo_transfer_stream_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
@@ -67,9 +70,8 @@ static tb_bool_t tb_demo_transfer_stream_save_func(tb_size_t state, tb_hize_t of
 		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s\n", save, rate, percent, tb_state_cstr(state));
 	}
 
-	// failed? kill aicp
-	if (state != TB_STATE_OK)
-		tb_aicp_kill(tb_async_stream_aicp(context->istream));
+	// failed or closed? exit wait
+	if (state != TB_STATE_OK && context->event) tb_event_post(context->event);
 
 	// ok?
 	return (state == TB_STATE_OK)? tb_true : tb_false;
@@ -135,20 +137,20 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t sta
 		}
 		tb_assert_and_check_break(context->ostream);
 
-		// init tstream
-		context->tstream = tb_transfer_stream_init_aa(ast, context->ostream, 0);
-		tb_assert_and_check_break(context->tstream);
+		// init transfer
+		context->transfer = tb_transfer_init_aa(ast, context->ostream, 0);
+		tb_assert_and_check_break(context->transfer);
 
-		// open and save tstream
-		if (!tb_transfer_stream_osave(context->tstream, tb_demo_transfer_stream_save_func, context)) break;
+		// open and save transfer
+		if (!tb_transfer_osave(context->transfer, tb_demo_transfer_save_func, context)) break;
 
 		// ok
 		ok = tb_true;
 
 	} while (0);
 
-	// failed? kill aicp
-	if (!ok) tb_aicp_kill(tb_async_stream_aicp(ast));
+	// failed or closed? exit wait
+	if (state != TB_STATE_OK && context->event) tb_event_post(context->event);
 
 	// ok?
 	return ok;
@@ -191,7 +193,6 @@ static tb_option_item_t g_options[] =
 tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 {
 	// done
-	tb_aicp_t* 			aicp = tb_null;
 	tb_demo_context_t 	context = {0};
 	do
 	{
@@ -209,12 +210,12 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 			// done url
 			if (tb_option_find(context.option, "url")) 
 			{
-				// init aicp
-				aicp = tb_aicp_init(2);
-				tb_assert_and_check_break(aicp);
+				// init event
+				context.event = tb_event_init();
+				tb_assert_and_check_break(context.event);
 
 				// init istream
-				context.istream = tb_async_stream_init_from_url(aicp, tb_option_item_cstr(context.option, "url"));
+				context.istream = tb_async_stream_init_from_url(tb_aicp(), tb_option_item_cstr(context.option, "url"));
 				tb_assert_and_check_break(context.istream);
 
 				// ctrl http
@@ -369,8 +370,8 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 					break;
 				}
 
-				// loop aicp
-				tb_aicp_loop(aicp);
+				// wait it
+				tb_event_wait(context.event, -1);
 			}
 			else tb_option_help(context.option);
 		}
@@ -378,9 +379,9 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 
 	} while (0);
 
-	// exit tstream
-	if (context.tstream) tb_transfer_stream_exit(context.tstream, tb_false);
-	context.tstream = tb_null;
+	// exit transfer
+	if (context.transfer) tb_transfer_exit(context.transfer, tb_false);
+	context.transfer = tb_null;
 
 	// exit istream
 	if (context.istream) tb_async_stream_exit(context.istream, tb_false);
@@ -394,9 +395,9 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 	if (context.option) tb_option_exit(context.option);
 	context.option = tb_null;
 
-	// exit aicp
-	if (aicp) tb_aicp_exit(aicp);
-	aicp = tb_null;
+	// exit event
+	if (context.event) tb_event_exit(context.event);
+	context.event = tb_null;
 
 	return 0;
 }

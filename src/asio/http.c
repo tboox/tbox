@@ -94,8 +94,8 @@ typedef struct __tb_aicp_http_t
 	// the zstream for gzip/deflate
 	tb_async_stream_t* 				zstream;
 
-	// the tstream for post
-	tb_handle_t 					tstream;
+	// the transfer for post
+	tb_handle_t 					transfer;
 
 	// the pool for string
 	tb_handle_t						pool;
@@ -655,9 +655,9 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
 		if (http->stream) tb_async_stream_clos(http->stream, tb_true);
 		http->stream = http->sstream;
 
-		// exit tstream
-		if (http->tstream) tb_transfer_stream_exit(http->tstream, tb_true);
-		http->tstream = tb_null;
+		// exit transfer
+		if (http->transfer) tb_transfer_exit(http->transfer, tb_true);
+		http->transfer = tb_null;
 
 		// trace
 		tb_trace_d("redirect: %s", tb_scoped_string_cstr(&http->status.location));
@@ -1006,10 +1006,10 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* astream, tb_size
 		else if (http->option.method == TB_HTTP_METHOD_POST)
 		{
 			// check
-			tb_assert_and_check_break(http->tstream);
+			tb_assert_and_check_break(http->transfer);
  
 			// post data
-			if (!tb_transfer_stream_save(http->tstream, tb_aicp_http_head_post_func, http)) break;
+			if (!tb_transfer_save(http->transfer, tb_aicp_http_head_post_func, http)) break;
 		}
 		// finished? read data
 		else
@@ -1134,20 +1134,20 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size
 		else if (http->option.method == TB_HTTP_METHOD_POST)
 		{
 			// check
-			tb_assert_and_check_break(!http->tstream && !http->post_file);
+			tb_assert_and_check_break(!http->transfer && !http->post_file);
 
-			// init tstream
+			// init transfer
 			tb_char_t const* 	url = tb_url_get(&http->option.post_url);
 			if (http->option.post_data && http->option.post_size)
-				http->tstream = tb_transfer_stream_init_da(http->option.post_data, http->option.post_size, http->stream, 0);
-			else if (url) http->tstream = tb_transfer_stream_init_ua(url, http->stream, 0);
-			tb_assert_and_check_break(http->tstream);
+				http->transfer = tb_transfer_init_da(http->option.post_data, http->option.post_size, http->stream, 0);
+			else if (url) http->transfer = tb_transfer_init_ua(url, http->stream, 0);
+			tb_assert_and_check_break(http->transfer);
 
 			// limit rate
-			if (http->option.post_lrate) tb_transfer_stream_limitrate(http->tstream, http->option.post_lrate);
+			if (http->option.post_lrate) tb_transfer_limitrate(http->transfer, http->option.post_lrate);
 
-			// open tstream
-			ok = tb_transfer_stream_open(http->tstream, tb_aicp_http_post_open_func, http);
+			// open transfer
+			ok = tb_transfer_open(http->transfer, tb_aicp_http_post_open_func, http);
 		}
 		else tb_assert_and_check_break(0);
 
@@ -1299,8 +1299,8 @@ tb_void_t tb_aicp_http_kill(tb_handle_t handle)
 	// kill stream
 	if (http->stream) tb_stream_kill(http->stream);
 
-	// kill tstream
-	if (http->tstream) tb_transfer_stream_kill(http->tstream);
+	// kill transfer
+	if (http->transfer) tb_transfer_kill(http->transfer);
 }
 tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 {
@@ -1315,9 +1315,9 @@ tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 	if (http->stream) tb_async_stream_clos(http->stream, bcalling);
 	http->stream = http->sstream;
 
-	// exit tstream
-	if (http->tstream) tb_transfer_stream_exit(http->tstream, bcalling);
-	http->tstream = tb_null;
+	// exit transfer
+	if (http->transfer) tb_transfer_exit(http->transfer, bcalling);
+	http->transfer = tb_null;
 
 	// exit the post file
 	if (http->post_file) tb_file_exit(http->post_file);
@@ -1353,9 +1353,9 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// exit stream
 	http->stream = tb_null;
 	
-	// exit tstream
-	if (http->tstream) tb_transfer_stream_exit(http->tstream, bcalling);
-	http->tstream = tb_null;
+	// exit transfer
+	if (http->transfer) tb_transfer_exit(http->transfer, bcalling);
+	http->transfer = tb_null;
 
 	// exit the post file
 	if (http->post_file) tb_file_exit(http->post_file);
@@ -1454,9 +1454,9 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 		if (http->stream) tb_async_stream_clos(http->stream, tb_true);
 		http->stream = http->sstream;
 
-		// exit tstream
-		if (http->tstream) tb_transfer_stream_exit(http->tstream, tb_true);
-		http->tstream = tb_null;
+		// exit transfer
+		if (http->transfer) tb_transfer_exit(http->transfer, tb_true);
+		http->transfer = tb_null;
 
 		// trace
 		tb_trace_d("seek: %llu", offset);

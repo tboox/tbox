@@ -60,12 +60,12 @@ install : .null
 prefix : .null
 	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)
 	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)
-	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
-	-@$(CP) $(BIN_DIR)/lib/$(LIB_PREFIX)$(PRO_NAME)$(LIB_SUFFIX) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/$(LIB_PREFIX)$(PRO_NAME)$(DTYPE)$(LIB_SUFFIX)
+	-@$(CPDIR) $(BIN_DIR)/inc/* $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
+	-@$(CP) $(BIN_DIR)/lib/* $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/
 	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/inc/$(PLAT)/$(ARCH),)
 	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/lib/$(PLAT)/$(ARCH),)
-	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME) $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
-	$(if $(PREFIX),-@$(CP) $(BIN_DIR)/lib/$(LIB_PREFIX)$(PRO_NAME)$(LIB_SUFFIX) $(PREFIX)/lib/$(PLAT)/$(ARCH)/$(LIB_PREFIX)$(PRO_NAME)$(DTYPE)$(LIB_SUFFIX),)
+	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/* $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
+	$(if $(PREFIX),-@$(CP) $(BIN_DIR)/lib/* $(PREFIX)/lib/$(PLAT)/$(ARCH)/,)
 
 # make lipo
 lipo : .null
