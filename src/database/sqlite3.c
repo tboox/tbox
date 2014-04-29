@@ -160,6 +160,9 @@ tb_size_t tb_database_sqlite3_probe(tb_url_t const* url)
 			}
 		}
 
+		// has host or port? no sqlite3
+		if (tb_url_host_get(url) || tb_url_port_get(url)) break;
+
 		// the database path
 		tb_char_t const* path = tb_url_path_get(url);
 		tb_assert_and_check_break(path);

@@ -196,7 +196,41 @@ static tb_void_t tb_database_mysql_exit(tb_database_t* database)
  */
 tb_size_t tb_database_mysql_probe(tb_url_t const* url)
 {
-	return 100;
+	// check
+	tb_assert_and_check_return_val(url, 0);
+
+	// done
+	tb_size_t score = 0;
+	do
+	{
+		// the url arguments
+		tb_char_t const* args = tb_url_args_get(url);
+		if (args)
+		{
+			// find the database type
+			tb_char_t const* ptype = tb_stristr(args, "type=");
+			if (ptype && !tb_strnicmp(ptype + 5, "mysql", 5))
+			{
+				// ok
+				score = 100;
+				break;
+			}
+		}
+
+		// the database port, the default port: 3306 
+		if (tb_url_port_get(url) == 3306) score += 20;
+
+		// is sql url? 
+		if (tb_url_protocol_get(url) == TB_URL_PROTOCOL_SQL) 
+			score += 5;
+
+	} while (0);
+
+	// trace
+	tb_trace_d("probe: %s, score: %lu", tb_url_get((tb_url_t*)url), score);
+
+	// ok?
+	return score;
 }
 tb_database_t* tb_database_mysql_init(tb_url_t const* url)
 {
