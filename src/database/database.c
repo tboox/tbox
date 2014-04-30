@@ -166,19 +166,87 @@ tb_bool_t tb_database_open(tb_handle_t handle)
 {
 	// check
 	tb_database_t* database = (tb_database_t*)handle;
-	tb_assert_and_check_return_val(database, tb_false);
+	tb_assert_and_check_return_val(database && database->open, tb_false);
 	
+	// opened?
+	tb_check_return_val(!database->bopened, tb_true);
+
 	// open it
-	return database->open(database);
+	database->bopened = database->open(database);
+
+	// ok?
+	return database->bopened;
 }
 tb_void_t tb_database_clos(tb_handle_t handle)
 {
 	// check
 	tb_database_t* database = (tb_database_t*)handle;
 	tb_assert_and_check_return(database);
-	
+			
+	// opened?
+	tb_check_return(database->bopened);
+
 	// clos it
 	if (database->clos) database->clos(database);
+	
+	// closed
+	database->bopened = tb_false;
 }
+tb_void_t tb_database_kill(tb_handle_t handle)
+{
+	// check
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return(database);
+	
+	// opened?
+	tb_check_return(database->bopened);
 
+	// kill it
+	if (database->kill) database->kill(database);
+}
+tb_size_t tb_database_state(tb_handle_t handle)
+{
+	// check
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return_val(database, TB_STATE_UNKNOWN_ERROR);
+	
+	// the state
+	return database->state;
+}
+tb_bool_t tb_database_done(tb_handle_t handle, tb_char_t const* sql)
+{
+	// check
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return_val(database && database->done && sql, tb_false);
+			
+	// opened?
+	tb_check_return_val(database->bopened, tb_false);
+
+	// done it
+	return database->done(database, sql);
+}
+tb_iterator_t* tb_database_results_load(tb_handle_t handle)
+{
+	// check
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return_val(database && database->results_load, tb_null);
+			
+	// opened?
+	tb_check_return_val(database->bopened, tb_null);
+
+	// load it
+	return database->results_load(database);
+}
+tb_void_t tb_database_results_exit(tb_handle_t handle, tb_iterator_t* results)
+{
+	// check
+	tb_database_t* database = (tb_database_t*)handle;
+	tb_assert_and_check_return(database && database->results_exit && results);
+			
+	// opened?
+	tb_check_return(database->bopened);
+
+	// exit it
+	database->results_exit(database, results);
+}
 

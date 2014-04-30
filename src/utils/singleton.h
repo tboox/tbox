@@ -37,31 +37,37 @@
 typedef enum __tb_singleton_type_e
 {
 	/// the object pool type
-	TB_SINGLETON_TYPE_OBJECT_POOL 	= 0
+	TB_SINGLETON_TYPE_OBJECT_POOL 		= 0
 
 	/// the thread pool type
-,	TB_SINGLETON_TYPE_THREAD_POOL 	= 1
+,	TB_SINGLETON_TYPE_THREAD_POOL 		= 1
 
 	/// the string pool type
-,	TB_SINGLETON_TYPE_STRING_POOL 	= 2
+,	TB_SINGLETON_TYPE_STRING_POOL 		= 2
 
 	/// the transfer pool type
-,	TB_SINGLETON_TYPE_TRANSFER_POOL = 3
+,	TB_SINGLETON_TYPE_TRANSFER_POOL 	= 3
 
 	/// the lock profiler type
-,	TB_SINGLETON_TYPE_LOCK_PROFILER = 4
+,	TB_SINGLETON_TYPE_LOCK_PROFILER 	= 4
 
 	/// the aicp type
-,	TB_SINGLETON_TYPE_AICP 			= 5
+,	TB_SINGLETON_TYPE_AICP 				= 5
+
+	/// the openssl library type
+,	TB_SINGLETON_TYPE_LIBRARY_OPENSSL 	= 6
+
+	/// the mysql library type
+,	TB_SINGLETON_TYPE_LIBRARY_MYSQL 	= 7
 
 	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 			= 6
+,	TB_SINGLETON_TYPE_USER 				= 8
 
 	/// the max count of the singleton type
 #ifdef __tb_small__
-,	TB_SINGLETON_TYPE_MAXN 			= 32
+,	TB_SINGLETON_TYPE_MAXN 				= 32
 #else
-,	TB_SINGLETON_TYPE_MAXN 			= 128
+,	TB_SINGLETON_TYPE_MAXN 				= 128
 #endif
 
 }tb_singleton_type_e;

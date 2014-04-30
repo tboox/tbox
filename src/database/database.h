@@ -62,6 +62,23 @@ tb_size_t 			tb_database_type(tb_handle_t database);
 
 /*! open database
  *
+ * @code
+ * tb_handle_t database = tb_database_init("sql://localhost/?type=mysql&username=xxxx&password=xxxx");
+ * if (database)
+ * {
+ *     // open it
+ *     if (tb_database_open(database))
+ *     {
+ *          // done it
+ *          // ...
+ *
+ *          // close it
+ *          tb_database_clos(database);
+ *     }
+ *     tb_database_exit(database);
+ * }
+ * @endcode
+ *
  * @param database 	the database handle
  *
  * @return 			tb_true or tb_false
@@ -74,7 +91,36 @@ tb_bool_t 			tb_database_open(tb_handle_t database);
  */
 tb_void_t 			tb_database_clos(tb_handle_t database);
 
+/*! kill database
+ *
+ * @param database 	the database handle
+ */
+tb_void_t 			tb_database_kill(tb_handle_t database);
+
+/*! the database state
+ *
+ * @param database 	the database handle
+ *
+ * @return 			the database state
+ */
+tb_size_t 			tb_database_state(tb_handle_t database);
+
 /*! done database
+ *
+ * @code
+ *
+ * // done sql
+ * if (!tb_database_done(database, "select * from table"))
+ * {
+ *     // trace
+ *     tb_trace_e("done sql failed, error: %s", tb_state_cstr(tb_database_state(database)));
+ *     return ;
+ * }
+ *
+ * // load results
+ * // ..
+ *
+ * @endcode
  *
  * @param database 	the database handle
  * @param sql 		the sql command
@@ -83,6 +129,65 @@ tb_void_t 			tb_database_clos(tb_handle_t database);
  */
 tb_bool_t 			tb_database_done(tb_handle_t database, tb_char_t const* sql);
 
+/*! load the database results
+ *
+ * @code
+ *
+ * // done sql
+ * // ..
+ *
+ * // load results
+ * tb_iterator_t* results = tb_database_results_load(database);
+ * if (results)
+ * {
+ *     // walk results
+ *     tb_for_all_if (tb_iterator_t*, row, results, row)
+ *     {
+ *          // walk items
+ *          tb_for_all_if (tb_database_results_item_t*, item, row, item)
+ *          {
+ *               tb_trace_i("name: %s, data: %s, size: %lu, at: %lux%lu", item->name, item->data, item->size, row_itor, item_itor);
+ *          }
+ *     }
+ *
+ *     // or
+ *     tb_size_t row_itor = tb_iterator_head(results);
+ *     tb_size_t row_tail = tb_iterator_tail(results);
+ *     for (; row_itor != row_tail; row_itor = tb_iterator_next(results, row_itor))
+ *     {
+ *          tb_handle_t row = (tb_handle_t)tb_iterator_item(results, row_itor);
+ *          if (row)
+ *          {
+ *              tb_size_t item_itor = 0;
+ *              tb_size_t item_size = tb_iterator_size(row);
+ *              for (item_itor = 0; i < item_size; item_itor++)
+ *              {
+ *                   tb_database_results_item_t* item = (tb_database_results_item_t*)tb_iterator_item(row, item_itor);
+ *                   if (item)
+ *                   {
+ *                       tb_trace_i("name: %s, data: %s, size: %lu, at: %lux%lu", item->name, item->data, item->size, row_itor, item_itor);
+ *                   }
+ *              }
+ *          }
+ *     }
+ *
+ *     // exit results
+ *     tb_database_results_exit(results);
+ * }
+ * @endcode
+ *
+ * @param database 	the database handle
+ *
+ * @return 			the database results
+ */
+tb_iterator_t* 		tb_database_results_load(tb_handle_t database);
+
+/*! exit the database results
+ *
+ * @param database 	the database handle
+ * @param results 	the database results
+ */
+tb_void_t 			tb_database_results_exit(tb_handle_t database, tb_iterator_t* results);
 
 
 

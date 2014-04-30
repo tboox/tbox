@@ -33,6 +33,7 @@
 #include <openssl/err.h>
 #include <openssl/x509v3.h>
 #include "../../asio/asio.h"
+#include "../../utils/utils.h"
 #include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +104,25 @@ static BIO_METHOD g_ssl_bio_method =
 ,	tb_ssl_bio_method_exit
 ,	tb_null
 };
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * library implementation
+ */
+static tb_handle_t tb_ssl_library_init(tb_cpointer_t* ppriv)
+{
+	// init it
+	SSL_library_init();
+
+	// ok
+	return ppriv;
+}
+static tb_void_t tb_ssl_library_exit(tb_handle_t handle, tb_cpointer_t priv)
+{
+}
+static tb_handle_t tb_ssl_library_load()
+{
+	return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_OPENSSL, tb_ssl_library_init, tb_ssl_library_exit, tb_null);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -345,9 +365,8 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
 	tb_bool_t ok = tb_false;
 	do
 	{
-		// init ssl library first
-		static tb_atomic_t s_init = 0;
-		if (!tb_atomic_fetch_and_set(&s_init, 1)) SSL_library_init();
+		// load openssl library
+		if (!tb_ssl_library_load()) break;
 
 		// make ssl
 		ssl = tb_malloc0(sizeof(tb_ssl_t));
