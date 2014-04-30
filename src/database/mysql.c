@@ -223,10 +223,28 @@ static tb_bool_t tb_database_mysql_done(tb_database_t* database, tb_char_t const
 {
 	// check
 	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
-	tb_assert_and_check_return_val(mysql && sql, tb_false);
+	tb_assert_and_check_return_val(mysql && mysql->database && sql, tb_false);
 
-	// ok?
-	return tb_false;
+	// done query
+	if (mysql_query(mysql->database, sql))
+	{
+		// trace
+		tb_trace_e("done: sql: %s failed, error: %s", sql, mysql_error(mysql->database));
+		return tb_false;
+	}
+
+	// trace
+	tb_trace_d("done: sql: %s: ok", sql);
+
+	// ok
+	return tb_true;
+}
+static tb_iterator_t* tb_database_mysql_results_load(tb_database_t* database)
+{
+	return tb_null;
+}
+static tb_void_t tb_database_mysql_results_exit(tb_database_t* database, tb_iterator_t* results)
+{
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -285,12 +303,14 @@ tb_database_t* tb_database_mysql_init(tb_url_t const* url)
 		tb_assert_and_check_break(mysql);
 
 		// init database
-		mysql->base.type = TB_DATABASE_TYPE_MYSQL;
-		mysql->base.open = tb_database_mysql_open;
-		mysql->base.clos = tb_database_mysql_clos;
-		mysql->base.kill = tb_database_mysql_kill;
-		mysql->base.exit = tb_database_mysql_exit;
-		mysql->base.done = tb_database_mysql_done;
+		mysql->base.type 			= TB_DATABASE_TYPE_MYSQL;
+		mysql->base.open 			= tb_database_mysql_open;
+		mysql->base.clos 			= tb_database_mysql_clos;
+		mysql->base.kill 			= tb_database_mysql_kill;
+		mysql->base.exit 			= tb_database_mysql_exit;
+		mysql->base.done 			= tb_database_mysql_done;
+		mysql->base.results_load 	= tb_database_mysql_results_load;
+		mysql->base.results_exit 	= tb_database_mysql_results_exit;
 
 		// init url
 		if (!tb_url_init(&mysql->base.url)) break;

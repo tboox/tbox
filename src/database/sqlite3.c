@@ -124,10 +124,44 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_t* database, tb_char_t con
 {
 	// check
 	tb_database_sqlite3_t* sqlite3_db = tb_database_sqlite3_cast(database);
-	tb_assert_and_check_return_val(sqlite3_db && sql, tb_false);
-		
+	tb_assert_and_check_return_val(sqlite3_db && sqlite3_db->database && sql, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// done sql
+		tb_int_t 	row_count = 0;
+		tb_int_t 	col_count = 0;
+		tb_char_t* 	error = tb_null;
+		tb_char_t** results = tb_null;
+		if (SQLITE_OK != sqlite3_get_table(sqlite3_db->database, sql, &results, &row_count, &col_count, &error))
+		{
+			// trace
+			tb_trace_e("done: sql: %s failed, error: %s", sql, error);
+			break;
+		}
+
+		// exit results
+		if (results) sqlite3_free_table(results);
+
+		// trace
+		tb_trace_d("done: sql: %s: ok", sql);
+
+		// ok
+		ok = tb_true;
+	
+	} while (0);
+
 	// ok?
-	return tb_false;
+	return ok;
+}
+static tb_iterator_t* tb_database_sqlite3_results_load(tb_database_t* database)
+{
+	return tb_null;
+}
+static tb_void_t tb_database_sqlite3_results_exit(tb_database_t* database, tb_iterator_t* results)
+{
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -205,11 +239,13 @@ tb_database_t* tb_database_sqlite3_init(tb_url_t const* url)
 		tb_assert_and_check_break(sqlite3_db);
 
 		// init database
-		sqlite3_db->base.type = TB_DATABASE_TYPE_SQLITE3;
-		sqlite3_db->base.open = tb_database_sqlite3_open;
-		sqlite3_db->base.clos = tb_database_sqlite3_clos;
-		sqlite3_db->base.exit = tb_database_sqlite3_exit;
-		sqlite3_db->base.done = tb_database_sqlite3_done;
+		sqlite3_db->base.type 			= TB_DATABASE_TYPE_SQLITE3;
+		sqlite3_db->base.open 			= tb_database_sqlite3_open;
+		sqlite3_db->base.clos 			= tb_database_sqlite3_clos;
+		sqlite3_db->base.exit 			= tb_database_sqlite3_exit;
+		sqlite3_db->base.done 			= tb_database_sqlite3_done;
+		sqlite3_db->base.results_load 	= tb_database_sqlite3_results_load;
+		sqlite3_db->base.results_exit 	= tb_database_sqlite3_results_exit;
 
 		// init url
 		if (!tb_url_init(&sqlite3_db->base.url)) break;
