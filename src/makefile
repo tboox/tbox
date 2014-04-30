@@ -47,6 +47,11 @@ tbox_C_FILES 			+= \
 						container/dlist \
 						container/vector \
 						container/iterator \
+						container/iterator/str \
+						container/iterator/ptr \
+						container/iterator/mem \
+						container/iterator/long \
+						container/iterator/size \
 						container/item/str \
 						container/item/obj \
 						container/item/ptr \

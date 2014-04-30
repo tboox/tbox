@@ -113,6 +113,15 @@ typedef struct __tb_slist_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
+static tb_size_t tb_slist_iterator_size(tb_iterator_t* iterator)
+{
+	// check
+	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
+	tb_assert_and_check_return_val(slist && slist->pool, 0);
+
+	// the size
+	return tb_fixed_pool_size(slist->pool);
+}
 static tb_size_t tb_slist_iterator_head(tb_iterator_t* iterator)
 {
 	// check
@@ -336,9 +345,9 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 
 	// init iterator
 	slist->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-	slist->itor.size = 0;
 	slist->itor.priv = tb_null;
 	slist->itor.step = func.size;
+	slist->itor.size = tb_slist_iterator_size;
 	slist->itor.head = tb_slist_iterator_head;
 	slist->itor.tail = tb_slist_iterator_tail;
 	slist->itor.prev = tb_slist_iterator_prev;
@@ -413,14 +422,20 @@ tb_pointer_t tb_slist_last(tb_slist_t const* handle)
 }
 tb_size_t tb_slist_size(tb_slist_t const* handle)
 {
+	// check
 	tb_slist_impl_t const* slist = (tb_slist_impl_t const*)handle;
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
+
+	// the size
 	return tb_fixed_pool_size(slist->pool);
 }
 tb_size_t tb_slist_maxn(tb_slist_t const* handle)
 {
+	// check
 	tb_slist_impl_t const* slist = (tb_slist_impl_t const*)handle;
 	tb_assert_and_check_return_val(slist, 0);
+
+	// the maxn
 	return TB_MAXU32;
 }
 /* insert node:

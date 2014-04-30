@@ -97,6 +97,8 @@ typedef struct __tb_hash_impl_t
 
 	/// the hash list
 	tb_hash_item_list_t** 	hash_list;
+
+	/// the hash list size
 	tb_size_t 				hash_size;
 
 	/// the item size
@@ -108,8 +110,10 @@ typedef struct __tb_hash_impl_t
 	/// the hash item
 	tb_hash_item_t 			hash_item;
 
-	/// the hash func
+	/// the hash name func
 	tb_item_func_t 			name_func;
+
+	/// the hash data func
 	tb_item_func_t 			data_func;
 
 }tb_hash_impl_t;
@@ -239,8 +243,18 @@ static tb_bool_t tb_hash_item_at(tb_hash_impl_t* hash, tb_size_t buck, tb_size_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
+static tb_size_t tb_hash_iterator_size(tb_iterator_t* iterator)
+{
+	// check
+	tb_hash_impl_t* hash = (tb_hash_impl_t*)iterator;
+	tb_assert_and_check_return_val(hash, 0);
+
+	// the size
+	return hash->item_size;
+}
 static tb_size_t tb_hash_iterator_head(tb_iterator_t* iterator)
 {
+	// check
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)iterator;
 	tb_assert_and_check_return_val(hash, 0);
 
@@ -399,9 +413,9 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 
 	// init item itor
 	hash->item_itor.mode = TB_ITERATOR_MODE_FORWARD;
-	hash->item_itor.size = 0;
 	hash->item_itor.priv = tb_null;
 	hash->item_itor.step = sizeof(tb_hash_item_t);
+	hash->item_itor.size = tb_hash_iterator_size;
 	hash->item_itor.head = tb_hash_iterator_head;
 	hash->item_itor.tail = tb_hash_iterator_tail;
 	hash->item_itor.prev = tb_null;
@@ -615,14 +629,20 @@ tb_size_t tb_hash_set(tb_hash_t* handle, tb_cpointer_t name, tb_cpointer_t data)
 }
 tb_size_t tb_hash_size(tb_hash_t const* handle)
 {
+	// check
 	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
 	tb_assert_and_check_return_val(hash, 0);
+
+	// the size
 	return hash->item_size;
 }
 tb_size_t tb_hash_maxn(tb_hash_t const* handle)
 {
+	// check
 	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
 	tb_assert_and_check_return_val(hash, 0);
+
+	// the maxn
 	return hash->item_maxn;
 }
 tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)

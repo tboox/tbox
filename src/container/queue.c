@@ -88,6 +88,15 @@ typedef struct __tb_queue_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
+static tb_size_t tb_queue_iterator_size(tb_iterator_t* iterator)
+{	
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
+	tb_assert_and_check_return_val(queue, 0);
+
+	// the size
+	return ((queue->tail + queue->maxn - queue->head) & (queue->maxn - 1));
+}
 static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
 {
 	// check
@@ -172,9 +181,9 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 
 	// init iterator
 	queue->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-	queue->itor.size = 0;
 	queue->itor.priv = tb_null;
 	queue->itor.step = func.size;
+	queue->itor.size = tb_queue_iterator_size;
 	queue->itor.head = tb_queue_iterator_head;
 	queue->itor.tail = tb_queue_iterator_tail;
 	queue->itor.prev = tb_queue_iterator_prev;

@@ -153,6 +153,15 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* heap)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
+static tb_size_t tb_heap_iterator_size(tb_iterator_t* iterator)
+{
+	// check
+	tb_heap_impl_t* heap = (tb_heap_impl_t*)iterator;
+	tb_assert_and_check_return_val(heap, 0);
+
+	// size
+	return heap->size;
+}
 static tb_size_t tb_heap_iterator_head(tb_iterator_t* iterator)
 {
 	// check
@@ -435,9 +444,9 @@ tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
 
 	// init iterator
 	heap->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	heap->itor.size = 0;
 	heap->itor.priv = tb_null;
 	heap->itor.step = func.size;
+	heap->itor.size = tb_heap_iterator_size;
 	heap->itor.head = tb_heap_iterator_head;
 	heap->itor.tail = tb_heap_iterator_tail;
 	heap->itor.prev = tb_heap_iterator_prev;
