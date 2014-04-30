@@ -52,14 +52,14 @@ typedef struct __tb_iterator_t
 	/// the iterator step
 	tb_size_t 				step;
 
-	/// the iterator size
-	tb_size_t 				size;
-
 	/// the iterator data
 	tb_pointer_t 			data;
 
 	/// the iterator priv
 	tb_pointer_t 			priv;
+
+	/// the iterator size
+	tb_size_t 				(*size)(struct __tb_iterator_t* iterator);
 
 	/// the iterator head
 	tb_size_t 				(*head)(struct __tb_iterator_t* iterator);
@@ -94,23 +94,29 @@ typedef tb_long_t 			(*tb_iterator_comp_t)(tb_iterator_t* iterator, tb_cpointer_
  * interfaces
  */
 
-/// the integer iterator
-tb_iterator_t 	tb_iterator_int(tb_long_t* data, tb_size_t size);
+/// init the long iterator
+tb_iterator_t 	tb_iterator_init_long(tb_long_t* data, tb_size_t size);
 
-/// the string iterator
-tb_iterator_t 	tb_iterator_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase);
+/// init the size iterator
+tb_iterator_t 	tb_iterator_init_size(tb_size_t* data, tb_size_t size);
 
-/// the pointer iterator
-tb_iterator_t 	tb_iterator_ptr(tb_pointer_t* data, tb_size_t size);
+/// init the string iterator
+tb_iterator_t 	tb_iterator_init_str(tb_char_t** data, tb_size_t size);
 
-/// the memory iterator 
-tb_iterator_t 	tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step);
+/// init the pointer iterator
+tb_iterator_t 	tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size);
+
+/// init the memory iterator 
+tb_iterator_t 	tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step);
 
 /// the iterator mode
 tb_size_t 		tb_iterator_mode(tb_iterator_t* iterator);
 
 /// the iterator step
 tb_size_t 		tb_iterator_step(tb_iterator_t* iterator);
+
+/// the iterator size
+tb_size_t 		tb_iterator_size(tb_iterator_t* iterator);
 
 /// the iterator head
 tb_size_t 		tb_iterator_head(tb_iterator_t* iterator);

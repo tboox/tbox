@@ -119,6 +119,15 @@ typedef struct __tb_dlist_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
+static tb_size_t tb_dlist_iterator_size(tb_iterator_t* iterator)
+{
+	// check
+	tb_dlist_impl_t* dlist = (tb_dlist_impl_t*)iterator;
+	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
+
+	// the size
+	return tb_fixed_pool_size(dlist->pool);
+}
 static tb_size_t tb_dlist_iterator_head(tb_iterator_t* iterator)
 {
 	// check
@@ -382,9 +391,9 @@ tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 
 	// init iterator
 	dlist->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-	dlist->itor.size = 0;
 	dlist->itor.priv = tb_null;
 	dlist->itor.step = func.size;
+	dlist->itor.size = tb_dlist_iterator_size;
 	dlist->itor.head = tb_dlist_iterator_head;
 	dlist->itor.tail = tb_dlist_iterator_tail;
 	dlist->itor.prev = tb_dlist_iterator_prev;
@@ -459,12 +468,16 @@ tb_pointer_t tb_dlist_last(tb_dlist_t const* handle)
 }
 tb_size_t tb_dlist_size(tb_dlist_t const* handle)
 {
+	// check
 	tb_dlist_impl_t* dlist = (tb_dlist_impl_t*)handle;
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
+
+	// the size
 	return tb_fixed_pool_size(dlist->pool);
 }
 tb_size_t tb_dlist_maxn(tb_dlist_t const* handle)
 {
+	// check
 	tb_assert_and_check_return_val(handle, 0);
 	return TB_MAXU32;
 }

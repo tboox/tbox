@@ -107,6 +107,15 @@ typedef struct __tb_vector_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
+static tb_size_t tb_vector_iterator_size(tb_iterator_t* iterator)
+{
+	// check
+	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
+	tb_assert_and_check_return_val(vector, 0);
+
+	// size
+	return vector->size;
+}
 static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
 {
 	// check
@@ -194,9 +203,9 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 
 	// init iterator
 	vector->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	vector->itor.size = 0;
 	vector->itor.priv = tb_null;
 	vector->itor.step = func.size;
+	vector->itor.size = tb_vector_iterator_size;
 	vector->itor.head = tb_vector_iterator_head;
 	vector->itor.tail = tb_vector_iterator_tail;
 	vector->itor.prev = tb_vector_iterator_prev;
@@ -258,7 +267,6 @@ tb_void_t tb_vector_copy(tb_vector_t* handle, tb_vector_t const* hcopy)
 
 	// check itor
 	tb_assert_and_check_return(vector->itor.mode == copy->itor.mode);
-	tb_assert_and_check_return(vector->itor.size == copy->itor.size);
 	tb_assert_and_check_return(vector->itor.step == copy->itor.step);
 
 	// null? clear it
