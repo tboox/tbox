@@ -222,6 +222,9 @@ tb_bool_t tb_database_done(tb_handle_t handle, tb_char_t const* sql)
 	// opened?
 	tb_check_return_val(database->bopened, tb_false);
 
+	// trace
+	tb_trace_d("done: sql: %s: ..", sql);
+
 	// done it
 	return database->done(database, sql);
 }
