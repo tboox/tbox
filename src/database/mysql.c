@@ -32,6 +32,7 @@
  */
 #include "mysql.h"
 #include "../libc/libc.h"
+#include "../utils/utils.h"
 #include <mysql/mysql.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +49,32 @@ typedef struct __tb_database_mysql_t
 	MYSQL* 					database;
 
 }tb_database_mysql_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * library implementation
+ */
+static tb_handle_t tb_database_mysql_library_init(tb_cpointer_t* ppriv)
+{
+	// init it
+	if (mysql_library_init(0, tb_null, tb_null))
+	{
+		// trace
+		tb_trace_e("init: mysql library failed!");
+		return tb_null;
+	}
+
+	// ok
+	return ppriv;
+}
+static tb_void_t tb_database_mysql_library_exit(tb_handle_t handle, tb_cpointer_t priv)
+{
+	// exit it
+	mysql_library_end();
+}
+static tb_handle_t tb_database_mysql_library_load()
+{
+	return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_MYSQL, tb_database_mysql_library_init, tb_database_mysql_library_exit, tb_null);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -75,9 +102,6 @@ static tb_bool_t tb_database_mysql_open(tb_database_t* database)
 	tb_char_t 			database_name[64] = {0};
 	do
 	{
-		// opened?
-		tb_check_return_val(!database->bopened, tb_true);
-
 		// the database host
 		host = tb_url_host_get(&database->url);
 		tb_assert_and_check_break(host);
@@ -138,15 +162,20 @@ static tb_bool_t tb_database_mysql_open(tb_database_t* database)
 			}
 		}
 
+		// load mysql library
+		if (!tb_database_mysql_library_load()) break;
+
 		// init mysql database
 		mysql->database = mysql_init(tb_null);
 		tb_assert_and_check_break(mysql->database);
 
 		// connect it
-		if (!mysql_real_connect(mysql->database, host, username[0]? username : tb_null, password[0]? password : tb_null, database_name[0]? database_name : tb_null, (tb_uint_t)port, tb_null, 0)) break;
-
-		// opened
-		database->bopened = tb_true;
+		if (!mysql_real_connect(mysql->database, host, username[0]? username : tb_null, password[0]? password : tb_null, database_name[0]? database_name : tb_null, (tb_uint_t)port, tb_null, 0))
+		{
+			// trace
+			tb_trace_e("open: host: %s failed, error: %s", host, mysql_error(mysql->database));
+			break;
+		}
 
 		// ok
 		ok = tb_true;
@@ -164,16 +193,16 @@ static tb_void_t tb_database_mysql_clos(tb_database_t* database)
 	// check
 	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
 	tb_assert_and_check_return(mysql);
-		
-	// opened?
-	tb_check_return(database->bopened);
 
 	// close database
 	if (mysql->database) mysql_close(mysql->database);
 	mysql->database = tb_null;
-
-	// closed
-	database->bopened = tb_false;
+}
+static tb_void_t tb_database_mysql_kill(tb_database_t* database)
+{
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return(mysql);
 }
 static tb_void_t tb_database_mysql_exit(tb_database_t* database)
 {
@@ -189,6 +218,15 @@ static tb_void_t tb_database_mysql_exit(tb_database_t* database)
 
 	// exit it
 	tb_free(mysql);
+}
+static tb_bool_t tb_database_mysql_done(tb_database_t* database, tb_char_t const* sql)
+{
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return_val(mysql && sql, tb_false);
+
+	// ok?
+	return tb_false;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -250,13 +288,18 @@ tb_database_t* tb_database_mysql_init(tb_url_t const* url)
 		mysql->base.type = TB_DATABASE_TYPE_MYSQL;
 		mysql->base.open = tb_database_mysql_open;
 		mysql->base.clos = tb_database_mysql_clos;
+		mysql->base.kill = tb_database_mysql_kill;
 		mysql->base.exit = tb_database_mysql_exit;
+		mysql->base.done = tb_database_mysql_done;
 
 		// init url
 		if (!tb_url_init(&mysql->base.url)) break;
 
 		// copy url
 		tb_url_copy(&mysql->base.url, url);
+
+		// init state
+		mysql->base.state = TB_STATE_OK;
 
 		// ok
 		ok = tb_true;

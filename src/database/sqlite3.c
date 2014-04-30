@@ -72,9 +72,6 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_t* database)
 	tb_char_t const* 	path = tb_null;
 	do
 	{
-		// opened?
-		tb_check_return_val(!database->bopened, tb_true);
-
 		// the database path
 		path = tb_url_path_get(&database->url);
 		tb_assert_and_check_break(path);
@@ -86,9 +83,6 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_t* database)
 			if (sqlite3_db->database) tb_trace_e("open: %s failed, error: %s", path, sqlite3_errmsg(sqlite3_db->database));
 			break;
 		}
-
-		// opened
-		database->bopened = tb_true;
 
 		// ok
 		ok = tb_true;
@@ -107,15 +101,9 @@ static tb_void_t tb_database_sqlite3_clos(tb_database_t* database)
 	tb_database_sqlite3_t* sqlite3_db = tb_database_sqlite3_cast(database);
 	tb_assert_and_check_return(sqlite3_db);
 		
-	// opened?
-	tb_check_return(database->bopened);
-
 	// close database
 	if (sqlite3_db->database) sqlite3_close(sqlite3_db->database);
 	sqlite3_db->database = tb_null;
-
-	// closed
-	database->bopened = tb_false;
 }
 static tb_void_t tb_database_sqlite3_exit(tb_database_t* database)
 {
@@ -131,6 +119,15 @@ static tb_void_t tb_database_sqlite3_exit(tb_database_t* database)
 
 	// exit it
 	tb_free(sqlite3_db);
+}
+static tb_bool_t tb_database_sqlite3_done(tb_database_t* database, tb_char_t const* sql)
+{
+	// check
+	tb_database_sqlite3_t* sqlite3_db = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return_val(sqlite3_db && sql, tb_false);
+		
+	// ok?
+	return tb_false;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -212,12 +209,16 @@ tb_database_t* tb_database_sqlite3_init(tb_url_t const* url)
 		sqlite3_db->base.open = tb_database_sqlite3_open;
 		sqlite3_db->base.clos = tb_database_sqlite3_clos;
 		sqlite3_db->base.exit = tb_database_sqlite3_exit;
+		sqlite3_db->base.done = tb_database_sqlite3_done;
 
 		// init url
 		if (!tb_url_init(&sqlite3_db->base.url)) break;
 
 		// copy url
 		tb_url_copy(&sqlite3_db->base.url, url);
+
+		// init state
+		sqlite3_db->base.state = TB_STATE_OK;
 
 		// ok
 		ok = tb_true;

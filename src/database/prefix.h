@@ -47,11 +47,14 @@ typedef enum __tb_database_database_type_e
 /// the database type
 typedef struct __tb_database_t
 {
+	/// the url
+	tb_url_t 			url;
+
 	/// the type
 	tb_size_t 			type;
 
-	/// the url
-	tb_url_t 			url;
+	/// the state
+	tb_size_t 			state;
 
 	/// is opened?
 	tb_bool_t 			bopened;
@@ -62,9 +65,35 @@ typedef struct __tb_database_t
 	/// clos
 	tb_void_t 			(*clos)(struct __tb_database_t* database);
 
+	/// kill
+	tb_void_t 			(*kill)(struct __tb_database_t* database);
+
 	/// exit
 	tb_void_t 			(*exit)(struct __tb_database_t* database);
 
+	/// done
+	tb_bool_t 			(*done)(struct __tb_database_t* database, tb_char_t const* sql);
+
+	/// load results
+	tb_iterator_t* 		(*results_load)(struct __tb_database_t* database);
+
+	/// exit results
+	tb_void_t 			(*results_exit)(struct __tb_database_t* database, tb_iterator_t* results);
+
 }tb_database_t;
+
+/// the database results item type
+typedef struct _tb_database_results_item_t
+{
+	/// the field name
+	tb_char_t const* 	name;
+
+	/// the data
+	tb_byte_t const* 	data;
+
+	/// the data size
+	tb_size_t 			size;
+
+}tb_database_results_item_t;
 
 #endif

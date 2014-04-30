@@ -29,7 +29,9 @@
  */
 #include "prefix.h"
 #include "for.h"
+#include "for_if.h"
 #include "rfor.h"
+#include "rfor_if.h"
 #include "sort.h"
 #include "heap_sort.h"
 #include "quick_sort.h"

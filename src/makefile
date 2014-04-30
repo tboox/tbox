@@ -389,7 +389,9 @@ INC_FILES 				= \
 						algorithm/prefix.h \
 						algorithm/algorithm.h \
 						algorithm/for.h \
+						algorithm/for_if.h \
 						algorithm/rfor.h \
+						algorithm/rfor_if.h \
 						algorithm/sort.h \
 						algorithm/heap_sort.h \
 						algorithm/quick_sort.h \
