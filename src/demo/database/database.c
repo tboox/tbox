@@ -19,23 +19,23 @@ static tb_void_t tb_demo_database_test_done(tb_handle_t database, tb_char_t cons
 		return ;
 	}
 
-	// load results
-	tb_iterator_t* results = tb_database_results_load(database);
-	if (results)
+	// load result
+	tb_iterator_t* result = tb_database_result_load(database);
+	if (result)
 	{
-		// walk results
-		tb_for_all_if (tb_iterator_t*, row, results, row)
+		// walk result
+		tb_for_all_if (tb_iterator_t*, row, result, row)
 		{
 			// walk items
-			tb_for_all_if (tb_database_results_item_t*, item, row, item)
+			tb_for_all_if (tb_database_result_item_t*, item, row, item)
 			{
 				// trace
 				tb_trace_i("name: %s, data: %s, size: %lu, at: %lux%lu", item->name, item->data, item->size, row_itor, item_itor);
 			}
 		}
 
-		// exit results
-		tb_database_results_exit(database, results);
+		// exit result
+		tb_database_result_exit(database, result);
 	}
 }
 
@@ -61,6 +61,7 @@ tb_int_t tb_demo_database_main(tb_int_t argc, tb_char_t** argv)
 			tb_demo_database_test_done(database, "insert into table1 values(5,'name5',350000)");
 			tb_demo_database_test_done(database, "insert into table1 values(6,'name6',21000)");
 			tb_demo_database_test_done(database, "insert into table1 values(8,'name7',21600)");
+			tb_demo_database_test_done(database, "select * from table1");
 		}
 
 		// exit database

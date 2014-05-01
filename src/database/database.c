@@ -192,18 +192,6 @@ tb_void_t tb_database_clos(tb_handle_t handle)
 	// closed
 	database->bopened = tb_false;
 }
-tb_void_t tb_database_kill(tb_handle_t handle)
-{
-	// check
-	tb_database_t* database = (tb_database_t*)handle;
-	tb_assert_and_check_return(database);
-	
-	// opened?
-	tb_check_return(database->bopened);
-
-	// kill it
-	if (database->kill) database->kill(database);
-}
 tb_size_t tb_database_state(tb_handle_t handle)
 {
 	// check
@@ -228,28 +216,28 @@ tb_bool_t tb_database_done(tb_handle_t handle, tb_char_t const* sql)
 	// done it
 	return database->done(database, sql);
 }
-tb_iterator_t* tb_database_results_load(tb_handle_t handle)
+tb_iterator_t* tb_database_result_load(tb_handle_t handle)
 {
 	// check
 	tb_database_t* database = (tb_database_t*)handle;
-	tb_assert_and_check_return_val(database && database->results_load, tb_null);
+	tb_assert_and_check_return_val(database && database->result_load, tb_null);
 			
 	// opened?
 	tb_check_return_val(database->bopened, tb_null);
 
 	// load it
-	return database->results_load(database);
+	return database->result_load(database);
 }
-tb_void_t tb_database_results_exit(tb_handle_t handle, tb_iterator_t* results)
+tb_void_t tb_database_result_exit(tb_handle_t handle, tb_iterator_t* result)
 {
 	// check
 	tb_database_t* database = (tb_database_t*)handle;
-	tb_assert_and_check_return(database && database->results_exit && results);
+	tb_assert_and_check_return(database && database->result_exit && result);
 			
 	// opened?
 	tb_check_return(database->bopened);
 
 	// exit it
-	database->results_exit(database, results);
+	database->result_exit(database, result);
 }
 

@@ -65,25 +65,22 @@ typedef struct __tb_database_t
 	/// clos
 	tb_void_t 			(*clos)(struct __tb_database_t* database);
 
-	/// kill
-	tb_void_t 			(*kill)(struct __tb_database_t* database);
-
 	/// exit
 	tb_void_t 			(*exit)(struct __tb_database_t* database);
 
 	/// done
 	tb_bool_t 			(*done)(struct __tb_database_t* database, tb_char_t const* sql);
 
-	/// load results
-	tb_iterator_t* 		(*results_load)(struct __tb_database_t* database);
+	/// load result
+	tb_iterator_t* 		(*result_load)(struct __tb_database_t* database);
 
-	/// exit results
-	tb_void_t 			(*results_exit)(struct __tb_database_t* database, tb_iterator_t* results);
+	/// exit result
+	tb_void_t 			(*result_exit)(struct __tb_database_t* database, tb_iterator_t* result);
 
 }tb_database_t;
 
-/// the database results item type
-typedef struct _tb_database_results_item_t
+/// the database result item type
+typedef struct _tb_database_result_item_t
 {
 	/// the field name
 	tb_char_t const* 	name;
@@ -94,6 +91,6 @@ typedef struct _tb_database_results_item_t
 	/// the data size
 	tb_size_t 			size;
 
-}tb_database_results_item_t;
+}tb_database_result_item_t;
 
 #endif

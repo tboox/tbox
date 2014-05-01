@@ -40,6 +40,9 @@ tb_void_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_it
 	// check
 	tb_check_return(iterator && head != tail);
 
+	// readonly?
+	tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
+
 	// random access iterator? 
 	if (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS) 
 	{

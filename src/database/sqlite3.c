@@ -134,16 +134,16 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_t* database, tb_char_t con
 		tb_int_t 	row_count = 0;
 		tb_int_t 	col_count = 0;
 		tb_char_t* 	error = tb_null;
-		tb_char_t** results = tb_null;
-		if (SQLITE_OK != sqlite3_get_table(sqlite3_db->database, sql, &results, &row_count, &col_count, &error))
+		tb_char_t** result = tb_null;
+		if (SQLITE_OK != sqlite3_get_table(sqlite3_db->database, sql, &result, &row_count, &col_count, &error))
 		{
 			// trace
 			tb_trace_e("done: sql: %s failed, error: %s", sql, error);
 			break;
 		}
 
-		// exit results
-		if (results) sqlite3_free_table(results);
+		// exit result
+		if (result) sqlite3_free_table(result);
 
 		// trace
 		tb_trace_d("done: sql: %s: ok", sql);
@@ -156,11 +156,11 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_t* database, tb_char_t con
 	// ok?
 	return ok;
 }
-static tb_iterator_t* tb_database_sqlite3_results_load(tb_database_t* database)
+static tb_iterator_t* tb_database_sqlite3_result_load(tb_database_t* database)
 {
 	return tb_null;
 }
-static tb_void_t tb_database_sqlite3_results_exit(tb_database_t* database, tb_iterator_t* results)
+static tb_void_t tb_database_sqlite3_result_exit(tb_database_t* database, tb_iterator_t* result)
 {
 }
 
@@ -244,8 +244,8 @@ tb_database_t* tb_database_sqlite3_init(tb_url_t const* url)
 		sqlite3_db->base.clos 			= tb_database_sqlite3_clos;
 		sqlite3_db->base.exit 			= tb_database_sqlite3_exit;
 		sqlite3_db->base.done 			= tb_database_sqlite3_done;
-		sqlite3_db->base.results_load 	= tb_database_sqlite3_results_load;
-		sqlite3_db->base.results_exit 	= tb_database_sqlite3_results_exit;
+		sqlite3_db->base.result_load 	= tb_database_sqlite3_result_load;
+		sqlite3_db->base.result_exit 	= tb_database_sqlite3_result_exit;
 
 		// init url
 		if (!tb_url_init(&sqlite3_db->base.url)) break;
