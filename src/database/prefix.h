@@ -36,16 +36,16 @@
  */
 
 /// the sql database type enum
-typedef enum __tb_database_database_type_e
+typedef enum __tb_database_sql_type_e
 {
-	TB_DATABASE_TYPE_NONE 		= 0
-,	TB_DATABASE_TYPE_MYSQL 		= 1
-,	TB_DATABASE_TYPE_SQLITE3 	= 2
+	TB_DATABASE_SQL_TYPE_NONE 		= 0
+,	TB_DATABASE_SQL_TYPE_MYSQL 		= 1
+,	TB_DATABASE_SQL_TYPE_SQLITE3 	= 2
 
-}tb_database_database_type_e;
+}tb_database_sql_type_e;
 
 /// the database type
-typedef struct __tb_database_t
+typedef struct __tb_database_sql_t
 {
 	/// the url
 	tb_url_t 			url;
@@ -60,37 +60,40 @@ typedef struct __tb_database_t
 	tb_bool_t 			bopened;
 
 	/// open
-	tb_bool_t 			(*open)(struct __tb_database_t* database);
+	tb_bool_t 			(*open)(struct __tb_database_sql_t* database);
 
 	/// clos
-	tb_void_t 			(*clos)(struct __tb_database_t* database);
+	tb_void_t 			(*clos)(struct __tb_database_sql_t* database);
 
 	/// exit
-	tb_void_t 			(*exit)(struct __tb_database_t* database);
+	tb_void_t 			(*exit)(struct __tb_database_sql_t* database);
 
 	/// done
-	tb_bool_t 			(*done)(struct __tb_database_t* database, tb_char_t const* sql);
+	tb_bool_t 			(*done)(struct __tb_database_sql_t* database, tb_char_t const* sql);
 
 	/// load result
-	tb_iterator_t* 		(*result_load)(struct __tb_database_t* database);
+	tb_iterator_t* 		(*result_load)(struct __tb_database_sql_t* database, tb_bool_t ball);
 
 	/// exit result
-	tb_void_t 			(*result_exit)(struct __tb_database_t* database, tb_iterator_t* result);
+	tb_void_t 			(*result_exit)(struct __tb_database_sql_t* database, tb_iterator_t* result);
 
-}tb_database_t;
+	/// the result fields
+	tb_iterator_t* 		(*result_fields)(struct __tb_database_sql_t* database, tb_iterator_t* result);
+
+}tb_database_sql_t;
 
 /// the database result item type
-typedef struct _tb_database_result_item_t
+typedef struct __tb_database_sql_result_item_t
 {
-	/// the field name
+	/// the name
 	tb_char_t const* 	name;
 
 	/// the data
 	tb_byte_t const* 	data;
 
-	/// the data size
+	/// the data size, maybe zero for c-string
 	tb_size_t 			size;
 
-}tb_database_result_item_t;
+}tb_database_sql_result_item_t;
 
 #endif

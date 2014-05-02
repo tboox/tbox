@@ -46,6 +46,6 @@ tb_size_t 			tb_database_sqlite3_probe(tb_url_t const* url);
  *
  * @return 			the database handle
  */
-tb_database_t* 		tb_database_sqlite3_init(tb_url_t const* url);
+tb_database_sql_t* 	tb_database_sqlite3_init(tb_url_t const* url);
 
 #endif
