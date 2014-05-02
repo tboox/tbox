@@ -93,6 +93,8 @@ tb_void_t 			tb_database_sql_clos(tb_handle_t database);
 
 /*! the database state
  *
+ * TODO: ..
+ *
  * @param database 	the database handle
  *
  * @return 			the database state
