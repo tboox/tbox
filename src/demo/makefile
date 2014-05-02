@@ -99,7 +99,7 @@ demo_C_FILES 							+= \
 										platform/semaphore \
 										platform/thread_pool \
 										platform/thread_store \
-										database/database \
+										database/sql \
 										container/heap \
 										container/hash \
 										container/dlist \
