@@ -92,6 +92,22 @@ tb_bool_t 			tb_database_sql_open(tb_handle_t database);
  */
 tb_void_t 			tb_database_sql_clos(tb_handle_t database);
 
+/*! commit the current transaction
+ *
+ * @param database 	the database handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_database_sql_commit(tb_handle_t database);
+
+/*! rollback the current transaction
+ *
+ * @param database 	the database handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_database_sql_rollback(tb_handle_t database);
+
 /*! the database state
  *
  * TODO: ..
