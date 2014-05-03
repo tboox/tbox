@@ -83,6 +83,7 @@ tb_int64_t tb_database_sql_value_int64(tb_database_sql_value_t const* value)
 {
 	return 0;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_database_sql_value_float(tb_database_sql_value_t const* value)
 {
 	return 0;
@@ -91,6 +92,7 @@ tb_double_t tb_database_sql_value_double(tb_database_sql_value_t const* value)
 {
 	return 0;
 }
+#endif
 tb_void_t tb_database_sql_value_int8_set(tb_database_sql_value_t* value, tb_int8_t number)
 {
 }
@@ -103,12 +105,14 @@ tb_void_t tb_database_sql_value_int32_set(tb_database_sql_value_t* value, tb_int
 tb_void_t tb_database_sql_value_int64_set(tb_database_sql_value_t* value, tb_int64_t number)
 {
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_database_sql_value_float_set(tb_database_sql_value_t* value, tb_float_t number)
 {
 }
 tb_void_t tb_database_sql_value_double_set(tb_database_sql_value_t* value, tb_double_t number)
 {
 }
+#endif
 tb_void_t tb_database_sql_value_text8_set(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
 {
 	// check
