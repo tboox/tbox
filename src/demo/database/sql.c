@@ -35,10 +35,10 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
 			tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
 
 			// walk items
-			tb_for_all_if (tb_database_sql_result_item_t*, item, row, item)
+			tb_for_all_if (tb_database_sql_value_t*, value, row, value)
 			{
 				// trace
-				tb_tracet_i("[%s[%lu]:%s] ", item->name, item->size, item->data);
+				tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(value), tb_database_sql_value_text(value));
 			}
 
 			// trace

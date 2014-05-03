@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "value.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -139,31 +140,10 @@ tb_bool_t 			tb_database_sql_done(tb_handle_t database, tb_char_t const* sql);
  *     // walk result
  *     tb_for_all_if (tb_iterator_t*, row, result, row)
  *     {
- *          // walk items
- *          tb_for_all_if (tb_database_sql_result_item_t*, item, row, item)
+ *          // walk values
+ *          tb_for_all_if (tb_database_sql_value_t*, value, row, value)
  *          {
- *               tb_trace_i("name: %s, data: %s, size: %lu, at: %lux%lu", item->name, item->data, item->size, row_itor, item_itor);
- *          }
- *     }
- *
- *     // or
- *     tb_size_t row_itor = tb_iterator_head(result);
- *     tb_size_t row_tail = tb_iterator_tail(result);
- *     for (; row_itor != row_tail; row_itor = tb_iterator_next(result, row_itor))
- *     {
- *          tb_iterator_t* row = (tb_iterator_t*)tb_iterator_item(result, row_itor);
- *          if (row)
- *          {
- *              tb_size_t item_itor = 0;
- *              tb_size_t item_size = tb_iterator_size(row);
- *              for (item_itor = 0; item_itor < item_size; item_itor++)
- *              {
- *                   tb_database_sql_result_item_t* item = (tb_database_sql_result_item_t*)tb_iterator_item(row, item_itor);
- *                   if (item)
- *                   {
- *                       tb_trace_i("name: %s, data: %s, size: %lu, at: %lux%lu", item->name, item->data, item->size, row_itor, item_itor);
- *                   }
- *              }
+ *               tb_trace_i("name: %s, data: %s, at: %lux%lu", tb_database_sql_value_name(value), tb_database_sql_value_text(value), row_itor, item_itor);
  *          }
  *     }
  *
@@ -186,7 +166,41 @@ tb_iterator_t* 		tb_database_sql_result_load(tb_handle_t database, tb_bool_t bal
  */
 tb_void_t 			tb_database_sql_result_exit(tb_handle_t database, tb_iterator_t* result);
 
+/*! init the database stmt
+ *
+ * @param database 	the database handle
+ * @param sql 		the sql command
+ *
+ * @return 			the stmt handle
+ */
+tb_handle_t 		tb_database_sql_stmt_init(tb_handle_t database, tb_char_t const* sql);
 
+/*! exit the database stmt
+ *
+ * @param database 	the database handle
+ * @param stmt 		the stmt handle
+ */
+tb_void_t 			tb_database_sql_stmt_exit(tb_handle_t database, tb_handle_t stmt);
+
+/*! done the database stmt
+ *
+ * @param database 	the database handle
+ * @param stmt 		the stmt handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_database_sql_stmt_done(tb_handle_t database, tb_handle_t stmt);
+
+/*! bind the database stmt argument
+ *
+ * @param database 	the database handle
+ * @param stmt 		the stmt handle
+ * @param index 	the argument index
+ * @param value 	the argument value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_database_sql_stmt_bind(tb_handle_t database, tb_handle_t stmt, tb_size_t index, tb_database_sql_value_t const* value);
 
 
 #endif

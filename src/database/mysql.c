@@ -30,6 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "value.h"
 #include "mysql.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
@@ -54,8 +55,8 @@ typedef struct __tb_database_mysql_result_row_t
 	// the col count
 	tb_size_t 							count;
 
-	// the col item
-	tb_database_sql_result_item_t 		item;
+	// the col value
+	tb_database_sql_value_t 			value;
 
 }tb_database_mysql_result_row_t;
 
@@ -278,13 +279,12 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 	tb_database_mysql_t* mysql = (tb_database_mysql_t*)iterator->priv;
 	tb_assert_and_check_return_val(mysql && mysql->result.fields, tb_null);
 
-	// init item
-	row->item.data = (tb_byte_t const*)row->row[itor];
-	row->item.size = (tb_size_t)row->lengths[itor];
-	row->item.name = (tb_char_t const*)mysql->result.fields[itor].name;
+	// init value
+	tb_database_sql_value_name_set(&row->value, (tb_char_t const*)mysql->result.fields[itor].name);
+	tb_database_sql_value_text32_set(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
 
 	// the col item
-	return (tb_pointer_t)&row->item;
+	return (tb_pointer_t)&row->value;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

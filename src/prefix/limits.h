@@ -32,18 +32,26 @@
  * macros
  */
 
-#define TB_MAXS16 				(32767)
-#define TB_MINS16 				(-32767)
+#define TB_MAXS8 				(0x7f)
+#define TB_MINS8 				(0x81)
+#define TB_MAXU8 				(0xff)
+#define TB_MINU8 				(0)
+
+#define TB_MAXS16 				(0x7fff)
+#define TB_MINS16 				(0x8001)
 #define TB_MAXU16 				(0xffff)
 #define TB_MINU16 				(0)
+
 #define TB_MAXS32 				(0x7fffffff)
 #define TB_MINS32 				(0x80000001)
 #define TB_MAXU32 				(0xffffffff)
 #define TB_MINU32 				(0)
+
 #define TB_MAXS64 				(0x7fffffffffffffffLL)
 #define TB_MINS64 				(0x8000000000000001LL)
 #define TB_MAXU64 				(0xffffffffffffffffULL)
 #define TB_MINU64 				(0)
+
 #define TB_NAN32 				(0x80000000)
 
 

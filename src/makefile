@@ -64,6 +64,7 @@ tbox_C_FILES 			+= \
 						container/item/uint32 \
 						container/item/string_pool \
 						database/sql \
+						database/value \
 						network/network \
 						network/dns/cache \
 						network/dns/server \
@@ -553,6 +554,7 @@ INC_FILES 				= \
 						xml/writer.h \
 						database/prefix.h \
 						database/sql.h \
+						database/value.h \
 						zip/prefix.h \
 						zip/zip.h \
 						zip/vlc.h \
