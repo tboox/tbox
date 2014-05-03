@@ -30,6 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "value.h"
 #include "sqlite3.h"
 #include "../libc/libc.h"
 #include "../stream/stream.h"
@@ -51,8 +52,8 @@ typedef struct __tb_database_sqlite3_result_row_t
 	// the col count
 	tb_size_t 							count;
 
-	// the col item
-	tb_database_sql_result_item_t 		item;
+	// the col value
+	tb_database_sql_value_t 			value;
 
 }tb_database_sqlite3_result_row_t;
 
@@ -204,13 +205,12 @@ static tb_pointer_t tb_sqlite3_result_col_iterator_item(tb_iterator_t* iterator,
 	tb_database_sqlite3_t* sqlite = (tb_database_sqlite3_t*)iterator->priv;
 	tb_assert_and_check_return_val(sqlite && sqlite->result.result, tb_null);
 
-	// init item
-	row->item.data = (tb_byte_t const*)sqlite->result.result[((1 + sqlite->result.row.row) * row->count) + itor];
-	row->item.size = 0;
-	row->item.name = (tb_char_t const*)sqlite->result.result[itor];
+	// init value
+	tb_database_sql_value_name_set(&row->value, (tb_char_t const*)sqlite->result.result[itor]);
+	tb_database_sql_value_text32_set(&row->value, (tb_char_t const*)sqlite->result.result[((1 + sqlite->result.row.row) * row->count) + itor], 0);
 
 	// the col item
-	return (tb_pointer_t)&row->item;
+	return (tb_pointer_t)&row->value;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +263,7 @@ static tb_void_t tb_database_sqlite3_clos(tb_database_sql_t* database)
 	// check
 	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
 	tb_assert_and_check_return(sqlite);
-		
+	
 	// close database
 	if (sqlite->database) sqlite3_close(sqlite->database);
 	sqlite->database = tb_null;
@@ -311,6 +311,21 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_sql_t* database, tb_char_t
 			break;
 		}
 
+		// no result?
+		if (!row_count)
+		{
+			// exit result
+			if (sqlite->result.result) sqlite3_free_table(sqlite->result.result);
+			sqlite->result.result = tb_null;
+
+			// trace
+			tb_trace_d("done: sql: %s: ok", sql);
+
+			// ok
+			ok = tb_true;
+			break;
+		}
+
 		// save result row count
 		sqlite->result.count = row_count;
 
@@ -324,7 +339,7 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_sql_t* database, tb_char_t
 		ok = tb_true;
 	
 	} while (0);
-
+	
 	// ok?
 	return ok;
 }
