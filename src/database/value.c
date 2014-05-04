@@ -106,7 +106,7 @@ tb_int32_t tb_database_sql_value_int32(tb_database_sql_value_t const* value)
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT32:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT16:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT8:
-		return value->text.data? (tb_int32_t)tb_atoi(value->text.data) : 0;
+		return value->text.data? (tb_int32_t)tb_stoi32(value->text.data) : 0;
 	default:
 		tb_trace_e("unknown number type: %lu", value->type);
 		break;
@@ -139,7 +139,7 @@ tb_int64_t tb_database_sql_value_int64(tb_database_sql_value_t const* value)
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT32:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT16:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT8:
-		return value->text.data? (tb_int64_t)tb_atoll(value->text.data) : 0;
+		return value->text.data? (tb_int64_t)tb_stoi64(value->text.data) : 0;
 	default:
 		tb_trace_e("unknown number type: %lu", value->type);
 		break;
@@ -171,7 +171,7 @@ tb_float_t tb_database_sql_value_float(tb_database_sql_value_t const* value)
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT32:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT16:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT8:
-		return value->text.data? (tb_float_t)tb_atof(value->text.data) : 0;
+		return value->text.data? tb_stof(value->text.data) : 0;
 	default:
 		tb_trace_e("unknown number type: %lu", value->type);
 		break;
@@ -202,7 +202,7 @@ tb_double_t tb_database_sql_value_double(tb_database_sql_value_t const* value)
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT32:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT16:
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT8:
-		return value->text.data? (tb_double_t)tb_atof(value->text.data) : 0;
+		return value->text.data? tb_stod(value->text.data) : 0;
 	default:
 		tb_trace_e("unknown number type: %lu", value->type);
 		break;
