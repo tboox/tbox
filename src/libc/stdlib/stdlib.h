@@ -69,18 +69,130 @@
  * interfaces
  */
 
+/*! convert the binary string to uint32
+ *
+ * .e.g "0b1001" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint32 number
+ */
 tb_uint32_t 		tb_s2tou32(tb_char_t const* s);
+
+/*! convert the octal string to uint32
+ *
+ * .e.g "011" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint32 number
+ */
 tb_uint32_t 		tb_s8tou32(tb_char_t const* s);
+
+/*! convert the decimal string to uint32
+ *
+ * .e.g "9" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint32 number
+ */
 tb_uint32_t 		tb_s10tou32(tb_char_t const* s);
+
+/*! convert the hex string to uint32
+ *
+ * .e.g "0x9" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint32 number
+ */
 tb_uint32_t 		tb_s16tou32(tb_char_t const* s);
+
+/*! auto convert string to uint32
+ *
+ * .e.g 
+ *
+ * "0b1001" => 9
+ * "011"    => 9
+ * "9"      => 9
+ * "0x9"    => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint32 number
+ */
 tb_uint32_t 		tb_stou32(tb_char_t const* s);
+
+/*! convert string to uint32 using the given base
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint32 number
+ */
 tb_uint32_t 		tb_sbtou32(tb_char_t const* s, tb_int_t base);
 
+/*! convert the binary string to uint64
+ *
+ * .e.g "0b1001" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint64 number
+ */
 tb_uint64_t 		tb_s2tou64(tb_char_t const* s);
+
+/*! convert the octal string to uint64
+ *
+ * .e.g "011" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint64 number
+ */
 tb_uint64_t 		tb_s8tou64(tb_char_t const* s);
+
+/*! convert the decimal string to uint64
+ *
+ * .e.g "9" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint64 number
+ */
 tb_uint64_t 		tb_s10tou64(tb_char_t const* s);
+
+/*! convert the hex string to uint64
+ *
+ * .e.g "0x9" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint64 number
+ */
 tb_uint64_t 		tb_s16tou64(tb_char_t const* s);
+
+/*! auto convert string to uint64
+ *
+ * .e.g 
+ *
+ * "0b1001" => 9
+ * "011"    => 9
+ * "9"      => 9
+ * "0x9"    => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint64 number
+ */
 tb_uint64_t 		tb_stou64(tb_char_t const* s);
+
+/*! convert string to uint64 using the given base
+ *
+ * @param s 		the string
+ *
+ * @return 			the uint64 number
+ */
 tb_uint64_t 		tb_sbtou64(tb_char_t const* s, tb_int_t base);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
@@ -94,10 +206,24 @@ tb_float_t 			tb_sbtof(tb_char_t const* s, tb_int_t base);
 
 #endif
 
-// mbstowcs
+/*! mbstowcs, convert string to wstring
+ *
+ * @param s1 		the wstring data
+ * @param s2 		the string data
+ * @param n 		the string length
+ *
+ * @return 			the wstring length
+ */
 tb_size_t 			tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n);
 
-// wcstombs
+/*! wcstombs, convert wstring to string
+ *
+ * @param s1 		the string data
+ * @param s2 		the wstring data
+ * @param n 		the wstring length
+ *
+ * @return 			the string length
+ */
 tb_size_t 			tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n);
 
 
