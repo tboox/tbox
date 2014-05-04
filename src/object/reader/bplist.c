@@ -331,10 +331,12 @@ static tb_object_t* tb_object_bplist_reader_func_number(tb_object_bplist_reader_
 				break;
 			case TB_OBJECT_BPLIST_TYPE_REAL:
 				{
-					tb_byte_t b[4];
-					if (!tb_basic_stream_bread(reader->stream, b, 4)) return tb_null;
-					tb_float_t val = tb_bits_get_float_be(b);
+#ifdef TB_CONFIG_TYPE_FLOAT
+					tb_float_t val = tb_basic_stream_bread_float_be(reader->stream);
 					object = tb_number_init_from_float(val);
+#else
+					tb_trace_e("real type is not supported! please enable float config.");
+#endif
 				}
 				break;
 			default:
@@ -355,10 +357,12 @@ static tb_object_t* tb_object_bplist_reader_func_number(tb_object_bplist_reader_
 				break;
 			case TB_OBJECT_BPLIST_TYPE_REAL:
 				{
-					tb_byte_t b[8];
-					if (!tb_basic_stream_bread(reader->stream, b, 8)) return tb_null;
-					tb_double_t val = tb_bits_get_double_bbe(b);
+#ifdef TB_CONFIG_TYPE_FLOAT
+					tb_double_t val = tb_basic_stream_bread_double_bbe(reader->stream);
 					object = tb_number_init_from_double(val);
+#else
+					tb_trace_e("real type is not supported! please enable float config.");
+#endif
 				}
 				break;
 			default:

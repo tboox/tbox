@@ -21,9 +21,11 @@ static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value
 {
 	switch (value->type)
 	{
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_FLV_SDATA_TYPE_NUMBER:
 		tb_trace_i("%s = %lf", spath, value->u.number);
 		break;
+#endif
 	case TB_FLV_SDATA_TYPE_BOOLEAN:
 		tb_trace_i("%s = %s", spath, value->u.boolean? "true" : "false");
 		break;
@@ -141,12 +143,14 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 			tb_assert_return(data);
 			tb_static_stream_read_data(&sstream, data, size);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 			// remove emulation bytes
 			size = tb_flv_video_h264_sps_analyze_remove_emulation(data, size);
 
 			// analyze framerate
 			tb_double_t framerate = tb_flv_video_h264_sps_analyze_framerate(data, size);
 			tb_trace_i("sps_framerate: %lf", framerate);
+#endif
 
 			// free data
 			tb_free(data);
@@ -236,21 +240,21 @@ tb_int_t tb_demo_flv_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(hflv, end);
 
 	// ioctl
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_CB_SDATA, 			tb_flv_sdata_cb_func, 			&info);
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_CB_HDATA, 			tb_flv_hdata_cb_func, 			&info);
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_CB_SDATA_DATA, 		tb_flv_sdata_data_cb_func, 		&info);
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_CB_AUDIO_CONFIG, 	tb_flv_audio_config_cb_func, 	&info);
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_CB_VIDEO_CONFIG, 	tb_flv_video_config_cb_func, 	&info);
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_CB_AUDIO_DATA, 		tb_flv_audio_data_cb_func, 		&info);
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_CB_VIDEO_DATA, 		tb_flv_video_data_cb_func, 		&info);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_CB_SDATA, 			tb_flv_sdata_cb_func, 			&info);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_CB_HDATA, 			tb_flv_hdata_cb_func, 			&info);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_CB_SDATA_DATA, 		tb_flv_sdata_data_cb_func, 		&info);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_CB_AUDIO_CONFIG, 	tb_flv_audio_config_cb_func, 	&info);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_CB_VIDEO_CONFIG, 	tb_flv_video_config_cb_func, 	&info);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_CB_AUDIO_DATA, 		tb_flv_audio_data_cb_func, 		&info);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_CB_VIDEO_DATA, 		tb_flv_video_data_cb_func, 		&info);
 
-	//tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_SDATA);
-	tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_HDATA | TB_FLV_SPANK_TYPE_SDATA | TB_FLV_SPANK_TYPE_VIDEO_CONFIG | TB_FLV_SPANK_TYPE_VIDEO_DATA);
-	//tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_HDATA | TB_FLV_SPANK_TYPE_SDATA | TB_FLV_SPANK_TYPE_AUDIO_CONFIG | TB_FLV_SPANK_TYPE_AUDIO_DATA);
-	//tb_flv_ioctl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_HDATA | TB_FLV_SPANK_TYPE_SDATA | TB_FLV_SPANK_TYPE_VIDEO_CONFIG | TB_FLV_SPANK_TYPE_AUDIO_CONFIG | TB_FLV_SPANK_TYPE_VIDEO_DATA | TB_FLV_SPANK_TYPE_AUDIO_DATA);
+	//tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_SDATA);
+	tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_HDATA | TB_FLV_SPANK_TYPE_SDATA | TB_FLV_SPANK_TYPE_VIDEO_CONFIG | TB_FLV_SPANK_TYPE_VIDEO_DATA);
+	//tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_HDATA | TB_FLV_SPANK_TYPE_SDATA | TB_FLV_SPANK_TYPE_AUDIO_CONFIG | TB_FLV_SPANK_TYPE_AUDIO_DATA);
+	//tb_flv_ctrl(hflv, TB_FLV_IOCTL_CMD_SPANK_TYPE, TB_FLV_SPANK_TYPE_HDATA | TB_FLV_SPANK_TYPE_SDATA | TB_FLV_SPANK_TYPE_VIDEO_CONFIG | TB_FLV_SPANK_TYPE_AUDIO_CONFIG | TB_FLV_SPANK_TYPE_VIDEO_DATA | TB_FLV_SPANK_TYPE_AUDIO_DATA);
 
 	// spank
-	while (tb_flv_spank(hflv)) ;
+	while (tb_flv_spak(hflv)) ;
 
 	// free decoder
 	tb_flv_exit(hflv);

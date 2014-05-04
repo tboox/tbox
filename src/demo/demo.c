@@ -50,8 +50,10 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(libc_stdlib)
 
 	// libm
+#ifdef TB_CONFIG_TYPE_FLOAT
 , 	TB_DEMO_MAIN_ITEM(libm_float)
 ,	TB_DEMO_MAIN_ITEM(libm_double)
+#endif
 ,	TB_DEMO_MAIN_ITEM(libm_integer)
 
 	// asio
@@ -64,7 +66,9 @@ static tb_demo_t g_demo[] =
 
 	// math
 ,	TB_DEMO_MAIN_ITEM(math_rand)
+#ifdef TB_CONFIG_TYPE_FLOAT
 ,	TB_DEMO_MAIN_ITEM(math_fixed)
+#endif
 
 	// utils
 ,	TB_DEMO_MAIN_ITEM(utils_url)

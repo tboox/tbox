@@ -82,6 +82,7 @@ static __tb_inline__ tb_bool_t tb_option_is_integer(tb_char_t const* data)
 	// ok?
 	return *p? tb_false : tb_true;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 static __tb_inline__ tb_bool_t tb_option_is_float(tb_char_t const* data)
 {
 	// check
@@ -96,6 +97,7 @@ static __tb_inline__ tb_bool_t tb_option_is_float(tb_char_t const* data)
 	// ok?
 	return *p? tb_false : tb_true;
 }
+#endif
 static __tb_inline__ tb_option_item_t const* tb_option_item_find(tb_option_item_t const* opts, tb_char_t const* lname, tb_char_t sname)
 {
 	// check

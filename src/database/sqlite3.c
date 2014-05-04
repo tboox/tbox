@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "value.h"
+#include "sql.h"
 #include "sqlite3.h"
 #include "../libc/libc.h"
 #include "../stream/stream.h"
@@ -102,10 +102,6 @@ static tb_size_t tb_sqlite3_result_row_iterator_size(tb_iterator_t* iterator)
 }
 static tb_size_t tb_sqlite3_result_row_iterator_head(tb_iterator_t* iterator)
 {
-	// check
-	tb_database_sqlite3_result_t* result = (tb_database_sqlite3_result_t*)iterator;
-	tb_assert_return_val(result, 0);
-
 	// head
 	return 0;
 }

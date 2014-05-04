@@ -19,8 +19,6 @@ demo_C_FILES 							+= \
 										libc/wchar \
 										libc/string \
 										libc/stdlib \
-										libm/float \
-										libm/double \
 										libm/integer \
 										asio/dns \
 										asio/http \
@@ -29,7 +27,6 @@ demo_C_FILES 							+= \
 										asio/aicpc \
 										asio/aicpd \
 										math/rand \
-										math/fixed \
 										utils/url \
 										utils/crc \
 										utils/md5 \
@@ -109,6 +106,11 @@ demo_C_FILES 							+= \
 										container/vector \
 										algorithm/find \
 										algorithm/sort 
+
+demo_C_FILES-$(TB_CONFIG_TYPE_FLOAT) 	+= \
+										math/fixed \
+										libm/float \
+										libm/double
 
 # libs
 demo_LIBS 								+= tbox$(DTYPE) 

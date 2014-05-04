@@ -30,6 +30,66 @@
 #include "value.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the sql database type enum
+typedef enum __tb_database_sql_type_e
+{
+	TB_DATABASE_SQL_TYPE_NONE 				= 0
+,	TB_DATABASE_SQL_TYPE_MYSQL 				= 1
+,	TB_DATABASE_SQL_TYPE_SQLITE3 			= 2
+
+}tb_database_sql_type_e;
+
+/// the database type
+typedef struct __tb_database_sql_t
+{
+	/// the url
+	tb_url_t 					url;
+
+	/// the type
+	tb_size_t 					type;
+
+	/// the state
+	tb_size_t 					state;
+
+	/// is opened?
+	tb_bool_t 					bopened;
+
+	/// open
+	tb_bool_t 					(*open)(struct __tb_database_sql_t* database);
+
+	/// clos
+	tb_void_t 					(*clos)(struct __tb_database_sql_t* database);
+
+	/// exit
+	tb_void_t 					(*exit)(struct __tb_database_sql_t* database);
+
+	/// done
+	tb_bool_t 					(*done)(struct __tb_database_sql_t* database, tb_char_t const* sql);
+
+	/// load result
+	tb_iterator_t* 				(*result_load)(struct __tb_database_sql_t* database, tb_bool_t ball);
+
+	/// exit result
+	tb_void_t 					(*result_exit)(struct __tb_database_sql_t* database, tb_iterator_t* result);
+
+	/// stmt init
+	tb_handle_t 				(*stmt_init)(tb_handle_t database, tb_char_t const* sql);
+
+	/// stmt exit
+	tb_void_t 					(*stmt_exit)(tb_handle_t database, tb_handle_t stmt);
+
+	/// stmt done
+	tb_bool_t 					(*stmt_done)(tb_handle_t database, tb_handle_t stmt);
+
+	/// stmt bind
+	tb_bool_t 					(*stmt_bind)(tb_handle_t database, tb_handle_t stmt, tb_size_t index, tb_database_sql_value_t const* value);
+
+}tb_database_sql_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 

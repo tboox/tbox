@@ -105,6 +105,7 @@ static tb_bool_t tb_object_bplist_writer_func_number(tb_object_bplist_writer_t* 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */	
+#ifdef TB_CONFIG_TYPE_FLOAT
 static __tb_inline__ tb_time_t tb_object_bplist_writer_time_host2apple(tb_time_t time)
 {
 	tb_tm_t tm = {0};
@@ -115,6 +116,7 @@ static __tb_inline__ tb_time_t tb_object_bplist_writer_time_host2apple(tb_time_t
 	}
 	return time;
 }
+#endif
 static tb_bool_t tb_object_bplist_writer_func_rdata(tb_object_bplist_writer_t* writer, tb_uint8_t bype, tb_byte_t const* data, tb_size_t size, tb_size_t item_size)
 {
     // check
@@ -156,11 +158,13 @@ static tb_bool_t tb_object_bplist_writer_func_date(tb_object_bplist_writer_t* wr
 	// check
 	tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 	// writ date time
-	tb_byte_t data[8];
-	tb_bits_set_double_bbe(data, (tb_double_t)tb_object_bplist_writer_time_host2apple(tb_date_time(object)));
 	if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_DATE | 3)) return tb_false;
-	if (!tb_basic_stream_bwrit(writer->stream, data, 8)) return tb_false;
+	if (!tb_basic_stream_bwrit_double_bbe(writer->stream, (tb_double_t)tb_object_bplist_writer_time_host2apple(tb_date_time(object)))) return tb_false;
+#else
+	tb_assert_and_check_return_val(0, tb_false);
+#endif
 
 	// ok
 	return tb_true;
@@ -310,22 +314,20 @@ static tb_bool_t tb_object_bplist_writer_func_number(tb_object_bplist_writer_t* 
 		if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT)) return tb_false;
 		if (!tb_basic_stream_bwrit_s8(writer->stream, tb_number_sint8(object))) return tb_false;
 		break;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		{
-			tb_byte_t 	data[4];
-			tb_bits_set_float_be(data, tb_number_float(object));
 			if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_REAL | 2)) return tb_false;
-			if (!tb_basic_stream_bwrit(writer->stream, data, 4)) return tb_false;
+			if (!tb_basic_stream_bwrit_float_be(writer->stream, tb_number_float(object))) return tb_false;
 		}
 		break;
 	case TB_NUMBER_TYPE_DOUBLE:
 		{
-			tb_byte_t 	data[8];
-			tb_bits_set_double_bbe(data, tb_number_double(object));
 			if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_REAL | 3)) return tb_false;
-			if (!tb_basic_stream_bwrit(writer->stream, data, 8)) return tb_false;
+			if (!tb_basic_stream_bwrit_double_bbe(writer->stream, tb_number_double(object))) return tb_false;
 		}
 		break;
+#endif
 	default:
 		tb_assert_and_check_return_val(0, tb_false);
 		break;
