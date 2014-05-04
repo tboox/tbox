@@ -33,14 +33,23 @@
  * macros
  */
 
-// for signed int32
-#define tb_s2toi32(s) 				((tb_int32_t)tb_s2tou32(s))
-#define tb_s8toi32(s) 				((tb_int32_t)tb_s8tou32(s))
-#define tb_s10toi32(s) 				((tb_int32_t)tb_s10tou32(s))
-#define tb_s16toi32(s) 				((tb_int32_t)tb_s16tou32(s))
-#define tb_stoi32(s) 				((tb_int32_t)tb_stou32(s))
-#define tb_sbtoi32(s, b) 			((tb_int32_t)tb_sbtou32(s, b))
+// for uint32
+#define tb_s2tou32(s) 				((tb_uint32_t)tb_s2tou64(s))
+#define tb_s8tou32(s) 				((tb_uint32_t)tb_s8tou64(s))
+#define tb_s10tou32(s) 				((tb_uint32_t)tb_s10tou64(s))
+#define tb_s16tou32(s) 				((tb_uint32_t)tb_s16tou64(s))
+#define tb_stou32(s) 				((tb_uint32_t)tb_stou64(s))
+#define tb_sbtou32(s, b) 			((tb_uint32_t)tb_sbtou64(s, b))
 
+// for int32
+#define tb_s2toi32(s) 				((tb_int32_t)tb_s2tou64(s))
+#define tb_s8toi32(s) 				((tb_int32_t)tb_s8tou64(s))
+#define tb_s10toi32(s) 				((tb_int32_t)tb_s10tou64(s))
+#define tb_s16toi32(s) 				((tb_int32_t)tb_s16tou64(s))
+#define tb_stoi32(s) 				((tb_int32_t)tb_stou64(s))
+#define tb_sbtoi32(s, b) 			((tb_int32_t)tb_sbtou64(s, b))
+
+// for int64
 #define tb_s2toi64(s) 				((tb_int64_t)tb_s2tou64(s))
 #define tb_s8toi64(s) 				((tb_int64_t)tb_s8tou64(s))
 #define tb_s10toi64(s) 				((tb_int64_t)tb_s10tou64(s))
@@ -48,16 +57,26 @@
 #define tb_stoi64(s) 				((tb_int64_t)tb_stou64(s))
 #define tb_sbtoi64(s, b) 			((tb_int64_t)tb_sbtou64(s, b))
 
-// c porting
+// for float
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	define tb_s2tof(s) 				((tb_float_t)tb_s2tod(s))
+# 	define tb_s8tof(s) 				((tb_float_t)tb_s8tod(s))
+# 	define tb_s10tof(s) 			((tb_float_t)tb_s10tod(s))
+# 	define tb_s16tof(s) 			((tb_float_t)tb_s16tod(s))
+# 	define tb_stof(s) 				((tb_float_t)tb_stod(s))
+# 	define tb_sbtof(s, b) 			((tb_float_t)tb_sbtod(s, b))
+#endif
+
+// for porting libc
 #define tb_atoi(s) 					tb_s10toi32(s)
 #define tb_atoll(s) 				tb_s10toi64(s)
-#define tb_atof(s) 					tb_s10tof(s)
-
-#define tb_strtod(s, e) 			tb_s10tof(s)
-#define tb_strtold(s, e) 			tb_s10tof(s)
-
 #define tb_strtol(s, e, b) 			tb_sbtoi32(s, b)
 #define tb_strtoll(s, e, b) 		tb_sbtoi64(s, b)
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	define tb_atof(s) 				tb_s10tod(s)
+# 	define tb_strtof(s, e) 			tb_s10tof(s)
+# 	define tb_strtod(s, e) 			tb_s10tod(s)
+#endif
 
 // atow
 #define tb_atow(s1, s2, n) 			tb_mbstowcs(s1, s2, n)
@@ -69,72 +88,14 @@
  * interfaces
  */
 
-/*! convert the binary string to uint32
- *
- * .e.g "0b1001" => 9
- *
- * @param s 		the string
- *
- * @return 			the uint32 number
- */
-tb_uint32_t 		tb_s2tou32(tb_char_t const* s);
-
-/*! convert the octal string to uint32
- *
- * .e.g "011" => 9
- *
- * @param s 		the string
- *
- * @return 			the uint32 number
- */
-tb_uint32_t 		tb_s8tou32(tb_char_t const* s);
-
-/*! convert the decimal string to uint32
- *
- * .e.g "9" => 9
- *
- * @param s 		the string
- *
- * @return 			the uint32 number
- */
-tb_uint32_t 		tb_s10tou32(tb_char_t const* s);
-
-/*! convert the hex string to uint32
- *
- * .e.g "0x9" => 9
- *
- * @param s 		the string
- *
- * @return 			the uint32 number
- */
-tb_uint32_t 		tb_s16tou32(tb_char_t const* s);
-
-/*! auto convert string to uint32
- *
- * .e.g 
- *
- * "0b1001" => 9
- * "011"    => 9
- * "9"      => 9
- * "0x9"    => 9
- *
- * @param s 		the string
- *
- * @return 			the uint32 number
- */
-tb_uint32_t 		tb_stou32(tb_char_t const* s);
-
-/*! convert string to uint32 using the given base
- *
- * @param s 		the string
- *
- * @return 			the uint32 number
- */
-tb_uint32_t 		tb_sbtou32(tb_char_t const* s, tb_int_t base);
-
 /*! convert the binary string to uint64
  *
- * .e.g "0b1001" => 9
+ * <pre>
+ * .e.g 
+ *
+ * "1001" => 9
+ * "0b1001" => 9
+ * </pre>
  *
  * @param s 		the string
  *
@@ -144,7 +105,12 @@ tb_uint64_t 		tb_s2tou64(tb_char_t const* s);
 
 /*! convert the octal string to uint64
  *
- * .e.g "011" => 9
+ * <pre>
+ * .e.g 
+ *
+ * "11" => 9
+ * "011" => 9
+ * </pre>
  *
  * @param s 		the string
  *
@@ -164,7 +130,12 @@ tb_uint64_t 		tb_s10tou64(tb_char_t const* s);
 
 /*! convert the hex string to uint64
  *
- * .e.g "0x9" => 9
+ * <pre>
+ * .e.g
+ * 
+ * "9" => 9
+ * "0x9" => 9
+ * </pre>
  *
  * @param s 		the string
  *
@@ -174,12 +145,14 @@ tb_uint64_t 		tb_s16tou64(tb_char_t const* s);
 
 /*! auto convert string to uint64
  *
+ * <pre>
  * .e.g 
  *
  * "0b1001" => 9
  * "011"    => 9
  * "9"      => 9
  * "0x9"    => 9
+ * </pre>
  *
  * @param s 		the string
  *
@@ -187,7 +160,7 @@ tb_uint64_t 		tb_s16tou64(tb_char_t const* s);
  */
 tb_uint64_t 		tb_stou64(tb_char_t const* s);
 
-/*! convert string to uint64 using the given base
+/*! convert string to uint64 using the given base number
  *
  * @param s 		the string
  *
@@ -197,12 +170,85 @@ tb_uint64_t 		tb_sbtou64(tb_char_t const* s, tb_int_t base);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 
-tb_float_t 			tb_s2tof(tb_char_t const* s);
-tb_float_t 			tb_s8tof(tb_char_t const* s);
-tb_float_t 			tb_s10tof(tb_char_t const* s);
-tb_float_t 			tb_s16tof(tb_char_t const* s);
-tb_float_t 			tb_stof(tb_char_t const* s);
-tb_float_t 			tb_sbtof(tb_char_t const* s, tb_int_t base);
+/*! convert the binary string to double
+ *
+ * <pre>
+ * .e.g 
+ *
+ * "1001" => 9
+ * "0b1001" => 9
+ * </pre>
+ *
+ * @param s 		the string
+ *
+ * @return 			the double number
+ */
+tb_double_t 		tb_s2tod(tb_char_t const* s);
+
+/*! convert the binary string to double
+ *
+ * <pre>
+ * .e.g 
+ *
+ * "11" => 9
+ * "011" => 9
+ * </pre>
+ *
+ * @param s 		the string
+ *
+ * @return 			the double number
+ */
+tb_double_t 		tb_s8tod(tb_char_t const* s);
+
+/*! convert the decimal string to double
+ *
+ * .e.g "9" => 9
+ *
+ * @param s 		the string
+ *
+ * @return 			the double number
+ */
+tb_double_t 		tb_s10tod(tb_char_t const* s);
+
+/*! convert the hex string to double
+ *
+ * <pre>
+ * .e.g
+ * 
+ * "9" => 9
+ * "0x9" => 9
+ * </pre>
+ *
+ * @param s 		the string
+ *
+ * @return 			the double number
+ */
+tb_double_t 		tb_s16tod(tb_char_t const* s);
+
+/*! auto convert string to double
+ *
+ * <pre>
+ * .e.g 
+ *
+ * "0b1001" => 9
+ * "011"    => 9
+ * "9"      => 9
+ * "0x9"    => 9
+ * </pre>
+ *
+ * @param s 		the string
+ *
+ * @return 			the double number
+ */
+tb_double_t 		tb_stod(tb_char_t const* s);
+
+/*! convert string to double using the given base number
+ *
+ * @param s 		the string
+ *
+ * @return 			the double number
+ */
+tb_double_t 		tb_sbtod(tb_char_t const* s, tb_int_t base);
 
 #endif
 
