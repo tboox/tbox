@@ -30,6 +30,74 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the sql database value type enum
+typedef enum __tb_database_sql_value_type_e
+{
+	TB_DATABASE_SQL_VALUE_TYPE_NULL 		= 0
+,	TB_DATABASE_SQL_VALUE_TYPE_INT8 		= 1
+,	TB_DATABASE_SQL_VALUE_TYPE_INT16 		= 2
+,	TB_DATABASE_SQL_VALUE_TYPE_INT32 		= 3
+,	TB_DATABASE_SQL_VALUE_TYPE_INT64 		= 4
+,	TB_DATABASE_SQL_VALUE_TYPE_BLOB8 		= 5
+,	TB_DATABASE_SQL_VALUE_TYPE_BLOB16 		= 6
+,	TB_DATABASE_SQL_VALUE_TYPE_BLOB32 		= 7
+,	TB_DATABASE_SQL_VALUE_TYPE_TEXT8 		= 8
+,	TB_DATABASE_SQL_VALUE_TYPE_TEXT16 		= 9
+,	TB_DATABASE_SQL_VALUE_TYPE_TEXT32 		= 10
+#ifdef TB_CONFIG_TYPE_FLOAT
+,	TB_DATABASE_SQL_VALUE_TYPE_FLOAT 		= 11
+,	TB_DATABASE_SQL_VALUE_TYPE_DOUBLE 		= 12
+#endif
+
+}tb_database_sql_value_type_e;
+
+/// the sql database value type
+typedef struct __tb_database_sql_value_t
+{
+	/// the type
+	tb_size_t 					type;
+
+	/// the name
+	tb_char_t const* 			name;
+
+	/// the data
+	union 
+	{
+		// int
+		tb_int8_t 				i8;
+		tb_int16_t 				i16;
+		tb_int32_t 				i32;
+		tb_int64_t 				i64;
+
+		// float
+#ifdef TB_CONFIG_TYPE_FLOAT
+		tb_float_t 				f;
+		tb_double_t 			d;
+#endif
+
+		// blob
+		struct 
+		{
+			tb_byte_t const* 	data;
+			tb_size_t 			size;
+
+		} 						blob;
+
+		// text
+		struct 
+		{
+			tb_char_t const* 	data;
+			tb_size_t 			hint;
+
+		} 						text;
+	};	
+
+}tb_database_sql_value_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 

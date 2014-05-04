@@ -139,7 +139,9 @@ typedef struct __tb_flv_sdata_value_t
 
 	union 
 	{
-		tb_double_t 						number;
+#ifdef TB_CONFIG_TYPE_FLOAT
+		tb_double_t 					number;
+#endif
 		tb_bool_t 						boolean;
 		tb_flv_sdata_string_t 			string;
 		struct __tb_flv_sdata_value_t* 	array;
@@ -149,7 +151,7 @@ typedef struct __tb_flv_sdata_value_t
 }tb_flv_sdata_value_t;
 
 // the flv spank type
-typedef enum __tb_flv_spank_type_t
+typedef enum __tb_flv_spak_type_t
 {
 	TB_FLV_SPANK_TYPE_HDATA 			= 1
 ,	TB_FLV_SPANK_TYPE_SDATA 			= 2
@@ -158,10 +160,10 @@ typedef enum __tb_flv_spank_type_t
 ,	TB_FLV_SPANK_TYPE_AUDIO_DATA 		= 16
 ,	TB_FLV_SPANK_TYPE_VIDEO_DATA 		= 32
 
-}tb_flv_spank_type_t;
+}tb_flv_spak_type_t;
 
 // the ioctl command type
-typedef enum __tb_flv_ioctl_cmd_t
+typedef enum __tb_flv_ctrl_cmd_t
 {
 	// callback type
 	TB_FLV_IOCTL_CMD_CB_SDATA
@@ -179,7 +181,7 @@ typedef enum __tb_flv_ioctl_cmd_t
 	// spank type
 ,	TB_FLV_IOCTL_CMD_SPANK_TYPE
 
-}tb_flv_ioctl_cmd_t;
+}tb_flv_ctrl_cmd_t;
 
 // the callback type
 typedef tb_void_t (*tb_flv_hdata_cb_func_t)(tb_byte_t const* data, tb_size_t size, tb_pointer_t cb_data);
@@ -194,21 +196,25 @@ typedef tb_bool_t (*tb_flv_video_data_cb_func_t)(tb_byte_t const* head_data, tb_
  * interfaces
  */
 
-// init & exit
-tb_handle_t tb_flv_init(tb_basic_stream_t* gst);
-tb_void_t 	tb_flv_exit(tb_handle_t hflv);
+// init 
+tb_handle_t 	tb_flv_init(tb_basic_stream_t* gst);
 
-// ioctl
-tb_bool_t 	tb_flv_ioctl(tb_handle_t hflv, tb_size_t cmd, ...);
+// exit
+tb_void_t 		tb_flv_exit(tb_handle_t hflv);
 
-// spank
-tb_bool_t 	tb_flv_spank(tb_handle_t hflv);
+// ctrl
+tb_bool_t 		tb_flv_ctrl(tb_handle_t hflv, tb_size_t cmd, ...);
+
+// spak
+tb_bool_t 		tb_flv_spak(tb_handle_t hflv);
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
  * helper
  */
 
-tb_size_t 	tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb_size_t sps_size);
+tb_size_t 		tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb_size_t sps_size);
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_double_t 	tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size);
+#endif
 
 #endif

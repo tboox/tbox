@@ -82,7 +82,7 @@ typedef struct __tb_flv_t
 
 
 // the spank func type
-typedef tb_bool_t (*tb_flv_spank_func_t)(tb_flv_t* );
+typedef tb_bool_t (*tb_flv_spak_func_t)(tb_flv_t* );
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
  * decls
@@ -110,9 +110,11 @@ static tb_char_t const* tb_flv_sdata_value_to_string(tb_flv_t* flv, tb_flv_sdata
 {
 	switch (value->type)
 	{
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_FLV_SDATA_TYPE_NUMBER:
 		tb_scoped_string_cstrfcpy(&flv->string, "%lf", value->u.number);
 		break;
+#endif
 	case TB_FLV_SDATA_TYPE_BOOLEAN:
 		tb_scoped_string_cstrfcpy(&flv->string, "%s", value->u.boolean? "true" : "false");
 		break;
@@ -182,15 +184,21 @@ static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_valu
 
 static tb_bool_t tb_flv_sdata_number_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
+	// check
 	tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 8, tb_false);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 	value->type = TB_FLV_SDATA_TYPE_NUMBER;
 	value->u.number = tb_static_stream_read_double_bbe(&flv->sdata_bst);
+#else
+	tb_assert_and_check_return_val(0, tb_false);
+#endif
 
 	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_boolean_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
+	// check
 	tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 1, tb_false);
 
 	value->type = TB_FLV_SDATA_TYPE_BOOLEAN;
@@ -199,6 +207,7 @@ static tb_bool_t tb_flv_sdata_boolean_spank(tb_flv_t* flv, tb_flv_sdata_value_t*
 }
 static tb_bool_t tb_flv_sdata_string_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
+	// check
 	tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 2, tb_false);
 
 	// read size
@@ -245,6 +254,7 @@ static tb_bool_t tb_flv_sdata_reference_spank(tb_flv_t* flv, tb_flv_sdata_value_
 #endif
 static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
+	// check
 	tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 4, tb_false);
 
 	// read size
@@ -317,6 +327,7 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 }
 static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
+	// check
 	tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 4, tb_false);
 	
 	// read size
@@ -326,7 +337,9 @@ static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_valu
 	// callback
 	tb_flv_sdata_value_t data;
 	data.type = TB_FLV_SDATA_TYPE_NUMBER;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	data.u.number = size;
+#endif
 	if (flv->sdata_cb_func) flv->sdata_cb_func(flv->spath, &data, flv->sdata_cb_data);
 
 	// read variable
@@ -378,6 +391,7 @@ static tb_bool_t tb_flv_sdata_longstring_spank(tb_flv_t* flv, tb_flv_sdata_value
 }
 static tb_bool_t tb_flv_sdata_value_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
+	// check
 	tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 1, tb_false);
 
 	value->type = tb_static_stream_read_u8(&flv->sdata_bst);
@@ -471,6 +485,7 @@ static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t*
 	// ok
 	return tb_true;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_t* sstream)
 {
 	tb_size_t nbits = 0;
@@ -483,6 +498,7 @@ static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_t
 	}
 	return (b - 1 + tb_static_stream_read_ubits32(sstream, nbits));
 }
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -543,7 +559,7 @@ tb_void_t tb_flv_exit(tb_handle_t hflv)
 		tb_free(flv);
 	}
 }
-tb_bool_t tb_flv_spank(tb_handle_t hflv)
+tb_bool_t tb_flv_spak(tb_handle_t hflv)
 {
 	tb_flv_t* flv = (tb_flv_t*)hflv;
 	tb_assert_and_check_return_val(flv, tb_false);
@@ -883,7 +899,7 @@ end:
 	tb_trace_d("spank %s", ret? "ok" : "fail");
 	return ret;
 }
-tb_bool_t tb_flv_ioctl(tb_handle_t hflv, tb_size_t cmd, ...)
+tb_bool_t tb_flv_ctrl(tb_handle_t hflv, tb_size_t cmd, ...)
 {
 	tb_flv_t* flv = (tb_flv_t*)hflv;
 	tb_assert_and_check_return_val(flv, tb_false);
@@ -1005,6 +1021,7 @@ tb_size_t tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb
 	}
 	return 0;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size)
 {
 	// attach data
@@ -1268,3 +1285,4 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 
 	return 0.;
 }
+#endif
