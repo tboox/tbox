@@ -172,7 +172,9 @@ tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_
 	if (!tb_network_init()) return tb_false;
 
 	// init object
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 	if (!tb_object_context_init()) return tb_false;
+#endif
 
 	// check version
 	tb_version_check(build);
@@ -196,7 +198,9 @@ tb_void_t tb_exit()
 	tb_singleton_kill();
 
 	// exit object
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 	tb_object_context_exit();
+#endif
 	
 	// exit network
 	tb_network_exit();

@@ -140,6 +140,7 @@ typedef struct __tb_transfer_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+#ifdef TB_CONFIG_MODULE_HAVE_ASIO
 static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 static tb_bool_t tb_transfer_ostream_writ_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -579,6 +580,7 @@ static tb_bool_t tb_transfer_open_func(tb_size_t state, tb_hize_t offset, tb_hon
 	// ok?
 	return ok;
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -936,6 +938,7 @@ tb_hong_t tb_transfer_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_basic_
 	// ok?
 	return size;
 }
+#ifdef TB_CONFIG_MODULE_HAVE_ASIO
 tb_handle_t tb_transfer_init_aa(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_hize_t offset)
 {
 	// done
@@ -1457,4 +1460,4 @@ tb_void_t tb_transfer_timeout_set(tb_handle_t handle, tb_long_t timeout)
 		tb_stream_ctrl(transfer->ostream, TB_STREAM_CTRL_SET_TIMEOUT, timeout);
 	}
 }
-
+#endif

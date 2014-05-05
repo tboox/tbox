@@ -233,6 +233,7 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
 	tb_size_t 			size = tb_string_size(object);
 	if (utf8 && size)
 	{
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 		// done
 		tb_bool_t 	ok = tb_false;
 		tb_char_t* 	utf16 = tb_null;
@@ -266,6 +267,10 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
 		// exit utf16
 		if (utf16) tb_free(utf16);
 		utf16 = tb_null;
+#else
+		// writ utf8 only
+		tb_bool_t ok = tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, (tb_byte_t*)utf8, size, item_size);
+#endif
 
 		// ok?
 		return ok;

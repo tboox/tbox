@@ -662,7 +662,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 				// switch to zstream if gzip or deflate
 				if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
 				{
-#ifdef TB_CONFIG_THIRD_PARTY_HAVE_ZLIB
+#ifdef TB_CONFIG_THIRD_HAVE_ZLIB
 					// init zstream
 					if (http->zstream)
 					{

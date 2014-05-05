@@ -291,15 +291,20 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					tb_size_t charset = TB_CHARSET_TYPE_UTF8;
 					if (!tb_scoped_string_cstricmp(&xreader->charset, "gb2312") || !tb_scoped_string_cstricmp(&xreader->charset, "gbk")) 
 						charset = TB_CHARSET_TYPE_GB2312;
-					else tb_trace_d("the charset: %s is not supported", tb_scoped_string_cstr(&xreader->charset));
+					else tb_trace_e("the charset: %s is not supported", tb_scoped_string_cstr(&xreader->charset));
 
 					// init transform stream
 					if (charset != TB_CHARSET_TYPE_UTF8)
 					{
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 						xreader->filter = tb_basic_stream_init_filter_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
 						if (xreader->filter && tb_basic_stream_open(xreader->filter))
 							xreader->rstream = xreader->filter;
 						tb_scoped_string_cstrcpy(&xreader->charset, "utf-8");
+#else
+						// trace
+						tb_trace_e("unicode type is not supported, please enable charset module config if you want to use it!");
+#endif
 					}
 				}
 			}

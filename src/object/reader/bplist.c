@@ -254,6 +254,7 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
 		break;
 	case TB_OBJECT_BPLIST_TYPE_UNICODE:
 		{
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 			// size is too large?
 			if (size == 0x0f)
 			{
@@ -282,6 +283,10 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
 				// init object
 				object = tb_string_init_from_cstr(utf8);
 			}
+#else
+			// trace
+			tb_trace1_e("unicode type is not supported, please enable charset module config if you want to use it!");
+#endif
 		}
 		break;
 	default:
