@@ -211,6 +211,14 @@ tb_double_t tb_database_sql_value_double(tb_database_sql_value_t const* value)
 	return 0;
 }
 #endif
+tb_void_t tb_database_sql_value_set_null(tb_database_sql_value_t* value)
+{
+	// check
+	tb_assert_and_check_return(value);
+
+	// init null
+	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_NULL;
+}
 tb_void_t tb_database_sql_value_set_int8(tb_database_sql_value_t* value, tb_int8_t number)
 {
 	// check

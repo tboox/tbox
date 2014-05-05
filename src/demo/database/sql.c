@@ -78,30 +78,57 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 			break ;
 		}
 
-		// done result
-		if (tb_iterator_size(stmt))
+		// load result
+		tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
+//		tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+		tb_check_break(result);
+
+		// trace
+		tb_trace_i("==============================================================================");
+		tb_trace_i("row: size: %lu", tb_iterator_size(result));
+
+		// walk result
+		tb_for_all_if (tb_iterator_t*, row, result, row)
 		{
 			// trace
-			tb_trace_i("==============================================================================");
-			tb_trace_i("row: size: %lu", tb_iterator_size(stmt));
+			tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
 
-			// walk result
-			tb_for_all_if (tb_iterator_t*, row, stmt, row)
-			{
-				// trace
-				tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
+			// trace id
+			tb_database_sql_value_t const* id = tb_iterator_item(row, 0);
+			tb_assert_and_check_break(id);
+			tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(id), tb_database_sql_value_int32(id));
 
-				// walk items
-				tb_for_all_if (tb_database_sql_value_t*, value, row, value)
-				{
-					// trace
-					tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(value), tb_database_sql_value_text(value));
-				}
+			// trace fval
+			tb_database_sql_value_t const* fval = tb_iterator_item(row, 1);
+			tb_assert_and_check_break(fval);
+			tb_tracet_i("[%s:%f] ", tb_database_sql_value_name(fval), tb_database_sql_value_float(fval));
 
-				// trace
-				tb_tracet_i(__tb_newline__);
-			}
+			// trace name
+			tb_database_sql_value_t const* name = tb_iterator_item(row, 2);
+			tb_assert_and_check_break(name);
+			tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(name), tb_database_sql_value_text(name));
+
+			// trace data
+			tb_database_sql_value_t const* data = tb_iterator_item(row, 3);
+			tb_assert_and_check_break(data);
+			tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(data), tb_database_sql_value_blob(data));
+
+			// trace number
+			tb_database_sql_value_t const* number = tb_iterator_item(row, 4);
+			tb_assert_and_check_break(number);
+			tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(number), tb_database_sql_value_int32(number));
+
+			// trace snumber
+			tb_database_sql_value_t const* snumber = tb_iterator_item(row, 5);
+			tb_assert_and_check_break(snumber);
+			tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(snumber), tb_database_sql_value_int32(snumber));
+
+			// trace
+			tb_tracet_i(__tb_newline__);
 		}
+
+		// exit result
+		tb_database_sql_result_exit(database, result);
 
 	} while (0);
 

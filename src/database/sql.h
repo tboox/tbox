@@ -226,6 +226,35 @@ tb_bool_t 			tb_database_sql_done(tb_handle_t database, tb_char_t const* sql);
  *     // exit result
  *     tb_database_sql_result_exit(result);
  * }
+ * 
+ * // load result
+ * tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+ * if (result)
+ * {
+ *     // walk result
+ *     tb_for_all_if (tb_iterator_t*, row, result, row)
+ *     {
+ *          // field count
+ *          tb_trace_i("count: %lu", tb_iterator_size(row));
+ *
+ *          // id
+ *			tb_database_sql_value_t const* id = tb_iterator_item(row, 0);
+ *			if (id)
+ *          {
+ *               tb_trace_i("id: %d", tb_database_sql_value_int32(id));
+ *          }
+ *  
+ *          // name
+ *			tb_database_sql_value_t const* name = tb_iterator_item(row, 1);
+ *			if (name)
+ *          {
+ *               tb_trace_i("name: %s", tb_database_sql_value_text(name));
+ *          }
+ *     }
+ *
+ *     // exit result
+ *     tb_database_sql_result_exit(result);
+ * }
  * @endcode
  *
  * @param database 	the database handle
@@ -259,6 +288,28 @@ tb_handle_t 		tb_database_sql_stmt_init(tb_handle_t database, tb_char_t const* s
 tb_void_t 			tb_database_sql_stmt_exit(tb_handle_t database, tb_handle_t stmt);
 
 /*! done the database stmt
+ *
+ * @code
+ * tb_handle_t stmt = tb_database_sql_stmt_init(database, "select * from table where id=?");
+ * if (stmt)
+ * {
+ *      // bind arguments
+ *      tb_database_sql_value_t list[1];
+ *      tb_database_sql_value_set_int32(&list[0], 12345);
+ *      if (tb_database_sql_stmt_bind(database, stmt, list, tb_arrayn(list)))
+ *      {
+ *            // done stmt
+ *            if (tb_database_sql_stmt_done(database, stmt))
+ *            {
+ *                  // load result
+ *                  // ...
+ *            }
+ *      }
+ *
+ *      // exit stmt
+ *      tb_database_sql_stmt_exit(database, stmt);
+ * }
+ * @endcode
  *
  * @param database 	the database handle
  * @param stmt 		the stmt handle
