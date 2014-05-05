@@ -18,11 +18,11 @@
  *
  * @author		ruki
  * @file		filter.h
- * @defgroup 	filter
+ * @defgroup 	stream
  *
  */
-#ifndef TB_FILTER_H
-#define TB_FILTER_H
+#ifndef TB_STREAM_FILTER_H
+#define TB_STREAM_FILTER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -40,7 +40,7 @@
  *
  * @return 			the filter
  */
-tb_filter_t* 		tb_filter_init_from_zip(tb_size_t algo, tb_size_t action);
+tb_stream_filter_t*	tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t action);
 
 /*! init filter from charset
  *
@@ -49,7 +49,7 @@ tb_filter_t* 		tb_filter_init_from_zip(tb_size_t algo, tb_size_t action);
  *
  * @return 			the filter
  */
-tb_filter_t* 		tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
+tb_stream_filter_t*	tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t to);
 
 /*! init filter from chunked
  *
@@ -57,7 +57,7 @@ tb_filter_t* 		tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
  *
  * @return 			the filter
  */
-tb_filter_t* 		tb_filter_init_from_chunked(tb_bool_t dechunked);
+tb_stream_filter_t*	tb_stream_filter_init_from_chunked(tb_bool_t dechunked);
 
 /*! init filter from cache
  *
@@ -65,19 +65,19 @@ tb_filter_t* 		tb_filter_init_from_chunked(tb_bool_t dechunked);
  *
  * @return 			the filter
  */
-tb_filter_t* 		tb_filter_init_from_cache(tb_size_t size);
+tb_stream_filter_t*	tb_stream_filter_init_from_cache(tb_size_t size);
 
 /*! exit filter
  *
  * @param filter 	the filter
  */
-tb_void_t 			tb_filter_exit(tb_filter_t* filter);
+tb_void_t 			tb_stream_filter_exit(tb_stream_filter_t* filter);
 
 /*! clear filter
  *
  * @param filter 	the filter
  */
-tb_void_t 			tb_filter_cler(tb_filter_t* filter);
+tb_void_t 			tb_stream_filter_cler(tb_stream_filter_t* filter);
 
 /*! is eof for the filter input data, but the output maybe exists the left data and need flush it
  *
@@ -85,14 +85,14 @@ tb_void_t 			tb_filter_cler(tb_filter_t* filter);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_filter_beof(tb_filter_t* filter);
+tb_bool_t 			tb_stream_filter_beof(tb_stream_filter_t* filter);
 
 /*! limit the input size for filter
  *
  * @param filter 	the filter
  * @param limit 	the input limit size
  */
-tb_void_t 			tb_filter_limit(tb_filter_t* filter, tb_hong_t limit);
+tb_void_t 			tb_stream_filter_limit(tb_stream_filter_t* filter, tb_hong_t limit);
 
 /*! push data to the filter input data
  *
@@ -100,7 +100,7 @@ tb_void_t 			tb_filter_limit(tb_filter_t* filter, tb_hong_t limit);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_filter_push(tb_filter_t* filter, tb_byte_t const* data, tb_size_t size);
+tb_bool_t 			tb_stream_filter_push(tb_stream_filter_t* filter, tb_byte_t const* data, tb_size_t size);
 
 /*! spak filter
  *
@@ -113,7 +113,7 @@ tb_bool_t 			tb_filter_push(tb_filter_t* filter, tb_byte_t const* data, tb_size_
  *
  * @return 			> 0: the output size, 0: continue, -1: end
  */
-tb_long_t 			tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync);
+tb_long_t 			tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync);
 
 
 #endif

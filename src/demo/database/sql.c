@@ -11,19 +11,22 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
 	// check
 	tb_assert_and_check_return(database && sql);
 
-	// done sql
-	if (!tb_database_sql_done(database, sql))
+	// done
+	do
 	{
-		// trace
-		tb_trace_e("done sql failed, error: %s", tb_state_cstr(tb_database_sql_state(database)));
-		return ;
-	}
+		// done sql
+		if (!tb_database_sql_done(database, sql))
+		{
+			// trace
+			tb_trace_e("done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+			break ;
+		}
 
-	// load result
-	tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
-//	tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
-	if (result)
-	{
+		// load result
+		tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
+//		tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+		tb_check_break(result);
+
 		// trace
 		tb_trace_i("==============================================================================");
 		tb_trace_i("row: size: %lu", tb_iterator_size(result));
@@ -47,7 +50,106 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
 
 		// exit result
 		tb_database_sql_result_exit(database, result);
-	}
+
+	} while (0);
+}
+static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_char_t const* sql)
+{
+	// check
+	tb_assert_and_check_return(database && sql);
+
+	// done
+	tb_handle_t stmt = tb_null;
+	do
+	{
+		// init stmt
+		if (!(stmt = tb_database_sql_stmt_init(database, sql)))
+		{
+			// trace
+			tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+			break ;
+		}
+
+		// done stmt
+		if (!tb_database_sql_stmt_done(database, stmt))
+		{
+			// trace
+			tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+			break ;
+		}
+
+		// done result
+		if (tb_iterator_size(stmt))
+		{
+			// trace
+			tb_trace_i("==============================================================================");
+			tb_trace_i("row: size: %lu", tb_iterator_size(stmt));
+
+			// walk result
+			tb_for_all_if (tb_iterator_t*, row, stmt, row)
+			{
+				// trace
+				tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
+
+				// walk items
+				tb_for_all_if (tb_database_sql_value_t*, value, row, value)
+				{
+					// trace
+					tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(value), tb_database_sql_value_text(value));
+				}
+
+				// trace
+				tb_tracet_i(__tb_newline__);
+			}
+		}
+
+	} while (0);
+
+	// exit stmt
+	if (stmt) tb_database_sql_stmt_exit(database, stmt);
+}
+static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_size_t number, tb_uint16_t snumber)
+{
+	// check
+	tb_assert_and_check_return(database && sql);
+
+	// done
+	tb_handle_t stmt = tb_null;
+	do
+	{
+		// init stmt
+		if (!(stmt = tb_database_sql_stmt_init(database, sql)))
+		{
+			// trace
+			tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+			break ;
+		}
+
+		// bind stmt
+		tb_database_sql_value_t list[4];
+		tb_database_sql_value_set_text8(&list[0], name, 0);
+		tb_database_sql_value_set_blob8(&list[1], (tb_byte_t const*)data, tb_strlen(data) + 1);
+		tb_database_sql_value_set_int32(&list[2], number);
+		tb_database_sql_value_set_int16(&list[3], snumber);
+		if (!tb_database_sql_stmt_bind(database, stmt, list, tb_arrayn(list)))
+		{
+			// trace
+			tb_trace_e("stmt: bind %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+			break ;
+		}
+
+		// done stmt
+		if (!tb_database_sql_stmt_done(database, stmt))
+		{
+			// trace
+			tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+			break ;
+		}
+
+	} while (0);
+
+	// exit stmt
+	if (stmt) tb_database_sql_stmt_exit(database, stmt);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +175,18 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 			tb_demo_database_sql_test_done(database, "insert into table1 values(6, 'name6', 21000)");
 			tb_demo_database_sql_test_done(database, "insert into table1 values(7, 'name7', 21600)");
 			tb_demo_database_sql_test_done(database, "select * from table1");
+	
+			// done tests 
+			tb_demo_database_sql_test_stmt_done(database, "drop table if exists table2");
+			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber short)");
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?)", "name1", "data1", 52642, 2642);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?)", "name2", "data2", 57127, 7127);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?)", "name3", "data3", 9000, 9000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(4, 3.1415, ?, ?, ?, ?)", "name4", "data4", 29000, 9000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(5, -3.1, ?, ?, ?, ?)", "name5", "data5", 350000, 5000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(6, 3.454, ?, ?, ?, ?)", "name6", "data6", 21000, 1000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?)", "name7", "data7", 21600, 1600);
+			tb_demo_database_sql_test_stmt_done(database, "select * from table2");
 		}
 
 		// exit database

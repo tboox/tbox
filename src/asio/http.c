@@ -35,7 +35,7 @@
 #include "aico.h"
 #include "aicp.h"
 #include "../zip/zip.h"
-#include "../filter/filter.h"
+#include "../stream/stream.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 #include "../algorithm/algorithm.h"
@@ -816,15 +816,15 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
 				if (p < e)
 				{
 					// the filter
-					tb_filter_t* filter = tb_null;
+					tb_stream_filter_t* filter = tb_null;
 					if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 					tb_assert_and_check_break(filter);
 
 					// clear filter
-					tb_filter_cler(filter);
+					tb_stream_filter_cler(filter);
 
 					// push data
-					if (!tb_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
+					if (!tb_stream_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
 					p = e;
 				}
 
@@ -851,21 +851,21 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
 				tb_assert_and_check_break(http->zstream);
 
 				// the filter
-				tb_filter_t* filter = tb_null;
+				tb_stream_filter_t* filter = tb_null;
 				if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 				tb_assert_and_check_break(filter);
 
 				// clear filter
-				tb_filter_cler(filter);
+				tb_stream_filter_cler(filter);
 
 				// limit the filter input size
-				if (http->status.content_size) tb_filter_limit(filter, http->status.content_size);
+				if (http->status.content_size) tb_stream_filter_limit(filter, http->status.content_size);
 
 				// push the left data to filter
 				if (p < e)
 				{
 					// push data
-					if (!tb_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
+					if (!tb_stream_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
 					p = e;
 				}
 

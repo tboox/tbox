@@ -76,16 +76,16 @@ typedef struct __tb_database_sql_t
 	tb_void_t 					(*result_exit)(struct __tb_database_sql_t* database, tb_iterator_t* result);
 
 	/// stmt init
-	tb_handle_t 				(*stmt_init)(tb_handle_t database, tb_char_t const* sql);
+	tb_handle_t 				(*stmt_init)(struct __tb_database_sql_t* database, tb_char_t const* sql);
 
 	/// stmt exit
-	tb_void_t 					(*stmt_exit)(tb_handle_t database, tb_handle_t stmt);
+	tb_void_t 					(*stmt_exit)(struct __tb_database_sql_t* database, tb_handle_t stmt);
 
 	/// stmt done
-	tb_bool_t 					(*stmt_done)(tb_handle_t database, tb_handle_t stmt);
+	tb_bool_t 					(*stmt_done)(struct __tb_database_sql_t* database, tb_handle_t stmt);
 
 	/// stmt bind
-	tb_bool_t 					(*stmt_bind)(tb_handle_t database, tb_handle_t stmt, tb_size_t index, tb_database_sql_value_t const* value);
+	tb_bool_t 					(*stmt_bind)(struct __tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size);
 
 }tb_database_sql_t;
 
@@ -210,7 +210,7 @@ tb_bool_t 			tb_database_sql_done(tb_handle_t database, tb_char_t const* sql);
  * // ..
  *
  * // load result
- * tb_iterator_t* result = tb_database_sql_result_load(database);
+ * tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
  * if (result)
  * {
  *     // walk result
@@ -271,12 +271,12 @@ tb_bool_t 			tb_database_sql_stmt_done(tb_handle_t database, tb_handle_t stmt);
  *
  * @param database 	the database handle
  * @param stmt 		the stmt handle
- * @param index 	the argument index
- * @param value 	the argument value
+ * @param list 		the argument value list
+ * @param size 		the argument value count
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_database_sql_stmt_bind(tb_handle_t database, tb_handle_t stmt, tb_size_t index, tb_database_sql_value_t const* value);
+tb_bool_t 			tb_database_sql_stmt_bind(tb_handle_t database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size);
 
 
 #endif

@@ -18,14 +18,14 @@
  *
  * @author		ruki
  * @file		filter.c
- * @ingroup 	filter
+ * @ingroup 	stream
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"filter"
+#define TB_TRACE_MODULE_NAME 			"stream_filter"
 #define TB_TRACE_MODULE_DEBUG 			(1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_filter_cler(tb_filter_t* filter)
+tb_void_t tb_stream_filter_cler(tb_stream_filter_t* filter)
 {
 	// check
 	tb_assert_and_check_return(filter);
@@ -59,7 +59,7 @@ tb_void_t tb_filter_cler(tb_filter_t* filter)
 	// exit odata
 	tb_queue_buffer_clear(&filter->odata);
 }
-tb_void_t tb_filter_exit(tb_filter_t* filter)
+tb_void_t tb_stream_filter_exit(tb_stream_filter_t* filter)
 {
 	// check
 	tb_assert_and_check_return(filter);
@@ -76,7 +76,7 @@ tb_void_t tb_filter_exit(tb_filter_t* filter)
 	// free it
 	tb_free(filter);
 }
-tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
+tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
 {
 	// check
 	tb_assert_and_check_return_val(filter && filter->spak && pdata, -1);
@@ -212,7 +212,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// ok?
 	return osize;
 }
-tb_bool_t tb_filter_push(tb_filter_t* filter, tb_byte_t const* data, tb_size_t size)
+tb_bool_t tb_stream_filter_push(tb_stream_filter_t* filter, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(filter && data && size, tb_false);
@@ -226,7 +226,7 @@ tb_bool_t tb_filter_push(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// ok?
 	return ok;
 }
-tb_bool_t tb_filter_beof(tb_filter_t* filter)
+tb_bool_t tb_stream_filter_beof(tb_stream_filter_t* filter)
 {
 	// check
 	tb_assert_and_check_return_val(filter, tb_false);
@@ -234,7 +234,7 @@ tb_bool_t tb_filter_beof(tb_filter_t* filter)
 	// is eof?
 	return filter->beof;
 }
-tb_void_t tb_filter_limit(tb_filter_t* filter, tb_hong_t limit)
+tb_void_t tb_stream_filter_limit(tb_stream_filter_t* filter, tb_hong_t limit)
 {
 	// check
 	tb_assert_and_check_return(filter);

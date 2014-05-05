@@ -98,11 +98,11 @@ tbox_C_FILES 			+= \
 						stream/async_stream/filter \
 						stream/transfer_pool \
 						stream/transfer \
-						filter/filter \
-						filter/zip \
-						filter/cache \
-						filter/charset \
-						filter/chunked \
+						stream/filter/filter \
+						stream/filter/zip \
+						stream/filter/cache \
+						stream/filter/charset \
+						stream/filter/chunked \
 						object/object \
 						object/null \
 						object/data \
@@ -495,8 +495,8 @@ INC_FILES 				= \
 						stream/static_stream.h \
 						stream/transfer_pool.h \
 						stream/transfer.h \
-						filter/prefix.h \
-						filter/filter.h \
+						stream/filter/prefix.h \
+						stream/filter/filter.h \
 						object/prefix.h \
 						object/object.h \
 						object/null.h \

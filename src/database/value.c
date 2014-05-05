@@ -211,7 +211,7 @@ tb_double_t tb_database_sql_value_double(tb_database_sql_value_t const* value)
 	return 0;
 }
 #endif
-tb_void_t tb_database_sql_value_int8_set(tb_database_sql_value_t* value, tb_int8_t number)
+tb_void_t tb_database_sql_value_set_int8(tb_database_sql_value_t* value, tb_int8_t number)
 {
 	// check
 	tb_assert_and_check_return(value);
@@ -220,7 +220,7 @@ tb_void_t tb_database_sql_value_int8_set(tb_database_sql_value_t* value, tb_int8
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT8;
 	value->i8 			= number;
 }
-tb_void_t tb_database_sql_value_int16_set(tb_database_sql_value_t* value, tb_int16_t number)
+tb_void_t tb_database_sql_value_set_int16(tb_database_sql_value_t* value, tb_int16_t number)
 {
 	// check
 	tb_assert_and_check_return(value);
@@ -229,7 +229,7 @@ tb_void_t tb_database_sql_value_int16_set(tb_database_sql_value_t* value, tb_int
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT16;
 	value->i16 			= number;
 }
-tb_void_t tb_database_sql_value_int32_set(tb_database_sql_value_t* value, tb_int32_t number)
+tb_void_t tb_database_sql_value_set_int32(tb_database_sql_value_t* value, tb_int32_t number)
 {
 	// check
 	tb_assert_and_check_return(value);
@@ -238,7 +238,7 @@ tb_void_t tb_database_sql_value_int32_set(tb_database_sql_value_t* value, tb_int
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT32;
 	value->i32 			= number;
 }
-tb_void_t tb_database_sql_value_int64_set(tb_database_sql_value_t* value, tb_int64_t number)
+tb_void_t tb_database_sql_value_set_int64(tb_database_sql_value_t* value, tb_int64_t number)
 {	
 	// check
 	tb_assert_and_check_return(value);
@@ -248,7 +248,7 @@ tb_void_t tb_database_sql_value_int64_set(tb_database_sql_value_t* value, tb_int
 	value->i64 			= number;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_void_t tb_database_sql_value_float_set(tb_database_sql_value_t* value, tb_float_t number)
+tb_void_t tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_float_t number)
 {
 	// check
 	tb_assert_and_check_return(value);
@@ -257,7 +257,7 @@ tb_void_t tb_database_sql_value_float_set(tb_database_sql_value_t* value, tb_flo
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_FLOAT;
 	value->f 			= number;
 }
-tb_void_t tb_database_sql_value_double_set(tb_database_sql_value_t* value, tb_double_t number)
+tb_void_t tb_database_sql_value_set_double(tb_database_sql_value_t* value, tb_double_t number)
 {	
 	// check
 	tb_assert_and_check_return(value);
@@ -267,7 +267,7 @@ tb_void_t tb_database_sql_value_double_set(tb_database_sql_value_t* value, tb_do
 	value->d 			= number;
 }
 #endif
-tb_void_t tb_database_sql_value_text8_set(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
+tb_void_t tb_database_sql_value_set_text8(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
 {
 	// check
 	tb_assert_and_check_return(value && text);
@@ -280,7 +280,7 @@ tb_void_t tb_database_sql_value_text8_set(tb_database_sql_value_t* value, tb_cha
 	// check size
 	tb_assert(tb_database_sql_value_size(value) <= TB_MAXU8);
 }
-tb_void_t tb_database_sql_value_text16_set(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
+tb_void_t tb_database_sql_value_set_text16(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
 {
 	// check
 	tb_assert_and_check_return(value && text);
@@ -293,7 +293,7 @@ tb_void_t tb_database_sql_value_text16_set(tb_database_sql_value_t* value, tb_ch
 	// check size
 	tb_assert(tb_database_sql_value_size(value) <= TB_MAXU16);
 }
-tb_void_t tb_database_sql_value_text32_set(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
+tb_void_t tb_database_sql_value_set_text32(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
 {
 	// check
 	tb_assert_and_check_return(value && text);
@@ -303,7 +303,7 @@ tb_void_t tb_database_sql_value_text32_set(tb_database_sql_value_t* value, tb_ch
 	value->text.data 	= text;
 	value->text.hint 	= hint;
 }
-tb_void_t tb_database_sql_value_blob8_set(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
+tb_void_t tb_database_sql_value_set_blob8(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return(value && data);
@@ -316,7 +316,7 @@ tb_void_t tb_database_sql_value_blob8_set(tb_database_sql_value_t* value, tb_byt
 	// check size
 	tb_assert(tb_database_sql_value_size(value) <= TB_MAXU8);
 }
-tb_void_t tb_database_sql_value_blob16_set(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
+tb_void_t tb_database_sql_value_set_blob16(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return(value && data);
@@ -329,7 +329,7 @@ tb_void_t tb_database_sql_value_blob16_set(tb_database_sql_value_t* value, tb_by
 	// check size
 	tb_assert(tb_database_sql_value_size(value) <= TB_MAXU16);
 }
-tb_void_t tb_database_sql_value_blob32_set(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
+tb_void_t tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return(value && data);

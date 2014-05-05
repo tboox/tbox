@@ -28,6 +28,7 @@
 #include "dump.h"
 #include "../asio/asio.h"
 #include "../libc/libc.h"
+#include "../stream/stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

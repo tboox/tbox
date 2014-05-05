@@ -33,6 +33,7 @@
  */
 #include "transfer.h"
 #include "transfer_pool.h"
+#include "stream.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 #include "../container/container.h"

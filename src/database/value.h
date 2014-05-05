@@ -164,28 +164,28 @@ tb_double_t 		tb_database_sql_value_double(tb_database_sql_value_t const* value)
  * @param value 	the value
  * @param number 	the number
  */
-tb_void_t 			tb_database_sql_value_int8_set(tb_database_sql_value_t* value, tb_int8_t number);
+tb_void_t 			tb_database_sql_value_set_int8(tb_database_sql_value_t* value, tb_int8_t number);
 
 /*! set the int16 value
  *
  * @param value 	the value
  * @param number 	the number
  */
-tb_void_t 			tb_database_sql_value_int16_set(tb_database_sql_value_t* value, tb_int16_t number);
+tb_void_t 			tb_database_sql_value_set_int16(tb_database_sql_value_t* value, tb_int16_t number);
 
 /*! set the int32 value
  *
  * @param value 	the value
  * @param number 	the number
  */
-tb_void_t 			tb_database_sql_value_int32_set(tb_database_sql_value_t* value, tb_int32_t number);
+tb_void_t 			tb_database_sql_value_set_int32(tb_database_sql_value_t* value, tb_int32_t number);
 
 /*! set the int64 value
  *
  * @param value 	the value
  * @param number 	the number
  */
-tb_void_t 			tb_database_sql_value_int64_set(tb_database_sql_value_t* value, tb_int64_t number);
+tb_void_t 			tb_database_sql_value_set_int64(tb_database_sql_value_t* value, tb_int64_t number);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 /*! set the float value
@@ -193,14 +193,14 @@ tb_void_t 			tb_database_sql_value_int64_set(tb_database_sql_value_t* value, tb_
  * @param value 	the value
  * @param number 	the number
  */
-tb_void_t 			tb_database_sql_value_float_set(tb_database_sql_value_t* value, tb_float_t number);
+tb_void_t 			tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_float_t number);
 
 /*! set the double value
  *
  * @param value 	the value
  * @param number 	the number
  */
-tb_void_t 			tb_database_sql_value_double_set(tb_database_sql_value_t* value, tb_double_t number);
+tb_void_t 			tb_database_sql_value_set_double(tb_database_sql_value_t* value, tb_double_t number);
 #endif
 
 /*! set the text8 value
@@ -209,7 +209,7 @@ tb_void_t 			tb_database_sql_value_double_set(tb_database_sql_value_t* value, tb
  * @param text 		the text data
  * @param hint 		the text size hint
  */
-tb_void_t 			tb_database_sql_value_text8_set(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
+tb_void_t 			tb_database_sql_value_set_text8(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
 
 /*! set the text16 value
  *
@@ -217,7 +217,7 @@ tb_void_t 			tb_database_sql_value_text8_set(tb_database_sql_value_t* value, tb_
  * @param text 		the text data
  * @param hint 		the text size hint
  */
-tb_void_t 			tb_database_sql_value_text16_set(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
+tb_void_t 			tb_database_sql_value_set_text16(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
 
 /*! set the text32 value
  *
@@ -225,7 +225,7 @@ tb_void_t 			tb_database_sql_value_text16_set(tb_database_sql_value_t* value, tb
  * @param text 		the text data
  * @param hint 		the text size hint
  */
-tb_void_t 			tb_database_sql_value_text32_set(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
+tb_void_t 			tb_database_sql_value_set_text32(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
 
 /*! set the blob8 value
  *
@@ -233,7 +233,7 @@ tb_void_t 			tb_database_sql_value_text32_set(tb_database_sql_value_t* value, tb
  * @param data 		the blob data
  * @param size 		the blob size
  */
-tb_void_t 			tb_database_sql_value_blob8_set(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
+tb_void_t 			tb_database_sql_value_set_blob8(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
 
 /*! set the blob16 value
  *
@@ -241,7 +241,7 @@ tb_void_t 			tb_database_sql_value_blob8_set(tb_database_sql_value_t* value, tb_
  * @param data 		the blob data
  * @param size 		the blob size
  */
-tb_void_t 			tb_database_sql_value_blob16_set(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
+tb_void_t 			tb_database_sql_value_set_blob16(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
 
 /*! set the blob32 value
  *
@@ -249,7 +249,7 @@ tb_void_t 			tb_database_sql_value_blob16_set(tb_database_sql_value_t* value, tb
  * @param data 		the blob data
  * @param size 		the blob size
  */
-tb_void_t 			tb_database_sql_value_blob32_set(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
+tb_void_t 			tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
