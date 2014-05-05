@@ -841,7 +841,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
 			// switch to zstream if gzip or deflate
 			if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
 			{
-#ifdef TB_CONFIG_HAVE_ZLIB
+#ifdef TB_CONFIG_THIRD_PARTY_HAVE_ZLIB
 				// init zstream
 				if (http->zstream)
 				{
