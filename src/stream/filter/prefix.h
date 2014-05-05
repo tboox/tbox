@@ -20,33 +20,33 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_FILTER_PREFIX_H
-#define TB_FILTER_PREFIX_H
+#ifndef TB_STREAM_FILTER_PREFIX_H
+#define TB_STREAM_FILTER_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
-#include "../stream/static_stream.h"
-#include "../memory/memory.h"
+#include "../static_stream.h"
+#include "../../memory/memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
 /// the filter type enum
-typedef enum __tb_filter_type_e
+typedef enum __tb_stream_filter_type_e
 {
-	TB_FILTER_TYPE_NONE 	= 0
-,	TB_FILTER_TYPE_ZIP 		= 1
-,	TB_FILTER_TYPE_CACHE 	= 2
-,	TB_FILTER_TYPE_CHARSET 	= 3
-,	TB_FILTER_TYPE_CHUNKED 	= 4
+	TB_STREAM_FILTER_TYPE_NONE 	= 0
+,	TB_STREAM_FILTER_TYPE_ZIP 		= 1
+,	TB_STREAM_FILTER_TYPE_CACHE 	= 2
+,	TB_STREAM_FILTER_TYPE_CHARSET 	= 3
+,	TB_STREAM_FILTER_TYPE_CHUNKED 	= 4
 
-}tb_filter_type_e;
+}tb_stream_filter_type_e;
 
 /// the filter type
-typedef struct __tb_filter_t
+typedef struct __tb_stream_filter_t
 {
 	/// the type
 	tb_size_t 			type;
@@ -67,20 +67,20 @@ typedef struct __tb_filter_t
 	tb_queue_buffer_t 	odata;
 
 	/// the spak
-	tb_long_t 			(*spak)(struct __tb_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
+	tb_long_t 			(*spak)(struct __tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
 
 	/// the cler
-	tb_void_t 			(*cler)(struct __tb_filter_t* filter);
+	tb_void_t 			(*cler)(struct __tb_stream_filter_t* filter);
 
 	/// the exit
-	tb_void_t 			(*exit)(struct __tb_filter_t* filter);
+	tb_void_t 			(*exit)(struct __tb_stream_filter_t* filter);
 
-}tb_filter_t;
+}tb_stream_filter_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-static __tb_inline__ tb_bool_t tb_filter_init(tb_filter_t* filter, tb_size_t type)
+static __tb_inline__ tb_bool_t tb_stream_filter_init(tb_stream_filter_t* filter, tb_size_t type)
 {
 	// check
 	tb_assert_and_check_return_val(filter, tb_false);

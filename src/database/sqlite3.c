@@ -74,6 +74,23 @@ typedef struct __tb_database_sqlite3_result_t
 
 }tb_database_sqlite3_result_t;
 
+// the sqlite3 stmt type
+typedef struct __tb_database_sqlite3_stmt_t
+{
+	// the iterator
+	tb_iterator_t 						itor;
+
+	// the stmt
+	sqlite3_stmt* 						stmt;
+
+	// the row count
+	tb_size_t 							count;
+
+	// the row
+	tb_database_sqlite3_result_row_t 	row;
+
+}tb_database_sqlite3_stmt_t;
+
 // the sqlite3 type
 typedef struct __tb_database_sqlite3_t
 {
@@ -203,10 +220,63 @@ static tb_pointer_t tb_sqlite3_result_col_iterator_item(tb_iterator_t* iterator,
 
 	// init value
 	tb_database_sql_value_name_set(&row->value, (tb_char_t const*)sqlite->result.result[itor]);
-	tb_database_sql_value_text32_set(&row->value, (tb_char_t const*)sqlite->result.result[((1 + sqlite->result.row.row) * row->count) + itor], 0);
+	tb_database_sql_value_set_text32(&row->value, (tb_char_t const*)sqlite->result.result[((1 + sqlite->result.row.row) * row->count) + itor], 0);
 
 	// the col item
 	return (tb_pointer_t)&row->value;
+}
+static tb_size_t tb_sqlite3_stmt_row_iterator_size(tb_iterator_t* iterator)
+{
+	// check
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)iterator;
+	tb_assert_return_val(stmt, 0);
+
+	// size
+	return stmt->count;
+}
+static tb_size_t tb_sqlite3_stmt_row_iterator_head(tb_iterator_t* iterator)
+{
+	// head
+	return 0;
+}
+static tb_size_t tb_sqlite3_stmt_row_iterator_tail(tb_iterator_t* iterator)
+{
+	// check
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)iterator;
+	tb_assert_return_val(stmt, 0);
+
+	// tail
+	return stmt->count;
+}
+static tb_size_t tb_sqlite3_stmt_row_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+{
+	// check
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)iterator;
+	tb_assert_return_val(stmt, 0);
+	tb_assert_and_check_return_val(itor && itor <= stmt->count, stmt->count);
+
+	// prev
+	return itor - 1;
+}
+static tb_size_t tb_sqlite3_stmt_row_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+{
+	// check
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)iterator;
+	tb_assert_return_val(stmt, 0);
+	tb_assert_and_check_return_val(itor < stmt->count, stmt->count);
+
+	// next
+	return itor + 1;
+}
+static tb_pointer_t tb_sqlite3_stmt_row_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+{
+	// check
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)iterator;
+	tb_assert_and_check_return_val(stmt && itor < stmt->count, tb_null);
+
+
+	// the row iterator
+	return (tb_pointer_t)tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -260,6 +330,10 @@ static tb_void_t tb_database_sqlite3_clos(tb_database_sql_t* database)
 	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
 	tb_assert_and_check_return(sqlite);
 	
+	// exit result first if exists
+	if (sqlite->result.result) sqlite3_free_table(sqlite->result.result);
+	sqlite->result.result = tb_null;
+
 	// close database
 	if (sqlite->database) sqlite3_close(sqlite->database);
 	sqlite->database = tb_null;
@@ -362,6 +436,157 @@ static tb_iterator_t* tb_database_sqlite3_result_load(tb_database_sql_t* databas
 	// ok?
 	return sqlite->result.result? (tb_iterator_t*)&sqlite->result : tb_null;
 }
+static tb_void_t tb_database_sqlite3_stmt_exit(tb_database_sql_t* database, tb_handle_t handle)
+{
+	// check
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)handle;
+	tb_assert_and_check_return(stmt);
+
+	// exit stmt
+	if (stmt->stmt) sqlite3_finalize(stmt->stmt);
+	stmt->stmt = tb_null;
+
+	// exit it
+	tb_free(stmt);
+}
+static tb_handle_t tb_database_sqlite3_stmt_init(tb_database_sql_t* database, tb_char_t const* sql)
+{
+	// check
+	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return_val(sqlite && sqlite->database && sql, tb_null);
+
+	// done
+	tb_bool_t 					ok = tb_false;
+	tb_database_sqlite3_stmt_t* stmt = tb_null;
+	do
+	{
+		// make stmt
+		stmt = (tb_database_sqlite3_stmt_t*)tb_malloc0(sizeof(tb_database_sqlite3_stmt_t));
+		tb_assert_and_check_break(stmt);
+
+		// init itor
+		stmt->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_READONLY;
+		stmt->itor.priv = (tb_pointer_t)sqlite;
+		stmt->itor.step = 0;
+		stmt->itor.size = tb_sqlite3_stmt_row_iterator_size;
+		stmt->itor.head = tb_sqlite3_stmt_row_iterator_head;
+		stmt->itor.tail = tb_sqlite3_stmt_row_iterator_tail;
+		stmt->itor.prev = tb_sqlite3_stmt_row_iterator_prev;
+		stmt->itor.next = tb_sqlite3_stmt_row_iterator_next;
+		stmt->itor.item = tb_sqlite3_stmt_row_iterator_item;
+		stmt->itor.copy = tb_null;
+		stmt->itor.comp = tb_null;
+
+		// init stmt
+		if (SQLITE_OK != sqlite3_prepare_v2(sqlite->database, sql, -1, &stmt->stmt, 0))
+		{
+			// trace
+			tb_trace_e("stmt: init %s failed, error: %s", sql, sqlite3_errmsg(sqlite->database));
+		}
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok) 
+	{
+		// exit stmt
+		if (stmt) tb_database_sqlite3_stmt_exit(database, stmt);
+		stmt = tb_null;
+	}
+
+	// ok?
+	return (tb_handle_t)stmt;
+}
+static tb_bool_t tb_database_sqlite3_stmt_done(tb_database_sql_t* database, tb_handle_t handle)
+{
+	// check
+	tb_database_sqlite3_t* 		sqlite = tb_database_sqlite3_cast(database);
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)handle;
+	tb_assert_and_check_return_val(sqlite && sqlite->database && stmt && stmt->stmt, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// step stmt
+		tb_int_t result = sqlite3_step(stmt->stmt);
+		tb_assert_and_check_break(result == SQLITE_DONE || result == SQLITE_ROW);
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
+}
+static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_handle_t handle, tb_database_sql_value_t const* list, tb_size_t size)
+{
+	// check
+	tb_database_sqlite3_t* 		sqlite = tb_database_sqlite3_cast(database);
+	tb_database_sqlite3_stmt_t* stmt = (tb_database_sqlite3_stmt_t*)handle;
+	tb_assert_and_check_return_val(sqlite && sqlite->database && stmt && stmt->stmt && list && size, tb_false);
+
+	// walk
+	tb_size_t i = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the value
+		tb_database_sql_value_t const* value = &list[i];
+
+		// done
+		tb_int_t ok = 0;
+		switch (value->type)
+		{
+		case TB_DATABASE_SQL_VALUE_TYPE_TEXT32:
+			ok = sqlite3_bind_text(stmt->stmt, (tb_int_t)(i + 1), value->text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
+			break;
+		case TB_DATABASE_SQL_VALUE_TYPE_TEXT16:
+		case TB_DATABASE_SQL_VALUE_TYPE_TEXT8:
+			ok = sqlite3_bind_text16(stmt->stmt, (tb_int_t)(i + 1), value->text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
+			break;
+		case TB_DATABASE_SQL_VALUE_TYPE_INT64:
+			ok = sqlite3_bind_int64(stmt->stmt, (tb_int_t)(i + 1), value->i64);
+			break;
+		case TB_DATABASE_SQL_VALUE_TYPE_INT32:
+		case TB_DATABASE_SQL_VALUE_TYPE_INT16:
+		case TB_DATABASE_SQL_VALUE_TYPE_INT8:
+			ok = sqlite3_bind_int(stmt->stmt, (tb_int_t)(i + 1), (tb_int_t)tb_database_sql_value_int32(value));
+			break;
+		case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
+		case TB_DATABASE_SQL_VALUE_TYPE_BLOB16:
+		case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
+			ok = sqlite3_bind_blob(stmt->stmt, (tb_int_t)(i + 1), value->blob.data, (tb_int_t)value->blob.size, tb_null);
+			break;
+#ifdef TB_CONFIG_TYPE_FLOAT
+		case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
+		case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
+			ok = sqlite3_bind_double(stmt->stmt, (tb_int_t)(i + 1), (tb_double_t)tb_database_sql_value_double(value));
+			break;
+#endif
+		case TB_DATABASE_SQL_VALUE_TYPE_NULL:
+			ok = sqlite3_bind_null(stmt->stmt, (tb_int_t)(i + 1));
+			break;
+		default:
+			tb_trace_e("bind: unknown value type: %lu", value->type);
+			break;
+		}
+
+		// failed?
+		if (SQLITE_OK != ok)
+		{
+			// trace
+			tb_trace_e("stmt: bind value[%lu] failed, error: %s", i, sqlite3_errmsg(sqlite->database));
+			break;
+		}
+	}
+
+	// ok?
+	return (i == size)? tb_true : tb_false;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -445,6 +670,10 @@ tb_database_sql_t* tb_database_sqlite3_init(tb_url_t const* url)
 		sqlite->base.done 			= tb_database_sqlite3_done;
 		sqlite->base.result_load 	= tb_database_sqlite3_result_load;
 		sqlite->base.result_exit 	= tb_database_sqlite3_result_exit;
+		sqlite->base.stmt_init 		= tb_database_sqlite3_stmt_init;
+		sqlite->base.stmt_exit 		= tb_database_sqlite3_stmt_exit;
+		sqlite->base.stmt_done 		= tb_database_sqlite3_stmt_done;
+		sqlite->base.stmt_bind 		= tb_database_sqlite3_stmt_bind;
 
 		// init result row iterator
 		sqlite->result.itor.mode 	= TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;

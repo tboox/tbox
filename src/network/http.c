@@ -37,7 +37,6 @@
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
-#include "../filter/filter.h"
 #include "../stream/stream.h"
 #include "../platform/platform.h"
 #include "../algorithm/algorithm.h"
@@ -673,15 +672,15 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 					tb_assert_and_check_break(http->zstream);
 
 					// the filter
-					tb_filter_t* filter = tb_null;
+					tb_stream_filter_t* filter = tb_null;
 					if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 					tb_assert_and_check_break(filter);
 
 					// clear filter
-					tb_filter_cler(filter);
+					tb_stream_filter_cler(filter);
 
 					// limit the filter input size
-					if (http->status.content_size) tb_filter_limit(filter, http->status.content_size);
+					if (http->status.content_size) tb_stream_filter_limit(filter, http->status.content_size);
 
 					// open zstream, need not async
 					if (!tb_basic_stream_open(http->zstream)) break;

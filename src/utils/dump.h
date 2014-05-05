@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../stream/stream.h"
+#include "../stream/basic_stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

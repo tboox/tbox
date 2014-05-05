@@ -208,7 +208,7 @@ tb_bool_t tb_database_sql_done(tb_handle_t handle, tb_char_t const* sql)
 	tb_assert_and_check_return_val(database && database->done && sql, tb_false);
 			
 	// opened?
-	tb_check_return_val(database->bopened, tb_false);
+	tb_assert_and_check_return_val(database->bopened, tb_false);
 
 	// trace
 	tb_trace_d("done: sql: %s: ..", sql);
@@ -223,7 +223,7 @@ tb_iterator_t* tb_database_sql_result_load(tb_handle_t handle, tb_bool_t ball)
 	tb_assert_and_check_return_val(database && database->result_load, tb_null);
 			
 	// opened?
-	tb_check_return_val(database->bopened, tb_null);
+	tb_assert_and_check_return_val(database->bopened, tb_null);
 
 	// load it
 	return database->result_load(database, ball);
@@ -235,9 +235,56 @@ tb_void_t tb_database_sql_result_exit(tb_handle_t handle, tb_iterator_t* result)
 	tb_assert_and_check_return(database && database->result_exit && result);
 			
 	// opened?
-	tb_check_return(database->bopened);
+	tb_assert_and_check_return(database->bopened);
 
 	// exit it
 	database->result_exit(database, result);
 }
+tb_handle_t tb_database_sql_stmt_init(tb_handle_t handle, tb_char_t const* sql)
+{
+	// check
+	tb_database_sql_t* database = (tb_database_sql_t*)handle;
+	tb_assert_and_check_return_val(database && database->stmt_init && sql, tb_null);
+	
+	// opened?
+	tb_assert_and_check_return_val(database->bopened, tb_null);
 
+	// init stmt
+	return database->stmt_init(database, sql);
+}
+tb_void_t tb_database_sql_stmt_exit(tb_handle_t handle, tb_handle_t stmt)
+{
+	// check
+	tb_database_sql_t* database = (tb_database_sql_t*)handle;
+	tb_assert_and_check_return(database && database->stmt_done && stmt);
+	
+	// opened?
+	tb_assert_and_check_return(database->bopened);
+
+	// exit stmt
+	database->stmt_exit(database, stmt);
+}
+tb_bool_t tb_database_sql_stmt_done(tb_handle_t handle, tb_handle_t stmt)
+{
+	// check
+	tb_database_sql_t* database = (tb_database_sql_t*)handle;
+	tb_assert_and_check_return_val(database && database->stmt_done && stmt, tb_false);
+	
+	// opened?
+	tb_assert_and_check_return_val(database->bopened, tb_false);
+
+	// done stmt
+	return database->stmt_done(database, stmt);
+}
+tb_bool_t tb_database_sql_stmt_bind(tb_handle_t handle, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
+{
+	// check
+	tb_database_sql_t* database = (tb_database_sql_t*)handle;
+	tb_assert_and_check_return_val(database && database->stmt_bind && stmt && list && size, tb_false);
+	
+	// opened?
+	tb_assert_and_check_return_val(database->bopened, tb_false);
+
+	// bind stmt argument
+	return database->stmt_bind(database, stmt, list, size);
+}

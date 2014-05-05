@@ -39,7 +39,6 @@ extern "C" {
 #include "network/network.h"
 #include "charset/charset.h"
 #include "memory/memory.h"
-#include "filter/filter.h"
 #include "stream/stream.h"
 #include "string/string.h"
 #include "object/object.h"

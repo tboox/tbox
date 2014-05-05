@@ -32,6 +32,7 @@
  * includes
  */
 #include "transfer.h"
+#include "stream.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 

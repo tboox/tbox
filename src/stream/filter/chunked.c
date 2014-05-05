@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		chunked.c
- * @ingroup 	filter
+ * @ingroup 	stream
  *
  */
 
@@ -38,10 +38,10 @@
  */
 
 // the chunked filter type
-typedef struct __tb_filter_chunked_t
+typedef struct __tb_stream_filter_chunked_t
 {
 	// the filter base
-	tb_filter_t 			base;
+	tb_stream_filter_t 			base;
 
 	// the chunked size
 	tb_size_t 				size;
@@ -52,16 +52,16 @@ typedef struct __tb_filter_chunked_t
 	// the cache line
 	tb_scoped_string_t 		line;
 
-}tb_filter_chunked_t;
+}tb_stream_filter_chunked_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_filter_chunked_t* tb_filter_chunked_cast(tb_filter_t* filter)
+static __tb_inline__ tb_stream_filter_chunked_t* tb_stream_filter_chunked_cast(tb_stream_filter_t* filter)
 {
 	// check
-	tb_assert_and_check_return_val(filter && filter->type == TB_FILTER_TYPE_CHUNKED, tb_null);
-	return (tb_filter_chunked_t*)filter;
+	tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHUNKED, tb_null);
+	return (tb_stream_filter_chunked_t*)filter;
 }
 /* chunked_data
  *
@@ -70,10 +70,10 @@ static __tb_inline__ tb_filter_chunked_t* tb_filter_chunked_cast(tb_filter_t* fi
  * ---------------------- ------------------------- ---------
  *        chunk0                  chunk1               end
  */
-static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
+static tb_long_t tb_stream_filter_chunked_spak(tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
 {
 	// check
-	tb_filter_chunked_t* cfilter = tb_filter_chunked_cast(filter);
+	tb_stream_filter_chunked_t* cfilter = tb_stream_filter_chunked_cast(filter);
 	tb_assert_and_check_return_val(cfilter && istream && ostream, -1);
 	tb_assert_and_check_return_val(tb_static_stream_valid(istream) && tb_static_stream_valid(ostream), -1);
 
@@ -206,10 +206,10 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_t*
 	// ok
 	return (op - ob);
 }
-static tb_void_t tb_filter_chunked_cler(tb_filter_t* filter)
+static tb_void_t tb_stream_filter_chunked_cler(tb_stream_filter_t* filter)
 {
 	// check
-	tb_filter_chunked_t* cfilter = tb_filter_chunked_cast(filter);
+	tb_stream_filter_chunked_t* cfilter = tb_stream_filter_chunked_cast(filter);
 	tb_assert_and_check_return(cfilter);
 
 	// clear size
@@ -221,10 +221,10 @@ static tb_void_t tb_filter_chunked_cler(tb_filter_t* filter)
 	// clear line
 	tb_scoped_string_clear(&cfilter->line);
 }
-static tb_void_t tb_filter_chunked_exit(tb_filter_t* filter)
+static tb_void_t tb_stream_filter_chunked_exit(tb_stream_filter_t* filter)
 {
 	// check
-	tb_filter_chunked_t* cfilter = tb_filter_chunked_cast(filter);
+	tb_stream_filter_chunked_t* cfilter = tb_stream_filter_chunked_cast(filter);
 	tb_assert_and_check_return(cfilter);
 
 	// exit line
@@ -234,11 +234,11 @@ static tb_void_t tb_filter_chunked_exit(tb_filter_t* filter)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_filter_t* tb_filter_init_from_chunked(tb_bool_t dechunked)
+tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
 {
 	// done
 	tb_bool_t 				ok = tb_false;
-	tb_filter_chunked_t* 	filter = tb_null;
+	tb_stream_filter_chunked_t* 	filter = tb_null;
 	do
 	{
 		// noimpl for encoding chunked
@@ -249,14 +249,14 @@ tb_filter_t* tb_filter_init_from_chunked(tb_bool_t dechunked)
 		}
 
 		// make filter
-		filter = (tb_filter_chunked_t*)tb_malloc0(sizeof(tb_filter_chunked_t));
+		filter = (tb_stream_filter_chunked_t*)tb_malloc0(sizeof(tb_stream_filter_chunked_t));
 		tb_assert_and_check_break(filter);
 
 		// init filter 
-		if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CHUNKED)) break;
-		filter->base.spak = tb_filter_chunked_spak;
-		filter->base.cler = tb_filter_chunked_cler;
-		filter->base.exit = tb_filter_chunked_exit;
+		if (!tb_stream_filter_init((tb_stream_filter_t*)filter, TB_STREAM_FILTER_TYPE_CHUNKED)) break;
+		filter->base.spak = tb_stream_filter_chunked_spak;
+		filter->base.cler = tb_stream_filter_chunked_cler;
+		filter->base.exit = tb_stream_filter_chunked_exit;
 
 		// init line
 		if (!tb_scoped_string_init(&filter->line)) break;
@@ -270,11 +270,11 @@ tb_filter_t* tb_filter_init_from_chunked(tb_bool_t dechunked)
 	if (!ok)
 	{
 		// exit filter
-		tb_filter_exit((tb_filter_t*)filter);
+		tb_stream_filter_exit((tb_stream_filter_t*)filter);
 		filter = tb_null;
 	}
 
 	// ok?
-	return (tb_filter_t*)filter;
+	return (tb_stream_filter_t*)filter;
 }
 

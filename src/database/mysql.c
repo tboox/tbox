@@ -281,7 +281,7 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 
 	// init value
 	tb_database_sql_value_name_set(&row->value, (tb_char_t const*)mysql->result.fields[itor].name);
-	tb_database_sql_value_text32_set(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
+	tb_database_sql_value_set_text32(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
 
 	// the col item
 	return (tb_pointer_t)&row->value;
@@ -497,6 +497,21 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 	// ok?
 	return ok? (tb_iterator_t*)&mysql->result : tb_null;
 }
+static tb_handle_t tb_database_mysql_stmt_init(tb_database_sql_t* database, tb_char_t const* sql)
+{
+	return tb_null;
+}
+static tb_void_t tb_database_mysql_stmt_exit(tb_database_sql_t* database, tb_handle_t stmt)
+{
+}
+static tb_bool_t tb_database_mysql_stmt_done(tb_database_sql_t* database, tb_handle_t stmt)
+{
+	return tb_false;
+}
+static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
+{
+	return tb_false;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -561,6 +576,11 @@ tb_database_sql_t* tb_database_mysql_init(tb_url_t const* url)
 		mysql->base.done 			= tb_database_mysql_done;
 		mysql->base.result_load 	= tb_database_mysql_result_load;
 		mysql->base.result_exit 	= tb_database_mysql_result_exit;
+		mysql->base.stmt_init 		= tb_database_mysql_stmt_init;
+		mysql->base.stmt_exit 		= tb_database_mysql_stmt_exit;
+		mysql->base.stmt_done 		= tb_database_mysql_stmt_done;
+		mysql->base.stmt_bind 		= tb_database_mysql_stmt_bind;
+
 
 		// init result row iterator
 		mysql->result.itor.mode 	= TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;

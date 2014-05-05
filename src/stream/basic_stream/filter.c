@@ -26,7 +26,6 @@
  */
 #include "prefix.h"
 #include "../stream.h"
-#include "../../filter/filter.h"
 #include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +39,7 @@ typedef struct __tb_basic_stream_filter_t
 	tb_basic_stream_t 		base;
 
 	// the filter 
-	tb_filter_t* 			filter;
+	tb_stream_filter_t* 	filter;
 
 	// the filter is referenced? need not exit it
 	tb_bool_t 				bref;
@@ -103,7 +102,7 @@ static tb_bool_t tb_basic_stream_filter_clos(tb_handle_t bstream)
 	{
 		// spak data
 		tb_byte_t const* 	data = tb_null;
-		tb_long_t 			size = tb_filter_spak(fstream->filter, tb_null, 0, &data, 0, -1);
+		tb_long_t 			size = tb_stream_filter_spak(fstream->filter, tb_null, 0, &data, 0, -1);
 		if (size > 0 && data)
 		{
 			// writ data
@@ -130,7 +129,7 @@ static tb_bool_t tb_basic_stream_filter_clos(tb_handle_t bstream)
 		fstream->beof = tb_false;
 
 		// clear the filter
-		if (fstream->filter) tb_filter_cler(fstream->filter);
+		if (fstream->filter) tb_stream_filter_cler(fstream->filter);
 	}
 
 	// ok?
@@ -143,7 +142,7 @@ static tb_void_t tb_basic_stream_filter_exit(tb_handle_t bstream)
 	tb_assert_and_check_return(fstream);
 
 	// exit it
-	if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
+	if (!fstream->bref && fstream->filter) tb_stream_filter_exit(fstream->filter);
 	fstream->filter = tb_null;
 	fstream->bref = tb_false;
 }
@@ -178,16 +177,16 @@ static tb_long_t tb_basic_stream_filter_read(tb_handle_t bstream, tb_byte_t* dat
 		fstream->last = real;
 
 		// eof?
-		if (real < 0 || (!real && fstream->wait) || tb_filter_beof(fstream->filter))
+		if (real < 0 || (!real && fstream->wait) || tb_stream_filter_beof(fstream->filter))
 			fstream->beof = tb_true;
 		// clear wait
 		else if (real > 0) fstream->wait = tb_false;
 
 		// spak data
 		tb_byte_t const* odata = tb_null;
-		if (real) real = tb_filter_spak(fstream->filter, data, real < 0? 0 : real, &odata, size, fstream->beof? -1 : 0);
+		if (real) real = tb_stream_filter_spak(fstream->filter, data, real < 0? 0 : real, &odata, size, fstream->beof? -1 : 0);
 		// no data? try to sync it
-		if (!real) real = tb_filter_spak(fstream->filter, tb_null, 0, &odata, size, fstream->beof? -1 : 1);
+		if (!real) real = tb_stream_filter_spak(fstream->filter, tb_null, 0, &odata, size, fstream->beof? -1 : 1);
 
 		// has data? save it
 		if (real > 0 && odata) tb_memcpy(data, odata, real);
@@ -215,7 +214,7 @@ static tb_long_t tb_basic_stream_filter_writ(tb_handle_t bstream, tb_byte_t cons
 		tb_assert_and_check_return_val(fstream->mode == -1, -1);
 
 		// spak data
-		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, size, 0);
+		tb_long_t real = tb_stream_filter_spak(fstream->filter, data, size, &data, size, 0);
 		tb_assert_and_check_return_val(real >= 0, -1);
 
 		// no data?
@@ -247,7 +246,7 @@ static tb_bool_t tb_basic_stream_filter_sync(tb_handle_t bstream, tb_bool_t bclo
 		tb_byte_t const* 	data = tb_null;
 		tb_long_t 			real = -1;
 		while ( !tb_atomic_get(&fstream->base.base.bstoped)
-			&& 	(real = tb_filter_spak(fstream->filter, tb_null, 0, &data, 0, bclosing? -1 : 1)) > 0
+			&& 	(real = tb_stream_filter_spak(fstream->filter, tb_null, 0, &data, 0, bclosing? -1 : 1)) > 0
 			&& 	data)
 		{
 			if (!tb_basic_stream_bwrit(fstream->bstream, data, real)) return tb_false;
@@ -270,7 +269,7 @@ static tb_long_t tb_basic_stream_filter_wait(tb_handle_t bstream, tb_size_t wait
 		// wait ok
 		if (fstream->last > 0) ok = wait;
 		// need wait
-		else if (!fstream->last && !fstream->beof && !tb_filter_beof(fstream->filter))
+		else if (!fstream->last && !fstream->beof && !tb_stream_filter_beof(fstream->filter))
 		{
 			// wait
 			ok = tb_basic_stream_wait(fstream->bstream, wait, timeout);
@@ -345,10 +344,10 @@ static tb_bool_t tb_basic_stream_filter_ctrl(tb_handle_t bstream, tb_size_t ctrl
 			tb_assert_and_check_return_val(!tb_stream_is_opened(bstream), tb_false);
 
 			//  exit filter first if exists
-			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
+			if (!fstream->bref && fstream->filter) tb_stream_filter_exit(fstream->filter);
 
 			// set filter
-			tb_filter_t* filter = (tb_filter_t*)tb_va_arg(args, tb_filter_t*);
+			tb_stream_filter_t* filter = (tb_stream_filter_t*)tb_va_arg(args, tb_stream_filter_t*);
 			fstream->filter = filter;
 			fstream->bref = filter? tb_true : tb_false;
 			return tb_true;
@@ -356,7 +355,7 @@ static tb_bool_t tb_basic_stream_filter_ctrl(tb_handle_t bstream, tb_size_t ctrl
 	case TB_STREAM_CTRL_FLTR_GET_FILTER:
 		{
 			// get filter
-			tb_filter_t** phandle = (tb_filter_t**)tb_va_arg(args, tb_filter_t**);
+			tb_stream_filter_t** phandle = (tb_stream_filter_t**)tb_va_arg(args, tb_stream_filter_t**);
 			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = fstream->filter;
 			return tb_true;
@@ -428,7 +427,7 @@ tb_basic_stream_t* tb_basic_stream_init_filter_from_zip(tb_basic_stream_t* bstre
 
 	// set filter
 	((tb_basic_stream_filter_t*)fstream)->bref = tb_false;
-	((tb_basic_stream_filter_t*)fstream)->filter = tb_filter_init_from_zip(algo, action);
+	((tb_basic_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_zip(algo, action);
 	tb_assert_and_check_goto(((tb_basic_stream_filter_t*)fstream)->filter, fail);
 	
 	// ok
@@ -451,7 +450,7 @@ tb_basic_stream_t* tb_basic_stream_init_filter_from_cache(tb_basic_stream_t* bst
 
 	// set filter
 	((tb_basic_stream_filter_t*)fstream)->bref = tb_false;
-	((tb_basic_stream_filter_t*)fstream)->filter = tb_filter_init_from_cache(size);
+	((tb_basic_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_cache(size);
 	tb_assert_and_check_goto(((tb_basic_stream_filter_t*)fstream)->filter, fail);
 	
 	// ok
@@ -474,7 +473,7 @@ tb_basic_stream_t* tb_basic_stream_init_filter_from_charset(tb_basic_stream_t* b
 
 	// set filter
 	((tb_basic_stream_filter_t*)fstream)->bref = tb_false;
-	((tb_basic_stream_filter_t*)fstream)->filter = tb_filter_init_from_charset(fr, to);
+	((tb_basic_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_charset(fr, to);
 	tb_assert_and_check_goto(((tb_basic_stream_filter_t*)fstream)->filter, fail);
 	
 	// ok
@@ -497,7 +496,7 @@ tb_basic_stream_t* tb_basic_stream_init_filter_from_chunked(tb_basic_stream_t* b
 
 	// set filter
 	((tb_basic_stream_filter_t*)fstream)->bref = tb_false;
-	((tb_basic_stream_filter_t*)fstream)->filter = tb_filter_init_from_chunked(dechunked);
+	((tb_basic_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_chunked(dechunked);
 	tb_assert_and_check_goto(((tb_basic_stream_filter_t*)fstream)->filter, fail);
 	
 	// ok

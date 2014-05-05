@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		cache.c
- * @ingroup 	filter
+ * @ingroup 	stream
  *
  */
 
@@ -38,26 +38,26 @@
  */
 
 // the cache filter type
-typedef struct __tb_filter_cache_t
+typedef struct __tb_stream_filter_cache_t
 {
 	// the filter base
-	tb_filter_t 			base;
+	tb_stream_filter_t 			base;
 
-}tb_filter_cache_t;
+}tb_stream_filter_cache_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_filter_cache_t* tb_filter_cache_cast(tb_filter_t* filter)
+static __tb_inline__ tb_stream_filter_cache_t* tb_stream_filter_cache_cast(tb_stream_filter_t* filter)
 {
 	// check
-	tb_assert_and_check_return_val(filter && filter->type == TB_FILTER_TYPE_CACHE, tb_null);
-	return (tb_filter_cache_t*)filter;
+	tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CACHE, tb_null);
+	return (tb_stream_filter_cache_t*)filter;
 }
-static tb_long_t tb_filter_cache_spak(tb_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
+static tb_long_t tb_stream_filter_cache_spak(tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
 {
 	// check
-	tb_filter_cache_t* cfilter = tb_filter_cache_cast(filter);
+	tb_stream_filter_cache_t* cfilter = tb_stream_filter_cache_cast(filter);
 	tb_assert_and_check_return_val(cfilter && istream && ostream, -1);
 	tb_assert_and_check_return_val(tb_static_stream_valid(istream) && tb_static_stream_valid(ostream), -1);
 
@@ -92,20 +92,20 @@ static tb_long_t tb_filter_cache_spak(tb_filter_t* filter, tb_static_stream_t* i
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_filter_t* tb_filter_init_from_cache(tb_size_t size)
+tb_stream_filter_t* tb_stream_filter_init_from_cache(tb_size_t size)
 {
 	// done
 	tb_bool_t 			ok = tb_false;
-	tb_filter_cache_t* 	filter = tb_null;
+	tb_stream_filter_cache_t* 	filter = tb_null;
 	do
 	{
 		// make filter
-		filter = (tb_filter_cache_t*)tb_malloc0(sizeof(tb_filter_cache_t));
+		filter = (tb_stream_filter_cache_t*)tb_malloc0(sizeof(tb_stream_filter_cache_t));
 		tb_assert_and_check_break(filter);
 
 		// init filter 
-		if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CACHE)) break;
-		filter->base.spak = tb_filter_cache_spak;
+		if (!tb_stream_filter_init((tb_stream_filter_t*)filter, TB_STREAM_FILTER_TYPE_CACHE)) break;
+		filter->base.spak = tb_stream_filter_cache_spak;
 
 		// init the cache size
 		if (size) tb_queue_buffer_resize(&filter->base.odata, size);
@@ -119,11 +119,11 @@ tb_filter_t* tb_filter_init_from_cache(tb_size_t size)
 	if (!ok)
 	{
 		// exit filter
-		tb_filter_exit((tb_filter_t*)filter);
+		tb_stream_filter_exit((tb_stream_filter_t*)filter);
 		filter = tb_null;
 	}
 
 	// ok?
-	return (tb_filter_t*)filter;
+	return (tb_stream_filter_t*)filter;
 }
 
