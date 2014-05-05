@@ -87,18 +87,18 @@
 //#define TB_CONFIG_LIBM_HAVE_LOG2F
 
 // zlib
-//#define TB_CONFIG_HAVE_ZLIB					
+//#define TB_CONFIG_THIRD_PARTY_HAVE_ZLIB					
 
 // openssl
-//#define TB_CONFIG_HAVE_OPENSSL	
+//#define TB_CONFIG_THIRD_PARTY_HAVE_OPENSSL	
 
 // polarssl
-//#define TB_CONFIG_HAVE_POLARSSL	
+//#define TB_CONFIG_THIRD_PARTY_HAVE_POLARSSL	
 
 // mysql
-//#define TB_CONFIG_HAVE_MYSQL
+//#define TB_CONFIG_THIRD_PARTY_HAVE_MYSQL
 
 // sqlite3
-//#define TB_CONFIG_HAVE_SQLITE3
+//#define TB_CONFIG_THIRD_PARTY_HAVE_SQLITE3
 
 #endif

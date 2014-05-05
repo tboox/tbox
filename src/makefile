@@ -229,23 +229,23 @@ tbox_C_FILES 			+= \
 						libm/ilog2i \
 						libm/isqrti \
 
-tbox_C_FILES-$(TB_CONFIG_HAVE_ZLIB) += \
+tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_ZLIB) += \
 						zip/zlib \
 						zip/gzip \
 						zip/zlibraw 
 
-tbox_C_FILES-$(TB_CONFIG_HAVE_OPENSSL) += \
+tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_OPENSSL) += \
 						asio/ssl \
 						network/ssl/openssl 
 
-tbox_C_FILES-$(TB_CONFIG_HAVE_POLARSSL) += \
+tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_POLARSSL) += \
 						asio/ssl \
 						network/ssl/polarssl 
 
-tbox_C_FILES-$(TB_CONFIG_HAVE_MYSQL) += \
+tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_MYSQL) += \
 						database/mysql
 
-tbox_C_FILES-$(TB_CONFIG_HAVE_SQLITE3) += \
+tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_SQLITE3) += \
 						database/sqlite3
 
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
