@@ -598,7 +598,7 @@ fail:
 	if (fstream) tb_async_stream_exit(fstream, tb_false);
 	return tb_null;
 }
-
+#ifdef TB_CONFIG_MODULE_HAVE_ZIP
 tb_async_stream_t* tb_async_stream_init_filter_from_zip(tb_async_stream_t* astream, tb_size_t algo, tb_size_t action)
 {
 	// check
@@ -626,6 +626,7 @@ fail:
 	if (fstream) tb_async_stream_exit(fstream, tb_false);
 	return tb_null;
 }
+#endif
 tb_async_stream_t* tb_async_stream_init_filter_from_cache(tb_async_stream_t* astream, tb_size_t size)
 {
 	// check
@@ -653,6 +654,7 @@ fail:
 	if (fstream) tb_async_stream_exit(fstream, tb_false);
 	return tb_null;
 }
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 tb_async_stream_t* tb_async_stream_init_filter_from_charset(tb_async_stream_t* astream, tb_size_t fr, tb_size_t to)
 {
 	// check
@@ -680,6 +682,7 @@ fail:
 	if (fstream) tb_async_stream_exit(fstream, tb_false);
 	return tb_null;
 }
+#endif
 tb_async_stream_t* tb_async_stream_init_filter_from_chunked(tb_async_stream_t* astream, tb_bool_t dechunked)
 {
 	// check

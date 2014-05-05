@@ -65,10 +65,10 @@ tb_handle_t tb_database_sql_init(tb_char_t const* url)
 		static tb_size_t (*s_probe[])(tb_url_t const*) = 
 		{
 			tb_null
-#ifdef TB_CONFIG_THIRD_PARTY_HAVE_MYSQL
+#ifdef TB_CONFIG_THIRD_HAVE_MYSQL
 		,	tb_database_mysql_probe
 #endif
-#ifdef TB_CONFIG_THIRD_PARTY_HAVE_SQLITE3
+#ifdef TB_CONFIG_THIRD_HAVE_SQLITE3
 		,	tb_database_sqlite3_probe
 #endif
 		};
@@ -77,10 +77,10 @@ tb_handle_t tb_database_sql_init(tb_char_t const* url)
 		static tb_database_sql_t* (*s_init[])(tb_url_t const*) = 
 		{
 			tb_null
-#ifdef TB_CONFIG_THIRD_PARTY_HAVE_MYSQL
+#ifdef TB_CONFIG_THIRD_HAVE_MYSQL
 		,	tb_database_mysql_init
 #endif
-#ifdef TB_CONFIG_THIRD_PARTY_HAVE_SQLITE3
+#ifdef TB_CONFIG_THIRD_HAVE_SQLITE3
 		,	tb_database_sqlite3_init
 #endif
 		};

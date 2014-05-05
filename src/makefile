@@ -53,7 +53,6 @@ tbox_C_FILES 			+= \
 						container/iterator/long \
 						container/iterator/size \
 						container/item/str \
-						container/item/obj \
 						container/item/ptr \
 						container/item/mem \
 						container/item/true \
@@ -63,8 +62,6 @@ tbox_C_FILES 			+= \
 						container/item/uint16 \
 						container/item/uint32 \
 						container/item/string_pool \
-						database/sql \
-						database/value \
 						network/network \
 						network/dns/cache \
 						network/dns/server \
@@ -73,15 +70,8 @@ tbox_C_FILES 			+= \
 						network/ipv4 \
 						network/http \
 						network/cookies \
-						charset/charset \
-						charset/ascii \
-						charset/utf8 \
-						charset/utf16 \
-						charset/utf32 \
-						charset/ucs2 \
-						charset/ucs4 \
-						charset/gb2312 \
-						charset/iso8859 \
+						asio/aioo \
+						asio/aiop \
 						stream/stream \
 						stream/static_stream \
 						stream/basic_stream \
@@ -90,46 +80,10 @@ tbox_C_FILES 			+= \
 						stream/basic_stream/data \
 						stream/basic_stream/sock \
 						stream/basic_stream/filter \
-						stream/async_stream \
-						stream/async_stream/http \
-						stream/async_stream/file \
-						stream/async_stream/data \
-						stream/async_stream/sock \
-						stream/async_stream/filter \
-						stream/transfer_pool \
 						stream/transfer \
 						stream/filter/filter \
-						stream/filter/zip \
 						stream/filter/cache \
-						stream/filter/charset \
 						stream/filter/chunked \
-						object/object \
-						object/null \
-						object/data \
-						object/date \
-						object/object_pool \
-						object/array \
-						object/string \
-						object/number \
-						object/boolean \
-						object/dictionary \
-						object/reader/xml \
-						object/reader/bin \
-						object/reader/json \
-						object/reader/xplist \
-						object/reader/bplist \
-						object/reader/reader \
-						object/writer/xml \
-						object/writer/bin \
-						object/writer/json \
-						object/writer/xplist \
-						object/writer/bplist \
-						object/writer/writer \
-						zip/zip \
-						zip/vlc/fixed \
-						zip/vlc/golomb \
-						zip/vlc/gamma \
-						zip/rlc \
 						utils/bits \
 						utils/md5 \
 						utils/sha \
@@ -138,21 +92,10 @@ tbox_C_FILES 			+= \
 						utils/dump \
 						utils/used \
 						utils/trace \
-						utils/option \
 						utils/base32 \
 						utils/base64 \
 						utils/singleton \
 						utils/lock_profiler \
-						xml/node \
-						xml/reader \
-						xml/writer \
-						asio/aioo \
-						asio/aico \
-						asio/aiop \
-						asio/aicp \
-						asio/pool \
-						asio/http \
-						asio/dns \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -227,27 +170,9 @@ tbox_C_FILES 			+= \
 						libc/string/wcsnirchr \
 						libm/idivi8 \
 						libm/ilog2i \
-						libm/isqrti \
+						libm/isqrti 
 
-tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_ZLIB) += \
-						zip/zlib \
-						zip/gzip \
-						zip/zlibraw 
-
-tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_OPENSSL) += \
-						asio/ssl \
-						network/ssl/openssl 
-
-tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_POLARSSL) += \
-						asio/ssl \
-						network/ssl/polarssl 
-
-tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_MYSQL) += \
-						database/mysql
-
-tbox_C_FILES-$(TB_CONFIG_THIRD_PARTY_HAVE_SQLITE3) += \
-						database/sqlite3
-
+# float
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isin \
 						libm/isinf \
@@ -281,9 +206,6 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/sincosf \
 						libm/pow
 
-# arm
-tbox_ASM_FILES-$(ARM) 	+= utils/opt/arm/crc
-
 # platform
 tbox_C_FILES 			+= \
 						platform/api \
@@ -312,8 +234,121 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_FILE)/directory \
 						platform/$(TB_CONFIG_API_PROCESS)/process \
 						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aioo \
-						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aiop \
+						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aiop 
+
+
+# arm
+tbox_ASM_FILES-$(ARM) 	+= utils/opt/arm/crc
+
+# openssl
+tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
+						network/ssl/openssl 
+
+# polarssl
+tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_POLARSSL) += \
+						network/ssl/polarssl 
+
+# xml
+tbox_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) += \
+						xml/node \
+						xml/reader \
+						xml/writer
+
+# charset
+tbox_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
+						charset/charset \
+						charset/ascii \
+						charset/utf8 \
+						charset/utf16 \
+						charset/utf32 \
+						charset/ucs2 \
+						charset/ucs4 \
+						charset/gb2312 \
+						charset/iso8859 \
+						stream/filter/charset
+
+# asio
+ifeq ($(TB_CONFIG_MODULE_HAVE_ASIO),y)
+tbox_C_FILES 			+= \
+						asio/aico \
+						asio/aicp \
+						asio/pool \
+						asio/http \
+						asio/dns \
+						stream/async_stream \
+						stream/async_stream/http \
+						stream/async_stream/file \
+						stream/async_stream/data \
+						stream/async_stream/sock \
+						stream/async_stream/filter \
+						stream/transfer_pool \
 						platform/$(TB_CONFIG_API_ASIO)/asio/proactor/aicp
+
+tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
+						asio/ssl 
+tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_POLARSSL) += \
+						asio/ssl 
+endif
+
+# object
+ifeq ($(TB_CONFIG_MODULE_HAVE_OBJECT),y)
+tbox_C_FILES 			+= \
+						utils/option \
+						container/item/obj \
+						object/object \
+						object/null \
+						object/data \
+						object/date \
+						object/object_pool \
+						object/array \
+						object/string \
+						object/number \
+						object/boolean \
+						object/dictionary \
+						object/reader/bin \
+						object/reader/json \
+						object/reader/bplist \
+						object/reader/reader \
+						object/writer/bin \
+						object/writer/json \
+						object/writer/bplist \
+						object/writer/writer
+
+tbox_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) += \
+						object/reader/xml \
+						object/writer/xml \
+						object/reader/xplist \
+						object/writer/xplist
+endif
+
+# zip
+ifeq ($(TB_CONFIG_MODULE_HAVE_ZIP),y)
+tbox_C_FILES 			+= \
+						zip/zip \
+						zip/vlc/fixed \
+						zip/vlc/golomb \
+						zip/vlc/gamma \
+						zip/rlc \
+						stream/filter/zip 
+
+tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_ZLIB) += \
+						zip/zlib \
+						zip/gzip \
+						zip/zlibraw 
+endif
+
+# database
+ifeq ($(TB_CONFIG_MODULE_HAVE_DATABASE),y)
+tbox_C_FILES 			+= \
+						database/sql \
+						database/value 
+
+tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_MYSQL) += \
+						database/mysql
+
+tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_SQLITE3) += \
+						database/sqlite3
+endif
 
 # flags
 tbox_CXFLAGS 			+= -DTB_TRACE_PREFIX=\"tbox\"

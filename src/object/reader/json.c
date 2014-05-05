@@ -176,6 +176,7 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 			// unicode?
 			if (ch == 'u')
 			{
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 				// the unicode string
 				tb_char_t unicode_str[5];
 				unicode_str[0] = tb_basic_stream_bread_s8(reader->stream);
@@ -188,7 +189,7 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 				tb_uint16_t unicode_val = tb_s16toi32(unicode_str);
 
 				// the utf8 stream
-				tb_char_t 		utf8_data[16] = {0};
+				tb_char_t 			utf8_data[16] = {0};
 				tb_static_stream_t 	utf8_stream;
 				tb_static_stream_init(&utf8_stream, (tb_byte_t*)utf8_data, sizeof(utf8_data));
 
@@ -199,6 +200,13 @@ static tb_object_t* tb_object_json_reader_func_string(tb_object_json_reader_t* r
 				// unicode to utf8
 				tb_long_t utf8_size = tb_charset_conv_bst(TB_CHARSET_TYPE_UCS2 | TB_CHARSET_TYPE_NE, TB_CHARSET_TYPE_UTF8, &unicode_stream, &utf8_stream);
 				if (utf8_size > 0) tb_scoped_string_cstrncat(&data, utf8_data, utf8_size);
+#else
+				// trace
+				tb_trace1_e("unicode type is not supported, please enable charset module config if you want to use it!");
+
+				// only append it
+				tb_scoped_string_chrcat(&data, ch);
+#endif
 			}
 			// append escaped character
 			else tb_scoped_string_chrcat(&data, ch);

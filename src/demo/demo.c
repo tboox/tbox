@@ -36,12 +36,16 @@ static tb_demo_t g_demo[] =
 	TB_DEMO_MAIN_ITEM(flv)
 
 	// database
+#ifdef TB_CONFIG_MODULE_HAVE_DATABASE
 ,	TB_DEMO_MAIN_ITEM(database_sql)
+#endif
 
 	// xml
+#ifdef TB_CONFIG_MODULE_HAVE_XML
 ,	TB_DEMO_MAIN_ITEM(xml_reader)
 ,	TB_DEMO_MAIN_ITEM(xml_writer)
 ,	TB_DEMO_MAIN_ITEM(xml_document)
+#endif
 
 	// libc
 ,	TB_DEMO_MAIN_ITEM(libc_time)
@@ -57,12 +61,14 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(libm_integer)
 
 	// asio
+#ifdef TB_CONFIG_MODULE_HAVE_ASIO
 ,	TB_DEMO_MAIN_ITEM(asio_dns)
 ,	TB_DEMO_MAIN_ITEM(asio_http)
 ,	TB_DEMO_MAIN_ITEM(asio_aiopc)
 ,	TB_DEMO_MAIN_ITEM(asio_aiopd)
 ,	TB_DEMO_MAIN_ITEM(asio_aicpc)
 , 	TB_DEMO_MAIN_ITEM(asio_aicpd)
+#endif
 
 	// math
 ,	TB_DEMO_MAIN_ITEM(math_rand)
@@ -77,39 +83,59 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(utils_sha)
 ,	TB_DEMO_MAIN_ITEM(utils_bits)
 ,	TB_DEMO_MAIN_ITEM(utils_dump)
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 ,	TB_DEMO_MAIN_ITEM(utils_option)
+#endif
 ,	TB_DEMO_MAIN_ITEM(utils_base32)
 ,	TB_DEMO_MAIN_ITEM(utils_base64)
 
 	// other
 ,	TB_DEMO_MAIN_ITEM(other_test)
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,	TB_DEMO_MAIN_ITEM(other_charset)
+#endif
 
 	// object
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 ,	TB_DEMO_MAIN_ITEM(object_json)
 ,	TB_DEMO_MAIN_ITEM(object_bin)
 ,	TB_DEMO_MAIN_ITEM(object_xml)
 ,	TB_DEMO_MAIN_ITEM(object_bplist)
 ,	TB_DEMO_MAIN_ITEM(object_xplist)
 ,	TB_DEMO_MAIN_ITEM(object_dump)
+#endif
 
 	// spider
 ,	TB_DEMO_MAIN_ITEM(spider)
 ,	TB_DEMO_MAIN_ITEM(spider_queue)
 
 	// stream
-,	TB_DEMO_MAIN_ITEM(stream_transfer_pool)
-,	TB_DEMO_MAIN_ITEM(stream_transfer)
-,	TB_DEMO_MAIN_ITEM(stream_async_stream)
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream)
-,	TB_DEMO_MAIN_ITEM(stream_basic_stream_zip)
+#endif
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream_null)
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream_cache)
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream_charset)
-,	TB_DEMO_MAIN_ITEM(stream_async_stream_zip)
+#endif
+#ifdef TB_CONFIG_MODULE_HAVE_ZIP
+,	TB_DEMO_MAIN_ITEM(stream_basic_stream_zip)
+#endif
+#ifdef TB_CONFIG_MODULE_HAVE_ASIO
+,	TB_DEMO_MAIN_ITEM(stream_transfer)
+,	TB_DEMO_MAIN_ITEM(stream_transfer_pool)
 ,	TB_DEMO_MAIN_ITEM(stream_async_stream_null)
 ,	TB_DEMO_MAIN_ITEM(stream_async_stream_cache)
+# 	ifdef TB_CONFIG_MODULE_HAVE_OBJECT
+,	TB_DEMO_MAIN_ITEM(stream_async_stream)
+# 	endif
+# 	ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,	TB_DEMO_MAIN_ITEM(stream_async_stream_charset)
+# 	endif
+# 	ifdef TB_CONFIG_MODULE_HAVE_ZIP
+,	TB_DEMO_MAIN_ITEM(stream_async_stream_zip)
+# 	endif
+#endif
 
 	// string
 ,	TB_DEMO_MAIN_ITEM(string_pool)
