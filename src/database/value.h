@@ -159,6 +159,13 @@ tb_float_t 			tb_database_sql_value_float(tb_database_sql_value_t const* value);
 tb_double_t 		tb_database_sql_value_double(tb_database_sql_value_t const* value);
 #endif
 
+/*! set the null value
+ *
+ * @param value 	the value
+ * @param number 	the number
+ */
+tb_void_t 			tb_database_sql_value_set_null(tb_database_sql_value_t* value);
+
 /*! set the int8 value
  *
  * @param value 	the value
@@ -305,6 +312,16 @@ static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_number(tb_database
 				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_DOUBLE
 #endif
 				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT8))? tb_true : tb_false;
+}
+
+/// the value type
+static __tb_inline_force__ tb_size_t tb_database_sql_value_type(tb_database_sql_value_t const* value)
+{
+	// check
+	tb_assert_and_check_return_val(value, TB_DATABASE_SQL_VALUE_TYPE_NULL);
+
+	// the type
+	return value->type;
 }
 
 /// the value name
