@@ -89,11 +89,17 @@ typedef struct __tb_database_mysql_t
 	// the base
 	tb_database_sql_t 					base;
 
+	// the result
+	tb_database_mysql_result_t 			result;
+
 	// the database
 	MYSQL* 								database;
 
-	// the result
-	tb_database_mysql_result_t 			result;
+	// the bind list
+	MYSQL_BIND* 						bind_list;
+
+	// the bind maxn
+	tb_size_t 							bind_maxn;
 
 }tb_database_mysql_t;
 
@@ -281,7 +287,7 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 
 	// init value
 	tb_database_sql_value_name_set(&row->value, (tb_char_t const*)mysql->result.fields[itor].name);
-	tb_database_sql_value_set_text32(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
+	tb_database_sql_value_set_text(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
 
 	// the col item
 	return (tb_pointer_t)&row->value;
@@ -418,6 +424,11 @@ static tb_void_t tb_database_mysql_exit(tb_database_sql_t* database)
 	// close it first
 	tb_database_mysql_clos(database);
 
+	// exit bind list
+	if (mysql->bind_list) tb_free(mysql->bind_list);
+	mysql->bind_list = tb_null;
+	mysql->bind_maxn = 0;
+
 	// exit url
 	tb_url_exit(&database->url);
 
@@ -499,18 +510,193 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 }
 static tb_handle_t tb_database_mysql_stmt_init(tb_database_sql_t* database, tb_char_t const* sql)
 {
-	return tb_null;
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return_val(mysql && mysql->database && sql, tb_null);
+
+	// done
+	tb_bool_t 	ok = tb_false;
+	MYSQL_STMT* stmt = tb_null;
+	do
+	{
+		// init stmt
+		stmt = mysql_stmt_init(mysql->database);
+		if (!stmt)
+		{
+			// trace
+			tb_trace_e("stmt: init: %s failed, error: %s", sql, mysql_error(mysql->database));
+			break;
+		}
+
+		// prepare stmt
+		if (mysql_stmt_prepare(stmt, sql, tb_strlen(sql)))
+		{
+			// trace
+			tb_trace_e("stmt: prepare: %s failed, error: %s", sql, mysql_stmt_error(stmt));
+			break;
+		}
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// exit it
+		if (stmt) mysql_stmt_close(stmt);
+		stmt = tb_null;
+	}
+
+	// ok?
+	return (tb_handle_t)stmt;
 }
 static tb_void_t tb_database_mysql_stmt_exit(tb_database_sql_t* database, tb_handle_t stmt)
 {
+	// exit it
+	if (stmt) mysql_stmt_close((MYSQL_STMT*)stmt);
 }
 static tb_bool_t tb_database_mysql_stmt_done(tb_database_sql_t* database, tb_handle_t stmt)
 {
-	return tb_false;
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return_val(mysql && mysql->database && stmt, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// done stmt
+		if (mysql_stmt_execute((MYSQL_STMT*)stmt))
+		{
+			// trace
+			tb_trace_e("stmt: done failed, error: %s", mysql_stmt_error(stmt));
+			break;
+		}
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
 }
 static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
 {
-	return tb_false;
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return_val(mysql && mysql->database && stmt && list && size, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// check the param count
+		tb_size_t param_count = mysql_stmt_param_count((MYSQL_STMT*)stmt);
+		tb_assert_and_check_break(size <= param_count);
+
+		// make bind list
+		if (!mysql->bind_list)
+		{
+			mysql->bind_maxn = size + 16;
+			mysql->bind_list = (MYSQL_BIND*)tb_nalloc(mysql->bind_maxn, sizeof(MYSQL_BIND));
+		}
+		// grow bind list
+		else if (size > mysql->bind_maxn)
+		{
+			mysql->bind_maxn = size + 16;
+			mysql->bind_list = (MYSQL_BIND*)tb_ralloc(mysql->bind_list, mysql->bind_maxn * sizeof(MYSQL_BIND));
+		}
+
+		// check
+		tb_assert_and_check_break(mysql->bind_list && size <= mysql->bind_maxn);
+
+		// clear bind list
+		tb_memset(mysql->bind_list, 0, mysql->bind_maxn * sizeof(MYSQL_BIND));
+
+		// init bind list
+		tb_size_t i = 0;
+		for (i = 0; i < size; i++)
+		{
+			// the value
+			tb_database_sql_value_t const* value = &list[i];
+			switch (value->type)
+			{
+			case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_STRING;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)tb_database_sql_value_text(value);   
+				mysql->bind_list[i].buffer_length 	= tb_database_sql_value_size(value) + 1;   
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_INT64:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONGLONG;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i64;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_INT32:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONG;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i32;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_INT16:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_SHORT;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i16;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_INT8:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_TINY;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i8;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONG_BLOB;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)tb_database_sql_value_blob(value);   
+				mysql->bind_list[i].buffer_length 	= tb_database_sql_value_size(value);   
+				mysql->bind_list[i].length 			= &mysql->bind_list[i].buffer_length; 
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_BLOB16:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_BLOB;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)tb_database_sql_value_blob(value);   
+				mysql->bind_list[i].buffer_length 	= tb_database_sql_value_size(value);   
+				mysql->bind_list[i].length 			= &mysql->bind_list[i].buffer_length; 
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_TINY_BLOB;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)tb_database_sql_value_blob(value);   
+				mysql->bind_list[i].buffer_length 	= tb_database_sql_value_size(value);   
+				mysql->bind_list[i].length 			= &mysql->bind_list[i].buffer_length; 
+				break;
+#ifdef TB_CONFIG_TYPE_FLOAT
+			case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_FLOAT;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->f;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_DOUBLE;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->d;
+				break;
+#endif
+			case TB_DATABASE_SQL_VALUE_TYPE_NULL:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_NULL;   
+				break;
+			default:
+				tb_trace_e("stmt: bind: unknown value type: %lu", value->type);
+				break;
+			}
+		}
+
+		// bind it
+		if (mysql_stmt_bind_param((MYSQL_STMT*)stmt, mysql->bind_list))
+		{
+			// trace
+			tb_trace_e("stmt: bind failed, error: %s", mysql_stmt_error(stmt));
+			break;
+		}
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

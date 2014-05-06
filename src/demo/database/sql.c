@@ -98,10 +98,12 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 			tb_assert_and_check_break(id);
 			tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(id), tb_database_sql_value_int32(id));
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 			// trace fval
 			tb_database_sql_value_t const* fval = tb_iterator_item(row, 1);
 			tb_assert_and_check_break(fval);
 			tb_tracet_i("[%s:%f] ", tb_database_sql_value_name(fval), tb_database_sql_value_float(fval));
+#endif
 
 			// trace name
 			tb_database_sql_value_t const* name = tb_iterator_item(row, 2);
@@ -154,7 +156,7 @@ static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database
 
 		// bind stmt
 		tb_database_sql_value_t list[4];
-		tb_database_sql_value_set_text8(&list[0], name, 0);
+		tb_database_sql_value_set_text(&list[0], name, 0);
 		tb_database_sql_value_set_blob8(&list[1], (tb_byte_t const*)data, tb_strlen(data) + 1);
 		tb_database_sql_value_set_int32(&list[2], number);
 		tb_database_sql_value_set_int16(&list[3], snumber);
@@ -205,7 +207,8 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 	
 			// done tests 
 			tb_demo_database_sql_test_stmt_done(database, "drop table if exists table2");
-			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber short)");
+//			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber short)");
+			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber smallint)");
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?)", "name1", "data1", 52642, 2642);
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?)", "name2", "data2", 57127, 7127);
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?)", "name3", "data3", 9000, 9000);

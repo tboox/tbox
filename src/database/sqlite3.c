@@ -220,7 +220,7 @@ static tb_pointer_t tb_sqlite3_result_col_iterator_item(tb_iterator_t* iterator,
 	{
 		// init value
 		tb_database_sql_value_name_set(&row->value, (tb_char_t const*)sqlite->result.result[itor]);
-		tb_database_sql_value_set_text32(&row->value, (tb_char_t const*)sqlite->result.result[((1 + sqlite->result.row.row) * row->count) + itor], 0);
+		tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite->result.result[((1 + sqlite->result.row.row) * row->count) + itor], 0);
 		return (tb_pointer_t)&row->value;
 	}
 	// stmt result?
@@ -237,7 +237,7 @@ static tb_pointer_t tb_sqlite3_result_col_iterator_item(tb_iterator_t* iterator,
 			tb_database_sql_value_set_int32(&row->value, sqlite3_column_int(sqlite->result.stmt, itor));
 			break;
 		case SQLITE_TEXT:
-			tb_database_sql_value_set_text32(&row->value, (tb_char_t const*)sqlite3_column_text(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor));
+			tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite3_column_text(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor));
 			break;
 		case SQLITE_FLOAT:
 #ifdef TB_CONFIG_TYPE_FLOAT
@@ -539,9 +539,7 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 		tb_int_t ok = 0;
 		switch (value->type)
 		{
-		case TB_DATABASE_SQL_VALUE_TYPE_TEXT32:
-		case TB_DATABASE_SQL_VALUE_TYPE_TEXT16:
-		case TB_DATABASE_SQL_VALUE_TYPE_TEXT8:
+		case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
 			ok = sqlite3_bind_text((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
 			break;
 		case TB_DATABASE_SQL_VALUE_TYPE_INT64:
@@ -567,7 +565,7 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 			ok = sqlite3_bind_null((sqlite3_stmt*)stmt, (tb_int_t)(i + 1));
 			break;
 		default:
-			tb_trace_e("bind: unknown value type: %lu", value->type);
+			tb_trace_e("stmt: bind: unknown value type: %lu", value->type);
 			break;
 		}
 

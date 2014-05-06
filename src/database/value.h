@@ -44,12 +44,10 @@ typedef enum __tb_database_sql_value_type_e
 ,	TB_DATABASE_SQL_VALUE_TYPE_BLOB8 		= 5
 ,	TB_DATABASE_SQL_VALUE_TYPE_BLOB16 		= 6
 ,	TB_DATABASE_SQL_VALUE_TYPE_BLOB32 		= 7
-,	TB_DATABASE_SQL_VALUE_TYPE_TEXT8 		= 8
-,	TB_DATABASE_SQL_VALUE_TYPE_TEXT16 		= 9
-,	TB_DATABASE_SQL_VALUE_TYPE_TEXT32 		= 10
+,	TB_DATABASE_SQL_VALUE_TYPE_TEXT 		= 8
 #ifdef TB_CONFIG_TYPE_FLOAT
-,	TB_DATABASE_SQL_VALUE_TYPE_FLOAT 		= 11
-,	TB_DATABASE_SQL_VALUE_TYPE_DOUBLE 		= 12
+,	TB_DATABASE_SQL_VALUE_TYPE_FLOAT 		= 9
+,	TB_DATABASE_SQL_VALUE_TYPE_DOUBLE 		= 10
 #endif
 
 }tb_database_sql_value_type_e;
@@ -210,29 +208,13 @@ tb_void_t 			tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_
 tb_void_t 			tb_database_sql_value_set_double(tb_database_sql_value_t* value, tb_double_t number);
 #endif
 
-/*! set the text8 value
+/*! set the text value
  *
  * @param value 	the value
  * @param text 		the text data
  * @param hint 		the text size hint
  */
-tb_void_t 			tb_database_sql_value_set_text8(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
-
-/*! set the text16 value
- *
- * @param value 	the value
- * @param text 		the text data
- * @param hint 		the text size hint
- */
-tb_void_t 			tb_database_sql_value_set_text16(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
-
-/*! set the text32 value
- *
- * @param value 	the value
- * @param text 		the text data
- * @param hint 		the text size hint
- */
-tb_void_t 			tb_database_sql_value_set_text32(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
+tb_void_t 			tb_database_sql_value_set_text(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
 
 /*! set the blob8 value
  *
@@ -265,10 +247,7 @@ tb_void_t 			tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb
 /// the value is text?
 static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_text(tb_database_sql_value_t const* value)
 {
-	return ( 	value 
-			&& 	( 	value->type == TB_DATABASE_SQL_VALUE_TYPE_TEXT32
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_TEXT16
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_TEXT8))? tb_true : tb_false;
+	return (value && value->type == TB_DATABASE_SQL_VALUE_TYPE_TEXT)? tb_true : tb_false;
 }
 
 /// the value is blob?

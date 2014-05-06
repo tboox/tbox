@@ -590,6 +590,7 @@ INC_FILES 				= \
 						database/prefix.h \
 						database/sql.h \
 						database/value.h \
+						database/database.h \
 						zip/prefix.h \
 						zip/zip.h \
 						zip/vlc.h \
