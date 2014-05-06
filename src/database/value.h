@@ -41,14 +41,18 @@ typedef enum __tb_database_sql_value_type_e
 ,	TB_DATABASE_SQL_VALUE_TYPE_INT16 		= 2
 ,	TB_DATABASE_SQL_VALUE_TYPE_INT32 		= 3
 ,	TB_DATABASE_SQL_VALUE_TYPE_INT64 		= 4
-,	TB_DATABASE_SQL_VALUE_TYPE_BLOB8 		= 5
-,	TB_DATABASE_SQL_VALUE_TYPE_BLOB16 		= 6
-,	TB_DATABASE_SQL_VALUE_TYPE_BLOB32 		= 7
-,	TB_DATABASE_SQL_VALUE_TYPE_TEXT 		= 8
+,	TB_DATABASE_SQL_VALUE_TYPE_UINT8 		= 5
+,	TB_DATABASE_SQL_VALUE_TYPE_UINT16 		= 6
+,	TB_DATABASE_SQL_VALUE_TYPE_UINT32 		= 7
+,	TB_DATABASE_SQL_VALUE_TYPE_UINT64 		= 8
 #ifdef TB_CONFIG_TYPE_FLOAT
-,	TB_DATABASE_SQL_VALUE_TYPE_FLOAT 		= 9
-,	TB_DATABASE_SQL_VALUE_TYPE_DOUBLE 		= 10
+,	TB_DATABASE_SQL_VALUE_TYPE_FLOAT 		= 13
+,	TB_DATABASE_SQL_VALUE_TYPE_DOUBLE 		= 14
 #endif
+,	TB_DATABASE_SQL_VALUE_TYPE_BLOB8 		= 9
+,	TB_DATABASE_SQL_VALUE_TYPE_BLOB16 		= 10
+,	TB_DATABASE_SQL_VALUE_TYPE_BLOB32 		= 11
+,	TB_DATABASE_SQL_VALUE_TYPE_TEXT 		= 12
 
 }tb_database_sql_value_type_e;
 
@@ -69,6 +73,12 @@ typedef struct __tb_database_sql_value_t
 		tb_int16_t 				i16;
 		tb_int32_t 				i32;
 		tb_int64_t 				i64;
+
+		// uint
+		tb_uint8_t 				u8;
+		tb_uint16_t 			u16;
+		tb_uint32_t 			u32;
+		tb_uint64_t 			u64;
 
 		// float
 #ifdef TB_CONFIG_TYPE_FLOAT
@@ -139,6 +149,38 @@ tb_int32_t 			tb_database_sql_value_int32(tb_database_sql_value_t const* value);
  */
 tb_int64_t 			tb_database_sql_value_int64(tb_database_sql_value_t const* value);
 
+/*! the uint8 value
+ *
+ * @param value 	the value
+ *
+ * @return 			the uint8 value
+ */
+tb_uint8_t 			tb_database_sql_value_uint8(tb_database_sql_value_t const* value);
+
+/*! the uint16 value
+ *
+ * @param value 	the value
+ *
+ * @return 			the uint16 value
+ */
+tb_uint16_t 		tb_database_sql_value_uint16(tb_database_sql_value_t const* value);
+
+/*! the uint32 value
+ *
+ * @param value 	the value
+ *
+ * @return 			the uint32 value
+ */
+tb_uint32_t 		tb_database_sql_value_uint32(tb_database_sql_value_t const* value);
+
+/*! the uint64 value
+ *
+ * @param value 	the value
+ *
+ * @return 			the uint64 value
+ */
+tb_uint64_t 		tb_database_sql_value_uint64(tb_database_sql_value_t const* value);
+
 #ifdef TB_CONFIG_TYPE_FLOAT
 /*! the float value
  *
@@ -191,6 +233,34 @@ tb_void_t 			tb_database_sql_value_set_int32(tb_database_sql_value_t* value, tb_
  * @param number 	the number
  */
 tb_void_t 			tb_database_sql_value_set_int64(tb_database_sql_value_t* value, tb_int64_t number);
+
+/*! set the uint8 value
+ *
+ * @param value 	the value
+ * @param number 	the number
+ */
+tb_void_t 			tb_database_sql_value_set_uint8(tb_database_sql_value_t* value, tb_uint8_t number);
+
+/*! set the uint16 value
+ *
+ * @param value 	the value
+ * @param number 	the number
+ */
+tb_void_t 			tb_database_sql_value_set_uint16(tb_database_sql_value_t* value, tb_uint16_t number);
+
+/*! set the uint32 value
+ *
+ * @param value 	the value
+ * @param number 	the number
+ */
+tb_void_t 			tb_database_sql_value_set_uint32(tb_database_sql_value_t* value, tb_uint32_t number);
+
+/*! set the uint64 value
+ *
+ * @param value 	the value
+ * @param number 	the number
+ */
+tb_void_t 			tb_database_sql_value_set_uint64(tb_database_sql_value_t* value, tb_uint64_t number);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 /*! set the float value
@@ -262,11 +332,7 @@ static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_blob(tb_database_s
 /// the value is integer?
 static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_integer(tb_database_sql_value_t const* value)
 {
-	return ( 	value 
-			&& 	( 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT32
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT64
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT16
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT8))? tb_true : tb_false;
+	return (value && value->type >= TB_DATABASE_SQL_VALUE_TYPE_INT8 && value->type <= TB_DATABASE_SQL_VALUE_TYPE_UINT64)? tb_true : tb_false;
 }
 
 /// the value is float?
@@ -282,15 +348,7 @@ static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_float(tb_database_
 /// the value is number?
 static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_number(tb_database_sql_value_t const* value)
 {
-	return ( 	value 
-			&& 	( 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT32
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT64
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT16
-#ifdef TB_CONFIG_TYPE_FLOAT
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_FLOAT
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_DOUBLE
-#endif
-				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_INT8))? tb_true : tb_false;
+	return (value && value->type >= TB_DATABASE_SQL_VALUE_TYPE_INT8 && value->type < TB_DATABASE_SQL_VALUE_TYPE_BLOB8)? tb_true : tb_false;
 }
 
 /// the value type

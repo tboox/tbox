@@ -75,8 +75,8 @@ typedef struct __tb_database_mysql_result_t
 	// the row count
 	tb_size_t 							count;
 
-	// load all?
-	tb_bool_t 							ball;
+	// try loading all?
+	tb_bool_t 							try_all;
 
 	// the row
 	tb_database_mysql_result_row_t 		row;
@@ -148,7 +148,7 @@ static tb_size_t tb_mysql_result_row_iterator_head(tb_iterator_t* iterator)
 	tb_assert_return_val(result, 0);
 
 	// not load all? try fetching it
-	if (!result->ball)
+	if (!result->try_all)
 	{
 		// fetch the row
 		result->row.row = mysql_fetch_row(result->result);
@@ -179,7 +179,7 @@ static tb_size_t tb_mysql_result_row_iterator_prev(tb_iterator_t* iterator, tb_s
 	tb_assert_and_check_return_val(itor && itor <= result->count, result->count);
 
 	// load all? 
-	tb_assert_and_check_return_val(result->ball, result->count);
+	tb_assert_and_check_return_val(result->try_all, result->count);
 
 	// prev
 	return itor - 1;
@@ -192,7 +192,7 @@ static tb_size_t tb_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_s
 	tb_assert_and_check_return_val(itor < result->count, result->count);
 
 	// not load all? try fetching it
-	if (!result->ball)
+	if (!result->try_all)
 	{
 		// fetch the row
 		result->row.row = mysql_fetch_row(result->result);
@@ -213,7 +213,7 @@ static tb_pointer_t tb_mysql_result_row_iterator_item(tb_iterator_t* iterator, t
 	tb_assert_and_check_return_val(result && result->result && itor < result->count, tb_null);
 
 	// load all?
-	if (result->ball)
+	if (result->try_all)
 	{
 		// seek to the row number
 		mysql_data_seek(result->result, itor);
@@ -470,7 +470,7 @@ static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_i
 	mysql_result->count = 0;
 	mysql_result->row.count = 0;
 }
-static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database, tb_bool_t ball)
+static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database, tb_bool_t try_all)
 {
 	// check
 	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
@@ -481,7 +481,7 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 	do
 	{
 		// load result
-		mysql->result.result = ball? mysql_store_result(mysql->database) : mysql_use_result(mysql->database);
+		mysql->result.result = try_all? mysql_store_result(mysql->database) : mysql_use_result(mysql->database);
 		tb_check_break(mysql->result.result);
 
 		// load result fields
@@ -489,16 +489,16 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 		tb_assert_and_check_break(mysql->result.fields);
 
 		// save result row count
-		mysql->result.count = ball? (tb_size_t)mysql_num_rows(mysql->result.result) : -1;
+		mysql->result.count = try_all? (tb_size_t)mysql_num_rows(mysql->result.result) : -1;
 
 		// save result col count
 		mysql->result.row.count = (tb_size_t)mysql_num_fields(mysql->result.result);
 
-		// load all?
-		mysql->result.ball = ball;
+		// try loading all?
+		mysql->result.try_all = try_all;
 
 		// init mode
-		mysql->result.itor.mode = (ball? TB_ITERATOR_MODE_RACCESS : TB_ITERATOR_MODE_FORWARD) | TB_ITERATOR_MODE_READONLY;
+		mysql->result.itor.mode = (try_all? TB_ITERATOR_MODE_RACCESS : TB_ITERATOR_MODE_FORWARD) | TB_ITERATOR_MODE_READONLY;
 
 		// ok
 		ok = tb_true;
@@ -644,6 +644,26 @@ static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_han
 			case TB_DATABASE_SQL_VALUE_TYPE_INT8:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_TINY;   
 				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i8;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONGLONG;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u64;
+				mysql->bind_list[i].is_unsigned 	= 1;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONG;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u32;
+				mysql->bind_list[i].is_unsigned 	= 1;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_SHORT;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u16;
+				mysql->bind_list[i].is_unsigned 	= 1;
+				break;
+			case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
+				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_TINY;   
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u8;
+				mysql->bind_list[i].is_unsigned 	= 1;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONG_BLOB;   

@@ -51,18 +51,22 @@ tb_size_t tb_database_sql_value_size(tb_database_sql_value_t const* value)
 	case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
 		return value->blob.size;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT32:
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
 #ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
 #endif
 		return 4;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT64:
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
 #ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
 #endif
 		return 8;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT16:
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
 		return 2;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT8:
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
 		return 1;
 	default:
 		tb_trace_e("unknown type: %lu", value->type);
@@ -88,13 +92,21 @@ tb_int32_t tb_database_sql_value_int32(tb_database_sql_value_t const* value)
 	switch (value->type)
 	{
 	case TB_DATABASE_SQL_VALUE_TYPE_INT32:
-		return value->i32;
+		return (tb_int32_t)value->i32;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT64:
 		return (tb_int32_t)value->i64;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT16:
 		return (tb_int32_t)value->i16;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT8:
 		return (tb_int32_t)value->i8;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
+		return (tb_int32_t)value->u32;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
+		return (tb_int32_t)value->u64;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
+		return (tb_int32_t)value->u16;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
+		return (tb_int32_t)value->u8;
 #ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
 		return (tb_int32_t)value->f;
@@ -119,13 +131,21 @@ tb_int64_t tb_database_sql_value_int64(tb_database_sql_value_t const* value)
 	switch (value->type)
 	{
 	case TB_DATABASE_SQL_VALUE_TYPE_INT64:
-		return value->i64;
+		return (tb_int64_t)value->i64;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT32:
 		return (tb_int64_t)value->i32;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT16:
 		return (tb_int64_t)value->i16;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT8:
 		return (tb_int64_t)value->i8;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
+		return (tb_int64_t)value->u64;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
+		return (tb_int64_t)value->u32;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
+		return (tb_int64_t)value->u16;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
+		return (tb_int64_t)value->u8;
 #ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
 		return (tb_int64_t)value->f;
@@ -134,6 +154,92 @@ tb_int64_t tb_database_sql_value_int64(tb_database_sql_value_t const* value)
 #endif
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
 		return value->text.data? (tb_int64_t)tb_stoi64(value->text.data) : 0;
+	default:
+		tb_trace_e("unknown number type: %lu", value->type);
+		break;
+	}
+
+	return 0;
+}
+tb_uint8_t tb_database_sql_value_uint8(tb_database_sql_value_t const* value)
+{
+	return (tb_uint8_t)tb_database_sql_value_uint32(value);
+}
+tb_uint16_t tb_database_sql_value_uint16(tb_database_sql_value_t const* value)
+{
+	return (tb_uint16_t)tb_database_sql_value_uint32(value);
+}
+tb_uint32_t tb_database_sql_value_uint32(tb_database_sql_value_t const* value)
+{
+	// check
+	tb_assert_and_check_return_val(value, 0);
+
+	// done
+	switch (value->type)
+	{
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
+		return (tb_uint32_t)value->u32;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
+		return (tb_uint32_t)value->u64;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
+		return (tb_uint32_t)value->u16;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
+		return (tb_uint32_t)value->u8;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT32:
+		return (tb_uint32_t)value->i32;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT64:
+		return (tb_uint32_t)value->i64;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT16:
+		return (tb_uint32_t)value->i16;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT8:
+		return (tb_uint32_t)value->i8;
+#ifdef TB_CONFIG_TYPE_FLOAT
+	case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
+		return (tb_uint32_t)value->f;
+	case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
+		return (tb_uint32_t)value->d;
+#endif
+	case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
+		return value->text.data? (tb_uint32_t)tb_stoi32(value->text.data) : 0;
+	default:
+		tb_trace_e("unknown number type: %lu", value->type);
+		break;
+	}
+
+	return 0;
+}
+tb_uint64_t tb_database_sql_value_uint64(tb_database_sql_value_t const* value)
+{
+	// check
+	tb_assert_and_check_return_val(value, 0);
+
+	// done
+	switch (value->type)
+	{
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
+		return (tb_uint64_t)value->u64;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
+		return (tb_uint64_t)value->u32;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
+		return (tb_uint64_t)value->u16;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
+		return (tb_uint64_t)value->u8;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT64:
+		return (tb_uint64_t)value->i64;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT32:
+		return (tb_uint64_t)value->i32;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT16:
+		return (tb_uint64_t)value->i16;
+	case TB_DATABASE_SQL_VALUE_TYPE_INT8:
+		return (tb_uint64_t)value->i8;
+#ifdef TB_CONFIG_TYPE_FLOAT
+	case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
+		return (tb_uint64_t)value->f;
+	case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
+		return (tb_uint64_t)value->d;
+#endif
+	case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
+		return value->text.data? (tb_uint64_t)tb_stou64(value->text.data) : 0;
 	default:
 		tb_trace_e("unknown number type: %lu", value->type);
 		break;
@@ -162,6 +268,14 @@ tb_float_t tb_database_sql_value_float(tb_database_sql_value_t const* value)
 		return (tb_float_t)value->i16;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT8:
 		return (tb_float_t)value->i8;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
+		return (tb_float_t)value->u64;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
+		return (tb_float_t)value->u32;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
+		return (tb_float_t)value->u16;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
+		return (tb_float_t)value->u8;
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
 		return value->text.data? tb_stof(value->text.data) : 0;
 	default:
@@ -191,6 +305,14 @@ tb_double_t tb_database_sql_value_double(tb_database_sql_value_t const* value)
 		return (tb_double_t)value->i16;
 	case TB_DATABASE_SQL_VALUE_TYPE_INT8:
 		return (tb_double_t)value->i8;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
+		return (tb_double_t)value->u64;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
+		return (tb_double_t)value->u32;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
+		return (tb_double_t)value->u16;
+	case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
+		return (tb_double_t)value->u8;
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
 		return value->text.data? tb_stod(value->text.data) : 0;
 	default:
@@ -244,6 +366,42 @@ tb_void_t tb_database_sql_value_set_int64(tb_database_sql_value_t* value, tb_int
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT64;
 	value->i64 			= number;
+}
+tb_void_t tb_database_sql_value_set_uint8(tb_database_sql_value_t* value, tb_uint8_t number)
+{
+	// check
+	tb_assert_and_check_return(value);
+
+	// init number
+	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT8;
+	value->u8 			= number;
+}
+tb_void_t tb_database_sql_value_set_uint16(tb_database_sql_value_t* value, tb_uint16_t number)
+{
+	// check
+	tb_assert_and_check_return(value);
+
+	// init number
+	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT16;
+	value->u16 			= number;
+}
+tb_void_t tb_database_sql_value_set_uint32(tb_database_sql_value_t* value, tb_uint32_t number)
+{
+	// check
+	tb_assert_and_check_return(value);
+
+	// init number
+	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT32;
+	value->u32 			= number;
+}
+tb_void_t tb_database_sql_value_set_uint64(tb_database_sql_value_t* value, tb_uint64_t number)
+{	
+	// check
+	tb_assert_and_check_return(value);
+
+	// init number
+	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT64;
+	value->u64 			= number;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_float_t number)
