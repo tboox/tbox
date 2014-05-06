@@ -70,7 +70,7 @@ typedef struct __tb_database_sql_t
 	tb_bool_t 					(*done)(struct __tb_database_sql_t* database, tb_char_t const* sql);
 
 	/// load result
-	tb_iterator_t* 				(*result_load)(struct __tb_database_sql_t* database, tb_bool_t ball);
+	tb_iterator_t* 				(*result_load)(struct __tb_database_sql_t* database, tb_bool_t try_all);
 
 	/// exit result
 	tb_void_t 					(*result_exit)(struct __tb_database_sql_t* database, tb_iterator_t* result);
@@ -258,11 +258,11 @@ tb_bool_t 			tb_database_sql_done(tb_handle_t database, tb_char_t const* sql);
  * @endcode
  *
  * @param database 	the database handle
- * @param ball 		load all result into memory?
+ * @param try_all 	try loading all result into memory
  *
  * @return 			the database result
  */
-tb_iterator_t* 		tb_database_sql_result_load(tb_handle_t database, tb_bool_t ball);
+tb_iterator_t* 		tb_database_sql_result_load(tb_handle_t database, tb_bool_t try_all);
 
 /*! exit the database result
  *
