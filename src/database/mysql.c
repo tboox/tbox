@@ -66,11 +66,17 @@ typedef struct __tb_database_mysql_result_t
 	// the iterator
 	tb_iterator_t 						itor;
 
+	// the stmt
+	MYSQL_STMT* 						stmt;
+
 	// the result
 	MYSQL_RES* 							result;
 
 	// the fields
 	MYSQL_FIELD* 						fields;
+
+	// the metadata 
+	MYSQL_RES* 							metadata;
 
 	// the row count
 	tb_size_t 							count;
@@ -102,6 +108,11 @@ typedef struct __tb_database_mysql_t
 	tb_size_t 							bind_maxn;
 
 }tb_database_mysql_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_iterator_t* result);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * library implementation
@@ -150,13 +161,24 @@ static tb_size_t tb_mysql_result_row_iterator_head(tb_iterator_t* iterator)
 	// not load all? try fetching it
 	if (!result->try_all)
 	{
-		// fetch the row
-		result->row.row = mysql_fetch_row(result->result);
-		tb_check_return_val(result->row.row, result->count);
+		// fetch stmt
+		if (result->stmt)
+		{
+		}
+		// fetch result
+		else 
+		{
+			// check
+			tb_assert_and_check_return_val(result->result, result->count);
 
-		// fetch the lengths
-		result->row.lengths = mysql_fetch_lengths(result->result);
-		tb_assert_and_check_return_val(result->row.lengths, result->count);
+			// fetch the row
+			result->row.row = mysql_fetch_row(result->result);
+			tb_check_return_val(result->row.row, result->count);
+
+			// fetch the lengths
+			result->row.lengths = mysql_fetch_lengths(result->result);
+			tb_assert_and_check_return_val(result->row.lengths, result->count);
+		}
 	}
 
 	// head
@@ -194,13 +216,24 @@ static tb_size_t tb_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_s
 	// not load all? try fetching it
 	if (!result->try_all)
 	{
-		// fetch the row
-		result->row.row = mysql_fetch_row(result->result);
-		tb_check_return_val(result->row.row, (tb_size_t)-1);
+		// fetch stmt
+		if (result->stmt)
+		{
+		}
+		// fetch result
+		else 
+		{
+			// check
+			tb_assert_and_check_return_val(result->result, result->count);
+			
+			// fetch the row
+			result->row.row = mysql_fetch_row(result->result);
+			tb_check_return_val(result->row.row, result->count);
 
-		// fetch the lengths
-		result->row.lengths = mysql_fetch_lengths(result->result);
-		tb_assert_and_check_return_val(result->row.lengths, (tb_size_t)-1);
+			// fetch the lengths
+			result->row.lengths = mysql_fetch_lengths(result->result);
+			tb_assert_and_check_return_val(result->row.lengths, result->count);
+		}
 	}
 
 	// next
@@ -210,21 +243,42 @@ static tb_pointer_t tb_mysql_result_row_iterator_item(tb_iterator_t* iterator, t
 {
 	// check
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
-	tb_assert_and_check_return_val(result && result->result && itor < result->count, tb_null);
+	tb_assert_and_check_return_val(result && itor < result->count, tb_null);
 
 	// load all?
 	if (result->try_all)
 	{
-		// seek to the row number
-		mysql_data_seek(result->result, itor);
-		
-		// fetch the row
-		result->row.row = mysql_fetch_row(result->result);
-		tb_assert_and_check_return_val(result->row.row, tb_null);
+		// load stmt row
+		if (result->stmt)
+		{
+			// seek to the row number
+			mysql_stmt_data_seek(result->stmt, itor);
 
-		// fetch the lengths
-		result->row.lengths = mysql_fetch_lengths(result->result);
-		tb_assert_and_check_return_val(result->row.lengths, tb_null);
+			// fetch the row
+			if (mysql_stmt_fetch(result->stmt))
+			{
+				// trace
+				tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
+				return tb_null;
+			}
+		}
+		// load result row
+		else
+		{
+			// check
+			tb_assert_and_check_return_val(result->result, tb_null);
+
+			// seek to the row number
+			mysql_data_seek(result->result, itor);
+			
+			// fetch the row
+			result->row.row = mysql_fetch_row(result->result);
+			tb_assert_and_check_return_val(result->row.row, tb_null);
+
+			// fetch the lengths
+			result->row.lengths = mysql_fetch_lengths(result->result);
+			tb_assert_and_check_return_val(result->row.lengths, tb_null);
+		}
 	}
 
 	// the row iterator
@@ -279,15 +333,26 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 {
 	// check
 	tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
-	tb_assert_and_check_return_val(row && row->row && row->lengths && itor < row->count, tb_null);
+	tb_assert_and_check_return_val(row && itor < row->count, tb_null);
 
 	// the mysql
 	tb_database_mysql_t* mysql = (tb_database_mysql_t*)iterator->priv;
-	tb_assert_and_check_return_val(mysql && mysql->result.fields, tb_null);
+	tb_assert_and_check_return_val(mysql, tb_null);
 
-	// init value
-	tb_database_sql_value_name_set(&row->value, (tb_char_t const*)mysql->result.fields[itor].name);
-	tb_database_sql_value_set_text(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
+	// fetch column from stmt
+	if (mysql->result.stmt)
+	{
+	}
+	// fetch column from result
+	else
+	{
+		// check
+		tb_assert_and_check_return_val(mysql->result.fields && row->row && row->lengths, tb_null);
+
+		// init value
+		tb_database_sql_value_name_set(&row->value, (tb_char_t const*)mysql->result.fields[itor].name);
+		tb_database_sql_value_set_text(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
+	}
 
 	// the col item
 	return (tb_pointer_t)&row->value;
@@ -441,6 +506,9 @@ static tb_bool_t tb_database_mysql_done(tb_database_sql_t* database, tb_char_t c
 	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
 	tb_assert_and_check_return_val(mysql && mysql->database && sql, tb_false);
 
+	// exit the last result first
+	tb_database_mysql_result_exit(database, (tb_iterator_t*)&mysql->result);
+
 	// done query
 	if (mysql_query(mysql->database, sql))
 	{
@@ -469,6 +537,137 @@ static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_i
 	// clear result
 	mysql_result->count = 0;
 	mysql_result->row.count = 0;
+
+	// exit metadata
+	if (mysql_result->metadata) mysql_free_result(mysql_result->metadata);
+	mysql_result->metadata = tb_null;
+
+	// clear stmt
+	if (mysql_result->stmt && mysql_result->try_all)
+		mysql_stmt_free_result(mysql_result->stmt);
+	mysql_result->stmt = tb_null;
+
+	// reset try all
+	mysql_result->try_all = tb_false;
+}
+static tb_bool_t tb_database_mysql_result_bind(tb_database_mysql_t* mysql)
+{
+	// check
+	tb_assert_and_check_return_val(mysql && mysql->database && mysql->result.stmt, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// load the field infos
+		mysql->result.metadata = mysql_stmt_result_metadata(mysql->result.stmt);
+		tb_assert_and_check_break(mysql->result.metadata);
+
+		// check the field count
+		tb_size_t field_count = mysql_num_fields(mysql->result.metadata);
+		tb_assert_and_check_break(field_count);
+
+		// load result fields
+		mysql->result.fields = mysql_fetch_fields(mysql->result.metadata);
+		tb_assert_and_check_break(mysql->result.fields);
+
+		// make bind list
+		if (!mysql->bind_list)
+		{
+			mysql->bind_maxn = field_count + 16;
+			mysql->bind_list = (MYSQL_BIND*)tb_nalloc(mysql->bind_maxn, sizeof(MYSQL_BIND));
+		}
+		// grow bind list
+		else if (field_count > mysql->bind_maxn)
+		{
+			mysql->bind_maxn = field_count + 16;
+			mysql->bind_list = (MYSQL_BIND*)tb_ralloc(mysql->bind_list, mysql->bind_maxn * sizeof(MYSQL_BIND));
+		}
+
+		// check
+		tb_assert_and_check_break(mysql->bind_list);
+
+		// clear bind list
+		tb_memset(mysql->bind_list, 0, mysql->bind_maxn * sizeof(MYSQL_BIND));
+
+		// init bind list
+		tb_size_t i = 0;
+		for (i = 0; i < field_count; i++)
+		{
+			// the field
+			MYSQL_FIELD* field = &mysql->result.fields[i];
+
+			// the bind
+			MYSQL_BIND* bind = &mysql->bind_list[i];
+
+			// done
+			switch (field->type)
+			{
+			case FIELD_TYPE_STRING:
+				bind->buffer_type = MYSQL_TYPE_STRING;  
+				break;
+			case FIELD_TYPE_LONG:
+				break;
+			case FIELD_TYPE_LONGLONG:
+				break;
+			case FIELD_TYPE_SHORT:
+				break;
+			case FIELD_TYPE_TINY:
+				break;
+			case FIELD_TYPE_INT24:
+				break;
+			case FIELD_TYPE_BLOB:
+				break;
+#ifdef TB_CONFIG_TYPE_FLOAT
+			case FIELD_TYPE_FLOAT:
+				break;
+			case FIELD_TYPE_DOUBLE:
+				break;
+#endif
+			case FIELD_TYPE_NULL:
+				break;
+			case FIELD_TYPE_DECIMAL:
+			case FIELD_TYPE_TIMESTAMP:
+			case FIELD_TYPE_DATE:
+			case FIELD_TYPE_TIME:
+			case FIELD_TYPE_DATETIME:
+			case FIELD_TYPE_YEAR:
+			case FIELD_TYPE_SET:
+			case FIELD_TYPE_ENUM:
+				tb_trace_e("stmt: bind result: not supported field type: %d", field->type);
+				break;
+			default:
+				tb_trace_e("stmt: bind result: unknown field type: %d", field->type);
+				break;
+			}
+		}
+
+		// bind result
+		if (mysql_stmt_bind_result(mysql->result.stmt, mysql->bind_list))
+		{
+			// trace
+			tb_trace_e("stmt: bind result failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+			break;
+		}
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// exit metadata
+		if (mysql->result.metadata) mysql_free_result(mysql->result.metadata);
+		mysql->result.metadata = tb_null;
+
+		// clear fields
+		mysql->result.fields = tb_null;
+	}
+
+	// ok?
+	return ok;
 }
 static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database, tb_bool_t try_all)
 {
@@ -480,25 +679,60 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 	tb_bool_t ok = tb_false;
 	do
 	{
-		// load result
-		mysql->result.result = try_all? mysql_store_result(mysql->database) : mysql_use_result(mysql->database);
-		tb_check_break(mysql->result.result);
+		// load result from stmt
+		if (mysql->result.stmt)
+		{
+			// load all?
+			if (try_all && mysql_stmt_store_result(mysql->result.stmt))
+			{
+				// trace
+				tb_trace_e("stmt: load all result failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+				break;
+			}
+	
+			// bind result
+			if (!tb_database_mysql_result_bind(mysql)) break;
 
-		// load result fields
-		mysql->result.fields = mysql_fetch_fields(mysql->result.result);
-		tb_assert_and_check_break(mysql->result.fields);
+			// try fetching it
+			if (!try_all)
+			{
+				// TODO
+			}
 
-		// save result row count
-		mysql->result.count = try_all? (tb_size_t)mysql_num_rows(mysql->result.result) : -1;
+			// save result row count
+			mysql->result.count = try_all? (tb_size_t)mysql_stmt_num_rows(mysql->result.stmt) : -1;
 
-		// save result col count
-		mysql->result.row.count = (tb_size_t)mysql_num_fields(mysql->result.result);
+			// save result col count
+			mysql->result.row.count = (tb_size_t)mysql_stmt_field_count(mysql->result.stmt);
 
-		// try loading all?
-		mysql->result.try_all = try_all;
+			// try loading all?
+			mysql->result.try_all = try_all;
 
-		// init mode
-		mysql->result.itor.mode = (try_all? TB_ITERATOR_MODE_RACCESS : TB_ITERATOR_MODE_FORWARD) | TB_ITERATOR_MODE_READONLY;
+			// init mode
+			mysql->result.itor.mode = (try_all? TB_ITERATOR_MODE_RACCESS : TB_ITERATOR_MODE_FORWARD) | TB_ITERATOR_MODE_READONLY;
+		}
+		else
+		{
+			// load result
+			mysql->result.result = try_all? mysql_store_result(mysql->database) : mysql_use_result(mysql->database);
+			tb_check_break(mysql->result.result);
+
+			// load result fields
+			mysql->result.fields = mysql_fetch_fields(mysql->result.result);
+			tb_assert_and_check_break(mysql->result.fields);
+
+			// save result row count
+			mysql->result.count = try_all? (tb_size_t)mysql_num_rows(mysql->result.result) : -1;
+
+			// save result col count
+			mysql->result.row.count = (tb_size_t)mysql_num_fields(mysql->result.result);
+
+			// try loading all?
+			mysql->result.try_all = try_all;
+
+			// init mode
+			mysql->result.itor.mode = (try_all? TB_ITERATOR_MODE_RACCESS : TB_ITERATOR_MODE_FORWARD) | TB_ITERATOR_MODE_READONLY;
+		}
 
 		// ok
 		ok = tb_true;
@@ -567,6 +801,9 @@ static tb_bool_t tb_database_mysql_stmt_done(tb_database_sql_t* database, tb_han
 	tb_bool_t ok = tb_false;
 	do
 	{
+		// exit the last result first
+		tb_database_mysql_result_exit(database, (tb_iterator_t*)&mysql->result);
+
 		// done stmt
 		if (mysql_stmt_execute((MYSQL_STMT*)stmt))
 		{
@@ -574,6 +811,9 @@ static tb_bool_t tb_database_mysql_stmt_done(tb_database_sql_t* database, tb_han
 			tb_trace_e("stmt: done failed, error: %s", mysql_stmt_error(stmt));
 			break;
 		}
+
+		// save stmt
+		mysql->result.stmt = (MYSQL_STMT*)stmt;
 
 		// ok
 		ok = tb_true;

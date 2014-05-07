@@ -89,7 +89,8 @@ ASFLAGS-o 			= -o
 # arflags
 ARFLAGS 			= -cr
 
-# share ldflags
+# shflags
+SHFLAGS_RELEASE 	= -s
 SHFLAGS 			= -shared -Wl,-soname
 
 # include sub-config

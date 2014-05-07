@@ -88,7 +88,8 @@ ASFLAGS-o 			= -o
 # arflags
 ARFLAGS 			= -cr
 
-# share ldflags
+# shflags
+SHFLAGS_RELEASE 	= -s
 SHFLAGS 			= -march=$(ARCH) -shared -Wl,-soname -nostdlib \
 					-L$(NDK)/platforms/android-8/arch-arm/usr/lib/ \
 					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtbegin_so.o \

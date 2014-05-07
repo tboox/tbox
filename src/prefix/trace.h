@@ -35,22 +35,22 @@
 
 // the trace prefix
 #ifndef TB_TRACE_PREFIX 
-# 	define TB_TRACE_PREFIX									tb_null
+# 	define TB_TRACE_PREFIX								tb_null
 #endif
 
 // the trace module name
 #ifndef TB_TRACE_MODULE_NAME
-# 	define TB_TRACE_MODULE_NAME 							tb_null
+# 	define TB_TRACE_MODULE_NAME 						tb_null
 #endif
 
 // the trace module debug
 #ifndef TB_TRACE_MODULE_DEBUG
-# 	define TB_TRACE_MODULE_DEBUG 							(1)
+# 	define TB_TRACE_MODULE_DEBUG 						(1)
 #endif
 
 // the trace debug
 #ifndef TB_TRACE_DEBUG
-# 	define TB_TRACE_DEBUG 									(TB_CONFIG_DEBUG)
+# 	define TB_TRACE_DEBUG 								(TB_CONFIG_DEBUG)
 #endif
 
 // trace prefix
