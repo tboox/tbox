@@ -337,20 +337,101 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 
 	// the mysql
 	tb_database_mysql_t* mysql = (tb_database_mysql_t*)iterator->priv;
-	tb_assert_and_check_return_val(mysql, tb_null);
+	tb_assert_and_check_return_val(mysql && mysql->result.fields, tb_null);
+
+	// the field
+	MYSQL_FIELD* field = &mysql->result.fields[itor];
 
 	// fetch column from stmt
 	if (mysql->result.stmt)
 	{
+		// bind result
+		tb_ulong_t 	length = 0;
+		my_bool 	is_null = 0;
+		tb_byte_t 	buffer[512] = {0};
+		MYSQL_BIND 	result = {0};
+		result.buffer_type 		= field->type;
+		result.length 			= &length;
+		result.buffer 			= (tb_char_t*)buffer;
+		result.buffer_length 	= sizeof(buffer);  
+		result.is_null 			= &is_null;  
+
+		// FIXME: fetch failed? need bind result before doning
+		// fetch column
+		if (mysql_stmt_fetch_column(mysql->result.stmt, &result, itor, 0))
+		{
+			// trace
+			tb_trace_e("stmt: fetch result failed at: %lu, field_type: %d, error: %s", itor, field->type, mysql_stmt_error(mysql->result.stmt));
+			return tb_null;
+		}
+
+		// init value
+		tb_database_sql_value_name_set(&row->value, (tb_char_t const*)mysql->result.fields[itor].name);
+		switch (field->type)
+		{
+		case FIELD_TYPE_STRING:
+			tb_trace_d("string: %s", (tb_char_t const*)result.buffer);
+			tb_database_sql_value_set_text(&row->value, (tb_char_t const*)result.buffer, (tb_size_t)*result.length);
+			break;
+		case FIELD_TYPE_LONG:
+			tb_trace_d("long: %d", *((tb_int32_t const*)result.buffer));
+			tb_database_sql_value_set_int32(&row->value, *((tb_int32_t const*)result.buffer));
+			break;
+		case FIELD_TYPE_LONGLONG:
+			tb_database_sql_value_set_int64(&row->value, *((tb_int64_t const*)result.buffer));
+			break;
+		case FIELD_TYPE_SHORT:
+			tb_database_sql_value_set_int16(&row->value, *((tb_int16_t const*)result.buffer));
+			break;
+		case FIELD_TYPE_TINY:
+			tb_database_sql_value_set_int8(&row->value, *((tb_int8_t const*)result.buffer));
+			break;
+		case FIELD_TYPE_INT24:
+			break;
+		case FIELD_TYPE_BLOB:
+			tb_database_sql_value_set_blob16(&row->value, (tb_byte_t const*)result.buffer, (tb_size_t)*result.length);
+			break;	
+		case FIELD_TYPE_LONG_BLOB:
+		case FIELD_TYPE_MEDIUM_BLOB:
+			tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)result.buffer, (tb_size_t)*result.length);
+			break;
+		case FIELD_TYPE_TINY_BLOB:
+			tb_database_sql_value_set_blob8(&row->value, (tb_byte_t const*)result.buffer, (tb_size_t)*result.length);
+			break;
+#ifdef TB_CONFIG_TYPE_FLOAT
+		case FIELD_TYPE_FLOAT:
+			tb_database_sql_value_set_float(&row->value, *((tb_float_t const*)result.buffer));
+			break;
+		case FIELD_TYPE_DOUBLE:
+			tb_database_sql_value_set_double(&row->value, *((tb_double_t const*)result.buffer));
+			break;
+#endif
+		case FIELD_TYPE_NULL:
+			tb_database_sql_value_set_null(&row->value);
+			break;
+		case FIELD_TYPE_DECIMAL:
+		case FIELD_TYPE_TIMESTAMP:
+		case FIELD_TYPE_DATE:
+		case FIELD_TYPE_TIME:
+		case FIELD_TYPE_DATETIME:
+		case FIELD_TYPE_YEAR:
+		case FIELD_TYPE_SET:
+		case FIELD_TYPE_ENUM:
+			tb_trace_e("stmt: bind result: not supported field type: %d", field->type);
+			return tb_null;
+		default:
+			tb_trace_e("stmt: bind result: unknown field type: %d", field->type);
+			return tb_null;
+		}
 	}
 	// fetch column from result
 	else
 	{
 		// check
-		tb_assert_and_check_return_val(mysql->result.fields && row->row && row->lengths, tb_null);
+		tb_assert_and_check_return_val(row->row && row->lengths, tb_null);
 
 		// init value
-		tb_database_sql_value_name_set(&row->value, (tb_char_t const*)mysql->result.fields[itor].name);
+		tb_database_sql_value_name_set(&row->value, (tb_char_t const*)field->name);
 		tb_database_sql_value_set_text(&row->value, (tb_char_t const*)row->row[itor], (tb_size_t)row->lengths[itor]);
 	}
 
@@ -550,125 +631,6 @@ static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_i
 	// reset try all
 	mysql_result->try_all = tb_false;
 }
-static tb_bool_t tb_database_mysql_result_bind(tb_database_mysql_t* mysql)
-{
-	// check
-	tb_assert_and_check_return_val(mysql && mysql->database && mysql->result.stmt, tb_false);
-
-	// done
-	tb_bool_t ok = tb_false;
-	do
-	{
-		// load the field infos
-		mysql->result.metadata = mysql_stmt_result_metadata(mysql->result.stmt);
-		tb_assert_and_check_break(mysql->result.metadata);
-
-		// check the field count
-		tb_size_t field_count = mysql_num_fields(mysql->result.metadata);
-		tb_assert_and_check_break(field_count);
-
-		// load result fields
-		mysql->result.fields = mysql_fetch_fields(mysql->result.metadata);
-		tb_assert_and_check_break(mysql->result.fields);
-
-		// make bind list
-		if (!mysql->bind_list)
-		{
-			mysql->bind_maxn = field_count + 16;
-			mysql->bind_list = (MYSQL_BIND*)tb_nalloc(mysql->bind_maxn, sizeof(MYSQL_BIND));
-		}
-		// grow bind list
-		else if (field_count > mysql->bind_maxn)
-		{
-			mysql->bind_maxn = field_count + 16;
-			mysql->bind_list = (MYSQL_BIND*)tb_ralloc(mysql->bind_list, mysql->bind_maxn * sizeof(MYSQL_BIND));
-		}
-
-		// check
-		tb_assert_and_check_break(mysql->bind_list);
-
-		// clear bind list
-		tb_memset(mysql->bind_list, 0, mysql->bind_maxn * sizeof(MYSQL_BIND));
-
-		// init bind list
-		tb_size_t i = 0;
-		for (i = 0; i < field_count; i++)
-		{
-			// the field
-			MYSQL_FIELD* field = &mysql->result.fields[i];
-
-			// the bind
-			MYSQL_BIND* bind = &mysql->bind_list[i];
-
-			// done
-			switch (field->type)
-			{
-			case FIELD_TYPE_STRING:
-				bind->buffer_type = MYSQL_TYPE_STRING;  
-				break;
-			case FIELD_TYPE_LONG:
-				break;
-			case FIELD_TYPE_LONGLONG:
-				break;
-			case FIELD_TYPE_SHORT:
-				break;
-			case FIELD_TYPE_TINY:
-				break;
-			case FIELD_TYPE_INT24:
-				break;
-			case FIELD_TYPE_BLOB:
-				break;
-#ifdef TB_CONFIG_TYPE_FLOAT
-			case FIELD_TYPE_FLOAT:
-				break;
-			case FIELD_TYPE_DOUBLE:
-				break;
-#endif
-			case FIELD_TYPE_NULL:
-				break;
-			case FIELD_TYPE_DECIMAL:
-			case FIELD_TYPE_TIMESTAMP:
-			case FIELD_TYPE_DATE:
-			case FIELD_TYPE_TIME:
-			case FIELD_TYPE_DATETIME:
-			case FIELD_TYPE_YEAR:
-			case FIELD_TYPE_SET:
-			case FIELD_TYPE_ENUM:
-				tb_trace_e("stmt: bind result: not supported field type: %d", field->type);
-				break;
-			default:
-				tb_trace_e("stmt: bind result: unknown field type: %d", field->type);
-				break;
-			}
-		}
-
-		// bind result
-		if (mysql_stmt_bind_result(mysql->result.stmt, mysql->bind_list))
-		{
-			// trace
-			tb_trace_e("stmt: bind result failed, error: %s", mysql_stmt_error(mysql->result.stmt));
-			break;
-		}
-
-		// ok
-		ok = tb_true;
-
-	} while (0);
-
-	// failed?
-	if (!ok)
-	{
-		// exit metadata
-		if (mysql->result.metadata) mysql_free_result(mysql->result.metadata);
-		mysql->result.metadata = tb_null;
-
-		// clear fields
-		mysql->result.fields = tb_null;
-	}
-
-	// ok?
-	return ok;
-}
 static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database, tb_bool_t try_all)
 {
 	// check
@@ -682,6 +644,14 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 		// load result from stmt
 		if (mysql->result.stmt)
 		{
+			// load the field infos
+			mysql->result.metadata = mysql_stmt_result_metadata(mysql->result.stmt);
+			tb_check_break(mysql->result.metadata);
+
+			// load result fields
+			mysql->result.fields = mysql_fetch_fields(mysql->result.metadata);
+			tb_assert_and_check_break(mysql->result.fields);
+
 			// load all?
 			if (try_all && mysql_stmt_store_result(mysql->result.stmt))
 			{
@@ -689,9 +659,6 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 				tb_trace_e("stmt: load all result failed, error: %s", mysql_stmt_error(mysql->result.stmt));
 				break;
 			}
-	
-			// bind result
-			if (!tb_database_mysql_result_bind(mysql)) break;
 
 			// try fetching it
 			if (!try_all)
@@ -738,6 +705,17 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 		ok = tb_true;
 
 	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// exit metadata
+		if (mysql->result.metadata) mysql_free_result(mysql->result.metadata);
+		mysql->result.metadata = tb_null;
+
+		// clear fields
+		mysql->result.fields = tb_null;
+	}
 
 	// ok?
 	return ok? (tb_iterator_t*)&mysql->result : tb_null;
