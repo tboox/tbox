@@ -207,7 +207,6 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 	
 			// done tests 
 			tb_demo_database_sql_test_stmt_done(database, "drop table if exists table2");
-//			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber short)");
 			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber smallint)");
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?)", "name1", "blob_data1", 52642, 2642);
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?)", "name2", "blob_data2", 57127, 7127);

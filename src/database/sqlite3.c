@@ -540,7 +540,7 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 		switch (value->type)
 		{
 		case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
-			ok = sqlite3_bind_text((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
+			ok = sqlite3_bind_text((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->u.text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
 			break;
 		case TB_DATABASE_SQL_VALUE_TYPE_INT64:
 		case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
@@ -557,7 +557,7 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 		case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
 		case TB_DATABASE_SQL_VALUE_TYPE_BLOB16:
 		case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
-			ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->blob.data, (tb_int_t)value->blob.size, tb_null);
+			ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
 			break;
 #ifdef TB_CONFIG_TYPE_FLOAT
 		case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:

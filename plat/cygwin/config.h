@@ -12,6 +12,11 @@
 
 // os
 #define TB_CONFIG_OS_WINDOWS
+//#define TB_CONFIG_OS_LIKE_UNIX
+
+// api
+#define TB_CONFIG_API_HAVE_POSIX
+//#define TB_CONFIG_API_HAVE_SYSTEMV
 
 // assembler
 #if defined(_MSC_VER)
@@ -28,17 +33,6 @@
 
 // exception
 #define TB_CONFIG_EXCEPTION_ENABLE
-
-// semaphore
-#define TB_CONFIG_SEMAPHORE_HAVE_POSIX
-//#define TB_CONFIG_SEMAPHORE_HAVE_SYSTEMV
-
-// asio
-#define TB_CONFIG_ASIO_HAVE_SELECT
-//#define TB_CONFIG_ASIO_HAVE_EPOLL
-#define TB_CONFIG_ASIO_HAVE_POLL
-//#define TB_CONFIG_ASIO_HAVE_PORT
-//#define TB_CONFIG_ASIO_HAVE_KQUEUE
 
 // libc
 #define TB_CONFIG_LIBC_HAVE_MEMCPY

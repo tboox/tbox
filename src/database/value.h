@@ -101,7 +101,8 @@ typedef struct __tb_database_sql_value_t
 			tb_size_t 			hint;
 
 		} 						text;
-	};	
+
+	}u;	
 
 }tb_database_sql_value_t;
 
@@ -378,9 +379,9 @@ static __tb_inline_force__ tb_char_t const* tb_database_sql_value_text(tb_databa
 	tb_assert_and_check_return_val(value, tb_null);
 
 	// is text?
-	if (tb_database_sql_value_is_text(value)) return value->text.data;
+	if (tb_database_sql_value_is_text(value)) return value->u.text.data;
 	// is blob?
-	else if (tb_database_sql_value_is_blob(value)) return (tb_char_t const*)value->blob.data;
+	else if (tb_database_sql_value_is_blob(value)) return (tb_char_t const*)value->u.blob.data;
 	
 	// failed
 	tb_assert(0);
@@ -394,9 +395,9 @@ static __tb_inline_force__ tb_byte_t const* tb_database_sql_value_blob(tb_databa
 	tb_assert_and_check_return_val(value, tb_null);
 
 	// is blob?
-	if (tb_database_sql_value_is_blob(value)) return value->blob.data;
+	if (tb_database_sql_value_is_blob(value)) return value->u.blob.data;
 	// is text?
-	else if (tb_database_sql_value_is_text(value)) return (tb_byte_t const*)value->text.data;
+	else if (tb_database_sql_value_is_text(value)) return (tb_byte_t const*)value->u.text.data;
 
 	// failed
 	tb_assert(0);

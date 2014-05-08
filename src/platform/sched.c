@@ -32,6 +32,8 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 # 	include "windows/sched.c"
+#elif defined(TB_CONFIG_API_HAVE_POSIX)
+# 	include "posix/sched.c"
 #else
-# 	include "unix/sched.c"
+# 	error not supported
 #endif

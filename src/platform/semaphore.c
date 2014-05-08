@@ -18,12 +18,13 @@
  *
  * @author		ruki
  * @file		semaphore.c
- *
+ * @ingroup 	platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "semaphore.h"
 #include "time.h"
 #include "ctime.h"
 #include "atomic.h"
@@ -31,6 +32,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+#if defined(TB_CONFIG_OS_WINDOWS)
+# 	include "windows/semaphore.c"
+#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+# 	include "mach/semaphore.c"
+#elif defined(TB_CONFIG_API_HAVE_POSIX)
+# 	include "posix/semaphore.c"
+#elif defined(TB_CONFIG_API_HAVE_SYSTEMV)
+# 	include "systemv/semaphore.c"
+#else 
 tb_handle_t tb_semaphore_init(tb_size_t init)
 {
 	// make
@@ -120,4 +130,5 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 
 	return r;
 }
+#endif
 
