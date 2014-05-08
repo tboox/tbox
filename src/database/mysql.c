@@ -367,11 +367,9 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 		switch (result->buffer_type)
 		{
 		case MYSQL_TYPE_STRING:
-			tb_trace_d("string: %s", (tb_char_t const*)result->buffer);
 			tb_database_sql_value_set_text(&row->value, (tb_char_t const*)result->buffer, (tb_size_t)*result->length);
 			break;
 		case MYSQL_TYPE_LONG:
-			tb_trace_d("long: %d", *((tb_int32_t const*)result->buffer));
 			tb_database_sql_value_set_int32(&row->value, *((tb_int32_t const*)result->buffer));
 			break;
 		case MYSQL_TYPE_LONGLONG:
@@ -384,9 +382,9 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 			tb_database_sql_value_set_int8(&row->value, *((tb_int8_t const*)result->buffer));
 			break;
 		case MYSQL_TYPE_INT24:
+			tb_database_sql_value_set_int32(&row->value, tb_bits_get_s24_ne((tb_byte_t const*)result->buffer));
 			break;
 		case MYSQL_TYPE_BLOB:
-			tb_trace_d("blob: %lu", (tb_size_t)*result->length);
 			tb_database_sql_value_set_blob16(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);
 			break;	
 		case MYSQL_TYPE_LONG_BLOB:
@@ -645,29 +643,29 @@ static tb_size_t tb_database_mysql_result_type_size(tb_size_t type)
 	tb_size_t size = 0;
 	switch (type)
 	{
-	case FIELD_TYPE_STRING: 		size = 1024; 	break;
-	case FIELD_TYPE_LONG: 			size = 4; 		break;
-	case FIELD_TYPE_LONGLONG: 		size = 8; 		break;
-	case FIELD_TYPE_SHORT: 			size = 2; 		break;
-	case FIELD_TYPE_TINY: 			size = 1; 		break;
-	case FIELD_TYPE_INT24: 			size = 3; 		break;
-	case FIELD_TYPE_BLOB:
-	case FIELD_TYPE_MEDIUM_BLOB: 	size = 8192; 	break;
-	case FIELD_TYPE_LONG_BLOB: 		size = 65536; 	break;
-	case FIELD_TYPE_TINY_BLOB: 		size = 256; 	break;
+	case MYSQL_TYPE_STRING: 		size = 1024; 	break;
+	case MYSQL_TYPE_LONG: 			size = 4; 		break;
+	case MYSQL_TYPE_LONGLONG: 		size = 8; 		break;
+	case MYSQL_TYPE_SHORT: 			size = 2; 		break;
+	case MYSQL_TYPE_TINY: 			size = 1; 		break;
+	case MYSQL_TYPE_INT24: 			size = 3; 		break;
+	case MYSQL_TYPE_BLOB:
+	case MYSQL_TYPE_MEDIUM_BLOB: 	size = 8192; 	break;
+	case MYSQL_TYPE_LONG_BLOB: 		size = 65536; 	break;
+	case MYSQL_TYPE_TINY_BLOB: 		size = 256; 	break;
 #ifdef TB_CONFIG_TYPE_FLOAT
-	case FIELD_TYPE_FLOAT: 			size = 4; 		break;
-	case FIELD_TYPE_DOUBLE: 		size = 8; 		break;
+	case MYSQL_TYPE_FLOAT: 			size = 4; 		break;
+	case MYSQL_TYPE_DOUBLE: 		size = 8; 		break;
 #endif
-	case FIELD_TYPE_NULL: 							break;
-	case FIELD_TYPE_DECIMAL:
-	case FIELD_TYPE_TIMESTAMP:
-	case FIELD_TYPE_DATE:
-	case FIELD_TYPE_TIME:
-	case FIELD_TYPE_DATETIME:
-	case FIELD_TYPE_YEAR:
-	case FIELD_TYPE_SET:
-	case FIELD_TYPE_ENUM:
+	case MYSQL_TYPE_NULL: 							break;
+	case MYSQL_TYPE_DECIMAL:
+	case MYSQL_TYPE_TIMESTAMP:
+	case MYSQL_TYPE_DATE:
+	case MYSQL_TYPE_TIME:
+	case MYSQL_TYPE_DATETIME:
+	case MYSQL_TYPE_YEAR:
+	case MYSQL_TYPE_SET:
+	case MYSQL_TYPE_ENUM:
 		tb_trace_e("not supported field type: %d", type);
 		break;
 	default:
