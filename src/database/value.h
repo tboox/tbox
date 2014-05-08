@@ -375,20 +375,32 @@ static __tb_inline_force__ tb_char_t const* tb_database_sql_value_name(tb_databa
 static __tb_inline_force__ tb_char_t const* tb_database_sql_value_text(tb_database_sql_value_t const* value)
 {
 	// check
-	tb_assert_and_check_return_val(tb_database_sql_value_is_text(value), tb_null);
+	tb_assert_and_check_return_val(value, tb_null);
 
-	// the text data
-	return value->text.data;
+	// is text?
+	if (tb_database_sql_value_is_text(value)) return value->text.data;
+	// is blob?
+	else if (tb_database_sql_value_is_blob(value)) return (tb_char_t const*)value->blob.data;
+	
+	// failed
+	tb_assert(0);
+	return tb_null;
 }
 
 /// the value blob data
 static __tb_inline_force__ tb_byte_t const* tb_database_sql_value_blob(tb_database_sql_value_t const* value)
 {
 	// check
-	tb_assert_and_check_return_val(tb_database_sql_value_is_blob(value), tb_null);
+	tb_assert_and_check_return_val(value, tb_null);
 
-	// the blob data
-	return value->blob.data;
+	// is blob?
+	if (tb_database_sql_value_is_blob(value)) return value->blob.data;
+	// is text?
+	else if (tb_database_sql_value_is_text(value)) return (tb_byte_t const*)value->text.data;
+
+	// failed
+	tb_assert(0);
+	return tb_null;
 }
 
 /// set the value name

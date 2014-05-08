@@ -167,6 +167,28 @@ static tb_size_t tb_mysql_result_row_iterator_head(tb_iterator_t* iterator)
 		// fetch stmt
 		if (result->stmt)
 		{
+			// fetch the row
+			tb_int_t ok = 0;
+			if ((ok = mysql_stmt_fetch(result->stmt)))
+			{
+				// error?
+				if (ok == 1)
+				{
+					// trace
+					tb_trace_e("stmt: fetch row head failed, error: %s", mysql_stmt_error(result->stmt));
+					return result->count;
+				}
+				// end?
+				else if (ok == MYSQL_NO_DATA) return result->count;
+				// truncated?
+				else if (ok == MYSQL_DATA_TRUNCATED)
+				{
+					// trace
+					tb_trace_d("truncated!");
+
+					// TODO: ..
+				}
+			}
 		}
 		// fetch result
 		else 
@@ -222,6 +244,28 @@ static tb_size_t tb_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_s
 		// fetch stmt
 		if (result->stmt)
 		{
+			// fetch the row
+			tb_int_t ok = 0;
+			if ((ok = mysql_stmt_fetch(result->stmt)))
+			{
+				// error?
+				if (ok == 1)
+				{
+					// trace
+					tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
+					return result->count;
+				}
+				// end?
+				else if (ok == MYSQL_NO_DATA) return result->count;
+				// truncated?
+				else if (ok == MYSQL_DATA_TRUNCATED)
+				{
+					// trace
+					tb_trace_d("truncated!");
+
+					// TODO: ..
+				}
+			}
 		}
 		// fetch result
 		else 
@@ -864,12 +908,6 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 		{
 			// bind result
 			if (!tb_database_mysql_result_bind(mysql, try_all)) break;
-
-			// try fetching it
-			if (!try_all)
-			{
-				// TODO
-			}
 		}
 		else
 		{
