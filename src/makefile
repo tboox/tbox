@@ -211,30 +211,30 @@ tbox_C_FILES 			+= \
 						platform/api \
 						platform/dns \
 						platform/path \
+						platform/file \
+						platform/time \
 						platform/ctime \
 						platform/sched \
 						platform/timer \
 						platform/ltimer \
+						platform/print \
+						platform/mutex \
+						platform/event \
+						platform/socket \
+						platform/thread \
+						platform/memory \
+						platform/process \
+						platform/dynamic \
 						platform/atomic64 \
 						platform/platform \
+						platform/hostname \
+						platform/directory \
+						platform/semaphore \
 						platform/backtrace \
 						platform/thread_pool \
 						platform/thread_store \
-						platform/$(TB_CONFIG_API_DLL)/dynamic \
-						platform/$(TB_CONFIG_API_FILE)/file \
-						platform/$(TB_CONFIG_API_UTIL)/utils \
-						platform/$(TB_CONFIG_API_MUTX)/mutex \
-						platform/$(TB_CONFIG_API_SOCK)/socket \
-						platform/$(TB_CONFIG_API_THRD)/thread \
-						platform/$(TB_CONFIG_API_EVENT)/event \
-						platform/$(TB_CONFIG_API_MEMORY)/memory \
-						platform/$(TB_CONFIG_API_SEMAPHORE)/semaphore \
-						platform/$(TB_CONFIG_API_TIME)/time \
-						platform/$(TB_CONFIG_API_PRINT)/print \
-						platform/$(TB_CONFIG_API_FILE)/directory \
-						platform/$(TB_CONFIG_API_PROCESS)/process \
-						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aioo \
-						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aiop 
+						platform/asio/aioo \
+						platform/asio/aiop 
 
 
 # arm
@@ -282,7 +282,7 @@ tbox_C_FILES 			+= \
 						stream/async_stream/sock \
 						stream/async_stream/filter \
 						stream/transfer_pool \
-						platform/$(TB_CONFIG_API_ASIO)/asio/proactor/aicp
+						platform/asio/aicp
 
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
 						asio/ssl 
@@ -463,7 +463,6 @@ INC_FILES 				= \
 						platform/time.h \
 						platform/ctime.h \
 						platform/sched.h \
-						platform/utils.h \
 						platform/mutex.h \
 						platform/timer.h \
 						platform/ltimer.h \
@@ -476,6 +475,7 @@ INC_FILES 				= \
 						platform/barrier.h \
 						platform/dynamic.h \
 						platform/process.h \
+						platform/hostname.h \
 						platform/spinlock.h \
 						platform/atomic64.h \
 						platform/directory.h \
@@ -507,8 +507,8 @@ INC_FILES 				= \
 						platform/windows/barrier.h \
 						platform/windows/atomic64.h \
 						platform/windows/exception.h \
-						platform/unix/prefix.h \
-						platform/unix/exception.h \
+						platform/libc/prefix.h \
+						platform/libc/exception.h \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \

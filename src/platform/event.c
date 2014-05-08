@@ -18,12 +18,14 @@
  *
  * @author		ruki
  * @file		event.c
+ * @ingroup 	platform
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "event.h"
 #include "time.h"
 #include "ctime.h"
 #include "atomic.h"
@@ -31,6 +33,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+#if defined(TB_CONFIG_OS_WINDOWS)
+# 	include "windows/event.c"
+#elif defined(TB_CONFIG_API_HAVE_POSIX)
+# 	include "posix/event.c"
+#else 
 tb_handle_t tb_event_init()
 {
 	return tb_malloc0(sizeof(tb_atomic_t));
@@ -95,4 +102,5 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 
 	return r;
 }
+#endif
 

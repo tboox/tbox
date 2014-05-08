@@ -1076,38 +1076,38 @@ static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_han
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_INT64:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONGLONG;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i64;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.i64;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_INT32:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONG;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i32;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.i32;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_INT16:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_SHORT;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i16;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.i16;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_INT8:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_TINY;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->i8;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.i8;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONGLONG;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u64;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.u64;
 				mysql->bind_list[i].is_unsigned 	= 1;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_LONG;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u32;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.u32;
 				mysql->bind_list[i].is_unsigned 	= 1;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_SHORT;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u16;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.u16;
 				mysql->bind_list[i].is_unsigned 	= 1;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_TINY;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u8;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.u8;
 				mysql->bind_list[i].is_unsigned 	= 1;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
@@ -1131,11 +1131,11 @@ static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_han
 #ifdef TB_CONFIG_TYPE_FLOAT
 			case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_FLOAT;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->f;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.f;
 				break;
 			case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
 				mysql->bind_list[i].buffer_type 	= MYSQL_TYPE_DOUBLE;   
-				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->d;
+				mysql->bind_list[i].buffer 			= (tb_char_t*)&value->u.d;
 				break;
 #endif
 			case TB_DATABASE_SQL_VALUE_TYPE_NULL:

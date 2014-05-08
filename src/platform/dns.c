@@ -32,9 +32,22 @@
  * includes
  */
 #include "dns.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
 #if defined(TB_CONFIG_OS_WINDOWS)
 # 	include "windows/dns.c"
-#else
+#elif defined(TB_CONFIG_OS_LIKE_UNIX)
 # 	include "unix/dns.c"
+#else
+tb_bool_t tb_dns_init()
+{
+	tb_trace_noimpl();
+	return tb_true;
+}
+tb_void_t tb_dns_exit()
+{
+}
 #endif
 
