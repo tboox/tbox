@@ -79,8 +79,8 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 		}
 
 		// load result
-		tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
-//		tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+//		tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
+		tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
 		tb_check_break(result);
 
 		// trace
@@ -208,7 +208,7 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 			// done tests 
 			tb_demo_database_sql_test_stmt_done(database, "drop table if exists table2");
 //			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber short)");
-			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name char(10), data blob, number int, snumber smallint)");
+			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber smallint)");
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?)", "name1", "blob_data1", 52642, 2642);
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?)", "name2", "blob_data2", 57127, 7127);
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?)", "name3", "blob_data3", 9000, 9000);
