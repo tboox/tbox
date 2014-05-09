@@ -249,7 +249,7 @@ static tb_pointer_t tb_sqlite3_result_col_iterator_item(tb_iterator_t* iterator,
 			return tb_null;
 #endif
 		case SQLITE_BLOB:
-			tb_database_sql_value_set_blob32(&row->value, sqlite3_column_blob(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor));
+			tb_database_sql_value_set_blob32(&row->value, sqlite3_column_blob(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor), tb_null);
 			break;
 		case SQLITE_NULL:
 			tb_database_sql_value_set_null(&row->value);
@@ -522,11 +522,23 @@ static tb_bool_t tb_database_sqlite3_stmt_done(tb_database_sql_t* database, tb_h
 	// ok?
 	return ok;
 }
+static tb_void_t tb_database_sqlite3_stmt_bind_exit(tb_pointer_t data)
+{
+	// trace
+	tb_trace_d("bind: exit: %p", data);
+
+	// exit it
+	if (data) tb_free(data);
+}
 static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
 {
 	// check
 	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
 	tb_assert_and_check_return_val(sqlite && sqlite->database && stmt && list && size, tb_false);
+
+	// the param count
+	tb_size_t param_count = (tb_size_t)sqlite3_bind_parameter_count((sqlite3_stmt*)stmt);
+	tb_assert_and_check_return_val(size == param_count, tb_false);
 
 	// walk
 	tb_size_t i = 0;
@@ -536,7 +548,8 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 		tb_database_sql_value_t const* value = &list[i];
 
 		// done
-		tb_int_t ok = 0;
+		tb_int_t 	ok = SQLITE_ERROR;
+		tb_byte_t* 	data = tb_null;
 		switch (value->type)
 		{
 		case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
@@ -554,10 +567,35 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 		case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
 			ok = sqlite3_bind_int((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), (tb_int_t)tb_database_sql_value_int32(value));
 			break;
-		case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
 		case TB_DATABASE_SQL_VALUE_TYPE_BLOB16:
 		case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
 			ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
+			break;
+		case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
+			{
+				if (value->u.blob.stream)
+				{
+					// done
+					do
+					{
+						// the stream size
+						tb_hong_t size = tb_stream_size(value->u.blob.stream);
+						tb_assert_and_check_break(size >= 0);
+
+						// make data
+						data = (tb_byte_t*)tb_malloc0(size);
+						tb_assert_and_check_break(data);
+
+						// read data
+						if (!tb_basic_stream_bread(value->u.blob.stream, data, size)) break;
+
+						// bind it
+						ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), data, (tb_int_t)size, tb_database_sqlite3_stmt_bind_exit);
+
+					} while (0);
+				}
+				else ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
+			}
 			break;
 #ifdef TB_CONFIG_TYPE_FLOAT
 		case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
@@ -576,6 +614,10 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 		// failed?
 		if (SQLITE_OK != ok)
 		{
+			// exit data
+			if (data) tb_free(data);
+			data = tb_null;
+
 			// trace
 			tb_trace_e("stmt: bind value[%lu] failed, error: %s", i, sqlite3_errmsg(sqlite->database));
 			break;

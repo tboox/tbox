@@ -32,6 +32,7 @@
  * includes
  */
 #include "value.h"
+#include "../stream/stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -45,7 +46,11 @@ tb_size_t tb_database_sql_value_size(tb_database_sql_value_t const* value)
 	switch (value->type)
 	{
 	case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
-		return value->u.text.hint? value->u.text.hint : (value->u.text.data? tb_strlen(value->u.text.data) : 0);
+		if (!value->u.text.hint && value->u.text.data)
+		{
+			((tb_database_sql_value_t*)value)->u.text.hint = tb_strlen(value->u.text.data);
+		}
+		return value->u.text.hint;
 	case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
 	case TB_DATABASE_SQL_VALUE_TYPE_BLOB16:
 	case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
@@ -338,7 +343,7 @@ tb_void_t tb_database_sql_value_set_int8(tb_database_sql_value_t* value, tb_int8
 
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT8;
-	value->u.i8 			= number;
+	value->u.i8 		= number;
 }
 tb_void_t tb_database_sql_value_set_int16(tb_database_sql_value_t* value, tb_int16_t number)
 {
@@ -347,7 +352,7 @@ tb_void_t tb_database_sql_value_set_int16(tb_database_sql_value_t* value, tb_int
 
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT16;
-	value->u.i16 			= number;
+	value->u.i16 		= number;
 }
 tb_void_t tb_database_sql_value_set_int32(tb_database_sql_value_t* value, tb_int32_t number)
 {
@@ -356,7 +361,7 @@ tb_void_t tb_database_sql_value_set_int32(tb_database_sql_value_t* value, tb_int
 
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT32;
-	value->u.i32 			= number;
+	value->u.i32 		= number;
 }
 tb_void_t tb_database_sql_value_set_int64(tb_database_sql_value_t* value, tb_int64_t number)
 {	
@@ -374,7 +379,7 @@ tb_void_t tb_database_sql_value_set_uint8(tb_database_sql_value_t* value, tb_uin
 
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT8;
-	value->u.u8 			= number;
+	value->u.u8 		= number;
 }
 tb_void_t tb_database_sql_value_set_uint16(tb_database_sql_value_t* value, tb_uint16_t number)
 {
@@ -383,7 +388,7 @@ tb_void_t tb_database_sql_value_set_uint16(tb_database_sql_value_t* value, tb_ui
 
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT16;
-	value->u.u16 			= number;
+	value->u.u16 		= number;
 }
 tb_void_t tb_database_sql_value_set_uint32(tb_database_sql_value_t* value, tb_uint32_t number)
 {
@@ -392,7 +397,7 @@ tb_void_t tb_database_sql_value_set_uint32(tb_database_sql_value_t* value, tb_ui
 
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT32;
-	value->u.u32 			= number;
+	value->u.u32 		= number;
 }
 tb_void_t tb_database_sql_value_set_uint64(tb_database_sql_value_t* value, tb_uint64_t number)
 {	
@@ -401,7 +406,7 @@ tb_void_t tb_database_sql_value_set_uint64(tb_database_sql_value_t* value, tb_ui
 
 	// init number
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_INT64;
-	value->u.u64 			= number;
+	value->u.u64 		= number;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_float_t number)
@@ -426,7 +431,7 @@ tb_void_t tb_database_sql_value_set_double(tb_database_sql_value_t* value, tb_do
 tb_void_t tb_database_sql_value_set_text(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint)
 {
 	// check
-	tb_assert_and_check_return(value && text);
+	tb_assert_and_check_return(value);
 
 	// init text
 	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_TEXT;
@@ -436,12 +441,13 @@ tb_void_t tb_database_sql_value_set_text(tb_database_sql_value_t* value, tb_char
 tb_void_t tb_database_sql_value_set_blob8(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return(value && data);
+	tb_assert_and_check_return(value);
 
 	// init blob
-	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_BLOB8;
-	value->u.blob.data 	= data;
-	value->u.blob.size 	= size;
+	value->type 			= TB_DATABASE_SQL_VALUE_TYPE_BLOB8;
+	value->u.blob.data 		= data;
+	value->u.blob.size 		= size;
+	value->u.blob.stream 	= tb_null;
 
 	// check size
 	tb_assert(tb_database_sql_value_size(value) <= TB_MAXU8);
@@ -449,25 +455,39 @@ tb_void_t tb_database_sql_value_set_blob8(tb_database_sql_value_t* value, tb_byt
 tb_void_t tb_database_sql_value_set_blob16(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return(value && data);
+	tb_assert_and_check_return(value);
 
 	// init blob
-	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_BLOB16;
-	value->u.blob.data 	= data;
-	value->u.blob.size 	= size;
+	value->type 			= TB_DATABASE_SQL_VALUE_TYPE_BLOB16;
+	value->u.blob.data 		= data;
+	value->u.blob.size 		= size;
+	value->u.blob.stream 	= tb_null;
 
 	// check size
 	tb_assert(tb_database_sql_value_size(value) <= TB_MAXU16);
 }
-tb_void_t tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size)
+tb_void_t tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_basic_stream_t* stream)
 {
 	// check
-	tb_assert_and_check_return(value && data);
+	tb_assert_and_check_return(value);
+
+	// check stream
+	tb_hong_t stream_size = 0;
+	if (stream)
+	{
+		// must be opened 
+		tb_assert_and_check_return(tb_stream_is_opened(stream));
+
+		// the stream size
+		stream_size = tb_stream_size(stream);
+		tb_assert_and_check_return(stream_size >= 0);
+	}
 
 	// init blob
-	value->type 		= TB_DATABASE_SQL_VALUE_TYPE_BLOB32;
-	value->u.blob.data 	= data;
-	value->u.blob.size 	= size;
+	value->type 			= TB_DATABASE_SQL_VALUE_TYPE_BLOB32;
+	value->u.blob.data 		= data;
+	value->u.blob.size 		= data? size : stream_size;
+	value->u.blob.stream 	= stream;
 
 	// check size
 	tb_assert(tb_database_sql_value_size(value) <= TB_MAXU32);

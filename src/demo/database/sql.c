@@ -115,13 +115,63 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 			tb_assert_and_check_break(data);
 			tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(data), tb_database_sql_value_blob(data));
 
+			// trace tdata
+			tb_database_sql_value_t const* tdata = tb_iterator_item(row, 4);
+			tb_assert_and_check_break(tdata);
+			tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(tdata), tb_database_sql_value_blob(tdata));
+
+			// trace ldata
+			tb_database_sql_value_t const* ldata = tb_iterator_item(row, 5);
+			tb_assert_and_check_break(ldata);
+			tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(ldata), tb_database_sql_value_blob(ldata));
+
+			// trace ldata2
+			tb_database_sql_value_t const* ldata2 = tb_iterator_item(row, 6);
+			tb_assert_and_check_break(ldata2);
+			{
+				// data?
+				tb_basic_stream_t* 	stream = tb_null;
+				if (tb_database_sql_value_blob(ldata2))
+				{
+					// trace
+					tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), 0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, tb_database_sql_value_blob(ldata2), tb_database_sql_value_size(ldata2)));
+				}
+				// stream?
+				else if ((stream = tb_database_sql_value_blob_stream(ldata2)))
+				{
+					// the stream size
+					tb_hong_t size = tb_stream_size(stream);
+					tb_assert_and_check_break(size >= 0);
+
+					// make data
+					tb_byte_t* data = (tb_byte_t*)tb_malloc0(size);
+					tb_assert_and_check_break(data);
+
+					// read data
+					if (tb_basic_stream_bread(stream, data, size))
+					{
+						// trace
+						tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), 0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, data, size));
+					}
+
+					// exit data
+					tb_free(data);
+				}
+				// null?
+				else
+				{
+					// trace
+					tb_tracet_i("[%s:null] ", tb_database_sql_value_name(ldata2));
+				}
+			}
+
 			// trace number
-			tb_database_sql_value_t const* number = tb_iterator_item(row, 4);
+			tb_database_sql_value_t const* number = tb_iterator_item(row, 7);
 			tb_assert_and_check_break(number);
 			tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(number), tb_database_sql_value_int32(number));
 
 			// trace snumber
-			tb_database_sql_value_t const* snumber = tb_iterator_item(row, 5);
+			tb_database_sql_value_t const* snumber = tb_iterator_item(row, 8);
 			tb_assert_and_check_break(snumber);
 			tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(snumber), tb_database_sql_value_int32(snumber));
 
@@ -137,13 +187,14 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 	// exit stmt
 	if (stmt) tb_database_sql_stmt_exit(database, stmt);
 }
-static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_size_t number, tb_uint16_t snumber)
+static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_char_t const* tdata, tb_char_t const* ldata1, tb_char_t const* ldata2, tb_size_t number, tb_uint16_t snumber)
 {
 	// check
 	tb_assert_and_check_return(database && sql);
 
 	// done
-	tb_handle_t stmt = tb_null;
+	tb_handle_t 		stmt = tb_null;
+	tb_basic_stream_t* 	stream = tb_null;
 	do
 	{
 		// init stmt
@@ -154,12 +205,26 @@ static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database
 			break ;
 		}
 
+		// init stream
+		if (ldata2)
+		{
+			// init it
+			stream = tb_basic_stream_init_from_url(ldata2);
+			tb_assert_and_check_break(stream);
+
+			// open it
+			if (!tb_basic_stream_open(stream)) break;
+		}
+
 		// bind stmt
-		tb_database_sql_value_t list[4];
+		tb_database_sql_value_t list[7];
 		tb_database_sql_value_set_text(&list[0], name, 0);
-		tb_database_sql_value_set_blob8(&list[1], (tb_byte_t const*)data, tb_strlen(data) + 1);
-		tb_database_sql_value_set_int32(&list[2], number);
-		tb_database_sql_value_set_int16(&list[3], snumber);
+		tb_database_sql_value_set_blob16(&list[1], (tb_byte_t const*)data, tb_strlen(data) + 1);
+		tb_database_sql_value_set_blob8(&list[2], (tb_byte_t const*)tdata, tb_strlen(tdata) + 1);
+		tb_database_sql_value_set_blob32(&list[3], (tb_byte_t const*)ldata1, tb_strlen(ldata1) + 1, tb_null);
+		tb_database_sql_value_set_blob32(&list[4], tb_null, 0, stream);
+		tb_database_sql_value_set_int32(&list[5], number);
+		tb_database_sql_value_set_int16(&list[6], snumber);
 		if (!tb_database_sql_stmt_bind(database, stmt, list, tb_arrayn(list)))
 		{
 			// trace
@@ -179,6 +244,9 @@ static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database
 
 	// exit stmt
 	if (stmt) tb_database_sql_stmt_exit(database, stmt);
+
+	// exit stream
+	if (stream) tb_basic_stream_exit(stream);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -207,14 +275,14 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 	
 			// done tests 
 			tb_demo_database_sql_test_stmt_done(database, "drop table if exists table2");
-			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, number int, snumber smallint)");
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?)", "name1", "blob_data1", 52642, 2642);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?)", "name2", "blob_data2", 57127, 7127);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?)", "name3", "blob_data3", 9000, 9000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(4, 3.1415, ?, ?, ?, ?)", "name4", "blob_data4", 29000, 9000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(5, -3.1, ?, ?, ?, ?)", "name5", "blob_data5", 350000, 5000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(6, 3.454, ?, ?, ?, ?)", "name6", "blob_data6", 21000, 1000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?)", "name7", "blob_data7", 21600, 1600);
+			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, tinydata tinyblob, longdata1 longblob, longdata2 longblob, number int, snumber smallint)");
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?, ?, ?, ?)", "name1", "data1", "longdata1", "tinydata1", argv[2], 52642, 2642);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?, ?, ?, ?)", "name2", "data2", "longdata2", "tinydata2", argv[2], 57127, 7127);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?, ?, ?, ?)", "name3", "data3", "longdata3", "tinydata3", argv[2], 9000, 9000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(4, 3.1415, ?, ?, ?, ?, ?, ?, ?)", "name4", "data4", "longdata4", "tinydata4", argv[2], 29000, 9000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(5, -3.1, ?, ?, ?, ?, ?, ?, ?)", "name5", "data5", "longdata5", "tinydata5", argv[2], 350000, 5000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(6, 3.454, ?, ?, ?, ?, ?, ?, ?)", "name6", "data6", "longdata6", "tinydata6", argv[2], 21000, 1000);
+			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?, ?, ?, ?)", "name7", "data7", "longdata7", "tinydata7", argv[2], 21600, 1600);
 			tb_demo_database_sql_test_stmt_done(database, "select * from table2");
 		}
 
