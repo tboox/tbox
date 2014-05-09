@@ -34,6 +34,7 @@
 #include "mysql.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
+#include "../stream/stream.h"
 #include <mysql/mysql.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -203,22 +204,17 @@ static tb_size_t tb_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_s
 			tb_int_t ok = 0;
 			if ((ok = mysql_stmt_fetch(result->stmt)))
 			{
-				// error?
-				if (ok == 1)
+				// end or error?
+				if (ok != MYSQL_DATA_TRUNCATED)
 				{
 					// trace
-					tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
-					return result->count;
-				}
-				// end?
-				else if (ok == MYSQL_NO_DATA) return result->count;
-				// truncated?
-				else if (ok == MYSQL_DATA_TRUNCATED)
-				{
-					// trace
-					tb_trace_d("truncated!");
+					if (ok != MYSQL_NO_DATA)
+					{
+						tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
+					}
 
-					// TODO: ..
+					// end
+					return result->count;
 				}
 			}
 		}
@@ -257,11 +253,19 @@ static tb_pointer_t tb_mysql_result_row_iterator_item(tb_iterator_t* iterator, t
 			mysql_stmt_data_seek(result->stmt, itor);
 
 			// fetch the row
-			if (mysql_stmt_fetch(result->stmt))
+			tb_int_t ok = 0;
+			if ((ok = mysql_stmt_fetch(result->stmt)))
 			{
-				// trace
-				tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
-				return tb_null;
+				// end or error?
+				if (ok != MYSQL_DATA_TRUNCATED)
+				{
+					// trace
+					if (ok != MYSQL_NO_DATA)
+					{
+						tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
+					}
+					return tb_null;
+				}
 			}
 		}
 		// load result row
@@ -383,12 +387,38 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 		case MYSQL_TYPE_INT24:
 			tb_database_sql_value_set_int32(&row->value, tb_bits_get_s24_ne((tb_byte_t const*)result->buffer));
 			break;
+			// note: the field type of text, tinyblob, blob and longblob always be blob
 		case MYSQL_TYPE_BLOB:
-			tb_database_sql_value_set_blob16(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);
+			{
+				// text?
+				if (field->charsetnr != 63)
+				{
+					tb_database_sql_value_set_text(&row->value, (tb_char_t const*)result->buffer, (tb_size_t)*result->length);
+				}
+				// blob?
+				else
+				{
+					// blob8?
+					if ((tb_size_t)*result->length <= TB_MAXU8)
+					{
+						tb_database_sql_value_set_blob8(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);
+					}
+					// blob16?
+					else if ((tb_size_t)*result->length <= TB_MAXU16)
+					{
+						tb_database_sql_value_set_blob16(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);
+					}
+					// blob32?
+					else
+					{
+						tb_trace_d("blob32: %p, %lu %lu", result->buffer, (tb_size_t)*result->length, (tb_size_t)result->buffer_length);
+					}
+				}
+			}
 			break;	
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_MEDIUM_BLOB:
-			tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);
+			tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length, tb_null);
 			break;
 		case MYSQL_TYPE_TINY_BLOB:
 			tb_database_sql_value_set_blob8(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);
@@ -642,14 +672,15 @@ static tb_size_t tb_database_mysql_result_type_size(tb_size_t type)
 	tb_size_t size = 0;
 	switch (type)
 	{
-	case MYSQL_TYPE_STRING: 		size = 1024; 	break;
+	case MYSQL_TYPE_STRING: 		size = 8192; 	break;
 	case MYSQL_TYPE_LONG: 			size = 4; 		break;
 	case MYSQL_TYPE_LONGLONG: 		size = 8; 		break;
 	case MYSQL_TYPE_SHORT: 			size = 2; 		break;
 	case MYSQL_TYPE_TINY: 			size = 1; 		break;
 	case MYSQL_TYPE_INT24: 			size = 3; 		break;
+	// TODO: for text and tinyblob
 	case MYSQL_TYPE_BLOB:
-	case MYSQL_TYPE_MEDIUM_BLOB: 	size = 8192; 	break;
+	case MYSQL_TYPE_MEDIUM_BLOB:
 	case MYSQL_TYPE_LONG_BLOB: 		size = 65536; 	break;
 	case MYSQL_TYPE_TINY_BLOB: 		size = 256; 	break;
 #ifdef TB_CONFIG_TYPE_FLOAT
@@ -871,22 +902,15 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 				tb_int_t ok = 0;
 				if ((ok = mysql_stmt_fetch(mysql->result.stmt)))
 				{
-					// error?
-					if (ok == 1)
+					// end or error?
+					if (ok != MYSQL_DATA_TRUNCATED)
 					{
 						// trace
-						tb_trace_e("stmt: fetch row head failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+						if (ok != MYSQL_NO_DATA)
+						{
+							tb_trace_e("stmt: fetch row head failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+						}
 						break;
-					}
-					// end?
-					else if (ok == MYSQL_NO_DATA) break;
-					// truncated?
-					else if (ok == MYSQL_DATA_TRUNCATED)
-					{
-						// trace
-						tb_trace_d("truncated!");
-
-						// TODO: ..
 					}
 				}
 			}
@@ -1034,7 +1058,7 @@ static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_han
 	{
 		// check the param count
 		tb_size_t param_count = mysql_stmt_param_count((MYSQL_STMT*)stmt);
-		tb_assert_and_check_break(size <= param_count);
+		tb_assert_and_check_break(size == param_count);
 
 		// make bind list
 		if (!mysql->bind_list)
@@ -1145,8 +1169,45 @@ static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_han
 		if (mysql_stmt_bind_param((MYSQL_STMT*)stmt, mysql->bind_list))
 		{
 			// trace
-			tb_trace_e("stmt: bind failed, error: %s", mysql_stmt_error(stmt));
+			tb_trace_e("stmt: bind failed, error: %s", mysql_stmt_error((MYSQL_STMT*)stmt));
 			break;
+		}
+		
+		// send blob32 data
+		tb_byte_t data[TB_BASIC_STREAM_BLOCK_MAXN];
+		for (i = 0; i < size; i++)
+		{
+			// the value
+			tb_database_sql_value_t const* value = &list[i];
+			if (value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB32 && value->u.blob.stream)
+			{
+				// trace
+				tb_trace_d("stmt: bind: send: blob: %lld: ..", tb_stream_size(value->u.blob.stream));
+
+				// done
+				while (!tb_stream_beof(value->u.blob.stream))
+				{
+					// read it
+					tb_long_t real = tb_basic_stream_read(value->u.blob.stream, data, sizeof(data));
+					if (real > 0)
+					{
+						// send it
+						if (mysql_stmt_send_long_data((MYSQL_STMT*)stmt, i, (tb_char_t const*)data, real))
+						{
+							// trace
+							tb_trace_e("stmt: bind: send blob data failed, error: %s", mysql_stmt_error((MYSQL_STMT*)stmt));
+							break;
+						}
+					}
+					else if (!real)
+					{
+						// wait 
+						tb_long_t wait = tb_basic_stream_wait(value->u.blob.stream, TB_BASIC_STREAM_WAIT_READ, tb_stream_timeout(value->u.blob.stream));
+						tb_assert_and_check_break(wait > 0);
+					}
+					else break;
+				}
+			}
 		}
 
 		// ok

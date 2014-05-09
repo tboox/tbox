@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../stream/basic_stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -91,6 +92,9 @@ typedef struct __tb_database_sql_value_t
 		{
 			tb_byte_t const* 	data;
 			tb_size_t 			size;
+
+			// the stream for blob32
+			tb_basic_stream_t* 	stream;
 
 		} 						blob;
 
@@ -308,8 +312,9 @@ tb_void_t 			tb_database_sql_value_set_blob16(tb_database_sql_value_t* value, tb
  * @param value 	the value
  * @param data 		the blob data
  * @param size 		the blob size
+ * @param stream 	the stream, using it if data == null
  */
-tb_void_t 			tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
+tb_void_t 			tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_basic_stream_t* stream);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
@@ -330,6 +335,11 @@ static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_blob(tb_database_s
 				|| 	value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB8))? tb_true : tb_false;
 }
 
+/// the value is blob32?
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_blob32(tb_database_sql_value_t const* value)
+{
+	return (value && value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB32)? tb_true : tb_false;
+}
 /// the value is integer?
 static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_integer(tb_database_sql_value_t const* value)
 {
@@ -379,10 +389,12 @@ static __tb_inline_force__ tb_char_t const* tb_database_sql_value_text(tb_databa
 	tb_assert_and_check_return_val(value, tb_null);
 
 	// is text?
-	if (tb_database_sql_value_is_text(value)) return value->u.text.data;
+	if (tb_database_sql_value_is_text(value)) 
+		return value->u.text.data;
 	// is blob?
-	else if (tb_database_sql_value_is_blob(value)) return (tb_char_t const*)value->u.blob.data;
-	
+	else if (tb_database_sql_value_is_blob(value))
+		return (tb_char_t const*)value->u.blob.data;
+
 	// failed
 	tb_assert(0);
 	return tb_null;
@@ -395,13 +407,25 @@ static __tb_inline_force__ tb_byte_t const* tb_database_sql_value_blob(tb_databa
 	tb_assert_and_check_return_val(value, tb_null);
 
 	// is blob?
-	if (tb_database_sql_value_is_blob(value)) return value->u.blob.data;
+	if (tb_database_sql_value_is_blob(value)) 
+		return value->u.blob.data;
 	// is text?
-	else if (tb_database_sql_value_is_text(value)) return (tb_byte_t const*)value->u.text.data;
+	else if (tb_database_sql_value_is_text(value)) 
+		return (tb_byte_t const*)value->u.text.data;
 
 	// failed
 	tb_assert(0);
 	return tb_null;
+}
+
+/// the value blob stream
+static __tb_inline_force__ tb_basic_stream_t* tb_database_sql_value_blob_stream(tb_database_sql_value_t const* value)
+{
+	// check
+	tb_assert_and_check_return_val(tb_database_sql_value_is_blob(value), tb_null);
+
+	// the blob stream
+	return value->u.blob.stream;
 }
 
 /// set the value name
