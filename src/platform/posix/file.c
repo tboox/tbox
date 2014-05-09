@@ -44,7 +44,6 @@
  * implementation
  */
 
-// file
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
 	// check

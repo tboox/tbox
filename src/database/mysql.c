@@ -161,51 +161,6 @@ static tb_size_t tb_mysql_result_row_iterator_head(tb_iterator_t* iterator)
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
 	tb_assert_return_val(result, 0);
 
-	// not load all? try fetching it
-	if (!result->try_all)
-	{
-		// fetch stmt
-		if (result->stmt)
-		{
-			// fetch the row
-			tb_int_t ok = 0;
-			if ((ok = mysql_stmt_fetch(result->stmt)))
-			{
-				// error?
-				if (ok == 1)
-				{
-					// trace
-					tb_trace_e("stmt: fetch row head failed, error: %s", mysql_stmt_error(result->stmt));
-					return result->count;
-				}
-				// end?
-				else if (ok == MYSQL_NO_DATA) return result->count;
-				// truncated?
-				else if (ok == MYSQL_DATA_TRUNCATED)
-				{
-					// trace
-					tb_trace_d("truncated!");
-
-					// TODO: ..
-				}
-			}
-		}
-		// fetch result
-		else 
-		{
-			// check
-			tb_assert_and_check_return_val(result->result, result->count);
-
-			// fetch the row
-			result->row.row = mysql_fetch_row(result->result);
-			tb_check_return_val(result->row.row, result->count);
-
-			// fetch the lengths
-			result->row.lengths = mysql_fetch_lengths(result->result);
-			tb_assert_and_check_return_val(result->row.lengths, result->count);
-		}
-	}
-
 	// head
 	return 0;
 }
@@ -908,12 +863,51 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 		{
 			// bind result
 			if (!tb_database_mysql_result_bind(mysql, try_all)) break;
+	
+			// try fetching the first result
+			if (!try_all)
+			{
+				// fetch the first row
+				tb_int_t ok = 0;
+				if ((ok = mysql_stmt_fetch(mysql->result.stmt)))
+				{
+					// error?
+					if (ok == 1)
+					{
+						// trace
+						tb_trace_e("stmt: fetch row head failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+						break;
+					}
+					// end?
+					else if (ok == MYSQL_NO_DATA) break;
+					// truncated?
+					else if (ok == MYSQL_DATA_TRUNCATED)
+					{
+						// trace
+						tb_trace_d("truncated!");
+
+						// TODO: ..
+					}
+				}
+			}
 		}
 		else
 		{
 			// load result
 			mysql->result.result = try_all? mysql_store_result(mysql->database) : mysql_use_result(mysql->database);
 			tb_check_break(mysql->result.result);
+
+			// try fetching the first result
+			if (!try_all)
+			{
+				// fetch the first row
+				mysql->result.row.row = mysql_fetch_row(mysql->result.result);
+				tb_check_break(mysql->result.row.row);
+
+				// fetch the first lengths
+				mysql->result.row.lengths = mysql_fetch_lengths(mysql->result.result);
+				tb_assert_and_check_break(mysql->result.row.lengths);
+			}
 
 			// load result fields
 			mysql->result.fields = mysql_fetch_fields(mysql->result.result);

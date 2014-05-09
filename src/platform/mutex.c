@@ -25,6 +25,7 @@
  * includes
  */
 #include "mutex.h"
+#include "spinlock.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -34,5 +35,80 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 # 	include "posix/mutex.c"
 #else
-# 	error not supported
+tb_handle_t tb_mutex_init()
+{
+	// done
+	tb_bool_t 		ok = tb_false;
+	tb_spinlock_t* 	lock = tb_null;
+	do
+	{
+		// make lock
+		lock = (tb_spinlock_t*)tb_malloc0(sizeof(tb_spinlock_t));
+		tb_assert_and_check_break(lock);
+
+		// init lock
+		if (!tb_spinlock_init(lock)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// exit it
+		tb_free(lock);
+		lock = tb_null;
+	}
+
+	// ok?
+	return (tb_handle_t)lock;
+}
+tb_void_t tb_mutex_exit(tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return(handle);
+
+	// exit it
+	tb_spinlock_t* lock = (tb_spinlock_t*)handle;
+	if (pmutex)
+	{
+		// exit lock
+		tb_spinlock_exit(lock);
+
+		// free it
+		tb_free(lock);
+	}
+}
+tb_bool_t tb_mutex_enter(tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(handle, tb_false);
+
+	// enter
+	tb_spinlock_enter((tb_spinlock_t*)handle);
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(handle, tb_false);
+
+	// try to enter
+	return tb_spinlock_enter_try((tb_spinlock_t*)handle);
+}
+tb_bool_t tb_mutex_leave(tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(handle, tb_false);
+
+	// leave
+	tb_spinlock_leave((tb_spinlock_t*)handle);
+
+	// ok
+	return tb_true;
+}
 #endif

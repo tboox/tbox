@@ -34,6 +34,10 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 # 	include "posix/process.c"
 #else
-# 	error not supported
+tb_bool_t tb_process_done(tb_char_t const* line)
+{
+	tb_trace_noimpl();
+	return tb_false;
+}
 #endif
 

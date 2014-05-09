@@ -23,8 +23,8 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
 		}
 
 		// load result
-		tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
-//		tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+//		tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
+		tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
 		tb_check_break(result);
 
 		// trace
