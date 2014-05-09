@@ -18,32 +18,21 @@
  *
  * @author		ruki
  * @file		barrier.h
- * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFORM_BARRIER_H
-#define TB_PLATFORM_BARRIER_H
+#ifndef TB_PLATFORM_MACH_BARRIER_H
+#define TB_PLATFORM_MACH_BARRIER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#if defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-# 	include "mach/barrier.h"
-#elif defined(TB_COMPILER_IS_GCC) \
-	&&	TB_COMPILER_VERSION_BE(4, 1)
-# 	include "compiler/gcc/barrier.h"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-# 	include "windows/barrier.h"
-#endif
-#include "arch/barrier.h"
+#include <libkern/OSAtomic.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * macros
  */
-#ifndef tb_barrier
-# 	define tb_barrier() 		
-#endif
+#define tb_barrier() 		OSMemoryBarrier()
 
 
 #endif

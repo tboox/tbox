@@ -31,7 +31,7 @@ static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t data)
 	tb_trace_i("[loop: %x]: init", self);
 
 	// loop
-	__tb_volatile__ tb_size_t n = 1000000;
+	__tb_volatile__ tb_size_t n = 100000;
 	while (n--)
 	{
 #if defined(TB_TEST_LOCK_MUTEX)
@@ -62,6 +62,9 @@ static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t data)
 		// value++
 		g_value++;
 #endif
+
+		// yield
+		tb_sched_yield();
 	}
 
 	tb_trace_i("[loop: %x]: exit", self);
