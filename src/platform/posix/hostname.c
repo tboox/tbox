@@ -31,7 +31,6 @@
  * implementation
  */
 
-// the host name
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
 {
 	return !gethostname(name, size)? tb_true : tb_false;

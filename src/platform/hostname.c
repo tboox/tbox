@@ -34,5 +34,9 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 # 	include "posix/hostname.c"
 #else
-# 	error not supported
+tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
+{
+	tb_trace_noimpl();
+	return tb_false;
+}
 #endif

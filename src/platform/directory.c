@@ -34,5 +34,33 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 # 	include "posix/directory.c"
 #else
-# 	error not supported
+tb_bool_t tb_directory_create(tb_char_t const* path)
+{
+	tb_trace_noimpl();
+	return tb_false;
+}
+tb_bool_t tb_directory_remove(tb_char_t const* path)
+{
+	tb_trace_noimpl();
+	return tb_false;
+}
+tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
+{
+	tb_trace_noimpl();
+	return 0;
+}
+tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
+{
+	tb_trace_noimpl();
+	return 0;
+}
+tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_pointer_t data)
+{
+	tb_trace_noimpl();
+}
+tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
+{
+	tb_trace_noimpl();
+	return tb_false;
+}
 #endif
