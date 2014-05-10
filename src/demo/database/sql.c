@@ -53,7 +53,7 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
 
 	} while (0);
 }
-static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_char_t const* sql)
+static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, tb_char_t const* sql)
 {
 	// check
 	tb_assert_and_check_return(database && sql);
@@ -63,7 +63,7 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 	do
 	{
 		// init stmt
-		if (!(stmt = tb_database_sql_stmt_init(database, sql)))
+		if (!(stmt = tb_database_sql_statement_init(database, sql)))
 		{
 			// trace
 			tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
@@ -71,7 +71,7 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 		}
 
 		// done stmt
-		if (!tb_database_sql_stmt_done(database, stmt))
+		if (!tb_database_sql_statement_done(database, stmt))
 		{
 			// trace
 			tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
@@ -185,9 +185,9 @@ static tb_void_t tb_demo_database_sql_test_stmt_done(tb_handle_t database, tb_ch
 	} while (0);
 
 	// exit stmt
-	if (stmt) tb_database_sql_stmt_exit(database, stmt);
+	if (stmt) tb_database_sql_statement_exit(database, stmt);
 }
-static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_char_t const* tdata, tb_char_t const* ldata1, tb_char_t const* ldata2, tb_size_t number, tb_uint16_t snumber)
+static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_char_t const* tdata, tb_char_t const* ldata1, tb_char_t const* ldata2, tb_size_t number, tb_uint16_t snumber)
 {
 	// check
 	tb_assert_and_check_return(database && sql);
@@ -198,7 +198,7 @@ static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database
 	do
 	{
 		// init stmt
-		if (!(stmt = tb_database_sql_stmt_init(database, sql)))
+		if (!(stmt = tb_database_sql_statement_init(database, sql)))
 		{
 			// trace
 			tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
@@ -225,7 +225,7 @@ static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database
 		tb_database_sql_value_set_blob32(&list[4], tb_null, 0, stream);
 		tb_database_sql_value_set_int32(&list[5], number);
 		tb_database_sql_value_set_int16(&list[6], snumber);
-		if (!tb_database_sql_stmt_bind(database, stmt, list, tb_arrayn(list)))
+		if (!tb_database_sql_statement_bind(database, stmt, list, tb_arrayn(list)))
 		{
 			// trace
 			tb_trace_e("stmt: bind %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
@@ -233,7 +233,7 @@ static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database
 		}
 
 		// done stmt
-		if (!tb_database_sql_stmt_done(database, stmt))
+		if (!tb_database_sql_statement_done(database, stmt))
 		{
 			// trace
 			tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
@@ -243,7 +243,7 @@ static tb_void_t tb_demo_database_sql_test_stmt_done_insert(tb_handle_t database
 	} while (0);
 
 	// exit stmt
-	if (stmt) tb_database_sql_stmt_exit(database, stmt);
+	if (stmt) tb_database_sql_statement_exit(database, stmt);
 
 	// exit stream
 	if (stream) tb_basic_stream_exit(stream);
@@ -274,16 +274,16 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 			tb_demo_database_sql_test_done(database, "select * from table1");
 	
 			// done tests 
-			tb_demo_database_sql_test_stmt_done(database, "drop table if exists table2");
-			tb_demo_database_sql_test_stmt_done(database, "create table table2(id int, fval float, name text, data blob, tdata tinyblob, ldata1 longblob, ldata2 longblob, number int, snumber smallint)");
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?, ?, ?, ?)", "name1", "data1", "ldata1", "tdata1", argv[2], 52642, 2642);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?, ?, ?, ?)", "name2", "data2", "ldata2", "tdata2", argv[2], 57127, 7127);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?, ?, ?, ?)", "name3", "data3", "ldata3", "tdata3", argv[2], 9000, 9000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(4, 3.1415, ?, ?, ?, ?, ?, ?, ?)", "name4", "data4", "ldata4", "tdata4", argv[2], 29000, 9000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(5, -3.1, ?, ?, ?, ?, ?, ?, ?)", "name5", "data5", "ldata5", "tdata5", argv[2], 350000, 5000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(6, 3.454, ?, ?, ?, ?, ?, ?, ?)", "name6", "data6", "ldata6", "tdata6", argv[2], 21000, 1000);
-			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?, ?, ?, ?)", "name7", "data7", "ldata7", "tdata7", argv[2], 21600, 1600);
-			tb_demo_database_sql_test_stmt_done(database, "select * from table2");
+			tb_demo_database_sql_test_statement_done(database, "drop table if exists table2");
+			tb_demo_database_sql_test_statement_done(database, "create table table2(id int, fval float, name text, data blob, tdata tinyblob, ldata1 longblob, ldata2 longblob, number int, snumber smallint)");
+			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?, ?, ?, ?)", "name1", "data1", "ldata1", "tdata1", argv[2], 52642, 2642);
+			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?, ?, ?, ?)", "name2", "data2", "ldata2", "tdata2", argv[2], 57127, 7127);
+			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?, ?, ?, ?)", "name3", "data3", "ldata3", "tdata3", argv[2], 9000, 9000);
+			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(4, 3.1415, ?, ?, ?, ?, ?, ?, ?)", "name4", "data4", "ldata4", "tdata4", argv[2], 29000, 9000);
+			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(5, -3.1, ?, ?, ?, ?, ?, ?, ?)", "name5", "data5", "ldata5", "tdata5", argv[2], 350000, 5000);
+			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(6, 3.454, ?, ?, ?, ?, ?, ?, ?)", "name6", "data6", "ldata6", "tdata6", argv[2], 21000, 1000);
+			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?, ?, ?, ?)", "name7", "data7", "ldata7", "tdata7", argv[2], 21600, 1600);
+			tb_demo_database_sql_test_statement_done(database, "select * from table2");
 		}
 		else
 		{
