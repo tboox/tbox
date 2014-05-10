@@ -60,6 +60,7 @@ typedef enum __tb_stream_type_e
 , 	TB_STREAM_TYPE_HTTP 	= 3
 , 	TB_STREAM_TYPE_DATA 	= 4
 , 	TB_STREAM_TYPE_FLTR 	= 5
+, 	TB_STREAM_TYPE_USER 	= 6 ///!< for user defined stream type
 
 }tb_stream_type_e;
 

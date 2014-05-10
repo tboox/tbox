@@ -30,38 +30,5 @@
 #include "../stream.h"
 #include "../basic_stream.h"
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * inlines
- */
-static __tb_inline__ tb_bool_t tb_basic_stream_init(tb_basic_stream_t* bstream, tb_size_t type, tb_size_t cache)
-{
-	// check
-	tb_assert_and_check_return_val(bstream, tb_false);
-
-	// init mode
-	bstream->base.mode = TB_STREAM_MODE_AIOO;
-
-	// init type
-	bstream->base.type = type;
-
-	// init timeout, 10s
-	bstream->base.timeout = 10000;
-
-	// init stoped?
-	bstream->base.bstoped = 1;
-
-	// init url
-	if (!tb_url_init(&bstream->base.url)) return tb_false;
-
-	// init cache
-	if (!tb_queue_buffer_init(&bstream->cache, cache)) goto fail;
-
-	// ok
-	return tb_true;
-
-fail:
-	tb_queue_buffer_exit(&bstream->cache);
-	return tb_false;
-}
 
 #endif

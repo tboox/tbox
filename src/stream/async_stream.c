@@ -432,6 +432,57 @@ static tb_bool_t tb_async_stream_sseek_func(tb_async_stream_t* stream, tb_size_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_size_t type, tb_size_t rcache, tb_size_t wcache)
+{
+	// check
+	tb_assert_and_check_return_val(stream && aicp, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	tb_bool_t ok_url = tb_false;
+	tb_bool_t ok_rcache = tb_false;
+	do
+	{
+		// init
+		stream->base.mode 		= TB_STREAM_MODE_AICO;
+		stream->base.type 		= type;
+		stream->base.timeout 	= -1;
+		stream->base.bopened 	= 0;
+		stream->base.bstoped 	= 1;
+		stream->aicp 			= aicp;
+
+		// init url
+		if (!tb_url_init(&stream->base.url)) break;
+		ok_url = tb_true;
+
+		// init rcache
+		if (!tb_scoped_buffer_init(&stream->rcache_data)) break;
+		stream->rcache_maxn = rcache;
+		ok_rcache = tb_true;
+
+		// init wcache
+		if (!tb_scoped_buffer_init(&stream->wcache_data)) break;
+		stream->wcache_maxn = wcache;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed? 
+	if (!ok)
+	{
+		// exit rcache
+		if (ok_rcache) tb_scoped_buffer_exit(&stream->rcache_data);
+
+		// exit url
+		if (ok_url) tb_url_exit(&stream->base.url);
+	}
+
+	// ok?
+	return ok;
+}
+
 tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 {
 	// check
