@@ -130,20 +130,20 @@ tb_size_t 			tb_database_sql_type(tb_handle_t database);
 /*! open database
  *
  * @code
- * tb_handle_t database = tb_database_sql_init("sql://localhost/?type=mysql&username=xxxx&password=xxxx");
- * if (database)
- * {
- *     // open it
- *     if (tb_database_sql_open(database))
- *     {
- *          // done it
- *          // ...
- *
- *          // close it
- *          tb_database_sql_clos(database);
- *     }
- *     tb_database_sql_exit(database);
- * }
+	tb_handle_t database = tb_database_sql_init("sql://localhost/?type=mysql&username=xxxx&password=xxxx");
+	if (database)
+	{
+		// open it
+		if (tb_database_sql_open(database))
+		{
+			// done it
+			// ...
+
+			// close it
+			tb_database_sql_clos(database);
+		}
+		tb_database_sql_exit(database);
+	}
  * @endcode
  *
  * @param database 	the database handle
@@ -210,55 +210,85 @@ tb_bool_t 			tb_database_sql_done(tb_handle_t database, tb_char_t const* sql);
  *
  * @code
  *
- * // done sql
- * // ..
- *
- * // load result
- * tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
- * if (result)
- * {
- *     // walk result
- *     tb_for_all_if (tb_iterator_t*, row, result, row)
- *     {
- *          // walk values
- *          tb_for_all_if (tb_database_sql_value_t*, value, row, value)
- *          {
- *               tb_trace_i("name: %s, data: %s, at: %lux%lu", tb_database_sql_value_name(value), tb_database_sql_value_text(value), row_itor, item_itor);
- *          }
- *     }
- *
- *     // exit result
- *     tb_database_sql_result_exit(result);
- * }
- * 
- * // load result
- * tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
- * if (result)
- * {
- *     // walk result
- *     tb_for_all_if (tb_iterator_t*, row, result, row)
- *     {
- *          // field count
- *          tb_trace_i("count: %lu", tb_iterator_size(row));
- *
- *          // id
- *			tb_database_sql_value_t const* id = tb_iterator_item(row, 0);
- *			if (id)
- *          {
- *               tb_trace_i("id: %d", tb_database_sql_value_int32(id));
- *          }
- *  
- *          // name
- *			tb_database_sql_value_t const* name = tb_iterator_item(row, 1);
- *			if (name)
- *          {
- *               tb_trace_i("name: %s", tb_database_sql_value_text(name));
- *          }
- *     }
- *
- *     // exit result
- *     tb_database_sql_result_exit(result);
- * }
+	// done sql
+	// ..
+
+	// load result
+	tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
+	if (result)
+	{
+		// walk result
+		tb_for_all_if (tb_iterator_t*, row, result, row)
+		{
+			// walk values
+			tb_for_all_if (tb_database_sql_value_t*, value, row, value)
+			{
+			   tb_trace_i("name: %s, data: %s, at: %lux%lu", tb_database_sql_value_name(value), tb_database_sql_value_text(value), row_itor, item_itor);
+			}
+		}
+
+		// exit result
+		tb_database_sql_result_exit(result);
+	}
+
+	// load result
+	tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+	if (result)
+	{
+		// walk result
+		tb_for_all_if (tb_iterator_t*, row, result, row)
+		{
+			// field count
+			tb_trace_i("count: %lu", tb_iterator_size(row));
+
+			// id
+			tb_database_sql_value_t const* id = tb_iterator_item(row, 0);
+			if (id)
+			{
+				tb_trace_i("id: %d", tb_database_sql_value_int32(id));
+			}
+
+			// name
+			tb_database_sql_value_t const* name = tb_iterator_item(row, 1);
+			if (name)
+			{
+				tb_trace_i("name: %s", tb_database_sql_value_text(name));
+			}
+
+			// blob
+			tb_database_sql_value_t const* blob = tb_iterator_item(row, 2);
+			if (blob)
+			{
+				// data?
+				tb_basic_stream_t* stream = tb_null;
+				if (tb_database_sql_value_blob(blob))
+				{
+					// trace
+					tb_trace_i("[data: %p, size: %lu] ", tb_database_sql_value_blob(blob), tb_database_sql_value_size(blob));
+				}
+				// stream?
+				else if ((stream = tb_database_sql_value_blob_stream(blob)))
+				{
+					// trace
+					tb_trace_i("[stream: %p, size: %lld] ", stream, tb_stream_size(stream));
+
+					// read stream
+					// ...
+				}
+				// null?
+				else
+				{
+					// trace
+					tb_trace_i("[%s:null] ", tb_database_sql_value_name(blob));
+				}
+			}
+
+		}
+
+		// exit result
+		tb_database_sql_result_exit(result);
+	}
+
  * @endcode
  *
  * @param database 	the database handle
@@ -294,25 +324,25 @@ tb_void_t 			tb_database_sql_statement_exit(tb_handle_t database, tb_handle_t st
 /*! done the database statement
  *
  * @code
- * tb_handle_t statement = tb_database_sql_statement_init(database, "select * from table where id=?");
- * if (statement)
- * {
- *      // bind arguments
- *      tb_database_sql_value_t list[1];
- *      tb_database_sql_value_set_int32(&list[0], 12345);
- *      if (tb_database_sql_statement_bind(database, statement, list, tb_arrayn(list)))
- *      {
- *            // done statement
- *            if (tb_database_sql_statement_done(database, statement))
- *            {
- *                  // load result
- *                  // ...
- *            }
- *      }
- *
- *      // exit statement
- *      tb_database_sql_statement_exit(database, statement);
- * }
+	tb_handle_t statement = tb_database_sql_statement_init(database, "select * from table where id=?");
+	if (statement)
+	{
+		// bind arguments
+		tb_database_sql_value_t list[1] = {0};
+		tb_database_sql_value_set_int32(&list[0], 12345);
+		if (tb_database_sql_statement_bind(database, statement, list, tb_arrayn(list)))
+		{
+			// done statement
+			if (tb_database_sql_statement_done(database, statement))
+			{
+				// load result
+				// ...
+			}
+		}
+
+		// exit statement
+		tb_database_sql_statement_exit(database, statement);
+	}
  * @endcode
  *
  * @param database 	the database handle
