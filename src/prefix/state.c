@@ -102,6 +102,16 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 	case TB_STATE_HTTP_POST_FAILED: 			return "http: post: failed";
 	case TB_STATE_HTTP_RANGE_INVALID: 			return "http: range: invalid";
 	case TB_STATE_HTTP_GZIP_NOT_SUPPORTED: 		return "http: gzip: not supported";
+	case TB_STATE_HTTP_UNKNOWN_ERROR: 			return "http: unknown error";
+
+	case TB_STATE_DATABASE_NO_SUCH_TABLE: 		return "database: no such table";
+	case TB_STATE_DATABASE_NO_SUCH_FIELD: 		return "database: no such field";
+	case TB_STATE_DATABASE_NO_SUCH_DATABASE: 	return "database: no such database";
+	case TB_STATE_DATABASE_ACCESS_DENIED: 		return "database: access denied";
+	case TB_STATE_DATABASE_PARSE_ERROR: 		return "database: parse error";
+	case TB_STATE_DATABASE_VALUE_COUNT_ERROR: 	return "database: value count error";
+	case TB_STATE_DATABASE_UNKNOWN_HOST: 		return "database: unknown host";
+	case TB_STATE_DATABASE_UNKNOWN_ERROR: 		return "database: unknown error";
 	default: 									return "unknown";
 	}
 

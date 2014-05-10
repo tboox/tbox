@@ -285,6 +285,11 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 			tb_demo_database_sql_test_stmt_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?, ?, ?, ?)", "name7", "data7", "ldata7", "tdata7", argv[2], 21600, 1600);
 			tb_demo_database_sql_test_stmt_done(database, "select * from table2");
 		}
+		else
+		{
+			// trace
+			tb_trace_i("open failed: %s", tb_state_cstr(tb_database_sql_state(database)));
+		}
 
 		// exit database
 		tb_database_sql_exit(database);
