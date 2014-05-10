@@ -183,6 +183,16 @@ typedef struct __tb_basic_stream_t
  * interfaces
  */
 
+/*! init basic stream
+ *
+ * @param stream 		the basic stream 
+ * @param type 			the stream type
+ * @param cache 		the cache size
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_basic_stream_init(tb_basic_stream_t* stream, tb_size_t type, tb_size_t cache);
+
 /*! init data stream 
  *
  * @return 				the stream

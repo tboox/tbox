@@ -333,6 +333,18 @@ typedef struct __tb_async_stream_t
  * interfaces
  */
 
+/*! init async stream
+ *
+ * @param stream 		the async stream
+ * @param aicp 			the aicp
+ * @param type 			the type
+ * @param rcache 		the read cache size
+ * @param wcache 		the writ cache size
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_size_t type, tb_size_t rcache, tb_size_t wcache);
+
 /*! init data stream 
  *
  * @param aicp 			the aicp

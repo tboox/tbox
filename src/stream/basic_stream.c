@@ -43,6 +43,44 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_bool_t tb_basic_stream_init(tb_basic_stream_t* stream, tb_size_t type, tb_size_t cache)
+{
+	// check
+	tb_assert_and_check_return_val(stream, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// init mode
+		stream->base.mode = TB_STREAM_MODE_AIOO;
+
+		// init type
+		stream->base.type = type;
+
+		// init timeout, 10s
+		stream->base.timeout = 10000;
+
+		// init stoped?
+		stream->base.bstoped = 1;
+
+		// init url
+		if (!tb_url_init(&stream->base.url)) break;
+
+		// init cache
+		if (!tb_queue_buffer_init(&stream->cache, cache)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed? exit it
+	if (!ok) tb_queue_buffer_exit(&stream->cache);
+
+	// ok?
+	return ok;
+}
 tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
 {
 	// check
@@ -215,7 +253,7 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
 	tb_assert_and_check_return_val(data && size, tb_false);
 
 	// check stream
-	tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream) && stream->read, tb_false);
+	tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream) && stream->read && stream->wait, tb_false);
 
 	// stoped?
 	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
@@ -512,7 +550,7 @@ tb_bool_t tb_basic_stream_bwrit(tb_basic_stream_t* stream, tb_byte_t const* data
 tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
 {
 	// check stream
-	tb_assert_and_check_return_val(stream && stream->writ && tb_stream_is_opened(stream), tb_false);
+	tb_assert_and_check_return_val(stream && stream->writ && stream->wait && tb_stream_is_opened(stream), tb_false);
 
 	// stoped?
 	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
