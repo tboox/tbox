@@ -36,6 +36,8 @@
 #include "../utils/utils.h"
 #include "../stream/stream.h"
 #include <mysql/mysql.h>
+#include <mysql/errmsg.h>
+#include <mysql/mysqld_error.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -168,6 +170,48 @@ static tb_handle_t tb_database_mysql_library_load()
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * state implementation
+ */
+static tb_size_t tb_database_mysql_state_from_errno(tb_size_t errno)
+{
+	// done
+	tb_size_t state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+	switch (errno)
+	{
+	case ER_NO_DB_ERROR:
+	case ER_BAD_DB_ERROR:
+		state = TB_STATE_DATABASE_NO_SUCH_DATABASE;
+		break;
+	case ER_NO_SUCH_TABLE:
+		state = TB_STATE_DATABASE_NO_SUCH_TABLE;
+		break;
+	case ER_BAD_FIELD_ERROR:
+		state = TB_STATE_DATABASE_NO_SUCH_FIELD;
+		break;
+	case ER_ACCESS_DENIED_ERROR:
+		state = TB_STATE_DATABASE_ACCESS_DENIED;
+		break;
+	case ER_PARSE_ERROR:
+		state = TB_STATE_DATABASE_PARSE_ERROR;
+		break;
+	case ER_WRONG_VALUE_COUNT_ON_ROW:
+		state = TB_STATE_DATABASE_VALUE_COUNT_ERROR;
+		break;
+	case CR_UNKNOWN_HOST:
+		state = TB_STATE_DATABASE_UNKNOWN_HOST;
+		break;
+	case ER_UNKNOWN_ERROR:
+		break;
+	default:
+		tb_trace_e("unknown errno: %lu", errno);
+		break;
+	}
+
+	// ok?
+	return state;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * stream implementation
  */
 static __tb_inline__ tb_database_mysql_stream_t* tb_database_mysql_stream_cast(tb_handle_t stream)
@@ -227,7 +271,7 @@ static tb_long_t tb_database_mysql_stream_read(tb_handle_t stream, tb_byte_t* da
 	if (mysql_stmt_fetch_column(mstream->stmt, mstream->result, mstream->column, mstream->offset))
 	{
 		// trace
-		tb_trace_e("stream: fetch failed at: %lu, error: %s", mstream->column, mysql_stmt_error(mstream->stmt));
+		tb_trace_e("stream: fetch failed at: %lu, error[%d]: %s", mstream->column, mysql_stmt_errno(mstream->stmt), mysql_stmt_error(mstream->stmt));
 		return -1;
 	}
 
@@ -368,7 +412,7 @@ static tb_bool_t tb_database_mysql_stream_set_value(tb_database_sql_value_t* val
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator implementation
  */
-static tb_size_t tb_mysql_result_row_iterator_size(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_row_iterator_size(tb_iterator_t* iterator)
 {
 	// check
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -377,7 +421,7 @@ static tb_size_t tb_mysql_result_row_iterator_size(tb_iterator_t* iterator)
 	// size
 	return result->count;
 }
-static tb_size_t tb_mysql_result_row_iterator_head(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_row_iterator_head(tb_iterator_t* iterator)
 {
 	// check
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -386,7 +430,7 @@ static tb_size_t tb_mysql_result_row_iterator_head(tb_iterator_t* iterator)
 	// head
 	return 0;
 }
-static tb_size_t tb_mysql_result_row_iterator_tail(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_row_iterator_tail(tb_iterator_t* iterator)
 {
 	// check
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -395,7 +439,7 @@ static tb_size_t tb_mysql_result_row_iterator_tail(tb_iterator_t* iterator)
 	// tail
 	return result->count;
 }
-static tb_size_t tb_mysql_result_row_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_row_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
 	// check
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -408,7 +452,7 @@ static tb_size_t tb_mysql_result_row_iterator_prev(tb_iterator_t* iterator, tb_s
 	// prev
 	return itor - 1;
 }
-static tb_size_t tb_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
 	// check
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -428,10 +472,17 @@ static tb_size_t tb_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_s
 				// end or error?
 				if (ok != MYSQL_DATA_TRUNCATED)
 				{
-					// trace
+					// error?
 					if (ok != MYSQL_NO_DATA)
 					{
-						tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
+						// the mysql
+						tb_database_mysql_t* mysql = (tb_database_mysql_t*)iterator->priv;
+
+						// save state
+						if (mysql) mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(result->stmt));
+
+						// trace
+						tb_trace_e("stmt: fetch row %lu failed, error[%d]: %s", itor, mysql_stmt_errno(result->stmt), mysql_stmt_error(result->stmt));
 					}
 
 					// end
@@ -458,7 +509,7 @@ static tb_size_t tb_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_s
 	// next
 	return itor + 1;
 }
-static tb_pointer_t tb_mysql_result_row_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_database_mysql_result_row_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	// check
 	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -480,10 +531,17 @@ static tb_pointer_t tb_mysql_result_row_iterator_item(tb_iterator_t* iterator, t
 				// end or error?
 				if (ok != MYSQL_DATA_TRUNCATED)
 				{
-					// trace
+					// error?
 					if (ok != MYSQL_NO_DATA)
-					{
-						tb_trace_e("stmt: fetch row %lu failed, error: %s", itor, mysql_stmt_error(result->stmt));
+					{	
+						// the mysql
+						tb_database_mysql_t* mysql = (tb_database_mysql_t*)iterator->priv;
+
+						// save state
+						if (mysql) mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(result->stmt));
+
+						// trace
+						tb_trace_e("stmt: fetch row %lu failed, error[%d]: %s", itor, mysql_stmt_errno(result->stmt), mysql_stmt_error(result->stmt));
 					}
 					return tb_null;
 				}
@@ -511,7 +569,7 @@ static tb_pointer_t tb_mysql_result_row_iterator_item(tb_iterator_t* iterator, t
 	// the row iterator
 	return (tb_pointer_t)&result->row;
 }
-static tb_size_t tb_mysql_result_col_iterator_size(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_col_iterator_size(tb_iterator_t* iterator)
 {
 	// check
 	tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -520,7 +578,7 @@ static tb_size_t tb_mysql_result_col_iterator_size(tb_iterator_t* iterator)
 	// size
 	return row->count;
 }
-static tb_size_t tb_mysql_result_col_iterator_head(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_col_iterator_head(tb_iterator_t* iterator)
 {
 	// check
 	tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -529,7 +587,7 @@ static tb_size_t tb_mysql_result_col_iterator_head(tb_iterator_t* iterator)
 	// head
 	return 0;
 }
-static tb_size_t tb_mysql_result_col_iterator_tail(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_col_iterator_tail(tb_iterator_t* iterator)
 {
 	// check
 	tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -538,7 +596,7 @@ static tb_size_t tb_mysql_result_col_iterator_tail(tb_iterator_t* iterator)
 	// tail
 	return row->count;
 }
-static tb_size_t tb_mysql_result_col_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_col_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
 	// check
 	tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -547,7 +605,7 @@ static tb_size_t tb_mysql_result_col_iterator_prev(tb_iterator_t* iterator, tb_s
 	// prev
 	return itor - 1;
 }
-static tb_size_t tb_mysql_result_col_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_col_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
 	// check
 	tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -556,7 +614,7 @@ static tb_size_t tb_mysql_result_col_iterator_next(tb_iterator_t* iterator, tb_s
 	// next
 	return itor + 1;
 }
-static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_database_mysql_result_col_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	// check
 	tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -581,8 +639,11 @@ static tb_pointer_t tb_mysql_result_col_iterator_item(tb_iterator_t* iterator, t
 		// fetch column
 		if (mysql_stmt_fetch_column(mysql->result.stmt, result, itor, 0))
 		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(mysql->result.stmt));
+
 			// trace
-			tb_trace_e("stmt: fetch result failed at: %lu, field_type: %d, error: %s", itor, field->type, mysql_stmt_error(mysql->result.stmt));
+			tb_trace_e("stmt: fetch result failed at: %lu, field_type: %d, error[%d]: %s", itor, field->type, mysql_stmt_errno(mysql->result.stmt), mysql_stmt_error(mysql->result.stmt));
 			return tb_null;
 		}
 
@@ -781,8 +842,11 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_t* database)
 		// connect it
 		if (!mysql_real_connect(mysql->database, host, username[0]? username : tb_null, password[0]? password : tb_null, database_sql_name[0]? database_sql_name : tb_null, (tb_uint_t)port, tb_null, 0))
 		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
+
 			// trace
-			tb_trace_e("open: host: %s failed, error: %s", host, mysql_error(mysql->database));
+			tb_trace_e("open: host: %s failed, error[%d]: %s", host, mysql_errno(mysql->database), mysql_error(mysql->database));
 			break;
 		}
 
@@ -849,8 +913,11 @@ static tb_bool_t tb_database_mysql_done(tb_database_sql_t* database, tb_char_t c
 	// done query
 	if (mysql_query(mysql->database, sql))
 	{
+		// save state
+		mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
+
 		// trace
-		tb_trace_e("done: sql: %s failed, error: %s", sql, mysql_error(mysql->database));
+		tb_trace_e("done: sql: %s failed, error[%d]: %s", sql, mysql_errno(mysql->database), mysql_error(mysql->database));
 		return tb_false;
 	}
 
@@ -1016,8 +1083,11 @@ static tb_bool_t tb_database_mysql_result_bind_data(tb_database_mysql_t* mysql)
 		// bind result
 		if (mysql_stmt_bind_result(mysql->result.stmt, mysql->bind_list))
 		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(mysql->result.stmt));
+
 			// trace
-			tb_trace_e("stmt: bind result failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+			tb_trace_e("stmt: bind result failed, error[%d]: %s", mysql_stmt_errno(mysql->result.stmt), mysql_stmt_error(mysql->result.stmt));
 			break;
 		}
 
@@ -1082,8 +1152,11 @@ static tb_bool_t tb_database_mysql_result_bind(tb_database_mysql_t* mysql, tb_bo
 		// load all?
 		if (try_all && mysql_stmt_store_result(mysql->result.stmt))
 		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(mysql->result.stmt));
+
 			// trace
-			tb_trace_e("stmt: load all result failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+			tb_trace_e("stmt: load all result failed, error[%d]: %s", mysql_stmt_errno(mysql->result.stmt), mysql_stmt_error(mysql->result.stmt));
 			break;
 		}
 
@@ -1130,10 +1203,14 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 					// end or error?
 					if (ok != MYSQL_DATA_TRUNCATED)
 					{
-						// trace
+						// error?
 						if (ok != MYSQL_NO_DATA)
 						{
-							tb_trace_e("stmt: fetch row head failed, error: %s", mysql_stmt_error(mysql->result.stmt));
+							// save state
+							mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(mysql->result.stmt));
+
+							// trace
+							tb_trace_e("stmt: fetch row head failed, error[%d]: %s", mysql_stmt_errno(mysql->result.stmt), mysql_stmt_error(mysql->result.stmt));
 						}
 						break;
 					}
@@ -1204,17 +1281,23 @@ static tb_handle_t tb_database_mysql_stmt_init(tb_database_sql_t* database, tb_c
 		// init stmt
 		stmt = mysql_stmt_init(mysql->database);
 		if (!stmt)
-		{
+		{	
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
+
 			// trace
-			tb_trace_e("stmt: init: %s failed, error: %s", sql, mysql_error(mysql->database));
+			tb_trace_e("stmt: init: %s failed, error[%d]: %s", sql, mysql_errno(mysql->database), mysql_error(mysql->database));
 			break;
 		}
 
 		// prepare stmt
 		if (mysql_stmt_prepare(stmt, sql, tb_strlen(sql)))
 		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(stmt));
+
 			// trace
-			tb_trace_e("stmt: prepare: %s failed, error: %s", sql, mysql_stmt_error(stmt));
+			tb_trace_e("stmt: prepare: %s failed, error[%d]: %s", sql, mysql_stmt_errno(stmt), mysql_stmt_error(stmt));
 			break;
 		}
 
@@ -1255,8 +1338,11 @@ static tb_bool_t tb_database_mysql_stmt_done(tb_database_sql_t* database, tb_han
 		// done stmt
 		if (mysql_stmt_execute((MYSQL_STMT*)stmt))
 		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno(stmt));
+
 			// trace
-			tb_trace_e("stmt: done failed, error: %s", mysql_stmt_error(stmt));
+			tb_trace_e("stmt: done failed, error[%d]: %s", mysql_stmt_errno(stmt), mysql_stmt_error(stmt));
 			break;
 		}
 
@@ -1393,8 +1479,11 @@ static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_han
 		// bind it
 		if (mysql_stmt_bind_param((MYSQL_STMT*)stmt, mysql->bind_list))
 		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno((MYSQL_STMT*)stmt));
+
 			// trace
-			tb_trace_e("stmt: bind failed, error: %s", mysql_stmt_error((MYSQL_STMT*)stmt));
+			tb_trace_e("stmt: bind failed, error[%d]: %s", mysql_stmt_errno((MYSQL_STMT*)stmt), mysql_stmt_error((MYSQL_STMT*)stmt));
 			break;
 		}
 		
@@ -1419,8 +1508,11 @@ static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_han
 						// send it
 						if (mysql_stmt_send_long_data((MYSQL_STMT*)stmt, i, (tb_char_t const*)data, real))
 						{
+							// save state
+							mysql->base.state = tb_database_mysql_state_from_errno(mysql_stmt_errno((MYSQL_STMT*)stmt));
+
 							// trace
-							tb_trace_e("stmt: bind: send blob data failed, error: %s", mysql_stmt_error((MYSQL_STMT*)stmt));
+							tb_trace_e("stmt: bind: send blob data failed, error[%d]: %s", mysql_stmt_errno((MYSQL_STMT*)stmt), mysql_stmt_error((MYSQL_STMT*)stmt));
 							break;
 						}
 					}
@@ -1516,12 +1608,12 @@ tb_database_sql_t* tb_database_mysql_init(tb_url_t const* url)
 		mysql->result.itor.mode 	= TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;
 		mysql->result.itor.priv 	= (tb_pointer_t)mysql;
 		mysql->result.itor.step 	= 0;
-		mysql->result.itor.size 	= tb_mysql_result_row_iterator_size;
-		mysql->result.itor.head 	= tb_mysql_result_row_iterator_head;
-		mysql->result.itor.tail 	= tb_mysql_result_row_iterator_tail;
-		mysql->result.itor.prev 	= tb_mysql_result_row_iterator_prev;
-		mysql->result.itor.next 	= tb_mysql_result_row_iterator_next;
-		mysql->result.itor.item 	= tb_mysql_result_row_iterator_item;
+		mysql->result.itor.size 	= tb_database_mysql_result_row_iterator_size;
+		mysql->result.itor.head 	= tb_database_mysql_result_row_iterator_head;
+		mysql->result.itor.tail 	= tb_database_mysql_result_row_iterator_tail;
+		mysql->result.itor.prev 	= tb_database_mysql_result_row_iterator_prev;
+		mysql->result.itor.next 	= tb_database_mysql_result_row_iterator_next;
+		mysql->result.itor.item 	= tb_database_mysql_result_row_iterator_item;
 		mysql->result.itor.copy 	= tb_null;
 		mysql->result.itor.comp 	= tb_null;
 
@@ -1529,12 +1621,12 @@ tb_database_sql_t* tb_database_mysql_init(tb_url_t const* url)
 		mysql->result.row.itor.mode = TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;
 		mysql->result.row.itor.priv = (tb_pointer_t)mysql;
 		mysql->result.row.itor.step = 0;
-		mysql->result.row.itor.size = tb_mysql_result_col_iterator_size;
-		mysql->result.row.itor.head = tb_mysql_result_col_iterator_head;
-		mysql->result.row.itor.tail = tb_mysql_result_col_iterator_tail;
-		mysql->result.row.itor.prev = tb_mysql_result_col_iterator_prev;
-		mysql->result.row.itor.next = tb_mysql_result_col_iterator_next;
-		mysql->result.row.itor.item = tb_mysql_result_col_iterator_item;
+		mysql->result.row.itor.size = tb_database_mysql_result_col_iterator_size;
+		mysql->result.row.itor.head = tb_database_mysql_result_col_iterator_head;
+		mysql->result.row.itor.tail = tb_database_mysql_result_col_iterator_tail;
+		mysql->result.row.itor.prev = tb_database_mysql_result_col_iterator_prev;
+		mysql->result.row.itor.next = tb_database_mysql_result_col_iterator_next;
+		mysql->result.row.itor.item = tb_database_mysql_result_col_iterator_item;
 		mysql->result.row.itor.copy = tb_null;
 		mysql->result.row.itor.comp = tb_null;
 

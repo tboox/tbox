@@ -320,6 +320,12 @@ tb_void_t 			tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb
  * inlines
  */
 
+/// the value is null?
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_null(tb_database_sql_value_t const* value)
+{
+	return (value && value->type == TB_DATABASE_SQL_VALUE_TYPE_NULL)? tb_true : tb_false;
+}
+
 /// the value is text?
 static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_text(tb_database_sql_value_t const* value)
 {
@@ -394,9 +400,12 @@ static __tb_inline_force__ tb_char_t const* tb_database_sql_value_text(tb_databa
 	// is blob?
 	else if (tb_database_sql_value_is_blob(value))
 		return (tb_char_t const*)value->u.blob.data;
+	// is null?
+	else if (tb_database_sql_value_is_null(value))
+		return tb_null;
 
-	// failed
-	tb_assert(0);
+	// trace
+	tb_trace_e("not text value type: %lu", value->type);
 	return tb_null;
 }
 
@@ -412,20 +421,20 @@ static __tb_inline_force__ tb_byte_t const* tb_database_sql_value_blob(tb_databa
 	// is text?
 	else if (tb_database_sql_value_is_text(value)) 
 		return (tb_byte_t const*)value->u.text.data;
+	// is null?
+	else if (tb_database_sql_value_is_null(value))
+		return tb_null;
 
-	// failed
-	tb_assert(0);
+	// trace
+	tb_trace_e("not blob value type: %lu", value->type);
 	return tb_null;
 }
 
 /// the value blob stream
 static __tb_inline_force__ tb_basic_stream_t* tb_database_sql_value_blob_stream(tb_database_sql_value_t const* value)
 {
-	// check
-	tb_assert_and_check_return_val(tb_database_sql_value_is_blob(value), tb_null);
-
 	// the blob stream
-	return value->u.blob.stream;
+	return tb_database_sql_value_is_blob(value)? value->u.blob.stream : tb_null;
 }
 
 /// set the value name

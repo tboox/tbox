@@ -170,8 +170,6 @@ tb_bool_t 			tb_database_sql_rollback(tb_handle_t database);
 
 /*! the database state
  *
- * TODO: ..
- *
  * @param database 	the database handle
  *
  * @return 			the database state

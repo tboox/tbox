@@ -170,9 +170,15 @@ tb_bool_t tb_database_sql_open(tb_handle_t handle)
 	
 	// opened?
 	tb_check_return_val(!database->bopened, tb_true);
+	
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
 	// open it
 	database->bopened = database->open(database);
+
+	// save state
+	if (database->bopened) database->state = TB_STATE_OK;
 
 	// ok?
 	return database->bopened;
@@ -191,6 +197,9 @@ tb_void_t tb_database_sql_clos(tb_handle_t handle)
 	
 	// closed
 	database->bopened = tb_false;
+	
+	// clear state
+	database->state = TB_STATE_OK;
 }
 tb_size_t tb_database_sql_state(tb_handle_t handle)
 {
@@ -206,27 +215,45 @@ tb_bool_t tb_database_sql_done(tb_handle_t handle, tb_char_t const* sql)
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
 	tb_assert_and_check_return_val(database && database->done && sql, tb_false);
-			
+	
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+		
 	// opened?
 	tb_assert_and_check_return_val(database->bopened, tb_false);
 
-	// trace
-	tb_trace_d("done: sql: %s: ..", sql);
-
 	// done it
-	return database->done(database, sql);
+	tb_bool_t ok = database->done(database, sql);
+
+	// trace
+	tb_trace_d("done: sql: %s: %s", sql, ok? "ok" : "no");
+
+	// save state
+	if (ok) database->state = TB_STATE_OK;
+
+	// ok?
+	return ok;
 }
 tb_iterator_t* tb_database_sql_result_load(tb_handle_t handle, tb_bool_t ball)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
 	tb_assert_and_check_return_val(database && database->result_load, tb_null);
-			
+		
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+
 	// opened?
 	tb_assert_and_check_return_val(database->bopened, tb_null);
 
 	// load it
-	return database->result_load(database, ball);
+	tb_iterator_t* result = database->result_load(database, ball);
+
+	// save state
+	if (result) database->state = TB_STATE_OK;
+
+	// ok?
+	return result;
 }
 tb_void_t tb_database_sql_result_exit(tb_handle_t handle, tb_iterator_t* result)
 {
@@ -239,18 +266,30 @@ tb_void_t tb_database_sql_result_exit(tb_handle_t handle, tb_iterator_t* result)
 
 	// exit it
 	database->result_exit(database, result);
+
+	// clear state
+	database->state = TB_STATE_OK;
 }
 tb_handle_t tb_database_sql_stmt_init(tb_handle_t handle, tb_char_t const* sql)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
 	tb_assert_and_check_return_val(database && database->stmt_init && sql, tb_null);
-	
+		
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+
 	// opened?
 	tb_assert_and_check_return_val(database->bopened, tb_null);
 
 	// init stmt
-	return database->stmt_init(database, sql);
+	tb_handle_t stmt = database->stmt_init(database, sql);
+	
+	// save state
+	if (stmt) database->state = TB_STATE_OK;
+
+	// ok?
+	return stmt;
 }
 tb_void_t tb_database_sql_stmt_exit(tb_handle_t handle, tb_handle_t stmt)
 {
@@ -263,28 +302,49 @@ tb_void_t tb_database_sql_stmt_exit(tb_handle_t handle, tb_handle_t stmt)
 
 	// exit stmt
 	database->stmt_exit(database, stmt);
+
+	// clear state
+	database->state = TB_STATE_OK;
 }
 tb_bool_t tb_database_sql_stmt_done(tb_handle_t handle, tb_handle_t stmt)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
 	tb_assert_and_check_return_val(database && database->stmt_done && stmt, tb_false);
-	
+		
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+
 	// opened?
 	tb_assert_and_check_return_val(database->bopened, tb_false);
 
 	// done stmt
-	return database->stmt_done(database, stmt);
+	tb_bool_t ok = database->stmt_done(database, stmt);
+
+	// save state
+	if (ok) database->state = TB_STATE_OK;
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_database_sql_stmt_bind(tb_handle_t handle, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
 	tb_assert_and_check_return_val(database && database->stmt_bind && stmt && list && size, tb_false);
-	
+		
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+
 	// opened?
 	tb_assert_and_check_return_val(database->bopened, tb_false);
 
 	// bind stmt argument
-	return database->stmt_bind(database, stmt, list, size);
+	tb_bool_t ok = database->stmt_bind(database, stmt, list, size);
+	
+	// save state
+	if (ok) database->state = TB_STATE_OK;
+
+	// ok?
+	return ok;
 }
