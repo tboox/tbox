@@ -901,6 +901,46 @@ static tb_void_t tb_database_mysql_exit(tb_database_sql_t* database)
 	// exit it
 	tb_free(mysql);
 }
+static tb_bool_t tb_database_mysql_commit(tb_database_sql_t* database)
+{
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return_val(mysql && mysql->database, tb_false);
+
+	// done commit
+	if (mysql_commit(mysql->database))
+	{
+		// save state
+		mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
+
+		// trace
+		tb_trace_e("commit: failed, error[%d]: %s", mysql_errno(mysql->database), mysql_error(mysql->database));
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_database_mysql_rollback(tb_database_sql_t* database)
+{
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return_val(mysql && mysql->database, tb_false);
+
+	// done rollback
+	if (mysql_rollback(mysql->database))
+	{
+		// save state
+		mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
+
+		// trace
+		tb_trace_e("rollback: failed, error[%d]: %s", mysql_errno(mysql->database), mysql_error(mysql->database));
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_database_mysql_done(tb_database_sql_t* database, tb_char_t const* sql)
 {
 	// check
@@ -1267,7 +1307,7 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
 	// ok?
 	return ok? (tb_iterator_t*)&mysql->result : tb_null;
 }
-static tb_handle_t tb_database_mysql_stmt_init(tb_database_sql_t* database, tb_char_t const* sql)
+static tb_handle_t tb_database_mysql_statement_init(tb_database_sql_t* database, tb_char_t const* sql)
 {
 	// check
 	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
@@ -1317,12 +1357,12 @@ static tb_handle_t tb_database_mysql_stmt_init(tb_database_sql_t* database, tb_c
 	// ok?
 	return (tb_handle_t)stmt;
 }
-static tb_void_t tb_database_mysql_stmt_exit(tb_database_sql_t* database, tb_handle_t stmt)
+static tb_void_t tb_database_mysql_statement_exit(tb_database_sql_t* database, tb_handle_t stmt)
 {
 	// exit it
 	if (stmt) mysql_stmt_close((MYSQL_STMT*)stmt);
 }
-static tb_bool_t tb_database_mysql_stmt_done(tb_database_sql_t* database, tb_handle_t stmt)
+static tb_bool_t tb_database_mysql_statement_done(tb_database_sql_t* database, tb_handle_t stmt)
 {
 	// check
 	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
@@ -1357,7 +1397,7 @@ static tb_bool_t tb_database_mysql_stmt_done(tb_database_sql_t* database, tb_han
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_database_mysql_stmt_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
+static tb_bool_t tb_database_mysql_statement_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
 {
 	// check
 	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
@@ -1597,12 +1637,14 @@ tb_database_sql_t* tb_database_mysql_init(tb_url_t const* url)
 		mysql->base.clos 			= tb_database_mysql_clos;
 		mysql->base.exit 			= tb_database_mysql_exit;
 		mysql->base.done 			= tb_database_mysql_done;
+		mysql->base.commit 			= tb_database_mysql_commit;
+		mysql->base.rollback 		= tb_database_mysql_rollback;
 		mysql->base.result_load 	= tb_database_mysql_result_load;
 		mysql->base.result_exit 	= tb_database_mysql_result_exit;
-		mysql->base.stmt_init 		= tb_database_mysql_stmt_init;
-		mysql->base.stmt_exit 		= tb_database_mysql_stmt_exit;
-		mysql->base.stmt_done 		= tb_database_mysql_stmt_done;
-		mysql->base.stmt_bind 		= tb_database_mysql_stmt_bind;
+		mysql->base.statement_init 	= tb_database_mysql_statement_init;
+		mysql->base.statement_exit 	= tb_database_mysql_statement_exit;
+		mysql->base.statement_done 	= tb_database_mysql_statement_done;
+		mysql->base.statement_bind 	= tb_database_mysql_statement_bind;
 
 		// init result row iterator
 		mysql->result.itor.mode 	= TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;

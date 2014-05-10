@@ -69,23 +69,29 @@ typedef struct __tb_database_sql_t
 	/// done
 	tb_bool_t 					(*done)(struct __tb_database_sql_t* database, tb_char_t const* sql);
 
+	/// commit
+	tb_bool_t 					(*commit)(struct __tb_database_sql_t* database);
+
+	/// rollback
+	tb_bool_t 					(*rollback)(struct __tb_database_sql_t* database);
+
 	/// load result
 	tb_iterator_t* 				(*result_load)(struct __tb_database_sql_t* database, tb_bool_t try_all);
 
 	/// exit result
 	tb_void_t 					(*result_exit)(struct __tb_database_sql_t* database, tb_iterator_t* result);
 
-	/// stmt init
-	tb_handle_t 				(*stmt_init)(struct __tb_database_sql_t* database, tb_char_t const* sql);
+	/// statement init
+	tb_handle_t 				(*statement_init)(struct __tb_database_sql_t* database, tb_char_t const* sql);
 
-	/// stmt exit
-	tb_void_t 					(*stmt_exit)(struct __tb_database_sql_t* database, tb_handle_t stmt);
+	/// statement exit
+	tb_void_t 					(*statement_exit)(struct __tb_database_sql_t* database, tb_handle_t statement);
 
-	/// stmt done
-	tb_bool_t 					(*stmt_done)(struct __tb_database_sql_t* database, tb_handle_t stmt);
+	/// statement done
+	tb_bool_t 					(*statement_done)(struct __tb_database_sql_t* database, tb_handle_t statement);
 
-	/// stmt bind
-	tb_bool_t 					(*stmt_bind)(struct __tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size);
+	/// statement bind
+	tb_bool_t 					(*statement_bind)(struct __tb_database_sql_t* database, tb_handle_t statement, tb_database_sql_value_t const* list, tb_size_t size);
 
 }tb_database_sql_t;
 
@@ -269,63 +275,63 @@ tb_iterator_t* 		tb_database_sql_result_load(tb_handle_t database, tb_bool_t try
  */
 tb_void_t 			tb_database_sql_result_exit(tb_handle_t database, tb_iterator_t* result);
 
-/*! init the database stmt
+/*! init the database statement
  *
  * @param database 	the database handle
  * @param sql 		the sql command
  *
- * @return 			the stmt handle
+ * @return 			the statement handle
  */
-tb_handle_t 		tb_database_sql_stmt_init(tb_handle_t database, tb_char_t const* sql);
+tb_handle_t 		tb_database_sql_statement_init(tb_handle_t database, tb_char_t const* sql);
 
-/*! exit the database stmt
+/*! exit the database statement
  *
  * @param database 	the database handle
- * @param stmt 		the stmt handle
+ * @param statement the statement handle
  */
-tb_void_t 			tb_database_sql_stmt_exit(tb_handle_t database, tb_handle_t stmt);
+tb_void_t 			tb_database_sql_statement_exit(tb_handle_t database, tb_handle_t statement);
 
-/*! done the database stmt
+/*! done the database statement
  *
  * @code
- * tb_handle_t stmt = tb_database_sql_stmt_init(database, "select * from table where id=?");
- * if (stmt)
+ * tb_handle_t statement = tb_database_sql_statement_init(database, "select * from table where id=?");
+ * if (statement)
  * {
  *      // bind arguments
  *      tb_database_sql_value_t list[1];
  *      tb_database_sql_value_set_int32(&list[0], 12345);
- *      if (tb_database_sql_stmt_bind(database, stmt, list, tb_arrayn(list)))
+ *      if (tb_database_sql_statement_bind(database, statement, list, tb_arrayn(list)))
  *      {
- *            // done stmt
- *            if (tb_database_sql_stmt_done(database, stmt))
+ *            // done statement
+ *            if (tb_database_sql_statement_done(database, statement))
  *            {
  *                  // load result
  *                  // ...
  *            }
  *      }
  *
- *      // exit stmt
- *      tb_database_sql_stmt_exit(database, stmt);
+ *      // exit statement
+ *      tb_database_sql_statement_exit(database, statement);
  * }
  * @endcode
  *
  * @param database 	the database handle
- * @param stmt 		the stmt handle
+ * @param statement the statement handle
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_database_sql_stmt_done(tb_handle_t database, tb_handle_t stmt);
+tb_bool_t 			tb_database_sql_statement_done(tb_handle_t database, tb_handle_t statement);
 
-/*! bind the database stmt argument
+/*! bind the database statement argument
  *
  * @param database 	the database handle
- * @param stmt 		the stmt handle
+ * @param statement the statement handle
  * @param list 		the argument value list
  * @param size 		the argument value count
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_database_sql_stmt_bind(tb_handle_t database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size);
+tb_bool_t 			tb_database_sql_statement_bind(tb_handle_t database, tb_handle_t statement, tb_database_sql_value_t const* list, tb_size_t size);
 
 
 #endif

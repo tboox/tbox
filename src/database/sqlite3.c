@@ -478,12 +478,12 @@ static tb_iterator_t* tb_database_sqlite3_result_load(tb_database_sql_t* databas
 	// ok?
 	return (sqlite->result.result || sqlite->result.stmt)? (tb_iterator_t*)&sqlite->result : tb_null;
 }
-static tb_void_t tb_database_sqlite3_stmt_exit(tb_database_sql_t* database, tb_handle_t stmt)
+static tb_void_t tb_database_sqlite3_statement_exit(tb_database_sql_t* database, tb_handle_t stmt)
 {
 	// exit stmt
 	if (stmt) sqlite3_finalize((sqlite3_stmt*)stmt);
 }
-static tb_handle_t tb_database_sqlite3_stmt_init(tb_database_sql_t* database, tb_char_t const* sql)
+static tb_handle_t tb_database_sqlite3_statement_init(tb_database_sql_t* database, tb_char_t const* sql)
 {
 	// check
 	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -512,7 +512,7 @@ static tb_handle_t tb_database_sqlite3_stmt_init(tb_database_sql_t* database, tb
 	// ok?
 	return (tb_handle_t)stmt;
 }
-static tb_bool_t tb_database_sqlite3_stmt_done(tb_database_sql_t* database, tb_handle_t stmt)
+static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_t* database, tb_handle_t stmt)
 {
 	// check
 	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -563,7 +563,7 @@ static tb_bool_t tb_database_sqlite3_stmt_done(tb_database_sql_t* database, tb_h
 	// ok?
 	return ok;
 }
-static tb_void_t tb_database_sqlite3_stmt_bind_exit(tb_pointer_t data)
+static tb_void_t tb_database_sqlite3_statement_bind_exit(tb_pointer_t data)
 {
 	// trace
 	tb_trace_d("bind: exit: %p", data);
@@ -571,7 +571,7 @@ static tb_void_t tb_database_sqlite3_stmt_bind_exit(tb_pointer_t data)
 	// exit it
 	if (data) tb_free(data);
 }
-static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
+static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
 {
 	// check
 	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -631,7 +631,7 @@ static tb_bool_t tb_database_sqlite3_stmt_bind(tb_database_sql_t* database, tb_h
 						if (!tb_basic_stream_bread(value->u.blob.stream, data, size)) break;
 
 						// bind it
-						ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), data, (tb_int_t)size, tb_database_sqlite3_stmt_bind_exit);
+						ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), data, (tb_int_t)size, tb_database_sqlite3_statement_bind_exit);
 
 					} while (0);
 				}
@@ -754,10 +754,10 @@ tb_database_sql_t* tb_database_sqlite3_init(tb_url_t const* url)
 		sqlite->base.done 			= tb_database_sqlite3_done;
 		sqlite->base.result_load 	= tb_database_sqlite3_result_load;
 		sqlite->base.result_exit 	= tb_database_sqlite3_result_exit;
-		sqlite->base.stmt_init 		= tb_database_sqlite3_stmt_init;
-		sqlite->base.stmt_exit 		= tb_database_sqlite3_stmt_exit;
-		sqlite->base.stmt_done 		= tb_database_sqlite3_stmt_done;
-		sqlite->base.stmt_bind 		= tb_database_sqlite3_stmt_bind;
+		sqlite->base.statement_init	= tb_database_sqlite3_statement_init;
+		sqlite->base.statement_exit = tb_database_sqlite3_statement_exit;
+		sqlite->base.statement_done = tb_database_sqlite3_statement_done;
+		sqlite->base.statement_bind = tb_database_sqlite3_statement_bind;
 
 		// init result row iterator
 		sqlite->result.itor.mode 	= 0;

@@ -210,6 +210,48 @@ tb_size_t tb_database_sql_state(tb_handle_t handle)
 	// the state
 	return database->state;
 }
+tb_bool_t tb_database_sql_commit(tb_handle_t handle)
+{
+	// check
+	tb_database_sql_t* database = (tb_database_sql_t*)handle;
+	tb_assert_and_check_return_val(database && database->commit, tb_false);
+	
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+		
+	// opened?
+	tb_assert_and_check_return_val(database->bopened, tb_false);
+
+	// rollback it
+	tb_bool_t ok = database->commit(database);
+
+	// save state
+	if (ok) database->state = TB_STATE_OK;
+
+	// ok?
+	return ok;
+}
+tb_bool_t tb_database_sql_rollback(tb_handle_t handle)
+{
+	// check
+	tb_database_sql_t* database = (tb_database_sql_t*)handle;
+	tb_assert_and_check_return_val(database && database->rollback, tb_false);
+	
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+		
+	// opened?
+	tb_assert_and_check_return_val(database->bopened, tb_false);
+
+	// rollback it
+	tb_bool_t ok = database->rollback(database);
+
+	// save state
+	if (ok) database->state = TB_STATE_OK;
+
+	// ok?
+	return ok;
+}
 tb_bool_t tb_database_sql_done(tb_handle_t handle, tb_char_t const* sql)
 {
 	// check
@@ -270,11 +312,11 @@ tb_void_t tb_database_sql_result_exit(tb_handle_t handle, tb_iterator_t* result)
 	// clear state
 	database->state = TB_STATE_OK;
 }
-tb_handle_t tb_database_sql_stmt_init(tb_handle_t handle, tb_char_t const* sql)
+tb_handle_t tb_database_sql_statement_init(tb_handle_t handle, tb_char_t const* sql)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
-	tb_assert_and_check_return_val(database && database->stmt_init && sql, tb_null);
+	tb_assert_and_check_return_val(database && database->statement_init && sql, tb_null);
 		
 	// init state
 	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
@@ -283,7 +325,7 @@ tb_handle_t tb_database_sql_stmt_init(tb_handle_t handle, tb_char_t const* sql)
 	tb_assert_and_check_return_val(database->bopened, tb_null);
 
 	// init stmt
-	tb_handle_t stmt = database->stmt_init(database, sql);
+	tb_handle_t stmt = database->statement_init(database, sql);
 	
 	// save state
 	if (stmt) database->state = TB_STATE_OK;
@@ -291,26 +333,26 @@ tb_handle_t tb_database_sql_stmt_init(tb_handle_t handle, tb_char_t const* sql)
 	// ok?
 	return stmt;
 }
-tb_void_t tb_database_sql_stmt_exit(tb_handle_t handle, tb_handle_t stmt)
+tb_void_t tb_database_sql_statement_exit(tb_handle_t handle, tb_handle_t stmt)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
-	tb_assert_and_check_return(database && database->stmt_done && stmt);
+	tb_assert_and_check_return(database && database->statement_done && stmt);
 	
 	// opened?
 	tb_assert_and_check_return(database->bopened);
 
 	// exit stmt
-	database->stmt_exit(database, stmt);
+	database->statement_exit(database, stmt);
 
 	// clear state
 	database->state = TB_STATE_OK;
 }
-tb_bool_t tb_database_sql_stmt_done(tb_handle_t handle, tb_handle_t stmt)
+tb_bool_t tb_database_sql_statement_done(tb_handle_t handle, tb_handle_t stmt)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
-	tb_assert_and_check_return_val(database && database->stmt_done && stmt, tb_false);
+	tb_assert_and_check_return_val(database && database->statement_done && stmt, tb_false);
 		
 	// init state
 	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
@@ -319,7 +361,7 @@ tb_bool_t tb_database_sql_stmt_done(tb_handle_t handle, tb_handle_t stmt)
 	tb_assert_and_check_return_val(database->bopened, tb_false);
 
 	// done stmt
-	tb_bool_t ok = database->stmt_done(database, stmt);
+	tb_bool_t ok = database->statement_done(database, stmt);
 
 	// save state
 	if (ok) database->state = TB_STATE_OK;
@@ -327,11 +369,11 @@ tb_bool_t tb_database_sql_stmt_done(tb_handle_t handle, tb_handle_t stmt)
 	// ok?
 	return ok;
 }
-tb_bool_t tb_database_sql_stmt_bind(tb_handle_t handle, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
+tb_bool_t tb_database_sql_statement_bind(tb_handle_t handle, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
 {
 	// check
 	tb_database_sql_t* database = (tb_database_sql_t*)handle;
-	tb_assert_and_check_return_val(database && database->stmt_bind && stmt && list && size, tb_false);
+	tb_assert_and_check_return_val(database && database->statement_bind && stmt && list && size, tb_false);
 		
 	// init state
 	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
@@ -340,7 +382,7 @@ tb_bool_t tb_database_sql_stmt_bind(tb_handle_t handle, tb_handle_t stmt, tb_dat
 	tb_assert_and_check_return_val(database->bopened, tb_false);
 
 	// bind stmt argument
-	tb_bool_t ok = database->stmt_bind(database, stmt, list, size);
+	tb_bool_t ok = database->statement_bind(database, stmt, list, size);
 	
 	// save state
 	if (ok) database->state = TB_STATE_OK;
