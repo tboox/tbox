@@ -69,6 +69,9 @@ typedef struct __tb_database_sql_t
 	/// done
 	tb_bool_t 					(*done)(struct __tb_database_sql_t* database, tb_char_t const* sql);
 
+	/// begin
+	tb_bool_t 					(*begin)(struct __tb_database_sql_t* database);
+
 	/// commit
 	tb_bool_t 					(*commit)(struct __tb_database_sql_t* database);
 
@@ -158,7 +161,15 @@ tb_bool_t 			tb_database_sql_open(tb_handle_t database);
  */
 tb_void_t 			tb_database_sql_clos(tb_handle_t database);
 
-/*! commit the current transaction
+/*! begin transaction
+ *
+ * @param database 	the database handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_database_sql_begin(tb_handle_t database);
+
+/*! commit transaction
  *
  * @param database 	the database handle
  *
@@ -166,7 +177,7 @@ tb_void_t 			tb_database_sql_clos(tb_handle_t database);
  */
 tb_bool_t 			tb_database_sql_commit(tb_handle_t database);
 
-/*! rollback the current transaction
+/*! rollback transaction
  *
  * @param database 	the database handle
  *

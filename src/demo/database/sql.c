@@ -272,18 +272,30 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 			tb_demo_database_sql_test_done(database, "insert into table1 values(6, 'name6', 21000)");
 			tb_demo_database_sql_test_done(database, "insert into table1 values(7, 'name7', 21600)");
 			tb_demo_database_sql_test_done(database, "select * from table1");
-	
-			// done tests 
+
+			// remove first
 			tb_demo_database_sql_test_statement_done(database, "drop table if exists table2");
-			tb_demo_database_sql_test_statement_done(database, "create table table2(id int, fval float, name text, data blob, tdata tinyblob, ldata1 longblob, ldata2 longblob, number int, snumber smallint)");
-			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?, ?, ?, ?)", "name1", "data1", "ldata1", "tdata1", argv[2], 52642, 2642);
-			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?, ?, ?, ?)", "name2", "data2", "ldata2", "tdata2", argv[2], 57127, 7127);
-			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?, ?, ?, ?)", "name3", "data3", "ldata3", "tdata3", argv[2], 9000, 9000);
-			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(4, 3.1415, ?, ?, ?, ?, ?, ?, ?)", "name4", "data4", "ldata4", "tdata4", argv[2], 29000, 9000);
-			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(5, -3.1, ?, ?, ?, ?, ?, ?, ?)", "name5", "data5", "ldata5", "tdata5", argv[2], 350000, 5000);
-			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(6, 3.454, ?, ?, ?, ?, ?, ?, ?)", "name6", "data6", "ldata6", "tdata6", argv[2], 21000, 1000);
-			tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?, ?, ?, ?)", "name7", "data7", "ldata7", "tdata7", argv[2], 21600, 1600);
-			tb_demo_database_sql_test_statement_done(database, "select * from table2");
+
+			// begin
+			if (tb_database_sql_begin(database))
+			{
+				// done tests 
+				tb_demo_database_sql_test_statement_done(database, "create table table2(id int, fval float, name text, data blob, tdata tinyblob, ldata1 longblob, ldata2 longblob, number int, snumber smallint)");
+				tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(1, 3.0, ?, ?, ?, ?, ?, ?, ?)", "name1", "data1", "ldata1", "tdata1", argv[2], 52642, 2642);
+				tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(2, 3.1, ?, ?, ?, ?, ?, ?, ?)", "name2", "data2", "ldata2", "tdata2", argv[2], 57127, 7127);
+				tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(3, 3.14, ?, ?, ?, ?, ?, ?, ?)", "name3", "data3", "ldata3", "tdata3", argv[2], 9000, 9000);
+				tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(4, 3.1415, ?, ?, ?, ?, ?, ?, ?)", "name4", "data4", "ldata4", "tdata4", argv[2], 29000, 9000);
+				tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(5, -3.1, ?, ?, ?, ?, ?, ?, ?)", "name5", "data5", "ldata5", "tdata5", argv[2], 350000, 5000);
+				tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(6, 3.454, ?, ?, ?, ?, ?, ?, ?)", "name6", "data6", "ldata6", "tdata6", argv[2], 21000, 1000);
+				tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?, ?, ?, ?)", "name7", "data7", "ldata7", "tdata7", argv[2], 21600, 1600);
+				
+				// commit
+//				tb_database_sql_commit(database);
+				tb_database_sql_rollback(database);
+
+				// select
+				tb_demo_database_sql_test_statement_done(database, "select * from table2");
+			}
 		}
 		else
 		{

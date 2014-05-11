@@ -210,6 +210,27 @@ tb_size_t tb_database_sql_state(tb_handle_t handle)
 	// the state
 	return database->state;
 }
+tb_bool_t tb_database_sql_begin(tb_handle_t handle)
+{
+	// check
+	tb_database_sql_t* database = (tb_database_sql_t*)handle;
+	tb_assert_and_check_return_val(database && database->commit, tb_false);
+	
+	// init state
+	database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
+		
+	// opened?
+	tb_assert_and_check_return_val(database->bopened, tb_false);
+
+	// begin it
+	tb_bool_t ok = database->begin(database);
+
+	// save state
+	if (ok) database->state = TB_STATE_OK;
+
+	// ok?
+	return ok;
+}
 tb_bool_t tb_database_sql_commit(tb_handle_t handle)
 {
 	// check
@@ -222,7 +243,7 @@ tb_bool_t tb_database_sql_commit(tb_handle_t handle)
 	// opened?
 	tb_assert_and_check_return_val(database->bopened, tb_false);
 
-	// rollback it
+	// commit it
 	tb_bool_t ok = database->commit(database);
 
 	// save state
