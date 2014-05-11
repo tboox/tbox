@@ -92,6 +92,33 @@ typedef struct __tb_database_sqlite3_t
 }tb_database_sqlite3_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * library implementation
+ */
+static tb_handle_t tb_database_sqlite3_library_init(tb_cpointer_t* ppriv)
+{
+	// init it
+	tb_int_t ok = SQLITE_OK;
+	if ((ok = sqlite3_initialize()) != SQLITE_OK)
+	{
+		// trace
+		tb_trace_e("init: sqlite3 library failed, error: %d", ok);
+		return tb_null;
+	}
+
+	// ok
+	return ppriv;
+}
+static tb_void_t tb_database_sqlite3_library_exit(tb_handle_t handle, tb_cpointer_t priv)
+{
+	// exit it
+	sqlite3_shutdown();
+}
+static tb_handle_t tb_database_sqlite3_library_load()
+{
+	return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_SQLITE3, tb_database_sqlite3_library_init, tb_database_sqlite3_library_exit, tb_null);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * state implementation
  */
 static tb_size_t tb_database_sqlite3_state_from_errno(tb_size_t errno)
@@ -322,8 +349,11 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_sql_t* database)
 		path = tb_url_path_get(&database->url);
 		tb_assert_and_check_break(path);
 
+		// load sqlite3 library
+		if (!tb_database_sqlite3_library_load()) break;
+
 		// open database
-		if (SQLITE_OK != sqlite3_open(path, &sqlite->database) || !sqlite->database) 
+		if (SQLITE_OK != sqlite3_open_v2(path, &sqlite->database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, tb_null) || !sqlite->database) 
 		{
 			// error
 			if (sqlite->database) 
@@ -376,6 +406,66 @@ static tb_void_t tb_database_sqlite3_exit(tb_database_sql_t* database)
 
 	// exit it
 	tb_free(sqlite);
+}
+static tb_bool_t tb_database_sqlite3_begin(tb_database_sql_t* database)
+{
+	// check
+	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return_val(sqlite && sqlite->database, tb_false);
+
+	// done commit
+	if (SQLITE_OK != sqlite3_exec(sqlite->database, "begin;", tb_null, tb_null, tb_null))
+	{
+		// save state
+		sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
+
+		// trace
+		tb_trace_e("begin: failed, error[%d]: %s", sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_database_sqlite3_commit(tb_database_sql_t* database)
+{
+	// check
+	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return_val(sqlite && sqlite->database, tb_false);
+
+	// done commit
+	if (SQLITE_OK != sqlite3_exec(sqlite->database, "commit;", tb_null, tb_null, tb_null))
+	{
+		// save state
+		sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
+
+		// trace
+		tb_trace_e("commit: failed, error[%d]: %s", sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_database_sqlite3_rollback(tb_database_sql_t* database)
+{
+	// check
+	tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
+	tb_assert_and_check_return_val(sqlite && sqlite->database, tb_false);
+
+	// done rollback
+	if (SQLITE_OK != sqlite3_exec(sqlite->database, "rollback;", tb_null, tb_null, tb_null))
+	{
+		// save state
+		sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
+
+		// trace
+		tb_trace_e("rollback: failed, error[%d]: %s", sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
 }
 static tb_bool_t tb_database_sqlite3_done(tb_database_sql_t* database, tb_char_t const* sql)
 {
@@ -752,6 +842,9 @@ tb_database_sql_t* tb_database_sqlite3_init(tb_url_t const* url)
 		sqlite->base.clos 			= tb_database_sqlite3_clos;
 		sqlite->base.exit 			= tb_database_sqlite3_exit;
 		sqlite->base.done 			= tb_database_sqlite3_done;
+		sqlite->base.begin 			= tb_database_sqlite3_begin;
+		sqlite->base.commit 		= tb_database_sqlite3_commit;
+		sqlite->base.rollback		= tb_database_sqlite3_rollback;
 		sqlite->base.result_load 	= tb_database_sqlite3_result_load;
 		sqlite->base.result_exit 	= tb_database_sqlite3_result_exit;
 		sqlite->base.statement_init	= tb_database_sqlite3_statement_init;

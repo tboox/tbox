@@ -850,6 +850,17 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_t* database)
 			break;
 		}
 
+		// disable auto commit
+		if (mysql_autocommit(mysql->database, 0))
+		{
+			// save state
+			mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
+
+			// trace
+			tb_trace_e("open: disable auto commit failed, error[%d]: %s", mysql_errno(mysql->database), mysql_error(mysql->database));
+			break;
+		}
+
 		// ok
 		ok = tb_true;
 
@@ -900,6 +911,32 @@ static tb_void_t tb_database_mysql_exit(tb_database_sql_t* database)
 
 	// exit it
 	tb_free(mysql);
+}
+/* begin mysql transaction
+ *
+ * @note
+ * the default storage engine MyIASM do not support transaction
+ * need enable InnoDB engine and set autocommit=0 if you want to use it
+ */
+static tb_bool_t tb_database_mysql_begin(tb_database_sql_t* database)
+{
+	// check
+	tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
+	tb_assert_and_check_return_val(mysql && mysql->database, tb_false);
+
+	// done begin
+	if (mysql_query(mysql->database, "begin;"))
+	{
+		// save state
+		mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
+
+		// trace
+		tb_trace_e("begin: failed, error[%d]: %s", mysql_errno(mysql->database), mysql_error(mysql->database));
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
 }
 static tb_bool_t tb_database_mysql_commit(tb_database_sql_t* database)
 {
@@ -1637,6 +1674,7 @@ tb_database_sql_t* tb_database_mysql_init(tb_url_t const* url)
 		mysql->base.clos 			= tb_database_mysql_clos;
 		mysql->base.exit 			= tb_database_mysql_exit;
 		mysql->base.done 			= tb_database_mysql_done;
+		mysql->base.begin 			= tb_database_mysql_begin;
 		mysql->base.commit 			= tb_database_mysql_commit;
 		mysql->base.rollback 		= tb_database_mysql_rollback;
 		mysql->base.result_load 	= tb_database_mysql_result_load;

@@ -60,8 +60,11 @@ typedef enum __tb_singleton_type_e
 	/// the mysql library type
 ,	TB_SINGLETON_TYPE_LIBRARY_MYSQL 	= 7
 
+	/// the sqlite3 library type
+,	TB_SINGLETON_TYPE_LIBRARY_SQLITE3 	= 8
+
 	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 				= 8
+,	TB_SINGLETON_TYPE_USER 				= 9
 
 	/// the max count of the singleton type
 #ifdef __tb_small__
