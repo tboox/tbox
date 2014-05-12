@@ -118,7 +118,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 	tb_assert_and_check_return(hash);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// performance
 	tb_char_t s[256] = {0};
@@ -126,7 +126,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_int_t r = tb_snprintf(s, sizeof(s) - 1, "%x", tb_rand_uint32(0, TB_MAXU32)); 
+		tb_int_t r = tb_snprintf(s, sizeof(s) - 1, "%x", tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
 		s[r] = '\0'; 
 		tb_hash_test_set_s2i(hash, s); 
 		tb_hash_test_get_s2i(hash, s);
@@ -214,14 +214,14 @@ static tb_void_t tb_hash_test_i2s_perf()
 	tb_assert_and_check_return(hash);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_size_t i = tb_random_range(tb_random_generator(), 0, TB_MAXU32);
 		tb_hash_test_set_i2s(hash, i); 
 		tb_hash_test_get_i2s(hash, i);
 	}
@@ -352,14 +352,14 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_assert_and_check_return(hash);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_size_t i = tb_random_range(tb_random_generator(), 0, TB_MAXU32);
 		tb_hash_test_set_m2m(hash, i); 
 		tb_hash_test_get_m2m(hash, i);
 	}
@@ -445,14 +445,14 @@ static tb_void_t tb_hash_test_i2i_perf()
 	tb_assert_and_check_return(hash);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_size_t i = tb_random_range(tb_random_generator(), 0, TB_MAXU32);
 		tb_hash_test_set_i2i(hash, i); 
 		tb_hash_test_get_i2i(hash, i);
 	}
@@ -537,14 +537,14 @@ static tb_void_t tb_hash_test_i2t_perf()
 	tb_assert_and_check_return(hash);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_size_t i = tb_random_range(tb_random_generator(), 0, TB_MAXU32);
 		tb_hash_test_set_i2t(hash, i); 
 		tb_hash_test_get_i2t(hash, i);
 	}
@@ -563,7 +563,7 @@ static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, t
 		if (!(((tb_size_t)item->data >> 25) & 0x1))
 //		if (!(((tb_size_t)item->data) & 0x7))
 //		if (1)
-//		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
+//		if (!(tb_random_range(tb_random_generator(), 0, TB_MAXU32) & 0x1))
 			*bdel = tb_true;
 		else
 		{
@@ -584,13 +584,13 @@ static tb_void_t tb_hash_test_walk_perf()
 	tb_assert_and_check_return(hash);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// add items
 	__tb_volatile__ tb_size_t n = 100000;
 	while (n--) 
 	{
-		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_size_t i = tb_random_range(tb_random_generator(), 0, TB_MAXU32);
 		tb_hash_test_set_i2i(hash, i); 
 		tb_hash_test_get_i2i(hash, i);
 	}

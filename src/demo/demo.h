@@ -72,8 +72,8 @@ TB_DEMO_MAIN_DECL(asio_aicpc);
 TB_DEMO_MAIN_DECL(asio_aicpd);
 
 // math
-TB_DEMO_MAIN_DECL(math_rand);
 TB_DEMO_MAIN_DECL(math_fixed);
+TB_DEMO_MAIN_DECL(math_random);
 
 // utils
 TB_DEMO_MAIN_DECL(utils_url);

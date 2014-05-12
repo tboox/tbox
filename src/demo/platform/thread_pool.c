@@ -41,12 +41,12 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 #else
 
 	// done
-	tb_size_t count = tb_rand_uint32(1, 16);
+	tb_size_t count = tb_random_range(tb_random_generator(), 1, 16);
 	tb_size_t total = count;
 	while (count-- && total < 1000)
 	{
 		// the time
-		tb_size_t time = tb_rand_uint32(0, 500);
+		tb_size_t time = tb_random_range(tb_random_generator(), 0, 500);
 
 		// trace
 		tb_trace_i("post: %lu ms, total: %lu", time, total);
@@ -61,7 +61,7 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 			tb_msleep(100);
 
 			// update count
-			count = tb_rand_uint32(1, 16);
+			count = tb_random_range(tb_random_generator(), 1, 16);
 			total += count;
 		}
 	}

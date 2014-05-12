@@ -71,10 +71,10 @@ static tb_demo_t g_demo[] =
 #endif
 
 	// math
-,	TB_DEMO_MAIN_ITEM(math_rand)
 #ifdef TB_CONFIG_TYPE_FLOAT
 ,	TB_DEMO_MAIN_ITEM(math_fixed)
 #endif
+,	TB_DEMO_MAIN_ITEM(math_random)
 
 	// utils
 ,	TB_DEMO_MAIN_ITEM(utils_url)

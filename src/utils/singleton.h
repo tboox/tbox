@@ -54,17 +54,20 @@ typedef enum __tb_singleton_type_e
 	/// the aicp type
 ,	TB_SINGLETON_TYPE_AICP 				= 5
 
+	/// the random type
+,	TB_SINGLETON_TYPE_RANDOM 			= 6
+
 	/// the openssl library type
-,	TB_SINGLETON_TYPE_LIBRARY_OPENSSL 	= 6
+,	TB_SINGLETON_TYPE_LIBRARY_OPENSSL 	= 7
 
 	/// the mysql library type
-,	TB_SINGLETON_TYPE_LIBRARY_MYSQL 	= 7
+,	TB_SINGLETON_TYPE_LIBRARY_MYSQL 	= 8
 
 	/// the sqlite3 library type
-,	TB_SINGLETON_TYPE_LIBRARY_SQLITE3 	= 8
+,	TB_SINGLETON_TYPE_LIBRARY_SQLITE3 	= 9
 
 	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 				= 9
+,	TB_SINGLETON_TYPE_USER 				= 10
 
 	/// the max count of the singleton type
 #ifdef __tb_small__

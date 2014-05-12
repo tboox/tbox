@@ -10,10 +10,10 @@ tbox_TYPE 				= LIB
 # basic files
 tbox_C_FILES 			+= \
 						tbox \
-						math/math \
 						math/int32 \
-						math/rand \
 						math/fixed16 \
+						math/random/random \
+						math/random/linear \
 						prefix/state \
 						memory/static_block_pool \
 						memory/static_fixed_pool \
@@ -111,6 +111,7 @@ tbox_C_FILES 			+= \
 						libc/stdio/vsnprintf \
 						libc/stdio/vswprintf \
 						libc/stdlib/stdlib \
+						libc/stdlib/random \
 						libc/stdlib/mbstowcs \
 						libc/stdlib/wcstombs \
 						libc/string/memset \
@@ -409,12 +410,13 @@ INC_FILES 				= \
 						asio/ssl.h \
 						math/prefix.h \
 						math/math.h \
-						math/rand.h \
 						math/fixed.h \
 						math/fixed6.h \
 						math/fixed16.h \
 						math/fixed30.h \
 						math/int32.h \
+						math/random/prefix.h \
+						math/random/random.h \
 						math/opt/prefix.h \
 						math/opt/fixed16_x86.h \
 						math/opt/fixed16_arm.h \

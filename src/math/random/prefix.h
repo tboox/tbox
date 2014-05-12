@@ -17,36 +17,50 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		prefix.h
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
+#ifndef TB_MATH_RANDOM_PREFIX_H
+#define TB_MATH_RANDOM_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
-#include "random/random.h"
+#include "../prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * types
  */
 
-/*! init math 
- *
- * @return 		tb_true or tb_false
- */
-tb_bool_t 		tb_math_init(tb_noarg_t);
+/// the random generator type enum
+typedef enum __tb_random_generator_type_e
+{
+	TB_RANDOM_GENERATOR_TYPE_NONE 		= 0
+,	TB_RANDOM_GENERATOR_TYPE_LINEAR 	= 1
 
-/// exit math 
-tb_void_t 		tb_math_exit(tb_noarg_t);
+}tb_random_generator_type_e;
+
+/// the random type
+typedef struct __tb_random_t
+{
+	/// the type
+	tb_size_t 			type;
+
+	/// exit 
+	tb_void_t 			(*exit)(struct __tb_random_t* random);
+
+	/// seed
+	tb_void_t 			(*seed)(struct __tb_random_t* random, tb_size_t seed);
+
+	/// clear
+	tb_void_t 			(*clear)(struct __tb_random_t* random);
+
+	/// range
+	tb_long_t 			(*range)(struct __tb_random_t* random, tb_long_t beg, tb_long_t end);
+
+}tb_random_t;
+
+
+
 
 #endif
-

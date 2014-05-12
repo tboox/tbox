@@ -84,6 +84,10 @@
 // wtoa
 #define tb_wtoa(s1, s2, n) 			tb_wcstombs(s1, s2, n)
 
+// rand
+#define tb_rand() 					(tb_int_t)tb_random()
+#define tb_srand(seed) 				tb_srandom(seed)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -271,6 +275,18 @@ tb_size_t 			tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n);
  * @return 			the string length
  */
 tb_size_t 			tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n);
+
+/*! update random seed
+ *
+ * @param seed 		the random seed
+ */
+tb_void_t 			tb_srandom(tb_size_t seed);
+
+/*! generate the random with range: [0, max)
+ *
+ * @return 			the random value
+ */
+tb_long_t 			tb_random(tb_noarg_t);
 
 
 #endif

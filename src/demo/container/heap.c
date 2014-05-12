@@ -17,14 +17,14 @@ static tb_void_t tb_test_heap_min_func()
 	tb_assert_and_check_return(heap);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// walk
 	tb_size_t i = 0;
 	for (i = 0; i < 100; i++) 
 	{
 		// the value
-		tb_uint32_t val = tb_rand_uint32(0, TB_MAXU32);
+		tb_uint32_t val = tb_random_range(tb_random_generator(), 0, TB_MAXU32);
 
 		// trace
 //		tb_trace_i("heap_min: put: %u", val);
@@ -59,7 +59,7 @@ static tb_void_t tb_test_heap_min_perf()
 	tb_assert_and_check_return(heap);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// init time
 	tb_hong_t time = tb_mclock();
@@ -67,7 +67,7 @@ static tb_void_t tb_test_heap_min_perf()
 	// walk
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
-	for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_rand_uint32(0, TB_MAXU32));
+	for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_random_range(tb_random_generator(), 0, TB_MAXU32));
 	for (i = 0; i < n; i++) tb_heap_pop(heap);
 
 	// exit time
@@ -89,14 +89,14 @@ static tb_void_t tb_test_heap_max_func()
 	tb_assert_and_check_return(heap);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// walk
 	tb_size_t i = 0;
 	for (i = 0; i < 100; i++) 
 	{
 		// the value
-		tb_uint32_t val = tb_rand_uint32(0, TB_MAXU32);
+		tb_uint32_t val = tb_random_range(tb_random_generator(), 0, TB_MAXU32);
 
 		// trace
 //		tb_trace_i("heap_max: put: %u", val);
@@ -134,7 +134,7 @@ static tb_void_t tb_test_heap_max_perf()
 	tb_assert_and_check_return(heap);
 
 	// clear rand
-	tb_rand_clear();
+	tb_random_clear(tb_random_generator());
 
 	// init time
 	tb_hong_t time = tb_mclock();
@@ -142,7 +142,7 @@ static tb_void_t tb_test_heap_max_perf()
 	// walk
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
-	for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_rand_uint32(0, TB_MAXU32));
+	for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_random_range(tb_random_generator(), 0, TB_MAXU32));
 	for (i = 0; i < n; i++) tb_heap_pop(heap);
 
 	// exit time
