@@ -71,11 +71,11 @@ demo_C_FILES 								+= \
 											platform/thread_store \
 											container/heap \
 											container/hash \
-											container/dlist \
-											container/slist \
+											container/list \
 											container/queue \
 											container/stack \
 											container/vector \
+											container/single_list \
 											algorithm/find \
 											algorithm/sort 
 

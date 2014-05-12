@@ -311,7 +311,7 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
 	tb_assert_and_check_return_val(s && n, 0);
  
 	// reuse it if exists
-	tb_slist_t* 	spool = cookies->spool;
+	tb_single_list_t* 	spool = cookies->spool;
 	tb_size_t 		itor = tb_iterator_head(spool);
 	tb_size_t 		tail = tb_iterator_tail(spool);
 	for (; itor != tail; itor = tb_iterator_next(spool, itor))
@@ -329,7 +329,7 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
 	string.refn = 1;
 	string.data = tb_strndup(s, n);
 	tb_assert(string.data);
-	if (string.data) return tb_slist_insert_tail(spool, &string);
+	if (string.data) return tb_single_list_insert_tail(spool, &string);
 	else return 0;
 }
 
@@ -340,7 +340,7 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 
 	tb_size_t 		i = 0;	
 	tb_vector_t* 	cpool = cookies->cpool;
-	tb_slist_t* 	spool = cookies->spool;
+	tb_single_list_t* 	spool = cookies->spool;
 	tb_size_t 		size = tb_vector_size(cpool);
 	for (i = 0; i < size; i++)
 	{
@@ -366,7 +366,7 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 
 				// update value
 				if (svalue->refn > 1) svalue->refn--;
-				else tb_slist_remove(spool, cookie->value);
+				else tb_single_list_remove(spool, cookie->value);
 				cookie->value = tb_cookie_set_string(cookies, entry->pvalue, entry->nvalue);
 				tb_assert_abort(cookie->value);
 
@@ -388,7 +388,7 @@ static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 
 	tb_size_t 		i = 0;	
 	tb_vector_t* 	cpool = cookies->cpool;
-	tb_slist_t* 	spool = cookies->spool;
+	tb_single_list_t* 	spool = cookies->spool;
 	tb_size_t 		size = tb_vector_size(cpool);
 	for (i = 0; i < size; i++)
 	{
@@ -407,15 +407,15 @@ static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 			{
 				// remove domain
 				if (sdomain->refn > 1) sdomain->refn--;
-				else tb_slist_remove(spool, cookie->domain);
+				else tb_single_list_remove(spool, cookie->domain);
 
 				// remove path
 				if (spath->refn > 1) spath->refn--;
-				else tb_slist_remove(spool, cookie->path);
+				else tb_single_list_remove(spool, cookie->path);
 	
 				// remove name
 				if (sname->refn > 1) sname->refn--;
-				else tb_slist_remove(spool, cookie->name);
+				else tb_single_list_remove(spool, cookie->name);
 
 				// remove cookie
 				tb_vector_remove(cpool, i);
@@ -527,7 +527,7 @@ tb_cookies_t* tb_cookies_init()
 	tb_assert_and_check_goto(cookies->hmutex, fail);
 
 	// init spool
-	cookies->spool = tb_slist_init(TB_COOKIES_BLOCK_POOL_GROW, tb_item_func_mem(sizeof(tb_cookie_string_t), tb_cookies_block_pool_free, tb_null));
+	cookies->spool = tb_single_list_init(TB_COOKIES_BLOCK_POOL_GROW, tb_item_func_mem(sizeof(tb_cookie_string_t), tb_cookies_block_pool_free, tb_null));
 	tb_assert_and_check_goto(cookies->spool, fail);
 
 	// init cpool
@@ -557,7 +557,7 @@ tb_void_t tb_cookies_exit(tb_cookies_t* cookies)
 		cookies->cpool = tb_null;
 
 		// free spool
-		if (cookies->spool) tb_slist_exit(cookies->spool);
+		if (cookies->spool) tb_single_list_exit(cookies->spool);
 		cookies->spool = tb_null;
 
 		tb_mutex_leave(cookies->hmutex);
@@ -576,7 +576,7 @@ tb_void_t tb_cookies_clear(tb_cookies_t* cookies)
 
 	tb_mutex_enter(cookies->hmutex);
 	tb_vector_clear(cookies->cpool);
-	tb_slist_clear(cookies->spool);
+	tb_single_list_clear(cookies->spool);
 	cookies->value[0] = '\0';
 	tb_mutex_leave(cookies->hmutex);
 }
@@ -629,7 +629,7 @@ tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, 
 	tb_size_t 		i = 0;
 	tb_size_t 		n = 0;
 	tb_vector_t* 	cpool = cookies->cpool;
-	tb_slist_t* 	spool = cookies->spool;
+	tb_single_list_t* 	spool = cookies->spool;
 	tb_size_t 		size = tb_vector_size(cpool);
 	for (i = 0; i < size; i++)
 	{
@@ -756,7 +756,7 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	tb_trace_i("cookies:");
 	
 	tb_vector_t* cpool = cookies->cpool;
-	tb_slist_t* spool = cookies->spool;
+	tb_single_list_t* spool = cookies->spool;
 
 	// dump items
 	tb_size_t i = 0;
@@ -783,7 +783,7 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	}
 
 	// dump strings
-	tb_trace_i("[spool]: size: %d, maxn: %d", n, tb_slist_maxn(spool));
+	tb_trace_i("[spool]: size: %d, maxn: %d", n, tb_single_list_maxn(spool));
 	tb_for_all (tb_cookie_string_t*, s, spool)
 	{
 		if (s)

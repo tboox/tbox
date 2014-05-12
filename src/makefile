@@ -41,11 +41,11 @@ tbox_C_FILES 			+= \
 						algorithm/count \
 						container/hash \
 						container/heap \
+						container/list \
 						container/queue \
 						container/stack \
-						container/slist \
-						container/dlist \
 						container/vector \
+						container/single_list \
 						container/iterator \
 						container/iterator/str \
 						container/iterator/ptr \
@@ -451,12 +451,12 @@ INC_FILES 				= \
 						container/item.h \
 						container/hash.h \
 						container/heap.h \
-						container/slist.h \
-						container/dlist.h \
+						container/list.h \
 						container/queue.h \
 						container/stack.h \
 						container/vector.h \
 						container/iterator.h \
+						container/single_list.h \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/dns.h \
