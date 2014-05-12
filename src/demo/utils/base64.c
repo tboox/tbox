@@ -48,7 +48,7 @@ tb_int_t tb_demo_utils_base64_main(tb_int_t argc, tb_char_t** argv)
 		tb_char_t table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 		while (1)
 		{
-			tb_size_t i = tb_rand_uint32(0, 63);
+			tb_size_t i = tb_random() & 63;
 			tb_size_t j = 63 - i;
 			tb_char_t t = table[i];
 			table[i] = table[j];

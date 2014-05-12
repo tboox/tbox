@@ -17,7 +17,7 @@ demo_C_FILES 								+= \
 											libc/string \
 											libc/stdlib \
 											libm/integer \
-											math/rand \
+											math/random \
 											utils/url \
 											utils/crc \
 											utils/md5 \

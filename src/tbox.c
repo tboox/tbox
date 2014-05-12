@@ -168,9 +168,6 @@ tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_
 	// init platform
 	if (!tb_platform_init()) return tb_false;
 
-	// init math
-	if (!tb_math_init()) return tb_false;
-
 	// init network 
 	if (!tb_network_init()) return tb_false;
 
@@ -207,9 +204,6 @@ tb_void_t tb_exit()
 	
 	// exit network
 	tb_network_exit();
-	
-	// exit math
-	tb_math_exit();
 	
 	// exit platform
 	tb_platform_exit();

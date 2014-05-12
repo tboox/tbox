@@ -17,29 +17,26 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.c
- * @defgroup 	math
+ * @file		random.c
+ * @ingroup 	libc
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "math.h"
+#include "stdlib.h"
+#include "../../math/math.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces 
  */
-tb_bool_t tb_math_init()
+tb_void_t tb_srandom(tb_size_t seed)
 {
-	// init rand
-	if (!tb_rand_init()) return tb_false;
+	tb_random_seed(tb_random_generator(), seed);
+}
+tb_long_t tb_random()
+{
+	return tb_random_value(tb_random_generator());
+}
 
-	// ok
-	return tb_true;
-}
-tb_void_t tb_math_exit()
-{	
-	// exit rand
-	tb_rand_exit();
-}
