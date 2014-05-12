@@ -178,13 +178,13 @@ typedef struct __tb_thread_pool_t
 	tb_handle_t 			jobs_pool;
 
 	// the urgent jobs
-	tb_slist_t* 			jobs_urgent;
+	tb_single_list_t* 		jobs_urgent;
 	
 	// the waiting jobs
-	tb_slist_t* 			jobs_waiting;
+	tb_single_list_t* 		jobs_waiting;
 	
 	// the pending jobs
-	tb_dlist_t* 			jobs_pending;
+	tb_list_t* 				jobs_pending;
 
 	// is stoped
 	tb_bool_t 				bstoped;
@@ -227,7 +227,7 @@ static tb_void_t tb_thread_pool_instance_kill(tb_handle_t handle, tb_cpointer_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * worker implementation
  */
-static tb_bool_t tb_thread_pool_worker_walk_pull(tb_slist_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(jobs && bdel, tb_false);
@@ -248,7 +248,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull(tb_slist_t* jobs, tb_pointer_t 
 	tb_assert_and_check_return_val(pool && pool->jobs_pending, tb_false);
 
 	// append the job to the pending jobs
-	tb_size_t itor = tb_dlist_insert_tail(pool->jobs_pending, job);	
+	tb_size_t itor = tb_list_insert_tail(pool->jobs_pending, job);	
 	tb_assert_and_check_return_val(itor != tb_iterator_tail(pool->jobs_pending), tb_false);
 
 	// append the job to the working jobs
@@ -274,7 +274,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull(tb_slist_t* jobs, tb_pointer_t 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_dlist_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(jobs && bdel, tb_false);
@@ -339,7 +339,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_dlist_t* jobs, tb_
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_thread_pool_worker_walk_clean(tb_dlist_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(jobs && bdel, tb_false);
@@ -439,47 +439,47 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
 				// pull from the urgent jobs
 				tb_size_t jobs_urgent_size = 0;
-				if (pool->jobs_urgent && tb_slist_size(pool->jobs_urgent))
+				if (pool->jobs_urgent && tb_single_list_size(pool->jobs_urgent))
 				{
 					// trace
-					tb_trace_d("worker[%lu]: try pulling from urgent: %lu", worker->id, tb_slist_size(pool->jobs_urgent));
+					tb_trace_d("worker[%lu]: try pulling from urgent: %lu", worker->id, tb_single_list_size(pool->jobs_urgent));
 
 					// pull it
-					tb_slist_walk(pool->jobs_urgent, tb_thread_pool_worker_walk_pull, worker);
+					tb_single_list_walk(pool->jobs_urgent, tb_thread_pool_worker_walk_pull, worker);
 
 					// update the jobs urgent size
-					jobs_urgent_size = tb_slist_size(pool->jobs_urgent);
+					jobs_urgent_size = tb_single_list_size(pool->jobs_urgent);
 				}
 
 				// pull from the waiting jobs
 				tb_size_t jobs_waiting_size = 0;
-				if (pool->jobs_waiting && tb_slist_size(pool->jobs_waiting))
+				if (pool->jobs_waiting && tb_single_list_size(pool->jobs_waiting))
 				{
 					// trace
-					tb_trace_d("worker[%lu]: try pulling from waiting: %lu", worker->id, tb_slist_size(pool->jobs_waiting));
+					tb_trace_d("worker[%lu]: try pulling from waiting: %lu", worker->id, tb_single_list_size(pool->jobs_waiting));
 
 					// pull it
-					tb_slist_walk(pool->jobs_waiting, tb_thread_pool_worker_walk_pull, worker);
+					tb_single_list_walk(pool->jobs_waiting, tb_thread_pool_worker_walk_pull, worker);
 
 					// update the jobs waiting size
-					jobs_waiting_size = tb_slist_size(pool->jobs_waiting);
+					jobs_waiting_size = tb_single_list_size(pool->jobs_waiting);
 				}
 
 				// pull from the pending jobs and clean some finished and killed jobs
 				tb_size_t jobs_pending_size = 0;
-				if (pool->jobs_pending && tb_dlist_size(pool->jobs_pending))
+				if (pool->jobs_pending && tb_list_size(pool->jobs_pending))
 				{
 					// trace
-					tb_trace_d("worker[%lu]: try pulling from pending: %lu", worker->id, tb_dlist_size(pool->jobs_pending));
+					tb_trace_d("worker[%lu]: try pulling from pending: %lu", worker->id, tb_list_size(pool->jobs_pending));
 
 					// no jobs? try to pull from the pending jobs
 					if (!tb_vector_size(worker->jobs))
-						tb_dlist_walk(pool->jobs_pending, tb_thread_pool_worker_walk_pull_and_clean, worker);
+						tb_list_walk(pool->jobs_pending, tb_thread_pool_worker_walk_pull_and_clean, worker);
 					// clean some finished and killed jobs
-					else tb_dlist_walk(pool->jobs_pending, tb_thread_pool_worker_walk_clean, worker);
+					else tb_list_walk(pool->jobs_pending, tb_thread_pool_worker_walk_clean, worker);
 
 					// update the jobs pending size
-					jobs_pending_size = tb_dlist_size(pool->jobs_pending);
+					jobs_pending_size = tb_list_size(pool->jobs_pending);
 				}
 
 				// leave 
@@ -661,7 +661,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_t* poo
 	do
 	{
 		// check
-		tb_assert_and_check_break(tb_slist_size(pool->jobs_waiting) + tb_slist_size(pool->jobs_urgent) + 1 < TB_THREAD_POOL_JOBS_WAITING_MAXN);
+		tb_assert_and_check_break(tb_single_list_size(pool->jobs_waiting) + tb_single_list_size(pool->jobs_urgent) + 1 < TB_THREAD_POOL_JOBS_WAITING_MAXN);
 
 		// make job
 		job = (tb_thread_pool_job_t*)tb_fixed_pool_malloc0(pool->jobs_pool);
@@ -676,18 +676,18 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_t* poo
 		if (!task->urgent)
 		{
 			// post to the waiting jobs
-			tb_size_t itor = tb_slist_insert_tail(pool->jobs_waiting, job);
+			tb_size_t itor = tb_single_list_insert_tail(pool->jobs_waiting, job);
 			tb_assert_and_check_break(itor != tb_iterator_tail(pool->jobs_waiting));
 		}
 		else
 		{
 			// post to the urgent jobs
-			tb_size_t itor = tb_slist_insert_tail(pool->jobs_urgent, job);
+			tb_size_t itor = tb_single_list_insert_tail(pool->jobs_urgent, job);
 			tb_assert_and_check_break(itor != tb_iterator_tail(pool->jobs_urgent));
 		}
 
 		// the waiting jobs count
-		tb_size_t jobs_waiting_count = tb_slist_size(pool->jobs_waiting) + tb_slist_size(pool->jobs_urgent);
+		tb_size_t jobs_waiting_count = tb_single_list_size(pool->jobs_waiting) + tb_single_list_size(pool->jobs_urgent);
 		tb_assert_and_check_break(jobs_waiting_count);
 
 		// update the post size
@@ -782,15 +782,15 @@ tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
 		tb_assert_and_check_break(pool->jobs_pool);
 
 		// init jobs urgent
-		pool->jobs_urgent 	= tb_slist_init(TB_THREAD_POOL_JOBS_URGENT_GROW, tb_item_func_ptr(tb_null, tb_null));
+		pool->jobs_urgent 	= tb_single_list_init(TB_THREAD_POOL_JOBS_URGENT_GROW, tb_item_func_ptr(tb_null, tb_null));
 		tb_assert_and_check_break(pool->jobs_urgent);
 
 		// init jobs waiting
-		pool->jobs_waiting 	= tb_slist_init(TB_THREAD_POOL_JOBS_WAITING_GROW, tb_item_func_ptr(tb_null, tb_null));
+		pool->jobs_waiting 	= tb_single_list_init(TB_THREAD_POOL_JOBS_WAITING_GROW, tb_item_func_ptr(tb_null, tb_null));
 		tb_assert_and_check_break(pool->jobs_waiting);
 
 		// init jobs pending
-		pool->jobs_pending 	= tb_dlist_init(TB_THREAD_POOL_JOBS_PENDING_GROW, tb_item_func_ptr(tb_null, tb_null));
+		pool->jobs_pending 	= tb_list_init(TB_THREAD_POOL_JOBS_PENDING_GROW, tb_item_func_ptr(tb_null, tb_null));
 		tb_assert_and_check_break(pool->jobs_pending);
 
 		// init semaphore
@@ -860,15 +860,15 @@ tb_void_t tb_thread_pool_exit(tb_handle_t handle)
 	pool->worker_size = 0;
 
 	// exit pending jobs
-	if (pool->jobs_pending) tb_dlist_exit(pool->jobs_pending);
+	if (pool->jobs_pending) tb_list_exit(pool->jobs_pending);
 	pool->jobs_pending = tb_null;
 
 	// exit waiting jobs
-	if (pool->jobs_waiting) tb_slist_exit(pool->jobs_waiting);
+	if (pool->jobs_waiting) tb_single_list_exit(pool->jobs_waiting);
 	pool->jobs_waiting = tb_null;
 
 	// exit urgent jobs
-	if (pool->jobs_urgent) tb_slist_exit(pool->jobs_urgent);
+	if (pool->jobs_urgent) tb_single_list_exit(pool->jobs_urgent);
 	pool->jobs_urgent = tb_null;
 
 	// exit jobs pool
@@ -1169,9 +1169,9 @@ tb_long_t tb_thread_pool_task_wait_all(tb_handle_t handle, tb_long_t timeout)
 			// trace
 			tb_trace_d("wait: jobs: %lu, waiting: %lu, pending: %lu, urgent: %lu: .."
 						, size
-						, pool->jobs_waiting? tb_slist_size(pool->jobs_waiting) : 0
-						, pool->jobs_pending? tb_dlist_size(pool->jobs_pending) : 0
-						, pool->jobs_urgent? tb_slist_size(pool->jobs_urgent) : 0);
+						, pool->jobs_waiting? tb_single_list_size(pool->jobs_waiting) : 0
+						, pool->jobs_pending? tb_list_size(pool->jobs_pending) : 0
+						, pool->jobs_urgent? tb_single_list_size(pool->jobs_urgent) : 0);
 		}
 		else size = 0;
 

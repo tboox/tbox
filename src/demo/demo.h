@@ -165,8 +165,8 @@ TB_DEMO_MAIN_DECL(platform_thread_pool);
 // container
 TB_DEMO_MAIN_DECL(container_heap);
 TB_DEMO_MAIN_DECL(container_hash);
-TB_DEMO_MAIN_DECL(container_dlist);
-TB_DEMO_MAIN_DECL(container_slist);
+TB_DEMO_MAIN_DECL(container_list);
+TB_DEMO_MAIN_DECL(container_single_list);
 TB_DEMO_MAIN_DECL(container_queue);
 TB_DEMO_MAIN_DECL(container_stack);
 TB_DEMO_MAIN_DECL(container_vector);

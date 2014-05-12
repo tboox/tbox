@@ -215,7 +215,7 @@ typedef struct __tb_cookie_t
 typedef struct __tb_cookies_t
 {
 	// the string pool
-	tb_slist_t* 		spool;
+	tb_single_list_t* 		spool;
 
 	// the cookie pool
 	tb_vector_t* 		cpool;

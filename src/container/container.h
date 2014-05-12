@@ -31,11 +31,11 @@
 #include "item.h"
 #include "hash.h"
 #include "heap.h"
-#include "slist.h"
-#include "dlist.h"
+#include "list.h"
 #include "queue.h"
 #include "stack.h"
 #include "vector.h"
 #include "iterator.h"
+#include "single_list.h"
 
 #endif
