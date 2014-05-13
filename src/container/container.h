@@ -37,5 +37,6 @@
 #include "vector.h"
 #include "iterator.h"
 #include "single_list.h"
+#include "bloom_filter.h"
 
 #endif
