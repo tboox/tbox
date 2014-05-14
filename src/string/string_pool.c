@@ -104,7 +104,7 @@ tb_handle_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
 		tb_assert_and_check_break(pool->pool);
 
 		// init hash
-		pool->cache = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(bcase, pool->pool), tb_item_func_size());
+		pool->cache = tb_hash_init(0, tb_item_func_str(bcase, pool->pool), tb_item_func_size());
 		tb_assert_and_check_break(pool->cache);
 
 		// register lock profiler

@@ -404,7 +404,7 @@ static tb_pointer_t tb_static_block_pool_malloc_from(tb_static_block_pool_t* poo
 	{
 		// the block
 		tb_static_block_pool_block_t* 	block = ((tb_static_block_pool_block_t*)p);
-		tb_size_t 			bsize = ((tb_static_block_pool_block_t*)p)->size;
+		tb_size_t 						bsize = ((tb_static_block_pool_block_t*)p)->size;
 			
 		// overflow?
 		tb_check_abort(tb_static_block_pool_overflow_check(pool, block, tb_null));

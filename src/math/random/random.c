@@ -38,7 +38,7 @@ tb_handle_t tb_random_linear_init(tb_size_t seed);
 static tb_handle_t tb_random_instance_init(tb_cpointer_t* ppriv)
 {
 	// init it
-	return tb_random_init(TB_RANDOM_GENERATOR_TYPE_LINEAR, (tb_size_t)tb_time());
+	return tb_random_init(TB_RANDOM_GENERATOR_TYPE_LINEAR, 2166136261);
 }
 static tb_void_t tb_random_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {

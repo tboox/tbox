@@ -98,7 +98,7 @@ tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
 		tb_assert_and_check_break(writer->elements);
 
 		// init attributes
-		writer->attributes 	= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, writer->pool), tb_item_func_str(tb_false, writer->pool));
+		writer->attributes 	= tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false, writer->pool), tb_item_func_str(tb_false, writer->pool));
 		tb_assert_and_check_break(writer->attributes);
 
 		// ok
