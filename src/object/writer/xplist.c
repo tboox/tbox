@@ -381,7 +381,7 @@ tb_object_writer_t* tb_object_xplist_writer()
 	s_writer.writ = tb_object_xplist_writer_done;
  
 	// init hooker
-	s_writer.hooker = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+	s_writer.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
 	// hook writer 

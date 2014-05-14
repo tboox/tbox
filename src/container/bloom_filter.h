@@ -35,14 +35,9 @@
  */
 
 // the item maxn
-#define TB_BLOOM_FILTER_MAXN_MICRO 					(1 << 16)
-#define TB_BLOOM_FILTER_MAXN_SMALL 					(1 << 20)
-#define TB_BLOOM_FILTER_MAXN_LARGE 					(1 << 24)
-#ifdef __tb_small__
-# 	define TB_BLOOM_FILTER_MAXN_DEFAULT 			TB_BLOOM_FILTER_MAXN_MICRO
-#else
-# 	define TB_BLOOM_FILTER_MAXN_DEFAULT 			TB_BLOOM_FILTER_MAXN_SMALL
-#endif
+#define TB_BLOOM_FILTER_ITEM_MAXN_MICRO 				(1 << 16)
+#define TB_BLOOM_FILTER_ITEM_MAXN_SMALL 				(1 << 20)
+#define TB_BLOOM_FILTER_ITEM_MAXN_LARGE 				(1 << 24)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -135,12 +130,12 @@ typedef enum __tb_bloom_filter_probability_e
  *
  * @param probability 	the probability of false positives
  * @param hash_count 	the hash count
- * @param maxn 			the item maxn
+ * @param item_maxn 	the item maxn
  * @param func 			the item func only for hash
  *
  * @return 				the bloom_filter
  */
-tb_bloom_filter_t* 		tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t maxn, tb_item_func_t func);
+tb_bloom_filter_t* 		tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func);
 
 /*! exit bloom filter
  *
@@ -164,6 +159,8 @@ tb_void_t 				tb_bloom_filter_clear(tb_bloom_filter_t* bloom_filter);
  * else
  * {
  *     tb_trace_i("this data have been existed, set failed!");
+ *
+ *     // note: maybe false positives
  * }
  * @endcode
  *
@@ -180,6 +177,8 @@ tb_bool_t 				tb_bloom_filter_set(tb_bloom_filter_t* bloom_filter, tb_cpointer_t
  * if (tb_bloom_filter_get(filter, data))
  * {
  *     tb_trace_i("this data have been existed, get ok!");
+ *
+ *     // note: maybe false positives
  * }
  * else
  * {

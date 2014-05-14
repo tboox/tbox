@@ -35,15 +35,10 @@
  * macros
  */
 
-// the hash size
-#define TB_HASH_SIZE_MICRO 					(64)
-#define TB_HASH_SIZE_SMALL 					(256)
-#define TB_HASH_SIZE_LARGE 					(65536)
-#ifdef __tb_small__
-# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_MICRO
-#else
-# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_SMALL
-#endif
+// the hash bulk size
+#define TB_HASH_BULK_SIZE_MICRO 				(64)
+#define TB_HASH_BULK_SIZE_SMALL 				(256)
+#define TB_HASH_BULK_SIZE_LARGE 				(65536)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -69,13 +64,13 @@ typedef tb_void_t 		tb_hash_t;
 
 /*! init hash
  *
- * @param size 			the hash size
+ * @param bulk_size 	the hash bulk size, using the default size if be zero
  * @param name_func 	the hash name func
  * @param data_func 	the hash data func
  *
  * @return 				the hash
  */
-tb_hash_t* 				tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
+tb_hash_t* 				tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_func_t data_func);
 
 /*! exit hash
  *
@@ -140,12 +135,6 @@ tb_size_t 				tb_hash_size(tb_hash_t const* hash);
  */
 tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
 
-/*! dump hash
- *
- * @param hash 			the hash
- */
-tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
-
 /*! walk hash items
  *
  * be faster than the iterator mode, optimizate to remove items for walking
@@ -169,6 +158,14 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  *
  */
 tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
+
+#ifdef __tb_debug__
+/*! dump hash
+ *
+ * @param hash 			the hash
+ */
+tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
+#endif
 
 #endif
 

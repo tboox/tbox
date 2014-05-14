@@ -35,7 +35,7 @@
 
 // the callback type
 struct __tb_item_func_t;
-typedef tb_size_t 				(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_size_t size);
+typedef tb_size_t 				(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index);
 typedef tb_long_t 				(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata);
 
 typedef tb_pointer_t 			(*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_cpointer_t item);

@@ -30,14 +30,20 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_size_t tb_item_func_uint16_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
+static tb_size_t tb_item_func_uint16_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {
 	// check
-	tb_assert_and_check_return_val(size, 0);
-	tb_assert_return_val(tb_ispow2(size), 0);
+	tb_assert_and_check_return_val(mask, 0);
 
-	// compute the crc hash
-	return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, (tb_byte_t const*)&data, sizeof(tb_uint16_t)) & (size - 1));
+	// compute the first hash
+	if (!index) return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, (tb_byte_t const*)&data, sizeof(tb_uint16_t)) & mask);
+ 
+	// the hash seed
+	static tb_size_t s_seed[] = {2654435761, 16777619, 158761, 326903, 436841, 587269, 733157, 827327, 920743, 983579, 795323, 250153, 2166136261, 67211, 977, 23};
+	tb_assert_and_check_return_val(index < tb_arrayn(s_seed) + 1, 0);
+
+	// compute the other hash
+	return ((((tb_size_t)data) * s_seed[index - 1]) & mask);
 }
 static tb_long_t tb_item_func_uint16_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {

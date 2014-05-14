@@ -469,7 +469,7 @@ tb_object_reader_t* tb_object_bin_reader()
 	s_reader.probe 	= tb_object_bin_reader_probe;
 
 	// init hooker
-	s_reader.hooker = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+	s_reader.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
 	// hook reader 

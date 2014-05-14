@@ -30,14 +30,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_size_t tb_item_func_size_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
+static tb_size_t tb_item_func_size_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {
-	// check
-	tb_assert_and_check_return_val(size, 0);
-	tb_assert_return_val(tb_ispow2(size), 0);
+	// the hash seed
+	static tb_size_t s_seed[] = {997, 463, 103, 151, 197, 293, 401, 503, 61, 587, 683, 811, 929, 953, 977, 23};
+	tb_assert_and_check_return_val(index < tb_arrayn(s_seed) + 1, 0);
 
 	// compute the crc hash
-	return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, (tb_byte_t const*)&data, sizeof(tb_size_t)) & (size - 1));
+	return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, index? s_seed[index - 1] : 0, (tb_byte_t const*)&data, sizeof(tb_size_t)) & mask);
 }
 static tb_long_t tb_item_func_size_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {

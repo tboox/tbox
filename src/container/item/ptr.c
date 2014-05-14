@@ -30,15 +30,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_size_t tb_item_func_ptr_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
-{
-	// check
-	tb_assert_and_check_return_val(data && size, 0);
-	tb_assert_return_val(tb_ispow2(size), 0);
-
-	// compute the crc hash
-	return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, (tb_byte_t const*)&data, sizeof(tb_pointer_t)) & (size - 1));
-}
 static tb_long_t tb_item_func_ptr_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
 	return ((tb_size_t)ldata > (tb_size_t)rdata? 1 : ((tb_size_t)ldata < (tb_size_t)rdata? -1 : 0));
@@ -147,10 +138,13 @@ static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item,
  */
 tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_cpointer_t priv)
 {
+	// the size func
+	tb_item_func_t func_size = tb_item_func_size();
+
 	// init func
 	tb_item_func_t func = {0};
 	func.type 	= TB_ITEM_TYPE_PTR;
-	func.hash 	= tb_item_func_ptr_hash;
+	func.hash 	= func_size.hash;
 	func.comp 	= tb_item_func_ptr_comp;
 	func.data 	= tb_item_func_ptr_data;
 	func.cstr 	= tb_item_func_ptr_cstr;

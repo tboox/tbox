@@ -422,7 +422,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 		tb_assert_and_check_break(worker->jobs);
 
 		// init stats
-		worker->stats = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_mem(sizeof(tb_thread_pool_job_stats_t), tb_null, tb_null));
+		worker->stats = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_mem(sizeof(tb_thread_pool_job_stats_t), tb_null, tb_null));
 		tb_assert_and_check_break(worker->stats);
 		
 		// loop

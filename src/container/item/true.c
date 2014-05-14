@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_size_t tb_item_func_true_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
+static tb_size_t tb_item_func_true_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size, tb_size_t index)
 {
 	return 0;
 }

@@ -54,8 +54,12 @@
 # 	define TB_HASH_INDEX_ITEM(index) 				(((index) >> 16) & 0xffff)
 #endif
 
-// grow
-#define TB_HASH_GROW_MIN 							(8)
+// the hash bulk default size
+#ifdef __tb_small__
+# 	define TB_HASH_BULK_SIZE_DEFAULT 			TB_HASH_BULK_SIZE_MICRO
+#else
+# 	define TB_HASH_BULK_SIZE_DEFAULT 			TB_HASH_BULK_SIZE_SMALL
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -114,6 +118,9 @@ typedef struct __tb_hash_impl_t
 	/// the item maxn
 	tb_size_t 				item_maxn;
 
+	/// the item grow
+	tb_size_t 				item_grow;
+
 	/// the hash item
 	tb_hash_item_t 			hash_item;
 
@@ -140,7 +147,7 @@ static tb_bool_t tb_hash_item_find(tb_hash_impl_t* hash, tb_cpointer_t name, tb_
 	tb_assert_and_check_return_val(step, tb_false);
 
 	// comupte hash from name
-	tb_size_t buck = hash->name_func.hash(&hash->name_func, name, hash->hash_size);
+	tb_size_t buck = hash->name_func.hash(&hash->name_func, name, hash->hash_size - 1, 0);
 	tb_assert_and_check_return_val(buck < hash->hash_size, tb_false);
 
 	// update bucket
@@ -182,7 +189,7 @@ static tb_bool_t tb_hash_item_find(tb_hash_impl_t* hash, tb_cpointer_t name, tb_
 	tb_assert_and_check_return_val(step, tb_false);
 
 	// comupte hash from name
-	tb_size_t buck = hash->name_func.hash(&hash->name_func, name, hash->hash_size);
+	tb_size_t buck = hash->name_func.hash(&hash->name_func, name, hash->hash_size - 1, 0);
 	tb_assert_and_check_return_val(buck < hash->hash_size, tb_false);
 
 	// update bucket
@@ -403,12 +410,15 @@ static tb_long_t tb_hash_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t lt
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
+tb_hash_t* tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_func_t data_func)
 {
 	// check
-	tb_assert_and_check_return_val(size, tb_null);
 	tb_assert_and_check_return_val(name_func.size && name_func.hash && name_func.comp && name_func.data && name_func.dupl, tb_null);
 	tb_assert_and_check_return_val(data_func.data && data_func.dupl && data_func.repl, tb_null);
+
+	// check bulk size
+	if (!bulk_size) bulk_size = TB_HASH_BULK_SIZE_DEFAULT;
+	tb_assert_and_check_return_val(bulk_size <= TB_HASH_BULK_SIZE_LARGE, tb_null);
 
 	// make hash
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)tb_malloc0(sizeof(tb_hash_impl_t));
@@ -433,12 +443,17 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	hash->item_itor.comp = tb_hash_iterator_comp;
 
 	// init hash size
-	hash->hash_size = tb_align_pow2(size);
+	hash->hash_size = tb_align_pow2(bulk_size);
 	tb_assert_and_check_goto(hash->hash_size <= 65536, fail);
 
 	// init hash list
 	hash->hash_list = tb_nalloc0(hash->hash_size, sizeof(tb_size_t));
 	tb_assert_and_check_goto(hash->hash_list, fail);
+
+	// init item grow
+	hash->item_grow = tb_isqrti(bulk_size);
+	if (hash->item_grow < 8) hash->item_grow = 8;
+	hash->item_grow = tb_align_pow2(hash->item_grow);
 
 	// ok
 	return (tb_hash_t*)hash;
@@ -581,7 +596,11 @@ tb_size_t tb_hash_set(tb_hash_t* handle, tb_cpointer_t name, tb_cpointer_t data)
 			// grow?
 			if (list->size >= list->maxn)
 			{
-				tb_size_t maxn = tb_align_pow2(list->maxn + 1);
+				// check
+				tb_assert_and_check_return_val(hash->item_grow, 0);
+
+				// resize maxn
+				tb_size_t maxn = tb_align_pow2(list->maxn + hash->item_grow);
 				tb_assert_and_check_return_val(maxn > list->maxn, 0);
 
 				// realloc it
@@ -610,13 +629,16 @@ tb_size_t tb_hash_set(tb_hash_t* handle, tb_cpointer_t name, tb_cpointer_t data)
 		// create list for adding item
 		else
 		{
-			// alloc list
-			list = tb_malloc0(sizeof(tb_hash_item_list_t) + TB_HASH_GROW_MIN * step);
+			// check
+			tb_assert_and_check_return_val(hash->item_grow, 0);
+
+			// make list
+			list = tb_malloc0(sizeof(tb_hash_item_list_t) + hash->item_grow * step);
 			tb_assert_and_check_return_val(list, 0);
 
 			// init list
 			list->size = 1;
-			list->maxn = TB_HASH_GROW_MIN;
+			list->maxn = hash->item_grow;
 			hash->name_func.dupl(&hash->name_func, ((tb_byte_t*)&list[1]), name);
 			hash->data_func.dupl(&hash->data_func, ((tb_byte_t*)&list[1]) + hash->name_func.size, data);
 
@@ -780,6 +802,7 @@ tb_void_t tb_hash_dump(tb_hash_t const* handle)
 	tb_trace_i("hash_list: hash_size: %d, item_size: %u, item_maxn: %u", hash->hash_size, hash->item_size, hash->item_maxn);
 	tb_trace_i("=========================================================");
 
+#if 0
 	// dump
 	tb_size_t i = 0;
 	tb_char_t name[4096];
@@ -798,21 +821,21 @@ tb_void_t tb_hash_dump(tb_hash_t const* handle)
 
 				if (hash->name_func.cstr && hash->data_func.cstr) 
 					tb_trace_i("bucket[%d:%d] => [%d]:\t%s\t\t=> %s", i, j
-						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size - 1, 0)
 						, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
 						, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
 				else if (hash->name_func.cstr) 
 					tb_trace_i("bucket[%d:%d] => [%d]:\t%s\t\t=> %x", i, j
-						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size - 1, 0)
 						, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
 						, item_data);
 				else if (hash->data_func.cstr) 
 					tb_trace_i("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
-						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size - 1, 0)
 						, item_name
 						, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
 				else tb_trace_i("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
-						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size - 1, 0)
 						, item_name
 						, item_data);
 			}
@@ -828,24 +851,36 @@ tb_void_t tb_hash_dump(tb_hash_t const* handle)
 		{
 			if (hash->name_func.cstr && hash->data_func.cstr) 
 				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %s", item_itor
-					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size - 1, 0)
 					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 			else if (hash->name_func.cstr) 
 				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %x", item_itor
-					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size - 1, 0)
 					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 					, item->data);
 			else if (hash->data_func.cstr) 
 				tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", item_itor
-					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size - 1, 0)
 					, item->name
 					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 			else tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", item_itor
-					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size - 1, 0)
 					, item->name
 					, item->data);
 		}
 	}
+#else
+	tb_size_t i = 0;
+	for (i = 0; i < hash->hash_size; i++)
+	{
+		tb_hash_item_list_t* list = hash->hash_list[i];
+		if (list)
+		{
+			tb_trace_i("bucket[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
+		}
+	}
+
+#endif
 }
 #endif
