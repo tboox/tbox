@@ -12,6 +12,13 @@
  */
 tb_int_t tb_demo_container_bloom_filter_main(tb_int_t argc, tb_char_t** argv)
 {
+	// init filter
+	tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_0001, 4, 10000000, tb_item_func_size());
+	if (filter)
+	{
 
+		// exit filter
+		tb_bloom_filter_exit(filter);
+	}
 	return 0;
 }

@@ -32,8 +32,8 @@ tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
 	// s ~= -k / (-c-0.5c^2) = 2k / (2c + c * c)
 
 
-	tb_double_t p2 = 0.001;
-	tb_double_t k2 = k;
+	tb_double_t p2 = 0.0001;
+	tb_double_t k2 = 5;
 //	tb_double_t tt = 1.0 - tb_pow(p2, 1.0 / k2);
 //	tb_double_t s2 = -k2 * tb_log2(2.718281828459045) / tb_log2(tt);
 
