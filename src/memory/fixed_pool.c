@@ -34,10 +34,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
+
 #ifdef __tb_small__
 # 	define TB_FIXED_POOL_CHUNK_GROW 			(8)
 #else
 # 	define TB_FIXED_POOL_CHUNK_GROW 			(16)
+#endif
+
+#ifdef __tb_small__
+# 	define TB_FIXED_POOL_GROW_DEFAULT 			TB_FIXED_POOL_GROW_SMALL
+#else
+# 	define TB_FIXED_POOL_GROW_DEFAULT 			TB_FIXED_POOL_GROW_LARGE
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -134,11 +141,15 @@ static tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_pointer_t data)
  */
 tb_handle_t tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 {
-	tb_assert_and_check_return_val(grow && step, tb_null);
+	// check
+	tb_assert_and_check_return_val(step, tb_null);
 
 	// init pool
 	tb_fixed_pool_t* pool = (tb_fixed_pool_t*)tb_malloc0(sizeof(tb_fixed_pool_t));
 	tb_assert_and_check_return_val(pool, tb_null);
+
+	// using the default grow
+	if (!grow) grow = TB_FIXED_POOL_GROW_DEFAULT;
 
 	// init pools size
 	pool->size = 0;

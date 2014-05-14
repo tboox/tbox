@@ -9,7 +9,7 @@
 tb_int_t tb_demo_memory_fixed_pool_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init pool
-	tb_handle_t pool = tb_fixed_pool_init(TB_FIXED_POOL_GROW_DEFAULT, 64, 0);
+	tb_handle_t pool = tb_fixed_pool_init(0, 64, 0);
 	tb_assert_and_check_return_val(pool, 0);
 
 	__tb_volatile__ tb_hong_t 	time = tb_mclock();

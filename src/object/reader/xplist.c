@@ -436,7 +436,7 @@ static tb_object_t* tb_object_xplist_reader_func_dictionary(tb_object_xplist_rea
 	if (!tb_static_string_init(&kname, kdata, 8192)) return tb_null;
 
 	// init dictionary
-	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT, tb_false);
+	tb_object_t* dictionary = tb_dictionary_init(0, tb_false);
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
 	// walk

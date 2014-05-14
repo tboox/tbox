@@ -32,6 +32,15 @@
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef __tb_small__
+# 	define TB_QUEUE_SIZE_DEFAULT 			TB_QUEUE_SIZE_SMALL
+#else
+# 	define TB_QUEUE_SIZE_DEFAULT 			TB_QUEUE_SIZE_LARGE
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -167,12 +176,14 @@ static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t l
 tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 {
 	// check
-	tb_assert_and_check_return_val(maxn, tb_null);
 	tb_assert_and_check_return_val(func.size && func.dupl && func.data, tb_null);
 
 	// alloc queue
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)tb_malloc0(sizeof(tb_queue_impl_t));
 	tb_assert_and_check_return_val(queue, tb_null);
+
+	// using the default maxn
+	if (!maxn) maxn = TB_QUEUE_SIZE_DEFAULT;
 
 	// init queue
 	queue->maxn = tb_align_pow2(maxn + 1); // + tail

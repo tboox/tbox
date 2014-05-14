@@ -40,6 +40,12 @@
 # 	define TB_BLOCK_POOL_CHUNK_GROW 			(16)
 #endif
 
+#ifdef __tb_small__
+# 	define TB_BLOCK_POOL_GROW_DEFAULT 			TB_BLOCK_POOL_GROW_SMALL
+#else
+# 	define TB_BLOCK_POOL_GROW_DEFAULT 			TB_BLOCK_POOL_GROW_LARGE
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -167,7 +173,8 @@ static tb_pointer_t tb_block_pool_ralloc_fast(tb_block_pool_t* pool, tb_pointer_
  */
 tb_handle_t tb_block_pool_init(tb_size_t grow, tb_size_t align)
 {
-	tb_assert_and_check_return_val(grow, tb_null);
+	// using the default grow
+	if (!grow) grow = TB_BLOCK_POOL_GROW_DEFAULT;
 
 	// init pool
 	tb_block_pool_t* pool = (tb_block_pool_t*)tb_malloc0(sizeof(tb_block_pool_t));

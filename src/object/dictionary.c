@@ -36,6 +36,15 @@
 #include "../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef __tb_small__
+# 	define TB_DICTIONARY_SIZE_DEFAULT 			TB_DICTIONARY_SIZE_MICRO
+#else
+# 	define TB_DICTIONARY_SIZE_DEFAULT 			TB_DICTIONARY_SIZE_SMALL
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -132,12 +141,14 @@ static tb_dictionary_t* tb_dictionary_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
 tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 {
 	// make
 	tb_dictionary_t* dictionary = tb_dictionary_init_base();
 	tb_assert_and_check_return_val(dictionary, tb_null);
+
+	// using the default size
+	if (!size) size = TB_DICTIONARY_SIZE_DEFAULT;
 
 	// init
 	dictionary->size = size;
