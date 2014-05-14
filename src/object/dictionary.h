@@ -36,12 +36,6 @@
 #define TB_DICTIONARY_SIZE_SMALL 				(256)
 #define TB_DICTIONARY_SIZE_LARGE 				(65536)
 
-#ifdef __tb_small__
-# 	define TB_DICTIONARY_SIZE_DEFAULT 			TB_DICTIONARY_SIZE_MICRO
-#else
-# 	define TB_DICTIONARY_SIZE_DEFAULT 			TB_DICTIONARY_SIZE_SMALL
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -63,7 +57,7 @@ typedef struct __tb_dictionary_item_t
 
 /*! init dictionary
  *
- * @param size			the dictionary size
+ * @param size			the dictionary size, using the default size if be zero
  * @param incr			is increase refn?
  *
  * @return 				the dictionary object

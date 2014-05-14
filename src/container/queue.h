@@ -38,12 +38,6 @@
 #define TB_QUEUE_SIZE_SMALL 				(255)
 #define TB_QUEUE_SIZE_LARGE 				(65535)
 
-#ifdef __tb_small__
-# 	define TB_QUEUE_SIZE_DEFAULT 			TB_QUEUE_SIZE_SMALL
-#else
-# 	define TB_QUEUE_SIZE_DEFAULT 			TB_QUEUE_SIZE_LARGE
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -57,7 +51,7 @@ typedef tb_void_t 	tb_queue_t;
 
 /*! init queue
  *
- * @param maxn 		the item maxn
+ * @param maxn 		the item maxn, using the default maxn if be zero
  * @param func 		the item func
  *
  * @return 			the queue

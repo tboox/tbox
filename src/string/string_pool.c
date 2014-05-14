@@ -100,7 +100,7 @@ tb_handle_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
 		if (!tb_spinlock_init(&pool->lock)) break;
 
 		// init pool
-		pool->pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, align);
+		pool->pool = tb_block_pool_init(0, align);
 		tb_assert_and_check_break(pool->pool);
 
 		// init hash

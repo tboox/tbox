@@ -144,7 +144,7 @@ tb_bool_t tb_dns_cache_init()
 	do
 	{
 		// init pool
-		if (!g_cache.pool) g_cache.pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, 0);
+		if (!g_cache.pool) g_cache.pool = tb_block_pool_init(0, 0);
 		tb_assert_and_check_break(g_cache.pool);
 
 		// init hash

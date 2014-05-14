@@ -48,19 +48,13 @@
 #define TB_BLOCK_POOL_GROW_SMALL 							(65536)
 #define TB_BLOCK_POOL_GROW_LARGE 							(256 * 1024)
 
-#ifdef __tb_small__
-# 	define TB_BLOCK_POOL_GROW_DEFAULT 						TB_BLOCK_POOL_GROW_SMALL
-#else
-# 	define TB_BLOCK_POOL_GROW_DEFAULT 						TB_BLOCK_POOL_GROW_LARGE
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 /*! init the block pool
  * 
- * @param grow 		the pool grow size
+ * @param grow 		the pool grow size, using the default grow
  * @param align 	the pool bytes align, using the cpu-aligned if be zero
  *
  * @return 			the pool handle
