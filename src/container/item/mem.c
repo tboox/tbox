@@ -26,21 +26,14 @@
  * includes
  */
 #include "prefix.h"
+#include "hash.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_size_t tb_item_func_mem_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {	
-	// check
-	tb_assert_and_check_return_val(func && func->size && data, 0);
-
-	// the hash seed
-	static tb_size_t s_seed[] = {2654435761, 16777619, 158761, 326903, 436841, 587269, 733157, 827327, 920743, 983579, 795323, 250153, 2166136261, 67211, 977, 23};
-	tb_assert_and_check_return_val(index < tb_arrayn(s_seed) + 1, 0);
-
-	// compute the crc hash
-	return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, index? s_seed[index - 1] : 0, data, func->size) & mask);
+	return tb_item_func_hash_data(data, func->size, mask, index);
 }
 static tb_long_t tb_item_func_mem_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {

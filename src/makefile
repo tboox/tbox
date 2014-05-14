@@ -56,6 +56,7 @@ tbox_C_FILES 			+= \
 						container/item/str \
 						container/item/ptr \
 						container/item/mem \
+						container/item/hash \
 						container/item/true \
 						container/item/long \
 						container/item/size \
