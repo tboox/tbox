@@ -13,10 +13,11 @@
 tb_int_t tb_demo_container_bloom_filter_main(tb_int_t argc, tb_char_t** argv)
 {
 	// the count
+//	tb_size_t count = 1000000;
 	tb_size_t count = 10000000;
 
 	// init filter
-	tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 4, count, tb_item_func_long());
+	tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 3, count, tb_item_func_long());
 	if (filter)
 	{
 		// init hash
