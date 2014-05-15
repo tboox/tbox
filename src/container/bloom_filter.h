@@ -129,7 +129,7 @@ typedef enum __tb_bloom_filter_probability_e
  * @note not supports iterator 
  *
  * @param probability 	the probability of false positives
- * @param hash_count 	the hash count
+ * @param hash_count 	the hash count: < 16
  * @param item_maxn 	the item maxn
  * @param func 			the item func only for hash
  *

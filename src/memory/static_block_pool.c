@@ -610,7 +610,7 @@ tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_p
 	// the block
 	tb_static_block_pool_block_t* 	block = ((tb_static_block_pool_block_t*)(p - nhead));
 #ifdef __tb_debug__
-	tb_size_t 			bsize = block->size;
+	tb_size_t 						bsize = block->size;
 #endif
 
 	// check block

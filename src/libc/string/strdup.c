@@ -33,15 +33,20 @@
 
 tb_char_t* tb_strdup(tb_char_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
+	// make 
 	__tb_register__ tb_size_t 	n = tb_strlen(s);
 	__tb_register__ tb_char_t* 	p = tb_malloc(n + 1);
-	if (p)
-	{
-		tb_memcpy(p, s, n);
-		p[n] = '\0';
-	}
+	tb_assert_and_check_return_val(p, tb_null);
 
+	// copy
+	tb_memcpy(p, s, n);
+
+	// end
+	p[n] = '\0';
+
+	// ok
 	return p;
 }
