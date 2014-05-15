@@ -423,10 +423,6 @@ static tb_size_t tb_database_mysql_result_row_iterator_size(tb_iterator_t* itera
 }
 static tb_size_t tb_database_mysql_result_row_iterator_head(tb_iterator_t* iterator)
 {
-	// check
-	tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
-	tb_assert_return_val(result, 0);
-
 	// head
 	return 0;
 }

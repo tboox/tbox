@@ -625,6 +625,7 @@ tb_size_t tb_hash_set(tb_hash_t* handle, tb_cpointer_t name, tb_cpointer_t data)
 			list->size++;
 			hash->name_func.dupl(&hash->name_func, ((tb_byte_t*)&list[1]) + item * step, name);
 			hash->data_func.dupl(&hash->data_func, ((tb_byte_t*)&list[1]) + item * step + hash->name_func.size, data);
+
 		}
 		// create list for adding item
 		else

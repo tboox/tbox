@@ -40,7 +40,12 @@
 #else 
 tb_handle_t tb_event_init()
 {
-	return tb_malloc0(sizeof(tb_atomic_t));
+	// make 
+	tb_handle_t event = (tb_handle_t)tb_malloc0(sizeof(tb_atomic_t));
+	tb_assert_and_check_return_val(event, tb_null);
+
+	// ok
+	return event;
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
