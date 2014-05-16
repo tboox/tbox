@@ -82,7 +82,17 @@ static tb_bool_t tb_basic_stream_file_open(tb_handle_t bstream)
 
 	// open file
 	fstream->file = tb_file_init(url, fstream->mode);
-	tb_assert_and_check_return_val(fstream->file, tb_false);
+	
+	// open file failed?
+	if (!fstream->file)
+	{
+		// trace
+		tb_trace_e("open %s: failed", url);
+
+		// save state
+		fstream->base.state = TB_STATE_FILE_OPEN_FAILED;
+		return tb_false;
+	}
 
 	// ok
 	return tb_true;

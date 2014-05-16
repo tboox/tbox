@@ -69,6 +69,7 @@ tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
 
 	} while (1);
 
+	// no found
 	return tb_null;
 }
 #endif

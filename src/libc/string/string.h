@@ -102,12 +102,15 @@ tb_char_t* 		tb_strnirchr(tb_char_t const* s, tb_size_t n, tb_char_t c);
 tb_char_t* 		tb_strstr(tb_char_t const* s1, tb_char_t const* s2);
 tb_char_t* 		tb_stristr(tb_char_t const* s1, tb_char_t const* s2);
 
+tb_char_t* 		tb_strnstr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2);
+tb_char_t* 		tb_strnistr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2);
+
 // strrstr
 tb_char_t* 		tb_strrstr(tb_char_t const* s1, tb_char_t const* s2);
 tb_char_t* 		tb_strirstr(tb_char_t const* s1, tb_char_t const* s2);
 
-tb_char_t* 		tb_strnrstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
-tb_char_t* 		tb_strnirstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
+tb_char_t* 		tb_strnrstr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2);
+tb_char_t* 		tb_strnirstr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2);
 
 // wcslen
 tb_size_t 		tb_wcslen(tb_wchar_t const* s);

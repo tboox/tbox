@@ -100,7 +100,6 @@ TB_DEMO_MAIN_DECL(object_dump);
 
 // spider
 TB_DEMO_MAIN_DECL(spider);
-TB_DEMO_MAIN_DECL(spider_queue);
 
 // stream
 TB_DEMO_MAIN_DECL(stream_transfer_pool);

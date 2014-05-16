@@ -258,7 +258,10 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
 	// stoped?
 	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
 
-	// must enable cache
+	// no cache? enable it first
+	if (!tb_queue_buffer_maxn(&stream->cache)) tb_queue_buffer_resize(&stream->cache, size);
+
+	// check
 	tb_assert_and_check_return_val(tb_queue_buffer_maxn(&stream->cache) && size <= tb_queue_buffer_maxn(&stream->cache), tb_false);
 
 	// have writed cache? sync first
@@ -802,7 +805,6 @@ tb_sint8_t tb_basic_stream_bread_s8(tb_basic_stream_t* stream)
 	if (!tb_basic_stream_bread(stream, b, 1)) return 0;
 	return b[0];
 }
-
 tb_uint16_t tb_basic_stream_bread_u16_le(tb_basic_stream_t* stream)
 {	
 	tb_byte_t b[2];

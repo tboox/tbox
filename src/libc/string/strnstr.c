@@ -17,17 +17,50 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		strnstr.c
+ * @ingroup 	libc
  *
  */
-#ifndef TB_DEMO_SPIDER_PREFIX_H
-#define TB_DEMO_SPIDER_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../demo.h"
+#include "string.h"
 
-#endif
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation 
+ */
+tb_char_t* tb_strnstr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2)
+{
+	// check
+	tb_assert_and_check_return_val(s1 && s2 && n1, tb_null);
 
+	// init
+	__tb_register__ tb_char_t const* 	s = s1;
+	__tb_register__ tb_char_t const* 	p = s2;
+	__tb_register__ tb_size_t 			n = n1;
+
+	// done
+	do 
+	{
+		if (!*p) return (tb_char_t *)s1;
+		if (n && *p == *s) 
+		{
+			++p;
+			++s;
+			--n;
+		} 
+		else 
+		{
+			p = s2;
+			if (!*s || !n) return tb_null;
+			s = ++s1;
+			n = --n1;
+		}
+
+	} while (1);
+
+	// no found
+	return tb_null;
+}
 

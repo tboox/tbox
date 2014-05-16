@@ -44,11 +44,14 @@ tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 #else
 tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 {
+	// check
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
+	// init
 	__tb_register__ tb_char_t const* s = s1;
 	__tb_register__ tb_char_t const* p = s2;
 
+	// done
 	do 
 	{
 		if (!*p) return (tb_char_t *)s1;
@@ -66,6 +69,7 @@ tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 
 	} while (1);
 
+	// no found
 	return tb_null;
 }
 #endif

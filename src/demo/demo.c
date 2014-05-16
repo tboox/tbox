@@ -106,8 +106,14 @@ static tb_demo_t g_demo[] =
 #endif
 
 	// spider
+#if defined(TB_CONFIG_MODULE_HAVE_DATABASE) \
+	&& defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
+	&& defined(TB_CONFIG_MODULE_HAVE_ASIO) \
+	&& defined(TB_CONFIG_MODULE_HAVE_ZIP) \
+	&& defined(TB_CONFIG_MODULE_HAVE_XML) \
+	&& defined(TB_CONFIG_MODULE_HAVE_OBJECT)
 ,	TB_DEMO_MAIN_ITEM(spider)
-,	TB_DEMO_MAIN_ITEM(spider_queue)
+#endif
 
 	// stream
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
