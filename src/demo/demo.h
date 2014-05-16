@@ -98,9 +98,6 @@ TB_DEMO_MAIN_DECL(object_xplist);
 TB_DEMO_MAIN_DECL(object_bplist);
 TB_DEMO_MAIN_DECL(object_dump);
 
-// spider
-TB_DEMO_MAIN_DECL(spider);
-
 // stream
 TB_DEMO_MAIN_DECL(stream_transfer_pool);
 TB_DEMO_MAIN_DECL(stream_transfer);
@@ -139,6 +136,7 @@ TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_http);
 TB_DEMO_MAIN_DECL(network_whois);
+TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
 
 // platform

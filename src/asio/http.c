@@ -659,11 +659,21 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
 		if (http->transfer) tb_transfer_exit(http->transfer, tb_true);
 		http->transfer = tb_null;
 
-		// trace
-		tb_trace_d("redirect: %s", tb_scoped_string_cstr(&http->status.location));
+		// done location url
+		tb_char_t const* location = tb_scoped_string_cstr(&http->status.location);
+		tb_assert_and_check_break(location);
 
-		// set url
-		if (!tb_url_set(&http->option.url, tb_scoped_string_cstr(&http->status.location))) break;
+		// trace
+		tb_trace_d("redirect: %s", location);
+
+		// only path?
+		if (location[0] == '/') tb_url_path_set(&http->option.url, location);
+		// full url?
+		else
+		{
+			// set url
+			if (!tb_url_set(&http->option.url, location)) break;
+		}
 
 		// done open
 		if (!tb_aicp_http_open_done(http)) break;

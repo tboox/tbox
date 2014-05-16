@@ -27,7 +27,6 @@ demo_C_FILES 								+= \
 											utils/base32 \
 											utils/base64 \
 											other/test \
-											spider/spider \
 											stream/basic_stream/null \
 											stream/basic_stream/cache \
 											string/string_pool \
@@ -49,6 +48,7 @@ demo_C_FILES 								+= \
 											network/ipv4 \
 											network/http \
 											network/whois \
+											network/spider \
 											network/cookies \
 											platform/file \
 											platform/lock \

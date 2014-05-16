@@ -105,16 +105,6 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(object_dump)
 #endif
 
-	// spider
-#if defined(TB_CONFIG_MODULE_HAVE_DATABASE) \
-	&& defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
-	&& defined(TB_CONFIG_MODULE_HAVE_ASIO) \
-	&& defined(TB_CONFIG_MODULE_HAVE_ZIP) \
-	&& defined(TB_CONFIG_MODULE_HAVE_XML) \
-	&& defined(TB_CONFIG_MODULE_HAVE_OBJECT)
-,	TB_DEMO_MAIN_ITEM(spider)
-#endif
-
 	// stream
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream)
@@ -167,6 +157,7 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(network_ipv4)
 ,	TB_DEMO_MAIN_ITEM(network_http)
 ,	TB_DEMO_MAIN_ITEM(network_whois)
+,	TB_DEMO_MAIN_ITEM(network_spider)
 ,	TB_DEMO_MAIN_ITEM(network_cookies)
 
 	// platform

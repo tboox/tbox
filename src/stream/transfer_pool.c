@@ -75,6 +75,9 @@ typedef struct __tb_transfer_pool_t
 	// the aicp is referneced?
 	tb_bool_t 						bref;
 
+	// the task maxn
+	tb_size_t 						maxn;
+
 	// the concurrent task count
 	tb_size_t 						conc;
 
@@ -273,7 +276,7 @@ static tb_pointer_t tb_transfer_pool_loop(tb_cpointer_t data)
 static tb_handle_t tb_transfer_pool_instance_init(tb_cpointer_t* ppriv)
 {
 	// init it
-	return tb_transfer_pool_init(tb_aicp(), 0, 0);
+	return tb_transfer_pool_init(tb_aicp(), 0, 0, 0);
 }
 static tb_void_t tb_transfer_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
@@ -291,7 +294,7 @@ tb_handle_t tb_transfer_pool()
 {
 	return tb_singleton_instance(TB_SINGLETON_TYPE_TRANSFER_POOL, tb_transfer_pool_instance_init, tb_transfer_pool_instance_exit, tb_transfer_pool_instance_kill);
 }
-tb_handle_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t conc, tb_long_t timeout)
+tb_handle_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn, tb_size_t conc, tb_long_t timeout)
 {
 	// done
 	tb_bool_t 				ok = tb_false;
@@ -309,6 +312,7 @@ tb_handle_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t conc, tb_long_t tim
 		pool->bref 		= aicp? tb_true : tb_false;
 		pool->aicp 		= aicp? aicp : tb_aicp_init(conc);
 		pool->conc 		= conc;
+		pool->maxn 		= maxn;
 		pool->timeout 	= timeout;
 		pool->bstoped 	= tb_false;
 		tb_assert_and_check_break(pool->aicp);
@@ -477,6 +481,15 @@ tb_void_t tb_transfer_pool_exit(tb_handle_t handle)
 	// trace
 	tb_trace_d("exit: ok");
 }
+tb_size_t tb_transfer_pool_maxn(tb_handle_t handle)
+{
+	// check
+	tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
+	tb_assert_and_check_return_val(pool, 0);
+
+	// the maxn
+	return pool->maxn;
+}
 tb_size_t tb_transfer_pool_size(tb_handle_t handle)
 {
 	// check
@@ -515,6 +528,9 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
 
 		// check
 		tb_assert_and_check_break(pool->working && pool->pool);
+
+		// too many tasks?
+		tb_check_break(!pool->maxn || tb_fixed_pool_size(pool->pool) < pool->maxn);
 
 		// init loop
 		if (!pool->loop && !pool->bref)

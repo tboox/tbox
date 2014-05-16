@@ -44,12 +44,13 @@ tb_handle_t 			tb_transfer_pool(tb_noarg_t);
 /*! init transfer pool
  *
  * @param aicp 			the aicp, will make it if be null
+ * @param maxn 			the transfer task max count, no limit if be zero
  * @param conc 			the concurrent transfer count, no limit if be zero
  * @param timeout 		the timeout, using the default timeout if be zero 
  *
  * @return 				the transfer pool 
  */
-tb_handle_t 			tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t conc, tb_long_t timeout);
+tb_handle_t 			tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn, tb_size_t conc, tb_long_t timeout);
 
 /*! exit transfer pool
  *
@@ -68,6 +69,12 @@ tb_void_t 				tb_transfer_pool_kill(tb_handle_t pool);
  * @param pool 			the transfer pool 
  */
 tb_size_t 				tb_transfer_pool_size(tb_handle_t pool);
+
+/*! the transfer pool maxn
+ *
+ * @param pool 			the transfer pool 
+ */
+tb_size_t 				tb_transfer_pool_maxn(tb_handle_t pool);
 
 /*! done transfer from iurl to ourl
  *
