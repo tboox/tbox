@@ -11,7 +11,7 @@
 #define TB_DEMO_SPIDER_URL_MAXN 		(4096)
 
 // the spider task maxn
-#define TB_DEMO_SPIDER_TASK_MAXN 		(256)
+#define TB_DEMO_SPIDER_TASK_MAXN 		(64)
 
 // the spider filter maxn
 #define TB_DEMO_SPIDER_FILTER_MAXN 		(100000)
@@ -25,6 +25,9 @@ typedef struct __tb_demo_spider_t
 {
 	// the pool
 	tb_handle_t 				pool;
+
+	// the lock
+	tb_spinlock_t 				lock;
 
 	// the root
 	tb_char_t 					root[256];
@@ -52,11 +55,15 @@ typedef struct __tb_demo_spider_task_t
  * declaration
  */ 
 static tb_void_t tb_demo_spider_task_exit(tb_demo_spider_task_t* task);
-static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t const* url);
+static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t const* url, tb_bool_t* full);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+#if defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
+	&& defined(TB_CONFIG_MODULE_HAVE_ASIO) \
+	&& defined(TB_CONFIG_MODULE_HAVE_ZIP) \
+	&& defined(TB_CONFIG_MODULE_HAVE_XML)
 static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
 {
 	// check
@@ -162,7 +169,7 @@ static tb_size_t tb_demo_spider_parser_get_url(tb_handle_t reader, tb_char_t* da
 					for (; attr; attr = attr->next)
 					{
 						// href or src?
-						if ( 	tb_scoped_string_size(&attr->data)
+						if ( 	tb_scoped_string_size(&attr->data) > 8
 							&& 	( 	!tb_scoped_string_cstricmp(&attr->name, "href")
 								|| 	!tb_scoped_string_cstricmp(&attr->name, "src"))
 							&& 	( 	!tb_scoped_string_cstrnicmp(&attr->data, "http://", 7)
@@ -208,7 +215,8 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
 				tb_trace_d("parser: done: %s => %s", task->iurl, data);
 
 				// done
-				tb_demo_spider_task_done(task->spider, data);
+				tb_bool_t full = tb_false;
+				if (!tb_demo_spider_task_done(task->spider, data, &full) && full) break;
 			}
 
 			// exit reader
@@ -234,30 +242,56 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_t* spider, tb_char_t co
 	tb_assert_and_check_return_val(spider && url && data && maxn, tb_false);
 
 	// skip protocol
-	tb_char_t const* p = url;
+	tb_char_t* p = (tb_char_t*)url;
+	tb_char_t* e = (tb_char_t*)url + tb_strlen(url);
 	if (!tb_strnicmp(p, "http://", 7)) p += 7;
 	else if (!tb_strnicmp(p, "https://", 8)) p += 8;
+	tb_assert_and_check_return_val(p < e, tb_false);
 
-	// format ourl
-	tb_long_t n = tb_snprintf(data, maxn, "%s/%s", spider->root, p);
-	if (n >= 0) data[n] = '\0';
+	// make md5
+	tb_byte_t md5_data[16];
+	tb_size_t md5_size = tb_md5_encode((tb_byte_t const*)p, e - p, md5_data, 16);
+	tb_assert_and_check_return_val(md5_size == 16, tb_false);
+
+	// append root
+	p = data;
+	e = data + maxn;
+	p += tb_snprintf(p, e - p, "%s/", spider->root);
+
+	// append md5
+	tb_size_t i = 0;
+	for (i = 0; i < 16 && p < e; ++i) p += tb_snprintf(p, e - p, "%02X", md5_data[i]);
+	tb_assert_and_check_return_val(p < e, tb_false);
+
+	// end
+	*p = '\0';
 
 	// trace
 	tb_trace_d("make: %s => %s", url, data);
 
 	// ok?
-	return n > 0? tb_true : tb_false;
+	return i == 16? tb_true : tb_false;
 }
 static tb_void_t tb_demo_spider_task_exit(tb_demo_spider_task_t* task)
 {
 	// check
-	tb_assert_and_check_return(task && task->spider && task->spider->pool);
+	tb_assert_and_check_return(task);
+
+	// the spider 
+	tb_demo_spider_t* spider = task->spider;
+	tb_assert_and_check_return(spider);
+
+	// enter
+	tb_spinlock_enter(&spider->lock);
 
 	// trace
-	tb_trace_d("task: exit: %s", task->iurl);
+	tb_trace_d("task: size: %lu, exit: %s", spider->pool? tb_fixed_pool_size(spider->pool) : 0, task->iurl);
 
 	// exit task
-	tb_fixed_pool_free(task->spider->pool, task);
+	if (spider->pool) tb_fixed_pool_free(spider->pool, task);
+
+	// leave
+	tb_spinlock_leave(&spider->lock);
 }
 static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
@@ -298,27 +332,42 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
 	// break or continue?
 	return ok;
 }
-static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t const* url)
+static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t const* url, tb_bool_t* full)
 {
 	// check
-	tb_assert_and_check_return_val(spider && spider->filter && spider->pool && url, tb_false);
+	tb_assert_and_check_return_val(spider && url, tb_false);
+
+	// enter
+	tb_spinlock_enter(&spider->lock);
 
 	// done
 	tb_bool_t 				ok = tb_false;
+	tb_size_t 				size = 0;
 	tb_demo_spider_task_t* 	task = tb_null;
+	tb_bool_t 				repeat = tb_false;
 	do
 	{
+		// check
+		tb_assert_and_check_break(spider->filter && spider->pool);
+
+		// the task count
+		size = tb_fixed_pool_size(spider->pool);
+		
 		// have been done already?
 		if (!tb_bloom_filter_set(spider->filter, url)) 
 		{
 			// trace
-			tb_trace_d("task: done: %s: repeat", url);
+			tb_trace_d("task: size: %lu, done: %s: repeat", size, url);
 			ok = tb_true;
+			repeat = tb_true;
 			break;
 		}
 
 		// trace
-		tb_trace_d("task: done: %s: ..", url);
+		tb_trace_d("task: size: %lu, done: %s: ..", size, url);
+
+		// full?
+		tb_check_break(size < TB_DEMO_SPIDER_TASK_MAXN);
 
 		// make task
 		task = (tb_demo_spider_task_t*)tb_fixed_pool_malloc0(spider->pool);
@@ -329,9 +378,6 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 		tb_strlcpy(task->iurl, url, sizeof(task->iurl) - 1);
 		if (!tb_demo_spider_make_ourl(spider, url, task->ourl, sizeof(task->ourl) - 1)) break;
 
-		// done task
-		if (!tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, tb_demo_spider_task_save, task)) break;
-
 		// ok 
 		ok = tb_true;
 
@@ -340,22 +386,128 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 	// failed?
 	if (!ok)
 	{
-		// trace
-		tb_trace_e("task: done: %s: no", url);
-
 		// exit task
 		if (task) tb_demo_spider_task_exit(task);
 		task = tb_null;
 	}
 
+	// leave
+	tb_spinlock_leave(&spider->lock);
+
+	// ok? done task
+	if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, tb_demo_spider_task_save, task) : tb_false;
+
+	// failed?
+	if (!ok && size < TB_DEMO_SPIDER_TASK_MAXN)
+	{
+		// trace
+		tb_trace_e("task: size: %lu, done: %s: no", size, url);
+	}
+
+	// save full
+	if (full) *full = size < TB_DEMO_SPIDER_TASK_MAXN? tb_false : tb_true;
+
 	// ok?
 	return ok;
+}
+static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_char_t const* root)
+{
+	// check
+	tb_assert_and_check_return_val(spider, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// init root
+		if (root) tb_strlcpy(spider->root, root, sizeof(spider->root) - 1);
+		else 
+		{
+			// the temporary root
+			tb_directory_temp(spider->root, sizeof(spider->root) - 1);
+
+			// append spider
+			tb_strcat(spider->root, "/spider");
+		}
+		tb_trace_d("root: %s", spider->root);
+
+		// strip root tail: '/' or '\\'
+		tb_size_t size = tb_strlen(spider->root);
+		if (size && (spider->root[size - 1] == '/' || spider->root[size - 1] == '\\')) spider->root[size - 1] = '\0';
+
+		// init lock
+		if (!tb_spinlock_init(&spider->lock)) break;
+
+		// init pool
+		spider->pool = tb_fixed_pool_init(TB_DEMO_SPIDER_TASK_MAXN, sizeof(tb_demo_spider_task_t), 0);
+		tb_assert_and_check_break(spider->pool);
+
+		// init filter
+		spider->filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 3, TB_DEMO_SPIDER_FILTER_MAXN, tb_item_func_str(tb_true, tb_null));
+		tb_assert_and_check_break(spider->filter);
+
+		// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+		tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&spider->lock, "spider");
+#endif
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
+}
+static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
+{
+	// check
+	tb_assert_and_check_return(spider);
+
+	// trace
+	tb_trace_d("exit: ..");
+
+	// kill all transfer tasks
+	tb_transfer_pool_kill(tb_transfer_pool());
+
+	// kill all parser tasks
+	tb_thread_pool_task_kill_all(tb_thread_pool());
+
+	// wait all parser tasks exiting
+	tb_thread_pool_task_wait_all(tb_thread_pool(), -1);
+
+	// wait all transfer tasks exiting
+	while (tb_transfer_pool_size(tb_transfer_pool()))
+	{
+		// wait some time
+		tb_msleep(500);
+	}
+
+	// enter
+	tb_spinlock_enter(&spider->lock);
+
+	// exit filter
+	if (spider->filter) tb_bloom_filter_exit(spider->filter);
+	spider->filter = tb_null;
+
+	// exit pool
+	if (spider->pool) tb_fixed_pool_exit(spider->pool);
+	spider->pool = tb_null;
+
+	// leave
+	tb_spinlock_leave(&spider->lock);
+
+	// exit lock
+	tb_spinlock_exit(&spider->lock);
+
+	// trace
+	tb_trace_d("exit: ok");
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_spider_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
 {
 	// done
 	tb_demo_spider_t spider = {0};
@@ -365,39 +517,26 @@ tb_int_t tb_demo_spider_main(tb_int_t argc, tb_char_t** argv)
 		tb_char_t const* home = argv[1]? argv[1] : tb_null;
 		tb_trace_d("home: %s", home);
 
-		// init root
-		if (argv[2]) tb_strlcpy(spider.root, argv[2], sizeof(spider.root) - 1);
-		else tb_directory_temp(spider.root, sizeof(spider.root) - 1);
-		tb_trace_d("root: %s", spider.root);
-
-		// strip root tail: '/' or '\\'
-		tb_size_t size = tb_strlen(spider.root);
-		if (size && (spider.root[size - 1] == '/' || spider.root[size - 1] == '\\')) spider.root[size - 1] = '\0';
-
-		// init pool
-		spider.pool = tb_fixed_pool_init(TB_DEMO_SPIDER_TASK_MAXN, sizeof(tb_demo_spider_task_t), 0);
-		tb_assert_and_check_break(spider.pool);
-
-		// init filter
-		spider.filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, TB_DEMO_SPIDER_FILTER_MAXN, tb_item_func_str(tb_true, tb_null));
-		tb_assert_and_check_break(spider.filter);
+		// init spider
+		if (!tb_demo_spider_init(&spider, argv[2])) break;
 
 		// done the home task if exists
-		if (home) tb_demo_spider_task_done(&spider, home);
+		if (home) tb_demo_spider_task_done(&spider, home, tb_null);
 
 		// wait 
 		getchar();
 
 	} while (0);
 
-	// exit filter
-	if (spider.filter) tb_bloom_filter_exit(spider.filter);
-	spider.filter = tb_null;
-
-	// exit pool
-	if (spider.pool) tb_fixed_pool_exit(spider.pool);
-	spider.pool = tb_null;
+	// exit spider
+	tb_demo_spider_exit(&spider);
 
 	// end
 	return 0;
 }
+#else
+tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
+{
+	return 0;
+}
+#endif

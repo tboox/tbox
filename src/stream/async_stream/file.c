@@ -370,6 +370,9 @@ static tb_void_t tb_async_stream_file_clos(tb_handle_t astream, tb_bool_t bcalli
 	tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
 	tb_assert_and_check_return(fstream);
 
+	// trace
+	tb_trace_d("clos: ..");
+
 	// exit aico
 	if (fstream->aico) tb_aico_exit(fstream->aico, bcalling);
 	fstream->aico = tb_null;
@@ -381,6 +384,9 @@ static tb_void_t tb_async_stream_file_clos(tb_handle_t astream, tb_bool_t bcalli
 	if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
 	fstream->file = tb_null;
 	fstream->bref = tb_false;
+
+	// trace
+	tb_trace_d("clos: ok");
 }
 static tb_bool_t tb_async_stream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va_list_t args)
 {

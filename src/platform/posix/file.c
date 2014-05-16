@@ -113,6 +113,9 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 		fd = open(path, flags, modes);
 	}
  
+	// trace
+	tb_trace_d("open: %p", tb_fd2handle(fd));
+
 	// ok?
 	return tb_fd2handle(fd);
 }
@@ -121,8 +124,21 @@ tb_bool_t tb_file_exit(tb_handle_t file)
 	// check
 	tb_assert_and_check_return_val(file, tb_false);
 
+	// trace
+	tb_trace_d("clos: %p", file);
+
 	// close it
-	return !close(tb_handle2fd(file))? tb_true : tb_false;
+	tb_bool_t ok = !close(tb_handle2fd(file))? tb_true : tb_false;
+	
+	// failed?
+	if (!ok)
+	{
+		// trace
+		tb_trace_e("close: %p failed, errno: %d", file, errno);
+	}
+
+	// ok?
+	return ok;
 }
 tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
 {

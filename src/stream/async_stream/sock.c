@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 				"async_stream_sock"
-#define TB_TRACE_MODULE_DEBUG 				(1)
+#define TB_TRACE_MODULE_DEBUG 				(0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -53,7 +53,7 @@
 typedef struct __tb_async_stream_sock_t
 {
 	// the base
-	tb_async_stream_t 						base;
+	tb_async_stream_t 					base;
 
 	// the sock handle
 	tb_handle_t 						sock;
@@ -855,6 +855,9 @@ static tb_void_t tb_async_stream_sock_clos(tb_handle_t astream, tb_bool_t bcalli
 	tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
 
+	// trace
+	tb_trace_d("clos: ..");
+
 	// clear the mode
 	sstream->bread = 0;
 
@@ -884,6 +887,9 @@ static tb_void_t tb_async_stream_sock_clos(tb_handle_t astream, tb_bool_t bcalli
 
 	// exit ipv4
 	tb_ipv4_clr(&sstream->ipv4);
+
+	// trace
+	tb_trace_d("clos: ok");
 }
 static tb_void_t tb_async_stream_sock_exit(tb_handle_t astream, tb_bool_t bcalling)
 {	

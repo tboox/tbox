@@ -95,6 +95,9 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	tb_trace_i("n: %d", n);
 #endif
 
+	// trace
+	tb_trace_d("open: %p", tb_fd2handle(fd));
+
 	// ok
 	return tb_fd2handle(fd);
 }
@@ -128,6 +131,9 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 	// save pair
 	pair[0] = tb_fd2handle(fd[0]);
 	pair[1] = tb_fd2handle(fd[1]);
+
+	// trace
+	tb_trace_d("pair: %p %p", pair[0], pair[1]);
 
 	// ok
 	return tb_true;
@@ -286,8 +292,21 @@ tb_bool_t tb_socket_clos(tb_handle_t handle)
 	// check
 	tb_assert_and_check_return_val(handle, tb_false);
 
+	// trace
+	tb_trace_d("clos: %p", handle);
+
 	// close it
-	return !close(tb_handle2fd(handle))? tb_true : tb_false;
+	tb_bool_t ok = !close(tb_handle2fd(handle))? tb_true : tb_false;
+	
+	// failed?
+	if (!ok)
+	{
+		// trace
+		tb_trace_e("close: %p failed, errno: %d", handle, errno);
+	}
+
+	// ok?
+	return ok;
 }
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
