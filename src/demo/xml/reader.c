@@ -9,11 +9,11 @@
 tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init stream
-	tb_basic_stream_t* gst = tb_basic_stream_init_from_url(argv[1]);
-	if (gst && tb_basic_stream_open(gst))
+	tb_basic_stream_t* stream = tb_basic_stream_init_from_url(argv[1]);
+	if (stream && tb_basic_stream_open(stream))
 	{
 		// init reader
-		tb_handle_t reader = tb_xml_reader_init(gst);
+		tb_handle_t reader = tb_xml_reader_init(stream);
 		if (reader)
 		{
 			// goto
@@ -21,10 +21,10 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 			if (argv[2]) ok = tb_xml_reader_goto(reader, argv[2]);
 
 			// walk
-			tb_size_t e = TB_XML_READER_EVENT_NONE;
-			while (ok && (e = tb_xml_reader_next(reader)))
+			tb_size_t event = TB_XML_READER_EVENT_NONE;
+			while (ok && (event = tb_xml_reader_next(reader)))
 			{
-				switch (e)
+				switch (event)
 				{
 				case TB_XML_READER_EVENT_DOCUMENT: 
 					{
@@ -110,7 +110,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 		}
 	
 		// exit stream
-		tb_basic_stream_exit(gst);
+		tb_basic_stream_exit(stream);
 	}
 	
 	return 0;

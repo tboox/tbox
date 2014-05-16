@@ -113,8 +113,18 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
 			// open file
 			fstream->file = tb_file_init(url, fstream->mode | TB_FILE_MODE_AICP);
 			fstream->bref = tb_false;
+	
+			// open file failed?
+			if (!fstream->file)
+			{
+				// trace
+				tb_trace_e("open %s: failed", url);
+
+				// save state
+				state = TB_STATE_FILE_OPEN_FAILED;
+				break;
+			}
 		}
-		tb_check_break(fstream->file);
 
 		// addo file
 		fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);

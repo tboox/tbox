@@ -46,6 +46,10 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 	case TB_STATE_NOT_SUPPORTED: 				return "not supported";
 	case TB_STATE_UNKNOWN_ERROR: 				return "unknown error";
 
+	case TB_STATE_FILE_NOT_EXISTS: 				return "file: not exists";
+	case TB_STATE_FILE_OPEN_FAILED: 			return "file: open failed";
+	case TB_STATE_FILE_UNKNOWN_ERROR: 			return "file: unknown error";
+
 	case TB_STATE_SOCK_DNS_FAILED: 				return "sock: dns: failed";
 	case TB_STATE_SOCK_CONNECT_FAILED: 			return "sock: connect: failed";
 	case TB_STATE_SOCK_CONNECT_TIMEOUT: 		return "sock: connect: timeout";

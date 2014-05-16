@@ -8,6 +8,7 @@
  */
 tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
 {
+#if 0
 	// s = m/n = -lnp / (ln2 * ln2) = -log2(p) / ln2
 	// k = s * ln2 = -log2(p)
  	// p = (1 - e^(-k/s))^k
@@ -42,6 +43,7 @@ tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
 	tb_double_t s2 = (k2 + k2) / (c2 + c2 + c2 * c2);
 	tb_double_t v2 = tb_pow((1 - tb_exp(-k2/s2)), k2);
 	tb_trace_i("p: %lf, k: %lf, s: %lf, v: %lf", p2, k2, s2, v2);
+#endif
 
 	return 0;
 }

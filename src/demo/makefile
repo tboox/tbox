@@ -28,7 +28,6 @@ demo_C_FILES 								+= \
 											utils/base64 \
 											other/test \
 											spider/spider \
-											spider/queue \
 											stream/basic_stream/null \
 											stream/basic_stream/cache \
 											string/string_pool \

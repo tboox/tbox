@@ -40,7 +40,7 @@ tb_long_t tb_printf(tb_char_t const* format, ...)
 	// format line
 	tb_long_t size = 0;
 	tb_char_t line[8192] = {0};
-	tb_vsnprintf_format(line, TB_MAXU32, format, &size);
+	tb_vsnprintf_format(line, sizeof(line) - 1, format, &size);
 
 	// print it
 	tb_print(line);

@@ -593,7 +593,6 @@ fail:
 	if (bstream) tb_basic_stream_exit((tb_basic_stream_t*)bstream);
 	return tb_null;
 }
-
 tb_basic_stream_t* tb_basic_stream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
 {
 	// check

@@ -136,6 +136,8 @@ tbox_C_FILES 			+= \
 						libc/string/strnicmp \
 						libc/string/strstr \
 						libc/string/stristr \
+						libc/string/strnstr \
+						libc/string/strnistr \
 						libc/string/strrstr \
 						libc/string/strirstr \
 						libc/string/strnrstr \

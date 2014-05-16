@@ -306,58 +306,6 @@ static tb_size_t tb_item_func_hash_uint32_func_2(tb_uint32_t value)
 	value = value ^ (value >> 16); 
 	return value;
 }
-static tb_size_t tb_item_func_hash_uint32_func_3(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_0((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_4(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_1((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_5(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_2((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_6(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_3((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_7(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_4((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_8(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_5((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_9(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_6((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_10(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_7((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_11(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_8((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_12(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_9((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_13(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_10((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_14(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_11((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
-static tb_size_t tb_item_func_hash_uint32_func_15(tb_uint32_t value)
-{
-	return tb_item_func_hash_data_func_12((tb_byte_t const*)&value, sizeof(tb_uint32_t));
-}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * uint64 hash implementation
@@ -422,30 +370,24 @@ tb_size_t tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t 
 	// check
 	tb_assert_and_check_return_val(mask, 0);
 
-	// the func
-	static tb_size_t (*s_func[])(tb_uint32_t) = 
+	// for optimization
+	if (index < 3)
 	{
-		tb_item_func_hash_uint32_func_0
-	,	tb_item_func_hash_uint32_func_1
-	,	tb_item_func_hash_uint32_func_2
-	,	tb_item_func_hash_uint32_func_3
-	,	tb_item_func_hash_uint32_func_4
-	,	tb_item_func_hash_uint32_func_5
-	,	tb_item_func_hash_uint32_func_6
-	,	tb_item_func_hash_uint32_func_7
-	,	tb_item_func_hash_uint32_func_8
-	,	tb_item_func_hash_uint32_func_9
-	,	tb_item_func_hash_uint32_func_10
-	,	tb_item_func_hash_uint32_func_11
-	,	tb_item_func_hash_uint32_func_12
-	,	tb_item_func_hash_uint32_func_13
-	,	tb_item_func_hash_uint32_func_14
-	,	tb_item_func_hash_uint32_func_15
-	};
-	tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+		// the func
+		static tb_size_t (*s_func[])(tb_uint32_t) = 
+		{
+			tb_item_func_hash_uint32_func_0
+		,	tb_item_func_hash_uint32_func_1
+		,	tb_item_func_hash_uint32_func_2
+		};
+		tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+
+		// done
+		return s_func[index](value) & mask;
+	}
 
 	// done
-	return s_func[index](value) & mask;
+	return tb_item_func_hash_data((tb_byte_t const*)&value, sizeof(tb_uint32_t), mask, index - 3);
 }
 tb_size_t tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index)
 {
