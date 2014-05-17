@@ -35,6 +35,16 @@
  * types
  */
 
+/*! the transfer ctrl func type
+ *
+ * @param istream 	the istream 
+ * @param ostream 	the ostream 
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok, tb_false: break it
+ */
+typedef tb_bool_t 	(*tb_transfer_ctrl_func_t)(tb_stream_t* istream, tb_stream_t* ostream, tb_pointer_t priv);
+
 /*! the transfer open func type
  *
  * @param state 	the stream state 
@@ -236,6 +246,16 @@ tb_handle_t 		tb_transfer_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_si
  * @return 			the transfer 
  */
 tb_handle_t 		tb_transfer_init_da(tb_byte_t const* idata, tb_size_t isize, tb_async_stream_t* ostream, tb_hize_t offset);
+
+/*! ctrl transfer, will call the given ctrl func before opening transfer
+ *
+ * @param transfer 	the transfer
+ * @param func 		the ctrl func 
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_transfer_ctrl(tb_handle_t transfer, tb_transfer_ctrl_func_t func, tb_pointer_t priv);
 
 /*! open transfer
  *

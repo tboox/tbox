@@ -76,7 +76,7 @@ tb_int_t tb_demo_stream_transfer_pool_main(tb_int_t argc, tb_char_t** argv)
 		for (; p && *p; p++)
 		{
 			// done transfer
-			if (!tb_transfer_pool_done(tb_transfer_pool(), argv[1], *p, 0, tb_demo_transfer_save_func, *p)) break;
+			if (!tb_transfer_pool_done(tb_transfer_pool(), argv[1], *p, 0, tb_demo_transfer_save_func, tb_null, *p)) break;
 		}
 
 	} while (0);

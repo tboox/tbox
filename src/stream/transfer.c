@@ -40,6 +40,17 @@
  * types
  */
 
+// the transfer ctrl type
+typedef struct __tb_transfer_ctrl_t
+{
+	// the func
+	tb_transfer_ctrl_func_t 	func;
+
+	// the priv
+	tb_pointer_t 				priv;
+
+}tb_transfer_ctrl_t;
+
 // the transfer open type
 typedef struct __tb_transfer_open_t
 {
@@ -131,6 +142,9 @@ typedef struct __tb_transfer_t
 		tb_transfer_save_t 		save;
 
 	} func;
+
+	// ctrl
+	tb_transfer_ctrl_t 			ctrl;
 
 	// open and save
 	tb_transfer_osave_t 		osave;
@@ -429,56 +443,6 @@ static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_si
 	// continue to read or break it
 	return bread;
 }
-static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
-{
-	// check
-	tb_transfer_t* transfer = (tb_transfer_t*)priv;
-	tb_assert_and_check_return_val(astream && transfer && transfer->func.open.func, tb_false);
-
-	// trace
-	tb_trace_d("open: istream: offset: %llu, state: %s", offset, tb_state_cstr(state));
-
-	// done
-	tb_bool_t ok = tb_true;
-	do
-	{
-		// ok?
-		tb_check_break(state == TB_STATE_OK);
-
-		// reset state
-		state = TB_STATE_UNKNOWN_ERROR;
-			
-		// stoped?
-		if (tb_atomic_get(&transfer->stoped))
-		{
-			state = TB_STATE_KILLED;
-			break;
-		}
-
-		// opened
-		tb_atomic_set(&transfer->opened, 1);
-
-		// done func
-		ok = transfer->func.open.func(TB_STATE_OK, tb_stream_offset(astream), tb_stream_size(astream), transfer->func.open.priv);
-
-		// ok
-		state = TB_STATE_OK;
-
-	} while (0);
-
-	// failed?
-	if (state != TB_STATE_OK) 
-	{
-		// done func
-		ok = transfer->func.open.func(state, 0, 0, transfer->func.open.priv);
-
-		// stoped
-		tb_atomic_set(&transfer->stoped, 1);
-	}
-
-	// ok?
-	return ok;
-}
 static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_size_t state, tb_pointer_t priv)
 {
 	// check
@@ -508,8 +472,11 @@ static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_si
 			break;
 		}
 
-		// open and seek istream
-		if (!tb_async_stream_oseek(transfer->istream, transfer->offset, tb_transfer_istream_open_func, transfer)) break;
+		// save opened
+		tb_atomic_set(&transfer->opened, 1);
+
+		// done func
+		ok = transfer->func.open.func(TB_STATE_OK, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->func.open.priv);
 
 		// ok
 		state = TB_STATE_OK;
@@ -527,6 +494,77 @@ static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_si
 	}
 
 	// ok
+	return ok;
+}
+static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
+{
+	// check
+	tb_transfer_t* transfer = (tb_transfer_t*)priv;
+	tb_assert_and_check_return_val(astream && transfer && transfer->func.open.func, tb_false);
+
+	// trace
+	tb_trace_d("open: istream: offset: %llu, state: %s", offset, tb_state_cstr(state));
+
+	// done
+	tb_bool_t ok = tb_true;
+	do
+	{
+		// ok?
+		tb_check_break(state == TB_STATE_OK);
+
+		// reset state
+		state = TB_STATE_UNKNOWN_ERROR;
+			
+		// stoped?
+		if (tb_atomic_get(&transfer->stoped))
+		{
+			state = TB_STATE_KILLED;
+			break;
+		}
+
+		// open it
+		tb_bool_t bopened = tb_false;
+		if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO)
+		{
+			if (!tb_stream_is_opened(transfer->ostream))
+			{
+				if (!tb_async_stream_open(transfer->ostream, tb_transfer_ostream_open_func, transfer)) break;
+			}
+			else bopened = tb_true;
+		}
+		else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
+		{
+			if (!tb_stream_is_opened(transfer->ostream) && !tb_basic_stream_open(transfer->ostream)) break;
+			bopened = tb_true;
+		}
+		else tb_assert_and_check_break(0);
+
+		// opened?
+		if (bopened)
+		{
+			// save opened
+			tb_atomic_set(&transfer->opened, 1);
+
+			// done func
+			ok = transfer->func.open.func(TB_STATE_OK, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->func.open.priv);
+		}
+
+		// ok
+		state = TB_STATE_OK;
+
+	} while (0);
+
+	// failed?
+	if (state != TB_STATE_OK) 
+	{
+		// done func
+		ok = transfer->func.open.func(state, 0, 0, transfer->func.open.priv);
+
+		// stoped
+		tb_atomic_set(&transfer->stoped, 1);
+	}
+
+	// ok?
 	return ok;
 }
 static tb_bool_t tb_transfer_open_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_pointer_t priv)
@@ -1222,6 +1260,19 @@ tb_handle_t tb_transfer_init_da(tb_byte_t const* idata, tb_size_t isize, tb_asyn
 	// ok?
 	return (tb_handle_t)transfer;
 }
+tb_bool_t tb_transfer_ctrl(tb_handle_t handle, tb_transfer_ctrl_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_transfer_t* transfer = (tb_transfer_t*)handle;
+	tb_assert_and_check_return_val(transfer, tb_false);
+
+	// init func
+	transfer->ctrl.func = func;
+	transfer->ctrl.priv = priv;
+
+	// ok
+	return tb_true;
+}
 tb_bool_t tb_transfer_open(tb_handle_t handle, tb_transfer_open_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -1249,31 +1300,17 @@ tb_bool_t tb_transfer_open(tb_handle_t handle, tb_transfer_open_func_t func, tb_
 		tb_assert_and_check_break(transfer->ostream);
 
 		// init some rate info
-		transfer->base 	= tb_aicp_time(tb_async_stream_aicp(transfer->istream));
-		transfer->base1s = transfer->base;
-		transfer->save 	= 0;
-		transfer->save1s = 0;
+		transfer->base 		= tb_aicp_time(tb_async_stream_aicp(transfer->istream));
+		transfer->base1s 	= transfer->base;
+		transfer->save 		= 0;
+		transfer->save1s 	= 0;
 		transfer->crate 	= 0;
 
-		// open ostream
-		tb_bool_t bopened = tb_false;
-		if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO)
-		{
-			if (!tb_stream_is_opened(transfer->ostream))
-			{
-				if (!tb_async_stream_open(transfer->ostream, tb_transfer_ostream_open_func, transfer)) break;
-			}
-			else bopened = tb_true;
-		}
-		else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
-		{
-			if (!tb_stream_is_opened(transfer->ostream) && !tb_basic_stream_open(transfer->ostream)) break;
-			bopened = tb_true;
-		}
-		else tb_assert_and_check_break(0);
+		// ctrl stream
+		if (transfer->ctrl.func && !transfer->ctrl.func(transfer->istream, transfer->ostream, transfer->ctrl.priv)) break;
 
 		// open and seek istream
-		if (bopened && !tb_async_stream_oseek(transfer->istream, transfer->offset, tb_transfer_istream_open_func, transfer)) break;
+		if (!tb_async_stream_oseek(transfer->istream, transfer->offset, tb_transfer_istream_open_func, transfer)) break;
 
 		// ok
 		ok = tb_true;

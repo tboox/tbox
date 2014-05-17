@@ -35,7 +35,7 @@
  * macros
  */
 #ifdef __tb_small__
-# 	define TB_URL_HOST_MAX 		(32)
+# 	define TB_URL_HOST_MAX 		(64)
 # 	define TB_URL_PATH_MAX 		(1024)
 #else
 # 	define TB_URL_HOST_MAX 		(128)

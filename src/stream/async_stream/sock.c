@@ -223,11 +223,22 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
 			// init sock
 			if (!sstream->sock) 
 			{
+				// open sock
 				sstream->sock = tb_socket_open(sstream->type);
 				sstream->bref = 0;
+
+				// open sock failed?
+				if (!sstream->sock)
+				{
+					// trace
+					tb_trace_e("open sock failed!");
+
+					// save state
+					state = TB_STATE_SOCK_OPEN_FAILED;
+					break;
+				}
 			}
-			tb_assert_and_check_break(sstream->sock);
-	
+
 			// resize cache
 			tb_size_t rcache = tb_socket_recv_buffer_size(sstream->sock);
 			tb_size_t wcache = tb_socket_send_buffer_size(sstream->sock);
@@ -344,16 +355,16 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
 	// clear ipv4
 	tb_ipv4_clr(&sstream->ipv4);
 
-	// init dns
-	if (!sstream->hdns) sstream->hdns = tb_aicp_dns_init(sstream->base.aicp, tb_stream_timeout(astream), tb_async_stream_sock_dns_func, astream);
-	tb_assert_and_check_return_val(sstream->hdns, tb_false);
-
 	// save func and priv
 	sstream->priv 		= priv;
 	sstream->func.open 	= func;
 
+	// init dns
+	if (!sstream->hdns) sstream->hdns = tb_aicp_dns_init(sstream->base.aicp, tb_stream_timeout(astream), tb_async_stream_sock_dns_func, astream);
+	tb_assert(sstream->hdns);
+
 	// done addr
-	if (!tb_aicp_dns_done(sstream->hdns, host))
+	if (!sstream->hdns || !tb_aicp_dns_done(sstream->hdns, host))
 	{
 		// done func
 		func((tb_async_stream_t*)sstream, TB_STATE_SOCK_DNS_FAILED, priv);

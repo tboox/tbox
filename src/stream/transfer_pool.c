@@ -508,7 +508,7 @@ tb_size_t tb_transfer_pool_size(tb_handle_t handle)
 	// ok?
 	return size;
 }
-tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t save, tb_transfer_ctrl_func_t ctrl, tb_pointer_t priv)
 {
 	// check
 	tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
@@ -546,9 +546,12 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
 		// init task
 		task->pool 		= pool;
 		task->transfer 	= tb_transfer_init_uu(pool->aicp, iurl, ourl, offset);
-		task->func 		= func;
+		task->func 		= save;
 		task->priv 		= priv;
 		tb_assert_and_check_break(task->transfer);
+
+		// ctrl task
+		if (!tb_transfer_ctrl(task->transfer, ctrl, priv)) break;
 
 		// init timeout
 		if (pool->timeout) tb_transfer_timeout_set(task->transfer, pool->timeout);

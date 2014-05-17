@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		transfer_pool_pool.h
+ * @file		transfer_pool.h
  * @ingroup 	stream
  *
  */
@@ -87,6 +87,6 @@ tb_size_t 				tb_transfer_pool_maxn(tb_handle_t pool);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_transfer_pool_done(tb_handle_t pool, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t func, tb_pointer_t priv);
+tb_bool_t 				tb_transfer_pool_done(tb_handle_t pool, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t save, tb_transfer_ctrl_func_t ctrl, tb_pointer_t priv);
 
 #endif
