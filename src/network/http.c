@@ -183,8 +183,8 @@ static tb_void_t tb_http_status_cler(tb_http_t* http, tb_bool_t host_changed)
 	http->status.bgzip = 0;
 	http->status.bdeflate = 0;
 	http->status.bchunked = 0;
-	http->status.content_size = 0;
-	http->status.document_size = 0;
+	http->status.content_size = -1;
+	http->status.document_size = -1;
 	http->status.state = TB_STATE_OK;
 
 	// clear content type
@@ -213,8 +213,8 @@ static tb_void_t tb_http_status_dump(tb_http_t* http)
 	tb_trace_i("status: code: %d", http->status.code);
 	tb_trace_i("status: version: HTTP/1.%1u", http->status.version);
 	tb_trace_i("status: content:type: %s", tb_scoped_string_cstr(&http->status.content_type));
-	tb_trace_i("status: content:size: %llu", http->status.content_size);
-	tb_trace_i("status: document:size: %llu", http->status.document_size);
+	tb_trace_i("status: content:size: %lld", http->status.content_size);
+	tb_trace_i("status: document:size: %lld", http->status.document_size);
 	tb_trace_i("status: location: %s", tb_scoped_string_cstr(&http->status.location));
 	tb_trace_i("status: bgzip: %s", http->status.bgzip? "true" : "false");
 	tb_trace_i("status: bdeflate: %s", http->status.bdeflate? "true" : "false");
@@ -539,7 +539,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
 		if (!tb_strnicmp(line, "Content-Length", 14))
 		{
 			http->status.content_size = tb_stou64(p);
-			if (!http->status.document_size) 
+			if (http->status.document_size < 0) 
 				http->status.document_size = http->status.content_size;
 		}
 		// parse content range: "bytes $from-$to/$document_size"
@@ -560,7 +560,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
 			// no stream, be able to seek
 			http->status.bseeked = 1;
 			http->status.document_size = document_size;
-			if (!http->status.content_size) 
+			if (http->status.content_size < 0) 
 			{
 				if (from && to > from) http->status.content_size = to - from;
 				else if (!from && to) http->status.content_size = to;
@@ -680,7 +680,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 					tb_stream_filter_cler(filter);
 
 					// limit the filter input size
-					if (http->status.content_size) tb_stream_filter_limit(filter, http->status.content_size);
+					if (http->status.content_size > 0) tb_stream_filter_limit(filter, http->status.content_size);
 
 					// open zstream, need not async
 					if (!tb_basic_stream_open(http->zstream)) break;
@@ -732,7 +732,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 	for (i = 0; i < http->option.redirect && tb_scoped_string_size(&http->status.location); i++)
 	{
 		// read the redirect content
-		if (http->status.content_size)
+		if (http->status.content_size > 0)
 		{
 			tb_byte_t data[TB_BASIC_STREAM_BLOCK_MAXN];
 			tb_hize_t read = 0;
@@ -978,7 +978,7 @@ tb_bool_t tb_http_seek(tb_handle_t handle, tb_hize_t offset)
 
 		// set range
 		http->option.range.bof = offset;
-		http->option.range.eof = http->status.document_size? http->status.document_size - 1 : 0;
+		http->option.range.eof = http->status.document_size > 0? http->status.document_size - 1 : 0;
 
 		// connect it
 		if (!tb_http_connect(http)) break;

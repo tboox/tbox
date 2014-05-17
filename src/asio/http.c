@@ -254,8 +254,8 @@ static tb_void_t tb_aicp_http_status_cler(tb_aicp_http_t* http, tb_bool_t host_c
 	http->status.bgzip = 0;
 	http->status.bdeflate = 0;
 	http->status.bchunked = 0;
-	http->status.content_size = 0;
-	http->status.document_size = 0;
+	http->status.content_size = -1;
+	http->status.document_size = -1;
 	http->status.state = TB_STATE_OK;
 
 	// clear content type
@@ -284,8 +284,8 @@ static tb_void_t tb_aicp_http_status_dump(tb_aicp_http_t* http)
 	tb_trace_i("status: code: %d", 				http->status.code);
 	tb_trace_i("status: version: HTTP/1.%1u", 	http->status.version);
 	tb_trace_i("status: content:type: %s", 		tb_scoped_string_cstr(&http->status.content_type));
-	tb_trace_i("status: content:size: %llu", 	http->status.content_size);
-	tb_trace_i("status: document:size: %llu", 	http->status.document_size);
+	tb_trace_i("status: content:size: %lld", 	http->status.content_size);
+	tb_trace_i("status: document:size: %lld", 	http->status.document_size);
 	tb_trace_i("status: location: %s", 			tb_scoped_string_cstr(&http->status.location));
 	tb_trace_i("status: bgzip: %s", 			http->status.bgzip? "true" : "false");
 	tb_trace_i("status: bdeflate: %s", 			http->status.bdeflate? "true" : "false");
@@ -548,7 +548,7 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
 		if (!tb_strnicmp(line, "Content-Length", 14))
 		{
 			http->status.content_size = tb_stou64(p);
-			if (!http->status.document_size) 
+			if (http->status.document_size < 0) 
 				http->status.document_size = http->status.content_size;
 		}
 		// parse content range: "bytes $from-$to/$document_size"
@@ -569,7 +569,7 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
 			// no stream, be able to seek
 			http->status.bseeked = 1;
 			http->status.document_size = document_size;
-			if (!http->status.content_size) 
+			if (http->status.content_size < 0) 
 			{
 				if (from && to > from) http->status.content_size = to - from;
 				else if (!from && to) http->status.content_size = to;
@@ -642,7 +642,7 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
 			http->redirect_read += real;
 
 			// continue?
-			if (http->redirect_read < http->status.content_size) return tb_true;
+			if (http->status.content_size < 0 || http->redirect_read < http->status.content_size) return tb_true;
 		}
 
 		// ok? 
@@ -802,7 +802,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
 				http->redirect_read = e - p;
 
 				// read the left data
-				if (http->redirect_read < http->status.content_size)
+				if (http->status.content_size < 0 || http->redirect_read < http->status.content_size)
 				{
 					if (!tb_async_stream_read(http->stream, 0, tb_aicp_http_head_redt_func, http)) break;
 				}
@@ -869,7 +869,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
 				tb_stream_filter_cler(filter);
 
 				// limit the filter input size
-				if (http->status.content_size) tb_stream_filter_limit(filter, http->status.content_size);
+				if (http->status.content_size > 0) tb_stream_filter_limit(filter, http->status.content_size);
 
 				// push the left data to filter
 				if (p < e)
@@ -1485,7 +1485,7 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 
 		// set range
 		http->option.range.bof = offset;
-		http->option.range.eof = http->status.document_size? http->status.document_size - 1 : 0;
+		http->option.range.eof = http->status.document_size > 0? http->status.document_size - 1 : 0;
 
 		// done open
 		if (!tb_aicp_http_open_done(http)) break;
