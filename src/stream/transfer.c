@@ -450,7 +450,7 @@ static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_si
 	tb_assert_and_check_return_val(astream && transfer && transfer->func.open.func, tb_false);
 
 	// trace
-	tb_trace_d("open: ostream: state: %s", tb_state_cstr(state));
+	tb_trace_d("open: ostream: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -503,7 +503,7 @@ static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_si
 	tb_assert_and_check_return_val(astream && transfer && transfer->func.open.func, tb_false);
 
 	// trace
-	tb_trace_d("open: istream: offset: %llu, state: %s", offset, tb_state_cstr(state));
+	tb_trace_d("open: istream: %s, offset: %llu, state: %s", tb_url_get(&astream->base.url), offset, tb_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
