@@ -111,6 +111,7 @@ static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
 
 		// the stream size
 		tb_hong_t size = tb_stream_size(stream);
+		tb_check_break(size);
 
 		// prefetch some data
 		tb_byte_t* 	data = tb_null;

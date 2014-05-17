@@ -229,10 +229,10 @@ typedef struct __tb_http_status_t
 	tb_size_t 			state;
 
 	/// the document size
-	tb_hize_t 			document_size;
+	tb_hong_t 			document_size;
 
 	/// the current content size, maybe in range
-	tb_hize_t 			content_size;
+	tb_hong_t 			content_size;
 
 	/// the content type
 	tb_scoped_string_t 	content_type;
