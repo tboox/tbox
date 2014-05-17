@@ -158,7 +158,7 @@ static tb_bool_t tb_async_stream_http_read(tb_handle_t astream, tb_size_t delay,
 		tb_hize_t offset = tb_atomic64_get(&hstream->offset);
 		if (offset == hsize)
 		{
-			hstream->func.read(astream, TB_STATE_CLOSED, tb_null, 0, size, priv);
+			func(astream, TB_STATE_CLOSED, tb_null, 0, size, priv);
 			return tb_true;
 		}
 	}

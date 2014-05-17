@@ -316,7 +316,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
 			|| 	url->poto == TB_URL_PROTOCOL_SQL)
 		{
 			// parse host
-			while (*p && *p != '/' && *p != '\\' && *p != ':') tb_static_string_chrcat(&url->host, *p++);
+			while (*p && *p != '/' && *p != '\\' && *p != ':' && *p != '?') tb_static_string_chrcat(&url->host, *p++);
 
 			// try set ipv4
 			if (tb_static_string_size(&url->host)) tb_ipv4_set(&url->ipv4, tb_static_string_cstr(&url->host));
