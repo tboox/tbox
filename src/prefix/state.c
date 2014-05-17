@@ -57,6 +57,7 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 	case TB_STATE_SOCK_SEND_TIMEOUT: 			return "sock: send: timeout";
 	case TB_STATE_SOCK_RECV_FAILED: 			return "sock: recv: failed";
 	case TB_STATE_SOCK_SEND_FAILED: 			return "sock: send: failed";
+	case TB_STATE_SOCK_OPEN_FAILED: 			return "sock: open: failed";
 	case TB_STATE_SOCK_UNKNOWN_ERROR: 			return "sock: unknown error";
 	case TB_STATE_SOCK_SSL_FAILED: 				return "sock: ssl: failed";
 	case TB_STATE_SOCK_SSL_TIMEOUT: 			return "sock: ssl: timeout";

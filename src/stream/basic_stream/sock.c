@@ -158,8 +158,18 @@ static tb_bool_t tb_basic_stream_sock_open(tb_handle_t bstream)
 	// make sock
 	sstream->sock = tb_socket_open(sstream->type);
 	sstream->bref = 0;
-	tb_assert_and_check_return_val(sstream->sock, tb_false);
 	
+	// open sock failed?
+	if (!sstream->sock)
+	{
+		// trace
+		tb_trace_e("open sock failed!");
+
+		// save state
+		sstream->base.state = TB_STATE_SOCK_OPEN_FAILED;
+		return tb_false;
+	}
+
 	// resize cache 
 	tb_size_t recv_cache = tb_socket_recv_buffer_size(sstream->sock);
 	tb_size_t send_cache = tb_socket_send_buffer_size(sstream->sock);

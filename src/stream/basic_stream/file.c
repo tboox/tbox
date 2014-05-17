@@ -90,7 +90,7 @@ static tb_bool_t tb_basic_stream_file_open(tb_handle_t bstream)
 		tb_trace_e("open %s: failed", url);
 
 		// save state
-		fstream->base.state = TB_STATE_FILE_OPEN_FAILED;
+		fstream->base.state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
 		return tb_false;
 	}
 
