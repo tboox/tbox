@@ -496,11 +496,11 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
 	// trace
 	tb_trace_d("exit: ..");
 
-	// kill all transfer tasks
-	tb_transfer_pool_kill(tb_transfer_pool());
-
 	// kill all parser tasks
 	tb_thread_pool_task_kill_all(tb_thread_pool());
+
+	// kill all transfer tasks
+	tb_transfer_pool_kill(tb_transfer_pool());
 
 	// wait all parser tasks exiting
 	tb_thread_pool_task_wait_all(tb_thread_pool(), -1);
