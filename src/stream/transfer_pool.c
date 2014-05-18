@@ -524,7 +524,7 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
 	do
 	{
 		// stoped?
-		tb_assert_and_check_break(!pool->bstoped);
+		tb_check_break(!pool->bstoped);
 
 		// check
 		tb_assert_and_check_break(pool->working && pool->pool);

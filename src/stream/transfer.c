@@ -486,11 +486,11 @@ static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_si
 	// failed?
 	if (state != TB_STATE_OK) 
 	{
-		// done func
-		ok = transfer->func.open.func(state, 0, 0, transfer->func.open.priv);
-
 		// stoped
 		tb_atomic_set(&transfer->stoped, 1);
+
+		// done func
+		ok = transfer->func.open.func(state, 0, 0, transfer->func.open.priv);
 	}
 
 	// ok
@@ -557,11 +557,11 @@ static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_si
 	// failed?
 	if (state != TB_STATE_OK) 
 	{
-		// done func
-		ok = transfer->func.open.func(state, 0, 0, transfer->func.open.priv);
-
 		// stoped
 		tb_atomic_set(&transfer->stoped, 1);
+
+		// done func
+		ok = transfer->func.open.func(state, 0, 0, transfer->func.open.priv);
 	}
 
 	// ok?
