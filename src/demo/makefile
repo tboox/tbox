@@ -53,7 +53,6 @@ demo_C_FILES 								+= \
 											platform/file \
 											platform/lock \
 											platform/path \
-											platform/ctime \
 											platform/event \
 											platform/utils \
 											platform/timer \
@@ -66,6 +65,7 @@ demo_C_FILES 								+= \
 											platform/directory \
 											platform/exception \
 											platform/semaphore \
+											platform/cache_time \
 											platform/thread_pool \
 											platform/thread_store \
 											container/heap \

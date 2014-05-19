@@ -109,7 +109,7 @@ static __tb_inline__ tb_hong_t tb_timer_now(tb_timer_t* timer)
 	}
 
 	// using cached time
-	return tb_ctime_time();
+	return tb_cache_time_time();
 }
 static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
@@ -402,7 +402,7 @@ tb_void_t tb_timer_loop(tb_handle_t handle)
 		}
 
 		// spak ctime
-		if (timer->ctime) tb_ctime_spak();
+		if (timer->ctime) tb_cache_time_spak();
 
 		// spak it
 		if (!tb_timer_spak(handle)) break;

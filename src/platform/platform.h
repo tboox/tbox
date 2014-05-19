@@ -34,7 +34,7 @@
 #include "time.h"
 #include "mutex.h"
 #include "event.h"
-#include "ctime.h"
+#include "cache_time.h"
 #include "timer.h"
 #include "print.h"
 #include "ltimer.h"

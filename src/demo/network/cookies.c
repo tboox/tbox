@@ -6,7 +6,7 @@
 tb_int_t tb_demo_network_cookies_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init cookies
-	tb_cookies_t* cookies = tb_cookies_init();
+	tb_handle_t cookies = tb_cookies_init();
 	tb_assert_and_check_return_val(cookies, 0);
 
 	// set cookies
@@ -23,23 +23,21 @@ tb_int_t tb_demo_network_cookies_main(tb_int_t argc, tb_char_t** argv)
 	tb_cookies_set_from_url(cookies, "http://mail.163.com:2000/WorldClient.dll?View=Main", "Theme=Standard; Expires=Tue, 19-Apr-2012 07:10:56 GMT; path=/");
 	
 	// get cookies
-	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.space.baidu.com/style/foo/login.css"));
-	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style/foo/login.css"));
-	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style"));
-	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com"));
-	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "https://www.baidu.com/"));
-	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://pingfore.qq.com/pingd?dm=qzone.qq.com&url=login/qzone_n&tt=-&rdm=-&rurl=-&pvid=7466815060&scr=-&scl=-&lang=-&java=1&cc=-&pf=-&tz=-8&ct=-&vs=3.3&emu=0.20486706611700356"));
-	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://mail.163.com:2000/?Session=LZBMQVW&View=Menu"));
+	tb_char_t data[8192] = {0};
+	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.space.baidu.com/style/foo/login.css", data, sizeof(data) - 1));
+	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style/foo/login.css", data, sizeof(data) - 1));
+	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style", data, sizeof(data) - 1));
+	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com", data, sizeof(data) - 1));
+	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "https://www.baidu.com/", data, sizeof(data) - 1));
+	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://pingfore.qq.com/pingd?dm=qzone.qq.com&url=login/qzone_n&tt=-&rdm=-&rurl=-&pvid=7466815060&scr=-&scl=-&lang=-&java=1&cc=-&pf=-&tz=-8&ct=-&vs=3.3&emu=0.20486706611700356", data, sizeof(data) - 1));
+	tb_trace_i("%s", tb_cookies_get_from_url(cookies, "http://mail.163.com:2000/?Session=LZBMQVW&View=Menu", data, sizeof(data) - 1));
 
 #ifdef __tb_debug__
 	// dump
 	tb_cookies_dump(cookies);
 #endif
 
-	getchar();
-
 	// exit cookies
 	tb_cookies_exit(cookies);
-
 	return 0;
 }

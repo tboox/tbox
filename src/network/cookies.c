@@ -26,223 +26,438 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 			"cookies"
-#define TB_TRACE_MODULE_DEBUG 			(1)
+#define TB_TRACE_MODULE_DEBUG 			(0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "cookies.h"
+#include "url.h"
+#include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
-#include "../libc/libc.h"
+#include "../string/string.h"
 #include "../platform/platform.h"
 #include "../algorithm/algorithm.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_COOKIES_BLOCK_POOL_GROW 		(64)
-#define TB_COOKIES_CPOOL_GROW 		(16)
+#include "../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the cookie entry type
-typedef struct __tb_cookie_entry_t
+// the cookies entry type
+typedef struct __tb_cookies_entry_t
 {
-	// the string data
-	tb_char_t const* 	pdomain;
-	tb_char_t const* 	ppath;
-	tb_char_t const* 	pname;
-	tb_char_t const* 	pvalue;
-	tb_char_t const* 	pexpires;
-	tb_char_t const* 	pmaxage;
-	tb_char_t const* 	pversion;
+	// the domain 
+	tb_char_t const* 	domain;
 
-	// the string size
-	tb_uint16_t 		ndomain;
-	tb_uint16_t 		npath;
-	tb_uint16_t 		nname;
-	tb_uint16_t 		nvalue;
-	tb_uint16_t 		nexpires;
-	tb_uint16_t 		nmaxage;
-	tb_uint16_t 		nversion;
+	// the path
+	tb_char_t const* 	path;
 
-	// the boolean value
-	tb_uint16_t 		bsecure : 1;
+	// the name
+	tb_char_t const* 	name;
 
-}tb_cookie_entry_t;
+	// the value
+	tb_char_t const* 	value;
 
-// the cookie string
-typedef struct __tb_cookie_string_t
+	// the expires
+	tb_time_t 			expires;
+
+	// the max-age, default: 1 and storage: 0
+	tb_uint32_t 		maxage 	: 30;
+
+	// storage cookies to file? remove it immediately if maxage == 0 and storage: 0
+	tb_uint32_t 		storage : 1;
+
+	// is secure?
+	tb_uint32_t 		secure 	: 1;
+
+}tb_cookies_entry_t;
+
+// the cookies type
+typedef struct __tb_cookies_t
 {
-	// the string refn
-	tb_size_t 			refn;
+	// the lock
+	tb_spinlock_t 		lock;
 
-	// the string data
-	tb_char_t const* 	data;
+	// the string func
+	tb_item_func_t 		string_func;
 
-}tb_cookie_string_t;
+	// the string pool
+	tb_handle_t 		string_pool;
+	
+	// the cookie pool, key: "domain+path+name"
+	tb_hash_t* 			cookie_pool;
+
+}tb_cookies_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * details
+ * private implementation
  */
-static tb_bool_t tb_cookies_split_url(tb_char_t const* url, tb_char_t const* phost, tb_size_t* nhost, tb_char_t* ppath, tb_size_t* npath, tb_bool_t* psecure)
+static tb_bool_t tb_cookies_get_domain_and_path_from_url(tb_char_t const* url, tb_char_t* pdomain, tb_size_t ndomain, tb_char_t* ppath, tb_size_t npath, tb_bool_t* psecure)
 {
-	tb_assert_and_check_return_val(url && phost && ppath && psecure, tb_false);
-
-	// get url size
-	tb_size_t n = tb_strlen(url);
-	if (!n) return tb_false;
+	// check
+	tb_assert_and_check_return_val(url && pdomain && ndomain && ppath && npath && psecure, tb_false);
 
 	// get url pointer
 	tb_char_t const* p = url;
-	tb_char_t const* e = url + n;
+	tb_char_t const* e = url + tb_strlen(url);
+	tb_assert_and_check_return_val(p < e, tb_false);
 
-	// init
-	*psecure = tb_false;
-
-	// is "http://" ?
-	if (n > 7 
-		&& p[0] == 'h'
-		&& p[1] == 't'
-		&& p[2] == 't'
-		&& p[3] == 'p'
-		&& p[4] == ':'
-		&& p[5] == '/'
-		&& p[6] == '/')
+	// skip "http://"
+	if (p + 7 < e && !tb_strnicmp(p, "http://", 7))
 	{
 		p += 7;
 	}
-	else if (n > 8 
-		&& p[0] == 'h'
-		&& p[1] == 't'
-		&& p[2] == 't'
-		&& p[3] == 'p'
-		&& p[4] == 's'
-		&& p[5] == ':'
-		&& p[6] == '/'
-		&& p[7] == '/')
+	// skip "https://"
+	else if (p + 8 < e && !tb_strnicmp(p, "https://", 8))
 	{
 		p += 8;
-
-		// is https?
 		*psecure = tb_true;
 	}
 
-	// get host
-	tb_char_t* pb = (tb_char_t*)phost;
-	tb_char_t* pe = (tb_char_t*)phost + *nhost - 1;
+	// skip www
+	if (p + 3 < e && !tb_strnicmp(p, "www", 3)) p += 3;
+
+	// skip .
+	if (p + 1 < e && *p == '.') p++;
+
+	// get domain
+	tb_char_t* pb = (tb_char_t*)pdomain;
+	tb_char_t* pe = (tb_char_t*)pdomain + ndomain - 1;
 	while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
 	*pb = '\0';
-	*nhost = pb - phost;
-	//tb_trace_d("host: %s", phost);
+	
+	// trace
+	tb_trace_d("domain: %s", pdomain);
 
 	// skip port
-	if (*p && *p == ':')
-	{
-		for (p++; p < e && *p && *p != '/'; p++) ;
-	}
+	if (*p && *p == ':') for (p++; p < e && *p && *p != '/'; p++) ;
 
 	// get path
 	pb = ppath;
-	pe = ppath + *npath - 1;
-	while (p < e && pb < pe && *p) *pb++ = *p++;
+	pe = ppath + npath - 1;
+	while (p < e && pb < pe && *p && *p != '?') *pb++ = *p++;
 	*pb = '\0';
-	*npath = pb - ppath;
 	
 	// no path?
 	if (!*ppath) 
 	{
 		*ppath++ = '/';
 		*ppath = '\0';
-		*npath = 1;
 	}
-	//tb_trace_d("path: %s", ppath);
 
-	return *phost? tb_true : tb_false;
+	// trace
+	tb_trace_d("path: %s", ppath);
+
+	// ok?
+	return *pdomain? tb_true : tb_false;
 }
-// parse cookies entry
-static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
+static tb_bool_t tb_cookies_is_child_domain(tb_char_t const* parent, tb_char_t const* child)
 {
-	// init entry
-	tb_memset(entry, 0, sizeof(tb_cookie_entry_t));
+	// check
+	tb_assert_and_check_return_val(parent && child, tb_false);
 
-	// parse item
+	// init
+	tb_char_t const* 	pb = parent;
+	tb_char_t const* 	cb = child;
+	tb_size_t 			pn = tb_strlen(pb);
+	tb_size_t 			cn = tb_strlen(cb);
+	tb_assert_and_check_return_val(pn > 3 && cn > 3, tb_false);
+
+	// is child?
+	tb_size_t 			n = 0;
+	tb_char_t const* 	pe = pb + pn - 1;
+	tb_char_t const* 	ce = cb + cn - 1;
+	for (; pe >= pb && ce >= cb && *pe == *ce; pe--, ce--)
+	{
+		if (*ce == '.') n++;
+	}
+
+	// ok?
+	return (pe < pb && n >= 1 && (ce < cb || *ce == '.'))? tb_true : tb_false;
+}
+static tb_bool_t tb_cookies_is_child_path(tb_char_t const* parent, tb_char_t const* child)
+{
+	// check
+	tb_assert_and_check_return_val(parent && child, tb_false);
+
+	// parent is root?
+	if (parent[0] == '/' && !parent[1]) return tb_true;
+
+	// is child?
+	tb_char_t const* 	p = parent;
+	tb_char_t const* 	c = child;
+	tb_size_t 			n = tb_strlen(parent);
+	while (n-- && *p && *c && *p++ == *c++) ; 
+
+	// ok?
+	return (!*p && (!*c || *c == '/'))? tb_true : tb_false;
+}
+static tb_void_t tb_cookies_entry_exit(tb_cookies_t* cookies, tb_cookies_entry_t* entry)
+{
+	// check
+	tb_assert_and_check_return(cookies && entry);
+
+	// exit domain
+	if (entry->domain) tb_string_pool_del(cookies->string_pool, entry->domain);
+	entry->domain = tb_null;
+	
+	// exit path
+	if (entry->path) tb_string_pool_del(cookies->string_pool, entry->path);
+	entry->path = tb_null;
+	
+	// exit name
+	if (entry->name) tb_string_pool_del(cookies->string_pool, entry->name);
+	entry->name = tb_null;
+	
+	// exit value
+	if (entry->value) tb_string_pool_del(cookies->string_pool, entry->value);
+	entry->value = tb_null;
+}
+static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
+{
+	// check
+	tb_cookies_entry_t* entry = (tb_cookies_entry_t*)item;
+	tb_assert_and_check_return(func && entry);
+
+	// the cookies
+	tb_cookies_t* cookies = (tb_cookies_t*)func->priv;
+	tb_assert_and_check_return(cookies && cookies->string_pool);
+
+	// exit it
+	tb_cookies_entry_exit(cookies, entry);
+}
+static tb_size_t tb_cookies_entry_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
+{
+	// check
+	tb_cookies_entry_t* entry = (tb_cookies_entry_t*)data;
+	tb_assert_and_check_return_val(func && entry && entry->domain && entry->path && entry->name, 0);
+
+	// the cookies
+	tb_cookies_t* cookies = (tb_cookies_t*)func->priv;
+	tb_assert_and_check_return_val(cookies && cookies->string_func.hash, 0);
+
+	// compute the three hash values
+	tb_size_t v0 = cookies->string_func.hash(&cookies->string_func, entry->domain, mask, index);
+	tb_size_t v1 = cookies->string_func.hash(&cookies->string_func, entry->path, mask, index);
+	tb_size_t v2 = cookies->string_func.hash(&cookies->string_func, entry->name, mask, index);
+
+	// the hash value
+	return (v0 ^ v1 ^ v2) & mask;
+}
+static tb_long_t tb_cookies_entry_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+{
+	// check
+	tb_cookies_entry_t* lentry = (tb_cookies_entry_t*)ldata;
+	tb_cookies_entry_t* rentry = (tb_cookies_entry_t*)rdata;
+	tb_assert_and_check_return_val(lentry && lentry->domain && lentry->path && lentry->name, 0);
+	tb_assert_and_check_return_val(rentry && rentry->domain && rentry->path && rentry->name, 0);
+
+	// compare domain
+	tb_long_t ok = tb_strcmp(lentry->domain, rentry->domain);
+	tb_check_return_val(!ok, ok);
+
+	// compare domain
+	ok = tb_strcmp(lentry->path, rentry->path);
+	tb_check_return_val(!ok, ok);
+
+	// compare name
+	return tb_strcmp(lentry->name, rentry->name);
+}
+static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t* entry, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
+{
+	// check
+	tb_assert_and_check_return_val(cookies && cookies->string_pool && entry && value, tb_false);
+
+	// init maxage: -1
+	entry->maxage = 1;
+	entry->storage = 0;
+
+	// done 
 	tb_char_t const* p = value;
 	tb_char_t const* b = tb_null;
 	tb_char_t const* v = tb_null;
+	tb_char_t data[4096] = {0};
 	while (1)
 	{
-		// parse field
+		// key=value; or value;
 		if (!*p || *p == ';')
 		{
 			// end?
-			if (!b) break;
+			tb_check_break(b);
 
-			//tb_trace_d("name: %s", b? b : "");
-			//tb_trace_d("value[%d]: %s", p - v, v? v : "");
+			// trace
+//			tb_trace_d("name: %s", b? b : "");
+//			tb_trace_d("value[%d]: %s", p - v, v? v : "");
 
-			// parse field
+			// done value
 			if (!tb_strnicmp(b, "expires", 7))
 			{	
-				// invalid format?
+				// must have value
 				tb_assert_and_check_return_val(v, tb_false);
 
-				entry->pexpires = v;
-				entry->nexpires = p - v;
+				// init date: Wdy, DD-Mon-YYYY HH:MM:SS GMT
+				tb_tm_t date = {0};
+
+				// parse week
+				tb_char_t const* q = v;
+				if ((q + 6 < p && !tb_strnicmp(q, "Monday", 6)) || (q + 3 < p && !tb_strnicmp(q, "Mon", 3)))
+					date.week = 1;
+				else if ((q + 7 < p && !tb_strnicmp(q, "Tuesday", 7)) || (q + 3 < p && !tb_strnicmp(q, "Tue", 3)))
+					date.week = 2;
+				else if ((q + 9 < p && !tb_strnicmp(q, "Wednesday", 9)) || (q + 3 < p && !tb_strnicmp(q, "Wed", 3)))
+					date.week = 3;	
+				else if ((q + 8 < p && !tb_strnicmp(q, "Thursday", 8)) || (q + 3 < p && !tb_strnicmp(q, "Thu", 3)))
+					date.week = 4;
+				else if ((q + 6 < p && !tb_strnicmp(q, "Friday", 6)) || (q + 3 < p && !tb_strnicmp(q, "Fri", 3)))
+					date.week = 5;
+				else if ((q + 8 < p && !tb_strnicmp(q, "Saturday", 8)) || (q + 3 < p && !tb_strnicmp(q, "Sat", 3)))
+					date.week = 6;
+				else if ((q + 6 < p && !tb_strnicmp(q, "Sunday", 6)) || (q + 3 < p && !tb_strnicmp(q, "sun", 3)))
+					date.week = 7;
+
+				// skip week
+				while (q < p && *q != ',') q++; if (q < p && *q == ',') q++;
+
+				// parse day
+				while (q < p && !tb_isdigit(*q)) q++;
+				date.mday = tb_stou32(q);
+
+				// skip day
+				while (q < p && *q != '-') q++; if (q < p && *q == '-') q++;
+
+				// parse month
+				if (q + 3 < p && !tb_strnicmp(q, "Jan", 3))
+					date.month = 1;
+				else if (q + 3 < p && !tb_strnicmp(q, "Feb", 3))
+					date.month = 2;
+				else if (q + 3 < p && !tb_strnicmp(q, "Mar", 3))
+					date.month = 3;
+				else if (q + 3 < p && !tb_strnicmp(q, "Apr", 3))
+					date.month = 4;
+				else if (q + 3 < p && !tb_strnicmp(q, "May", 3))
+					date.month = 5;
+				else if (q + 3 < p && !tb_strnicmp(q, "Jun", 3))
+					date.month = 6;
+				else if (q + 3 < p && !tb_strnicmp(q, "Jul", 3))
+					date.month = 7;
+				else if (q + 3 < p && !tb_strnicmp(q, "Aug", 3))
+					date.month = 8;
+				else if (q + 3 < p && !tb_strnicmp(q, "Sep", 3))
+					date.month = 9;
+				else if (q + 3 < p && !tb_strnicmp(q, "Oct", 3))
+					date.month = 10;
+				else if (q + 3 < p && !tb_strnicmp(q, "Nov", 3))
+					date.month = 11;
+				else if (q + 3 < p && !tb_strnicmp(q, "Dec", 3))
+					date.month = 12;
+
+				// skip month
+				while (q < p && *q != '-') q++; if (q < p && *q == '-') q++;
+
+				// parse year
+				date.year = tb_stou32(q);
+				if (date.year < 100) date.year += 1900;
+
+				// skip year
+				while (q < p && !tb_isspace(*q)) q++; 
+				while (q < p && tb_isspace(*q)) q++; 
+
+				// parse hour
+				date.hour = tb_stou32(q);
+
+				// skip hour
+				while (q < p && *q != ':') q++; if (q < p && *q == ':') q++;
+
+				// parse minute
+				date.minute = tb_stou32(q);
+
+				// skip minute
+				while (q < p && *q != ':') q++; if (q < p && *q == ':') q++;
+
+				// parse second
+				date.second = tb_stou32(q);
+
+				// make expires time
+				entry->expires = tb_gmmktime(&date);
+
+				// trace
+				tb_trace_d("expires: %04ld-%02ld-%02ld %02ld:%02ld:%02ld GMT, week: %d", date.year, date.month, date.mday, date.hour, date.minute, date.second, date.week);
 			}
 			else if (!tb_strnicmp(b, "max-age", 7))
 			{			
-				// invalid format?
+				// must have value
 				tb_assert_and_check_return_val(v, tb_false);
 
-				entry->pmaxage = v;
-				entry->nmaxage = p - v;
+				// the maxage
+				tb_long_t maxage = tb_stoi32(v);
+
+				// storage to file?
+				entry->storage = maxage > 0? 1 : 0;
+				
+				// save maxage
+				entry->maxage = tb_abs(maxage);
 			}
 			else if (!tb_strnicmp(b, "domain", 6))
 			{			
-				// invalid format?
+				// must have value
 				tb_assert_and_check_return_val(v, tb_false);
 
-				entry->pdomain = v;
-				entry->ndomain = p - v;
+				// save value
+				tb_assert_and_check_return_val(p - v < sizeof(data) - 1, tb_false);
+				if (v < p)
+				{
+					tb_strlcpy(data, v, p - v); data[p - v] = '\0';
+					entry->domain = tb_string_pool_put(cookies->string_pool, data[0] == '.'? data + 1 : data);
+				}
 			}
 			else if (!tb_strnicmp(b, "path", 4))
 			{				
-				// invalid format?
+				// must have value
 				tb_assert_and_check_return_val(v, tb_false);
 
-				entry->ppath = v;
-				entry->npath = p - v;
+				// save value
+				tb_assert_and_check_return_val(p - v < sizeof(data) - 1, tb_false);
+				if (v < p)
+				{
+					tb_strlcpy(data, v, p - v); data[p - v] = '\0';
+					entry->path = tb_string_pool_put(cookies->string_pool, data);
+				}
 			}	
 			else if (!tb_strnicmp(b, "version", 7))
 			{
-				// invalid format?
+				// must have value
 				tb_assert_and_check_return_val(v, tb_false);
 
-				entry->pversion = v;
-				entry->nversion = p - v;
 			}	
 			else if (!tb_strnicmp(b, "secure", 6))
 			{
-				entry->bsecure = 1;
+				entry->secure = 1;
 			}
-			// ignore 
+			// ignore it
 			else if (!tb_strnicmp(b, "HttpOnly", 8)) ;
+			// key=value
 			else if (v)
 			{
-				// invalid format?
+				// must have value
 				tb_assert_and_check_return_val(v > b, tb_false);
 
-				entry->pname = b;
-				entry->nname = v - b - 1;
-				entry->pvalue = v;
-				entry->nvalue = p - v;
+				// save name
+				tb_assert_and_check_return_val(v - b - 1 < sizeof(data) - 1, tb_false);
+				tb_strlcpy(data, b, v - b - 1); data[v - b - 1] = '\0';
+				entry->name = tb_string_pool_put(cookies->string_pool, data);
+
+				// save value
+				tb_assert_and_check_return_val(p - v < sizeof(data) - 1, tb_false);
+				if (v < p)
+				{
+					tb_strlcpy(data, v, p - v); data[p - v] = '\0';
+					entry->value = tb_string_pool_put(cookies->string_pool, data);
+				}
 			}
 
-			// next field
+			// next key-value pair
 			if (*p) 
 			{
 				b = tb_null;
@@ -263,535 +478,343 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 	}
 
 	// check name
-	tb_assert_and_check_return_val(entry->pname && entry->nname, tb_false);
+	tb_assert_and_check_return_val(entry->name, tb_false);
 
-	// domain not exists?
-	if (!entry->pdomain)
+	// domain not exists? using the given domain
+	if (!entry->domain && domain)
+		entry->domain = tb_string_pool_put(cookies->string_pool, domain);
+	if (!entry->domain)
 	{
-		if (domain)
-		{
-			entry->pdomain = domain;
-			entry->ndomain = tb_strlen(domain);
-		}
-		else return tb_false;
+		// trace
+		tb_trace_e("no domain for value: %s", value);
+		return tb_false;
 	}
 
-	// skip '.'
-	if (*entry->pdomain == '.')
-	{
-		entry->pdomain++;
-		entry->ndomain--;
-	}
+	// path not exists? using the given path
+	if (!entry->path) entry->path = tb_string_pool_put(cookies->string_pool, path? path : "/");
+	tb_assert_and_check_return_val(entry->path, tb_false);
 
-	// path not exists?
-	if (!entry->ppath)
-	{
-		if (path)
-		{
-			entry->ppath = path;
-			entry->npath = tb_strlen(path);
-		}
-		else 
-		{
-			entry->ppath = "/";
-			entry->npath = 1;
-		}
-	}
-
-	// secure not exists?
-	if (!entry->bsecure && secure) entry->bsecure = 1;
+	// no secure? using the given secure value
+	if (!entry->secure && secure) entry->secure = 1;
 	
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv)
+{
+	// check
+	tb_value_t* tuple = (tb_value_t*)priv;
+	tb_assert_and_check_return_val(hash && item && bdel && tuple, tb_false);
+
+	// the entry
+	tb_cookies_entry_t* entry = (tb_cookies_entry_t*)item->name;
+	tb_assert_and_check_return_val(entry && entry->domain && entry->path && entry->name, tb_false);
+
+	// the domain
+	tb_char_t const* domain = tuple[0].cstr;
+
+	// the path
+	tb_char_t const* path = tuple[1].cstr;
+
+	// the secure
+	tb_size_t secure = tuple[2].ul;
+
+	// the data and maxn
+	tb_char_t* 	data = tuple[3].str;
+	tb_size_t 	maxn = tuple[4].ul;
+	tb_assert_and_check_return_val(data && maxn > 5, tb_false);
+
+	// this cookies is at domain/path?
+	if ( 	tb_cookies_is_child_domain(entry->domain, domain)
+		&& 	tb_cookies_is_child_path(entry->path, path)
+		&& 	entry->secure == secure)
+	{
+
+		// append "key=value; "
+		tb_long_t size = tb_snprintf(data, maxn, "%s=%s; ", entry->name, entry->value? entry->value : "");
+		if (size >= 0) 
+		{
+			// end
+			data[size] = '\0';
+
+			// update data
+			tuple[3].str += size;
+
+			// update maxn
+			tuple[4].ul -= size;
+		}
+	}
+
+	// ok
+	tuple[5].b = tb_true;
 	return tb_true;
 }
 
-// set cookies string
-static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s, tb_size_t n)
-{
-	// check
-	tb_assert_and_check_return_val(s && n, 0);
- 
-	// reuse it if exists
-	tb_single_list_t* 	spool = cookies->spool;
-	tb_size_t 		itor = tb_iterator_head(spool);
-	tb_size_t 		tail = tb_iterator_tail(spool);
-	for (; itor != tail; itor = tb_iterator_next(spool, itor))
-	{
-		tb_cookie_string_t* string = (tb_cookie_string_t*)tb_iterator_item(spool, itor);
-		if (string && string->data && !tb_strncmp(string->data, s, n))
-		{
-			string->refn++;
-			return itor;
-		}
-	}
-
-	// add it if not exists
-	tb_cookie_string_t string;
-	string.refn = 1;
-	string.data = tb_strndup(s, n);
-	tb_assert(string.data);
-	if (string.data) return tb_single_list_insert_tail(spool, &string);
-	else return 0;
-}
-
-// set cookies entry
-static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
-{
-	tb_mutex_enter(cookies->hmutex);
-
-	tb_size_t 		i = 0;	
-	tb_vector_t* 	cpool = cookies->cpool;
-	tb_single_list_t* 	spool = cookies->spool;
-	tb_size_t 		size = tb_vector_size(cpool);
-	for (i = 0; i < size; i++)
-	{
-		tb_cookie_t* cookie = (tb_cookie_t*)tb_iterator_item(cpool, i);
-		if (cookie)
-		{
-			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_iterator_item(spool, cookie->domain);
-			tb_cookie_string_t* spath = (tb_cookie_string_t*)tb_iterator_item(spool, cookie->path);
-			tb_cookie_string_t* sname = (tb_cookie_string_t*)tb_iterator_item(spool, cookie->name);
-			tb_cookie_string_t* svalue = (tb_cookie_string_t*)tb_iterator_item(spool, cookie->value);
-
-			// is this?
-			if ( 	sdomain && sdomain->data && !tb_strnicmp(sdomain->data, entry->pdomain, entry->ndomain)
-				&& 	spath && spath->data && !tb_strncmp(spath->data, entry->ppath, entry->npath)
-				&& 	sname && sname->data && !tb_strncmp(sname->data, entry->pname, entry->nname)
-				)
-			{
-				// update secure
-				cookie->secure = entry->bsecure;
-
-				// update expires
-				cookie->expires = 0;
-
-				// update value
-				if (svalue->refn > 1) svalue->refn--;
-				else tb_single_list_remove(spool, cookie->value);
-				cookie->value = tb_cookie_set_string(cookies, entry->pvalue, entry->nvalue);
-				tb_assert_abort(cookie->value);
-
-				tb_mutex_leave(cookies->hmutex);
-				return tb_true;
-			}
-		}
-	}
-
-	// no find
-	tb_mutex_leave(cookies->hmutex);
-	return tb_false;
-}
-
-// del cookies entry
-static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
-{
-	tb_mutex_enter(cookies->hmutex);
-
-	tb_size_t 		i = 0;	
-	tb_vector_t* 	cpool = cookies->cpool;
-	tb_single_list_t* 	spool = cookies->spool;
-	tb_size_t 		size = tb_vector_size(cpool);
-	for (i = 0; i < size; i++)
-	{
-		tb_cookie_t* cookie = (tb_cookie_t*)tb_iterator_item(cpool, i);
-		if (cookie)
-		{
-			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_iterator_item(spool, cookie->domain);
-			tb_cookie_string_t* spath = (tb_cookie_string_t*)tb_iterator_item(spool, cookie->path);
-			tb_cookie_string_t* sname = (tb_cookie_string_t*)tb_iterator_item(spool, cookie->name);
-
-			// is this?
-			if ( 	sdomain && sdomain->data && !tb_strnicmp(sdomain->data, entry->pdomain, entry->ndomain)
-				&& 	spath && spath->data && !tb_strncmp(spath->data, entry->ppath, entry->npath)
-				&& 	sname && sname->data && !tb_strncmp(sname->data, entry->pname, entry->nname)
-				)
-			{
-				// remove domain
-				if (sdomain->refn > 1) sdomain->refn--;
-				else tb_single_list_remove(spool, cookie->domain);
-
-				// remove path
-				if (spath->refn > 1) spath->refn--;
-				else tb_single_list_remove(spool, cookie->path);
-	
-				// remove name
-				if (sname->refn > 1) sname->refn--;
-				else tb_single_list_remove(spool, cookie->name);
-
-				// remove cookie
-				tb_vector_remove(cpool, i);
-
-				break;
-			}
-		}
-	}
-
-	tb_mutex_leave(cookies->hmutex);
-}
-// add cookies entry
-static tb_void_t tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
-{
-	// lock
-	tb_mutex_enter(cookies->hmutex);
-
-	// set secure
-	tb_cookie_t cookie;
-	cookie.secure = entry->bsecure;
-
-	// set expires
-	cookie.expires = 0;
-
-	// set strings
-	cookie.domain = tb_cookie_set_string(cookies, entry->pdomain, entry->ndomain);
-	cookie.path = tb_cookie_set_string(cookies, entry->ppath, entry->npath);
-	cookie.name = tb_cookie_set_string(cookies, entry->pname, entry->nname);
-	cookie.value = tb_cookie_set_string(cookies, entry->pvalue, entry->nvalue);
-	tb_assert_abort(cookie.domain && cookie.path && cookie.name && cookie.value);
-
-	// add cookie
-	tb_vector_insert_tail(cookies->cpool, &cookie);
-
-	// unlock
-	tb_mutex_leave(cookies->hmutex);
-}
-
-// is child domain?
-static tb_bool_t tb_cookies_domain_ischild(tb_char_t const* parent, tb_char_t const* child)
-{
-	tb_assert_and_check_return_val(parent && child, tb_false);
-
-	tb_char_t const* 	pb = parent;
-	tb_char_t const* 	cb = child;
-	tb_size_t 			pn = tb_strlen(pb);
-	tb_size_t 			cn = tb_strlen(cb);
-	tb_assert_and_check_return_val(pn > 3 && cn > 3, tb_false);
-
-	tb_size_t 			n = 0;
-	tb_char_t const* 	pe = pb + pn - 1;
-	tb_char_t const* 	ce = cb + cn - 1;
-	for (; pe >= pb && ce >= cb && *pe == *ce; pe--, ce--)
-	{
-		if (*ce == '.') n++;
-	}
-
-	// ok?
-	if (pe < pb && n >= 1 && (ce < cb || *ce == '.')) return tb_true;
-
-	return tb_false;
-}
-// is child path?
-static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t const* child)
-{
-	tb_assert_and_check_return_val(parent && child, tb_false);
-
-	// parent is root?
-	if (parent[0] == '/' && !parent[1]) return tb_true;
-
-	// is child?
-	tb_char_t const* 	p = parent;
-	tb_char_t const* 	c = child;
-	tb_size_t 			n = tb_strlen(parent);
-	while (n-- && *p && *c && *p++ == *c++) ; 
-
-	// ok?
-	if (!*p && (!*c || *c == '/')) return tb_true;
-
-	return tb_false;
-}
-
-// the dtor of string
-static tb_void_t tb_cookies_block_pool_free(tb_item_func_t* func, tb_pointer_t item)
-{
-	if (item) 
-	{
-		tb_cookie_string_t* s = (tb_cookie_string_t*)item;
-		//tb_trace_d("[string]::dtor: %s", s->data? s->data : "");
-		if (s->data) 
-		{
-			tb_free((tb_pointer_t)s->data);
-			s->data = tb_null;
-		}
-	}
-}
-
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interface implementation
  */
-tb_cookies_t* tb_cookies_init()
+tb_handle_t tb_cookies_init()
 {
-	// calloc
-	tb_cookies_t* cookies = (tb_cookies_t*)tb_malloc0(sizeof(tb_cookies_t));
-	tb_assert_and_check_return_val(cookies, tb_null);
-
-	// init hmutex
-	cookies->hmutex = tb_mutex_init();
-	tb_assert_and_check_goto(cookies->hmutex, fail);
-
-	// init spool
-	cookies->spool = tb_single_list_init(TB_COOKIES_BLOCK_POOL_GROW, tb_item_func_mem(sizeof(tb_cookie_string_t), tb_cookies_block_pool_free, tb_null));
-	tb_assert_and_check_goto(cookies->spool, fail);
-
-	// init cpool
-	cookies->cpool = tb_vector_init(TB_COOKIES_CPOOL_GROW, tb_item_func_mem(sizeof(tb_cookie_t), tb_null, tb_null));
-	tb_assert_and_check_goto(cookies->cpool, fail);
-
-	return cookies;
-
-fail:
-	if (cookies) tb_cookies_exit(cookies);
-	return tb_null;
-}
-tb_void_t tb_cookies_exit(tb_cookies_t* cookies)
-{
-	if (cookies)
+	// done
+	tb_bool_t 		ok = tb_false;
+	tb_cookies_t* 	cookies = tb_null;
+	do
 	{
-		tb_assert_and_check_return(cookies->hmutex);
+		// make cookies
+		cookies = (tb_cookies_t*)tb_malloc0(sizeof(tb_cookies_t));
+		tb_assert_and_check_break(cookies);
 
-		// clear cookies
-		tb_cookies_clear(cookies);
+		// init lock
+		if (!tb_spinlock_init(&cookies->lock)) break;
 
-		// free cpool & spool
-		tb_mutex_enter(cookies->hmutex);
+		// init string pool
+		cookies->string_pool = tb_string_pool_init(tb_true, 0);
+		tb_assert_and_check_break(cookies->string_pool);
 
-		// free cpool
-		if (cookies->cpool) tb_vector_exit(cookies->cpool);
-		cookies->cpool = tb_null;
+		// init cookie pool
+		tb_item_func_t func = tb_item_func_mem(sizeof(tb_cookies_entry_t), tb_cookies_entry_free, cookies);
+		func.hash = tb_cookies_entry_hash;
+		func.comp = tb_cookies_entry_comp;
+		cookies->cookie_pool = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, func, tb_item_func_true());
+		tb_assert_and_check_break(cookies->cookie_pool);
 
-		// free spool
-		if (cookies->spool) tb_single_list_exit(cookies->spool);
-		cookies->spool = tb_null;
+		// init string func
+		cookies->string_func = tb_item_func_str(tb_true, tb_null);
 
-		tb_mutex_leave(cookies->hmutex);
-
-		// free mutex
-		tb_mutex_exit(cookies->hmutex);
-		
-		// free it
-		tb_free(cookies);
-	}
-}
-
-tb_void_t tb_cookies_clear(tb_cookies_t* cookies)
-{
-	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
-
-	tb_mutex_enter(cookies->hmutex);
-	tb_vector_clear(cookies->cpool);
-	tb_single_list_clear(cookies->spool);
-	cookies->value[0] = '\0';
-	tb_mutex_leave(cookies->hmutex);
-}
-
-tb_void_t tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
-{
-	tb_assert_and_check_return(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex);
-	//tb_trace_d("[set]::%s%s%s = %s", secure == tb_true? "https://" : "http://", domain? domain : "", path? path : "", value);
-
-	// is null?
-	tb_check_return(value[0]);
-
-	// parse cookies entry
-	tb_cookie_entry_t entry;
-	if (!tb_cookies_parse(&entry, domain, path, secure, value)) return ;
-
-#if 0
-	tb_trace_d("domain[%d]: %s", entry.ndomain, entry.pdomain? entry.pdomain : "");
-	tb_trace_d("path[%d]: %s", entry.npath, entry.ppath? entry.ppath : "");
-	tb_trace_d("name[%d]: %s", entry.nname, entry.pname? entry.pname : "");
-	tb_trace_d("value[%d]: %s", entry.nvalue, entry.pvalue? entry.pvalue : "");
-	tb_trace_d("expires[%d]: %s", entry.nexpires, entry.pexpires? entry.pexpires : "");
-	tb_trace_d("maxage[%d]: %s", entry.nmaxage, entry.pmaxage? entry.pmaxage : "");
-	tb_trace_d("version[%d]: %s", entry.nversion, entry.pversion? entry.pversion : "");
-	tb_trace_d("secure: %s", entry.bsecure? "true" : "false");
+		// register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+		tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&cookies->lock, TB_TRACE_MODULE_NAME);
 #endif
 
-	// delete cookie entry if value is null
-	if (!entry.pvalue || !entry.nvalue)
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
 	{
-		tb_cookies_del_entry(cookies, &entry);
-		return ;
+		// exit cookies
+		if (cookies) tb_cookies_exit(cookies);
+		cookies = tb_null;
 	}
 
-	// set or add cookie entry
-	if (!tb_cookies_set_entry(cookies, &entry))
-		tb_cookies_add_entry(cookies, &entry);
+	// ok?
+	return (tb_handle_t)cookies;
 }
-tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure)
+tb_void_t tb_cookies_exit(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(cookies && domain && *domain && cookies->cpool && cookies->spool && cookies->hmutex, tb_null);
+	// check
+	tb_cookies_t* cookies = (tb_cookies_t*)handle;
+	tb_assert_and_check_return(cookies);
+
+	// enter
+	tb_spinlock_enter(&cookies->lock);
+
+	// exit cookie pool
+	if (cookies->cookie_pool) tb_hash_exit(cookies->cookie_pool);
+	cookies->cookie_pool = tb_null;
 	
-	// no path?
-	if (!path || !path[0]) path = "/";
+	// exit string pool
+	if (cookies->string_pool) tb_string_pool_exit(cookies->string_pool);
+	cookies->string_pool = tb_null;
 
-	// skip '.'
-	if (*domain == '.') domain++;
+	// leave
+	tb_spinlock_leave(&cookies->lock);
 
-	// find the matched cookie values
-	tb_size_t 		i = 0;
-	tb_size_t 		n = 0;
-	tb_vector_t* 	cpool = cookies->cpool;
-	tb_single_list_t* 	spool = cookies->spool;
-	tb_size_t 		size = tb_vector_size(cpool);
-	for (i = 0; i < size; i++)
+	// exit lock
+	tb_spinlock_exit(&cookies->lock);
+
+	// exit it
+	tb_free(cookies);
+}
+tb_void_t tb_cookies_clear(tb_handle_t handle)
+{
+	// check
+	tb_cookies_t* cookies = (tb_cookies_t*)handle;
+	tb_assert_and_check_return(cookies);
+
+	// enter
+	tb_spinlock_enter(&cookies->lock);
+
+	// clear cookie pool
+	if (cookies->cookie_pool) tb_hash_clear(cookies->cookie_pool);
+	
+	// clear string pool
+	if (cookies->string_pool) tb_string_pool_clear(cookies->string_pool);
+
+	// leave
+	tb_spinlock_leave(&cookies->lock);
+}
+tb_bool_t tb_cookies_set(tb_handle_t handle, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
+{
+	// check
+	tb_cookies_t* cookies = (tb_cookies_t*)handle;
+	tb_assert_and_check_return_val(cookies, tb_false);
+
+	// enter
+	tb_spinlock_enter(&cookies->lock);
+
+	// done
+	tb_bool_t 			ok = tb_false;
+	tb_cookies_entry_t 	entry = {0};
+	do
 	{
-		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_iterator_item(cpool, i);
-		if (cookie)
+		// check
+		tb_assert_and_check_break(cookies->string_pool && cookies->cookie_pool);
+
+		// init entry
+		if (!tb_cookies_entry_init(cookies, &entry, domain, path, secure, value)) break;
+
+		// maxage is zero? remove it
+		if (!entry.maxage && !entry.storage)
 		{
-			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->domain) : tb_null;
-			tb_cookie_string_t const* spath = cookie->path? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->path) : tb_null;
-			
-			// this cookies is at domain/path?
-			if ( 	tb_cookies_domain_ischild(sdomain->data, domain)
-				&& 	tb_cookies_path_ischild(spath->data, path))
-			{
-				tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->name) : tb_null;
-				tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->value) : tb_null;
-				tb_assert_and_check_return_val(sname && sname->data, tb_null);
-				tb_assert_and_check_return_val(svalue && svalue->data, tb_null);
-			
-				// enough?
-				if (n + 8 < TB_COOKIES_VALUE_MAX)
-				{
-					tb_int_t ret = tb_snprintf(cookies->value + n, TB_COOKIES_VALUE_MAX - n, "%s=%s; ", sname->data, svalue->data);
-					if (ret > 0) 
-					{
-						n += ret;
-						cookies->value[n] = '\0';
-					}
-				}
-				else break;
-			}
-		}
-	}
+			// remove it
+			tb_hash_del(cookies->cookie_pool, &entry);
 
-	// strip tail
-	if (n > 2) 
+			// exit it
+			tb_cookies_entry_exit(cookies, &entry);
+		}
+		// set entry
+		else tb_hash_set(cookies->cookie_pool, &entry, (tb_cpointer_t)tb_true);
+
+		// storage to file?
+		if (entry.storage)
+		{
+			// TODO
+			tb_trace1_w("not supports storaging cookies to file now!");
+		}
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
 	{
-		n -= 2;
-		cookies->value[n] = '\0';
+		// exit it
+		tb_cookies_entry_exit(cookies, &entry);
 	}
 	
-	// no cookie?
-	if (!n) return tb_null;
+	// leave
+	tb_spinlock_leave(&cookies->lock);
 
-	// ok
-	//tb_trace_d("[get]::%s%s%s: %s", secure == tb_true? "https://" : "http://", domain, path, cookies->value);
-	return cookies->value;
+	// ok?
+	return ok;
 }
-
-tb_void_t tb_cookies_set_from_url(tb_cookies_t* cookies, tb_char_t const* url, tb_char_t const* value)
+tb_bool_t tb_cookies_set_from_url(tb_handle_t handle, tb_char_t const* url, tb_char_t const* value)
 {
-	tb_char_t phost[1024];
-	tb_char_t ppath[4096];
-	tb_size_t nhost = 1024;
-	tb_size_t npath = 4096;
+	// check
+	tb_cookies_t* cookies = (tb_cookies_t*)handle;
+	tb_assert_and_check_return_val(cookies, tb_false);
+	
+	// get domain and path from the given url
 	tb_bool_t secure = tb_false;
-	if (tb_cookies_split_url(url, phost, &nhost, ppath, &npath, &secure))
+	tb_char_t path[TB_URL_PATH_MAXN] = {0};
+	tb_char_t domain[TB_URL_HOST_MAXN] = {0};
+	if (tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure))
 	{
-		// get domain
-		tb_char_t const* domain = phost;
-		if (nhost > 3
-			&& (phost[0] == 'w' || phost[0] == 'W')
-			&& (phost[1] == 'w' || phost[1] == 'W')
-			&& (phost[2] == 'w' || phost[2] == 'W')
-			)
-		{
-			domain += 3;
-		}
+		// trace
+		tb_trace_d("domain: %s, path: %s, secure: %s", domain, path, secure? "ok" : "no");
+
+		// set it with domain and path
+		return tb_cookies_set(cookies, domain, path, secure, value);
+	}
+
+	// try to set it without domain and path
+	return tb_cookies_set(cookies, tb_null, tb_null, tb_false, value);
+}
+tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t* data, tb_size_t maxn)
+{
+	// check
+	tb_cookies_t* cookies = (tb_cookies_t*)handle;
+	tb_assert_and_check_return_val(cookies && domain && data && maxn, tb_null);
+
+	// enter
+	tb_spinlock_enter(&cookies->lock);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// check
+		tb_assert_and_check_break(cookies->string_pool && cookies->cookie_pool);
+	
+		// no path? using the root path
+		if (!path || !path[0]) path = "/";
+
+		// skip '.'
 		if (*domain == '.') domain++;
 
-		// strip path
-		tb_char_t* p = ppath;
-		while (*p && *p != '?') p++;
-		*p = '\0';
-		
-		//tb_trace_d("domain: %s, path: %s", domain, ppath);
+		// get the matched values
+		tb_value_t tuple[6];
+		tuple[0].cstr 	= domain;
+		tuple[1].cstr 	= path;
+		tuple[2].ul 	= secure? 1 : 0;
+		tuple[3].str 	= data;
+		tuple[4].ul 	= maxn;
+		tuple[5].b 		= tb_false;
+		tb_hash_walk(cookies->cookie_pool, tb_cookies_entry_walk, tuple);
+		tb_assert_and_check_break(tuple[5].b);
 
-		// set it
-		if (*domain) tb_cookies_set(cookies, domain, ppath, secure, value);
-	}
-	else tb_cookies_set(cookies, tb_null, tb_null, tb_false, value);
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok) data = tb_null;
+	
+	// leave
+	tb_spinlock_leave(&cookies->lock);
+
+	// ok?
+	return data;
 }
-tb_char_t const* tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const* url)
+tb_char_t const* tb_cookies_get_from_url(tb_handle_t handle, tb_char_t const* url, tb_char_t* data, tb_size_t maxn)
 {
-	tb_char_t phost[1024];
-	tb_char_t ppath[4096];
-	tb_size_t nhost = 1024;
-	tb_size_t npath = 4096;
+	// check
+	tb_cookies_t* cookies = (tb_cookies_t*)handle;
+	tb_assert_and_check_return_val(cookies && data && maxn, tb_null);
+	
+	// get domain and path from the given url
 	tb_bool_t secure = tb_false;
-	if (tb_cookies_split_url(url, phost, &nhost, ppath, &npath, &secure))
-	{
-		// get domain
-		tb_char_t const* domain = phost;
-		if (nhost > 3
-			&& (phost[0] == 'w' || phost[0] == 'W')
-			&& (phost[1] == 'w' || phost[1] == 'W')
-			&& (phost[2] == 'w' || phost[2] == 'W')
-			)
-		{
-			domain += 3;
-		}
-		if (*domain == '.') domain++;
+	tb_char_t path[TB_URL_PATH_MAXN] = {0};
+	tb_char_t domain[TB_URL_HOST_MAXN] = {0};
+	if (!tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure)) return tb_null;
 
-		// strip path
-		tb_char_t* p = ppath;
-		while (*p && *p != '?') p++;
-		*p = '\0';
-		
-		//tb_trace_d("domain: %s, path: %s", domain, ppath);
+	// trace
+	tb_trace_d("domain: %s, path: %s, secure: %s", domain, path, secure? "ok" : "no");
 
-		// get it
-		if (*domain) return tb_cookies_get(cookies, domain, ppath, secure);
-	}
-	return tb_null;
+	// get it from domain and path
+	return tb_cookies_get(cookies, domain, path, secure, data, maxn);
 }
-
-
 #ifdef __tb_debug__
-tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
+tb_void_t tb_cookies_dump(tb_handle_t handle)
 {
-	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
-	tb_mutex_enter(cookies->hmutex);
+	// check
+	tb_cookies_t* cookies = (tb_cookies_t*)handle;
+	tb_assert_and_check_return(cookies && cookies->cookie_pool);
 
-	tb_trace_i("==================================================");
-	tb_trace_i("cookies:");
-	
-	tb_vector_t* cpool = cookies->cpool;
-	tb_single_list_t* spool = cookies->spool;
+	// enter
+	tb_spinlock_enter(&cookies->lock);
 
-	// dump items
-	tb_size_t i = 0;
-	tb_size_t n = tb_vector_size(cpool);
-	tb_trace_i("[cpool]: size: %d, maxn: %d", n, tb_vector_maxn(cpool));
-	for (i = 0; i < n; i++)
+	// dump
+	tb_trace_i("=========================================================");
+	tb_trace_i("cookie: size: %lu", tb_hash_size(cookies->cookie_pool));
+	tb_for_all_if (tb_hash_item_t*, item, cookies->cookie_pool, item)
 	{
-		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_iterator_item(cpool, i);
-		if (cookie)
-		{
-			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->domain) : tb_null;
-			tb_cookie_string_t const* spath = cookie->path? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->path) : tb_null;
-			tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->name) : tb_null;
-			tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->value) : tb_null;
+		// the entry
+		tb_cookies_entry_t* entry = (tb_cookies_entry_t*)item->name;
+		tb_assert_and_check_continue(entry && entry->domain && entry->path && entry->name);
 
-			tb_trace_i("[cookie]: url = %s%s%s, %s = %s"
-				, cookie->secure? "https://" : "http://"
-				, sdomain && sdomain->data? sdomain->data : ""
-				, spath && spath->data? spath->data : ""
-				, sname && sname->data? sname->data : ""
-				, svalue && svalue->data? svalue->data : ""
-				);
-		}
+		// trace
+		tb_trace_i("%s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "");
 	}
 
-	// dump strings
-	tb_trace_i("[spool]: size: %d, maxn: %d", n, tb_single_list_maxn(spool));
-	tb_for_all (tb_cookie_string_t*, s, spool)
-	{
-		if (s)
-		{
-			tb_trace_i("[string]: [%d]: %s ", s->refn, s->data? s->data : "");
-		}
-	}
-	tb_mutex_leave(cookies->hmutex);
+	// leave
+	tb_spinlock_leave(&cookies->lock);
 }
 #endif
 

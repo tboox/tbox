@@ -51,8 +51,8 @@ tb_bool_t tb_url_init(tb_url_t* url)
 		url->port = 0;
 		url->bssl = 0;
 		tb_ipv4_clr(&url->ipv4);
-		if (!tb_static_string_init(&url->host, url->data, TB_URL_HOST_MAX)) break;
-		if (!tb_static_string_init(&url->path, url->data + TB_URL_HOST_MAX, TB_URL_PATH_MAX)) break;
+		if (!tb_static_string_init(&url->host, url->data, TB_URL_HOST_MAXN)) break;
+		if (!tb_static_string_init(&url->path, url->data + TB_URL_HOST_MAXN, TB_URL_PATH_MAXN)) break;
 		if (!tb_scoped_string_init(&url->args)) break;
 		if (!tb_scoped_string_init(&url->urls)) break;
 

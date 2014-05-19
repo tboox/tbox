@@ -17,36 +17,46 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		ctime.h
+ * @file		cache_time.c
  * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFORM_CTIME_H
-#define TB_PLATFORM_CTIME_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "cache_time.h"
+#include "time.h"
+#include "atomic64.h"
+#include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * globals
  */
 
-/*! spak ctime 
- *
- * update the cached time for the external loop thread
- *
- * @return 			the now ctime value
- */
-tb_hong_t 			tb_ctime_spak(tb_noarg_t);
+// the cached time
+static tb_atomic64_t 	g_time = 0;
 
-/*! the time as the number of ms since the epoch
- *
- * cache time, lower accuracy and faster
- *
- * @return 			the now ctime value
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
  */
-tb_hong_t 			tb_ctime_time(tb_noarg_t);
+tb_hong_t tb_cache_time_spak(tb_noarg_t)
+{
+	// get the time
+	tb_timeval_t tv = {0};
+    if (!tb_gettimeofday(&tv, tb_null)) return -1;
 
-#endif
+	// the time value
+	tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
+
+	// save it
+	tb_atomic64_set(&g_time, val);
+
+	// ok
+	return val;
+}
+tb_hong_t tb_cache_time_time(tb_noarg_t)
+{
+	return (tb_hong_t)tb_atomic64_get(&g_time);
+}
+

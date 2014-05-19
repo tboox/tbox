@@ -44,7 +44,7 @@ tb_bool_t tb_platform_init()
 	if (!tb_dns_init()) return tb_false;
 
 	// spak ctime
-	tb_ctime_spak();
+	tb_cache_time_spak();
 
 	// ok
 	return tb_true;

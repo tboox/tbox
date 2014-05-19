@@ -102,6 +102,13 @@
  * is a secure one. Currently this means that secure cookies will only be sent to HTTPS (HTTP over SSL) servers. 
  * If secure is not specified, a cookie is considered safe to be sent in the clear over unsecured channels. 
  *
+ * max-age
+ * A positive valueindicates that the cookie will expire after that many seconds have passed. 
+ * Note that the value is the maximum age when the cookie will expire, not the cookie's current age. 
+ * A negative value means that the cookie is not stored persistently and will be deleted when the Web browser exits. 
+ * A zero value causes the cookie to be deleted. 
+ * The default value is -1
+ *
  * Syntax of the Cookie HTTP Request Header
  * When requesting a URL from an HTTP server, the browser will match the URL against all cookies 
  * and if any of them match, a line containing the name/value pairs of all matching cookies will be included 
@@ -187,71 +194,81 @@
  * includes
  */
 #include "prefix.h"
-#include "../container/container.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-#define TB_COOKIES_VALUE_MAX 		(32 * 1024)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the cookie type
-typedef struct __tb_cookie_t
-{
-	tb_hize_t 			expires;
-	tb_size_t 			secure;
-	tb_size_t 			domain;
-	tb_size_t 			path;
-	tb_size_t 			name;
-	tb_size_t 			value;
-
-}tb_cookie_t;
-
-// the cookies type
-typedef struct __tb_cookies_t
-{
-	// the string pool
-	tb_single_list_t* 		spool;
-
-	// the cookie pool
-	tb_vector_t* 		cpool;
-
-	// the value data
-	tb_char_t 			value[TB_COOKIES_VALUE_MAX];
-
-	// the mutex
-	tb_handle_t 		hmutex;
-
-}tb_cookies_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// init & exit
-tb_cookies_t* 		tb_cookies_init(tb_noarg_t);
-tb_void_t 			tb_cookies_exit(tb_cookies_t* cookies);
-
-/* get & set
+/*! init cookies
  *
- * domain: 	.google.com or google.com
- * path: 	/home/foo
+ * @return 			the cookies
  */
-tb_void_t 			tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value);
-tb_char_t const* 	tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure);
+tb_handle_t 		tb_cookies_init(tb_noarg_t);
 
-// get & set from url
-tb_void_t 			tb_cookies_set_from_url(tb_cookies_t* cookies, tb_char_t const* url, tb_char_t const* value);
-tb_char_t const* 	tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const* url);
+/*! exit cookies
+ *
+ * @param cookies 	the cookies
+ */
+tb_void_t 			tb_cookies_exit(tb_handle_t cookies);
 
-// clear
-tb_void_t 			tb_cookies_clear(tb_cookies_t* cookies);
+/*! set cookies from the given domain and path
+ *
+ * @param cookies 	the cookies
+ * @param domain 	the domain, .e.g .google.com or google.com
+ * @param path 		the path, .e.g /root/path
+ * @param secure 	is secure?
+ * @param value 	the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_cookies_set(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value);
 
-// dump
-tb_void_t 			tb_cookies_dump(tb_cookies_t const* cookies);
+/*! set cookies from the given url
+ *
+ * @param cookies 	the cookies
+ * @param url 		the url
+ * @param value 	the value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_cookies_set_from_url(tb_handle_t cookies, tb_char_t const* url, tb_char_t const* value);
+
+/*! get cookies from the given domain and path 
+ *
+ * @param cookies 	the cookies
+ * @param domain 	the domain, .e.g .google.com or google.com
+ * @param path 		the path, .e.g /root/path
+ * @param secure 	is secure?
+ * @param data 		the cookies data
+ * @param maxn 		the cookies data maxn
+ *
+ * @return 			the cookies data
+ */
+tb_char_t const* 	tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t* data, tb_size_t maxn);
+
+/*! get cookies from the given url 
+ *
+ * @param cookies 	the cookies
+ * @param url 		the url
+ * @param data 		the cookies data
+ * @param maxn 		the cookies data maxn
+ *
+ * @return 			the cookies data
+ */
+tb_char_t const* 	tb_cookies_get_from_url(tb_handle_t cookies, tb_char_t const* url, tb_char_t* data, tb_size_t maxn);
+
+/*! clear cookies 
+ *
+ * @param cookies 	the cookies
+ */
+tb_void_t 			tb_cookies_clear(tb_handle_t cookies);
+
+#ifdef __tb_debug__
+/*! dump cookies
+ *
+ * @param cookies 	the cookies
+ */
+tb_void_t 			tb_cookies_dump(tb_handle_t cookies);
+#endif
 
 #endif

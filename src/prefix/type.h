@@ -162,7 +162,7 @@ typedef struct __tb_timezone_t
 
 }tb_timezone_t;
 
-/// the version
+/// the version type
 typedef struct __tb_version_t
 {
 	/// the major
@@ -178,6 +178,91 @@ typedef struct __tb_version_t
 	tb_hize_t 						build;
 
 }tb_version_t;
+
+/// the value type
+typedef union __tb_value_t
+{
+	/// uint8
+	tb_uint8_t 						u8;
+
+	/// sint8
+	tb_sint8_t 						s8;
+
+	/// char
+	tb_char_t 						c;
+
+	/// wchar
+	tb_wchar_t 						wc;
+
+	/// boolean
+	tb_bool_t 						b;
+
+	/// uint16
+	tb_uint16_t 					u16;
+
+	/// sint16
+	tb_sint16_t 					s16;
+
+	/// uint32
+	tb_uint32_t 					u32;
+
+	/// sint32
+	tb_sint32_t 					s32;
+
+	/// uint64
+	tb_uint64_t 					u64;
+
+	/// sint64
+	tb_sint64_t 					s64;
+
+	/// size
+	tb_size_t 						ul;
+
+	/// long
+	tb_long_t 						l;
+
+	/// time
+	tb_time_t 						t;
+
+	/// pointer
+	tb_pointer_t 					ptr;
+
+	/// const pointer
+	tb_cpointer_t 					cptr;
+
+	/// handle
+	tb_handle_t 					handle;
+
+	/// string
+	tb_char_t* 						str;
+
+	/// const string
+	tb_char_t const* 				cstr;
+
+	/// wstring
+	tb_wchar_t* 					wstr;
+
+	/// const wstring
+	tb_wchar_t const* 				wcstr;
+
+	/// atomic
+	tb_atomic_t 					a;
+
+	/// atomic64
+	tb_atomic_t 					a64;
+
+	/// spinlock
+	tb_spinlock_t 					lock;
+
+#ifdef TB_CONFIG_TYPE_FLOAT
+	/// float
+	tb_float_t 						f;
+
+	/// double
+	tb_double_t 					d;
+#endif
+
+}tb_value_t;
 
 #endif
 
