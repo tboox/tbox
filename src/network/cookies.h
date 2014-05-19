@@ -200,6 +200,12 @@
  * interfaces
  */
 
+/*! the cookies instances
+ *
+ * @return 			the cookies
+ */
+tb_handle_t 		tb_cookies(tb_noarg_t);
+
 /*! init cookies
  *
  * @return 			the cookies

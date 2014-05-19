@@ -49,7 +49,6 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t 		aicp = tb_null;
 	tb_handle_t 		http = tb_null;
 	tb_async_stream_t* 	post = tb_null;
-	tb_handle_t 		cookies = tb_null;
 
 	// init aicp
 	aicp = tb_aicp_init(3);
@@ -60,8 +59,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(http, end);
 
 	// init cookies
-	cookies = tb_cookies_init();
-	if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, cookies)) goto end;
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) goto end;
 	
 	// init url
 	if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_URL, argv[1])) goto end;
@@ -95,17 +93,6 @@ end:
 
 	// trace
 	tb_trace_i("end");
-
-	// exit cookies
-	if (cookies) 
-	{
-		// dump cookies
-#ifdef __tb_debug__
-		tb_cookies_dump(cookies);
-#endif
-
-		tb_cookies_exit(cookies);
-	}
 
 	// exit http
 	if (http) tb_aicp_http_exit(http, tb_false);

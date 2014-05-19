@@ -358,6 +358,9 @@ static tb_bool_t tb_demo_spider_task_ctrl(tb_stream_t* istream, tb_stream_t* ost
 	// user agent
 	if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "User-Agent", TB_DEMO_SPIDER_USER_AGENT)) return tb_false;
 
+	// enable cookies
+	if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_COOKIES, tb_cookies())) return tb_false;
+
 	// ok
 	return tb_true;
 }
