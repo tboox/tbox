@@ -135,6 +135,7 @@ TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_http);
+TB_DEMO_MAIN_DECL(network_date);
 TB_DEMO_MAIN_DECL(network_whois);
 TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);

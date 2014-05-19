@@ -344,5 +344,26 @@ tb_bool_t 				tb_http_option(tb_handle_t handle, tb_size_t option, ...);
  */
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
 
+/*! get the http date from the given cstring
+ *
+ * <pre>
+ * supports format:
+ *    Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
+ *    Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
+ *    Sun Nov 6 08:49:37 1994        ; ANSI C's asctime() format
+ *
+ * for cookies(RFC 822, RFC 850, RFC 1036, and RFC 1123):
+ *    Sun, 06-Nov-1994 08:49:37 GMT
+ *
+ * </pre>
+ *
+ * @param cstr 			the cstring
+ * @param size 			the cstring length
+ *
+ * @return 				the date
+ */
+tb_time_t				tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size);
+
+
 #endif
 

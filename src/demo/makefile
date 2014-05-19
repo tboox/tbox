@@ -47,6 +47,7 @@ demo_C_FILES 								+= \
 											network/url \
 											network/ipv4 \
 											network/http \
+											network/date \
 											network/whois \
 											network/spider \
 											network/cookies \
