@@ -524,13 +524,13 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 					tb_trace_d("worker[%lu]: done: task[%p:%s]: ..", worker->id, job->task.done, job->task.name);
 
 					// init the time
-					tb_hong_t time = tb_ctime_spak();
+					tb_hong_t time = tb_cache_time_spak();
 
 					// done the job
 					job->task.done(job->task.priv);
 
 					// computate the time
-					time = tb_ctime_spak() - time;
+					time = tb_cache_time_spak() - time;
 
 					// update the stats
 					tb_size_t done_count = 1;
@@ -1128,11 +1128,11 @@ tb_long_t tb_thread_pool_task_wait(tb_handle_t handle, tb_handle_t task, tb_long
 	tb_assert_and_check_return_val(handle && job, -1);
 
 	// wait it
-	tb_hong_t time = tb_ctime_spak();
+	tb_hong_t time = tb_cache_time_spak();
 	tb_size_t state = TB_THREAD_POOL_JOB_STATE_WAITING;
 	while ( ((state = tb_atomic_get(&job->state)) != TB_THREAD_POOL_JOB_STATE_FINISHED) 
 		&& 	state != TB_THREAD_POOL_JOB_STATE_KILLED
-		&& 	(timeout < 0 || tb_ctime_spak() < time + timeout))
+		&& 	(timeout < 0 || tb_cache_time_spak() < time + timeout))
 	{
 		// trace
 		tb_trace_d("task[%p:%s]: wait: ..", job->task.done, job->task.name);
@@ -1152,9 +1152,9 @@ tb_long_t tb_thread_pool_task_wait_all(tb_handle_t handle, tb_long_t timeout)
 
 	// wait it
 	tb_size_t size = 0;
-	tb_hong_t time = tb_ctime_spak();
+	tb_hong_t time = tb_cache_time_spak();
 	tb_bool_t bstoped = tb_false;
-	while (!bstoped && (timeout < 0 || tb_ctime_spak() < time + timeout))
+	while (!bstoped && (timeout < 0 || tb_cache_time_spak() < time + timeout))
 	{
 		// enter
 		tb_spinlock_enter(&pool->lock);

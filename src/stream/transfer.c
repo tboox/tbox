@@ -641,7 +641,7 @@ tb_hong_t tb_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ost
 	tb_byte_t 	data[TB_BASIC_STREAM_BLOCK_MAXN];
 	tb_hize_t 	writ = 0;
 	tb_hize_t 	left = tb_stream_left(istream);
-	tb_hong_t 	base = tb_ctime_spak();
+	tb_hong_t 	base = tb_cache_time_spak();
 	tb_hong_t 	base1s = base;
 	tb_hong_t 	time = 0;
 	tb_size_t 	crate = 0;
@@ -666,7 +666,7 @@ tb_hong_t tb_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ost
 			if (func || lrate) 
 			{
 				// the time
-				time = tb_ctime_spak();
+				time = tb_cache_time_spak();
 
 				// < 1s?
 				if (time < base1s + 1000)
@@ -728,7 +728,7 @@ tb_hong_t tb_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ost
 	if (func) 
 	{
 		// the time
-		time = tb_ctime_spak();
+		time = tb_cache_time_spak();
 
 		// compute the total rate
 		tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : writ;

@@ -315,7 +315,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 	if (aice->state == TB_STATE_OK)
 	{
 		// trace
-		tb_trace_i("task[%p]: now: %lld", aice->aico, tb_ctime_time());
+		tb_trace_i("task[%p]: now: %lld", aice->aico, tb_cache_time_time());
 
 		// run task
 		if (!tb_aico_task_run(aice->aico, 1001, tb_demo_task_func, aice->priv)) return tb_false;

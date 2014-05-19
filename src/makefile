@@ -218,7 +218,6 @@ tbox_C_FILES 			+= \
 						platform/path \
 						platform/file \
 						platform/time \
-						platform/ctime \
 						platform/sched \
 						platform/timer \
 						platform/ltimer \
@@ -236,6 +235,7 @@ tbox_C_FILES 			+= \
 						platform/directory \
 						platform/semaphore \
 						platform/backtrace \
+						platform/cache_time \
 						platform/thread_pool \
 						platform/thread_store \
 						platform/asio/aioo \
@@ -467,7 +467,7 @@ INC_FILES 				= \
 						platform/file.h \
 						platform/path.h \
 						platform/time.h \
-						platform/ctime.h \
+						platform/cache_time.h \
 						platform/sched.h \
 						platform/mutex.h \
 						platform/timer.h \

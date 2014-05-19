@@ -93,7 +93,7 @@ static tb_dns_cache_t 		g_cache = {0};
  */
 static __tb_inline__ tb_size_t tb_dns_cache_now()
 {
-	return (tb_size_t)(tb_ctime_spak() / 1000);
+	return (tb_size_t)(tb_cache_time_spak() / 1000);
 }
 static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {

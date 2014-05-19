@@ -167,7 +167,7 @@ static tb_pointer_t tb_iocp_timer_loop(tb_cpointer_t data)
 		}
 
 		// spak ctime
-		tb_ctime_spak();
+		tb_cache_time_spak();
 
 		// spak timer
 		if (!tb_timer_spak(ptor->timer)) break;
@@ -1227,7 +1227,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 	aico->olap.aice = *aice;
 
 	// now
-	tb_hong_t now = tb_ctime_time();
+	tb_hong_t now = tb_cache_time_time();
 
 	// timeout?
 	if (aice->u.runtask.when <= now)
@@ -1941,7 +1941,7 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 	tb_trace_d("spak[%lu]: ..", loop->self);
 
 	// spak ctime
-	tb_ctime_spak();
+	tb_cache_time_spak();
 
 	// exists GetQueuedCompletionStatusEx? using it
 	if (ptor->GetQueuedCompletionStatusEx)

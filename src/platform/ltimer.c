@@ -148,7 +148,7 @@ static __tb_inline__ tb_hong_t tb_ltimer_now(tb_ltimer_t* timer)
 	}
 
 	// using cached time
-	return tb_ctime_time();
+	return tb_cache_time_time();
 }
 static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 {
@@ -555,7 +555,7 @@ tb_void_t tb_ltimer_loop(tb_handle_t handle)
 		if (delay) tb_msleep(delay);
 
 		// spak ctime
-		if (timer->ctime) tb_ctime_spak();
+		if (timer->ctime) tb_cache_time_spak();
 
 		// spak it
 		if (!tb_ltimer_spak(handle)) break;

@@ -27,7 +27,7 @@
  */
 #include "event.h"
 #include "time.h"
-#include "ctime.h"
+#include "cache_time.h"
 #include "atomic.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// init
 	tb_long_t 	r = 0;
-	tb_hong_t 	base = tb_ctime_spak();
+	tb_hong_t 	base = tb_cache_time_spak();
 
 	// wait 
 	while (1)
@@ -100,7 +100,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 		else
 		{
 			// timeout?
-			if (timeout >= 0 && tb_ctime_spak() - base >= timeout) break;
+			if (timeout >= 0 && tb_cache_time_spak() - base >= timeout) break;
 			else tb_msleep(200);
 		}
 	}

@@ -35,11 +35,11 @@
  * macros
  */
 #ifdef __tb_small__
-# 	define TB_URL_HOST_MAX 		(64)
-# 	define TB_URL_PATH_MAX 		(1024)
+# 	define TB_URL_HOST_MAXN 		(64)
+# 	define TB_URL_PATH_MAXN 		(1024)
 #else
-# 	define TB_URL_HOST_MAX 		(128)
-# 	define TB_URL_PATH_MAX 		(4096)
+# 	define TB_URL_HOST_MAXN 		(128)
+# 	define TB_URL_PATH_MAXN 		(4096)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ typedef struct __tb_url_t
 	tb_scoped_string_t 	args;
 
 	// the data
-	tb_char_t 			data[TB_URL_HOST_MAX + TB_URL_PATH_MAX];
+	tb_char_t 			data[TB_URL_HOST_MAXN + TB_URL_PATH_MAXN];
 
 }tb_url_t;
 

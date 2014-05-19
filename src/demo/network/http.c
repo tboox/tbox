@@ -12,7 +12,7 @@ static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line,
 	tb_assert_and_check_return_val(http && line, tb_false);
 
 	// cookies
-	tb_cookies_t* cookies = priv;
+	tb_handle_t cookies = (tb_handle_t)priv;
 
 	// trace
 	tb_trace_i("head: %s", line);
@@ -43,7 +43,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init
 	tb_handle_t 	http = tb_null;
-	tb_cookies_t* 	cookies = tb_null;
+	tb_handle_t 	cookies = tb_null;
 
 	// init http
 	http = tb_http_init();
