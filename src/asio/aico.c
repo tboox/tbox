@@ -842,7 +842,7 @@ tb_bool_t tb_aico_task_run_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t f
 	aice.func 				= func;
 	aice.priv 				= priv;
 	aice.aico 				= aico;
-	aice.u.runtask.when 	= tb_cache_time_time() + delay;
+	aice.u.runtask.when 	= tb_cache_time_mclock() + delay;
 	aice.u.runtask.delay 	= delay;
 
 	// post

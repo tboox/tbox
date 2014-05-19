@@ -109,7 +109,7 @@ static __tb_inline__ tb_hong_t tb_timer_now(tb_timer_t* timer)
 	}
 
 	// using cached time
-	return tb_cache_time_time();
+	return tb_cache_time_mclock();
 }
 static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {

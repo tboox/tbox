@@ -94,6 +94,9 @@ typedef struct __tb_aicp_http_t
 	// the zstream for gzip/deflate
 	tb_async_stream_t* 				zstream;
 
+	// the cookies
+	tb_scoped_string_t 				cookies;
+
 	// the transfer for post
 	tb_handle_t 					transfer;
 
@@ -335,6 +338,26 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
 	if (!tb_hash_get(http->option.head, "Connection")) 
 		tb_hash_set(http->option.head, "Connection", "close");
 	else if (http->status.balived) tb_hash_set(http->option.head, "Connection", "keep-alive");
+
+	// init cookies
+	if (http->option.cookies && !tb_hash_get(http->option.head, "Cookie"))
+	{
+		// the host
+		tb_char_t const* host = tb_null;
+		tb_aicp_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
+
+		// the path
+		tb_char_t const* path = tb_null;
+		tb_aicp_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
+
+		// is ssl?
+		tb_bool_t bssl = tb_false;
+		tb_aicp_http_option(http, TB_HTTP_OPTION_GET_SSL, &bssl);
+			
+		// set cookie
+		if (tb_cookies_get(http->option.cookies, host, path, bssl, &http->cookies))
+			tb_hash_set(http->option.head, "Cookie", tb_scoped_string_cstr(&http->cookies));
+	}
 
 	// init range
 	if (http->option.range.bof && http->option.range.eof >= http->option.range.bof)
@@ -617,6 +640,24 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
 
 			// ctrl stream for sock
 			if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+		}
+		// parse cookies
+		else if (http->option.cookies && !tb_strnicmp(line, "Set-Cookie", 10))
+		{
+			// the host
+			tb_char_t const* host = tb_null;
+			tb_aicp_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
+
+			// the path
+			tb_char_t const* path = tb_null;
+			tb_aicp_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
+
+			// is ssl?
+			tb_bool_t bssl = tb_false;
+			tb_aicp_http_option(http, TB_HTTP_OPTION_GET_SSL, &bssl);
+				
+			// set cookies
+			tb_cookies_set(http->option.cookies, host, path, bssl, p);
 		}
 	}
 
@@ -1269,6 +1310,9 @@ tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
 		http->pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_MICRO, 0);
 		tb_assert_and_check_break(http->pool);
 
+		// init cookies data
+		if (!tb_scoped_string_init(&http->cookies)) break;
+
 		// init line data
 		if (!tb_scoped_string_init(&http->line_data)) break;
 
@@ -1382,6 +1426,9 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 
 	// exit cache data
 	tb_scoped_buffer_exit(&http->cache_data);
+
+	// exit cookies data
+	tb_scoped_string_exit(&http->cookies);
 
 	// exit pool
 	if (http->pool) tb_block_pool_exit(http->pool);
@@ -1849,6 +1896,27 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 
 			// get timeout
 			*ptimeout = http->option.timeout;
+			return tb_true;
+		}
+		break;
+	case TB_HTTP_OPTION_SET_COOKIES:
+		{	
+			// is opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
+			// set cookies
+			http->option.cookies = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+			return tb_true;
+		}
+		break;
+	case TB_HTTP_OPTION_GET_COOKIES:
+		{
+			// ptimeout
+			tb_handle_t* pcookies = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
+			tb_assert_and_check_return_val(pcookies, tb_false);
+
+			// get cookies
+			*pcookies = http->option.cookies;
 			return tb_true;
 		}
 		break;

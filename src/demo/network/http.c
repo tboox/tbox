@@ -11,28 +11,10 @@ static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line,
 	// check
 	tb_assert_and_check_return_val(http && line, tb_false);
 
-	// cookies
-	tb_handle_t cookies = (tb_handle_t)priv;
-
 	// trace
 	tb_trace_i("head: %s", line);
 
-	// cookie
-	if (cookies && !tb_strnicmp(line, "Set-Cookie", 10))
-	{
-		// seek to value
-		tb_char_t const* p = line;
-		while (*p && *p != ':') p++;
-		tb_assert_and_check_return_val(*p, tb_false);
-		p++; while (tb_isspace(*p)) p++;
-		tb_assert_and_check_return_val(*p, tb_false);
-	
-		// the url
-		tb_char_t const* url = tb_null;
-		if (tb_http_option(http, TB_HTTP_OPTION_GET_URL, &url) && url)
-			tb_cookies_set_from_url(cookies, url, p);
-	}
-
+	// ok
 	return tb_true;
 }
 
@@ -51,7 +33,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 
 	// init cookies
 	cookies = tb_cookies_init();
-	if (!tb_http_option(http, TB_HTTP_OPTION_SET_HEAD_PRIV, cookies)) goto end;
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, cookies)) goto end;
 	
 	// init head func
 	if (!tb_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_http_demo_head_func)) goto end;

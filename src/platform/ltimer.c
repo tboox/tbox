@@ -148,7 +148,7 @@ static __tb_inline__ tb_hong_t tb_ltimer_now(tb_ltimer_t* timer)
 	}
 
 	// using cached time
-	return tb_cache_time_time();
+	return tb_cache_time_mclock();
 }
 static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 {

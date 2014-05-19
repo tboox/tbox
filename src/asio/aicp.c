@@ -544,5 +544,5 @@ tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 }
 tb_hong_t tb_aicp_time(tb_aicp_t* aicp)
 {
-	return tb_cache_time_time();
+	return tb_cache_time_mclock();
 }
