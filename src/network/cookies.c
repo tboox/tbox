@@ -481,8 +481,30 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * instance implementation
+ */
+static tb_handle_t tb_cookies_instance_init(tb_cpointer_t* ppriv)
+{
+	return tb_cookies_init();
+}
+static tb_void_t tb_cookies_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
+{
+	// dump it
+#ifdef __tb_debug__
+	tb_cookies_dump(handle);
+#endif
+
+	// exit it
+	tb_cookies_exit(handle);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interface implementation
  */
+tb_handle_t tb_cookies()
+{
+	return tb_singleton_instance(TB_SINGLETON_TYPE_COOKIES, tb_cookies_instance_init, tb_cookies_instance_exit, tb_null);
+}
 tb_handle_t tb_cookies_init()
 {
 	// done

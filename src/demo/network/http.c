@@ -23,17 +23,12 @@ static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line,
  */ 
 tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	tb_handle_t 	http = tb_null;
-	tb_handle_t 	cookies = tb_null;
-
 	// init http
-	http = tb_http_init();
+	tb_handle_t http = tb_http_init();
 	tb_assert_and_check_goto(http, end);
 
 	// init cookies
-	cookies = tb_cookies_init();
-	if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, cookies)) goto end;
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) goto end;
 	
 	// init head func
 	if (!tb_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_http_demo_head_func)) goto end;
@@ -114,17 +109,6 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	} while(1);
 
 end:
-
-	// exit cookies
-	if (cookies) 
-	{
-		// dump cookies
-#ifdef __tb_debug__
-		tb_cookies_dump(cookies);
-#endif
-
-		tb_cookies_exit(cookies);
-	}
 
 	// exit http
 	if (http) tb_http_exit(http);

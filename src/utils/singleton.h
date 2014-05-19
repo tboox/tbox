@@ -57,17 +57,20 @@ typedef enum __tb_singleton_type_e
 	/// the random type
 ,	TB_SINGLETON_TYPE_RANDOM 			= 6
 
+	/// the cookies type
+,	TB_SINGLETON_TYPE_COOKIES 			= 7
+
 	/// the openssl library type
-,	TB_SINGLETON_TYPE_LIBRARY_OPENSSL 	= 7
+,	TB_SINGLETON_TYPE_LIBRARY_OPENSSL 	= 8
 
 	/// the mysql library type
-,	TB_SINGLETON_TYPE_LIBRARY_MYSQL 	= 8
+,	TB_SINGLETON_TYPE_LIBRARY_MYSQL 	= 9
 
 	/// the sqlite3 library type
-,	TB_SINGLETON_TYPE_LIBRARY_SQLITE3 	= 9
+,	TB_SINGLETON_TYPE_LIBRARY_SQLITE3 	= 10
 
 	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 				= 10
+,	TB_SINGLETON_TYPE_USER 				= 11
 
 	/// the max count of the singleton type
 #ifdef __tb_small__

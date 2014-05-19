@@ -558,6 +558,25 @@ static tb_bool_t tb_basic_stream_http_ctrl(tb_handle_t bstream, tb_size_t ctrl, 
 			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_VERSION, pversion);
 		}
 		break;
+	case TB_STREAM_CTRL_HTTP_SET_COOKIES:
+		{
+			// cookies
+			tb_handle_t cookies = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+
+			// set cookies
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_COOKIES, cookies);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_GET_COOKIES:
+		{
+			// pcookies
+			tb_handle_t* pcookies = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
+			tb_assert_and_check_return_val(pcookies, tb_false);
+
+			// get version
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_COOKIES, pcookies);
+		}
+		break;
 	default:
 		break;
 	}
