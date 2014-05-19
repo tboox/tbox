@@ -76,6 +76,9 @@ typedef struct __tb_http_t
 	// the request data
 	tb_scoped_string_t 	request;
 
+	// the cookies
+	tb_scoped_string_t 	cookies;
+
 }tb_http_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -104,6 +107,7 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 	http->option.timeout 	= TB_HTTP_DEFAULT_TIMEOUT;
 	http->option.version 	= 1; // HTTP/1.1
 	http->option.bunzip 	= 0;
+	http->option.cookies 	= tb_null;
 
 	// init url
 	if (!tb_url_init(&http->option.url)) return tb_false;
@@ -129,6 +133,9 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
 
 	// exit post url
 	tb_url_exit(&http->option.post_url);
+
+	// clear cookies
+	http->option.cookies = tb_null;
 }
 #ifdef __tb_debug__
 static tb_void_t tb_http_option_dump(tb_http_t* http)
@@ -309,7 +316,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		tb_scoped_string_clear(&http->request);
 
 		// init the head value
-		tb_char_t  		data[64];
+		tb_char_t  			data[64];
 		tb_static_string_t 	value;
 		if (!tb_static_string_init(&value, data, 64)) break;
 
@@ -338,6 +345,26 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		if (!tb_hash_get(http->option.head, "Connection")) 
 			tb_hash_set(http->option.head, "Connection", "close");
 		else if (http->status.balived) tb_hash_set(http->option.head, "Connection", "keep-alive");
+
+		// init cookies
+		if (http->option.cookies && !tb_hash_get(http->option.head, "Cookie"))
+		{
+			// the host
+			tb_char_t const* host = tb_null;
+			tb_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
+
+			// the path
+			tb_char_t const* path = tb_null;
+			tb_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
+
+			// is ssl?
+			tb_bool_t bssl = tb_false;
+			tb_http_option(http, TB_HTTP_OPTION_GET_SSL, &bssl);
+				
+			// set cookie
+			if (tb_cookies_get(http->option.cookies, host, path, bssl, &http->cookies))
+				tb_hash_set(http->option.head, "Cookie", tb_scoped_string_cstr(&http->cookies));
+		}
 
 		// init range
 		if (http->option.range.bof && http->option.range.eof >= http->option.range.bof)
@@ -609,6 +636,24 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
 			// ctrl stream for sock
 			if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
 		}
+		// parse cookies
+		else if (http->option.cookies && !tb_strnicmp(line, "Set-Cookie", 10))
+		{
+			// the host
+			tb_char_t const* host = tb_null;
+			tb_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
+
+			// the path
+			tb_char_t const* path = tb_null;
+			tb_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
+
+			// is ssl?
+			tb_bool_t bssl = tb_false;
+			tb_http_option(http, TB_HTTP_OPTION_GET_SSL, &bssl);
+				
+			// set cookies
+			tb_cookies_set(http->option.cookies, host, path, bssl, p);
+		}
 	}
 
 	// ok
@@ -812,8 +857,11 @@ tb_handle_t tb_http_init()
 		http->pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_MICRO, 0);
 		tb_assert_and_check_break(http->pool);
 
-		// init line data
+		// init request data
 		if (!tb_scoped_string_init(&http->request)) break;
+
+		// init cookies data
+		if (!tb_scoped_string_init(&http->cookies)) break;
 
 		// init option
 		if (!tb_http_option_init(http)) break;
@@ -875,7 +923,10 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 	// exit option
 	tb_http_option_exit(http);
 
-	// exit line data
+	// exit cookies data
+	tb_scoped_string_exit(&http->cookies);
+
+	// exit request data
 	tb_scoped_string_exit(&http->request);
 
 	// exit pool
@@ -1357,6 +1408,27 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 
 			// get timeout
 			*ptimeout = http->option.timeout;
+			return tb_true;
+		}
+		break;
+	case TB_HTTP_OPTION_SET_COOKIES:
+		{	
+			// is opened?
+			tb_assert_and_check_return_val(!http->bopened, tb_false);
+
+			// set cookies
+			http->option.cookies = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+			return tb_true;
+		}
+		break;
+	case TB_HTTP_OPTION_GET_COOKIES:
+		{
+			// ptimeout
+			tb_handle_t* pcookies = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
+			tb_assert_and_check_return_val(pcookies, tb_false);
+
+			// get cookies
+			*pcookies = http->option.cookies;
 			return tb_true;
 		}
 		break;

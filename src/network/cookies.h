@@ -194,6 +194,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../string/string.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -214,7 +215,7 @@ tb_void_t 			tb_cookies_exit(tb_handle_t cookies);
 /*! set cookies from the given domain and path
  *
  * @param cookies 	the cookies
- * @param domain 	the domain, .e.g .google.com or google.com
+ * @param domain 	the domain, .e.g .xxx.com or xxx.com and compatible www.xxx.com
  * @param path 		the path, .e.g /root/path
  * @param secure 	is secure?
  * @param value 	the value
@@ -236,26 +237,24 @@ tb_bool_t 			tb_cookies_set_from_url(tb_handle_t cookies, tb_char_t const* url, 
 /*! get cookies from the given domain and path 
  *
  * @param cookies 	the cookies
- * @param domain 	the domain, .e.g .google.com or google.com
+ * @param domain 	the domain, .e.g .xxx.com or xxx.com and compatible www.xxx.com
  * @param path 		the path, .e.g /root/path
  * @param secure 	is secure?
- * @param data 		the cookies data
- * @param maxn 		the cookies data maxn
+ * @param value 	the cookies value
  *
  * @return 			the cookies data
  */
-tb_char_t const* 	tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t* data, tb_size_t maxn);
+tb_char_t const* 	tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_scoped_string_t* value);
 
 /*! get cookies from the given url 
  *
  * @param cookies 	the cookies
  * @param url 		the url
- * @param data 		the cookies data
- * @param maxn 		the cookies data maxn
+ * @param value 	the cookies value
  *
  * @return 			the cookies data
  */
-tb_char_t const* 	tb_cookies_get_from_url(tb_handle_t cookies, tb_char_t const* url, tb_char_t* data, tb_size_t maxn);
+tb_char_t const* 	tb_cookies_get_from_url(tb_handle_t cookies, tb_char_t const* url, tb_scoped_string_t* value);
 
 /*! clear cookies 
  *

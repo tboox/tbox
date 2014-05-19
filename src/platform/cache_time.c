@@ -40,7 +40,7 @@ static tb_atomic64_t 	g_time = 0;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_hong_t tb_cache_time_spak(tb_noarg_t)
+tb_hong_t tb_cache_time_spak()
 {
 	// get the time
 	tb_timeval_t tv = {0};
@@ -55,8 +55,16 @@ tb_hong_t tb_cache_time_spak(tb_noarg_t)
 	// ok
 	return val;
 }
-tb_hong_t tb_cache_time_time(tb_noarg_t)
+tb_hong_t tb_cache_time_mclock()
 {
 	return (tb_hong_t)tb_atomic64_get(&g_time);
+}
+tb_hong_t tb_cache_time_sclock()
+{
+	return (tb_hong_t)tb_atomic64_get(&g_time) / 1000;
+}
+tb_time_t tb_cache_time()
+{
+	return (tb_time_t)tb_atomic64_get(&g_time) / 1000;
 }
 

@@ -482,7 +482,23 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
 
 	// domain not exists? using the given domain
 	if (!entry->domain && domain)
+	{
+		// the domain size
+		tb_size_t n = tb_strlen(domain);
+
+		// skip www
+		if (n > 3 && !tb_strnicmp(domain, "www", 3)) 
+		{
+			domain += 3;
+			n -= 3;
+		}
+
+		// skip .
+		if (n && *domain == '.') domain++;
+
+		// save domain
 		entry->domain = tb_string_pool_put(cookies->string_pool, domain);
+	}
 	if (!entry->domain)
 	{
 		// trace
@@ -520,33 +536,31 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb
 	tb_size_t secure = tuple[2].ul;
 
 	// the data and maxn
-	tb_char_t* 	data = tuple[3].str;
-	tb_size_t 	maxn = tuple[4].ul;
-	tb_assert_and_check_return_val(data && maxn > 5, tb_false);
+	tb_scoped_string_t* value = tuple[3].ptr;
+	tb_assert_and_check_return_val(value, tb_false);
+
+	// expired?
+	if (tb_cache_time() >= entry->expires)
+	{
+		// trace
+		tb_trace_d("expired: %s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "");
+
+		// remove it
+		*bdel = tb_true;
+		return tb_true;
+	}
 
 	// this cookies is at domain/path?
 	if ( 	tb_cookies_is_child_domain(entry->domain, domain)
 		&& 	tb_cookies_is_child_path(entry->path, path)
 		&& 	entry->secure == secure)
 	{
-
 		// append "key=value; "
-		tb_long_t size = tb_snprintf(data, maxn, "%s=%s; ", entry->name, entry->value? entry->value : "");
-		if (size >= 0) 
-		{
-			// end
-			data[size] = '\0';
-
-			// update data
-			tuple[3].str += size;
-
-			// update maxn
-			tuple[4].ul -= size;
-		}
+		tb_scoped_string_cstrfcat(value, "%s=%s; ", entry->name, entry->value? entry->value : "");
 	}
 
 	// ok
-	tuple[5].b = tb_true;
+	tuple[4].b = tb_true;
 	return tb_true;
 }
 
@@ -725,11 +739,14 @@ tb_bool_t tb_cookies_set_from_url(tb_handle_t handle, tb_char_t const* url, tb_c
 	// try to set it without domain and path
 	return tb_cookies_set(cookies, tb_null, tb_null, tb_false, value);
 }
-tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t* data, tb_size_t maxn)
+tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_scoped_string_t* value)
 {
 	// check
 	tb_cookies_t* cookies = (tb_cookies_t*)handle;
-	tb_assert_and_check_return_val(cookies && domain && data && maxn, tb_null);
+	tb_assert_and_check_return_val(cookies && domain && value, tb_null);
+
+	// clear value first
+	tb_scoped_string_clear(value);
 
 	// enter
 	tb_spinlock_enter(&cookies->lock);
@@ -747,16 +764,18 @@ tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_
 		// skip '.'
 		if (*domain == '.') domain++;
 
+		// spak the cached time
+		tb_cache_time_spak();
+
 		// get the matched values
 		tb_value_t tuple[6];
 		tuple[0].cstr 	= domain;
 		tuple[1].cstr 	= path;
 		tuple[2].ul 	= secure? 1 : 0;
-		tuple[3].str 	= data;
-		tuple[4].ul 	= maxn;
-		tuple[5].b 		= tb_false;
+		tuple[3].ptr 	= value;
+		tuple[4].b 		= tb_false;
 		tb_hash_walk(cookies->cookie_pool, tb_cookies_entry_walk, tuple);
-		tb_assert_and_check_break(tuple[5].b);
+		tb_check_break(tuple[4].b);
 
 		// ok
 		ok = tb_true;
@@ -764,19 +783,19 @@ tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_
 	} while (0);
 
 	// failed?
-	if (!ok) data = tb_null;
+	if (!ok) tb_scoped_string_clear(value);
 	
 	// leave
 	tb_spinlock_leave(&cookies->lock);
 
 	// ok?
-	return data;
+	return tb_scoped_string_cstr(value);
 }
-tb_char_t const* tb_cookies_get_from_url(tb_handle_t handle, tb_char_t const* url, tb_char_t* data, tb_size_t maxn)
+tb_char_t const* tb_cookies_get_from_url(tb_handle_t handle, tb_char_t const* url, tb_scoped_string_t* value)
 {
 	// check
 	tb_cookies_t* cookies = (tb_cookies_t*)handle;
-	tb_assert_and_check_return_val(cookies && data && maxn, tb_null);
+	tb_assert_and_check_return_val(cookies && value, tb_null);
 	
 	// get domain and path from the given url
 	tb_bool_t secure = tb_false;
@@ -788,7 +807,7 @@ tb_char_t const* tb_cookies_get_from_url(tb_handle_t handle, tb_char_t const* ur
 	tb_trace_d("domain: %s, path: %s, secure: %s", domain, path, secure? "ok" : "no");
 
 	// get it from domain and path
-	return tb_cookies_get(cookies, domain, path, secure, data, maxn);
+	return tb_cookies_get(cookies, domain, path, secure, value);
 }
 #ifdef __tb_debug__
 tb_void_t tb_cookies_dump(tb_handle_t handle)
@@ -809,8 +828,12 @@ tb_void_t tb_cookies_dump(tb_handle_t handle)
 		tb_cookies_entry_t* entry = (tb_cookies_entry_t*)item->name;
 		tb_assert_and_check_continue(entry && entry->domain && entry->path && entry->name);
 
+		// the date
+		tb_tm_t date = {0};
+		tb_gmtime(entry->expires, &date);
+
 		// trace
-		tb_trace_i("%s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "");
+		tb_trace_i("%s%s%s: %s = %s, expires: %04ld-%02ld-%02ld %02ld:%02ld:%02ld GMT, week: %d", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "", date.year, date.month, date.mday, date.hour, date.minute, date.second, date.week);
 	}
 
 	// leave

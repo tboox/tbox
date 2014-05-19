@@ -1227,7 +1227,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 	aico->olap.aice = *aice;
 
 	// now
-	tb_hong_t now = tb_cache_time_time();
+	tb_hong_t now = tb_cache_time_mclock();
 
 	// timeout?
 	if (aice->u.runtask.when <= now)

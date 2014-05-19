@@ -33,20 +33,36 @@
  * interfaces
  */
 
-/*! spak ctime 
+/*! the cached time, like tb_time
+ *
+ * lower accuracy and faster
+ *
+ * @return 			the now time, s
+ */
+tb_time_t 			tb_cache_time(tb_noarg_t);
+
+/*! spak cached time 
  *
  * update the cached time for the external loop thread
  *
- * @return 			the now ctime value
+ * @return 			the now ms-clock
  */
 tb_hong_t 			tb_cache_time_spak(tb_noarg_t);
 
-/*! the time as the number of ms since the epoch
+/*! the cached ms-clock
  *
- * cache time, lower accuracy and faster
+ * lower accuracy and faster
  *
- * @return 			the now ctime value
+ * @return 			the now ms-clock
  */
-tb_hong_t 			tb_cache_time_time(tb_noarg_t);
+tb_hong_t 			tb_cache_time_mclock(tb_noarg_t);
+
+/*! the cached s-clock
+ *
+ * lower accuracy and faster
+ *
+ * @return 			the now s-clock
+ */
+tb_hong_t 			tb_cache_time_clock(tb_noarg_t);
 
 #endif
