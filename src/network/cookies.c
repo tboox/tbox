@@ -33,6 +33,7 @@
  */
 #include "cookies.h"
 #include "url.h"
+#include "http.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -297,93 +298,8 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
 				// must have value
 				tb_assert_and_check_return_val(v, tb_false);
 
-				// init date: Wdy, DD-Mon-YYYY HH:MM:SS GMT
-				tb_tm_t date = {0};
-
-				// parse week
-				tb_char_t const* q = v;
-				if ((q + 6 < p && !tb_strnicmp(q, "Monday", 6)) || (q + 3 < p && !tb_strnicmp(q, "Mon", 3)))
-					date.week = 1;
-				else if ((q + 7 < p && !tb_strnicmp(q, "Tuesday", 7)) || (q + 3 < p && !tb_strnicmp(q, "Tue", 3)))
-					date.week = 2;
-				else if ((q + 9 < p && !tb_strnicmp(q, "Wednesday", 9)) || (q + 3 < p && !tb_strnicmp(q, "Wed", 3)))
-					date.week = 3;	
-				else if ((q + 8 < p && !tb_strnicmp(q, "Thursday", 8)) || (q + 3 < p && !tb_strnicmp(q, "Thu", 3)))
-					date.week = 4;
-				else if ((q + 6 < p && !tb_strnicmp(q, "Friday", 6)) || (q + 3 < p && !tb_strnicmp(q, "Fri", 3)))
-					date.week = 5;
-				else if ((q + 8 < p && !tb_strnicmp(q, "Saturday", 8)) || (q + 3 < p && !tb_strnicmp(q, "Sat", 3)))
-					date.week = 6;
-				else if ((q + 6 < p && !tb_strnicmp(q, "Sunday", 6)) || (q + 3 < p && !tb_strnicmp(q, "sun", 3)))
-					date.week = 7;
-
-				// skip week
-				while (q < p && *q != ',') q++; if (q < p && *q == ',') q++;
-
-				// parse day
-				while (q < p && !tb_isdigit(*q)) q++;
-				date.mday = tb_stou32(q);
-
-				// skip day
-				while (q < p && *q != '-') q++; if (q < p && *q == '-') q++;
-
-				// parse month
-				if (q + 3 < p && !tb_strnicmp(q, "Jan", 3))
-					date.month = 1;
-				else if (q + 3 < p && !tb_strnicmp(q, "Feb", 3))
-					date.month = 2;
-				else if (q + 3 < p && !tb_strnicmp(q, "Mar", 3))
-					date.month = 3;
-				else if (q + 3 < p && !tb_strnicmp(q, "Apr", 3))
-					date.month = 4;
-				else if (q + 3 < p && !tb_strnicmp(q, "May", 3))
-					date.month = 5;
-				else if (q + 3 < p && !tb_strnicmp(q, "Jun", 3))
-					date.month = 6;
-				else if (q + 3 < p && !tb_strnicmp(q, "Jul", 3))
-					date.month = 7;
-				else if (q + 3 < p && !tb_strnicmp(q, "Aug", 3))
-					date.month = 8;
-				else if (q + 3 < p && !tb_strnicmp(q, "Sep", 3))
-					date.month = 9;
-				else if (q + 3 < p && !tb_strnicmp(q, "Oct", 3))
-					date.month = 10;
-				else if (q + 3 < p && !tb_strnicmp(q, "Nov", 3))
-					date.month = 11;
-				else if (q + 3 < p && !tb_strnicmp(q, "Dec", 3))
-					date.month = 12;
-
-				// skip month
-				while (q < p && *q != '-') q++; if (q < p && *q == '-') q++;
-
-				// parse year
-				date.year = tb_stou32(q);
-				if (date.year < 100) date.year += 1900;
-
-				// skip year
-				while (q < p && !tb_isspace(*q)) q++; 
-				while (q < p && tb_isspace(*q)) q++; 
-
-				// parse hour
-				date.hour = tb_stou32(q);
-
-				// skip hour
-				while (q < p && *q != ':') q++; if (q < p && *q == ':') q++;
-
-				// parse minute
-				date.minute = tb_stou32(q);
-
-				// skip minute
-				while (q < p && *q != ':') q++; if (q < p && *q == ':') q++;
-
-				// parse second
-				date.second = tb_stou32(q);
-
 				// make expires time
-				entry->expires = tb_gmmktime(&date);
-
-				// trace
-				tb_trace_d("expires: %04ld-%02ld-%02ld %02ld:%02ld:%02ld GMT, week: %d", date.year, date.month, date.mday, date.hour, date.minute, date.second, date.week);
+				entry->expires = tb_http_date_from_cstr(v, p - v);
 			}
 			else if (!tb_strnicmp(b, "max-age", 7))
 			{			
@@ -540,7 +456,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb
 	tb_assert_and_check_return_val(value, tb_false);
 
 	// expired?
-	if (tb_cache_time() >= entry->expires)
+	if (entry->expires && tb_cache_time() >= entry->expires)
 	{
 		// trace
 		tb_trace_d("expired: %s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "");
