@@ -411,7 +411,7 @@ tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_dns_fun
 		tb_assert_and_check_break(sock);
 
 		// init aico
-		aico = tb_aico_init_sock(aicp, sock);
+		aico = tb_aico_init_sock(aicp, sock, tb_null, tb_null);
 		tb_assert_and_check_break(aico);
 
 		// init timeout
@@ -443,7 +443,7 @@ tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_dns_fun
 		dns = tb_null;
 
 		// exit aico
-		if (aico) tb_aico_exit(aico, tb_false);
+		if (aico) tb_aico_exit(aico);
 		aico = tb_null;
 
 		// exit sock
@@ -481,14 +481,11 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// the sock
 	tb_handle_t sock = dns->sock;
 
-	// wait pending before freeing dns
-	if (aico) tb_aico_wait(aico, bcalling);
-
 	// exit it
 	if (aico) tb_aico_pool_free(aico, dns);
 
 	// exit aico
-	if (aico) tb_aico_exit(aico, bcalling);
+	if (aico) tb_aico_exit(aico);
 
 	// exit sock
 	if (sock) tb_socket_clos(sock);

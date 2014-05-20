@@ -739,7 +739,7 @@ tb_void_t tb_aicp_ssl_clos(tb_handle_t handle, tb_bool_t bcalling)
 	}
 
 	// exit aico
-	if (ssl->aico) tb_aico_exit(ssl->aico, bcalling);
+	if (ssl->aico) tb_aico_exit(ssl->aico);
 	ssl->aico = tb_null;
 
 	// clear data
@@ -818,7 +818,7 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 		tb_assert_and_check_break(ssl->aicp && ssl->ssl && ssl->sock && !ssl->aico);
 
 		// init aico
-		ssl->aico = tb_aico_init_sock(ssl->aicp, ssl->sock);
+		ssl->aico = tb_aico_init_sock(ssl->aicp, ssl->sock, tb_null, tb_null);
 		tb_assert_and_check_break(ssl->aico);
 
 		// init timeout
