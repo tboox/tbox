@@ -197,7 +197,7 @@ static __tb_inline__ tb_bool_t tb_aiop_aico_is_killing(tb_aiop_aico_t* aico)
     tb_size_t state = tb_atomic_get(&aico->base.state);
 
     // killing or exiting?
-    return (state == TB_AICO_STATE_KILLING) || (state == TB_AICO_STATE_EXITING);
+    return (state == TB_STATE_KILLING) || (state == TB_STATE_EXITING);
 }
 static tb_void_t tb_aiop_spak_work(tb_aicp_proactor_aiop_t* ptor)
 {
@@ -1472,7 +1472,8 @@ static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, t
 {
     // check
     tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-    tb_assert_and_check_return_val(ptor && ptor->spak[0] && ptor->spak[1] && resp, -1);
+    tb_aicp_t*               aicp = ptor? ptor->base.aicp : tb_null;
+    tb_assert_and_check_return_val(ptor && aicp && ptor->spak[0] && ptor->spak[1] && resp, -1);
 
     // spak ctime
     tb_cache_time_spak();
@@ -1535,6 +1536,9 @@ static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, t
 
     // null?
     tb_check_return_val(!ok && null, ok);
+    
+    // killed?
+    tb_check_return_val(!tb_atomic_get(&aicp->kill), -1);
 
     // trace
     tb_trace_d("wait[%u]: ..", (tb_uint16_t)tb_thread_self());

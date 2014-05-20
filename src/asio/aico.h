@@ -101,16 +101,6 @@ typedef enum __tb_aico_timeout_e
 
 }tb_aico_timeout_e;
 
-/// the aico state enum
-typedef enum __tb_aico_state_e
-{
-    TB_AICO_STATE_OK        = 0
-,   TB_AICO_STATE_PENDING   = 1
-,   TB_AICO_STATE_EXITING   = 2
-,   TB_AICO_STATE_KILLING   = 3
-
-}tb_aico_state_e;
-
 /// the aico exit func type
 typedef tb_void_t       (*tb_aico_exit_func_t)(tb_handle_t aico, tb_cpointer_t priv);
 

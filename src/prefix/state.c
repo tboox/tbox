@@ -41,6 +41,9 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 	case TB_STATE_PAUSED: 						return "paused";
 	case TB_STATE_CLOSED: 						return "closed";
 	case TB_STATE_PENDING: 						return "pending";
+	case TB_STATE_WAITING: 						return "waiting";
+	case TB_STATE_KILLING: 						return "killing";
+	case TB_STATE_EXITING: 						return "exiting";
 	case TB_STATE_TIMEOUT: 						return "timeout";
 	case TB_STATE_WAIT_FAILED: 					return "wait failed";
 	case TB_STATE_NOT_SUPPORTED: 				return "not supported";
