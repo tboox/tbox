@@ -54,7 +54,7 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 		context->sock = tb_null;
 
 		// exit aico
-		if (context->aico[0]) tb_aico_exit(context->aico[0], tb_true);
+		if (context->aico[0]) tb_aico_exit(context->aico[0]);
 		context->aico[0] = tb_null;
 
 		// exit
@@ -242,7 +242,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			tb_assert_and_check_break(context->file);
 
 			// addo sock
-			context->aico[0] = tb_aico_init_sock(aicp, context->sock);
+			context->aico[0] = tb_aico_init_sock(aicp, context->sock, tb_null, tb_null);
 			tb_assert_and_check_break(context->aico[0]);
 
 			// post sendf from file
@@ -381,11 +381,11 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// addo sock
-	aico = tb_aico_init_sock(aicp, sock);
+	aico = tb_aico_init_sock(aicp, sock, tb_null, tb_null);
 	tb_assert_and_check_goto(aico, end);
 
 	// addo task
-	task = tb_aico_init_task(aicp, tb_false);
+	task = tb_aico_init_task(aicp, tb_false, tb_null, tb_null);
 	tb_assert_and_check_goto(task, end);
 
 	// run task
@@ -428,10 +428,10 @@ end:
 	}
 
 	// exit aico
-	if (aico) tb_aico_exit(aico, tb_false);
+	if (aico) tb_aico_exit(aico);
 
 	// exit task
-	if (task) tb_aico_exit(task, tb_false);
+	if (task) tb_aico_exit(task);
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);

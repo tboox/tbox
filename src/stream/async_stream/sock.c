@@ -246,7 +246,7 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
 			if (wcache) sstream->base.wcache_maxn = wcache;
 
 			// init aico
-			if (!sstream->aico) sstream->aico = tb_aico_init_sock(sstream->base.aicp, sstream->sock);
+			if (!sstream->aico) sstream->aico = tb_aico_init_sock(sstream->base.aicp, sstream->sock, tb_null, tb_null);
 			tb_assert_and_check_break(sstream->aico);
 
 			// init timeout
@@ -884,7 +884,7 @@ static tb_void_t tb_async_stream_sock_clos(tb_handle_t astream, tb_bool_t bcalli
 	tb_check_return(!sstream->balived);
 
 	// exit aico
-	if (sstream->aico) tb_aico_exit(sstream->aico, bcalling);
+	if (sstream->aico) tb_aico_exit(sstream->aico);
 	sstream->aico = tb_null;
 
 	// exit dns
@@ -909,7 +909,7 @@ static tb_void_t tb_async_stream_sock_exit(tb_handle_t astream, tb_bool_t bcalli
 	tb_assert_and_check_return(sstream);
 
 	// exit aico
-	if (sstream->aico) tb_aico_exit(sstream->aico, bcalling);
+	if (sstream->aico) tb_aico_exit(sstream->aico);
 	sstream->aico = tb_null;
 
 	// exit dns
@@ -963,7 +963,7 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
 			if (sstream->type != type)
 			{
 				// exit aico
-				if (sstream->aico) tb_aico_exit(sstream->aico, tb_false);
+				if (sstream->aico) tb_aico_exit(sstream->aico);
 				sstream->aico = tb_null;
 
 				// exit it
@@ -997,7 +997,7 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
 			if (sstream->sock != sock)
 			{
 				// exit aico
-				if (sstream->aico) tb_aico_exit(sstream->aico, tb_false);
+				if (sstream->aico) tb_aico_exit(sstream->aico);
 				sstream->aico = tb_null;
 
 				// exit it

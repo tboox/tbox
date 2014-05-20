@@ -127,7 +127,7 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
 		}
 
 		// addo file
-		fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);
+		fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file, tb_null, tb_null);
 		tb_assert_and_check_break(fstream->aico);
 
 		// init offset
@@ -374,7 +374,7 @@ static tb_void_t tb_async_stream_file_clos(tb_handle_t astream, tb_bool_t bcalli
 	tb_trace_d("clos: ..");
 
 	// exit aico
-	if (fstream->aico) tb_aico_exit(fstream->aico, bcalling);
+	if (fstream->aico) tb_aico_exit(fstream->aico);
 	fstream->aico = tb_null;
 
 	// clear the offset

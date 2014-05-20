@@ -138,7 +138,7 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
 		tb_assert_and_check_break(dstream->data && dstream->size);
 		
 		// init aico
-		if (!dstream->aico) dstream->aico = tb_aico_init_task(dstream->base.aicp, tb_false);
+		if (!dstream->aico) dstream->aico = tb_aico_init_task(dstream->base.aicp, tb_false, tb_null, tb_null);
 		tb_assert_and_check_break(dstream->aico);
 
 		// init head
@@ -416,7 +416,7 @@ static tb_void_t tb_async_stream_data_clos(tb_handle_t astream, tb_bool_t bcalli
 	tb_assert_and_check_return(dstream);
 
 	// exit aico
-	if (dstream->aico) tb_aico_exit(dstream->aico, bcalling);
+	if (dstream->aico) tb_aico_exit(dstream->aico);
 	dstream->aico = tb_null;
 
 	// clear head
@@ -432,7 +432,7 @@ static tb_void_t tb_async_stream_data_exit(tb_handle_t astream, tb_bool_t bcalli
 	tb_assert_and_check_return(dstream);
 
 	// exit aico
-	if (dstream->aico) tb_aico_exit(dstream->aico, bcalling);
+	if (dstream->aico) tb_aico_exit(dstream->aico);
 	dstream->aico = tb_null;
 
 	// clear head
