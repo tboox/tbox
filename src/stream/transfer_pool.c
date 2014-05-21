@@ -193,7 +193,7 @@ static tb_bool_t tb_transfer_task_save(tb_size_t state, tb_hize_t offset, tb_hon
 		if (next_ok && task && task->transfer)
 		{
 			// done
-			if (!tb_transfer_osave(task->transfer, tb_transfer_task_save, task))
+			if (!tb_transfer_open_save(task->transfer, tb_transfer_task_save, task))
 			{
 				// enter
 				tb_spinlock_enter(&pool->lock);
@@ -598,7 +598,7 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
 	if (ok && bworking && task && task->transfer)
 	{
 		// done
-		if (!tb_transfer_osave(task->transfer, tb_transfer_task_save, task))
+		if (!tb_transfer_open_save(task->transfer, tb_transfer_task_save, task))
 		{
 			// enter
 			tb_spinlock_enter(&pool->lock);

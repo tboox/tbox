@@ -52,7 +52,7 @@ tb_int_t tb_demo_stream_async_stream_null_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(transfer);
 
 		// open and save transfer
-		if (!tb_transfer_osave(transfer, tb_demo_async_stream_null_save_func, event)) break;
+		if (!tb_transfer_open_save(transfer, tb_demo_async_stream_null_save_func, event)) break;
 
 		// wait it
 		tb_event_wait(event, -1);

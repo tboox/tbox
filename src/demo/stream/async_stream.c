@@ -83,7 +83,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t sta
 	tb_assert_and_check_return_val(ast && context && context->option, tb_false);
 
 	// done
-	tb_bool_t 		ok = tb_false;
+	tb_bool_t ok = tb_false;
 	do
 	{
 		// check
@@ -142,7 +142,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t sta
 		tb_assert_and_check_break(context->transfer);
 
 		// open and save transfer
-		if (!tb_transfer_osave(context->transfer, tb_demo_transfer_save_func, context)) break;
+		if (!tb_transfer_open_save(context->transfer, tb_demo_transfer_save_func, context)) break;
 
 		// ok
 		ok = tb_true;

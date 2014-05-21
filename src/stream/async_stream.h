@@ -605,7 +605,7 @@ tb_bool_t 				tb_async_stream_task_(tb_async_stream_t* stream, tb_size_t delay, 
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_oread_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_read_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! open and writ the stream, open it first if not opened 
  *

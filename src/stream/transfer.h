@@ -302,7 +302,7 @@ tb_bool_t 			tb_transfer_save(tb_handle_t transfer, tb_transfer_save_func_t func
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_transfer_osave(tb_handle_t transfer, tb_transfer_save_func_t func, tb_cpointer_t priv);
+tb_bool_t 			tb_transfer_open_save(tb_handle_t transfer, tb_transfer_save_func_t func, tb_cpointer_t priv);
 
 /*! kill transfer 
  *

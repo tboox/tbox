@@ -6,8 +6,35 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+static tb_void_t tb_demo_transfer_clos_func(tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_value_t* tuple = (tb_value_t*)priv;
+    tb_assert_and_check_return(tuple);
+
+    // trace
+    tb_trace_i("clos: state: %s", tb_state_cstr(state));
+
+#if 0
+	// exit transfer
+	if (tuple[0].ptr) tb_transfer_exit(tuple[0].ptr);
+	tuple[0].ptr = tb_null;
+
+	// exit istream
+	if (tuple[1].ptr) tb_async_stream_exit(tuple[1].ptr);
+	tuple[1].ptr = tb_null;
+
+	// exit ostream
+	if (tuple[2].ptr) tb_basic_stream_exit(tuple[2].ptr);
+	tuple[2].ptr = tb_null;
+#endif
+}
 static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
+    // check
+    tb_value_t* tuple = (tb_value_t*)priv;
+    tb_assert_and_check_return_val(tuple, tb_false);
+
 	// percent
 	tb_size_t percent = 0;
 	if (size > 0) percent = (offset * 100) / size;
@@ -15,6 +42,9 @@ static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, t
 
 	// trace
 	tb_trace_i("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_state_cstr(state));
+
+    // clos it
+    if (state != TB_STATE_OK) tb_transfer_clos(tuple[0].ptr, tb_demo_transfer_clos_func, priv);
 
 	// ok
 	return tb_true;
@@ -31,12 +61,14 @@ static tb_pointer_t tb_demo_transfer_loop(tb_cpointer_t priv)
 	tb_thread_return(tb_null);
 	return tb_null;
 }
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
 tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 {
 	// done
+    tb_value_t          tuple[3];
 	tb_aicp_t* 			aicp = tb_null;
 	tb_handle_t 		transfer = tb_null;
 	tb_async_stream_t* 	istream = tb_null;
@@ -66,8 +98,13 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 		// trace
 		tb_trace_i("save: ..");
 
+        // init tuple
+        tuple[0].ptr = transfer;
+        tuple[1].ptr = istream;
+        tuple[2].ptr = ostream;
+
 		// open and save transfer
-		if (!tb_transfer_osave(transfer, tb_demo_transfer_save_func, tb_null)) break;
+		if (!tb_transfer_open_save(transfer, tb_demo_transfer_save_func, tuple)) break;
 
 		// wait
 		getchar();
@@ -94,7 +131,7 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 		tb_trace_i("save: ..");
 
 		// open and save transfer
-		if (!tb_transfer_osave(transfer, tb_demo_transfer_save_func, tb_null)) break;
+		if (!tb_transfer_open_save(transfer, tb_demo_transfer_save_func, tuple)) break;
 
 		// wait
 		getchar();
@@ -103,18 +140,6 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 
 	// trace
 	tb_trace_i("exit: ..");
-
-	// exit transfer
-	if (transfer) tb_transfer_exit(transfer);
-	transfer = tb_null;
-
-	// exit istream
-	if (istream) tb_async_stream_exit(istream);
-	istream = tb_null;
-
-	// exit ostream
-	if (ostream) tb_basic_stream_exit(ostream);
-	ostream = tb_null;
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);
