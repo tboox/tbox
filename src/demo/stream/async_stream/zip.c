@@ -84,15 +84,15 @@ tb_int_t tb_demo_stream_async_stream_zip_main(tb_int_t argc, tb_char_t** argv)
 	transfer = tb_null;
 
 	// exit fstream
-	if (fstream) tb_async_stream_exit(fstream, tb_false);
+	if (fstream) tb_async_stream_exit(fstream);
 	fstream = tb_null;
 
 	// exit istream
-	if (istream) tb_async_stream_exit(istream, tb_false);
+	if (istream) tb_async_stream_exit(istream);
 	istream = tb_null;
 
 	// exit ostream
-	if (ostream) tb_async_stream_exit(ostream, tb_false);
+	if (ostream) tb_async_stream_exit(ostream);
 	ostream = tb_null;
 
 	// exit event

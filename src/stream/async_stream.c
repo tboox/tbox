@@ -482,7 +482,6 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
 	// ok?
 	return ok;
 }
-
 tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 {
 	// check
@@ -529,52 +528,27 @@ tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t cons
 fail:
 	
 	// exit stream
-	if (stream) tb_async_stream_exit(stream, tb_false);
+	if (stream) tb_async_stream_exit(stream);
 	return tb_null;
 }
-tb_void_t tb_async_stream_clos(tb_async_stream_t* stream, tb_bool_t bcalling)
+tb_bool_t tb_async_stream_exit(tb_async_stream_t* stream)
 {
 	// check
-	tb_assert_and_check_return(stream);
-
-	// trace
-	tb_trace_d("clos: ..");
-
-	// kill it first 
-	tb_stream_kill(stream);
-
-	// clos it
-	if (stream->clos) stream->clos(stream, bcalling);
-
-	// not opened
-	tb_atomic_set0(&stream->base.bopened);
-
-	// clear wcache
-	tb_scoped_buffer_clear(&stream->wcache_data);
-
-	// clear debug info
-#ifdef __tb_debug__
-	stream->file = tb_null;
-	stream->func = tb_null;
-	stream->line = 0;
-#endif
-
-	// trace
-	tb_trace_d("clos: ok");
-}
-tb_void_t tb_async_stream_exit(tb_async_stream_t* stream, tb_bool_t bcalling)
-{
-	// check
-	tb_assert_and_check_return(stream);
+	tb_assert_and_check_return_val(stream, tb_false);
 
 	// trace
 	tb_trace_d("exit: ..");
 
-	// close it first
-	tb_async_stream_clos(stream, bcalling);
+	// opened? please close it first
+	if (tb_atomic_get(&stream->base.bopened))
+    {
+        // trace
+        tb_trace_e("exit: failed, this stream have been not closed already, please close it first!");
+        return tb_false;
+    }
 
 	// exit it
-	if (stream->exit) stream->exit(stream, bcalling);
+	if (stream->exit && !stream->exit(stream)) return tb_false;
 
 	// exit url
 	tb_url_exit(&stream->base.url);
@@ -591,6 +565,8 @@ tb_void_t tb_async_stream_exit(tb_async_stream_t* stream, tb_bool_t bcalling)
 	// trace
 	tb_trace_d("exit: ok");
 
+    // ok
+    return tb_true;
 }
 tb_bool_t tb_async_stream_open_try(tb_async_stream_t* stream)
 {
@@ -622,13 +598,6 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_
 	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bopened), tb_false);
 	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bstoped), tb_false);
 
-	// save debug info
-#ifdef __tb_debug__
-	stream->func = func_;
-	stream->file = file_;
-	stream->line = line_;
-#endif
-
 	// init state
 	tb_atomic_set0(&stream->base.bstoped);
 
@@ -640,6 +609,41 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_
 
 	// ok?
 	return ok;
+}
+tb_bool_t tb_async_stream_clos_(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+{
+	// check
+	tb_assert_and_check_return_val(stream && stream->clos && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
+
+	// trace
+	tb_trace_d("clos: ..");
+
+	// kill it first 
+	tb_stream_kill(stream);
+
+	// save debug info
+#ifdef __tb_debug__
+	stream->func = func_;
+	stream->file = file_;
+	stream->line = line_;
+#endif
+
+	// clos it
+	return stream->clos(stream, func, priv);
+
+    // TODO
+	// not opened
+//	tb_atomic_set0(&stream->base.bopened);
+
+	// clear rcache
+//	tb_scoped_buffer_clear(&stream->rcache_data);
+
+	// clear wcache
+//	tb_scoped_buffer_clear(&stream->wcache_data);
 }
 tb_bool_t tb_async_stream_read_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {

@@ -40,6 +40,9 @@
 /// open
 #define tb_async_stream_open(stream, func, priv) 									tb_async_stream_open_(stream, func, priv __tb_debug_vals__)
 
+/// clos
+#define tb_async_stream_clos(stream, func, priv) 									tb_async_stream_clos_(stream, func, priv __tb_debug_vals__)
+
 /// read
 #define tb_async_stream_read(stream, size, func, priv) 					    		tb_async_stream_read_(stream, size, func, priv __tb_debug_vals__)
 
@@ -77,13 +80,6 @@
 /// the asio stream declaration
 struct __tb_async_stream_t;
 
-/*! the stream exit func type
- *
- * @param stream 				the stream
- * @param priv 					the func private data
- */
-typedef tb_void_t 				(*tb_async_stream_exit_func_t)(struct __tb_async_stream_t* stream, tb_cpointer_t priv);
-
 /*! the stream open func type
  *
  * @param stream 				the stream
@@ -93,6 +89,14 @@ typedef tb_void_t 				(*tb_async_stream_exit_func_t)(struct __tb_async_stream_t*
  * @return 						tb_true: ok, tb_false: error, but not break aicp
  */
 typedef tb_bool_t 				(*tb_async_stream_open_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv);
+
+/*! the stream clos func type
+ *
+ * @param stream 				the stream
+ * @param state 				the state
+ * @param priv 					the func private data
+ */
+typedef tb_void_t 				(*tb_async_stream_clos_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv);
 
 /*! the stream read func type
  *
@@ -310,6 +314,9 @@ typedef struct __tb_async_stream_t
 	/// open
 	tb_bool_t 					(*open)(tb_handle_t stream, tb_async_stream_open_func_t func, tb_cpointer_t priv);
 
+	/// clos
+	tb_bool_t 					(*clos)(tb_handle_t stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv);
+
 	/// read
 	tb_bool_t 					(*read)(tb_handle_t stream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv);
 
@@ -328,11 +335,8 @@ typedef struct __tb_async_stream_t
 	/// kill
 	tb_void_t 					(*kill)(tb_handle_t stream);
 
-	/// clos
-	tb_void_t 					(*clos)(tb_handle_t stream, tb_bool_t bcalling);
-
 	/// exit
-	tb_void_t 					(*exit)(tb_handle_t stream, tb_bool_t bcalling);
+	tb_bool_t 					(*exit)(tb_handle_t stream);
 
 }tb_async_stream_t;
 
@@ -392,19 +396,13 @@ tb_async_stream_t* 		tb_async_stream_init_http(tb_aicp_t* aicp);
  */
 tb_async_stream_t* 		tb_async_stream_init_filter(tb_aicp_t* aicp);
 
-/*! close stream, will block it if be pending
+/*! exit stream
  *
  * @param stream 		the stream
- * @param bcalling 		close it from the calling callback?
- */
-tb_void_t 				tb_async_stream_clos(tb_async_stream_t* stream, tb_bool_t bcalling);
-
-/*! exit stream, will block it if be pending
  *
- * @param stream 		the stream
- * @param bcalling 		exit it from the calling callback?
+ * @return              tb_true or tb_false
  */
-tb_void_t 				tb_async_stream_exit(tb_async_stream_t* stream, tb_bool_t bcalling);
+tb_bool_t 				tb_async_stream_exit(tb_async_stream_t* stream);
 
 /*! init stream from url
  *
@@ -531,6 +529,16 @@ tb_bool_t 				tb_async_stream_open_try(tb_async_stream_t* stream);
  * @return 				tb_true or tb_false
  */
 tb_bool_t 				tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+
+/*! close the stream
+ *
+ * @param stream 		the stream
+ * @param func 			the func
+ * @param priv 			the func data
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_async_stream_clos_(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! read the stream 
  *

@@ -115,6 +115,28 @@ static tb_bool_t tb_async_stream_http_open(tb_handle_t astream, tb_async_stream_
 	// post open
 	return tb_aicp_http_open(hstream->http, tb_async_stream_http_open_func, astream);
 }
+static tb_bool_t tb_async_stream_http_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+{	
+	// check
+	tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
+    tb_assert_and_check_return_val(hstream, tb_false);
+
+    // trace
+    tb_trace_d("clos: ..");
+
+    // noimpl
+    tb_trace_noimpl();
+    return tb_false;
+
+#if 0
+	// close it
+	if (hstream->http) tb_aicp_http_clos(hstream->http, bcalling);
+
+	// clear size and offset
+	tb_atomic64_set(&hstream->size, -1);
+	tb_atomic64_set0(&hstream->offset);
+#endif
+}
 static tb_bool_t tb_async_stream_http_read_func(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
@@ -232,28 +254,24 @@ static tb_void_t tb_async_stream_http_kill(tb_handle_t astream)
 	// kill it
 	if (hstream->http) tb_aicp_http_kill(hstream->http);
 }
-static tb_void_t tb_async_stream_http_clos(tb_handle_t astream, tb_bool_t bcalling)
+static tb_bool_t tb_async_stream_http_exit(tb_handle_t astream)
 {	
 	// check
 	tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
-	tb_assert_and_check_return(hstream);
+	tb_assert_and_check_return_val(hstream, tb_false);
 
-	// close it
-	if (hstream->http) tb_aicp_http_clos(hstream->http, bcalling);
+    // noimpl
+    tb_trace_noimpl();
 
-	// clear size and offset
-	tb_atomic64_set(&hstream->size, -1);
-	tb_atomic64_set0(&hstream->offset);
-}
-static tb_void_t tb_async_stream_http_exit(tb_handle_t astream, tb_bool_t bcalling)
-{	
-	// check
-	tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
-	tb_assert_and_check_return(hstream);
-
+    // TODO
+#if 0
 	// exit it
 	if (hstream->http) tb_aicp_http_exit(hstream->http, bcalling);
 	hstream->http = tb_null;
+#endif
+
+    // ok
+    return tb_true;
 }
 static tb_bool_t tb_async_stream_http_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va_list_t args)
 {
@@ -701,51 +719,80 @@ tb_async_stream_t* tb_async_stream_init_http(tb_aicp_t* aicp)
 	// check
 	tb_assert_and_check_return_val(aicp, tb_null);
 
-	// make stream
-	tb_async_stream_http_t* hstream = (tb_async_stream_http_t*)tb_malloc0(sizeof(tb_async_stream_http_t));
-	tb_assert_and_check_return_val(hstream, tb_null);
+	// done
+    tb_bool_t               ok = tb_false;
+	tb_async_stream_http_t* hstream = tb_null;
+    do
+    {
+        // make stream
+        hstream = (tb_async_stream_http_t*)tb_malloc0(sizeof(tb_async_stream_http_t));
+        tb_assert_and_check_break(hstream);
 
-	// init stream
-	if (!tb_async_stream_init((tb_async_stream_t*)hstream, aicp, TB_STREAM_TYPE_HTTP, 0, 0)) goto fail;
-	hstream->base.open 		= tb_async_stream_http_open;
-	hstream->base.read 		= tb_async_stream_http_read;
-	hstream->base.seek 		= tb_async_stream_http_seek;
-	hstream->base.task 		= tb_async_stream_http_task;
-	hstream->base.kill 		= tb_async_stream_http_kill;
-	hstream->base.clos 		= tb_async_stream_http_clos;
-	hstream->base.exit 		= tb_async_stream_http_exit;
-	hstream->base.base.ctrl = tb_async_stream_http_ctrl;
+        // init stream
+        if (!tb_async_stream_init((tb_async_stream_t*)hstream, aicp, TB_STREAM_TYPE_HTTP, 0, 0)) break;
+        hstream->base.open 		= tb_async_stream_http_open;
+        hstream->base.read 		= tb_async_stream_http_read;
+        hstream->base.seek 		= tb_async_stream_http_seek;
+        hstream->base.task 		= tb_async_stream_http_task;
+        hstream->base.kill 		= tb_async_stream_http_kill;
+        hstream->base.clos 		= tb_async_stream_http_clos;
+        hstream->base.exit 		= tb_async_stream_http_exit;
+        hstream->base.base.ctrl = tb_async_stream_http_ctrl;
 
-	// init http
-	hstream->http = tb_aicp_http_init(aicp);
-	tb_assert_and_check_goto(hstream->http, fail);
+        // init http
+        hstream->http = tb_aicp_http_init(aicp);
+        tb_assert_and_check_break(hstream->http);
 
-	// ok
-	return (tb_async_stream_t*)hstream;
+        // ok
+        ok = tb_true;
 
-fail:
-	if (hstream) tb_async_stream_exit((tb_async_stream_t*)hstream, tb_false);
-	return tb_null;
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (hstream) tb_async_stream_exit((tb_async_stream_t*)hstream);
+        hstream = tb_null;
+    }
+
+    // ok
+    return (tb_async_stream_t*)hstream;
 }
 tb_async_stream_t* tb_async_stream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && host && port && path, tb_null);
 
-	// init http stream
-	tb_async_stream_t* hstream = tb_async_stream_init_http(aicp);
-	tb_assert_and_check_return_val(hstream, tb_null);
+	// done
+	tb_bool_t           ok = tb_false;
+    tb_async_stream_t*  hstream = tb_null;
+    do
+    {
+        // init stream
+        hstream = tb_async_stream_init_http(aicp);
+        tb_assert_and_check_break(hstream);
 
-	// ctrl
-	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_PATH, path)) goto fail;
-	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
+        // ctrl
+        if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_HOST, host)) break;
+        if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_PORT, port)) break;
+        if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_PATH, path)) break;
+        if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_SSL, bssl)) break;
 	
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (hstream) tb_async_stream_exit(hstream);
+        hstream = tb_null;
+    }
+
 	// ok
 	return hstream;
-fail:
-	if (hstream) tb_async_stream_exit(hstream, tb_false);
-	return tb_null;
 }
 

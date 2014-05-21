@@ -109,7 +109,7 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 	transfer = tb_null;
 
 	// exit istream
-	if (istream) tb_async_stream_exit(istream, tb_false);
+	if (istream) tb_async_stream_exit(istream);
 	istream = tb_null;
 
 	// exit ostream

@@ -384,11 +384,11 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 	context.transfer = tb_null;
 
 	// exit istream
-	if (context.istream) tb_async_stream_exit(context.istream, tb_false);
+	if (context.istream) tb_async_stream_exit(context.istream);
 	context.istream = tb_null;
 
 	// exit ostream
-	if (context.ostream) tb_async_stream_exit(context.ostream, tb_false);
+	if (context.ostream) tb_async_stream_exit(context.ostream);
 	context.ostream = tb_null;
 
 	// exit option
