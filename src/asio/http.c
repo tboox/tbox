@@ -692,8 +692,8 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
 		// redirect failed
 		state = TB_STATE_HTTP_REDIRECT_FAILED;
 
-		// close stream
-		if (http->stream) tb_async_stream_clos(http->stream, tb_true);
+		// TODO: close stream
+		if (http->stream) tb_async_stream_clos(http->stream, tb_null, tb_null);
 		http->stream = http->sstream;
 
 		// exit transfer
@@ -1365,8 +1365,8 @@ tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 	// trace
 	tb_trace_d("clos: ..");
 
-	// close stream
-	if (http->stream) tb_async_stream_clos(http->stream, bcalling);
+	// TODO: close stream
+	if (http->stream) tb_async_stream_clos(http->stream, tb_null, tb_null);
 	http->stream = http->sstream;
 
 	// exit transfer
@@ -1392,16 +1392,17 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// close it
 	tb_aicp_http_clos(handle, bcalling);
 
+    // TODO
 	// exit zstream
-	if (http->zstream) tb_async_stream_exit(http->zstream, bcalling);
+	if (http->zstream) tb_async_stream_exit(http->zstream);
 	http->zstream = tb_null;
 
 	// exit cstream
-	if (http->cstream) tb_async_stream_exit(http->cstream, bcalling);
+	if (http->cstream) tb_async_stream_exit(http->cstream);
 	http->cstream = tb_null;
 
 	// exit sstream
-	if (http->sstream) tb_async_stream_exit(http->sstream, bcalling);
+	if (http->sstream) tb_async_stream_exit(http->sstream);
 	http->sstream = tb_null;
 
 	// exit stream
@@ -1507,8 +1508,8 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 	tb_bool_t ok = tb_false;
 	do
 	{
-		// close stream
-		if (http->stream) tb_async_stream_clos(http->stream, tb_true);
+		// TODO: close stream
+		if (http->stream) tb_async_stream_clos(http->stream, tb_null, tb_null);
 		http->stream = http->sstream;
 
 		// exit transfer

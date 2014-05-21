@@ -98,7 +98,7 @@ end:
 	if (http) tb_aicp_http_exit(http, tb_false);
 
 	// exit post
-	if (post) tb_async_stream_exit(post, tb_false);
+	if (post) tb_async_stream_exit(post);
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);

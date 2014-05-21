@@ -1068,7 +1068,7 @@ tb_handle_t tb_transfer_init_au(tb_async_stream_t* istream, tb_char_t const* our
 	} while (0);
 
 	// exit ostream
-	if (ostream) tb_async_stream_exit(ostream, tb_false);
+	if (ostream) tb_async_stream_exit(ostream);
 	ostream = tb_null;
 
 	// ok?
@@ -1119,11 +1119,11 @@ tb_handle_t tb_transfer_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_
 	} while (0);
 
 	// exit istream
-	if (istream) tb_async_stream_exit(istream, tb_false);
+	if (istream) tb_async_stream_exit(istream);
 	istream = tb_null;
 
 	// exit ostream
-	if (ostream) tb_async_stream_exit(ostream, tb_false);
+	if (ostream) tb_async_stream_exit(ostream);
 	ostream = tb_null;
 
 	// ok?
@@ -1161,7 +1161,7 @@ tb_handle_t tb_transfer_init_ua(tb_char_t const* iurl, tb_async_stream_t* ostrea
 	} while (0);
 
 	// exit istream
-	if (istream) tb_async_stream_exit(istream, tb_false);
+	if (istream) tb_async_stream_exit(istream);
 	istream = tb_null;
 
 	// ok?
@@ -1212,11 +1212,11 @@ tb_handle_t tb_transfer_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_size
 	} while (0);
 
 	// exit istream
-	if (istream) tb_async_stream_exit(istream, tb_false);
+	if (istream) tb_async_stream_exit(istream);
 	istream = tb_null;
 
 	// exit ostream
-	if (ostream) tb_async_stream_exit(ostream, tb_false);
+	if (ostream) tb_async_stream_exit(ostream);
 	ostream = tb_null;
 
 	// ok?
@@ -1254,7 +1254,7 @@ tb_handle_t tb_transfer_init_da(tb_byte_t const* idata, tb_size_t isize, tb_asyn
 	} while (0);
 
 	// exit istream
-	if (istream) tb_async_stream_exit(istream, tb_false);
+	if (istream) tb_async_stream_exit(istream);
 	istream = tb_null;
 
 	// ok?
@@ -1394,15 +1394,16 @@ tb_void_t tb_transfer_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// kill it first 
 	tb_transfer_kill(transfer);
 
+    // TODO
 	// exit istream
-	if (transfer->istream && transfer->iowner) tb_async_stream_exit(transfer->istream, bcalling);
+	if (transfer->istream && transfer->iowner) tb_async_stream_exit(transfer->istream);
 	transfer->istream = tb_null;
 
 	// exit ostream
 	if (transfer->ostream && transfer->oowner)
 	{
 		if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO) 
-			tb_async_stream_exit(transfer->ostream, bcalling);
+			tb_async_stream_exit(transfer->ostream);
 		else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
 			tb_basic_stream_exit(transfer->ostream);
 	}
