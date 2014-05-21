@@ -287,36 +287,50 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_readv_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writv_t, real), tb_null);
 
-    // make aicp
-    tb_aicp_t* aicp = tb_malloc0(sizeof(tb_aicp_t));
-    tb_assert_and_check_return_val(aicp, tb_null);
+    // done
+    tb_aicp_t*  aicp = tb_null;
+    tb_bool_t   ok = tb_false;
+    do
+    {
+        // make aicp
+        aicp = tb_malloc0(sizeof(tb_aicp_t));
+        tb_assert_and_check_break(aicp);
 
-    // init aicp
-    aicp->maxn = maxn? maxn : (1 << 16);
-    aicp->kill = 0;
+        // init aicp
+        aicp->maxn = maxn? maxn : (1 << 16);
+        aicp->kill = 0;
 
-    // init lock
-    if (!tb_spinlock_init(&aicp->lock)) goto fail;
+        // init lock
+        if (!tb_spinlock_init(&aicp->lock)) break;
 
-    // init proactor
-    aicp->ptor = tb_aicp_proactor_init(aicp);
-    tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
+        // init proactor
+        aicp->ptor = tb_aicp_proactor_init(aicp);
+        tb_assert_and_check_break(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t));
 
-    // init aico pool
-    aicp->pool = tb_fixed_pool_init((aicp->maxn >> 2) + 16, aicp->ptor->step, 0);
-    tb_assert_and_check_goto(aicp->pool, fail);
+        // init aico pool
+        aicp->pool = tb_fixed_pool_init((aicp->maxn >> 2) + 16, aicp->ptor->step, 0);
+        tb_assert_and_check_break(aicp->pool);
 
-    // register lock profiler
+        // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-    tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&aicp->lock, TB_TRACE_MODULE_NAME);
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&aicp->lock, TB_TRACE_MODULE_NAME);
 #endif
 
-    // ok
-    return aicp;
+        // ok
+        ok = tb_true;
 
-fail:
-    if (aicp) tb_aicp_exit(aicp);
-    return tb_null;
+    } while (0);
+
+    // failed?
+    if (!ok) 
+    {
+        // exit aicp
+        if (aicp) tb_aicp_exit(aicp);
+        aicp = tb_null;
+    }
+
+    // ok?
+    return aicp;
 }
 tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 {
