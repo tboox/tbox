@@ -66,7 +66,7 @@ typedef struct __tb_async_stream_http_t
 	} 									func;
 
 	// the priv
-	tb_pointer_t 						priv;
+	tb_cpointer_t 						priv;
 
 }tb_async_stream_http_t;
 
@@ -79,7 +79,7 @@ static __tb_inline__ tb_async_stream_http_t* tb_async_stream_http_cast(tb_handle
 	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
 	return (tb_async_stream_http_t*)astream;
 }
-static tb_bool_t tb_async_stream_http_open_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_open_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(http && status, tb_false);
@@ -98,7 +98,7 @@ static tb_bool_t tb_async_stream_http_open_func(tb_handle_t http, tb_size_t stat
 	// done func
 	return hstream->func.open((tb_async_stream_t*)hstream, state, hstream->priv);
 }
-static tb_bool_t tb_async_stream_http_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
@@ -115,7 +115,7 @@ static tb_bool_t tb_async_stream_http_open(tb_handle_t astream, tb_async_stream_
 	// post open
 	return tb_aicp_http_open(hstream->http, tb_async_stream_http_open_func, astream);
 }
-static tb_bool_t tb_async_stream_http_read_func(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_read_func(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(http, tb_false);
@@ -145,7 +145,7 @@ static tb_bool_t tb_async_stream_http_read_func(tb_handle_t http, tb_size_t stat
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_async_stream_http_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
@@ -170,7 +170,7 @@ static tb_bool_t tb_async_stream_http_read(tb_handle_t astream, tb_size_t delay,
 	// post read
 	return tb_aicp_http_read_after(hstream->http, delay, size, tb_async_stream_http_read_func, astream);
 }
-static tb_bool_t tb_async_stream_http_seek_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_seek_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(http, tb_false);
@@ -185,7 +185,7 @@ static tb_bool_t tb_async_stream_http_seek_func(tb_handle_t http, tb_size_t stat
 	// done func
 	return hstream->func.seek((tb_async_stream_t*)hstream, state, offset, hstream->priv);
 }
-static tb_bool_t tb_async_stream_http_seek(tb_handle_t astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_seek(tb_handle_t astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
@@ -198,7 +198,7 @@ static tb_bool_t tb_async_stream_http_seek(tb_handle_t astream, tb_hize_t offset
 	// post seek
 	return tb_aicp_http_seek(hstream->http, offset, tb_async_stream_http_seek_func, astream);
 }
-static tb_bool_t tb_async_stream_http_task_func(tb_handle_t http, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_task_func(tb_handle_t http, tb_size_t state, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(http, tb_false);
@@ -210,7 +210,7 @@ static tb_bool_t tb_async_stream_http_task_func(tb_handle_t http, tb_size_t stat
 	// done func
 	return hstream->func.task((tb_async_stream_t*)hstream, state, hstream->priv);
 }
-static tb_bool_t tb_async_stream_http_task(tb_handle_t astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_http_task(tb_handle_t astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
@@ -576,7 +576,7 @@ static tb_bool_t tb_async_stream_http_ctrl(tb_handle_t astream, tb_size_t ctrl, 
 	case TB_STREAM_CTRL_HTTP_SET_POST_PRIV:
 		{
 			// post priv
-			tb_pointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
+			tb_cpointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
 
 			// set post priv
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_PRIV, priv);

@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t data)
+static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t priv)
 {
 	// get the time
 	tb_timeval_t tv = {0};
@@ -16,13 +16,13 @@ static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t data)
 		tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
 		// trace
-		tb_trace_i("task[%s]: %lld ms, killed: %d", (tb_char_t const*)data, val, killed);
+		tb_trace_i("task[%s]: %lld ms, killed: %d", (tb_char_t const*)priv, val, killed);
 	}
 }
-static tb_pointer_t tb_demo_timer_loop(tb_cpointer_t data)
+static tb_pointer_t tb_demo_timer_loop(tb_cpointer_t priv)
 {
 	// the timer
-	tb_handle_t timer = (tb_handle_t)data;
+	tb_handle_t timer = (tb_handle_t)priv;
 
 	// wait
 	if (timer) tb_timer_loop(timer);

@@ -349,7 +349,7 @@ tb_size_t 			tb_single_list_maxn(tb_single_list_t const* list);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_single_list_item_func(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+ * tb_bool_t tb_single_list_item_func(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
  * {
  *  	tb_assert_and_check_return_val(list && bdel, tb_false);
  *
@@ -366,7 +366,7 @@ tb_size_t 			tb_single_list_maxn(tb_single_list_t const* list);
  * @param priv 		the walk priv
  *
  */
-tb_void_t 			tb_single_list_walk(tb_single_list_t* list, tb_bool_t (*func)(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
+tb_void_t 			tb_single_list_walk(tb_single_list_t* list, tb_bool_t (*func)(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
 
 
 

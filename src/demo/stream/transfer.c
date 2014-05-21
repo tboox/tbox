@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
 	// percent
 	tb_size_t percent = 0;
@@ -19,10 +19,10 @@ static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, t
 	// ok
 	return tb_true;
 }
-static tb_pointer_t tb_demo_transfer_loop(tb_cpointer_t data)
+static tb_pointer_t tb_demo_transfer_loop(tb_cpointer_t priv)
 {
 	// the aicp
-	tb_aicp_t* aicp = (tb_aicp_t*)data;
+	tb_aicp_t* aicp = (tb_aicp_t*)priv;
 
 	// done loop
 	if (aicp) tb_aicp_loop(aicp);

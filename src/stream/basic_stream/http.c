@@ -466,7 +466,7 @@ static tb_bool_t tb_basic_stream_http_ctrl(tb_handle_t bstream, tb_size_t ctrl, 
 	case TB_STREAM_CTRL_HTTP_SET_POST_PRIV:
 		{
 			// post priv
-			tb_pointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
+			tb_cpointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
 
 			// set post priv
 			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_PRIV, priv);

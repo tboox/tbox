@@ -213,10 +213,10 @@ static tb_void_t tb_aiop_spak_work(tb_aicp_proactor_aiop_t* ptor)
     // post wait
     if (value >= 0 && value < work) tb_semaphore_post(ptor->wait, work - value);
 }
-static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t data)
+static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
 {
     // check
-    tb_aicp_proactor_aiop_t*    ptor = (tb_aicp_proactor_aiop_t*)data;
+    tb_aicp_proactor_aiop_t*    ptor = (tb_aicp_proactor_aiop_t*)priv;
     tb_aicp_t*                  aicp = ptor? ptor->base.aicp : tb_null;
     tb_assert_and_check_goto(ptor && ptor->aiop && ptor->list && ptor->timer && ptor->ltimer && aicp, end);
 
@@ -338,10 +338,10 @@ end:
     tb_thread_return(tb_null);
     return tb_null;
 }
-static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t data)
+static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t priv)
 {
     // the aico
-    tb_aiop_aico_t* aico = (tb_aiop_aico_t*)data;
+    tb_aiop_aico_t* aico = (tb_aiop_aico_t*)priv;
     tb_assert_and_check_return(aico && aico->waiting);
 
     // the ptor
@@ -1002,10 +1002,10 @@ static tb_long_t tb_aiop_spak_sendf(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
     // ok
     return 1;
 }
-static tb_void_t tb_aiop_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t data)
+static tb_void_t tb_aiop_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t priv)
 {
     // the aico
-    tb_aiop_aico_t* aico = (tb_aiop_aico_t*)data;
+    tb_aiop_aico_t* aico = (tb_aiop_aico_t*)priv;
     tb_assert_and_check_return(aico && aico->waiting);
 
     // the ptor

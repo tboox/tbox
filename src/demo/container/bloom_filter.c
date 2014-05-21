@@ -12,9 +12,9 @@ static tb_item_func_t 	g_func_prev;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-static tb_size_t tb_demo_test_hash_func(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
+static tb_size_t tb_demo_test_hash_func(tb_item_func_t* func, tb_cpointer_t priv, tb_size_t mask, tb_size_t index)
 {
-	return g_func_prev.hash(func, data, mask, g_func_indx);
+	return g_func_prev.hash(func, priv, mask, g_func_indx);
 }
 static tb_void_t tb_demo_test_cstr_h(tb_size_t index)
 {

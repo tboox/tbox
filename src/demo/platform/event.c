@@ -28,9 +28,9 @@ tb_char_t* gets(tb_char_t*);
 /* //////////////////////////////////////////////////////////////////////////////////////
  * thread
  */
-static tb_pointer_t tb_test_thread(tb_cpointer_t data)
+static tb_pointer_t tb_test_thread(tb_cpointer_t priv)
 {
-	tb_test_item_t* it = (tb_test_item_t*)data;
+	tb_test_item_t* it = (tb_test_item_t*)priv;
 	tb_assert_and_check_goto(it, end);
 	tb_trace_i("[thread: %u]: init", it->i);
 

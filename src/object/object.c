@@ -115,13 +115,13 @@ tb_void_t tb_object_cler(tb_object_t* object)
 	// clear
 	if (object->cler) object->cler(object);
 }
-tb_void_t tb_object_setp(tb_object_t* object, tb_pointer_t priv)
+tb_void_t tb_object_setp(tb_object_t* object, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return(object);
 	object->priv = priv;
 }
-tb_pointer_t tb_object_getp(tb_object_t* object)
+tb_cpointer_t tb_object_getp(tb_object_t* object)
 {
 	// check
 	tb_assert_and_check_return_val(object, tb_null);

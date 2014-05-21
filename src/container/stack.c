@@ -78,7 +78,7 @@ tb_size_t tb_stack_maxn(tb_stack_t const* stack)
 {
 	return tb_vector_maxn(stack);
 }
-tb_void_t tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
+tb_void_t tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
 	tb_vector_walk(stack, func, priv);
 }

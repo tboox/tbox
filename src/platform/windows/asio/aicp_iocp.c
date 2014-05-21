@@ -131,16 +131,31 @@ typedef struct __tb_iocp_loop_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_cpointer_t data);
-static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t data);
+static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_cpointer_t priv);
+static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t priv);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * aico 
+ */
+static __tb_inline__ tb_bool_t tb_iocp_aico_is_killing(tb_iocp_aico_t* aico)
+{
+    // check
+    tb_assert_and_check_return_val(aico, tb_false);
+
+    // the state
+    tb_size_t state = tb_atomic_get(&aico->base.state);
+
+    // killing or exiting?
+    return (state == TB_STATE_KILLING) || (state == TB_STATE_EXITING);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * timer 
  */
-static tb_pointer_t tb_iocp_timer_loop(tb_cpointer_t data)
+static tb_pointer_t tb_iocp_timer_loop(tb_cpointer_t priv)
 {
 	// check
-	tb_aicp_proactor_iocp_t* 	ptor = (tb_aicp_proactor_iocp_t*)data;
+	tb_aicp_proactor_iocp_t* 	ptor = (tb_aicp_proactor_iocp_t*)priv;
 	tb_aicp_t* 					aicp = ptor? ptor->base.aicp : tb_null;
 	tb_assert_and_check_return_val(ptor && ptor->timer && ptor->ltimer && ptor->event && aicp, tb_null);
 
@@ -1277,10 +1292,10 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 /* //////////////////////////////////////////////////////////////////////////////////////
  * spak 
  */
-static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_cpointer_t data)
+static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_cpointer_t priv)
 {
 	// the aico
-	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)data;
+	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)priv;
 	tb_assert_and_check_return(aico);
 
 	// the ptor
@@ -1326,10 +1341,10 @@ static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_cpointer_t data)
 		break;
 	}
 }
-static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t data)
+static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t priv)
 {
 	// the aico
-	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)data;
+	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)priv;
 	tb_assert_and_check_return(aico);
 
 	// the ptor
@@ -1607,8 +1622,7 @@ static tb_long_t tb_iocp_spak_done(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	tb_check_return_val(resp->state == TB_STATE_PENDING, 1);
 
 	// killed?
-	tb_aico_t* aico = (tb_aico_t*)resp->aico;
-	if (tb_atomic_get(&aico->killed))
+	if (tb_iocp_aico_is_killing((tb_iocp_aico_t*)resp->aico))
 	{
 		// save state
 		resp->state = TB_STATE_KILLED;
@@ -1767,7 +1781,7 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	}
 	
 	// killed?
-	if (tb_atomic_get(&aico->base.killed) || tb_atomic_get(&proactor->aicp->kill))
+	if (tb_iocp_aico_is_killing(aico) || tb_atomic_get(&proactor->aicp->kill))
 	{
 		// post the killed state
 		aico->olap.aice = *aice;

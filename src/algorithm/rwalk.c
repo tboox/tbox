@@ -31,7 +31,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_rwalk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_rwalk_func_t func, tb_pointer_t priv)
+tb_size_t tb_rwalk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_rwalk_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_REVERSE) && func, 0);
@@ -53,7 +53,7 @@ tb_size_t tb_rwalk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_r
 	// ok?
 	return count;
 }
-tb_size_t tb_rwalk_all(tb_iterator_t* iterator, tb_rwalk_func_t func, tb_pointer_t priv)
+tb_size_t tb_rwalk_all(tb_iterator_t* iterator, tb_rwalk_func_t func, tb_cpointer_t priv)
 {
 	return tb_rwalk(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), func, priv);
 }

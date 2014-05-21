@@ -95,7 +95,7 @@ static __tb_inline__ tb_size_t tb_dns_cache_now()
 {
 	return (tb_size_t)(tb_cache_time_spak() / 1000);
 }
-static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(cache && bdel, tb_false);

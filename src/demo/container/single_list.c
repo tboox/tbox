@@ -860,13 +860,13 @@ static tb_void_t tb_single_list_test_itor_perf()
 
 	tb_single_list_exit(list);
 }
-static tb_bool_t tb_single_list_test_walk_item(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_single_list_test_walk_item(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(list && bdel && priv, tb_false);
 
 	// done
-	tb_hize_t* test = priv;
+	tb_hize_t* test = (tb_hize_t*)priv;
 	tb_size_t i = (tb_size_t)item;
 	if (!((i >> 25) & 0x1))
 //	if (!(i & 0x7))

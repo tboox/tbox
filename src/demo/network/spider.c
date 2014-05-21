@@ -295,7 +295,7 @@ static tb_void_t tb_demo_spider_task_exit(tb_demo_spider_task_t* task)
 	// leave
 	tb_spinlock_leave(&spider->lock);
 }
-static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
 	// check
 	tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;
@@ -334,7 +334,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
 	// break or continue?
 	return ok;
 }
-static tb_bool_t tb_demo_spider_task_ctrl(tb_stream_t* istream, tb_stream_t* ostream, tb_pointer_t priv)
+static tb_bool_t tb_demo_spider_task_ctrl(tb_stream_t* istream, tb_stream_t* ostream, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(istream && ostream, tb_false);

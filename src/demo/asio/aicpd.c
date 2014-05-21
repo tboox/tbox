@@ -338,10 +338,10 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
     return tb_true;
 }
 #endif
-static tb_pointer_t tb_demo_loop(tb_cpointer_t data)
+static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
 {
     // aicp
-    tb_handle_t aicp = (tb_handle_t)data;
+    tb_handle_t aicp = (tb_handle_t)priv;
     tb_size_t   self = tb_thread_self();
 
     // trace

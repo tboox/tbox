@@ -33,7 +33,7 @@
  */
 static tb_size_t tb_item_func_uint32_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {
-	return tb_item_func_hash_uint32((tb_uint32_t)data, mask, index);
+	return tb_item_func_hash_uint32(tb_p2u32(data), mask, index);
 }
 static tb_long_t tb_item_func_uint32_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {

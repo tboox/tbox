@@ -38,12 +38,12 @@
  *
  * @param name 			the thread name, maybe null
  * @param func 			the thread func
- * @param data 			the thread data
+ * @param priv 			the thread func private data
  * @param stack 		the thread stack, using the default stack size if be zero 
  *
  * @return 				the thread handle
  */
-tb_handle_t 			tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t data, tb_size_t stack);
+tb_handle_t 			tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack);
 
 /*! exit thread
  *

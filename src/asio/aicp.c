@@ -180,10 +180,10 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
-static tb_pointer_t tb_aicp_instance_loop(tb_cpointer_t data)
+static tb_pointer_t tb_aicp_instance_loop(tb_cpointer_t priv)
 {
     // aicp
-    tb_handle_t aicp = (tb_handle_t)data;
+    tb_handle_t aicp = (tb_handle_t)priv;
 
     // trace
     tb_trace_d("loop: init");
@@ -496,7 +496,7 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
     tb_aicp_loop_util(aicp, tb_null, tb_null);  
 }
-tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_pointer_t priv), tb_pointer_t priv)
+tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t priv), tb_cpointer_t priv)
 {   
     // check
     tb_assert_and_check_return(aicp);

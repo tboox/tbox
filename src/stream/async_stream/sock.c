@@ -98,7 +98,7 @@ typedef struct __tb_async_stream_sock_t
     }                                   func;
 
     // the priv
-    tb_pointer_t                        priv;
+    tb_cpointer_t                       priv;
 
 }tb_async_stream_sock_t;
 
@@ -112,10 +112,10 @@ static __tb_inline__ tb_async_stream_sock_t* tb_async_stream_sock_cast(tb_handle
     return (tb_async_stream_sock_t*)astream;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_sopen_func(tb_handle_t ssl, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_sopen_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(priv);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
     tb_assert_and_check_return_val(ssl && sstream->func.open, tb_false);
 
     // trace
@@ -137,7 +137,7 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
 
     // the stream
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(aice->priv);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)aice->priv);
     tb_assert_and_check_return_val(sstream && sstream->func.open, tb_false);
 
     // done
@@ -308,7 +308,7 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
     // done func if failed
     if (state != TB_STATE_OK) sstream->func.open((tb_async_stream_t*)sstream, state, sstream->priv);
 }
-static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
@@ -480,7 +480,7 @@ static tb_bool_t tb_async_stream_sock_uread_func(tb_aice_t const* aice)
     return tb_true;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_sread_func(tb_handle_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_sread_func(tb_handle_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ssl, tb_false);
@@ -511,7 +511,7 @@ static tb_bool_t tb_async_stream_sock_sread_func(tb_handle_t ssl, tb_size_t stat
     return tb_true;
 }
 #endif
-static tb_bool_t tb_async_stream_sock_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
@@ -674,7 +674,7 @@ static tb_bool_t tb_async_stream_sock_uwrit_func(tb_aice_t const* aice)
     return tb_true;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_swrit_func(tb_handle_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_swrit_func(tb_handle_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ssl, tb_false);
@@ -705,7 +705,7 @@ static tb_bool_t tb_async_stream_sock_swrit_func(tb_handle_t ssl, tb_size_t stat
     return tb_true;
 }
 #endif
-static tb_bool_t tb_async_stream_sock_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
@@ -759,7 +759,7 @@ static tb_bool_t tb_async_stream_sock_writ(tb_handle_t astream, tb_size_t delay,
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_sock_seek(tb_handle_t astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_seek(tb_handle_t astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
@@ -771,7 +771,7 @@ static tb_bool_t tb_async_stream_sock_seek(tb_handle_t astream, tb_hize_t offset
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_sock_sync(tb_handle_t astream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_sync(tb_handle_t astream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
@@ -806,7 +806,7 @@ static tb_bool_t tb_async_stream_sock_task_func(tb_aice_t const* aice)
     return tb_true;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_stask_func(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_stask_func(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ssl, tb_false);
@@ -829,7 +829,7 @@ static tb_bool_t tb_async_stream_sock_stask_func(tb_handle_t ssl, tb_size_t stat
     return tb_true;
 }
 #endif
-static tb_bool_t tb_async_stream_sock_task(tb_handle_t astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_sock_task(tb_handle_t astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);

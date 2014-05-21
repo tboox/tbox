@@ -378,7 +378,7 @@ static tb_void_t tb_hash_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 	// update the hash item size
 	hash->item_size--;
 }
-static tb_void_t tb_hash_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t data)
+static tb_void_t tb_hash_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)iterator;
 	tb_assert_return(hash && hash->hash_list && hash->hash_size);
@@ -398,7 +398,7 @@ static tb_void_t tb_hash_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, 
 	tb_check_return(list && list->size && i < list->size);
 
 	// note: copy data only, will destroy hash index if copy name
-	hash->data_func.copy(&hash->data_func, ((tb_byte_t*)&list[1]) + i * step + hash->name_func.size, data);
+	hash->data_func.copy(&hash->data_func, ((tb_byte_t*)&list[1]) + i * step + hash->name_func.size, item);
 }
 static tb_long_t tb_hash_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
@@ -675,7 +675,7 @@ tb_size_t tb_hash_maxn(tb_hash_t const* handle)
 	// the maxn
 	return hash->item_maxn;
 }
-tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
+tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
 	// check
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;

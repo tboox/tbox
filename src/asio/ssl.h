@@ -42,7 +42,7 @@
  *
  * @return 			tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_ssl_open_func_t)(tb_handle_t ssl, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_ssl_open_func_t)(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv);
 
 /*! the aicp ssl read func type
  *
@@ -55,7 +55,7 @@ typedef tb_bool_t 	(*tb_aicp_ssl_open_func_t)(tb_handle_t ssl, tb_size_t state, 
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_ssl_read_func_t)(tb_handle_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_ssl_read_func_t)(tb_handle_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 
 /*! the aicp ssl writ func type
  *
@@ -68,7 +68,7 @@ typedef tb_bool_t 	(*tb_aicp_ssl_read_func_t)(tb_handle_t ssl, tb_size_t state, 
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_ssl_writ_func_t)(tb_handle_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_ssl_writ_func_t)(tb_handle_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 
 /*! the aicp ssl task func type
  *
@@ -79,7 +79,7 @@ typedef tb_bool_t 	(*tb_aicp_ssl_writ_func_t)(tb_handle_t ssl, tb_size_t state, 
  *
  * @return 			tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_ssl_task_func_t)(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_ssl_task_func_t)(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -136,7 +136,7 @@ tb_void_t 			tb_aicp_ssl_set_timeout(tb_handle_t handle, tb_long_t timeout);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_cpointer_t priv);
 
 /*! read the ssl
  *
@@ -148,7 +148,7 @@ tb_bool_t 			tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, 
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
 
 /*! writ the ssl
  *
@@ -160,7 +160,7 @@ tb_bool_t 			tb_aicp_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t siz
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
 
 /*! read the ssl after the delay time
  *
@@ -173,7 +173,7 @@ tb_bool_t 			tb_aicp_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
 
 /*! writ the ssl after the delay time
  *
@@ -186,7 +186,7 @@ tb_bool_t 			tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
 
 /*! task the ssl
  *
@@ -197,7 +197,7 @@ tb_bool_t 			tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_task(tb_handle_t handle, tb_size_t delay, tb_aicp_ssl_task_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_task(tb_handle_t handle, tb_size_t delay, tb_aicp_ssl_task_func_t func, tb_cpointer_t priv);
 
 /*! open and read the ssl, open it first if not opened 
  *
@@ -209,7 +209,7 @@ tb_bool_t 			tb_aicp_ssl_task(tb_handle_t handle, tb_size_t delay, tb_aicp_ssl_t
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
 
 /*! open and writ the ssl, open it first if not opened 
  *
@@ -221,7 +221,7 @@ tb_bool_t 			tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t si
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_owrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_owrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
 
 /*! the ssl aicp
  *

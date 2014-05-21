@@ -46,8 +46,8 @@ typedef struct __tb_timer_task_t
 	// the func
 	tb_timer_task_func_t 		func;
 
-	// the data
-	tb_cpointer_t 				data;
+	// the priv
+	tb_cpointer_t 				priv;
 
 	// the when
 	tb_hong_t 					when;
@@ -304,7 +304,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 	// done
 	tb_bool_t 				ok = tb_false;
 	tb_timer_task_func_t 	func = tb_null;
-	tb_cpointer_t 			data = tb_null;
+	tb_cpointer_t 			priv = tb_null;
 	tb_bool_t 				killed = tb_false;
 	do
 	{
@@ -333,7 +333,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 
 			// save func and data for calling it later
 			func = task->func;
-			data = task->data;
+			priv = task->priv;
 
 			// killed?
 			killed = task->killed? tb_true : tb_false;
@@ -365,7 +365,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 	tb_spinlock_leave(&timer->lock);
 
 	// done func
-	if (func) func(killed, data);
+	if (func) func(killed, priv);
 
 	// ok?
 	return ok;
@@ -411,16 +411,16 @@ tb_void_t tb_timer_loop(tb_handle_t handle)
 	// work--
 	tb_atomic_fetch_and_dec(&timer->work);
 }
-tb_handle_t tb_timer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data)
+tb_handle_t tb_timer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
 	tb_assert_and_check_return_val(timer && func, tb_null);
 
 	// add task
-	return tb_timer_task_init_at(handle, tb_timer_now(timer) + delay, delay, repeat, func, data);
+	return tb_timer_task_init_at(handle, tb_timer_now(timer) + delay, delay, repeat, func, priv);
 }
-tb_handle_t tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data)
+tb_handle_t tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
@@ -448,7 +448,7 @@ tb_handle_t tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 		// init task
 		task->refn 		= 2;
 		task->func 		= func;
-		task->data 		= data;
+		task->priv 		= priv;
 		task->when 		= when;
 		task->period 	= period;
 		task->repeat 	= repeat? 1 : 0;
@@ -470,25 +470,25 @@ tb_handle_t tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 	// ok?
 	return task;
 }
-tb_handle_t tb_timer_task_init_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data)
+tb_handle_t tb_timer_task_init_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
 	tb_assert_and_check_return_val(timer && func, tb_null);
 
 	// add task
-	return tb_timer_task_init_at(handle, tb_timer_now(timer) + after, period, repeat, func, data);
+	return tb_timer_task_init_at(handle, tb_timer_now(timer) + after, period, repeat, func, priv);
 }
-tb_void_t tb_timer_task_post(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data)
+tb_void_t tb_timer_task_post(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
 	tb_assert_and_check_return(timer && func);
 
 	// run task
-	tb_timer_task_post_at(handle, tb_timer_now(timer) + delay, delay, repeat, func, data);
+	tb_timer_task_post_at(handle, tb_timer_now(timer) + delay, delay, repeat, func, priv);
 }
-tb_void_t tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data)
+tb_void_t tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
@@ -516,7 +516,7 @@ tb_void_t tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 		// init task
 		task->refn 		= 1;
 		task->func 		= func;
-		task->data 		= data;
+		task->priv 		= priv;
 		task->when 		= when;
 		task->period 	= period;
 		task->repeat 	= repeat? 1 : 0;
@@ -535,14 +535,14 @@ tb_void_t tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 	if (event && task && when < when_top)
 		tb_event_post(event);
 }
-tb_void_t tb_timer_task_post_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data)
+tb_void_t tb_timer_task_post_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
 	tb_assert_and_check_return(timer && func);
 
 	// run task
-	tb_timer_task_post_at(handle, tb_timer_now(timer) + after, period, repeat, func, data);
+	tb_timer_task_post_at(handle, tb_timer_now(timer) + after, period, repeat, func, priv);
 }
 tb_void_t tb_timer_task_exit(tb_handle_t handle, tb_handle_t htask)
 {
@@ -565,7 +565,7 @@ tb_void_t tb_timer_task_exit(tb_handle_t handle, tb_handle_t htask)
 
 		// cancel task
 		task->func 		= tb_null;
-		task->data 		= tb_null;
+		task->priv 		= tb_null;
 		task->repeat 	= 0;
 	}
 	// remove it from pool directly if the task have been expired 

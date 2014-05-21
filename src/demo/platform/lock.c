@@ -23,11 +23,11 @@ static __tb_volatile__ tb_atomic_t g_value = 0;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * loop
  */
-static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t data)
+static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t priv)
 {
 	// check
 	tb_uint32_t self = (tb_uint32_t)tb_thread_self();
-	tb_handle_t lock = (tb_handle_t)data; tb_used(lock);
+	tb_handle_t lock = (tb_handle_t)priv; tb_used(lock);
 	tb_trace_i("[loop: %x]: init", self);
 
 	// loop

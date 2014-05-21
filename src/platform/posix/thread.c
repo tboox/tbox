@@ -34,7 +34,7 @@
  * implementation
  */
 
-tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t data, tb_size_t stack)
+tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack)
 {
 	// done
 	pthread_t 		handle;
@@ -50,7 +50,7 @@ tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpoint
 		}
 
 		// init thread
-		if (pthread_create(&handle, stack? &attr : tb_null, (tb_pointer_t (*)(tb_pointer_t))func, (tb_pointer_t)data)) break;
+		if (pthread_create(&handle, stack? &attr : tb_null, (tb_pointer_t (*)(tb_pointer_t))func, (tb_pointer_t)priv)) break;
 
 		// ok
 		ok = tb_true;

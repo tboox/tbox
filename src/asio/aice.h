@@ -522,7 +522,7 @@ typedef struct __tb_aice_t
     tb_aico_func_t              func;
 
     /// the aico private data
-    tb_pointer_t                priv;
+    tb_cpointer_t               priv;
 
     /// the aico
     tb_aico_t*                  aico;

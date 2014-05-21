@@ -161,7 +161,7 @@ static tb_char_t const* tb_ssl_error(tb_long_t error)
 	return "";
 }
 #endif
-static tb_long_t tb_ssl_sock_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_ssl_sock_read(tb_cpointer_t priv, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(priv, -1);
@@ -169,7 +169,7 @@ static tb_long_t tb_ssl_sock_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t 
 	// recv it
 	return tb_socket_recv((tb_handle_t)priv, data, size);
 }
-static tb_long_t tb_ssl_sock_writ(tb_pointer_t priv, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_ssl_sock_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(priv, -1);
@@ -177,7 +177,7 @@ static tb_long_t tb_ssl_sock_writ(tb_pointer_t priv, tb_byte_t const* data, tb_s
 	// send it
 	return tb_socket_send((tb_handle_t)priv, data, size);
 }
-static tb_long_t tb_ssl_sock_wait(tb_pointer_t priv, tb_size_t code, tb_long_t timeout)
+static tb_long_t tb_ssl_sock_wait(tb_cpointer_t priv, tb_size_t code, tb_long_t timeout)
 {
 	// check
 	tb_assert_and_check_return_val(priv, -1);
@@ -445,7 +445,7 @@ tb_void_t tb_ssl_set_bio_sock(tb_handle_t handle, tb_handle_t sock)
 	// set bio: sock
 	tb_ssl_set_bio_func(ssl, tb_ssl_sock_read, tb_ssl_sock_writ, tb_ssl_sock_wait, sock);
 }
-tb_void_t tb_ssl_set_bio_func(tb_handle_t handle, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_pointer_t priv)
+tb_void_t tb_ssl_set_bio_func(tb_handle_t handle, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv)
 {
 	// the ssl
 	tb_ssl_t* ssl = (tb_ssl_t*)handle;

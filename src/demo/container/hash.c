@@ -553,11 +553,11 @@ static tb_void_t tb_hash_test_i2t_perf()
 
 	tb_hash_exit(hash);
 }
-static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
-	tb_assert_and_check_return_val(hash && bdel && data, tb_false);
+	tb_assert_and_check_return_val(hash && bdel && priv, tb_false);
 
-	tb_hize_t* test = data;
+	tb_hize_t* test = (tb_hize_t*)priv;
 	if (item)
 	{
 		if (!(((tb_size_t)item->data >> 25) & 0x1))
@@ -598,7 +598,7 @@ static tb_void_t tb_hash_test_walk_perf()
 	// performance
 	tb_hong_t t = tb_mclock();
 	__tb_volatile__ tb_hize_t test[3] = {0};
-	tb_hash_walk(hash, tb_hash_test_walk_item, (tb_pointer_t)test);
+	tb_hash_walk(hash, tb_hash_test_walk_item, (tb_cpointer_t)test);
 	t = tb_mclock() - t;
 	tb_trace_i("name: %llx, data: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], test[2], tb_hash_size(hash), t);
 

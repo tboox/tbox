@@ -38,7 +38,7 @@
  * @param killed 	is killed?
  * @param data 		the timer data
  */
-typedef tb_void_t 	(*tb_timer_task_func_t)(tb_bool_t killed, tb_cpointer_t data);
+typedef tb_void_t 	(*tb_timer_task_func_t)(tb_bool_t killed, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -108,7 +108,7 @@ tb_bool_t 			tb_timer_spak(tb_handle_t handle);
 /*! loop timer for the external thread
  *
  * @code
- * tb_void_t tb_timer_thread(tb_pointer_t)
+ * tb_void_t tb_timer_thread(tb_cpointer_t priv)
  * {
  * 		tb_timer_loop(timer);
  * }
@@ -126,10 +126,10 @@ tb_void_t 			tb_timer_loop(tb_handle_t handle);
  * @param delay 	the delay time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
- * @param data		the timer data
+ * @param priv		the timer priv
  *
  */
-tb_void_t 			tb_timer_task_post(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
+tb_void_t 			tb_timer_task_post(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv);
 
 /*! post timer task at the absolute time and will be auto-remove it after be expired
  *
@@ -138,10 +138,10 @@ tb_void_t 			tb_timer_task_post(tb_handle_t handle, tb_size_t delay, tb_bool_t r
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
- * @param data		the timer data
+ * @param priv		the timer priv
  *
  */
-tb_void_t 			tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
+tb_void_t 			tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv);
 
 /*! post timer task after the relative time and will be auto-remove it after be expired
  *
@@ -150,10 +150,10 @@ tb_void_t 			tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
- * @param data		the timer data
+ * @param priv		the timer priv
  *
  */
-tb_void_t 			tb_timer_task_post_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
+tb_void_t 			tb_timer_task_post_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv);
 
 /*! init and post timer task after delay and need remove it manually
  *
@@ -161,11 +161,11 @@ tb_void_t 			tb_timer_task_post_after(tb_handle_t handle, tb_hize_t after, tb_si
  * @param delay 	the delay time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
- * @param data		the timer data
+ * @param priv		the timer priv
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_timer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
+tb_handle_t 		tb_timer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv);
 
 /*! init and post timer task at the absolute time and need remove it manually
  *
@@ -174,11 +174,11 @@ tb_handle_t 		tb_timer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t 
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
- * @param data		the timer data
+ * @param priv		the timer priv
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
+tb_handle_t 		tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv);
 
 /*! init and post timer task after the relative time and need remove it manually
  *
@@ -187,11 +187,11 @@ tb_handle_t 		tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
- * @param data		the timer data
+ * @param priv		the timer priv
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_timer_task_init_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t data);
+tb_handle_t 		tb_timer_task_init_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv);
 
 /*! exit timer task, the task will be not called if have been not called
  *

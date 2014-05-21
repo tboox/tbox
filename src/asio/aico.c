@@ -148,7 +148,7 @@ tb_void_t tb_aico_timeout_set(tb_handle_t haico, tb_size_t type, tb_long_t timeo
     // set the aico timeout
     tb_atomic_set((tb_atomic_t*)(aico->timeout + type), (tb_atomic_t)timeout);
 }
-tb_bool_t tb_aico_acpt_(tb_handle_t haico, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_acpt_(tb_handle_t haico, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -165,7 +165,7 @@ tb_bool_t tb_aico_acpt_(tb_handle_t haico, tb_aico_func_t func, tb_pointer_t pri
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_conn_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_conn_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -184,7 +184,7 @@ tb_bool_t tb_aico_conn_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_recv_(tb_handle_t haico, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_recv_(tb_handle_t haico, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -203,7 +203,7 @@ tb_bool_t tb_aico_recv_(tb_handle_t haico, tb_byte_t* data, tb_size_t size, tb_a
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_send_(tb_handle_t haico, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_send_(tb_handle_t haico, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -222,7 +222,7 @@ tb_bool_t tb_aico_send_(tb_handle_t haico, tb_byte_t const* data, tb_size_t size
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_urecv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_urecv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -243,7 +243,7 @@ tb_bool_t tb_aico_urecv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t por
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usend_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usend_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -264,7 +264,7 @@ tb_bool_t tb_aico_usend_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t por
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_recvv_(tb_handle_t haico, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_recvv_(tb_handle_t haico, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -283,7 +283,7 @@ tb_bool_t tb_aico_recvv_(tb_handle_t haico, tb_iovec_t const* list, tb_size_t si
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_sendv_(tb_handle_t haico, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_sendv_(tb_handle_t haico, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -302,7 +302,7 @@ tb_bool_t tb_aico_sendv_(tb_handle_t haico, tb_iovec_t const* list, tb_size_t si
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_urecvv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_urecvv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -323,7 +323,7 @@ tb_bool_t tb_aico_urecvv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t po
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usendv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usendv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -344,7 +344,7 @@ tb_bool_t tb_aico_usendv_(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t po
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_sendf_(tb_handle_t haico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_sendf_(tb_handle_t haico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -364,7 +364,7 @@ tb_bool_t tb_aico_sendf_(tb_handle_t haico, tb_handle_t file, tb_hize_t seek, tb
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_read_(tb_handle_t haico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_read_(tb_handle_t haico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -384,7 +384,7 @@ tb_bool_t tb_aico_read_(tb_handle_t haico, tb_hize_t seek, tb_byte_t* data, tb_s
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_writ_(tb_handle_t haico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_writ_(tb_handle_t haico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -404,7 +404,7 @@ tb_bool_t tb_aico_writ_(tb_handle_t haico, tb_hize_t seek, tb_byte_t const* data
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_readv_(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_readv_(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -424,7 +424,7 @@ tb_bool_t tb_aico_readv_(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* li
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_writv_(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_writv_(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -444,7 +444,7 @@ tb_bool_t tb_aico_writv_(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* li
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_fsync_(tb_handle_t haico, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_fsync_(tb_handle_t haico, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -461,7 +461,7 @@ tb_bool_t tb_aico_fsync_(tb_handle_t haico, tb_aico_func_t func, tb_pointer_t pr
     // post
     return tb_aicp_post_(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_acpt_after_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_acpt_after_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -478,7 +478,7 @@ tb_bool_t tb_aico_acpt_after_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_conn_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_conn_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -497,7 +497,7 @@ tb_bool_t tb_aico_conn_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t cons
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_recv_after_(tb_handle_t haico, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_recv_after_(tb_handle_t haico, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -516,7 +516,7 @@ tb_bool_t tb_aico_recv_after_(tb_handle_t haico, tb_size_t delay, tb_byte_t* dat
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_send_after_(tb_handle_t haico, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_send_after_(tb_handle_t haico, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -535,7 +535,7 @@ tb_bool_t tb_aico_send_after_(tb_handle_t haico, tb_size_t delay, tb_byte_t cons
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_urecv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_urecv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -556,7 +556,7 @@ tb_bool_t tb_aico_urecv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t con
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usend_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usend_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -577,7 +577,7 @@ tb_bool_t tb_aico_usend_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t con
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_recvv_after_(tb_handle_t haico, tb_size_t delay, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_recvv_after_(tb_handle_t haico, tb_size_t delay, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -596,7 +596,7 @@ tb_bool_t tb_aico_recvv_after_(tb_handle_t haico, tb_size_t delay, tb_iovec_t co
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_sendv_after_(tb_handle_t haico, tb_size_t delay, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_sendv_after_(tb_handle_t haico, tb_size_t delay, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -615,7 +615,7 @@ tb_bool_t tb_aico_sendv_after_(tb_handle_t haico, tb_size_t delay, tb_iovec_t co
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_urecvv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_urecvv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -636,7 +636,7 @@ tb_bool_t tb_aico_urecvv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t co
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usendv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usendv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -657,7 +657,7 @@ tb_bool_t tb_aico_usendv_after_(tb_handle_t haico, tb_size_t delay, tb_ipv4_t co
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_sendf_after_(tb_handle_t haico, tb_size_t delay, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_sendf_after_(tb_handle_t haico, tb_size_t delay, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -677,7 +677,7 @@ tb_bool_t tb_aico_sendf_after_(tb_handle_t haico, tb_size_t delay, tb_handle_t f
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_read_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_read_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -697,7 +697,7 @@ tb_bool_t tb_aico_read_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_writ_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_writ_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -717,7 +717,7 @@ tb_bool_t tb_aico_writ_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_readv_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_readv_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -737,7 +737,7 @@ tb_bool_t tb_aico_readv_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t see
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_writv_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_writv_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -757,7 +757,7 @@ tb_bool_t tb_aico_writv_after_(tb_handle_t haico, tb_size_t delay, tb_hize_t see
     // post
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_fsync_after_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_fsync_after_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
@@ -775,7 +775,7 @@ tb_bool_t tb_aico_fsync_after_(tb_handle_t haico, tb_size_t delay, tb_aico_func_
     return tb_aicp_post_after_(aico->aicp, delay, &aice __tb_debug_args__);
 }
 
-tb_bool_t tb_aico_task_run_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_task_run_(tb_handle_t haico, tb_size_t delay, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;

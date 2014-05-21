@@ -34,7 +34,7 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 # 	include "posix/thread.c"
 #else
-tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t data, tb_size_t stack)
+tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_cpointer_t priv, tb_size_t stack)
 {
 	tb_trace_noimpl();
 	return tb_null;
