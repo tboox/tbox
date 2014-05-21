@@ -30,4 +30,19 @@
 #include "../stream.h"
 #include "../async_stream.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inlines
+ */
+static __tb_inline__ tb_void_t tb_async_stream_clear(tb_async_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return(stream);
+
+	// clear rcache
+	tb_scoped_buffer_clear(&stream->rcache_data);
+
+	// clear wcache
+	tb_scoped_buffer_clear(&stream->wcache_data);
+}
+
 #endif

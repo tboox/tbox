@@ -116,8 +116,9 @@ static tb_void_t tb_transfer_task_exit(tb_transfer_task_t* task, tb_bool_t bcall
 	// trace
 	tb_trace_d("task[%p]: exit", task);
 
+    // TODO
 	// exit transfer
-	if (task->transfer) tb_transfer_exit(task->transfer, bcalling);
+	if (task->transfer) tb_transfer_exit(task->transfer);
 	task->transfer = tb_null;
 
 	// free it

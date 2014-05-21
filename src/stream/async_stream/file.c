@@ -45,6 +45,17 @@
  * types
  */
 
+// the file stream clos type
+typedef struct __tb_async_stream_file_clos_t
+{
+    // the func
+    tb_async_stream_clos_func_t         func;
+
+    // the priv
+    tb_cpointer_t                       priv;
+
+}tb_async_stream_file_clos_t;
+
 // the file stream type
 typedef struct __tb_async_stream_file_t
 {
@@ -69,6 +80,9 @@ typedef struct __tb_async_stream_file_t
     // is closing
     tb_bool_t                           bclosing;
 
+    // the clos
+    tb_async_stream_file_clos_t         clos;
+
     // the func
     union
     {
@@ -92,6 +106,36 @@ static __tb_inline__ tb_async_stream_file_t* tb_async_stream_file_cast(tb_handle
     tb_async_stream_t* astream = (tb_async_stream_t*)stream;
     tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_null);
     return (tb_async_stream_file_t*)astream;
+}
+static tb_void_t tb_async_stream_file_aico_exit(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_file_t* fstream = tb_async_stream_file_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(fstream);
+
+    // done clos func
+    if (fstream->clos.func) fstream->clos.func((tb_handle_t)fstream, TB_STATE_OK, fstream->clos.priv);
+
+    // clear clos func
+    fstream->clos.func = tb_null;
+    fstream->clos.priv = tb_null;
+
+    // clear the offset
+    tb_atomic64_set0(&fstream->offset);
+
+    // exit it
+    if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
+    fstream->file = tb_null;
+    fstream->bref = tb_false;
+
+	// clear base
+	tb_async_stream_clear(&fstream->base);
+
+    // clear opened
+	tb_atomic_set0(&fstream->base.base.bopened);
+
+    // trace
+    tb_trace_d("clos: ok");
 }
 static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
@@ -126,8 +170,12 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
             }
         }
 
+        // init clos
+        fstream->clos.func = tb_null;
+        fstream->clos.priv = tb_null;
+
         // addo file
-        fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file, tb_null, tb_null);
+        fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file, tb_async_stream_file_aico_exit, fstream);
         tb_assert_and_check_break(fstream->aico);
 
         // init offset
@@ -151,31 +199,21 @@ static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_
 {   
     // check
     tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
-    tb_assert_and_check_return_val(fstream, tb_false);
+    tb_assert_and_check_return_val(fstream && fstream->aico && func, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
 
-    // noimpl
-    tb_trace_noimpl();
-    return tb_false;
+    // init clos
+    fstream->clos.func = func;
+    fstream->clos.priv = priv;
 
-#if 0
     // exit aico
-    if (fstream->aico) tb_aico_exit(fstream->aico);
+    tb_aico_exit(fstream->aico);
     fstream->aico = tb_null;
 
-    // clear the offset
-    tb_atomic64_set0(&fstream->offset);
-
-    // exit it
-    if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
-    fstream->file = tb_null;
-    fstream->bref = tb_false;
-
-    // trace
-    tb_trace_d("clos: ok");
-#endif
+    // ok
+    return tb_true;
 }
 static tb_bool_t tb_async_stream_file_read_func(tb_aice_t const* aice)
 {

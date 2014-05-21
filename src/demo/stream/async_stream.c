@@ -380,7 +380,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 	} while (0);
 
 	// exit transfer
-	if (context.transfer) tb_transfer_exit(context.transfer, tb_false);
+	if (context.transfer) tb_transfer_exit(context.transfer);
 	context.transfer = tb_null;
 
 	// exit istream
