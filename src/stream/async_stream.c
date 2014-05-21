@@ -634,16 +634,6 @@ tb_bool_t tb_async_stream_clos_(tb_async_stream_t* stream, tb_async_stream_clos_
 
 	// clos it
 	return stream->clos(stream, func, priv);
-
-    // TODO
-	// not opened
-//	tb_atomic_set0(&stream->base.bopened);
-
-	// clear rcache
-//	tb_scoped_buffer_clear(&stream->rcache_data);
-
-	// clear wcache
-//	tb_scoped_buffer_clear(&stream->wcache_data);
 }
 tb_bool_t tb_async_stream_read_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {

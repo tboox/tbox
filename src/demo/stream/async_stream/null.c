@@ -60,7 +60,7 @@ tb_int_t tb_demo_stream_async_stream_null_main(tb_int_t argc, tb_char_t** argv)
 	} while (0);
 
 	// exit transfer
-	if (transfer) tb_transfer_exit(transfer, tb_false);
+	if (transfer) tb_transfer_exit(transfer);
 	transfer = tb_null;
 
 	// exit fstream

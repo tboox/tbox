@@ -696,8 +696,9 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
 		if (http->stream) tb_async_stream_clos(http->stream, tb_null, tb_null);
 		http->stream = http->sstream;
 
+        // TODO
 		// exit transfer
-		if (http->transfer) tb_transfer_exit(http->transfer, tb_true);
+		if (http->transfer) tb_transfer_exit(http->transfer);
 		http->transfer = tb_null;
 
 		// done location url
@@ -1369,8 +1370,9 @@ tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 	if (http->stream) tb_async_stream_clos(http->stream, tb_null, tb_null);
 	http->stream = http->sstream;
 
+    // TODO
 	// exit transfer
-	if (http->transfer) tb_transfer_exit(http->transfer, bcalling);
+	if (http->transfer) tb_transfer_exit(http->transfer);
 	http->transfer = tb_null;
 
 	// exit the post file
@@ -1408,8 +1410,9 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// exit stream
 	http->stream = tb_null;
 	
+    // TODO
 	// exit transfer
-	if (http->transfer) tb_transfer_exit(http->transfer, bcalling);
+	if (http->transfer) tb_transfer_exit(http->transfer);
 	http->transfer = tb_null;
 
 	// exit the post file
@@ -1512,8 +1515,9 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 		if (http->stream) tb_async_stream_clos(http->stream, tb_null, tb_null);
 		http->stream = http->sstream;
 
+        // TODO
 		// exit transfer
-		if (http->transfer) tb_transfer_exit(http->transfer, tb_true);
+		if (http->transfer) tb_transfer_exit(http->transfer);
 		http->transfer = tb_null;
 
 		// trace

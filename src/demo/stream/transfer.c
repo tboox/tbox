@@ -105,7 +105,7 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
 	tb_trace_i("exit: ..");
 
 	// exit transfer
-	if (transfer) tb_transfer_exit(transfer, tb_false);
+	if (transfer) tb_transfer_exit(transfer);
 	transfer = tb_null;
 
 	// exit istream
