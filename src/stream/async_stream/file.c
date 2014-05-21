@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME                "async_stream_file"
-#define TB_TRACE_MODULE_DEBUG               (0)
+#define TB_TRACE_MODULE_DEBUG               (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -113,12 +113,8 @@ static tb_void_t tb_async_stream_file_aico_exit(tb_handle_t aico, tb_cpointer_t 
     tb_async_stream_file_t* fstream = tb_async_stream_file_cast((tb_handle_t)priv);
     tb_assert_and_check_return(fstream);
 
-    // done clos func
-    if (fstream->clos.func) fstream->clos.func((tb_handle_t)fstream, TB_STATE_OK, fstream->clos.priv);
-
-    // clear clos func
-    fstream->clos.func = tb_null;
-    fstream->clos.priv = tb_null;
+    // trace
+    tb_trace_d("clos: notify: ..");
 
     // clear the offset
     tb_atomic64_set0(&fstream->offset);
@@ -134,8 +130,14 @@ static tb_void_t tb_async_stream_file_aico_exit(tb_handle_t aico, tb_cpointer_t 
     // clear opened
 	tb_atomic_set0(&fstream->base.base.bopened);
 
+    /* done clos func
+     *
+     * note: cannot use this stream after closing, the stream may be exited in the closing func
+     */
+    if (fstream->clos.func) fstream->clos.func((tb_handle_t)fstream, TB_STATE_OK, fstream->clos.priv);
+
     // trace
-    tb_trace_d("clos: ok");
+    tb_trace_d("clos: notify: ok");
 }
 static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
@@ -208,9 +210,15 @@ static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_
     fstream->clos.func = func;
     fstream->clos.priv = priv;
 
-    // exit aico
-    tb_aico_exit(fstream->aico);
+    // save and clear aico
+    tb_handle_t aico = fstream->aico;
     fstream->aico = tb_null;
+
+    /* exit aico
+     *
+     * note: cannot use this stream after exiting, the stream may be exited after calling clos func
+     */
+    tb_aico_exit(aico);
 
     // ok
     return tb_true;
