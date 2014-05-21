@@ -586,7 +586,7 @@ tb_void_t tb_vector_nremove_last(tb_vector_t* handle, tb_size_t size)
 	// remove last
 	tb_vector_nremove(vector, vector->size - size, size);
 }
-tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
+tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
 	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;

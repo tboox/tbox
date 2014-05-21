@@ -432,7 +432,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
 	// check
 	tb_value_t* tuple = (tb_value_t*)priv;

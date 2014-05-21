@@ -153,7 +153,7 @@ tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_stack_item_func(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+ * tb_bool_t tb_stack_item_func(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
  * {
  * 		// check
  * 		tb_assert_and_check_return_val(stack && bdel, tb_false);
@@ -171,7 +171,7 @@ tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
  * @param data 		the walk data
  *
  */
-tb_void_t 			tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
+tb_void_t 			tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
 
 
 #endif

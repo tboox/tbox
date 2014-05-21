@@ -53,7 +53,7 @@
  *
  * @return 			the real size, no data: 0, failed: -1
  */
-typedef tb_long_t 	(*tb_ssl_func_read_t)(tb_pointer_t priv, tb_byte_t* data, tb_size_t size);
+typedef tb_long_t 	(*tb_ssl_func_read_t)(tb_cpointer_t priv, tb_byte_t* data, tb_size_t size);
 
 /*! the ssl writ func type 
  *
@@ -63,7 +63,7 @@ typedef tb_long_t 	(*tb_ssl_func_read_t)(tb_pointer_t priv, tb_byte_t* data, tb_
  *
  * @return 			the real size, no data: 0, failed: -1
  */
-typedef tb_long_t 	(*tb_ssl_func_writ_t)(tb_pointer_t priv, tb_byte_t const* data, tb_size_t size);
+typedef tb_long_t 	(*tb_ssl_func_writ_t)(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size);
 
 /*! the ssl wait func type 
  *
@@ -73,7 +73,7 @@ typedef tb_long_t 	(*tb_ssl_func_writ_t)(tb_pointer_t priv, tb_byte_t const* dat
  *
  * @return 			the real code, no event: 0, failed or closed: -1
  */
-typedef tb_long_t 	(*tb_ssl_func_wait_t)(tb_pointer_t priv, tb_size_t code, tb_long_t timeout);
+typedef tb_long_t 	(*tb_ssl_func_wait_t)(tb_cpointer_t priv, tb_size_t code, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -108,7 +108,7 @@ tb_void_t 			tb_ssl_set_bio_sock(tb_handle_t ssl, tb_handle_t sock);
  * #param wait 		the wait func only for tb_ssl_open and tb_ssl_wait
  * @param priv 		the priv data
  */
-tb_void_t 			tb_ssl_set_bio_func(tb_handle_t ssl, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_pointer_t priv);
+tb_void_t 			tb_ssl_set_bio_func(tb_handle_t ssl, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv);
 
 /*! set ssl timeout for opening
  *

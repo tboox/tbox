@@ -286,7 +286,7 @@ tb_void_t           tb_aicp_loop(tb_aicp_t* aicp);
  *
  * @param aicp      the aicp
  */
-tb_void_t           tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_pointer_t priv), tb_pointer_t priv);
+tb_void_t           tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t priv), tb_cpointer_t priv);
 
 /*! kill the spak 
  *

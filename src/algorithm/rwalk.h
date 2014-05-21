@@ -34,7 +34,7 @@
  */
 
 /// the reverse walk func type
-typedef tb_bool_t 	(*tb_rwalk_func_t)(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_rwalk_func_t)(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -50,7 +50,7 @@ typedef tb_bool_t 	(*tb_rwalk_func_t)(tb_iterator_t* iterator, tb_pointer_t item
  *
  * @return 			the item count
  */
-tb_size_t 			tb_rwalk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_rwalk_func_t func, tb_pointer_t priv);
+tb_size_t 			tb_rwalk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_rwalk_func_t func, tb_cpointer_t priv);
 
 /*! the reverse walker for all
  *
@@ -60,7 +60,7 @@ tb_size_t 			tb_rwalk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, t
  *
  * @return 			the item count
  */
-tb_size_t 			tb_rwalk_all(tb_iterator_t* iterator, tb_rwalk_func_t func, tb_pointer_t priv);
+tb_size_t 			tb_rwalk_all(tb_iterator_t* iterator, tb_rwalk_func_t func, tb_cpointer_t priv);
 
 
 #endif

@@ -564,7 +564,7 @@ static tb_object_t* tb_object_bplist_reader_done(tb_basic_stream_t* stream)
 			case TB_OBJECT_TYPE_ARRAY:
 				{
 					// the priv data
-					tb_byte_t* priv = tb_object_getp(object);
+					tb_byte_t* priv = (tb_byte_t*)tb_object_getp(object);
 					if (priv)
 					{
 						// count
@@ -602,7 +602,7 @@ static tb_object_t* tb_object_bplist_reader_done(tb_basic_stream_t* stream)
 			case TB_OBJECT_TYPE_DICTIONARY:
 				{ 
 					// the priv data
-					tb_byte_t* priv = tb_object_getp(object);
+					tb_byte_t* priv = (tb_byte_t*)tb_object_getp(object);
 					if (priv)
 					{
 						// count

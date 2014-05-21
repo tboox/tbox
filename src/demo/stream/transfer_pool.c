@@ -20,7 +20,7 @@ static tb_handle_t g_event = tb_null;
  * implementation
  */ 
 #if TB_DEMO_TEST_AICP
-static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
@@ -40,7 +40,7 @@ static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, t
 	return tb_true;
 }
 #else
-static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE

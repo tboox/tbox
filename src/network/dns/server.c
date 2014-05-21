@@ -271,7 +271,7 @@ end:
 	// ok
 	return rate;
 }
-static tb_bool_t tb_dns_server_rate(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_dns_server_rate(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(vector && bdel, tb_false);

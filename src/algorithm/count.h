@@ -43,7 +43,7 @@
  *
  * @return 			the real count
  */
-tb_size_t 			tb_count(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp);
+tb_size_t 			tb_count(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t priv, tb_iterator_comp_t comp);
 
 /*! the counter for all
  *
@@ -53,6 +53,6 @@ tb_size_t 			tb_count(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, t
  *
  * @return 			the real count
  */
-tb_size_t 			tb_count_all(tb_iterator_t* iterator, tb_cpointer_t data, tb_iterator_comp_t comp);
+tb_size_t 			tb_count_all(tb_iterator_t* iterator, tb_cpointer_t priv, tb_iterator_comp_t comp);
 
 #endif

@@ -692,7 +692,7 @@ tb_size_t tb_single_list_moveto_tail(tb_single_list_t* handle, tb_size_t move)
 {
 	return tb_single_list_moveto_prev(handle, tb_iterator_tail(handle), move);
 }
-tb_void_t tb_single_list_walk(tb_single_list_t* handle, tb_bool_t (*func)(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
+tb_void_t tb_single_list_walk(tb_single_list_t* handle, tb_bool_t (*func)(tb_single_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
 	// check
 	tb_single_list_impl_t* list = (tb_single_list_impl_t*)handle;

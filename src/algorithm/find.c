@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp)
+tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t priv, tb_iterator_comp_t comp)
 {
 	// check
 	tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
@@ -45,13 +45,13 @@ tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cp
 	tb_long_t find = -1;
 	tb_size_t itor = head;
 	for (; itor != tail; itor = tb_iterator_next(iterator, itor)) 
-		if (!(find = comp(iterator, tb_iterator_item(iterator, itor), data))) break;
+		if (!(find = comp(iterator, tb_iterator_item(iterator, itor), priv))) break;
 
 	// ok?
 	return !find? itor : tail;
 } 
-tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t data, tb_iterator_comp_t comp)
+tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t priv, tb_iterator_comp_t comp)
 {
-	return tb_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), data, comp);
+	return tb_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), priv, comp);
 }
 

@@ -80,7 +80,7 @@ typedef struct __tb_async_stream_file_t
 	} 									func;
 
 	// the priv
-	tb_pointer_t 						priv;
+	tb_cpointer_t 						priv;
 
 }tb_async_stream_file_t;
 
@@ -93,7 +93,7 @@ static __tb_inline__ tb_async_stream_file_t* tb_async_stream_file_cast(tb_handle
 	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_null);
 	return (tb_async_stream_file_t*)astream;
 }
-static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
@@ -192,7 +192,7 @@ static tb_bool_t tb_async_stream_file_read_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_async_stream_file_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_file_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
@@ -251,7 +251,7 @@ static tb_bool_t tb_async_stream_file_writ_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_async_stream_file_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_file_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
@@ -264,7 +264,7 @@ static tb_bool_t tb_async_stream_file_writ(tb_handle_t astream, tb_size_t delay,
 	// post writ
 	return tb_aico_writ_after(fstream->aico, delay, (tb_hize_t)tb_atomic64_get(&fstream->offset), data, size, tb_async_stream_file_writ_func, astream);
 }
-static tb_bool_t tb_async_stream_file_seek(tb_handle_t astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_file_seek(tb_handle_t astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
@@ -306,7 +306,7 @@ static tb_bool_t tb_async_stream_file_sync_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_async_stream_file_sync(tb_handle_t astream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_file_sync(tb_handle_t astream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
@@ -342,7 +342,7 @@ static tb_bool_t tb_async_stream_file_task_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_async_stream_file_task(tb_handle_t astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_async_stream_file_task(tb_handle_t astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);

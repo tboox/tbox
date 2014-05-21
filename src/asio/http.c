@@ -52,7 +52,7 @@ typedef struct __tb_aicp_http_oread_t
 	tb_aicp_http_read_func_t 		func;
 
 	// the priv
-	tb_pointer_t 					priv;
+	tb_cpointer_t 					priv;
 
 	// the size
 	tb_size_t 						size;
@@ -66,7 +66,7 @@ typedef struct __tb_aicp_http_oseek_t
 	tb_aicp_http_seek_func_t 		func;
 
 	// the priv
-	tb_pointer_t 					priv;
+	tb_cpointer_t 					priv;
 
 	// the offset
 	tb_hize_t 						offset;
@@ -143,7 +143,7 @@ typedef struct __tb_aicp_http_t
 	} 								func;
 
 	// the priv
-	tb_pointer_t 					priv;
+	tb_cpointer_t 					priv;
 
 }tb_aicp_http_t;
 
@@ -428,7 +428,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
 	// ok
 	return tb_scoped_string_cstr(&http->line_data);
 }
-static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_oread_t* oread = (tb_aicp_http_oread_t*)priv;
@@ -462,7 +462,7 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_aicp_http_open_seek_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_open_seek_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_oseek_t* oseek = (tb_aicp_http_oseek_t*)priv;
@@ -664,7 +664,7 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -733,7 +733,7 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
 	// break
 	return tb_false;
 }
-static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -968,7 +968,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
 	// break 
 	return tb_false;
 }
-static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1028,7 +1028,7 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
 	// ok?
 	return bpost;
 }
-static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1095,7 +1095,7 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* astream, tb_size
 	// ok?
 	return bwrit;
 }
-static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1148,7 +1148,7 @@ static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, 
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size_t state, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1218,7 +1218,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_aicp_http_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1230,7 +1230,7 @@ static tb_bool_t tb_aicp_http_read_func(tb_async_stream_t* astream, tb_size_t st
 	// done func
 	return http->func.read(http, state, data, real, size, http->priv);
 }
-static tb_bool_t tb_aicp_http_task_func(tb_async_stream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_aicp_http_task_func(tb_async_stream_t* astream, tb_size_t state, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1440,7 +1440,7 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// trace
 	tb_trace_d("exit: ok");
 }
-tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1456,7 +1456,7 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 	// done open
 	return tb_aicp_http_open_done(http);
 }
-tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1465,7 +1465,7 @@ tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t size, tb_aicp_http_rea
 	// post read
 	return tb_aicp_http_read_after(handle, 0, size, func, priv);
 }
-tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1497,7 +1497,7 @@ tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t
 	// post read
 	return tb_async_stream_read_after(http->stream, delay, size, tb_aicp_http_read_func, http);
 }
-tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1545,7 +1545,7 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 	// ok?
 	return ok;
 }
-tb_bool_t tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_task_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_task_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1558,7 +1558,7 @@ tb_bool_t tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_ta
 	// post task
 	return tb_async_stream_task(http->stream, delay, tb_aicp_http_task_func, http);
 }
-tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1570,7 +1570,7 @@ tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_re
 	http->open_and.read.size = size;
 	return tb_aicp_http_open(http, tb_aicp_http_open_read_func, &http->open_and.read);
 }
-tb_bool_t tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -2015,7 +2015,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
 
 			// post priv
-			tb_pointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
+			tb_cpointer_t priv = (tb_cpointer_t)tb_va_arg(args, tb_cpointer_t);
 
 			// set post priv
 			http->option.post_priv = priv;
@@ -2025,7 +2025,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 	case TB_HTTP_OPTION_GET_POST_PRIV:
 		{
 			// ppost priv
-			tb_pointer_t* ppriv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
+			tb_cpointer_t* ppriv = (tb_cpointer_t*)tb_va_arg(args, tb_cpointer_t*);
 			tb_assert_and_check_return_val(ppriv, tb_false);
 
 			// get post priv

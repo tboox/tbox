@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv)
+static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(http && line, tb_false);

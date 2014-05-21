@@ -6,8 +6,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-tb_pointer_t tb_exception_test(tb_cpointer_t data);
-tb_pointer_t tb_exception_test(tb_cpointer_t data)
+tb_pointer_t tb_exception_test(tb_cpointer_t priv);
+tb_pointer_t tb_exception_test(tb_cpointer_t priv)
 {
 	// self
 	tb_size_t self = tb_thread_self();

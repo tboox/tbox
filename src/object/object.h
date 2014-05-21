@@ -83,7 +83,7 @@ tb_void_t 			tb_object_cler(tb_object_t* object);
  * @param priv 		the private data
  *
  */
-tb_void_t 			tb_object_setp(tb_object_t* object, tb_pointer_t priv);
+tb_void_t 			tb_object_setp(tb_object_t* object, tb_cpointer_t priv);
 
 /*! get the object private data
  *
@@ -91,7 +91,7 @@ tb_void_t 			tb_object_setp(tb_object_t* object, tb_pointer_t priv);
  *
  * @return 			the private data
  */
-tb_pointer_t 		tb_object_getp(tb_object_t* object);
+tb_cpointer_t 		tb_object_getp(tb_object_t* object);
 
 /*! read object
  *

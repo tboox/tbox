@@ -140,7 +140,7 @@ tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv)
+ * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
  * {
  * 		tb_assert_and_check_return_val(hash && bdel, tb_false);
  *
@@ -154,10 +154,10 @@ tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
  *
  * @param hash 			the hash
  * @param func 			the walk callback func
- * @param data 			the walk callback data
+ * @param priv 			the walk callback data
  *
  */
-tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
+tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
 
 #ifdef __tb_debug__
 /*! dump hash

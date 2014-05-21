@@ -144,7 +144,7 @@ static tb_size_t tb_item_func_hash_data_func_7(tb_byte_t const* data, tb_size_t 
 	tb_byte_t const* 	p = data;
 	for (i = 0; i < size; i++, p++) 
 	{  
-		v ^= (!(i & 1)) ? ((v << 7) ^ (*p) * (v >> 3)) : (~((v << 11) + (*p) ^ (v >> 5)));  
+		v ^= (!(i & 1)) ? ((v << 7) ^ ((*p) * (v >> 3))) : (~(((v << 11) + (*p)) ^ (v >> 5)));  
 	}
 	return v;  
 }

@@ -285,7 +285,7 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_http_request_post(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_http_request_post(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
 	// check
 	tb_http_t* http = (tb_http_t*)priv;
@@ -1527,7 +1527,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 			tb_assert_and_check_return_val(!http->bopened, tb_false);
 
 			// post priv
-			tb_pointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
+			tb_cpointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
 
 			// set post priv
 			http->option.post_priv = priv;
@@ -1537,7 +1537,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 	case TB_HTTP_OPTION_GET_POST_PRIV:
 		{
 			// ppost priv
-			tb_pointer_t* ppriv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
+			tb_cpointer_t* ppriv = (tb_cpointer_t*)tb_va_arg(args, tb_cpointer_t*);
 			tb_assert_and_check_return_val(ppriv, tb_false);
 
 			// get post priv

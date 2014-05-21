@@ -135,7 +135,7 @@ typedef struct __tb_http_range_t
  *
  * @return 				tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 		(*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv);
+typedef tb_bool_t 		(*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* line, tb_cpointer_t priv);
 
 /*! the http post func type
  *
@@ -148,7 +148,7 @@ typedef tb_bool_t 		(*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* li
  *
  * @return 				tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 		(*tb_http_post_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv);
+typedef tb_bool_t 		(*tb_http_post_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv);
 
 /// the http option type
 typedef struct __tb_http_option_t
@@ -199,7 +199,7 @@ typedef struct __tb_http_option_t
 	tb_http_post_func_t post_func;
 
 	/// the post data
-	tb_pointer_t 		post_priv;
+	tb_cpointer_t 		post_priv;
 
 	/// the post limit rate
 	tb_size_t 			post_lrate;

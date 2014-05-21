@@ -183,7 +183,7 @@ static tb_bool_t tb_object_bplist_writer_func_array(tb_object_bplist_writer_t* w
 	tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
 	// index tables
-	tb_byte_t* index_tables = tb_object_getp(object);
+	tb_byte_t* index_tables = (tb_byte_t*)tb_object_getp(object);
 
 	// size
 	tb_size_t size = tb_array_size(object);
@@ -355,7 +355,7 @@ static tb_bool_t tb_object_bplist_writer_func_dictionary(tb_object_bplist_writer
 	tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
 	// index tables
-	tb_byte_t* index_tables = tb_object_getp(object);
+	tb_byte_t* index_tables = (tb_byte_t*)tb_object_getp(object);
 
 	// size
 	tb_size_t size = tb_dictionary_size(object);
@@ -470,7 +470,7 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 			tb_size_t 	size = tb_array_size(object);
 			if (size) 
 			{
-				index_tables = tb_object_getp(object);
+				index_tables = (tb_byte_t*)tb_object_getp(object);
 				if (!index_tables)
 				{
 					// make it
@@ -508,7 +508,7 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 			tb_size_t 	size = tb_dictionary_size(object);
 			if (size) 
 			{
-				index_tables = tb_object_getp(object);
+				index_tables = (tb_byte_t*)tb_object_getp(object);
 				if (!index_tables)
 				{
 					// make it
@@ -584,7 +584,7 @@ static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_t* list, tb_hash
 			// exit item
 			if (item && item->name)
 			{
-				tb_byte_t* priv = tb_object_getp(item->name);
+				tb_byte_t* priv = (tb_byte_t*)tb_object_getp(item->name);
 				if (priv)
 				{
 					tb_free(priv);

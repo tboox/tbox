@@ -47,7 +47,7 @@ typedef struct __tb_transfer_ctrl_t
 	tb_transfer_ctrl_func_t 	func;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 }tb_transfer_ctrl_t;
 
@@ -58,7 +58,7 @@ typedef struct __tb_transfer_open_t
 	tb_transfer_open_func_t 	func;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 }tb_transfer_open_t;
 
@@ -69,7 +69,7 @@ typedef struct __tb_transfer_save_t
 	tb_transfer_save_func_t 	func;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 }tb_transfer_save_t;
 
@@ -80,7 +80,7 @@ typedef struct __tb_transfer_osave_t
 	tb_transfer_save_func_t 	func;
 
 	// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 	// the transfer
 	tb_handle_t 				transfer;
@@ -155,8 +155,8 @@ typedef struct __tb_transfer_t
  * implementation
  */
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
-static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
-static tb_bool_t tb_transfer_ostream_writ_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
+static tb_bool_t tb_transfer_ostream_writ_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)priv;
@@ -268,7 +268,7 @@ static tb_bool_t tb_transfer_ostream_writ_func(tb_async_stream_t* astream, tb_si
 	// continue to writ or break it
 	return bwrit;
 }
-static tb_bool_t tb_transfer_ostream_sync_func(tb_async_stream_t* astream, tb_size_t state, tb_bool_t bclosing, tb_pointer_t priv)
+static tb_bool_t tb_transfer_ostream_sync_func(tb_async_stream_t* astream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)priv;
@@ -286,7 +286,7 @@ static tb_bool_t tb_transfer_ostream_sync_func(tb_async_stream_t* astream, tb_si
 	// done func
 	return transfer->func.save.func(state == TB_STATE_OK? TB_STATE_CLOSED : state, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->save, trate, transfer->func.save.priv);
 }
-static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)priv;
@@ -443,7 +443,7 @@ static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_si
 	// continue to read or break it
 	return bread;
 }
-static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_size_t state, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)priv;
@@ -496,7 +496,7 @@ static tb_bool_t tb_transfer_ostream_open_func(tb_async_stream_t* astream, tb_si
 	// ok
 	return ok;
 }
-static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
+static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)priv;
@@ -567,7 +567,7 @@ static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_si
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_transfer_open_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_pointer_t priv)
+static tb_bool_t tb_transfer_open_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_osave_t* osave = (tb_transfer_osave_t*)priv;
@@ -623,7 +623,7 @@ static tb_bool_t tb_transfer_open_func(tb_size_t state, tb_hize_t offset, tb_hon
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_hong_t tb_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(ostream && istream, -1);	
@@ -740,7 +740,7 @@ tb_hong_t tb_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ost
 	// ok?
 	return writ;
 }
-tb_hong_t tb_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(istream && ourl, -1);
@@ -773,7 +773,7 @@ tb_hong_t tb_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t const* ourl,
 	// ok?
 	return size;
 }
-tb_hong_t tb_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(istream && odata && osize, -1);
@@ -799,7 +799,7 @@ tb_hong_t tb_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* odata, tb_s
 	// ok?
 	return size;
 }
-tb_hong_t tb_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(iurl && ourl, -1);
@@ -847,7 +847,7 @@ tb_hong_t tb_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_s
 	// ok?
 	return size;
 }
-tb_hong_t tb_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(iurl && ostream, -1);
@@ -873,7 +873,7 @@ tb_hong_t tb_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t* ostream,
 	// ok?
 	return size;
 }
-tb_hong_t tb_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(iurl && odata && osize, -1);
@@ -908,7 +908,7 @@ tb_hong_t tb_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t
 	// ok?
 	return size;
 }
-tb_hong_t tb_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(idata && isize && ourl, -1);
@@ -950,7 +950,7 @@ tb_hong_t tb_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t
 	// ok?
 	return size;
 }
-tb_hong_t tb_transfer_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_hong_t tb_transfer_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(idata && isize && ostream, -1);
@@ -1260,7 +1260,7 @@ tb_handle_t tb_transfer_init_da(tb_byte_t const* idata, tb_size_t isize, tb_asyn
 	// ok?
 	return (tb_handle_t)transfer;
 }
-tb_bool_t tb_transfer_ctrl(tb_handle_t handle, tb_transfer_ctrl_func_t func, tb_pointer_t priv)
+tb_bool_t tb_transfer_ctrl(tb_handle_t handle, tb_transfer_ctrl_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)handle;
@@ -1273,7 +1273,7 @@ tb_bool_t tb_transfer_ctrl(tb_handle_t handle, tb_transfer_ctrl_func_t func, tb_
 	// ok
 	return tb_true;
 }
-tb_bool_t tb_transfer_open(tb_handle_t handle, tb_transfer_open_func_t func, tb_pointer_t priv)
+tb_bool_t tb_transfer_open(tb_handle_t handle, tb_transfer_open_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)handle;
@@ -1323,7 +1323,7 @@ tb_bool_t tb_transfer_open(tb_handle_t handle, tb_transfer_open_func_t func, tb_
 	// ok?
 	return ok;
 }
-tb_bool_t tb_transfer_save(tb_handle_t handle, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_bool_t tb_transfer_save(tb_handle_t handle, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)handle;
@@ -1343,7 +1343,7 @@ tb_bool_t tb_transfer_save(tb_handle_t handle, tb_transfer_save_func_t func, tb_
 	// read it
 	return tb_async_stream_read(transfer->istream, (tb_size_t)tb_atomic_get(&transfer->lrate), tb_transfer_istream_read_func, transfer);
 }
-tb_bool_t tb_transfer_osave(tb_handle_t handle, tb_transfer_save_func_t func, tb_pointer_t priv)
+tb_bool_t tb_transfer_osave(tb_handle_t handle, tb_transfer_save_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_t* transfer = (tb_transfer_t*)handle;

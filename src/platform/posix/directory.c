@@ -38,7 +38,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * callback
  */
-static tb_void_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data)
+static tb_void_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return(path && info);
@@ -56,22 +56,19 @@ static tb_void_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
 		break;
 	}
 }
-static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data)
+static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
 	// check
-	tb_assert_and_check_return(path && info && data);
+    tb_value_t* tuple = (tb_value_t*)priv;
+	tb_assert_and_check_return(path && info && priv);
 
 	// the dest directory
-	tb_char_t const* dest = (tb_char_t const*)((tb_cpointer_t*)data)[0];
+	tb_char_t const* dest = tuple[0].cstr;
 	tb_assert_and_check_return(dest);
 
 	// the file name
-	tb_size_t size = (tb_size_t)((tb_cpointer_t*)data)[1];
+	tb_size_t size = tuple[1].ul;
 	tb_char_t const* name = path + size;
-
-	// the ok pointer
-	tb_size_t* ok = (tb_size_t*)&((tb_cpointer_t*)data)[2];
-	tb_check_return(*ok);
 
 	// the dest file path
 	tb_char_t dpath[8192] = {0};
@@ -92,16 +89,16 @@ static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
 	switch (info->type)
 	{
 	case TB_FILE_TYPE_FILE:
-		if (!tb_file_copy(path, dpath)) *ok = 0;
+		if (!tb_file_copy(path, dpath)) tuple[2].b = tb_false;
 		break;
 	case TB_FILE_TYPE_DIRECTORY:
-		if (!tb_directory_create(dpath)) *ok = 0;
+		if (!tb_directory_create(dpath)) tuple[2].b = tb_false;
 		break;
 	default:
 		break;
 	}
 }
-static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_pointer_t data)
+static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return(path && func);
@@ -136,13 +133,13 @@ static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursi
 				if (tb_file_info(temp, &info))
 				{
 					// do callback
-					if (prefix) func(temp, &info, data);
+					if (prefix) func(temp, &info, priv);
 
 					// walk to the next directory
-					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk_impl(temp, recursion, prefix, func, data);
+					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk_impl(temp, recursion, prefix, func, priv);
 	
 					// do callback
-					if (!prefix) func(temp, &info, data);
+					if (!prefix) func(temp, &info, priv);
 				}
 			}
 		}
@@ -231,7 +228,7 @@ tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
 	// ok?
 	return size;
 }
-tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_pointer_t data)
+tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return(path && func);
@@ -239,7 +236,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 	// exists?
 	tb_file_info_t info = {0};
 	if (tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
-		tb_directory_walk_impl(path, recursion, prefix, func, data);
+		tb_directory_walk_impl(path, recursion, prefix, func, priv);
 	else
 	{
 		// the full path
@@ -248,7 +245,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 		tb_assert_and_check_return(path);
 
 		// walk
-		tb_directory_walk_impl(path, recursion, prefix, func, data);
+		tb_directory_walk_impl(path, recursion, prefix, func, priv);
 	}
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
@@ -264,13 +261,13 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// walk copy
-	tb_cpointer_t data[3] = {0};
-	data[0] = (tb_cpointer_t)dest;
-	data[1] = (tb_cpointer_t)tb_strlen(path);
-	data[2] = (tb_cpointer_t)1;
-	tb_directory_walk_impl(path, tb_true, tb_true, tb_directory_walk_copy, data);
+	tb_value_t tuple[3];
+	tuple[0].cstr = dest;
+	tuple[1].ul = tb_strlen(path);
+	tuple[2].b = tb_true;
+	tb_directory_walk_impl(path, tb_true, tb_true, tb_directory_walk_copy, tuple);
 
 	// ok?
-	return data[2]? tb_true : tb_false;
+	return tuple[2].b;
 }
 

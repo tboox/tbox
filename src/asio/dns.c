@@ -277,7 +277,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(aicp, tb_false);
     
     // the dns
-    tb_aicp_dns_t* dns = aice->priv; 
+    tb_aicp_dns_t* dns = (tb_aicp_dns_t*)aice->priv; 
     tb_assert_and_check_return_val(dns, tb_false);
 
     // done
@@ -345,7 +345,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(aicp, tb_false);
     
     // the dns
-    tb_aicp_dns_t* dns = aice->priv; 
+    tb_aicp_dns_t* dns = (tb_aicp_dns_t*)aice->priv; 
     tb_assert_and_check_return_val(dns && dns->done, tb_false);
 
     // done

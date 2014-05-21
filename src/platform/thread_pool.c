@@ -227,7 +227,7 @@ static tb_void_t tb_thread_pool_instance_kill(tb_handle_t handle, tb_cpointer_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * worker implementation
  */
-static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(jobs && bdel, tb_false);
@@ -274,7 +274,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_t* jobs, tb_poin
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(jobs && bdel, tb_false);
@@ -339,7 +339,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_p
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_thread_pool_worker_walk_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(jobs && bdel, tb_false);

@@ -56,7 +56,7 @@ typedef struct __tb_transfer_task_t
 	tb_transfer_save_func_t 		func;
 
 	// the priv
-	tb_pointer_t 					priv;
+	tb_cpointer_t 					priv;
 
 	// the itor for the working list
 	tb_size_t 						itor;
@@ -123,7 +123,7 @@ static tb_void_t tb_transfer_task_exit(tb_transfer_task_t* task, tb_bool_t bcall
 	// free it
 	tb_fixed_pool_free(pool->pool, task);
 }
-static tb_bool_t tb_transfer_task_save(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_transfer_task_save(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
 	// the task
 	tb_transfer_task_t* task = (tb_transfer_task_t*)priv;
@@ -212,7 +212,7 @@ static tb_bool_t tb_transfer_task_save(tb_size_t state, tb_hize_t offset, tb_hon
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_transfer_working_kill(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv)
+static tb_bool_t tb_transfer_working_kill(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
 	// the task 
 	tb_transfer_task_t* task = (tb_transfer_task_t*)item;
@@ -227,7 +227,7 @@ static tb_bool_t tb_transfer_working_kill(tb_iterator_t* iterator, tb_pointer_t 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_transfer_working_copy(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv)
+static tb_bool_t tb_transfer_working_copy(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
 	// the task 
 	tb_transfer_task_t* task = (tb_transfer_task_t*)item;
@@ -239,7 +239,7 @@ static tb_bool_t tb_transfer_working_copy(tb_iterator_t* iterator, tb_pointer_t 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_transfer_waiting_exit(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv)
+static tb_bool_t tb_transfer_waiting_exit(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
 	// the task 
 	tb_transfer_task_t* task = (tb_transfer_task_t*)item;
@@ -251,10 +251,10 @@ static tb_bool_t tb_transfer_waiting_exit(tb_iterator_t* iterator, tb_pointer_t 
 	// ok
 	return tb_true;
 }
-static tb_pointer_t tb_transfer_pool_loop(tb_cpointer_t data)
+static tb_pointer_t tb_transfer_pool_loop(tb_cpointer_t priv)
 {
 	// aicp
-	tb_handle_t aicp = (tb_handle_t)data;
+	tb_handle_t aicp = (tb_handle_t)priv;
 
 	// trace
 	tb_trace_d("loop: init");
@@ -508,7 +508,7 @@ tb_size_t tb_transfer_pool_size(tb_handle_t handle)
 	// ok?
 	return size;
 }
-tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t save, tb_transfer_ctrl_func_t ctrl, tb_pointer_t priv)
+tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t save, tb_transfer_ctrl_func_t ctrl, tb_cpointer_t priv)
 {
 	// check
 	tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;

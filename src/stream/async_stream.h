@@ -82,7 +82,7 @@ struct __tb_async_stream_t;
  * @param stream 				the stream
  * @param priv 					the func private data
  */
-typedef tb_void_t 				(*tb_async_stream_exit_func_t)(struct __tb_async_stream_t* stream, tb_pointer_t priv);
+typedef tb_void_t 				(*tb_async_stream_exit_func_t)(struct __tb_async_stream_t* stream, tb_cpointer_t priv);
 
 /*! the stream open func type
  *
@@ -92,7 +92,7 @@ typedef tb_void_t 				(*tb_async_stream_exit_func_t)(struct __tb_async_stream_t*
  *
  * @return 						tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 				(*tb_async_stream_open_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 				(*tb_async_stream_open_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv);
 
 /*! the stream read func type
  *
@@ -105,7 +105,7 @@ typedef tb_bool_t 				(*tb_async_stream_open_func_t)(struct __tb_async_stream_t*
  *
  * @return 						tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 				(*tb_async_stream_read_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 				(*tb_async_stream_read_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 
 /*! the stream writ func type
  *
@@ -118,7 +118,7 @@ typedef tb_bool_t 				(*tb_async_stream_read_func_t)(struct __tb_async_stream_t*
  *
  * @return 						tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 				(*tb_async_stream_writ_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 				(*tb_async_stream_writ_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 
 /*! the stream seek func type
  *
@@ -129,7 +129,7 @@ typedef tb_bool_t 				(*tb_async_stream_writ_func_t)(struct __tb_async_stream_t*
  *
  * @return 						tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 				(*tb_async_stream_seek_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
+typedef tb_bool_t 				(*tb_async_stream_seek_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv);
 
 /*! the stream sync func type
  *
@@ -140,7 +140,7 @@ typedef tb_bool_t 				(*tb_async_stream_seek_func_t)(struct __tb_async_stream_t*
  *
  * @return 						tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 				(*tb_async_stream_sync_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_pointer_t priv);
+typedef tb_bool_t 				(*tb_async_stream_sync_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv);
 
 /*! the stream task func type
  *
@@ -150,7 +150,7 @@ typedef tb_bool_t 				(*tb_async_stream_sync_func_t)(struct __tb_async_stream_t*
  *
  * @return 						tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 				(*tb_async_stream_task_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 				(*tb_async_stream_task_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv);
 
 /// the stream open and read type
 typedef struct __tb_async_stream_oread_t
@@ -159,7 +159,7 @@ typedef struct __tb_async_stream_oread_t
 	tb_async_stream_read_func_t func;
 
 	/// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 	/// the size
 	tb_size_t 					size;
@@ -173,7 +173,7 @@ typedef struct __tb_async_stream_owrit_t
 	tb_async_stream_writ_func_t func;
 
 	/// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 	/// the data
 	tb_byte_t const* 			data;
@@ -190,7 +190,7 @@ typedef struct __tb_async_stream_oseek_t
 	tb_async_stream_seek_func_t	func;
 
 	/// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 	/// the offset
 	tb_hize_t 					offset;
@@ -229,7 +229,7 @@ typedef struct __tb_async_stream_sread_t
 	tb_async_stream_read_func_t func;
 
 	/// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 	/// the size
 	tb_size_t 					size;
@@ -243,7 +243,7 @@ typedef struct __tb_async_stream_sseek_t
 	tb_async_stream_seek_func_t	func;
 
 	/// the priv
-	tb_pointer_t 				priv;
+	tb_cpointer_t 				priv;
 
 	/// the offset
 	tb_hize_t 					offset;
@@ -308,22 +308,22 @@ typedef struct __tb_async_stream_t
 	tb_size_t 					wcache_maxn;
 
 	/// open
-	tb_bool_t 					(*open)(tb_handle_t stream, tb_async_stream_open_func_t func, tb_pointer_t priv);
+	tb_bool_t 					(*open)(tb_handle_t stream, tb_async_stream_open_func_t func, tb_cpointer_t priv);
 
 	/// read
-	tb_bool_t 					(*read)(tb_handle_t stream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv);
+	tb_bool_t 					(*read)(tb_handle_t stream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv);
 
 	/// writ
-	tb_bool_t 					(*writ)(tb_handle_t stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv);
+	tb_bool_t 					(*writ)(tb_handle_t stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv);
 
 	/// seek
-	tb_bool_t 					(*seek)(tb_handle_t stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv);
+	tb_bool_t 					(*seek)(tb_handle_t stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv);
 
 	/// sync
-	tb_bool_t 					(*sync)(tb_handle_t stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_pointer_t priv);
+	tb_bool_t 					(*sync)(tb_handle_t stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv);
 
 	/// task
-	tb_bool_t 					(*task)(tb_handle_t stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_pointer_t priv);
+	tb_bool_t 					(*task)(tb_handle_t stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv);
 
 	/// kill
 	tb_void_t 					(*kill)(tb_handle_t stream);
@@ -530,7 +530,7 @@ tb_bool_t 				tb_async_stream_open_try(tb_async_stream_t* stream);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! read the stream 
  *
@@ -541,7 +541,7 @@ tb_bool_t 				tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_o
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_read_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_read_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! writ the stream 
  *
@@ -553,7 +553,7 @@ tb_bool_t 				tb_async_stream_read_(tb_async_stream_t* stream, tb_size_t size, t
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_writ_(tb_async_stream_t* stream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_writ_(tb_async_stream_t* stream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! seek the stream
  *
@@ -564,7 +564,7 @@ tb_bool_t 				tb_async_stream_writ_(tb_async_stream_t* stream, tb_byte_t const* 
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_seek_(tb_async_stream_t* stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_seek_(tb_async_stream_t* stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! sync the stream
  *
@@ -575,7 +575,7 @@ tb_bool_t 				tb_async_stream_seek_(tb_async_stream_t* stream, tb_hize_t offset,
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_sync_(tb_async_stream_t* stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_sync_(tb_async_stream_t* stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! task the stream
  *
@@ -586,7 +586,7 @@ tb_bool_t 				tb_async_stream_sync_(tb_async_stream_t* stream, tb_bool_t bclosin
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_task_(tb_async_stream_t* stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_task_(tb_async_stream_t* stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! open and read the stream, open it first if not opened 
  *
@@ -597,7 +597,7 @@ tb_bool_t 				tb_async_stream_task_(tb_async_stream_t* stream, tb_size_t delay, 
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_oread_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_oread_(tb_async_stream_t* stream, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! open and writ the stream, open it first if not opened 
  *
@@ -609,7 +609,7 @@ tb_bool_t 				tb_async_stream_oread_(tb_async_stream_t* stream, tb_size_t size, 
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_owrit_(tb_async_stream_t* stream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_owrit_(tb_async_stream_t* stream, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! open and seek the stream, open it first if not opened 
  *
@@ -620,7 +620,7 @@ tb_bool_t 				tb_async_stream_owrit_(tb_async_stream_t* stream, tb_byte_t const*
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_oseek_(tb_async_stream_t* stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_oseek_(tb_async_stream_t* stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 	
 /*! read the stream after the delay time
  *
@@ -632,7 +632,7 @@ tb_bool_t 				tb_async_stream_oseek_(tb_async_stream_t* stream, tb_hize_t offset
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_read_after_(tb_async_stream_t* stream, tb_size_t delay, tb_size_t size, tb_async_stream_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_read_after_(tb_async_stream_t* stream, tb_size_t delay, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! writ the stream after the delay time
  *
@@ -645,7 +645,7 @@ tb_bool_t 				tb_async_stream_read_after_(tb_async_stream_t* stream, tb_size_t d
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_async_stream_writ_after_(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 				tb_async_stream_writ_after_(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! the stream aicp
  *
