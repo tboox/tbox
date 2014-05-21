@@ -41,7 +41,7 @@
 #define tb_async_stream_open(stream, func, priv) 									tb_async_stream_open_(stream, func, priv __tb_debug_vals__)
 
 /// read
-#define tb_async_stream_read(stream, size, func, priv) 							tb_async_stream_read_(stream, size, func, priv __tb_debug_vals__)
+#define tb_async_stream_read(stream, size, func, priv) 					    		tb_async_stream_read_(stream, size, func, priv __tb_debug_vals__)
 
 /// writ
 #define tb_async_stream_writ(stream, data, size, func, priv) 						tb_async_stream_writ_(stream, data, size, func, priv __tb_debug_vals__)
@@ -50,7 +50,7 @@
 #define tb_async_stream_seek(stream, offset, func, priv) 							tb_async_stream_seek_(stream, offset, func, priv __tb_debug_vals__)
 
 /// sync
-#define tb_async_stream_sync(stream, bclosing, func, priv) 						tb_async_stream_sync_(stream, bclosing, func, priv __tb_debug_vals__)
+#define tb_async_stream_sync(stream, bclosing, func, priv) 			    			tb_async_stream_sync_(stream, bclosing, func, priv __tb_debug_vals__)
 
 /// task
 #define tb_async_stream_task(stream, delay, func, priv) 							tb_async_stream_task_(stream, delay, func, priv __tb_debug_vals__)
@@ -76,6 +76,13 @@
 
 /// the asio stream declaration
 struct __tb_async_stream_t;
+
+/*! the stream exit func type
+ *
+ * @param stream 				the stream
+ * @param priv 					the func private data
+ */
+typedef tb_void_t 				(*tb_async_stream_exit_func_t)(struct __tb_async_stream_t* stream, tb_pointer_t priv);
 
 /*! the stream open func type
  *

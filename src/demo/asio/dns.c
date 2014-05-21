@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_sock_dns_func(tb_handle_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data)
+static tb_void_t tb_demo_sock_dns_done_func(tb_handle_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
 {
 	// check
 	tb_assert_and_check_return(dns);
@@ -29,10 +29,15 @@ static tb_void_t tb_demo_sock_dns_func(tb_handle_t dns, tb_char_t const* host, t
 	}
 
 	// exit addr
-	if (dns) tb_aicp_dns_exit(dns, tb_true);
+	if (dns) tb_aicp_dns_exit(dns);
 
 	// kill aicp
 	tb_aicp_kill(aicp);
+}
+static tb_void_t tb_demo_sock_dns_exit_func(tb_handle_t dns, tb_cpointer_t priv)
+{
+    // trace
+    tb_trace_i("dns: exit");
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +57,7 @@ tb_int_t tb_demo_asio_dns_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// init dns
-	dns = tb_aicp_dns_init(aicp, -1, tb_demo_sock_dns_func, tb_null);
+	dns = tb_aicp_dns_init(aicp, -1, tb_demo_sock_dns_done_func, tb_demo_sock_dns_exit_func, tb_null);
 	tb_assert_and_check_goto(dns, end);
 
 	// sort server 
