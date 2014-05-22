@@ -315,6 +315,7 @@ tb_void_t 			tb_transfer_kill(tb_handle_t transfer);
  * @param transfer 	the transfer
  */
 tb_bool_t 			tb_transfer_exit(tb_handle_t transfer);
+tb_bool_t 			tb_transfer_closed(tb_handle_t transfer);
 
 /*! pause transfer 
  *
