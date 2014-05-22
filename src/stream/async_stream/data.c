@@ -580,9 +580,9 @@ tb_async_stream_t* tb_async_stream_init_data(tb_aicp_t* aicp)
         dstream->base.writ      = tb_async_stream_data_writ;
         dstream->base.seek      = tb_async_stream_data_seek;
         dstream->base.task      = tb_async_stream_data_task;
-        dstream->base.kill      = tb_async_stream_data_kill;
         dstream->base.clos      = tb_async_stream_data_clos;
         dstream->base.exit      = tb_async_stream_data_exit;
+        dstream->base.base.kill = tb_async_stream_data_kill;
         dstream->base.base.ctrl = tb_async_stream_data_ctrl;
 
         // ok

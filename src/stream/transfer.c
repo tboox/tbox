@@ -71,6 +71,30 @@ typedef struct __tb_transfer_save_t
     // the priv
     tb_cpointer_t               priv;
 
+    // the base time
+    tb_hong_t                   base;
+
+    // the base time for 1s
+    tb_hong_t                   base1s;
+
+    // the saved size
+    tb_hize_t                   saved;
+
+    // the saved size for 1s
+    tb_size_t                   saved1s;
+ 
+    // the closed size
+    tb_hong_t                   csize;
+
+    // the closed state
+    tb_size_t                   cstate;
+
+    // the closed offset 
+    tb_hize_t                   coffset;
+
+    // the current rate
+    tb_size_t                   crate;
+
 }tb_transfer_save_t;
 
 // the transfer type
@@ -100,38 +124,11 @@ typedef struct __tb_transfer_t
     // is pausing?
     tb_atomic_t                 pausing;
 
-    // is exiting?
-    tb_atomic_t                 exiting;
-
-    // the base time
-    tb_hong_t                   base;
-
-    // the base time for 1s
-    tb_hong_t                   base1s;
-
     // the seek offset
     tb_hize_t                   offset;
 
-    // the saved size
-    tb_hize_t                   saved;
-
-    // the saved size for 1s
-    tb_size_t                   saved1s;
- 
     // the limit rate
     tb_atomic_t                 lrate;
-
-    // the current rate
-    tb_size_t                   crate;
-
-    // the closed size
-    tb_hong_t                   csize;
-
-    // the closed state
-    tb_size_t                   cstate;
-
-    // the closed offset 
-    tb_hize_t                   coffset;
 
     // ctrl
     tb_transfer_ctrl_t          ctrl;
@@ -155,29 +152,15 @@ static tb_void_t tb_transfer_clos_func(tb_transfer_t* transfer)
          
     // trace
     tb_trace_d("closed");
-   
+
+    // save func
+    tb_transfer_save_t save = transfer->save;
+
     // clear opened
     tb_atomic_set0(&transfer->opened);
 
     // done
-    transfer->save.func(transfer->cstate, transfer->coffset, transfer->csize, transfer->saved, transfer->crate, transfer->save.priv);
-
-    // exit it
-    if (tb_atomic_fetch_and_pset(&transfer->exiting, 1, 0))
-    {
-    }
-}
-static tb_void_t tb_transfer_ostream_clos_func(tb_async_stream_t* astream, tb_size_t state, tb_cpointer_t priv)
-{
-    // check
-    tb_transfer_t* transfer = (tb_transfer_t*)priv;
-    tb_assert_and_check_return(astream && transfer);
-
-    // trace
-    tb_trace_d("clos: ostream: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
-
-    // done func
-    tb_transfer_clos_func(transfer);
+    save.func(save.cstate, save.coffset, save.csize, save.saved, save.crate, save.priv);
 }
 static tb_void_t tb_transfer_istream_clos_func(tb_async_stream_t* astream, tb_size_t state, tb_cpointer_t priv)
 {
@@ -187,6 +170,18 @@ static tb_void_t tb_transfer_istream_clos_func(tb_async_stream_t* astream, tb_si
 
     // trace
     tb_trace_d("clos: istream: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
+
+    // done func
+    tb_transfer_clos_func(transfer);
+}
+static tb_void_t tb_transfer_ostream_clos_func(tb_async_stream_t* astream, tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_transfer_t* transfer = (tb_transfer_t*)priv;
+    tb_assert_and_check_return(astream && transfer);
+
+    // trace
+    tb_trace_d("clos: ostream: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
 
     // done
     do
@@ -199,20 +194,11 @@ static tb_void_t tb_transfer_istream_clos_func(tb_async_stream_t* astream, tb_si
            
         // clos it
         tb_bool_t bclosed = tb_false;
-        if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO)
+        if (tb_stream_is_opened(transfer->istream))
         {
-            if (tb_stream_is_opened(transfer->ostream))
-            {
-                if (!tb_async_stream_clos(transfer->ostream, tb_transfer_ostream_clos_func, transfer)) break;
-            }
-            else bclosed = tb_true;
+            if (!tb_async_stream_clos(transfer->istream, tb_transfer_istream_clos_func, transfer)) break;
         }
-        else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
-        {
-            tb_basic_stream_clos(transfer->ostream);
-            bclosed = tb_true;
-        }
-        else tb_assert_and_check_break(0);
+        else bclosed = tb_true;
 
         // closed? done func
         if (bclosed) tb_transfer_clos_func(transfer);
@@ -238,20 +224,20 @@ static tb_bool_t tb_transfer_istream_save_func(tb_transfer_t* transfer, tb_size_
     tb_assert_and_check_return_val(transfer && transfer->istream && transfer->save.func, tb_false);
 
     // trace
-    tb_trace_d("save: %llu, rate: %lu bytes/s, state: %s", transfer->crate, tb_stream_offset(transfer->istream), tb_state_cstr(state));
+    tb_trace_d("save: %llu, rate: %lu bytes/s, state: %s", transfer->save.crate, tb_stream_offset(transfer->istream), tb_state_cstr(state));
 
-    // failed or closed? close it
-    if (state != TB_STATE_OK) 
+    // killed or failed or closed? close it
+    if ((state != TB_STATE_OK && state != TB_STATE_PAUSED) || tb_atomic_get(&transfer->stoped)) 
     {
         // save the closed state
-        transfer->cstate    = state;
-        transfer->csize     = tb_stream_size(transfer->istream);
-        transfer->coffset   = tb_stream_offset(transfer->istream);
-        return tb_async_stream_clos(transfer->istream, tb_transfer_istream_clos_func, transfer);
+        transfer->save.cstate    = state;
+        transfer->save.csize     = tb_stream_size(transfer->istream);
+        transfer->save.coffset   = tb_stream_offset(transfer->istream);
+        return tb_async_stream_clos(transfer->ostream, tb_transfer_ostream_clos_func, transfer);
     }
 
     // done
-    return transfer->save.func(state, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->saved, transfer->crate, transfer->save.priv);
+    return transfer->save.func(state, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->save.saved, transfer->save.crate, transfer->save.priv);
 }
 static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 static tb_bool_t tb_transfer_ostream_writ_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
@@ -277,35 +263,35 @@ static tb_bool_t tb_transfer_ostream_writ_func(tb_async_stream_t* astream, tb_si
         state = TB_STATE_UNKNOWN_ERROR;
 
         // done func at first once
-        if (!transfer->saved && !tb_transfer_istream_save_func(transfer, TB_STATE_OK)) break;
+        if (!transfer->save.saved && !tb_transfer_istream_save_func(transfer, TB_STATE_OK)) break;
 
         // save size
-        transfer->saved += real;
+        transfer->save.saved += real;
     
         // < 1s?
         tb_size_t delay = 0;
         tb_size_t lrate = tb_atomic_get(&transfer->lrate);
-        if (time < transfer->base1s + 1000)
+        if (time < transfer->save.base1s + 1000)
         {
             // save size for 1s
-            transfer->saved1s += real;
+            transfer->save.saved1s += real;
 
             // save current rate if < 1s from base
-            if (time < transfer->base + 1000) transfer->crate = transfer->saved1s;
+            if (time < transfer->save.base + 1000) transfer->save.crate = transfer->save.saved1s;
                     
             // compute the delay for limit rate
-            if (lrate) delay = transfer->saved1s >= lrate? transfer->base1s + 1000 - time : 0;
+            if (lrate) delay = transfer->save.saved1s >= lrate? transfer->save.base1s + 1000 - time : 0;
         }
         else
         {
             // save current rate
-            transfer->crate = transfer->saved1s;
+            transfer->save.crate = transfer->save.saved1s;
 
             // update base1s
-            transfer->base1s = time;
+            transfer->save.base1s = time;
 
             // reset size
-            transfer->saved1s = 0;
+            transfer->save.saved1s = 0;
 
             // reset delay
             delay = 0;
@@ -354,7 +340,7 @@ static tb_bool_t tb_transfer_ostream_writ_func(tb_async_stream_t* astream, tb_si
     if (state != TB_STATE_OK) 
     {
         // compute the total rate
-        transfer->crate = (transfer->saved && (time > transfer->base))? (tb_size_t)((transfer->saved * 1000) / (time - transfer->base)) : (tb_size_t)transfer->saved;
+        transfer->save.crate = (transfer->save.saved && (time > transfer->save.base))? (tb_size_t)((transfer->save.saved * 1000) / (time - transfer->save.base)) : (tb_size_t)transfer->save.saved;
 
         // done func
         tb_transfer_istream_save_func(transfer, TB_STATE_OK);
@@ -379,7 +365,7 @@ static tb_bool_t tb_transfer_ostream_sync_func(tb_async_stream_t* astream, tb_si
     tb_hong_t time = tb_aicp_time(tb_async_stream_aicp(astream));
 
     // compute the total rate
-    transfer->crate = (transfer->saved && (time > transfer->base))? (tb_size_t)((transfer->saved * 1000) / (time - transfer->base)) : (tb_size_t)transfer->saved;
+    transfer->save.crate = (transfer->save.saved && (time > transfer->save.base))? (tb_size_t)((transfer->save.saved * 1000) / (time - transfer->save.base)) : (tb_size_t)transfer->save.saved;
 
     // done func
     return tb_transfer_istream_save_func(transfer, state == TB_STATE_OK? TB_STATE_CLOSED : state);
@@ -421,87 +407,8 @@ static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_si
             break;
         }
 
-        // for astream
-        if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO)
-        {
-            // writ it
-            if (!tb_async_stream_writ(transfer->ostream, data, real, tb_transfer_ostream_writ_func, transfer)) break;
-        }
-        // for bstream
-        else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
-        {
-            // writ it
-            if (!tb_basic_stream_bwrit(transfer->ostream, data, real)) break;
-
-            // the time
-            tb_hong_t time = tb_aicp_time(tb_async_stream_aicp(astream));
-
-            // save size 
-            transfer->saved += real;
-
-            // < 1s?
-            tb_size_t delay = 0;
-            tb_size_t lrate = tb_atomic_get(&transfer->lrate);
-            if (time < transfer->base1s + 1000)
-            {
-                // save size for 1s
-                transfer->saved1s += real;
-
-                // save current rate if < 1s from base
-                if (time < transfer->base + 1000) transfer->crate = transfer->saved1s;
-            
-                // compute the delay for limit rate
-                if (lrate) delay = transfer->saved1s >= lrate? transfer->base1s + 1000 - time : 0;
-            }
-            else
-            {
-                // save current rate
-                transfer->crate = transfer->saved1s;
-
-                // update base1s
-                transfer->base1s = time;
-
-                // reset size
-                transfer->saved1s = 0;
-
-                // reset delay
-                delay = 0;
-            }
-
-            // done func
-            if (!tb_transfer_istream_save_func(transfer, TB_STATE_OK)) break;
-
-            // pausing or paused?
-            if (tb_atomic_get(&transfer->pausing) || tb_atomic_get(&transfer->paused))
-            {
-                // paused
-                tb_atomic_set(&transfer->paused, 1);
-                
-                // clear pausing
-                tb_atomic_set0(&transfer->pausing);
-        
-                // done func
-                if (!tb_transfer_istream_save_func(transfer, TB_STATE_PAUSED)) break;
-            }
-            // continue?
-            else
-            {
-                // no delay? continue to read it immediately
-                if (!delay) bread = tb_true;
-                else 
-                {
-                    // trace
-                    tb_trace_d("delay: %lu ms", delay);
-
-                    // continue to read it after the delay time
-                    if (!tb_async_stream_read_after(transfer->istream, delay, lrate, tb_transfer_istream_read_func, transfer)) break;
-                }
-            }
-        }
-        else 
-        {
-            tb_assert_and_check_break(0);
-        }
+        // writ it
+        if (!tb_async_stream_writ(transfer->ostream, data, real, tb_transfer_ostream_writ_func, transfer)) break;
 
         // ok
         state = TB_STATE_OK;
@@ -514,12 +421,7 @@ static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_si
         // sync it if closed
         tb_bool_t bend = tb_true;
         if (state == TB_STATE_CLOSED)
-        {
-            if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
-                tb_basic_stream_sync(transfer->ostream, tb_true);
-            else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO)
-                bend = tb_async_stream_sync(transfer->ostream, tb_true, tb_transfer_ostream_sync_func, transfer)? tb_false : tb_true;
-        }
+            bend = tb_async_stream_sync(transfer->ostream, tb_true, tb_transfer_ostream_sync_func, transfer)? tb_false : tb_true;
 
         // end? 
         if (bend)
@@ -528,7 +430,7 @@ static tb_bool_t tb_transfer_istream_read_func(tb_async_stream_t* astream, tb_si
             tb_hong_t time = tb_aicp_time(tb_async_stream_aicp(astream));
 
             // compute the total rate
-            transfer->crate = (transfer->saved && (time > transfer->base))? (tb_size_t)((transfer->saved * 1000) / (time - transfer->base)) : (tb_size_t)transfer->saved;
+            transfer->save.crate = (transfer->save.saved && (time > transfer->save.base))? (tb_size_t)((transfer->save.saved * 1000) / (time - transfer->save.base)) : (tb_size_t)transfer->save.saved;
 
             // done func
             tb_transfer_istream_save_func(transfer, state);
@@ -622,20 +524,11 @@ static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_si
 
         // open it
         tb_bool_t bopened = tb_false;
-        if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO)
+        if (!tb_stream_is_opened(transfer->ostream))
         {
-            if (!tb_stream_is_opened(transfer->ostream))
-            {
-                if (!tb_async_stream_open(transfer->ostream, tb_transfer_ostream_open_func, transfer)) break;
-            }
-            else bopened = tb_true;
+            if (!tb_async_stream_open(transfer->ostream, tb_transfer_ostream_open_func, transfer)) break;
         }
-        else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
-        {
-            if (!tb_stream_is_opened(transfer->ostream) && !tb_basic_stream_open(transfer->ostream)) break;
-            bopened = tb_true;
-        }
-        else tb_assert_and_check_break(0);
+        else bopened = tb_true;
 
         // opened?
         if (bopened)
@@ -1097,37 +990,11 @@ tb_handle_t tb_transfer_init_aa(tb_async_stream_t* istream, tb_async_stream_t* o
     // ok?
     return (tb_handle_t)transfer;
 }
-tb_handle_t tb_transfer_init_ag(tb_async_stream_t* istream, tb_basic_stream_t* ostream, tb_hize_t offset)
-{
-    // done
-    tb_transfer_t* transfer = tb_null;
-    do
-    {
-        // check
-        tb_assert_and_check_break(istream && ostream);  
-
-        // make transfer
-        transfer = tb_malloc0(sizeof(tb_transfer_t));
-        tb_assert_and_check_break(transfer);
-
-        // init transfer
-        transfer->istream   = istream;
-        transfer->ostream   = ostream;
-        transfer->iowner    = 0;
-        transfer->oowner    = 0;
-        transfer->stoped    = 1;
-        transfer->offset    = offset;
-
-    } while (0);
-
-    // ok?
-    return (tb_handle_t)transfer;
-}
 tb_handle_t tb_transfer_init_au(tb_async_stream_t* istream, tb_char_t const* ourl, tb_hize_t offset)
 {
     // done
     tb_async_stream_t*  ostream = tb_null;
-    tb_transfer_t*  transfer = tb_null;
+    tb_transfer_t*      transfer = tb_null;
     do
     {
         // check
@@ -1173,7 +1040,7 @@ tb_handle_t tb_transfer_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_
     // done
     tb_async_stream_t*  istream = tb_null;
     tb_async_stream_t*  ostream = tb_null;
-    tb_transfer_t*  transfer = tb_null;
+    tb_transfer_t*      transfer = tb_null;
     do
     {
         // check
@@ -1266,7 +1133,7 @@ tb_handle_t tb_transfer_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_size
     // done
     tb_async_stream_t*  istream = tb_null;
     tb_async_stream_t*  ostream = tb_null;
-    tb_transfer_t*  transfer = tb_null;
+    tb_transfer_t*      transfer = tb_null;
     do
     {
         // check
@@ -1320,7 +1187,7 @@ tb_handle_t tb_transfer_init_da(tb_byte_t const* idata, tb_size_t isize, tb_asyn
 {
     // done
     tb_async_stream_t*  istream = tb_null;
-    tb_transfer_t*  transfer = tb_null;
+    tb_transfer_t*      transfer = tb_null;
     do
     {
         // check
@@ -1390,15 +1257,15 @@ tb_bool_t tb_transfer_open(tb_handle_t handle, tb_transfer_open_func_t func, tb_
         transfer->open.priv = priv;
 
         // check
-        tb_assert_and_check_break(transfer->istream && tb_stream_mode(transfer->istream) == TB_STREAM_MODE_AICO);
+        tb_assert_and_check_break(transfer->istream);
         tb_assert_and_check_break(transfer->ostream);
 
         // init some rate info
-        transfer->base      = tb_aicp_time(tb_async_stream_aicp(transfer->istream));
-        transfer->base1s    = transfer->base;
-        transfer->saved     = 0;
-        transfer->saved1s   = 0;
-        transfer->crate     = 0;
+        transfer->save.base      = tb_aicp_time(tb_async_stream_aicp(transfer->istream));
+        transfer->save.base1s    = transfer->save.base;
+        transfer->save.saved     = 0;
+        transfer->save.saved1s   = 0;
+        transfer->save.crate     = 0;
 
         // ctrl stream
         if (transfer->ctrl.func && !transfer->ctrl.func(transfer->istream, transfer->ostream, transfer->ctrl.priv)) break;
@@ -1467,27 +1334,17 @@ tb_void_t tb_transfer_kill(tb_handle_t handle)
         tb_trace_d("kill: ..");
 
         // kill istream
-        if (transfer->istream && tb_stream_mode(transfer->istream) == TB_STREAM_MODE_AICO) 
-            tb_stream_kill(transfer->istream);
+        if (transfer->istream) tb_stream_kill(transfer->istream);
 
         // kill ostream
-        if (transfer->ostream && tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO) 
-            tb_stream_kill(transfer->ostream);
+        if (transfer->ostream) tb_stream_kill(transfer->ostream);
     }
 }
-tb_bool_t tb_transfer_closed(tb_handle_t handle)
+tb_bool_t tb_transfer_exit(tb_handle_t handle)
 {
     // check
     tb_transfer_t* transfer = (tb_transfer_t*)handle;
     tb_assert_and_check_return_val(transfer, tb_false);
-
-    return tb_atomic_get(&transfer->opened)? tb_false : tb_true;
-}
-tb_bool_t tb_transfer_exit(tb_handle_t handle, tb_transfer_exit_func_t func, tb_cpointer_t priv)
-{
-    // check
-    tb_transfer_t* transfer = (tb_transfer_t*)handle;
-    tb_assert_and_check_return_val(transfer && func, tb_false);
 
     // trace
     tb_trace_d("exit: ..");
@@ -1495,21 +1352,16 @@ tb_bool_t tb_transfer_exit(tb_handle_t handle, tb_transfer_exit_func_t func, tb_
     // kill it first
     tb_transfer_kill(handle);
 
-    // exiting ..
-//    tb_atomic_set(&transfer->exiting, 1);
-
-    // closed already?
-    if (!tb_atomic_get(&transfer->opened))
+    // wait for closing
+    tb_size_t tryn = 30;
+    while (tb_atomic_get(&transfer->opened) && tryn--)
     {
-        // exit it
-        // ..
-    }
-    else
-    {
-    }
+        // trace
+        tb_trace_d("exit: wait: ..");
 
-#if 0
-    // must be closed
+        // wait some time
+        tb_msleep(200);
+    }
     tb_assert_and_check_return_val(!tb_atomic_get(&transfer->opened), tb_false);
 
     // exit istream
@@ -1517,13 +1369,7 @@ tb_bool_t tb_transfer_exit(tb_handle_t handle, tb_transfer_exit_func_t func, tb_
     transfer->istream = tb_null;
 
     // exit ostream
-    if (transfer->ostream && transfer->oowner)
-    {
-        if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO) 
-            tb_async_stream_exit(transfer->ostream);
-        else if (tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AIOO)
-            tb_basic_stream_exit(transfer->ostream);
-    }
+    if (transfer->ostream && transfer->oowner) tb_async_stream_exit(transfer->ostream);
     transfer->ostream = tb_null;
 
     // exit transfer
@@ -1531,7 +1377,6 @@ tb_bool_t tb_transfer_exit(tb_handle_t handle, tb_transfer_exit_func_t func, tb_
 
     // trace
     tb_trace_d("exit: ok");
-#endif
 
     // ok
     return tb_true;
@@ -1571,10 +1416,10 @@ tb_bool_t tb_transfer_resume(tb_handle_t handle)
         tb_check_return_val(tb_atomic_fetch_and_set0(&transfer->paused), tb_true);
 
         // init some rate info
-        transfer->base      = tb_aicp_time(tb_async_stream_aicp(transfer->istream));
-        transfer->base1s    = transfer->base;
-        transfer->saved1s   = 0;
-        transfer->crate     = 0;
+        transfer->save.base      = tb_aicp_time(tb_async_stream_aicp(transfer->istream));
+        transfer->save.base1s    = transfer->save.base;
+        transfer->save.saved1s   = 0;
+        transfer->save.crate     = 0;
 
         // read it
         if (!tb_async_stream_read(transfer->istream, (tb_size_t)tb_atomic_get(&transfer->lrate), tb_transfer_istream_read_func, transfer)) 

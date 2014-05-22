@@ -35,12 +35,6 @@
  * types
  */
 
-/*! the transfer exit func type
- *
- * @param priv 		the func private data
- */
-typedef tb_void_t 	(*tb_transfer_exit_func_t)(tb_cpointer_t priv);
-
 /*! the transfer ctrl func type
  *
  * @param istream 	the istream 
@@ -189,16 +183,6 @@ tb_hong_t 			tb_transfer_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_bas
  */
 tb_handle_t 		tb_transfer_init_aa(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_hize_t offset);
 
-/*! init transfer from astream to bstream, async transfer
- *
- * @param istream 	the istream
- * @param ostream 	the ostream
- * @param offset 	the offset
- *
- * @return 			the transfer 
- */
-tb_handle_t 		tb_transfer_init_ag(tb_async_stream_t* istream, tb_basic_stream_t* ostream, tb_hize_t offset);
-
 /*! init transfer from astream to url, async transfer
  *
  * @param istream 	the istream
@@ -301,13 +285,13 @@ tb_void_t 			tb_transfer_kill(tb_handle_t transfer);
 
 /*! exit transfer 
  *
+ * @note will wait transfer closed and cannot be called in the callback func
+ *
  * @param transfer 	the transfer
- * @param func      the exiting func
- * @param priv      the func private data
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_transfer_exit(tb_handle_t transfer, tb_transfer_exit_func_t func, tb_cpointer_t priv);
+tb_bool_t 			tb_transfer_exit(tb_handle_t transfer);
 
 /*! pause transfer 
  *

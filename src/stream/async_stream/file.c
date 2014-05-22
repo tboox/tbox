@@ -436,6 +436,9 @@ static tb_void_t tb_async_stream_file_kill(tb_handle_t astream)
     tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
     tb_assert_and_check_return(fstream);
 
+    // trace
+    tb_trace_d("kill: ..");
+
     // kill it
     if (fstream->aico) tb_aico_kill(fstream->aico);
 }
@@ -551,9 +554,9 @@ tb_async_stream_t* tb_async_stream_init_file(tb_aicp_t* aicp)
         fstream->base.seek      = tb_async_stream_file_seek;
         fstream->base.sync      = tb_async_stream_file_sync;
         fstream->base.task      = tb_async_stream_file_task;
-        fstream->base.kill      = tb_async_stream_file_kill;
         fstream->base.clos      = tb_async_stream_file_clos;
         fstream->base.exit      = tb_async_stream_file_exit;
+        fstream->base.base.kill = tb_async_stream_file_kill;
         fstream->base.base.ctrl = tb_async_stream_file_ctrl;
         fstream->mode           = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
