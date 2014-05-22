@@ -169,9 +169,6 @@ typedef struct __tb_aicp_t
     /// the object maxn
     tb_size_t               maxn;
 
-    /// is killed?
-    tb_atomic_t             kill;
-
     /// the proactor
     tb_aicp_proactor_t*     ptor;
 
@@ -183,6 +180,12 @@ typedef struct __tb_aicp_t
 
     /// the pool lock
     tb_spinlock_t           lock;
+
+    /// kill it?
+    tb_atomic_t             kill;
+
+    /// killall it?
+    tb_atomic_t             kill_all;
 
 }tb_aicp_t;
 
@@ -217,19 +220,19 @@ tb_bool_t           tb_aicp_exit(tb_aicp_t* aicp);
  * @param aicp      the aicp
  * @param handle    the handle
  * @param type      the aico type
- * @param exit      the exit func
- * @param priv      the private data for exit func
  *
  * @return          the aico
  */
-tb_handle_t         tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type, tb_aico_exit_func_t exit, tb_cpointer_t priv);
+tb_handle_t         tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
 
 /*! remove the aico, will call the exit callback func if ok
  *
  * @param aicp      the aicp
  * @param aico      the aico
+ * @param func      the exiting func
+ * @param priv      the private data for exiting func
  */
-tb_void_t           tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
+tb_void_t           tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
 
 /*! kill the aico
  *
@@ -288,11 +291,26 @@ tb_void_t           tb_aicp_loop(tb_aicp_t* aicp);
  */
 tb_void_t           tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t priv), tb_cpointer_t priv);
 
-/*! kill the spak 
+/*! kill loop
  *
  * @param aicp      the aicp
  */
 tb_void_t           tb_aicp_kill(tb_aicp_t* aicp);
+
+/*! kill all and cannot continue to post it, but not kill loop
+ *
+ * @param aicp      the aicp
+ */
+tb_void_t           tb_aicp_kill_all(tb_aicp_t* aicp);
+
+/*! wait all exiting
+ *
+ * @param aicp      the aicp
+ * @param timeout   the timeout
+ * 
+ * @return          ok: > 0, timeout: 0, failed: -1
+ */
+tb_long_t           tb_aicp_wait_all(tb_aicp_t* aicp, tb_long_t timeout);
 
 /*! the spak time
  *

@@ -333,6 +333,7 @@ end:
 
     // kill
     tb_atomic_set(&aicp->kill, 1);
+    tb_atomic_set(&aicp->kill_all, 1);
 
     // exit
     tb_thread_return(tb_null);

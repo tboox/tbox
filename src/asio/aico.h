@@ -157,7 +157,7 @@ typedef struct __tb_aico_t
  *
  * @return          the aico
  */
-tb_handle_t         tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle, tb_aico_exit_func_t exit, tb_cpointer_t priv);
+tb_handle_t         tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle);
 
 /*! init the file aico
  *
@@ -168,7 +168,7 @@ tb_handle_t         tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle, tb_a
  *
  * @return          the aico
  */
-tb_handle_t         tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle, tb_aico_exit_func_t exit, tb_cpointer_t priv);
+tb_handle_t         tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle);
 
 /*! init the task aico
  *
@@ -180,7 +180,7 @@ tb_handle_t         tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle, tb_a
  *
  * @return          the aico
  */
-tb_handle_t         tb_aico_init_task(tb_handle_t aicp, tb_bool_t bltimer, tb_aico_exit_func_t exit, tb_cpointer_t priv);
+tb_handle_t         tb_aico_init_task(tb_handle_t aicp, tb_bool_t bltimer);
 
 /*! kill the aico
  *
@@ -188,11 +188,13 @@ tb_handle_t         tb_aico_init_task(tb_handle_t aicp, tb_bool_t bltimer, tb_ai
  */
 tb_void_t           tb_aico_kill(tb_handle_t aico);
 
-/*! exit the aico, will call the exiting callback func if ok
+/*! exit the aico, will call the callback func if ok
  *
  * @param aico      the aico
+ * @param func      the func
+ * @param priv      the func private data
  */
-tb_void_t           tb_aico_exit(tb_handle_t aico);
+tb_void_t           tb_aico_exit(tb_handle_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
 
 /*! the aico aicp
  *

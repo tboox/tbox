@@ -436,7 +436,7 @@ tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_dns_don
         tb_assert_and_check_break(dns->sock);
 
         // init aico
-        dns->aico = tb_aico_init_sock(aicp, dns->sock, tb_aicp_dns_exit_func, dns);
+        dns->aico = tb_aico_init_sock(aicp, dns->sock);
         tb_assert_and_check_break(dns->aico);
 
         // init timeout
@@ -486,7 +486,7 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle)
     tb_trace_d("exit: ..");
 
     // exit aico
-    tb_aico_exit(dns->aico);
+    tb_aico_exit(dns->aico, tb_aicp_dns_exit_func, dns);
 }
 tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host)
 {

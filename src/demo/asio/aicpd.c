@@ -38,6 +38,11 @@ typedef struct __tb_demo_context_t
 }tb_demo_context_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #ifdef TB_DEMO_MODE_SENDF
@@ -46,7 +51,7 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
     if (context)
     {
         // exit aico
-        if (context->aico[0]) tb_aico_exit(context->aico[0]);
+        if (context->aico[0]) tb_aico_exit(context->aico[0], tb_demo_sock_exit_func, tb_null);
         context->aico[0] = tb_null;
 
         // exit
@@ -54,17 +59,19 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
     }
 }
 #else
+static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv);
 static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 {
     if (context)
     {
         // exit aico
-        if (context->aico[0]) tb_aico_exit(context->aico[0]);
+        if (context->aico[0]) tb_aico_exit(context->aico[0], tb_demo_sock_exit_func, tb_null);
         context->aico[0] = tb_null;
 
-        if (context->aico[1]) tb_aico_exit(context->aico[1]);
+        // exit aico
+        if (context->aico[1]) tb_aico_exit(context->aico[1], tb_demo_file_exit_func, tb_null);
         context->aico[1] = tb_null;
-        
+
         // exit data
         if (context->data) tb_free(context->data);
         context->data = tb_null;
@@ -155,7 +162,17 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
     return tb_true;
 }
 #endif
+static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_assert_and_check_return(aico);
 
+    // trace
+    tb_trace_i("aico: sock: exit: %p", tb_aico_handle(aico));
+
+    // exit it
+    tb_socket_clos(tb_aico_handle(aico));
+}
 #ifdef TB_DEMO_MODE_SENDF
 static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
 {
@@ -198,18 +215,6 @@ static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
     return tb_true;
 }
 #endif
-
-static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_assert_and_check_return(aico);
-
-    // trace
-    tb_trace_i("aico: sock: exit: %p", tb_aico_handle(aico));
-
-    // exit it
-    tb_socket_clos(tb_aico_handle(aico));
-}
 static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 {
     // check
@@ -248,7 +253,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
             tb_assert_and_check_break(context->file);
 
             // addo sock
-            context->aico[0] = tb_aico_init_sock(aicp, context->sock, tb_demo_sock_exit_func, tb_null);
+            context->aico[0] = tb_aico_init_sock(aicp, context->sock);
             tb_assert_and_check_break(context->aico[0]);
 
             // post sendf from file
@@ -282,8 +287,8 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
             // exit context
             if (context) tb_demo_context_exit(context);
 
-            // exit loop
-            tb_aicp_kill(tb_aico_aicp(aice->aico));
+            // exit aico
+            tb_aico_exit(aice->aico, tb_demo_sock_exit_func, tb_null);
         }
         else
         {
@@ -305,7 +310,9 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
     {
         // exit loop
         tb_trace_i("acpt[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-        tb_aicp_kill(tb_aico_aicp(aice->aico));
+ 
+        // exit aico
+        tb_aico_exit(aice->aico, tb_demo_sock_exit_func, tb_null);
     }
 
     // ok
@@ -331,7 +338,6 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
     {
         // trace
         tb_trace_i("task[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-        tb_aicp_kill(tb_aico_aicp(aice->aico));
     }
 
     // ok
@@ -387,11 +393,11 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_goto(aicp, end);
 
     // addo sock
-    aico = tb_aico_init_sock(aicp, sock, tb_demo_sock_exit_func, tb_null);
+    aico = tb_aico_init_sock(aicp, sock);
     tb_assert_and_check_goto(aico, end);
 
     // addo task
-    task = tb_aico_init_task(aicp, tb_false, tb_null, tb_null);
+    task = tb_aico_init_task(aicp, tb_false);
     tb_assert_and_check_goto(task, end);
 
     // run task
@@ -418,10 +424,20 @@ end:
 
     // trace
     tb_trace_i("end");
+ 
+    // exit task
+    if (task) tb_aico_exit(task, tb_null, tb_null);
+
+#if 1
+    // kill all
+    if (aicp) tb_aicp_kill_all(aicp);
+   
+    // wait all
+    tb_aicp_wait_all(aicp, -1);
 
     // kill aicp
-    if (aicp) tb_aicp_kill(aicp);
-    
+    tb_aicp_kill(aicp);
+
     // wait exit
     {
         // exit loop
@@ -432,12 +448,7 @@ end:
             tb_thread_exit(*l);
         }
     }
-
-    // exit aico
-    if (aico) tb_aico_exit(aico);
-
-    // exit task
-    if (task) tb_aico_exit(task);
+#endif
 
     // exit aicp
     if (aicp) tb_aicp_exit(aicp);
