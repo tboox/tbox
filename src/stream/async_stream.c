@@ -616,14 +616,10 @@ tb_bool_t tb_async_stream_clos_(tb_async_stream_t* stream, tb_async_stream_clos_
 	tb_assert_and_check_return_val(stream && stream->clos && func, tb_false);
 	
 	// check state
-	tb_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
 	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
 
 	// trace
 	tb_trace_d("clos: ..");
-
-	// kill it first 
-	tb_stream_kill(stream);
 
 	// save debug info
 #ifdef __tb_debug__

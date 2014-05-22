@@ -1393,7 +1393,6 @@ tb_bool_t tb_transfer_clos(tb_handle_t handle, tb_transfer_clos_func_t func, tb_
     tb_assert_and_check_return_val(transfer && func, tb_false);
 
     // check state
-    tb_assert_and_check_return_val(!tb_atomic_get(&transfer->stoped), tb_false);
     tb_assert_and_check_return_val(tb_atomic_get(&transfer->opened), tb_false);
     
     // check stream
@@ -1463,6 +1462,14 @@ tb_void_t tb_transfer_kill(tb_handle_t handle)
         if (transfer->ostream && tb_stream_mode(transfer->ostream) == TB_STREAM_MODE_AICO) 
             tb_stream_kill(transfer->ostream);
     }
+}
+tb_bool_t tb_transfer_closed(tb_handle_t handle)
+{
+    // check
+    tb_transfer_t* transfer = (tb_transfer_t*)handle;
+    tb_assert_and_check_return_val(transfer, tb_false);
+
+    return tb_atomic_get(&transfer->opened)? tb_false : tb_true;
 }
 tb_bool_t tb_transfer_exit(tb_handle_t handle)
 {

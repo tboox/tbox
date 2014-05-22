@@ -206,11 +206,11 @@ tb_aicp_t*          tb_aicp_init(tb_size_t maxn);
 
 /*! exit the aicp
  *
- * @note            not multi-thread safe
- *
  * @param aicp      the aicp
+ *
+ * @return          tb_true or tb_false
  */     
-tb_void_t           tb_aicp_exit(tb_aicp_t* aicp);
+tb_bool_t           tb_aicp_exit(tb_aicp_t* aicp);
 
 /*! add the aico
  *
