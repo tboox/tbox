@@ -35,6 +35,12 @@
  * types
  */
 
+/*! the transfer exit func type
+ *
+ * @param priv 		the func private data
+ */
+typedef tb_void_t 	(*tb_transfer_exit_func_t)(tb_cpointer_t priv);
+
 /*! the transfer ctrl func type
  *
  * @param istream 	the istream 
@@ -55,13 +61,6 @@ typedef tb_bool_t 	(*tb_transfer_ctrl_func_t)(tb_stream_t* istream, tb_stream_t*
  * @return 			tb_true: ok, tb_false: break it
  */
 typedef tb_bool_t 	(*tb_transfer_open_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_cpointer_t priv);
-
-/*! the transfer clos func type
- *
- * @param state 	the stream state 
- * @param priv 		the func private data
- */
-typedef tb_void_t 	(*tb_transfer_clos_func_t)(tb_size_t state, tb_cpointer_t priv);
 
 /*! the transfer save func type
  *
@@ -274,16 +273,6 @@ tb_bool_t 			tb_transfer_ctrl(tb_handle_t transfer, tb_transfer_ctrl_func_t func
  */
 tb_bool_t 			tb_transfer_open(tb_handle_t transfer, tb_transfer_open_func_t func, tb_cpointer_t priv);
 
-/*! clos transfer
- *
- * @param transfer 	the transfer
- * @param func 		the clos func 
- * @param priv 		the func private data
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_transfer_clos(tb_handle_t transfer, tb_transfer_clos_func_t func, tb_cpointer_t priv);
-
 /*! save transfer
  *
  * @param transfer 	the transfer
@@ -313,9 +302,12 @@ tb_void_t 			tb_transfer_kill(tb_handle_t transfer);
 /*! exit transfer 
  *
  * @param transfer 	the transfer
+ * @param func      the exiting func
+ * @param priv      the func private data
+ *
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_transfer_exit(tb_handle_t transfer);
-tb_bool_t 			tb_transfer_closed(tb_handle_t transfer);
+tb_bool_t 			tb_transfer_exit(tb_handle_t transfer, tb_transfer_exit_func_t func, tb_cpointer_t priv);
 
 /*! pause transfer 
  *

@@ -138,7 +138,7 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
         tb_assert_and_check_break(dstream->data && dstream->size);
         
         // init aico
-        if (!dstream->aico) dstream->aico = tb_aico_init_task(dstream->base.aicp, tb_false, tb_null, tb_null);
+        if (!dstream->aico) dstream->aico = tb_aico_init_task(dstream->base.aicp, tb_false);
         tb_assert_and_check_break(dstream->aico);
 
         // init head

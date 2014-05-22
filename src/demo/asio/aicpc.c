@@ -47,6 +47,53 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv);
+static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv);
+static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
+{
+    if (context)
+    {
+        // exit aico
+        if (context->aico[0]) tb_aico_exit(context->aico[0], tb_demo_sock_exit_func, tb_null);
+        context->aico[0] = tb_null;
+
+        // exit aico
+        if (context->aico[1]) tb_aico_exit(context->aico[1], tb_demo_file_exit_func, tb_null);
+        context->aico[1] = tb_null;
+
+        // exit data
+        if (context->data) tb_free(context->data);
+        context->data = tb_null;
+    }
+}
+static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_assert_and_check_return(aico);
+
+    // trace
+    tb_trace_i("aico: file: exit: %p", tb_aico_handle(aico));
+
+    // exit it
+    tb_file_exit(tb_aico_handle(aico));
+
+    // kill aicp
+    tb_aicp_kill(tb_aico_aicp(aico));
+}
+static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_assert_and_check_return(aico);
+
+    // trace
+    tb_trace_i("aico: sock: exit: %p", tb_aico_handle(aico));
+
+    // exit it
+    tb_socket_clos(tb_aico_handle(aico));
+
+    // exit file
+    if (priv) tb_aico_exit((tb_handle_t)priv, tb_demo_file_exit_func, tb_null);
+}
 static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice);
 static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 {
@@ -79,23 +126,15 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
     // closed or failed?
     else
     {
+        // trace
         tb_trace_i("writ[%p]: %s", aice->aico, tb_state_cstr(aice->state));
-        tb_aicp_kill(tb_aico_aicp(aice->aico));
+
+        // exit context
+        tb_demo_context_exit(context);
     }
 
     // ok
     return tb_true;
-}
-static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_assert_and_check_return(aico);
-
-    // trace
-    tb_trace_i("aico: file: exit: %p", tb_aico_handle(aico));
-
-    // exit it
-    tb_file_exit(tb_aico_handle(aico));
 }
 static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 {
@@ -139,8 +178,11 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
     // closed or failed?
     else
     {
+        // trace
         tb_trace_i("recv[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-        tb_aicp_kill(tb_aico_aicp(aice->aico));
+
+        // exit context
+        tb_demo_context_exit(context);
     }
 
     // ok
@@ -169,22 +211,13 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
     {
         // exit loop
         tb_trace_i("conn[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-        tb_aicp_kill(tb_aico_aicp(aice->aico));
+
+        // exit context
+        tb_demo_context_exit(context);
     }
 
     // ok
     return tb_true;
-}
-static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_assert_and_check_return(aico);
-
-    // trace
-    tb_trace_i("aico: sock: exit: %p", tb_aico_handle(aico));
-
-    // exit it
-    tb_socket_clos(tb_aico_handle(aico));
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -216,11 +249,11 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_goto(context.data, end);
 
     // addo sock
-    context.aico[0] = tb_aico_init_sock(aicp, context.sock, tb_demo_sock_exit_func, tb_null);
+    context.aico[0] = tb_aico_init_sock(aicp, context.sock);
     tb_assert_and_check_goto(context.aico[0], end);
 
     // addo file
-    context.aico[1] = tb_aico_init_file(aicp, context.file, tb_demo_file_exit_func, tb_null);
+    context.aico[1] = tb_aico_init_file(aicp, context.file);
     tb_assert_and_check_goto(context.aico[1], end);
 
     // init conn timeout
@@ -244,9 +277,6 @@ end:
 
     // exit aicp
     if (aicp) tb_aicp_exit(aicp);
-
-    // exit data
-    if (context.data) tb_free(context.data);
 
     return 0;
 }

@@ -6,33 +6,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_atomic_t g_clos = 0;
-static tb_atomic_t g_exit = 0;
-static tb_void_t tb_demo_transfer_clos_func(tb_size_t state, tb_cpointer_t priv)
-{
-    // check
-    tb_value_t* tuple = (tb_value_t*)priv;
-    tb_assert_and_check_return(tuple);
-
-    // trace
-    tb_trace_i("clos: state: %s", tb_state_cstr(state));
-
-    if (tb_atomic_get(&g_exit) && !tb_atomic_fetch_and_set(&g_clos, 1))
-    {
-        tb_trace_i("exit: clos");
-        // exit transfer
-        if (tuple[0].ptr) tb_transfer_exit(tuple[0].ptr);
-        tuple[0].ptr = tb_null;
-
-        // exit istream
-        if (tuple[1].ptr) tb_async_stream_exit(tuple[1].ptr);
-        tuple[1].ptr = tb_null;
-
-        // exit ostream
-        if (tuple[2].ptr) tb_basic_stream_exit(tuple[2].ptr);
-        tuple[2].ptr = tb_null;
-    }
-}
+//static tb_atomic_t g_clos = 0;
+//static tb_atomic_t g_exit = 0;
 static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // check
@@ -47,8 +22,27 @@ static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, t
     // trace
     tb_trace_i("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_state_cstr(state));
 
+#if 0
     // clos it
-    if (state != TB_STATE_OK) tb_transfer_clos(tuple[0].ptr, tb_demo_transfer_clos_func, priv);
+    if (state != TB_STATE_OK) 
+    {
+        if (tb_atomic_get(&g_exit) && !tb_atomic_fetch_and_set(&g_clos, 1))
+        {
+            tb_trace_i("exit: clos");
+            // exit transfer
+            if (tuple[0].ptr) tb_transfer_exit(tuple[0].ptr);
+            tuple[0].ptr = tb_null;
+
+            // exit istream
+            if (tuple[1].ptr) tb_async_stream_exit(tuple[1].ptr);
+            tuple[1].ptr = tb_null;
+
+            // exit ostream
+            if (tuple[2].ptr) tb_basic_stream_exit(tuple[2].ptr);
+            tuple[2].ptr = tb_null;
+        }
+    }
+#endif
 
     // ok
     return tb_true;
@@ -145,10 +139,11 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
     // trace
     tb_trace_i("exit: ..");
 
-    tb_atomic_set(&g_exit, 1);
+//    tb_atomic_set(&g_exit, 1);
 
-tb_transfer_kill(tuple[0].ptr);
+//    tb_transfer_exit(transfer, tb_transfer_exit_func_t);
 
+#if 0
 // exit it if closed 
     if (tb_transfer_closed(transfer) && !tb_atomic_fetch_and_set(&g_clos, 1))
     {
@@ -167,6 +162,7 @@ tb_transfer_kill(tuple[0].ptr);
     }
 
     while (!tb_atomic_get(&g_clos)) tb_msleep(100);
+#endif
 
     // exit aicp
     if (aicp) tb_aicp_exit(aicp);

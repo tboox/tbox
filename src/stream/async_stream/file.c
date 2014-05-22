@@ -116,13 +116,16 @@ static tb_void_t tb_async_stream_file_aico_exit(tb_handle_t aico, tb_cpointer_t 
     // trace
     tb_trace_d("clos: notify: ..");
 
-    // clear the offset
-    tb_atomic64_set0(&fstream->offset);
-
     // exit it
     if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
     fstream->file = tb_null;
     fstream->bref = tb_false;
+
+    // clear the offset
+    tb_atomic64_set0(&fstream->offset);
+
+    // clear aico
+    fstream->aico = tb_null;
 
 	// clear base
 	tb_async_stream_clear(&fstream->base);
@@ -177,7 +180,7 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
         fstream->clos.priv = tb_null;
 
         // addo file
-        fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file, tb_async_stream_file_aico_exit, fstream);
+        fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);
         tb_assert_and_check_break(fstream->aico);
 
         // init offset
@@ -210,15 +213,11 @@ static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_
     fstream->clos.func = func;
     fstream->clos.priv = priv;
 
-    // save and clear aico
-    tb_handle_t aico = fstream->aico;
-    fstream->aico = tb_null;
-
     /* exit aico
      *
      * note: cannot use this stream after exiting, the stream may be exited after calling clos func
      */
-    tb_aico_exit(aico);
+    tb_aico_exit(fstream->aico, tb_async_stream_file_aico_exit, fstream);
 
     // ok
     return tb_true;

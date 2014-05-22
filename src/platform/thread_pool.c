@@ -1182,7 +1182,7 @@ tb_long_t tb_thread_pool_task_wait_all(tb_handle_t handle, tb_long_t timeout)
 		tb_check_break(size);
 
 		// wait some time
-		tb_sleep(1);
+		tb_msleep(200);
 	}
 
 	// ok?
