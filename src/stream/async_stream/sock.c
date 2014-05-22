@@ -1058,9 +1058,9 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
         sstream->base.seek      = tb_async_stream_sock_seek;
         sstream->base.sync      = tb_async_stream_sock_sync;
         sstream->base.task      = tb_async_stream_sock_task;
-        sstream->base.kill      = tb_async_stream_sock_kill;
         sstream->base.clos      = tb_async_stream_sock_clos;
         sstream->base.exit      = tb_async_stream_sock_exit;
+        sstream->base.base.kill = tb_async_stream_sock_kill;
         sstream->base.base.ctrl = tb_async_stream_sock_ctrl;
         sstream->type           = TB_SOCKET_TYPE_TCP;
 

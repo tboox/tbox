@@ -332,9 +332,6 @@ typedef struct __tb_async_stream_t
 	/// task
 	tb_bool_t 					(*task)(tb_handle_t stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv);
 
-	/// kill
-	tb_void_t 					(*kill)(tb_handle_t stream);
-
 	/// exit
 	tb_bool_t 					(*exit)(tb_handle_t stream);
 
