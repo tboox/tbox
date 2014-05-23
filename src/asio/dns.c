@@ -41,17 +41,36 @@
  * types
  */
 
+// the aicp dns done type
+typedef struct __tb_aicp_dns_done_t
+{
+    // the func
+    tb_aicp_dns_done_func_t func;
+
+    // the priv
+    tb_cpointer_t           priv;
+
+}tb_aicp_dns_done_t;
+
+// the aicp dns exit type
+typedef struct __tb_aicp_dns_exit_t
+{
+    // the func
+    tb_aicp_dns_exit_func_t func;
+
+    // the priv
+    tb_cpointer_t           priv;
+
+}tb_aicp_dns_exit_t;
+
 // the aicp dns type
 typedef struct __tb_aicp_dns_t
 {
-    // the done func
-    tb_aicp_dns_done_func_t done;
+    // the done 
+    tb_aicp_dns_done_t      done;
 
-    // the exit func
-    tb_aicp_dns_exit_func_t exit;
-
-    // the func private data
-    tb_cpointer_t           priv;
+    // the exit 
+    tb_aicp_dns_exit_t      exit;
 
     // the sock
     tb_handle_t             sock;
@@ -308,7 +327,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
         if (!from_cache) tb_dns_cache_set(dns->host, &ipv4);
         
         // done func
-        dns->done(dns, dns->host, &ipv4, dns->priv);
+        dns->done.func(dns, dns->host, &ipv4, dns->done.priv);
         return tb_true;
     }
 
@@ -330,7 +349,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     }
 
     // failed? done func
-    if (!ok) dns->done(dns, dns->host, tb_null, dns->priv);
+    if (!ok) dns->done.func(dns, dns->host, tb_null, dns->done.priv);
 
     // continue
     return tb_true;
@@ -346,7 +365,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     
     // the dns
     tb_aicp_dns_t* dns = (tb_aicp_dns_t*)aice->priv; 
-    tb_assert_and_check_return_val(dns && dns->done, tb_false);
+    tb_assert_and_check_return_val(dns && dns->done.func, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
@@ -389,7 +408,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     }
 
     // failed? done func
-    if (!ok) dns->done(dns, dns->host, tb_null, dns->priv);
+    if (!ok) dns->done.func(dns, dns->host, tb_null, dns->done.priv);
 
     // continue 
     return tb_true;
@@ -401,7 +420,7 @@ static tb_void_t tb_aicp_dns_exit_func(tb_handle_t aico, tb_cpointer_t priv)
     tb_assert_and_check_return(dns);
 
     // done exit
-    if (dns->exit) dns->exit(dns, dns->priv);
+    if (dns->exit.func) dns->exit.func(dns, dns->exit.priv);
 
     // exit sock
     if (dns->sock) tb_socket_clos(dns->sock);
@@ -417,10 +436,10 @@ static tb_void_t tb_aicp_dns_exit_func(tb_handle_t aico, tb_cpointer_t priv)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_dns_done_func_t done, tb_aicp_dns_exit_func_t exit, tb_cpointer_t priv)
+tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout)
 {
     // check
-    tb_assert_and_check_return_val(aicp && done, tb_null);
+    tb_assert_and_check_return_val(aicp, tb_null);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -443,11 +462,6 @@ tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_dns_don
         tb_aico_timeout_set(dns->aico, TB_AICO_TIMEOUT_SEND, timeout);
         tb_aico_timeout_set(dns->aico, TB_AICO_TIMEOUT_RECV, timeout);
 
-        // init dns
-        dns->done = done;
-        dns->exit = exit;
-        dns->priv = priv;
-
         // ok
         ok = tb_true;
 
@@ -457,7 +471,7 @@ tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_dns_don
     if (!ok)
     {
         // exit it
-        if (dns) tb_aicp_dns_exit(dns);
+        if (dns) tb_aicp_dns_exit(dns, tb_null, tb_null);
         dns = tb_null;
     }
 
@@ -476,7 +490,7 @@ tb_void_t tb_aicp_dns_kill(tb_handle_t handle)
     // kill sock
     if (dns->sock) tb_socket_kill(dns->sock, TB_SOCKET_KILL_RW);
 }
-tb_void_t tb_aicp_dns_exit(tb_handle_t handle)
+tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t exit, tb_cpointer_t priv)
 {
     // check
     tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
@@ -485,15 +499,23 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle)
     // trace
     tb_trace_d("exit: ..");
 
+    // save func
+    dns->exit.func = exit;
+    dns->exit.priv = priv;
+
     // exit aico
     tb_aico_exit(dns->aico, tb_aicp_dns_exit_func, dns);
 }
-tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host)
+tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host, tb_aicp_dns_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
-    tb_assert_and_check_return_val(dns && dns->aico && dns->done && host && host[0], tb_false);
+    tb_assert_and_check_return_val(dns && dns->aico && func && host && host[0], tb_false);
     
+    // init func
+    dns->done.func = func;
+    dns->done.priv = priv;
+
     // save host
     tb_strlcpy(dns->host, host, sizeof(dns->host) - 1);
  
@@ -501,14 +523,14 @@ tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host)
     tb_ipv4_t ipv4 = {0};
     if (tb_ipv4_set(&ipv4, dns->host))
     {
-        dns->done(handle, dns->host, &ipv4, dns->priv);
+        dns->done.func(handle, dns->host, &ipv4, dns->done.priv);
         return tb_true;
     }
 
     // try to lookup it from cache first
     if (tb_dns_cache_get(dns->host, &ipv4))
     {
-        dns->done(handle, dns->host, &ipv4, dns->priv);
+        dns->done.func(handle, dns->host, &ipv4, dns->done.priv);
         return tb_true;
     }
 
