@@ -96,39 +96,47 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
 	,	tb_basic_stream_init_data
 	};
 
-	// init
-	tb_char_t const* 	p = url;
-	tb_basic_stream_t* 	stream = tb_null;
-	tb_size_t 			type = TB_STREAM_TYPE_NONE;
-	if (!tb_strnicmp(p, "http://", 7)) 			type = TB_STREAM_TYPE_HTTP;
-	else if (!tb_strnicmp(p, "sock://", 7)) 	type = TB_STREAM_TYPE_SOCK;
-	else if (!tb_strnicmp(p, "file://", 7)) 	type = TB_STREAM_TYPE_FILE;
-	else if (!tb_strnicmp(p, "data://", 7)) 	type = TB_STREAM_TYPE_DATA;
-	else if (!tb_strnicmp(p, "https://", 8)) 	type = TB_STREAM_TYPE_HTTP;
-	else if (!tb_strnicmp(p, "socks://", 8)) 	type = TB_STREAM_TYPE_SOCK;
-	else if (!tb_strstr(p, "://")) 				type = TB_STREAM_TYPE_FILE;
-	else 
-	{
-		tb_trace_d("[stream]: unknown prefix for url: %s", url);
-		return tb_null;
-	}
-	tb_assert_and_check_goto(type && type < tb_arrayn(s_init) && s_init[type], fail);
+    // probe protocol
+    tb_size_t protocol = tb_url_protocol_probe(url);
 
-	// init stream
-	stream = s_init[type]();
-	tb_assert_and_check_goto(stream, fail);
+    // protocol => type
+	tb_size_t type = TB_STREAM_TYPE_NONE;
+    switch (protocol)
+    {
+    case TB_URL_PROTOCOL_FILE: type = TB_STREAM_TYPE_FILE; break;
+    case TB_URL_PROTOCOL_HTTP: type = TB_STREAM_TYPE_HTTP; break;
+    case TB_URL_PROTOCOL_SOCK: type = TB_STREAM_TYPE_SOCK; break;
+    case TB_URL_PROTOCOL_DATA: type = TB_STREAM_TYPE_DATA; break;
+    default:
+		tb_trace_e("unknown stream for url: %s", url);
+        return tb_null;
+    }
+	tb_assert_and_check_return_val(type && type < tb_arrayn(s_init) && s_init[type], tb_null);
 
-	// set url
-	if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_URL, url)) goto fail;
+    // done
+    tb_bool_t           ok = tb_false;
+	tb_basic_stream_t*  stream = tb_null;
+    do
+    {
+        // init stream
+        stream = s_init[type]();
+        tb_assert_and_check_break(stream);
 
-	// ok
+        // set url
+        if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_URL, url)) break;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+	    // exit stream
+	    if (stream) tb_basic_stream_exit(stream);
+        stream = tb_null;
+    }
+
+	// ok?
 	return stream;
-
-fail:
-	
-	// exit stream
-	if (stream) tb_basic_stream_exit(stream);
-	return tb_null;
 }
 tb_void_t tb_basic_stream_exit(tb_basic_stream_t* stream)
 {

@@ -183,6 +183,14 @@ tb_void_t 			tb_url_protocol_set(tb_url_t* url, tb_size_t protocol);
  */
 tb_char_t const* 	tb_url_protocol_cstr(tb_url_t const* url);
 
+/*! probe the protocol from the url
+ *
+ * @param url 		the url
+ *
+ * @return 			the url protocol
+ */
+tb_size_t 			tb_url_protocol_probe(tb_char_t const* url);
+
 /*! get the port from the url
  *
  * @param url 		the url
