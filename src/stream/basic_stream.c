@@ -61,8 +61,8 @@ tb_bool_t tb_basic_stream_init(tb_basic_stream_t* stream, tb_size_t type, tb_siz
 		// init timeout, 10s
 		stream->base.timeout = 10000;
 
-		// init stoped?
-		stream->base.bstoped = 1;
+		// init internal state?
+		stream->base.istate = TB_STATE_CLOSED;
 
 		// init url
 		if (!tb_url_init(&stream->base.url)) break;
@@ -156,7 +156,7 @@ tb_long_t tb_basic_stream_wait(tb_basic_stream_t* stream, tb_size_t wait, tb_lon
 	tb_assert_and_check_return_val(stream && stream->wait, -1);
 
 	// stoped?
-	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bstoped), -1);
+	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), -1);
 
 	// wait it
 	tb_long_t ok = stream->wait(stream, wait, timeout);
@@ -197,8 +197,8 @@ tb_bool_t tb_basic_stream_open(tb_basic_stream_t* stream)
 	// already been opened?
 	tb_check_return_val(!tb_stream_is_opened(stream), tb_true);
 
-	// stoped?
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bstoped), tb_false);
+	// closed?
+	tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// init offset
 	stream->offset = 0;
@@ -206,16 +206,11 @@ tb_bool_t tb_basic_stream_open(tb_basic_stream_t* stream)
 	// init state
 	stream->state = TB_STATE_OK;
 
-	// clear stoped
-	tb_atomic_set0(&stream->base.bstoped);
-
 	// open it
 	tb_bool_t ok = stream->open(stream);
 
 	// opened
-	if (ok) stream->base.bopened = 1;
-	// stoped
-	else tb_atomic_set(&stream->base.bstoped, 1);
+	if (ok) tb_atomic_set(&stream->base.istate, TB_STATE_OPENED);
 
 	// ok?
 	return ok;
@@ -237,9 +232,8 @@ tb_bool_t tb_basic_stream_clos(tb_basic_stream_t* stream)
 	// clear state
 	stream->offset = 0;
 	stream->bwrited = 0;
-	stream->base.bopened = 0;
 	stream->state = TB_STATE_OK;
-	tb_atomic_set(&stream->base.bstoped, 1);
+	tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
 
 	// clear cache
 	tb_queue_buffer_clear(&stream->cache);
@@ -256,7 +250,7 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
 	tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream) && stream->read && stream->wait, tb_false);
 
 	// stoped?
-	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
+	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// no cache? enable it first
 	if (!tb_queue_buffer_maxn(&stream->cache)) tb_queue_buffer_resize(&stream->cache, size);
@@ -292,7 +286,7 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
 
 	// fill cache
 	tb_size_t read = 0;
-	while (read < push && !tb_atomic_get(&stream->base.bstoped))
+	while (read < push && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
 	{
 		// read data
 		tb_long_t real = stream->read(stream, tail + read, push - read);
@@ -322,7 +316,7 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
 	if (size > tb_queue_buffer_size(&stream->cache))
 	{
 		// killed? save state
-		if (!stream->state && tb_atomic_get(&stream->base.bstoped))
+		if (!stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
 			stream->state = TB_STATE_KILLED;
 
 		// failed
@@ -494,7 +488,7 @@ tb_bool_t tb_basic_stream_bread(tb_basic_stream_t* stream, tb_byte_t* data, tb_s
 
 	// read data from cache
 	tb_long_t read = 0;
-	while (read < size && !tb_atomic_get(&stream->base.bstoped))
+	while (read < size && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
 	{
 		// read data
 		tb_long_t real = tb_basic_stream_read(stream, data + read, size - read);	
@@ -512,7 +506,7 @@ tb_bool_t tb_basic_stream_bread(tb_basic_stream_t* stream, tb_byte_t* data, tb_s
 	}
 
 	// killed? save state
-	if (read != size && !stream->state && tb_atomic_get(&stream->base.bstoped))
+	if (read != size && !stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
 		stream->state = TB_STATE_KILLED;
 
 	// ok?
@@ -526,7 +520,7 @@ tb_bool_t tb_basic_stream_bwrit(tb_basic_stream_t* stream, tb_byte_t const* data
 
 	// writ data to cache
 	tb_long_t writ = 0;
-	while (writ < size && !tb_atomic_get(&stream->base.bstoped))
+	while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
 	{
 		// writ data
 		tb_long_t real = tb_basic_stream_writ(stream, data + writ, size - writ);	
@@ -544,7 +538,7 @@ tb_bool_t tb_basic_stream_bwrit(tb_basic_stream_t* stream, tb_byte_t const* data
 	}
 
 	// killed? save state
-	if (writ != size && !stream->state && tb_atomic_get(&stream->base.bstoped))
+	if (writ != size && !stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
 		stream->state = TB_STATE_KILLED;
 
 	// ok?
@@ -556,7 +550,7 @@ tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
 	tb_assert_and_check_return_val(stream && stream->writ && stream->wait && tb_stream_is_opened(stream), tb_false);
 
 	// stoped?
-	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
+	tb_assert_and_check_return_val((TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)), tb_false);
 
 	// cached? sync cache first
 	if (tb_queue_buffer_maxn(&stream->cache))
@@ -574,7 +568,7 @@ tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
 
 			// writ cache data to stream
 			tb_size_t 	writ = 0;
-			while (writ < size && !tb_atomic_get(&stream->base.bstoped))
+			while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
 			{
 				// writ
 				tb_long_t real = stream->writ(stream, head + writ, size - writ);
@@ -605,7 +599,7 @@ tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
 			if (!tb_queue_buffer_null(&stream->cache))
 			{
 				// killed? save state
-				if (!stream->state && tb_atomic_get(&stream->base.bstoped))
+				if (!stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
 					stream->state = TB_STATE_KILLED;
 
 				// failed
@@ -624,7 +618,7 @@ tb_bool_t tb_basic_stream_seek(tb_basic_stream_t* stream, tb_hize_t offset)
 	tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream), tb_false);
 
 	// stoped?
-	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
+	tb_assert_and_check_return_val((TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)), tb_false);
 
 	// limit offset
 	tb_hong_t size = tb_stream_size(stream);
@@ -713,7 +707,7 @@ tb_long_t tb_basic_stream_bread_line(tb_basic_stream_t* stream, tb_char_t* data,
 	// done
 	tb_char_t 	ch = 0;
 	tb_char_t* 	p = data;
-	while (!tb_atomic_get(&stream->base.bstoped))
+	while ((TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
 	{
 		// read char
 		ch = tb_basic_stream_bread_s8(stream);
@@ -741,7 +735,7 @@ tb_long_t tb_basic_stream_bread_line(tb_basic_stream_t* stream, tb_char_t* data,
 	}
 
 	// killed?
-	if (tb_atomic_get(&stream->base.bstoped)) return -1;
+	if ((TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))) return -1;
 
 	// end?
 	return tb_stream_beof(stream)? -1 : 0;
