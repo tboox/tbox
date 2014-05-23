@@ -45,17 +45,6 @@
  * types
  */
 
-// the file stream clos type
-typedef struct __tb_async_stream_file_clos_t
-{
-    // the func
-    tb_async_stream_clos_func_t         func;
-
-    // the priv
-    tb_cpointer_t                       priv;
-
-}tb_async_stream_file_clos_t;
-
 // the file stream type
 typedef struct __tb_async_stream_file_t
 {
@@ -80,9 +69,6 @@ typedef struct __tb_async_stream_file_t
     // is closing
     tb_bool_t                           bclosing;
 
-    // the clos
-    tb_async_stream_file_clos_t         clos;
-
     // the func
     union
     {
@@ -90,6 +76,7 @@ typedef struct __tb_async_stream_file_t
         tb_async_stream_writ_func_t     writ;
         tb_async_stream_sync_func_t     sync;
         tb_async_stream_task_func_t     task;
+        tb_async_stream_clos_func_t     clos;
 
     }                                   func;
 
@@ -106,41 +93,6 @@ static __tb_inline__ tb_async_stream_file_t* tb_async_stream_file_cast(tb_handle
     tb_async_stream_t* astream = (tb_async_stream_t*)stream;
     tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_null);
     return (tb_async_stream_file_t*)astream;
-}
-static tb_void_t tb_async_stream_file_aico_exit(tb_handle_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_async_stream_file_t* fstream = tb_async_stream_file_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(fstream);
-
-    // trace
-    tb_trace_d("clos: notify: ..");
-
-    // exit it
-    if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
-    fstream->file = tb_null;
-    fstream->bref = tb_false;
-
-    // clear the offset
-    tb_atomic64_set0(&fstream->offset);
-
-    // clear aico
-    fstream->aico = tb_null;
-
-	// clear base
-	tb_async_stream_clear(&fstream->base);
-
-    // clear opened
-	tb_atomic_set0(&fstream->base.base.bopened);
-
-    /* done clos func
-     *
-     * note: cannot use this stream after closing, the stream may be exited in the closing func
-     */
-    if (fstream->clos.func) fstream->clos.func((tb_handle_t)fstream, TB_STATE_OK, fstream->clos.priv);
-
-    // trace
-    tb_trace_d("clos: notify: ok");
 }
 static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
@@ -176,8 +128,8 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
         }
 
         // init clos
-        fstream->clos.func = tb_null;
-        fstream->clos.priv = tb_null;
+        fstream->func.clos  = tb_null;
+        fstream->priv       = tb_null;
 
         // addo file
         fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);
@@ -200,6 +152,41 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
     // ok?
     return func? tb_true : ((state == TB_STATE_OK)? tb_true : tb_false);
 }
+static tb_void_t tb_async_stream_file_clos_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_file_t* fstream = tb_async_stream_file_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(fstream && fstream->func.clos);
+
+    // trace
+    tb_trace_d("clos: notify: ..");
+
+    // exit it
+    if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
+    fstream->file = tb_null;
+    fstream->bref = tb_false;
+
+    // clear the offset
+    tb_atomic64_set0(&fstream->offset);
+
+    // clear aico
+    fstream->aico = tb_null;
+
+	// clear base
+	tb_async_stream_clear(&fstream->base);
+
+    // clear opened
+	tb_atomic_set0(&fstream->base.base.bopened);
+
+    /* done clos func
+     *
+     * note: cannot use this stream after closing, the stream may be exited in the closing func
+     */
+    fstream->func.clos(&fstream->base, TB_STATE_OK, fstream->priv);
+
+    // trace
+    tb_trace_d("clos: notify: ok");
+}
 static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
 {   
     // check
@@ -210,14 +197,14 @@ static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_
     tb_trace_d("clos: ..");
 
     // init clos
-    fstream->clos.func = func;
-    fstream->clos.priv = priv;
+    fstream->func.clos  = func;
+    fstream->priv       = priv;
 
     /* exit aico
      *
      * note: cannot use this stream after exiting, the stream may be exited after calling clos func
      */
-    tb_aico_exit(fstream->aico, tb_async_stream_file_aico_exit, fstream);
+    tb_aico_exit(fstream->aico, tb_async_stream_file_clos_func, fstream);
 
     // ok
     return tb_true;

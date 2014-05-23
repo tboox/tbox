@@ -72,6 +72,7 @@ typedef struct __tb_async_stream_filter_t
         tb_async_stream_writ_func_t     writ;
         tb_async_stream_sync_func_t     sync;
         tb_async_stream_task_func_t     task;
+        tb_async_stream_clos_func_t     clos;
 
     }                                   func;
 
@@ -136,22 +137,14 @@ static tb_bool_t tb_async_stream_filter_open(tb_handle_t astream, tb_async_strea
     // post open
     return tb_async_stream_open(fstream->astream, tb_async_stream_filter_open_func, astream);
 }
-static tb_bool_t tb_async_stream_filter_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
-{   
+static tb_void_t tb_async_stream_filter_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+{
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(astream);
-    tb_assert_and_check_return_val(fstream, tb_false);
+    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(fstream && fstream->func.clos);
 
     // trace
-    tb_trace_d("clos: ..");
-
-    // noimpl
-    tb_trace_noimpl();
-    return tb_false;
-
-#if 0
-    // close stream
-    if (fstream->astream) tb_async_stream_clos(fstream->astream, bcalling);
+    tb_trace_d("clos: notify: ..");
 
     // clear the filter
     if (fstream->filter) tb_stream_filter_cler(fstream->filter);
@@ -161,7 +154,37 @@ static tb_bool_t tb_async_stream_filter_clos(tb_handle_t astream, tb_async_strea
 
     // clear the offset
     tb_atomic64_set0(&fstream->offset);
-#endif
+
+	// clear base
+	tb_async_stream_clear(&fstream->base);
+
+    // clear opened
+	tb_atomic_set0(&fstream->base.base.bopened);
+
+    /* done clos func
+     *
+     * note: cannot use this stream after closing, the stream may be exited in the closing func
+     */
+    fstream->func.clos(&fstream->base, TB_STATE_OK, fstream->priv);
+
+    // trace
+    tb_trace_d("clos: notify: ok");
+}
+static tb_bool_t tb_async_stream_filter_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+{   
+    // check
+    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(astream);
+    tb_assert_and_check_return_val(fstream && fstream->astream, tb_false);
+
+    // trace
+    tb_trace_d("clos: ..");
+
+    // init clos
+    fstream->func.clos  = func;
+    fstream->priv       = priv;
+
+    // close it
+    return tb_async_stream_clos(fstream->astream, tb_async_stream_filter_clos_func, fstream);
 }
 static tb_bool_t tb_async_stream_filter_sync_read_func(tb_async_stream_t* astream, tb_size_t state, tb_cpointer_t priv)
 {
