@@ -323,7 +323,7 @@ static tb_bool_t tb_basic_stream_filter_ctrl(tb_handle_t bstream, tb_size_t ctrl
     case TB_STREAM_CTRL_FLTR_SET_STREAM:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(bstream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(bstream), tb_false);
 
             // set bstream
             tb_basic_stream_t* bstream = (tb_basic_stream_t*)tb_va_arg(args, tb_basic_stream_t*);
@@ -341,7 +341,7 @@ static tb_bool_t tb_basic_stream_filter_ctrl(tb_handle_t bstream, tb_size_t ctrl
     case TB_STREAM_CTRL_FLTR_SET_FILTER:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(bstream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(bstream), tb_false);
 
             //  exit filter first if exists
             if (!fstream->bref && fstream->filter) tb_stream_filter_exit(fstream->filter);

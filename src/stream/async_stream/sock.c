@@ -123,8 +123,8 @@ static tb_bool_t tb_async_stream_sock_open_ssl_func(tb_handle_t ssl, tb_size_t s
     tb_trace_d("ssl: open: %s", tb_state_cstr(state));
 
     // ok? opened
-    if (state == TB_STATE_OK) tb_atomic_set(&sstream->base.base.bopened, 1);
-
+    if (state == TB_STATE_OK) tb_atomic_set(&sstream->base.base.istate, TB_STATE_OPENED);
+ 
     // done func
     sstream->func.open((tb_async_stream_t*)sstream, state, sstream->priv);
 
@@ -175,7 +175,7 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
 #endif
             {
                 // opened
-                tb_atomic_set(&sstream->base.base.bopened, 1);
+                tb_atomic_set(&sstream->base.base.istate, TB_STATE_OPENED);
 
                 // done func
                 sstream->func.open((tb_async_stream_t*)sstream, TB_STATE_OK, sstream->priv);
@@ -285,7 +285,7 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
                 sstream->ipv4 = *addr;
 
                 // opened
-                tb_atomic_set(&sstream->base.base.bopened, 1);
+                tb_atomic_set(&sstream->base.base.istate, TB_STATE_OPENED);
 
                 // done func
                 sstream->func.open((tb_async_stream_t*)sstream, TB_STATE_OK, sstream->priv);
@@ -340,7 +340,7 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
     if (sstream->balived && sstream->hdns && sstream->aico)
     {
         // opened
-        tb_atomic_set(&sstream->base.base.bopened, 1);
+        tb_atomic_set(&sstream->base.base.istate, TB_STATE_OPENED);
 
         // done func
         func((tb_async_stream_t*)sstream, TB_STATE_OK, priv);
@@ -985,10 +985,18 @@ static tb_void_t tb_async_stream_sock_kill(tb_handle_t astream)
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
     tb_assert_and_check_return(sstream);
 
+    // trace
+    tb_trace_d("kill: ..");
+
+    // exit ssl
+#ifdef TB_SSL_ENABLE
+    if (sstream->hssl) tb_aicp_ssl_kill(sstream->hssl);
+#endif
+    // kill addr
+    if (sstream->hdns) tb_aicp_dns_kill(sstream->hdns);
+
     // kill aico
     if (sstream->aico) tb_aico_kill(sstream->aico);
-    // kill addr
-    else if (sstream->hdns) tb_aicp_dns_kill(sstream->hdns);
 }
 static tb_bool_t tb_async_stream_sock_exit(tb_handle_t astream)
 {   
@@ -1037,7 +1045,7 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_SOCK_SET_TYPE:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
 
             // the type
             tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -1072,7 +1080,7 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_SOCK_SET_HANDLE:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
 
             // the sock
             tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);

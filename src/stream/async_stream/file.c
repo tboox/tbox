@@ -139,7 +139,7 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
         tb_atomic64_set0(&fstream->offset);
 
         // opened
-        tb_atomic_set(&fstream->base.base.bopened, 1);
+        tb_atomic_set(&fstream->base.base.istate, TB_STATE_OPENED);
 
         // ok
         state = TB_STATE_OK;
@@ -472,7 +472,7 @@ static tb_bool_t tb_async_stream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_FILE_SET_MODE:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
 
             // set mode
             fstream->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -488,7 +488,7 @@ static tb_bool_t tb_async_stream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_FILE_SET_HANDLE:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
 
             // exit file first if exists
             if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);

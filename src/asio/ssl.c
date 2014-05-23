@@ -165,8 +165,14 @@ typedef struct __tb_aicp_ssl_t
 	// the timeout
 	tb_long_t 				timeout;
 
-	// is opened?
-	tb_atomic_t 			bopened;
+	/* the state
+     *
+     * TB_STATE_CLOSED
+     * TB_STATE_OPENED
+     * TB_STATE_OPENING
+     * TB_STATE_KILLING
+     */
+	tb_atomic_t 			state;
 
 	// the read data
 	tb_scoped_buffer_t 		read_data;
@@ -298,7 +304,7 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
 		if (ok > 0)
 		{
 			// opened
-			tb_atomic_set(&ssl->bopened, 1);
+			tb_atomic_set(&ssl->state, TB_STATE_OPENED);
 
 			// done func
 			ssl->func.open.func(ssl, TB_STATE_OK, ssl->func.open.priv);
@@ -703,7 +709,7 @@ static tb_void_t tb_aicp_ssl_done_clos(tb_handle_t aico, tb_cpointer_t priv)
 	ssl->post.real = 0;
 
 	// clear opened
-	tb_atomic_set0(&ssl->bopened);
+	tb_atomic_set(&ssl->state, TB_STATE_CLOSED);
 
 	// done func
 	ssl->func.clos.func(ssl, TB_STATE_OK, ssl->func.clos.priv);
@@ -728,6 +734,9 @@ tb_handle_t tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver)
 		// make ssl
 		ssl = tb_malloc0(sizeof(tb_aicp_ssl_t));
 		tb_assert_and_check_break(ssl);
+
+        // init state
+        ssl->state = TB_STATE_CLOSED;
 
 		// init aicp
 		ssl->aicp = aicp;
@@ -764,6 +773,13 @@ tb_void_t tb_aicp_ssl_kill(tb_handle_t handle)
 	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;
 	tb_assert_and_check_return(ssl);
 
+	// kill it
+	tb_size_t state = tb_atomic_fetch_and_pset(&ssl->state, TB_STATE_OPENED, TB_STATE_KILLING);
+    tb_check_return(state != TB_STATE_KILLING && state != TB_STATE_CLOSED);
+
+    // opening? kill it
+    tb_atomic_pset(&ssl->state, TB_STATE_OPENING, TB_STATE_KILLING);
+
 	// trace
 	tb_trace_d("kill: ..");
 
@@ -781,7 +797,7 @@ tb_bool_t tb_aicp_ssl_exit(tb_handle_t handle)
 
     // wait for closing
     tb_size_t tryn = 30;
-    while (tb_atomic_get(&ssl->bopened) && tryn--)
+    while (TB_STATE_CLOSED != tb_atomic_get(&ssl->state) && tryn--)
     {
         // trace
         tb_trace_d("exit: wait: ..");
@@ -789,7 +805,7 @@ tb_bool_t tb_aicp_ssl_exit(tb_handle_t handle)
         // wait some time
         tb_msleep(200);
     }
-    tb_assert_and_check_return_val(!tb_atomic_get(&ssl->bopened), tb_false);
+    tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&ssl->state), tb_false);
 
 	// exit ssl
 	if (ssl->ssl) tb_ssl_exit(ssl->ssl);
@@ -836,8 +852,18 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 	tb_bool_t ok = tb_false;
 	do
 	{
-		// opened?
-		tb_assert_and_check_break(!tb_atomic_get(&ssl->bopened));
+        // set opening
+        tb_size_t state = tb_atomic_fetch_and_pset(&ssl->state, TB_STATE_CLOSED, TB_STATE_OPENING);
+
+        // opened? done func directly
+        if (state == TB_STATE_OPENED)
+        {
+            func(ssl, TB_STATE_OK, priv);
+            return tb_true;
+        }
+
+        // must be closed
+        tb_assert_and_check_break(state == TB_STATE_CLOSED);
 
 		// check
 		tb_assert_and_check_break(ssl->aicp && ssl->ssl && ssl->sock && !ssl->aico);
@@ -858,10 +884,10 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 		ssl->func.open.priv = priv;
 
 		// init post
-		ssl->post.func = tb_aicp_ssl_open_done;
+		ssl->post.func  = tb_aicp_ssl_open_done;
 		ssl->post.delay = 0;
 		ssl->post.bpost = tb_false;
-		ssl->post.real = -1;
+		ssl->post.real  = -1;
 
 		// init post func
 		tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_post_read, tb_aicp_ssl_post_writ, tb_null, ssl);
@@ -873,7 +899,7 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 		if (r > 0)
 		{
 			// opened
-			tb_atomic_set(&ssl->bopened, 1);
+			tb_atomic_set(&ssl->state, TB_STATE_OPENED);
 
 			// done func
 			func(ssl, TB_STATE_OK, priv);
@@ -902,6 +928,9 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 
 	} while (0);
 
+    // failed? restore state
+    if (!ok) tb_atomic_pset(&ssl->state, TB_STATE_OPENING, TB_STATE_CLOSED);
+
 	// ok?
 	return ok;
 }
@@ -913,6 +942,14 @@ tb_bool_t tb_aicp_ssl_clos(tb_handle_t handle, tb_aicp_ssl_clos_func_t func, tb_
 
 	// trace
 	tb_trace_d("clos: ..");
+
+	// closed? done func directly
+	if (TB_STATE_CLOSED == tb_atomic_get(&ssl->state))
+    {
+        // done func
+        func(ssl, TB_STATE_OK, priv);
+        return tb_true;
+    }
 
     // init func
     ssl->func.clos.func = func;
@@ -946,7 +983,7 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
 	do
 	{
 		// opened?
-		tb_assert_and_check_break(tb_atomic_get(&ssl->bopened));
+	    tb_assert_and_check_break(TB_STATE_OPENED == tb_atomic_get(&ssl->state));
 
 		// check
 		tb_assert_and_check_break(ssl->aicp && ssl->ssl && ssl->aico);
@@ -1016,7 +1053,7 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
 	do
 	{
 		// opened?
-		tb_assert_and_check_break(tb_atomic_get(&ssl->bopened));
+	    tb_assert_and_check_break(TB_STATE_OPENED == tb_atomic_get(&ssl->state));
 
 		// check
 		tb_assert_and_check_break(ssl->aicp && ssl->ssl && ssl->aico);
@@ -1093,7 +1130,7 @@ tb_bool_t tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t size,
 	tb_assert_and_check_return_val(ssl && data && size && func, tb_false);
 
 	// not opened? open it first
-	if (!tb_atomic_get(&ssl->bopened))
+	if (TB_STATE_CLOSED == tb_atomic_get(&ssl->state))
 	{
 		ssl->open_and.read.func = func;
 		ssl->open_and.read.data = data;
@@ -1112,7 +1149,7 @@ tb_bool_t tb_aicp_ssl_owrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t
 	tb_assert_and_check_return_val(ssl && data && size && func, tb_false);
 
 	// not opened? open it first
-	if (!tb_atomic_get(&ssl->bopened))
+	if (TB_STATE_CLOSED == tb_atomic_get(&ssl->state))
 	{
 		ssl->open_and.writ.func = func;
 		ssl->open_and.writ.data = data;

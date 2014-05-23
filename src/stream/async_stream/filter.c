@@ -100,7 +100,7 @@ static tb_bool_t tb_async_stream_filter_open_func(tb_async_stream_t* astream, tb
     tb_assert_and_check_return_val(fstream && fstream->func.open, tb_false);
 
     // opened
-    tb_atomic_set(&fstream->base.base.bopened, 1);
+    tb_atomic_set(&fstream->base.base.istate, TB_STATE_OPENED);
 
     // done func
     return fstream->func.open((tb_async_stream_t*)fstream, state, fstream->priv);
@@ -121,7 +121,7 @@ static tb_bool_t tb_async_stream_filter_open(tb_handle_t astream, tb_async_strea
     if (tb_stream_is_opened(fstream->astream)) 
     {
         // opened
-        tb_atomic_set(&fstream->base.base.bopened, 1);
+        tb_atomic_set(&fstream->base.base.istate, TB_STATE_OPENED);
 
         // done func
         return func? func(astream, TB_STATE_OK, fstream->priv) : tb_true;
@@ -534,7 +534,7 @@ static tb_bool_t tb_async_stream_filter_ctrl(tb_handle_t astream, tb_size_t ctrl
     case TB_STREAM_CTRL_FLTR_SET_STREAM:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
 
             // set astream
             tb_handle_t astream = (tb_async_stream_t*)tb_va_arg(args, tb_async_stream_t*);
@@ -552,7 +552,7 @@ static tb_bool_t tb_async_stream_filter_ctrl(tb_handle_t astream, tb_size_t ctrl
     case TB_STREAM_CTRL_FLTR_SET_FILTER:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
 
             //  exit filter first if exists
             if (!fstream->bref && fstream->filter) tb_stream_filter_exit(fstream->filter);

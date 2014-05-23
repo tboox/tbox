@@ -160,7 +160,7 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
         tb_atomic64_set0(&dstream->offset);
 
         // opened
-        tb_atomic_set(&dstream->base.base.bopened, 1);
+        tb_atomic_set(&dstream->base.base.istate, TB_STATE_OPENED);
 
         // ok
         state = TB_STATE_OK;
@@ -547,7 +547,7 @@ static tb_bool_t tb_async_stream_data_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_SET_URL:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
 
             // set url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);

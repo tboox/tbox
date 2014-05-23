@@ -578,7 +578,7 @@ static tb_bool_t tb_basic_stream_sock_ctrl(tb_handle_t bstream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_SOCK_SET_TYPE:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(bstream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(bstream), tb_false);
 
             // the type
             tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -609,7 +609,7 @@ static tb_bool_t tb_basic_stream_sock_ctrl(tb_handle_t bstream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_SOCK_SET_HANDLE:
         {
             // check
-            tb_assert_and_check_return_val(!tb_stream_is_opened(bstream), tb_false);
+            tb_assert_and_check_return_val(tb_stream_is_closed(bstream), tb_false);
             
             // the sock
             tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);

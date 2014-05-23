@@ -210,8 +210,8 @@ static tb_bool_t tb_async_stream_oread_func(tb_async_stream_t* stream, tb_size_t
 		// reset state
 		state = TB_STATE_UNKNOWN_ERROR;
 		
-		// stoped?
-		if (tb_atomic_get(&stream->base.bstoped))
+		// killed?
+		if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
 		{
 			state = TB_STATE_KILLED;
 			break;
@@ -228,8 +228,8 @@ static tb_bool_t tb_async_stream_oread_func(tb_async_stream_t* stream, tb_size_t
 	// failed?
 	if (state != TB_STATE_OK) 
 	{
-		// stoped
-		tb_atomic_set(&stream->base.bstoped, 1);
+		// kill it
+		tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
  
 		// done func
 		ok = oread->func(stream, state, tb_null, 0, oread->size, oread->priv);
@@ -254,8 +254,8 @@ static tb_bool_t tb_async_stream_owrit_func(tb_async_stream_t* stream, tb_size_t
 		// reset state
 		state = TB_STATE_UNKNOWN_ERROR;
 			
-		// stoped?
-		if (tb_atomic_get(&stream->base.bstoped))
+		// killed?
+		if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
 		{
 			state = TB_STATE_KILLED;
 			break;
@@ -275,8 +275,8 @@ static tb_bool_t tb_async_stream_owrit_func(tb_async_stream_t* stream, tb_size_t
 	// failed? 
 	if (state != TB_STATE_OK)
 	{	
-		// stoped
-		tb_atomic_set(&stream->base.bstoped, 1);
+		// kill it
+		tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
 
 		// done func
 		ok = owrit->func(stream, state, owrit->data, 0, owrit->size, owrit->priv);
@@ -301,8 +301,8 @@ static tb_bool_t tb_async_stream_oseek_func(tb_async_stream_t* stream, tb_size_t
 		// reset state
 		state = TB_STATE_UNKNOWN_ERROR;
 		
-		// stoped?
-		if (tb_atomic_get(&stream->base.bstoped))
+		// killed?
+		if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
 		{
 			state = TB_STATE_KILLED;
 			break;
@@ -328,8 +328,8 @@ static tb_bool_t tb_async_stream_oseek_func(tb_async_stream_t* stream, tb_size_t
 	// failed? 
 	if (state != TB_STATE_OK) 
 	{	
-		// stoped
-		tb_atomic_set(&stream->base.bstoped, 1);
+		// kill it
+		tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
 
 		// done func
 		ok = oseek->func(stream, state, 0, oseek->priv);
@@ -354,8 +354,8 @@ static tb_bool_t tb_async_stream_sread_func(tb_async_stream_t* stream, tb_size_t
 		// reset state
 		state = TB_STATE_UNKNOWN_ERROR;
 		
-		// stoped?
-		if (tb_atomic_get(&stream->base.bstoped))
+		// killed?
+		if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
 		{
 			state = TB_STATE_KILLED;
 			break;
@@ -395,8 +395,8 @@ static tb_bool_t tb_async_stream_sseek_func(tb_async_stream_t* stream, tb_size_t
 		// reset state
 		state = TB_STATE_UNKNOWN_ERROR;
 		
-		// stoped?
-		if (tb_atomic_get(&stream->base.bstoped))
+		// killed?
+		if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
 		{
 			state = TB_STATE_KILLED;
 			break;
@@ -447,8 +447,7 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
 		stream->base.mode 		= TB_STREAM_MODE_AICO;
 		stream->base.type 		= type;
 		stream->base.timeout 	= -1;
-		stream->base.bopened 	= 0;
-		stream->base.bstoped 	= 1;
+		stream->base.istate 	= TB_STATE_CLOSED;
 		stream->aicp 			= aicp;
 
 		// init url
@@ -539,13 +538,12 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_t* stream)
 	// trace
 	tb_trace_d("exit: ..");
 
-    // FIXME: kill it first
-    // for bstoped
+    // kill it first
     tb_stream_kill(stream);
 
     // wait for closing
     tb_size_t tryn = 30;
-    while (!tb_atomic_get(&stream->base.bstoped) && tryn--)
+    while ((TB_STATE_CLOSED != tb_atomic_get(&stream->base.istate)) && tryn--)
     {
         // trace
         tb_trace_d("exit: wait: ..");
@@ -553,7 +551,7 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_t* stream)
         // wait some time
         tb_msleep(200);
     }
-    tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bstoped), tb_false);
+    tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// exit it
 	if (stream->exit && !stream->exit(stream)) return tb_false;
@@ -580,54 +578,67 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_t* stream)
 {
 	// check
 	tb_assert_and_check_return_val(stream && stream->open, tb_false);
-		
-	// check state
-	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bopened), tb_true);
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bstoped), tb_false);
+	
+    // set opening
+    tb_size_t state = tb_atomic_fetch_and_pset(&stream->base.istate, TB_STATE_CLOSED, TB_STATE_OPENING);
 
-	// init state
-	tb_atomic_set0(&stream->base.bstoped);
+    // opened?
+    tb_check_return_val(state != TB_STATE_OPENED, tb_true);
 
-	// try to open it
+    // must be closed
+	tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
+
+    // open it
 	tb_bool_t ok = stream->open(stream, tb_null, tb_null);
 
-	// open failed?
-	if (!ok) tb_atomic_set(&stream->base.bstoped, 1);
+    // failed? restore state
+    if (!ok) tb_atomic_pset(&stream->base.istate, TB_STATE_OPENING, TB_STATE_CLOSED);
 
-	// ok?
-	return ok;
+    // ok?
+    return ok;
 }
 tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(stream && stream->open && func, tb_false);
 	
-	// check state
-	tb_assert_and_check_return_val(!tb_atomic_get(&stream->base.bopened), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bstoped), tb_false);
+    // set opening
+    tb_size_t state = tb_atomic_fetch_and_pset(&stream->base.istate, TB_STATE_CLOSED, TB_STATE_OPENING);
 
-	// init state
-	tb_atomic_set0(&stream->base.bstoped);
+    // opened? done func directly
+    if (state == TB_STATE_OPENED)
+    {
+        func(stream, TB_STATE_OK, priv);
+        return tb_true;
+    }
 
-	// open it
+    // must be closed
+	tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
+
+    // open it
 	tb_bool_t ok = stream->open(stream, func, priv);
 
-	// post failed?
-	if (!ok) tb_atomic_set(&stream->base.bstoped, 1);
+    // failed? restore state
+    if (!ok) tb_atomic_pset(&stream->base.istate, TB_STATE_OPENING, TB_STATE_CLOSED);
 
-	// ok?
-	return ok;
+    // ok?
+    return ok;
 }
 tb_bool_t tb_async_stream_clos_(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(stream && stream->clos && func, tb_false);
-	
-	// check state
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
 
 	// trace
 	tb_trace_d("clos: ..");
+
+	// closed? done func directly
+	if (TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate))
+    {
+        // done func
+        func(stream, TB_STATE_OK, priv);
+        return tb_true;
+    }
 
 	// save debug info
 #ifdef __tb_debug__
@@ -655,8 +666,7 @@ tb_bool_t tb_async_stream_seek_(tb_async_stream_t* stream, tb_hize_t offset, tb_
 	tb_assert_and_check_return_val(stream && stream->seek && func, tb_false);
 	
 	// check state
-	tb_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
+	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -691,8 +701,7 @@ tb_bool_t tb_async_stream_sync_(tb_async_stream_t* stream, tb_bool_t bclosing, t
 	tb_assert_and_check_return_val(stream && stream->sync && func, tb_false);
 	
 	// check state
-	tb_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
+	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -730,8 +739,7 @@ tb_bool_t tb_async_stream_task_(tb_async_stream_t* stream, tb_size_t delay, tb_a
 	tb_assert_and_check_return_val(stream && stream->task && func, tb_false);
 	
 	// check state
-	tb_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
+	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -749,7 +757,7 @@ tb_bool_t tb_async_stream_oread_(tb_async_stream_t* stream, tb_size_t size, tb_a
 	tb_assert_and_check_return_val(stream && stream->open && stream->read && func, tb_false);
 
 	// no opened? open it first
-	if (!tb_atomic_get(&stream->base.bopened))
+	if (TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate))
 	{
 		// init open and read
 		stream->open_and.read.func = func;
@@ -767,7 +775,7 @@ tb_bool_t tb_async_stream_owrit_(tb_async_stream_t* stream, tb_byte_t const* dat
 	tb_assert_and_check_return_val(stream && stream->open && stream->writ && data && size && func, tb_false);
 
 	// no opened? open it first
-	if (!tb_atomic_get(&stream->base.bopened))
+	if (TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate))
 	{
 		// init open and writ
 		stream->open_and.writ.func = func;
@@ -786,7 +794,7 @@ tb_bool_t tb_async_stream_oseek_(tb_async_stream_t* stream, tb_hize_t offset, tb
 	tb_assert_and_check_return_val(stream && stream->open && stream->seek && func, tb_false);
 
 	// no opened? open it first
-	if (!tb_atomic_get(&stream->base.bopened))
+	if (TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate))
 	{
 		// init open and seek
 		stream->open_and.seek.func = func;
@@ -804,8 +812,7 @@ tb_bool_t tb_async_stream_read_after_(tb_async_stream_t* stream, tb_size_t delay
 	tb_assert_and_check_return_val(stream && stream->read && func, tb_false);
 	
 	// check state
-	tb_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
+	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -833,8 +840,7 @@ tb_bool_t tb_async_stream_writ_after_(tb_async_stream_t* stream, tb_size_t delay
 	tb_assert_and_check_return_val(stream && stream->writ && data && size && func, tb_false);
 	
 	// check state
-	tb_check_return_val(!tb_atomic_get(&stream->base.bstoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bopened), tb_false);
+	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
