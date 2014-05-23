@@ -111,8 +111,11 @@ tb_bool_t tb_stream_is_opened(tb_handle_t handle)
 	tb_stream_t* stream = (tb_stream_t*)handle;
 	tb_assert_and_check_return_val(stream, tb_false);
 
+    // the state
+    tb_size_t state = tb_atomic_get(&stream->istate);
+
 	// is opened?
-	return tb_atomic_get(&stream->bopened)? tb_true : tb_false;
+	return ((state == TB_STATE_OPENED) || (state == TB_STATE_KILLING))? tb_true : tb_false;
 }
 tb_long_t tb_stream_timeout(tb_handle_t handle)
 {
@@ -314,7 +317,7 @@ tb_void_t tb_stream_kill(tb_handle_t handle)
 	tb_assert_and_check_return(stream);
 
 	// stop it
-	tb_check_return(!tb_atomic_fetch_and_set(&stream->bstoped, 1));
+	tb_check_return(TB_STATE_OPENED == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING));
 
 	// trace
 	tb_trace_d("kill: ..");
