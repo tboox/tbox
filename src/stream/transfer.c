@@ -1248,7 +1248,7 @@ tb_bool_t tb_transfer_open(tb_handle_t handle, tb_transfer_open_func_t func, tb_
         if (transfer->ctrl.func && !transfer->ctrl.func(transfer->istream, transfer->ostream, transfer->ctrl.priv)) break;
 
         // open and seek istream
-        if (!tb_async_stream_oseek(transfer->istream, transfer->offset, tb_transfer_istream_open_func, transfer)) break;
+        if (!tb_async_stream_open_seek(transfer->istream, transfer->offset, tb_transfer_istream_open_func, transfer)) break;
 
         // ok
         ok = tb_true;
