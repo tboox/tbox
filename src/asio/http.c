@@ -1176,7 +1176,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size
 			tb_trace_d("request:\n%s", head_data);
 
 			// post writ head
-			ok = tb_async_stream_owrit(http->stream, (tb_byte_t const*)head_data, head_size, tb_aicp_http_head_writ_func, http);
+			ok = tb_async_stream_open_writ(http->stream, (tb_byte_t const*)head_data, head_size, tb_aicp_http_head_writ_func, http);
 		}
 		// post?
 		else if (http->option.method == TB_HTTP_METHOD_POST)
