@@ -83,6 +83,7 @@ tbox_C_FILES 			+= \
 						stream/basic_stream/sock \
 						stream/basic_stream/filter \
 						stream/transfer \
+						stream/basic_transfer \
 						stream/filter/filter \
 						stream/filter/cache \
 						stream/filter/chunked \
@@ -286,6 +287,7 @@ tbox_C_FILES 			+= \
 						stream/async_stream/data \
 						stream/async_stream/sock \
 						stream/async_stream/filter \
+						stream/async_transfer \
 						stream/transfer_pool \
 						platform/asio/aicp
 
@@ -535,6 +537,8 @@ INC_FILES 				= \
 						stream/async_stream.h \
 						stream/static_stream.h \
 						stream/transfer_pool.h \
+						stream/async_transfer.h \
+						stream/basic_transfer.h \
 						stream/transfer.h \
 						stream/filter/prefix.h \
 						stream/filter/filter.h \
