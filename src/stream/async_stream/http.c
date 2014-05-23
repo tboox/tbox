@@ -90,7 +90,7 @@ static tb_bool_t tb_async_stream_http_open_func(tb_handle_t http, tb_size_t stat
     tb_assert_and_check_return_val(hstream && hstream->func.open, tb_false);
 
     // opened
-    tb_atomic_set(&hstream->base.base.bopened, 1);
+    tb_atomic_set(&hstream->base.base.istate, TB_STATE_OPENED);
 
     // save size
     tb_hong_t size = (!status->bgzip && !status->bdeflate && !status->bchunked)? status->document_size : -1;
@@ -272,6 +272,9 @@ static tb_void_t tb_async_stream_http_kill(tb_handle_t astream)
     // check
     tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
     tb_assert_and_check_return(hstream);
+
+    // trace
+    tb_trace_d("kill: ..");
 
     // kill it
     if (hstream->http) tb_aicp_http_kill(hstream->http);

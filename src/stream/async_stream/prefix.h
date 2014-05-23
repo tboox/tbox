@@ -45,11 +45,8 @@ static __tb_inline__ tb_void_t tb_async_stream_clear(tb_async_stream_t* stream)
 	// clear wcache
 	tb_scoped_buffer_clear(&stream->wcache_data);
 
-    // clear opened
-	tb_atomic_set0(&stream->base.bopened);
-
-    // clear stoped
-	tb_atomic_set(&stream->base.bstoped, 1);
+    // clear istate
+	tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
 }
 
 #endif

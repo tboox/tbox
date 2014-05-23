@@ -226,7 +226,7 @@ static tb_bool_t tb_basic_stream_data_ctrl(tb_handle_t stream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
 
 			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);

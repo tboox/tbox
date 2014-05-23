@@ -65,7 +65,7 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_transfer_open_save(transfer, tb_demo_transfer_save_func, tb_null)) break;
 
         // wait
-        getchar();
+//        getchar();
 
         // trace
         tb_trace_i("pause: ..");
@@ -74,7 +74,7 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
         tb_transfer_pause(transfer);
 
         // wait 
-        getchar();
+//        getchar();
 
         // trace
         tb_trace_i("resume: ..");
@@ -83,7 +83,7 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_transfer_resume(transfer)) break;
 
         // wait
-        getchar();
+//        getchar();
 
         // trace
         tb_trace_i("save: ..");
@@ -92,7 +92,7 @@ tb_int_t tb_demo_stream_transfer_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_transfer_open_save(transfer, tb_demo_transfer_save_func, tb_null)) break;
 
         // wait
-        getchar();
+//        getchar();
 
     } while (0);
 

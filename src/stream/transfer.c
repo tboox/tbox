@@ -193,15 +193,7 @@ static tb_void_t tb_transfer_ostream_clos_func(tb_async_stream_t* astream, tb_si
         state = TB_STATE_UNKNOWN_ERROR;
            
         // clos it
-        tb_bool_t bclosed = tb_false;
-        if (tb_stream_is_opened(transfer->istream))
-        {
-            if (!tb_async_stream_clos(transfer->istream, tb_transfer_istream_clos_func, transfer)) break;
-        }
-        else bclosed = tb_true;
-
-        // closed? done func
-        if (bclosed) tb_transfer_clos_func(transfer);
+        if (!tb_async_stream_clos(transfer->istream, tb_transfer_istream_clos_func, transfer)) break;
 
         // ok
         state = TB_STATE_OK;
@@ -523,22 +515,7 @@ static tb_bool_t tb_transfer_istream_open_func(tb_async_stream_t* astream, tb_si
         }
 
         // open it
-        tb_bool_t bopened = tb_false;
-        if (!tb_stream_is_opened(transfer->ostream))
-        {
-            if (!tb_async_stream_open(transfer->ostream, tb_transfer_ostream_open_func, transfer)) break;
-        }
-        else bopened = tb_true;
-
-        // opened?
-        if (bopened)
-        {
-            // save opened
-            tb_atomic_set(&transfer->opened, 1);
-
-            // done func
-            ok = transfer->open.func(TB_STATE_OK, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->open.priv);
-        }
+        if (!tb_async_stream_open(transfer->ostream, tb_transfer_ostream_open_func, transfer)) break;
 
         // ok
         state = TB_STATE_OK;
@@ -616,10 +593,10 @@ tb_hong_t tb_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ost
     tb_assert_and_check_return_val(ostream && istream, -1); 
 
     // open it first if istream have been not opened
-    if (!tb_stream_is_opened(istream) && !tb_basic_stream_open(istream)) return -1;
+    if (tb_stream_is_closed(istream) && tb_stream_is_closed(istream)) return -1;
     
     // open it first if ostream have been not opened
-    if (!tb_stream_is_opened(ostream) && !tb_basic_stream_open(ostream)) return -1;
+    if (tb_stream_is_closed(ostream) && tb_stream_is_closed(ostream)) return -1;
                 
     // done func
     if (func) func(TB_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);

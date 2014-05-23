@@ -153,16 +153,11 @@ typedef struct __tb_stream_t
 	/// the url
 	tb_url_t 		url;
 
-	/// is opened?
-	tb_atomic_t 	bopened;
-
-	/// is stoped?
-	tb_atomic_t 	bstoped;
-
     /*! internal state
      *
      * TB_STATE_CLOSED
      * TB_STATE_OPENED
+     * TB_STATE_OPENING
      * TB_STATE_KILLING
      */
     tb_atomic_t     istate;

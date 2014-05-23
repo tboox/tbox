@@ -117,6 +117,15 @@ tb_bool_t tb_stream_is_opened(tb_handle_t handle)
 	// is opened?
 	return ((state == TB_STATE_OPENED) || (state == TB_STATE_KILLING))? tb_true : tb_false;
 }
+tb_bool_t tb_stream_is_closed(tb_handle_t handle)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, tb_false);
+
+	// is closed?
+	return (TB_STATE_CLOSED == tb_atomic_get(&stream->istate))? tb_true : tb_false;
+}
 tb_long_t tb_stream_timeout(tb_handle_t handle)
 {
 	// check
@@ -144,7 +153,7 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
 
 			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -169,7 +178,7 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_HOST:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
 
 			// set host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -198,7 +207,7 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_PORT:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
 
 			// set port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -223,7 +232,7 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_PATH:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
 
 			// set path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -252,7 +261,7 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_SSL:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
 
 			// set ssl
 			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
@@ -274,7 +283,7 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_TIMEOUT:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
 
 			// set timeout
 			tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
@@ -316,8 +325,12 @@ tb_void_t tb_stream_kill(tb_handle_t handle)
 	tb_stream_t* stream = (tb_stream_t*)handle;
 	tb_assert_and_check_return(stream);
 
-	// stop it
-	tb_check_return(TB_STATE_OPENED == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING));
+	// kill it
+	tb_size_t state = tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING);
+    tb_check_return(state != TB_STATE_KILLING && state != TB_STATE_CLOSED);
+
+    // opening? kill it
+    tb_atomic_pset(&stream->istate, TB_STATE_OPENING, TB_STATE_KILLING);
 
 	// trace
 	tb_trace_d("kill: ..");
