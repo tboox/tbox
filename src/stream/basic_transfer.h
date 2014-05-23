@@ -34,7 +34,7 @@
  * types
  */
 
-/*! the basic transfer save func type
+/*! the basic transfer done func type
  *
  * @param state 	the stream state 
  * @param offset 	the istream offset
@@ -45,13 +45,13 @@
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 	(*tb_basic_transfer_save_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv);
+typedef tb_bool_t 	(*tb_basic_transfer_done_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! save bstream to bstream, block transfer
+/*! done transfer from stream to stream
  *
  * @param istream 	the istream
  * @param ostream 	the ostream
@@ -61,9 +61,9 @@ typedef tb_bool_t 	(*tb_basic_transfer_save_func_t)(tb_size_t state, tb_hize_t o
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! save bstream to url, block transfer
+/*! done transfer from stream to url
  *
  * @param istream 	the istream
  * @param ourl 		the output url
@@ -73,9 +73,9 @@ tb_hong_t 			tb_basic_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stre
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! save bstream to data, block transfer
+/*! done transfer from stream to data
  *
  * @param istream 	the istream
  * @param odata 	the output data
@@ -86,9 +86,9 @@ tb_hong_t 			tb_basic_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t con
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done_stream_to_data(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! save url to url, block transfer
+/*! done transfer from url to url
  *
  * @param iurl 		the input url
  * @param ourl 		the output url
@@ -98,9 +98,9 @@ tb_hong_t 			tb_basic_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* od
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! save url to bstream, block transfer
+/*! done transfer from url to stream
  *
  * @param iurl 		the input url
  * @param ostream 	the ostream
@@ -110,9 +110,9 @@ tb_hong_t 			tb_basic_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* o
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done_url_to_stream(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! save url to data, block transfer
+/*! done transfer from url to data
  *
  * @param iurl 		the input url
  * @param odata 	the output data
@@ -123,9 +123,9 @@ tb_hong_t 			tb_basic_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t*
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! save data to url, block transfer
+/*! done transfer from data to url
  *
  * @param idata 	the input data
  * @param isize 	the input size
@@ -136,9 +136,9 @@ tb_hong_t 			tb_basic_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, 
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! save data to bstream, block transfer
+/*! done transfer from data to stream
  *
  * @param idata 	the input data
  * @param isize 	the input size
@@ -149,6 +149,6 @@ tb_hong_t 			tb_basic_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, 
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_basic_transfer_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv);
+tb_hong_t 			tb_basic_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv);
 
 #endif

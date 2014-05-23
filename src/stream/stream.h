@@ -175,7 +175,7 @@ tb_long_t 			tb_stream_timeout(tb_handle_t stream);
 /*! ctrl stream
  *
  * @param stream 	the stream
- * @param ctrl 		the ctrl command
+ * @param ctrl 		the ctrl code
  *
  * @return 			tb_true or tb_false
  */

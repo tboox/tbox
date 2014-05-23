@@ -39,7 +39,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_hong_t tb_basic_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ostream && istream, -1); 
@@ -156,7 +156,7 @@ tb_hong_t tb_basic_transfer_save_gg(tb_basic_stream_t* istream, tb_basic_stream_
     // ok?
     return writ;
 }
-tb_hong_t tb_basic_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(istream && ourl, -1);
@@ -178,7 +178,7 @@ tb_hong_t tb_basic_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t const*
         }
 
         // save stream
-        size = tb_basic_transfer_save_gg(istream, ostream, lrate, func, priv);
+        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
@@ -189,7 +189,7 @@ tb_hong_t tb_basic_transfer_save_gu(tb_basic_stream_t* istream, tb_char_t const*
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done_stream_to_data(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(istream && odata && osize, -1);
@@ -204,7 +204,7 @@ tb_hong_t tb_basic_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* odata
         tb_assert_and_check_break(ostream);
 
         // save stream
-        size = tb_basic_transfer_save_gg(istream, ostream, lrate, func, priv);
+        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
@@ -215,7 +215,7 @@ tb_hong_t tb_basic_transfer_save_gd(tb_basic_stream_t* istream, tb_byte_t* odata
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iurl && ourl, -1);
@@ -248,7 +248,7 @@ tb_hong_t tb_basic_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* ourl
         if (!tb_basic_stream_open(ostream)) break;
 
         // save stream
-        size = tb_basic_transfer_save_gg(istream, ostream, lrate, func, priv);
+        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
@@ -263,7 +263,7 @@ tb_hong_t tb_basic_transfer_save_uu(tb_char_t const* iurl, tb_char_t const* ourl
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done_url_to_stream(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iurl && ostream, -1);
@@ -278,7 +278,7 @@ tb_hong_t tb_basic_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t* os
         tb_assert_and_check_break(istream);
 
         // save stream
-        size = tb_basic_transfer_save_gg(istream, ostream, lrate, func, priv);
+        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
@@ -289,7 +289,7 @@ tb_hong_t tb_basic_transfer_save_ug(tb_char_t const* iurl, tb_basic_stream_t* os
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iurl && odata && osize, -1);
@@ -309,7 +309,7 @@ tb_hong_t tb_basic_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_
         tb_assert_and_check_break(ostream);
 
         // save stream
-        size = tb_basic_transfer_save_gg(istream, ostream, lrate, func, priv);
+        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
@@ -324,7 +324,7 @@ tb_hong_t tb_basic_transfer_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(idata && isize && ourl, -1);
@@ -351,7 +351,7 @@ tb_hong_t tb_basic_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, tb_
         }
 
         // save stream
-        size = tb_basic_transfer_save_gg(istream, ostream, lrate, func, priv);
+        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
@@ -366,7 +366,7 @@ tb_hong_t tb_basic_transfer_save_du(tb_byte_t const* idata, tb_size_t isize, tb_
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_save_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_basic_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(idata && isize && ostream, -1);
@@ -381,7 +381,7 @@ tb_hong_t tb_basic_transfer_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_
         tb_assert_and_check_break(istream);
 
         // save stream
-        size = tb_basic_transfer_save_gg(istream, ostream, lrate, func, priv);
+        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
