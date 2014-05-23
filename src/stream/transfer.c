@@ -1328,7 +1328,7 @@ tb_void_t tb_transfer_kill(tb_handle_t handle)
     tb_assert_and_check_return(transfer);
 
     // stop it
-    if (!tb_atomic_fetch_and_set(&transfer->stoped, 1))
+    if (tb_atomic_get(&transfer->opened) && !tb_atomic_fetch_and_set(&transfer->stoped, 1))
     {
         // trace
         tb_trace_d("kill: ..");

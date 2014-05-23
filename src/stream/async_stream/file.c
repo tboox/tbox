@@ -175,9 +175,6 @@ static tb_void_t tb_async_stream_file_clos_func(tb_handle_t aico, tb_cpointer_t 
 	// clear base
 	tb_async_stream_clear(&fstream->base);
 
-    // clear opened
-	tb_atomic_set0(&fstream->base.base.bopened);
-
     /* done clos func
      *
      * note: cannot use this stream after closing, the stream may be exited in the closing func

@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME                "async_stream_http"
-#define TB_TRACE_MODULE_DEBUG               (0)
+#define TB_TRACE_MODULE_DEBUG               (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -62,6 +62,7 @@ typedef struct __tb_async_stream_http_t
         tb_async_stream_seek_func_t     seek;
         tb_async_stream_sync_func_t     sync;
         tb_async_stream_task_func_t     task;
+        tb_async_stream_clos_func_t     clos;
 
     }                                   func;
 
@@ -115,27 +116,48 @@ static tb_bool_t tb_async_stream_http_open(tb_handle_t astream, tb_async_stream_
     // post open
     return tb_aicp_http_open(hstream->http, tb_async_stream_http_open_func, astream);
 }
+static tb_void_t tb_async_stream_http_clos_func(tb_handle_t http, tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_http_t* hstream = tb_async_stream_http_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(hstream && hstream->func.clos);
+
+    // trace
+    tb_trace_d("clos: notify: ..");
+
+    // clear size 
+    tb_atomic64_set(&hstream->size, -1);
+
+    // clear offset
+    tb_atomic64_set0(&hstream->offset);
+
+	// clear base
+	tb_async_stream_clear(&hstream->base);
+
+    /* done clos func
+     *
+     * note: cannot use this stream after closing, the stream may be exited in the closing func
+     */
+    hstream->func.clos(&hstream->base, TB_STATE_OK, hstream->priv);
+
+    // trace
+    tb_trace_d("clos: notify: ok");
+}
 static tb_bool_t tb_async_stream_http_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
 {   
     // check
     tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
-    tb_assert_and_check_return_val(hstream, tb_false);
+    tb_assert_and_check_return_val(hstream && hstream->http && func, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
 
-    // noimpl
-    tb_trace_noimpl();
-    return tb_false;
+    // init func
+    hstream->func.clos  = func;
+    hstream->priv       = priv;
 
-#if 0
     // close it
-    if (hstream->http) tb_aicp_http_clos(hstream->http, bcalling);
-
-    // clear size and offset
-    tb_atomic64_set(&hstream->size, -1);
-    tb_atomic64_set0(&hstream->offset);
-#endif
+    return tb_aicp_http_clos(hstream->http, tb_async_stream_http_clos_func, hstream);
 }
 static tb_bool_t tb_async_stream_http_read_func(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
@@ -260,15 +282,9 @@ static tb_bool_t tb_async_stream_http_exit(tb_handle_t astream)
     tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
     tb_assert_and_check_return_val(hstream, tb_false);
 
-    // noimpl
-    tb_trace_noimpl();
-
-    // TODO
-#if 0
     // exit it
-    if (hstream->http) tb_aicp_http_exit(hstream->http, bcalling);
+    if (hstream->http) tb_aicp_http_exit(hstream->http);
     hstream->http = tb_null;
-#endif
 
     // ok
     return tb_true;

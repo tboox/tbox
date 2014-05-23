@@ -17,13 +17,21 @@ static tb_bool_t tb_demo_aicp_http_head_func(tb_handle_t http, tb_char_t const* 
 	// ok
 	return tb_true;
 }
+static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state, tb_cpointer_t priv)
+{
+	// trace
+	tb_trace_i("clos: state: %s", tb_state_cstr(state));
+
+    // kill loop
+    tb_aicp_kill((tb_aicp_t*)priv);
+}
 static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
 	// trace
 	tb_trace_i("read: %lu, state: %s", real, tb_state_cstr(state));
 
-	// failed or closed? kill aicp
-	if (state != TB_STATE_OK) tb_aicp_kill((tb_aicp_t*)priv);
+	// failed or closed? close it
+	if (state != TB_STATE_OK) tb_aicp_http_clos(handle, tb_demo_aicp_http_clos_func, priv);
 
 	// ok
 	return tb_true;
@@ -95,7 +103,7 @@ end:
 	tb_trace_i("end");
 
 	// exit http
-	if (http) tb_aicp_http_exit(http, tb_false);
+	if (http) tb_aicp_http_exit(http);
 
 	// exit post
 	if (post) tb_async_stream_exit(post);
