@@ -152,7 +152,7 @@ tb_bool_t 			tb_async_transfer_ctrl_ostream(tb_handle_t transfer, tb_size_t ctrl
  */
 tb_bool_t 			tb_async_transfer_open(tb_handle_t transfer, tb_async_transfer_open_func_t func, tb_cpointer_t priv);
 
-/*! done transfer
+/*! done transfer and will close it automaticly
  *
  * @param transfer 	the async transfer
  * @param func 		the save func 
@@ -162,7 +162,7 @@ tb_bool_t 			tb_async_transfer_open(tb_handle_t transfer, tb_async_transfer_open
  */
 tb_bool_t 			tb_async_transfer_done(tb_handle_t transfer, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
 
-/*! open and done transfer
+/*! open and done transfer and will close it automaticly
  *
  * @param transfer 	the async transfer
  * @param func 		the save func 

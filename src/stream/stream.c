@@ -146,6 +146,25 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 	tb_va_list_t args;
     tb_va_start(args, ctrl);
 
+    // ctrl it
+    tb_bool_t ok = tb_stream_ctrl_with_args(stream, ctrl, args);
+
+    // exit args
+	tb_va_end(args);
+
+	// ok?
+	return ok;
+}
+tb_bool_t tb_stream_ctrl_with_args(tb_handle_t handle, tb_size_t ctrl, tb_va_list_t args)
+{	
+    // check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream && stream->ctrl, tb_false);
+
+	// save args
+	tb_va_list_t args_saved;
+    tb_va_copy(args_saved, args);
+
 	// ctrl
 	tb_bool_t ok = tb_false;
 	switch (ctrl)
@@ -306,15 +325,11 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 		break;
 	}
 
-	// reset args
-	tb_va_end(args);
-    tb_va_start(args, ctrl);
+	// restore args
+    tb_va_copy(args, args_saved);
 
 	// ctrl stream
 	ok = (stream->ctrl(stream, ctrl, args) || ok)? tb_true : tb_false;
-
-	// exit args
-	tb_va_end(args);
 
 	// ok?
 	return ok;
