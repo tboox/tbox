@@ -64,9 +64,11 @@ typedef tb_bool_t 	(*tb_async_transfer_done_func_t)(tb_size_t state, tb_hize_t o
 
 /*! init async transfer
  *
+ * @param aicp      the aicp, using the default aicp if be null
+ *
  * @return 			the async transfer 
  */
-tb_handle_t 		tb_async_transfer_init(tb_noarg_t);
+tb_handle_t 		tb_async_transfer_init(tb_aicp_t* aicp);
 
 /*! init istream
  *
@@ -145,12 +147,13 @@ tb_bool_t 			tb_async_transfer_ctrl_ostream(tb_handle_t transfer, tb_size_t ctrl
 /*! open transfer
  *
  * @param transfer 	the async transfer
+ * @param offset    the start offset
  * @param func 		the open func 
  * @param priv 		the func private data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_async_transfer_open(tb_handle_t transfer, tb_async_transfer_open_func_t func, tb_cpointer_t priv);
+tb_bool_t 			tb_async_transfer_open(tb_handle_t transfer, tb_hize_t offset, tb_async_transfer_open_func_t func, tb_cpointer_t priv);
 
 /*! done transfer and will close it automaticly
  *
@@ -165,12 +168,13 @@ tb_bool_t 			tb_async_transfer_done(tb_handle_t transfer, tb_async_transfer_done
 /*! open and done transfer and will close it automaticly
  *
  * @param transfer 	the async transfer
+ * @param offset    the start offset
  * @param func 		the save func 
  * @param priv 		the func private data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_async_transfer_open_done(tb_handle_t transfer, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
+tb_bool_t 			tb_async_transfer_open_done(tb_handle_t transfer, tb_hize_t offset, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
 
 /*! kill transfer 
  *

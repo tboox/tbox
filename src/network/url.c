@@ -436,6 +436,31 @@ tb_char_t const* tb_url_protocol_cstr(tb_url_t const* url)
 	// ok
 	return s_protocols[url->poto];
 }
+tb_size_t tb_url_protocol_probe(tb_char_t const* url)
+{
+    // check
+    tb_assert_and_check_return_val(url, TB_URL_PROTOCOL_NONE);
+
+	// init
+	tb_char_t const* 	p = url;
+	tb_size_t 			protocol = TB_URL_PROTOCOL_NONE;
+	if (!tb_strnicmp(p, "http://", 7)) 			protocol = TB_URL_PROTOCOL_HTTP;
+	else if (!tb_strnicmp(p, "sock://", 7)) 	protocol = TB_URL_PROTOCOL_SOCK;
+	else if (!tb_strnicmp(p, "file://", 7)) 	protocol = TB_URL_PROTOCOL_FILE;
+	else if (!tb_strnicmp(p, "data://", 7)) 	protocol = TB_URL_PROTOCOL_DATA;
+	else if (!tb_strnicmp(p, "https://", 8)) 	protocol = TB_URL_PROTOCOL_HTTP;
+	else if (!tb_strnicmp(p, "socks://", 8)) 	protocol = TB_URL_PROTOCOL_SOCK;
+	else if (!tb_strnicmp(p, "rtsp://", 7)) 	protocol = TB_URL_PROTOCOL_RTSP;
+	else if (!tb_strnicmp(p, "sql://", 6)) 	    protocol = TB_URL_PROTOCOL_SQL;
+	else if (!tb_strstr(p, "://")) 				protocol = TB_URL_PROTOCOL_FILE;
+	else 
+	{
+		tb_trace_e("unknown protocol for url: %s", url);
+	}
+
+    // ok?
+    return protocol;
+}
 tb_size_t tb_url_port_get(tb_url_t const* url)
 {
 	// check
