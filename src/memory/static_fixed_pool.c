@@ -466,7 +466,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_handle_t handle, tb_pointer_t data)
 	// ok
 	return tb_true;
 }
-tb_void_t tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t , tb_cpointer_t ), tb_cpointer_t priv)
 {
 	// check 
 	tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
@@ -493,14 +493,14 @@ tb_void_t tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_poi
 			if (!(u + 1))
 			{
 				// done func
-				func(pool->data + (i + 0) * pool->step, data);
-				func(pool->data + (i + 1) * pool->step, data);
-				func(pool->data + (i + 2) * pool->step, data);
-				func(pool->data + (i + 3) * pool->step, data);
-				func(pool->data + (i + 4) * pool->step, data);
-				func(pool->data + (i + 5) * pool->step, data);
-				func(pool->data + (i + 6) * pool->step, data);
-				func(pool->data + (i + 7) * pool->step, data);
+				func(pool->data + (i + 0) * pool->step, priv);
+				func(pool->data + (i + 1) * pool->step, priv);
+				func(pool->data + (i + 2) * pool->step, priv);
+				func(pool->data + (i + 3) * pool->step, priv);
+				func(pool->data + (i + 4) * pool->step, priv);
+				func(pool->data + (i + 5) * pool->step, priv);
+				func(pool->data + (i + 6) * pool->step, priv);
+				func(pool->data + (i + 7) * pool->step, priv);
 
 				// skip this byte and continue it
 				i += 7;
@@ -513,7 +513,7 @@ tb_void_t tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_poi
 		if ((u & (0x01 << b)))
 		{
 			// done func
-			func(pool->data + i * pool->step, data);
+			func(pool->data + i * pool->step, priv);
 		}
 	}
 }

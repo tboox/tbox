@@ -104,7 +104,7 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t* aico)
     // leave 
     tb_spinlock_leave(&aicp->lock);
 }
-static tb_bool_t tb_aicp_aico_wait(tb_pointer_t item, tb_pointer_t data)
+static tb_bool_t tb_aicp_aico_wait(tb_pointer_t item, tb_cpointer_t priv)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)item;
@@ -120,11 +120,11 @@ static tb_bool_t tb_aicp_aico_wait(tb_pointer_t item, tb_pointer_t data)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aicp_aico_kill(tb_pointer_t item, tb_pointer_t data)
+static tb_bool_t tb_aicp_aico_kill(tb_pointer_t item, tb_cpointer_t priv)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)item;
-    tb_aicp_t* aicp = (tb_aicp_t*)data;
+    tb_aicp_t* aicp = (tb_aicp_t*)priv;
     tb_assert_and_check_return_val(aico && aicp, tb_false);
 
     // kill it

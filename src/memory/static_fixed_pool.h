@@ -101,7 +101,7 @@ tb_bool_t 			tb_static_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
 /*! walk pool item
  *
  * @code
- * tb_bool_t tb_static_fixed_pool_item_func(tb_pointer_t item, tb_pointer_t data)
+ * tb_bool_t tb_static_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
  * {
  * 		// ok or break
  * 		return tb_true;
@@ -110,10 +110,10 @@ tb_bool_t 			tb_static_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
  *
  * @param handle 	the pool handle
  * @param func 		the walk func
- * @param data 		the walk data
+ * @param priv 		the walk data
  *
  */
-tb_void_t 			tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 			tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t , tb_cpointer_t ), tb_cpointer_t priv);
 
 #ifdef __tb_debug__
 /*! dump pool
