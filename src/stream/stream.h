@@ -181,6 +181,16 @@ tb_long_t 			tb_stream_timeout(tb_handle_t stream);
  */
 tb_bool_t 			tb_stream_ctrl(tb_handle_t stream, tb_size_t ctrl, ...);
 
+/*! ctrl stream with arguments
+ *
+ * @param stream 	the stream
+ * @param ctrl 		the ctrl code
+ * @param args      the ctrl args
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_stream_ctrl_with_args(tb_handle_t stream, tb_size_t ctrl, tb_va_list_t args);
+
 /*! kill stream
  *
  * @param stream 	the stream

@@ -31,8 +31,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "basic_transfer.h"
 #include "stream.h"
+#include "basic_transfer.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 

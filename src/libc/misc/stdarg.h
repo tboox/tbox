@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		stdarg.h
- * @ingroup 	libc
+ * @author      ruki
+ * @file        stdarg.h
+ * @ingroup     libc
  *
  */
 #ifndef TB_LIBC_MISC_STDARG_H
@@ -29,20 +29,22 @@
  */
 #include "../../prefix.h"
 #ifndef TB_COMPILER_IS_GCC
-# 	include <stdarg.h>
+#   include <stdarg.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #ifdef TB_COMPILER_IS_GCC
-# 	define tb_va_start(v, l)	__builtin_va_start(v, l)
-# 	define tb_va_end(v)			__builtin_va_end(v)
-# 	define tb_va_arg(v, l)		__builtin_va_arg(v, l)
+#   define tb_va_start(v, l)    __builtin_va_start(v, l)
+#   define tb_va_end(v)         __builtin_va_end(v)
+#   define tb_va_arg(v, l)      __builtin_va_arg(v, l)
+#   define tb_va_copy(v, c)     __builtin_va_copy(v, c)
 #else
-# 	define tb_va_start(v, l) 	va_start(v, l)
-# 	define tb_va_end(v) 		va_end(v)
-# 	define tb_va_arg(v, l) 		va_arg(v, l)
+#   define tb_va_start(v, l)    va_start(v, l)
+#   define tb_va_end(v)         va_end(v)
+#   define tb_va_arg(v, l)      va_arg(v, l)
+#   define tb_va_copy(v, c)     va_copy(v, c)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -50,9 +52,9 @@
  */
 
 #ifdef TB_COMPILER_IS_GCC
-typedef __builtin_va_list 	tb_va_list_t;
+typedef __builtin_va_list   tb_va_list_t;
 #else
-typedef va_list 			tb_va_list_t;
+typedef va_list             tb_va_list_t;
 #endif
 
 #endif
