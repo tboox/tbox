@@ -30,6 +30,8 @@
 #include "prefix.h"
 #include "basic_stream.h"
 #include "async_stream.h"
+#include "basic_transfer.h"
+#include "async_transfer.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
