@@ -539,13 +539,21 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_t* stream)
 	// trace
 	tb_trace_d("exit: ..");
 
-	// opened? please close it first
-	if (tb_atomic_get(&stream->base.bopened))
+    // FIXME: kill it first
+    // for bstoped
+    tb_stream_kill(stream);
+
+    // wait for closing
+    tb_size_t tryn = 30;
+    while (!tb_atomic_get(&stream->base.bstoped) && tryn--)
     {
         // trace
-        tb_trace_e("exit: failed, this stream have been not closed already, please close it first!");
-        return tb_false;
+        tb_trace_d("exit: wait: ..");
+
+        // wait some time
+        tb_msleep(200);
     }
+    tb_assert_and_check_return_val(tb_atomic_get(&stream->base.bstoped), tb_false);
 
 	// exit it
 	if (stream->exit && !stream->exit(stream)) return tb_false;

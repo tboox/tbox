@@ -80,6 +80,17 @@ typedef struct __tb_async_stream_data_task_t
 
 }tb_async_stream_data_task_t;
 
+// the data clos type
+typedef struct __tb_async_stream_data_clos_t
+{
+    // the func
+    tb_async_stream_clos_func_t         func;
+
+    // the priv
+    tb_cpointer_t                       priv;
+
+}tb_async_stream_data_clos_t;
+
 // the data stream type
 typedef struct __tb_async_stream_data_t
 {
@@ -110,6 +121,7 @@ typedef struct __tb_async_stream_data_t
         tb_async_stream_data_read_t     read;
         tb_async_stream_data_writ_t     writ;
         tb_async_stream_data_task_t     task;
+        tb_async_stream_data_clos_t     clos;
 
     }                                   func;
 
@@ -161,22 +173,16 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
     // ok?
     return func? tb_true : ((state == TB_STATE_OK)? tb_true : tb_false);
 }
-static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
-{   
+static tb_void_t tb_async_stream_data_clos_func(tb_handle_t aico, tb_cpointer_t priv)
+{
     // check
-    tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
-    tb_assert_and_check_return_val(dstream, tb_false);
+    tb_async_stream_data_t* dstream = tb_async_stream_data_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(dstream && dstream->func.clos.func);
 
     // trace
-    tb_trace_d("clos: ..");
+    tb_trace_d("clos: notify: ..");
 
-    // noimpl
-    tb_trace_noimpl();
-    return tb_false;
-
-#if 0
-    // exit aico
-    if (dstream->aico) tb_aico_exit(dstream->aico);
+    // clear aico
     dstream->aico = tb_null;
 
     // clear head
@@ -184,7 +190,37 @@ static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_
 
     // clear offset
     tb_atomic64_set0(&dstream->offset);
-#endif
+
+    // clear base
+    tb_async_stream_clear(&dstream->base);
+
+    /* done clos func
+     *
+     * note: cannot use this stream after closing, the stream may be exited in the closing func
+     */
+    dstream->func.clos.func(&dstream->base, TB_STATE_OK, dstream->func.clos.priv);
+
+    // trace
+    tb_trace_d("clos: notify: ok");
+}
+static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+{   
+    // check
+    tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
+    tb_assert_and_check_return_val(dstream && dstream->aico && func, tb_false);
+
+    // trace
+    tb_trace_d("clos: ..");
+
+    // init func
+    dstream->func.clos.func = func;
+    dstream->func.clos.priv = priv;
+
+    // exit it
+    tb_aico_exit(dstream->aico, tb_async_stream_data_clos_func, dstream);
+
+    // ok
+    return tb_true;
 }
 static tb_bool_t tb_async_stream_data_read_func(tb_aice_t const* aice)
 {

@@ -44,6 +44,14 @@
  */
 typedef tb_bool_t 	(*tb_aicp_ssl_open_func_t)(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv);
 
+/*! the aicp ssl clos func type
+ *
+ * @param ssl 		the ssl handle
+ * @param state 	the state
+ * @param priv 		the func private data
+ */
+typedef tb_void_t 	(*tb_aicp_ssl_clos_func_t)(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv);
+
 /*! the aicp ssl read func type
  *
  * @param ssl 		the ssl handle
@@ -103,16 +111,20 @@ tb_void_t 			tb_aicp_ssl_kill(tb_handle_t handle);
 /*! close the ssl
  *
  * @param handle 	the ssl handle
- * @param bcalling 	close it at the self callback?
+ * @param func      the func
+ * @param priv      the func private data
+ *
+ * @return          tb_true or tb_false
  */
-tb_void_t 			tb_aicp_ssl_clos(tb_handle_t handle, tb_bool_t bcalling);
+tb_bool_t 			tb_aicp_ssl_clos(tb_handle_t handle, tb_aicp_ssl_clos_func_t func, tb_cpointer_t priv);
 
 /*! exit the ssl
  *
  * @param handle 	the ssl handle
- * @param bcalling 	exit it at the self callback?
+ *
+ * @return          tb_true or tb_false
  */
-tb_void_t 			tb_aicp_ssl_exit(tb_handle_t handle, tb_bool_t bcalling);
+tb_bool_t 			tb_aicp_ssl_exit(tb_handle_t handle);
 
 /*! set the ssl sock
  * 

@@ -403,9 +403,6 @@ static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t 
 	// clear base
 	tb_async_stream_clear(&sstream->base);
 
-    // clear opened
-	tb_atomic_set0(&sstream->base.base.bopened);
-
     /* done clos func
      *
      * note: cannot use this stream after closing, the stream may be exited in the closing func
@@ -433,7 +430,7 @@ static tb_void_t tb_async_stream_sock_clos_dns_func(tb_handle_t aico, tb_cpointe
     // trace
     tb_trace_d("clos: dns: notify: ok");
 }
-static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
@@ -441,9 +438,6 @@ static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t aico, tb_cpointe
 
     // trace
     tb_trace_d("clos: ssl: notify: ..");
-
-    // clear ssl
-    sstream->hssl = tb_null;
 
     // keep alive? not close it
     if (sstream->balived)
@@ -482,9 +476,7 @@ static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_
 
     // clos ssl first
 #ifdef TB_SSL_ENABLE
-    // TODO
-    tb_used(tb_async_stream_sock_clos_ssl_func);
-    if (sstream->hssl) tb_aicp_ssl_clos(sstream->hssl, tb_false);
+    if (sstream->hssl) tb_aicp_ssl_clos(sstream->hssl, tb_async_stream_sock_clos_ssl_func, sstream);
     else
 #endif
     {
@@ -1010,9 +1002,10 @@ static tb_bool_t tb_async_stream_sock_exit(tb_handle_t astream)
     // dns has been not closed already?
     tb_assert_and_check_return_val(!sstream->hdns, tb_false);
 
+    // exit ssl
 #ifdef TB_SSL_ENABLE
-    // ssl has been not closed already?
-    tb_assert_and_check_return_val(!sstream->hssl, tb_false);
+    if (sstream->hssl) tb_aicp_ssl_exit(sstream->hssl);
+    sstream->hssl = tb_null;
 #endif
 
     // sock has been not closed already?

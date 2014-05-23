@@ -45,6 +45,16 @@
  */
 typedef tb_bool_t 	(*tb_aicp_http_open_func_t)(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv);
 
+/*! the aicp http open func type
+ *
+ * @param http 		the http handle
+ * @param state 	the state
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok, tb_false: error, but not break aicp
+ */
+typedef tb_void_t 	(*tb_aicp_http_clos_func_t)(tb_handle_t http, tb_size_t state, tb_cpointer_t priv);
+
 /*! the aicp http read func type
  *
  * @param http 		the http handle
@@ -97,19 +107,13 @@ tb_handle_t 		tb_aicp_http_init(tb_aicp_t* aicp);
  */
 tb_void_t 			tb_aicp_http_kill(tb_handle_t handle);
 
-/*! close the http
- *
- * @param handle 	the http handle
- * @param bcalling 	close it at the self callback?
- */
-tb_void_t 			tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling);
-
 /*! exit the http
  *
  * @param handle 	the http handle
- * @param bcalling 	exit it at the self callback?
+ *
+ * @return          tb_true or tb_false
  */
-tb_void_t 			tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling);
+tb_bool_t 			tb_aicp_http_exit(tb_handle_t handle);
 
 /*! open the http 
  *
@@ -120,6 +124,16 @@ tb_void_t 			tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_cpointer_t priv);
+
+/*! close the http
+ *
+ * @param handle 	the http handle
+ * @param func      the func
+ * @param priv      the private data
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_http_clos(tb_handle_t handle, tb_aicp_http_clos_func_t func, tb_cpointer_t priv);
 
 /*! read the http
  *
