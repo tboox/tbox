@@ -113,24 +113,24 @@ typedef struct __tb_fixed_pool_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_pointer_t data)
+static tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
 {
 	// check
-	tb_pointer_t* rdata = (tb_pointer_t*)data;
-	tb_assert_and_check_return_val(rdata, tb_false);
+	tb_value_t* tuple = (tb_value_t*)priv;
+	tb_assert_and_check_return_val(tuple, tb_false);
 
 	// the func
-	typedef tb_bool_t (*func_t)(tb_pointer_t , tb_pointer_t );
-	func_t func = (func_t)rdata[0];
+	typedef tb_bool_t (*func_t)(tb_pointer_t , tb_cpointer_t );
+	func_t func = (func_t)tuple[0].ptr;
 
 	// the data
-	data = rdata[1];
+	priv = tuple[1].cptr;
 
 	// done func
-	tb_bool_t ok = func(item, data);
+	tb_bool_t ok = func(item, priv);
 
 	// save it
-	rdata[2] = (tb_pointer_t)(tb_size_t)ok;
+	tuple[2].b = ok;
 
 	// ok?
 	return ok;
@@ -467,7 +467,7 @@ tb_pointer_t tb_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data)
 	// ok?
 	return p;
 }
-tb_void_t tb_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_cpointer_t priv), tb_cpointer_t priv)
 {
 	// check 
 	tb_fixed_pool_t* pool = (tb_fixed_pool_t*)handle;
@@ -481,14 +481,14 @@ tb_void_t tb_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t 
 		if (pool->pools[i].pool) 
 		{
 			// done walk
-			tb_pointer_t rdata[3];
-			rdata[0] = (tb_pointer_t)func;
-			rdata[1] = data;
-			rdata[2] = (tb_pointer_t)tb_true;
-			tb_static_fixed_pool_walk(pool->pools[i].pool, tb_fixed_pool_item_func, rdata);
+			tb_value_t tuple[3];
+			tuple[0].ptr = (tb_pointer_t)func;
+			tuple[1].cptr = priv;
+			tuple[2].b = tb_true;
+			tb_static_fixed_pool_walk(pool->pools[i].pool, tb_fixed_pool_item_func, tuple);
 
 			// ok?
-			if (!rdata[2]) break;
+			if (!tuple[2].b) break;
 		}
 	}
 }

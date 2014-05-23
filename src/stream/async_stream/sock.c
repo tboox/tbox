@@ -430,6 +430,7 @@ static tb_void_t tb_async_stream_sock_clos_dns_func(tb_handle_t aico, tb_cpointe
     // trace
     tb_trace_d("clos: dns: notify: ok");
 }
+#ifdef TB_SSL_ENABLE
 static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
     // check
@@ -461,6 +462,7 @@ static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t ssl, tb_size_t s
     // trace
     tb_trace_d("clos: ssl: notify: ok");
 }
+#endif
 static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
 {   
     // check

@@ -610,7 +610,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * jobs implementation
  */
-static tb_bool_t tb_thread_pool_jobs_walk_kill_all(tb_pointer_t item, tb_pointer_t data)
+static tb_bool_t tb_thread_pool_jobs_walk_kill_all(tb_pointer_t item, tb_cpointer_t priv)
 {
 	// check
 	tb_thread_pool_job_t* job = (tb_thread_pool_job_t*)item;
@@ -626,7 +626,7 @@ static tb_bool_t tb_thread_pool_jobs_walk_kill_all(tb_pointer_t item, tb_pointer
 	return tb_true;
 }
 #ifdef __tb_debug__
-static tb_bool_t tb_thread_pool_jobs_walk_dump_all(tb_pointer_t item, tb_pointer_t data)
+static tb_bool_t tb_thread_pool_jobs_walk_dump_all(tb_pointer_t item, tb_cpointer_t priv)
 {
 	// check
 	tb_thread_pool_job_t* job = (tb_thread_pool_job_t*)item;
