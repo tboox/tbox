@@ -98,16 +98,15 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
 
     // probe protocol
     tb_size_t protocol = tb_url_protocol_probe(url);
+    tb_assert_static(TB_URL_PROTOCOL_FILE == TB_STREAM_TYPE_FILE);
+    tb_assert_static(TB_URL_PROTOCOL_HTTP == TB_STREAM_TYPE_HTTP);
+    tb_assert_static(TB_URL_PROTOCOL_SOCK == TB_STREAM_TYPE_SOCK);
+    tb_assert_static(TB_URL_PROTOCOL_DATA == TB_STREAM_TYPE_DATA);
 
     // protocol => type
-	tb_size_t type = TB_STREAM_TYPE_NONE;
-    switch (protocol)
+	tb_size_t type = protocol;
+    if (!type || type > TB_STREAM_TYPE_DATA)
     {
-    case TB_URL_PROTOCOL_FILE: type = TB_STREAM_TYPE_FILE; break;
-    case TB_URL_PROTOCOL_HTTP: type = TB_STREAM_TYPE_HTTP; break;
-    case TB_URL_PROTOCOL_SOCK: type = TB_STREAM_TYPE_SOCK; break;
-    case TB_URL_PROTOCOL_DATA: type = TB_STREAM_TYPE_DATA; break;
-    default:
 		tb_trace_e("unknown stream for url: %s", url);
         return tb_null;
     }
@@ -122,8 +121,11 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
         stream = s_init[type]();
         tb_assert_and_check_break(stream);
 
-        // set url
+        // init url
         if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_URL, url)) break;
+
+        // ok
+        ok = tb_true;
 
     } while (0);
 

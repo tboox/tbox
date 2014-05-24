@@ -167,6 +167,9 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
 
     } while (0);
 
+    // failed? restore state
+    if (state != TB_STATE_OK) tb_atomic_set(&dstream->base.base.istate, TB_STATE_CLOSED);
+
     // done func
     if (func) func(astream, state, priv);
 

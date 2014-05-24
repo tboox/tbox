@@ -100,7 +100,7 @@ static tb_bool_t tb_async_stream_filter_open_func(tb_async_stream_t* astream, tb
     tb_assert_and_check_return_val(fstream && fstream->func.open, tb_false);
 
     // opened
-    tb_atomic_set(&fstream->base.base.istate, TB_STATE_OPENED);
+    tb_atomic_set(&fstream->base.base.istate, state == TB_STATE_OK? TB_STATE_OPENED : TB_STATE_CLOSED);
 
     // done func
     return fstream->func.open((tb_async_stream_t*)fstream, state, fstream->priv);

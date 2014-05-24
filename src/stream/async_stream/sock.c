@@ -122,8 +122,8 @@ static tb_bool_t tb_async_stream_sock_open_ssl_func(tb_handle_t ssl, tb_size_t s
     // trace
     tb_trace_d("ssl: open: %s", tb_state_cstr(state));
 
-    // ok? opened
-    if (state == TB_STATE_OK) tb_atomic_set(&sstream->base.base.istate, TB_STATE_OPENED);
+    // save state
+    tb_atomic_set(&sstream->base.base.istate, state == TB_STATE_OK? TB_STATE_OPENED : TB_STATE_CLOSED);
  
     // done func
     sstream->func.open((tb_async_stream_t*)sstream, state, sstream->priv);
@@ -199,8 +199,15 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
         break;
     }
 
-    // failed? done func
-    if (state != TB_STATE_OK) sstream->func.open((tb_async_stream_t*)sstream, state, sstream->priv);
+    // failed? 
+    if (state != TB_STATE_OK) 
+    {
+        // closed
+        tb_atomic_set(&sstream->base.base.istate, TB_STATE_CLOSED);
+
+        // done func
+        sstream->func.open((tb_async_stream_t*)sstream, state, sstream->priv);
+    }
 
     // ok
     return tb_true;
@@ -306,8 +313,15 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
 
     } while (0);
 
-    // done func if failed
-    if (state != TB_STATE_OK) sstream->func.open((tb_async_stream_t*)sstream, state, sstream->priv);
+    // failed?
+    if (state != TB_STATE_OK) 
+    {
+        // closed
+        tb_atomic_set(&sstream->base.base.istate, TB_STATE_CLOSED);
+
+        // done func
+        sstream->func.open((tb_async_stream_t*)sstream, state, sstream->priv);
+    }
 }
 static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
@@ -327,6 +341,9 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
     {
         // trace
         tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
+
+        // closed
+        tb_atomic_set(&sstream->base.base.istate, TB_STATE_CLOSED);
 
         // done func
         func((tb_async_stream_t*)sstream, TB_STATE_SOCK_SSL_NOT_SUPPORTED, priv);
@@ -367,6 +384,9 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
     // done addr
     if (!sstream->hdns || !tb_aicp_dns_done(sstream->hdns, host, tb_async_stream_sock_dns_func, astream))
     {
+        // closed
+        tb_atomic_set(&sstream->base.base.istate, TB_STATE_CLOSED);
+
         // done func
         func((tb_async_stream_t*)sstream, TB_STATE_SOCK_DNS_FAILED, priv);
     }

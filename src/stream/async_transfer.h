@@ -128,8 +128,10 @@ tb_bool_t 		    tb_async_transfer_init_ostream_from_data(tb_handle_t transfer, t
 
 /*! ctrl istream
  *
+ * @note must call it before opening
+ *
  * @param transfer 	the async transfer
- * @param ctrl 		the ctrl code
+ * @param ctrl 		the ctrl code, using the stream ctrl code
  *
  * @return 			tb_true or tb_false
  */
@@ -137,8 +139,10 @@ tb_bool_t 			tb_async_transfer_ctrl_istream(tb_handle_t transfer, tb_size_t ctrl
 
 /*! ctrl ostream
  *
+ * @note must call it before opening
+ *
  * @param transfer 	the async transfer
- * @param ctrl 		the ctrl code
+ * @param ctrl 		the ctrl code, using the stream ctrl code
  *
  * @return 			tb_true or tb_false
  */
@@ -166,6 +170,45 @@ tb_bool_t 			tb_async_transfer_open(tb_handle_t transfer, tb_hize_t offset, tb_a
 tb_bool_t 			tb_async_transfer_done(tb_handle_t transfer, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
 
 /*! open and done transfer and will close it automaticly
+ *
+ * @code
+ *
+    static tb_bool_t tb_demo_transfer_done_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
+    {
+        // percent
+        tb_size_t percent = 0;
+        if (size > 0) percent = (offset * 100) / size;
+        else if (state == TB_STATE_OK) percent = 100;
+
+        // trace
+        tb_trace_i("done: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_state_cstr(state));
+
+        // ok
+        return tb_true;
+    }
+
+    // init transfer
+    tb_handle_t transfer = tb_async_transfer_init(tb_null);
+    if (transfer)
+    {
+        // init stream
+        tb_async_transfer_init_istream_from_url(transfer, url);
+        tb_async_transfer_init_ostream_from_data(transfer, data, size);
+
+        // ctrl stream
+//      tb_async_transfer_ctrl_istream(transfer, TB_STREAM_CTRL_SET_TIMEOUT, 10000);
+
+        // limit rate
+//      tb_async_transfer_limitrate(transfer, 256000);
+
+        // open and done transfer
+        tb_async_transfer_open_done(transfer, 0, tb_demo_transfer_done_func, tb_null);
+
+        // exit transfer
+        tb_async_transfer_exit(transfer);
+    }
+ *
+ * @endcode
  *
  * @param transfer 	the async transfer
  * @param offset    the start offset
@@ -214,12 +257,5 @@ tb_bool_t 			tb_async_transfer_resume(tb_handle_t transfer);
  * @param rate 		the trasfer rate and no limit if 0, bytes/s
  */
 tb_void_t 			tb_async_transfer_limitrate(tb_handle_t transfer, tb_size_t rate);
-
-/*! set transfer timeout 
- *
- * @param transfer 	the async transfer
- * @param timeout 	the timeout, using the default timeout if be zero 
- */
-tb_void_t 			tb_async_transfer_timeout_set(tb_handle_t transfer, tb_long_t timeout);
 
 #endif
