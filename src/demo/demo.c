@@ -118,8 +118,8 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(stream_basic_stream_zip)
 #endif
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
-,	TB_DEMO_MAIN_ITEM(stream_transfer)
 ,	TB_DEMO_MAIN_ITEM(stream_transfer_pool)
+,	TB_DEMO_MAIN_ITEM(stream_async_transfer)
 ,	TB_DEMO_MAIN_ITEM(stream_async_stream_null)
 ,	TB_DEMO_MAIN_ITEM(stream_async_stream_cache)
 # 	ifdef TB_CONFIG_MODULE_HAVE_OBJECT

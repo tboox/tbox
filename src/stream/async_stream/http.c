@@ -90,7 +90,7 @@ static tb_bool_t tb_async_stream_http_open_func(tb_handle_t http, tb_size_t stat
     tb_assert_and_check_return_val(hstream && hstream->func.open, tb_false);
 
     // opened
-    tb_atomic_set(&hstream->base.base.istate, TB_STATE_OPENED);
+    tb_atomic_set(&hstream->base.base.istate, state == TB_STATE_OK? TB_STATE_OPENED : TB_STATE_CLOSED);
 
     // save size
     tb_hong_t size = (!status->bgzip && !status->bdeflate && !status->bchunked)? status->document_size : -1;

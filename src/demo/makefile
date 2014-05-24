@@ -120,7 +120,7 @@ demo_C_FILES 								+= \
 											asio/aicpd \
 											stream/async_stream/null \
 											stream/async_stream/cache \
-											stream/transfer \
+											stream/async_transfer \
 											stream/transfer_pool 
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
