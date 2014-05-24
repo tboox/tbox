@@ -197,8 +197,8 @@ static tb_bool_t tb_async_stream_cache_read_done(tb_async_stream_t* stream, tb_s
 static tb_bool_t tb_async_stream_open_read_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
 	// check
-	tb_async_stream_open_read_t* oread = (tb_async_stream_open_read_t*)priv;
-	tb_assert_and_check_return_val(stream && stream->read && oread && oread->func, tb_false);
+	tb_async_stream_open_read_t* open_read = (tb_async_stream_open_read_t*)priv;
+	tb_assert_and_check_return_val(stream && stream->read && open_read && open_read->func, tb_false);
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -218,7 +218,7 @@ static tb_bool_t tb_async_stream_open_read_func(tb_async_stream_t* stream, tb_si
 		}
 	
 		// read it
-		if (!tb_async_stream_cache_read_done(stream, 0, oread->size, oread->func, oread->priv)) break;
+		if (!tb_async_stream_cache_read_done(stream, 0, open_read->size, open_read->func, open_read->priv)) break;
 
 		// ok
 		state = TB_STATE_OK;
@@ -232,7 +232,7 @@ static tb_bool_t tb_async_stream_open_read_func(tb_async_stream_t* stream, tb_si
 		tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
  
 		// done func
-		ok = oread->func(stream, state, tb_null, 0, oread->size, oread->priv);
+		ok = open_read->func(stream, state, tb_null, 0, open_read->size, open_read->priv);
 	}
  
 	// ok?
@@ -288,8 +288,8 @@ static tb_bool_t tb_async_stream_open_writ_func(tb_async_stream_t* stream, tb_si
 static tb_bool_t tb_async_stream_open_seek_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
 	// check
-	tb_async_stream_open_seek_t* oseek = (tb_async_stream_open_seek_t*)priv;
-	tb_assert_and_check_return_val(stream && stream->seek && oseek && oseek->func, tb_false);
+	tb_async_stream_open_seek_t* open_seek = (tb_async_stream_open_seek_t*)priv;
+	tb_assert_and_check_return_val(stream && stream->seek && open_seek && open_seek->func, tb_false);
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -309,15 +309,15 @@ static tb_bool_t tb_async_stream_open_seek_func(tb_async_stream_t* stream, tb_si
 		}
 
 		// offset be not modified?
-		if (tb_stream_offset(stream) == oseek->offset)
+		if (tb_stream_offset(stream) == open_seek->offset)
 		{
 			// done func
-			ok = oseek->func(stream, TB_STATE_OK, oseek->offset, oseek->priv);
+			ok = open_seek->func(stream, TB_STATE_OK, open_seek->offset, open_seek->priv);
 		}
 		else
 		{
 			// seek it
-			if (!stream->seek(stream, oseek->offset, oseek->func, oseek->priv)) break;
+			if (!stream->seek(stream, open_seek->offset, open_seek->func, open_seek->priv)) break;
 		}
 
 		// ok
@@ -332,7 +332,7 @@ static tb_bool_t tb_async_stream_open_seek_func(tb_async_stream_t* stream, tb_si
 		tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
 
 		// done func
-		ok = oseek->func(stream, state, 0, oseek->priv);
+		ok = open_seek->func(stream, state, 0, open_seek->priv);
 	}
 
 	// ok?
@@ -341,8 +341,8 @@ static tb_bool_t tb_async_stream_open_seek_func(tb_async_stream_t* stream, tb_si
 static tb_bool_t tb_async_stream_sync_read_func(tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv)
 {
 	// check
-	tb_async_stream_sread_t* sread = (tb_async_stream_sread_t*)priv;
-	tb_assert_and_check_return_val(stream && stream->read && sread && sread->func, tb_false);
+	tb_async_stream_sync_read_t* sync_read = (tb_async_stream_sync_read_t*)priv;
+	tb_assert_and_check_return_val(stream && stream->read && sync_read && sync_read->func, tb_false);
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -362,7 +362,7 @@ static tb_bool_t tb_async_stream_sync_read_func(tb_async_stream_t* stream, tb_si
 		}
 	
 		// read it
-		if (!tb_async_stream_cache_read_done(stream, 0, sread->size, sread->func, sread->priv)) break;
+		if (!tb_async_stream_cache_read_done(stream, 0, sync_read->size, sync_read->func, sync_read->priv)) break;
 
 		// ok
 		state = TB_STATE_OK;
@@ -373,7 +373,7 @@ static tb_bool_t tb_async_stream_sync_read_func(tb_async_stream_t* stream, tb_si
 	if (state != TB_STATE_OK) 
 	{
 		// done func
-		ok = sread->func(stream, state, tb_null, 0, sread->size, sread->priv);
+		ok = sync_read->func(stream, state, tb_null, 0, sync_read->size, sync_read->priv);
 	}
  
 	// ok?
@@ -382,8 +382,8 @@ static tb_bool_t tb_async_stream_sync_read_func(tb_async_stream_t* stream, tb_si
 static tb_bool_t tb_async_stream_sync_seek_func(tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv)
 {
 	// check
-	tb_async_stream_sseek_t* sseek = (tb_async_stream_sseek_t*)priv;
-	tb_assert_and_check_return_val(stream && stream->seek && sseek && sseek->func, tb_false);
+	tb_async_stream_sync_seek_t* sync_seek = (tb_async_stream_sync_seek_t*)priv;
+	tb_assert_and_check_return_val(stream && stream->seek && sync_seek && sync_seek->func, tb_false);
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -403,15 +403,15 @@ static tb_bool_t tb_async_stream_sync_seek_func(tb_async_stream_t* stream, tb_si
 		}
 
 		// offset be not modified?
-		if (tb_stream_offset(stream) == sseek->offset)
+		if (tb_stream_offset(stream) == sync_seek->offset)
 		{
 			// done func
-			ok = sseek->func(stream, TB_STATE_OK, sseek->offset, sseek->priv);
+			ok = sync_seek->func(stream, TB_STATE_OK, sync_seek->offset, sync_seek->priv);
 		}
 		else
 		{
 			// seek it
-			if (!stream->seek(stream, sseek->offset, sseek->func, sseek->priv)) break;
+			if (!stream->seek(stream, sync_seek->offset, sync_seek->func, sync_seek->priv)) break;
 		}
 
 		// ok
@@ -423,7 +423,7 @@ static tb_bool_t tb_async_stream_sync_seek_func(tb_async_stream_t* stream, tb_si
 	if (state != TB_STATE_OK) 
 	{	
 		// done func
-		ok = sseek->func(stream, state, 0, sseek->priv);
+		ok = sync_seek->func(stream, state, 0, sync_seek->priv);
 	}
 
 	// ok?
@@ -599,13 +599,7 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_t* stream)
 	tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
 
     // open it
-	tb_bool_t ok = stream->open(stream, tb_null, tb_null);
-
-    // failed? restore state
-    if (!ok) tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
-
-    // ok?
-    return ok;
+	return stream->open(stream, tb_null, tb_null);
 }
 tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
@@ -626,13 +620,7 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_
 	tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
 
     // open it
-	tb_bool_t ok = stream->open(stream, func, priv);
-
-    // failed? restore state
-    if (!ok) tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
-
-    // ok?
-    return ok;
+	return stream->open(stream, func, priv);
 }
 tb_bool_t tb_async_stream_clos_(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
