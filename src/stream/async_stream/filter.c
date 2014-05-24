@@ -99,11 +99,8 @@ static tb_bool_t tb_async_stream_filter_open_func(tb_async_stream_t* astream, tb
     tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
     tb_assert_and_check_return_val(fstream && fstream->func.open, tb_false);
 
-    // opened
-    tb_atomic_set(&fstream->base.base.istate, state == TB_STATE_OK? TB_STATE_OPENED : TB_STATE_CLOSED);
-
-    // done func
-    return fstream->func.open((tb_async_stream_t*)fstream, state, fstream->priv);
+    // open done
+    return tb_async_stream_open_func(&fstream->base, state, fstream->func.open, fstream->priv);
 }
 static tb_bool_t tb_async_stream_filter_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
@@ -120,11 +117,8 @@ static tb_bool_t tb_async_stream_filter_open(tb_handle_t astream, tb_async_strea
     // have been opened?
     if (tb_stream_is_opened(fstream->astream)) 
     {
-        // opened
-        tb_atomic_set(&fstream->base.base.istate, TB_STATE_OPENED);
-
-        // done func
-        return func? func(astream, TB_STATE_OK, fstream->priv) : tb_true;
+        // open done
+        return tb_async_stream_open_func(astream, TB_STATE_OK, func, priv);
     }
 
     // check
@@ -171,7 +165,7 @@ static tb_bool_t tb_async_stream_filter_clos(tb_handle_t astream, tb_async_strea
 {   
     // check
     tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(astream);
-    tb_assert_and_check_return_val(fstream && fstream->astream, tb_false);
+    tb_assert_and_check_return_val(fstream, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
@@ -179,6 +173,16 @@ static tb_bool_t tb_async_stream_filter_clos(tb_handle_t astream, tb_async_strea
     // init clos
     fstream->func.clos  = func;
     fstream->priv       = priv;
+
+    // no astream? done func directly
+    if (!fstream->astream)
+    {
+        // done func
+        tb_async_stream_filter_clos_func(tb_null, TB_STATE_OK, fstream);
+
+        // ok
+        return tb_true;
+    }
 
     // close it
     return tb_async_stream_clos(fstream->astream, tb_async_stream_filter_clos_func, fstream);

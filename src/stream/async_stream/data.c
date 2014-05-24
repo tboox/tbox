@@ -159,19 +159,13 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
         // init offset
         tb_atomic64_set0(&dstream->offset);
 
-        // opened
-        tb_atomic_set(&dstream->base.base.istate, TB_STATE_OPENED);
-
         // ok
         state = TB_STATE_OK;
 
     } while (0);
 
-    // failed? restore state
-    if (state != TB_STATE_OK) tb_atomic_set(&dstream->base.base.istate, TB_STATE_CLOSED);
-
     // done func
-    if (func) func(astream, state, priv);
+    tb_async_stream_open_func(astream, state, func, priv);
 
     // ok?
     return func? tb_true : ((state == TB_STATE_OK)? tb_true : tb_false);
@@ -210,7 +204,7 @@ static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_
 {   
     // check
     tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
-    tb_assert_and_check_return_val(dstream && dstream->aico && func, tb_false);
+    tb_assert_and_check_return_val(dstream && func, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
@@ -218,6 +212,16 @@ static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_
     // init func
     dstream->func.clos.func = func;
     dstream->func.clos.priv = priv;
+
+    // no aico? done func directly
+    if (!dstream->aico)
+    {
+        // done func
+        tb_async_stream_data_clos_func(tb_null, dstream);
+
+        // ok
+        return tb_true;
+    }
 
     // exit it
     tb_aico_exit(dstream->aico, tb_async_stream_data_clos_func, dstream);

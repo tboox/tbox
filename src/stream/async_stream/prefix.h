@@ -32,21 +32,25 @@
 #include "../../platform/atomic.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * inlines
+ * private interfaces
  */
-static __tb_inline__ tb_void_t tb_async_stream_clear(tb_async_stream_t* stream)
-{
-    // check
-    tb_assert_and_check_return(stream);
 
-	// clear rcache
-	tb_scoped_buffer_clear(&stream->rcache_data);
+/* clear the stream after closing stream
+ *
+ * @param stream        the stream
+ */
+tb_void_t               tb_async_stream_clear(tb_async_stream_t* stream);
 
-	// clear wcache
-	tb_scoped_buffer_clear(&stream->wcache_data);
+/* done the open func after opening stream
+ *
+ * @param stream        the stream
+ * @param state         the state
+ * @param func          the open func
+ * @param priv          the func private data
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv);
 
-    // clear istate
-	tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
-}
 
 #endif

@@ -487,8 +487,8 @@ tb_void_t tb_aicp_dns_kill(tb_handle_t handle)
     // trace
     tb_trace_d("kill: ..");
 
-    // kill sock
-    if (dns->sock) tb_socket_kill(dns->sock, TB_SOCKET_KILL_RW);
+    // kill it
+    if (dns->aico) tb_aico_kill(dns->aico);
 }
 tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t exit, tb_cpointer_t priv)
 {

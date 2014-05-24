@@ -201,6 +201,20 @@ typedef struct __tb_async_stream_open_seek_t
 
 }tb_async_stream_open_seek_t;
 
+/// the stream close opening type
+typedef struct __tb_async_stream_clos_opening_t
+{
+    /// the func
+    tb_async_stream_open_func_t         func;
+
+    /// the priv
+    tb_cpointer_t                       priv;
+
+    /// the open state
+    tb_size_t                           state;
+
+}tb_async_stream_clos_opening_t;
+
 /// the stream cache and writ type
 typedef struct __tb_async_stream_cache_writ_t
 {
@@ -227,7 +241,7 @@ typedef struct __tb_async_stream_cache_sync_t
 }tb_async_stream_cache_sync_t;
 
 /// the stream sync and read type
-typedef struct __tb_async_stream_sread_t
+typedef struct __tb_async_stream_sync_read_t
 {
     /// the func
     tb_async_stream_read_func_t         func;
@@ -238,10 +252,10 @@ typedef struct __tb_async_stream_sread_t
     /// the size
     tb_size_t                           size;
 
-}tb_async_stream_sread_t;
+}tb_async_stream_sync_read_t;
 
 /// the stream sync and seek type
-typedef struct __tb_async_stream_sseek_t
+typedef struct __tb_async_stream_sync_seek_t
 {
     /// the func
     tb_async_stream_seek_func_t         func;
@@ -252,7 +266,7 @@ typedef struct __tb_async_stream_sseek_t
     /// the offset
     tb_hize_t                           offset;
 
-}tb_async_stream_sseek_t;
+}tb_async_stream_sync_seek_t;
 
 /// the asio stream type
 typedef struct __tb_async_stream_t
@@ -286,8 +300,8 @@ typedef struct __tb_async_stream_t
     /// the sync and read, writ, seek, ...
     union
     {
-        tb_async_stream_sread_t         read;
-        tb_async_stream_sseek_t         seek;
+        tb_async_stream_sync_read_t     read;
+        tb_async_stream_sync_seek_t     seek;
 
     }                                   sync_and;
 
@@ -298,6 +312,9 @@ typedef struct __tb_async_stream_t
         tb_async_stream_cache_sync_t    sync;
 
     }                                   wcache_and;
+
+    /// the close opening
+    tb_async_stream_clos_opening_t      clos_opening;
 
     /// the read cache data
     tb_scoped_buffer_t                  rcache_data;

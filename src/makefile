@@ -287,6 +287,7 @@ tbox_C_FILES 			+= \
 						stream/async_stream/data \
 						stream/async_stream/sock \
 						stream/async_stream/filter \
+						stream/async_stream/prefix \
 						stream/async_transfer \
 						stream/transfer_pool \
 						platform/asio/aicp
