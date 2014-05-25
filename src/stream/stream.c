@@ -306,7 +306,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_handle_t handle, tb_size_t ctrl, tb_va_lis
 
             // set timeout
             tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
-            stream->timeout = timeout;
+            stream->timeout = timeout? timeout : TB_STREAM_DEFAULT_TIMEOUT;
             ok = tb_true;
         }
         break;

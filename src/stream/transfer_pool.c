@@ -53,12 +53,12 @@ typedef struct __tb_transfer_task_t
     tb_handle_t                     pool;
 
     // the func
-    tb_transfer_save_func_t         func;
+    tb_async_transfer_done_func_t   func;
 
     // the priv
     tb_cpointer_t                   priv;
 
-    // the itor for the working list
+    // the itor for the work list
     tb_size_t                       itor;
 
 }tb_transfer_task_t;
@@ -69,17 +69,8 @@ typedef struct __tb_transfer_pool_t
     // the aicp
     tb_aicp_t*                      aicp;
 
-    // the loop
-    tb_handle_t                     loop;
-
-    // the aicp is referneced?
-    tb_bool_t                       bref;
-
     // the task maxn
     tb_size_t                       maxn;
-
-    // the concurrent task count
-    tb_size_t                       conc;
 
     // the lock 
     tb_spinlock_t                   lock;
@@ -87,44 +78,105 @@ typedef struct __tb_transfer_pool_t
     // the task pool
     tb_handle_t                     pool;
 
-    // the working list
-    tb_list_t*                      working;
+    // the idle task list
+    tb_vector_t*                    idle;
 
-    // the waiting list
-    tb_single_list_t*               waiting;
+    // the work task list
+    tb_list_t*                      work;
 
-    // the timeout
-    tb_long_t                       timeout;
-
-    // is stoped?
-    tb_bool_t                       bstoped;
+    /* the state
+     *
+     * TB_STATE_OK
+     * TB_STATE_KILLING
+     */
+    tb_atomic_t                     state;
 
 }tb_transfer_pool_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_transfer_task_exit(tb_transfer_task_t* task, tb_bool_t bcalling)
+static tb_void_t tb_transfer_task_exit(tb_transfer_pool_t* pool, tb_transfer_task_t* task)
 {
     // check
-    tb_assert_and_check_return(task);
-
-    // the pool
-    tb_transfer_pool_t* pool = (tb_transfer_pool_t*)task->pool;
-    tb_assert_and_check_return(pool && pool->pool);
+    tb_assert_and_check_return(pool && pool->pool && pool->idle && task);
 
     // trace
     tb_trace_d("task[%p]: exit", task);
 
-    // TODO
-    // exit transfer
-    if (task->transfer) tb_transfer_exit(task->transfer);
-    task->transfer = tb_null;
-
-    // free it
-    tb_fixed_pool_free(pool->pool, task);
+    // append task to the idle list
+    tb_vector_insert_tail(pool->idle, task);
 }
-static tb_bool_t tb_transfer_task_save(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
+static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_t* pool, tb_async_transfer_done_func_t func, tb_cpointer_t priv)
+{
+    // check
+    tb_assert_and_check_return_val(pool && func, tb_null);
+
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_transfer_task_t* task = tb_null;
+    do
+    {
+        // init task pool
+        if (!pool->pool) pool->pool = tb_fixed_pool_init((pool->maxn >> 2) + 16, sizeof(tb_transfer_task_t), 0);
+        tb_assert_and_check_break(pool->pool);
+
+        // init idle task list
+        if (!pool->idle) pool->idle = tb_vector_init((pool->maxn >> 2) + 16, tb_item_func_ptr(tb_null, tb_null));
+        tb_assert_and_check_break(pool->idle);
+
+        // init work task list
+        if (!pool->work) pool->work = tb_list_init((pool->maxn >> 2) + 16, tb_item_func_ptr(tb_null, tb_null));
+        tb_assert_and_check_break(pool->work);
+
+        // init task from the idle list first
+        if (tb_vector_size(pool->idle))
+        {
+            // get the last task
+            task = (tb_transfer_task_t*)tb_vector_last(pool->idle);
+            tb_assert_and_check_break(task);
+
+            // remove the last task
+            tb_vector_remove_last(pool->idle);
+
+            // check
+            tb_assert_and_check_break(task->transfer);
+        }
+        // init task from the task pool
+        else
+        {
+            // make task
+            task = (tb_transfer_task_t*)tb_fixed_pool_malloc0(pool->pool);
+            tb_assert_and_check_break(task);
+
+            // init transfer
+            task->transfer = tb_async_transfer_init(pool->aicp);
+            tb_assert_and_check_break(task->transfer);
+        }
+
+        // init task
+        task->func = func;
+        task->priv = priv;
+        task->itor = tb_iterator_tail(pool->work);
+        task->pool = pool;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (task) tb_transfer_task_exit(pool, task);
+        task = tb_null;
+    }
+
+    // ok?
+    return task;
+}
+static tb_bool_t tb_transfer_task_done(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // the task
     tb_transfer_task_t* task = (tb_transfer_task_t*)priv;
@@ -135,7 +187,7 @@ static tb_bool_t tb_transfer_task_save(tb_size_t state, tb_hize_t offset, tb_hon
     tb_assert_and_check_return_val(pool, tb_false);
 
     // trace
-    tb_trace_d("task[%p]: save: %llu bytes, rate: %lu bytes/s, state: %s", task, save, rate, tb_state_cstr(state));
+    tb_trace_d("task[%p]: done: %llu bytes, rate: %lu bytes/s, state: %s", task, save, rate, tb_state_cstr(state));
 
     // done func
     tb_bool_t ok = task->func(state, offset, size, save, rate, task->priv); 
@@ -146,74 +198,24 @@ static tb_bool_t tb_transfer_task_save(tb_size_t state, tb_hize_t offset, tb_hon
         // enter
         tb_spinlock_enter(&pool->lock);
 
-        // done
-        tb_bool_t next_ok = tb_false;
-        do
-        {
-            // check working
-            tb_assert_and_check_break(pool->working);
+        // check 
+        tb_assert(pool->work && task->itor != tb_iterator_tail(pool->work));
 
-            // remove task from the working list
-            tb_list_remove(pool->working, task->itor);
-        
-            // exit task
-            tb_transfer_task_exit(task, tb_true);
-            task = tb_null;
-
-            // continue the next waiting task
-            tb_check_break(!pool->bstoped);
-
-            // need work it?
-            tb_bool_t next = (pool->conc && tb_list_size(pool->working) >= pool->conc)? tb_false : tb_true;
-            tb_check_break(next && pool->waiting && tb_single_list_size(pool->waiting));
-            
-            // get the head task from the waiting list
-            task = tb_single_list_head(pool->waiting);
-            tb_assert_and_check_break(task && task->transfer);
-
-            // append the task to the working list
-            task->itor = tb_list_insert_tail(pool->working, task);
-            tb_assert_and_check_break(task->itor != tb_iterator_tail(pool->working));
-
-            // remove the task from the waiting list
-            tb_single_list_remove_head(pool->waiting);
-
-            // trace
-            tb_trace_d("next: working: %lu, waiting: %lu", tb_list_size(pool->working), pool->waiting? tb_single_list_size(pool->waiting) : 0);
-
-            // ok
-            next_ok = tb_true;
-
-        } while (0);
+        // remove task from the work list
+        if (pool->work) tb_list_remove(pool->work, task->itor);
+    
+        // exit task
+        tb_transfer_task_exit(pool, task);
+        task = tb_null;
 
         // leave
         tb_spinlock_leave(&pool->lock);
-
-        // ok and work it?
-        if (next_ok && task && task->transfer)
-        {
-            // done
-            if (!tb_transfer_open_save(task->transfer, tb_transfer_task_save, task))
-            {
-                // enter
-                tb_spinlock_enter(&pool->lock);
-
-                // remove task from the working list
-                tb_list_remove(pool->working, task->itor);
-
-                // exit task
-                tb_transfer_task_exit(task, tb_false);
-
-                // leave
-                tb_spinlock_leave(&pool->lock);
-            }
-        }
     }
 
     // ok?
     return ok;
 }
-static tb_bool_t tb_transfer_working_kill(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_transfer_pool_work_kill(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the task 
     tb_transfer_task_t* task = (tb_transfer_task_t*)item;
@@ -223,12 +225,12 @@ static tb_bool_t tb_transfer_working_kill(tb_iterator_t* iterator, tb_pointer_t 
     tb_assert_and_check_return_val(task->transfer, tb_false);
 
     // kill it
-    tb_transfer_kill(task->transfer);
+    tb_async_transfer_kill(task->transfer);
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_transfer_working_copy(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_transfer_pool_work_copy(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the task 
     tb_transfer_task_t* task = (tb_transfer_task_t*)item;
@@ -240,35 +242,18 @@ static tb_bool_t tb_transfer_working_copy(tb_iterator_t* iterator, tb_pointer_t 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_transfer_waiting_exit(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_transfer_pool_walk_exit(tb_pointer_t item, tb_cpointer_t priv)
 {
-    // the task 
+    // check
     tb_transfer_task_t* task = (tb_transfer_task_t*)item;
-    tb_check_return_val(task, tb_false);
+    tb_assert_and_check_return_val(task, tb_false);
 
-    // exit it
-    tb_transfer_task_exit(task, tb_false);
+    // exit transfer
+    if (task->transfer) tb_async_transfer_exit(task->transfer);
+    task->transfer = tb_null;
 
     // ok
     return tb_true;
-}
-static tb_pointer_t tb_transfer_pool_loop(tb_cpointer_t priv)
-{
-    // aicp
-    tb_handle_t aicp = (tb_handle_t)priv;
-
-    // trace
-    tb_trace_d("loop: init");
-
-    // loop aicp
-    if (aicp) tb_aicp_loop(aicp);
-    
-    // trace
-    tb_trace_d("loop: exit");
-
-    // exit
-    tb_thread_return(tb_null);
-    return tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -277,7 +262,7 @@ static tb_pointer_t tb_transfer_pool_loop(tb_cpointer_t priv)
 static tb_handle_t tb_transfer_pool_instance_init(tb_cpointer_t* ppriv)
 {
     // init it
-    return tb_transfer_pool_init(tb_aicp(), 0, 0, 0);
+    return tb_transfer_pool_init(tb_null, 0);
 }
 static tb_void_t tb_transfer_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
@@ -295,7 +280,7 @@ tb_handle_t tb_transfer_pool()
 {
     return tb_singleton_instance(TB_SINGLETON_TYPE_TRANSFER_POOL, tb_transfer_pool_instance_init, tb_transfer_pool_instance_exit, tb_transfer_pool_instance_kill);
 }
-tb_handle_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn, tb_size_t conc, tb_long_t timeout)
+tb_handle_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn)
 {
     // done
     tb_bool_t               ok = tb_false;
@@ -310,24 +295,15 @@ tb_handle_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn, tb_size_t con
         if (!tb_spinlock_init(&pool->lock)) break;
 
         // init pool
-        pool->bref      = aicp? tb_true : tb_false;
-        pool->aicp      = aicp? aicp : tb_aicp_init(conc);
-        pool->conc      = conc;
-        pool->maxn      = maxn;
-        pool->timeout   = timeout;
-        pool->bstoped   = tb_false;
+        pool->aicp      = aicp? aicp : tb_aicp();
+        pool->maxn      = maxn? maxn : (1 << 16);
+        pool->state     = TB_STATE_OK;
         tb_assert_and_check_break(pool->aicp);
 
-        // init pool
-        pool->pool = tb_fixed_pool_init(conc? conc : 16, sizeof(tb_transfer_task_t), 0);
-        tb_assert_and_check_break(pool->pool);
-
-        // init working list
-        pool->working = tb_list_init(conc? conc : 16, tb_item_func_ptr(tb_null, tb_null));
-        tb_assert_and_check_break(pool->working);
-
-        // init waiting list delay, maybe not used if conc be zero
-        pool->waiting = tb_null;
+        // register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&pool->lock, TB_TRACE_MODULE_NAME);
+#endif
 
         // ok
         ok = tb_true;
@@ -354,124 +330,102 @@ tb_void_t tb_transfer_pool_kill(tb_handle_t handle)
     // trace
     tb_trace_d("kill: ..");
 
-    // enter
-    tb_spinlock_enter(&pool->lock);
-
-    // kill it if be not stoped
-    tb_list_t* working = tb_null;
-    if (!pool->bstoped && pool->working && tb_list_size(pool->working))
-    {
-        // stop it
-        pool->bstoped = tb_true;
-
-        // init the working list
-        working = tb_list_init(pool->conc? pool->conc : 16, tb_item_func_ptr(tb_null, tb_null));
-
-        // copy it
-        tb_walk_all(pool->working, tb_transfer_working_copy, working);
-    }
-
-    // leave
-    tb_spinlock_leave(&pool->lock);
-
     // kill it
-    if (working)
-    {
-        tb_walk_all(working, tb_transfer_working_kill, tb_null);
-        tb_list_exit(working);
-        working = tb_null;
-    }
+    if (TB_STATE_OK == tb_atomic_fetch_and_set(&pool->state, TB_STATE_KILLING))
+        tb_transfer_pool_kill_all(handle);
 }
-tb_void_t tb_transfer_pool_exit(tb_handle_t handle)
+tb_void_t tb_transfer_pool_kill_all(tb_handle_t handle)
 {
     // check
     tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
     tb_assert_and_check_return(pool);
 
     // trace
-    tb_trace_d("exit: ..");
+    tb_trace_d("kill_all: ..");
+
+    // enter
+    tb_spinlock_enter(&pool->lock);
 
     // kill it
+    tb_list_t* copy = tb_null;
+    if (pool->work && tb_list_size(pool->work))
+    {
+        // init the work list
+        copy = tb_list_init((pool->maxn >> 2) + 16, tb_item_func_ptr(tb_null, tb_null));
+
+        // copy it
+        if (copy) tb_walk_all(pool->work, tb_transfer_pool_work_copy, copy);
+    }
+
+    // leave
+    tb_spinlock_leave(&pool->lock);
+
+    // kill it
+    if (copy)
+    {
+        tb_walk_all(copy, tb_transfer_pool_work_kill, tb_null);
+        tb_list_exit(copy);
+        copy = tb_null;
+    }
+}
+tb_long_t tb_transfer_pool_wait_all(tb_handle_t pool, tb_long_t timeout)
+{
+    return -1;
+}
+tb_bool_t tb_transfer_pool_exit(tb_handle_t handle)
+{
+    // check
+    tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
+    tb_assert_and_check_return_val(pool, tb_false);
+
+    // trace
+    tb_trace_d("exit: ..");
+
+    // kill it first
     tb_transfer_pool_kill(handle);
 
-    // wait all working transfers exit
-    tb_size_t tryn = 10;
-    while (tryn--)
+    // wait all
+    if (tb_transfer_pool_wait_all(handle, 5000) > 0)
     {
-        // the working count
-        tb_spinlock_enter(&pool->lock);
-        tb_size_t nworking = pool->working? tb_list_size(pool->working) : 0;
-        tb_spinlock_leave(&pool->lock);
-
-        // ok?
-        tb_check_break(nworking);
-
-        // too long? failed
-        if (!tryn)
-        {
-            // trace
-            tb_trace_e("exit failed: nworking: %lu", nworking);
-            return ;
-        }
-
-        // wait some time
-        tb_msleep(500);
+        // trace
+        tb_trace_e("exit: wait failed!");
+        return tb_false;
     }
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
-    // exit working
-    if (pool->working)
+    // exit the work list
+    if (pool->work)
     {
         // check
-        tb_assert(!tb_list_size(pool->working));
+        tb_assert(!tb_list_size(pool->work));
 
         // exit it
-        tb_list_exit(pool->working);
-        pool->working = tb_null;
+        tb_list_exit(pool->work);
+        pool->work = tb_null;
     }
 
-    // exit waiting
-    if (pool->waiting) 
+    // exit the idle list
+    if (pool->idle) 
     {
-        // exit it
-        tb_walk_all(pool->waiting, tb_transfer_waiting_exit, tb_null);
-        tb_single_list_exit(pool->waiting);
-        pool->waiting = tb_null;
+        tb_vector_exit(pool->idle);
+        pool->idle = tb_null;
     }
 
     // exit pool
-    if (pool->pool) tb_fixed_pool_exit(pool->pool);
-    pool->pool = tb_null;
+    if (pool->pool) 
+    {
+        // exit all task
+        tb_fixed_pool_walk(pool->pool, tb_transfer_pool_walk_exit, tb_null);
+
+        // exit it
+        tb_fixed_pool_exit(pool->pool);
+        pool->pool = tb_null;
+    }
 
     // leave
     tb_spinlock_leave(&pool->lock);
-
-    // kill aicp
-    if (pool->aicp && !pool->bref)
-        tb_aicp_kill(pool->aicp);
-
-    // exit loop
-    if (pool->loop)
-    {
-        // wait loop
-        tb_long_t wait = 0;
-        if ((wait = tb_thread_wait(pool->loop, 5000)) <= 0)
-        {
-            // trace
-            tb_trace_e("loop[%p]: wait failed: %ld!", pool->loop, wait);
-        }
-
-        // exit loop
-        tb_thread_exit(pool->loop);
-        pool->loop = tb_null;
-    }
-
-    // exit aicp
-    if (pool->aicp && !pool->bref)
-        tb_aicp_exit(pool->aicp);
-    pool->aicp = tb_null;
 
     // exit lock
     tb_spinlock_exit(&pool->lock);
@@ -481,6 +435,9 @@ tb_void_t tb_transfer_pool_exit(tb_handle_t handle)
 
     // trace
     tb_trace_d("exit: ok");
+    
+    // ok
+    return tb_true;
 }
 tb_size_t tb_transfer_pool_maxn(tb_handle_t handle)
 {
@@ -501,7 +458,7 @@ tb_size_t tb_transfer_pool_size(tb_handle_t handle)
     tb_spinlock_enter(&pool->lock);
 
     // the size
-    tb_size_t size = pool->pool? tb_fixed_pool_size(pool->pool) : 0;
+    tb_size_t size = pool->work? tb_list_size(pool->work) : 0;
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -509,7 +466,7 @@ tb_size_t tb_transfer_pool_size(tb_handle_t handle)
     // ok?
     return size;
 }
-tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t save, tb_transfer_ctrl_func_t ctrl, tb_cpointer_t priv)
+tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_size_t rate, tb_long_t timeout, tb_async_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
@@ -520,65 +477,41 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
 
     // done
     tb_bool_t               ok = tb_false;
-    tb_bool_t               bworking = tb_false;
     tb_transfer_task_t*     task = tb_null;
     do
     {
-        // stoped?
-        tb_check_break(!pool->bstoped);
-
-        // check
-        tb_assert_and_check_break(pool->working && pool->pool);
+        // check 
+        tb_check_break(TB_STATE_OK == tb_atomic_get(&pool->state));
 
         // too many tasks?
-        tb_check_break(!pool->maxn || tb_fixed_pool_size(pool->pool) < pool->maxn);
-
-        // init loop
-        if (!pool->loop && !pool->bref)
+        if (pool->work && tb_list_size(pool->work) >= pool->maxn)
         {
-            pool->loop = tb_thread_init(tb_null, tb_transfer_pool_loop, pool->aicp, 0);
-            tb_assert_and_check_break(pool->loop);
+            // trace
+            tb_trace_e("too many tasks, done task: %s => %s failed!", iurl, ourl);
+            break;
         }
-
-        // make task
-        task = tb_fixed_pool_malloc0(pool->pool);
-        tb_assert_and_check_break(task);
 
         // init task
-        task->pool      = pool;
-        task->transfer  = tb_transfer_init_uu(pool->aicp, iurl, ourl, offset);
-        task->func      = save;
-        task->priv      = priv;
-        tb_assert_and_check_break(task->transfer);
+        task = tb_transfer_task_init(pool, func, priv);
+        tb_assert_and_check_break(task && task->transfer);
 
-        // ctrl task
-        if (!tb_transfer_ctrl(task->transfer, ctrl, priv)) break;
+        // init transfer stream
+        if (!tb_async_transfer_init_istream_from_url(task->transfer, iurl)) break;
+        if (!tb_async_transfer_init_ostream_from_url(task->transfer, ourl)) break;
 
-        // init timeout
-        if (pool->timeout) tb_transfer_timeout_set(task->transfer, pool->timeout);
+        // init transfer timeout
+        if (!tb_async_transfer_ctrl_istream(task->transfer, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
+        if (!tb_async_transfer_ctrl_ostream(task->transfer, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
 
-        // working now?
-        bworking = (pool->conc && tb_list_size(pool->working) >= pool->conc)? tb_false : tb_true;
-        if (bworking)
-        {
-            // append to the working list
-            task->itor = tb_list_insert_tail(pool->working, task);
-            tb_assert_and_check_break(task->itor != tb_iterator_tail(pool->working));
-        }
-        // waiting
-        else
-        {
-            // init waiting list
-            if (!pool->waiting)
-            {
-                pool->waiting = tb_single_list_init(pool->conc? pool->conc : 16, tb_item_func_ptr(tb_null, tb_null));
-                tb_assert_and_check_break(pool->waiting);
-            }
+        // init transfer rate
+        tb_async_transfer_limitrate(task->transfer, rate);
 
-            // append to the waiting list
-            tb_size_t itor = tb_single_list_insert_tail(pool->waiting, task);
-            tb_assert_and_check_break(itor != tb_iterator_tail(pool->waiting));
-        }
+        // check
+        tb_assert_and_check_break(pool->pool && pool->idle && pool->work);
+
+        // append to the work list
+        task->itor = tb_list_insert_tail(pool->work, task);
+        tb_assert_and_check_break(task->itor != tb_iterator_tail(pool->work));
 
         // ok
         ok = tb_true;
@@ -586,28 +519,33 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
     } while (0);
 
     // trace
-    tb_trace_d("done: %s => %s, working: %lu, waiting: %lu, state: %s", iurl, ourl, tb_list_size(pool->working), pool->waiting? tb_single_list_size(pool->waiting) : 0, ok? "ok" : "no");
+    tb_trace_d("done: %s => %s, work: %lu, idle: %lu, state: %s", iurl, ourl, tb_list_size(pool->work), tb_vector_size(pool->idle), ok? "ok" : "no");
 
-    // failed? exit task
-    if (!ok && task) tb_transfer_task_exit(task, tb_false);
+    // failed?
+    if (!ok) 
+    {
+        // exit it
+        if (task) tb_transfer_task_exit(pool, task);
+        task = tb_null;
+    }
 
     // leave
     tb_spinlock_leave(&pool->lock);
 
-    // ok and work it?
-    if (ok && bworking && task && task->transfer)
+    // ok? done it
+    if (ok && task && task->transfer)
     {
         // done
-        if (!tb_transfer_open_save(task->transfer, tb_transfer_task_save, task))
+        if (!tb_async_transfer_open_done(task->transfer, 0, tb_transfer_task_done, task))
         {
             // enter
             tb_spinlock_enter(&pool->lock);
 
-            // remove task from the working list
-            tb_list_remove(pool->working, task->itor);
+            // remove task from the work list
+            tb_list_remove(pool->work, task->itor);
 
             // exit task
-            tb_transfer_task_exit(task, tb_false);
+            tb_transfer_task_exit(pool, task);
 
             // leave
             tb_spinlock_leave(&pool->lock);

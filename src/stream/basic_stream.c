@@ -59,9 +59,9 @@ tb_bool_t tb_basic_stream_init(tb_basic_stream_t* stream, tb_size_t type, tb_siz
         stream->base.type = type;
 
         // init timeout, 10s
-        stream->base.timeout = 10000;
+        stream->base.timeout = TB_STREAM_DEFAULT_TIMEOUT;
 
-        // init internal state?
+        // init internal state
         stream->base.istate = TB_STATE_CLOSED;
 
         // init url

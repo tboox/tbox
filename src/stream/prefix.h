@@ -38,6 +38,9 @@
 #define TB_STREAM_CTRL(type, ctrl)                              (((type) << 16) | (ctrl))
 #define TB_STREAM_CTRL_FLTR(type, ctrl)                         TB_STREAM_CTRL(TB_STREAM_TYPE_FLTR, (((type) << 8) | (ctrl)))
 
+/// the stream default timeout, 10s
+#define TB_STREAM_DEFAULT_TIMEOUT                               (10000)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */

@@ -142,14 +142,14 @@ tb_size_t               tb_thread_pool_task_post_list(tb_handle_t pool, tb_threa
  */
 tb_handle_t             tb_thread_pool_task_init(tb_handle_t pool, tb_char_t const* name, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_cpointer_t priv, tb_bool_t urgent);
 
-/*! cancel the waiting task
+/*! kill the waiting task
  *
  * @param pool          the thread pool handle
  * @param task          the task handle
  */
 tb_void_t               tb_thread_pool_task_kill(tb_handle_t pool, tb_handle_t task);
 
-/*!cancel all waiting tasks
+/*! kill all waiting tasks
  *
  * @param pool          the thread pool handle
  */

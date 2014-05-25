@@ -43,26 +43,41 @@ tb_handle_t             tb_transfer_pool(tb_noarg_t);
 
 /*! init transfer pool
  *
- * @param aicp          the aicp, will make it if be null
+ * @param aicp          the aicp, using the default aicp if be null
  * @param maxn          the transfer task max count, no limit if be zero
- * @param conc          the concurrent transfer count, no limit if be zero
- * @param timeout       the timeout, using the default timeout if be zero 
  *
  * @return              the transfer pool 
  */
-tb_handle_t             tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn, tb_size_t conc, tb_long_t timeout);
+tb_handle_t             tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn);
 
 /*! exit transfer pool
  *
  * @param pool          the transfer pool 
+ *
+ * @return              tb_true or tb_false
  */
-tb_void_t               tb_transfer_pool_exit(tb_handle_t pool);
+tb_bool_t               tb_transfer_pool_exit(tb_handle_t pool);
 
 /*! kill transfer pool
  *
  * @param pool          the transfer pool 
  */
 tb_void_t               tb_transfer_pool_kill(tb_handle_t pool);
+
+/*! kill all working tasks
+ *
+ * @param pool          the transfer pool handle
+ */
+tb_void_t               tb_transfer_pool_kill_all(tb_handle_t pool);
+
+/*! wait all working tasks
+ *
+ * @param pool          the transfer pool handle
+ * @param timeout       the timeout
+ *
+ * @return              ok: 1, timeout: 0, error: -1
+ */
+tb_long_t               tb_transfer_pool_wait_all(tb_handle_t pool, tb_long_t timeout);
 
 /*! the transfer pool size
  *
@@ -82,11 +97,13 @@ tb_size_t               tb_transfer_pool_maxn(tb_handle_t pool);
  * @param iurl          the input url
  * @param ourl          the output url
  * @param offset        the offset
- * @param func          the save func 
+ * @param rate          the limited rate, not limit if be zero
+ * @param timeout       the timeout, using the default timeout if be zero
+ * @param func          the done func 
  * @param priv          the func private data
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_transfer_pool_done(tb_handle_t pool, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_transfer_save_func_t save, tb_transfer_ctrl_func_t ctrl, tb_cpointer_t priv);
+tb_bool_t               tb_transfer_pool_done(tb_handle_t pool, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_size_t rate, tb_long_t timeout, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
 
 #endif

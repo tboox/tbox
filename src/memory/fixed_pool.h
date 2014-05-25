@@ -107,11 +107,11 @@ tb_bool_t           tb_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
 /*! walk fixed pool item
  *
  * @code
- * tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
- * {
- *      // ok or break
- *      return tb_true;
- * }
+    tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
+    {
+       // ok or break
+       return tb_true;
+    }
  * @endcode
  *
  * @param handle    the pool handle
