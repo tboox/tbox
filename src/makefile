@@ -82,7 +82,6 @@ tbox_C_FILES 			+= \
 						stream/basic_stream/data \
 						stream/basic_stream/sock \
 						stream/basic_stream/filter \
-						stream/transfer \
 						stream/basic_transfer \
 						stream/filter/filter \
 						stream/filter/cache \

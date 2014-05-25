@@ -1921,15 +1921,18 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
             // check opened?
             tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
 
+            // the timeout
+            tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
+
             // set timeout
-            http->option.timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
+            http->option.timeout = timeout? timeout : TB_HTTP_DEFAULT_TIMEOUT;
             return tb_true;
         }
         break;
     case TB_HTTP_OPTION_GET_TIMEOUT:
         {
             // ptimeout
-            tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+            tb_long_t* ptimeout = (tb_long_t*)tb_va_arg(args, tb_long_t*);
             tb_assert_and_check_return_val(ptimeout, tb_false);
 
             // get timeout
@@ -1949,7 +1952,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
         break;
     case TB_HTTP_OPTION_GET_COOKIES:
         {
-            // ptimeout
+            // pcookies
             tb_handle_t* pcookies = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
             tb_assert_and_check_return_val(pcookies, tb_false);
 

@@ -443,11 +443,19 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
     tb_bool_t ok_rcache = tb_false;
     do
     {
-        // init
+        // init mode
         stream->base.mode       = TB_STREAM_MODE_AICO;
+        
+        // init type
         stream->base.type       = type;
-        stream->base.timeout    = -1;
+
+        // init timeout, 10s
+        stream->base.timeout    = TB_STREAM_DEFAULT_TIMEOUT;
+
+        // init internal state
         stream->base.istate     = TB_STATE_CLOSED;
+
+        // init aicp
         stream->aicp            = aicp? aicp : tb_aicp();
         tb_assert_and_check_break(stream->aicp);
 

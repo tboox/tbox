@@ -37,7 +37,7 @@
  * macros
  */
 
-/// the http default timeout
+/// the http default timeout, 10s
 #define TB_HTTP_DEFAULT_TIMEOUT                 (10000)
 
 /// the http default redirect maxn
@@ -172,7 +172,7 @@ typedef struct __tb_http_option_t
     tb_hash_t*          head;
 
     /// timeout: ms
-    tb_size_t           timeout;
+    tb_long_t           timeout;
 
     /// range
     tb_http_range_t     range;
