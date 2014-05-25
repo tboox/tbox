@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		find.h
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        find.h
+ * @ingroup     algorithm
  *
  */
 #ifndef TB_ALGORITHM_FIND_H
@@ -35,24 +35,24 @@
 
 /*! the finder
  *
- * @param iterator 	the iterator
- * @param head 		the iterator head
- * @param tail 		the iterator tail
- * @param data 		the finded data
- * @param comp 		the comparer
+ * @param iterator  the iterator
+ * @param head      the iterator head
+ * @param tail      the iterator tail
+ * @param data      the finded data
+ * @param comp      the comparer
  *
- * @return 			the iterator itor
+ * @return          the iterator itor
  */
-tb_size_t 			tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t priv, tb_iterator_comp_t comp);
+tb_size_t           tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t priv, tb_iterator_comp_t comp);
 
 /*! the finder for all
  *
- * @param iterator 	the iterator
- * @param data 		the finded data
- * @param comp 		the comparer
+ * @param iterator  the iterator
+ * @param data      the finded data
+ * @param comp      the comparer
  *
- * @return 			the iterator itor
+ * @return          the iterator itor
  */
-tb_size_t 			tb_find_all(tb_iterator_t* iterator, tb_cpointer_t priv, tb_iterator_comp_t comp);
+tb_size_t           tb_find_all(tb_iterator_t* iterator, tb_cpointer_t priv, tb_iterator_comp_t comp);
 
 #endif

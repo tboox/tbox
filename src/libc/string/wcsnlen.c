@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsnlen.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsnlen.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSNLEN
-# 	include <wchar.h>
+#   include <wchar.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,33 +36,33 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSNLEN
 tb_size_t tb_wcsnlen(tb_wchar_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, 0);
-	return wcsnlen(s, n);
+    tb_assert_and_check_return_val(s, 0);
+    return wcsnlen(s, n);
 }
 #else
 tb_size_t tb_wcsnlen(tb_wchar_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, 0);
-	if (!n) return 0;
+    tb_assert_and_check_return_val(s, 0);
+    if (!n) return 0;
 
-	__tb_register__ tb_wchar_t const* p = s;
+    __tb_register__ tb_wchar_t const* p = s;
 
 #ifdef __tb_small__
-	while (n-- && *p) ++p;
-	return p - s;
+    while (n-- && *p) ++p;
+    return p - s;
 #else
-	tb_size_t l = n & 0x3; n = (n - l) >> 2;
-	while (n--)
-	{
-		if (!p[0]) return (p - s + 0);
-		if (!p[1]) return (p - s + 1);
-		if (!p[2]) return (p - s + 2);
-		if (!p[3]) return (p - s + 3);
-		p += 4;
-	}
+    tb_size_t l = n & 0x3; n = (n - l) >> 2;
+    while (n--)
+    {
+        if (!p[0]) return (p - s + 0);
+        if (!p[1]) return (p - s + 1);
+        if (!p[2]) return (p - s + 2);
+        if (!p[3]) return (p - s + 3);
+        p += 4;
+    }
 
-	while (l-- && *p) ++p;
-	return p - s;
+    while (l-- && *p) ++p;
+    return p - s;
 #endif
 }
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsnrstr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsnrstr.c
+ * @ingroup     libc
  *
  */
 
@@ -33,8 +33,8 @@
 
 tb_wchar_t* tb_wcsnrstr(tb_wchar_t const* s1, tb_size_t n, tb_wchar_t const* s2)
 {
-	tb_assert_and_check_return_val(s1, tb_null);
-	
-	tb_trace_noimpl();
-	return tb_null;
+    tb_assert_and_check_return_val(s1, tb_null);
+    
+    tb_trace_noimpl();
+    return tb_null;
 }

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		swprintf.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        swprintf.c
+ * @ingroup     libc
  *
  */
 
@@ -33,7 +33,7 @@
 
 tb_long_t tb_swprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* fmt, ...)
 {
-	tb_long_t ret = 0;
-	tb_vswprintf_format(s, n, fmt, &ret);
-	return ret;
+    tb_long_t ret = 0;
+    tb_vswprintf_format(s, n, fmt, &ret);
+    return ret;
 }

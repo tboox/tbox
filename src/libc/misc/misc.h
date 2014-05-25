@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		misc.h
- * @ingroup 	libc
+ * @author      ruki
+ * @file        misc.h
+ * @ingroup     libc
  *
  */
 #ifndef TB_LIBC_MISC_H

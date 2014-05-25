@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		time.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        time.c
+ * @ingroup     libc
  *
  */
 
@@ -34,8 +34,8 @@
 
 tb_time_t tb_time()
 {
-	// time
-	tb_timeval_t tv = {0};
-	return tb_gettimeofday(&tv, tb_null)? tv.tv_sec : (tb_time_t)-1;
+    // time
+    tb_timeval_t tv = {0};
+    return tb_gettimeofday(&tv, tb_null)? tv.tv_sec : (tb_time_t)-1;
 }
 

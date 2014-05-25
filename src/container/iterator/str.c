@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		str.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        str.c
+ * @ingroup     container
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -31,39 +31,39 @@
  */
 static tb_long_t tb_iterator_init_str_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	// check
-	tb_assert_and_check_return_val(ltem && rtem, 0);
+    // check
+    tb_assert_and_check_return_val(ltem && rtem, 0);
 
-	// compare it
-	return iterator->priv? tb_strcmp((tb_char_t const*)ltem, (tb_char_t const*)rtem) : tb_stricmp((tb_char_t const*)ltem, (tb_char_t const*)rtem);
+    // compare it
+    return iterator->priv? tb_strcmp((tb_char_t const*)ltem, (tb_char_t const*)rtem) : tb_stricmp((tb_char_t const*)ltem, (tb_char_t const*)rtem);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_iterator_t tb_iterator_init_str(tb_char_t** data, tb_size_t size)
-{	
-	// check
-	tb_assert(data && size);
+{   
+    // check
+    tb_assert(data && size);
 
-	// the ptr iterator
-	tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
+    // the ptr iterator
+    tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
 
-	// init
-	tb_iterator_t itor;
-	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	itor.data = (tb_pointer_t)data;
-	itor.priv = tb_u2p(size);
-	itor.step = sizeof(tb_char_t*);
-	itor.size = ptr.size;
-	itor.head = ptr.head;
-	itor.tail = ptr.tail;
-	itor.prev = ptr.prev;
-	itor.next = ptr.next;
-	itor.item = ptr.item;
-	itor.copy = ptr.copy;
-	itor.comp = tb_iterator_init_str_comp;
+    // init
+    tb_iterator_t itor;
+    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+    itor.data = (tb_pointer_t)data;
+    itor.priv = tb_u2p(size);
+    itor.step = sizeof(tb_char_t*);
+    itor.size = ptr.size;
+    itor.head = ptr.head;
+    itor.tail = ptr.tail;
+    itor.prev = ptr.prev;
+    itor.next = ptr.next;
+    itor.item = ptr.item;
+    itor.copy = ptr.copy;
+    itor.comp = tb_iterator_init_str_comp;
 
-	// ok
-	return itor;
+    // ok
+    return itor;
 }

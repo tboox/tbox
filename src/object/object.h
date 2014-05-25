@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		object.h
- * @defgroup 	object
+ * @author      ruki
+ * @file        object.h
+ * @defgroup    object
  *
  */
 #ifndef TB_OBJECT_H
@@ -46,133 +46,133 @@
 
 /*! init object context
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_object_context_init(tb_noarg_t);
+tb_bool_t           tb_object_context_init(tb_noarg_t);
 
 /// exit object context
-tb_void_t 			tb_object_context_exit(tb_noarg_t);
+tb_void_t           tb_object_context_exit(tb_noarg_t);
 
 /*! init object
  *
- * @param object 	the object
- * @param flag 		the object flag
- * @param type 		the object type
+ * @param object    the object
+ * @param flag      the object flag
+ * @param type      the object type
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type);
+tb_bool_t           tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type);
 
 /*! exit object
  *
- * @param object 	the object
+ * @param object    the object
  *
  * @note the reference count must be one
  */
-tb_void_t 			tb_object_exit(tb_object_t* object);
+tb_void_t           tb_object_exit(tb_object_t* object);
 
 /*! cler object
  *
- * @param object 	the object
+ * @param object    the object
  */
-tb_void_t 			tb_object_cler(tb_object_t* object);
+tb_void_t           tb_object_cler(tb_object_t* object);
 
 /*! set the object private data
  *
- * @param object 	the object
- * @param priv 		the private data
+ * @param object    the object
+ * @param priv      the private data
  *
  */
-tb_void_t 			tb_object_setp(tb_object_t* object, tb_cpointer_t priv);
+tb_void_t           tb_object_setp(tb_object_t* object, tb_cpointer_t priv);
 
 /*! get the object private data
  *
- * @param object 	the object
+ * @param object    the object
  *
- * @return 			the private data
+ * @return          the private data
  */
-tb_cpointer_t 		tb_object_getp(tb_object_t* object);
+tb_cpointer_t       tb_object_getp(tb_object_t* object);
 
 /*! read object
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the object
+ * @return          the object
  */
-tb_object_t* 		tb_object_read(tb_basic_stream_t* stream);
+tb_object_t*        tb_object_read(tb_basic_stream_t* stream);
 
 /*! read object from url
  *
- * @param url 		the url
+ * @param url       the url
  *
- * @return 			the object
+ * @return          the object
  */
-tb_object_t* 		tb_object_read_from_url(tb_char_t const* url);
+tb_object_t*        tb_object_read_from_url(tb_char_t const* url);
 
 /*! read object from data
  *
- * @param data 		the data
- * @param size 		the size
+ * @param data      the data
+ * @param size      the size
  *
- * @return 			the object
+ * @return          the object
  */
-tb_object_t* 		tb_object_read_from_data(tb_byte_t const* data, tb_size_t size);
+tb_object_t*        tb_object_read_from_data(tb_byte_t const* data, tb_size_t size);
 
 /*! writ object
  *
- * @param object 	the object
- * @param stream 	the stream
- * @param format 	the object format
+ * @param object    the object
+ * @param stream    the stream
+ * @param format    the object format
  *
- * @return 			the writed size, failed: -1
+ * @return          the writed size, failed: -1
  */
-tb_long_t 			tb_object_writ(tb_object_t* object, tb_basic_stream_t* stream, tb_size_t format);
+tb_long_t           tb_object_writ(tb_object_t* object, tb_basic_stream_t* stream, tb_size_t format);
 
 /*! writ object to url
  *
- * @param object	the object
- * @param url 		the url
- * @param format 	the format
+ * @param object    the object
+ * @param url       the url
+ * @param format    the format
  *
- * @return 			the writed size, failed: -1
+ * @return          the writed size, failed: -1
  */
-tb_long_t 			tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_size_t format);
+tb_long_t           tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_size_t format);
 
 /*! writ object to data
  *
- * @param object	the object
- * @param data 		the data
- * @param size 		the size
- * @param format 	the format
+ * @param object    the object
+ * @param data      the data
+ * @param size      the size
+ * @param format    the format
  *
- * @return 			the writed size, failed: -1
+ * @return          the writed size, failed: -1
  */
-tb_long_t 			tb_object_writ_to_data(tb_object_t* object, tb_byte_t* data, tb_size_t size, tb_size_t format);
+tb_long_t           tb_object_writ_to_data(tb_object_t* object, tb_byte_t* data, tb_size_t size, tb_size_t format);
 
 /*! copy object
  *
- * @param object 	the object
+ * @param object    the object
  *
- * @return 			the object copy
+ * @return          the object copy
  */
-tb_object_t* 		tb_object_copy(tb_object_t* object);
+tb_object_t*        tb_object_copy(tb_object_t* object);
 
 /*! the object type
  *
- * @param object 	the object
+ * @param object    the object
  *
- * @return 			the object type
+ * @return          the object type
  */
-tb_size_t 			tb_object_type(tb_object_t* object);
+tb_size_t           tb_object_type(tb_object_t* object);
 
 /*! the object data
  *
- * @param object	the object
- * @param format 	the format
+ * @param object    the object
+ * @param format    the format
  *
- * @return 			the data object
+ * @return          the data object
  */
-tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
+tb_object_t*        tb_object_data(tb_object_t* object, tb_size_t format);
 
 /*! seek to the object for the gived path
  *
@@ -181,83 +181,83 @@ tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
  * xml:
  *
  * <dict>
-		<key>string</key>
-		<string>hello wolrd!</string>
+        <key>string</key>
+        <string>hello wolrd!</string>
 
-		<key>com.xxx.xxx</key>
-		<string>hello wolrd!</string>
+        <key>com.xxx.xxx</key>
+        <string>hello wolrd!</string>
 
-		<key>integer</key>
-		<number>31415926</number>
+        <key>integer</key>
+        <number>31415926</number>
 
-		<key>array</key>
-		<array>
-			<string>hello wolrd!</string>
-			<number>31415926</number>
-			<number>3.1415926</number>
-			<false/>
-			<true/>
-			<dict>
-				<key>string</key>
-				<string>hello wolrd!</string>
-			</dict>
-		</array>
-	</dict>
+        <key>array</key>
+        <array>
+            <string>hello wolrd!</string>
+            <number>31415926</number>
+            <number>3.1415926</number>
+            <false/>
+            <true/>
+            <dict>
+                <key>string</key>
+                <string>hello wolrd!</string>
+            </dict>
+        </array>
+    </dict>
  *
  * path:
  *
- * 1. ".string" 			: hello wolrd!
- * 2. ".array[1]" 			: 31415926
- * 3. ".array[5].string" 	: hello wolrd!
- * 4. ".com\\.xxx\\.xxx" 	: hello wolrd!
+ * 1. ".string"             : hello wolrd!
+ * 2. ".array[1]"           : 31415926
+ * 3. ".array[5].string"    : hello wolrd!
+ * 4. ".com\\.xxx\\.xxx"    : hello wolrd!
  * 
  * </pre>
  *
- * @param object	the object
- * @param path 		the object path
- * @param type 		the object type, check it if not TB_OBJECT_TYPE_NONE
+ * @param object    the object
+ * @param path      the object path
+ * @param type      the object type, check it if not TB_OBJECT_TYPE_NONE
  *
  *
  * <code>
- * tb_object_t* 	object = tb_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
+ * tb_object_t*     object = tb_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
  * if (object)
  * {
- * 		tb_trace_d("%s", tb_string_cstr(object));
+ *      tb_trace_d("%s", tb_string_cstr(object));
  * }
  * <endcode>
  *
  *
- * @return 			the object
+ * @return          the object
  */
-tb_object_t* 		tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_t type);
+tb_object_t*        tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_t type);
 
 /*! dump the object
  *
- * @param object 	the object
+ * @param object    the object
  *
- * @return 			the object
+ * @return          the object
  */
-tb_object_t* 		tb_object_dump(tb_object_t* object);
+tb_object_t*        tb_object_dump(tb_object_t* object);
 
 /*! the object reference count
  *
- * @param object 	the object
+ * @param object    the object
  *
- * @return 			the object reference count
+ * @return          the object reference count
  */
-tb_size_t 			tb_object_ref(tb_object_t* object);
+tb_size_t           tb_object_ref(tb_object_t* object);
 
 /*! increase the object reference count
  *
- * @param object 	the object
+ * @param object    the object
  */
-tb_void_t 			tb_object_inc(tb_object_t* object);
+tb_void_t           tb_object_inc(tb_object_t* object);
 
 /*! decrease the object reference count, will free it if --refn == 0
  *
- * @param object 	the object
+ * @param object    the object
  */
-tb_void_t 			tb_object_dec(tb_object_t* object);
+tb_void_t           tb_object_dec(tb_object_t* object);
 
 #endif
 

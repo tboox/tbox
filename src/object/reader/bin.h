@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		bin.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        bin.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_READER_BIN_H
@@ -36,16 +36,16 @@
 /// the bin reader type
 typedef struct __tb_object_bin_reader_t
 {
-	/// the stream
-	tb_basic_stream_t* 				stream;
+    /// the stream
+    tb_basic_stream_t*              stream;
 
-	/// the object list
-	tb_vector_t* 				list;
+    /// the object list
+    tb_vector_t*                list;
 
 }tb_object_bin_reader_t;
 
 /// the bin reader func type
-typedef tb_object_t* 			(*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
+typedef tb_object_t*            (*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -53,26 +53,26 @@ typedef tb_object_t* 			(*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* r
 
 /*! the bin object reader
  *
- * @return 						the bin object reader
+ * @return                      the bin object reader
  */
-tb_object_reader_t* 			tb_object_bin_reader(tb_noarg_t);
+tb_object_reader_t*             tb_object_bin_reader(tb_noarg_t);
 
 /*! hook the bin reader
  *
- * @param type 					the object type 
- * @param func 					the reader func
+ * @param type                  the object type 
+ * @param func                  the reader func
  *
- * @return 						tb_true or tb_false
+ * @return                      tb_true or tb_false
  */
-tb_bool_t 						tb_object_bin_reader_hook(tb_size_t type, tb_object_bin_reader_func_t func);
+tb_bool_t                       tb_object_bin_reader_hook(tb_size_t type, tb_object_bin_reader_func_t func);
 
 /*! the bin reader func
  *
- * @param type 					the object type 
+ * @param type                  the object type 
  *
- * @return 						the object reader func
+ * @return                      the object reader func
  */
-tb_object_bin_reader_func_t 	tb_object_bin_reader_func(tb_size_t type);
+tb_object_bin_reader_func_t     tb_object_bin_reader_func(tb_size_t type);
 
 #endif
 

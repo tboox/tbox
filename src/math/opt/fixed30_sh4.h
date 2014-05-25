@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		fixed30_sh4.h
+ * @author      ruki
+ * @file        fixed30_sh4.h
  *
  */
 #ifndef TB_MATH_OPT_FIXED30_SH4_H

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		asin.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        asin.c
+ * @ingroup     libm
  *
  */
 
@@ -33,5 +33,5 @@
  */
 tb_double_t tb_asin(tb_double_t x)
 {
-	return asin(x);
+    return asin(x);
 }

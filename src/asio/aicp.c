@@ -638,12 +638,12 @@ tb_long_t tb_aicp_wait_all(tb_aicp_t* aicp, tb_long_t timeout)
     // check
     tb_assert_and_check_return_val(aicp, -1);
 
-	// wait it
-	tb_size_t size = 0;
-	tb_hong_t time = tb_cache_time_spak();
-	while ((timeout < 0 || tb_cache_time_spak() < time + timeout))
-	{
-		// enter
+    // wait it
+    tb_size_t size = 0;
+    tb_hong_t time = tb_cache_time_spak();
+    while ((timeout < 0 || tb_cache_time_spak() < time + timeout))
+    {
+        // enter
         tb_spinlock_enter(&aicp->lock);
 
         // the aico count
@@ -652,18 +652,18 @@ tb_long_t tb_aicp_wait_all(tb_aicp_t* aicp, tb_long_t timeout)
         // trace
         tb_trace_d("wait: count: %lu: ..", size);
 
-		// leave
+        // leave
         tb_spinlock_leave(&aicp->lock);
 
-		// ok?
-		tb_check_break(size);
+        // ok?
+        tb_check_break(size);
 
-		// wait some time
-		tb_msleep(200);
-	}
+        // wait some time
+        tb_msleep(200);
+    }
 
-	// ok?
-	return !size? 1 : 0;
+    // ok?
+    return !size? 1 : 0;
 }
 tb_hong_t tb_aicp_time(tb_aicp_t* aicp)
 {

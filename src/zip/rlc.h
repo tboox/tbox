@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		rlc.h
- * @ingroup 	zip
+ * @author      ruki
+ * @file        rlc.h
+ * @ingroup     zip
  *
  */
 #ifndef TB_ZIP_RLC_H
@@ -34,9 +34,9 @@
  */
 
 // vlc 
-#define TB_ZIP_RLC_VLC_TYPE_FIXED 			(0)
-#define TB_ZIP_RLC_VLC_TYPE_GAMMA 			(1)
-#define TB_ZIP_RLC_VLC_TYPE_GOLOMB 			(0)
+#define TB_ZIP_RLC_VLC_TYPE_FIXED           (0)
+#define TB_ZIP_RLC_VLC_TYPE_GAMMA           (1)
+#define TB_ZIP_RLC_VLC_TYPE_GOLOMB          (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -45,17 +45,17 @@
 // the rlc zip type
 typedef struct __tb_zip_rlc_t
 {
-	// the zip base
-	tb_zip_t 		base;
+    // the zip base
+    tb_zip_t        base;
 
-	// the reference to vlc
-	tb_zip_vlc_t* 	vlc;
+    // the reference to vlc
+    tb_zip_vlc_t*   vlc;
 
-	// the last byte
-	tb_byte_t 		last;
+    // the last byte
+    tb_byte_t       last;
 
-	// the repeat size
-	tb_size_t 		repeat;
+    // the repeat size
+    tb_size_t       repeat;
 
 }tb_zip_rlc_t;
 
@@ -63,8 +63,8 @@ typedef struct __tb_zip_rlc_t
  * interfaces
  */
 
-tb_zip_t* 	tb_zip_rlc_init(tb_size_t action);
-tb_void_t 	tb_zip_rlc_exit(tb_zip_t* zip);
+tb_zip_t*   tb_zip_rlc_init(tb_size_t action);
+tb_void_t   tb_zip_rlc_exit(tb_zip_t* zip);
 
 #endif
 

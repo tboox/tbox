@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strchr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        strchr.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_STRCHR
-# 	include <string.h>
+#   include <string.h>
 #endif
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces 
@@ -36,21 +36,21 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRCHR
 tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
-	return strchr(s1, c);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    return strchr(s1, c);
 }
 #else
 tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
 {
-	tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
-	while (*s)
-	{
-		if (*s == c) return (tb_char_t* )s;
-		s++;
+    while (*s)
+    {
+        if (*s == c) return (tb_char_t* )s;
+        s++;
 
-	}
-	return tb_null;
+    }
+    return tb_null;
 }
 #endif
 

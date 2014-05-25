@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		cpu.h
+ * @author      ruki
+ * @file        cpu.h
  *
  */
 #ifndef TB_PREFIX_CPU_H
@@ -34,26 +34,26 @@
 
 // check 64-bits
 #if defined (__LP64__) \
-	|| defined (__64BIT__) \
-	|| defined (_LP64) \
-	|| defined (__x86_64) \
-	|| defined (__x86_64__) \
-	|| defined (__amd64) \
-	|| defined (__amd64__) \
-	|| defined (__arm64) \
-	|| defined (__arm64__) \
-	|| (__WORDSIZE == 64)
-# 	define TB_CPU_BITSIZE 		(64)
-# 	define TB_CPU_BITBYTE 		(8)
-# 	define TB_CPU_BITALIGN 		(7)
-# 	define TB_CPU_BIT32 		(0)
-# 	define TB_CPU_BIT64 		(1)
+    || defined (__64BIT__) \
+    || defined (_LP64) \
+    || defined (__x86_64) \
+    || defined (__x86_64__) \
+    || defined (__amd64) \
+    || defined (__amd64__) \
+    || defined (__arm64) \
+    || defined (__arm64__) \
+    || (__WORDSIZE == 64)
+#   define TB_CPU_BITSIZE       (64)
+#   define TB_CPU_BITBYTE       (8)
+#   define TB_CPU_BITALIGN      (7)
+#   define TB_CPU_BIT32         (0)
+#   define TB_CPU_BIT64         (1)
 #else
-# 	define TB_CPU_BITSIZE 		(32)
-# 	define TB_CPU_BITBYTE 		(4)
-# 	define TB_CPU_BITALIGN 		(3)
-# 	define TB_CPU_BIT32 		(1)
-# 	define TB_CPU_BIT64 		(0)
+#   define TB_CPU_BITSIZE       (32)
+#   define TB_CPU_BITBYTE       (4)
+#   define TB_CPU_BITALIGN      (3)
+#   define TB_CPU_BIT32         (1)
+#   define TB_CPU_BIT64         (0)
 #endif
 
 

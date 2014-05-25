@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		process.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        process.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -30,14 +30,14 @@
  * implementation
  */
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	include "windows/process.c"
+#   include "windows/process.c"
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-# 	include "posix/process.c"
+#   include "posix/process.c"
 #else
 tb_bool_t tb_process_done(tb_char_t const* line)
 {
-	tb_trace_noimpl();
-	return tb_false;
+    tb_trace_noimpl();
+    return tb_false;
 }
 #endif
 

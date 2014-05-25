@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		dns.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        dns.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_DNS_H
@@ -36,11 +36,11 @@
 
 /*! init dns 
  *
- * @return 	tb_true or tb_false
+ * @return  tb_true or tb_false
  */
-tb_bool_t 	tb_dns_init(tb_noarg_t);
+tb_bool_t   tb_dns_init(tb_noarg_t);
 
 /// exit dns
-tb_void_t 	tb_dns_exit(tb_noarg_t);
+tb_void_t   tb_dns_exit(tb_noarg_t);
 
 #endif

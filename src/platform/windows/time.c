@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		utils.c
+ * @author      ruki
+ * @file        utils.c
  *
  */
 
@@ -34,51 +34,51 @@
 
 tb_void_t tb_usleep(tb_size_t us)
 {
-	Sleep(1);
+    Sleep(1);
 }
 tb_void_t tb_msleep(tb_size_t ms)
 {
-	Sleep(ms);
+    Sleep(ms);
 }
 tb_void_t tb_sleep(tb_size_t s)
 {
-	Sleep(s * 1000);
+    Sleep(s * 1000);
 }
 tb_hong_t tb_mclock()
 {
-	return (tb_hong_t)GetTickCount();
+    return (tb_hong_t)GetTickCount();
 }
 tb_hong_t tb_uclock()
 {
-	LARGE_INTEGER f = {{0}};
+    LARGE_INTEGER f = {{0}};
     if (!QueryPerformanceFrequency(&f)) return 0;
-	tb_assert_and_check_return_val(f.QuadPart, 0);
+    tb_assert_and_check_return_val(f.QuadPart, 0);
 
-	LARGE_INTEGER t = {{0}};
-	if (!QueryPerformanceCounter(&t)) return 0;
-	tb_assert_and_check_return_val(t.QuadPart, 0);
-	
-	return (t.QuadPart * 1000000) / f.QuadPart;
+    LARGE_INTEGER t = {{0}};
+    if (!QueryPerformanceCounter(&t)) return 0;
+    tb_assert_and_check_return_val(t.QuadPart, 0);
+    
+    return (t.QuadPart * 1000000) / f.QuadPart;
 }
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
-	union 
-	{
-		tb_uint64_t ns100; //< time since 1 Jan 1601 in 100ns units
-		FILETIME 	ft;
+    union 
+    {
+        tb_uint64_t ns100; //< time since 1 Jan 1601 in 100ns units
+        FILETIME    ft;
 
-	}now;
+    }now;
 
-	if (tv)
-	{
-		GetSystemTimeAsFileTime(&now.ft);
-		tv->tv_sec 	= (tb_time_t)((now.ns100 - 116444736000000000ULL) / 10000000ULL);
-		tv->tv_usec = (tb_suseconds_t)((now.ns100 / 10ULL) % 1000000ULL);
-	}
+    if (tv)
+    {
+        GetSystemTimeAsFileTime(&now.ft);
+        tv->tv_sec  = (tb_time_t)((now.ns100 - 116444736000000000ULL) / 10000000ULL);
+        tv->tv_usec = (tb_suseconds_t)((now.ns100 / 10ULL) % 1000000ULL);
+    }
 
-	// tz is not implementated now.
-	tb_assert_and_check_return_val(!tz, tb_false);
+    // tz is not implementated now.
+    tb_assert_and_check_return_val(!tz, tb_false);
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }

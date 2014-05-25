@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcslen.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcslen.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSLEN
-# 	include <wchar.h>
+#   include <wchar.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -37,29 +37,29 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSLEN
 tb_size_t tb_wcslen(tb_wchar_t const* s)
 {
-	tb_assert_and_check_return_val(s, 0);
-	return wcslen(s);
+    tb_assert_and_check_return_val(s, 0);
+    return wcslen(s);
 }
 #else
 tb_size_t tb_wcslen(tb_wchar_t const* s)
 {
-	tb_assert_and_check_return_val(s, 0);
+    tb_assert_and_check_return_val(s, 0);
 
-	__tb_register__ tb_wchar_t const* p = s;
+    __tb_register__ tb_wchar_t const* p = s;
 
 #ifdef __tb_small__
-	while (*p) p++;
-	return (p - s);
+    while (*p) p++;
+    return (p - s);
 #else
-	while (1) 
-	{
-		if (!p[0]) return (p - s + 0);
-		if (!p[1]) return (p - s + 1);
-		if (!p[2]) return (p - s + 2);
-		if (!p[3]) return (p - s + 3);
-		p += 4;
-	}
-	return 0;
+    while (1) 
+    {
+        if (!p[0]) return (p - s + 0);
+        if (!p[1]) return (p - s + 1);
+        if (!p[2]) return (p - s + 2);
+        if (!p[3]) return (p - s + 3);
+        p += 4;
+    }
+    return 0;
 #endif
 }
 #endif

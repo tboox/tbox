@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		int32.h
- * @ingroup 	math
+ * @author      ruki
+ * @file        int32.h
+ * @ingroup     math
  *
  */
 #ifndef TB_MATH_INT32_H
@@ -34,18 +34,18 @@
  */
 
 // sign
-#define tb_int32_get_sign(x) 			tb_int32_get_sign_inline(x)
-#define tb_int32_set_sign(x, s) 		tb_int32_set_sign_inline(x, s)
+#define tb_int32_get_sign(x)            tb_int32_get_sign_inline(x)
+#define tb_int32_set_sign(x, s)         tb_int32_set_sign_inline(x, s)
 
 // bool: is true?
-#define tb_int32_nz(x) 					tb_int32_nz_inline(x)
+#define tb_int32_nz(x)                  tb_int32_nz_inline(x)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 // div
-tb_int32_t 	tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits);
+tb_int32_t  tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline
@@ -54,7 +54,7 @@ tb_int32_t 	tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits);
 // return -1 if x < 0, else return 0
 static __tb_inline__ tb_int32_t tb_int32_get_sign_inline(tb_int32_t x)
 {
-	tb_int32_t s = ((tb_int32_t)(x) >> 31);
+    tb_int32_t s = ((tb_int32_t)(x) >> 31);
     tb_assert((x < 0 && s == -1) || (x >= 0 && !s));
     return s;
 }
@@ -67,8 +67,8 @@ static __tb_inline__ tb_int32_t tb_int32_set_sign_inline(tb_int32_t x, tb_int32_
 // non zero, return 1 if x != 0, else return 0
 static __tb_inline__ tb_long_t tb_int32_nz_inline(tb_uint32_t x)
 {
-	//return (x? 1 : 0);
-	return ((x | (0 - x)) >> 31);
+    //return (x? 1 : 0);
+    return ((x | (0 - x)) >> 31);
 }
 #endif
 

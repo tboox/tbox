@@ -149,8 +149,8 @@ static tb_void_t tb_async_stream_filter_clos_func(tb_async_stream_t* stream, tb_
     // clear the offset
     tb_atomic64_set0(&fstream->offset);
 
-	// clear base
-	tb_async_stream_clear(&fstream->base);
+    // clear base
+    tb_async_stream_clear(&fstream->base);
 
     /* done clos func
      *

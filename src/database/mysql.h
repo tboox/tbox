@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		mysql.h
- * @ingroup 	database
+ * @author      ruki
+ * @file        mysql.h
+ * @ingroup     database
  */
 #ifndef TB_DATABASE_MYSQL_H
 #define TB_DATABASE_MYSQL_H
@@ -34,18 +34,18 @@
 
 /* probe mysql from the url
  *
- * @param url 		the database url
+ * @param url       the database url
  *
- * @return 			the score
+ * @return          the score
  */
-tb_size_t 			tb_database_mysql_probe(tb_url_t const* url);
+tb_size_t           tb_database_mysql_probe(tb_url_t const* url);
 
 /* init mysql
  *
- * @param url 		the database url
+ * @param url       the database url
  *
- * @return 			the database handle
+ * @return          the database handle
  */
-tb_database_sql_t* 	tb_database_mysql_init(tb_url_t const* url);
+tb_database_sql_t*  tb_database_mysql_init(tb_url_t const* url);
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		null.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        null.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_NULL_H
@@ -35,9 +35,9 @@
 
 /*! init null
  *
- * @return 			the null object
+ * @return          the null object
  */
-tb_object_t* 		tb_null_init(tb_noarg_t);
+tb_object_t*        tb_null_init(tb_noarg_t);
 
 
 #endif

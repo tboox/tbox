@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		sched.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        sched.c
+ * @ingroup     platform
  *
  */
 
@@ -34,11 +34,11 @@
 tb_bool_t tb_sched_yield()
 {
 #if defined(YieldProcessor)
-	YieldProcessor();
-	return tb_true;
+    YieldProcessor();
+    return tb_true;
 #else
-	tb_usleep(1);
-	return tb_true;
+    tb_usleep(1);
+    return tb_true;
 #endif
 }
 

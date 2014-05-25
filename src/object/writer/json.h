@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		json.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        json.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_WRITER_JSON_H
@@ -36,16 +36,16 @@
 /// the object json writer type
 typedef struct __tb_object_json_writer_t
 {
-	/// the stream
-	tb_basic_stream_t* 				stream;
+    /// the stream
+    tb_basic_stream_t*              stream;
 
-	/// is deflate?
-	tb_bool_t 					deflate;
+    /// is deflate?
+    tb_bool_t                   deflate;
 
 }tb_object_json_writer_t;
 
 /// the json writer func type
-typedef tb_bool_t 				(*tb_object_json_writer_func_t)(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level);
+typedef tb_bool_t               (*tb_object_json_writer_func_t)(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -53,26 +53,26 @@ typedef tb_bool_t 				(*tb_object_json_writer_func_t)(tb_object_json_writer_t* w
 
 /*! the json object writer
  *
- * @return 						the json object writer
+ * @return                      the json object writer
  */
-tb_object_writer_t* 			tb_object_json_writer(tb_noarg_t);
+tb_object_writer_t*             tb_object_json_writer(tb_noarg_t);
 
 /*! hook the json writer
  *
- * @param type 					the object type 
- * @param func 					the writer func
+ * @param type                  the object type 
+ * @param func                  the writer func
  *
- * @return 						tb_true or tb_false
+ * @return                      tb_true or tb_false
  */
-tb_bool_t 						tb_object_json_writer_hook(tb_size_t type, tb_object_json_writer_func_t func);
+tb_bool_t                       tb_object_json_writer_hook(tb_size_t type, tb_object_json_writer_func_t func);
 
 /*! the json writer func
  *
- * @param type 					the object type 
+ * @param type                  the object type 
  *
- * @return 						the object writer func
+ * @return                      the object writer func
  */
-tb_object_json_writer_func_t 	tb_object_json_writer_func(tb_size_t type);
+tb_object_json_writer_func_t    tb_object_json_writer_func(tb_size_t type);
 
 #endif
 

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		walk.c
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        walk.c
+ * @ingroup     algorithm
  *
  */
 
@@ -33,27 +33,27 @@
  */
 tb_size_t tb_walk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_walk_func_t func, tb_cpointer_t priv)
 {
-	// check
-	tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD) && func, 0);
+    // check
+    tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD) && func, 0);
 
-	// null?
-	tb_check_return_val(head != tail, 0);
+    // null?
+    tb_check_return_val(head != tail, 0);
 
-	// walk
-	tb_size_t count = 0;
-	tb_for (tb_pointer_t, item, head, tail, iterator)
-	{
-		// done
-		if (!func(iterator, item, priv)) break;
+    // walk
+    tb_size_t count = 0;
+    tb_for (tb_pointer_t, item, head, tail, iterator)
+    {
+        // done
+        if (!func(iterator, item, priv)) break;
 
-		// count++
-		count++;
-	}
+        // count++
+        count++;
+    }
 
-	// ok?
-	return count;
+    // ok?
+    return count;
 }
 tb_size_t tb_walk_all(tb_iterator_t* iterator, tb_walk_func_t func, tb_cpointer_t priv)
 {
-	return tb_walk(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), func, priv);
+    return tb_walk(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), func, priv);
 }

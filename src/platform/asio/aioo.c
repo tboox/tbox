@@ -16,16 +16,16 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		aioo.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        aioo.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"platform_aioo"
-#define TB_TRACE_MODULE_DEBUG 			(0)
+#define TB_TRACE_MODULE_NAME            "platform_aioo"
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -41,18 +41,18 @@ tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t tim
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-# 	include "../posix/asio/aioo_select.c"
-	tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
-	{
-		return tb_aioo_reactor_select_wait(handle, code, timeout);
-	}
+#   include "../posix/asio/aioo_select.c"
+    tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+    {
+        return tb_aioo_reactor_select_wait(handle, code, timeout);
+    }
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-# 	include "../posix/asio/aioo_poll.c"
-	tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
-	{
-		return tb_aioo_reactor_poll_wait(handle, code, timeout);
-	}
+#   include "../posix/asio/aioo_poll.c"
+    tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+    {
+        return tb_aioo_reactor_poll_wait(handle, code, timeout);
+    }
 #else
-# 	error have not available event mode
+#   error have not available event mode
 #endif
 

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		pow.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        pow.c
+ * @ingroup     libm
  *
  */
 
@@ -33,5 +33,5 @@
  */
 tb_double_t tb_pow(tb_double_t x, tb_double_t y)
 {
-	return pow(x, y);
+    return pow(x, y);
 }

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		lock_profiler.h
- * @ingroup 	utils
+ * @author      ruki
+ * @file        lock_profiler.h
+ * @ingroup     utils
  *
  */
 #ifndef TB_UTILS_LOCK_PROFILER_H
@@ -36,7 +36,7 @@
 // enable lock profiler
 #undef TB_LOCK_PROFILER_ENABLE
 #ifdef __tb_debug__
-# 	define TB_LOCK_PROFILER_ENABLE
+#   define TB_LOCK_PROFILER_ENABLE
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -45,44 +45,44 @@
 
 /*! the lock profiler instance
  *
- * @return 				the lock profiler handle
+ * @return              the lock profiler handle
  */
-tb_handle_t 			tb_lock_profiler(tb_noarg_t);
+tb_handle_t             tb_lock_profiler(tb_noarg_t);
 
 /*! init lock profiler
  *
  * @note be used for the debug mode generally 
  *
- * @return 				the lock profiler handle
+ * @return              the lock profiler handle
  */
-tb_handle_t 			tb_lock_profiler_init(tb_noarg_t);
+tb_handle_t             tb_lock_profiler_init(tb_noarg_t);
 
 /*! exit lock profiler
  *
- * @param profiler 		the lock profiler handle
+ * @param profiler      the lock profiler handle
  */
-tb_void_t 				tb_lock_profiler_exit(tb_handle_t profiler);
+tb_void_t               tb_lock_profiler_exit(tb_handle_t profiler);
 
 /*! dump lock profiler
  *
- * @param profiler 		the lock profiler handle
+ * @param profiler      the lock profiler handle
  */
-tb_void_t 				tb_lock_profiler_dump(tb_handle_t profiler);
+tb_void_t               tb_lock_profiler_dump(tb_handle_t profiler);
 
 /*! register the lock to the lock profiler
  *
- * @param profiler 		the lock profiler handle
- * @param lock 			the lock address
- * @param name 			the lock name
+ * @param profiler      the lock profiler handle
+ * @param lock          the lock address
+ * @param name          the lock name
  */
-tb_void_t 				tb_lock_profiler_register(tb_handle_t profiler, tb_pointer_t lock, tb_char_t const* name);
+tb_void_t               tb_lock_profiler_register(tb_handle_t profiler, tb_pointer_t lock, tb_char_t const* name);
 
 /*! the lock be occupied 
  *
- * @param profiler 		the lock profiler handle
- * @param lock 			the lock address
+ * @param profiler      the lock profiler handle
+ * @param lock          the lock address
  */
-tb_void_t 				tb_lock_profiler_occupied(tb_handle_t profiler, tb_pointer_t lock);
+tb_void_t               tb_lock_profiler_occupied(tb_handle_t profiler, tb_pointer_t lock);
 
 #endif
 

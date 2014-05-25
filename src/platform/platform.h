@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @author      ruki
+ * @file        platform.h
+ * @defgroup    platform
  *
  */
 #ifndef TB_PLATFORM_H
@@ -63,9 +63,9 @@
  *
  * @return tb_true or tb_false
  */
-tb_bool_t 	tb_platform_init(tb_noarg_t);
+tb_bool_t   tb_platform_init(tb_noarg_t);
 
 /// exit the platform 
-tb_void_t 	tb_platform_exit(tb_noarg_t);
+tb_void_t   tb_platform_exit(tb_noarg_t);
 
 #endif

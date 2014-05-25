@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		stricmp.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        stricmp.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-# 	include <string.h>
+#   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,20 +36,20 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRICMP
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	return strcasecmp(s1, s2);
+    tb_assert_and_check_return_val(s1 && s2, 0);
+    return strcasecmp(s1, s2);
 }
 #else
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	tb_check_return_val(s1 != s2, 0);
+    // check
+    tb_assert_and_check_return_val(s1 && s2, 0);
+    tb_check_return_val(s1 != s2, 0);
 
-	// done
-	tb_long_t r = 0;
-	while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
-	return r;
+    // done
+    tb_long_t r = 0;
+    while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
+    return r;
 }
 #endif
 
@@ -58,15 +58,15 @@ static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
  */
 tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 {
-	// check
+    // check
 #ifdef __tb_debug__
-	{
-		// check overflow? 
-		tb_strlen(s1);
-		tb_strlen(s2);
-	}
+    {
+        // check overflow? 
+        tb_strlen(s1);
+        tb_strlen(s2);
+    }
 #endif
 
-	// done
-	return tb_stricmp_impl(s1, s2);
+    // done
+    return tb_stricmp_impl(s1, s2);
 }

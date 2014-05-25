@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		cache.h
- * @ingroup 	network
+ * @author      ruki
+ * @file        cache.h
+ * @ingroup     network
  *
  */
 #ifndef TB_NETWORK_DNS_CACHE_H
@@ -37,27 +37,27 @@
  *
  * not using ctime default
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_dns_cache_init(tb_noarg_t);
+tb_bool_t           tb_dns_cache_init(tb_noarg_t);
 
 /// exit the cache list
-tb_void_t 			tb_dns_cache_exit(tb_noarg_t);
+tb_void_t           tb_dns_cache_exit(tb_noarg_t);
 
 /*! get addr from cache 
  *
- * @param name 		the host name 
- * @param addr 		the host addr
+ * @param name      the host name 
+ * @param addr      the host addr
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr);
+tb_bool_t           tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr);
 
 /*! set addr to cache 
  *
- * @param name 		the host name 
- * @param addr 		the host addr
+ * @param name      the host name 
+ * @param addr      the host addr
  */
-tb_void_t 			tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr);
+tb_void_t           tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr);
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		cookies.h
- * @ingroup 	network
+ * @author      ruki
+ * @file        cookies.h
+ * @ingroup     network
  *
  */
 #ifndef TB_NETWORK_COOKIES_H
@@ -202,78 +202,78 @@
 
 /*! the cookies instances
  *
- * @return 			the cookies
+ * @return          the cookies
  */
-tb_handle_t 		tb_cookies(tb_noarg_t);
+tb_handle_t         tb_cookies(tb_noarg_t);
 
 /*! init cookies
  *
- * @return 			the cookies
+ * @return          the cookies
  */
-tb_handle_t 		tb_cookies_init(tb_noarg_t);
+tb_handle_t         tb_cookies_init(tb_noarg_t);
 
 /*! exit cookies
  *
- * @param cookies 	the cookies
+ * @param cookies   the cookies
  */
-tb_void_t 			tb_cookies_exit(tb_handle_t cookies);
+tb_void_t           tb_cookies_exit(tb_handle_t cookies);
 
 /*! set cookies from the given domain and path
  *
- * @param cookies 	the cookies
- * @param domain 	the domain, .e.g .xxx.com or xxx.com and compatible www.xxx.com
- * @param path 		the path, .e.g /root/path
- * @param secure 	is secure?
- * @param value 	the value
+ * @param cookies   the cookies
+ * @param domain    the domain, .e.g .xxx.com or xxx.com and compatible www.xxx.com
+ * @param path      the path, .e.g /root/path
+ * @param secure    is secure?
+ * @param value     the value
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_cookies_set(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value);
+tb_bool_t           tb_cookies_set(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value);
 
 /*! set cookies from the given url
  *
- * @param cookies 	the cookies
- * @param url 		the url
- * @param value 	the value
+ * @param cookies   the cookies
+ * @param url       the url
+ * @param value     the value
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_cookies_set_from_url(tb_handle_t cookies, tb_char_t const* url, tb_char_t const* value);
+tb_bool_t           tb_cookies_set_from_url(tb_handle_t cookies, tb_char_t const* url, tb_char_t const* value);
 
 /*! get cookies from the given domain and path 
  *
- * @param cookies 	the cookies
- * @param domain 	the domain, .e.g .xxx.com or xxx.com and compatible www.xxx.com
- * @param path 		the path, .e.g /root/path
- * @param secure 	is secure?
- * @param value 	the cookies value
+ * @param cookies   the cookies
+ * @param domain    the domain, .e.g .xxx.com or xxx.com and compatible www.xxx.com
+ * @param path      the path, .e.g /root/path
+ * @param secure    is secure?
+ * @param value     the cookies value
  *
- * @return 			the cookies data
+ * @return          the cookies data
  */
-tb_char_t const* 	tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_scoped_string_t* value);
+tb_char_t const*    tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_scoped_string_t* value);
 
 /*! get cookies from the given url 
  *
- * @param cookies 	the cookies
- * @param url 		the url
- * @param value 	the cookies value
+ * @param cookies   the cookies
+ * @param url       the url
+ * @param value     the cookies value
  *
- * @return 			the cookies data
+ * @return          the cookies data
  */
-tb_char_t const* 	tb_cookies_get_from_url(tb_handle_t cookies, tb_char_t const* url, tb_scoped_string_t* value);
+tb_char_t const*    tb_cookies_get_from_url(tb_handle_t cookies, tb_char_t const* url, tb_scoped_string_t* value);
 
 /*! clear cookies 
  *
- * @param cookies 	the cookies
+ * @param cookies   the cookies
  */
-tb_void_t 			tb_cookies_clear(tb_handle_t cookies);
+tb_void_t           tb_cookies_clear(tb_handle_t cookies);
 
 #ifdef __tb_debug__
 /*! dump cookies
  *
- * @param cookies 	the cookies
+ * @param cookies   the cookies
  */
-tb_void_t 			tb_cookies_dump(tb_handle_t cookies);
+tb_void_t           tb_cookies_dump(tb_handle_t cookies);
 #endif
 
 #endif

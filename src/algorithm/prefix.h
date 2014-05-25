@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        prefix.h
+ * @ingroup     algorithm
  *
  */
 #ifndef TB_ALGORITHM_PREFIX_H

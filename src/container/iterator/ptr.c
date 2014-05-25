@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		ptr.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        ptr.c
+ * @ingroup     container
  *
  */
 
@@ -32,62 +32,62 @@
  */
 static tb_size_t tb_iterator_init_ptr_size(tb_iterator_t* iterator)
 {
-	// check
-	tb_assert_return_val(iterator, 0);
+    // check
+    tb_assert_return_val(iterator, 0);
 
-	// the size
-	return (tb_size_t)iterator->priv;
+    // the size
+    return (tb_size_t)iterator->priv;
 }
 static tb_size_t tb_iterator_init_ptr_head(tb_iterator_t* iterator)
 {
-	return 0;
+    return 0;
 }
 static tb_size_t tb_iterator_init_ptr_tail(tb_iterator_t* iterator)
 {
-	// check
-	tb_assert_return_val(iterator, 0);
+    // check
+    tb_assert_return_val(iterator, 0);
 
-	// the tail
-	return (tb_size_t)iterator->priv;
+    // the tail
+    return (tb_size_t)iterator->priv;
 }
 static tb_size_t tb_iterator_init_ptr_next(tb_iterator_t* iterator, tb_size_t itor)
 {
-	// check
-	tb_assert_return_val(iterator, 0);
-	tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, (tb_size_t)iterator->priv);
+    // check
+    tb_assert_return_val(iterator, 0);
+    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, (tb_size_t)iterator->priv);
 
-	// the next
-	return itor + 1;
+    // the next
+    return itor + 1;
 }
 static tb_size_t tb_iterator_init_ptr_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
-	// check
-	tb_assert_and_check_return_val(itor, 0);
+    // check
+    tb_assert_and_check_return_val(itor, 0);
 
-	// the prev
-	return itor - 1;
+    // the prev
+    return itor - 1;
 }
 static tb_pointer_t tb_iterator_init_ptr_item(tb_iterator_t* iterator, tb_size_t itor)
 {
-	// check
-	tb_assert_return_val(iterator, tb_null);
-	tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
+    // check
+    tb_assert_return_val(iterator, tb_null);
+    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
 
-	// the item
-	return ((tb_pointer_t*)iterator->data)[itor];
+    // the item
+    return ((tb_pointer_t*)iterator->data)[itor];
 }
 static tb_void_t tb_iterator_init_ptr_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	// check
-	tb_assert_return(iterator);
-	tb_assert_and_check_return(itor < (tb_size_t)iterator->priv);
+    // check
+    tb_assert_return(iterator);
+    tb_assert_and_check_return(itor < (tb_size_t)iterator->priv);
 
-	// copy
-	((tb_cpointer_t*)iterator->data)[itor] = item;
+    // copy
+    ((tb_cpointer_t*)iterator->data)[itor] = item;
 }
 static tb_long_t tb_iterator_init_ptr_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	return ((tb_size_t)ltem > (tb_size_t)rtem? 1 : ((tb_size_t)ltem < (tb_size_t)rtem? -1 : 0));
+    return ((tb_size_t)ltem > (tb_size_t)rtem? 1 : ((tb_size_t)ltem < (tb_size_t)rtem? -1 : 0));
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -95,25 +95,25 @@ static tb_long_t tb_iterator_init_ptr_comp(tb_iterator_t* iterator, tb_cpointer_
  */
 tb_iterator_t tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size)
 {
-	// check
-	tb_assert(data && size);
+    // check
+    tb_assert(data && size);
 
-	// init
-	tb_iterator_t itor;
-	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	itor.data = (tb_pointer_t)data;
-	itor.priv = tb_u2p(size);
-	itor.step = sizeof(tb_pointer_t);
-	itor.size = tb_iterator_init_ptr_size;
-	itor.head = tb_iterator_init_ptr_head;
-	itor.tail = tb_iterator_init_ptr_tail;
-	itor.prev = tb_iterator_init_ptr_prev;
-	itor.next = tb_iterator_init_ptr_next;
-	itor.item = tb_iterator_init_ptr_item;
-	itor.copy = tb_iterator_init_ptr_copy;
-	itor.comp = tb_iterator_init_ptr_comp;
+    // init
+    tb_iterator_t itor;
+    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+    itor.data = (tb_pointer_t)data;
+    itor.priv = tb_u2p(size);
+    itor.step = sizeof(tb_pointer_t);
+    itor.size = tb_iterator_init_ptr_size;
+    itor.head = tb_iterator_init_ptr_head;
+    itor.tail = tb_iterator_init_ptr_tail;
+    itor.prev = tb_iterator_init_ptr_prev;
+    itor.next = tb_iterator_init_ptr_next;
+    itor.item = tb_iterator_init_ptr_item;
+    itor.copy = tb_iterator_init_ptr_copy;
+    itor.comp = tb_iterator_init_ptr_comp;
 
-	// ok
-	return itor;
+    // ok
+    return itor;
 }
 

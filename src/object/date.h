@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		date.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        date.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_DATE_H
@@ -35,54 +35,54 @@
 
 /*! init date reader
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_date_init_reader(tb_noarg_t);
+tb_bool_t           tb_date_init_reader(tb_noarg_t);
 
 /*! init date writer
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_date_init_writer(tb_noarg_t);
+tb_bool_t           tb_date_init_writer(tb_noarg_t);
 
 /*! init date from now
  *
- * @return 			the date object
+ * @return          the date object
  */
-tb_object_t* 		tb_date_init_from_now(tb_noarg_t);
+tb_object_t*        tb_date_init_from_now(tb_noarg_t);
 
 /*! init date from time
  *
- * @param 			the date time
+ * @param           the date time
  *
- * @return 			the date object
+ * @return          the date object
  */
-tb_object_t* 		tb_date_init_from_time(tb_time_t time);
+tb_object_t*        tb_date_init_from_time(tb_time_t time);
 
 /*! the date time
  *
- * @param 			the date object
+ * @param           the date object
  *
- * @return 			the date time
+ * @return          the date time
  */
-tb_time_t 			tb_date_time(tb_object_t* date);
+tb_time_t           tb_date_time(tb_object_t* date);
 
 /*! set the date time
  *
- * @param 			the date object
- * @param 			the date time
+ * @param           the date object
+ * @param           the date time
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_date_time_set(tb_object_t* date, tb_time_t time);
+tb_bool_t           tb_date_time_set(tb_object_t* date, tb_time_t time);
 
 /*! set the date time for now
  *
- * @param 			the date object
+ * @param           the date object
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_date_time_set_now(tb_object_t* date);
+tb_bool_t           tb_date_time_set_now(tb_object_t* date);
 
 #endif
 

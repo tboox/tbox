@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		server.h
- * @ingroup 	network
+ * @author      ruki
+ * @file        server.h
+ * @ingroup     network
  *
  */
 #ifndef TB_NETWORK_DNS_SERVER_H
@@ -35,31 +35,31 @@
 
 /*! init the server list
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_dns_server_init(tb_noarg_t);
+tb_bool_t           tb_dns_server_init(tb_noarg_t);
 
 /// exit the server list
-tb_void_t 			tb_dns_server_exit(tb_noarg_t);
+tb_void_t           tb_dns_server_exit(tb_noarg_t);
 
 /// dump the server list
-tb_void_t 			tb_dns_server_dump(tb_noarg_t);
+tb_void_t           tb_dns_server_dump(tb_noarg_t);
 
 /// sort the server list by the response speed
-tb_void_t 			tb_dns_server_sort(tb_noarg_t);
+tb_void_t           tb_dns_server_sort(tb_noarg_t);
 
 /*! get the server 
  *
- * @param addr 		the server address list, addr[0] is the fastest 
+ * @param addr      the server address list, addr[0] is the fastest 
  *
- * @return 			the server size
+ * @return          the server size
  */
-tb_size_t 			tb_dns_server_get(tb_ipv4_t addr[2]);
+tb_size_t           tb_dns_server_get(tb_ipv4_t addr[2]);
 
 /*! add the server 
  *
- * @param addr 		the server address 
+ * @param addr      the server address 
  */
-tb_void_t 			tb_dns_server_add(tb_char_t const* addr);
+tb_void_t           tb_dns_server_add(tb_char_t const* addr);
 
 #endif

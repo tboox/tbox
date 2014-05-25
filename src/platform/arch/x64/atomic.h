@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		atomic.h
+ * @author      ruki
+ * @file        atomic.h
  *
  */
 #ifndef TB_PLATFORM_ARCH_x64_ATOMIC_H

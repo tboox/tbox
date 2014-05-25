@@ -397,8 +397,8 @@ static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t 
     // exit ipv4
     tb_ipv4_clr(&sstream->ipv4);
 
-	// clear base
-	tb_async_stream_clear(&sstream->base);
+    // clear base
+    tb_async_stream_clear(&sstream->base);
 
     /* done clos func
      *

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		config.h
+ * @author      ruki
+ * @file        config.h
  *
  */
 #ifndef TB_PREFIX_CONFIG_H

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsdup.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsdup.c
+ * @ingroup     libc
  *
  */
 
@@ -33,16 +33,16 @@
 
 tb_wchar_t* tb_wcsdup(tb_wchar_t const* s)
 {
-	// check
-	tb_assert_and_check_return_val(s, tb_null);
+    // check
+    tb_assert_and_check_return_val(s, tb_null);
 
-	__tb_register__ tb_size_t 		n = tb_wcslen(s);
-	__tb_register__ tb_wchar_t* 	p = tb_malloc((n + 1) * sizeof(tb_wchar_t));
-	if (p)
-	{
-		tb_memcpy(p, s, n * sizeof(tb_wchar_t));
-		p[n] = L'\0';
-	}
+    __tb_register__ tb_size_t       n = tb_wcslen(s);
+    __tb_register__ tb_wchar_t*     p = tb_malloc((n + 1) * sizeof(tb_wchar_t));
+    if (p)
+    {
+        tb_memcpy(p, s, n * sizeof(tb_wchar_t));
+        p[n] = L'\0';
+    }
 
-	return p;
+    return p;
 }

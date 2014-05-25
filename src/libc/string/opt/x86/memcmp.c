@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memcmp.c
+ * @author      ruki
+ * @file        memcmp.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-//# 	define TB_LIBC_STRING_OPT_MEMCMP
+//#     define TB_LIBC_STRING_OPT_MEMCMP
 #endif
 
 

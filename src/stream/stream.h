@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		stream.h
- * @defgroup 	stream
+ * @author      ruki
+ * @file        stream.h
+ * @defgroup    stream
  *
  */
 #ifndef TB_STREAM_H
@@ -99,103 +99,103 @@
 
 /*! the stream mode
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the stream mode
+ * @return          the stream mode
  */
-tb_size_t 			tb_stream_mode(tb_handle_t stream);
+tb_size_t           tb_stream_mode(tb_handle_t stream);
 
 /*! the stream type
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the stream type
+ * @return          the stream type
  */
-tb_size_t 			tb_stream_type(tb_handle_t stream);
+tb_size_t           tb_stream_type(tb_handle_t stream);
 
 /*! the stream size and not seeking it
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the stream size, no size: -1, empty or error: 0
+ * @return          the stream size, no size: -1, empty or error: 0
  */
-tb_hong_t 			tb_stream_size(tb_handle_t stream);
+tb_hong_t           tb_stream_size(tb_handle_t stream);
 
 /*! the stream left size and not seeking it 
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the stream left size, no size: infinity, empty or end: 0
+ * @return          the stream left size, no size: infinity, empty or end: 0
  */
-tb_hize_t 			tb_stream_left(tb_handle_t stream);
+tb_hize_t           tb_stream_left(tb_handle_t stream);
 
 /*! the stream is end?
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_stream_beof(tb_handle_t stream);
+tb_bool_t           tb_stream_beof(tb_handle_t stream);
 
 /*! the stream offset
  *
  * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, .. 
  * the offset is calculated from the last read/writ and not seeking it if size == -1, .e.g: sock, filter, ..
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the stream offset
+ * @return          the stream offset
  */
-tb_hize_t 			tb_stream_offset(tb_handle_t stream);
+tb_hize_t           tb_stream_offset(tb_handle_t stream);
 
 /*! is opened?
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_stream_is_opened(tb_handle_t stream);
+tb_bool_t           tb_stream_is_opened(tb_handle_t stream);
 
 /*! is closed?
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_stream_is_closed(tb_handle_t stream);
+tb_bool_t           tb_stream_is_closed(tb_handle_t stream);
 
 /*! the stream timeout
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the stream timeout
+ * @return          the stream timeout
  */
-tb_long_t 			tb_stream_timeout(tb_handle_t stream);
+tb_long_t           tb_stream_timeout(tb_handle_t stream);
 
 /*! ctrl stream
  *
- * @param stream 	the stream
- * @param ctrl 		the ctrl code
+ * @param stream    the stream
+ * @param ctrl      the ctrl code
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_stream_ctrl(tb_handle_t stream, tb_size_t ctrl, ...);
+tb_bool_t           tb_stream_ctrl(tb_handle_t stream, tb_size_t ctrl, ...);
 
 /*! ctrl stream with arguments
  *
- * @param stream 	the stream
- * @param ctrl 		the ctrl code
+ * @param stream    the stream
+ * @param ctrl      the ctrl code
  * @param args      the ctrl args
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_stream_ctrl_with_args(tb_handle_t stream, tb_size_t ctrl, tb_va_list_t args);
+tb_bool_t           tb_stream_ctrl_with_args(tb_handle_t stream, tb_size_t ctrl, tb_va_list_t args);
 
 /*! kill stream
  *
- * @param stream 	the stream
+ * @param stream    the stream
  */
-tb_void_t 			tb_stream_kill(tb_handle_t stream);
+tb_void_t           tb_stream_kill(tb_handle_t stream);
 
 #endif
 

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		fixed.h
- * @ingroup 	math
+ * @author      ruki
+ * @file        fixed.h
+ * @ingroup     math
  *
  */
 #ifndef TB_MATH_FIXED_H
@@ -35,62 +35,62 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_FIXED_ONE 				TB_FIXED16_ONE
-#define TB_FIXED_HALF 				TB_FIXED16_HALF
-#define TB_FIXED_MAX 				TB_FIXED16_MAX
-#define TB_FIXED_MIN 				TB_FIXED16_MIN
-#define TB_FIXED_NAN 				TB_FIXED16_NAN
-#define TB_FIXED_INF 				TB_FIXED16_INF
-#define TB_FIXED_PI 				TB_FIXED16_PI
-#define TB_FIXED_SQRT2 				TB_FIXED16_SQRT2
+#define TB_FIXED_ONE                TB_FIXED16_ONE
+#define TB_FIXED_HALF               TB_FIXED16_HALF
+#define TB_FIXED_MAX                TB_FIXED16_MAX
+#define TB_FIXED_MIN                TB_FIXED16_MIN
+#define TB_FIXED_NAN                TB_FIXED16_NAN
+#define TB_FIXED_INF                TB_FIXED16_INF
+#define TB_FIXED_PI                 TB_FIXED16_PI
+#define TB_FIXED_SQRT2              TB_FIXED16_SQRT2
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	define tb_fixed_to_float(x) 	tb_fixed16_to_float(x)
-# 	define tb_float_to_fixed(x) 	tb_float_to_fixed16(x)
+#   define tb_fixed_to_float(x)     tb_fixed16_to_float(x)
+#   define tb_float_to_fixed(x)     tb_float_to_fixed16(x)
 #endif
 
-#define tb_int_to_fixed(x) 			tb_int_to_fixed16(x)
-#define tb_fixed_to_int(x) 			tb_fixed16_to_int(x)
+#define tb_int_to_fixed(x)          tb_int_to_fixed16(x)
+#define tb_fixed_to_int(x)          tb_fixed16_to_int(x)
 
-#define tb_long_to_fixed(x) 		tb_long_to_fixed16(x)
-#define tb_fixed_to_long(x) 		tb_fixed16_to_long(x)
+#define tb_long_to_fixed(x)         tb_long_to_fixed16(x)
+#define tb_fixed_to_long(x)         tb_fixed16_to_long(x)
 
-#define tb_fixed6_to_fixed(x) 		tb_fixed6_to_fixed16(x)
-#define tb_fixed_to_fixed6(x) 		tb_fixed16_to_fixed6(x)
+#define tb_fixed6_to_fixed(x)       tb_fixed6_to_fixed16(x)
+#define tb_fixed_to_fixed6(x)       tb_fixed16_to_fixed6(x)
 
-#define tb_fixed30_to_fixed(x) 		tb_fixed30_to_fixed16(x)
-#define tb_fixed_to_fixed30(x) 		tb_fixed16_to_fixed30(x)
+#define tb_fixed30_to_fixed(x)      tb_fixed30_to_fixed16(x)
+#define tb_fixed_to_fixed30(x)      tb_fixed16_to_fixed30(x)
 
 // round
-#define tb_fixed_round(x) 			tb_fixed16_round(x)
-#define tb_fixed_ceil(x) 			tb_fixed16_ceil(x)
-#define tb_fixed_floor(x) 			tb_fixed16_floor(x)
+#define tb_fixed_round(x)           tb_fixed16_round(x)
+#define tb_fixed_ceil(x)            tb_fixed16_ceil(x)
+#define tb_fixed_floor(x)           tb_fixed16_floor(x)
 
 // operations
-#define tb_fixed_abs(x) 			tb_fixed16_abs(x)
-#define tb_fixed_avg(x, y) 			tb_fixed16_avg(x, y)
-#define tb_fixed_lsh(x, y) 			tb_fixed16_lsh(x, y)
-#define tb_fixed_rsh(x, y) 			tb_fixed16_rsh(x, y)
-#define tb_fixed_mul(x, y) 			tb_fixed16_mul(x, y)
-#define tb_fixed_div(x, y) 			tb_fixed16_div(x, y)
-#define tb_fixed_imul(x, y) 		tb_fixed16_imul(x, y)
-#define tb_fixed_idiv(x, y) 		tb_fixed16_idiv(x, y)
-#define tb_fixed_invert(x) 			tb_fixed16_invert(x)
-#define tb_fixed_sqre(x) 			tb_fixed16_sqre(x)
-#define tb_fixed_sqrt(x) 			tb_fixed16_sqrt(x)
-#define tb_fixed_sin(x) 			tb_fixed16_sin(x)
-#define tb_fixed_cos(x) 			tb_fixed16_cos(x)
-#define tb_fixed_sincos(x, s, c) 	tb_fixed16_sincos(x, s, c)
-#define tb_fixed_tan(x) 			tb_fixed16_tan(x)
-#define tb_fixed_asin(x) 			tb_fixed16_asin(x)
-#define tb_fixed_acos(x) 			tb_fixed16_acos(x)
-#define tb_fixed_atan(x) 			tb_fixed16_atan(x)
-#define tb_fixed_atan2(y, x) 		tb_fixed16_atan2(y, x)
-#define tb_fixed_exp(x) 			tb_fixed16_exp(x)
-#define tb_fixed_exp1(x) 			tb_fixed16_exp1(x)
-#define tb_fixed_expi(x) 			tb_fixed16_expi(x)
-#define tb_fixed_ilog2(x) 			tb_fixed16_ilog2(x)
+#define tb_fixed_abs(x)             tb_fixed16_abs(x)
+#define tb_fixed_avg(x, y)          tb_fixed16_avg(x, y)
+#define tb_fixed_lsh(x, y)          tb_fixed16_lsh(x, y)
+#define tb_fixed_rsh(x, y)          tb_fixed16_rsh(x, y)
+#define tb_fixed_mul(x, y)          tb_fixed16_mul(x, y)
+#define tb_fixed_div(x, y)          tb_fixed16_div(x, y)
+#define tb_fixed_imul(x, y)         tb_fixed16_imul(x, y)
+#define tb_fixed_idiv(x, y)         tb_fixed16_idiv(x, y)
+#define tb_fixed_invert(x)          tb_fixed16_invert(x)
+#define tb_fixed_sqre(x)            tb_fixed16_sqre(x)
+#define tb_fixed_sqrt(x)            tb_fixed16_sqrt(x)
+#define tb_fixed_sin(x)             tb_fixed16_sin(x)
+#define tb_fixed_cos(x)             tb_fixed16_cos(x)
+#define tb_fixed_sincos(x, s, c)    tb_fixed16_sincos(x, s, c)
+#define tb_fixed_tan(x)             tb_fixed16_tan(x)
+#define tb_fixed_asin(x)            tb_fixed16_asin(x)
+#define tb_fixed_acos(x)            tb_fixed16_acos(x)
+#define tb_fixed_atan(x)            tb_fixed16_atan(x)
+#define tb_fixed_atan2(y, x)        tb_fixed16_atan2(y, x)
+#define tb_fixed_exp(x)             tb_fixed16_exp(x)
+#define tb_fixed_exp1(x)            tb_fixed16_exp1(x)
+#define tb_fixed_expi(x)            tb_fixed16_expi(x)
+#define tb_fixed_ilog2(x)           tb_fixed16_ilog2(x)
 
 
 

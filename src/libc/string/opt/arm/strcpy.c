@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strcpy.c
+ * @author      ruki
+ * @file        strcpy.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-//# 	define TB_LIBC_STRING_OPT_STRCPY
+//#     define TB_LIBC_STRING_OPT_STRCPY
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,8 +39,8 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	return tb_null;
+    return tb_null;
 }
 #endif

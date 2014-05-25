@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		hostname.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        hostname.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_HOSTNAME_H
@@ -36,12 +36,12 @@
 
 /*! the host name
  *
- * @param name 	the hostname data
- * @param size 	the hostname size
+ * @param name  the hostname data
+ * @param size  the hostname size
  *
- * @return 		tb_true or tb_false
+ * @return      tb_true or tb_false
  */
-tb_bool_t 		tb_hostname(tb_char_t* name, tb_size_t size);
+tb_bool_t       tb_hostname(tb_char_t* name, tb_size_t size);
 
 
 

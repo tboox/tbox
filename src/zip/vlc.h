@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		vlc.h
- * @ingroup 	zip
+ * @author      ruki
+ * @file        vlc.h
+ * @ingroup     zip
  *
  */
 #ifndef TB_ZIP_VLC_H
@@ -42,33 +42,33 @@
 
 // the callback type
 struct __tb_zip_vlc_t;
-typedef tb_void_t 		(*tb_zip_vlc_set_t)(struct __tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_t* sstream);
-typedef tb_uint32_t 	(*tb_zip_vlc_get_t)(struct __tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream);
-typedef tb_void_t 		(*tb_zip_vlc_clos_t)(struct __tb_zip_vlc_t* vlc);
+typedef tb_void_t       (*tb_zip_vlc_set_t)(struct __tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_t* sstream);
+typedef tb_uint32_t     (*tb_zip_vlc_get_t)(struct __tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream);
+typedef tb_void_t       (*tb_zip_vlc_clos_t)(struct __tb_zip_vlc_t* vlc);
 
 // the vlc type
 typedef enum __tb_zip_vlc_type_t
 {
-	TB_ZIP_VLC_TYPE_FIXED 	= 0
-,	TB_ZIP_VLC_TYPE_GOLOMB 	= 1
-,	TB_ZIP_VLC_TYPE_GAMMA 	= 2
+    TB_ZIP_VLC_TYPE_FIXED   = 0
+,   TB_ZIP_VLC_TYPE_GOLOMB  = 1
+,   TB_ZIP_VLC_TYPE_GAMMA   = 2
 
 }tb_zip_vlc_type_t;
 
 // the variable length coding type
 typedef struct __tb_zip_vlc_t
 {
-	// the vlc type
-	tb_size_t 			type;
+    // the vlc type
+    tb_size_t           type;
 
-	// set value to the bits stream
-	tb_zip_vlc_set_t 	set;
+    // set value to the bits stream
+    tb_zip_vlc_set_t    set;
 
-	// get value from the bits stream
-	tb_zip_vlc_get_t 	get;
+    // get value from the bits stream
+    tb_zip_vlc_get_t    get;
 
-	// close it
-	tb_zip_vlc_clos_t 	clos;
+    // close it
+    tb_zip_vlc_clos_t   clos;
 
 }tb_zip_vlc_t;
 
@@ -76,35 +76,35 @@ typedef struct __tb_zip_vlc_t
 // the fixed length coding type
 typedef struct __tb_zip_vlc_fixed_t
 {
-	// the base
-	tb_zip_vlc_t 		base;
+    // the base
+    tb_zip_vlc_t        base;
 
-	// the bits
-	tb_byte_t 			nbits;
+    // the bits
+    tb_byte_t           nbits;
 
 }tb_zip_vlc_fixed_t;
 
 // the gamma length coding type
 typedef struct __tb_zip_vlc_gamma_t
 {
-	// the base
-	tb_zip_vlc_t 		base;
+    // the base
+    tb_zip_vlc_t        base;
 
 }tb_zip_vlc_gamma_t;
 
 // the golomb length coding type
 typedef struct __tb_zip_vlc_golomb_t
 {
-	// the base
-	tb_zip_vlc_t 		base;
-	
-	// the m value
-	tb_size_t 			defm;
+    // the base
+    tb_zip_vlc_t        base;
+    
+    // the m value
+    tb_size_t           defm;
 
 #ifdef TB_ZIP_VLC_GOLOMB_ADAPTIVE
-	// for computing the average value
-	tb_size_t 			total;
-	tb_size_t 			count;
+    // for computing the average value
+    tb_size_t           total;
+    tb_size_t           count;
 #endif
 
 }tb_zip_vlc_golomb_t;

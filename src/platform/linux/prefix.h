@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        prefix.h
+ * @ingroup     platform
  */
 #ifndef TB_PLATFORM_LINUX_PREFIX_H
 #define TB_PLATFORM_LINUX_PREFIX_H

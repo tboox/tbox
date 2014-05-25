@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
+ * @author      ruki
+ * @file        prefix.h
  *
  */
 #ifndef TB_STREAM_FILTER_PREFIX_H
@@ -37,43 +37,43 @@
 /// the filter type enum
 typedef enum __tb_stream_filter_type_e
 {
-	TB_STREAM_FILTER_TYPE_NONE 	= 0
-,	TB_STREAM_FILTER_TYPE_ZIP 		= 1
-,	TB_STREAM_FILTER_TYPE_CACHE 	= 2
-,	TB_STREAM_FILTER_TYPE_CHARSET 	= 3
-,	TB_STREAM_FILTER_TYPE_CHUNKED 	= 4
+    TB_STREAM_FILTER_TYPE_NONE  = 0
+,   TB_STREAM_FILTER_TYPE_ZIP       = 1
+,   TB_STREAM_FILTER_TYPE_CACHE     = 2
+,   TB_STREAM_FILTER_TYPE_CHARSET   = 3
+,   TB_STREAM_FILTER_TYPE_CHUNKED   = 4
 
 }tb_stream_filter_type_e;
 
 /// the filter type
 typedef struct __tb_stream_filter_t
 {
-	/// the type
-	tb_size_t 			type;
+    /// the type
+    tb_size_t           type;
 
-	/// the input is eof?
-	tb_bool_t 			beof;
+    /// the input is eof?
+    tb_bool_t           beof;
 
-	/// the input limit size 
-	tb_hong_t 			limit;
-	
-	/// the input offset 
-	tb_hize_t 			offset;
+    /// the input limit size 
+    tb_hong_t           limit;
+    
+    /// the input offset 
+    tb_hize_t           offset;
 
-	/// the input data
-	tb_scoped_buffer_t 	idata;
+    /// the input data
+    tb_scoped_buffer_t  idata;
 
-	/// the output data 
-	tb_queue_buffer_t 	odata;
+    /// the output data 
+    tb_queue_buffer_t   odata;
 
-	/// the spak
-	tb_long_t 			(*spak)(struct __tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
+    /// the spak
+    tb_long_t           (*spak)(struct __tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
 
-	/// the cler
-	tb_void_t 			(*cler)(struct __tb_stream_filter_t* filter);
+    /// the cler
+    tb_void_t           (*cler)(struct __tb_stream_filter_t* filter);
 
-	/// the exit
-	tb_void_t 			(*exit)(struct __tb_stream_filter_t* filter);
+    /// the exit
+    tb_void_t           (*exit)(struct __tb_stream_filter_t* filter);
 
 }tb_stream_filter_t;
 
@@ -82,29 +82,29 @@ typedef struct __tb_stream_filter_t
  */
 static __tb_inline__ tb_bool_t tb_stream_filter_init(tb_stream_filter_t* filter, tb_size_t type)
 {
-	// check
-	tb_assert_and_check_return_val(filter, tb_false);
-	
-	// init type
-	filter->type = type;
+    // check
+    tb_assert_and_check_return_val(filter, tb_false);
+    
+    // init type
+    filter->type = type;
 
-	// init the input eof
-	filter->beof = tb_false;
+    // init the input eof
+    filter->beof = tb_false;
 
-	// init input limit size
-	filter->limit = -1;
+    // init input limit size
+    filter->limit = -1;
 
-	// init the input offset
-	filter->offset = 0;
+    // init the input offset
+    filter->offset = 0;
 
-	// init idata
-	if (!tb_scoped_buffer_init(&filter->idata)) return tb_false;
+    // init idata
+    if (!tb_scoped_buffer_init(&filter->idata)) return tb_false;
 
-	// init odata
-	if (!tb_queue_buffer_init(&filter->odata, 8192)) return tb_false;
+    // init odata
+    if (!tb_queue_buffer_init(&filter->odata, 8192)) return tb_false;
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }
 
 #endif

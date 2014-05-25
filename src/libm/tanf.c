@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		tanf.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        tanf.c
+ * @ingroup     libm
  *
  */
 
@@ -33,5 +33,5 @@
  */
 tb_float_t tb_tanf(tb_float_t x)
 {
-	return tanf(x);
+    return tanf(x);
 }

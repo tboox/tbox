@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
+ * @author      ruki
+ * @file        prefix.h
  *
  */
 #ifndef TB_MATH_RANDOM_PREFIX_H
@@ -35,28 +35,28 @@
 /// the random generator type enum
 typedef enum __tb_random_generator_type_e
 {
-	TB_RANDOM_GENERATOR_TYPE_NONE 		= 0
-,	TB_RANDOM_GENERATOR_TYPE_LINEAR 	= 1
+    TB_RANDOM_GENERATOR_TYPE_NONE       = 0
+,   TB_RANDOM_GENERATOR_TYPE_LINEAR     = 1
 
 }tb_random_generator_type_e;
 
 /// the random type
 typedef struct __tb_random_t
 {
-	/// the type
-	tb_size_t 			type;
+    /// the type
+    tb_size_t           type;
 
-	/// exit 
-	tb_void_t 			(*exit)(struct __tb_random_t* random);
+    /// exit 
+    tb_void_t           (*exit)(struct __tb_random_t* random);
 
-	/// seed
-	tb_void_t 			(*seed)(struct __tb_random_t* random, tb_size_t seed);
+    /// seed
+    tb_void_t           (*seed)(struct __tb_random_t* random, tb_size_t seed);
 
-	/// clear
-	tb_void_t 			(*clear)(struct __tb_random_t* random);
+    /// clear
+    tb_void_t           (*clear)(struct __tb_random_t* random);
 
-	/// range
-	tb_long_t 			(*range)(struct __tb_random_t* random, tb_long_t beg, tb_long_t end);
+    /// range
+    tb_long_t           (*range)(struct __tb_random_t* random, tb_long_t beg, tb_long_t end);
 
 }tb_random_t;
 

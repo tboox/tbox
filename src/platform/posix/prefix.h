@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        prefix.h
+ * @ingroup     platform
  */
 #ifndef TB_PLATFORM_POSIX_PREFIX_H
 #define TB_PLATFORM_POSIX_PREFIX_H
@@ -35,9 +35,9 @@
  */
 
 // fd to handle
-#define tb_fd2handle(fd) 			((fd) >= 0? (tb_handle_t)((tb_long_t)(fd) + 1) : tb_null)
+#define tb_fd2handle(fd)            ((fd) >= 0? (tb_handle_t)((tb_long_t)(fd) + 1) : tb_null)
 
 // handle to fd
-#define tb_handle2fd(handle) 		(tb_int_t)((handle)? (((tb_long_t)(handle)) - 1) : -1)
+#define tb_handle2fd(handle)        (tb_int_t)((handle)? (((tb_long_t)(handle)) - 1) : -1)
 
 #endif

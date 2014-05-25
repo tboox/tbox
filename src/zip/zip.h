@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		zip.h
+ * @author      ruki
+ * @file        zip.h
  *
  */
 #ifndef TB_ZIP_H
@@ -38,28 +38,28 @@
 
 /*! init zip
  *
- * @param algo 		the zip zlgo
- * @param action 	the zip action
+ * @param algo      the zip zlgo
+ * @param action    the zip action
  *
- * @return 			the zip
+ * @return          the zip
  */
-tb_zip_t* 			tb_zip_init(tb_size_t algo, tb_size_t action);
+tb_zip_t*           tb_zip_init(tb_size_t algo, tb_size_t action);
 
 /*! exit zip
  *
- * @param zip 		the zip
+ * @param zip       the zip
  */
-tb_void_t 			tb_zip_exit(tb_zip_t* zip);
+tb_void_t           tb_zip_exit(tb_zip_t* zip);
 
 /*! spak
  *
- * @param zip 		the zip
- * @param ist 		the input stream
- * @param ost 		the output stream
- * @param sync 		sync? 1: sync, 0: no sync, -1: end
+ * @param zip       the zip
+ * @param ist       the input stream
+ * @param ost       the output stream
+ * @param sync      sync? 1: sync, 0: no sync, -1: end
  *
- * @return 			1: ok, 0: continue, -1: end
+ * @return          1: ok, 0: continue, -1: end
  */
-tb_long_t 			tb_zip_spak(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync);
+tb_long_t           tb_zip_spak(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync);
 
 #endif

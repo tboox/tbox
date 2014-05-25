@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		sched.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        sched.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_SCHED_H
@@ -37,8 +37,8 @@
 
 /*! yield the processor
  *
- * @return 		tb_true or tb_false
+ * @return      tb_true or tb_false
  */
-tb_bool_t 		tb_sched_yield(tb_noarg_t);
+tb_bool_t       tb_sched_yield(tb_noarg_t);
 
 #endif

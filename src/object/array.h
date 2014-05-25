@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		array.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        array.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_ARRAY_H
@@ -35,84 +35,84 @@
 
 /*! init array
  *
- * @param grow		the array grow
- * @param incr		is increase refn?
+ * @param grow      the array grow
+ * @param incr      is increase refn?
  *
- * @return 			the array object
+ * @return          the array object
  */
-tb_object_t* 		tb_array_init(tb_size_t grow, tb_bool_t incr);
+tb_object_t*        tb_array_init(tb_size_t grow, tb_bool_t incr);
 
 /*! the array size
  *
- * @param array		the array object
+ * @param array     the array object
  *
- * @return 			the array size
+ * @return          the array size
  */
-tb_size_t 			tb_array_size(tb_object_t* array);
+tb_size_t           tb_array_size(tb_object_t* array);
 
 /*! the array item at index
  *
- * @param array		the array object
- * @param index		the array index
+ * @param array     the array object
+ * @param index     the array index
  *
- * @return 			the array item
+ * @return          the array item
  */
-tb_object_t* 		tb_array_item(tb_object_t* array, tb_size_t index);
+tb_object_t*        tb_array_item(tb_object_t* array, tb_size_t index);
 
 /*! set the array incr
  *
- * @param array	the array object
- * @param incr			is increase refn?
+ * @param array the array object
+ * @param incr          is increase refn?
  */
-tb_void_t 			tb_array_incr(tb_object_t* array, tb_bool_t incr);
+tb_void_t           tb_array_incr(tb_object_t* array, tb_bool_t incr);
 
 /*! the array iterator
  *
- * @param array		the array object
+ * @param array     the array object
  *
- * @return 			the array iterator
+ * @return          the array iterator
  *
  * @code
  * tb_for_all (tb_object_t*, item, tb_array_itor(array))
  * {
- * 		if (item)
- * 		{
- * 			// ...
- * 		}
+ *      if (item)
+ *      {
+ *          // ...
+ *      }
  * }
  * @endcode
  */
-tb_iterator_t* 		tb_array_itor(tb_object_t* array);
+tb_iterator_t*      tb_array_itor(tb_object_t* array);
 
 /*! remove the item from index
  *
- * @param array		the array object
- * @param index		the array index
+ * @param array     the array object
+ * @param index     the array index
  */
-tb_void_t 			tb_array_remove(tb_object_t* array, tb_size_t index);
+tb_void_t           tb_array_remove(tb_object_t* array, tb_size_t index);
 
 /*! append item to array
  *
- * @param array		the array object
- * @param index		the array index
+ * @param array     the array object
+ * @param index     the array index
  */
-tb_void_t 			tb_array_append(tb_object_t* array, tb_object_t* item);
+tb_void_t           tb_array_append(tb_object_t* array, tb_object_t* item);
 
 /*! insert item to array
  *
- * @param array		the array object
- * @param index		the array index
- * @param item		the array item
+ * @param array     the array object
+ * @param index     the array index
+ * @param item      the array item
  */
-tb_void_t 			tb_array_insert(tb_object_t* array, tb_size_t index, tb_object_t* item);
+tb_void_t           tb_array_insert(tb_object_t* array, tb_size_t index, tb_object_t* item);
 
 /*! replace item to array
  *
- * @param array		the array object
- * @param index		the array index
- * @param item		the array item
+ * @param array     the array object
+ * @param index     the array index
+ * @param item      the array item
  */
-tb_void_t 			tb_array_replace(tb_object_t* array, tb_size_t index, tb_object_t* item);
+tb_void_t           tb_array_replace(tb_object_t* array, tb_size_t index, tb_object_t* item);
 
 #endif
 

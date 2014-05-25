@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		setjmp.h
- * @ingroup 	libc
+ * @author      ruki
+ * @file        setjmp.h
+ * @ingroup     libc
  *
  */
 #ifndef TB_LIBC_MISC_SETJMP_H
@@ -29,7 +29,7 @@
  */
 #include "prefix.h"
 #if defined(TB_CONFIG_LIBC_HAVE_SETJMP) || defined(TB_CONFIG_LIBC_HAVE_SIGSETJMP)
-# 	include <setjmp.h>
+#   include <setjmp.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -38,25 +38,25 @@
 
 // setjmp
 #ifdef TB_CONFIG_LIBC_HAVE_SETJMP
-# 	if defined(TB_COMPILER_IS_GCC)
-# 		define tb_setjmp(buf) 			__builtin_setjmp(buf)
-# 		define tb_longjmp(buf, val) 	__builtin_longjmp(buf, val)
-# 	else
-# 		define tb_setjmp(buf) 			setjmp(buf)
-# 		define tb_longjmp(buf, val) 	longjmp(buf, val)
-# 	endif
+#   if defined(TB_COMPILER_IS_GCC)
+#       define tb_setjmp(buf)           __builtin_setjmp(buf)
+#       define tb_longjmp(buf, val)     __builtin_longjmp(buf, val)
+#   else
+#       define tb_setjmp(buf)           setjmp(buf)
+#       define tb_longjmp(buf, val)     longjmp(buf, val)
+#   endif
 #else
-# 	undef tb_setjmp
-# 	undef tb_longjmp
+#   undef tb_setjmp
+#   undef tb_longjmp
 #endif
 
 // sigsetjmp
 #ifdef TB_CONFIG_LIBC_HAVE_SIGSETJMP
-# 	define tb_sigsetjmp(buf, sig) 		sigsetjmp(buf, sig)
-# 	define tb_siglongjmp(buf, val) 		siglongjmp(buf, val)
+#   define tb_sigsetjmp(buf, sig)       sigsetjmp(buf, sig)
+#   define tb_siglongjmp(buf, val)      siglongjmp(buf, val)
 #else
-# 	undef tb_sigsetjmp
-# 	undef tb_siglongjmp
+#   undef tb_sigsetjmp
+#   undef tb_siglongjmp
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -65,12 +65,12 @@
 
 // the jmpbuf type
 #ifdef TB_CONFIG_LIBC_HAVE_SETJMP
-typedef jmp_buf 	tb_jmpbuf_t;
+typedef jmp_buf     tb_jmpbuf_t;
 #endif
 
 // the sigjmpbuf type
 #ifdef TB_CONFIG_LIBC_HAVE_SIGSETJMP
-typedef sigjmp_buf 	tb_sigjmpbuf_t;
+typedef sigjmp_buf  tb_sigjmpbuf_t;
 #endif
 
 

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		type.h
+ * @author      ruki
+ * @file        type.h
  *
  */
 #ifndef TB_LIBC_MISC_TIME_TYPE_H
@@ -35,15 +35,15 @@
 /// the tm type
 typedef struct __tb_tm_t
 {
-	tb_long_t 	second;
-	tb_long_t 	minute;
-	tb_long_t 	hour;
-	tb_long_t 	mday;
-	tb_long_t 	month;
-	tb_long_t 	year;
-	tb_long_t 	week;
-	tb_long_t 	yday;
-	tb_long_t 	isdst;
+    tb_long_t   second;
+    tb_long_t   minute;
+    tb_long_t   hour;
+    tb_long_t   mday;
+    tb_long_t   month;
+    tb_long_t   year;
+    tb_long_t   week;
+    tb_long_t   yday;
+    tb_long_t   isdst;
 
 }tb_tm_t;
 

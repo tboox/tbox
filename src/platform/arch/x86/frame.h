@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		frame.h
+ * @author      ruki
+ * @file        frame.h
  *
  */
 #ifndef TB_PLATFORM_ARCH_x86_FRAME_H
@@ -34,9 +34,9 @@
 
 // the current stack frame address
 #if !defined(TB_CURRENT_STACK_FRAME) \
-	&& defined(TB_COMPILER_IS_GCC) \
-	&&	TB_COMPILER_VERSION_BE(4, 1)
-# 	define TB_CURRENT_STACK_FRAME 		__builtin_frame_address(0)
+    && defined(TB_COMPILER_IS_GCC) \
+    &&  TB_COMPILER_VERSION_BE(4, 1)
+#   define TB_CURRENT_STACK_FRAME       __builtin_frame_address(0)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -46,11 +46,11 @@
 // the frame layout type
 typedef struct __tb_frame_layout_t
 {
-	// the next
-	struct __tb_frame_layout_t* 	next;
+    // the next
+    struct __tb_frame_layout_t*     next;
 
-	// the frame return address
-	tb_pointer_t 					return_address;
+    // the frame return address
+    tb_pointer_t                    return_address;
 
 }tb_frame_layout_t;
 

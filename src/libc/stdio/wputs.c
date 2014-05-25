@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wputs.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wputs.c
+ * @ingroup     libc
  *
  */
 
@@ -35,17 +35,17 @@
 
 tb_long_t tb_wputs(tb_wchar_t const* string)
 {
-	// check
-	tb_check_return_val(string, 0);
+    // check
+    tb_check_return_val(string, 0);
 
-	// wtoa
-	tb_char_t line[8192] = {0};
-	tb_long_t size = tb_wtoa(line, string, 8191);
-	if (size >= 0 && size < 8192) line[size] = '\0';
+    // wtoa
+    tb_char_t line[8192] = {0};
+    tb_long_t size = tb_wtoa(line, string, 8191);
+    if (size >= 0 && size < 8192) line[size] = '\0';
 
-	// print it
-	tb_printl(line);
+    // print it
+    tb_printl(line);
 
-	// ok?
-	return tb_wcslen(string);
+    // ok?
+    return tb_wcslen(string);
 }

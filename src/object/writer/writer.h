@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		writer.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        writer.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_WRITER_H
@@ -39,36 +39,36 @@
 
 /*! set object writer
  *
- * @param format 	the writer format
- * @param writer 	the writer
+ * @param format    the writer format
+ * @param writer    the writer
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_object_writer_set(tb_size_t format, tb_object_writer_t* writer);
+tb_bool_t           tb_object_writer_set(tb_size_t format, tb_object_writer_t* writer);
 
 /*! del object writer
  *
- * @param format 	the writer format
+ * @param format    the writer format
  */
-tb_void_t 			tb_object_writer_del(tb_size_t format);
+tb_void_t           tb_object_writer_del(tb_size_t format);
 
 /*! get object writer
  *
- * @param format 	the writer format
+ * @param format    the writer format
  *
- * @return 			the object writer
+ * @return          the object writer
  */
 tb_object_writer_t* tb_object_writer_get(tb_size_t format);
 
 /*! done writer
  *
- * @param object 	the object
- * @param stream 	the stream
- * @param format 	the object format
+ * @param object    the object
+ * @param stream    the stream
+ * @param format    the object format
  *
- * @return 			the writed size, failed: -1
+ * @return          the writed size, failed: -1
  */
-tb_long_t 			tb_object_writer_done(tb_object_t* object, tb_basic_stream_t* stream, tb_size_t format);
+tb_long_t           tb_object_writer_done(tb_object_t* object, tb_basic_stream_t* stream, tb_size_t format);
 
 
 #endif

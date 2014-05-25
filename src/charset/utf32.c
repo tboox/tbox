@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		utf32.c
- * @ingroup 	charset
+ * @author      ruki
+ * @file        utf32.c
+ * @ingroup     charset
  *
  */
 
@@ -34,14 +34,14 @@
 tb_long_t tb_charset_utf32_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_utf32_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
 {
-	tb_trace_noimpl();
-	return -1;
+    tb_trace_noimpl();
+    return -1;
 }
 
 tb_long_t tb_charset_utf32_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
 tb_long_t tb_charset_utf32_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
 {
-	tb_trace_noimpl();
-	return -1;
+    tb_trace_noimpl();
+    return -1;
 }
 

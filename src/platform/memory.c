@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memory.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        memory.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -30,8 +30,8 @@
  * implementation
  */
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	include "windows/memory.c"
+#   include "windows/memory.c"
 #else
-# 	include "libc/memory.c"
+#   include "libc/memory.c"
 #endif
 

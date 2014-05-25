@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		barrier.h
+ * @author      ruki
+ * @file        barrier.h
  *
  */
 #ifndef TB_PLATFORM_ARCH_x64_BARRIER_H

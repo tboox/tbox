@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		semaphore.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        semaphore.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -33,102 +33,102 @@
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-# 	include "windows/semaphore.c"
+#   include "windows/semaphore.c"
 #elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-# 	include "mach/semaphore.c"
+#   include "mach/semaphore.c"
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-# 	include "posix/semaphore.c"
+#   include "posix/semaphore.c"
 #elif defined(TB_CONFIG_API_HAVE_SYSTEMV)
-# 	include "systemv/semaphore.c"
+#   include "systemv/semaphore.c"
 #else 
 tb_handle_t tb_semaphore_init(tb_size_t init)
 {
-	// make
-	tb_atomic_t* semaphore = tb_malloc0(sizeof(tb_atomic_t));
-	tb_assert_and_check_return_val(semaphore, tb_null);
+    // make
+    tb_atomic_t* semaphore = tb_malloc0(sizeof(tb_atomic_t));
+    tb_assert_and_check_return_val(semaphore, tb_null);
 
-	// init
-	*semaphore = init;
+    // init
+    *semaphore = init;
 
-	// ok
-	return (tb_handle_t)semaphore;
+    // ok
+    return (tb_handle_t)semaphore;
 
 fail:
-	if (semaphore) tb_free(semaphore);
-	return tb_null;
+    if (semaphore) tb_free(semaphore);
+    return tb_null;
 }
 tb_void_t tb_semaphore_exit(tb_handle_t handle)
 {
-	// check
-	tb_atomic_t* semaphore = (tb_atomic_t*)handle;
-	tb_assert_and_check_return(handle);
+    // check
+    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
+    tb_assert_and_check_return(handle);
 
-	// free it
-	tb_free(semaphore);
+    // free it
+    tb_free(semaphore);
 }
 tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
 {
-	// check
-	tb_atomic_t* semaphore = (tb_atomic_t*)handle;
-	tb_assert_and_check_return_val(semaphore && post, tb_false);
+    // check
+    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
+    tb_assert_and_check_return_val(semaphore && post, tb_false);
 
-	// post it
-	tb_long_t value = tb_atomic_fetch_and_add(semaphore, post);
+    // post it
+    tb_long_t value = tb_atomic_fetch_and_add(semaphore, post);
 
-	// ok
-	return value >= 0? tb_true : tb_false;
+    // ok
+    return value >= 0? tb_true : tb_false;
 }
 tb_long_t tb_semaphore_value(tb_handle_t handle)
 {
-	// check
-	tb_atomic_t* semaphore = (tb_atomic_t*)handle;
-	tb_assert_and_check_return_val(semaphore, tb_false);
+    // check
+    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
+    tb_assert_and_check_return_val(semaphore, tb_false);
 
-	// get value
-	return (tb_long_t)tb_atomic_get(semaphore);
+    // get value
+    return (tb_long_t)tb_atomic_get(semaphore);
 }
 tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	// check
-	tb_atomic_t* semaphore = (tb_atomic_t*)handle;
-	tb_assert_and_check_return_val(semaphore, -1);
+    // check
+    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
+    tb_assert_and_check_return_val(semaphore, -1);
 
-	// init
-	tb_long_t 	r = 0;
-	tb_hong_t 	base = tb_cache_time_spak();
+    // init
+    tb_long_t   r = 0;
+    tb_hong_t   base = tb_cache_time_spak();
 
-	// wait 
-	while (1)
-	{
-		// get post
-		tb_long_t post = (tb_long_t)tb_atomic_get(semaphore);
+    // wait 
+    while (1)
+    {
+        // get post
+        tb_long_t post = (tb_long_t)tb_atomic_get(semaphore);
 
-		// has signal?
-		if (post > 0) 
-		{
-			// semaphore--
-			tb_atomic_fetch_and_dec(semaphore);
+        // has signal?
+        if (post > 0) 
+        {
+            // semaphore--
+            tb_atomic_fetch_and_dec(semaphore);
 
-			// ok
-			r = post;
-			break;
-		}
-		// no signal?
-		else if (!post)
-		{
-			// timeout?
-			if (timeout >= 0 && tb_cache_time_spak() - base >= timeout) break;
-			else tb_msleep(200);
-		}
-		// error
-		else
-		{
-			r = -1;
-			break;
-		}
-	}
+            // ok
+            r = post;
+            break;
+        }
+        // no signal?
+        else if (!post)
+        {
+            // timeout?
+            if (timeout >= 0 && tb_cache_time_spak() - base >= timeout) break;
+            else tb_msleep(200);
+        }
+        // error
+        else
+        {
+            r = -1;
+            break;
+        }
+    }
 
-	return r;
+    return r;
 }
 #endif
 

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		atomic.h
+ * @author      ruki
+ * @file        atomic.h
  *
  */
 #ifndef TB_PLATFORM_ARCH_ATOMIC_H
@@ -29,11 +29,11 @@
  */
 #include "prefix.h"
 #if defined(TB_ARCH_x86)
-# 	include "x86/atomic.h"
+#   include "x86/atomic.h"
 #elif defined(TB_ARCH_x64)
-# 	include "x64/atomic.h"
+#   include "x64/atomic.h"
 #elif defined(TB_ARCH_ARM)
-# 	include "arm/atomic.h"
+#   include "arm/atomic.h"
 #endif
 
 #endif

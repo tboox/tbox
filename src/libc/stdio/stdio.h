@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		stdio.h
- * @ingroup 	libc
+ * @author      ruki
+ * @file        stdio.h
+ * @ingroup     libc
  *
  */
 #ifndef TB_LIBC_STDIO_H
@@ -37,13 +37,13 @@
 #define tb_vsnprintf_format(s, n, format, r) \
 do \
 { \
-	tb_long_t __tb_ret = 0; \
-	tb_va_list_t __tb_varg_list; \
+    tb_long_t __tb_ret = 0; \
+    tb_va_list_t __tb_varg_list; \
     tb_va_start(__tb_varg_list, format); \
     __tb_ret = tb_vsnprintf(s, (n), format, __tb_varg_list); \
     tb_va_end(__tb_varg_list); \
-	if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
-	*r = __tb_ret > 0? __tb_ret : 0; \
+    if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
+    *r = __tb_ret > 0? __tb_ret : 0; \
  \
 } while (0) 
 
@@ -51,13 +51,13 @@ do \
 #define tb_vswprintf_format(s, n, format, r) \
 do \
 { \
-	tb_long_t __tb_ret = 0; \
-	tb_va_list_t __tb_varg_list; \
+    tb_long_t __tb_ret = 0; \
+    tb_va_list_t __tb_varg_list; \
     tb_va_start(__tb_varg_list, format); \
     __tb_ret = tb_vswprintf(s, (n), format, __tb_varg_list); \
     tb_va_end(__tb_varg_list); \
-	if (__tb_ret >= 0) s[__tb_ret] = L'\0'; \
-	*r = __tb_ret > 0? __tb_ret : 0; \
+    if (__tb_ret >= 0) s[__tb_ret] = L'\0'; \
+    *r = __tb_ret > 0? __tb_ret : 0; \
  \
 } while (0) 
 
@@ -67,85 +67,85 @@ do \
 
 /*! puts
  *
- * @param string 	the string
+ * @param string    the string
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_puts(tb_char_t const* string);
+tb_long_t           tb_puts(tb_char_t const* string);
 
 /*! wputs
  *
- * @param string 	the string
+ * @param string    the string
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_wputs(tb_wchar_t const* string);
+tb_long_t           tb_wputs(tb_wchar_t const* string);
 
 /*! printf
  *
- * @param format 	the format string
+ * @param format    the format string
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_printf(tb_char_t const* format, ...);
+tb_long_t           tb_printf(tb_char_t const* format, ...);
 
 /*! wprintf
  *
- * @param format 	the format string
+ * @param format    the format string
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_wprintf(tb_wchar_t const* format, ...);
+tb_long_t           tb_wprintf(tb_wchar_t const* format, ...);
 
 /*! sprintf
  *
- * @param s 		the string data
- * @param format 	the format string
+ * @param s         the string data
+ * @param format    the format string
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_sprintf(tb_char_t* s, tb_char_t const* format, ...);
+tb_long_t           tb_sprintf(tb_char_t* s, tb_char_t const* format, ...);
 
 /*! snprintf
  *
- * @param s 		the string data
- * @param n 		the string size
- * @param format 	the format string
+ * @param s         the string data
+ * @param n         the string size
+ * @param format    the format string
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_snprintf(tb_char_t* s, tb_size_t n, tb_char_t const* format, ...);
+tb_long_t           tb_snprintf(tb_char_t* s, tb_size_t n, tb_char_t const* format, ...);
 
 /*! vsnprintf
  *
- * @param s 		the string data
- * @param n 		the string size
- * @param format 	the format string
- * @param args 		the arguments
+ * @param s         the string data
+ * @param n         the string size
+ * @param format    the format string
+ * @param args      the arguments
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* format, tb_va_list_t args);
+tb_long_t           tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* format, tb_va_list_t args);
 
 /*! swprintf
  *
- * @param s 		the string data
- * @param n 		the string size
- * @param format 	the format string
+ * @param s         the string data
+ * @param n         the string size
+ * @param format    the format string
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_swprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* format, ...);
+tb_long_t           tb_swprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* format, ...);
 
 /*! vswprintf
  *
- * @param s 		the string data
- * @param n 		the string size
- * @param format 	the format string
- * @param args 		the arguments
+ * @param s         the string data
+ * @param n         the string size
+ * @param format    the format string
+ * @param args      the arguments
  * 
- * @return 			the real size
+ * @return          the real size
  */
-tb_long_t 			tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* format, tb_va_list_t args);
+tb_long_t           tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* format, tb_va_list_t args);
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		powf.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        powf.c
+ * @ingroup     libm
  *
  */
 
@@ -32,5 +32,5 @@
  */
 tb_float_t tb_powf(tb_float_t x, tb_float_t y)
 {
-	return (tb_float_t)tb_pow(x, y);
+    return (tb_float_t)tb_pow(x, y);
 }

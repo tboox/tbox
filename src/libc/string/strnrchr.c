@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strnrchr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        strnrchr.c
+ * @ingroup     libc
  *
  */
 
@@ -33,13 +33,13 @@
 
 tb_char_t* tb_strnrchr(tb_char_t const* s, tb_size_t n, tb_char_t c)
 {
-	tb_assert_and_check_return_val(s, tb_null);
-	
-	tb_char_t const* p = s + n - 1;
-	while (p >= s && *p)
-	{
-		if (*p == c) return (tb_char_t*)p;
-		p--;
-	}
-	return tb_null;
+    tb_assert_and_check_return_val(s, tb_null);
+    
+    tb_char_t const* p = s + n - 1;
+    while (p >= s && *p)
+    {
+        if (*p == c) return (tb_char_t*)p;
+        p--;
+    }
+    return tb_null;
 }

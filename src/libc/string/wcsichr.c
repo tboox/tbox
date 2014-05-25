@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsichr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsichr.c
+ * @ingroup     libc
  *
  */
 
@@ -33,20 +33,20 @@
 
 tb_wchar_t* tb_wcsichr(tb_wchar_t const* s, tb_wchar_t c)
 {
-	// check
-	tb_assert_and_check_return_val(s, tb_null);
+    // check
+    tb_assert_and_check_return_val(s, tb_null);
 
-	// init
-	tb_wchar_t const* 	p = s;
-	tb_wchar_t 			b = tb_tolower(c);
+    // init
+    tb_wchar_t const*   p = s;
+    tb_wchar_t          b = tb_tolower(c);
 
-	// find
-	while (*p)
-	{
-		if (tb_tolower(*p) == b) return (tb_wchar_t*)p;
-		p++;
+    // find
+    while (*p)
+    {
+        if (tb_tolower(*p) == b) return (tb_wchar_t*)p;
+        p++;
 
-	}
+    }
 
-	return tb_null;
+    return tb_null;
 }

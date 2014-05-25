@@ -16,17 +16,17 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		boolean.c
- * @ingroup 	object
+ * @author      ruki
+ * @file        boolean.c
+ * @ingroup     object
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 		"object_boolean"
-#define TB_TRACE_MODULE_DEBUG 		(0)
+#define TB_TRACE_MODULE_NAME        "object_boolean"
+#define TB_TRACE_MODULE_DEBUG       (0)
  
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -40,11 +40,11 @@
 // the boolean type
 typedef struct __tb_boolean_t
 {
-	// the object base
-	tb_object_t 		base;
+    // the object base
+    tb_object_t         base;
 
-	// the boolean value
-	tb_bool_t 			value;
+    // the boolean value
+    tb_bool_t           value;
 
 }tb_boolean_t;
 
@@ -53,21 +53,21 @@ typedef struct __tb_boolean_t
  */
 static __tb_inline__ tb_boolean_t* tb_boolean_cast(tb_object_t const* object)
 {
-	// check
-	tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_BOOLEAN, tb_null);
+    // check
+    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_BOOLEAN, tb_null);
 
-	// cast
-	return (tb_boolean_t*)object;
+    // cast
+    return (tb_boolean_t*)object;
 }
 
 static tb_object_t* tb_boolean_copy(tb_object_t* object)
 {
-	// check
-	tb_boolean_t* boolean = (tb_boolean_t*)object;
-	tb_assert_and_check_return_val(boolean, tb_null);
+    // check
+    tb_boolean_t* boolean = (tb_boolean_t*)object;
+    tb_assert_and_check_return_val(boolean, tb_null);
 
-	// copy
-	return object;
+    // copy
+    return object;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -77,32 +77,32 @@ static tb_object_t* tb_boolean_copy(tb_object_t* object)
 // true
 static tb_boolean_t const g_boolean_true = 
 {
-	{
-		TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
-	,	TB_OBJECT_TYPE_BOOLEAN
-	, 	1
-	, 	tb_null
-	, 	tb_boolean_copy
-	, 	tb_null
-	, 	tb_null
-	}
-, 	tb_true
+    {
+        TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
+    ,   TB_OBJECT_TYPE_BOOLEAN
+    ,   1
+    ,   tb_null
+    ,   tb_boolean_copy
+    ,   tb_null
+    ,   tb_null
+    }
+,   tb_true
 
 };
 
 // false
 static tb_boolean_t const g_boolean_false = 
 {
-	{
-		TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
-	,	TB_OBJECT_TYPE_BOOLEAN
-	, 	1
-	, 	tb_null
-	, 	tb_boolean_copy
-	, 	tb_null
-	, 	tb_null
-	}
-, 	tb_false
+    {
+        TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
+    ,   TB_OBJECT_TYPE_BOOLEAN
+    ,   1
+    ,   tb_null
+    ,   tb_boolean_copy
+    ,   tb_null
+    ,   tb_null
+    }
+,   tb_false
 
 };
 
@@ -111,21 +111,21 @@ static tb_boolean_t const g_boolean_false =
  */
 tb_object_t* tb_boolean_init(tb_bool_t value)
 {
-	return value? tb_boolean_true() : tb_boolean_false();
+    return value? tb_boolean_true() : tb_boolean_false();
 }
 tb_object_t* tb_boolean_true()
 {
-	return (tb_object_t*)&g_boolean_true;
+    return (tb_object_t*)&g_boolean_true;
 }
 tb_object_t* tb_boolean_false()
 {
-	return (tb_object_t*)&g_boolean_false;
+    return (tb_object_t*)&g_boolean_false;
 }
 tb_bool_t tb_boolean_bool(tb_object_t const* object)
 {
-	tb_boolean_t* boolean = tb_boolean_cast(object);
-	tb_assert_and_check_return_val(boolean, tb_false);
+    tb_boolean_t* boolean = tb_boolean_cast(object);
+    tb_assert_and_check_return_val(boolean, tb_false);
 
-	return boolean->value;
+    return boolean->value;
 }
 

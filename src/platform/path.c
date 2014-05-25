@@ -16,17 +16,17 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @path		path.c
- * @ingroup 	platform
+ * @author      ruki
+ * @path        path.c
+ * @ingroup     platform
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 				"path"
-#define TB_TRACE_MODULE_DEBUG 				(0)
+#define TB_TRACE_MODULE_NAME                "path"
+#define TB_TRACE_MODULE_DEBUG               (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -40,122 +40,122 @@
  */
 tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t maxn)
 {
-	// check
-	tb_assert_and_check_return_val(path && full && maxn, tb_null);
-	tb_trace_d("path: %s", path);
+    // check
+    tb_assert_and_check_return_val(path && full && maxn, tb_null);
+    tb_trace_d("path: %s", path);
 
-	// unix path?
-	if (path[0] == '/' || !tb_strnicmp(path, "file://", 7)) 
-	{
-		// skip prefix
-		if (path[0] != '/') path += 7;
+    // unix path?
+    if (path[0] == '/' || !tb_strnicmp(path, "file://", 7)) 
+    {
+        // skip prefix
+        if (path[0] != '/') path += 7;
 
-		// full? 
-		if (path[0] == '/')
-		{
-			tb_strlcpy(full, path, maxn - 1);
-			full[maxn - 1] = '\0';
-			tb_trace_d("full: %s", full);
-			return full;
-		}
-	}
-	// windows path?
-	else if (tb_isalpha(path[0]) && path[1] == ':' && (path[2] == '/' || path[2] == '\\'))
-	{
-		tb_strlcpy(full, path, maxn - 1);
-		full[maxn - 1] = '\0';
-		tb_trace_d("full: %s", full);
-		return full;
-	}
-	
-	// the current directory
-	tb_size_t size = 0;
-	if (!(size = tb_directory_curt(full, maxn))) return tb_null;
-	tb_trace_d("curt: %s", full);
+        // full? 
+        if (path[0] == '/')
+        {
+            tb_strlcpy(full, path, maxn - 1);
+            full[maxn - 1] = '\0';
+            tb_trace_d("full: %s", full);
+            return full;
+        }
+    }
+    // windows path?
+    else if (tb_isalpha(path[0]) && path[1] == ':' && (path[2] == '/' || path[2] == '\\'))
+    {
+        tb_strlcpy(full, path, maxn - 1);
+        full[maxn - 1] = '\0';
+        tb_trace_d("full: %s", full);
+        return full;
+    }
+    
+    // the current directory
+    tb_size_t size = 0;
+    if (!(size = tb_directory_curt(full, maxn))) return tb_null;
+    tb_trace_d("curt: %s", full);
 
-	// is windows path?
-	tb_size_t 	w = tb_false;
-	tb_char_t* 	b = full;
-	if (size > 2 && tb_isalpha(b[0]) && b[1] == ':' && (b[2] == '/' || b[2] == '\\'))
-	{
-		// skip the drive prefix
-		b += 2;
-		size -= 2;
+    // is windows path?
+    tb_size_t   w = tb_false;
+    tb_char_t*  b = full;
+    if (size > 2 && tb_isalpha(b[0]) && b[1] == ':' && (b[2] == '/' || b[2] == '\\'))
+    {
+        // skip the drive prefix
+        b += 2;
+        size -= 2;
 
-		// set root 
-		b[0] = '\\';
+        // set root 
+        b[0] = '\\';
 
-		// windows path: true
-		w = tb_true;
-	}
+        // windows path: true
+        w = tb_true;
+    }
 
-	// remove the last '/' or '\\'
-	tb_size_t n = tb_strlen(b);
-	if (n > 1 && (b[n - 1] == '/' || b[n - 1] == '\\'))
-		b[n - 1] = '\0';
+    // remove the last '/' or '\\'
+    tb_size_t n = tb_strlen(b);
+    if (n > 1 && (b[n - 1] == '/' || b[n - 1] == '\\'))
+        b[n - 1] = '\0';
 
-	// path => full
-	tb_char_t const* 	p = path;
-	tb_char_t const* 	t = p;
-	tb_char_t* 			q = b + size;
-	tb_char_t const* 	e = b + maxn - 1;
-	while (1)
-	{
-		if (*p == '/' || *p == '\\' || !*p)
-		{
-			// the item size
-			n = p - t;
+    // path => full
+    tb_char_t const*    p = path;
+    tb_char_t const*    t = p;
+    tb_char_t*          q = b + size;
+    tb_char_t const*    e = b + maxn - 1;
+    while (1)
+    {
+        if (*p == '/' || *p == '\\' || !*p)
+        {
+            // the item size
+            n = p - t;
 
-			// ..? remove item
-			if (n == 2 && t[0] == '.' && t[1] == '.')
-			{
-				// find the last '/'
-				for (; q > b && (*q != '/' && *q != '\\'); q--) ;
+            // ..? remove item
+            if (n == 2 && t[0] == '.' && t[1] == '.')
+            {
+                // find the last '/'
+                for (; q > b && (*q != '/' && *q != '\\'); q--) ;
 
-				// strip it
-				*q = '\0';
-			}
-			// .? continue it
-			else if (n == 1 && t[0] == '.') ;
-			// append item
-			else if (n && q + 1 + n < e)
-			{
-				*q++ = w? '\\' : '/';
-				tb_strlcpy(q, t, n);
-				q += n;
-			}
-			// empty item
-			else if (!n) ;
-			// too small?
-			else 
-			{
-				tb_trace_e("the full path is too small for %s", path);
-				return tb_null;
-			}
+                // strip it
+                *q = '\0';
+            }
+            // .? continue it
+            else if (n == 1 && t[0] == '.') ;
+            // append item
+            else if (n && q + 1 + n < e)
+            {
+                *q++ = w? '\\' : '/';
+                tb_strlcpy(q, t, n);
+                q += n;
+            }
+            // empty item
+            else if (!n) ;
+            // too small?
+            else 
+            {
+                tb_trace_e("the full path is too small for %s", path);
+                return tb_null;
+            }
 
-			// break
-			tb_check_break(*p);
+            // break
+            tb_check_break(*p);
 
-			// next
-			t = p + 1;
-		}
+            // next
+            t = p + 1;
+        }
 
-		// next
-		p++;
-	}
+        // next
+        p++;
+    }
 
-	// end
-	if (q > b) *q = '\0';
-	// root?
-	else
-	{
-		*q++ = w? '\\' : '/';
-		*q = '\0';
-	}
+    // end
+    if (q > b) *q = '\0';
+    // root?
+    else
+    {
+        *q++ = w? '\\' : '/';
+        *q = '\0';
+    }
 
-	// trace	
-	tb_trace_d("full: %s", full);
-	
-	// ok?
-	return full;
+    // trace    
+    tb_trace_d("full: %s", full);
+    
+    // ok?
+    return full;
 }

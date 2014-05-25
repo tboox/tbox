@@ -128,8 +128,8 @@ static tb_void_t tb_async_stream_http_clos_func(tb_handle_t http, tb_size_t stat
     // clear offset
     tb_atomic64_set0(&hstream->offset);
 
-	// clear base
-	tb_async_stream_clear(&hstream->base);
+    // clear base
+    tb_async_stream_clear(&hstream->base);
 
     /* done clos func
      *
