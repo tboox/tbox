@@ -52,7 +52,7 @@ static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hi
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
+static tb_bool_t tb_demo_transfer_done_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // check
     tb_demo_context_t* context = (tb_demo_context_t*)priv;
@@ -76,11 +76,11 @@ static tb_bool_t tb_demo_transfer_save_func(tb_size_t state, tb_hize_t offset, t
     // ok?
     return (state == TB_STATE_OK)? tb_true : tb_false;
 }
-static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_demo_context_t* context = (tb_demo_context_t*)priv;
-    tb_assert_and_check_return_val(ast && context && context->option, tb_false);
+    tb_assert_and_check_return_val(stream && context && context->option, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
@@ -93,7 +93,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t sta
             if (context->verbose) 
             {
                 tb_char_t const* url = tb_null;
-                tb_stream_ctrl(ast, TB_STREAM_CTRL_GET_URL, &url);
+                tb_stream_ctrl(stream, TB_STREAM_CTRL_GET_URL, &url);
                 tb_printf("open: %s: %s\n", url, tb_state_cstr(state));
             }
             break;
@@ -109,7 +109,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t sta
             tb_char_t const* path = tb_option_item_cstr(context->option, "more0");
 
             // init
-            context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp(ast), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+            context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp(stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
             // print verbose info
             if (context->verbose) tb_printf("save: %s: ..\n", path);
@@ -129,7 +129,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t sta
                 tb_strcat(path, name);
 
                 // init file
-                context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp(ast), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+                context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp(stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
                 // print verbose info
                 if (context->verbose) tb_printf("save: %s: ..\n", path);
@@ -138,11 +138,15 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* ast, tb_size_t sta
         tb_assert_and_check_break(context->ostream);
 
         // init transfer
-        context->transfer = tb_transfer_init_aa(ast, context->ostream, 0);
+        context->transfer = tb_async_transfer_init(tb_null);
         tb_assert_and_check_break(context->transfer);
 
-        // open and save transfer
-        if (!tb_transfer_open_save(context->transfer, tb_demo_transfer_save_func, context)) break;
+        // init transfer stream
+        if (!tb_async_transfer_init_istream(context->transfer, stream)) break;
+        if (!tb_async_transfer_init_ostream(context->transfer, context->ostream)) break;
+
+        // open and done transfer
+        if (!tb_async_transfer_open_done(context->transfer, 0, tb_demo_transfer_done_func, context)) break;
 
         // ok
         ok = tb_true;
@@ -215,7 +219,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                 tb_assert_and_check_break(context.event);
 
                 // init istream
-                context.istream = tb_async_stream_init_from_url(tb_aicp(), tb_option_item_cstr(context.option, "url"));
+                context.istream = tb_async_stream_init_from_url(tb_null, tb_option_item_cstr(context.option, "url"));
                 tb_assert_and_check_break(context.istream);
 
                 // ctrl http
@@ -380,7 +384,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
     } while (0);
 
     // exit transfer
-    if (context.transfer) tb_transfer_exit(context.transfer);
+    if (context.transfer) tb_async_transfer_exit(context.transfer);
     context.transfer = tb_null;
 
     // exit istream

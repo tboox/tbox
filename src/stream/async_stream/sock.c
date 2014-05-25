@@ -1124,9 +1124,6 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
  */
 tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
 {
-    // check
-    tb_assert_and_check_return_val(aicp, tb_null);
-
     // done
     tb_bool_t               ok = tb_false;
     tb_async_stream_sock_t* sstream = tb_null;
@@ -1169,7 +1166,7 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
 tb_async_stream_t* tb_async_stream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
 {
     // check
-    tb_assert_and_check_return_val(aicp && host && port, tb_null);
+    tb_assert_and_check_return_val(host && port, tb_null);
 
     // ssl is not supported now.
     tb_assert_and_check_return_val(!bssl, tb_null);
