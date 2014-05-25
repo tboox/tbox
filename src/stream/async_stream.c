@@ -435,7 +435,7 @@ static tb_bool_t tb_async_stream_sync_seek_func(tb_async_stream_t* stream, tb_si
 tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_size_t type, tb_size_t rcache, tb_size_t wcache)
 {
     // check
-    tb_assert_and_check_return_val(stream && aicp, tb_false);
+    tb_assert_and_check_return_val(stream, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
@@ -448,7 +448,8 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
         stream->base.type       = type;
         stream->base.timeout    = -1;
         stream->base.istate     = TB_STATE_CLOSED;
-        stream->aicp            = aicp;
+        stream->aicp            = aicp? aicp : tb_aicp();
+        tb_assert_and_check_break(stream->aicp);
 
         // init url
         if (!tb_url_init(&stream->base.url)) break;
@@ -484,7 +485,7 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
 tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(aicp && url, tb_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // the init
     static tb_async_stream_t* (*s_init[])() = 

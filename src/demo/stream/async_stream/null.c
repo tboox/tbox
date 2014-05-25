@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_async_stream_null_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
+static tb_bool_t tb_demo_async_stream_null_done_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("save: %llu bytes, rate: %lu bytes/s, state: %s", save, rate, tb_state_cstr(state));
@@ -48,11 +48,15 @@ tb_int_t tb_demo_stream_async_stream_null_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(fstream);
 
         // init transfer
-        transfer = tb_transfer_init_aa(fstream, ostream, 0);
+        transfer = tb_async_transfer_init(tb_null);
         tb_assert_and_check_break(transfer);
 
+        // init transfer stream
+        if (!tb_async_transfer_init_istream(transfer, fstream)) break;
+        if (!tb_async_transfer_init_ostream(transfer, ostream)) break;
+
         // open and save transfer
-        if (!tb_transfer_open_save(transfer, tb_demo_async_stream_null_save_func, event)) break;
+        if (!tb_async_transfer_open_done(transfer, 0, tb_demo_async_stream_null_done_func, event)) break;
 
         // wait it
         tb_event_wait(event, -1);
@@ -60,7 +64,7 @@ tb_int_t tb_demo_stream_async_stream_null_main(tb_int_t argc, tb_char_t** argv)
     } while (0);
 
     // exit transfer
-    if (transfer) tb_transfer_exit(transfer);
+    if (transfer) tb_async_transfer_exit(transfer);
     transfer = tb_null;
 
     // exit fstream

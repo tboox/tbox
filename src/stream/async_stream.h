@@ -361,7 +361,7 @@ typedef struct __tb_async_stream_t
 /*! init async stream
  *
  * @param stream        the async stream
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  * @param type          the type
  * @param rcache        the read cache size
  * @param wcache        the writ cache size
@@ -372,7 +372,7 @@ tb_bool_t               tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_
 
 /*! init data stream 
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  *
  * @return              the stream
  */
@@ -380,7 +380,7 @@ tb_async_stream_t*      tb_async_stream_init_data(tb_aicp_t* aicp);
 
 /*! init file stream 
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  *
  * @return              the stream
  */
@@ -388,7 +388,7 @@ tb_async_stream_t*      tb_async_stream_init_file(tb_aicp_t* aicp);
 
 /*! init sock stream 
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  *
  * @return              the stream
  */
@@ -396,7 +396,7 @@ tb_async_stream_t*      tb_async_stream_init_sock(tb_aicp_t* aicp);
 
 /*! init http stream 
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  *
  * @return              the stream
  */
@@ -404,7 +404,7 @@ tb_async_stream_t*      tb_async_stream_init_http(tb_aicp_t* aicp);
 
 /*! init filter stream 
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  *
  * @return              the stream
  */
@@ -420,7 +420,7 @@ tb_bool_t               tb_async_stream_exit(tb_async_stream_t* stream);
 
 /*! init stream from url
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  * @param url           the url
  * <pre>
  * data://base64
@@ -438,7 +438,7 @@ tb_async_stream_t*      tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t
 
 /*! init stream from data
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  * @param data          the data
  * @param size          the size
  *
@@ -448,7 +448,7 @@ tb_async_stream_t*      tb_async_stream_init_from_data(tb_aicp_t* aicp, tb_byte_
 
 /*! init stream from file
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  * @param path          the file path
  * @param mode          the file mode, using the default ro mode if zero
  *
@@ -458,7 +458,7 @@ tb_async_stream_t*      tb_async_stream_init_from_file(tb_aicp_t* aicp, tb_char_
 
 /*! init stream from sock
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  * @param host          the host
  * @param port          the port
  * @param type          the socket type, tcp or udp
@@ -470,7 +470,7 @@ tb_async_stream_t*      tb_async_stream_init_from_sock(tb_aicp_t* aicp, tb_char_
 
 /*! init stream from http or https
  *
- * @param aicp          the aicp
+ * @param aicp          the aicp, using the default aicp if be null
  * @param host          the host
  * @param port          the port
  * @param path          the path

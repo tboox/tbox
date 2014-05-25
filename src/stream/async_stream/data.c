@@ -604,9 +604,6 @@ static tb_bool_t tb_async_stream_data_ctrl(tb_handle_t astream, tb_size_t ctrl, 
  */
 tb_async_stream_t* tb_async_stream_init_data(tb_aicp_t* aicp)
 {
-    // check
-    tb_assert_and_check_return_val(aicp, tb_null);
-
     // done
     tb_bool_t                   ok = tb_false;
     tb_async_stream_data_t*     dstream = tb_null; 
@@ -647,7 +644,7 @@ tb_async_stream_t* tb_async_stream_init_data(tb_aicp_t* aicp)
 tb_async_stream_t* tb_async_stream_init_from_data(tb_aicp_t* aicp, tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(aicp && data && size, tb_null);
+    tb_assert_and_check_return_val(data && size, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
