@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
- * @ingroup 	database
+ * @author      ruki
+ * @file        prefix.h
+ * @ingroup     database
  *
  */
 #ifndef TB_DATABASE_PREFIX_H

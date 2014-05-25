@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		barrier.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        barrier.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_BARRIER_H
@@ -29,12 +29,12 @@
  */
 #include "prefix.h"
 #if defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-# 	include "mach/barrier.h"
+#   include "mach/barrier.h"
 #elif defined(TB_COMPILER_IS_GCC) \
-	&&	TB_COMPILER_VERSION_BE(4, 1)
-# 	include "compiler/gcc/barrier.h"
+    &&  TB_COMPILER_VERSION_BE(4, 1)
+#   include "compiler/gcc/barrier.h"
 #elif defined(TB_CONFIG_OS_WINDOWS)
-# 	include "windows/barrier.h"
+#   include "windows/barrier.h"
 #endif
 #include "arch/barrier.h"
 
@@ -42,7 +42,7 @@
  * implementation
  */
 #ifndef tb_barrier
-# 	define tb_barrier() 		
+#   define tb_barrier()         
 #endif
 
 

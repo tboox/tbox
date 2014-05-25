@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		dns.c
+ * @author      ruki
+ * @file        dns.c
  *
  */
 
@@ -34,74 +34,74 @@
  */
 tb_bool_t tb_dns_init()
 {
-	// done
-	FIXED_INFO* 			info = tb_null;
-	ULONG 					size = 0;
-	tb_size_t 				count = 0;
-	do 
-	{
-		// init func
-		tb_api_GetNetworkParams_t pGetNetworkParams = tb_api_GetNetworkParams();
-		tb_assert_and_check_break(pGetNetworkParams);
+    // done
+    FIXED_INFO*             info = tb_null;
+    ULONG                   size = 0;
+    tb_size_t               count = 0;
+    do 
+    {
+        // init func
+        tb_api_GetNetworkParams_t pGetNetworkParams = tb_api_GetNetworkParams();
+        tb_assert_and_check_break(pGetNetworkParams);
 
-		// init info
-		info = tb_malloc0(sizeof(FIXED_INFO));
-		tb_assert_and_check_break(info);
+        // init info
+        info = tb_malloc0(sizeof(FIXED_INFO));
+        tb_assert_and_check_break(info);
 
-		// get the info size
-		size = sizeof(FIXED_INFO);
-		if (pGetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW) 
-		{
-			// grow info
-			info = (FIXED_INFO *)tb_ralloc(info, size);
-			tb_assert_and_check_break(info);
-		}
-		
-		// get the info
-		if (pGetNetworkParams(info, &size) != NO_ERROR) break;
+        // get the info size
+        size = sizeof(FIXED_INFO);
+        if (pGetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW) 
+        {
+            // grow info
+            info = (FIXED_INFO *)tb_ralloc(info, size);
+            tb_assert_and_check_break(info);
+        }
+        
+        // get the info
+        if (pGetNetworkParams(info, &size) != NO_ERROR) break;
 
-		// trace
-//		tb_trace_d("host: %s", 	info->HostName);
-//		tb_trace_d("domain: %s", info->DomainName);
-		tb_trace_d("server: %s", info->DnsServerList.IpAddress.String);
+        // trace
+//      tb_trace_d("host: %s",  info->HostName);
+//      tb_trace_d("domain: %s", info->DomainName);
+        tb_trace_d("server: %s", info->DnsServerList.IpAddress.String);
 
-		// add the first dns address
-		if (info->DnsServerList.IpAddress.String)
-		{
-			tb_dns_server_add(info->DnsServerList.IpAddress.String);
-			count++;
-		}
-
-		// walk dns address
-        IP_ADDR_STRING* addr = info->DnsServerList.Next;
-        for (; addr; addr = addr->Next) 
-		{
-			// trace
-			tb_trace_d("server: %s", addr->IpAddress.String);
-			
-			// add the dns address
-			if (addr->IpAddress.String)
-			{
-				tb_dns_server_add(addr->IpAddress.String);
-				count++;
-			}
+        // add the first dns address
+        if (info->DnsServerList.IpAddress.String)
+        {
+            tb_dns_server_add(info->DnsServerList.IpAddress.String);
+            count++;
         }
 
-	} while (0);
+        // walk dns address
+        IP_ADDR_STRING* addr = info->DnsServerList.Next;
+        for (; addr; addr = addr->Next) 
+        {
+            // trace
+            tb_trace_d("server: %s", addr->IpAddress.String);
+            
+            // add the dns address
+            if (addr->IpAddress.String)
+            {
+                tb_dns_server_add(addr->IpAddress.String);
+                count++;
+            }
+        }
 
-	// exit info
-	if (info) tb_free(info);
-	info = tb_null;
+    } while (0);
 
-	// no server? add the default server
-	if (!count) 
-	{
-		tb_dns_server_add("8.8.8.8");
-		tb_dns_server_add("8.8.8.4");
-	}
+    // exit info
+    if (info) tb_free(info);
+    info = tb_null;
 
-	// ok
-	return tb_true;
+    // no server? add the default server
+    if (!count) 
+    {
+        tb_dns_server_add("8.8.8.8");
+        tb_dns_server_add("8.8.8.4");
+    }
+
+    // ok
+    return tb_true;
 }
 tb_void_t tb_dns_exit()
 {

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		singleton.h
- * @ingroup 	utils
+ * @author      ruki
+ * @file        singleton.h
+ * @ingroup     utils
  *
  */
 #ifndef TB_UTILS_SINGLETON_H
@@ -36,47 +36,47 @@
 /// the singleton type enum
 typedef enum __tb_singleton_type_e
 {
-	/// the object pool type
-	TB_SINGLETON_TYPE_OBJECT_POOL 		= 0
+    /// the object pool type
+    TB_SINGLETON_TYPE_OBJECT_POOL       = 0
 
-	/// the thread pool type
-,	TB_SINGLETON_TYPE_THREAD_POOL 		= 1
+    /// the thread pool type
+,   TB_SINGLETON_TYPE_THREAD_POOL       = 1
 
-	/// the string pool type
-,	TB_SINGLETON_TYPE_STRING_POOL 		= 2
+    /// the string pool type
+,   TB_SINGLETON_TYPE_STRING_POOL       = 2
 
-	/// the transfer pool type
-,	TB_SINGLETON_TYPE_TRANSFER_POOL 	= 3
+    /// the transfer pool type
+,   TB_SINGLETON_TYPE_TRANSFER_POOL     = 3
 
-	/// the lock profiler type
-,	TB_SINGLETON_TYPE_LOCK_PROFILER 	= 4
+    /// the lock profiler type
+,   TB_SINGLETON_TYPE_LOCK_PROFILER     = 4
 
-	/// the aicp type
-,	TB_SINGLETON_TYPE_AICP 				= 5
+    /// the aicp type
+,   TB_SINGLETON_TYPE_AICP              = 5
 
-	/// the random type
-,	TB_SINGLETON_TYPE_RANDOM 			= 6
+    /// the random type
+,   TB_SINGLETON_TYPE_RANDOM            = 6
 
-	/// the cookies type
-,	TB_SINGLETON_TYPE_COOKIES 			= 7
+    /// the cookies type
+,   TB_SINGLETON_TYPE_COOKIES           = 7
 
-	/// the openssl library type
-,	TB_SINGLETON_TYPE_LIBRARY_OPENSSL 	= 8
+    /// the openssl library type
+,   TB_SINGLETON_TYPE_LIBRARY_OPENSSL   = 8
 
-	/// the mysql library type
-,	TB_SINGLETON_TYPE_LIBRARY_MYSQL 	= 9
+    /// the mysql library type
+,   TB_SINGLETON_TYPE_LIBRARY_MYSQL     = 9
 
-	/// the sqlite3 library type
-,	TB_SINGLETON_TYPE_LIBRARY_SQLITE3 	= 10
+    /// the sqlite3 library type
+,   TB_SINGLETON_TYPE_LIBRARY_SQLITE3   = 10
 
-	/// the user defined type
-,	TB_SINGLETON_TYPE_USER 				= 11
+    /// the user defined type
+,   TB_SINGLETON_TYPE_USER              = 11
 
-	/// the max count of the singleton type
+    /// the max count of the singleton type
 #ifdef __tb_small__
-,	TB_SINGLETON_TYPE_MAXN 				= 32
+,   TB_SINGLETON_TYPE_MAXN              = 32
 #else
-,	TB_SINGLETON_TYPE_MAXN 				= 128
+,   TB_SINGLETON_TYPE_MAXN              = 128
 #endif
 
 }tb_singleton_type_e;
@@ -85,10 +85,10 @@ typedef enum __tb_singleton_type_e
 typedef tb_handle_t (*tb_singleton_init_func_t)(tb_cpointer_t* ppriv);
 
 /// the singleton exit func type
-typedef tb_void_t 	(*tb_singleton_exit_func_t)(tb_handle_t instance, tb_cpointer_t priv);
+typedef tb_void_t   (*tb_singleton_exit_func_t)(tb_handle_t instance, tb_cpointer_t priv);
 
 /// the singleton kill func type
-typedef tb_void_t 	(*tb_singleton_kill_func_t)(tb_handle_t instance, tb_cpointer_t priv);
+typedef tb_void_t   (*tb_singleton_kill_func_t)(tb_handle_t instance, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -96,28 +96,28 @@ typedef tb_void_t 	(*tb_singleton_kill_func_t)(tb_handle_t instance, tb_cpointer
 
 /*! init singleton
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_singleton_init(tb_noarg_t);
+tb_bool_t           tb_singleton_init(tb_noarg_t);
 
 /*! kill singleton
  */
-tb_void_t 			tb_singleton_kill(tb_noarg_t);
+tb_void_t           tb_singleton_kill(tb_noarg_t);
 
 /*! exit singleton
  */
-tb_void_t 			tb_singleton_exit(tb_noarg_t);
+tb_void_t           tb_singleton_exit(tb_noarg_t);
 
 /*! the singleton instance
  *
- * @param type 		the singleton type
- * @param init 		the singleton init func 
- * @param exit 		the singleton exit func 
- * @param kill 		the singleton kill func 
+ * @param type      the singleton type
+ * @param init      the singleton init func 
+ * @param exit      the singleton exit func 
+ * @param kill      the singleton kill func 
  *
- * @return 			the singleton instance handle
+ * @return          the singleton instance handle
  */
-tb_handle_t 		tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill);
+tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill);
 
 
 #endif

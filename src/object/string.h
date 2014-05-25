@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		string.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        string.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_STRING_H
@@ -35,44 +35,44 @@
 
 /*! init string from c-string
  *
- * @param cstr 		the c-string
+ * @param cstr      the c-string
  *
- * @return 			the string object
+ * @return          the string object
  */
-tb_object_t* 		tb_string_init_from_cstr(tb_char_t const* cstr);
+tb_object_t*        tb_string_init_from_cstr(tb_char_t const* cstr);
 
 /*! init string from pstring
  *
- * @param pstr 		the pstring
+ * @param pstr      the pstring
  *
- * @return 			the string object
+ * @return          the string object
  */
-tb_object_t* 		tb_string_init_from_pstr(tb_scoped_string_t* pstr);
+tb_object_t*        tb_string_init_from_pstr(tb_scoped_string_t* pstr);
 
 /*! the c-string
  *
- * @param string 	the string object
+ * @param string    the string object
  *
- * @return 			the c-string
+ * @return          the c-string
  */
-tb_char_t const* 	tb_string_cstr(tb_object_t* string);
+tb_char_t const*    tb_string_cstr(tb_object_t* string);
 
 /*! set the c-string
  *
- * @param string 	the string object
- * @param cstr 		the c-string
+ * @param string    the string object
+ * @param cstr      the c-string
  *
- * @return 			the string size
+ * @return          the string size
  */
-tb_size_t 			tb_string_cstr_set(tb_object_t* string, tb_char_t const* cstr);
+tb_size_t           tb_string_cstr_set(tb_object_t* string, tb_char_t const* cstr);
 
 /*! the string size
  *
- * @param string 	the string object
+ * @param string    the string object
  *
- * @return 			the string size
+ * @return          the string size
  */
-tb_size_t 			tb_string_size(tb_object_t* string);
+tb_size_t           tb_string_size(tb_object_t* string);
 
 #endif
 

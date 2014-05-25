@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		hostname.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        hostname.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -30,13 +30,13 @@
  * implementation
  */
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	include "windows/hostname.c"
+#   include "windows/hostname.c"
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-# 	include "posix/hostname.c"
+#   include "posix/hostname.c"
 #else
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
 {
-	tb_trace_noimpl();
-	return tb_false;
+    tb_trace_noimpl();
+    return tb_false;
 }
 #endif

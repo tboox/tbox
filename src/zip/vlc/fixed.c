@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		fixed.c
+ * @author      ruki
+ * @file        fixed.c
  *
  */
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -31,30 +31,30 @@
 
 static tb_void_t tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_t* sstream)
 {
-	tb_assert(vlc);
-	tb_assert(val && val <= (0x1 << ((tb_zip_vlc_fixed_t*)vlc)->nbits));
-	tb_static_stream_writ_ubits32(sstream, val - 1, ((tb_zip_vlc_fixed_t*)vlc)->nbits);
+    tb_assert(vlc);
+    tb_assert(val && val <= (0x1 << ((tb_zip_vlc_fixed_t*)vlc)->nbits));
+    tb_static_stream_writ_ubits32(sstream, val - 1, ((tb_zip_vlc_fixed_t*)vlc)->nbits);
 }
 static tb_uint32_t tb_zip_vlc_fixed_get(tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream)
 {
-	tb_assert(vlc);
-	return (tb_static_stream_read_ubits32((tb_static_stream_t*)sstream, ((tb_zip_vlc_fixed_t*)vlc)->nbits) + 1);
+    tb_assert(vlc);
+    return (tb_static_stream_read_ubits32((tb_static_stream_t*)sstream, ((tb_zip_vlc_fixed_t*)vlc)->nbits) + 1);
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_zip_vlc_t* tb_zip_vlc_fixed_open(tb_zip_vlc_fixed_t* fixed, tb_byte_t nbits)
 {
-	// init
-	tb_memset(fixed, 0, sizeof(tb_zip_vlc_fixed_t));
-	((tb_zip_vlc_t*)fixed)->type = TB_ZIP_VLC_TYPE_FIXED;
-	((tb_zip_vlc_t*)fixed)->set = tb_zip_vlc_fixed_set;
-	((tb_zip_vlc_t*)fixed)->get = tb_zip_vlc_fixed_get;
-	((tb_zip_vlc_t*)fixed)->clos = tb_null;
-	fixed->nbits = nbits;
+    // init
+    tb_memset(fixed, 0, sizeof(tb_zip_vlc_fixed_t));
+    ((tb_zip_vlc_t*)fixed)->type = TB_ZIP_VLC_TYPE_FIXED;
+    ((tb_zip_vlc_t*)fixed)->set = tb_zip_vlc_fixed_set;
+    ((tb_zip_vlc_t*)fixed)->get = tb_zip_vlc_fixed_get;
+    ((tb_zip_vlc_t*)fixed)->clos = tb_null;
+    fixed->nbits = nbits;
 
-	// check
-	tb_assert_and_check_return_val(nbits <= 32, tb_null);
+    // check
+    tb_assert_and_check_return_val(nbits <= 32, tb_null);
 
-	return (tb_zip_vlc_t*)fixed;
+    return (tb_zip_vlc_t*)fixed;
 }

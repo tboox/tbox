@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  * *
- * @author		ruki
- * @file		url.c
- * @ingroup 	utils
+ * @author      ruki
+ * @file        url.c
+ * @ingroup     utils
  *
  */
 
@@ -33,67 +33,67 @@
  */
 tb_size_t tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on)
 {
-	// init
-	tb_char_t const* 	ip = ib;
-	tb_char_t* 			op = ob;
-	tb_char_t const* 	ie = ib + in;
-	tb_char_t const* 	oe = ob + on;
-	static tb_char_t 	ht[] = "0123456789ABCDEF";
+    // init
+    tb_char_t const*    ip = ib;
+    tb_char_t*          op = ob;
+    tb_char_t const*    ie = ib + in;
+    tb_char_t const*    oe = ob + on;
+    static tb_char_t    ht[] = "0123456789ABCDEF";
 
-	// walk
-	while (ip < ie && op < oe) 
-	{
-		// character
-		tb_byte_t c = *ip++;
+    // walk
+    while (ip < ie && op < oe) 
+    {
+        // character
+        tb_byte_t c = *ip++;
 
-		// space?
-		if (c == ' ') *op++ = '+';
-		// %xx?
-		else if ((c < '0' && c != '-' && c != '.') ||(c < 'A' && c > '9') ||(c > 'Z' && c < 'a' && c != '_') || (c > 'z'))
-		{
-			op[0] = '%';
-			op[1] = ht[c >> 4];
-			op[2] = ht[c & 15];
-			op += 3;
-		} 
-		else *op++ = c;
-	}
+        // space?
+        if (c == ' ') *op++ = '+';
+        // %xx?
+        else if ((c < '0' && c != '-' && c != '.') ||(c < 'A' && c > '9') ||(c > 'Z' && c < 'a' && c != '_') || (c > 'z'))
+        {
+            op[0] = '%';
+            op[1] = ht[c >> 4];
+            op[2] = ht[c & 15];
+            op += 3;
+        } 
+        else *op++ = c;
+    }
 
-	// end
-	*op = '\0';
+    // end
+    *op = '\0';
 
-	// ok
-	return op - ob;
+    // ok
+    return op - ob;
 }
 tb_size_t tb_url_decode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on)
 {
-	// init
-	tb_char_t const* 	ip = ib;
-	tb_char_t* 			op = ob;
-	tb_char_t const* 	ie = ib + in;
-	tb_char_t const* 	oe = ob + on;
+    // init
+    tb_char_t const*    ip = ib;
+    tb_char_t*          op = ob;
+    tb_char_t const*    ie = ib + in;
+    tb_char_t const*    oe = ob + on;
 
-	// walk
-	while (ip < ie && op < oe) 
-	{
-		// space?
-		if (*ip == '+') *op = ' ';
-		// %xx?
-		else if (*ip == '%' && ip + 2 < ie && tb_isdigit16(ip[1]) && tb_isdigit16(ip[2]))
-		{
-			*op = (tb_char_t)tb_s16tou32(&ip[1]);
-			ip += 2;
-		}
-		else *op = *ip;
+    // walk
+    while (ip < ie && op < oe) 
+    {
+        // space?
+        if (*ip == '+') *op = ' ';
+        // %xx?
+        else if (*ip == '%' && ip + 2 < ie && tb_isdigit16(ip[1]) && tb_isdigit16(ip[2]))
+        {
+            *op = (tb_char_t)tb_s16tou32(&ip[1]);
+            ip += 2;
+        }
+        else *op = *ip;
 
-		// next
-		ip++;
-		op++;
-	}
+        // next
+        ip++;
+        op++;
+    }
 
-	// end
-	*op = '\0';
+    // end
+    *op = '\0';
 
-	// ok
-	return op - ob;
+    // ok
+    return op - ob;
 }

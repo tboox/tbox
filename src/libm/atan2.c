@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		atan2.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        atan2.c
+ * @ingroup     libm
  *
  */
 
@@ -33,5 +33,5 @@
  */
 tb_double_t tb_atan2(tb_double_t y, tb_double_t x)
 {
-	return atan2(y, x);
+    return atan2(y, x);
 }

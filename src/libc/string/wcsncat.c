@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsncat.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsncat.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSNCAT
-# 	include <wchar.h>
+#   include <wchar.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,19 +36,19 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSNCAT
 tb_wchar_t* tb_wcsncat(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
-	return wcsncat(s1, s2, n);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    return wcsncat(s1, s2, n);
 }
 #else
 tb_wchar_t* tb_wcsncat(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    // check
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	// done
-	__tb_register__ tb_wchar_t* s = s1;
-	while (*s) s++; --s;
-	while (n-- && !(*s++ = *s2++));
-	return s1;
+    // done
+    __tb_register__ tb_wchar_t* s = s1;
+    while (*s) s++; --s;
+    while (n-- && !(*s++ = *s2++));
+    return s1;
 }
 #endif

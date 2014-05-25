@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		asm.h
+ * @author      ruki
+ * @file        asm.h
  *
  */
 #ifndef TB_PREFIX_ASM_H

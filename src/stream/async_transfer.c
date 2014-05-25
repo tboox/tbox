@@ -42,10 +42,10 @@
 
 /* the async transfer clos func type
  *
- * @param state 	the stream state 
- * @param priv 		the func private data
+ * @param state     the stream state 
+ * @param priv      the func private data
  */
-typedef tb_void_t 	                    (*tb_async_transfer_clos_func_t)(tb_handle_t transfer, tb_size_t state, tb_cpointer_t priv);
+typedef tb_void_t                       (*tb_async_transfer_clos_func_t)(tb_handle_t transfer, tb_size_t state, tb_cpointer_t priv);
 
 // the async transfer open type
 typedef struct __tb_async_transfer_open_t
@@ -662,9 +662,9 @@ static tb_bool_t tb_async_transfer_clos(tb_handle_t handle, tb_async_transfer_cl
     // check
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)handle;
     tb_assert_and_check_return_val(transfer && func, tb_false);
-	
-	// closed?
-	if (TB_STATE_CLOSED == tb_atomic_get(&transfer->state))
+    
+    // closed?
+    if (TB_STATE_CLOSED == tb_atomic_get(&transfer->state))
     {
         // done func directly
         func(transfer, TB_STATE_OK, priv);
@@ -1045,9 +1045,9 @@ tb_bool_t tb_async_transfer_done(tb_handle_t handle, tb_async_transfer_done_func
     // check
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)handle;
     tb_assert_and_check_return_val(transfer && func, tb_false);
-	
-	// check state
-	tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&transfer->state), tb_false);
+    
+    // check state
+    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&transfer->state), tb_false);
 
     // check stream
     tb_assert_and_check_return_val(transfer->istream && transfer->ostream, tb_false);
@@ -1082,15 +1082,15 @@ tb_void_t tb_async_transfer_kill(tb_handle_t handle)
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)handle;
     tb_assert_and_check_return(transfer);
 
-	// kill it
-	tb_size_t state = tb_atomic_fetch_and_pset(&transfer->state, TB_STATE_OPENED, TB_STATE_KILLING);
+    // kill it
+    tb_size_t state = tb_atomic_fetch_and_pset(&transfer->state, TB_STATE_OPENED, TB_STATE_KILLING);
     tb_check_return(state != TB_STATE_KILLING && state != TB_STATE_CLOSED);
 
     // opening? kill it
     tb_atomic_pset(&transfer->state, TB_STATE_OPENING, TB_STATE_KILLING);
 
-	// trace
-	tb_trace_d("kill: ..");
+    // trace
+    tb_trace_d("kill: ..");
 
     // kill istream
     if (transfer->istream) tb_stream_kill(transfer->istream);
@@ -1160,7 +1160,7 @@ tb_bool_t tb_async_transfer_resume(tb_handle_t handle)
     do
     {
         // must be opened?
-	    tb_check_break(TB_STATE_OPENED == tb_atomic_get(&transfer->state));
+        tb_check_break(TB_STATE_OPENED == tb_atomic_get(&transfer->state));
 
         // resume it
         tb_size_t state_pause = tb_atomic_fetch_and_set(&transfer->state_pause, TB_STATE_OK);

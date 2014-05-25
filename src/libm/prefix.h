@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
- * @ingroup 	libm
+ * @author      ruki
+ * @file        prefix.h
+ * @ingroup     libm
  *
  */
 #ifndef TB_LIBM_PREFIX_H
@@ -38,36 +38,36 @@
 // the ieee float type
 typedef union __tb_ieee_float_t
 {
-	tb_float_t 	f;
-	tb_uint32_t i;
+    tb_float_t  f;
+    tb_uint32_t i;
 
 }tb_ieee_float_t;
 
 // the ieee double type
-# 	ifdef TB_FLOAT_BIGENDIAN
-	typedef union __tb_ieee_double_t
-	{
-		tb_double_t d;
-		struct
-		{
-			tb_uint32_t h;
-			tb_uint32_t l;
+#   ifdef TB_FLOAT_BIGENDIAN
+    typedef union __tb_ieee_double_t
+    {
+        tb_double_t d;
+        struct
+        {
+            tb_uint32_t h;
+            tb_uint32_t l;
 
-		}i;
+        }i;
 
-	}tb_ieee_double_t;
-# 	else
-	typedef union __tb_ieee_double_t
-	{
-		tb_double_t d;
-		struct
-		{
-			tb_uint32_t l;
-			tb_uint32_t h;
-		}i;
+    }tb_ieee_double_t;
+#   else
+    typedef union __tb_ieee_double_t
+    {
+        tb_double_t d;
+        struct
+        {
+            tb_uint32_t l;
+            tb_uint32_t h;
+        }i;
 
-	}tb_ieee_double_t;
-# 	endif
+    }tb_ieee_double_t;
+#   endif
 
 #endif
 

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcscpy.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcscpy.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCPY
-# 	include <wchar.h>
+#   include <wchar.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -37,33 +37,33 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCPY
 tb_wchar_t* tb_wcscpy(tb_wchar_t* s1, tb_wchar_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
-	return wcscpy(s1, s2);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    return wcscpy(s1, s2);
 }
 #else
 tb_wchar_t* tb_wcscpy(tb_wchar_t* s1, tb_wchar_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	__tb_register__ tb_wchar_t* s = s1;
-	if (s1 == s2) return s;
+    __tb_register__ tb_wchar_t* s = s1;
+    if (s1 == s2) return s;
 
 #if 1
-	tb_memcpy(s1, s2, (tb_wcslen(s2) + 1) * sizeof(tb_wchar_t));
+    tb_memcpy(s1, s2, (tb_wcslen(s2) + 1) * sizeof(tb_wchar_t));
 #elif defined(__tb_small__)
-	while ((*s++ = *s2++)) ;
+    while ((*s++ = *s2++)) ;
 #else
-	while (1) 
-	{
-		if (!(s1[0] = s2[0])) break;
-		if (!(s1[1] = s2[1])) break;
-		if (!(s1[2] = s2[2])) break;
-		if (!(s1[3] = s2[3])) break;
-		s1 += 4;
-		s2 += 4;
-	}
+    while (1) 
+    {
+        if (!(s1[0] = s2[0])) break;
+        if (!(s1[1] = s2[1])) break;
+        if (!(s1[2] = s2[2])) break;
+        if (!(s1[3] = s2[3])) break;
+        s1 += 4;
+        s2 += 4;
+    }
 #endif
 
-	return s;
+    return s;
 }
 #endif

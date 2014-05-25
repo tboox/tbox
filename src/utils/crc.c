@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		crc.c
- * @ingroup 	utils
+ * @author      ruki
+ * @file        crc.c
+ * @ingroup     utils
  *
  */
 
@@ -29,7 +29,7 @@
 #include "crc.g"
 #include "../libc/libc.h"
 #if defined(TB_ARCH_ARM)
-# 	include "opt/arm/crc.h"
+#   include "opt/arm/crc.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -38,59 +38,59 @@
 
 tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in)
 {
-	// check
-	tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && ib, 0);
+    // check
+    tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && ib, 0);
 
-	// done
+    // done
 #ifdef tb_crc32_encode
-# 	ifndef __tb_small__
-	if (mode == TB_CRC_MODE_32_IEEE_LE || mode == TB_CRC_MODE_32_IEEE)
-# 	else
-	if (mode == TB_CRC_MODE_32_IEEE_LE)
-# 	endif
-	{
-		crc = tb_crc32_encode(crc, ib, in, (tb_uint32_t const*)&g_crc_table[mode]);
-	}
-	else
-	{
-		tb_byte_t const* 	ie = ib + in;
-		tb_uint32_t const* 	pt = (tb_uint32_t const*)&g_crc_table[mode];
-		while (ib < ie) crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
-	}
+#   ifndef __tb_small__
+    if (mode == TB_CRC_MODE_32_IEEE_LE || mode == TB_CRC_MODE_32_IEEE)
+#   else
+    if (mode == TB_CRC_MODE_32_IEEE_LE)
+#   endif
+    {
+        crc = tb_crc32_encode(crc, ib, in, (tb_uint32_t const*)&g_crc_table[mode]);
+    }
+    else
+    {
+        tb_byte_t const*    ie = ib + in;
+        tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
+        while (ib < ie) crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
+    }
 #else
-	tb_byte_t const* 	ie = ib + in;
-	tb_uint32_t const* 	pt = (tb_uint32_t const*)&g_crc_table[mode];
-	while (ib < ie) crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
+    tb_byte_t const*    ie = ib + in;
+    tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
+    while (ib < ie) crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
 #endif
 
-	// ok?
-	return crc;
+    // ok?
+    return crc;
 }
 tb_uint32_t tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t const* cstr)
 {
-	// check
-	tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && cstr, 0);
+    // check
+    tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && cstr, 0);
 
-	// done
+    // done
 #ifdef tb_crc32_encode
-# 	ifndef __tb_small__
-	if (mode == TB_CRC_MODE_32_IEEE_LE || mode == TB_CRC_MODE_32_IEEE)
-# 	else
-	if (mode == TB_CRC_MODE_32_IEEE_LE)
-# 	endif
-	{
-		crc = tb_crc32_encode(crc, (tb_byte_t const*)cstr, tb_strlen(cstr), (tb_uint32_t const*)&g_crc_table[mode]);
-	}
-	else
-	{
-		tb_uint32_t const* 	pt = (tb_uint32_t const*)&g_crc_table[mode];
-		while (*cstr) crc = pt[((tb_uint8_t)crc) ^ *cstr++] ^ (crc >> 8);
-	}
+#   ifndef __tb_small__
+    if (mode == TB_CRC_MODE_32_IEEE_LE || mode == TB_CRC_MODE_32_IEEE)
+#   else
+    if (mode == TB_CRC_MODE_32_IEEE_LE)
+#   endif
+    {
+        crc = tb_crc32_encode(crc, (tb_byte_t const*)cstr, tb_strlen(cstr), (tb_uint32_t const*)&g_crc_table[mode]);
+    }
+    else
+    {
+        tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
+        while (*cstr) crc = pt[((tb_uint8_t)crc) ^ *cstr++] ^ (crc >> 8);
+    }
 #else
-	tb_uint32_t const* 	pt = (tb_uint32_t const*)&g_crc_table[mode];
-	while (*cstr) crc = pt[((tb_uint8_t)crc) ^ *cstr++] ^ (crc >> 8);
+    tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
+    while (*cstr) crc = pt[((tb_uint8_t)crc) ^ *cstr++] ^ (crc >> 8);
 #endif
 
-	// ok?
-	return crc;
+    // ok?
+    return crc;
 }

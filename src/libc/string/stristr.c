@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		stristr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        stristr.c
+ * @ingroup     libc
  *
  */
 
@@ -28,7 +28,7 @@
 #include "string.h"
 
 #ifdef TB_CONFIG_LIBC_HAVE_STRISTR
-# 	include <string.h>
+#   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -38,39 +38,39 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRISTR
 tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
-	return strcasestr(s1, s2);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    return strcasestr(s1, s2);
 }
 #else
 tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    // check
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	// init
-	__tb_register__ tb_char_t const* s = s1;
-	__tb_register__ tb_char_t const* p = s2;
+    // init
+    __tb_register__ tb_char_t const* s = s1;
+    __tb_register__ tb_char_t const* p = s2;
 
-	// done
-	do 
-	{
-		if (!*p) return (tb_char_t* )s1;
-		if ((*p == *s) 	|| (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s)))) 
-		{
-			++p;
-			++s;
-		} 
-		else 
-		{
-			p = s2;
-			if (!*s) return tb_null;
-			s = ++s1;
-		}
+    // done
+    do 
+    {
+        if (!*p) return (tb_char_t* )s1;
+        if ((*p == *s)  || (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s)))) 
+        {
+            ++p;
+            ++s;
+        } 
+        else 
+        {
+            p = s2;
+            if (!*s) return tb_null;
+            s = ++s1;
+        }
 
-	} while (1);
+    } while (1);
 
-	// no found
-	return tb_null;
+    // no found
+    return tb_null;
 }
 #endif
 

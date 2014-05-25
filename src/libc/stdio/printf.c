@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		printf.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        printf.c
+ * @ingroup     libc
  *
  */
 
@@ -34,17 +34,17 @@
 
 tb_long_t tb_printf(tb_char_t const* format, ...)
 {
-	// check
-	tb_check_return_val(format, 0);
+    // check
+    tb_check_return_val(format, 0);
 
-	// format line
-	tb_long_t size = 0;
-	tb_char_t line[8192] = {0};
-	tb_vsnprintf_format(line, sizeof(line) - 1, format, &size);
+    // format line
+    tb_long_t size = 0;
+    tb_char_t line[8192] = {0};
+    tb_vsnprintf_format(line, sizeof(line) - 1, format, &size);
 
-	// print it
-	tb_print(line);
+    // print it
+    tb_print(line);
 
-	// ok?
-	return size;
+    // ok?
+    return size;
 }

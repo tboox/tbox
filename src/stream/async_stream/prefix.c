@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.c
+ * @author      ruki
+ * @file        prefix.c
  *
  */
 
@@ -44,7 +44,7 @@ static tb_void_t tb_async_stream_clos_opening(tb_async_stream_t* stream, tb_size
     tb_trace_d("clos: opening: %s, state: %s", tb_url_get(&stream->base.url), tb_state_cstr(stream->clos_opening.state));
 
     // closed
-	tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
+    tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
 
     // done func
     if (stream->clos_opening.func) stream->clos_opening.func(stream, stream->clos_opening.state, stream->clos_opening.priv);
@@ -58,14 +58,14 @@ tb_void_t tb_async_stream_clear(tb_async_stream_t* stream)
     // check
     tb_assert_and_check_return(stream);
 
-	// clear rcache
-	tb_scoped_buffer_clear(&stream->rcache_data);
+    // clear rcache
+    tb_scoped_buffer_clear(&stream->rcache_data);
 
-	// clear wcache
-	tb_scoped_buffer_clear(&stream->wcache_data);
+    // clear wcache
+    tb_scoped_buffer_clear(&stream->wcache_data);
 
     // clear istate
-	tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
+    tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
 }
 tb_bool_t tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {

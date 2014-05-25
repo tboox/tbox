@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strnlen.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        strnlen.c
+ * @ingroup     libc
  *
  */
 
@@ -28,15 +28,15 @@
 #include "string.h"
 #include "../../memory/memory.h"
 #ifndef TB_CONFIG_LIBC_HAVE_STRNLEN
-# 	if defined(TB_ARCH_x86)
-# 		include "opt/x86/strnlen.c"
-# 	elif defined(TB_ARCH_ARM)
-# 		include "opt/arm/strnlen.c"
-# 	elif defined(TB_ARCH_SH4)
-# 		include "opt/sh4/strnlen.c"
-# 	endif
+#   if defined(TB_ARCH_x86)
+#       include "opt/x86/strnlen.c"
+#   elif defined(TB_ARCH_ARM)
+#       include "opt/arm/strnlen.c"
+#   elif defined(TB_ARCH_SH4)
+#       include "opt/sh4/strnlen.c"
+#   endif
 #else
-# 	include <string.h>
+#   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -45,34 +45,34 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRNLEN)
 static tb_size_t tb_strnlen_impl(tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, 0);
-	return strnlen(s, n);
+    tb_assert_and_check_return_val(s, 0);
+    return strnlen(s, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRNLEN)
 static tb_size_t tb_strnlen_impl(tb_char_t const* s, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s, 0);
-	if (!n) return 0;
+    // check
+    tb_assert_and_check_return_val(s, 0);
+    if (!n) return 0;
 
-	__tb_register__ tb_char_t const* p = s;
+    __tb_register__ tb_char_t const* p = s;
 
 #ifdef __tb_small__
-	while (n-- && *p) ++p;
-	return p - s;
+    while (n-- && *p) ++p;
+    return p - s;
 #else
-	tb_size_t l = n & 0x3; n = (n - l) >> 2;
-	while (n--)
-	{
-		if (!p[0]) return (p - s + 0);
-		if (!p[1]) return (p - s + 1);
-		if (!p[2]) return (p - s + 2);
-		if (!p[3]) return (p - s + 3);
-		p += 4;
-	}
+    tb_size_t l = n & 0x3; n = (n - l) >> 2;
+    while (n--)
+    {
+        if (!p[0]) return (p - s + 0);
+        if (!p[1]) return (p - s + 1);
+        if (!p[2]) return (p - s + 2);
+        if (!p[3]) return (p - s + 3);
+        p += 4;
+    }
 
-	while (l-- && *p) ++p;
-	return p - s;
+    while (l-- && *p) ++p;
+    return p - s;
 #endif
 }
 #endif
@@ -82,26 +82,26 @@ static tb_size_t tb_strnlen_impl(tb_char_t const* s, tb_size_t n)
  */
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
-	// check
+    // check
 #ifdef __tb_debug__
-	{
-		// overflow? 
-		tb_size_t size = tb_memory_data_size(s);
-		if (size)
-		{
-			// no '\0'?
-			tb_size_t real = tb_strnlen_impl(s, size);
-			if (s[real])
-			{
-				tb_trace_i("[strnlen]: [overflow]: [%p, %lu]", s, size);
-				tb_backtrace_dump("[strnlen]: [overflow]: ", tb_null, 10);
-				tb_memory_data_dump(s, "\t[malloc]: [from]: ");
-				tb_abort();
-			}
-		}
-	}
+    {
+        // overflow? 
+        tb_size_t size = tb_memory_data_size(s);
+        if (size)
+        {
+            // no '\0'?
+            tb_size_t real = tb_strnlen_impl(s, size);
+            if (s[real])
+            {
+                tb_trace_i("[strnlen]: [overflow]: [%p, %lu]", s, size);
+                tb_backtrace_dump("[strnlen]: [overflow]: ", tb_null, 10);
+                tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+                tb_abort();
+            }
+        }
+    }
 #endif
 
-	// done
-	return tb_strnlen_impl(s, n);
+    // done
+    return tb_strnlen_impl(s, n);
 }

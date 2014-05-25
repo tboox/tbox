@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		barrier.h
+ * @author      ruki
+ * @file        barrier.h
  *
  */
 #ifndef TB_PLATFORM_COMPILER_GCC_BARRIER_H
@@ -33,7 +33,7 @@
  */
 
 #ifndef tb_barrier
-# 	define tb_barrier() 		__sync_synchronize()
+#   define tb_barrier()         __sync_synchronize()
 #endif
 
 #endif

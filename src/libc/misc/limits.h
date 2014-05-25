@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		limits.h
- * @ingroup 	libc
+ * @author      ruki
+ * @file        limits.h
+ * @ingroup     libc
  *
  */
 #ifndef TB_LIBC_MISC_LIMITS_H

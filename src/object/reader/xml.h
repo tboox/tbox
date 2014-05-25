@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		xml.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        xml.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_READER_XML_H
@@ -36,13 +36,13 @@
 /// the xml reader type
 typedef struct __tb_object_xml_reader_t
 {
-	/// the xml reader
-	tb_handle_t 				reader;
+    /// the xml reader
+    tb_handle_t                 reader;
 
 }tb_object_xml_reader_t;
 
 /// the xml reader func type
-typedef tb_object_t* 			(*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* reader, tb_size_t event);
+typedef tb_object_t*            (*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* reader, tb_size_t event);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -50,26 +50,26 @@ typedef tb_object_t* 			(*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* r
 
 /*! the xml object reader
  *
- * @return 						the xml object reader
+ * @return                      the xml object reader
  */
-tb_object_reader_t* 			tb_object_xml_reader(tb_noarg_t);
+tb_object_reader_t*             tb_object_xml_reader(tb_noarg_t);
 
 /*! hook the xml reader
  *
- * @param type 					the object type name
- * @param func 					the reader func
+ * @param type                  the object type name
+ * @param func                  the reader func
  *
- * @return 						tb_true or tb_false
+ * @return                      tb_true or tb_false
  */
-tb_bool_t 						tb_object_xml_reader_hook(tb_char_t const* type, tb_object_xml_reader_func_t func);
+tb_bool_t                       tb_object_xml_reader_hook(tb_char_t const* type, tb_object_xml_reader_func_t func);
 
 /*! the xml reader func
  *
- * @param type 					the object type name
+ * @param type                  the object type name
  *
- * @return 						the object reader func
+ * @return                      the object reader func
  */
-tb_object_xml_reader_func_t 	tb_object_xml_reader_func(tb_char_t const* type);
+tb_object_xml_reader_func_t     tb_object_xml_reader_func(tb_char_t const* type);
 
 #endif
 

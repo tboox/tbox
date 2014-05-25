@@ -165,8 +165,8 @@ static tb_void_t tb_async_stream_file_clos_func(tb_handle_t aico, tb_cpointer_t 
     // clear aico
     fstream->aico = tb_null;
 
-	// clear base
-	tb_async_stream_clear(&fstream->base);
+    // clear base
+    tb_async_stream_clear(&fstream->base);
 
     /* done clos func
      *

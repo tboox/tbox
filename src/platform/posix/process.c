@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		process.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        process.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -33,9 +33,9 @@
  */
 tb_bool_t tb_process_done(tb_char_t const* line)
 {
-	// check
-	tb_assert_and_check_return_val(line, tb_false);
+    // check
+    tb_assert_and_check_return_val(line, tb_false);
 
-	// done
-	return !system(line)? tb_true : tb_false;
+    // done
+    return !system(line)? tb_true : tb_false;
 }

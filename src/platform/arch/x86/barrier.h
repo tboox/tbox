@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		barrier.h
+ * @author      ruki
+ * @file        barrier.h
  *
  */
 #ifndef TB_PLATFORM_ARCH_x86_BARRIER_H
@@ -33,9 +33,9 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-# 	ifndef tb_barrier
-# 		define tb_barrier() 			__tb_asm__ __tb_volatile__ ("" ::: "memory")
-# 	endif
+#   ifndef tb_barrier
+#       define tb_barrier()             __tb_asm__ __tb_volatile__ ("" ::: "memory")
+#   endif
 #endif
 
 

@@ -16,16 +16,16 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		aiop.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        aiop.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"platform_aiop"
-#define TB_TRACE_MODULE_DEBUG 			(0)
+#define TB_TRACE_MODULE_NAME            "platform_aiop"
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -41,30 +41,30 @@ tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-# 	include "../posix/asio/aiop_select.c"
-	tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
-	{
-		return tb_aiop_reactor_select_init(aiop);
-	}
+#   include "../posix/asio/aiop_select.c"
+    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+    {
+        return tb_aiop_reactor_select_init(aiop);
+    }
 #elif defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
-# 	include "../linux/asio/aiop_epoll.c"
-	tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
-	{
-		return tb_aiop_reactor_epoll_init(aiop);
-	}
+#   include "../linux/asio/aiop_epoll.c"
+    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+    {
+        return tb_aiop_reactor_epoll_init(aiop);
+    }
 #elif defined(TB_CONFIG_OS_MAC)
-# 	include "../mach/asio/aiop_kqueue.c"
-	tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
-	{
-		return tb_aiop_reactor_kqueue_init(aiop);
-	}
+#   include "../mach/asio/aiop_kqueue.c"
+    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+    {
+        return tb_aiop_reactor_kqueue_init(aiop);
+    }
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-# 	include "../posix/asio/aiop_poll.c"
-	tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
-	{
-		return tb_aiop_reactor_poll_init(aiop);
-	}
+#   include "../posix/asio/aiop_poll.c"
+    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+    {
+        return tb_aiop_reactor_poll_init(aiop);
+    }
 #else
-# 	error have not available event mode
+#   error have not available event mode
 #endif
 

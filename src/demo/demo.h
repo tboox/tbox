@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		demo.h
+ * @author      ruki
+ * @file        demo.h
  *
  */
 #ifndef TB_DEMO_H
@@ -35,7 +35,7 @@
  */
 
 // the main decl
-#define TB_DEMO_MAIN_DECL(name) 		tb_int_t tb_demo_##name##_main(tb_int_t argc, tb_char_t** argv)
+#define TB_DEMO_MAIN_DECL(name)         tb_int_t tb_demo_##name##_main(tb_int_t argc, tb_char_t** argv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

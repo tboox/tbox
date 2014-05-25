@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		cache_time.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        cache_time.c
+ * @ingroup     platform
  *
  */
 
@@ -35,36 +35,36 @@
  */
 
 // the cached time
-static tb_atomic64_t 	g_time = 0;
+static tb_atomic64_t    g_time = 0;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_hong_t tb_cache_time_spak()
 {
-	// get the time
-	tb_timeval_t tv = {0};
+    // get the time
+    tb_timeval_t tv = {0};
     if (!tb_gettimeofday(&tv, tb_null)) return -1;
 
-	// the time value
-	tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
+    // the time value
+    tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
-	// save it
-	tb_atomic64_set(&g_time, val);
+    // save it
+    tb_atomic64_set(&g_time, val);
 
-	// ok
-	return val;
+    // ok
+    return val;
 }
 tb_hong_t tb_cache_time_mclock()
 {
-	return (tb_hong_t)tb_atomic64_get(&g_time);
+    return (tb_hong_t)tb_atomic64_get(&g_time);
 }
 tb_hong_t tb_cache_time_sclock()
 {
-	return (tb_hong_t)tb_atomic64_get(&g_time) / 1000;
+    return (tb_hong_t)tb_atomic64_get(&g_time) / 1000;
 }
 tb_time_t tb_cache_time()
 {
-	return (tb_time_t)tb_atomic64_get(&g_time) / 1000;
+    return (tb_time_t)tb_atomic64_get(&g_time) / 1000;
 }
 

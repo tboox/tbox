@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		iso8859.c
- * @ingroup 	charset
+ * @author      ruki
+ * @file        iso8859.c
+ * @ingroup     charset
  *
  */
 
@@ -34,26 +34,26 @@
 tb_long_t tb_charset_iso8859_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_iso8859_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
 {
-	tb_byte_t b = tb_static_stream_read_u8(sstream);
-	if (b < 0xa0) *ch = b;
-	else
-	{
-		// @note: need lookup characters table
-		tb_trace_d("iso8859: unknown character: %x", b);
-		*ch = 0;
-	}
-	return 1;
+    tb_byte_t b = tb_static_stream_read_u8(sstream);
+    if (b < 0xa0) *ch = b;
+    else
+    {
+        // @note: need lookup characters table
+        tb_trace_d("iso8859: unknown character: %x", b);
+        *ch = 0;
+    }
+    return 1;
 }
 
 tb_long_t tb_charset_iso8859_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
 tb_long_t tb_charset_iso8859_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
 {
-	if (ch <= 0xa0) tb_static_stream_writ_u8(sstream, (tb_uint8_t)ch);
-	else 
-	{
-		// @note: need lookup characters table
-		tb_trace_d("iso8859: unknown character: %x", ch);
-	}
-	return 1;
+    if (ch <= 0xa0) tb_static_stream_writ_u8(sstream, (tb_uint8_t)ch);
+    else 
+    {
+        // @note: need lookup characters table
+        tb_trace_d("iso8859: unknown character: %x", ch);
+    }
+    return 1;
 }
 

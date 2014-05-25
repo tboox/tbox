@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		event.c
+ * @author      ruki
+ * @file        event.c
  *
  */
 
@@ -34,38 +34,38 @@
 
 tb_handle_t tb_event_init()
 {
-	HANDLE handle = CreateEventA(tb_null, FALSE, FALSE, tb_null);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
+    HANDLE handle = CreateEventA(tb_null, FALSE, FALSE, tb_null);
+    return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
-	if (handle) CloseHandle(handle);
+    if (handle) CloseHandle(handle);
 }
 tb_bool_t tb_event_post(tb_handle_t handle)
 {
-	// check
-	tb_assert_and_check_return_val(handle, tb_false);
-	
-	// post
-	return SetEvent(handle)? tb_true : tb_false;
+    // check
+    tb_assert_and_check_return_val(handle, tb_false);
+    
+    // post
+    return SetEvent(handle)? tb_true : tb_false;
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	// check
-	tb_assert_and_check_return_val(handle, -1);
+    // check
+    tb_assert_and_check_return_val(handle, -1);
 
-	// wait
-	tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
-	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
+    // wait
+    tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
+    tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
-	// timeout?
-	tb_check_return_val(r != WAIT_TIMEOUT, 0);
+    // timeout?
+    tb_check_return_val(r != WAIT_TIMEOUT, 0);
 
-	// error?
-	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
+    // error?
+    tb_check_return_val(r >= WAIT_OBJECT_0, -1);
 
-	// ok
-	return 1;
+    // ok
+    return 1;
 }
 
 

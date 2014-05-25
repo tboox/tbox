@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		barrier.h
+ * @author      ruki
+ * @file        barrier.h
  *
  */
 #ifndef TB_PLATFORM_WINDOWS_BARRIER_H
@@ -33,11 +33,11 @@
  * macros
  */
 #if defined(MemoryBarrier)
-# 	define tb_barrier() 		MemoryBarrier()
+#   define tb_barrier()         MemoryBarrier()
 #elif defined(_AMD64_)
-# 	define tb_barrier() 		__faststorefence()
+#   define tb_barrier()         __faststorefence()
 #elif defined(_IA64_)
-# 	define tb_barrier() 		__mf()
+#   define tb_barrier()         __mf()
 #endif
 
 

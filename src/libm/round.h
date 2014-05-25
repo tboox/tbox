@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		round.h
- * @ingroup 	libm
+ * @author      ruki
+ * @file        round.h
+ * @ingroup     libm
  *
  */
 #ifndef TB_LIBM_ROUND_H
@@ -32,6 +32,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_round(x) 				((x) > 0? (tb_int32_t)((x) + 0.5) : (tb_int32_t)((x) - 0.5))
+#define tb_round(x)                 ((x) > 0? (tb_int32_t)((x) + 0.5) : (tb_int32_t)((x) - 0.5))
 
 #endif

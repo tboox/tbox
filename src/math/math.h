@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @author      ruki
+ * @file        math.h
+ * @defgroup    math
  *
  */
 #ifndef TB_MATH_H
@@ -41,12 +41,12 @@
 
 /*! init math 
  *
- * @return 		tb_true or tb_false
+ * @return      tb_true or tb_false
  */
-tb_bool_t 		tb_math_init(tb_noarg_t);
+tb_bool_t       tb_math_init(tb_noarg_t);
 
 /// exit math 
-tb_void_t 		tb_math_exit(tb_noarg_t);
+tb_void_t       tb_math_exit(tb_noarg_t);
 
 #endif
 

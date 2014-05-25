@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		bits.h
+ * @author      ruki
+ * @file        bits.h
  *
  */
 #ifndef TB_UTILS_OPT_SH4_BITS_H
@@ -33,10 +33,10 @@
  */
 // swap
 #ifndef tb_bits_swap_u16
-# 	define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
+#   define tb_bits_swap_u16(x)              tb_bits_swap_u16_asm(x)
 #endif
 #ifndef tb_bits_swap_u32
-# 	define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
+#   define tb_bits_swap_u32(x)              tb_bits_swap_u32_asm(x)
 #endif
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -45,17 +45,17 @@
 // swap
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 {
-	__tb_asm__("swap.b %0,%0" : "+r"(x));
-	return x;
+    __tb_asm__("swap.b %0,%0" : "+r"(x));
+    return x;
 }
 
 static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 {
-	__tb_asm__( "swap.b %0,%0\n"
-				"swap.w %0,%0\n"
-				"swap.b %0,%0\n"
-				: "+r"(x));
-	return x;
+    __tb_asm__( "swap.b %0,%0\n"
+                "swap.w %0,%0\n"
+                "swap.b %0,%0\n"
+                : "+r"(x));
+    return x;
 }
 
 

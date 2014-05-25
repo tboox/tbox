@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		static_tiny_pool.h
- * @ingroup 	memory
+ * @author      ruki
+ * @file        static_tiny_pool.h
+ * @ingroup     memory
  *
  */
 #ifndef TB_MEMORY_STATIC_TINY_POOL_H
@@ -34,36 +34,36 @@
  */
 
 // init
-tb_handle_t 	tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
+tb_handle_t     tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
 // exit
-tb_void_t 		tb_tiny_pool_exit(tb_handle_t handle);
+tb_void_t       tb_tiny_pool_exit(tb_handle_t handle);
 
 // limit
-tb_size_t 		tb_tiny_pool_limit(tb_handle_t handle);
+tb_size_t       tb_tiny_pool_limit(tb_handle_t handle);
 
 // clear
-tb_void_t 		tb_tiny_pool_clear(tb_handle_t handle);
+tb_void_t       tb_tiny_pool_clear(tb_handle_t handle);
 
 // malloc
-tb_pointer_t 	tb_tiny_pool_malloc(tb_handle_t handle, tb_size_t size);
+tb_pointer_t    tb_tiny_pool_malloc(tb_handle_t handle, tb_size_t size);
 
 // malloc0
-tb_pointer_t 	tb_tiny_pool_malloc0(tb_handle_t handle, tb_size_t size);
+tb_pointer_t    tb_tiny_pool_malloc0(tb_handle_t handle, tb_size_t size);
 
 // nalloc
-tb_pointer_t  	tb_tiny_pool_nalloc(tb_handle_t handle, tb_size_t item, tb_size_t size);
+tb_pointer_t    tb_tiny_pool_nalloc(tb_handle_t handle, tb_size_t item, tb_size_t size);
 
 // nalloc0
-tb_pointer_t  	tb_tiny_pool_nalloc0(tb_handle_t handle, tb_size_t item, tb_size_t size);
+tb_pointer_t    tb_tiny_pool_nalloc0(tb_handle_t handle, tb_size_t item, tb_size_t size);
 
 // ralloc
-tb_pointer_t 	tb_tiny_pool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_t size);
+tb_pointer_t    tb_tiny_pool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_t size);
 
 // free
-tb_bool_t 		tb_tiny_pool_free(tb_handle_t handle, tb_pointer_t data);
+tb_bool_t       tb_tiny_pool_free(tb_handle_t handle, tb_pointer_t data);
 
 // dump
-tb_void_t 		tb_tiny_pool_dump(tb_handle_t handle);
+tb_void_t       tb_tiny_pool_dump(tb_handle_t handle);
 
 #endif

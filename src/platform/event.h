@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		event.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        event.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_EVENT_H
@@ -36,32 +36,32 @@
 
 /*! init event
  * 
- * @return 			the event handle
+ * @return          the event handle
  */
-tb_handle_t 		tb_event_init(tb_noarg_t);
+tb_handle_t         tb_event_init(tb_noarg_t);
 
 /*! exit event
  * 
- * @param handle 	the event handle
+ * @param handle    the event handle
  */
-tb_void_t 			tb_event_exit(tb_handle_t handle);
+tb_void_t           tb_event_exit(tb_handle_t handle);
 
 /*! post event
  * 
- * @param handle 	the event handle
+ * @param handle    the event handle
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_event_post(tb_handle_t handle);
+tb_bool_t           tb_event_post(tb_handle_t handle);
 
 /*! wait event
  * 
- * @param handle 	the event handle
- * @param timeout 	the timeout
+ * @param handle    the event handle
+ * @param timeout   the timeout
  *
- * @return 			ok: 1, timeout: 0, fail: -1
+ * @return          ok: 1, timeout: 0, fail: -1
  */
-tb_long_t 			tb_event_wait(tb_handle_t handle, tb_long_t timeout);
+tb_long_t           tb_event_wait(tb_handle_t handle, tb_long_t timeout);
 
-	
+    
 #endif

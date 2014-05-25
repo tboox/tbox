@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		bits.h
+ * @author      ruki
+ * @file        bits.h
  *
  */
 #ifndef TB_UTILS_OPT_x86_BITS_H
@@ -36,13 +36,13 @@
 
 // swap
 #ifndef tb_bits_swap_u16
-# 	define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
+#   define tb_bits_swap_u16(x)              tb_bits_swap_u16_asm(x)
 #endif
 #ifndef tb_bits_swap_u32
-# 	define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
+#   define tb_bits_swap_u32(x)              tb_bits_swap_u32_asm(x)
 #endif
 #ifndef tb_bits_swap_u64
-# 	define tb_bits_swap_u64(x) 				tb_bits_swap_u64_asm(x)
+#   define tb_bits_swap_u64(x)              tb_bits_swap_u64_asm(x)
 #endif
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
@@ -55,46 +55,46 @@
 // swap
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 {
-	__tb_asm__ __tb_volatile__("rorw 	$8, %w0" : "+r"(x));
-	return x;
+    __tb_asm__ __tb_volatile__("rorw    $8, %w0" : "+r"(x));
+    return x;
 }
 
 static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 {
 #if 1
-	__tb_asm__ __tb_volatile__("bswap 	%0" : "+r" (x));
+    __tb_asm__ __tb_volatile__("bswap   %0" : "+r" (x));
 #else
-	__tb_asm__ __tb_volatile__
-	(
-		"rorw 	$8,  %w0 \n" 	//!< swap low 16 bits
-		"rorl 	$16, %0  \n" 	//!< swap x by word
-		"rorw 	$8,  %w0" 		//!< swap low 16 bits
+    __tb_asm__ __tb_volatile__
+    (
+        "rorw   $8,  %w0 \n"    //!< swap low 16 bits
+        "rorl   $16, %0  \n"    //!< swap x by word
+        "rorw   $8,  %w0"       //!< swap low 16 bits
 
-		: "+r"(x)
-	);
+        : "+r"(x)
+    );
 #endif
-	return x;
+    return x;
 }
 
 static __tb_inline__ tb_hize_t const tb_bits_swap_u64_asm(tb_hize_t x)
 {
-	__tb_register__ tb_size_t esi, edi;
-	__tb_asm__ __tb_volatile__
-	(
-		"lodsl\n"
-		"bswap 	%%eax\n"
-		"movl 	%%eax, %%ebx\n"
-		"lodsl\n"
-		"bswap 	%%eax\n"
-		"stosl\n"
-		"movl 	%%ebx, %%eax\n"
-		"stosl\n"
+    __tb_register__ tb_size_t esi, edi;
+    __tb_asm__ __tb_volatile__
+    (
+        "lodsl\n"
+        "bswap  %%eax\n"
+        "movl   %%eax, %%ebx\n"
+        "lodsl\n"
+        "bswap  %%eax\n"
+        "stosl\n"
+        "movl   %%ebx, %%eax\n"
+        "stosl\n"
 
-		: "=&S" (esi), "=&D" (edi)
-		: "0"(&x), "1"(&x)
-		: "memory", "eax", "ebx"
-	);
-	return x;
+        : "=&S" (esi), "=&D" (edi)
+        : "0"(&x), "1"(&x)
+        : "memory", "eax", "ebx"
+    );
+    return x;
 }
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */

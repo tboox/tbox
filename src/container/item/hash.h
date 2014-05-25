@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		hash.h
+ * @author      ruki
+ * @file        hash.h
  *
  */
 #ifndef TB_CONTAINER_ITEM_HASH_H
@@ -34,63 +34,63 @@
 
 /* compute the uint8 hash 
  *
- * @param value 	the value
- * @param mask 		the mask
- * @param index 	the hash func index
+ * @param value     the value
+ * @param mask      the mask
+ * @param index     the hash func index
  *
- * @return 			the hash value
+ * @return          the hash value
  */
-tb_size_t 			tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the uint16 hash 
  *
- * @param value 	the value
- * @param mask 		the mask
- * @param index 	the hash func index
+ * @param value     the value
+ * @param mask      the mask
+ * @param index     the hash func index
  *
- * @return 			the hash value
+ * @return          the hash value
  */
-tb_size_t 			tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the uint32 hash 
  *
- * @param value 	the value
- * @param mask 		the mask
- * @param index 	the hash func index
+ * @param value     the value
+ * @param mask      the mask
+ * @param index     the hash func index
  *
- * @return 			the hash value
+ * @return          the hash value
  */
-tb_size_t 			tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the uint64 hash 
  *
- * @param value 	the value
- * @param mask 		the mask
- * @param index 	the hash func index
+ * @param value     the value
+ * @param mask      the mask
+ * @param index     the hash func index
  *
- * @return 			the hash value
+ * @return          the hash value
  */
-tb_size_t 			tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the data hash 
  *
- * @param data 		the data
- * @param size 		the size
- * @param mask 		the mask
- * @param index 	the hash func index
+ * @param data      the data
+ * @param size      the size
+ * @param mask      the mask
+ * @param index     the hash func index
  *
- * @return 			the hash value
+ * @return          the hash value
  */
-tb_size_t 			tb_item_func_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_item_func_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t mask, tb_size_t index);
 
 /* compute the cstring hash 
  *
- * @param cstr 		the cstring
- * @param mask 		the mask
- * @param index 	the hash func index
+ * @param cstr      the cstring
+ * @param mask      the mask
+ * @param index     the hash func index
  *
- * @return 			the hash value
+ * @return          the hash value
  */
-tb_size_t 			tb_item_func_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_item_func_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t index);
 
 #endif

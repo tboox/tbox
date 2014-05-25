@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strlen.c
+ * @author      ruki
+ * @file        strlen.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-//# 	define TB_LIBC_STRING_OPT_STRLEN
+//#     define TB_LIBC_STRING_OPT_STRLEN
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,8 +39,8 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 static tb_size_t tb_strlen_impl(tb_char_t const* s)
 {
-	tb_assert_and_check_return_val(s, 0);
+    tb_assert_and_check_return_val(s, 0);
 
-	return 0;
+    return 0;
 }
 #endif

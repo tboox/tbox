@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		packed_e.h
+ * @author      ruki
+ * @file        packed_e.h
  *
  */
 
@@ -37,8 +37,8 @@
  * #include "tbox/prefix/packed.h"
  * typedef struct __tb_xxxxx_t
  * {
- * 		tb_byte_t 	a;
- * 		tb_uint32_t b;
+ *      tb_byte_t   a;
+ *      tb_uint32_t b;
  *
  * } __tb_packed__ tb_xxxxx_t;
  *
@@ -48,16 +48,16 @@
  *
  */
 #ifdef TB_COMPILER_IS_MSVC
-# 	ifndef TB_PACKED_ENTER
-# 		ifdef TB_PACKED_ALIGN
-# 			pragma pack(push, TB_PACKED_ALIGN)
-# 		else
-# 			pragma pack(push, 1)
-# 		endif
-# 		define TB_PACKED_ENTER
-# 	else
-# 		pragma pack(pop)
-# 		undef TB_PACKED_ENTER
-# 		undef TB_PACKED_ALIGN
-# 	endif
+#   ifndef TB_PACKED_ENTER
+#       ifdef TB_PACKED_ALIGN
+#           pragma pack(push, TB_PACKED_ALIGN)
+#       else
+#           pragma pack(push, 1)
+#       endif
+#       define TB_PACKED_ENTER
+#   else
+#       pragma pack(pop)
+#       undef TB_PACKED_ENTER
+#       undef TB_PACKED_ALIGN
+#   endif
 #endif

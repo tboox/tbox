@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		network.c
- * @defgroup 	network
+ * @author      ruki
+ * @file        network.c
+ * @defgroup    network
  *
  */
 
@@ -32,20 +32,20 @@
  */
 tb_bool_t tb_network_init()
 {
-	// init dns server
-	if (!tb_dns_server_init()) return tb_false;
+    // init dns server
+    if (!tb_dns_server_init()) return tb_false;
 
-	// init dns cache
-	if (!tb_dns_cache_init()) return tb_false;
+    // init dns cache
+    if (!tb_dns_cache_init()) return tb_false;
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }
 tb_void_t tb_network_exit()
 {
-	// exit dns cache
-	tb_dns_cache_exit();
+    // exit dns cache
+    tb_dns_cache_exit();
 
-	// exit dns server
-	tb_dns_server_exit();
+    // exit dns server
+    tb_dns_server_exit();
 }

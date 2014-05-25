@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		thread.c
+ * @author      ruki
+ * @file        thread.c
  *
  */
 
@@ -33,43 +33,43 @@
 
 tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack)
 {
-	HANDLE handle = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)priv, 0, NULL);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
+    HANDLE handle = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)priv, 0, NULL);
+    return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_thread_exit(tb_handle_t handle)
 {
-	if (handle) CloseHandle(handle);
+    if (handle) CloseHandle(handle);
 }
 tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	// wait
-	tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
-	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
+    // wait
+    tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
+    tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
-	// timeout?
-	tb_check_return_val(r != WAIT_TIMEOUT, 0);
+    // timeout?
+    tb_check_return_val(r != WAIT_TIMEOUT, 0);
 
-	// error?
-	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
+    // error?
+    tb_check_return_val(r >= WAIT_OBJECT_0, -1);
 
-	// ok
-	return 1;
+    // ok
+    return 1;
 }
 tb_void_t tb_thread_return(tb_pointer_t value)
 {
-	ExitThread(0);
+    ExitThread(0);
 }
 tb_bool_t tb_thread_suspend(tb_handle_t handle)
 {
-	if (handle) return ((DWORD)-1 != SuspendThread(handle))? tb_true : tb_false;
-	return tb_false;
+    if (handle) return ((DWORD)-1 != SuspendThread(handle))? tb_true : tb_false;
+    return tb_false;
 }
 tb_bool_t tb_thread_resume(tb_handle_t handle)
 {
-	if (handle) return ((DWORD)-1 != ResumeThread(handle))? tb_true : tb_false;
-	return tb_false;
+    if (handle) return ((DWORD)-1 != ResumeThread(handle))? tb_true : tb_false;
+    return tb_false;
 }
 tb_size_t tb_thread_self()
 {
-	return (tb_size_t)GetCurrentThreadId();
+    return (tb_size_t)GetCurrentThreadId();
 }

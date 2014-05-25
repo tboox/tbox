@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		mutex.c
+ * @author      ruki
+ * @file        mutex.c
  *
  */
 
@@ -34,41 +34,41 @@
 
 tb_handle_t tb_mutex_init()
 {
-	HANDLE handle = CreateMutex(tb_null, FALSE, tb_null);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
+    HANDLE handle = CreateMutex(tb_null, FALSE, tb_null);
+    return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_mutex_exit(tb_handle_t handle)
 {
-	if (handle) CloseHandle(handle);
+    if (handle) CloseHandle(handle);
 }
 tb_bool_t tb_mutex_enter(tb_handle_t handle)
 {
-	// try to enter for profiler
+    // try to enter for profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-	if (tb_mutex_enter_try(handle)) return tb_true;
+    if (tb_mutex_enter_try(handle)) return tb_true;
 #endif
-	
-	// enter
-	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return tb_true;
+    
+    // enter
+    if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return tb_true;
 
-	// failed
-	return tb_false;
+    // failed
+    return tb_false;
 }
 tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
 {
-	// try to enter
-	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, 0)) return tb_true;
-	
-	// occupied
+    // try to enter
+    if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, 0)) return tb_true;
+    
+    // occupied
 #ifdef TB_LOCK_PROFILER_ENABLE
-	tb_lock_profiler_occupied(tb_lock_profiler(), handle);
+    tb_lock_profiler_occupied(tb_lock_profiler(), handle);
 #endif
 
-	// failed
-	return tb_false;
+    // failed
+    return tb_false;
 }
 tb_bool_t tb_mutex_leave(tb_handle_t handle)
 {
-	if (handle) return ReleaseMutex(handle)? tb_true : tb_false;
-	return tb_false;
+    if (handle) return ReleaseMutex(handle)? tb_true : tb_false;
+    return tb_false;
 }

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		crc.h
- * @ingroup 	utils
+ * @author      ruki
+ * @file        crc.h
+ * @ingroup     utils
  *
  */
 #ifndef TB_UTILS_CRC_H
@@ -37,16 +37,16 @@
 typedef enum __tb_crc_mode_t
 {
 #ifdef __tb_small__
-	TB_CRC_MODE_16_CCITT 	= 0
-,	TB_CRC_MODE_32_IEEE_LE 	= 1
-,	TB_CRC_MODE_MAX 		= 2
+    TB_CRC_MODE_16_CCITT    = 0
+,   TB_CRC_MODE_32_IEEE_LE  = 1
+,   TB_CRC_MODE_MAX         = 2
 #else
-	TB_CRC_MODE_8_ATM 		= 0
-,	TB_CRC_MODE_16_ANSI 	= 1
-,	TB_CRC_MODE_16_CCITT 	= 2
-,	TB_CRC_MODE_32_IEEE 	= 3
-,	TB_CRC_MODE_32_IEEE_LE 	= 4
-,	TB_CRC_MODE_MAX 		= 5
+    TB_CRC_MODE_8_ATM       = 0
+,   TB_CRC_MODE_16_ANSI     = 1
+,   TB_CRC_MODE_16_CCITT    = 2
+,   TB_CRC_MODE_32_IEEE     = 3
+,   TB_CRC_MODE_32_IEEE_LE  = 4
+,   TB_CRC_MODE_MAX         = 5
 #endif
 
 }tb_crc_mode_t;
@@ -57,24 +57,24 @@ typedef enum __tb_crc_mode_t
 
 /*! encode crc
  *
- * @param mode 		the crc mode
- * @param crc 		the initial crc value
- * @param ib		the input data
- * @param in 		the input size
+ * @param mode      the crc mode
+ * @param crc       the initial crc value
+ * @param ib        the input data
+ * @param in        the input size
  *
- * @return 			the crc value
+ * @return          the crc value
  */
-tb_uint32_t 		tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in);
+tb_uint32_t         tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in);
 
 /*! encode crc for cstr
  *
- * @param mode 		the crc mode
- * @param crc 		the initial crc value
- * @param cstr		the input cstr
+ * @param mode      the crc mode
+ * @param crc       the initial crc value
+ * @param cstr      the input cstr
  *
- * @return 			the crc value
+ * @return          the crc value
  */
-tb_uint32_t 		tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t const* cstr);
+tb_uint32_t         tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t const* cstr);
 
 #endif
 

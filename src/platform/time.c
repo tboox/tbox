@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		time.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        time.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -30,35 +30,35 @@
  * implementation
  */
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	include "windows/time.c"
+#   include "windows/time.c"
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-# 	include "posix/time.c"
+#   include "posix/time.c"
 #else
 tb_void_t tb_usleep(tb_size_t us)
 {
-	tb_trace_noimpl();
+    tb_trace_noimpl();
 }
 tb_void_t tb_msleep(tb_size_t ms)
 {
-	tb_trace_noimpl();
+    tb_trace_noimpl();
 }
 tb_void_t tb_sleep(tb_size_t s)
 {
-	tb_trace_noimpl();
+    tb_trace_noimpl();
 }
 tb_hong_t tb_mclock()
 {
-	tb_trace_noimpl();
-	return 0;
+    tb_trace_noimpl();
+    return 0;
 }
 tb_hong_t tb_uclock()
 {
-	tb_trace_noimpl();
-	return 0;
+    tb_trace_noimpl();
+    return 0;
 }
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
-	tb_trace_noimpl();
-	return tb_false;
+    tb_trace_noimpl();
+    return tb_false;
 }
 #endif

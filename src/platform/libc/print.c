@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		print.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        print.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -28,14 +28,14 @@
 #include "../print.h"
 #include <stdio.h>
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	include <windows.h>
+#   include <windows.h>
 #else
-# 	include <unistd.h>
+#   include <unistd.h>
 #endif
 #if defined(TB_CONFIG_OS_ANDROID)
-# 	include <android/log.h>     
+#   include <android/log.h>     
 #elif defined(TB_CONFIG_OS_IOS)
-# 	include <asl.h>
+#   include <asl.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -43,41 +43,41 @@
  */
 tb_void_t tb_print(tb_char_t const* string)
 {
-	// check
-	tb_check_return(string);
+    // check
+    tb_check_return(string);
 
 #if defined(TB_CONFIG_OS_ANDROID)
-	// print to the android device log
-	__android_log_print(ANDROID_LOG_DEBUG, TB_TRACE_PREFIX? TB_TRACE_PREFIX : "tbox", "%s", string);
+    // print to the android device log
+    __android_log_print(ANDROID_LOG_DEBUG, TB_TRACE_PREFIX? TB_TRACE_PREFIX : "tbox", "%s", string);
 #elif defined(TB_CONFIG_OS_IOS)
-	// print to the ios device log
-	asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s", string);
+    // print to the ios device log
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s", string);
 #endif
 
-	// print to the stdout
-	fputs(string, stdout);
+    // print to the stdout
+    fputs(string, stdout);
 }
 tb_void_t tb_printl(tb_char_t const* string)
 {
-	// check
-	tb_check_return(string);
+    // check
+    tb_check_return(string);
 
 #if defined(TB_CONFIG_OS_ANDROID)
-	// print to the android device log
-	__android_log_print(ANDROID_LOG_DEBUG, TB_TRACE_PREFIX? TB_TRACE_PREFIX : "tbox", "%s\n", string);
+    // print to the android device log
+    __android_log_print(ANDROID_LOG_DEBUG, TB_TRACE_PREFIX? TB_TRACE_PREFIX : "tbox", "%s\n", string);
 #elif defined(TB_CONFIG_OS_IOS)
-	// print to the ios device log
-	asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s\n", string);
+    // print to the ios device log
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s\n", string);
 #endif
 
-	// print string to the stdout
-	fputs(string, stdout);
+    // print string to the stdout
+    fputs(string, stdout);
 
-	// print newline to the stdout
-	fputs(__tb_newline__, stdout);
+    // print newline to the stdout
+    fputs(__tb_newline__, stdout);
 }
 tb_void_t tb_print_sync()
 {
-	// flush the stdout
-	fflush(stdout);
+    // flush the stdout
+    fflush(stdout);
 }

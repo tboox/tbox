@@ -303,7 +303,7 @@ static tb_void_t tb_aicp_ssl_clos_clear(tb_aicp_ssl_t* ssl)
     ssl->post.real = 0;
 
     // closed
-	tb_atomic_set(&ssl->state, TB_STATE_CLOSED);
+    tb_atomic_set(&ssl->state, TB_STATE_CLOSED);
 }
 static tb_void_t tb_aicp_ssl_clos_opening(tb_handle_t aico, tb_cpointer_t priv)
 {

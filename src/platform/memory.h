@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memory.h
- * @defgroup 	platform
+ * @author      ruki
+ * @file        memory.h
+ * @defgroup    platform
  *
  */
 #ifndef TB_PLATFORM_MEMORY_H
@@ -35,63 +35,63 @@
 
 /*! init native memory
  *
- * @return 				tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t 				tb_native_memory_init(tb_noarg_t);
+tb_bool_t               tb_native_memory_init(tb_noarg_t);
 
 /// exit native memory
-tb_void_t 				tb_native_memory_exit(tb_noarg_t);
+tb_void_t               tb_native_memory_exit(tb_noarg_t);
 
 /*! malloc the native memory
  *
- * @param size 			the size
+ * @param size          the size
  *
- * @return 				the data address
+ * @return              the data address
  */
-tb_pointer_t 			tb_native_memory_malloc(tb_size_t size);
+tb_pointer_t            tb_native_memory_malloc(tb_size_t size);
 
 /*! malloc the native memory and fill zero 
  *
- * @param size 			the size
+ * @param size          the size
  *
- * @return 				the data address
+ * @return              the data address
  */
-tb_pointer_t 			tb_native_memory_malloc0(tb_size_t size);
+tb_pointer_t            tb_native_memory_malloc0(tb_size_t size);
 
 /*! malloc the native memory with the item count
  *
- * @param item 			the item count
- * @param size 			the item size
+ * @param item          the item count
+ * @param size          the item size
  *
- * @return 				the data address
+ * @return              the data address
  */
-tb_pointer_t  			tb_native_memory_nalloc(tb_size_t item, tb_size_t size);
+tb_pointer_t            tb_native_memory_nalloc(tb_size_t item, tb_size_t size);
 
 /*! malloc the native memory with the item count and fill zero
  *
- * @param item 			the item count
- * @param size 			the item size
+ * @param item          the item count
+ * @param size          the item size
  *
- * @return 				the data address
+ * @return              the data address
  */
-tb_pointer_t  			tb_native_memory_nalloc0(tb_size_t item, tb_size_t size);
+tb_pointer_t            tb_native_memory_nalloc0(tb_size_t item, tb_size_t size);
 
 /*! realloc the native memory
  *
- * @param data 			the data address
- * @param size 			the size
+ * @param data          the data address
+ * @param size          the size
  *
- * @return 				the new data address
+ * @return              the new data address
  */
-tb_pointer_t 			tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size);
+tb_pointer_t            tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size);
 
 /*! free the native memory
  *
- * @param data 			the data address
+ * @param data          the data address
  *
- * @return 				tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t 				tb_native_memory_free(tb_pointer_t data);
+tb_bool_t               tb_native_memory_free(tb_pointer_t data);
 
 #endif
 

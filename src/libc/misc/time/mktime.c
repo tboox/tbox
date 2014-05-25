@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		mktime.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        mktime.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "time.h"
 #ifdef TB_CONFIG_LIBC_HAVE_GMTIME
-# 	include <time.h>
+#   include <time.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,28 +36,28 @@
 
 tb_time_t tb_mktime(tb_tm_t const* tm)
 {
-	// check
-	tb_assert_and_check_return_val(tm, -1);
+    // check
+    tb_assert_and_check_return_val(tm, -1);
 
 #ifdef TB_CONFIG_LIBC_HAVE_GMTIME
-	// init
-	struct tm t = {0};
-	t.tm_sec = tm->second;
-	t.tm_min = tm->minute;
-	t.tm_hour = tm->hour;
-	t.tm_mday = tm->mday;
-	t.tm_mon = tm->month - 1;
-	t.tm_year = tm->year > 1900? tm->year - 1900 : tm->year;
-	t.tm_wday = tm->week;
-	t.tm_yday = tm->yday;
-	t.tm_isdst = tm->isdst;
-	
-	// mktime
-	return (tb_time_t)mktime(&t);
+    // init
+    struct tm t = {0};
+    t.tm_sec = tm->second;
+    t.tm_min = tm->minute;
+    t.tm_hour = tm->hour;
+    t.tm_mday = tm->mday;
+    t.tm_mon = tm->month - 1;
+    t.tm_year = tm->year > 1900? tm->year - 1900 : tm->year;
+    t.tm_wday = tm->week;
+    t.tm_yday = tm->yday;
+    t.tm_isdst = tm->isdst;
+    
+    // mktime
+    return (tb_time_t)mktime(&t);
 #else
-	// GMT+8 for beijing.china.
-	tb_time_t time = tb_gmmktime(tm);
-	return time >= 8 * 3600? time - 8 * 3600: -1;
+    // GMT+8 for beijing.china.
+    tb_time_t time = tb_gmmktime(tm);
+    return time >= 8 * 3600? time - 8 * 3600: -1;
 #endif
 }
 

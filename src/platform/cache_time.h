@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		cache_time.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        cache_time.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_CACHE_TIME_H
@@ -37,32 +37,32 @@
  *
  * lower accuracy and faster
  *
- * @return 			the now time, s
+ * @return          the now time, s
  */
-tb_time_t 			tb_cache_time(tb_noarg_t);
+tb_time_t           tb_cache_time(tb_noarg_t);
 
 /*! spak cached time 
  *
  * update the cached time for the external loop thread
  *
- * @return 			the now ms-clock
+ * @return          the now ms-clock
  */
-tb_hong_t 			tb_cache_time_spak(tb_noarg_t);
+tb_hong_t           tb_cache_time_spak(tb_noarg_t);
 
 /*! the cached ms-clock
  *
  * lower accuracy and faster
  *
- * @return 			the now ms-clock
+ * @return          the now ms-clock
  */
-tb_hong_t 			tb_cache_time_mclock(tb_noarg_t);
+tb_hong_t           tb_cache_time_mclock(tb_noarg_t);
 
 /*! the cached s-clock
  *
  * lower accuracy and faster
  *
- * @return 			the now s-clock
+ * @return          the now s-clock
  */
-tb_hong_t 			tb_cache_time_clock(tb_noarg_t);
+tb_hong_t           tb_cache_time_clock(tb_noarg_t);
 
 #endif

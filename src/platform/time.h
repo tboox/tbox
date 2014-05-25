@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		time.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        time.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_TIME_H
@@ -36,41 +36,41 @@
 
 /*! usleep
  *
- * @param us 	the microsecond time
+ * @param us    the microsecond time
  */
-tb_void_t 		tb_usleep(tb_size_t us);
+tb_void_t       tb_usleep(tb_size_t us);
 
 /*! msleep
  *
- * @param ms 	the millisecond time
+ * @param ms    the millisecond time
  */
-tb_void_t 		tb_msleep(tb_size_t ms);
+tb_void_t       tb_msleep(tb_size_t ms);
 
 /*! sleep
  *
- * @param s 	the second time
+ * @param s     the second time
  */
-tb_void_t 		tb_sleep(tb_size_t s);
+tb_void_t       tb_sleep(tb_size_t s);
 
 /*! clock, ms
  *
- * @return 		the mclock
+ * @return      the mclock
  */
-tb_hong_t 		tb_mclock(tb_noarg_t);
+tb_hong_t       tb_mclock(tb_noarg_t);
 
 /*! uclock, us
  *
- * @return 		the uclock
+ * @return      the uclock
  */
-tb_hong_t 		tb_uclock(tb_noarg_t);
+tb_hong_t       tb_uclock(tb_noarg_t);
 
 /*! get the time from 1970-01-01 00:00:00:000
  *
- * @param tv 	the timeval
- * @param tz 	the timezone
+ * @param tv    the timeval
+ * @param tz    the timezone
  *
- * @return 		tb_true or tb_false
+ * @return      tb_true or tb_false
  */
-tb_bool_t 		tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz);
+tb_bool_t       tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz);
 
 #endif

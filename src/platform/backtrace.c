@@ -16,26 +16,26 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		backtrace.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        backtrace.c
+ * @ingroup     platform
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"backtrace"
-#define TB_TRACE_MODULE_DEBUG 			(0)
+#define TB_TRACE_MODULE_NAME            "backtrace"
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "backtrace.h"
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	include "windows/backtrace.c"
+#   include "windows/backtrace.c"
 #else
-# 	include "libc/backtrace.c"
+#   include "libc/backtrace.c"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -43,50 +43,50 @@
  */
 tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe)
 {
-	// check
-	tb_check_return(nframe < 256);
+    // check
+    tb_check_return(nframe < 256);
 
-	// the frames
-	tb_pointer_t frames_data[256] = {0};
-	if (!frames)
-	{
-		nframe = tb_backtrace_frames(frames_data, nframe, 2);
-		frames = frames_data;
-	}
+    // the frames
+    tb_pointer_t frames_data[256] = {0};
+    if (!frames)
+    {
+        nframe = tb_backtrace_frames(frames_data, nframe, 2);
+        frames = frames_data;
+    }
 
-	// dump frames
-	if (frames && nframe)
-	{
-		// init symbols
-		tb_handle_t symbols = tb_backtrace_symbols_init(frames, nframe);
-		if (symbols)
-		{
-			// walk
-			tb_size_t i = 0;
-			for (i = 0; i < nframe; i++)
-			{
+    // dump frames
+    if (frames && nframe)
+    {
+        // init symbols
+        tb_handle_t symbols = tb_backtrace_symbols_init(frames, nframe);
+        if (symbols)
+        {
+            // walk
+            tb_size_t i = 0;
+            for (i = 0; i < nframe; i++)
+            {
 #if TB_CPU_BIT64
-				tb_trace_i("%s[%016p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+                tb_trace_i("%s[%016p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
 #else
-				tb_trace_i("%s[%08p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+                tb_trace_i("%s[%08p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
 #endif
-			}
-		
-			// exit symbols
-			tb_backtrace_symbols_exit(symbols);
-		}
-		else
-		{
-			// walk
-			tb_size_t i = 0;
-			for (i = 0; i < nframe; i++)
-			{
+            }
+        
+            // exit symbols
+            tb_backtrace_symbols_exit(symbols);
+        }
+        else
+        {
+            // walk
+            tb_size_t i = 0;
+            for (i = 0; i < nframe; i++)
+            {
 #if TB_CPU_BIT64
-				tb_trace_i("%s[%016p]", prefix? prefix : "", frames[i]);
+                tb_trace_i("%s[%016p]", prefix? prefix : "", frames[i]);
 #else
-				tb_trace_i("%s[%08p]", prefix? prefix : "", frames[i]);
-#endif				
-			}
-		}
-	}
+                tb_trace_i("%s[%08p]", prefix? prefix : "", frames[i]);
+#endif              
+            }
+        }
+    }
 }

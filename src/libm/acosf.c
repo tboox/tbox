@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		acosf.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        acosf.c
+ * @ingroup     libm
  *
  */
 
@@ -33,5 +33,5 @@
  */
 tb_float_t tb_acosf(tb_float_t x)
 {
-	return acosf(x);
+    return acosf(x);
 }

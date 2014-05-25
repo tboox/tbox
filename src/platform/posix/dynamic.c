@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		dynamic.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        dynamic.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -33,38 +33,38 @@
  */
 tb_handle_t tb_dynamic_init(tb_char_t const* name)
 {
-	// check
-	tb_assert_and_check_return_val(name, tb_null);
+    // check
+    tb_assert_and_check_return_val(name, tb_null);
 
-	// clear error
-	dlerror();
+    // clear error
+    dlerror();
 
-	// open
-	tb_handle_t dynamic = dlopen(name, RTLD_LAZY);
+    // open
+    tb_handle_t dynamic = dlopen(name, RTLD_LAZY);
 
-	// error?
-	if (dlerror()) 
-	{
-		if (dynamic) dlclose(dynamic);
-		dynamic = tb_null;
-	}
+    // error?
+    if (dlerror()) 
+    {
+        if (dynamic) dlclose(dynamic);
+        dynamic = tb_null;
+    }
 
-	// ok?
-	return dynamic;
+    // ok?
+    return dynamic;
 }
 tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 {
-	tb_assert_and_check_return(dynamic);
-	dlclose(dynamic);
-	tb_assert(!dlerror());
+    tb_assert_and_check_return(dynamic);
+    dlclose(dynamic);
+    tb_assert(!dlerror());
 }
 tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
 {
-	tb_assert_and_check_return_val(dynamic && name, tb_null);
-	return (tb_pointer_t)dlsym(dynamic, name);
+    tb_assert_and_check_return_val(dynamic && name, tb_null);
+    return (tb_pointer_t)dlsym(dynamic, name);
 }
 tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
 {
-	tb_assert_and_check_return_val(dynamic && name, tb_null);
-	return (tb_pointer_t)dlsym(dynamic, name);
+    tb_assert_and_check_return_val(dynamic && name, tb_null);
+    return (tb_pointer_t)dlsym(dynamic, name);
 }

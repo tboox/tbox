@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		aioo.h
- * @ingroup 	asio
+ * @author      ruki
+ * @file        aioo.h
+ * @ingroup     asio
  *
  */
 #ifndef TB_ASIO_AIOO_H
@@ -36,14 +36,14 @@
 /// the aioo type
 typedef struct __tb_aioo_t
 {
-	// the code
-	tb_size_t 				code;
+    // the code
+    tb_size_t               code;
 
-	// the data
-	tb_pointer_t 			data;
+    // the data
+    tb_pointer_t            data;
 
-	// the handle 
-	tb_handle_t 			handle;
+    // the handle 
+    tb_handle_t             handle;
 
 }tb_aioo_t;
 
@@ -54,32 +54,32 @@ typedef struct __tb_aioo_t
 
 /*! the aioo type
  *
- * @param aioo 		the aioo
+ * @param aioo      the aioo
  *
- * @return 			the aioo data
+ * @return          the aioo data
  */
-tb_pointer_t 		tb_aioo_data(tb_handle_t aioo);
+tb_pointer_t        tb_aioo_data(tb_handle_t aioo);
 
 /*! the aioo handle
  *
- * @param aioo 		the aioo
+ * @param aioo      the aioo
  *
- * @return 			the aioo handle
+ * @return          the aioo handle
  */
-tb_handle_t 		tb_aioo_handle(tb_handle_t aioo);
+tb_handle_t         tb_aioo_handle(tb_handle_t aioo);
 
 /*! wait the aioo
  *
  * blocking wait the single event aioo, so need not aiop 
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param handle 	the handle 
- * @param code 		the aioe code
- * @param timeout 	the timeout, infinity: -1
+ * @param handle    the handle 
+ * @param code      the aioe code
+ * @param timeout   the timeout, infinity: -1
  *
- * @return 			> 0: the aioe code, 0: timeout, -1: failed
+ * @return          > 0: the aioe code, 0: timeout, -1: failed
  */
-tb_long_t 			tb_aioo_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
+tb_long_t           tb_aioo_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
 
 
 #endif

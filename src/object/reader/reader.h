@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		reader.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        reader.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_READER_H
@@ -39,34 +39,34 @@
 
 /*! set object reader
  *
- * @param format 	the reader format
- * @param reader 	the reader
+ * @param format    the reader format
+ * @param reader    the reader
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader);
+tb_bool_t           tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader);
 
 /*! del object reader
  *
- * @param format 	the reader format
+ * @param format    the reader format
  */
-tb_void_t 			tb_object_reader_del(tb_size_t format);
+tb_void_t           tb_object_reader_del(tb_size_t format);
 
 /*! get object reader
  *
- * @param format 	the reader format
+ * @param format    the reader format
  *
- * @return 			the object reader
+ * @return          the object reader
  */
 tb_object_reader_t* tb_object_reader_get(tb_size_t format);
 
 /*! done reader
  *
- * @param stream 	the stream
+ * @param stream    the stream
  *
- * @return 			the object
+ * @return          the object
  */
-tb_object_t* 		tb_object_reader_done(tb_basic_stream_t* stream);
+tb_object_t*        tb_object_reader_done(tb_basic_stream_t* stream);
 
 
 #endif

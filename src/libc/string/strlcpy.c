@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strlcpy.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        strlcpy.c
+ * @ingroup     libc
  *
  */
 
@@ -28,15 +28,15 @@
 #include "string.h"
 #include "../../memory/memory.h"
 #ifndef TB_CONFIG_LIBC_HAVE_STRLCPY
-# 	if defined(TB_ARCH_x86)
-# 		include "opt/x86/strlcpy.c"
-# 	elif defined(TB_ARCH_ARM)
-# 		include "opt/arm/strlcpy.c"
-# 	elif defined(TB_ARCH_SH4)
-# 		include "opt/sh4/strlcpy.c"
-# 	endif
+#   if defined(TB_ARCH_x86)
+#       include "opt/x86/strlcpy.c"
+#   elif defined(TB_ARCH_ARM)
+#       include "opt/arm/strlcpy.c"
+#   elif defined(TB_ARCH_SH4)
+#       include "opt/sh4/strlcpy.c"
+#   endif
 #else
-# 	include <string.h>
+#   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -45,35 +45,35 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRLCPY)
 static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	return strlcpy(s1, s2, n);
+    tb_assert_and_check_return_val(s1 && s2, 0);
+    return strlcpy(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRLCPY)
 static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, 0);
+    // check
+    tb_assert_and_check_return_val(s1 && s2, 0);
 
-	// no size or same? 
-	tb_check_return_val(n && s1 != s2, tb_strlen(s1));
+    // no size or same? 
+    tb_check_return_val(n && s1 != s2, tb_strlen(s1));
 
-	// copy
+    // copy
 #if 0
-	tb_char_t const* s = s2; --n;
-	while (*s1 = *s2) 
-	{
-		if (n) 
-		{
-			--n;
-			++s1;
-		}
-		++s2;
-	}
-	return s2 - s;
+    tb_char_t const* s = s2; --n;
+    while (*s1 = *s2) 
+    {
+        if (n) 
+        {
+            --n;
+            ++s1;
+        }
+        ++s2;
+    }
+    return s2 - s;
 #else
-	tb_size_t sn = tb_strlen(s2);
-	tb_memcpy(s1, s2, tb_min(sn + 1, n));
-	return tb_min(sn, n);
+    tb_size_t sn = tb_strlen(s2);
+    tb_memcpy(s1, s2, tb_min(sn + 1, n));
+    return tb_min(sn, n);
 #endif
 }
 #endif
@@ -83,24 +83,24 @@ static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n
  */
 tb_size_t tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	// check
+    // check
 #ifdef __tb_debug__
-	{
-		// overflow dst? 
-		tb_size_t n2 = tb_strlen(s2);
+    {
+        // overflow dst? 
+        tb_size_t n2 = tb_strlen(s2);
 
-		// strlcpy overflow? 
-		tb_size_t n1 = tb_memory_data_size(s1);
-		if (n1 && tb_min(n2, n) + 1 > n1)
-		{
-			tb_trace_i("[strlcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, tb_min(n2, n), s1, n1);
-			tb_backtrace_dump("[strlcpy]: [overflow]: ", tb_null, 10);
-			tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
-			tb_abort();
-		}
-	}
+        // strlcpy overflow? 
+        tb_size_t n1 = tb_memory_data_size(s1);
+        if (n1 && tb_min(n2, n) + 1 > n1)
+        {
+            tb_trace_i("[strlcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, tb_min(n2, n), s1, n1);
+            tb_backtrace_dump("[strlcpy]: [overflow]: ", tb_null, 10);
+            tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
+            tb_abort();
+        }
+    }
 #endif
 
-	// done
-	return tb_strlcpy_impl(s1, s2, n);
+    // done
+    return tb_strlcpy_impl(s1, s2, n);
 }

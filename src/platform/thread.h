@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		thread.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        thread.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_THREAD_H
@@ -36,56 +36,56 @@
 
 /*! init thread
  *
- * @param name 			the thread name, maybe null
- * @param func 			the thread func
- * @param priv 			the thread func private data
- * @param stack 		the thread stack, using the default stack size if be zero 
+ * @param name          the thread name, maybe null
+ * @param func          the thread func
+ * @param priv          the thread func private data
+ * @param stack         the thread stack, using the default stack size if be zero 
  *
- * @return 				the thread handle
+ * @return              the thread handle
  */
-tb_handle_t 			tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack);
+tb_handle_t             tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack);
 
 /*! exit thread
  *
- * @param handle 		the thread handle
+ * @param handle        the thread handle
  */
-tb_void_t 				tb_thread_exit(tb_handle_t handle);
+tb_void_t               tb_thread_exit(tb_handle_t handle);
 
 /*! wait thread
  *
- * @param handle 		the thread handle
- * @param timeout 		the timeout
+ * @param handle        the thread handle
+ * @param timeout       the timeout
  *
- * @return 				ok: 1, timeout: 0, error: -1
+ * @return              ok: 1, timeout: 0, error: -1
  */
-tb_long_t 				tb_thread_wait(tb_handle_t handle, tb_long_t timeout);
+tb_long_t               tb_thread_wait(tb_handle_t handle, tb_long_t timeout);
 
 /*! suspend thread
  *
- * @param handle 		the thread handle
+ * @param handle        the thread handle
  *
- * @return 				tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t 				tb_thread_suspend(tb_handle_t handle);
+tb_bool_t               tb_thread_suspend(tb_handle_t handle);
 
 /*! resume thread
  *
- * @param handle 		the thread handle
+ * @param handle        the thread handle
  *
- * @return 				tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t 				tb_thread_resume(tb_handle_t handle);
+tb_bool_t               tb_thread_resume(tb_handle_t handle);
 
 /*! the self thread identifier
  *
- * @return 				the self thread identifier
+ * @return              the self thread identifier
  */
-tb_size_t 				tb_thread_self(tb_noarg_t);
+tb_size_t               tb_thread_self(tb_noarg_t);
 
 /*! return the thread value
  *
- * @param value 		the value pointer
+ * @param value         the value pointer
  */
-tb_void_t 				tb_thread_return(tb_pointer_t value);
+tb_void_t               tb_thread_return(tb_pointer_t value);
 
 #endif

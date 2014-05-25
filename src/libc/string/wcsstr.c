@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsstr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsstr.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSSTR
-# 	include <wchar.h>
+#   include <wchar.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -37,34 +37,34 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSSTR
 tb_wchar_t* tb_wcsstr(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
-	return wcsstr(s1, s2);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    return wcsstr(s1, s2);
 }
 #else
 tb_wchar_t* tb_wcsstr(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	__tb_register__ tb_wchar_t const* s = s1;
-	__tb_register__ tb_wchar_t const* p = s2;
+    __tb_register__ tb_wchar_t const* s = s1;
+    __tb_register__ tb_wchar_t const* p = s2;
 
-	do 
-	{
-		if (!*p) return (tb_wchar_t *)s1;
-		if (*p == *s) 
-		{
-			++p;
-			++s;
-		} 
-		else 
-		{
-			p = s2;
-			if (!*s) return tb_null;
-			s = ++s1;
-		}
+    do 
+    {
+        if (!*p) return (tb_wchar_t *)s1;
+        if (*p == *s) 
+        {
+            ++p;
+            ++s;
+        } 
+        else 
+        {
+            p = s2;
+            if (!*s) return tb_null;
+            s = ++s1;
+        }
 
-	} while (1);
+    } while (1);
 
-	return tb_null;
+    return tb_null;
 }
 #endif

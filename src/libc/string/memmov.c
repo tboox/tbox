@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memmov.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        memmov.c
+ * @ingroup     libc
  *
  */
 
@@ -29,15 +29,15 @@
 #include "../../memory/memory.h"
 
 #ifndef TB_CONFIG_LIBC_HAVE_MEMMOV
-# 	if defined(TB_ARCH_x86)
-# 		include "opt/x86/memmov.c"
-# 	elif defined(TB_ARCH_ARM)
-# 		include "opt/arm/memmov.c"
-# 	elif defined(TB_ARCH_SH4)
-# 		include "opt/sh4/memmov.c"
-# 	endif
+#   if defined(TB_ARCH_x86)
+#       include "opt/x86/memmov.c"
+#   elif defined(TB_ARCH_ARM)
+#       include "opt/arm/memmov.c"
+#   elif defined(TB_ARCH_SH4)
+#       include "opt/sh4/memmov.c"
+#   endif
 #else
-# 	include <string.h>
+#   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -47,35 +47,35 @@
 #if defined(TB_CONFIG_LIBC_HAVE_MEMMOV)
 static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
-	return memmove(s1, s2, n);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    return memmove(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMMOV)
 static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	__tb_register__ tb_byte_t* 			s = s1;
-	__tb_register__ tb_byte_t const* 	p = s2;
+    __tb_register__ tb_byte_t*          s = s1;
+    __tb_register__ tb_byte_t const*    p = s2;
 
-	if (p >= s) 
-	{
-		while (n) 
-		{
-			*s++ = *p++;
-			--n;
-		}
-	} 
-	else 
-	{
-		while (n) 
-		{
-			--n;
-			s[n] = p[n];
-		}
-	}
+    if (p >= s) 
+    {
+        while (n) 
+        {
+            *s++ = *p++;
+            --n;
+        }
+    } 
+    else 
+    {
+        while (n) 
+        {
+            --n;
+            s[n] = p[n];
+        }
+    }
 
-	return s1;
+    return s1;
 }
 #endif
 
@@ -84,32 +84,32 @@ static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t 
  */
 tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	// check
+    // check
 #ifdef __tb_debug__
-	{
-		// overflow dst?
-		tb_size_t n1 = tb_memory_data_size(s1);
-		if (n1 && n > n1)
-		{
-			tb_trace_i("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
-			tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
-			tb_memory_data_dump(s1, "\t[malloc]: [from]: ");
-			tb_abort();
-		}
+    {
+        // overflow dst?
+        tb_size_t n1 = tb_memory_data_size(s1);
+        if (n1 && n > n1)
+        {
+            tb_trace_i("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+            tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
+            tb_memory_data_dump(s1, "\t[malloc]: [from]: ");
+            tb_abort();
+        }
 
-		// overflow src?
-		tb_size_t n2 = tb_memory_data_size(s2);
-		if (n2 && n > n2)
-		{
-			tb_trace_i("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
-			tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
-			tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
-			tb_abort();
-		}
-	}
+        // overflow src?
+        tb_size_t n2 = tb_memory_data_size(s2);
+        if (n2 && n > n2)
+        {
+            tb_trace_i("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+            tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
+            tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
+            tb_abort();
+        }
+    }
 #endif
 
-	// done
-	return tb_memmov_impl(s1, s2, n);
+    // done
+    return tb_memmov_impl(s1, s2, n);
 }
 

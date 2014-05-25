@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		lzsw.h
- * @ingroup 	zip
+ * @author      ruki
+ * @file        lzsw.h
+ * @ingroup     zip
  *
  */
 #ifndef TB_STREAM_ZSTREAM_LZSW_H
@@ -34,18 +34,18 @@
  */
 
 // vlc 
-#define TB_LZSW_VLC_TYPE_FIXED 			(0)
-#define TB_LZSW_VLC_TYPE_GAMMA 			(1)
-#define TB_LZSW_VLC_TYPE_GOLOMB 		(0)
+#define TB_LZSW_VLC_TYPE_FIXED          (0)
+#define TB_LZSW_VLC_TYPE_GAMMA          (1)
+#define TB_LZSW_VLC_TYPE_GOLOMB         (0)
 
 // window
-//#define TB_LZSW_WINDOW_SIZE_MAX 		(256)
-//#define TB_LZSW_WINDOW_SIZE_MAX 		(4096)
-#define TB_LZSW_WINDOW_SIZE_MAX 		(65536)
-//#define TB_LZSW_WINDOW_SIZE_MAX 		(8)
+//#define TB_LZSW_WINDOW_SIZE_MAX       (256)
+//#define TB_LZSW_WINDOW_SIZE_MAX       (4096)
+#define TB_LZSW_WINDOW_SIZE_MAX         (65536)
+//#define TB_LZSW_WINDOW_SIZE_MAX       (8)
 
-#define TB_LZSW_WINDOW_HASH_FIND 		(1)
-#define TB_LZSW_WINDOW_HASH_MAX			(768) 	// (256 + 256 + 256)
+#define TB_LZSW_WINDOW_HASH_FIND        (1)
+#define TB_LZSW_WINDOW_HASH_MAX         (768)   // (256 + 256 + 256)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -55,18 +55,18 @@
 // the node type
 typedef struct __tb_lzsw_node_t
 {
-	// the signature
-	tb_byte_t 					sign[4];
+    // the signature
+    tb_byte_t                   sign[4];
 
-	// the circle offset
-	tb_size_t 					coff;
+    // the circle offset
+    tb_size_t                   coff;
 
-	// the global address
-	tb_byte_t const* 			addr;
+    // the global address
+    tb_byte_t const*            addr;
 
-	// the next & prev
-	tb_size_t 					prev;
-	tb_size_t 					next;
+    // the next & prev
+    tb_size_t                   prev;
+    tb_size_t                   next;
 
 }tb_lzsw_node_t;
 #endif
@@ -74,13 +74,13 @@ typedef struct __tb_lzsw_node_t
 // the inflate window type
 typedef struct __tb_lzsw_inflate_window_t
 {
-	// the window rage
-	tb_byte_t const* 			we;
-	tb_size_t 					wn;
+    // the window rage
+    tb_byte_t const*            we;
+    tb_size_t                   wn;
 
-	// the window bits
-	tb_size_t 					wb;
-	tb_size_t 					mb;
+    // the window bits
+    tb_size_t                   wb;
+    tb_size_t                   mb;
 
 }tb_lzsw_inflate_window_t;
 
@@ -88,21 +88,21 @@ typedef struct __tb_lzsw_inflate_window_t
 // the deflate window type
 typedef struct __tb_lzsw_deflate_window_t
 {
-	// the window rage
-	tb_byte_t const* 			we;
-	tb_size_t 					wn;
+    // the window rage
+    tb_byte_t const*            we;
+    tb_size_t                   wn;
 
-	// the window bits
-	tb_size_t 					wb;
-	tb_size_t 					mb;
+    // the window bits
+    tb_size_t                   wb;
+    tb_size_t                   mb;
 
 #if TB_LZSW_WINDOW_HASH_FIND
-	// the circle base
-	tb_size_t 					base;
+    // the circle base
+    tb_size_t                   base;
 
-	// the window hash
-	tb_pointer_t 						pool;
-	tb_size_t 					hash[TB_LZSW_WINDOW_HASH_MAX];
+    // the window hash
+    tb_pointer_t                        pool;
+    tb_size_t                   hash[TB_LZSW_WINDOW_HASH_MAX];
 #endif
 
 }tb_lzsw_deflate_window_t;
@@ -111,28 +111,28 @@ typedef struct __tb_lzsw_deflate_window_t
 // the lzsw inflate zstream type
 typedef struct __tb_lzsw_inflate_basic_stream_filter_zip_t
 {
-	// the stream base
-	tb_inflate_basic_stream_filter_zip_t 		base;
+    // the stream base
+    tb_inflate_basic_stream_filter_zip_t        base;
 
-	// the reference to vlc
-	tb_basic_stream_filter_zip_vlc_t* 			vlc;
+    // the reference to vlc
+    tb_basic_stream_filter_zip_vlc_t*           vlc;
 
-	// the window 
-	tb_lzsw_inflate_window_t  	window;
+    // the window 
+    tb_lzsw_inflate_window_t    window;
 
 }tb_lzsw_inflate_basic_stream_filter_zip_t;
 
 // the lzsw deflate zstream type
 typedef struct __tb_lzsw_deflate_basic_stream_filter_zip_t
 {
-	// the stream base
-	tb_deflate_basic_stream_filter_zip_t 		base;
+    // the stream base
+    tb_deflate_basic_stream_filter_zip_t        base;
 
-	// the reference to vlc
-	tb_basic_stream_filter_zip_vlc_t* 			vlc;
+    // the reference to vlc
+    tb_basic_stream_filter_zip_vlc_t*           vlc;
 
-	// the window 
-	tb_lzsw_deflate_window_t  	window;
+    // the window 
+    tb_lzsw_deflate_window_t    window;
 
 }tb_lzsw_deflate_basic_stream_filter_zip_t;
 
@@ -140,8 +140,8 @@ typedef struct __tb_lzsw_deflate_basic_stream_filter_zip_t
 // the lzsw zstream type
 typedef union __tb_lzsw_basic_stream_filter_zip_t
 {
-	tb_lzsw_inflate_basic_stream_filter_zip_t 	infst;
-	tb_lzsw_deflate_basic_stream_filter_zip_t 	defst;
+    tb_lzsw_inflate_basic_stream_filter_zip_t   infst;
+    tb_lzsw_deflate_basic_stream_filter_zip_t   defst;
 
 }tb_lzsw_basic_stream_filter_zip_t;
 
@@ -149,9 +149,9 @@ typedef union __tb_lzsw_basic_stream_filter_zip_t
  * interfaces
  */
 
-tb_basic_stream_filter_t* 	tb_basic_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_basic_stream_filter_zip_t* zst);
-tb_basic_stream_filter_t* 	tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_basic_stream_filter_zip_t* zst);
-tb_basic_stream_filter_t* 	tb_basic_stream_filter_zip_open_lzsw(tb_lzsw_basic_stream_filter_zip_t* zst, tb_size_t action);
+tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_basic_stream_filter_zip_t* zst);
+tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_basic_stream_filter_zip_t* zst);
+tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw(tb_lzsw_basic_stream_filter_zip_t* zst, tb_size_t action);
 
 #endif
 

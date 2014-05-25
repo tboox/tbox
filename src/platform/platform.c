@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		platform.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        platform.c
+ * @ingroup     platform
  *
  */
 
@@ -34,30 +34,30 @@
 
 tb_bool_t tb_platform_init()
 {
-	// init socket
-	if (!tb_socket_init()) return tb_false;
+    // init socket
+    if (!tb_socket_init()) return tb_false;
 
-	// init tstore
-	if (!tb_thread_store_init()) return tb_false;
+    // init tstore
+    if (!tb_thread_store_init()) return tb_false;
 
-	// init dns
-	if (!tb_dns_init()) return tb_false;
+    // init dns
+    if (!tb_dns_init()) return tb_false;
 
-	// spak ctime
-	tb_cache_time_spak();
+    // spak ctime
+    tb_cache_time_spak();
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }
 tb_void_t tb_platform_exit()
 {
-	// exit dns
-	tb_dns_exit();
+    // exit dns
+    tb_dns_exit();
 
-	// exit tstore
-	tb_thread_store_exit();
+    // exit tstore
+    tb_thread_store_exit();
 
-	// exit socket
-	tb_socket_exit();
+    // exit socket
+    tb_socket_exit();
 }
 

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		algorithm.h
- * @defgroup 	algorithm
+ * @author      ruki
+ * @file        algorithm.h
+ * @defgroup    algorithm
  *
  */
 #ifndef TB_ALGORITHM_H

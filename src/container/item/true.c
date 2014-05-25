@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		true.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        true.c
+ * @ingroup     container
  *
  */
 
@@ -32,28 +32,28 @@
  */
 static tb_size_t tb_item_func_true_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size, tb_size_t index)
 {
-	return 0;
+    return 0;
 }
 static tb_long_t tb_item_func_true_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	// always be equal
-	return 0;
+    // always be equal
+    return 0;
 }
 static tb_pointer_t tb_item_func_true_data(tb_item_func_t* func, tb_cpointer_t item)
 {
-	// the item data
-	return (tb_pointer_t)tb_true;
+    // the item data
+    return (tb_pointer_t)tb_true;
 }
 static tb_char_t const* tb_item_func_true_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
-	// check
-	tb_assert_and_check_return_val(func && cstr && maxn, "");
+    // check
+    tb_assert_and_check_return_val(func && cstr && maxn, "");
 
-	// format string
-	tb_strlcpy(cstr, "true", maxn - 1); cstr[maxn - 1] = '\0';
+    // format string
+    tb_strlcpy(cstr, "true", maxn - 1); cstr[maxn - 1] = '\0';
 
-	// ok?
-	return (tb_char_t const*)cstr;
+    // ok?
+    return (tb_char_t const*)cstr;
 }
 static tb_void_t tb_item_func_true_free(tb_item_func_t* func, tb_pointer_t item)
 {
@@ -63,11 +63,11 @@ static tb_void_t tb_item_func_true_nfree(tb_item_func_t* func, tb_pointer_t item
 }
 static tb_void_t tb_item_func_true_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
-	tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
+    tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
 }
 static tb_void_t tb_item_func_true_nrepl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
-	tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
+    tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -75,23 +75,23 @@ static tb_void_t tb_item_func_true_nrepl(tb_item_func_t* func, tb_pointer_t item
  */
 tb_item_func_t tb_item_func_true()
 {
-	// init func
-	tb_item_func_t func = {0};
-	func.type 	= TB_ITEM_TYPE_TRUE;
-	func.hash 	= tb_item_func_true_hash;
-	func.comp 	= tb_item_func_true_comp;
-	func.data 	= tb_item_func_true_data;
-	func.cstr 	= tb_item_func_true_cstr;
-	func.free 	= tb_item_func_true_free;
-	func.dupl 	= tb_item_func_true_repl;
-	func.repl 	= tb_item_func_true_repl;
-	func.copy 	= tb_item_func_true_repl;
-	func.nfree 	= tb_item_func_true_nfree;
-	func.ndupl 	= tb_item_func_true_nrepl;
-	func.nrepl 	= tb_item_func_true_nrepl;
-	func.ncopy 	= tb_item_func_true_nrepl;
-	func.size 	= 0;
+    // init func
+    tb_item_func_t func = {0};
+    func.type   = TB_ITEM_TYPE_TRUE;
+    func.hash   = tb_item_func_true_hash;
+    func.comp   = tb_item_func_true_comp;
+    func.data   = tb_item_func_true_data;
+    func.cstr   = tb_item_func_true_cstr;
+    func.free   = tb_item_func_true_free;
+    func.dupl   = tb_item_func_true_repl;
+    func.repl   = tb_item_func_true_repl;
+    func.copy   = tb_item_func_true_repl;
+    func.nfree  = tb_item_func_true_nfree;
+    func.ndupl  = tb_item_func_true_nrepl;
+    func.nrepl  = tb_item_func_true_nrepl;
+    func.ncopy  = tb_item_func_true_nrepl;
+    func.size   = 0;
 
-	// ok?
-	return func;
+    // ok?
+    return func;
 }

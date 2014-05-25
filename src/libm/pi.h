@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		pi.h
- * @ingroup 	libm
+ * @author      ruki
+ * @file        pi.h
+ * @ingroup     libm
  *
  */
 #ifndef TB_LIBM_PI_H
@@ -32,6 +32,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_PI 	(3.141592653589793)
+#define TB_PI   (3.141592653589793)
 
 #endif

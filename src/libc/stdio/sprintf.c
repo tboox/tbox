@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		sprintf.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        sprintf.c
+ * @ingroup     libc
  *
  */
 
@@ -33,7 +33,7 @@
 
 tb_long_t tb_sprintf(tb_char_t* s, tb_char_t const* fmt, ...)
 {
-	tb_long_t ret = 0;
-	tb_vsnprintf_format(s, TB_MAXU32, fmt, &ret);
-	return ret;
+    tb_long_t ret = 0;
+    tb_vsnprintf_format(s, TB_MAXU32, fmt, &ret);
+    return ret;
 }

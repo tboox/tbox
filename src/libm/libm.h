@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		libm.h
- * @defgroup 	libm
+ * @author      ruki
+ * @file        libm.h
+ * @defgroup    libm
  *
  */
 #ifndef TB_LIBM_H

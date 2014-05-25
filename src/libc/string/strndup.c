@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strndup.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        strndup.c
+ * @ingroup     libc
  *
  */
 
@@ -34,17 +34,17 @@
 
 tb_char_t* tb_strndup(tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
-	__tb_register__ tb_char_t* p;
+    __tb_register__ tb_char_t* p;
 
-	n = tb_strnlen(s, n);
-	p = tb_malloc(n + 1);
-	if (p)
-	{
-		tb_memcpy(p, s, n);
-		p[n] = '\0';
-	}
+    n = tb_strnlen(s, n);
+    p = tb_malloc(n + 1);
+    if (p)
+    {
+        tb_memcpy(p, s, n);
+        p[n] = '\0';
+    }
 
-	return p;
+    return p;
 }

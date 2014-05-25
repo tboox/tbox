@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		object_pool.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        object_pool.h
+ * @ingroup     object
  *
  */
 #ifndef TB_MEMORY_OBJECT_POOL_H
@@ -32,8 +32,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_object_pool_get(pool, size, flag, type) 		tb_object_pool_get_(pool, size, flag, type __tb_debug_vals__)
-#define tb_object_pool_del(pool, object) 				tb_object_pool_del_(pool, object __tb_debug_vals__)
+#define tb_object_pool_get(pool, size, flag, type)      tb_object_pool_get_(pool, size, flag, type __tb_debug_vals__)
+#define tb_object_pool_del(pool, object)                tb_object_pool_del_(pool, object __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -41,52 +41,52 @@
 
 /*! the object pool instance
  *
- * @return 			the object pool
+ * @return          the object pool
  */
-tb_handle_t 		tb_object_pool(tb_noarg_t);
+tb_handle_t         tb_object_pool(tb_noarg_t);
 
 /*! init object pool
  *
- * @return 			the object pool
+ * @return          the object pool
  */
-tb_handle_t 		tb_object_pool_init(tb_noarg_t);
+tb_handle_t         tb_object_pool_init(tb_noarg_t);
 
 /*! exit object pool
  *
- * @param pool 		the object pool
+ * @param pool      the object pool
  */
-tb_void_t 			tb_object_pool_exit(tb_handle_t pool);
+tb_void_t           tb_object_pool_exit(tb_handle_t pool);
 
 /*! exit object pool
  *
- * @param pool 		the object pool
+ * @param pool      the object pool
  */
-tb_void_t 			tb_object_pool_clear(tb_handle_t pool);
+tb_void_t           tb_object_pool_clear(tb_handle_t pool);
 
 /*! get object from object_pool
  *
- * @param pool 		the object pool
- * @param size 		the object size
- * @param flag 		the object flag
- * @param type 		the object type
+ * @param pool      the object pool
+ * @param size      the object size
+ * @param flag      the object flag
+ * @param type      the object type
  *
- * @return 			the object pointer
+ * @return          the object pointer
  */
-tb_object_t* 		tb_object_pool_get_(tb_handle_t pool, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__);
+tb_object_t*        tb_object_pool_get_(tb_handle_t pool, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__);
 
 /*! del object from object_pool
  *
- * @param pool 		the object pool
- * @param object 	the object pointer
+ * @param pool      the object pool
+ * @param object    the object pointer
  */
-tb_void_t 			tb_object_pool_del_(tb_handle_t pool, tb_object_t* object __tb_debug_decl__);
+tb_void_t           tb_object_pool_del_(tb_handle_t pool, tb_object_t* object __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! dump object pool
  *
- * @param pool 		the object pool
+ * @param pool      the object pool
  */
-tb_void_t 			tb_object_pool_dump(tb_handle_t pool);
+tb_void_t           tb_object_pool_dump(tb_handle_t pool);
 #endif
 
 #endif

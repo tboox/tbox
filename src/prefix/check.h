@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		check.h
+ * @author      ruki
+ * @file        check.h
  *
  */
 #ifndef TB_PREFIX_CHECK_H
@@ -35,12 +35,12 @@
  */
 
 // check
-#define tb_check_return(x) 								do { if (!(x)) return ; } while (0)
-#define tb_check_return_val(x, v) 						do { if (!(x)) return (v); } while (0)
-#define tb_check_goto(x, b) 							do { if (!(x)) goto b; } while (0)
-#define tb_check_break(x) 								{ if (!(x)) break ; }
-#define tb_check_abort(x) 								do { if (!(x)) tb_abort(); } while (0)
-#define tb_check_continue(x) 							{ if (!(x)) continue ; }
+#define tb_check_return(x)                              do { if (!(x)) return ; } while (0)
+#define tb_check_return_val(x, v)                       do { if (!(x)) return (v); } while (0)
+#define tb_check_goto(x, b)                             do { if (!(x)) goto b; } while (0)
+#define tb_check_break(x)                               { if (!(x)) break ; }
+#define tb_check_abort(x)                               do { if (!(x)) tb_abort(); } while (0)
+#define tb_check_continue(x)                            { if (!(x)) continue ; }
 
 
 #endif

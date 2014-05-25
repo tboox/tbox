@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		sin.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        sin.c
+ * @ingroup     libm
  *
  */
 
@@ -33,5 +33,5 @@
  */
 tb_double_t tb_sin(tb_double_t x)
 {
-	return sin(x);
+    return sin(x);
 }

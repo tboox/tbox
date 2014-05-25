@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		obj.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        obj.c
+ * @ingroup     container
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -31,56 +31,56 @@
  */
 static tb_char_t const* tb_item_func_obj_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
-	// check
-	tb_assert_and_check_return_val(cstr, "");
+    // check
+    tb_assert_and_check_return_val(cstr, "");
 
-	// format string
-	tb_long_t n = tb_snprintf(cstr, maxn, "<object: %p>", data);
-	if (n >= 0 && n < (tb_long_t)maxn) cstr[n] = '\0';
+    // format string
+    tb_long_t n = tb_snprintf(cstr, maxn, "<object: %p>", data);
+    if (n >= 0 && n < (tb_long_t)maxn) cstr[n] = '\0';
 
-	// ok?
-	return (tb_char_t const*)cstr;
+    // ok?
+    return (tb_char_t const*)cstr;
 }
 static tb_void_t tb_item_func_obj_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	// check
-	tb_assert_and_check_return(func && item);
+    // check
+    tb_assert_and_check_return(func && item);
 
-	// exit
-	tb_object_t* object = *((tb_object_t**)item);
-	if (object)
-	{
-		tb_object_exit(object);
-		*((tb_object_t**)item) = tb_null;
-	}
+    // exit
+    tb_object_t* object = *((tb_object_t**)item);
+    if (object)
+    {
+        tb_object_exit(object);
+        *((tb_object_t**)item) = tb_null;
+    }
 }
 static tb_void_t tb_item_func_obj_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
-	// check
-	tb_assert_and_check_return(func && item);
+    // check
+    tb_assert_and_check_return(func && item);
 
-	// refn++
-	if (data) tb_object_inc((tb_object_t*)data);
+    // refn++
+    if (data) tb_object_inc((tb_object_t*)data);
 
-	// copy it
-	*((tb_cpointer_t*)item) = data;
+    // copy it
+    *((tb_cpointer_t*)item) = data;
 }
 static tb_void_t tb_item_func_obj_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
-	// check
-	tb_assert_and_check_return(func && item);
+    // check
+    tb_assert_and_check_return(func && item);
 
-	// save the previous object
-	tb_object_t* object = *((tb_object_t**)item);
+    // save the previous object
+    tb_object_t* object = *((tb_object_t**)item);
 
-	// refn++
-	if (data) tb_object_inc((tb_object_t*)data);
+    // refn++
+    if (data) tb_object_inc((tb_object_t*)data);
 
-	// copy it
-	*((tb_cpointer_t*)item) = data;
+    // copy it
+    *((tb_cpointer_t*)item) = data;
 
-	// refn--
-	if (object) tb_object_dec(object);
+    // refn--
+    if (object) tb_object_dec(object);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -88,29 +88,29 @@ static tb_void_t tb_item_func_obj_repl(tb_item_func_t* func, tb_pointer_t item, 
  */
 tb_item_func_t tb_item_func_obj()
 {
-	// the ptr func
-	tb_item_func_t func_ptr = tb_item_func_ptr(tb_null, tb_null);
+    // the ptr func
+    tb_item_func_t func_ptr = tb_item_func_ptr(tb_null, tb_null);
 
-	// the str func
-	tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
+    // the str func
+    tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
 
-	// init func
-	tb_item_func_t func = {0};
-	func.type 	= TB_ITEM_TYPE_OBJ;
-	func.hash 	= func_ptr.hash;
-	func.comp 	= func_ptr.comp;
-	func.data 	= func_ptr.data;
-	func.cstr 	= tb_item_func_obj_cstr;
-	func.free 	= tb_item_func_obj_free;
-	func.dupl 	= tb_item_func_obj_dupl;
-	func.repl 	= tb_item_func_obj_repl;
-	func.copy 	= func_ptr.copy;
-	func.nfree 	= func_str.nfree;
-	func.ndupl 	= func_str.ndupl;
-	func.nrepl 	= func_str.nrepl;
-	func.ncopy 	= func_ptr.ncopy;
-	func.size 	= sizeof(tb_object_t*);
-	
-	// ok?
-	return func;
+    // init func
+    tb_item_func_t func = {0};
+    func.type   = TB_ITEM_TYPE_OBJ;
+    func.hash   = func_ptr.hash;
+    func.comp   = func_ptr.comp;
+    func.data   = func_ptr.data;
+    func.cstr   = tb_item_func_obj_cstr;
+    func.free   = tb_item_func_obj_free;
+    func.dupl   = tb_item_func_obj_dupl;
+    func.repl   = tb_item_func_obj_repl;
+    func.copy   = func_ptr.copy;
+    func.nfree  = func_str.nfree;
+    func.ndupl  = func_str.ndupl;
+    func.nrepl  = func_str.nrepl;
+    func.ncopy  = func_ptr.ncopy;
+    func.size   = sizeof(tb_object_t*);
+    
+    // ok?
+    return func;
 }

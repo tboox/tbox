@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		count.c
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        count.c
+ * @ingroup     algorithm
  *
  */
 
@@ -33,25 +33,25 @@
  */
 tb_size_t tb_count(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t priv, tb_iterator_comp_t comp)
 {
-	// check
-	tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
+    // check
+    tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
 
-	// null?
-	tb_check_return_val(head != tail, tail);
+    // null?
+    tb_check_return_val(head != tail, tail);
 
-	// the comparer
-	if (!comp) comp = tb_iterator_comp;
+    // the comparer
+    if (!comp) comp = tb_iterator_comp;
 
-	// count
-	tb_size_t count = 0;
-	tb_for (tb_pointer_t, item, head, tail, iterator) 
-		if (!comp(iterator, item, priv)) count++;
+    // count
+    tb_size_t count = 0;
+    tb_for (tb_pointer_t, item, head, tail, iterator) 
+        if (!comp(iterator, item, priv)) count++;
 
-	// ok?
-	return count;
+    // ok?
+    return count;
 } 
 tb_size_t tb_count_all(tb_iterator_t* iterator, tb_cpointer_t priv, tb_iterator_comp_t comp)
 {
-	return tb_count(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), priv, comp);
+    return tb_count(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), priv, comp);
 }
 

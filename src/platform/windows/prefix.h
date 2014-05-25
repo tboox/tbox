@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
+ * @author      ruki
+ * @file        prefix.h
  *
  */
 #ifndef TB_PLATFORM_WINDOWS_PREFIX_H
@@ -38,25 +38,25 @@
 // FILETIME => tb_time_t
 static __tb_inline__ tb_time_t tb_filetime_to_time(FILETIME ft)
 {
-	ULARGE_INTEGER 	ui = {{0}};  
-	ui.LowPart 		= ft.dwLowDateTime;  
-	ui.HighPart 	= ft.dwHighDateTime;  
-	return (tb_time_t)((LONGLONG)(ui.QuadPart - 116444736000000000) / 10000000);  
+    ULARGE_INTEGER  ui = {{0}};  
+    ui.LowPart      = ft.dwLowDateTime;  
+    ui.HighPart     = ft.dwHighDateTime;  
+    return (tb_time_t)((LONGLONG)(ui.QuadPart - 116444736000000000) / 10000000);  
 }
 
 // the path full for wchar
 static __tb_inline__ tb_wchar_t const* tb_path_full_w(tb_char_t const* path, tb_wchar_t* full, tb_size_t maxn)
 {
-	// the path full
-	tb_char_t full_a[TB_PATH_MAXN] = {0};
-	if (!tb_path_full(path, full_a, TB_PATH_MAXN)) return tb_null;
+    // the path full
+    tb_char_t full_a[TB_PATH_MAXN] = {0};
+    if (!tb_path_full(path, full_a, TB_PATH_MAXN)) return tb_null;
 
-	// atow
-	tb_size_t size = tb_atow(full, full_a, maxn);
-	if (size < maxn) full[size] = L'\0';
+    // atow
+    tb_size_t size = tb_atow(full, full_a, maxn);
+    if (size < maxn) full[size] = L'\0';
 
-	// ok?
-	return size? full : tb_null;
+    // ok?
+    return size? full : tb_null;
 }
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		rlc.c
- * @ingroup 	zip
+ * @author      ruki
+ * @file        rlc.c
+ * @ingroup     zip
  *
  */
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -31,156 +31,156 @@
  */
 static __tb_inline__ tb_zip_rlc_t* tb_zip_rlc_cast(tb_zip_t* zip)
 {
-	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_RLC, tb_null);
-	return (tb_zip_rlc_t*)zip;
+    tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_RLC, tb_null);
+    return (tb_zip_rlc_t*)zip;
 }
 static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
 {
-	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	tb_assert_and_check_return_val(rlc && ist && ost, -1);
+    tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
+    tb_assert_and_check_return_val(rlc && ist && ost, -1);
 
-	// the input stream
-	tb_byte_t* ip = ist->p;
-	tb_byte_t* ie = ist->e;
-	tb_check_return_val(ip && ip < ie, -1);
+    // the input stream
+    tb_byte_t* ip = ist->p;
+    tb_byte_t* ie = ist->e;
+    tb_check_return_val(ip && ip < ie, -1);
 
-	// the output stream
-	tb_byte_t* op = ost->p;
-	tb_byte_t* oe = ost->e;
-	tb_assert_and_check_return_val(op && oe, -1);
+    // the output stream
+    tb_byte_t* op = ost->p;
+    tb_byte_t* oe = ost->e;
+    tb_assert_and_check_return_val(op && oe, -1);
 
-	// get vlc
-	tb_zip_vlc_t* vlc = rlc->vlc;
-	tb_assert_and_check_return_val(vlc && vlc->set, -1);
+    // get vlc
+    tb_zip_vlc_t* vlc = rlc->vlc;
+    tb_assert_and_check_return_val(vlc && vlc->set, -1);
 
-	// vlc callback
-	tb_zip_vlc_set_t vlc_set = vlc->set;
-	
-	// get last & repeat
-	tb_byte_t last = 0;
-	tb_size_t repeat = 1;
-	if (!rlc->repeat)
-	{
-		last = *ip++;
-		repeat = 1;
-	}
-	else 
-	{
-		last = rlc->last;
-		repeat = rlc->repeat;
-	}
+    // vlc callback
+    tb_zip_vlc_set_t vlc_set = vlc->set;
+    
+    // get last & repeat
+    tb_byte_t last = 0;
+    tb_size_t repeat = 1;
+    if (!rlc->repeat)
+    {
+        last = *ip++;
+        repeat = 1;
+    }
+    else 
+    {
+        last = rlc->last;
+        repeat = rlc->repeat;
+    }
 
-	// deflate 
-	for (; ip <= ie; ip++)
-	{
-		// update repeat
-		if (*ip != last || ip == ie) 
-		{
-			// fill output, [FIXME]: vlc < 24?
-			if (tb_static_stream_left_bits(ost) > 32) 
-			{
-				if (repeat > 1)
-				{
-					// set flag
-					tb_static_stream_writ_u1(ost, 1);
+    // deflate 
+    for (; ip <= ie; ip++)
+    {
+        // update repeat
+        if (*ip != last || ip == ie) 
+        {
+            // fill output, [FIXME]: vlc < 24?
+            if (tb_static_stream_left_bits(ost) > 32) 
+            {
+                if (repeat > 1)
+                {
+                    // set flag
+                    tb_static_stream_writ_u1(ost, 1);
 
-					// set repeat
-					vlc_set(vlc, repeat, ost);
-					
-					// set value
-					tb_static_stream_writ_ubits32(ost, last, 8);
+                    // set repeat
+                    vlc_set(vlc, repeat, ost);
+                    
+                    // set value
+                    tb_static_stream_writ_ubits32(ost, last, 8);
 
-					//tb_trace_d("repeat(0x%02x): %d", last, repeat);
-				}
-				else
-				{
-					tb_assert(repeat == 1);
+                    //tb_trace_d("repeat(0x%02x): %d", last, repeat);
+                }
+                else
+                {
+                    tb_assert(repeat == 1);
 
-					// set flag
-					tb_static_stream_writ_u1(ost, 0);
+                    // set flag
+                    tb_static_stream_writ_u1(ost, 0);
 
-					// set value
-					tb_static_stream_writ_ubits32(ost, last, 8);
-				}
-			}
+                    // set value
+                    tb_static_stream_writ_ubits32(ost, last, 8);
+                }
+            }
 
-			// input is end?
-			if (ip == ie) break;
+            // input is end?
+            if (ip == ie) break;
 
-			// reset
-			last = *ip;
-			repeat = 1;
-		}
-		else repeat++;
-	}
+            // reset
+            last = *ip;
+            repeat = 1;
+        }
+        else repeat++;
+    }
 
-	// sync 
-	//tb_static_stream_sync(ost);
+    // sync 
+    //tb_static_stream_sync(ost);
 
-	// update 
-	ist->p = ip;
-	rlc->last = last;
-	rlc->repeat = repeat;
+    // update 
+    ist->p = ip;
+    rlc->last = last;
+    rlc->repeat = repeat;
 
-	// ok
-	return (ost->p - op);
+    // ok
+    return (ost->p - op);
 }
 static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
 {
-	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	tb_assert_and_check_return_val(rlc && ist && ost, -1);
+    tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
+    tb_assert_and_check_return_val(rlc && ist && ost, -1);
 
-	// the input stream
-	tb_byte_t* ip = ist->p;
-	tb_byte_t* ie = ist->e;
-	tb_assert_and_check_return_val(ip && ie, -1);
+    // the input stream
+    tb_byte_t* ip = ist->p;
+    tb_byte_t* ie = ist->e;
+    tb_assert_and_check_return_val(ip && ie, -1);
 
-	// the output stream
-	tb_byte_t* ob = ost->p;
-	tb_byte_t* op = ost->p;
-	tb_byte_t* oe = ost->e;
-	tb_assert_and_check_return_val(op && oe, -1);
+    // the output stream
+    tb_byte_t* ob = ost->p;
+    tb_byte_t* op = ost->p;
+    tb_byte_t* oe = ost->e;
+    tb_assert_and_check_return_val(op && oe, -1);
 
-	// get vlc
-	tb_zip_vlc_t* vlc = rlc->vlc;
-	tb_assert_and_check_return_val(vlc && vlc->get, -1);
+    // get vlc
+    tb_zip_vlc_t* vlc = rlc->vlc;
+    tb_assert_and_check_return_val(vlc && vlc->get, -1);
 
-	// vlc callback
-	tb_zip_vlc_get_t vlc_get = vlc->get;
+    // vlc callback
+    tb_zip_vlc_get_t vlc_get = vlc->get;
 
-	// fill the left bytes
-	tb_int_t 	repeat = rlc->repeat;
-	tb_byte_t 	last = rlc->last;
-	while (repeat-- > 0 && op < oe) *op++ = last;
+    // fill the left bytes
+    tb_int_t    repeat = rlc->repeat;
+    tb_byte_t   last = rlc->last;
+    while (repeat-- > 0 && op < oe) *op++ = last;
 
-	// inflate, [FIXME]: vlc < 24?
-	while (tb_static_stream_left_bits(ist) > 32 && op < oe)
-	{
-		// get flag
-		if (tb_static_stream_read_u1(ist))
-		{
-			// get repeat
-			repeat = vlc_get(vlc, ist);
+    // inflate, [FIXME]: vlc < 24?
+    while (tb_static_stream_left_bits(ist) > 32 && op < oe)
+    {
+        // get flag
+        if (tb_static_stream_read_u1(ist))
+        {
+            // get repeat
+            repeat = vlc_get(vlc, ist);
 
-			// get value
-			last = tb_static_stream_read_ubits32(ist, 8);
+            // get value
+            last = tb_static_stream_read_ubits32(ist, 8);
 
-			//tb_trace_d("repeat(0x%02x): %d", last, repeat);
+            //tb_trace_d("repeat(0x%02x): %d", last, repeat);
 
-			// fill bytes
-			while (repeat-- > 0 && op < oe) *op++ = last;
-	
-		}
-		else if (op < oe) *op++ = tb_static_stream_read_ubits32(ist, 8);
-	}
+            // fill bytes
+            while (repeat-- > 0 && op < oe) *op++ = last;
+    
+        }
+        else if (op < oe) *op++ = tb_static_stream_read_ubits32(ist, 8);
+    }
 
-	// update 
-	ost->p = op;
-	rlc->last = last;
-	rlc->repeat = repeat;
+    // update 
+    ost->p = op;
+    rlc->last = last;
+    rlc->repeat = repeat;
 
-	// ok
-	return (op - ob);
+    // ok
+    return (op - ob);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -189,44 +189,44 @@ static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_static_stream_t* ist,
 
 tb_zip_t* tb_zip_rlc_init(tb_size_t action)
 {
-	// alloc
-	tb_zip_t* zip = (tb_zip_t*)tb_malloc0(sizeof(tb_zip_rlc_t));
-	tb_assert_and_check_return_val(zip, tb_null);
-	
-	// init zip
-	zip->algo 		= TB_ZIP_ALGO_RLC;
-	zip->action 	= action;
-	zip->spak 		= (action == TB_ZIP_ACTION_INFLATE)? tb_zip_rlc_spak_inflate : tb_zip_rlc_spak_deflate;
+    // alloc
+    tb_zip_t* zip = (tb_zip_t*)tb_malloc0(sizeof(tb_zip_rlc_t));
+    tb_assert_and_check_return_val(zip, tb_null);
+    
+    // init zip
+    zip->algo       = TB_ZIP_ALGO_RLC;
+    zip->action     = action;
+    zip->spak       = (action == TB_ZIP_ACTION_INFLATE)? tb_zip_rlc_spak_inflate : tb_zip_rlc_spak_deflate;
 
-	// open vlc
+    // open vlc
 #if TB_ZIP_RLC_VLC_TYPE_GOLOMB
-	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_golomb_open((tb_zip_vlc_golomb_t*)&(zip->vlc), 4);
+    ((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_golomb_open((tb_zip_vlc_golomb_t*)&(zip->vlc), 4);
 #elif TB_ZIP_RLC_VLC_TYPE_GAMMA
-	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_gamma_open((tb_zip_vlc_gamma_t*)&(zip->vlc));
+    ((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_gamma_open((tb_zip_vlc_gamma_t*)&(zip->vlc));
 #else
-	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_fixed_open((tb_zip_vlc_fixed_t*)&(zip->vlc), 16);
+    ((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_fixed_open((tb_zip_vlc_fixed_t*)&(zip->vlc), 16);
 #endif
 
-	// check vlc
-	tb_assert_and_check_goto(((tb_zip_rlc_t*)zip)->vlc, fail);
+    // check vlc
+    tb_assert_and_check_goto(((tb_zip_rlc_t*)zip)->vlc, fail);
 
-	// ok
-	return zip;
+    // ok
+    return zip;
 
 fail:
-	if (zip) tb_free(zip);
-	return tb_null;
+    if (zip) tb_free(zip);
+    return tb_null;
 }
 tb_void_t tb_zip_rlc_exit(tb_zip_t* zip)
 {
-	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	if (rlc) 
-	{
-		// close vlc
-		if (rlc->vlc && rlc->vlc->clos) rlc->vlc->clos(rlc->vlc); 
+    tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
+    if (rlc) 
+    {
+        // close vlc
+        if (rlc->vlc && rlc->vlc->clos) rlc->vlc->clos(rlc->vlc); 
 
-		// free it
-		tb_free(rlc);
-	}
+        // free it
+        tb_free(rlc);
+    }
 }
 

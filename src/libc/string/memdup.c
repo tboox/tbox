@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memdup.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        memdup.c
+ * @ingroup     libc
  *
  */
 
@@ -34,26 +34,26 @@
 
 tb_pointer_t tb_memdup(tb_cpointer_t s, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s, tb_null);
-	
-	// check
+    // check
+    tb_assert_and_check_return_val(s, tb_null);
+    
+    // check
 #ifdef __tb_debug__
-	{
-		// overflow?
-		tb_size_t size = tb_memory_data_size(s);
-		if (size && n > size)
-		{
-			tb_trace_i("[memdup]: [overflow]: [%p, %lu] from [%p, %lu]", s, n, s, size);
-			tb_backtrace_dump("[memdup]: [overflow]: ", tb_null, 10);
-			tb_memory_data_dump(s, "\t[malloc]: [from]: ");
-			tb_abort();
-		}
-	}
+    {
+        // overflow?
+        tb_size_t size = tb_memory_data_size(s);
+        if (size && n > size)
+        {
+            tb_trace_i("[memdup]: [overflow]: [%p, %lu] from [%p, %lu]", s, n, s, size);
+            tb_backtrace_dump("[memdup]: [overflow]: ", tb_null, 10);
+            tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+            tb_abort();
+        }
+    }
 #endif
 
-	// done
-	__tb_register__ tb_pointer_t* p = tb_malloc(n);
-	if (p) tb_memcpy(p, s, n);
-	return p;
+    // done
+    __tb_register__ tb_pointer_t* p = tb_malloc(n);
+    if (p) tb_memcpy(p, s, n);
+    return p;
 }
