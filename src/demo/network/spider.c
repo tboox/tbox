@@ -334,7 +334,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
     // break or continue?
     return ok;
 }
-static tb_bool_t tb_demo_spider_task_ctrl(tb_stream_t* istream, tb_stream_t* ostream, tb_cpointer_t priv)
+static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(istream && ostream, tb_false);
@@ -427,7 +427,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     tb_spinlock_leave(&spider->lock);
 
     // ok? done task
-    if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
+    if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, 0, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
 
     // failed?
     if (!ok && size < TB_DEMO_SPIDER_TASK_MAXN)
@@ -503,17 +503,13 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
     tb_thread_pool_task_kill_all(tb_thread_pool());
 
     // kill all transfer tasks
-    tb_transfer_pool_kill(tb_transfer_pool());
+    tb_transfer_pool_kill_all(tb_transfer_pool());
 
     // wait all parser tasks exiting
     tb_thread_pool_task_wait_all(tb_thread_pool(), -1);
 
     // wait all transfer tasks exiting
-    while (tb_transfer_pool_size(tb_transfer_pool()))
-    {
-        // wait some time
-        tb_msleep(500);
-    }
+    tb_transfer_pool_wait_all(tb_transfer_pool(), -1);
 
     // enter
     tb_spinlock_enter(&spider->lock);

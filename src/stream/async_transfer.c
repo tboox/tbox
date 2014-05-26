@@ -58,6 +58,17 @@ typedef struct __tb_async_transfer_open_t
 
 }tb_async_transfer_open_t;
 
+// the async transfer ctrl type
+typedef struct __tb_async_transfer_ctrl_t
+{
+    // the func
+    tb_async_transfer_ctrl_func_t       func;
+
+    // the priv
+    tb_cpointer_t                       priv;
+
+}tb_async_transfer_ctrl_t;
+
 // the async transfer clos type
 typedef struct __tb_async_transfer_clos_t
 {
@@ -155,6 +166,9 @@ typedef struct __tb_async_transfer_t
 
     // the limited rate
     tb_atomic_t                         limited_rate;
+
+    // the ctrl
+    tb_async_transfer_ctrl_t            ctrl;
 
     // the open
     tb_async_transfer_open_t            open;
@@ -1026,6 +1040,9 @@ tb_bool_t tb_async_transfer_open(tb_handle_t handle, tb_hize_t offset, tb_async_
         transfer->done.saved_size1s   = 0;
         transfer->done.current_rate   = 0;
 
+        // ctrl stream
+        if (transfer->ctrl.func && !transfer->ctrl.func(transfer->istream, transfer->ostream, transfer->ctrl.priv)) break;
+
         // open and seek istream
         if (!tb_async_stream_open_seek(transfer->istream, offset, tb_async_transfer_istream_open_func, transfer)) break;
 
@@ -1039,6 +1056,22 @@ tb_bool_t tb_async_transfer_open(tb_handle_t handle, tb_hize_t offset, tb_async_
 
     // ok?
     return ok;
+}
+tb_bool_t tb_async_transfer_ctrl(tb_handle_t handle, tb_async_transfer_ctrl_func_t func, tb_cpointer_t priv)
+{
+    // check
+    tb_async_transfer_t* transfer = (tb_async_transfer_t*)handle;
+    tb_assert_and_check_return_val(transfer && func, tb_false);
+    
+    // check state
+    tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&transfer->state), tb_false);
+
+    // init func
+    transfer->ctrl.func = func;
+    transfer->ctrl.priv = priv;
+
+    // ok
+    return tb_true;
 }
 tb_bool_t tb_async_transfer_done(tb_handle_t handle, tb_async_transfer_done_func_t func, tb_cpointer_t priv)
 {

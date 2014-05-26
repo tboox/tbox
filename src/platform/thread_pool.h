@@ -81,8 +81,10 @@ tb_handle_t             tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t sta
 /*! exit thread pool
  *
  * @param pool          the thread pool handle
+ *
+ * @return              tb_true or tb_false
  */
-tb_void_t               tb_thread_pool_exit(tb_handle_t pool);
+tb_bool_t               tb_thread_pool_exit(tb_handle_t pool);
 
 /*! kill thread pool, all workers and waiting tasks 
  *

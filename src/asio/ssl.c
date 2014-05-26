@@ -327,7 +327,7 @@ static tb_bool_t tb_aicp_ssl_open_func(tb_aicp_ssl_t* ssl, tb_size_t state, tb_a
 
     // ok?
     tb_bool_t ok = tb_true;
-    if (state == TB_STATE_OK && !ssl->aico) 
+    if (state == TB_STATE_OK || !ssl->aico) 
     {
         // opened
         tb_atomic_set(&ssl->state, TB_STATE_OPENED);

@@ -65,10 +65,11 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
             total += count;
         }
     }
-#endif
 
     // wait all
     tb_thread_pool_task_wait_all(tb_thread_pool(), -1);
+
+#endif
 
     // trace
     tb_trace_i("end");
