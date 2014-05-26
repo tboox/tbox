@@ -39,10 +39,10 @@ typedef struct __tb_stream_filter_charset_t
     tb_stream_filter_t          base;
 
     // the from type
-    tb_size_t               ftype;
+    tb_size_t                   ftype;
 
     // the to type
-    tb_size_t               ttype;
+    tb_size_t                   ttype;
 
 }tb_stream_filter_charset_t;
 
@@ -77,7 +77,7 @@ static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_t* filter, tb_st
 tb_stream_filter_t* tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t to)
 {
     // done
-    tb_bool_t               ok = tb_false;
+    tb_bool_t                       ok = tb_false;
     tb_stream_filter_charset_t*     filter = tb_null;
     do
     {

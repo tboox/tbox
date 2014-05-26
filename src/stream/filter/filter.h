@@ -73,11 +73,28 @@ tb_stream_filter_t* tb_stream_filter_init_from_cache(tb_size_t size);
  */
 tb_void_t           tb_stream_filter_exit(tb_stream_filter_t* filter);
 
-/*! clear filter
+/*! open filter
+ *
+ * @param filter    the filter
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_stream_filter_open(tb_stream_filter_t* filter);
+
+/*! clos filter
  *
  * @param filter    the filter
  */
-tb_void_t           tb_stream_filter_cler(tb_stream_filter_t* filter);
+tb_void_t           tb_stream_filter_clos(tb_stream_filter_t* filter);
+
+/*! ctrl filter
+ *
+ * @param filter    the filter
+ * @param ctrl      the ctrl code
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_stream_filter_ctrl(tb_stream_filter_t* filter, tb_size_t ctrl, ...);
 
 /*! is eof for the filter input data, but the output maybe exists the left data and need flush it
  *

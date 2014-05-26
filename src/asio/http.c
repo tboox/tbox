@@ -697,8 +697,8 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
         // trace
         tb_trace_d("redirect: %s", location);
 
-        // only path?
-        if (location[0] == '/') tb_url_path_set(&http->option.url, location);
+        // only file path?
+        if (tb_url_protocol_probe(location) == TB_URL_PROTOCOL_FILE) tb_url_path_set(&http->option.url, location);
         // full url?
         else
         {
@@ -861,9 +861,6 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
                     if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 
-                    // clear filter
-                    tb_stream_filter_cler(filter);
-
                     // push data
                     if (!tb_stream_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
                     p = e;
@@ -896,8 +893,8 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
                 if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                 tb_assert_and_check_break(filter);
 
-                // clear filter
-                tb_stream_filter_cler(filter);
+                // ctrl filter
+                if (!tb_stream_filter_ctrl(filter, TB_STREAM_FILTER_CTRL_ZIP_SET_ALGO, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE)) break;
 
                 // limit the filter input size
                 if (http->status.content_size > 0) tb_stream_filter_limit(filter, http->status.content_size);
@@ -1225,7 +1222,7 @@ static tb_bool_t tb_aicp_http_read_func(tb_async_stream_t* astream, tb_size_t st
     tb_assert_and_check_return_val(http && http->stream && http->func.read, tb_false);
 
     // trace
-    tb_trace_d("read: real: %lu, state: %s", real, tb_state_cstr(state));
+    tb_trace_d("read: %s, real: %lu, state: %s", tb_url_get(&http->option.url), real, tb_state_cstr(state));
 
     // done func
     return http->func.read(http, state, data, real, size, http->priv);

@@ -36,10 +36,30 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_stream_filter_cler(tb_stream_filter_t* filter)
+tb_bool_t tb_stream_filter_open(tb_stream_filter_t* filter)
+{
+    // check
+    tb_assert_and_check_return_val(filter, tb_false);
+
+    // opened?
+    tb_check_return_val(!filter->bopened, tb_true);
+
+    // open it
+    filter->bopened = filter->open? filter->open(filter) : tb_true;
+
+    // ok?
+    return filter->bopened;
+}
+tb_void_t tb_stream_filter_clos(tb_stream_filter_t* filter)
 {
     // check
     tb_assert_and_check_return(filter);
+
+    // opened?
+    tb_check_return(filter->bopened);
+
+    // clos it
+    if (filter->clos) filter->clos(filter);
 
     // clear eof
     filter->beof = tb_false;
@@ -50,14 +70,14 @@ tb_void_t tb_stream_filter_cler(tb_stream_filter_t* filter)
     // clear offset
     filter->offset = 0;
     
-    // clear it
-    if (filter->cler) filter->cler(filter);
-
     // exit idata
     tb_scoped_buffer_clear(&filter->idata);
 
     // exit odata
     tb_queue_buffer_clear(&filter->odata);
+
+    // closed
+    filter->bopened = tb_false;
 }
 tb_void_t tb_stream_filter_exit(tb_stream_filter_t* filter)
 {
@@ -75,6 +95,24 @@ tb_void_t tb_stream_filter_exit(tb_stream_filter_t* filter)
 
     // free it
     tb_free(filter);
+}
+tb_bool_t tb_stream_filter_ctrl(tb_stream_filter_t* filter, tb_size_t ctrl, ...)
+{
+    // check
+    tb_assert_and_check_return_val(filter && filter->ctrl && ctrl, tb_false);
+
+    // init args
+    tb_va_list_t args;
+    tb_va_start(args, ctrl);
+
+    // ctrl it
+    tb_bool_t ok = filter->ctrl(filter, ctrl, args);
+
+    // exit args
+    tb_va_end(args);
+
+    // ok?
+    return ok;
 }
 tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
 {

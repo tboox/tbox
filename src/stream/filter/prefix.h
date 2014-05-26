@@ -31,19 +31,37 @@
 #include "../../memory/memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the stream filter ctrl
+#define TB_STREAM_FILTER_CTRL(type, ctrl)               (((type) << 16) | (ctrl))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
 /// the filter type enum
 typedef enum __tb_stream_filter_type_e
 {
-    TB_STREAM_FILTER_TYPE_NONE  = 0
+    TB_STREAM_FILTER_TYPE_NONE      = 0
 ,   TB_STREAM_FILTER_TYPE_ZIP       = 1
 ,   TB_STREAM_FILTER_TYPE_CACHE     = 2
 ,   TB_STREAM_FILTER_TYPE_CHARSET   = 3
 ,   TB_STREAM_FILTER_TYPE_CHUNKED   = 4
 
 }tb_stream_filter_type_e;
+
+/// the filter ctrl enum
+typedef enum __tb_stream_filter_ctrl_e
+{
+    TB_STREAM_FILTER_CTRL_NONE                  = 0
+,   TB_STREAM_FILTER_CTRL_ZIP_GET_ALGO          = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 1)
+,   TB_STREAM_FILTER_CTRL_ZIP_GET_ACTION        = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 2)
+,   TB_STREAM_FILTER_CTRL_ZIP_SET_ALGO          = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 3)
+,   TB_STREAM_FILTER_CTRL_ZIP_SET_ACTION        = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 4)
+
+}tb_stream_filter_ctrl_e;
 
 /// the filter type
 typedef struct __tb_stream_filter_t
@@ -53,6 +71,9 @@ typedef struct __tb_stream_filter_t
 
     /// the input is eof?
     tb_bool_t           beof;
+
+    /// is opened?
+    tb_bool_t           bopened;
 
     /// the input limit size 
     tb_hong_t           limit;
@@ -66,11 +87,17 @@ typedef struct __tb_stream_filter_t
     /// the output data 
     tb_queue_buffer_t   odata;
 
+    /// the open
+    tb_bool_t           (*open)(struct __tb_stream_filter_t* filter);
+
+    /// the clos
+    tb_void_t           (*clos)(struct __tb_stream_filter_t* filter);
+
     /// the spak
     tb_long_t           (*spak)(struct __tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
 
-    /// the cler
-    tb_void_t           (*cler)(struct __tb_stream_filter_t* filter);
+    /// the ctrl
+    tb_bool_t           (*ctrl)(struct __tb_stream_filter_t* filter, tb_size_t ctrl, tb_va_list_t args);
 
     /// the exit
     tb_void_t           (*exit)(struct __tb_stream_filter_t* filter);

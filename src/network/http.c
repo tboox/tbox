@@ -721,8 +721,8 @@ static tb_bool_t tb_http_response(tb_http_t* http)
                     if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 
-                    // clear filter
-                    tb_stream_filter_cler(filter);
+                    // ctrl filter
+                    if (!tb_stream_filter_ctrl(filter, TB_STREAM_FILTER_CTRL_ZIP_SET_ALGO, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE)) break;
 
                     // limit the filter input size
                     if (http->status.content_size > 0) tb_stream_filter_limit(filter, http->status.content_size);
@@ -812,7 +812,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
         tb_trace_d("redirect: %s", location);
 
         // only path?
-        if (location[0] == '/') tb_url_path_set(&http->option.url, location);
+        if (tb_url_protocol_probe(location) == TB_URL_PROTOCOL_FILE) tb_url_path_set(&http->option.url, location);
         // full url?
         else
         {

@@ -95,7 +95,7 @@ static tb_long_t tb_stream_filter_cache_spak(tb_stream_filter_t* filter, tb_stat
 tb_stream_filter_t* tb_stream_filter_init_from_cache(tb_size_t size)
 {
     // done
-    tb_bool_t           ok = tb_false;
+    tb_bool_t                   ok = tb_false;
     tb_stream_filter_cache_t*   filter = tb_null;
     do
     {

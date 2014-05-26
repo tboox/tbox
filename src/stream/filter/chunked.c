@@ -44,13 +44,13 @@ typedef struct __tb_stream_filter_chunked_t
     tb_stream_filter_t          base;
 
     // the chunked size
-    tb_size_t               size;
+    tb_size_t                   size;
 
     // the chunked read
-    tb_size_t               read;
+    tb_size_t                   read;
 
     // the cache line
-    tb_scoped_string_t      line;
+    tb_scoped_string_t          line;
 
 }tb_stream_filter_chunked_t;
 
@@ -206,7 +206,7 @@ static tb_long_t tb_stream_filter_chunked_spak(tb_stream_filter_t* filter, tb_st
     // ok
     return (op - ob);
 }
-static tb_void_t tb_stream_filter_chunked_cler(tb_stream_filter_t* filter)
+static tb_void_t tb_stream_filter_chunked_clos(tb_stream_filter_t* filter)
 {
     // check
     tb_stream_filter_chunked_t* cfilter = tb_stream_filter_chunked_cast(filter);
@@ -237,8 +237,8 @@ static tb_void_t tb_stream_filter_chunked_exit(tb_stream_filter_t* filter)
 tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
 {
     // done
-    tb_bool_t               ok = tb_false;
-    tb_stream_filter_chunked_t*     filter = tb_null;
+    tb_bool_t                   ok = tb_false;
+    tb_stream_filter_chunked_t* filter = tb_null;
     do
     {
         // noimpl for encoding chunked
@@ -255,7 +255,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
         // init filter 
         if (!tb_stream_filter_init((tb_stream_filter_t*)filter, TB_STREAM_FILTER_TYPE_CHUNKED)) break;
         filter->base.spak = tb_stream_filter_chunked_spak;
-        filter->base.cler = tb_stream_filter_chunked_cler;
+        filter->base.clos = tb_stream_filter_chunked_clos;
         filter->base.exit = tb_stream_filter_chunked_exit;
 
         // init line
