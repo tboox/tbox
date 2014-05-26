@@ -98,12 +98,12 @@ tb_size_t               tb_transfer_pool_maxn(tb_handle_t pool);
  * @param ourl          the output url
  * @param offset        the offset
  * @param rate          the limited rate, not limit if be zero
- * @param timeout       the timeout, using the default timeout if be zero
- * @param func          the done func 
+ * @param done          the done func 
+ * @param ctrl          the ctrl func 
  * @param priv          the func private data
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_transfer_pool_done(tb_handle_t pool, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_size_t rate, tb_long_t timeout, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_transfer_pool_done(tb_handle_t pool, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_size_t rate, tb_async_transfer_done_func_t done, tb_async_transfer_ctrl_func_t ctrl, tb_cpointer_t priv);
 
 #endif

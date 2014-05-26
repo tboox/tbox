@@ -45,6 +45,16 @@
  */
 typedef tb_bool_t   (*tb_async_transfer_open_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_cpointer_t priv);
 
+/*! the async transfer ctrl func type
+ *
+ * @param istream   the istream
+ * @param ostream   the ostream
+ * @param priv      the func private data
+ *
+ * @return          tb_true: ok, tb_false: break it
+ */
+typedef tb_bool_t   (*tb_async_transfer_ctrl_func_t)(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_cpointer_t priv);
+
 /*! the async transfer done func type
  *
  * @param state     the stream state 
@@ -147,6 +157,17 @@ tb_bool_t           tb_async_transfer_ctrl_istream(tb_handle_t transfer, tb_size
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_async_transfer_ctrl_ostream(tb_handle_t transfer, tb_size_t ctrl, ...);
+
+/*! ctrl transfer
+ *
+ * @param transfer  the async transfer
+ * @param offset    the start offset
+ * @param func      the ctrl func 
+ * @param priv      the func private data
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_async_transfer_ctrl(tb_handle_t transfer, tb_async_transfer_ctrl_func_t func, tb_cpointer_t priv);
 
 /*! open transfer
  *

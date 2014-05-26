@@ -107,10 +107,10 @@ static tb_void_t tb_transfer_task_exit(tb_transfer_pool_t* pool, tb_transfer_tas
     // append task to the idle list
     tb_vector_insert_tail(pool->idle, task);
 }
-static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_t* pool, tb_async_transfer_done_func_t func, tb_cpointer_t priv)
+static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_t* pool, tb_async_transfer_done_func_t done, tb_async_transfer_ctrl_func_t ctrl, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(pool && func, tb_null);
+    tb_assert_and_check_return_val(pool && done, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
@@ -154,8 +154,11 @@ static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_t* pool, tb_as
             tb_assert_and_check_break(task->transfer);
         }
 
+        // init ctrl
+        if (ctrl && !tb_async_transfer_ctrl(task->transfer, ctrl, priv)) break;
+
         // init task
-        task->func = func;
+        task->func = done;
         task->priv = priv;
         task->itor = tb_iterator_tail(pool->work);
         task->pool = pool;
@@ -343,6 +346,9 @@ tb_void_t tb_transfer_pool_kill_all(tb_handle_t handle)
     // trace
     tb_trace_d("kill_all: ..");
 
+    // check 
+    tb_check_return(TB_STATE_OK == tb_atomic_get(&pool->state));
+
     // enter
     tb_spinlock_enter(&pool->lock);
 
@@ -368,9 +374,32 @@ tb_void_t tb_transfer_pool_kill_all(tb_handle_t handle)
         copy = tb_null;
     }
 }
-tb_long_t tb_transfer_pool_wait_all(tb_handle_t pool, tb_long_t timeout)
+tb_long_t tb_transfer_pool_wait_all(tb_handle_t handle, tb_long_t timeout)
 {
-    return -1;
+    // check
+    tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
+    tb_assert_and_check_return_val(pool, -1);
+
+    // wait it
+    tb_size_t size = 0;
+    tb_hong_t time = tb_cache_time_spak();
+    while ((timeout < 0 || tb_cache_time_spak() < time + timeout))
+    {
+        // the task count
+        size = tb_transfer_pool_size(handle);
+
+        // ok?
+        tb_check_break(size);
+
+        // trace
+        tb_trace_d("wait: %lu: ..", size);
+
+        // wait some time
+        tb_msleep(200);
+    }
+
+    // ok?
+    return !size? 1 : 0;
 }
 tb_bool_t tb_transfer_pool_exit(tb_handle_t handle)
 {
@@ -385,7 +414,7 @@ tb_bool_t tb_transfer_pool_exit(tb_handle_t handle)
     tb_transfer_pool_kill(handle);
 
     // wait all
-    if (tb_transfer_pool_wait_all(handle, 5000) > 0)
+    if (tb_transfer_pool_wait_all(handle, 5000) <= 0)
     {
         // trace
         tb_trace_e("exit: wait failed!");
@@ -466,7 +495,7 @@ tb_size_t tb_transfer_pool_size(tb_handle_t handle)
     // ok?
     return size;
 }
-tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_size_t rate, tb_long_t timeout, tb_async_transfer_done_func_t func, tb_cpointer_t priv)
+tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_size_t rate, tb_async_transfer_done_func_t done, tb_async_transfer_ctrl_func_t ctrl, tb_cpointer_t priv)
 {
     // check
     tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
@@ -492,16 +521,12 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
         }
 
         // init task
-        task = tb_transfer_task_init(pool, func, priv);
+        task = tb_transfer_task_init(pool, done, ctrl, priv);
         tb_assert_and_check_break(task && task->transfer);
 
         // init transfer stream
         if (!tb_async_transfer_init_istream_from_url(task->transfer, iurl)) break;
         if (!tb_async_transfer_init_ostream_from_url(task->transfer, ourl)) break;
-
-        // init transfer timeout
-        if (!tb_async_transfer_ctrl_istream(task->transfer, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
-        if (!tb_async_transfer_ctrl_ostream(task->transfer, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
 
         // init transfer rate
         tb_async_transfer_limitrate(task->transfer, rate);

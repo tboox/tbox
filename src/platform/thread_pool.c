@@ -426,7 +426,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
         tb_assert_and_check_break(worker->stats);
         
         // loop
-        while (!tb_atomic_get(&worker->bstoped))
+        while (1)
         {
             // pull jobs if be idle
             if (!tb_vector_size(worker->jobs))
@@ -488,6 +488,9 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                 // idle? wait it
                 if (!tb_vector_size(worker->jobs))
                 {
+                    // killed?
+                    tb_check_break(!tb_atomic_get(&worker->bstoped));
+
                     // trace
                     tb_trace_d("worker[%lu]: wait: ..", worker->id);
 
@@ -818,11 +821,11 @@ tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
     // ok?
     return (tb_handle_t)pool;
 }
-tb_void_t tb_thread_pool_exit(tb_handle_t handle)
+tb_bool_t tb_thread_pool_exit(tb_handle_t handle)
 {
     // check
     tb_thread_pool_t* pool = (tb_thread_pool_t*)handle;
-    tb_assert_and_check_return(pool);
+    tb_assert_and_check_return_val(pool, tb_false);
 
     // trace
     tb_trace_d("exit: ..");
@@ -830,10 +833,17 @@ tb_void_t tb_thread_pool_exit(tb_handle_t handle)
     // kill it first
     tb_thread_pool_kill(handle);
 
-    // enter
-    tb_spinlock_enter(&pool->lock);
+    // wait all
+    if (tb_thread_pool_task_wait_all(handle, 5000) <= 0)
+    {
+        // trace
+        tb_trace_e("exit: wait failed!");
+        return tb_false;
+    }
 
-    // exit all workers
+    /* exit all workers
+     * need not lock it because the worker size will not be increase d
+     */
     tb_size_t i = 0;
     tb_size_t n = pool->worker_size;
     for (i = 0; i < n; i++) 
@@ -858,6 +868,9 @@ tb_void_t tb_thread_pool_exit(tb_handle_t handle)
         }
     }
     pool->worker_size = 0;
+
+    // enter
+    tb_spinlock_enter(&pool->lock);
 
     // exit pending jobs
     if (pool->jobs_pending) tb_list_exit(pool->jobs_pending);
@@ -890,6 +903,9 @@ tb_void_t tb_thread_pool_exit(tb_handle_t handle)
 
     // trace
     tb_trace_d("exit: ok");
+
+    // ok
+    return tb_true;
 }
 tb_void_t tb_thread_pool_kill(tb_handle_t handle)
 {
@@ -1153,27 +1169,20 @@ tb_long_t tb_thread_pool_task_wait_all(tb_handle_t handle, tb_long_t timeout)
     // wait it
     tb_size_t size = 0;
     tb_hong_t time = tb_cache_time_spak();
-    tb_bool_t bstoped = tb_false;
-    while (!bstoped && (timeout < 0 || tb_cache_time_spak() < time + timeout))
+    while ((timeout < 0 || tb_cache_time_spak() < time + timeout))
     {
         // enter
         tb_spinlock_enter(&pool->lock);
 
-        // is stoped?
-        bstoped = pool->bstoped;
-        if (!bstoped)
-        {
-            // the jobs count
-            size = pool->jobs_pool? tb_fixed_pool_size(pool->jobs_pool) : 0;
+        // the jobs count
+        size = pool->jobs_pool? tb_fixed_pool_size(pool->jobs_pool) : 0;
 
-            // trace
-            tb_trace_d("wait: jobs: %lu, waiting: %lu, pending: %lu, urgent: %lu: .."
-                        , size
-                        , pool->jobs_waiting? tb_single_list_size(pool->jobs_waiting) : 0
-                        , pool->jobs_pending? tb_list_size(pool->jobs_pending) : 0
-                        , pool->jobs_urgent? tb_single_list_size(pool->jobs_urgent) : 0);
-        }
-        else size = 0;
+        // trace
+        tb_trace_d("wait: jobs: %lu, waiting: %lu, pending: %lu, urgent: %lu: .."
+                    , size
+                    , pool->jobs_waiting? tb_single_list_size(pool->jobs_waiting) : 0
+                    , pool->jobs_pending? tb_list_size(pool->jobs_pending) : 0
+                    , pool->jobs_urgent? tb_single_list_size(pool->jobs_urgent) : 0);
 
         // leave
         tb_spinlock_leave(&pool->lock);
