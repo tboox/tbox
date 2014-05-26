@@ -10,8 +10,6 @@ demo_TYPE 									= BIN
 # files
 demo_C_FILES 								+= \
 											demo \
-											flv/flv \
-											flv/libflv \
 											libc/time \
 											libc/wchar \
 											libc/string \
@@ -27,6 +25,8 @@ demo_C_FILES 								+= \
 											utils/base32 \
 											utils/base64 \
 											other/test \
+											other/flv \
+											other/libflv \
 											stream/basic_stream/null \
 											stream/basic_stream/cache \
 											string/string_pool \
