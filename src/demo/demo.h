@@ -41,9 +41,6 @@
  * interfaces
  */
 
-// flv
-TB_DEMO_MAIN_DECL(flv);
-
 // database
 TB_DEMO_MAIN_DECL(database_sql);
 
@@ -87,6 +84,7 @@ TB_DEMO_MAIN_DECL(utils_base32);
 TB_DEMO_MAIN_DECL(utils_base64);
 
 // other
+TB_DEMO_MAIN_DECL(other_flv);
 TB_DEMO_MAIN_DECL(other_test);
 TB_DEMO_MAIN_DECL(other_charset);
 

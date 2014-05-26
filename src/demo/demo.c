@@ -32,8 +32,18 @@ typedef struct __tb_demo_t
 // the demos
 static tb_demo_t g_demo[] = 
 {
-    // flv
-    TB_DEMO_MAIN_ITEM(flv)
+    // libc
+    TB_DEMO_MAIN_ITEM(libc_time)
+,   TB_DEMO_MAIN_ITEM(libc_wchar)
+,   TB_DEMO_MAIN_ITEM(libc_string)
+,   TB_DEMO_MAIN_ITEM(libc_stdlib)
+
+    // libm
+#ifdef TB_CONFIG_TYPE_FLOAT
+,   TB_DEMO_MAIN_ITEM(libm_float)
+,   TB_DEMO_MAIN_ITEM(libm_double)
+#endif
+,   TB_DEMO_MAIN_ITEM(libm_integer)
 
     // database
 #ifdef TB_CONFIG_MODULE_HAVE_DATABASE
@@ -46,19 +56,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(xml_writer)
 ,   TB_DEMO_MAIN_ITEM(xml_document)
 #endif
-
-    // libc
-,   TB_DEMO_MAIN_ITEM(libc_time)
-,   TB_DEMO_MAIN_ITEM(libc_wchar)
-,   TB_DEMO_MAIN_ITEM(libc_string)
-,   TB_DEMO_MAIN_ITEM(libc_stdlib)
-
-    // libm
-#ifdef TB_CONFIG_TYPE_FLOAT
-,   TB_DEMO_MAIN_ITEM(libm_float)
-,   TB_DEMO_MAIN_ITEM(libm_double)
-#endif
-,   TB_DEMO_MAIN_ITEM(libm_integer)
 
     // asio
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
@@ -90,6 +87,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(utils_base64)
 
     // other
+,   TB_DEMO_MAIN_ITEM(other_flv)
 ,   TB_DEMO_MAIN_ITEM(other_test)
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,   TB_DEMO_MAIN_ITEM(other_charset)
