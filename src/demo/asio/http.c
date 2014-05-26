@@ -17,13 +17,19 @@ static tb_bool_t tb_demo_aicp_http_head_func(tb_handle_t http, tb_char_t const* 
     // ok
     return tb_true;
 }
+static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("clos: state: %s", tb_state_cstr(state));
 
+#if 0
     // kill loop
     tb_aicp_kill((tb_aicp_t*)priv);
+#else
+    // reopen and read 
+    tb_aicp_http_oread(handle, 0, tb_demo_aicp_http_read_func, priv);
+#endif
 }
 static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
@@ -68,6 +74,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
 
     // init cookies
     if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) goto end;
+    if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Cookie", "H_PS_PSSID=4990_6552_6249_1434_5225_6582_6504_6476_4760_6017_6673_6428_6632_6530_6502; BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; BDSVRTM=0; BAIDUID=344544EE3DE59CCF2BFDDB2EE0F49F7E:FG=1;")) goto end;
     
     // init url
     if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_URL, argv[1])) goto end;
@@ -77,6 +84,17 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
 
     // init head func
     if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_demo_aicp_http_head_func)) goto end;
+
+#ifdef TB_CONFIG_MODULE_HAVE_ZIP
+    // need gzip
+    if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Accept-Encoding", "gzip,deflate")) goto end;
+
+    // auto unzip
+    if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_AUTO_UNZIP, 1)) goto end;
+#endif
+
+    // user agent
+    if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36")) goto end;
 
     // init post
     if (argv[2])

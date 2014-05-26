@@ -47,7 +47,7 @@ typedef enum __tb_zip_action_t
 // the zip algorithm type
 typedef enum __tb_zip_algo_t
 {
-    TB_ZIP_ALGO_NULL        = 0     //!< null
+    TB_ZIP_ALGO_NONE        = 0     //!< null
 ,   TB_ZIP_ALGO_RLC         = 1     //!< run length coding
 ,   TB_ZIP_ALGO_HUFFMAN     = 2     //!< adaptive huffman
 ,   TB_ZIP_ALGO_LZSW        = 3     //!< sliding window .e.g lz77 lzss ...

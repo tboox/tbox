@@ -38,6 +38,9 @@ typedef struct __tb_demo_spider_t
     // the filter
     tb_bloom_filter_t*          filter;
 
+    // the state
+    tb_atomic_t                 state;
+
 }tb_demo_spider_t;
 
 // the demo spider task type
@@ -299,7 +302,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
 {
     // check
     tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;
-    tb_assert_and_check_return_val(task, tb_false);
+    tb_assert_and_check_return_val(task && task->spider, tb_false);
 
     // percent
     tb_size_t percent = 0;
@@ -313,7 +316,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
     tb_bool_t ok = tb_false;
     if (state == TB_STATE_OK) ok = tb_true;
     // closed?
-    else if (state == TB_STATE_CLOSED)
+    else if (state == TB_STATE_CLOSED && TB_STATE_OK == tb_atomic_get(&task->spider->state))
     {
         // trace
         tb_trace_i("task: done: %s: ok", task->iurl);
@@ -368,6 +371,9 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 {
     // check
     tb_assert_and_check_return_val(spider && url, tb_false);
+
+    // killed?
+    tb_check_return_val(TB_STATE_OK == tb_atomic_get(&spider->state), tb_false);
 
     // enter
     tb_spinlock_enter(&spider->lock);
@@ -467,6 +473,9 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_char_t const* 
         tb_size_t size = tb_strlen(spider->root);
         if (size && (spider->root[size - 1] == '/' || spider->root[size - 1] == '\\')) spider->root[size - 1] = '\0';
 
+        // init state
+        spider->state = TB_STATE_OK;
+
         // init lock
         if (!tb_spinlock_init(&spider->lock)) break;
 
@@ -499,17 +508,20 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
     // trace
     tb_trace_d("exit: ..");
 
-    // kill all parser tasks
-    tb_thread_pool_task_kill_all(tb_thread_pool());
+    // kill it
+    tb_atomic_set(&spider->state, TB_STATE_KILLING);
 
     // kill all transfer tasks
     tb_transfer_pool_kill_all(tb_transfer_pool());
 
-    // wait all parser tasks exiting
-    tb_thread_pool_task_wait_all(tb_thread_pool(), -1);
+    // kill all parser tasks
+    tb_thread_pool_task_kill_all(tb_thread_pool());
 
     // wait all transfer tasks exiting
     tb_transfer_pool_wait_all(tb_transfer_pool(), -1);
+
+    // wait all parser tasks exiting
+    tb_thread_pool_task_wait_all(tb_thread_pool(), -1);
 
     // enter
     tb_spinlock_enter(&spider->lock);
