@@ -555,22 +555,27 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_t* stream)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // trace
-    tb_trace_d("exit: ..");
+    tb_trace_d("exit: %s: ..", tb_url_get(&stream->base.url));
 
     // kill it first
     tb_stream_kill(stream);
 
-    // wait for closing
+    // try closing it
     tb_size_t tryn = 30;
-    while ((TB_STATE_CLOSED != tb_atomic_get(&stream->base.istate)) && tryn--)
+    tb_bool_t ok = tb_false;
+    while (!(ok = tb_async_stream_clos_try(stream)) && tryn--)
     {
-        // trace
-        tb_trace_d("exit: wait: %s: %s: ..", tb_url_get(&stream->base.url), tb_state_cstr(tb_atomic_get(&stream->base.istate)));
-
         // wait some time
         tb_msleep(200);
     }
-    tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate), tb_false);
+
+    // close failed?
+    if (!ok)
+    {
+        // trace
+        tb_trace_e("exit: %s: failed!", tb_url_get(&stream->base.url));
+        return tb_false;
+    }
 
     // exit it
     if (stream->exit && !stream->exit(stream)) return tb_false;
@@ -597,7 +602,10 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_t* stream)
 {
     // check
     tb_assert_and_check_return_val(stream && stream->open, tb_false);
-    
+     
+    // trace
+    tb_trace_d("open: try: %s: ..", tb_url_get(&stream->base.url));
+
     // set opening
     tb_size_t state = tb_atomic_fetch_and_pset(&stream->base.istate, TB_STATE_CLOSED, TB_STATE_OPENING);
 
@@ -607,7 +615,7 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_t* stream)
     // must be closed
     tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
 
-    // open it
+    // try opening it
     return stream->open(stream, tb_null, tb_null);
 }
 tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv __tb_debug_decl__)
@@ -615,6 +623,9 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_
     // check
     tb_assert_and_check_return_val(stream && stream->open && func, tb_false);
     
+    // trace
+    tb_trace_d("open: %s: ..", tb_url_get(&stream->base.url));
+
     // set opening
     tb_size_t state = tb_atomic_fetch_and_pset(&stream->base.istate, TB_STATE_CLOSED, TB_STATE_OPENING);
 
@@ -631,24 +642,51 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_
     // open it
     return stream->open(stream, func, priv);
 }
+tb_bool_t tb_async_stream_clos_try(tb_async_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream && stream->clos, tb_false);
+
+    // trace
+    tb_trace_d("clos: try: %s: ..", tb_url_get(&stream->base.url));
+
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // closed?
+        if (TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate))
+        {
+            ok = tb_true;
+            break;
+        }
+
+        // try closing it
+        ok = stream->clos(stream, tb_null, tb_null);
+
+    } while (0);
+
+    // trace
+    tb_trace_d("clos: try: %s: %s", tb_url_get(&stream->base.url), ok? "ok" : "no");
+         
+    // ok?
+    return ok;
+}
 tb_bool_t tb_async_stream_clos_(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(stream && stream->clos && func, tb_false);
 
     // trace
-    tb_trace_d("clos: ..");
+    tb_trace_d("clos: %s: ..", tb_url_get(&stream->base.url));
 
-    // closed? done func directly
-    if (TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate))
+    // try closing ok? done func directly
+    if (tb_async_stream_clos_try(stream))
     {
         // done func
         func(stream, TB_STATE_OK, priv);
         return tb_true;
     }
-
-    // must be opened
-    tb_assert_and_check_return_val(tb_stream_is_opened(stream), tb_false);
 
     // save debug info
 #ifdef __tb_debug__

@@ -138,14 +138,10 @@ static tb_bool_t tb_async_stream_filter_open(tb_handle_t astream, tb_async_strea
     // post open
     return tb_async_stream_open(fstream->stream, tb_async_stream_filter_open_func, astream);
 }
-static tb_void_t tb_async_stream_filter_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_filter_clos_clear(tb_async_stream_filter_t* fstream)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(fstream && fstream->func.clos);
-
-    // trace
-    tb_trace_d("clos: notify: ..");
+    tb_assert_and_check_return(fstream);
 
     // clos the filter
     if (fstream->filter) tb_stream_filter_clos(fstream->filter);
@@ -158,6 +154,18 @@ static tb_void_t tb_async_stream_filter_clos_func(tb_async_stream_t* stream, tb_
 
     // clear base
     tb_async_stream_clear(&fstream->base);
+}
+static tb_void_t tb_async_stream_filter_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(fstream && fstream->func.clos);
+
+    // trace
+    tb_trace_d("clos: notify: ..");
+
+    // clear it
+    tb_async_stream_filter_clos_clear(fstream);
 
     /* done clos func
      *
@@ -177,12 +185,27 @@ static tb_bool_t tb_async_stream_filter_clos(tb_handle_t astream, tb_async_strea
     // trace
     tb_trace_d("clos: ..");
 
+    // try closing?
+    if (!func)
+    {
+        // try closing ok?
+        if (!fstream->stream || tb_async_stream_clos_try(fstream->stream))
+        {
+            // clear it
+            tb_async_stream_filter_clos_clear(fstream);
+            return tb_true;
+        }
+
+        // failed
+        return tb_false;
+    }
+
     // init clos
     fstream->func.clos  = func;
     fstream->priv       = priv;
 
-    // no stream? done func directly
-    if (!fstream->stream)
+    // try closing ok?
+    if (!fstream->stream || tb_async_stream_clos_try(fstream->stream))
     {
         // done func
         tb_async_stream_filter_clos_func(tb_null, TB_STATE_OK, fstream);

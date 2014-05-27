@@ -81,6 +81,9 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
     case TB_STATE_HTTP_RESPONSE_302:            return "http: response: 302";
     case TB_STATE_HTTP_RESPONSE_303:            return "http: response: 303";
     case TB_STATE_HTTP_RESPONSE_304:            return "http: response: 304";
+    case TB_STATE_HTTP_RESPONSE_305:            return "http: response: 305";
+    case TB_STATE_HTTP_RESPONSE_306:            return "http: response: 306";
+    case TB_STATE_HTTP_RESPONSE_307:            return "http: response: 307";
     case TB_STATE_HTTP_RESPONSE_400:            return "http: response: 400";
     case TB_STATE_HTTP_RESPONSE_401:            return "http: response: 401";
     case TB_STATE_HTTP_RESPONSE_402:            return "http: response: 402";

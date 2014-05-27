@@ -108,16 +108,6 @@ tb_handle_t         tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver);
  */
 tb_void_t           tb_aicp_ssl_kill(tb_handle_t handle);
 
-/*! close the ssl
- *
- * @param handle    the ssl handle
- * @param func      the func
- * @param priv      the func private data
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_aicp_ssl_clos(tb_handle_t handle, tb_aicp_ssl_clos_func_t func, tb_cpointer_t priv);
-
 /*! exit the ssl
  *
  * @param handle    the ssl handle
@@ -149,6 +139,24 @@ tb_void_t           tb_aicp_ssl_set_timeout(tb_handle_t handle, tb_long_t timeou
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_cpointer_t priv);
+
+/*! close the ssl
+ *
+ * @param handle    the ssl handle
+ * @param func      the func
+ * @param priv      the func private data
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aicp_ssl_clos(tb_handle_t handle, tb_aicp_ssl_clos_func_t func, tb_cpointer_t priv);
+
+/*! try closing the ssl
+ *
+ * @param handle    the ssl handle
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aicp_ssl_clos_try(tb_handle_t handle);
 
 /*! read the ssl
  *
@@ -221,7 +229,7 @@ tb_bool_t           tb_aicp_ssl_task(tb_handle_t handle, tb_size_t delay, tb_aic
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
+tb_bool_t           tb_aicp_ssl_open_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
 
 /*! open and writ the ssl, open it first if not opened 
  *
@@ -233,7 +241,7 @@ tb_bool_t           tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_si
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_ssl_owrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
+tb_bool_t           tb_aicp_ssl_open_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
 
 /*! the ssl aicp
  *

@@ -135,6 +135,14 @@ tb_bool_t           tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func
  */
 tb_bool_t           tb_aicp_http_clos(tb_handle_t handle, tb_aicp_http_clos_func_t func, tb_cpointer_t priv);
 
+/*! try closing the http
+ *
+ * @param handle    the http handle
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aicp_http_clos_try(tb_handle_t handle);
+
 /*! read the http
  *
  * @param handle    the http handle

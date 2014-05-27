@@ -134,11 +134,6 @@ tb_void_t tb_string_pool_exit(tb_handle_t handle)
     tb_string_pool_t* pool = (tb_string_pool_t*)handle;
     tb_assert_and_check_return(pool);
 
-    // dump
-#ifdef __tb_debug__
-    tb_string_pool_dump(handle);
-#endif
-
     // enter
     tb_spinlock_enter(&pool->lock);
 

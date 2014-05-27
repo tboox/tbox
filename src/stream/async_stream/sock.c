@@ -370,14 +370,10 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
     // ok
     return tb_true;
 }
-static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_clos_clear(tb_async_stream_sock_t* sstream)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(sstream && sstream->func.clos);
-
-    // trace
-    tb_trace_d("clos: notify: ..");
+    tb_assert_and_check_return(sstream);
 
     // clear the mode
     sstream->bread = 0;
@@ -399,6 +395,18 @@ static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t 
 
     // clear base
     tb_async_stream_clear(&sstream->base);
+}
+static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(sstream && sstream->func.clos);
+
+    // trace
+    tb_trace_d("clos: notify: ..");
+
+    // clear it
+    tb_async_stream_sock_clos_clear(sstream);
 
     /* done clos func
      *
@@ -472,10 +480,31 @@ static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_
 {   
     // check
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
-    tb_assert_and_check_return_val(sstream && func, tb_false);
+    tb_assert_and_check_return_val(sstream, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
+
+    // try closing?
+    if (!func)
+    {
+        // try closing ssl first
+#ifdef TB_SSL_ENABLE
+        if (!sstream->hssl || tb_aicp_ssl_clos_try(sstream->hssl))
+#endif
+        {
+            // no aico and dns?
+            if (!sstream->aico && !sstream->hdns) 
+            {
+                // clear it
+                tb_async_stream_sock_clos_clear(sstream);
+                return tb_true;
+            }
+        }
+
+        // failed
+        return tb_false;
+    }
 
     // init clos
     sstream->func.clos  = func;
@@ -1011,8 +1040,10 @@ static tb_bool_t tb_async_stream_sock_exit(tb_handle_t astream)
     sstream->hssl = tb_null;
 #endif
 
-    // sock has been not closed already?
-    tb_assert_and_check_return_val(!sstream->sock, tb_false);
+    // exit it
+    if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
+    sstream->sock = tb_null;
+    sstream->bref = 0;
 
     // ok
     return tb_true;

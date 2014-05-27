@@ -328,28 +328,95 @@ typedef struct __tb_async_stream_t
     /// the writ cache maxn
     tb_size_t                           wcache_maxn;
 
-    /// open
+    /*! open stream
+     *
+     * will try opening it if func and priv be passed null
+     * 
+     * @param stream                    the stream
+     * @param func                      the open func
+     * @param priv                      the func private data
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*open)(tb_handle_t stream, tb_async_stream_open_func_t func, tb_cpointer_t priv);
 
-    /// clos
+    /*! clos stream
+     *
+     * will try closing it if func and priv be passed null
+     * 
+     * @param stream                    the stream
+     * @param func                      the open func
+     * @param priv                      the func private data
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*clos)(tb_handle_t stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv);
 
-    /// read
+    /*! read stream
+     *
+     * @param stream                    the stream
+     * @param delay                     read it after the delay time, ms
+     * @param data                      the read data
+     * @param size                      the read size
+     * @param func                      the read func
+     * @param priv                      the func private data
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*read)(tb_handle_t stream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv);
 
-    /// writ
+    /*! writ stream
+     *
+     * @param stream                    the stream
+     * @param delay                     writ it after the delay time, ms
+     * @param data                      the writ data
+     * @param size                      the writ size
+     * @param func                      the writ func
+     * @param priv                      the func private data
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*writ)(tb_handle_t stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv);
 
-    /// seek
+    /*! seek stream
+     *
+     * @param stream                    the stream
+     * @param offset                    the seek offset
+     * @param func                      the writ func
+     * @param priv                      the func private data
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*seek)(tb_handle_t stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv);
 
-    /// sync
+    /*! sync stream
+     *
+     * @param stream                    the stream
+     * @param bclosing                  the stream will be closed? 
+     * @param func                      the writ func
+     * @param priv                      the func private data
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*sync)(tb_handle_t stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv);
 
-    /// task
+    /*! post stream task
+     *
+     * @param stream                    the stream
+     * @param delay                     done it after the delay time, ms
+     * @param func                      the writ func
+     * @param priv                      the func private data
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*task)(tb_handle_t stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv);
 
-    /// exit
+    /*! exit stream
+     *
+     * @param stream                    the stream
+     *
+     * @return                          tb_true or tb_false
+     */
     tb_bool_t                           (*exit)(tb_handle_t stream);
 
 }tb_async_stream_t;
@@ -526,7 +593,7 @@ tb_async_stream_t*      tb_async_stream_init_filter_from_charset(tb_async_stream
  */
 tb_async_stream_t*      tb_async_stream_init_filter_from_chunked(tb_async_stream_t* stream, tb_bool_t dechunked);
 
-/*! try to open the stream for stream: file, filter, ... 
+/*! try opening the stream for stream: file, filter, ... 
  *
  * @param stream        the stream
  *
@@ -543,6 +610,14 @@ tb_bool_t               tb_async_stream_open_try(tb_async_stream_t* stream);
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+
+/*! try closing the stream for stream: file, filter, or closed stream... 
+ *
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_async_stream_clos_try(tb_async_stream_t* stream);
 
 /*! close the stream
  *

@@ -409,7 +409,9 @@ tb_long_t tb_transfer_pool_wait_all(tb_handle_t handle, tb_long_t timeout)
         tb_trace_d("wait: %lu: ..", size);
 
         // trace work
+#ifdef __tb_debug__
         if (size) tb_walk_all(pool->work, tb_transfer_pool_work_wait, tb_null);
+#endif
 
         // leave
         tb_spinlock_leave(&pool->lock);
