@@ -471,6 +471,11 @@ static tb_pointer_t tb_static_block_pool_malloc_from(tb_static_block_pool_t* poo
                     // merge next block
                     block->size += nhead + next->size;
 
+#ifdef __tb_debug__
+                    // clear magic for avoiding memory check
+                    next->magic = 0xcccc;
+#endif
+
                     // reset the next predicted block
                     if (pool->pred == (tb_byte_t*)next)
                         pool->pred = tb_null;
@@ -557,9 +562,6 @@ end:
         // fill 0xcc
         if (block->real < block->size) tb_memset(p + block->real, 0xcc, block->size - block->real);
 
-        // clear frames for avoid memory check
-        block->frames[0] = 0;
-
         // set frames
         tb_size_t nframe = tb_backtrace_frames(block->frames, tb_arrayn(block->frames), 5);
         if (nframe < tb_arrayn(block->frames)) tb_memset(block->frames + nframe, 0, (tb_arrayn(block->frames) - nframe) * sizeof(tb_cpointer_t));
@@ -643,6 +645,11 @@ tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_p
     {
         // merge it
         block->size += nhead + next->size;
+
+#ifdef __tb_debug__
+        // clear magic for avoiding memory check
+        next->magic = 0xcccc;
+#endif
 
         // split it if the free block is too large
         if (block->size > asize + nhead)
@@ -943,7 +950,16 @@ tb_bool_t tb_static_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_
         tb_check_abort(tb_static_block_pool_overflow_check(pool, next, block));
 
         // merge it if the next block is free
-        if (next->free) block->size += nhead + next->size;
+        if (next->free) 
+        {
+            // merge it
+            block->size += nhead + next->size;
+
+#ifdef __tb_debug__
+            // clear magic for avoiding memory check
+            next->magic = 0xcccc;
+#endif
+        }
     }
 
     // free it

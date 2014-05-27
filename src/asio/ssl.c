@@ -171,11 +171,20 @@ typedef struct __tb_aicp_ssl_t
         // the post delay
         tb_size_t               delay;
 
-        // have post?
-        tb_bool_t               bpost;
-
         // the real size
         tb_long_t               real;
+
+        // the read or writ data
+        tb_byte_t*              data;
+
+        // the read or writ size
+        tb_size_t               size;
+
+        // post read?
+        tb_bool_t               read;
+
+        // have post?
+        tb_bool_t               post;
 
     }                           post;
 
@@ -276,6 +285,51 @@ static tb_long_t tb_aicp_ssl_fill_writ(tb_aicp_ssl_t* ssl, tb_byte_t const* data
     // ok?
     return real;
 }
+static tb_bool_t tb_aicp_ssl_done_post(tb_aicp_ssl_t* ssl)
+{
+    // check
+    tb_assert_and_check_return_val(ssl, tb_false);
+
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // check
+        tb_assert_and_check_break(ssl->post.post && ssl->post.data && ssl->post.size && ssl->post.func);
+
+        // check
+        tb_assert_and_check_break(ssl->aico);
+
+        // post read?
+        if (ssl->post.read)
+        {
+            // trace
+            tb_trace_d("post: read: %lu: ..", ssl->post.size);
+
+            // post read
+            if (!tb_aico_recv_after(ssl->aico, ssl->post.delay, ssl->post.data, ssl->post.size, ssl->post.func, ssl)) break;
+        }
+        // post writ?
+        else
+        {
+            // trace
+            tb_trace_d("post: writ: %lu: ..", ssl->post.size);
+
+            // post writ
+            if (!tb_aico_send_after(ssl->aico, ssl->post.delay, ssl->post.data, ssl->post.size, ssl->post.func, ssl)) break;
+        }
+
+        // delay only for first
+        ssl->post.delay = 0;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // ok?
+    return ok;
+}
 static tb_void_t tb_aicp_ssl_clos_clear(tb_aicp_ssl_t* ssl)
 {
     // check
@@ -370,8 +424,10 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
     do
     {
         // clear post
-        ssl->post.bpost = tb_false;
-
+        ssl->post.post  = tb_false;
+        ssl->post.data  = tb_null;
+        ssl->post.size  = 0;
+        
         // failed or closed?
         if (aice->state != TB_STATE_OK)
         {
@@ -405,7 +461,16 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
             break;
         }
         // have post? continue it
-        else if (ssl->post.bpost) ;
+        else if (ssl->post.post)
+        {
+            // post it
+            if (!tb_aicp_ssl_done_post(ssl))
+            {
+                // trace
+                tb_trace_e("open: done: post failed!");
+                break;
+            }
+        }
         else
         {
             // trace
@@ -447,7 +512,9 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
     do
     {
         // clear post
-        ssl->post.bpost = tb_false;
+        ssl->post.post  = tb_false;
+        ssl->post.data  = tb_null;
+        ssl->post.size  = 0;
 
         // failed or closed?
         if (aice->state != TB_STATE_OK)
@@ -475,7 +542,6 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
             ssl->func.read.func(ssl, TB_STATE_OK, ssl->func.read.data, real, ssl->func.read.size, ssl->func.read.priv);
         }
         // failed?
-        // FIXME: have post?
         else if (real < 0)
         {
             // save state
@@ -483,7 +549,16 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
             break;
         }
         // have post? continue it
-        else if (ssl->post.bpost) ;
+        else if (ssl->post.post)
+        {
+            // post it
+            if (!tb_aicp_ssl_done_post(ssl))
+            {
+                // trace
+                tb_trace_e("read: done: post failed!");
+                break;
+            }
+        }
         else
         {
             // trace
@@ -528,7 +603,9 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
     do
     {
         // clear post
-        ssl->post.bpost = tb_false;
+        ssl->post.post  = tb_false;
+        ssl->post.data  = tb_null;
+        ssl->post.size  = 0;
 
         // failed or closed?
         if (aice->state != TB_STATE_OK)
@@ -563,7 +640,16 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
             break;
         }
         // have post? continue it
-        else if (ssl->post.bpost) ;
+        else if (ssl->post.post)
+        {
+            // post it
+            if (!tb_aicp_ssl_done_post(ssl))
+            {
+                // trace
+                tb_trace_e("writ: done: post failed!");
+                break;
+            }
+        }
         else
         {
             // trace
@@ -588,11 +674,11 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_long_t tb_aicp_ssl_post_read(tb_cpointer_t priv, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_aicp_ssl_read_func(tb_cpointer_t priv, tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
-    tb_assert_and_check_return_val(ssl && ssl->post.func && !ssl->post.bpost, -1);
+    tb_assert_and_check_return_val(ssl && ssl->post.func && !ssl->post.post, -1);
 
     // done
     tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
@@ -610,22 +696,11 @@ static tb_long_t tb_aicp_ssl_post_read(tb_cpointer_t priv, tb_byte_t* data, tb_s
         tb_size_t   read_size = tb_scoped_buffer_size(&ssl->read_data);
         tb_assert_and_check_break(read_data && read_size && size <= read_size);
 
-        // trace
-        tb_trace_d("post: read: %lu: ..", size);
-
-        // check
-        tb_assert_and_check_break(ssl->aico);
-
         // post read
-        ssl->post.bpost = tb_true;
-        if (!tb_aico_recv_after(ssl->aico, ssl->post.delay, read_data, size, ssl->post.func, ssl)) 
-        {
-            ssl->post.bpost = tb_false;
-            break;
-        }
-
-        // delay only for first
-        ssl->post.delay = 0;
+        ssl->post.post = tb_true;
+        ssl->post.read = tb_true;
+        ssl->post.data = read_data;
+        ssl->post.size = size;
 
         // ok
         state = TB_STATE_OK;
@@ -635,11 +710,11 @@ static tb_long_t tb_aicp_ssl_post_read(tb_cpointer_t priv, tb_byte_t* data, tb_s
     // read failed or continue?
     return state != TB_STATE_OK? -1 : 0;
 }
-static tb_long_t tb_aicp_ssl_post_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_aicp_ssl_writ_func(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
-    tb_assert_and_check_return_val(ssl && ssl->post.func && !ssl->post.bpost, -1);
+    tb_assert_and_check_return_val(ssl && ssl->post.func && !ssl->post.post, -1);
 
     // done
     tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
@@ -656,22 +731,11 @@ static tb_long_t tb_aicp_ssl_post_writ(tb_cpointer_t priv, tb_byte_t const* data
         tb_size_t   writ_size = tb_scoped_buffer_size(&ssl->writ_data);
         tb_assert_and_check_break(writ_data && writ_size && size == writ_size);
 
-        // trace
-        tb_trace_d("post: writ: %lu: ..", writ_size);
-
-        // check
-        tb_assert_and_check_break(ssl->aico);
-
         // post writ
-        ssl->post.bpost = tb_true;
-        if (!tb_aico_send_after(ssl->aico, ssl->post.delay, writ_data, writ_size, ssl->post.func, ssl)) 
-        {
-            ssl->post.bpost = tb_false;
-            break;
-        }
-
-        // delay only for first
-        ssl->post.delay = 0;
+        ssl->post.post = tb_true;
+        ssl->post.read = tb_false;
+        ssl->post.data = writ_data;
+        ssl->post.size = writ_size;
 
         // ok
         state = TB_STATE_OK;
@@ -954,11 +1018,13 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
         // init post
         ssl->post.func  = tb_aicp_ssl_open_done;
         ssl->post.delay = 0;
-        ssl->post.bpost = tb_false;
+        ssl->post.post  = tb_false;
+        ssl->post.data  = tb_null;
+        ssl->post.size  = 0;
         ssl->post.real  = -1;
 
         // init post func
-        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_post_read, tb_aicp_ssl_post_writ, tb_null, ssl);
+        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_null, ssl);
 
         // try opening it
         tb_long_t r = tb_ssl_open_try(ssl->ssl);
@@ -977,11 +1043,23 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
             break;
         }
         // have post? continue it
-        else if (ssl->post.bpost) ;
+        else if (ssl->post.post)
+        {
+            // post it
+            if (!tb_aicp_ssl_done_post(ssl))
+            {
+                // trace
+                tb_trace_e("open: post failed!");
+        
+                // done func
+                tb_aicp_ssl_open_func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, func, priv);
+                break;
+            }
+        }
         else
         {
             // trace
-            tb_trace_d("open: done: no post!");
+            tb_trace_e("open: no post!");
     
             // done func
             tb_aicp_ssl_open_func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, func, priv);
@@ -1061,11 +1139,13 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
         // init post
         ssl->post.func  = tb_aicp_ssl_read_done;
         ssl->post.delay = delay;
-        ssl->post.bpost = tb_false;
+        ssl->post.post  = tb_false;
+        ssl->post.data  = tb_null;
+        ssl->post.size  = 0;
         ssl->post.real = -1;
 
         // init post func
-        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_post_read, tb_aicp_ssl_post_writ, tb_null, ssl);
+        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_null, ssl);
 
         // try reading it
         tb_long_t real = tb_ssl_read(ssl->ssl, data, size);
@@ -1084,11 +1164,23 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
             break;
         }
         // have post? continue it
-        else if (ssl->post.bpost) ;
+        else if (ssl->post.post)
+        {
+            // post it
+            if (!tb_aicp_ssl_done_post(ssl))
+            {
+                // trace
+                tb_trace_e("read: post failed!");
+        
+                // done func
+                func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
+                break;
+            }
+        }
         else
         {
             // trace
-            tb_trace_e("read: done: no post!");
+            tb_trace_e("read: no post!");
     
             // done func
             func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
@@ -1131,11 +1223,13 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
         // init post
         ssl->post.func  = tb_aicp_ssl_writ_done;
         ssl->post.delay = delay;
-        ssl->post.bpost = tb_false;
+        ssl->post.post  = tb_false;
+        ssl->post.data  = tb_null;
+        ssl->post.size  = 0;
         ssl->post.real  = -1;
 
         // init post func
-        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_post_read, tb_aicp_ssl_post_writ, tb_null, ssl);
+        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_null, ssl);
 
         // try writing it
         tb_long_t real = tb_ssl_writ(ssl->ssl, data, size);
@@ -1154,11 +1248,23 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
             break;
         }
         // have post? continue it
-        else if (ssl->post.bpost) ;
+        else if (ssl->post.post)
+        {
+            // post it
+            if (!tb_aicp_ssl_done_post(ssl))
+            {
+                // trace
+                tb_trace_e("writ: post failed!");
+        
+                // done func
+                func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
+                break;
+            }
+        }
         else
         {
             // trace
-            tb_trace_e("writ: done: no post!");
+            tb_trace_e("writ: no post!");
     
             // done func
             func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
