@@ -475,6 +475,7 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
             ssl->func.read.func(ssl, TB_STATE_OK, ssl->func.read.data, real, ssl->func.read.size, ssl->func.read.priv);
         }
         // failed?
+        // FIXME: have post?
         else if (real < 0)
         {
             // save state

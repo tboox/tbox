@@ -28,7 +28,7 @@ static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state
     tb_aicp_kill((tb_aicp_t*)priv);
 #else
     // reopen and read 
-    tb_aicp_http_oread(handle, 0, tb_demo_aicp_http_read_func, priv);
+    tb_aicp_http_open_read(handle, 0, tb_demo_aicp_http_read_func, priv);
 #endif
 }
 static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
@@ -110,7 +110,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
     }
 
     // open and read 
-    if (!tb_aicp_http_oread(http, 0, tb_demo_aicp_http_read_func, aicp)) goto end;
+    if (!tb_aicp_http_open_read(http, 0, tb_demo_aicp_http_read_func, aicp)) goto end;
 
     // loop aicp
     tb_aicp_loop(aicp);

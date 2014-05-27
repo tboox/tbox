@@ -341,11 +341,8 @@ tb_void_t tb_stream_kill(tb_handle_t handle)
     tb_assert_and_check_return(stream);
 
     // kill it
-    tb_size_t state = tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING);
-    tb_check_return(state != TB_STATE_KILLING && state != TB_STATE_CLOSED);
-
-    // opening? kill it
-    tb_atomic_pset(&stream->istate, TB_STATE_OPENING, TB_STATE_KILLING);
+    tb_size_t state = tb_atomic_fetch_and_set(&stream->istate, TB_STATE_KILLING);
+    tb_check_return(state != TB_STATE_KILLING);
 
     // trace
     tb_trace_d("kill: ..");

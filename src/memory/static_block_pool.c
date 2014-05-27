@@ -557,6 +557,9 @@ end:
         // fill 0xcc
         if (block->real < block->size) tb_memset(p + block->real, 0xcc, block->size - block->real);
 
+        // clear frames for avoid memory check
+        block->frames[0] = 0;
+
         // set frames
         tb_size_t nframe = tb_backtrace_frames(block->frames, tb_arrayn(block->frames), 5);
         if (nframe < tb_arrayn(block->frames)) tb_memset(block->frames + nframe, 0, (tb_arrayn(block->frames) - nframe) * sizeof(tb_cpointer_t));
