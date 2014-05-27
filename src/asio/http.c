@@ -46,7 +46,7 @@
  */
 
 // the aicp http open and read type
-typedef struct __tb_aicp_http_oread_t
+typedef struct __tb_aicp_http_open_read_t
 {
     // the func
     tb_aicp_http_read_func_t        func;
@@ -57,10 +57,10 @@ typedef struct __tb_aicp_http_oread_t
     // the size
     tb_size_t                       size;
 
-}tb_aicp_http_oread_t;
+}tb_aicp_http_open_read_t;
 
 // the aicp http open and seek type
-typedef struct __tb_aicp_http_oseek_t
+typedef struct __tb_aicp_http_open_seek_t
 {
     // the func
     tb_aicp_http_seek_func_t        func;
@@ -71,7 +71,21 @@ typedef struct __tb_aicp_http_oseek_t
     // the offset
     tb_hize_t                       offset;
 
-}tb_aicp_http_oseek_t;
+}tb_aicp_http_open_seek_t;
+
+// the aicp http close opening type
+typedef struct __tb_aicp_http_clos_opening_t
+{
+    // the func
+    tb_aicp_http_open_func_t        func;
+
+    // the priv
+    tb_cpointer_t                   priv;
+
+    // the state
+    tb_size_t                       state;
+
+}tb_aicp_http_clos_opening_t;
 
 // the aicp http type
 typedef struct __tb_aicp_http_t
@@ -103,6 +117,15 @@ typedef struct __tb_aicp_http_t
     // the pool for string
     tb_handle_t                     pool;
 
+    /* the state
+     *
+     * TB_STATE_CLOSED
+     * TB_STATE_OPENED
+     * TB_STATE_OPENING
+     * TB_STATE_KILLING
+     */
+    tb_atomic_t                     state;
+
     // the line data
     tb_scoped_string_t              line_data;
 
@@ -121,11 +144,14 @@ typedef struct __tb_aicp_http_t
     // the redirect tryn
     tb_size_t                       redirect_tryn;
 
+    // the clos opening
+    tb_aicp_http_clos_opening_t     clos_opening;
+
     // the open and read, writ, seek, ...
     union
     {
-        tb_aicp_http_oread_t        read;
-        tb_aicp_http_oseek_t        seek;
+        tb_aicp_http_open_read_t    read;
+        tb_aicp_http_open_seek_t    seek;
 
     }                               open_and;
 
@@ -429,8 +455,8 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
 static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv)
 {
     // check
-    tb_aicp_http_oread_t* oread = (tb_aicp_http_oread_t*)priv;
-    tb_assert_and_check_return_val(http && status && oread && oread->func, tb_false);
+    tb_aicp_http_open_read_t* open_read = (tb_aicp_http_open_read_t*)priv;
+    tb_assert_and_check_return_val(http && status && open_read && open_read->func, tb_false);
 
     // done
     tb_bool_t ok = tb_true;
@@ -443,7 +469,7 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
         state = TB_STATE_UNKNOWN_ERROR;
     
         // read it
-        if (!tb_aicp_http_read(http, oread->size, oread->func, oread->priv)) break;
+        if (!tb_aicp_http_read(http, open_read->size, open_read->func, open_read->priv)) break;
 
         // ok
         state = TB_STATE_OK;
@@ -454,7 +480,7 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
     if (state != TB_STATE_OK) 
     {
         // done func
-        ok = oread->func(http, state, tb_null, 0, oread->size, oread->priv);
+        ok = open_read->func(http, state, tb_null, 0, open_read->size, open_read->priv);
     }
  
     // ok?
@@ -463,8 +489,8 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
 static tb_bool_t tb_aicp_http_open_seek_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv)
 {
     // check
-    tb_aicp_http_oseek_t* oseek = (tb_aicp_http_oseek_t*)priv;
-    tb_assert_and_check_return_val(http && status && oseek && oseek->func, tb_false);
+    tb_aicp_http_open_seek_t* open_seek = (tb_aicp_http_open_seek_t*)priv;
+    tb_assert_and_check_return_val(http && status && open_seek && open_seek->func, tb_false);
 
     // done
     tb_bool_t ok = tb_true;
@@ -477,7 +503,7 @@ static tb_bool_t tb_aicp_http_open_seek_func(tb_handle_t http, tb_size_t state, 
         state = TB_STATE_UNKNOWN_ERROR;
     
         // seek it
-        if (!tb_aicp_http_seek(http, oseek->offset, oseek->func, oseek->priv)) break;
+        if (!tb_aicp_http_seek(http, open_seek->offset, open_seek->func, open_seek->priv)) break;
 
         // ok
         state = TB_STATE_OK;
@@ -488,7 +514,7 @@ static tb_bool_t tb_aicp_http_open_seek_func(tb_handle_t http, tb_size_t state, 
     if (state != TB_STATE_OK) 
     {
         // done func
-        ok = oseek->func(http, state, 0, oseek->priv);
+        ok = open_seek->func(http, state, 0, open_seek->priv);
     }
  
     // ok?
@@ -662,6 +688,7 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
     // ok
     return tb_true;
 }
+static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, tb_aicp_http_open_func_t func, tb_cpointer_t priv);
 static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
@@ -674,6 +701,13 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
     // done
     do
     {
+        // killed?
+        if (TB_STATE_KILLING == tb_atomic_get(&http->state))
+        {
+            state = TB_STATE_KILLED;
+            break;
+        }
+
         // ok? 
         if (state == TB_STATE_OK)
         {
@@ -714,11 +748,8 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* astream, tb_size
 
     } while (0);
 
-    // sync state
-    http->status.state = state;
-
     // done func
-    http->func.open(http, state, &http->status, http->priv);
+    tb_aicp_http_open_func(http, state, http->func.open, http->priv);
 
     // break
     return tb_false;
@@ -946,11 +977,8 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
 
     } while (0);
 
-    // sync state
-    http->status.state = state;
-
     // done func
-    http->func.open(http, state, &http->status, http->priv);
+    tb_aicp_http_open_func(http, state, http->func.open, http->priv);
 
     // break 
     return tb_false;
@@ -1009,8 +1037,7 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
     if (state != TB_STATE_OK)
     {
         // done func
-        http->status.state = state;
-        http->func.open(http, state, &http->status, http->priv);
+        tb_aicp_http_open_func(http, state, http->func.open, http->priv);
     }
  
     // ok?
@@ -1032,6 +1059,13 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* astream, tb_size
     {
         // ok? 
         tb_check_break(state == TB_STATE_OK);
+
+        // killed?
+        if (TB_STATE_KILLING == tb_atomic_get(&http->state))
+        {
+            state = TB_STATE_KILLED;
+            break;
+        }
 
         // reset state
         state = TB_STATE_UNKNOWN_ERROR;
@@ -1080,8 +1114,7 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* astream, tb_size
     if (state != TB_STATE_OK) 
     {
         // done func
-        http->status.state = state;
-        http->func.open(http, state, &http->status, http->priv);
+        tb_aicp_http_open_func(http, state, http->func.open, http->priv);
     }
  
     // ok?
@@ -1134,8 +1167,7 @@ static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, 
     if (state != TB_STATE_OK) 
     {
         // done func
-        http->status.state = state;
-        ok = http->func.open(http, state, &http->status, http->priv);
+        tb_aicp_http_open_func(http, state, http->func.open, http->priv);
     }
  
     // ok?
@@ -1157,6 +1189,13 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size
     {
         // ok? 
         tb_check_break(state == TB_STATE_OK);
+
+        // killed?
+        if (TB_STATE_KILLING == tb_atomic_get(&http->state))
+        {
+            state = TB_STATE_KILLED;
+            break;
+        }
 
         // reset state
         state = TB_STATE_UNKNOWN_ERROR;
@@ -1208,8 +1247,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size
     if (state != TB_STATE_OK) 
     {
         // done func
-        http->status.state = state;
-        ok = http->func.open(http, state, &http->status, http->priv);
+        tb_aicp_http_open_func(http, state, http->func.open, http->priv);
     }
  
     // ok?
@@ -1258,11 +1296,27 @@ static tb_void_t tb_aicp_http_clos_func(tb_async_stream_t* stream, tb_size_t sta
     http->transfer = tb_null;
 #endif
 
+    // closed
+    tb_atomic_set(&http->state, TB_STATE_CLOSED);
+
     // done func
     http->func.clos(http, state, http->priv);
 
     // trace
     tb_trace_d("clos: notify: ok");
+}
+static tb_void_t tb_aicp_http_clos_opening_func(tb_handle_t handle, tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
+    tb_assert_and_check_return(http && http->clos_opening.func);
+
+    // trace
+    tb_trace_d("clos: opening");
+
+    // done
+    http->status.state = http->clos_opening.state;
+    http->clos_opening.func(http, http->status.state, &http->status, http->clos_opening.priv);
 }
 static tb_void_t tb_aicp_http_open_clos(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
@@ -1276,6 +1330,13 @@ static tb_void_t tb_aicp_http_open_clos(tb_async_stream_t* stream, tb_size_t sta
     {
         // check
         tb_assert_and_check_break(state == TB_STATE_OK);
+
+        // killed?
+        if (TB_STATE_KILLING == tb_atomic_get(&http->state))
+        {
+            state = TB_STATE_KILLED;
+            break;
+        }
 
         // reset state
         state = TB_STATE_HTTP_UNKNOWN_ERROR;
@@ -1314,8 +1375,7 @@ static tb_void_t tb_aicp_http_open_clos(tb_async_stream_t* stream, tb_size_t sta
     if (!ok)
     {
         // done func
-        http->status.state = state;
-        http->func.open(http, state, &http->status, http->priv);
+        tb_aicp_http_open_func(http, state, http->func.open, http->priv);
     }
 }
 static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
@@ -1332,6 +1392,37 @@ static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
 
     // close it first
     return tb_async_stream_clos(http->stream, tb_aicp_http_open_clos, http);
+}
+static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, tb_aicp_http_open_func_t func, tb_cpointer_t priv)
+{
+    // check
+    tb_assert_and_check_return_val(http, tb_false);
+
+    // ok?
+    tb_bool_t ok = tb_true;
+    if (state == TB_STATE_OK) 
+    {
+        // opened
+        tb_atomic_set(&http->state, TB_STATE_OPENED);
+
+        // done func
+        http->status.state = state;
+        if (func) ok = func(http, state, &http->status, priv);
+    }
+    // failed? 
+    else 
+    {
+        // init func and state
+        http->clos_opening.func   = func;
+        http->clos_opening.priv   = priv;
+        http->clos_opening.state  = state;
+
+        // close it
+        ok = tb_aicp_http_clos(http, tb_aicp_http_clos_opening_func, tb_null);
+    }
+
+    // ok?
+    return ok;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -1350,6 +1441,9 @@ tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
         // make http
         http = tb_malloc0(sizeof(tb_aicp_http_t));
         tb_assert_and_check_break(http);
+
+        // init state
+        http->state = TB_STATE_CLOSED;
 
         // init stream
         http->stream = http->sstream = tb_async_stream_init_sock(aicp);
@@ -1395,6 +1489,10 @@ tb_void_t tb_aicp_http_kill(tb_handle_t handle)
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
     tb_assert_and_check_return(http);
+
+    // kill it
+    tb_size_t state = tb_atomic_fetch_and_set(&http->state, TB_STATE_KILLING);
+    tb_check_return(state != TB_STATE_KILLING);
 
     // trace
     tb_trace_d("kill: ..");
@@ -1472,6 +1570,20 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
     tb_assert_and_check_return_val(http && func, tb_false);
+    
+    // set opening
+    tb_size_t state = tb_atomic_fetch_and_pset(&http->state, TB_STATE_CLOSED, TB_STATE_OPENING);
+
+    // opened? done func directly
+    if (state == TB_STATE_OPENED)
+    {
+        http->status.state = TB_STATE_OK;
+        func(http, http->status.state, &http->status, priv);
+        return tb_true;
+    }
+
+    // must be closed
+    tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
 
     // init open
     http->func.open = func;
@@ -1491,6 +1603,14 @@ tb_bool_t tb_aicp_http_clos(tb_handle_t handle, tb_aicp_http_clos_func_t func, t
 
     // trace
     tb_trace_d("clos: ..");
+
+    // closed? done func directly
+    if (TB_STATE_CLOSED == tb_atomic_get(&http->state))
+    {
+        // done func
+        func(http, TB_STATE_OK, priv);
+        return tb_true;
+    }
 
     // init func
     http->func.clos = func;
@@ -1513,6 +1633,9 @@ tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
     tb_assert_and_check_return_val(http && http->stream && func, tb_false);
+ 
+    // check state
+    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&http->state), tb_false);
 
     // read the cache data first, note: must be reentrant
     tb_byte_t const*    cache_data = tb_scoped_buffer_data(&http->cache_data);
@@ -1545,6 +1668,12 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
     tb_assert_and_check_return_val(http && http->stream && func, tb_false);
+ 
+    // set opening
+    tb_size_t state = tb_atomic_fetch_and_pset(&http->state, TB_STATE_CLOSED, TB_STATE_OPENING);
+
+    // killed?
+    tb_assert_and_check_return_val(state != TB_STATE_KILLING, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
@@ -1585,6 +1714,9 @@ tb_bool_t tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_ta
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
     tb_assert_and_check_return_val(http && http->stream && func, tb_false);
+ 
+    // check state
+    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&http->state), tb_false);
 
     // init task
     http->func.task = func;
@@ -1593,7 +1725,7 @@ tb_bool_t tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_ta
     // post task
     return tb_async_stream_task(http->stream, delay, tb_aicp_http_task_func, http);
 }
-tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv)
+tb_bool_t tb_aicp_http_open_read(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1605,7 +1737,7 @@ tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_re
     http->open_and.read.size = size;
     return tb_aicp_http_open(http, tb_aicp_http_open_read_func, &http->open_and.read);
 }
-tb_bool_t tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv)
+tb_bool_t tb_aicp_http_open_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;

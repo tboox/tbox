@@ -189,7 +189,7 @@ tb_bool_t           tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_ai
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv);
+tb_bool_t           tb_aicp_http_open_read(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv);
 
 /*! open and seek the http, open it first if not opened 
  *
@@ -200,7 +200,7 @@ tb_bool_t           tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_ai
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv);
+tb_bool_t           tb_aicp_http_open_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv);
 
 /*! the http aicp
  *

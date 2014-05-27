@@ -245,6 +245,20 @@ static tb_bool_t tb_transfer_pool_work_copy(tb_iterator_t* iterator, tb_pointer_
     // ok
     return tb_true;
 }
+#ifdef __tb_debug__
+static tb_bool_t tb_transfer_pool_work_wait(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+{
+    // check
+    tb_transfer_task_t* task = (tb_transfer_task_t*)item;
+    tb_assert_and_check_return_val(task, tb_false);
+
+    // trace
+    tb_trace_d("wait: task: %p: ..", task);
+
+    // ok
+    return tb_true;
+}
+#endif
 static tb_bool_t tb_transfer_pool_walk_exit(tb_pointer_t item, tb_cpointer_t priv)
 {
     // check
@@ -343,14 +357,14 @@ tb_void_t tb_transfer_pool_kill_all(tb_handle_t handle)
     tb_transfer_pool_t* pool = (tb_transfer_pool_t*)handle;
     tb_assert_and_check_return(pool);
 
-    // trace
-    tb_trace_d("kill_all: ..");
-
     // check 
     tb_check_return(TB_STATE_OK == tb_atomic_get(&pool->state));
 
     // enter
     tb_spinlock_enter(&pool->lock);
+
+    // trace
+    tb_trace_d("kill_all: %lu, ..", pool->work? tb_list_size(pool->work) : 0);
 
     // kill it
     tb_list_t* copy = tb_null;
@@ -385,14 +399,23 @@ tb_long_t tb_transfer_pool_wait_all(tb_handle_t handle, tb_long_t timeout)
     tb_hong_t time = tb_cache_time_spak();
     while ((timeout < 0 || tb_cache_time_spak() < time + timeout))
     {
-        // the task count
-        size = tb_transfer_pool_size(handle);
+        // enter
+        tb_spinlock_enter(&pool->lock);
 
-        // ok?
-        tb_check_break(size);
+        // the size
+        tb_size_t size = pool->work? tb_list_size(pool->work) : 0;
 
         // trace
         tb_trace_d("wait: %lu: ..", size);
+
+        // trace work
+        if (size) tb_walk_all(pool->work, tb_transfer_pool_work_wait, tb_null);
+
+        // leave
+        tb_spinlock_leave(&pool->lock);
+
+        // ok?
+        tb_check_break(size);
 
         // wait some time
         tb_msleep(200);
@@ -544,7 +567,7 @@ tb_bool_t tb_transfer_pool_done(tb_handle_t handle, tb_char_t const* iurl, tb_ch
     } while (0);
 
     // trace
-    tb_trace_d("done: %s => %s, work: %lu, idle: %lu, state: %s", iurl, ourl, tb_list_size(pool->work), tb_vector_size(pool->idle), ok? "ok" : "no");
+    tb_trace_d("done: task: %p, %s => %s, work: %lu, idle: %lu, state: %s", task, iurl, ourl, tb_list_size(pool->work), tb_vector_size(pool->idle), ok? "ok" : "no");
 
     // failed?
     if (!ok) 

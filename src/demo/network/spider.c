@@ -198,7 +198,7 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
 {
     // check
     tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;
-    tb_assert_and_check_return(task);
+    tb_assert_and_check_return(task && task->spider);
 
     // init stream
     tb_basic_stream_t* stream = tb_demo_spider_parser_open_html(task->ourl);
@@ -211,7 +211,8 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
             // parse url
             tb_char_t data[TB_DEMO_SPIDER_URL_MAXN] = {0};
             tb_bool_t html = tb_true;
-            while (tb_demo_spider_parser_get_url(reader, data, sizeof(data) - 1, &html))
+            while (     TB_STATE_OK == tb_atomic_get(&task->spider->state)
+                    &&  tb_demo_spider_parser_get_url(reader, data, sizeof(data) - 1, &html))
             {
                 // trace
                 tb_trace_d("parser: done: %s => %s", task->iurl, data);
