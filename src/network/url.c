@@ -336,6 +336,9 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
 
             // skip '/' or '\\'
             if (*p == '/' || *p == '\\') p++;
+
+            // trim the right spaces
+            tb_static_string_rtrim(&url->host);
         }
 
         // done path and args 
@@ -345,15 +348,28 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
             if (*p != '/' && *p != '\\' && !url->bwin) tb_static_string_chrcat(&url->path, '/');
             while (*p && *p != '?' && *p != '&' && *p != '=') tb_static_string_chrcat(&url->path, *p++);
 
+            // trim the right spaces
+            tb_static_string_rtrim(&url->path);
+
             // parse args
             while (*p && (*p == '?' || *p == '=')) p++;
             if (*p) tb_scoped_string_cstrcpy(&url->args, p);
+
+            // trim the right spaces
+            tb_scoped_string_rtrim(&url->args);
         }
         // done data
         else 
         {
             // set to urls directly
-            if (*p) tb_scoped_string_cstrcpy(&url->urls, p);
+            if (*p) 
+            {
+                // copy it
+                tb_scoped_string_cstrcpy(&url->urls, p);
+
+                // trim the right spaces
+                tb_scoped_string_rtrim(&url->urls);
+            }
         }
 
         // ok

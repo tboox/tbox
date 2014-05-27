@@ -88,6 +88,14 @@ tb_void_t               tb_static_string_clear(tb_static_string_t* string);
  */
 tb_char_t const*        tb_static_string_strip(tb_static_string_t* string, tb_size_t n);
 
+/*! trim the right spaces for string
+ *
+ * @param string        the string
+ *
+ * @return              the c-string
+ */
+tb_char_t const*        tb_static_string_rtrim(tb_static_string_t* string);
+
 /*! find charactor position
  *
  * @param string        the string

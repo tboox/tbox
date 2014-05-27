@@ -972,7 +972,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
         else 
         {
             // trace
-            tb_trace_d("head: read: error, state: %s", tb_state_cstr(state));
+            tb_trace_d("head: read: %s, error, state: %s", tb_url_get(&http->option.url), tb_state_cstr(state));
         }
 
     } while (0);
