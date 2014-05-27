@@ -494,7 +494,7 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t exit, tb_
 {
     // check
     tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
-    tb_assert_and_check_return(dns && dns->aico);
+    tb_assert_and_check_return(dns);
 
     // trace
     tb_trace_d("exit: ..");
@@ -504,7 +504,9 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t exit, tb_
     dns->exit.priv = priv;
 
     // exit aico
-    tb_aico_exit(dns->aico, tb_aicp_dns_exit_func, dns);
+    if (dns->aico) tb_aico_exit(dns->aico, tb_aicp_dns_exit_func, dns);
+    // done func directly
+    else tb_aicp_dns_exit_func(tb_null, dns);
 }
 tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host, tb_aicp_dns_done_func_t func, tb_cpointer_t priv)
 {

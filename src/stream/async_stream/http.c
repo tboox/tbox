@@ -113,14 +113,10 @@ static tb_bool_t tb_async_stream_http_open(tb_handle_t astream, tb_async_stream_
     // post open
     return tb_aicp_http_open(hstream->http, tb_async_stream_http_open_func, astream);
 }
-static tb_void_t tb_async_stream_http_clos_func(tb_handle_t http, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_http_clos_clear(tb_async_stream_http_t* hstream)
 {
     // check
-    tb_async_stream_http_t* hstream = tb_async_stream_http_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(hstream && hstream->func.clos);
-
-    // trace
-    tb_trace_d("clos: notify: ..");
+    tb_assert_and_check_return(hstream);
 
     // clear size 
     tb_atomic64_set(&hstream->size, -1);
@@ -130,6 +126,18 @@ static tb_void_t tb_async_stream_http_clos_func(tb_handle_t http, tb_size_t stat
 
     // clear base
     tb_async_stream_clear(&hstream->base);
+}
+static tb_void_t tb_async_stream_http_clos_func(tb_handle_t http, tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_http_t* hstream = tb_async_stream_http_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(hstream && hstream->func.clos);
+
+    // trace
+    tb_trace_d("clos: notify: ..");
+
+    // clear it
+    tb_async_stream_http_clos_clear(hstream);
 
     /* done clos func
      *
@@ -144,17 +152,32 @@ static tb_bool_t tb_async_stream_http_clos(tb_handle_t astream, tb_async_stream_
 {   
     // check
     tb_async_stream_http_t* hstream = tb_async_stream_http_cast(astream);
-    tb_assert_and_check_return_val(hstream && func, tb_false);
+    tb_assert_and_check_return_val(hstream, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
+
+    // try closing?
+    if (!func)
+    {
+        // try closing ok?
+        if (!hstream->http || tb_aicp_http_clos_try(hstream->http))
+        {
+            // clear it
+            tb_async_stream_http_clos_clear(hstream);
+            return tb_true;
+        }
+
+        // failed
+        return tb_false;
+    }
 
     // init func
     hstream->func.clos  = func;
     hstream->priv       = priv;
 
-    // no http? done func directly
-    if (!hstream->http)
+    // try closing ok?
+    if (!hstream->http || tb_aicp_http_clos_try(hstream->http))
     {
         // done func
         tb_async_stream_http_clos_func(tb_null, TB_STATE_OK, hstream);

@@ -187,6 +187,48 @@ typedef struct __tb_async_transfer_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+static tb_bool_t tb_async_transfer_clos_try(tb_async_transfer_t* transfer)
+{
+    // check
+    tb_assert_and_check_return_val(transfer, tb_false);
+
+    // trace
+    tb_trace_d("clos: try: ..");
+       
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // closed?
+        if (TB_STATE_CLOSED == tb_atomic_get(&transfer->state))
+        {
+            ok = tb_true;
+            break;
+        }
+
+        // try closing istream
+        if (transfer->istream && !tb_async_stream_clos_try(transfer->istream)) break;
+
+        // try closing ostream
+        if (transfer->ostream && !tb_async_stream_clos_try(transfer->ostream)) break;
+
+        // closed
+        tb_atomic_set(&transfer->state, TB_STATE_CLOSED);
+
+        // clear pause state
+        tb_atomic_set(&transfer->state_pause, TB_STATE_OK);
+
+        // ok
+        ok = tb_true;
+        
+    } while (0);
+
+    // trace
+    tb_trace_d("clos: try: %s", ok? "ok" : "no");
+         
+    // ok?
+    return ok;
+}
 static tb_void_t tb_async_transfer_clos_func(tb_async_transfer_t* transfer, tb_size_t state)
 {
     // check
@@ -1140,17 +1182,22 @@ tb_bool_t tb_async_transfer_exit(tb_handle_t handle)
     // kill it first
     tb_async_transfer_kill(handle);
 
-    // wait for closing
+    // try closing it
     tb_size_t tryn = 30;
-    while (TB_STATE_CLOSED != tb_atomic_get(&transfer->state) && tryn--)
+    tb_bool_t ok = tb_false;
+    while (!(ok = tb_async_transfer_clos_try(transfer)) && tryn--)
     {
-        // trace
-        tb_trace_d("exit: wait: %s: ..", tb_state_cstr(tb_atomic_get(&transfer->state)));
-
         // wait some time
         tb_msleep(200);
     }
-    tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&transfer->state), tb_false);
+
+    // close failed?
+    if (!ok)
+    {
+        // trace
+        tb_trace_e("exit: failed!");
+        return tb_false;
+    }
 
     // exit istream
     if (transfer->istream && transfer->iowner) tb_async_stream_exit(transfer->istream);

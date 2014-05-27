@@ -540,7 +540,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
             http->status.state = TB_STATE_OK;
         else if (http->status.code == 204)
             http->status.state = TB_STATE_HTTP_RESPONSE_204;
-        else if (http->status.code >= 300 && http->status.code <= 304)
+        else if (http->status.code >= 300 && http->status.code <= 307)
             http->status.state = TB_STATE_HTTP_RESPONSE_300 + (http->status.code - 300);
         else if (http->status.code >= 400 && http->status.code <= 416)
             http->status.state = TB_STATE_HTTP_RESPONSE_400 + (http->status.code - 400);
@@ -621,8 +621,8 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
         // parse location
         else if (!tb_strnicmp(line, "Location", 8)) 
         {
-            // redirect? check code: 301 - 303
-            tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 304, tb_false);
+            // redirect? check code: 301 - 307
+            tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 308, tb_false);
 
             // save location
             tb_scoped_string_cstrcpy(&http->status.location, p);
