@@ -231,6 +231,9 @@ static tb_bool_t tb_async_stream_data_open_try(tb_handle_t astream)
         if (!dstream->aico) dstream->aico = tb_aico_init_task(dstream->base.aicp, tb_false);
         tb_assert_and_check_break(dstream->aico);
 
+        // killed?
+        tb_check_break(TB_STATE_KILLING != tb_atomic_get(&dstream->base.base.istate));
+
         // init head
         dstream->head = dstream->data;
 
@@ -259,6 +262,10 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
 
     // try opening it
     tb_size_t state = tb_async_stream_data_open_try(astream)? TB_STATE_OK : TB_STATE_UNKNOWN_ERROR;
+
+    // killed?
+    if (state != TB_STATE_OK && TB_STATE_KILLING == tb_atomic_get(&dstream->base.base.istate))
+        state = TB_STATE_KILLED;
 
     // done func
     return tb_async_stream_open_func(astream, state, func, priv);

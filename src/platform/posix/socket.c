@@ -47,7 +47,13 @@
 tb_bool_t tb_socket_init()
 {
     // ignore sigpipe
+#if 1
     signal(SIGPIPE, SIG_IGN);
+#else
+    struct sigaction sa;
+    sa.sa_handler = SIG_IGN;
+    sigaction(SIGPIPE, &sa, 0);
+#endif
 
     // ok
     return tb_true;

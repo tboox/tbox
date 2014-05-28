@@ -157,7 +157,7 @@ static tb_bool_t tb_async_stream_file_open_try(tb_handle_t astream)
 {
     // check
     tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
-    tb_assert_and_check_return_val(fstream && fstream->base.aicp, tb_false);
+    tb_assert_and_check_return_val(fstream && fstream->base.aicp && !fstream->aico, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
@@ -179,6 +179,9 @@ static tb_bool_t tb_async_stream_file_open_try(tb_handle_t astream)
         // addo file
         fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);
         tb_assert_and_check_break(fstream->aico);
+
+        // killed?
+        tb_check_break(TB_STATE_KILLING != tb_atomic_get(&fstream->base.base.istate));
 
         // init offset
         tb_atomic64_set0(&fstream->offset);
@@ -210,6 +213,14 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
         // try opening it
         if (!tb_async_stream_file_open_try(astream))
         {
+            // killed?
+            if (TB_STATE_KILLING == tb_atomic_get(&fstream->base.base.istate))
+            {
+                // save state
+                state = TB_STATE_KILLED;
+                break;
+            }
+
             // open file failed?
             if (!fstream->file)
             {
@@ -473,7 +484,7 @@ static tb_void_t tb_async_stream_file_kill(tb_handle_t astream)
     tb_assert_and_check_return(fstream);
 
     // trace
-    tb_trace_d("kill: ..");
+    tb_trace_d("kill: %s: ..", tb_url_get(&fstream->base.base.url));
 
     // kill it
     if (fstream->aico) tb_aico_kill(fstream->aico);

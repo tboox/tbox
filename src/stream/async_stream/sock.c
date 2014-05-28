@@ -300,7 +300,7 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(sstream && sstream->func.open, tb_false);
 
     // done
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
+    tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
     switch (aice->state)
     {
         // ok
@@ -319,6 +319,14 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
                 // init ssl
                 if (!sstream->hssl) sstream->hssl = tb_aicp_ssl_init(sstream->base.aicp, tb_false);
                 tb_assert_and_check_break(sstream->hssl);
+
+                // killed?
+                if (TB_STATE_KILLING == tb_atomic_get(&sstream->base.base.istate))
+                {
+                    // save state
+                    state = TB_STATE_KILLED;
+                    break;
+                }
 
                 // init ssl sock
                 tb_aicp_ssl_set_sock(sstream->hssl, sstream->sock);
@@ -371,7 +379,7 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
     tb_assert_and_check_return(haddr && sstream && sstream->func.open);
 
     // done
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
+    tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
     do
     {
         // addr ok?
@@ -424,6 +432,14 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
             else if (args && !tb_strnicmp(args, "tcp=", 4)) sstream->type = TB_SOCKET_TYPE_TCP;
             tb_assert_and_check_break(sstream->type == TB_SOCKET_TYPE_TCP || sstream->type == TB_SOCKET_TYPE_UDP);
 
+            // killed?
+            if (TB_STATE_KILLING == tb_atomic_get(&sstream->base.base.istate))
+            {
+                // save state
+                state = TB_STATE_KILLED;
+                break;
+            }
+
             // tcp?
             if (sstream->type == TB_SOCKET_TYPE_TCP)
             {
@@ -475,57 +491,81 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
     tb_assert_and_check_return_val(sstream && sstream->type && func, tb_false);
 
-    // clear the mode
-    sstream->bread = 0;
+    // done
+    tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
+    do
+    {
+        // clear the mode
+        sstream->bread = 0;
 
-    // clear the offset
-    tb_atomic64_set0(&sstream->offset);
+        // clear the offset
+        tb_atomic64_set0(&sstream->offset);
 
 #ifndef TB_SSL_ENABLE
-    // ssl? not supported
-    if (tb_url_ssl_get(&sstream->base.base.url))
-    {
-        // trace
-        tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
+        // ssl? not supported
+        if (tb_url_ssl_get(&sstream->base.base.url))
+        {
+            // trace
+            tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
 
-        // open done
-        tb_async_stream_open_func(&sstream->base, TB_STATE_SOCK_SSL_NOT_SUPPORTED, func, priv);
-
-        // ok
-        return tb_true;
-    }
+            // save state
+            state = TB_STATE_SOCK_SSL_NOT_SUPPORTED;
+            break;
+        }
 #endif
 
-    // keep alive and have been opened? reopen it directly
-    if (sstream->balived && sstream->hdns && sstream->aico)
-    {
-        // open done
-        tb_async_stream_open_func(&sstream->base, TB_STATE_OK, func, priv);
+        // keep alive and have been opened? reopen it directly
+        if (sstream->balived && sstream->hdns && sstream->aico)
+        {
+            // open done
+            tb_async_stream_open_func(&sstream->base, TB_STATE_OK, func, priv);
+
+            // ok
+            state = TB_STATE_OK;
+            break;
+        }
+
+        // get the host from url
+        tb_char_t const* host = tb_url_host_get(&sstream->base.base.url);
+        tb_assert_and_check_break(host);
+
+        // clear ipv4
+        tb_ipv4_clr(&sstream->ipv4);
+
+        // save func and priv
+        sstream->priv       = priv;
+        sstream->func.open  = func;
+
+        // init dns
+        if (!sstream->hdns) sstream->hdns = tb_aicp_dns_init(sstream->base.aicp, tb_stream_timeout(astream));
+        tb_assert(sstream->hdns);
+
+        // killed?
+        if (TB_STATE_KILLING == tb_atomic_get(&sstream->base.base.istate))
+        {
+            // save state
+            state = TB_STATE_KILLED;
+            break;
+        }
+
+        // done addr
+        if (!sstream->hdns || !tb_aicp_dns_done(sstream->hdns, host, tb_async_stream_sock_dns_func, astream))
+        {
+            // save state
+            state = TB_STATE_SOCK_DNS_FAILED;
+            break;
+        }
 
         // ok
-        return tb_true;
-    }
+        state = TB_STATE_OK;
 
-    // get the host from url
-    tb_char_t const* host = tb_url_host_get(&sstream->base.base.url);
-    tb_assert_and_check_return_val(host, tb_false);
+    } while (0);
 
-    // clear ipv4
-    tb_ipv4_clr(&sstream->ipv4);
-
-    // save func and priv
-    sstream->priv       = priv;
-    sstream->func.open  = func;
-
-    // init dns
-    if (!sstream->hdns) sstream->hdns = tb_aicp_dns_init(sstream->base.aicp, tb_stream_timeout(astream));
-    tb_assert(sstream->hdns);
-
-    // done addr
-    if (!sstream->hdns || !tb_aicp_dns_done(sstream->hdns, host, tb_async_stream_sock_dns_func, astream))
+    // failed?
+    if (state != TB_STATE_OK) 
     {
         // open done
-        tb_async_stream_open_func(&sstream->base, TB_STATE_SOCK_DNS_FAILED, func, priv);
+        tb_async_stream_open_func(&sstream->base, state, func, priv);
     }
 
     // ok
@@ -544,7 +584,7 @@ static tb_bool_t tb_async_stream_sock_read_func(tb_aice_t const* aice)
     tb_trace_d("recv: real: %lu, size: %lu, state: %s", aice->u.recv.real, aice->u.recv.size, tb_state_cstr(aice->state));
 
     // done state
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
+    tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
     switch (aice->state)
     {
         // ok
@@ -597,7 +637,7 @@ static tb_bool_t tb_async_stream_sock_read_udp_func(tb_aice_t const* aice)
     tb_trace_d("urecv: real: %lu, size: %lu, state: %s", aice->u.urecv.real, aice->u.urecv.size, tb_state_cstr(aice->state));
 
     // done state
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
+    tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
     switch (aice->state)
     {
         // ok
@@ -736,7 +776,7 @@ static tb_bool_t tb_async_stream_sock_writ_func(tb_aice_t const* aice)
     tb_trace_d("send: real: %lu, size: %lu, state: %s", aice->u.send.real, aice->u.send.size, tb_state_cstr(aice->state));
 
     // done state
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
+    tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
     switch (aice->state)
     {
         // ok
@@ -790,7 +830,7 @@ static tb_bool_t tb_async_stream_sock_writ_udp_func(tb_aice_t const* aice)
     tb_trace_d("usend: real: %lu, size: %lu, state: %s", aice->u.usend.real, aice->u.usend.size, tb_state_cstr(aice->state));
 
     // done state
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
+    tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
     switch (aice->state)
     {
         // ok
@@ -1014,7 +1054,7 @@ static tb_void_t tb_async_stream_sock_kill(tb_handle_t astream)
     tb_assert_and_check_return(sstream);
 
     // trace
-    tb_trace_d("kill: ..");
+    tb_trace_d("kill: %s: aico: %p, ..", tb_url_get(&sstream->base.base.url), sstream->aico);
 
     // exit ssl
 #ifdef TB_SSL_ENABLE

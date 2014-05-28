@@ -13,6 +13,9 @@
 // the spider task maxn
 #define TB_DEMO_SPIDER_TASK_MAXN        (100)
 
+// the spider task rate
+#define TB_DEMO_SPIDER_TASK_RATE        (256000)
+
 // the spider filter maxn
 #define TB_DEMO_SPIDER_FILTER_MAXN      (100000)
 
@@ -254,6 +257,19 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_t* spider, tb_char_t co
     else if (!tb_strnicmp(p, "https://", 8)) p += 8;
     tb_assert_and_check_return_val(p < e, tb_false);
 
+    // find suffix
+    tb_char_t suffix[64] = {0};
+    {
+        tb_char_t* f = e - 1;
+        while (f >= p && *f != '.') f--;
+        if (f >= p && *f == '.')
+        {
+            f++;
+            tb_size_t i = 0;
+            while (f < e && tb_isalpha(*f) && i < 64) suffix[i++] = *f++; 
+        }
+    }
+
     // make md5
     tb_byte_t md5_data[16];
     tb_size_t md5_size = tb_md5_encode((tb_byte_t const*)p, e - p, md5_data, 16);
@@ -261,13 +277,16 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_t* spider, tb_char_t co
 
     // append root
     p = data;
-    e = data + maxn;
-    p += tb_snprintf(p, e - p, "%s/%s/", spider->root, html? "html" : "other");
+    e = data + maxn - 1;
+    if (p < e) p += tb_snprintf(p, e - p, "%s/%s/", spider->root, html? "html" : "other");
 
     // append md5
     tb_size_t i = 0;
     for (i = 0; i < 16 && p < e; ++i) p += tb_snprintf(p, e - p, "%02X", md5_data[i]);
     tb_assert_and_check_return_val(p < e, tb_false);
+
+    // append suffix
+    if (p < e) p += tb_snprintf(p, e - p, ".%s", suffix[0]? suffix : (html? "html" : "other"));
 
     // end
     *p = '\0';
@@ -434,7 +453,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     tb_spinlock_leave(&spider->lock);
 
     // ok? done task
-    if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, 0, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
+    if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, TB_DEMO_SPIDER_TASK_RATE, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
 
     // failed?
     if (!ok && size < TB_DEMO_SPIDER_TASK_MAXN)

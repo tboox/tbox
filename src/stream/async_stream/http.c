@@ -298,7 +298,7 @@ static tb_void_t tb_async_stream_http_kill(tb_handle_t astream)
     tb_assert_and_check_return(hstream);
 
     // trace
-    tb_trace_d("kill: ..");
+    tb_trace_d("kill: %s: ..", tb_url_get(&hstream->base.base.url));
 
     // kill it
     if (hstream->http) tb_aicp_http_kill(hstream->http);

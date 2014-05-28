@@ -73,7 +73,7 @@ typedef struct __tb_ssl_t
     tb_ssl_func_wait_t  wait;
 
     // the priv data
-    tb_pointer_t        priv;
+    tb_cpointer_t        priv;
 
 }tb_ssl_t;
 
