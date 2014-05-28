@@ -246,6 +246,16 @@ static tb_bool_t tb_async_stream_filter_sync_read_func(tb_async_stream_t* astrea
     tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
     tb_assert_and_check_return_val(fstream && fstream->func.read, tb_false);
 
+    // killed or failed?
+    if (state != TB_STATE_OK && state != TB_STATE_CLOSED)
+    {
+        // done func
+        fstream->func.read((tb_async_stream_t*)fstream, state, tb_null, 0, fstream->size, fstream->priv);
+
+        // break it
+        return tb_false;
+    }
+
     // spak the filter
     tb_byte_t const*    data = tb_null;
     tb_long_t           spak = tb_stream_filter_spak(fstream->filter, tb_null, 0, &data, fstream->size, -1);

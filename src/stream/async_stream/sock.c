@@ -321,7 +321,7 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
                 tb_assert_and_check_break(sstream->hssl);
 
                 // killed?
-                if (TB_STATE_KILLING == tb_atomic_get(&sstream->base.base.istate))
+                if (tb_stream_is_killed(sstream))
                 {
                     // save state
                     state = TB_STATE_KILLED;
@@ -433,7 +433,7 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
             tb_assert_and_check_break(sstream->type == TB_SOCKET_TYPE_TCP || sstream->type == TB_SOCKET_TYPE_UDP);
 
             // killed?
-            if (TB_STATE_KILLING == tb_atomic_get(&sstream->base.base.istate))
+            if (tb_stream_is_killed(sstream))
             {
                 // save state
                 state = TB_STATE_KILLED;
@@ -541,7 +541,7 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
         tb_assert(sstream->hdns);
 
         // killed?
-        if (TB_STATE_KILLING == tb_atomic_get(&sstream->base.base.istate))
+        if (tb_stream_is_killed(sstream))
         {
             // save state
             state = TB_STATE_KILLED;
@@ -1033,9 +1033,9 @@ static tb_bool_t tb_async_stream_sock_task(tb_handle_t astream, tb_size_t delay,
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
     tb_assert_and_check_return_val(sstream && sstream->sock && func, tb_false);
 
-    // save func and priv
-    sstream->priv       = priv;
+    // init func
     sstream->func.task  = func;
+    sstream->priv       = priv;
 
     // post task
     if (sstream->aico) return tb_aico_task_run(sstream->aico, delay, tb_async_stream_sock_task_func, astream);

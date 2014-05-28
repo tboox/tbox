@@ -158,10 +158,13 @@ typedef struct __tb_stream_t
 
     /*! internal state
      *
+     * <pre>
      * TB_STATE_CLOSED
      * TB_STATE_OPENED
+     * TB_STATE_KILLED
      * TB_STATE_OPENING
      * TB_STATE_KILLING
+     * </pre>
      */
     tb_atomic_t     istate;
 

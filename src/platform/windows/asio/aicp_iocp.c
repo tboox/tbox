@@ -137,7 +137,7 @@ static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t pr
 /* //////////////////////////////////////////////////////////////////////////////////////
  * aico 
  */
-static __tb_inline__ tb_bool_t tb_iocp_aico_is_canceled(tb_iocp_aico_t* aico)
+static __tb_inline__ tb_bool_t tb_iocp_aico_is_killed(tb_iocp_aico_t* aico)
 {
     // check
     tb_assert_and_check_return_val(aico, tb_false);
@@ -1622,7 +1622,7 @@ static tb_long_t tb_iocp_spak_done(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
     tb_check_return_val(resp->state == TB_STATE_PENDING, 1);
 
     // killed?
-    if (tb_iocp_aico_is_canceled((tb_iocp_aico_t*)resp->aico))
+    if (tb_iocp_aico_is_killed((tb_iocp_aico_t*)resp->aico))
     {
         // save state
         resp->state = TB_STATE_KILLED;
@@ -1780,8 +1780,8 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
         return PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;  
     }
     
-    // canceled or killed?
-    if (tb_iocp_aico_is_canceled(aico) || tb_atomic_get(&proactor->aicp->kill))
+    // killed?
+    if (tb_iocp_aico_is_killed(aico) || tb_atomic_get(&proactor->aicp->kill))
     {
         // post the killed state
         aico->olap.aice = *aice;

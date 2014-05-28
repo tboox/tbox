@@ -211,7 +211,7 @@ static tb_bool_t tb_async_stream_open_read_func(tb_async_stream_t* stream, tb_si
         state = TB_STATE_UNKNOWN_ERROR;
         
         // killed?
-        if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
+        if (tb_stream_is_killed(stream))
         {
             state = TB_STATE_KILLED;
             break;
@@ -228,9 +228,6 @@ static tb_bool_t tb_async_stream_open_read_func(tb_async_stream_t* stream, tb_si
     // failed?
     if (state != TB_STATE_OK) 
     {
-        // kill it
-        tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
- 
         // done func
         ok = open_read->func(stream, state, tb_null, 0, open_read->size, open_read->priv);
     }
@@ -255,7 +252,7 @@ static tb_bool_t tb_async_stream_open_writ_func(tb_async_stream_t* stream, tb_si
         state = TB_STATE_UNKNOWN_ERROR;
             
         // killed?
-        if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
+        if (tb_stream_is_killed(stream))
         {
             state = TB_STATE_KILLED;
             break;
@@ -275,9 +272,6 @@ static tb_bool_t tb_async_stream_open_writ_func(tb_async_stream_t* stream, tb_si
     // failed? 
     if (state != TB_STATE_OK)
     {   
-        // kill it
-        tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
-
         // done func
         ok = owrit->func(stream, state, owrit->data, 0, owrit->size, owrit->priv);
     }
@@ -302,7 +296,7 @@ static tb_bool_t tb_async_stream_open_seek_func(tb_async_stream_t* stream, tb_si
         state = TB_STATE_UNKNOWN_ERROR;
         
         // killed?
-        if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
+        if (tb_stream_is_killed(stream))
         {
             state = TB_STATE_KILLED;
             break;
@@ -328,9 +322,6 @@ static tb_bool_t tb_async_stream_open_seek_func(tb_async_stream_t* stream, tb_si
     // failed? 
     if (state != TB_STATE_OK) 
     {   
-        // kill it
-        tb_atomic_set(&stream->base.istate, TB_STATE_KILLING);
-
         // done func
         ok = open_seek->func(stream, state, 0, open_seek->priv);
     }
@@ -355,7 +346,7 @@ static tb_bool_t tb_async_stream_sync_read_func(tb_async_stream_t* stream, tb_si
         state = TB_STATE_UNKNOWN_ERROR;
         
         // killed?
-        if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
+        if (tb_stream_is_killed(stream))
         {
             state = TB_STATE_KILLED;
             break;
@@ -396,7 +387,7 @@ static tb_bool_t tb_async_stream_sync_seek_func(tb_async_stream_t* stream, tb_si
         state = TB_STATE_UNKNOWN_ERROR;
         
         // killed?
-        if (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))
+        if (tb_stream_is_killed(stream))
         {
             state = TB_STATE_KILLED;
             break;

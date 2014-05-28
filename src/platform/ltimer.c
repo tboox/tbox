@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME                "ltimer"
-#define TB_TRACE_MODULE_DEBUG               (0)
+#define TB_TRACE_MODULE_DEBUG               (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -252,9 +252,6 @@ static tb_bool_t tb_ltimer_expired_init(tb_iterator_t* iterator, tb_pointer_t it
     tb_ltimer_task_t const* task = (tb_ltimer_task_t const*)item;
     if (task)
     {
-        // trace
-        tb_trace_d("spak: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
-
         // check refn
         tb_assert(task->refn);
 
@@ -271,7 +268,14 @@ static tb_bool_t tb_ltimer_expired_done(tb_iterator_t* iterator, tb_pointer_t it
     tb_ltimer_task_t const* task = (tb_ltimer_task_t const*)item;
     
     // done func
-    if (task && task->func) task->func(task->killed? tb_true : tb_false, task->priv);
+    if (task && task->func) 
+    { 
+        // trace
+        tb_trace_d("done: expired: when: %lld, period: %u, refn: %u, killed: %u", task->when, task->period, task->refn, task->killed);
+
+        // done
+        task->func(task->killed? tb_true : tb_false, task->priv);
+    }
 
     // ok
     return tb_true;
@@ -682,7 +686,7 @@ tb_void_t tb_ltimer_task_exit(tb_handle_t handle, tb_handle_t htask)
     tb_assert_and_check_return(timer && timer->pool && task);
 
     // trace
-    tb_trace_d("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+    tb_trace_d("exit: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -711,7 +715,7 @@ tb_void_t tb_ltimer_task_kill(tb_handle_t handle, tb_handle_t htask)
     tb_assert_and_check_return(timer && timer->pool && task);
 
     // trace
-    tb_trace_d("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+    tb_trace_d("kill: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
     // enter
     tb_spinlock_enter(&timer->lock);

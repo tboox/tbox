@@ -111,8 +111,11 @@ tb_bool_t tb_stream_is_opened(tb_handle_t handle)
     tb_stream_t* stream = (tb_stream_t*)handle;
     tb_assert_and_check_return_val(stream, tb_false);
 
+    // the state
+    tb_size_t state = tb_atomic_get(&stream->istate);
+
     // is opened?
-    return (TB_STATE_OPENED == tb_atomic_get(&stream->istate))? tb_true : tb_false;
+    return (TB_STATE_OPENED == state || TB_STATE_KILLING == state)? tb_true : tb_false;
 }
 tb_bool_t tb_stream_is_closed(tb_handle_t handle)
 {
@@ -120,8 +123,23 @@ tb_bool_t tb_stream_is_closed(tb_handle_t handle)
     tb_stream_t* stream = (tb_stream_t*)handle;
     tb_assert_and_check_return_val(stream, tb_false);
 
+    // the state
+    tb_size_t state = tb_atomic_get(&stream->istate);
+
     // is closed?
-    return (TB_STATE_CLOSED == tb_atomic_get(&stream->istate))? tb_true : tb_false;
+    return (TB_STATE_CLOSED == state || TB_STATE_KILLED == state)? tb_true : tb_false;
+}
+tb_bool_t tb_stream_is_killed(tb_handle_t handle)
+{
+    // check
+    tb_stream_t* stream = (tb_stream_t*)handle;
+    tb_assert_and_check_return_val(stream, tb_false);
+
+    // the state
+    tb_size_t state = tb_atomic_get(&stream->istate);
+
+    // is killed?
+    return (TB_STATE_KILLED == state || TB_STATE_KILLING == state)? tb_true : tb_false;
 }
 tb_long_t tb_stream_timeout(tb_handle_t handle)
 {
@@ -337,13 +355,30 @@ tb_void_t tb_stream_kill(tb_handle_t handle)
     tb_stream_t* stream = (tb_stream_t*)handle;
     tb_assert_and_check_return(stream);
 
-    // kill it
-    tb_size_t state = tb_atomic_fetch_and_set(&stream->istate, TB_STATE_KILLING);
-    tb_check_return(state != TB_STATE_KILLING);
-
     // trace
-    tb_trace_d("kill: %s: ..", tb_url_get(&stream->url));
+    tb_trace_d("kill: %s: state: %s: ..", tb_url_get(&stream->url), tb_state_cstr(tb_atomic_get(&stream->istate)));
 
-    // kill it
-    if (stream->kill) stream->kill(stream);
+    // opened? kill it
+    if (TB_STATE_OPENED == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING))
+    {
+        // kill it
+        if (stream->kill) stream->kill(stream);
+
+        // trace
+        tb_trace_d("kill: %s: ok", tb_url_get(&stream->url));
+    }
+    // opening? kill it
+    else if (TB_STATE_OPENING == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENING, TB_STATE_KILLING))
+    {
+        // kill it
+        if (stream->kill) stream->kill(stream);
+
+        // trace
+        tb_trace_d("kill: %s: ok", tb_url_get(&stream->url));
+    }
+    else 
+    {
+        // closed? killed
+        tb_atomic_pset(&stream->istate, TB_STATE_CLOSED, TB_STATE_KILLED);
+    }
 }

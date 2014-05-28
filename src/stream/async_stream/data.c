@@ -232,7 +232,7 @@ static tb_bool_t tb_async_stream_data_open_try(tb_handle_t astream)
         tb_assert_and_check_break(dstream->aico);
 
         // killed?
-        tb_check_break(TB_STATE_KILLING != tb_atomic_get(&dstream->base.base.istate));
+        tb_check_break(!tb_stream_is_killed(&dstream));
 
         // init head
         dstream->head = dstream->data;
@@ -264,7 +264,7 @@ static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_
     tb_size_t state = tb_async_stream_data_open_try(astream)? TB_STATE_OK : TB_STATE_UNKNOWN_ERROR;
 
     // killed?
-    if (state != TB_STATE_OK && TB_STATE_KILLING == tb_atomic_get(&dstream->base.base.istate))
+    if (state != TB_STATE_OK && tb_stream_is_killed(dstream))
         state = TB_STATE_KILLED;
 
     // done func
