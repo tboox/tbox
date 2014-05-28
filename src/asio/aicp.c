@@ -497,16 +497,15 @@ tb_bool_t tb_aicp_post_(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__
     tb_size_t state = tb_atomic_fetch_and_pset(&aice->aico->state, TB_STATE_OK, TB_STATE_PENDING);
     if (state != TB_STATE_OK)
     {
+        // trace
 #ifdef __tb_debug__
-        // trace
         tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(state), func_, line_, file_);
-        
-        // pending? abort it for the debug mode
-        if (state == TB_STATE_PENDING) tb_abort();
 #else
-        // trace
         tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(state));
 #endif
+
+        // pending? abort it
+        tb_assert_abort(state != TB_STATE_PENDING);
         return tb_false;
     }
 
@@ -554,7 +553,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
 {   
     // check
     tb_assert_and_check_return(aicp);
-
+   
     // the ptor 
     tb_aicp_proactor_t* ptor = aicp->ptor;
     tb_assert_and_check_return(ptor && ptor->delo && ptor->loop_init && ptor->loop_exit && ptor->loop_spak);
@@ -568,6 +567,9 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
     // init loop
     tb_handle_t loop = ptor->loop_init(ptor);
     tb_assert_and_check_return(loop);
+ 
+    // trace
+    tb_trace_d("loop[%p]: init", loop);
 
     // loop
     while (1)
@@ -575,6 +577,11 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
         // spak
         tb_aice_t   resp = {0};
         tb_long_t   ok = loop_spak(ptor, loop, &resp, -1);
+
+        // trace
+        tb_trace_d("loop[%p]: spak: code: %lu, aico: %p, state: %s: %ld", loop, resp.code, resp.aico, resp.aico? tb_state_cstr(tb_atomic_get(&resp.aico->state)) : "null", ok);
+
+        // failed?
         tb_check_break(ok >= 0);
 
         // timeout?
@@ -599,9 +606,9 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
         {
             // trace
 #ifdef __tb_debug__
-            tb_trace_e("done aice func failed at line: %lu, func: %s, file: %s!", resp.aico->line, resp.aico->func, resp.aico->file);
+            tb_trace_e("loop[%p]: done aice func failed with code: %lu at line: %lu, func: %s, file: %s!", loop, resp.code, resp.aico->line, resp.aico->func, resp.aico->file);
 #else
-            tb_trace_e("done aice func failed!");
+            tb_trace_e("loop[%p]: done aice func failed with code: %lu!", loopresp.code, );
 #endif
         }
 
@@ -616,7 +623,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
             resp.aico->priv = tb_null;
  
             // trace
-            tb_trace_d("exit: aico[%p]: type: %lu, handle: %p: ok", resp.aico, tb_aico_type(resp.aico), tb_aico_handle(resp.aico));
+            tb_trace_d("loop[%p]: exit: aico[%p]: type: %lu, handle: %p: ok", loop, resp.aico, tb_aico_type(resp.aico), tb_aico_handle(resp.aico));
 
             // exit it
             if (ptor->delo(ptor, resp.aico)) tb_aicp_aico_exit(aicp, resp.aico);
@@ -631,6 +638,9 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
 
     // worker--
     tb_atomic_fetch_and_dec(&aicp->work);
+
+    // trace
+    tb_trace_d("loop[%p]: exit", loop);
 }
 tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 {

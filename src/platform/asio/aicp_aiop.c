@@ -188,7 +188,7 @@ static __tb_inline__ tb_size_t tb_aiop_aice_priority(tb_aice_t const* aice)
     // the priority
     return s_priorities[aice->code];
 }
-static __tb_inline__ tb_bool_t tb_aiop_aico_is_canceled(tb_aiop_aico_t* aico)
+static __tb_inline__ tb_bool_t tb_aiop_aico_is_killed(tb_aiop_aico_t* aico)
 {
     // check
     tb_assert_and_check_return_val(aico, tb_false);
@@ -233,8 +233,14 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
         tb_size_t ldelay = tb_ltimer_delay(ptor->ltimer);
         tb_assert_and_check_break(ldelay != -1);
 
+        // trace
+        tb_trace_d("loop: wait: ..");
+
         // wait aioe
         tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, tb_min(delay, ldelay));
+
+        // trace
+        tb_trace_d("loop: wait: %ld", real);
 
         // spak ctime
         tb_cache_time_spak();
@@ -295,8 +301,8 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             tb_size_t priority = tb_aiop_aice_priority(aice);
             tb_assert_and_check_goto(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], end);
 
-            // this aico is canceled? post to higher priority queue
-            if (tb_aiop_aico_is_canceled(aico)) priority = 0;
+            // this aico is killed? post to higher priority queue
+            if (tb_aiop_aico_is_killed(aico)) priority = 0;
 
             // trace
             tb_trace_d("wait: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
@@ -410,7 +416,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
     tb_assert_and_check_return_val(code != TB_AIOE_CODE_NONE, tb_false);
                 
     // trace
-    tb_trace_d("wait: code: %lu: time: %lld: ..", aice->code, tb_cache_time_mclock());
+    tb_trace_d("wait: aico: %p, code: %lu: time: %lld: ..", aico, aice->code, tb_cache_time_mclock());
 
     // done
     tb_bool_t ok = tb_false;
@@ -453,7 +459,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
     if (!ok) 
     {
         // trace
-        tb_trace_d("wait: code: %lu: failed", aice->code);
+        tb_trace_d("wait: aico: %p, code: %lu: failed", aico, aice->code);
 
         // restore it
         aico->aice = prev;
@@ -1136,8 +1142,8 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
         return 1;
     }
 
-    // canceled?
-    if (tb_aiop_aico_is_canceled(aico))
+    // killed?
+    if (tb_aiop_aico_is_killed(aico))
     {
         // reset wait
         aico->waiting = 0;
@@ -1149,7 +1155,7 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
         aice->state = TB_STATE_KILLED;
 
         // trace
-        tb_trace_d("spak: code: %u: killed", aice->code);
+        tb_trace_d("spak: aico: %p, code: %u: killed", aico, aice->code);
 
         // ok
         return 1;
@@ -1295,25 +1301,42 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
     tb_assert_and_check_return(ptor && ptor->timer && ptor->ltimer && ptor->aiop && aico);
 
     // trace
-    tb_trace_d("kilo: type: %u", aico->type);
+    tb_trace_d("kilo: aico: %p, type: %u: ..", aico, aico->type);
 
     // kill the task
     if (((tb_aiop_aico_t*)aico)->task) 
     {
+        // trace
+        tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, ((tb_aiop_aico_t*)aico)->task);
+
+        // kill task
         if (((tb_aiop_aico_t*)aico)->bltimer) tb_ltimer_task_kill(ptor->ltimer, ((tb_aiop_aico_t*)aico)->task);
         else tb_timer_task_kill(ptor->timer, ((tb_aiop_aico_t*)aico)->task);
     }
 
     // kill sock
-    if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
+    if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) 
+    {
+        // trace
+        tb_trace_d("kilo: aico: %p, type: %u, sock: %p: ..", aico, aico->type, aico->handle);
+
+        // kill it
+        tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
+    }
     // kill file
     else if (aico->type == TB_AICO_TYPE_FILE)
+    {
+        // kill it
         tb_aicp_file_kilo(ptor, aico);
+    }
 
     /* the aiop will wait long time if the lastest task wait period is too long
      * so spak the aiop manually for spak the ltimer
      */
     tb_aiop_spak(ptor->aiop);
+
+    // trace
+    tb_trace_d("kilo: aico: %p, type: %u: ok", aico, aico->type);
 }
 static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {

@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME                "timer"
-#define TB_TRACE_MODULE_DEBUG               (0)
+#define TB_TRACE_MODULE_DEBUG               (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -552,7 +552,7 @@ tb_void_t tb_timer_task_exit(tb_handle_t handle, tb_handle_t htask)
     tb_assert_and_check_return(timer && timer->pool && task);
 
     // trace
-    tb_trace_d("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+    tb_trace_d("exit: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -582,7 +582,7 @@ tb_void_t tb_timer_task_kill(tb_handle_t handle, tb_handle_t htask)
     tb_assert_and_check_return(timer && timer->pool && task);
 
     // trace
-    tb_trace_d("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+    tb_trace_d("kill: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
     // enter
     tb_spinlock_enter(&timer->lock);

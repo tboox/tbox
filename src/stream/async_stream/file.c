@@ -181,7 +181,7 @@ static tb_bool_t tb_async_stream_file_open_try(tb_handle_t astream)
         tb_assert_and_check_break(fstream->aico);
 
         // killed?
-        tb_check_break(TB_STATE_KILLING != tb_atomic_get(&fstream->base.base.istate));
+        tb_check_break(!tb_stream_is_killed(fstream));
 
         // init offset
         tb_atomic64_set0(&fstream->offset);
@@ -214,7 +214,7 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
         if (!tb_async_stream_file_open_try(astream))
         {
             // killed?
-            if (TB_STATE_KILLING == tb_atomic_get(&fstream->base.base.istate))
+            if (tb_stream_is_killed(astream))
             {
                 // save state
                 state = TB_STATE_KILLED;

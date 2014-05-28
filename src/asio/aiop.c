@@ -181,7 +181,19 @@ tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
     tb_assert_and_check_return(aiop);
 
     // kill it
-    if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"k", 1);
+    if (aiop->spak[0]) 
+    {
+        // post: 'k'
+        tb_long_t ok = tb_socket_send(aiop->spak[0], (tb_byte_t const*)"k", 1);
+        if (ok != 1)
+        {
+            // trace
+            tb_trace_e("kill: failed!");
+
+            // abort it
+            tb_assert_abort(0);
+        }
+    }
 }
 tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
 {
@@ -189,7 +201,19 @@ tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
     tb_assert_and_check_return(aiop);
 
     // spak it
-    if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
+    if (aiop->spak[0]) 
+    {
+        // post: 'p'
+        tb_long_t ok = tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
+        if (ok != 1)
+        {
+            // trace
+            tb_trace_e("spak: failed!");
+
+            // abort it
+            tb_assert_abort(0);
+        }
+    }
 }
 tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
