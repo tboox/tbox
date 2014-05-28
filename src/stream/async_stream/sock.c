@@ -112,6 +112,167 @@ static __tb_inline__ tb_async_stream_sock_t* tb_async_stream_sock_cast(tb_handle
     tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_SOCK, tb_null);
     return (tb_async_stream_sock_t*)astream;
 }
+static tb_void_t tb_async_stream_sock_clos_clear(tb_async_stream_sock_t* sstream)
+{
+    // check
+    tb_assert_and_check_return(sstream);
+
+    // clear the mode
+    sstream->bread = 0;
+
+    // clear the offset
+    tb_atomic64_set0(&sstream->offset);
+
+    // not keep alive? close it
+    if (!sstream->balived)
+    {
+        // exit it
+        if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
+        sstream->sock = tb_null;
+        sstream->bref = 0;
+    }
+
+    // exit ipv4
+    tb_ipv4_clr(&sstream->ipv4);
+
+    // clear base
+    tb_async_stream_clear(&sstream->base);
+}
+static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(sstream && sstream->func.clos);
+
+    // trace
+    tb_trace_d("clos: notify: ..");
+
+    // clear it
+    tb_async_stream_sock_clos_clear(sstream);
+
+    /* done clos func
+     *
+     * note: cannot use this stream after closing, the stream may be exited in the closing func
+     */
+    sstream->func.clos(&sstream->base, TB_STATE_OK, sstream->priv);
+
+    // trace
+    tb_trace_d("clos: notify: ok");
+}
+static tb_void_t tb_async_stream_sock_clos_dns_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(sstream);
+
+    // trace
+    tb_trace_d("clos: dns: notify: ..");
+
+    // clear dns
+    sstream->hdns = tb_null;
+
+    // done func directly
+    tb_async_stream_sock_clos_func(tb_null, sstream);
+
+    // trace
+    tb_trace_d("clos: dns: notify: ok");
+}
+static tb_void_t tb_async_stream_sock_clos_aico_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(sstream);
+
+    // trace
+    tb_trace_d("clos: aico: notify: ..");
+
+    // clear aico
+    sstream->aico = tb_null;
+
+    // exit dns 
+    if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
+    // done func directly
+    else tb_async_stream_sock_clos_func(tb_null, sstream);
+
+    // trace
+    tb_trace_d("clos: aico: notify: ok");
+}
+#ifdef TB_SSL_ENABLE
+static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(sstream && sstream->func.clos);
+
+    // trace
+    tb_trace_d("clos: ssl: notify: ..");
+
+    // exit aico 
+    if (sstream->aico) tb_aico_exit(sstream->aico, tb_async_stream_sock_clos_aico_func, sstream);
+    // exit dns 
+    else if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
+    // done func directly
+    else tb_async_stream_sock_clos_func(tb_null, sstream);
+
+    // trace
+    tb_trace_d("clos: ssl: notify: ok");
+}
+#endif
+static tb_bool_t tb_async_stream_sock_clos_try(tb_handle_t astream)
+{   
+    // check
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_assert_and_check_return_val(sstream, tb_false);
+
+    // try closing ssl first
+#ifdef TB_SSL_ENABLE
+    if (!sstream->hssl || tb_aicp_ssl_clos_try(sstream->hssl))
+#endif
+    {
+        // no aico and dns?
+        if (!sstream->aico && !sstream->hdns) 
+        {
+            // clear it
+            tb_async_stream_sock_clos_clear(sstream);
+
+            // ok
+            return tb_true;
+        }
+    }
+
+    // failed
+    return tb_false;
+}
+static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+{   
+    // check
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_assert_and_check_return_val(sstream && func, tb_false);
+
+    // trace
+    tb_trace_d("clos: ..");
+
+    // init clos
+    sstream->func.clos  = func;
+    sstream->priv       = priv;
+
+    // clos ssl first
+#ifdef TB_SSL_ENABLE
+    if (sstream->hssl) tb_aicp_ssl_clos(sstream->hssl, tb_async_stream_sock_clos_ssl_func, sstream);
+    else
+#endif
+    {
+        // exit aico 
+        if (sstream->aico) tb_aico_exit(sstream->aico, tb_async_stream_sock_clos_aico_func, sstream);
+        // exit dns
+        else if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
+        // done func directly
+        else tb_async_stream_sock_clos_func(tb_null, sstream);
+    }
+
+    // ok
+    return tb_true;
+}
 #ifdef TB_SSL_ENABLE
 static tb_bool_t tb_async_stream_sock_open_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
@@ -365,163 +526,6 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
     {
         // open done
         tb_async_stream_open_func(&sstream->base, TB_STATE_SOCK_DNS_FAILED, func, priv);
-    }
-
-    // ok
-    return tb_true;
-}
-static tb_void_t tb_async_stream_sock_clos_clear(tb_async_stream_sock_t* sstream)
-{
-    // check
-    tb_assert_and_check_return(sstream);
-
-    // clear the mode
-    sstream->bread = 0;
-
-    // clear the offset
-    tb_atomic64_set0(&sstream->offset);
-
-    // not keep alive? close it
-    if (!sstream->balived)
-    {
-        // exit it
-        if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
-        sstream->sock = tb_null;
-        sstream->bref = 0;
-    }
-
-    // exit ipv4
-    tb_ipv4_clr(&sstream->ipv4);
-
-    // clear base
-    tb_async_stream_clear(&sstream->base);
-}
-static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(sstream && sstream->func.clos);
-
-    // trace
-    tb_trace_d("clos: notify: ..");
-
-    // clear it
-    tb_async_stream_sock_clos_clear(sstream);
-
-    /* done clos func
-     *
-     * note: cannot use this stream after closing, the stream may be exited in the closing func
-     */
-    sstream->func.clos(&sstream->base, TB_STATE_OK, sstream->priv);
-
-    // trace
-    tb_trace_d("clos: notify: ok");
-}
-static tb_void_t tb_async_stream_sock_clos_dns_func(tb_handle_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(sstream);
-
-    // trace
-    tb_trace_d("clos: dns: notify: ..");
-
-    // clear dns
-    sstream->hdns = tb_null;
-
-    // done func directly
-    tb_async_stream_sock_clos_func(tb_null, sstream);
-
-    // trace
-    tb_trace_d("clos: dns: notify: ok");
-}
-static tb_void_t tb_async_stream_sock_clos_aico_func(tb_handle_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(sstream);
-
-    // trace
-    tb_trace_d("clos: aico: notify: ..");
-
-    // clear aico
-    sstream->aico = tb_null;
-
-    // exit dns 
-    if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
-    // done func directly
-    else tb_async_stream_sock_clos_func(tb_null, sstream);
-
-    // trace
-    tb_trace_d("clos: aico: notify: ok");
-}
-#ifdef TB_SSL_ENABLE
-static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
-{
-    // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(sstream && sstream->func.clos);
-
-    // trace
-    tb_trace_d("clos: ssl: notify: ..");
-
-    // exit aico 
-    if (sstream->aico) tb_aico_exit(sstream->aico, tb_async_stream_sock_clos_aico_func, sstream);
-    // exit dns 
-    else if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
-    // done func directly
-    else tb_async_stream_sock_clos_func(tb_null, sstream);
-
-    // trace
-    tb_trace_d("clos: ssl: notify: ok");
-}
-#endif
-static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
-{   
-    // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
-    tb_assert_and_check_return_val(sstream, tb_false);
-
-    // trace
-    tb_trace_d("clos: ..");
-
-    // try closing?
-    if (!func)
-    {
-        // try closing ssl first
-#ifdef TB_SSL_ENABLE
-        if (!sstream->hssl || tb_aicp_ssl_clos_try(sstream->hssl))
-#endif
-        {
-            // no aico and dns?
-            if (!sstream->aico && !sstream->hdns) 
-            {
-                // clear it
-                tb_async_stream_sock_clos_clear(sstream);
-                return tb_true;
-            }
-        }
-
-        // failed
-        return tb_false;
-    }
-
-    // init clos
-    sstream->func.clos  = func;
-    sstream->priv       = priv;
-
-    // clos ssl first
-#ifdef TB_SSL_ENABLE
-    if (sstream->hssl) tb_aicp_ssl_clos(sstream->hssl, tb_async_stream_sock_clos_ssl_func, sstream);
-    else
-#endif
-    {
-        // exit aico 
-        if (sstream->aico) tb_aico_exit(sstream->aico, tb_async_stream_sock_clos_aico_func, sstream);
-        // exit dns
-        else if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
-        // done func directly
-        else tb_async_stream_sock_clos_func(tb_null, sstream);
     }
 
     // ok
@@ -1167,15 +1171,16 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
         // init stream
         if (!tb_async_stream_init((tb_async_stream_t*)sstream, aicp, TB_STREAM_TYPE_SOCK, TB_BASIC_STREAM_SOCK_CACHE_MAXN, TB_BASIC_STREAM_SOCK_CACHE_MAXN)) break;
         sstream->base.open      = tb_async_stream_sock_open;
+        sstream->base.clos      = tb_async_stream_sock_clos;
         sstream->base.read      = tb_async_stream_sock_read;
         sstream->base.writ      = tb_async_stream_sock_writ;
         sstream->base.seek      = tb_async_stream_sock_seek;
         sstream->base.sync      = tb_async_stream_sock_sync;
         sstream->base.task      = tb_async_stream_sock_task;
-        sstream->base.clos      = tb_async_stream_sock_clos;
         sstream->base.exit      = tb_async_stream_sock_exit;
         sstream->base.base.kill = tb_async_stream_sock_kill;
         sstream->base.base.ctrl = tb_async_stream_sock_ctrl;
+        sstream->base.clos_try  = tb_async_stream_sock_clos_try;
         sstream->type           = TB_SOCKET_TYPE_TCP;
 
         // ok

@@ -111,11 +111,8 @@ tb_bool_t tb_stream_is_opened(tb_handle_t handle)
     tb_stream_t* stream = (tb_stream_t*)handle;
     tb_assert_and_check_return_val(stream, tb_false);
 
-    // the state
-    tb_size_t state = tb_atomic_get(&stream->istate);
-
     // is opened?
-    return ((state == TB_STATE_OPENED) || (state == TB_STATE_KILLING))? tb_true : tb_false;
+    return (TB_STATE_OPENED == tb_atomic_get(&stream->istate))? tb_true : tb_false;
 }
 tb_bool_t tb_stream_is_closed(tb_handle_t handle)
 {

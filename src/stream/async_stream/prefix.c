@@ -67,10 +67,18 @@ tb_void_t tb_async_stream_clear(tb_async_stream_t* stream)
     // clear istate
     tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
 }
+tb_void_t tb_async_stream_open_done(tb_async_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return(stream);
+
+    // opened or closed?
+    tb_atomic_set(&stream->base.istate, TB_STATE_OPENED);
+}
 tb_bool_t tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(stream && stream->clos, tb_false);
+    tb_assert_and_check_return_val(stream, tb_false);
 
     // ok?
     tb_bool_t ok = tb_true;
@@ -85,13 +93,28 @@ tb_bool_t tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, 
     // failed? 
     else 
     {
-        // init func and state
-        stream->clos_opening.func   = func;
-        stream->clos_opening.priv   = priv;
-        stream->clos_opening.state  = state;
+        // try closing ok?
+        if (stream->clos_try && stream->clos_try(stream))
+        {
+            // closed
+            tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
 
-        // close it
-        ok = stream->clos(stream, tb_async_stream_clos_opening, tb_null);
+            // done func
+            if (func) func(stream, state, priv);
+        }
+        else
+        {
+            // check
+            tb_assert_and_check_return_val(stream->clos, tb_false);
+
+            // init func and state
+            stream->clos_opening.func   = func;
+            stream->clos_opening.priv   = priv;
+            stream->clos_opening.state  = state;
+
+            // close it
+            ok = stream->clos(stream, tb_async_stream_clos_opening, tb_null);
+        }
     }
 
     // ok?

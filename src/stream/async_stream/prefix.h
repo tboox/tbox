@@ -41,6 +41,12 @@
  */
 tb_void_t               tb_async_stream_clear(tb_async_stream_t* stream);
 
+/* done the opening stream
+ *
+ * @param stream        the stream
+ */
+tb_void_t               tb_async_stream_open_done(tb_async_stream_t* stream);
+
 /* done the open func after opening stream
  *
  * @param stream        the stream

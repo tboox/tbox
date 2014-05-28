@@ -328,10 +328,24 @@ typedef struct __tb_async_stream_t
     /// the writ cache maxn
     tb_size_t                           wcache_maxn;
 
+    /*! try opening stream, optional
+     * 
+     * @param stream                    the stream
+     *
+     * @return                          tb_true or tb_false
+     */
+    tb_bool_t                           (*open_try)(tb_handle_t stream);
+
+    /*! try closing stream, optional
+     *
+     * @param stream                    the stream
+     *
+     * @return                          tb_true or tb_false
+     */
+    tb_bool_t                           (*clos_try)(tb_handle_t stream);
+
     /*! open stream
      *
-     * will try opening it if func and priv be passed null
-     * 
      * @param stream                    the stream
      * @param func                      the open func
      * @param priv                      the func private data
@@ -342,8 +356,6 @@ typedef struct __tb_async_stream_t
 
     /*! clos stream
      *
-     * will try closing it if func and priv be passed null
-     * 
      * @param stream                    the stream
      * @param func                      the open func
      * @param priv                      the func private data
@@ -378,7 +390,7 @@ typedef struct __tb_async_stream_t
      */
     tb_bool_t                           (*writ)(tb_handle_t stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv);
 
-    /*! seek stream
+    /*! seek stream, optional
      *
      * @param stream                    the stream
      * @param offset                    the seek offset
@@ -389,7 +401,7 @@ typedef struct __tb_async_stream_t
      */
     tb_bool_t                           (*seek)(tb_handle_t stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv);
 
-    /*! sync stream
+    /*! sync stream, optional
      *
      * @param stream                    the stream
      * @param bclosing                  the stream will be closed? 
@@ -411,7 +423,7 @@ typedef struct __tb_async_stream_t
      */
     tb_bool_t                           (*task)(tb_handle_t stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv);
 
-    /*! exit stream
+    /*! exit stream, optional
      *
      * @param stream                    the stream
      *

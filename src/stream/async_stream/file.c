@@ -94,57 +94,6 @@ static __tb_inline__ tb_async_stream_file_t* tb_async_stream_file_cast(tb_handle
     tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_null);
     return (tb_async_stream_file_t*)astream;
 }
-static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
-{
-    // check
-    tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
-    tb_assert_and_check_return_val(fstream && fstream->base.aicp, tb_false);
-
-    // done
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
-    do
-    {
-        // init file
-        if (!fstream->file)
-        {
-            // the url
-            tb_char_t const* url = tb_url_get(&fstream->base.base.url);
-            tb_assert_and_check_break(url);
-
-            // open file
-            fstream->file = tb_file_init(url, fstream->mode | TB_FILE_MODE_AICP);
-            fstream->bref = tb_false;
-    
-            // open file failed?
-            if (!fstream->file)
-            {
-                // trace
-                tb_trace_e("open %s: failed", url);
-
-                // save state
-                state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
-                break;
-            }
-        }
-
-        // addo file
-        fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);
-        tb_assert_and_check_break(fstream->aico);
-
-        // init offset
-        tb_atomic64_set0(&fstream->offset);
-
-        // ok
-        state = TB_STATE_OK;
-
-    } while (0);
-
-    // open done
-    tb_async_stream_open_func(astream, state, func, priv);
-
-    // ok?
-    return func? tb_true : ((state == TB_STATE_OK)? tb_true : tb_false);
-}
 static tb_void_t tb_async_stream_file_clos_clear(tb_async_stream_file_t* fstream)
 {
     // check
@@ -185,49 +134,126 @@ static tb_void_t tb_async_stream_file_clos_func(tb_handle_t aico, tb_cpointer_t 
     // trace
     tb_trace_d("clos: notify: ok");
 }
-static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_file_clos_try(tb_handle_t astream)
 {   
     // check
     tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
     tb_assert_and_check_return_val(fstream, tb_false);
 
-    // trace
-    tb_trace_d("clos: ..");
-
-    // try closing?
-    if (!func)
-    {
-        // no aico? closed 
-        if (!fstream->aico)
-        {
-            // clear it
-            tb_async_stream_file_clos_clear(fstream);
-            return tb_true;
-        }
-
-        // failed
-        return tb_false;
-    }
-
-    // init clos
-    fstream->func.clos  = func;
-    fstream->priv       = priv;
-
-    // no aico? done func directly
+    // no aico? closed 
     if (!fstream->aico)
     {
-        // done func
-        tb_async_stream_file_clos_func(tb_null, fstream);
+        // clear it
+        tb_async_stream_file_clos_clear(fstream);
 
         // ok
         return tb_true;
     }
 
+    // failed
+    return tb_false;
+}
+static tb_bool_t tb_async_stream_file_open_try(tb_handle_t astream)
+{
+    // check
+    tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
+    tb_assert_and_check_return_val(fstream && fstream->base.aicp, tb_false);
+
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // init file
+        if (!fstream->file)
+        {
+            // the url
+            tb_char_t const* url = tb_url_get(&fstream->base.base.url);
+            tb_assert_and_check_break(url);
+
+            // open file
+            fstream->file = tb_file_init(url, fstream->mode | TB_FILE_MODE_AICP);
+            fstream->bref = tb_false;
+            tb_check_break(fstream->file);
+        }
+
+        // addo file
+        fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);
+        tb_assert_and_check_break(fstream->aico);
+
+        // init offset
+        tb_atomic64_set0(&fstream->offset);
+
+        // open done
+        tb_async_stream_open_done(astream);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? clear it
+    if (!ok) tb_async_stream_file_clos_clear(fstream);
+
+    // ok?
+    return ok;
+}
+static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
+    tb_assert_and_check_return_val(fstream && fstream->base.aicp && func, tb_false);
+
+    // done
+    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
+    do
+    {
+        // try opening it
+        if (!tb_async_stream_file_open_try(astream))
+        {
+            // open file failed?
+            if (!fstream->file)
+            {
+                // the url
+                tb_char_t const* url = tb_url_get(&fstream->base.base.url);
+                tb_assert_and_check_break(url);
+
+                // trace
+                tb_trace_e("open %s: failed", url);
+
+                // save state
+                state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
+            }
+            break;
+        }
+
+        // ok
+        state = TB_STATE_OK;
+
+    } while (0);
+
+    // open done
+    return tb_async_stream_open_func(astream, state, func, priv);
+}
+static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+{   
+    // check
+    tb_async_stream_file_t* fstream = tb_async_stream_file_cast(astream);
+    tb_assert_and_check_return_val(fstream && func, tb_false);
+
+    // trace
+    tb_trace_d("clos: ..");
+
+    // init clos
+    fstream->func.clos  = func;
+    fstream->priv       = priv;
+
     /* exit aico
      *
      * note: cannot use this stream after exiting, the stream may be exited after calling clos func
      */
-    tb_aico_exit(fstream->aico, tb_async_stream_file_clos_func, fstream);
+    if (fstream->aico) tb_aico_exit(fstream->aico, tb_async_stream_file_clos_func, fstream);
+    // done func directly
+    else tb_async_stream_file_clos_func(tb_null, fstream);
 
     // ok
     return tb_true;
@@ -556,15 +582,18 @@ tb_async_stream_t* tb_async_stream_init_file(tb_aicp_t* aicp)
         // init stream
         if (!tb_async_stream_init((tb_async_stream_t*)fstream, aicp, TB_STREAM_TYPE_FILE, TB_ASYNC_STREAM_FILE_CACHE_MAXN, TB_ASYNC_STREAM_FILE_CACHE_MAXN)) break;
         fstream->base.open      = tb_async_stream_file_open;
+        fstream->base.clos      = tb_async_stream_file_clos;
         fstream->base.read      = tb_async_stream_file_read;
         fstream->base.writ      = tb_async_stream_file_writ;
         fstream->base.seek      = tb_async_stream_file_seek;
         fstream->base.sync      = tb_async_stream_file_sync;
         fstream->base.task      = tb_async_stream_file_task;
-        fstream->base.clos      = tb_async_stream_file_clos;
         fstream->base.exit      = tb_async_stream_file_exit;
         fstream->base.base.kill = tb_async_stream_file_kill;
         fstream->base.base.ctrl = tb_async_stream_file_ctrl;
+        fstream->base.open_try  = tb_async_stream_file_open_try;
+        fstream->base.clos_try  = tb_async_stream_file_clos_try;
+
         fstream->mode           = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
         // ok
