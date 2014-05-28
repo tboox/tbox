@@ -101,16 +101,6 @@
  * types
  */
 
-// the thread pool job state enum
-typedef enum __tb_thread_pool_job_state_e
-{
-    TB_THREAD_POOL_JOB_STATE_WAITING    = 0
-,   TB_THREAD_POOL_JOB_STATE_WORKING    = 1
-,   TB_THREAD_POOL_JOB_STATE_KILLED     = 2
-,   TB_THREAD_POOL_JOB_STATE_FINISHED   = 3
-
-}tb_thread_pool_job_state_e;
-
 // the thread pool job type
 typedef struct __tb_thread_pool_job_t
 {
@@ -120,7 +110,14 @@ typedef struct __tb_thread_pool_job_t
     // the reference count, must be <= 2
     tb_atomic_t             refn;
 
-    // the state
+    /* the state
+     *
+     * TB_STATE_KILLED
+     * TB_STATE_WAITING
+     * TB_STATE_WORKING
+     * TB_STATE_KILLING
+     * TB_STATE_FINISHED
+     */
     tb_atomic_t             state;
 
 }tb_thread_pool_job_t;
@@ -291,7 +288,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_p
     tb_size_t state = tb_atomic_get(&job->state);
 
     // waiting and non-full? pull it
-    if (state == TB_THREAD_POOL_JOB_STATE_WAITING && worker->pull < TB_THREAD_POOL_JOBS_PULL_TIME_MAXN)
+    if (state == TB_STATE_WAITING && worker->pull < TB_THREAD_POOL_JOBS_PULL_TIME_MAXN)
     {
         // append the job to the working jobs
         tb_vector_insert_tail(worker->jobs, job);   
@@ -311,7 +308,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_p
         tb_trace_d("worker[%lu]: pull: task[%p:%s] from pending", worker->id, job->task.done, job->task.name);
     }
     // finished or killed? remove it
-    else if (state == TB_THREAD_POOL_JOB_STATE_FINISHED || state == TB_THREAD_POOL_JOB_STATE_KILLED)
+    else if (state == TB_STATE_FINISHED || state == TB_STATE_KILLED)
     {
         // trace
         tb_trace_d("worker[%lu]: remove: task[%p:%s] from pending", worker->id, job->task.done, job->task.name);
@@ -356,7 +353,7 @@ static tb_bool_t tb_thread_pool_worker_walk_clean(tb_list_t* jobs, tb_pointer_t 
     tb_size_t state = tb_atomic_get(&job->state);
 
     // finished or killed? remove it
-    if (state == TB_THREAD_POOL_JOB_STATE_FINISHED || state == TB_THREAD_POOL_JOB_STATE_KILLED)
+    if (state == TB_STATE_FINISHED || state == TB_STATE_KILLED)
     {
         // trace
         tb_trace_d("worker[%lu]: remove: task[%p:%s] from pending", worker->id, job->task.done, job->task.name);
@@ -518,10 +515,10 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                 tb_assert_and_check_continue(job && job->task.done);
 
                 // the job state
-                tb_size_t state = tb_atomic_fetch_and_pset(&job->state, TB_THREAD_POOL_JOB_STATE_WAITING, TB_THREAD_POOL_JOB_STATE_WORKING);
+                tb_size_t state = tb_atomic_fetch_and_pset(&job->state, TB_STATE_WAITING, TB_STATE_WORKING);
                 
                 // the job is waiting? work it
-                if (state == TB_THREAD_POOL_JOB_STATE_WAITING)
+                if (state == TB_STATE_WAITING)
                 {
                     // trace
                     tb_trace_d("worker[%lu]: done: task[%p:%s]: ..", worker->id, job->task.done, job->task.name);
@@ -577,7 +574,13 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                     tb_trace_d("worker[%lu]: done: task[%p:%s]: time: %lld ms, average: %lld ms, count: %lu", worker->id, job->task.done, job->task.name, time, (total_time / (tb_hize_t)done_count), done_count);
 
                     // update the job state
-                    tb_atomic_set(&job->state, TB_THREAD_POOL_JOB_STATE_FINISHED);
+                    tb_atomic_set(&job->state, TB_STATE_FINISHED);
+                }
+                // the job is killing? work it
+                else if (state == TB_STATE_KILLING)
+                {
+                    // update the job state
+                    tb_atomic_set(&job->state, TB_STATE_KILLED);
                 }
             }
 
@@ -622,8 +625,8 @@ static tb_bool_t tb_thread_pool_jobs_walk_kill_all(tb_pointer_t item, tb_cpointe
     // trace
     tb_trace_d("task[%p:%s]: kill: ..", job->task.done, job->task.name);
 
-    // kill it
-    tb_atomic_set(&job->state, TB_THREAD_POOL_JOB_STATE_KILLED);
+    // kill it if be waiting
+    tb_atomic_pset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
 
     // ok
     return tb_true;
@@ -672,7 +675,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_t* poo
 
         // init job
         job->refn   = 1;
-        job->state  = TB_THREAD_POOL_JOB_STATE_WAITING;
+        job->state  = TB_STATE_WAITING;
         job->task   = *task;
 
         // non-urgent job? 
@@ -1116,10 +1119,10 @@ tb_void_t tb_thread_pool_task_kill(tb_handle_t handle, tb_handle_t task)
     tb_assert_and_check_return(handle && job);
 
     // trace
-    tb_trace_d("task[%p:%s]: kill: ..", job->task.done, job->task.name);
+    tb_trace_d("task[%p:%s]: kill: state: %s: ..", job->task.done, job->task.name, tb_state_cstr(tb_atomic_get(&job->state)));
 
-    // kill it
-    tb_atomic_set(&job->state, TB_THREAD_POOL_JOB_STATE_KILLED);
+    // kill it if be waiting
+    tb_atomic_pset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
 }
 tb_void_t tb_thread_pool_task_kill_all(tb_handle_t handle)
 {
@@ -1145,20 +1148,20 @@ tb_long_t tb_thread_pool_task_wait(tb_handle_t handle, tb_handle_t task, tb_long
 
     // wait it
     tb_hong_t time = tb_cache_time_spak();
-    tb_size_t state = TB_THREAD_POOL_JOB_STATE_WAITING;
-    while ( ((state = tb_atomic_get(&job->state)) != TB_THREAD_POOL_JOB_STATE_FINISHED) 
-        &&  state != TB_THREAD_POOL_JOB_STATE_KILLED
+    tb_size_t state = TB_STATE_WAITING;
+    while ( ((state = tb_atomic_get(&job->state)) != TB_STATE_FINISHED) 
+        &&  state != TB_STATE_KILLED
         &&  (timeout < 0 || tb_cache_time_spak() < time + timeout))
     {
         // trace
-        tb_trace_d("task[%p:%s]: wait: ..", job->task.done, job->task.name);
+        tb_trace_d("task[%p:%s]: wait: state: %s: ..", job->task.done, job->task.name, tb_state_cstr(state));
 
         // wait some time
         tb_msleep(200);
     }
 
     // ok?
-    return (state == TB_THREAD_POOL_JOB_STATE_FINISHED || state == TB_THREAD_POOL_JOB_STATE_KILLED)? 1 : 0;
+    return (state == TB_STATE_FINISHED || state == TB_STATE_KILLED)? 1 : 0;
 }
 tb_long_t tb_thread_pool_task_wait_all(tb_handle_t handle, tb_long_t timeout)
 {
@@ -1205,7 +1208,7 @@ tb_void_t tb_thread_pool_task_exit(tb_handle_t handle, tb_handle_t task)
     tb_assert_and_check_return(pool && job);
 
     // kill it first
-    tb_atomic_set(&job->state, TB_THREAD_POOL_JOB_STATE_KILLED);
+    tb_thread_pool_task_kill(handle, task);
 
     // enter
     tb_spinlock_enter(&pool->lock);
