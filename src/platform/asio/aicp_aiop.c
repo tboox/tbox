@@ -188,7 +188,7 @@ static __tb_inline__ tb_size_t tb_aiop_aice_priority(tb_aice_t const* aice)
     // the priority
     return s_priorities[aice->code];
 }
-static __tb_inline__ tb_bool_t tb_aiop_aico_is_killing(tb_aiop_aico_t* aico)
+static __tb_inline__ tb_bool_t tb_aiop_aico_is_canceled(tb_aiop_aico_t* aico)
 {
     // check
     tb_assert_and_check_return_val(aico, tb_false);
@@ -196,8 +196,8 @@ static __tb_inline__ tb_bool_t tb_aiop_aico_is_killing(tb_aiop_aico_t* aico)
     // the state
     tb_size_t state = tb_atomic_get(&aico->base.state);
 
-    // killing or exiting?
-    return (state == TB_STATE_KILLING) || (state == TB_STATE_EXITING);
+    // killing or exiting or killed?
+    return (state == TB_STATE_KILLING) || (state == TB_STATE_EXITING) || (state == TB_STATE_KILLED);
 }
 static tb_void_t tb_aiop_spak_work(tb_aicp_proactor_aiop_t* ptor)
 {
@@ -295,8 +295,8 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             tb_size_t priority = tb_aiop_aice_priority(aice);
             tb_assert_and_check_goto(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], end);
 
-            // this aico is killing? post to higher priority queue
-            if (tb_aiop_aico_is_killing(aico)) priority = 0;
+            // this aico is canceled? post to higher priority queue
+            if (tb_aiop_aico_is_canceled(aico)) priority = 0;
 
             // trace
             tb_trace_d("wait: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
@@ -1136,8 +1136,8 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
         return 1;
     }
 
-    // killed?
-    if (tb_aiop_aico_is_killing(aico))
+    // canceled?
+    if (tb_aiop_aico_is_canceled(aico))
     {
         // reset wait
         aico->waiting = 0;

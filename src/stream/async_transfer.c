@@ -309,7 +309,7 @@ static tb_bool_t tb_async_transfer_done_func(tb_async_transfer_t* transfer, tb_s
     if ((state != TB_STATE_OK && state != TB_STATE_PAUSED) || (TB_STATE_KILLING == tb_atomic_get(&transfer->state))) 
     {
         // save the closed state
-        transfer->done.closed_state    = state;
+        transfer->done.closed_state    = (TB_STATE_KILLING == tb_atomic_get(&transfer->state))? TB_STATE_KILLED : state;
         transfer->done.closed_size     = tb_stream_size(transfer->istream);
         transfer->done.closed_offset   = tb_stream_offset(transfer->istream);
         return tb_async_transfer_clos(transfer, tb_async_transfer_done_clos_func, transfer);
@@ -474,7 +474,7 @@ static tb_bool_t tb_async_transfer_ostream_writ_func(tb_async_stream_t* astream,
         transfer->done.current_rate = (transfer->done.saved_size && (time > transfer->done.base_time))? (tb_size_t)((transfer->done.saved_size * 1000) / (time - transfer->done.base_time)) : (tb_size_t)transfer->done.saved_size;
 
         // done func
-        tb_async_transfer_done_func(transfer, TB_STATE_OK);
+        tb_async_transfer_done_func(transfer, state);
 
         // break;
         bwrit = tb_false;

@@ -342,7 +342,7 @@ tb_void_t tb_stream_kill(tb_handle_t handle)
     tb_check_return(state != TB_STATE_KILLING);
 
     // trace
-    tb_trace_d("kill: ..");
+    tb_trace_d("kill: %s: ..", tb_url_get(&stream->url));
 
     // kill it
     if (stream->kill) stream->kill(stream);

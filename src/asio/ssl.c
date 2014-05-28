@@ -906,11 +906,8 @@ tb_void_t tb_aicp_ssl_kill(tb_handle_t handle)
     tb_assert_and_check_return(ssl);
 
     // kill it
-    tb_size_t state = tb_atomic_fetch_and_pset(&ssl->state, TB_STATE_OPENED, TB_STATE_KILLING);
-    tb_check_return(state != TB_STATE_KILLING && state != TB_STATE_CLOSED);
-
-    // opening? kill it
-    tb_atomic_pset(&ssl->state, TB_STATE_OPENING, TB_STATE_KILLING);
+    tb_size_t state = tb_atomic_fetch_and_set(&ssl->state, TB_STATE_KILLING);
+    tb_check_return(state != TB_STATE_KILLING);
 
     // trace
     tb_trace_d("kill: ..");
@@ -1008,6 +1005,14 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
         // init aico
         ssl->aico = tb_aico_init_sock(ssl->aicp, ssl->sock);
         tb_assert_and_check_break(ssl->aico);
+
+        // killed?
+        if (TB_STATE_KILLING == tb_atomic_get(&ssl->state))
+        {
+            // done func
+            tb_aicp_ssl_open_func(ssl, TB_STATE_KILLED, func, priv);
+            break;
+        }
 
         // init timeout
         if (ssl->timeout)

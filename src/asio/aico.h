@@ -119,7 +119,16 @@ typedef struct __tb_aico_t
     /// the handle
     tb_handle_t         handle;
 
-    /// the state
+    /*! the state
+     *
+     * <pre>
+     * TB_STATE_OK
+     * TB_STATE_KILLED
+     * TB_STATE_KILLING
+     * TB_STATE_PENDING
+     * TB_STATE_EXITING
+     * </pre>
+     */
     tb_atomic_t         state;
 
     /// the timeout for aice

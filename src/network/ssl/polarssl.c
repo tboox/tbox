@@ -490,6 +490,9 @@ tb_long_t tb_ssl_clos_try(tb_handle_t handle)
             ssl->state = TB_STATE_SOCK_SSL_FAILED;
         }
 
+        // clear ssl
+        if (ok > 0) ssl_session_reset(&ssl->ssl);
+
     } while (0);
 
     // ok?
@@ -497,9 +500,6 @@ tb_long_t tb_ssl_clos_try(tb_handle_t handle)
     {
         // closed
         ssl->bopened = tb_false;
-
-        // clear ssl
-        ssl_session_reset(&ssl->ssl);
     }
     // failed?
     else if (ok < 0)
