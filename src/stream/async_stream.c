@@ -601,7 +601,10 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_t* stream)
 tb_bool_t tb_async_stream_open_try(tb_async_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream && stream->open, tb_false);
+    tb_assert_and_check_return_val(stream, tb_false);
+
+    // not supported?
+    if (!stream->open_try) return tb_stream_is_opened(stream);
      
     // trace
     tb_trace_d("open: try: %s: ..", tb_url_get(&stream->base.url));
@@ -616,7 +619,13 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_t* stream)
     tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
 
     // try opening it
-    return stream->open(stream, tb_null, tb_null);
+    tb_bool_t ok = stream->open_try(stream);
+
+    // trace
+    tb_trace_d("open: try: %s: %s", tb_url_get(&stream->base.url), ok? "ok" : "no");
+
+    // ok?
+    return ok;
 }
 tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
@@ -626,15 +635,16 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_
     // trace
     tb_trace_d("open: %s: ..", tb_url_get(&stream->base.url));
 
-    // set opening
-    tb_size_t state = tb_atomic_fetch_and_pset(&stream->base.istate, TB_STATE_CLOSED, TB_STATE_OPENING);
-
-    // opened? done func directly
-    if (state == TB_STATE_OPENED)
+    // try opening ok? done func directly
+    if (tb_async_stream_open_try(stream))
     {
+        // done func
         func(stream, TB_STATE_OK, priv);
         return tb_true;
     }
+
+    // set opening
+    tb_size_t state = tb_atomic_fetch_and_pset(&stream->base.istate, TB_STATE_CLOSED, TB_STATE_OPENING);
 
     // must be closed
     tb_assert_and_check_return_val(state == TB_STATE_CLOSED, tb_false);
@@ -645,8 +655,11 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_t* stream, tb_async_stream_open_
 tb_bool_t tb_async_stream_clos_try(tb_async_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream && stream->clos, tb_false);
+    tb_assert_and_check_return_val(stream, tb_false);
 
+    // not supported?
+    if (!stream->clos_try) return tb_stream_is_closed(stream);
+     
     // trace
     tb_trace_d("clos: try: %s: ..", tb_url_get(&stream->base.url));
 
@@ -662,7 +675,7 @@ tb_bool_t tb_async_stream_clos_try(tb_async_stream_t* stream)
         }
 
         // try closing it
-        ok = stream->clos(stream, tb_null, tb_null);
+        ok = stream->clos_try(stream);
 
     } while (0);
 

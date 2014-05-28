@@ -136,40 +136,6 @@ static __tb_inline__ tb_async_stream_data_t* tb_async_stream_data_cast(tb_handle
     tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_DATA, tb_null);
     return (tb_async_stream_data_t*)astream;
 }
-static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
-{
-    // check
-    tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
-    tb_assert_and_check_return_val(dstream, tb_false);
-
-    // done
-    tb_size_t state = TB_STATE_UNKNOWN_ERROR;
-    do
-    {
-        // check
-        tb_assert_and_check_break(dstream->data && dstream->size);
-        
-        // init aico
-        if (!dstream->aico) dstream->aico = tb_aico_init_task(dstream->base.aicp, tb_false);
-        tb_assert_and_check_break(dstream->aico);
-
-        // init head
-        dstream->head = dstream->data;
-
-        // init offset
-        tb_atomic64_set0(&dstream->offset);
-
-        // ok
-        state = TB_STATE_OK;
-
-    } while (0);
-
-    // done func
-    tb_async_stream_open_func(astream, state, func, priv);
-
-    // ok?
-    return func? tb_true : ((state == TB_STATE_OK)? tb_true : tb_false);
-}
 static tb_void_t tb_async_stream_data_clos_clear(tb_async_stream_data_t* dstream)
 {
     // check
@@ -208,49 +174,94 @@ static tb_void_t tb_async_stream_data_clos_func(tb_handle_t aico, tb_cpointer_t 
     // trace
     tb_trace_d("clos: notify: ok");
 }
-static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_data_clos_try(tb_handle_t astream)
 {   
     // check
     tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
     tb_assert_and_check_return_val(dstream, tb_false);
 
-    // trace
-    tb_trace_d("clos: ..");
-
-    // try closing?
-    if (!func)
-    {
-        // no aico? closed 
-        if (!dstream->aico)
-        {
-            // clear it
-            tb_async_stream_data_clos_clear(dstream);
-            return tb_true;
-        }
-
-        // failed
-        return tb_false;
-    }
-
-    // init func
-    dstream->func.clos.func = func;
-    dstream->func.clos.priv = priv;
-
-    // no aico? done func directly
+    // no aico? closed 
     if (!dstream->aico)
     {
-        // done func
-        tb_async_stream_data_clos_func(tb_null, dstream);
+        // clear it
+        tb_async_stream_data_clos_clear(dstream);
 
         // ok
         return tb_true;
     }
 
+    // failed
+    return tb_false;
+}
+static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+{   
+    // check
+    tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
+    tb_assert_and_check_return_val(dstream && func, tb_false);
+
+    // trace
+    tb_trace_d("clos: ..");
+
+    // init func
+    dstream->func.clos.func = func;
+    dstream->func.clos.priv = priv;
+
     // exit it
-    tb_aico_exit(dstream->aico, tb_async_stream_data_clos_func, dstream);
+    if (dstream->aico) tb_aico_exit(dstream->aico, tb_async_stream_data_clos_func, dstream);
+    // done func directly
+    else tb_async_stream_data_clos_func(tb_null, dstream);
 
     // ok
     return tb_true;
+}
+static tb_bool_t tb_async_stream_data_open_try(tb_handle_t astream)
+{
+    // check
+    tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
+    tb_assert_and_check_return_val(dstream, tb_false);
+
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // check
+        tb_assert_and_check_break(dstream->data && dstream->size);
+        
+        // init aico
+        if (!dstream->aico) dstream->aico = tb_aico_init_task(dstream->base.aicp, tb_false);
+        tb_assert_and_check_break(dstream->aico);
+
+        // init head
+        dstream->head = dstream->data;
+
+        // init offset
+        tb_atomic64_set0(&dstream->offset);
+
+        // open done
+        tb_async_stream_open_done(astream);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? clear it
+    if (!ok) tb_async_stream_data_clos_clear(dstream);
+
+    // ok?
+    return ok;
+}
+static tb_bool_t tb_async_stream_data_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
+{
+    // check
+    tb_async_stream_data_t* dstream = tb_async_stream_data_cast(astream);
+    tb_assert_and_check_return_val(dstream && func, tb_false);
+
+    // try opening it
+    tb_size_t state = tb_async_stream_data_open_try(astream)? TB_STATE_OK : TB_STATE_UNKNOWN_ERROR;
+
+    // done func
+    return tb_async_stream_open_func(astream, state, func, priv);
 }
 static tb_bool_t tb_async_stream_data_read_func(tb_aice_t const* aice)
 {
@@ -639,14 +650,16 @@ tb_async_stream_t* tb_async_stream_init_data(tb_aicp_t* aicp)
         // init stream
         if (!tb_async_stream_init((tb_async_stream_t*)dstream, aicp, TB_STREAM_TYPE_DATA, 0, 0)) break;
         dstream->base.open      = tb_async_stream_data_open;
+        dstream->base.clos      = tb_async_stream_data_clos;
         dstream->base.read      = tb_async_stream_data_read;
         dstream->base.writ      = tb_async_stream_data_writ;
         dstream->base.seek      = tb_async_stream_data_seek;
         dstream->base.task      = tb_async_stream_data_task;
-        dstream->base.clos      = tb_async_stream_data_clos;
         dstream->base.exit      = tb_async_stream_data_exit;
         dstream->base.base.kill = tb_async_stream_data_kill;
         dstream->base.base.ctrl = tb_async_stream_data_ctrl;
+        dstream->base.open_try  = tb_async_stream_data_open_try;
+        dstream->base.clos_try  = tb_async_stream_data_clos_try;
 
         // ok
         ok = tb_true;
