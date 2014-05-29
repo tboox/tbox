@@ -1093,6 +1093,30 @@ tb_void_t tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
             // leak
             ok = tb_false;
         }
+#if 0
+        else 
+        {
+            // dump free
+            tb_trace_i("%s: free: data: %p size: %lu at %s(): %d, file: %s"
+                    , prefix
+                    , pb + nhead
+                    , block->size
+                    , block->func
+                    , block->line
+                    , block->file
+                    );
+
+            // dump frames
+            {
+                // the backtrace prefix 
+                tb_char_t backtrace_prefix[64] = {0};
+                tb_snprintf(backtrace_prefix, 63, "%s:     ", prefix);
+
+                // dump backtrace
+                tb_static_block_pool_dump_backtrace(backtrace_prefix, block);
+            }
+        }
+#endif
 
         // next
         pb += nhead + block->size;
@@ -1115,5 +1139,8 @@ tb_void_t tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
     tb_trace_i("%s: fail: %lu",         prefix, pool->info.fail);
     tb_trace_i("%s: pred: %lu%%",       prefix, pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
     tb_trace_i("%s: frag: %lu",         prefix, frag);
+
+    // dump
+    tb_trace_i("======================================================================");
 }
 #endif

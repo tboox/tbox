@@ -463,13 +463,13 @@ INC_FILES 				= \
 						container/vector.h \
 						container/iterator.h \
 						container/single_list.h \
+						container/bloom_filter.h \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/dns.h \
 						platform/file.h \
 						platform/path.h \
 						platform/time.h \
-						platform/cache_time.h \
 						platform/sched.h \
 						platform/mutex.h \
 						platform/timer.h \
@@ -489,6 +489,8 @@ INC_FILES 				= \
 						platform/directory.h \
 						platform/exception.h \
 						platform/backtrace.h \
+						platform/semaphore.h \
+						platform/cache_time.h \
 						platform/thread_pool.h \
 						platform/thread_store.h \
 						platform/compiler/prefix.h \

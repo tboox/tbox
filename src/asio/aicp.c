@@ -497,15 +497,19 @@ tb_bool_t tb_aicp_post_(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__
     tb_size_t state = tb_atomic_fetch_and_pset(&aice->aico->state, TB_STATE_OK, TB_STATE_PENDING);
     if (state != TB_STATE_OK)
     {
-        // trace
+        // pending? error
+        if (state == TB_STATE_PENDING)
+        {
+            // trace
 #ifdef __tb_debug__
-        tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(state), func_, line_, file_);
+            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(state), func_, line_, file_);
 #else
-        tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(state));
+            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(state));
 #endif
 
-        // pending? abort it
-        tb_assert_abort(state != TB_STATE_PENDING);
+            // abort it
+            tb_assert_abort(0);
+        }
         return tb_false;
     }
 

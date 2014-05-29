@@ -113,7 +113,7 @@ static __tb_inline__ tb_char_t const* tb_dns_encode_name(tb_char_t* name)
     tb_assert_and_check_return_val(name && name[0] == '.', tb_null);
     
     // encode
-    tb_size_t   n = 0;
+    tb_byte_t   n = 0;
     tb_char_t*  b = name;
     tb_char_t*  p = name + 1;
     while (*p)
@@ -121,7 +121,7 @@ static __tb_inline__ tb_char_t const* tb_dns_encode_name(tb_char_t* name)
         if (*p == '.')
         {
             //*b = '0' + n;
-            *b = n;
+            *b = (tb_char_t)n;
             n = 0;
             b = p;
         }

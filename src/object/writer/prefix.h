@@ -85,7 +85,7 @@ static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_basic_stream_t*
     tb_assert_and_check_return_val(sizef, tb_false);
 
     // writ flag 
-    tb_uint8_t flag = ((type < 0xf? (tb_uint8_t)type : 0xf) << 4) | (size < 0xc? (tb_uint8_t)size : sizef);
+    tb_uint8_t flag = ((type < 0xf? (tb_uint8_t)type : 0xf) << 4) | (size < 0xc? (tb_uint8_t)size : (tb_uint8_t)sizef);
     if (!tb_basic_stream_bwrit_u8(stream, flag)) return tb_false;
 
     // trace

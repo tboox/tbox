@@ -1258,6 +1258,7 @@ tb_void_t tb_thread_pool_dump(tb_handle_t handle)
             // dump jobs
             tb_fixed_pool_walk(pool->jobs_pool, tb_thread_pool_jobs_walk_dump_all, tb_null);
         }
+        tb_trace_i("======================================================================");
     }
 
     // leave

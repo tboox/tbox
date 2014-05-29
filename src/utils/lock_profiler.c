@@ -138,6 +138,9 @@ tb_void_t tb_lock_profiler_dump(tb_handle_t handle)
             c++;
         }
     }
+
+    // trace end
+    if (c) tb_trace_i("======================================================================");
 }
 tb_void_t tb_lock_profiler_register(tb_handle_t handle, tb_pointer_t lock, tb_char_t const* name)
 {

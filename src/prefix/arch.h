@@ -44,18 +44,29 @@
 #if defined(__i386) \
     || defined(__i686) \
     || defined(__i386__) \
-    || defined(__i686__)
+    || defined(__i686__) \
+    || defined(_M_IX86)
 #   define TB_ARCH_x86
 #   if defined(__i386) || defined(__i386__)
 #       define  TB_ARCH_STRING              "i386"
 #   elif defined(__i686) || defined(__i686__)
 #       define  TB_ARCH_STRING              "i686"
+#   elif defined(_M_IX86)
+#       if (_M_IX86 == 300)
+#           define  TB_ARCH_STRING          "i386"
+#       elif (_M_IX86 == 400)
+#           define  TB_ARCH_STRING          "i486"
+#       elif (_M_IX86 == 500 || _M_IX86 == 600)
+#           define  TB_ARCH_STRING          "Pentium"
+#       endif
 #   else
 #       define TB_ARCH_STRING               "x86"
 #   endif
 #elif defined(__x86_64) \
     || defined(__amd64__) \
-    || defined(__amd64)
+    || defined(__amd64) \
+    || defined(_M_IA64) \
+    || defined(_M_X64)
 #   define TB_ARCH_x64
 #   if defined(__x86_64)
 #       define  TB_ARCH_STRING              "x86_64"
