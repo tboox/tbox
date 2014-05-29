@@ -51,6 +51,7 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
     case TB_STATE_TIMEOUT:                      return "timeout";
     case TB_STATE_FINISHED:                     return "finished";
     case TB_STATE_WAIT_FAILED:                  return "wait failed";
+    case TB_STATE_POST_FAILED:                  return "post failed";
     case TB_STATE_NOT_SUPPORTED:                return "not supported";
     case TB_STATE_UNKNOWN_ERROR:                return "unknown error";
 

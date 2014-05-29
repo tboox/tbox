@@ -277,6 +277,7 @@ tb_void_t tb_string_pool_dump(tb_handle_t handle)
         {
             if (item) tb_trace_i("item: refn: %lu, cstr: %s", (tb_size_t)item->data, item->name);
         }
+        tb_trace_i("======================================================================");
     }
 
     // leave

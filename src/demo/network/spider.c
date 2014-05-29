@@ -38,14 +38,29 @@ typedef struct __tb_demo_spider_t
     // the lock
     tb_spinlock_t               lock;
 
-    // the root
-    tb_char_t                   root[256];
-
     // the filter
     tb_bloom_filter_t*          filter;
 
     // the state
     tb_atomic_t                 state;
+
+    // the option
+    tb_handle_t                 option;
+
+    // the home
+    tb_char_t const*            home;
+
+    // the root
+    tb_char_t                   root[256];
+
+    // the timeout 
+    tb_long_t                   timeout;
+
+    // the user agent
+    tb_char_t const*            user_agent;
+
+    // the limited rate
+    tb_size_t                   limited_rate;
 
 }tb_demo_spider_t;
 
@@ -62,6 +77,22 @@ typedef struct __tb_demo_spider_task_t
     tb_char_t                   ourl[TB_DEMO_SPIDER_URL_MAXN];
 
 }tb_demo_spider_task_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */ 
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
+static tb_option_item_t g_options[] = 
+{
+    {'t',   "timeout",      TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set the timeout"               }
+,   {'d',   "directory",    TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_CSTR,        "set the root directory"        }
+,   {'u',   "agent",        TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_CSTR,        "set the user agent"            }
+,   {'r',   "rate",         TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set limited rate"              }
+,   {'h',   "help",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "display this help and exit"    } 
+,   {'-',   "home",         TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the home url"                  }
+,   {'-',   tb_null,        TB_OPTION_MODE_END,         TB_OPTION_TYPE_NONE,        tb_null                         }
+};
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
@@ -85,7 +116,7 @@ static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
     tb_basic_stream_t*  stream = tb_null;
     do
     {
-        // html?
+        // the file path contains /html/?
         if (!tb_strstr(url, "html")) break;
 
         // init stream
@@ -105,7 +136,14 @@ static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
         if (!tb_basic_stream_need(stream, &data, need)) break;
 
         // is html?
-        ok = tb_strnistr((tb_char_t const*)data, need, "<html>")? tb_true : tb_false;
+        if (tb_strnistr((tb_char_t const*)data, need, "<!DOCTYPE html>"))
+        {
+            ok = tb_true;
+            break;
+        }
+
+        // is html?
+        ok = tb_strnistr((tb_char_t const*)data, need, "<html")? tb_true : tb_false;
 
     } while (0);
 
@@ -329,7 +367,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
 
     // percent
     tb_size_t percent = 0;
-    if (size > 0) percent = (offset * 100) / size;
+    if (size > 0) percent = (tb_size_t)((offset * 100) / size);
     else if (state == TB_STATE_OK) percent = 100;
 
     // trace
@@ -351,7 +389,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
     else 
     {
         // trace
-        tb_trace_e("task: done: %s: no", task->iurl);
+        tb_trace_e("task: done: %s: %s", task->iurl, tb_state_cstr(state));
 
         // exit task
         tb_demo_spider_task_exit(task);
@@ -363,6 +401,8 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
 static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_cpointer_t priv)
 {
     // check
+    tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;
+    tb_assert_and_check_return_val(task && task->spider, tb_false);
     tb_assert_and_check_return_val(istream && ostream, tb_false);
     tb_assert_and_check_return_val(tb_stream_type(istream) == TB_STREAM_TYPE_HTTP, tb_false);
 
@@ -374,9 +414,9 @@ static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_t* istream, tb_async_s
     tb_trace_d("ctrl: %s: ..", url);
 
     // set timeout
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, TB_DEMO_SPIDER_TASK_TIMEOUT)) return tb_false;
+    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, task->spider->timeout)) return tb_false;
 
-#ifdef TB_CONFIG_MODULE_HAVE_ZIP
+#if defined(TB_CONFIG_MODULE_HAVE_ZIP) && defined(TB_CONFIG_THIRD_HAVE_ZLIB)
     // need gzip
     if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) return tb_false;
 
@@ -385,7 +425,7 @@ static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_t* istream, tb_async_s
 #endif
 
     // user agent
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "User-Agent", TB_DEMO_SPIDER_USER_AGENT)) return tb_false;
+    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "User-Agent", task->spider->user_agent)) return tb_false;
 
     // enable cookies
     if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_COOKIES, tb_cookies())) return tb_false;
@@ -459,13 +499,13 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     tb_spinlock_leave(&spider->lock);
 
     // ok? done task
-    if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, TB_DEMO_SPIDER_TASK_RATE, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
+    if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, spider->limited_rate, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
 
     // failed?
     if (!ok && size < TB_DEMO_SPIDER_TASK_MAXN)
     {
         // trace
-        tb_trace_e("task: size: %lu, done: %s: no", size, url);
+        tb_trace_e("task: size: %lu, done: %s: post failed", size, url);
     }
 
     // save full
@@ -474,16 +514,53 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     // ok?
     return ok;
 }
-static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_char_t const* root)
+static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb_char_t** argv)
 {
     // check
-    tb_assert_and_check_return_val(spider, tb_false);
+    tb_assert_and_check_return_val(spider && argc && argv, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
     do
     {
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
+        // init option
+        spider->option = tb_option_init("spider", "the spider demo", g_options);
+        tb_assert_and_check_break(spider->option);
+ 
+        // done option
+        if (!tb_option_done(spider->option, argc - 1, &argv[1])) break;
+
+        // init home
+        spider->home = tb_option_item_cstr(spider->option, "home");
+        tb_assert_and_check_break(spider->home);
+        tb_trace_d("home: %s", spider->home);
+
         // init root
+        tb_char_t const* root = tb_option_item_cstr(spider->option, "directory");
+
+        // init user agent
+        spider->user_agent = tb_option_item_cstr(spider->option, "agent");
+
+        // init timeout
+        if (tb_option_find(spider->option, "timeout"))
+            spider->timeout = tb_option_item_sint32(spider->option, "timeout");
+
+        // init limited rate
+        if (tb_option_find(spider->option, "rate"))
+            spider->limited_rate = tb_option_item_uint32(spider->option, "rate");
+#else
+
+        // init home
+        spider->home = argv[1]? argv[1] : tb_null;
+        tb_assert_and_check_break(spider->home);
+        tb_trace_d("home: %s", spider->home);
+
+        // init root
+        tb_char_t const* root = argv[2];
+#endif
+
+        // using the default root
         if (root) tb_strlcpy(spider->root, root, sizeof(spider->root) - 1);
         else 
         {
@@ -494,6 +571,15 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_char_t const* 
             tb_strcat(spider->root, "/spider");
         }
         tb_trace_d("root: %s", spider->root);
+
+        // using the default user agent
+        if (!spider->user_agent) spider->user_agent = TB_DEMO_SPIDER_USER_AGENT;
+
+        // using the default timeout
+        if (!spider->timeout) spider->timeout = TB_DEMO_SPIDER_TASK_TIMEOUT;
+
+        // using the default rate
+        if (!spider->limited_rate) spider->limited_rate = TB_DEMO_SPIDER_TASK_RATE;
 
         // strip root tail: '/' or '\\'
         tb_size_t size = tb_strlen(spider->root);
@@ -522,6 +608,11 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_char_t const* 
         ok = tb_true;
 
     } while (0);
+
+    // failed? help it
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
+    if (!ok && spider->option) tb_option_help(spider->option);
+#endif
 
     // ok?
     return ok;
@@ -566,6 +657,12 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
     // exit lock
     tb_spinlock_exit(&spider->lock);
 
+    // exit option
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
+    if (spider->option) tb_option_exit(spider->option);
+    spider->option = tb_null;
+#endif
+
     // trace
     tb_trace_d("exit: ok");
 }
@@ -579,15 +676,11 @@ tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
     tb_demo_spider_t spider = {0};
     do
     {
-        // init home
-        tb_char_t const* home = argv[1]? argv[1] : tb_null;
-        tb_trace_d("home: %s", home);
-
         // init spider
-        if (!tb_demo_spider_init(&spider, argv[2])) break;
+        if (!tb_demo_spider_init(&spider, argc, argv)) break;
 
         // done the home task if exists
-        if (home) tb_demo_spider_task_done(&spider, home, tb_true, tb_null);
+        tb_demo_spider_task_done(&spider, spider.home, tb_true, tb_null);
 
         // wait 
         getchar();

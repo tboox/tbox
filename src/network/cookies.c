@@ -758,7 +758,7 @@ tb_void_t tb_cookies_dump(tb_handle_t handle)
     tb_spinlock_enter(&cookies->lock);
 
     // dump
-    tb_trace_i("=========================================================");
+    tb_trace_i("======================================================================");
     tb_trace_i("cookie: size: %lu", tb_hash_size(cookies->cookie_pool));
     tb_for_all_if (tb_hash_item_t*, item, cookies->cookie_pool, item)
     {
@@ -776,6 +776,7 @@ tb_void_t tb_cookies_dump(tb_handle_t handle)
 
     // leave
     tb_spinlock_leave(&cookies->lock);
+    tb_trace_i("======================================================================");
 }
 #endif
 
