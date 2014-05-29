@@ -13,8 +13,11 @@
 // the spider task maxn
 #define TB_DEMO_SPIDER_TASK_MAXN        (100)
 
-// the spider task rate
+// the spider task rate, 256KB/s
 #define TB_DEMO_SPIDER_TASK_RATE        (256000)
+
+// the spider task timeout, 30s
+#define TB_DEMO_SPIDER_TASK_TIMEOUT     (30000)
 
 // the spider filter maxn
 #define TB_DEMO_SPIDER_FILTER_MAXN      (100000)
@@ -369,6 +372,9 @@ static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_t* istream, tb_async_s
 
     // trace
     tb_trace_d("ctrl: %s: ..", url);
+
+    // set timeout
+    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, TB_DEMO_SPIDER_TASK_TIMEOUT)) return tb_false;
 
 #ifdef TB_CONFIG_MODULE_HAVE_ZIP
     // need gzip
