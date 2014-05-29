@@ -1211,7 +1211,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* astream, tb_size
         else if (http->option.method == TB_HTTP_METHOD_POST)
         {
             // init transfer
-            if (!http->transfer) http->transfer = tb_async_transfer_init(tb_async_stream_aicp(http->stream));
+            if (!http->transfer) http->transfer = tb_async_transfer_init(tb_async_stream_aicp(http->stream), tb_false);
             tb_assert_and_check_break(http->transfer);
 
             // init transfer istream
@@ -1304,6 +1304,21 @@ static tb_void_t tb_aicp_http_clos_func(tb_async_stream_t* stream, tb_size_t sta
     // trace
     tb_trace_d("clos: notify: ok");
 }
+static tb_void_t tb_aicp_http_clos_transfer_func(tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
+    tb_assert_and_check_return(http && http->stream && http->func.clos);
+
+    // trace
+    tb_trace_d("clos: transfer: notify: ..");
+
+    // done func directly, because the stream have been closed by transfer
+    tb_aicp_http_clos_func(http->stream, state, http);
+
+    // trace
+    tb_trace_d("clos: transfer: notify: ok");
+}
 static tb_void_t tb_aicp_http_clos_opening_func(tb_handle_t handle, tb_size_t state, tb_cpointer_t priv)
 {
     // check
@@ -1377,13 +1392,24 @@ static tb_void_t tb_aicp_http_open_clos(tb_async_stream_t* stream, tb_size_t sta
         tb_aicp_http_open_func(http, state, http->func.open, http->priv);
     }
 }
+static tb_void_t tb_aicp_http_open_clos_transfer(tb_size_t state, tb_cpointer_t priv)
+{
+    // check
+    tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
+    tb_assert_and_check_return(http && http->stream);
+
+    // done func directly, because the stream have been closed by transfer
+    tb_aicp_http_open_clos(http->stream, state, http);
+}
 static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
 {
     // check
     tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
-    // close it first
-    return tb_async_stream_clos(http->stream, tb_aicp_http_open_clos, http);
+    // close transfer
+    if (http->transfer) return tb_async_transfer_clos(http->transfer, tb_aicp_http_open_clos_transfer, http);
+    // close stream 
+    else return tb_async_stream_clos(http->stream, tb_aicp_http_open_clos, http);
 }
 static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, tb_aicp_http_open_func_t func, tb_cpointer_t priv)
 {
@@ -1622,8 +1648,10 @@ tb_bool_t tb_aicp_http_clos(tb_handle_t handle, tb_aicp_http_clos_func_t func, t
     http->func.clos = func;
     http->priv      = priv;
 
+    // close transfer
+    if (http->transfer) return tb_async_transfer_clos(http->transfer, tb_aicp_http_clos_transfer_func, http);
     // close stream
-    return tb_async_stream_clos(http->stream, tb_aicp_http_clos_func, http);
+    else return tb_async_stream_clos(http->stream, tb_aicp_http_clos_func, http);
 }
 tb_bool_t tb_aicp_http_clos_try(tb_handle_t handle)
 {
@@ -1644,6 +1672,9 @@ tb_bool_t tb_aicp_http_clos_try(tb_handle_t handle)
             ok = tb_true;
             break;
         }
+
+        // try closing transfer
+        if (http->transfer && !tb_async_transfer_clos_try(http->transfer)) break;
 
         // try closing it
         if (!tb_async_stream_clos_try(http->stream)) break;

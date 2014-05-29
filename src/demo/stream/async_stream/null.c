@@ -48,7 +48,7 @@ tb_int_t tb_demo_stream_async_stream_null_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(fstream);
 
         // init transfer
-        transfer = tb_async_transfer_init(tb_null);
+        transfer = tb_async_transfer_init(tb_null, tb_true);
         tb_assert_and_check_break(transfer);
 
         // init transfer stream

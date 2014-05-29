@@ -150,7 +150,7 @@ static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_t* pool, tb_as
             tb_assert_and_check_break(task);
 
             // init transfer
-            task->transfer = tb_async_transfer_init(pool->aicp);
+            task->transfer = tb_async_transfer_init(pool->aicp, tb_true);
             tb_assert_and_check_break(task->transfer);
         }
 
