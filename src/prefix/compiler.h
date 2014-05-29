@@ -55,6 +55,20 @@
 #       define TB_COMPILER_VERSION_STRING           "intel c/c++ 11.0"
 #   elif (__INTEL_COMPILER == 1110)
 #       define TB_COMPILER_VERSION_STRING           "intel c/c++ 11.1"
+#   elif (__INTEL_COMPILER == 1200)
+#       define TB_COMPILER_VERSION_STRING           "intel c/c++ 12.0"
+#   elif (__INTEL_COMPILER == 1210)
+#       define TB_COMPILER_VERSION_STRING           "intel c/c++ 12.1"
+#   elif (__INTEL_COMPILER == 1300)
+#       define TB_COMPILER_VERSION_STRING           "intel c/c++ 13.0"
+#   elif (__INTEL_COMPILER == 1310)
+#       define TB_COMPILER_VERSION_STRING           "intel c/c++ 13.1"
+#   elif (__INTEL_COMPILER == 1400)
+#       define TB_COMPILER_VERSION_STRING           "intel c/c++ 14.0"
+#   elif (__INTEL_COMPILER == 1410)
+#       define TB_COMPILER_VERSION_STRING           "intel c/c++ 14.1"
+#   elif (__INTEL_COMPILER == 9999)
+#       define TB_COMPILER_VERSION_STRING           "intel c/c++ mainline"
 #   else
 #       error Unknown Intel C++ Compiler Version
 #   endif
@@ -132,6 +146,26 @@
 #           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 4.8"
 #       elif __GNUC_MINOR__ == 9
 #           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 4.9"
+#       endif
+#   elif __GNUC__ == 5
+#       if __GNUC_MINOR__ == 1
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.1"
+#       elif __GNUC_MINOR__ == 2
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.2"
+#       elif __GNUC_MINOR__ == 3
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.3"
+#       elif __GNUC_MINOR__ == 4
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.4"
+#       elif __GNUC_MINOR__ == 5
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.5"
+#       elif __GNUC_MINOR__ == 6
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.6"
+#       elif __GNUC_MINOR__ == 7
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.7"
+#       elif __GNUC_MINOR__ == 8
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.8"
+#       elif __GNUC_MINOR__ == 9
+#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 5.9"
 #       endif
 #   else
 #       error Unknown gnu c/c++ Compiler Version
@@ -246,11 +280,17 @@
 #   elif (_MSC_VER == 1300)
 #       define TB_COMPILER_VERSION_STRING           "visual c++ .net (7.0)"
 #   elif (_MSC_VER == 1310)
-#       define TB_COMPILER_VERSION_STRING           "visual c++ .net (7.1)" /* .net 2003 */
+#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2003 (7.1)" 
 #   elif (_MSC_VER == 1400)
-#       define TB_COMPILER_VERSION_STRING           "visual c++ .net (8.0)" /* .net 2005 */
+#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2005 (8.0)"
 #   elif (_MSC_VER == 1500)
-#       define TB_COMPILER_VERSION_STRING           "visual c++ .net (9.0)" /* .net 2008 */
+#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2008 (9.0)"
+#   elif (_MSC_VER == 1600)
+#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2010 (10.0)"
+#   elif (_MSC_VER == 1700)
+#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2012 (11.0)"
+#   elif (_MSC_VER == 1800)
+#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2013 (12.0)"
 #   else
 #       error Unknown visual c++ Compiler Version
 #   endif
