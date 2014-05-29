@@ -23,7 +23,7 @@ static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state
     // trace
     tb_trace_i("clos: state: %s", tb_state_cstr(state));
 
-#if 0
+#if 1
     // kill loop
     tb_aicp_kill((tb_aicp_t*)priv);
 #else

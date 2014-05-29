@@ -106,7 +106,7 @@ tb_bool_t           tb_async_transfer_init_istream_from_url(tb_handle_t transfer
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_async_transfer_init_istream_from_data(tb_handle_t transfer, tb_byte_t* data, tb_size_t size);
+tb_bool_t           tb_async_transfer_init_istream_from_data(tb_handle_t transfer, tb_byte_t const* data, tb_size_t size);
 
 /*! init ostream
  *

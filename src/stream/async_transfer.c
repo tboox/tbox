@@ -842,7 +842,7 @@ tb_bool_t tb_async_transfer_init_istream_from_url(tb_handle_t handle, tb_char_t 
     // ok
     return tb_true;
 }
-tb_bool_t tb_async_transfer_init_istream_from_data(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_async_transfer_init_istream_from_data(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)handle;
@@ -867,7 +867,7 @@ tb_bool_t tb_async_transfer_init_istream_from_data(tb_handle_t handle, tb_byte_t
     else 
     {
         // init stream
-        transfer->istream = tb_async_stream_init_from_data(transfer->aicp, data, size);
+        transfer->istream = tb_async_stream_init_from_data(transfer->aicp, (tb_byte_t*)data, size);
         tb_assert_and_check_return_val(transfer->istream, tb_false);
 
         // init owner

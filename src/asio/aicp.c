@@ -608,7 +608,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
 #ifdef __tb_debug__
             tb_trace_e("loop[%p]: done aice func failed with code: %lu at line: %lu, func: %s, file: %s!", loop, resp.code, resp.aico->line, resp.aico->func, resp.aico->file);
 #else
-            tb_trace_e("loop[%p]: done aice func failed with code: %lu!", loopresp.code, );
+            tb_trace_e("loop[%p]: done aice func failed with code: %lu!", loop, resp.code);
 #endif
         }
 
