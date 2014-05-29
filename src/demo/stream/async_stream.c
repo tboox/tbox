@@ -138,7 +138,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* stream, tb_size_t 
         tb_assert_and_check_break(context->ostream);
 
         // init transfer
-        context->transfer = tb_async_transfer_init(tb_null);
+        context->transfer = tb_async_transfer_init(tb_null, tb_true);
         tb_assert_and_check_break(context->transfer);
 
         // init transfer stream
