@@ -108,7 +108,7 @@ MMFLAGS 			=
 # ldflags
 LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= 
-LDFLAGS 			= -arch $(ARCH) 
+LDFLAGS 			= -arch $(ARCH) -framework Foundation
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o
