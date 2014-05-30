@@ -34,6 +34,7 @@
 #include <polarssl/entropy.h>
 #include <polarssl/ctr_drbg.h>
 #include "../../asio/asio.h"
+#include "../../libc/libc.h"
 #include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////

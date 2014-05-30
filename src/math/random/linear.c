@@ -101,6 +101,7 @@ static tb_long_t tb_random_linear_range(tb_random_t* random, tb_long_t beg, tb_l
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_handle_t tb_random_linear_init(tb_size_t seed);
 tb_handle_t tb_random_linear_init(tb_size_t seed)
 {
     // done
