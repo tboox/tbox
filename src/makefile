@@ -357,6 +357,12 @@ tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_SQLITE3) += \
 						database/sqlite3
 endif
 
+# ios
+ifeq ($(PLAT),ios)
+tbox_M_FILES 			+= \
+						platform/mach/ios/directory
+endif
+
 # flags
 tbox_CXFLAGS 			+= -DTB_TRACE_PREFIX=\"tbox\"
 
