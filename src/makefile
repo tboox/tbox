@@ -519,6 +519,8 @@ INC_FILES 				= \
 						platform/windows/exception.h \
 						platform/libc/prefix.h \
 						platform/libc/exception.h \
+						platform/mach/prefix.h \
+						platform/mach/barrier.h \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \

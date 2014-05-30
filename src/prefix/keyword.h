@@ -59,7 +59,7 @@
 #   define __tb_fastcall__                      __attribute__((__fastcall__))
 #   define __tb_thiscall__                      __attribute__((__thiscall__))
 #   define __tb_packed__                        __attribute__((packed, aligned(1)))
-#   define __tb_aligned__(a)                    __attribute__((packed, aligned(a)))
+#   define __tb_aligned__(a)                    __attribute__((aligned(a)))
 #else
 
 #   define __tb_inline__                        inline
