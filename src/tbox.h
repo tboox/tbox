@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 // init tbox
-#define tb_init(data, size)     tb_init_and_check(data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD)
+#define tb_init(priv, data, size)     tb_init_and_check(priv, data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -79,6 +79,9 @@ extern "C" {
 
 /*! init the tbox library
  *
+ * @param priv      the platform private data
+ *                  pass JNIEnv* env for android
+ *                  pass tb_null for other platform
  * @param data      the memory data, using the native memory if be tb_null
  * @param size      the memory size, using the native memory if be zero
  * @param mode      the compile mode for check __tb_small__ and __tb_debug__
@@ -86,7 +89,7 @@ extern "C" {
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build);
+tb_bool_t           tb_init_and_check(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build);
 
 /// exit the tbox library
 tb_void_t           tb_exit(tb_noarg_t);

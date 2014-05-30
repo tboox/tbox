@@ -363,6 +363,14 @@ tbox_M_FILES 			+= \
 						platform/mach/ios/directory
 endif
 
+# android
+ifeq ($(PLAT),android)
+tbox_C_FILES 			+= \
+						platform/linux/android/android \
+						platform/linux/android/directory \
+						platform/linux/android/package/android/os/environment
+endif
+
 # flags
 tbox_CXFLAGS 			+= -DTB_TRACE_PREFIX=\"tbox\"
 

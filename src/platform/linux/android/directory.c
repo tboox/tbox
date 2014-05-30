@@ -17,59 +17,36 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.h
- * @defgroup    platform
- *
+ * @file        directory.c
+ * @ingroup     platform
  */
-#ifndef TB_PLATFORM_H
-#define TB_PLATFORM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "mutex.h"
-#include "event.h"
-#include "cache_time.h"
-#include "timer.h"
-#include "print.h"
-#include "ltimer.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "memory.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "hostname.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-#include "thread_pool.h"
-#include "thread_store.h"
+#include "android.h"
+#include "../../directory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
+tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(path && maxn > 4, 0);
 
-/*! init the platform
- *
- * @param priv      the platform private data
- *                  pass JNIEnv* env for android
- *                  pass tb_null for other platform
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_platform_init(tb_handle_t priv);
+    // the jni environment
+    JNIEnv* jenv = tb_android_jenv();
+    if (jenv)
+    {
+    }
+    else
+    {
+        // the temporary directory
+        tb_strlcpy(path, "/tmp", maxn - 1);
+        path[4] = '\0';
+        return 4;
+    }
+}
 
-/// exit the platform 
-tb_void_t           tb_platform_exit(tb_noarg_t);
-
-#endif

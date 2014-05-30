@@ -17,60 +17,15 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.c
+ * @file        prefix.h
  * @ingroup     platform
- *
  */
+#ifndef TB_PLATFORM_LINUX_ANDROID_PACKAGE_ANDROID_PREFIX_H
+#define TB_PLATFORM_LINUX_ANDROID_PACKAGE_ANDROID_PREFIX_H 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "platform.h"
-#include "../network/network.h"
-#ifdef TB_CONFIG_OS_ANDROID
-#   include "linux/android/android.h"
+#include "../prefix.h"
+
 #endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-
-tb_bool_t tb_platform_init(tb_handle_t priv)
-{
-    // init android
-#ifdef TB_CONFIG_OS_ANDROID
-    if (!tb_android_init(priv)) return tb_false;
-#endif
-
-    // init socket
-    if (!tb_socket_init()) return tb_false;
-
-    // init tstore
-    if (!tb_thread_store_init()) return tb_false;
-
-    // init dns
-    if (!tb_dns_init()) return tb_false;
-
-    // spak ctime
-    tb_cache_time_spak();
-
-    // ok
-    return tb_true;
-}
-tb_void_t tb_platform_exit()
-{
-    // exit dns
-    tb_dns_exit();
-
-    // exit tstore
-    tb_thread_store_exit();
-
-    // exit socket
-    tb_socket_exit();
-
-    // exit android
-#ifdef TB_CONFIG_OS_ANDROID
-    tb_android_exit();
-#endif
-}
-
