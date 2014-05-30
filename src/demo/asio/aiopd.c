@@ -99,7 +99,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
     {
         // wait
         tb_long_t objn = tb_aiop_wait(aiop, list, 16, -1);
-        tb_assert_and_check_break(objn > 0);
+        tb_assert_and_check_break(objn >= 0);
 
         // walk list
         tb_size_t i = 0;

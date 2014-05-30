@@ -13,7 +13,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-#if 1
 static tb_void_t tb_dns_test_done(tb_char_t const* name)
 {
     // time
@@ -29,29 +28,6 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
     }
     else tb_trace_i("[demo]: %s failed", name);
 }
-#else
-#include <netdb.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-static tb_void_t tb_dns_test_done(tb_char_t const* name)
-{
-    // time
-    tb_hong_t time = tb_mclock();
-
-    // done
-    struct hostent* h = gethostbyname(name);
-    if (h)
-    {
-        time = tb_mclock() - time;
-        tb_trace_i("[demo]: %s => %s, %lld ms", name, inet_ntoa(*((struct in_addr*)(h->h_addr))), time);
-    }
-    else tb_trace_i("[demo]: %s failed", name);
-}
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main

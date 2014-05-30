@@ -20,7 +20,7 @@ static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hi
 {
     // percent
     tb_size_t percent = 0;
-    if (size > 0) percent = (offset * 100) / size;
+    if (size > 0) percent = (tb_size_t)((offset * 100) / size);
     else if (state == TB_STATE_CLOSED) percent = 100;
 
     // trace

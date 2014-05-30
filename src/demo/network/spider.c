@@ -16,8 +16,8 @@
 // the spider task rate, 256KB/s
 #define TB_DEMO_SPIDER_TASK_RATE        (256000)
 
-// the spider task timeout, 30s
-#define TB_DEMO_SPIDER_TASK_TIMEOUT     (30000)
+// the spider task timeout, 15s
+#define TB_DEMO_SPIDER_TASK_TIMEOUT     (15000)
 
 // the spider filter maxn
 #define TB_DEMO_SPIDER_FILTER_MAXN      (100000)

@@ -135,7 +135,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
     }
     
     // trace
-    if (sock) tb_trace_i("recv[%p]: size: %llu, sped: %llu KB/s", sock, size, size / (tb_mclock() - base));
+    if (sock && tb_mclock() > base) tb_trace_i("recv[%p]: size: %llu, sped: %llu KB/s", sock, size, size / (tb_mclock() - base));
 
 end:
 

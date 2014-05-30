@@ -268,7 +268,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     tb_aicp_loop(aicp);
         
     // trace
-    tb_trace_i("recv[%p]: size: %llu, sped: %llu KB/s", context.sock, context.size, context.size / (tb_mclock() - context.base));
+    if (tb_mclock() > context.base) tb_trace_i("recv[%p]: size: %llu, sped: %llu KB/s", context.sock, context.size, context.size / (tb_mclock() - context.base));
 
 end:
 

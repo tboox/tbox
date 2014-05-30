@@ -56,6 +56,11 @@ tb_void_t tb_print(tb_char_t const* string)
 
     // print to the stdout
     fputs(string, stdout);
+
+    // force flush it for windows
+#ifdef TB_CONFIG_OS_WINDOWS
+    fflush(stdout);
+#endif
 }
 tb_void_t tb_printl(tb_char_t const* string)
 {
@@ -75,6 +80,11 @@ tb_void_t tb_printl(tb_char_t const* string)
 
     // print newline to the stdout
     fputs(__tb_newline__, stdout);
+
+    // force flush it for windows
+#ifdef TB_CONFIG_OS_WINDOWS
+    fflush(stdout);
+#endif
 }
 tb_void_t tb_print_sync()
 {

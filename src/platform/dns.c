@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "dns"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,6 +38,8 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/dns.c"
+#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+#   include "mach/dns.c"
 #elif defined(TB_CONFIG_OS_LIKE_UNIX)
 #   include "unix/dns.c"
 #else
