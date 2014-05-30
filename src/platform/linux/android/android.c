@@ -17,59 +17,48 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.h
- * @defgroup    platform
- *
+ * @file        android.c
+ * @ingroup     platform
  */
-#ifndef TB_PLATFORM_H
-#define TB_PLATFORM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "mutex.h"
-#include "event.h"
-#include "cache_time.h"
-#include "timer.h"
-#include "print.h"
-#include "ltimer.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "memory.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "hostname.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-#include "thread_pool.h"
-#include "thread_store.h"
+#include "android.h"
+#include "../../atomic.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * globals
  */
+static tb_atomic_t g_jenv = 0;
 
-/*! init the platform
- *
- * @param priv      the platform private data
- *                  pass JNIEnv* env for android
- *                  pass tb_null for other platform
- *
- * @return          tb_true or tb_false
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
  */
-tb_bool_t           tb_platform_init(tb_handle_t priv);
+tb_bool_t tb_android_init(JNIEnv* jenv)
+{
+    // check
+    if (!jenv)
+    {
+        // warning
+        tb_trace_w("the jni environment be not inited, please pass it to the tb_init function!");
+    }
 
-/// exit the platform 
-tb_void_t           tb_platform_exit(tb_noarg_t);
+    // init it
+    tb_atomic_set(&g_jenv, (tb_size_t)jenv);
 
-#endif
+    // ok
+    return tb_true;
+}
+tb_void_t tb_android_exit()
+{
+    // clear it
+    tb_atomic_set(&g_jenv, 0);
+}
+JNIEnv* tb_android_jenv()
+{
+    // get it
+    return (JNIEnv*)tb_atomic_get(&g_jenv);
+}
+

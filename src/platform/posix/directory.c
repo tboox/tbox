@@ -204,7 +204,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     // remove it
     return !remove(path)? tb_true : tb_false;
 }
-#if !defined(TB_CONFIG_OS_IOS)
+#if !defined(TB_CONFIG_OS_IOS) && !defined(TB_CONFIG_OS_ANDROID)
 tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
 {
     // check

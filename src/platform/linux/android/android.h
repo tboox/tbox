@@ -17,59 +17,37 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.h
- * @defgroup    platform
- *
+ * @file        android.h
+ * @ingroup     platform
  */
-#ifndef TB_PLATFORM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_LINUX_ANDROID_H
+#define TB_PLATFORM_LINUX_ANDROID_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "mutex.h"
-#include "event.h"
-#include "cache_time.h"
-#include "timer.h"
-#include "print.h"
-#include "ltimer.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "memory.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "hostname.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-#include "thread_pool.h"
-#include "thread_store.h"
+#include "package/package.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init the platform
+/*! init the android platform
  *
- * @param priv      the platform private data
- *                  pass JNIEnv* env for android
- *                  pass tb_null for other platform
+ * @param jenv      the jni environment pointer
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_platform_init(tb_handle_t priv);
+tb_bool_t           tb_android_init(JNIEnv* jenv);
 
-/// exit the platform 
-tb_void_t           tb_platform_exit(tb_noarg_t);
+/// exit the android platform 
+tb_void_t           tb_android_exit(tb_noarg_t);
+
+/*! the jni environment pointer
+ *
+ * @return          the environment pointer
+ */
+JNIEnv*             tb_android_jenv(tb_noarg_t);
 
 #endif
