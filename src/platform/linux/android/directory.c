@@ -22,6 +22,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME            "android_directory"
+#define TB_TRACE_MODULE_DEBUG           (0)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
@@ -37,16 +43,39 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
     // the jni environment
-    JNIEnv* jenv = tb_android_jenv();
+    tb_size_t   size = 0;
+    JNIEnv*     jenv = tb_android_jenv();
     if (jenv)
     {
+        // enter
+        if ((*jenv)->PushLocalFrame(jenv, 5) >= 0) 
+        {
+            // done
+            jboolean error = tb_false;
+            do
+            {
+                // get the environment class
+                jclass environment_class = (*jenv)->FindClass(jenv, "android/os/Environment");
+                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && environment_class);
+
+            } while (0);
+
+            // exception? clear it
+            if (error) (*jenv)->ExceptionClear(jenv);
+
+            // leave
+            (*jenv)->PopLocalFrame(jenv, tb_null);
+        }
     }
     else
     {
         // the temporary directory
         tb_strlcpy(path, "/tmp", maxn - 1);
         path[4] = '\0';
-        return 4;
+        size = 4;
     }
+
+    // ok?
+    return size;
 }
 

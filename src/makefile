@@ -367,8 +367,7 @@ endif
 ifeq ($(PLAT),android)
 tbox_C_FILES 			+= \
 						platform/linux/android/android \
-						platform/linux/android/directory \
-						platform/linux/android/package/android/os/environment
+						platform/linux/android/directory 
 endif
 
 # flags
