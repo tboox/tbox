@@ -36,14 +36,14 @@ tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t tim
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_pointer_t tb_aioo_data(tb_handle_t handle)
+tb_cpointer_t tb_aioo_priv(tb_handle_t handle)
 {
     // check
     tb_aioo_t const* aioo = (tb_aioo_t const*)handle;
     tb_assert_and_check_return_val(aioo, tb_null);
 
     // the handle
-    return aioo->data;
+    return aioo->priv;
 }
 tb_handle_t tb_aioo_handle(tb_handle_t handle)
 {

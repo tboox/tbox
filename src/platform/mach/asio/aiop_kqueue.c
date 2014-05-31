@@ -144,7 +144,7 @@ static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe
 
     // save aioo
     aioo->code = aioe->code;
-    aioo->data = aioe->data;
+    aioo->priv = aioe->priv;
 
     // add event
     struct kevent   e[2];
@@ -261,7 +261,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
         tb_aioe_t* aioe = &list[wait++];
         aioe->code = TB_AIOE_CODE_NONE;
         aioe->aioo = aioo;
-        aioe->data = aioo->data;
+        aioe->priv = aioo->priv;
         if (e->filter == EVFILT_READ) 
         {
             aioe->code |= TB_AIOE_CODE_RECV;

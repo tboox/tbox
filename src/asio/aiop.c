@@ -46,7 +46,7 @@ tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
 /* //////////////////////////////////////////////////////////////////////////////////////
  * aioo
  */
-static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
+static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(aiop && aiop->pool, tb_null);
@@ -61,7 +61,7 @@ static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size
     if (aioo)
     {
         aioo->code = code;
-        aioo->data = data;
+        aioo->priv = priv;
         aioo->handle = handle;
     }
 
@@ -215,7 +215,7 @@ tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
         }
     }
 }
-tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
+tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_null);
@@ -226,7 +226,7 @@ tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb
     do
     {
         // init aioo
-        aioo = tb_aiop_aioo_init(aiop, handle, code, data);
+        aioo = tb_aiop_aioo_init(aiop, handle, code, priv);
         tb_assert_and_check_break(aioo);
         
         // addo aioo
@@ -263,7 +263,7 @@ tb_bool_t tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* aioe)
     // post
     return aiop->rtor->post(aiop->rtor, aioe);
 }
-tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_pointer_t data)
+tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(aiop && aioo && tb_aioo_handle(aioo) && code, tb_false);
@@ -271,7 +271,7 @@ tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_poi
     // init aioe
     tb_aioe_t aioe;
     aioe.code = code;
-    aioe.data = data;
+    aioe.priv = priv;
     aioe.aioo = aioo;
 
     // post aioe

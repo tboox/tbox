@@ -190,7 +190,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
             else if (list[i].code & TB_AIOE_CODE_SEND)
             {
                 // the context
-                tb_demo_context_t* context = (tb_demo_context_t*)list[i].data;
+                tb_demo_context_t* context = (tb_demo_context_t*)list[i].priv;
                 tb_assert_and_check_break(context);
 
                 // continue to send it if not finished
