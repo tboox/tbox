@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		mem.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        mem.c
+ * @ingroup     container
  *
  */
 
@@ -32,29 +32,29 @@
  */
 static tb_pointer_t tb_iterator_init_mem_item(tb_iterator_t* iterator, tb_size_t itor)
 {
-	// check
-	tb_assert_return_val(iterator, tb_null);
-	tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
+    // check
+    tb_assert_return_val(iterator, tb_null);
+    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
 
-	// the item
-	return (tb_pointer_t)((tb_byte_t*)iterator->data + itor * iterator->step);
+    // the item
+    return (tb_pointer_t)((tb_byte_t*)iterator->data + itor * iterator->step);
 }
 static tb_void_t tb_iterator_init_mem_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	// check
-	tb_assert_return(iterator);
-	tb_assert_and_check_return(itor < (tb_size_t)iterator->priv && item);
+    // check
+    tb_assert_return(iterator);
+    tb_assert_and_check_return(itor < (tb_size_t)iterator->priv && item);
 
-	// copy
-	tb_memcpy((tb_byte_t*)iterator->data + itor * iterator->step, item, iterator->step);
+    // copy
+    tb_memcpy((tb_byte_t*)iterator->data + itor * iterator->step, item, iterator->step);
 }
 static tb_long_t tb_iterator_init_mem_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	// check
-	tb_assert_and_check_return_val(ltem && rtem, 0);
+    // check
+    tb_assert_and_check_return_val(ltem && rtem, 0);
 
-	// compare it
-	return tb_memcmp(ltem, rtem, iterator->step);
+    // compare it
+    return tb_memcmp(ltem, rtem, iterator->step);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -62,27 +62,27 @@ static tb_long_t tb_iterator_init_mem_comp(tb_iterator_t* iterator, tb_cpointer_
  */
 tb_iterator_t tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step)
 {
-	// check
-	tb_assert(data && size);
+    // check
+    tb_assert(data && size);
 
-	// the ptr iterator
-	tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
+    // the ptr iterator
+    tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
 
-	// init
-	tb_iterator_t itor;
-	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	itor.data = (tb_pointer_t)data;
-	itor.priv = tb_u2p(size);
-	itor.step = step;
-	itor.size = ptr.size;
-	itor.head = ptr.head;
-	itor.tail = ptr.tail;
-	itor.prev = ptr.prev;
-	itor.next = ptr.next;
-	itor.item = tb_iterator_init_mem_item;
-	itor.copy = tb_iterator_init_mem_copy;
-	itor.comp = tb_iterator_init_mem_comp;
+    // init
+    tb_iterator_t itor;
+    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+    itor.data = (tb_pointer_t)data;
+    itor.priv = tb_u2p(size);
+    itor.step = step;
+    itor.size = ptr.size;
+    itor.head = ptr.head;
+    itor.tail = ptr.tail;
+    itor.prev = ptr.prev;
+    itor.next = ptr.next;
+    itor.item = tb_iterator_init_mem_item;
+    itor.copy = tb_iterator_init_mem_copy;
+    itor.comp = tb_iterator_init_mem_comp;
 
-	// ok
-	return itor;
+    // ok
+    return itor;
 }

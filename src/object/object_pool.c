@@ -16,17 +16,17 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		object_pool.c
- * @ingroup 	object
+ * @author      ruki
+ * @file        object_pool.c
+ * @ingroup     object
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 				"object_pool"
-#define TB_TRACE_MODULE_DEBUG 				(1)
+#define TB_TRACE_MODULE_NAME                "object_pool"
+#define TB_TRACE_MODULE_DEBUG               (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -39,9 +39,9 @@
  * macros
  */
 #ifdef __tb_small__
-# 	define TB_OBJECT_POOL_GROW 		(256 * 1024)
+#   define TB_OBJECT_POOL_GROW      (256 * 1024)
 #else
-# 	define TB_OBJECT_POOL_GROW 		(512 * 1024)
+#   define TB_OBJECT_POOL_GROW      (512 * 1024)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -51,11 +51,11 @@
 // the object pool type
 typedef struct __tb_object_pool_t
 {
-	// the pool
-	tb_handle_t 		pool;
+    // the pool
+    tb_handle_t         pool;
 
-	// the lock
-	tb_spinlock_t 		lock;
+    // the lock
+    tb_spinlock_t       lock;
 
 }tb_object_pool_t;
 
@@ -64,20 +64,20 @@ typedef struct __tb_object_pool_t
  */
 static tb_handle_t tb_object_pool_instance_init(tb_cpointer_t* ppriv)
 {
-	return tb_object_pool_init();
+    return tb_object_pool_init();
 }
 static tb_void_t tb_object_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
-	if (handle) 
-	{
-		// dump it
+    if (handle) 
+    {
+        // dump it
 #ifdef __tb_debug__
-		tb_object_pool_dump(handle);
+        tb_object_pool_dump(handle);
 #endif
 
-		// exit it
-		tb_object_pool_exit(handle);
-	}
+        // exit it
+        tb_object_pool_exit(handle);
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -85,142 +85,142 @@ static tb_void_t tb_object_pool_instance_exit(tb_handle_t handle, tb_cpointer_t 
  */
 tb_handle_t tb_object_pool()
 {
-	return tb_singleton_instance(TB_SINGLETON_TYPE_OBJECT_POOL, tb_object_pool_instance_init, tb_object_pool_instance_exit, tb_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_OBJECT_POOL, tb_object_pool_instance_init, tb_object_pool_instance_exit, tb_null);
 }
 tb_handle_t tb_object_pool_init()
 {
-	// done
-	tb_object_pool_t* 	pool = tb_null;
-	tb_bool_t 			ok = tb_false;
-	do
-	{
-		// make pool
-		pool = (tb_object_pool_t*)tb_malloc0(sizeof(tb_object_pool_t));
-		tb_assert_and_check_break(pool);
+    // done
+    tb_object_pool_t*   pool = tb_null;
+    tb_bool_t           ok = tb_false;
+    do
+    {
+        // make pool
+        pool = (tb_object_pool_t*)tb_malloc0(sizeof(tb_object_pool_t));
+        tb_assert_and_check_break(pool);
 
-		// init lock
-		if (!tb_spinlock_init(&pool->lock)) break;
+        // init lock
+        if (!tb_spinlock_init(&pool->lock)) break;
 
-		// init pool
-		pool->pool = tb_block_pool_init(TB_OBJECT_POOL_GROW, 0);
-		tb_assert_and_check_break(pool->pool);
+        // init pool
+        pool->pool = tb_block_pool_init(TB_OBJECT_POOL_GROW, 0);
+        tb_assert_and_check_break(pool->pool);
 
-		// register lock profiler
+        // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-		tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&pool->lock, TB_TRACE_MODULE_NAME);
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&pool->lock, TB_TRACE_MODULE_NAME);
 #endif
 
-		// ok
-		ok = tb_true;
+        // ok
+        ok = tb_true;
 
-	} while (0);
+    } while (0);
 
-	// failed?
-	if (!ok)
-	{
-		// exit it
-		if (pool) tb_object_pool_exit(pool);
-		pool = tb_null;
-	}
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (pool) tb_object_pool_exit(pool);
+        pool = tb_null;
+    }
 
-	// ok?
-	return pool;
+    // ok?
+    return pool;
 }
 tb_void_t tb_object_pool_exit(tb_handle_t handle)
 {
-	// the pool
-	tb_object_pool_t* pool = (tb_object_pool_t*)handle;
-	tb_assert_and_check_return(pool);
+    // the pool
+    tb_object_pool_t* pool = (tb_object_pool_t*)handle;
+    tb_assert_and_check_return(pool);
 
-	// enter
-	tb_spinlock_enter(&pool->lock);
+    // enter
+    tb_spinlock_enter(&pool->lock);
 
-	// exit pool
-	if (pool->pool) tb_block_pool_exit(pool->pool);
-	pool->pool = tb_null;
+    // exit pool
+    if (pool->pool) tb_block_pool_exit(pool->pool);
+    pool->pool = tb_null;
 
-	// leave
-	tb_spinlock_leave(&pool->lock);
+    // leave
+    tb_spinlock_leave(&pool->lock);
 
-	// exit lock
-	tb_spinlock_exit(&pool->lock);
+    // exit lock
+    tb_spinlock_exit(&pool->lock);
 
-	// exit it
-	tb_free(pool);
+    // exit it
+    tb_free(pool);
 }
 tb_void_t tb_object_pool_clear(tb_handle_t handle)
 {
-	// the pool
-	tb_object_pool_t* pool = (tb_object_pool_t*)handle;
-	tb_assert_and_check_return(pool);
+    // the pool
+    tb_object_pool_t* pool = (tb_object_pool_t*)handle;
+    tb_assert_and_check_return(pool);
 
-	// enter
-	tb_spinlock_enter(&pool->lock);
+    // enter
+    tb_spinlock_enter(&pool->lock);
 
-	// clear pool
-	if (pool->pool) tb_block_pool_clear(pool->pool);
+    // clear pool
+    if (pool->pool) tb_block_pool_clear(pool->pool);
 
-	// leave
-	tb_spinlock_leave(&pool->lock);
+    // leave
+    tb_spinlock_leave(&pool->lock);
 }
 #ifdef __tb_debug__
 tb_void_t tb_object_pool_dump(tb_handle_t handle)
 {
-	// the pool
-	tb_object_pool_t* pool = (tb_object_pool_t*)handle;
-	tb_assert_and_check_return(pool);
+    // the pool
+    tb_object_pool_t* pool = (tb_object_pool_t*)handle;
+    tb_assert_and_check_return(pool);
 
-	// enter
-	tb_spinlock_enter(&pool->lock);
+    // enter
+    tb_spinlock_enter(&pool->lock);
 
-	// dump
-	if (pool->pool) tb_block_pool_dump(pool->pool, "[object_pool]");
+    // dump
+    if (pool->pool) tb_block_pool_dump(pool->pool, "[object_pool]");
 
-	// leave
-	tb_spinlock_leave(&pool->lock);
+    // leave
+    tb_spinlock_leave(&pool->lock);
 }
 #endif
 tb_object_t* tb_object_pool_get_(tb_handle_t handle, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__)
 {
-	// check
-	tb_object_pool_t* pool = (tb_object_pool_t*)handle;
-	tb_assert_and_check_return_val(pool && size && type, tb_null);
+    // check
+    tb_object_pool_t* pool = (tb_object_pool_t*)handle;
+    tb_assert_and_check_return_val(pool && size && type, tb_null);
 
-	// enter
-	tb_spinlock_enter(&pool->lock);
+    // enter
+    tb_spinlock_enter(&pool->lock);
 
-	// make object
-	tb_object_t* object = pool->pool? tb_block_pool_malloc0_(pool->pool, size __tb_debug_args__) : tb_null;
+    // make object
+    tb_object_t* object = pool->pool? tb_block_pool_malloc0_(pool->pool, size __tb_debug_args__) : tb_null;
 
-	// init object
-	if (object) 
-	{
-		if (!tb_object_init(object, flag, type)) 
-		{
-			tb_block_pool_free_(pool->pool, object __tb_debug_args__);
-			object = tb_null;
-		}
-	}
+    // init object
+    if (object) 
+    {
+        if (!tb_object_init(object, flag, type)) 
+        {
+            tb_block_pool_free_(pool->pool, object __tb_debug_args__);
+            object = tb_null;
+        }
+    }
 
-	// leave
-	tb_spinlock_leave(&pool->lock);
+    // leave
+    tb_spinlock_leave(&pool->lock);
 
-	// ok?
-	return object;
+    // ok?
+    return object;
 }
 tb_void_t tb_object_pool_del_(tb_handle_t handle, tb_object_t* object __tb_debug_decl__)
 {
-	// check
-	tb_object_pool_t* pool = (tb_object_pool_t*)handle;
-	tb_assert_and_check_return(pool && object);
+    // check
+    tb_object_pool_t* pool = (tb_object_pool_t*)handle;
+    tb_assert_and_check_return(pool && object);
 
-	// enter
-	tb_spinlock_enter(&pool->lock);
+    // enter
+    tb_spinlock_enter(&pool->lock);
 
-	// exit object
-	if (pool->pool) tb_block_pool_free_(pool->pool, object __tb_debug_args__);
+    // exit object
+    if (pool->pool) tb_block_pool_free_(pool->pool, object __tb_debug_args__);
 
-	// leave
-	tb_spinlock_leave(&pool->lock);
+    // leave
+    tb_spinlock_leave(&pool->lock);
 }
 

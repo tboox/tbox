@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		gamma.c
+ * @author      ruki
+ * @file        gamma.c
  *
  */
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -33,39 +33,39 @@
 static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_t* sstream)
 {
 #if 0
-	tb_assert(vlc && val);
+    tb_assert(vlc && val);
 
-	// compute q & r
-	tb_uint32_t q = TB_MATH_ILOG2I(val);
-	tb_uint32_t r = val - (1 << q);
-	tb_assert(q < 32);
+    // compute q & r
+    tb_uint32_t q = TB_MATH_ILOG2I(val);
+    tb_uint32_t r = val - (1 << q);
+    tb_assert(q < 32);
 
-	//tb_trace_d("x: %d, q: %d, r: %d", val, q, r);
+    //tb_trace_d("x: %d, q: %d, r: %d", val, q, r);
 
-	// store
-	tb_int_t i = 0;
-	for (i = 0; i < q; i++) tb_static_stream_writ_u1(sstream, 1);
-	tb_static_stream_writ_u1(sstream, 0);
-	for (i = 0; i < q; i++, r >>= 1) tb_static_stream_writ_u1(sstream, r & 0x1);
+    // store
+    tb_int_t i = 0;
+    for (i = 0; i < q; i++) tb_static_stream_writ_u1(sstream, 1);
+    tb_static_stream_writ_u1(sstream, 0);
+    for (i = 0; i < q; i++, r >>= 1) tb_static_stream_writ_u1(sstream, r & 0x1);
 #endif
 }
 static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream)
 {
-	tb_assert(vlc);
+    tb_assert(vlc);
 
-	// get q
-	tb_uint32_t q = 0;
-	while (tb_static_stream_read_u1((tb_static_stream_t*)sstream)) q++;
-	tb_assert(q < 32);
+    // get q
+    tb_uint32_t q = 0;
+    while (tb_static_stream_read_u1((tb_static_stream_t*)sstream)) q++;
+    tb_assert(q < 32);
 
-	// get r
-	tb_uint32_t i = 0;
-	tb_uint32_t r = 0;
-	for (i = 0; i < q; i++) r |= tb_static_stream_read_u1((tb_static_stream_t*)sstream) << i;
+    // get r
+    tb_uint32_t i = 0;
+    tb_uint32_t r = 0;
+    for (i = 0; i < q; i++) r |= tb_static_stream_read_u1((tb_static_stream_t*)sstream) << i;
 
-	//tb_trace_d("x: %d, q: %d, r: %d", r + (1 << q), q, r);
+    //tb_trace_d("x: %d, q: %d, r: %d", r + (1 << q), q, r);
 
-	return (r + (1 << q));
+    return (r + (1 << q));
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -73,59 +73,59 @@ static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_static_stream_t co
  */
 tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
 {
-	// init
-	tb_memset(gamma, 0, sizeof(tb_zip_vlc_gamma_t));
-	((tb_zip_vlc_t*)gamma)->type = TB_ZIP_VLC_TYPE_GAMMA;
-	((tb_zip_vlc_t*)gamma)->set = tb_zip_vlc_gamma_set;
-	((tb_zip_vlc_t*)gamma)->get = tb_zip_vlc_gamma_get;
-	((tb_zip_vlc_t*)gamma)->clos = tb_null;
+    // init
+    tb_memset(gamma, 0, sizeof(tb_zip_vlc_gamma_t));
+    ((tb_zip_vlc_t*)gamma)->type = TB_ZIP_VLC_TYPE_GAMMA;
+    ((tb_zip_vlc_t*)gamma)->set = tb_zip_vlc_gamma_set;
+    ((tb_zip_vlc_t*)gamma)->get = tb_zip_vlc_gamma_get;
+    ((tb_zip_vlc_t*)gamma)->clos = tb_null;
 
-	/* gamma coding
-	 *
-	 * x = [1, ...)
-	 * q = (int)log2(x)
-	 * r = x - (1 << q)
-	 *
-	 * x      code
-	 * --------------------
-	 * 1       0
-	 * 2      10 0
-	 * 3      10 1
-	 * 4     110 00
-	 * 5     110 01
-	 *
-	 * code: 11111 ...  0    r
-	 *        q-bits        q-bits
-	 */
+    /* gamma coding
+     *
+     * x = [1, ...)
+     * q = (int)log2(x)
+     * r = x - (1 << q)
+     *
+     * x      code
+     * --------------------
+     * 1       0
+     * 2      10 0
+     * 3      10 1
+     * 4     110 00
+     * 5     110 01
+     *
+     * code: 11111 ...  0    r
+     *        q-bits        q-bits
+     */
 #if 0
 
-	// make it
-	tb_int_t 		x = 0;
-	tb_int_t 		i = 0;
-	tb_static_stream_t 	sstream;
-	tb_byte_t 		d[4];
-	for (x = 1; x <= 65535; x++)
-	{
-		tb_int_t q = TB_MATH_ILOG2I(x);
-		tb_int_t r = x - (1 << q);
+    // make it
+    tb_int_t        x = 0;
+    tb_int_t        i = 0;
+    tb_static_stream_t  sstream;
+    tb_byte_t       d[4];
+    for (x = 1; x <= 65535; x++)
+    {
+        tb_int_t q = TB_MATH_ILOG2I(x);
+        tb_int_t r = x - (1 << q);
 
-		// is out?
-		if ((q << 1) + 1 > 16) break;
+        // is out?
+        if ((q << 1) + 1 > 16) break;
 
-		tb_static_stream_init(&sstream, d, 4);
-		for (i = 0; i < q; i++) tb_static_stream_writ_u1(&sstream, 1);
-		tb_static_stream_writ_u1(&sstream, 0);
-		for (i = 0; i < q; i++, r >>= 1) tb_static_stream_writ_u1(&sstream, r & 0x1);
+        tb_static_stream_init(&sstream, d, 4);
+        for (i = 0; i < q; i++) tb_static_stream_writ_u1(&sstream, 1);
+        tb_static_stream_writ_u1(&sstream, 0);
+        for (i = 0; i < q; i++, r >>= 1) tb_static_stream_writ_u1(&sstream, r & 0x1);
 
-		tb_printf("x = 0x%04x, q = %d: ", x, q);
-		tb_static_stream_init(&sstream, d, 4);
-		for (q = 0; tb_static_stream_read_u1(&sstream); q++) tb_printf("1");
-		tb_printf("0 ");
-		for (i = 0; i < q; i++) tb_printf("%d", tb_static_stream_read_u1(&sstream));
-		tb_printf("\n");
-	}
+        tb_printf("x = 0x%04x, q = %d: ", x, q);
+        tb_static_stream_init(&sstream, d, 4);
+        for (q = 0; tb_static_stream_read_u1(&sstream); q++) tb_printf("1");
+        tb_printf("0 ");
+        for (i = 0; i < q; i++) tb_printf("%d", tb_static_stream_read_u1(&sstream));
+        tb_printf("\n");
+    }
 
 #endif
 
-	return (tb_zip_vlc_t*)gamma;
+    return (tb_zip_vlc_t*)gamma;
 }

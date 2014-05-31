@@ -10,8 +10,6 @@ demo_TYPE 									= BIN
 # files
 demo_C_FILES 								+= \
 											demo \
-											flv/flv \
-											flv/libflv \
 											libc/time \
 											libc/wchar \
 											libc/string \
@@ -27,6 +25,8 @@ demo_C_FILES 								+= \
 											utils/base32 \
 											utils/base64 \
 											other/test \
+											other/flv \
+											other/libflv \
 											stream/basic_stream/null \
 											stream/basic_stream/cache \
 											string/string_pool \
@@ -47,13 +47,13 @@ demo_C_FILES 								+= \
 											network/url \
 											network/ipv4 \
 											network/http \
+											network/date \
 											network/whois \
 											network/spider \
 											network/cookies \
 											platform/file \
 											platform/lock \
 											platform/path \
-											platform/ctime \
 											platform/event \
 											platform/utils \
 											platform/timer \
@@ -66,6 +66,7 @@ demo_C_FILES 								+= \
 											platform/directory \
 											platform/exception \
 											platform/semaphore \
+											platform/cache_time \
 											platform/thread_pool \
 											platform/thread_store \
 											container/heap \
@@ -119,7 +120,7 @@ demo_C_FILES 								+= \
 											asio/aicpd \
 											stream/async_stream/null \
 											stream/async_stream/cache \
-											stream/transfer \
+											stream/async_transfer \
 											stream/transfer_pool 
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \

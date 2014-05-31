@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		time.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        time.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -37,54 +37,54 @@
 
 tb_void_t tb_usleep(tb_size_t us)
 {
-	usleep(us);
+    usleep(us);
 }
 
 tb_void_t tb_msleep(tb_size_t ms)
 {
-	tb_usleep(ms * 1000);
+    tb_usleep(ms * 1000);
 }
 
 tb_void_t tb_sleep(tb_size_t s)
 {
-	tb_msleep(s * 1000);
+    tb_msleep(s * 1000);
 }
 
 tb_hong_t tb_mclock()
 {
-	tb_timeval_t tv = {0};
+    tb_timeval_t tv = {0};
     if (!tb_gettimeofday(&tv, tb_null)) return -1;
-	return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
+    return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
 tb_hong_t tb_uclock()
 {
-	tb_timeval_t tv = {0};
+    tb_timeval_t tv = {0};
     if (!tb_gettimeofday(&tv, tb_null)) return -1;
-	return ((tb_hong_t)tv.tv_sec * 1000000 + tv.tv_usec);
+    return ((tb_hong_t)tv.tv_sec * 1000000 + tv.tv_usec);
 }
 
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
-	// gettimeofday
-	struct timeval ttv = {0};
-	struct timezone ttz = {0};
-	if (gettimeofday(&ttv, &ttz)) return tb_false;
+    // gettimeofday
+    struct timeval ttv = {0};
+    struct timezone ttz = {0};
+    if (gettimeofday(&ttv, &ttz)) return tb_false;
 
-	// tv
-	if (tv) 
-	{
-		tv->tv_sec = (tb_time_t)ttv.tv_sec;
-		tv->tv_usec = (tb_suseconds_t)ttv.tv_usec;
-	}
+    // tv
+    if (tv) 
+    {
+        tv->tv_sec = (tb_time_t)ttv.tv_sec;
+        tv->tv_usec = (tb_suseconds_t)ttv.tv_usec;
+    }
 
-	// tz
-	if (tz) 
-	{
-		tz->tz_minuteswest = ttz.tz_minuteswest;
-		tz->tz_dsttime = ttz.tz_dsttime;
-	}
+    // tz
+    if (tz) 
+    {
+        tz->tz_minuteswest = ttz.tz_minuteswest;
+        tz->tz_dsttime = ttz.tz_dsttime;
+    }
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }

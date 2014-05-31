@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		abort.h
+ * @author      ruki
+ * @file        abort.h
  *
  */
 #ifndef TB_PREFIX_ABORT_H
@@ -35,14 +35,14 @@
 
 // abort impl
 #if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
-# 	define tb_abort_done() 								do { __tb_asm__ __tb_volatile__ ("ud2"); } while (0)
-//# 	define tb_abort_done() 								do { __tb_asm__ __tb_volatile__ ("int3"); } while (0)
+#   define tb_abort_done()                              do { __tb_asm__ __tb_volatile__ ("ud2"); } while (0)
+//#     define tb_abort_done()                              do { __tb_asm__ __tb_volatile__ ("int3"); } while (0)
 #else
-# 	define tb_abort_done() 								do { *((__tb_volatile__ tb_int_t*)0) = 0; } while (0)
+#   define tb_abort_done()                              do { *((__tb_volatile__ tb_int_t*)0) = 0; } while (0)
 #endif
 
 // abort
-#define tb_abort()										do { tb_trace_e("abort"); tb_abort_done(); } while(0)
+#define tb_abort()                                      do { tb_trace_e("abort"); tb_abort_done(); } while(0)
 
 #endif
 

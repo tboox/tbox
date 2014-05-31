@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		mif.h
- * @ingroup 	libm
+ * @author      ruki
+ * @file        mif.h
+ * @ingroup     libm
  *
  */
 #ifndef TB_LIBM_MIF_H
@@ -33,6 +33,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_MIF 	(-TB_MAF)
+#define TB_MIF  (-TB_MAF)
 
 #endif

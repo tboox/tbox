@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		inf.h
- * @ingroup 	libm
+ * @author      ruki
+ * @file        inf.h
+ * @ingroup     libm
  *
  */
 #ifndef TB_LIBM_INF_H
@@ -35,10 +35,10 @@
  */
 
 #if defined(TB_COMPILER_IS_GCC) \
-		&& TB_COMPILER_VERSION_BE(3, 3)
-# 	define TB_INF	(__builtin_inff ())
+        && TB_COMPILER_VERSION_BE(3, 3)
+#   define TB_INF   (__builtin_inff ())
 #else
-# 	define TB_INF	TB_MAF
+#   define TB_INF   TB_MAF
 #endif
 
 

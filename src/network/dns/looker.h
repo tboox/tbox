@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		looker.h
- * @ingroup 	network
+ * @author      ruki
+ * @file        looker.h
+ * @ingroup     network
  *
  */
 #ifndef TB_NETWORK_DNS_LOOKER_H
@@ -35,45 +35,45 @@
 
 /*! init for looking ipv4 from the host name, non-block
  *
- * @param name 		the host name
+ * @param name      the host name
  *
- * @return 			the looker handle
+ * @return          the looker handle
  */
-tb_handle_t 		tb_dns_looker_init(tb_char_t const* name);
+tb_handle_t         tb_dns_looker_init(tb_char_t const* name);
 
 /*! spak the looker
  *
- * @param handle 	the looker handle
- * @param addr 		the ipv4 addr
+ * @param handle    the looker handle
+ * @param addr      the ipv4 addr
  *
- * @return 			1: ok, 0: continue: -1: failed
+ * @return          1: ok, 0: continue: -1: failed
  */
-tb_long_t 			tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_t* addr);
+tb_long_t           tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_t* addr);
 
 /*! wait the looker
  *
- * @param handle 	the looker handle
- * @param timeout 	the timeout
+ * @param handle    the looker handle
+ * @param timeout   the timeout
  *
- * @return 			1: ok, 0: continue: -1: failed
+ * @return          1: ok, 0: continue: -1: failed
  */
-tb_long_t 			tb_dns_looker_wait(tb_handle_t handle, tb_long_t timeout);
+tb_long_t           tb_dns_looker_wait(tb_handle_t handle, tb_long_t timeout);
 
 /*! exit the looker
  *
- * @param handle 	the looker handle
+ * @param handle    the looker handle
  */
-tb_void_t 			tb_dns_looker_exit(tb_handle_t handle);
+tb_void_t           tb_dns_looker_exit(tb_handle_t handle);
 
 /*! look ipv4 from the host name, block
  *
  * try to look it from cache first
  *
- * @param name 		the host name
- * @param addr 		the ipv4 addr
+ * @param name      the host name
+ * @param addr      the ipv4 addr
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_dns_looker_done(tb_char_t const* name, tb_ipv4_t* addr);
+tb_bool_t           tb_dns_looker_done(tb_char_t const* name, tb_ipv4_t* addr);
 
 #endif

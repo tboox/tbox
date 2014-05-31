@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		uint8.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        uint8.c
+ * @ingroup     container
  *
  */
 
@@ -33,64 +33,64 @@
  */
 static tb_size_t tb_item_func_uint8_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {
-	return tb_item_func_hash_uint8((tb_uint8_t)data, mask, index);
+    return tb_item_func_hash_uint8(tb_p2u8(data), mask, index);
 }
 static tb_long_t tb_item_func_uint8_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	// compare it
-	return (tb_p2u8(ldata) > tb_p2u8(rdata)? 1 : (tb_p2u8(ldata) < tb_p2u8(rdata)? -1 : 0));
+    // compare it
+    return (tb_p2u8(ldata) > tb_p2u8(rdata)? 1 : (tb_p2u8(ldata) < tb_p2u8(rdata)? -1 : 0));
 }
 static tb_pointer_t tb_item_func_uint8_data(tb_item_func_t* func, tb_cpointer_t item)
 {
-	// check
-	tb_assert_and_check_return_val(item, tb_null);
+    // check
+    tb_assert_and_check_return_val(item, tb_null);
 
-	// the item data
-	return tb_u2p(*((tb_uint8_t*)item));
+    // the item data
+    return tb_u2p(*((tb_uint8_t*)item));
 }
 static tb_char_t const* tb_item_func_uint8_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
-	// check
-	tb_assert_and_check_return_val(func && cstr, "");
+    // check
+    tb_assert_and_check_return_val(func && cstr, "");
 
-	// format string
-	tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint8_t)(tb_size_t)data);
-	if (n >= 0 && n < (tb_long_t)maxn) cstr[n] = '\0';
+    // format string
+    tb_long_t n = tb_snprintf(cstr, maxn, "%u", (tb_uint8_t)(tb_size_t)data);
+    if (n >= 0 && n < (tb_long_t)maxn) cstr[n] = '\0';
 
-	// ok?
-	return (tb_char_t const*)cstr;
+    // ok?
+    return (tb_char_t const*)cstr;
 }
 static tb_void_t tb_item_func_uint8_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	// check
-	tb_assert_and_check_return(item);
+    // check
+    tb_assert_and_check_return(item);
 
-	// clear
-	*((tb_uint8_t*)item) = 0;
+    // clear
+    *((tb_uint8_t*)item) = 0;
 }
 static tb_void_t tb_item_func_uint8_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
-	// check
-	tb_assert_and_check_return(item);
+    // check
+    tb_assert_and_check_return(item);
 
-	// copy item
-	*((tb_uint8_t*)item) = tb_p2u8(data);
+    // copy item
+    *((tb_uint8_t*)item) = tb_p2u8(data);
 }
 static tb_void_t tb_item_func_uint8_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
 {
-	// check
-	tb_assert_and_check_return(item);
+    // check
+    tb_assert_and_check_return(item);
 
-	// clear items
-	if (size) tb_memset(item, 0, size);
+    // clear items
+    if (size) tb_memset(item, 0, size);
 }
 static tb_void_t tb_item_func_uint8_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
-	// check
-	tb_assert_and_check_return(item);
+    // check
+    tb_assert_and_check_return(item);
 
-	// copy items
-	tb_memset(item, tb_p2u8(data), size);
+    // copy items
+    tb_memset(item, tb_p2u8(data), size);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -98,23 +98,23 @@ static tb_void_t tb_item_func_uint8_ncopy(tb_item_func_t* func, tb_pointer_t ite
  */
 tb_item_func_t tb_item_func_uint8()
 {
-	// init func
-	tb_item_func_t func = {0};
-	func.type 	= TB_ITEM_TYPE_UINT8;
-	func.hash 	= tb_item_func_uint8_hash;
-	func.comp 	= tb_item_func_uint8_comp;
-	func.data 	= tb_item_func_uint8_data;
-	func.cstr 	= tb_item_func_uint8_cstr;
-	func.free 	= tb_item_func_uint8_free;
-	func.dupl 	= tb_item_func_uint8_copy;
-	func.repl 	= tb_item_func_uint8_copy;
-	func.copy 	= tb_item_func_uint8_copy;
-	func.nfree 	= tb_item_func_uint8_nfree;
-	func.ndupl 	= tb_item_func_uint8_ncopy;
-	func.nrepl 	= tb_item_func_uint8_ncopy;
-	func.ncopy 	= tb_item_func_uint8_ncopy;
-	func.size 	= sizeof(tb_uint8_t);
+    // init func
+    tb_item_func_t func = {0};
+    func.type   = TB_ITEM_TYPE_UINT8;
+    func.hash   = tb_item_func_uint8_hash;
+    func.comp   = tb_item_func_uint8_comp;
+    func.data   = tb_item_func_uint8_data;
+    func.cstr   = tb_item_func_uint8_cstr;
+    func.free   = tb_item_func_uint8_free;
+    func.dupl   = tb_item_func_uint8_copy;
+    func.repl   = tb_item_func_uint8_copy;
+    func.copy   = tb_item_func_uint8_copy;
+    func.nfree  = tb_item_func_uint8_nfree;
+    func.ndupl  = tb_item_func_uint8_ncopy;
+    func.nrepl  = tb_item_func_uint8_ncopy;
+    func.ncopy  = tb_item_func_uint8_ncopy;
+    func.size   = sizeof(tb_uint8_t);
 
-	// ok?
-	return func;
+    // ok?
+    return func;
 }

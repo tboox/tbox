@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		heap_sort.c
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        heap_sort.c
+ * @ingroup     algorithm
  *
  */
 
@@ -34,26 +34,26 @@
 #ifdef __tb_debug__
 static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
-	// the comparer 
-	if (!comp) comp = tb_iterator_comp;
+    // the comparer 
+    if (!comp) comp = tb_iterator_comp;
 
-	// walk
-	if (head != tail)
-	{
-		tb_size_t root;
-		for (root = head; ++head != tail; ++root)
-		{
-			// root < left?
-			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return tb_false;
-			// end?
-			else if (++head == tail) break;
-			// root < right?
-			else if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return tb_false;
-		}
-	}
+    // walk
+    if (head != tail)
+    {
+        tb_size_t root;
+        for (root = head; ++head != tail; ++root)
+        {
+            // root < left?
+            if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return tb_false;
+            // end?
+            else if (++head == tail) break;
+            // root < right?
+            else if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return tb_false;
+        }
+    }
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }
 #endif
 
@@ -88,25 +88,25 @@ static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t 
 #if 0
 static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t top, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
-	// check
-	tb_assert_and_check_return(comp);
+    // check
+    tb_assert_and_check_return(comp);
 
-	// (hole - 1) / 2: the parent node of the hole
-	// finds the final hole
-	tb_size_t 		parent = 0;
-	tb_cpointer_t 	parent_item = tb_null;
-	for (parent = (hole - 1) >> 1; hole > top && (comp(iterator, (parent_item = tb_iterator_item(iterator, head + parent)), item) < 0); parent = (hole - 1) >> 1)
-	{	
-		// move item: parent => hole
-//		tb_iterator_copy(iterator, head + parent, item);
-		tb_iterator_copy(iterator, head + hole, parent_item);
+    // (hole - 1) / 2: the parent node of the hole
+    // finds the final hole
+    tb_size_t       parent = 0;
+    tb_cpointer_t   parent_item = tb_null;
+    for (parent = (hole - 1) >> 1; hole > top && (comp(iterator, (parent_item = tb_iterator_item(iterator, head + parent)), item) < 0); parent = (hole - 1) >> 1)
+    {   
+        // move item: parent => hole
+//      tb_iterator_copy(iterator, head + parent, item);
+        tb_iterator_copy(iterator, head + hole, parent_item);
 
-		// move node: hole => parent
-		hole = parent;
-	}
+        // move node: hole => parent
+        hole = parent;
+    }
 
-	// copy item
-	tb_iterator_copy(iterator, head + hole, item);
+    // copy item
+    tb_iterator_copy(iterator, head + hole, item);
 }
 #endif
 
@@ -153,67 +153,67 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
  */
 static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
-	// the comparer 
-	if (!comp) comp = tb_iterator_comp;
+    // the comparer 
+    if (!comp) comp = tb_iterator_comp;
 
 #if 0
-	// save top position
-	tb_size_t top = hole;
+    // save top position
+    tb_size_t top = hole;
 
-	// 2 * hole + 2: the right child node of hole
-	tb_size_t child = (hole << 1) + 2;
-	for (; child < tail; child = (child << 1) + 2)
-	{	
-		// the larger child node
-		if (comp(iterator, tb_iterator_item(iterator, head + child), tb_iterator_item(iterator, head + child - 1)) < 0) child--;
+    // 2 * hole + 2: the right child node of hole
+    tb_size_t child = (hole << 1) + 2;
+    for (; child < tail; child = (child << 1) + 2)
+    {   
+        // the larger child node
+        if (comp(iterator, tb_iterator_item(iterator, head + child), tb_iterator_item(iterator, head + child - 1)) < 0) child--;
 
-		// the larger child node => hole
-		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + child));
+        // the larger child node => hole
+        tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + child));
 
-		// move the hole down to it's larger child node 
-		hole = child;
-	}
+        // move the hole down to it's larger child node 
+        hole = child;
+    }
 
-	// no right child node? 
-	if (child == tail)
-	{	
-		// the last child => hole
-		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + tail - 1));
+    // no right child node? 
+    if (child == tail)
+    {   
+        // the last child => hole
+        tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + tail - 1));
 
-		// move hole down to tail
-		hole = tail - 1;
-	}
+        // move hole down to tail
+        hole = tail - 1;
+    }
 
-	// push item into the hole
-	tb_heap_push(iterator, head, hole, top, item, comp);
+    // push item into the hole
+    tb_heap_push(iterator, head, hole, top, item, comp);
 #else
 
-	// walk, 2 * hole + 1: the left child node of hole
-	tb_size_t 		child = (hole << 1) + 1;
-	tb_cpointer_t 	child_item = tb_null;
-	tb_cpointer_t 	child_item_r = tb_null;
-	for (; child < tail; child = (child << 1) + 1)
-	{	
-		// the larger child node
-		child_item = tb_iterator_item(iterator, head + child);
-		if (child + 1 < tail && comp(iterator, child_item, (child_item_r = tb_iterator_item(iterator, head + child + 1))) < 0) 
-		{
-			child++;
-			child_item = child_item_r;
-		}
+    // walk, 2 * hole + 1: the left child node of hole
+    tb_size_t       child = (hole << 1) + 1;
+    tb_cpointer_t   child_item = tb_null;
+    tb_cpointer_t   child_item_r = tb_null;
+    for (; child < tail; child = (child << 1) + 1)
+    {   
+        // the larger child node
+        child_item = tb_iterator_item(iterator, head + child);
+        if (child + 1 < tail && comp(iterator, child_item, (child_item_r = tb_iterator_item(iterator, head + child + 1))) < 0) 
+        {
+            child++;
+            child_item = child_item_r;
+        }
 
-		// end?
-		if (comp(iterator, child_item, item) < 0) break;
+        // end?
+        if (comp(iterator, child_item, item) < 0) break;
 
-		// the larger child node => hole
-		tb_iterator_copy(iterator, head + hole, child_item);
+        // the larger child node => hole
+        tb_iterator_copy(iterator, head + hole, child_item);
 
-		// move the hole down to it's larger child node 
-		hole = child;
-	}
+        // move the hole down to it's larger child node 
+        hole = child;
+    }
 
-	// copy item
-	tb_iterator_copy(iterator, head + hole, item);
+    // copy item
+    tb_iterator_copy(iterator, head + hole, item);
 
 #endif
 }
@@ -236,31 +236,31 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
  */
 static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
-	// init
-	tb_size_t 		step = tb_iterator_step(iterator);
-	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
-	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
+    // init
+    tb_size_t       step = tb_iterator_step(iterator);
+    tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
+    tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
-	// make
-	tb_size_t hole;
-	tb_size_t bottom = tail - head;
-	for (hole = (bottom >> 1); hole > 0; )
-	{
-		--hole;
+    // make
+    tb_size_t hole;
+    tb_size_t bottom = tail - head;
+    for (hole = (bottom >> 1); hole > 0; )
+    {
+        --hole;
 
-		// save hole
-		if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, head + hole);
-		else tb_memcpy(temp, tb_iterator_item(iterator, head + hole), step);
+        // save hole
+        if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, head + hole);
+        else tb_memcpy(temp, tb_iterator_item(iterator, head + hole), step);
 
-		// reheap top half, bottom to top
-		tb_heap_adjust(iterator, head, hole, bottom, temp, comp);
-	}
+        // reheap top half, bottom to top
+        tb_heap_adjust(iterator, head, hole, bottom, temp, comp);
+    }
 
-	// free
-	if (temp && step > sizeof(tb_pointer_t)) tb_free(temp);
+    // free
+    if (temp && step > sizeof(tb_pointer_t)) tb_free(temp);
 
-	// check
-	tb_assert(tb_heap_check(iterator, head, tail, comp));
+    // check
+    tb_assert(tb_heap_check(iterator, head, tail, comp));
 }
 /*!pop the top of heap to last and reheap
  *
@@ -280,14 +280,14 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t h
  */   
 static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
-	// top => last
-	tb_iterator_copy(iterator, tail - 1, tb_iterator_item(iterator, head));
+    // top => last
+    tb_iterator_copy(iterator, tail - 1, tb_iterator_item(iterator, head));
 
-	// reheap it
-	tb_heap_adjust(iterator, head, 0, tail - head - 1, item, comp);
+    // reheap it
+    tb_heap_adjust(iterator, head, 0, tail - head - 1, item, comp);
 
-	// check
-//	tb_assert(tb_heap_check(iterator, head, tail - head - 1, comp));
+    // check
+//  tb_assert(tb_heap_check(iterator, head, tail - head - 1, comp));
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -401,33 +401,33 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t h
  */
 tb_void_t tb_heap_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
-	// check
-	tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS));
-	tb_check_return(head != tail);
+    // check
+    tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS));
+    tb_check_return(head != tail);
 
-	// make
-	tb_heap_make(iterator, head, tail, comp);
+    // make
+    tb_heap_make(iterator, head, tail, comp);
 
-	// init
-	tb_size_t 		step = tb_iterator_step(iterator);
-	tb_pointer_t 	last = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
-	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || last);
+    // init
+    tb_size_t       step = tb_iterator_step(iterator);
+    tb_pointer_t    last = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
+    tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || last);
 
-	// pop0 ...
-	for (; tail > head + 1; tail--)
-	{
-		// save last
-		if (step <= sizeof(tb_pointer_t)) last = tb_iterator_item(iterator, tail - 1);
-		else tb_memcpy(last, tb_iterator_item(iterator, tail - 1), step);
+    // pop0 ...
+    for (; tail > head + 1; tail--)
+    {
+        // save last
+        if (step <= sizeof(tb_pointer_t)) last = tb_iterator_item(iterator, tail - 1);
+        else tb_memcpy(last, tb_iterator_item(iterator, tail - 1), step);
 
-		// pop0
-		tb_heap_pop0(iterator, head, tail, last, comp);
-	}
+        // pop0
+        tb_heap_pop0(iterator, head, tail, last, comp);
+    }
 
-	// free
-	if (last && step > sizeof(tb_pointer_t)) tb_free(last);
+    // free
+    if (last && step > sizeof(tb_pointer_t)) tb_free(last);
 }
 tb_void_t tb_heap_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp)
 {
-	tb_heap_sort(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp);
+    tb_heap_sort(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp);
 }

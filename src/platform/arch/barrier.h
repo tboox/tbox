@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		barrier.h
+ * @author      ruki
+ * @file        barrier.h
  *
  */
 #ifndef TB_PLATFORM_ARCH_BARRIER_H
@@ -28,9 +28,9 @@
  */
 #include "prefix.h"
 #if defined(TB_ARCH_x86)
-# 	include "x86/barrier.h"
+#   include "x86/barrier.h"
 #elif defined(TB_ARCH_x64)
-# 	include "x64/barrier.h"
+#   include "x64/barrier.h"
 #endif
 
 #endif

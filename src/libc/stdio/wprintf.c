@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wprintf.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wprintf.c
+ * @ingroup     libc
  *
  */
 
@@ -35,23 +35,23 @@
 
 tb_long_t tb_wprintf(tb_wchar_t const* format, ...)
 {
-	// check
-	tb_check_return_val(format, 0);
+    // check
+    tb_check_return_val(format, 0);
 
-	// format line
-	tb_long_t 	size = 0;
-	tb_wchar_t 	line[8192] = {0};
-	tb_vswprintf_format(line, 8191, format, &size);
-	if (size >= 0 && size < 8192) line[size] = L'\0';
+    // format line
+    tb_long_t   size = 0;
+    tb_wchar_t  line[8192] = {0};
+    tb_vswprintf_format(line, 8191, format, &size);
+    if (size >= 0 && size < 8192) line[size] = L'\0';
 
-	// wtoa
-	tb_char_t text[8192] = {0};
-	size = tb_wtoa(text, line, 8191);
-	if (size >= 0 && size < 8192) text[size] = '\0';
+    // wtoa
+    tb_char_t text[8192] = {0};
+    size = tb_wtoa(text, line, 8191);
+    if (size >= 0 && size < 8192) text[size] = '\0';
 
-	// print it
-	tb_print(text);
+    // print it
+    tb_print(text);
 
-	// ok?
-	return size;
+    // ok?
+    return size;
 }

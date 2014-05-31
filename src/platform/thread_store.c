@@ -16,17 +16,17 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @tstore		thread_store.c
- * @ingroup 	platform
+ * @author      ruki
+ * @tstore      thread_store.c
+ * @ingroup     platform
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"thread_store"
-#define TB_TRACE_MODULE_DEBUG 			(0)
+#define TB_TRACE_MODULE_NAME            "thread_store"
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -42,24 +42,24 @@
  */
 
 // the store
-static tb_handle_t 		g_store = tb_null;
+static tb_handle_t      g_store = tb_null;
 
 // the lock
-static tb_spinlock_t 	g_lock = TB_SPINLOCK_INIT;
+static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * callback
  */
 static tb_void_t tb_thread_store_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	// data item
-	tb_thread_store_data_t* data = item? *((tb_thread_store_data_t**)item) : tb_null;
+    // data item
+    tb_thread_store_data_t* data = item? *((tb_thread_store_data_t**)item) : tb_null;
 
-	// free data
-	if (data && data->free) data->free(data); 
+    // free data
+    if (data && data->free) data->free(data); 
 
-	// clear item
-	if (item) *((tb_thread_store_data_t**)item) = tb_null;
+    // clear item
+    if (item) *((tb_thread_store_data_t**)item) = tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -67,65 +67,65 @@ static tb_void_t tb_thread_store_free(tb_item_func_t* func, tb_pointer_t item)
  */
 tb_bool_t tb_thread_store_init()
 {
-	// enter lock
-	tb_spinlock_enter(&g_lock);
+    // enter lock
+    tb_spinlock_enter(&g_lock);
 
-	// no store?
-	if (!g_store) 
-	{
-		// init store
-		g_store = tb_hash_init(8, tb_item_func_size(), tb_item_func_ptr(tb_thread_store_free, tb_null));
-	}
+    // no store?
+    if (!g_store) 
+    {
+        // init store
+        g_store = tb_hash_init(8, tb_item_func_size(), tb_item_func_ptr(tb_thread_store_free, tb_null));
+    }
 
-	// leave lock
-	tb_spinlock_leave(&g_lock);
+    // leave lock
+    tb_spinlock_leave(&g_lock);
 
-	// register lock profiler
+    // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-	tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&g_lock, TB_TRACE_MODULE_NAME);
+    tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&g_lock, TB_TRACE_MODULE_NAME);
 #endif
 
-	// ok?
-	return g_store? tb_true : tb_false;
+    // ok?
+    return g_store? tb_true : tb_false;
 }
 tb_void_t tb_thread_store_exit()
-{	
-	// enter lock
-	tb_spinlock_enter(&g_lock);
+{   
+    // enter lock
+    tb_spinlock_enter(&g_lock);
 
-	// exit store
-	if (g_store) tb_hash_exit(g_store);
-	g_store = tb_null;
+    // exit store
+    if (g_store) tb_hash_exit(g_store);
+    g_store = tb_null;
 
-	// leave lock
-	tb_spinlock_leave(&g_lock);
+    // leave lock
+    tb_spinlock_leave(&g_lock);
 }
 tb_void_t tb_thread_store_setp(tb_thread_store_data_t const* data)
 {
-	// enter lock
-	tb_spinlock_enter(&g_lock);
+    // enter lock
+    tb_spinlock_enter(&g_lock);
 
-	// get data
-	if (g_store) tb_hash_set(g_store, (tb_pointer_t)tb_thread_self(), data);
+    // get data
+    if (g_store) tb_hash_set(g_store, (tb_pointer_t)tb_thread_self(), data);
 
-	// leave lock
-	tb_spinlock_leave(&g_lock);
+    // leave lock
+    tb_spinlock_leave(&g_lock);
 }
 tb_thread_store_data_t* tb_thread_store_getp()
 {
-	// init data
-	tb_pointer_t data = tb_null;
+    // init data
+    tb_pointer_t data = tb_null;
 
-	// enter lock
-	tb_spinlock_enter(&g_lock);
+    // enter lock
+    tb_spinlock_enter(&g_lock);
 
-	// get data
-	if (g_store) data = tb_hash_get(g_store, (tb_pointer_t)tb_thread_self());
+    // get data
+    if (g_store) data = tb_hash_get(g_store, (tb_pointer_t)tb_thread_self());
 
-	// leave lock
-	tb_spinlock_leave(&g_lock);
+    // leave lock
+    tb_spinlock_leave(&g_lock);
 
-	// ok?
-	return (tb_thread_store_data_t*)data;
+    // ok?
+    return (tb_thread_store_data_t*)data;
 }
 

@@ -16,16 +16,16 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		aicp.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        aicp.c
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"platform_aicp"
-#define TB_TRACE_MODULE_DEBUG 			(1)
+#define TB_TRACE_MODULE_NAME            "platform_aicp"
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -41,16 +41,16 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-# 	include "../windows/asio/aicp_iocp.c"
-	tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
-	{
-		return tb_aicp_proactor_iocp_init(aicp);
-	}
+#   include "../windows/asio/aicp_iocp.c"
+    tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
+    {
+        return tb_aicp_proactor_iocp_init(aicp);
+    }
 #else
-# 	include "aicp_aiop.c"
-	tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
-	{
-		return tb_aicp_proactor_aiop_init(aicp);
-	}
+#   include "aicp_aiop.c"
+    tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
+    {
+        return tb_aicp_proactor_aiop_init(aicp);
+    }
 #endif
 

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
+ * @author      ruki
+ * @file        prefix.h
  *
  */
 #ifndef TB_PLATFORM_PREFIX_H
@@ -36,22 +36,22 @@
 /// the iovec type for WSASend, WSARecv using WSABUF
 typedef struct __tb_iovec_t
 {
-	/// the size
-	tb_size_t 				size;
+    /// the size
+    tb_size_t               size;
 
-	/// the data
-	tb_byte_t* 				data;
+    /// the data
+    tb_byte_t*              data;
 
 }tb_iovec_t;
 #else
 /// the iovec type for readv, preadv, writv, pwritv, recvv, sendv
 typedef struct __tb_iovec_t
 {
-	/// the data
-	tb_byte_t* 				data;
+    /// the data
+    tb_byte_t*              data;
 
-	/// the size
-	tb_size_t 				size;
+    /// the size
+    tb_size_t               size;
 
 }tb_iovec_t;
 #endif

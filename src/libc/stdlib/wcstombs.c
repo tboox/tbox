@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcstombs.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcstombs.c
+ * @ingroup     libc
  *
  */
 
@@ -27,9 +27,9 @@
  */
 #include "stdlib.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSTOMBS
-# 	include <stdlib.h>
+#   include <stdlib.h>
 #else
-# 	include "../../charset/charset.h"
+#   include "../../charset/charset.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -38,29 +38,29 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSTOMBS
 tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	return wcstombs(s1, s2, n);
+    return wcstombs(s1, s2, n);
 }
 #else
 tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, 0);
+    // check
+    tb_assert_and_check_return_val(s1 && s2, 0);
 
-	// init
-	tb_long_t r = 0;
-	tb_size_t l = tb_wcslen(s2);
-	
-	// atow
-	if (l) 
-	{
-		tb_size_t e = (sizeof(tb_wchar_t) == 4)? TB_CHARSET_TYPE_UCS4 : TB_CHARSET_TYPE_UCS2;
-		r = tb_charset_conv_data(e | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, (tb_byte_t const*)s2, l * sizeof(tb_wchar_t), (tb_byte_t*)s1, n);
-	}
+    // init
+    tb_long_t r = 0;
+    tb_size_t l = tb_wcslen(s2);
+    
+    // atow
+    if (l) 
+    {
+        tb_size_t e = (sizeof(tb_wchar_t) == 4)? TB_CHARSET_TYPE_UCS4 : TB_CHARSET_TYPE_UCS2;
+        r = tb_charset_conv_data(e | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, (tb_byte_t const*)s2, l * sizeof(tb_wchar_t), (tb_byte_t*)s1, n);
+    }
 
-	// strip
-	if (r >= 0) s1[r] = '\0';
+    // strip
+    if (r >= 0) s1[r] = '\0';
 
-	// ok?
-	return r > 0? r : 0;
+    // ok?
+    return r > 0? r : 0;
 }
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		zlibraw.h
- * @ingroup 	zip
+ * @author      ruki
+ * @file        zlibraw.h
+ * @ingroup     zip
  *
  */
 #ifndef TB_ZIP_ZLIBRAW_H
@@ -29,7 +29,7 @@
  */
 #include "prefix.h"
 #ifdef TB_CONFIG_THIRD_HAVE_ZLIB
-# 	include <zlib.h>
+#   include <zlib.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,11 +39,11 @@
 // the zlibraw zip type
 typedef struct __tb_zip_zlibraw_t
 {
-	// the zip base
-	tb_zip_t 		base;
+    // the zip base
+    tb_zip_t        base;
 
 #ifdef TB_CONFIG_THIRD_HAVE_ZLIB
-	z_stream 		zst;
+    z_stream        zst;
 #endif
 
 }tb_zip_zlibraw_t;
@@ -52,8 +52,8 @@ typedef struct __tb_zip_zlibraw_t
  * interfaces
  */
 
-tb_zip_t* 	tb_zip_zlibraw_init(tb_size_t action);
-tb_void_t 	tb_zip_zlibraw_exit(tb_zip_t* zip);
+tb_zip_t*   tb_zip_zlibraw_init(tb_size_t action);
+tb_void_t   tb_zip_zlibraw_exit(tb_zip_t* zip);
 
 #endif
 

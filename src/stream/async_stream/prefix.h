@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.h
+ * @author      ruki
+ * @file        prefix.h
  *
  */
 #ifndef TB_STREAM_ASYNC_STREAM_PREFIX_H
@@ -29,5 +29,34 @@
 #include "../prefix.h"
 #include "../stream.h"
 #include "../async_stream.h"
+#include "../../platform/atomic.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private interfaces
+ */
+
+/* clear the stream after closing stream
+ *
+ * @param stream        the stream
+ */
+tb_void_t               tb_async_stream_clear(tb_async_stream_t* stream);
+
+/* done the opening stream
+ *
+ * @param stream        the stream
+ */
+tb_void_t               tb_async_stream_open_done(tb_async_stream_t* stream);
+
+/* done the open func after opening stream
+ *
+ * @param stream        the stream
+ * @param state         the state
+ * @param func          the open func
+ * @param priv          the func private data
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv);
+
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		insert_sort.h
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        insert_sort.h
+ * @ingroup     algorithm
  *
  */
 #ifndef TB_ALGORITHM_INSERT_SORT_H
@@ -35,21 +35,21 @@
 
 /*! the insert sorter, O(n^2)
  *
- * @param iterator 	the iterator
- * @param head 		the iterator head
- * @param tail 		the iterator tail
- * @param comp 		the comparer
+ * @param iterator  the iterator
+ * @param head      the iterator head
+ * @param tail      the iterator tail
+ * @param comp      the comparer
  */
-tb_void_t 			tb_insert_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
+tb_void_t           tb_insert_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
 
 /*! the insert sorter for all
  *
- * @param iterator 	the iterator
- * @param head 		the iterator head
- * @param tail 		the iterator tail
- * @param comp 		the comparer
+ * @param iterator  the iterator
+ * @param head      the iterator head
+ * @param tail      the iterator tail
+ * @param comp      the comparer
  */
-tb_void_t 			tb_insert_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp);
+tb_void_t           tb_insert_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp);
 
 
 #endif

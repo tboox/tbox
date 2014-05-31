@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strnicmp.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        strnicmp.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_STRNICMP
-# 	include <string.h>
+#   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,18 +36,18 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRNICMP
 static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	return strncasecmp(s1, s2, n);
+    tb_assert_and_check_return_val(s1 && s2, 0);
+    return strncasecmp(s1, s2, n);
 }
 #else
 static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	if (s1 == s2 || !n) return 0;
+    tb_assert_and_check_return_val(s1 && s2, 0);
+    if (s1 == s2 || !n) return 0;
 
-	tb_long_t r = 0;
-	while (n && ((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t*)s1)))) - tb_tolower(*((tb_byte_t*)s2)))) && (--n, ++s2, *s1++));
-	return r;
+    tb_long_t r = 0;
+    while (n && ((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t*)s1)))) - tb_tolower(*((tb_byte_t*)s2)))) && (--n, ++s2, *s1++));
+    return r;
 }
 #endif
 
@@ -56,6 +56,6 @@ static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_s
  */
 tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-	// done
-	return tb_strnicmp_impl(s1, s2, n);
+    // done
+    return tb_strnicmp_impl(s1, s2, n);
 }

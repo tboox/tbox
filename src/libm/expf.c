@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		expf.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        expf.c
+ * @ingroup     libm
  *
  */
 
@@ -34,9 +34,9 @@
 tb_float_t tb_expf(tb_float_t x)
 {
 #if 0
-	return expf(x);
+    return expf(x);
 #else
-	tb_float_t a = x - (tb_long_t)x;
-	return (tb_expif(((tb_long_t)x)) * tb_exp1f(a));
+    tb_float_t a = x - (tb_long_t)x;
+    return (tb_expif(((tb_long_t)x)) * tb_exp1f(a));
 #endif
 }

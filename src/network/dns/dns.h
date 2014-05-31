@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		dns.h
- * @ingroup 	network
+ * @author      ruki
+ * @file        dns.h
+ * @ingroup     network
  *
  */
 #ifndef TB_NETWORK_DNS_H

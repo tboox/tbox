@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memory.c
+ * @author      ruki
+ * @file        memory.c
  *
  */
 
@@ -33,62 +33,62 @@
  */
 tb_bool_t tb_native_memory_init()
 {
-	return tb_true;
+    return tb_true;
 }
 tb_void_t tb_native_memory_exit()
 {
 }
 tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 {
-	// check
-	tb_check_return_val(size, tb_null);
+    // check
+    tb_check_return_val(size, tb_null);
 
-	// malloc it
-	return malloc(size);
+    // malloc it
+    return malloc(size);
 }
 tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 {
-	// check
-	tb_check_return_val(size, tb_null);	
+    // check
+    tb_check_return_val(size, tb_null); 
 
-	// malloc0 it
-	return calloc(1, size);
+    // malloc0 it
+    return calloc(1, size);
 }
 tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
-	// check
-	tb_check_return_val(item && size, tb_null);	
+    // check
+    tb_check_return_val(item && size, tb_null); 
 
-	// nalloc it
-	return malloc(item * size);
+    // nalloc it
+    return malloc(item * size);
 }
 tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 {
-	// check
-	tb_check_return_val(item && size, tb_null);
+    // check
+    tb_check_return_val(item && size, tb_null);
 
-	// nalloc0 it
-	return calloc(item, size);
+    // nalloc0 it
+    return calloc(item, size);
 }
 tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
-	// no size? free it
-	if (!size) 
-	{
-		free(data);
-		return tb_null;
-	}
-	// no data? malloc it
-	else if (!data) return malloc(size);
-	// realloc it
-	else return realloc(data, size);
+    // no size? free it
+    if (!size) 
+    {
+        free(data);
+        return tb_null;
+    }
+    // no data? malloc it
+    else if (!data) return malloc(size);
+    // realloc it
+    else return realloc(data, size);
 }
 tb_bool_t tb_native_memory_free(tb_pointer_t data)
 {
-	// free it
-	if (data) free(data);
+    // free it
+    if (data) free(data);
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }
 

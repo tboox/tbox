@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		boolean.h
- * @ingroup 	object
+ * @author      ruki
+ * @file        boolean.h
+ * @ingroup     object
  *
  */
 #ifndef TB_OBJECT_BOOLEAN_H
@@ -35,31 +35,31 @@
 
 /*! init boolean
  *
- * @param value 	the value
+ * @param value     the value
  *
- * @return 			the boolean object
+ * @return          the boolean object
  */
-tb_object_t* 		tb_boolean_init(tb_bool_t value);
+tb_object_t*        tb_boolean_init(tb_bool_t value);
 
 /*! the boolean value: true
  *
- * @return 			the boolean object
+ * @return          the boolean object
  */
-tb_object_t* 		tb_boolean_true(tb_noarg_t);
+tb_object_t*        tb_boolean_true(tb_noarg_t);
 
 /*! the boolean value: false
  *
- * @return 			the boolean object
+ * @return          the boolean object
  */
-tb_object_t* 		tb_boolean_false(tb_noarg_t);
+tb_object_t*        tb_boolean_false(tb_noarg_t);
 
 /*! the boolean value
  *
- * @param 			the boolean object
+ * @param           the boolean object
  *
- * @return 			tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t 			tb_boolean_bool(tb_object_t const* boolean);
+tb_bool_t           tb_boolean_bool(tb_object_t const* boolean);
 
 
 #endif

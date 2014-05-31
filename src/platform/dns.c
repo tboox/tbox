@@ -16,17 +16,17 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		dns.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        dns.c
+ * @ingroup     platform
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 			"dns"
-#define TB_TRACE_MODULE_DEBUG 			(0)
+#define TB_TRACE_MODULE_NAME            "dns"
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -37,14 +37,16 @@
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-# 	include "windows/dns.c"
+#   include "windows/dns.c"
+#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+#   include "mach/dns.c"
 #elif defined(TB_CONFIG_OS_LIKE_UNIX)
-# 	include "unix/dns.c"
+#   include "unix/dns.c"
 #else
 tb_bool_t tb_dns_init()
 {
-	tb_trace_noimpl();
-	return tb_true;
+    tb_trace_noimpl();
+    return tb_true;
 }
 tb_void_t tb_dns_exit()
 {

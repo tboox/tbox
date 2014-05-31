@@ -2,13 +2,13 @@
 #define TB_CONFIG_H
 
 // build version
-#define TB_CONFIG_VERSION_BUILD 		[build]
+#define TB_CONFIG_VERSION_BUILD         [build]
 
 // debug
-#define TB_CONFIG_DEBUG					[debug]
+#define TB_CONFIG_DEBUG                 [debug]
 
 // small
-#define TB_CONFIG_SMALL					[small]
+#define TB_CONFIG_SMALL                 [small]
 
 // os
 #define TB_CONFIG_OS_WINDOWS
@@ -20,9 +20,9 @@
 
 // assembler
 #if defined(_MSC_VER)
-# 	define TB_CONFIG_ASSEMBLER_MASM
+#   define TB_CONFIG_ASSEMBLER_MASM
 #elif defined(__GNUC__)
-# 	define TB_CONFIG_ASSEMBLER_GAS
+#   define TB_CONFIG_ASSEMBLER_GAS
 #endif
 
 // type
@@ -71,7 +71,7 @@
 #define TB_CONFIG_LIBC_HAVE_MKTIME
 #define TB_CONFIG_LIBC_HAVE_LOCALTIME
 #if !defined(_MSC_VER)
-# 	define TB_CONFIG_LIBC_HAVE_SETJMP
+#   define TB_CONFIG_LIBC_HAVE_SETJMP
 #endif
 
 // libm
@@ -89,9 +89,9 @@
 #define TB_CONFIG_MODULE_HAVE_DATABASE
 
 // third party
-//#define TB_CONFIG_THIRD_HAVE_ZLIB					
-//#define TB_CONFIG_THIRD_HAVE_OPENSSL	
-//#define TB_CONFIG_THIRD_HAVE_POLARSSL	
+//#define TB_CONFIG_THIRD_HAVE_ZLIB                 
+//#define TB_CONFIG_THIRD_HAVE_OPENSSL  
+//#define TB_CONFIG_THIRD_HAVE_POLARSSL 
 //#define TB_CONFIG_THIRD_HAVE_MYSQL
 //#define TB_CONFIG_THIRD_HAVE_SQLITE3
 

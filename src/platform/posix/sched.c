@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		sched.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        sched.c
+ * @ingroup     platform
  *
  */
 
@@ -33,6 +33,6 @@
  */
 tb_bool_t tb_sched_yield()
 {
-	return !sched_yield()? tb_true : tb_false;
+    return !sched_yield()? tb_true : tb_false;
 }
 

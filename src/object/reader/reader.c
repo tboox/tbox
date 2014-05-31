@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		reader.c
- * @ingroup 	object
+ * @author      ruki
+ * @file        reader.c
+ * @ingroup     object
  *
  */
 
@@ -32,78 +32,78 @@
  */
 
 // the object reader
-static tb_object_reader_t* 	g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_null};
+static tb_object_reader_t*  g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_null};
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader)
 {
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return_val(reader && (format < tb_arrayn(g_reader)), tb_false);
+    // check
+    format &= 0x00ff;
+    tb_assert_and_check_return_val(reader && (format < tb_arrayn(g_reader)), tb_false);
 
-	// exit the older reader if exists
-	tb_object_reader_del(format);
+    // exit the older reader if exists
+    tb_object_reader_del(format);
 
-	// set
-	g_reader[format] = reader;
+    // set
+    g_reader[format] = reader;
 
-	// ok
-	return tb_true;
+    // ok
+    return tb_true;
 }
 tb_void_t tb_object_reader_del(tb_size_t format)
 {
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return((format < tb_arrayn(g_reader)));
+    // check
+    format &= 0x00ff;
+    tb_assert_and_check_return((format < tb_arrayn(g_reader)));
 
-	// exit it
-	if (g_reader[format])
-	{
-		// exit hooker
-		if (g_reader[format]->hooker) tb_hash_exit(g_reader[format]->hooker);
-		g_reader[format]->hooker = tb_null;
-		
-		// clear it
-		g_reader[format] = tb_null;
-	}
+    // exit it
+    if (g_reader[format])
+    {
+        // exit hooker
+        if (g_reader[format]->hooker) tb_hash_exit(g_reader[format]->hooker);
+        g_reader[format]->hooker = tb_null;
+        
+        // clear it
+        g_reader[format] = tb_null;
+    }
 }
 tb_object_reader_t* tb_object_reader_get(tb_size_t format)
 {
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return_val((format < tb_arrayn(g_reader)), tb_null);
+    // check
+    format &= 0x00ff;
+    tb_assert_and_check_return_val((format < tb_arrayn(g_reader)), tb_null);
 
-	// ok
-	return g_reader[format];
+    // ok
+    return g_reader[format];
 }
 tb_object_t* tb_object_reader_done(tb_basic_stream_t* stream)
 {
-	// check
-	tb_assert_and_check_return_val(stream, tb_null);
+    // check
+    tb_assert_and_check_return_val(stream, tb_null);
 
-	// probe it
-	tb_size_t i = 0;
-	tb_size_t n = tb_arrayn(g_reader);
-	tb_size_t m = 0;
-	tb_size_t f = 0;
-	for (i = 0; i < n && m < 100; i++)
-	{
-		// the reader
-		tb_object_reader_t* reader = g_reader[i];
-		if (reader && reader->probe)
-		{
-			// the probe score
-			tb_size_t score = reader->probe(stream);
-			if (score > m) 
-			{
-				m = score;
-				f = i;
-			}
-		}
-	}
+    // probe it
+    tb_size_t i = 0;
+    tb_size_t n = tb_arrayn(g_reader);
+    tb_size_t m = 0;
+    tb_size_t f = 0;
+    for (i = 0; i < n && m < 100; i++)
+    {
+        // the reader
+        tb_object_reader_t* reader = g_reader[i];
+        if (reader && reader->probe)
+        {
+            // the probe score
+            tb_size_t score = reader->probe(stream);
+            if (score > m) 
+            {
+                m = score;
+                f = i;
+            }
+        }
+    }
 
-	// ok? read it
-	return (m && g_reader[f] && g_reader[f]->read)? g_reader[f]->read(stream) : tb_null;
+    // ok? read it
+    return (m && g_reader[f] && g_reader[f]->read)? g_reader[f]->read(stream) : tb_null;
 }

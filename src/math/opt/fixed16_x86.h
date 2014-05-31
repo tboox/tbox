@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		fixed16_x86.h
+ * @author      ruki
+ * @file        fixed16_x86.h
  *
  */
 #ifndef TB_MATH_OPT_FIXED16_x86_H

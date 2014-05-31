@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memmov.c
+ * @author      ruki
+ * @file        memmov.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-//# 	define TB_LIBC_STRING_OPT_MEMMOV
+//#     define TB_LIBC_STRING_OPT_MEMMOV
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -40,8 +40,8 @@
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	return tb_null;
+    return tb_null;
 }
 #endif

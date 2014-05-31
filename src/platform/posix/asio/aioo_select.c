@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		aioo_select.c
+ * @author      ruki
+ * @file        aioo_select.c
  *
  */
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -25,14 +25,14 @@
  */
 #include "prefix.h"
 #ifndef TB_CONFIG_OS_WINDOWS
-# 	include <sys/select.h>
+#   include <sys/select.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 #ifdef TB_CONFIG_OS_WINDOWS
-typedef tb_int_t 	socklen_t;
+typedef tb_int_t    socklen_t;
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -40,74 +40,74 @@ typedef tb_int_t 	socklen_t;
  */
 static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {
-	// check
-	tb_assert_and_check_return_val(handle, -1);
+    // check
+    tb_assert_and_check_return_val(handle, -1);
 
-	// fd
-	tb_long_t fd = ((tb_long_t)handle) - 1;
-	tb_assert_and_check_return_val(fd >= 0, -1);
-	
-	// init time
-	struct timeval t = {0};
-	if (timeout > 0)
-	{
-		t.tv_sec = timeout / 1000;
-		t.tv_usec = (timeout % 1000) * 1000;
-	}
+    // fd
+    tb_long_t fd = ((tb_long_t)handle) - 1;
+    tb_assert_and_check_return_val(fd >= 0, -1);
+    
+    // init time
+    struct timeval t = {0};
+    if (timeout > 0)
+    {
+        t.tv_sec = timeout / 1000;
+        t.tv_usec = (timeout % 1000) * 1000;
+    }
 
-	// init fds
-	fd_set 	rfds;
-	fd_set 	wfds;
-	fd_set 	efds;
-	fd_set* prfds = (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT)? &rfds : tb_null;
-	fd_set* pwfds = (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN)? &wfds : tb_null;
+    // init fds
+    fd_set  rfds;
+    fd_set  wfds;
+    fd_set  efds;
+    fd_set* prfds = (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT)? &rfds : tb_null;
+    fd_set* pwfds = (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN)? &wfds : tb_null;
 
-	if (prfds)
-	{
-		FD_ZERO(prfds);
-		FD_SET(fd, prfds);
-	}
+    if (prfds)
+    {
+        FD_ZERO(prfds);
+        FD_SET(fd, prfds);
+    }
 
-	if (pwfds)
-	{
-		FD_ZERO(pwfds);
-		FD_SET(fd, pwfds);
-	}
-	
-	FD_ZERO(&efds);
-	FD_SET(fd, &efds);
+    if (pwfds)
+    {
+        FD_ZERO(pwfds);
+        FD_SET(fd, pwfds);
+    }
+    
+    FD_ZERO(&efds);
+    FD_SET(fd, &efds);
 
-	// select
-	tb_long_t r = select(fd + 1
-						, prfds
-						, pwfds
-						, &efds
-						, timeout >= 0? &t : tb_null);
-	tb_assert_and_check_return_val(r >= 0, -1);
+    // select
+    tb_long_t r = select(fd + 1
+                        , prfds
+                        , pwfds
+                        , &efds
+                        , timeout >= 0? &t : tb_null);
+    tb_assert_and_check_return_val(r >= 0, -1);
 
-	// timeout?
-	tb_check_return_val(r, 0);
+    // timeout?
+    tb_check_return_val(r, 0);
 
-	// error?
-	tb_int_t o = 0;
-	socklen_t n = sizeof(socklen_t);
-	getsockopt(fd, SOL_SOCKET, SO_ERROR, (tb_char_t*)&o, &n);
-	if (o) return -1;
+    // error?
+    tb_int_t o = 0;
+    socklen_t n = sizeof(socklen_t);
+    getsockopt(fd, SOL_SOCKET, SO_ERROR, (tb_char_t*)&o, &n);
+    if (o) return -1;
 
-	// ok
-	tb_long_t e = 0;
-	if (prfds && FD_ISSET(fd, &rfds)) 
-	{
-		e |= TB_AIOE_CODE_RECV;
-		if (code & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
-	}
-	if (pwfds && FD_ISSET(fd, &wfds)) 
-	{
-		e |= TB_AIOE_CODE_SEND;
-		if (code & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
-	}
-	if (FD_ISSET(fd, &efds) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
-		e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
-	return e;
+    // ok
+    tb_long_t e = 0;
+    if (prfds && FD_ISSET(fd, &rfds)) 
+    {
+        e |= TB_AIOE_CODE_RECV;
+        if (code & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
+    }
+    if (pwfds && FD_ISSET(fd, &wfds)) 
+    {
+        e |= TB_AIOE_CODE_SEND;
+        if (code & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
+    }
+    if (FD_ISSET(fd, &efds) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
+        e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
+    return e;
 }
 

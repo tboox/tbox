@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		demo.h
+ * @author      ruki
+ * @file        demo.h
  *
  */
 #ifndef TB_DEMO_H
@@ -35,14 +35,11 @@
  */
 
 // the main decl
-#define TB_DEMO_MAIN_DECL(name) 		tb_int_t tb_demo_##name##_main(tb_int_t argc, tb_char_t** argv)
+#define TB_DEMO_MAIN_DECL(name)         tb_int_t tb_demo_##name##_main(tb_int_t argc, tb_char_t** argv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
-// flv
-TB_DEMO_MAIN_DECL(flv);
 
 // database
 TB_DEMO_MAIN_DECL(database_sql);
@@ -87,6 +84,7 @@ TB_DEMO_MAIN_DECL(utils_base32);
 TB_DEMO_MAIN_DECL(utils_base64);
 
 // other
+TB_DEMO_MAIN_DECL(other_flv);
 TB_DEMO_MAIN_DECL(other_test);
 TB_DEMO_MAIN_DECL(other_charset);
 
@@ -100,7 +98,7 @@ TB_DEMO_MAIN_DECL(object_dump);
 
 // stream
 TB_DEMO_MAIN_DECL(stream_transfer_pool);
-TB_DEMO_MAIN_DECL(stream_transfer);
+TB_DEMO_MAIN_DECL(stream_async_transfer);
 TB_DEMO_MAIN_DECL(stream_async_stream);
 TB_DEMO_MAIN_DECL(stream_basic_stream);
 TB_DEMO_MAIN_DECL(stream_basic_stream_zip);
@@ -135,6 +133,7 @@ TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_http);
+TB_DEMO_MAIN_DECL(network_date);
 TB_DEMO_MAIN_DECL(network_whois);
 TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
@@ -143,7 +142,7 @@ TB_DEMO_MAIN_DECL(network_cookies);
 TB_DEMO_MAIN_DECL(platform_file);
 TB_DEMO_MAIN_DECL(platform_lock);
 TB_DEMO_MAIN_DECL(platform_path);
-TB_DEMO_MAIN_DECL(platform_ctime);
+TB_DEMO_MAIN_DECL(platform_cache_time);
 TB_DEMO_MAIN_DECL(platform_event);
 TB_DEMO_MAIN_DECL(platform_utils);
 TB_DEMO_MAIN_DECL(platform_timer);

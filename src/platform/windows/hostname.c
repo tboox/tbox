@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		hostname.c
+ * @author      ruki
+ * @file        hostname.c
  *
  */
 
@@ -33,6 +33,6 @@
 
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
 {
-	return !gethostname(name, size)? tb_true : tb_false;
+    return !gethostname(name, size)? tb_true : tb_false;
 }
 

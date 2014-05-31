@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.S
+ * @author      ruki
+ * @file        prefix.S
  *
  */
 
@@ -31,19 +31,19 @@
  */
 
 #ifdef TB_ARCH_ARM_THUMB
-# 	define A @
-# 	define T
+#   define A @
+#   define T
 #else
-# 	define A
-# 	define T @
+#   define A
+#   define T @
 #endif
 
 #ifdef TB_ARCH_ELF
-# 	define ELF
-# 	define EXTERN_ASM
+#   define ELF
+#   define EXTERN_ASM
 #else
-# 	define ELF @
-# 	define EXTERN_ASM _
+#   define ELF @
+#   define EXTERN_ASM _
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -51,15 +51,15 @@
  */
 
 #if defined(TB_ARCH_ARM_v7A)
- 		.arch armv7-a
+        .arch armv7-a
 #elif defined(TB_ARCH_ARM_v7)
- 		.arch armv7
+        .arch armv7
 #elif defined(TB_ARCH_ARM_v6) 
- 		.arch armv6
+        .arch armv6
 #elif defined(TB_ARCH_ARM_v5te) 
- 		.arch armv5te
+        .arch armv5te
 #elif defined(TB_ARCH_ARM_v5) 
- 		.arch armv5
+        .arch armv5
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -67,27 +67,29 @@
  */
 
 #if defined(TB_ARCH_ARM_NEON) && !defined(TB_ARCH_ARM64)
- 		.fpu neon
+        .fpu neon
 #elif defined(TB_ARCH_VFP)
- 		.fpu vfp
+        .fpu vfp
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * syntax
  */
 #ifndef TB_ARCH_ARM64
- 		.syntax unified
+        .syntax unified
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * thumb
  */
-T 		.thumb
+
+// will crash
+//T       .thumb
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * eabi
  */
-ELF 	.eabi_attribute 25, 1 
+ELF     .eabi_attribute 25, 1 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -96,26 +98,48 @@ ELF 	.eabi_attribute 25, 1
 /*! function
  * 
  * @code
- 	function func_xxxx, export=1
-		...
- 		bx lr
- 	endfunc
+    function func_xxxx, export=1
+        ...
+        bx lr
+    endfunc
    @endcode
  */
 .macro function name, export=0
- 	.macro endfunc
-ELF 	.size \name, . - \name
- 		.endfunc
- 		.purgem endfunc
- 	.endm
+    .macro endfunc
+ELF     .size \name, . - \name
+        .endfunc
+        .purgem endfunc
+    .endm
 
- 		.text
- 		.align 2
- 	.if \export
- 		.global EXTERN_ASM\name
+        .text
+#ifdef TB_ARCH_ARM64
+        .align 8
+#else 
+        .align 4
+#endif
+    .if \export
+        .global EXTERN_ASM\name
 EXTERN_ASM\name:
- 	.endif
-ELF 	.type \name, %function
- 		.func \name
+    .endif
+ELF     .type \name, %function
+        .func \name
+\name:
+.endm
+
+/*! label
+ * 
+ * @code
+    label name
+       xxx
+       xxx
+       bl name
+   @endcode
+ */
+.macro label name
+#ifdef TB_ARCH_ARM64
+        .align 8
+#else 
+        .align 4
+#endif
 \name:
 .endm

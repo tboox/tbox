@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strrstr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        strrstr.c
+ * @ingroup     libc
  *
  */
 
@@ -32,6 +32,6 @@
  */
 tb_char_t* tb_strrstr(tb_char_t const* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1, tb_null);
-	return tb_strnrstr(s1, tb_strlen(s1), s2);
+    tb_assert_and_check_return_val(s1, tb_null);
+    return tb_strnrstr(s1, tb_strlen(s1), s2);
 }

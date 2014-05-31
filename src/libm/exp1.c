@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		exp1.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        exp1.c
+ * @ingroup     libm
  *
  */
 
@@ -32,6 +32,6 @@
  */
 tb_double_t tb_exp1(tb_double_t x)
 {
-	tb_assert(x >= -1 && x <= 1);
-	return (1 + (x) + ((x) * (x)) / 2 + ((x) * (x) * (x)) / 6);
+    tb_assert(x >= -1 && x <= 1);
+    return (1 + (x) + ((x) * (x)) / 2 + ((x) * (x) * (x)) / 6);
 }

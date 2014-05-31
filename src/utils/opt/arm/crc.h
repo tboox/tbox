@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		crc.h
+ * @author      ruki
+ * @file        crc.h
  *
  */
 #ifndef TB_UTILS_OPT_ARM_CRC_H
@@ -32,7 +32,7 @@
  * macros
  */
 #ifndef TB_ARCH_ARM64
-# 	define tb_crc32_encode(crc, ib, in, table) 	tb_crc32_encode_asm(crc, ib, in, table)
+#   define tb_crc32_encode(crc, ib, in, table)  tb_crc32_encode_asm(crc, ib, in, table)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

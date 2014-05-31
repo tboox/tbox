@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		directory.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        directory.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_DIRECTORY_H
@@ -34,7 +34,7 @@
  * types
  */
 /// the directory walk func type
-typedef tb_void_t 		(*tb_directory_walk_func_t)(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data);
+typedef tb_void_t       (*tb_directory_walk_func_t)(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -42,56 +42,56 @@ typedef tb_void_t 		(*tb_directory_walk_func_t)(tb_char_t const* path, tb_file_i
 
 /*! create the directory
  * 
- * @param path 			the directory path
+ * @param path          the directory path
  *
- * @return 				tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t 				tb_directory_create(tb_char_t const* path);
+tb_bool_t               tb_directory_create(tb_char_t const* path);
 
 /*! remove the directory
  * 
- * @param path 			the directory path
+ * @param path          the directory path
  *
- * @return 				tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t 				tb_directory_remove(tb_char_t const* path);
+tb_bool_t               tb_directory_remove(tb_char_t const* path);
 
 /*! the temporary directory
  * 
- * @param path 			the directory path data
- * @param maxn 			the directory path maxn
+ * @param path          the directory path data
+ * @param maxn          the directory path maxn
  *
- * @return 				the directory path size
+ * @return              the directory path size
  */
-tb_size_t 				tb_directory_temp(tb_char_t* path, tb_size_t maxn);
+tb_size_t               tb_directory_temp(tb_char_t* path, tb_size_t maxn);
 
 /*! the current directory
  * 
- * @param path 			the directory path data
- * @param maxn 			the directory path maxn
+ * @param path          the directory path data
+ * @param maxn          the directory path maxn
  *
- * @return 				the directory path size
+ * @return              the directory path size
  */
-tb_size_t 				tb_directory_curt(tb_char_t* path, tb_size_t maxn);
+tb_size_t               tb_directory_curt(tb_char_t* path, tb_size_t maxn);
 
 /*! the directory walk
  *
- * @param path 			the directory path
- * @param recursion 	is recursion?
- * @param prefix 		is prefix recursion? directory is the first item
- * @param func 			the callback func
- * @param data 			the callback data
+ * @param path          the directory path
+ * @param recursion     is recursion?
+ * @param prefix        is prefix recursion? directory is the first item
+ * @param func          the callback func
+ * @param data          the callback data
  * 
  */
-tb_void_t 				tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_pointer_t data);
+tb_void_t               tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv);
 
 /*! copy directory
  * 
- * @param path 			the directory path
- * @param dest 			the directory dest
+ * @param path          the directory path
+ * @param dest          the directory dest
  *
- * @return 				tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t 				tb_directory_copy(tb_char_t const* path, tb_char_t const* dest);
+tb_bool_t               tb_directory_copy(tb_char_t const* path, tb_char_t const* dest);
 
 #endif

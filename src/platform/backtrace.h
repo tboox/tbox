@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		backtrace.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        backtrace.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_BACKTRACE_H
@@ -35,46 +35,46 @@
 
 /*! get backtrace frames
  *
- * @param frames 		the backtrace frames
- * @param nframe 		the backtrace frame maxn
- * @param nskip 		the backtrace frame skip
+ * @param frames        the backtrace frames
+ * @param nframe        the backtrace frame maxn
+ * @param nskip         the backtrace frame skip
  *
- * @return 				the real backtrace frame count
+ * @return              the real backtrace frame count
  */
-tb_size_t 				tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip);
+tb_size_t               tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip);
 
 /*! init backtrace frame symbols
  *
- * @param frames 		the backtrace frames
- * @param nframe 		the backtrace frame count
+ * @param frames        the backtrace frames
+ * @param nframe        the backtrace frame count
  *
- * @return 				the backtrace frame symbols handle
+ * @return              the backtrace frame symbols handle
  */
-tb_handle_t 			tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe);
+tb_handle_t             tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe);
 
 /*! get backtrace frame symbol name
  *
- * @param symbols 		the symbols handle
- * @param frames 		the backtrace frames
- * @param nframe 		the backtrace frame count
- * @param frame 		the backtrace frame index
+ * @param symbols       the symbols handle
+ * @param frames        the backtrace frames
+ * @param nframe        the backtrace frame count
+ * @param frame         the backtrace frame index
  *
- * @return 				the symbol name
+ * @return              the symbol name
  */
-tb_char_t const* 		tb_backtrace_symbols_name(tb_handle_t symbols, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe);
+tb_char_t const*        tb_backtrace_symbols_name(tb_handle_t symbols, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe);
 
 /*! exit backtrace frame symbols
  *
- * @param symbols 		the symbols handle
+ * @param symbols       the symbols handle
  */
-tb_void_t 				tb_backtrace_symbols_exit(tb_handle_t symbols);
+tb_void_t               tb_backtrace_symbols_exit(tb_handle_t symbols);
 
 /*! dump backtrace
  *
- * @param prefix 		the backtrace prefix
- * @param frames 		the backtrace frames, dump the current frames if null
- * @param nframe 		the backtrace frame count
+ * @param prefix        the backtrace prefix
+ * @param frames        the backtrace frames, dump the current frames if null
+ * @param nframe        the backtrace frame count
  */
-tb_void_t 				tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe);
+tb_void_t               tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe);
 
 #endif

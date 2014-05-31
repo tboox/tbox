@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strlen.c
+ * @author      ruki
+ * @file        strlen.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-//# 	define TB_LIBC_STRING_OPT_STRLEN
+//#     define TB_LIBC_STRING_OPT_STRLEN
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,39 +39,39 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 static tb_size_t tb_strlen_impl(tb_char_t const* s)
 {
-	tb_assert_and_check_return_val(s, 0);
+    tb_assert_and_check_return_val(s, 0);
 
 #if 0
-	__tb_register__ tb_size_t r = 0;
-	__tb_asm__ __tb_volatile__
-	(
-		"repne\n"
-		"scasb\n"
-		"notl 	%0\n"
-		"decl 	%0"
+    __tb_register__ tb_size_t r = 0;
+    __tb_asm__ __tb_volatile__
+    (
+        "repne\n"
+        "scasb\n"
+        "notl   %0\n"
+        "decl   %0"
 
-		: "=c" (r)
-		: "D" (s), "a" (0), "0" (0xffffffffu)
-		: "memory"
-	);
-	return r;
+        : "=c" (r)
+        : "D" (s), "a" (0), "0" (0xffffffffu)
+        : "memory"
+    );
+    return r;
 #else
-	__tb_register__ tb_size_t r = 0;
-	__tb_asm__ __tb_volatile__
-	(
-		" 	movl 	%1, %0\n"
-		" 	decl 	%0\n"
-		"1:\n"	
-		" 	incl 	%0\n"
-		" 	cmpb 	$0, (%0)\n"
-		" 	jne 	1b\n"
-		" 	subl 	%1, %0"
+    __tb_register__ tb_size_t r = 0;
+    __tb_asm__ __tb_volatile__
+    (
+        "   movl    %1, %0\n"
+        "   decl    %0\n"
+        "1:\n"  
+        "   incl    %0\n"
+        "   cmpb    $0, (%0)\n"
+        "   jne     1b\n"
+        "   subl    %1, %0"
 
-		: "=a" (r)
-		: "d" (s)
-		: "memory"
-	);
-	return r;
+        : "=a" (r)
+        : "d" (s)
+        : "memory"
+    );
+    return r;
 #endif
 }
 #endif

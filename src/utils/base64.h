@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		base.h
- * @ingroup 	utils
+ * @author      ruki
+ * @file        base.h
+ * @ingroup     utils
  *
  */
 #ifndef TB_UTILS_BASE64_H
@@ -35,25 +35,25 @@
 
 /*! encode base64
  *
- * @param ib 		the input data
- * @param in 		the input size
- * @param ob 		the output data
- * @param on 		the output size
+ * @param ib        the input data
+ * @param in        the input size
+ * @param ob        the output data
+ * @param on        the output size
  *
- * @return 			the real size
+ * @return          the real size
  */
-tb_size_t 			tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
+tb_size_t           tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
 
 /*! encode base64
  *
- * @param ib 		the input data
- * @param in 		the input size
- * @param ob 		the output data
- * @param on 		the output size
+ * @param ib        the input data
+ * @param in        the input size
+ * @param ob        the output data
+ * @param on        the output size
  *
- * @return 			the real size
+ * @return          the real size
  */
-tb_size_t 			tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on);
+tb_size_t           tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on);
 
 #endif
 

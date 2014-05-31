@@ -82,7 +82,7 @@ tbox_C_FILES 			+= \
 						stream/basic_stream/data \
 						stream/basic_stream/sock \
 						stream/basic_stream/filter \
-						stream/transfer \
+						stream/basic_transfer \
 						stream/filter/filter \
 						stream/filter/cache \
 						stream/filter/chunked \
@@ -218,7 +218,6 @@ tbox_C_FILES 			+= \
 						platform/path \
 						platform/file \
 						platform/time \
-						platform/ctime \
 						platform/sched \
 						platform/timer \
 						platform/ltimer \
@@ -236,6 +235,7 @@ tbox_C_FILES 			+= \
 						platform/directory \
 						platform/semaphore \
 						platform/backtrace \
+						platform/cache_time \
 						platform/thread_pool \
 						platform/thread_store \
 						platform/asio/aioo \
@@ -286,6 +286,8 @@ tbox_C_FILES 			+= \
 						stream/async_stream/data \
 						stream/async_stream/sock \
 						stream/async_stream/filter \
+						stream/async_stream/prefix \
+						stream/async_transfer \
 						stream/transfer_pool \
 						platform/asio/aicp
 
@@ -353,6 +355,19 @@ tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_MYSQL) += \
 
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_SQLITE3) += \
 						database/sqlite3
+endif
+
+# ios
+ifeq ($(PLAT),ios)
+tbox_M_FILES 			+= \
+						platform/mach/ios/directory
+endif
+
+# android
+ifeq ($(PLAT),android)
+tbox_C_FILES 			+= \
+						platform/linux/android/android \
+						platform/linux/android/directory 
 endif
 
 # flags
@@ -461,13 +476,13 @@ INC_FILES 				= \
 						container/vector.h \
 						container/iterator.h \
 						container/single_list.h \
+						container/bloom_filter.h \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/dns.h \
 						platform/file.h \
 						platform/path.h \
 						platform/time.h \
-						platform/ctime.h \
 						platform/sched.h \
 						platform/mutex.h \
 						platform/timer.h \
@@ -487,6 +502,8 @@ INC_FILES 				= \
 						platform/directory.h \
 						platform/exception.h \
 						platform/backtrace.h \
+						platform/semaphore.h \
+						platform/cache_time.h \
 						platform/thread_pool.h \
 						platform/thread_store.h \
 						platform/compiler/prefix.h \
@@ -515,6 +532,8 @@ INC_FILES 				= \
 						platform/windows/exception.h \
 						platform/libc/prefix.h \
 						platform/libc/exception.h \
+						platform/mach/prefix.h \
+						platform/mach/barrier.h \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \
@@ -535,6 +554,8 @@ INC_FILES 				= \
 						stream/async_stream.h \
 						stream/static_stream.h \
 						stream/transfer_pool.h \
+						stream/async_transfer.h \
+						stream/basic_transfer.h \
 						stream/transfer.h \
 						stream/filter/prefix.h \
 						stream/filter/filter.h \

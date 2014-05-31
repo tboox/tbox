@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		print.h
- * @ingroup 	platform
+ * @author      ruki
+ * @file        print.h
+ * @ingroup     platform
  *
  */
 #ifndef TB_PLATFORM_PRINT_H
@@ -36,18 +36,18 @@
 
 /*! print string and without newline
  *
- * @param string 	the print string
+ * @param string    the print string
  */
-tb_void_t 			tb_print(tb_char_t const* string);
+tb_void_t           tb_print(tb_char_t const* string);
 
 /*! print string and newline
  *
- * @param string 	the print string
+ * @param string    the print string
  */
-tb_void_t 			tb_printl(tb_char_t const* string);
+tb_void_t           tb_printl(tb_char_t const* string);
 
 /*! sync print
  */
-tb_void_t 			tb_print_sync(tb_noarg_t);
+tb_void_t           tb_print_sync(tb_noarg_t);
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		database.h
- * @defgroup 	database
+ * @author      ruki
+ * @file        database.h
+ * @defgroup    database
  */
 #ifndef TB_DATABASE_H
 #define TB_DATABASE_H

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		for.h
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        for.h
+ * @ingroup     algorithm
  *
  */
 #ifndef TB_ALGORITHM_FOR_H
@@ -38,34 +38,34 @@
  * @code
  * tb_for(tb_char_t*, item, tb_iterator_head(iterator), tb_iterator_tail(iterator), iterator)
  * {
- * 		tb_trace_d("item: %s", item);
+ *      tb_trace_d("item: %s", item);
  * }
  *
  * tb_for(tb_size_t, item, tb_iterator_head(iterator), tb_iterator_tail(iterator), iterator)
  * {
- * 		tb_trace_d("item: %lu", item);
+ *      tb_trace_d("item: %lu", item);
  * }
  *
  * tb_for(tb_hash_item_t*, item, tb_iterator_head(iterator), tb_iterator_tail(iterator), iterator)
  * {
- * 		if (item) tb_trace_d("item: %p => %p", item->name, item->data);
+ *      if (item) tb_trace_d("item: %p => %p", item->name, item->data);
  * }
  * @endcode
  */
 #define tb_for(type, item, head, tail, iterator) \
-			/* iterator */ \
-			tb_iterator_t* item##_iterator = (tb_iterator_t*)iterator; \
-			tb_assert(!item##_iterator || (tb_iterator_mode(item##_iterator) & TB_ITERATOR_MODE_FORWARD)); \
-			/* init */ \
-			type item; \
-			tb_size_t item##_itor = head; \
-			tb_size_t item##_head = head; \
-			tb_size_t item##_tail = tail; \
-			/* walk */ \
-			if (item##_iterator && item##_head != item##_tail) \
-				for ( 	; \
-						item##_itor != item##_tail && ((item = (type)tb_iterator_item(item##_iterator, item##_itor)), 1); \
-						item##_itor = tb_iterator_next(item##_iterator, item##_itor))
+            /* iterator */ \
+            tb_iterator_t* item##_iterator = (tb_iterator_t*)iterator; \
+            tb_assert(!item##_iterator || (tb_iterator_mode(item##_iterator) & TB_ITERATOR_MODE_FORWARD)); \
+            /* init */ \
+            type item; \
+            tb_size_t item##_itor = head; \
+            tb_size_t item##_head = head; \
+            tb_size_t item##_tail = tail; \
+            /* walk */ \
+            if (item##_iterator && item##_head != item##_tail) \
+                for (   ; \
+                        item##_itor != item##_tail && ((item = (type)tb_iterator_item(item##_iterator, item##_itor)), 1); \
+                        item##_itor = tb_iterator_next(item##_iterator, item##_itor))
 
 /*! for all items using iterator
  *
@@ -73,21 +73,21 @@
  *
  * tb_for_all(tb_char_t*, item, iterator)
  * {
- * 		tb_trace_d("item: %s", item);
+ *      tb_trace_d("item: %s", item);
  * }
  *
  * tb_for_all(tb_size_t, item, iterator)
  * {
- * 		tb_trace_d("item: %lu", item);
+ *      tb_trace_d("item: %lu", item);
  * }
  *
  * tb_for_all(tb_hash_item_t*, item, iterator)
  * {
- * 		if (item) tb_trace_d("item: %p => %p", item->name, item->data);
+ *      if (item) tb_trace_d("item: %p => %p", item->name, item->data);
  * }
  * @endcode
  */
 #define tb_for_all(type, item, iterator) \
-			tb_for(type, item, tb_iterator_head((tb_iterator_t*)iterator), tb_iterator_tail((tb_iterator_t*)iterator), iterator)
+            tb_for(type, item, tb_iterator_head((tb_iterator_t*)iterator), tb_iterator_tail((tb_iterator_t*)iterator), iterator)
 
 #endif

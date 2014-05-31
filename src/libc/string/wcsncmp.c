@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsncmp.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsncmp.c
+ * @ingroup     libc
  *
  */
 
@@ -32,16 +32,16 @@
  */
 tb_long_t tb_wcsncmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	tb_check_return_val(s1 != s2 && n, 0);
-		
-	// done
-	while (n && (*((tb_wchar_t *)s1) == *((tb_wchar_t *)s2)))
-	{
-		if (!*s1++) return 0;
-		++s2;
-		--n;
-	}
-	return n? (*((tb_wchar_t *)s1) - *((tb_wchar_t *)s2)) : 0;
+    // check
+    tb_assert_and_check_return_val(s1 && s2, 0);
+    tb_check_return_val(s1 != s2 && n, 0);
+        
+    // done
+    while (n && (*((tb_wchar_t *)s1) == *((tb_wchar_t *)s2)))
+    {
+        if (!*s1++) return 0;
+        ++s2;
+        --n;
+    }
+    return n? (*((tb_wchar_t *)s1) - *((tb_wchar_t *)s2)) : 0;
 }

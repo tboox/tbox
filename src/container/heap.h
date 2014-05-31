@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		heap.h
- * @ingroup 	container
+ * @author      ruki
+ * @file        heap.h
+ * @ingroup     container
  *
  */
 #ifndef TB_CONTAINER_HEAP_H
@@ -36,7 +36,7 @@
  */
 
 /// the heap type
-typedef tb_void_t 	tb_heap_t;
+typedef tb_void_t   tb_heap_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -44,76 +44,76 @@ typedef tb_void_t 	tb_heap_t;
 
 /*! init heap, default: minheap
  *
- * @param grow 		the item grow
- * @param func 		the item func
+ * @param grow      the item grow
+ * @param func      the item func
  *
- * @return 			the heap
+ * @return          the heap
  */
-tb_heap_t* 			tb_heap_init(tb_size_t grow, tb_item_func_t func);
+tb_heap_t*          tb_heap_init(tb_size_t grow, tb_item_func_t func);
 
 /*! exist heap
  *
- * @param heap 		the heap
+ * @param heap      the heap
  */
-tb_void_t 			tb_heap_exit(tb_heap_t* heap);
+tb_void_t           tb_heap_exit(tb_heap_t* heap);
 
 /*! clear the heap
  *
- * @param heap 		the heap
+ * @param heap      the heap
  */
-tb_void_t 			tb_heap_clear(tb_heap_t* heap);
+tb_void_t           tb_heap_clear(tb_heap_t* heap);
 
 /*! the heap size
  *
- * @param heap 		the heap
+ * @param heap      the heap
  *
- * @return 			the heap size
+ * @return          the heap size
  */
-tb_size_t 			tb_heap_size(tb_heap_t const* heap);
+tb_size_t           tb_heap_size(tb_heap_t const* heap);
 
 /*! the heap grow
  *
- * @param heap 		the heap
+ * @param heap      the heap
  *
- * @return 			the heap grow
+ * @return          the heap grow
  */
-tb_size_t 			tb_heap_grow(tb_heap_t const* heap);
+tb_size_t           tb_heap_grow(tb_heap_t const* heap);
 
 /*! the heap maxn
  *
- * @param heap 		the heap
+ * @param heap      the heap
  *
- * @return 			the heap maxn
+ * @return          the heap maxn
  */
-tb_size_t 			tb_heap_maxn(tb_heap_t const* heap);
+tb_size_t           tb_heap_maxn(tb_heap_t const* heap);
 
 /*! the heap top item
  *
- * @param heap 		the heap
+ * @param heap      the heap
  *
- * @return 			the heap top item
+ * @return          the heap top item
  */
-tb_pointer_t 		tb_heap_top(tb_heap_t* heap);
+tb_pointer_t        tb_heap_top(tb_heap_t* heap);
 
 /*! put the heap item
  *
- * @param heap 		the heap
- * @param data 		the item data
+ * @param heap      the heap
+ * @param data      the item data
  */
-tb_void_t 	 		tb_heap_put(tb_heap_t* heap, tb_cpointer_t data);
+tb_void_t           tb_heap_put(tb_heap_t* heap, tb_cpointer_t data);
 
 /*! pop the heap item
  *
- * @param heap 		the heap
+ * @param heap      the heap
  */
-tb_void_t 	 		tb_heap_pop(tb_heap_t* heap);
+tb_void_t           tb_heap_pop(tb_heap_t* heap);
 
 /*! del the heap item
  *
- * @param heap 		the heap
- * @param itor 		the itor
+ * @param heap      the heap
+ * @param itor      the itor
  */
-tb_void_t 	 		tb_heap_del(tb_heap_t* heap, tb_size_t itor);
+tb_void_t           tb_heap_del(tb_heap_t* heap, tb_size_t itor);
 
 #endif
 

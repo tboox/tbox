@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		aioe.h
- * @ingroup 	asio
+ * @author      ruki
+ * @file        aioe.h
+ * @ingroup     asio
  *
  */
 #ifndef TB_ASIO_AIOE_H
@@ -37,27 +37,27 @@
 /// the aioe code enum, only for sock
 typedef enum __tb_aioe_code_e
 {
- 	TB_AIOE_CODE_NONE 		= 0x0000
-, 	TB_AIOE_CODE_CONN 		= 0x0001
-, 	TB_AIOE_CODE_ACPT 		= 0x0002
-,	TB_AIOE_CODE_RECV 		= 0x0004
-,	TB_AIOE_CODE_SEND 		= 0x0008
-, 	TB_AIOE_CODE_EALL 		= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND | TB_AIOE_CODE_ACPT | TB_AIOE_CODE_CONN
-,	TB_AIOE_CODE_ONESHOT 	= 0x0010
+    TB_AIOE_CODE_NONE       = 0x0000
+,   TB_AIOE_CODE_CONN       = 0x0001
+,   TB_AIOE_CODE_ACPT       = 0x0002
+,   TB_AIOE_CODE_RECV       = 0x0004
+,   TB_AIOE_CODE_SEND       = 0x0008
+,   TB_AIOE_CODE_EALL       = TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND | TB_AIOE_CODE_ACPT | TB_AIOE_CODE_CONN
+,   TB_AIOE_CODE_ONESHOT    = 0x0010
 
 }tb_aioe_code_e;
 
 /// the aioe type
 typedef struct __tb_aioe_t
 {
-	// the code
-	tb_size_t 				code;
+    // the code
+    tb_size_t               code;
 
-	// the data
-	tb_pointer_t 			data;
+    // the data
+    tb_pointer_t            data;
 
-	// the aioo
-	tb_aioo_t* 				aioo;
+    // the aioo
+    tb_aioo_t*              aioo;
 
 }tb_aioe_t;
 

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		sched.c
- * @ingroup 	platform
+ * @author      ruki
+ * @file        sched.c
+ * @ingroup     platform
  *
  */
 
@@ -31,13 +31,13 @@
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-# 	include "windows/sched.c"
+#   include "windows/sched.c"
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-# 	include "posix/sched.c"
+#   include "posix/sched.c"
 #else
 tb_bool_t tb_sched_yield()
 {
-	tb_trace_noimpl();
-	return tb_false;
+    tb_trace_noimpl();
+    return tb_false;
 }
 #endif

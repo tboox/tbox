@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memmov.c
+ * @author      ruki
+ * @file        memmov.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-# 	define TB_LIBC_STRING_OPT_MEMMOV
+#   define TB_LIBC_STRING_OPT_MEMMOV
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,26 +39,26 @@
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	tb_long_t eax, ecx, esi, edi;
-	__tb_asm__ __tb_volatile__
-	(
-		" 	movl 	%%eax, %%edi\n"
-		" 	cmpl 	%%esi, %%eax\n"
-		" 	je		2f\n" /* (optional) s2 == s1 -> NOP */
-		" 	jb		1f\n" /* s2 > s1 -> simple copy */
-		" 	leal	-1(%%esi,%%ecx), %%esi\n"
-		" 	leal 	-1(%%eax,%%ecx), %%edi\n"
-		" 	std\n"
-		"1:	rep; 	movsb\n"
-		" 	cld\n"
-		"2:\n"
+    tb_long_t eax, ecx, esi, edi;
+    __tb_asm__ __tb_volatile__
+    (
+        "   movl    %%eax, %%edi\n"
+        "   cmpl    %%esi, %%eax\n"
+        "   je      2f\n" /* (optional) s2 == s1 -> NOP */
+        "   jb      1f\n" /* s2 > s1 -> simple copy */
+        "   leal    -1(%%esi,%%ecx), %%esi\n"
+        "   leal    -1(%%eax,%%ecx), %%edi\n"
+        "   std\n"
+        "1: rep;    movsb\n"
+        "   cld\n"
+        "2:\n"
 
-		: "=&c" (ecx), "=&S" (esi), "=&a" (eax), "=&D" (edi)
-		: "0" (n), "1" (s2), "2" (s1)
-		: "memory"
-	);
-	return (tb_pointer_t)eax;
+        : "=&c" (ecx), "=&S" (esi), "=&a" (eax), "=&D" (edi)
+        : "0" (n), "1" (s2), "2" (s1)
+        : "memory"
+    );
+    return (tb_pointer_t)eax;
 }
 #endif

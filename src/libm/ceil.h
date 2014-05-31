@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		ceil.h
- * @ingroup 	libm
+ * @author      ruki
+ * @file        ceil.h
+ * @ingroup     libm
  *
  */
 #ifndef TB_LIBM_CEIL_H
@@ -32,6 +32,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_ceil(x) 				((x) > 0? (tb_int32_t)((x) + 0.9999999999) : (tb_int32_t)(x))
+#define tb_ceil(x)              ((x) > 0? (tb_int32_t)((x) + 0.9999999999) : (tb_int32_t)(x))
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		string_pool.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        string_pool.c
+ * @ingroup     container
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ static tb_void_t tb_item_func_string_pool_free(tb_item_func_t* func, tb_pointer_
     // check
     tb_assert_and_check_return(func && item);
 
-	// free item
+    // free item
     if (*((tb_pointer_t*)item)) tb_string_pool_del(tb_string_pool(), *((tb_pointer_t*)item));
 }
 static tb_void_t tb_item_func_string_pool_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
@@ -42,7 +42,7 @@ static tb_void_t tb_item_func_string_pool_dupl(tb_item_func_t* func, tb_pointer_
     // check
     tb_assert_and_check_return(func && item);
  
-	// dupl item
+    // dupl item
     if (data) *((tb_pointer_t*)item) = (tb_pointer_t)tb_string_pool_put(tb_string_pool(), data);
     else *((tb_pointer_t*)item) = tb_null;
 }
@@ -66,30 +66,30 @@ static tb_void_t tb_item_func_string_pool_repl(tb_item_func_t* func, tb_pointer_
  */
 tb_item_func_t tb_item_func_string_pool(tb_handle_t spool)
 {
-	// check
-	tb_assert(spool);
+    // check
+    tb_assert(spool);
 
-	// the str func
-	tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
+    // the str func
+    tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
 
-	// init func
-	tb_item_func_t func = {0};
-	func.type 	= TB_ITEM_TYPE_STRING_POOL;
-	func.hash 	= func_str.hash;
-	func.comp 	= func_str.comp;
-	func.data 	= func_str.data;
-	func.cstr 	= func_str.cstr;
-	func.free 	= tb_item_func_string_pool_free;
-	func.dupl 	= tb_item_func_string_pool_dupl;
-	func.repl 	= tb_item_func_string_pool_repl;
-	func.copy 	= func_str.copy;
-	func.nfree 	= func_str.nfree;
-	func.ndupl 	= func_str.ndupl;
-	func.nrepl 	= func_str.nrepl;
-	func.ncopy 	= func_str.ncopy;
-	func.pool 	= spool;
-	func.size 	= sizeof(tb_char_t*);
+    // init func
+    tb_item_func_t func = {0};
+    func.type   = TB_ITEM_TYPE_STRING_POOL;
+    func.hash   = func_str.hash;
+    func.comp   = func_str.comp;
+    func.data   = func_str.data;
+    func.cstr   = func_str.cstr;
+    func.free   = tb_item_func_string_pool_free;
+    func.dupl   = tb_item_func_string_pool_dupl;
+    func.repl   = tb_item_func_string_pool_repl;
+    func.copy   = func_str.copy;
+    func.nfree  = func_str.nfree;
+    func.ndupl  = func_str.ndupl;
+    func.nrepl  = func_str.nrepl;
+    func.ncopy  = func_str.ncopy;
+    func.pool   = spool;
+    func.size   = sizeof(tb_char_t*);
 
-	// ok?
-	return func;
+    // ok?
+    return func;
 }

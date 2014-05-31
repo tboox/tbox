@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		random.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        random.c
+ * @ingroup     libc
  *
  */
 
@@ -33,10 +33,10 @@
  */
 tb_void_t tb_srandom(tb_size_t seed)
 {
-	tb_random_seed(tb_random_generator(), seed);
+    tb_random_seed(tb_random_generator(), seed);
 }
 tb_long_t tb_random()
 {
-	return tb_random_value(tb_random_generator());
+    return tb_random_value(tb_random_generator());
 }
 

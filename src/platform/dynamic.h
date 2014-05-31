@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		mutex.h
- * @ingroup 	dynamic
+ * @author      ruki
+ * @file        mutex.h
+ * @ingroup     dynamic
  *
  */
 #ifndef TB_PLATFORM_DYNAMIC_H
@@ -36,34 +36,34 @@
 
 /*! init dynamic library
  * 
- * @param name 		the library name
+ * @param name      the library name
  *
- * @return 			the library handle
+ * @return          the library handle
  */
-tb_handle_t 		tb_dynamic_init(tb_char_t const* name);
+tb_handle_t         tb_dynamic_init(tb_char_t const* name);
 
 /*! exit dynamic library
  * 
- * @param dynamic 	the library handle
+ * @param dynamic   the library handle
  */
-tb_void_t 			tb_dynamic_exit(tb_handle_t handle);
+tb_void_t           tb_dynamic_exit(tb_handle_t handle);
 
 /*! the dynamic library function
  * 
- * @param handle 	the library handle
- * @param name 		the function name
+ * @param handle    the library handle
+ * @param name      the function name
  *
- * @return 			the function address
+ * @return          the function address
  */
-tb_pointer_t 		tb_dynamic_func(tb_handle_t handle, tb_char_t const* name);
+tb_pointer_t        tb_dynamic_func(tb_handle_t handle, tb_char_t const* name);
 
 /*! the dynamic library variable
  * 
- * @param handle 	the library handle
- * @param name 		the variable name
+ * @param handle    the library handle
+ * @param name      the variable name
  *
- * @return 			the variable address
+ * @return          the variable address
  */
-tb_pointer_t 		tb_dynamic_pvar(tb_handle_t handle, tb_char_t const* name);
+tb_pointer_t        tb_dynamic_pvar(tb_handle_t handle, tb_char_t const* name);
 
 #endif

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		memcpy.c
+ * @author      ruki
+ * @file        memcpy.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-# 	define TB_LIBC_STRING_OPT_MEMCPY
+#   define TB_LIBC_STRING_OPT_MEMCPY
 #endif
 
 
@@ -40,24 +40,24 @@
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-	tb_long_t d0, d1, d2;
-	__tb_asm__ __tb_volatile__
-	(
-		" 	rep; 	movsl\n"
-		" 	movl 	%4, %%ecx\n"
-		" 	andl 	$3, %%ecx\n"
-		/* jz is optional. avoids "rep; movsb" with ecx == 0,
-		* but adds a branch, which is currently (2008) faster */
-		" 	jz		1f\n"
-		" 	rep; 	movsb\n"
-		"1:\n"
+    tb_long_t d0, d1, d2;
+    __tb_asm__ __tb_volatile__
+    (
+        "   rep;    movsl\n"
+        "   movl    %4, %%ecx\n"
+        "   andl    $3, %%ecx\n"
+        /* jz is optional. avoids "rep; movsb" with ecx == 0,
+        * but adds a branch, which is currently (2008) faster */
+        "   jz      1f\n"
+        "   rep;    movsb\n"
+        "1:\n"
 
-		: "=&c" (d0), "=&D" (d1), "=&S" (d2)
-		: "0" (n / 4), "g" (n), "1" ((tb_size_t)s1), "2" ((tb_size_t)s2)
-		: "memory"
-	);
-	return s1;
+        : "=&c" (d0), "=&D" (d1), "=&S" (d2)
+        : "0" (n / 4), "g" (n), "1" ((tb_size_t)s1), "2" ((tb_size_t)s2)
+        : "memory"
+    );
+    return s1;
 }
 #endif

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		barrier.h
+ * @author      ruki
+ * @file        barrier.h
  *
  */
 #ifndef TB_PLATFORM_MACH_BARRIER_H
@@ -32,7 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_barrier() 		OSMemoryBarrier()
+#define tb_barrier()        OSMemoryBarrier()
 
 
 #endif

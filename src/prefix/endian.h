@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		endian.h
+ * @author      ruki
+ * @file        endian.h
  *
  */
 #ifndef TB_PREFIX_ENDIAN_H
@@ -34,18 +34,18 @@
 
 // words endian
 #ifdef __BYTE_ORDER__
-# 	if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
-# 		define TB_WORDS_BIGENDIAN
-# 		error check it
-# 	endif
+#   if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+#       define TB_WORDS_BIGENDIAN
+#       error check it
+#   endif
 #endif
 
 // float endian
 #ifdef __FLOAT_WORD_ORDER__
-# 	if __FLOAT_WORD_ORDER__ != __ORDER_LITTLE_ENDIAN__
-# 	define TB_FLOAT_BIGENDIAN
-# 		error check it
-# 	endif
+#   if __FLOAT_WORD_ORDER__ != __ORDER_LITTLE_ENDIAN__
+#   define TB_FLOAT_BIGENDIAN
+#       error check it
+#   endif
 #endif
 
 #endif

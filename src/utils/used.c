@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		used.c
- * @ingroup 	utils
+ * @author      ruki
+ * @file        used.c
+ * @ingroup     utils
  *
  */
 

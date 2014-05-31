@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcsirchr.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcsirchr.c
+ * @ingroup     libc
  *
  */
 
@@ -32,6 +32,6 @@
  */
 tb_wchar_t* tb_wcsirchr(tb_wchar_t const* s, tb_wchar_t c)
 {
-	tb_assert_and_check_return_val(s, tb_null);
-	return tb_wcsnirchr(s, tb_wcslen(s), c);
+    tb_assert_and_check_return_val(s, tb_null);
+    return tb_wcsnirchr(s, tb_wcslen(s), c);
 }

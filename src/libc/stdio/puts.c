@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		puts.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        puts.c
+ * @ingroup     libc
  *
  */
 
@@ -35,12 +35,12 @@
 
 tb_long_t tb_puts(tb_char_t const* string)
 {
-	// check
-	tb_check_return_val(string, 0);
+    // check
+    tb_check_return_val(string, 0);
 
-	// print it
-	tb_printl(string);
+    // print it
+    tb_printl(string);
 
-	// ok?
-	return tb_strlen(string);
+    // ok?
+    return tb_strlen(string);
 }

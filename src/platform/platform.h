@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @author      ruki
+ * @file        platform.h
+ * @defgroup    platform
  *
  */
 #ifndef TB_PLATFORM_H
@@ -34,7 +34,7 @@
 #include "time.h"
 #include "mutex.h"
 #include "event.h"
-#include "ctime.h"
+#include "cache_time.h"
 #include "timer.h"
 #include "print.h"
 #include "ltimer.h"
@@ -59,13 +59,17 @@
  * interfaces
  */
 
-/*!init the platform
+/*! init the platform
  *
- * @return tb_true or tb_false
+ * @param priv      the platform private data
+ *                  pass JNIEnv* env for android
+ *                  pass tb_null for other platform
+ *
+ * @return          tb_true or tb_false
  */
-tb_bool_t 	tb_platform_init(tb_noarg_t);
+tb_bool_t           tb_platform_init(tb_handle_t priv);
 
 /// exit the platform 
-tb_void_t 	tb_platform_exit(tb_noarg_t);
+tb_void_t           tb_platform_exit(tb_noarg_t);
 
 #endif

@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		bloom_filter.h
- * @ingroup 	container
+ * @author      ruki
+ * @file        bloom_filter.h
+ * @ingroup     container
  *
  */
 #ifndef TB_CONTAINER_BLOOM_FILTER_H
@@ -35,9 +35,9 @@
  */
 
 // the item maxn
-#define TB_BLOOM_FILTER_ITEM_MAXN_MICRO 				(1 << 16)
-#define TB_BLOOM_FILTER_ITEM_MAXN_SMALL 				(1 << 20)
-#define TB_BLOOM_FILTER_ITEM_MAXN_LARGE 				(1 << 24)
+#define TB_BLOOM_FILTER_ITEM_MAXN_MICRO                 (1 << 16)
+#define TB_BLOOM_FILTER_ITEM_MAXN_SMALL                 (1 << 20)
+#define TB_BLOOM_FILTER_ITEM_MAXN_LARGE                 (1 << 24)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -106,18 +106,18 @@
  * c = p^(1/k)
  * s = m / n = 2k / (2c + c * c)
  */
-typedef tb_void_t 		tb_bloom_filter_t;
+typedef tb_void_t       tb_bloom_filter_t;
 
 /// the probability of false positives
 typedef enum __tb_bloom_filter_probability_e
 {
-	TB_BLOOM_FILTER_PROBABILITY_0_1 		= 3 ///!< 1 / 2^3 = 0.125 ~= 0.1
-,	TB_BLOOM_FILTER_PROBABILITY_0_01 		= 6 ///!< 1 / 2^6 = 0.015625 ~= 0.01
-,	TB_BLOOM_FILTER_PROBABILITY_0_001 		= 10 ///!< 1 / 2^10 = 0.0009765625 ~= 0.001
-,	TB_BLOOM_FILTER_PROBABILITY_0_0001 		= 13 ///!< 1 / 2^13 = 0.0001220703125 ~= 0.0001
-,	TB_BLOOM_FILTER_PROBABILITY_0_00001 	= 16 ///!< 1 / 2^16 = 0.0000152587890625 ~= 0.00001
-,	TB_BLOOM_FILTER_PROBABILITY_0_000001 	= 20 ///!< 1 / 2^20 = 0.00000095367431640625 ~= 0.000001
-		
+    TB_BLOOM_FILTER_PROBABILITY_0_1         = 3 ///!< 1 / 2^3 = 0.125 ~= 0.1
+,   TB_BLOOM_FILTER_PROBABILITY_0_01        = 6 ///!< 1 / 2^6 = 0.015625 ~= 0.01
+,   TB_BLOOM_FILTER_PROBABILITY_0_001       = 10 ///!< 1 / 2^10 = 0.0009765625 ~= 0.001
+,   TB_BLOOM_FILTER_PROBABILITY_0_0001      = 13 ///!< 1 / 2^13 = 0.0001220703125 ~= 0.0001
+,   TB_BLOOM_FILTER_PROBABILITY_0_00001     = 16 ///!< 1 / 2^16 = 0.0000152587890625 ~= 0.00001
+,   TB_BLOOM_FILTER_PROBABILITY_0_000001    = 20 ///!< 1 / 2^20 = 0.00000095367431640625 ~= 0.000001
+        
 }tb_bloom_filter_probability_e;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -128,26 +128,26 @@ typedef enum __tb_bloom_filter_probability_e
  *
  * @note not supports iterator 
  *
- * @param probability 	the probability of false positives
- * @param hash_count 	the hash count: < 16
- * @param item_maxn 	the item maxn
- * @param func 			the item func only for hash
+ * @param probability   the probability of false positives
+ * @param hash_count    the hash count: < 16
+ * @param item_maxn     the item maxn
+ * @param func          the item func only for hash
  *
- * @return 				the bloom_filter
+ * @return              the bloom_filter
  */
-tb_bloom_filter_t* 		tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func);
+tb_bloom_filter_t*      tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func);
 
 /*! exit bloom filter
  *
- * @param bloom_filter 	the bloom filter
+ * @param bloom_filter  the bloom filter
  */
-tb_void_t 				tb_bloom_filter_exit(tb_bloom_filter_t* bloom_filter);
+tb_void_t               tb_bloom_filter_exit(tb_bloom_filter_t* bloom_filter);
 
 /*! clear bloom filter
  *
- * @param bloom_filter 	the bloom filter
+ * @param bloom_filter  the bloom filter
  */
-tb_void_t 				tb_bloom_filter_clear(tb_bloom_filter_t* bloom_filter);
+tb_void_t               tb_bloom_filter_clear(tb_bloom_filter_t* bloom_filter);
 
 /*! set data to the bloom filter 
  *
@@ -164,12 +164,12 @@ tb_void_t 				tb_bloom_filter_clear(tb_bloom_filter_t* bloom_filter);
  * }
  * @endcode
  *
- * @param bloom_filter 	the bloom filter
- * @param data 			the item data 
+ * @param bloom_filter  the bloom filter
+ * @param data          the item data 
  *
- * @return 				return tb_false if the data have been existed, otherwise set it and return tb_true
+ * @return              return tb_false if the data have been existed, otherwise set it and return tb_true
  */
-tb_bool_t 				tb_bloom_filter_set(tb_bloom_filter_t* bloom_filter, tb_cpointer_t data);
+tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_t* bloom_filter, tb_cpointer_t data);
 
 /*! get data to the bloom filter 
  *
@@ -186,12 +186,12 @@ tb_bool_t 				tb_bloom_filter_set(tb_bloom_filter_t* bloom_filter, tb_cpointer_t
  * }
  * @endcode
  *
- * @param bloom_filter 	the bloom filter
- * @param data 			the item data 
+ * @param bloom_filter  the bloom filter
+ * @param data          the item data 
  *
- * @return 				return tb_true if the data exists, otherwise return tb_false
+ * @return              return tb_true if the data exists, otherwise return tb_false
  */
-tb_bool_t 				tb_bloom_filter_get(tb_bloom_filter_t* bloom_filter, tb_cpointer_t data);
+tb_bool_t               tb_bloom_filter_get(tb_bloom_filter_t* bloom_filter, tb_cpointer_t data);
 
 #endif
 

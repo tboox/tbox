@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strncmp.c
+ * @author      ruki
+ * @file        strncmp.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
-# 	define TB_LIBC_STRING_OPT_STRNCMP
+#   define TB_LIBC_STRING_OPT_STRNCMP
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,9 +39,9 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
+    tb_assert_and_check_return_val(s1 && s2, 0);
 
 
-	return 0;
+    return 0;
 }
 #endif

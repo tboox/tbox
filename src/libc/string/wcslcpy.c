@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		wcslcpy.c
- * @ingroup 	libc
+ * @author      ruki
+ * @file        wcslcpy.c
+ * @ingroup     libc
  *
  */
 
@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSLCPY
-# 	include <wchar.h>
+#   include <wchar.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,36 +36,36 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSLCPY
 tb_size_t tb_wcslcpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	return wcslcpy(s1, s2, n);
+    // check
+    tb_assert_and_check_return_val(s1 && s2, 0);
+    return wcslcpy(s1, s2, n);
 }
 #else
 tb_size_t tb_wcslcpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	// check
-	tb_assert_and_check_return_val(s1 && s2, 0);
+    // check
+    tb_assert_and_check_return_val(s1 && s2, 0);
 
-	// no size or same? 
-	tb_check_return_val(n && s1 != s2, tb_wcslen(s1));
+    // no size or same? 
+    tb_check_return_val(n && s1 != s2, tb_wcslen(s1));
 
-	// copy
+    // copy
 #if 0
-	tb_wchar_t const* s = s2; --n;
-	while (*s1 = *s2) 
-	{
-		if (n) 
-		{
-			--n;
-			++s1;
-		}
-		++s2;
-	}
-	return s2 - s;
+    tb_wchar_t const* s = s2; --n;
+    while (*s1 = *s2) 
+    {
+        if (n) 
+        {
+            --n;
+            ++s1;
+        }
+        ++s2;
+    }
+    return s2 - s;
 #else
-	tb_size_t sn = tb_wcslen(s2);
-	tb_memcpy(s1, s2, tb_min(sn + 1, n) * sizeof(tb_wchar_t));
-	return tb_min(sn, n);
+    tb_size_t sn = tb_wcslen(s2);
+    tb_memcpy(s1, s2, tb_min(sn + 1, n) * sizeof(tb_wchar_t));
+    return tb_min(sn, n);
 #endif
 }
 #endif

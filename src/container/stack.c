@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		stack.c
- * @ingroup 	container
+ * @author      ruki
+ * @file        stack.c
+ * @ingroup     container
  *
  */
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,49 +36,49 @@
 
 tb_stack_t* tb_stack_init(tb_size_t grow, tb_item_func_t func)
 {
-	return tb_vector_init(grow, func);
+    return tb_vector_init(grow, func);
 }
 tb_void_t tb_stack_exit(tb_stack_t* stack)
 {
-	tb_vector_exit(stack);
+    tb_vector_exit(stack);
 }
 tb_void_t tb_stack_clear(tb_stack_t* stack)
 {
-	tb_vector_clear(stack);
+    tb_vector_clear(stack);
 }
 tb_void_t tb_stack_copy(tb_stack_t* stack, tb_stack_t* copy)
 {
-	tb_vector_copy(stack, copy);
+    tb_vector_copy(stack, copy);
 }
 tb_void_t tb_stack_put(tb_stack_t* stack, tb_cpointer_t data)
 {
-	tb_vector_insert_tail(stack, data);
+    tb_vector_insert_tail(stack, data);
 }
 tb_void_t tb_stack_pop(tb_stack_t* stack)
 {
-	tb_vector_remove_last(stack);
+    tb_vector_remove_last(stack);
 }
 tb_pointer_t tb_stack_top(tb_stack_t* stack)
 {
-	return tb_vector_last(stack);
+    return tb_vector_last(stack);
 }
 tb_pointer_t tb_stack_head(tb_stack_t* stack)
 {
-	return tb_vector_head(stack);
+    return tb_vector_head(stack);
 }
 tb_pointer_t tb_stack_last(tb_stack_t* stack)
 {
-	return tb_vector_last(stack);
+    return tb_vector_last(stack);
 }
 tb_size_t tb_stack_size(tb_stack_t const* stack)
 {
-	return tb_vector_size(stack);
+    return tb_vector_size(stack);
 }
 tb_size_t tb_stack_maxn(tb_stack_t const* stack)
 {
-	return tb_vector_maxn(stack);
+    return tb_vector_maxn(stack);
 }
-tb_void_t tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
+tb_void_t tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
-	tb_vector_walk(stack, func, priv);
+    tb_vector_walk(stack, func, priv);
 }

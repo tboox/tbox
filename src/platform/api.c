@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		api.c
+ * @author      ruki
+ * @file        api.c
  *
  */
 
@@ -26,6 +26,6 @@
  */
 #include "prefix.h"
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	include "windows/api.c"
+#   include "windows/api.c"
 #endif
 

@@ -16,17 +16,17 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		null.c
- * @ingroup 	object
+ * @author      ruki
+ * @file        null.c
+ * @ingroup     object
  *
  */
  
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 		"object_null"
-#define TB_TRACE_MODULE_DEBUG 		(0)
+#define TB_TRACE_MODULE_NAME        "object_null"
+#define TB_TRACE_MODULE_DEBUG       (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,7 +38,7 @@
  */
 static tb_object_t* tb_null_copy(tb_object_t* object)
 {
-	return object;
+    return object;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -48,13 +48,13 @@ static tb_object_t* tb_null_copy(tb_object_t* object)
 // null
 static tb_object_t const g_null = 
 {
-	TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
-,	TB_OBJECT_TYPE_NULL
-, 	1
-, 	tb_null
-, 	tb_null_copy
-, 	tb_null
-, 	tb_null
+    TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
+,   TB_OBJECT_TYPE_NULL
+,   1
+,   tb_null
+,   tb_null_copy
+,   tb_null
+,   tb_null
 
 };
 
@@ -63,6 +63,6 @@ static tb_object_t const g_null =
  */
 tb_object_t* tb_null_init()
 {
-	return (tb_object_t*)&g_null;
+    return (tb_object_t*)&g_null;
 }
 

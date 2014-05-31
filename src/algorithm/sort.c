@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		sort.c
- * @ingroup 	algorithm
+ * @author      ruki
+ * @file        sort.c
+ * @ingroup     algorithm
  *
  */
 
@@ -37,22 +37,22 @@
  */
 tb_void_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
-	// check
-	tb_check_return(iterator && head != tail);
+    // check
+    tb_check_return(iterator && head != tail);
 
-	// readonly?
-	tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
+    // readonly?
+    tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
 
-	// random access iterator? 
-	if (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS) 
-	{
-		if (tail > head + 100000) tb_heap_sort(iterator, head, tail, comp);
-		else tb_quick_sort(iterator, head, tail, comp); //!< @note the recursive stack size is limit
-	}
-	else tb_bubble_sort(iterator, head, tail, comp);
+    // random access iterator? 
+    if (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS) 
+    {
+        if (tail > head + 100000) tb_heap_sort(iterator, head, tail, comp);
+        else tb_quick_sort(iterator, head, tail, comp); //!< @note the recursive stack size is limit
+    }
+    else tb_bubble_sort(iterator, head, tail, comp);
 }
 tb_void_t tb_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp)
 {
-	tb_sort(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp);
+    tb_sort(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp);
 }
 

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		strcmp.c
+ * @author      ruki
+ * @file        strcmp.c
  *
  */
 
@@ -30,7 +30,7 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-//# 	define TB_LIBC_STRING_OPT_STRCMP
+//#     define TB_LIBC_STRING_OPT_STRCMP
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,31 +39,31 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 static tb_long_t tb_strcmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
+    tb_assert_and_check_return_val(s1 && s2, 0);
 
-	// FIXME: return is -1, 0, 1
-	tb_size_t d0, d1;
-	tb_size_t r;
-	__tb_asm__ __tb_volatile__
-	(
-		"1:\n"
-		" 	lodsb\n"
-		" 	scasb\n"
-		" 	jne 2f\n"
-		" 	testb %%al, %%al\n"
-		" 	jne 1b\n"
-		" 	xorl %%eax, %%eax\n"
-		" 	jmp 3f\n"
-		"2:\n"
-		" 	sbbl %%eax, %%eax\n"
-		" 	orb $1, %%al\n"
-		"3:"
+    // FIXME: return is -1, 0, 1
+    tb_size_t d0, d1;
+    tb_size_t r;
+    __tb_asm__ __tb_volatile__
+    (
+        "1:\n"
+        "   lodsb\n"
+        "   scasb\n"
+        "   jne 2f\n"
+        "   testb %%al, %%al\n"
+        "   jne 1b\n"
+        "   xorl %%eax, %%eax\n"
+        "   jmp 3f\n"
+        "2:\n"
+        "   sbbl %%eax, %%eax\n"
+        "   orb $1, %%al\n"
+        "3:"
 
-		: "=a" (r), "=&S" (d0), "=&D" (d1)
-		: "1" (s1), "2" (s2)
-		: "memory"
-	);
+        : "=a" (r), "=&S" (d0), "=&D" (d1)
+        : "1" (s1), "2" (s2)
+        : "memory"
+    );
 
-	return r;
+    return r;
 }
 #endif

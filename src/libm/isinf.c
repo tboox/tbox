@@ -16,9 +16,9 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author		ruki
- * @file		isinff.c
- * @ingroup 	libm
+ * @author      ruki
+ * @file        isinff.c
+ * @ingroup     libm
  *
  */
 
@@ -33,9 +33,9 @@
 
 tb_long_t tb_isinf(tb_float_t x)
 {
-	tb_ieee_float_t e; e.f = x;
-	tb_int32_t 		t = e.i & 0x7fffffff;
-	t ^= 0x7f800000;
-	t |= -t;
-	return (tb_long_t)(~(t >> 31) & (e.i >> 30));
+    tb_ieee_float_t e; e.f = x;
+    tb_int32_t      t = e.i & 0x7fffffff;
+    t ^= 0x7f800000;
+    t |= -t;
+    return (tb_long_t)(~(t >> 31) & (e.i >> 30));
 }
