@@ -198,7 +198,7 @@ static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t
 
     // save aioo
     aioo->code = aioe->code;
-    aioo->data = aioe->data;
+    aioo->priv = aioe->priv;
 
     // sete it, TODO: sete by binary search
     if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
@@ -278,7 +278,7 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
 
             // the aioo
             tb_size_t       code = TB_AIOE_CODE_NONE;
-            tb_pointer_t    data = tb_null;
+            tb_cpointer_t   priv = tb_null;
             tb_aioo_t*      aioo = tb_null;
             if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
             if (rtor->hash)
@@ -288,13 +288,13 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
                 {
                     // save code & data
                     code = aioo->code;
-                    data = aioo->data;
+                    priv = aioo->priv;
 
                     // oneshot? clear it
                     if (aioo->code & TB_AIOE_CODE_ONESHOT)
                     {
                         aioo->code = TB_AIOE_CODE_NONE;
-                        aioo->data = tb_null;
+                        aioo->priv = tb_null;
                     }
                 }
             }
@@ -303,7 +303,7 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
             
             // init aioe
             tb_aioe_t   aioe = {0};
-            aioe.data   = data;
+            aioe.priv   = priv;
             aioe.aioo   = aioo;
             if (events & POLLIN)
             {

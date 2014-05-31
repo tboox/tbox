@@ -284,7 +284,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             tb_assert_and_check_goto(aioe, end);
 
             // the aice
-            tb_aice_t const* aice = aioe->data;
+            tb_aice_t const* aice = aioe->priv;
             tb_assert_and_check_goto(aice, end);
 
             // the aico

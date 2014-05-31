@@ -39,8 +39,8 @@ typedef struct __tb_aioo_t
     // the code
     tb_size_t               code;
 
-    // the data
-    tb_pointer_t            data;
+    // the priv
+    tb_cpointer_t           priv;
 
     // the handle 
     tb_handle_t             handle;
@@ -58,7 +58,7 @@ typedef struct __tb_aioo_t
  *
  * @return          the aioo data
  */
-tb_pointer_t        tb_aioo_data(tb_handle_t aioo);
+tb_cpointer_t        tb_aioo_priv(tb_handle_t aioo);
 
 /*! the aioo handle
  *

@@ -177,7 +177,7 @@ static tb_bool_t tb_aiop_reactor_select_post(tb_aiop_reactor_t* reactor, tb_aioe
 
     // save aioo
     aioo->code = aioe->code;
-    aioo->data = aioe->data;
+    aioo->priv = aioe->priv;
 
     // fd
     tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
@@ -295,7 +295,7 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 
                 // init aioe
                 tb_aioe_t aioe = {0};
-                aioe.data   = aioo->data;
+                aioe.priv   = aioo->priv;
                 aioe.aioo   = aioo;
                 if (FD_ISSET(fd, &rtor->rfdo)) 
                 {
@@ -321,7 +321,7 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
                     {
                         // clear aioo
                         aioo->code = TB_AIOE_CODE_NONE;
-                        aioo->data = tb_null;
+                        aioo->priv = tb_null;
 
                         // clear events
                         if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);

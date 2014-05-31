@@ -94,8 +94,8 @@ static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_
     // the code
     tb_size_t       code = aioe->code;
 
-    // the data
-    tb_pointer_t    data = aioe->data;
+    // the priv
+    tb_cpointer_t   priv = aioe->priv;
 
     // the aioo
     tb_aioo_t*      aioo = aioe->aioo;
@@ -113,7 +113,7 @@ static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_
     // save aioo
     tb_aioo_t prev = *aioo;
     aioo->code = code;
-    aioo->data = data;
+    aioo->priv = priv;
 
     // sete
     if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, ((tb_long_t)aioo->handle) - 1, &e) < 0) 
@@ -211,7 +211,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
         // save aioe
         tb_aioe_t* aioe = &list[wait++];
         aioe->code = TB_AIOE_CODE_NONE;
-        aioe->data = aioo->data;
+        aioe->priv = aioo->priv;
         aioe->aioo = (tb_aioo_t*)aioo;
         if (events & EPOLLIN) 
         {

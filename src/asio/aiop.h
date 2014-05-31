@@ -134,11 +134,11 @@ tb_void_t           tb_aiop_spak(tb_aiop_t* aiop);
  * @param aiop      the aiop
  * @param handle    the handle
  * @param code      the code
- * @param data      the data
+ * @param priv      the private data
  *
  * @return          the aioo
  */
-tb_handle_t         tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
+tb_handle_t         tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv);
 
 /*! delo the aioo
  *
@@ -148,7 +148,7 @@ tb_handle_t         tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t 
  */
 tb_void_t           tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t aioo);
 
-/*! post the aioe list
+/*! post the aioe 
  *
  * @param aiop      the aiop
  * @param aioe      the aioe
@@ -157,16 +157,16 @@ tb_void_t           tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t aioo);
  */
 tb_bool_t           tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* aioe);
 
-/*! set the asie
+/*! set the aioe
  *
  * @param aiop      the aiop
  * @param aioo      the aioo
  * @param code      the code
- * @param data      the data
+ * @param priv      the private data
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_pointer_t data);
+tb_bool_t           tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_cpointer_t priv);
 
 /*! wait the asio objects in the pool
  *

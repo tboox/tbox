@@ -53,8 +53,8 @@ typedef struct __tb_aioe_t
     // the code
     tb_size_t               code;
 
-    // the data
-    tb_pointer_t            data;
+    // the priv
+    tb_cpointer_t           priv;
 
     // the aioo
     tb_aioo_t*              aioo;
