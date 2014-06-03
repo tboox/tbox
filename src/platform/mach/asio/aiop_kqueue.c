@@ -276,7 +276,11 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
             aioe->code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 
         // oneshot? clear it
-        if (aioo->code & TB_AIOE_CODE_ONESHOT) aioo->code = TB_AIOE_CODE_NONE;
+        if (aioo->code & TB_AIOE_CODE_ONESHOT) 
+        {
+            aioo->code = TB_AIOE_CODE_NONE;
+            aioo->priv = tb_null;
+        }
     }
 
     // ok

@@ -48,15 +48,54 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
     if (jenv)
     {
         // enter
-        if ((*jenv)->PushLocalFrame(jenv, 5) >= 0) 
+        if ((*jenv)->PushLocalFrame(jenv, 10) >= 0) 
         {
             // done
             jboolean error = tb_false;
             do
             {
                 // get the environment class
-                jclass environment_class = (*jenv)->FindClass(jenv, "android/os/Environment");
-                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && environment_class);
+                jclass environment = (*jenv)->FindClass(jenv, "android/os/Environment");
+                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && environment);
+
+                // get the getDownloadCacheDirectory func
+                jmethodID getDownloadCacheDirectory_func = (*jenv)->GetStaticMethodID(jenv, environment, "getDownloadCacheDirectory", "()Ljava/io/File;");
+                tb_assert_and_check_break(getDownloadCacheDirectory_func);
+
+                // get the download cache directory 
+                jobject directory = (*jenv)->CallStaticObjectMethod(jenv, environment, getDownloadCacheDirectory_func);
+                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && directory);
+
+                // get file class
+                jclass file_class = (*jenv)->GetObjectClass(jenv, directory);
+                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && file_class);
+
+                // get the getPath func
+                jmethodID getPath_func = (*jenv)->GetMethodID(jenv, file_class, "getPath", "()Ljava/lang/String;");
+                tb_assert_and_check_break(getPath_func);
+
+                // get the directory path
+                jstring path_jstr = (jstring)(*jenv)->CallObjectMethod(jenv, directory, getPath_func);
+                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && path_jstr);
+
+                // get the path string length
+                size = (tb_size_t)(*jenv)->GetStringLength(jenv, path_jstr);
+                tb_assert_and_check_break(size);
+
+                // get the path string
+		        tb_char_t const* path_cstr = (*jenv)->GetStringUTFChars(jenv, path_jstr, tb_null);
+                tb_assert_and_check_break(path_cstr);
+
+                // trace
+                tb_trace_d("temp: %s", path_cstr);
+
+                // copy it
+                tb_size_t need = tb_min(size, maxn - 1);
+                tb_strlcpy(path, path_cstr, need);
+                path[need] = '\0';
+
+                // exit the path string
+			    (*jenv)->ReleaseStringUTFChars(jenv, path_jstr, path_cstr);
 
             } while (0);
 

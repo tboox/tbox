@@ -65,15 +65,25 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_aioo_
     // the code
     tb_size_t code = aioo->code;
 
-    // addo
+    // init event
     struct epoll_event e = {0};
     if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
     if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
-#ifdef EPOLLONESHOT // FIXME: no oneshot for android
+#ifdef EPOLLONESHOT 
     if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 #endif
     e.data.u64 = (tb_hize_t)aioo;
-    return (epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, ((tb_long_t)aioo->handle) - 1, &e) < 0)? tb_false : tb_true;
+
+    // add aioo
+    if (epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, tb_handle2fd(aioo->handle), &e) < 0)
+    {
+        // trace
+        tb_trace_e("addo aioo[%p], code: %lu failed, errno: %d", aioo, code, errno);
+        return tb_false;
+    }
+
+    // ok
+    return tb_true;
 }
 static tb_bool_t tb_aiop_reactor_epoll_delo(tb_aiop_reactor_t* reactor, tb_aioo_t const* aioo)
 {
@@ -81,9 +91,17 @@ static tb_bool_t tb_aiop_reactor_epoll_delo(tb_aiop_reactor_t* reactor, tb_aioo_
     tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
     tb_assert_and_check_return_val(rtor && rtor->epfd > 0 && aioo && aioo->handle, tb_false);
 
-    // delo
+    // init event
     struct epoll_event e = {0};
-    return (epoll_ctl(rtor->epfd, EPOLL_CTL_DEL, ((tb_long_t)aioo->handle) - 1, &e) < 0)? tb_false : tb_true;
+    if (epoll_ctl(rtor->epfd, EPOLL_CTL_DEL, ((tb_long_t)aioo->handle) - 1, &e) < 0)
+    {
+        // trace
+//        tb_trace_e("delo aioo[%p] failed, errno: %d", aioo, errno);
+        return tb_false;
+    }
+
+    // ok
+    return tb_true;
 }
 static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
@@ -101,11 +119,11 @@ static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_
     tb_aioo_t*      aioo = aioe->aioo;
     tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
 
-    // init 
+    // init event
     struct epoll_event e = {0};
     if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
     if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
-#ifdef EPOLLONESHOT // FIXME: no oneshot for android
+#ifdef EPOLLONESHOT 
     if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 #endif
     e.data.u64 = (tb_hize_t)aioo;
@@ -116,8 +134,11 @@ static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_
     aioo->priv = priv;
 
     // sete
-    if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, ((tb_long_t)aioo->handle) - 1, &e) < 0) 
+    if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, tb_handle2fd(aioo->handle), &e) < 0) 
     {
+        // trace
+        tb_trace_e("post aice code: %lu failed, errno: %d", code, errno);
+
         // restore aioo
         *aioo = prev;
         return tb_false;
@@ -181,7 +202,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
     for (i = 0; i < evtn; i++)
     {
         // the aioo
-        tb_aioo_t const* aioo = (tb_aioo_t const*)rtor->evts[i].data.u64;
+        tb_aioo_t* aioo = (tb_aioo_t*)rtor->evts[i].data.u64;
         tb_assert_and_check_return_val(aioo, -1);
 
         // the handle 
@@ -212,7 +233,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
         tb_aioe_t* aioe = &list[wait++];
         aioe->code = TB_AIOE_CODE_NONE;
         aioe->priv = aioo->priv;
-        aioe->aioo = (tb_aioo_t*)aioo;
+        aioe->aioo = aioo;
         if (events & EPOLLIN) 
         {
             aioe->code |= TB_AIOE_CODE_RECV;
@@ -225,6 +246,25 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
         }
         if (events & (EPOLLHUP | EPOLLERR) && !(aioe->code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
             aioe->code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
+
+        // onshot? clear it
+        if (aioo->code & TB_AIOE_CODE_ONESHOT)
+        {
+            aioo->code = TB_AIOE_CODE_NONE;
+            aioo->priv = tb_null;
+
+            // clear events manually if no epoll oneshot
+#ifndef EPOLLONESHOT
+            struct epoll_event e = {0};
+            e.data.u64 = (tb_hize_t)aioo;
+            if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, tb_handle2fd(aioo->handle), &e) < 0) 
+            {
+                // trace
+                tb_trace_e("clear aioo[%p] failed manually for oneshot, error: %d", aioo, errno);
+                continue;
+            }
+#endif
+        }
     }
 
     // ok

@@ -651,6 +651,9 @@ tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
     // check
     tb_assert_and_check_return(aicp);
         
+    // trace
+    tb_trace_d("kill: ..");
+
     // kill all
     tb_aicp_kill_all(aicp);
 
@@ -666,6 +669,9 @@ tb_void_t tb_aicp_kill_all(tb_aicp_t* aicp)
     // check
     tb_assert_and_check_return(aicp);
 
+    // trace
+    tb_trace_d("kill: all: ..");
+
     // kill all
     if (!tb_atomic_fetch_and_set(&aicp->kill_all, 1))
     {
@@ -678,6 +684,9 @@ tb_long_t tb_aicp_wait_all(tb_aicp_t* aicp, tb_long_t timeout)
 {
     // check
     tb_assert_and_check_return_val(aicp, -1);
+
+    // trace
+    tb_trace_d("wait: all: ..");
 
     // wait it
     tb_size_t size = 0;
