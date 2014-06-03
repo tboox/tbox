@@ -23,7 +23,7 @@ static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state
     // trace
     tb_trace_i("clos: state: %s", tb_state_cstr(state));
 
-#if 1
+#if 0
     // kill loop
     tb_aicp_kill((tb_aicp_t*)priv);
 #else
@@ -80,7 +80,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
     if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_URL, argv[1])) goto end;
 
     // init head 
-//  if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Connection", "keep-alive")) goto end;
+    if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Connection", "keep-alive")) goto end;
 
     // init head func
     if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_demo_aicp_http_head_func)) goto end;
