@@ -329,7 +329,9 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
                 tb_char_t*  pe = port + 12;
                 for (p++; pb < pe && *p && *p != '/' && *p != '\\' && *p != '?' && *p != '&' && *p != '='; ) *pb++ = *p++;
                 url->port = tb_s10tou32(port);
-                tb_assert_and_check_break(url->port);
+
+                // no port? using the default port
+                if (!url->port) url->port = url->bssl? TB_HTTP_DEFAULT_PORT_SSL : TB_HTTP_DEFAULT_PORT;
             }
             else if (url->poto == TB_URL_PROTOCOL_HTTP) url->port = url->bssl? TB_HTTP_DEFAULT_PORT_SSL : TB_HTTP_DEFAULT_PORT;
             else if (url->poto != TB_URL_PROTOCOL_SQL) break;
@@ -352,7 +354,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
             tb_static_string_rtrim(&url->path);
 
             // parse args
-            while (*p && (*p == '?' || *p == '=')) p++;
+            while (*p && (*p == '?' || *p == '=' || tb_isspace(*p))) p++;
             if (*p) tb_scoped_string_cstrcpy(&url->args, p);
 
             // trim the right spaces

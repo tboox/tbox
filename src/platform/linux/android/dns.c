@@ -19,39 +19,51 @@
  * @author      ruki
  * @file        dns.c
  * @ingroup     platform
- *
  */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME            "dns"
-#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "dns.h"
+#include "prefix.h"
+#include "../../dns.h"
+#include "../../../network/network.h"
+#include <sys/system_properties.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/dns.c"
-#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-#   include "mach/dns.c"
-#elif defined(TB_CONFIG_OS_ANDROID)
-#   include "linux/android/dns.c"
-#elif defined(TB_CONFIG_OS_LIKE_UNIX)
-#   include "unix/dns.c"
-#else
 tb_bool_t tb_dns_init()
 {
-    tb_trace_noimpl();
+    // done
+    tb_size_t count = 0;
+    for (count = 0; count < 6; count++)
+    {
+        // init the dns property name
+        tb_char_t prop_name[PROP_NAME_MAX] = {0};
+        tb_snprintf(prop_name, sizeof(prop_name) - 1, "net.dns%lu", count + 1);
+        
+        // get dns address name
+        tb_char_t dns[64] = {0};
+        if (!__system_property_get(prop_name, dns)) break;
+
+        // trace
+        tb_trace_d("addr: %s", dns);
+
+        // add server
+        tb_dns_server_add(dns);
+    }
+
+    // no server? add the default server
+    if (!count) 
+    {
+        tb_dns_server_add("8.8.8.8");
+        tb_dns_server_add("8.8.8.4");
+    }
+
+    // ok
     return tb_true;
 }
 tb_void_t tb_dns_exit()
 {
 }
-#endif
 

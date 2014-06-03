@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "cookies"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -289,8 +289,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
             tb_check_break(b);
 
             // trace
-//          tb_trace_d("name: %s", b? b : "");
-//          tb_trace_d("value[%d]: %s", p - v, v? v : "");
+            tb_trace_d("entry: %s: %s", b? b : "", v? v : "");
 
             // done value
             if (!tb_strnicmp(b, "expires", 7))
@@ -363,6 +362,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
                 tb_assert_and_check_return_val(v - b - 1 < sizeof(data) - 1, tb_false);
                 tb_strlcpy(data, b, v - b - 1); data[v - b - 1] = '\0';
                 entry->name = tb_string_pool_put(cookies->string_pool, data);
+                tb_assert_and_check_return_val(entry->name, tb_false);
 
                 // save value
                 tb_assert_and_check_return_val(p - v < sizeof(data) - 1, tb_false);
@@ -370,6 +370,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
                     entry->value = tb_string_pool_put(cookies->string_pool, data);
+                    tb_assert_and_check_return_val(entry->value, tb_false);
                 }
             }
 
