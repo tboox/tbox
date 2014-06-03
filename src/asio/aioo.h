@@ -52,14 +52,6 @@ typedef struct __tb_aioo_t
  * interfaces
  */
 
-/*! the aioo type
- *
- * @param aioo      the aioo
- *
- * @return          the aioo data
- */
-tb_cpointer_t        tb_aioo_priv(tb_handle_t aioo);
-
 /*! the aioo handle
  *
  * @param aioo      the aioo

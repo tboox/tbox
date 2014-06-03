@@ -136,6 +136,12 @@ static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_
     // sete
     if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, tb_handle2fd(aioo->handle), &e) < 0) 
     {
+        // re-add it 
+#ifndef EPOLLONESHOT 
+        if (errno == ENOENT && epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, tb_handle2fd(aioo->handle), &e) >= 0) 
+            return tb_true;
+#endif
+
         // trace
         tb_trace_e("post aice code: %lu failed, errno: %d", code, errno);
 
@@ -247,21 +253,20 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
         if (events & (EPOLLHUP | EPOLLERR) && !(aioe->code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
             aioe->code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 
-        // onshot? clear it
+        // oneshot? clear it
         if (aioo->code & TB_AIOE_CODE_ONESHOT)
         {
+            // clear code
             aioo->code = TB_AIOE_CODE_NONE;
             aioo->priv = tb_null;
 
             // clear events manually if no epoll oneshot
 #ifndef EPOLLONESHOT
             struct epoll_event e = {0};
-            e.data.u64 = (tb_hize_t)aioo;
-            if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, tb_handle2fd(aioo->handle), &e) < 0) 
+            if (epoll_ctl(rtor->epfd, EPOLL_CTL_DEL, tb_handle2fd(aioo->handle), &e) < 0) 
             {
                 // trace
                 tb_trace_e("clear aioo[%p] failed manually for oneshot, error: %d", aioo, errno);
-                continue;
             }
 #endif
         }

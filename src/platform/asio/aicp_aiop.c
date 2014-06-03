@@ -338,8 +338,7 @@ end:
     tb_trace_d("loop: exit");
 
     // kill
-    tb_atomic_set(&aicp->kill, 1);
-    tb_atomic_set(&aicp->kill_all, 1);
+    tb_aicp_kill(aicp);
 
     // exit
     tb_thread_return(tb_null);
