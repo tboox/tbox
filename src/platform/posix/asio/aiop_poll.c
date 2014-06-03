@@ -25,22 +25,23 @@
  */
 #include "prefix.h"
 #include <sys/poll.h>
+#include "../../spinlock.h"
 #include "../../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the poll mutx type
-typedef struct __tb_poll_mutx_t
+// the poll lock type
+typedef struct __tb_poll_lock_t
 {
     // the pfds
-    tb_handle_t             pfds;
+    tb_spinlock_t           pfds;
 
     // the hash
-    tb_handle_t             hash;
+    tb_spinlock_t           hash;
 
-}tb_poll_mutx_t;
+}tb_poll_lock_t;
 
 // the poll reactor type
 typedef struct __tb_aiop_reactor_poll_t
@@ -57,8 +58,8 @@ typedef struct __tb_aiop_reactor_poll_t
     // the hash
     tb_hash_t*              hash;
 
-    // the mutx
-    tb_poll_mutx_t          mutx;
+    // the lock
+    tb_poll_lock_t          lock;
 
 }tb_aiop_reactor_poll_t;
 
@@ -127,13 +128,13 @@ static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_aioo_t
 
     // add handle => aioo
     tb_bool_t ok = tb_false;
-    if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+    tb_spinlock_enter(&rtor->lock.hash);
     if (rtor->hash) 
     {
         tb_hash_set(rtor->hash, aioo->handle, aioo);
         ok = tb_true;
     }
-    if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+    tb_spinlock_leave(&rtor->lock.hash);
     tb_assert_and_check_return_val(ok, tb_false);
 
     // the code
@@ -146,9 +147,9 @@ static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_aioo_t
     if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
 
     // add pfd, TODO: addo by binary search
-    if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+    tb_spinlock_enter(&rtor->lock.pfds);
     tb_vector_insert_tail(rtor->pfds, &pfd);
-    if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+    tb_spinlock_leave(&rtor->lock.pfds);
 
     // spak it
     if (aiop->spak[0] && code) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
@@ -167,14 +168,14 @@ static tb_bool_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_aioo_t
     tb_assert_and_check_return_val(aiop, tb_false);
 
     // delo it, TODO: delo by binary search
-    if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+    tb_spinlock_enter(&rtor->lock.pfds);
     tb_vector_walk(rtor->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)aioo->handle) - 1));
-    if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+    tb_spinlock_leave(&rtor->lock.pfds);
 
     // del handle => aioo
-    if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+    tb_spinlock_enter(&rtor->lock.hash);
     if (rtor->hash) tb_hash_del(rtor->hash, aioo->handle);
-    if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+    tb_spinlock_leave(&rtor->lock.hash);
 
     // spak it
     if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
@@ -201,9 +202,9 @@ static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t
     aioo->priv = aioe->priv;
 
     // sete it, TODO: sete by binary search
-    if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+    tb_spinlock_enter(&rtor->lock.pfds);
     tb_walk_all(rtor->pfds, tb_poll_walk_sete, (tb_pointer_t)aioe);
-    if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+    tb_spinlock_leave(&rtor->lock.pfds);
 
     // spak it
     if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
@@ -228,9 +229,9 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
     while (!wait && !stop && (timeout < 0 || tb_mclock() < time + timeout))
     {
         // copy pfds
-        if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+        tb_spinlock_enter(&rtor->lock.pfds);
         tb_vector_copy(rtor->cfds, rtor->pfds);
-        if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+        tb_spinlock_leave(&rtor->lock.pfds);
 
         // cfds
         struct pollfd*  cfds = (struct pollfd*)tb_vector_data(rtor->cfds);
@@ -280,7 +281,7 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
             tb_size_t       code = TB_AIOE_CODE_NONE;
             tb_cpointer_t   priv = tb_null;
             tb_aioo_t*      aioo = tb_null;
-            if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+            tb_spinlock_enter(&rtor->lock.hash);
             if (rtor->hash)
             {
                 aioo = (tb_aioo_t*)tb_hash_get(rtor->hash, handle);
@@ -298,7 +299,7 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
                     }
                 }
             }
-            if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+            tb_spinlock_leave(&rtor->lock.hash);
             tb_check_continue(aioo && code);
             
             // init aioe
@@ -324,10 +325,10 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
             // oneshot?
             if (code & TB_AIOE_CODE_ONESHOT)
             {
-                if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+                tb_spinlock_enter(&rtor->lock.pfds);
                 struct pollfd* pfds = (struct pollfd*)tb_vector_data(rtor->pfds);
                 if (pfds) pfds[i].events = 0;
-                if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+                tb_spinlock_leave(&rtor->lock.pfds);
             }
         }
     }
@@ -341,26 +342,24 @@ static tb_void_t tb_aiop_reactor_poll_exit(tb_aiop_reactor_t* reactor)
     if (rtor)
     {
         // exit pfds
-        if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+        tb_spinlock_enter(&rtor->lock.pfds);
         if (rtor->pfds) tb_vector_exit(rtor->pfds);
         rtor->pfds = tb_null;
-        if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+        tb_spinlock_leave(&rtor->lock.pfds);
 
         // exit cfds
         if (rtor->cfds) tb_vector_exit(rtor->cfds);
         rtor->cfds = tb_null;
 
         // exit hash
-        if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+        tb_spinlock_enter(&rtor->lock.hash);
         if (rtor->hash) tb_hash_exit(rtor->hash);
         rtor->hash = tb_null;
-        if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+        tb_spinlock_leave(&rtor->lock.hash);
 
-        // exit mutx
-        if (rtor->mutx.pfds) tb_mutex_exit(rtor->mutx.pfds);
-        rtor->mutx.pfds = tb_null;
-        if (rtor->mutx.hash) tb_mutex_exit(rtor->mutx.hash);
-        rtor->mutx.hash = tb_null;
+        // exit lock
+        tb_spinlock_exit(&rtor->lock.pfds);
+        tb_spinlock_exit(&rtor->lock.hash);
 
         // free it
         tb_free(rtor);
@@ -372,14 +371,14 @@ static tb_void_t tb_aiop_reactor_poll_cler(tb_aiop_reactor_t* reactor)
     if (rtor)
     {
         // clear pfds
-        if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+        tb_spinlock_enter(&rtor->lock.pfds);
         if (rtor->pfds) tb_vector_clear(rtor->pfds);
-        if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+        tb_spinlock_leave(&rtor->lock.pfds);
 
         // clear hash
-        if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+        tb_spinlock_enter(&rtor->lock.hash);
         if (rtor->hash) tb_hash_clear(rtor->hash);
-        if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+        tb_spinlock_leave(&rtor->lock.hash);
 
         // spak it
         if (reactor->aiop && reactor->aiop->spak[0])
@@ -391,40 +390,53 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
     // check
     tb_assert_and_check_return_val(aiop && aiop->maxn, tb_null);
 
-    // alloc reactor
-    tb_aiop_reactor_poll_t* rtor = tb_malloc0(sizeof(tb_aiop_reactor_poll_t));
-    tb_assert_and_check_return_val(rtor, tb_null);
+    // done
+    tb_bool_t               ok = tb_false;
+    tb_aiop_reactor_poll_t* rtor = tb_null;
+    do
+    {
+        // make reactor
+        rtor = (tb_aiop_reactor_poll_t*)tb_malloc0(sizeof(tb_aiop_reactor_poll_t));
+        tb_assert_and_check_break(rtor);
 
-    // init base
-    rtor->base.aiop = aiop;
-    rtor->base.exit = tb_aiop_reactor_poll_exit;
-    rtor->base.cler = tb_aiop_reactor_poll_cler;
-    rtor->base.addo = tb_aiop_reactor_poll_addo;
-    rtor->base.delo = tb_aiop_reactor_poll_delo;
-    rtor->base.post = tb_aiop_reactor_poll_post;
-    rtor->base.wait = tb_aiop_reactor_poll_wait;
+        // init base
+        rtor->base.aiop = aiop;
+        rtor->base.exit = tb_aiop_reactor_poll_exit;
+        rtor->base.cler = tb_aiop_reactor_poll_cler;
+        rtor->base.addo = tb_aiop_reactor_poll_addo;
+        rtor->base.delo = tb_aiop_reactor_poll_delo;
+        rtor->base.post = tb_aiop_reactor_poll_post;
+        rtor->base.wait = tb_aiop_reactor_poll_wait;
 
-    // init mutx
-    rtor->mutx.pfds = tb_mutex_init();
-    rtor->mutx.hash = tb_mutex_init();
-    tb_assert_and_check_goto(rtor->mutx.pfds && rtor->mutx.hash, fail);
+        // init lock
+        if (!tb_spinlock_init(&rtor->lock.pfds)) break;
+        if (!tb_spinlock_init(&rtor->lock.hash)) break;
 
-    // init pfds
-    rtor->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
-    tb_assert_and_check_goto(rtor->pfds, fail);
+        // init pfds
+        rtor->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
+        tb_assert_and_check_break(rtor->pfds);
 
-    // init cfds
-    rtor->cfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
-    tb_assert_and_check_goto(rtor->cfds, fail);
+        // init cfds
+        rtor->cfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
+        tb_assert_and_check_break(rtor->cfds);
 
-    // init hash
-    rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
-    tb_assert_and_check_goto(rtor->hash, fail);
+        // init hash
+        rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
+        tb_assert_and_check_break(rtor->hash);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (rtor) tb_aiop_reactor_poll_exit((tb_aiop_reactor_t*)rtor);
+        rtor = tb_null;
+    }
 
     // ok
     return (tb_aiop_reactor_t*)rtor;
-
-fail:
-    if (rtor) tb_aiop_reactor_poll_exit((tb_aiop_reactor_t*)rtor);
-    return tb_null;
 }
