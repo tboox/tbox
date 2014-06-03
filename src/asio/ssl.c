@@ -359,17 +359,14 @@ static tb_void_t tb_aicp_ssl_clos_clear(tb_aicp_ssl_t* ssl)
     // closed
     tb_atomic_set(&ssl->state, TB_STATE_CLOSED);
 }
-static tb_void_t tb_aicp_ssl_clos_opening(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_aicp_ssl_clos_opening(tb_handle_t handle, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
+    tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;
     tb_assert_and_check_return(ssl);
 
     // trace
     tb_trace_d("clos: opening: state: %s", tb_state_cstr(ssl->clos_opening.state));
-
-    // clear ssl
-    tb_aicp_ssl_clos_clear(ssl);
 
     // done func
     if (ssl->clos_opening.func) ssl->clos_opening.func(ssl, ssl->clos_opening.state, ssl->clos_opening.priv);
@@ -398,7 +395,7 @@ static tb_bool_t tb_aicp_ssl_open_func(tb_aicp_ssl_t* ssl, tb_size_t state, tb_a
         ssl->clos_opening.state  = state;
 
         // close it
-        tb_aico_exit(ssl->aico, tb_aicp_ssl_clos_opening, ssl);
+        tb_aicp_ssl_clos(ssl, tb_aicp_ssl_clos_opening, tb_null);
     }
 
     // ok?
@@ -1123,26 +1120,7 @@ tb_bool_t tb_aicp_ssl_clos_try(tb_handle_t handle)
     tb_trace_d("clos: try: ..");
 
     // done
-    tb_bool_t ok = tb_false;
-    do
-    {
-        // closed? 
-        if (TB_STATE_CLOSED == tb_atomic_get(&ssl->state))
-        {
-            ok = tb_true;
-            break;
-        }
-
-        // check 
-        tb_check_break(!ssl->aico);
-
-        // clear ssl
-        tb_aicp_ssl_clos_clear(ssl);
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
+    tb_bool_t ok = (TB_STATE_CLOSED == tb_atomic_get(&ssl->state))? tb_true : tb_false;
 
     // trace
     tb_trace_d("clos: try: %s", ok? "ok" : "no");
