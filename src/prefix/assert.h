@@ -52,30 +52,102 @@
 // assert
 #if TB_ASSERT_DEBUG
 #   if defined(TB_COMPILER_IS_GCC)
-#       define tb_assert_message(x, fmt, arg...)            do { if (!(x)) {tb_trace_a("expr: %s, msg: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
+#       define tb_assertf(x, fmt, arg...)                                   do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
+#       define tb_assertf_abort(x, fmt, arg...)                             do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); tb_abort(); } } while(0)
+#       define tb_assertf_return(x, fmt, arg...)                            do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); return ; } } while(0)
+#       define tb_assertf_return_val(x, v, fmt, arg...)                     do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); return (v); } } while(0)
+#       define tb_assertf_goto(x, b, fmt, arg...)                           do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); goto b; } } while(0)
+#       define tb_assertf_break(x, fmt, arg...)                             { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); break ; } }
+#       define tb_assertf_continue(x, fmt, arg...)                          { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); continue ; } }
+#       define tb_assertf_and_check_abort(x, fmt, arg...)                   tb_assertf_abort(x, fmt, ##arg)
+#       define tb_assertf_and_check_return(x, fmt, arg...)                  tb_assertf_return(x, fmt, ##arg)
+#       define tb_assertf_and_check_return_val(x, v, fmt, arg...)           tb_assertf_return_val(x, v, fmt, ##arg)
+#       define tb_assertf_and_check_goto(x, b, fmt, arg...)                 tb_assertf_goto(x, b, fmt, ##arg)
+#       define tb_assertf_and_check_break(x, fmt, arg...)                   tb_assertf_break(x, fmt, ##arg)
+#       define tb_assertf_and_check_continue(x, fmt, arg...)                tb_assertf_continue(x, fmt, ##arg)
 #   elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
-#       define tb_assert_message(x, fmt, ...)               do { if (!(x)) {tb_trace_a("expr: %s, msg: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); } } while(0)
+#       define tb_assertf(x, fmt, ...)                                      do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); } } while(0)
+#       define tb_assertf_abort(x, fmt, ...)                                do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); tb_abort(); } } while(0)
+#       define tb_assertf_return(x, fmt, ...)                               do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); return ; } } while(0)
+#       define tb_assertf_return_val(x, v, fmt, ...)                        do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); return (v); } } while(0)
+#       define tb_assertf_goto(x, b, fmt, ...)                              do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); goto b; } } while(0)
+#       define tb_assertf_break(x, fmt, ...)                                { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); break ; } }
+#       define tb_assertf_continue(x, fmt, ...)                             { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); continue ; } }
+#       define tb_assertf_and_check_abort(x, fmt, ...)                      tb_assertf_abort(x, fmt, __VA_ARGS__)
+#       define tb_assertf_and_check_return(x, fmt, ...)                     tb_assertf_return(x, fmt, __VA_ARGS__)
+#       define tb_assertf_and_check_return_val(x, v, fmt, ...)              tb_assertf_return_val(x, v, fmt, __VA_ARGS__)
+#       define tb_assertf_and_check_goto(x, b, fmt, ...)                    tb_assertf_goto(x, b, fmt, __VA_ARGS__)
+#       define tb_assertf_and_check_break(x, fmt, ...)                      tb_assertf_break(x, fmt, __VA_ARGS__)
+#       define tb_assertf_and_check_continue(x, fmt, ...)                   tb_assertf_continue(x, fmt, __VA_ARGS__)
 #   else
-#       define tb_assert_message 
+#       define tb_assertf                                   
+#       define tb_assertf_abort                             
+#       define tb_assertf_return                            
+#       define tb_assertf_return_val(x, v, fmt, ...)                     
+#       define tb_assertf_goto(x, b, fmt, ...)                           
+#       define tb_assertf_break                             
+#       define tb_assertf_continue                          
+#       define tb_assertf_and_check_abort                   
+#       define tb_assertf_and_check_return                  
+#       define tb_assertf_and_check_return_val(x, v, fmt, ...)           
+#       define tb_assertf_and_check_goto(x, b, fmt, ...)                 
+#       define tb_assertf_and_check_break                   
+#       define tb_assertf_and_check_continue         
 #   endif
 #else
 #   if defined(TB_COMPILER_IS_GCC)
-#       define tb_assert_message(x, fmt, arg...)
+#       define tb_assertf(x, fmt, arg...)                                   
+#       define tb_assertf_abort(x, fmt, arg...)                             
+#       define tb_assertf_return(x, fmt, arg...)                            
+#       define tb_assertf_return_val(x, v, fmt, arg...)                     
+#       define tb_assertf_goto(x, b, fmt, arg...)                           
+#       define tb_assertf_break(x, fmt, arg...)                             
+#       define tb_assertf_continue(x, fmt, arg...)                          
+#       define tb_assertf_and_check_abort(x, fmt, arg...)                   
+#       define tb_assertf_and_check_return(x, fmt, arg...)                  
+#       define tb_assertf_and_check_return_val(x, v, fmt, arg...)           
+#       define tb_assertf_and_check_goto(x, b, fmt, arg...)                 
+#       define tb_assertf_and_check_break(x, fmt, arg...)                   
+#       define tb_assertf_and_check_continue(x, fmt, arg...)                
 #   elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
-#       define tb_assert_message(x, fmt, ...)
+#       define tb_assertf(x, fmt, ...)                                   
+#       define tb_assertf_abort(x, fmt, ...)                             
+#       define tb_assertf_return(x, fmt, ...)                            
+#       define tb_assertf_return_val(x, v, fmt, ...)                     
+#       define tb_assertf_goto(x, b, fmt, ...)                           
+#       define tb_assertf_break(x, fmt, ...)                             
+#       define tb_assertf_continue(x, fmt, ...)                          
+#       define tb_assertf_and_check_abort(x, fmt, ...)                   
+#       define tb_assertf_and_check_return(x, fmt, ...)                  
+#       define tb_assertf_and_check_return_val(x, v, fmt, ...)           
+#       define tb_assertf_and_check_goto(x, b, fmt, ...)                 
+#       define tb_assertf_and_check_break(x, fmt, ...)                   
+#       define tb_assertf_and_check_continue(x, fmt, ...)                
 #   else
-#       define tb_assert_message 
+#       define tb_assertf                                   
+#       define tb_assertf_abort                             
+#       define tb_assertf_return                            
+#       define tb_assertf_return_val(x, v, fmt, ...)                     
+#       define tb_assertf_goto(x, b, fmt, ...)                           
+#       define tb_assertf_break                             
+#       define tb_assertf_continue                          
+#       define tb_assertf_and_check_abort                   
+#       define tb_assertf_and_check_return                  
+#       define tb_assertf_and_check_return_val(x, v, fmt, ...)           
+#       define tb_assertf_and_check_goto(x, b, fmt, ...)                 
+#       define tb_assertf_and_check_break                   
+#       define tb_assertf_and_check_continue         
 #   endif
 #endif
 
 #if TB_ASSERT_DEBUG
-#   define tb_assert(x)                                     do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); } } while(0)
-#   define tb_assert_abort(x)                               do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); tb_abort(); } } while(0)
-#   define tb_assert_return(x)                              do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); return ; } } while(0)
-#   define tb_assert_return_val(x, v)                       do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); return (v); } } while(0)
-#   define tb_assert_goto(x, b)                             do { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); goto b; } } while(0)
-#   define tb_assert_break(x)                               { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); break ; } }
-#   define tb_assert_continue(x)                            { if (!(x)) {tb_trace_a("expr: %s", #x); tb_assert_backtrace_dump(); continue ; } }
+#   define tb_assert(x)                                     do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); } } while(0)
+#   define tb_assert_abort(x)                               do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); tb_abort(); } } while(0)
+#   define tb_assert_return(x)                              do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); return ; } } while(0)
+#   define tb_assert_return_val(x, v)                       do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); return (v); } } while(0)
+#   define tb_assert_goto(x, b)                             do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); goto b; } } while(0)
+#   define tb_assert_break(x)                               { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); break ; } }
+#   define tb_assert_continue(x)                            { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); continue ; } }
 #   define tb_assert_and_check_abort(x)                     tb_assert_abort(x)
 #   define tb_assert_and_check_return(x)                    tb_assert_return(x)
 #   define tb_assert_and_check_return_val(x, v)             tb_assert_return_val(x, v)
