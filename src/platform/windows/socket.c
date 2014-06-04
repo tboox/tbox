@@ -27,7 +27,6 @@
 #include "prefix.h"
 #include "api.h"
 #include "../socket.h"
-#include <winsock2.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

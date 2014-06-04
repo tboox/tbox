@@ -27,6 +27,9 @@
  */
 #include "prefix.h"
 #include "../sched.h"
+#if defined(YieldProcessor)
+#   include <intrin.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

@@ -29,7 +29,10 @@
 #include "../prefix.h"
 #include "../path.h"
 #include "../../libc/libc.h"
+#include <winsock2.h>
+#include <mswsock.h>
 #include <windows.h>
+#include <iphlpapi.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines

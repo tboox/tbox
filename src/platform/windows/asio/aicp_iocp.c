@@ -121,7 +121,7 @@ typedef struct __tb_iocp_loop_t
     tb_size_t                               self;
 
     // the olap list
-    OVERLAPPED_ENTRY                        list[TB_IOCP_OLAP_LIST_MAXN];
+    tb_OVERLAPPED_ENTRY_t                   list[TB_IOCP_OLAP_LIST_MAXN];
 
     // the aice spak 
     tb_queue_t*                             spak;                   
@@ -1931,7 +1931,7 @@ static tb_handle_t tb_aicp_proactor_iocp_loop_init(tb_aicp_proactor_t* proactor)
     // init spak
     if (ptor->GetQueuedCompletionStatusEx)
     {
-        loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_mem(sizeof(OVERLAPPED_ENTRY), tb_null, tb_null));
+        loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_mem(sizeof(tb_OVERLAPPED_ENTRY_t), tb_null, tb_null));
         tb_assert_and_check_goto(loop->spak, fail);
     }
 
@@ -1967,7 +1967,7 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
         if (!tb_queue_null(loop->spak))
         {
             // the top entry
-            LPOVERLAPPED_ENTRY entry = (LPOVERLAPPED_ENTRY)tb_queue_get(loop->spak);
+            tb_LPOVERLAPPED_ENTRY_t entry = (tb_LPOVERLAPPED_ENTRY_t)tb_queue_get(loop->spak);
             tb_assert_and_check_return_val(entry, -1);
 
             // pop the entry
