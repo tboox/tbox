@@ -27,24 +27,20 @@
  * includes
  */
 #include "prefix.h"
-#include <windows.h>
-#include <winsock2.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * the mswsock types
  */
 
 // the OVERLAPPED_ENTRY type
-typedef struct _OVERLAPPED_ENTRY 
+typedef struct _tb_OVERLAPPED_ENTRY_t
 {
     ULONG_PTR    lpCompletionKey;
     LPOVERLAPPED lpOverlapped;
     ULONG_PTR    Internal;
     DWORD        dwNumberOfBytesTransferred;
 
-}OVERLAPPED_ENTRY, *LPOVERLAPPED_ENTRY;
+}tb_OVERLAPPED_ENTRY_t, *tb_LPOVERLAPPED_ENTRY_t;
 
 // the AcceptEx func type 
 typedef BOOL (WINAPI* tb_api_AcceptEx_t)(   SOCKET sListenSocket
@@ -80,7 +76,7 @@ typedef BOOL (WINAPI* tb_api_TransmitFile_t)(   SOCKET hSocket
 
 // the GetQueuedCompletionStatusEx func type 
 typedef BOOL (WINAPI* tb_api_GetQueuedCompletionStatusEx_t)(    HANDLE CompletionPort
-                                                            ,   LPOVERLAPPED_ENTRY lpCompletionPortEntries
+                                                            ,   tb_LPOVERLAPPED_ENTRY_t lpCompletionPortEntries
                                                             ,   ULONG ulCount
                                                             ,   PULONG ulNumEntriesRemoved
                                                             ,   DWORD dwMilliseconds

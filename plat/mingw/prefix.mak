@@ -42,7 +42,7 @@ PWD 				= pwd
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fvisibility=hidden 
 CXFLAGS_DEBUG 		= -g 
-CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments 
+CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 

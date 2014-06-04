@@ -1,6 +1,6 @@
 # demo
-TB_CONFIG_DEMO_LIBS 			= rt m dl pthread
-TB_CONFIG_DEMO_CMD1 			=
+TB_CONFIG_DEMO_LIBS 					= rt m dl pthread
+TB_CONFIG_DEMO_CMD1 					=
 
 # float
 TB_CONFIG_TYPE_FLOAT 					= y

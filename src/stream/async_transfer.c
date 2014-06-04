@@ -732,10 +732,10 @@ tb_bool_t tb_async_transfer_init_istream_from_url(tb_handle_t handle, tb_char_t 
     {
         // probe protocol
         tb_size_t protocol = tb_url_protocol_probe(url);
-        tb_assert_static(TB_URL_PROTOCOL_FILE == TB_STREAM_TYPE_FILE);
-        tb_assert_static(TB_URL_PROTOCOL_HTTP == TB_STREAM_TYPE_HTTP);
-        tb_assert_static(TB_URL_PROTOCOL_SOCK == TB_STREAM_TYPE_SOCK);
-        tb_assert_static(TB_URL_PROTOCOL_DATA == TB_STREAM_TYPE_DATA);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_FILE == (tb_size_t)TB_STREAM_TYPE_FILE);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_HTTP == (tb_size_t)TB_STREAM_TYPE_HTTP);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_SOCK == (tb_size_t)TB_STREAM_TYPE_SOCK);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_DATA == (tb_size_t)TB_STREAM_TYPE_DATA);
 
         // protocol => type
         tb_size_t type = protocol;
@@ -844,10 +844,10 @@ tb_bool_t tb_async_transfer_init_ostream_from_url(tb_handle_t handle, tb_char_t 
     {
         // probe protocol
         tb_size_t protocol = tb_url_protocol_probe(url);
-        tb_assert_static(TB_URL_PROTOCOL_FILE == TB_STREAM_TYPE_FILE);
-        tb_assert_static(TB_URL_PROTOCOL_HTTP == TB_STREAM_TYPE_HTTP);
-        tb_assert_static(TB_URL_PROTOCOL_SOCK == TB_STREAM_TYPE_SOCK);
-        tb_assert_static(TB_URL_PROTOCOL_DATA == TB_STREAM_TYPE_DATA);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_FILE == (tb_size_t)TB_STREAM_TYPE_FILE);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_HTTP == (tb_size_t)TB_STREAM_TYPE_HTTP);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_SOCK == (tb_size_t)TB_STREAM_TYPE_SOCK);
+        tb_assert_static((tb_size_t)TB_URL_PROTOCOL_DATA == (tb_size_t)TB_STREAM_TYPE_DATA);
 
         // protocol => type
         tb_size_t type = protocol;
