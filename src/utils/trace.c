@@ -176,7 +176,7 @@ tb_bool_t tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend)
     // ok?
     return ok;
 }
-tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...)
+tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, tb_va_list_t args)
 {
     // check
     tb_check_return(format);
@@ -191,10 +191,8 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
         tb_check_break(g_mode);
 
         // init
-        tb_va_list_t    l;
         tb_char_t*      p = g_line;
         tb_char_t*      e = g_line + sizeof(g_line);
-        tb_va_start(l, format);
 
         // print prefix to file
         if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
@@ -216,7 +214,7 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
         if (module && p < e) p += tb_snprintf(p, e - p, "[%s]: ", module);
 
         // append format
-        if (p < e) p += tb_vsnprintf(p, e - p, format, l);
+        if (p < e) p += tb_vsnprintf(p, e - p, format, args);
 
         // append end
         if (p < e) *p = '\0'; e[-1] = '\0';
@@ -241,13 +239,25 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
             }
         }
 
-        // exit
-        tb_va_end(l);
-
     } while (0);
 
     // leave
     tb_spinlock_leave(&g_lock);
+}
+tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...)
+{
+    // check
+    tb_check_return(format);
+
+    // init args
+    tb_va_list_t args;
+    tb_va_start(args, format);
+
+    // done trace
+    tb_trace_done_with_args(prefix, module, format, args);
+
+    // exit args
+    tb_va_end(args);
 }
 tb_void_t tb_trace_tail(tb_char_t const* format, ...)
 {

@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -92,6 +93,15 @@ tb_bool_t           tb_trace_file_set(tb_handle_t file);
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend);
+
+/*! done trace with arguments
+ *
+ * @param prefix    the trace prefix
+ * @param module    the trace module
+ * @param format    the trace format
+ * @param args      the trace arguments
+ */
+tb_void_t           tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, tb_va_list_t args);
 
 /*! done trace
  *

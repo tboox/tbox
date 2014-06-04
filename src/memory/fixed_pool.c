@@ -362,7 +362,7 @@ tb_pointer_t tb_fixed_pool_malloc(tb_handle_t handle)
             return p;
         }
         
-        tb_assert_message(0, "the chunk size may be too small: %lu < %lu", chunk->size, pool->step);
+        tb_assertf(0, "the chunk size may be too small: %lu < %lu", chunk->size, pool->step);
 
     } while (0);
 
@@ -447,7 +447,7 @@ tb_bool_t tb_fixed_pool_free(tb_handle_t handle, tb_pointer_t data)
     }
 
     // fail
-    tb_assert_message(0, "invalid free data address: %p", data);
+    tb_assertf(0, "invalid free data address: %p", data);
     return tb_false;
 }
 
