@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "ws2_32.h"
 #include "mswsock.h"
 #include "dbghelp.h"
 #include "kernel32.h"

@@ -178,6 +178,9 @@ tb_bool_t tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, t
 
         // init it
         if (!init(instance)) return tb_false;
+
+        // init ok
+        tb_atomic_set(binited, 2);
     }
     // initing? wait it
     else

@@ -33,32 +33,13 @@
  */
 
 // the AcceptEx func type 
-typedef BOOL (WINAPI* tb_mswsock_AcceptEx_t)(   SOCKET sListenSocket
-                                            ,   SOCKET sAcceptSocket
-                                            ,   PVOID lpOutputBuffer
-                                            ,   DWORD dwReceiveDataLength
-                                            ,   DWORD dwLocalAddressLength
-                                            ,   DWORD dwRemoteAddressLength
-                                            ,   LPDWORD lpdwBytesReceived
-                                            ,   LPOVERLAPPED lpOverlapped);
+typedef BOOL (WINAPI* tb_mswsock_AcceptEx_t)(SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength, DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped);
 
 // the ConnectEx func type 
-typedef BOOL (WINAPI* tb_mswsock_ConnectEx_t)(  SOCKET s
-                                            ,   struct sockaddr const*name
-                                            ,   tb_int_t namelen
-                                            ,   PVOID lpSendBuffer
-                                            ,   DWORD dwSendDataLength
-                                            ,   LPDWORD lpdwBytesSent
-                                            ,   LPOVERLAPPED lpOverlapped);
+typedef BOOL (WINAPI* tb_mswsock_ConnectEx_t)(SOCKET s, struct sockaddr const* name, tb_int_t namelen, PVOID lpSendBuffer, DWORD dwSendDataLength, LPDWORD lpdwBytesSent, LPOVERLAPPED lpOverlapped);
 
 // the TransmitFile func type 
-typedef BOOL (WINAPI* tb_mswsock_TransmitFile_t)(   SOCKET hSocket
-                                                ,   HANDLE hFile
-                                                ,   DWORD nNumberOfBytesToWrite
-                                                ,   DWORD nNumberOfBytesPerSend
-                                                ,   LPOVERLAPPED lpOverlapped
-                                                ,   LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers
-                                                ,   DWORD dwReserved);
+typedef BOOL (WINAPI* tb_mswsock_TransmitFile_t)(SOCKET hSocket, HANDLE hFile, DWORD nNumberOfBytesToWrite, DWORD nNumberOfBytesPerSend, LPOVERLAPPED lpOverlapped, LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers, DWORD dwReserved);
 
 // the mswsock interfaces type
 typedef struct __tb_mswsock_t

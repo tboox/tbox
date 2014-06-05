@@ -25,6 +25,7 @@
  * includes
  */
 #include "mswsock.h"
+#include "ws2_32.h"
 #include "../../socket.h"
 #include "../../../utils/singleton.h"
 
@@ -58,41 +59,41 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
         // init AcceptEx
         DWORD   AcceptEx_real = 0;
         GUID    AcceptEx_guid = TB_MSWSOCK_WSAID_ACCEPTEX;
-        WSAIoctl(  (SOCKET)sock - 1
-                ,   SIO_GET_EXTENSION_FUNCTION_POINTER
-                ,   &AcceptEx_guid
-                ,   sizeof(GUID)
-                ,   &mswsock->AcceptEx
-                ,   sizeof(tb_mswsock_AcceptEx_t)
-                ,   &AcceptEx_real
-                ,   tb_null
-                ,   tb_null);
+        tb_ws2_32()->WSAIoctl(  (SOCKET)sock - 1
+                            ,   SIO_GET_EXTENSION_FUNCTION_POINTER
+                            ,   &AcceptEx_guid
+                            ,   sizeof(GUID)
+                            ,   &mswsock->AcceptEx
+                            ,   sizeof(tb_mswsock_AcceptEx_t)
+                            ,   &AcceptEx_real
+                            ,   tb_null
+                            ,   tb_null);
 
         // init ConnectEx
         DWORD   ConnectEx_real = 0;
         GUID    ConnectEx_guid = TB_MSWSOCK_WSAID_CONNECTEX;
-        WSAIoctl(  (SOCKET)sock - 1
-                ,   SIO_GET_EXTENSION_FUNCTION_POINTER
-                ,   &ConnectEx_guid
-                ,   sizeof(GUID)
-                ,   &mswsock->ConnectEx
-                ,   sizeof(tb_mswsock_ConnectEx_t)
-                ,   &ConnectEx_real
-                ,   tb_null
-                ,   tb_null);
+        tb_ws2_32()->WSAIoctl(  (SOCKET)sock - 1
+                            ,   SIO_GET_EXTENSION_FUNCTION_POINTER
+                            ,   &ConnectEx_guid
+                            ,   sizeof(GUID)
+                            ,   &mswsock->ConnectEx
+                            ,   sizeof(tb_mswsock_ConnectEx_t)
+                            ,   &ConnectEx_real
+                            ,   tb_null
+                            ,   tb_null);
 
         // init TransmitFile
         DWORD   TransmitFile_real = 0;
         GUID    TransmitFile_guid = TB_MSWSOCK_WSAID_TRANSMITFILE;
-        WSAIoctl(  (SOCKET)sock - 1
-                ,   SIO_GET_EXTENSION_FUNCTION_POINTER
-                ,   &TransmitFile_guid
-                ,   sizeof(GUID)
-                ,   &mswsock->TransmitFile
-                ,   sizeof(tb_mswsock_TransmitFile_t)
-                ,   &TransmitFile_real
-                ,   tb_null
-                ,   tb_null);
+        tb_ws2_32()->WSAIoctl(  (SOCKET)sock - 1
+                            ,   SIO_GET_EXTENSION_FUNCTION_POINTER
+                            ,   &TransmitFile_guid
+                            ,   sizeof(GUID)
+                            ,   &mswsock->TransmitFile
+                            ,   sizeof(tb_mswsock_TransmitFile_t)
+                            ,   &TransmitFile_real
+                            ,   tb_null
+                            ,   tb_null);
     } while (0);
 
     // exit sock

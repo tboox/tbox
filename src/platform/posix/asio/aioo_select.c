@@ -24,15 +24,8 @@
  * includes
  */
 #include "prefix.h"
-#ifndef TB_CONFIG_OS_WINDOWS
-#   include <sys/select.h>
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
 #ifdef TB_CONFIG_OS_WINDOWS
-typedef tb_int_t    socklen_t;
+#   include "../../windows/interface/interface.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +71,11 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code,
     FD_SET(fd, &efds);
 
     // select
-    tb_long_t r = select(fd + 1
-                        , prfds
-                        , pwfds
-                        , &efds
-                        , timeout >= 0? &t : tb_null);
+#ifdef TB_CONFIG_OS_WINDOWS
+    tb_long_t r = tb_ws2_32()->select(fd + 1, prfds, pwfds, &efds, timeout >= 0? &t : tb_null);
+#else
+    tb_long_t r = select(fd + 1, prfds, pwfds, &efds, timeout >= 0? &t : tb_null);
+#endif
     tb_assert_and_check_return_val(r >= 0, -1);
 
     // timeout?
@@ -90,8 +83,13 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code,
 
     // error?
     tb_int_t o = 0;
+#ifdef TB_CONFIG_OS_WINDOWS
+    tb_int_t n = sizeof(tb_int_t);
+    tb_ws2_32()->getsockopt(fd, SOL_SOCKET, SO_ERROR, (tb_char_t*)&o, &n);
+#else
     socklen_t n = sizeof(socklen_t);
     getsockopt(fd, SOL_SOCKET, SO_ERROR, (tb_char_t*)&o, &n);
+#endif
     if (o) return -1;
 
     // ok
