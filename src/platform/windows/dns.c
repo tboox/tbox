@@ -25,8 +25,8 @@
  * includes
  */
 #include "prefix.h"
-#include "api.h"
 #include "../dynamic.h"
+#include "interface/interface.h"
 #include "../../network/network.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ tb_bool_t tb_dns_init()
     do 
     {
         // init func
-        tb_api_GetNetworkParams_t pGetNetworkParams = tb_api_GetNetworkParams();
+        tb_iphlpapi_GetNetworkParams_t pGetNetworkParams = tb_iphlpapi()->GetNetworkParams;
         tb_assert_and_check_break(pGetNetworkParams);
 
         // init info

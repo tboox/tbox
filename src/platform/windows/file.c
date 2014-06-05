@@ -25,10 +25,10 @@
  * includes
  */
 #include "prefix.h"
-#include "api.h"
 #include "../file.h"
 #include "../path.h"
 #include "../print.h"
+#include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -358,7 +358,7 @@ tb_hize_t tb_file_size(tb_handle_t file)
     tb_assert_and_check_return_val(file, 0);
 
     // the GetFileSizeEx func
-    tb_api_GetFileSizeEx_t pGetFileSizeEx = tb_api_GetFileSizeEx();
+    tb_kernel32_GetFileSizeEx_t pGetFileSizeEx = tb_kernel32()->GetFileSizeEx;
     tb_assert_and_check_return_val(pGetFileSizeEx, 0);
 
     // the file size

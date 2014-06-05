@@ -17,22 +17,19 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        prefix.h
+ * @file        interface.h
  *
  */
-#ifndef TB_PLATFORM_WINDOWS_ASIO_PREFIX_H
-#define TB_PLATFORM_WINDOWS_ASIO_PREFIX_H
+#ifndef TB_PLATFORM_WINDOWS_INTERFACE_H
+#define TB_PLATFORM_WINDOWS_INTERFACE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../interface/interface.h"
-#include "../../../asio/asio.h"
-#include "../../../libc/libc.h"
-#include "../../../math/math.h"
-#include "../../../memory/memory.h"
-#include "../../../platform/platform.h"
-#include "../../../container/container.h"
+#include "prefix.h"
+#include "mswsock.h"
+#include "dbghelp.h"
+#include "kernel32.h"
+#include "iphlpapi.h"
 
 #endif
