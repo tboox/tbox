@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../file.h"
 #include "../socket.h"
+#include "../../utils/utils.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -181,7 +182,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t
     // init
     struct sockaddr_in d = {0};
     d.sin_family = AF_INET;
-    d.sin_port = htons(port);
+    d.sin_port = tb_bits_ne_to_be_u16(port);
     d.sin_addr.s_addr = addr->u32;
 
     // connect
@@ -204,7 +205,7 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
     // init
     struct sockaddr_in d = {0};
     d.sin_family = AF_INET;
-    d.sin_port = htons(port);
+    d.sin_port = tb_bits_ne_to_be_u16(port);
     d.sin_addr.s_addr = (addr && addr->u32)? addr->u32 : INADDR_ANY;
 
     // reuse addr
@@ -235,7 +236,7 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
     {
         tb_int_t n = sizeof(d);
         if (getsockname(tb_handle2fd(handle), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return 0;
-        port = ntohs(d.sin_port);
+        port = tb_bits_be_to_ne_u16(d.sin_port);
     }
 
     // ok?
@@ -454,7 +455,7 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t p
     // init
     struct sockaddr_in d = {0};
     d.sin_family = AF_INET;
-    d.sin_port = htons(port);
+    d.sin_port = tb_bits_ne_to_be_u16(port);
     d.sin_addr.s_addr = addr->u32;
 
     // recv
@@ -479,7 +480,7 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t p
     // init
     struct sockaddr_in d = {0};
     d.sin_family = AF_INET;
-    d.sin_port = htons(port);
+    d.sin_port = tb_bits_ne_to_be_u16(port);
     d.sin_addr.s_addr = addr->u32;
 
     // send
@@ -502,7 +503,7 @@ tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t 
     // init
     struct sockaddr_in d = {0};
     d.sin_family = AF_INET;
-    d.sin_port = htons(port);
+    d.sin_port = tb_bits_ne_to_be_u16(port);
     d.sin_addr.s_addr = addr->u32;
 
     // init msg
@@ -535,7 +536,7 @@ tb_long_t tb_socket_usendv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t 
     // init
     struct sockaddr_in d = {0};
     d.sin_family = AF_INET;
-    d.sin_port = htons(port);
+    d.sin_port = tb_bits_ne_to_be_u16(port);
     d.sin_addr.s_addr = addr->u32;
 
     // init msg

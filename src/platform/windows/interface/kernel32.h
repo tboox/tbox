@@ -43,12 +43,7 @@ typedef struct _tb_OVERLAPPED_ENTRY_t
 }tb_OVERLAPPED_ENTRY_t, *tb_LPOVERLAPPED_ENTRY_t;
 
 // the GetQueuedCompletionStatusEx func type 
-typedef BOOL (WINAPI* tb_kernel32_GetQueuedCompletionStatusEx_t)(   HANDLE CompletionPort
-                                                                ,   tb_LPOVERLAPPED_ENTRY_t lpCompletionPortEntries
-                                                                ,   ULONG ulCount
-                                                                ,   PULONG ulNumEntriesRemoved
-                                                                ,   DWORD dwMilliseconds
-                                                                ,   BOOL fAlertable);
+typedef BOOL (WINAPI* tb_kernel32_GetQueuedCompletionStatusEx_t)(HANDLE CompletionPort, tb_LPOVERLAPPED_ENTRY_t lpCompletionPortEntries, ULONG ulCount, PULONG ulNumEntriesRemoved, DWORD dwMilliseconds, BOOL fAlertable);
 
 // the CancelIoEx func type
 typedef BOOL (WINAPI* tb_kernel32_CancelIoEx_t)(HANDLE hFile, LPOVERLAPPED lpOverlapped);

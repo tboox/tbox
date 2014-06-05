@@ -27,8 +27,8 @@
 #include "prefix.h"
 #include "../ntstatus.h"
 #include "../../ltimer.h"
-#include "../../../utils/utils.h"
 #include "../../../asio/pool.h"
+#include "../../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -80,6 +80,24 @@ typedef struct __tb_aicp_proactor_iocp_t
 
     // the GetQueuedCompletionStatusEx func
     tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
+ 
+    // WSAGetLastError
+    tb_ws2_32_WSAGetLastError_t                 WSAGetLastError;
+
+    // WSASend
+    tb_ws2_32_WSASend_t                         WSASend;
+
+    // WSARecv
+    tb_ws2_32_WSARecv_t                         WSARecv;
+
+    // WSASendTo
+    tb_ws2_32_WSASendTo_t                       WSASendTo;
+
+    // WSARecvFrom
+    tb_ws2_32_WSARecvFrom_t                     WSARecvFrom;
+
+    // bind
+    tb_ws2_32_bind_t                            bind;
 
 }tb_aicp_proactor_iocp_t;
 
@@ -266,7 +284,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
                                     ,   sizeof(SOCKADDR_IN) + 16
                                     ,   &real
                                     ,   (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
-        tb_trace_d("AcceptEx: %d, error: %d", AcceptEx_ok, WSAGetLastError());
+        tb_trace_d("AcceptEx: %d, error: %d", AcceptEx_ok, ptor->WSAGetLastError());
         tb_check_break(AcceptEx_ok);
 
         // post ok
@@ -282,7 +300,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
     if (init_ok && !AcceptEx_ok)
     {
         // pending? continue it
-        if (WSA_IO_PENDING == WSAGetLastError()) 
+        if (WSA_IO_PENDING == ptor->WSAGetLastError()) 
         {
             // post timeout
             tb_iocp_post_timeout(proactor, aico);
@@ -298,7 +316,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
             if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) ok = tb_true;
 
             // trace
-            tb_trace_d("AcceptEx: unknown error: %d", WSAGetLastError());
+            tb_trace_d("AcceptEx: unknown error: %d", ptor->WSAGetLastError());
         }
     }
 
@@ -351,14 +369,14 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
         local.sin_family = AF_INET;
         local.sin_addr.S_un.S_addr = INADDR_ANY;
         local.sin_port = 0;
-        if (SOCKET_ERROR == bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&local, sizeof(local))) break;
+        if (SOCKET_ERROR == ptor->bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&local, sizeof(local))) break;
         init_ok = tb_true;
 
         // done ConnectEx
         DWORD real = 0;
         SOCKADDR_IN addr = {0};
         addr.sin_family = AF_INET;
-        addr.sin_port = htons(aice->u.conn.port);
+        addr.sin_port = tb_bits_ne_to_be_u16(aice->u.conn.port);
         addr.sin_addr.S_un.S_addr = aice->u.conn.addr.u32;
         ConnectEx_ok = ptor->ConnectEx(     (SOCKET)aico->base.handle - 1
                                         ,   (struct sockaddr const*)&addr
@@ -367,7 +385,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
                                         ,   0
                                         ,   &real
                                         ,   (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
-        tb_trace_d("ConnectEx: %d, error: %d", ConnectEx_ok, WSAGetLastError());
+        tb_trace_d("ConnectEx: %d, error: %d", ConnectEx_ok, ptor->WSAGetLastError());
         tb_check_break(ConnectEx_ok);
 
         // post ok
@@ -383,7 +401,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
     if (init_ok && !ConnectEx_ok)
     {
         // pending? continue it
-        if (WSA_IO_PENDING == WSAGetLastError()) 
+        if (WSA_IO_PENDING == ptor->WSAGetLastError()) 
         {   
             // post timeout
             tb_iocp_post_timeout(proactor, aico);
@@ -399,7 +417,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
             if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) ok = tb_true;
 
             // trace
-            tb_trace_d("ConnectEx: unknown error: %d", WSAGetLastError());
+            tb_trace_d("ConnectEx: unknown error: %d", ptor->WSAGetLastError());
         }
     }
 
@@ -428,11 +446,11 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 
     // done recv
     DWORD       flag = 0;
-    tb_long_t   ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.recv, 1, tb_null, &flag, (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSARecv: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t   ok = ptor->WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.recv, 1, tb_null, &flag, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSARecv: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -445,7 +463,7 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -486,11 +504,11 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
     aico->olap.aice = *aice;
 
     // done send
-    tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.send, 1, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSASend: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t ok = ptor->WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.send, 1, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSASend: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -503,7 +521,7 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -547,17 +565,17 @@ static tb_bool_t tb_iocp_post_urecv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     // init addr
     SOCKADDR_IN                 addr = {0};
     addr.sin_family             = AF_INET;
-    addr.sin_port               = htons(aice->u.urecv.port);
+    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.urecv.port);
     addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
 
     // done recv
     DWORD       flag = 0;
     tb_int_t    size = sizeof(addr);
-    tb_long_t   ok = WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.urecv, 1, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSARecv: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t   ok = ptor->WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.urecv, 1, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSARecv: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -570,7 +588,7 @@ static tb_bool_t tb_iocp_post_urecv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -614,15 +632,15 @@ static tb_bool_t tb_iocp_post_usend(tb_aicp_proactor_t* proactor, tb_aice_t cons
     // init addr
     SOCKADDR_IN                 addr = {0};
     addr.sin_family             = AF_INET;
-    addr.sin_port               = htons(aice->u.usend.port);
+    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.usend.port);
     addr.sin_addr.S_un.S_addr   = aice->u.usend.addr.u32;
 
     // done send
-    tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSASend: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t ok = ptor->WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSASend: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -635,7 +653,7 @@ static tb_bool_t tb_iocp_post_usend(tb_aicp_proactor_t* proactor, tb_aice_t cons
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -677,11 +695,11 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
     // done recv
     DWORD       flag = 0;
-    tb_long_t   ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.recvv.list, (DWORD)aico->olap.aice.u.recvv.size, tb_null, &flag, (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSARecv: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t   ok = ptor->WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.recvv.list, (DWORD)aico->olap.aice.u.recvv.size, tb_null, &flag, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSARecv: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -694,7 +712,7 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -735,11 +753,11 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     aico->olap.aice = *aice;
 
     // done send
-    tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSASend: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t ok = ptor->WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSASend: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -752,7 +770,7 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -796,17 +814,17 @@ static tb_bool_t tb_iocp_post_urecvv(tb_aicp_proactor_t* proactor, tb_aice_t con
     // init addr
     SOCKADDR_IN                 addr = {0};
     addr.sin_family             = AF_INET;
-    addr.sin_port               = htons(aice->u.urecvv.port);
+    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.urecvv.port);
     addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
 
     // done recv
     DWORD       flag = 0;
     tb_int_t    size = sizeof(addr);
-    tb_long_t   ok = WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.urecvv.list, (DWORD)aico->olap.aice.u.urecvv.size, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSARecvFrom: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t   ok = ptor->WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.urecvv.list, (DWORD)aico->olap.aice.u.urecvv.size, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSARecvFrom: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -819,7 +837,7 @@ static tb_bool_t tb_iocp_post_urecvv(tb_aicp_proactor_t* proactor, tb_aice_t con
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -863,15 +881,15 @@ static tb_bool_t tb_iocp_post_usendv(tb_aicp_proactor_t* proactor, tb_aice_t con
     // init addr
     SOCKADDR_IN                 addr = {0};
     addr.sin_family             = AF_INET;
-    addr.sin_port               = htons(aice->u.usendv.port);
+    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.usendv.port);
     addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
 
     // done send
-    tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
-    tb_trace_d("WSASendTo: %ld, error: %d", ok, WSAGetLastError());
+    tb_long_t ok = ptor->WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_trace_d("WSASendTo: %ld, error: %d", ok, ptor->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == ptor->WSAGetLastError())))
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -884,7 +902,7 @@ static tb_bool_t tb_iocp_post_usendv(tb_aicp_proactor_t* proactor, tb_aice_t con
     if (ok == SOCKET_ERROR)
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -935,10 +953,10 @@ static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
     // done send
     tb_long_t real = ptor->TransmitFile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendf.file, (DWORD)aice->u.sendf.size, (1 << 16), (LPOVERLAPPED)&aico->olap, tb_null, 0);
-    tb_trace_d("sendf: %ld, error: %d", real, WSAGetLastError());
+    tb_trace_d("sendf: %ld, error: %d", real, ptor->WSAGetLastError());
 
     // pending? continue it
-    if (!real || WSA_IO_PENDING == WSAGetLastError()) 
+    if (!real || WSA_IO_PENDING == ptor->WSAGetLastError()) 
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -958,7 +976,7 @@ static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t cons
     else
     {
         // done error
-        switch (WSAGetLastError())
+        switch (ptor->WSAGetLastError())
         {
         // closed?
         case WSAECONNABORTED:
@@ -2137,6 +2155,12 @@ static tb_aicp_proactor_t* tb_aicp_proactor_iocp_init(tb_aicp_t* aicp)
     ptor->TransmitFile                  = tb_mswsock()->TransmitFile;
     ptor->CancelIoEx                    = tb_kernel32()->CancelIoEx;
     ptor->GetQueuedCompletionStatusEx   = tb_kernel32()->GetQueuedCompletionStatusEx;
+    ptor->WSAGetLastError               = tb_ws2_32()->WSAGetLastError;
+    ptor->WSASend                       = tb_ws2_32()->WSASend;
+    ptor->WSARecv                       = tb_ws2_32()->WSARecv;
+    ptor->WSASendTo                     = tb_ws2_32()->WSASendTo;
+    ptor->WSARecvFrom                   = tb_ws2_32()->WSARecvFrom;
+    ptor->bind                          = tb_ws2_32()->bind;
     tb_assert_and_check_goto(ptor->AcceptEx && ptor->ConnectEx, fail);
 
     // init port

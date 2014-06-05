@@ -25,24 +25,25 @@
  * includes
  */
 #include "prefix.h"
-#ifndef TB_CONFIG_OS_WINDOWS
-#   include <sys/select.h>
+#include "../../spinlock.h"
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include "../../windows/interface/interface.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the poll mutx type
-typedef struct __tb_select_mutx_t
+// the poll lock type
+typedef struct __tb_select_lock_t
 {
     // the pfds
-    tb_handle_t             pfds;
+    tb_spinlock_t           pfds;
 
     // the hash
-    tb_handle_t             hash;
+    tb_spinlock_t           hash;
 
-}tb_select_mutx_t;
+}tb_select_lock_t;
 
 // the select reactor type
 typedef struct __tb_aiop_reactor_select_t
@@ -65,8 +66,8 @@ typedef struct __tb_aiop_reactor_select_t
     // the hash
     tb_hash_t*              hash;
 
-    // the mutx
-    tb_select_mutx_t        mutx;
+    // the lock
+    tb_select_lock_t        lock;
 
 }tb_aiop_reactor_select_t;
 
@@ -84,20 +85,20 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_aioo
     tb_assert_and_check_return_val(aiop, tb_false);
 
     // check size
-    if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+    tb_spinlock_enter(&rtor->lock.hash);
     tb_size_t size = tb_hash_size(rtor->hash);
-    if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+    tb_spinlock_leave(&rtor->lock.hash);
     tb_assert_and_check_return_val(size < FD_SETSIZE, tb_false);
 
     // add handle => aioo
     tb_bool_t ok = tb_false;
-    if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+    tb_spinlock_enter(&rtor->lock.hash);
     if (rtor->hash) 
     {
         tb_hash_set(rtor->hash, aioo->handle, aioo);
         ok = tb_true;
     }
-    if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+    tb_spinlock_leave(&rtor->lock.hash);
     tb_assert_and_check_return_val(ok, tb_false);
 
     // the fd
@@ -107,7 +108,7 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_aioo
     tb_size_t code = aioo->code;
 
     // enter
-    if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+    tb_spinlock_enter(&rtor->lock.pfds);
 
     // update fd max
     if (fd > rtor->sfdm) rtor->sfdm = fd;
@@ -118,7 +119,7 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_aioo
     FD_SET(fd, &rtor->efdi);
 
     // leave
-    if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+    tb_spinlock_leave(&rtor->lock.pfds);
 
     // spak it
     if (aiop->spak[0] && code) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
@@ -140,7 +141,7 @@ static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_aioo
     tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
 
     // enter
-    if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+    tb_spinlock_enter(&rtor->lock.pfds);
 
     // del fds
     FD_CLR(fd, &rtor->rfdi);
@@ -148,12 +149,12 @@ static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_aioo
     FD_CLR(fd, &rtor->efdi);
 
     // leave
-    if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+    tb_spinlock_leave(&rtor->lock.pfds);
 
     // del handle => aioo
-    if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+    tb_spinlock_enter(&rtor->lock.hash);
     if (rtor->hash) tb_hash_del(rtor->hash, aioo->handle);
-    if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+    tb_spinlock_leave(&rtor->lock.hash);
 
     // spak it
     if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
@@ -183,7 +184,7 @@ static tb_bool_t tb_aiop_reactor_select_post(tb_aiop_reactor_t* reactor, tb_aioe
     tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
 
     // enter
-    if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+    tb_spinlock_enter(&rtor->lock.pfds);
 
     // set fds
     if (aioe->code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_ACPT)) FD_SET(fd, &rtor->rfdi); else FD_CLR(fd, &rtor->rfdi);
@@ -199,7 +200,7 @@ static tb_bool_t tb_aiop_reactor_select_post(tb_aiop_reactor_t* reactor, tb_aioe
     }
 
     // leave
-    if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+    tb_spinlock_leave(&rtor->lock.pfds);
 
     // spak it
     if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
@@ -232,7 +233,7 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
     while (!wait && !stop && (timeout < 0 || tb_mclock() < time + timeout))
     {
         // enter
-        if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+        tb_spinlock_enter(&rtor->lock.pfds);
 
         // init fdo
         tb_size_t sfdm = rtor->sfdm;
@@ -241,17 +242,21 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
         tb_memcpy(&rtor->efdo, &rtor->efdi, sizeof(fd_set));
 
         // leave
-        if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+        tb_spinlock_leave(&rtor->lock.pfds);
 
         // wait
+#ifdef TB_CONFIG_OS_WINDOWS
+        tb_long_t sfdn = tb_ws2_32()->select(sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_null);
+#else
         tb_long_t sfdn = select(sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_null);
+#endif
         tb_assert_and_check_return_val(sfdn >= 0, -1);
 
         // timeout?
         tb_check_return_val(sfdn, 0);
         
         // enter
-        if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+        tb_spinlock_enter(&rtor->lock.hash);
 
         // sync
         tb_size_t itor = tb_iterator_head(rtor->hash);
@@ -324,18 +329,18 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
                         aioo->priv = tb_null;
 
                         // clear events
-                        if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+                        tb_spinlock_enter(&rtor->lock.pfds);
                         FD_CLR(fd, &rtor->rfdi);
                         FD_CLR(fd, &rtor->wfdi);
                         FD_CLR(fd, &rtor->efdi);
-                        if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+                        tb_spinlock_leave(&rtor->lock.pfds);
                     }
                 }
             }
         }
 
         // leave
-        if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+        tb_spinlock_leave(&rtor->lock.hash);
     }
 
     // ok
@@ -347,26 +352,24 @@ static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
     if (rtor)
     {
         // free fds
-        if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+        tb_spinlock_enter(&rtor->lock.pfds);
         FD_ZERO(&rtor->rfdi);
         FD_ZERO(&rtor->wfdi);
         FD_ZERO(&rtor->efdi);
         FD_ZERO(&rtor->rfdo);
         FD_ZERO(&rtor->wfdo);
         FD_ZERO(&rtor->efdo);
-        if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+        tb_spinlock_leave(&rtor->lock.pfds);
 
         // exit hash
-        if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+        tb_spinlock_enter(&rtor->lock.hash);
         if (rtor->hash) tb_hash_exit(rtor->hash);
         rtor->hash = tb_null;
-        if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+        tb_spinlock_leave(&rtor->lock.hash);
 
-        // exit mutx
-        if (rtor->mutx.pfds) tb_mutex_exit(rtor->mutx.pfds);
-        rtor->mutx.pfds = tb_null;
-        if (rtor->mutx.hash) tb_mutex_exit(rtor->mutx.hash);
-        rtor->mutx.hash = tb_null;
+        // exit lock
+        tb_spinlock_exit(&rtor->lock.pfds);
+        tb_spinlock_exit(&rtor->lock.hash);
 
         // free it
         tb_free(rtor);
@@ -378,7 +381,7 @@ static tb_void_t tb_aiop_reactor_select_cler(tb_aiop_reactor_t* reactor)
     if (rtor)
     {
         // free fds
-        if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+        tb_spinlock_enter(&rtor->lock.pfds);
         rtor->sfdm = 0;
         FD_ZERO(&rtor->rfdi);
         FD_ZERO(&rtor->wfdi);
@@ -386,12 +389,12 @@ static tb_void_t tb_aiop_reactor_select_cler(tb_aiop_reactor_t* reactor)
         FD_ZERO(&rtor->rfdo);
         FD_ZERO(&rtor->wfdo);
         FD_ZERO(&rtor->efdo);
-        if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+        tb_spinlock_leave(&rtor->lock.pfds);
 
         // clear hash
-        if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+        tb_spinlock_enter(&rtor->lock.hash);
         if (rtor->hash) tb_hash_clear(rtor->hash);
-        if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+        tb_spinlock_leave(&rtor->lock.hash);
 
         // spak it
         if (reactor->aiop && reactor->aiop->spak[0]) tb_socket_send(reactor->aiop->spak[0], (tb_byte_t const*)"p", 1);
@@ -402,41 +405,54 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
     // check
     tb_assert_and_check_return_val(aiop && aiop->maxn, tb_null);
 
-    // alloc reactor
-    tb_aiop_reactor_select_t* rtor = tb_malloc0(sizeof(tb_aiop_reactor_select_t));
-    tb_assert_and_check_return_val(rtor, tb_null);
+    // done
+    tb_bool_t                   ok = tb_false;
+    tb_aiop_reactor_select_t*   rtor = tb_null;
+    do
+    {
+        // make reactor
+        rtor = (tb_aiop_reactor_select_t*)tb_malloc0(sizeof(tb_aiop_reactor_select_t));
+        tb_assert_and_check_break(rtor);
 
-    // init base
-    rtor->base.aiop = aiop;
-    rtor->base.exit = tb_aiop_reactor_select_exit;
-    rtor->base.cler = tb_aiop_reactor_select_cler;
-    rtor->base.addo = tb_aiop_reactor_select_addo;
-    rtor->base.delo = tb_aiop_reactor_select_delo;
-    rtor->base.post = tb_aiop_reactor_select_post;
-    rtor->base.wait = tb_aiop_reactor_select_wait;
+        // init base
+        rtor->base.aiop = aiop;
+        rtor->base.exit = tb_aiop_reactor_select_exit;
+        rtor->base.cler = tb_aiop_reactor_select_cler;
+        rtor->base.addo = tb_aiop_reactor_select_addo;
+        rtor->base.delo = tb_aiop_reactor_select_delo;
+        rtor->base.post = tb_aiop_reactor_select_post;
+        rtor->base.wait = tb_aiop_reactor_select_wait;
 
-    // init fds
-    FD_ZERO(&rtor->rfdi);
-    FD_ZERO(&rtor->wfdi);
-    FD_ZERO(&rtor->efdi);
-    FD_ZERO(&rtor->rfdo);
-    FD_ZERO(&rtor->wfdo);
-    FD_ZERO(&rtor->efdo);
+        // init fds
+        FD_ZERO(&rtor->rfdi);
+        FD_ZERO(&rtor->wfdi);
+        FD_ZERO(&rtor->efdi);
+        FD_ZERO(&rtor->rfdo);
+        FD_ZERO(&rtor->wfdo);
+        FD_ZERO(&rtor->efdo);
 
-    // init mutx
-    rtor->mutx.pfds = tb_mutex_init();
-    rtor->mutx.hash = tb_mutex_init();
-    tb_assert_and_check_goto(rtor->mutx.pfds && rtor->mutx.hash, fail);
+        // init lock
+        if (!tb_spinlock_init(&rtor->lock.pfds)) break;
+        if (!tb_spinlock_init(&rtor->lock.hash)) break;
 
-    // init hash
-    rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
-    tb_assert_and_check_goto(rtor->hash, fail);
+        // init hash
+        rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
+        tb_assert_and_check_break(rtor->hash);
 
-    // ok
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (rtor) tb_aiop_reactor_select_exit((tb_aiop_reactor_t*)rtor);
+        rtor = tb_null;
+    }
+
+    // ok?
     return (tb_aiop_reactor_t*)rtor;
-
-fail:
-    if (rtor) tb_aiop_reactor_select_exit((tb_aiop_reactor_t*)rtor);
-    return tb_null;
 }
 
