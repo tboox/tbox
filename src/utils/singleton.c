@@ -160,4 +160,42 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
     // ok?
     return instance;
 }
+tb_bool_t tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, tb_singleton_static_init_func_t init)
+{
+    // check
+    tb_check_return_val(binited && instance, tb_false);
+
+    // inited?
+    tb_atomic_t inited = tb_atomic_fetch_and_pset(binited, 0, 1);
+
+    // ok?
+    if (inited && inited != 1) return tb_true;
+    // null? init it
+    else if (!inited)
+    {
+        // check
+        tb_check_return_val(init, tb_false);
+
+        // init it
+        if (!init(instance)) return tb_false;
+    }
+    // initing? wait it
+    else
+    {
+        // try getting it
+        tb_size_t tryn = 50;
+        while ((1 != tb_atomic_get(binited)) && tryn--)
+        {
+            // wait some time
+            tb_msleep(100);
+        }
+
+        // failed?
+        if (tb_atomic_get(binited) == 1 || !instance)
+            return tb_false;
+    }
+
+    // ok?
+    return tb_true;
+}
 

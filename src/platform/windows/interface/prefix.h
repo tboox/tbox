@@ -20,19 +20,20 @@
  * @file        prefix.h
  *
  */
-#ifndef TB_PLATFORM_WINDOWS_ASIO_PREFIX_H
-#define TB_PLATFORM_WINDOWS_ASIO_PREFIX_H
+#ifndef TB_PLATFORM_WINDOWS_INTERFACE_PREFIX_H
+#define TB_PLATFORM_WINDOWS_INTERFACE_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
-#include "../interface/interface.h"
-#include "../../../asio/asio.h"
-#include "../../../libc/libc.h"
-#include "../../../math/math.h"
-#include "../../../memory/memory.h"
-#include "../../../platform/platform.h"
-#include "../../../container/container.h"
+#include "../../atomic.h"
+#include "../../dynamic.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_INTERFACE_LOAD(module_name, interface_name)  \
+    do { module_name->interface_name = (tb_##module_name##_##interface_name##_t)GetProcAddress(module, #interface_name); } while (0)
 
 #endif

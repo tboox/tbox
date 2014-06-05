@@ -213,7 +213,6 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 
 # platform
 tbox_C_FILES 			+= \
-						platform/api \
 						platform/dns \
 						platform/path \
 						platform/file \
@@ -368,6 +367,26 @@ ifeq ($(PLAT),android)
 tbox_C_FILES 			+= \
 						platform/linux/android/android \
 						platform/linux/android/directory 
+endif
+
+# mingw
+ifeq ($(PLAT),mingw)
+tbox_C_FILES 			+= \
+						platform/windows/interface/interface \
+						platform/windows/interface/dbghelp \
+						platform/windows/interface/mswsock \
+						platform/windows/interface/kernel32 \
+						platform/windows/interface/iphlpapi 
+endif
+
+# cygwin
+ifeq ($(PLAT),cygwin)
+tbox_C_FILES 			+= \
+						platform/windows/interface/interface \
+						platform/windows/interface/dbghelp \
+						platform/windows/interface/mswsock \
+						platform/windows/interface/kernel32 \
+						platform/windows/interface/iphlpapi 
 endif
 
 # flags

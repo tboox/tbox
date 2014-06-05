@@ -17,15 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        api.c
+ * @file        interface.c
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#ifdef TB_CONFIG_OS_WINDOWS
-#   include "windows/api.c"
-#endif
+#include "interface.h"
 

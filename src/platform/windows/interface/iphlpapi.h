@@ -17,22 +17,41 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        prefix.h
+ * @file        iphlpapi.h
  *
  */
-#ifndef TB_PLATFORM_WINDOWS_ASIO_PREFIX_H
-#define TB_PLATFORM_WINDOWS_ASIO_PREFIX_H
+#ifndef TB_PLATFORM_WINDOWS_INTERFACE_IPHLPAPI_H
+#define TB_PLATFORM_WINDOWS_INTERFACE_IPHLPAPI_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../interface/interface.h"
-#include "../../../asio/asio.h"
-#include "../../../libc/libc.h"
-#include "../../../math/math.h"
-#include "../../../memory/memory.h"
-#include "../../../platform/platform.h"
-#include "../../../container/container.h"
+#include "prefix.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the GetNetworkParams func type
+typedef DWORD (* tb_iphlpapi_GetNetworkParams_t)(PFIXED_INFO pFixedInfo, PULONG pOutBufLen);
+
+// the iphlpapi interfaces type
+typedef struct __tb_iphlpapi_t
+{
+    // GetNetworkParams
+    tb_iphlpapi_GetNetworkParams_t          GetNetworkParams;
+
+}tb_iphlpapi_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/* the iphlpapi interfaces
+ *
+ * @return          the iphlpapi interfaces pointer
+ */
+tb_iphlpapi_t*      tb_iphlpapi(tb_noarg_t);
+
 
 #endif

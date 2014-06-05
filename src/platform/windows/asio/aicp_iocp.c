@@ -49,37 +49,37 @@
 typedef struct __tb_aicp_proactor_iocp_t
 {
     // the proactor base
-    tb_aicp_proactor_t                      base;
+    tb_aicp_proactor_t                          base;
 
     // the i/o completion port
-    HANDLE                                  port;
+    HANDLE                                      port;
 
     // the spak timer for task
-    tb_handle_t                             timer;
+    tb_handle_t                                 timer;
 
     // the spak low precision timer for timeout
-    tb_handle_t                             ltimer;
+    tb_handle_t                                 ltimer;
 
     // the timer loop
-    tb_handle_t                             loop;
+    tb_handle_t                                 loop;
 
     // the timer event
-    tb_handle_t                             event;
+    tb_handle_t                                 event;
 
     // the AcceptEx func
-    tb_api_AcceptEx_t                       AcceptEx;
+    tb_mswsock_AcceptEx_t                       AcceptEx;
 
     // the ConnectEx func
-    tb_api_ConnectEx_t                      ConnectEx;
+    tb_mswsock_ConnectEx_t                      ConnectEx;
 
     // the TransmitFile func
-    tb_api_TransmitFile_t                   TransmitFile;
+    tb_mswsock_TransmitFile_t                   TransmitFile;
 
     // the CancelIoEx func
-    tb_api_CancelIoEx_t                     CancelIoEx;
+    tb_kernel32_CancelIoEx_t                    CancelIoEx;
 
     // the GetQueuedCompletionStatusEx func
-    tb_api_GetQueuedCompletionStatusEx_t    GetQueuedCompletionStatusEx;
+    tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
 
 }tb_aicp_proactor_iocp_t;
 
@@ -87,10 +87,10 @@ typedef struct __tb_aicp_proactor_iocp_t
 typedef struct __tb_iocp_olap_t
 {
     // the base
-    OVERLAPPED                              base;
+    OVERLAPPED                                  base;
     
     // the aice
-    tb_aice_t                               aice;
+    tb_aice_t                                   aice;
 
 }tb_iocp_olap_t;
 
@@ -98,19 +98,19 @@ typedef struct __tb_iocp_olap_t
 typedef struct __tb_iocp_aico_t
 {
     // the base
-    tb_aico_t                               base;
+    tb_aico_t                                   base;
 
     // the ptor
-    tb_aicp_proactor_iocp_t*                ptor;
+    tb_aicp_proactor_iocp_t*                    ptor;
 
     // the olap
-    tb_iocp_olap_t                          olap;
+    tb_iocp_olap_t                              olap;
     
     // the task
-    tb_handle_t                             task;
+    tb_handle_t                                 task;
 
     // is ltimer?
-    tb_uint8_t                              bltimer : 1;
+    tb_uint8_t                                  bltimer : 1;
 
 }tb_iocp_aico_t;
 
@@ -118,13 +118,13 @@ typedef struct __tb_iocp_aico_t
 typedef struct __tb_iocp_loop_t
 {
     // the self
-    tb_size_t                               self;
+    tb_size_t                                   self;
 
     // the olap list
-    tb_OVERLAPPED_ENTRY_t                   list[TB_IOCP_OLAP_LIST_MAXN];
+    tb_OVERLAPPED_ENTRY_t                       list[TB_IOCP_OLAP_LIST_MAXN];
 
     // the aice spak 
-    tb_queue_t*                             spak;                   
+    tb_queue_t*                                 spak;                   
 
 }tb_iocp_loop_t;
 
@@ -2132,11 +2132,11 @@ static tb_aicp_proactor_t* tb_aicp_proactor_iocp_init(tb_aicp_t* aicp)
     ptor->base.loop_spak    = tb_aicp_proactor_iocp_loop_spak;
 
     // init func
-    ptor->AcceptEx                      = tb_api_AcceptEx();
-    ptor->ConnectEx                     = tb_api_ConnectEx();
-    ptor->TransmitFile                  = tb_api_TransmitFile();
-    ptor->CancelIoEx                    = tb_api_CancelIoEx();
-    ptor->GetQueuedCompletionStatusEx   = tb_api_GetQueuedCompletionStatusEx();
+    ptor->AcceptEx                      = tb_mswsock()->AcceptEx;
+    ptor->ConnectEx                     = tb_mswsock()->ConnectEx;
+    ptor->TransmitFile                  = tb_mswsock()->TransmitFile;
+    ptor->CancelIoEx                    = tb_kernel32()->CancelIoEx;
+    ptor->GetQueuedCompletionStatusEx   = tb_kernel32()->GetQueuedCompletionStatusEx;
     tb_assert_and_check_goto(ptor->AcceptEx && ptor->ConnectEx, fail);
 
     // init port

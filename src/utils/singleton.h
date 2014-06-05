@@ -90,6 +90,9 @@ typedef tb_void_t   (*tb_singleton_exit_func_t)(tb_handle_t instance, tb_cpointe
 /// the singleton kill func type
 typedef tb_void_t   (*tb_singleton_kill_func_t)(tb_handle_t instance, tb_cpointer_t priv);
 
+/// the singleton static init func type
+typedef tb_bool_t   (*tb_singleton_static_init_func_t)(tb_handle_t instance);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -119,6 +122,39 @@ tb_void_t           tb_singleton_exit(tb_noarg_t);
  */
 tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill);
 
+/*! the singleton static instance
+ *
+ * @code
+    static tb_bool_t tb_xxxx_instance_init(tb_handle_t instance)
+    {
+        // init 
+        // ...
+
+        // ok
+        return tb_true;
+    }
+    tb_xxxx_t* tb_xxxx()
+    {
+        // init
+        static tb_atomic_t      s_binited = 0;
+        static tb_xxxx_t        s_xxxx = {0};
+
+        // init the static instance
+        tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_xxxx, tb_xxxx_instance_init);
+        tb_assert(ok);
+
+        // ok
+        return &s_xxxx;
+    }
+ * @endcode
+ *
+ * @param binited   the singleton static instance is inited?
+ * @param instance  the singleton static instance
+ * @param init      the singleton static init func 
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, tb_singleton_static_init_func_t init);
 
 #endif
 
