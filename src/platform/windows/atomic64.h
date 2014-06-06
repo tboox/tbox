@@ -40,13 +40,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_pset_windows(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_pset_windows(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
     // check
     tb_assert_abort(tb_kernel32()->InterlockedCompareExchange64);
 
     // done
-    return (tb_hize_t)tb_kernel32()->InterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
+    return (tb_hong_t)tb_kernel32()->InterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
 }
 
 

@@ -57,18 +57,6 @@ typedef BOOL (WINAPI* tb_kernel32_GetFileSizeEx_t)(HANDLE hFile, PLARGE_INTEGER 
 // the InterlockedCompareExchange64 func type
 typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedCompareExchange64_t)(LONGLONG __tb_volatile__* Destination, LONGLONG Exchange, LONGLONG Comparand);
 
-// the InterlockedExchange64 func type
-typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedExchange64_t)(LONGLONG __tb_volatile__* Target, LONGLONG Value);
-
-// the InterlockedIncrement64 func type
-typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedIncrement64_t)(LONGLONG __tb_volatile__* Addend);
-
-// the InterlockedDecrement64 func type
-typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedDecrement64_t)(LONGLONG __tb_volatile__* Addend);
-
-// the InterlockedExchangeAdd64 func type
-typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedExchangeAdd64_t)(LONGLONG __tb_volatile__* Addend, LONGLONG Value);
-
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
