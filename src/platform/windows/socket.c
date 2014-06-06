@@ -64,6 +64,7 @@ tb_bool_t tb_socket_init()
     tb_assert_and_check_return_val(ws2_32->ioctlsocket, tb_false);
     tb_assert_and_check_return_val(ws2_32->closesocket, tb_false);
     tb_assert_and_check_return_val(ws2_32->gethostname, tb_false);
+    tb_assert_and_check_return_val(ws2_32->__WSAFDIsSet, tb_false);
 
     // init it
     WSADATA WSAData = {0};

@@ -48,11 +48,26 @@ typedef BOOL (WINAPI* tb_kernel32_GetQueuedCompletionStatusEx_t)(HANDLE Completi
 // the CancelIoEx func type
 typedef BOOL (WINAPI* tb_kernel32_CancelIoEx_t)(HANDLE hFile, LPOVERLAPPED lpOverlapped);
 
-// the CaptureStackBackTrace func type
-typedef USHORT (WINAPI* tb_kernel32_CaptureStackBackTrace_t)(ULONG FramesToSkip, ULONG FramesToCapture, PVOID *BackTrace, PULONG BackTraceHash);
+// the RtlCaptureStackBackTrace func type
+typedef USHORT (WINAPI* tb_kernel32_RtlCaptureStackBackTrace_t)(ULONG FramesToSkip, ULONG FramesToCapture, PVOID *BackTrace, PULONG BackTraceHash);
 
 // the GetFileSizeEx func type
 typedef BOOL (WINAPI* tb_kernel32_GetFileSizeEx_t)(HANDLE hFile, PLARGE_INTEGER lpFileSize);
+
+// the InterlockedCompareExchange64 func type
+typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedCompareExchange64_t)(LONGLONG __tb_volatile__* Destination, LONGLONG Exchange, LONGLONG Comparand);
+
+// the InterlockedExchange64 func type
+typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedExchange64_t)(LONGLONG __tb_volatile__* Target, LONGLONG Value);
+
+// the InterlockedIncrement64 func type
+typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedIncrement64_t)(LONGLONG __tb_volatile__* Addend);
+
+// the InterlockedDecrement64 func type
+typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedDecrement64_t)(LONGLONG __tb_volatile__* Addend);
+
+// the InterlockedExchangeAdd64 func type
+typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedExchangeAdd64_t)(LONGLONG __tb_volatile__* Addend, LONGLONG Value);
 
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
@@ -61,13 +76,16 @@ typedef struct __tb_kernel32_t
     tb_kernel32_CancelIoEx_t                    CancelIoEx;
 
     // CaptureStackBackTrace
-    tb_kernel32_CaptureStackBackTrace_t         CaptureStackBackTrace;
+    tb_kernel32_RtlCaptureStackBackTrace_t      RtlCaptureStackBackTrace;
 
     // GetFileSizeEx
     tb_kernel32_GetFileSizeEx_t                 GetFileSizeEx;
 
     // GetQueuedCompletionStatusEx
     tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
+
+    // InterlockedCompareExchange64
+    tb_kernel32_InterlockedCompareExchange64_t  InterlockedCompareExchange64;
 
 }tb_kernel32_t;
 

@@ -70,48 +70,16 @@
 
 #endif
 
-#ifndef tb_atomic64_get
-#   define tb_atomic64_get(a)                   tb_atomic64_get_generic(a)
-#endif
-
-#ifndef tb_atomic64_set
-#   define tb_atomic64_set(a, v)                tb_atomic64_set_generic(a, v)
-#endif
-
-#ifndef tb_atomic64_set0
-#   define tb_atomic64_set0(a)                  tb_atomic64_set0_generic(a)
-#endif
-
-#ifndef tb_atomic64_pset
-#   define tb_atomic64_pset(a, p, v)            tb_atomic64_pset_generic(a, p, v)
-#endif
-
-#ifndef tb_atomic64_fetch_and_set0
-#   define tb_atomic64_fetch_and_set0(a)        tb_atomic64_fetch_and_set0_generic(a)
+#ifndef tb_atomic64_fetch_and_pset
+#   define tb_atomic64_fetch_and_pset(a, p, v)  tb_atomic64_fetch_and_pset_generic(a, p, v)
 #endif
 
 #ifndef tb_atomic64_fetch_and_set
 #   define tb_atomic64_fetch_and_set(a, v)      tb_atomic64_fetch_and_set_generic(a, v)
 #endif
 
-#ifndef tb_atomic64_fetch_and_pset
-#   define tb_atomic64_fetch_and_pset(a, p, v)  tb_atomic64_fetch_and_pset_generic(a, p, v)
-#endif
-
-#ifndef tb_atomic64_fetch_and_inc
-#   define tb_atomic64_fetch_and_inc(a)         tb_atomic64_fetch_and_inc_generic(a)
-#endif
-
-#ifndef tb_atomic64_fetch_and_dec
-#   define tb_atomic64_fetch_and_dec(a)         tb_atomic64_fetch_and_dec_generic(a)
-#endif
-
 #ifndef tb_atomic64_fetch_and_add
 #   define tb_atomic64_fetch_and_add(a, v)      tb_atomic64_fetch_and_add_generic(a, v)
-#endif
-
-#ifndef tb_atomic64_fetch_and_sub
-#   define tb_atomic64_fetch_and_sub(a, v)      tb_atomic64_fetch_and_sub_generic(a, v)
 #endif
 
 #ifndef tb_atomic64_fetch_and_or
@@ -126,61 +94,74 @@
 #   define tb_atomic64_fetch_and_and(a, v)      tb_atomic64_fetch_and_and_generic(a, v)
 #endif
 
-#ifndef tb_atomic64_inc_and_fetch
-#   define tb_atomic64_inc_and_fetch(a)         tb_atomic64_inc_and_fetch_generic(a)
+#ifndef tb_atomic64_get
+#   define tb_atomic64_get(a)                   tb_atomic64_fetch_and_pset(a, 0, 0)
 #endif
 
-#ifndef tb_atomic64_dec_and_fetch
-#   define tb_atomic64_dec_and_fetch(a)         tb_atomic64_dec_and_fetch_generic(a)
+#ifndef tb_atomic64_set
+#   define tb_atomic64_set(a, v)                tb_atomic64_fetch_and_set(a, v)
+#endif
+
+#ifndef tb_atomic64_set0
+#   define tb_atomic64_set0(a)                  tb_atomic64_set(a, 0)
+#endif
+
+#ifndef tb_atomic64_pset
+#   define tb_atomic64_pset(a, p, v)            tb_atomic64_fetch_and_pset(a, p, v)
+#endif
+
+#ifndef tb_atomic64_fetch_and_set0
+#   define tb_atomic64_fetch_and_set0(a)        tb_atomic64_fetch_and_set(a, 0)
+#endif
+
+#ifndef tb_atomic64_fetch_and_inc
+#   define tb_atomic64_fetch_and_inc(a)         tb_atomic64_fetch_and_add(a, 1)
+#endif
+
+#ifndef tb_atomic64_fetch_and_dec
+#   define tb_atomic64_fetch_and_dec(a)         tb_atomic64_fetch_and_add(a, -1)
+#endif
+
+#ifndef tb_atomic64_fetch_and_sub
+#   define tb_atomic64_fetch_and_sub(a, v)      tb_atomic64_fetch_and_add(a, -(v))
 #endif
 
 #ifndef tb_atomic64_add_and_fetch
-#   define tb_atomic64_add_and_fetch(a, v)      tb_atomic64_add_and_fetch_generic(a, v)
+#   define tb_atomic64_add_and_fetch(a, v)      (tb_atomic64_fetch_and_add(a, v) + (v))
+#endif
+
+#ifndef tb_atomic64_inc_and_fetch
+#   define tb_atomic64_inc_and_fetch(a)         tb_atomic64_add_and_fetch(a, 1)
+#endif
+
+#ifndef tb_atomic64_dec_and_fetch
+#   define tb_atomic64_dec_and_fetch(a)         tb_atomic64_add_and_fetch(a, -1)
 #endif
 
 #ifndef tb_atomic64_sub_and_fetch
-#   define tb_atomic64_sub_and_fetch(a, v)      tb_atomic64_sub_and_fetch_generic(a, v)
+#   define tb_atomic64_sub_and_fetch(a, v)      tb_atomic64_add_and_fetch(a, -(v))
 #endif
 
 #ifndef tb_atomic64_or_and_fetch
-#   define tb_atomic64_or_and_fetch(a, v)       tb_atomic64_or_and_fetch_generic(a, v)
+#   define tb_atomic64_or_and_fetch(a, v)       (tb_atomic64_fetch_and_or(a, v) | (v))
 #endif
 
 #ifndef tb_atomic64_xor_and_fetch
-#   define tb_atomic64_xor_and_fetch(a, v)      tb_atomic64_xor_and_fetch_generic(a, v)
+#   define tb_atomic64_xor_and_fetch(a, v)      (tb_atomic64_fetch_and_xor(a, v) ^ (v))
 #endif
 
 #ifndef tb_atomic64_and_and_fetch
-#   define tb_atomic64_and_and_fetch(a, v)      tb_atomic64_and_and_fetch_generic(a, v)
+#   define tb_atomic64_and_and_fetch(a, v)      (tb_atomic64_fetch_and_and(a, v) & (v))
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_hong_t tb_atomic64_get_generic(tb_atomic64_t* a);
-tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_void_t tb_atomic64_set0_generic(tb_atomic64_t* a);
-tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
-
-tb_hong_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a);
 tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v);
 tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
-tb_hong_t tb_atomic64_fetch_and_inc_generic(tb_atomic64_t* a);
-tb_hong_t tb_atomic64_fetch_and_dec_generic(tb_atomic64_t* a);
 tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_fetch_and_sub_generic(tb_atomic64_t* a, tb_hong_t v);
 tb_hong_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v);
 tb_hong_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v);
 tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v);
-
-tb_hong_t tb_atomic64_inc_and_fetch_generic(tb_atomic64_t* a);
-tb_hong_t tb_atomic64_dec_and_fetch_generic(tb_atomic64_t* a);
-tb_hong_t tb_atomic64_add_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_sub_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
-
-
 
 #endif

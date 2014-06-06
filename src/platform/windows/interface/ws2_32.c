@@ -66,6 +66,7 @@ static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance)
     TB_INTERFACE_LOAD(ws2_32, ioctlsocket);
     TB_INTERFACE_LOAD(ws2_32, closesocket);
     TB_INTERFACE_LOAD(ws2_32, gethostname);
+    TB_INTERFACE_LOAD(ws2_32, __WSAFDIsSet);
 
     // ok
     return tb_true;
