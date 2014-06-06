@@ -94,7 +94,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-//      tb_trace_i("read[%p]: real: %lu, size: %lu, seek: %llu", aice->aico, aice->u.read.real, aice->u.read.size, aice->u.read.seek);
+        tb_trace_d("read[%p]: real: %lu, size: %lu, seek: %llu", aice->aico, aice->u.read.real, aice->u.read.size, aice->u.read.seek);
             
         // post send to client
         if (!tb_aico_send(context->aico[0], aice->u.read.data, aice->u.read.real, tb_demo_sock_send_func, context)) return tb_false;
@@ -133,7 +133,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-//      tb_trace_i("send[%p]: real: %lu, size: %lu", aice->aico, aice->u.send.real, aice->u.send.size);
+        tb_trace_d("send[%p]: real: %lu, size: %lu", aice->aico, aice->u.send.real, aice->u.send.size);
 
         // save size
         context->size += aice->u.send.real;
@@ -187,7 +187,7 @@ static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-//      tb_trace_i("sendf[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendf.real, aice->u.sendf.size);
+        tb_trace_d("sendf[%p]: real: %lu, size: %llu", aice->aico, aice->u.sendf.real, aice->u.sendf.size);
 
         // save size
         context->size += aice->u.sendf.real;

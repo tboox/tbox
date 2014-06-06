@@ -294,6 +294,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_send_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_read_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writ_t, real), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_sendf_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_sendv_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_recvv_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_readv_t, real), tb_null);
@@ -582,9 +583,6 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
         tb_aice_t   resp = {0};
         tb_long_t   ok = loop_spak(ptor, loop, &resp, -1);
 
-        // trace
-        tb_trace_d("loop[%p]: spak: code: %lu, aico: %p, state: %s: %ld", loop, resp.code, resp.aico, resp.aico? tb_state_cstr(tb_atomic_get(&resp.aico->state)) : "null", ok);
-
         // failed?
         tb_check_break(ok >= 0);
 
@@ -593,6 +591,9 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
 
         // check aico
         tb_assert_and_check_continue(resp.aico);
+
+        // trace
+        tb_trace_d("loop[%p]: spak: code: %lu, aico: %p, state: %s: %ld", loop, resp.code, resp.aico, resp.aico? tb_state_cstr(tb_atomic_get(&resp.aico->state)) : "null", ok);
 
         // kill? force updating state to be killing
         tb_size_t state = TB_STATE_OK;

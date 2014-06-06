@@ -953,7 +953,7 @@ static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
     // done send
     tb_long_t real = ptor->TransmitFile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendf.file, (DWORD)aice->u.sendf.size, (1 << 16), (LPOVERLAPPED)&aico->olap, tb_null, 0);
-    tb_trace_d("sendf: %ld, error: %d", real, ptor->WSAGetLastError());
+    tb_trace_d("sendf: %ld, size: %llu, error: %d", real, aice->u.sendf.size, ptor->WSAGetLastError());
 
     // pending? continue it
     if (!real || WSA_IO_PENDING == ptor->WSAGetLastError()) 
@@ -1494,6 +1494,9 @@ static tb_long_t tb_iocp_spak_iorw(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
     // ok?
     if (real)
     {
+        // trace
+        tb_trace_d("iorw: code: %lu, real: %lu", resp->code, real);
+
         // save the real size, @note: hack the real offset for the other io aice
         resp->u.recv.real = real;
 
@@ -1541,8 +1544,11 @@ static tb_long_t tb_iocp_spak_iorw(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
         // unknown error
     default:
         {
+            // trace
+            tb_trace_e("iorw: code: %lu, unknown error: %lu", resp->code, error);
+
+            // failed
             resp->state = TB_STATE_FAILED;
-            tb_trace_d("iorw: code: %lu, unknown error: %u", resp->code, error);
         }
         break;
     }
@@ -1675,6 +1681,9 @@ static tb_long_t tb_iocp_spak_done(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
     ,   tb_iocp_spak_runtask
     };
     tb_assert_and_check_return_val(resp->code < tb_arrayn(s_spak), -1);
+
+    // trace
+    tb_trace_d("spak: code: %u: done: ..", resp->code);
 
     // done spak
     return (s_spak[resp->code])? s_spak[resp->code](ptor, resp, real, error) : -1;
@@ -1988,9 +1997,6 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
             tb_LPOVERLAPPED_ENTRY_t entry = (tb_LPOVERLAPPED_ENTRY_t)tb_queue_get(loop->spak);
             tb_assert_and_check_return_val(entry, -1);
 
-            // pop the entry
-            tb_queue_pop(loop->spak);
-    
             // init 
             tb_size_t           real = (tb_size_t)entry->dwNumberOfBytesTransferred;
             tb_iocp_aico_t*     aico = (tb_iocp_aico_t* )entry->lpCompletionKey;
@@ -1998,6 +2004,9 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
             tb_size_t           error = tb_ntstatus_to_winerror((tb_size_t)entry->Internal);
             tb_trace_d("spak[%lu]: ntstatus: %lx, winerror: %lu", loop->self, (tb_size_t)entry->Internal, error);
 
+            // pop the entry
+            tb_queue_pop(loop->spak);
+    
             // check
             tb_assert_and_check_return_val(olap && aico, -1);
 
