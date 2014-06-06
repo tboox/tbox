@@ -28,6 +28,18 @@
 #include "../../spinlock.h"
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "../../windows/interface/interface.h"
+#else
+#   include <sys/select.h>
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// FD_ISSET
+#ifdef TB_CONFIG_OS_WINDOWS
+#   undef FD_ISSET
+#   define FD_ISSET(fd, set) tb_ws2_32()->__WSAFDIsSet((SOCKET)(fd), (fd_set FAR *)(set))
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

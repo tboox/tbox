@@ -84,93 +84,8 @@ static __tb_inline_force__ tb_spinlock_t* tb_atomic64_lock(tb_atomic64_t* a)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_hong_t tb_atomic64_get_generic(tb_atomic64_t* a)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // get value
-    tb_hong_t v = (tb_hong_t)*a;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return v;
-}
-tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    *a = (tb_atomic64_t)v;
-
-    // leave
-    tb_spinlock_leave(lock);
-}
-tb_void_t tb_atomic64_set0_generic(tb_atomic64_t* a)
-{
-    tb_atomic64_set_generic(a, 0);
-}
-tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    if ((tb_hong_t)*a == p) *a = (tb_atomic64_t)v;
-
-    // leave
-    tb_spinlock_leave(lock);
-}
-tb_hong_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a)
-{
-    return tb_atomic64_fetch_and_set_generic(a, 0);
-}
-tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)*a; *a = (tb_atomic64_t)v;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
 tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
-    // check
-    tb_assert(a);
-
     // the lock
     tb_spinlock_t* lock = tb_atomic64_lock(a);
 
@@ -186,252 +101,68 @@ tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_h
     // ok?
     return o;
 }
-tb_hong_t tb_atomic64_fetch_and_inc_generic(tb_atomic64_t* a)
+tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-    // check
-    tb_assert(a);
+    // done
+    tb_hong_t o;
+    do
+    {
+        o = *a;
 
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
+    } while (tb_atomic64_fetch_and_pset(a, o, v) != o);
 
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)(*a)++;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
-tb_hong_t tb_atomic64_fetch_and_dec_generic(tb_atomic64_t* a)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)(*a)--;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
+    // ok
     return o;
 }
 tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-    // check
-    tb_assert(a);
+    // done
+    tb_hong_t o;
+    do
+    {
+        o = *a;
 
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
+    } while (tb_atomic64_fetch_and_pset(a, o, o + v) != o);
 
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)*a; *a += (tb_atomic64_t)v;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
+    // ok
     return o;
-}
-tb_hong_t tb_atomic64_fetch_and_sub_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    return tb_atomic64_fetch_and_add_generic(a, -v);
 }
 tb_hong_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-    // check
-    tb_assert(a);
+    // done
+    tb_hong_t o;
+    do
+    {
+        o = *a;
 
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
+    } while (tb_atomic64_fetch_and_pset(a, o, o ^ v) != o);
 
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)*a; *a ^= (tb_atomic64_t)v;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
+    // ok
     return o;
 }
 tb_hong_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-    // check
-    tb_assert(a);
+    // done
+    tb_hong_t o;
+    do
+    {
+        o = *a;
 
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
+    } while (tb_atomic64_fetch_and_pset(a, o, o & v) != o);
 
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)*a; *a &= (tb_atomic64_t)v;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
+    // ok
     return o;
 }
 tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-    // check
-    tb_assert(a);
+    // done
+    tb_hong_t o;
+    do
+    {
+        o = *a;
 
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
+    } while (tb_atomic64_fetch_and_pset(a, o, o | v) != o);
 
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)*a; *a |= (tb_atomic64_t)v;
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
+    // ok
     return o;
 }
-tb_hong_t tb_atomic64_inc_and_fetch_generic(tb_atomic64_t* a)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)++(*a);
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
-tb_hong_t tb_atomic64_dec_and_fetch_generic(tb_atomic64_t* a)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    tb_hong_t o = (tb_hong_t)--(*a);
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
-tb_hong_t tb_atomic64_add_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    *a += (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
-tb_hong_t tb_atomic64_sub_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    return tb_atomic64_add_and_fetch_generic(a, -v);
-}
-tb_hong_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    *a ^= (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
-tb_hong_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    *a &= (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
-tb_hong_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // check
-    tb_assert(a);
-
-    // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
-
-    // enter
-    tb_spinlock_enter(lock);
-
-    // set value
-    *a |= (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
-
-    // leave
-    tb_spinlock_leave(lock);
-
-    // ok?
-    return o;
-}
-

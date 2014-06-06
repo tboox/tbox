@@ -109,6 +109,9 @@ typedef tb_int_t (WSAAPI* tb_ws2_32_closesocket_t)(SOCKET s);
 // the gethostname func type
 typedef tb_int_t (WSAAPI* tb_ws2_32_gethostname_t)(tb_char_t* name, tb_int_t namelen);
 
+// the __WSAFDIsSet func type
+typedef tb_int_t (WSAAPI* tb_ws2_32___WSAFDIsSet_t)(SOCKET fd, fd_set* set);
+
 // the ws2_32 interfaces type
 typedef struct __tb_ws2_32_t
 {
@@ -186,6 +189,9 @@ typedef struct __tb_ws2_32_t
     
     // gethostname
     tb_ws2_32_gethostname_t         gethostname;
+ 
+    // __WSAFDIsSet
+    tb_ws2_32___WSAFDIsSet_t        __WSAFDIsSet;
 
 }tb_ws2_32_t;
 
