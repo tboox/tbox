@@ -328,6 +328,7 @@ static __tb_inline__ tb_size_t tb_ntstatus_to_winerror(tb_size_t status)
     case STATUS_CONNECTION_DISCONNECTED:
     case STATUS_PORT_UNREACHABLE:
     case STATUS_HOPLIMIT_EXCEEDED:
+    case STATUS_INVALID_DEVICE_STATE:
         return WSAECONNRESET;
 
     case STATUS_LOCAL_DISCONNECT:
