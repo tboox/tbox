@@ -55,11 +55,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_set_sync(tb_atomic64_t* a, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_sync(tb_atomic64_t* a, tb_hong_t v)
 {
     return __sync_lock_test_and_set_8(a, v);
 }
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_pset_sync(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_pset_sync(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
     return __sync_val_compare_and_swap_8(a, p, v);
 }
@@ -72,16 +72,16 @@ static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_sub_sync(tb_atomic64_t* a, 
     return __sync_fetch_and_sub(a, v);
 }
 #if !(defined(TB_CONFIG_OS_IOS) && (TB_ARCH_ARM_VERSION < 7))
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_xor_sync(tb_atomic64_t* a, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_xor_sync(tb_atomic64_t* a, tb_hong_t v)
 {
     return __sync_fetch_and_xor_8(a, v);
 }
 #endif
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_and_sync(tb_atomic64_t* a, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_and_sync(tb_atomic64_t* a, tb_hong_t v)
 {
     return __sync_fetch_and_and_8(a, v);
 }
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_or_sync(tb_atomic64_t* a, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_or_sync(tb_atomic64_t* a, tb_hong_t v)
 {
     return __sync_fetch_and_or_8(a, v);
 }
@@ -94,16 +94,16 @@ static __tb_inline__ tb_hong_t tb_atomic64_sub_and_fetch_sync(tb_atomic64_t* a, 
     return __sync_sub_and_fetch_8(a, v);
 }
 #if !(defined(TB_CONFIG_OS_IOS) && (TB_ARCH_ARM_VERSION < 7))
-static __tb_inline__ tb_hize_t tb_atomic64_xor_and_fetch_sync(tb_atomic64_t* a, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_xor_and_fetch_sync(tb_atomic64_t* a, tb_hong_t v)
 {
     return __sync_xor_and_fetch_8(a, v);
 }
 #endif
-static __tb_inline__ tb_hize_t tb_atomic64_and_and_fetch_sync(tb_atomic64_t* a, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_and_and_fetch_sync(tb_atomic64_t* a, tb_hong_t v)
 {
     return __sync_and_and_fetch_8(a, v);
 }
-static __tb_inline__ tb_hize_t tb_atomic64_or_and_fetch_sync(tb_atomic64_t* a, tb_hize_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_or_and_fetch_sync(tb_atomic64_t* a, tb_hong_t v)
 {
     return __sync_or_and_fetch_8(a, v);
 }

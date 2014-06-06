@@ -57,7 +57,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_void_t tb_atomic_set_x86(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_void_t tb_atomic_set_x86(tb_atomic_t* a, tb_long_t v)
 {
     __tb_asm__ __tb_volatile__ 
     (
@@ -71,7 +71,7 @@ static __tb_inline__ tb_void_t tb_atomic_set_x86(tb_atomic_t* a, tb_size_t v)
         : "memory"
     );
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_long_t v)
 {
     __tb_asm__ __tb_volatile__ 
     (
@@ -88,7 +88,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_si
 
     return v;
 }
-static __tb_inline__ tb_void_t tb_atomic_pset_x86(tb_atomic_t* a, tb_size_t p, tb_size_t v)
+static __tb_inline__ tb_void_t tb_atomic_pset_x86(tb_atomic_t* a, tb_long_t p, tb_long_t v)
 {
     /*
      * cmpxchgl v, [a]:
@@ -117,7 +117,7 @@ static __tb_inline__ tb_void_t tb_atomic_pset_x86(tb_atomic_t* a, tb_size_t p, t
         : "cc", "memory"                //!< "cc" means that flags were changed.
     );
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_size_t p, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_long_t p, tb_long_t v)
 {
     /*
      * cmpxchgl v, [a]:
@@ -134,7 +134,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_s
      * }
      *
      */
-    tb_size_t o;
+    tb_long_t o;
     __tb_asm__ __tb_volatile__ 
     (
 #if TB_CPU_BITSIZE == 64
