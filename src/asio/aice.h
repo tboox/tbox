@@ -432,17 +432,17 @@ typedef struct __tb_aice_sendf_t
     /// the file
     tb_handle_t                 file;
 
+    /// the private data for using the left space of the union
+    tb_handle_t                 priv[1];
+
+    /// the real
+    tb_size_t                   real;
+
     /// the size
     tb_hize_t                   size;
 
-    /// the real
-    tb_hize_t                   real;
-
     /// the seek
     tb_hize_t                   seek;
-
-    /// the private data for using the left space of the union
-    tb_handle_t                 priv[1];
 
 }tb_aice_sendf_t;
 

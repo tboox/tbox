@@ -102,7 +102,7 @@
 #endif
 
 #ifndef STATUS_HOPLIMIT_EXCEEDED
-#   define STATUS_HOPLIMIT_EXCEEDED         (0xC000A012L)
+#   define STATUS_HOPLIMIT_EXCEEDED         (0xC000A012)
 #endif
 
 #ifndef STATUS_ADDRESS_ALREADY_EXISTS
@@ -271,6 +271,10 @@
 
 #ifndef STATUS_ACCESS_DENIED
 #   define STATUS_ACCESS_DENIED             (0xC0000022)
+#endif
+
+#ifndef STATUS_INVALID_DEVICE_STATE
+#   define STATUS_INVALID_DEVICE_STATE      (0xC0000184)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

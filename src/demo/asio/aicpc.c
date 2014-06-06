@@ -108,7 +108,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-//      tb_trace_i("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
+        tb_trace_d("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
 
         // continue?
         if (aice->u.writ.real < aice->u.writ.size)
@@ -149,7 +149,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-//      tb_trace_i("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
+        tb_trace_d("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
 
         // post writ to file
         if (!tb_aico_writ(context->aico[1], context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
