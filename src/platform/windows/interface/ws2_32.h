@@ -32,8 +32,6 @@
  * types
  */
 
-
-
 // the WSAStartup func type
 typedef tb_int_t (WSAAPI* tb_ws2_32_WSAStartup_t)(WORD wVersionRequested, LPWSADATA lpWSAData);
 

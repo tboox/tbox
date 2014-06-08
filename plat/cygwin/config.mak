@@ -1,5 +1,5 @@
 # demo
-TB_CONFIG_DEMO_LIBS 				= m dl pthread
+TB_CONFIG_DEMO_LIBS 				= ws2_32 m dl pthread
 TB_CONFIG_DEMO_CMD1 				=
 
 # float

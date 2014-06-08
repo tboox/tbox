@@ -44,7 +44,7 @@ static __tb_inline__ tb_time_t tb_filetime_to_time(FILETIME ft)
     ULARGE_INTEGER  ui = {{0}};  
     ui.LowPart      = ft.dwLowDateTime;  
     ui.HighPart     = ft.dwHighDateTime;  
-    return (tb_time_t)((LONGLONG)(ui.QuadPart - 116444736000000000) / 10000000);  
+    return (tb_time_t)((LONGLONG)(ui.QuadPart - 116444736000000000ull) / 10000000ul);  
 }
 
 // the path full for wchar
