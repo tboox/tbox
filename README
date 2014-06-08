@@ -3,9 +3,7 @@ The Treasure Box Library
 
 TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
 
-It includes asio, stream, network, container, algorithm, object, memory, database
-string, charset, math, libc, libm, utils and other library modules.
-
+It includes asio, stream, network, container, algorithm, object, memory, database, string, charset, math, libc, libm, utils and other library modules.
 
 ========================================================================
 features:
@@ -81,85 +79,6 @@ the libc library
 the libm library
 	implements lightweight libm library interfaces, the interface name contains tb_xxx prefix for avoiding conflict.
 	supports float and double type.
-
-
-========================================================================
-usage:
-
-1. configure
-	make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=]
-	make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]
-	make config|f [PLAT=android] [ARCH=armv5te|armv6] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [NDK=..] [SDK=..]
-
-2. build
-	make [all]
-	make rebuild|r
-	make lipo ARCH1=armv6 ARCH2=armv7 DEBUG=[y|n] SDK=[5.0|5.1|6.0|..] // for ios 
-
-3. update build
-	make update|u
-
-4. clean build
-	make clean|c
-
-5. install
-	make prefix|p
-	make install|i
-
-6. make info
-	make error|e
-	make output|o
-	make warning|w
-
-7. make document
-	make doc|d
-
-8. help
-	make help|h
-
-build for linux-x86 debug
-	make f PLAT=linux ARCH=x86 DEBUG=y
-	make r
-
-build for linux-x64 release
-	make f PLAT=linux ARCH=x64 DEBUG=n
-	make r
-
-build for mac, auto detecting architecture
-	make f PLAT=mac 
-	make r
-
-build for ios-armv7, using sdk7.1 framework
-	make f PLAT=ios ARCH=armv7 SDK=7.1
-	make r
-	
-build for ios armv7 and arm64 universal version
-	make lipo ARCH1=armv7 ARCH2=arm64 SDK=7.1
-
-build for android-armv5te, need set the ndk and toolchains directory
-	make f PLAT=android ARCH=armv5te NDK=/home/xxxx/android-ndk-r9d BIN=/home/xxxx/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/darwin-x86_64/bin
-	make r
-	
-build for android-armv6, if ndk and toolchains have been setted
-	make f PLAT=android ARCH=armv6
-	make r
-
-build for windows using mingw
-linux + i686-w64-mingw32 will be faster and better and supports for mac and cygwin + mingw
-	make f PLAT=mingw ARCH=x86
-	make r
-
-build for windows using cygwin
-	make f PLAT=cygwin ARCH=x86
-	make r
-
-build for linux and add cflags and ldflags
-	make f PLAT=linux CFLAG="-I." LDFLAG="-L. -lxxx"
-	make r
-
-build for windows and custom complier path and prefix
-	make f PLAT=mingw ARCH=x86 BIN="/home/xxx/bin" PRE="i386-mingw32-"
-	make r
 
 ========================================================================
 contact:

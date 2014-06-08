@@ -157,7 +157,8 @@ endif
 # host
 HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i linux},linux,))
 HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i darwin},mac,))
-HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i cygwin},windows,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i cygwin},cygwin,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i mingw},msys,))
 HOST :=$(if $(HOST),$(HOST),linux)
 
 # platform
@@ -234,7 +235,7 @@ endif
 
 config : .null
 	-@cp ./plat/$(PLAT)/config.h ./src/config.h
-	-@perl -pi -e "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/config.h
+	-@perl -pi -e "s/\[build\]/`date +%Y%m%d%H%Mull`/g" ./src/config.h
 	-@perl -pi -e "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/config.h
 	-@perl -pi -e "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/config.h
 	@echo "config: ==================================================================="
@@ -363,5 +364,5 @@ config : .null
 
 # make help
 help : .null
-	@cat ./README
+	@cat ./INSTALL
 

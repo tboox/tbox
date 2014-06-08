@@ -579,25 +579,16 @@ static tb_handle_t tb_database_sqlite3_statement_init(tb_database_sql_t* databas
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
     tb_assert_and_check_return_val(sqlite && sqlite->database && sql, tb_null);
 
-    // done
-    tb_bool_t       ok = tb_false;
-    sqlite3_stmt*   stmt = tb_null;
-    do
+    // init stmt
+    sqlite3_stmt* stmt = tb_null;
+    if (SQLITE_OK != sqlite3_prepare_v2(sqlite->database, sql, -1, &stmt, 0))
     {
-        // init stmt
-        if (SQLITE_OK != sqlite3_prepare_v2(sqlite->database, sql, -1, &stmt, 0))
-        {
-            // save state
-            sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
+        // save state
+        sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
 
-            // trace
-            tb_trace_e("stmt: init %s failed, error[%d]: %s", sql, sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
-        }
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
+        // trace
+        tb_trace_e("stmt: init %s failed, error[%d]: %s", sql, sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+    }
 
     // ok?
     return (tb_handle_t)stmt;

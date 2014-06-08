@@ -16,7 +16,7 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # prefix
-PRE 				:= $(if $(findstring x86,$(ARCH)),$(if $(findstring mac,$(HOST)),i386-mingw32-,i686-w64-mingw32-),$(PRE))
+PRE 				:= $(if $(findstring x86,$(ARCH)),$(if $(findstring mac,$(HOST)),i386-mingw32-,$(if $(findstring msys,$(HOST)),,i686-w64-mingw32-)),$(PRE))
 PRE 				:= $(if $(findstring x64,$(ARCH)),x86_64-w64-mingw32-,$(PRE))
 PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),$(PRE))
 
@@ -70,7 +70,6 @@ endif
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
-					-std=c99 \
 					-D_GNU_SOURCE=1 -D_REENTRANT -fno-math-errno
 
 # ccflags: .cc/.cpp files

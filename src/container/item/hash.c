@@ -40,7 +40,7 @@ static tb_size_t tb_item_func_hash_data_func_0(tb_byte_t const* data, tb_size_t 
 static tb_size_t tb_item_func_hash_data_func_1(tb_byte_t const* data, tb_size_t size)
 {
     // from stl string
-    tb_size_t           v = 2166136261;
+    tb_size_t           v = 2166136261ul;
     tb_byte_t const*    p = data;
     tb_byte_t const*    e = data + size;
     while (p < e) v = 16777619 * v ^ (tb_size_t)(*p++);
@@ -95,7 +95,7 @@ static tb_size_t tb_item_func_hash_data_func_2(tb_byte_t const* data, tb_size_t 
 static tb_size_t tb_item_func_hash_data_func_3(tb_byte_t const* data, tb_size_t size)
 {
     // fnv-1a-hash
-    tb_size_t           v = size; v ^= 2166136261;
+    tb_size_t           v = size; v ^= 2166136261ul;
     tb_byte_t const*    p = data;
     tb_byte_t const*    e = data + size;
     while (p < e) 
@@ -154,7 +154,7 @@ static tb_size_t tb_item_func_hash_data_func_8(tb_byte_t const* data, tb_size_t 
     tb_uint32_t const   m = 0x5bd1e995;
     tb_uint32_t const   r = 24;
     tb_uint32_t         l = size;
-    tb_size_t           v = 2166136261;
+    tb_size_t           v = 2166136261ul;
 
 #define mmix(v,k) { k *= m; k ^= k >> r; k *= m; v *= m; v ^= k; }
     while (size >= 4)
@@ -251,7 +251,7 @@ static tb_size_t tb_item_func_hash_cstr_func_0(tb_char_t const* data)
 static tb_size_t tb_item_func_hash_cstr_func_1(tb_char_t const* data)
 {
     // from stl string
-    tb_size_t           v = 2166136261;
+    tb_size_t           v = 2166136261ul;
     tb_byte_t const*    p = (tb_byte_t const*)data;
     while (*p) v = 16777619 * v ^ (tb_size_t)(*p++);
     return v;
@@ -266,7 +266,7 @@ static tb_size_t tb_item_func_hash_uint8_func_0(tb_uint8_t value)
 }
 static tb_size_t tb_item_func_hash_uint8_func_1(tb_uint8_t value)
 {
-    return (tb_size_t)(((tb_uint64_t)(value) * 2654435761) >> 16);
+    return (tb_size_t)(((tb_uint64_t)(value) * 2654435761ul) >> 16);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -274,7 +274,7 @@ static tb_size_t tb_item_func_hash_uint8_func_1(tb_uint8_t value)
  */
 static tb_size_t tb_item_func_hash_uint16_func_0(tb_uint16_t value)
 {
-    return (tb_size_t)(((tb_uint64_t)(value) * 2654435761) >> 16);
+    return (tb_size_t)(((tb_uint64_t)(value) * 2654435761ul) >> 16);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -282,7 +282,7 @@ static tb_size_t tb_item_func_hash_uint16_func_0(tb_uint16_t value)
  */
 static tb_size_t tb_item_func_hash_uint32_func_0(tb_uint32_t value)
 {
-    return (tb_size_t)(((tb_uint64_t)(value) * 2654435761) >> 16);
+    return (tb_size_t)(((tb_uint64_t)(value) * 2654435761ul) >> 16);
 }
 static tb_size_t tb_item_func_hash_uint32_func_1(tb_uint32_t value)
 {
@@ -312,7 +312,7 @@ static tb_size_t tb_item_func_hash_uint32_func_2(tb_uint32_t value)
  */
 static tb_size_t tb_item_func_hash_uint64_func_0(tb_uint64_t value)
 {
-    return (tb_size_t)((value * 2654435761) >> 16);
+    return (tb_size_t)((value * 2654435761ul) >> 16);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
