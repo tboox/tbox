@@ -346,7 +346,7 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_sql_t* database)
     do
     {
         // the database path
-        path = tb_url_path_get(&database->url);
+        path = tb_url_get(&database->url);
         tb_assert_and_check_break(path);
 
         // load sqlite3 library
@@ -784,8 +784,11 @@ tb_size_t tb_database_sqlite3_probe(tb_url_t const* url)
         if (tb_url_host_get(url) || tb_url_port_get(url)) break;
 
         // the database path
-        tb_char_t const* path = tb_url_path_get(url);
+        tb_char_t const* path = tb_url_get((tb_url_t*)url);
         tb_assert_and_check_break(path);
+
+        // is file?
+        if (tb_url_protocol_get(url) == TB_URL_PROTOCOL_FILE) score += 20;
 
         // init stream
         stream = tb_basic_stream_init_from_url(path);

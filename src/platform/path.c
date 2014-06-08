@@ -42,6 +42,8 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 {
     // check
     tb_assert_and_check_return_val(path && full && maxn, tb_null);
+
+    // trace
     tb_trace_d("path: %s", path);
 
     // unix path?
@@ -53,21 +55,41 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
         // full? 
         if (path[0] == '/')
         {
+            // copy it
             tb_strlcpy(full, path, maxn - 1);
             full[maxn - 1] = '\0';
+
+            // trace
             tb_trace_d("full: %s", full);
+
+            // ok
             return full;
         }
     }
     // windows path?
     else if (tb_isalpha(path[0]) && path[1] == ':' && (path[2] == '/' || path[2] == '\\'))
     {
+        // copy it
         tb_strlcpy(full, path, maxn - 1);
         full[maxn - 1] = '\0';
+
+        // trace
         tb_trace_d("full: %s", full);
+
+        // ok
         return full;
     }
     
+    // must be relative path
+    if (tb_strstr(path, ":/") || tb_strstr(path, ":\\")) 
+    {
+        // trace
+        tb_trace_e("invalid file path: %s", path);
+
+        // failed
+        return tb_null;
+    }
+
     // the current directory
     tb_size_t size = 0;
     if (!(size = tb_directory_curt(full, maxn))) return tb_null;
