@@ -66,15 +66,15 @@ build for android-armv6, if ndk and toolchains have been setted
 	make f PLAT=android ARCH=armv6
 	make r
 
-build for windows using mingw
+build for windows using mingw and need link libgcc.a from mingw
 	make f PLAT=mingw ARCH=x86
 	make r
 
-build for windows using cygwin
+build for windows using cygwin and need link libgcc.a from mingw
 	make f PLAT=cygwin ARCH=x86
 	make r
 
-build for windows and custom complier path and prefix
+build for windows and custom complier path and prefix and need link libgcc.a from mingw
 	make f PLAT=mingw ARCH=x86 BIN="/home/xxx/bin" PRE="i386-mingw32-"
 	make r
 
