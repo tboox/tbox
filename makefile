@@ -39,7 +39,7 @@ all : .null
 # make rebuild
 rebuild : .null
 	@$(MAKE) c
-	-@$(MAKE) -j4
+	-@$(MAKE)
 	@$(MAKE)
 	@$(MAKE) i
 	@$(MAKE) p
@@ -165,6 +165,7 @@ HOST :=$(if $(HOST),$(HOST),linux)
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},mingw,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i mingw},mingw,))
 PLAT :=$(if $(PLAT),$(PLAT),linux)
 
 # architecture
