@@ -131,7 +131,7 @@ tb_handle_t tb_database_sql_init(tb_char_t const* url)
         tb_trace_d("init: %s: no", url);
 
         // exit database
-        tb_database_sql_exit((tb_handle_t)database);
+        if (database) tb_database_sql_exit((tb_handle_t)database);
         database = tb_null;
     }
 

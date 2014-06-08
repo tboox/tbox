@@ -273,12 +273,9 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
             url->bssl = 0;
             p += 6;
         }
-        else if (!tb_strstr(p, "://")) 
+        // ./file or /home/file or c:/file or c:\\file ...
+        else if ((p = tb_path_full(cstr, full, TB_PATH_MAXN))) 
         {
-            // the full path
-            p = tb_path_full(cstr, full, TB_PATH_MAXN);
-            tb_assert_and_check_break(p);
-
             // for unix style path
             if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
             {
