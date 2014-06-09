@@ -16,9 +16,12 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # prefix
+ifeq ($(PRE_),)
 PRE 				:= $(if $(findstring x86,$(ARCH)),$(if $(findstring mac,$(HOST)),i386-mingw32-,$(if $(findstring msys,$(HOST)),,i686-w64-mingw32-)),$(PRE))
 PRE 				:= $(if $(findstring x64,$(ARCH)),x86_64-w64-mingw32-,$(PRE))
 PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),$(PRE))
+export PRE_
+endif
 
 # cpu bits
 BITS 				:= $(if $(findstring x64,$(ARCH)),64,)

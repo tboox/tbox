@@ -32,21 +32,25 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-
 #if !defined(tb_atomic64_fetch_and_pset)
 #   define tb_atomic64_fetch_and_pset(a, p, v)      tb_atomic64_fetch_and_pset_windows(a, p, v)
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_pset_windows(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
-    // check
-    tb_assert_abort(tb_kernel32()->InterlockedCompareExchange64);
-
     // done
-    return (tb_hong_t)tb_kernel32()->InterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
+    if (tb_kernel32()->InterlockedCompareExchange64) return (tb_hong_t)tb_kernel32()->InterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
+
+    // using the generic implementation
+    return tb_atomic64_fetch_and_pset_generic(a, p, v);
 }
 
 

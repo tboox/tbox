@@ -39,7 +39,6 @@ all : .null
 # make rebuild
 rebuild : .null
 	@$(MAKE) c
-	-@$(MAKE)
 	@$(MAKE)
 	@$(MAKE) i
 	@$(MAKE) p
