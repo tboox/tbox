@@ -266,11 +266,11 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
             tb_assert_and_check_break(context->file && context->data);
 
             // addo sock
-            context->aico[0] = tb_aico_init_sock(aicp, context->sock, tb_demo_sock_exit_func, tb_null);
+            context->aico[0] = tb_aico_init_sock(aicp, context->sock);
             tb_assert_and_check_break(context->aico[0]);
 
             // addo file
-            context->aico[1] = tb_aico_init_file(aicp, context->file, tb_demo_file_exit_func, tb_null);
+            context->aico[1] = tb_aico_init_file(aicp, context->file);
             tb_assert_and_check_break(context->aico[1]);
 
             // post read from file

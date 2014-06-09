@@ -1020,10 +1020,10 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
     // done read
     DWORD       real = 0;
     BOOL        ok = ReadFile((HANDLE)aico->base.handle, aice->u.read.data, (DWORD)aice->u.read.size, &real, (LPOVERLAPPED)&aico->olap);
-    tb_trace_d("ReadFile: real: %u, size: %lu, error: %d", real, aice->u.read.size, GetLastError());
+    tb_trace_d("ReadFile: real: %u, size: %lu, error: %d, ok: %d", real, aice->u.read.size, GetLastError(), ok);
 
-    // pending? continue it
-    if (!real || ERROR_IO_PENDING == GetLastError())
+    // finished or pending? continue it
+    if (ok || ERROR_IO_PENDING == GetLastError())
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -1032,20 +1032,9 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
         return tb_true;
     }
 
-    // finished?
-    if (ok || real > 0)
-    {
-        // post ok
-        aico->olap.aice.state = TB_STATE_OK;
-        aico->olap.aice.u.read.real = real;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
-    else 
-    {
-        // post failed
-        aico->olap.aice.state = TB_STATE_FAILED;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
+    // post failed
+    aico->olap.aice.state = TB_STATE_FAILED;
+    if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 
     // failed
     return tb_false;
@@ -1074,10 +1063,10 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
     // done writ
     DWORD       real = 0;
     BOOL        ok = WriteFile((HANDLE)aico->base.handle, aice->u.writ.data, (DWORD)aice->u.writ.size, &real, (LPOVERLAPPED)&aico->olap);
-    tb_trace_d("WriteFile: real: %u, size: %lu, error: %d", real, aice->u.writ.size, GetLastError());
+    tb_trace_d("WriteFile: real: %u, size: %lu, error: %d, ok: %d", real, aice->u.writ.size, GetLastError(), ok);
 
-    // pending? continue it
-    if (!real || ERROR_IO_PENDING == GetLastError())
+    // finished or pending? continue it
+    if (ok || ERROR_IO_PENDING == GetLastError())
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -1086,20 +1075,9 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
         return tb_true;
     }
 
-    // finished?
-    if (ok || real > 0)
-    {
-        // post ok
-        aico->olap.aice.state = TB_STATE_OK;
-        aico->olap.aice.u.writ.real = real;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
-    else
-    {
-        // post failed
-        aico->olap.aice.state = TB_STATE_FAILED;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
+    // post failed
+    aico->olap.aice.state = TB_STATE_FAILED;
+    if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 
     // failed
     return tb_false;
@@ -1130,8 +1108,8 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     BOOL        ok = ReadFile((HANDLE)aico->base.handle, aice->u.readv.list[0].data, (DWORD)aice->u.readv.list[0].size, &real, (LPOVERLAPPED)&aico->olap);
     tb_trace_d("ReadFile: %u, error: %d", real, GetLastError());
 
-    // pending? continue it
-    if (!real || ERROR_IO_PENDING == GetLastError())
+    // finished or pending? continue it
+    if (ok || ERROR_IO_PENDING == GetLastError())
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -1140,20 +1118,9 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
         return tb_true;
     }
 
-    // finished?
-    if (ok || real > 0)
-    {
-        // post ok
-        aico->olap.aice.state = TB_STATE_OK;
-        aico->olap.aice.u.readv.real = real;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
-    else 
-    {
-        // post failed
-        aico->olap.aice.state = TB_STATE_FAILED;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
+    // post failed
+    aico->olap.aice.state = TB_STATE_FAILED;
+    if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 
     // failed
     return tb_false;
@@ -1184,8 +1151,8 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     BOOL        ok = WriteFile((HANDLE)aico->base.handle, aice->u.writv.list[0].data, (DWORD)aice->u.writv.list[0].size, &real, (LPOVERLAPPED)&aico->olap);
     tb_trace_d("WriteFile: %u, error: %d", real, GetLastError());
 
-    // pending? continue it
-    if (!real || ERROR_IO_PENDING == GetLastError())
+    // finished or pending? continue it
+    if (ok || ERROR_IO_PENDING == GetLastError())
     {
         // post timeout 
         tb_iocp_post_timeout(proactor, aico);
@@ -1194,20 +1161,9 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
         return tb_true;
     }
 
-    // finished?
-    if (ok || real > 0)
-    {
-        // post ok
-        aico->olap.aice.state = TB_STATE_OK;
-        aico->olap.aice.u.writv.real = real;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
-    else
-    {
-        // post failed
-        aico->olap.aice.state = TB_STATE_FAILED;
-        if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
-    }
+    // post failed
+    aico->olap.aice.state = TB_STATE_FAILED;
+    if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 
     // failed
     return tb_false;
@@ -1530,6 +1486,7 @@ static tb_long_t tb_iocp_spak_iorw(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
     case WSAECONNRESET:
     case ERROR_HANDLE_EOF:
     case ERROR_NETNAME_DELETED:
+    case ERROR_BAD_COMMAND:
         {
             resp->state = TB_STATE_CLOSED;
         }
