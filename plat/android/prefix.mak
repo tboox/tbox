@@ -33,7 +33,7 @@ PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g 
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -c -Wall -fomit-frame-pointer -march=$(ARCH) \
 					  -I$(NDK)/platforms/android-8/arch-arm/usr/include 
 CXFLAGS-I 			= -I

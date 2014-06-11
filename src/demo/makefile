@@ -147,7 +147,7 @@ demo_LIBS-y 								+= $(TB_CONFIG_DEMO_LIBS)
 demo_LIB_DIR 								+= ..
 
 # flags
-demo_CXFLAGS 								+= -DTB_TRACE_PREFIX=\"demo\"
+demo_CXFLAGS 								+= -D__tb_prefix__=\"demo\"
 
 # command
 demo_SUFFIX_CMD1 							+= $(TB_CONFIG_DEMO_CMD1)
