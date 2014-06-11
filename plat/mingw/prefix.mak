@@ -73,6 +73,7 @@ endif
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
+					-std=gnu99 \
 					-D_GNU_SOURCE=1 -D_REENTRANT -fno-math-errno
 
 # ccflags: .cc/.cpp files

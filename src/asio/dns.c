@@ -490,7 +490,7 @@ tb_void_t tb_aicp_dns_kill(tb_handle_t handle)
     // kill it
     if (dns->aico) tb_aico_kill(dns->aico);
 }
-tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t exit, tb_cpointer_t priv)
+tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
@@ -499,14 +499,31 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t exit, tb_
     // trace
     tb_trace_d("exit: ..");
 
-    // save func
-    dns->exit.func = exit;
-    dns->exit.priv = priv;
+    // no func? wait exiting
+    if (!func)
+    {
+        // exit aico
+        if (dns->aico) tb_aico_exit(dns->aico, tb_null, tb_null);
+        dns->aico = tb_null;
 
-    // exit aico
-    if (dns->aico) tb_aico_exit(dns->aico, tb_aicp_dns_exit_func, dns);
-    // done func directly
-    else tb_aicp_dns_exit_func(tb_null, dns);
+        // exit sock
+        if (dns->sock) tb_socket_clos(dns->sock);
+        dns->sock = tb_null;
+
+        // exit it
+        tb_free(dns);
+    }
+    else
+    {
+        // save func
+        dns->exit.func = func;
+        dns->exit.priv = priv;
+
+        // exit aico
+        if (dns->aico) tb_aico_exit(dns->aico, tb_aicp_dns_exit_func, dns);
+        // done func directly
+        else tb_aicp_dns_exit_func(tb_null, dns);
+    }
 }
 tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host, tb_aicp_dns_done_func_t func, tb_cpointer_t priv)
 {

@@ -261,6 +261,7 @@ static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_
     if (sstream->hssl) tb_aicp_ssl_clos(sstream->hssl, tb_async_stream_sock_clos_ssl_func, sstream);
     else
 #endif
+    if (!sstream->balived)
     {
         // exit aico 
         if (sstream->aico) tb_aico_exit(sstream->aico, tb_async_stream_sock_clos_aico_func, sstream);
@@ -269,6 +270,8 @@ static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_
         // done func directly
         else tb_async_stream_sock_clos_func(tb_null, sstream);
     }
+    // done func directly
+    else tb_async_stream_sock_clos_func(tb_null, sstream);
 
     // ok
     return tb_true;
@@ -1072,17 +1075,29 @@ static tb_bool_t tb_async_stream_sock_exit(tb_handle_t astream)
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
     tb_assert_and_check_return_val(sstream, tb_false);
 
-    // aico has been not closed already?
-    tb_assert_and_check_return_val(!sstream->aico, tb_false);
-
-    // dns has been not closed already?
-    tb_assert_and_check_return_val(!sstream->hdns, tb_false);
-
     // exit ssl
 #ifdef TB_SSL_ENABLE
     if (sstream->hssl) tb_aicp_ssl_exit(sstream->hssl);
     sstream->hssl = tb_null;
 #endif
+
+    // alived? exit it
+    if (sstream->balived)
+    {
+        // exit aico
+        if (sstream->aico) tb_aico_exit(sstream->aico, tb_null, tb_null);
+        sstream->aico = tb_null;
+
+        // exit hdns
+        if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_null, tb_null);
+        sstream->hdns = tb_null;
+    }
+    else
+    {
+        // check
+        tb_assert_and_check_return_val(sstream->aico, tb_false);
+        tb_assert_and_check_return_val(sstream->hdns, tb_false);
+    }
 
     // exit it
     if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);

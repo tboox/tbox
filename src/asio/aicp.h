@@ -229,7 +229,7 @@ tb_handle_t         tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t 
  *
  * @param aicp      the aicp
  * @param aico      the aico
- * @param func      the exiting func, will wait it if be null
+ * @param func      the exiting func, wait exiting if be null
  * @param priv      the private data for exiting func
  */
 tb_void_t           tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
