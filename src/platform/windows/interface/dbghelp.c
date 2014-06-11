@@ -34,7 +34,7 @@ static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance)
 {
     // check
     tb_dbghelp_t* dbghelp = (tb_dbghelp_t*)instance;
-    tb_assert_and_check_return_val(dbghelp, tb_false);
+    tb_check_return_val(dbghelp, tb_false);
 
     // the dbghelp module
     HANDLE module = tb_dynamic_init("dbghelp.dll");
@@ -42,7 +42,7 @@ static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance)
 
     // init interfaces
     TB_INTERFACE_LOAD(dbghelp, SymInitialize);
-    tb_assert_and_check_return_val(dbghelp->SymInitialize, tb_false);
+    tb_check_return_val(dbghelp->SymInitialize, tb_false);
  
     // init symbols
     if (!dbghelp->SymInitialize(GetCurrentProcess(), tb_null, TRUE)) return tb_false;
@@ -65,8 +65,7 @@ tb_dbghelp_t* tb_dbghelp()
     static tb_dbghelp_t     s_dbghelp = {0};
 
     // init the static instance
-    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_dbghelp, tb_dbghelp_instance_init);
-    tb_assert(ok);
+    tb_singleton_static_init(&s_binited, &s_dbghelp, tb_dbghelp_instance_init);
 
     // ok
     return &s_dbghelp;

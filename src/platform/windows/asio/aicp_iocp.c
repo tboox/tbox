@@ -1665,7 +1665,12 @@ static tb_bool_t tb_aicp_proactor_iocp_addo(tb_aicp_proactor_t* proactor, tb_aic
 
             // add aico to port
             HANDLE port = CreateIoCompletionPort((HANDLE)((SOCKET)aico->handle - 1), ptor->port, (ULONG_PTR)aico, 0);
-            tb_assert_and_check_return_val(port == ptor->port, tb_false);
+            if (port != ptor->port)
+            {
+                // trace
+                tb_trace_e("CreateIoCompletionPort failed: %d, aico: %p, handle: %p", GetLastError(), aico, aico->handle);
+                return tb_false;
+            }
         }
         break;
     case TB_AICO_TYPE_FILE:
@@ -1675,7 +1680,12 @@ static tb_bool_t tb_aicp_proactor_iocp_addo(tb_aicp_proactor_t* proactor, tb_aic
 
             // add aico to port
             HANDLE port = CreateIoCompletionPort((HANDLE)aico->handle, ptor->port, (ULONG_PTR)aico, 0);
-            tb_assert_and_check_return_val(port == ptor->port, tb_false);
+            if (port != ptor->port)
+            {
+                // trace
+                tb_trace_e("CreateIoCompletionPort failed: %d, aico: %p, handle: %p", GetLastError(), aico, aico->handle);
+                return tb_false;
+            }
         }
         break;
     case TB_AICO_TYPE_TASK:

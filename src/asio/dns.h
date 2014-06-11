@@ -61,7 +61,7 @@ tb_void_t           tb_aicp_dns_kill(tb_handle_t handle);
 
 /*! exit the dns
  *
- * @param func      the exit func
+ * @param func      the exit func, wait exiting if be null
  * @param priv      the func private data
  *
  * @param handle    the dns handle

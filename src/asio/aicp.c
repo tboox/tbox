@@ -133,6 +133,15 @@ static tb_bool_t tb_aicp_aico_kill(tb_pointer_t item, tb_cpointer_t priv)
     // ok
     return tb_true;
 }
+static tb_void_t tb_aicp_aico_exit_func(tb_handle_t aico, tb_cpointer_t priv)
+{
+    // check
+    tb_atomic_t* wait = (tb_atomic_t*)priv;
+    tb_assert_and_check_return(wait);
+
+    // exit ok
+    tb_atomic_set(wait, 1);
+}
 static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 {
     // check
@@ -429,6 +438,15 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aico_exit_func_t fu
     // check
     tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
+    // no func? wait exiting
+    tb_atomic_t wait = 0;
+    if (!func)
+    {
+        func = tb_aicp_aico_exit_func;
+        priv = (tb_cpointer_t)&wait;
+    }
+    else tb_atomic_set(&wait, 1);
+
     // save func
     ((tb_aico_t*)aico)->exit = func;
     ((tb_aico_t*)aico)->priv = priv;
@@ -452,6 +470,24 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aico_exit_func_t fu
 
         // exit it
         if (aicp->ptor->delo(aicp->ptor, aico)) tb_aicp_aico_exit(aicp, aico);
+    }
+
+    // wait exiting
+    tb_size_t tryn = 20;
+    while (!tb_atomic_get(&wait) && tryn--)
+    {
+        // trace
+        tb_trace_d("exit: aico[%p]: waiting: ..", aico);
+
+        // wait it
+        tb_msleep(200);
+    }
+
+    // check
+    if (!tb_atomic_get(&wait))
+    {
+        // trace
+        tb_trace_e("exit: aico[%p]: failed", aico);
     }
 }
 tb_void_t tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico)
