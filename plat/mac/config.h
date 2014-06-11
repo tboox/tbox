@@ -4,9 +4,6 @@
 // build version
 #define TB_CONFIG_VERSION_BUILD         [build]
 
-// debug
-#define TB_CONFIG_DEBUG                 [debug]
-
 // small
 #define TB_CONFIG_SMALL                 [small]
 

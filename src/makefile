@@ -392,7 +392,7 @@ tbox_C_FILES 			+= \
 endif
 
 # flags
-tbox_CXFLAGS 			+= -DTB_TRACE_PREFIX=\"tbox\"
+tbox_CXFLAGS 			+= -D__tb_prefix__=\"tbox\"
 
 # header files
 INC_FILES 				= \

@@ -55,7 +55,7 @@ PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g  
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
@@ -92,7 +92,7 @@ CCFLAGS 			= \
 
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -fvisibility=hidden
-MXFLAGS_DEBUG 		= -g  
+MXFLAGS_DEBUG 		= -g -D__tb_debug__
 MXFLAGS 			= \
 					-m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments \
 					-mssse3 $(ARCH_CXFLAGS) -fmessage-length=0 -pipe -fpascal-strings \
