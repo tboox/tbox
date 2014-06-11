@@ -137,9 +137,6 @@ typedef struct __tb_aicp_ssl_t
     // the aico
     tb_handle_t                 aico;
 
-    // the sock
-    tb_handle_t                 sock;
-
     // the func
     union
     {
@@ -336,10 +333,10 @@ static tb_void_t tb_aicp_ssl_clos_clear(tb_aicp_ssl_t* ssl)
     tb_assert_and_check_return(ssl);
 
     // close ssl
-    if (ssl->ssl) 
+    if (ssl->ssl && ssl->aico) 
     {       
         // init bio sock, need some blocking time for closing
-        tb_ssl_set_bio_sock(ssl->ssl, ssl->sock);
+        tb_ssl_set_bio_sock(ssl->ssl, tb_aico_handle(ssl->aico));
 
         // close it
         tb_ssl_clos(ssl->ssl);
@@ -828,11 +825,14 @@ static tb_bool_t tb_aicp_ssl_done_task(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_void_t tb_aicp_ssl_done_clos(tb_handle_t aico, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_ssl_done_clos(tb_aice_t const* aice)
 {
+    // check
+    tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
+
     // the ssl
-    tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
-    tb_assert_and_check_return(ssl && ssl->func.clos.func);
+    tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)aice->priv;
+    tb_assert_and_check_return_val(ssl && ssl->func.clos.func, tb_false);
 
     // trace
     tb_trace_d("clos: notify: ..");
@@ -845,6 +845,9 @@ static tb_void_t tb_aicp_ssl_done_clos(tb_handle_t aico, tb_cpointer_t priv)
 
     // trace
     tb_trace_d("clos: notify: ok");
+
+    // ok
+    return tb_true;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -955,14 +958,14 @@ tb_bool_t tb_aicp_ssl_exit(tb_handle_t handle)
     // ok
     return tb_true;
 }
-tb_void_t tb_aicp_ssl_set_sock(tb_handle_t handle, tb_handle_t sock)
+tb_void_t tb_aicp_ssl_set_aico(tb_handle_t handle, tb_handle_t aico)
 {
     // check
     tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;
-    tb_assert_and_check_return(ssl && sock);
+    tb_assert_and_check_return(ssl);
 
-    // save sock
-    ssl->sock = sock;
+    // save aico
+    ssl->aico = aico;
 }
 tb_void_t tb_aicp_ssl_set_timeout(tb_handle_t handle, tb_long_t timeout)
 {
@@ -997,11 +1000,7 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
         tb_assert_and_check_break(state == TB_STATE_CLOSED);
 
         // check
-        tb_assert_and_check_break(ssl->aicp && ssl->ssl && ssl->sock && !ssl->aico);
-
-        // init aico
-        ssl->aico = tb_aico_init_sock(ssl->aicp, ssl->sock);
-        tb_assert_and_check_break(ssl->aico);
+        tb_assert_and_check_break(ssl->aicp && ssl->ssl && ssl->aico);
 
         // killed?
         if (TB_STATE_KILLING == tb_atomic_get(&ssl->state))
@@ -1102,10 +1101,16 @@ tb_bool_t tb_aicp_ssl_clos(tb_handle_t handle, tb_aicp_ssl_clos_func_t func, tb_
     ssl->func.clos.func = func;
     ssl->func.clos.priv = priv;
     
-    // exit aico
-    if (ssl->aico) tb_aico_exit(ssl->aico, tb_aicp_ssl_done_clos, ssl);
-    // done func directly
-    else tb_aicp_ssl_done_clos(tb_null, ssl);
+    // clos aico
+    if (ssl->aico) tb_aico_task_run(ssl->aico, 0, tb_aicp_ssl_done_clos, ssl);
+    else
+    {
+        // clear ssl
+        tb_aicp_ssl_clos_clear(ssl);
+
+        // done func
+        ssl->func.clos.func(ssl, TB_STATE_OK, ssl->func.clos.priv);
+    }
 
     // ok
     return tb_true;

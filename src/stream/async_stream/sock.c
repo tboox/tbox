@@ -296,7 +296,7 @@ static tb_bool_t tb_async_stream_sock_open_ssl_func(tb_handle_t ssl, tb_size_t s
 static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
 {
     // check
-    tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
+    tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CONN, tb_false);
 
     // the stream
     tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast((tb_handle_t)aice->priv);
@@ -331,8 +331,8 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
                     break;
                 }
 
-                // init ssl sock
-                tb_aicp_ssl_set_sock(sstream->hssl, sstream->sock);
+                // init ssl aico
+                tb_aicp_ssl_set_aico(sstream->hssl, aice->aico);
 
                 // init ssl timeout
                 tb_aicp_ssl_set_timeout(sstream->hssl, sstream->base.base.timeout);

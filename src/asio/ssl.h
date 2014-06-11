@@ -116,12 +116,12 @@ tb_void_t           tb_aicp_ssl_kill(tb_handle_t handle);
  */
 tb_bool_t           tb_aicp_ssl_exit(tb_handle_t handle);
 
-/*! set the ssl sock
+/*! set the ssl aico
  * 
  * @param handle    the ssl handle
- * @param sock      the ssl sock
+ * @param aico      the aico
  */
-tb_void_t           tb_aicp_ssl_set_sock(tb_handle_t handle, tb_handle_t sock);
+tb_void_t           tb_aicp_ssl_set_aico(tb_handle_t handle, tb_handle_t aico);
 
 /*! set the ssl timeout
  * 
