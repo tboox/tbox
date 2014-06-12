@@ -304,7 +304,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-        tb_trace_d("resp[%s]: server: %u.%u.%u.%u, real: %lu", dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
+        tb_trace_d("resp[%s]: aico: %p, server: %u.%u.%u.%u, real: %lu", dns->aico, dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
 
         // check
         tb_assert_and_check_return_val(aice->u.urecv.real, tb_false);
@@ -316,7 +316,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     else
     {
         // trace
-        tb_trace_d("resp[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_state_cstr(aice->state));
+        tb_trace_d("resp[%s]: aico: %p, server: %u.%u.%u.%u, state: %s", dns->aico, dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_state_cstr(aice->state));
     }
 
     // ok or try to get ok from cache again if failed or timeout? 
@@ -372,7 +372,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-        tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, real: %lu", dns->host, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
+        tb_trace_d("reqt[%s]: aico: %p, server: %u.%u.%u.%u, real: %lu", dns->aico, dns->host, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
 
         // check
         tb_assert_and_check_return_val(aice->u.usend.real, tb_false);
@@ -388,7 +388,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     else
     {
         // trace
-        tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_state_cstr(aice->state));
+        tb_trace_d("reqt[%s]: aico: %p, server: %u.%u.%u.%u, state: %s", dns->aico, dns->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_state_cstr(aice->state));
             
         // the next server 
         tb_ipv4_t const* server = &dns->list[dns->indx + 1];
@@ -426,11 +426,11 @@ static tb_void_t tb_aicp_dns_exit_func(tb_handle_t aico, tb_cpointer_t priv)
     if (dns->sock) tb_socket_clos(dns->sock);
     dns->sock = tb_null;
 
+    // trace
+    tb_trace_d("exit: aico: %p: ok", dns->aico);
+
     // exit it
     tb_free(dns);
-
-    // trace
-    tb_trace_d("exit: ok");
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -485,7 +485,7 @@ tb_void_t tb_aicp_dns_kill(tb_handle_t handle)
     tb_assert_and_check_return(dns);
 
     // trace
-    tb_trace_d("kill: ..");
+    tb_trace_d("kill: aico: %p ..", dns->aico);
 
     // kill it
     if (dns->aico) tb_aico_kill(dns->aico);
@@ -497,7 +497,7 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t func, tb_
     tb_assert_and_check_return(dns);
 
     // trace
-    tb_trace_d("exit: ..");
+    tb_trace_d("exit: aico: %p ..", dns->aico);
 
     // no func? wait exiting
     if (!func)
@@ -509,6 +509,9 @@ tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_aicp_dns_exit_func_t func, tb_
         // exit sock
         if (dns->sock) tb_socket_clos(dns->sock);
         dns->sock = tb_null;
+
+        // trace
+        tb_trace_d("exit: aico: %p: ok", dns->aico);
 
         // exit it
         tb_free(dns);

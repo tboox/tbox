@@ -141,7 +141,7 @@ static tb_bool_t tb_async_stream_http_clos(tb_handle_t astream, tb_async_stream_
     tb_assert_and_check_return_val(hstream && hstream->http && func, tb_false);
 
     // trace
-    tb_trace_d("clos: ..");
+    tb_trace_d("clos: %s: ..", tb_url_get(&hstream->base.base.url));
 
     // init func
     hstream->func.clos  = func;

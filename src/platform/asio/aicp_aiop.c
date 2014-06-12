@@ -305,7 +305,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             if (tb_aiop_aico_is_killed(aico)) priority = 0;
 
             // trace
-            tb_trace_d("wait: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
+            tb_trace_d("wait: aico: %p, handle: %p, code: %lu, priority: %lu, size: %lu", aico, aico->base.handle, aice->code, priority, tb_queue_size(ptor->spak[priority]));
 
             // sock?
             if (aico->base.type == TB_AICO_TYPE_SOCK)
@@ -415,7 +415,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
     tb_assert_and_check_return_val(code != TB_AIOE_CODE_NONE, tb_false);
                 
     // trace
-    tb_trace_d("wait: aico: %p, code: %lu: time: %lld: ..", aico, aice->code, tb_cache_time_mclock());
+    tb_trace_d("wait: aico: %p, handle: %p, code: %lu: time: %lld: ..", aico, aico->base.handle, aice->code, tb_cache_time_mclock());
 
     // done
     tb_bool_t ok = tb_false;

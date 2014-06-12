@@ -761,7 +761,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* astream, tb_size
     tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
     // trace
-    tb_trace_d("head: read: real: %lu, size: %lu, state: %s", real, size, tb_state_cstr(state));
+    tb_trace_d("head: read: %s, real: %lu, size: %lu, state: %s", tb_url_get(&http->option.url), real, size, tb_state_cstr(state));
 
     // done
     do
@@ -1049,7 +1049,7 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* astream, tb_size
     tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
     // trace
-    tb_trace_d("head: writ: real: %lu, size: %lu, state: %s", real, size, tb_state_cstr(state));
+    tb_trace_d("head: writ: %s, real: %lu, size: %lu, state: %s", tb_url_get(&http->option.url), real, size, tb_state_cstr(state));
 
     // done
     tb_bool_t bwrit = tb_false;
@@ -1660,7 +1660,7 @@ tb_bool_t tb_aicp_http_clos_try(tb_handle_t handle)
     tb_assert_and_check_return_val(http && http->stream, tb_false);
 
     // trace
-    tb_trace_d("clos: try: ..");
+    tb_trace_d("clos: try: %s: ..", tb_url_get(&http->option.url));
 
     // done
     tb_bool_t ok = tb_false;
@@ -1688,7 +1688,7 @@ tb_bool_t tb_aicp_http_clos_try(tb_handle_t handle)
     } while (0);
 
     // trace
-    tb_trace_d("clos: try: %s", ok? "ok" : "no");
+    tb_trace_d("clos: try: %s: %s", tb_url_get(&http->option.url), ok? "ok" : "no");
 
     // ok?
     return ok;
