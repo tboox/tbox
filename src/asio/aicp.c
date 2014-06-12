@@ -669,6 +669,8 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
             // exit it
             if (ptor->delo(ptor, resp.aico)) tb_aicp_aico_exit(aicp, resp.aico);
         }
+        // killing? change state to be killed
+        else tb_atomic_fetch_and_pset(&resp.aico->state, TB_STATE_KILLING, TB_STATE_KILLED);
 
         // stop it?
         if (stop && stop(priv)) tb_aicp_kill(aicp);

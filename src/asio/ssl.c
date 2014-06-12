@@ -239,7 +239,7 @@ static tb_long_t tb_aicp_ssl_fill_read(tb_aicp_ssl_t* ssl, tb_byte_t* data, tb_s
         tb_memcpy(data, read_data, read_real);
 
         // trace
-        tb_trace_d("read: fill: %lu: ok", read_real);
+        tb_trace_d("[aico:%p]: read: fill: %lu: ok", ssl->aico, read_real);
 
         // read ok
         real = read_real;
@@ -272,7 +272,7 @@ static tb_long_t tb_aicp_ssl_fill_writ(tb_aicp_ssl_t* ssl, tb_byte_t const* data
         tb_assert_and_check_break(writ_real <= size);
 
         // trace
-        tb_trace_d("writ: try: %lu: ok", writ_real);
+        tb_trace_d("[aico:%p]: writ: try: %lu: ok", ssl->aico, writ_real);
 
         // writ ok
         real = writ_real;
@@ -301,7 +301,7 @@ static tb_bool_t tb_aicp_ssl_done_post(tb_aicp_ssl_t* ssl)
         if (ssl->post.read)
         {
             // trace
-            tb_trace_d("post: read: %lu: ..", ssl->post.size);
+            tb_trace_d("[aico:%p]: post: read: %lu: ..", ssl->aico, ssl->post.size);
 
             // post read
             if (!tb_aico_recv_after(ssl->aico, ssl->post.delay, ssl->post.data, ssl->post.size, ssl->post.func, ssl)) break;
@@ -310,7 +310,7 @@ static tb_bool_t tb_aicp_ssl_done_post(tb_aicp_ssl_t* ssl)
         else
         {
             // trace
-            tb_trace_d("post: writ: %lu: ..", ssl->post.size);
+            tb_trace_d("[aico:%p]: post: writ: %lu: ..", ssl->aico, ssl->post.size);
 
             // post writ
             if (!tb_aico_send_after(ssl->aico, ssl->post.delay, ssl->post.data, ssl->post.size, ssl->post.func, ssl)) break;
@@ -342,9 +342,6 @@ static tb_void_t tb_aicp_ssl_clos_clear(tb_aicp_ssl_t* ssl)
         tb_ssl_clos(ssl->ssl);
     }
 
-    // clear aico
-    ssl->aico = tb_null;
-
     // clear data
     tb_scoped_buffer_clear(&ssl->read_data);
     tb_scoped_buffer_clear(&ssl->writ_data);
@@ -363,7 +360,7 @@ static tb_void_t tb_aicp_ssl_clos_opening(tb_handle_t handle, tb_size_t state, t
     tb_assert_and_check_return(ssl);
 
     // trace
-    tb_trace_d("clos: opening: state: %s", tb_state_cstr(ssl->clos_opening.state));
+    tb_trace_d("[aico:%p]: clos: opening: state: %s", ssl->aico, tb_state_cstr(ssl->clos_opening.state));
 
     // done func
     if (ssl->clos_opening.func) ssl->clos_opening.func(ssl, ssl->clos_opening.state, ssl->clos_opening.priv);
@@ -411,7 +408,7 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
     tb_size_t real = aice->code == TB_AICE_CODE_RECV? aice->u.recv.real : aice->u.send.real;
 
     // trace
-    tb_trace_d("open: done: real: %lu, state: %s", real, tb_state_cstr(aice->state));
+    tb_trace_d("[aico:%p]: open: done: real: %lu, state: %s", ssl->aico, real, tb_state_cstr(aice->state));
 
     // done
     tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
@@ -433,13 +430,13 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
         ssl->post.real = real;
 
         // trace
-        tb_trace_d("open: done: try: ..");
+        tb_trace_d("[aico:%p]: open: done: try: ..", ssl->aico);
     
         // try opening it
         tb_long_t ok = tb_ssl_open_try(ssl->ssl);
 
         // trace
-        tb_trace_d("open: done: try: %ld", ok);
+        tb_trace_d("[aico:%p]: open: done: try: %ld", ssl->aico, ok);
     
         // ok?
         if (ok > 0)
@@ -461,14 +458,14 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
             if (!tb_aicp_ssl_done_post(ssl))
             {
                 // trace
-                tb_trace_e("open: done: post failed!");
+                tb_trace_e("[aico:%p]: open: done: post failed!", ssl->aico);
                 break;
             }
         }
         else
         {
             // trace
-            tb_trace_d("open: done: no post!");
+            tb_trace_d("[aico:%p]: open: done: no post!", ssl->aico);
         }
 
         // ok
@@ -499,7 +496,7 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
     tb_size_t real = aice->code == TB_AICE_CODE_RECV? aice->u.recv.real : aice->u.send.real;
 
     // trace
-    tb_trace_d("read: done: real: %lu, state: %s", real, tb_state_cstr(aice->state));
+    tb_trace_d("[aico:%p]: read: done: real: %lu, state: %s", ssl->aico, real, tb_state_cstr(aice->state));
 
     // done
     tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
@@ -521,13 +518,13 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
         ssl->post.real = real;
 
         // trace
-        tb_trace_d("read: done: try: %lu: ..", ssl->func.read.size);
+        tb_trace_d("[aico:%p]: read: done: try: %lu: ..", ssl->aico, ssl->func.read.size);
     
         // try reading it
         tb_long_t real = tb_ssl_read(ssl->ssl, ssl->func.read.data, ssl->func.read.size);
 
         // trace
-        tb_trace_d("read: done: try: %lu: %ld", ssl->func.read.size, real);
+        tb_trace_d("[aico:%p]: read: done: try: %lu: %ld", ssl->aico, ssl->func.read.size, real);
     
         // ok?
         if (real > 0)
@@ -549,14 +546,14 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
             if (!tb_aicp_ssl_done_post(ssl))
             {
                 // trace
-                tb_trace_e("read: done: post failed!");
+                tb_trace_e("[aico:%p]: read: done: post failed!", ssl->aico);
                 break;
             }
         }
         else
         {
             // trace
-            tb_trace_d("read: done: no post!");
+            tb_trace_d("[aico:%p]: read: done: no post!", ssl->aico);
     
             // done func
             ssl->func.read.func(ssl, TB_STATE_OK, ssl->func.read.data, 0, ssl->func.read.size, ssl->func.read.priv);
@@ -590,7 +587,7 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
     tb_size_t real = aice->code == TB_AICE_CODE_RECV? aice->u.recv.real : aice->u.send.real;
 
     // trace
-    tb_trace_d("writ: done: real: %lu, state: %s", real, tb_state_cstr(aice->state));
+    tb_trace_d("[aico:%p]: writ: done: real: %lu, state: %s", ssl->aico, real, tb_state_cstr(aice->state));
 
     // done
     tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
@@ -612,13 +609,13 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
         ssl->post.real = real;
 
         // trace
-        tb_trace_d("writ: done: try: %lu: ..", ssl->func.writ.size);
+        tb_trace_d("[aico:%p]: writ: done: try: %lu: ..", ssl->aico, ssl->func.writ.size);
 
         // try writing it
         tb_long_t real = tb_ssl_writ(ssl->ssl, ssl->func.writ.data, ssl->func.writ.size);
 
         // trace
-        tb_trace_d("writ: done: try: %lu: %ld", ssl->func.writ.size, real);
+        tb_trace_d("[aico:%p]: writ: done: try: %lu: %ld", ssl->aico, ssl->func.writ.size, real);
     
         // ok?
         if (real > 0)
@@ -640,14 +637,14 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
             if (!tb_aicp_ssl_done_post(ssl))
             {
                 // trace
-                tb_trace_e("writ: done: post failed!");
+                tb_trace_e("[aico:%p]: writ: done: post failed!", ssl->aico);
                 break;
             }
         }
         else
         {
             // trace
-            tb_trace_d("writ: done: no post!");
+            tb_trace_d("[aico:%p]: writ: done: no post!", ssl->aico);
     
             // done func
             ssl->func.writ.func(ssl, TB_STATE_OK, ssl->func.writ.data, 0, ssl->func.writ.size, ssl->func.writ.priv);
@@ -817,7 +814,7 @@ static tb_bool_t tb_aicp_ssl_done_task(tb_aice_t const* aice)
     tb_assert_and_check_return_val(ssl && ssl->func.task.func, tb_false);
 
     // trace
-    tb_trace_d("task: done: state: %s", tb_state_cstr(aice->state));
+    tb_trace_d("[aico:%p]: task: done: state: %s", ssl->aico, tb_state_cstr(aice->state));
 
     // done func
     ssl->func.task.func(ssl, aice->state, ssl->post.delay, ssl->func.task.priv);
@@ -835,7 +832,7 @@ static tb_bool_t tb_aicp_ssl_done_clos(tb_aice_t const* aice)
     tb_assert_and_check_return_val(ssl && ssl->func.clos.func, tb_false);
 
     // trace
-    tb_trace_d("clos: notify: ..");
+    tb_trace_d("[aico:%p]: clos: notify: ..", ssl->aico);
 
     // clear ssl
     tb_aicp_ssl_clos_clear(ssl);
@@ -844,7 +841,7 @@ static tb_bool_t tb_aicp_ssl_done_clos(tb_aice_t const* aice)
     ssl->func.clos.func(ssl, TB_STATE_OK, ssl->func.clos.priv);
 
     // trace
-    tb_trace_d("clos: notify: ok");
+    tb_trace_d("[aico:%p]: clos: notify: ok", ssl->aico);
 
     // ok
     return tb_true;
@@ -910,7 +907,7 @@ tb_void_t tb_aicp_ssl_kill(tb_handle_t handle)
     tb_check_return(state != TB_STATE_KILLING);
 
     // trace
-    tb_trace_d("kill: ..");
+    tb_trace_d("[aico:%p]: kill: ..", ssl->aico);
 
     // kill aico
     if (ssl->aico) tb_aico_kill(ssl->aico);
@@ -922,7 +919,7 @@ tb_bool_t tb_aicp_ssl_exit(tb_handle_t handle)
     tb_assert_and_check_return_val(ssl, tb_false);
 
     // trace
-    tb_trace_d("exit: ..");
+    tb_trace_d("[aico:%p]: exit: ..", ssl->aico);
 
     // try closing it
     tb_size_t tryn = 30;
@@ -937,7 +934,7 @@ tb_bool_t tb_aicp_ssl_exit(tb_handle_t handle)
     if (!ok)
     {
         // trace
-        tb_trace_e("exit: failed!");
+        tb_trace_e("[aico:%p]: exit: failed!", ssl->aico);
         return tb_false;
     }
 
@@ -949,12 +946,12 @@ tb_bool_t tb_aicp_ssl_exit(tb_handle_t handle)
     tb_scoped_buffer_exit(&ssl->read_data);
     tb_scoped_buffer_exit(&ssl->writ_data);
 
+    // trace
+    tb_trace_d("[aico:%p]: exit: ok", ssl->aico);
+    
     // exit it
     tb_free(ssl);
 
-    // trace
-    tb_trace_d("exit: ok");
-    
     // ok
     return tb_true;
 }
@@ -1055,7 +1052,7 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
             if (!tb_aicp_ssl_done_post(ssl))
             {
                 // trace
-                tb_trace_e("open: post failed!");
+                tb_trace_e("[aico:%p]: open: post failed!", ssl->aico);
         
                 // done func
                 tb_aicp_ssl_open_func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, func, priv);
@@ -1065,7 +1062,7 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
         else
         {
             // trace
-            tb_trace_e("open: no post!");
+            tb_trace_e("[aico:%p]: open: no post!", ssl->aico);
     
             // done func
             tb_aicp_ssl_open_func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, func, priv);
@@ -1087,7 +1084,7 @@ tb_bool_t tb_aicp_ssl_clos(tb_handle_t handle, tb_aicp_ssl_clos_func_t func, tb_
     tb_assert_and_check_return_val(ssl && func, tb_false);
 
     // trace
-    tb_trace_d("clos: ..");
+    tb_trace_d("[aico:%p]: clos: ..", ssl->aico);
 
     // try closing ok?
     if (tb_aicp_ssl_clos_try(ssl))
@@ -1102,7 +1099,7 @@ tb_bool_t tb_aicp_ssl_clos(tb_handle_t handle, tb_aicp_ssl_clos_func_t func, tb_
     ssl->func.clos.priv = priv;
     
     // clos aico
-    if (ssl->aico) tb_aico_task_run(ssl->aico, 0, tb_aicp_ssl_done_clos, ssl);
+    if (ssl->aico && tb_aico_task_run(ssl->aico, 0, tb_aicp_ssl_done_clos, ssl));
     else
     {
         // clear ssl
@@ -1122,13 +1119,28 @@ tb_bool_t tb_aicp_ssl_clos_try(tb_handle_t handle)
     tb_assert_and_check_return_val(ssl, tb_false);
 
     // trace
-    tb_trace_d("clos: try: ..");
+    tb_trace_d("[aico:%p]: clos: try: ..", ssl->aico);
 
     // done
-    tb_bool_t ok = (TB_STATE_CLOSED == tb_atomic_get(&ssl->state))? tb_true : tb_false;
+    tb_bool_t ok = tb_true;
+    do
+    {
+        // closed? ok
+        if (TB_STATE_CLOSED == tb_atomic_get(&ssl->state)) break;
+
+        // no aico? ok
+        if (!ssl->aico) break;
+
+        // failed
+        ok = tb_false;
+
+    } while (0);
+
+    // ok? closed
+    if (ok) tb_atomic_set(&ssl->state, TB_STATE_CLOSED);
 
     // trace
-    tb_trace_d("clos: try: %s", ok? "ok" : "no");
+    tb_trace_d("[aico:%p]: clos: try: %s", ssl->aico, ok? "ok" : "no");
 
     // ok?
     return ok;
@@ -1148,7 +1160,7 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
     tb_assert_and_check_return_val(ssl && data && size && func, tb_false);
 
     // trace
-    tb_trace_d("read: %lu, after: %lu", size, delay);
+    tb_trace_d("[aico:%p]: read: %lu, after: %lu", ssl->aico, size, delay);
         
     // done
     tb_bool_t ok = tb_false;
@@ -1200,7 +1212,7 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
             if (!tb_aicp_ssl_done_post(ssl))
             {
                 // trace
-                tb_trace_e("read: post failed!");
+                tb_trace_e("[aico:%p]: read: post failed!", ssl->aico);
         
                 // done func
                 func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
@@ -1210,7 +1222,7 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
         else
         {
             // trace
-            tb_trace_e("read: no post!");
+            tb_trace_e("[aico:%p]: read: no post!", ssl->aico);
     
             // done func
             func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
@@ -1232,7 +1244,7 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
     tb_assert_and_check_return_val(ssl && data && size && func, tb_false);
 
     // trace
-    tb_trace_d("writ: %lu, after: %lu", size, delay);
+    tb_trace_d("[aico:%p]: writ: %lu, after: %lu", ssl->aico, size, delay);
 
     // done
     tb_bool_t ok = tb_false;
@@ -1284,7 +1296,7 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
             if (!tb_aicp_ssl_done_post(ssl))
             {
                 // trace
-                tb_trace_e("writ: post failed!");
+                tb_trace_e("[aico:%p]: writ: post failed!", ssl->aico);
         
                 // done func
                 func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
@@ -1294,7 +1306,7 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
         else
         {
             // trace
-            tb_trace_e("writ: no post!");
+            tb_trace_e("[aico:%p]: writ: no post!", ssl->aico);
     
             // done func
             func(ssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR, data, 0, size, priv);
