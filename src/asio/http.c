@@ -1435,8 +1435,11 @@ static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, t
         http->clos_opening.priv   = priv;
         http->clos_opening.state  = state;
 
+        tb_trace_d("tb_aicp_http_open_func b");
         // close it
         ok = tb_aicp_http_clos(http, tb_aicp_http_clos_opening_func, tb_null);
+
+        tb_trace_d("tb_aicp_http_open_func e: %d", ok);
     }
 
     // ok?
