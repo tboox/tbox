@@ -99,6 +99,9 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     // check
     tb_assert_and_check_return_val(url, tb_null);
 
+    // exists? return it directly
+    if (tb_scoped_string_size(&url->urls)) return tb_scoped_string_cstr(&url->urls);
+
     // make
     switch (url->poto)
     {
@@ -106,9 +109,6 @@ tb_char_t const* tb_url_get(tb_url_t* url)
         {
             // check
             tb_check_return_val(tb_static_string_size(&url->path), tb_null);
-
-            // clear urls 
-            tb_scoped_string_clear(&url->urls);
 
             // add protocol
             if (!url->bwin)
@@ -132,9 +132,6 @@ tb_char_t const* tb_url_get(tb_url_t* url)
         {   
             // check
             tb_check_return_val(url->port && tb_static_string_size(&url->host), tb_null);
-
-            // clear urls 
-            tb_scoped_string_clear(&url->urls);
 
             // add protocol
             if (url->poto == TB_URL_PROTOCOL_HTTP) tb_scoped_string_cstrcpy(&url->urls, "http");
@@ -173,9 +170,6 @@ tb_char_t const* tb_url_get(tb_url_t* url)
         break;
     case TB_URL_PROTOCOL_SQL:
         {
-            // clear urls 
-            tb_scoped_string_clear(&url->urls);
-
             // add protocol
             tb_scoped_string_cstrcpy(&url->urls, "sql://");
 
