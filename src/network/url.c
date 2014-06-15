@@ -485,6 +485,9 @@ tb_void_t tb_url_port_set(tb_url_t* url, tb_size_t port)
 
     // set port
     url->port = port;
+
+    // clear url
+    tb_scoped_string_clear(&url->urls);
 }
 tb_char_t const* tb_url_host_get(tb_url_t const* url)
 {
@@ -515,6 +518,9 @@ tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
         // clear ipv4
         tb_ipv4_clr(&url->ipv4);
     }
+
+    // clear url
+    tb_scoped_string_clear(&url->urls);
 }
 tb_ipv4_t const* tb_url_ipv4_get(tb_url_t const* url)
 {
@@ -542,6 +548,9 @@ tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
             tb_char_t           data[16];
             tb_char_t const*    host = tb_ipv4_get(ipv4, data, 16);
             if (host) tb_static_string_cstrcpy(&url->host, host);
+ 
+            // clear url
+            tb_scoped_string_clear(&url->urls);
         }
     }
 }
@@ -566,6 +575,9 @@ tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
     {
         if (path[0] != '/') tb_static_string_chrcat(&url->path, '/');
         tb_static_string_cstrcat(&url->path, path);
+ 
+        // clear url
+        tb_scoped_string_clear(&url->urls);
     }
 }
 tb_char_t const* tb_url_args_get(tb_url_t const* url)
@@ -590,6 +602,9 @@ tb_void_t tb_url_args_set(tb_url_t* url, tb_char_t const* args)
         tb_char_t const* p = args;
         while (*p && (*p == '?' || *p == '=')) p++;
         if (*p) tb_scoped_string_cstrcpy(&url->args, p);
+ 
+        // clear url
+        tb_scoped_string_clear(&url->urls);
     }
 }
 

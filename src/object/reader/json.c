@@ -461,7 +461,7 @@ static tb_object_t* tb_object_json_reader_done(tb_basic_stream_t* stream)
     reader.stream = stream;
 
     // skip spaces
-    tb_char_t type;
+    tb_char_t type = '\0';
     while (tb_stream_left(stream)) 
     {
         type = tb_basic_stream_bread_s8(stream);

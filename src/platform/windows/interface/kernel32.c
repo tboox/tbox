@@ -25,7 +25,7 @@
  * includes
  */
 #include "kernel32.h"
-#include "../../../utils/singleton.h"
+#include "../../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -62,7 +62,7 @@ tb_kernel32_t* tb_kernel32()
 
     // init the static instance
     tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_kernel32, tb_kernel32_instance_init);
-    tb_assert(ok);
+    tb_assert(ok); tb_used(ok);
 
     // ok
     return &s_kernel32;
