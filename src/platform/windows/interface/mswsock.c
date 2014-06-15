@@ -27,7 +27,7 @@
 #include "mswsock.h"
 #include "ws2_32.h"
 #include "../../socket.h"
-#include "../../../utils/singleton.h"
+#include "../../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -114,7 +114,7 @@ tb_mswsock_t* tb_mswsock()
 
     // init the static instance
     tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_mswsock, tb_mswsock_instance_init);
-    tb_assert(ok);
+    tb_assert(ok); tb_used(ok);
 
     // ok
     return &s_mswsock;

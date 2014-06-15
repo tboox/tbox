@@ -25,7 +25,7 @@
  * includes
  */
 #include "ws2_32.h"
-#include "../../../utils/singleton.h"
+#include "../../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -83,7 +83,7 @@ tb_ws2_32_t* tb_ws2_32()
 
     // init the static instance
     tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_ws2_32, tb_ws2_32_instance_init);
-    tb_assert(ok);
+    tb_assert(ok); tb_used(ok);
 
     // ok
     return &s_ws2_32;

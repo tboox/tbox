@@ -57,7 +57,7 @@
             __tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (&__r)); \
             \
             /* save jmpbuf */ \
-            tb_int_t __j = tb_setjmp(__h.jmpbuf); \
+            __tb_volatile__ tb_int_t __j = tb_setjmp(__h.jmpbuf); \
             if (!__j) \
             {
 

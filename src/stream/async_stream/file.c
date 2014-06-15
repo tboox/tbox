@@ -604,7 +604,6 @@ tb_async_stream_t* tb_async_stream_init_file(tb_aicp_t* aicp)
         fstream->base.base.ctrl = tb_async_stream_file_ctrl;
         fstream->base.open_try  = tb_async_stream_file_open_try;
         fstream->base.clos_try  = tb_async_stream_file_clos_try;
-
         fstream->mode           = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
         // ok
