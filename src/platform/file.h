@@ -58,7 +58,7 @@ typedef enum __tb_file_mode_t
 ,   TB_FILE_MODE_TRUNC      = 32    //!< truncate
 ,   TB_FILE_MODE_BINARY     = 64    //!< binary
 ,   TB_FILE_MODE_DIRECT     = 128   //!< direct, no cache, @note data & size must be aligned by TB_FILE_DIRECT_ASIZE
-,   TB_FILE_MODE_AICP       = 256   //!< support for aicp
+,   TB_FILE_MODE_ASIO       = 256   //!< support for asio
 
 }tb_file_mode_t;
 

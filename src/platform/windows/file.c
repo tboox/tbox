@@ -63,7 +63,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
     // init attr
     DWORD attr = FILE_ATTRIBUTE_NORMAL;
-    if (mode & TB_FILE_MODE_AICP) attr |= FILE_FLAG_OVERLAPPED;
+    if (mode & TB_FILE_MODE_ASIO) attr |= FILE_FLAG_OVERLAPPED;
     if (mode & TB_FILE_MODE_DIRECT) attr |= FILE_FLAG_NO_BUFFERING;
 
     // init file

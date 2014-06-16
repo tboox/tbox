@@ -73,6 +73,9 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
         tb_strlcpy(full, path, maxn - 1);
         full[maxn - 1] = '\0';
 
+        // using '\\'
+        full[2] = '\\';
+
         // trace
         tb_trace_d("full: %s", full);
 

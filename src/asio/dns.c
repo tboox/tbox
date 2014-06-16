@@ -462,6 +462,9 @@ tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout)
         tb_aico_timeout_set(dns->aico, TB_AICO_TIMEOUT_SEND, timeout);
         tb_aico_timeout_set(dns->aico, TB_AICO_TIMEOUT_RECV, timeout);
 
+        // trace
+        tb_trace_d("init: aico: %p, sock: %p: ok", dns->aico, dns->sock);
+
         // ok
         ok = tb_true;
 
@@ -534,6 +537,9 @@ tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host, tb_aicp_dn
     tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
     tb_assert_and_check_return_val(dns && dns->aico && func && host && host[0], tb_false);
     
+    // trace
+    tb_trace_d("done: aico: %p, %s: ..", host);
+
     // init func
     dns->done.func = func;
     dns->done.priv = priv;

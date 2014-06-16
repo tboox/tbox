@@ -781,7 +781,7 @@ tb_async_stream_t* tb_async_stream_init_http(tb_aicp_t* aicp)
         hstream->base.clos_try  = tb_async_stream_http_clos_try;
 
         // init http
-        hstream->http = tb_aicp_http_init(aicp);
+        hstream->http = tb_aicp_http_init(tb_async_stream_aicp((tb_async_stream_t*)hstream));
         tb_assert_and_check_break(hstream->http);
 
         // ok
