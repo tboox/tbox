@@ -268,7 +268,11 @@ static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_
     tb_assert_and_check_return_val(sstream && func, tb_false);
 
     // trace
+#ifdef TB_SSL_ENABLE
     tb_trace_d("clos: %s: balived: %d, aico: %p, hssl: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hssl, sstream->hdns);
+#else
+    tb_trace_d("clos: %s: balived: %d, aico: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hdns);
+#endif
 
     // init clos
     sstream->func.clos  = func;
@@ -1086,7 +1090,11 @@ static tb_void_t tb_async_stream_sock_kill(tb_handle_t astream)
     tb_assert_and_check_return(sstream);
 
     // trace
+#ifdef TB_SSL_ENABLE
     tb_trace_d("kill: %s: balived: %d, aico: %p, hssl: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hssl, sstream->hdns);
+#else
+    tb_trace_d("kill: %s: balived: %d, aico: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hdns);
+#endif
 
     // exit ssl
 #ifdef TB_SSL_ENABLE

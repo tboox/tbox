@@ -256,6 +256,9 @@ static tb_bool_t tb_async_stream_filter_sync_read_func(tb_async_stream_t* astrea
         return tb_false;
     }
 
+    // trace
+    tb_trace_d("sync_read: spak: %s", tb_url_get(&astream->base.url));
+
     // spak the filter
     tb_byte_t const*    data = tb_null;
     tb_long_t           spak = tb_stream_filter_spak(fstream->filter, tb_null, 0, &data, fstream->size, -1);
@@ -301,6 +304,9 @@ static tb_bool_t tb_async_stream_filter_read_func(tb_async_stream_t* astream, tb
         {
         case TB_STATE_OK:
             {
+                // trace
+                tb_trace_d("read: spak: %s", tb_url_get(&astream->base.url));
+
                 // spak the filter
                 tb_long_t spak = tb_stream_filter_spak(fstream->filter, data, real, &data, size, 0);
                 
@@ -424,6 +430,9 @@ static tb_bool_t tb_async_stream_filter_writ(tb_handle_t astream, tb_size_t dela
     tb_bool_t ok = tb_true;
     if (fstream->filter)
     {
+        // trace
+        tb_trace_d("writ: spak: %s", tb_url_get(&fstream->stream->base.url));
+
         // spak the filter
         tb_long_t real = tb_stream_filter_spak(fstream->filter, data, size, &data, size, 0);
         
@@ -513,6 +522,9 @@ static tb_bool_t tb_async_stream_filter_sync(tb_handle_t astream, tb_bool_t bclo
     tb_bool_t ok = tb_true;
     if (fstream->filter)
     {
+        // trace
+        tb_trace_d("sync: spak: %s", tb_url_get(&fstream->stream->base.url));
+
         // spak the filter
         tb_byte_t const*    data = tb_null;
         tb_long_t           real = tb_stream_filter_spak(fstream->filter, tb_null, 0, &data, 0, bclosing? -1 : 1);
