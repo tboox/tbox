@@ -261,7 +261,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
     tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
 
     // trace
-    tb_trace_d("accept: ..");
+    tb_trace_d("accept: aico: %p: ..", aico);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -290,7 +290,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
                                     ,   sizeof(SOCKADDR_IN) + 16
                                     ,   &real
                                     ,   (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
-        tb_trace_d("AcceptEx: %d, error: %d", AcceptEx_ok, ptor->WSAGetLastError());
+        tb_trace_d("AcceptEx: aico: %p, ok: %d, error: %d", aico, AcceptEx_ok, ptor->WSAGetLastError());
         tb_check_break(AcceptEx_ok);
 
         // post ok
@@ -356,7 +356,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
     tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
 
     // trace
-    tb_trace_d("connect: %u.%u.%u.%u: %lu", aice->u.conn.addr.u8[0], aice->u.conn.addr.u8[1], aice->u.conn.addr.u8[2], aice->u.conn.addr.u8[3], aice->u.conn.port);
+    tb_trace_d("connect: aico: %p, %u.%u.%u.%u: %lu: ..", aico, aice->u.conn.addr.u8[0], aice->u.conn.addr.u8[1], aice->u.conn.addr.u8[2], aice->u.conn.addr.u8[3], aice->u.conn.port);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -391,7 +391,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
                                         ,   0
                                         ,   &real
                                         ,   (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
-        tb_trace_d("ConnectEx: %d, error: %d", ConnectEx_ok, ptor->WSAGetLastError());
+        tb_trace_d("ConnectEx: aico: %p, ok: %d, error: %d", aico, ConnectEx_ok, ptor->WSAGetLastError());
         tb_check_break(ConnectEx_ok);
 
         // post ok
@@ -449,6 +449,9 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 
     // init aice
     aico->olap.aice = *aice;
+
+    // trace
+    tb_trace_d("recv: aico: %p: ..", aico);
 
     // done recv
     DWORD       flag = 0;
@@ -508,6 +511,9 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 
     // init aice
     aico->olap.aice = *aice;
+
+    // trace
+    tb_trace_d("send: aico: %p: ..", aico);
 
     // done send
     tb_long_t ok = ptor->WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.send, 1, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
@@ -573,6 +579,9 @@ static tb_bool_t tb_iocp_post_urecv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     addr.sin_family             = AF_INET;
     addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.urecv.port);
     addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
+
+    // trace
+    tb_trace_d("urecv: aico: %p: ..", aico);
 
     // done recv
     DWORD       flag = 0;
@@ -641,6 +650,9 @@ static tb_bool_t tb_iocp_post_usend(tb_aicp_proactor_t* proactor, tb_aice_t cons
     addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.usend.port);
     addr.sin_addr.S_un.S_addr   = aice->u.usend.addr.u32;
 
+    // trace
+    tb_trace_d("usend: aico: %p: ..", aico);
+
     // done send
     tb_long_t ok = ptor->WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("WSASendTo: aico: %p, %ld, error: %d", aico, ok, ptor->WSAGetLastError());
@@ -698,6 +710,9 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
     // init aice
     aico->olap.aice = *aice;
+
+    // trace
+    tb_trace_d("recvv: aico: %p: ..", aico);
 
     // done recv
     DWORD       flag = 0;
@@ -757,6 +772,9 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
     // init aice
     aico->olap.aice = *aice;
+
+    // trace
+    tb_trace_d("sendv: aico: %p: ..", aico);
 
     // done send
     tb_long_t ok = ptor->WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, (LPOVERLAPPED)&aico->olap, tb_null);
@@ -822,6 +840,9 @@ static tb_bool_t tb_iocp_post_urecvv(tb_aicp_proactor_t* proactor, tb_aice_t con
     addr.sin_family             = AF_INET;
     addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.urecvv.port);
     addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
+
+    // trace
+    tb_trace_d("urecvv: aico: %p: ..", aico);
 
     // done recv
     DWORD       flag = 0;
@@ -890,6 +911,9 @@ static tb_bool_t tb_iocp_post_usendv(tb_aicp_proactor_t* proactor, tb_aice_t con
     addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.usendv.port);
     addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
 
+    // trace
+    tb_trace_d("usendv: aico: %p: ..", aico);
+
     // done send
     tb_long_t ok = ptor->WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("WSASendTo: %ld, error: %d", ok, ptor->WSAGetLastError());
@@ -948,6 +972,9 @@ static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
     // init aice
     aico->olap.aice = *aice;
+
+    // trace
+    tb_trace_d("sendf: aico: %p: ..", aico);
 
     // not supported?
     if (!ptor->TransmitFile)
@@ -1023,6 +1050,9 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
     // init aice
     aico->olap.aice = *aice;
 
+    // trace
+    tb_trace_d("read: aico: %p: ..", aico);
+
     // done read
     DWORD       real = 0;
     BOOL        ok = ReadFile((HANDLE)aico->base.handle, aice->u.read.data, (DWORD)aice->u.read.size, &real, (LPOVERLAPPED)&aico->olap);
@@ -1065,6 +1095,9 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 
     // init aice
     aico->olap.aice = *aice;
+
+    // trace
+    tb_trace_d("writ: aico: %p: ..", aico);
 
     // done writ
     DWORD       real = 0;
@@ -1109,6 +1142,9 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
     // init aice
     aico->olap.aice = *aice;
 
+    // trace
+    tb_trace_d("readv: aico: %p: ..", aico);
+
     // done read
     DWORD       real = 0;
     BOOL        ok = ReadFile((HANDLE)aico->base.handle, aice->u.readv.list[0].data, (DWORD)aice->u.readv.list[0].size, &real, (LPOVERLAPPED)&aico->olap);
@@ -1151,6 +1187,9 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
     // init aice
     aico->olap.aice = *aice;
+
+    // trace
+    tb_trace_d("writv: aico: %p: ..", aico);
 
     // done writ
     DWORD       real = 0;
