@@ -513,7 +513,6 @@ typedef struct __tb_aice_t
      * TB_STATE_KILLED  
      * TB_STATE_CLOSED  
      * TB_STATE_PENDING 
-     * TB_STATE_WAITING 
      * TB_STATE_TIMEOUT 
      * TB_STATE_NOT_SUPPORTED 
      */

@@ -257,7 +257,7 @@ static tb_bool_t tb_async_stream_filter_sync_read_func(tb_async_stream_t* astrea
     }
 
     // trace
-    tb_trace_d("sync_read: spak: %s", tb_url_get(&astream->base.url));
+    tb_trace_d("sync_read: spak: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
 
     // spak the filter
     tb_byte_t const*    data = tb_null;

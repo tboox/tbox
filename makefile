@@ -186,7 +186,9 @@ DEBUG :=$(if $(DEBUG),$(DEBUG),y)
 DTYPE :=$(if $(findstring y,$(DEBUG)),d,r)
 
 # small
-SMALL :=$(if $(SMALL),$(SMALL),y)
+SMALL :=$(if $(SMALL),$(SMALL),n)
+SMALL :=$(if $(findstring ios,$(PLAT)),y,$(SMALL))
+SMALL :=$(if $(findstring android,$(PLAT)),y,$(SMALL))
 
 # demo
 DEMO :=$(if $(DEMO),$(DEMO),y)
