@@ -361,7 +361,7 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
             {
                 // open ssl
                 state = tb_async_stream_sock_open_ssl(sstream);
-                tb_assert_and_check_break(state == TB_STATE_OK);
+                tb_assert_and_check_break(state != TB_STATE_SOCK_SSL_UNKNOWN_ERROR);
             }
             else
 #endif
@@ -553,7 +553,7 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
             {
                 // open ssl
                 state = tb_async_stream_sock_open_ssl(sstream);
-                tb_assert_and_check_break(state == TB_STATE_OK);
+                tb_assert_and_check_break(state != TB_STATE_SOCK_SSL_UNKNOWN_ERROR);
             }
             else
 #endif

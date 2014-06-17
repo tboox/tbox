@@ -319,7 +319,11 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
         tb_assert_and_check_break(aicp);
 
         // init aicp
+#ifdef __tb_small__
+        aicp->maxn = maxn? maxn : (1 << 8);
+#else
         aicp->maxn = maxn? maxn : (1 << 16);
+#endif
 
         // init lock
         if (!tb_spinlock_init(&aicp->lock)) break;
@@ -611,12 +615,18 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
     // trace
     tb_trace_d("loop[%p]: init", loop);
 
+    // spak ctime
+    tb_cache_time_spak();
+
     // loop
     while (1)
     {
         // spak
         tb_aice_t   resp = {0};
         tb_long_t   ok = loop_spak(ptor, loop, &resp, -1);
+
+        // spak ctime
+        tb_cache_time_spak();
 
         // failed?
         tb_check_break(ok >= 0);
@@ -630,16 +640,13 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
         // trace
         tb_trace_d("loop[%p]: spak: code: %lu, aico: %p, state: %s: %ld", loop, resp.code, resp.aico, resp.aico? tb_state_cstr(tb_atomic_get(&resp.aico->state)) : "null", ok);
 
-        // kill? force updating state to be killing
-        tb_size_t state = TB_STATE_OK;
-        if (tb_atomic_get(&aicp->kill_all))
-        {
-            resp.state = TB_STATE_KILLED;
-            state = TB_STATE_KILLING;
-        }
-
         // pending? clear state
+        tb_size_t state = TB_STATE_OK;
         state = tb_atomic_fetch_and_pset(&resp.aico->state, TB_STATE_PENDING, state);
+
+        // killed? update the aice state 
+        if ((state == TB_STATE_KILLING) || (state == TB_STATE_EXITING) || (state == TB_STATE_KILLED))
+            resp.state = TB_STATE_KILLED;
 
         // done func, @note maybe the aico exit will be called
         if (resp.func && !resp.func(&resp)) 
