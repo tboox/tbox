@@ -29,32 +29,32 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
+static tb_bool_t tb_aicp_file_init(tb_aiop_ptor_t* ptor)
 {
     return tb_true;
 }
-static tb_void_t tb_aicp_file_exit(tb_aicp_proactor_aiop_t* ptor)
+static tb_void_t tb_aicp_file_exit(tb_aiop_ptor_t* ptor)
 {
 }
-static tb_bool_t tb_aicp_file_addo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico)
-{
-    return tb_true;
-}
-static tb_bool_t tb_aicp_file_delo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_aicp_file_addo(tb_aiop_ptor_t* ptor, tb_aico_t* aico)
 {
     return tb_true;
 }
-static tb_void_t tb_aicp_file_kilo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_aicp_file_delo(tb_aiop_ptor_t* ptor, tb_aico_t* aico)
+{
+    return tb_true;
+}
+static tb_void_t tb_aicp_file_kilo(tb_aiop_ptor_t* ptor, tb_aico_t* aico)
 {
     if (aico && aico->handle) tb_file_exit(aico->handle);
 }
-static tb_bool_t tb_aicp_file_post(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_t* ptor, tb_aice_t const* aice)
 {
     // check
     tb_assert_and_check_return_val(ptor && aice, tb_false);
         
     // the priority
-    tb_size_t priority = tb_aiop_aice_priority(aice);
+    tb_size_t priority = tb_aice_priority(aice);
     tb_assert_and_check_return_val(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], tb_false);
 
     // enter 
@@ -85,7 +85,7 @@ static tb_bool_t tb_aicp_file_post(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
     // ok?
     return ok;
 }
-static tb_long_t tb_aicp_file_spak_read(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
 {
     // check
     tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_READ, -1);
@@ -115,7 +115,7 @@ static tb_long_t tb_aicp_file_spak_read(tb_aicp_proactor_aiop_t* ptor, tb_aice_t
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_writ(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
 {
     // check
     tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_WRIT, -1);
@@ -145,7 +145,7 @@ static tb_long_t tb_aicp_file_spak_writ(tb_aicp_proactor_aiop_t* ptor, tb_aice_t
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_readv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
 {
     // check
     tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_READV, -1);
@@ -175,7 +175,7 @@ static tb_long_t tb_aicp_file_spak_readv(tb_aicp_proactor_aiop_t* ptor, tb_aice_
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_writv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
 {
     // check
     tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_WRITV, -1);
@@ -205,7 +205,7 @@ static tb_long_t tb_aicp_file_spak_writv(tb_aicp_proactor_aiop_t* ptor, tb_aice_
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_fsync(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
 {
     // check
     tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_FSYNC, -1);
@@ -226,10 +226,10 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_aicp_proactor_aiop_t* ptor, tb_aice_
     // ok?
     return 1;
 }
-static tb_void_t tb_aicp_file_kill(tb_aicp_proactor_aiop_t* ptor)
+static tb_void_t tb_aicp_file_kill(tb_aiop_ptor_t* ptor)
 {
 }
-static tb_void_t tb_aicp_file_poll(tb_aicp_proactor_aiop_t* ptor)
+static tb_void_t tb_aicp_file_poll(tb_aiop_ptor_t* ptor)
 {
 }
 
