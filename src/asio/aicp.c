@@ -597,7 +597,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
    
     // the ptor 
     tb_aicp_proactor_t* ptor = aicp->ptor;
-    tb_assert_and_check_return(ptor && ptor->delo && ptor->loop_init && ptor->loop_exit && ptor->loop_spak);
+    tb_assert_and_check_return(ptor && ptor->delo && ptor->loop_spak);
 
     // the loop spak
     tb_long_t (*loop_spak)(tb_aicp_proactor_t* , tb_handle_t, tb_aice_t* , tb_long_t ) = ptor->loop_spak;
@@ -606,8 +606,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
     tb_atomic_fetch_and_inc(&aicp->work);
 
     // init loop
-    tb_handle_t loop = ptor->loop_init(ptor);
-    tb_assert_and_check_return(loop);
+    tb_handle_t loop = ptor->loop_init? ptor->loop_init(ptor) : tb_null;
  
     // trace
     tb_trace_d("loop[%p]: init", loop);
@@ -677,7 +676,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
     }
 
     // exit loop
-    ptor->loop_exit(ptor, loop);
+    if (ptor->loop_exit) ptor->loop_exit(ptor, loop);
 
     // worker--
     tb_atomic_fetch_and_dec(&aicp->work);

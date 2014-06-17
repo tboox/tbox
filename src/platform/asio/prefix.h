@@ -33,5 +33,52 @@
 #include "../../platform/platform.h"
 #include "../../container/container.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inlines
+ */
+static __tb_inline__ tb_bool_t tb_aico_is_killed(tb_handle_t aico)
+{
+    // check
+    tb_assert_and_check_return_val(aico, tb_false);
+
+    // the state
+    tb_size_t state = tb_atomic_get(&((tb_aico_t*)aico)->state);
+
+    // killing or exiting or killed?
+    return (state == TB_STATE_KILLING) || (state == TB_STATE_EXITING) || (state == TB_STATE_KILLED);
+}
+static __tb_inline__ tb_size_t tb_aice_priority(tb_aice_t const* aice)
+{
+    // the priorities
+    static tb_size_t s_priorities[] =
+    {
+        1
+
+    ,   1   
+    ,   0   // acpt
+    ,   0   // conn
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+    ,   1
+
+    ,   0   // task
+    };
+    tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_priorities), 1);
+    
+    // the priority
+    return s_priorities[aice->code];
+}
 
 #endif

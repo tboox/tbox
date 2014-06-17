@@ -44,13 +44,13 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 #   include "../windows/asio/aicp_iocp.c"
     tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
     {
-        return tb_aicp_proactor_iocp_init(aicp);
+        return tb_iocp_ptor_init(aicp);
     }
 #else
 #   include "aicp_aiop.c"
     tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
     {
-        return tb_aicp_proactor_aiop_init(aicp);
+        return tb_aiop_ptor_init(aicp);
     }
 #endif
 
