@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define tb_object_pool_get(pool, size, flag, type)      tb_object_pool_get_(pool, size, flag, type __tb_debug_vals__)
@@ -88,5 +93,10 @@ tb_void_t           tb_object_pool_del_(tb_handle_t pool, tb_object_t* object __
  */
 tb_void_t           tb_object_pool_dump(tb_handle_t pool);
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

@@ -30,6 +30,11 @@
 #include "keyword.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define tb_malloc(size)             tb_memory_malloc_(size __tb_debug_vals__)
@@ -49,6 +54,10 @@ tb_pointer_t    tb_memory_nalloc0_(tb_size_t item, tb_size_t size __tb_debug_dec
 tb_pointer_t    tb_memory_ralloc_(tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 tb_bool_t       tb_memory_free_(tb_pointer_t data __tb_debug_decl__);
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

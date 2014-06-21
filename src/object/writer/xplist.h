@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -73,6 +78,11 @@ tb_bool_t                       tb_object_xplist_writer_hook(tb_size_t type, tb_
  * @return                      the object writer func
  */
 tb_object_xplist_writer_func_t  tb_object_xplist_writer_func(tb_size_t type);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

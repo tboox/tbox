@@ -13,6 +13,7 @@
 *.orig
 *.pdb
 *.idb
+*.ilk
 *.stackdump
 *.manifest
 .ccache

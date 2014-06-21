@@ -30,7 +30,6 @@
 #include "prefix.h"
 #include "int32.h"
 #include "../libm/libm.h"
-
 #if defined(TB_ARCH_x86) || defined(TB_ARCH_x86)
 #   include "opt/fixed16_x86.h"
 #elif defined(TB_ARCH_ARM)
@@ -38,6 +37,11 @@
 #elif defined(TB_ARCH_SH4)
 #   include "opt/fixed16_sh4.h"
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -221,6 +225,11 @@ static __tb_inline__ tb_fixed30_t tb_fixed30_sqrt_int32(tb_fixed30_t x)
     tb_assert(x > 0);
     return (x > 0? (tb_isqrti(x) << 15) : 0);
 }
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 
 #endif

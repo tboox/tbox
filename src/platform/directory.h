@@ -31,6 +31,11 @@
 #include "file.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 /// the directory walk func type
@@ -93,5 +98,10 @@ tb_void_t               tb_directory_walk(tb_char_t const* path, tb_bool_t recur
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_directory_copy(tb_char_t const* path, tb_char_t const* dest);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

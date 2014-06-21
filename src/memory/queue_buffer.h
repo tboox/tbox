@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -208,6 +213,11 @@ tb_byte_t*          tb_queue_buffer_push_init(tb_queue_buffer_t* buffer, tb_size
  * @param size      the size
  */
 tb_void_t           tb_queue_buffer_push_exit(tb_queue_buffer_t* buffer, tb_size_t size);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 
 #endif

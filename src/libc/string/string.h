@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -157,5 +162,10 @@ tb_wchar_t*         tb_wcsirstr(tb_wchar_t const* s1, tb_wchar_t const* s2);
 
 tb_wchar_t*         tb_wcsnrstr(tb_wchar_t const* s1, tb_size_t n, tb_wchar_t const* s2);
 tb_wchar_t*         tb_wcsnirstr(tb_wchar_t const* s1, tb_size_t n, tb_wchar_t const* s2);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

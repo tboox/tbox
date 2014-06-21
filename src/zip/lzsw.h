@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -152,6 +157,11 @@ typedef union __tb_lzsw_basic_stream_filter_zip_t
 tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_basic_stream_filter_zip_t* zst);
 tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_basic_stream_filter_zip_t* zst);
 tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw(tb_lzsw_basic_stream_filter_zip_t* zst, tb_size_t action);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

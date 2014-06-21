@@ -30,6 +30,11 @@
 #include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #if !defined(tb_atomic64_fetch_and_pset)
@@ -52,6 +57,11 @@ static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_pset_windows(tb_atomic64_t*
     // using the generic implementation
     return tb_atomic64_fetch_and_pset_generic(a, p, v);
 }
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 
 #endif

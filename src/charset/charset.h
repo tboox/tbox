@@ -32,6 +32,11 @@
 #include "../stream/stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -167,6 +172,11 @@ tb_long_t           tb_charset_conv_cstr(tb_size_t ftype, tb_size_t ttype, tb_ch
  * @return          the converted bytes for output or -1
  */
 tb_long_t           tb_charset_conv_data(tb_size_t ftype, tb_size_t ttype, tb_byte_t const* idata, tb_size_t isize, tb_byte_t* odata, tb_size_t osize);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

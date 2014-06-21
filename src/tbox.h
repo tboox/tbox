@@ -23,11 +23,6 @@
 #ifndef TB_TBOX_H
 #define TB_TBOX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -76,6 +71,7 @@ extern "C" {
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+__tb_extern_c_enter__
 
 /*! init the tbox library
  *
@@ -97,10 +93,5 @@ tb_void_t           tb_exit(tb_noarg_t);
 /// the tbox version string
 tb_version_t const* tb_version(tb_noarg_t);
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
-
+__tb_extern_c_leave__
 #endif

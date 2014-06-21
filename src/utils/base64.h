@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -54,6 +59,11 @@ tb_size_t           tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_
  * @return          the real size
  */
 tb_size_t           tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

@@ -592,8 +592,8 @@ end:
     // ok?
     return p;
 }
-tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
-tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
+__tb_extern_c__ tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
+__tb_extern_c__ tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {
     // check
     tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_BLOCK_POOL_MAGIC, tb_null);

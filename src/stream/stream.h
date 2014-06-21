@@ -35,6 +35,11 @@
 #include "transfer_pool.h"
 #include "filter/filter.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
 /*!architecture
  *
  *
@@ -204,6 +209,11 @@ tb_bool_t           tb_stream_ctrl_with_args(tb_handle_t stream, tb_size_t ctrl,
  * @param stream    the stream
  */
 tb_void_t           tb_stream_kill(tb_handle_t stream);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

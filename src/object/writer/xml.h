@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -37,7 +42,7 @@
 typedef struct __tb_object_xml_writer_t
 {
     /// the stream
-    tb_basic_stream_t*              stream;
+    tb_basic_stream_t*          stream;
 
     /// is deflate?
     tb_bool_t                   deflate;
@@ -73,6 +78,11 @@ tb_bool_t                       tb_object_xml_writer_hook(tb_size_t type, tb_obj
  * @return                      the object writer func
  */
 tb_object_xml_writer_func_t     tb_object_xml_writer_func(tb_size_t type);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

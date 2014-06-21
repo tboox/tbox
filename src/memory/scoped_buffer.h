@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -242,6 +247,11 @@ tb_byte_t*          tb_scoped_buffer_memcat(tb_scoped_buffer_t* buffer, tb_scope
  * @return          the buffer data address
  */
 tb_byte_t*          tb_scoped_buffer_memncat(tb_scoped_buffer_t* buffer, tb_byte_t const* b, tb_size_t n);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 
 #endif

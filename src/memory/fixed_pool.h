@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define TB_FIXED_POOL_GROW_MICRO                (128)
@@ -128,5 +133,10 @@ tb_void_t           tb_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_
  */
 tb_void_t           tb_fixed_pool_dump(tb_handle_t handle);
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

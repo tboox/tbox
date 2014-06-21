@@ -369,6 +369,17 @@ tbox_C_FILES 			+= \
 						platform/linux/android/directory 
 endif
 
+# msvc
+ifeq ($(PLAT),msvc)
+tbox_C_FILES 			+= \
+						platform/windows/interface/interface \
+						platform/windows/interface/ws2_32 \
+						platform/windows/interface/dbghelp \
+						platform/windows/interface/mswsock \
+						platform/windows/interface/kernel32 \
+						platform/windows/interface/iphlpapi 
+endif
+
 # mingw
 ifeq ($(PLAT),mingw)
 tbox_C_FILES 			+= \

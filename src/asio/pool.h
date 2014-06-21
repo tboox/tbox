@@ -30,6 +30,11 @@
 #include "aico.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define tb_aico_pool_malloc(aico, size)             tb_aico_pool_malloc_(aico, size __tb_debug_vals__)
@@ -72,5 +77,10 @@ tb_char_t*      tb_aico_pool_strndup_(tb_aico_t* aico, tb_char_t const* data, tb
 
 // free
 tb_bool_t       tb_aico_pool_free_(tb_aico_t* aico, tb_pointer_t data __tb_debug_decl__);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

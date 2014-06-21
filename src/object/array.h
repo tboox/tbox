@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -113,6 +118,11 @@ tb_void_t           tb_array_insert(tb_object_t* array, tb_size_t index, tb_obje
  * @param item      the array item
  */
 tb_void_t           tb_array_replace(tb_object_t* array, tb_size_t index, tb_object_t* item);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

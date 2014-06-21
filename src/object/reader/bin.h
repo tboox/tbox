@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -73,6 +78,11 @@ tb_bool_t                       tb_object_bin_reader_hook(tb_size_t type, tb_obj
  * @return                      the object reader func
  */
 tb_object_bin_reader_func_t     tb_object_bin_reader_func(tb_size_t type);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

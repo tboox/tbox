@@ -32,6 +32,11 @@
 #include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define TB_QUEUE_SIZE_MICRO                 (63)
@@ -138,6 +143,11 @@ tb_bool_t           tb_queue_full(tb_queue_t const* queue);
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_queue_null(tb_queue_t const* queue);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

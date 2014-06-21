@@ -28,6 +28,12 @@
  */
 #include "config.h"
 #include "type.h"
+#include "keyword.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -224,6 +230,11 @@
 tb_void_t       tb_trace_sync(tb_noarg_t);
 tb_void_t       tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
 tb_void_t       tb_trace_tail(tb_char_t const* format, ...);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

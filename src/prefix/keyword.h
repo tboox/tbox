@@ -119,6 +119,17 @@
 #   define __tb_lstring__(x)                    x
 #endif
 
+// extern c
+#ifdef __cplusplus
+#   define __tb_extern_c__                      extern "C" 
+#   define __tb_extern_c_enter__                extern "C" {
+#   define __tb_extern_c_leave__                }
+#else
+#   define __tb_extern_c__
+#   define __tb_extern_c_enter__
+#   define __tb_extern_c_leave__                
+#endif
+
 // macros
 #define __tb_mstring__(x)                                   #x
 #define __tb_mstring_ex__(x)                                __tb_mstring__(x)

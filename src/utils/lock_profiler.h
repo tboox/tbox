@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -83,6 +88,11 @@ tb_void_t               tb_lock_profiler_register(tb_handle_t profiler, tb_point
  * @param lock          the lock address
  */
 tb_void_t               tb_lock_profiler_occupied(tb_handle_t profiler, tb_pointer_t lock);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

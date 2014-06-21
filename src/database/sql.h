@@ -30,6 +30,11 @@
 #include "value.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -374,5 +379,9 @@ tb_bool_t           tb_database_sql_statement_done(tb_handle_t database, tb_hand
  */
 tb_bool_t           tb_database_sql_statement_bind(tb_handle_t database, tb_handle_t statement, tb_database_sql_value_t const* list, tb_size_t size);
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

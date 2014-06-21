@@ -34,6 +34,11 @@
 #include "bplist.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -69,6 +74,11 @@ tb_object_writer_t* tb_object_writer_get(tb_size_t format);
  * @return          the writed size, failed: -1
  */
 tb_long_t           tb_object_writer_done(tb_object_t* object, tb_basic_stream_t* stream, tb_size_t format);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 
 #endif

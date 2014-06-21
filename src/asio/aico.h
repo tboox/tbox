@@ -32,6 +32,11 @@
 #include "../platform/prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define tb_aico_acpt(aico, func, priv)                                          tb_aico_acpt_(aico, func, priv __tb_debug_vals__)
@@ -747,5 +752,10 @@ static __tb_inline__ tb_long_t tb_aico_timeout_from_code(tb_handle_t aico, tb_si
     return tb_aico_timeout(aico, type[code]);
 }
 
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
