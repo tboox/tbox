@@ -32,18 +32,18 @@
  * macros
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 
 #if 0
 #   define tb_fixed30_mul(x, y)             tb_fixed30_mul_asm(x, y)
 #endif
 
-#endif /* TB_CONFIG_ASSEMBLER_GAS */
+#endif /* TB_ASSEMBLER_IS_GAS */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-#if defined(TB_CONFIG_ASSEMBLER_GAS)
+#if defined(TB_ASSEMBLER_IS_GAS)
 static __tb_inline__ tb_fixed30_t tb_fixed30_mul_asm(tb_fixed30_t x, tb_fixed30_t y)
 {
     __tb_register__ tb_fixed30_t t;

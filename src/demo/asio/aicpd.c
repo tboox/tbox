@@ -243,7 +243,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
             tb_assert_and_check_break(aice->u.acpt.sock);
 
             // make context
-            context = tb_malloc0(sizeof(tb_demo_context_t));
+            context = (tb_demo_context_t*)tb_malloc0(sizeof(tb_demo_context_t));
             tb_assert_and_check_break(context);
 
 #ifdef TB_DEMO_MODE_SENDF
@@ -262,7 +262,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
             // init context
             context->sock = aice->u.acpt.sock;
             context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_ASIO);
-            context->data = tb_malloc(TB_DEMO_FILE_READ_MAXN);
+            context->data = (tb_byte_t*)tb_malloc(TB_DEMO_FILE_READ_MAXN);
             tb_assert_and_check_break(context->file && context->data);
 
             // addo sock
@@ -347,7 +347,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
 {
     // aicp
-    tb_handle_t aicp = (tb_handle_t)priv;
+    tb_aicp_t*  aicp = (tb_aicp_t*)priv;
     tb_size_t   self = tb_thread_self();
 
     // trace
@@ -373,7 +373,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
 
     // init
     tb_handle_t         sock = tb_null;
-    tb_handle_t         aicp = tb_null;
+    tb_aicp_t*          aicp = tb_null;
     tb_handle_t         aico = tb_null;
     tb_handle_t         task = tb_null;
     tb_handle_t         loop[16] = {0};

@@ -11,7 +11,7 @@ static tb_void_t tb_sort_int_test_perf(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -40,7 +40,7 @@ static tb_void_t tb_sort_int_test_perf_bubble(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -71,7 +71,7 @@ static tb_void_t tb_sort_int_test_func_bubble()
     __tb_volatile__ tb_size_t n = 20;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -105,7 +105,7 @@ static tb_void_t tb_sort_int_test_perf_insert(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -136,7 +136,7 @@ static tb_void_t tb_sort_int_test_func_insert()
     __tb_volatile__ tb_size_t n = 20;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -170,7 +170,7 @@ static tb_void_t tb_sort_int_test_perf_quick(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -201,7 +201,7 @@ static tb_void_t tb_sort_int_test_func_quick()
     __tb_volatile__ tb_size_t n = 20;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -235,7 +235,7 @@ static tb_void_t tb_sort_int_test_perf_heap(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -266,7 +266,7 @@ static tb_void_t tb_sort_int_test_func_heap()
     __tb_volatile__ tb_size_t n = 20;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -300,7 +300,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_char_t** data = tb_nalloc0(n, sizeof(tb_char_t*));
+    tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
     // init pool
@@ -342,7 +342,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_char_t** data = tb_nalloc0(n, sizeof(tb_char_t*));
+    tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
     // init pool
@@ -384,7 +384,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_char_t** data = tb_nalloc0(n, sizeof(tb_char_t*));
+    tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
     // init pool
@@ -426,7 +426,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_char_t** data = tb_nalloc0(n, sizeof(tb_char_t*));
+    tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
     // init pool
@@ -468,7 +468,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
     __tb_volatile__ tb_size_t i = 0;
 
     // init data
-    tb_char_t** data = tb_nalloc0(n, sizeof(tb_char_t*));
+    tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
     // init pool

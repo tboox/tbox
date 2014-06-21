@@ -32,7 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 #   ifndef tb_barrier
 #       define tb_barrier()             __tb_asm__ __tb_volatile__ ("" ::: "memory")
 #   endif

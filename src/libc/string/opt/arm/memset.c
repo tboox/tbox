@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#if defined(TB_CONFIG_ASSEMBLER_GAS) && !defined(TB_ARCH_ARM_THUMB) && !defined(TB_ARCH_ARM64)
+#if defined(TB_ASSEMBLER_IS_GAS) && !defined(TB_ARCH_ARM_THUMB) && !defined(TB_ARCH_ARM64)
 #   define TB_LIBC_STRING_OPT_MEMSET_U8
 #   define TB_LIBC_STRING_OPT_MEMSET_U16
 #   define TB_LIBC_STRING_OPT_MEMSET_U32

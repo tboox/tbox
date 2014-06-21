@@ -524,7 +524,7 @@ static tb_pointer_t tb_static_block_pool_malloc_skip_frame(tb_handle_t handle, t
     tb_size_t tryn = 1;
 
     // try allocating from the predicted block
-    tb_byte_t* p = tb_static_block_pool_malloc_from(pool, pool->pred, asize, tryn);
+    tb_byte_t* p = (tb_byte_t*)tb_static_block_pool_malloc_from(pool, pool->pred, asize, tryn);
 
     // ok?
     tb_check_goto(!p, end);
@@ -533,7 +533,7 @@ static tb_pointer_t tb_static_block_pool_malloc_skip_frame(tb_handle_t handle, t
     tryn = -1;
 
     // alloc it from the first block
-    p = tb_static_block_pool_malloc_from(pool, pool->data, asize, tryn);
+    p = (tb_byte_t*)tb_static_block_pool_malloc_from(pool, pool->data, asize, tryn);
 
 end:
 
@@ -548,7 +548,7 @@ end:
         block->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 
         // set line
-        block->line = line_;
+        block->line = (tb_uint16_t)line_;
 
         // set file
         block->file = file_;
@@ -606,7 +606,7 @@ tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_p
     tb_byte_t*  pe = pb + pool->size;
 
     // the data
-    tb_byte_t*  p = data;
+    tb_byte_t*  p = (tb_byte_t*)data;
     tb_check_return_val(p && p >= pb && p < pe, tb_null);
 
     // the nhead
@@ -734,7 +734,7 @@ tb_handle_t tb_static_block_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
     pool->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 
     // init align
-    pool->align = align;
+    pool->align = (tb_uint16_t)align;
 
     // init nhead
     pool->nhead = tb_align(sizeof(tb_static_block_pool_block_t), pool->align);
@@ -830,7 +830,7 @@ tb_pointer_t tb_static_block_pool_malloc_(tb_handle_t handle, tb_size_t size __t
 tb_pointer_t tb_static_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
     // malloc
-    tb_byte_t* p = tb_static_block_pool_malloc_skip_frame(handle, size __tb_debug_args__);
+    tb_pointer_t p = tb_static_block_pool_malloc_skip_frame(handle, size __tb_debug_args__);
 
     // clear
     if (p && size) tb_memset(p, 0, size);
@@ -838,7 +838,6 @@ tb_pointer_t tb_static_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __
     // ok?
     return p;
 }
-
 tb_pointer_t tb_static_block_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
@@ -912,7 +911,7 @@ tb_bool_t tb_static_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_
     tb_byte_t*  pe = pb + pool->size;
 
     // the data
-    tb_byte_t*  p = data;
+    tb_byte_t*  p = (tb_byte_t*)data;
     tb_check_return_val(p >= pb && p < pe, tb_false);
 
     // the nhead
@@ -1038,7 +1037,7 @@ tb_void_t tb_static_block_pool_data_dump(tb_handle_t handle, tb_cpointer_t data,
     tb_static_block_pool_dump_backtrace(tag, block);
 
     // dump data
-    tb_static_block_pool_dump_data(data, tb_min(block->real, 4096));
+    tb_static_block_pool_dump_data((tb_byte_t const*)data, tb_min(block->real, 4096));
 }
 tb_void_t tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 {

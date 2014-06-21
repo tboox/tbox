@@ -347,7 +347,7 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
 
         // alloc chunk data
         chunk->size = pool->grow;
-        chunk->data = tb_malloc(chunk->size);
+        chunk->data = (tb_byte_t*)tb_malloc(chunk->size);
 
         // no space
         tb_check_break(chunk->data);
@@ -381,7 +381,7 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
 tb_pointer_t tb_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
     // malloc
-    tb_byte_t* p = tb_block_pool_malloc_(handle, size __tb_debug_args__);
+    tb_pointer_t p = tb_block_pool_malloc_(handle, size __tb_debug_args__);
 
     // clear
     if (p && size) tb_memset(p, 0, size);
@@ -448,8 +448,9 @@ tb_char_t* tb_block_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_
     // check
     tb_assert_and_check_return_val(handle && data, tb_null);
 
+    // done
     tb_size_t   n = tb_strlen(data);
-    tb_char_t*  p = tb_block_pool_malloc_(handle, n + 1 __tb_debug_args__);
+    tb_char_t*  p = (tb_char_t*)tb_block_pool_malloc_(handle, n + 1 __tb_debug_args__);
     if (p)
     {
         tb_memcpy(p, data, n);
@@ -464,8 +465,9 @@ tb_char_t* tb_block_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_
     // check
     tb_assert_and_check_return_val(handle && data, tb_null);
 
+    // done
     size = tb_strnlen(data, size);
-    tb_char_t*  p = tb_block_pool_malloc_(handle, size + 1 __tb_debug_args__);
+    tb_char_t*  p = (tb_char_t*)tb_block_pool_malloc_(handle, size + 1 __tb_debug_args__);
     if (p)
     {
         tb_memcpy(p, data, size);

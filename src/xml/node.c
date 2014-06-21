@@ -41,8 +41,8 @@ tb_xml_node_t* tb_xml_node_init_element(tb_char_t const* name)
     // check
     tb_assert_and_check_return_val(name, tb_null);
 
-    // alloc
-    tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_element_t));
+    // make node
+    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0(sizeof(tb_xml_element_t));
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -56,8 +56,8 @@ tb_xml_node_t* tb_xml_node_init_element(tb_char_t const* name)
 }
 tb_xml_node_t* tb_xml_node_init_text(tb_char_t const* data)
 {
-    // alloc
-    tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_text_t));
+    // make node
+    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0(sizeof(tb_xml_text_t));
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -72,8 +72,8 @@ tb_xml_node_t* tb_xml_node_init_text(tb_char_t const* data)
 }
 tb_xml_node_t* tb_xml_node_init_cdata(tb_char_t const* cdata)
 {
-    // alloc
-    tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_cdata_t));
+    // make node
+    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0(sizeof(tb_xml_cdata_t));
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -88,8 +88,8 @@ tb_xml_node_t* tb_xml_node_init_cdata(tb_char_t const* cdata)
 }
 tb_xml_node_t* tb_xml_node_init_comment(tb_char_t const* comment)
 {
-    // alloc
-    tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_comment_t));
+    // make node
+    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0(sizeof(tb_xml_comment_t));
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -104,8 +104,8 @@ tb_xml_node_t* tb_xml_node_init_comment(tb_char_t const* comment)
 }
 tb_xml_node_t* tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const* data)
 {
-    // alloc
-    tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_attribute_t));
+    // make node
+    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0(sizeof(tb_xml_attribute_t));
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -120,8 +120,8 @@ tb_xml_node_t* tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const
 }
 tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* charset)
 {
-    // alloc
-    tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_document_t));
+    // make node
+    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0(sizeof(tb_xml_document_t));
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -139,8 +139,8 @@ tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t con
 }
 tb_xml_node_t* tb_xml_node_init_document_type(tb_char_t const* type)
 {
-    // alloc
-    tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_document_type_t));
+    // make node
+    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0(sizeof(tb_xml_document_type_t));
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 

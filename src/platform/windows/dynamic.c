@@ -45,16 +45,25 @@ tb_handle_t tb_dynamic_init(tb_char_t const* name)
 }
 tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 {
+    // check
     tb_assert_and_check_return(dynamic);
-    FreeLibrary(dynamic);
+
+    // exit it
+    FreeLibrary((HMODULE)dynamic);
 }
 tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
 {
+    // check
     tb_assert_and_check_return_val(dynamic && name, tb_null);
-    return (tb_pointer_t)GetProcAddress(dynamic, name);
+
+    // get func
+    return (tb_pointer_t)GetProcAddress((HMODULE)dynamic, name);
 }
 tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
 {
+    // check
     tb_assert_and_check_return_val(dynamic && name, tb_null);
-    return (tb_pointer_t)GetProcAddress(dynamic, name);
+
+    // get variable address
+    return (tb_pointer_t)GetProcAddress((HMODULE)dynamic, name);
 }

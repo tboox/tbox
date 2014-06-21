@@ -94,39 +94,39 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
             tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
 
             // trace id
-            tb_database_sql_value_t const* id = tb_iterator_item(row, 0);
+            tb_database_sql_value_t const* id = (tb_database_sql_value_t const*)tb_iterator_item(row, 0);
             tb_assert_and_check_break(id);
             tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(id), tb_database_sql_value_int32(id));
 
 #ifdef TB_CONFIG_TYPE_FLOAT
             // trace fval
-            tb_database_sql_value_t const* fval = tb_iterator_item(row, 1);
+            tb_database_sql_value_t const* fval = (tb_database_sql_value_t const*)tb_iterator_item(row, 1);
             tb_assert_and_check_break(fval);
             tb_tracet_i("[%s:%f] ", tb_database_sql_value_name(fval), tb_database_sql_value_float(fval));
 #endif
 
             // trace name
-            tb_database_sql_value_t const* name = tb_iterator_item(row, 2);
+            tb_database_sql_value_t const* name = (tb_database_sql_value_t const*)tb_iterator_item(row, 2);
             tb_assert_and_check_break(name);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(name), tb_database_sql_value_text(name));
 
             // trace data
-            tb_database_sql_value_t const* data = tb_iterator_item(row, 3);
+            tb_database_sql_value_t const* data = (tb_database_sql_value_t const*)tb_iterator_item(row, 3);
             tb_assert_and_check_break(data);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(data), tb_database_sql_value_blob(data));
 
             // trace tdata
-            tb_database_sql_value_t const* tdata = tb_iterator_item(row, 4);
+            tb_database_sql_value_t const* tdata = (tb_database_sql_value_t const*)tb_iterator_item(row, 4);
             tb_assert_and_check_break(tdata);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(tdata), tb_database_sql_value_blob(tdata));
 
             // trace ldata
-            tb_database_sql_value_t const* ldata = tb_iterator_item(row, 5);
+            tb_database_sql_value_t const* ldata = (tb_database_sql_value_t const*)tb_iterator_item(row, 5);
             tb_assert_and_check_break(ldata);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(ldata), tb_database_sql_value_blob(ldata));
 
             // trace ldata2
-            tb_database_sql_value_t const* ldata2 = tb_iterator_item(row, 6);
+            tb_database_sql_value_t const* ldata2 = (tb_database_sql_value_t const*)tb_iterator_item(row, 6);
             tb_assert_and_check_break(ldata2);
             {
                 // data?
@@ -144,14 +144,14 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
                     tb_assert_and_check_break(size >= 0);
 
                     // make data
-                    tb_byte_t* data = (tb_byte_t*)tb_malloc0(size);
+                    tb_byte_t* data = (tb_byte_t*)tb_malloc0((tb_size_t)size);
                     tb_assert_and_check_break(data);
 
                     // read data
-                    if (tb_basic_stream_bread(stream, data, size))
+                    if (tb_basic_stream_bread(stream, data, (tb_size_t)size))
                     {
                         // trace
-                        tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, data, size)));
+                        tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, data, (tb_size_t)size)));
                     }
 
                     // exit data
@@ -166,12 +166,12 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
             }
 
             // trace number
-            tb_database_sql_value_t const* number = tb_iterator_item(row, 7);
+            tb_database_sql_value_t const* number = (tb_database_sql_value_t const*)tb_iterator_item(row, 7);
             tb_assert_and_check_break(number);
             tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(number), tb_database_sql_value_int32(number));
 
             // trace snumber
-            tb_database_sql_value_t const* snumber = tb_iterator_item(row, 8);
+            tb_database_sql_value_t const* snumber = (tb_database_sql_value_t const*)tb_iterator_item(row, 8);
             tb_assert_and_check_break(snumber);
             tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(snumber), tb_database_sql_value_int32(snumber));
 

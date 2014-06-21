@@ -199,27 +199,27 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
     tb_hong_t time = tb_cache_time_spak();
 
     // se/nd request
-    tb_long_t writ = 0;
+    tb_size_t writ = 0;
     while (writ < size)
     {
         // writ data
-        tb_long_t r = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
-        tb_trace_d("writ %d", r);
-        tb_check_goto(r >= 0, end);
+        tb_long_t real = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
+        tb_trace_d("writ %ld", real);
+        tb_check_goto(real >= 0, end);
         
         // no data?
-        if (!r)
+        if (!real)
         {
             // abort?
             tb_check_goto(!writ, end);
  
             // wait
-            r = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
+            real = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
 
             // fail or timeout?
-            tb_check_goto(r > 0, end);
+            tb_check_goto(real > 0, end);
         }
-        else writ += r;
+        else writ += real;
     }
 
     // only recv id & answer, 8 bytes 

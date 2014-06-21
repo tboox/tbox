@@ -34,6 +34,7 @@
 #include "endian.h"
 #include "version.h"
 #include "compiler.h"
+#include "assembler.h"
 #include "keyword.h"
 #include "trace.h"
 #include "abort.h"
@@ -43,7 +44,6 @@
 #include "utils.h"
 #include "state.h"
 #include "asm.h"
-
 
 #endif
 

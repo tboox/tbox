@@ -86,8 +86,8 @@ tb_bool_t tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type)
 
     // init
     tb_memset(object, 0, sizeof(tb_object_t));
-    object->flag = flag;
-    object->type = type;
+    object->flag = (tb_uint8_t)flag;
+    object->type = (tb_uint16_t)type;
     object->refn = 1;
 
     // ok
@@ -152,7 +152,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
     do
     {
         // make data
-        data = data? tb_ralloc(data, maxn) : tb_malloc(maxn);
+        data = data? (tb_byte_t*)tb_ralloc(data, maxn) : (tb_byte_t*)tb_malloc(maxn);
         tb_assert_and_check_break(data);
 
         // writ object to data
@@ -265,7 +265,7 @@ tb_object_t* tb_object_dump(tb_object_t* object)
     if (odata)
     {
         // data & size 
-        tb_byte_t const*    data = tb_data_getp(odata);
+        tb_byte_t const*    data = (tb_byte_t const*)tb_data_getp(odata);
         tb_size_t           size = tb_data_size(odata);
         if (data && size)
         {

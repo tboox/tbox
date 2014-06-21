@@ -53,7 +53,7 @@ tb_pointer_t tb_memdup(tb_cpointer_t s, tb_size_t n)
 #endif
 
     // done
-    __tb_register__ tb_pointer_t* p = tb_malloc(n);
+    __tb_register__ tb_pointer_t p = tb_malloc(n);
     if (p) tb_memcpy(p, s, n);
     return p;
 }

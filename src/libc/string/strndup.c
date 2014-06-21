@@ -34,12 +34,12 @@
 
 tb_char_t* tb_strndup(tb_char_t const* s, tb_size_t n)
 {
+    // check
     tb_assert_and_check_return_val(s, tb_null);
 
-    __tb_register__ tb_char_t* p;
-
+    // done
     n = tb_strnlen(s, n);
-    p = tb_malloc(n + 1);
+    __tb_register__ tb_char_t* p = (tb_char_t*)tb_malloc(n + 1);
     if (p)
     {
         tb_memcpy(p, s, n);

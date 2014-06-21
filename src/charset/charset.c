@@ -90,7 +90,7 @@ static tb_long_t tb_charset_comp_by_name(tb_iterator_t* iterator, tb_cpointer_t 
     tb_assert_return_val(item, 0);
 
     // comp
-    return tb_stricmp(((tb_charset_t const*)item)->name, name);
+    return tb_stricmp(((tb_charset_t const*)item)->name, (tb_char_t const*)name);
 }
 static tb_long_t tb_charset_comp_by_type(tb_iterator_t* iterator, tb_cpointer_t item, tb_cpointer_t type)
 {
@@ -205,7 +205,7 @@ tb_long_t tb_charset_conv_data(tb_size_t ftype, tb_size_t ttype, tb_byte_t const
     // init static stream
     tb_static_stream_t ist;
     tb_static_stream_t ost;
-    tb_static_stream_init(&ist, (tb_pointer_t)idata, isize);
+    tb_static_stream_init(&ist, (tb_byte_t*)idata, isize);
     tb_static_stream_init(&ost, odata, osize);
 
     // conv

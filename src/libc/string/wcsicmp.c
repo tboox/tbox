@@ -36,8 +36,13 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSICMP
 tb_long_t tb_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, 0);
+#   ifdef TB_COMPILER_IS_MSVC
+    return _wcsicmp(s1, s2);
+#   else
     return wcscasecmp(s1, s2);
+#   endif
 }
 #else
 tb_long_t tb_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2)

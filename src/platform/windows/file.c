@@ -272,7 +272,7 @@ tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, t
     tb_check_return_val(read > 0, read);
 
     // writ data
-    tb_size_t writ = 0;
+    tb_long_t writ = 0;
     while (writ < read)
     {
         tb_long_t real = tb_file_writ(file, data + writ, read - writ);

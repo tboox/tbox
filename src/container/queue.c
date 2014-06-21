@@ -44,13 +44,13 @@
  * types
  */
 
-/*! the queue type
+/*! the impl type
  *
  * <pre>
- * queue: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
+ * impl: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
  *       head                                                           last    tail
  *
- * queue: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
+ * impl: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
  *                   last  tail                       head                
  *
  * head: => the head item
@@ -100,74 +100,74 @@ typedef struct __tb_queue_impl_t
 static tb_size_t tb_queue_iterator_size(tb_iterator_t* iterator)
 {   
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(queue, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // the size
-    return ((queue->tail + queue->maxn - queue->head) & (queue->maxn - 1));
+    return ((impl->tail + impl->maxn - impl->head) & (impl->maxn - 1));
 }
 static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
 {
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(queue, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // head
-    return queue->head;
+    return impl->head;
 }
 static tb_size_t tb_queue_iterator_tail(tb_iterator_t* iterator)
 {
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(queue, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // tail
-    return queue->tail;
+    return impl->tail;
 }
 static tb_size_t tb_queue_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(queue, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // next
-    return ((itor + 1) & (queue->maxn - 1));
+    return ((itor + 1) & (impl->maxn - 1));
 }
 static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(queue, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // prev
-    return ((itor + queue->maxn - 1) & (queue->maxn - 1));
+    return ((itor + impl->maxn - 1) & (impl->maxn - 1));
 }
 static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(queue && itor < queue->maxn, tb_null);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl && itor < impl->maxn, tb_null);
 
     // item
-    return queue->func.data(&queue->func, queue->data + itor * iterator->step);
+    return impl->func.data(&impl->func, impl->data + itor * iterator->step);
 }
 static tb_void_t tb_queue_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_return(queue);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_return(impl);
 
     // copy
-    queue->func.copy(&queue->func, queue->data + itor * iterator->step, item);
+    impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
 static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(queue && queue->func.comp, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl && impl->func.comp, 0);
 
     // comp
-    return queue->func.comp(&queue->func, ltem, rtem);
+    return impl->func.comp(&impl->func, ltem, rtem);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -178,126 +178,143 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
     // check
     tb_assert_and_check_return_val(func.size && func.dupl && func.data, tb_null);
 
-    // alloc queue
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)tb_malloc0(sizeof(tb_queue_impl_t));
-    tb_assert_and_check_return_val(queue, tb_null);
-
-    // using the default maxn
-    if (!maxn) maxn = TB_QUEUE_SIZE_DEFAULT;
-
-    // init queue
-    queue->maxn = tb_align_pow2(maxn + 1); // + tail
-    queue->func = func;
-    tb_assert_and_check_goto(tb_ispow2(queue->maxn), fail);
-
-    // init iterator
-    queue->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-    queue->itor.priv = tb_null;
-    queue->itor.step = func.size;
-    queue->itor.size = tb_queue_iterator_size;
-    queue->itor.head = tb_queue_iterator_head;
-    queue->itor.tail = tb_queue_iterator_tail;
-    queue->itor.prev = tb_queue_iterator_prev;
-    queue->itor.next = tb_queue_iterator_next;
-    queue->itor.item = tb_queue_iterator_item;
-    queue->itor.copy = tb_queue_iterator_copy;
-    queue->itor.comp = tb_queue_iterator_comp;
-
-    // calloc data
-    queue->data = tb_nalloc0(queue->maxn, func.size);
-    tb_assert_and_check_goto(queue->data, fail);
-
-    return queue;
-fail:
-    if (queue) tb_queue_exit(queue);
-    return tb_null;
-}
-
-tb_void_t tb_queue_exit(tb_queue_t* handle)
-{   
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    if (queue)
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_queue_impl_t*    impl = tb_null;
+    do
     {
-        // clear data
-        tb_queue_clear(queue);
+        // make impl
+        impl = (tb_queue_impl_t*)tb_malloc0(sizeof(tb_queue_impl_t));
+        tb_assert_and_check_break(impl);
 
-        // free data
-        if (queue->data) tb_free(queue->data);
+        // using the default maxn
+        if (!maxn) maxn = TB_QUEUE_SIZE_DEFAULT;
 
-        // free it
-        tb_free(queue);
-    }
-}
-tb_void_t tb_queue_clear(tb_queue_t* handle)
-{
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    if (queue) 
+        // init impl
+        impl->maxn = tb_align_pow2(maxn + 1); // + tail
+        impl->func = func;
+        tb_assert_and_check_break(tb_ispow2(impl->maxn));
+
+        // init iterator
+        impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
+        impl->itor.priv = tb_null;
+        impl->itor.step = func.size;
+        impl->itor.size = tb_queue_iterator_size;
+        impl->itor.head = tb_queue_iterator_head;
+        impl->itor.tail = tb_queue_iterator_tail;
+        impl->itor.prev = tb_queue_iterator_prev;
+        impl->itor.next = tb_queue_iterator_next;
+        impl->itor.item = tb_queue_iterator_item;
+        impl->itor.copy = tb_queue_iterator_copy;
+        impl->itor.comp = tb_queue_iterator_comp;
+
+        // make data
+        impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, func.size);
+        tb_assert_and_check_break(impl->data);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
     {
-        while (!tb_queue_null(queue)) tb_queue_pop(queue);
-        queue->head = 0;
-        queue->tail = 0;
+        if (impl) tb_queue_exit((tb_queue_t*)impl);
+        impl = tb_null;
     }
+
+    // ok?
+    return (tb_queue_t*)impl;
 }
-tb_void_t tb_queue_put(tb_queue_t* handle, tb_cpointer_t data)
+tb_void_t tb_queue_exit(tb_queue_t* queue)
 {   
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    tb_assert_and_check_return(queue && !tb_queue_full(queue));
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return(impl);
+    
+    // clear data
+    tb_queue_clear(queue);
 
-    queue->func.dupl(&queue->func, queue->data + queue->tail * queue->func.size, data);
-    queue->tail = ((queue->tail + 1) & (queue->maxn - 1));
-}
-tb_void_t tb_queue_pop(tb_queue_t* handle)
-{   
-    // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    tb_assert_and_check_return(queue && !tb_queue_null(queue));
+    // free data
+    if (impl->data) tb_free(impl->data);
 
-    if (queue->func.free) queue->func.free(&queue->func, queue->data + queue->head * queue->func.size);
-    queue->head = ((queue->head + 1) & (queue->maxn - 1));
+    // free it
+    tb_free(impl);
 }
-tb_pointer_t tb_queue_get(tb_queue_t const* handle)
+tb_void_t tb_queue_clear(tb_queue_t* queue)
 {
-    return tb_queue_head(handle);
+    // check
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return(impl);
+    
+    // clear it
+    while (!tb_queue_null(queue)) tb_queue_pop(queue);
+    impl->head = 0;
+    impl->tail = 0;
 }
-tb_pointer_t tb_queue_head(tb_queue_t const* handle)
+tb_void_t tb_queue_put(tb_queue_t* queue, tb_cpointer_t data)
+{   
+    // check
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return(impl && !tb_queue_full(queue));
+
+    // put it
+    impl->func.dupl(&impl->func, impl->data + impl->tail * impl->func.size, data);
+    impl->tail = ((impl->tail + 1) & (impl->maxn - 1));
+}
+tb_void_t tb_queue_pop(tb_queue_t* queue)
+{   
+    // check
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return(impl && !tb_queue_null(queue));
+
+    // pop it
+    if (impl->func.free) impl->func.free(&impl->func, impl->data + impl->head * impl->func.size);
+    impl->head = ((impl->head + 1) & (impl->maxn - 1));
+}
+tb_pointer_t tb_queue_get(tb_queue_t const* queue)
 {
-    return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_head((tb_iterator_t*)handle));
+    return tb_queue_head(queue);
 }
-tb_pointer_t tb_queue_last(tb_queue_t const* handle)
+tb_pointer_t tb_queue_head(tb_queue_t const* queue)
 {
-    return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_last((tb_iterator_t*)handle));
+    return tb_iterator_item((tb_iterator_t*)queue, tb_iterator_head((tb_iterator_t*)queue));
 }
-tb_size_t tb_queue_size(tb_queue_t const* handle)
+tb_pointer_t tb_queue_last(tb_queue_t const* queue)
+{
+    return tb_iterator_item((tb_iterator_t*)queue, tb_iterator_last((tb_iterator_t*)queue));
+}
+tb_size_t tb_queue_size(tb_queue_t const* queue)
 {   
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    tb_assert_and_check_return_val(queue, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return_val(impl, 0);
 
-    return ((queue->tail + queue->maxn - queue->head) & (queue->maxn - 1));
+    return ((impl->tail + impl->maxn - impl->head) & (impl->maxn - 1));
 }
-tb_size_t tb_queue_maxn(tb_queue_t const* handle)
+tb_size_t tb_queue_maxn(tb_queue_t const* queue)
 {   
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    tb_assert_and_check_return_val(queue, 0);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return_val(impl, 0);
 
-    return (queue->maxn? queue->maxn - 1 : 0);
+    return (impl->maxn? impl->maxn - 1 : 0);
 }
-tb_bool_t tb_queue_full(tb_queue_t const* handle)
+tb_bool_t tb_queue_full(tb_queue_t const* queue)
 {   
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    tb_assert_and_check_return_val(queue, tb_true);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return_val(impl, tb_true);
 
-    return ((queue->head == ((queue->tail + 1) & (queue->maxn - 1)))? tb_true : tb_false);
+    return ((impl->head == ((impl->tail + 1) & (impl->maxn - 1)))? tb_true : tb_false);
 }
-tb_bool_t tb_queue_null(tb_queue_t const* handle)
+tb_bool_t tb_queue_null(tb_queue_t const* queue)
 {   
     // check
-    tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-    tb_assert_and_check_return_val(queue, tb_true);
+    tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
+    tb_assert_and_check_return_val(impl, tb_true);
 
-    return ((queue->head == queue->tail)? tb_true : tb_false);
+    return ((impl->head == impl->tail)? tb_true : tb_false);
 }
 

@@ -143,7 +143,7 @@ tb_uint32_t tb_isqrti(tb_uint32_t x)
         tb_size_t s = tb_ilog2i(x >> 16) >> 1;
         tb_size_t c = x >> (s + 2);
         b = table[c >> (s + 8)];
-        b = tb_idivi8(c, b) + (b << s);
+        b = tb_idivi8(c, (tb_uint8_t)b) + (b << s);
     }
     return b - (x < b * b);
 #elif 0

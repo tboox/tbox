@@ -339,7 +339,7 @@ tb_pointer_t tb_fixed_pool_malloc(tb_handle_t handle)
 
         // alloc chunk data
         chunk->size = pool->grow;
-        chunk->data = tb_malloc(chunk->size);
+        chunk->data = (tb_byte_t*)tb_malloc(chunk->size);
 
         // no space?
         tb_check_break(chunk->data);
@@ -382,7 +382,7 @@ tb_pointer_t tb_fixed_pool_malloc0(tb_handle_t handle)
     tb_assert_and_check_return_val(pool && pool->pools, tb_null);
 
     // malloc
-    tb_byte_t* p = tb_fixed_pool_malloc(handle);
+    tb_pointer_t p = tb_fixed_pool_malloc(handle);
 
     // clear
     if (p) tb_memset(p, 0, pool->step);
@@ -458,8 +458,8 @@ tb_pointer_t tb_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data)
     tb_assert_and_check_return_val(pool && data, tb_null);
 
     // init
-    tb_size_t   n = pool->step;
-    tb_char_t*  p = tb_fixed_pool_malloc(handle);
+    tb_size_t       n = pool->step;
+    tb_pointer_t    p = tb_fixed_pool_malloc(handle);
 
     // copy
     if (p) tb_memcpy(p, data, n);

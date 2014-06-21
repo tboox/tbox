@@ -195,7 +195,7 @@ tb_zip_t* tb_zip_rlc_init(tb_size_t action)
     
     // init zip
     zip->algo       = TB_ZIP_ALGO_RLC;
-    zip->action     = action;
+    zip->action     = (tb_uint16_t)action;
     zip->spak       = (action == TB_ZIP_ACTION_INFLATE)? tb_zip_rlc_spak_inflate : tb_zip_rlc_spak_deflate;
 
     // open vlc

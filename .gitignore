@@ -11,11 +11,17 @@
 *.swo
 *.bak
 *.orig
+*.pdb
+*.idb
+*.stackdump
+*.manifest
+.ccache
 .demo
 .config.mak
 src/config.h
 .svn
 .DS_Store
+tool/msys
 cscope.*
 gmon.out
 other

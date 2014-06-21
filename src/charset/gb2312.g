@@ -24,6 +24,9 @@
  * includes
  */
 #include "prefix.h"
+#ifdef TB_COMPILER_IS_MSVC
+#   pragma warning(disable: 4819)
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals

@@ -17,7 +17,7 @@ typedef struct __tb_flv_info_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value_t const* value, tb_pointer_t cb_data)
+static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value_t const* value, tb_pointer_t priv)
 {
     switch (value->type)
     {
@@ -62,17 +62,17 @@ static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value
     }
 }
 
-static tb_void_t tb_flv_sdata_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t cb_data)
+static tb_void_t tb_flv_sdata_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t priv)
 {
     tb_trace_i("=================================================================================");
     tb_trace_i("sdata_data: %d %d", head_size, body_size);
 }
-static tb_void_t tb_flv_hdata_cb_func(tb_byte_t const* data, tb_size_t size, tb_pointer_t cb_data)
+static tb_void_t tb_flv_hdata_cb_func(tb_byte_t const* data, tb_size_t size, tb_pointer_t priv)
 {
     tb_trace_i("=================================================================================");
     tb_trace_i("head_size: %d", size);
 }
-static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t cb_data)
+static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t priv)
 {
     tb_trace_i("=================================================================================");
     tb_trace_i("audio_config_size: %d %d", head_size, body_size);
@@ -110,7 +110,7 @@ static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size
     if (!channels) channels = (flags & TB_FLV_AUDIO_CHANNEL_MASK) == TB_FLV_AUDIO_CHANNEL_STEREO ? 2 : 1;
     tb_trace_i("samplerate: %u Hz, channels: %u, object_type: %u", samplerate, channels, object_type);
 }
-static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t cb_data)
+static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t priv)
 {
     tb_trace_i("=================================================================================");
     tb_trace_i("video_config_size: %d %d", head_size, body_size);
@@ -139,13 +139,13 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
         if (size)
         {
             // get sps data
-            tb_byte_t* data = tb_malloc0(size);
+            tb_byte_t* data = (tb_byte_t*)tb_malloc0(size);
             tb_assert_return(data);
             tb_static_stream_read_data(&sstream, data, size);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
             // remove emulation bytes
-            size = tb_flv_video_h264_sps_analyze_remove_emulation(data, size);
+            size = (tb_uint16_t)tb_flv_video_h264_sps_analyze_remove_emulation(data, size);
 
             // analyze framerate
             tb_double_t framerate = tb_flv_video_h264_sps_analyze_framerate(data, size);
@@ -167,18 +167,18 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
         tb_static_stream_skip(&sstream, size);
     }
 }
-static tb_bool_t tb_flv_audio_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_size_t dts, tb_pointer_t cb_data)
+static tb_bool_t tb_flv_audio_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_size_t dts, tb_pointer_t priv)
 {   
-    tb_flv_info_t* info = cb_data;
+    tb_flv_info_t* info = (tb_flv_info_t*)priv;
     tb_trace_i("=================================================================================");
     tb_trace_i("audio_data_size: %u %u, dts: %u, dt: %u", head_size, body_size, dts, dts - info->audio_dts_last);
     info->audio_dts_last = dts;
 
     return tb_true;
 }
-static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_size_t dts, tb_sint32_t cts, tb_pointer_t cb_data)
+static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_size_t dts, tb_sint32_t cts, tb_pointer_t priv)
 {
-    tb_flv_info_t* info = cb_data;
+    tb_flv_info_t* info = (tb_flv_info_t*)priv;
     tb_uint8_t  flags = head_data[11];
     tb_bool_t   bkeyframe = (flags & TB_FLV_VIDEO_FRAMETYPE_MASK) == TB_FLV_FRAME_TYPE_KEY? tb_true : tb_false;
 

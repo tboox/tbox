@@ -409,6 +409,7 @@ INC_FILES 				= \
 						prefix/arch.h \
 						prefix/keyword.h \
 						prefix/compiler.h \
+						prefix/assembler.h \
 						prefix/version.h \
 						prefix/endian.h \
 						prefix/assert.h \

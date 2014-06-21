@@ -281,7 +281,7 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
     pool->magic = TB_STATIC_FIXED_POOL_MAGIC;
 
     // init align
-    pool->align = align;
+    pool->align = (tb_uint16_t)align;
 
     // init step
     pool->step = tb_align(step, pool->align);
@@ -306,7 +306,7 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
     // init data
     pool->data = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)pool->used + (tb_align8(pool->maxn) >> 3), (tb_hize_t)pool->align);
     tb_assert_and_check_return_val(data + size > pool->data, tb_null);
-    tb_assert_and_check_return_val(pool->maxn * pool->step <= (data + size - pool->data), tb_null);
+    tb_assert_and_check_return_val(pool->maxn * pool->step <= (tb_size_t)(data + size - pool->data), tb_null);
 
     // init size
     pool->size = 0;
@@ -425,8 +425,8 @@ tb_pointer_t tb_static_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data)
     tb_assert_and_check_return_val(pool && data, tb_null);
 
     // init
-    tb_size_t   n = pool->step;
-    tb_char_t*  p = tb_static_fixed_pool_malloc(handle);
+    tb_size_t       n = pool->step;
+    tb_pointer_t    p = tb_static_fixed_pool_malloc(handle);
 
     // copy
     if (p) tb_memcpy(p, data, n);
@@ -458,7 +458,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_handle_t handle, tb_pointer_t data)
     tb_static_fixed_pool_used_set0(pool->used, i);
     
     // predict it
-    pool->pred = data;
+    pool->pred = (tb_byte_t*)data;
 
     // size--
     pool->size--;

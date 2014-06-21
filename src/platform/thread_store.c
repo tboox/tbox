@@ -42,7 +42,7 @@
  */
 
 // the store
-static tb_handle_t      g_store = tb_null;
+static tb_hash_t*       g_store = tb_null;
 
 // the lock
 static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;

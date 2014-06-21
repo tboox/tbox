@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 //#     define TB_LIBC_STRING_OPT_MEMCMP
 #endif
 
@@ -37,7 +37,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if 0//def TB_CONFIG_ASSEMBLER_GAS
+#if 0//def TB_ASSEMBLER_IS_GAS
 static tb_long_t tb_memcmp_impl(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
 }

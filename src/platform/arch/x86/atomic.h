@@ -32,7 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 
 #ifndef tb_atomic_set
 #   define tb_atomic_set(a, v)                  tb_atomic_set_x86(a, v)
@@ -178,7 +178,7 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_x86(tb_atomic_t* a, tb_lo
 }
 
 
-#endif // TB_CONFIG_ASSEMBLER_GAS
+#endif // TB_ASSEMBLER_IS_GAS
 
 
 #endif

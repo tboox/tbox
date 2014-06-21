@@ -39,7 +39,7 @@
 #       define __tb_except(x)           __except(!!(x))
 #       define __tb_leave               __leave
 #       define __tb_end                 
-#   elif defined(TB_CONFIG_ASSEMBLER_GAS) && !TB_CPU_BIT64
+#   elif defined(TB_ASSEMBLER_IS_GAS) && !TB_CPU_BIT64
 
         // try
 #       define __tb_try \
@@ -99,7 +99,7 @@
 #if defined(tb_setjmp) \
     && defined(tb_longjmp) \
     && !defined(TB_COMPILER_IS_MSVC) \
-    && defined(TB_CONFIG_ASSEMBLER_GAS) \
+    && defined(TB_ASSEMBLER_IS_GAS) \
     && !TB_CPU_BIT64
 
 #include "../../prefix/packed.h"

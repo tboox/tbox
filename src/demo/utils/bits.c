@@ -788,11 +788,11 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_double_lle(3.1415926);
 
     tb_trace_i("");
-    tb_test_bits_float_be(3.1415926);
-    tb_test_bits_float_le(3.1415926);
+    tb_test_bits_float_be(3.1415926f);
+    tb_test_bits_float_le(3.1415926f);
 
-    tb_test_bits_float_be(3.1415926);
-    tb_test_bits_float_le(3.1415926);
+    tb_test_bits_float_be(3.1415926f);
+    tb_test_bits_float_le(3.1415926f);
 #endif
 #endif
 

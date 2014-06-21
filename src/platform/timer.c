@@ -132,7 +132,7 @@ static tb_long_t tb_timer_comp_by_task(tb_iterator_t* iterator, tb_cpointer_t lt
 tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 {
     // make timer
-    tb_timer_t* timer = tb_malloc0(sizeof(tb_timer_t));
+    tb_timer_t* timer = (tb_timer_t*)tb_malloc0(sizeof(tb_timer_t));
     tb_assert_and_check_return_val(timer, tb_null);
 
     // init func
@@ -245,7 +245,7 @@ tb_hize_t tb_timer_top(tb_handle_t handle)
     if (tb_heap_size(timer->heap))
     {
         // the task
-        tb_timer_task_t const* task = tb_heap_top(timer->heap);
+        tb_timer_task_t const* task = (tb_timer_task_t const*)tb_heap_top(timer->heap);
         if (task) when = task->when;
     }
 
@@ -272,14 +272,14 @@ tb_size_t tb_timer_delay(tb_handle_t handle)
     if (tb_heap_size(timer->heap))
     {
         // the task
-        tb_timer_task_t const* task = tb_heap_top(timer->heap);
+        tb_timer_task_t const* task = (tb_timer_task_t const*)tb_heap_top(timer->heap);
         if (task)
         {
             // the now
             tb_hong_t now = tb_timer_now(timer);
 
             // the delay
-            delay = task->when > now? task->when - now : 0;
+            delay = task->when > now? (tb_size_t)(task->when - now) : 0;
         }
     }
 
@@ -316,7 +316,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
         }
 
         // the top task
-        tb_timer_task_t* task = tb_heap_top(timer->heap);
+        tb_timer_task_t* task = (tb_timer_task_t*)tb_heap_top(timer->heap);
         tb_assert_and_check_break(task);
 
         // check refn
@@ -441,7 +441,7 @@ tb_handle_t tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
         // the top when 
         if (tb_heap_size(timer->heap))
         {
-            tb_timer_task_t* task = tb_heap_top(timer->heap);
+            tb_timer_task_t* task = (tb_timer_task_t*)tb_heap_top(timer->heap);
             if (task) when_top = task->when;
         }
 
@@ -509,7 +509,7 @@ tb_void_t tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
         // the top when 
         if (tb_heap_size(timer->heap))
         {
-            tb_timer_task_t* task = tb_heap_top(timer->heap);
+            tb_timer_task_t* task = (tb_timer_task_t*)tb_heap_top(timer->heap);
             if (task) when_top = task->when;
         }
 

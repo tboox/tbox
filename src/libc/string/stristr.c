@@ -26,7 +26,6 @@
  * includes
  */
 #include "string.h"
-
 #ifdef TB_CONFIG_LIBC_HAVE_STRISTR
 #   include <string.h>
 #endif
@@ -38,6 +37,7 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRISTR
 tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, tb_null);
     return strcasestr(s1, s2);
 }

@@ -204,7 +204,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 static tb_pointer_t tb_aicp_instance_loop(tb_cpointer_t priv)
 {
     // aicp
-    tb_handle_t aicp = (tb_handle_t)priv;
+    tb_aicp_t* aicp = (tb_aicp_t*)priv;
 
     // trace
     tb_trace_d("loop: init");
@@ -315,7 +315,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
     do
     {
         // make aicp
-        aicp = tb_malloc0(sizeof(tb_aicp_t));
+        aicp = (tb_aicp_t*)tb_malloc0(sizeof(tb_aicp_t));
         tb_assert_and_check_break(aicp);
 
         // init aicp
@@ -473,7 +473,7 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aico_exit_func_t fu
         tb_trace_d("exit: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), tb_aico_handle(aico));
 
         // exit it
-        if (aicp->ptor->delo(aicp->ptor, aico)) tb_aicp_aico_exit(aicp, aico);
+        if (aicp->ptor->delo(aicp->ptor, (tb_aico_t*)aico)) tb_aicp_aico_exit(aicp, (tb_aico_t*)aico);
     }
 
     // wait exiting
@@ -515,7 +515,7 @@ tb_void_t tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico)
     else if (TB_STATE_PENDING == tb_atomic_fetch_and_pset(&((tb_aico_t*)aico)->state, TB_STATE_PENDING, TB_STATE_KILLING)) 
     {
         // kill it
-        aicp->ptor->kilo(aicp->ptor, aico);
+        aicp->ptor->kilo(aicp->ptor, (tb_aico_t*)aico);
 
         // trace
         tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: pending: ok", aico, tb_aico_type(aico), tb_aico_handle(aico));

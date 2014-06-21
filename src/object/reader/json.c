@@ -580,6 +580,6 @@ tb_object_json_reader_func_t tb_object_json_reader_func(tb_char_t type)
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
  
     // the func
-    return tb_hash_get(reader->hooker, (tb_pointer_t)(tb_size_t)type);
+    return (tb_object_json_reader_func_t)tb_hash_get(reader->hooker, (tb_pointer_t)(tb_size_t)type);
 }
 

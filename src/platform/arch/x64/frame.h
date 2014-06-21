@@ -34,7 +34,7 @@
 
 // the current stack frame address
 #if !defined(TB_CURRENT_STACK_FRAME) \
-    && defined(TB_CONFIG_ASSEMBLER_GAS)
+    && defined(TB_ASSEMBLER_IS_GAS)
 #   define TB_CURRENT_STACK_FRAME       ({ __tb_register__ tb_char_t* frame __tb_asm__("rsp"); frame; })
 #endif
 

@@ -20,13 +20,13 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
         tb_hong_t isize = tb_stream_size(istream);
         if (isize > 0)
         {
-            tb_long_t   osize = isize << 2;
-            tb_byte_t*  idata = tb_malloc(isize);
-            tb_byte_t*  odata = tb_malloc(osize);
-            if (idata && odata && tb_basic_stream_bread(istream, idata, isize))
+            tb_long_t   osize = (tb_long_t)(isize << 2);
+            tb_byte_t*  idata = (tb_byte_t*)tb_malloc((tb_size_t)isize);
+            tb_byte_t*  odata = (tb_byte_t*)tb_malloc((tb_size_t)osize);
+            if (idata && odata && tb_basic_stream_bread(istream, idata, (tb_size_t)isize))
             {
                 // conv
-                osize = tb_charset_conv_data(tb_charset_type(argv[3]), tb_charset_type(argv[4]), idata, isize, odata, osize);
+                osize = tb_charset_conv_data(tb_charset_type(argv[3]), tb_charset_type(argv[4]), idata, (tb_size_t)isize, odata, osize);
                 tb_trace_i("conv: %ld bytes", osize);
                 
                 // save

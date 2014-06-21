@@ -29,14 +29,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 //#     define TB_LIBC_STRING_OPT_STRLEN
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if 0//def TB_CONFIG_ASSEMBLER_GAS
+#if 0//def TB_ASSEMBLER_IS_GAS
 static tb_size_t tb_strlen_impl(tb_char_t const* s)
 {
     tb_assert_and_check_return_val(s, 0);

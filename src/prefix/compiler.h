@@ -90,7 +90,7 @@
 #       define TB_COMPILER_VERSION_STRING           "borland c++ 5.51"
 #   elif (__BORLANDC__ == 0x0560)
 #       define TB_COMPILER_VERSION_STRING           "borland c++ 5.6"
-# elif (__BORLANDC__ == 0x0564)
+#   elif (__BORLANDC__ == 0x0564)
 #       define TB_COMPILER_VERSION_STRING           "borland c++ 5.6.4 (c++ builderx)"
 #   elif (__BORLANDC__ == 0x0582)
 #       define TB_COMPILER_VERSION_STRING           "borland c++ 5.82 (turbo c++)"
@@ -294,6 +294,10 @@
 #   else
 #       error Unknown visual c++ Compiler Version
 #   endif
+
+// suppress warning
+#   pragma warning(disable:4018)
+#   pragma warning(disable:4197)
 
 #else
 #   define TB_COMPILER_STRING                       "unknown compiler"

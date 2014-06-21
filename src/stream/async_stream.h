@@ -88,7 +88,7 @@ struct __tb_async_stream_t;
  *
  * @return                      tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t               (*tb_async_stream_open_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv);
+typedef tb_bool_t               (*tb_async_stream_open_func_t)(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv);
 
 /*! the stream clos func type
  *
@@ -96,7 +96,7 @@ typedef tb_bool_t               (*tb_async_stream_open_func_t)(struct __tb_async
  * @param state                 the state
  * @param priv                  the func private data
  */
-typedef tb_void_t               (*tb_async_stream_clos_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv);
+typedef tb_void_t               (*tb_async_stream_clos_func_t)(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv);
 
 /*! the stream read func type
  *
@@ -109,7 +109,7 @@ typedef tb_void_t               (*tb_async_stream_clos_func_t)(struct __tb_async
  *
  * @return                      tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t               (*tb_async_stream_read_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
+typedef tb_bool_t               (*tb_async_stream_read_func_t)(tb_handle_t stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 
 /*! the stream writ func type
  *
@@ -122,7 +122,7 @@ typedef tb_bool_t               (*tb_async_stream_read_func_t)(struct __tb_async
  *
  * @return                      tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t               (*tb_async_stream_writ_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
+typedef tb_bool_t               (*tb_async_stream_writ_func_t)(tb_handle_t stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
 
 /*! the stream seek func type
  *
@@ -133,7 +133,7 @@ typedef tb_bool_t               (*tb_async_stream_writ_func_t)(struct __tb_async
  *
  * @return                      tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t               (*tb_async_stream_seek_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv);
+typedef tb_bool_t               (*tb_async_stream_seek_func_t)(tb_handle_t stream, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv);
 
 /*! the stream sync func type
  *
@@ -144,7 +144,7 @@ typedef tb_bool_t               (*tb_async_stream_seek_func_t)(struct __tb_async
  *
  * @return                      tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t               (*tb_async_stream_sync_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv);
+typedef tb_bool_t               (*tb_async_stream_sync_func_t)(tb_handle_t stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv);
 
 /*! the stream task func type
  *
@@ -154,7 +154,7 @@ typedef tb_bool_t               (*tb_async_stream_sync_func_t)(struct __tb_async
  *
  * @return                      tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t               (*tb_async_stream_task_func_t)(struct __tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv);
+typedef tb_bool_t               (*tb_async_stream_task_func_t)(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv);
 
 /// the stream open and read type
 typedef struct __tb_async_stream_open_read_t

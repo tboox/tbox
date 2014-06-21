@@ -305,7 +305,7 @@ tb_handle_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn)
     do
     {
         // make pool
-        pool = (tb_handle_t)tb_malloc0(sizeof(tb_transfer_pool_t));
+        pool = (tb_transfer_pool_t*)tb_malloc0(sizeof(tb_transfer_pool_t));
         tb_assert_and_check_break(pool);
 
         // init lock

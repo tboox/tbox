@@ -120,7 +120,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
                 do
                 {
                     // make context
-                    context = tb_malloc0(sizeof(tb_demo_context_t));
+                    context = (tb_demo_context_t*)tb_malloc0(sizeof(tb_demo_context_t));
                     tb_assert_and_check_break(context);
 
                     // init sock
@@ -132,7 +132,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
                     tb_assert_and_check_break(context->file);
 
                     // init data
-                    context->data = tb_malloc(TB_DEMO_FILE_READ_MAXN);
+                    context->data = (tb_byte_t*)tb_malloc(TB_DEMO_FILE_READ_MAXN);
                     tb_assert_and_check_break(context->data);
 
                     // addo sock
@@ -146,7 +146,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
                     context->left = tb_file_size(context->file);
 
                     // done read
-                    tb_long_t real = tb_file_read(context->file, context->data, tb_min(context->left, TB_DEMO_FILE_READ_MAXN));
+                    tb_long_t real = tb_file_read(context->file, context->data, tb_min((tb_size_t)context->left, TB_DEMO_FILE_READ_MAXN));
                     tb_assert_and_check_break(real > 0);
 
                     // save size
@@ -226,7 +226,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
                     // done read
                     tb_size_t tryn = 1;
                     tb_long_t real = 0;
-                    while (!(real = tb_file_read(context->file, context->data, tb_min(context->left, TB_DEMO_FILE_READ_MAXN))) && tryn--);
+                    while (!(real = tb_file_read(context->file, context->data, tb_min((tb_size_t)context->left, TB_DEMO_FILE_READ_MAXN))) && tryn--);
                     if (real > 0)
                     {
                         // save left

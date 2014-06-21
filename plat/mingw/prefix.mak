@@ -2,16 +2,16 @@
 
 # prefix & suffix
 BIN_PREFIX 			= 
-BIN_SUFFIX 			= .b
+BIN_SUFFIX 			= .exe
 
 OBJ_PREFIX 			= 
-OBJ_SUFFIX 			= .o
+OBJ_SUFFIX 			= .obj
 
-LIB_PREFIX 			= lib
-LIB_SUFFIX 			= .a
+LIB_PREFIX 			= 
+LIB_SUFFIX 			= .lib
 
-DLL_PREFIX 			= lib
-DLL_SUFFIX 			= .so
+DLL_PREFIX 			= 
+DLL_SUFFIX 			= .dll
 
 ASM_SUFFIX 			= .S
 
@@ -39,7 +39,7 @@ RMDIR 				= rm -rf
 CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
-MAKE 				= make
+MAKE 				= make -r
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
@@ -89,6 +89,7 @@ LDFLAGS_DEBUG 		=
 LDFLAGS 			= -m$(BITS) -static
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
+LDFLAGS-f 			=
 LDFLAGS-o 			= -o
 
 # asflags
@@ -99,7 +100,10 @@ ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
 # arflags
+ARFLAGS_RELEASE 	= 
+ARFLAGS_DEBUG 		= 
 ARFLAGS 			= -cr
+ARFLAGS-o 			= 
 
 # shflags
 SHFLAGS_RELEASE 	= -s

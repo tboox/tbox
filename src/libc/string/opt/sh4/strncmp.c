@@ -29,14 +29,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#if 0//def TB_CONFIG_ASSEMBLER_GAS
+#if 0//def TB_ASSEMBLER_IS_GAS
 #   define TB_LIBC_STRING_OPT_STRNCMP
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if 0//def TB_CONFIG_ASSEMBLER_GAS
+#if 0//def TB_ASSEMBLER_IS_GAS
 static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
     tb_assert_and_check_return_val(s1 && s2, 0);

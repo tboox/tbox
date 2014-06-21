@@ -45,7 +45,7 @@ static tb_bool_t tb_demo_basic_stream_save_func(tb_size_t state, tb_hize_t offse
     {
         // percent
         tb_size_t percent = 0;
-        if (size > 0) percent = (offset * 100) / size;
+        if (size > 0) percent = (tb_size_t)((offset * 100) / size);
         else if (state == TB_STATE_CLOSED) percent = 100;
 
         // trace

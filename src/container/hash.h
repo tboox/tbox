@@ -56,7 +56,7 @@ typedef struct __tb_hash_item_t
 }tb_hash_item_t;
 
 /// the hash type
-typedef tb_void_t       tb_hash_t;
+typedef tb_iterator_t       tb_hash_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

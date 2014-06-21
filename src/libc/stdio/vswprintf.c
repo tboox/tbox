@@ -39,52 +39,52 @@
 // printf format type
 typedef enum __tb_printf_type_t
 {
-    TB_PRINTF_TYPE_NONE
-,   TB_PRINTF_TYPE_INT
-,   TB_PRINTF_TYPE_CHAR
-,   TB_PRINTF_TYPE_CHAR_PERCENT
-,   TB_PRINTF_TYPE_FLOAT
-,   TB_PRINTF_TYPE_DOUBLE
-,   TB_PRINTF_TYPE_STRING
-,   TB_PRINTF_TYPE_WIDTH
-,   TB_PRINTF_TYPE_PRECISION
-,   TB_PRINTF_TYPE_INVALID
+    TB_PRINTF_TYPE_NONE             = 0
+,   TB_PRINTF_TYPE_INT              = 1
+,   TB_PRINTF_TYPE_CHAR             = 2
+,   TB_PRINTF_TYPE_CHAR_PERCENT     = 3
+,   TB_PRINTF_TYPE_FLOAT            = 4
+,   TB_PRINTF_TYPE_DOUBLE           = 5
+,   TB_PRINTF_TYPE_STRING           = 6
+,   TB_PRINTF_TYPE_WIDTH            = 7
+,   TB_PRINTF_TYPE_PRECISION        = 8
+,   TB_PRINTF_TYPE_INVALID          = 9
 
 }tb_printf_type_t;
 
 // printf format extra info
 typedef enum __tb_printf_extra_t
 {
-    TB_PRINTF_EXTRA_NONE    = 0
-,   TB_PRINTF_EXTRA_SIGNED  = 1     // signed integer for %d %i
-,   TB_PRINTF_EXTRA_UPPER   = 2     // upper case for %X %B
-,   TB_PRINTF_EXTRA_PERCENT = 4     // percent char: %
-,   TB_PRINTF_EXTRA_EXP     = 8     // exponent form: [-]d.ddd e[+/-]ddd
+    TB_PRINTF_EXTRA_NONE            = 0
+,   TB_PRINTF_EXTRA_SIGNED          = 1     // signed integer for %d %i
+,   TB_PRINTF_EXTRA_UPPER           = 2     // upper case for %X %B
+,   TB_PRINTF_EXTRA_PERCENT         = 4     // percent char: %
+,   TB_PRINTF_EXTRA_EXP             = 8     // exponent form: [-]d.ddd e[+/-]ddd
 
 }tb_printf_extra_t;
 
 // printf length qualifier
 typedef enum __tb_printf_qual_t
 {
-    TB_PRINTF_QUAL_NONE
-,   TB_PRINTF_QUAL_H
-,   TB_PRINTF_QUAL_L
-,   TB_PRINTF_QUAL_LL
-,   TB_PRINTF_QUAL_I8
-,   TB_PRINTF_QUAL_I16
-,   TB_PRINTF_QUAL_I32
-,   TB_PRINTF_QUAL_I64
+    TB_PRINTF_QUAL_NONE             = 0
+,   TB_PRINTF_QUAL_H                = 1
+,   TB_PRINTF_QUAL_L                = 2
+,   TB_PRINTF_QUAL_LL               = 3
+,   TB_PRINTF_QUAL_I8               = 4
+,   TB_PRINTF_QUAL_I16              = 5
+,   TB_PRINTF_QUAL_I32              = 6
+,   TB_PRINTF_QUAL_I64              = 7
 
 }tb_printf_qual_t;
 
 // printf flag type
 typedef enum __tb_printf_flag_t
 {
-    TB_PRINTF_FLAG_NONE     = 0
-,   TB_PRINTF_FLAG_PLUS     = 1     // +: denote the sign '+' or '-' of a number
-,   TB_PRINTF_FLAG_LEFT     = 2     // -: left-justified
-,   TB_PRINTF_FLAG_ZERO     = 4     // 0: fill 0 instead of spaces
-,   TB_PRINTF_FLAG_PFIX     = 8     // #: add prefix 
+    TB_PRINTF_FLAG_NONE             = 0
+,   TB_PRINTF_FLAG_PLUS             = 1     // +: denote the sign '+' or '-' of a number
+,   TB_PRINTF_FLAG_LEFT             = 2     // -: left-justified
+,   TB_PRINTF_FLAG_ZERO             = 4     // 0: fill 0 instead of spaces
+,   TB_PRINTF_FLAG_PFIX             = 8     // #: add prefix 
 
 }tb_printf_flag_t;
 
@@ -92,13 +92,16 @@ typedef enum __tb_printf_flag_t
 typedef struct __tb_printf_entry_t
 {
     // format type
-    tb_printf_type_t    type;
+    tb_uint8_t          type;
 
     // extra info 
-    tb_printf_extra_t   extra;
+    tb_uint8_t          extra;
 
     // flag
-    tb_printf_flag_t    flags;
+    tb_uint8_t          flags;
+
+    // qualifier
+    tb_uint8_t          qual;
 
     // field width
     tb_int_t            width;
@@ -106,24 +109,18 @@ typedef struct __tb_printf_entry_t
     // precision
     tb_int_t            precision;
 
-    // qualifier
-    tb_printf_qual_t    qual;
-
     // base: 2 8 10 16 
     tb_int_t            base;
-
 
 }tb_printf_entry_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
-
 static tb_int_t tb_skip_atoi(tb_wchar_t const** s)
 {
     tb_int_t i = 0;
-    while (tb_isdigit(**s)) 
-        i = i * 10 + *((*s)++) - L'0';
+    while (tb_isdigit(**s)) i = i * 10 + *((*s)++) - L'0';
     return i;
 }
 static tb_wchar_t* tb_printf_string(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_entry_t e, tb_wchar_t const* s)
@@ -140,7 +137,7 @@ static tb_wchar_t* tb_printf_string(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
         }
 
         // copy string
-        tb_size_t i = 0;
+        tb_int_t i = 0;
         for (i = 0; i < n; ++i)
             if (pb < pe) *pb++ = *s++;
 
@@ -493,7 +490,7 @@ static tb_wchar_t* tb_printf_float(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_ent
     tb_size_t   n = e.precision;
     while (n--) p *= 10;
     if (((tb_uint32_t)(num * p * 10) % 10) > 4) 
-        num += 1. / (tb_float_t)p;
+        num += 1.0f / (tb_float_t)p;
 
     // get integer & decimal
     tb_int32_t integer = (tb_int32_t)num;
@@ -519,7 +516,7 @@ static tb_wchar_t* tb_printf_float(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_ent
         tb_long_t d = (tb_long_t)(decimal * 10);
         do 
         {
-            decs[decs_i++] = d + L'0';
+            decs[decs_i++] = (tb_wchar_t)(d + (tb_long_t)L'0');
             decimal = decimal * 10 - d;
             d = (tb_long_t)(decimal * 10);
         }
@@ -649,7 +646,7 @@ static tb_wchar_t* tb_printf_double(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
         tb_long_t d = (tb_long_t)(decimal * 10);
         do 
         {
-            decs[decs_i++] = d + L'0';
+            decs[decs_i++] = (tb_wchar_t)(d + (tb_long_t)L'0');
             decimal = decimal * 10 - d;
             d = (tb_long_t)(decimal * 10);
         }
@@ -1133,7 +1130,7 @@ tb_long_t tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* fmt, tb_va_
                 }
                 else 
                 {
-                    tb_float_t num = tb_va_arg(args, tb_double_t);
+                    tb_float_t num = (tb_float_t)tb_va_arg(args, tb_double_t);
                     pb = tb_printf_float(pb, pe, e, num);
                 }
                 break;

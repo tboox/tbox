@@ -36,15 +36,19 @@
  * macros
  */
 #ifdef TB_COMPILER_IS_GCC
-#   define tb_va_start(v, l)    __builtin_va_start(v, l)
-#   define tb_va_end(v)         __builtin_va_end(v)
-#   define tb_va_arg(v, l)      __builtin_va_arg(v, l)
-#   define tb_va_copy(v, c)     __builtin_va_copy(v, c)
+#   define tb_va_start(v, l)        __builtin_va_start(v, l)
+#   define tb_va_end(v)             __builtin_va_end(v)
+#   define tb_va_arg(v, l)          __builtin_va_arg(v, l)
+#   define tb_va_copy(v, c)         __builtin_va_copy(v, c)
 #else
-#   define tb_va_start(v, l)    va_start(v, l)
-#   define tb_va_end(v)         va_end(v)
-#   define tb_va_arg(v, l)      va_arg(v, l)
-#   define tb_va_copy(v, c)     va_copy(v, c)
+#   define tb_va_start(v, l)        va_start(v, l)
+#   define tb_va_end(v)             va_end(v)
+#   define tb_va_arg(v, l)          va_arg(v, l)
+#   ifndef va_copy
+#       define tb_va_copy(v, c)     ((v) = (c))
+#   else
+#       define tb_va_copy(v, c)     va_copy(v, c)
+#   endif
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

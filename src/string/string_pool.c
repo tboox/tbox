@@ -188,7 +188,7 @@ tb_char_t const* tb_string_pool_put(tb_handle_t handle, tb_char_t const* data)
         // exists?
         tb_size_t               itor;
         tb_hash_item_t const*   item = tb_null;
-        if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = tb_iterator_item(pool->cache, itor)))
+        if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = (tb_hash_item_t const*)tb_iterator_item(pool->cache, itor)))
         {
             // refn
             tb_size_t refn = (tb_size_t)item->data;
@@ -212,11 +212,11 @@ tb_char_t const* tb_string_pool_put(tb_handle_t handle, tb_char_t const* data)
         {
             // add it
             if ((itor = tb_hash_set(pool->cache, data, (tb_pointer_t)1)) != tb_iterator_tail(pool->cache))
-                item = tb_iterator_item(pool->cache, itor);
+                item = (tb_hash_item_t const*)tb_iterator_item(pool->cache, itor);
         }
 
         // save the cstr
-        if (item) cstr = item->name;
+        if (item) cstr = (tb_char_t const*)item->name;
     }
 
     // leave
@@ -240,7 +240,7 @@ tb_void_t tb_string_pool_del(tb_handle_t handle, tb_char_t const* data)
     {
         // exists?
         tb_size_t itor;
-        if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = tb_iterator_item(pool->cache, itor)))
+        if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = (tb_hash_item_t const*)tb_iterator_item(pool->cache, itor)))
         {
             // refn
             tb_size_t refn = (tb_size_t)item->data;
