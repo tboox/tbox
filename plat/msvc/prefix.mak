@@ -38,9 +38,10 @@ endif
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -MD -SSE2 -GL -Gy -Zi
-CXFLAGS_DEBUG 		= -Od -GS -MDd -ZI -RTC1 -Fd"$(PDB)" -D__tb_debug__
+CXFLAGS_DEBUG 		= -Od -GS -MDd -ZI -RTC1 -D__tb_debug__
 CXFLAGS 			= \
-					-D_MBCS -D_CRT_SECURE_NO_WARNINGS -DNOCRYPT -Gf -Gd -Gm -W3 -WX -nologo -c -TP \
+					-Fd"$(PDB)" \
+					-D_MBCS -D_CRT_SECURE_NO_WARNINGS -DNOCRYPT -DNOGDI -Gf -Gd -Gm -W3 -WX -nologo -c -TP \
 					-I'/usr/local/inc'
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -Fo
@@ -63,9 +64,10 @@ CCFLAGS_DEBUG 		=
 CCFLAGS 			= 
 
 # ldflags
-LDFLAGS_RELEASE 	= 
-LDFLAGS_DEBUG 		= -debug -pdb:"$(PDB)"
+LDFLAGS_RELEASE 	=
+LDFLAGS_DEBUG 		= -debug
 LDFLAGS 			= \
+ 					-pdb:"$(PDB)" \
 					-manifestuac:"level='asInvoker' uiAccess='false'" \
 					-nologo -machine:x86 -dynamicbase -nxcompat -libpath:'$(HOME)tool\msys\local\lib'
 LDFLAGS-L 			= -libpath:
@@ -82,14 +84,14 @@ ASFLAGS-o 			=
 
 # arflags
 ARFLAGS_RELEASE 	= 
-ARFLAGS_DEBUG 		= -debug -pdb:"$(PDB)"
-ARFLAGS 			= -lib -nologo -machine:x86 -libpath:'$(HOME)tool\msys\local\lib'
+ARFLAGS_DEBUG 		= -debug 
+ARFLAGS 			= -lib -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)tool\msys\local\lib'
 ARFLAGS-o 			= -out:
 
 # shflags
 SHFLAGS_RELEASE 	= 
-SHFLAGS_DEBUG 		= -debug -pdb:"$(PDB)"
-SHFLAGS 			= -dll -nologo -machine:x86 -libpath:'$(HOME)tool\msys\local\lib'
+SHFLAGS_DEBUG 		= -debug 
+SHFLAGS 			= -dll -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)tool\msys\local\lib'
 
 # include sub-config
 include 		$(PLAT_DIR)/config.mak

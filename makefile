@@ -237,11 +237,20 @@ else
 DISTCC 		:= 
 endif
 
+# sed
+ifeq ($(HOST),mac)
+SED 		:= sed -i ''
+#SED 		:= perl -pi -e
+else
+SED 		:= sed -i
+endif
+
+# config
 config : .null
 	-@cp ./plat/$(PLAT)/config.h ./src/config.h
-	-@perl -pi -e "s/\[build\]/`date +%Y%m%d%H%Mull`/g" ./src/config.h
-	-@perl -pi -e "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/config.h
-	-@perl -pi -e "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/config.h
+	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%Mull`/g" ./src/config.h
+	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/config.h
+	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/config.h
 	@echo "config: ==================================================================="
 	@echo "config: name:     " 							$(PRO_NAME)
 	@echo "config: plat:     " 							$(PLAT)
