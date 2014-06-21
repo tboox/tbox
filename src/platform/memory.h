@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -92,6 +97,11 @@ tb_pointer_t            tb_native_memory_ralloc(tb_pointer_t data, tb_size_t siz
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_native_memory_free(tb_pointer_t data);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

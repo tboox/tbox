@@ -31,6 +31,11 @@
 #include "async_stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -304,5 +309,10 @@ tb_bool_t               tb_async_transfer_resume(tb_handle_t transfer);
  * @param rate          the trasfer rate and no limit if 0, bytes/s
  */
 tb_void_t               tb_async_transfer_limitrate(tb_handle_t transfer, tb_size_t rate);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

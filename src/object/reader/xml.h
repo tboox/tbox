@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -70,6 +75,11 @@ tb_bool_t                       tb_object_xml_reader_hook(tb_char_t const* type,
  * @return                      the object reader func
  */
 tb_object_xml_reader_func_t     tb_object_xml_reader_func(tb_char_t const* type);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define tb_block_pool_malloc(handle, size)                  tb_block_pool_malloc_(handle, size __tb_debug_vals__)
@@ -157,5 +162,10 @@ tb_bool_t           tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __
  */
 tb_void_t           tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

@@ -31,6 +31,11 @@
 #include "node.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -160,5 +165,10 @@ tb_void_t               tb_xml_writer_attributes_float(tb_handle_t writer, tb_ch
  */
 tb_void_t               tb_xml_writer_attributes_double(tb_handle_t writer, tb_char_t const* name, tb_double_t value);
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

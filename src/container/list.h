@@ -32,6 +32,11 @@
 #include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -369,6 +374,10 @@ tb_size_t           tb_list_maxn(tb_list_t const* list);
  */
 tb_void_t           tb_list_walk(tb_list_t* list, tb_bool_t (*func)(tb_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 #define TB_DICTIONARY_SIZE_MICRO                (64)
@@ -123,6 +128,11 @@ tb_void_t               tb_dictionary_del(tb_object_t* dictionary, tb_char_t con
  * @param val           the value
  */
 tb_void_t               tb_dictionary_set(tb_object_t* dictionary, tb_char_t const* key, tb_object_t* val);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

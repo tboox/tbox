@@ -33,6 +33,11 @@
 #include "../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -181,5 +186,10 @@ tb_bool_t           tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t co
  * @return          > 0: the aioe list size, 0: timeout, -1: failed
  */
 tb_long_t           tb_aiop_wait(tb_aiop_t* aiop, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

@@ -62,3 +62,4 @@ tb_size_t tb_bfind_all(tb_iterator_t* iterator, tb_cpointer_t priv, tb_iterator_
 {
     return tb_binary_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), priv, comp);
 }
+

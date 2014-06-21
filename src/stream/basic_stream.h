@@ -34,6 +34,11 @@
 #include "../memory/memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -886,5 +891,10 @@ tb_bool_t               tb_basic_stream_bwrit_double_lle(tb_basic_stream_t* stre
 tb_bool_t               tb_basic_stream_bwrit_double_lbe(tb_basic_stream_t* stream, tb_double_t val);
 
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

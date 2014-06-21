@@ -31,6 +31,11 @@
 #include "item.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -192,6 +197,11 @@ tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_t* bloom_filter, tb_
  * @return              return tb_true if the data exists, otherwise return tb_false
  */
 tb_bool_t               tb_bloom_filter_get(tb_bloom_filter_t* bloom_filter, tb_cpointer_t data);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

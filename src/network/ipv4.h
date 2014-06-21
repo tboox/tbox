@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -79,5 +84,10 @@ tb_uint32_t         tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip);
  * @return          the ipv4 address
  */
 tb_char_t const*    tb_ipv4_get(tb_ipv4_t const* ipv4, tb_char_t* data, tb_size_t maxn);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

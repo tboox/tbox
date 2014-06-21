@@ -106,7 +106,7 @@ typedef struct __tb_block_pool_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_pointer_t tb_static_block_pool_ralloc_fast(tb_pointer_t bpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
+__tb_extern_c__ tb_pointer_t tb_static_block_pool_ralloc_fast(tb_pointer_t bpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

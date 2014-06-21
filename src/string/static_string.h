@@ -31,6 +31,11 @@
 #include "../memory/memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -364,6 +369,11 @@ tb_long_t               tb_static_string_cstrncmp(tb_static_string_t* string, tb
  * @return              equal: 0
  */
 tb_long_t               tb_static_string_cstrnicmp(tb_static_string_t* string, tb_char_t const* s, tb_size_t n);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 

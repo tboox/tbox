@@ -24,12 +24,16 @@
 #ifndef TB_PLATFORM_SOCKET_H
 #define TB_PLATFORM_SOCKET_H
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
 #include "../network/ipv4.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -257,5 +261,10 @@ tb_long_t           tb_socket_urecvv(tb_handle_t socket, tb_ipv4_t const* addr, 
  * @return          the real size or -1
  */
 tb_long_t           tb_socket_usendv(tb_handle_t socket, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

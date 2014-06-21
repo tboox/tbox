@@ -30,6 +30,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -147,5 +152,10 @@ tb_long_t           tb_swprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* fo
  * @return          the real size
  */
 tb_long_t           tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* format, tb_va_list_t args);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
