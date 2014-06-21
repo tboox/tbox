@@ -122,7 +122,7 @@ tb_byte_t* tb_scoped_buffer_resize(tb_scoped_buffer_t* buffer, tb_size_t size)
             tb_assert_and_check_break(size < buffer->maxn);
 
             // alloc data
-            buffer->data = tb_malloc(buffer->maxn);
+            buffer->data = (tb_byte_t*)tb_malloc(buffer->maxn);
             tb_assert_and_check_break(buffer->data);
         }
         // decrease
@@ -139,7 +139,7 @@ tb_byte_t* tb_scoped_buffer_resize(tb_scoped_buffer_t* buffer, tb_size_t size)
 
             // realloc
             buffer->size = size;
-            buffer->data = tb_ralloc(buffer->data, buffer->maxn);
+            buffer->data = (tb_byte_t*)tb_ralloc(buffer->data, buffer->maxn);
             tb_assert_and_check_break(buffer->data);
         }
 

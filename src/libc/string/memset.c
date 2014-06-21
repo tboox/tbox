@@ -95,7 +95,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
     tb_assert(!(((tb_size_t)s) & 0x1));
 
     // init
-    __tb_register__ tb_uint16_t* p = s;
+    __tb_register__ tb_uint16_t* p = (tb_uint16_t*)s;
 
     // done
 #ifdef __tb_small__
@@ -129,7 +129,7 @@ static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
     tb_check_return_val(n, s);
 
     // init
-    __tb_register__ tb_byte_t* p = s;
+    __tb_register__ tb_byte_t* p = (tb_byte_t*)s;
     __tb_register__ tb_byte_t* e = p + (n * 3);
 
     // done
@@ -171,7 +171,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
     tb_assert(!(((tb_size_t)s) & 0x3));
 
     // init 
-    __tb_register__ tb_uint32_t* p = s;
+    __tb_register__ tb_uint32_t* p = (tb_uint32_t*)s;
 
     // done
 #ifdef __tb_small__
@@ -208,7 +208,7 @@ static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t 
     tb_assert(!(((tb_size_t)s) & 0x7));
 
     // init
-    __tb_register__ tb_uint64_t* p = s;
+    __tb_register__ tb_uint64_t* p = (tb_uint64_t*)s;
 
     // done
 #ifdef __tb_small__

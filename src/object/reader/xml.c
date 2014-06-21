@@ -202,7 +202,7 @@ static tb_object_t* tb_object_xml_reader_func_data(tb_object_xml_reader_t* reade
                 if (in)
                 {
                     tb_size_t           on = in;
-                    tb_byte_t*          ob = tb_malloc0(on);
+                    tb_byte_t*          ob = (tb_byte_t*)tb_malloc0(on);
                     tb_assert_and_check_goto(ob && on, end);
                     on = tb_base64_decode(ib, in, ob, on);
                     tb_trace_d("base64: %u => %u", in, on);
@@ -644,6 +644,6 @@ tb_object_xml_reader_func_t tb_object_xml_reader_func(tb_char_t const* type)
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
-    return tb_hash_get(reader->hooker, type);
+    return (tb_object_xml_reader_func_t)tb_hash_get(reader->hooker, type);
 }
 

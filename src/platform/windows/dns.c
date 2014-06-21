@@ -45,7 +45,7 @@ tb_bool_t tb_dns_init()
         tb_assert_and_check_break(pGetNetworkParams);
 
         // init info
-        info = tb_malloc0(sizeof(FIXED_INFO));
+        info = (FIXED_INFO*)tb_malloc0(sizeof(FIXED_INFO));
         tb_assert_and_check_break(info);
 
         // get the info size

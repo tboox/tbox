@@ -123,7 +123,7 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_aioo
     tb_spinlock_enter(&rtor->lock.pfds);
 
     // update fd max
-    if (fd > rtor->sfdm) rtor->sfdm = fd;
+    if (fd > (tb_long_t)rtor->sfdm) rtor->sfdm = (tb_size_t)fd;
     
     // init fds
     if (code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_ACPT)) FD_SET(fd, &rtor->rfdi);
@@ -273,9 +273,9 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
         // sync
         tb_size_t itor = tb_iterator_head(rtor->hash);
         tb_size_t tail = tb_iterator_tail(rtor->hash);
-        for (; itor != tail && wait >= 0 && wait < maxn; itor = tb_iterator_next(rtor->hash, itor))
+        for (; itor != tail && wait >= 0 && (tb_size_t)wait < maxn; itor = tb_iterator_next(rtor->hash, itor))
         {
-            tb_hash_item_t* item = tb_iterator_item(rtor->hash, itor);
+            tb_hash_item_t* item = (tb_hash_item_t*)tb_iterator_item(rtor->hash, itor);
             if (item)
             {
                 // the handle

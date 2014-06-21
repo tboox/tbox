@@ -453,7 +453,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb
     tb_size_t secure = tuple[2].ul;
 
     // the data and maxn
-    tb_scoped_string_t* value = tuple[3].ptr;
+    tb_scoped_string_t* value = (tb_scoped_string_t*)tuple[3].ptr;
     tb_assert_and_check_return_val(value, tb_false);
 
     // expired?

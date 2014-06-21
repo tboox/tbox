@@ -436,7 +436,7 @@ tb_handle_t tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
     // init data
     pool->data = (tb_byte_t*)tb_align((tb_size_t)(pool->last + pool->maxn), pool->align);
     tb_assert_and_check_return_val(data + size > pool->data, tb_null);
-    tb_assert_and_check_return_val(pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN <= (data + size - pool->data), tb_null);
+    tb_assert_and_check_return_val(pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN <= (tb_size_t)(data + size - pool->data), tb_null);
 
     // init pred => the first chunk index at used
     tb_size_t n = TB_STATIC_TINY_POOL_BLOCK_MAXN; while (n--) pool->pred[n] = n + 1;
@@ -573,7 +573,7 @@ tb_pointer_t tb_tiny_pool_malloc(tb_handle_t handle, tb_size_t size)
 tb_pointer_t tb_tiny_pool_malloc0(tb_handle_t handle, tb_size_t size)
 {
     // malloc
-    tb_byte_t* p = tb_tiny_pool_malloc(handle, size);
+    tb_pointer_t p = tb_tiny_pool_malloc(handle, size);
 
     // clear
     if (p && size) tb_memset(p, 0, size);

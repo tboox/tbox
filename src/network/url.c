@@ -484,7 +484,7 @@ tb_void_t tb_url_port_set(tb_url_t* url, tb_size_t port)
     tb_assert_and_check_return(url);
 
     // set port
-    url->port = port;
+    url->port = (tb_uint16_t)port;
 
     // clear url
     tb_scoped_string_clear(&url->urls);

@@ -60,7 +60,7 @@ static tb_bool_t tb_object_bin_writer_func_data(tb_object_bin_writer_t* writer, 
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
 
     // the data & size
-    tb_byte_t const*    data = tb_data_getp(object);
+    tb_byte_t const*    data = (tb_byte_t const*)tb_data_getp(object);
     tb_size_t           size = tb_data_size(object);
 
     // writ type & size
@@ -76,12 +76,12 @@ static tb_bool_t tb_object_bin_writer_func_data(tb_object_bin_writer_t* writer, 
     if (!writer->data)
     {
         writer->maxn = tb_max(size, 8192);
-        writer->data = tb_malloc0(writer->maxn);
+        writer->data = (tb_byte_t*)tb_malloc0(writer->maxn);
     }
     else if (writer->maxn < size)
     {
         writer->maxn = size;
-        writer->data = tb_ralloc(writer->data, writer->maxn);
+        writer->data = (tb_byte_t*)tb_ralloc(writer->data, writer->maxn);
     }
     tb_assert_and_check_return_val(writer->data && size <= writer->maxn, tb_false);
 
@@ -159,12 +159,12 @@ static tb_bool_t tb_object_bin_writer_func_string(tb_object_bin_writer_t* writer
     if (!writer->data)
     {
         writer->maxn = tb_max(size, 8192);
-        writer->data = tb_malloc0(writer->maxn);
+        writer->data = (tb_byte_t*)tb_malloc0(writer->maxn);
     }
     else if (writer->maxn < size)
     {
         writer->maxn = size;
-        writer->data = tb_ralloc(writer->data, writer->maxn);
+        writer->data = (tb_byte_t*)tb_ralloc(writer->data, writer->maxn);
     }
     tb_assert_and_check_return_val(writer->data && size <= writer->maxn, tb_false);
 
@@ -422,6 +422,6 @@ tb_object_bin_writer_func_t tb_object_bin_writer_func(tb_size_t type)
     tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
     // the func
-    return tb_hash_get(writer->hooker, (tb_pointer_t)type);
+    return (tb_object_bin_writer_func_t)tb_hash_get(writer->hooker, (tb_pointer_t)type);
 }
 

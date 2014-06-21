@@ -46,21 +46,6 @@
 #   define TB_OBJECT_BPLIST_READER_ARRAY_GROW           (256)
 #endif
 
-// get bits
-#define tb_object_bplist_bits_get(p, n) \
-({ \
-    tb_size_t __val = 0; \
-    switch ((n)) \
-    { \
-    case 1: __val = tb_bits_get_u8((p)); break; \
-    case 2: __val = tb_bits_get_u16_be((p)); break; \
-    case 4: __val = tb_bits_get_u32_be((p)); break; \
-    case 8: __val = tb_bits_get_u64_be((p)); break; \
-    default: break; \
-    } \
-    __val; \
-})
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -97,6 +82,19 @@ static __tb_inline__ tb_time_t tb_object_bplist_reader_time_apple2host(tb_time_t
         time = tb_mktime(&tm);
     }
     return time;
+}
+static __tb_inline__ tb_size_t tb_object_bplist_bits_get(tb_byte_t const* p, tb_size_t n)
+{
+    tb_size_t v = 0;
+    switch (n) 
+    {
+    case 1: v = tb_bits_get_u8((p)); break; 
+    case 2: v = tb_bits_get_u16_be((p)); break; 
+    case 4: v = tb_bits_get_u32_be((p)); break; 
+    case 8: v = tb_bits_get_u64_be((p)); break; 
+    default: break; 
+    }
+    return v; 
 }
 static tb_object_t* tb_object_bplist_reader_func_object(tb_object_bplist_reader_t* reader, tb_size_t item_size)
 {
@@ -156,7 +154,7 @@ static tb_object_t* tb_object_bplist_reader_func_data(tb_object_bplist_reader_t*
     if (size)
     {
         // make data
-        data = tb_malloc(size);
+        data = (tb_byte_t*)tb_malloc(size);
         tb_assert_and_check_return_val(data, tb_null);
 
         // read data
@@ -195,7 +193,7 @@ static tb_object_t* tb_object_bplist_reader_func_array(tb_object_bplist_reader_t
     // init items data
     if (size)
     {
-        tb_byte_t* data = tb_malloc(sizeof(tb_uint32_t) + (size * item_size));
+        tb_byte_t* data = (tb_byte_t*)tb_malloc(sizeof(tb_uint32_t) + (size * item_size));
         if (data)
         {
             if (tb_basic_stream_bread(reader->stream, data + sizeof(tb_uint32_t), size * item_size))
@@ -240,7 +238,7 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
             if (size)
             {
                 // init utf8
-                utf8 = tb_malloc(size + 1);
+                utf8 = (tb_char_t*)tb_malloc(size + 1);
                 tb_assert_and_check_break(utf8);
 
                 // read utf8
@@ -268,8 +266,8 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
             if (size)
             {
                 // init utf8 & utf16 data
-                utf8 = tb_malloc((size + 1) << 2);
-                utf16 = tb_malloc(size << 1);
+                utf8 = (tb_char_t*)tb_malloc((size + 1) << 2);
+                utf16 = (tb_char_t*)tb_malloc(size << 1);
                 tb_assert_and_check_break(utf8 && utf16);
 
                 // read utf16
@@ -277,7 +275,7 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
                 
                 // utf16 to utf8
                 tb_long_t osize = tb_charset_conv_data(TB_CHARSET_TYPE_UTF16, TB_CHARSET_TYPE_UTF8, (tb_byte_t*)utf16, size << 1, (tb_byte_t*)utf8, (size + 1) << 2);
-                tb_assert_and_check_break(osize > 0 && osize < ((size + 1) << 2));
+                tb_assert_and_check_break(osize > 0 && osize < (tb_long_t)((size + 1) << 2));
                 utf8[osize] = '\0';
 
                 // init object
@@ -447,7 +445,7 @@ static tb_object_t* tb_object_bplist_reader_func_dictionary(tb_object_bplist_rea
     if (size)
     {
         item_size <<= 1;
-        tb_byte_t* data = tb_malloc(sizeof(tb_uint32_t) + (size * item_size));
+        tb_byte_t* data = (tb_byte_t*)tb_malloc(sizeof(tb_uint32_t) + (size * item_size));
         if (data)
         {
             if (tb_basic_stream_bread(reader->stream, data + sizeof(tb_uint32_t), size * item_size))
@@ -499,22 +497,22 @@ static tb_object_t* tb_object_bplist_reader_done(tb_basic_stream_t* stream)
     tb_trace_d("item_size: %lu", item_size);
     
     // read object count
-    tb_uint64_t object_count = tb_basic_stream_bread_u64_be(stream);
-    tb_trace_d("object_count: %llu", object_count);
+    tb_size_t object_count = (tb_size_t)tb_basic_stream_bread_u64_be(stream);
+    tb_trace_d("object_count: %lu", object_count);
     
     // read root object
-    tb_uint64_t root_object = tb_basic_stream_bread_u64_be(stream);
-    tb_trace_d("root_object: %llu", root_object);
+    tb_size_t root_object = (tb_size_t)tb_basic_stream_bread_u64_be(stream);
+    tb_trace_d("root_object: %lu", root_object);
 
     // read offset table index
-    tb_uint64_t offset_table_index = tb_basic_stream_bread_u64_be(stream);
-    tb_trace_d("offset_table_index: %llu", offset_table_index);
+    tb_size_t offset_table_index = (tb_size_t)tb_basic_stream_bread_u64_be(stream);
+    tb_trace_d("offset_table_index: %lu", offset_table_index);
 
     // check
     tb_assert_and_check_return_val(item_size && offset_size && object_count, tb_null);
 
     // init object hash
-    tb_object_t** object_hash = tb_malloc0(sizeof(tb_object_t*) * object_count);
+    tb_object_t** object_hash = (tb_object_t**)tb_malloc0(sizeof(tb_object_t*) * object_count);
     tb_assert_and_check_return_val(object_hash, tb_null);
 
     // walk
@@ -746,6 +744,6 @@ tb_object_bplist_reader_func_t tb_object_bplist_reader_func(tb_size_t type)
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
-    return tb_hash_get(reader->hooker, (tb_pointer_t)type);
+    return (tb_object_bplist_reader_func_t)tb_hash_get(reader->hooker, (tb_pointer_t)type);
 }
 

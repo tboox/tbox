@@ -95,7 +95,7 @@ static __tb_inline__ tb_size_t tb_dns_cache_now()
 {
     return (tb_size_t)(tb_cache_time_spak() / 1000);
 }
-static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_dns_cache_cler(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(cache && bdel, tb_false);
@@ -103,7 +103,7 @@ static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_b
     if (item)
     {
         // the dns cache address
-        tb_dns_cache_addr_t const* caddr = item->data;
+        tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)item->data;
         tb_assert_and_check_return_val(caddr, tb_false);
 
         // is expired?
@@ -219,7 +219,7 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
         tb_assert_and_check_break(g_cache.hash);
 
         // get the host address
-        tb_dns_cache_addr_t* caddr = tb_hash_get(g_cache.hash, name);
+        tb_dns_cache_addr_t* caddr = (tb_dns_cache_addr_t*)tb_hash_get(g_cache.hash, name);
         tb_check_break(caddr);
 
         // trace

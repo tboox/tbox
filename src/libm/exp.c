@@ -36,7 +36,7 @@ tb_double_t tb_exp(tb_double_t x)
 #if 0
     return exp(x);
 #else
-    tb_float_t a = x - (tb_long_t)x;
+    tb_double_t a = x - (tb_double_t)(tb_long_t)x;
     return (tb_expi(((tb_long_t)x)) * tb_exp1(a));
 #endif
 }

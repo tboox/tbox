@@ -34,13 +34,13 @@
  */
 #define __tb_register__                         register
 #define __tb_volatile__                         volatile
-#define __tb_asm__                              __asm__
 #define __tb_func__                             __FUNCTION__
 #define __tb_file__                             __FILE__
 #define __tb_line__                             __LINE__
 
 #if defined(TB_COMPILER_IS_MSVC)
 
+#   define __tb_asm__                           __asm
 #   define __tb_inline__                        __inline
 #   define __tb_inline_force__                  __forceinline
 #   define __tb_cdecl__                         __cdecl
@@ -52,6 +52,7 @@
 
 #elif defined(TB_COMPILER_IS_GCC)
 
+#   define __tb_asm__                           __asm__
 #   define __tb_inline__                        __inline__
 #   define __tb_inline_force__                  __inline__ __attribute__((always_inline))
 #   define __tb_cdecl__                         __attribute__((__cdecl__))
@@ -62,9 +63,9 @@
 #   define __tb_aligned__(a)                    __attribute__((aligned(a)))
 #else
 
+#   define __tb_asm__               
 #   define __tb_inline__                        inline
 #   define __tb_inline_force__                  inline
-#   define __tb_asm__               
 #   define __tb_func__                  
 #   define __tb_file__                          ""
 #   define __tb_line__                          (0)

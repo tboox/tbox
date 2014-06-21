@@ -480,13 +480,13 @@ tb_void_t tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_by
 
         // the stream size
         stream_size = tb_stream_size(stream);
-        tb_assert_and_check_return(stream_size >= 0);
+        tb_assert_and_check_return(stream_size >= 0 && stream_size < TB_MAXS32);
     }
 
     // init blob
     value->type             = TB_DATABASE_SQL_VALUE_TYPE_BLOB32;
     value->u.blob.data      = data;
-    value->u.blob.size      = data? size : stream_size;
+    value->u.blob.size      = data? size : (tb_size_t)stream_size;
     value->u.blob.stream    = stream;
 
     // check size

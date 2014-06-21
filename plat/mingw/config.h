@@ -15,13 +15,6 @@
 //#define TB_CONFIG_API_HAVE_POSIX
 //#define TB_CONFIG_API_HAVE_SYSTEMV
 
-// assembler
-#if defined(_MSC_VER)
-#   define TB_CONFIG_ASSEMBLER_MASM
-#elif defined(__GNUC__)
-#   define TB_CONFIG_ASSEMBLER_GAS
-#endif
-
 // type
 #define TB_CONFIG_TYPE_FLOAT
 

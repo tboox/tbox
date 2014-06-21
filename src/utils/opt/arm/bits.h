@@ -32,7 +32,7 @@
  * macros
  */
 
-#if defined(TB_CONFIG_ASSEMBLER_GAS) && !defined(TB_ARCH_ARM64)
+#if defined(TB_ASSEMBLER_IS_GAS) && !defined(TB_ARCH_ARM64)
 
 // swap
 #if TB_ARCH_ARM_VERSION >= 6
@@ -47,13 +47,13 @@
 // FIXME: for ios
 //#define tb_bits_get_ubits32_impl(p, b, n)     tb_bits_get_ubits32_impl_asm(p, b, n)
 
-#endif /* TB_CONFIG_ASSEMBLER_GAS */
+#endif /* TB_ASSEMBLER_IS_GAS */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-#if defined(TB_CONFIG_ASSEMBLER_GAS) && !defined(TB_ARCH_ARM64)
+#if defined(TB_ASSEMBLER_IS_GAS) && !defined(TB_ARCH_ARM64)
 
 // swap
 #if (TB_ARCH_ARM_VERSION >= 6)
@@ -191,7 +191,7 @@ static __tb_inline__ tb_uint32_t tb_bits_get_ubits32_impl_asm(tb_byte_t const* p
 }
 #endif
 
-#endif /* TB_CONFIG_ASSEMBLER_GAS */
+#endif /* TB_ASSEMBLER_IS_GAS */
 
 
 #endif

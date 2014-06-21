@@ -33,7 +33,7 @@
  */
 static tb_size_t tb_item_func_str_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {
-    return tb_item_func_hash_cstr(data, mask, index);
+    return tb_item_func_hash_cstr((tb_char_t const*)data, mask, index);
 }
 static tb_long_t tb_item_func_str_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
@@ -41,7 +41,7 @@ static tb_long_t tb_item_func_str_comp(tb_item_func_t* func, tb_cpointer_t ldata
     tb_assert_and_check_return_val(func && ldata && rdata, 0);
 
     // compare it
-    return func->priv? tb_strcmp(ldata, rdata) : tb_stricmp(ldata, rdata);
+    return func->priv? tb_strcmp((tb_char_t const*)ldata, (tb_char_t const*)rdata) : tb_stricmp((tb_char_t const*)ldata, (tb_char_t const*)rdata);
 }
 static tb_pointer_t tb_item_func_str_data(tb_item_func_t* func, tb_cpointer_t item)
 {
@@ -77,9 +77,9 @@ static tb_void_t tb_item_func_str_dupl(tb_item_func_t* func, tb_pointer_t item, 
     tb_assert_and_check_return(func && item);
 
     // duplicate it
-    if (data) *((tb_pointer_t*)item) = func->pool? tb_block_pool_strdup(func->pool, data) : tb_strdup(data);
+    if (data) *((tb_char_t const**)item) = func->pool? tb_block_pool_strdup(func->pool, (tb_char_t const*)data) : tb_strdup((tb_char_t const*)data);
     // clear it
-    else *((tb_pointer_t*)item) = tb_null;
+    else *((tb_char_t const**)item) = tb_null;
 }
 static tb_void_t tb_item_func_str_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {

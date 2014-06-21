@@ -2,6 +2,9 @@
  * includes
  */
 #include "../demo.h"
+#ifdef TB_COMPILER_IS_MSVC
+#   pragma warning(disable:4273)
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros

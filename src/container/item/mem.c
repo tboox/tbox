@@ -33,7 +33,7 @@
  */
 static tb_size_t tb_item_func_mem_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {   
-    return tb_item_func_hash_data(data, func->size, mask, index);
+    return tb_item_func_hash_data((tb_byte_t const*)data, func->size, mask, index);
 }
 static tb_long_t tb_item_func_mem_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
@@ -57,7 +57,7 @@ static tb_char_t const* tb_item_func_mem_cstr(tb_item_func_t* func, tb_cpointer_
     tb_assert_and_check_return_val(func && func->size && cstr && data, "");
 
     // format string
-    tb_long_t n = tb_snprintf(cstr, maxn - 1, "0x%x", tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, data, func->size));
+    tb_long_t n = tb_snprintf(cstr, maxn - 1, "0x%x", tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, (tb_byte_t const*)data, func->size));
     if (n >= 0 && n < (tb_long_t)maxn) cstr[n] = '\0';
 
     // ok?

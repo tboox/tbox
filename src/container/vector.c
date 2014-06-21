@@ -48,10 +48,10 @@
  * types
  */
 
-/*!the vector type
+/*!the impl type
  *
  * <pre>
- * vector: |-----|--------------------------------------------------------|------|
+ * impl: |-----|--------------------------------------------------------|------|
  *       head                                                           last    tail
  *
  * head: => the first item
@@ -110,17 +110,17 @@ typedef struct __tb_vector_impl_t
 static tb_size_t tb_vector_iterator_size(tb_iterator_t* iterator)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(vector, 0);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // size
-    return vector->size;
+    return impl->size;
 }
 static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(vector, 0);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // head
     return 0;
@@ -128,18 +128,18 @@ static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
 static tb_size_t tb_vector_iterator_tail(tb_iterator_t* iterator)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(vector, 0);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
 
     // tail
-    return vector->size;
+    return impl->size;
 }
 static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(vector, 0);
-    tb_assert_and_check_return_val(itor < vector->size, vector->size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_and_check_return_val(itor < impl->size, impl->size);
 
     // next
     return itor + 1;
@@ -147,9 +147,9 @@ static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor
 static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(vector, 0);
-    tb_assert_and_check_return_val(itor && itor <= vector->size, 0);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_and_check_return_val(itor && itor <= impl->size, 0);
 
     // prev
     return itor - 1;
@@ -157,30 +157,31 @@ static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor
 static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(vector && itor < vector->size, tb_null);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl && itor < impl->size, tb_null);
     
     // data
-    return vector->func.data(&vector->func, vector->data + itor * iterator->step);
+    return impl->func.data(&impl->func, impl->data + itor * iterator->step);
 }
 static tb_void_t tb_vector_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return(vector);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return(impl);
 
     // copy
-    vector->func.copy(&vector->func, vector->data + itor * iterator->step, item);
+    impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
 static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(vector && vector->func.comp, 0);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl && impl->func.comp, 0);
 
     // comp
-    return vector->func.comp(&vector->func, ltem, rtem);
+    return impl->func.comp(&impl->func, ltem, rtem);
 }
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -190,84 +191,98 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
     tb_assert_and_check_return_val(grow, tb_null);
     tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl && func.ndupl && func.nrepl, tb_null);
 
-    // make vector
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)tb_malloc0(sizeof(tb_vector_impl_t));
-    tb_assert_and_check_return_val(vector, tb_null);
-
-    // init vector
-    vector->size = 0;
-    vector->grow = grow;
-    vector->maxn = grow;
-    vector->func = func;
-    tb_assert_and_check_goto(vector->maxn < TB_VECTOR_ITEM_MAXN, fail);
-
-    // init iterator
-    vector->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-    vector->itor.priv = tb_null;
-    vector->itor.step = func.size;
-    vector->itor.size = tb_vector_iterator_size;
-    vector->itor.head = tb_vector_iterator_head;
-    vector->itor.tail = tb_vector_iterator_tail;
-    vector->itor.prev = tb_vector_iterator_prev;
-    vector->itor.next = tb_vector_iterator_next;
-    vector->itor.item = tb_vector_iterator_item;
-    vector->itor.copy = tb_vector_iterator_copy;
-    vector->itor.comp = tb_vector_iterator_comp;
-
-    // make data
-    vector->data = tb_nalloc0(vector->maxn, func.size);
-    tb_assert_and_check_goto(vector->data, fail);
-
-    // ok
-    return vector;
-fail:
-    if (vector) tb_vector_exit(vector);
-    return tb_null;
-}
-
-tb_void_t tb_vector_exit(tb_vector_t* handle)
-{
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    if (vector)
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_vector_impl_t*   impl = tb_null;
+    do
     {
-        // clear data
-        tb_vector_clear(vector);
+        // make impl
+        impl = (tb_vector_impl_t*)tb_malloc0(sizeof(tb_vector_impl_t));
+        tb_assert_and_check_break(impl);
 
-        // free data
-        if (vector->data) tb_free(vector->data);
-        vector->data = tb_null;
+        // init impl
+        impl->size = 0;
+        impl->grow = grow;
+        impl->maxn = grow;
+        impl->func = func;
+        tb_assert_and_check_break(impl->maxn < TB_VECTOR_ITEM_MAXN);
 
-        // free it
-        tb_free(vector);
-    }
-}
-tb_void_t tb_vector_clear(tb_vector_t* handle)
-{
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    if (vector) 
+        // init iterator
+        impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+        impl->itor.priv = tb_null;
+        impl->itor.step = func.size;
+        impl->itor.size = tb_vector_iterator_size;
+        impl->itor.head = tb_vector_iterator_head;
+        impl->itor.tail = tb_vector_iterator_tail;
+        impl->itor.prev = tb_vector_iterator_prev;
+        impl->itor.next = tb_vector_iterator_next;
+        impl->itor.item = tb_vector_iterator_item;
+        impl->itor.copy = tb_vector_iterator_copy;
+        impl->itor.comp = tb_vector_iterator_comp;
+
+        // make data
+        impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, func.size);
+        tb_assert_and_check_break(impl->data);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
     {
-        // free data
-        if (vector->func.nfree)
-            vector->func.nfree(&vector->func, vector->data, vector->size);
-
-        // reset size 
-        vector->size = 0;
+        // exit it
+        if (impl) tb_vector_exit((tb_vector_t*)impl);
+        impl = tb_null;
     }
+
+    // ok?
+    return (tb_vector_t*)impl;
 }
-tb_void_t tb_vector_copy(tb_vector_t* handle, tb_vector_t const* hcopy)
+tb_void_t tb_vector_exit(tb_vector_t* vector)
 {
     // check
-    tb_vector_impl_t*       vector = (tb_vector_impl_t*)handle;
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl);
+
+    // clear data
+    tb_vector_clear(vector);
+
+    // free data
+    if (impl->data) tb_free(impl->data);
+    impl->data = tb_null;
+
+    // free it
+    tb_free(impl);
+}
+tb_void_t tb_vector_clear(tb_vector_t* vector)
+{
+    // check
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl);
+
+    // free data
+    if (impl->func.nfree)
+        impl->func.nfree(&impl->func, impl->data, impl->size);
+
+    // reset size 
+    impl->size = 0;
+}
+tb_void_t tb_vector_copy(tb_vector_t* vector, tb_vector_t const* hcopy)
+{
+    // check
+    tb_vector_impl_t*       impl = (tb_vector_impl_t*)vector;
     tb_vector_impl_t const* copy = (tb_vector_impl_t const*)hcopy;
-    tb_assert_and_check_return(vector && copy);
+    tb_assert_and_check_return(impl && copy);
 
     // check func
-    tb_assert_and_check_return(vector->func.type == copy->func.type);
-    tb_assert_and_check_return(vector->func.size == copy->func.size);
+    tb_assert_and_check_return(impl->func.type == copy->func.type);
+    tb_assert_and_check_return(impl->func.size == copy->func.size);
 
     // check itor
-    tb_assert_and_check_return(vector->itor.mode == copy->itor.mode);
-    tb_assert_and_check_return(vector->itor.step == copy->itor.step);
+    tb_assert_and_check_return(impl->itor.mode == copy->itor.mode);
+    tb_assert_and_check_return(impl->itor.step == copy->itor.step);
 
     // null? clear it
     if (!copy->size) 
@@ -277,291 +292,291 @@ tb_void_t tb_vector_copy(tb_vector_t* handle, tb_vector_t const* hcopy)
     }
     
     // resize if small
-    if (vector->size < copy->size) tb_vector_resize(vector, copy->size);
-    tb_assert_and_check_return(vector->data && copy->data && vector->size >= copy->size);
+    if (impl->size < copy->size) tb_vector_resize(vector, copy->size);
+    tb_assert_and_check_return(impl->data && copy->data && impl->size >= copy->size);
 
     // copy data
-    if (copy->data != vector->data) tb_memcpy(vector->data, copy->data, copy->size * copy->func.size);
+    if (copy->data != impl->data) tb_memcpy(impl->data, copy->data, copy->size * copy->func.size);
 
     // copy size
-    vector->size = copy->size;
+    impl->size = copy->size;
 }
-tb_pointer_t tb_vector_data(tb_vector_t* handle)
+tb_pointer_t tb_vector_data(tb_vector_t* vector)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return_val(vector, tb_null);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return_val(impl, tb_null);
 
     // data
-    return vector->data;
+    return impl->data;
 }
-tb_pointer_t tb_vector_head(tb_vector_t* handle)
+tb_pointer_t tb_vector_head(tb_vector_t* vector)
 {
-    return tb_iterator_item(handle, tb_iterator_head(handle));
+    return tb_iterator_item(vector, tb_iterator_head(vector));
 }
-tb_pointer_t tb_vector_last(tb_vector_t* handle)
+tb_pointer_t tb_vector_last(tb_vector_t* vector)
 {
-    return tb_iterator_item(handle, tb_iterator_last(handle));
+    return tb_iterator_item(vector, tb_iterator_last(vector));
 }
-tb_size_t tb_vector_size(tb_vector_t const* handle)
+tb_size_t tb_vector_size(tb_vector_t const* vector)
 {
     // check
-    tb_vector_impl_t const* vector = (tb_vector_impl_t const*)handle;
-    tb_assert_and_check_return_val(vector, 0);
+    tb_vector_impl_t const* impl = (tb_vector_impl_t const*)vector;
+    tb_assert_and_check_return_val(impl, 0);
 
     // size
-    return vector->size;
+    return impl->size;
 }
-tb_size_t tb_vector_grow(tb_vector_t const* handle)
+tb_size_t tb_vector_grow(tb_vector_t const* vector)
 {
     // check
-    tb_vector_impl_t const* vector = (tb_vector_impl_t const*)handle;
-    tb_assert_and_check_return_val(vector, 0);
+    tb_vector_impl_t const* impl = (tb_vector_impl_t const*)vector;
+    tb_assert_and_check_return_val(impl, 0);
 
     // grow
-    return vector->grow;
+    return impl->grow;
 }
-tb_size_t tb_vector_maxn(tb_vector_t const* handle)
+tb_size_t tb_vector_maxn(tb_vector_t const* vector)
 {
     // check
-    tb_vector_impl_t const* vector = (tb_vector_impl_t const*)handle;
-    tb_assert_and_check_return_val(vector, 0);
+    tb_vector_impl_t const* impl = (tb_vector_impl_t const*)vector;
+    tb_assert_and_check_return_val(impl, 0);
 
     // maxn
-    return vector->maxn;
+    return impl->maxn;
 }
-tb_bool_t tb_vector_resize(tb_vector_t* handle, tb_size_t size)
+tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return_val(vector, tb_false);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return_val(impl, tb_false);
     
-    // free items if the vector is decreased
-    if (size < vector->size)
+    // free items if the impl is decreased
+    if (size < impl->size)
     {
         // free data
-        if (vector->func.nfree) 
-            vector->func.nfree(&vector->func, vector->data + size * vector->func.size, vector->size - size);
+        if (impl->func.nfree) 
+            impl->func.nfree(&impl->func, impl->data + size * impl->func.size, impl->size - size);
     }
 
     // resize buffer
-    if (size > vector->maxn)
+    if (size > impl->maxn)
     {
-        tb_size_t maxn = tb_align4(size + vector->grow);
+        tb_size_t maxn = tb_align4(size + impl->grow);
         tb_assert_and_check_return_val(maxn < TB_VECTOR_ITEM_MAXN, tb_false);
 
         // realloc data
-        vector->data = (tb_byte_t*)tb_ralloc(vector->data, maxn * vector->func.size);
-        tb_assert_and_check_return_val(vector->data, tb_false);
+        impl->data = (tb_byte_t*)tb_ralloc(impl->data, maxn * impl->func.size);
+        tb_assert_and_check_return_val(impl->data, tb_false);
 
         // must be align by 4-bytes
-        tb_assert_and_check_return_val(!(((tb_size_t)(vector->data)) & 3), tb_false);
+        tb_assert_and_check_return_val(!(((tb_size_t)(impl->data)) & 3), tb_false);
 
         // clear the grow data
-        tb_memset(vector->data + vector->size * vector->func.size, 0, (maxn - vector->maxn) * vector->func.size);
+        tb_memset(impl->data + impl->size * impl->func.size, 0, (maxn - impl->maxn) * impl->func.size);
 
         // save maxn
-        vector->maxn = maxn;
+        impl->maxn = maxn;
     }
 
     // update size
-    vector->size = size;
+    impl->size = size;
     return tb_true;
 }
-tb_void_t tb_vector_insert_prev(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t data)
+tb_void_t tb_vector_insert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && vector->data && vector->func.size && itor <= vector->size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && impl->data && impl->func.size && itor <= impl->size);
 
     // save size
-    tb_size_t osize = vector->size;
+    tb_size_t osize = impl->size;
 
     // grow a item
     if (!tb_vector_resize(vector, osize + 1)) 
     {
-        tb_trace_d("vector resize: %u => %u failed", osize, osize + 1);
+        tb_trace_d("impl resize: %u => %u failed", osize, osize + 1);
         return ;
     }
 
     // move items if not at tail
-    if (osize != itor) tb_memmov(vector->data + (itor + 1) * vector->func.size, vector->data + itor * vector->func.size, (osize - itor) * vector->func.size);
+    if (osize != itor) tb_memmov(impl->data + (itor + 1) * impl->func.size, impl->data + itor * impl->func.size, (osize - itor) * impl->func.size);
 
     // save data
-    vector->func.dupl(&vector->func, vector->data + itor * vector->func.size, data);
+    impl->func.dupl(&impl->func, impl->data + itor * impl->func.size, data);
 }
-tb_void_t tb_vector_insert_next(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t data)
+tb_void_t tb_vector_insert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
 {
-    tb_vector_insert_prev(handle, tb_iterator_next(handle, itor), data);
+    tb_vector_insert_prev(vector, tb_iterator_next(vector, itor), data);
 }
-tb_void_t tb_vector_insert_head(tb_vector_t* handle, tb_cpointer_t data)
+tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t data)
 {
-    tb_vector_insert_prev(handle, 0, data);
+    tb_vector_insert_prev(vector, 0, data);
 }
-tb_void_t tb_vector_insert_tail(tb_vector_t* handle, tb_cpointer_t data)
+tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_cpointer_t data)
 {
-    tb_vector_insert_prev(handle, tb_vector_size(handle), data);
+    tb_vector_insert_prev(vector, tb_vector_size(vector), data);
 }
-tb_void_t tb_vector_ninsert_prev(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && vector->data && size && itor <= vector->size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && impl->data && size && itor <= impl->size);
 
     // save size
-    tb_size_t osize = vector->size;
+    tb_size_t osize = impl->size;
 
     // grow size
     if (!tb_vector_resize(vector, osize + size)) 
     {
-        tb_trace_d("vector resize: %u => %u failed", osize, osize + 1);
+        tb_trace_d("impl resize: %u => %u failed", osize, osize + 1);
         return ;
     }
 
     // move items if not at tail
-    if (osize != itor) tb_memmov(vector->data + (itor + size) * vector->func.size, vector->data + itor * vector->func.size, (osize - itor) * vector->func.size);
+    if (osize != itor) tb_memmov(impl->data + (itor + size) * impl->func.size, impl->data + itor * impl->func.size, (osize - itor) * impl->func.size);
 
     // duplicate data
-    vector->func.ndupl(&vector->func, vector->data + itor * vector->func.size, data, size);
+    impl->func.ndupl(&impl->func, impl->data + itor * impl->func.size, data, size);
 }
-tb_void_t tb_vector_ninsert_next(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
-    tb_vector_ninsert_prev(handle, tb_iterator_next(handle, itor), data, size);
+    tb_vector_ninsert_prev(vector, tb_iterator_next(vector, itor), data, size);
 }
-tb_void_t tb_vector_ninsert_head(tb_vector_t* handle, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
-    tb_vector_ninsert_prev(handle, 0, data, size);
+    tb_vector_ninsert_prev(vector, 0, data, size);
 }
-tb_void_t tb_vector_ninsert_tail(tb_vector_t* handle, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
-    tb_vector_ninsert_prev(handle, tb_vector_size(handle), data, size);
+    tb_vector_ninsert_prev(vector, tb_vector_size(vector), data, size);
 }
-tb_void_t tb_vector_replace(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t data)
+tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && vector->data && itor <= vector->size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && impl->data && itor <= impl->size);
 
     // replace data
-    vector->func.repl(&vector->func, vector->data + itor * vector->func.size, data);
+    impl->func.repl(&impl->func, impl->data + itor * impl->func.size, data);
 }
-tb_void_t tb_vector_replace_head(tb_vector_t* handle, tb_cpointer_t data)
+tb_void_t tb_vector_replace_head(tb_vector_t* vector, tb_cpointer_t data)
 {
-    tb_vector_replace(handle, 0, data);
+    tb_vector_replace(vector, 0, data);
 }
-tb_void_t tb_vector_replace_last(tb_vector_t* handle, tb_cpointer_t data)
+tb_void_t tb_vector_replace_last(tb_vector_t* vector, tb_cpointer_t data)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && vector->size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && impl->size);
 
     // replace
-    tb_vector_replace(vector, vector->size - 1, data);
+    tb_vector_replace(vector, impl->size - 1, data);
 }
-tb_void_t tb_vector_nreplace(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && vector->data && vector->size && itor <= vector->size && size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && impl->data && impl->size && itor <= impl->size && size);
 
     // strip size
-    if (itor + size > vector->size) size = vector->size - itor;
+    if (itor + size > impl->size) size = impl->size - itor;
 
     // replace data
-    vector->func.nrepl(&vector->func, vector->data + itor * vector->func.size, data, size);
+    impl->func.nrepl(&impl->func, impl->data + itor * impl->func.size, data, size);
 }
-tb_void_t tb_vector_nreplace_head(tb_vector_t* handle, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_nreplace_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
-    tb_vector_nreplace(handle, 0, data, size);
+    tb_vector_nreplace(vector, 0, data, size);
 }
-tb_void_t tb_vector_nreplace_last(tb_vector_t* handle, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_nreplace_last(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && vector->size && size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && impl->size && size);
 
     // replace
-    tb_vector_nreplace(vector, size >= vector->size? 0 : vector->size - size, data, size);
+    tb_vector_nreplace(vector, size >= impl->size? 0 : impl->size - size, data, size);
 }
-tb_void_t tb_vector_remove(tb_vector_t* handle, tb_size_t itor)
+tb_void_t tb_vector_remove(tb_vector_t* vector, tb_size_t itor)
 {   
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && itor < vector->size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && itor < impl->size);
 
-    if (vector->size)
+    if (impl->size)
     {
         // do free
-        if (vector->func.free) vector->func.free(&vector->func, vector->data + itor * vector->func.size);
+        if (impl->func.free) impl->func.free(&impl->func, impl->data + itor * impl->func.size);
 
         // move data if itor is not last
-        if (itor < vector->size - 1) tb_memmov(vector->data + itor * vector->func.size, vector->data + (itor + 1) * vector->func.size, (vector->size - itor - 1) * vector->func.size);
+        if (itor < impl->size - 1) tb_memmov(impl->data + itor * impl->func.size, impl->data + (itor + 1) * impl->func.size, (impl->size - itor - 1) * impl->func.size);
 
         // resize
-        vector->size--;
+        impl->size--;
     }
 }
-tb_void_t tb_vector_remove_head(tb_vector_t* handle)
+tb_void_t tb_vector_remove_head(tb_vector_t* vector)
 {
-    tb_vector_remove(handle, 0);
+    tb_vector_remove(vector, 0);
 }
-tb_void_t tb_vector_remove_last(tb_vector_t* handle)
+tb_void_t tb_vector_remove_last(tb_vector_t* vector)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl);
 
-    if (vector->size)
+    if (impl->size)
     {
         // do free
-        if (vector->func.free) vector->func.free(&vector->func, vector->data + (vector->size - 1) * vector->func.size);
+        if (impl->func.free) impl->func.free(&impl->func, impl->data + (impl->size - 1) * impl->func.size);
 
         // resize
-        vector->size--;
+        impl->size--;
     }
 }
-tb_void_t tb_vector_nremove(tb_vector_t* handle, tb_size_t itor, tb_size_t size)
+tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t size)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && size && itor < vector->size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && size && itor < impl->size);
 
     // clear it
-    if (!itor && size >= vector->size) 
+    if (!itor && size >= impl->size) 
     {
         tb_vector_clear(vector);
         return ;
     }
     
     // strip size
-    if (itor + size > vector->size) size = vector->size - itor;
+    if (itor + size > impl->size) size = impl->size - itor;
 
     // compute the left size
-    tb_size_t left = vector->size - itor - size;
+    tb_size_t left = impl->size - itor - size;
 
     // free data
-    if (vector->func.nfree)
-        vector->func.nfree(&vector->func, vector->data + itor * vector->func.size, size);
+    if (impl->func.nfree)
+        impl->func.nfree(&impl->func, impl->data + itor * impl->func.size, size);
 
     // move the left data
     if (left)
     {
-        tb_byte_t* pd = vector->data + itor * vector->func.size;
-        tb_byte_t* ps = vector->data + (itor + size) * vector->func.size;
-        tb_memmov(pd, ps, left * vector->func.size);
+        tb_byte_t* pd = impl->data + itor * impl->func.size;
+        tb_byte_t* ps = impl->data + (itor + size) * impl->func.size;
+        tb_memmov(pd, ps, left * impl->func.size);
     }
 
     // update size
-    vector->size -= size;
+    impl->size -= size;
 }
-tb_void_t tb_vector_nremove_head(tb_vector_t* handle, tb_size_t size)
+tb_void_t tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && size);
 
     // clear it
-    if (size >= vector->size)
+    if (size >= impl->size)
     {
         tb_vector_clear(vector);
         return ;
@@ -570,43 +585,43 @@ tb_void_t tb_vector_nremove_head(tb_vector_t* handle, tb_size_t size)
     // remove head
     tb_vector_nremove(vector, 0, size);
 }
-tb_void_t tb_vector_nremove_last(tb_vector_t* handle, tb_size_t size)
+tb_void_t tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size)
 {   
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && size);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && size);
 
     // clear it
-    if (size >= vector->size)
+    if (size >= impl->size)
     {
         tb_vector_clear(vector);
         return ;
     }
 
     // remove last
-    tb_vector_nremove(vector, vector->size - size, size);
+    tb_vector_nremove(vector, impl->size - size, size);
 }
-tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
+tb_void_t tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* impl, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
     // check
-    tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
-    tb_assert_and_check_return(vector && vector->data && func);
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl && impl->data && func);
 
     // step
-    tb_size_t step = vector->func.size;
+    tb_size_t step = impl->func.size;
     tb_assert_and_check_return(step);
 
     // walk
     tb_size_t   i = 0;
     tb_size_t   b = -1;
-    tb_size_t   n = vector->size;
-    tb_byte_t*  d = vector->data;
+    tb_size_t   n = impl->size;
+    tb_byte_t*  d = impl->data;
     tb_bool_t   bdel = tb_false;
     tb_bool_t   stop = tb_false;
     for (i = 0; i < n; i++)
     {
         // item
-        tb_pointer_t item = vector->func.data(&vector->func, d + i * step);
+        tb_pointer_t item = impl->func.data(&impl->func, d + i * step);
 
         // bdel
         bdel = tb_false;
@@ -621,7 +636,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vec
             if (b == -1) b = i;
 
             // free item
-            if (vector->func.free) vector->func.free(&vector->func, d + i * step);
+            if (impl->func.free) impl->func.free(&impl->func, d + i * step);
         }
 
         // remove items?
@@ -647,7 +662,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vec
                     {
                         // update the list size
                         n -= m;
-                        vector->size = n;
+                        impl->size = n;
 
                         // update i
                         i = b;
@@ -656,7 +671,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vec
                     {
                         // update the list size
                         n = 0;
-                        vector->size = 0;
+                        impl->size = 0;
                     }
                 }
             }

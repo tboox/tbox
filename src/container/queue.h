@@ -43,7 +43,7 @@
  */
 
 /// the queue type
-typedef tb_void_t   tb_queue_t;
+typedef tb_iterator_t   tb_queue_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

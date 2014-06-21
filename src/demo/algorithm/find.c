@@ -12,7 +12,7 @@ static tb_void_t tb_find_int_test()
     __tb_volatile__ tb_size_t n = 10000;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -42,7 +42,7 @@ static tb_void_t tb_find_int_test_binary()
     __tb_volatile__ tb_size_t n = 10000;
 
     // init data
-    tb_long_t* data = tb_nalloc0(n, sizeof(tb_long_t));
+    tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
     
     // init iterator
@@ -72,7 +72,7 @@ static tb_void_t tb_find_str_test()
     __tb_volatile__ tb_size_t n = 10000;
 
     // init data
-    tb_char_t** data = tb_nalloc0(n, sizeof(tb_char_t*));
+    tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
     // init pool
@@ -115,7 +115,7 @@ static tb_void_t tb_find_str_test_binary()
     __tb_volatile__ tb_size_t n = 10000;
 
     // init data
-    tb_char_t** data = tb_nalloc0(n, sizeof(tb_char_t*));
+    tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
     // init pool

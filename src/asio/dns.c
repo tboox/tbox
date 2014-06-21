@@ -584,5 +584,5 @@ tb_aicp_t* tb_aicp_dns_aicp(tb_handle_t handle)
     tb_assert_and_check_return_val(dns && dns->aico, tb_null);
     
     // the aicp
-    return tb_aico_aicp(dns->aico);
+    return (tb_aicp_t*)tb_aico_aicp(dns->aico);
 }

@@ -516,7 +516,7 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
     tb_assert_return_val(!tb_ipv4_set(tb_null, name), tb_null);
 
     // make looker
-    tb_dns_looker_t* looker = tb_malloc0(sizeof(tb_dns_looker_t));
+    tb_dns_looker_t* looker = (tb_dns_looker_t*)tb_malloc0(sizeof(tb_dns_looker_t));
     tb_assert_and_check_return_val(looker, tb_null);
 
     // dump server

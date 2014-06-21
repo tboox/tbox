@@ -32,7 +32,7 @@
  */
 #define TB_LIBC_STRING_OPT_MEMSET_U8
 
-#if defined(TB_CONFIG_ASSEMBLER_GAS)
+#if defined(TB_ASSEMBLER_IS_GAS)
 #   define TB_LIBC_STRING_OPT_MEMSET_U16
 #   define TB_LIBC_STRING_OPT_MEMSET_U32
 #endif
@@ -40,7 +40,7 @@
  * implementation
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
 
@@ -56,7 +56,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 
 #   if 1
     memset(s, c, n);
-#   elif defined(TB_CONFIG_ASSEMBLER_GAS)
+#   elif defined(TB_ASSEMBLER_IS_GAS)
     tb_memset_impl_u8_opt_v1(s, (tb_byte_t)c, n);
 #   else
 #       error
@@ -67,7 +67,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 #endif
 
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
     /* align by 4-bytes */
@@ -160,7 +160,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
     tb_assert(!(((tb_size_t)s) & 0x1));
     if (!n) return s;
 
-#   if defined(TB_CONFIG_ASSEMBLER_GAS)
+#   if defined(TB_ASSEMBLER_IS_GAS)
     tb_memset_u16_impl_opt_v1(s, c, n);
 #   else
 #       error
@@ -170,7 +170,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
 }
 #endif
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
     tb_size_t l = n & 0x3;
@@ -282,7 +282,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
     tb_assert(!(((tb_size_t)s) & 0x3));
     if (!n) return s;
 
-#   if defined(TB_CONFIG_ASSEMBLER_GAS)
+#   if defined(TB_ASSEMBLER_IS_GAS)
     tb_memset_u32_impl_opt_v1(s, c, n);
 #   else
 #       error

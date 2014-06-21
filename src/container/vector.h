@@ -36,7 +36,7 @@
  */
 
 /// the vector type
-typedef tb_void_t   tb_vector_t;
+typedef tb_iterator_t   tb_vector_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

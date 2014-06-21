@@ -324,6 +324,6 @@ tb_object_json_writer_func_t tb_object_json_writer_func(tb_size_t type)
     tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
     // the func
-    return tb_hash_get(writer->hooker, (tb_pointer_t)type);
+    return (tb_object_json_writer_func_t)tb_hash_get(writer->hooker, (tb_pointer_t)type);
 }
 

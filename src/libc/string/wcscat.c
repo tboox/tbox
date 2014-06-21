@@ -29,10 +29,10 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCAT
 #   include <wchar.h>
 #endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCAT
 tb_wchar_t* tb_wcscat(tb_wchar_t* s1, tb_wchar_t const* s2)
 {

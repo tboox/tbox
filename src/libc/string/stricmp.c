@@ -37,7 +37,11 @@
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
     tb_assert_and_check_return_val(s1 && s2, 0);
+#ifdef TB_COMPILER_IS_MSVC
+    return _stricmp(s1, s2);
+#else
     return strcasecmp(s1, s2);
+#endif
 }
 #else
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)

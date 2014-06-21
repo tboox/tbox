@@ -38,7 +38,7 @@
 tb_wchar_t* tb_wcsstr(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
     tb_assert_and_check_return_val(s1 && s2, tb_null);
-    return wcsstr(s1, s2);
+    return (tb_wchar_t*)wcsstr(s1, s2);
 }
 #else
 tb_wchar_t* tb_wcsstr(tb_wchar_t const* s1, tb_wchar_t const* s2)

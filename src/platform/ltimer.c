@@ -326,7 +326,7 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
     tb_assert_and_check_return_val(tick >= TB_LTIMER_TICK_100MS, tb_null);
 
     // make timer
-    tb_ltimer_t* timer = tb_malloc0(sizeof(tb_ltimer_t));
+    tb_ltimer_t* timer = (tb_ltimer_t*)tb_malloc0(sizeof(tb_ltimer_t));
     tb_assert_and_check_return_val(timer, tb_null);
 
     // init timer

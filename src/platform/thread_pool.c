@@ -255,7 +255,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_t* jobs, tb_poin
     tb_size_t average_time = 200;
     if (tb_hash_size(worker->stats))
     {
-        tb_thread_pool_job_stats_t* stats = tb_hash_get(worker->stats, job->task.done);
+        tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_get(worker->stats, job->task.done);
         if (stats && stats->done_count) average_time = (tb_size_t)(stats->total_time / stats->done_count);
     }
 
@@ -297,7 +297,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_p
         tb_size_t average_time = 200;
         if (tb_hash_size(worker->stats))
         {
-            tb_thread_pool_job_stats_t* stats = tb_hash_get(worker->stats, job->task.done);
+            tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_get(worker->stats, job->task.done);
             if (stats && stats->done_count) average_time = (tb_size_t)(stats->total_time / stats->done_count);
         }
 
@@ -390,7 +390,7 @@ static tb_void_t tb_thread_pool_worker_post(tb_thread_pool_t* pool, tb_size_t po
     tb_long_t value = tb_semaphore_value(pool->semaphore);
 
     // post wait
-    if (value >= 0 && value < post) 
+    if (value >= 0 && (tb_size_t)value < post) 
         tb_semaphore_post(pool->semaphore, post - value);
 }
 static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
@@ -540,7 +540,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                         tb_size_t               itor;
                         tb_hash_item_t const*   item = tb_null;
                         if (    ((itor = tb_hash_itor(worker->stats, job->task.done)) != tb_iterator_tail(worker->stats))
-                            &&  (item = tb_iterator_item(worker->stats, itor)))
+                            &&  (item = (tb_hash_item_t const*)tb_iterator_item(worker->stats, itor)))
                         {
                             // the stats
                             tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)item->data;
@@ -759,7 +759,7 @@ tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
     do
     {
         // make pool
-        pool = tb_malloc0(sizeof(tb_thread_pool_t));
+        pool = (tb_thread_pool_t*)tb_malloc0(sizeof(tb_thread_pool_t));
         tb_assert_and_check_break(pool);
 
         // init lock

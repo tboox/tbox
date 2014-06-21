@@ -62,7 +62,7 @@ tb_hong_t tb_basic_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* 
     tb_hong_t   time = 0;
     tb_size_t   crate = 0;
     tb_long_t   delay = 0;
-    tb_hize_t   writ1s = 0;
+    tb_size_t   writ1s = 0;
     do
     {
         // the need
@@ -94,7 +94,7 @@ tb_hong_t tb_basic_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* 
                     if (time < base + 1000) crate = writ1s;
                 
                     // compute the delay for limit rate
-                    if (lrate) delay = writ1s >= lrate? base1s + 1000 - time : 0;
+                    if (lrate) delay = writ1s >= lrate? (tb_size_t)(base1s + 1000 - time) : 0;
                 }
                 else
                 {
@@ -147,7 +147,7 @@ tb_hong_t tb_basic_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* 
         time = tb_cache_time_spak();
 
         // compute the total rate
-        tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : writ;
+        tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : (tb_size_t)writ;
     
         // done func
         func(TB_STATE_CLOSED, tb_stream_offset(istream), tb_stream_size(istream), writ, trate, priv);

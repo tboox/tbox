@@ -130,7 +130,7 @@ tb_byte_t* tb_queue_buffer_resize(tb_queue_buffer_t* buffer, tb_size_t maxn)
             buffer->head = tb_null;
 
             // make data
-            buffer->data = tb_ralloc(buffer->data, maxn);
+            buffer->data = (tb_byte_t*)tb_ralloc(buffer->data, maxn);
             tb_assert_and_check_return_val(buffer->data, tb_null);
 
             // save head
@@ -197,7 +197,7 @@ tb_long_t tb_queue_buffer_writ(tb_queue_buffer_t* buffer, tb_byte_t const* data,
     if (!buffer->data)
     {
         // make data
-        buffer->data = tb_malloc(buffer->maxn);
+        buffer->data = (tb_byte_t*)tb_malloc(buffer->maxn);
         tb_assert_and_check_return_val(buffer->data, -1);
 
         // init it
@@ -266,7 +266,7 @@ tb_byte_t* tb_queue_buffer_push_init(tb_queue_buffer_t* buffer, tb_size_t* size)
     if (!buffer->data)
     {
         // make data
-        buffer->data = tb_malloc(buffer->maxn);
+        buffer->data = (tb_byte_t*)tb_malloc(buffer->maxn);
         tb_assert_and_check_return_val(buffer->data, tb_null);
 
         // init 

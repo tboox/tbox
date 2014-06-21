@@ -49,7 +49,7 @@ tb_int_t tb_demo_asio_dns_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_handle_t         aicp = tb_null;
+    tb_aicp_t*          aicp = tb_null;
     tb_handle_t         dns = tb_null;
 
     // init aicp

@@ -1283,7 +1283,7 @@ static tb_bool_t tb_iocp_post_sendf(tb_iocp_ptor_t* ptor, tb_aice_t const* aice)
 
     // init olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-    aico->olap.base.Offset  = aice->u.sendf.seek;
+    aico->olap.base.Offset  = (DWORD)aice->u.sendf.seek;
 
     // init aice
     aico->olap.aice = *aice;
@@ -1358,7 +1358,7 @@ static tb_bool_t tb_iocp_post_read(tb_iocp_ptor_t* ptor, tb_aice_t const* aice)
 
     // init olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-    aico->olap.base.Offset  = aice->u.read.seek;
+    aico->olap.base.Offset  = (DWORD)aice->u.read.seek;
 
     // init aice
     aico->olap.aice = *aice;
@@ -1396,7 +1396,7 @@ static tb_bool_t tb_iocp_post_writ(tb_iocp_ptor_t* ptor, tb_aice_t const* aice)
 
     // init olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-    aico->olap.base.Offset  = aice->u.writ.seek;
+    aico->olap.base.Offset  = (DWORD)aice->u.writ.seek;
 
     // init aice
     aico->olap.aice = *aice;
@@ -1434,7 +1434,7 @@ static tb_bool_t tb_iocp_post_readv(tb_iocp_ptor_t* ptor, tb_aice_t const* aice)
 
     // init olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-    aico->olap.base.Offset  = aice->u.readv.seek;
+    aico->olap.base.Offset  = (DWORD)aice->u.readv.seek;
 
     // init aice
     aico->olap.aice = *aice;
@@ -1472,7 +1472,7 @@ static tb_bool_t tb_iocp_post_writv(tb_iocp_ptor_t* ptor, tb_aice_t const* aice)
 
     // init olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-    aico->olap.base.Offset  = aice->u.writv.seek;
+    aico->olap.base.Offset  = (DWORD)aice->u.writv.seek;
 
     // init aice
     aico->olap.aice = *aice;
@@ -1547,7 +1547,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_iocp_ptor_t* ptor, tb_aice_t const* aic
     tb_hong_t now = tb_cache_time_mclock();
 
     // timeout?
-    if (aice->u.runtask.when <= now)
+    if (aice->u.runtask.when <= (tb_hize_t)now)
     {
         // trace
         tb_trace_d("runtask: when: %llu, now: %lld: ok", aice->u.runtask.when, now);
@@ -1684,7 +1684,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
         if (!tb_queue_null(ptor->post[0])) 
         {
             // get resp
-            tb_aice_t const* aice = tb_queue_get(ptor->post[0]);
+            tb_aice_t const* aice = (tb_aice_t const*)tb_queue_get(ptor->post[0]);
             if (aice) 
             {
                 // save post
@@ -1702,7 +1702,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
         if (post.code == TB_AICE_CODE_NONE && !tb_queue_null(ptor->post[1]))
         {
             // get resp
-            tb_aice_t const* aice = tb_queue_get(ptor->post[1]);
+            tb_aice_t const* aice = (tb_aice_t const*)tb_queue_get(ptor->post[1]);
             if (aice) 
             {
                 // save post
@@ -2038,7 +2038,7 @@ static tb_handle_t tb_iocp_ptor_loop_init(tb_aicp_proactor_t* proactor)
     tb_assert_and_check_return_val(ptor, tb_null);
 
     // make loop
-    tb_iocp_loop_t* loop = tb_malloc0(sizeof(tb_iocp_loop_t));
+    tb_iocp_loop_t* loop = (tb_iocp_loop_t*)tb_malloc0(sizeof(tb_iocp_loop_t));
     tb_assert_and_check_return_val(loop, tb_null);
 
     // init self
@@ -2227,7 +2227,7 @@ static tb_aicp_proactor_t* tb_iocp_ptor_init(tb_aicp_t* aicp)
     do
     {
         // make proactor
-        ptor = tb_malloc0(sizeof(tb_iocp_ptor_t));
+        ptor = (tb_iocp_ptor_t*)tb_malloc0(sizeof(tb_iocp_ptor_t));
         tb_assert_and_check_break(ptor);
 
         // init base

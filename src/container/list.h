@@ -36,7 +36,7 @@
  */
 
 /// the list type
-typedef tb_void_t   tb_list_t;
+typedef tb_iterator_t   tb_list_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

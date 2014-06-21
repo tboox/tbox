@@ -126,30 +126,44 @@ static tb_array_t* tb_array_init_base()
  */
 tb_object_t* tb_array_init(tb_size_t grow, tb_bool_t incr)
 {
-    // make
-    tb_array_t* array = tb_array_init_base();
-    tb_assert_and_check_return_val(array, tb_null);
+    // done
+    tb_bool_t   ok = tb_false;
+    tb_array_t* array = tb_null;
+    do
+    {
+        // make array
+        array = tb_array_init_base();
+        tb_assert_and_check_break(array);
 
-    // init item func
-    tb_item_func_t func = tb_item_func_obj();
+        // init item func
+        tb_item_func_t func = tb_item_func_obj();
 
-    // init vector
-    array->vector = tb_vector_init(grow, func);
-    tb_assert_and_check_goto(array->vector, fail);
+        // init vector
+        array->vector = tb_vector_init(grow, func);
+        tb_assert_and_check_break(array->vector);
 
-    // init incr
-    array->incr = incr;
+        // init incr
+        array->incr = incr;
 
-    // ok
+        // ok
+        ok = tb_true;
+
+    } while (0);
+    
+    // failed
+    if (!ok)
+    {
+        // exit it
+        if (array) tb_array_exit((tb_object_t*)array);
+        array = tb_null;
+    }
+
+    // ok?
     return (tb_object_t*)array;
-
-fail:
-    // no
-    tb_array_exit((tb_object_t*)array);
-    return tb_null;
 }
 tb_size_t tb_array_size(tb_object_t* object)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return_val(array && array->vector, 0);
 
@@ -158,6 +172,7 @@ tb_size_t tb_array_size(tb_object_t* object)
 }
 tb_object_t* tb_array_item(tb_object_t* object, tb_size_t index)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return_val(array && array->vector, tb_null);
 
@@ -166,6 +181,7 @@ tb_object_t* tb_array_item(tb_object_t* object, tb_size_t index)
 }
 tb_iterator_t* tb_array_itor(tb_object_t* object)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return_val(array, tb_null);
 
@@ -174,6 +190,7 @@ tb_iterator_t* tb_array_itor(tb_object_t* object)
 }
 tb_void_t tb_array_remove(tb_object_t* object, tb_size_t index)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return(array && array->vector);
 
@@ -182,6 +199,7 @@ tb_void_t tb_array_remove(tb_object_t* object, tb_size_t index)
 }
 tb_void_t tb_array_append(tb_object_t* object, tb_object_t* item)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return(array && array->vector && item);
 
@@ -193,6 +211,7 @@ tb_void_t tb_array_append(tb_object_t* object, tb_object_t* item)
 }
 tb_void_t tb_array_insert(tb_object_t* object, tb_size_t index, tb_object_t* item)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return(array && array->vector && item);
 
@@ -204,6 +223,7 @@ tb_void_t tb_array_insert(tb_object_t* object, tb_size_t index, tb_object_t* ite
 }
 tb_void_t tb_array_replace(tb_object_t* object, tb_size_t index, tb_object_t* item)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return(array && array->vector && item);
 
@@ -215,6 +235,7 @@ tb_void_t tb_array_replace(tb_object_t* object, tb_size_t index, tb_object_t* it
 }
 tb_void_t tb_array_incr(tb_object_t* object, tb_bool_t incr)
 {
+    // check
     tb_array_t* array = tb_array_cast(object);
     tb_assert_and_check_return(array);
 

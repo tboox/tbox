@@ -36,7 +36,7 @@
  */
 
 /// the heap type
-typedef tb_void_t   tb_heap_t;
+typedef tb_iterator_t   tb_heap_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

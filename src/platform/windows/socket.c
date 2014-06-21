@@ -310,7 +310,9 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
     {
         tb_int_t reuseaddr = 1;
         if (tb_ws2_32()->setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0) 
+        {
             tb_trace_d("reuseaddr: failed");
+        }
     }
 #endif
 
@@ -320,7 +322,9 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
     {
         tb_int_t reuseport = 1;
         if (tb_ws2_32()->setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_char_t*)&reuseport, sizeof(reuseport)) < 0) 
+        {
             tb_trace_d("reuseport: %lu failed", port);
+        }
     }
 #endif
 
@@ -531,7 +535,7 @@ tb_hong_t tb_socket_sendf(tb_handle_t handle, tb_handle_t file, tb_hize_t offset
     tb_assert_and_check_return_val(pTransmitFile, -1);
 
     // transmit it
-    OVERLAPPED  olap = {0}; olap.Offset = offset;
+    OVERLAPPED  olap = {0}; olap.Offset = (DWORD)offset;
     tb_hong_t   real = pTransmitFile((SOCKET)handle - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);
 
     // ok?

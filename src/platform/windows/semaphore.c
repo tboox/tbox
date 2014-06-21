@@ -57,7 +57,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
     tb_assert_and_check_return_val(init <= TB_SEMAPHORE_VALUE_MAXN, tb_null);
 
     // make semaphore
-    tb_semaphore_t* semaphore = tb_malloc0(sizeof(tb_semaphore_t));
+    tb_semaphore_t* semaphore = (tb_semaphore_t*)tb_malloc0(sizeof(tb_semaphore_t));
     tb_assert_and_check_return_val(semaphore, tb_null);
 
     // init semaphore 
@@ -101,7 +101,7 @@ tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
     if (!ReleaseSemaphore(semaphore->handle, (LONG)post, &prev) && prev >= 0) 
     {
         // restore
-        tb_atomic_fetch_and_sub(&semaphore->value, post);
+        tb_atomic_fetch_and_sub(&semaphore->value, (tb_long_t)post);
         return tb_false;
     }
 

@@ -9,7 +9,7 @@
 tb_int_t tb_demo_memory_static_block_pool_main(tb_int_t argc, tb_char_t** argv)
 {
     // init
-    tb_handle_t pool = tb_static_block_pool_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 0);
+    tb_handle_t pool = tb_static_block_pool_init((tb_byte_t*)malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 0);
     tb_assert_and_check_return_val(pool, 0);
 
 #if 0
@@ -31,7 +31,7 @@ tb_int_t tb_demo_memory_static_block_pool_main(tb_int_t argc, tb_char_t** argv)
     while (maxn--)
     {
         size = (size * 10807 + 1) & 0xffffffff;
-        data = tb_static_block_pool_malloc(pool, (size & lmod)? (size & lmod) : 1);
+        data = (__tb_volatile__ tb_byte_t*)tb_static_block_pool_malloc(pool, (size & lmod)? (size & lmod) : 1);
         tb_check_break(data);
     }
     time = tb_mclock() - time;

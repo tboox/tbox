@@ -699,7 +699,7 @@ tb_bool_t tb_basic_stream_seek(tb_basic_stream_t* stream, tb_hize_t offset)
             tb_byte_t data[TB_BASIC_STREAM_BLOCK_MAXN];
             while (tb_stream_offset(stream) != offset)
             {
-                tb_size_t need = tb_min(offset - curt, TB_BASIC_STREAM_BLOCK_MAXN);
+                tb_size_t need = (tb_size_t)tb_min(offset - curt, TB_BASIC_STREAM_BLOCK_MAXN);
                 if (!tb_basic_stream_bread(stream, data, need)) return tb_false;
             }
         }

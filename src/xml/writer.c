@@ -64,7 +64,7 @@ typedef struct __tb_xml_writer_t
     tb_stack_t*             elements;
 
     // attributes
-    tb_handle_t             attributes;
+    tb_hash_t*              attributes;
 
 }tb_xml_writer_t;
 
@@ -82,7 +82,7 @@ tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
     do
     {
         // make writer
-        writer = tb_malloc0(sizeof(tb_xml_writer_t));
+        writer = (tb_xml_writer_t*)tb_malloc0(sizeof(tb_xml_writer_t));
         tb_assert_and_check_break(writer);
 
         // init writer
@@ -366,7 +366,7 @@ tb_void_t tb_xml_writer_element_leave(tb_handle_t writer)
     }
 
     // writ name
-    tb_char_t const* name = tb_stack_top(xwriter->elements);
+    tb_char_t const* name = (tb_char_t const*)tb_stack_top(xwriter->elements);
     tb_assert_and_check_return(name);
 
     tb_basic_stream_printf(xwriter->wstream, "</%s>", name);

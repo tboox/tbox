@@ -106,10 +106,10 @@ static tb_bool_t tb_object_xml_writer_func_data(tb_object_xml_writer_t* writer, 
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         // decode base64 data
-        tb_byte_t const*    ib = tb_data_getp(object);
+        tb_byte_t const*    ib = (tb_byte_t const*)tb_data_getp(object);
         tb_size_t           in = tb_data_size(object); 
         tb_size_t           on = in << 1;
-        tb_char_t*          ob = tb_malloc0(on);
+        tb_char_t*          ob = (tb_char_t*)tb_malloc0(on);
         tb_assert_and_check_return_val(ob && on, tb_false);
         on = tb_base64_encode(ib, in, ob, on);
         tb_trace_d("base64: %u => %u", in, on);
@@ -420,6 +420,6 @@ tb_object_xml_writer_func_t tb_object_xml_writer_func(tb_size_t type)
     tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
     // the func
-    return tb_hash_get(writer->hooker, (tb_pointer_t)type);
+    return (tb_object_xml_writer_func_t)tb_hash_get(writer->hooker, (tb_pointer_t)type);
 }
 

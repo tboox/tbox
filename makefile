@@ -110,36 +110,36 @@ else
 # no-config
 # #
 all : 
-	make f
-	make r
+	make -r f
+	make -r r
 
 rebuild :
-	make f
-	make r
+	make -r f
+	make -r r
 
 install :
-	make f
-	make i
+	make -r f
+	make -r i
 
 prefix :
-	make f
-	make p
+	make -r f
+	make -r p
 
 lipo : help
 clean :
-	make f
-	make c
+	make -r f
+	make -r c
 
 update :
-	make f
-	make u
+	make -r f
+	make -r u
 
 output : 	
 error : 	
 warning : 	
 doc :
-	make f
-	make d
+	make -r f
+	make -r d
 
 endif
 
@@ -158,6 +158,7 @@ HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i linux},linux,))
 HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i darwin},mac,))
 HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i cygwin},cygwin,))
 HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i mingw},msys,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i msvc},msys,))
 HOST :=$(if $(HOST),$(HOST),linux)
 
 # platform
@@ -165,6 +166,7 @@ PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},mingw,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i mingw},mingw,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i msvc},msvc,))
 PLAT :=$(if $(PLAT),$(PLAT),linux)
 
 # architecture

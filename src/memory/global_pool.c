@@ -168,7 +168,7 @@ tb_void_t tb_global_pool_clear(tb_handle_t handle)
     pool->tpool = tb_null;
     if (pool->tsize >= TB_GLOBAL_POOL_TPOOL_MINN)
     {
-        pool->tdata = tb_static_block_pool_malloc(pool->bpool, pool->tsize);
+        pool->tdata = (tb_byte_t*)tb_static_block_pool_malloc(pool->bpool, pool->tsize);
         if (pool->tdata) pool->tpool = tb_tiny_pool_init(pool->tdata, pool->tsize, pool->align);
     }
 }

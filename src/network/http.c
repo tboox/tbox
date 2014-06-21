@@ -785,7 +785,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
             while (read < size) 
             {
                 // the need
-                tb_size_t need = tb_min(size - read, TB_BASIC_STREAM_BLOCK_MAXN);
+                tb_size_t need = (tb_size_t)tb_min(size - read, (tb_hize_t)TB_BASIC_STREAM_BLOCK_MAXN);
 
                 // read it
                 if (!tb_basic_stream_bread(http->stream, data, need)) break;
@@ -846,7 +846,7 @@ tb_handle_t tb_http_init()
     do
     {
         // make http
-        http = tb_malloc0(sizeof(tb_http_t));
+        http = (tb_http_t*)tb_malloc0(sizeof(tb_http_t));
         tb_assert_and_check_break(http);
 
         // init stream
@@ -1070,7 +1070,7 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
     tb_assert_and_check_return_val(http->bopened, tb_false);
 
     // read
-    tb_long_t read = 0;
+    tb_size_t read = 0;
     while (read < size)
     {
         // read data
@@ -1283,7 +1283,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
             tb_assert_and_check_return_val(pval, tb_false);
 
             // get val
-            tb_char_t const* val = tb_hash_get(http->option.head, key);
+            tb_char_t const* val = (tb_char_t const*)tb_hash_get(http->option.head, key);
             tb_assert_and_check_return_val(val, tb_false);
 
             // ok

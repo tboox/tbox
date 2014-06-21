@@ -32,7 +32,7 @@
  * macros
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 
 // swap
 #ifndef tb_bits_swap_u16
@@ -45,12 +45,12 @@
 #   define tb_bits_swap_u64(x)              tb_bits_swap_u64_asm(x)
 #endif
 
-#endif /* TB_CONFIG_ASSEMBLER_GAS */
+#endif /* TB_ASSEMBLER_IS_GAS */
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_ASSEMBLER_IS_GAS
 
 // swap
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
@@ -97,7 +97,7 @@ static __tb_inline__ tb_hize_t const tb_bits_swap_u64_asm(tb_hize_t x)
     return x;
 }
 
-#endif /* TB_CONFIG_ASSEMBLER_GAS */
+#endif /* TB_ASSEMBLER_IS_GAS */
 
 #endif
 

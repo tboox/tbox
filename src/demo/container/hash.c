@@ -18,7 +18,7 @@
 #define tb_hash_test_del_s2i(h, s)      do {tb_hash_del(h, s); tb_assert(!tb_hash_get(h, s)); } while (0);
 
 #define tb_hash_test_set_i2s(h, i)      do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_hash_set(h, (tb_pointer_t)i, s); } while (0);
-#define tb_hash_test_get_i2s(h, i)      do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_assert(!tb_strcmp(s, tb_hash_get(h, (tb_pointer_t)i))); } while (0);
+#define tb_hash_test_get_i2s(h, i)      do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_assert(!tb_strcmp(s, (tb_char_t const*)tb_hash_get(h, (tb_pointer_t)i))); } while (0);
 #define tb_hash_test_del_i2s(h, i)      do {tb_hash_del(h, (tb_pointer_t)i); tb_assert(!tb_hash_get(h, (tb_pointer_t)i)); } while (0);
 
 #define tb_hash_test_set_m2m(h, i)      do {tb_memset_u32(item, i, step >> 2); tb_hash_set(h, item, item); } while (0);

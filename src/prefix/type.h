@@ -88,7 +88,11 @@ typedef tb_pointer_t                tb_handle_t;
 
 // wchar
 #ifdef TB_CONFIG_OS_WINDOWS
-typedef tb_uint16_t                 tb_wchar_t;
+#   if defined(_WCHAR_T_DEFINED) || defined(_NATIVE_WCHAR_T_DEFINED)
+    typedef wchar_t                 tb_wchar_t;
+#   else
+    typedef tb_uint16_t             tb_wchar_t;
+#   endif
 #else
 typedef tb_int32_t                  tb_wchar_t;
 #endif

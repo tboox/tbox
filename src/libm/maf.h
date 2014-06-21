@@ -48,7 +48,7 @@
 #       define __tb_maf_bytes   { 0, 0, 0, 0, 0, 0, 0xf0, 0x7f }
 #   endif
     static __tb_maf_t __tb_maf = { __tb_maf_bytes };
-#   define TB_MAF       (__maf.__d)
+#   define TB_MAF       (__tb_maf.__d)
 #endif
 
 

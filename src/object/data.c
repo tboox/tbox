@@ -111,20 +111,20 @@ tb_object_t* tb_data_init_from_url(tb_char_t const* url)
     {
         // size
         tb_hong_t size = tb_stream_size(stream);
-        if (size > 0)
+        if (size > 0 && size < TB_MAXS32)
         {
-            tb_byte_t* data = tb_malloc0(size);
+            tb_byte_t* data = (tb_byte_t*)tb_malloc0((tb_size_t)size);
             if (data) 
             {
-                if (tb_basic_stream_bread(stream, data, size))
-                    object = tb_data_init_from_data(data, size);
+                if (tb_basic_stream_bread(stream, data, (tb_size_t)size))
+                    object = tb_data_init_from_data(data, (tb_size_t)size);
                 tb_free(data);
             }
         }
         else object = tb_data_init_from_data(tb_null, 0);
 
         // check, TODO: read stream if no size
-        tb_assert(size >= 0);
+        tb_assert(size >= 0 && size < TB_MAXS32);
 
         // exit stream
         tb_basic_stream_exit(stream);
@@ -140,18 +140,17 @@ tb_object_t* tb_data_init_from_data(tb_pointer_t addr, tb_size_t size)
     tb_assert_and_check_return_val(data, tb_null);
 
     // init buff
-    if (!tb_scoped_buffer_init(&data->buff)) goto fail;
+    if (!tb_scoped_buffer_init(&data->buff))
+    {
+        tb_data_exit((tb_object_t*)data);
+        return tb_null;
+    }
 
     // copy data
-    if (addr && size) tb_scoped_buffer_memncpy(&data->buff, addr, size);
+    if (addr && size) tb_scoped_buffer_memncpy(&data->buff, (tb_byte_t const*)addr, size);
 
     // ok
     return (tb_object_t*)data;
-
-    // no
-fail:
-    tb_data_exit((tb_object_t*)data);
-    return tb_null;
 }
 tb_object_t* tb_data_init_from_pbuf(tb_scoped_buffer_t* pbuf)
 {   
@@ -160,18 +159,17 @@ tb_object_t* tb_data_init_from_pbuf(tb_scoped_buffer_t* pbuf)
     tb_assert_and_check_return_val(data, tb_null);
 
     // init buff
-    if (!tb_scoped_buffer_init(&data->buff)) goto fail;
+    if (!tb_scoped_buffer_init(&data->buff))
+    {
+        tb_data_exit((tb_object_t*)data);
+        return tb_null;
+    }
 
     // copy data
     if (pbuf) tb_scoped_buffer_memcpy(&data->buff, pbuf);
 
     // ok
     return (tb_object_t*)data;
-
-    // no
-fail:
-    tb_data_exit((tb_object_t*)data);
-    return tb_null;
 }
 tb_pointer_t tb_data_getp(tb_object_t* object)
 {
@@ -189,7 +187,7 @@ tb_bool_t tb_data_setp(tb_object_t* object, tb_pointer_t addr, tb_size_t size)
     tb_assert_and_check_return_val(data && addr, tb_false);
 
     // data
-    tb_scoped_buffer_memncpy(&data->buff, addr, size);
+    tb_scoped_buffer_memncpy(&data->buff, (tb_byte_t const*)addr, size);
 
     // ok
     return tb_true;
@@ -231,7 +229,7 @@ tb_bool_t tb_data_writ_to_url(tb_object_t* object, tb_char_t const* url)
     if (tb_basic_stream_open(stream))
     {
         // writ stream
-        if (tb_basic_stream_bwrit(stream, tb_data_getp((tb_object_t*)data), tb_data_size((tb_object_t*)data))) ok = tb_true;
+        if (tb_basic_stream_bwrit(stream, (tb_byte_t const*)tb_data_getp((tb_object_t*)data), tb_data_size((tb_object_t*)data))) ok = tb_true;
     }
 
     // exit stream
