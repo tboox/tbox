@@ -65,7 +65,56 @@
 #   define __tb_mode_small__    (0)
 #endif
 
-// init tbox
+/*! init tbox
+ *
+ * @param priv      the platform private data
+ *                  pass JNIEnv* env for android
+ *                  pass tb_null for other platform
+ * @param data      the memory data for the memory pool, using the native memory if be tb_null
+ * @param size      the memory size for the memory pool, using the native memory if be zero
+ *
+ * @return          tb_true or tb_false
+ *
+ * @code
+    #include "tbox/tbox.h"
+
+    int main(int argc, char** argv)
+    {
+#ifdef __tb_debug__
+        // for checking memory leaks and overflow
+        if (!tb_init(tb_null, malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
+#else
+        if (!tb_init(tb_null, tb_null, 0)) return 0;
+#endif
+
+        // print info with tag
+        // output: [tag]: hello tbox
+        tb_trace_i("hello tbox");
+
+        // print info only for debug
+        // output: [tag]: hello tbox
+        tb_trace_d("hello tbox"); 
+
+        // print error info
+        // output: [tag]: [error]: hello tbox
+        tb_trace_e("hello tbox");
+
+        // print warning info
+        // output: [tag]: [warning]: hello tbox
+        tb_trace_w("hello tbox");
+
+        // print info without prefix tag
+        // output: hello tbox
+        tb_printf("hello tbox\n");
+
+        // ..
+
+        // exit tbox
+        tb_exit();
+        return 0;
+    }
+ * @endcode
+ */
 #define tb_init(priv, data, size)     tb_init_and_check(priv, data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +127,8 @@ __tb_extern_c_enter__
  * @param priv      the platform private data
  *                  pass JNIEnv* env for android
  *                  pass tb_null for other platform
- * @param data      the memory data, using the native memory if be tb_null
- * @param size      the memory size, using the native memory if be zero
+ * @param data      the memory data for the memory pool, using the native memory if be tb_null
+ * @param size      the memory size for the memory pool, using the native memory if be zero
  * @param mode      the compile mode for check __tb_small__ and __tb_debug__
  * @param build     the build version
  *

@@ -164,7 +164,7 @@ HOST :=$(if $(HOST),$(HOST),linux)
 # platform
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
-PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},mingw,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},cygwin,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i mingw},mingw,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i msvc},msvc,))
 PLAT :=$(if $(PLAT),$(PLAT),linux)

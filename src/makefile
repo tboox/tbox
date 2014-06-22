@@ -563,6 +563,13 @@ INC_FILES 				= \
 						platform/windows/barrier.h \
 						platform/windows/atomic64.h \
 						platform/windows/exception.h \
+						platform/windows/interface/prefix.h \
+						platform/windows/interface/interface.h \
+						platform/windows/interface/kernel32.h \
+						platform/windows/interface/mswsock.h \
+						platform/windows/interface/dbghelp.h \
+						platform/windows/interface/iphlpapi.h \
+						platform/windows/interface/ws2_32.h \
 						platform/libc/prefix.h \
 						platform/libc/exception.h \
 						platform/mach/prefix.h \
