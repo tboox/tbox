@@ -37,10 +37,10 @@ export PDB
 endif
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -MD -SSE2 -GL -Gy -Zi
-CXFLAGS_DEBUG 		= -Od -GS -MDd -ZI -RTC1 -D__tb_debug__
+CXFLAGS_RELEASE 	= -MD -GL -Gy -Zi
+CXFLAGS_DEBUG 		= -Od -GS -MDd -ZI -D__tb_debug__
 CXFLAGS 			= \
-					-Fd"$(PDB)" \
+					-Fd"$(PDB)" -SSE2 \
 					-D_MBCS -D_CRT_SECURE_NO_WARNINGS -DNOCRYPT -DNOGDI -Gf -Gd -Gm -W3 -WX -nologo -c -TP \
 					-I'/usr/local/inc'
 CXFLAGS-I 			= -I
@@ -68,7 +68,7 @@ LDFLAGS_RELEASE 	=
 LDFLAGS_DEBUG 		= -debug
 LDFLAGS 			= \
  					-pdb:"$(PDB)" \
-					-manifestuac:"level='asInvoker' uiAccess='false'" \
+					-manifest -manifestuac:"level='asInvoker' uiAccess='false'" \
 					-nologo -machine:x86 -dynamicbase -nxcompat -libpath:'$(HOME)tool\msys\local\lib'
 LDFLAGS-L 			= -libpath:
 LDFLAGS-l 			= 

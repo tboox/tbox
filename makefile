@@ -172,6 +172,7 @@ PLAT :=$(if $(PLAT),$(PLAT),linux)
 # architecture
 ifeq ($(ARCH),)
 
+ARCH :=$(if $(findstring msvc,$(PLAT)),x86,$(ARCH))
 ARCH :=$(if $(findstring mingw,$(PLAT)),x86,$(ARCH))
 ARCH :=$(if $(findstring mac,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
 ARCH :=$(if $(findstring linux,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
