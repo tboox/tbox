@@ -130,7 +130,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
             tb_assert_and_check_break(ldata2);
             {
                 // data?
-                tb_basic_stream_t*  stream = tb_null;
+                tb_stream_t*  stream = tb_null;
                 if (tb_object_database_sql_value_blob(ldata2))
                 {
                     // trace
@@ -140,7 +140,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
                 else if ((stream = tb_object_database_sql_value_blob_stream(ldata2)))
                 {
                     // the stream size
-                    tb_hong_t size = tb_basic_stream_size(stream);
+                    tb_hong_t size = tb_stream_size(stream);
                     tb_assert_and_check_break(size >= 0);
 
                     // make data
@@ -148,7 +148,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
                     tb_assert_and_check_break(data);
 
                     // read data
-                    if (tb_basic_stream_bread(stream, data, (tb_size_t)size))
+                    if (tb_stream_bread(stream, data, (tb_size_t)size))
                     {
                         // trace
                         tb_tracet_i("[%s:crc(%lx)] ", tb_object_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, data, (tb_size_t)size)));
@@ -194,7 +194,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
 
     // done
     tb_handle_t         stmt = tb_null;
-    tb_basic_stream_t*  stream = tb_null;
+    tb_stream_t*  stream = tb_null;
     do
     {
         // init stmt
@@ -209,11 +209,11 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
         if (ldata2)
         {
             // init it
-            stream = tb_basic_stream_init_from_url(ldata2);
+            stream = tb_stream_init_from_url(ldata2);
             tb_assert_and_check_break(stream);
 
             // open it
-            if (!tb_basic_stream_open(stream)) break;
+            if (!tb_stream_open(stream)) break;
         }
 
         // bind stmt
@@ -246,7 +246,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
     if (stmt) tb_object_database_sql_statement_exit(database, stmt);
 
     // exit stream
-    if (stream) tb_basic_stream_exit(stream);
+    if (stream) tb_stream_exit(stream);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

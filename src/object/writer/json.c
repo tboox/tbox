@@ -44,7 +44,7 @@ static tb_bool_t tb_object_json_writer_func_null(tb_object_json_writer_t* writer
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
     // writ
-    if (tb_basic_stream_printf(writer->stream, "null") < 0) return tb_false;
+    if (tb_stream_printf(writer->stream, "null") < 0) return tb_false;
     if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
     // ok
@@ -59,7 +59,7 @@ static tb_bool_t tb_object_json_writer_func_array(tb_object_json_writer_t* write
     if (tb_object_array_size(object))
     {
         // writ beg
-        if (tb_basic_stream_printf(writer->stream, "[") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "[") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         // walk
@@ -76,7 +76,7 @@ static tb_bool_t tb_object_json_writer_func_array(tb_object_json_writer_t* write
                 if (item_itor != item_head)
                 {
                     if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-                    if (tb_basic_stream_printf(writer->stream, ",") < 0) return tb_false;
+                    if (tb_stream_printf(writer->stream, ",") < 0) return tb_false;
                     if (!tb_object_writer_tab(writer->stream, writer->deflate, 1)) return tb_false;
                 }
                 else if (!tb_object_writer_tab(writer->stream, writer->deflate, level + 1)) return tb_false;
@@ -88,12 +88,12 @@ static tb_bool_t tb_object_json_writer_func_array(tb_object_json_writer_t* write
 
         // writ end
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "]") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "]") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
-        if (tb_basic_stream_printf(writer->stream, "[]") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "[]") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
 
@@ -108,9 +108,9 @@ static tb_bool_t tb_object_json_writer_func_string(tb_object_json_writer_t* writ
     // writ
     if (tb_object_string_size(object))
     {
-        if (tb_basic_stream_printf(writer->stream, "\"%s\"", tb_object_string_cstr(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "\"%s\"", tb_object_string_cstr(object)) < 0) return tb_false;
     }
-    else if (tb_basic_stream_printf(writer->stream, "\"\"") < 0) return tb_false;
+    else if (tb_stream_printf(writer->stream, "\"\"") < 0) return tb_false;
     if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
     // ok
@@ -125,44 +125,44 @@ static tb_bool_t tb_object_json_writer_func_number(tb_object_json_writer_t* writ
     switch (tb_object_number_type(object))
     {
     case TB_NUMBER_TYPE_UINT64:
-        if (tb_basic_stream_printf(writer->stream, "%llu", tb_object_number_uint64(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%llu", tb_object_number_uint64(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT64:
-        if (tb_basic_stream_printf(writer->stream, "%lld", tb_object_number_sint64(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%lld", tb_object_number_sint64(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT32:
-        if (tb_basic_stream_printf(writer->stream, "%u", tb_object_number_uint32(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%u", tb_object_number_uint32(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT32:
-        if (tb_basic_stream_printf(writer->stream, "%d", tb_object_number_sint32(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%d", tb_object_number_sint32(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT16:
-        if (tb_basic_stream_printf(writer->stream, "%u", tb_object_number_uint16(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%u", tb_object_number_uint16(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT16:
-        if (tb_basic_stream_printf(writer->stream, "%d", tb_object_number_sint16(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%d", tb_object_number_sint16(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT8:
-        if (tb_basic_stream_printf(writer->stream, "%u", tb_object_number_uint8(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%u", tb_object_number_uint8(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT8:
-        if (tb_basic_stream_printf(writer->stream, "%d", tb_object_number_sint8(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%d", tb_object_number_sint8(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
 #ifdef TB_CONFIG_TYPE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
-        if (tb_basic_stream_printf(writer->stream, "%f", tb_object_number_float(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%f", tb_object_number_float(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_DOUBLE:
-        if (tb_basic_stream_printf(writer->stream, "%lf", tb_object_number_double(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "%lf", tb_object_number_double(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
 #endif
@@ -179,7 +179,7 @@ static tb_bool_t tb_object_json_writer_func_boolean(tb_object_json_writer_t* wri
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
     // writ
-    if (tb_basic_stream_printf(writer->stream, "%s", tb_object_boolean_bool(object)? "true" : "false") < 0) return tb_false;
+    if (tb_stream_printf(writer->stream, "%s", tb_object_boolean_bool(object)? "true" : "false") < 0) return tb_false;
     if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
     // ok
@@ -194,7 +194,7 @@ static tb_bool_t tb_object_json_writer_func_dictionary(tb_object_json_writer_t* 
     if (tb_object_dictionary_size(object))
     {
         // writ beg
-        if (tb_basic_stream_printf(writer->stream, "{") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "{") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         // walk
@@ -211,16 +211,16 @@ static tb_bool_t tb_object_json_writer_func_dictionary(tb_object_json_writer_t* 
                 if (item_itor != item_head)
                 {
                     if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-                    if (tb_basic_stream_printf(writer->stream, ",") < 0) return tb_false;
+                    if (tb_stream_printf(writer->stream, ",") < 0) return tb_false;
                     if (!tb_object_writer_tab(writer->stream, writer->deflate, 1)) return tb_false;
                 }
                 else if (!tb_object_writer_tab(writer->stream, writer->deflate, level + 1)) return tb_false;
 
                 // writ key
-                if (tb_basic_stream_printf(writer->stream, "\"%s\":", item->key) < 0) return tb_false;
+                if (tb_stream_printf(writer->stream, "\"%s\":", item->key) < 0) return tb_false;
 
                 // writ spaces
-                if (!writer->deflate) if (tb_basic_stream_printf(writer->stream, " ") < 0) return tb_false;
+                if (!writer->deflate) if (tb_stream_printf(writer->stream, " ") < 0) return tb_false;
                 if (item->val->type == TB_OBJECT_TYPE_DICTIONARY || item->val->type == TB_OBJECT_TYPE_ARRAY)
                 {
                     if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -234,19 +234,19 @@ static tb_bool_t tb_object_json_writer_func_dictionary(tb_object_json_writer_t* 
 
         // writ end
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "}") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "}") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
-        if (tb_basic_stream_printf(writer->stream, "{}") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "{}") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
 
     // ok
     return tb_true;
 }
-static tb_long_t tb_object_json_writer_done(tb_basic_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
+static tb_long_t tb_object_json_writer_done(tb_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
@@ -261,16 +261,16 @@ static tb_long_t tb_object_json_writer_done(tb_basic_stream_t* stream, tb_object
     tb_assert_and_check_return_val(func, tb_false);
 
     // the begin offset
-    tb_hize_t bof = tb_basic_stream_offset(stream);
+    tb_hize_t bof = tb_stream_offset(stream);
 
     // writ
     if (!func(&writer, object, 0)) return -1;
 
     // sync
-    if (!tb_basic_stream_sync(stream, tb_true)) return -1;
+    if (!tb_stream_sync(stream, tb_true)) return -1;
 
     // the end offset
-    tb_hize_t eof = tb_basic_stream_offset(stream);
+    tb_hize_t eof = tb_stream_offset(stream);
 
     // ok?
     return eof >= bof? (tb_long_t)(eof - bof) : -1;

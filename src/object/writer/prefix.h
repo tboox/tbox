@@ -44,26 +44,26 @@
  * inlines
  */
 
-static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_basic_stream_t* stream, tb_bool_t deflate, tb_size_t tab)
+static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_stream_t* stream, tb_bool_t deflate, tb_size_t tab)
 {
     // writ tab
     if (!deflate) 
     {
-        while (tab--) if (tb_basic_stream_printf(stream, "\t") < 0) return tb_false;
+        while (tab--) if (tb_stream_printf(stream, "\t") < 0) return tb_false;
     }
 
     // ok
     return tb_true;
 }
-static __tb_inline__ tb_bool_t tb_object_writer_newline(tb_basic_stream_t* stream, tb_bool_t deflate)
+static __tb_inline__ tb_bool_t tb_object_writer_newline(tb_stream_t* stream, tb_bool_t deflate)
 {
     // writ newline
-    if (!deflate && tb_basic_stream_printf(stream, __tb_newline__) < 0) return tb_false;
+    if (!deflate && tb_stream_printf(stream, __tb_newline__) < 0) return tb_false;
 
     // ok
     return tb_true;
 }
-static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_basic_stream_t* stream, tb_size_t type, tb_uint64_t size)
+static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_stream_t* stream, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(stream && type <= 0xff, tb_false);
@@ -86,13 +86,13 @@ static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_basic_stream_t*
 
     // writ flag 
     tb_uint8_t flag = ((type < 0xf? (tb_uint8_t)type : 0xf) << 4) | (size < 0xc? (tb_uint8_t)size : (tb_uint8_t)sizef);
-    if (!tb_basic_stream_bwrit_u8(stream, flag)) return tb_false;
+    if (!tb_stream_bwrit_u8(stream, flag)) return tb_false;
 
     // trace
 //  tb_trace("writ: type: %lu, size: %llu", type, size);
 
     // writ type
-    if (type >= 0xf) if (!tb_basic_stream_bwrit_u8(stream, (tb_uint8_t)type)) return tb_false;
+    if (type >= 0xf) if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)type)) return tb_false;
 
     // writ size
     if (size >= 0xc)
@@ -100,16 +100,16 @@ static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_basic_stream_t*
         switch (sizeb)
         {
         case 1:
-            if (!tb_basic_stream_bwrit_u8(stream, (tb_uint8_t)size)) return tb_false;
+            if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)size)) return tb_false;
             break;
         case 2:
-            if (!tb_basic_stream_bwrit_u16_be(stream, (tb_uint16_t)size)) return tb_false;
+            if (!tb_stream_bwrit_u16_be(stream, (tb_uint16_t)size)) return tb_false;
             break;
         case 4:
-            if (!tb_basic_stream_bwrit_u32_be(stream, (tb_uint32_t)size)) return tb_false;
+            if (!tb_stream_bwrit_u32_be(stream, (tb_uint32_t)size)) return tb_false;
             break;
         case 8:
-            if (!tb_basic_stream_bwrit_u64_be(stream, (tb_uint64_t)size)) return tb_false;
+            if (!tb_stream_bwrit_u64_be(stream, (tb_uint64_t)size)) return tb_false;
             break;
         default:
             tb_assert_and_check_return_val(0, tb_false);

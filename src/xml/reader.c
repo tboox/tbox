@@ -57,9 +57,9 @@ typedef struct __tb_xml_reader_t
     tb_size_t               level;
     
     // the stream
-    tb_basic_stream_t*      istream;
-    tb_basic_stream_t*      filter;
-    tb_basic_stream_t*      rstream;
+    tb_stream_t*      istream;
+    tb_stream_t*      filter;
+    tb_stream_t*      rstream;
 
     // the version
     tb_string_t      version;
@@ -92,7 +92,7 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_t* reader)
     // parse element
     tb_char_t ch = '\0';
     tb_size_t in = 0;
-    while ((ch = tb_basic_stream_bread_s8(reader->rstream)))
+    while ((ch = tb_stream_bread_s8(reader->rstream)))
     {
         // append element
         if (!in && ch == '<') in = 1;
@@ -111,14 +111,14 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 
     // parse text
     tb_char_t* pc = tb_null;
-    while (tb_basic_stream_need(reader->rstream, (tb_byte_t**)&pc, 1) && pc)
+    while (tb_stream_need(reader->rstream, (tb_byte_t**)&pc, 1) && pc)
     {
         // is end? </ ..>
         if (pc[0] == '<') return tb_string_cstr(&reader->text);
         else
         {
             tb_string_chrcat(&reader->text, *pc);
-            if (!tb_basic_stream_skip(reader->rstream, 1)) return tb_null;
+            if (!tb_stream_skip(reader->rstream, 1)) return tb_null;
         }
     }
     return tb_null;
@@ -127,7 +127,7 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_xml_reader_init(tb_basic_stream_t* stream)
+tb_handle_t tb_xml_reader_init(tb_stream_t* stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
@@ -167,7 +167,7 @@ tb_void_t tb_xml_reader_exit(tb_handle_t reader)
     if (xreader)
     {
         // exit stream
-        if (xreader->filter) tb_basic_stream_exit(xreader->filter);
+        if (xreader->filter) tb_stream_exit(xreader->filter);
 
         // exit version
         tb_string_exit(&xreader->version);
@@ -207,7 +207,7 @@ tb_void_t tb_xml_reader_clear(tb_handle_t reader)
     xreader->level = 0;
 
     // reset stream
-    if (xreader->rstream) tb_basic_stream_seek(xreader->rstream, 0);
+    if (xreader->rstream) tb_stream_seek(xreader->rstream, 0);
 
     // clear element
     tb_string_clear(&xreader->element);
@@ -227,7 +227,7 @@ tb_void_t tb_xml_reader_clear(tb_handle_t reader)
         tb_string_clear(&node->data);
     }
 }
-tb_basic_stream_t* tb_xml_reader_stream(tb_handle_t reader)
+tb_stream_t* tb_xml_reader_stream(tb_handle_t reader)
 {
     // check
     tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
@@ -257,7 +257,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
     {
         // peek character
         tb_char_t* pc = tb_null;
-        if (!tb_basic_stream_need(xreader->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
+        if (!tb_stream_need(xreader->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
 
         // is element?
         if (*pc == '<') 
@@ -297,8 +297,8 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
                     if (charset != TB_CHARSET_TYPE_UTF8)
                     {
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
-                        xreader->filter = tb_basic_stream_init_filter_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
-                        if (xreader->filter && tb_basic_stream_open(xreader->filter))
+                        xreader->filter = tb_stream_init_filter_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
+                        if (xreader->filter && tb_stream_open(xreader->filter))
                             xreader->rstream = xreader->filter;
                         tb_string_cstrcpy(&xreader->charset, "utf-8");
 #else
@@ -338,7 +338,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
                     // seek to comment end
                     tb_char_t ch = '\0';
                     tb_int_t n = 0;
-                    while ((ch = tb_basic_stream_bread_s8(xreader->rstream)))
+                    while ((ch = tb_stream_bread_s8(xreader->rstream)))
                     {
                         // -->
                         if (n == 2 && ch == '>') break;
@@ -368,7 +368,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
                     // seek to cdata end
                     tb_char_t ch = '\0';
                     tb_int_t n = 0;
-                    while ((ch = tb_basic_stream_bread_s8(xreader->rstream)))
+                    while ((ch = tb_stream_bread_s8(xreader->rstream)))
                     {
                         // ]]>
                         if (n == 2 && ch == '>') break;
@@ -431,7 +431,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 
     // reset
     xreader->level = 0;
-    if (!tb_basic_stream_seek(xreader->rstream, 0)) return tb_false;
+    if (!tb_stream_seek(xreader->rstream, 0)) return tb_false;
 
     // init
     tb_static_string_t  s;
@@ -441,7 +441,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
     // walk
     tb_bool_t ok = tb_false;
     tb_size_t e = TB_XML_READER_EVENT_NONE;
-    tb_hize_t save = tb_basic_stream_offset(xreader->rstream);
+    tb_hize_t save = tb_stream_offset(xreader->rstream);
     while (!ok && (e = tb_xml_reader_next(reader)))
     {
         switch (e)
@@ -465,7 +465,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
                 tb_static_string_strip(&s, n);
 
                 // restore
-                if (ok) if (!(ok = tb_basic_stream_seek(xreader->rstream, save))) goto end;
+                if (ok) if (!(ok = tb_stream_seek(xreader->rstream, save))) goto end;
             }
             break;
         case TB_XML_READER_EVENT_ELEMENT_BEG: 
@@ -483,7 +483,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
                 // restore
-                if (ok) if (!(ok = tb_basic_stream_seek(xreader->rstream, save))) goto end;
+                if (ok) if (!(ok = tb_stream_seek(xreader->rstream, save))) goto end;
             }
             break;
         case TB_XML_READER_EVENT_ELEMENT_END: 
@@ -497,7 +497,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
                 // restore
-                if (ok) if (!(ok = tb_basic_stream_seek(xreader->rstream, save))) goto end;
+                if (ok) if (!(ok = tb_stream_seek(xreader->rstream, save))) goto end;
             }
             break;
         default:
@@ -505,13 +505,13 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
         }
 
         // save
-        save = tb_basic_stream_offset(xreader->rstream);
+        save = tb_stream_offset(xreader->rstream);
     }
 
 end:
     tb_static_string_exit(&s);
     xreader->level = 0;
-    if (!ok) tb_basic_stream_seek(xreader->rstream, 0);
+    if (!ok) tb_stream_seek(xreader->rstream, 0);
     return ok;
 }
 tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)

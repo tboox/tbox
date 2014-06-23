@@ -49,13 +49,13 @@ static tb_bool_t tb_object_xplist_writer_func_date(tb_object_xplist_writer_t* wr
     {
         // writ beg
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<date>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<date>") < 0) return tb_false;
 
         // writ date
         tb_tm_t date = {0};
         if (tb_localtime(time, &date))
         {
-            if (tb_basic_stream_printf(writer->stream,  "%04ld-%02ld-%02ldT%02ld:%02ld:%02ldZ"
+            if (tb_stream_printf(writer->stream,  "%04ld-%02ld-%02ldT%02ld:%02ld:%02ldZ"
                                 ,   date.year
                                 ,   date.month
                                 ,   date.mday
@@ -65,14 +65,14 @@ static tb_bool_t tb_object_xplist_writer_func_date(tb_object_xplist_writer_t* wr
         }
                     
         // writ end
-        if (tb_basic_stream_printf(writer->stream, "</date>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "</date>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
         // writ
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<date/>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<date/>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
 
@@ -89,7 +89,7 @@ static tb_bool_t tb_object_xplist_writer_func_data(tb_object_xplist_writer_t* wr
     {
         // writ beg
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<data>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<data>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         // decode base64 data
@@ -112,7 +112,7 @@ static tb_bool_t tb_object_xplist_writer_func_data(tb_object_xplist_writer_t* wr
                 if (n) if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
                 if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
             }
-            if (tb_basic_stream_printf(writer->stream, "%c", *p) < 0) return tb_false;
+            if (tb_stream_printf(writer->stream, "%c", *p) < 0) return tb_false;
         }
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
@@ -121,18 +121,18 @@ static tb_bool_t tb_object_xplist_writer_func_data(tb_object_xplist_writer_t* wr
                     
         // writ end
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "</data>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "</data>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
         // writ
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<data>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<data>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "</data>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "</data>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
 
@@ -149,7 +149,7 @@ static tb_bool_t tb_object_xplist_writer_func_array(tb_object_xplist_writer_t* w
     {
         // writ beg
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<array>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<array>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         // walk
@@ -169,13 +169,13 @@ static tb_bool_t tb_object_xplist_writer_func_array(tb_object_xplist_writer_t* w
 
         // writ end
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "</array>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "</array>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<array/>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<array/>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
 
@@ -191,9 +191,9 @@ static tb_bool_t tb_object_xplist_writer_func_string(tb_object_xplist_writer_t* 
     if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
     if (tb_object_string_size(object))
     {
-        if (tb_basic_stream_printf(writer->stream, "<string>%s</string>", tb_object_string_cstr(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<string>%s</string>", tb_object_string_cstr(object)) < 0) return tb_false;
     }
-    else if (tb_basic_stream_printf(writer->stream, "<string/>") < 0) return tb_false;
+    else if (tb_stream_printf(writer->stream, "<string/>") < 0) return tb_false;
     if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
     // ok
@@ -209,53 +209,53 @@ static tb_bool_t tb_object_xplist_writer_func_number(tb_object_xplist_writer_t* 
     {
     case TB_NUMBER_TYPE_UINT64:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%llu</integer>", tb_object_number_uint64(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%llu</integer>", tb_object_number_uint64(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT64:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%lld</integer>", tb_object_number_sint64(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%lld</integer>", tb_object_number_sint64(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT32:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%u</integer>", tb_object_number_uint32(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%u</integer>", tb_object_number_uint32(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT32:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%d</integer>", tb_object_number_sint32(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%d</integer>", tb_object_number_sint32(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT16:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%u</integer>", tb_object_number_uint16(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%u</integer>", tb_object_number_uint16(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT16:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%d</integer>", tb_object_number_sint16(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%d</integer>", tb_object_number_sint16(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT8:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%u</integer>", tb_object_number_uint8(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%u</integer>", tb_object_number_uint8(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT8:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<integer>%d</integer>", tb_object_number_sint8(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<integer>%d</integer>", tb_object_number_sint8(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
 #ifdef TB_CONFIG_TYPE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<real>%f</real>", tb_object_number_float(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<real>%f</real>", tb_object_number_float(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
     case TB_NUMBER_TYPE_DOUBLE:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<real>%lf</real>", tb_object_number_double(object)) < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<real>%lf</real>", tb_object_number_double(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
 #endif
@@ -273,7 +273,7 @@ static tb_bool_t tb_object_xplist_writer_func_boolean(tb_object_xplist_writer_t*
 
     // writ
     if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-    if (tb_basic_stream_printf(writer->stream, "<%s/>", tb_object_boolean_bool(object)? "true" : "false") < 0) return tb_false;
+    if (tb_stream_printf(writer->stream, "<%s/>", tb_object_boolean_bool(object)? "true" : "false") < 0) return tb_false;
     if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
     // ok
@@ -289,7 +289,7 @@ static tb_bool_t tb_object_xplist_writer_func_dictionary(tb_object_xplist_writer
     {
         // writ beg
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<dict>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<dict>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         // walk
@@ -304,7 +304,7 @@ static tb_bool_t tb_object_xplist_writer_func_dictionary(tb_object_xplist_writer
 
                 // writ key
                 tb_object_writer_tab(writer->stream, writer->deflate, level + 1);
-                if (tb_basic_stream_printf(writer->stream, "<key>%s</key>", item->key) < 0) return tb_false;
+                if (tb_stream_printf(writer->stream, "<key>%s</key>", item->key) < 0) return tb_false;
                 if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
                 // writ val
@@ -314,20 +314,20 @@ static tb_bool_t tb_object_xplist_writer_func_dictionary(tb_object_xplist_writer
 
         // writ end
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "</dict>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "</dict>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
-        if (tb_basic_stream_printf(writer->stream, "<dict/>") < 0) return tb_false;
+        if (tb_stream_printf(writer->stream, "<dict/>") < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
 
     // ok
     return tb_true;
 }
-static tb_long_t tb_object_xplist_writer_done(tb_basic_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
+static tb_long_t tb_object_xplist_writer_done(tb_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
@@ -342,28 +342,28 @@ static tb_long_t tb_object_xplist_writer_done(tb_basic_stream_t* stream, tb_obje
     tb_assert_and_check_return_val(func, -1);
 
     // the begin offset
-    tb_hize_t bof = tb_basic_stream_offset(stream);
+    tb_hize_t bof = tb_stream_offset(stream);
 
     // writ xplist header
-    if (tb_basic_stream_printf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>") < 0) return -1;
+    if (tb_stream_printf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>") < 0) return -1;
     if (!tb_object_writer_newline(stream, deflate)) return -1;
-    if (tb_basic_stream_printf(stream, "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">") < 0) return -1;
+    if (tb_stream_printf(stream, "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">") < 0) return -1;
     if (!tb_object_writer_newline(stream, deflate)) return -1;
-    if (tb_basic_stream_printf(stream, "<plist version=\"1.0\">") < 0) return -1;
+    if (tb_stream_printf(stream, "<plist version=\"1.0\">") < 0) return -1;
     if (!tb_object_writer_newline(stream, deflate)) return -1;
 
     // writ
     if (!func(&writer, object, 0)) return -1;
 
     // writ xplist end
-    if (tb_basic_stream_printf(stream, "</plist>") < 0) return -1;
+    if (tb_stream_printf(stream, "</plist>") < 0) return -1;
     if (!tb_object_writer_newline(stream, deflate)) return -1;
 
     // sync
-    if (!tb_basic_stream_sync(stream, tb_true)) return -1;
+    if (!tb_stream_sync(stream, tb_true)) return -1;
 
     // the end offset
-    tb_hize_t eof = tb_basic_stream_offset(stream);
+    tb_hize_t eof = tb_stream_offset(stream);
 
     // ok?
     return eof >= bof? (tb_long_t)(eof - bof) : -1;

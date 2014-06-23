@@ -42,7 +42,7 @@ __tb_extern_c_enter__
 typedef struct __tb_object_bin_reader_t
 {
     /// the stream
-    tb_basic_stream_t*              stream;
+    tb_stream_t*              stream;
 
     /// the object list
     tb_vector_t*                list;

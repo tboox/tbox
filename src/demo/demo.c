@@ -105,15 +105,15 @@ static tb_demo_t g_demo[] =
 
     // stream
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream)
+,   TB_DEMO_MAIN_ITEM(stream_stream)
 #endif
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_null)
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_cache)
+,   TB_DEMO_MAIN_ITEM(stream_stream_null)
+,   TB_DEMO_MAIN_ITEM(stream_stream_cache)
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_charset)
+,   TB_DEMO_MAIN_ITEM(stream_stream_charset)
 #endif
 #ifdef TB_CONFIG_MODULE_HAVE_ZIP
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_zip)
+,   TB_DEMO_MAIN_ITEM(stream_stream_zip)
 #endif
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
 ,   TB_DEMO_MAIN_ITEM(stream_transfer_pool)
@@ -272,11 +272,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
         tb_trace_i("help: or");
         tb_trace_i("help: ./demo.b name args ...");
         tb_trace_i("help: ");
-        tb_trace_i("help: example: echo \"stream_basic_stream\" > ./.demo");
+        tb_trace_i("help: example: echo \"stream_stream\" > ./.demo");
         tb_trace_i("help: example:     ./demo.b --help");
         tb_trace_i("help: example:     ./demo.b http://www.xxxxx.com /tmp/a");
         tb_trace_i("help: example: or");
-        tb_trace_i("help: example: ./demo.b stream_basic_stream http://www.xxxxx.com /tmp/a");
+        tb_trace_i("help: example: ./demo.b stream_stream http://www.xxxxx.com /tmp/a");
         tb_trace_i("help: ");
 
         // walk name

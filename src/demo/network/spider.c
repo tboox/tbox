@@ -106,34 +106,34 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 #if defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
     && defined(TB_CONFIG_MODULE_HAVE_ASIO) \
     && defined(TB_CONFIG_MODULE_HAVE_XML)
-static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
+static tb_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_basic_stream_t*  stream = tb_null;
+    tb_stream_t*  stream = tb_null;
     do
     {
         // the file path contains /html/?
         if (!tb_strstr(url, "html")) break;
 
         // init stream
-        stream = tb_basic_stream_init_from_url(url);
+        stream = tb_stream_init_from_url(url);
         tb_assert_and_check_break(stream);
 
         // open stream
-        if (!tb_basic_stream_open(stream)) break;
+        if (!tb_stream_open(stream)) break;
 
         // the stream size
-        tb_hong_t size = tb_basic_stream_size(stream);
+        tb_hong_t size = tb_stream_size(stream);
         tb_check_break(size);
 
         // prefetch some data
         tb_byte_t*  data = tb_null;
         tb_size_t   need = tb_min((tb_size_t)size, 256);
-        if (!tb_basic_stream_need(stream, &data, need)) break;
+        if (!tb_stream_need(stream, &data, need)) break;
 
         // is html?
         if (tb_strnistr((tb_char_t const*)data, need, "<!DOCTYPE html>"))
@@ -151,7 +151,7 @@ static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
     if (!ok) 
     {
         // exit stream
-        if (stream) tb_basic_stream_exit(stream);
+        if (stream) tb_stream_exit(stream);
         stream = tb_null;
     }
 
@@ -245,7 +245,7 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
     tb_assert_and_check_return(task && task->spider);
 
     // init stream
-    tb_basic_stream_t* stream = tb_demo_spider_parser_open_html(task->ourl);
+    tb_stream_t* stream = tb_demo_spider_parser_open_html(task->ourl);
     if (stream)
     {
         // init reader
@@ -274,7 +274,7 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
         }
 
         // exit stream
-        tb_basic_stream_exit(stream);
+        tb_stream_exit(stream);
     }
 }
 static tb_void_t tb_demo_spider_parser_exit(tb_cpointer_t priv)

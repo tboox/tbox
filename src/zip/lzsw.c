@@ -303,9 +303,9 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inflate
  */
-static tb_static_stream_t* tb_basic_stream_filter_zip_inflate_lzsw_transform(tb_basic_stream_filter_t* st)
+static tb_static_stream_t* tb_stream_filter_zip_inflate_lzsw_transform(tb_stream_filter_t* st)
 {
-    tb_lzsw_inflate_basic_stream_filter_zip_t* zst = (tb_lzsw_inflate_basic_stream_filter_zip_t*)st;
+    tb_lzsw_inflate_stream_filter_zip_t* zst = (tb_lzsw_inflate_stream_filter_zip_t*)st;
     tb_assert(zst);
     if (!zst) return tb_null;
 
@@ -317,14 +317,14 @@ static tb_static_stream_t* tb_basic_stream_filter_zip_inflate_lzsw_transform(tb_
     if (!dp || !de) return tb_null;
 
     // get src
-    tb_static_stream_t* src = tb_basic_stream_filter_src(st);
+    tb_static_stream_t* src = tb_stream_filter_src(st);
 
     // get vlc
-    tb_basic_stream_filter_zip_vlc_t* vlc = zst->vlc;
+    tb_stream_filter_zip_vlc_t* vlc = zst->vlc;
     tb_assert(vlc && vlc->get);
 
     // vlc callback
-    tb_basic_stream_filter_zip_vlc_get_t vlc_get = vlc->get;
+    tb_stream_filter_zip_vlc_get_t vlc_get = vlc->get;
 
     // init window
     tb_lzsw_inflate_window_t* window = &zst->window;
@@ -391,26 +391,26 @@ static tb_static_stream_t* tb_basic_stream_filter_zip_inflate_lzsw_transform(tb_
 
     // update position
     st->dst.p = dp;
-    return tb_basic_stream_filter_dst(st);
+    return tb_stream_filter_dst(st);
 }
-static tb_void_t tb_basic_stream_filter_zip_inflate_lzsw_clos(tb_basic_stream_filter_t* st)
+static tb_void_t tb_stream_filter_zip_inflate_lzsw_clos(tb_stream_filter_t* st)
 {
-    tb_lzsw_inflate_basic_stream_filter_zip_t* zst = (tb_lzsw_inflate_basic_stream_filter_zip_t*)st;
+    tb_lzsw_inflate_stream_filter_zip_t* zst = (tb_lzsw_inflate_stream_filter_zip_t*)st;
     if (zst) 
     {
         // close vlc
         if (zst->vlc && zst->vlc->clos) zst->vlc->clos(zst->vlc); 
 
         // reset it
-        tb_memset(zst, 0, sizeof(tb_lzsw_inflate_basic_stream_filter_zip_t));
+        tb_memset(zst, 0, sizeof(tb_lzsw_inflate_stream_filter_zip_t));
     }
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * deflate
  */
-static tb_static_stream_t* tb_basic_stream_filter_zip_deflate_lzsw_transform(tb_basic_stream_filter_t* st)
+static tb_static_stream_t* tb_stream_filter_zip_deflate_lzsw_transform(tb_stream_filter_t* st)
 {
-    tb_lzsw_deflate_basic_stream_filter_zip_t* zst = (tb_lzsw_deflate_basic_stream_filter_zip_t*)st;
+    tb_lzsw_deflate_stream_filter_zip_t* zst = (tb_lzsw_deflate_stream_filter_zip_t*)st;
     tb_assert(zst);
     if (!zst) return tb_null;
 
@@ -422,14 +422,14 @@ static tb_static_stream_t* tb_basic_stream_filter_zip_deflate_lzsw_transform(tb_
     if (!sp || !se) return tb_null;
 
     // get dst
-    tb_static_stream_t* dst = tb_basic_stream_filter_dst(st);
+    tb_static_stream_t* dst = tb_stream_filter_dst(st);
 
     // get vlc
-    tb_basic_stream_filter_zip_vlc_t* vlc = zst->vlc;
+    tb_stream_filter_zip_vlc_t* vlc = zst->vlc;
     tb_assert(vlc && vlc->set);
 
     // vlc callback
-    tb_basic_stream_filter_zip_vlc_set_t vlc_set = vlc->set;
+    tb_stream_filter_zip_vlc_set_t vlc_set = vlc->set;
 
     // init window
     tb_lzsw_deflate_window_t* window = &zst->window;
@@ -511,9 +511,9 @@ static tb_static_stream_t* tb_basic_stream_filter_zip_deflate_lzsw_transform(tb_
     st->src.p = sp;
     return dst;
 }
-static tb_void_t tb_basic_stream_filter_zip_deflate_lzsw_clos(tb_basic_stream_filter_t* st)
+static tb_void_t tb_stream_filter_zip_deflate_lzsw_clos(tb_stream_filter_t* st)
 {
-    tb_lzsw_deflate_basic_stream_filter_zip_t* zst = (tb_lzsw_deflate_basic_stream_filter_zip_t*)st;
+    tb_lzsw_deflate_stream_filter_zip_t* zst = (tb_lzsw_deflate_stream_filter_zip_t*)st;
     if (zst) 
     {
         // close vlc
@@ -525,7 +525,7 @@ static tb_void_t tb_basic_stream_filter_zip_deflate_lzsw_clos(tb_basic_stream_fi
 #endif
 
         // reset it
-        tb_memset(zst, 0, sizeof(tb_lzsw_deflate_basic_stream_filter_zip_t));
+        tb_memset(zst, 0, sizeof(tb_lzsw_deflate_stream_filter_zip_t));
     }
 }
 
@@ -533,59 +533,59 @@ static tb_void_t tb_basic_stream_filter_zip_deflate_lzsw_clos(tb_basic_stream_fi
  * interfaces
  */
 
-tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_basic_stream_filter_zip_t* zst)
+tb_stream_filter_t* tb_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_stream_filter_zip_t* zst)
 {
     tb_assert(zst);
     if (!zst) return tb_null;
 
     // init 
-    tb_memset(zst, 0, sizeof(tb_lzsw_inflate_basic_stream_filter_zip_t));
+    tb_memset(zst, 0, sizeof(tb_lzsw_inflate_stream_filter_zip_t));
 
     // init filter
-    ((tb_basic_stream_filter_t*)zst)->transform     = tb_basic_stream_filter_zip_inflate_lzsw_transform;
-    ((tb_basic_stream_filter_t*)zst)->clos      = tb_basic_stream_filter_zip_inflate_lzsw_clos;
+    ((tb_stream_filter_t*)zst)->transform     = tb_stream_filter_zip_inflate_lzsw_transform;
+    ((tb_stream_filter_t*)zst)->clos      = tb_stream_filter_zip_inflate_lzsw_clos;
 
     // init zstream
-    ((tb_basic_stream_filter_zip_t*)zst)->algo      = TB_ZSTREAM_ALGO_LZSW;
-    ((tb_basic_stream_filter_zip_t*)zst)->action    = TB_ZSTREAM_ACTION_INFLATE;
+    ((tb_stream_filter_zip_t*)zst)->algo      = TB_ZSTREAM_ALGO_LZSW;
+    ((tb_stream_filter_zip_t*)zst)->action    = TB_ZSTREAM_ACTION_INFLATE;
 
     // open vlc
 #if TB_LZSW_VLC_TYPE_GOLOMB
-    zst->vlc = tb_basic_stream_filter_zip_vlc_golomb_open(&(((tb_basic_stream_filter_zip_t*)zst)->vlc), 4);
+    zst->vlc = tb_stream_filter_zip_vlc_golomb_open(&(((tb_stream_filter_zip_t*)zst)->vlc), 4);
 #elif TB_LZSW_VLC_TYPE_GAMMA
-    zst->vlc = tb_basic_stream_filter_zip_vlc_gamma_open(&(((tb_basic_stream_filter_zip_t*)zst)->vlc));
+    zst->vlc = tb_stream_filter_zip_vlc_gamma_open(&(((tb_stream_filter_zip_t*)zst)->vlc));
 #else
-    zst->vlc = tb_basic_stream_filter_zip_vlc_fixed_open(&(((tb_basic_stream_filter_zip_t*)zst)->vlc), 16);
+    zst->vlc = tb_stream_filter_zip_vlc_fixed_open(&(((tb_stream_filter_zip_t*)zst)->vlc), 16);
 #endif
 
     // init window
     zst->window.mb = TB_MATH_ICLOG2I(TB_LZSW_WINDOW_SIZE_MAX);
 
-    return ((tb_basic_stream_filter_t*)zst);
+    return ((tb_stream_filter_t*)zst);
 }
-tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_basic_stream_filter_zip_t* zst)
+tb_stream_filter_t* tb_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_stream_filter_zip_t* zst)
 {
     tb_assert(zst);
     if (!zst) return tb_null;
 
     // init 
-    tb_memset(zst, 0, sizeof(tb_lzsw_deflate_basic_stream_filter_zip_t));
+    tb_memset(zst, 0, sizeof(tb_lzsw_deflate_stream_filter_zip_t));
 
     // init filter
-    ((tb_basic_stream_filter_t*)zst)->transform = tb_basic_stream_filter_zip_deflate_lzsw_transform;
-    ((tb_basic_stream_filter_t*)zst)->clos  = tb_basic_stream_filter_zip_deflate_lzsw_clos;
+    ((tb_stream_filter_t*)zst)->transform = tb_stream_filter_zip_deflate_lzsw_transform;
+    ((tb_stream_filter_t*)zst)->clos  = tb_stream_filter_zip_deflate_lzsw_clos;
 
     // init zstream
-    ((tb_basic_stream_filter_zip_t*)zst)->algo      = TB_ZSTREAM_ALGO_LZSW;
-    ((tb_basic_stream_filter_zip_t*)zst)->action    = TB_ZSTREAM_ACTION_DEFLATE;
+    ((tb_stream_filter_zip_t*)zst)->algo      = TB_ZSTREAM_ALGO_LZSW;
+    ((tb_stream_filter_zip_t*)zst)->action    = TB_ZSTREAM_ACTION_DEFLATE;
 
     // open vlc
 #if TB_LZSW_VLC_TYPE_GOLOMB
-    zst->vlc = tb_basic_stream_filter_zip_vlc_golomb_open(&(((tb_basic_stream_filter_zip_t*)zst)->vlc), 4);
+    zst->vlc = tb_stream_filter_zip_vlc_golomb_open(&(((tb_stream_filter_zip_t*)zst)->vlc), 4);
 #elif TB_LZSW_VLC_TYPE_GAMMA
-    zst->vlc = tb_basic_stream_filter_zip_vlc_gamma_open(&(((tb_basic_stream_filter_zip_t*)zst)->vlc));
+    zst->vlc = tb_stream_filter_zip_vlc_gamma_open(&(((tb_stream_filter_zip_t*)zst)->vlc));
 #else
-    zst->vlc = tb_basic_stream_filter_zip_vlc_fixed_open(&(((tb_basic_stream_filter_zip_t*)zst)->vlc), 16);
+    zst->vlc = tb_stream_filter_zip_vlc_fixed_open(&(((tb_stream_filter_zip_t*)zst)->vlc), 16);
 #endif
 
     // init window
@@ -594,14 +594,14 @@ tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_d
     zst->window.pool = tb_pool_init(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0, tb_null, tb_null);
 #endif
 
-    return ((tb_basic_stream_filter_t*)zst);
+    return ((tb_stream_filter_t*)zst);
 }
 
-tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw(tb_lzsw_basic_stream_filter_zip_t* zst, tb_size_t action)
+tb_stream_filter_t* tb_stream_filter_zip_open_lzsw(tb_lzsw_stream_filter_zip_t* zst, tb_size_t action)
 {
     if (action == TB_ZSTREAM_ACTION_INFLATE)
-        return tb_basic_stream_filter_zip_open_lzsw_inflate((tb_lzsw_inflate_basic_stream_filter_zip_t*)zst);
+        return tb_stream_filter_zip_open_lzsw_inflate((tb_lzsw_inflate_stream_filter_zip_t*)zst);
     else if (action == TB_ZSTREAM_ACTION_DEFLATE)
-        return tb_basic_stream_filter_zip_open_lzsw_deflate((tb_lzsw_deflate_basic_stream_filter_zip_t*)zst);
+        return tb_stream_filter_zip_open_lzsw_deflate((tb_lzsw_deflate_stream_filter_zip_t*)zst);
     else return tb_null;
 }

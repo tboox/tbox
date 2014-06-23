@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../stream/basic_stream.h"
+#include "../stream/stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -99,7 +99,7 @@ typedef struct __tb_object_database_sql_value_t
             tb_size_t           size;
 
             // the stream for blob32
-            tb_basic_stream_t*  stream;
+            tb_stream_t*  stream;
 
         }                       blob;
 
@@ -319,7 +319,7 @@ tb_void_t           tb_object_database_sql_value_set_blob16(tb_object_database_s
  * @param size      the blob size
  * @param stream    the stream, using it if data == null
  */
-tb_void_t           tb_object_database_sql_value_set_blob32(tb_object_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_basic_stream_t* stream);
+tb_void_t           tb_object_database_sql_value_set_blob32(tb_object_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_stream_t* stream);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
@@ -436,7 +436,7 @@ static __tb_inline_force__ tb_byte_t const* tb_object_database_sql_value_blob(tb
 }
 
 /// the value blob stream
-static __tb_inline_force__ tb_basic_stream_t* tb_object_database_sql_value_blob_stream(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_stream_t* tb_object_database_sql_value_blob_stream(tb_object_database_sql_value_t const* value)
 {
     // the blob stream
     return tb_object_database_sql_value_is_blob(value)? value->u.blob.stream : tb_null;

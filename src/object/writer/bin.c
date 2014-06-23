@@ -97,7 +97,7 @@ static tb_bool_t tb_object_bin_writer_func_data(tb_object_bin_writer_t* writer, 
     for (; pb < pe && qb < qe; pb++, qb++, xb++) *qb = *pb ^ xb;
 
     // writ it
-    return tb_basic_stream_bwrit(writer->stream, writer->data, size);
+    return tb_stream_bwrit(writer->stream, writer->data, size);
 }
 static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
@@ -180,7 +180,7 @@ static tb_bool_t tb_object_bin_writer_func_string(tb_object_bin_writer_t* writer
     for (; pb < pe && qb < qe && *pb; pb++, qb++, xb++) *qb = *pb ^ xb;
 
     // writ it
-    return tb_basic_stream_bwrit(writer->stream, writer->data, size);
+    return tb_stream_bwrit(writer->stream, writer->data, size);
 }
 static tb_bool_t tb_object_bin_writer_func_number(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
@@ -194,42 +194,42 @@ static tb_bool_t tb_object_bin_writer_func_number(tb_object_bin_writer_t* writer
     switch (tb_object_number_type(object))
     {
     case TB_NUMBER_TYPE_UINT64:
-        if (!tb_basic_stream_bwrit_u64_be(writer->stream, tb_object_number_uint64(object))) return tb_false;
+        if (!tb_stream_bwrit_u64_be(writer->stream, tb_object_number_uint64(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT64:
-        if (!tb_basic_stream_bwrit_s64_be(writer->stream, tb_object_number_sint64(object))) return tb_false;
+        if (!tb_stream_bwrit_s64_be(writer->stream, tb_object_number_sint64(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT32:
-        if (!tb_basic_stream_bwrit_u32_be(writer->stream, tb_object_number_uint32(object))) return tb_false;
+        if (!tb_stream_bwrit_u32_be(writer->stream, tb_object_number_uint32(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT32:
-        if (!tb_basic_stream_bwrit_s32_be(writer->stream, tb_object_number_sint32(object))) return tb_false;
+        if (!tb_stream_bwrit_s32_be(writer->stream, tb_object_number_sint32(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT16:
-        if (!tb_basic_stream_bwrit_u16_be(writer->stream, tb_object_number_uint16(object))) return tb_false;
+        if (!tb_stream_bwrit_u16_be(writer->stream, tb_object_number_uint16(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT16:
-        if (!tb_basic_stream_bwrit_s16_be(writer->stream, tb_object_number_sint16(object))) return tb_false;
+        if (!tb_stream_bwrit_s16_be(writer->stream, tb_object_number_sint16(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT8:
-        if (!tb_basic_stream_bwrit_u8(writer->stream, tb_object_number_uint8(object))) return tb_false;
+        if (!tb_stream_bwrit_u8(writer->stream, tb_object_number_uint8(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT8:
-        if (!tb_basic_stream_bwrit_s8(writer->stream, tb_object_number_sint8(object))) return tb_false;
+        if (!tb_stream_bwrit_s8(writer->stream, tb_object_number_sint8(object))) return tb_false;
         break;
 #ifdef TB_CONFIG_TYPE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         {
             tb_byte_t data[4];
             tb_bits_set_float_be(data, tb_object_number_float(object));
-            if (!tb_basic_stream_bwrit(writer->stream, data, 4)) return tb_false;
+            if (!tb_stream_bwrit(writer->stream, data, 4)) return tb_false;
         }
         break;
     case TB_NUMBER_TYPE_DOUBLE:
         {
             tb_byte_t data[8];
             tb_bits_set_double_bbe(data, tb_object_number_double(object));
-            if (!tb_basic_stream_bwrit(writer->stream, data, 8)) return tb_false;
+            if (!tb_stream_bwrit(writer->stream, data, 8)) return tb_false;
         }
         break;
 #endif
@@ -325,7 +325,7 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
     // ok
     return tb_true;
 }
-static tb_long_t tb_object_bin_writer_done(tb_basic_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
+static tb_long_t tb_object_bin_writer_done(tb_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
@@ -335,10 +335,10 @@ static tb_long_t tb_object_bin_writer_done(tb_basic_stream_t* stream, tb_object_
     tb_assert_and_check_return_val(func, -1);
 
     // the begin offset
-    tb_hize_t bof = tb_basic_stream_offset(stream);
+    tb_hize_t bof = tb_stream_offset(stream);
 
     // writ bin header
-    if (!tb_basic_stream_bwrit(stream, (tb_byte_t const*)"tbo00", 5)) return -1;
+    if (!tb_stream_bwrit(stream, (tb_byte_t const*)"tbo00", 5)) return -1;
 
     // done
     tb_object_bin_writer_t writer = {0};
@@ -354,7 +354,7 @@ static tb_long_t tb_object_bin_writer_done(tb_basic_stream_t* stream, tb_object_
         if (!func(&writer, object)) break;
 
         // sync
-        if (!tb_basic_stream_sync(stream, tb_true)) break;
+        if (!tb_stream_sync(stream, tb_true)) break;
 
     } while (0);
 
@@ -366,7 +366,7 @@ static tb_long_t tb_object_bin_writer_done(tb_basic_stream_t* stream, tb_object_
     if (writer.data) tb_free(writer.data);
 
     // the end offset
-    tb_hize_t eof = tb_basic_stream_offset(stream);
+    tb_hize_t eof = tb_stream_offset(stream);
 
     // ok?
     return eof >= bof? (tb_long_t)(eof - bof) : -1;

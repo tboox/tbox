@@ -75,12 +75,12 @@ tbox_C_FILES 			+= \
 						asio/aioo \
 						asio/aiop \
 						stream/static_stream \
-						stream/basic_stream \
-						stream/basic_stream/http \
-						stream/basic_stream/file \
-						stream/basic_stream/data \
-						stream/basic_stream/sock \
-						stream/basic_stream/filter \
+						stream/stream \
+						stream/stream/http \
+						stream/stream/file \
+						stream/stream/data \
+						stream/stream/sock \
+						stream/stream/filter \
 						stream/transfer \
 						stream/filter/filter \
 						stream/filter/cache \
@@ -589,7 +589,7 @@ INC_FILES 				= \
 						charset/prefix.h \
 						stream/prefix.h \
 						stream/stream.h \
-						stream/basic_stream.h \
+						stream/stream.h \
 						stream/async_stream.h \
 						stream/static_stream.h \
 						stream/transfer_pool.h \

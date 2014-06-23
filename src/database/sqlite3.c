@@ -701,7 +701,7 @@ static tb_bool_t tb_object_database_sqlite3_statement_bind(tb_object_database_sq
                     do
                     {
                         // the stream size
-                        tb_hong_t size = tb_basic_stream_size(value->u.blob.stream);
+                        tb_hong_t size = tb_stream_size(value->u.blob.stream);
                         tb_assert_and_check_break(size >= 0);
 
                         // make data
@@ -709,7 +709,7 @@ static tb_bool_t tb_object_database_sqlite3_statement_bind(tb_object_database_sq
                         tb_assert_and_check_break(data);
 
                         // read data
-                        if (!tb_basic_stream_bread(value->u.blob.stream, data, size)) break;
+                        if (!tb_stream_bread(value->u.blob.stream, data, size)) break;
 
                         // bind it
                         ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), data, (tb_int_t)size, tb_object_database_sqlite3_statement_bind_exit);
@@ -763,7 +763,7 @@ tb_size_t tb_object_database_sqlite3_probe(tb_url_t const* url)
 
     // done
     tb_size_t           score = 0;
-    tb_basic_stream_t*  stream = tb_null;
+    tb_stream_t*  stream = tb_null;
     do
     {
         // the url arguments
@@ -791,15 +791,15 @@ tb_size_t tb_object_database_sqlite3_probe(tb_url_t const* url)
         if (tb_url_protocol_get(url) == TB_URL_PROTOCOL_FILE) score += 20;
 
         // init stream
-        stream = tb_basic_stream_init_from_url(path);
+        stream = tb_stream_init_from_url(path);
         tb_assert_and_check_break(stream);
 
         // open stream
-        if (!tb_basic_stream_open(stream)) break;
+        if (!tb_stream_open(stream)) break;
 
         // read head
         tb_char_t head[16] = {0};
-        if (!tb_basic_stream_bread(stream, (tb_byte_t*)head, sizeof(head))) break;
+        if (!tb_stream_bread(stream, (tb_byte_t*)head, sizeof(head))) break;
 
         // is sqlite3?
         if (!tb_stricmp(head, "SQLite format 3")) score = 100;
@@ -807,7 +807,7 @@ tb_size_t tb_object_database_sqlite3_probe(tb_url_t const* url)
     } while (0);
 
     // exit stream
-    if (stream) tb_basic_stream_exit(stream);
+    if (stream) tb_stream_exit(stream);
     stream = tb_null;
 
     // trace
