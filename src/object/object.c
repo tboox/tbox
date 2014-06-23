@@ -124,13 +124,13 @@ tb_void_t tb_object_setp(tb_object_t* object, tb_cpointer_t priv)
 tb_cpointer_t tb_object_getp(tb_object_t* object)
 {
     // check
-    tb_assert_and_check_return_val(object, tb_null);
+    tb_assert_and_check_return_val(object, tb_object_null);
     return object->priv;
 }
 tb_object_t* tb_object_copy(tb_object_t* object)
 {
     // check
-    tb_assert_and_check_return_val(object && object->copy, tb_null);
+    tb_assert_and_check_return_val(object && object->copy, tb_object_null);
 
     // copy
     return object->copy(object);
@@ -143,12 +143,12 @@ tb_size_t tb_object_type(tb_object_t* object)
 tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 {   
     // check
-    tb_assert_and_check_return_val(object, tb_null);
+    tb_assert_and_check_return_val(object, tb_object_null);
 
     // done
-    tb_object_t*    odata = tb_null;
+    tb_object_t*    odata = tb_object_null;
     tb_size_t       maxn = 4096;
-    tb_byte_t*      data = tb_null;
+    tb_byte_t*      data = tb_object_null;
     do
     {
         // make data
@@ -159,7 +159,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
         tb_long_t size = tb_object_writ_to_data(object, data, maxn, format);
     
         // ok? make the data object
-        if (size >= 0) odata = tb_data_init_from_data(data, size);
+        if (size >= 0) odata = tb_object_data_init_from_data(data, size);
         // failed? grow it
         else maxn <<= 1;
 
@@ -167,7 +167,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 
     // exit data
     if (data) tb_free(data);
-    data = tb_null;
+    data = tb_object_null;
 
     // ok?
     return odata;
@@ -175,7 +175,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_t type)
 {
     // check
-    tb_assert_and_check_return_val(object, tb_null);
+    tb_assert_and_check_return_val(object, tb_object_null);
 
     // null?
     tb_check_return_val(path, object);
@@ -191,7 +191,7 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
         case '.':
             {
                 // check
-                tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_DICTIONARY, tb_null);
+                tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_DICTIONARY, tb_object_null);
 
                 // skip
                 p++;
@@ -210,13 +210,13 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
                 tb_trace_d("key: %s", key);
             
                 // the value
-                object = tb_dictionary_val(object, key);
+                object = tb_object_dictionary_val(object, key);
             }
             break;
         case '[':
             {
                 // check
-                tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_ARRAY, tb_null);
+                tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_ARRAY, tb_object_null);
 
                 // skip
                 p++;
@@ -232,10 +232,10 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
 
                 // check
                 tb_size_t i = tb_atoi(index);
-                tb_assert_and_check_return_val(i < tb_array_size(object), tb_null);
+                tb_assert_and_check_return_val(i < tb_object_array_size(object), tb_object_null);
 
                 // the value
-                object = tb_array_item(object, i);
+                object = tb_object_array_item(object, i);
             }
             break;
         case ']':
@@ -249,7 +249,7 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
     if (object && type != TB_OBJECT_TYPE_NONE) 
     {
         // is this type?
-        if (tb_object_type(object) != type) return tb_null;
+        if (tb_object_type(object) != type) return tb_object_null;
     }
 
     // ok?
@@ -258,15 +258,15 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
 tb_object_t* tb_object_dump(tb_object_t* object)
 {
     // check
-    tb_assert_and_check_return_val(object, tb_null);
+    tb_assert_and_check_return_val(object, tb_object_null);
 
     // data
     tb_object_t* odata = tb_object_data(object, TB_OBJECT_FORMAT_XML);
     if (odata)
     {
         // data & size 
-        tb_byte_t const*    data = (tb_byte_t const*)tb_data_getp(odata);
-        tb_size_t           size = tb_data_size(odata);
+        tb_byte_t const*    data = (tb_byte_t const*)tb_object_data_getp(odata);
+        tb_size_t           size = tb_object_data_size(odata);
         if (data && size)
         {
             tb_char_t const*    p = tb_strstr((tb_char_t const*)data, "?>");
@@ -330,7 +330,7 @@ tb_void_t tb_object_dec(tb_object_t* object)
 tb_object_t* tb_object_read(tb_basic_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_null);
+    tb_assert_and_check_return_val(stream, tb_object_null);
 
     // done reader
     return tb_object_reader_done(stream);
@@ -338,14 +338,14 @@ tb_object_t* tb_object_read(tb_basic_stream_t* stream)
 tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // init
-    tb_object_t* object = tb_null;
+    tb_object_t* object = tb_object_null;
 
     // make stream
     tb_basic_stream_t* stream = tb_basic_stream_init_from_url(url);
-    tb_assert_and_check_return_val(stream, tb_null);
+    tb_assert_and_check_return_val(stream, tb_object_null);
 
     // read object
     if (tb_basic_stream_open(stream)) object = tb_object_read(stream);
@@ -359,14 +359,14 @@ tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(data && size, tb_null);
+    tb_assert_and_check_return_val(data && size, tb_object_null);
 
     // init
-    tb_object_t* object = tb_null;
+    tb_object_t* object = tb_object_null;
 
     // make stream
     tb_basic_stream_t* stream = tb_basic_stream_init_from_data(data, size);
-    tb_assert_and_check_return_val(stream, tb_null);
+    tb_assert_and_check_return_val(stream, tb_object_null);
 
     // read object
     if (tb_basic_stream_open(stream)) object = tb_object_read(stream);

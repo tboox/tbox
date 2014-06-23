@@ -44,7 +44,7 @@ __tb_extern_c_enter__
  *
  * @return          the string object
  */
-tb_object_t*        tb_string_init_from_cstr(tb_char_t const* cstr);
+tb_object_t*        tb_object_string_init_from_cstr(tb_char_t const* cstr);
 
 /*! init string from pstring
  *
@@ -52,7 +52,7 @@ tb_object_t*        tb_string_init_from_cstr(tb_char_t const* cstr);
  *
  * @return          the string object
  */
-tb_object_t*        tb_string_init_from_pstr(tb_scoped_string_t* pstr);
+tb_object_t*        tb_object_string_init_from_pstr(tb_string_t* pstr);
 
 /*! the c-string
  *
@@ -60,7 +60,7 @@ tb_object_t*        tb_string_init_from_pstr(tb_scoped_string_t* pstr);
  *
  * @return          the c-string
  */
-tb_char_t const*    tb_string_cstr(tb_object_t* string);
+tb_char_t const*    tb_object_string_cstr(tb_object_t* string);
 
 /*! set the c-string
  *
@@ -69,7 +69,7 @@ tb_char_t const*    tb_string_cstr(tb_object_t* string);
  *
  * @return          the string size
  */
-tb_size_t           tb_string_cstr_set(tb_object_t* string, tb_char_t const* cstr);
+tb_size_t           tb_object_string_cstr_set(tb_object_t* string, tb_char_t const* cstr);
 
 /*! the string size
  *
@@ -77,7 +77,7 @@ tb_size_t           tb_string_cstr_set(tb_object_t* string, tb_char_t const* cst
  *
  * @return          the string size
  */
-tb_size_t           tb_string_size(tb_object_t* string);
+tb_size_t           tb_object_string_size(tb_object_t* string);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

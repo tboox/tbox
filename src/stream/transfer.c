@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        basic_transfer.c
+ * @file        transfer.c
  * @ingroup     stream
  *
  */
@@ -25,21 +25,21 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME                "basic_transfer"
+#define TB_TRACE_MODULE_NAME                "transfer"
 #define TB_TRACE_MODULE_DEBUG               (1)
  
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "stream.h"
-#include "basic_transfer.h"
+#include "transfer.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_hong_t tb_basic_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ostream && istream, -1); 
@@ -156,14 +156,14 @@ tb_hong_t tb_basic_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* 
     // ok?
     return writ;
 }
-tb_hong_t tb_basic_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(istream && ourl, -1);
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  ostream = tb_null;
+    tb_basic_stream_t*  ostream = tb_object_null;
     do
     {
         // init ostream
@@ -178,25 +178,25 @@ tb_hong_t tb_basic_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_ch
         }
 
         // save stream
-        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
+        size = tb_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_null;
+    ostream = tb_object_null;
 
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_done_stream_to_data(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_stream_to_data(tb_basic_stream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(istream && odata && osize, -1);
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  ostream = tb_null;
+    tb_basic_stream_t*  ostream = tb_object_null;
     do
     {
         // init ostream
@@ -204,26 +204,26 @@ tb_hong_t tb_basic_transfer_done_stream_to_data(tb_basic_stream_t* istream, tb_b
         tb_assert_and_check_break(ostream);
 
         // save stream
-        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
+        size = tb_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_null;
+    ostream = tb_object_null;
 
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iurl && ourl, -1);
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_null;
-    tb_basic_stream_t*  ostream = tb_null;
+    tb_basic_stream_t*  istream = tb_object_null;
+    tb_basic_stream_t*  ostream = tb_object_null;
     do
     {
         // init istream
@@ -248,29 +248,29 @@ tb_hong_t tb_basic_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t con
         if (!tb_basic_stream_open(ostream)) break;
 
         // save stream
-        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
+        size = tb_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_null;
+    istream = tb_object_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_null;
+    ostream = tb_object_null;
 
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_done_url_to_stream(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_url_to_stream(tb_char_t const* iurl, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iurl && ostream, -1);
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_null;
+    tb_basic_stream_t*  istream = tb_object_null;
     do
     {
         // init istream
@@ -278,26 +278,26 @@ tb_hong_t tb_basic_transfer_done_url_to_stream(tb_char_t const* iurl, tb_basic_s
         tb_assert_and_check_break(istream);
 
         // save stream
-        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
+        size = tb_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_null;
+    istream = tb_object_null;
 
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iurl && odata && osize, -1);
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_null;
-    tb_basic_stream_t*  ostream = tb_null;
+    tb_basic_stream_t*  istream = tb_object_null;
+    tb_basic_stream_t*  ostream = tb_object_null;
     do
     {
         // init istream
@@ -309,30 +309,30 @@ tb_hong_t tb_basic_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* o
         tb_assert_and_check_break(ostream);
 
         // save stream
-        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
+        size = tb_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_null;
+    istream = tb_object_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_null;
+    ostream = tb_object_null;
 
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(idata && isize && ourl, -1);
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_null;
-    tb_basic_stream_t*  ostream = tb_null;
+    tb_basic_stream_t*  istream = tb_object_null;
+    tb_basic_stream_t*  ostream = tb_object_null;
     do
     {
         // init istream
@@ -351,29 +351,29 @@ tb_hong_t tb_basic_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t i
         }
 
         // save stream
-        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
+        size = tb_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_null;
+    istream = tb_object_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_null;
+    ostream = tb_object_null;
 
     // ok?
     return size;
 }
-tb_hong_t tb_basic_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_basic_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_t isize, tb_basic_stream_t* ostream, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(idata && isize && ostream, -1);
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_null;
+    tb_basic_stream_t*  istream = tb_object_null;
     do
     {
         // init istream
@@ -381,13 +381,13 @@ tb_hong_t tb_basic_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_
         tb_assert_and_check_break(istream);
 
         // save stream
-        size = tb_basic_transfer_done(istream, ostream, lrate, func, priv);
+        size = tb_transfer_done(istream, ostream, lrate, func, priv);
 
     } while (0);
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_null;
+    istream = tb_object_null;
 
     // ok?
     return size;

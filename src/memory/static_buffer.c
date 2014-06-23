@@ -60,7 +60,7 @@ tb_void_t tb_static_buffer_exit(tb_static_buffer_t* buffer)
     // exit it
     if (buffer)
     {
-        buffer->data = tb_null;
+        buffer->data = tb_object_null;
         buffer->size = 0;
         buffer->maxn = 0;
     }
@@ -68,7 +68,7 @@ tb_void_t tb_static_buffer_exit(tb_static_buffer_t* buffer)
 tb_byte_t* tb_static_buffer_data(tb_static_buffer_t* buffer)
 {
     // check
-    tb_assert_and_check_return_val(buffer, tb_null);
+    tb_assert_and_check_return_val(buffer, tb_object_null);
 
     // the buffer data
     return buffer->data;
@@ -100,7 +100,7 @@ tb_void_t tb_static_buffer_clear(tb_static_buffer_t* buffer)
 tb_byte_t* tb_static_buffer_resize(tb_static_buffer_t* buffer, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(buffer && buffer->data && size <= buffer->maxn, tb_null);
+    tb_assert_and_check_return_val(buffer && buffer->data && size <= buffer->maxn, tb_object_null);
 
     // resize
     buffer->size = size;
@@ -123,14 +123,14 @@ tb_byte_t* tb_static_buffer_memnset(tb_static_buffer_t* buffer, tb_byte_t b, tb_
 tb_byte_t* tb_static_buffer_memnsetp(tb_static_buffer_t* buffer, tb_size_t p, tb_byte_t b, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(buffer, tb_null);
+    tb_assert_and_check_return_val(buffer, tb_object_null);
     
     // check
     tb_check_return_val(n, tb_static_buffer_data(buffer));
 
     // resize
     tb_byte_t* d = tb_static_buffer_resize(buffer, p + n);
-    tb_assert_and_check_return_val(d, tb_null);
+    tb_assert_and_check_return_val(d, tb_object_null);
 
     // memset
     tb_memset(d + p, b, n);
@@ -153,14 +153,14 @@ tb_byte_t* tb_static_buffer_memncpy(tb_static_buffer_t* buffer, tb_byte_t const*
 tb_byte_t* tb_static_buffer_memncpyp(tb_static_buffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(buffer && b, tb_null);
+    tb_assert_and_check_return_val(buffer && b, tb_object_null);
     
     // check
     tb_check_return_val(n, tb_static_buffer_data(buffer));
 
     // resize
     tb_byte_t* d = tb_static_buffer_resize(buffer, p + n);
-    tb_assert_and_check_return_val(d, tb_null);
+    tb_assert_and_check_return_val(d, tb_object_null);
 
     // memcpy
     tb_memcpy(d + p, b, n);
@@ -171,13 +171,13 @@ tb_byte_t* tb_static_buffer_memncpyp(tb_static_buffer_t* buffer, tb_size_t p, tb
 tb_byte_t* tb_static_buffer_memmov(tb_static_buffer_t* buffer, tb_size_t b)
 {
     // check
-    tb_assert_and_check_return_val(b <= tb_static_buffer_size(buffer), tb_null);
+    tb_assert_and_check_return_val(b <= tb_static_buffer_size(buffer), tb_object_null);
     return tb_static_buffer_memnmovp(buffer, 0, b, tb_static_buffer_size(buffer) - b);
 }
 tb_byte_t* tb_static_buffer_memmovp(tb_static_buffer_t* buffer, tb_size_t p, tb_size_t b)
 {
     // check
-    tb_assert_and_check_return_val(b <= tb_static_buffer_size(buffer), tb_null);
+    tb_assert_and_check_return_val(b <= tb_static_buffer_size(buffer), tb_object_null);
     return tb_static_buffer_memnmovp(buffer, p, b, tb_static_buffer_size(buffer) - b);
 }
 tb_byte_t* tb_static_buffer_memnmov(tb_static_buffer_t* buffer, tb_size_t b, tb_size_t n)
@@ -187,7 +187,7 @@ tb_byte_t* tb_static_buffer_memnmov(tb_static_buffer_t* buffer, tb_size_t b, tb_
 tb_byte_t* tb_static_buffer_memnmovp(tb_static_buffer_t* buffer, tb_size_t p, tb_size_t b, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(buffer && (b + n) <= tb_static_buffer_size(buffer), tb_null);
+    tb_assert_and_check_return_val(buffer && (b + n) <= tb_static_buffer_size(buffer), tb_object_null);
 
     // clear?
     if (b == tb_static_buffer_size(buffer)) 
@@ -201,7 +201,7 @@ tb_byte_t* tb_static_buffer_memnmovp(tb_static_buffer_t* buffer, tb_size_t p, tb
 
     // resize
     tb_byte_t* d = tb_static_buffer_resize(buffer, p + n);
-    tb_assert_and_check_return_val(d, tb_null);
+    tb_assert_and_check_return_val(d, tb_object_null);
 
     // memmov
     tb_memmov(d + p, d + b, n);
@@ -216,7 +216,7 @@ tb_byte_t* tb_static_buffer_memcat(tb_static_buffer_t* buffer, tb_static_buffer_
 tb_byte_t* tb_static_buffer_memncat(tb_static_buffer_t* buffer, tb_byte_t const* b, tb_size_t n)
 {   
     // check
-    tb_assert_and_check_return_val(buffer && b, tb_null);
+    tb_assert_and_check_return_val(buffer && b, tb_object_null);
     
     // check
     tb_check_return_val(n, tb_static_buffer_data(buffer));
@@ -227,7 +227,7 @@ tb_byte_t* tb_static_buffer_memncat(tb_static_buffer_t* buffer, tb_byte_t const*
 
     // resize
     tb_byte_t* d = tb_static_buffer_resize(buffer, p + n);
-    tb_assert_and_check_return_val(d, tb_null);
+    tb_assert_and_check_return_val(d, tb_object_null);
 
     // memcat
     tb_memcpy(d + p, b, n);

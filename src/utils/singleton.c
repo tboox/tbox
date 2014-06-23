@@ -117,7 +117,7 @@ tb_void_t tb_singleton_exit()
 tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill)
 {
     // check, @note cannot use trace, assert and memory
-    tb_check_return_val(type < TB_SINGLETON_TYPE_MAXN, tb_null);
+    tb_check_return_val(type < TB_SINGLETON_TYPE_MAXN, tb_object_null);
     
     // the instance
     tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_pset(&g_singletons[type].instance, 0, 1);
@@ -128,11 +128,11 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
     else if (!instance)
     {
         // check
-        tb_check_return_val(init && exit, tb_null);
+        tb_check_return_val(init && exit, tb_object_null);
 
         // init it
         instance = init(&g_singletons[type].priv);
-        tb_check_return_val(instance, tb_null);
+        tb_check_return_val(instance, tb_object_null);
 
         // init func
         g_singletons[type].exit = exit;
@@ -154,7 +154,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
 
         // failed?
         if (instance == (tb_handle_t)1 || !instance)
-            return tb_null;
+            return tb_object_null;
     }
 
     // ok?

@@ -616,7 +616,7 @@ static tb_void_t tb_single_list_str_dump(tb_single_list_t const* list)
 }
 static tb_void_t tb_single_list_str_test()
 {
-    tb_handle_t bpool = tb_block_pool_init(TB_BLOCK_POOL_GROW_SMALL, 0);
+    tb_handle_t bpool = tb_pool_init(TB_POOL_GROW_SMALL, 0);
     tb_single_list_t* list = tb_single_list_init(TB_SINGLE_LIST_GROW_SIZE, tb_item_func_str(tb_true, bpool));
     tb_assert_and_check_return(list);
 
@@ -685,7 +685,7 @@ static tb_void_t tb_single_list_str_test()
     tb_single_list_str_dump(list);
 
     tb_single_list_exit(list);
-    tb_block_pool_exit(bpool);
+    tb_pool_exit(bpool);
 }
 static tb_void_t tb_single_list_mem_free(tb_item_func_t* func, tb_pointer_t item)
 {

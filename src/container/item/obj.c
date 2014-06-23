@@ -51,7 +51,7 @@ static tb_void_t tb_item_func_obj_free(tb_item_func_t* func, tb_pointer_t item)
     if (object)
     {
         tb_object_exit(object);
-        *((tb_object_t**)item) = tb_null;
+        *((tb_object_t**)item) = tb_object_null;
     }
 }
 static tb_void_t tb_item_func_obj_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
@@ -89,10 +89,10 @@ static tb_void_t tb_item_func_obj_repl(tb_item_func_t* func, tb_pointer_t item, 
 tb_item_func_t tb_item_func_obj()
 {
     // the ptr func
-    tb_item_func_t func_ptr = tb_item_func_ptr(tb_null, tb_null);
+    tb_item_func_t func_ptr = tb_item_func_ptr(tb_object_null, tb_object_null);
 
     // the str func
-    tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
+    tb_item_func_t func_str = tb_item_func_str(tb_true, tb_object_null);
 
     // init func
     tb_item_func_t func = {0};

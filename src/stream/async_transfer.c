@@ -682,11 +682,11 @@ tb_handle_t tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autoclosing)
 {
     // using the default aicp
     if (!aicp) aicp = tb_aicp();
-    tb_assert_and_check_return_val(aicp, tb_null);
+    tb_assert_and_check_return_val(aicp, tb_object_null);
 
     // make transfer
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)tb_malloc0(sizeof(tb_async_transfer_t));
-    tb_assert_and_check_return_val(transfer, tb_null);
+    tb_assert_and_check_return_val(transfer, tb_object_null);
 
     // init state
     transfer->state         = TB_STATE_CLOSED;
@@ -712,7 +712,7 @@ tb_bool_t tb_async_transfer_init_istream(tb_handle_t handle, tb_async_stream_t* 
     if (transfer->istream && transfer->istream != stream)
     {
         if (transfer->iowner) tb_async_stream_exit(transfer->istream);
-        transfer->istream = tb_null;
+        transfer->istream = tb_object_null;
     }
 
     // init stream
@@ -753,7 +753,7 @@ tb_bool_t tb_async_transfer_init_istream_from_url(tb_handle_t handle, tb_char_t 
         if (tb_stream_type(transfer->istream) != type)
         {
             if (transfer->iowner) tb_async_stream_exit(transfer->istream);
-            transfer->istream = tb_null;
+            transfer->istream = tb_object_null;
         }
     }
 
@@ -789,7 +789,7 @@ tb_bool_t tb_async_transfer_init_istream_from_data(tb_handle_t handle, tb_byte_t
     if (transfer->istream && tb_stream_type(transfer->istream) != TB_STREAM_TYPE_DATA)
     {
         if (transfer->iowner) tb_async_stream_exit(transfer->istream);
-        transfer->istream = tb_null;
+        transfer->istream = tb_object_null;
     }
 
     // using the previous stream?
@@ -824,7 +824,7 @@ tb_bool_t tb_async_transfer_init_ostream(tb_handle_t handle, tb_async_stream_t* 
     if (transfer->ostream && transfer->ostream != stream)
     {
         if (transfer->oowner) tb_async_stream_exit(transfer->ostream);
-        transfer->ostream = tb_null;
+        transfer->ostream = tb_object_null;
     }
 
     // init stream
@@ -865,7 +865,7 @@ tb_bool_t tb_async_transfer_init_ostream_from_url(tb_handle_t handle, tb_char_t 
         if (tb_stream_type(transfer->ostream) != type)
         {
             if (transfer->oowner) tb_async_stream_exit(transfer->ostream);
-            transfer->ostream = tb_null;
+            transfer->ostream = tb_object_null;
         }
     }
 
@@ -908,7 +908,7 @@ tb_bool_t tb_async_transfer_init_ostream_from_data(tb_handle_t handle, tb_byte_t
     if (transfer->ostream && tb_stream_type(transfer->ostream) != TB_STREAM_TYPE_DATA)
     {
         if (transfer->oowner) tb_async_stream_exit(transfer->ostream);
-        transfer->ostream = tb_null;
+        transfer->ostream = tb_object_null;
     }
 
     // using the previous stream?
@@ -1206,11 +1206,11 @@ tb_bool_t tb_async_transfer_exit(tb_handle_t handle)
 
     // exit istream
     if (transfer->istream && transfer->iowner) tb_async_stream_exit(transfer->istream);
-    transfer->istream = tb_null;
+    transfer->istream = tb_object_null;
 
     // exit ostream
     if (transfer->ostream && transfer->oowner) tb_async_stream_exit(transfer->ostream);
-    transfer->ostream = tb_null;
+    transfer->ostream = tb_object_null;
 
     // exit transfer
     tb_free(transfer);

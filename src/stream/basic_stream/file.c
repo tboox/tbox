@@ -64,7 +64,7 @@ typedef struct __tb_basic_stream_file_t
 static __tb_inline__ tb_basic_stream_file_t* tb_basic_stream_file_cast(tb_handle_t stream)
 {
     tb_basic_stream_t* bstream = (tb_basic_stream_t*)stream;
-    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_FILE, tb_null);
+    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_FILE, tb_object_null);
     return (tb_basic_stream_file_t*)bstream;
 }
 static tb_bool_t tb_basic_stream_file_open(tb_handle_t bstream)
@@ -87,7 +87,7 @@ static tb_bool_t tb_basic_stream_file_open(tb_handle_t bstream)
     if (!fstream->file)
     {
         // save state
-        fstream->base.state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
+        fstream->base.state = tb_file_info(url, tb_object_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
         return tb_false;
     }
 
@@ -104,7 +104,7 @@ static tb_bool_t tb_basic_stream_file_clos(tb_handle_t bstream)
     if (!fstream->bref)
     {
         if (fstream->file && !tb_file_exit(fstream->file)) return tb_false;
-        fstream->file = tb_null;
+        fstream->file = tb_object_null;
     }
 
     // ok
@@ -234,7 +234,7 @@ tb_basic_stream_t* tb_basic_stream_init_file()
 {
     // make stream
     tb_basic_stream_file_t* bstream = (tb_basic_stream_file_t*)tb_malloc0(sizeof(tb_basic_stream_file_t));
-    tb_assert_and_check_return_val(bstream, tb_null);
+    tb_assert_and_check_return_val(bstream, tb_object_null);
 
     // init base
     if (!tb_basic_stream_init((tb_basic_stream_t*)bstream, TB_STREAM_TYPE_FILE, TB_BASIC_STREAM_FILE_CACHE_MAXN)) goto fail;
@@ -248,7 +248,7 @@ tb_basic_stream_t* tb_basic_stream_init_file()
     bstream->base.seek      = tb_basic_stream_file_seek;
     bstream->base.wait      = tb_basic_stream_file_wait;
     bstream->base.base.ctrl = tb_basic_stream_file_ctrl;
-    bstream->file           = tb_null;
+    bstream->file           = tb_object_null;
     bstream->mode           = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
     // ok
@@ -256,17 +256,17 @@ tb_basic_stream_t* tb_basic_stream_init_file()
 
 fail:
     if (bstream) tb_basic_stream_exit((tb_basic_stream_t*)bstream);
-    return tb_null;
+    return tb_object_null;
 }
 
 tb_basic_stream_t* tb_basic_stream_init_from_file(tb_char_t const* path, tb_size_t mode)
 {
     // check
-    tb_assert_and_check_return_val(path, tb_null);
+    tb_assert_and_check_return_val(path, tb_object_null);
 
     // init file stream
     tb_basic_stream_t* bstream = tb_basic_stream_init_file();
-    tb_assert_and_check_return_val(bstream, tb_null);
+    tb_assert_and_check_return_val(bstream, tb_object_null);
 
     // set path
     if (!tb_stream_ctrl(bstream, TB_STREAM_CTRL_SET_URL, path)) goto fail;
@@ -278,5 +278,5 @@ tb_basic_stream_t* tb_basic_stream_init_from_file(tb_char_t const* path, tb_size
     return bstream;
 fail:
     if (bstream) tb_basic_stream_exit(bstream);
-    return tb_null;
+    return tb_object_null;
 }

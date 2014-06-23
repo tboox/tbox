@@ -158,7 +158,7 @@ static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t i
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && itor < impl->size, tb_null);
+    tb_assert_and_check_return_val(impl && itor < impl->size, tb_object_null);
     
     // data
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
@@ -188,12 +188,12 @@ static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t 
 tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 {
     // check
-    tb_assert_and_check_return_val(grow, tb_null);
-    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl && func.ndupl && func.nrepl, tb_null);
+    tb_assert_and_check_return_val(grow, tb_object_null);
+    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl && func.ndupl && func.nrepl, tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_vector_impl_t*   impl = tb_null;
+    tb_vector_impl_t*   impl = tb_object_null;
     do
     {
         // make impl
@@ -209,7 +209,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 
         // init iterator
         impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-        impl->itor.priv = tb_null;
+        impl->itor.priv = tb_object_null;
         impl->itor.step = func.size;
         impl->itor.size = tb_vector_iterator_size;
         impl->itor.head = tb_vector_iterator_head;
@@ -234,7 +234,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
     {
         // exit it
         if (impl) tb_vector_exit((tb_vector_t*)impl);
-        impl = tb_null;
+        impl = tb_object_null;
     }
 
     // ok?
@@ -251,7 +251,7 @@ tb_void_t tb_vector_exit(tb_vector_t* vector)
 
     // free data
     if (impl->data) tb_free(impl->data);
-    impl->data = tb_null;
+    impl->data = tb_object_null;
 
     // free it
     tb_free(impl);
@@ -305,7 +305,7 @@ tb_pointer_t tb_vector_data(tb_vector_t* vector)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
-    tb_assert_and_check_return_val(impl, tb_null);
+    tb_assert_and_check_return_val(impl, tb_object_null);
 
     // data
     return impl->data;

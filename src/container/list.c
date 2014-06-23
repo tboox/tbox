@@ -170,7 +170,7 @@ static tb_pointer_t tb_list_iterator_item(tb_iterator_t* iterator, tb_size_t ito
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && itor, tb_null);
+    tb_assert_and_check_return_val(impl && itor, tb_object_null);
 
     // data
     return impl->func.data(&impl->func, &((tb_list_item_t const*)itor)[1]);
@@ -377,12 +377,12 @@ static tb_size_t tb_list_detach_item(tb_list_impl_t* impl, tb_size_t itor)
 tb_list_t* tb_list_init(tb_size_t grow, tb_item_func_t func)
 {
     // check
-    tb_assert_and_check_return_val(grow, tb_null);
-    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_null);
+    tb_assert_and_check_return_val(grow, tb_object_null);
+    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_object_null);
 
     // done
     tb_bool_t       ok = tb_false;
-    tb_list_impl_t* impl = tb_null;
+    tb_list_impl_t* impl = tb_object_null;
     do
     {
         // make impl
@@ -396,7 +396,7 @@ tb_list_t* tb_list_init(tb_size_t grow, tb_item_func_t func)
 
         // init iterator
         impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-        impl->itor.priv = tb_null;
+        impl->itor.priv = tb_object_null;
         impl->itor.step = func.size;
         impl->itor.size = tb_list_iterator_size;
         impl->itor.head = tb_list_iterator_head;
@@ -421,7 +421,7 @@ tb_list_t* tb_list_init(tb_size_t grow, tb_item_func_t func)
     {
         // exit it
         if (impl) tb_list_exit((tb_list_t*)impl);
-        impl = tb_null;
+        impl = tb_object_null;
     }
 
     // ok?

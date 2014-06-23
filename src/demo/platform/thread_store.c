@@ -19,7 +19,7 @@ static tb_pointer_t tb_thread_store_test(tb_cpointer_t priv)
     tb_trace_i("thread[%lu]: init", self);
 
     // done
-    tb_thread_store_data_t* item = tb_null;
+    tb_thread_store_data_t* item = tb_object_null;
     while (1)
     {
         if (!(item = tb_thread_store_getp()))
@@ -41,8 +41,8 @@ static tb_pointer_t tb_thread_store_test(tb_cpointer_t priv)
 
     // trace
     tb_trace_i("thread[%lu]: exit", self);
-    tb_thread_return(tb_null);
-    return tb_null;
+    tb_thread_return(tb_object_null);
+    return tb_object_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -51,10 +51,10 @@ static tb_pointer_t tb_thread_store_test(tb_cpointer_t priv)
 tb_int_t tb_demo_platform_thread_store_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_thread_init(tb_null, tb_thread_store_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_thread_store_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_thread_store_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_thread_store_test, tb_null, 0);
+    tb_thread_init(tb_object_null, tb_thread_store_test, tb_object_null, 0);
+    tb_thread_init(tb_object_null, tb_thread_store_test, tb_object_null, 0);
+    tb_thread_init(tb_object_null, tb_thread_store_test, tb_object_null, 0);
+    tb_thread_init(tb_object_null, tb_thread_store_test, tb_object_null, 0);
 
     // wait
     getchar();

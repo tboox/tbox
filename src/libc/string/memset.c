@@ -47,14 +47,14 @@
 #if defined(TB_CONFIG_LIBC_HAVE_MEMSET)
 static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
     return memset(s, c, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMSET_U8)
 static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
 
     // no size?
     tb_check_return_val(n, s);
@@ -86,7 +86,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
 
     // no size?
     tb_check_return_val(n, s);
@@ -123,7 +123,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
 static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
 
     // no size?
     tb_check_return_val(n, s);
@@ -162,7 +162,7 @@ static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
 static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
 
     // no size?
     tb_check_return_val(n, s);
@@ -199,7 +199,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
 static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
 
     // no size?
     tb_check_return_val(n, s);
@@ -244,7 +244,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_byte_t c, tb_size_t n)
         if (size && n > size)
         {
             tb_trace_i("[memset]: [overflow]: [%#x x %lu] => [%p, %lu]", c, n, s, size);
-            tb_backtrace_dump("[memset]: [overflow]: ", tb_null, 10);
+            tb_backtrace_dump("[memset]: [overflow]: ", tb_object_null, 10);
             tb_memory_data_dump(s, "\t[malloc]: [from]: ");
             tb_abort();
         }
@@ -264,7 +264,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
         if (size && (n << 1) > size)
         {
             tb_trace_i("[memset_u16]: [overflow]: [%#x x %lu x 2] => [%p, %lu]", c, n, s, size);
-            tb_backtrace_dump("[memset_u16]: [overflow]: ", tb_null, 10);
+            tb_backtrace_dump("[memset_u16]: [overflow]: ", tb_object_null, 10);
             tb_memory_data_dump(s, "\t[malloc]: [from]: ");
             tb_abort();
         }
@@ -303,7 +303,7 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
         if (size && (n << 2) > size)
         {
             tb_trace_i("[memset_u32]: [overflow]: [%#x x %lu x 4] => [%p, %lu]", c, n, s, size);
-            tb_backtrace_dump("[memset_u32]: [overflow]: ", tb_null, 10);
+            tb_backtrace_dump("[memset_u32]: [overflow]: ", tb_object_null, 10);
             tb_memory_data_dump(s, "\t[malloc]: [from]: ");
             tb_abort();
         }
@@ -323,7 +323,7 @@ tb_pointer_t tb_memset_u64(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
         if (size && (n << 3) > size)
         {
             tb_trace_i("[memset_u64]: [overflow]: [%#llx x %lu x 4] => [%p, %lu]", c, n, s, size);
-            tb_backtrace_dump("[memset_u64]: [overflow]: ", tb_null, 10);
+            tb_backtrace_dump("[memset_u64]: [overflow]: ", tb_object_null, 10);
             tb_memory_data_dump(s, "\t[malloc]: [from]: ");
             tb_abort();
         }

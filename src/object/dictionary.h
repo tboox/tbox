@@ -37,16 +37,16 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_DICTIONARY_SIZE_MICRO                (64)
-#define TB_DICTIONARY_SIZE_SMALL                (256)
-#define TB_DICTIONARY_SIZE_LARGE                (65536)
+#define TB_OBJECT_DICTIONARY_SIZE_MICRO                (64)
+#define TB_OBJECT_DICTIONARY_SIZE_SMALL                (256)
+#define TB_OBJECT_DICTIONARY_SIZE_LARGE                (65536)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
 /// the dictionary item type
-typedef struct __tb_dictionary_item_t
+typedef struct __tb_object_dictionary_item_t
 {
     /// the key
     tb_char_t const*        key;
@@ -54,7 +54,7 @@ typedef struct __tb_dictionary_item_t
     /// the value
     tb_object_t*            val;
 
-}tb_dictionary_item_t;
+}tb_object_dictionary_item_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -67,7 +67,7 @@ typedef struct __tb_dictionary_item_t
  *
  * @return              the dictionary object
  */
-tb_object_t*            tb_dictionary_init(tb_size_t size, tb_size_t incr);
+tb_object_t*            tb_object_dictionary_init(tb_size_t size, tb_size_t incr);
 
 /*! the dictionary size
  *
@@ -75,14 +75,14 @@ tb_object_t*            tb_dictionary_init(tb_size_t size, tb_size_t incr);
  *
  * @return              the dictionary size
  */
-tb_size_t               tb_dictionary_size(tb_object_t* dictionary);
+tb_size_t               tb_object_dictionary_size(tb_object_t* dictionary);
 
 /*! set the dictionary incr
  *
  * @param dictionary    the dictionary object
  * @param incr          is increase refn?
  */
-tb_void_t               tb_dictionary_incr(tb_object_t* dictionary, tb_bool_t incr);
+tb_void_t               tb_object_dictionary_incr(tb_object_t* dictionary, tb_bool_t incr);
 
 /*! the dictionary iterator
  *
@@ -91,7 +91,7 @@ tb_void_t               tb_dictionary_incr(tb_object_t* dictionary, tb_bool_t in
  * @return              the dictionary iterator
  *
  * @code
- * tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(dictionary))
+ * tb_for_all (tb_object_dictionary_item_t*, item, tb_object_dictionary_itor(dictionary))
  * {
  *      if (item)
  *      {
@@ -103,7 +103,7 @@ tb_void_t               tb_dictionary_incr(tb_object_t* dictionary, tb_bool_t in
  * }
  * @endcode
  */
-tb_iterator_t*          tb_dictionary_itor(tb_object_t* dictionary);
+tb_iterator_t*          tb_object_dictionary_itor(tb_object_t* dictionary);
 
 /*! the dictionary value
  *
@@ -112,14 +112,14 @@ tb_iterator_t*          tb_dictionary_itor(tb_object_t* dictionary);
  *
  * @return              the dictionary value
  */
-tb_object_t*            tb_dictionary_val(tb_object_t* dictionary, tb_char_t const* key);
+tb_object_t*            tb_object_dictionary_val(tb_object_t* dictionary, tb_char_t const* key);
 
 /*! del dictionary item
  *
  * @param dictionary    the dictionary object
  * @param key           the key
  */
-tb_void_t               tb_dictionary_del(tb_object_t* dictionary, tb_char_t const* key);
+tb_void_t               tb_object_dictionary_del(tb_object_t* dictionary, tb_char_t const* key);
 
 /*! set dictionary item
  *
@@ -127,7 +127,7 @@ tb_void_t               tb_dictionary_del(tb_object_t* dictionary, tb_char_t con
  * @param key           the key
  * @param val           the value
  */
-tb_void_t               tb_dictionary_set(tb_object_t* dictionary, tb_char_t const* key, tb_object_t* val);
+tb_void_t               tb_object_dictionary_set(tb_object_t* dictionary, tb_char_t const* key, tb_object_t* val);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -50,7 +50,7 @@ tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpoint
         }
 
         // init thread
-        if (pthread_create(&handle, stack? &attr : tb_null, (tb_pointer_t (*)(tb_pointer_t))func, (tb_pointer_t)priv)) break;
+        if (pthread_create(&handle, stack? &attr : tb_object_null, (tb_pointer_t (*)(tb_pointer_t))func, (tb_pointer_t)priv)) break;
 
         // ok
         ok = tb_true;
@@ -61,7 +61,7 @@ tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpoint
     if (stack) pthread_attr_destroy(&attr);
     
     // ok?
-    return ok? ((tb_handle_t)handle) : tb_null;
+    return ok? ((tb_handle_t)handle) : tb_object_null;
 }
 tb_void_t tb_thread_exit(tb_handle_t handle)
 {
@@ -80,7 +80,7 @@ tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 
     // wait
     tb_long_t ok = -1;
-    if ((ok = pthread_join(((pthread_t)handle), tb_null)))
+    if ((ok = pthread_join(((pthread_t)handle), tb_object_null)))
     {
         // trace
         tb_trace_e("thread[%p]: wait failed: %ld, errno: %d", handle, ok, errno);

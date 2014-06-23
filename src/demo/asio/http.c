@@ -60,9 +60,9 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // done
-    tb_aicp_t*          aicp = tb_null;
-    tb_handle_t         http = tb_null;
-    tb_async_stream_t*  post = tb_null;
+    tb_aicp_t*          aicp = tb_object_null;
+    tb_handle_t         http = tb_object_null;
+    tb_async_stream_t*  post = tb_object_null;
     do
     {
         // init aicp

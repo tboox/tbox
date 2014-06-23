@@ -109,11 +109,11 @@ static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursi
 
     // init info
     tb_char_t       temp[4096] = {0};
-    DIR*            directory = tb_null;
+    DIR*            directory = tb_object_null;
     if ((directory = opendir(path)))
     {
         // walk
-        struct dirent* item = tb_null;
+        struct dirent* item = tb_object_null;
         while ((item = readdir(directory)))
         {
             // check
@@ -176,7 +176,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
             if (*p == '/')
             {
                 // make directory if not exists
-                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU);
+                if (!tb_file_info(temp, tb_object_null)) mkdir(temp, S_IRWXU);
 
                 // skip repeat '/'
                 while (*p && *p == '/') p++;
@@ -199,7 +199,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     tb_assert_and_check_return_val(path, tb_false);
 
     // walk remove
-    tb_directory_walk_impl(path, tb_true, tb_false, tb_directory_walk_remove, tb_null);
+    tb_directory_walk_impl(path, tb_true, tb_false, tb_directory_walk_remove, tb_object_null);
 
     // remove it
     return !remove(path)? tb_true : tb_false;

@@ -43,7 +43,7 @@ static tb_long_t tb_item_func_uint8_comp(tb_item_func_t* func, tb_cpointer_t lda
 static tb_pointer_t tb_item_func_uint8_data(tb_item_func_t* func, tb_cpointer_t item)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_null);
+    tb_assert_and_check_return_val(item, tb_object_null);
 
     // the item data
     return tb_u2p(*((tb_uint8_t*)item));

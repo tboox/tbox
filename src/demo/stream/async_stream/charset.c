@@ -24,11 +24,11 @@ static tb_bool_t tb_demo_async_stream_charset_done_func(tb_size_t state, tb_hize
 tb_int_t tb_demo_stream_async_stream_charset_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t         event = tb_null;
-    tb_handle_t         transfer = tb_null;
-    tb_async_stream_t*  istream = tb_null;
-    tb_async_stream_t*  ostream = tb_null;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_handle_t         event = tb_object_null;
+    tb_handle_t         transfer = tb_object_null;
+    tb_async_stream_t*  istream = tb_object_null;
+    tb_async_stream_t*  ostream = tb_object_null;
+    tb_async_stream_t*  fstream = tb_object_null;
     do
     {
         // init event
@@ -52,7 +52,7 @@ tb_int_t tb_demo_stream_async_stream_charset_main(tb_int_t argc, tb_char_t** arg
         tb_assert_and_check_break(fstream);
 
         // init transfer
-        transfer = tb_async_transfer_init(tb_null, tb_true);
+        transfer = tb_async_transfer_init(tb_object_null, tb_true);
         tb_assert_and_check_break(transfer);
 
         // init transfer stream
@@ -80,22 +80,22 @@ tb_int_t tb_demo_stream_async_stream_charset_main(tb_int_t argc, tb_char_t** arg
 
     // exit transfer
     if (transfer) tb_async_transfer_exit(transfer);
-    transfer = tb_null;
+    transfer = tb_object_null;
 
     // exit fstream
     if (fstream) tb_async_stream_exit(fstream);
-    fstream = tb_null;
+    fstream = tb_object_null;
 
     // exit istream
     if (istream) tb_async_stream_exit(istream);
-    istream = tb_null;
+    istream = tb_object_null;
 
     // exit ostream
     if (ostream) tb_async_stream_exit(ostream);
-    ostream = tb_null;
+    ostream = tb_object_null;
 
     // exit event
     if (event) tb_event_exit(event);
-    event = tb_null;
+    event = tb_object_null;
     return 0;
 }

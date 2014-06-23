@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        static_block_pool.h
+ * @file        static_pool.h
  * @ingroup     memory
  *
  */
-#ifndef TB_MEMORY_STATIC_BLOCK_POOL_H
-#define TB_MEMORY_STATIC_BLOCK_POOL_H
+#ifndef TB_MEMORY_STATIC_POOL_H
+#define TB_MEMORY_STATIC_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -37,14 +37,14 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_static_block_pool_malloc(handle, size)               tb_static_block_pool_malloc_(handle, size __tb_debug_vals__)
-#define tb_static_block_pool_malloc0(handle, size)              tb_static_block_pool_malloc0_(handle, size __tb_debug_vals__)
+#define tb_static_pool_malloc(handle, size)               tb_static_pool_malloc_(handle, size __tb_debug_vals__)
+#define tb_static_pool_malloc0(handle, size)              tb_static_pool_malloc0_(handle, size __tb_debug_vals__)
 
-#define tb_static_block_pool_nalloc(handle, item, size)         tb_static_block_pool_nalloc_(handle, item, size __tb_debug_vals__)
-#define tb_static_block_pool_nalloc0(handle, item, size)        tb_static_block_pool_nalloc0_(handle, item, size __tb_debug_vals__)
+#define tb_static_pool_nalloc(handle, item, size)         tb_static_pool_nalloc_(handle, item, size __tb_debug_vals__)
+#define tb_static_pool_nalloc0(handle, item, size)        tb_static_pool_nalloc0_(handle, item, size __tb_debug_vals__)
 
-#define tb_static_block_pool_ralloc(handle, data, size)         tb_static_block_pool_ralloc_(handle, data, size __tb_debug_vals__)
-#define tb_static_block_pool_free(handle, data)                 tb_static_block_pool_free_(handle, data __tb_debug_vals__)
+#define tb_static_pool_ralloc(handle, data, size)         tb_static_pool_ralloc_(handle, data, size __tb_debug_vals__)
+#define tb_static_pool_free(handle, data)                 tb_static_pool_free_(handle, data __tb_debug_vals__)
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -59,19 +59,19 @@ __tb_extern_c_enter__
  *
  * @return          the pool handle
  */
-tb_handle_t         tb_static_block_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
+tb_handle_t         tb_static_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
 /*! exit the static block pool
  *
  * @param handle    the pool handle
  */
-tb_void_t           tb_static_block_pool_exit(tb_handle_t handle);
+tb_void_t           tb_static_pool_exit(tb_handle_t handle);
 
 /*! clear the static block pool
  *
  * @param handle    the pool handle
  */
-tb_void_t           tb_static_block_pool_clear(tb_handle_t handle);
+tb_void_t           tb_static_pool_clear(tb_handle_t handle);
 
 /*! malloc the memory
  *
@@ -80,7 +80,7 @@ tb_void_t           tb_static_block_pool_clear(tb_handle_t handle);
  *
  * @return          the data address
  */
-tb_pointer_t        tb_static_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_static_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory and fill zero 
  *
@@ -89,7 +89,7 @@ tb_pointer_t        tb_static_block_pool_malloc_(tb_handle_t handle, tb_size_t s
  *
  * @return          the data address
  */
-tb_pointer_t        tb_static_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_static_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count
  *
@@ -99,7 +99,7 @@ tb_pointer_t        tb_static_block_pool_malloc0_(tb_handle_t handle, tb_size_t 
  *
  * @return          the data address
  */
-tb_pointer_t        tb_static_block_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_static_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count and fill zero
  *
@@ -109,7 +109,7 @@ tb_pointer_t        tb_static_block_pool_nalloc_(tb_handle_t handle, tb_size_t i
  *
  * @return          the data address
  */
-tb_pointer_t        tb_static_block_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_static_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! realloc the memory
  *
@@ -119,7 +119,7 @@ tb_pointer_t        tb_static_block_pool_nalloc0_(tb_handle_t handle, tb_size_t 
  *
  * @return          the new data address
  */
-tb_pointer_t        tb_static_block_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_static_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /*! free the memory
  *
@@ -128,7 +128,7 @@ tb_pointer_t        tb_static_block_pool_ralloc_(tb_handle_t handle, tb_pointer_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
+tb_bool_t           tb_static_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! the memory data size
@@ -138,7 +138,7 @@ tb_bool_t           tb_static_block_pool_free_(tb_handle_t handle, tb_pointer_t 
  *
  * @return          the data size
  */
-tb_size_t           tb_static_block_pool_data_size(tb_handle_t handle, tb_cpointer_t data);
+tb_size_t           tb_static_pool_data_size(tb_handle_t handle, tb_cpointer_t data);
 
 /*! dump the memory data 
  *
@@ -146,14 +146,14 @@ tb_size_t           tb_static_block_pool_data_size(tb_handle_t handle, tb_cpoint
  * @param data      the data address
  * @param prefix    the trace prefix
  */
-tb_void_t           tb_static_block_pool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix);
+tb_void_t           tb_static_pool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix);
 
 /*! dump the static block pool
  *
  * @param handle    the pool handle
  * @param prefix    the trace prefix
  */
-tb_void_t           tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
+tb_void_t           tb_static_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -43,7 +43,7 @@
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
     tb_trace_noimpl();
-    return tb_null;
+    return tb_object_null;
 }
 tb_bool_t tb_file_exit(tb_handle_t file)
 {

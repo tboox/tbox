@@ -307,14 +307,14 @@ static tb_static_stream_t* tb_basic_stream_filter_zip_inflate_lzsw_transform(tb_
 {
     tb_lzsw_inflate_basic_stream_filter_zip_t* zst = (tb_lzsw_inflate_basic_stream_filter_zip_t*)st;
     tb_assert(zst);
-    if (!zst) return tb_null;
+    if (!zst) return tb_object_null;
 
     // get dst
     tb_byte_t* dp = st->dst.p;
     tb_byte_t* de = st->dst.e;
     tb_byte_t* db = dp;
     tb_assert(dp && de);
-    if (!dp || !de) return tb_null;
+    if (!dp || !de) return tb_object_null;
 
     // get src
     tb_static_stream_t* src = tb_basic_stream_filter_src(st);
@@ -412,14 +412,14 @@ static tb_static_stream_t* tb_basic_stream_filter_zip_deflate_lzsw_transform(tb_
 {
     tb_lzsw_deflate_basic_stream_filter_zip_t* zst = (tb_lzsw_deflate_basic_stream_filter_zip_t*)st;
     tb_assert(zst);
-    if (!zst) return tb_null;
+    if (!zst) return tb_object_null;
 
     // get src
     tb_byte_t* sp = st->src.p;
     tb_byte_t* se = st->src.e;
     tb_byte_t* sb = sp;
     tb_assert(sp && se);
-    if (!sp || !se) return tb_null;
+    if (!sp || !se) return tb_object_null;
 
     // get dst
     tb_static_stream_t* dst = tb_basic_stream_filter_dst(st);
@@ -536,7 +536,7 @@ static tb_void_t tb_basic_stream_filter_zip_deflate_lzsw_clos(tb_basic_stream_fi
 tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_basic_stream_filter_zip_t* zst)
 {
     tb_assert(zst);
-    if (!zst) return tb_null;
+    if (!zst) return tb_object_null;
 
     // init 
     tb_memset(zst, 0, sizeof(tb_lzsw_inflate_basic_stream_filter_zip_t));
@@ -566,7 +566,7 @@ tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw_inflate(tb_lzsw_i
 tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_basic_stream_filter_zip_t* zst)
 {
     tb_assert(zst);
-    if (!zst) return tb_null;
+    if (!zst) return tb_object_null;
 
     // init 
     tb_memset(zst, 0, sizeof(tb_lzsw_deflate_basic_stream_filter_zip_t));
@@ -591,7 +591,7 @@ tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_d
     // init window
     zst->window.mb = TB_MATH_ICLOG2I(TB_LZSW_WINDOW_SIZE_MAX);
 #if TB_LZSW_WINDOW_HASH_FIND
-    zst->window.pool = tb_pool_init(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0, tb_null, tb_null);
+    zst->window.pool = tb_pool_init(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0, tb_object_null, tb_object_null);
 #endif
 
     return ((tb_basic_stream_filter_t*)zst);
@@ -603,5 +603,5 @@ tb_basic_stream_filter_t* tb_basic_stream_filter_zip_open_lzsw(tb_lzsw_basic_str
         return tb_basic_stream_filter_zip_open_lzsw_inflate((tb_lzsw_inflate_basic_stream_filter_zip_t*)zst);
     else if (action == TB_ZSTREAM_ACTION_DEFLATE)
         return tb_basic_stream_filter_zip_open_lzsw_deflate((tb_lzsw_deflate_basic_stream_filter_zip_t*)zst);
-    else return tb_null;
+    else return tb_object_null;
 }

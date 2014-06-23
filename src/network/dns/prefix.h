@@ -110,7 +110,7 @@ typedef struct __tb_dns_answer_t
 // size + data, e.g. .www.google.com => 3www6google3com
 static __tb_inline__ tb_char_t const* tb_dns_encode_name(tb_char_t* name)
 {
-    tb_assert_and_check_return_val(name && name[0] == '.', tb_null);
+    tb_assert_and_check_return_val(name && name[0] == '.', tb_object_null);
     
     // encode
     tb_byte_t   n = 0;
@@ -173,7 +173,7 @@ static __tb_inline__ tb_char_t const* tb_dns_decode_name(tb_static_stream_t* sst
         tb_static_stream_goto(sstream, (tb_byte_t*)p);
         return name;
     }
-    else return tb_null;
+    else return tb_object_null;
 }
 
 #endif

@@ -94,7 +94,7 @@ tb_size_t tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
         if (n1 && tb_min(n2, n) + 1 > n1)
         {
             tb_trace_i("[strlcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, tb_min(n2, n), s1, n1);
-            tb_backtrace_dump("[strlcpy]: [overflow]: ", tb_null, 10);
+            tb_backtrace_dump("[strlcpy]: [overflow]: ", tb_object_null, 10);
             tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
             tb_abort();
         }

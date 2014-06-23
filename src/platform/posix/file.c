@@ -47,12 +47,12 @@
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
     // check
-    tb_assert_and_check_return_val(path, tb_null);
+    tb_assert_and_check_return_val(path, tb_object_null);
 
     // the full path
     tb_char_t full[TB_PATH_MAXN];
     path = tb_path_full(path, full, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(path, tb_null);
+    tb_assert_and_check_return_val(path, tb_object_null);
 
     // flags
     tb_size_t flags = 0;
@@ -101,7 +101,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
             if (*p == '/')
             {
                 // make directory if not exists
-                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU);
+                if (!tb_file_info(temp, tb_object_null)) mkdir(temp, S_IRWXU);
 
                 // skip repeat '/'
                 while (*p && *p == '/') p++;
@@ -426,7 +426,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     return ok;
 #else
     // copy it
-    return tb_basic_transfer_done_url_to_url(path, dest, 0, tb_null, tb_null) >= 0? tb_true : tb_false;
+    return tb_transfer_done_url_to_url(path, dest, 0, tb_object_null, tb_object_null) >= 0? tb_true : tb_false;
 #endif
 }
 tb_bool_t tb_file_create(tb_char_t const* path)

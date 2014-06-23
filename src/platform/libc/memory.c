@@ -41,7 +41,7 @@ tb_void_t tb_native_memory_exit()
 tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 {
     // check
-    tb_check_return_val(size, tb_null);
+    tb_check_return_val(size, tb_object_null);
 
     // malloc it
     return malloc(size);
@@ -49,7 +49,7 @@ tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 {
     // check
-    tb_check_return_val(size, tb_null); 
+    tb_check_return_val(size, tb_object_null); 
 
     // malloc0 it
     return calloc(1, size);
@@ -57,7 +57,7 @@ tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
     // check
-    tb_check_return_val(item && size, tb_null); 
+    tb_check_return_val(item && size, tb_object_null); 
 
     // nalloc it
     return malloc(item * size);
@@ -65,7 +65,7 @@ tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 {
     // check
-    tb_check_return_val(item && size, tb_null);
+    tb_check_return_val(item && size, tb_object_null);
 
     // nalloc0 it
     return calloc(item, size);
@@ -76,7 +76,7 @@ tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
     if (!size) 
     {
         free(data);
-        return tb_null;
+        return tb_object_null;
     }
     // no data? malloc it
     else if (!data) return malloc(size);

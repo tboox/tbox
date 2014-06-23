@@ -144,7 +144,7 @@ static __tb_inline__ tb_hong_t tb_ltimer_now(tb_ltimer_t* timer)
     {
         // get the time
         tb_timeval_t tv = {0};
-        if (tb_gettimeofday(&tv, tb_null)) return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
+        if (tb_gettimeofday(&tv, tb_object_null)) return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
     }
 
     // using cached time
@@ -187,7 +187,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 
         // the wheel list
         tb_vector_t* wlist = timer->wheel[windx];
-        if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
+        if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_object_null, tb_object_null));
         tb_assert_and_check_break(wlist);
 
         // save the wheel index
@@ -218,14 +218,14 @@ static tb_bool_t tb_ltimer_del_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
     do
     {
         // check
-        tb_assert_and_check_break(task->windx != -1 && task->windx < tb_arrayn(timer->wheel));
+        tb_assert_and_check_break(task->windx != -1 && task->windx < tb_object_arrayn(timer->wheel));
 
         // the wheel list
         tb_vector_t* wlist = timer->wheel[task->windx];
         tb_assert_and_check_break(wlist);
 
         // find the task from the wheel list
-        tb_size_t itor = tb_find_all(wlist, task, tb_null);
+        tb_size_t itor = tb_find_all(wlist, task, tb_object_null);
         tb_assert_and_check_break(itor != tb_iterator_tail(wlist));
 
         // del the task from the wheel list
@@ -283,8 +283,8 @@ static tb_bool_t tb_ltimer_expired_done(tb_iterator_t* iterator, tb_pointer_t it
 static tb_bool_t tb_ltimer_expired_exit(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the timer
-    tb_ltimer_t*    timer = priv? (tb_ltimer_t*)(((tb_pointer_t*)priv)[0]) : tb_null;
-    tb_hong_t*      now = priv? (tb_hong_t*)(((tb_pointer_t*)priv)[1]) : tb_null;
+    tb_ltimer_t*    timer = priv? (tb_ltimer_t*)(((tb_pointer_t*)priv)[0]) : tb_object_null;
+    tb_hong_t*      now = priv? (tb_hong_t*)(((tb_pointer_t*)priv)[1]) : tb_object_null;
     tb_assert_and_check_return_val(timer && now, tb_false);
 
     // the task
@@ -323,11 +323,11 @@ static tb_bool_t tb_ltimer_expired_exit(tb_iterator_t* iterator, tb_pointer_t it
 tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
 {
     // check
-    tb_assert_and_check_return_val(tick >= TB_LTIMER_TICK_100MS, tb_null);
+    tb_assert_and_check_return_val(tick >= TB_LTIMER_TICK_100MS, tb_object_null);
 
     // make timer
     tb_ltimer_t* timer = (tb_ltimer_t*)tb_malloc0(sizeof(tb_ltimer_t));
-    tb_assert_and_check_return_val(timer, tb_null);
+    tb_assert_and_check_return_val(timer, tb_object_null);
 
     // init timer
     timer->maxn         = tb_max(maxn, 16);
@@ -343,7 +343,7 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
     tb_assert_and_check_goto(timer->pool, fail);
 
     // init the expired tasks
-    timer->expired      = tb_vector_init((maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
+    timer->expired      = tb_vector_init((maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_object_null, tb_object_null));
     tb_assert_and_check_goto(timer->expired, fail);
 
     // register lock profiler
@@ -355,7 +355,7 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
     return (tb_handle_t)timer;
 fail:
     if (timer) tb_ltimer_exit(timer);
-    return tb_null;
+    return tb_object_null;
 }
 tb_void_t tb_ltimer_exit(tb_handle_t handle)
 {
@@ -381,20 +381,20 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
             for (i = 0; i < TB_LTIMER_WHEEL_MAXN; i++)
             {
                 if (timer->wheel[i]) tb_vector_exit(timer->wheel[i]);
-                timer->wheel[i] = tb_null;
+                timer->wheel[i] = tb_object_null;
             }
         }
 
         // exit pool
         if (timer->pool) tb_fixed_pool_exit(timer->pool);
-        timer->pool = tb_null;
+        timer->pool = tb_object_null;
 
         // leave
         tb_spinlock_leave(&timer->lock);
 
         // exit the expired tasks
         if (timer->expired) tb_vector_exit(timer->expired);
-        timer->expired = tb_null;
+        timer->expired = tb_object_null;
 
         // exit lock
         tb_spinlock_exit(&timer->lock);
@@ -523,7 +523,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
     if (ok && tb_vector_size(timer->expired))
     {
         // done the expired task 
-        tb_walk_all(timer->expired, tb_ltimer_expired_done, tb_null);
+        tb_walk_all(timer->expired, tb_ltimer_expired_done, tb_object_null);
 
         // enter
         tb_spinlock_enter(&timer->lock);
@@ -572,7 +572,7 @@ tb_handle_t tb_ltimer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t r
 {
     // check
     tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-    tb_assert_and_check_return_val(timer && func, tb_null);
+    tb_assert_and_check_return_val(timer && func, tb_object_null);
 
     // add task
     return tb_ltimer_task_init_at(handle, tb_ltimer_now(timer) + delay, delay, repeat, func, priv);
@@ -581,10 +581,10 @@ tb_handle_t tb_ltimer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t
 {
     // check
     tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-    tb_assert_and_check_return_val(timer && timer->pool && func, tb_null);
+    tb_assert_and_check_return_val(timer && timer->pool && func, tb_object_null);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_null);
+    tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_object_null);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -607,7 +607,7 @@ tb_handle_t tb_ltimer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t
         if (!tb_ltimer_add_task(timer, task))
         {
             tb_fixed_pool_free(timer->pool, task);
-            task = tb_null;
+            task = tb_object_null;
         }
     }
 
@@ -621,7 +621,7 @@ tb_handle_t tb_ltimer_task_init_after(tb_handle_t handle, tb_hize_t after, tb_si
 {
     // check
     tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-    tb_assert_and_check_return_val(timer && func, tb_null);
+    tb_assert_and_check_return_val(timer && func, tb_object_null);
 
     // add task
     return tb_ltimer_task_init_at(handle, tb_ltimer_now(timer) + after, period, repeat, func, priv);
@@ -697,8 +697,8 @@ tb_void_t tb_ltimer_task_exit(tb_handle_t handle, tb_handle_t htask)
         task->refn--;
 
         // cancel task
-        task->func      = tb_null;
-        task->priv      = tb_null;
+        task->func      = tb_object_null;
+        task->priv      = tb_object_null;
         task->repeat    = 0;
     }
     // remove it from pool directly if the task have been expired 

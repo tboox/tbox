@@ -36,14 +36,14 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSNCAT
 tb_wchar_t* tb_wcsncat(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
     return wcsncat(s1, s2, n);
 }
 #else
 tb_wchar_t* tb_wcsncat(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
 
     // done
     __tb_register__ tb_wchar_t* s = s1;

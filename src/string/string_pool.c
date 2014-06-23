@@ -44,7 +44,7 @@
  */
 
 // the string pool type
-typedef struct __tb_string_pool_t
+typedef struct __tb_object_string_pool_t
 {
     // the block pool
     tb_handle_t             pool;
@@ -55,52 +55,52 @@ typedef struct __tb_string_pool_t
     // the lock
     tb_spinlock_t           lock;
 
-}tb_string_pool_t;
+}tb_object_string_pool_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
-static tb_handle_t tb_string_pool_instance_init(tb_cpointer_t* ppriv)
+static tb_handle_t tb_object_string_pool_instance_init(tb_cpointer_t* ppriv)
 {
-    return tb_string_pool_init(tb_true, 0);
+    return tb_object_string_pool_init(tb_true, 0);
 }
-static tb_void_t tb_string_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
+static tb_void_t tb_object_string_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
     if (handle)
     {
 #ifdef __tb_debug__
         // dump it
-        tb_string_pool_dump(handle);
+        tb_object_string_pool_dump(handle);
 #endif
 
         // exit it
-        tb_string_pool_exit(handle);
+        tb_object_string_pool_exit(handle);
     }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_string_pool()
+tb_handle_t tb_object_string_pool()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_string_pool_instance_init, tb_string_pool_instance_exit, tb_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_object_string_pool_instance_init, tb_object_string_pool_instance_exit, tb_object_null);
 }
-tb_handle_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
+tb_handle_t tb_object_string_pool_init(tb_bool_t bcase, tb_size_t align)
 {
     // done
     tb_bool_t           ok = tb_false;
-    tb_string_pool_t*   pool = tb_null;
+    tb_object_string_pool_t*   pool = tb_object_null;
     do
     {
         // make pool
-        pool = (tb_string_pool_t*)tb_malloc0(sizeof(tb_string_pool_t));
+        pool = (tb_object_string_pool_t*)tb_malloc0(sizeof(tb_object_string_pool_t));
         tb_assert_and_check_break(pool);
 
         // init lock
         if (!tb_spinlock_init(&pool->lock)) break;
 
         // init pool
-        pool->pool = tb_block_pool_init(0, align);
+        pool->pool = tb_pool_init(0, align);
         tb_assert_and_check_break(pool->pool);
 
         // init hash
@@ -121,17 +121,17 @@ tb_handle_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
     if (!ok)
     {
         // exit it
-        if (pool) tb_string_pool_exit((tb_handle_t)pool);
-        pool = tb_null;
+        if (pool) tb_object_string_pool_exit((tb_handle_t)pool);
+        pool = tb_object_null;
     }
 
     // ok?
     return (tb_handle_t)pool;
 }
-tb_void_t tb_string_pool_exit(tb_handle_t handle)
+tb_void_t tb_object_string_pool_exit(tb_handle_t handle)
 {
     // check
-    tb_string_pool_t* pool = (tb_string_pool_t*)handle;
+    tb_object_string_pool_t* pool = (tb_object_string_pool_t*)handle;
     tb_assert_and_check_return(pool);
 
     // enter
@@ -139,11 +139,11 @@ tb_void_t tb_string_pool_exit(tb_handle_t handle)
 
     // exit cache
     if (pool->cache) tb_hash_exit(pool->cache);
-    pool->cache = tb_null;
+    pool->cache = tb_object_null;
 
     // exit pool
-    if (pool->pool) tb_block_pool_exit(pool->pool);
-    pool->pool = tb_null;
+    if (pool->pool) tb_pool_exit(pool->pool);
+    pool->pool = tb_object_null;
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -154,10 +154,10 @@ tb_void_t tb_string_pool_exit(tb_handle_t handle)
     // exit it
     tb_free(pool);
 }
-tb_void_t tb_string_pool_clear(tb_handle_t handle)
+tb_void_t tb_object_string_pool_clear(tb_handle_t handle)
 {
     // check
-    tb_string_pool_t* pool = (tb_string_pool_t*)handle;
+    tb_object_string_pool_t* pool = (tb_object_string_pool_t*)handle;
     tb_assert_and_check_return(pool);
 
     // enter
@@ -167,27 +167,27 @@ tb_void_t tb_string_pool_clear(tb_handle_t handle)
     if (pool->cache) tb_hash_clear(pool->cache);
 
     // clear pool
-    if (pool->pool) tb_block_pool_clear(pool->pool);
+    if (pool->pool) tb_pool_clear(pool->pool);
 
     // leave
     tb_spinlock_leave(&pool->lock);
 }
-tb_char_t const* tb_string_pool_put(tb_handle_t handle, tb_char_t const* data)
+tb_char_t const* tb_object_string_pool_put(tb_handle_t handle, tb_char_t const* data)
 {
     // check
-    tb_string_pool_t* pool = (tb_string_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && data, tb_null);
+    tb_object_string_pool_t* pool = (tb_object_string_pool_t*)handle;
+    tb_assert_and_check_return_val(pool && data, tb_object_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_char_t const* cstr = tb_null;
+    tb_char_t const* cstr = tb_object_null;
     if (pool->cache)
     {
         // exists?
         tb_size_t               itor;
-        tb_hash_item_t const*   item = tb_null;
+        tb_hash_item_t const*   item = tb_object_null;
         if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = (tb_hash_item_t const*)tb_iterator_item(pool->cache, itor)))
         {
             // refn
@@ -203,7 +203,7 @@ tb_char_t const* tb_string_pool_put(tb_handle_t handle, tb_char_t const* data)
 
                 // del it
                 tb_iterator_delt(pool->cache, itor);
-                item = tb_null;
+                item = tb_object_null;
             }
         }
         
@@ -225,17 +225,17 @@ tb_char_t const* tb_string_pool_put(tb_handle_t handle, tb_char_t const* data)
     // ok?
     return cstr;
 }
-tb_void_t tb_string_pool_del(tb_handle_t handle, tb_char_t const* data)
+tb_void_t tb_object_string_pool_del(tb_handle_t handle, tb_char_t const* data)
 {
     // check
-    tb_string_pool_t* pool = (tb_string_pool_t*)handle;
+    tb_object_string_pool_t* pool = (tb_object_string_pool_t*)handle;
     tb_assert_and_check_return(pool && data);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_hash_item_t const* item = tb_null;
+    tb_hash_item_t const* item = tb_object_null;
     if (pool->cache)
     {
         // exists?
@@ -256,10 +256,10 @@ tb_void_t tb_string_pool_del(tb_handle_t handle, tb_char_t const* data)
     tb_spinlock_leave(&pool->lock);
 }
 #ifdef __tb_debug__
-tb_void_t tb_string_pool_dump(tb_handle_t handle)
+tb_void_t tb_object_string_pool_dump(tb_handle_t handle)
 {
     // check
-    tb_string_pool_t* pool = (tb_string_pool_t*)handle;
+    tb_object_string_pool_t* pool = (tb_object_string_pool_t*)handle;
     tb_assert_and_check_return(pool);
 
     // enter

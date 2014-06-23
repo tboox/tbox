@@ -65,7 +65,7 @@ tb_void_t tb_socket_exit()
 tb_handle_t tb_socket_open(tb_size_t type)
 {
     // check
-    tb_assert_and_check_return_val(type, tb_null);
+    tb_assert_and_check_return_val(type, tb_object_null);
     
     // init type & protocol
     tb_int_t t = 0;
@@ -85,12 +85,12 @@ tb_handle_t tb_socket_open(tb_size_t type)
         }
         break;
     default:
-        return tb_null;
+        return tb_object_null;
     }
 
     // socket
     tb_int_t fd = socket(AF_INET, t, p);
-    tb_assert_and_check_return_val(fd >= 0, tb_null);
+    tb_assert_and_check_return_val(fd >= 0, tb_object_null);
 
     // non-block
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
@@ -253,7 +253,7 @@ tb_bool_t tb_socket_listen(tb_handle_t handle)
 tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_null);
+    tb_assert_and_check_return_val(handle, tb_object_null);
 
     // accept  
     struct sockaddr_in d = {0};
@@ -261,7 +261,7 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
     tb_long_t   fd = accept(tb_handle2fd(handle), (struct sockaddr *)&d, &n);
 
     // no client?
-    tb_check_return_val(fd > 0, tb_null);
+    tb_check_return_val(fd > 0, tb_object_null);
 
     // non-block
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
@@ -419,7 +419,7 @@ tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hize_t offset
 
     // send it
     off_t real = (off_t)size;
-    if (!sendfile(tb_handle2fd(file), tb_handle2fd(socket), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
+    if (!sendfile(tb_handle2fd(file), tb_handle2fd(socket), (off_t)offset, &real, tb_object_null, 0)) return (tb_hong_t)real;
 
     // continue?
     if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
@@ -512,7 +512,7 @@ tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t 
     msg.msg_namelen     = sizeof(d);
     msg.msg_iov         = (struct iovec*)list;
     msg.msg_iovlen      = (size_t)size;
-    msg.msg_control     = tb_null;
+    msg.msg_control     = tb_object_null;
     msg.msg_controllen  = 0;
     msg.msg_flags       = 0;
 
@@ -545,7 +545,7 @@ tb_long_t tb_socket_usendv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t 
     msg.msg_namelen     = sizeof(d);
     msg.msg_iov         = (struct iovec*)list;
     msg.msg_iovlen      = (size_t)size;
-    msg.msg_control     = tb_null;
+    msg.msg_control     = tb_object_null;
     msg.msg_controllen  = 0;
     msg.msg_flags       = 0;
 

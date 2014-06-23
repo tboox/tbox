@@ -38,7 +38,7 @@ tb_bool_t tb_dns_init()
 {
     // done
     tb_size_t count = 0;
-    if (tb_file_info("/etc/resolv.conf", tb_null)) 
+    if (tb_file_info("/etc/resolv.conf", tb_object_null)) 
     {
         /* try get list from "/etc/resolv.conf"
          *

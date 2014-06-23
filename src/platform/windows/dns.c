@@ -35,7 +35,7 @@
 tb_bool_t tb_dns_init()
 {
     // done
-    FIXED_INFO*             info = tb_null;
+    FIXED_INFO*             info = tb_object_null;
     ULONG                   size = 0;
     tb_size_t               count = 0;
     do 
@@ -91,7 +91,7 @@ tb_bool_t tb_dns_init()
 
     // exit info
     if (info) tb_free(info);
-    info = tb_null;
+    info = tb_object_null;
 
     // no server? add the default server
     if (!count) 

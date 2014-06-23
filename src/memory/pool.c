@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        block_pool.c
+ * @file        pool.c
  * @ingroup     memory
  *
  */
@@ -35,15 +35,15 @@
  * macros
  */
 #ifdef __tb_small__
-#   define TB_BLOCK_POOL_CHUNK_GROW             (8)
+#   define TB_POOL_CHUNK_GROW             (8)
 #else
-#   define TB_BLOCK_POOL_CHUNK_GROW             (16)
+#   define TB_POOL_CHUNK_GROW             (16)
 #endif
 
 #ifdef __tb_small__
-#   define TB_BLOCK_POOL_GROW_DEFAULT           TB_BLOCK_POOL_GROW_SMALL
+#   define TB_POOL_GROW_DEFAULT           TB_POOL_GROW_SMALL
 #else
-#   define TB_BLOCK_POOL_GROW_DEFAULT           TB_BLOCK_POOL_GROW_LARGE
+#   define TB_POOL_GROW_DEFAULT           TB_POOL_GROW_LARGE
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@
  */
 
 /// the pool chunk type
-typedef struct __tb_block_pool_chunk_t
+typedef struct __tb_pool_chunk_t
 {
     // the static block pool
     tb_handle_t             pool;
@@ -60,11 +60,11 @@ typedef struct __tb_block_pool_chunk_t
     tb_byte_t*              data;
     tb_size_t               size;
 
-}tb_block_pool_chunk_t;
+}tb_pool_chunk_t;
 
 /// the pool info type
 #ifdef __tb_debug__
-typedef struct __tb_block_pool_info_t
+typedef struct __tb_pool_info_t
 {
     // the pred count
     tb_size_t               pred;
@@ -72,17 +72,17 @@ typedef struct __tb_block_pool_info_t
     // the aloc count
     tb_size_t               aloc;
 
-}tb_block_pool_info_t;
+}tb_pool_info_t;
 #endif
 
 /// the small or string pool
-typedef struct __tb_block_pool_t
+typedef struct __tb_pool_t
 {
     // the pools align
     tb_size_t               align;
 
     // the chunk pools
-    tb_block_pool_chunk_t*  pools;
+    tb_pool_chunk_t*  pools;
 
     // the chunk pool count
     tb_size_t               pooln;
@@ -98,48 +98,48 @@ typedef struct __tb_block_pool_t
 
     // the info
 #ifdef __tb_debug__
-    tb_block_pool_info_t    info;
+    tb_pool_info_t    info;
 #endif
 
-}tb_block_pool_t;
+}tb_pool_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-__tb_extern_c__ tb_pointer_t tb_static_block_pool_ralloc_fast(tb_pointer_t bpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
+__tb_extern_c__ tb_pointer_t tb_static_pool_ralloc_fast(tb_pointer_t bpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_pointer_t tb_block_pool_ralloc_fast(tb_block_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
+static tb_pointer_t tb_pool_ralloc_fast(tb_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {
     // check 
-    tb_assert_and_check_return_val(pool && pool->pools, tb_null);
+    tb_assert_and_check_return_val(pool && pool->pools, tb_object_null);
 
     // no size?
-    tb_check_return_val(size, tb_null);
+    tb_check_return_val(size, tb_object_null);
 
     // check osize
-    tb_assert_and_check_return_val(osize && !*osize, tb_null);
+    tb_assert_and_check_return_val(osize && !*osize, tb_object_null);
     
     // reallocate it from the predicted pool first
     if (pool->pred)
     {
         // check
-        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
+        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_object_null);
 
         // the predicted pool
         tb_handle_t bpool = pool->pools[pool->pred - 1].pool;
         if (bpool) 
         {
             // try reallocating it
-            tb_pointer_t p = tb_static_block_pool_ralloc_fast(bpool, data, size, osize);
+            tb_pointer_t p = tb_static_pool_ralloc_fast(bpool, data, size, osize);
 
             // ok?
             tb_check_return_val(!p, p);
 
             // no space?
-            tb_check_return_val(!*osize, tb_null);
+            tb_check_return_val(!*osize, tb_object_null);
         }
     }
 
@@ -154,31 +154,31 @@ static tb_pointer_t tb_block_pool_ralloc_fast(tb_block_pool_t* pool, tb_pointer_
             if (bpool) 
             {
                 // try reallocating it
-                tb_pointer_t p = tb_static_block_pool_ralloc_fast(bpool, data, size, osize);
+                tb_pointer_t p = tb_static_pool_ralloc_fast(bpool, data, size, osize);
 
                 // ok?
                 tb_check_return_val(!p, p);
 
                 // no space?
-                tb_check_return_val(!*osize, tb_null);
+                tb_check_return_val(!*osize, tb_object_null);
             }
         }
     }
 
-    return tb_null;
+    return tb_object_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_block_pool_init(tb_size_t grow, tb_size_t align)
+tb_handle_t tb_pool_init(tb_size_t grow, tb_size_t align)
 {
     // using the default grow
-    if (!grow) grow = TB_BLOCK_POOL_GROW_DEFAULT;
+    if (!grow) grow = TB_POOL_GROW_DEFAULT;
 
     // init pool
-    tb_block_pool_t* pool = (tb_block_pool_t*)tb_malloc0(sizeof(tb_block_pool_t));
-    tb_assert_and_check_return_val(pool, tb_null);
+    tb_pool_t* pool = (tb_pool_t*)tb_malloc0(sizeof(tb_pool_t));
+    tb_assert_and_check_return_val(pool, tb_object_null);
 
     // init pools align
     pool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
@@ -189,8 +189,8 @@ tb_handle_t tb_block_pool_init(tb_size_t grow, tb_size_t align)
 
     // init chunk pools
     pool->pooln = 0;
-    pool->poolm = TB_BLOCK_POOL_CHUNK_GROW;
-    pool->pools = (tb_block_pool_chunk_t*)tb_nalloc0(TB_BLOCK_POOL_CHUNK_GROW, sizeof(tb_block_pool_chunk_t));
+    pool->poolm = TB_POOL_CHUNK_GROW;
+    pool->pools = (tb_pool_chunk_t*)tb_nalloc0(TB_POOL_CHUNK_GROW, sizeof(tb_pool_chunk_t));
     tb_assert_and_check_goto(pool->pools, fail);
 
     // init chunk pred
@@ -206,18 +206,18 @@ tb_handle_t tb_block_pool_init(tb_size_t grow, tb_size_t align)
     return (tb_handle_t)pool;
 
 fail:
-    if (pool) tb_block_pool_exit(pool);
-    return tb_null;
+    if (pool) tb_pool_exit(pool);
+    return tb_object_null;
 }
 
-tb_void_t tb_block_pool_exit(tb_handle_t handle)
+tb_void_t tb_pool_exit(tb_handle_t handle)
 {
     // check 
-    tb_block_pool_t* pool = (tb_block_pool_t*)handle;
+    tb_pool_t* pool = (tb_pool_t*)handle;
     tb_assert_and_check_return(pool);
 
     // clear
-    tb_block_pool_clear(handle);
+    tb_pool_clear(handle);
 
     // free pools
     if (pool->pools) 
@@ -227,7 +227,7 @@ tb_void_t tb_block_pool_exit(tb_handle_t handle)
         for (i = 0; i < n; i++)
         {
             if (pool->pools[i].pool) 
-                tb_static_block_pool_exit(pool->pools[i].pool);
+                tb_static_pool_exit(pool->pools[i].pool);
 
             if (pool->pools[i].data) 
                 tb_free(pool->pools[i].data);
@@ -239,10 +239,10 @@ tb_void_t tb_block_pool_exit(tb_handle_t handle)
     // free pool
     tb_free(pool);
 }
-tb_void_t tb_block_pool_clear(tb_handle_t handle)
+tb_void_t tb_pool_clear(tb_handle_t handle)
 {
     // check 
-    tb_block_pool_t* pool = (tb_block_pool_t*)handle;
+    tb_pool_t* pool = (tb_pool_t*)handle;
     tb_assert_and_check_return(pool && pool->pools);
 
     // clear pools
@@ -251,7 +251,7 @@ tb_void_t tb_block_pool_clear(tb_handle_t handle)
     for (i = 0; i < n; i++)
     {
         if (pool->pools[i].pool) 
-            tb_static_block_pool_clear(pool->pools[i].pool);
+            tb_static_pool_clear(pool->pools[i].pool);
     }
     
     // reinit grow
@@ -267,14 +267,14 @@ tb_void_t tb_block_pool_clear(tb_handle_t handle)
 #endif
 
 }
-tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_block_pool_t* pool = (tb_block_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->pools, tb_null);
+    tb_pool_t* pool = (tb_pool_t*)handle;
+    tb_assert_and_check_return_val(pool && pool->pools, tb_object_null);
 
     // no size?
-    tb_check_return_val(size, tb_null);
+    tb_check_return_val(size, tb_object_null);
     
     // aloc++
 #ifdef __tb_debug__
@@ -285,14 +285,14 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
     if (pool->pred)
     {
         // check
-        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
+        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_object_null);
 
         // the predicted pool
         tb_handle_t bpool = pool->pools[pool->pred - 1].pool;
         if (bpool) 
         {
             // try allocating it
-            tb_pointer_t p = tb_static_block_pool_malloc_(bpool, size __tb_debug_args__);
+            tb_pointer_t p = tb_static_pool_malloc_(bpool, size __tb_debug_args__);
 
             // ok
             if (p) 
@@ -317,7 +317,7 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
             if (bpool) 
             {
                 // try allocating it
-                tb_pointer_t p = tb_static_block_pool_malloc_(bpool, size __tb_debug_args__);
+                tb_pointer_t p = tb_static_pool_malloc_(bpool, size __tb_debug_args__);
 
                 // ok
                 if (p) 
@@ -333,17 +333,17 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
     if (pool->pooln >= pool->poolm)
     {
         // grow
-        pool->poolm += TB_BLOCK_POOL_CHUNK_GROW;
-        pool->pools = (tb_block_pool_chunk_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_block_pool_chunk_t));
-        tb_assert_and_check_return_val(pool->pools, tb_null);
+        pool->poolm += TB_POOL_CHUNK_GROW;
+        pool->pools = (tb_pool_chunk_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_pool_chunk_t));
+        tb_assert_and_check_return_val(pool->pools, tb_object_null);
     }
     
     // append a new pool for allocation
-    tb_block_pool_chunk_t* chunk = &pool->pools[pool->pooln];
+    tb_pool_chunk_t* chunk = &pool->pools[pool->pooln];
     do
     {
         // clear the chunk
-        tb_memset(chunk, 0, sizeof(tb_block_pool_chunk_t));
+        tb_memset(chunk, 0, sizeof(tb_pool_chunk_t));
 
         // alloc chunk data
         chunk->size = pool->grow;
@@ -353,11 +353,11 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
         tb_check_break(chunk->data);
 
         // init chunk pool
-        chunk->pool = tb_static_block_pool_init(chunk->data, chunk->size, pool->align);
+        chunk->pool = tb_static_pool_init(chunk->data, chunk->size, pool->align);
         tb_assert_and_check_break(chunk->pool);
 
         // try allocating it
-        tb_pointer_t p = tb_static_block_pool_malloc_(chunk->pool, size __tb_debug_args__);
+        tb_pointer_t p = tb_static_pool_malloc_(chunk->pool, size __tb_debug_args__);
 
         // ok
         if (p) 
@@ -371,17 +371,17 @@ tb_pointer_t tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug
     } while (0);
 
     // clean chunk
-    if (chunk->pool) tb_static_block_pool_exit(chunk->pool);
+    if (chunk->pool) tb_static_pool_exit(chunk->pool);
     if (chunk->data) tb_free(chunk->data);
-    tb_memset(chunk, 0, sizeof(tb_block_pool_chunk_t));
+    tb_memset(chunk, 0, sizeof(tb_pool_chunk_t));
 
     // fail
-    return tb_null;
+    return tb_object_null;
 }
-tb_pointer_t tb_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
     // malloc
-    tb_pointer_t p = tb_block_pool_malloc_(handle, size __tb_debug_args__);
+    tb_pointer_t p = tb_pool_malloc_(handle, size __tb_debug_args__);
 
     // clear
     if (p && size) tb_memset(p, 0, size);
@@ -389,68 +389,68 @@ tb_pointer_t tb_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debu
     // ok?
     return p;
 }
-tb_pointer_t tb_block_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_null);
+    tb_assert_and_check_return_val(item, tb_object_null);
 
     // malloc
-    return tb_block_pool_malloc_(handle, item * size __tb_debug_args__);
+    return tb_pool_malloc_(handle, item * size __tb_debug_args__);
 }
 
-tb_pointer_t tb_block_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_null);
+    tb_assert_and_check_return_val(item, tb_object_null);
 
     // malloc
-    return tb_block_pool_malloc0_(handle, item * size __tb_debug_args__);
+    return tb_pool_malloc0_(handle, item * size __tb_debug_args__);
 }
 
-tb_pointer_t tb_block_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_block_pool_t* pool = (tb_block_pool_t*)handle;
-    tb_assert_and_check_return_val(pool, tb_null);
+    tb_pool_t* pool = (tb_pool_t*)handle;
+    tb_assert_and_check_return_val(pool, tb_object_null);
 
     // free it if no size
     if (!size)
     {
-        tb_block_pool_free_(pool, data __tb_debug_args__);
-        return tb_null;
+        tb_pool_free_(pool, data __tb_debug_args__);
+        return tb_object_null;
     }
 
     // alloc it if no data?
-    if (!data) return tb_block_pool_malloc_(pool, size __tb_debug_args__);
+    if (!data) return tb_pool_malloc_(pool, size __tb_debug_args__);
     
     // ralloc it with fast mode if enough
     tb_size_t       osize = 0;
-    tb_pointer_t    pdata = tb_block_pool_ralloc_fast(pool, data, size, &osize);
+    tb_pointer_t    pdata = tb_pool_ralloc_fast(pool, data, size, &osize);
     tb_check_return_val(!pdata, pdata);
-    tb_assert_and_check_return_val(osize < size, tb_null);
+    tb_assert_and_check_return_val(osize < size, tb_object_null);
 
     // malloc it
-    pdata = tb_block_pool_malloc_(pool, size __tb_debug_args__);
-    tb_check_return_val(pdata, tb_null);
+    pdata = tb_pool_malloc_(pool, size __tb_debug_args__);
+    tb_check_return_val(pdata, tb_object_null);
     tb_assert_and_check_return_val(pdata != data, pdata);
 
     // copy data
     tb_memcpy(pdata, data, osize);
     
     // free it
-    tb_block_pool_free_(pool, data __tb_debug_args__);
+    tb_pool_free_(pool, data __tb_debug_args__);
 
     // ok
     return pdata;
 }
-tb_char_t* tb_block_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__)
+tb_char_t* tb_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(handle && data, tb_null);
+    tb_assert_and_check_return_val(handle && data, tb_object_null);
 
     // done
     tb_size_t   n = tb_strlen(data);
-    tb_char_t*  p = (tb_char_t*)tb_block_pool_malloc_(handle, n + 1 __tb_debug_args__);
+    tb_char_t*  p = (tb_char_t*)tb_pool_malloc_(handle, n + 1 __tb_debug_args__);
     if (p)
     {
         tb_memcpy(p, data, n);
@@ -460,14 +460,14 @@ tb_char_t* tb_block_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_
     return p;
 }
 
-tb_char_t* tb_block_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__)
+tb_char_t* tb_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(handle && data, tb_null);
+    tb_assert_and_check_return_val(handle && data, tb_object_null);
 
     // done
     size = tb_strnlen(data, size);
-    tb_char_t*  p = (tb_char_t*)tb_block_pool_malloc_(handle, size + 1 __tb_debug_args__);
+    tb_char_t*  p = (tb_char_t*)tb_pool_malloc_(handle, size + 1 __tb_debug_args__);
     if (p)
     {
         tb_memcpy(p, data, size);
@@ -476,10 +476,10 @@ tb_char_t* tb_block_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_
 
     return p;
 }
-tb_bool_t tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
+tb_bool_t tb_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
 {
     // check 
-    tb_block_pool_t* pool = (tb_block_pool_t*)handle;
+    tb_pool_t* pool = (tb_pool_t*)handle;
     tb_assert_and_check_return_val(pool && pool->pools, tb_false);
 
     // no data?
@@ -496,7 +496,7 @@ tb_bool_t tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_d
         if (bpool) 
         {
             // try allocating it
-            tb_bool_t r = tb_static_block_pool_free_(bpool, data __tb_debug_args__);
+            tb_bool_t r = tb_static_pool_free_(bpool, data __tb_debug_args__);
 
             // ok
             if (r) return r;
@@ -511,7 +511,7 @@ tb_bool_t tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_d
         if (bpool) 
         {
             // try free it
-            tb_bool_t r = tb_static_block_pool_free_(bpool, data __tb_debug_args__);
+            tb_bool_t r = tb_static_pool_free_(bpool, data __tb_debug_args__);
 
             // ok
             if (r) 
@@ -528,10 +528,10 @@ tb_bool_t tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_d
 }
 
 #ifdef __tb_debug__
-tb_void_t tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
+tb_void_t tb_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 {
     // check 
-    tb_block_pool_t* pool = (tb_block_pool_t*)handle;
+    tb_pool_t* pool = (tb_pool_t*)handle;
     tb_assert_and_check_return(pool && pool->pools);
 
     // prefix
@@ -553,7 +553,7 @@ tb_void_t tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
     for (i = 0; i < n; i++)
     {
         tb_handle_t bpool = pool->pools[i].pool;
-        if (bpool) tb_static_block_pool_dump(bpool, prefix);
+        if (bpool) tb_static_pool_dump(bpool, prefix);
     }
 }
 #endif

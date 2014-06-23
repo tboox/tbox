@@ -36,7 +36,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 {
     // alloc
     sem_t* h = tb_malloc0(sizeof(sem_t));
-    tb_assert_and_check_return_val(h, tb_null);
+    tb_assert_and_check_return_val(h, tb_object_null);
 
     // init
     if (sem_init(h, 0, init) < 0) goto fail;
@@ -45,7 +45,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
     return (tb_handle_t)h;
 
 fail:
-    return tb_null;
+    return tb_object_null;
 }
 tb_void_t tb_semaphore_exit(tb_handle_t handle)
 {
@@ -92,7 +92,7 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 
     // init time
     struct timespec t = {0};
-    t.tv_sec = time(tb_null);
+    t.tv_sec = time(tb_object_null);
     if (timeout > 0)
     {
         t.tv_sec += timeout / 1000;

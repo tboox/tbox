@@ -45,13 +45,13 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRCPY)
 static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
     return strcpy(s1, s2);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRCPY)
 static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
 
     __tb_register__ tb_char_t* s = s1;
     if (s1 == s2) return s;
@@ -92,7 +92,7 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
         if (n1 && n2 + 1 > n1)
         {
             tb_trace_i("[strcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n2, s1, n1);
-            tb_backtrace_dump("[strcpy]: [overflow]: ", tb_null, 10);
+            tb_backtrace_dump("[strcpy]: [overflow]: ", tb_object_null, 10);
             tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
             tb_abort();
         }

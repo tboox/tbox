@@ -17,9 +17,9 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // done
-    tb_handle_t sock = tb_null;
-    tb_handle_t file = tb_null;
-    tb_byte_t*  data = tb_null;
+    tb_handle_t sock = tb_object_null;
+    tb_handle_t file = tb_object_null;
+    tb_byte_t*  data = tb_object_null;
     do
     {
         // init sock

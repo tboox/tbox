@@ -15,18 +15,18 @@ tbox_C_FILES 			+= \
 						math/random/random \
 						math/random/linear \
 						prefix/state \
-						memory/static_block_pool \
+						memory/static_pool \
 						memory/static_fixed_pool \
 						memory/static_tiny_pool \
-						memory/block_pool \
+						memory/pool \
 						memory/fixed_pool \
 						memory/global_pool \
 						memory/memory \
-						memory/scoped_buffer \
+						memory/buffer \
 						memory/static_buffer \
 						memory/queue_buffer \
 						string/string_pool \
-						string/scoped_string \
+						string/string \
 						string/static_string \
 						algorithm/sort \
 						algorithm/heap_sort \
@@ -82,7 +82,7 @@ tbox_C_FILES 			+= \
 						stream/basic_stream/data \
 						stream/basic_stream/sock \
 						stream/basic_stream/filter \
-						stream/basic_transfer \
+						stream/transfer \
 						stream/filter/filter \
 						stream/filter/cache \
 						stream/filter/chunked \
@@ -305,7 +305,7 @@ tbox_C_FILES 			+= \
 						object/null \
 						object/data \
 						object/date \
-						object/object_pool \
+						object/pool \
 						object/array \
 						object/string \
 						object/number \
@@ -437,15 +437,15 @@ INC_FILES 				= \
 						prefix/asm/cache.h \
 						prefix/asm/arm/prefix.h \
 						prefix/asm/arm/prefix.S \
-						memory/static_block_pool.h \
+						memory/static_pool.h \
 						memory/static_fixed_pool.h \
 						memory/static_tiny_pool.h \
  						memory/global_pool.h \
-						memory/block_pool.h \
+						memory/pool.h \
 						memory/fixed_pool.h \
 						memory/prefix.h \
 						memory/memory.h \
-						memory/scoped_buffer.h \
+						memory/buffer.h \
 						memory/static_buffer.h \
 						memory/queue_buffer.h \
 						asio/asio.h \
@@ -479,7 +479,7 @@ INC_FILES 				= \
 						string/prefix.h \
 						string/string.h \
 						string/string_pool.h \
-						string/scoped_string.h \
+						string/string.h \
 						string/static_string.h \
 						algorithm/prefix.h \
 						algorithm/algorithm.h \
@@ -595,7 +595,7 @@ INC_FILES 				= \
 						stream/static_stream.h \
 						stream/transfer_pool.h \
 						stream/async_transfer.h \
-						stream/basic_transfer.h \
+						stream/transfer.h \
 						stream/transfer.h \
 						stream/filter/prefix.h \
 						stream/filter/filter.h \
@@ -609,7 +609,7 @@ INC_FILES 				= \
 						object/string.h \
 						object/boolean.h \
 						object/dictionary.h \
-						object/object_pool.h \
+						object/pool.h \
 						object/reader/prefix.h \
 						object/reader/reader.h \
 						object/reader/xml.h \

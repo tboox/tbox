@@ -51,7 +51,7 @@ tb_void_t tb_socket_exit()
 tb_handle_t tb_socket_open(tb_size_t type)
 {
     tb_trace_noimpl();
-    return tb_null;
+    return tb_object_null;
 }
 tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 {
@@ -90,7 +90,7 @@ tb_bool_t tb_socket_listen(tb_handle_t handle)
 tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
     tb_trace_noimpl();
-    return tb_null;
+    return tb_object_null;
 }
 tb_bool_t tb_socket_kill(tb_handle_t handle, tb_size_t mode)
 {

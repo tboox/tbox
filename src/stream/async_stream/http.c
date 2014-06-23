@@ -77,7 +77,7 @@ typedef struct __tb_async_stream_http_t
 static __tb_inline__ tb_async_stream_http_t* tb_async_stream_http_cast(tb_handle_t stream)
 {
     tb_async_stream_t* astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
+    tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_HTTP, tb_object_null);
     return (tb_async_stream_http_t*)astream;
 }
 static tb_void_t tb_async_stream_http_clos_clear(tb_async_stream_http_t* hstream)
@@ -226,7 +226,7 @@ static tb_bool_t tb_async_stream_http_read(tb_handle_t astream, tb_size_t delay,
         tb_hize_t offset = tb_atomic64_get(&hstream->offset);
         if (offset == hsize)
         {
-            func(astream, TB_STATE_CLOSED, tb_null, 0, size, priv);
+            func(astream, TB_STATE_CLOSED, tb_object_null, 0, size, priv);
             return tb_true;
         }
     }
@@ -311,7 +311,7 @@ static tb_bool_t tb_async_stream_http_exit(tb_handle_t astream)
 
     // exit it
     if (hstream->http) tb_aicp_http_exit(hstream->http);
-    hstream->http = tb_null;
+    hstream->http = tb_object_null;
 
     // ok
     return tb_true;
@@ -761,7 +761,7 @@ tb_async_stream_t* tb_async_stream_init_http(tb_aicp_t* aicp)
 {
     // done
     tb_bool_t               ok = tb_false;
-    tb_async_stream_http_t* hstream = tb_null;
+    tb_async_stream_http_t* hstream = tb_object_null;
     do
     {
         // make stream
@@ -794,7 +794,7 @@ tb_async_stream_t* tb_async_stream_init_http(tb_aicp_t* aicp)
     {
         // exit it
         if (hstream) tb_async_stream_exit((tb_async_stream_t*)hstream);
-        hstream = tb_null;
+        hstream = tb_object_null;
     }
 
     // ok
@@ -803,11 +803,11 @@ tb_async_stream_t* tb_async_stream_init_http(tb_aicp_t* aicp)
 tb_async_stream_t* tb_async_stream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
 {
     // check
-    tb_assert_and_check_return_val(host && port && path, tb_null);
+    tb_assert_and_check_return_val(host && port && path, tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  hstream = tb_null;
+    tb_async_stream_t*  hstream = tb_object_null;
     do
     {
         // init stream
@@ -830,7 +830,7 @@ tb_async_stream_t* tb_async_stream_init_from_http(tb_aicp_t* aicp, tb_char_t con
     {
         // exit it
         if (hstream) tb_async_stream_exit(hstream);
-        hstream = tb_null;
+        hstream = tb_object_null;
     }
 
     // ok

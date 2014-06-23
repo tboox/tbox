@@ -332,7 +332,7 @@ tb_size_t tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t in
             tb_item_func_hash_uint8_func_0
         ,   tb_item_func_hash_uint8_func_1
         };
-        tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+        tb_assert_and_check_return_val(index < tb_object_arrayn(s_func), 0);
 
         // done
         return s_func[index](value) & mask;
@@ -355,7 +355,7 @@ tb_size_t tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t 
         {
             tb_item_func_hash_uint16_func_0
         };
-        tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+        tb_assert_and_check_return_val(index < tb_object_arrayn(s_func), 0);
 
         // done
         return s_func[index](value) & mask;
@@ -380,7 +380,7 @@ tb_size_t tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t 
         ,   tb_item_func_hash_uint32_func_1
         ,   tb_item_func_hash_uint32_func_2
         };
-        tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+        tb_assert_and_check_return_val(index < tb_object_arrayn(s_func), 0);
 
         // done
         return s_func[index](value) & mask;
@@ -399,7 +399,7 @@ tb_size_t tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t 
         {
             tb_item_func_hash_uint64_func_0
         };
-        tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+        tb_assert_and_check_return_val(index < tb_object_arrayn(s_func), 0);
 
         // done
         return s_func[index](value) & mask;
@@ -435,7 +435,7 @@ tb_size_t tb_item_func_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_
     ,   tb_item_func_hash_data_func_14
     ,   tb_item_func_hash_data_func_15
     };
-    tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+    tb_assert_and_check_return_val(index < tb_object_arrayn(s_func), 0);
 
     // done
     return s_func[index](data, size) & mask;
@@ -454,7 +454,7 @@ tb_size_t tb_item_func_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_
             tb_item_func_hash_cstr_func_0
         ,   tb_item_func_hash_cstr_func_1
         };
-        tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
+        tb_assert_and_check_return_val(index < tb_object_arrayn(s_func), 0);
 
         // done
         return s_func[index](cstr) & mask;

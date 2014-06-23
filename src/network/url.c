@@ -53,8 +53,8 @@ tb_bool_t tb_url_init(tb_url_t* url)
         tb_ipv4_clr(&url->ipv4);
         if (!tb_static_string_init(&url->host, url->data, TB_URL_HOST_MAXN)) break;
         if (!tb_static_string_init(&url->path, url->data + TB_URL_HOST_MAXN, TB_URL_PATH_MAXN)) break;
-        if (!tb_scoped_string_init(&url->args)) break;
-        if (!tb_scoped_string_init(&url->urls)) break;
+        if (!tb_string_init(&url->args)) break;
+        if (!tb_string_init(&url->urls)) break;
 
         // ok
         ok = tb_true;
@@ -73,8 +73,8 @@ tb_void_t tb_url_exit(tb_url_t* url)
     {
         tb_static_string_exit(&url->host);
         tb_static_string_exit(&url->path);
-        tb_scoped_string_exit(&url->args);
-        tb_scoped_string_exit(&url->urls);
+        tb_string_exit(&url->args);
+        tb_string_exit(&url->urls);
     }
 }
 tb_void_t tb_url_clear(tb_url_t* url)
@@ -91,16 +91,16 @@ tb_void_t tb_url_clear(tb_url_t* url)
     tb_ipv4_clr(&url->ipv4);
     tb_static_string_clear(&url->host);
     tb_static_string_clear(&url->path);
-    tb_scoped_string_clear(&url->args);
-    tb_scoped_string_clear(&url->urls);
+    tb_string_clear(&url->args);
+    tb_string_clear(&url->urls);
 }
 tb_char_t const* tb_url_get(tb_url_t* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // exists? return it directly
-    if (tb_scoped_string_size(&url->urls)) return tb_scoped_string_cstr(&url->urls);
+    if (tb_string_size(&url->urls)) return tb_string_cstr(&url->urls);
 
     // make
     switch (url->poto)
@@ -108,22 +108,22 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     case TB_URL_PROTOCOL_FILE:
         {
             // check
-            tb_check_return_val(tb_static_string_size(&url->path), tb_null);
+            tb_check_return_val(tb_static_string_size(&url->path), tb_object_null);
 
             // add protocol
             if (!url->bwin)
             {
-                if (url->bssl) tb_scoped_string_cstrncpy(&url->urls, "files://", 8);
-                else tb_scoped_string_cstrncpy(&url->urls, "file://", 7);
+                if (url->bssl) tb_string_cstrncpy(&url->urls, "files://", 8);
+                else tb_string_cstrncpy(&url->urls, "file://", 7);
             }
             else
             {
                 tb_assert(url->pwin);
-                tb_scoped_string_cstrfcpy(&url->urls, "%c:/", url->pwin);
+                tb_string_cstrfcpy(&url->urls, "%c:/", url->pwin);
             }
 
             // add path
-            tb_scoped_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
+            tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
         }
         break;
     case TB_URL_PROTOCOL_SOCK:
@@ -131,67 +131,67 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     case TB_URL_PROTOCOL_RTSP:
         {   
             // check
-            tb_check_return_val(url->port && tb_static_string_size(&url->host), tb_null);
+            tb_check_return_val(url->port && tb_static_string_size(&url->host), tb_object_null);
 
             // add protocol
-            if (url->poto == TB_URL_PROTOCOL_HTTP) tb_scoped_string_cstrcpy(&url->urls, "http");
-            else if (url->poto == TB_URL_PROTOCOL_SOCK) tb_scoped_string_cstrcpy(&url->urls, "sock");
-            else if (url->poto == TB_URL_PROTOCOL_RTSP) tb_scoped_string_cstrcpy(&url->urls, "rtsp");
+            if (url->poto == TB_URL_PROTOCOL_HTTP) tb_string_cstrcpy(&url->urls, "http");
+            else if (url->poto == TB_URL_PROTOCOL_SOCK) tb_string_cstrcpy(&url->urls, "sock");
+            else if (url->poto == TB_URL_PROTOCOL_RTSP) tb_string_cstrcpy(&url->urls, "rtsp");
             else tb_assert_and_check_break(0);
 
             // add ssl
-            if (url->bssl) tb_scoped_string_chrcat(&url->urls, 's');
+            if (url->bssl) tb_string_chrcat(&url->urls, 's');
 
             // add ://
-            tb_scoped_string_cstrncat(&url->urls, "://", 3);
+            tb_string_cstrncat(&url->urls, "://", 3);
 
             // add host
-            tb_scoped_string_cstrncat(&url->urls, tb_static_string_cstr(&url->host), tb_static_string_size(&url->host));
+            tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->host), tb_static_string_size(&url->host));
 
             // add port
             if (    (url->poto != TB_URL_PROTOCOL_HTTP)
                 ||  (url->bssl && url->port != TB_HTTP_DEFAULT_PORT_SSL) 
                 ||  (!url->bssl && url->port != TB_HTTP_DEFAULT_PORT))
             {
-                tb_scoped_string_cstrfcat(&url->urls, ":%u", url->port);
+                tb_string_cstrfcat(&url->urls, ":%u", url->port);
             }
 
             // add path
             if (tb_static_string_size(&url->path)) 
-                tb_scoped_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
+                tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
 
             // add args
-            if (tb_scoped_string_size(&url->args)) 
+            if (tb_string_size(&url->args)) 
             {
-                tb_scoped_string_chrcat(&url->urls, '?');
-                tb_scoped_string_strcat(&url->urls, &url->args);
+                tb_string_chrcat(&url->urls, '?');
+                tb_string_strcat(&url->urls, &url->args);
             }
         }
         break;
     case TB_URL_PROTOCOL_SQL:
         {
             // add protocol
-            tb_scoped_string_cstrcpy(&url->urls, "sql://");
+            tb_string_cstrcpy(&url->urls, "sql://");
 
             // add host and port
             if (tb_static_string_size(&url->host))
             {
                 // add host
-                tb_scoped_string_cstrncat(&url->urls, tb_static_string_cstr(&url->host), tb_static_string_size(&url->host));
+                tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->host), tb_static_string_size(&url->host));
 
                 // add port
-                if (url->port) tb_scoped_string_cstrfcat(&url->urls, ":%u", url->port);
+                if (url->port) tb_string_cstrfcat(&url->urls, ":%u", url->port);
             }
 
             // add path
             if (tb_static_string_size(&url->path)) 
-                tb_scoped_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
+                tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
 
             // add args
-            if (tb_scoped_string_size(&url->args)) 
+            if (tb_string_size(&url->args)) 
             {
-                tb_scoped_string_chrcat(&url->urls, '?');
-                tb_scoped_string_strcat(&url->urls, &url->args);
+                tb_string_chrcat(&url->urls, '?');
+                tb_string_strcat(&url->urls, &url->args);
             }
         }
         break;
@@ -202,7 +202,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     }
 
     // ok?
-    return tb_scoped_string_size(&url->urls)? tb_scoped_string_cstr(&url->urls) : tb_null;
+    return tb_string_size(&url->urls)? tb_string_cstr(&url->urls) : tb_object_null;
 }
 tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
 {
@@ -346,10 +346,10 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
 
             // parse args
             while (*p && (*p == '?' || *p == '=' || tb_isspace(*p))) p++;
-            if (*p) tb_scoped_string_cstrcpy(&url->args, p);
+            if (*p) tb_string_cstrcpy(&url->args, p);
 
             // trim the right spaces
-            tb_scoped_string_rtrim(&url->args);
+            tb_string_rtrim(&url->args);
         }
         // done data
         else 
@@ -358,10 +358,10 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
             if (*p) 
             {
                 // copy it
-                tb_scoped_string_cstrcpy(&url->urls, p);
+                tb_string_cstrcpy(&url->urls, p);
 
                 // trim the right spaces
-                tb_scoped_string_rtrim(&url->urls);
+                tb_string_rtrim(&url->urls);
             }
         }
 
@@ -389,8 +389,8 @@ tb_void_t tb_url_copy(tb_url_t* url, tb_url_t const* copy)
     url->pwin = copy->pwin;
     tb_static_string_strcpy(&url->host, &copy->host);
     tb_static_string_strcpy(&url->path, &copy->path);
-    tb_scoped_string_strcpy(&url->args, &copy->args);
-    tb_scoped_string_strcpy(&url->urls, &copy->urls);
+    tb_string_strcpy(&url->args, &copy->args);
+    tb_string_strcpy(&url->urls, &copy->urls);
 }
 tb_bool_t tb_url_ssl_get(tb_url_t const* url)
 {
@@ -427,12 +427,12 @@ tb_void_t tb_url_protocol_set(tb_url_t* url, tb_size_t poto)
 tb_char_t const* tb_url_protocol_cstr(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // the protocols
     static tb_char_t const* s_protocols[] = 
     {
-        tb_null
+        tb_object_null
     ,   "data"
     ,   "file"
     ,   "sock"
@@ -440,7 +440,7 @@ tb_char_t const* tb_url_protocol_cstr(tb_url_t const* url)
     ,   "rtsp"
     ,   "sql"
     };
-    tb_assert_and_check_return_val(url->poto < tb_arrayn(s_protocols), tb_null);
+    tb_assert_and_check_return_val(url->poto < tb_object_arrayn(s_protocols), tb_object_null);
 
     // ok
     return s_protocols[url->poto];
@@ -487,15 +487,15 @@ tb_void_t tb_url_port_set(tb_url_t* url, tb_size_t port)
     url->port = (tb_uint16_t)port;
 
     // clear url
-    tb_scoped_string_clear(&url->urls);
+    tb_string_clear(&url->urls);
 }
 tb_char_t const* tb_url_host_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // get host
-    return tb_static_string_size(&url->host)? tb_static_string_cstr(&url->host) : tb_null;
+    return tb_static_string_size(&url->host)? tb_static_string_cstr(&url->host) : tb_object_null;
 }
 tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 {
@@ -520,12 +520,12 @@ tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
     }
 
     // clear url
-    tb_scoped_string_clear(&url->urls);
+    tb_string_clear(&url->urls);
 }
 tb_ipv4_t const* tb_url_ipv4_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // get ipv4
     return &(url->ipv4);
@@ -550,17 +550,17 @@ tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
             if (host) tb_static_string_cstrcpy(&url->host, host);
  
             // clear url
-            tb_scoped_string_clear(&url->urls);
+            tb_string_clear(&url->urls);
         }
     }
 }
 tb_char_t const* tb_url_path_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // get path
-    return tb_static_string_size(&url->path)? tb_static_string_cstr(&url->path) : tb_null;
+    return tb_static_string_size(&url->path)? tb_static_string_cstr(&url->path) : tb_object_null;
 }
 tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
 {
@@ -577,16 +577,16 @@ tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
         tb_static_string_cstrcat(&url->path, path);
  
         // clear url
-        tb_scoped_string_clear(&url->urls);
+        tb_string_clear(&url->urls);
     }
 }
 tb_char_t const* tb_url_args_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // get args
-    return tb_scoped_string_size(&url->args)? tb_scoped_string_cstr(&url->args) : tb_null;
+    return tb_string_size(&url->args)? tb_string_cstr(&url->args) : tb_object_null;
 }
 tb_void_t tb_url_args_set(tb_url_t* url, tb_char_t const* args)
 {
@@ -594,17 +594,17 @@ tb_void_t tb_url_args_set(tb_url_t* url, tb_char_t const* args)
     tb_assert_and_check_return(url);
 
     // clear args
-    tb_scoped_string_clear(&url->args);
+    tb_string_clear(&url->args);
 
     // set args
     if (args) 
     {
         tb_char_t const* p = args;
         while (*p && (*p == '?' || *p == '=')) p++;
-        if (*p) tb_scoped_string_cstrcpy(&url->args, p);
+        if (*p) tb_string_cstrcpy(&url->args, p);
  
         // clear url
-        tb_scoped_string_clear(&url->urls);
+        tb_string_clear(&url->urls);
     }
 }
 

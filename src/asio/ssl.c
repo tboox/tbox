@@ -198,10 +198,10 @@ typedef struct __tb_aicp_ssl_t
     tb_atomic_t                 state;
 
     // the read data
-    tb_scoped_buffer_t          read_data;
+    tb_buffer_t          read_data;
 
     // the writ data
-    tb_scoped_buffer_t          writ_data;
+    tb_buffer_t          writ_data;
 
 }tb_aicp_ssl_t;
 
@@ -231,8 +231,8 @@ static tb_long_t tb_aicp_ssl_fill_read(tb_aicp_ssl_t* ssl, tb_byte_t* data, tb_s
         tb_assert_and_check_break(read_real <= size);
 
         // the data and size
-        tb_byte_t*  read_data = tb_scoped_buffer_data(&ssl->read_data);
-        tb_size_t   read_size = tb_scoped_buffer_size(&ssl->read_data);
+        tb_byte_t*  read_data = tb_buffer_data(&ssl->read_data);
+        tb_size_t   read_size = tb_buffer_size(&ssl->read_data);
         tb_assert_and_check_break(read_data && read_size && size <= read_size);
 
         // copy data
@@ -343,8 +343,8 @@ static tb_void_t tb_aicp_ssl_clos_clear(tb_aicp_ssl_t* ssl)
     }
 
     // clear data
-    tb_scoped_buffer_clear(&ssl->read_data);
-    tb_scoped_buffer_clear(&ssl->writ_data);
+    tb_buffer_clear(&ssl->read_data);
+    tb_buffer_clear(&ssl->writ_data);
 
     // clear real
     ssl->post.real = 0;
@@ -389,7 +389,7 @@ static tb_bool_t tb_aicp_ssl_open_func(tb_aicp_ssl_t* ssl, tb_size_t state, tb_a
         ssl->clos_opening.state  = state;
 
         // close it
-        tb_aicp_ssl_clos(ssl, tb_aicp_ssl_clos_opening, tb_null);
+        tb_aicp_ssl_clos(ssl, tb_aicp_ssl_clos_opening, tb_object_null);
     }
 
     // ok?
@@ -416,7 +416,7 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
     {
         // clear post
         ssl->post.post  = tb_false;
-        ssl->post.data  = tb_null;
+        ssl->post.data  = tb_object_null;
         ssl->post.size  = 0;
         
         // failed or closed?
@@ -504,7 +504,7 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
     {
         // clear post
         ssl->post.post  = tb_false;
-        ssl->post.data  = tb_null;
+        ssl->post.data  = tb_object_null;
         ssl->post.size  = 0;
 
         // failed or closed?
@@ -595,7 +595,7 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
     {
         // clear post
         ssl->post.post  = tb_false;
-        ssl->post.data  = tb_null;
+        ssl->post.data  = tb_object_null;
         ssl->post.size  = 0;
 
         // failed or closed?
@@ -679,12 +679,12 @@ static tb_long_t tb_aicp_ssl_read_func(tb_cpointer_t priv, tb_byte_t* data, tb_s
         if (ssl->post.real >= 0) return tb_aicp_ssl_fill_read(ssl, data, size);
 
         // resize data
-        if (tb_scoped_buffer_size(&ssl->read_data) < size)
-            tb_scoped_buffer_resize(&ssl->read_data, size);
+        if (tb_buffer_size(&ssl->read_data) < size)
+            tb_buffer_resize(&ssl->read_data, size);
 
         // the data and size
-        tb_byte_t*  read_data = tb_scoped_buffer_data(&ssl->read_data);
-        tb_size_t   read_size = tb_scoped_buffer_size(&ssl->read_data);
+        tb_byte_t*  read_data = tb_buffer_data(&ssl->read_data);
+        tb_size_t   read_size = tb_buffer_size(&ssl->read_data);
         tb_assert_and_check_break(read_data && read_size && size <= read_size);
 
         // post read
@@ -715,11 +715,11 @@ static tb_long_t tb_aicp_ssl_writ_func(tb_cpointer_t priv, tb_byte_t const* data
         if (ssl->post.real >= 0) return tb_aicp_ssl_fill_writ(ssl, data, size);
 
         // save data
-        tb_scoped_buffer_memncpy(&ssl->writ_data, data, size);
+        tb_buffer_memncpy(&ssl->writ_data, data, size);
 
         // the data and size
-        tb_byte_t*  writ_data = tb_scoped_buffer_data(&ssl->writ_data);
-        tb_size_t   writ_size = tb_scoped_buffer_size(&ssl->writ_data);
+        tb_byte_t*  writ_data = tb_buffer_data(&ssl->writ_data);
+        tb_size_t   writ_size = tb_buffer_size(&ssl->writ_data);
         tb_assert_and_check_break(writ_data && writ_size && size == writ_size);
 
         // post writ
@@ -853,11 +853,11 @@ static tb_bool_t tb_aicp_ssl_done_clos(tb_aice_t const* aice)
 tb_handle_t tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver)
 {
     // check
-    tb_assert_and_check_return_val(aicp, tb_null);
+    tb_assert_and_check_return_val(aicp, tb_object_null);
 
     // done
     tb_bool_t       ok = tb_false;
-    tb_aicp_ssl_t*  ssl = tb_null;
+    tb_aicp_ssl_t*  ssl = tb_object_null;
     do
     {
         // make ssl
@@ -875,10 +875,10 @@ tb_handle_t tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver)
         tb_assert_and_check_break(ssl->ssl);
 
         // init read data
-        if (!tb_scoped_buffer_init(&ssl->read_data)) break;
+        if (!tb_buffer_init(&ssl->read_data)) break;
 
         // init writ data
-        if (!tb_scoped_buffer_init(&ssl->writ_data)) break;
+        if (!tb_buffer_init(&ssl->writ_data)) break;
 
         // ok
         ok = tb_true;
@@ -890,7 +890,7 @@ tb_handle_t tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver)
     {
         // exit it
         if (ssl) tb_aicp_ssl_exit(ssl);
-        ssl = tb_null;
+        ssl = tb_object_null;
     }
 
     // ok?
@@ -940,11 +940,11 @@ tb_bool_t tb_aicp_ssl_exit(tb_handle_t handle)
 
     // exit ssl
     if (ssl->ssl) tb_ssl_exit(ssl->ssl);
-    ssl->ssl = tb_null;
+    ssl->ssl = tb_object_null;
 
     // exit data
-    tb_scoped_buffer_exit(&ssl->read_data);
-    tb_scoped_buffer_exit(&ssl->writ_data);
+    tb_buffer_exit(&ssl->read_data);
+    tb_buffer_exit(&ssl->writ_data);
 
     // trace
     tb_trace_d("[aico:%p]: exit: ok", ssl->aico);
@@ -1021,12 +1021,12 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
         ssl->post.func  = tb_aicp_ssl_open_done;
         ssl->post.delay = 0;
         ssl->post.post  = tb_false;
-        ssl->post.data  = tb_null;
+        ssl->post.data  = tb_object_null;
         ssl->post.size  = 0;
         ssl->post.real  = -1;
 
         // init post func
-        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_null, ssl);
+        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_object_null, ssl);
 
         // try opening it
         tb_long_t r = tb_ssl_open_try(ssl->ssl);
@@ -1174,12 +1174,12 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
         ssl->post.func  = tb_aicp_ssl_read_done;
         ssl->post.delay = delay;
         ssl->post.post  = tb_false;
-        ssl->post.data  = tb_null;
+        ssl->post.data  = tb_object_null;
         ssl->post.size  = 0;
         ssl->post.real = -1;
 
         // init post func
-        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_null, ssl);
+        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_object_null, ssl);
 
         // try reading it
         tb_long_t real = tb_ssl_read(ssl->ssl, data, size);
@@ -1251,12 +1251,12 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
         ssl->post.func  = tb_aicp_ssl_writ_done;
         ssl->post.delay = delay;
         ssl->post.post  = tb_false;
-        ssl->post.data  = tb_null;
+        ssl->post.data  = tb_object_null;
         ssl->post.size  = 0;
         ssl->post.real  = -1;
 
         // init post func
-        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_null, ssl);
+        tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_read_func, tb_aicp_ssl_writ_func, tb_object_null, ssl);
 
         // try writing it
         tb_long_t real = tb_ssl_writ(ssl->ssl, data, size);
@@ -1356,7 +1356,7 @@ tb_aicp_t* tb_aicp_ssl_aicp(tb_handle_t handle)
 {
     // check
     tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl, tb_null);
+    tb_assert_and_check_return_val(ssl, tb_object_null);
 
     // the aicp
     return ssl->aicp;

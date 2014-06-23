@@ -60,10 +60,10 @@ tb_void_t tb_async_stream_clear(tb_async_stream_t* stream)
     tb_assert_and_check_return(stream);
 
     // clear rcache
-    tb_scoped_buffer_clear(&stream->rcache_data);
+    tb_buffer_clear(&stream->rcache_data);
 
     // clear wcache
-    tb_scoped_buffer_clear(&stream->wcache_data);
+    tb_buffer_clear(&stream->wcache_data);
 
     // clear istate
     tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
@@ -116,7 +116,7 @@ tb_bool_t tb_async_stream_open_func(tb_handle_t stream, tb_size_t state, tb_asyn
             astream->clos_opening.state  = state;
 
             // close it
-            ok = astream->clos(astream, tb_async_stream_clos_opening, tb_null);
+            ok = astream->clos(astream, tb_async_stream_clos_opening, tb_object_null);
         }
     }
 

@@ -42,7 +42,7 @@ __tb_extern_c_enter__
  *
  * @return pool     the string pool instance
  */
-tb_handle_t         tb_string_pool(tb_noarg_t);
+tb_handle_t         tb_object_string_pool(tb_noarg_t);
 
 /*! init string pool for small, readonly and repeat strings
  *
@@ -53,19 +53,19 @@ tb_handle_t         tb_string_pool(tb_noarg_t);
  *
  * @return          the string pool
  */
-tb_handle_t         tb_string_pool_init(tb_bool_t bcase, tb_size_t align);
+tb_handle_t         tb_object_string_pool_init(tb_bool_t bcase, tb_size_t align);
 
 /*! exit the string pool
  *
  * @param pool      the string pool
  */
-tb_void_t           tb_string_pool_exit(tb_handle_t pool);
+tb_void_t           tb_object_string_pool_exit(tb_handle_t pool);
 
 /*! clear the string pool
  *
  * @param pool      the string pool
  */
-tb_void_t           tb_string_pool_clear(tb_handle_t pool);
+tb_void_t           tb_object_string_pool_clear(tb_handle_t pool);
 
 /*! put string to the pool and increase the reference count
  *
@@ -74,21 +74,21 @@ tb_void_t           tb_string_pool_clear(tb_handle_t pool);
  *
  * @return          the string data
  */
-tb_char_t const*    tb_string_pool_put(tb_handle_t pool, tb_char_t const* data);
+tb_char_t const*    tb_object_string_pool_put(tb_handle_t pool, tb_char_t const* data);
 
 /*! remove string from the pool if the reference count be zero
  *
  * @param pool      the string pool
  * @param data      the string data
  */
-tb_void_t           tb_string_pool_del(tb_handle_t pool, tb_char_t const* data);
+tb_void_t           tb_object_string_pool_del(tb_handle_t pool, tb_char_t const* data);
 
 #ifdef __tb_debug__
 /*! dump the string pool
  *
  * @param pool      the string pool
  */
-tb_void_t           tb_string_pool_dump(tb_handle_t pool);
+tb_void_t           tb_object_string_pool_dump(tb_handle_t pool);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

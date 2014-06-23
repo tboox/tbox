@@ -51,7 +51,7 @@ typedef struct __tb_basic_stream_http_t
 static __tb_inline__ tb_basic_stream_http_t* tb_basic_stream_http_cast(tb_handle_t stream)
 {
     tb_basic_stream_t* bstream = (tb_basic_stream_t*)stream;
-    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
+    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_HTTP, tb_object_null);
     return (tb_basic_stream_http_t*)bstream;
 }
 static tb_bool_t tb_basic_stream_http_open(tb_handle_t bstream)
@@ -590,7 +590,7 @@ tb_basic_stream_t* tb_basic_stream_init_http()
 {
     // make stream
     tb_basic_stream_http_t* bstream = (tb_basic_stream_http_t*)tb_malloc0(sizeof(tb_basic_stream_http_t));
-    tb_assert_and_check_return_val(bstream, tb_null);
+    tb_assert_and_check_return_val(bstream, tb_object_null);
 
     // init stream
     if (!tb_basic_stream_init((tb_basic_stream_t*)bstream, TB_STREAM_TYPE_HTTP, 0)) goto fail;
@@ -610,16 +610,16 @@ tb_basic_stream_t* tb_basic_stream_init_http()
 
 fail:
     if (bstream) tb_basic_stream_exit((tb_basic_stream_t*)bstream);
-    return tb_null;
+    return tb_object_null;
 }
 tb_basic_stream_t* tb_basic_stream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
 {
     // check
-    tb_assert_and_check_return_val(host && port && path, tb_null);
+    tb_assert_and_check_return_val(host && port && path, tb_object_null);
 
     // init http stream
     tb_basic_stream_t* bstream = tb_basic_stream_init_http();
-    tb_assert_and_check_return_val(bstream, tb_null);
+    tb_assert_and_check_return_val(bstream, tb_object_null);
 
     // ctrl
     if (!tb_stream_ctrl(bstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
@@ -632,5 +632,5 @@ tb_basic_stream_t* tb_basic_stream_init_from_http(tb_char_t const* host, tb_size
 
 fail:
     if (bstream) tb_basic_stream_exit(bstream);
-    return tb_null;
+    return tb_object_null;
 }

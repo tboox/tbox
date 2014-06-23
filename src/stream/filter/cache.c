@@ -51,7 +51,7 @@ typedef struct __tb_stream_filter_cache_t
 static __tb_inline__ tb_stream_filter_cache_t* tb_stream_filter_cache_cast(tb_stream_filter_t* filter)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CACHE, tb_null);
+    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CACHE, tb_object_null);
     return (tb_stream_filter_cache_t*)filter;
 }
 static tb_long_t tb_stream_filter_cache_spak(tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
@@ -96,7 +96,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_cache(tb_size_t size)
 {
     // done
     tb_bool_t                   ok = tb_false;
-    tb_stream_filter_cache_t*   filter = tb_null;
+    tb_stream_filter_cache_t*   filter = tb_object_null;
     do
     {
         // make filter
@@ -120,7 +120,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_cache(tb_size_t size)
     {
         // exit filter
         tb_stream_filter_exit((tb_stream_filter_t*)filter);
-        filter = tb_null;
+        filter = tb_object_null;
     }
 
     // ok?

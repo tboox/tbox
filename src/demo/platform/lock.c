@@ -68,8 +68,8 @@ static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t priv)
     }
 
     tb_trace_i("[loop: %x]: exit", self);
-    tb_thread_return(tb_null);
-    return tb_null;
+    tb_thread_return(tb_object_null);
+    return tb_object_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -84,9 +84,9 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
 #elif defined(TB_TEST_LOCK_SPINLOCK)
     tb_handle_t     lock = TB_SPINLOCK_INIT;
 #elif defined(TB_TEST_LOCK_ATOMIC)
-    tb_handle_t     lock = tb_null; 
+    tb_handle_t     lock = tb_object_null; 
 #else
-    tb_handle_t     lock = tb_null; 
+    tb_handle_t     lock = tb_object_null; 
 #endif
 
     // init time
@@ -98,7 +98,7 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
     tb_handle_t loop[TB_TEST_LOOP_MAXN] = {0};
     for (i = 0; i < n; i++)
     {
-        loop[i] = tb_thread_init(tb_null, tb_test_mutx_loop, lock, 0);
+        loop[i] = tb_thread_init(tb_object_null, tb_test_mutx_loop, lock, 0);
         tb_assert_and_check_break(loop[i]);
     }
 
@@ -110,19 +110,19 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
         {
             tb_thread_wait(loop[i], -1);
             tb_thread_exit(loop[i]);
-            loop[i] = tb_null;
+            loop[i] = tb_object_null;
         }
 
         // exit lock
 #if defined(TB_TEST_LOCK_MUTEX)
         if (lock) tb_mutex_exit(lock);
-        lock = tb_null;
+        lock = tb_object_null;
 #elif defined(TB_TEST_LOCK_SPINLOCK)
         tb_spinlock_exit((tb_spinlock_t*)&lock);
 #elif defined(TB_TEST_LOCK_ATOMIC)
-        lock = tb_null;
+        lock = tb_object_null;
 #else
-        lock = tb_null;
+        lock = tb_object_null;
 #endif
     }
 

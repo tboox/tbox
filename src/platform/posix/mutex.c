@@ -38,10 +38,10 @@ tb_handle_t tb_mutex_init()
 {
     // make mutex
     pthread_mutex_t* pmutex = tb_malloc0(sizeof(pthread_mutex_t));
-    tb_assert_and_check_return_val(pmutex, tb_null);
+    tb_assert_and_check_return_val(pmutex, tb_object_null);
 
     // init mutex
-    if (pthread_mutex_init(pmutex, tb_null)) return tb_null;
+    if (pthread_mutex_init(pmutex, tb_object_null)) return tb_object_null;
     
     // ok
     return ((tb_handle_t)pmutex);

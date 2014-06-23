@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        block_pool.h
+ * @file        pool.h
  * @ingroup     memory
  *
  */
-#ifndef TB_MEMORY_BLOCK_POOL_H
-#define TB_MEMORY_BLOCK_POOL_H
+#ifndef TB_MEMORY_POOL_H
+#define TB_MEMORY_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -37,21 +37,21 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_block_pool_malloc(handle, size)                  tb_block_pool_malloc_(handle, size __tb_debug_vals__)
-#define tb_block_pool_malloc0(handle, size)                 tb_block_pool_malloc0_(handle, size __tb_debug_vals__)
+#define tb_pool_malloc(handle, size)                  tb_pool_malloc_(handle, size __tb_debug_vals__)
+#define tb_pool_malloc0(handle, size)                 tb_pool_malloc0_(handle, size __tb_debug_vals__)
 
-#define tb_block_pool_nalloc(handle, item, size)            tb_block_pool_nalloc_(handle, item, size __tb_debug_vals__)
-#define tb_block_pool_nalloc0(handle, item, size)           tb_block_pool_nalloc0_(handle, item, size __tb_debug_vals__)
+#define tb_pool_nalloc(handle, item, size)            tb_pool_nalloc_(handle, item, size __tb_debug_vals__)
+#define tb_pool_nalloc0(handle, item, size)           tb_pool_nalloc0_(handle, item, size __tb_debug_vals__)
 
-#define tb_block_pool_strdup(handle, data)                  tb_block_pool_strdup_(handle, data __tb_debug_vals__)
-#define tb_block_pool_strndup(handle, data, size)           tb_block_pool_strndup_(handle, data, size __tb_debug_vals__)
+#define tb_pool_strdup(handle, data)                  tb_pool_strdup_(handle, data __tb_debug_vals__)
+#define tb_pool_strndup(handle, data, size)           tb_pool_strndup_(handle, data, size __tb_debug_vals__)
 
-#define tb_block_pool_ralloc(handle, data, size)            tb_block_pool_ralloc_(handle, data, size __tb_debug_vals__)
-#define tb_block_pool_free(handle, data)                    tb_block_pool_free_(handle, data __tb_debug_vals__)
+#define tb_pool_ralloc(handle, data, size)            tb_pool_ralloc_(handle, data, size __tb_debug_vals__)
+#define tb_pool_free(handle, data)                    tb_pool_free_(handle, data __tb_debug_vals__)
 
-#define TB_BLOCK_POOL_GROW_MICRO                            (8096)
-#define TB_BLOCK_POOL_GROW_SMALL                            (65536)
-#define TB_BLOCK_POOL_GROW_LARGE                            (256 * 1024)
+#define TB_POOL_GROW_MICRO                            (8096)
+#define TB_POOL_GROW_SMALL                            (65536)
+#define TB_POOL_GROW_LARGE                            (256 * 1024)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -64,19 +64,19 @@ __tb_extern_c_enter__
  *
  * @return          the pool handle
  */
-tb_handle_t         tb_block_pool_init(tb_size_t grow, tb_size_t align);
+tb_handle_t         tb_pool_init(tb_size_t grow, tb_size_t align);
 
 /*! exit the block pool
  *
  * @param handle    the pool handle
  */
-tb_void_t           tb_block_pool_exit(tb_handle_t handle);
+tb_void_t           tb_pool_exit(tb_handle_t handle);
 
 /*! clear the block pool
  *
  * @param handle    the pool handle
  */
-tb_void_t           tb_block_pool_clear(tb_handle_t handle);
+tb_void_t           tb_pool_clear(tb_handle_t handle);
 
 /*! malloc the memory
  *
@@ -85,7 +85,7 @@ tb_void_t           tb_block_pool_clear(tb_handle_t handle);
  *
  * @return          the data address
  */
-tb_pointer_t        tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory and fill zero 
  *
@@ -94,7 +94,7 @@ tb_pointer_t        tb_block_pool_malloc_(tb_handle_t handle, tb_size_t size __t
  *
  * @return          the data address
  */
-tb_pointer_t        tb_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count
  *
@@ -104,7 +104,7 @@ tb_pointer_t        tb_block_pool_malloc0_(tb_handle_t handle, tb_size_t size __
  *
  * @return          the data address
  */
-tb_pointer_t        tb_block_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count and fill zero
  *
@@ -114,7 +114,7 @@ tb_pointer_t        tb_block_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb
  *
  * @return          the data address
  */
-tb_pointer_t        tb_block_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! realloc the memory
  *
@@ -124,7 +124,7 @@ tb_pointer_t        tb_block_pool_nalloc0_(tb_handle_t handle, tb_size_t item, t
  *
  * @return          the new data address
  */
-tb_pointer_t        tb_block_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /*! duplicate the string memory
  *
@@ -133,7 +133,7 @@ tb_pointer_t        tb_block_pool_ralloc_(tb_handle_t handle, tb_pointer_t data,
  *
  * @return          the new string address
  */
-tb_char_t*          tb_block_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__);
+tb_char_t*          tb_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__);
 
 /*! duplicate the string memory with the given size
  *
@@ -143,7 +143,7 @@ tb_char_t*          tb_block_pool_strdup_(tb_handle_t handle, tb_char_t const* d
  *
  * @return          the new string address
  */
-tb_char_t*          tb_block_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
+tb_char_t*          tb_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
 
 /*! free the memory
  *
@@ -152,7 +152,7 @@ tb_char_t*          tb_block_pool_strndup_(tb_handle_t handle, tb_char_t const* 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
+tb_bool_t           tb_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! dump the block pool
@@ -160,7 +160,7 @@ tb_bool_t           tb_block_pool_free_(tb_handle_t handle, tb_pointer_t data __
  * @param handle    the pool handle
  * @param prefix    the trace prefix
  */
-tb_void_t           tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
+tb_void_t           tb_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

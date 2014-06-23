@@ -92,10 +92,10 @@ typedef struct __tb_url_t
     tb_static_string_t  path;
 
     // the urls
-    tb_scoped_string_t  urls;
+    tb_string_t  urls;
 
     // the args
-    tb_scoped_string_t  args;
+    tb_string_t  args;
 
     // the data
     tb_char_t           data[TB_URL_HOST_MAXN + TB_URL_PATH_MAXN];

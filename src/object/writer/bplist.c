@@ -62,9 +62,9 @@ do { \
 
 // number
 #define tb_object_bplist_writer_init_number(x) \
-(((tb_uint64_t)(x)) < (1ull << 8) ? tb_number_init_from_uint8((tb_uint8_t)(x)) : \
-(((tb_uint64_t)(x)) < (1ull << 16) ? tb_number_init_from_uint16((tb_uint16_t)(x)) : \
-(((tb_uint64_t)(x)) < (1ull << 32) ? tb_number_init_from_uint32((tb_uint32_t)(x)) : tb_number_init_from_uint64((x)))))
+(((tb_uint64_t)(x)) < (1ull << 8) ? tb_object_number_init_from_uint8((tb_uint8_t)(x)) : \
+(((tb_uint64_t)(x)) < (1ull << 16) ? tb_object_number_init_from_uint16((tb_uint16_t)(x)) : \
+(((tb_uint64_t)(x)) < (1ull << 32) ? tb_object_number_init_from_uint32((tb_uint32_t)(x)) : tb_object_number_init_from_uint64((x)))))
 
 // object list grow
 #ifdef __tb_small__
@@ -161,7 +161,7 @@ static tb_bool_t tb_object_bplist_writer_func_date(tb_object_bplist_writer_t* wr
 #ifdef TB_CONFIG_TYPE_FLOAT
     // writ date time
     if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_DATE | 3)) return tb_false;
-    if (!tb_basic_stream_bwrit_double_bbe(writer->stream, (tb_double_t)tb_object_bplist_writer_time_host2apple(tb_date_time(object)))) return tb_false;
+    if (!tb_basic_stream_bwrit_double_bbe(writer->stream, (tb_double_t)tb_object_bplist_writer_time_host2apple(tb_object_date_time(object)))) return tb_false;
 #else
     tb_assert_and_check_return_val(0, tb_false);
 #endif
@@ -175,7 +175,7 @@ static tb_bool_t tb_object_bplist_writer_func_data(tb_object_bplist_writer_t* wr
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
     // writ
-    return tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_DATA, (tb_byte_t const*)tb_data_getp(object), tb_data_size(object), item_size);
+    return tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_DATA, (tb_byte_t const*)tb_object_data_getp(object), tb_object_data_size(object), item_size);
 }
 static tb_bool_t tb_object_bplist_writer_func_array(tb_object_bplist_writer_t* writer, tb_object_t* object, tb_size_t item_size)
 {
@@ -186,7 +186,7 @@ static tb_bool_t tb_object_bplist_writer_func_array(tb_object_bplist_writer_t* w
     tb_byte_t* index_tables = (tb_byte_t*)tb_object_getp(object);
 
     // size
-    tb_size_t size = tb_array_size(object);
+    tb_size_t size = tb_object_array_size(object);
     tb_assert_and_check_return_val(!size == !index_tables, tb_false);
 
     // writ flag
@@ -226,17 +226,17 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 #if 0
     // writ utf8
-    return tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, tb_string_cstr(object), tb_string_size(object), item_size);
+    return tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, tb_object_string_cstr(object), tb_object_string_size(object), item_size);
 #else
     // writ utf16
-    tb_char_t const*    utf8 = tb_string_cstr(object);
-    tb_size_t           size = tb_string_size(object);
+    tb_char_t const*    utf8 = tb_object_string_cstr(object);
+    tb_size_t           size = tb_object_string_size(object);
     if (utf8 && size)
     {
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
         // done
         tb_bool_t   ok = tb_false;
-        tb_char_t*  utf16 = tb_null;
+        tb_char_t*  utf16 = tb_object_null;
         tb_size_t   osize = 0;
         do
         {
@@ -266,7 +266,7 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
 
         // exit utf16
         if (utf16) tb_free(utf16);
-        utf16 = tb_null;
+        utf16 = tb_object_null;
 #else
         // writ utf8 only
         tb_bool_t ok = tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, (tb_byte_t*)utf8, size, item_size);
@@ -276,7 +276,7 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
         return ok;
     }
     // writ empty
-    else return tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, tb_null, 0, item_size);
+    else return tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, tb_object_null, 0, item_size);
 #endif
 }
 static tb_bool_t tb_object_bplist_writer_func_number(tb_object_bplist_writer_t* writer, tb_object_t* object, tb_size_t item_size)
@@ -285,51 +285,51 @@ static tb_bool_t tb_object_bplist_writer_func_number(tb_object_bplist_writer_t* 
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
     // done
-    switch (tb_number_type(object))
+    switch (tb_object_number_type(object))
     {
     case TB_NUMBER_TYPE_UINT64:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT | 3)) return tb_false;
-        if (!tb_basic_stream_bwrit_u64_be(writer->stream, tb_number_uint64(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_u64_be(writer->stream, tb_object_number_uint64(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT64:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT | 3)) return tb_false;
-        if (!tb_basic_stream_bwrit_s64_be(writer->stream, tb_number_sint64(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_s64_be(writer->stream, tb_object_number_sint64(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT32:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT | 2)) return tb_false;
-        if (!tb_basic_stream_bwrit_u32_be(writer->stream, tb_number_uint32(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_u32_be(writer->stream, tb_object_number_uint32(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT32:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT | 2)) return tb_false;
-        if (!tb_basic_stream_bwrit_s32_be(writer->stream, tb_number_sint32(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_s32_be(writer->stream, tb_object_number_sint32(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT16:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT | 1)) return tb_false;
-        if (!tb_basic_stream_bwrit_u16_be(writer->stream, tb_number_uint16(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_u16_be(writer->stream, tb_object_number_uint16(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT16:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT | 1)) return tb_false;
-        if (!tb_basic_stream_bwrit_s16_be(writer->stream, tb_number_sint16(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_s16_be(writer->stream, tb_object_number_sint16(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_UINT8:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT)) return tb_false;
-        if (!tb_basic_stream_bwrit_u8(writer->stream, tb_number_uint8(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_u8(writer->stream, tb_object_number_uint8(object))) return tb_false;
         break;
     case TB_NUMBER_TYPE_SINT8:
         if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT)) return tb_false;
-        if (!tb_basic_stream_bwrit_s8(writer->stream, tb_number_sint8(object))) return tb_false;
+        if (!tb_basic_stream_bwrit_s8(writer->stream, tb_object_number_sint8(object))) return tb_false;
         break;
 #ifdef TB_CONFIG_TYPE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         {
             if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_REAL | 2)) return tb_false;
-            if (!tb_basic_stream_bwrit_float_be(writer->stream, tb_number_float(object))) return tb_false;
+            if (!tb_basic_stream_bwrit_float_be(writer->stream, tb_object_number_float(object))) return tb_false;
         }
         break;
     case TB_NUMBER_TYPE_DOUBLE:
         {
             if (!tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_REAL | 3)) return tb_false;
-            if (!tb_basic_stream_bwrit_double_bbe(writer->stream, tb_number_double(object))) return tb_false;
+            if (!tb_basic_stream_bwrit_double_bbe(writer->stream, tb_object_number_double(object))) return tb_false;
         }
         break;
 #endif
@@ -347,7 +347,7 @@ static tb_bool_t tb_object_bplist_writer_func_boolean(tb_object_bplist_writer_t*
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
     // writ it
-    return tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_NONE | (tb_boolean_bool(object)? TB_OBJECT_BPLIST_TYPE_TRUE : TB_OBJECT_BPLIST_TYPE_FALSE));
+    return tb_basic_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_NONE | (tb_object_boolean_bool(object)? TB_OBJECT_BPLIST_TYPE_TRUE : TB_OBJECT_BPLIST_TYPE_FALSE));
 }
 static tb_bool_t tb_object_bplist_writer_func_dictionary(tb_object_bplist_writer_t* writer, tb_object_t* object, tb_size_t item_size)
 {
@@ -358,7 +358,7 @@ static tb_bool_t tb_object_bplist_writer_func_dictionary(tb_object_bplist_writer
     tb_byte_t* index_tables = (tb_byte_t*)tb_object_getp(object);
 
     // size
-    tb_size_t size = tb_dictionary_size(object);
+    tb_size_t size = tb_object_dictionary_size(object);
     tb_assert_and_check_return_val(!size == !index_tables, tb_false);
 
     // writ flag
@@ -404,7 +404,7 @@ static tb_uint64_t tb_object_bplist_writer_builder_maxn(tb_object_t* object)
     case TB_OBJECT_TYPE_ARRAY:
         {
             // walk
-            tb_for_all (tb_object_t*, item, tb_array_itor(object))
+            tb_for_all (tb_object_t*, item, tb_object_array_itor(object))
             {
                 if (item) size += tb_object_bplist_writer_builder_maxn(item);
             }
@@ -413,7 +413,7 @@ static tb_uint64_t tb_object_bplist_writer_builder_maxn(tb_object_t* object)
     case TB_OBJECT_TYPE_DICTIONARY:
         {
             // walk
-            tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
+            tb_for_all (tb_object_dictionary_item_t*, item, tb_object_dictionary_itor(object))
             {
                 // item
                 if (item && item->key && item->val)
@@ -439,10 +439,10 @@ static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_t* object, tb_ob
     if (!index) 
     {
         // append object
-        tb_array_append(list, object);
+        tb_object_array_append(list, object);
 
         // index
-        index = tb_array_size(list);
+        index = tb_object_array_size(list);
 
         // set index
         tb_hash_set(hash, object, (tb_pointer_t)index);
@@ -466,8 +466,8 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
     case TB_OBJECT_TYPE_ARRAY:
         {
             // make index tables
-            tb_byte_t*  index_tables = tb_null;
-            tb_size_t   size = tb_array_size(object);
+            tb_byte_t*  index_tables = tb_object_null;
+            tb_size_t   size = tb_object_array_size(object);
             if (size) 
             {
                 index_tables = (tb_byte_t*)tb_object_getp(object);
@@ -483,7 +483,7 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 
             // walk
             tb_size_t i = 0;
-            tb_for_all (tb_object_t*, item, tb_array_itor(object))
+            tb_for_all (tb_object_t*, item, tb_object_array_itor(object))
             {
                 // build item
                 if (item) 
@@ -504,8 +504,8 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
     case TB_OBJECT_TYPE_DICTIONARY:
         {
             // make index tables
-            tb_byte_t*  index_tables = tb_null;
-            tb_size_t   size = tb_dictionary_size(object);
+            tb_byte_t*  index_tables = tb_object_null;
+            tb_size_t   size = tb_object_dictionary_size(object);
             if (size) 
             {
                 index_tables = (tb_byte_t*)tb_object_getp(object);
@@ -522,13 +522,13 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
             // walk keys
             {
                 tb_size_t i = 0;
-                tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
+                tb_for_all (tb_object_dictionary_item_t*, item, tb_object_dictionary_itor(object))
                 {
                     // item
                     if (item && item->key && item->val)
                     {
                         // make key object
-                        tb_object_t* key = tb_string_init_from_cstr(item->key);
+                        tb_object_t* key = tb_object_string_init_from_cstr(item->key);
                         if (key)
                         {
                             // add key to builder
@@ -550,7 +550,7 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
             // walk vals
             {
                 tb_size_t       i = 0;
-                tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
+                tb_for_all (tb_object_dictionary_item_t*, item, tb_object_dictionary_itor(object))
                 {
                     // item
                     if (item && item->key && item->val)
@@ -588,7 +588,7 @@ static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_t* list, tb_hash
                 if (priv)
                 {
                     tb_free(priv);
-                    tb_object_setp((tb_object_t*)item->name, tb_null);
+                    tb_object_setp((tb_object_t*)item->name, tb_object_null);
                 }
 
                 tb_object_dec((tb_object_t*)item->name);
@@ -611,15 +611,15 @@ static tb_long_t tb_object_bplist_writer_done(tb_basic_stream_t* stream, tb_obje
     tb_bool_t       ok                  = tb_false;
     tb_size_t       i                   = 0;
     tb_byte_t       pad[6]              = {0};
-    tb_object_t*    list                = tb_null;
-    tb_hash_t*      hash                = tb_null;
+    tb_object_t*    list                = tb_object_null;
+    tb_hash_t*      hash                = tb_object_null;
     tb_size_t       object_count        = 0;
     tb_uint64_t     object_maxn         = 0;
     tb_uint64_t     root_object         = 0;
     tb_uint64_t     offset_table_index  = 0;
     tb_size_t       offset_size         = 0;
     tb_size_t       item_size           = 0;
-    tb_uint64_t*    offsets             = tb_null;
+    tb_uint64_t*    offsets             = tb_object_null;
     tb_hize_t       bof                 = 0;
     tb_hize_t       eof                 = 0;
 
@@ -628,11 +628,11 @@ static tb_long_t tb_object_bplist_writer_done(tb_basic_stream_t* stream, tb_obje
     writer.stream = stream;
     
     // init list
-    list = tb_array_init(TB_OBJECT_BPLIST_LIST_GROW, tb_true);
+    list = tb_object_array_init(TB_OBJECT_BPLIST_LIST_GROW, tb_true);
     tb_assert_and_check_goto(list, end);
 
     // init hash
-    hash = tb_hash_init(0, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
+    hash = tb_hash_init(0, tb_item_func_ptr(tb_object_null, tb_object_null), tb_item_func_uint32());
     tb_assert_and_check_goto(hash, end);
 
     // object maxn
@@ -648,7 +648,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_basic_stream_t* stream, tb_obje
     tb_object_bplist_writer_builder_init(object, list, hash, item_size);
 
     // init object count
-    object_count = tb_array_size(list);
+    object_count = tb_object_array_size(list);
     tb_trace_d("object_count: %lu", object_count);
 
     // init offsets
@@ -665,7 +665,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_basic_stream_t* stream, tb_obje
     if (object_count)
     {
         i = 0;
-        tb_for_all (tb_object_t*, item, tb_array_itor(list))
+        tb_for_all (tb_object_t*, item, tb_object_array_itor(list))
         {
             // item
             if (item) 
@@ -738,12 +738,12 @@ end:
 
     // exit offsets
     if (offsets) tb_free(offsets);
-    offsets = tb_null;
+    offsets = tb_object_null;
 
     // exit object builder
     tb_object_bplist_writer_builder_exit(list, hash);
-    list = tb_null;
-    hash = tb_null;
+    list = tb_object_null;
+    hash = tb_object_null;
 
     // ok?
     return (ok && (eof >= bof))? (tb_long_t)(eof - bof) : -1;
@@ -761,8 +761,8 @@ tb_object_writer_t* tb_object_bplist_writer()
     s_writer.writ = tb_object_bplist_writer_done;
  
     // init hooker
-    s_writer.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-    tb_assert_and_check_return_val(s_writer.hooker, tb_null);
+    s_writer.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_object_null, tb_object_null));
+    tb_assert_and_check_return_val(s_writer.hooker, tb_object_null);
 
     // hook writer 
     tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_object_bplist_writer_func_date);
@@ -795,7 +795,7 @@ tb_object_bplist_writer_func_t tb_object_bplist_writer_func(tb_size_t type)
 {
     // the writer
     tb_object_writer_t* writer = tb_object_writer_get(TB_OBJECT_FORMAT_BPLIST);
-    tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
+    tb_assert_and_check_return_val(writer && writer->hooker, tb_object_null);
 
     // the func
     return (tb_object_bplist_writer_func_t)tb_hash_get(writer->hooker, (tb_pointer_t)type);

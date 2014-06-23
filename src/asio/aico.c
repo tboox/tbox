@@ -69,7 +69,7 @@ tb_handle_t tb_aico_aicp(tb_handle_t haico)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
-    tb_assert_and_check_return_val(aico, tb_null);
+    tb_assert_and_check_return_val(aico, tb_object_null);
 
     // the aico aicp
     return aico->aicp;
@@ -87,7 +87,7 @@ tb_handle_t tb_aico_pool(tb_handle_t haico)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
-    tb_assert_and_check_return_val(aico, tb_null);
+    tb_assert_and_check_return_val(aico, tb_object_null);
 
     // the pool handle
     return aico->pool;
@@ -97,7 +97,7 @@ tb_char_t const* tb_aico_func(tb_handle_t haico)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
-    tb_assert_and_check_return_val(aico, tb_null);
+    tb_assert_and_check_return_val(aico, tb_object_null);
 
     // the func
     return aico->func;
@@ -106,7 +106,7 @@ tb_char_t const* tb_aico_file(tb_handle_t haico)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
-    tb_assert_and_check_return_val(aico, tb_null);
+    tb_assert_and_check_return_val(aico, tb_object_null);
 
     // the file
     return aico->file;
@@ -125,7 +125,7 @@ tb_handle_t tb_aico_handle(tb_handle_t haico)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
-    tb_assert_and_check_return_val(aico, tb_null);
+    tb_assert_and_check_return_val(aico, tb_object_null);
 
     // the aico handle
     return aico->handle;
@@ -134,7 +134,7 @@ tb_long_t tb_aico_timeout(tb_handle_t haico, tb_size_t type)
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
-    tb_assert_and_check_return_val(aico && type < tb_arrayn(aico->timeout), -1);
+    tb_assert_and_check_return_val(aico && type < tb_object_arrayn(aico->timeout), -1);
 
     // the aico timeout
     return tb_atomic_get((tb_atomic_t*)(aico->timeout + type));
@@ -143,7 +143,7 @@ tb_void_t tb_aico_timeout_set(tb_handle_t haico, tb_size_t type, tb_long_t timeo
 {
     // check
     tb_aico_t* aico = (tb_aico_t*)haico;
-    tb_assert_and_check_return(aico && type < tb_arrayn(aico->timeout));
+    tb_assert_and_check_return(aico && type < tb_object_arrayn(aico->timeout));
 
     // set the aico timeout
     tb_atomic_set((tb_atomic_t*)(aico->timeout + type), timeout);
