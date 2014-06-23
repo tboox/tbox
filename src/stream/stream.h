@@ -42,44 +42,49 @@
  *                                                                   | 
  *                                                                   |                                          - data
  *                                                                 [aioo]                                       |
- *                                                           ----- stream -------- stream ----------- file
+ *                                                           ----- stream -------- stream ----------------------- file
  *                                                           |                        |                         |
  *                                                           |                        |                         - sock 
  *                                                           |                        |                         |
  *                                                           |                        |                         - http
  *                                                           |                        |           - charset
- *                                data -                     |                        |          |
- *                                     |  [istream]          |                        - filter - |- chunked 
- *                                url  |-- stream ---------  |                                   |        
- *                                     |      |              |                                   |- cache
- *                                ... -       |              |                                   |
- *                                            |              |                                    - zip
- *                                            |              |
- *                                            |              |
- *                                            |              |
- *                                            |              |            - loop
- *                                            |              |     [asio] |
- *                                            |              |      aicp -| loop
- *                                            |              |       |    |
- *                                            |              |       |    - ...                                  - data
- *                                            |              |     [aico]                                        |
- *                                            |              ----- async_stream -------- async_stream ------------ file
+ *                                                           |                        |          |
+ *                                                           |                        - filter - |- chunked 
+ *                                       transfer ---------  |                                   |        
+ *                                                           |                                   |- cache
+ *                                                           |                                   |
+ *                                                           |                                    - zip
+ *                                                           |
+ *                                                           ----- stream
+ *
+ *
+ *
+ *
+ *                                                            
+ *                                                            
+ *                                                                        - loop
+ *                                                                 [asio] |
+ *                                                                  aicp -| loop
+ *                                                                   |    |
+ *                                                                   |    - ...                                  - data
+ *                                                                 [aico]                                        |
+ *                                            -------------------- async_stream -------- async_stream ------------ file
  *                                            |                                       |                          |
  *                                            |                                       |                          - sock
  *                            ----------------                                        |                          |
  *                            |                                                       |                          - http
- *                 -----  transfer ---------- |                                       |           - charset
- *                |           |           [ostream]                                   |          |
- *                |           ------------ stream                                     - filter - |- chunked 
- *                |                                                                        |     |        
- *  transfer_pool  -----  transfer                                                         |     |- cache
- *                |                                                                        |     |
- *                |                                                                        |      - zip    
- *                |                                                                        |
- *                 -----   ...                                                             |
- *                                                                                      static_stream - [data, size]
- *                                                                                  
- *                         
+ *                 -----  transfer                                                    |           - charset
+ *                |           |                                                       |          |
+ *                |           ----------------                                        - filter - |- chunked 
+ *                |                           |                                            |     |        
+ *  transfer_pool  -----  transfer            |                                            |     |- cache
+ *                |                           |                                            |     |
+ *                |                           |                                            |      - zip    
+ *                |                           |                                            |
+ *                 -----   ...                |                                            |
+ *                                            |                                         static_stream - [data, size]
+ *                                            |                                     
+ *                                            -------------------- async_stream
  * url: 
  * data://base64
  * file://path or unix path: e.g. /root/xxxx/file
