@@ -243,7 +243,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
             tb_assert_and_check_break(aice->u.acpt.sock);
 
             // make context
-            context = (tb_demo_context_t*)tb_malloc0(sizeof(tb_demo_context_t));
+            context = tb_malloc0_type(tb_demo_context_t);
             tb_assert_and_check_break(context);
 
 #ifdef TB_DEMO_MODE_SENDF

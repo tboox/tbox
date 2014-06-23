@@ -510,7 +510,7 @@ tb_handle_t tb_flv_init(tb_stream_t* stream)
     tb_assert_and_check_return_val(stream, tb_null);
 
     // alloc flv
-    tb_flv_t* flv = (tb_flv_t*)tb_malloc0(sizeof(tb_flv_t));
+    tb_flv_t* flv = tb_malloc0_type(tb_flv_t);
     tb_assert_and_check_return_val(flv, tb_null);
 
     // init flv

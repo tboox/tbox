@@ -24,7 +24,7 @@ static tb_pointer_t tb_thread_store_test(tb_cpointer_t priv)
     {
         if (!(item = tb_thread_store_getp()))
         {
-            item = (tb_thread_store_data_t*)tb_malloc0(sizeof(tb_thread_store_data_t));
+            item = tb_malloc0_type(tb_thread_store_data_t);
             if (item)
             {
                 item->type = (tb_size_t)self;

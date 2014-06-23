@@ -1256,7 +1256,7 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
     do
     {
         // make stream
-        impl = (tb_async_stream_impl_t*)tb_malloc0(sizeof(tb_async_stream_impl_t));
+        impl = tb_malloc0_type(tb_async_stream_impl_t);
         tb_assert_and_check_break(impl);
 
         // init stream

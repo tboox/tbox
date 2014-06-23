@@ -2038,7 +2038,7 @@ static tb_handle_t tb_iocp_ptor_loop_init(tb_aicp_proactor_t* proactor)
     tb_assert_and_check_return_val(ptor, tb_null);
 
     // make loop
-    tb_iocp_loop_t* loop = (tb_iocp_loop_t*)tb_malloc0(sizeof(tb_iocp_loop_t));
+    tb_iocp_loop_t* loop = tb_malloc0_type(tb_iocp_loop_t);
     tb_assert_and_check_return_val(loop, tb_null);
 
     // init self
@@ -2227,7 +2227,7 @@ static tb_aicp_proactor_t* tb_iocp_ptor_init(tb_aicp_t* aicp)
     do
     {
         // make proactor
-        ptor = (tb_iocp_ptor_t*)tb_malloc0(sizeof(tb_iocp_ptor_t));
+        ptor = tb_malloc0_type(tb_iocp_ptor_t);
         tb_assert_and_check_break(ptor);
 
         // init base

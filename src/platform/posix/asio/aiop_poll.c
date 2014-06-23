@@ -396,7 +396,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
     do
     {
         // make reactor
-        rtor = (tb_aiop_reactor_poll_t*)tb_malloc0(sizeof(tb_aiop_reactor_poll_t));
+        rtor = tb_malloc0_type(tb_aiop_reactor_poll_t);
         tb_assert_and_check_break(rtor);
 
         // init base

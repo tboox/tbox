@@ -426,7 +426,7 @@ tb_hash_t* tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_f
     do
     {
         // make impl
-        impl = (tb_hash_impl_t*)tb_malloc0(sizeof(tb_hash_impl_t));
+        impl = tb_malloc0_type(tb_hash_impl_t);
         tb_assert_and_check_break(impl);
 
         // init impl func

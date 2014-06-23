@@ -100,7 +100,7 @@ tb_aiop_t* tb_aiop_init(tb_size_t maxn)
     do
     {
         // make aiop
-        aiop = (tb_aiop_t*)tb_malloc0(sizeof(tb_aiop_t));
+        aiop = tb_malloc0_type(tb_aiop_t);
         tb_assert_and_check_break(aiop);
 
         // init aiop

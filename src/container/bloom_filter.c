@@ -114,7 +114,7 @@ tb_bloom_filter_t* tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_co
         tb_assert_and_check_break(item_maxn < TB_MAXU32);
 
         // make filter
-        filter = (tb_bloom_filter_impl_t*)tb_malloc0(sizeof(tb_bloom_filter_impl_t));
+        filter = tb_malloc0_type(tb_bloom_filter_impl_t);
         tb_assert_and_check_break(filter);
     
         // init filter

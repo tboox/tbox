@@ -193,7 +193,7 @@ static tb_object_t* tb_object_bplist_reader_func_array(tb_object_bplist_reader_t
     // init items data
     if (size)
     {
-        tb_byte_t* data = (tb_byte_t*)tb_malloc(sizeof(tb_uint32_t) + (size * item_size));
+        tb_byte_t* data = tb_malloc_type(tb_uint32_t) + (size * item_size);
         if (data)
         {
             if (tb_stream_bread(reader->stream, data + sizeof(tb_uint32_t), size * item_size))
@@ -445,7 +445,7 @@ static tb_object_t* tb_object_bplist_reader_func_dictionary(tb_object_bplist_rea
     if (size)
     {
         item_size <<= 1;
-        tb_byte_t* data = (tb_byte_t*)tb_malloc(sizeof(tb_uint32_t) + (size * item_size));
+        tb_byte_t* data = tb_malloc_type(tb_uint32_t) + (size * item_size);
         if (data)
         {
             if (tb_stream_bread(reader->stream, data + sizeof(tb_uint32_t), size * item_size))

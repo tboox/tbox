@@ -120,8 +120,8 @@ static tb_long_t tb_zip_gzip_spak_inflate(tb_zip_t* zip, tb_static_stream_t* ist
 
 tb_zip_t* tb_zip_gzip_init(tb_size_t action)
 {   
-    // alloc
-    tb_zip_t* zip = (tb_zip_t*)tb_malloc0(sizeof(tb_zip_gzip_t));
+    // make zip
+    tb_zip_t* zip = (tb_zip_t*)tb_malloc0_type(tb_zip_gzip_t);
     tb_assert_and_check_return_val(zip, tb_null);
     
     // init zip

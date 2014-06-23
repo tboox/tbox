@@ -145,7 +145,7 @@ tb_handle_t tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
     tb_assert_and_check_return_val(step, tb_null);
 
     // init pool
-    tb_fixed_pool_t* pool = (tb_fixed_pool_t*)tb_malloc0(sizeof(tb_fixed_pool_t));
+    tb_fixed_pool_t* pool = tb_malloc0_type(tb_fixed_pool_t);
     tb_assert_and_check_return_val(pool, tb_null);
 
     // using the default grow

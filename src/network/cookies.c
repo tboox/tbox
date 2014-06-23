@@ -514,7 +514,7 @@ tb_handle_t tb_cookies_init()
     do
     {
         // make cookies
-        cookies = (tb_cookies_t*)tb_malloc0(sizeof(tb_cookies_t));
+        cookies = tb_malloc0_type(tb_cookies_t);
         tb_assert_and_check_break(cookies);
 
         // init lock

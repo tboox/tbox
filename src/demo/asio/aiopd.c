@@ -120,7 +120,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
                 do
                 {
                     // make context
-                    context = (tb_demo_context_t*)tb_malloc0(sizeof(tb_demo_context_t));
+                    context = tb_malloc0_type(tb_demo_context_t);
                     tb_assert_and_check_break(context);
 
                     // init sock

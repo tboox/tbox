@@ -93,7 +93,7 @@ tb_handle_t tb_object_string_pool_init(tb_bool_t bcase, tb_size_t align)
     do
     {
         // make pool
-        pool = (tb_object_string_pool_t*)tb_malloc0(sizeof(tb_object_string_pool_t));
+        pool = tb_malloc0_type(tb_object_string_pool_t);
         tb_assert_and_check_break(pool);
 
         // init lock

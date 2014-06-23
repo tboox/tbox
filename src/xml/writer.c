@@ -82,7 +82,7 @@ tb_handle_t tb_xml_writer_init(tb_stream_t* wstream, tb_bool_t bformat)
     do
     {
         // make writer
-        writer = (tb_xml_writer_t*)tb_malloc0(sizeof(tb_xml_writer_t));
+        writer = tb_malloc0_type(tb_xml_writer_t);
         tb_assert_and_check_break(writer);
 
         // init writer

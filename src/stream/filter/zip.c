@@ -166,7 +166,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t act
     do
     {
         // make filter
-        filter = (tb_stream_filter_zip_t*)tb_malloc0(sizeof(tb_stream_filter_zip_t));
+        filter = tb_malloc0_type(tb_stream_filter_zip_t);
         tb_assert_and_check_break(filter);
 
         // init filter 

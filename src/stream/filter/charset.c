@@ -82,7 +82,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t t
     do
     {
         // make filter
-        filter = (tb_stream_filter_charset_t*)tb_malloc0(sizeof(tb_stream_filter_charset_t));
+        filter = tb_malloc0_type(tb_stream_filter_charset_t);
         tb_assert_and_check_break(filter);
 
         // init filter 

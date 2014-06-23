@@ -110,7 +110,7 @@ tb_handle_t tb_random_linear_init(tb_size_t seed)
     do
     {
         // make random
-        random = (tb_random_linear_t*)tb_malloc0(sizeof(tb_random_linear_t));
+        random = tb_malloc0_type(tb_random_linear_t);
         tb_assert_and_check_break(random);
 
         // init random
