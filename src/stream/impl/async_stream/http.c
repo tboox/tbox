@@ -31,9 +31,6 @@
  * includes
  */
 #include "prefix.h"
-#include "../stream.h"
-#include "../../asio/asio.h"
-#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types

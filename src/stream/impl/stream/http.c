@@ -25,10 +25,6 @@
  * includes
  */
 #include "prefix.h"
-#include "../../asio/asio.h"
-#include "../../string/string.h"
-#include "../../network/network.h"
-#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types

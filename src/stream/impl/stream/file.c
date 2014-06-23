@@ -25,10 +25,6 @@
  * includes
  */
 #include "prefix.h"
-#include "../stream.h"
-#include "../../asio/asio.h"
-#include "../../string/string.h"
-#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros

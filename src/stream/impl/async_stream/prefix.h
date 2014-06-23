@@ -20,16 +20,14 @@
  * @file        prefix.h
  *
  */
-#ifndef TB_STREAM_ASYNC_STREAM_PREFIX_H
-#define TB_STREAM_ASYNC_STREAM_PREFIX_H
+#ifndef TB_STREAM_IMPL_ASYNC_STREAM_PREFIX_H
+#define TB_STREAM_IMPL_ASYNC_STREAM_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
-#include "../stream.h"
-#include "../async_stream.h"
-#include "../../platform/atomic.h"
+#include "../../async_stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private interfaces

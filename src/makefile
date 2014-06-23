@@ -76,11 +76,11 @@ tbox_C_FILES 			+= \
 						asio/aiop \
 						stream/static_stream \
 						stream/stream \
-						stream/stream/http \
-						stream/stream/file \
-						stream/stream/data \
-						stream/stream/sock \
-						stream/stream/filter \
+						stream/impl/stream/http \
+						stream/impl/stream/file \
+						stream/impl/stream/data \
+						stream/impl/stream/sock \
+						stream/impl/stream/filter \
 						stream/transfer \
 						stream/filter/filter \
 						stream/filter/cache \
@@ -279,12 +279,12 @@ tbox_C_FILES 			+= \
 						asio/http \
 						asio/dns \
 						stream/async_stream \
-						stream/async_stream/http \
-						stream/async_stream/file \
-						stream/async_stream/data \
-						stream/async_stream/sock \
-						stream/async_stream/filter \
-						stream/async_stream/prefix \
+						stream/impl/async_stream/http \
+						stream/impl/async_stream/file \
+						stream/impl/async_stream/data \
+						stream/impl/async_stream/sock \
+						stream/impl/async_stream/filter \
+						stream/impl/async_stream/prefix \
 						stream/async_transfer \
 						stream/transfer_pool \
 						platform/asio/aicp
