@@ -113,7 +113,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
         tb_static_stream_t  sstream;
         tb_byte_t       rpkt[TB_DNS_RPKT_MAXN];
         tb_size_t       size = 0;
-        tb_byte_t*      p = tb_null;
+        tb_byte_t*      p = tb_object_null;
         tb_static_stream_init(&sstream, rpkt, TB_DNS_RPKT_MAXN);
 
         // identification number
@@ -199,7 +199,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
     tb_assert_and_check_return_val(data && size && looker->size < size, -1);
 
     // try get addr from the dns list
-    tb_ipv4_t const* addr = tb_null;
+    tb_ipv4_t const* addr = tb_object_null;
     if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
         addr = &looker->list[looker->itor - 1];
 
@@ -442,7 +442,7 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
     tb_check_return_val(!(looker->step & TB_DNS_LOOKER_STEP_RESP), 1);
 
     // try get addr from the dns list
-    tb_ipv4_t const* addr = tb_null;
+    tb_ipv4_t const* addr = tb_object_null;
     if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
         addr = &looker->list[looker->itor - 1];
 
@@ -510,21 +510,21 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
 tb_handle_t tb_dns_looker_init(tb_char_t const* name)
 {
     // check
-    tb_assert_and_check_return_val(name, tb_null);
+    tb_assert_and_check_return_val(name, tb_object_null);
 
     // must be not ipv4
-    tb_assert_return_val(!tb_ipv4_set(tb_null, name), tb_null);
+    tb_assert_return_val(!tb_ipv4_set(tb_object_null, name), tb_object_null);
 
     // make looker
     tb_dns_looker_t* looker = (tb_dns_looker_t*)tb_malloc0(sizeof(tb_dns_looker_t));
-    tb_assert_and_check_return_val(looker, tb_null);
+    tb_assert_and_check_return_val(looker, tb_object_null);
 
     // dump server
 //  tb_dns_server_dump();
 
     // get the dns server list
     looker->maxn = tb_dns_server_get(looker->list);
-    tb_check_goto(looker->maxn && looker->maxn <= tb_arrayn(looker->list), fail);
+    tb_check_goto(looker->maxn && looker->maxn <= tb_object_arrayn(looker->list), fail);
 
     // init name
     if (!tb_static_string_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) goto fail;
@@ -545,7 +545,7 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
 
 fail:
     if (looker) tb_dns_looker_exit(looker);
-    return tb_null;
+    return tb_object_null;
 }
 tb_long_t tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_t* addr)
 {
@@ -627,7 +627,7 @@ tb_void_t tb_dns_looker_exit(tb_handle_t handle)
     {
         // exit sock
         if (looker->sock) tb_socket_clos(looker->sock);
-        looker->sock = tb_null;
+        looker->sock = tb_object_null;
 
         // exit it
         tb_free(looker);

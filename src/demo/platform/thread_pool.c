@@ -27,10 +27,10 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 0
     // post task: 60s
-    tb_thread_pool_task_post(tb_thread_pool(), "60000ms", tb_demo_task_time_done, tb_null, (tb_cpointer_t)60000, tb_false);
+    tb_thread_pool_task_post(tb_thread_pool(), "60000ms", tb_demo_task_time_done, tb_object_null, (tb_cpointer_t)60000, tb_false);
 
     // post task: 10s
-    tb_thread_pool_task_post(tb_thread_pool(), "10000ms", tb_demo_task_time_done, tb_null, (tb_cpointer_t)10000, tb_false);
+    tb_thread_pool_task_post(tb_thread_pool(), "10000ms", tb_demo_task_time_done, tb_object_null, (tb_cpointer_t)10000, tb_false);
 
     // post task: 1s
     tb_thread_pool_task_post(tb_thread_pool(), "1000ms", tb_demo_task_time_done, tb_demo_task_time_exit, (tb_cpointer_t)1000, tb_false);
@@ -52,7 +52,7 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
         tb_trace_i("post: %lu ms, total: %lu", time, total);
     
         // post task: time ms
-        tb_thread_pool_task_post(tb_thread_pool(), tb_null, tb_demo_task_time_done, tb_demo_task_time_exit, (tb_pointer_t)time, !(time & 15)? tb_true : tb_false);
+        tb_thread_pool_task_post(tb_thread_pool(), tb_object_null, tb_demo_task_time_done, tb_demo_task_time_exit, (tb_pointer_t)time, !(time & 15)? tb_true : tb_false);
 
         // finished? wait some time and update count
         if (!count) 

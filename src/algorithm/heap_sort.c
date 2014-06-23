@@ -94,7 +94,7 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
     // (hole - 1) / 2: the parent node of the hole
     // finds the final hole
     tb_size_t       parent = 0;
-    tb_cpointer_t   parent_item = tb_null;
+    tb_cpointer_t   parent_item = tb_object_null;
     for (parent = (hole - 1) >> 1; hole > top && (comp(iterator, (parent_item = tb_iterator_item(iterator, head + parent)), item) < 0); parent = (hole - 1) >> 1)
     {   
         // move item: parent => hole
@@ -190,8 +190,8 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 
     // walk, 2 * hole + 1: the left child node of hole
     tb_size_t       child = (hole << 1) + 1;
-    tb_cpointer_t   child_item = tb_null;
-    tb_cpointer_t   child_item_r = tb_null;
+    tb_cpointer_t   child_item = tb_object_null;
+    tb_cpointer_t   child_item_r = tb_object_null;
     for (; child < tail; child = (child << 1) + 1)
     {   
         // the larger child node
@@ -238,7 +238,7 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t h
 {
     // init
     tb_size_t       step = tb_iterator_step(iterator);
-    tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
+    tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_object_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
     // make
@@ -410,7 +410,7 @@ tb_void_t tb_heap_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, 
 
     // init
     tb_size_t       step = tb_iterator_step(iterator);
-    tb_pointer_t    last = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
+    tb_pointer_t    last = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_object_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || last);
 
     // pop0 ...

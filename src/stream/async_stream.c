@@ -45,7 +45,7 @@ static tb_bool_t tb_async_stream_cache_sync_func(tb_handle_t stream, tb_size_t s
     tb_assert_and_check_return_val(astream && astream->sync && astream->wcache_and.sync.func, tb_false);
 
     // move cache
-    if (real) tb_scoped_buffer_memmov(&astream->wcache_data, real);
+    if (real) tb_buffer_memmov(&astream->wcache_data, real);
 
     // not finished? continue it
     if (state == TB_STATE_OK && real < size) return tb_true;
@@ -57,7 +57,7 @@ static tb_bool_t tb_async_stream_cache_sync_func(tb_handle_t stream, tb_size_t s
     else if (state == TB_STATE_OK && real == size)
     {
         // check
-        tb_assert_and_check_return_val(!tb_scoped_buffer_size(&astream->wcache_data), tb_false);
+        tb_assert_and_check_return_val(!tb_buffer_size(&astream->wcache_data), tb_false);
 
         // post sync
         ok = astream->sync(stream, astream->wcache_and.sync.bclosing, astream->wcache_and.sync.func, priv);
@@ -95,7 +95,7 @@ static tb_bool_t tb_async_stream_cache_writ_func(tb_handle_t stream, tb_size_t s
             tb_trace_d("cache: writ: %lu: ok", astream->wcache_and.writ.size);
 
             // clear cache
-            tb_scoped_buffer_clear(&astream->wcache_data);
+            tb_buffer_clear(&astream->wcache_data);
     
             // done func
             astream->wcache_and.writ.func(astream, TB_STATE_OK, astream->wcache_and.writ.data, astream->wcache_and.writ.size, astream->wcache_and.writ.size, priv);
@@ -132,11 +132,11 @@ static tb_bool_t tb_async_stream_cache_writ_done(tb_async_stream_t* stream, tb_s
     if (stream->wcache_maxn)
     {
         // writ data to cache 
-        if (data && size) tb_scoped_buffer_memncat(&stream->wcache_data, data, size);
+        if (data && size) tb_buffer_memncat(&stream->wcache_data, data, size);
 
         // the writ data and size
-        tb_byte_t const*    writ_data = tb_scoped_buffer_data(&stream->wcache_data);
-        tb_size_t           writ_size = tb_scoped_buffer_size(&stream->wcache_data);
+        tb_byte_t const*    writ_data = tb_buffer_data(&stream->wcache_data);
+        tb_size_t           writ_size = tb_buffer_size(&stream->wcache_data);
     
         // no full? writ ok
         if (writ_size < stream->wcache_maxn)
@@ -172,22 +172,22 @@ static tb_bool_t tb_async_stream_cache_read_done(tb_async_stream_t* stream, tb_s
     tb_assert_and_check_return_val(stream && stream->read && func, tb_false);
 
     // have writed cache? need sync it first
-    tb_assert_and_check_return_val(!stream->wcache_maxn || !tb_scoped_buffer_size(&stream->wcache_data), tb_false);
+    tb_assert_and_check_return_val(!stream->wcache_maxn || !tb_buffer_size(&stream->wcache_data), tb_false);
 
     // using cache?
-    tb_byte_t* data = tb_null;
+    tb_byte_t* data = tb_object_null;
     if (stream->rcache_maxn)
     {
         // grow data
-        if (stream->rcache_maxn > tb_scoped_buffer_maxn(&stream->rcache_data)) 
-            tb_scoped_buffer_resize(&stream->rcache_data, stream->rcache_maxn);
+        if (stream->rcache_maxn > tb_buffer_maxn(&stream->rcache_data)) 
+            tb_buffer_resize(&stream->rcache_data, stream->rcache_maxn);
 
         // the cache data
-        data = tb_scoped_buffer_data(&stream->rcache_data);
+        data = tb_buffer_data(&stream->rcache_data);
         tb_assert_and_check_return_val(data, tb_false);
 
         // the maxn
-        tb_size_t maxn = tb_scoped_buffer_maxn(&stream->rcache_data);
+        tb_size_t maxn = tb_buffer_maxn(&stream->rcache_data);
 
         // adjust the size
         if (!size || size > maxn) size = maxn;
@@ -232,7 +232,7 @@ static tb_bool_t tb_async_stream_open_read_func(tb_handle_t stream, tb_size_t st
     if (state != TB_STATE_OK) 
     {
         // done func
-        ok = open_read->func(stream, state, tb_null, 0, open_read->size, open_read->priv);
+        ok = open_read->func(stream, state, tb_object_null, 0, open_read->size, open_read->priv);
     }
  
     // ok?
@@ -370,7 +370,7 @@ static tb_bool_t tb_async_stream_sync_read_func(tb_handle_t stream, tb_size_t st
     if (state != TB_STATE_OK) 
     {
         // done func
-        ok = sync_read->func(stream, state, tb_null, 0, sync_read->size, sync_read->priv);
+        ok = sync_read->func(stream, state, tb_object_null, 0, sync_read->size, sync_read->priv);
     }
  
     // ok?
@@ -462,12 +462,12 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
         ok_url = tb_true;
 
         // init rcache
-        if (!tb_scoped_buffer_init(&stream->rcache_data)) break;
+        if (!tb_buffer_init(&stream->rcache_data)) break;
         stream->rcache_maxn = rcache;
         ok_rcache = tb_true;
 
         // init wcache
-        if (!tb_scoped_buffer_init(&stream->wcache_data)) break;
+        if (!tb_buffer_init(&stream->wcache_data)) break;
         stream->wcache_maxn = wcache;
 
         // ok
@@ -479,7 +479,7 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
     if (!ok)
     {
         // exit rcache
-        if (ok_rcache) tb_scoped_buffer_exit(&stream->rcache_data);
+        if (ok_rcache) tb_buffer_exit(&stream->rcache_data);
 
         // exit url
         if (ok_url) tb_url_exit(&stream->base.url);
@@ -491,12 +491,12 @@ tb_bool_t tb_async_stream_init(tb_async_stream_t* stream, tb_aicp_t* aicp, tb_si
 tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // the init
     static tb_async_stream_t* (*s_init[])(tb_aicp_t*) = 
     {
-        tb_null
+        tb_object_null
     ,   tb_async_stream_init_file
     ,   tb_async_stream_init_sock
     ,   tb_async_stream_init_http
@@ -515,13 +515,13 @@ tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t cons
     if (!type || type > TB_STREAM_TYPE_DATA)
     {
         tb_trace_e("unknown stream for url: %s", url);
-        return tb_null;
+        return tb_object_null;
     }
-    tb_assert_and_check_return_val(type && type < tb_arrayn(s_init) && s_init[type], tb_null);
+    tb_assert_and_check_return_val(type && type < tb_object_arrayn(s_init) && s_init[type], tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  stream = tb_null;
+    tb_async_stream_t*  stream = tb_object_null;
     do
     {
         // init stream
@@ -541,7 +541,7 @@ tb_async_stream_t* tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t cons
     {
         // exit stream
         if (stream) tb_async_stream_exit(stream);
-        stream = tb_null;
+        stream = tb_object_null;
     }
 
     // ok?
@@ -582,10 +582,10 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_t* stream)
     tb_url_exit(&stream->base.url);
 
     // exit rcache
-    tb_scoped_buffer_exit(&stream->rcache_data);
+    tb_buffer_exit(&stream->rcache_data);
 
     // exit wcache
-    tb_scoped_buffer_exit(&stream->wcache_data);
+    tb_buffer_exit(&stream->wcache_data);
 
     // free it
     tb_free(stream);
@@ -735,7 +735,7 @@ tb_bool_t tb_async_stream_seek_(tb_async_stream_t* stream, tb_hize_t offset, tb_
 #endif
 
     // have writed cache? sync it first
-    if (stream->wcache_maxn && tb_scoped_buffer_size(&stream->wcache_data))
+    if (stream->wcache_maxn && tb_buffer_size(&stream->wcache_data))
     {
         // init sync and seek
         stream->sync_and.seek.func = func;
@@ -774,8 +774,8 @@ tb_bool_t tb_async_stream_sync_(tb_async_stream_t* stream, tb_bool_t bclosing, t
     if (stream->wcache_maxn)
     {
         // sync the cache data 
-        tb_byte_t*  data = tb_scoped_buffer_data(&stream->wcache_data);
-        tb_size_t   size = tb_scoped_buffer_size(&stream->wcache_data);
+        tb_byte_t*  data = tb_buffer_data(&stream->wcache_data);
+        tb_size_t   size = tb_buffer_size(&stream->wcache_data);
         if (data && size)
         {
             // writ the cache data
@@ -881,7 +881,7 @@ tb_bool_t tb_async_stream_read_after_(tb_async_stream_t* stream, tb_size_t delay
 #endif
 
     // have writed cache? sync it first
-    if (stream->wcache_maxn && tb_scoped_buffer_size(&stream->wcache_data))
+    if (stream->wcache_maxn && tb_buffer_size(&stream->wcache_data))
     {
         // init sync and read
         stream->sync_and.read.func = func;
@@ -914,7 +914,7 @@ tb_bool_t tb_async_stream_writ_after_(tb_async_stream_t* stream, tb_size_t delay
 tb_aicp_t* tb_async_stream_aicp(tb_async_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_null);
+    tb_assert_and_check_return_val(stream, tb_object_null);
 
     // the aicp
     return stream->aicp;
@@ -923,7 +923,7 @@ tb_aicp_t* tb_async_stream_aicp(tb_async_stream_t* stream)
 tb_char_t const* tb_async_stream_func(tb_async_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_null);
+    tb_assert_and_check_return_val(stream, tb_object_null);
 
     // the func
     return stream->func;
@@ -931,7 +931,7 @@ tb_char_t const* tb_async_stream_func(tb_async_stream_t* stream)
 tb_char_t const* tb_async_stream_file(tb_async_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_null);
+    tb_assert_and_check_return_val(stream, tb_object_null);
 
     // the file
     return stream->file;

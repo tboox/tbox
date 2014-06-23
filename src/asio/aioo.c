@@ -40,7 +40,7 @@ tb_handle_t tb_aioo_handle(tb_handle_t handle)
 {
     // check
     tb_aioo_t const* aioo = (tb_aioo_t const*)handle;
-    tb_assert_and_check_return_val(aioo, tb_null);
+    tb_assert_and_check_return_val(aioo, tb_object_null);
 
     // the handle
     return aioo->handle;

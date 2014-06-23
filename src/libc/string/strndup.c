@@ -35,7 +35,7 @@
 tb_char_t* tb_strndup(tb_char_t const* s, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
 
     // done
     n = tb_strnlen(s, n);

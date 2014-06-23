@@ -54,16 +54,16 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
     if (context)
     {
         // exit aico
-        if (context->aico[0]) tb_aico_exit(context->aico[0], tb_demo_sock_exit_func, tb_null);
-        context->aico[0] = tb_null;
+        if (context->aico[0]) tb_aico_exit(context->aico[0], tb_demo_sock_exit_func, tb_object_null);
+        context->aico[0] = tb_object_null;
 
         // exit aico
-        if (context->aico[1]) tb_aico_exit(context->aico[1], tb_demo_file_exit_func, tb_null);
-        context->aico[1] = tb_null;
+        if (context->aico[1]) tb_aico_exit(context->aico[1], tb_demo_file_exit_func, tb_object_null);
+        context->aico[1] = tb_object_null;
 
         // exit data
         if (context->data) tb_free(context->data);
-        context->data = tb_null;
+        context->data = tb_object_null;
     }
 }
 static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv)
@@ -92,7 +92,7 @@ static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv)
     tb_socket_clos(tb_aico_handle(aico));
 
     // exit file
-    if (priv) tb_aico_exit((tb_handle_t)priv, tb_demo_file_exit_func, tb_null);
+    if (priv) tb_aico_exit((tb_handle_t)priv, tb_demo_file_exit_func, tb_object_null);
 }
 static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice);
 static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
@@ -229,7 +229,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_aicp_t*          aicp = tb_null;
+    tb_aicp_t*          aicp = tb_object_null;
     tb_demo_context_t   context = {0};
 
     // init aicp

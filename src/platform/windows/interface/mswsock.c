@@ -49,7 +49,7 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
     tb_assert_and_check_return_val(mswsock, tb_false);
 
     // done
-    tb_handle_t sock = tb_null;
+    tb_handle_t sock = tb_object_null;
     do
     {
         // init sock
@@ -66,8 +66,8 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
                             ,   &mswsock->AcceptEx
                             ,   sizeof(tb_mswsock_AcceptEx_t)
                             ,   &AcceptEx_real
-                            ,   tb_null
-                            ,   tb_null);
+                            ,   tb_object_null
+                            ,   tb_object_null);
 
         // init ConnectEx
         DWORD   ConnectEx_real = 0;
@@ -79,8 +79,8 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
                             ,   &mswsock->ConnectEx
                             ,   sizeof(tb_mswsock_ConnectEx_t)
                             ,   &ConnectEx_real
-                            ,   tb_null
-                            ,   tb_null);
+                            ,   tb_object_null
+                            ,   tb_object_null);
 
         // init TransmitFile
         DWORD   TransmitFile_real = 0;
@@ -92,8 +92,8 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
                             ,   &mswsock->TransmitFile
                             ,   sizeof(tb_mswsock_TransmitFile_t)
                             ,   &TransmitFile_real
-                            ,   tb_null
-                            ,   tb_null);
+                            ,   tb_object_null
+                            ,   tb_object_null);
     } while (0);
 
     // exit sock

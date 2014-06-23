@@ -95,7 +95,7 @@ typedef struct __tb_basic_stream_sock_t
 static __tb_inline__ tb_basic_stream_sock_t* tb_basic_stream_sock_cast(tb_handle_t stream)
 {
     tb_basic_stream_t* bstream = (tb_basic_stream_t*)stream;
-    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_SOCK, tb_null);
+    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_SOCK, tb_object_null);
     return (tb_basic_stream_sock_t*)bstream;
 }
 static tb_bool_t tb_basic_stream_sock_open(tb_handle_t bstream)
@@ -289,7 +289,7 @@ static tb_bool_t tb_basic_stream_sock_clos(tb_handle_t bstream)
     if (!sstream->bref) 
     {
         if (sstream->sock && !tb_socket_clos(sstream->sock)) return tb_false;
-        sstream->sock = tb_null;
+        sstream->sock = tb_object_null;
     }
 
     // clear 
@@ -311,7 +311,7 @@ static tb_void_t tb_basic_stream_sock_exit(tb_handle_t bstream)
 #ifdef TB_SSL_ENABLE
     // exit ssl
     if (sstream->hssl) tb_ssl_exit(sstream->hssl);
-    sstream->hssl = tb_null;
+    sstream->hssl = tb_object_null;
 #endif
 
     // close sock
@@ -322,7 +322,7 @@ static tb_void_t tb_basic_stream_sock_exit(tb_handle_t bstream)
             // trace
             tb_trace_d("[sock]: exit failed");
         }
-        sstream->sock = tb_null;
+        sstream->sock = tb_object_null;
     }
 
     // clear 
@@ -589,7 +589,7 @@ static tb_bool_t tb_basic_stream_sock_ctrl(tb_handle_t bstream, tb_size_t ctrl, 
             {
                 // exit it
                 if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
-                sstream->sock = tb_null;
+                sstream->sock = tb_object_null;
                 sstream->bref = 0;
             }
 
@@ -655,7 +655,7 @@ tb_basic_stream_t* tb_basic_stream_init_sock()
 {
     // make stream
     tb_basic_stream_sock_t* bstream = (tb_basic_stream_sock_t*)tb_malloc0(sizeof(tb_basic_stream_sock_t));
-    tb_assert_and_check_return_val(bstream, tb_null);
+    tb_assert_and_check_return_val(bstream, tb_object_null);
 
     // init stream
     if (!tb_basic_stream_init((tb_basic_stream_t*)bstream, TB_STREAM_TYPE_SOCK, TB_BASIC_STREAM_SOCK_CACHE_MAXN)) goto fail;
@@ -667,7 +667,7 @@ tb_basic_stream_t* tb_basic_stream_init_sock()
     bstream->base.wait      = tb_basic_stream_sock_wait;
     bstream->base.base.ctrl = tb_basic_stream_sock_ctrl;
     bstream->base.base.kill = tb_basic_stream_sock_kill;
-    bstream->sock           = tb_null;
+    bstream->sock           = tb_object_null;
     bstream->type           = TB_SOCKET_TYPE_TCP;
 
     // ok
@@ -675,17 +675,17 @@ tb_basic_stream_t* tb_basic_stream_init_sock()
 
 fail:
     if (bstream) tb_basic_stream_exit((tb_basic_stream_t*)bstream);
-    return tb_null;
+    return tb_object_null;
 }
 
 tb_basic_stream_t* tb_basic_stream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
 {
     // check
-    tb_assert_and_check_return_val(host && port, tb_null);
+    tb_assert_and_check_return_val(host && port, tb_object_null);
 
     // init stream
     tb_basic_stream_t* bstream = tb_basic_stream_init_sock();
-    tb_assert_and_check_return_val(bstream, tb_null);
+    tb_assert_and_check_return_val(bstream, tb_object_null);
 
     // ctrl
     if (!tb_stream_ctrl(bstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
@@ -698,5 +698,5 @@ tb_basic_stream_t* tb_basic_stream_init_from_sock(tb_char_t const* host, tb_size
 
 fail:
     if (bstream) tb_basic_stream_exit(bstream);
-    return tb_null;
+    return tb_object_null;
 }

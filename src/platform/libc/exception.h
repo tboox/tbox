@@ -66,7 +66,7 @@ typedef struct __tb_exception_list_t
         tb_exception_init_impl(); \
         \
         /* init exception data */ \
-        tb_exception_list_t* __l = tb_null; \
+        tb_exception_list_t* __l = tb_object_null; \
         if (!(__l = (tb_exception_list_t*)tb_thread_store_getp())) \
         { \
             __l = tb_malloc0(sizeof(tb_exception_list_t)); \
@@ -74,13 +74,13 @@ typedef struct __tb_exception_list_t
             { \
                 __l->base.type = TB_THREAD_STORE_DATA_TYPE_EXCEPTION; \
                 __l->base.free = tb_exception_list_free; \
-                __l->stack = tb_stack_init(16, tb_item_func_mem(sizeof(tb_sigjmpbuf_t), tb_null, tb_null)); \
+                __l->stack = tb_stack_init(16, tb_item_func_mem(sizeof(tb_sigjmpbuf_t), tb_object_null, tb_object_null)); \
                 tb_thread_store_setp((tb_thread_store_data_t const*)__l); \
             } \
         } \
         \
         /* push jmpbuf */ \
-        tb_sigjmpbuf_t* __top = tb_null; \
+        tb_sigjmpbuf_t* __top = tb_object_null; \
         if (__l && __l->stack) \
         { \
             tb_sigjmpbuf_t __buf; \
@@ -167,7 +167,7 @@ static __tb_inline__ tb_void_t tb_exception_list_free(tb_thread_store_data_t* da
     {
         // exit stack
         if (list->stack) tb_stack_exit(list->stack);
-        list->stack = tb_null;
+        list->stack = tb_object_null;
 
         // exit exception
         tb_free(list);

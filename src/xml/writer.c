@@ -74,11 +74,11 @@ typedef struct __tb_xml_writer_t
 tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
 {
     // check
-    tb_assert_and_check_return_val(wstream, tb_null);
+    tb_assert_and_check_return_val(wstream, tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_xml_writer_t*    writer = tb_null;
+    tb_xml_writer_t*    writer = tb_object_null;
     do
     {
         // make writer
@@ -90,7 +90,7 @@ tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
         writer->bformat     = bformat;
 
         // init pool
-        writer->pool        = tb_block_pool_init(TB_BLOCK_POOL_GROW_SMALL, 0);
+        writer->pool        = tb_pool_init(TB_POOL_GROW_SMALL, 0);
         tb_assert_and_check_break(writer->pool);
         
         // init elements
@@ -111,7 +111,7 @@ tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
     {
         // exit it
         if (writer) tb_xml_writer_exit(writer);
-        writer = tb_null;
+        writer = tb_object_null;
     }
 
     // ok?
@@ -124,15 +124,15 @@ tb_void_t tb_xml_writer_exit(tb_handle_t writer)
     {
         // exit attributes
         if (xwriter->attributes) tb_hash_exit(xwriter->attributes);
-        xwriter->attributes = tb_null;
+        xwriter->attributes = tb_object_null;
 
         // exit elements
         if (xwriter->elements) tb_stack_exit(xwriter->elements);
-        xwriter->elements = tb_null;
+        xwriter->elements = tb_object_null;
 
         // exit pool
-        if (xwriter->pool) tb_block_pool_exit(xwriter->pool);
-        xwriter->pool = tb_null;
+        if (xwriter->pool) tb_pool_exit(xwriter->pool);
+        xwriter->pool = tb_object_null;
 
         // free it
         tb_free(xwriter);
@@ -150,7 +150,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
         {
             // document
             tb_xml_document_t* document = (tb_xml_document_t*)node;
-            tb_xml_writer_document(writer, tb_scoped_string_cstr(&document->version), tb_scoped_string_cstr(&document->charset));
+            tb_xml_writer_document(writer, tb_string_cstr(&document->version), tb_string_cstr(&document->charset));
 
             // childs
             tb_xml_node_t* next = node->chead;
@@ -168,7 +168,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
         {
             // document type
             tb_xml_document_type_t* doctype = (tb_xml_document_type_t*)node;
-            tb_xml_writer_document_type(writer, tb_scoped_string_cstr(&doctype->type));
+            tb_xml_writer_document_type(writer, tb_string_cstr(&doctype->type));
         }
         break;
     case TB_XML_NODE_TYPE_ELEMENT:
@@ -178,7 +178,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
             while (attr)
             {
                 // save
-                tb_xml_writer_attributes_cstr(writer, tb_scoped_string_cstr(&attr->name), tb_scoped_string_cstr(&attr->data));
+                tb_xml_writer_attributes_cstr(writer, tb_string_cstr(&attr->name), tb_string_cstr(&attr->data));
 
                 // next
                 attr = attr->next;
@@ -189,7 +189,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
             if (next)
             {
                 // enter
-                tb_xml_writer_element_enter(writer, tb_scoped_string_cstr(&node->name));
+                tb_xml_writer_element_enter(writer, tb_string_cstr(&node->name));
 
                 // init
                 while (next)
@@ -204,17 +204,17 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
                 // leave
                 tb_xml_writer_element_leave(writer);
             }
-            else tb_xml_writer_element_empty(writer, tb_scoped_string_cstr(&node->name));
+            else tb_xml_writer_element_empty(writer, tb_string_cstr(&node->name));
         }
         break;
     case TB_XML_NODE_TYPE_COMMENT:
-        tb_xml_writer_comment(writer, tb_scoped_string_cstr(&node->data));
+        tb_xml_writer_comment(writer, tb_string_cstr(&node->data));
         break;
     case TB_XML_NODE_TYPE_CDATA:
-        tb_xml_writer_cdata(writer, tb_scoped_string_cstr(&node->data));
+        tb_xml_writer_cdata(writer, tb_string_cstr(&node->data));
         break;
     case TB_XML_NODE_TYPE_TEXT:
-        tb_xml_writer_text(writer, tb_scoped_string_cstr(&node->data));
+        tb_xml_writer_text(writer, tb_string_cstr(&node->data));
         break;
     default:
         break;

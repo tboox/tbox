@@ -133,7 +133,7 @@ typedef struct __tb_async_stream_data_t
 static __tb_inline__ tb_async_stream_data_t* tb_async_stream_data_cast(tb_handle_t stream)
 {
     tb_async_stream_t* astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_DATA, tb_null);
+    tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_DATA, tb_object_null);
     return (tb_async_stream_data_t*)astream;
 }
 static tb_void_t tb_async_stream_data_clos_clear(tb_async_stream_data_t* dstream)
@@ -142,10 +142,10 @@ static tb_void_t tb_async_stream_data_clos_clear(tb_async_stream_data_t* dstream
     tb_assert_and_check_return(dstream);
 
     // clear aico
-    dstream->aico = tb_null;
+    dstream->aico = tb_object_null;
 
     // clear head
-    dstream->head = tb_null;
+    dstream->head = tb_object_null;
 
     // clear offset
     tb_atomic64_set0(&dstream->offset);
@@ -209,7 +209,7 @@ static tb_bool_t tb_async_stream_data_clos(tb_handle_t astream, tb_async_stream_
     // exit it
     if (dstream->aico) tb_aico_exit(dstream->aico, tb_async_stream_data_clos_func, dstream);
     // done func directly
-    else tb_async_stream_data_clos_func(tb_null, dstream);
+    else tb_async_stream_data_clos_func(tb_object_null, dstream);
 
     // ok
     return tb_true;
@@ -333,7 +333,7 @@ static tb_bool_t tb_async_stream_data_read_func(tb_aice_t const* aice)
     }
  
     // done func
-    if (state != TB_STATE_OK) dstream->func.read.func((tb_async_stream_t*)dstream, state, tb_null, 0, dstream->func.read.size, dstream->func.read.priv);
+    if (state != TB_STATE_OK) dstream->func.read.func((tb_async_stream_t*)dstream, state, tb_object_null, 0, dstream->func.read.size, dstream->func.read.priv);
 
     // ok
     return tb_true;
@@ -528,14 +528,14 @@ static tb_bool_t tb_async_stream_data_exit(tb_handle_t astream)
     tb_assert_and_check_return_val(!dstream->aico, tb_false);
 
     // clear head
-    dstream->head = tb_null;
+    dstream->head = tb_object_null;
 
     // clear offset
     tb_atomic64_set0(&dstream->offset);
 
     // exit data
     if (dstream->data && !dstream->bref) tb_free(dstream->data);
-    dstream->data = tb_null;
+    dstream->data = tb_object_null;
     dstream->size = 0;
 
     // ok
@@ -582,7 +582,7 @@ static tb_bool_t tb_async_stream_data_ctrl(tb_handle_t astream, tb_size_t ctrl, 
             // save data
             dstream->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
             dstream->size = (tb_size_t)tb_va_arg(args, tb_size_t);
-            dstream->head = tb_null;
+            dstream->head = tb_object_null;
             dstream->bref = tb_true;
 
             // clear offset
@@ -625,7 +625,7 @@ static tb_bool_t tb_async_stream_data_ctrl(tb_handle_t astream, tb_size_t ctrl, 
             dstream->data = data;
             dstream->size = size;
             dstream->bref = tb_false;
-            dstream->head = tb_null;
+            dstream->head = tb_object_null;
 
             // clear offset
             tb_atomic64_set0(&dstream->offset);
@@ -647,7 +647,7 @@ tb_async_stream_t* tb_async_stream_init_data(tb_aicp_t* aicp)
 {
     // done
     tb_bool_t                   ok = tb_false;
-    tb_async_stream_data_t*     dstream = tb_null; 
+    tb_async_stream_data_t*     dstream = tb_object_null; 
     do
     {
         // make stream
@@ -678,7 +678,7 @@ tb_async_stream_t* tb_async_stream_init_data(tb_aicp_t* aicp)
     {
         // exit it
         if (dstream) tb_async_stream_exit((tb_async_stream_t*)dstream);
-        dstream = tb_null;
+        dstream = tb_object_null;
     }
 
     // ok?
@@ -687,11 +687,11 @@ tb_async_stream_t* tb_async_stream_init_data(tb_aicp_t* aicp)
 tb_async_stream_t* tb_async_stream_init_from_data(tb_aicp_t* aicp, tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(data && size, tb_null);
+    tb_assert_and_check_return_val(data && size, tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  dstream = tb_null;
+    tb_async_stream_t*  dstream = tb_object_null;
     do
     {
         // init stream
@@ -711,7 +711,7 @@ tb_async_stream_t* tb_async_stream_init_from_data(tb_aicp_t* aicp, tb_byte_t con
     {
         // exit it
         if (dstream) tb_async_stream_exit(dstream);
-        dstream = tb_null;
+        dstream = tb_object_null;
     }
 
     // ok?

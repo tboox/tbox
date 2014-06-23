@@ -68,10 +68,10 @@ typedef struct __tb_xml_node_t
     tb_size_t                   type;
 
     /// the node name
-    tb_scoped_string_t          name;
+    tb_string_t          name;
 
     /// the node data
-    tb_scoped_string_t          data;
+    tb_string_t          data;
 
     /// the next
     struct __tb_xml_node_t*     next;
@@ -149,10 +149,10 @@ typedef struct __tb_xml_document_t
     tb_xml_node_t               base;
 
     /// the version
-    tb_scoped_string_t          version;
+    tb_string_t          version;
 
     /// the charset 
-    tb_scoped_string_t          charset;
+    tb_string_t          charset;
 
 }tb_xml_document_t;
 
@@ -163,7 +163,7 @@ typedef struct __tb_xml_document_type_t
     tb_xml_node_t               base;
 
     /// the type 
-    tb_scoped_string_t          type;
+    tb_string_t          type;
 
 }tb_xml_document_type_t;
 

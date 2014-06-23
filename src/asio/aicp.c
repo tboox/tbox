@@ -49,7 +49,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
     // check
-    tb_assert_and_check_return_val(aicp && aicp->pool && type, tb_null);
+    tb_assert_and_check_return_val(aicp && aicp->pool && type, tb_object_null);
 
     // enter 
     tb_spinlock_enter(&aicp->lock);
@@ -63,12 +63,12 @@ static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size
         aico->aicp      = aicp;
         aico->type      = type;
         aico->handle    = handle;
-        aico->pool      = tb_null;
+        aico->pool      = tb_object_null;
         aico->state     = TB_STATE_OK;
 
         // init timeout 
         tb_size_t i = 0;
-        tb_size_t n = tb_arrayn(aico->timeout);
+        tb_size_t n = tb_object_arrayn(aico->timeout);
         for (i = 0; i < n; i++) aico->timeout[i] = -1;
     }
 
@@ -94,8 +94,8 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t* aico)
         tb_trace_d("exit: aico[%p]: type: %lu, handle: %p, state: %s", aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(tb_atomic_get(&aico->state)));
         
         // exit pool
-        if (aico->pool) tb_block_pool_exit(aico->pool);
-        aico->pool = tb_null;
+        if (aico->pool) tb_pool_exit(aico->pool);
+        aico->pool = tb_object_null;
 
         // exit it
         tb_fixed_pool_free(aicp->pool, aico);
@@ -216,17 +216,17 @@ static tb_pointer_t tb_aicp_instance_loop(tb_cpointer_t priv)
     tb_trace_d("loop: exit");
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    tb_thread_return(tb_object_null);
+    return tb_object_null;
 }
 static tb_handle_t tb_aicp_instance_init(tb_cpointer_t* ppriv)
 {
     // check
-    tb_assert_and_check_return_val(ppriv, tb_null);
+    tb_assert_and_check_return_val(ppriv, tb_object_null);
 
     // done
     tb_bool_t   ok = tb_false;
-    tb_aicp_t*  aicp = tb_null;
+    tb_aicp_t*  aicp = tb_object_null;
     do
     {
         // init aicp
@@ -234,7 +234,7 @@ static tb_handle_t tb_aicp_instance_init(tb_cpointer_t* ppriv)
         tb_assert_and_check_break(aicp);
 
         // init loop
-        *ppriv = (tb_cpointer_t)tb_thread_init(tb_null, tb_aicp_instance_loop, aicp, 0);
+        *ppriv = (tb_cpointer_t)tb_thread_init(tb_object_null, tb_aicp_instance_loop, aicp, 0);
         tb_assert_and_check_break(*ppriv);
 
         // ok
@@ -247,7 +247,7 @@ static tb_handle_t tb_aicp_instance_init(tb_cpointer_t* ppriv)
     {
         // exit aicp
         if (aicp) tb_aicp_exit(aicp);
-        aicp = tb_null;
+        aicp = tb_object_null;
     }
 
     // ok?
@@ -290,27 +290,27 @@ tb_aicp_t* tb_aicp()
 tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 {
     // check iovec
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, data, tb_iovec_t, data), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, size, tb_iovec_t, size), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_send_t, data, tb_iovec_t, data), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_send_t, size, tb_iovec_t, size), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_read_t, data, tb_iovec_t, data), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_read_t, size, tb_iovec_t, size), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, data, tb_iovec_t, data), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, size, tb_iovec_t, size), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, data, tb_iovec_t, data), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, size, tb_iovec_t, size), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_send_t, data, tb_iovec_t, data), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_send_t, size, tb_iovec_t, size), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_read_t, data, tb_iovec_t, data), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_read_t, size, tb_iovec_t, size), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, data, tb_iovec_t, data), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, size, tb_iovec_t, size), tb_object_null);
 
     // check real
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_send_t, real), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_read_t, real), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writ_t, real), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_sendf_t, real), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_sendv_t, real), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_recvv_t, real), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_readv_t, real), tb_null);
-    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writv_t, real), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_send_t, real), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_read_t, real), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writ_t, real), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_sendf_t, real), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_sendv_t, real), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_recvv_t, real), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_readv_t, real), tb_object_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writv_t, real), tb_object_null);
 
     // done
-    tb_aicp_t*  aicp = tb_null;
+    tb_aicp_t*  aicp = tb_object_null;
     tb_bool_t   ok = tb_false;
     do
     {
@@ -351,7 +351,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
     {
         // exit aicp
         if (aicp) tb_aicp_exit(aicp);
-        aicp = tb_null;
+        aicp = tb_object_null;
     }
 
     // ok?
@@ -370,7 +370,7 @@ tb_bool_t tb_aicp_exit(tb_aicp_t* aicp)
     {
         // wait failed, trace left aicos
         tb_spinlock_enter(&aicp->lock);
-        if (aicp->pool) tb_fixed_pool_walk(aicp->pool, tb_aicp_aico_wait, tb_null);
+        if (aicp->pool) tb_fixed_pool_walk(aicp->pool, tb_aicp_aico_wait, tb_object_null);
         tb_spinlock_leave(&aicp->lock);
         return tb_false;
     }
@@ -387,13 +387,13 @@ tb_bool_t tb_aicp_exit(tb_aicp_t* aicp)
     {
         tb_assert(aicp->ptor && aicp->ptor->exit);
         aicp->ptor->exit(aicp->ptor);
-        aicp->ptor = tb_null;
+        aicp->ptor = tb_object_null;
     }
 
     // exit aico pool
     tb_spinlock_enter(&aicp->lock);
     if (aicp->pool) tb_fixed_pool_exit(aicp->pool);
-    aicp->pool = tb_null;
+    aicp->pool = tb_object_null;
     tb_spinlock_leave(&aicp->lock);
 
     // exit lock
@@ -408,11 +408,11 @@ tb_bool_t tb_aicp_exit(tb_aicp_t* aicp)
 tb_handle_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
     // check
-    tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && type, tb_null);
+    tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && type, tb_object_null);
 
     // done
     tb_bool_t   ok = tb_false;
-    tb_aico_t*  aico = tb_null;
+    tb_aico_t*  aico = tb_object_null;
     do
     {
         // init aico
@@ -431,7 +431,7 @@ tb_handle_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
     if (!ok && aico) 
     {
         tb_aicp_aico_exit(aicp, aico);
-        aico = tb_null;
+        aico = tb_object_null;
     }
 
     // ok?
@@ -466,8 +466,8 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aico_exit_func_t fu
         if (((tb_aico_t*)aico)->exit) ((tb_aico_t*)aico)->exit(aico, ((tb_aico_t*)aico)->priv);
 
         // clear func
-        ((tb_aico_t*)aico)->exit = tb_null;
-        ((tb_aico_t*)aico)->priv = tb_null;
+        ((tb_aico_t*)aico)->exit = tb_object_null;
+        ((tb_aico_t*)aico)->priv = tb_object_null;
  
         // trace
         tb_trace_d("exit: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), tb_aico_handle(aico));
@@ -592,7 +592,7 @@ tb_bool_t tb_aicp_post_after_(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t const*
 }
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
-    tb_aicp_loop_util(aicp, tb_null, tb_null);  
+    tb_aicp_loop_util(aicp, tb_object_null, tb_object_null);  
 }
 tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t priv), tb_cpointer_t priv)
 {   
@@ -610,7 +610,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
     tb_atomic_fetch_and_inc(&aicp->work);
 
     // init loop
-    tb_handle_t loop = ptor->loop_init? ptor->loop_init(ptor) : tb_null;
+    tb_handle_t loop = ptor->loop_init? ptor->loop_init(ptor) : tb_object_null;
  
     // trace
     tb_trace_d("loop[%p]: init", loop);
@@ -666,8 +666,8 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t pri
             if (resp.aico->exit) resp.aico->exit(resp.aico, resp.aico->priv);
 
             // clear func
-            resp.aico->exit = tb_null;
-            resp.aico->priv = tb_null;
+            resp.aico->exit = tb_object_null;
+            resp.aico->priv = tb_object_null;
  
             // trace
             tb_trace_d("loop[%p]: exit: aico[%p]: type: %lu, handle: %p: ok", loop, resp.aico, tb_aico_type(resp.aico), tb_aico_handle(resp.aico));

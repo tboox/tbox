@@ -41,9 +41,9 @@
 
 // null
 #ifdef __cplusplus
-#   define tb_null                  (0)
+#   define tb_object_null                  (0)
 #else
-#   define tb_null                  ((tb_pointer_t)0)
+#   define tb_object_null                  ((tb_pointer_t)0)
 #endif
 
 // check config

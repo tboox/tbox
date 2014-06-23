@@ -30,18 +30,18 @@ demo_C_FILES 								+= \
 											stream/basic_stream/null \
 											stream/basic_stream/cache \
 											string/string_pool \
-											string/scoped_string \
+											string/string \
 											string/static_string \
 											memory/check \
 											memory/fixed_pool \
-											memory/block_pool \
+											memory/pool \
 											memory/global_pool \
 											memory/static_fixed_pool \
-											memory/static_block_pool \
+											memory/static_pool \
 											memory/static_tiny_pool \
 											memory/memops \
 											memory/queue_buffer \
-											memory/scoped_buffer \
+											memory/buffer \
 											memory/static_buffer \
 											network/dns \
 											network/url \

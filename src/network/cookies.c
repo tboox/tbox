@@ -201,20 +201,20 @@ static tb_void_t tb_cookies_entry_exit(tb_cookies_t* cookies, tb_cookies_entry_t
     tb_assert_and_check_return(cookies && entry);
 
     // exit domain
-    if (entry->domain) tb_string_pool_del(cookies->string_pool, entry->domain);
-    entry->domain = tb_null;
+    if (entry->domain) tb_object_string_pool_del(cookies->string_pool, entry->domain);
+    entry->domain = tb_object_null;
     
     // exit path
-    if (entry->path) tb_string_pool_del(cookies->string_pool, entry->path);
-    entry->path = tb_null;
+    if (entry->path) tb_object_string_pool_del(cookies->string_pool, entry->path);
+    entry->path = tb_object_null;
     
     // exit name
-    if (entry->name) tb_string_pool_del(cookies->string_pool, entry->name);
-    entry->name = tb_null;
+    if (entry->name) tb_object_string_pool_del(cookies->string_pool, entry->name);
+    entry->name = tb_object_null;
     
     // exit value
-    if (entry->value) tb_string_pool_del(cookies->string_pool, entry->value);
-    entry->value = tb_null;
+    if (entry->value) tb_object_string_pool_del(cookies->string_pool, entry->value);
+    entry->value = tb_object_null;
 }
 static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
 {
@@ -277,8 +277,8 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
 
     // done 
     tb_char_t const* p = value;
-    tb_char_t const* b = tb_null;
-    tb_char_t const* v = tb_null;
+    tb_char_t const* b = tb_object_null;
+    tb_char_t const* v = tb_object_null;
     tb_char_t data[4096] = {0};
     while (1)
     {
@@ -324,7 +324,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->domain = tb_string_pool_put(cookies->string_pool, data[0] == '.'? data + 1 : data);
+                    entry->domain = tb_object_string_pool_put(cookies->string_pool, data[0] == '.'? data + 1 : data);
                 }
             }
             else if (!tb_strnicmp(b, "path", 4))
@@ -337,7 +337,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->path = tb_string_pool_put(cookies->string_pool, data);
+                    entry->path = tb_object_string_pool_put(cookies->string_pool, data);
                 }
             }   
             else if (!tb_strnicmp(b, "version", 7))
@@ -361,7 +361,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
                 // save name
                 tb_assert_and_check_return_val(v - b - 1 < sizeof(data) - 1, tb_false);
                 tb_strlcpy(data, b, v - b - 1); data[v - b - 1] = '\0';
-                entry->name = tb_string_pool_put(cookies->string_pool, data);
+                entry->name = tb_object_string_pool_put(cookies->string_pool, data);
                 tb_assert_and_check_return_val(entry->name, tb_false);
 
                 // save value
@@ -369,7 +369,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->value = tb_string_pool_put(cookies->string_pool, data);
+                    entry->value = tb_object_string_pool_put(cookies->string_pool, data);
                     tb_assert_and_check_return_val(entry->value, tb_false);
                 }
             }
@@ -377,8 +377,8 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
             // next key-value pair
             if (*p) 
             {
-                b = tb_null;
-                v = tb_null;
+                b = tb_object_null;
+                v = tb_object_null;
                 p++;
             }
             // end
@@ -414,7 +414,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
         if (n && *domain == '.') domain++;
 
         // save domain
-        entry->domain = tb_string_pool_put(cookies->string_pool, domain);
+        entry->domain = tb_object_string_pool_put(cookies->string_pool, domain);
     }
     if (!entry->domain)
     {
@@ -424,7 +424,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
     }
 
     // path not exists? using the given path
-    if (!entry->path) entry->path = tb_string_pool_put(cookies->string_pool, path? path : "/");
+    if (!entry->path) entry->path = tb_object_string_pool_put(cookies->string_pool, path? path : "/");
     tb_assert_and_check_return_val(entry->path, tb_false);
 
     // no secure? using the given secure value
@@ -453,7 +453,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb
     tb_size_t secure = tuple[2].ul;
 
     // the data and maxn
-    tb_scoped_string_t* value = (tb_scoped_string_t*)tuple[3].ptr;
+    tb_string_t* value = (tb_string_t*)tuple[3].ptr;
     tb_assert_and_check_return_val(value, tb_false);
 
     // expired?
@@ -473,7 +473,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb
         &&  entry->secure == secure)
     {
         // append "key=value; "
-        tb_scoped_string_cstrfcat(value, "%s=%s; ", entry->name, entry->value? entry->value : "");
+        tb_string_cstrfcat(value, "%s=%s; ", entry->name, entry->value? entry->value : "");
     }
 
     // ok
@@ -504,13 +504,13 @@ static tb_void_t tb_cookies_instance_exit(tb_handle_t handle, tb_cpointer_t priv
  */
 tb_handle_t tb_cookies()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_COOKIES, tb_cookies_instance_init, tb_cookies_instance_exit, tb_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_COOKIES, tb_cookies_instance_init, tb_cookies_instance_exit, tb_object_null);
 }
 tb_handle_t tb_cookies_init()
 {
     // done
     tb_bool_t       ok = tb_false;
-    tb_cookies_t*   cookies = tb_null;
+    tb_cookies_t*   cookies = tb_object_null;
     do
     {
         // make cookies
@@ -521,7 +521,7 @@ tb_handle_t tb_cookies_init()
         if (!tb_spinlock_init(&cookies->lock)) break;
 
         // init string pool
-        cookies->string_pool = tb_string_pool_init(tb_true, 0);
+        cookies->string_pool = tb_object_string_pool_init(tb_true, 0);
         tb_assert_and_check_break(cookies->string_pool);
 
         // init cookie pool
@@ -532,7 +532,7 @@ tb_handle_t tb_cookies_init()
         tb_assert_and_check_break(cookies->cookie_pool);
 
         // init string func
-        cookies->string_func = tb_item_func_str(tb_true, tb_null);
+        cookies->string_func = tb_item_func_str(tb_true, tb_object_null);
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
@@ -549,7 +549,7 @@ tb_handle_t tb_cookies_init()
     {
         // exit cookies
         if (cookies) tb_cookies_exit(cookies);
-        cookies = tb_null;
+        cookies = tb_object_null;
     }
 
     // ok?
@@ -566,11 +566,11 @@ tb_void_t tb_cookies_exit(tb_handle_t handle)
 
     // exit cookie pool
     if (cookies->cookie_pool) tb_hash_exit(cookies->cookie_pool);
-    cookies->cookie_pool = tb_null;
+    cookies->cookie_pool = tb_object_null;
     
     // exit string pool
-    if (cookies->string_pool) tb_string_pool_exit(cookies->string_pool);
-    cookies->string_pool = tb_null;
+    if (cookies->string_pool) tb_object_string_pool_exit(cookies->string_pool);
+    cookies->string_pool = tb_object_null;
 
     // leave
     tb_spinlock_leave(&cookies->lock);
@@ -594,7 +594,7 @@ tb_void_t tb_cookies_clear(tb_handle_t handle)
     if (cookies->cookie_pool) tb_hash_clear(cookies->cookie_pool);
     
     // clear string pool
-    if (cookies->string_pool) tb_string_pool_clear(cookies->string_pool);
+    if (cookies->string_pool) tb_object_string_pool_clear(cookies->string_pool);
 
     // leave
     tb_spinlock_leave(&cookies->lock);
@@ -676,16 +676,16 @@ tb_bool_t tb_cookies_set_from_url(tb_handle_t handle, tb_char_t const* url, tb_c
     }
 
     // try to set it without domain and path
-    return tb_cookies_set(cookies, tb_null, tb_null, tb_false, value);
+    return tb_cookies_set(cookies, tb_object_null, tb_object_null, tb_false, value);
 }
-tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_scoped_string_t* value)
+tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_string_t* value)
 {
     // check
     tb_cookies_t* cookies = (tb_cookies_t*)handle;
-    tb_assert_and_check_return_val(cookies && domain && value, tb_null);
+    tb_assert_and_check_return_val(cookies && domain && value, tb_object_null);
 
     // clear value first
-    tb_scoped_string_clear(value);
+    tb_string_clear(value);
 
     // enter
     tb_spinlock_enter(&cookies->lock);
@@ -722,25 +722,25 @@ tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_
     } while (0);
 
     // failed?
-    if (!ok) tb_scoped_string_clear(value);
+    if (!ok) tb_string_clear(value);
     
     // leave
     tb_spinlock_leave(&cookies->lock);
 
     // ok?
-    return tb_scoped_string_cstr(value);
+    return tb_string_cstr(value);
 }
-tb_char_t const* tb_cookies_get_from_url(tb_handle_t handle, tb_char_t const* url, tb_scoped_string_t* value)
+tb_char_t const* tb_cookies_get_from_url(tb_handle_t handle, tb_char_t const* url, tb_string_t* value)
 {
     // check
     tb_cookies_t* cookies = (tb_cookies_t*)handle;
-    tb_assert_and_check_return_val(cookies && value, tb_null);
+    tb_assert_and_check_return_val(cookies && value, tb_object_null);
     
     // get domain and path from the given url
     tb_bool_t secure = tb_false;
     tb_char_t path[TB_URL_PATH_MAXN] = {0};
     tb_char_t domain[TB_URL_HOST_MAXN] = {0};
-    if (!tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure)) return tb_null;
+    if (!tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure)) return tb_object_null;
 
     // trace
     tb_trace_d("domain: %s, path: %s, secure: %s", domain, path, secure? "ok" : "no");

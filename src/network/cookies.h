@@ -255,7 +255,7 @@ tb_bool_t           tb_cookies_set_from_url(tb_handle_t cookies, tb_char_t const
  *
  * @return          the cookies data
  */
-tb_char_t const*    tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_scoped_string_t* value);
+tb_char_t const*    tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_string_t* value);
 
 /*! get cookies from the given url 
  *
@@ -265,7 +265,7 @@ tb_char_t const*    tb_cookies_get(tb_handle_t cookies, tb_char_t const* domain,
  *
  * @return          the cookies data
  */
-tb_char_t const*    tb_cookies_get_from_url(tb_handle_t cookies, tb_char_t const* url, tb_scoped_string_t* value);
+tb_char_t const*    tb_cookies_get_from_url(tb_handle_t cookies, tb_char_t const* url, tb_string_t* value);
 
 /*! clear cookies 
  *

@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "pool.h"
 #include "null.h"
 #include "data.h"
 #include "date.h"
@@ -36,7 +37,6 @@
 #include "number.h"
 #include "boolean.h"
 #include "dictionary.h"
-#include "object_pool.h"
 #include "reader/reader.h"
 #include "writer/writer.h"
 
@@ -227,7 +227,7 @@ tb_object_t*        tb_object_data(tb_object_t* object, tb_size_t format);
  * tb_object_t*     object = tb_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
  * if (object)
  * {
- *      tb_trace_d("%s", tb_string_cstr(object));
+ *      tb_trace_d("%s", tb_object_string_cstr(object));
  * }
  * <endcode>
  *

@@ -171,7 +171,7 @@ tb_item_func_t      tb_item_func_uint32(tb_noarg_t);
 /*! the string item function
  *
  * using tb_strdup if the bpool is null, 
- * using tb_block_pool_strdup if the bpool exists
+ * using tb_pool_strdup if the bpool exists
  *
  * @param bcase     is case?
  * @param bpool     the block pool

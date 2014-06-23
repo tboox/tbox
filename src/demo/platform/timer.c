@@ -10,7 +10,7 @@ static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t priv)
 {
     // get the time
     tb_timeval_t tv = {0};
-    if (tb_gettimeofday(&tv, tb_null))
+    if (tb_gettimeofday(&tv, tb_object_null))
     {
         // the time value
         tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
@@ -28,8 +28,8 @@ static tb_pointer_t tb_demo_timer_loop(tb_cpointer_t priv)
     if (timer) tb_timer_loop(timer);
 
     // exit it
-    tb_thread_return(tb_null);
-    return tb_null;
+    tb_thread_return(tb_object_null);
+    return tb_object_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ tb_int_t tb_demo_platform_timer_main(tb_int_t argc, tb_char_t** argv)
         tb_handle_t after = tb_timer_task_init_after(timer, 10000, 5000, tb_true, tb_demo_timer_task_func, "after");
 
         // init loop
-        tb_thread_init(tb_null, tb_demo_timer_loop, timer, 0);
+        tb_thread_init(tb_object_null, tb_demo_timer_loop, timer, 0);
 
         // wait some time
         getchar();

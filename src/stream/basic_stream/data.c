@@ -59,7 +59,7 @@ typedef struct __tb_basic_stream_data_t
 static __tb_inline__ tb_basic_stream_data_t* tb_basic_stream_data_cast(tb_handle_t stream)
 {
     tb_basic_stream_t* bstream = (tb_basic_stream_t*)stream;
-    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_DATA, tb_null);
+    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_DATA, tb_object_null);
     return (tb_basic_stream_data_t*)bstream;
 }
 static tb_bool_t tb_basic_stream_data_open(tb_handle_t stream)
@@ -81,7 +81,7 @@ static tb_bool_t tb_basic_stream_data_clos(tb_handle_t stream)
     tb_assert_and_check_return_val(dstream, tb_false);
     
     // clear head
-    dstream->head = tb_null;
+    dstream->head = tb_object_null;
 
     // ok
     return tb_true;
@@ -93,11 +93,11 @@ static tb_void_t tb_basic_stream_data_exit(tb_handle_t stream)
     tb_assert_and_check_return(dstream);
     
     // clear head
-    dstream->head = tb_null;
+    dstream->head = tb_object_null;
 
     // exit data
     if (dstream->data && !dstream->bref) tb_free(dstream->data);
-    dstream->data = tb_null;
+    dstream->data = tb_object_null;
     dstream->size = 0;
 }
 static tb_long_t tb_basic_stream_data_read(tb_handle_t stream, tb_byte_t* data, tb_size_t size)
@@ -216,7 +216,7 @@ static tb_bool_t tb_basic_stream_data_ctrl(tb_handle_t stream, tb_size_t ctrl, t
             // save data
             dstream->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
             dstream->size = (tb_size_t)tb_va_arg(args, tb_size_t);
-            dstream->head = tb_null;
+            dstream->head = tb_object_null;
             dstream->bref = tb_true;
 
             // check
@@ -256,7 +256,7 @@ static tb_bool_t tb_basic_stream_data_ctrl(tb_handle_t stream, tb_size_t ctrl, t
             dstream->data = data;
             dstream->size = size;
             dstream->bref = tb_false;
-            dstream->head = tb_null;
+            dstream->head = tb_object_null;
 
             // ok
             return tb_true;
@@ -275,7 +275,7 @@ tb_basic_stream_t* tb_basic_stream_init_data()
 {
     // done
     tb_bool_t           ok = tb_false;
-    tb_basic_stream_t*  stream = tb_null;
+    tb_basic_stream_t*  stream = tb_object_null;
     do
     {
         // make stream
@@ -305,7 +305,7 @@ tb_basic_stream_t* tb_basic_stream_init_data()
     {
         // exit it
         if (stream) tb_basic_stream_exit(stream);
-        stream = tb_null;
+        stream = tb_object_null;
     }
 
     // ok?
@@ -314,11 +314,11 @@ tb_basic_stream_t* tb_basic_stream_init_data()
 tb_basic_stream_t* tb_basic_stream_init_from_data(tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(data && size, tb_null);
+    tb_assert_and_check_return_val(data && size, tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_basic_stream_t*  stream = tb_null;
+    tb_basic_stream_t*  stream = tb_object_null;
     do
     {
         // init stream
@@ -338,7 +338,7 @@ tb_basic_stream_t* tb_basic_stream_init_from_data(tb_byte_t const* data, tb_size
     {
         // exit it
         if (stream) tb_basic_stream_exit(stream);
-        stream = tb_null;
+        stream = tb_object_null;
     }
 
     // ok

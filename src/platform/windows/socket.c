@@ -82,7 +82,7 @@ tb_void_t tb_socket_exit()
 tb_handle_t tb_socket_open(tb_size_t type)
 {
     // check
-    tb_assert_and_check_return_val(type, tb_null);
+    tb_assert_and_check_return_val(type, tb_object_null);
     
     // init type & protocol
     tb_int_t t = 0;
@@ -102,12 +102,12 @@ tb_handle_t tb_socket_open(tb_size_t type)
         }
         break;
     default:
-        return tb_null;
+        return tb_object_null;
     }
 
     // socket
-    SOCKET fd = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
-    tb_assert_and_check_return_val(fd >= 0, tb_null);
+    SOCKET fd = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_object_null, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
+    tb_assert_and_check_return_val(fd >= 0, tb_object_null);
 
     // non-block
     tb_ulong_t nb = 1;
@@ -118,7 +118,7 @@ tb_handle_t tb_socket_open(tb_size_t type)
 
 fail: 
     if (fd >= 0) tb_ws2_32()->closesocket(fd);
-    return tb_null;
+    return tb_object_null;
 }
 tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 {
@@ -126,8 +126,8 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
     tb_assert_and_check_return_val(type && pair, tb_false);
     
     // init pair
-    pair[0] = tb_null;
-    pair[1] = tb_null;
+    pair[0] = tb_object_null;
+    pair[1] = tb_object_null;
 
     // init type & protocol
     tb_int_t t = 0;
@@ -158,7 +158,7 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
     do
     {
         // init listener
-        listener = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED);
+        listener = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_object_null, 0, WSA_FLAG_OVERLAPPED);
         tb_assert_and_check_break(listener != INVALID_SOCKET);
 
         // init bind address
@@ -190,14 +190,14 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
         if (tb_ws2_32()->listen(listener, 1) == SOCKET_ERROR) break;
 
         // init sock1
-        sock1 = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED);
+        sock1 = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_object_null, 0, WSA_FLAG_OVERLAPPED);
         tb_assert_and_check_break(sock1 != INVALID_SOCKET);
 
         // connect it
         if (tb_ws2_32()->connect(sock1, (struct sockaddr const*)&d, sizeof(d)) == SOCKET_ERROR) break;
 
         // accept it
-        sock2 = tb_ws2_32()->accept(listener, tb_null, tb_null);
+        sock2 = tb_ws2_32()->accept(listener, tb_object_null, tb_object_null);
         tb_assert_and_check_break(sock2 != INVALID_SOCKET);
 
         // set non-block
@@ -353,7 +353,7 @@ tb_bool_t tb_socket_listen(tb_handle_t handle)
 tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_null);
+    tb_assert_and_check_return_val(handle, tb_object_null);
 
     // accept  
     SOCKADDR_IN d;
@@ -361,7 +361,7 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
     tb_long_t   r = tb_ws2_32()->accept((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, &n);
 
     // no client?
-    tb_check_return_val(r > 0, tb_null);
+    tb_check_return_val(r > 0, tb_object_null);
 
     // non-block
     tb_ulong_t nb = 1;
@@ -372,7 +372,7 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 
 fail: 
     if (r >= 0) tb_ws2_32()->closesocket(r);
-    return tb_null;
+    return tb_object_null;
 }
 tb_bool_t tb_socket_kill(tb_handle_t handle, tb_size_t mode)
 {
@@ -536,7 +536,7 @@ tb_hong_t tb_socket_sendf(tb_handle_t handle, tb_handle_t file, tb_hize_t offset
 
     // transmit it
     OVERLAPPED  olap = {0}; olap.Offset = (DWORD)offset;
-    tb_hong_t   real = pTransmitFile((SOCKET)handle - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);
+    tb_hong_t   real = pTransmitFile((SOCKET)handle - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_object_null, 0);
 
     // ok?
     if (real >= 0) return real;

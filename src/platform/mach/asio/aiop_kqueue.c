@@ -72,7 +72,7 @@ static tb_bool_t tb_aiop_reactor_kqueue_sync(tb_aiop_reactor_t* reactor, struct 
 
     // change events
     struct timespec t = {0};
-    if (kevent(rtor->kqfd, evts, evtn, tb_null, 0, &t) < 0) return tb_false;
+    if (kevent(rtor->kqfd, evts, evtn, tb_object_null, 0, &t) < 0) return tb_false;
 
     // ok
     return tb_true;
@@ -203,7 +203,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
     }
 
     // wait events
-    tb_long_t evtn = kevent(rtor->kqfd, tb_null, 0, rtor->evts, rtor->evtn, timeout >= 0? &t : tb_null);
+    tb_long_t evtn = kevent(rtor->kqfd, tb_object_null, 0, rtor->evts, rtor->evtn, timeout >= 0? &t : tb_object_null);
     tb_assert_and_check_return_val(evtn >= 0 && evtn <= rtor->evtn, -1);
     
     // timeout?
@@ -279,7 +279,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
         if (aioo->code & TB_AIOE_CODE_ONESHOT) 
         {
             aioo->code = TB_AIOE_CODE_NONE;
-            aioo->priv = tb_null;
+            aioo->priv = tb_object_null;
         }
     }
 
@@ -317,11 +317,11 @@ static tb_void_t tb_aiop_reactor_kqueue_cler(tb_aiop_reactor_t* reactor)
 static tb_aiop_reactor_t* tb_aiop_reactor_kqueue_init(tb_aiop_t* aiop)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->maxn, tb_null);
+    tb_assert_and_check_return_val(aiop && aiop->maxn, tb_object_null);
 
     // alloc reactor
     tb_aiop_reactor_kqueue_t* rtor = tb_malloc0(sizeof(tb_aiop_reactor_kqueue_t));
-    tb_assert_and_check_return_val(rtor, tb_null);
+    tb_assert_and_check_return_val(rtor, tb_object_null);
 
     // init base
     rtor->base.aiop = aiop;
@@ -341,6 +341,6 @@ static tb_aiop_reactor_t* tb_aiop_reactor_kqueue_init(tb_aiop_t* aiop)
 
 fail:
     if (rtor) tb_aiop_reactor_kqueue_exit((tb_aiop_reactor_t*)rtor);
-    return tb_null;
+    return tb_object_null;
 }
 

@@ -50,7 +50,7 @@ tb_pointer_t tb_exception_test(tb_cpointer_t priv)
         __tb_except(1)
         {
             tb_trace_i("thread[%lu]: except1: %lu", self, i++);
-            tb_backtrace_dump("\t\t", tb_null, 10);
+            tb_backtrace_dump("\t\t", tb_object_null, 10);
         }
         __tb_end
         tb_trace_i("thread[%lu]: try0: e: %lu", self, i);
@@ -64,14 +64,14 @@ tb_pointer_t tb_exception_test(tb_cpointer_t priv)
     __tb_except(1)
     {
         tb_trace_i("thread[%lu]: except0: %lu", self, i++);
-        tb_backtrace_dump("\t", tb_null, 10);
+        tb_backtrace_dump("\t", tb_object_null, 10);
     }
     __tb_end
 
     // trace
     tb_trace_i("thread[%lu]: exit: %lu", self, i);
-    tb_thread_return(tb_null);
-    return tb_null;
+    tb_thread_return(tb_object_null);
+    return tb_object_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -81,10 +81,10 @@ tb_int_t tb_demo_platform_exception_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1
     // done
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
+    tb_thread_init(tb_object_null, tb_exception_test, tb_object_null, 0);
+    tb_thread_init(tb_object_null, tb_exception_test, tb_object_null, 0);
+    tb_thread_init(tb_object_null, tb_exception_test, tb_object_null, 0);
+    tb_thread_init(tb_object_null, tb_exception_test, tb_object_null, 0);
 #elif 0
     __tb_try 
     {

@@ -28,13 +28,13 @@
  * includes
  */
 #include "prefix.h"
-#include "static_block_pool.h"
+#include "static_pool.h"
 #include "static_fixed_pool.h"
 #include "static_tiny_pool.h"
 #include "global_pool.h"
-#include "block_pool.h"
+#include "pool.h"
 #include "fixed_pool.h"
-#include "scoped_buffer.h"
+#include "buffer.h"
 #include "static_buffer.h"
 #include "queue_buffer.h"
 
@@ -50,7 +50,7 @@ __tb_extern_c_enter__
 /*!architecture
  *
  * <pre>
- * block_pool --------------------- static_block_pool --
+ * pool --------------------- static_pool --
  *                |                     |              |
  *             global_pool -------------|              | 
  *                |                 static_tiny_pool --|- data: |-------------------------------|

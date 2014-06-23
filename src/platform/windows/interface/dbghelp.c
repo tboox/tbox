@@ -45,7 +45,7 @@ static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance)
     tb_check_return_val(dbghelp->SymInitialize, tb_false);
  
     // init symbols
-    if (!dbghelp->SymInitialize(GetCurrentProcess(), tb_null, TRUE)) return tb_false;
+    if (!dbghelp->SymInitialize(GetCurrentProcess(), tb_object_null, TRUE)) return tb_false;
 
     // init interfaces
     TB_INTERFACE_LOAD(dbghelp, SymFromAddr);

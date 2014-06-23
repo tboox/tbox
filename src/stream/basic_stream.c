@@ -84,12 +84,12 @@ tb_bool_t tb_basic_stream_init(tb_basic_stream_t* stream, tb_size_t type, tb_siz
 tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(url, tb_object_null);
 
     // the init
     static tb_basic_stream_t* (*s_init[])() = 
     {
-        tb_null
+        tb_object_null
     ,   tb_basic_stream_init_file
     ,   tb_basic_stream_init_sock
     ,   tb_basic_stream_init_http
@@ -108,13 +108,13 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
     if (!type || type > TB_STREAM_TYPE_DATA)
     {
         tb_trace_e("unknown stream for url: %s", url);
-        return tb_null;
+        return tb_object_null;
     }
-    tb_assert_and_check_return_val(type && type < tb_arrayn(s_init) && s_init[type], tb_null);
+    tb_assert_and_check_return_val(type && type < tb_object_arrayn(s_init) && s_init[type], tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_basic_stream_t*  stream = tb_null;
+    tb_basic_stream_t*  stream = tb_object_null;
     do
     {
         // init stream
@@ -134,7 +134,7 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
     {
         // exit stream
         if (stream) tb_basic_stream_exit(stream);
-        stream = tb_null;
+        stream = tb_object_null;
     }
 
     // ok?

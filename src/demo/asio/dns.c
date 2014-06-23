@@ -34,7 +34,7 @@ static tb_void_t tb_demo_sock_dns_done_func(tb_handle_t dns, tb_char_t const* ho
     }
 
     // exit addr
-    if (dns) tb_aicp_dns_exit(dns, tb_demo_sock_dns_exit_func, tb_null);
+    if (dns) tb_aicp_dns_exit(dns, tb_demo_sock_dns_exit_func, tb_object_null);
 
     // kill aicp
     tb_aicp_kill(aicp);
@@ -49,8 +49,8 @@ tb_int_t tb_demo_asio_dns_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_aicp_t*          aicp = tb_null;
-    tb_handle_t         dns = tb_null;
+    tb_aicp_t*          aicp = tb_object_null;
+    tb_handle_t         dns = tb_object_null;
 
     // init aicp
     aicp = tb_aicp_init(2);
@@ -70,7 +70,7 @@ tb_int_t tb_demo_asio_dns_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("dns: %s: ..", argv[1]);
 
     // done dns
-    tb_aicp_dns_done(dns, argv[1], tb_demo_sock_dns_done_func, tb_null);
+    tb_aicp_dns_done(dns, argv[1], tb_demo_sock_dns_done_func, tb_object_null);
 
     // loop aicp
     tb_aicp_loop(aicp);

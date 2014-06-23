@@ -24,7 +24,7 @@ tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
             if (argv[3]) ok = tb_xml_reader_goto(reader, argv[3]);
 
             // load & save
-            tb_xml_node_t* root = tb_null;
+            tb_xml_node_t* root = tb_object_null;
             if (ok) tb_xml_writer_save(writer, root = tb_xml_reader_load(reader));
 
             // exit root

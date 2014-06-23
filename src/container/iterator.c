@@ -94,7 +94,7 @@ tb_size_t tb_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 tb_pointer_t tb_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_assert_return_val(iterator && iterator->item, tb_null);
+    tb_assert_return_val(iterator && iterator->item, tb_object_null);
 
     // item
     return iterator->item(iterator, itor);

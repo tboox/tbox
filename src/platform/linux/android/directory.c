@@ -83,7 +83,7 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
                 tb_assert_and_check_break(size);
 
                 // get the path string
-		        tb_char_t const* path_cstr = (*jenv)->GetStringUTFChars(jenv, path_jstr, tb_null);
+		        tb_char_t const* path_cstr = (*jenv)->GetStringUTFChars(jenv, path_jstr, tb_object_null);
                 tb_assert_and_check_break(path_cstr);
 
                 // trace
@@ -103,7 +103,7 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
             if (error) (*jenv)->ExceptionClear(jenv);
 
             // leave
-            (*jenv)->PopLocalFrame(jenv, tb_null);
+            (*jenv)->PopLocalFrame(jenv, tb_object_null);
         }
     }
     else

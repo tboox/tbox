@@ -45,7 +45,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 {
     // make
     tb_atomic_t* semaphore = tb_malloc0(sizeof(tb_atomic_t));
-    tb_assert_and_check_return_val(semaphore, tb_null);
+    tb_assert_and_check_return_val(semaphore, tb_object_null);
 
     // init
     *semaphore = init;
@@ -55,7 +55,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 
 fail:
     if (semaphore) tb_free(semaphore);
-    return tb_null;
+    return tb_object_null;
 }
 tb_void_t tb_semaphore_exit(tb_handle_t handle)
 {

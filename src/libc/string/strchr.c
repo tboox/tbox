@@ -36,13 +36,13 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRCHR
 tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
     return strchr(s1, c);
 }
 #else
 tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
 {
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
 
     while (*s)
     {
@@ -50,7 +50,7 @@ tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
         s++;
 
     }
-    return tb_null;
+    return tb_object_null;
 }
 #endif
 

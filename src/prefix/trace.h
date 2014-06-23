@@ -41,12 +41,12 @@ __tb_extern_c_enter__
 
 // the trace prefix
 #ifndef __tb_prefix__ 
-#   define __tb_prefix__                                    tb_null
+#   define __tb_prefix__                                    tb_object_null
 #endif
 
 // the trace module name
 #ifndef TB_TRACE_MODULE_NAME
-#   define TB_TRACE_MODULE_NAME                             tb_null
+#   define TB_TRACE_MODULE_NAME                             tb_object_null
 #endif
 
 // the trace module debug

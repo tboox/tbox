@@ -240,7 +240,7 @@ tb_bool_t               tb_async_transfer_done(tb_handle_t transfer, tb_async_tr
     }
 
     // init transfer
-    tb_handle_t transfer = tb_async_transfer_init(tb_null);
+    tb_handle_t transfer = tb_async_transfer_init(tb_object_null);
     if (transfer)
     {
         // init stream
@@ -254,7 +254,7 @@ tb_bool_t               tb_async_transfer_done(tb_handle_t transfer, tb_async_tr
 //      tb_async_transfer_limitrate(transfer, 256000);
 
         // open and done transfer
-        tb_async_transfer_open_done(transfer, 0, tb_demo_transfer_done_func, tb_null);
+        tb_async_transfer_open_done(transfer, 0, tb_demo_transfer_done_func, tb_object_null);
 
         // exit transfer
         tb_async_transfer_exit(transfer);

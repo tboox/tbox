@@ -91,7 +91,7 @@ typedef struct __tb_async_stream_file_t
 static __tb_inline__ tb_async_stream_file_t* tb_async_stream_file_cast(tb_handle_t stream)
 {
     tb_async_stream_t* astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_null);
+    tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_object_null);
     return (tb_async_stream_file_t*)astream;
 }
 static tb_void_t tb_async_stream_file_clos_clear(tb_async_stream_file_t* fstream)
@@ -101,14 +101,14 @@ static tb_void_t tb_async_stream_file_clos_clear(tb_async_stream_file_t* fstream
 
     // exit it
     if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
-    fstream->file = tb_null;
+    fstream->file = tb_object_null;
     fstream->bref = tb_false;
 
     // clear the offset
     tb_atomic64_set0(&fstream->offset);
 
     // clear aico
-    fstream->aico = tb_null;
+    fstream->aico = tb_object_null;
 
     // clear base
     tb_async_stream_clear(&fstream->base);
@@ -232,7 +232,7 @@ static tb_bool_t tb_async_stream_file_open(tb_handle_t astream, tb_async_stream_
                 tb_trace_e("open %s: failed", url);
 
                 // save state
-                state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
+                state = tb_file_info(url, tb_object_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
             }
             break;
         }
@@ -264,7 +264,7 @@ static tb_bool_t tb_async_stream_file_clos(tb_handle_t astream, tb_async_stream_
      */
     if (fstream->aico) tb_aico_exit(fstream->aico, tb_async_stream_file_clos_func, fstream);
     // done func directly
-    else tb_async_stream_file_clos_func(tb_null, fstream);
+    else tb_async_stream_file_clos_func(tb_object_null, fstream);
 
     // ok
     return tb_true;
@@ -583,7 +583,7 @@ tb_async_stream_t* tb_async_stream_init_file(tb_aicp_t* aicp)
 {
     // done
     tb_bool_t               ok = tb_false;
-    tb_async_stream_file_t* fstream = tb_null;
+    tb_async_stream_file_t* fstream = tb_object_null;
     do
     {
         // make stream
@@ -616,7 +616,7 @@ tb_async_stream_t* tb_async_stream_init_file(tb_aicp_t* aicp)
     {
         // exit it
         if (fstream) tb_async_stream_exit((tb_async_stream_t*)fstream);
-        fstream = tb_null;
+        fstream = tb_object_null;
     }
 
     // ok
@@ -625,11 +625,11 @@ tb_async_stream_t* tb_async_stream_init_file(tb_aicp_t* aicp)
 tb_async_stream_t* tb_async_stream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path, tb_size_t mode)
 {
     // check
-    tb_assert_and_check_return_val(path, tb_null);
+    tb_assert_and_check_return_val(path, tb_object_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_async_stream_t*  fstream = tb_object_null;
     do
     {
         // init stream
@@ -652,7 +652,7 @@ tb_async_stream_t* tb_async_stream_init_from_file(tb_aicp_t* aicp, tb_char_t con
     {
         // exit it
         if (fstream) tb_async_stream_exit(fstream);
-        fstream = tb_null;
+        fstream = tb_object_null;
     }
 
     // ok

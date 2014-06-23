@@ -50,7 +50,7 @@ typedef struct __tb_stream_filter_chunked_t
     tb_size_t                   read;
 
     // the cache line
-    tb_scoped_string_t          line;
+    tb_string_t          line;
 
 }tb_stream_filter_chunked_t;
 
@@ -60,7 +60,7 @@ typedef struct __tb_stream_filter_chunked_t
 static __tb_inline__ tb_stream_filter_chunked_t* tb_stream_filter_chunked_cast(tb_stream_filter_t* filter)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHUNKED, tb_null);
+    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHUNKED, tb_object_null);
     return (tb_stream_filter_chunked_t*)filter;
 }
 /* chunked_data
@@ -120,23 +120,23 @@ static tb_long_t tb_stream_filter_chunked_spak(tb_stream_filter_t* filter, tb_st
             tb_assert_and_check_return_val(ch, -1);
         
             // append char to line
-            if (ch != '\n') tb_scoped_string_chrcat(&cfilter->line, ch);
+            if (ch != '\n') tb_string_chrcat(&cfilter->line, ch);
             // is line end?
             else
             {
                 // check
-                tb_char_t const*    pb = tb_scoped_string_cstr(&cfilter->line);
-                tb_size_t           pn = tb_scoped_string_size(&cfilter->line);
+                tb_char_t const*    pb = tb_string_cstr(&cfilter->line);
+                tb_size_t           pn = tb_string_size(&cfilter->line);
                 tb_assert_and_check_return_val(pb, -1);
 
                 // trace
-                tb_trace_d("line: %s", tb_scoped_string_cstr(&cfilter->line));
+                tb_trace_d("line: %s", tb_string_cstr(&cfilter->line));
 
                 // strip '\r' if exists
-                if (pb[pn - 1] == '\r') tb_scoped_string_strip(&cfilter->line, pn - 1);
+                if (pb[pn - 1] == '\r') tb_string_strip(&cfilter->line, pn - 1);
 
                 // is chunked tail? only "\r\n"
-                if (!tb_scoped_string_size(&cfilter->line)) 
+                if (!tb_string_size(&cfilter->line)) 
                 {
                     // reset size
                     cfilter->read = 0;
@@ -158,7 +158,7 @@ static tb_long_t tb_stream_filter_chunked_spak(tb_stream_filter_t* filter, tb_st
                     tb_trace_d("size: %lu", cfilter->size);
 
                     // clear data
-                    tb_scoped_string_clear(&cfilter->line);
+                    tb_string_clear(&cfilter->line);
 
                     // is eof? "0\r\n\r\n"
                     if (!cfilter->size)
@@ -219,7 +219,7 @@ static tb_void_t tb_stream_filter_chunked_clos(tb_stream_filter_t* filter)
     cfilter->read = 0;
 
     // clear line
-    tb_scoped_string_clear(&cfilter->line);
+    tb_string_clear(&cfilter->line);
 }
 static tb_void_t tb_stream_filter_chunked_exit(tb_stream_filter_t* filter)
 {
@@ -228,7 +228,7 @@ static tb_void_t tb_stream_filter_chunked_exit(tb_stream_filter_t* filter)
     tb_assert_and_check_return(cfilter);
 
     // exit line
-    tb_scoped_string_exit(&cfilter->line);
+    tb_string_exit(&cfilter->line);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +238,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
 {
     // done
     tb_bool_t                   ok = tb_false;
-    tb_stream_filter_chunked_t* filter = tb_null;
+    tb_stream_filter_chunked_t* filter = tb_object_null;
     do
     {
         // noimpl for encoding chunked
@@ -259,7 +259,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
         filter->base.exit = tb_stream_filter_chunked_exit;
 
         // init line
-        if (!tb_scoped_string_init(&filter->line)) break;
+        if (!tb_string_init(&filter->line)) break;
 
         // ok
         ok = tb_true;
@@ -271,7 +271,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
     {
         // exit filter
         tb_stream_filter_exit((tb_stream_filter_t*)filter);
-        filter = tb_null;
+        filter = tb_object_null;
     }
 
     // ok?

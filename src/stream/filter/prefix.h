@@ -82,7 +82,7 @@ typedef struct __tb_stream_filter_t
     tb_hize_t           offset;
 
     /// the input data
-    tb_scoped_buffer_t  idata;
+    tb_buffer_t  idata;
 
     /// the output data 
     tb_queue_buffer_t   odata;
@@ -125,7 +125,7 @@ static __tb_inline__ tb_bool_t tb_stream_filter_init(tb_stream_filter_t* filter,
     filter->offset = 0;
 
     // init idata
-    if (!tb_scoped_buffer_init(&filter->idata)) return tb_false;
+    if (!tb_buffer_init(&filter->idata)) return tb_false;
 
     // init odata
     if (!tb_queue_buffer_init(&filter->odata, 8192)) return tb_false;

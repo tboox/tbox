@@ -71,7 +71,7 @@ tb_void_t tb_stream_filter_clos(tb_stream_filter_t* filter)
     filter->offset = 0;
     
     // exit idata
-    tb_scoped_buffer_clear(&filter->idata);
+    tb_buffer_clear(&filter->idata);
 
     // exit odata
     tb_queue_buffer_clear(&filter->odata);
@@ -88,7 +88,7 @@ tb_void_t tb_stream_filter_exit(tb_stream_filter_t* filter)
     if (filter->exit) filter->exit(filter);
 
     // exit idata
-    tb_scoped_buffer_exit(&filter->idata);
+    tb_buffer_exit(&filter->idata);
 
     // exit odata
     tb_queue_buffer_exit(&filter->odata);
@@ -120,7 +120,7 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     tb_assert_and_check_return_val(filter && filter->spak && pdata, -1);
 
     // init odata
-    *pdata = tb_null;
+    *pdata = tb_object_null;
 
     // save the input offset
     filter->offset += size;
@@ -133,16 +133,16 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     if (filter->beof) sync = -1;
 
     // the idata
-    tb_byte_t const*    idata = tb_scoped_buffer_data(&filter->idata);
-    tb_size_t           isize = tb_scoped_buffer_size(&filter->idata);
+    tb_byte_t const*    idata = tb_buffer_data(&filter->idata);
+    tb_size_t           isize = tb_buffer_size(&filter->idata);
     if (data && size)
     {
         // append data to cache if have the cache data
         if (idata && isize) 
         {
             // append data
-            idata = tb_scoped_buffer_memncat(&filter->idata, data, size);
-            isize = tb_scoped_buffer_size(&filter->idata);
+            idata = tb_buffer_memncat(&filter->idata, data, size);
+            isize = tb_buffer_size(&filter->idata);
         }
         // using the data directly if no cache data
         else
@@ -220,12 +220,12 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     if (left) 
     {
         // move to the cache head if idata is belong to the cache
-        if (idata != data) tb_scoped_buffer_memnmov(&filter->idata, tb_static_stream_offset(&istream), left);
+        if (idata != data) tb_buffer_memnmov(&filter->idata, tb_static_stream_offset(&istream), left);
         // append to the cache if idata is not belong to the cache
-        else tb_scoped_buffer_memncat(&filter->idata, tb_static_stream_pos(&istream), left);
+        else tb_buffer_memncat(&filter->idata, tb_static_stream_pos(&istream), left);
     }
     // clear the cache
-    else tb_scoped_buffer_clear(&filter->idata);
+    else tb_buffer_clear(&filter->idata);
 
     // init pull
     omaxn = 0;
@@ -245,7 +245,7 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     if (osize > 0) *pdata = odata;
 
     // trace
-    tb_trace_d("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_scoped_buffer_size(&filter->idata), tb_queue_buffer_size(&filter->odata), filter->offset, filter->limit);
+    tb_trace_d("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_buffer_size(&filter->idata), tb_queue_buffer_size(&filter->odata), filter->offset, filter->limit);
 
     // ok?
     return osize;
@@ -256,7 +256,7 @@ tb_bool_t tb_stream_filter_push(tb_stream_filter_t* filter, tb_byte_t const* dat
     tb_assert_and_check_return_val(filter && data && size, tb_false);
 
     // push data
-    tb_bool_t ok = tb_scoped_buffer_memncat(&filter->idata, data, size)? tb_true : tb_false;
+    tb_bool_t ok = tb_buffer_memncat(&filter->idata, data, size)? tb_true : tb_false;
 
     // save the input offset
     if (ok) filter->offset += size;

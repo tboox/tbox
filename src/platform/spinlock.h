@@ -104,7 +104,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_t* lock)
 
             // dump backtrace
 #if 0//def __tb_debug__
-            tb_backtrace_dump("spinlock", tb_null, 10);
+            tb_backtrace_dump("spinlock", tb_object_null, 10);
 #endif
         }
 #endif

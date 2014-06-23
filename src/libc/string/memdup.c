@@ -35,7 +35,7 @@
 tb_pointer_t tb_memdup(tb_cpointer_t s, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
     
     // check
 #ifdef __tb_debug__
@@ -45,7 +45,7 @@ tb_pointer_t tb_memdup(tb_cpointer_t s, tb_size_t n)
         if (size && n > size)
         {
             tb_trace_i("[memdup]: [overflow]: [%p, %lu] from [%p, %lu]", s, n, s, size);
-            tb_backtrace_dump("[memdup]: [overflow]: ", tb_null, 10);
+            tb_backtrace_dump("[memdup]: [overflow]: ", tb_object_null, 10);
             tb_memory_data_dump(s, "\t[malloc]: [from]: ");
             tb_abort();
         }

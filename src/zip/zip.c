@@ -35,23 +35,23 @@ tb_zip_t* tb_zip_init(tb_size_t algo, tb_size_t action)
     // table
     static tb_zip_t* (*s_init[])(tb_size_t action) =
     {
-        tb_null
+        tb_object_null
     ,   tb_zip_rlc_init
-    ,   tb_null
-    ,   tb_null
-    ,   tb_null
+    ,   tb_object_null
+    ,   tb_object_null
+    ,   tb_object_null
 #ifdef TB_CONFIG_THIRD_HAVE_ZLIB
     ,   tb_zip_zlibraw_init
     ,   tb_zip_zlib_init
     ,   tb_zip_gzip_init
 #else
-    ,   tb_null
-    ,   tb_null
-    ,   tb_null
+    ,   tb_object_null
+    ,   tb_object_null
+    ,   tb_object_null
 #endif
-    ,   tb_null
+    ,   tb_object_null
     };
-    tb_assert_and_check_return_val(algo < tb_arrayn(s_init) && s_init[algo], tb_null);
+    tb_assert_and_check_return_val(algo < tb_object_arrayn(s_init) && s_init[algo], tb_object_null);
 
     // init
     return s_init[algo](action);
@@ -64,23 +64,23 @@ tb_void_t tb_zip_exit(tb_zip_t* zip)
     // table
     static tb_void_t (*s_exit[])(tb_zip_t* zip) =
     {
-        tb_null
+        tb_object_null
     ,   tb_zip_rlc_exit
-    ,   tb_null
-    ,   tb_null
-    ,   tb_null
+    ,   tb_object_null
+    ,   tb_object_null
+    ,   tb_object_null
 #ifdef TB_CONFIG_THIRD_HAVE_ZLIB
     ,   tb_zip_zlibraw_exit
     ,   tb_zip_zlib_exit
     ,   tb_zip_gzip_exit
 #else
-    ,   tb_null
-    ,   tb_null
-    ,   tb_null
+    ,   tb_object_null
+    ,   tb_object_null
+    ,   tb_object_null
 #endif
-    ,   tb_null
+    ,   tb_object_null
     };
-    tb_assert_and_check_return(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo]);
+    tb_assert_and_check_return(zip->algo < tb_object_arrayn(s_exit) && s_exit[zip->algo]);
 
     // exit
     s_exit[zip->algo](zip);

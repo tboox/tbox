@@ -33,8 +33,8 @@
 
 tb_handle_t tb_event_init()
 {
-    HANDLE handle = CreateEventA(tb_null, FALSE, FALSE, tb_null);
-    return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
+    HANDLE handle = CreateEventA(tb_object_null, FALSE, FALSE, tb_object_null);
+    return ((handle != INVALID_HANDLE_VALUE)? handle : tb_object_null);
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {

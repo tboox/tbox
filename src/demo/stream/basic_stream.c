@@ -73,7 +73,7 @@ static tb_option_item_t g_options[] =
 ,   {'-',   "limitrate",    TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set the limitrate"         }
 ,   {'h',   "help",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "display this help and exit"}
 ,   {'-',   "url",          TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the url"                   }
-,   {'-',   tb_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_null                     }
+,   {'-',   tb_object_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_object_null                     }
 
 };
 
@@ -83,10 +83,10 @@ static tb_option_item_t g_options[] =
 tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t     option = tb_null;
-    tb_basic_stream_t*  istream = tb_null;
-    tb_basic_stream_t*  ostream = tb_null;
-    tb_basic_stream_t*  pst = tb_null;
+    tb_handle_t     option = tb_object_null;
+    tb_basic_stream_t*  istream = tb_object_null;
+    tb_basic_stream_t*  ostream = tb_object_null;
+    tb_basic_stream_t*  pst = tb_object_null;
     do
     {
         // init option
@@ -121,16 +121,16 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                     }
 
                     // enable debug?
-                    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, debug? tb_demo_basic_stream_head_func : tb_null)) break;
+                    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, debug? tb_demo_basic_stream_head_func : tb_object_null)) break;
 
                     // custem header?
                     if (tb_option_find(option, "header"))
                     {
                         // init
-                        tb_scoped_string_t key;
-                        tb_scoped_string_t val;
-                        tb_scoped_string_init(&key);
-                        tb_scoped_string_init(&val);
+                        tb_string_t key;
+                        tb_string_t val;
+                        tb_string_init(&key);
+                        tb_string_init(&val);
 
                         // done
                         tb_bool_t           k = tb_true;
@@ -140,7 +140,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                             // is key?
                             if (k)
                             {
-                                if (*p != ':' && !tb_isspace(*p)) tb_scoped_string_chrcat(&key, *p++);
+                                if (*p != ':' && !tb_isspace(*p)) tb_string_chrcat(&key, *p++);
                                 else if (*p == ':') 
                                 {
                                     // skip ':'
@@ -157,7 +157,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                             // is val?
                             else
                             {
-                                if (*p != ';') tb_scoped_string_chrcat(&val, *p++);
+                                if (*p != ';') tb_string_chrcat(&val, *p++);
                                 else
                                 {
                                     // skip ';'
@@ -167,32 +167,32 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                                     while (*p && tb_isspace(*p)) p++;
 
                                     // set header
-                                    if (tb_scoped_string_size(&key) && tb_scoped_string_size(&val))
+                                    if (tb_string_size(&key) && tb_string_size(&val))
                                     {
-                                        if (debug) tb_printf("header: %s: %s\n", tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val));
-                                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val))) break;
+                                        if (debug) tb_printf("header: %s: %s\n", tb_string_cstr(&key), tb_string_cstr(&val));
+                                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
                                     }
 
                                     // is key now
                                     k = tb_true;
 
                                     // clear key & val
-                                    tb_scoped_string_clear(&key);
-                                    tb_scoped_string_clear(&val);
+                                    tb_string_clear(&key);
+                                    tb_string_clear(&val);
                                 }
                             }
                         }
 
                         // set header
-                        if (tb_scoped_string_size(&key) && tb_scoped_string_size(&val))
+                        if (tb_string_size(&key) && tb_string_size(&val))
                         {
-                            if (debug) tb_printf("header: %s: %s\n", tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val));
-                            if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val))) break;
+                            if (debug) tb_printf("header: %s: %s\n", tb_string_cstr(&key), tb_string_cstr(&val));
+                            if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
                         }
 
                         // exit 
-                        tb_scoped_string_exit(&key);
-                        tb_scoped_string_exit(&val);
+                        tb_string_exit(&key);
+                        tb_string_exit(&val);
                     }
 
                     // keep alive?
@@ -304,7 +304,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                 tb_hong_t           save = 0;
                 tb_demo_context_t   context = {0}; 
                 context.verbose     = verbose;
-                if ((save = tb_basic_transfer_done(istream, ostream, limitrate, tb_demo_basic_stream_save_func, &context)) < 0) break;
+                if ((save = tb_transfer_done(istream, ostream, limitrate, tb_demo_basic_stream_save_func, &context)) < 0) break;
             }
             else tb_option_help(option);
         }
@@ -314,19 +314,19 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
 
     // exit pst
     if (pst) tb_basic_stream_exit(pst);
-    pst = tb_null;
+    pst = tb_object_null;
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_null;
+    istream = tb_object_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_null;
+    ostream = tb_object_null;
 
     // exit option
     if (option) tb_option_exit(option);
-    option = tb_null;
+    option = tb_object_null;
 
     return 0;
 }

@@ -746,7 +746,7 @@ static __tb_inline__ tb_long_t tb_aico_timeout_from_code(tb_handle_t aico, tb_si
 
     ,   -1
     };
-    tb_assert_and_check_return_val(code < tb_arrayn(type) && type[code] != (tb_size_t)-1, -1);
+    tb_assert_and_check_return_val(code < tb_object_arrayn(type) && type[code] != (tb_size_t)-1, -1);
 
     // timeout
     return tb_aico_timeout(aico, type[code]);

@@ -120,7 +120,7 @@ tb_void_t               tb_xml_reader_clear(tb_handle_t reader);
  *                      {
  *                          tb_printf("<%s", name);
  *                          for (; attr; attr = attr->next)
- *                              tb_printf(" %s = \"%s\"", tb_scoped_string_cstr(&attr->name), tb_scoped_string_cstr(&attr->data));
+ *                              tb_printf(" %s = \"%s\"", tb_string_cstr(&attr->name), tb_string_cstr(&attr->data));
  *                          tb_printf("/>\n");
  *                      }
  *                  }
@@ -134,7 +134,7 @@ tb_void_t               tb_xml_reader_clear(tb_handle_t reader);
  *                      {
  *                          tb_printf("<%s", name);
  *                          for (; attr; attr = attr->next)
- *                              tb_printf(" %s = \"%s\"", tb_scoped_string_cstr(&attr->name), tb_scoped_string_cstr(&attr->data));
+ *                              tb_printf(" %s = \"%s\"", tb_string_cstr(&attr->name), tb_string_cstr(&attr->data));
  *                          tb_printf(">\n");
  *                      }
  *                  }

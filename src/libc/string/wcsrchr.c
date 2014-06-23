@@ -32,6 +32,6 @@
  */
 tb_wchar_t* tb_wcsrchr(tb_wchar_t const* s, tb_wchar_t c)
 {
-    tb_assert_and_check_return_val(s, tb_null);
+    tb_assert_and_check_return_val(s, tb_object_null);
     return tb_wcsnrchr(s, tb_wcslen(s), c);
 }

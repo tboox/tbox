@@ -13,7 +13,7 @@
  * globals
  */ 
 #if TB_DEMO_TEST_AICP
-static tb_handle_t g_event = tb_null;
+static tb_handle_t g_event = tb_object_null;
 #endif
     
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ tb_int_t tb_demo_stream_transfer_pool_main(tb_int_t argc, tb_char_t** argv)
         for (; p && *p; p++)
         {
             // done transfer
-            if (!tb_transfer_pool_done(tb_transfer_pool(), argv[1], *p, 0, 0, tb_demo_transfer_done_func, tb_null, *p)) break;
+            if (!tb_transfer_pool_done(tb_transfer_pool(), argv[1], *p, 0, 0, tb_demo_transfer_done_func, tb_object_null, *p)) break;
         }
 
     } while (0);
@@ -86,10 +86,10 @@ tb_int_t tb_demo_stream_transfer_pool_main(tb_int_t argc, tb_char_t** argv)
 
     // exit event
     if (g_event) tb_event_exit(g_event);
-    g_event = tb_null;
+    g_event = tb_object_null;
 #else
     tb_char_t** p = &argv[2];
-    for (; p && *p; p++) tb_basic_transfer_done_url_to_url(argv[1], *p, 0, tb_demo_transfer_done_func, *p);
+    for (; p && *p; p++) tb_transfer_done_url_to_url(argv[1], *p, 0, tb_demo_transfer_done_func, *p);
 #endif
     return 0;
 }

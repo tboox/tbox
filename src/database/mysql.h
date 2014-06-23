@@ -43,7 +43,7 @@ __tb_extern_c_enter__
  *
  * @return          the score
  */
-tb_size_t           tb_database_mysql_probe(tb_url_t const* url);
+tb_size_t           tb_object_database_mysql_probe(tb_url_t const* url);
 
 /* init mysql
  *
@@ -51,7 +51,7 @@ tb_size_t           tb_database_mysql_probe(tb_url_t const* url);
  *
  * @return          the database handle
  */
-tb_database_sql_t*  tb_database_mysql_init(tb_url_t const* url);
+tb_object_database_sql_t*  tb_object_database_mysql_init(tb_url_t const* url);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

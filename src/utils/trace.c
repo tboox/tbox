@@ -48,7 +48,7 @@
 static tb_size_t        g_mode = TB_TRACE_MODE_PRINT;
 
 // the file
-static tb_handle_t      g_file = tb_null;
+static tb_handle_t      g_file = tb_object_null;
 
 // the file is referenced?
 static tb_bool_t        g_bref = tb_false;
@@ -80,7 +80,7 @@ tb_void_t tb_trace_exit()
 
     // clear file
     if (g_file && !g_bref) tb_file_exit(g_file);
-    g_file = tb_null;
+    g_file = tb_object_null;
     g_bref = tb_false;
 
     // leave
