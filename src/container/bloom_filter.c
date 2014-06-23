@@ -191,7 +191,7 @@ tb_bloom_filter_t* tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_co
         tb_trace_d("size: %lu", filter->size);
 
         // init data
-        filter->data = (tb_byte_t*)tb_malloc0(filter->size);
+        filter->data = tb_malloc0_bytes(filter->size);
         tb_assert_and_check_break(filter->data);
 
         // init hash mask

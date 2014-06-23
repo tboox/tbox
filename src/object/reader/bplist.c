@@ -154,7 +154,7 @@ static tb_object_t* tb_object_bplist_reader_func_data(tb_object_bplist_reader_t*
     if (size)
     {
         // make data
-        data = (tb_byte_t*)tb_malloc(size);
+        data = tb_malloc_bytes(size);
         tb_assert_and_check_return_val(data, tb_null);
 
         // read data
@@ -193,7 +193,7 @@ static tb_object_t* tb_object_bplist_reader_func_array(tb_object_bplist_reader_t
     // init items data
     if (size)
     {
-        tb_byte_t* data = tb_malloc_type(tb_uint32_t) + (size * item_size);
+        tb_byte_t* data = tb_malloc_bytes(sizeof(tb_uint32_t) + (size * item_size));
         if (data)
         {
             if (tb_stream_bread(reader->stream, data + sizeof(tb_uint32_t), size * item_size))
@@ -238,7 +238,7 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
             if (size)
             {
                 // init utf8
-                utf8 = (tb_char_t*)tb_malloc(size + 1);
+                utf8 = tb_malloc_cstr(size + 1);
                 tb_assert_and_check_break(utf8);
 
                 // read utf8
@@ -266,8 +266,8 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
             if (size)
             {
                 // init utf8 & utf16 data
-                utf8 = (tb_char_t*)tb_malloc((size + 1) << 2);
-                utf16 = (tb_char_t*)tb_malloc(size << 1);
+                utf8 = tb_malloc_cstr((size + 1) << 2);
+                utf16 = tb_malloc_cstr(size << 1);
                 tb_assert_and_check_break(utf8 && utf16);
 
                 // read utf16
@@ -445,7 +445,7 @@ static tb_object_t* tb_object_bplist_reader_func_dictionary(tb_object_bplist_rea
     if (size)
     {
         item_size <<= 1;
-        tb_byte_t* data = tb_malloc_type(tb_uint32_t) + (size * item_size);
+        tb_byte_t* data = tb_malloc_bytes(sizeof(tb_uint32_t) + (size * item_size));
         if (data)
         {
             if (tb_stream_bread(reader->stream, data + sizeof(tb_uint32_t), size * item_size))

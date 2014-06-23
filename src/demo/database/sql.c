@@ -144,7 +144,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
                     tb_assert_and_check_break(size >= 0);
 
                     // make data
-                    tb_byte_t* data = (tb_byte_t*)tb_malloc0((tb_size_t)size);
+                    tb_byte_t* data = tb_malloc0_bytes((tb_size_t)size);
                     tb_assert_and_check_break(data);
 
                     // read data

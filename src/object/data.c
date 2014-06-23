@@ -113,7 +113,7 @@ tb_object_t* tb_object_data_init_from_url(tb_char_t const* url)
         tb_hong_t size = tb_stream_size(stream);
         if (size > 0 && size < TB_MAXS32)
         {
-            tb_byte_t* data = (tb_byte_t*)tb_malloc0((tb_size_t)size);
+            tb_byte_t* data = tb_malloc0_bytes((tb_size_t)size);
             if (data) 
             {
                 if (tb_stream_bread(stream, data, (tb_size_t)size))

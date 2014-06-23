@@ -705,7 +705,7 @@ static tb_bool_t tb_object_database_sqlite3_statement_bind(tb_object_database_sq
                         tb_assert_and_check_break(size >= 0);
 
                         // make data
-                        data = (tb_byte_t*)tb_malloc0(size);
+                        data = tb_malloc0_bytes(size);
                         tb_assert_and_check_break(data);
 
                         // read data

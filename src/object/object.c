@@ -152,7 +152,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
     do
     {
         // make data
-        data = data? (tb_byte_t*)tb_ralloc(data, maxn) : (tb_byte_t*)tb_malloc(maxn);
+        data = data? (tb_byte_t*)tb_ralloc(data, maxn) : tb_malloc_bytes(maxn);
         tb_assert_and_check_break(data);
 
         // writ object to data

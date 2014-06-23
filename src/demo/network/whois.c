@@ -205,7 +205,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // init ping
-    tb_char_t* ping = (tb_char_t*)tb_malloc0(1000 * 16);
+    tb_char_t* ping = tb_malloc0_cstr(1000 * 16);
     tb_assert_and_check_return_val(stream, tb_false);
 
     // open
@@ -243,7 +243,7 @@ static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // init ping
-    tb_char_t* ping = (tb_char_t*)tb_malloc0(1000 * 16);
+    tb_char_t* ping = tb_malloc0_cstr(1000 * 16);
     tb_assert_and_check_return_val(stream, tb_false);
 
     // open

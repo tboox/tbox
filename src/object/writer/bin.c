@@ -76,7 +76,7 @@ static tb_bool_t tb_object_bin_writer_func_data(tb_object_bin_writer_t* writer, 
     if (!writer->data)
     {
         writer->maxn = tb_max(size, 8192);
-        writer->data = (tb_byte_t*)tb_malloc0(writer->maxn);
+        writer->data = tb_malloc0_bytes(writer->maxn);
     }
     else if (writer->maxn < size)
     {
@@ -159,7 +159,7 @@ static tb_bool_t tb_object_bin_writer_func_string(tb_object_bin_writer_t* writer
     if (!writer->data)
     {
         writer->maxn = tb_max(size, 8192);
-        writer->data = (tb_byte_t*)tb_malloc0(writer->maxn);
+        writer->data = tb_malloc0_bytes(writer->maxn);
     }
     else if (writer->maxn < size)
     {

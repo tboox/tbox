@@ -109,7 +109,7 @@ static tb_bool_t tb_object_xml_writer_func_data(tb_object_xml_writer_t* writer, 
         tb_byte_t const*    ib = (tb_byte_t const*)tb_object_data_getp(object);
         tb_size_t           in = tb_object_data_size(object); 
         tb_size_t           on = in << 1;
-        tb_char_t*          ob = (tb_char_t*)tb_malloc0(on);
+        tb_char_t*          ob = tb_malloc0_cstr(on);
         tb_assert_and_check_return_val(ob && on, tb_false);
         on = tb_base64_encode(ib, in, ob, on);
         tb_trace_d("base64: %u => %u", in, on);
