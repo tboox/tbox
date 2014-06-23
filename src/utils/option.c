@@ -190,7 +190,7 @@ tb_handle_t tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_opti
     tb_assert_and_check_return_val(name && opts, tb_null);
 
     // make option
-    tb_option_t* option = (tb_option_t*)tb_malloc0(sizeof(tb_option_t));
+    tb_option_t* option = tb_malloc0_type(tb_option_t);
     tb_assert_and_check_return_val(option, tb_null);
 
     // init option

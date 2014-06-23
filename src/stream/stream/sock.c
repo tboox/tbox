@@ -658,7 +658,7 @@ tb_stream_t* tb_stream_init_sock()
     do
     {
         // make stream
-        stream = (tb_stream_impl_t*)tb_malloc0(sizeof(tb_stream_impl_t));
+        stream = tb_malloc0_type(tb_stream_impl_t);
         tb_assert_and_check_break(stream);
 
         // init stream

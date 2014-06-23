@@ -43,7 +43,7 @@ tb_handle_t tb_mutex_init()
     do
     {
         // make lock
-        lock = (tb_spinlock_t*)tb_malloc0(sizeof(tb_spinlock_t));
+        lock = tb_malloc0_type(tb_spinlock_t);
         tb_assert_and_check_break(lock);
 
         // init lock

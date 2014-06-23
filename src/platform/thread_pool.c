@@ -759,7 +759,7 @@ tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
     do
     {
         // make pool
-        pool = (tb_thread_pool_t*)tb_malloc0(sizeof(tb_thread_pool_t));
+        pool = tb_malloc0_type(tb_thread_pool_t);
         tb_assert_and_check_break(pool);
 
         // init lock

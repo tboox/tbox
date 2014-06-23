@@ -315,7 +315,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
     do
     {
         // make aicp
-        aicp = (tb_aicp_t*)tb_malloc0(sizeof(tb_aicp_t));
+        aicp = tb_malloc0_type(tb_aicp_t);
         tb_assert_and_check_break(aicp);
 
         // init aicp

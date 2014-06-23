@@ -447,7 +447,7 @@ tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout)
     do
     {
         // make dns
-        dns = (tb_aicp_dns_t*)tb_malloc0(sizeof(tb_aicp_dns_t));
+        dns = tb_malloc0_type(tb_aicp_dns_t);
         tb_assert_and_check_break(dns);
 
         // init sock

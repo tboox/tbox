@@ -197,7 +197,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
     do
     {
         // make impl
-        impl = (tb_vector_impl_t*)tb_malloc0(sizeof(tb_vector_impl_t));
+        impl = tb_malloc0_type(tb_vector_impl_t);
         tb_assert_and_check_break(impl);
 
         // init impl

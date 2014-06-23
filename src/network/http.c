@@ -846,7 +846,7 @@ tb_handle_t tb_http_init()
     do
     {
         // make http
-        http = (tb_http_t*)tb_malloc0(sizeof(tb_http_t));
+        http = tb_malloc0_type(tb_http_t);
         tb_assert_and_check_break(http);
 
         // init stream

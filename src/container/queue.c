@@ -184,7 +184,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
     do
     {
         // make impl
-        impl = (tb_queue_impl_t*)tb_malloc0(sizeof(tb_queue_impl_t));
+        impl = tb_malloc0_type(tb_queue_impl_t);
         tb_assert_and_check_break(impl);
 
         // using the default maxn

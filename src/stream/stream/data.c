@@ -273,26 +273,26 @@ static tb_bool_t tb_stream_impl_ctrl(tb_stream_t* stream, tb_size_t ctrl, tb_va_
 tb_stream_t* tb_stream_init_data()
 {
     // done
-    tb_bool_t       ok = tb_false;
-    tb_stream_t*    stream = tb_null;
+    tb_bool_t           ok = tb_false;
+    tb_stream_impl_t*   stream = tb_null;
     do
     {
         // make stream
-        stream = (tb_stream_t*)tb_malloc0(sizeof(tb_stream_impl_t));
+        stream = tb_malloc0_type(tb_stream_impl_t);
         tb_assert_and_check_break(stream);
 
         // init stream
-        if (!tb_stream_init(stream, TB_STREAM_TYPE_DATA, 0)) break;
+        if (!tb_stream_init((tb_stream_t*)stream, TB_STREAM_TYPE_DATA, 0)) break;
 
         // init func
-        stream->open        = tb_stream_impl_open;
-        stream->clos        = tb_stream_impl_clos;
-        stream->exit        = tb_stream_impl_exit;
-        stream->read        = tb_stream_impl_read;
-        stream->writ        = tb_stream_impl_writ;
-        stream->seek        = tb_stream_impl_seek;
-        stream->wait        = tb_stream_impl_wait;
-        stream->ctrl        = tb_stream_impl_ctrl;
+        stream->base.open        = tb_stream_impl_open;
+        stream->base.clos        = tb_stream_impl_clos;
+        stream->base.exit        = tb_stream_impl_exit;
+        stream->base.read        = tb_stream_impl_read;
+        stream->base.writ        = tb_stream_impl_writ;
+        stream->base.seek        = tb_stream_impl_seek;
+        stream->base.wait        = tb_stream_impl_wait;
+        stream->base.ctrl        = tb_stream_impl_ctrl;
 
         // ok
         ok = tb_true;
@@ -303,12 +303,12 @@ tb_stream_t* tb_stream_init_data()
     if (!ok)
     {
         // exit it
-        if (stream) tb_stream_exit(stream);
+        if (stream) tb_stream_exit((tb_stream_t*)stream);
         stream = tb_null;
     }
 
     // ok?
-    return stream;
+    return (tb_stream_t*)stream;
 }
 tb_stream_t* tb_stream_init_from_data(tb_byte_t const* data, tb_size_t size)
 {

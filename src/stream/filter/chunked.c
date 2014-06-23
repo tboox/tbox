@@ -249,7 +249,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
         }
 
         // make filter
-        filter = (tb_stream_filter_chunked_t*)tb_malloc0(sizeof(tb_stream_filter_chunked_t));
+        filter = tb_malloc0_type(tb_stream_filter_chunked_t);
         tb_assert_and_check_break(filter);
 
         // init filter 

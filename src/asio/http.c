@@ -1460,7 +1460,7 @@ tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
     do
     {
         // make http
-        http = (tb_aicp_http_t*)tb_malloc0(sizeof(tb_aicp_http_t));
+        http = tb_malloc0_type(tb_aicp_http_t);
         tb_assert_and_check_break(http);
 
         // init state

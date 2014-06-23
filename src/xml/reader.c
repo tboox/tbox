@@ -133,7 +133,7 @@ tb_handle_t tb_xml_reader_init(tb_stream_t* stream)
     tb_assert_and_check_return_val(stream, tb_null);
 
     // alloc
-    tb_xml_reader_t* reader = (tb_xml_reader_t*)tb_malloc0(sizeof(tb_xml_reader_t));
+    tb_xml_reader_t* reader = tb_malloc0_type(tb_xml_reader_t);
     tb_assert_and_check_return_val(reader, tb_null);
 
     // init stream

@@ -132,7 +132,7 @@ static tb_long_t tb_timer_comp_by_task(tb_iterator_t* iterator, tb_cpointer_t lt
 tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 {
     // make timer
-    tb_timer_t* timer = (tb_timer_t*)tb_malloc0(sizeof(tb_timer_t));
+    tb_timer_t* timer = tb_malloc0_type(tb_timer_t);
     tb_assert_and_check_return_val(timer, tb_null);
 
     // init func

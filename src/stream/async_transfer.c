@@ -681,7 +681,7 @@ tb_handle_t tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autoclosing)
     tb_assert_and_check_return_val(aicp, tb_null);
 
     // make transfer
-    tb_async_transfer_t* transfer = (tb_async_transfer_t*)tb_malloc0(sizeof(tb_async_transfer_t));
+    tb_async_transfer_t* transfer = tb_malloc0_type(tb_async_transfer_t);
     tb_assert_and_check_return_val(transfer, tb_null);
 
     // init state

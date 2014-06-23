@@ -110,8 +110,8 @@ tb_stream_t* tb_stream_init_from_url(tb_char_t const* url)
     tb_assert_and_check_return_val(type && type < tb_object_arrayn(s_init) && s_init[type], tb_null);
 
     // done
-    tb_bool_t           ok = tb_false;
-    tb_stream_t*  stream = tb_null;
+    tb_bool_t       ok = tb_false;
+    tb_stream_t*    stream = tb_null;
     do
     {
         // init stream

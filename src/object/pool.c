@@ -95,7 +95,7 @@ tb_handle_t tb_object_pool_init()
     do
     {
         // make pool
-        pool = (tb_object_pool_t*)tb_malloc0(sizeof(tb_object_pool_t));
+        pool = tb_malloc0_type(tb_object_pool_t);
         tb_assert_and_check_break(pool);
 
         // init lock

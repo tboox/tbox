@@ -177,7 +177,7 @@ tb_handle_t tb_pool_init(tb_size_t grow, tb_size_t align)
     if (!grow) grow = TB_POOL_GROW_DEFAULT;
 
     // init pool
-    tb_pool_t* pool = (tb_pool_t*)tb_malloc0(sizeof(tb_pool_t));
+    tb_pool_t* pool = tb_malloc0_type(tb_pool_t);
     tb_assert_and_check_return_val(pool, tb_null);
 
     // init pools align

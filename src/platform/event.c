@@ -41,7 +41,7 @@
 tb_handle_t tb_event_init()
 {
     // make 
-    tb_handle_t event = (tb_handle_t)tb_malloc0(sizeof(tb_atomic_t));
+    tb_handle_t event = tb_malloc0_type(tb_atomic_t);
     tb_assert_and_check_return_val(event, tb_null);
 
     // ok

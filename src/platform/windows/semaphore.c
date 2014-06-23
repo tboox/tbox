@@ -57,7 +57,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
     tb_assert_and_check_return_val(init <= TB_SEMAPHORE_VALUE_MAXN, tb_null);
 
     // make semaphore
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)tb_malloc0(sizeof(tb_semaphore_t));
+    tb_semaphore_t* semaphore = tb_malloc0_type(tb_semaphore_t);
     tb_assert_and_check_return_val(semaphore, tb_null);
 
     // init semaphore 

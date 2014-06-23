@@ -340,7 +340,7 @@ tb_single_list_t* tb_single_list_init(tb_size_t grow, tb_item_func_t func)
     do
     {
         // make impl
-        impl = (tb_single_list_impl_t*)tb_malloc0(sizeof(tb_single_list_impl_t));
+        impl = tb_malloc0_type(tb_single_list_impl_t);
         tb_assert_and_check_break(impl);
 
         // init impl
