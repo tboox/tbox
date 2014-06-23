@@ -256,7 +256,7 @@ static tb_bool_t tb_async_transfer_done_func(tb_async_transfer_t* transfer, tb_s
     }
 
     // trace
-    tb_trace_d("done: %llu bytes, rate: %lu bytes/s, state: %s", tb_stream_offset(transfer->istream), transfer->done.current_rate, tb_state_cstr(state));
+    tb_trace_d("done: %llu bytes, rate: %lu bytes/s, state: %s", tb_async_stream_offset(transfer->istream), transfer->done.current_rate, tb_state_cstr(state));
 
     // auto closing it?
     if (transfer->autoclosing)
@@ -266,14 +266,14 @@ static tb_bool_t tb_async_transfer_done_func(tb_async_transfer_t* transfer, tb_s
         {
             // save the closed state
             transfer->done.closed_state    = (TB_STATE_KILLING == tb_atomic_get(&transfer->state))? TB_STATE_KILLED : state;
-            transfer->done.closed_size     = tb_stream_size(transfer->istream);
-            transfer->done.closed_offset   = tb_stream_offset(transfer->istream);
+            transfer->done.closed_size     = tb_async_stream_size(transfer->istream);
+            transfer->done.closed_offset   = tb_async_stream_offset(transfer->istream);
             return tb_async_transfer_clos(transfer, tb_async_transfer_done_clos_func, transfer);
         }
     }
 
     // done
-    return transfer->done.func(state, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->done.saved_size, transfer->done.current_rate, transfer->done.priv);
+    return transfer->done.func(state, tb_async_stream_offset(transfer->istream), tb_async_stream_size(transfer->istream), transfer->done.saved_size, transfer->done.current_rate, transfer->done.priv);
 }
 static tb_void_t tb_async_transfer_done_clos_func(tb_size_t state, tb_cpointer_t priv)
 {
@@ -331,12 +331,12 @@ static tb_bool_t tb_async_transfer_open_done_func(tb_size_t state, tb_hize_t off
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_transfer_istream_read_func(tb_handle_t astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
-static tb_bool_t tb_async_transfer_ostream_writ_func(tb_handle_t astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_transfer_istream_read_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
+static tb_bool_t tb_async_transfer_ostream_writ_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)priv;
-    tb_assert_and_check_return_val(astream && transfer && transfer->aicp && transfer->istream, tb_false);
+    tb_assert_and_check_return_val(stream && transfer && transfer->aicp && transfer->istream, tb_false);
 
     // trace
     tb_trace_d("writ: real: %lu, size: %lu, state: %s", real, size, tb_state_cstr(state));
@@ -440,11 +440,11 @@ static tb_bool_t tb_async_transfer_ostream_writ_func(tb_handle_t astream, tb_siz
     // continue to writ or break it
     return bwrit;
 }
-static tb_bool_t tb_async_transfer_ostream_sync_func(tb_handle_t astream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv)
+static tb_bool_t tb_async_transfer_ostream_sync_func(tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv)
 {
     // check
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)priv;
-    tb_assert_and_check_return_val(astream && transfer && transfer->aicp && transfer->istream, tb_false);
+    tb_assert_and_check_return_val(stream && transfer && transfer->aicp && transfer->istream, tb_false);
 
     // trace
     tb_trace_d("sync: state: %s", tb_state_cstr(state));
@@ -458,11 +458,11 @@ static tb_bool_t tb_async_transfer_ostream_sync_func(tb_handle_t astream, tb_siz
     // done func
     return tb_async_transfer_done_func(transfer, state == TB_STATE_OK? TB_STATE_CLOSED : state);
 }
-static tb_bool_t tb_async_transfer_istream_read_func(tb_handle_t astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_transfer_istream_read_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)priv;
-    tb_assert_and_check_return_val(astream && transfer && transfer->aicp && transfer->ostream, tb_false);
+    tb_assert_and_check_return_val(stream && transfer && transfer->aicp && transfer->ostream, tb_false);
 
     // trace
     tb_trace_d("read: size: %lu, state: %s", real, tb_state_cstr(state));
@@ -531,15 +531,14 @@ static tb_bool_t tb_async_transfer_istream_read_func(tb_handle_t astream, tb_siz
     // continue to read or break it
     return bread;
 }
-static tb_bool_t tb_async_transfer_ostream_open_func(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_async_transfer_ostream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_async_transfer_t*    transfer = (tb_async_transfer_t*)priv;
-    tb_async_stream_t*      astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return_val(astream && transfer && transfer->open.func, tb_false);
+    tb_async_transfer_t* transfer = (tb_async_transfer_t*)priv;
+    tb_assert_and_check_return_val(stream && transfer && transfer->open.func, tb_false);
 
     // trace
-    tb_trace_d("open: ostream: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
+    tb_trace_d("open: ostream: %s, state: %s", tb_url_get(&stream->url), tb_state_cstr(state));
 
     // done
     tb_bool_t ok = tb_true;
@@ -562,7 +561,7 @@ static tb_bool_t tb_async_transfer_ostream_open_func(tb_handle_t stream, tb_size
         }
 
         // done func
-        ok = tb_async_transfer_open_func(transfer, TB_STATE_OK, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), transfer->open.func, transfer->open.priv);
+        ok = tb_async_transfer_open_func(transfer, TB_STATE_OK, tb_async_stream_offset(transfer->istream), tb_async_stream_size(transfer->istream), transfer->open.func, transfer->open.priv);
 
         // ok
         state = TB_STATE_OK;
@@ -579,15 +578,14 @@ static tb_bool_t tb_async_transfer_ostream_open_func(tb_handle_t stream, tb_size
     // ok
     return ok;
 }
-static tb_bool_t tb_async_transfer_istream_open_func(tb_handle_t stream, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv)
+static tb_bool_t tb_async_transfer_istream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv)
 {
     // check
-    tb_async_transfer_t*    transfer = (tb_async_transfer_t*)priv;
-    tb_async_stream_t*      astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return_val(astream && transfer && transfer->open.func, tb_false);
+    tb_async_transfer_t* transfer = (tb_async_transfer_t*)priv;
+    tb_assert_and_check_return_val(stream && transfer && transfer->open.func, tb_false);
 
     // trace
-    tb_trace_d("open: istream: %s, offset: %llu, state: %s", tb_url_get(&astream->base.url), offset, tb_state_cstr(state));
+    tb_trace_d("open: istream: %s, offset: %llu, state: %s", tb_url_get(&stream->url), offset, tb_state_cstr(state));
 
     // done
     tb_bool_t ok = tb_true;
@@ -624,28 +622,26 @@ static tb_bool_t tb_async_transfer_istream_open_func(tb_handle_t stream, tb_size
     // ok?
     return ok;
 }
-static tb_void_t tb_async_transfer_ostream_clos_func(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_transfer_ostream_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_async_transfer_t*    transfer = (tb_async_transfer_t*)priv;
-    tb_async_stream_t*      astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return(astream && transfer);
+    tb_async_transfer_t* transfer = (tb_async_transfer_t*)priv;
+    tb_assert_and_check_return(stream && transfer);
 
     // trace
-    tb_trace_d("clos: ostream: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
+    tb_trace_d("clos: ostream: %s, state: %s", tb_url_get(&stream->url), tb_state_cstr(state));
 
     // done func
     tb_async_transfer_clos_func(transfer, state);
 }
-static tb_void_t tb_async_transfer_istream_clos_func(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_transfer_istream_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_async_transfer_t*    transfer = (tb_async_transfer_t*)priv;
-    tb_async_stream_t*      astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return(astream && transfer);
+    tb_async_transfer_t* transfer = (tb_async_transfer_t*)priv;
+    tb_assert_and_check_return(stream && transfer);
 
     // trace
-    tb_trace_d("clos: istream: %s, state: %s", tb_url_get(&astream->base.url), tb_state_cstr(state));
+    tb_trace_d("clos: istream: %s, state: %s", tb_url_get(&stream->url), tb_state_cstr(state));
 
     // done
     do
@@ -682,11 +678,11 @@ tb_handle_t tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autoclosing)
 {
     // using the default aicp
     if (!aicp) aicp = tb_aicp();
-    tb_assert_and_check_return_val(aicp, tb_object_null);
+    tb_assert_and_check_return_val(aicp, tb_null);
 
     // make transfer
     tb_async_transfer_t* transfer = (tb_async_transfer_t*)tb_malloc0(sizeof(tb_async_transfer_t));
-    tb_assert_and_check_return_val(transfer, tb_object_null);
+    tb_assert_and_check_return_val(transfer, tb_null);
 
     // init state
     transfer->state         = TB_STATE_CLOSED;
@@ -712,7 +708,7 @@ tb_bool_t tb_async_transfer_init_istream(tb_handle_t handle, tb_async_stream_t* 
     if (transfer->istream && transfer->istream != stream)
     {
         if (transfer->iowner) tb_async_stream_exit(transfer->istream);
-        transfer->istream = tb_object_null;
+        transfer->istream = tb_null;
     }
 
     // init stream
@@ -750,10 +746,10 @@ tb_bool_t tb_async_transfer_init_istream_from_url(tb_handle_t handle, tb_char_t 
         }
 
         // exit the previous stream first if be different stream type
-        if (tb_stream_type(transfer->istream) != type)
+        if (tb_async_stream_type(transfer->istream) != type)
         {
             if (transfer->iowner) tb_async_stream_exit(transfer->istream);
-            transfer->istream = tb_object_null;
+            transfer->istream = tb_null;
         }
     }
 
@@ -761,7 +757,7 @@ tb_bool_t tb_async_transfer_init_istream_from_url(tb_handle_t handle, tb_char_t 
     if (transfer->istream)
     {
         // ctrl stream
-        if (!tb_stream_ctrl(transfer->istream, TB_STREAM_CTRL_SET_URL, url)) return tb_false;
+        if (!tb_async_stream_ctrl(transfer->istream, TB_STREAM_CTRL_SET_URL, url)) return tb_false;
     }
     else 
     {
@@ -786,17 +782,17 @@ tb_bool_t tb_async_transfer_init_istream_from_data(tb_handle_t handle, tb_byte_t
     tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&transfer->state), tb_false);
 
     // exit the previous stream first if be not data stream
-    if (transfer->istream && tb_stream_type(transfer->istream) != TB_STREAM_TYPE_DATA)
+    if (transfer->istream && tb_async_stream_type(transfer->istream) != TB_STREAM_TYPE_DATA)
     {
         if (transfer->iowner) tb_async_stream_exit(transfer->istream);
-        transfer->istream = tb_object_null;
+        transfer->istream = tb_null;
     }
 
     // using the previous stream?
     if (transfer->istream)
     {
         // ctrl stream
-        if (!tb_stream_ctrl(transfer->istream, TB_STREAM_CTRL_DATA_SET_DATA, data, size)) return tb_false;
+        if (!tb_async_stream_ctrl(transfer->istream, TB_STREAM_CTRL_DATA_SET_DATA, data, size)) return tb_false;
     }
     else 
     {
@@ -824,7 +820,7 @@ tb_bool_t tb_async_transfer_init_ostream(tb_handle_t handle, tb_async_stream_t* 
     if (transfer->ostream && transfer->ostream != stream)
     {
         if (transfer->oowner) tb_async_stream_exit(transfer->ostream);
-        transfer->ostream = tb_object_null;
+        transfer->ostream = tb_null;
     }
 
     // init stream
@@ -862,10 +858,10 @@ tb_bool_t tb_async_transfer_init_ostream_from_url(tb_handle_t handle, tb_char_t 
         }
 
         // exit the previous stream first if be different stream type
-        if (tb_stream_type(transfer->ostream) != type)
+        if (tb_async_stream_type(transfer->ostream) != type)
         {
             if (transfer->oowner) tb_async_stream_exit(transfer->ostream);
-            transfer->ostream = tb_object_null;
+            transfer->ostream = tb_null;
         }
     }
 
@@ -873,7 +869,7 @@ tb_bool_t tb_async_transfer_init_ostream_from_url(tb_handle_t handle, tb_char_t 
     if (transfer->ostream)
     {
         // ctrl stream
-        if (!tb_stream_ctrl(transfer->ostream, TB_STREAM_CTRL_SET_URL, url)) return tb_false;
+        if (!tb_async_stream_ctrl(transfer->ostream, TB_STREAM_CTRL_SET_URL, url)) return tb_false;
     }
     else 
     {
@@ -882,10 +878,10 @@ tb_bool_t tb_async_transfer_init_ostream_from_url(tb_handle_t handle, tb_char_t 
         tb_assert_and_check_return_val(transfer->ostream, tb_false);
 
         // ctrl stream for file
-        if (tb_stream_type(transfer->ostream) == TB_STREAM_TYPE_FILE) 
+        if (tb_async_stream_type(transfer->ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(transfer->ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) return tb_false;
+            if (!tb_async_stream_ctrl(transfer->ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) return tb_false;
         }
 
         // init owner
@@ -905,17 +901,17 @@ tb_bool_t tb_async_transfer_init_ostream_from_data(tb_handle_t handle, tb_byte_t
     tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&transfer->state), tb_false);
 
     // exit the previous stream first if be not data stream
-    if (transfer->ostream && tb_stream_type(transfer->ostream) != TB_STREAM_TYPE_DATA)
+    if (transfer->ostream && tb_async_stream_type(transfer->ostream) != TB_STREAM_TYPE_DATA)
     {
         if (transfer->oowner) tb_async_stream_exit(transfer->ostream);
-        transfer->ostream = tb_object_null;
+        transfer->ostream = tb_null;
     }
 
     // using the previous stream?
     if (transfer->ostream)
     {
         // ctrl stream
-        if (!tb_stream_ctrl(transfer->ostream, TB_STREAM_CTRL_DATA_SET_DATA, data, size)) return tb_false;
+        if (!tb_async_stream_ctrl(transfer->ostream, TB_STREAM_CTRL_DATA_SET_DATA, data, size)) return tb_false;
     }
     else 
     {
@@ -941,7 +937,7 @@ tb_bool_t tb_async_transfer_ctrl_istream(tb_handle_t handle, tb_size_t ctrl, ...
     tb_va_start(args, ctrl);
 
     // ctrl it
-    tb_bool_t ok = tb_stream_ctrl_with_args(transfer->istream, ctrl, args);
+    tb_bool_t ok = tb_async_stream_ctrl_with_args(transfer->istream, ctrl, args);
 
     // exit args
     tb_va_end(args);
@@ -960,7 +956,7 @@ tb_bool_t tb_async_transfer_ctrl_ostream(tb_handle_t handle, tb_size_t ctrl, ...
     tb_va_start(args, ctrl);
 
     // ctrl it
-    tb_bool_t ok = tb_stream_ctrl_with_args(transfer->ostream, ctrl, args);
+    tb_bool_t ok = tb_async_stream_ctrl_with_args(transfer->ostream, ctrl, args);
 
     // exit args
     tb_va_end(args);
@@ -988,7 +984,7 @@ tb_bool_t tb_async_transfer_open(tb_handle_t handle, tb_hize_t offset, tb_async_
             tb_assert_and_check_break(transfer->istream && transfer->ostream);
 
             // done func
-            func(TB_STATE_OK, tb_stream_offset(transfer->istream), tb_stream_size(transfer->istream), priv);
+            func(TB_STATE_OK, tb_async_stream_offset(transfer->istream), tb_async_stream_size(transfer->istream), priv);
 
             // ok
             ok = tb_true;
@@ -1170,10 +1166,10 @@ tb_void_t tb_async_transfer_kill(tb_handle_t handle)
     tb_trace_d("kill: ..");
 
     // kill istream
-    if (transfer->istream) tb_stream_kill(transfer->istream);
+    if (transfer->istream) tb_async_stream_kill(transfer->istream);
 
     // kill ostream
-    if (transfer->ostream) tb_stream_kill(transfer->ostream);
+    if (transfer->ostream) tb_async_stream_kill(transfer->ostream);
 }
 tb_bool_t tb_async_transfer_exit(tb_handle_t handle)
 {
@@ -1206,11 +1202,11 @@ tb_bool_t tb_async_transfer_exit(tb_handle_t handle)
 
     // exit istream
     if (transfer->istream && transfer->iowner) tb_async_stream_exit(transfer->istream);
-    transfer->istream = tb_object_null;
+    transfer->istream = tb_null;
 
     // exit ostream
     if (transfer->ostream && transfer->oowner) tb_async_stream_exit(transfer->ostream);
-    transfer->ostream = tb_object_null;
+    transfer->ostream = tb_null;
 
     // exit transfer
     tb_free(transfer);

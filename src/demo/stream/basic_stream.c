@@ -73,7 +73,7 @@ static tb_option_item_t g_options[] =
 ,   {'-',   "limitrate",    TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set the limitrate"         }
 ,   {'h',   "help",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "display this help and exit"}
 ,   {'-',   "url",          TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the url"                   }
-,   {'-',   tb_object_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_object_null                     }
+,   {'-',   tb_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_null                     }
 
 };
 
@@ -83,10 +83,10 @@ static tb_option_item_t g_options[] =
 tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t     option = tb_object_null;
-    tb_basic_stream_t*  istream = tb_object_null;
-    tb_basic_stream_t*  ostream = tb_object_null;
-    tb_basic_stream_t*  pst = tb_object_null;
+    tb_handle_t     option = tb_null;
+    tb_basic_stream_t*  istream = tb_null;
+    tb_basic_stream_t*  ostream = tb_null;
+    tb_basic_stream_t*  pst = tb_null;
     do
     {
         // init option
@@ -108,20 +108,20 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                 tb_assert_and_check_break(istream);
     
                 // ctrl http
-                if (tb_stream_type(istream) == TB_STREAM_TYPE_HTTP) 
+                if (tb_basic_stream_type(istream) == TB_STREAM_TYPE_HTTP) 
                 {
                     // enable gzip?
                     if (tb_option_find(option, "gzip"))
                     {
                         // auto unzip
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
 
                         // need gzip
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
                     }
 
                     // enable debug?
-                    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, debug? tb_demo_basic_stream_head_func : tb_object_null)) break;
+                    if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, debug? tb_demo_basic_stream_head_func : tb_null)) break;
 
                     // custem header?
                     if (tb_option_find(option, "header"))
@@ -170,7 +170,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                                     if (tb_string_size(&key) && tb_string_size(&val))
                                     {
                                         if (debug) tb_printf("header: %s: %s\n", tb_string_cstr(&key), tb_string_cstr(&val));
-                                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
+                                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
                                     }
 
                                     // is key now
@@ -187,7 +187,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                         if (tb_string_size(&key) && tb_string_size(&val))
                         {
                             if (debug) tb_printf("header: %s: %s\n", tb_string_cstr(&key), tb_string_cstr(&val));
-                            if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
+                            if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
                         }
 
                         // exit 
@@ -198,7 +198,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                     // keep alive?
                     if (tb_option_find(option, "keep-alive"))
                     {
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Connection", "keep-alive")) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Connection", "keep-alive")) break;
                     }
 
                     // post-data?
@@ -206,18 +206,18 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                     {
                         tb_char_t const*    post_data = tb_option_item_cstr(option, "post-data");
                         tb_hize_t           post_size = tb_strlen(post_data);
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_DATA, post_data, post_size)) break;
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_DATA, post_data, post_size)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
                         if (debug) tb_printf("post: %llu\n", post_size);
                     }
                     // post-file?
                     else if (tb_option_find(option, "post-file"))
                     {
                         tb_char_t const* url = tb_option_item_cstr(option, "post-file");
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_URL, url)) break;
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_URL, url)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
                         if (debug) tb_printf("post: %s\n", url);
                     }
                 }
@@ -237,7 +237,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                             p++;
                             eof = tb_atoll(p);
                         }
-                        if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_RANGE, bof, eof)) break;
+                        if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_RANGE, bof, eof)) break;
                     }
                 }
 
@@ -245,7 +245,7 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
                 if (tb_option_find(option, "timeout"))
                 {
                     tb_size_t timeout = tb_option_item_uint32(option, "timeout");
-                    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
+                    if (!tb_basic_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
                 }
 
                 // print verbose info
@@ -314,19 +314,19 @@ tb_int_t tb_demo_stream_basic_stream_main(tb_int_t argc, tb_char_t** argv)
 
     // exit pst
     if (pst) tb_basic_stream_exit(pst);
-    pst = tb_object_null;
+    pst = tb_null;
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_object_null;
+    istream = tb_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_object_null;
+    ostream = tb_null;
 
     // exit option
     if (option) tb_option_exit(option);
-    option = tb_object_null;
+    option = tb_null;
 
     return 0;
 }

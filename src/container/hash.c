@@ -325,12 +325,12 @@ static tb_pointer_t tb_hash_iterator_item(tb_iterator_t* iterator, tb_size_t ito
     // get buck & item
     tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
     tb_size_t item = TB_HASH_INDEX_ITEM(itor);
-    tb_assert_and_check_return_val(buck && item, tb_object_null);
+    tb_assert_and_check_return_val(buck && item, tb_null);
 
     // get item
     if (tb_hash_item_at(impl, buck - 1, item - 1, &((tb_hash_impl_t*)impl)->hash_item.name, &((tb_hash_impl_t*)impl)->hash_item.data))
         return &(impl->hash_item);
-    return tb_object_null;
+    return tb_null;
 }
 static tb_void_t tb_hash_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 {
@@ -372,7 +372,7 @@ static tb_void_t tb_hash_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
         tb_free(list);
 
         // reset
-        impl->hash_list[buck] = tb_object_null;
+        impl->hash_list[buck] = tb_null;
     }
 
     // update the impl item size
@@ -413,16 +413,16 @@ static tb_long_t tb_hash_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t lt
 tb_hash_t* tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_func_t data_func)
 {
     // check
-    tb_assert_and_check_return_val(name_func.size && name_func.hash && name_func.comp && name_func.data && name_func.dupl, tb_object_null);
-    tb_assert_and_check_return_val(data_func.data && data_func.dupl && data_func.repl, tb_object_null);
+    tb_assert_and_check_return_val(name_func.size && name_func.hash && name_func.comp && name_func.data && name_func.dupl, tb_null);
+    tb_assert_and_check_return_val(data_func.data && data_func.dupl && data_func.repl, tb_null);
 
     // check bulk size
     if (!bulk_size) bulk_size = TB_HASH_BULK_SIZE_DEFAULT;
-    tb_assert_and_check_return_val(bulk_size <= TB_HASH_BULK_SIZE_LARGE, tb_object_null);
+    tb_assert_and_check_return_val(bulk_size <= TB_HASH_BULK_SIZE_LARGE, tb_null);
 
     // make impl
     tb_bool_t       ok = tb_false;
-    tb_hash_impl_t* impl = tb_object_null;
+    tb_hash_impl_t* impl = tb_null;
     do
     {
         // make impl
@@ -435,12 +435,12 @@ tb_hash_t* tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_f
 
         // init item itor
         impl->item_itor.mode = TB_ITERATOR_MODE_FORWARD;
-        impl->item_itor.priv = tb_object_null;
+        impl->item_itor.priv = tb_null;
         impl->item_itor.step = sizeof(tb_hash_item_t);
         impl->item_itor.size = tb_hash_iterator_size;
         impl->item_itor.head = tb_hash_iterator_head;
         impl->item_itor.tail = tb_hash_iterator_tail;
-        impl->item_itor.prev = tb_object_null;
+        impl->item_itor.prev = tb_null;
         impl->item_itor.next = tb_hash_iterator_next;
         impl->item_itor.item = tb_hash_iterator_item;
         impl->item_itor.copy = tb_hash_iterator_copy;
@@ -470,7 +470,7 @@ tb_hash_t* tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_f
     {
         // exit it
         if (impl) tb_hash_exit((tb_hash_t*)impl);
-        impl = tb_object_null;
+        impl = tb_null;
     }
 
     // ok?
@@ -525,7 +525,7 @@ tb_void_t tb_hash_clear(tb_hash_t* hash)
             // free list
             tb_free(list);
         }
-        impl->hash_list[i] = tb_object_null;
+        impl->hash_list[i] = tb_null;
     }
 
     // reset info
@@ -548,17 +548,17 @@ tb_pointer_t tb_hash_get(tb_hash_t const* hash, tb_cpointer_t name)
 {
     // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)hash;
-    tb_assert_and_check_return_val(impl, tb_object_null);
+    tb_assert_and_check_return_val(impl, tb_null);
 
     // find
     tb_size_t buck = 0;
     tb_size_t item = 0;
     if (tb_hash_item_find(impl, name, &buck, &item))
     {
-        tb_pointer_t data = tb_object_null;
-        if (tb_hash_item_at(impl, buck, item, tb_object_null, &data)) return (tb_pointer_t)data;
+        tb_pointer_t data = tb_null;
+        if (tb_hash_item_at(impl, buck, item, tb_null, &data)) return (tb_pointer_t)data;
     }
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_hash_del(tb_hash_t* hash, tb_cpointer_t name)
 {
@@ -779,8 +779,8 @@ tb_void_t tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* impl, tb_ha
                                 tb_free(list);
 
                                 // reset
-                                list = tb_object_null;
-                                impl->hash_list[i] = tb_object_null;
+                                list = tb_null;
+                                impl->hash_list[i] = tb_null;
                             }
 
                             // update the impl item size

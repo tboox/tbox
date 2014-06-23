@@ -288,7 +288,7 @@ tb_void_t           tb_aicp_loop(tb_aicp_t* aicp);
  * }
  * tb_pointer_t tb_aicp_worker_thread(tb_pointer_t)
  * {
- *      tb_aicp_loop_util(aicp, stop_func, tb_object_null);
+ *      tb_aicp_loop_util(aicp, stop_func, tb_null);
  * }
  * @endcode
  *

@@ -40,7 +40,7 @@ tb_void_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 
     // init
     tb_size_t       step = tb_iterator_step(iterator);
-    tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_object_null;
+    tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
     // the comparer

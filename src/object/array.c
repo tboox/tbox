@@ -58,7 +58,7 @@ typedef struct __tb_object_array_t
 static __tb_inline__ tb_object_array_t* tb_object_array_cast(tb_object_t* object)
 {
     // check
-    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_ARRAY, tb_object_null);
+    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_ARRAY, tb_null);
 
     // cast
     return (tb_object_array_t*)object;
@@ -67,11 +67,11 @@ static tb_object_t* tb_object_array_copy(tb_object_t* object)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
-    tb_assert_and_check_return_val(array && array->vector, tb_object_null);
+    tb_assert_and_check_return_val(array && array->vector, tb_null);
 
     // init copy
     tb_object_array_t* copy = (tb_object_array_t*)tb_object_array_init(tb_vector_grow(array->vector), array->incr);
-    tb_assert_and_check_return_val(copy && copy->vector, tb_object_null);
+    tb_assert_and_check_return_val(copy && copy->vector, tb_null);
 
     // refn++
     tb_for_all (tb_object_t*, item, array->vector)
@@ -93,7 +93,7 @@ static tb_void_t tb_object_array_exit(tb_object_t* object)
 
     // exit vector
     if (array->vector) tb_vector_exit(array->vector);
-    array->vector = tb_object_null;
+    array->vector = tb_null;
 
     // exit it
     tb_object_pool_del(tb_object_pool(), object);
@@ -110,7 +110,7 @@ static tb_object_array_t* tb_object_array_init_base()
 {
     // make
     tb_object_array_t* array = (tb_object_array_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_array_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY);
-    tb_assert_and_check_return_val(array, tb_object_null);
+    tb_assert_and_check_return_val(array, tb_null);
 
     // init base
     array->base.copy = tb_object_array_copy;
@@ -128,7 +128,7 @@ tb_object_t* tb_object_array_init(tb_size_t grow, tb_bool_t incr)
 {
     // done
     tb_bool_t   ok = tb_false;
-    tb_object_array_t* array = tb_object_null;
+    tb_object_array_t* array = tb_null;
     do
     {
         // make array
@@ -155,7 +155,7 @@ tb_object_t* tb_object_array_init(tb_size_t grow, tb_bool_t incr)
     {
         // exit it
         if (array) tb_object_array_exit((tb_object_t*)array);
-        array = tb_object_null;
+        array = tb_null;
     }
 
     // ok?
@@ -174,7 +174,7 @@ tb_object_t* tb_object_array_item(tb_object_t* object, tb_size_t index)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
-    tb_assert_and_check_return_val(array && array->vector, tb_object_null);
+    tb_assert_and_check_return_val(array && array->vector, tb_null);
 
     // item
     return (tb_object_t*)tb_iterator_item(array->vector, index);
@@ -183,7 +183,7 @@ tb_iterator_t* tb_object_array_itor(tb_object_t* object)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
-    tb_assert_and_check_return_val(array, tb_object_null);
+    tb_assert_and_check_return_val(array, tb_null);
 
     // iterator
     return (tb_iterator_t*)array->vector;

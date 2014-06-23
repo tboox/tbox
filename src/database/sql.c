@@ -40,11 +40,11 @@
 tb_handle_t tb_object_database_sql_init(tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_object_database_sql_t*  database = tb_object_null;
+    tb_object_database_sql_t*  database = tb_null;
     tb_url_t            database_url;
     do
     {
@@ -64,7 +64,7 @@ tb_handle_t tb_object_database_sql_init(tb_char_t const* url)
         // the probe func
         static tb_size_t (*s_probe[])(tb_url_t const*) = 
         {
-            tb_object_null
+            tb_null
 #ifdef TB_CONFIG_THIRD_HAVE_MYSQL
         ,   tb_object_database_mysql_probe
 #endif
@@ -76,7 +76,7 @@ tb_handle_t tb_object_database_sql_init(tb_char_t const* url)
         // the init func
         static tb_object_database_sql_t* (*s_init[])(tb_url_t const*) = 
         {
-            tb_object_null
+            tb_null
 #ifdef TB_CONFIG_THIRD_HAVE_MYSQL
         ,   tb_object_database_mysql_init
 #endif
@@ -132,7 +132,7 @@ tb_handle_t tb_object_database_sql_init(tb_char_t const* url)
 
         // exit database
         if (database) tb_object_database_sql_exit((tb_handle_t)database);
-        database = tb_object_null;
+        database = tb_null;
     }
 
     // ok?
@@ -301,13 +301,13 @@ tb_iterator_t* tb_object_database_sql_result_load(tb_handle_t handle, tb_bool_t 
 {
     // check
     tb_object_database_sql_t* database = (tb_object_database_sql_t*)handle;
-    tb_assert_and_check_return_val(database && database->result_load, tb_object_null);
+    tb_assert_and_check_return_val(database && database->result_load, tb_null);
         
     // init state
     database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
     // opened?
-    tb_assert_and_check_return_val(database->bopened, tb_object_null);
+    tb_assert_and_check_return_val(database->bopened, tb_null);
 
     // load it
     tb_iterator_t* result = database->result_load(database, ball);
@@ -337,13 +337,13 @@ tb_handle_t tb_object_database_sql_statement_init(tb_handle_t handle, tb_char_t 
 {
     // check
     tb_object_database_sql_t* database = (tb_object_database_sql_t*)handle;
-    tb_assert_and_check_return_val(database && database->statement_init && sql, tb_object_null);
+    tb_assert_and_check_return_val(database && database->statement_init && sql, tb_null);
         
     // init state
     database->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
     // opened?
-    tb_assert_and_check_return_val(database->bopened, tb_object_null);
+    tb_assert_and_check_return_val(database->bopened, tb_null);
 
     // init stmt
     tb_handle_t stmt = database->statement_init(database, sql);

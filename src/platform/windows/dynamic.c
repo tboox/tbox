@@ -34,14 +34,14 @@
 tb_handle_t tb_dynamic_init(tb_char_t const* name)
 {
     // check
-    tb_assert_and_check_return_val(name, tb_object_null);
+    tb_assert_and_check_return_val(name, tb_null);
 
     // atow
     tb_wchar_t temp[TB_PATH_MAXN] = {0};
-    if (!tb_atow(temp, name, TB_PATH_MAXN)) return tb_object_null;
+    if (!tb_atow(temp, name, TB_PATH_MAXN)) return tb_null;
 
     // load
-    return (tb_handle_t)LoadLibraryExW(temp, tb_object_null, LOAD_WITH_ALTERED_SEARCH_PATH);
+    return (tb_handle_t)LoadLibraryExW(temp, tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
 }
 tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 {
@@ -54,7 +54,7 @@ tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
 {
     // check
-    tb_assert_and_check_return_val(dynamic && name, tb_object_null);
+    tb_assert_and_check_return_val(dynamic && name, tb_null);
 
     // get func
     return (tb_pointer_t)GetProcAddress((HMODULE)dynamic, name);
@@ -62,7 +62,7 @@ tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
 tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
 {
     // check
-    tb_assert_and_check_return_val(dynamic && name, tb_object_null);
+    tb_assert_and_check_return_val(dynamic && name, tb_null);
 
     // get variable address
     return (tb_pointer_t)GetProcAddress((HMODULE)dynamic, name);

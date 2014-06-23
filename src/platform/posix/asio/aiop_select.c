@@ -258,9 +258,9 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 
         // wait
 #ifdef TB_CONFIG_OS_WINDOWS
-        tb_long_t sfdn = tb_ws2_32()->select(sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_object_null);
+        tb_long_t sfdn = tb_ws2_32()->select(sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_null);
 #else
-        tb_long_t sfdn = select(sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_object_null);
+        tb_long_t sfdn = select(sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_null);
 #endif
         tb_assert_and_check_return_val(sfdn >= 0, -1);
 
@@ -338,7 +338,7 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
                     {
                         // clear aioo
                         aioo->code = TB_AIOE_CODE_NONE;
-                        aioo->priv = tb_object_null;
+                        aioo->priv = tb_null;
 
                         // clear events
                         tb_spinlock_enter(&rtor->lock.pfds);
@@ -376,7 +376,7 @@ static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
         // exit hash
         tb_spinlock_enter(&rtor->lock.hash);
         if (rtor->hash) tb_hash_exit(rtor->hash);
-        rtor->hash = tb_object_null;
+        rtor->hash = tb_null;
         tb_spinlock_leave(&rtor->lock.hash);
 
         // exit lock
@@ -415,11 +415,11 @@ static tb_void_t tb_aiop_reactor_select_cler(tb_aiop_reactor_t* reactor)
 static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->maxn, tb_object_null);
+    tb_assert_and_check_return_val(aiop && aiop->maxn, tb_null);
 
     // done
     tb_bool_t                   ok = tb_false;
-    tb_aiop_reactor_select_t*   rtor = tb_object_null;
+    tb_aiop_reactor_select_t*   rtor = tb_null;
     do
     {
         // make reactor
@@ -448,7 +448,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
         if (!tb_spinlock_init(&rtor->lock.hash)) break;
 
         // init hash
-        rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_object_null, tb_object_null), tb_item_func_ptr(tb_object_null, tb_object_null));
+        rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
         tb_assert_and_check_break(rtor->hash);
 
         // ok
@@ -461,7 +461,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
     {
         // exit it
         if (rtor) tb_aiop_reactor_select_exit((tb_aiop_reactor_t*)rtor);
-        rtor = tb_object_null;
+        rtor = tb_null;
     }
 
     // ok?

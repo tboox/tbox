@@ -258,7 +258,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
         {
             // clear code
             aioo->code = TB_AIOE_CODE_NONE;
-            aioo->priv = tb_object_null;
+            aioo->priv = tb_null;
 
             // clear events manually if no epoll oneshot
 #ifndef EPOLLONESHOT
@@ -282,7 +282,7 @@ static tb_void_t tb_aiop_reactor_epoll_exit(tb_aiop_reactor_t* reactor)
     {
         // exit events
         if (rtor->evts) tb_free(rtor->evts);
-        rtor->evts = tb_object_null;
+        rtor->evts = tb_null;
 
         // exit fd
         if (rtor->epfd) close(rtor->epfd);
@@ -309,11 +309,11 @@ static tb_void_t tb_aiop_reactor_epoll_cler(tb_aiop_reactor_t* reactor)
 static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->maxn, tb_object_null);
+    tb_assert_and_check_return_val(aiop && aiop->maxn, tb_null);
 
     // make reactor
     tb_aiop_reactor_epoll_t* rtor = tb_malloc0(sizeof(tb_aiop_reactor_epoll_t));
-    tb_assert_and_check_return_val(rtor, tb_object_null);
+    tb_assert_and_check_return_val(rtor, tb_null);
 
     // init base
     rtor->base.aiop = aiop;
@@ -333,6 +333,6 @@ static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 
 fail:
     if (rtor) tb_aiop_reactor_epoll_exit((tb_aiop_reactor_t*)rtor);
-    return tb_object_null;
+    return tb_null;
 }
 

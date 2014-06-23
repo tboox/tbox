@@ -83,13 +83,13 @@ static tb_void_t tb_object_string_pool_instance_exit(tb_handle_t handle, tb_cpoi
  */
 tb_handle_t tb_object_string_pool()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_object_string_pool_instance_init, tb_object_string_pool_instance_exit, tb_object_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_object_string_pool_instance_init, tb_object_string_pool_instance_exit, tb_null);
 }
 tb_handle_t tb_object_string_pool_init(tb_bool_t bcase, tb_size_t align)
 {
     // done
     tb_bool_t           ok = tb_false;
-    tb_object_string_pool_t*   pool = tb_object_null;
+    tb_object_string_pool_t*   pool = tb_null;
     do
     {
         // make pool
@@ -122,7 +122,7 @@ tb_handle_t tb_object_string_pool_init(tb_bool_t bcase, tb_size_t align)
     {
         // exit it
         if (pool) tb_object_string_pool_exit((tb_handle_t)pool);
-        pool = tb_object_null;
+        pool = tb_null;
     }
 
     // ok?
@@ -139,11 +139,11 @@ tb_void_t tb_object_string_pool_exit(tb_handle_t handle)
 
     // exit cache
     if (pool->cache) tb_hash_exit(pool->cache);
-    pool->cache = tb_object_null;
+    pool->cache = tb_null;
 
     // exit pool
     if (pool->pool) tb_pool_exit(pool->pool);
-    pool->pool = tb_object_null;
+    pool->pool = tb_null;
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -176,18 +176,18 @@ tb_char_t const* tb_object_string_pool_put(tb_handle_t handle, tb_char_t const* 
 {
     // check
     tb_object_string_pool_t* pool = (tb_object_string_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && data, tb_object_null);
+    tb_assert_and_check_return_val(pool && data, tb_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_char_t const* cstr = tb_object_null;
+    tb_char_t const* cstr = tb_null;
     if (pool->cache)
     {
         // exists?
         tb_size_t               itor;
-        tb_hash_item_t const*   item = tb_object_null;
+        tb_hash_item_t const*   item = tb_null;
         if (((itor = tb_hash_itor(pool->cache, data)) != tb_iterator_tail(pool->cache)) && (item = (tb_hash_item_t const*)tb_iterator_item(pool->cache, itor)))
         {
             // refn
@@ -203,7 +203,7 @@ tb_char_t const* tb_object_string_pool_put(tb_handle_t handle, tb_char_t const* 
 
                 // del it
                 tb_iterator_delt(pool->cache, itor);
-                item = tb_object_null;
+                item = tb_null;
             }
         }
         
@@ -235,7 +235,7 @@ tb_void_t tb_object_string_pool_del(tb_handle_t handle, tb_char_t const* data)
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_hash_item_t const* item = tb_object_null;
+    tb_hash_item_t const* item = tb_null;
     if (pool->cache)
     {
         // exists?

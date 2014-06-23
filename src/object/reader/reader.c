@@ -32,7 +32,7 @@
  */
 
 // the object reader
-static tb_object_reader_t*  g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_object_null};
+static tb_object_reader_t*  g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_null};
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -63,17 +63,17 @@ tb_void_t tb_object_reader_del(tb_size_t format)
     {
         // exit hooker
         if (g_reader[format]->hooker) tb_hash_exit(g_reader[format]->hooker);
-        g_reader[format]->hooker = tb_object_null;
+        g_reader[format]->hooker = tb_null;
         
         // clear it
-        g_reader[format] = tb_object_null;
+        g_reader[format] = tb_null;
     }
 }
 tb_object_reader_t* tb_object_reader_get(tb_size_t format)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return_val((format < tb_object_arrayn(g_reader)), tb_object_null);
+    tb_assert_and_check_return_val((format < tb_object_arrayn(g_reader)), tb_null);
 
     // ok
     return g_reader[format];
@@ -81,7 +81,7 @@ tb_object_reader_t* tb_object_reader_get(tb_size_t format)
 tb_object_t* tb_object_reader_done(tb_basic_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_object_null);
+    tb_assert_and_check_return_val(stream, tb_null);
 
     // probe it
     tb_size_t i = 0;
@@ -105,5 +105,5 @@ tb_object_t* tb_object_reader_done(tb_basic_stream_t* stream)
     }
 
     // ok? read it
-    return (m && g_reader[f] && g_reader[f]->read)? g_reader[f]->read(stream) : tb_object_null;
+    return (m && g_reader[f] && g_reader[f]->read)? g_reader[f]->read(stream) : tb_null;
 }

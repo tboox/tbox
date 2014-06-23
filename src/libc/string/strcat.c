@@ -36,13 +36,13 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRCAT
 tb_char_t* tb_strcat(tb_char_t* s1, tb_char_t const* s2)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
     return strcat(s1, s2);
 }
 #else
 tb_char_t* tb_strcat(tb_char_t* s1, tb_char_t const* s2)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
     __tb_register__ tb_char_t* s = s1;
     while (*s++); --s;

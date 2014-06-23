@@ -202,19 +202,19 @@ static tb_void_t tb_cookies_entry_exit(tb_cookies_t* cookies, tb_cookies_entry_t
 
     // exit domain
     if (entry->domain) tb_object_string_pool_del(cookies->string_pool, entry->domain);
-    entry->domain = tb_object_null;
+    entry->domain = tb_null;
     
     // exit path
     if (entry->path) tb_object_string_pool_del(cookies->string_pool, entry->path);
-    entry->path = tb_object_null;
+    entry->path = tb_null;
     
     // exit name
     if (entry->name) tb_object_string_pool_del(cookies->string_pool, entry->name);
-    entry->name = tb_object_null;
+    entry->name = tb_null;
     
     // exit value
     if (entry->value) tb_object_string_pool_del(cookies->string_pool, entry->value);
-    entry->value = tb_object_null;
+    entry->value = tb_null;
 }
 static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
 {
@@ -277,8 +277,8 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
 
     // done 
     tb_char_t const* p = value;
-    tb_char_t const* b = tb_object_null;
-    tb_char_t const* v = tb_object_null;
+    tb_char_t const* b = tb_null;
+    tb_char_t const* v = tb_null;
     tb_char_t data[4096] = {0};
     while (1)
     {
@@ -377,8 +377,8 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
             // next key-value pair
             if (*p) 
             {
-                b = tb_object_null;
-                v = tb_object_null;
+                b = tb_null;
+                v = tb_null;
                 p++;
             }
             // end
@@ -504,13 +504,13 @@ static tb_void_t tb_cookies_instance_exit(tb_handle_t handle, tb_cpointer_t priv
  */
 tb_handle_t tb_cookies()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_COOKIES, tb_cookies_instance_init, tb_cookies_instance_exit, tb_object_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_COOKIES, tb_cookies_instance_init, tb_cookies_instance_exit, tb_null);
 }
 tb_handle_t tb_cookies_init()
 {
     // done
     tb_bool_t       ok = tb_false;
-    tb_cookies_t*   cookies = tb_object_null;
+    tb_cookies_t*   cookies = tb_null;
     do
     {
         // make cookies
@@ -532,7 +532,7 @@ tb_handle_t tb_cookies_init()
         tb_assert_and_check_break(cookies->cookie_pool);
 
         // init string func
-        cookies->string_func = tb_item_func_str(tb_true, tb_object_null);
+        cookies->string_func = tb_item_func_str(tb_true, tb_null);
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
@@ -549,7 +549,7 @@ tb_handle_t tb_cookies_init()
     {
         // exit cookies
         if (cookies) tb_cookies_exit(cookies);
-        cookies = tb_object_null;
+        cookies = tb_null;
     }
 
     // ok?
@@ -566,11 +566,11 @@ tb_void_t tb_cookies_exit(tb_handle_t handle)
 
     // exit cookie pool
     if (cookies->cookie_pool) tb_hash_exit(cookies->cookie_pool);
-    cookies->cookie_pool = tb_object_null;
+    cookies->cookie_pool = tb_null;
     
     // exit string pool
     if (cookies->string_pool) tb_object_string_pool_exit(cookies->string_pool);
-    cookies->string_pool = tb_object_null;
+    cookies->string_pool = tb_null;
 
     // leave
     tb_spinlock_leave(&cookies->lock);
@@ -676,13 +676,13 @@ tb_bool_t tb_cookies_set_from_url(tb_handle_t handle, tb_char_t const* url, tb_c
     }
 
     // try to set it without domain and path
-    return tb_cookies_set(cookies, tb_object_null, tb_object_null, tb_false, value);
+    return tb_cookies_set(cookies, tb_null, tb_null, tb_false, value);
 }
 tb_char_t const* tb_cookies_get(tb_handle_t handle, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_string_t* value)
 {
     // check
     tb_cookies_t* cookies = (tb_cookies_t*)handle;
-    tb_assert_and_check_return_val(cookies && domain && value, tb_object_null);
+    tb_assert_and_check_return_val(cookies && domain && value, tb_null);
 
     // clear value first
     tb_string_clear(value);
@@ -734,13 +734,13 @@ tb_char_t const* tb_cookies_get_from_url(tb_handle_t handle, tb_char_t const* ur
 {
     // check
     tb_cookies_t* cookies = (tb_cookies_t*)handle;
-    tb_assert_and_check_return_val(cookies && value, tb_object_null);
+    tb_assert_and_check_return_val(cookies && value, tb_null);
     
     // get domain and path from the given url
     tb_bool_t secure = tb_false;
     tb_char_t path[TB_URL_PATH_MAXN] = {0};
     tb_char_t domain[TB_URL_HOST_MAXN] = {0};
-    if (!tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure)) return tb_object_null;
+    if (!tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure)) return tb_null;
 
     // trace
     tb_trace_d("domain: %s, path: %s, secure: %s", domain, path, secure? "ok" : "no");

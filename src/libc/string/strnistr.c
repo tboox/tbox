@@ -33,7 +33,7 @@
 tb_char_t* tb_strnistr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2)
 {
     // check
-    tb_assert_and_check_return_val(s1 && s2 && n1, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2 && n1, tb_null);
 
     // init
     __tb_register__ tb_char_t const* s = s1;
@@ -53,7 +53,7 @@ tb_char_t* tb_strnistr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2)
         else 
         {
             p = s2;
-            if (!*s || !n) return tb_object_null;
+            if (!*s || !n) return tb_null;
             s = ++s1;
             n = --n1;
         }
@@ -61,6 +61,6 @@ tb_char_t* tb_strnistr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2)
     } while (1);
 
     // no found
-    return tb_object_null;
+    return tb_null;
 }
 

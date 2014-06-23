@@ -222,22 +222,22 @@ tb_uint64_t tb_sbtou64(tb_char_t const* s, tb_int_t base)
     // the convect functions
     static tb_uint64_t (*s_conv[])(tb_char_t const*) =
     {
-        tb_object_null
-    ,   tb_object_null
+        tb_null
+    ,   tb_null
     ,   tb_s2tou64
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
     ,   tb_s8tou64
-    ,   tb_object_null
+    ,   tb_null
     ,   tb_s10tou64
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
     ,   tb_s16tou64
     };
     tb_assert_and_check_return_val(base < tb_object_arrayn(s_conv) && s_conv[base], 0);
@@ -668,22 +668,22 @@ tb_double_t tb_sbtod(tb_char_t const* s, tb_int_t base)
     // the convect functions
     static tb_double_t (*s_conv[])(tb_char_t const*) =
     {
-        tb_object_null
-    ,   tb_object_null
+        tb_null
+    ,   tb_null
     ,   tb_s2tod
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
     ,   tb_s8tod
-    ,   tb_object_null
+    ,   tb_null
     ,   tb_s10tod
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
-    ,   tb_object_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
+    ,   tb_null
     ,   tb_s16tod
     };
     tb_assert_and_check_return_val(base < tb_object_arrayn(s_conv) && s_conv[base], 0);

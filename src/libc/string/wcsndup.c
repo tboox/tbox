@@ -35,7 +35,7 @@
 tb_wchar_t* tb_wcsndup(tb_wchar_t const* s, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     // done
     n = tb_wcsnlen(s, n);

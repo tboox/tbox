@@ -104,7 +104,7 @@ fail:
 }
 tb_char_t const* tb_ipv4_get(tb_ipv4_t const* ipv4, tb_char_t* data, tb_size_t maxn)
 {
-    tb_assert_and_check_return_val(ipv4 && data && maxn > 15, tb_object_null);
+    tb_assert_and_check_return_val(ipv4 && data && maxn > 15, tb_null);
 
     // format
     tb_size_t size = tb_snprintf(data, maxn, "%u.%u.%u.%u", ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);

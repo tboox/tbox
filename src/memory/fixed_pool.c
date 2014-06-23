@@ -142,11 +142,11 @@ static tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
 tb_handle_t tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 {
     // check
-    tb_assert_and_check_return_val(step, tb_object_null);
+    tb_assert_and_check_return_val(step, tb_null);
 
     // init pool
     tb_fixed_pool_t* pool = (tb_fixed_pool_t*)tb_malloc0(sizeof(tb_fixed_pool_t));
-    tb_assert_and_check_return_val(pool, tb_object_null);
+    tb_assert_and_check_return_val(pool, tb_null);
 
     // using the default grow
     if (!grow) grow = TB_FIXED_POOL_GROW_DEFAULT;
@@ -184,7 +184,7 @@ tb_handle_t tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 
 fail:
     if (pool) tb_fixed_pool_exit(pool);
-    return tb_object_null;
+    return tb_null;
 }
 
 tb_void_t tb_fixed_pool_exit(tb_handle_t handle)
@@ -259,7 +259,7 @@ tb_pointer_t tb_fixed_pool_malloc(tb_handle_t handle)
 {
     // check 
     tb_fixed_pool_t* pool = (tb_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->pools, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->pools, tb_null);
 
     // aloc++
 #ifdef __tb_debug__
@@ -270,7 +270,7 @@ tb_pointer_t tb_fixed_pool_malloc(tb_handle_t handle)
     if (pool->pred)
     {
         // check
-        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_object_null);
+        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
 
         // the predicted pool
         tb_handle_t fpool = pool->pools[pool->pred - 1].pool;
@@ -327,7 +327,7 @@ tb_pointer_t tb_fixed_pool_malloc(tb_handle_t handle)
         // grow
         pool->poolm += TB_FIXED_POOL_CHUNK_GROW;
         pool->pools = (tb_fixed_pool_chunk_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_fixed_pool_chunk_t));
-        tb_assert_and_check_return_val(pool->pools, tb_object_null);
+        tb_assert_and_check_return_val(pool->pools, tb_null);
     }
     
     // append a new pool for allocation
@@ -372,14 +372,14 @@ tb_pointer_t tb_fixed_pool_malloc(tb_handle_t handle)
     tb_memset(chunk, 0, sizeof(tb_fixed_pool_chunk_t));
 
     // fail
-    return tb_object_null;
+    return tb_null;
 }
 
 tb_pointer_t tb_fixed_pool_malloc0(tb_handle_t handle)
 {
     // check 
     tb_fixed_pool_t* pool = (tb_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->pools, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->pools, tb_null);
 
     // malloc
     tb_pointer_t p = tb_fixed_pool_malloc(handle);
@@ -455,7 +455,7 @@ tb_pointer_t tb_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data)
 {
     // check 
     tb_fixed_pool_t* pool = (tb_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && data, tb_object_null);
+    tb_assert_and_check_return_val(pool && data, tb_null);
 
     // init
     tb_size_t       n = pool->step;

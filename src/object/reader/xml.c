@@ -51,7 +51,7 @@
 static tb_object_t* tb_object_xml_reader_func_null(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // ok
     return (tb_object_t*)tb_object_null_init();
@@ -59,14 +59,14 @@ static tb_object_t* tb_object_xml_reader_func_null(tb_object_xml_reader_t* reade
 static tb_object_t* tb_object_xml_reader_func_date(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
         return tb_object_date_init_from_time(0);
 
     // walk
-    tb_object_t* date = tb_object_null;
+    tb_object_t* date = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -154,15 +154,15 @@ end:
 static tb_object_t* tb_object_xml_reader_func_data(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-        return tb_object_data_init_from_data(tb_object_null, 0);
+        return tb_object_data_init_from_data(tb_null, 0);
 
     // walk
-    tb_char_t*      base64  = tb_object_null;
-    tb_object_t*    data    = tb_object_null;
+    tb_char_t*      base64  = tb_null;
+    tb_object_t*    data    = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -177,7 +177,7 @@ static tb_object_t* tb_object_xml_reader_func_data(tb_object_xml_reader_t* reade
                 if (!tb_stricmp(name, "data"))
                 {
                     // empty?
-                    if (!data) data = tb_object_data_init_from_data(tb_object_null, 0);
+                    if (!data) data = tb_object_data_init_from_data(tb_null, 0);
                     goto end;
                 }
             }
@@ -210,7 +210,7 @@ static tb_object_t* tb_object_xml_reader_func_data(tb_object_xml_reader_t* reade
                     // init data
                     data = tb_object_data_init_from_data(ob, on); tb_free(ob);
                 }
-                else data = tb_object_data_init_from_data(tb_object_null, 0);
+                else data = tb_object_data_init_from_data(tb_null, 0);
                 tb_assert_and_check_goto(data, end);
             }
             break;
@@ -230,7 +230,7 @@ end:
 static tb_object_t* tb_object_xml_reader_func_array(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
@@ -238,7 +238,7 @@ static tb_object_t* tb_object_xml_reader_func_array(tb_object_xml_reader_t* read
 
     // init array
     tb_object_t* array = tb_object_array_init(TB_OBJECT_XML_READER_ARRAY_GROW, tb_false);
-    tb_assert_and_check_return_val(array, tb_object_null);
+    tb_assert_and_check_return_val(array, tb_null);
 
     // walk
     tb_bool_t ok = tb_false;
@@ -289,7 +289,7 @@ end:
     if (!ok)
     {
         if (array) tb_object_exit(array);
-        array = tb_object_null;
+        array = tb_null;
     }
 
     // ok?
@@ -298,14 +298,14 @@ end:
 static tb_object_t* tb_object_xml_reader_func_string(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-        return tb_object_string_init_from_cstr(tb_object_null);
+        return tb_object_string_init_from_cstr(tb_null);
 
     // walk
-    tb_object_t* string = tb_object_null;
+    tb_object_t* string = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -320,7 +320,7 @@ static tb_object_t* tb_object_xml_reader_func_string(tb_object_xml_reader_t* rea
                 if (!tb_stricmp(name, "string"))
                 {
                     // empty?
-                    if (!string) string = tb_object_string_init_from_cstr(tb_object_null);
+                    if (!string) string = tb_object_string_init_from_cstr(tb_null);
                     goto end;
                 }
             }
@@ -350,14 +350,14 @@ end:
 static tb_object_t* tb_object_xml_reader_func_number(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
         return tb_object_number_init_from_uint32(0);
 
     // walk
-    tb_object_t* number = tb_object_null;
+    tb_object_t* number = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -413,18 +413,18 @@ end:
 static tb_object_t* tb_object_xml_reader_func_boolean(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // name
     tb_char_t const* name = tb_xml_reader_element(reader->reader);
-    tb_assert_and_check_return_val(name, tb_object_null);
+    tb_assert_and_check_return_val(name, tb_null);
     tb_trace_d("boolean: %s", name);
 
     // the boolean value
     tb_bool_t val = tb_false;
     if (!tb_stricmp(name, "true")) val = tb_true;
     else if (!tb_stricmp(name, "false")) val = tb_false;
-    else return tb_object_null;
+    else return tb_null;
 
     // ok?
     return (tb_object_t*)tb_object_boolean_init(val);
@@ -432,7 +432,7 @@ static tb_object_t* tb_object_xml_reader_func_boolean(tb_object_xml_reader_t* re
 static tb_object_t* tb_object_xml_reader_func_dictionary(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->reader && event, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
@@ -441,11 +441,11 @@ static tb_object_t* tb_object_xml_reader_func_dictionary(tb_object_xml_reader_t*
     // init key name
     tb_static_string_t  kname;
     tb_char_t       kdata[8192];
-    if (!tb_static_string_init(&kname, kdata, 8192)) return tb_object_null;
+    if (!tb_static_string_init(&kname, kdata, 8192)) return tb_null;
 
     // init dictionary
     tb_object_t* dictionary = tb_object_dictionary_init(0, tb_false);
-    tb_assert_and_check_return_val(dictionary, tb_object_null);
+    tb_assert_and_check_return_val(dictionary, tb_null);
 
     // walk
     tb_bool_t   ok = tb_false;
@@ -522,7 +522,7 @@ end:
     if (!ok) 
     {
         tb_object_exit(dictionary);
-        dictionary = tb_object_null;
+        dictionary = tb_null;
     }
 
     // exit key name
@@ -536,10 +536,10 @@ static tb_object_t* tb_object_xml_reader_done(tb_basic_stream_t* stream)
     // init reader 
     tb_object_xml_reader_t reader = {0};
     reader.reader = tb_xml_reader_init(stream);
-    tb_assert_and_check_return_val(reader.reader, tb_object_null);
+    tb_assert_and_check_return_val(reader.reader, tb_null);
 
     // init object
-    tb_object_t* object = tb_object_null;
+    tb_object_t* object = tb_null;
 
     // walk
     tb_size_t event = TB_XML_READER_EVENT_NONE;
@@ -581,7 +581,7 @@ static tb_size_t tb_object_xml_reader_probe(tb_basic_stream_t* stream)
     tb_assert_and_check_return_val(stream, 0);
 
     // need it
-    tb_byte_t* p = tb_object_null;
+    tb_byte_t* p = tb_null;
     if (!tb_basic_stream_need(stream, &p, 5)) return 0;
     tb_assert_and_check_return_val(p, 0);
 
@@ -602,8 +602,8 @@ tb_object_reader_t* tb_object_xml_reader()
     s_reader.probe  = tb_object_xml_reader_probe;
 
     // init hooker
-    s_reader.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false, tb_object_null), tb_item_func_ptr(tb_object_null, tb_object_null));
-    tb_assert_and_check_return_val(s_reader.hooker, tb_object_null);
+    s_reader.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false, tb_null), tb_item_func_ptr(tb_null, tb_null));
+    tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
     tb_hash_set(s_reader.hooker, "null", tb_object_xml_reader_func_null);
@@ -637,11 +637,11 @@ tb_bool_t tb_object_xml_reader_hook(tb_char_t const* type, tb_object_xml_reader_
 tb_object_xml_reader_func_t tb_object_xml_reader_func(tb_char_t const* type)
 {
     // check
-    tb_assert_and_check_return_val(type, tb_object_null);
+    tb_assert_and_check_return_val(type, tb_null);
 
     // the reader
     tb_object_reader_t* reader = tb_object_reader_get(TB_OBJECT_FORMAT_XML);
-    tb_assert_and_check_return_val(reader && reader->hooker, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
     return (tb_object_xml_reader_func_t)tb_hash_get(reader->hooker, type);

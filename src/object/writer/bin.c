@@ -335,7 +335,7 @@ static tb_long_t tb_object_bin_writer_done(tb_basic_stream_t* stream, tb_object_
     tb_assert_and_check_return_val(func, -1);
 
     // the begin offset
-    tb_hize_t bof = tb_stream_offset(stream);
+    tb_hize_t bof = tb_basic_stream_offset(stream);
 
     // writ bin header
     if (!tb_basic_stream_bwrit(stream, (tb_byte_t const*)"tbo00", 5)) return -1;
@@ -346,8 +346,8 @@ static tb_long_t tb_object_bin_writer_done(tb_basic_stream_t* stream, tb_object_
     {
         // init writer
         writer.stream           = stream;
-        writer.ohash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_ptr(tb_object_null, tb_object_null), tb_item_func_uint32());
-        writer.shash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_true, tb_object_null), tb_item_func_uint32());
+        writer.ohash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
+        writer.shash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_true, tb_null), tb_item_func_uint32());
         tb_assert_and_check_break(writer.shash && writer.ohash);
 
         // writ
@@ -366,7 +366,7 @@ static tb_long_t tb_object_bin_writer_done(tb_basic_stream_t* stream, tb_object_
     if (writer.data) tb_free(writer.data);
 
     // the end offset
-    tb_hize_t eof = tb_stream_offset(stream);
+    tb_hize_t eof = tb_basic_stream_offset(stream);
 
     // ok?
     return eof >= bof? (tb_long_t)(eof - bof) : -1;
@@ -384,8 +384,8 @@ tb_object_writer_t* tb_object_bin_writer()
     s_writer.writ = tb_object_bin_writer_done;
  
     // init hooker
-    s_writer.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_object_null, tb_object_null));
-    tb_assert_and_check_return_val(s_writer.hooker, tb_object_null);
+    s_writer.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
     // hook writer 
     tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_object_bin_writer_func_null);
@@ -419,7 +419,7 @@ tb_object_bin_writer_func_t tb_object_bin_writer_func(tb_size_t type)
 {
     // the writer
     tb_object_writer_t* writer = tb_object_writer_get(TB_OBJECT_FORMAT_BIN);
-    tb_assert_and_check_return_val(writer && writer->hooker, tb_object_null);
+    tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
     // the func
     return (tb_object_bin_writer_func_t)tb_hash_get(writer->hooker, (tb_pointer_t)type);

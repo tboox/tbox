@@ -32,6 +32,6 @@
  */
 tb_char_t* tb_strirchr(tb_char_t const* s, tb_char_t c)
 {
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
     return tb_strnirchr(s, tb_strlen(s), c);
 }

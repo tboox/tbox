@@ -39,8 +39,8 @@
 #if 0//def TB_ASSEMBLER_IS_GAS
 static tb_char_t* tb_strncpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-    return tb_object_null;
+    return tb_null;
 }
 #endif

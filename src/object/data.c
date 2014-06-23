@@ -55,7 +55,7 @@ typedef struct __tb_object_data_t
 static __tb_inline__ tb_object_data_t* tb_object_data_cast(tb_object_t* object)
 {
     // check
-    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DATA, tb_object_null);
+    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DATA, tb_null);
 
     // cast
     return (tb_object_data_t*)object;
@@ -82,7 +82,7 @@ static tb_object_data_t* tb_object_data_init_base()
 {
     // make
     tb_object_data_t* data = (tb_object_data_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_data_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA);
-    tb_assert_and_check_return_val(data, tb_object_null);
+    tb_assert_and_check_return_val(data, tb_null);
 
     // init base
     data->base.copy = tb_object_data_copy;
@@ -99,18 +99,18 @@ static tb_object_data_t* tb_object_data_init_base()
 tb_object_t* tb_object_data_init_from_url(tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // init stream
     tb_basic_stream_t* stream = tb_basic_stream_init_from_url(url);
-    tb_assert_and_check_return_val(stream, tb_object_null);
+    tb_assert_and_check_return_val(stream, tb_null);
 
     // make stream
-    tb_object_t* object = tb_object_null;
+    tb_object_t* object = tb_null;
     if (tb_basic_stream_open(stream))
     {
         // size
-        tb_hong_t size = tb_stream_size(stream);
+        tb_hong_t size = tb_basic_stream_size(stream);
         if (size > 0 && size < TB_MAXS32)
         {
             tb_byte_t* data = (tb_byte_t*)tb_malloc0((tb_size_t)size);
@@ -121,7 +121,7 @@ tb_object_t* tb_object_data_init_from_url(tb_char_t const* url)
                 tb_free(data);
             }
         }
-        else object = tb_object_data_init_from_data(tb_object_null, 0);
+        else object = tb_object_data_init_from_data(tb_null, 0);
 
         // check, TODO: read stream if no size
         tb_assert(size >= 0 && size < TB_MAXS32);
@@ -137,13 +137,13 @@ tb_object_t* tb_object_data_init_from_data(tb_pointer_t addr, tb_size_t size)
 {
     // make
     tb_object_data_t* data = tb_object_data_init_base();
-    tb_assert_and_check_return_val(data, tb_object_null);
+    tb_assert_and_check_return_val(data, tb_null);
 
     // init buff
     if (!tb_buffer_init(&data->buff))
     {
         tb_object_data_exit((tb_object_t*)data);
-        return tb_object_null;
+        return tb_null;
     }
 
     // copy data
@@ -156,13 +156,13 @@ tb_object_t* tb_object_data_init_from_pbuf(tb_buffer_t* pbuf)
 {   
     // make
     tb_object_data_t* data = tb_object_data_init_base();
-    tb_assert_and_check_return_val(data, tb_object_null);
+    tb_assert_and_check_return_val(data, tb_null);
 
     // init buff
     if (!tb_buffer_init(&data->buff))
     {
         tb_object_data_exit((tb_object_t*)data);
-        return tb_object_null;
+        return tb_null;
     }
 
     // copy data
@@ -175,7 +175,7 @@ tb_pointer_t tb_object_data_getp(tb_object_t* object)
 {
     // check
     tb_object_data_t* data = tb_object_data_cast(object);
-    tb_assert_and_check_return_val(data, tb_object_null);
+    tb_assert_and_check_return_val(data, tb_null);
 
     // data
     return tb_buffer_data(&data->buff);
@@ -205,7 +205,7 @@ tb_buffer_t* tb_object_data_buff(tb_object_t* object)
 {
     // check
     tb_object_data_t* data = tb_object_data_cast(object);
-    tb_assert_and_check_return_val(data, tb_object_null);
+    tb_assert_and_check_return_val(data, tb_null);
 
     // buff
     return &data->buff;
@@ -221,8 +221,8 @@ tb_bool_t tb_object_data_writ_to_url(tb_object_t* object, tb_char_t const* url)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // ctrl
-    if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE)
-        tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+    if (tb_basic_stream_type(stream) == TB_STREAM_TYPE_FILE)
+        tb_basic_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
     
     // open stream
     tb_bool_t ok = tb_false;

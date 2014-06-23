@@ -92,7 +92,7 @@ static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size, -1);
 
     // the handle 
-    tb_handle_t handle = aice->aico? aice->aico->handle : tb_object_null;
+    tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
     tb_assert_and_check_return_val(handle, -1);
 
     // read it from the given offset
@@ -122,7 +122,7 @@ static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size, -1);
 
     // the handle 
-    tb_handle_t handle = aice->aico? aice->aico->handle : tb_object_null;
+    tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
     tb_assert_and_check_return_val(handle, -1);
 
     // writ it from the given offset
@@ -152,7 +152,7 @@ static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     tb_assert_and_check_return_val(aice->u.readv.list && aice->u.readv.size, -1);
 
     // the handle 
-    tb_handle_t handle = aice->aico? aice->aico->handle : tb_object_null;
+    tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
     tb_assert_and_check_return_val(handle, -1);
 
     // read it from the given offset
@@ -182,7 +182,7 @@ static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     tb_assert_and_check_return_val(aice->u.writv.list && aice->u.writv.size, -1);
 
     // the handle 
-    tb_handle_t handle = aice->aico? aice->aico->handle : tb_object_null;
+    tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
     tb_assert_and_check_return_val(handle, -1);
 
     // read it from the given offset
@@ -211,7 +211,7 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_FSYNC, -1);
 
     // the handle 
-    tb_handle_t handle = aice->aico? aice->aico->handle : tb_object_null;
+    tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
     tb_assert_and_check_return_val(handle, -1);
 
     // done sync

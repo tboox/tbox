@@ -54,14 +54,14 @@ typedef struct __tb_semaphore_t
 tb_handle_t tb_semaphore_init(tb_size_t init)
 {
     // check
-    tb_assert_and_check_return_val(init <= TB_SEMAPHORE_VALUE_MAXN, tb_object_null);
+    tb_assert_and_check_return_val(init <= TB_SEMAPHORE_VALUE_MAXN, tb_null);
 
     // make semaphore
     tb_semaphore_t* semaphore = (tb_semaphore_t*)tb_malloc0(sizeof(tb_semaphore_t));
-    tb_assert_and_check_return_val(semaphore, tb_object_null);
+    tb_assert_and_check_return_val(semaphore, tb_null);
 
     // init semaphore 
-    semaphore->handle = CreateSemaphoreA(tb_object_null, (DWORD)init, TB_SEMAPHORE_VALUE_MAXN, tb_object_null);
+    semaphore->handle = CreateSemaphoreA(tb_null, (DWORD)init, TB_SEMAPHORE_VALUE_MAXN, tb_null);
     tb_assert_and_check_goto(semaphore->handle && semaphore->handle != INVALID_HANDLE_VALUE, fail);
 
     // init value
@@ -72,7 +72,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 
 fail:
     if (semaphore) tb_semaphore_exit(semaphore);
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_semaphore_exit(tb_handle_t handle)
 {

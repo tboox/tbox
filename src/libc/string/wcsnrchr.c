@@ -33,7 +33,7 @@
 
 tb_wchar_t* tb_wcsnrchr(tb_wchar_t const* s, tb_size_t n, tb_wchar_t c)
 {
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
     
     tb_wchar_t const* p = s + n - 1;
     while (p >= s && *p)
@@ -41,5 +41,5 @@ tb_wchar_t* tb_wcsnrchr(tb_wchar_t const* s, tb_size_t n, tb_wchar_t c)
         if (*p == c) return (tb_wchar_t*)p;
         p--;
     }
-    return tb_object_null;
+    return tb_null;
 }

@@ -320,7 +320,7 @@ tb_bool_t tb_dns_server_init()
         // init list
         if (!g_list.list) 
         {
-            g_list.list = tb_vector_init(8, tb_item_func_mem(sizeof(tb_dns_server_t), tb_object_null, tb_object_null));
+            g_list.list = tb_vector_init(8, tb_item_func_mem(sizeof(tb_dns_server_t), tb_null, tb_null));
             g_list.sort = tb_false;
         }
         tb_assert_and_check_break(g_list.list);
@@ -346,7 +346,7 @@ tb_void_t tb_dns_server_exit()
 
     // exit list
     if (g_list.list) tb_vector_exit(g_list.list);
-    g_list.list = tb_object_null;
+    g_list.list = tb_null;
 
     // exit sort
     g_list.sort = tb_false;
@@ -393,7 +393,7 @@ tb_void_t tb_dns_server_sort()
     tb_spinlock_enter(&g_lock);
 
     // done
-    tb_vector_t* list = tb_object_null;
+    tb_vector_t* list = tb_null;
     do
     {
         // check
@@ -403,7 +403,7 @@ tb_void_t tb_dns_server_sort()
         tb_check_break(!g_list.sort);
 
         // init func
-        tb_item_func_t func = tb_item_func_mem(sizeof(tb_dns_server_t), tb_object_null, tb_object_null);
+        tb_item_func_t func = tb_item_func_mem(sizeof(tb_dns_server_t), tb_null, tb_null);
         func.comp = tb_dns_server_comp;
 
         // init list
@@ -427,10 +427,10 @@ tb_void_t tb_dns_server_sort()
     tb_check_return(list);
 
     // rate list and remove no-rate servers
-    tb_vector_walk(list, tb_dns_server_rate, tb_object_null);
+    tb_vector_walk(list, tb_dns_server_rate, tb_null);
 
     // sort list
-    tb_sort_all(list, tb_object_null);
+    tb_sort_all(list, tb_null);
     
     // enter
     tb_spinlock_enter(&g_lock);

@@ -102,7 +102,7 @@ static BIO_METHOD g_ssl_bio_method =
 ,   tb_ssl_bio_method_ctrl
 ,   tb_ssl_bio_method_init
 ,   tb_ssl_bio_method_exit
-,   tb_object_null
+,   tb_null
 };
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -121,7 +121,7 @@ static tb_void_t tb_ssl_library_exit(tb_handle_t handle, tb_cpointer_t priv)
 }
 static tb_handle_t tb_ssl_library_load()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_OPENSSL, tb_ssl_library_init, tb_ssl_library_exit, tb_object_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_OPENSSL, tb_ssl_library_init, tb_ssl_library_exit, tb_null);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ static tb_int_t tb_ssl_bio_method_init(BIO* bio)
     // init 
     bio->init       = 1;
     bio->num        = 0;
-    bio->ptr        = tb_object_null;
+    bio->ptr        = tb_null;
     bio->flags      = 0;
     bio->shutdown   = 1;
 
@@ -214,7 +214,7 @@ static tb_int_t tb_ssl_bio_method_exit(BIO* bio)
     // exit 
     bio->init       = 0;
     bio->num        = 0;
-    bio->ptr        = tb_object_null;
+    bio->ptr        = tb_null;
     bio->flags      = 0;
 
     // ok
@@ -361,7 +361,7 @@ static tb_int_t tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size)
 tb_handle_t tb_ssl_init(tb_bool_t bserver)
 {
     // done
-    tb_ssl_t* ssl = tb_object_null;
+    tb_ssl_t* ssl = tb_null;
     tb_bool_t ok = tb_false;
     do
     {
@@ -410,7 +410,7 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
     if (!ok)
     {
         if (ssl) tb_ssl_exit((tb_handle_t)ssl);
-        ssl = tb_object_null;
+        ssl = tb_null;
     }
 
     // ok?
@@ -427,11 +427,11 @@ tb_void_t tb_ssl_exit(tb_handle_t handle)
 
     // exit ssl
     if (ssl->ssl) SSL_free(ssl->ssl);
-    ssl->ssl = tb_object_null;
+    ssl->ssl = tb_null;
 
     // exit ctx
     if (ssl->ctx) SSL_CTX_free(ssl->ctx);
-    ssl->ctx = tb_object_null;
+    ssl->ctx = tb_null;
 
     // exit it
     tb_free(ssl);

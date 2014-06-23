@@ -74,7 +74,6 @@ tbox_C_FILES 			+= \
 						network/cookies \
 						asio/aioo \
 						asio/aiop \
-						stream/stream \
 						stream/static_stream \
 						stream/basic_stream \
 						stream/basic_stream/http \

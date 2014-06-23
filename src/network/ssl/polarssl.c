@@ -171,7 +171,7 @@ static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, size_
 tb_handle_t tb_ssl_init(tb_bool_t bserver)
 {
     // done
-    tb_ssl_t* ssl = tb_object_null;
+    tb_ssl_t* ssl = tb_null;
     tb_bool_t ok = tb_false;
     do
     {
@@ -190,7 +190,7 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
 
         // init ssl ctr_drbg context
         tb_long_t r = 0;
-        if ((r = ctr_drbg_init(&ssl->ctr_drbg, entropy_func, &ssl->entropy, tb_object_null, 0)))
+        if ((r = ctr_drbg_init(&ssl->ctr_drbg, entropy_func, &ssl->entropy, tb_null, 0)))
         {
             tb_tracef_d("init ctr_drbg failed: %ld", r);
             break;
@@ -218,14 +218,14 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
         ssl_set_authmode(&ssl->ssl, SSL_VERIFY_OPTIONAL);
 
         // init ssl ca chain
-        ssl_set_ca_chain(&ssl->ssl, &ssl->x509_crt, tb_object_null, tb_object_null);
+        ssl_set_ca_chain(&ssl->ssl, &ssl->x509_crt, tb_null, tb_null);
 
         // init ssl random generator
         ssl_set_rng(&ssl->ssl, ctr_drbg_random, &ssl->ctr_drbg);
 
         // enable ssl debug?
 #if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-        ssl_set_dbg(&ssl->ssl, tb_ssl_trace_info, tb_object_null);
+        ssl_set_dbg(&ssl->ssl, tb_ssl_trace_info, tb_null);
 #endif
 
         // init state
@@ -240,7 +240,7 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
     if (!ok)
     {
         if (ssl) tb_ssl_exit((tb_handle_t)ssl);
-        ssl = tb_object_null;
+        ssl = tb_null;
     }
 
     // ok?

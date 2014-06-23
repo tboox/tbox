@@ -84,15 +84,15 @@ tb_bool_t tb_static_stream_sync(tb_static_stream_t* stream)
 tb_byte_t const* tb_static_stream_beg(tb_static_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_object_null);
+    tb_assert_and_check_return_val(stream, tb_null);
 
     // the head
-    return stream->e? (stream->e - stream->n) : tb_object_null;
+    return stream->e? (stream->e - stream->n) : tb_null;
 }
 tb_byte_t const* tb_static_stream_pos(tb_static_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream && stream->p <= stream->e, tb_object_null);
+    tb_assert_and_check_return_val(stream && stream->p <= stream->e, tb_null);
 
     // sync
     tb_static_stream_sync(stream);
@@ -103,7 +103,7 @@ tb_byte_t const* tb_static_stream_pos(tb_static_stream_t* stream)
 tb_byte_t const* tb_static_stream_end(tb_static_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_object_null);
+    tb_assert_and_check_return_val(stream, tb_null);
 
     // the end
     return stream->e;
@@ -275,10 +275,10 @@ tb_sint32_t tb_static_stream_read_sbits32(tb_static_stream_t* stream, tb_size_t 
 tb_char_t const* tb_static_stream_read_cstr(tb_static_stream_t* stream)
 {
     // check
-    tb_assert_and_check_return_val(stream && stream->p <= stream->e, tb_object_null);
+    tb_assert_and_check_return_val(stream && stream->p <= stream->e, tb_null);
 
     // sync it first
-    if (!tb_static_stream_sync(stream)) return tb_object_null;
+    if (!tb_static_stream_sync(stream)) return tb_null;
 
     // the string data
     tb_char_t const* data = (tb_char_t const*)stream->p;
@@ -287,7 +287,7 @@ tb_char_t const* tb_static_stream_read_cstr(tb_static_stream_t* stream)
     tb_size_t size = tb_strnlen(data, stream->e - stream->p);
 
     // skip bytes
-    if (!tb_static_stream_skip(stream, size + 1)) return tb_object_null;
+    if (!tb_static_stream_skip(stream, size + 1)) return tb_null;
 
     // ok
     return data;
@@ -584,10 +584,10 @@ tb_size_t tb_static_stream_writ_data(tb_static_stream_t* stream, tb_byte_t const
 tb_char_t* tb_static_stream_writ_cstr(tb_static_stream_t* stream, tb_char_t const* cstr)
 {
     // check
-    tb_assert_and_check_return_val(stream && stream->p && stream->p <= stream->e && cstr, tb_object_null);
+    tb_assert_and_check_return_val(stream && stream->p && stream->p <= stream->e && cstr, tb_null);
 
     // sync it first
-    if (!tb_static_stream_sync(stream)) return tb_object_null;
+    if (!tb_static_stream_sync(stream)) return tb_null;
 
     // writ string
     tb_char_t*          b = (tb_char_t*)stream->p;
@@ -597,7 +597,7 @@ tb_char_t* tb_static_stream_writ_cstr(tb_static_stream_t* stream, tb_char_t cons
     *p++ = '\0';
 
     // check
-    tb_assert_and_check_return_val(!*cstr, tb_object_null);
+    tb_assert_and_check_return_val(!*cstr, tb_null);
 
     // update position
     stream->p = (tb_byte_t*)p;

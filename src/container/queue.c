@@ -146,7 +146,7 @@ static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t it
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && itor < impl->maxn, tb_object_null);
+    tb_assert_and_check_return_val(impl && itor < impl->maxn, tb_null);
 
     // item
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
@@ -176,11 +176,11 @@ static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t l
 tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 {
     // check
-    tb_assert_and_check_return_val(func.size && func.dupl && func.data, tb_object_null);
+    tb_assert_and_check_return_val(func.size && func.dupl && func.data, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_queue_impl_t*    impl = tb_object_null;
+    tb_queue_impl_t*    impl = tb_null;
     do
     {
         // make impl
@@ -197,7 +197,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 
         // init iterator
         impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-        impl->itor.priv = tb_object_null;
+        impl->itor.priv = tb_null;
         impl->itor.step = func.size;
         impl->itor.size = tb_queue_iterator_size;
         impl->itor.head = tb_queue_iterator_head;
@@ -221,7 +221,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
     if (!ok)
     {
         if (impl) tb_queue_exit((tb_queue_t*)impl);
-        impl = tb_object_null;
+        impl = tb_null;
     }
 
     // ok?

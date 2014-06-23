@@ -36,11 +36,11 @@
 tb_pointer_t tb_aico_pool_malloc_(tb_aico_t* aico, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_assert_and_check_return_val(aico, tb_object_null);
+    tb_assert_and_check_return_val(aico, tb_null);
 
     // init pool
     if (!aico->pool) aico->pool = tb_pool_init(TB_POOL_GROW_MICRO, 0);
-    tb_assert_and_check_return_val(aico->pool, tb_object_null);
+    tb_assert_and_check_return_val(aico->pool, tb_null);
 
     // malloc
     return tb_pool_malloc_(aico->pool, size __tb_debug_args__);
@@ -48,11 +48,11 @@ tb_pointer_t tb_aico_pool_malloc_(tb_aico_t* aico, tb_size_t size __tb_debug_dec
 tb_pointer_t tb_aico_pool_malloc0_(tb_aico_t* aico, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_assert_and_check_return_val(aico, tb_object_null);
+    tb_assert_and_check_return_val(aico, tb_null);
 
     // init pool
     if (!aico->pool) aico->pool = tb_pool_init(TB_POOL_GROW_MICRO, 0);
-    tb_assert_and_check_return_val(aico->pool, tb_object_null);
+    tb_assert_and_check_return_val(aico->pool, tb_null);
 
     // malloc0
     return tb_pool_malloc0_(aico->pool, size __tb_debug_args__);
@@ -60,11 +60,11 @@ tb_pointer_t tb_aico_pool_malloc0_(tb_aico_t* aico, tb_size_t size __tb_debug_de
 tb_pointer_t tb_aico_pool_nalloc_(tb_aico_t* aico, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_assert_and_check_return_val(aico, tb_object_null);
+    tb_assert_and_check_return_val(aico, tb_null);
 
     // init pool
     if (!aico->pool) aico->pool = tb_pool_init(TB_POOL_GROW_MICRO, 0);
-    tb_assert_and_check_return_val(aico->pool, tb_object_null);
+    tb_assert_and_check_return_val(aico->pool, tb_null);
 
     // nalloc
     return tb_pool_nalloc_(aico->pool, item, size __tb_debug_args__);
@@ -72,11 +72,11 @@ tb_pointer_t tb_aico_pool_nalloc_(tb_aico_t* aico, tb_size_t item, tb_size_t siz
 tb_pointer_t tb_aico_pool_nalloc0_(tb_aico_t* aico, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_assert_and_check_return_val(aico, tb_object_null);
+    tb_assert_and_check_return_val(aico, tb_null);
 
     // init pool
     if (!aico->pool) aico->pool = tb_pool_init(TB_POOL_GROW_MICRO, 0);
-    tb_assert_and_check_return_val(aico->pool, tb_object_null);
+    tb_assert_and_check_return_val(aico->pool, tb_null);
 
     // nalloc0
     return tb_pool_nalloc0_(aico->pool, item, size __tb_debug_args__);
@@ -84,11 +84,11 @@ tb_pointer_t tb_aico_pool_nalloc0_(tb_aico_t* aico, tb_size_t item, tb_size_t si
 tb_pointer_t tb_aico_pool_ralloc_(tb_aico_t* aico, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_assert_and_check_return_val(aico, tb_object_null);
+    tb_assert_and_check_return_val(aico, tb_null);
 
     // init pool
     if (!aico->pool) aico->pool = tb_pool_init(TB_POOL_GROW_MICRO, 0);
-    tb_assert_and_check_return_val(aico->pool, tb_object_null);
+    tb_assert_and_check_return_val(aico->pool, tb_null);
 
     // ralloc
     return tb_pool_ralloc_(aico->pool, data, size __tb_debug_args__);

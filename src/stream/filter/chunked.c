@@ -60,7 +60,7 @@ typedef struct __tb_stream_filter_chunked_t
 static __tb_inline__ tb_stream_filter_chunked_t* tb_stream_filter_chunked_cast(tb_stream_filter_t* filter)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHUNKED, tb_object_null);
+    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHUNKED, tb_null);
     return (tb_stream_filter_chunked_t*)filter;
 }
 /* chunked_data
@@ -238,7 +238,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
 {
     // done
     tb_bool_t                   ok = tb_false;
-    tb_stream_filter_chunked_t* filter = tb_object_null;
+    tb_stream_filter_chunked_t* filter = tb_null;
     do
     {
         // noimpl for encoding chunked
@@ -271,7 +271,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_chunked(tb_bool_t dechunked)
     {
         // exit filter
         tb_stream_filter_exit((tb_stream_filter_t*)filter);
-        filter = tb_object_null;
+        filter = tb_null;
     }
 
     // ok?

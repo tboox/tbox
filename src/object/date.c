@@ -55,7 +55,7 @@ typedef struct __tb_object_date_t
 static __tb_inline__ tb_object_date_t* tb_object_date_cast(tb_object_t* object)
 {
     // check
-    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DATE, tb_object_null);
+    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DATE, tb_null);
 
     // cast
     return (tb_object_date_t*)object;
@@ -77,7 +77,7 @@ static tb_object_date_t* tb_object_date_init_base()
 {
     // make
     tb_object_date_t* date = (tb_object_date_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_date_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE);
-    tb_assert_and_check_return_val(date, tb_object_null);
+    tb_assert_and_check_return_val(date, tb_null);
 
     // init base
     date->base.copy = tb_object_date_copy;
@@ -95,7 +95,7 @@ tb_object_t* tb_object_date_init_from_now()
 {
     // make
     tb_object_date_t* date = tb_object_date_init_base();
-    tb_assert_and_check_return_val(date, tb_object_null);
+    tb_assert_and_check_return_val(date, tb_null);
 
     // init time
     date->time = tb_time();
@@ -107,7 +107,7 @@ tb_object_t* tb_object_date_init_from_time(tb_time_t time)
 {
     // make
     tb_object_date_t* date = tb_object_date_init_base();
-    tb_assert_and_check_return_val(date, tb_object_null);
+    tb_assert_and_check_return_val(date, tb_null);
 
     // init time
     if (time > 0) date->time = time;

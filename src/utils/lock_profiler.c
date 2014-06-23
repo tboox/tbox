@@ -93,7 +93,7 @@ static tb_void_t tb_lock_profiler_instance_exit(tb_handle_t handle, tb_cpointer_
  */
 tb_handle_t tb_lock_profiler()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_LOCK_PROFILER, tb_lock_profiler_instance_init, tb_lock_profiler_instance_exit, tb_object_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_LOCK_PROFILER, tb_lock_profiler_instance_init, tb_lock_profiler_instance_exit, tb_null);
 }
 tb_handle_t tb_lock_profiler_init()
 {
@@ -121,7 +121,7 @@ tb_void_t tb_lock_profiler_dump(tb_handle_t handle)
         tb_lock_profiler_item_t* item = &profiler->list[i];
 
         // the lock
-        tb_pointer_t lock = tb_object_null;
+        tb_pointer_t lock = tb_null;
         if ((lock = (tb_pointer_t)tb_atomic_get(&item->lock)))
         {
             // dump header

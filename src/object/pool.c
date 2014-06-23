@@ -85,12 +85,12 @@ static tb_void_t tb_object_pool_instance_exit(tb_handle_t handle, tb_cpointer_t 
  */
 tb_handle_t tb_object_pool()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_OBJECT_POOL, tb_object_pool_instance_init, tb_object_pool_instance_exit, tb_object_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_OBJECT_POOL, tb_object_pool_instance_init, tb_object_pool_instance_exit, tb_null);
 }
 tb_handle_t tb_object_pool_init()
 {
     // done
-    tb_object_pool_t*   pool = tb_object_null;
+    tb_object_pool_t*   pool = tb_null;
     tb_bool_t           ok = tb_false;
     do
     {
@@ -120,7 +120,7 @@ tb_handle_t tb_object_pool_init()
     {
         // exit it
         if (pool) tb_object_pool_exit(pool);
-        pool = tb_object_null;
+        pool = tb_null;
     }
 
     // ok?
@@ -137,7 +137,7 @@ tb_void_t tb_object_pool_exit(tb_handle_t handle)
 
     // exit pool
     if (pool->pool) tb_pool_exit(pool->pool);
-    pool->pool = tb_object_null;
+    pool->pool = tb_null;
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -184,13 +184,13 @@ tb_object_t* tb_object_pool_get_(tb_handle_t handle, tb_size_t size, tb_size_t f
 {
     // check
     tb_object_pool_t* pool = (tb_object_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && size && type, tb_object_null);
+    tb_assert_and_check_return_val(pool && size && type, tb_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // make object
-    tb_object_t* object = pool->pool? (tb_object_t*)tb_pool_malloc0_(pool->pool, size __tb_debug_args__) : tb_object_null;
+    tb_object_t* object = pool->pool? (tb_object_t*)tb_pool_malloc0_(pool->pool, size __tb_debug_args__) : tb_null;
 
     // init object
     if (object) 
@@ -198,7 +198,7 @@ tb_object_t* tb_object_pool_get_(tb_handle_t handle, tb_size_t size, tb_size_t f
         if (!tb_object_init(object, flag, type)) 
         {
             tb_pool_free_(pool->pool, object __tb_debug_args__);
-            object = tb_object_null;
+            object = tb_null;
         }
     }
 

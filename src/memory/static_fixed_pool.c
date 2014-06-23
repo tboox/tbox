@@ -115,14 +115,14 @@ typedef struct __tb_static_fixed_pool_t
 static tb_pointer_t tb_static_fixed_pool_malloc_pred(tb_static_fixed_pool_t* pool)
 {
     // init data
-    tb_pointer_t data = tb_object_null;
+    tb_pointer_t data = tb_null;
 
     // has pred?
     if (pool->pred)
     {
         // init index
         tb_size_t i = (pool->pred - pool->data) / pool->step;
-        tb_assert_and_check_return_val(!((pool->pred - pool->data) % pool->step), tb_object_null);
+        tb_assert_and_check_return_val(!((pool->pred - pool->data) % pool->step), tb_null);
 
         // is free?
         if (!tb_static_fixed_pool_used_bset(pool->used, i)) 
@@ -157,10 +157,10 @@ static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* poo
 #endif
     tb_size_t*  p = (tb_size_t*)pool->used;
     tb_size_t*  e = (tb_size_t*)pool->used + m;
-    tb_byte_t*  d = tb_object_null;
+    tb_byte_t*  d = tb_null;
 
     // check align
-    tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), tb_object_null);
+    tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), tb_null);
 
     // find the free chunk, step * 32|64 items
 #if 0
@@ -182,12 +182,12 @@ static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* poo
     }
     while (p < e && !(*p + 1)) p++; 
 #endif
-    tb_check_return_val(p < e, tb_object_null);
+    tb_check_return_val(p < e, tb_null);
 
     // find the free bit index
     m = pool->maxn;
     i = (((tb_byte_t*)p - pool->used) << 3) + tb_bits_fb0_le(*p);
-    tb_check_return_val(i < m, tb_object_null);
+    tb_check_return_val(i < m, tb_null);
 
     // alloc it
     d = pool->data + i * pool->step;
@@ -208,7 +208,7 @@ static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* poo
     tb_byte_t*  p = pool->used;
     tb_byte_t   u = *p;
     tb_byte_t   b = 0;
-    tb_byte_t*  d = tb_object_null;
+    tb_byte_t*  d = tb_null;
     for (i = 0; i < m; ++i)
     {
         // bit
@@ -257,19 +257,19 @@ static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* poo
 tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align)
 {
     // check
-    tb_assert_and_check_return_val(data && step && size, tb_object_null);
+    tb_assert_and_check_return_val(data && step && size, tb_null);
 
     // align
     align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
     align = tb_max(align, TB_CPU_BITBYTE);
-    tb_assert_and_check_return_val(align <= TB_STATIC_FIXED_POOL_ALIGN_MAXN, tb_object_null);
+    tb_assert_and_check_return_val(align <= TB_STATIC_FIXED_POOL_ALIGN_MAXN, tb_null);
 
     // align data
     tb_size_t byte = (tb_size_t)((tb_hize_t)tb_align((tb_hize_t)(tb_size_t)data, align) - (tb_hize_t)(tb_size_t)data);
-    tb_assert_and_check_return_val(size >= byte, tb_object_null);
+    tb_assert_and_check_return_val(size >= byte, tb_null);
     size -= byte;
     data += byte;
-    tb_assert_and_check_return_val(size, tb_object_null);
+    tb_assert_and_check_return_val(size, tb_null);
 
     // init data
     tb_memset(data, 0, size);
@@ -288,7 +288,7 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
 
     // init used
     pool->used = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)&pool[1], (tb_hize_t)pool->align);
-    tb_assert_and_check_return_val(data + size > pool->used, tb_object_null);
+    tb_assert_and_check_return_val(data + size > pool->used, tb_null);
 
     /* init maxn
      *
@@ -301,12 +301,12 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
      * maxn < (left * 8 - 7) / (1 + step * 8)
      */
     pool->maxn = (((data + size - pool->used) << 3) - 7) / (1 + (pool->step << 3));
-    tb_assert_and_check_return_val(pool->maxn, tb_object_null);
+    tb_assert_and_check_return_val(pool->maxn, tb_null);
 
     // init data
     pool->data = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)pool->used + (tb_align8(pool->maxn) >> 3), (tb_hize_t)pool->align);
-    tb_assert_and_check_return_val(data + size > pool->data, tb_object_null);
-    tb_assert_and_check_return_val(pool->maxn * pool->step <= (tb_size_t)(data + size - pool->data), tb_object_null);
+    tb_assert_and_check_return_val(data + size > pool->data, tb_null);
+    tb_assert_and_check_return_val(pool->maxn * pool->step <= (tb_size_t)(data + size - pool->data), tb_null);
 
     // init size
     pool->size = 0;
@@ -377,14 +377,14 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_handle_t handle)
 {
     // check 
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_object_null);
-    tb_assert_and_check_return_val(pool->step, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_null);
+    tb_assert_and_check_return_val(pool->step, tb_null);
 
     // no space?
-    tb_check_return_val(pool->size < pool->maxn, tb_object_null);
+    tb_check_return_val(pool->size < pool->maxn, tb_null);
 
     // predict it?
-//  tb_pointer_t data = tb_object_null;
+//  tb_pointer_t data = tb_null;
     tb_pointer_t data = tb_static_fixed_pool_malloc_pred(pool);
 
     // find the free block
@@ -407,7 +407,7 @@ tb_pointer_t tb_static_fixed_pool_malloc0(tb_handle_t handle)
 {
     // check 
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_null);
 
     // malloc
     tb_pointer_t p = tb_static_fixed_pool_malloc(handle);
@@ -422,7 +422,7 @@ tb_pointer_t tb_static_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data)
 {
     // check 
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && data, tb_object_null);
+    tb_assert_and_check_return_val(pool && data, tb_null);
 
     // init
     tb_size_t       n = pool->step;

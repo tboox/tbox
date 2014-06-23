@@ -101,7 +101,7 @@ static __tb_inline__ tb_bool_t tb_option_is_float(tb_char_t const* data)
 static __tb_inline__ tb_option_item_t const* tb_option_item_find(tb_option_item_t const* opts, tb_char_t const* lname, tb_char_t sname)
 {
     // check
-    tb_assert_and_check_return_val(opts, tb_object_null);
+    tb_assert_and_check_return_val(opts, tb_null);
 
     // walk
     tb_bool_t                   ok = tb_false;
@@ -137,13 +137,13 @@ static __tb_inline__ tb_option_item_t const* tb_option_item_find(tb_option_item_
         case TB_OPTION_MODE_MORE:
         case TB_OPTION_MODE_END:
         default:
-            item = tb_object_null;
+            item = tb_null;
             break;
         }
     }
 
     // ok?
-    return ok? item : tb_object_null;
+    return ok? item : tb_null;
 }
 #if 0
 static __tb_inline__ tb_bool_t tb_option_check(tb_option_t* option)
@@ -171,7 +171,7 @@ static __tb_inline__ tb_bool_t tb_option_check(tb_option_t* option)
         case TB_OPTION_MODE_MORE:
         case TB_OPTION_MODE_END:
         default:
-            item = tb_object_null;
+            item = tb_null;
             break;
         }
     }
@@ -187,11 +187,11 @@ static __tb_inline__ tb_bool_t tb_option_check(tb_option_t* option)
 tb_handle_t tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_option_item_t const* opts)
 {
     // check
-    tb_assert_and_check_return_val(name && opts, tb_object_null);
+    tb_assert_and_check_return_val(name && opts, tb_null);
 
     // make option
     tb_option_t* option = (tb_option_t*)tb_malloc0(sizeof(tb_option_t));
-    tb_assert_and_check_return_val(option, tb_object_null);
+    tb_assert_and_check_return_val(option, tb_null);
 
     // init option
     option->opts = opts;
@@ -210,7 +210,7 @@ tb_handle_t tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_opti
 
 fail:
     if (option) tb_option_exit(option);
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_option_exit(tb_handle_t handle)
 {
@@ -222,7 +222,7 @@ tb_void_t tb_option_exit(tb_handle_t handle)
 
         // exit list
         if (option->list) tb_object_exit(option->list);
-        option->list = tb_object_null;
+        option->list = tb_null;
 
         // exit option
         tb_free(option);
@@ -247,7 +247,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
     tb_size_t               i = 0;
     tb_size_t               more = 0;
     tb_option_item_t const* item = option->opts;
-    tb_option_item_t const* last = tb_object_null;
+    tb_option_item_t const* last = tb_null;
     for (i = 0; i < argc; i++)
     {
         // the argument
@@ -267,7 +267,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
             }
 
             // the val
-            tb_char_t* val = (*p == '=')? (p + 1) : tb_object_null;
+            tb_char_t* val = (*p == '=')? (p + 1) : tb_null;
 
             // trace
             tb_trace_d("[lname]: %s => %s", key, val);
@@ -280,7 +280,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
                 if (!val == !(find->mode == TB_OPTION_MODE_KEY_VAL))
                 {
                     // has value?
-                    tb_object_t* object = tb_object_null;
+                    tb_object_t* object = tb_null;
                     if (val)
                     {
                         // init the value object
@@ -368,7 +368,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
             }
 
             // the val
-            tb_char_t const* val = (*p == '=')? (p + 1) : tb_object_null;
+            tb_char_t const* val = (*p == '=')? (p + 1) : tb_null;
 
             // trace
             tb_trace_d("[sname]: %s => %s", key, val);
@@ -384,14 +384,14 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
             }
 
             // find the item
-            tb_option_item_t const* find = tb_option_item_find(option->opts, tb_object_null, key[0]);
+            tb_option_item_t const* find = tb_option_item_find(option->opts, tb_null, key[0]);
             if (find)
             {
                 // check key & val
                 if (!val == !(find->mode == TB_OPTION_MODE_KEY_VAL))
                 {
                     // has value?
-                    tb_object_t* object = tb_object_null;
+                    tb_object_t* object = tb_null;
                     if (val)
                     {
                         // add value
@@ -604,7 +604,7 @@ tb_void_t tb_option_help(tb_handle_t handle)
             tb_printf(" ...");
         case TB_OPTION_MODE_END:
         default:
-            item = tb_object_null;
+            item = tb_null;
             break;
         }
     }
@@ -724,7 +724,7 @@ tb_void_t tb_option_help(tb_handle_t handle)
         case TB_OPTION_MODE_MORE:
         case TB_OPTION_MODE_END:
         default:
-            item = tb_object_null;
+            item = tb_null;
             break;
         }
     }
@@ -803,7 +803,7 @@ tb_void_t tb_option_help(tb_handle_t handle)
             tb_printf("  ...\n");
         case TB_OPTION_MODE_END:
         default:
-            item = tb_object_null;
+            item = tb_null;
             break;
         }
     }
@@ -815,15 +815,15 @@ tb_char_t const* tb_option_item_cstr(tb_handle_t handle, tb_char_t const* name)
 {
     // check
     tb_option_t* option = (tb_option_t*)handle;
-    tb_assert_and_check_return_val(option && option->list && name, tb_object_null);
+    tb_assert_and_check_return_val(option && option->list && name, tb_null);
 
     // the option item
     tb_object_t* item = tb_object_dictionary_val(option->list, name);
-    tb_check_return_val(item, tb_object_null);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_STRING, tb_object_null);
+    tb_check_return_val(item, tb_null);
+    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_STRING, tb_null);
 
     // the option item value
-    return tb_object_string_size(item)? tb_object_string_cstr(item) : tb_object_null;
+    return tb_object_string_size(item)? tb_object_string_cstr(item) : tb_null;
 }
 tb_bool_t tb_option_item_bool(tb_handle_t handle, tb_char_t const* name)
 {

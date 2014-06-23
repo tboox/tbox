@@ -109,7 +109,7 @@ typedef struct __tb_aicp_http_t
     tb_async_stream_t*              zstream;
 
     // the cookies
-    tb_string_t              cookies;
+    tb_string_t                     cookies;
 
     // the transfer for post
     tb_handle_t                     transfer;
@@ -127,13 +127,13 @@ typedef struct __tb_aicp_http_t
     tb_atomic_t                     state;
 
     // the line data
-    tb_string_t              line_data;
+    tb_string_t                     line_data;
 
     // the line size
     tb_size_t                       line_size;
 
     // the cache data
-    tb_buffer_t              cache_data;
+    tb_buffer_t                     cache_data;
 
     // the cache read
     tb_size_t                       cache_read;
@@ -220,7 +220,7 @@ static tb_void_t tb_aicp_http_option_exit(tb_aicp_http_t* http)
 {
     // exit head
     if (http->option.head) tb_hash_exit(http->option.head);
-    http->option.head = tb_object_null;
+    http->option.head = tb_null;
 
     // exit url
     tb_url_exit(&http->option.url);
@@ -327,7 +327,7 @@ static tb_void_t tb_aicp_http_status_dump(tb_aicp_http_t* http)
 static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t post_size, tb_size_t* head_size, tb_size_t* state)
 {
     // check
-    tb_assert_and_check_return_val(http && head_size, tb_object_null);
+    tb_assert_and_check_return_val(http && head_size, tb_null);
 
     // clear line data
     tb_string_clear(&http->line_data);
@@ -335,23 +335,23 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
     // init the head value
     tb_char_t       data[64];
     tb_static_string_t  value;
-    if (!tb_static_string_init(&value, data, 64)) return tb_object_null;
+    if (!tb_static_string_init(&value, data, 64)) return tb_null;
 
     // init method
-    tb_assert_and_check_return_val(http->option.method < tb_object_arrayn(g_http_methods), tb_object_null);
+    tb_assert_and_check_return_val(http->option.method < tb_object_arrayn(g_http_methods), tb_null);
     tb_char_t const* method = g_http_methods[http->option.method];
-    tb_assert_and_check_return_val(method, tb_object_null);
+    tb_assert_and_check_return_val(method, tb_null);
 
     // init path
     tb_char_t const* path = tb_url_path_get(&http->option.url);
-    tb_assert_and_check_return_val(path, tb_object_null);
+    tb_assert_and_check_return_val(path, tb_null);
 
     // init args
     tb_char_t const* args = tb_url_args_get(&http->option.url);
 
     // init host
     tb_char_t const* host = tb_url_host_get(&http->option.url);
-    tb_assert_and_check_return_val(host, tb_object_null);
+    tb_assert_and_check_return_val(host, tb_null);
     tb_hash_set(http->option.head, "Host", host);
 
     // init accept
@@ -367,11 +367,11 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
     if (http->option.cookies && !tb_hash_get(http->option.head, "Cookie"))
     {
         // the host
-        tb_char_t const* host = tb_object_null;
+        tb_char_t const* host = tb_null;
         tb_aicp_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
 
         // the path
-        tb_char_t const* path = tb_object_null;
+        tb_char_t const* path = tb_null;
         tb_aicp_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
 
         // is ssl?
@@ -394,7 +394,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
     {
         // save state
         if (state) *state = TB_STATE_HTTP_RANGE_INVALID;
-        return tb_object_null;
+        return tb_null;
     }
 
     if (tb_static_string_size(&value)) 
@@ -409,7 +409,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
     }
 
     // check head
-    tb_assert_and_check_return_val(tb_hash_size(http->option.head), tb_object_null);
+    tb_assert_and_check_return_val(tb_hash_size(http->option.head), tb_null);
 
     // append method
     tb_string_cstrcat(&http->line_data, method);
@@ -480,7 +480,7 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
     if (state != TB_STATE_OK) 
     {
         // done func
-        ok = open_read->func(http, state, tb_object_null, 0, open_read->size, open_read->priv);
+        ok = open_read->func(http, state, tb_null, 0, open_read->size, open_read->priv);
     }
  
     // ok?
@@ -663,17 +663,17 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
             http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
 
             // ctrl stream for sock
-            if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+            if (!tb_async_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
         }
         // parse cookies
         else if (http->option.cookies && !tb_strnicmp(line, "Set-Cookie", 10))
         {
             // the host
-            tb_char_t const* host = tb_object_null;
+            tb_char_t const* host = tb_null;
             tb_aicp_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
 
             // the path
-            tb_char_t const* path = tb_object_null;
+            tb_char_t const* path = tb_null;
             tb_aicp_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
 
             // is ssl?
@@ -689,7 +689,7 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
     return tb_true;
 }
 static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, tb_aicp_http_open_func_t func, tb_cpointer_t priv);
-static tb_bool_t tb_aicp_http_head_redt_func(tb_handle_t astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -754,7 +754,7 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_handle_t astream, tb_size_t stat
     // break
     return tb_false;
 }
-static tb_bool_t tb_aicp_http_head_read_func(tb_handle_t astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -869,7 +869,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_handle_t astream, tb_size_t stat
                     if (!tb_async_stream_read(http->stream, 0, tb_aicp_http_head_redt_func, http)) break;
                 }
                 // no left data, redirect it directly
-                else tb_aicp_http_head_redt_func(http->stream, TB_STATE_OK, tb_object_null, 0, 0, http);
+                else tb_aicp_http_head_redt_func(http->stream, TB_STATE_OK, tb_null, 0, 0, http);
                 return tb_false;
             }
 
@@ -879,7 +879,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_handle_t astream, tb_size_t stat
                 // init cstream
                 if (http->cstream)
                 {
-                    if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
+                    if (!tb_async_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
                 }
                 else http->cstream = tb_async_stream_init_filter_from_chunked(http->stream, tb_true);
                 tb_assert_and_check_break(http->cstream);
@@ -888,8 +888,8 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_handle_t astream, tb_size_t stat
                 if (p < e)
                 {
                     // the filter
-                    tb_stream_filter_t* filter = tb_object_null;
-                    if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+                    tb_stream_filter_t* filter = tb_null;
+                    if (!tb_async_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 
                     // push data
@@ -914,14 +914,14 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_handle_t astream, tb_size_t stat
                 // init zstream
                 if (http->zstream)
                 {
-                    if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
+                    if (!tb_async_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
                 }
                 else http->zstream = tb_async_stream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
                 tb_assert_and_check_break(http->zstream);
 
                 // the filter
-                tb_stream_filter_t* filter = tb_object_null;
-                if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+                tb_stream_filter_t* filter = tb_null;
+                if (!tb_async_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                 tb_assert_and_check_break(filter);
 
                 // ctrl filter
@@ -1042,7 +1042,7 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
     // ok?
     return bpost;
 }
-static tb_bool_t tb_aicp_http_head_writ_func(tb_handle_t astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1167,7 +1167,7 @@ static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, 
     // ok?
     return ok;
 }
-static tb_bool_t tb_aicp_http_sock_open_func(tb_handle_t astream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1198,7 +1198,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_handle_t astream, tb_size_t stat
         {
             // the head data and size
             tb_size_t           head_size = 0;
-            tb_char_t const*    head_data = tb_aicp_http_head_format(http, 0, &head_size, tb_object_null);
+            tb_char_t const*    head_data = tb_aicp_http_head_format(http, 0, &head_size, tb_null);
             tb_check_break(head_data && head_size);
             
             // trace
@@ -1251,7 +1251,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_handle_t astream, tb_size_t stat
     // ok?
     return ok;
 }
-static tb_bool_t tb_aicp_http_read_func(tb_handle_t astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_http_read_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1263,7 +1263,7 @@ static tb_bool_t tb_aicp_http_read_func(tb_handle_t astream, tb_size_t state, tb
     // done func
     return http->func.read(http, state, data, real, size, http->priv);
 }
-static tb_bool_t tb_aicp_http_task_func(tb_handle_t astream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_http_task_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1286,7 +1286,7 @@ static tb_void_t tb_aicp_http_clos_clear(tb_aicp_http_t* http)
     // closed
     tb_atomic_set(&http->state, TB_STATE_CLOSED);
 }
-static tb_void_t tb_aicp_http_clos_func(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_aicp_http_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1332,7 +1332,7 @@ static tb_void_t tb_aicp_http_clos_opening_func(tb_handle_t handle, tb_size_t st
     http->status.state = http->clos_opening.state;
     http->clos_opening.func(http, http->status.state, &http->status, http->clos_opening.priv);
 }
-static tb_void_t tb_aicp_http_open_clos(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_aicp_http_open_clos(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
@@ -1360,17 +1360,17 @@ static tb_void_t tb_aicp_http_open_clos(tb_handle_t stream, tb_size_t state, tb_
 
         // the host is changed?
         tb_bool_t           host_changed = tb_true;
-        tb_char_t const*    host_old = tb_object_null;
+        tb_char_t const*    host_old = tb_null;
         tb_char_t const*    host_new = tb_url_host_get(&http->option.url);
-        tb_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
+        tb_async_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
         if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
 
         // trace
         tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
 
         // ctrl stream
-        if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
-        if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
+        if (!tb_async_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
+        if (!tb_async_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
         // dump option
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
@@ -1437,7 +1437,7 @@ static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, t
 
         tb_trace_d("tb_aicp_http_open_func b");
         // close it
-        ok = tb_aicp_http_clos(http, tb_aicp_http_clos_opening_func, tb_object_null);
+        ok = tb_aicp_http_clos(http, tb_aicp_http_clos_opening_func, tb_null);
 
         tb_trace_d("tb_aicp_http_open_func e: %d", ok);
     }
@@ -1452,11 +1452,11 @@ static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, t
 tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
 {
     // check
-    tb_assert_and_check_return_val(aicp, tb_object_null);
+    tb_assert_and_check_return_val(aicp, tb_null);
 
     // done
     tb_bool_t       ok = tb_false;
-    tb_aicp_http_t* http = tb_object_null;
+    tb_aicp_http_t* http = tb_null;
     do
     {
         // make http
@@ -1499,7 +1499,7 @@ tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
     if (!ok)
     {
         if (http) tb_aicp_http_exit(http);
-        http = tb_object_null;
+        http = tb_null;
     }
 
     // ok?
@@ -1522,7 +1522,7 @@ tb_void_t tb_aicp_http_kill(tb_handle_t handle)
     if (http->transfer) tb_async_transfer_kill(http->transfer);
 
     // kill stream
-    if (http->stream) tb_stream_kill(http->stream);
+    if (http->stream) tb_async_stream_kill(http->stream);
 }
 tb_bool_t tb_aicp_http_exit(tb_handle_t handle)
 {
@@ -1555,22 +1555,22 @@ tb_bool_t tb_aicp_http_exit(tb_handle_t handle)
 
     // exit transfer
     if (http->transfer) tb_async_transfer_exit(http->transfer);
-    http->transfer = tb_object_null;
+    http->transfer = tb_null;
 
     // exit zstream
     if (http->zstream) tb_async_stream_exit(http->zstream);
-    http->zstream = tb_object_null;
+    http->zstream = tb_null;
 
     // exit cstream
     if (http->cstream) tb_async_stream_exit(http->cstream);
-    http->cstream = tb_object_null;
+    http->cstream = tb_null;
 
     // exit sstream
     if (http->sstream) tb_async_stream_exit(http->sstream);
-    http->sstream = tb_object_null;
+    http->sstream = tb_null;
 
     // exit stream
-    http->stream = tb_object_null;
+    http->stream = tb_null;
 
     // exit status
     tb_aicp_http_status_exit(http);
@@ -1589,7 +1589,7 @@ tb_bool_t tb_aicp_http_exit(tb_handle_t handle)
 
     // exit pool
     if (http->pool) tb_pool_exit(http->pool);
-    http->pool = tb_object_null;
+    http->pool = tb_null;
 
     // free it
     tb_free(http);
@@ -1827,7 +1827,7 @@ tb_aicp_t* tb_aicp_http_aicp(tb_handle_t handle)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
-    tb_assert_and_check_return_val(http && http->stream, tb_object_null);
+    tb_assert_and_check_return_val(http && http->stream, tb_null);
 
     // the aicp 
     return tb_async_stream_aicp(http->stream);
@@ -1848,7 +1848,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_URL:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -1876,7 +1876,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_HOST:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // host
             tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -1905,7 +1905,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_PORT:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // port
             tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -1930,7 +1930,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_PATH:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // path
             tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -1959,7 +1959,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_METHOD:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // method
             tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -1983,7 +1983,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_HEAD:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // check
             tb_assert_and_check_return_val(http->option.head, tb_false);
@@ -2026,7 +2026,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_HEAD_FUNC:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // head_func
             tb_http_head_func_t head_func = (tb_http_head_func_t)tb_va_arg(args, tb_http_head_func_t);
@@ -2050,7 +2050,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_HEAD_PRIV:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // head priv
             tb_pointer_t head_priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
@@ -2074,7 +2074,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_RANGE:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // set range
             http->option.range.bof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
@@ -2101,7 +2101,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_SSL:
         {       
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // bssl
             tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
@@ -2125,7 +2125,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_TIMEOUT:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // the timeout
             tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
@@ -2149,7 +2149,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_COOKIES:
         {   
             // is opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // set cookies
             http->option.cookies = (tb_handle_t)tb_va_arg(args, tb_handle_t);
@@ -2170,14 +2170,14 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_POST_URL:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(url, tb_false);
 
             // clear post data and size
-            http->option.post_data = tb_object_null;
+            http->option.post_data = tb_null;
             http->option.post_size = 0;
             
             // set url
@@ -2202,7 +2202,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_POST_DATA:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // post data
             tb_byte_t const*    data = (tb_byte_t const*)tb_va_arg(args, tb_byte_t const*);
@@ -2235,7 +2235,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_POST_FUNC:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // func
             tb_http_post_func_t func = (tb_http_post_func_t)tb_va_arg(args, tb_http_post_func_t);
@@ -2259,7 +2259,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_POST_PRIV:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // post priv
             tb_cpointer_t priv = (tb_cpointer_t)tb_va_arg(args, tb_cpointer_t);
@@ -2283,7 +2283,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_POST_LRATE:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // post lrate
             tb_size_t lrate = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -2307,7 +2307,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_AUTO_UNZIP:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // bunzip
             tb_bool_t bunzip = (tb_bool_t)tb_va_arg(args, tb_bool_t);
@@ -2331,7 +2331,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_REDIRECT:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // redirect
             tb_size_t redirect = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -2355,7 +2355,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
     case TB_HTTP_OPTION_SET_VERSION:
         {
             // check opened?
-            tb_assert_and_check_return_val(tb_stream_is_closed(http->sstream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(http->sstream), tb_false);
 
             // version
             tb_size_t version = (tb_size_t)tb_va_arg(args, tb_size_t);

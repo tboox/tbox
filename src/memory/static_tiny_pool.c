@@ -209,7 +209,7 @@ static __tb_inline__ tb_size_t tb_tiny_pool_find_free(tb_size_t body, tb_size_t 
 static tb_pointer_t tb_tiny_pool_malloc_pred(tb_tiny_pool_t* pool, tb_size_t size, tb_size_t bits, tb_size_t bitn)
 {   
     // no pred?
-    tb_check_return_val(pool->pred[bitn - 1], tb_object_null);
+    tb_check_return_val(pool->pred[bitn - 1], tb_null);
 
     // init
     tb_size_t   maxn = pool->maxn;
@@ -219,7 +219,7 @@ static tb_pointer_t tb_tiny_pool_malloc_pred(tb_tiny_pool_t* pool, tb_size_t siz
         
     // find 
     tb_size_t   blki = tb_tiny_pool_find_free(*body, bits, bitn);
-    tb_check_return_val(blki < TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_object_null);
+    tb_check_return_val(blki < TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
 
     // alloc it
     tb_byte_t*  data = pool->data + (pred * TB_STATIC_TINY_POOL_BLOCK_MAXN + blki) * pool->step;
@@ -249,7 +249,7 @@ static tb_pointer_t tb_tiny_pool_malloc_find(tb_tiny_pool_t* pool, tb_size_t siz
     tb_size_t*  body = pool->body;
     tb_size_t*  last = pool->last;
     tb_size_t   maxn = pool->maxn;
-    tb_byte_t*  data = tb_object_null;
+    tb_byte_t*  data = tb_null;
 
     // find the free bit index for the enough space in the little-endian sort
     tb_size_t   blki = TB_STATIC_TINY_POOL_BLOCK_MAXN;
@@ -321,7 +321,7 @@ static tb_pointer_t tb_tiny_pool_malloc_find(tb_tiny_pool_t* pool, tb_size_t siz
     }
 
     // no space?
-    tb_check_return_val(body < tail && blki < TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_object_null);
+    tb_check_return_val(body < tail && blki < TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
 
     // alloc it
     data = pool->data + ((body - pool->body) * TB_STATIC_TINY_POOL_BLOCK_MAXN + blki) * pool->step;
@@ -346,13 +346,13 @@ tb_pointer_t tb_tiny_pool_ralloc_fast(tb_tiny_pool_t* pool, tb_pointer_t data, t
 tb_pointer_t tb_tiny_pool_ralloc_fast(tb_tiny_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {
     // check
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_TINY_POOL_MAGIC, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_TINY_POOL_MAGIC, tb_null);
 
     // check data
-    tb_check_return_val(data, tb_object_null);
-    tb_check_return_val((tb_byte_t*)data >= pool->data && (tb_byte_t*)data < pool->data + pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_object_null);
-    tb_check_return_val(!(((tb_size_t)data) & (pool->align - 1)), tb_object_null);
-    tb_check_return_val(!(((tb_byte_t*)data - pool->data) % pool->step), tb_object_null);
+    tb_check_return_val(data, tb_null);
+    tb_check_return_val((tb_byte_t*)data >= pool->data && (tb_byte_t*)data < pool->data + pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
+    tb_check_return_val(!(((tb_size_t)data) & (pool->align - 1)), tb_null);
+    tb_check_return_val(!(((tb_byte_t*)data - pool->data) % pool->step), tb_null);
 
     // the block bit index
     tb_size_t   blki = ((tb_byte_t*)data - pool->data) / pool->step;
@@ -364,13 +364,13 @@ tb_pointer_t tb_tiny_pool_ralloc_fast(tb_tiny_pool_t* pool, tb_pointer_t data, t
 
     // the block bit number
     tb_size_t   bitn = tb_bits_fb1_le(*last >> blki) + 1;   
-    tb_assert_and_check_return_val(bitn <= TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_object_null);
+    tb_assert_and_check_return_val(bitn <= TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
 
     // osize
     if (osize) *osize = bitn * pool->step;
 
     // ok?
-    return (tb_align(size, pool->step) <= bitn * pool->step)? data : tb_object_null;
+    return (tb_align(size, pool->step) <= bitn * pool->step)? data : tb_null;
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -378,20 +378,20 @@ tb_pointer_t tb_tiny_pool_ralloc_fast(tb_tiny_pool_t* pool, tb_pointer_t data, t
 tb_handle_t tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
     // check
-    tb_assert_and_check_return_val(data && size, tb_object_null);
+    tb_assert_and_check_return_val(data && size, tb_null);
     tb_assert_static(TB_STATIC_TINY_POOL_BLOCK_MAXN == sizeof(tb_size_t) << 3);
 
     // align
     align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
     align = tb_max(align, TB_CPU_BITBYTE);
-    tb_assert_and_check_return_val(align <= TB_STATIC_TINY_POOL_ALIGN_MAXN, tb_object_null);
+    tb_assert_and_check_return_val(align <= TB_STATIC_TINY_POOL_ALIGN_MAXN, tb_null);
 
     // align data
     tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
-    tb_assert_and_check_return_val(size >= byte, tb_object_null);
+    tb_assert_and_check_return_val(size >= byte, tb_null);
     size -= byte;
     data += byte;
-    tb_assert_and_check_return_val(size, tb_object_null);
+    tb_assert_and_check_return_val(size, tb_null);
 
     // init data
     tb_memset(data, 0, size);
@@ -413,8 +413,8 @@ tb_handle_t tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 
     // init body
     pool->body = (tb_size_t*)tb_align((tb_size_t)&pool[1], pool->align);
-    tb_assert_and_check_return_val(data + size > (tb_byte_t*)pool->body, tb_object_null);
-    tb_assert_and_check_return_val(!(((tb_size_t)pool->body) & (TB_CPU_BITBYTE - 1)), tb_object_null);
+    tb_assert_and_check_return_val(data + size > (tb_byte_t*)pool->body, tb_null);
+    tb_assert_and_check_return_val(!(((tb_size_t)pool->body) & (TB_CPU_BITBYTE - 1)), tb_null);
 
     /*!init maxn
      *
@@ -426,17 +426,17 @@ tb_handle_t tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
      * </pre>
      */
     pool->maxn = (data + size - (tb_byte_t*)pool->body) / ((1 + (pool->step << 2)) * (sizeof(tb_size_t) << 1));
-    tb_assert_and_check_return_val(pool->maxn >= TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_object_null);
+    tb_assert_and_check_return_val(pool->maxn >= TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
 
     // init last
     pool->last = pool->body + pool->maxn;
-    tb_assert_and_check_return_val(data + size > (tb_byte_t*)pool->last, tb_object_null);
-    tb_assert_and_check_return_val(!(((tb_size_t)pool->last) & (TB_CPU_BITBYTE - 1)), tb_object_null);
+    tb_assert_and_check_return_val(data + size > (tb_byte_t*)pool->last, tb_null);
+    tb_assert_and_check_return_val(!(((tb_size_t)pool->last) & (TB_CPU_BITBYTE - 1)), tb_null);
 
     // init data
     pool->data = (tb_byte_t*)tb_align((tb_size_t)(pool->last + pool->maxn), pool->align);
-    tb_assert_and_check_return_val(data + size > pool->data, tb_object_null);
-    tb_assert_and_check_return_val(pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN <= (tb_size_t)(data + size - pool->data), tb_object_null);
+    tb_assert_and_check_return_val(data + size > pool->data, tb_null);
+    tb_assert_and_check_return_val(pool->maxn * pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN <= (tb_size_t)(data + size - pool->data), tb_null);
 
     // init pred => the first chunk index at used
     tb_size_t n = TB_STATIC_TINY_POOL_BLOCK_MAXN; while (n--) pool->pred[n] = n + 1;
@@ -512,28 +512,28 @@ tb_pointer_t tb_tiny_pool_malloc(tb_handle_t handle, tb_size_t size)
 {
     // check
     tb_tiny_pool_t* pool = (tb_tiny_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_TINY_POOL_MAGIC, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_TINY_POOL_MAGIC, tb_null);
 
     // no size?
-    tb_check_return_val(size, tb_object_null);
+    tb_check_return_val(size, tb_null);
 
     // too large?
-    tb_check_return_val(size <= pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_object_null);
+    tb_check_return_val(size <= pool->step * TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
     
     // larger than limit, maybe slower
     tb_assert(size <= tb_tiny_pool_limit(pool));
 
     // full?
-    tb_check_return_val(!pool->full, tb_object_null);
+    tb_check_return_val(!pool->full, tb_null);
 
     // the free block bit in the chunk
     // e.g. 3 blocks => bits: 111
     tb_size_t   bitn = tb_align(size, pool->step) / pool->step;
     tb_size_t   bits = ((tb_size_t)1 << bitn) - 1;
-    tb_assert_and_check_return_val(bitn && bitn <= TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_object_null);
+    tb_assert_and_check_return_val(bitn && bitn <= TB_STATIC_TINY_POOL_BLOCK_MAXN, tb_null);
 
     // predict it?
-//  tb_pointer_t data = tb_object_null;
+//  tb_pointer_t data = tb_null;
     tb_pointer_t data = tb_tiny_pool_malloc_pred(pool, size, bits, bitn);
 
     // find the free block
@@ -585,7 +585,7 @@ tb_pointer_t tb_tiny_pool_malloc0(tb_handle_t handle, tb_size_t size)
 tb_pointer_t tb_tiny_pool_nalloc(tb_handle_t handle, tb_size_t item, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_object_null);
+    tb_assert_and_check_return_val(item, tb_null);
 
     // malloc
     return tb_tiny_pool_malloc(handle, item * size);
@@ -594,7 +594,7 @@ tb_pointer_t tb_tiny_pool_nalloc(tb_handle_t handle, tb_size_t item, tb_size_t s
 tb_pointer_t tb_tiny_pool_nalloc0(tb_handle_t handle, tb_size_t item, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_object_null);
+    tb_assert_and_check_return_val(item, tb_null);
 
     // malloc
     return tb_tiny_pool_malloc0(handle, item * size);
@@ -604,13 +604,13 @@ tb_pointer_t tb_tiny_pool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_
 {
     // check
     tb_tiny_pool_t* pool = (tb_tiny_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_TINY_POOL_MAGIC, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_TINY_POOL_MAGIC, tb_null);
 
     // free it if no size
     if (!size)
     {
         tb_tiny_pool_free(pool, data);
-        return tb_object_null;
+        return tb_null;
     }
 
     // alloc it if no data?
@@ -623,11 +623,11 @@ tb_pointer_t tb_tiny_pool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_
     tb_size_t       osize = 0;
     tb_pointer_t    pdata = tb_tiny_pool_ralloc_fast(pool, data, size, &osize);
     tb_check_return_val(!pdata, pdata);
-    tb_assert_and_check_return_val(osize && osize < size, tb_object_null);
+    tb_assert_and_check_return_val(osize && osize < size, tb_null);
 
     // malloc it
     pdata = tb_tiny_pool_malloc(pool, size);
-    tb_check_return_val(pdata, tb_object_null);
+    tb_check_return_val(pdata, tb_null);
     tb_assert_and_check_return_val(pdata != data, pdata);
 
     // copy data

@@ -507,11 +507,11 @@ static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_t
 tb_handle_t tb_flv_init(tb_basic_stream_t* stream)
 {
     // check 
-    tb_assert_and_check_return_val(stream, tb_object_null);
+    tb_assert_and_check_return_val(stream, tb_null);
 
     // alloc flv
     tb_flv_t* flv = (tb_flv_t*)tb_malloc0(sizeof(tb_flv_t));
-    tb_assert_and_check_return_val(flv, tb_object_null);
+    tb_assert_and_check_return_val(flv, tb_null);
 
     // init flv
     flv->stream    = stream;
@@ -525,7 +525,7 @@ tb_handle_t tb_flv_init(tb_basic_stream_t* stream)
 
 fail:
     if (flv) tb_flv_exit(flv);
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_flv_exit(tb_handle_t hflv)
 {
@@ -595,10 +595,10 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
     }
 
     // is end?
-    if (tb_stream_left(stream) < 16) goto end;
+    if (tb_basic_stream_left(stream) < 16) goto end;
     
     // read packets
-    while (tb_stream_left(stream) >= 15)
+    while (tb_basic_stream_left(stream) >= 15)
     {
         // read flv tag
         if (!tb_basic_stream_bread(stream, tag, 15)) goto end;
@@ -619,7 +619,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         ||  tag_type == TB_FLV_TAG_TYPE_SDATA, end);
 
         // is end?
-        if (tb_stream_left(stream) < data_size) break;
+        if (tb_basic_stream_left(stream) < data_size) break;
 
         // read flv data
         switch (tag_type)

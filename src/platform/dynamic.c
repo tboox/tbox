@@ -37,7 +37,7 @@
 tb_handle_t tb_dynamic_init(tb_char_t const* name)
 {
     tb_trace_noimpl();
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 {
@@ -46,12 +46,12 @@ tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
 {
     tb_trace_noimpl();
-    return tb_object_null;
+    return tb_null;
 }
 tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
 {
     tb_trace_noimpl();
-    return tb_object_null;
+    return tb_null;
 }
 #endif
 

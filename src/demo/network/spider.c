@@ -90,7 +90,7 @@ static tb_option_item_t g_options[] =
 ,   {'r',   "rate",         TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set limited rate"              }
 ,   {'h',   "help",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "display this help and exit"    } 
 ,   {'-',   "home",         TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the home url"                  }
-,   {'-',   tb_object_null,        TB_OPTION_MODE_END,         TB_OPTION_TYPE_NONE,        tb_object_null                         }
+,   {'-',   tb_null,        TB_OPTION_MODE_END,         TB_OPTION_TYPE_NONE,        tb_null                         }
 };
 #endif
 
@@ -109,11 +109,11 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_basic_stream_t*  stream = tb_object_null;
+    tb_basic_stream_t*  stream = tb_null;
     do
     {
         // the file path contains /html/?
@@ -127,11 +127,11 @@ static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
         if (!tb_basic_stream_open(stream)) break;
 
         // the stream size
-        tb_hong_t size = tb_stream_size(stream);
+        tb_hong_t size = tb_basic_stream_size(stream);
         tb_check_break(size);
 
         // prefetch some data
-        tb_byte_t*  data = tb_object_null;
+        tb_byte_t*  data = tb_null;
         tb_size_t   need = tb_min((tb_size_t)size, 256);
         if (!tb_basic_stream_need(stream, &data, need)) break;
 
@@ -152,7 +152,7 @@ static tb_basic_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
     {
         // exit stream
         if (stream) tb_basic_stream_exit(stream);
-        stream = tb_object_null;
+        stream = tb_null;
     }
 
     // ok?
@@ -404,31 +404,31 @@ static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_t* istream, tb_async_s
     tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;
     tb_assert_and_check_return_val(task && task->spider, tb_false);
     tb_assert_and_check_return_val(istream && ostream, tb_false);
-    tb_assert_and_check_return_val(tb_stream_type(istream) == TB_STREAM_TYPE_HTTP, tb_false);
+    tb_assert_and_check_return_val(tb_async_stream_type(istream) == TB_STREAM_TYPE_HTTP, tb_false);
 
     // the url
-    tb_char_t const* url = tb_object_null;
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_GET_URL, &url)) return tb_false;
+    tb_char_t const* url = tb_null;
+    if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_GET_URL, &url)) return tb_false;
 
     // trace
     tb_trace_d("ctrl: %s: ..", url);
 
     // set timeout
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, task->spider->timeout)) return tb_false;
+    if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, task->spider->timeout)) return tb_false;
 
 #if defined(TB_CONFIG_MODULE_HAVE_ZIP) && defined(TB_CONFIG_THIRD_HAVE_ZLIB)
     // need gzip
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) return tb_false;
+    if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) return tb_false;
 
     // auto unzip
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) return tb_false;
+    if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) return tb_false;
 #endif
 
     // user agent
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "User-Agent", task->spider->user_agent)) return tb_false;
+    if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "User-Agent", task->spider->user_agent)) return tb_false;
 
     // enable cookies
-    if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_COOKIES, tb_cookies())) return tb_false;
+    if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_COOKIES, tb_cookies())) return tb_false;
 
     // ok
     return tb_true;
@@ -447,7 +447,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     // done
     tb_bool_t               ok = tb_false;
     tb_size_t               size = 0;
-    tb_demo_spider_task_t*  task = tb_object_null;
+    tb_demo_spider_task_t*  task = tb_null;
     tb_bool_t               repeat = tb_false;
     do
     {
@@ -492,7 +492,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     {
         // exit task
         if (task) tb_demo_spider_task_exit(task);
-        task = tb_object_null;
+        task = tb_null;
     }
 
     // leave
@@ -552,7 +552,7 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
 #else
 
         // init home
-        spider->home = argv[1]? argv[1] : tb_object_null;
+        spider->home = argv[1]? argv[1] : tb_null;
         tb_assert_and_check_break(spider->home);
         tb_trace_d("home: %s", spider->home);
 
@@ -596,7 +596,7 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         tb_assert_and_check_break(spider->pool);
 
         // init filter
-        spider->filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 3, TB_DEMO_SPIDER_FILTER_MAXN, tb_item_func_str(tb_true, tb_object_null));
+        spider->filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 3, TB_DEMO_SPIDER_FILTER_MAXN, tb_item_func_str(tb_true, tb_null));
         tb_assert_and_check_break(spider->filter);
 
         // register lock profiler
@@ -645,11 +645,11 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
 
     // exit filter
     if (spider->filter) tb_bloom_filter_exit(spider->filter);
-    spider->filter = tb_object_null;
+    spider->filter = tb_null;
 
     // exit pool
     if (spider->pool) tb_fixed_pool_exit(spider->pool);
-    spider->pool = tb_object_null;
+    spider->pool = tb_null;
 
     // leave
     tb_spinlock_leave(&spider->lock);
@@ -660,7 +660,7 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
     // exit option
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
     if (spider->option) tb_option_exit(spider->option);
-    spider->option = tb_object_null;
+    spider->option = tb_null;
 #endif
 
     // trace
@@ -680,7 +680,7 @@ tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_demo_spider_init(&spider, argc, argv)) break;
 
         // done the home task if exists
-        tb_demo_spider_task_done(&spider, spider.home, tb_true, tb_object_null);
+        tb_demo_spider_task_done(&spider, spider.home, tb_true, tb_null);
 
         // wait 
         getchar();

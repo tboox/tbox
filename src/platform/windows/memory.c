@@ -35,7 +35,7 @@
  */
 
 // the heap
-static tb_handle_t      g_heap = tb_object_null;
+static tb_handle_t      g_heap = tb_null;
 
 // the lock
 static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT; 
@@ -74,7 +74,7 @@ tb_void_t tb_native_memory_exit()
 
     // exit heap
     if (g_heap) HeapDestroy(g_heap);
-    g_heap = tb_object_null;
+    g_heap = tb_null;
 
     // leave
     tb_spinlock_leave(&g_lock);
@@ -85,10 +85,10 @@ tb_void_t tb_native_memory_exit()
 tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 {
     // check
-    tb_check_return_val(size, tb_object_null);
+    tb_check_return_val(size, tb_null);
 
     // init data
-    tb_pointer_t data = tb_object_null;
+    tb_pointer_t data = tb_null;
 
     // enter 
     tb_spinlock_enter_without_profiler(&g_lock);
@@ -105,10 +105,10 @@ tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 {
     // check
-    tb_check_return_val(size, tb_object_null);
+    tb_check_return_val(size, tb_null);
 
     // init data
-    tb_pointer_t data = tb_object_null;
+    tb_pointer_t data = tb_null;
 
     // enter 
     tb_spinlock_enter_without_profiler(&g_lock);
@@ -125,7 +125,7 @@ tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
     // check
-    tb_check_return_val(item && size, tb_object_null); 
+    tb_check_return_val(item && size, tb_null); 
 
     // nalloc
     return tb_native_memory_malloc(item * size);
@@ -133,7 +133,7 @@ tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 {
     // check
-    tb_check_return_val(item && size, tb_object_null);     
+    tb_check_return_val(item && size, tb_null);     
 
     // nalloc0
     return tb_native_memory_malloc0(item * size);
@@ -144,7 +144,7 @@ tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
     if (!size) 
     {
         tb_native_memory_free(data);
-        return tb_object_null;
+        return tb_null;
     }
     // no data? malloc it
     else if (!data) return tb_native_memory_malloc(size);

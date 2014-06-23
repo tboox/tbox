@@ -36,13 +36,13 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCHR
 tb_wchar_t* tb_wcschr(tb_wchar_t const* s, tb_wchar_t c)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
     return wcschr(s1, c);
 }
 #else
 tb_wchar_t* tb_wcschr(tb_wchar_t const* s, tb_wchar_t c)
 {
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     while (*s)
     {
@@ -50,7 +50,7 @@ tb_wchar_t* tb_wcschr(tb_wchar_t const* s, tb_wchar_t c)
         s++;
 
     }
-    return tb_object_null;
+    return tb_null;
 }
 #endif
 

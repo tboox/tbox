@@ -51,10 +51,10 @@ static tb_object_t const g_null =
     TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
 ,   TB_OBJECT_TYPE_NULL
 ,   1
-,   tb_object_null
+,   tb_null
 ,   tb_object_null_copy
-,   tb_object_null
-,   tb_object_null
+,   tb_null
+,   tb_null
 
 };
 

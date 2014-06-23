@@ -40,16 +40,16 @@
 #if 1
 static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
     return memcpy(s1, s2, n);
 }
 #elif defined(TB_ASSEMBLER_IS_GAS)
 static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
     
-    return tb_object_null;
+    return tb_null;
 }
 #endif

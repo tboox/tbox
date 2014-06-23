@@ -52,14 +52,14 @@ static __tb_inline__ tb_wchar_t const* tb_path_full_w(tb_char_t const* path, tb_
 {
     // the path full
     tb_char_t full_a[TB_PATH_MAXN] = {0};
-    if (!tb_path_full(path, full_a, TB_PATH_MAXN)) return tb_object_null;
+    if (!tb_path_full(path, full_a, TB_PATH_MAXN)) return tb_null;
 
     // atow
     tb_size_t size = tb_atow(full, full_a, maxn);
     if (size < maxn) full[size] = L'\0';
 
     // ok?
-    return size? full : tb_object_null;
+    return size? full : tb_null;
 }
 
 #endif

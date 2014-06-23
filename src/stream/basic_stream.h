@@ -142,8 +142,26 @@ typedef enum __tb_basic_stream_wait_e
 /// the generic stream type
 typedef struct __tb_basic_stream_t
 {   
-    /// the base
-    tb_stream_t         base;
+    /// the stream type
+    tb_uint8_t          type;
+
+    /// the url
+    tb_url_t            url;
+
+    /*! internal state
+     *
+     * <pre>
+     * TB_STATE_CLOSED
+     * TB_STATE_OPENED
+     * TB_STATE_KILLED
+     * TB_STATE_OPENING
+     * TB_STATE_KILLING
+     * </pre>
+     */
+    tb_atomic_t         istate;
+
+    /// the timeout
+    tb_long_t           timeout;
 
     /// the state
     tb_size_t           state;
@@ -158,28 +176,34 @@ typedef struct __tb_basic_stream_t
     tb_queue_buffer_t   cache;
 
     /// wait 
-    tb_long_t           (*wait)(tb_handle_t stream, tb_size_t wait, tb_long_t timeout);
+    tb_long_t           (*wait)(struct __tb_basic_stream_t* stream, tb_size_t wait, tb_long_t timeout);
 
     /// open
-    tb_bool_t           (*open)(tb_handle_t stream);
+    tb_bool_t           (*open)(struct __tb_basic_stream_t* stream);
 
     /// clos
-    tb_bool_t           (*clos)(tb_handle_t stream);
+    tb_bool_t           (*clos)(struct __tb_basic_stream_t* stream);
 
     /// read
-    tb_long_t           (*read)(tb_handle_t stream, tb_byte_t* data, tb_size_t size);
+    tb_long_t           (*read)(struct __tb_basic_stream_t* stream, tb_byte_t* data, tb_size_t size);
 
     /// writ
-    tb_long_t           (*writ)(tb_handle_t stream, tb_byte_t const* data, tb_size_t size);
+    tb_long_t           (*writ)(struct __tb_basic_stream_t* stream, tb_byte_t const* data, tb_size_t size);
 
     /// seek
-    tb_bool_t           (*seek)(tb_handle_t stream, tb_hize_t offset);
+    tb_bool_t           (*seek)(struct __tb_basic_stream_t* stream, tb_hize_t offset);
 
     /// sync
-    tb_bool_t           (*sync)(tb_handle_t stream, tb_bool_t bclosing);
+    tb_bool_t           (*sync)(struct __tb_basic_stream_t* stream, tb_bool_t bclosing);
+
+    /// ctrl 
+    tb_bool_t           (*ctrl)(struct __tb_basic_stream_t* stream, tb_size_t ctrl, tb_va_list_t args);
 
     /// exit
-    tb_void_t           (*exit)(tb_handle_t stream);
+    tb_void_t           (*exit)(struct __tb_basic_stream_t* stream);
+
+    /// kill
+    tb_void_t           (*kill)(struct __tb_basic_stream_t* stream);
 
 }tb_basic_stream_t;
 
@@ -357,6 +381,106 @@ tb_long_t               tb_basic_stream_wait(tb_basic_stream_t* stream, tb_size_
  * @return              the state
  */
 tb_size_t               tb_basic_stream_state(tb_basic_stream_t* stream);
+
+/*! the stream type
+ *
+ * @param stream        the stream
+ *
+ * @return              the stream type
+ */
+tb_size_t               tb_basic_stream_type(tb_basic_stream_t* stream);
+
+/*! the stream size and not seeking it
+ *
+ * @param stream        the stream
+ *
+ * @return              the stream size, no size: -1, empty or error: 0
+ */
+tb_hong_t               tb_basic_stream_size(tb_basic_stream_t* stream);
+
+/*! the stream left size and not seeking it 
+ *
+ * @param stream        the stream
+ *
+ * @return              the stream left size, no size: infinity, empty or end: 0
+ */
+tb_hize_t               tb_basic_stream_left(tb_basic_stream_t* stream);
+
+/*! the stream is end?
+ *
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_basic_stream_beof(tb_basic_stream_t* stream);
+
+/*! the stream offset
+ *
+ * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, .. 
+ * the offset is calculated from the last read/writ and not seeking it if size == -1, .e.g: sock, filter, ..
+ *
+ * @param stream        the stream
+ *
+ * @return              the stream offset
+ */
+tb_hize_t               tb_basic_stream_offset(tb_basic_stream_t* stream);
+
+/*! is opened?
+ *
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_basic_stream_is_opened(tb_basic_stream_t* stream);
+
+/*! is closed?
+ *
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_basic_stream_is_closed(tb_basic_stream_t* stream);
+
+/*! is killed?
+ *
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_basic_stream_is_killed(tb_basic_stream_t* stream);
+
+/*! the stream timeout
+ *
+ * @param stream        the stream
+ *
+ * @return              the stream timeout
+ */
+tb_long_t               tb_basic_stream_timeout(tb_basic_stream_t* stream);
+
+/*! ctrl stream
+ *
+ * @param stream        the stream
+ * @param ctrl          the ctrl code
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_basic_stream_ctrl(tb_basic_stream_t* stream, tb_size_t ctrl, ...);
+
+/*! ctrl stream with arguments
+ *
+ * @param stream        the stream
+ * @param ctrl          the ctrl code
+ * @param args          the ctrl args
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_basic_stream_ctrl_with_args(tb_basic_stream_t* stream, tb_size_t ctrl, tb_va_list_t args);
+
+/*! kill stream
+ *
+ * @param stream        the stream
+ */
+tb_void_t               tb_basic_stream_kill(tb_basic_stream_t* stream);
 
 /*! open stream
  *

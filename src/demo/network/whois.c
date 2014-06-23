@@ -21,7 +21,7 @@ static tb_void_t tb_whois_test_done(tb_char_t const* name)
     tb_assert_and_check_return(stream);
 
     // timeout
-    tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
+    tb_basic_stream_ctrl(stream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
 
     // data
     tb_char_t data[251] = {0};
@@ -47,7 +47,7 @@ static tb_bool_t tb_whois_test_no_match_com(tb_char_t const* name)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // timeout
-    tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
+    tb_basic_stream_ctrl(stream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
 
     // data
     tb_char_t data[251] = {0};
@@ -73,7 +73,7 @@ static tb_bool_t tb_whois_test_no_match_cn(tb_char_t const* name)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // timeout
-    tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
+    tb_basic_stream_ctrl(stream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
 
     // data
     tb_char_t data[21] = {0};

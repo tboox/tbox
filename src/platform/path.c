@@ -41,7 +41,7 @@
 tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(path && full && maxn, tb_object_null);
+    tb_assert_and_check_return_val(path && full && maxn, tb_null);
 
     // trace
     tb_trace_d("path: %s", path);
@@ -90,12 +90,12 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
         tb_trace_e("invalid file path: %s", path);
 
         // failed
-        return tb_object_null;
+        return tb_null;
     }
 
     // the current directory
     tb_size_t size = 0;
-    if (!(size = tb_directory_curt(full, maxn))) return tb_object_null;
+    if (!(size = tb_directory_curt(full, maxn))) return tb_null;
     tb_trace_d("curt: %s", full);
 
     // is windows path?
@@ -155,7 +155,7 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
             else 
             {
                 tb_trace_e("the full path is too small for %s", path);
-                return tb_object_null;
+                return tb_null;
             }
 
             // break

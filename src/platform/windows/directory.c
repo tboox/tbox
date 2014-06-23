@@ -158,7 +158,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
 
     // make it
-    tb_bool_t ok = CreateDirectoryW(full, tb_object_null)? tb_true : tb_false;
+    tb_bool_t ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;
     if (!ok)
     {
         // make directory
@@ -172,7 +172,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
             if (*p == L'\\' || *p == L'/')
             {
                 // make directory if not exists
-                if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_object_null);
+                if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_null);
 
                 // skip repeat '\\' or '/'
                 while (*p && (*p == L'\\' || *p == L'/')) p++;
@@ -181,7 +181,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
         }
 
         // make it again
-        ok = CreateDirectoryW(full, tb_object_null)? tb_true : tb_false;
+        ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;
     }
 
     // ok?
@@ -197,7 +197,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
 
     // walk remove
-    tb_directory_walk_impl(full, tb_true, tb_false, tb_directory_walk_remove, tb_object_null);
+    tb_directory_walk_impl(full, tb_true, tb_false, tb_directory_walk_remove, tb_null);
 
     // remove it
     return RemoveDirectoryW(full)? tb_true : tb_false;

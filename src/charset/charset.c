@@ -107,12 +107,12 @@ static tb_charset_t const* tb_charset_find_by_name(tb_char_t const* name)
     iterator.comp = tb_charset_comp_by_name;
 
     // find it by the binary search
-    tb_size_t       itor = tb_bfind_all(&iterator, name, tb_object_null);
+    tb_size_t       itor = tb_bfind_all(&iterator, name, tb_null);
 
     // ok?
     if (itor != tb_iterator_tail(&iterator))
         return (tb_charset_t const*)tb_iterator_item(&iterator, itor);
-    else return tb_object_null;
+    else return tb_null;
 }
 static tb_charset_t const* tb_charset_find_by_type(tb_size_t type)
 {
@@ -121,12 +121,12 @@ static tb_charset_t const* tb_charset_find_by_type(tb_size_t type)
     iterator.comp = tb_charset_comp_by_type;
 
     // find it by the binary search
-    tb_size_t       itor = tb_bfind_all(&iterator, (tb_cpointer_t)TB_CHARSET_TYPE(type), tb_object_null);
+    tb_size_t       itor = tb_bfind_all(&iterator, (tb_cpointer_t)TB_CHARSET_TYPE(type), tb_null);
 
     // ok?
     if (itor != tb_iterator_tail(&iterator))
         return (tb_charset_t const*)tb_iterator_item(&iterator, itor);
-    else return tb_object_null;
+    else return tb_null;
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -135,7 +135,7 @@ tb_char_t const* tb_charset_name(tb_size_t type)
 {
     // find
     tb_charset_t const* charset = tb_charset_find_by_type(type);
-    tb_assert_and_check_return_val(charset, tb_object_null);
+    tb_assert_and_check_return_val(charset, tb_null);
 
     // type
     return charset->name;

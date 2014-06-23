@@ -26,11 +26,11 @@ static tb_bool_t tb_demo_transfer_done_func(tb_size_t state, tb_hize_t offset, t
 tb_int_t tb_demo_stream_async_transfer_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t transfer = tb_object_null;
+    tb_handle_t transfer = tb_null;
     do
     {
         // init transfer
-        transfer = tb_async_transfer_init(tb_object_null, tb_true);
+        transfer = tb_async_transfer_init(tb_null, tb_true);
         tb_assert_and_check_break(transfer);
 
         // init transfer stream
@@ -44,7 +44,7 @@ tb_int_t tb_demo_stream_async_transfer_main(tb_int_t argc, tb_char_t** argv)
         tb_trace_i("done: ..");
 
         // open and done transfer
-        if (!tb_async_transfer_open_done(transfer, 0, tb_demo_transfer_done_func, tb_object_null)) break;
+        if (!tb_async_transfer_open_done(transfer, 0, tb_demo_transfer_done_func, tb_null)) break;
 
         // wait
         getchar();
@@ -71,7 +71,7 @@ tb_int_t tb_demo_stream_async_transfer_main(tb_int_t argc, tb_char_t** argv)
         tb_trace_i("done: ..");
 
         // open and done transfer
-        if (!tb_async_transfer_open_done(transfer, 0, tb_demo_transfer_done_func, tb_object_null)) break;
+        if (!tb_async_transfer_open_done(transfer, 0, tb_demo_transfer_done_func, tb_null)) break;
 
         // wait
         getchar();
@@ -83,7 +83,7 @@ tb_int_t tb_demo_stream_async_transfer_main(tb_int_t argc, tb_char_t** argv)
 
     // exit transfer
     if (transfer) tb_async_transfer_exit(transfer);
-    transfer = tb_object_null;
+    transfer = tb_null;
 
     return 0;
 }
