@@ -44,7 +44,7 @@ tb_hong_t tb_cache_time_spak()
 {
     // get the time
     tb_timeval_t tv = {0};
-    if (!tb_gettimeofday(&tv, tb_object_null)) return -1;
+    if (!tb_gettimeofday(&tv, tb_null)) return -1;
 
     // the time value
     tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);

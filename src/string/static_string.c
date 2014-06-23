@@ -57,7 +57,7 @@ tb_void_t tb_static_string_exit(tb_static_string_t* string)
 tb_char_t const* tb_static_string_cstr(tb_static_string_t const* string)
 {
     // check
-    tb_assert_and_check_return_val(string, tb_object_null);
+    tb_assert_and_check_return_val(string, tb_null);
 
     // the cstr
     return (tb_char_t const*)tb_static_buffer_data((tb_static_buffer_t*)string);
@@ -86,7 +86,7 @@ tb_void_t tb_static_string_clear(tb_static_string_t* string)
 tb_char_t const* tb_static_string_strip(tb_static_string_t* string, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(string, tb_object_null);
+    tb_assert_and_check_return_val(string, tb_null);
 
     // out?
     tb_check_return_val(n < tb_static_string_size(string), tb_static_string_cstr(string));
@@ -99,12 +99,12 @@ tb_char_t const* tb_static_string_strip(tb_static_string_t* string, tb_size_t n)
 tb_char_t const* tb_static_string_rtrim(tb_static_string_t* string)
 {
     // check
-    tb_assert_and_check_return_val(string, tb_object_null);
+    tb_assert_and_check_return_val(string, tb_null);
 
     // init
     tb_char_t*      s = (tb_char_t*)tb_static_string_cstr(string);
     tb_size_t       n = tb_static_string_size(string);
-    tb_check_return_val(s && n, tb_object_null);
+    tb_check_return_val(s && n, tb_null);
 
     // done
     tb_char_t*      e = s + n - 1;
@@ -224,7 +224,7 @@ tb_long_t tb_static_string_cstrirstr(tb_static_string_t const* string, tb_size_t
 tb_char_t const* tb_static_string_strcpy(tb_static_string_t* string, tb_static_string_t const* s)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     // done
     tb_size_t n = tb_static_string_size(s);
@@ -232,13 +232,13 @@ tb_char_t const* tb_static_string_strcpy(tb_static_string_t* string, tb_static_s
     else 
     {
         tb_static_string_clear(string);
-        return tb_object_null;
+        return tb_null;
     }
 }
 tb_char_t const* tb_static_string_cstrcpy(tb_static_string_t* string, tb_char_t const* s)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     // done
     return tb_static_string_cstrncpy(string, s, tb_strlen(s));
@@ -246,7 +246,7 @@ tb_char_t const* tb_static_string_cstrcpy(tb_static_string_t* string, tb_char_t 
 tb_char_t const* tb_static_string_cstrncpy(tb_static_string_t* string, tb_char_t const* s, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(string && s && n, tb_object_null);
+    tb_assert_and_check_return_val(string && s && n, tb_null);
 
     // done
     tb_char_t* p = (tb_char_t*)tb_static_buffer_memncpy(string, (tb_byte_t const*)s, n + 1);
@@ -256,13 +256,13 @@ tb_char_t const* tb_static_string_cstrncpy(tb_static_string_t* string, tb_char_t
 tb_char_t const* tb_static_string_cstrfcpy(tb_static_string_t* string, tb_char_t const* fmt, ...)
 {
     // check
-    tb_assert_and_check_return_val(string && fmt, tb_object_null);
+    tb_assert_and_check_return_val(string && fmt, tb_null);
 
     // format data
     tb_char_t p[TB_STATIC_STRING_FMTD_SIZE] = {0};
     tb_size_t n = 0;
     tb_vsnprintf_format(p, TB_STATIC_STRING_FMTD_SIZE, fmt, &n);
-    tb_assert_and_check_return_val(n, tb_object_null);
+    tb_assert_and_check_return_val(n, tb_null);
     
     // done
     return tb_static_string_cstrncpy(string, p, n);
@@ -270,7 +270,7 @@ tb_char_t const* tb_static_string_cstrfcpy(tb_static_string_t* string, tb_char_t
 tb_char_t const* tb_static_string_chrcat(tb_static_string_t* string, tb_char_t c)
 {
     // check
-    tb_assert_and_check_return_val(string, tb_object_null);
+    tb_assert_and_check_return_val(string, tb_null);
     
     // done
     tb_char_t* p = (tb_char_t*)tb_static_buffer_memnsetp(string, tb_static_string_size(string), c, 2);
@@ -280,7 +280,7 @@ tb_char_t const* tb_static_string_chrcat(tb_static_string_t* string, tb_char_t c
 tb_char_t const* tb_static_string_chrncat(tb_static_string_t* string, tb_char_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(string, tb_object_null);
+    tb_assert_and_check_return_val(string, tb_null);
 
     // done
     tb_char_t* p = (tb_char_t*)tb_static_buffer_memnsetp(string, tb_static_string_size(string), c, n + 1);
@@ -290,19 +290,19 @@ tb_char_t const* tb_static_string_chrncat(tb_static_string_t* string, tb_char_t 
 tb_char_t const* tb_static_string_strcat(tb_static_string_t* string, tb_static_string_t const* s)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
     return tb_static_string_cstrncat(string, tb_static_string_cstr(s), tb_static_string_size(s));
 }
 tb_char_t const* tb_static_string_cstrcat(tb_static_string_t* string, tb_char_t const* s)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
     return tb_static_string_cstrncat(string, s, tb_strlen(s));
 }
 tb_char_t const* tb_static_string_cstrncat(tb_static_string_t* string, tb_char_t const* s, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(string && s && n, tb_object_null);
+    tb_assert_and_check_return_val(string && s && n, tb_null);
 
     // done
     tb_char_t* p = (tb_char_t*)tb_static_buffer_memncpyp(string, tb_static_string_size(string), (tb_byte_t const*)s, n + 1);
@@ -312,13 +312,13 @@ tb_char_t const* tb_static_string_cstrncat(tb_static_string_t* string, tb_char_t
 tb_char_t const* tb_static_string_cstrfcat(tb_static_string_t* string, tb_char_t const* fmt, ...)
 {
     // check
-    tb_assert_and_check_return_val(string && fmt, tb_object_null);
+    tb_assert_and_check_return_val(string && fmt, tb_null);
 
     // format data
     tb_char_t p[TB_STATIC_STRING_FMTD_SIZE] = {0};
     tb_size_t n = 0;
     tb_vsnprintf_format(p, TB_STATIC_STRING_FMTD_SIZE, fmt, &n);
-    tb_assert_and_check_return_val(n, tb_object_null);
+    tb_assert_and_check_return_val(n, tb_null);
     
     // done
     return tb_static_string_cstrncat(string, p, n);

@@ -26,11 +26,11 @@ tb_int_t tb_demo_stream_basic_stream_charset_main(tb_int_t argc, tb_char_t** arg
     {
         // save it
         tb_hong_t save = 0;
-        if (iostream == istream) save = tb_transfer_done(fstream, ostream, 0, tb_object_null, tb_object_null);
-        else save = tb_transfer_done(istream, fstream, 0, tb_object_null, tb_object_null);
+        if (iostream == istream) save = tb_transfer_done(fstream, ostream, 0, tb_null, tb_null);
+        else save = tb_transfer_done(istream, fstream, 0, tb_null, tb_null);
 
         // trace
-        tb_trace_i("save: %lld bytes, size: %lld bytes", save, tb_stream_size(istream));
+        tb_trace_i("save: %lld bytes, size: %lld bytes", save, tb_basic_stream_size(istream));
     }
 
     // exit fstream

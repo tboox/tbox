@@ -52,20 +52,17 @@ tb_bool_t tb_basic_stream_init(tb_basic_stream_t* stream, tb_size_t type, tb_siz
     tb_bool_t ok = tb_false;
     do
     {
-        // init mode
-        stream->base.mode = TB_STREAM_MODE_AIOO;
-
         // init type
-        stream->base.type = type;
+        stream->type = type;
 
         // init timeout, 10s
-        stream->base.timeout = TB_STREAM_DEFAULT_TIMEOUT;
+        stream->timeout = TB_STREAM_DEFAULT_TIMEOUT;
 
         // init internal state
-        stream->base.istate = TB_STATE_CLOSED;
+        stream->istate = TB_STATE_CLOSED;
 
         // init url
-        if (!tb_url_init(&stream->base.url)) break;
+        if (!tb_url_init(&stream->url)) break;
 
         // init cache
         if (!tb_queue_buffer_init(&stream->cache, cache)) break;
@@ -84,12 +81,12 @@ tb_bool_t tb_basic_stream_init(tb_basic_stream_t* stream, tb_size_t type, tb_siz
 tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // the init
     static tb_basic_stream_t* (*s_init[])() = 
     {
-        tb_object_null
+        tb_null
     ,   tb_basic_stream_init_file
     ,   tb_basic_stream_init_sock
     ,   tb_basic_stream_init_http
@@ -108,13 +105,13 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
     if (!type || type > TB_STREAM_TYPE_DATA)
     {
         tb_trace_e("unknown stream for url: %s", url);
-        return tb_object_null;
+        return tb_null;
     }
-    tb_assert_and_check_return_val(type && type < tb_object_arrayn(s_init) && s_init[type], tb_object_null);
+    tb_assert_and_check_return_val(type && type < tb_object_arrayn(s_init) && s_init[type], tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_basic_stream_t*  stream = tb_object_null;
+    tb_basic_stream_t*  stream = tb_null;
     do
     {
         // init stream
@@ -122,7 +119,7 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
         tb_assert_and_check_break(stream);
 
         // init url
-        if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_URL, url)) break;
+        if (!tb_basic_stream_ctrl(stream, TB_STREAM_CTRL_SET_URL, url)) break;
 
         // ok
         ok = tb_true;
@@ -134,7 +131,7 @@ tb_basic_stream_t* tb_basic_stream_init_from_url(tb_char_t const* url)
     {
         // exit stream
         if (stream) tb_basic_stream_exit(stream);
-        stream = tb_object_null;
+        stream = tb_null;
     }
 
     // ok?
@@ -154,7 +151,7 @@ tb_void_t tb_basic_stream_exit(tb_basic_stream_t* stream)
         tb_queue_buffer_exit(&stream->cache);
 
         // exit url
-        tb_url_exit(&stream->base.url);
+        tb_url_exit(&stream->url);
 
         // free it
         tb_free(stream);
@@ -166,7 +163,7 @@ tb_long_t tb_basic_stream_wait(tb_basic_stream_t* stream, tb_size_t wait, tb_lon
     tb_assert_and_check_return_val(stream && stream->wait, -1);
 
     // stoped?
-    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), -1);
+    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->istate), -1);
 
     // wait it
     tb_long_t ok = stream->wait(stream, wait, timeout);
@@ -199,16 +196,340 @@ tb_size_t tb_basic_stream_state(tb_basic_stream_t* stream)
     // the stream state
     return stream->state;
 }
+tb_size_t tb_basic_stream_type(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, TB_STREAM_TYPE_NONE);
+
+    // the type
+    return stream->type;
+}
+tb_hong_t tb_basic_stream_size(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, 0);
+
+    // get the size
+    tb_hong_t size = -1;
+    return tb_basic_stream_ctrl((tb_basic_stream_t*)stream, TB_STREAM_CTRL_GET_SIZE, &size)? size : -1;
+}
+tb_hize_t tb_basic_stream_left(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, 0);
+    
+    // the size
+    tb_hong_t size = tb_basic_stream_size(stream);
+    tb_check_return_val(size >= 0, -1);
+
+    // the offset
+    tb_hize_t offset = tb_basic_stream_offset(stream);
+    tb_assert_and_check_return_val(offset <= size, 0);
+
+    // the left
+    return size - offset;
+}
+tb_bool_t tb_basic_stream_beof(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, tb_true);
+
+    // size
+    tb_hong_t size = tb_basic_stream_size(stream);
+    tb_hize_t offt = tb_basic_stream_offset(stream);
+
+    // eof?
+    return (size > 0 && offt >= size)? tb_true : tb_false;
+}
+tb_hize_t tb_basic_stream_offset(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, 0);
+
+    // get the offset
+    tb_hize_t offset = 0;
+    return tb_basic_stream_ctrl((tb_basic_stream_t*)stream, TB_STREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
+}
+tb_bool_t tb_basic_stream_is_opened(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, tb_false);
+
+    // the state
+    tb_size_t state = tb_atomic_get(&stream->istate);
+
+    // is opened?
+    return (TB_STATE_OPENED == state || TB_STATE_KILLING == state)? tb_true : tb_false;
+}
+tb_bool_t tb_basic_stream_is_closed(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, tb_false);
+
+    // the state
+    tb_size_t state = tb_atomic_get(&stream->istate);
+
+    // is closed?
+    return (TB_STATE_CLOSED == state || TB_STATE_KILLED == state)? tb_true : tb_false;
+}
+tb_bool_t tb_basic_stream_is_killed(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, tb_false);
+
+    // the state
+    tb_size_t state = tb_atomic_get(&stream->istate);
+
+    // is killed?
+    return (TB_STATE_KILLED == state || TB_STATE_KILLING == state)? tb_true : tb_false;
+}
+tb_long_t tb_basic_stream_timeout(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, -1);
+
+    // get the timeout
+    tb_long_t timeout = -1;
+    return tb_basic_stream_ctrl(stream, TB_STREAM_CTRL_GET_TIMEOUT, &timeout)? timeout : -1;
+}
+tb_bool_t tb_basic_stream_ctrl(tb_basic_stream_t* stream, tb_size_t ctrl, ...)
+{
+    // check
+    tb_assert_and_check_return_val(stream && stream->ctrl, tb_false);
+
+    // init args
+    tb_va_list_t args;
+    tb_va_start(args, ctrl);
+
+    // ctrl it
+    tb_bool_t ok = tb_basic_stream_ctrl_with_args(stream, ctrl, args);
+
+    // exit args
+    tb_va_end(args);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_basic_stream_ctrl_with_args(tb_basic_stream_t* stream, tb_size_t ctrl, tb_va_list_t args)
+{   
+    // check
+    tb_assert_and_check_return_val(stream && stream->ctrl, tb_false);
+
+    // save args
+    tb_va_list_t args_saved;
+    tb_va_copy(args_saved, args);
+
+    // ctrl
+    tb_bool_t ok = tb_false;
+    switch (ctrl)
+    {
+    case TB_STREAM_CTRL_SET_URL:
+        {
+            // check
+            tb_assert_and_check_return_val(tb_basic_stream_is_closed(stream), tb_false);
+
+            // set url
+            tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+            if (url && tb_url_set(&stream->url, url)) ok = tb_true;
+        }
+        break;
+    case TB_STREAM_CTRL_GET_URL:
+        {
+            // get url
+            tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+            if (purl)
+            {
+                tb_char_t const* url = tb_url_get(&stream->url);
+                if (url)
+                {
+                    *purl = url;
+                    ok = tb_true;
+                }
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_SET_HOST:
+        {
+            // check
+            tb_assert_and_check_return_val(tb_basic_stream_is_closed(stream), tb_false);
+
+            // set host
+            tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+            if (host)
+            {
+                tb_url_host_set(&stream->url, host);
+                ok = tb_true;
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_GET_HOST:
+        {
+            // get host
+            tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+            if (phost)
+            {
+                tb_char_t const* host = tb_url_host_get(&stream->url);
+                if (host)
+                {
+                    *phost = host;
+                    ok = tb_true;
+                }
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_SET_PORT:
+        {
+            // check
+            tb_assert_and_check_return_val(tb_basic_stream_is_closed(stream), tb_false);
+
+            // set port
+            tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
+            if (port)
+            {
+                tb_url_port_set(&stream->url, port);
+                ok = tb_true;
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_GET_PORT:
+        {
+            // get port
+            tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+            if (pport)
+            {
+                *pport = tb_url_port_get(&stream->url);
+                ok = tb_true;
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_SET_PATH:
+        {
+            // check
+            tb_assert_and_check_return_val(tb_basic_stream_is_closed(stream), tb_false);
+
+            // set path
+            tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+            if (path)
+            {
+                tb_url_path_set(&stream->url, path);
+                ok = tb_true;
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_GET_PATH:
+        {
+            // get path
+            tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+            if (ppath)
+            {
+                tb_char_t const* path = tb_url_path_get(&stream->url);
+                if (path)
+                {
+                    *ppath = path;
+                    ok = tb_true;
+                }
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_SET_SSL:
+        {
+            // check
+            tb_assert_and_check_return_val(tb_basic_stream_is_closed(stream), tb_false);
+
+            // set ssl
+            tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+            tb_url_ssl_set(&stream->url, bssl);
+            ok = tb_true;
+        }
+        break;
+    case TB_STREAM_CTRL_GET_SSL:
+        {
+            // get ssl
+            tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+            if (pssl)
+            {
+                *pssl = tb_url_ssl_get(&stream->url);
+                ok = tb_true;
+            }
+        }
+        break;
+    case TB_STREAM_CTRL_SET_TIMEOUT:
+        {
+            // check
+            tb_assert_and_check_return_val(tb_basic_stream_is_closed(stream), tb_false);
+
+            // set timeout
+            tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
+            stream->timeout = timeout? timeout : TB_STREAM_DEFAULT_TIMEOUT;
+            ok = tb_true;
+        }
+        break;
+    case TB_STREAM_CTRL_GET_TIMEOUT:
+        {
+            // get timeout
+            tb_long_t* ptimeout = (tb_long_t*)tb_va_arg(args, tb_long_t*);
+            if (ptimeout)
+            {
+                *ptimeout = stream->timeout;
+                ok = tb_true;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+    // restore args
+    tb_va_copy(args, args_saved);
+
+    // ctrl stream
+    ok = (stream->ctrl(stream, ctrl, args) || ok)? tb_true : tb_false;
+
+    // ok?
+    return ok;
+}
+tb_void_t tb_basic_stream_kill(tb_basic_stream_t* stream)
+{
+    // check
+    tb_assert_and_check_return(stream);
+
+    // trace
+    tb_trace_d("kill: %s: state: %s: ..", tb_url_get(&stream->url), tb_state_cstr(tb_atomic_get(&stream->istate)));
+
+    // opened? kill it
+    if (TB_STATE_OPENED == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING))
+    {
+        // kill it
+        if (stream->kill) stream->kill(stream);
+
+        // trace
+        tb_trace_d("kill: %s: ok", tb_url_get(&stream->url));
+    }
+    // opening? kill it
+    else if (TB_STATE_OPENING == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENING, TB_STATE_KILLING))
+    {
+        // kill it
+        if (stream->kill) stream->kill(stream);
+
+        // trace
+        tb_trace_d("kill: %s: ok", tb_url_get(&stream->url));
+    }
+    else 
+    {
+        // closed? killed
+        tb_atomic_pset(&stream->istate, TB_STATE_CLOSED, TB_STATE_KILLED);
+    }
+}
 tb_bool_t tb_basic_stream_open(tb_basic_stream_t* stream)
 {
     // check stream
     tb_assert_and_check_return_val(stream && stream->open, tb_false);
 
     // already been opened?
-    tb_check_return_val(!tb_stream_is_opened(stream), tb_true);
+    tb_check_return_val(!tb_basic_stream_is_opened(stream), tb_true);
 
     // closed?
-    tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&stream->base.istate), tb_false);
+    tb_assert_and_check_return_val(TB_STATE_CLOSED == tb_atomic_get(&stream->istate), tb_false);
 
     // init offset
     stream->offset = 0;
@@ -220,7 +541,7 @@ tb_bool_t tb_basic_stream_open(tb_basic_stream_t* stream)
     tb_bool_t ok = stream->open(stream);
 
     // opened
-    if (ok) tb_atomic_set(&stream->base.istate, TB_STATE_OPENED);
+    if (ok) tb_atomic_set(&stream->istate, TB_STATE_OPENED);
 
     // ok?
     return ok;
@@ -231,7 +552,7 @@ tb_bool_t tb_basic_stream_clos(tb_basic_stream_t* stream)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // already been closed?
-    tb_check_return_val(tb_stream_is_opened(stream), tb_true);
+    tb_check_return_val(tb_basic_stream_is_opened(stream), tb_true);
 
     // flush writed data first
     if (stream->bwrited && !tb_basic_stream_sync(stream, tb_true)) return tb_false;
@@ -243,7 +564,7 @@ tb_bool_t tb_basic_stream_clos(tb_basic_stream_t* stream)
     stream->offset = 0;
     stream->bwrited = 0;
     stream->state = TB_STATE_OK;
-    tb_atomic_set(&stream->base.istate, TB_STATE_CLOSED);
+    tb_atomic_set(&stream->istate, TB_STATE_CLOSED);
 
     // clear cache
     tb_queue_buffer_clear(&stream->cache);
@@ -257,10 +578,10 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
     tb_assert_and_check_return_val(data && size, tb_false);
 
     // check stream
-    tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream) && stream->read && stream->wait, tb_false);
+    tb_assert_and_check_return_val(stream && tb_basic_stream_is_opened(stream) && stream->read && stream->wait, tb_false);
 
     // stoped?
-    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->base.istate), tb_false);
+    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->istate), tb_false);
 
     // no cache? enable it first
     if (!tb_queue_buffer_maxn(&stream->cache)) tb_queue_buffer_resize(&stream->cache, size);
@@ -296,7 +617,7 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
 
     // fill cache
     tb_size_t read = 0;
-    while (read < push && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
+    while (read < push && (TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
     {
         // read data
         tb_long_t real = stream->read(stream, tail + read, push - read);
@@ -311,7 +632,7 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
         else if (!real)
         {
             // wait
-            real = stream->wait(stream, TB_BASIC_STREAM_WAIT_READ, tb_stream_timeout(stream));
+            real = stream->wait(stream, TB_BASIC_STREAM_WAIT_READ, tb_basic_stream_timeout(stream));
 
             // ok?
             tb_check_break(real > 0);
@@ -326,7 +647,7 @@ tb_bool_t tb_basic_stream_need(tb_basic_stream_t* stream, tb_byte_t** data, tb_s
     if (size > tb_queue_buffer_size(&stream->cache))
     {
         // killed? save state
-        if (!stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
+        if (!stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->istate)))
             stream->state = TB_STATE_KILLED;
 
         // failed
@@ -348,7 +669,7 @@ tb_long_t tb_basic_stream_read(tb_basic_stream_t* stream, tb_byte_t* data, tb_si
     tb_check_return_val(size, 0);
 
     // check stream
-    tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream) && stream->read, -1);
+    tb_assert_and_check_return_val(stream && tb_basic_stream_is_opened(stream) && stream->read, -1);
 
     // done
     tb_long_t read = 0;
@@ -420,7 +741,7 @@ tb_long_t tb_basic_stream_writ(tb_basic_stream_t* stream, tb_byte_t const* data,
     tb_check_return_val(size, 0);
 
     // check stream
-    tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream) && stream->writ, -1);
+    tb_assert_and_check_return_val(stream && tb_basic_stream_is_opened(stream) && stream->writ, -1);
 
     // done
     tb_long_t writ = 0;
@@ -493,12 +814,12 @@ tb_bool_t tb_basic_stream_bread(tb_basic_stream_t* stream, tb_byte_t* data, tb_s
         return tb_false;
 
     // check the left
-    tb_hize_t left = tb_stream_left(stream);
+    tb_hize_t left = tb_basic_stream_left(stream);
     tb_check_return_val(size <= left, tb_false);
 
     // read data from cache
     tb_long_t read = 0;
-    while (read < size && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
+    while (read < size && (TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
     {
         // read data
         tb_long_t real = tb_basic_stream_read(stream, data + read, size - read);    
@@ -506,7 +827,7 @@ tb_bool_t tb_basic_stream_bread(tb_basic_stream_t* stream, tb_byte_t* data, tb_s
         else if (!real)
         {
             // wait
-            real = tb_basic_stream_wait(stream, TB_BASIC_STREAM_WAIT_READ, tb_stream_timeout(stream));
+            real = tb_basic_stream_wait(stream, TB_BASIC_STREAM_WAIT_READ, tb_basic_stream_timeout(stream));
             tb_check_break(real > 0);
 
             // has read?
@@ -516,7 +837,7 @@ tb_bool_t tb_basic_stream_bread(tb_basic_stream_t* stream, tb_byte_t* data, tb_s
     }
 
     // killed? save state
-    if (read != size && !stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
+    if (read != size && !stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->istate)))
         stream->state = TB_STATE_KILLED;
 
     // ok?
@@ -530,7 +851,7 @@ tb_bool_t tb_basic_stream_bwrit(tb_basic_stream_t* stream, tb_byte_t const* data
 
     // writ data to cache
     tb_long_t writ = 0;
-    while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
+    while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
     {
         // writ data
         tb_long_t real = tb_basic_stream_writ(stream, data + writ, size - writ);    
@@ -538,7 +859,7 @@ tb_bool_t tb_basic_stream_bwrit(tb_basic_stream_t* stream, tb_byte_t const* data
         else if (!real)
         {
             // wait
-            real = tb_basic_stream_wait(stream, TB_BASIC_STREAM_WAIT_WRIT, tb_stream_timeout(stream));
+            real = tb_basic_stream_wait(stream, TB_BASIC_STREAM_WAIT_WRIT, tb_basic_stream_timeout(stream));
             tb_check_break(real > 0);
 
             // has writ?
@@ -548,7 +869,7 @@ tb_bool_t tb_basic_stream_bwrit(tb_basic_stream_t* stream, tb_byte_t const* data
     }
 
     // killed? save state
-    if (writ != size && !stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
+    if (writ != size && !stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->istate)))
         stream->state = TB_STATE_KILLED;
 
     // ok?
@@ -557,10 +878,10 @@ tb_bool_t tb_basic_stream_bwrit(tb_basic_stream_t* stream, tb_byte_t const* data
 tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
 {
     // check stream
-    tb_assert_and_check_return_val(stream && stream->writ && stream->wait && tb_stream_is_opened(stream), tb_false);
+    tb_assert_and_check_return_val(stream && stream->writ && stream->wait && tb_basic_stream_is_opened(stream), tb_false);
 
     // stoped?
-    tb_assert_and_check_return_val((TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)), tb_false);
+    tb_assert_and_check_return_val((TB_STATE_OPENED == tb_atomic_get(&stream->istate)), tb_false);
 
     // cached? sync cache first
     if (tb_queue_buffer_maxn(&stream->cache))
@@ -578,7 +899,7 @@ tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
 
             // writ cache data to stream
             tb_size_t   writ = 0;
-            while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
+            while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
             {
                 // writ
                 tb_long_t real = stream->writ(stream, head + writ, size - writ);
@@ -593,7 +914,7 @@ tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
                 else if (!real)
                 {
                     // wait
-                    real = stream->wait(stream, TB_BASIC_STREAM_WAIT_WRIT, tb_stream_timeout(stream));
+                    real = stream->wait(stream, TB_BASIC_STREAM_WAIT_WRIT, tb_basic_stream_timeout(stream));
 
                     // ok?
                     tb_check_break(real > 0);
@@ -609,7 +930,7 @@ tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
             if (!tb_queue_buffer_null(&stream->cache))
             {
                 // killed? save state
-                if (!stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->base.istate)))
+                if (!stream->state && (TB_STATE_KILLING == tb_atomic_get(&stream->istate)))
                     stream->state = TB_STATE_KILLED;
 
                 // failed
@@ -625,17 +946,17 @@ tb_bool_t tb_basic_stream_sync(tb_basic_stream_t* stream, tb_bool_t bclosing)
 tb_bool_t tb_basic_stream_seek(tb_basic_stream_t* stream, tb_hize_t offset)
 {
     // check stream
-    tb_assert_and_check_return_val(stream && tb_stream_is_opened(stream), tb_false);
+    tb_assert_and_check_return_val(stream && tb_basic_stream_is_opened(stream), tb_false);
 
     // stoped?
-    tb_assert_and_check_return_val((TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)), tb_false);
+    tb_assert_and_check_return_val((TB_STATE_OPENED == tb_atomic_get(&stream->istate)), tb_false);
 
     // limit offset
-    tb_hong_t size = tb_stream_size(stream);
+    tb_hong_t size = tb_basic_stream_size(stream);
     if (size >= 0 && offset > size) offset = size;
 
     // the offset be not changed?
-    tb_hize_t curt = tb_stream_offset(stream);
+    tb_hize_t curt = tb_basic_stream_offset(stream);
     tb_check_return_val(offset != curt, tb_true);
 
     // for writing
@@ -697,7 +1018,7 @@ tb_bool_t tb_basic_stream_seek(tb_basic_stream_t* stream, tb_hize_t offset)
         {
             // read some data for updating offset
             tb_byte_t data[TB_BASIC_STREAM_BLOCK_MAXN];
-            while (tb_stream_offset(stream) != offset)
+            while (tb_basic_stream_offset(stream) != offset)
             {
                 tb_size_t need = (tb_size_t)tb_min(offset - curt, TB_BASIC_STREAM_BLOCK_MAXN);
                 if (!tb_basic_stream_bread(stream, data, need)) return tb_false;
@@ -706,18 +1027,18 @@ tb_bool_t tb_basic_stream_seek(tb_basic_stream_t* stream, tb_hize_t offset)
     }
 
     // ok?
-    return tb_stream_offset(stream) == offset? tb_true : tb_false;
+    return tb_basic_stream_offset(stream) == offset? tb_true : tb_false;
 }
 tb_bool_t tb_basic_stream_skip(tb_basic_stream_t* stream, tb_hize_t size)
 {
-    return tb_basic_stream_seek(stream, tb_stream_offset(stream) + size);
+    return tb_basic_stream_seek(stream, tb_basic_stream_offset(stream) + size);
 }
 tb_long_t tb_basic_stream_bread_line(tb_basic_stream_t* stream, tb_char_t* data, tb_size_t size)
 {
     // done
     tb_char_t   ch = 0;
     tb_char_t*  p = data;
-    while ((TB_STATE_OPENED == tb_atomic_get(&stream->base.istate)))
+    while ((TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
     {
         // read char
         ch = tb_basic_stream_bread_s8(stream);
@@ -745,10 +1066,10 @@ tb_long_t tb_basic_stream_bread_line(tb_basic_stream_t* stream, tb_char_t* data,
     }
 
     // killed?
-    if ((TB_STATE_KILLING == tb_atomic_get(&stream->base.istate))) return -1;
+    if ((TB_STATE_KILLING == tb_atomic_get(&stream->istate))) return -1;
 
     // end?
-    return tb_stream_beof(stream)? -1 : 0;
+    return tb_basic_stream_beof(stream)? -1 : 0;
 }
 tb_long_t tb_basic_stream_bwrit_line(tb_basic_stream_t* stream, tb_char_t* data, tb_size_t size)
 {

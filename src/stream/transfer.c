@@ -45,18 +45,18 @@ tb_hong_t tb_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostrea
     tb_assert_and_check_return_val(ostream && istream, -1); 
 
     // open it first if istream have been not opened
-    if (tb_stream_is_closed(istream) && tb_stream_is_closed(istream)) return -1;
+    if (tb_basic_stream_is_closed(istream) && tb_basic_stream_is_closed(istream)) return -1;
     
     // open it first if ostream have been not opened
-    if (tb_stream_is_closed(ostream) && tb_stream_is_closed(ostream)) return -1;
+    if (tb_basic_stream_is_closed(ostream) && tb_basic_stream_is_closed(ostream)) return -1;
                 
     // done func
-    if (func) func(TB_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);
+    if (func) func(TB_STATE_OK, tb_basic_stream_offset(istream), tb_basic_stream_size(istream), 0, 0, priv);
 
     // writ data
     tb_byte_t   data[TB_BASIC_STREAM_BLOCK_MAXN];
     tb_hize_t   writ = 0;
-    tb_hize_t   left = tb_stream_left(istream);
+    tb_hize_t   left = tb_basic_stream_left(istream);
     tb_hong_t   base = tb_cache_time_spak();
     tb_hong_t   base1s = base;
     tb_hong_t   time = 0;
@@ -111,7 +111,7 @@ tb_hong_t tb_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostrea
                     delay = 0;
 
                     // done func
-                    if (func) func(TB_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), writ, crate, priv);
+                    if (func) func(TB_STATE_OK, tb_basic_stream_offset(istream), tb_basic_stream_size(istream), writ, crate, priv);
                 }
 
                 // wait some time for limit rate
@@ -121,7 +121,7 @@ tb_hong_t tb_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostrea
         else if (!real) 
         {
             // wait
-            tb_long_t wait = tb_basic_stream_wait(istream, TB_BASIC_STREAM_WAIT_READ, tb_stream_timeout(istream));
+            tb_long_t wait = tb_basic_stream_wait(istream, TB_BASIC_STREAM_WAIT_READ, tb_basic_stream_timeout(istream));
             tb_assert_and_check_break(wait >= 0);
 
             // timeout?
@@ -150,7 +150,7 @@ tb_hong_t tb_transfer_done(tb_basic_stream_t* istream, tb_basic_stream_t* ostrea
         tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : (tb_size_t)writ;
     
         // done func
-        func(TB_STATE_CLOSED, tb_stream_offset(istream), tb_stream_size(istream), writ, trate, priv);
+        func(TB_STATE_CLOSED, tb_basic_stream_offset(istream), tb_basic_stream_size(istream), writ, trate, priv);
     }
 
     // ok?
@@ -163,7 +163,7 @@ tb_hong_t tb_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_char_t c
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  ostream = tb_object_null;
+    tb_basic_stream_t*  ostream = tb_null;
     do
     {
         // init ostream
@@ -171,10 +171,10 @@ tb_hong_t tb_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_char_t c
         tb_assert_and_check_break(ostream);
 
         // ctrl file
-        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
+        if (tb_basic_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+            if (!tb_basic_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
         }
 
         // save stream
@@ -184,7 +184,7 @@ tb_hong_t tb_transfer_done_stream_to_url(tb_basic_stream_t* istream, tb_char_t c
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_object_null;
+    ostream = tb_null;
 
     // ok?
     return size;
@@ -196,7 +196,7 @@ tb_hong_t tb_transfer_done_stream_to_data(tb_basic_stream_t* istream, tb_byte_t*
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  ostream = tb_object_null;
+    tb_basic_stream_t*  ostream = tb_null;
     do
     {
         // init ostream
@@ -210,7 +210,7 @@ tb_hong_t tb_transfer_done_stream_to_data(tb_basic_stream_t* istream, tb_byte_t*
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_object_null;
+    ostream = tb_null;
 
     // ok?
     return size;
@@ -222,8 +222,8 @@ tb_hong_t tb_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ou
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_object_null;
-    tb_basic_stream_t*  ostream = tb_object_null;
+    tb_basic_stream_t*  istream = tb_null;
+    tb_basic_stream_t*  ostream = tb_null;
     do
     {
         // init istream
@@ -235,10 +235,10 @@ tb_hong_t tb_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ou
         tb_assert_and_check_break(ostream);
 
         // ctrl file
-        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
+        if (tb_basic_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+            if (!tb_basic_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
         }
 
         // open istream
@@ -254,11 +254,11 @@ tb_hong_t tb_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ou
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_object_null;
+    istream = tb_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_object_null;
+    ostream = tb_null;
 
     // ok?
     return size;
@@ -270,7 +270,7 @@ tb_hong_t tb_transfer_done_url_to_stream(tb_char_t const* iurl, tb_basic_stream_
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_object_null;
+    tb_basic_stream_t*  istream = tb_null;
     do
     {
         // init istream
@@ -284,7 +284,7 @@ tb_hong_t tb_transfer_done_url_to_stream(tb_char_t const* iurl, tb_basic_stream_
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_object_null;
+    istream = tb_null;
 
     // ok?
     return size;
@@ -296,8 +296,8 @@ tb_hong_t tb_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* odata, 
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_object_null;
-    tb_basic_stream_t*  ostream = tb_object_null;
+    tb_basic_stream_t*  istream = tb_null;
+    tb_basic_stream_t*  ostream = tb_null;
     do
     {
         // init istream
@@ -315,11 +315,11 @@ tb_hong_t tb_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* odata, 
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_object_null;
+    istream = tb_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_object_null;
+    ostream = tb_null;
 
     // ok?
     return size;
@@ -331,8 +331,8 @@ tb_hong_t tb_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, 
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_object_null;
-    tb_basic_stream_t*  ostream = tb_object_null;
+    tb_basic_stream_t*  istream = tb_null;
+    tb_basic_stream_t*  ostream = tb_null;
     do
     {
         // init istream
@@ -344,10 +344,10 @@ tb_hong_t tb_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, 
         tb_assert_and_check_break(ostream);
 
         // ctrl file
-        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
+        if (tb_basic_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+            if (!tb_basic_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
         }
 
         // save stream
@@ -357,11 +357,11 @@ tb_hong_t tb_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, 
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_object_null;
+    istream = tb_null;
 
     // exit ostream
     if (ostream) tb_basic_stream_exit(ostream);
-    ostream = tb_object_null;
+    ostream = tb_null;
 
     // ok?
     return size;
@@ -373,7 +373,7 @@ tb_hong_t tb_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_t isiz
 
     // done
     tb_hong_t       size = -1;
-    tb_basic_stream_t*  istream = tb_object_null;
+    tb_basic_stream_t*  istream = tb_null;
     do
     {
         // init istream
@@ -387,7 +387,7 @@ tb_hong_t tb_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_t isiz
 
     // exit istream
     if (istream) tb_basic_stream_exit(istream);
-    istream = tb_object_null;
+    istream = tb_null;
 
     // ok?
     return size;

@@ -80,8 +80,8 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
 tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip)
 {
     // the libc stack end pointer
-    tb_pointer_t* __plibc_stack_end = dlsym(tb_object_null, "__libc_stack_end");
-    tb_pointer_t __libc_stack_end = __plibc_stack_end? *__plibc_stack_end : tb_object_null;
+    tb_pointer_t* __plibc_stack_end = dlsym(tb_null, "__libc_stack_end");
+    tb_pointer_t __libc_stack_end = __plibc_stack_end? *__plibc_stack_end : tb_null;
 
     // trace
 //  tb_trace_d("__libc_stack_end: %p", __libc_stack_end);
@@ -145,12 +145,12 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
 #if defined(TB_CONFIG_LIBC_HAVE_BACKTRACE)
 tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {
-    tb_check_return_val(frames && nframe, tb_object_null);
+    tb_check_return_val(frames && nframe, tb_null);
     return (tb_handle_t)backtrace_symbols(frames, nframe);
 }
 tb_char_t const* tb_backtrace_symbols_name(tb_handle_t symbols, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
 {
-    tb_check_return_val(symbols && frames && nframe && iframe < nframe, tb_object_null);
+    tb_check_return_val(symbols && frames && nframe && iframe < nframe, tb_null);
     return ((tb_char_t const**)symbols)[iframe];
 }
 tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
@@ -161,7 +161,7 @@ tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
 tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {
     // check
-    tb_check_return_val(frames && nframe, tb_object_null);
+    tb_check_return_val(frames && nframe, tb_null);
 
     // init symbols
     return malloc(8192);
@@ -169,15 +169,15 @@ tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 tb_char_t const* tb_backtrace_symbols_name(tb_handle_t symbols, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
 {
     // check
-    tb_check_return_val(symbols && frames && nframe && iframe < nframe, tb_object_null);
+    tb_check_return_val(symbols && frames && nframe && iframe < nframe, tb_null);
 
     // the frame address
     tb_pointer_t frame = frames[iframe];
-    tb_check_return_val(frame, tb_object_null);
+    tb_check_return_val(frame, tb_null);
 
     // the frame dlinfo
     Dl_info dlinfo = {0};
-    if (!dladdr(frame, &dlinfo)) return tb_object_null;
+    if (!dladdr(frame, &dlinfo)) return tb_null;
 
     // format
     tb_long_t size = 0;

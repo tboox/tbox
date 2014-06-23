@@ -117,7 +117,7 @@ tb_zip_vlc_t* tb_zip_vlc_golomb_open(tb_zip_vlc_golomb_t* golomb, tb_size_t defm
     ((tb_zip_vlc_t*)golomb)->type = TB_ZIP_VLC_TYPE_GOLOMB;
     ((tb_zip_vlc_t*)golomb)->set = tb_zip_vlc_golomb_set;
     ((tb_zip_vlc_t*)golomb)->get = tb_zip_vlc_golomb_get;
-    ((tb_zip_vlc_t*)golomb)->clos = tb_object_null;
+    ((tb_zip_vlc_t*)golomb)->clos = tb_null;
     golomb->defm = defm;
 
 #ifdef TB_ZIP_VLC_GOLOMB_ADAPTIVE

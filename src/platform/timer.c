@@ -105,7 +105,7 @@ static __tb_inline__ tb_hong_t tb_timer_now(tb_timer_t* timer)
     {
         // get the time
         tb_timeval_t tv = {0};
-        if (tb_gettimeofday(&tv, tb_object_null)) return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
+        if (tb_gettimeofday(&tv, tb_null)) return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
     }
 
     // using cached time
@@ -133,10 +133,10 @@ tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 {
     // make timer
     tb_timer_t* timer = (tb_timer_t*)tb_malloc0(sizeof(tb_timer_t));
-    tb_assert_and_check_return_val(timer, tb_object_null);
+    tb_assert_and_check_return_val(timer, tb_null);
 
     // init func
-    tb_item_func_t func = tb_item_func_ptr(tb_object_null, tb_object_null); func.comp = tb_timer_comp_by_when;
+    tb_item_func_t func = tb_item_func_ptr(tb_null, tb_null); func.comp = tb_timer_comp_by_when;
 
     // init timer
     timer->maxn         = tb_max(maxn, 16);
@@ -162,7 +162,7 @@ tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
     return (tb_handle_t)timer;
 fail:
     if (timer) tb_timer_exit(timer);
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_timer_exit(tb_handle_t handle)
 {
@@ -190,15 +190,15 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 
         // exit heap
         if (timer->heap) tb_heap_exit(timer->heap);
-        timer->heap = tb_object_null;
+        timer->heap = tb_null;
 
         // exit pool
         if (timer->pool) tb_fixed_pool_exit(timer->pool);
-        timer->pool = tb_object_null;
+        timer->pool = tb_null;
 
         // exit event
         if (timer->event) tb_event_exit(timer->event);
-        timer->event = tb_object_null;
+        timer->event = tb_null;
 
         // leave
         tb_spinlock_leave(&timer->lock);
@@ -303,8 +303,8 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 
     // done
     tb_bool_t               ok = tb_false;
-    tb_timer_task_func_t    func = tb_object_null;
-    tb_cpointer_t           priv = tb_object_null;
+    tb_timer_task_func_t    func = tb_null;
+    tb_cpointer_t           priv = tb_null;
     tb_bool_t               killed = tb_false;
     do
     {
@@ -415,7 +415,7 @@ tb_handle_t tb_timer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t re
 {
     // check
     tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && func, tb_object_null);
+    tb_assert_and_check_return_val(timer && func, tb_null);
 
     // add task
     return tb_timer_task_init_at(handle, tb_timer_now(timer) + delay, delay, repeat, func, priv);
@@ -424,16 +424,16 @@ tb_handle_t tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 {
     // check
     tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && timer->pool && timer->heap && func, tb_object_null);
+    tb_assert_and_check_return_val(timer && timer->pool && timer->heap && func, tb_null);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_object_null);
+    tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_null);
 
     // enter
     tb_spinlock_enter(&timer->lock);
 
     // make task
-    tb_handle_t         event = tb_object_null;
+    tb_handle_t         event = tb_null;
     tb_hize_t           when_top = -1;
     tb_timer_task_t*    task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
     if (task)
@@ -474,7 +474,7 @@ tb_handle_t tb_timer_task_init_after(tb_handle_t handle, tb_hize_t after, tb_siz
 {
     // check
     tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && func, tb_object_null);
+    tb_assert_and_check_return_val(timer && func, tb_null);
 
     // add task
     return tb_timer_task_init_at(handle, tb_timer_now(timer) + after, period, repeat, func, priv);
@@ -501,7 +501,7 @@ tb_void_t tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
     tb_spinlock_enter(&timer->lock);
 
     // make task
-    tb_handle_t         event = tb_object_null;
+    tb_handle_t         event = tb_null;
     tb_hize_t           when_top = -1;
     tb_timer_task_t*    task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
     if (task)
@@ -564,8 +564,8 @@ tb_void_t tb_timer_task_exit(tb_handle_t handle, tb_handle_t htask)
         task->refn--;
 
         // cancel task
-        task->func      = tb_object_null;
-        task->priv      = tb_object_null;
+        task->func      = tb_null;
+        task->priv      = tb_null;
         task->repeat    = 0;
     }
     // remove it from pool directly if the task have been expired 

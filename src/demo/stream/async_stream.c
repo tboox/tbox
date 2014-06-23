@@ -76,7 +76,7 @@ static tb_bool_t tb_demo_transfer_done_func(tb_size_t state, tb_hize_t offset, t
     // ok?
     return (state == TB_STATE_OK)? tb_true : tb_false;
 }
-static tb_bool_t tb_demo_istream_open_func(tb_handle_t stream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_demo_context_t* context = (tb_demo_context_t*)priv;
@@ -92,8 +92,8 @@ static tb_bool_t tb_demo_istream_open_func(tb_handle_t stream, tb_size_t state, 
             // print verbose info
             if (context->verbose) 
             {
-                tb_char_t const* url = tb_object_null;
-                tb_stream_ctrl(stream, TB_STREAM_CTRL_GET_URL, &url);
+                tb_char_t const* url = tb_null;
+                tb_async_stream_ctrl(stream, TB_STREAM_CTRL_GET_URL, &url);
                 tb_printf("open: %s: %s\n", url, tb_state_cstr(state));
             }
             break;
@@ -138,7 +138,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_handle_t stream, tb_size_t state, 
         tb_assert_and_check_break(context->ostream);
 
         // init transfer
-        context->transfer = tb_async_transfer_init(tb_object_null, tb_true);
+        context->transfer = tb_async_transfer_init(tb_null, tb_true);
         tb_assert_and_check_break(context->transfer);
 
         // init transfer stream
@@ -187,7 +187,7 @@ static tb_option_item_t g_options[] =
 ,   {'-',   "timeout",      TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set the timeout"           }
 ,   {'h',   "help",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "display this help and exit"}
 ,   {'-',   "url",          TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the url"                   }
-,   {'-',   tb_object_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_object_null                     }
+,   {'-',   tb_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_null                     }
 
 };
 
@@ -219,24 +219,24 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                 tb_assert_and_check_break(context.event);
 
                 // init istream
-                context.istream = tb_async_stream_init_from_url(tb_object_null, tb_option_item_cstr(context.option, "url"));
+                context.istream = tb_async_stream_init_from_url(tb_null, tb_option_item_cstr(context.option, "url"));
                 tb_assert_and_check_break(context.istream);
 
                 // ctrl http
-                if (tb_stream_type(context.istream) == TB_STREAM_TYPE_HTTP) 
+                if (tb_async_stream_type(context.istream) == TB_STREAM_TYPE_HTTP) 
                 {
                     // enable gzip?
                     if (tb_option_find(context.option, "gzip"))
                     {
                         // auto unzip
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
 
                         // need gzip
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
                     }
 
                     // enable debug?
-                    if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, context.debug? tb_demo_istream_head_func : tb_object_null)) break;
+                    if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, context.debug? tb_demo_istream_head_func : tb_null)) break;
 
                     // custem header?
                     if (tb_option_find(context.option, "header"))
@@ -285,7 +285,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                                     if (tb_string_size(&key) && tb_string_size(&val))
                                     {
                                         if (context.debug) tb_printf("header: %s: %s\n", tb_string_cstr(&key), tb_string_cstr(&val));
-                                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
+                                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
                                     }
 
                                     // is key now
@@ -302,7 +302,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                         if (tb_string_size(&key) && tb_string_size(&val))
                         {
                             if (context.debug) tb_printf("header: %s: %s\n", tb_string_cstr(&key), tb_string_cstr(&val));
-                            if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
+                            if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
                         }
 
                         // exit 
@@ -313,7 +313,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                     // keep alive?
                     if (tb_option_find(context.option, "keep-alive"))
                     {
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Connection", "keep-alive")) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Connection", "keep-alive")) break;
                     }
 
                     // post-data?
@@ -321,18 +321,18 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                     {
                         tb_char_t const*    post_data = tb_option_item_cstr(context.option, "post-data");
                         tb_hize_t           post_size = tb_strlen(post_data);
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_DATA, post_data, post_size)) break;
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_DATA, post_data, post_size)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
                         if (context.debug) tb_printf("post: %llu\n", post_size);
                     }
                     // post-file?
                     else if (tb_option_find(context.option, "post-file"))
                     {
                         tb_char_t const* url = tb_option_item_cstr(context.option, "post-file");
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_URL, url)) break;
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_URL, url)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
                         if (context.debug) tb_printf("post: %s\n", url);
                     }
                 }
@@ -352,7 +352,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                             p++;
                             eof = tb_atoll(p);
                         }
-                        if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_RANGE, bof, eof)) break;
+                        if (!tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_RANGE, bof, eof)) break;
                     }
                 }
 
@@ -360,7 +360,7 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
                 if (tb_option_find(context.option, "timeout"))
                 {
                     tb_size_t timeout = tb_option_item_uint32(context.option, "timeout");
-                    tb_stream_ctrl(context.istream, TB_STREAM_CTRL_SET_TIMEOUT, &timeout);
+                    tb_async_stream_ctrl(context.istream, TB_STREAM_CTRL_SET_TIMEOUT, &timeout);
                 }
 
                 // print verbose info
@@ -385,23 +385,23 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 
     // exit transfer
     if (context.transfer) tb_async_transfer_exit(context.transfer);
-    context.transfer = tb_object_null;
+    context.transfer = tb_null;
 
     // exit istream
     if (context.istream) tb_async_stream_exit(context.istream);
-    context.istream = tb_object_null;
+    context.istream = tb_null;
 
     // exit ostream
     if (context.ostream) tb_async_stream_exit(context.ostream);
-    context.ostream = tb_object_null;
+    context.ostream = tb_null;
 
     // exit option
     if (context.option) tb_option_exit(context.option);
-    context.option = tb_object_null;
+    context.option = tb_null;
 
     // exit event
     if (context.event) tb_event_exit(context.event);
-    context.event = tb_object_null;
+    context.event = tb_null;
 
     return 0;
 }

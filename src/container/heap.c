@@ -204,7 +204,7 @@ static tb_pointer_t tb_heap_iterator_item(tb_iterator_t* iterator, tb_size_t ito
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && itor < impl->size, tb_object_null);
+    tb_assert_and_check_return_val(impl && itor < impl->size, tb_null);
     
     // data
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
@@ -289,8 +289,8 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
     tb_byte_t*          tail = head + impl->size * step;
     tb_byte_t*          last = head + (impl->size - 1) * step;
     tb_byte_t*          child = head + ((itor << 1) + 1) * step;
-    tb_pointer_t        data_child = tb_object_null;
-    tb_pointer_t        data_rchild = tb_object_null;
+    tb_pointer_t        data_child = tb_null;
+    tb_pointer_t        data_rchild = tb_null;
     tb_pointer_t        data_last = func_data(&impl->func, last);
     switch (step)
     {
@@ -428,12 +428,12 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
 {
     // check
-    tb_assert_and_check_return_val(grow, tb_object_null);
-    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_object_null);
+    tb_assert_and_check_return_val(grow, tb_null);
+    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_null);
 
     // done
     tb_bool_t       ok = tb_false;
-    tb_heap_impl_t* impl = tb_object_null;
+    tb_heap_impl_t* impl = tb_null;
     do
     {
         // make impl
@@ -449,7 +449,7 @@ tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
 
         // init iterator
         impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-        impl->itor.priv = tb_object_null;
+        impl->itor.priv = tb_null;
         impl->itor.step = func.size;
         impl->itor.size = tb_heap_iterator_size;
         impl->itor.head = tb_heap_iterator_head;
@@ -475,7 +475,7 @@ tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
     {
         // exit it
         if (impl) tb_heap_exit((tb_heap_t*)impl);
-        impl = tb_object_null;
+        impl = tb_null;
     }
 
     // ok?
@@ -492,7 +492,7 @@ tb_void_t tb_heap_exit(tb_heap_t* heap)
 
     // free data
     if (impl->data) tb_free(impl->data);
-    impl->data = tb_object_null;
+    impl->data = tb_null;
 
     // free it
     tb_free(impl);

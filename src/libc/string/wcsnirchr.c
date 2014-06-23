@@ -34,7 +34,7 @@
 tb_wchar_t* tb_wcsnirchr(tb_wchar_t const* s, tb_size_t n, tb_wchar_t c)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     // done
     tb_wchar_t const*   p = s + n - 1;
@@ -44,5 +44,5 @@ tb_wchar_t* tb_wcsnirchr(tb_wchar_t const* s, tb_size_t n, tb_wchar_t c)
         if (tb_tolower(*p) == b) return (tb_wchar_t*)p;
         p--;
     }
-    return tb_object_null;
+    return tb_null;
 }

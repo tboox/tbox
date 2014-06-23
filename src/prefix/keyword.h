@@ -114,7 +114,7 @@
 
 // the string only for the large mode
 #ifdef __tb_small__
-#   define __tb_lstring__(x)                    tb_object_null
+#   define __tb_lstring__(x)                    tb_null
 #else
 #   define __tb_lstring__(x)                    x
 #endif

@@ -51,17 +51,17 @@ static tb_void_t tb_random_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
  */
 tb_handle_t tb_random_generator()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_RANDOM, tb_random_instance_init, tb_random_instance_exit, tb_object_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_RANDOM, tb_random_instance_init, tb_random_instance_exit, tb_null);
 }
 tb_handle_t tb_random_init(tb_size_t type, tb_size_t seed)
 {
     // the init func
     static tb_handle_t (*s_init[])(tb_size_t ) = 
     {
-        tb_object_null
+        tb_null
     ,   tb_random_linear_init
     };
-    tb_assert_and_check_return_val(type < tb_object_arrayn(s_init) && s_init[type], tb_object_null);
+    tb_assert_and_check_return_val(type < tb_object_arrayn(s_init) && s_init[type], tb_null);
 
     // init it
     return s_init[type](seed);

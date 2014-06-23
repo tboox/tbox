@@ -59,7 +59,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
     tb_assert_and_check_return(database && sql);
 
     // done
-    tb_handle_t stmt = tb_object_null;
+    tb_handle_t stmt = tb_null;
     do
     {
         // init stmt
@@ -130,7 +130,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
             tb_assert_and_check_break(ldata2);
             {
                 // data?
-                tb_basic_stream_t*  stream = tb_object_null;
+                tb_basic_stream_t*  stream = tb_null;
                 if (tb_object_database_sql_value_blob(ldata2))
                 {
                     // trace
@@ -140,7 +140,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
                 else if ((stream = tb_object_database_sql_value_blob_stream(ldata2)))
                 {
                     // the stream size
-                    tb_hong_t size = tb_stream_size(stream);
+                    tb_hong_t size = tb_basic_stream_size(stream);
                     tb_assert_and_check_break(size >= 0);
 
                     // make data
@@ -193,8 +193,8 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
     tb_assert_and_check_return(database && sql);
 
     // done
-    tb_handle_t         stmt = tb_object_null;
-    tb_basic_stream_t*  stream = tb_object_null;
+    tb_handle_t         stmt = tb_null;
+    tb_basic_stream_t*  stream = tb_null;
     do
     {
         // init stmt
@@ -221,8 +221,8 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
         tb_object_database_sql_value_set_text(&list[0], name, 0);
         tb_object_database_sql_value_set_blob16(&list[1], (tb_byte_t const*)data, tb_strlen(data) + 1);
         tb_object_database_sql_value_set_blob8(&list[2], (tb_byte_t const*)tdata, tb_strlen(tdata) + 1);
-        tb_object_database_sql_value_set_blob32(&list[3], (tb_byte_t const*)ldata1, tb_strlen(ldata1) + 1, tb_object_null);
-        tb_object_database_sql_value_set_blob32(&list[4], tb_object_null, 0, stream);
+        tb_object_database_sql_value_set_blob32(&list[3], (tb_byte_t const*)ldata1, tb_strlen(ldata1) + 1, tb_null);
+        tb_object_database_sql_value_set_blob32(&list[4], tb_null, 0, stream);
         tb_object_database_sql_value_set_int32(&list[5], number);
         tb_object_database_sql_value_set_int16(&list[6], snumber);
         if (!tb_object_database_sql_statement_bind(database, stmt, list, tb_object_arrayn(list)))

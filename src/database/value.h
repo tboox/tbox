@@ -387,7 +387,7 @@ static __tb_inline_force__ tb_size_t tb_object_database_sql_value_type(tb_object
 static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_name(tb_object_database_sql_value_t const* value)
 {
     // check
-    tb_assert_and_check_return_val(value, tb_object_null);
+    tb_assert_and_check_return_val(value, tb_null);
 
     // the name
     return value->name;
@@ -397,7 +397,7 @@ static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_name(tb
 static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_text(tb_object_database_sql_value_t const* value)
 {
     // check
-    tb_assert_and_check_return_val(value, tb_object_null);
+    tb_assert_and_check_return_val(value, tb_null);
 
     // is text?
     if (tb_object_database_sql_value_is_text(value)) 
@@ -407,18 +407,18 @@ static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_text(tb
         return (tb_char_t const*)value->u.blob.data;
     // is null?
     else if (tb_object_database_sql_value_is_null(value))
-        return tb_object_null;
+        return tb_null;
 
     // trace
     tb_trace_e("not text value type: %lu", value->type);
-    return tb_object_null;
+    return tb_null;
 }
 
 /// the value blob data
 static __tb_inline_force__ tb_byte_t const* tb_object_database_sql_value_blob(tb_object_database_sql_value_t const* value)
 {
     // check
-    tb_assert_and_check_return_val(value, tb_object_null);
+    tb_assert_and_check_return_val(value, tb_null);
 
     // is blob?
     if (tb_object_database_sql_value_is_blob(value)) 
@@ -428,18 +428,18 @@ static __tb_inline_force__ tb_byte_t const* tb_object_database_sql_value_blob(tb
         return (tb_byte_t const*)value->u.text.data;
     // is null?
     else if (tb_object_database_sql_value_is_null(value))
-        return tb_object_null;
+        return tb_null;
 
     // trace
     tb_trace_e("not blob value type: %lu", value->type);
-    return tb_object_null;
+    return tb_null;
 }
 
 /// the value blob stream
 static __tb_inline_force__ tb_basic_stream_t* tb_object_database_sql_value_blob_stream(tb_object_database_sql_value_t const* value)
 {
     // the blob stream
-    return tb_object_database_sql_value_is_blob(value)? value->u.blob.stream : tb_object_null;
+    return tb_object_database_sql_value_is_blob(value)? value->u.blob.stream : tb_null;
 }
 
 /// set the value name

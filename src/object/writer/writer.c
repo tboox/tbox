@@ -32,7 +32,7 @@
  */
 
 // the object writer
-static tb_object_writer_t*  g_writer[TB_OBJECT_FORMAT_MAXN] = {tb_object_null};
+static tb_object_writer_t*  g_writer[TB_OBJECT_FORMAT_MAXN] = {tb_null};
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -63,17 +63,17 @@ tb_void_t tb_object_writer_del(tb_size_t format)
     {
         // exit hooker
         if (g_writer[format]->hooker) tb_hash_exit(g_writer[format]->hooker);
-        g_writer[format]->hooker = tb_object_null;
+        g_writer[format]->hooker = tb_null;
         
         // clear it
-        g_writer[format] = tb_object_null;
+        g_writer[format] = tb_null;
     }
 }
 tb_object_writer_t* tb_object_writer_get(tb_size_t format)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return_val((format < tb_object_arrayn(g_writer)), tb_object_null);
+    tb_assert_and_check_return_val((format < tb_object_arrayn(g_writer)), tb_null);
 
     // ok
     return g_writer[format];

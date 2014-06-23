@@ -94,7 +94,7 @@ tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
             if (s[real])
             {
                 tb_trace_i("[strnlen]: [overflow]: [%p, %lu]", s, size);
-                tb_backtrace_dump("[strnlen]: [overflow]: ", tb_object_null, 10);
+                tb_backtrace_dump("[strnlen]: [overflow]: ", tb_null, 10);
                 tb_memory_data_dump(s, "\t[malloc]: [from]: ");
                 tb_abort();
             }

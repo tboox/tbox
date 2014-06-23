@@ -51,7 +51,7 @@ tb_void_t tb_print(tb_char_t const* string)
     __android_log_print(ANDROID_LOG_DEBUG, __tb_prefix__? __tb_prefix__ : "tbox", "%s", string);
 #elif defined(TB_CONFIG_OS_IOS)
     // print to the ios device log
-    asl_log(tb_object_null, tb_object_null, ASL_LEVEL_WARNING, "%s", string);
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s", string);
 #endif
 
     // print to the stdout
@@ -72,7 +72,7 @@ tb_void_t tb_printl(tb_char_t const* string)
     __android_log_print(ANDROID_LOG_DEBUG, __tb_prefix__? __tb_prefix__ : "tbox", "%s\n", string);
 #elif defined(TB_CONFIG_OS_IOS)
     // print to the ios device log
-    asl_log(tb_object_null, tb_object_null, ASL_LEVEL_WARNING, "%s\n", string);
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s\n", string);
 #endif
 
     // print string to the stdout

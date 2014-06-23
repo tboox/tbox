@@ -53,7 +53,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 {
     // make semaphore
     tb_semaphore_t* semaphore = tb_malloc0(sizeof(tb_semaphore_t));
-    tb_assert_and_check_return_val(semaphore, tb_object_null);
+    tb_assert_and_check_return_val(semaphore, tb_null);
 
     // init semaphore 
     if (KERN_SUCCESS != semaphore_create(mach_task_self(), &(semaphore->handle), SYNC_POLICY_FIFO, init)) goto fail;
@@ -66,7 +66,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 
 fail:
     if (semaphore) tb_semaphore_exit(semaphore);
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_semaphore_exit(tb_handle_t handle)
 {

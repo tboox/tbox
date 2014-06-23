@@ -60,8 +60,8 @@ static tb_pointer_t tb_test_thread(tb_cpointer_t priv)
 
 end:
     tb_trace_i("[thread: %u]: exit", it? it->i : 0);
-    tb_thread_return(tb_object_null);
-    return tb_object_null;
+    tb_thread_return(tb_null);
+    return tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ tb_int_t tb_demo_platform_semaphore_main(tb_int_t argc, tb_char_t** argv)
     {
         it[i].i = i;
         it[i].s = tb_semaphore_init(0); tb_semaphore_post(it[i].s, 1);
-        it[i].t = tb_thread_init(tb_object_null, tb_test_thread, it + i, 0);
+        it[i].t = tb_thread_init(tb_null, tb_test_thread, it + i, 0);
         tb_assert_and_check_goto(it[i].t, end);
     }
     tb_msleep(100);

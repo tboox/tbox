@@ -17,7 +17,7 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
     if (istream && ostream && tb_basic_stream_open(istream) && tb_basic_stream_open(ostream))
     {
         // init data & size
-        tb_hong_t isize = tb_stream_size(istream);
+        tb_hong_t isize = tb_basic_stream_size(istream);
         if (isize > 0)
         {
             tb_long_t   osize = (tb_long_t)(isize << 2);

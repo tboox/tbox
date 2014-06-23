@@ -74,11 +74,11 @@ typedef struct __tb_xml_writer_t
 tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
 {
     // check
-    tb_assert_and_check_return_val(wstream, tb_object_null);
+    tb_assert_and_check_return_val(wstream, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_xml_writer_t*    writer = tb_object_null;
+    tb_xml_writer_t*    writer = tb_null;
     do
     {
         // make writer
@@ -111,7 +111,7 @@ tb_handle_t tb_xml_writer_init(tb_basic_stream_t* wstream, tb_bool_t bformat)
     {
         // exit it
         if (writer) tb_xml_writer_exit(writer);
-        writer = tb_object_null;
+        writer = tb_null;
     }
 
     // ok?
@@ -124,15 +124,15 @@ tb_void_t tb_xml_writer_exit(tb_handle_t writer)
     {
         // exit attributes
         if (xwriter->attributes) tb_hash_exit(xwriter->attributes);
-        xwriter->attributes = tb_object_null;
+        xwriter->attributes = tb_null;
 
         // exit elements
         if (xwriter->elements) tb_stack_exit(xwriter->elements);
-        xwriter->elements = tb_object_null;
+        xwriter->elements = tb_null;
 
         // exit pool
         if (xwriter->pool) tb_pool_exit(xwriter->pool);
-        xwriter->pool = tb_object_null;
+        xwriter->pool = tb_null;
 
         // free it
         tb_free(xwriter);

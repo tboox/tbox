@@ -28,7 +28,7 @@ static tb_option_item_t g_options[] =
 ,   {'v',   "version",      TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "output version information and exit"}
 ,   {'-',   "file0",        TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the file0 path"}
 ,   {'-',   "file1",        TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the file1 path"}
-,   {'-',   tb_object_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_object_null}
+,   {'-',   tb_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_null}
 
 };
 

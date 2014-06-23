@@ -97,7 +97,7 @@ tb_void_t tb_url_clear(tb_url_t* url)
 tb_char_t const* tb_url_get(tb_url_t* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // exists? return it directly
     if (tb_string_size(&url->urls)) return tb_string_cstr(&url->urls);
@@ -108,7 +108,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     case TB_URL_PROTOCOL_FILE:
         {
             // check
-            tb_check_return_val(tb_static_string_size(&url->path), tb_object_null);
+            tb_check_return_val(tb_static_string_size(&url->path), tb_null);
 
             // add protocol
             if (!url->bwin)
@@ -131,7 +131,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     case TB_URL_PROTOCOL_RTSP:
         {   
             // check
-            tb_check_return_val(url->port && tb_static_string_size(&url->host), tb_object_null);
+            tb_check_return_val(url->port && tb_static_string_size(&url->host), tb_null);
 
             // add protocol
             if (url->poto == TB_URL_PROTOCOL_HTTP) tb_string_cstrcpy(&url->urls, "http");
@@ -202,7 +202,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     }
 
     // ok?
-    return tb_string_size(&url->urls)? tb_string_cstr(&url->urls) : tb_object_null;
+    return tb_string_size(&url->urls)? tb_string_cstr(&url->urls) : tb_null;
 }
 tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
 {
@@ -427,12 +427,12 @@ tb_void_t tb_url_protocol_set(tb_url_t* url, tb_size_t poto)
 tb_char_t const* tb_url_protocol_cstr(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // the protocols
     static tb_char_t const* s_protocols[] = 
     {
-        tb_object_null
+        tb_null
     ,   "data"
     ,   "file"
     ,   "sock"
@@ -440,7 +440,7 @@ tb_char_t const* tb_url_protocol_cstr(tb_url_t const* url)
     ,   "rtsp"
     ,   "sql"
     };
-    tb_assert_and_check_return_val(url->poto < tb_object_arrayn(s_protocols), tb_object_null);
+    tb_assert_and_check_return_val(url->poto < tb_object_arrayn(s_protocols), tb_null);
 
     // ok
     return s_protocols[url->poto];
@@ -492,10 +492,10 @@ tb_void_t tb_url_port_set(tb_url_t* url, tb_size_t port)
 tb_char_t const* tb_url_host_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // get host
-    return tb_static_string_size(&url->host)? tb_static_string_cstr(&url->host) : tb_object_null;
+    return tb_static_string_size(&url->host)? tb_static_string_cstr(&url->host) : tb_null;
 }
 tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 {
@@ -525,7 +525,7 @@ tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 tb_ipv4_t const* tb_url_ipv4_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // get ipv4
     return &(url->ipv4);
@@ -557,10 +557,10 @@ tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
 tb_char_t const* tb_url_path_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // get path
-    return tb_static_string_size(&url->path)? tb_static_string_cstr(&url->path) : tb_object_null;
+    return tb_static_string_size(&url->path)? tb_static_string_cstr(&url->path) : tb_null;
 }
 tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
 {
@@ -583,10 +583,10 @@ tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
 tb_char_t const* tb_url_args_get(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // get args
-    return tb_string_size(&url->args)? tb_string_cstr(&url->args) : tb_object_null;
+    return tb_string_size(&url->args)? tb_string_cstr(&url->args) : tb_null;
 }
 tb_void_t tb_url_args_set(tb_url_t* url, tb_char_t const* args)
 {

@@ -49,7 +49,7 @@ tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
 static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->pool, tb_object_null);
+    tb_assert_and_check_return_val(aiop && aiop->pool, tb_null);
 
     // enter 
     tb_spinlock_enter(&aiop->lock);
@@ -92,11 +92,11 @@ static tb_void_t tb_aiop_aioo_exit(tb_aiop_t* aiop, tb_handle_t aioo)
 tb_aiop_t* tb_aiop_init(tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(maxn, tb_object_null);
+    tb_assert_and_check_return_val(maxn, tb_null);
 
     // done
     tb_bool_t  ok = tb_false;
-    tb_aiop_t* aiop = tb_object_null;
+    tb_aiop_t* aiop = tb_null;
     do
     {
         // make aiop
@@ -121,7 +121,7 @@ tb_aiop_t* tb_aiop_init(tb_size_t maxn)
         tb_assert_and_check_break(aiop->rtor);
 
         // addo spak
-        if (!tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_object_null)) break;  
+        if (!tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null)) break;  
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
@@ -138,7 +138,7 @@ tb_aiop_t* tb_aiop_init(tb_size_t maxn)
     {
         // exit it
         if (aiop) tb_aiop_exit(aiop);
-        aiop = tb_object_null;
+        aiop = tb_null;
     }
 
     // ok?
@@ -156,13 +156,13 @@ tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
     // exit spak
     if (aiop->spak[0]) tb_socket_clos(aiop->spak[0]);
     if (aiop->spak[1]) tb_socket_clos(aiop->spak[1]);
-    aiop->spak[0] = tb_object_null;
-    aiop->spak[1] = tb_object_null;
+    aiop->spak[0] = tb_null;
+    aiop->spak[1] = tb_null;
 
     // exit pool
     tb_spinlock_enter(&aiop->lock);
     if (aiop->pool) tb_fixed_pool_exit(aiop->pool);
-    aiop->pool = tb_object_null;
+    aiop->pool = tb_null;
     tb_spinlock_leave(&aiop->lock);
 
     // exit lock
@@ -186,7 +186,7 @@ tb_void_t tb_aiop_cler(tb_aiop_t* aiop)
     tb_spinlock_leave(&aiop->lock);
 
     // addo spak
-    if (aiop->spak[1]) tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_object_null);   
+    if (aiop->spak[1]) tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null);   
 }
 tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
 {
@@ -231,11 +231,11 @@ tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
 tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_object_null);
+    tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_null);
 
     // done
     tb_bool_t   ok = tb_false;
-    tb_aioo_t*  aioo = tb_object_null;
+    tb_aioo_t*  aioo = tb_null;
     do
     {
         // init aioo
@@ -254,7 +254,7 @@ tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb
     if (!ok && aioo) 
     {
         tb_aiop_aioo_exit(aiop, aioo);
-        aioo = tb_object_null;
+        aioo = tb_null;
     }
 
     // ok?

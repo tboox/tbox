@@ -40,7 +40,7 @@
  */
 
 // the pool
-static tb_handle_t      g_pool = tb_object_null;
+static tb_handle_t      g_pool = tb_null;
 
 // the lock
 static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT; 
@@ -111,7 +111,7 @@ tb_void_t tb_memory_exit()
         // exit it
         tb_global_pool_exit(pool);
     }
-    g_pool = tb_object_null;
+    g_pool = tb_null;
 
     // leave
     tb_spinlock_leave(&g_lock);
@@ -131,7 +131,7 @@ tb_pointer_t tb_memory_malloc_(tb_size_t size __tb_debug_decl__)
     tb_handle_t pool = g_pool;
 
     // malloc
-    tb_pointer_t data = pool? tb_global_pool_malloc_(pool, size __tb_debug_args__) : tb_object_null;
+    tb_pointer_t data = pool? tb_global_pool_malloc_(pool, size __tb_debug_args__) : tb_null;
 
     // leave
     tb_spinlock_leave(&g_lock);
@@ -151,7 +151,7 @@ tb_pointer_t tb_memory_malloc0_(tb_size_t size __tb_debug_decl__)
     tb_handle_t pool = g_pool;
 
     // malloc0
-    tb_pointer_t data = pool? tb_global_pool_malloc0_(pool, size __tb_debug_args__) : tb_object_null;
+    tb_pointer_t data = pool? tb_global_pool_malloc0_(pool, size __tb_debug_args__) : tb_null;
 
     // leave
     tb_spinlock_leave(&g_lock);
@@ -171,7 +171,7 @@ tb_pointer_t tb_memory_nalloc_(tb_size_t item, tb_size_t size __tb_debug_decl__)
     tb_handle_t pool = g_pool;
 
     // nalloc
-    tb_pointer_t data = pool? tb_global_pool_nalloc_(pool, item, size __tb_debug_args__) : tb_object_null;
+    tb_pointer_t data = pool? tb_global_pool_nalloc_(pool, item, size __tb_debug_args__) : tb_null;
 
     // leave
     tb_spinlock_leave(&g_lock);
@@ -191,7 +191,7 @@ tb_pointer_t tb_memory_nalloc0_(tb_size_t item, tb_size_t size __tb_debug_decl__
     tb_handle_t pool = g_pool;
 
     // nalloc0
-    tb_pointer_t data = pool? tb_global_pool_nalloc0_(pool, item, size __tb_debug_args__) : tb_object_null;
+    tb_pointer_t data = pool? tb_global_pool_nalloc0_(pool, item, size __tb_debug_args__) : tb_null;
 
     // leave
     tb_spinlock_leave(&g_lock);

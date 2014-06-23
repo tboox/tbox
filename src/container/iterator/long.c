@@ -33,8 +33,8 @@
 static tb_pointer_t tb_iterator_init_long_item(tb_iterator_t* iterator, tb_size_t itor)
 {
     // check
-    tb_assert_return_val(iterator, tb_object_null);
-    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_object_null);
+    tb_assert_return_val(iterator, tb_null);
+    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
 
     // the item
     return (tb_pointer_t)((tb_long_t*)iterator->data)[itor];

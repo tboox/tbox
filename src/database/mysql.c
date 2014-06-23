@@ -149,11 +149,11 @@ static tb_void_t tb_object_database_mysql_result_exit(tb_object_database_sql_t* 
 static tb_handle_t tb_object_database_mysql_library_init(tb_cpointer_t* ppriv)
 {
     // init it
-    if (mysql_library_init(0, tb_object_null, tb_object_null))
+    if (mysql_library_init(0, tb_null, tb_null))
     {
         // trace
         tb_trace_e("init: mysql library failed!");
-        return tb_object_null;
+        return tb_null;
     }
 
     // ok
@@ -166,7 +166,7 @@ static tb_void_t tb_object_database_mysql_library_exit(tb_handle_t handle, tb_cp
 }
 static tb_handle_t tb_object_database_mysql_library_load()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_MYSQL, tb_object_database_mysql_library_init, tb_object_database_mysql_library_exit, tb_object_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_MYSQL, tb_object_database_mysql_library_init, tb_object_database_mysql_library_exit, tb_null);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ static tb_size_t tb_object_database_mysql_state_from_errno(tb_size_t errno)
 static __tb_inline__ tb_object_database_mysql_stream_t* tb_object_database_mysql_stream_cast(tb_handle_t stream)
 {
     tb_basic_stream_t* bstream = (tb_basic_stream_t*)stream;
-    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_NONE, tb_object_null);
+    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_NONE, tb_null);
     return (tb_object_database_mysql_stream_t*)bstream;
 }
 static tb_bool_t tb_object_database_mysql_stream_open(tb_handle_t stream)
@@ -331,11 +331,11 @@ static tb_bool_t tb_object_database_mysql_stream_ctrl(tb_handle_t stream, tb_siz
 static tb_basic_stream_t* tb_object_database_mysql_stream_init(MYSQL_STMT* stmt, MYSQL_BIND* result, tb_size_t column)
 {
     // check
-    tb_assert_and_check_return_val(stmt && result, tb_object_null);
+    tb_assert_and_check_return_val(stmt && result, tb_null);
 
     // done
     tb_bool_t                   ok = tb_false;
-    tb_object_database_mysql_stream_t* stream = tb_object_null;
+    tb_object_database_mysql_stream_t* stream = tb_null;
     do
     {
         // make stream
@@ -363,7 +363,7 @@ static tb_basic_stream_t* tb_object_database_mysql_stream_init(MYSQL_STMT* stmt,
     {
         // exit it
         if (stream) tb_basic_stream_exit((tb_basic_stream_t*)stream);
-        stream = tb_object_null;
+        stream = tb_null;
     }
 
     // ok?
@@ -380,7 +380,7 @@ static tb_bool_t tb_object_database_mysql_stream_set_value(tb_object_database_sq
     {
         // exit the last stream first
         if (mysql->result.stream) tb_basic_stream_exit(mysql->result.stream);
-        mysql->result.stream = tb_object_null;
+        mysql->result.stream = tb_null;
 
         // init stream
         mysql->result.stream = tb_object_database_mysql_stream_init(mysql->result.stmt, result, column);
@@ -390,7 +390,7 @@ static tb_bool_t tb_object_database_mysql_stream_set_value(tb_object_database_sq
         if (!tb_basic_stream_open(mysql->result.stream)) break;
 
         // set blob32
-        tb_object_database_sql_value_set_blob32(value, tb_object_null, 0, mysql->result.stream);
+        tb_object_database_sql_value_set_blob32(value, tb_null, 0, mysql->result.stream);
 
         // ok 
         ok = tb_true;
@@ -402,7 +402,7 @@ static tb_bool_t tb_object_database_mysql_stream_set_value(tb_object_database_sq
     {
         // exit it
         if (mysql->result.stream) tb_basic_stream_exit(mysql->result.stream);
-        mysql->result.stream = tb_object_null;
+        mysql->result.stream = tb_null;
     }
 
     // ok?
@@ -509,7 +509,7 @@ static tb_pointer_t tb_object_database_mysql_result_row_iterator_item(tb_iterato
 {
     // check
     tb_object_database_mysql_result_t* result = (tb_object_database_mysql_result_t*)iterator;
-    tb_assert_and_check_return_val(result && itor < result->count, tb_object_null);
+    tb_assert_and_check_return_val(result && itor < result->count, tb_null);
 
     // load all?
     if (result->try_all)
@@ -539,7 +539,7 @@ static tb_pointer_t tb_object_database_mysql_result_row_iterator_item(tb_iterato
                         // trace
                         tb_trace_e("stmt: fetch row %lu failed, error[%d]: %s", itor, mysql_stmt_errno(result->stmt), mysql_stmt_error(result->stmt));
                     }
-                    return tb_object_null;
+                    return tb_null;
                 }
             }
         }
@@ -547,18 +547,18 @@ static tb_pointer_t tb_object_database_mysql_result_row_iterator_item(tb_iterato
         else
         {
             // check
-            tb_assert_and_check_return_val(result->result, tb_object_null);
+            tb_assert_and_check_return_val(result->result, tb_null);
 
             // seek to the row number
             mysql_data_seek(result->result, itor);
             
             // fetch the row
             result->row.row = mysql_fetch_row(result->result);
-            tb_assert_and_check_return_val(result->row.row, tb_object_null);
+            tb_assert_and_check_return_val(result->row.row, tb_null);
 
             // fetch the lengths
             result->row.lengths = mysql_fetch_lengths(result->result);
-            tb_assert_and_check_return_val(result->row.lengths, tb_object_null);
+            tb_assert_and_check_return_val(result->row.lengths, tb_null);
         }
     }
 
@@ -614,11 +614,11 @@ static tb_pointer_t tb_object_database_mysql_result_col_iterator_item(tb_iterato
 {
     // check
     tb_object_database_mysql_result_row_t* row = (tb_object_database_mysql_result_row_t*)iterator;
-    tb_assert_and_check_return_val(row && itor < row->count, tb_object_null);
+    tb_assert_and_check_return_val(row && itor < row->count, tb_null);
 
     // the mysql
     tb_object_database_mysql_t* mysql = (tb_object_database_mysql_t*)iterator->priv;
-    tb_assert_and_check_return_val(mysql && mysql->result.fields, tb_object_null);
+    tb_assert_and_check_return_val(mysql && mysql->result.fields, tb_null);
 
     // the field
     MYSQL_FIELD* field = &mysql->result.fields[itor];
@@ -627,7 +627,7 @@ static tb_pointer_t tb_object_database_mysql_result_col_iterator_item(tb_iterato
     if (mysql->result.stmt)
     {
         // check
-        tb_assert_and_check_return_val(mysql->bind_list && itor < mysql->bind_maxn, tb_object_null);
+        tb_assert_and_check_return_val(mysql->bind_list && itor < mysql->bind_maxn, tb_null);
 
         // the result
         MYSQL_BIND* result = &mysql->bind_list[itor];
@@ -640,7 +640,7 @@ static tb_pointer_t tb_object_database_mysql_result_col_iterator_item(tb_iterato
 
             // trace
             tb_trace_e("stmt: fetch result failed at: %lu, field_type: %d, error[%d]: %s", itor, field->type, mysql_stmt_errno(mysql->result.stmt), mysql_stmt_error(mysql->result.stmt));
-            return tb_object_null;
+            return tb_null;
         }
 
         // init value
@@ -721,17 +721,17 @@ static tb_pointer_t tb_object_database_mysql_result_col_iterator_item(tb_iterato
         case MYSQL_TYPE_SET:
         case MYSQL_TYPE_ENUM:
             tb_trace_e("stmt: fetch result: not supported buffer type: %d", result->buffer_type);
-            return tb_object_null;
+            return tb_null;
         default:
             tb_trace_e("stmt: fetch result: unknown buffer type: %d", result->buffer_type);
-            return tb_object_null;
+            return tb_null;
         }
     }
     // fetch column from result
     else
     {
         // check
-        tb_assert_and_check_return_val(row->row && row->lengths, tb_object_null);
+        tb_assert_and_check_return_val(row->row && row->lengths, tb_null);
 
         // init value
         tb_object_database_sql_value_name_set(&row->value, (tb_char_t const*)field->name);
@@ -748,7 +748,7 @@ static tb_pointer_t tb_object_database_mysql_result_col_iterator_item(tb_iterato
 static __tb_inline__ tb_object_database_mysql_t* tb_object_database_mysql_cast(tb_object_database_sql_t* database)
 {
     // check
-    tb_assert_and_check_return_val(database && database->type == TB_DATABASE_SQL_TYPE_MYSQL, tb_object_null);
+    tb_assert_and_check_return_val(database && database->type == TB_DATABASE_SQL_TYPE_MYSQL, tb_null);
 
     // cast
     return (tb_object_database_mysql_t*)database;
@@ -761,7 +761,7 @@ static tb_bool_t tb_object_database_mysql_open(tb_object_database_sql_t* databas
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_char_t const*    host = tb_object_null;
+    tb_char_t const*    host = tb_null;
     tb_size_t           port = 0;
     tb_char_t           username[64] = {0};
     tb_char_t           password[64] = {0};
@@ -832,11 +832,11 @@ static tb_bool_t tb_object_database_mysql_open(tb_object_database_sql_t* databas
         if (!tb_object_database_mysql_library_load()) break;
 
         // init mysql database
-        mysql->database = mysql_init(tb_object_null);
+        mysql->database = mysql_init(tb_null);
         tb_assert_and_check_break(mysql->database);
 
         // connect it
-        if (!mysql_real_connect(mysql->database, host, username[0]? username : tb_object_null, password[0]? password : tb_object_null, database_sql_name[0]? database_sql_name : tb_object_null, (tb_uint_t)port, tb_object_null, 0))
+        if (!mysql_real_connect(mysql->database, host, username[0]? username : tb_null, password[0]? password : tb_null, database_sql_name[0]? database_sql_name : tb_null, (tb_uint_t)port, tb_null, 0))
         {
             // save state
             mysql->base.state = tb_object_database_mysql_state_from_errno(mysql_errno(mysql->database));
@@ -883,7 +883,7 @@ static tb_void_t tb_object_database_mysql_clos(tb_object_database_sql_t* databas
 
     // close database
     if (mysql->database) mysql_close(mysql->database);
-    mysql->database = tb_object_null;
+    mysql->database = tb_null;
 }
 static tb_void_t tb_object_database_mysql_exit(tb_object_database_sql_t* database)
 {
@@ -899,7 +899,7 @@ static tb_void_t tb_object_database_mysql_exit(tb_object_database_sql_t* databas
 
     // exit bind list
     if (mysql->bind_list) tb_free(mysql->bind_list);
-    mysql->bind_list = tb_object_null;
+    mysql->bind_list = tb_null;
     mysql->bind_maxn = 0;
 
     // exit url
@@ -1008,12 +1008,12 @@ static tb_void_t tb_object_database_mysql_result_exit(tb_object_database_sql_t* 
 
     // exit stream
     if (mysql_result->stream) tb_basic_stream_exit(mysql_result->stream);
-    mysql_result->stream = tb_object_null;
+    mysql_result->stream = tb_null;
 
     // exit result
     if (mysql_result->result) mysql_free_result(mysql_result->result);
-    mysql_result->result = tb_object_null;
-    mysql_result->fields = tb_object_null;
+    mysql_result->result = tb_null;
+    mysql_result->fields = tb_null;
 
     // clear result
     mysql_result->count = 0;
@@ -1021,12 +1021,12 @@ static tb_void_t tb_object_database_mysql_result_exit(tb_object_database_sql_t* 
 
     // exit metadata
     if (mysql_result->metadata) mysql_free_result(mysql_result->metadata);
-    mysql_result->metadata = tb_object_null;
+    mysql_result->metadata = tb_null;
 
     // clear stmt
     if (mysql_result->stmt && mysql_result->try_all)
         mysql_stmt_free_result(mysql_result->stmt);
-    mysql_result->stmt = tb_object_null;
+    mysql_result->stmt = tb_null;
 
     // reset try all
     mysql_result->try_all = tb_false;
@@ -1133,7 +1133,7 @@ static tb_bool_t tb_object_database_mysql_result_bind_data(tb_object_database_my
 
             // bind buffer
             tb_assert_and_check_break(p + bind->buffer_length < e);
-            bind->buffer = bind->buffer_length? (tb_char_t*)p : tb_object_null;
+            bind->buffer = bind->buffer_length? (tb_char_t*)p : tb_null;
             p += bind->buffer_length;
 
             // bind is_unsigned
@@ -1254,7 +1254,7 @@ static tb_iterator_t* tb_object_database_mysql_result_load(tb_object_database_sq
 {
     // check
     tb_object_database_mysql_t* mysql = tb_object_database_mysql_cast(database);
-    tb_assert_and_check_return_val(mysql && mysql->database, tb_object_null);
+    tb_assert_and_check_return_val(mysql && mysql->database, tb_null);
 
     // done
     tb_bool_t ok = tb_false;
@@ -1338,17 +1338,17 @@ static tb_iterator_t* tb_object_database_mysql_result_load(tb_object_database_sq
     }
 
     // ok?
-    return ok? (tb_iterator_t*)&mysql->result : tb_object_null;
+    return ok? (tb_iterator_t*)&mysql->result : tb_null;
 }
 static tb_handle_t tb_object_database_mysql_statement_init(tb_object_database_sql_t* database, tb_char_t const* sql)
 {
     // check
     tb_object_database_mysql_t* mysql = tb_object_database_mysql_cast(database);
-    tb_assert_and_check_return_val(mysql && mysql->database && sql, tb_object_null);
+    tb_assert_and_check_return_val(mysql && mysql->database && sql, tb_null);
 
     // done
     tb_bool_t   ok = tb_false;
-    MYSQL_STMT* stmt = tb_object_null;
+    MYSQL_STMT* stmt = tb_null;
     do
     {
         // init stmt
@@ -1384,7 +1384,7 @@ static tb_handle_t tb_object_database_mysql_statement_init(tb_object_database_sq
     {
         // exit it
         if (stmt) mysql_stmt_close(stmt);
-        stmt = tb_object_null;
+        stmt = tb_null;
     }
 
     // ok?
@@ -1569,10 +1569,10 @@ static tb_bool_t tb_object_database_mysql_statement_bind(tb_object_database_sql_
             if (value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB32 && value->u.blob.stream)
             {
                 // trace
-                tb_trace_d("stmt: bind: send: blob: %lld: ..", tb_stream_size(value->u.blob.stream));
+                tb_trace_d("stmt: bind: send: blob: %lld: ..", tb_basic_stream_size(value->u.blob.stream));
 
                 // done
-                while (!tb_stream_beof(value->u.blob.stream))
+                while (!tb_basic_stream_beof(value->u.blob.stream))
                 {
                     // read it
                     tb_long_t real = tb_basic_stream_read(value->u.blob.stream, data, sizeof(data));
@@ -1592,7 +1592,7 @@ static tb_bool_t tb_object_database_mysql_statement_bind(tb_object_database_sql_
                     else if (!real)
                     {
                         // wait 
-                        tb_long_t wait = tb_basic_stream_wait(value->u.blob.stream, TB_BASIC_STREAM_WAIT_READ, tb_stream_timeout(value->u.blob.stream));
+                        tb_long_t wait = tb_basic_stream_wait(value->u.blob.stream, TB_BASIC_STREAM_WAIT_READ, tb_basic_stream_timeout(value->u.blob.stream));
                         tb_assert_and_check_break(wait > 0);
                     }
                     else break;
@@ -1653,11 +1653,11 @@ tb_size_t tb_object_database_mysql_probe(tb_url_t const* url)
 tb_object_database_sql_t* tb_object_database_mysql_init(tb_url_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_object_null);
+    tb_assert_and_check_return_val(url, tb_null);
 
     // done
     tb_bool_t               ok = tb_false;
-    tb_object_database_mysql_t*    mysql = tb_object_null;
+    tb_object_database_mysql_t*    mysql = tb_null;
     do
     {
         // make database
@@ -1690,8 +1690,8 @@ tb_object_database_sql_t* tb_object_database_mysql_init(tb_url_t const* url)
         mysql->result.itor.prev     = tb_object_database_mysql_result_row_iterator_prev;
         mysql->result.itor.next     = tb_object_database_mysql_result_row_iterator_next;
         mysql->result.itor.item     = tb_object_database_mysql_result_row_iterator_item;
-        mysql->result.itor.copy     = tb_object_null;
-        mysql->result.itor.comp     = tb_object_null;
+        mysql->result.itor.copy     = tb_null;
+        mysql->result.itor.comp     = tb_null;
 
         // init result col iterator
         mysql->result.row.itor.mode = TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;
@@ -1703,8 +1703,8 @@ tb_object_database_sql_t* tb_object_database_mysql_init(tb_url_t const* url)
         mysql->result.row.itor.prev = tb_object_database_mysql_result_col_iterator_prev;
         mysql->result.row.itor.next = tb_object_database_mysql_result_col_iterator_next;
         mysql->result.row.itor.item = tb_object_database_mysql_result_col_iterator_item;
-        mysql->result.row.itor.copy = tb_object_null;
-        mysql->result.row.itor.comp = tb_object_null;
+        mysql->result.row.itor.copy = tb_null;
+        mysql->result.row.itor.comp = tb_null;
 
         // init url
         if (!tb_url_init(&mysql->base.url)) break;
@@ -1728,7 +1728,7 @@ tb_object_database_sql_t* tb_object_database_mysql_init(tb_url_t const* url)
     {
         // exit database
         if (mysql) tb_object_database_mysql_exit((tb_object_database_sql_t*)mysql);
-        mysql = tb_object_null;
+        mysql = tb_null;
     }
 
     // ok?

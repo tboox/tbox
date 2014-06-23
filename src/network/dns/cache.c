@@ -148,7 +148,7 @@ tb_bool_t tb_dns_cache_init()
         tb_assert_and_check_break(g_cache.pool);
 
         // init hash
-        if (!g_cache.hash) g_cache.hash = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false, g_cache.pool), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_object_null, tb_object_null));
+        if (!g_cache.hash) g_cache.hash = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false, g_cache.pool), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
         tb_assert_and_check_break(g_cache.hash);
 
         // ok
@@ -172,11 +172,11 @@ tb_void_t tb_dns_cache_exit()
 
     // exit hash
     if (g_cache.hash) tb_hash_exit(g_cache.hash);
-    g_cache.hash = tb_object_null;
+    g_cache.hash = tb_null;
 
     // exit pool
     if (g_cache.pool) tb_pool_exit(g_cache.pool);
-    g_cache.pool = tb_object_null;
+    g_cache.pool = tb_null;
 
     // exit times
     g_cache.times = 0;
@@ -287,7 +287,7 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
             tb_trace_d("expired: %lu", g_cache.expired);
 
             // remove the expired times
-            tb_hash_walk(g_cache.hash, tb_dns_cache_cler, tb_object_null);
+            tb_hash_walk(g_cache.hash, tb_dns_cache_cler, tb_null);
         }
 
         // check

@@ -78,7 +78,7 @@ tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
     ((tb_zip_vlc_t*)gamma)->type = TB_ZIP_VLC_TYPE_GAMMA;
     ((tb_zip_vlc_t*)gamma)->set = tb_zip_vlc_gamma_set;
     ((tb_zip_vlc_t*)gamma)->get = tb_zip_vlc_gamma_get;
-    ((tb_zip_vlc_t*)gamma)->clos = tb_object_null;
+    ((tb_zip_vlc_t*)gamma)->clos = tb_null;
 
     /* gamma coding
      *

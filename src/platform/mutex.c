@@ -39,7 +39,7 @@ tb_handle_t tb_mutex_init()
 {
     // done
     tb_bool_t       ok = tb_false;
-    tb_spinlock_t*  lock = tb_object_null;
+    tb_spinlock_t*  lock = tb_null;
     do
     {
         // make lock
@@ -59,7 +59,7 @@ tb_handle_t tb_mutex_init()
     {
         // exit it
         tb_free(lock);
-        lock = tb_object_null;
+        lock = tb_null;
     }
 
     // ok?

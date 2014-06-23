@@ -91,7 +91,7 @@ typedef struct __tb_object_number_t
 static __tb_inline__ tb_object_number_t* tb_object_number_cast(tb_object_t* object)
 {
     // check
-    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_NUMBER, tb_object_null);
+    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_NUMBER, tb_null);
 
     // cast
     return (tb_object_number_t*)object;
@@ -100,7 +100,7 @@ static tb_object_t* tb_object_number_copy(tb_object_t* object)
 {
     // check
     tb_object_number_t* number = (tb_object_number_t*)object;
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // copy
     switch (number->type)
@@ -131,7 +131,7 @@ static tb_object_t* tb_object_number_copy(tb_object_t* object)
         break;
     }
 
-    return tb_object_null;
+    return tb_null;
 }
 static tb_void_t tb_object_number_exit(tb_object_t* object)
 {
@@ -186,7 +186,7 @@ static tb_object_number_t* tb_object_number_init_base()
 {
     // make
     tb_object_number_t* number = (tb_object_number_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_number_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_NUMBER);
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init base
     number->base.copy = tb_object_number_copy;
@@ -204,7 +204,7 @@ tb_object_t* tb_object_number_init_from_uint8(tb_uint8_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_UINT8;
@@ -218,7 +218,7 @@ tb_object_t* tb_object_number_init_from_sint8(tb_sint8_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_SINT8;
@@ -232,7 +232,7 @@ tb_object_t* tb_object_number_init_from_uint16(tb_uint16_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_UINT16;
@@ -246,7 +246,7 @@ tb_object_t* tb_object_number_init_from_sint16(tb_sint16_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_SINT16;
@@ -260,7 +260,7 @@ tb_object_t* tb_object_number_init_from_uint32(tb_uint32_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_UINT32;
@@ -274,7 +274,7 @@ tb_object_t* tb_object_number_init_from_sint32(tb_sint32_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_SINT32;
@@ -288,7 +288,7 @@ tb_object_t* tb_object_number_init_from_uint64(tb_uint64_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_UINT64;
@@ -302,7 +302,7 @@ tb_object_t* tb_object_number_init_from_sint64(tb_sint64_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_SINT64;
@@ -317,7 +317,7 @@ tb_object_t* tb_object_number_init_from_float(tb_float_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_FLOAT;
@@ -331,7 +331,7 @@ tb_object_t* tb_object_number_init_from_double(tb_double_t value)
 {
     // make
     tb_object_number_t* number = tb_object_number_init_base();
-    tb_assert_and_check_return_val(number, tb_object_null);
+    tb_assert_and_check_return_val(number, tb_null);
 
     // init value
     number->type = TB_NUMBER_TYPE_DOUBLE;

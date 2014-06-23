@@ -45,19 +45,19 @@ static tb_void_t tb_demo_context_exit(tb_aiop_t* aiop, tb_demo_context_t* contex
     {
         // exit aioo
         if (context->aioo) tb_aiop_delo(aiop, context->aioo);
-        context->aioo = tb_object_null;
+        context->aioo = tb_null;
 
         // exit sock
         if (context->sock) tb_socket_clos(context->sock);
-        context->sock = tb_object_null;
+        context->sock = tb_null;
 
         // exit file
         if (context->file) tb_file_exit(context->file);
-        context->file = tb_object_null;
+        context->file = tb_null;
 
         // exit data
         if (context->data) tb_free(context->data);
-        context->data = tb_object_null;
+        context->data = tb_null;
 
         // exit it
         tb_free(context);
@@ -73,8 +73,8 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_handle_t sock = tb_object_null;
-    tb_aiop_t*  aiop = tb_object_null;
+    tb_handle_t sock = tb_null;
+    tb_aiop_t*  aiop = tb_null;
 
     // init sock
     sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
@@ -85,13 +85,13 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_goto(aiop, end);
 
     // bind 
-    if (!tb_socket_bind(sock, tb_object_null, 9090)) goto end;
+    if (!tb_socket_bind(sock, tb_null, 9090)) goto end;
 
     // listen sock
     if (!tb_socket_listen(sock)) goto end;
 
     // addo sock
-    if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_object_null)) goto end;
+    if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) goto end;
 
     // accept
     tb_aioe_t list[16];
@@ -116,7 +116,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
             {
                 // done acpt
                 tb_bool_t           ok = tb_false;
-                tb_demo_context_t*  context = tb_object_null;
+                tb_demo_context_t*  context = tb_null;
                 do
                 {
                     // make context

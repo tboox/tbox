@@ -37,13 +37,13 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCPY
 tb_wchar_t* tb_wcscpy(tb_wchar_t* s1, tb_wchar_t const* s2)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
     return wcscpy(s1, s2);
 }
 #else
 tb_wchar_t* tb_wcscpy(tb_wchar_t* s1, tb_wchar_t const* s2)
 {
-    tb_assert_and_check_return_val(s1 && s2, tb_object_null);
+    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
     __tb_register__ tb_wchar_t* s = s1;
     if (s1 == s2) return s;

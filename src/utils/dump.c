@@ -90,7 +90,7 @@ tb_void_t tb_dump_data_from_stream(tb_basic_stream_t* gst)
     tb_tracet_i(__tb_newline__);
 
     // walk
-    while (!tb_stream_beof(gst))
+    while (!tb_basic_stream_beof(gst))
     {
         // read line
         tb_long_t read = 0;
@@ -105,7 +105,7 @@ tb_void_t tb_dump_data_from_stream(tb_basic_stream_t* gst)
             else if (!real)
             {
                 // wait
-                tb_long_t e = tb_basic_stream_wait(gst, TB_AIOE_CODE_RECV, tb_stream_timeout(gst));
+                tb_long_t e = tb_basic_stream_wait(gst, TB_AIOE_CODE_RECV, tb_basic_stream_timeout(gst));
                 tb_assert_and_check_break(e >= 0);
 
                 // timeout?

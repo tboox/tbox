@@ -120,7 +120,7 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     tb_assert_and_check_return_val(filter && filter->spak && pdata, -1);
 
     // init odata
-    *pdata = tb_object_null;
+    *pdata = tb_null;
 
     // save the input offset
     filter->offset += size;

@@ -51,7 +51,7 @@
 static tb_object_t* tb_object_bin_reader_func_null(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // ok
     return tb_object_null_init();
@@ -59,7 +59,7 @@ static tb_object_t* tb_object_bin_reader_func_null(tb_object_bin_reader_t* reade
 static tb_object_t* tb_object_bin_reader_func_date(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // ok
     return tb_object_date_init_from_time((tb_time_t)size);
@@ -67,20 +67,20 @@ static tb_object_t* tb_object_bin_reader_func_date(tb_object_bin_reader_t* reade
 static tb_object_t* tb_object_bin_reader_func_data(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // empty?
-    if (!size) return tb_object_data_init_from_data(tb_object_null, 0);
+    if (!size) return tb_object_data_init_from_data(tb_null, 0);
 
     // make data
     tb_char_t* data = (tb_char_t*)tb_malloc0((tb_size_t)size);
-    tb_assert_and_check_return_val(data, tb_object_null);
+    tb_assert_and_check_return_val(data, tb_null);
 
     // read data
     if (!tb_basic_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size)) 
     {
         tb_free(data);
-        return tb_object_null;
+        return tb_null;
     }
 
     // decode data
@@ -103,14 +103,14 @@ static tb_object_t* tb_object_bin_reader_func_data(tb_object_bin_reader_t* reade
 static tb_object_t* tb_object_bin_reader_func_array(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // empty?
     if (!size) return tb_object_array_init(TB_OBJECT_BIN_READER_ARRAY_GROW, tb_false);
 
     // init array
     tb_object_t* array = tb_object_array_init(TB_OBJECT_BIN_READER_ARRAY_GROW, tb_false);
-    tb_assert_and_check_return_val(array, tb_object_null);
+    tb_assert_and_check_return_val(array, tb_null);
 
     // walk
     tb_size_t i = 0;
@@ -126,7 +126,7 @@ static tb_object_t* tb_object_bin_reader_func_array(tb_object_bin_reader_t* read
         tb_trace_d("item: type: %lu, size: %llu", type, size);
 
         // is index?
-        tb_object_t* item = tb_object_null;
+        tb_object_t* item = tb_null;
         if (!type)
         {
             // the object index
@@ -165,7 +165,7 @@ static tb_object_t* tb_object_bin_reader_func_array(tb_object_bin_reader_t* read
     if (i != n)
     {
         if (array) tb_object_exit(array);
-        array = tb_object_null;
+        array = tb_null;
     }
 
     // ok?
@@ -174,20 +174,20 @@ static tb_object_t* tb_object_bin_reader_func_array(tb_object_bin_reader_t* read
 static tb_object_t* tb_object_bin_reader_func_string(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // empty?
-    if (!size) return tb_object_string_init_from_cstr(tb_object_null);
+    if (!size) return tb_object_string_init_from_cstr(tb_null);
 
     // make data
     tb_char_t* data = (tb_char_t*)tb_malloc0((tb_size_t)size + 1);
-    tb_assert_and_check_return_val(data, tb_object_null);
+    tb_assert_and_check_return_val(data, tb_null);
 
     // read data
     if (!tb_basic_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size)) 
     {
         tb_free(data);
-        return tb_object_null;
+        return tb_null;
     }
 
     // decode string
@@ -210,13 +210,13 @@ static tb_object_t* tb_object_bin_reader_func_string(tb_object_bin_reader_t* rea
 static tb_object_t* tb_object_bin_reader_func_number(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // the number type
     tb_size_t number_type = (tb_size_t)size;
 
     // read number
-    tb_object_t* number = tb_object_null;
+    tb_object_t* number = tb_null;
     switch (number_type)
     {
     case TB_NUMBER_TYPE_UINT64:
@@ -247,20 +247,20 @@ static tb_object_t* tb_object_bin_reader_func_number(tb_object_bin_reader_t* rea
     case TB_NUMBER_TYPE_FLOAT:
         {
             tb_byte_t data[4] = {0};
-            if (!tb_basic_stream_bread(reader->stream, data, 4)) return tb_object_null;
+            if (!tb_basic_stream_bread(reader->stream, data, 4)) return tb_null;
             number = tb_object_number_init_from_float(tb_bits_get_float_be(data));
         }
         break;
     case TB_NUMBER_TYPE_DOUBLE:
         {
             tb_byte_t data[8] = {0};
-            if (!tb_basic_stream_bread(reader->stream, data, 8)) return tb_object_null;
+            if (!tb_basic_stream_bread(reader->stream, data, 8)) return tb_null;
             number = tb_object_number_init_from_double(tb_bits_get_double_bbe(data));
         }
         break;
 #endif
     default:
-        tb_assert_and_check_return_val(0, tb_object_null);
+        tb_assert_and_check_return_val(0, tb_null);
         break;
     }
 
@@ -270,7 +270,7 @@ static tb_object_t* tb_object_bin_reader_func_number(tb_object_bin_reader_t* rea
 static tb_object_t* tb_object_bin_reader_func_boolean(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // ok?
     return tb_object_boolean_init(size? tb_true : tb_false);
@@ -278,14 +278,14 @@ static tb_object_t* tb_object_bin_reader_func_boolean(tb_object_bin_reader_t* re
 static tb_object_t* tb_object_bin_reader_func_dictionary(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
-    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // empty?
     if (!size) return tb_object_dictionary_init(TB_OBJECT_DICTIONARY_SIZE_MICRO, tb_false);
 
     // init dictionary
     tb_object_t* dictionary = tb_object_dictionary_init(0, tb_false);
-    tb_assert_and_check_return_val(dictionary, tb_object_null);
+    tb_assert_and_check_return_val(dictionary, tb_null);
 
     // walk
     tb_size_t       i = 0;
@@ -293,7 +293,7 @@ static tb_object_t* tb_object_bin_reader_func_dictionary(tb_object_bin_reader_t*
     for (i = 0; i < n; i++)
     {
         // read key
-        tb_object_t* key = tb_object_null;
+        tb_object_t* key = tb_null;
         do
         {
             // the type & size
@@ -343,7 +343,7 @@ static tb_object_t* tb_object_bin_reader_func_dictionary(tb_object_bin_reader_t*
         tb_assert_and_check_break(tb_object_string_size(key) && tb_object_string_cstr(key));
         
         // read val
-        tb_object_t* val = tb_object_null;
+        tb_object_t* val = tb_null;
         do
         {
             // the type & size
@@ -395,7 +395,7 @@ static tb_object_t* tb_object_bin_reader_func_dictionary(tb_object_bin_reader_t*
     if (i != n)
     {
         if (dictionary) tb_object_exit(dictionary);
-        dictionary = tb_object_null;
+        dictionary = tb_null;
     }
 
     // ok?
@@ -405,19 +405,19 @@ static tb_object_t* tb_object_bin_reader_done(tb_basic_stream_t* stream)
 {
     // read bin header
     tb_byte_t data[32] = {0};
-    if (!tb_basic_stream_bread(stream, data, 5)) return tb_object_null;
+    if (!tb_basic_stream_bread(stream, data, 5)) return tb_null;
 
     // check 
-    if (tb_strnicmp((tb_char_t const*)data, "tbo00", 5)) return tb_object_null;
+    if (tb_strnicmp((tb_char_t const*)data, "tbo00", 5)) return tb_null;
 
     // init
-    tb_object_t*            object = tb_object_null;
+    tb_object_t*            object = tb_null;
     tb_object_bin_reader_t  reader = {0};
 
     // init reader
     reader.stream           = stream;
     reader.list             = tb_vector_init(256, tb_item_func_obj());
-    tb_assert_and_check_return_val(reader.list, tb_object_null);
+    tb_assert_and_check_return_val(reader.list, tb_null);
 
     // the type & size
     tb_size_t               type = 0;
@@ -448,7 +448,7 @@ static tb_size_t tb_object_bin_reader_probe(tb_basic_stream_t* stream)
     tb_assert_and_check_return_val(stream, 0);
 
     // need it
-    tb_byte_t* p = tb_object_null;
+    tb_byte_t* p = tb_null;
     if (!tb_basic_stream_need(stream, &p, 3)) return 0;
     tb_assert_and_check_return_val(p, 0);
 
@@ -469,8 +469,8 @@ tb_object_reader_t* tb_object_bin_reader()
     s_reader.probe  = tb_object_bin_reader_probe;
 
     // init hooker
-    s_reader.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_object_null, tb_object_null));
-    tb_assert_and_check_return_val(s_reader.hooker, tb_object_null);
+    s_reader.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
     tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_object_bin_reader_func_null);
@@ -503,11 +503,11 @@ tb_bool_t tb_object_bin_reader_hook(tb_size_t type, tb_object_bin_reader_func_t 
 tb_object_bin_reader_func_t tb_object_bin_reader_func(tb_size_t type)
 {
     // check
-    tb_assert_and_check_return_val(type, tb_object_null);
+    tb_assert_and_check_return_val(type, tb_null);
 
     // the reader
     tb_object_reader_t* reader = tb_object_reader_get(TB_OBJECT_FORMAT_BIN);
-    tb_assert_and_check_return_val(reader && reader->hooker, tb_object_null);
+    tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
     return (tb_object_bin_reader_func_t)tb_hash_get(reader->hooker, (tb_pointer_t)type);

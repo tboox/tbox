@@ -103,7 +103,7 @@ static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v2(tb_byte_t* s, tb_byte_t 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
 static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
     if (!n) return s;
 
 #   if defined(TB_ASSEMBLER_IS_GAS) && TB_CPU_BIT32
@@ -172,7 +172,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint
 static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     // align by 2-bytes 
     tb_assert(!(((tb_size_t)s) & 0x1));
@@ -240,7 +240,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint
 static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     // align by 4-bytes 
     tb_assert(!(((tb_size_t)s) & 0x3));

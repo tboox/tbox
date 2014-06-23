@@ -56,7 +56,7 @@ typedef struct __tb_random_linear_t
 static __tb_inline__ tb_random_linear_t* tb_random_linear_cast(tb_random_t* random)
 {
     // check
-    tb_assert_and_check_return_val(random && random->type == TB_RANDOM_GENERATOR_TYPE_LINEAR, tb_object_null);
+    tb_assert_and_check_return_val(random && random->type == TB_RANDOM_GENERATOR_TYPE_LINEAR, tb_null);
 
     // the random
     return (tb_random_linear_t*)random;
@@ -106,7 +106,7 @@ tb_handle_t tb_random_linear_init(tb_size_t seed)
 {
     // done
     tb_bool_t           ok = tb_false;
-    tb_random_linear_t* random = tb_object_null;
+    tb_random_linear_t* random = tb_null;
     do
     {
         // make random
@@ -132,7 +132,7 @@ tb_handle_t tb_random_linear_init(tb_size_t seed)
     {
         // exit it
         if (random) tb_random_exit((tb_handle_t)random);
-        random = tb_object_null;
+        random = tb_null;
     }
 
     // ok?

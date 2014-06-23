@@ -106,11 +106,10 @@ typedef struct __tb_async_stream_sock_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_async_stream_sock_t* tb_async_stream_sock_cast(tb_handle_t stream)
+static __tb_inline__ tb_async_stream_sock_t* tb_async_stream_sock_cast(tb_async_stream_t* stream)
 {
-    tb_async_stream_t* astream = (tb_async_stream_t*)stream;
-    tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_SOCK, tb_object_null);
-    return (tb_async_stream_sock_t*)astream;
+    tb_assert_and_check_return_val(stream && stream->type == TB_STREAM_TYPE_SOCK, tb_null);
+    return (tb_async_stream_sock_t*)stream;
 }
 static tb_void_t tb_async_stream_sock_clos_clear(tb_async_stream_sock_t* sstream)
 {
@@ -128,7 +127,7 @@ static tb_void_t tb_async_stream_sock_clos_clear(tb_async_stream_sock_t* sstream
     {
         // exit it
         if (sstream->sock) tb_socket_clos(sstream->sock);
-        sstream->sock = tb_object_null;
+        sstream->sock = tb_null;
         sstream->bref = 0;
     }
 
@@ -145,7 +144,7 @@ static tb_void_t tb_async_stream_sock_clos_func(tb_handle_t aico, tb_cpointer_t 
     tb_assert_and_check_return(sstream && sstream->func.clos);
 
     // trace
-    tb_trace_d("clos: notify: %s: ..", tb_url_get(&sstream->base.base.url));
+    tb_trace_d("clos: notify: %s: ..", tb_url_get(&sstream->base.url));
 
     // clear it
     tb_async_stream_sock_clos_clear(sstream);
@@ -166,13 +165,13 @@ static tb_void_t tb_async_stream_sock_clos_dns_func(tb_handle_t aico, tb_cpointe
     tb_assert_and_check_return(sstream);
 
     // trace
-    tb_trace_d("clos: dns: notify: %s: ..", tb_url_get(&sstream->base.base.url));
+    tb_trace_d("clos: dns: notify: %s: ..", tb_url_get(&sstream->base.url));
 
     // clear dns
-    sstream->hdns = tb_object_null;
+    sstream->hdns = tb_null;
 
     // done func directly
-    tb_async_stream_sock_clos_func(tb_object_null, sstream);
+    tb_async_stream_sock_clos_func(tb_null, sstream);
 
     // trace
     tb_trace_d("clos: dns: notify: ok");
@@ -184,18 +183,18 @@ static tb_void_t tb_async_stream_sock_clos_aico_func(tb_handle_t aico, tb_cpoint
     tb_assert_and_check_return(sstream);
 
     // trace
-    tb_trace_d("clos: aico: notify: %s: ..", tb_url_get(&sstream->base.base.url));
+    tb_trace_d("clos: aico: notify: %s: ..", tb_url_get(&sstream->base.url));
 
     // clear aico
-    sstream->aico = tb_object_null;
+    sstream->aico = tb_null;
 #ifdef TB_SSL_ENABLE
-    if (sstream->hssl) tb_aicp_ssl_set_aico(sstream->hssl, tb_object_null);
+    if (sstream->hssl) tb_aicp_ssl_set_aico(sstream->hssl, tb_null);
 #endif
 
     // exit dns 
     if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
     // done func directly
-    else tb_async_stream_sock_clos_func(tb_object_null, sstream);
+    else tb_async_stream_sock_clos_func(tb_null, sstream);
 
     // trace
     tb_trace_d("clos: aico: notify: ok");
@@ -208,7 +207,7 @@ static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t ssl, tb_size_t s
     tb_assert_and_check_return(sstream && sstream->func.clos);
 
     // trace
-    tb_trace_d("clos: ssl: notify: %s: ..", tb_url_get(&sstream->base.base.url));
+    tb_trace_d("clos: ssl: notify: %s: ..", tb_url_get(&sstream->base.url));
 
     // close it if be not alived
     if (!sstream->balived && !sstream->bref)
@@ -218,23 +217,23 @@ static tb_void_t tb_async_stream_sock_clos_ssl_func(tb_handle_t ssl, tb_size_t s
         // exit dns
         else if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
         // done func directly
-        else tb_async_stream_sock_clos_func(tb_object_null, sstream);
+        else tb_async_stream_sock_clos_func(tb_null, sstream);
     }
     // done func directly
-    else tb_async_stream_sock_clos_func(tb_object_null, sstream);
+    else tb_async_stream_sock_clos_func(tb_null, sstream);
 
     // trace
     tb_trace_d("clos: ssl: notify: ok");
 }
 #endif
-static tb_bool_t tb_async_stream_sock_clos_try(tb_handle_t astream)
+static tb_bool_t tb_async_stream_sock_clos_try(tb_async_stream_t* stream)
 {   
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream, tb_false);
 
     // trace
-    tb_trace_d("clos: try: %s: aico: %p: ..", tb_url_get(&sstream->base.base.url), sstream->aico);
+    tb_trace_d("clos: try: %s: aico: %p: ..", tb_url_get(&stream->url), sstream->aico);
 
     // try closing ssl first
 #ifdef TB_SSL_ENABLE
@@ -248,7 +247,7 @@ static tb_bool_t tb_async_stream_sock_clos_try(tb_handle_t astream)
             tb_async_stream_sock_clos_clear(sstream);
 
             // trace
-            tb_trace_d("clos: try: %s: aico: %p: ok", tb_url_get(&sstream->base.base.url), sstream->aico);
+            tb_trace_d("clos: try: %s: aico: %p: ok", tb_url_get(&stream->url), sstream->aico);
 
             // ok
             return tb_true;
@@ -256,22 +255,22 @@ static tb_bool_t tb_async_stream_sock_clos_try(tb_handle_t astream)
     }
 
     // trace
-    tb_trace_d("clos: try: %s: aico: %p: no", tb_url_get(&sstream->base.base.url), sstream->aico);
+    tb_trace_d("clos: try: %s: aico: %p: no", tb_url_get(&stream->url), sstream->aico);
 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_clos(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
 {   
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream && func, tb_false);
 
     // trace
 #ifdef TB_SSL_ENABLE
-    tb_trace_d("clos: %s: balived: %d, aico: %p, hssl: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hssl, sstream->hdns);
+    tb_trace_d("clos: %s: balived: %d, aico: %p, hssl: %p, hdns: %p: ..", tb_url_get(&stream->url), sstream->balived, sstream->aico, sstream->hssl, sstream->hdns);
 #else
-    tb_trace_d("clos: %s: balived: %d, aico: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hdns);
+    tb_trace_d("clos: %s: balived: %d, aico: %p, hdns: %p: ..", tb_url_get(&stream->url), sstream->balived, sstream->aico, sstream->hdns);
 #endif
 
     // init clos
@@ -290,10 +289,10 @@ static tb_bool_t tb_async_stream_sock_clos(tb_handle_t astream, tb_async_stream_
         // exit dns
         else if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_async_stream_sock_clos_dns_func, sstream);
         // done func directly
-        else tb_async_stream_sock_clos_func(tb_object_null, sstream);
+        else tb_async_stream_sock_clos_func(tb_null, sstream);
     }
     // done func directly
-    else tb_async_stream_sock_clos_func(tb_object_null, sstream);
+    else tb_async_stream_sock_clos_func(tb_null, sstream);
 
     // ok
     return tb_true;
@@ -324,13 +323,13 @@ static tb_size_t tb_async_stream_sock_open_ssl(tb_async_stream_sock_t* sstream)
     tb_assert_and_check_return_val(sstream->hssl, TB_STATE_SOCK_SSL_UNKNOWN_ERROR);
 
     // killed?
-    if (tb_stream_is_killed(sstream)) return TB_STATE_KILLED;
+    if (tb_async_stream_is_killed(&sstream->base)) return TB_STATE_KILLED;
 
     // init ssl aico
     tb_aicp_ssl_set_aico(sstream->hssl, sstream->aico);
 
     // init ssl timeout
-    tb_aicp_ssl_set_timeout(sstream->hssl, sstream->base.base.timeout);
+    tb_aicp_ssl_set_timeout(sstream->hssl, sstream->base.timeout);
 
     // open ssl
     if (!tb_aicp_ssl_open(sstream->hssl, tb_async_stream_sock_open_ssl_func, sstream)) return TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
@@ -357,7 +356,7 @@ static tb_bool_t tb_async_stream_sock_conn_func(tb_aice_t const* aice)
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(&sstream->base.base.url))
+            if (tb_url_ssl_get(&sstream->base.url))
             {
                 // open ssl
                 state = tb_async_stream_sock_open_ssl(sstream);
@@ -444,22 +443,22 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
             tb_assert_and_check_break(sstream->aico);
 
             // init timeout
-            tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_CONN, sstream->base.base.timeout);
-            tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_RECV, sstream->base.base.timeout);
-            tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_SEND, sstream->base.base.timeout);
+            tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_CONN, sstream->base.timeout);
+            tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_RECV, sstream->base.timeout);
+            tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_SEND, sstream->base.timeout);
 
             // port
-            tb_size_t port = tb_url_port_get(&sstream->base.base.url);
+            tb_size_t port = tb_url_port_get(&sstream->base.url);
             tb_assert_and_check_break(port);
             
             // the sock type: tcp or udp? for url: sock://ip:port/?udp=
-            tb_char_t const* args = tb_url_args_get(&sstream->base.base.url);
+            tb_char_t const* args = tb_url_args_get(&sstream->base.url);
             if (args && !tb_strnicmp(args, "udp=", 4)) sstream->type = TB_SOCKET_TYPE_UDP;
             else if (args && !tb_strnicmp(args, "tcp=", 4)) sstream->type = TB_SOCKET_TYPE_TCP;
             tb_assert_and_check_break(sstream->type == TB_SOCKET_TYPE_TCP || sstream->type == TB_SOCKET_TYPE_UDP);
 
             // killed?
-            if (tb_stream_is_killed(sstream))
+            if (tb_async_stream_is_killed(&sstream->base))
             {
                 // save state
                 state = TB_STATE_KILLED;
@@ -476,7 +475,7 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
             else
             {
                 // ssl? not supported
-                if (tb_url_ssl_get(&sstream->base.base.url))
+                if (tb_url_ssl_get(&sstream->base.url))
                 {
                     // trace
                     tb_trace_w("udp ssl is not supported!");
@@ -511,10 +510,10 @@ static tb_void_t tb_async_stream_sock_dns_func(tb_handle_t haddr, tb_char_t cons
         tb_async_stream_open_func(&sstream->base, state, sstream->func.open, sstream->priv);
     }
 }
-static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_open(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream && sstream->type && func, tb_false);
 
     // done
@@ -533,7 +532,7 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
 
 #ifndef TB_SSL_ENABLE
         // ssl? not supported
-        if (tb_url_ssl_get(&sstream->base.base.url))
+        if (tb_url_ssl_get(&stream->url))
         {
             // trace
             tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
@@ -549,7 +548,7 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(&sstream->base.base.url))
+            if (tb_url_ssl_get(&sstream->base.url))
             {
                 // open ssl
                 state = tb_async_stream_sock_open_ssl(sstream);
@@ -566,18 +565,18 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
         }
 
         // get the host from url
-        tb_char_t const* host = tb_url_host_get(&sstream->base.base.url);
+        tb_char_t const* host = tb_url_host_get(&sstream->base.url);
         tb_assert_and_check_break(host);
 
         // clear ipv4
         tb_ipv4_clr(&sstream->ipv4);
 
         // init dns
-        if (!sstream->hdns) sstream->hdns = tb_aicp_dns_init(sstream->base.aicp, tb_stream_timeout(astream));
+        if (!sstream->hdns) sstream->hdns = tb_aicp_dns_init(sstream->base.aicp, tb_async_stream_timeout(stream));
         tb_assert(sstream->hdns);
 
         // killed?
-        if (tb_stream_is_killed(sstream))
+        if (tb_async_stream_is_killed(stream))
         {
             // save state
             state = TB_STATE_KILLED;
@@ -585,7 +584,7 @@ static tb_bool_t tb_async_stream_sock_open(tb_handle_t astream, tb_async_stream_
         }
 
         // done addr
-        if (!sstream->hdns || !tb_aicp_dns_done(sstream->hdns, host, tb_async_stream_sock_dns_func, astream))
+        if (!sstream->hdns || !tb_aicp_dns_done(sstream->hdns, host, tb_async_stream_sock_dns_func, stream))
         {
             // save state
             state = TB_STATE_SOCK_DNS_FAILED;
@@ -745,10 +744,10 @@ static tb_bool_t tb_async_stream_sock_read_ssl_func(tb_handle_t ssl, tb_size_t s
     return tb_true;
 }
 #endif
-static tb_bool_t tb_async_stream_sock_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_read(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && data && size && func, tb_false);
 
     // clear the offset if be writ mode now
@@ -769,26 +768,26 @@ static tb_bool_t tb_async_stream_sock_read(tb_handle_t astream, tb_size_t delay,
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(&sstream->base.base.url))
+            if (tb_url_ssl_get(&sstream->base.url))
             {
                 // check
                 tb_assert_and_check_break(sstream->hssl);
 
                 // post ssl read
-                ok = tb_aicp_ssl_read_after(sstream->hssl, delay, data, size, tb_async_stream_sock_read_ssl_func, astream);
+                ok = tb_aicp_ssl_read_after(sstream->hssl, delay, data, size, tb_async_stream_sock_read_ssl_func, stream);
             }
             // post tcp read
             else
 #endif
             {
-                ok = tb_aico_recv_after(sstream->aico, delay, data, size, tb_async_stream_sock_read_func, astream);
+                ok = tb_aico_recv_after(sstream->aico, delay, data, size, tb_async_stream_sock_read_func, stream);
             }
         }
         break;
     case TB_SOCKET_TYPE_UDP:
         {
             // post udp read
-            ok = tb_aico_urecv_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.base.url), data, size, tb_async_stream_sock_read_udp_func, astream);
+            ok = tb_aico_urecv_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.url), data, size, tb_async_stream_sock_read_udp_func, stream);
         }
         break;
     default:
@@ -939,10 +938,10 @@ static tb_bool_t tb_async_stream_sock_writ_ssl_func(tb_handle_t ssl, tb_size_t s
     return tb_true;
 }
 #endif
-static tb_bool_t tb_async_stream_sock_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_writ(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && data && size && func, tb_false);
 
     // clear the offset if be read mode now
@@ -963,26 +962,26 @@ static tb_bool_t tb_async_stream_sock_writ(tb_handle_t astream, tb_size_t delay,
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(&sstream->base.base.url))
+            if (tb_url_ssl_get(&sstream->base.url))
             {
                 // check
                 tb_assert_and_check_break(sstream->hssl);
 
                 // post ssl writ
-                ok = tb_aicp_ssl_writ_after(sstream->hssl, delay, data, size, tb_async_stream_sock_writ_ssl_func, astream);
+                ok = tb_aicp_ssl_writ_after(sstream->hssl, delay, data, size, tb_async_stream_sock_writ_ssl_func, stream);
             }
             // post tcp writ
             else 
 #endif
             {
-                ok = tb_aico_send_after(sstream->aico, delay, data, size, tb_async_stream_sock_writ_func, astream);
+                ok = tb_aico_send_after(sstream->aico, delay, data, size, tb_async_stream_sock_writ_func, stream);
             }
         }
         break;
     case TB_SOCKET_TYPE_UDP:
         {
             // post udp writ
-            ok = tb_aico_usend_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.base.url), data, size, tb_async_stream_sock_writ_udp_func, astream);
+            ok = tb_aico_usend_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.url), data, size, tb_async_stream_sock_writ_udp_func, stream);
         }
         break;
     default:
@@ -993,26 +992,26 @@ static tb_bool_t tb_async_stream_sock_writ(tb_handle_t astream, tb_size_t delay,
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_sock_seek(tb_handle_t astream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_seek(tb_async_stream_t* stream, tb_hize_t offset, tb_async_stream_seek_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream && func, tb_false);
 
     // done func
-    func(astream, TB_STATE_NOT_SUPPORTED, 0, priv);
+    func(stream, TB_STATE_NOT_SUPPORTED, 0, priv);
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_sock_sync(tb_handle_t astream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_sync(tb_async_stream_t* stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && func, tb_false);
 
     // done func
-    func(astream, TB_STATE_OK, bclosing, priv);
+    func(stream, TB_STATE_OK, bclosing, priv);
 
     // ok
     return tb_true;
@@ -1063,10 +1062,10 @@ static tb_bool_t tb_async_stream_sock_task_ssl_func(tb_handle_t ssl, tb_size_t s
     return tb_true;
 }
 #endif
-static tb_bool_t tb_async_stream_sock_task(tb_handle_t astream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_task(tb_async_stream_t* stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream && sstream->sock && func, tb_false);
 
     // init func
@@ -1074,26 +1073,26 @@ static tb_bool_t tb_async_stream_sock_task(tb_handle_t astream, tb_size_t delay,
     sstream->priv       = priv;
 
     // post task
-    if (sstream->aico) return tb_aico_task_run(sstream->aico, delay, tb_async_stream_sock_task_func, astream);
+    if (sstream->aico) return tb_aico_task_run(sstream->aico, delay, tb_async_stream_sock_task_func, stream);
 #ifdef TB_SSL_ENABLE
-    else if (sstream->hssl) return tb_aicp_ssl_task(sstream->hssl, delay, tb_async_stream_sock_task_ssl_func, astream);
+    else if (sstream->hssl) return tb_aicp_ssl_task(sstream->hssl, delay, tb_async_stream_sock_task_ssl_func, stream);
 #endif
 
     // failed
     tb_trace_e("cannot run task!");
     return tb_false;
 }
-static tb_void_t tb_async_stream_sock_kill(tb_handle_t astream)
+static tb_void_t tb_async_stream_sock_kill(tb_async_stream_t* stream)
 {   
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return(sstream);
 
     // trace
 #ifdef TB_SSL_ENABLE
-    tb_trace_d("kill: %s: balived: %d, aico: %p, hssl: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hssl, sstream->hdns);
+    tb_trace_d("kill: %s: balived: %d, aico: %p, hssl: %p, hdns: %p: ..", tb_url_get(&stream->url), sstream->balived, sstream->aico, sstream->hssl, sstream->hdns);
 #else
-    tb_trace_d("kill: %s: balived: %d, aico: %p, hdns: %p: ..", tb_url_get(&sstream->base.base.url), sstream->balived, sstream->aico, sstream->hdns);
+    tb_trace_d("kill: %s: balived: %d, aico: %p, hdns: %p: ..", tb_url_get(&stream->url), sstream->balived, sstream->aico, sstream->hdns);
 #endif
 
     // exit ssl
@@ -1106,28 +1105,28 @@ static tb_void_t tb_async_stream_sock_kill(tb_handle_t astream)
     // kill aico
     if (sstream->aico) tb_aico_kill(sstream->aico);
 }
-static tb_bool_t tb_async_stream_sock_exit(tb_handle_t astream)
+static tb_bool_t tb_async_stream_sock_exit(tb_async_stream_t* stream)
 {   
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream, tb_false);
 
     // exit ssl
 #ifdef TB_SSL_ENABLE
     if (sstream->hssl) tb_aicp_ssl_exit(sstream->hssl);
-    sstream->hssl = tb_object_null;
+    sstream->hssl = tb_null;
 #endif
 
     // alived? exit it
     if (sstream->balived || sstream->bref)
     {
         // exit aico
-        if (sstream->aico) tb_aico_exit(sstream->aico, tb_object_null, tb_object_null);
-        sstream->aico = tb_object_null;
+        if (sstream->aico) tb_aico_exit(sstream->aico, tb_null, tb_null);
+        sstream->aico = tb_null;
 
         // exit hdns
-        if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_object_null, tb_object_null);
-        sstream->hdns = tb_object_null;
+        if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, tb_null, tb_null);
+        sstream->hdns = tb_null;
     }
     else
     {
@@ -1138,16 +1137,16 @@ static tb_bool_t tb_async_stream_sock_exit(tb_handle_t astream)
 
     // exit it
     if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
-    sstream->sock = tb_object_null;
+    sstream->sock = tb_null;
     sstream->bref = 0;
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_async_stream_sock_ctrl(tb_async_stream_t* stream, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
-    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(astream);
+    tb_async_stream_sock_t* sstream = tb_async_stream_sock_cast(stream);
     tb_assert_and_check_return_val(sstream, tb_false);
 
     // ctrl
@@ -1156,7 +1155,7 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_GET_OFFSET:
         {
             // check
-            tb_assert_and_check_return_val(tb_stream_is_opened(astream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_opened(stream), tb_false);
 
             // get offset
             tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -1167,7 +1166,7 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_SOCK_SET_TYPE:
         {
             // check
-            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(stream), tb_false);
 
             // the type
             tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -1177,12 +1176,12 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
             if (sstream->type != type)
             {
                 // exit aico
-                if (sstream->aico) tb_aico_exit(sstream->aico, tb_object_null, tb_object_null);
-                sstream->aico = tb_object_null;
+                if (sstream->aico) tb_aico_exit(sstream->aico, tb_null, tb_null);
+                sstream->aico = tb_null;
 
                 // exit it
                 if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
-                sstream->sock = tb_object_null;
+                sstream->sock = tb_null;
                 sstream->bref = 0;
             }
 
@@ -1202,7 +1201,7 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
     case TB_STREAM_CTRL_SOCK_SET_HANDLE:
         {
             // check
-            tb_assert_and_check_return_val(tb_stream_is_closed(astream), tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_closed(stream), tb_false);
 
             // the sock
             tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);
@@ -1211,8 +1210,8 @@ static tb_bool_t tb_async_stream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, 
             if (sstream->sock != sock)
             {
                 // exit aico
-                if (sstream->aico) tb_aico_exit(sstream->aico, tb_object_null, tb_object_null);
-                sstream->aico = tb_object_null;
+                if (sstream->aico) tb_aico_exit(sstream->aico, tb_null, tb_null);
+                sstream->aico = tb_null;
 
                 // exit it
                 if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
@@ -1253,7 +1252,7 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
 {
     // done
     tb_bool_t               ok = tb_false;
-    tb_async_stream_sock_t* sstream = tb_object_null;
+    tb_async_stream_sock_t* sstream = tb_null;
     do
     {
         // make stream
@@ -1270,8 +1269,8 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
         sstream->base.sync      = tb_async_stream_sock_sync;
         sstream->base.task      = tb_async_stream_sock_task;
         sstream->base.exit      = tb_async_stream_sock_exit;
-        sstream->base.base.kill = tb_async_stream_sock_kill;
-        sstream->base.base.ctrl = tb_async_stream_sock_ctrl;
+        sstream->base.kill      = tb_async_stream_sock_kill;
+        sstream->base.ctrl      = tb_async_stream_sock_ctrl;
         sstream->base.clos_try  = tb_async_stream_sock_clos_try;
         sstream->type           = TB_SOCKET_TYPE_TCP;
 
@@ -1285,7 +1284,7 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
     {
         // exit it
         if (sstream) tb_async_stream_exit((tb_async_stream_t*)sstream);
-        sstream = tb_object_null;
+        sstream = tb_null;
     }
 
     // ok
@@ -1294,25 +1293,25 @@ tb_async_stream_t* tb_async_stream_init_sock(tb_aicp_t* aicp)
 tb_async_stream_t* tb_async_stream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
 {
     // check
-    tb_assert_and_check_return_val(host && port, tb_object_null);
+    tb_assert_and_check_return_val(host && port, tb_null);
 
     // ssl is not supported now.
-    tb_assert_and_check_return_val(!bssl, tb_object_null);
+    tb_assert_and_check_return_val(!bssl, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  sstream = tb_object_null;
+    tb_async_stream_t*  sstream = tb_null;
     do
     {
         // init stream
         sstream = tb_async_stream_init_sock(aicp);
-        tb_assert_and_check_return_val(sstream, tb_object_null);
+        tb_assert_and_check_return_val(sstream, tb_null);
 
         // ctrl stream
-        if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_HOST, host)) break;
-        if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_PORT, port)) break;
-        if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_SSL, bssl)) break;
-        if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SOCK_SET_TYPE, type)) break;
+        if (!tb_async_stream_ctrl(sstream, TB_STREAM_CTRL_SET_HOST, host)) break;
+        if (!tb_async_stream_ctrl(sstream, TB_STREAM_CTRL_SET_PORT, port)) break;
+        if (!tb_async_stream_ctrl(sstream, TB_STREAM_CTRL_SET_SSL, bssl)) break;
+        if (!tb_async_stream_ctrl(sstream, TB_STREAM_CTRL_SOCK_SET_TYPE, type)) break;
 
         // ok
         ok = tb_true;
@@ -1324,7 +1323,7 @@ tb_async_stream_t* tb_async_stream_init_from_sock(tb_aicp_t* aicp, tb_char_t con
     {
         // exit it
         if (sstream) tb_async_stream_exit(sstream);
-        sstream = tb_object_null;
+        sstream = tb_null;
     }
 
     // ok

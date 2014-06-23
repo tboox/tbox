@@ -34,7 +34,7 @@
 tb_char_t* tb_strichr(tb_char_t const* s, tb_char_t c)
 {
     // check
-    tb_assert_and_check_return_val(s, tb_object_null);
+    tb_assert_and_check_return_val(s, tb_null);
 
     // init
     tb_byte_t const*    p = (tb_byte_t const*)s;
@@ -48,5 +48,5 @@ tb_char_t* tb_strichr(tb_char_t const* s, tb_char_t c)
 
     }
 
-    return tb_object_null;
+    return tb_null;
 }

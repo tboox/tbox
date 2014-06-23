@@ -36,11 +36,11 @@
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
     // check
-    tb_assert_and_check_return_val(path, tb_object_null);
+    tb_assert_and_check_return_val(path, tb_null);
 
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_object_null;
+    if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_null;
 
     // init access
     DWORD access = GENERIC_READ;
@@ -67,7 +67,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     if (mode & TB_FILE_MODE_DIRECT) attr |= FILE_FLAG_NO_BUFFERING;
 
     // init file
-    HANDLE file = CreateFileW(full, access, share, tb_object_null, cflag, attr, tb_object_null);
+    HANDLE file = CreateFileW(full, access, share, tb_null, cflag, attr, tb_null);
     if (file == INVALID_HANDLE_VALUE && (mode & TB_FILE_MODE_CREAT))
     {
         // make directory
@@ -81,7 +81,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
             if (*p == L'\\' || *p == L'/')
             {
                 // make directory if not exists
-                if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_object_null);
+                if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_null);
 
                 // skip repeat '\\' or '/'
                 while (*p && (*p == L'\\' || *p == L'/')) p++;
@@ -90,7 +90,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
         }
 
         // init it again
-        file = CreateFileW(full, access, share, tb_object_null, cflag, attr, tb_object_null);
+        file = CreateFileW(full, access, share, tb_null, cflag, attr, tb_null);
     }
 
     // append?
@@ -109,7 +109,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     }
 
     // ok?
-    return file != INVALID_HANDLE_VALUE? (tb_handle_t)file : tb_object_null;
+    return file != INVALID_HANDLE_VALUE? (tb_handle_t)file : tb_null;
 }
 tb_bool_t tb_file_exit(tb_handle_t file)
 {
@@ -129,7 +129,7 @@ tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
 
     // read
     DWORD real_size = 0;
-    return ReadFile(file, data, size, &real_size, tb_object_null)? (tb_long_t)real_size : -1;
+    return ReadFile(file, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
 {
@@ -141,7 +141,7 @@ tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
 
     // writ
     DWORD real_size = 0;
-    return WriteFile(file, data, size, &real_size, tb_object_null)? (tb_long_t)real_size : -1;
+    return WriteFile(file, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {

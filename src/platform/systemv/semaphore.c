@@ -37,13 +37,13 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 {
     // init semaphore
     tb_long_t h = semget((key_t)IPC_PRIVATE, 1, IPC_CREAT | IPC_EXCL | 0666);
-    tb_assert_and_check_return_val(h >= 0 || errno == EEXIST, tb_object_null);
+    tb_assert_and_check_return_val(h >= 0 || errno == EEXIST, tb_null);
 
     // exists?
     if (errno == EEXIST)
     {
         h = semget((key_t)IPC_PRIVATE, 1, 0);
-        tb_assert_and_check_return_val(h >= 0, tb_object_null);
+        tb_assert_and_check_return_val(h >= 0, tb_null);
     }
 
     // init value
@@ -65,7 +65,7 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
     if (semctl(h, 0, SETVAL, opts) < 0)
     {
         tb_semaphore_exit((tb_handle_t)(h + 1));
-        return tb_object_null;
+        return tb_null;
     }
 
     // ok
@@ -133,7 +133,7 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
     sb.sem_flg = SEM_UNDO;
 
     // wait semaphore
-    tb_long_t r = semtimedop(h, &sb, 1, timeout >= 0? &t : tb_object_null);
+    tb_long_t r = semtimedop(h, &sb, 1, timeout >= 0? &t : tb_null);
 
     // ok?
     tb_check_return_val(r, 1);

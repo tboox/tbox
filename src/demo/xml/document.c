@@ -11,7 +11,7 @@ tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
     // init stream
     tb_basic_stream_t* ist = tb_basic_stream_init_from_url(argv[1]);
     tb_basic_stream_t* ost = tb_basic_stream_init_from_url(argv[2]);
-    if (ost) tb_stream_ctrl(ost, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+    if (ost) tb_basic_stream_ctrl(ost, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
     if (ist && ost && tb_basic_stream_open(ist) && tb_basic_stream_open(ost))
     {
         // init reader & writer
@@ -24,7 +24,7 @@ tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
             if (argv[3]) ok = tb_xml_reader_goto(reader, argv[3]);
 
             // load & save
-            tb_xml_node_t* root = tb_object_null;
+            tb_xml_node_t* root = tb_null;
             if (ok) tb_xml_writer_save(writer, root = tb_xml_reader_load(reader));
 
             // exit root

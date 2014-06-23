@@ -98,11 +98,11 @@ typedef struct __tb_bloom_filter_impl_t
 tb_bloom_filter_t* tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func)
 {
     // check
-    tb_assert_and_check_return_val(func.hash, tb_object_null);
+    tb_assert_and_check_return_val(func.hash, tb_null);
 
     // done
     tb_bool_t               ok = tb_false;
-    tb_bloom_filter_impl_t* filter = tb_object_null;
+    tb_bloom_filter_impl_t* filter = tb_null;
     do
     {
         // check 
@@ -208,7 +208,7 @@ tb_bloom_filter_t* tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_co
     {
         // exit it
         if (filter) tb_bloom_filter_exit((tb_bloom_filter_t*)filter);
-        filter = tb_object_null;
+        filter = tb_null;
     }
 
     // ok?
@@ -222,7 +222,7 @@ tb_void_t tb_bloom_filter_exit(tb_bloom_filter_t* handle)
 
     // exit data
     if (filter->data) tb_free(filter->data);
-    filter->data = tb_object_null;
+    filter->data = tb_null;
 
     // exit it
     tb_free(filter);

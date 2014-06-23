@@ -48,7 +48,7 @@ __tb_extern_c_enter__
 #define TB_ASSERT_BACKTRACE_NFRAME                          (16)
 
 // the assert backtrace dump
-#define tb_assert_backtrace_dump()                          tb_backtrace_dump(TB_ASSERT_BACKTRACE_PREFIX, tb_object_null, TB_ASSERT_BACKTRACE_NFRAME)
+#define tb_assert_backtrace_dump()                          tb_backtrace_dump(TB_ASSERT_BACKTRACE_PREFIX, tb_null, TB_ASSERT_BACKTRACE_NFRAME)
 
 // assert
 #ifdef __tb_debug__

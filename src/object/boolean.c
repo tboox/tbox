@@ -54,7 +54,7 @@ typedef struct __tb_object_boolean_t
 static __tb_inline__ tb_object_boolean_t* tb_object_boolean_cast(tb_object_t const* object)
 {
     // check
-    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_BOOLEAN, tb_object_null);
+    tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_BOOLEAN, tb_null);
 
     // cast
     return (tb_object_boolean_t*)object;
@@ -64,7 +64,7 @@ static tb_object_t* tb_object_boolean_copy(tb_object_t* object)
 {
     // check
     tb_object_boolean_t* boolean = (tb_object_boolean_t*)object;
-    tb_assert_and_check_return_val(boolean, tb_object_null);
+    tb_assert_and_check_return_val(boolean, tb_null);
 
     // copy
     return object;
@@ -81,10 +81,10 @@ static tb_object_boolean_t const g_boolean_true =
         TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
     ,   TB_OBJECT_TYPE_BOOLEAN
     ,   1
-    ,   tb_object_null
+    ,   tb_null
     ,   tb_object_boolean_copy
-    ,   tb_object_null
-    ,   tb_object_null
+    ,   tb_null
+    ,   tb_null
     }
 ,   tb_true
 
@@ -97,10 +97,10 @@ static tb_object_boolean_t const g_boolean_false =
         TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
     ,   TB_OBJECT_TYPE_BOOLEAN
     ,   1
-    ,   tb_object_null
+    ,   tb_null
     ,   tb_object_boolean_copy
-    ,   tb_object_null
-    ,   tb_object_null
+    ,   tb_null
+    ,   tb_null
     }
 ,   tb_false
 

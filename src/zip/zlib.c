@@ -38,7 +38,7 @@
  */
 static __tb_inline__ tb_zip_zlib_t* tb_zip_zlib_cast(tb_zip_t* zip)
 {
-    tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_ZLIB, tb_object_null);
+    tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_ZLIB, tb_null);
     return (tb_zip_zlib_t*)zip;
 }
 static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
@@ -124,7 +124,7 @@ tb_zip_t* tb_zip_zlib_init(tb_size_t action)
 {   
     // alloc
     tb_zip_t* zip = (tb_zip_t*)tb_malloc0(sizeof(tb_zip_zlib_t));
-    tb_assert_and_check_return_val(zip, tb_object_null);
+    tb_assert_and_check_return_val(zip, tb_null);
     
     // init zip
     zip->algo       = TB_ZIP_ALGO_ZLIB;
@@ -156,7 +156,7 @@ tb_zip_t* tb_zip_zlib_init(tb_size_t action)
 
 fail:
     if (zip) tb_free(zip);
-    return tb_object_null;
+    return tb_null;
 }
 tb_void_t tb_zip_zlib_exit(tb_zip_t* zip)
 {

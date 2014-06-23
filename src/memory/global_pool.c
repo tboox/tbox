@@ -86,16 +86,16 @@ typedef struct __tb_global_pool_t
 tb_handle_t tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
     // check
-    tb_assert_and_check_return_val(data && size, tb_object_null);
+    tb_assert_and_check_return_val(data && size, tb_null);
 
     // align
     align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
     align = tb_max(align, TB_CPU_BITBYTE);
-    tb_assert_and_check_return_val(align <= TB_GLOBAL_POOL_ALIGN_MAXN, tb_object_null);
+    tb_assert_and_check_return_val(align <= TB_GLOBAL_POOL_ALIGN_MAXN, tb_null);
 
     // align data
     tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
-    tb_assert_and_check_return_val(size >= byte, tb_object_null);
+    tb_assert_and_check_return_val(size >= byte, tb_null);
     size -= byte;
     data += byte;
 
@@ -111,15 +111,15 @@ tb_handle_t tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align
 
     // init data
     pool->data = (tb_byte_t*)tb_align((tb_size_t)&pool[1], pool->align);
-    tb_assert_and_check_return_val(data + size > pool->data, tb_object_null);
+    tb_assert_and_check_return_val(data + size > pool->data, tb_null);
 
     // init size
     pool->size = (tb_byte_t*)data + size - pool->data;
-    tb_assert_and_check_return_val(pool->size, tb_object_null);
+    tb_assert_and_check_return_val(pool->size, tb_null);
 
     // init bpool
     pool->bpool = tb_static_pool_init(pool->data, pool->size, pool->align);
-    tb_assert_and_check_return_val(pool->bpool, tb_object_null);
+    tb_assert_and_check_return_val(pool->bpool, tb_null);
     
     // FIXME: alloc will be too slower now if space is small
 #if 0
@@ -131,7 +131,7 @@ tb_handle_t tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align
         if (pool->tdata)
         {
             pool->tpool = tb_tiny_pool_init(pool->tdata, pool->tsize, pool->align);
-            tb_assert_and_check_return_val(pool->tpool, tb_object_null);
+            tb_assert_and_check_return_val(pool->tpool, tb_null);
         }
     }
 #endif
@@ -164,8 +164,8 @@ tb_void_t tb_global_pool_clear(tb_handle_t handle)
     if (pool->bpool) tb_static_pool_clear(pool->bpool);
 
     // reinit tpool
-    pool->tdata = tb_object_null;
-    pool->tpool = tb_object_null;
+    pool->tdata = tb_null;
+    pool->tpool = tb_null;
     if (pool->tsize >= TB_GLOBAL_POOL_TPOOL_MINN)
     {
         pool->tdata = (tb_byte_t*)tb_static_pool_malloc(pool->bpool, pool->tsize);
@@ -177,7 +177,7 @@ tb_pointer_t tb_global_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debu
 {
     // check 
     tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
 
     // try malloc it from tpool
     if (pool->tpool && size <= tb_tiny_pool_limit(pool->tpool))
@@ -194,7 +194,7 @@ tb_pointer_t tb_global_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_deb
 {
     // check 
     tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
 
     // try malloc it from tpool
     if (pool->tpool && size <= tb_tiny_pool_limit(pool->tpool))
@@ -211,7 +211,7 @@ tb_pointer_t tb_global_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_
 {
     // check 
     tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
 
     // try malloc it from tpool
     if (pool->tpool && item * size <= tb_tiny_pool_limit(pool->tpool))
@@ -228,7 +228,7 @@ tb_pointer_t tb_global_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size
 {
     // check 
     tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
 
     // try malloc it from tpool
     if (pool->tpool && item * size <= tb_tiny_pool_limit(pool->tpool))
@@ -244,19 +244,19 @@ tb_pointer_t tb_global_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_si
 {
     // check 
     tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
 
     // try ralloc it from tpool
     if (pool->tpool && (tb_byte_t*)data > pool->tdata && (tb_byte_t*)data < pool->tdata + pool->tsize)
     {
         // ralloc it
-        tb_pointer_t pdata = tb_object_null;
+        tb_pointer_t pdata = tb_null;
         if (size <= tb_tiny_pool_limit(pool->tpool) && (pdata = tb_tiny_pool_ralloc(pool->tpool, data, size))) return pdata;
         else
         {
             // malloc it
             pdata = tb_static_pool_malloc_(pool->bpool, size __tb_debug_args__);
-            tb_check_return_val(pdata, tb_object_null);
+            tb_check_return_val(pdata, tb_null);
             tb_assert_and_check_return_val(pdata != data, pdata);
 
             // copy data

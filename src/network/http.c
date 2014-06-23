@@ -107,7 +107,7 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
     http->option.timeout    = TB_HTTP_DEFAULT_TIMEOUT;
     http->option.version    = 1; // HTTP/1.1
     http->option.bunzip     = 0;
-    http->option.cookies    = tb_object_null;
+    http->option.cookies    = tb_null;
 
     // init url
     if (!tb_url_init(&http->option.url)) return tb_false;
@@ -126,7 +126,7 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
 {
     // exit head
     if (http->option.head) tb_hash_exit(http->option.head);
-    http->option.head = tb_object_null;
+    http->option.head = tb_null;
 
     // exit url
     tb_url_exit(&http->option.url);
@@ -135,7 +135,7 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
     tb_url_exit(&http->option.post_url);
 
     // clear cookies
-    http->option.cookies = tb_object_null;
+    http->option.cookies = tb_null;
 }
 #ifdef __tb_debug__
 static tb_void_t tb_http_option_dump(tb_http_t* http)
@@ -244,17 +244,17 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
     {
         // the host is changed?
         tb_bool_t           host_changed = tb_true;
-        tb_char_t const*    host_old = tb_object_null;
+        tb_char_t const*    host_old = tb_null;
         tb_char_t const*    host_new = tb_url_host_get(&http->option.url);
-        tb_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
+        tb_basic_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
         if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
 
         // trace
         tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
 
         // ctrl stream
-        if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
-        if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
+        if (!tb_basic_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
+        if (!tb_basic_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
         // dump option
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
@@ -308,7 +308,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 
     // done
     tb_bool_t       ok = tb_false;
-    tb_basic_stream_t*  pstream = tb_object_null;
+    tb_basic_stream_t*  pstream = tb_null;
     tb_hong_t       post_size = 0;
     do
     {
@@ -350,11 +350,11 @@ static tb_bool_t tb_http_request(tb_http_t* http)
         if (http->option.cookies && !tb_hash_get(http->option.head, "Cookie"))
         {
             // the host
-            tb_char_t const* host = tb_object_null;
+            tb_char_t const* host = tb_null;
             tb_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
 
             // the path
-            tb_char_t const* path = tb_object_null;
+            tb_char_t const* path = tb_null;
             tb_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
 
             // is ssl?
@@ -400,7 +400,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
                 if (!tb_basic_stream_open(pstream)) break;
 
                 // the post size
-                post_size = tb_stream_size(pstream);
+                post_size = tb_basic_stream_size(pstream);
                 tb_assert_and_check_break(post_size >= 0);
 
                 // append post size
@@ -493,7 +493,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 
     // exit pstream
     if (pstream) tb_basic_stream_exit(pstream);
-    pstream = tb_object_null;
+    pstream = tb_null;
 
     // ok?
     return ok;
@@ -634,17 +634,17 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
             http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
 
             // ctrl stream for sock
-            if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+            if (!tb_basic_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
         }
         // parse cookies
         else if (http->option.cookies && !tb_strnicmp(line, "Set-Cookie", 10))
         {
             // the host
-            tb_char_t const* host = tb_object_null;
+            tb_char_t const* host = tb_null;
             tb_http_option(http, TB_HTTP_OPTION_GET_HOST, &host);
 
             // the path
-            tb_char_t const* path = tb_object_null;
+            tb_char_t const* path = tb_null;
             tb_http_option(http, TB_HTTP_OPTION_GET_PATH, &path);
 
             // is ssl?
@@ -689,7 +689,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
                     // init cstream
                     if (http->cstream)
                     {
-                        if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
+                        if (!tb_basic_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
                     }
                     else http->cstream = tb_basic_stream_init_filter_from_chunked(http->stream, tb_true);
                     tb_assert_and_check_break(http->cstream);
@@ -711,14 +711,14 @@ static tb_bool_t tb_http_response(tb_http_t* http)
                     // init zstream
                     if (http->zstream)
                     {
-                        if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
+                        if (!tb_basic_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
                     }
                     else http->zstream = tb_basic_stream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
                     tb_assert_and_check_break(http->zstream);
 
                     // the filter
-                    tb_stream_filter_t* filter = tb_object_null;
-                    if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+                    tb_stream_filter_t* filter = tb_null;
+                    if (!tb_basic_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 
                     // ctrl filter
@@ -842,7 +842,7 @@ tb_handle_t tb_http_init()
 {
     // done
     tb_bool_t   ok = tb_false;
-    tb_http_t*  http = tb_object_null;
+    tb_http_t*  http = tb_null;
     do
     {
         // make http
@@ -878,7 +878,7 @@ tb_handle_t tb_http_init()
     if (!ok)
     {
         if (http) tb_http_exit(http);
-        http = tb_object_null;
+        http = tb_null;
     }
 
     // ok?
@@ -891,7 +891,7 @@ tb_void_t tb_http_kill(tb_handle_t handle)
     tb_assert_and_check_return(http);
 
     // kill stream
-    if (http->stream) tb_stream_kill(http->stream);
+    if (http->stream) tb_basic_stream_kill(http->stream);
 }
 tb_void_t tb_http_exit(tb_handle_t handle)
 {
@@ -904,18 +904,18 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 
     // exit zstream
     if (http->zstream) tb_basic_stream_exit(http->zstream);
-    http->zstream = tb_object_null;
+    http->zstream = tb_null;
 
     // exit cstream
     if (http->cstream) tb_basic_stream_exit(http->cstream);
-    http->cstream = tb_object_null;
+    http->cstream = tb_null;
 
     // exit sstream
     if (http->sstream) tb_basic_stream_exit(http->sstream);
-    http->sstream = tb_object_null;
+    http->sstream = tb_null;
 
     // exit stream
-    http->stream = tb_object_null;
+    http->stream = tb_null;
     
     // exit status
     tb_http_status_exit(http);
@@ -931,7 +931,7 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 
     // exit pool
     if (http->pool) tb_pool_exit(http->pool);
-    http->pool = tb_object_null;
+    http->pool = tb_null;
 
     // free it
     tb_free(http);
@@ -1445,7 +1445,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
             tb_assert_and_check_return_val(url, tb_false);
 
             // clear post data and size
-            http->option.post_data = tb_object_null;
+            http->option.post_data = tb_null;
             http->option.post_size = 0;
             
             // set url
@@ -1652,7 +1652,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 tb_http_status_t const* tb_http_status(tb_handle_t handle)
 {
     tb_http_t* http = (tb_http_t*)handle;
-    tb_assert_and_check_return_val(http, tb_object_null);
+    tb_assert_and_check_return_val(http, tb_null);
     return &http->status;
 }
 tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)

@@ -44,11 +44,11 @@ tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
     if (tb_directory_curt(curt, 4096)) tb_trace_i("current: %s", curt);
 
     // current
-    tb_directory_walk(argv[1]? argv[1] : curt, tb_true, tb_true, tb_directory_walk_func, tb_object_null);
+    tb_directory_walk(argv[1]? argv[1] : curt, tb_true, tb_true, tb_directory_walk_func, tb_null);
 #elif 0
     tb_directory_remove(argv[1]);
 #else
-//  tb_directory_walk(argv[1], tb_true, tb_true, tb_directory_walk_func, tb_object_null);
+//  tb_directory_walk(argv[1], tb_true, tb_true, tb_directory_walk_func, tb_null);
     tb_directory_copy(argv[1], argv[2]);
 #endif
 

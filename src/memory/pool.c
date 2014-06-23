@@ -114,19 +114,19 @@ __tb_extern_c__ tb_pointer_t tb_static_pool_ralloc_fast(tb_pointer_t bpool, tb_p
 static tb_pointer_t tb_pool_ralloc_fast(tb_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {
     // check 
-    tb_assert_and_check_return_val(pool && pool->pools, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->pools, tb_null);
 
     // no size?
-    tb_check_return_val(size, tb_object_null);
+    tb_check_return_val(size, tb_null);
 
     // check osize
-    tb_assert_and_check_return_val(osize && !*osize, tb_object_null);
+    tb_assert_and_check_return_val(osize && !*osize, tb_null);
     
     // reallocate it from the predicted pool first
     if (pool->pred)
     {
         // check
-        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_object_null);
+        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
 
         // the predicted pool
         tb_handle_t bpool = pool->pools[pool->pred - 1].pool;
@@ -139,7 +139,7 @@ static tb_pointer_t tb_pool_ralloc_fast(tb_pool_t* pool, tb_pointer_t data, tb_s
             tb_check_return_val(!p, p);
 
             // no space?
-            tb_check_return_val(!*osize, tb_object_null);
+            tb_check_return_val(!*osize, tb_null);
         }
     }
 
@@ -160,12 +160,12 @@ static tb_pointer_t tb_pool_ralloc_fast(tb_pool_t* pool, tb_pointer_t data, tb_s
                 tb_check_return_val(!p, p);
 
                 // no space?
-                tb_check_return_val(!*osize, tb_object_null);
+                tb_check_return_val(!*osize, tb_null);
             }
         }
     }
 
-    return tb_object_null;
+    return tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ tb_handle_t tb_pool_init(tb_size_t grow, tb_size_t align)
 
     // init pool
     tb_pool_t* pool = (tb_pool_t*)tb_malloc0(sizeof(tb_pool_t));
-    tb_assert_and_check_return_val(pool, tb_object_null);
+    tb_assert_and_check_return_val(pool, tb_null);
 
     // init pools align
     pool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
@@ -207,7 +207,7 @@ tb_handle_t tb_pool_init(tb_size_t grow, tb_size_t align)
 
 fail:
     if (pool) tb_pool_exit(pool);
-    return tb_object_null;
+    return tb_null;
 }
 
 tb_void_t tb_pool_exit(tb_handle_t handle)
@@ -271,10 +271,10 @@ tb_pointer_t tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl_
 {
     // check 
     tb_pool_t* pool = (tb_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->pools, tb_object_null);
+    tb_assert_and_check_return_val(pool && pool->pools, tb_null);
 
     // no size?
-    tb_check_return_val(size, tb_object_null);
+    tb_check_return_val(size, tb_null);
     
     // aloc++
 #ifdef __tb_debug__
@@ -285,7 +285,7 @@ tb_pointer_t tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl_
     if (pool->pred)
     {
         // check
-        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_object_null);
+        tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
 
         // the predicted pool
         tb_handle_t bpool = pool->pools[pool->pred - 1].pool;
@@ -335,7 +335,7 @@ tb_pointer_t tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl_
         // grow
         pool->poolm += TB_POOL_CHUNK_GROW;
         pool->pools = (tb_pool_chunk_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_pool_chunk_t));
-        tb_assert_and_check_return_val(pool->pools, tb_object_null);
+        tb_assert_and_check_return_val(pool->pools, tb_null);
     }
     
     // append a new pool for allocation
@@ -376,7 +376,7 @@ tb_pointer_t tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl_
     tb_memset(chunk, 0, sizeof(tb_pool_chunk_t));
 
     // fail
-    return tb_object_null;
+    return tb_null;
 }
 tb_pointer_t tb_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
@@ -392,7 +392,7 @@ tb_pointer_t tb_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl
 tb_pointer_t tb_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_object_null);
+    tb_assert_and_check_return_val(item, tb_null);
 
     // malloc
     return tb_pool_malloc_(handle, item * size __tb_debug_args__);
@@ -401,7 +401,7 @@ tb_pointer_t tb_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size 
 tb_pointer_t tb_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_object_null);
+    tb_assert_and_check_return_val(item, tb_null);
 
     // malloc
     return tb_pool_malloc0_(handle, item * size __tb_debug_args__);
@@ -411,13 +411,13 @@ tb_pointer_t tb_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t si
 {
     // check
     tb_pool_t* pool = (tb_pool_t*)handle;
-    tb_assert_and_check_return_val(pool, tb_object_null);
+    tb_assert_and_check_return_val(pool, tb_null);
 
     // free it if no size
     if (!size)
     {
         tb_pool_free_(pool, data __tb_debug_args__);
-        return tb_object_null;
+        return tb_null;
     }
 
     // alloc it if no data?
@@ -427,11 +427,11 @@ tb_pointer_t tb_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t si
     tb_size_t       osize = 0;
     tb_pointer_t    pdata = tb_pool_ralloc_fast(pool, data, size, &osize);
     tb_check_return_val(!pdata, pdata);
-    tb_assert_and_check_return_val(osize < size, tb_object_null);
+    tb_assert_and_check_return_val(osize < size, tb_null);
 
     // malloc it
     pdata = tb_pool_malloc_(pool, size __tb_debug_args__);
-    tb_check_return_val(pdata, tb_object_null);
+    tb_check_return_val(pdata, tb_null);
     tb_assert_and_check_return_val(pdata != data, pdata);
 
     // copy data
@@ -446,7 +446,7 @@ tb_pointer_t tb_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t si
 tb_char_t* tb_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(handle && data, tb_object_null);
+    tb_assert_and_check_return_val(handle && data, tb_null);
 
     // done
     tb_size_t   n = tb_strlen(data);
@@ -463,7 +463,7 @@ tb_char_t* tb_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_
 tb_char_t* tb_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(handle && data, tb_object_null);
+    tb_assert_and_check_return_val(handle && data, tb_null);
 
     // done
     size = tb_strnlen(data, size);

@@ -132,5 +132,5 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
     default:                                    return "unknown";
     }
 
-    return tb_object_null;
+    return tb_null;
 }

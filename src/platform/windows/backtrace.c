@@ -43,16 +43,16 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
     tb_check_return_val(tb_kernel32()->RtlCaptureStackBackTrace && frames && nframe, 0);
 
     // note: cannot use assert
-    return (tb_size_t)tb_kernel32()->RtlCaptureStackBackTrace((DWORD)nskip, (DWORD)nframe < 63? nframe : 62, frames, tb_object_null);
+    return (tb_size_t)tb_kernel32()->RtlCaptureStackBackTrace((DWORD)nskip, (DWORD)nframe < 63? nframe : 62, frames, tb_null);
 }
 tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {
     // check
-    tb_check_return_val(frames && nframe, tb_object_null);
+    tb_check_return_val(frames && nframe, tb_null);
 
     // make symbol
     tb_dbghelp_symbol_info_t* symbol = (tb_dbghelp_symbol_info_t*)calloc(sizeof(tb_dbghelp_symbol_info_t) + TB_MAX_SYM_NAME * sizeof(tb_char_t), 1);
-    tb_check_return_val(symbol, tb_object_null);
+    tb_check_return_val(symbol, tb_null);
 
     // init symbol
     symbol->MaxNameLen = TB_MAX_SYM_NAME;
@@ -65,10 +65,10 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
 {
     // check
     tb_dbghelp_symbol_info_t* symbol = (tb_dbghelp_symbol_info_t*)handle;
-    tb_check_return_val(symbol && tb_dbghelp()->SymFromAddr && frames && nframe && iframe < nframe, tb_object_null);
+    tb_check_return_val(symbol && tb_dbghelp()->SymFromAddr && frames && nframe && iframe < nframe, tb_null);
 
     // done symbol
-    if (!tb_dbghelp()->SymFromAddr(GetCurrentProcess(), (DWORD64)(tb_size_t)(frames[iframe]), 0, symbol)) return tb_object_null;
+    if (!tb_dbghelp()->SymFromAddr(GetCurrentProcess(), (DWORD64)(tb_size_t)(frames[iframe]), 0, symbol)) return tb_null;
     
     // the symbol name
     return symbol->Name;

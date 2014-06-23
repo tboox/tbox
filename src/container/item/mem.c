@@ -46,7 +46,7 @@ static tb_long_t tb_item_func_mem_comp(tb_item_func_t* func, tb_cpointer_t ldata
 static tb_pointer_t tb_item_func_mem_data(tb_item_func_t* func, tb_cpointer_t item)
 {
     // check
-    tb_assert_and_check_return_val(func && item, tb_object_null);
+    tb_assert_and_check_return_val(func && item, tb_null);
 
     // the item data
     return (tb_pointer_t)item;
