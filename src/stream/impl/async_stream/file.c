@@ -31,8 +31,6 @@
  * includes
  */
 #include "prefix.h"
-#include "../stream.h"
-#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros

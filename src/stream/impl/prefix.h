@@ -20,15 +20,20 @@
  * @file        prefix.h
  *
  */
-#ifndef TB_STREAM_STREAM_PREFIX_H
-#define TB_STREAM_STREAM_PREFIX_H
+#ifndef TB_STREAM_IMPL_PREFIX_H
+#define TB_STREAM_IMPL_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
 #include "../stream.h"
-#include "../stream.h"
+#include "../../asio/asio.h"
+#include "../../utils/utils.h"
+#include "../../memory/memory.h"
+#include "../../string/string.h"
+#include "../../network/network.h"
+#include "../../platform/platform.h"
 
 
 #endif

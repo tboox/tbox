@@ -31,8 +31,6 @@
  * includes
  */
 #include "prefix.h"
-#include "../../utils/utils.h"
-#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
