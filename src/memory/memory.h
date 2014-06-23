@@ -50,9 +50,9 @@ __tb_extern_c_enter__
 /*!architecture
  *
  * <pre>
- * pool --------------------- static_pool --
- *                |                     |              |
- *             global_pool -------------|              | 
+ * pool -------------------------------- static_pool --
+ *                |                          |         |
+ *             global_pool ------------------|         | 
  *                |                 static_tiny_pool --|- data: |-------------------------------|
  *                |                                    |
  * fixed_pool --------------------- static_fixed_pool --
