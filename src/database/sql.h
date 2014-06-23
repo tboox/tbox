@@ -276,7 +276,7 @@ tb_bool_t           tb_object_database_sql_done(tb_handle_t database, tb_char_t 
             if (blob)
             {
                 // data?
-                tb_basic_stream_t* stream = tb_null;
+                tb_stream_t* stream = tb_null;
                 if (tb_object_database_sql_value_blob(blob))
                 {
                     // trace
@@ -286,7 +286,7 @@ tb_bool_t           tb_object_database_sql_done(tb_handle_t database, tb_char_t 
                 else if ((stream = tb_object_database_sql_value_blob_stream(blob)))
                 {
                     // trace
-                    tb_trace_i("[stream: %p, size: %lld] ", stream, tb_basic_stream_size(stream));
+                    tb_trace_i("[stream: %p, size: %lld] ", stream, tb_stream_size(stream));
 
                     // read stream
                     // ...

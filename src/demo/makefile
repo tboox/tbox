@@ -27,8 +27,8 @@ demo_C_FILES 								+= \
 											other/test \
 											other/flv \
 											other/libflv \
-											stream/basic_stream/null \
-											stream/basic_stream/cache \
+											stream/stream/null \
+											stream/stream/cache \
 											string/string_pool \
 											string/string \
 											string/static_string \
@@ -86,7 +86,7 @@ demo_C_FILES-$(TB_CONFIG_TYPE_FLOAT) 		+= \
 											libm/double
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ZIP) 	+= \
-											stream/basic_stream/zip
+											stream/stream/zip
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 											xml/reader \
@@ -95,7 +95,7 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 											utils/option \
-											stream/basic_stream \
+											stream/stream \
 											object/json \
 											object/bin \
 											object/xml \
@@ -105,7 +105,7 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
 											other/charset \
-											stream/basic_stream/charset 
+											stream/stream/charset 
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_DATABASE) += \
 											database/sql 

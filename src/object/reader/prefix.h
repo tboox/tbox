@@ -43,31 +43,31 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_void_t tb_object_reader_bin_type_size(tb_basic_stream_t* stream, tb_size_t* ptype, tb_uint64_t* psize)
+static __tb_inline__ tb_void_t tb_object_reader_bin_type_size(tb_stream_t* stream, tb_size_t* ptype, tb_uint64_t* psize)
 {
     // check
     tb_assert_and_check_return(stream);
 
     // the flag
-    tb_uint8_t flag = tb_basic_stream_bread_u8(stream);
+    tb_uint8_t flag = tb_stream_bread_u8(stream);
 
     // the type & size
     tb_size_t   type = flag >> 4;
     tb_uint64_t size = flag & 0x0f;
-    if (type == 0xf) type = tb_basic_stream_bread_u8(stream);
+    if (type == 0xf) type = tb_stream_bread_u8(stream);
     switch (size)
     {
     case 0xc:
-        size = tb_basic_stream_bread_u8(stream);
+        size = tb_stream_bread_u8(stream);
         break;
     case 0xd:
-        size = tb_basic_stream_bread_u16_be(stream);
+        size = tb_stream_bread_u16_be(stream);
         break;
     case 0xe:
-        size = tb_basic_stream_bread_u32_be(stream);
+        size = tb_stream_bread_u32_be(stream);
         break;
     case 0xf:
-        size = tb_basic_stream_bread_u64_be(stream);
+        size = tb_stream_bread_u64_be(stream);
         break;
     default:
         break;

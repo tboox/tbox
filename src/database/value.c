@@ -466,7 +466,7 @@ tb_void_t tb_object_database_sql_value_set_blob16(tb_object_database_sql_value_t
     // check size
     tb_assert(tb_object_database_sql_value_size(value) <= TB_MAXU16);
 }
-tb_void_t tb_object_database_sql_value_set_blob32(tb_object_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_basic_stream_t* stream)
+tb_void_t tb_object_database_sql_value_set_blob32(tb_object_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_stream_t* stream)
 {
     // check
     tb_assert_and_check_return(value);
@@ -476,10 +476,10 @@ tb_void_t tb_object_database_sql_value_set_blob32(tb_object_database_sql_value_t
     if (stream)
     {
         // must be opened 
-        tb_assert_and_check_return(tb_basic_stream_is_opened(stream));
+        tb_assert_and_check_return(tb_stream_is_opened(stream));
 
         // the stream size
-        stream_size = tb_basic_stream_size(stream);
+        stream_size = tb_stream_size(stream);
         tb_assert_and_check_return(stream_size >= 0 && stream_size < TB_MAXS32);
     }
 

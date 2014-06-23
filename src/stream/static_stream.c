@@ -25,7 +25,7 @@
  * includes
  */
 #include "static_stream.h"
-#include "basic_stream.h"
+#include "stream.h"
 #include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"

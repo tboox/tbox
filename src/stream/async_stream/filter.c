@@ -38,7 +38,7 @@
  */
 
 // the filter stream type
-typedef struct __tb_async_stream_filter_t
+typedef struct __tb_async_stream_impl_t
 {
     // the base
     tb_async_stream_t                   base;
@@ -79,65 +79,65 @@ typedef struct __tb_async_stream_filter_t
     // the priv
     tb_cpointer_t                       priv;
 
-}tb_async_stream_filter_t;
+}tb_async_stream_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_async_stream_filter_t* tb_async_stream_filter_cast(tb_async_stream_t* stream)
+static __tb_inline__ tb_async_stream_impl_t* tb_async_stream_impl_cast(tb_async_stream_t* stream)
 {
     tb_assert_and_check_return_val(stream && stream->type == TB_STREAM_TYPE_FLTR, tb_null);
-    return (tb_async_stream_filter_t*)stream;
+    return (tb_async_stream_impl_t*)stream;
 }
-static tb_void_t tb_async_stream_filter_clos_clear(tb_async_stream_filter_t* fstream)
+static tb_void_t tb_async_stream_impl_clos_clear(tb_async_stream_impl_t* impl)
 {
     // check
-    tb_assert_and_check_return(fstream);
+    tb_assert_and_check_return(impl);
 
     // clos the filter
-    if (fstream->filter) tb_stream_filter_clos(fstream->filter);
+    if (impl->filter) tb_stream_filter_clos(impl->filter);
 
     // clear the mode
-    fstream->bread = 0;
+    impl->bread = 0;
 
     // clear the offset
-    tb_atomic64_set0(&fstream->offset);
+    tb_atomic64_set0(&impl->offset);
 
     // clear base
-    tb_async_stream_clear(&fstream->base);
+    tb_async_stream_clear(&impl->base);
 }
-static tb_void_t tb_async_stream_filter_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_impl_clos_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast((tb_handle_t)priv);
-    tb_assert_and_check_return(fstream && fstream->func.clos);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast((tb_handle_t)priv);
+    tb_assert_and_check_return(impl && impl->func.clos);
 
     // trace
     tb_trace_d("clos: notify: ..");
 
     // clear it
-    tb_async_stream_filter_clos_clear(fstream);
+    tb_async_stream_impl_clos_clear(impl);
 
     /* done clos func
      *
      * note: cannot use this stream after closing, the stream may be exited in the closing func
      */
-    fstream->func.clos(&fstream->base, TB_STATE_OK, fstream->priv);
+    impl->func.clos(&impl->base, TB_STATE_OK, impl->priv);
 
     // trace
     tb_trace_d("clos: notify: ok");
 }
-static tb_bool_t tb_async_stream_filter_clos_try(tb_async_stream_t* stream)
+static tb_bool_t tb_async_stream_impl_clos_try(tb_async_stream_t* stream)
 {   
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // try closing ok?
-    if (!fstream->stream || tb_async_stream_clos_try(fstream->stream))
+    if (!impl->stream || tb_async_stream_clos_try(impl->stream))
     {
         // clear it
-        tb_async_stream_filter_clos_clear(fstream);
+        tb_async_stream_impl_clos_clear(impl);
 
         // ok
         return tb_true;
@@ -146,55 +146,55 @@ static tb_bool_t tb_async_stream_filter_clos_try(tb_async_stream_t* stream)
     // failed
     return tb_false;
 }
-static tb_bool_t tb_async_stream_filter_clos(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_clos(tb_async_stream_t* stream, tb_async_stream_clos_func_t func, tb_cpointer_t priv)
 {   
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream && fstream->stream && func, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl && impl->stream && func, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
 
     // init clos
-    fstream->func.clos  = func;
-    fstream->priv       = priv;
+    impl->func.clos  = func;
+    impl->priv       = priv;
 
     // close it
-    return tb_async_stream_clos(fstream->stream, tb_async_stream_filter_clos_func, fstream);
+    return tb_async_stream_clos(impl->stream, tb_async_stream_impl_clos_func, impl);
 }
-static tb_bool_t tb_async_stream_filter_open_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_open_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_false);
 
     // the stream
-    tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
-    tb_assert_and_check_return_val(fstream && fstream->func.open, tb_false);
+    tb_async_stream_impl_t* impl = (tb_async_stream_impl_t*)priv;
+    tb_assert_and_check_return_val(impl && impl->func.open, tb_false);
 
     // open done
-    return tb_async_stream_open_func(&fstream->base, state, fstream->func.open, fstream->priv);
+    return tb_async_stream_open_func(&impl->base, state, impl->func.open, impl->priv);
 }
-static tb_bool_t tb_async_stream_filter_open_try(tb_async_stream_t* stream)
+static tb_bool_t tb_async_stream_impl_open_try(tb_async_stream_t* stream)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream && fstream->stream, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl && impl->stream, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
     do
     {
         // clear the mode
-        fstream->bread = 0;
+        impl->bread = 0;
 
         // clear the offset
-        tb_atomic64_set0(&fstream->offset);
+        tb_atomic64_set0(&impl->offset);
 
         // open filter first
-        if (fstream->filter && !tb_stream_filter_open(fstream->filter)) break;
+        if (impl->filter && !tb_stream_filter_open(impl->filter)) break;
 
         // try opening stream
-        if (!tb_async_stream_open_try(fstream->stream)) break;
+        if (!tb_async_stream_open_try(impl->stream)) break;
 
         // open done
         tb_async_stream_open_done(stream);
@@ -205,51 +205,51 @@ static tb_bool_t tb_async_stream_filter_open_try(tb_async_stream_t* stream)
     } while (0);
 
     // failed? clear it
-    if (!ok) tb_async_stream_filter_clos_clear(fstream);
+    if (!ok) tb_async_stream_impl_clos_clear(impl);
 
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_filter_open(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_open(tb_async_stream_t* stream, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream && fstream->stream && func, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl && impl->stream && func, tb_false);
 
     // clear the mode
-    fstream->bread = 0;
+    impl->bread = 0;
 
     // clear the offset
-    tb_atomic64_set0(&fstream->offset);
+    tb_atomic64_set0(&impl->offset);
 
     // open filter first
-    if (fstream->filter && !tb_stream_filter_open(fstream->filter)) 
+    if (impl->filter && !tb_stream_filter_open(impl->filter)) 
     {
         // open done
         return tb_async_stream_open_func(stream, TB_STATE_FAILED, func, priv);
     }
 
     // init func and priv
-    fstream->priv       = priv;
-    fstream->func.open  = func;
+    impl->priv       = priv;
+    impl->func.open  = func;
 
     // post open
-    return tb_async_stream_open(fstream->stream, tb_async_stream_filter_open_func, stream);
+    return tb_async_stream_open(impl->stream, tb_async_stream_impl_open_func, stream);
 }
-static tb_bool_t tb_async_stream_filter_sync_read_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_sync_read_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_false);
 
     // the stream
-    tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
-    tb_assert_and_check_return_val(fstream && fstream->func.read, tb_false);
+    tb_async_stream_impl_t* impl = (tb_async_stream_impl_t*)priv;
+    tb_assert_and_check_return_val(impl && impl->func.read, tb_false);
 
     // killed or failed?
     if (state != TB_STATE_OK && state != TB_STATE_CLOSED)
     {
         // done func
-        fstream->func.read((tb_async_stream_t*)fstream, state, tb_null, 0, fstream->size, fstream->priv);
+        impl->func.read((tb_async_stream_t*)impl, state, tb_null, 0, impl->size, impl->priv);
 
         // break it
         return tb_false;
@@ -260,23 +260,23 @@ static tb_bool_t tb_async_stream_filter_sync_read_func(tb_async_stream_t* stream
 
     // spak the filter
     tb_byte_t const*    data = tb_null;
-    tb_long_t           spak = tb_stream_filter_spak(fstream->filter, tb_null, 0, &data, fstream->size, -1);
+    tb_long_t           spak = tb_stream_filter_spak(impl->filter, tb_null, 0, &data, impl->size, -1);
     
     // has output data?
     tb_bool_t ok = tb_false;
     if (spak > 0 && data)
     {   
         // save offset
-        tb_atomic64_fetch_and_add(&fstream->offset, spak);
+        tb_atomic64_fetch_and_add(&impl->offset, spak);
 
         // done data
-        ok = fstream->func.read((tb_async_stream_t*)fstream, TB_STATE_OK, data, spak, fstream->size, fstream->priv);
+        ok = impl->func.read((tb_async_stream_t*)impl, TB_STATE_OK, data, spak, impl->size, impl->priv);
     }
     // closed?
     else
     {
         // done closed
-        fstream->func.read((tb_async_stream_t*)fstream, TB_STATE_CLOSED, tb_null, 0, fstream->size, fstream->priv);
+        impl->func.read((tb_async_stream_t*)impl, TB_STATE_CLOSED, tb_null, 0, impl->size, impl->priv);
 
         // break it
         // ok = tb_false;
@@ -285,18 +285,18 @@ static tb_bool_t tb_async_stream_filter_sync_read_func(tb_async_stream_t* stream
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_filter_read_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_read_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_false);
 
     // the stream
-    tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
-    tb_assert_and_check_return_val(fstream && fstream->func.read, tb_false);
+    tb_async_stream_impl_t* impl = (tb_async_stream_impl_t*)priv;
+    tb_assert_and_check_return_val(impl && impl->func.read, tb_false);
 
     // done filter
     tb_bool_t ok = tb_false;
-    if (fstream->filter)
+    if (impl->filter)
     {
         // done filter
         switch (state)
@@ -307,16 +307,16 @@ static tb_bool_t tb_async_stream_filter_read_func(tb_async_stream_t* stream, tb_
                 tb_trace_d("read: spak: %s", tb_url_get(&((tb_stream_t*)stream)->url));
 
                 // spak the filter
-                tb_long_t spak = tb_stream_filter_spak(fstream->filter, data, real, &data, size, 0);
+                tb_long_t spak = tb_stream_filter_spak(impl->filter, data, real, &data, size, 0);
                 
                 // has output data?
                 if (spak > 0 && data)
                 {
                     // save offset
-                    tb_atomic64_fetch_and_add(&fstream->offset, spak);
+                    tb_atomic64_fetch_and_add(&impl->offset, spak);
 
                     // done data
-                    ok = fstream->func.read((tb_async_stream_t*)fstream, TB_STATE_OK, data, spak, size, fstream->priv);
+                    ok = impl->func.read((tb_async_stream_t*)impl, TB_STATE_OK, data, spak, size, impl->priv);
                 }
                 // no data? continue it
                 else if (!spak) ok = tb_true;
@@ -324,20 +324,20 @@ static tb_bool_t tb_async_stream_filter_read_func(tb_async_stream_t* stream, tb_
                 else
                 {
                     // done closed
-                    fstream->func.read((tb_async_stream_t*)fstream, TB_STATE_CLOSED, tb_null, 0, size, fstream->priv);
+                    impl->func.read((tb_async_stream_t*)impl, TB_STATE_CLOSED, tb_null, 0, size, impl->priv);
 
                     // break it
                     // ok = tb_false;
                 }
 
                 // eof and continue?
-                if (tb_stream_filter_beof(fstream->filter) && ok)
+                if (tb_stream_filter_beof(impl->filter) && ok)
                 {
                     // done sync for reading
-                    ok = tb_async_stream_task(fstream->stream, 0, tb_async_stream_filter_sync_read_func, fstream);
+                    ok = tb_async_stream_task(impl->stream, 0, tb_async_stream_impl_sync_read_func, impl);
                     
                     // error? done error
-                    if (!ok) fstream->func.read((tb_async_stream_t*)fstream, TB_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
+                    if (!ok) impl->func.read((tb_async_stream_t*)impl, TB_STATE_UNKNOWN_ERROR, tb_null, 0, size, impl->priv);
 
                     // need not read data, break it
                     ok = tb_false;
@@ -347,16 +347,16 @@ static tb_bool_t tb_async_stream_filter_read_func(tb_async_stream_t* stream, tb_
         case TB_STATE_CLOSED:
             {
                 // done sync for reading
-                ok = tb_async_stream_task(fstream->stream, 0, tb_async_stream_filter_sync_read_func, fstream);
+                ok = tb_async_stream_task(impl->stream, 0, tb_async_stream_impl_sync_read_func, impl);
                 
                 // error? done error
-                if (!ok) fstream->func.read((tb_async_stream_t*)fstream, TB_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
+                if (!ok) impl->func.read((tb_async_stream_t*)impl, TB_STATE_UNKNOWN_ERROR, tb_null, 0, size, impl->priv);
             }
             break;
         default:
             {
                 // done closed or failed
-                fstream->func.read((tb_async_stream_t*)fstream, state, tb_null, 0, size, fstream->priv);
+                impl->func.read((tb_async_stream_t*)impl, state, tb_null, 0, size, impl->priv);
 
                 // break it
                 // ok = tb_false;
@@ -365,118 +365,118 @@ static tb_bool_t tb_async_stream_filter_read_func(tb_async_stream_t* stream, tb_
         }
     }
     // done func
-    else ok = fstream->func.read((tb_async_stream_t*)fstream, state, data, real, size, fstream->priv);
+    else ok = impl->func.read((tb_async_stream_t*)impl, state, data, real, size, impl->priv);
  
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_filter_read(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_read(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_async_stream_read_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream && fstream->stream && func, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl && impl->stream && func, tb_false);
 
     // clear the offset if be writ mode now
-    if (!fstream->bread) tb_atomic64_set0(&fstream->offset);
+    if (!impl->bread) tb_atomic64_set0(&impl->offset);
 
     // set read mode
-    fstream->bread = 1;
+    impl->bread = 1;
 
     // save func and priv
-    fstream->priv       = priv;
-    fstream->func.read  = func;
-    fstream->size       = size;
+    impl->priv       = priv;
+    impl->func.read  = func;
+    impl->size       = size;
 
     // filter eof? flush the left data
-    if (fstream->filter && tb_stream_filter_beof(fstream->filter))
-        return tb_async_stream_task(fstream->stream, 0, tb_async_stream_filter_sync_read_func, fstream);
+    if (impl->filter && tb_stream_filter_beof(impl->filter))
+        return tb_async_stream_task(impl->stream, 0, tb_async_stream_impl_sync_read_func, impl);
 
     // post read
-    return tb_async_stream_read_after(fstream->stream, delay, size, tb_async_stream_filter_read_func, stream);
+    return tb_async_stream_read_after(impl->stream, delay, size, tb_async_stream_impl_read_func, stream);
 }
-static tb_bool_t tb_async_stream_filter_writ_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_writ_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_false);
 
     // the stream
-    tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
-    tb_assert_and_check_return_val(fstream && fstream->func.writ, tb_false);
+    tb_async_stream_impl_t* impl = (tb_async_stream_impl_t*)priv;
+    tb_assert_and_check_return_val(impl && impl->func.writ, tb_false);
 
     // save offset
-    if (real) tb_atomic64_fetch_and_add(&fstream->offset, real);
+    if (real) tb_atomic64_fetch_and_add(&impl->offset, real);
 
     // done func
-    return fstream->func.writ((tb_async_stream_t*)fstream, state, data, real, size, fstream->priv);
+    return impl->func.writ((tb_async_stream_t*)impl, state, data, real, size, impl->priv);
 }
-static tb_bool_t tb_async_stream_filter_writ(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_writ(tb_async_stream_t* stream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_async_stream_writ_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream && fstream->stream && data && size && func, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl && impl->stream && data && size && func, tb_false);
 
     // clear the offset if be read mode now
-    if (fstream->bread) tb_atomic64_set0(&fstream->offset);
+    if (impl->bread) tb_atomic64_set0(&impl->offset);
 
     // set writ mode
-    fstream->bread = 0;
+    impl->bread = 0;
 
     // save func and priv
-    fstream->priv       = priv;
-    fstream->func.writ  = func;
+    impl->priv       = priv;
+    impl->func.writ  = func;
 
     // done filter
     tb_bool_t ok = tb_true;
-    if (fstream->filter)
+    if (impl->filter)
     {
         // trace
         tb_trace_d("writ: spak: %s", tb_url_get(&stream->url));
 
         // spak the filter
-        tb_long_t real = tb_stream_filter_spak(fstream->filter, data, size, &data, size, 0);
+        tb_long_t real = tb_stream_filter_spak(impl->filter, data, size, &data, size, 0);
         
         // has data? 
         if (real > 0 && data)
         {
             // post writ
-            ok = tb_async_stream_writ_after(fstream->stream, delay, data, real, tb_async_stream_filter_writ_func, stream);
+            ok = tb_async_stream_writ_after(impl->stream, delay, data, real, tb_async_stream_impl_writ_func, stream);
         }
         // no data or end? continue to writ or sync
         else
         {
             // done func, no data and finished
-            ok = func((tb_async_stream_t*)fstream, TB_STATE_OK, tb_null, 0, 0, fstream->priv);
+            ok = func((tb_async_stream_t*)impl, TB_STATE_OK, tb_null, 0, 0, impl->priv);
         }
     }
     // post writ
-    else ok = tb_async_stream_writ_after(fstream->stream, delay, data, size, tb_async_stream_filter_writ_func, stream);
+    else ok = tb_async_stream_writ_after(impl->stream, delay, data, size, tb_async_stream_impl_writ_func, stream);
 
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_filter_sync_func(tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_sync_func(tb_async_stream_t* stream, tb_size_t state, tb_bool_t bclosing, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_false);
 
     // the stream
-    tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
-    tb_assert_and_check_return_val(fstream && fstream->func.sync, tb_false);
+    tb_async_stream_impl_t* impl = (tb_async_stream_impl_t*)priv;
+    tb_assert_and_check_return_val(impl && impl->func.sync, tb_false);
 
     // done func
-    return fstream->func.sync((tb_async_stream_t*)fstream, state, bclosing, fstream->priv);
+    return impl->func.sync((tb_async_stream_t*)impl, state, bclosing, impl->priv);
 }
-static tb_bool_t tb_async_stream_filter_writ_sync_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_writ_sync_func(tb_async_stream_t* stream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(stream && data && size, tb_false);
 
     // the stream
-    tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
-    tb_assert_and_check_return_val(fstream && fstream->func.sync, tb_false);
+    tb_async_stream_impl_t* impl = (tb_async_stream_impl_t*)priv;
+    tb_assert_and_check_return_val(impl && impl->func.sync, tb_false);
 
     // save offset
-    if (real) tb_atomic64_fetch_and_add(&fstream->offset, real);
+    if (real) tb_atomic64_fetch_and_add(&impl->offset, real);
 
     // not finished? continue it
     tb_bool_t ok = tb_false;
@@ -485,112 +485,112 @@ static tb_bool_t tb_async_stream_filter_writ_sync_func(tb_async_stream_t* stream
     else if (state == TB_STATE_OK && real == size)
     {
         // post sync
-        ok = tb_async_stream_sync(fstream->stream, fstream->bclosing, tb_async_stream_filter_sync_func, fstream);
+        ok = tb_async_stream_sync(impl->stream, impl->bclosing, tb_async_stream_impl_sync_func, impl);
 
         // failed? done func
-        if (!ok) ok = fstream->func.sync((tb_async_stream_t*)fstream, TB_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
+        if (!ok) ok = impl->func.sync((tb_async_stream_t*)impl, TB_STATE_UNKNOWN_ERROR, impl->bclosing, impl->priv);
     }
     // failed?
     else
     {
         // failed? done func
-        ok = fstream->func.sync((tb_async_stream_t*)fstream, state != TB_STATE_OK? state : TB_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
+        ok = impl->func.sync((tb_async_stream_t*)impl, state != TB_STATE_OK? state : TB_STATE_UNKNOWN_ERROR, impl->bclosing, impl->priv);
     }
 
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_filter_sync(tb_async_stream_t* stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_sync(tb_async_stream_t* stream, tb_bool_t bclosing, tb_async_stream_sync_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream && fstream->stream && func, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl && impl->stream && func, tb_false);
 
     // clear the offset if be read mode now
-    if (fstream->bread) tb_atomic64_set0(&fstream->offset);
+    if (impl->bread) tb_atomic64_set0(&impl->offset);
  
     // set writ mode
-    fstream->bread = 0;
+    impl->bread = 0;
 
     // save func and priv
-    fstream->priv       = priv;
-    fstream->func.sync  = func;
-    fstream->bclosing   = bclosing;
+    impl->priv       = priv;
+    impl->func.sync  = func;
+    impl->bclosing   = bclosing;
 
     // done filter
     tb_bool_t ok = tb_true;
-    if (fstream->filter)
+    if (impl->filter)
     {
         // trace
         tb_trace_d("sync: spak: %s", tb_url_get(&stream->url));
 
         // spak the filter
         tb_byte_t const*    data = tb_null;
-        tb_long_t           real = tb_stream_filter_spak(fstream->filter, tb_null, 0, &data, 0, bclosing? -1 : 1);
+        tb_long_t           real = tb_stream_filter_spak(impl->filter, tb_null, 0, &data, 0, bclosing? -1 : 1);
         
         // has data? post writ and sync
         if (real > 0 && data)
-            ok = tb_async_stream_writ(fstream->stream, data, real, tb_async_stream_filter_writ_sync_func, stream);
+            ok = tb_async_stream_writ(impl->stream, data, real, tb_async_stream_impl_writ_sync_func, stream);
     }
     // post sync
-    else ok = tb_async_stream_sync(fstream->stream, bclosing, tb_async_stream_filter_sync_func, stream);
+    else ok = tb_async_stream_sync(impl->stream, bclosing, tb_async_stream_impl_sync_func, stream);
 
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_filter_task_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_task_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_false);
 
     // the stream
-    tb_async_stream_filter_t* fstream = (tb_async_stream_filter_t*)priv;
-    tb_assert_and_check_return_val(fstream && fstream->func.task, tb_false);
+    tb_async_stream_impl_t* impl = (tb_async_stream_impl_t*)priv;
+    tb_assert_and_check_return_val(impl && impl->func.task, tb_false);
 
     // done func
-    return fstream->func.task((tb_async_stream_t*)fstream, state, fstream->priv);
+    return impl->func.task((tb_async_stream_t*)impl, state, impl->priv);
 }
-static tb_bool_t tb_async_stream_filter_task(tb_async_stream_t* stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_impl_task(tb_async_stream_t* stream, tb_size_t delay, tb_async_stream_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream && fstream->stream && func, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl && impl->stream && func, tb_false);
 
     // save func and priv
-    fstream->priv       = priv;
-    fstream->func.task  = func;
+    impl->priv       = priv;
+    impl->func.task  = func;
 
     // post task
-    return tb_async_stream_task(fstream->stream, delay, tb_async_stream_filter_task_func, stream);
+    return tb_async_stream_task(impl->stream, delay, tb_async_stream_impl_task_func, stream);
 }
-static tb_void_t tb_async_stream_filter_kill(tb_async_stream_t* stream)
+static tb_void_t tb_async_stream_impl_kill(tb_async_stream_t* stream)
 {   
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return(fstream);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return(impl);
 
     // kill stream
-    if (fstream->stream) tb_async_stream_kill(fstream->stream);
+    if (impl->stream) tb_async_stream_kill(impl->stream);
 }
-static tb_bool_t tb_async_stream_filter_exit(tb_async_stream_t* stream)
+static tb_bool_t tb_async_stream_impl_exit(tb_async_stream_t* stream)
 {   
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // exit it
-    if (!fstream->bref && fstream->filter) tb_stream_filter_exit(fstream->filter);
-    fstream->filter = tb_null;
-    fstream->bref = 0;
+    if (!impl->bref && impl->filter) tb_stream_filter_exit(impl->filter);
+    impl->filter = tb_null;
+    impl->bref = 0;
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_filter_ctrl(tb_async_stream_t* stream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_async_stream_impl_ctrl(tb_async_stream_t* stream, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
-    tb_async_stream_filter_t* fstream = tb_async_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(fstream, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl_cast(stream);
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // ctrl
     switch (ctrl)
@@ -605,7 +605,7 @@ static tb_bool_t tb_async_stream_filter_ctrl(tb_async_stream_t* stream, tb_size_
             tb_assert_and_check_break(poffset);
 
             // get offset
-            *poffset = (tb_hize_t)tb_atomic64_get(&fstream->offset);
+            *poffset = (tb_hize_t)tb_atomic64_get(&impl->offset);
 
             // ok
             return tb_true;
@@ -616,7 +616,7 @@ static tb_bool_t tb_async_stream_filter_ctrl(tb_async_stream_t* stream, tb_size_
             tb_assert_and_check_break(tb_async_stream_is_closed(stream));
 
             // set pstream
-            fstream->stream = (tb_async_stream_t*)tb_va_arg(args, tb_async_stream_t*);
+            impl->stream = (tb_async_stream_t*)tb_va_arg(args, tb_async_stream_t*);
 
             // ok
             return tb_true;
@@ -628,7 +628,7 @@ static tb_bool_t tb_async_stream_filter_ctrl(tb_async_stream_t* stream, tb_size_
             tb_assert_and_check_break(pstream);
 
             // get stream
-            *pstream = fstream->stream;
+            *pstream = impl->stream;
 
             // ok
             return tb_true;
@@ -639,12 +639,12 @@ static tb_bool_t tb_async_stream_filter_ctrl(tb_async_stream_t* stream, tb_size_
             tb_assert_and_check_break(tb_async_stream_is_closed(stream));
 
             // exit filter first if exists
-            if (!fstream->bref && fstream->filter) tb_stream_filter_exit(fstream->filter);
+            if (!impl->bref && impl->filter) tb_stream_filter_exit(impl->filter);
 
             // set filter
             tb_stream_filter_t* filter = (tb_stream_filter_t*)tb_va_arg(args, tb_stream_filter_t*);
-            fstream->filter = filter;
-            fstream->bref = filter? 1 : 0;
+            impl->filter = filter;
+            impl->bref = filter? 1 : 0;
 
             // ok
             return tb_true;
@@ -656,7 +656,7 @@ static tb_bool_t tb_async_stream_filter_ctrl(tb_async_stream_t* stream, tb_size_
             tb_assert_and_check_break(pfilter);
 
             // get filter
-            *pfilter = fstream->filter;
+            *pfilter = impl->filter;
 
             // ok
             return tb_true;
@@ -679,26 +679,26 @@ tb_async_stream_t* tb_async_stream_init_filter(tb_aicp_t* aicp)
 
     // done
     tb_bool_t                   ok = tb_false;
-    tb_async_stream_filter_t*   fstream = tb_null;
+    tb_async_stream_impl_t*   impl = tb_null;
     do
     {
         // make stream
-        fstream = (tb_async_stream_filter_t*)tb_malloc0(sizeof(tb_async_stream_filter_t));
-        tb_assert_and_check_break(fstream);
+        impl = (tb_async_stream_impl_t*)tb_malloc0(sizeof(tb_async_stream_impl_t));
+        tb_assert_and_check_break(impl);
 
         // init stream
-        if (!tb_async_stream_init((tb_async_stream_t*)fstream, aicp, TB_STREAM_TYPE_FLTR, 0, 0)) break;
-        fstream->base.open      = tb_async_stream_filter_open;
-        fstream->base.clos      = tb_async_stream_filter_clos;
-        fstream->base.read      = tb_async_stream_filter_read;
-        fstream->base.writ      = tb_async_stream_filter_writ;
-        fstream->base.sync      = tb_async_stream_filter_sync;
-        fstream->base.task      = tb_async_stream_filter_task;
-        fstream->base.exit      = tb_async_stream_filter_exit;
-        fstream->base.kill      = tb_async_stream_filter_kill;
-        fstream->base.ctrl      = tb_async_stream_filter_ctrl;
-        fstream->base.open_try  = tb_async_stream_filter_open_try;
-        fstream->base.clos_try  = tb_async_stream_filter_clos_try;
+        if (!tb_async_stream_init((tb_async_stream_t*)impl, aicp, TB_STREAM_TYPE_FLTR, 0, 0)) break;
+        impl->base.open      = tb_async_stream_impl_open;
+        impl->base.clos      = tb_async_stream_impl_clos;
+        impl->base.read      = tb_async_stream_impl_read;
+        impl->base.writ      = tb_async_stream_impl_writ;
+        impl->base.sync      = tb_async_stream_impl_sync;
+        impl->base.task      = tb_async_stream_impl_task;
+        impl->base.exit      = tb_async_stream_impl_exit;
+        impl->base.kill      = tb_async_stream_impl_kill;
+        impl->base.ctrl      = tb_async_stream_impl_ctrl;
+        impl->base.open_try  = tb_async_stream_impl_open_try;
+        impl->base.clos_try  = tb_async_stream_impl_clos_try;
 
         // ok 
         ok = tb_true;
@@ -709,12 +709,12 @@ tb_async_stream_t* tb_async_stream_init_filter(tb_aicp_t* aicp)
     if (!ok)
     {
         // exit it
-        if (fstream) tb_async_stream_exit((tb_async_stream_t*)fstream);
-        fstream = tb_null;
+        if (impl) tb_async_stream_exit((tb_async_stream_t*)impl);
+        impl = tb_null;
     }
 
     // ok
-    return (tb_async_stream_t*)fstream;
+    return (tb_async_stream_t*)impl;
 }
 tb_async_stream_t* tb_async_stream_init_filter_from_null(tb_async_stream_t* stream)
 {
@@ -727,15 +727,15 @@ tb_async_stream_t* tb_async_stream_init_filter_from_null(tb_async_stream_t* stre
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_async_stream_t*  impl = tb_null;
     do
     {
         // init stream
-        fstream = tb_async_stream_init_filter(aicp);
-        tb_assert_and_check_break(fstream);
+        impl = tb_async_stream_init_filter(aicp);
+        tb_assert_and_check_break(impl);
 
         // set stream
-        if (!tb_async_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
+        if (!tb_async_stream_ctrl(impl, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
 
         // ok 
         ok = tb_true;
@@ -746,12 +746,12 @@ tb_async_stream_t* tb_async_stream_init_filter_from_null(tb_async_stream_t* stre
     if (!ok)
     {
         // exit it
-        if (fstream) tb_async_stream_exit((tb_async_stream_t*)fstream);
-        fstream = tb_null;
+        if (impl) tb_async_stream_exit((tb_async_stream_t*)impl);
+        impl = tb_null;
     }
 
     // ok?
-    return fstream;
+    return impl;
 }
 #ifdef TB_CONFIG_MODULE_HAVE_ZIP
 tb_async_stream_t* tb_async_stream_init_filter_from_zip(tb_async_stream_t* stream, tb_size_t algo, tb_size_t action)
@@ -765,20 +765,20 @@ tb_async_stream_t* tb_async_stream_init_filter_from_zip(tb_async_stream_t* strea
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_async_stream_t*  impl = tb_null;
     do
     {
         // init stream
-        fstream = tb_async_stream_init_filter(aicp);
-        tb_assert_and_check_break(fstream);
+        impl = tb_async_stream_init_filter(aicp);
+        tb_assert_and_check_break(impl);
 
         // set stream
-        if (!tb_async_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
+        if (!tb_async_stream_ctrl(impl, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
 
         // set filter
-        ((tb_async_stream_filter_t*)fstream)->bref = 0;
-        ((tb_async_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_zip(algo, action);
-        tb_assert_and_check_break(((tb_async_stream_filter_t*)fstream)->filter);
+        ((tb_async_stream_impl_t*)impl)->bref = 0;
+        ((tb_async_stream_impl_t*)impl)->filter = tb_stream_filter_init_from_zip(algo, action);
+        tb_assert_and_check_break(((tb_async_stream_impl_t*)impl)->filter);
         
         // ok 
         ok = tb_true;
@@ -789,12 +789,12 @@ tb_async_stream_t* tb_async_stream_init_filter_from_zip(tb_async_stream_t* strea
     if (!ok)
     {
         // exit it
-        if (fstream) tb_async_stream_exit(fstream);
-        fstream = tb_null;
+        if (impl) tb_async_stream_exit(impl);
+        impl = tb_null;
     }
 
     // ok?
-    return fstream;
+    return impl;
 }
 #endif
 tb_async_stream_t* tb_async_stream_init_filter_from_cache(tb_async_stream_t* stream, tb_size_t size)
@@ -808,20 +808,20 @@ tb_async_stream_t* tb_async_stream_init_filter_from_cache(tb_async_stream_t* str
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_async_stream_t*  impl = tb_null;
     do
     {
         // init stream
-        fstream = tb_async_stream_init_filter(aicp);
-        tb_assert_and_check_break(fstream);
+        impl = tb_async_stream_init_filter(aicp);
+        tb_assert_and_check_break(impl);
 
         // set stream
-        if (!tb_async_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
+        if (!tb_async_stream_ctrl(impl, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
 
         // set filter
-        ((tb_async_stream_filter_t*)fstream)->bref = 0;
-        ((tb_async_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_cache(size);
-        tb_assert_and_check_break(((tb_async_stream_filter_t*)fstream)->filter);
+        ((tb_async_stream_impl_t*)impl)->bref = 0;
+        ((tb_async_stream_impl_t*)impl)->filter = tb_stream_filter_init_from_cache(size);
+        tb_assert_and_check_break(((tb_async_stream_impl_t*)impl)->filter);
         
         // ok 
         ok = tb_true;
@@ -832,12 +832,12 @@ tb_async_stream_t* tb_async_stream_init_filter_from_cache(tb_async_stream_t* str
     if (!ok)
     {
         // exit it
-        if (fstream) tb_async_stream_exit(fstream);
-        fstream = tb_null;
+        if (impl) tb_async_stream_exit(impl);
+        impl = tb_null;
     }
 
     // ok?
-    return fstream;
+    return impl;
 }
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 tb_async_stream_t* tb_async_stream_init_filter_from_charset(tb_async_stream_t* stream, tb_size_t fr, tb_size_t to)
@@ -851,20 +851,20 @@ tb_async_stream_t* tb_async_stream_init_filter_from_charset(tb_async_stream_t* s
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_async_stream_t*  impl = tb_null;
     do
     {
         // init stream
-        fstream = tb_async_stream_init_filter(aicp);
-        tb_assert_and_check_break(fstream);
+        impl = tb_async_stream_init_filter(aicp);
+        tb_assert_and_check_break(impl);
 
         // set stream
-        if (!tb_async_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
+        if (!tb_async_stream_ctrl(impl, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
 
         // set filter
-        ((tb_async_stream_filter_t*)fstream)->bref = 0;
-        ((tb_async_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_charset(fr, to);
-        tb_assert_and_check_break(((tb_async_stream_filter_t*)fstream)->filter);
+        ((tb_async_stream_impl_t*)impl)->bref = 0;
+        ((tb_async_stream_impl_t*)impl)->filter = tb_stream_filter_init_from_charset(fr, to);
+        tb_assert_and_check_break(((tb_async_stream_impl_t*)impl)->filter);
         
         // ok 
         ok = tb_true;
@@ -875,12 +875,12 @@ tb_async_stream_t* tb_async_stream_init_filter_from_charset(tb_async_stream_t* s
     if (!ok)
     {
         // exit it
-        if (fstream) tb_async_stream_exit(fstream);
-        fstream = tb_null;
+        if (impl) tb_async_stream_exit(impl);
+        impl = tb_null;
     }
 
     // ok?
-    return fstream;
+    return impl;
 }
 #endif
 tb_async_stream_t* tb_async_stream_init_filter_from_chunked(tb_async_stream_t* stream, tb_bool_t dechunked)
@@ -894,20 +894,20 @@ tb_async_stream_t* tb_async_stream_init_filter_from_chunked(tb_async_stream_t* s
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_async_stream_t*  impl = tb_null;
     do
     {
         // init stream
-        fstream = tb_async_stream_init_filter(aicp);
-        tb_assert_and_check_break(fstream);
+        impl = tb_async_stream_init_filter(aicp);
+        tb_assert_and_check_break(impl);
 
         // set stream
-        if (!tb_async_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
+        if (!tb_async_stream_ctrl(impl, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
 
         // set filter
-        ((tb_async_stream_filter_t*)fstream)->bref = 0;
-        ((tb_async_stream_filter_t*)fstream)->filter = tb_stream_filter_init_from_chunked(dechunked);
-        tb_assert_and_check_break(((tb_async_stream_filter_t*)fstream)->filter);
+        ((tb_async_stream_impl_t*)impl)->bref = 0;
+        ((tb_async_stream_impl_t*)impl)->filter = tb_stream_filter_init_from_chunked(dechunked);
+        tb_assert_and_check_break(((tb_async_stream_impl_t*)impl)->filter);
         
         // ok 
         ok = tb_true;
@@ -918,10 +918,10 @@ tb_async_stream_t* tb_async_stream_init_filter_from_chunked(tb_async_stream_t* s
     if (!ok)
     {
         // exit it
-        if (fstream) tb_async_stream_exit(fstream);
-        fstream = tb_null;
+        if (impl) tb_async_stream_exit(impl);
+        impl = tb_null;
     }
 
     // ok?
-    return fstream;
+    return impl;
 }

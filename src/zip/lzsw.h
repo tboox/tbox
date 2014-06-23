@@ -114,49 +114,49 @@ typedef struct __tb_lzsw_deflate_window_t
 
 
 // the lzsw inflate zstream type
-typedef struct __tb_lzsw_inflate_basic_stream_filter_zip_t
+typedef struct __tb_lzsw_inflate_stream_filter_zip_t
 {
     // the stream base
-    tb_inflate_basic_stream_filter_zip_t        base;
+    tb_inflate_stream_filter_zip_t        base;
 
     // the reference to vlc
-    tb_basic_stream_filter_zip_vlc_t*           vlc;
+    tb_stream_filter_zip_vlc_t*           vlc;
 
     // the window 
     tb_lzsw_inflate_window_t    window;
 
-}tb_lzsw_inflate_basic_stream_filter_zip_t;
+}tb_lzsw_inflate_stream_filter_zip_t;
 
 // the lzsw deflate zstream type
-typedef struct __tb_lzsw_deflate_basic_stream_filter_zip_t
+typedef struct __tb_lzsw_deflate_stream_filter_zip_t
 {
     // the stream base
-    tb_deflate_basic_stream_filter_zip_t        base;
+    tb_deflate_stream_filter_zip_t        base;
 
     // the reference to vlc
-    tb_basic_stream_filter_zip_vlc_t*           vlc;
+    tb_stream_filter_zip_vlc_t*           vlc;
 
     // the window 
     tb_lzsw_deflate_window_t    window;
 
-}tb_lzsw_deflate_basic_stream_filter_zip_t;
+}tb_lzsw_deflate_stream_filter_zip_t;
 
 
 // the lzsw zstream type
-typedef union __tb_lzsw_basic_stream_filter_zip_t
+typedef union __tb_lzsw_stream_filter_zip_t
 {
-    tb_lzsw_inflate_basic_stream_filter_zip_t   infst;
-    tb_lzsw_deflate_basic_stream_filter_zip_t   defst;
+    tb_lzsw_inflate_stream_filter_zip_t   infst;
+    tb_lzsw_deflate_stream_filter_zip_t   defst;
 
-}tb_lzsw_basic_stream_filter_zip_t;
+}tb_lzsw_stream_filter_zip_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_basic_stream_filter_zip_t* zst);
-tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_basic_stream_filter_zip_t* zst);
-tb_basic_stream_filter_t*   tb_basic_stream_filter_zip_open_lzsw(tb_lzsw_basic_stream_filter_zip_t* zst, tb_size_t action);
+tb_stream_filter_t*   tb_stream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_stream_filter_zip_t* zst);
+tb_stream_filter_t*   tb_stream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_stream_filter_zip_t* zst);
+tb_stream_filter_t*   tb_stream_filter_zip_open_lzsw(tb_lzsw_stream_filter_zip_t* zst, tb_size_t action);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

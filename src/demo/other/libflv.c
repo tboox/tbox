@@ -17,7 +17,7 @@
 typedef struct __tb_flv_t
 {
     // the stream
-    tb_basic_stream_t*              stream;
+    tb_stream_t*              stream;
 
     // the spank type
     tb_size_t                       spank_type;
@@ -504,7 +504,7 @@ static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_t
  * implementation
  */
 
-tb_handle_t tb_flv_init(tb_basic_stream_t* stream)
+tb_handle_t tb_flv_init(tb_stream_t* stream)
 {
     // check 
     tb_assert_and_check_return_val(stream, tb_null);
@@ -570,7 +570,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
     tb_bool_t       ret = tb_false;
 
     // get stream
-    tb_basic_stream_t* stream = flv->stream;
+    tb_stream_t* stream = flv->stream;
     tb_assert_and_check_return_val(stream, tb_false);
 
     // spank hdata?
@@ -578,7 +578,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
         && !(flv->spank_type_ok & TB_FLV_SPANK_TYPE_HDATA)) 
     {
         // read flv header
-        if (!tb_basic_stream_bread(stream, tag, 9)) goto end;
+        if (!tb_stream_bread(stream, tag, 9)) goto end;
 
         // check 
         if (tag[0] != 'F' || tag[1] != 'L' || tag[2] != 'V' || tag[3] > 6) goto end;
@@ -595,13 +595,13 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
     }
 
     // is end?
-    if (tb_basic_stream_left(stream) < 16) goto end;
+    if (tb_stream_left(stream) < 16) goto end;
     
     // read packets
-    while (tb_basic_stream_left(stream) >= 15)
+    while (tb_stream_left(stream) >= 15)
     {
         // read flv tag
-        if (!tb_basic_stream_bread(stream, tag, 15)) goto end;
+        if (!tb_stream_bread(stream, tag, 15)) goto end;
         tb_static_stream_init(&sstream, tag, 15);
         tb_uint32_t     ptag_size = tb_static_stream_read_u32_be(&sstream); tb_used(ptag_size);
         tb_uint8_t      tag_type = tb_static_stream_read_u8(&sstream);
@@ -619,7 +619,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         ||  tag_type == TB_FLV_TAG_TYPE_SDATA, end);
 
         // is end?
-        if (tb_basic_stream_left(stream) < data_size) break;
+        if (tb_stream_left(stream) < data_size) break;
 
         // read flv data
         switch (tag_type)
@@ -638,7 +638,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                     tb_static_stream_init(&flv->sdata_bst, data, data_size);
 
                     // read data
-                    if (!tb_basic_stream_bread(stream, data, data_size)) goto end;
+                    if (!tb_stream_bread(stream, data, data_size)) goto end;
 
                     // spank meta
                     if (flv->sdata_cb_func)
@@ -673,7 +673,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                 else
                 {
                     // skip it
-                    if (!tb_basic_stream_skip(stream, data_size)) goto end;
+                    if (!tb_stream_skip(stream, data_size)) goto end;
                 }
             }
             break; 
@@ -684,7 +684,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                 {
                     // read audio flag
                     tb_byte_t data[2];
-                    if (!tb_basic_stream_bread(stream, data, 2)) goto end;
+                    if (!tb_stream_bread(stream, data, 2)) goto end;
 
                     // aac?
                     if ((data[0] & TB_FLV_AUDIO_CODEC_MASK) != TB_FLV_AUDIO_CODEC_AAC) 
@@ -693,7 +693,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         tb_trace_d("skip this audio tag");
                         if (data_size > 2)
                         {
-                            if (!tb_basic_stream_skip(stream, data_size - 2)) goto end;
+                            if (!tb_stream_skip(stream, data_size - 2)) goto end;
                         }
                         break;
                     }
@@ -707,7 +707,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         flv->audio_config_size = data_size - 2;
                         flv->audio_config_data = (tb_byte_t*)tb_malloc(flv->audio_config_size);
                         tb_assert_goto(flv->audio_config_data, end);
-                        if (!tb_basic_stream_bread(stream, flv->audio_config_data, flv->audio_config_size)) goto end;
+                        if (!tb_stream_bread(stream, flv->audio_config_data, flv->audio_config_size)) goto end;
 
                         // make head data
                         tb_byte_t head_data[13];
@@ -746,7 +746,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         else flv->audio_size = data_size;
 
                         tb_assert_goto(flv->audio_data, end);
-                        if (!tb_basic_stream_bread(stream, flv->audio_data, flv->audio_size)) goto end;
+                        if (!tb_stream_bread(stream, flv->audio_data, flv->audio_size)) goto end;
 
                         // make head data
                         tb_byte_t head_data[13];
@@ -766,7 +766,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         // skip this tag    
                         if (data_size > 2)
                         {
-                            if (!tb_basic_stream_skip(stream, data_size - 2)) goto end;
+                            if (!tb_stream_skip(stream, data_size - 2)) goto end;
                         }
                         break;
                     }
@@ -774,7 +774,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                 else
                 {
                     // skip it
-                    if (!tb_basic_stream_skip(stream, data_size)) goto end;
+                    if (!tb_stream_skip(stream, data_size)) goto end;
                 }
             }
             break;
@@ -785,7 +785,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                 {
                     // read video flag
                     tb_byte_t data[5];
-                    if (!tb_basic_stream_bread(stream, data, 5)) goto end;
+                    if (!tb_stream_bread(stream, data, 5)) goto end;
             
                     // h264?
                     if ((data[0] & TB_FLV_VIDEO_CODEC_MASK) != TB_FLV_VIDEO_CODEC_H264) 
@@ -794,7 +794,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         tb_trace_d("skip this video tag");
                         if (data_size > 5)
                         {
-                            if (!tb_basic_stream_skip(stream, data_size - 5)) goto end;
+                            if (!tb_stream_skip(stream, data_size - 5)) goto end;
                         }
                         break;
                     }
@@ -811,7 +811,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         flv->video_config_size = data_size - 5;
                         flv->video_config_data = (tb_byte_t*)tb_malloc(flv->video_config_size);
                         tb_assert_goto(flv->video_config_data, end);
-                        if (!tb_basic_stream_bread(stream, flv->video_config_data, flv->video_config_size)) goto end;
+                        if (!tb_stream_bread(stream, flv->video_config_data, flv->video_config_size)) goto end;
 
                         // make head data
                         tb_byte_t head_data[16];
@@ -850,7 +850,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         else flv->video_size = data_size;
 
                         tb_assert_goto(flv->video_data, end);
-                        if (!tb_basic_stream_bread(stream, flv->video_data, flv->video_size)) goto end;
+                        if (!tb_stream_bread(stream, flv->video_data, flv->video_size)) goto end;
 
                         // make head data
                         tb_byte_t head_data[16];
@@ -870,7 +870,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         // skip this tag
                         if (data_size > 5)
                         {
-                            if (!tb_basic_stream_skip(stream, data_size - 5)) goto end;
+                            if (!tb_stream_skip(stream, data_size - 5)) goto end;
                         }
                         break;
                     }
@@ -878,14 +878,14 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                 else
                 {
                     // skip it
-                    if (!tb_basic_stream_skip(stream, data_size)) goto end;
+                    if (!tb_stream_skip(stream, data_size)) goto end;
                 }
             }
             break;
         default:
             {
                 // skip it
-                if (!tb_basic_stream_skip(stream, data_size)) goto end;
+                if (!tb_stream_skip(stream, data_size)) goto end;
                 break;
             }
         }
@@ -963,13 +963,13 @@ tb_bool_t tb_flv_ctrl(tb_handle_t hflv, tb_size_t cmd, ...)
         break;
     case TB_FLV_IOCTL_CMD_SET_STREAM:
         {
-            flv->stream = (tb_basic_stream_t*)tb_va_arg(arg, tb_basic_stream_t*);
+            flv->stream = (tb_stream_t*)tb_va_arg(arg, tb_stream_t*);
             ret = tb_true;
         }
         break;
     case TB_FLV_IOCTL_CMD_GET_STREAM:
         {
-            tb_basic_stream_t** pstream = (tb_basic_stream_t**)tb_va_arg(arg, tb_basic_stream_t**);
+            tb_stream_t** pstream = (tb_stream_t**)tb_va_arg(arg, tb_stream_t**);
             tb_assert_and_check_return_val(pstream, tb_false);
             
             *(pstream) = flv->stream;

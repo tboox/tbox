@@ -229,11 +229,11 @@ tb_int_t tb_demo_other_flv_main(tb_int_t argc, tb_char_t** argv)
     tb_flv_info_t info = {0};
 
     // create stream
-    tb_basic_stream_t* gst = tb_basic_stream_init_from_url(argv[1]);
+    tb_stream_t* gst = tb_stream_init_from_url(argv[1]);
     tb_assert_and_check_goto(gst, end);
     
     // open stream
-    if (!tb_basic_stream_open(gst)) goto end;
+    if (!tb_stream_open(gst)) goto end;
     
     // init decoder
     tb_handle_t hflv = tb_flv_init(gst);
@@ -261,6 +261,6 @@ tb_int_t tb_demo_other_flv_main(tb_int_t argc, tb_char_t** argv)
 
 end:
     // free bstream
-    if (gst) tb_basic_stream_exit(gst);
+    if (gst) tb_stream_exit(gst);
     return 0;
 }

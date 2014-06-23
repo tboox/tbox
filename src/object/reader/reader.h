@@ -71,7 +71,7 @@ tb_object_reader_t* tb_object_reader_get(tb_size_t format);
  *
  * @return          the object
  */
-tb_object_t*        tb_object_reader_done(tb_basic_stream_t* stream);
+tb_object_t*        tb_object_reader_done(tb_stream_t* stream);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
