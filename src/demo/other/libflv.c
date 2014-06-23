@@ -631,7 +631,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                     && !(flv->spank_type_ok & TB_FLV_SPANK_TYPE_SDATA)) 
                 {
                     // alloc data
-                    tb_byte_t* data = (tb_byte_t*)tb_malloc0(data_size);
+                    tb_byte_t* data = tb_malloc0_bytes(data_size);
                     tb_assert_goto(data, end);
 
                     // attach data
@@ -705,7 +705,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                     {
                         // read audio specific config
                         flv->audio_config_size = data_size - 2;
-                        flv->audio_config_data = (tb_byte_t*)tb_malloc(flv->audio_config_size);
+                        flv->audio_config_data = tb_malloc_bytes(flv->audio_config_size);
                         tb_assert_goto(flv->audio_config_data, end);
                         if (!tb_stream_bread(stream, flv->audio_config_data, flv->audio_config_size)) goto end;
 
@@ -734,7 +734,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                             tb_assert(!flv->audio_size && !flv->audio_maxn);
                             flv->audio_maxn = data_size + 4096;
                             flv->audio_size = data_size;
-                            flv->audio_data = (tb_byte_t*)tb_malloc(flv->audio_maxn);
+                            flv->audio_data = tb_malloc_bytes(flv->audio_maxn);
                         }
                         else if (flv->audio_maxn < data_size)
                         {
@@ -809,7 +809,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                         && !(flv->spank_type_ok & TB_FLV_SPANK_TYPE_VIDEO_CONFIG))
                     {
                         flv->video_config_size = data_size - 5;
-                        flv->video_config_data = (tb_byte_t*)tb_malloc(flv->video_config_size);
+                        flv->video_config_data = tb_malloc_bytes(flv->video_config_size);
                         tb_assert_goto(flv->video_config_data, end);
                         if (!tb_stream_bread(stream, flv->video_config_data, flv->video_config_size)) goto end;
 
@@ -838,7 +838,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
                             tb_assert(!flv->video_size && !flv->video_maxn);
                             flv->video_maxn = data_size + 4096;
                             flv->video_size = data_size;
-                            flv->video_data = (tb_byte_t*)tb_malloc(flv->video_maxn);
+                            flv->video_data = tb_malloc_bytes(flv->video_maxn);
                         }
                         else if (flv->video_maxn < data_size)
                         {

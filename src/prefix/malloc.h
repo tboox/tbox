@@ -43,11 +43,11 @@ __tb_extern_c_enter__
 #define tb_nalloc0(item, size)              tb_memory_nalloc0_(item, size __tb_debug_vals__)
 #define tb_ralloc(data, size)               tb_memory_ralloc_((tb_pointer_t)data, size __tb_debug_vals__)
 
-#define tb_malloc_str(size)                 (tb_char_t*)tb_memory_malloc_(size __tb_debug_vals__)
-#define tb_malloc0_str(size)                (tb_char_t*)tb_memory_malloc0_(size __tb_debug_vals__)
-#define tb_nalloc_str(item, size)           (tb_char_t*)tb_memory_nalloc_(item, size __tb_debug_vals__)
-#define tb_nalloc0_str(item, size)          (tb_char_t*)tb_memory_nalloc0_(item, size __tb_debug_vals__)
-#define tb_ralloc_str(data, size)           (tb_char_t*)tb_memory_ralloc_((tb_pointer_t)data, size __tb_debug_vals__)
+#define tb_malloc_cstr(size)                (tb_char_t*)tb_memory_malloc_(size __tb_debug_vals__)
+#define tb_malloc0_cstr(size)               (tb_char_t*)tb_memory_malloc0_(size __tb_debug_vals__)
+#define tb_nalloc_cstr(item, size)          (tb_char_t*)tb_memory_nalloc_(item, size __tb_debug_vals__)
+#define tb_nalloc0_cstr(item, size)         (tb_char_t*)tb_memory_nalloc0_(item, size __tb_debug_vals__)
+#define tb_ralloc_cstr(data, size)          (tb_char_t*)tb_memory_ralloc_((tb_pointer_t)data, size __tb_debug_vals__)
 
 #define tb_malloc_bytes(size)               (tb_byte_t*)tb_memory_malloc_(size __tb_debug_vals__)
 #define tb_malloc0_bytes(size)              (tb_byte_t*)tb_memory_malloc0_(size __tb_debug_vals__)

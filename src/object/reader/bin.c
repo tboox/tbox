@@ -73,7 +73,7 @@ static tb_object_t* tb_object_bin_reader_func_data(tb_object_bin_reader_t* reade
     if (!size) return tb_object_data_init_from_data(tb_null, 0);
 
     // make data
-    tb_char_t* data = (tb_char_t*)tb_malloc0((tb_size_t)size);
+    tb_char_t* data = tb_malloc0_cstr((tb_size_t)size);
     tb_assert_and_check_return_val(data, tb_null);
 
     // read data
@@ -180,7 +180,7 @@ static tb_object_t* tb_object_bin_reader_func_string(tb_object_bin_reader_t* rea
     if (!size) return tb_object_string_init_from_cstr(tb_null);
 
     // make data
-    tb_char_t* data = (tb_char_t*)tb_malloc0((tb_size_t)size + 1);
+    tb_char_t* data = tb_malloc0_cstr((tb_size_t)size + 1);
     tb_assert_and_check_return_val(data, tb_null);
 
     // read data

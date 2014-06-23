@@ -19,7 +19,7 @@ tb_void_t tb_demo_overflow()
 tb_void_t tb_demo_cstring(tb_noarg_t);
 tb_void_t tb_demo_cstring()
 {
-    tb_char_t* data = (tb_char_t*)tb_malloc0(10);
+    tb_char_t* data = tb_malloc0_cstr(10);
     if (data)
     {
         tb_memset(data, 'c', 10);

@@ -610,7 +610,7 @@ static tb_bool_t tb_async_stream_impl_ctrl(tb_async_stream_t* stream, tb_size_t 
 
             // make data
             tb_size_t   maxn = base64_size;
-            tb_byte_t*  data = (tb_byte_t*)tb_malloc(maxn); 
+            tb_byte_t*  data = tb_malloc_bytes(maxn); 
             tb_assert_and_check_return_val(data, tb_false);
 
             // decode base64 data

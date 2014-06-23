@@ -21,8 +21,8 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
         if (isize > 0)
         {
             tb_long_t   osize = (tb_long_t)(isize << 2);
-            tb_byte_t*  idata = (tb_byte_t*)tb_malloc((tb_size_t)isize);
-            tb_byte_t*  odata = (tb_byte_t*)tb_malloc((tb_size_t)osize);
+            tb_byte_t*  idata = tb_malloc_bytes((tb_size_t)isize);
+            tb_byte_t*  odata = tb_malloc_bytes((tb_size_t)osize);
             if (idata && odata && tb_stream_bread(istream, idata, (tb_size_t)isize))
             {
                 // conv

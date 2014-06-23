@@ -241,7 +241,7 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
         do
         {
             // init utf16 data
-            utf16 = (tb_char_t*)tb_malloc((size + 1) << 2);
+            utf16 = tb_malloc_cstr((size + 1) << 2);
             tb_assert_and_check_break(utf16);
 
             // utf8 to utf16
@@ -474,7 +474,7 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
                 if (!index_tables)
                 {
                     // make it
-                    index_tables = (tb_byte_t*)tb_malloc0(size * item_size);
+                    index_tables = tb_malloc0_bytes(size * item_size);
 
                     // FIXME: not using the user private data
                     tb_object_setp(object, index_tables);
@@ -512,7 +512,7 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
                 if (!index_tables)
                 {
                     // make it
-                    index_tables = (tb_byte_t*)tb_malloc0((size << 1) * item_size);
+                    index_tables = tb_malloc0_bytes((size << 1) * item_size);
 
                     // FIXME: not using the user private data
                     tb_object_setp(object, index_tables);

@@ -347,7 +347,7 @@ tb_pointer_t tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl_
 
         // alloc chunk data
         chunk->size = pool->grow;
-        chunk->data = (tb_byte_t*)tb_malloc(chunk->size);
+        chunk->data = tb_malloc_bytes(chunk->size);
 
         // no space
         tb_check_break(chunk->data);

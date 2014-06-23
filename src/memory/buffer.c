@@ -122,7 +122,7 @@ tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
             tb_assert_and_check_break(size < buffer->maxn);
 
             // alloc data
-            buffer->data = (tb_byte_t*)tb_malloc(buffer->maxn);
+            buffer->data = tb_malloc_bytes(buffer->maxn);
             tb_assert_and_check_break(buffer->data);
         }
         // decrease

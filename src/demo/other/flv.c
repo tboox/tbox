@@ -139,7 +139,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
         if (size)
         {
             // get sps data
-            tb_byte_t* data = (tb_byte_t*)tb_malloc0(size);
+            tb_byte_t* data = tb_malloc0_bytes(size);
             tb_assert_return(data);
             tb_static_stream_read_data(&sstream, data, size);
 

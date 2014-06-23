@@ -39,7 +39,7 @@ tb_char_t* tb_strndup(tb_char_t const* s, tb_size_t n)
 
     // done
     n = tb_strnlen(s, n);
-    __tb_register__ tb_char_t* p = (tb_char_t*)tb_malloc(n + 1);
+    __tb_register__ tb_char_t* p = tb_malloc_cstr(n + 1);
     if (p)
     {
         tb_memcpy(p, s, n);
