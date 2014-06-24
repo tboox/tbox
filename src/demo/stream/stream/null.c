@@ -9,17 +9,17 @@
 tb_int_t tb_demo_stream_stream_null_main(tb_int_t argc, tb_char_t** argv)
 {
     // init istream
-    tb_stream_t* istream = tb_stream_init_from_url(argv[1]);
+    tb_stream_ref_t istream = tb_stream_init_from_url(argv[1]);
 
     // init ostream
-    tb_stream_t* ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+    tb_stream_ref_t ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
     // filter istream or ostream?
-    tb_stream_t* iostream = istream;
-//  tb_stream_t* iostream = ostream;
+    tb_stream_ref_t iostream = istream;
+//  tb_stream_ref_t iostream = ostream;
 
     // init fstream
-    tb_stream_t* fstream = tb_stream_init_filter_from_null(iostream);
+    tb_stream_ref_t fstream = tb_stream_init_filter_from_null(iostream);
 
     // done
     if (istream && ostream && fstream) 

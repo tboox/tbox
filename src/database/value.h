@@ -40,7 +40,7 @@ __tb_extern_c_enter__
  */
 
 /// the sql database value type enum
-typedef enum __tb_object_database_sql_value_type_e
+typedef enum __tb_database_sql_value_type_e
 {
     TB_DATABASE_SQL_VALUE_TYPE_NULL         = 0
 ,   TB_DATABASE_SQL_VALUE_TYPE_INT8         = 1
@@ -60,10 +60,10 @@ typedef enum __tb_object_database_sql_value_type_e
 ,   TB_DATABASE_SQL_VALUE_TYPE_BLOB32       = 11
 ,   TB_DATABASE_SQL_VALUE_TYPE_TEXT         = 12
 
-}tb_object_database_sql_value_type_e;
+}tb_database_sql_value_type_e;
 
 /// the sql database value type
-typedef struct __tb_object_database_sql_value_t
+typedef struct __tb_database_sql_value_t
 {
     /// the type
     tb_size_t                   type;
@@ -99,7 +99,7 @@ typedef struct __tb_object_database_sql_value_t
             tb_size_t           size;
 
             // the stream for blob32
-            tb_stream_t*  stream;
+            tb_stream_ref_t  stream;
 
         }                       blob;
 
@@ -113,7 +113,7 @@ typedef struct __tb_object_database_sql_value_t
 
     }u; 
 
-}tb_object_database_sql_value_t;
+}tb_database_sql_value_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -125,7 +125,7 @@ typedef struct __tb_object_database_sql_value_t
  *
  * @return          the value data size
  */
-tb_size_t           tb_object_database_sql_value_size(tb_object_database_sql_value_t const* value);
+tb_size_t           tb_database_sql_value_size(tb_database_sql_value_t const* value);
 
 /*! the int8 value
  *
@@ -133,7 +133,7 @@ tb_size_t           tb_object_database_sql_value_size(tb_object_database_sql_val
  *
  * @return          the int8 value
  */
-tb_int8_t           tb_object_database_sql_value_int8(tb_object_database_sql_value_t const* value);
+tb_int8_t           tb_database_sql_value_int8(tb_database_sql_value_t const* value);
 
 /*! the int16 value
  *
@@ -141,7 +141,7 @@ tb_int8_t           tb_object_database_sql_value_int8(tb_object_database_sql_val
  *
  * @return          the int16 value
  */
-tb_int16_t          tb_object_database_sql_value_int16(tb_object_database_sql_value_t const* value);
+tb_int16_t          tb_database_sql_value_int16(tb_database_sql_value_t const* value);
 
 /*! the int32 value
  *
@@ -149,7 +149,7 @@ tb_int16_t          tb_object_database_sql_value_int16(tb_object_database_sql_va
  *
  * @return          the int32 value
  */
-tb_int32_t          tb_object_database_sql_value_int32(tb_object_database_sql_value_t const* value);
+tb_int32_t          tb_database_sql_value_int32(tb_database_sql_value_t const* value);
 
 /*! the int64 value
  *
@@ -157,7 +157,7 @@ tb_int32_t          tb_object_database_sql_value_int32(tb_object_database_sql_va
  *
  * @return          the int64 value
  */
-tb_int64_t          tb_object_database_sql_value_int64(tb_object_database_sql_value_t const* value);
+tb_int64_t          tb_database_sql_value_int64(tb_database_sql_value_t const* value);
 
 /*! the uint8 value
  *
@@ -165,7 +165,7 @@ tb_int64_t          tb_object_database_sql_value_int64(tb_object_database_sql_va
  *
  * @return          the uint8 value
  */
-tb_uint8_t          tb_object_database_sql_value_uint8(tb_object_database_sql_value_t const* value);
+tb_uint8_t          tb_database_sql_value_uint8(tb_database_sql_value_t const* value);
 
 /*! the uint16 value
  *
@@ -173,7 +173,7 @@ tb_uint8_t          tb_object_database_sql_value_uint8(tb_object_database_sql_va
  *
  * @return          the uint16 value
  */
-tb_uint16_t         tb_object_database_sql_value_uint16(tb_object_database_sql_value_t const* value);
+tb_uint16_t         tb_database_sql_value_uint16(tb_database_sql_value_t const* value);
 
 /*! the uint32 value
  *
@@ -181,7 +181,7 @@ tb_uint16_t         tb_object_database_sql_value_uint16(tb_object_database_sql_v
  *
  * @return          the uint32 value
  */
-tb_uint32_t         tb_object_database_sql_value_uint32(tb_object_database_sql_value_t const* value);
+tb_uint32_t         tb_database_sql_value_uint32(tb_database_sql_value_t const* value);
 
 /*! the uint64 value
  *
@@ -189,7 +189,7 @@ tb_uint32_t         tb_object_database_sql_value_uint32(tb_object_database_sql_v
  *
  * @return          the uint64 value
  */
-tb_uint64_t         tb_object_database_sql_value_uint64(tb_object_database_sql_value_t const* value);
+tb_uint64_t         tb_database_sql_value_uint64(tb_database_sql_value_t const* value);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 /*! the float value
@@ -198,7 +198,7 @@ tb_uint64_t         tb_object_database_sql_value_uint64(tb_object_database_sql_v
  *
  * @return          the float value
  */
-tb_float_t          tb_object_database_sql_value_float(tb_object_database_sql_value_t const* value);
+tb_float_t          tb_database_sql_value_float(tb_database_sql_value_t const* value);
 
 /*! the double value
  *
@@ -206,7 +206,7 @@ tb_float_t          tb_object_database_sql_value_float(tb_object_database_sql_va
  *
  * @return          the double value
  */
-tb_double_t         tb_object_database_sql_value_double(tb_object_database_sql_value_t const* value);
+tb_double_t         tb_database_sql_value_double(tb_database_sql_value_t const* value);
 #endif
 
 /*! set the null value
@@ -214,63 +214,63 @@ tb_double_t         tb_object_database_sql_value_double(tb_object_database_sql_v
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_null(tb_object_database_sql_value_t* value);
+tb_void_t           tb_database_sql_value_set_null(tb_database_sql_value_t* value);
 
 /*! set the int8 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_int8(tb_object_database_sql_value_t* value, tb_int8_t number);
+tb_void_t           tb_database_sql_value_set_int8(tb_database_sql_value_t* value, tb_int8_t number);
 
 /*! set the int16 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_int16(tb_object_database_sql_value_t* value, tb_int16_t number);
+tb_void_t           tb_database_sql_value_set_int16(tb_database_sql_value_t* value, tb_int16_t number);
 
 /*! set the int32 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_int32(tb_object_database_sql_value_t* value, tb_int32_t number);
+tb_void_t           tb_database_sql_value_set_int32(tb_database_sql_value_t* value, tb_int32_t number);
 
 /*! set the int64 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_int64(tb_object_database_sql_value_t* value, tb_int64_t number);
+tb_void_t           tb_database_sql_value_set_int64(tb_database_sql_value_t* value, tb_int64_t number);
 
 /*! set the uint8 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_uint8(tb_object_database_sql_value_t* value, tb_uint8_t number);
+tb_void_t           tb_database_sql_value_set_uint8(tb_database_sql_value_t* value, tb_uint8_t number);
 
 /*! set the uint16 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_uint16(tb_object_database_sql_value_t* value, tb_uint16_t number);
+tb_void_t           tb_database_sql_value_set_uint16(tb_database_sql_value_t* value, tb_uint16_t number);
 
 /*! set the uint32 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_uint32(tb_object_database_sql_value_t* value, tb_uint32_t number);
+tb_void_t           tb_database_sql_value_set_uint32(tb_database_sql_value_t* value, tb_uint32_t number);
 
 /*! set the uint64 value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_uint64(tb_object_database_sql_value_t* value, tb_uint64_t number);
+tb_void_t           tb_database_sql_value_set_uint64(tb_database_sql_value_t* value, tb_uint64_t number);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 /*! set the float value
@@ -278,14 +278,14 @@ tb_void_t           tb_object_database_sql_value_set_uint64(tb_object_database_s
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_float(tb_object_database_sql_value_t* value, tb_float_t number);
+tb_void_t           tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_float_t number);
 
 /*! set the double value
  *
  * @param value     the value
  * @param number    the number
  */
-tb_void_t           tb_object_database_sql_value_set_double(tb_object_database_sql_value_t* value, tb_double_t number);
+tb_void_t           tb_database_sql_value_set_double(tb_database_sql_value_t* value, tb_double_t number);
 #endif
 
 /*! set the text value
@@ -294,7 +294,7 @@ tb_void_t           tb_object_database_sql_value_set_double(tb_object_database_s
  * @param text      the text data
  * @param hint      the text size hint
  */
-tb_void_t           tb_object_database_sql_value_set_text(tb_object_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
+tb_void_t           tb_database_sql_value_set_text(tb_database_sql_value_t* value, tb_char_t const* text, tb_size_t hint);
 
 /*! set the blob8 value
  *
@@ -302,7 +302,7 @@ tb_void_t           tb_object_database_sql_value_set_text(tb_object_database_sql
  * @param data      the blob data
  * @param size      the blob size
  */
-tb_void_t           tb_object_database_sql_value_set_blob8(tb_object_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
+tb_void_t           tb_database_sql_value_set_blob8(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
 
 /*! set the blob16 value
  *
@@ -310,7 +310,7 @@ tb_void_t           tb_object_database_sql_value_set_blob8(tb_object_database_sq
  * @param data      the blob data
  * @param size      the blob size
  */
-tb_void_t           tb_object_database_sql_value_set_blob16(tb_object_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
+tb_void_t           tb_database_sql_value_set_blob16(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size);
 
 /*! set the blob32 value
  *
@@ -319,26 +319,26 @@ tb_void_t           tb_object_database_sql_value_set_blob16(tb_object_database_s
  * @param size      the blob size
  * @param stream    the stream, using it if data == null
  */
-tb_void_t           tb_object_database_sql_value_set_blob32(tb_object_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_stream_t* stream);
+tb_void_t           tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_byte_t const* data, tb_size_t size, tb_stream_ref_t stream);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
 
 /// the value is null?
-static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_null(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_null(tb_database_sql_value_t const* value)
 {
     return (value && value->type == TB_DATABASE_SQL_VALUE_TYPE_NULL)? tb_true : tb_false;
 }
 
 /// the value is text?
-static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_text(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_text(tb_database_sql_value_t const* value)
 {
     return (value && value->type == TB_DATABASE_SQL_VALUE_TYPE_TEXT)? tb_true : tb_false;
 }
 
 /// the value is blob?
-static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_blob(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_blob(tb_database_sql_value_t const* value)
 {
     return (    value 
             &&  (   value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB32
@@ -347,19 +347,19 @@ static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_blob(tb_obj
 }
 
 /// the value is blob32?
-static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_blob32(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_blob32(tb_database_sql_value_t const* value)
 {
     return (value && value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB32)? tb_true : tb_false;
 }
 /// the value is integer?
-static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_integer(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_integer(tb_database_sql_value_t const* value)
 {
     return (value && value->type >= TB_DATABASE_SQL_VALUE_TYPE_INT8 && value->type <= TB_DATABASE_SQL_VALUE_TYPE_UINT64)? tb_true : tb_false;
 }
 
 /// the value is float?
 #ifdef TB_CONFIG_TYPE_FLOAT
-static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_float(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_float(tb_database_sql_value_t const* value)
 {
     return (    value 
             &&  (   value->type == TB_DATABASE_SQL_VALUE_TYPE_FLOAT
@@ -368,13 +368,13 @@ static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_float(tb_ob
 #endif
 
 /// the value is number?
-static __tb_inline_force__ tb_bool_t tb_object_database_sql_value_is_number(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_number(tb_database_sql_value_t const* value)
 {
     return (value && value->type >= TB_DATABASE_SQL_VALUE_TYPE_INT8 && value->type < TB_DATABASE_SQL_VALUE_TYPE_BLOB8)? tb_true : tb_false;
 }
 
 /// the value type
-static __tb_inline_force__ tb_size_t tb_object_database_sql_value_type(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_size_t tb_database_sql_value_type(tb_database_sql_value_t const* value)
 {
     // check
     tb_assert_and_check_return_val(value, TB_DATABASE_SQL_VALUE_TYPE_NULL);
@@ -384,7 +384,7 @@ static __tb_inline_force__ tb_size_t tb_object_database_sql_value_type(tb_object
 }
 
 /// the value name
-static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_name(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_char_t const* tb_database_sql_value_name(tb_database_sql_value_t const* value)
 {
     // check
     tb_assert_and_check_return_val(value, tb_null);
@@ -394,19 +394,19 @@ static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_name(tb
 }
 
 /// the value text data
-static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_text(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_char_t const* tb_database_sql_value_text(tb_database_sql_value_t const* value)
 {
     // check
     tb_assert_and_check_return_val(value, tb_null);
 
     // is text?
-    if (tb_object_database_sql_value_is_text(value)) 
+    if (tb_database_sql_value_is_text(value)) 
         return value->u.text.data;
     // is blob?
-    else if (tb_object_database_sql_value_is_blob(value))
+    else if (tb_database_sql_value_is_blob(value))
         return (tb_char_t const*)value->u.blob.data;
     // is null?
-    else if (tb_object_database_sql_value_is_null(value))
+    else if (tb_database_sql_value_is_null(value))
         return tb_null;
 
     // trace
@@ -415,19 +415,19 @@ static __tb_inline_force__ tb_char_t const* tb_object_database_sql_value_text(tb
 }
 
 /// the value blob data
-static __tb_inline_force__ tb_byte_t const* tb_object_database_sql_value_blob(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_byte_t const* tb_database_sql_value_blob(tb_database_sql_value_t const* value)
 {
     // check
     tb_assert_and_check_return_val(value, tb_null);
 
     // is blob?
-    if (tb_object_database_sql_value_is_blob(value)) 
+    if (tb_database_sql_value_is_blob(value)) 
         return value->u.blob.data;
     // is text?
-    else if (tb_object_database_sql_value_is_text(value)) 
+    else if (tb_database_sql_value_is_text(value)) 
         return (tb_byte_t const*)value->u.text.data;
     // is null?
-    else if (tb_object_database_sql_value_is_null(value))
+    else if (tb_database_sql_value_is_null(value))
         return tb_null;
 
     // trace
@@ -436,14 +436,14 @@ static __tb_inline_force__ tb_byte_t const* tb_object_database_sql_value_blob(tb
 }
 
 /// the value blob stream
-static __tb_inline_force__ tb_stream_t* tb_object_database_sql_value_blob_stream(tb_object_database_sql_value_t const* value)
+static __tb_inline_force__ tb_stream_ref_t tb_database_sql_value_blob_stream(tb_database_sql_value_t const* value)
 {
     // the blob stream
-    return tb_object_database_sql_value_is_blob(value)? value->u.blob.stream : tb_null;
+    return tb_database_sql_value_is_blob(value)? value->u.blob.stream : tb_null;
 }
 
 /// set the value name
-static __tb_inline_force__ tb_void_t tb_object_database_sql_value_name_set(tb_object_database_sql_value_t* value, tb_char_t const* name)
+static __tb_inline_force__ tb_void_t tb_database_sql_value_name_set(tb_database_sql_value_t* value, tb_char_t const* name)
 {
     // check
     tb_assert_and_check_return(value);

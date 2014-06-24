@@ -255,7 +255,7 @@ static tb_bool_t tb_async_stream_impl_sync_read_func(tb_async_stream_t* stream, 
     }
 
     // trace
-    tb_trace_d("sync_read: spak: %s, state: %s", tb_url_get(&((tb_stream_t*)stream)->url), tb_state_cstr(state));
+    tb_trace_d("sync_read: spak: %s, state: %s", tb_url_get(&stream->url), tb_state_cstr(state));
 
     // spak the filter
     tb_byte_t const*    data = tb_null;
@@ -303,7 +303,7 @@ static tb_bool_t tb_async_stream_impl_read_func(tb_async_stream_t* stream, tb_si
         case TB_STATE_OK:
             {
                 // trace
-                tb_trace_d("read: spak: %s", tb_url_get(&((tb_stream_t*)stream)->url));
+                tb_trace_d("read: spak: %s", tb_url_get(&stream->url));
 
                 // spak the filter
                 tb_long_t spak = tb_stream_filter_spak(impl->filter, data, real, &data, size, 0);

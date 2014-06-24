@@ -56,16 +56,16 @@ typedef struct __tb_http_t
     tb_http_status_t    status;
 
     // the stream
-    tb_stream_t*  stream;
+    tb_stream_ref_t  stream;
 
     // the sstream for sock
-    tb_stream_t*  sstream;
+    tb_stream_ref_t  sstream;
 
     // the cstream for chunked
-    tb_stream_t*  cstream;
+    tb_stream_ref_t  cstream;
 
     // the zstream for gzip/deflate
-    tb_stream_t*  zstream;
+    tb_stream_ref_t  zstream;
 
     // is opened?
     tb_bool_t           bopened;
@@ -308,7 +308,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 
     // done
     tb_bool_t       ok = tb_false;
-    tb_stream_t*  pstream = tb_null;
+    tb_stream_ref_t  pstream = tb_null;
     tb_hong_t       post_size = 0;
     do
     {

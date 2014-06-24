@@ -69,6 +69,16 @@ typedef enum __tb_stream_type_e
 
 }tb_stream_type_e;
 
+/// the stream wait enum
+typedef enum __tb_stream_wait_e
+{
+    TB_STREAM_WAIT_NONE     = TB_AIOE_CODE_NONE
+,   TB_STREAM_WAIT_READ     = TB_AIOE_CODE_RECV
+,   TB_STREAM_WAIT_WRIT     = TB_AIOE_CODE_SEND
+,   TB_STREAM_WAIT_EALL     = TB_AIOE_CODE_EALL
+
+}tb_stream_wait_e;
+
 /// the stream ctrl enum
 typedef enum __tb_stream_ctrl_e
 {
@@ -146,83 +156,10 @@ typedef enum __tb_stream_ctrl_e
 
 }tb_stream_ctrl_e;
 
-/// the stream wait enum
-typedef enum __tb_stream_wait_e
-{
-    TB_STREAM_WAIT_NONE                   = TB_AIOE_CODE_NONE
-,   TB_STREAM_WAIT_READ                   = TB_AIOE_CODE_RECV
-,   TB_STREAM_WAIT_WRIT                   = TB_AIOE_CODE_SEND
-,   TB_STREAM_WAIT_EALL                   = TB_AIOE_CODE_EALL
+/// the stream ref type
+typedef struct{}*           tb_stream_ref_t;
 
-}tb_stream_wait_e;
-
-/// the generic stream type
-typedef struct __tb_stream_t
-{   
-    /// the stream type
-    tb_uint8_t          type;
-
-    /// the url
-    tb_url_t            url;
-
-    /*! internal state
-     *
-     * <pre>
-     * TB_STATE_CLOSED
-     * TB_STATE_OPENED
-     * TB_STATE_KILLED
-     * TB_STATE_OPENING
-     * TB_STATE_KILLING
-     * </pre>
-     */
-    tb_atomic_t         istate;
-
-    /// the timeout
-    tb_long_t           timeout;
-
-    /// the state
-    tb_size_t           state;
-
-    /// the offset
-    tb_hize_t           offset;
-
-    /// is writed?
-    tb_uint8_t          bwrited;
-
-    /// the cache
-    tb_queue_buffer_t   cache;
-
-    /// wait 
-    tb_long_t           (*wait)(struct __tb_stream_t* stream, tb_size_t wait, tb_long_t timeout);
-
-    /// open
-    tb_bool_t           (*open)(struct __tb_stream_t* stream);
-
-    /// clos
-    tb_bool_t           (*clos)(struct __tb_stream_t* stream);
-
-    /// read
-    tb_long_t           (*read)(struct __tb_stream_t* stream, tb_byte_t* data, tb_size_t size);
-
-    /// writ
-    tb_long_t           (*writ)(struct __tb_stream_t* stream, tb_byte_t const* data, tb_size_t size);
-
-    /// seek
-    tb_bool_t           (*seek)(struct __tb_stream_t* stream, tb_hize_t offset);
-
-    /// sync
-    tb_bool_t           (*sync)(struct __tb_stream_t* stream, tb_bool_t bclosing);
-
-    /// ctrl 
-    tb_bool_t           (*ctrl)(struct __tb_stream_t* stream, tb_size_t ctrl, tb_va_list_t args);
-
-    /// exit
-    tb_void_t           (*exit)(struct __tb_stream_t* stream);
-
-    /// kill
-    tb_void_t           (*kill)(struct __tb_stream_t* stream);
-
-}tb_stream_t;
-
+/// the async stream ref type
+typedef struct{}*           tb_async_stream_ref_t;
 
 #endif

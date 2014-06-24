@@ -460,7 +460,7 @@ static tb_object_t* tb_object_bplist_reader_func_dictionary(tb_object_bplist_rea
     // ok?
     return object;
 }
-static tb_object_t* tb_object_bplist_reader_done(tb_stream_t* stream)
+static tb_object_t* tb_object_bplist_reader_done(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
@@ -676,7 +676,7 @@ end:
     // ok?
     return root;
 }
-static tb_size_t tb_object_bplist_reader_probe(tb_stream_t* stream)
+static tb_size_t tb_object_bplist_reader_probe(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, 0);

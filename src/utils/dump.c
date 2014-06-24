@@ -40,7 +40,7 @@ tb_void_t tb_dump_data(tb_byte_t const* data, tb_size_t size)
     tb_assert_and_check_return(data && size);
 
     // init stream
-    tb_stream_t* gst = tb_stream_init_from_data(data, size);
+    tb_stream_ref_t gst = tb_stream_init_from_data(data, size);
     if (gst)
     {
         // open stream
@@ -60,7 +60,7 @@ tb_void_t tb_dump_data_from_url(tb_char_t const* url)
     tb_assert_and_check_return(url);
 
     // init stream
-    tb_stream_t* gst = tb_stream_init_from_url(url);
+    tb_stream_ref_t gst = tb_stream_init_from_url(url);
     if (gst)
     {
         // open stream
@@ -74,7 +74,7 @@ tb_void_t tb_dump_data_from_url(tb_char_t const* url)
         tb_stream_exit(gst);
     }
 }
-tb_void_t tb_dump_data_from_stream(tb_stream_t* gst)
+tb_void_t tb_dump_data_from_stream(tb_stream_ref_t gst)
 {
     // check
     tb_assert_and_check_return(gst);

@@ -47,7 +47,7 @@ tb_bool_t tb_dns_init()
          * nameserver 8.8.8.8
          *
          */
-        tb_stream_t* gst = tb_stream_init_from_url("/etc/resolv.conf");
+        tb_stream_ref_t gst = tb_stream_init_from_url("/etc/resolv.conf");
         if (gst)
         {
             // open

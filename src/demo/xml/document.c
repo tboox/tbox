@@ -9,8 +9,8 @@
 tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
 {
     // init stream
-    tb_stream_t* ist = tb_stream_init_from_url(argv[1]);
-    tb_stream_t* ost = tb_stream_init_from_url(argv[2]);
+    tb_stream_ref_t ist = tb_stream_init_from_url(argv[1]);
+    tb_stream_ref_t ost = tb_stream_init_from_url(argv[2]);
     if (ost) tb_stream_ctrl(ost, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
     if (ist && ost && tb_stream_open(ist) && tb_stream_open(ost))
     {

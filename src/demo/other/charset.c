@@ -12,8 +12,8 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argc == 5, 0);
 
     // init stream
-    tb_stream_t* istream = tb_stream_init_from_url(argv[1]);
-    tb_stream_t* ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+    tb_stream_ref_t istream = tb_stream_init_from_url(argv[1]);
+    tb_stream_ref_t ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
     if (istream && ostream && tb_stream_open(istream) && tb_stream_open(ostream))
     {
         // init data & size

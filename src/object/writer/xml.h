@@ -42,7 +42,7 @@ __tb_extern_c_enter__
 typedef struct __tb_object_xml_writer_t
 {
     /// the stream
-    tb_stream_t*          stream;
+    tb_stream_ref_t          stream;
 
     /// is deflate?
     tb_bool_t                   deflate;

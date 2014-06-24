@@ -102,7 +102,7 @@ tb_object_t* tb_object_data_init_from_url(tb_char_t const* url)
     tb_assert_and_check_return_val(url, tb_null);
 
     // init stream
-    tb_stream_t* stream = tb_stream_init_from_url(url);
+    tb_stream_ref_t stream = tb_stream_init_from_url(url);
     tb_assert_and_check_return_val(stream, tb_null);
 
     // make stream
@@ -217,7 +217,7 @@ tb_bool_t tb_object_data_writ_to_url(tb_object_t* object, tb_char_t const* url)
     tb_assert_and_check_return_val(data && tb_object_data_getp((tb_object_t*)data) && url, tb_false);
 
     // make stream
-    tb_stream_t* stream = tb_stream_init_from_url(url);
+    tb_stream_ref_t stream = tb_stream_init_from_url(url);
     tb_assert_and_check_return_val(stream, tb_false);
 
     // ctrl
