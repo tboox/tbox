@@ -96,11 +96,8 @@ typedef struct __tb_database_mysql_result_t
 }tb_database_mysql_result_t;
 
 // the mysql stream type
-typedef struct __tb_database_mysql_stream_t
+typedef struct __tb_database_mysql_stream_impl_t
 {
-    // the base
-    tb_stream_t                         base;
-
     // the stmt
     MYSQL_STMT*                         stmt;
 
@@ -113,7 +110,7 @@ typedef struct __tb_database_mysql_stream_t
     // the column
     tb_size_t                           column;
 
-}tb_database_mysql_stream_t;
+}tb_database_mysql_stream_impl_t;
 
 // the mysql type
 typedef struct __tb_database_mysql_t
@@ -214,64 +211,58 @@ static tb_size_t tb_database_mysql_state_from_errno(tb_size_t errno)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * stream implementation
  */
-static __tb_inline__ tb_database_mysql_stream_t* tb_database_mysql_stream_cast(tb_handle_t stream)
-{
-    tb_stream_ref_t bstream = (tb_stream_ref_t)stream;
-    tb_assert_and_check_return_val(bstream && bstream->base.type == TB_STREAM_TYPE_NONE, tb_null);
-    return (tb_database_mysql_stream_t*)bstream;
-}
-static tb_bool_t tb_database_mysql_stream_open(tb_handle_t stream)
+static tb_bool_t tb_database_mysql_stream_impl_open(tb_stream_ref_t stream)
 {
     // check
-    tb_database_mysql_stream_t* mstream = tb_database_mysql_stream_cast(stream);
-    tb_assert_and_check_return_val(mstream && mstream->stmt, tb_false);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_assert_and_check_return_val(impl && impl->stmt, tb_false);
 
     // check result
-    tb_assert_and_check_return_val(mstream->result && mstream->result->buffer && mstream->result->buffer_length, tb_false);
+    tb_assert_and_check_return_val(impl->result && impl->result->buffer && impl->result->buffer_length, tb_false);
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_database_mysql_stream_clos(tb_handle_t stream)
+static tb_bool_t tb_database_mysql_stream_impl_clos(tb_stream_ref_t stream)
 {
     // check
-    tb_database_mysql_stream_t* mstream = tb_database_mysql_stream_cast(stream);
-    tb_assert_and_check_return_val(mstream, tb_false);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_assert_and_check_return_val(impl, tb_false);
     
     // ok
     return tb_true;
 }
-static tb_long_t tb_database_mysql_stream_read(tb_handle_t stream, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_database_mysql_stream_impl_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_database_mysql_stream_t* mstream = tb_database_mysql_stream_cast(stream);
-    tb_assert_and_check_return_val(mstream && mstream->stmt, -1);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_assert_and_check_return_val(impl && impl->stmt, -1);
 
     // check data and size
     tb_check_return_val(data, -1);
     tb_check_return_val(size, 0);
 
     // check result
-    tb_assert_and_check_return_val(mstream->result && mstream->result->buffer && mstream->result->buffer_length, -1);
+    tb_assert_and_check_return_val(impl->result && impl->result->buffer && impl->result->buffer_length, -1);
 
     // the length
-    tb_size_t length = (tb_size_t)*mstream->result->length;
+    tb_size_t length = (tb_size_t)*impl->result->length;
 
     // end?
-    tb_check_return_val(length && mstream->offset < length, -1);
+    tb_check_return_val(length && impl->offset < length, -1);
 
     // read data
-    size = tb_min3(size, (tb_size_t)mstream->result->buffer_length, length - mstream->offset);
-    if (size) tb_memcpy(data, mstream->result->buffer, size);
+    size = tb_min3(size, (tb_size_t)impl->result->buffer_length, length - impl->offset);
+    if (size) tb_memcpy(data, impl->result->buffer, size);
     
     // update offset
-    mstream->offset += size;
+    impl->offset += size;
     
     // fetch column
-    if (mysql_stmt_fetch_column(mstream->stmt, mstream->result, mstream->column, mstream->offset))
+    if (mysql_stmt_fetch_column(impl->stmt, impl->result, impl->column, impl->offset))
     {
         // trace
-        tb_trace_e("stream: fetch failed at: %lu, error[%d]: %s", mstream->column, mysql_stmt_errno(mstream->stmt), mysql_stmt_error(mstream->stmt));
+        tb_trace_e("stream: fetch failed at: %lu, error[%d]: %s", impl->column, mysql_stmt_errno(impl->stmt), mysql_stmt_error(impl->stmt));
         return -1;
     }
 
@@ -281,20 +272,20 @@ static tb_long_t tb_database_mysql_stream_read(tb_handle_t stream, tb_byte_t* da
     // ok?
     return (tb_long_t)(size);
 }
-static tb_long_t tb_database_mysql_stream_wait(tb_handle_t stream, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_database_mysql_stream_impl_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
 {
     // check
-    tb_database_mysql_stream_t* mstream = tb_database_mysql_stream_cast(stream);
-    tb_assert_and_check_return_val(mstream, -1);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_assert_and_check_return_val(impl, -1);
 
     // ok?
     return wait;
 }
-static tb_bool_t tb_database_mysql_stream_ctrl(tb_handle_t stream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_database_mysql_stream_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
-    tb_database_mysql_stream_t* mstream = tb_database_mysql_stream_cast(stream);
-    tb_assert_and_check_return_val(mstream, tb_false);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // ctrl
     switch (ctrl)
@@ -303,73 +294,53 @@ static tb_bool_t tb_database_mysql_stream_ctrl(tb_handle_t stream, tb_size_t ctr
         {
             // the psize
             tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
-            tb_assert_and_check_return_val(psize && mstream->result, tb_false);
+            tb_assert_and_check_return_val(psize && impl->result, tb_false);
 
             // get size
-            *psize = (tb_hong_t)*mstream->result->length;
+            *psize = (tb_hong_t)*impl->result->length;
 
             // ok
             return tb_true;
         }   
-    case TB_STREAM_CTRL_GET_OFFSET:
-        {
-            // the poffset
-            tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
-            tb_assert_and_check_return_val(poffset, tb_false);
-
-            // get offset
-            *poffset = mstream->offset;
-
-            // ok
-            return tb_true;
-        }
     default:
         break;
     }
     return tb_false;
 }
-static tb_stream_ref_t tb_database_mysql_stream_init(MYSQL_STMT* stmt, MYSQL_BIND* result, tb_size_t column)
+static tb_stream_ref_t tb_database_mysql_stream_impl_init(MYSQL_STMT* stmt, MYSQL_BIND* result, tb_size_t column)
 {
     // check
     tb_assert_and_check_return_val(stmt && result, tb_null);
 
-    // done
-    tb_bool_t                   ok = tb_false;
-    tb_database_mysql_stream_t* stream = tb_null;
-    do
+    // init stream
+    tb_stream_ref_t stream = tb_stream_init(    TB_STREAM_TYPE_NONE
+                                            ,   sizeof(tb_database_mysql_stream_impl_t)
+                                            ,   0
+                                            ,   tb_database_mysql_stream_impl_open
+                                            ,   tb_database_mysql_stream_impl_clos
+                                            ,   tb_null
+                                            ,   tb_database_mysql_stream_impl_ctrl
+                                            ,   tb_database_mysql_stream_impl_wait
+                                            ,   tb_database_mysql_stream_impl_read
+                                            ,   tb_null
+                                            ,   tb_null
+                                            ,   tb_null
+                                            ,   tb_null);
+    tb_assert_and_check_return_val(stream, tb_null);
+
+    // init the stream impl
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    if (impl)
     {
-        // make stream
-        stream = tb_malloc0_type(tb_database_mysql_stream_t);
-        tb_assert_and_check_break(stream);
-
-        // init stream
-        if (!tb_stream_init((tb_stream_ref_t)stream, TB_STREAM_TYPE_NONE, 0)) break;
-        stream->base.open       = tb_database_mysql_stream_open;
-        stream->base.clos       = tb_database_mysql_stream_clos;
-        stream->base.read       = tb_database_mysql_stream_read;
-        stream->base.wait       = tb_database_mysql_stream_wait;
-        stream->base.base.ctrl  = tb_database_mysql_stream_ctrl;
-        stream->stmt            = stmt;
-        stream->result          = result;
-        stream->column          = column;
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed? 
-    if (!ok)
-    {
-        // exit it
-        if (stream) tb_stream_exit((tb_stream_ref_t)stream);
-        stream = tb_null;
+        impl->stmt      = stmt;
+        impl->result    = result;
+        impl->column    = column;
     }
 
     // ok?
     return (tb_stream_ref_t)stream;
 }
-static tb_bool_t tb_database_mysql_stream_set_value(tb_database_sql_value_t* value, tb_database_mysql_t* mysql, MYSQL_BIND* result, tb_size_t column)
+static tb_bool_t tb_database_mysql_stream_impl_set_value(tb_database_sql_value_t* value, tb_database_mysql_t* mysql, MYSQL_BIND* result, tb_size_t column)
 {
     // check
     tb_assert_and_check_return_val(value && mysql && mysql->result.stmt && result, tb_false);
@@ -383,7 +354,7 @@ static tb_bool_t tb_database_mysql_stream_set_value(tb_database_sql_value_t* val
         mysql->result.stream = tb_null;
 
         // init stream
-        mysql->result.stream = tb_database_mysql_stream_init(mysql->result.stmt, result, column);
+        mysql->result.stream = tb_database_mysql_stream_impl_init(mysql->result.stmt, result, column);
         tb_assert_and_check_break(mysql->result.stream);
 
         // open stream
@@ -689,14 +660,14 @@ static tb_pointer_t tb_database_mysql_result_col_iterator_item(tb_iterator_t* it
                     // blob32?
                     else
                     {
-                        tb_database_mysql_stream_set_value(&row->value, mysql, result, itor);
+                        tb_database_mysql_stream_impl_set_value(&row->value, mysql, result, itor);
                     }
                 }
             }
             break;  
         case MYSQL_TYPE_LONG_BLOB:
         case MYSQL_TYPE_MEDIUM_BLOB:
-            tb_database_mysql_stream_set_value(&row->value, mysql, result, itor);
+            tb_database_mysql_stream_impl_set_value(&row->value, mysql, result, itor);
             break;
         case MYSQL_TYPE_TINY_BLOB:
             tb_database_sql_value_set_blob8(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);

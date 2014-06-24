@@ -80,7 +80,7 @@ static tb_option_item_t g_options[] =
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_stream_stream_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
     tb_handle_t     option = tb_null;

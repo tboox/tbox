@@ -193,6 +193,89 @@ __tb_extern_c_enter__
  * interfaces
  */
 
+/*! init stream 
+ *
+ * @param type          the stream type
+ * @param type_size     the stream type size
+ * @param cache         the cache size
+ * @param open          the stream impl func: open
+ * @param clos          the stream impl func: clos
+ * @param exit          the stream impl func: exit, optional
+ * @param ctrl          the stream impl func: ctrl
+ * @param wait          the stream impl func: wait
+ * @param read          the stream impl func: read
+ * @param writ          the stream impl func: writ
+ * @param seek          the stream impl func: seek, optional
+ * @param sync          the stream impl func: sync, optional
+ * @param kill          the stream impl func: kill, optional
+ *
+ * @return              the stream
+ * 
+ * @code
+    // the custom xxxx stream type
+    typedef struct __tb_stream_xxxx_impl_t
+    {
+        // the xxxx data
+        tb_handle_t         xxxx;
+
+    }tb_stream_xxxx_impl_t;
+
+    static tb_bool_t tb_stream_xxxx_impl_open(tb_stream_ref_t stream)
+    {
+        // check
+        tb_stream_xxxx_impl_t* impl = (tb_stream_xxxx_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_XXXX);
+        tb_assert_and_check_return_val(impl, tb_false);
+
+        // ok
+        return tb_true;
+    }
+    static tb_bool_t tb_stream_xxxx_impl_clos(tb_stream_ref_t stream)
+    {
+        // check
+        tb_stream_xxxx_impl_t* impl = (tb_stream_xxxx_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_XXXX);
+        tb_assert_and_check_return_val(impl, tb_false);
+
+        // ok
+        return tb_true;
+    }
+
+    // define other xxxx stream func
+    // ...
+
+    // init stream
+    tb_stream_ref_t stream = tb_stream_init(    TB_STREAM_TYPE_XXXX
+                                            ,   sizeof(tb_stream_xxxx_impl_t)
+                                            ,   0
+                                            ,   tb_stream_xxxx_impl_open
+                                            ,   tb_stream_xxxx_impl_clos
+                                            ,   tb_stream_xxxx_impl_exit
+                                            ,   tb_stream_xxxx_impl_ctrl
+                                            ,   tb_stream_xxxx_impl_wait
+                                            ,   tb_stream_xxxx_impl_read
+                                            ,   tb_stream_xxxx_impl_writ
+                                            ,   tb_stream_xxxx_impl_seek
+                                            ,   tb_stream_xxxx_impl_sync
+                                            ,   tb_stream_xxxx_impl_kill);
+
+    // using stream
+    // ...
+
+ * @endcode
+ */
+tb_stream_ref_t         tb_stream_init(     tb_size_t type
+                                        ,   tb_size_t type_size
+                                        ,   tb_size_t cache
+                                        ,   tb_bool_t (*open)(tb_stream_ref_t stream)
+                                        ,   tb_bool_t (*clos)(tb_stream_ref_t stream)
+                                        ,   tb_void_t (*exit)(tb_stream_ref_t stream)
+                                        ,   tb_bool_t (*ctrl)(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
+                                        ,   tb_long_t (*wait)(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
+                                        ,   tb_long_t (*read)(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
+                                        ,   tb_long_t (*writ)(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
+                                        ,   tb_bool_t (*seek)(tb_stream_ref_t stream, tb_hize_t offset)
+                                        ,   tb_bool_t (*sync)(tb_stream_ref_t stream, tb_bool_t bclosing)
+                                        ,   tb_void_t (*kill)(tb_stream_ref_t stream));
+
 /*! init data stream 
  *
  * @return              the stream
@@ -228,6 +311,15 @@ tb_stream_ref_t         tb_stream_init_filter(tb_noarg_t);
  * @param stream        the stream
  */
 tb_void_t               tb_stream_exit(tb_stream_ref_t stream);
+
+/*! get the stream impl for the given stream type
+ *
+ * @param stream        the stream
+ * @param type          the stream type
+ *
+ * @return              the stream impl
+ */
+tb_handle_t             tb_stream_impl(tb_stream_ref_t stream, tb_size_t type);
 
 /*! init stream from url
  *
@@ -353,6 +445,13 @@ tb_long_t               tb_stream_wait(tb_stream_ref_t stream, tb_size_t wait, t
  */
 tb_size_t               tb_stream_state(tb_stream_ref_t stream);
 
+/*! set the state
+ *
+ * @param stream        the stream
+ * @param state         the state
+ */
+tb_void_t               tb_stream_state_set(tb_stream_ref_t stream, tb_size_t state);
+
 /*! the stream type
  *
  * @param stream        the stream
@@ -419,6 +518,14 @@ tb_bool_t               tb_stream_is_closed(tb_stream_ref_t stream);
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_stream_is_killed(tb_stream_ref_t stream);
+
+/*! the stream url
+ *
+ * @param stream        the stream
+ *
+ * @return              the stream url
+ */
+tb_url_t*               tb_stream_url(tb_stream_ref_t stream);
 
 /*! the stream timeout
  *

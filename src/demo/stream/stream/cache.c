@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_stream_stream_cache_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_stream_cache_main(tb_int_t argc, tb_char_t** argv)
 {
     // init istream
     tb_stream_ref_t istream = tb_stream_init_from_url(argv[1]);

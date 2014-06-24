@@ -40,9 +40,6 @@
 // the file stream type
 typedef struct __tb_stream_file_impl_t
 {
-    // the base
-    tb_stream_impl_t    base;
-
     // the file handle
     tb_handle_t         file;
 
@@ -57,22 +54,21 @@ typedef struct __tb_stream_file_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_stream_file_impl_t* tb_stream_impl_cast(tb_stream_impl_t* stream)
+static __tb_inline__ tb_stream_file_impl_t* tb_stream_file_impl_cast(tb_stream_ref_t stream)
 {
-    tb_assert_and_check_return_val(stream && stream->type == TB_STREAM_TYPE_FILE, tb_null);
-    return (tb_stream_file_impl_t*)stream;
+    return (tb_stream_file_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_FILE);
 }
-static tb_bool_t tb_stream_impl_open(tb_stream_impl_t* stream)
+static tb_bool_t tb_stream_file_impl_open(tb_stream_ref_t stream)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && !impl->file, tb_false);
 
     // opened?
     tb_check_return_val(!impl->file, tb_true);
 
     // url
-    tb_char_t const* url = tb_url_get(&impl->base.url);
+    tb_char_t const* url = tb_url_get(tb_stream_url(stream));
     tb_assert_and_check_return_val(url, tb_false);
 
     // open file
@@ -82,17 +78,17 @@ static tb_bool_t tb_stream_impl_open(tb_stream_impl_t* stream)
     if (!impl->file)
     {
         // save state
-        impl->base.state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
+        tb_stream_state_set(stream, tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS);
         return tb_false;
     }
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_stream_impl_clos(tb_stream_impl_t* stream)
+static tb_bool_t tb_stream_file_impl_clos(tb_stream_ref_t stream)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl, tb_false);
 
     // exit file
@@ -105,10 +101,10 @@ static tb_bool_t tb_stream_impl_clos(tb_stream_impl_t* stream)
     // ok
     return tb_true;
 }
-static tb_long_t tb_stream_impl_read(tb_stream_impl_t* stream, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_stream_file_impl_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && impl->file, -1);
 
     // check
@@ -118,10 +114,10 @@ static tb_long_t tb_stream_impl_read(tb_stream_impl_t* stream, tb_byte_t* data, 
     // read 
     return tb_file_read(impl->file, data, size);
 }
-static tb_long_t tb_stream_impl_writ(tb_stream_impl_t* stream, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_stream_file_impl_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && impl->file && data, -1);
 
     // check
@@ -130,33 +126,33 @@ static tb_long_t tb_stream_impl_writ(tb_stream_impl_t* stream, tb_byte_t const* 
     // writ
     return tb_file_writ(impl->file, data, size);
 }
-static tb_bool_t tb_stream_impl_sync(tb_stream_impl_t* stream, tb_bool_t bclosing)
+static tb_bool_t tb_stream_file_impl_sync(tb_stream_ref_t stream, tb_bool_t bclosing)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && impl->file, tb_false);
 
     // sync
     return tb_file_sync(impl->file);
 }
-static tb_bool_t tb_stream_impl_seek(tb_stream_impl_t* stream, tb_hize_t offset)
+static tb_bool_t tb_stream_file_impl_seek(tb_stream_ref_t stream, tb_hize_t offset)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && impl->file, tb_false);
 
     // seek
     return (tb_file_seek(impl->file, offset, TB_FILE_SEEK_BEG) == offset)? tb_true : tb_false;
 }
-static tb_long_t tb_stream_impl_wait(tb_stream_impl_t* stream, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_stream_file_impl_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && impl->file, -1);
 
     // wait 
     tb_long_t aioe = 0;
-    if (!tb_stream_beof((tb_stream_ref_t)stream))
+    if (!tb_stream_beof(stream))
     {
         if (wait & TB_STREAM_WAIT_READ) aioe |= TB_STREAM_WAIT_READ;
         if (wait & TB_STREAM_WAIT_WRIT) aioe |= TB_STREAM_WAIT_WRIT;
@@ -165,10 +161,10 @@ static tb_long_t tb_stream_impl_wait(tb_stream_impl_t* stream, tb_size_t wait, t
     // ok?
     return aioe;
 }
-static tb_bool_t tb_stream_impl_ctrl(tb_stream_impl_t* stream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_stream_file_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
-    tb_stream_file_impl_t* impl = tb_stream_impl_cast(stream);
+    tb_stream_file_impl_t*  impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl, tb_false);
 
     // ctrl
@@ -179,16 +175,6 @@ static tb_bool_t tb_stream_impl_ctrl(tb_stream_impl_t* stream, tb_size_t ctrl, t
             tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
             tb_assert_and_check_return_val(psize, tb_false);
             *psize = impl->file? tb_file_size(impl->file) : 0;
-            return tb_true;
-        }
-    case TB_STREAM_CTRL_GET_OFFSET:
-        {
-            // the poffset
-            tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
-            tb_assert_and_check_return_val(poffset, tb_false);
-
-            // get offset
-            *poffset = impl->base.offset;
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_SET_MODE:
@@ -222,50 +208,25 @@ static tb_bool_t tb_stream_impl_ctrl(tb_stream_impl_t* stream, tb_size_t ctrl, t
     }
     return tb_false;
 }
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_stream_ref_t tb_stream_init_file()
 {
-    // done
-    tb_bool_t               ok = tb_false;
-    tb_stream_file_impl_t*  stream = tb_null;
-    do
-    {
-        // make stream
-        stream = tb_malloc0_type(tb_stream_file_impl_t);
-        tb_assert_and_check_break(stream);
-
-        // init base
-        if (!tb_stream_impl_init((tb_stream_impl_t*)stream, TB_STREAM_TYPE_FILE, TB_STREAM_FILE_CACHE_MAXN)) break;
-
-        // init stream
-        stream->base.open      = tb_stream_impl_open;
-        stream->base.clos      = tb_stream_impl_clos;
-        stream->base.read      = tb_stream_impl_read;
-        stream->base.writ      = tb_stream_impl_writ;
-        stream->base.sync      = tb_stream_impl_sync;
-        stream->base.seek      = tb_stream_impl_seek;
-        stream->base.wait      = tb_stream_impl_wait;
-        stream->base.ctrl      = tb_stream_impl_ctrl;
-        stream->file           = tb_null;
-        stream->mode           = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed?
-    if (!ok)
-    {
-        // exit it
-        if (stream) tb_stream_exit((tb_stream_ref_t)stream);
-        stream = tb_null;
-    }
-
-    // ok
-    return (tb_stream_ref_t)stream;
+    return tb_stream_init(  TB_STREAM_TYPE_FILE
+                        ,   sizeof(tb_stream_file_impl_t)
+                        ,   TB_STREAM_FILE_CACHE_MAXN
+                        ,   tb_stream_file_impl_open
+                        ,   tb_stream_file_impl_clos
+                        ,   tb_null
+                        ,   tb_stream_file_impl_ctrl
+                        ,   tb_stream_file_impl_wait
+                        ,   tb_stream_file_impl_read
+                        ,   tb_stream_file_impl_writ
+                        ,   tb_stream_file_impl_seek
+                        ,   tb_stream_file_impl_sync
+                        ,   tb_null);
 }
 tb_stream_ref_t tb_stream_init_from_file(tb_char_t const* path, tb_size_t mode)
 {
