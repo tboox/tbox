@@ -106,14 +106,14 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 #if defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
     && defined(TB_CONFIG_MODULE_HAVE_ASIO) \
     && defined(TB_CONFIG_MODULE_HAVE_XML)
-static tb_stream_t* tb_demo_spider_parser_open_html(tb_char_t const* url)
+static tb_stream_ref_t tb_demo_spider_parser_open_html(tb_char_t const* url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_stream_t*  stream = tb_null;
+    tb_stream_ref_t  stream = tb_null;
     do
     {
         // the file path contains /html/?
@@ -245,7 +245,7 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
     tb_assert_and_check_return(task && task->spider);
 
     // init stream
-    tb_stream_t* stream = tb_demo_spider_parser_open_html(task->ourl);
+    tb_stream_ref_t stream = tb_demo_spider_parser_open_html(task->ourl);
     if (stream)
     {
         // init reader

@@ -451,7 +451,7 @@ end:
     // ok?
     return dictionary;
 }
-static tb_object_t* tb_object_json_reader_done(tb_stream_t* stream)
+static tb_object_t* tb_object_json_reader_done(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
@@ -478,7 +478,7 @@ static tb_object_t* tb_object_json_reader_done(tb_stream_t* stream)
     // read it
     return func(&reader, type);
 }
-static tb_size_t tb_object_json_reader_probe(tb_stream_t* stream)
+static tb_size_t tb_object_json_reader_probe(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, 0);

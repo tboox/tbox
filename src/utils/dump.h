@@ -56,7 +56,7 @@ tb_void_t           tb_dump_data_from_url(tb_char_t const* url);
  *
  * @param gst       the stream
  */
-tb_void_t           tb_dump_data_from_stream(tb_stream_t* gst);
+tb_void_t           tb_dump_data_from_stream(tb_stream_ref_t gst);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

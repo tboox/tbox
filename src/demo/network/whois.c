@@ -15,9 +15,9 @@
 static tb_void_t tb_whois_test_done(tb_char_t const* name)
 {
     // init
-//  tb_stream_t* stream = tb_stream_init_from_url("sock://whois.internic.net:43");
-    tb_stream_t* stream = tb_stream_init_from_url("sock://199.7.51.74:43");
-//  tb_stream_t* stream = tb_stream_init_from_url("sock://whois.cnnic.net.cn:43");
+//  tb_stream_ref_t stream = tb_stream_init_from_url("sock://whois.internic.net:43");
+    tb_stream_ref_t stream = tb_stream_init_from_url("sock://199.7.51.74:43");
+//  tb_stream_ref_t stream = tb_stream_init_from_url("sock://whois.cnnic.net.cn:43");
     tb_assert_and_check_return(stream);
 
     // timeout
@@ -42,8 +42,8 @@ static tb_void_t tb_whois_test_done(tb_char_t const* name)
 static tb_bool_t tb_whois_test_no_match_com(tb_char_t const* name)
 {
     // init
-//  tb_stream_t* stream = tb_stream_init_from_url("sock://whois.internic.net:43");
-    tb_stream_t* stream = tb_stream_init_from_url("sock://199.7.51.74:43");
+//  tb_stream_ref_t stream = tb_stream_init_from_url("sock://whois.internic.net:43");
+    tb_stream_ref_t stream = tb_stream_init_from_url("sock://199.7.51.74:43");
     tb_assert_and_check_return_val(stream, tb_false);
 
     // timeout
@@ -68,8 +68,8 @@ static tb_bool_t tb_whois_test_no_match_com(tb_char_t const* name)
 static tb_bool_t tb_whois_test_no_match_cn(tb_char_t const* name)
 {
     // init
-//  tb_stream_t* stream = tb_stream_init_from_url("sock://whois.cnnic.net.cn:43");
-    tb_stream_t* stream = tb_stream_init_from_url("sock://218.241.97.14:43");
+//  tb_stream_ref_t stream = tb_stream_init_from_url("sock://whois.cnnic.net.cn:43");
+    tb_stream_ref_t stream = tb_stream_init_from_url("sock://218.241.97.14:43");
     tb_assert_and_check_return_val(stream, tb_false);
 
     // timeout
@@ -201,7 +201,7 @@ static tb_void_t tb_whois_test_walk_6()
 static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 {
     // init stream
-    tb_stream_t* stream = tb_stream_init_from_url(file);
+    tb_stream_ref_t stream = tb_stream_init_from_url(file);
     tb_assert_and_check_return_val(stream, tb_false);
 
     // init ping
@@ -239,7 +239,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 {
     // init stream
-    tb_stream_t* stream = tb_stream_init_from_url(file);
+    tb_stream_ref_t stream = tb_stream_init_from_url(file);
     tb_assert_and_check_return_val(stream, tb_false);
 
     // init ping

@@ -401,7 +401,7 @@ static tb_object_t* tb_object_bin_reader_func_dictionary(tb_object_bin_reader_t*
     // ok?
     return dictionary;
 }
-static tb_object_t* tb_object_bin_reader_done(tb_stream_t* stream)
+static tb_object_t* tb_object_bin_reader_done(tb_stream_ref_t stream)
 {
     // read bin header
     tb_byte_t data[32] = {0};
@@ -442,7 +442,7 @@ end:
     // ok?
     return object;
 }
-static tb_size_t tb_object_bin_reader_probe(tb_stream_t* stream)
+static tb_size_t tb_object_bin_reader_probe(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, 0);

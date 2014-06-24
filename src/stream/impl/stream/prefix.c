@@ -17,11 +17,9 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        mysql.h
- * @ingroup     database
+ * @file        prefix.c
+ *
  */
-#ifndef TB_DATABASE_MYSQL_H
-#define TB_DATABASE_MYSQL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -29,33 +27,40 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * implementation
  */
-__tb_extern_c_enter__
+tb_bool_t tb_stream_impl_init(tb_stream_impl_t* stream, tb_size_t type, tb_size_t cache)
+{
+    // check
+    tb_assert_and_check_return_val(stream, tb_false);
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // init type
+        stream->type = type;
 
-/* probe mysql from the url
- *
- * @param url       the database url
- *
- * @return          the score
- */
-tb_size_t           tb_database_mysql_probe(tb_url_t const* url);
+        // init timeout, 10s
+        stream->timeout = TB_STREAM_DEFAULT_TIMEOUT;
 
-/* init mysql
- *
- * @param url       the database url
- *
- * @return          the database handle
- */
-tb_database_sql_t*  tb_database_mysql_init(tb_url_t const* url);
+        // init internal state
+        stream->istate = TB_STATE_CLOSED;
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
+        // init url
+        if (!tb_url_init(&stream->url)) break;
 
-#endif
+        // init cache
+        if (!tb_queue_buffer_init(&stream->cache, cache)) break;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? exit it
+    if (!ok) tb_queue_buffer_exit(&stream->cache);
+
+    // ok?
+    return ok;
+}

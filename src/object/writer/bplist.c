@@ -602,7 +602,7 @@ static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_t* list, tb_hash
     // exit list
     if (list) tb_object_exit(list);
 }
-static tb_long_t tb_object_bplist_writer_done(tb_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
+static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_t* object, tb_bool_t deflate)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);

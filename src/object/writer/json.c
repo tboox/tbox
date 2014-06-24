@@ -246,7 +246,7 @@ static tb_bool_t tb_object_json_writer_func_dictionary(tb_object_json_writer_t* 
     // ok
     return tb_true;
 }
-static tb_long_t tb_object_json_writer_done(tb_stream_t* stream, tb_object_t* object, tb_bool_t deflate)
+static tb_long_t tb_object_json_writer_done(tb_stream_ref_t stream, tb_object_t* object, tb_bool_t deflate)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);

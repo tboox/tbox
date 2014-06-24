@@ -57,9 +57,9 @@ typedef struct __tb_xml_reader_t
     tb_size_t               level;
     
     // the stream
-    tb_stream_t*      istream;
-    tb_stream_t*      filter;
-    tb_stream_t*      rstream;
+    tb_stream_ref_t      istream;
+    tb_stream_ref_t      filter;
+    tb_stream_ref_t      rstream;
 
     // the version
     tb_string_t      version;
@@ -127,7 +127,7 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_xml_reader_init(tb_stream_t* stream)
+tb_handle_t tb_xml_reader_init(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
@@ -227,7 +227,7 @@ tb_void_t tb_xml_reader_clear(tb_handle_t reader)
         tb_string_clear(&node->data);
     }
 }
-tb_stream_t* tb_xml_reader_stream(tb_handle_t reader)
+tb_stream_ref_t tb_xml_reader_stream(tb_handle_t reader)
 {
     // check
     tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;

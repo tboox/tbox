@@ -327,7 +327,7 @@ tb_void_t tb_object_dec(tb_object_t* object)
     // exit it?
     if (!object->refn && object->exit) object->exit(object);
 }
-tb_object_t* tb_object_read(tb_stream_t* stream)
+tb_object_t* tb_object_read(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
@@ -344,7 +344,7 @@ tb_object_t* tb_object_read_from_url(tb_char_t const* url)
     tb_object_t* object = tb_null;
 
     // make stream
-    tb_stream_t* stream = tb_stream_init_from_url(url);
+    tb_stream_ref_t stream = tb_stream_init_from_url(url);
     tb_assert_and_check_return_val(stream, tb_null);
 
     // read object
@@ -365,7 +365,7 @@ tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
     tb_object_t* object = tb_null;
 
     // make stream
-    tb_stream_t* stream = tb_stream_init_from_data(data, size);
+    tb_stream_ref_t stream = tb_stream_init_from_data(data, size);
     tb_assert_and_check_return_val(stream, tb_null);
 
     // read object
@@ -377,7 +377,7 @@ tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
     // ok?
     return object;
 }
-tb_long_t tb_object_writ(tb_object_t* object, tb_stream_t* stream, tb_size_t format)
+tb_long_t tb_object_writ(tb_object_t* object, tb_stream_ref_t stream, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
@@ -392,7 +392,7 @@ tb_long_t tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_si
 
     // make stream
     tb_long_t       writ = -1;
-    tb_stream_t*  stream = tb_stream_init_from_url(url);
+    tb_stream_ref_t  stream = tb_stream_init_from_url(url);
     if (stream)
     {
         // ctrl stream
@@ -416,7 +416,7 @@ tb_long_t tb_object_writ_to_data(tb_object_t* object, tb_byte_t* data, tb_size_t
 
     // make stream
     tb_long_t       writ = -1;
-    tb_stream_t*  stream = tb_stream_init_from_data(data, size);
+    tb_stream_ref_t  stream = tb_stream_init_from_data(data, size);
     if (stream)
     {
         // open and writ stream

@@ -28,5 +28,18 @@
  */
 #include "../prefix.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/* init stream
+ *
+ * @param stream        the basic stream 
+ * @param type          the stream type
+ * @param cache         the cache size
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_stream_impl_init(tb_stream_impl_t* stream, tb_size_t type, tb_size_t cache);
 
 #endif

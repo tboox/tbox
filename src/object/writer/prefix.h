@@ -44,7 +44,7 @@
  * inlines
  */
 
-static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_stream_t* stream, tb_bool_t deflate, tb_size_t tab)
+static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_stream_ref_t stream, tb_bool_t deflate, tb_size_t tab)
 {
     // writ tab
     if (!deflate) 
@@ -55,7 +55,7 @@ static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_stream_t* stream, tb_bool
     // ok
     return tb_true;
 }
-static __tb_inline__ tb_bool_t tb_object_writer_newline(tb_stream_t* stream, tb_bool_t deflate)
+static __tb_inline__ tb_bool_t tb_object_writer_newline(tb_stream_ref_t stream, tb_bool_t deflate)
 {
     // writ newline
     if (!deflate && tb_stream_printf(stream, __tb_newline__) < 0) return tb_false;
@@ -63,7 +63,7 @@ static __tb_inline__ tb_bool_t tb_object_writer_newline(tb_stream_t* stream, tb_
     // ok
     return tb_true;
 }
-static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_stream_t* stream, tb_size_t type, tb_uint64_t size)
+static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_stream_ref_t stream, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(stream && type <= 0xff, tb_false);

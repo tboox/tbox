@@ -52,7 +52,7 @@
 typedef struct __tb_xml_writer_t
 {
     // stream
-    tb_stream_t*      wstream;
+    tb_stream_ref_t      wstream;
 
     // is format?
     tb_bool_t               bformat;
@@ -71,7 +71,7 @@ typedef struct __tb_xml_writer_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_xml_writer_init(tb_stream_t* wstream, tb_bool_t bformat)
+tb_handle_t tb_xml_writer_init(tb_stream_ref_t wstream, tb_bool_t bformat)
 {
     // check
     tb_assert_and_check_return_val(wstream, tb_null);

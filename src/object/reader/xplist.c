@@ -523,7 +523,7 @@ end:
     // ok?
     return dictionary;
 }
-static tb_object_t* tb_object_xplist_reader_done(tb_stream_t* stream)
+static tb_object_t* tb_object_xplist_reader_done(tb_stream_ref_t stream)
 {
     // init reader 
     tb_object_xplist_reader_t reader = {0};
@@ -571,7 +571,7 @@ end:
     // ok?
     return object;
 }
-static tb_size_t tb_object_xplist_reader_probe(tb_stream_t* stream)
+static tb_size_t tb_object_xplist_reader_probe(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, 0);

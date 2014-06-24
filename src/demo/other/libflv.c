@@ -17,7 +17,7 @@
 typedef struct __tb_flv_t
 {
     // the stream
-    tb_stream_t*              stream;
+    tb_stream_ref_t              stream;
 
     // the spank type
     tb_size_t                       spank_type;
@@ -504,7 +504,7 @@ static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_t
  * implementation
  */
 
-tb_handle_t tb_flv_init(tb_stream_t* stream)
+tb_handle_t tb_flv_init(tb_stream_ref_t stream)
 {
     // check 
     tb_assert_and_check_return_val(stream, tb_null);
@@ -570,7 +570,7 @@ tb_bool_t tb_flv_spak(tb_handle_t hflv)
     tb_bool_t       ret = tb_false;
 
     // get stream
-    tb_stream_t* stream = flv->stream;
+    tb_stream_ref_t stream = flv->stream;
     tb_assert_and_check_return_val(stream, tb_false);
 
     // spank hdata?
@@ -963,13 +963,13 @@ tb_bool_t tb_flv_ctrl(tb_handle_t hflv, tb_size_t cmd, ...)
         break;
     case TB_FLV_IOCTL_CMD_SET_STREAM:
         {
-            flv->stream = (tb_stream_t*)tb_va_arg(arg, tb_stream_t*);
+            flv->stream = (tb_stream_ref_t)tb_va_arg(arg, tb_stream_ref_t);
             ret = tb_true;
         }
         break;
     case TB_FLV_IOCTL_CMD_GET_STREAM:
         {
-            tb_stream_t** pstream = (tb_stream_t**)tb_va_arg(arg, tb_stream_t**);
+            tb_stream_ref_t* pstream = (tb_stream_ref_t*)tb_va_arg(arg, tb_stream_ref_t*);
             tb_assert_and_check_return_val(pstream, tb_false);
             
             *(pstream) = flv->stream;

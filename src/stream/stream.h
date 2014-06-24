@@ -193,51 +193,41 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init basic stream
- *
- * @param stream        the basic stream 
- * @param type          the stream type
- * @param cache         the cache size
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_stream_init(tb_stream_t* stream, tb_size_t type, tb_size_t cache);
-
 /*! init data stream 
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_data(tb_noarg_t);
+tb_stream_ref_t         tb_stream_init_data(tb_noarg_t);
 
 /*! init file stream 
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_file(tb_noarg_t);
+tb_stream_ref_t         tb_stream_init_file(tb_noarg_t);
 
 /*! init sock stream 
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_sock(tb_noarg_t);
+tb_stream_ref_t         tb_stream_init_sock(tb_noarg_t);
 
 /*! init http stream 
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_http(tb_noarg_t);
+tb_stream_ref_t         tb_stream_init_http(tb_noarg_t);
 
 /*! init filter stream 
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_filter(tb_noarg_t);
+tb_stream_ref_t         tb_stream_init_filter(tb_noarg_t);
 
 /*! exit stream
  *
  * @param stream        the stream
  */
-tb_void_t               tb_stream_exit(tb_stream_t* stream);
+tb_void_t               tb_stream_exit(tb_stream_ref_t stream);
 
 /*! init stream from url
  *
@@ -254,7 +244,7 @@ tb_void_t               tb_stream_exit(tb_stream_t* stream);
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_from_url(tb_char_t const* url);
+tb_stream_ref_t         tb_stream_init_from_url(tb_char_t const* url);
 
 /*! init stream from data
  *
@@ -263,7 +253,7 @@ tb_stream_t*            tb_stream_init_from_url(tb_char_t const* url);
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_from_data(tb_byte_t const* data, tb_size_t size);
+tb_stream_ref_t         tb_stream_init_from_data(tb_byte_t const* data, tb_size_t size);
 
 /*! init stream from file
  *
@@ -272,7 +262,7 @@ tb_stream_t*            tb_stream_init_from_data(tb_byte_t const* data, tb_size_
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_from_file(tb_char_t const* path, tb_size_t mode);
+tb_stream_ref_t         tb_stream_init_from_file(tb_char_t const* path, tb_size_t mode);
 
 /*! init stream from sock
  *
@@ -283,7 +273,7 @@ tb_stream_t*            tb_stream_init_from_file(tb_char_t const* path, tb_size_
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
+tb_stream_ref_t         tb_stream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
 
 /*! init stream from http or https
  *
@@ -294,7 +284,7 @@ tb_stream_t*            tb_stream_init_from_sock(tb_char_t const* host, tb_size_
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
+tb_stream_ref_t         tb_stream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
 
 /*! init filter stream from null
  *
@@ -302,7 +292,7 @@ tb_stream_t*            tb_stream_init_from_http(tb_char_t const* host, tb_size_
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_filter_from_null(tb_stream_t* stream);
+tb_stream_ref_t         tb_stream_init_filter_from_null(tb_stream_ref_t stream);
 
 /*! init filter stream from zip
  *
@@ -312,7 +302,7 @@ tb_stream_t*            tb_stream_init_filter_from_null(tb_stream_t* stream);
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_filter_from_zip(tb_stream_t* stream, tb_size_t algo, tb_size_t action);
+tb_stream_ref_t         tb_stream_init_filter_from_zip(tb_stream_ref_t stream, tb_size_t algo, tb_size_t action);
 
 /*! init filter stream from cache
  *
@@ -321,7 +311,7 @@ tb_stream_t*            tb_stream_init_filter_from_zip(tb_stream_t* stream, tb_s
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_filter_from_cache(tb_stream_t* stream, tb_size_t size);
+tb_stream_ref_t         tb_stream_init_filter_from_cache(tb_stream_ref_t stream, tb_size_t size);
 
 /*! init filter stream from charset
  *
@@ -331,7 +321,7 @@ tb_stream_t*            tb_stream_init_filter_from_cache(tb_stream_t* stream, tb
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_filter_from_charset(tb_stream_t* stream, tb_size_t fr, tb_size_t to);
+tb_stream_ref_t         tb_stream_init_filter_from_charset(tb_stream_ref_t stream, tb_size_t fr, tb_size_t to);
 
 /*! init filter stream from chunked
  *
@@ -340,7 +330,7 @@ tb_stream_t*            tb_stream_init_filter_from_charset(tb_stream_t* stream, 
  *
  * @return              the stream
  */
-tb_stream_t*            tb_stream_init_filter_from_chunked(tb_stream_t* stream, tb_bool_t dechunked);
+tb_stream_ref_t         tb_stream_init_filter_from_chunked(tb_stream_ref_t stream, tb_bool_t dechunked);
 
 /*! wait stream 
  *
@@ -353,7 +343,7 @@ tb_stream_t*            tb_stream_init_filter_from_chunked(tb_stream_t* stream, 
  *
  * @return              the event type, return 0 if timeout, return -1 if error
  */
-tb_long_t               tb_stream_wait(tb_stream_t* stream, tb_size_t wait, tb_long_t timeout);
+tb_long_t               tb_stream_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout);
 
 /*! the state
  *
@@ -361,7 +351,7 @@ tb_long_t               tb_stream_wait(tb_stream_t* stream, tb_size_t wait, tb_l
  *
  * @return              the state
  */
-tb_size_t               tb_stream_state(tb_stream_t* stream);
+tb_size_t               tb_stream_state(tb_stream_ref_t stream);
 
 /*! the stream type
  *
@@ -369,7 +359,7 @@ tb_size_t               tb_stream_state(tb_stream_t* stream);
  *
  * @return              the stream type
  */
-tb_size_t               tb_stream_type(tb_stream_t* stream);
+tb_size_t               tb_stream_type(tb_stream_ref_t stream);
 
 /*! the stream size and not seeking it
  *
@@ -377,7 +367,7 @@ tb_size_t               tb_stream_type(tb_stream_t* stream);
  *
  * @return              the stream size, no size: -1, empty or error: 0
  */
-tb_hong_t               tb_stream_size(tb_stream_t* stream);
+tb_hong_t               tb_stream_size(tb_stream_ref_t stream);
 
 /*! the stream left size and not seeking it 
  *
@@ -385,7 +375,7 @@ tb_hong_t               tb_stream_size(tb_stream_t* stream);
  *
  * @return              the stream left size, no size: infinity, empty or end: 0
  */
-tb_hize_t               tb_stream_left(tb_stream_t* stream);
+tb_hize_t               tb_stream_left(tb_stream_ref_t stream);
 
 /*! the stream is end?
  *
@@ -393,7 +383,7 @@ tb_hize_t               tb_stream_left(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_beof(tb_stream_t* stream);
+tb_bool_t               tb_stream_beof(tb_stream_ref_t stream);
 
 /*! the stream offset
  *
@@ -404,7 +394,7 @@ tb_bool_t               tb_stream_beof(tb_stream_t* stream);
  *
  * @return              the stream offset
  */
-tb_hize_t               tb_stream_offset(tb_stream_t* stream);
+tb_hize_t               tb_stream_offset(tb_stream_ref_t stream);
 
 /*! is opened?
  *
@@ -412,7 +402,7 @@ tb_hize_t               tb_stream_offset(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_is_opened(tb_stream_t* stream);
+tb_bool_t               tb_stream_is_opened(tb_stream_ref_t stream);
 
 /*! is closed?
  *
@@ -420,7 +410,7 @@ tb_bool_t               tb_stream_is_opened(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_is_closed(tb_stream_t* stream);
+tb_bool_t               tb_stream_is_closed(tb_stream_ref_t stream);
 
 /*! is killed?
  *
@@ -428,7 +418,7 @@ tb_bool_t               tb_stream_is_closed(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_is_killed(tb_stream_t* stream);
+tb_bool_t               tb_stream_is_killed(tb_stream_ref_t stream);
 
 /*! the stream timeout
  *
@@ -436,7 +426,7 @@ tb_bool_t               tb_stream_is_killed(tb_stream_t* stream);
  *
  * @return              the stream timeout
  */
-tb_long_t               tb_stream_timeout(tb_stream_t* stream);
+tb_long_t               tb_stream_timeout(tb_stream_ref_t stream);
 
 /*! ctrl stream
  *
@@ -445,7 +435,7 @@ tb_long_t               tb_stream_timeout(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_ctrl(tb_stream_t* stream, tb_size_t ctrl, ...);
+tb_bool_t               tb_stream_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, ...);
 
 /*! ctrl stream with arguments
  *
@@ -455,13 +445,13 @@ tb_bool_t               tb_stream_ctrl(tb_stream_t* stream, tb_size_t ctrl, ...)
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_ctrl_with_args(tb_stream_t* stream, tb_size_t ctrl, tb_va_list_t args);
+tb_bool_t               tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args);
 
 /*! kill stream
  *
  * @param stream        the stream
  */
-tb_void_t               tb_stream_kill(tb_stream_t* stream);
+tb_void_t               tb_stream_kill(tb_stream_ref_t stream);
 
 /*! open stream
  *
@@ -469,7 +459,7 @@ tb_void_t               tb_stream_kill(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_open(tb_stream_t* stream);
+tb_bool_t               tb_stream_open(tb_stream_ref_t stream);
 
 /*! close stream
  *
@@ -477,7 +467,7 @@ tb_bool_t               tb_stream_open(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_clos(tb_stream_t* stream);
+tb_bool_t               tb_stream_clos(tb_stream_ref_t stream);
 
 /*! read data, non-blocking
  *
@@ -487,7 +477,7 @@ tb_bool_t               tb_stream_clos(tb_stream_t* stream);
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_stream_read(tb_stream_t* stream, tb_byte_t* data, tb_size_t size);
+tb_long_t               tb_stream_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size);
 
 /*! writ data, non-blocking
  *
@@ -497,7 +487,7 @@ tb_long_t               tb_stream_read(tb_stream_t* stream, tb_byte_t* data, tb_
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_stream_writ(tb_stream_t* stream, tb_byte_t const* data, tb_size_t size);
+tb_long_t               tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
 
 /*! block read
  *
@@ -507,7 +497,7 @@ tb_long_t               tb_stream_writ(tb_stream_t* stream, tb_byte_t const* dat
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bread(tb_stream_t* stream, tb_byte_t* data, tb_size_t size);
+tb_bool_t               tb_stream_bread(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size);
 
 /*! block writ
  *
@@ -517,7 +507,7 @@ tb_bool_t               tb_stream_bread(tb_stream_t* stream, tb_byte_t* data, tb
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit(tb_stream_t* stream, tb_byte_t const* data, tb_size_t size);
+tb_bool_t               tb_stream_bwrit(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
 
 /*! sync stream
  *
@@ -526,7 +516,7 @@ tb_bool_t               tb_stream_bwrit(tb_stream_t* stream, tb_byte_t const* da
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_sync(tb_stream_t* stream, tb_bool_t bclosing);
+tb_bool_t               tb_stream_sync(tb_stream_ref_t stream, tb_bool_t bclosing);
 
 /*! need stream
  *
@@ -536,7 +526,7 @@ tb_bool_t               tb_stream_sync(tb_stream_t* stream, tb_bool_t bclosing);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_need(tb_stream_t* stream, tb_byte_t** data, tb_size_t size);
+tb_bool_t               tb_stream_need(tb_stream_ref_t stream, tb_byte_t** data, tb_size_t size);
 
 /*! seek stream
  *
@@ -545,7 +535,7 @@ tb_bool_t               tb_stream_need(tb_stream_t* stream, tb_byte_t** data, tb
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_seek(tb_stream_t* stream, tb_hize_t offset);
+tb_bool_t               tb_stream_seek(tb_stream_ref_t stream, tb_hize_t offset);
 
 /*! skip stream
  *
@@ -554,7 +544,7 @@ tb_bool_t               tb_stream_seek(tb_stream_t* stream, tb_hize_t offset);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_skip(tb_stream_t* stream, tb_hize_t size);
+tb_bool_t               tb_stream_skip(tb_stream_ref_t stream, tb_hize_t size);
 
 /*! block writ format data
  *
@@ -563,7 +553,7 @@ tb_bool_t               tb_stream_skip(tb_stream_t* stream, tb_hize_t size);
  *
  * @return              the real size, failed: -1
  */
-tb_long_t               tb_stream_printf(tb_stream_t* stream, tb_char_t const* fmt, ...);
+tb_long_t               tb_stream_printf(tb_stream_ref_t stream, tb_char_t const* fmt, ...);
 
 /*! block read line 
  *
@@ -573,7 +563,7 @@ tb_long_t               tb_stream_printf(tb_stream_t* stream, tb_char_t const* f
  *
  * @return              the real size
  */
-tb_long_t               tb_stream_bread_line(tb_stream_t* stream, tb_char_t* data, tb_size_t size);
+tb_long_t               tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_t size);
 
 /*! block writ line 
  *
@@ -583,7 +573,7 @@ tb_long_t               tb_stream_bread_line(tb_stream_t* stream, tb_char_t* dat
  *
  * @return              the real size
  */
-tb_long_t               tb_stream_bwrit_line(tb_stream_t* stream, tb_char_t* data, tb_size_t size);
+tb_long_t               tb_stream_bwrit_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_t size);
 
 /*! block read uint8 integer
  *
@@ -591,7 +581,7 @@ tb_long_t               tb_stream_bwrit_line(tb_stream_t* stream, tb_char_t* dat
  *
  * @return              the uint8 integer
  */
-tb_uint8_t              tb_stream_bread_u8(tb_stream_t* stream);
+tb_uint8_t              tb_stream_bread_u8(tb_stream_ref_t stream);
 
 /*! block read sint8 integer
  *
@@ -599,7 +589,7 @@ tb_uint8_t              tb_stream_bread_u8(tb_stream_t* stream);
  *
  * @return              the sint8 integer
  */
-tb_sint8_t              tb_stream_bread_s8(tb_stream_t* stream);
+tb_sint8_t              tb_stream_bread_s8(tb_stream_ref_t stream);
 
 /*! block read uint16-le integer
  *
@@ -607,7 +597,7 @@ tb_sint8_t              tb_stream_bread_s8(tb_stream_t* stream);
  *
  * @return              the uint16-le integer
  */
-tb_uint16_t             tb_stream_bread_u16_le(tb_stream_t* stream);
+tb_uint16_t             tb_stream_bread_u16_le(tb_stream_ref_t stream);
 
 /*! block read sint16-le integer
  *
@@ -615,7 +605,7 @@ tb_uint16_t             tb_stream_bread_u16_le(tb_stream_t* stream);
  *
  * @return              the sint16-le integer
  */
-tb_sint16_t             tb_stream_bread_s16_le(tb_stream_t* stream);
+tb_sint16_t             tb_stream_bread_s16_le(tb_stream_ref_t stream);
 
 /*! block read uint24-le integer
  *
@@ -623,7 +613,7 @@ tb_sint16_t             tb_stream_bread_s16_le(tb_stream_t* stream);
  *
  * @return              the uint24-le integer
  */
-tb_uint32_t             tb_stream_bread_u24_le(tb_stream_t* stream);
+tb_uint32_t             tb_stream_bread_u24_le(tb_stream_ref_t stream);
 
 /*! block read sint24-le integer
  *
@@ -631,7 +621,7 @@ tb_uint32_t             tb_stream_bread_u24_le(tb_stream_t* stream);
  *
  * @return              the sint24-le integer
  */
-tb_sint32_t             tb_stream_bread_s24_le(tb_stream_t* stream);
+tb_sint32_t             tb_stream_bread_s24_le(tb_stream_ref_t stream);
 
 /*! block read uint32-le integer
  *
@@ -639,7 +629,7 @@ tb_sint32_t             tb_stream_bread_s24_le(tb_stream_t* stream);
  *
  * @return              the uint32-le integer
  */
-tb_uint32_t             tb_stream_bread_u32_le(tb_stream_t* stream);
+tb_uint32_t             tb_stream_bread_u32_le(tb_stream_ref_t stream);
 
 /*! block read sint32-le integer
  *
@@ -647,7 +637,7 @@ tb_uint32_t             tb_stream_bread_u32_le(tb_stream_t* stream);
  *
  * @return              the sint32-le integer
  */
-tb_sint32_t             tb_stream_bread_s32_le(tb_stream_t* stream);
+tb_sint32_t             tb_stream_bread_s32_le(tb_stream_ref_t stream);
 
 /*! block read uint64-le integer
  *
@@ -655,7 +645,7 @@ tb_sint32_t             tb_stream_bread_s32_le(tb_stream_t* stream);
  *
  * @return              the uint64-le integer
  */
-tb_uint64_t             tb_stream_bread_u64_le(tb_stream_t* stream);
+tb_uint64_t             tb_stream_bread_u64_le(tb_stream_ref_t stream);
 
 /*! block read sint64-le integer
  *
@@ -663,7 +653,7 @@ tb_uint64_t             tb_stream_bread_u64_le(tb_stream_t* stream);
  *
  * @return              the sint64-le integer
  */
-tb_sint64_t             tb_stream_bread_s64_le(tb_stream_t* stream);
+tb_sint64_t             tb_stream_bread_s64_le(tb_stream_ref_t stream);
 
 /*! block read uint16-be integer
  *
@@ -671,7 +661,7 @@ tb_sint64_t             tb_stream_bread_s64_le(tb_stream_t* stream);
  *
  * @return              the uint16-be integer
  */
-tb_uint16_t             tb_stream_bread_u16_be(tb_stream_t* stream);
+tb_uint16_t             tb_stream_bread_u16_be(tb_stream_ref_t stream);
 
 /*! block read sint16-be integer
  *
@@ -679,7 +669,7 @@ tb_uint16_t             tb_stream_bread_u16_be(tb_stream_t* stream);
  *
  * @return              the sint16-be integer
  */
-tb_sint16_t             tb_stream_bread_s16_be(tb_stream_t* stream);
+tb_sint16_t             tb_stream_bread_s16_be(tb_stream_ref_t stream);
 
 /*! block read uint24-be integer
  *
@@ -687,7 +677,7 @@ tb_sint16_t             tb_stream_bread_s16_be(tb_stream_t* stream);
  *
  * @return              the uint24-be integer
  */
-tb_uint32_t             tb_stream_bread_u24_be(tb_stream_t* stream);
+tb_uint32_t             tb_stream_bread_u24_be(tb_stream_ref_t stream);
 
 /*! block read sint24-be integer
  *
@@ -695,7 +685,7 @@ tb_uint32_t             tb_stream_bread_u24_be(tb_stream_t* stream);
  *
  * @return              the sint24-be integer
  */
-tb_sint32_t             tb_stream_bread_s24_be(tb_stream_t* stream);
+tb_sint32_t             tb_stream_bread_s24_be(tb_stream_ref_t stream);
 
 /*! block read uint32-be integer
  *
@@ -703,7 +693,7 @@ tb_sint32_t             tb_stream_bread_s24_be(tb_stream_t* stream);
  *
  * @return              the uint32-be integer
  */
-tb_uint32_t             tb_stream_bread_u32_be(tb_stream_t* stream);
+tb_uint32_t             tb_stream_bread_u32_be(tb_stream_ref_t stream);
 
 /*! block read sint32-be integer
  *
@@ -711,7 +701,7 @@ tb_uint32_t             tb_stream_bread_u32_be(tb_stream_t* stream);
  *
  * @return              the sint32-be integer
  */
-tb_sint32_t             tb_stream_bread_s32_be(tb_stream_t* stream);
+tb_sint32_t             tb_stream_bread_s32_be(tb_stream_ref_t stream);
 
 /*! block read uint64-be integer
  *
@@ -719,7 +709,7 @@ tb_sint32_t             tb_stream_bread_s32_be(tb_stream_t* stream);
  *
  * @return              the uint64-be integer
  */
-tb_uint64_t             tb_stream_bread_u64_be(tb_stream_t* stream);
+tb_uint64_t             tb_stream_bread_u64_be(tb_stream_ref_t stream);
 
 /*! block read sint64-be integer
  *
@@ -727,7 +717,7 @@ tb_uint64_t             tb_stream_bread_u64_be(tb_stream_t* stream);
  *
  * @return              the sint64-be integer
  */
-tb_sint64_t             tb_stream_bread_s64_be(tb_stream_t* stream);
+tb_sint64_t             tb_stream_bread_s64_be(tb_stream_ref_t stream);
 
 /*! block writ uint8 integer
  *
@@ -736,7 +726,7 @@ tb_sint64_t             tb_stream_bread_s64_be(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u8(tb_stream_t* stream, tb_uint8_t val);
+tb_bool_t               tb_stream_bwrit_u8(tb_stream_ref_t stream, tb_uint8_t val);
 
 /*! block writ sint8 integer
  *
@@ -745,7 +735,7 @@ tb_bool_t               tb_stream_bwrit_u8(tb_stream_t* stream, tb_uint8_t val);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s8(tb_stream_t* stream, tb_sint8_t val);
+tb_bool_t               tb_stream_bwrit_s8(tb_stream_ref_t stream, tb_sint8_t val);
 
 /*! block writ uint16-le integer
  *
@@ -754,7 +744,7 @@ tb_bool_t               tb_stream_bwrit_s8(tb_stream_t* stream, tb_sint8_t val);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u16_le(tb_stream_t* stream, tb_uint16_t val);
+tb_bool_t               tb_stream_bwrit_u16_le(tb_stream_ref_t stream, tb_uint16_t val);
 
 /*! block writ sint16-le integer
  *
@@ -763,7 +753,7 @@ tb_bool_t               tb_stream_bwrit_u16_le(tb_stream_t* stream, tb_uint16_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s16_le(tb_stream_t* stream, tb_sint16_t val);
+tb_bool_t               tb_stream_bwrit_s16_le(tb_stream_ref_t stream, tb_sint16_t val);
 
 /*! block writ uint24-le integer
  *
@@ -772,7 +762,7 @@ tb_bool_t               tb_stream_bwrit_s16_le(tb_stream_t* stream, tb_sint16_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u24_le(tb_stream_t* stream, tb_uint32_t val);
+tb_bool_t               tb_stream_bwrit_u24_le(tb_stream_ref_t stream, tb_uint32_t val);
 
 /*! block writ sint24-le integer
  *
@@ -781,7 +771,7 @@ tb_bool_t               tb_stream_bwrit_u24_le(tb_stream_t* stream, tb_uint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s24_le(tb_stream_t* stream, tb_sint32_t val);
+tb_bool_t               tb_stream_bwrit_s24_le(tb_stream_ref_t stream, tb_sint32_t val);
 
 /*! block writ uint32-le integer
  *
@@ -790,7 +780,7 @@ tb_bool_t               tb_stream_bwrit_s24_le(tb_stream_t* stream, tb_sint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u32_le(tb_stream_t* stream, tb_uint32_t val);
+tb_bool_t               tb_stream_bwrit_u32_le(tb_stream_ref_t stream, tb_uint32_t val);
 
 /*! block writ sint32-le integer
  *
@@ -799,7 +789,7 @@ tb_bool_t               tb_stream_bwrit_u32_le(tb_stream_t* stream, tb_uint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s32_le(tb_stream_t* stream, tb_sint32_t val);
+tb_bool_t               tb_stream_bwrit_s32_le(tb_stream_ref_t stream, tb_sint32_t val);
 
 /*! block writ uint64-le integer
  *
@@ -808,7 +798,7 @@ tb_bool_t               tb_stream_bwrit_s32_le(tb_stream_t* stream, tb_sint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u64_le(tb_stream_t* stream, tb_uint64_t val);
+tb_bool_t               tb_stream_bwrit_u64_le(tb_stream_ref_t stream, tb_uint64_t val);
 
 /*! block writ sint64-le integer
  *
@@ -817,7 +807,7 @@ tb_bool_t               tb_stream_bwrit_u64_le(tb_stream_t* stream, tb_uint64_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s64_le(tb_stream_t* stream, tb_sint64_t val);
+tb_bool_t               tb_stream_bwrit_s64_le(tb_stream_ref_t stream, tb_sint64_t val);
 
 /*! block writ uint16-be integer
  *
@@ -826,7 +816,7 @@ tb_bool_t               tb_stream_bwrit_s64_le(tb_stream_t* stream, tb_sint64_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u16_be(tb_stream_t* stream, tb_uint16_t val);
+tb_bool_t               tb_stream_bwrit_u16_be(tb_stream_ref_t stream, tb_uint16_t val);
 
 /*! block writ sint16-be integer
  *
@@ -835,7 +825,7 @@ tb_bool_t               tb_stream_bwrit_u16_be(tb_stream_t* stream, tb_uint16_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s16_be(tb_stream_t* stream, tb_sint16_t val);
+tb_bool_t               tb_stream_bwrit_s16_be(tb_stream_ref_t stream, tb_sint16_t val);
 
 /*! block writ uint24-be integer
  *
@@ -844,7 +834,7 @@ tb_bool_t               tb_stream_bwrit_s16_be(tb_stream_t* stream, tb_sint16_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u24_be(tb_stream_t* stream, tb_uint32_t val);
+tb_bool_t               tb_stream_bwrit_u24_be(tb_stream_ref_t stream, tb_uint32_t val);
 
 /*! block writ sint24-be integer
  *
@@ -853,7 +843,7 @@ tb_bool_t               tb_stream_bwrit_u24_be(tb_stream_t* stream, tb_uint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s24_be(tb_stream_t* stream, tb_sint32_t val);
+tb_bool_t               tb_stream_bwrit_s24_be(tb_stream_ref_t stream, tb_sint32_t val);
 
 /*! block writ uint32-be integer
  *
@@ -862,7 +852,7 @@ tb_bool_t               tb_stream_bwrit_s24_be(tb_stream_t* stream, tb_sint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u32_be(tb_stream_t* stream, tb_uint32_t val);
+tb_bool_t               tb_stream_bwrit_u32_be(tb_stream_ref_t stream, tb_uint32_t val);
 
 /*! block writ sint32-be integer
  *
@@ -871,7 +861,7 @@ tb_bool_t               tb_stream_bwrit_u32_be(tb_stream_t* stream, tb_uint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s32_be(tb_stream_t* stream, tb_sint32_t val);
+tb_bool_t               tb_stream_bwrit_s32_be(tb_stream_ref_t stream, tb_sint32_t val);
 
 /*! block writ uint64-be integer
  *
@@ -880,7 +870,7 @@ tb_bool_t               tb_stream_bwrit_s32_be(tb_stream_t* stream, tb_sint32_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_u64_be(tb_stream_t* stream, tb_uint64_t val);
+tb_bool_t               tb_stream_bwrit_u64_be(tb_stream_ref_t stream, tb_uint64_t val);
 
 /*! block writ sint64-be integer
  *
@@ -889,7 +879,7 @@ tb_bool_t               tb_stream_bwrit_u64_be(tb_stream_t* stream, tb_uint64_t 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_s64_be(tb_stream_t* stream, tb_sint64_t val);
+tb_bool_t               tb_stream_bwrit_s64_be(tb_stream_ref_t stream, tb_sint64_t val);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 
@@ -899,7 +889,7 @@ tb_bool_t               tb_stream_bwrit_s64_be(tb_stream_t* stream, tb_sint64_t 
  *
  * @return              the float-le number
  */
-tb_float_t              tb_stream_bread_float_le(tb_stream_t* stream);
+tb_float_t              tb_stream_bread_float_le(tb_stream_ref_t stream);
 
 /*! read float-be number
  *
@@ -907,7 +897,7 @@ tb_float_t              tb_stream_bread_float_le(tb_stream_t* stream);
  *
  * @return              the float-be number
  */
-tb_float_t              tb_stream_bread_float_be(tb_stream_t* stream);
+tb_float_t              tb_stream_bread_float_be(tb_stream_ref_t stream);
 
 /*! read double-ble number
  *
@@ -915,7 +905,7 @@ tb_float_t              tb_stream_bread_float_be(tb_stream_t* stream);
  *
  * @return              the double-ble number
  */
-tb_double_t             tb_stream_bread_double_ble(tb_stream_t* stream);
+tb_double_t             tb_stream_bread_double_ble(tb_stream_ref_t stream);
 
 /*! read double-bbe number
  *
@@ -923,7 +913,7 @@ tb_double_t             tb_stream_bread_double_ble(tb_stream_t* stream);
  *
  * @return              the double-bbe number
  */
-tb_double_t             tb_stream_bread_double_bbe(tb_stream_t* stream);
+tb_double_t             tb_stream_bread_double_bbe(tb_stream_ref_t stream);
 
 /*! read double-lle number
  *
@@ -931,7 +921,7 @@ tb_double_t             tb_stream_bread_double_bbe(tb_stream_t* stream);
  *
  * @return              the double-lle number
  */
-tb_double_t             tb_stream_bread_double_lle(tb_stream_t* stream);
+tb_double_t             tb_stream_bread_double_lle(tb_stream_ref_t stream);
 
 /*! read double-lbe number
  *
@@ -939,7 +929,7 @@ tb_double_t             tb_stream_bread_double_lle(tb_stream_t* stream);
  *
  * @return              the double-lbe number
  */
-tb_double_t             tb_stream_bread_double_lbe(tb_stream_t* stream);
+tb_double_t             tb_stream_bread_double_lbe(tb_stream_ref_t stream);
 
 /*! writ float-le number
  *
@@ -948,7 +938,7 @@ tb_double_t             tb_stream_bread_double_lbe(tb_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_float_le(tb_stream_t* stream, tb_float_t val);
+tb_bool_t               tb_stream_bwrit_float_le(tb_stream_ref_t stream, tb_float_t val);
 
 /*! writ float-be number
  *
@@ -957,7 +947,7 @@ tb_bool_t               tb_stream_bwrit_float_le(tb_stream_t* stream, tb_float_t
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_float_be(tb_stream_t* stream, tb_float_t val);
+tb_bool_t               tb_stream_bwrit_float_be(tb_stream_ref_t stream, tb_float_t val);
 
 /*! writ double-ble number
  *
@@ -966,7 +956,7 @@ tb_bool_t               tb_stream_bwrit_float_be(tb_stream_t* stream, tb_float_t
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_double_ble(tb_stream_t* stream, tb_double_t val);
+tb_bool_t               tb_stream_bwrit_double_ble(tb_stream_ref_t stream, tb_double_t val);
 
 /*! writ double-bbe number
  *
@@ -975,7 +965,7 @@ tb_bool_t               tb_stream_bwrit_double_ble(tb_stream_t* stream, tb_doubl
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_double_bbe(tb_stream_t* stream, tb_double_t val);
+tb_bool_t               tb_stream_bwrit_double_bbe(tb_stream_ref_t stream, tb_double_t val);
 
 /*! writ double-lle number
  *
@@ -984,7 +974,7 @@ tb_bool_t               tb_stream_bwrit_double_bbe(tb_stream_t* stream, tb_doubl
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_double_lle(tb_stream_t* stream, tb_double_t val);
+tb_bool_t               tb_stream_bwrit_double_lle(tb_stream_ref_t stream, tb_double_t val);
 
 /*! writ double-lbe number
  *
@@ -993,7 +983,7 @@ tb_bool_t               tb_stream_bwrit_double_lle(tb_stream_t* stream, tb_doubl
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_bwrit_double_lbe(tb_stream_t* stream, tb_double_t val);
+tb_bool_t               tb_stream_bwrit_double_lbe(tb_stream_ref_t stream, tb_double_t val);
 
 #endif
 
