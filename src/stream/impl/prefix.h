@@ -76,34 +76,34 @@ typedef struct __tb_stream_impl_t
     tb_queue_buffer_t   cache;
 
     // wait 
-    tb_long_t           (*wait)(struct __tb_stream_impl_t* stream, tb_size_t wait, tb_long_t timeout);
+    tb_long_t           (*wait)(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout);
 
     // open
-    tb_bool_t           (*open)(struct __tb_stream_impl_t* stream);
+    tb_bool_t           (*open)(tb_stream_ref_t stream);
 
     // clos
-    tb_bool_t           (*clos)(struct __tb_stream_impl_t* stream);
+    tb_bool_t           (*clos)(tb_stream_ref_t stream);
 
     // read
-    tb_long_t           (*read)(struct __tb_stream_impl_t* stream, tb_byte_t* data, tb_size_t size);
+    tb_long_t           (*read)(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size);
 
     // writ
-    tb_long_t           (*writ)(struct __tb_stream_impl_t* stream, tb_byte_t const* data, tb_size_t size);
+    tb_long_t           (*writ)(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
 
     // seek
-    tb_bool_t           (*seek)(struct __tb_stream_impl_t* stream, tb_hize_t offset);
+    tb_bool_t           (*seek)(tb_stream_ref_t stream, tb_hize_t offset);
 
     // sync
-    tb_bool_t           (*sync)(struct __tb_stream_impl_t* stream, tb_bool_t bclosing);
+    tb_bool_t           (*sync)(tb_stream_ref_t stream, tb_bool_t bclosing);
 
     // ctrl 
-    tb_bool_t           (*ctrl)(struct __tb_stream_impl_t* stream, tb_size_t ctrl, tb_va_list_t args);
+    tb_bool_t           (*ctrl)(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args);
 
     // exit
-    tb_void_t           (*exit)(struct __tb_stream_impl_t* stream);
+    tb_void_t           (*exit)(tb_stream_ref_t stream);
 
     // kill
-    tb_void_t           (*kill)(struct __tb_stream_impl_t* stream);
+    tb_void_t           (*kill)(tb_stream_ref_t stream);
 
 }tb_stream_impl_t;
 

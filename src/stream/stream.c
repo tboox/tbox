@@ -44,6 +44,77 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_stream_ref_t tb_stream_init(     tb_size_t type
+                                ,   tb_size_t type_size
+                                ,   tb_size_t cache
+                                ,   tb_bool_t (*open)(tb_stream_ref_t stream)
+                                ,   tb_bool_t (*clos)(tb_stream_ref_t stream)
+                                ,   tb_void_t (*exit)(tb_stream_ref_t stream)
+                                ,   tb_bool_t (*ctrl)(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
+                                ,   tb_long_t (*wait)(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
+                                ,   tb_long_t (*read)(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
+                                ,   tb_long_t (*writ)(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
+                                ,   tb_bool_t (*seek)(tb_stream_ref_t stream, tb_hize_t offset)
+                                ,   tb_bool_t (*sync)(tb_stream_ref_t stream, tb_bool_t bclosing)
+                                ,   tb_void_t (*kill)(tb_stream_ref_t stream))
+{
+    // check
+    tb_assert_and_check_return_val(type_size, tb_null);
+    tb_assert_and_check_return_val(open && clos && ctrl && wait, tb_null);
+    tb_assert_and_check_return_val(read || wait, tb_null);
+
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_stream_impl_t*   stream = tb_null;
+    do
+    {
+        // make stream
+        stream = (tb_stream_impl_t*)tb_malloc0(sizeof(tb_stream_impl_t) + type_size);
+        tb_assert_and_check_break(stream);
+
+        // init type
+        stream->type = type;
+
+        // init timeout, 10s
+        stream->timeout = TB_STREAM_DEFAULT_TIMEOUT;
+
+        // init internal state
+        stream->istate = TB_STATE_CLOSED;
+
+        // init url
+        if (!tb_url_init(&stream->url)) break;
+
+        // init cache
+        if (!tb_queue_buffer_init(&stream->cache, cache)) break;
+
+        // init func
+        stream->open = open;
+        stream->clos = clos;
+        stream->exit = exit;
+        stream->ctrl = ctrl;
+        stream->wait = wait;
+        stream->read = read;
+        stream->writ = writ;
+        stream->seek = seek;
+        stream->sync = sync;
+        stream->ctrl = ctrl;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? 
+    if (!ok)
+    {
+        // exit it
+        if (stream) tb_stream_exit((tb_stream_ref_t)stream);
+        stream = tb_null;
+    }
+
+    // ok?
+    return (tb_stream_ref_t)stream;
+}
 tb_stream_ref_t tb_stream_init_from_url(tb_char_t const* url)
 {
     // check
@@ -113,7 +184,7 @@ tb_void_t tb_stream_exit(tb_stream_ref_t stream)
     tb_stream_clos(stream);
 
     // exit it
-    if (impl->exit) impl->exit(impl);
+    if (impl->exit) impl->exit(stream);
 
     // exit cache
     tb_queue_buffer_exit(&impl->cache);
@@ -123,6 +194,14 @@ tb_void_t tb_stream_exit(tb_stream_ref_t stream)
 
     // free it
     tb_free(stream);
+}
+tb_handle_t tb_stream_impl(tb_stream_ref_t stream, tb_size_t type)
+{
+    // check
+    tb_assert_and_check_return_val(stream && ((tb_stream_impl_t*)stream)->type == type, tb_null);
+
+    // the impl
+    return (tb_handle_t)&(((tb_stream_impl_t*)stream)[1]);
 }
 tb_long_t tb_stream_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
 {
@@ -134,7 +213,7 @@ tb_long_t tb_stream_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeo
     tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&impl->istate), -1);
 
     // wait it
-    tb_long_t ok = impl->wait(impl, wait, timeout);
+    tb_long_t ok = impl->wait(stream, wait, timeout);
     
     // wait failed? save state
     if (ok < 0 && !impl->state) impl->state = TB_STATE_WAIT_FAILED;
@@ -164,6 +243,15 @@ tb_size_t tb_stream_state(tb_stream_ref_t stream)
 
     // the stream state
     return impl->state;
+}
+tb_void_t tb_stream_state_set(tb_stream_ref_t stream, tb_size_t state)
+{
+    // check
+    tb_stream_impl_t* impl = (tb_stream_impl_t*)stream;
+    tb_assert_and_check_return(impl);
+
+    // set the stream state
+    impl->state = state;
 }
 tb_size_t tb_stream_type(tb_stream_ref_t stream)
 {
@@ -220,6 +308,24 @@ tb_hize_t tb_stream_offset(tb_stream_ref_t stream)
     tb_hize_t offset = 0;
     return tb_stream_ctrl(stream, TB_STREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
 }
+tb_url_t* tb_stream_url(tb_stream_ref_t stream)
+{
+    // check
+    tb_stream_impl_t* impl = (tb_stream_impl_t*)stream;
+    tb_assert_and_check_return_val(impl, tb_null);
+
+    // get the url
+    return &impl->url;
+}
+tb_long_t tb_stream_timeout(tb_stream_ref_t stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, -1);
+
+    // get the timeout
+    tb_long_t timeout = -1;
+    return tb_stream_ctrl(stream, TB_STREAM_CTRL_GET_TIMEOUT, &timeout)? timeout : -1;
+}
 tb_bool_t tb_stream_is_opened(tb_stream_ref_t stream)
 {
     // check
@@ -256,15 +362,6 @@ tb_bool_t tb_stream_is_killed(tb_stream_ref_t stream)
     // is killed?
     return (TB_STATE_KILLED == state || TB_STATE_KILLING == state)? tb_true : tb_false;
 }
-tb_long_t tb_stream_timeout(tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(stream, -1);
-
-    // get the timeout
-    tb_long_t timeout = -1;
-    return tb_stream_ctrl(stream, TB_STREAM_CTRL_GET_TIMEOUT, &timeout)? timeout : -1;
-}
 tb_bool_t tb_stream_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, ...)
 {
     // check
@@ -298,6 +395,16 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
     tb_bool_t ok = tb_false;
     switch (ctrl)
     {
+    case TB_STREAM_CTRL_GET_OFFSET:
+        {
+            // the poffset
+            tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+            tb_assert_and_check_return_val(poffset, tb_false);
+
+            // get offset
+            *poffset = impl->offset;
+            return tb_true;
+        }
     case TB_STREAM_CTRL_SET_URL:
         {
             // check
@@ -458,7 +565,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
     tb_va_copy(args, args_saved);
 
     // ctrl stream
-    ok = (impl->ctrl(impl, ctrl, args) || ok)? tb_true : tb_false;
+    ok = (impl->ctrl(stream, ctrl, args) || ok)? tb_true : tb_false;
 
     // ok?
     return ok;
@@ -476,7 +583,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t stream)
     if (TB_STATE_OPENED == tb_atomic_fetch_and_pset(&impl->istate, TB_STATE_OPENED, TB_STATE_KILLING))
     {
         // kill it
-        if (impl->kill) impl->kill(impl);
+        if (impl->kill) impl->kill(stream);
 
         // trace
         tb_trace_d("kill: %s: ok", tb_url_get(&impl->url));
@@ -485,7 +592,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t stream)
     else if (TB_STATE_OPENING == tb_atomic_fetch_and_pset(&impl->istate, TB_STATE_OPENING, TB_STATE_KILLING))
     {
         // kill it
-        if (impl->kill) impl->kill(impl);
+        if (impl->kill) impl->kill(stream);
 
         // trace
         tb_trace_d("kill: %s: ok", tb_url_get(&impl->url));
@@ -515,7 +622,7 @@ tb_bool_t tb_stream_open(tb_stream_ref_t stream)
     impl->state = TB_STATE_OK;
 
     // open it
-    tb_bool_t ok = impl->open(impl);
+    tb_bool_t ok = impl->open(stream);
 
     // opened
     if (ok) tb_atomic_set(&impl->istate, TB_STATE_OPENED);
@@ -536,7 +643,7 @@ tb_bool_t tb_stream_clos(tb_stream_ref_t stream)
     if (impl->bwrited && !tb_stream_sync(stream, tb_true)) return tb_false;
 
     // has close?
-    if (impl->clos && !impl->clos(impl)) return tb_false;
+    if (impl->clos && !impl->clos(stream)) return tb_false;
 
     // clear state
     impl->offset = 0;
@@ -599,7 +706,7 @@ tb_bool_t tb_stream_need(tb_stream_ref_t stream, tb_byte_t** data, tb_size_t siz
     while (read < push && (TB_STATE_OPENED == tb_atomic_get(&impl->istate)))
     {
         // read data
-        tb_long_t real = impl->read(impl, tail + read, push - read);
+        tb_long_t real = impl->read(stream, tail + read, push - read);
         
         // ok?
         if (real > 0)
@@ -611,7 +718,7 @@ tb_bool_t tb_stream_need(tb_stream_ref_t stream, tb_byte_t** data, tb_size_t siz
         else if (!real)
         {
             // wait
-            real = impl->wait(impl, TB_STREAM_WAIT_READ, tb_stream_timeout(stream));
+            real = impl->wait(stream, TB_STREAM_WAIT_READ, tb_stream_timeout(stream));
 
             // ok?
             tb_check_break(real > 0);
@@ -680,7 +787,7 @@ tb_long_t tb_stream_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size
 
             // push data to cache from stream
             tb_assert(impl->read);
-            tb_long_t   real = impl->read(impl, tail, push);
+            tb_long_t   real = impl->read(stream, tail, push);
             tb_check_return_val(real >= 0, -1);
 
             // read the left data from cache
@@ -700,7 +807,7 @@ tb_long_t tb_stream_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size
         else 
         {
             // read it directly
-            read = impl->read(impl, data, size);
+            read = impl->read(stream, data, size);
             tb_check_return_val(read >= 0, -1);
         }
     }
@@ -752,7 +859,7 @@ tb_long_t tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_
             tb_assert_and_check_return_val(head && pull, -1);
 
             // pull data to stream from cache
-            tb_long_t   real = impl->writ(impl, head, pull);
+            tb_long_t   real = impl->writ(stream, head, pull);
             tb_check_return_val(real >= 0, -1);
 
             // writ the left data to cache
@@ -772,7 +879,7 @@ tb_long_t tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_
         else 
         {
             // writ it directly
-            writ = impl->writ(impl, data, size);
+            writ = impl->writ(stream, data, size);
             tb_check_return_val(writ >= 0, -1);
         }
 
@@ -886,7 +993,7 @@ tb_bool_t tb_stream_sync(tb_stream_ref_t stream, tb_bool_t bclosing)
             while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&impl->istate)))
             {
                 // writ
-                tb_long_t real = impl->writ(impl, head + writ, size - writ);
+                tb_long_t real = impl->writ(stream, head + writ, size - writ);
 
                 // ok?
                 if (real > 0)
@@ -898,7 +1005,7 @@ tb_bool_t tb_stream_sync(tb_stream_ref_t stream, tb_bool_t bclosing)
                 else if (!real)
                 {
                     // wait
-                    real = impl->wait(impl, TB_STREAM_WAIT_WRIT, tb_stream_timeout(stream));
+                    real = impl->wait(stream, TB_STREAM_WAIT_WRIT, tb_stream_timeout(stream));
 
                     // ok?
                     tb_check_break(real > 0);
@@ -925,7 +1032,7 @@ tb_bool_t tb_stream_sync(tb_stream_ref_t stream, tb_bool_t bclosing)
     }
 
     // sync
-    return impl->sync? impl->sync(impl, bclosing) : tb_true;
+    return impl->sync? impl->sync(stream, bclosing) : tb_true;
 }
 tb_bool_t tb_stream_seek(tb_stream_ref_t stream, tb_hize_t offset)
 {
@@ -954,7 +1061,7 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t stream, tb_hize_t offset)
         tb_assert_and_check_return_val(!tb_queue_buffer_maxn(&impl->cache) || tb_queue_buffer_null(&impl->cache), tb_false);
 
         // seek it
-        tb_bool_t ok = impl->seek? impl->seek(impl, offset) : tb_false;
+        tb_bool_t ok = impl->seek? impl->seek(stream, offset) : tb_false;
 
         // save offset
         if (ok) impl->offset = offset;
@@ -985,7 +1092,7 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t stream, tb_hize_t offset)
         if (!ok)
         {
             // seek it
-            ok = impl->seek? impl->seek(impl, offset) : tb_false;
+            ok = impl->seek? impl->seek(stream, offset) : tb_false;
 
             // ok?
             if (ok)
