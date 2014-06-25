@@ -36,6 +36,13 @@
 #include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the stream impl
+#define tb_stream_impl(stream) &(((tb_stream_impl_t*)stream)[-1])
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -106,7 +113,6 @@ typedef struct __tb_stream_impl_t
     tb_void_t           (*kill)(tb_stream_ref_t stream);
 
 }tb_stream_impl_t;
-
 
 
 #endif

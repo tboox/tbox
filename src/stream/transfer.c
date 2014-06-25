@@ -45,24 +45,24 @@ tb_hong_t tb_transfer_done(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_
     tb_assert_and_check_return_val(ostream && istream, -1); 
 
     // open it first if istream have been not opened
-    if (tb_stream_is_closed(istream) && tb_stream_is_closed(istream)) return -1;
+    if (tb_stream_is_closed(istream) && !tb_stream_open(istream)) return -1;
     
     // open it first if ostream have been not opened
-    if (tb_stream_is_closed(ostream) && tb_stream_is_closed(ostream)) return -1;
+    if (tb_stream_is_closed(ostream) && !tb_stream_open(ostream)) return -1;
                 
     // done func
     if (func) func(TB_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);
 
     // writ data
-    tb_byte_t   data[TB_STREAM_BLOCK_MAXN];
-    tb_hize_t   writ = 0;
-    tb_hize_t   left = tb_stream_left(istream);
-    tb_hong_t   base = tb_cache_time_spak();
-    tb_hong_t   base1s = base;
-    tb_hong_t   time = 0;
-    tb_size_t   crate = 0;
-    tb_long_t   delay = 0;
-    tb_size_t   writ1s = 0;
+    tb_byte_t data[TB_STREAM_BLOCK_MAXN];
+    tb_hize_t writ = 0;
+    tb_hize_t left = tb_stream_left(istream);
+    tb_hong_t base = tb_cache_time_spak();
+    tb_hong_t base1s = base;
+    tb_hong_t time = 0;
+    tb_size_t crate = 0;
+    tb_long_t delay = 0;
+    tb_size_t writ1s = 0;
     do
     {
         // the need
@@ -162,8 +162,8 @@ tb_hong_t tb_transfer_done_stream_to_url(tb_stream_ref_t istream, tb_char_t cons
     tb_assert_and_check_return_val(istream && ourl, -1);
 
     // done
-    tb_hong_t       size = -1;
-    tb_stream_ref_t  ostream = tb_null;
+    tb_hong_t           size = -1;
+    tb_stream_ref_t     ostream = tb_null;
     do
     {
         // init ostream
@@ -195,8 +195,8 @@ tb_hong_t tb_transfer_done_stream_to_data(tb_stream_ref_t istream, tb_byte_t* od
     tb_assert_and_check_return_val(istream && odata && osize, -1);
 
     // done
-    tb_hong_t       size = -1;
-    tb_stream_ref_t  ostream = tb_null;
+    tb_hong_t           size = -1;
+    tb_stream_ref_t     ostream = tb_null;
     do
     {
         // init ostream
@@ -221,9 +221,9 @@ tb_hong_t tb_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ou
     tb_assert_and_check_return_val(iurl && ourl, -1);
 
     // done
-    tb_hong_t       size = -1;
-    tb_stream_ref_t  istream = tb_null;
-    tb_stream_ref_t  ostream = tb_null;
+    tb_hong_t           size = -1;
+    tb_stream_ref_t     istream = tb_null;
+    tb_stream_ref_t     ostream = tb_null;
     do
     {
         // init istream
@@ -269,8 +269,8 @@ tb_hong_t tb_transfer_done_url_to_stream(tb_char_t const* iurl, tb_stream_ref_t 
     tb_assert_and_check_return_val(iurl && ostream, -1);
 
     // done
-    tb_hong_t       size = -1;
-    tb_stream_ref_t  istream = tb_null;
+    tb_hong_t           size = -1;
+    tb_stream_ref_t     istream = tb_null;
     do
     {
         // init istream
@@ -295,9 +295,9 @@ tb_hong_t tb_transfer_done_url_to_data(tb_char_t const* iurl, tb_byte_t* odata, 
     tb_assert_and_check_return_val(iurl && odata && osize, -1);
 
     // done
-    tb_hong_t       size = -1;
-    tb_stream_ref_t  istream = tb_null;
-    tb_stream_ref_t  ostream = tb_null;
+    tb_hong_t           size = -1;
+    tb_stream_ref_t     istream = tb_null;
+    tb_stream_ref_t     ostream = tb_null;
     do
     {
         // init istream
@@ -330,9 +330,9 @@ tb_hong_t tb_transfer_done_data_to_url(tb_byte_t const* idata, tb_size_t isize, 
     tb_assert_and_check_return_val(idata && isize && ourl, -1);
 
     // done
-    tb_hong_t       size = -1;
-    tb_stream_ref_t  istream = tb_null;
-    tb_stream_ref_t  ostream = tb_null;
+    tb_hong_t           size = -1;
+    tb_stream_ref_t     istream = tb_null;
+    tb_stream_ref_t     ostream = tb_null;
     do
     {
         // init istream
@@ -372,8 +372,8 @@ tb_hong_t tb_transfer_done_data_to_stream(tb_byte_t const* idata, tb_size_t isiz
     tb_assert_and_check_return_val(idata && isize && ostream, -1);
 
     // done
-    tb_hong_t       size = -1;
-    tb_stream_ref_t  istream = tb_null;
+    tb_hong_t           size = -1;
+    tb_stream_ref_t     istream = tb_null;
     do
     {
         // init istream

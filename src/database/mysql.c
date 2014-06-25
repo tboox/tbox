@@ -214,7 +214,7 @@ static tb_size_t tb_database_mysql_state_from_errno(tb_size_t errno)
 static tb_bool_t tb_database_mysql_stream_impl_open(tb_stream_ref_t stream)
 {
     // check
-    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     tb_assert_and_check_return_val(impl && impl->stmt, tb_false);
 
     // check result
@@ -226,7 +226,7 @@ static tb_bool_t tb_database_mysql_stream_impl_open(tb_stream_ref_t stream)
 static tb_bool_t tb_database_mysql_stream_impl_clos(tb_stream_ref_t stream)
 {
     // check
-    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     tb_assert_and_check_return_val(impl, tb_false);
     
     // ok
@@ -235,7 +235,7 @@ static tb_bool_t tb_database_mysql_stream_impl_clos(tb_stream_ref_t stream)
 static tb_long_t tb_database_mysql_stream_impl_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     tb_assert_and_check_return_val(impl && impl->stmt, -1);
 
     // check data and size
@@ -275,7 +275,7 @@ static tb_long_t tb_database_mysql_stream_impl_read(tb_stream_ref_t stream, tb_b
 static tb_long_t tb_database_mysql_stream_impl_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
 {
     // check
-    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     tb_assert_and_check_return_val(impl, -1);
 
     // ok?
@@ -284,7 +284,7 @@ static tb_long_t tb_database_mysql_stream_impl_wait(tb_stream_ref_t stream, tb_s
 static tb_bool_t tb_database_mysql_stream_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
-    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     tb_assert_and_check_return_val(impl, tb_false);
 
     // ctrl
@@ -329,7 +329,7 @@ static tb_stream_ref_t tb_database_mysql_stream_impl_init(MYSQL_STMT* stmt, MYSQ
     tb_assert_and_check_return_val(stream, tb_null);
 
     // init the stream impl
-    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_NONE);
+    tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     if (impl)
     {
         impl->stmt      = stmt;
