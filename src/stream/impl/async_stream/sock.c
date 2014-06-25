@@ -138,7 +138,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_clear(tb_async_stream_sock_impl_
 static tb_void_t tb_async_stream_sock_impl_clos_func(tb_handle_t aico, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_handle_t)priv);
+    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
     tb_assert_and_check_return(impl && impl->func.clos);
 
     // trace
@@ -159,7 +159,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_func(tb_handle_t aico, tb_cpoint
 static tb_void_t tb_async_stream_sock_impl_clos_dns_func(tb_handle_t aico, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_handle_t)priv);
+    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
     tb_assert_and_check_return(impl);
 
     // trace
@@ -177,7 +177,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_dns_func(tb_handle_t aico, tb_cp
 static tb_void_t tb_async_stream_sock_impl_clos_aico_func(tb_handle_t aico, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_handle_t)priv);
+    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
     tb_assert_and_check_return(impl);
 
     // trace
@@ -201,7 +201,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_aico_func(tb_handle_t aico, tb_c
 static tb_void_t tb_async_stream_sock_impl_clos_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_handle_t)priv);
+    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
     tb_assert_and_check_return(impl && impl->func.clos);
 
     // trace
@@ -299,7 +299,7 @@ static tb_bool_t tb_async_stream_sock_impl_clos(tb_async_stream_ref_t stream, tb
 static tb_bool_t tb_async_stream_sock_impl_open_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_handle_t)priv);
+    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
     tb_assert_and_check_return_val(ssl && impl->func.open, tb_false);
 
     // trace
@@ -342,7 +342,7 @@ static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CONN, tb_false);
 
     // the stream
-    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_handle_t)aice->priv);
+    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)aice->priv);
     tb_assert_and_check_return_val(impl && impl->func.open, tb_false);
 
     // done
@@ -398,7 +398,7 @@ static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_t const* aice)
 static tb_void_t tb_async_stream_sock_impl_dns_func(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_handle_t)priv);
+    tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
     tb_assert_and_check_return(haddr && impl && impl->func.open);
 
     // done

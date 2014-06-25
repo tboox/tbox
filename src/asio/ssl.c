@@ -861,7 +861,7 @@ tb_handle_t tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver)
     do
     {
         // make ssl
-        ssl = tb_malloc0(sizeof(tb_aicp_ssl_t));
+        ssl = tb_malloc_type(tb_aicp_ssl_t);
         tb_assert_and_check_break(ssl);
 
         // init state

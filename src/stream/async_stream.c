@@ -470,7 +470,7 @@ tb_async_stream_ref_t tb_async_stream_init( tb_aicp_t* aicp
         stream = (tb_async_stream_ref_t)&impl[1];
 
         // init type
-        impl->type = type;
+        impl->type = (tb_uint8_t)type;
 
         // init timeout, 10s
         impl->timeout = TB_STREAM_DEFAULT_TIMEOUT;

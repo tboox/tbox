@@ -80,6 +80,9 @@ typedef tb_bool_t       (*tb_async_transfer_ctrl_func_t)(tb_async_stream_ref_t i
  */
 typedef tb_bool_t       (*tb_async_transfer_done_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv);
 
+/// the async transfer ref type
+typedef struct{}*       tb_async_transfer_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -91,7 +94,7 @@ typedef tb_bool_t       (*tb_async_transfer_done_func_t)(tb_size_t state, tb_hiz
  *
  * @return              the async transfer 
  */
-tb_handle_t             tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autoclosing);
+tb_async_transfer_ref_t tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autoclosing);
 
 /*! init istream
  *
@@ -100,7 +103,7 @@ tb_handle_t             tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autocl
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_init_istream(tb_handle_t transfer, tb_async_stream_ref_t stream);
+tb_bool_t               tb_async_transfer_init_istream(tb_async_transfer_ref_t transfer, tb_async_stream_ref_t stream);
 
 /*! init istream from url
  *
@@ -109,7 +112,7 @@ tb_bool_t               tb_async_transfer_init_istream(tb_handle_t transfer, tb_
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_init_istream_from_url(tb_handle_t transfer, tb_char_t const* url);
+tb_bool_t               tb_async_transfer_init_istream_from_url(tb_async_transfer_ref_t transfer, tb_char_t const* url);
 
 /*! init istream from data
  *
@@ -119,7 +122,7 @@ tb_bool_t               tb_async_transfer_init_istream_from_url(tb_handle_t tran
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_init_istream_from_data(tb_handle_t transfer, tb_byte_t const* data, tb_size_t size);
+tb_bool_t               tb_async_transfer_init_istream_from_data(tb_async_transfer_ref_t transfer, tb_byte_t const* data, tb_size_t size);
 
 /*! init ostream
  *
@@ -128,7 +131,7 @@ tb_bool_t               tb_async_transfer_init_istream_from_data(tb_handle_t tra
  *
  * @return              the async transfer 
  */
-tb_bool_t               tb_async_transfer_init_ostream(tb_handle_t transfer, tb_async_stream_ref_t stream);
+tb_bool_t               tb_async_transfer_init_ostream(tb_async_transfer_ref_t transfer, tb_async_stream_ref_t stream);
 
 /*! init ostream from url
  *
@@ -137,7 +140,7 @@ tb_bool_t               tb_async_transfer_init_ostream(tb_handle_t transfer, tb_
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_init_ostream_from_url(tb_handle_t transfer, tb_char_t const* url);
+tb_bool_t               tb_async_transfer_init_ostream_from_url(tb_async_transfer_ref_t transfer, tb_char_t const* url);
 
 /*! init ostream from data
  *
@@ -147,7 +150,7 @@ tb_bool_t               tb_async_transfer_init_ostream_from_url(tb_handle_t tran
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_init_ostream_from_data(tb_handle_t transfer, tb_byte_t* data, tb_size_t size);
+tb_bool_t               tb_async_transfer_init_ostream_from_data(tb_async_transfer_ref_t transfer, tb_byte_t* data, tb_size_t size);
 
 /*! ctrl istream
  *
@@ -158,7 +161,7 @@ tb_bool_t               tb_async_transfer_init_ostream_from_data(tb_handle_t tra
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_ctrl_istream(tb_handle_t transfer, tb_size_t ctrl, ...);
+tb_bool_t               tb_async_transfer_ctrl_istream(tb_async_transfer_ref_t transfer, tb_size_t ctrl, ...);
 
 /*! ctrl ostream
  *
@@ -169,7 +172,7 @@ tb_bool_t               tb_async_transfer_ctrl_istream(tb_handle_t transfer, tb_
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_ctrl_ostream(tb_handle_t transfer, tb_size_t ctrl, ...);
+tb_bool_t               tb_async_transfer_ctrl_ostream(tb_async_transfer_ref_t transfer, tb_size_t ctrl, ...);
 
 /*! ctrl transfer
  *
@@ -180,7 +183,7 @@ tb_bool_t               tb_async_transfer_ctrl_ostream(tb_handle_t transfer, tb_
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_ctrl(tb_handle_t transfer, tb_async_transfer_ctrl_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_async_transfer_ctrl(tb_async_transfer_ref_t transfer, tb_async_transfer_ctrl_func_t func, tb_cpointer_t priv);
 
 /*! open transfer
  *
@@ -191,7 +194,7 @@ tb_bool_t               tb_async_transfer_ctrl(tb_handle_t transfer, tb_async_tr
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_open(tb_handle_t transfer, tb_hize_t offset, tb_async_transfer_open_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_async_transfer_open(tb_async_transfer_ref_t transfer, tb_hize_t offset, tb_async_transfer_open_func_t func, tb_cpointer_t priv);
 
 /*! clos transfer
  *
@@ -201,7 +204,7 @@ tb_bool_t               tb_async_transfer_open(tb_handle_t transfer, tb_hize_t o
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_clos(tb_handle_t transfer, tb_async_transfer_clos_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_async_transfer_clos(tb_async_transfer_ref_t transfer, tb_async_transfer_clos_func_t func, tb_cpointer_t priv);
 
 /*! try closing transfer
  *
@@ -209,7 +212,7 @@ tb_bool_t               tb_async_transfer_clos(tb_handle_t transfer, tb_async_tr
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_clos_try(tb_handle_t transfer);
+tb_bool_t               tb_async_transfer_clos_try(tb_async_transfer_ref_t transfer);
 
 /*! done transfer and will close it automaticly
  *
@@ -219,7 +222,7 @@ tb_bool_t               tb_async_transfer_clos_try(tb_handle_t transfer);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_done(tb_handle_t transfer, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_async_transfer_done(tb_async_transfer_ref_t transfer, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
 
 /*! open and done transfer and will close it automaticly
  *
@@ -240,7 +243,7 @@ tb_bool_t               tb_async_transfer_done(tb_handle_t transfer, tb_async_tr
     }
 
     // init transfer
-    tb_handle_t transfer = tb_async_transfer_init(tb_null);
+    tb_async_transfer_ref_t transfer = tb_async_transfer_init(tb_null);
     if (transfer)
     {
         // init stream
@@ -269,13 +272,13 @@ tb_bool_t               tb_async_transfer_done(tb_handle_t transfer, tb_async_tr
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_open_done(tb_handle_t transfer, tb_hize_t offset, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_async_transfer_open_done(tb_async_transfer_ref_t transfer, tb_hize_t offset, tb_async_transfer_done_func_t func, tb_cpointer_t priv);
 
 /*! kill transfer 
  *
  * @param transfer      the async transfer
  */
-tb_void_t               tb_async_transfer_kill(tb_handle_t transfer);
+tb_void_t               tb_async_transfer_kill(tb_async_transfer_ref_t transfer);
 
 /*! exit transfer 
  *
@@ -285,7 +288,7 @@ tb_void_t               tb_async_transfer_kill(tb_handle_t transfer);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_exit(tb_handle_t transfer);
+tb_bool_t               tb_async_transfer_exit(tb_async_transfer_ref_t transfer);
 
 /*! pause transfer 
  *
@@ -293,7 +296,7 @@ tb_bool_t               tb_async_transfer_exit(tb_handle_t transfer);
  *
  * @param transfer      the async transfer
  */
-tb_void_t               tb_async_transfer_pause(tb_handle_t transfer);
+tb_void_t               tb_async_transfer_pause(tb_async_transfer_ref_t transfer);
 
 /*! resume transfer 
  *
@@ -301,14 +304,14 @@ tb_void_t               tb_async_transfer_pause(tb_handle_t transfer);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_resume(tb_handle_t transfer);
+tb_bool_t               tb_async_transfer_resume(tb_async_transfer_ref_t transfer);
 
 /*! limit transfer rate  
  *
  * @param transfer      the async transfer
  * @param rate          the trasfer rate and no limit if 0, bytes/s
  */
-tb_void_t               tb_async_transfer_limitrate(tb_handle_t transfer, tb_size_t rate);
+tb_void_t               tb_async_transfer_limitrate(tb_async_transfer_ref_t transfer, tb_size_t rate);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

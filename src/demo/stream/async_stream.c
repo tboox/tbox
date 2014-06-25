@@ -23,13 +23,13 @@ typedef struct __tb_demo_context_t
     tb_bool_t               verbose;
 
     // the istream
-    tb_async_stream_ref_t      istream;
+    tb_async_stream_ref_t   istream;
 
     // the ostream
-    tb_async_stream_ref_t      ostream;
+    tb_async_stream_ref_t   ostream;
 
     // the transfer
-    tb_handle_t             transfer;
+    tb_async_transfer_ref_t transfer;
 
     // the event
     tb_handle_t             event;
@@ -142,7 +142,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_ref_t stream, tb_size
         tb_assert_and_check_break(context->transfer);
 
         // init transfer stream
-        if (!tb_async_transfer_init_istream(context->transfer, (tb_async_stream_ref_t)stream)) break;
+        if (!tb_async_transfer_init_istream(context->transfer, stream)) break;
         if (!tb_async_transfer_init_ostream(context->transfer, context->ostream)) break;
 
         // open and done transfer

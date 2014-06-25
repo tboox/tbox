@@ -97,22 +97,22 @@ typedef struct __tb_aicp_http_t
     tb_http_status_t                status;
 
     // the stream
-    tb_async_stream_ref_t              stream;
+    tb_async_stream_ref_t           stream;
 
     // the sstream for sock
-    tb_async_stream_ref_t              sstream;
+    tb_async_stream_ref_t           sstream;
 
     // the cstream for chunked
-    tb_async_stream_ref_t              cstream;
+    tb_async_stream_ref_t           cstream;
 
     // the zstream for gzip/deflate
-    tb_async_stream_ref_t              zstream;
+    tb_async_stream_ref_t           zstream;
 
     // the cookies
     tb_string_t                     cookies;
 
     // the transfer for post
-    tb_handle_t                     transfer;
+    tb_async_transfer_ref_t         transfer;
 
     // the pool for string
     tb_handle_t                     pool;
