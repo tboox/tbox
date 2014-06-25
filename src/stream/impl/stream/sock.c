@@ -670,7 +670,7 @@ tb_stream_ref_t tb_stream_init_sock()
     }
 
     // ok?
-    return (tb_stream_ref_t)stream;
+    return stream;
 }
 tb_stream_ref_t tb_stream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
 {

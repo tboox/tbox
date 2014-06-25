@@ -61,7 +61,7 @@ tb_stream_ref_t tb_stream_init(     tb_size_t type
     // check
     tb_assert_and_check_return_val(type_size, tb_null);
     tb_assert_and_check_return_val(open && clos && ctrl && wait, tb_null);
-    tb_assert_and_check_return_val(read || wait, tb_null);
+    tb_assert_and_check_return_val(read || writ, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
@@ -101,7 +101,7 @@ tb_stream_ref_t tb_stream_init(     tb_size_t type
         impl->writ = writ;
         impl->seek = seek;
         impl->sync = sync;
-        impl->ctrl = ctrl;
+        impl->kill = kill;
 
         // ok
         ok = tb_true;
