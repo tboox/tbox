@@ -56,7 +56,11 @@ typedef struct __tb_stream_file_impl_t
  */
 static __tb_inline__ tb_stream_file_impl_t* tb_stream_file_impl_cast(tb_stream_ref_t stream)
 {
-    return (tb_stream_file_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_FILE);
+    // check
+    tb_assert_and_check_return_val(stream && tb_stream_type(stream) == TB_STREAM_TYPE_FILE, tb_null);
+
+    // ok?
+    return (tb_stream_file_impl_t*)stream;
 }
 static tb_bool_t tb_stream_file_impl_open(tb_stream_ref_t stream)
 {

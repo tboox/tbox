@@ -61,7 +61,11 @@ typedef struct __tb_stream_filter_impl_t
  */
 static __tb_inline__ tb_stream_filter_impl_t* tb_stream_filter_impl_cast(tb_stream_ref_t stream)
 {
-    return (tb_stream_filter_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_FLTR);
+    // check
+    tb_assert_and_check_return_val(stream && tb_stream_type(stream) == TB_STREAM_TYPE_FLTR, tb_null);
+
+    // ok?
+    return (tb_stream_filter_impl_t*)stream;
 }
 static tb_bool_t tb_stream_filter_impl_open(tb_stream_ref_t stream)
 {
@@ -309,7 +313,7 @@ static tb_bool_t tb_stream_filter_impl_ctrl(tb_stream_ref_t stream, tb_size_t ct
     case TB_STREAM_CTRL_FLTR_SET_STREAM:
         {
             // check
-            tb_assert_and_check_break(tb_stream_is_closed((tb_stream_ref_t)stream));
+            tb_assert_and_check_break(tb_stream_is_closed(stream));
 
             // set stream
             impl->stream = (tb_stream_ref_t)tb_va_arg(args, tb_stream_ref_t);
@@ -332,7 +336,7 @@ static tb_bool_t tb_stream_filter_impl_ctrl(tb_stream_ref_t stream, tb_size_t ct
     case TB_STREAM_CTRL_FLTR_SET_FILTER:
         {
             // check
-            tb_assert_and_check_break(tb_stream_is_closed((tb_stream_ref_t)stream));
+            tb_assert_and_check_break(tb_stream_is_closed(stream));
 
             // exit filter first if exists
             if (!impl->bref && impl->filter) tb_stream_filter_exit(impl->filter);

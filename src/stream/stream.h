@@ -223,7 +223,7 @@ __tb_extern_c_enter__
     static tb_bool_t tb_stream_xxxx_impl_open(tb_stream_ref_t stream)
     {
         // check
-        tb_stream_xxxx_impl_t* impl = (tb_stream_xxxx_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_XXXX);
+        tb_stream_xxxx_impl_t* impl = (tb_stream_xxxx_impl_t*)stream;
         tb_assert_and_check_return_val(impl, tb_false);
 
         // ok
@@ -232,7 +232,7 @@ __tb_extern_c_enter__
     static tb_bool_t tb_stream_xxxx_impl_clos(tb_stream_ref_t stream)
     {
         // check
-        tb_stream_xxxx_impl_t* impl = (tb_stream_xxxx_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_XXXX);
+        tb_stream_xxxx_impl_t* impl = (tb_stream_xxxx_impl_t*)stream;
         tb_assert_and_check_return_val(impl, tb_false);
 
         // ok
@@ -311,15 +311,6 @@ tb_stream_ref_t         tb_stream_init_filter(tb_noarg_t);
  * @param stream        the stream
  */
 tb_void_t               tb_stream_exit(tb_stream_ref_t stream);
-
-/*! get the stream impl for the given stream type
- *
- * @param stream        the stream
- * @param type          the stream type
- *
- * @return              the stream impl
- */
-tb_handle_t             tb_stream_impl(tb_stream_ref_t stream, tb_size_t type);
 
 /*! init stream from url
  *

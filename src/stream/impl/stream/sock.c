@@ -87,7 +87,11 @@ typedef struct __tb_stream_sock_impl_t
  */
 static __tb_inline__ tb_stream_sock_impl_t* tb_stream_sock_impl_cast(tb_stream_ref_t stream)
 {
-    return (tb_stream_sock_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_SOCK);
+    // check
+    tb_assert_and_check_return_val(stream && tb_stream_type(stream) == TB_STREAM_TYPE_SOCK, tb_null);
+
+    // ok?
+    return (tb_stream_sock_impl_t*)stream;
 }
 static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
 {
@@ -164,11 +168,6 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
         tb_stream_state_set(stream, TB_STATE_SOCK_OPEN_FAILED);
         return tb_false;
     }
-
-    // resize cache 
-    tb_size_t recv_cache = tb_socket_recv_buffer_size(impl->sock);
-    tb_size_t send_cache = tb_socket_send_buffer_size(impl->sock);
-    if (recv_cache || send_cache) tb_queue_buffer_resize(&((tb_stream_impl_t*)stream)->cache, tb_max(recv_cache, send_cache));
 
     // done
     tb_bool_t ok = tb_false;

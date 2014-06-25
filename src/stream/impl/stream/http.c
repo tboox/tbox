@@ -43,7 +43,11 @@ typedef struct __tb_stream_http_impl_t
  */
 static __tb_inline__ tb_stream_http_impl_t* tb_stream_http_impl_cast(tb_stream_ref_t stream)
 {
-    return (tb_stream_http_impl_t*)tb_stream_impl(stream, TB_STREAM_TYPE_HTTP);
+    // check
+    tb_assert_and_check_return_val(stream && tb_stream_type(stream) == TB_STREAM_TYPE_HTTP, tb_null);
+
+    // ok?
+    return (tb_stream_http_impl_t*)stream;
 }
 static tb_bool_t tb_stream_http_impl_open(tb_stream_ref_t stream)
 {
@@ -569,19 +573,50 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
  */
 tb_stream_ref_t tb_stream_init_http()
 {
-    return tb_stream_init(  TB_STREAM_TYPE_HTTP
-                        ,   sizeof(tb_stream_http_impl_t)
-                        ,   0
-                        ,   tb_stream_http_impl_open
-                        ,   tb_stream_http_impl_clos
-                        ,   tb_stream_http_impl_exit
-                        ,   tb_stream_http_impl_ctrl
-                        ,   tb_stream_http_impl_wait
-                        ,   tb_stream_http_impl_read
-                        ,   tb_null
-                        ,   tb_stream_http_impl_seek
-                        ,   tb_null
-                        ,   tb_stream_http_impl_kill);
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_stream_ref_t stream = tb_null;
+    do
+    {
+        // init stream
+        stream = tb_stream_init(    TB_STREAM_TYPE_HTTP
+                                ,   sizeof(tb_stream_http_impl_t)
+                                ,   0
+                                ,   tb_stream_http_impl_open
+                                ,   tb_stream_http_impl_clos
+                                ,   tb_stream_http_impl_exit
+                                ,   tb_stream_http_impl_ctrl
+                                ,   tb_stream_http_impl_wait
+                                ,   tb_stream_http_impl_read
+                                ,   tb_null
+                                ,   tb_stream_http_impl_seek
+                                ,   tb_null
+                                ,   tb_stream_http_impl_kill);
+        tb_assert_and_check_break(stream);
+
+        // init the stream impl
+        tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
+        tb_assert_and_check_break(impl);
+    
+        // init http
+        impl->http = tb_http_init();
+        tb_assert_and_check_break(impl->http);
+    
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (stream) tb_stream_exit(stream);
+        stream = tb_null;
+    }
+
+    // ok?
+    return (tb_stream_ref_t)stream;
 }
 tb_stream_ref_t tb_stream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
 {
