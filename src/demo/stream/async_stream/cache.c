@@ -26,9 +26,9 @@ tb_int_t tb_demo_stream_async_stream_cache_main(tb_int_t argc, tb_char_t** argv)
     // done
     tb_handle_t         event = tb_null;
     tb_handle_t         transfer = tb_null;
-    tb_async_stream_t*  istream = tb_null;
-    tb_async_stream_t*  ostream = tb_null;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_async_stream_ref_t  istream = tb_null;
+    tb_async_stream_ref_t  ostream = tb_null;
+    tb_async_stream_ref_t  fstream = tb_null;
     do
     {
         // init event
@@ -44,8 +44,8 @@ tb_int_t tb_demo_stream_async_stream_cache_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(ostream);
 
         // filter istream or ostream?
-        tb_async_stream_t* iostream = istream;
-//      tb_async_stream_t* iostream = ostream;
+        tb_async_stream_ref_t iostream = istream;
+//      tb_async_stream_ref_t iostream = ostream;
 
         // init fstream
         fstream = tb_async_stream_init_filter_from_cache(iostream, 0);

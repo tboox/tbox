@@ -218,19 +218,32 @@ static tb_bool_t tb_stream_file_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
  */
 tb_stream_ref_t tb_stream_init_file()
 {
-    return tb_stream_init(  TB_STREAM_TYPE_FILE
-                        ,   sizeof(tb_stream_file_impl_t)
-                        ,   TB_STREAM_FILE_CACHE_MAXN
-                        ,   tb_stream_file_impl_open
-                        ,   tb_stream_file_impl_clos
-                        ,   tb_null
-                        ,   tb_stream_file_impl_ctrl
-                        ,   tb_stream_file_impl_wait
-                        ,   tb_stream_file_impl_read
-                        ,   tb_stream_file_impl_writ
-                        ,   tb_stream_file_impl_seek
-                        ,   tb_stream_file_impl_sync
-                        ,   tb_null);
+    // init stream
+    tb_stream_ref_t stream = tb_stream_init(    TB_STREAM_TYPE_FILE
+                                            ,   sizeof(tb_stream_file_impl_t)
+                                            ,   TB_STREAM_FILE_CACHE_MAXN
+                                            ,   tb_stream_file_impl_open
+                                            ,   tb_stream_file_impl_clos
+                                            ,   tb_null
+                                            ,   tb_stream_file_impl_ctrl
+                                            ,   tb_stream_file_impl_wait
+                                            ,   tb_stream_file_impl_read
+                                            ,   tb_stream_file_impl_writ
+                                            ,   tb_stream_file_impl_seek
+                                            ,   tb_stream_file_impl_sync
+                                            ,   tb_null);
+    tb_assert_and_check_return_val(stream, tb_null);
+
+    // init the stream impl
+    tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
+    if (impl)
+    {
+        // init mode
+        impl->mode = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+    }
+
+    // ok?
+    return (tb_stream_ref_t)stream;
 }
 tb_stream_ref_t tb_stream_init_from_file(tb_char_t const* path, tb_size_t mode)
 {

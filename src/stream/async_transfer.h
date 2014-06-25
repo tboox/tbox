@@ -65,7 +65,7 @@ typedef tb_void_t       (*tb_async_transfer_clos_func_t)(tb_size_t state, tb_cpo
  *
  * @return              tb_true: ok, tb_false: break it
  */
-typedef tb_bool_t       (*tb_async_transfer_ctrl_func_t)(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_cpointer_t priv);
+typedef tb_bool_t       (*tb_async_transfer_ctrl_func_t)(tb_async_stream_ref_t istream, tb_async_stream_ref_t ostream, tb_cpointer_t priv);
 
 /*! the async transfer done func type
  *
@@ -100,7 +100,7 @@ tb_handle_t             tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autocl
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_transfer_init_istream(tb_handle_t transfer, tb_async_stream_t* stream);
+tb_bool_t               tb_async_transfer_init_istream(tb_handle_t transfer, tb_async_stream_ref_t stream);
 
 /*! init istream from url
  *
@@ -128,7 +128,7 @@ tb_bool_t               tb_async_transfer_init_istream_from_data(tb_handle_t tra
  *
  * @return              the async transfer 
  */
-tb_bool_t               tb_async_transfer_init_ostream(tb_handle_t transfer, tb_async_stream_t* stream);
+tb_bool_t               tb_async_transfer_init_ostream(tb_handle_t transfer, tb_async_stream_ref_t stream);
 
 /*! init ostream from url
  *

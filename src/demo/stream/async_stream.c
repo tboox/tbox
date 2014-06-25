@@ -23,10 +23,10 @@ typedef struct __tb_demo_context_t
     tb_bool_t               verbose;
 
     // the istream
-    tb_async_stream_t*      istream;
+    tb_async_stream_ref_t      istream;
 
     // the ostream
-    tb_async_stream_t*      ostream;
+    tb_async_stream_ref_t      ostream;
 
     // the transfer
     tb_handle_t             transfer;
@@ -76,7 +76,7 @@ static tb_bool_t tb_demo_transfer_done_func(tb_size_t state, tb_hize_t offset, t
     // ok?
     return (state == TB_STATE_OK)? tb_true : tb_false;
 }
-static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_demo_istream_open_func(tb_async_stream_ref_t stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_demo_context_t* context = (tb_demo_context_t*)priv;
@@ -109,7 +109,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* stream, tb_size_t 
             tb_char_t const* path = tb_option_item_cstr(context->option, "more0");
 
             // init
-            context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_t*)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+            context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_ref_t)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
             // print verbose info
             if (context->verbose) tb_printf("save: %s: ..\n", path);
@@ -129,7 +129,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* stream, tb_size_t 
                 tb_strcat(path, name);
 
                 // init file
-                context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_t*)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+                context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_ref_t)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
                 // print verbose info
                 if (context->verbose) tb_printf("save: %s: ..\n", path);
@@ -142,7 +142,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_t* stream, tb_size_t 
         tb_assert_and_check_break(context->transfer);
 
         // init transfer stream
-        if (!tb_async_transfer_init_istream(context->transfer, (tb_async_stream_t*)stream)) break;
+        if (!tb_async_transfer_init_istream(context->transfer, (tb_async_stream_ref_t)stream)) break;
         if (!tb_async_transfer_init_ostream(context->transfer, context->ostream)) break;
 
         // open and done transfer

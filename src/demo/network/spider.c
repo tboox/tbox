@@ -398,7 +398,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
     // break or continue?
     return ok;
 }
-static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_t* istream, tb_async_stream_t* ostream, tb_cpointer_t priv)
+static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_ref_t istream, tb_async_stream_ref_t ostream, tb_cpointer_t priv)
 {
     // check
     tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;

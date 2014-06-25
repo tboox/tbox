@@ -35,57 +35,61 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_async_stream_clos_opening(tb_async_stream_t* stream, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_clos_opening(tb_async_stream_ref_t stream, tb_size_t state, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return(stream);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl(stream);
+    tb_assert_and_check_return(impl);
 
     // trace
-    tb_trace_d("clos: opening: %s, state: %s", tb_url_get(&stream->url), tb_state_cstr(stream->clos_opening.state));
+    tb_trace_d("clos: opening: %s, state: %s", tb_url_get(&impl->url), tb_state_cstr(impl->clos_opening.state));
 
     // closed
-    tb_atomic_set(&stream->istate, TB_STATE_CLOSED);
+    tb_atomic_set(&impl->istate, TB_STATE_CLOSED);
 
     // done func
-    if (stream->clos_opening.func) stream->clos_opening.func(stream, stream->clos_opening.state, stream->clos_opening.priv);
+    if (impl->clos_opening.func) impl->clos_opening.func(stream, impl->clos_opening.state, impl->clos_opening.priv);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private interfaces
  */
-tb_void_t tb_async_stream_clear(tb_async_stream_t* stream)
+tb_void_t tb_async_stream_clear(tb_async_stream_ref_t stream)
 {
     // check
-    tb_assert_and_check_return(stream);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl(stream);
+    tb_assert_and_check_return(impl);
 
     // clear rcache
-    tb_buffer_clear(&stream->rcache_data);
+    tb_buffer_clear(&impl->rcache_data);
 
     // clear wcache
-    tb_buffer_clear(&stream->wcache_data);
+    tb_buffer_clear(&impl->wcache_data);
 
     // clear istate
-    tb_atomic_set(&stream->istate, TB_STATE_CLOSED);
+    tb_atomic_set(&impl->istate, TB_STATE_CLOSED);
 }
-tb_void_t tb_async_stream_open_done(tb_async_stream_t* stream)
+tb_void_t tb_async_stream_open_done(tb_async_stream_ref_t stream)
 {
     // check
-    tb_assert_and_check_return(stream);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl(stream);
+    tb_assert_and_check_return(impl);
 
     // opened or closed?
-    tb_atomic_set(&stream->istate, TB_STATE_OPENED);
+    tb_atomic_set(&impl->istate, TB_STATE_OPENED);
 }
-tb_bool_t tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv)
+tb_bool_t tb_async_stream_open_func(tb_async_stream_ref_t stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_false);
+    tb_async_stream_impl_t* impl = tb_async_stream_impl(stream);
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // ok?
     tb_bool_t ok = tb_true;
     if (state == TB_STATE_OK) 
     {
         // opened
-        tb_atomic_set(&stream->istate, TB_STATE_OPENED);
+        tb_atomic_set(&impl->istate, TB_STATE_OPENED);
 
         // done func
         if (func) ok = func(stream, state, priv);
@@ -94,10 +98,10 @@ tb_bool_t tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, 
     else 
     {
         // try closing ok?
-        if (stream->clos_try && stream->clos_try(stream))
+        if (impl->clos_try && impl->clos_try(stream))
         {
             // closed
-            tb_atomic_set(&stream->istate, TB_STATE_CLOSED);
+            tb_atomic_set(&impl->istate, TB_STATE_CLOSED);
 
             // done func
             if (func) func(stream, state, priv);
@@ -105,15 +109,15 @@ tb_bool_t tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, 
         else
         {
             // check
-            tb_assert_and_check_return_val(stream->clos, tb_false);
+            tb_assert_and_check_return_val(impl->clos, tb_false);
 
             // init func and state
-            stream->clos_opening.func   = func;
-            stream->clos_opening.priv   = priv;
-            stream->clos_opening.state  = state;
+            impl->clos_opening.func   = func;
+            impl->clos_opening.priv   = priv;
+            impl->clos_opening.state  = state;
 
             // close it
-            ok = stream->clos(stream, tb_async_stream_clos_opening, tb_null);
+            ok = impl->clos(stream, tb_async_stream_clos_opening, tb_null);
         }
     }
 

@@ -37,13 +37,13 @@
  *
  * @param stream        the stream
  */
-tb_void_t               tb_async_stream_clear(tb_async_stream_t* stream);
+tb_void_t               tb_async_stream_clear(tb_async_stream_ref_t stream);
 
 /* done the opening stream
  *
  * @param stream        the stream
  */
-tb_void_t               tb_async_stream_open_done(tb_async_stream_t* stream);
+tb_void_t               tb_async_stream_open_done(tb_async_stream_ref_t stream);
 
 /* done the open func after opening stream
  *
@@ -54,7 +54,7 @@ tb_void_t               tb_async_stream_open_done(tb_async_stream_t* stream);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_async_stream_open_func(tb_async_stream_t* stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_async_stream_open_func(tb_async_stream_ref_t stream, tb_size_t state, tb_async_stream_open_func_t func, tb_cpointer_t priv);
 
 
 #endif
