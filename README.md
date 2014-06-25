@@ -196,7 +196,6 @@ development
  -  inc:                ./tbox/pre/inc/linux/x64/tbox
  -  lib[debug]:         ./tbox/pre/lib/linux/x64/libtboxd.a
  -  lib[release]:       ./tbox/pre/lib/linux/x64/libtboxr.a
-
  -  CFLAGS[debug]:      -D\_\_tb\_debug\_\_
  -  CFLAGS[release]:    
  -  CFLAGS[optional]:   -D\_\_tb\_prefix\_\_=\"tag\"
@@ -207,7 +206,6 @@ development
  -  inc:                ./tbox/pre/inc/msvc/x64/tbox
  -  lib[debug]:         ./tbox/pre/lib/msvc/x64/tboxd.lib
  -  lib[release]:       ./tbox/pre/lib/msvc/x64/tboxr.lib
-
  -  CFLAGS[debug]:      -D\_\_tb\_debug\_\_
  -  CFLAGS[release]:    
  -  CFLAGS[optional]:   -D\_\_tb\_prefix\_\_=\"tag\"
@@ -271,10 +269,10 @@ example
 contact
 -------
 
-- email:   	waruqi@gmail.com
-- source:  	git@github.com:waruqi/tbox.git
-- website: 	http://www.tboox.org or http://www.tboox.net
-- download: 	https://github.com/waruqi/tbox/archive/master.zip
-- qq(group): 	343118190
+- email:   	    waruqi@gmail.com
+- source:  	    https://github.com/waruqi/tbox
+- website: 	    http://www.tboox.org or http://www.tboox.net
+- download:     https://github.com/waruqi/tbox/archive/master.zip
+- qq(group):    343118190
 
 
