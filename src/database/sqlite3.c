@@ -304,7 +304,7 @@ static tb_pointer_t tb_database_sqlite3_result_col_iterator_item(tb_iterator_t* 
             return tb_null;
 #endif
         case SQLITE_BLOB:
-            tb_database_sql_value_set_blob32(&row->value, sqlite3_column_blob(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor), tb_null);
+            tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)sqlite3_column_blob(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor), tb_null);
             break;
         case SQLITE_NULL:
             tb_database_sql_value_set_null(&row->value);
@@ -705,11 +705,11 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_t* database,
                         tb_assert_and_check_break(size >= 0);
 
                         // make data
-                        data = tb_malloc0_bytes(size);
+                        data = tb_malloc0_bytes((tb_size_t)size);
                         tb_assert_and_check_break(data);
 
                         // read data
-                        if (!tb_stream_bread(value->u.blob.stream, data, size)) break;
+                        if (!tb_stream_bread(value->u.blob.stream, data, (tb_size_t)size)) break;
 
                         // bind it
                         ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), data, (tb_int_t)size, tb_database_sqlite3_statement_bind_exit);
@@ -827,7 +827,7 @@ tb_database_sql_t* tb_database_sqlite3_init(tb_url_t const* url)
     do
     {
         // make database
-        sqlite = tb_malloc0(sizeof(tb_database_sqlite3_t));
+        sqlite = tb_malloc_type(tb_database_sqlite3_t);
         tb_assert_and_check_break(sqlite);
 
         // init database

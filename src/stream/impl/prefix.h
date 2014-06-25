@@ -55,6 +55,9 @@ typedef struct __tb_stream_impl_t
     // the stream type
     tb_uint8_t          type;
 
+    // is writed?
+    tb_uint8_t          bwrited;
+
     // the url
     tb_url_t            url;
 
@@ -78,9 +81,6 @@ typedef struct __tb_stream_impl_t
 
     // the offset
     tb_hize_t           offset;
-
-    // is writed?
-    tb_uint8_t          bwrited;
 
     // the cache
     tb_queue_buffer_t   cache;

@@ -113,7 +113,7 @@ static tb_void_t tb_async_stream_file_impl_clos_clear(tb_async_stream_file_impl_
 static tb_void_t tb_async_stream_file_impl_clos_func(tb_handle_t aico, tb_cpointer_t priv)
 {
     // check
-    tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast((tb_handle_t)priv);
+    tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast((tb_async_stream_ref_t)priv);
     tb_assert_and_check_return(impl && impl->func.clos);
 
     // trace

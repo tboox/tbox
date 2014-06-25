@@ -127,7 +127,7 @@ tb_zip_t* tb_zip_zlibraw_init(tb_size_t action)
     
     // init zip
     zip->algo       = TB_ZIP_ALGO_ZLIBRAW;
-    zip->action     = action;
+    zip->action     = (tb_uint16_t)action;
 
     // open zst
     switch (action)
