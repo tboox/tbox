@@ -55,7 +55,7 @@ typedef struct __tb_stream_sock_impl_t
 
 #ifdef TB_SSL_ENABLE
     // the ssl handle
-    tb_handle_t             hssl;
+    tb_ssl_ref_t            hssl;
 #endif
 
     // the sock type
