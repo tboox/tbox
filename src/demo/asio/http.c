@@ -6,10 +6,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_demo_aicp_http_head_func(tb_aicp_http_ref_t http, tb_char_t const* line, tb_cpointer_t priv)
+static tb_bool_t tb_demo_aicp_http_head_func(tb_char_t const* line, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(http && line, tb_false);
+    tb_assert_and_check_return_val(line, tb_false);
 
     // trace
     tb_trace_i("head: %s", line);
@@ -74,7 +74,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(http);
 
         // init cookies
-        if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) break;
+        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) break;
         if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Cookie", "H_PS_PSSID=4990_6552_6249_1434_5225_6582_6504_6476_4760_6017_6673_6428_6632_6530_6502; BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; BDSVRTM=0; BAIDUID=344544EE3DE59CCF2BFDDB2EE0F49F7E:FG=1;")) break;
         
         // init url

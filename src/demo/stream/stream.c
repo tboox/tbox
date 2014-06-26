@@ -16,7 +16,7 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
+static tb_bool_t tb_demo_http_post_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // percent
     tb_size_t percent = 0;
@@ -29,7 +29,7 @@ static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hi
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_stream_head_func(tb_handle_t http, tb_char_t const* line, tb_cpointer_t priv)
+static tb_bool_t tb_demo_stream_head_func(tb_char_t const* line, tb_cpointer_t priv)
 {
     tb_printf("response: %s\n", line);
     return tb_true;

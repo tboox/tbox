@@ -45,7 +45,7 @@
  * types
  */
 
-// the aicp impl open and read type
+// the aicp http impl open and read type
 typedef struct __tb_aicp_http_open_read_t
 {
     // the func
@@ -59,7 +59,7 @@ typedef struct __tb_aicp_http_open_read_t
 
 }tb_aicp_http_open_read_t;
 
-// the aicp impl open and seek type
+// the aicp http impl open and seek type
 typedef struct __tb_aicp_http_open_seek_t
 {
     // the func
@@ -73,7 +73,7 @@ typedef struct __tb_aicp_http_open_seek_t
 
 }tb_aicp_http_open_seek_t;
 
-// the aicp impl close opening type
+// the aicp http impl close opening type
 typedef struct __tb_aicp_http_clos_opening_t
 {
     // the func
@@ -87,7 +87,7 @@ typedef struct __tb_aicp_http_clos_opening_t
 
 }tb_aicp_http_clos_opening_t;
 
-// the aicp impl type
+// the aicp http impl type
 typedef struct __tb_aicp_http_impl_t
 {
     // the option
@@ -812,7 +812,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
                 tb_trace_d("response: %s", pb);
      
                 // do callback
-                if (impl->option.head_func && !impl->option.head_func((tb_handle_t)impl, pb, impl->option.head_priv)) 
+                if (impl->option.head_func && !impl->option.head_func(pb, impl->option.head_priv)) 
                 {
                     ok = -1;
                     tb_assert(0);
@@ -997,7 +997,7 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
     do
     {
         // done func
-        if (impl->option.post_func && !impl->option.post_func(impl, state, offset, size, save, rate, impl->option.post_priv)) 
+        if (impl->option.post_func && !impl->option.post_func(state, offset, size, save, rate, impl->option.post_priv)) 
         {
             state = TB_STATE_UNKNOWN_ERROR;
             break;
@@ -2149,14 +2149,14 @@ tb_bool_t tb_aicp_http_option(tb_aicp_http_ref_t http, tb_size_t option, ...)
             tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
 
             // set cookies
-            impl->option.cookies = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+            impl->option.cookies = (tb_cookies_ref_t)tb_va_arg(args, tb_cookies_ref_t);
             return tb_true;
         }
         break;
     case TB_HTTP_OPTION_GET_COOKIES:
         {
             // pcookies
-            tb_handle_t* pcookies = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
+            tb_cookies_ref_t* pcookies = (tb_cookies_ref_t*)tb_va_arg(args, tb_cookies_ref_t*);
             tb_assert_and_check_return_val(pcookies, tb_false);
 
             // get cookies
