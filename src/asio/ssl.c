@@ -129,7 +129,7 @@ typedef struct __tb_aicp_ssl_clos_opening_t
 typedef struct __tb_aicp_ssl_impl_t
 {
     // the ssl 
-    tb_handle_t                 ssl;
+    tb_ssl_ref_t                ssl;
 
     // the aicp
     tb_aicp_ref_t               aicp;

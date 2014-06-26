@@ -21,7 +21,7 @@
  * @ingroup     network
  *
  */
-#define TB_TRACE_MODULE_NAME            "ssl"
+#define TB_TRACE_MODULE_NAME            "openssl"
 #define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -39,8 +39,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
-// the ssl type
-typedef struct __tb_ssl_t
+// the ssl impl type
+typedef struct __tb_ssl_impl_t
 {
     // the ssl session
     SSL*                ssl;
@@ -75,7 +75,7 @@ typedef struct __tb_ssl_t
     // the priv data
     tb_cpointer_t        priv;
 
-}tb_ssl_t;
+}tb_ssl_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
@@ -116,7 +116,7 @@ static tb_handle_t tb_ssl_library_init(tb_cpointer_t* ppriv)
     // ok
     return ppriv;
 }
-static tb_void_t tb_ssl_library_exit(tb_handle_t handle, tb_cpointer_t priv)
+static tb_void_t tb_ssl_library_exit(tb_handle_t ssl, tb_cpointer_t priv)
 {
 }
 static tb_handle_t tb_ssl_library_load()
@@ -226,19 +226,19 @@ static tb_int_t tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size)
     tb_assert_and_check_return_val(bio && data && size >= 0, -1);
 
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)bio->ptr;
-    tb_assert_and_check_return_val(ssl && ssl->read, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)bio->ptr;
+    tb_assert_and_check_return_val(impl && impl->read, -1);
 
     // writ 
-    tb_long_t real = ssl->read(ssl->priv, (tb_byte_t*)data, size);
+    tb_long_t real = impl->read(impl->priv, (tb_byte_t*)data, size);
 
     // trace
     tb_trace_d("bio: read: real: %ld, size: %d", real, size);
 
     // ok? clear wait
-    if (real > 0) ssl->lwait = 0;
+    if (real > 0) impl->lwait = 0;
     // peer closed?
-    else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_AIOE_CODE_RECV)) 
+    else if (!real && impl->lwait > 0 && (impl->lwait & TB_AIOE_CODE_RECV)) 
     {
         BIO_clear_retry_flags(bio);
         real = -1;
@@ -266,19 +266,19 @@ static tb_int_t tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t
     tb_assert_and_check_return_val(bio && data && size >= 0, -1);
 
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)bio->ptr;
-    tb_assert_and_check_return_val(ssl && ssl->writ, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)bio->ptr;
+    tb_assert_and_check_return_val(impl && impl->writ, -1);
 
     // writ 
-    tb_long_t real = ssl->writ(ssl->priv, (tb_byte_t const*)data, size);
+    tb_long_t real = impl->writ(impl->priv, (tb_byte_t const*)data, size);
 
     // trace
     tb_trace_d("bio: writ: real: %ld, size: %d", real, size);
 
     // ok? clear wait
-    if (real > 0) ssl->lwait = 0;
+    if (real > 0) impl->lwait = 0;
     // peer closed?
-    else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_AIOE_CODE_SEND)) 
+    else if (!real && impl->lwait > 0 && (impl->lwait & TB_AIOE_CODE_SEND)) 
     {
         BIO_clear_retry_flags(bio);
         real = -1;
@@ -306,8 +306,8 @@ static tb_long_t tb_ssl_bio_method_ctrl(BIO* bio, tb_int_t cmd, tb_long_t num, t
     tb_assert_and_check_return_val(bio, -1);
 
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)bio->ptr;
-    tb_assert_and_check_return_val(ssl, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)bio->ptr;
+    tb_assert_and_check_return_val(impl, -1);
 
     // done
     tb_long_t ok = 0;
@@ -358,48 +358,48 @@ static tb_int_t tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_ssl_init(tb_bool_t bserver)
+tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
 {
     // done
-    tb_ssl_t* ssl = tb_null;
-    tb_bool_t ok = tb_false;
+    tb_bool_t       ok = tb_false;
+    tb_ssl_impl_t*  impl = tb_null;
     do
     {
         // load openssl library
         if (!tb_ssl_library_load()) break;
 
         // make ssl
-        ssl = tb_malloc_type(tb_ssl_t);
-        tb_assert_and_check_break(ssl);
+        impl = tb_malloc_type(tb_ssl_impl_t);
+        tb_assert_and_check_break(impl);
 
         // init timeout, 30s
-        ssl->timeout = 30000;
+        impl->timeout = 30000;
 
         // init ctx
-        ssl->ctx = SSL_CTX_new(SSLv3_method());
-        tb_assert_and_check_break(ssl->ctx);
+        impl->ctx = SSL_CTX_new(SSLv3_method());
+        tb_assert_and_check_break(impl->ctx);
         
         // make ssl
-        ssl->ssl = SSL_new(ssl->ctx);
-        tb_assert_and_check_break(ssl->ssl);
+        impl->ssl = SSL_new(impl->ctx);
+        tb_assert_and_check_break(impl->ssl);
 
         // init endpoint 
-        if (bserver) SSL_set_accept_state(ssl->ssl);
-        else SSL_set_connect_state(ssl->ssl);
+        if (bserver) SSL_set_accept_state(impl->ssl);
+        else SSL_set_connect_state(impl->ssl);
 
         // init verify
-        SSL_set_verify(ssl->ssl, 0, tb_ssl_verify);
+        SSL_set_verify(impl->ssl, 0, tb_ssl_verify);
 
         // init bio
-        ssl->bio = BIO_new(&g_ssl_bio_method);
-        tb_assert_and_check_break(ssl->bio);
+        impl->bio = BIO_new(&g_ssl_bio_method);
+        tb_assert_and_check_break(impl->bio);
 
         // set bio to ssl
-        ssl->bio->ptr = ssl;
-        SSL_set_bio(ssl->ssl, ssl->bio, ssl->bio);
+        impl->bio->ptr = impl;
+        SSL_set_bio(impl->ssl, impl->bio, impl->bio);
 
         // init state
-        ssl->state = TB_STATE_OK;
+        impl->state = TB_STATE_OK;
 
         // ok
         ok = tb_true;
@@ -409,103 +409,103 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
     // failed? exit it
     if (!ok)
     {
-        if (ssl) tb_ssl_exit((tb_handle_t)ssl);
-        ssl = tb_null;
+        if (impl) tb_ssl_exit((tb_ssl_ref_t)impl);
+        impl = tb_null;
     }
 
     // ok?
-    return (tb_handle_t)ssl;
+    return (tb_ssl_ref_t)impl;
 }
-tb_void_t tb_ssl_exit(tb_handle_t handle)
+tb_void_t tb_ssl_exit(tb_ssl_ref_t ssl)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return(ssl);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return(impl);
 
     // close it first
-    tb_ssl_clos(handle);
+    tb_ssl_clos(ssl);
 
     // exit ssl
-    if (ssl->ssl) SSL_free(ssl->ssl);
-    ssl->ssl = tb_null;
+    if (impl->ssl) SSL_free(impl->ssl);
+    impl->ssl = tb_null;
 
     // exit ctx
-    if (ssl->ctx) SSL_CTX_free(ssl->ctx);
-    ssl->ctx = tb_null;
+    if (impl->ctx) SSL_CTX_free(impl->ctx);
+    impl->ctx = tb_null;
 
     // exit it
-    tb_free(ssl);
+    tb_free(impl);
 }
-tb_void_t tb_ssl_set_bio_sock(tb_handle_t handle, tb_handle_t sock)
+tb_void_t tb_ssl_set_bio_sock(tb_ssl_ref_t ssl, tb_handle_t sock)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return(ssl);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return(impl);
 
     // set bio: sock
     tb_ssl_set_bio_func(ssl, tb_ssl_sock_read, tb_ssl_sock_writ, tb_ssl_sock_wait, sock);
 }
-tb_void_t tb_ssl_set_bio_func(tb_handle_t handle, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv)
+tb_void_t tb_ssl_set_bio_func(tb_ssl_ref_t ssl, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return(ssl && read && writ);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return(impl && read && writ);
 
     // save func
-    ssl->read = read;
-    ssl->writ = writ;
-    ssl->wait = wait;
-    ssl->priv = priv;
+    impl->read = read;
+    impl->writ = writ;
+    impl->wait = wait;
+    impl->priv = priv;
 }
-tb_void_t tb_ssl_set_timeout(tb_handle_t handle, tb_long_t timeout)
+tb_void_t tb_ssl_set_timeout(tb_ssl_ref_t ssl, tb_long_t timeout)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return(ssl);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return(impl);
 
     // save timeout
-    ssl->timeout = timeout;
+    impl->timeout = timeout;
 }
-tb_bool_t tb_ssl_open(tb_handle_t handle)
+tb_bool_t tb_ssl_open(tb_ssl_ref_t ssl)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl && ssl->wait, tb_false);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl && impl->wait, tb_false);
 
     // open it
     tb_long_t ok = -1;
-    while (!(ok = tb_ssl_open_try(handle)))
+    while (!(ok = tb_ssl_open_try(ssl)))
     {
         // wait it
-        ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, ssl->timeout);
+        ok = tb_ssl_wait(ssl, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, impl->timeout);
         tb_check_break(ok > 0);
     }
 
     // ok?
     return ok > 0? tb_true : tb_false;
 }
-tb_long_t tb_ssl_open_try(tb_handle_t handle)
+tb_long_t tb_ssl_open_try(tb_ssl_ref_t ssl)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl && ssl->ssl, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl && impl->ssl, -1);
 
     // done
     tb_long_t ok = -1;
     do
     {
         // init state
-        ssl->state = TB_STATE_OK;
+        impl->state = TB_STATE_OK;
 
         // have been opened already?
-        if (ssl->bopened)
+        if (impl->bopened)
         {
             ok = 1;
             break;
         }
 
         // do handshake
-        tb_long_t r = SSL_do_handshake(ssl->ssl);
+        tb_long_t r = SSL_do_handshake(impl->ssl);
     
         // trace
         tb_trace_d("open: handshake: %ld", r);
@@ -517,7 +517,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
         else
         {
             // the error
-            tb_long_t error = SSL_get_error(ssl->ssl, r);
+            tb_long_t error = SSL_get_error(impl->ssl, r);
 
             // wait?
             if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
@@ -529,7 +529,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
                 ok = 0;
 
                 // save state
-                ssl->state = (error == SSL_ERROR_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
+                impl->state = (error == SSL_ERROR_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
             }
             // failed?
             else
@@ -538,7 +538,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
                 tb_trace_d("open: handshake: failed: %s", tb_ssl_error(error));
     
                 // save state
-                ssl->state = TB_STATE_SOCK_SSL_FAILED;
+                impl->state = TB_STATE_SOCK_SSL_FAILED;
             }
         }
 
@@ -548,14 +548,14 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
     if (ok > 0)
     {
         // opened
-        ssl->bopened = tb_true;
+        impl->bopened = tb_true;
     }
     // failed?
     else if (ok < 0)
     {
         // save state
-        if (ssl->state == TB_STATE_OK)
-            ssl->state = TB_STATE_SOCK_SSL_FAILED;
+        if (impl->state == TB_STATE_OK)
+            impl->state = TB_STATE_SOCK_SSL_FAILED;
     }
 
     // trace
@@ -564,46 +564,46 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
     // ok?
     return ok;
 }
-tb_bool_t tb_ssl_clos(tb_handle_t handle)
+tb_bool_t tb_ssl_clos(tb_ssl_ref_t ssl)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl, tb_false);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // open it
     tb_long_t ok = -1;
-    while (!(ok = tb_ssl_clos_try(handle)))
+    while (!(ok = tb_ssl_clos_try(ssl)))
     {
         // wait it
-        ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, ssl->timeout);
+        ok = tb_ssl_wait(ssl, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, impl->timeout);
         tb_check_break(ok > 0);
     }
 
     // ok?
     return ok > 0? tb_true : tb_false;
 }
-tb_long_t tb_ssl_clos_try(tb_handle_t handle)
+tb_long_t tb_ssl_clos_try(tb_ssl_ref_t ssl)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl, -1);
 
     // done
     tb_long_t ok = -1;
     do
     {
         // init state
-        ssl->state = TB_STATE_OK;
+        impl->state = TB_STATE_OK;
 
         // have been closed already?
-        if (!ssl->bopened || !ssl->ssl)
+        if (!impl->bopened || !impl->ssl)
         {
             ok = 1;
             break;
         }
 
         // do shutdown
-        tb_long_t r = SSL_shutdown(ssl->ssl);
+        tb_long_t r = SSL_shutdown(impl->ssl);
     
         // trace
         tb_trace_d("clos: shutdown: %ld", r);
@@ -615,7 +615,7 @@ tb_long_t tb_ssl_clos_try(tb_handle_t handle)
         else
         {
             // the error
-            tb_long_t error = SSL_get_error(ssl->ssl, r);
+            tb_long_t error = SSL_get_error(impl->ssl, r);
 
             // wait?
             if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
@@ -627,7 +627,7 @@ tb_long_t tb_ssl_clos_try(tb_handle_t handle)
                 ok = 0;
 
                 // save state
-                ssl->state = (error == SSL_ERROR_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
+                impl->state = (error == SSL_ERROR_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
             }
             // failed?
             else
@@ -636,7 +636,7 @@ tb_long_t tb_ssl_clos_try(tb_handle_t handle)
                 tb_trace_d("clos: shutdown: failed: %s", tb_ssl_error(error));
     
                 // save state
-                ssl->state = TB_STATE_SOCK_SSL_FAILED;
+                impl->state = TB_STATE_SOCK_SSL_FAILED;
             }
         }
 
@@ -646,17 +646,17 @@ tb_long_t tb_ssl_clos_try(tb_handle_t handle)
     if (ok > 0)
     {
         // closed
-        ssl->bopened = tb_false;
+        impl->bopened = tb_false;
 
         // clear ssl
-        if (ssl->ssl) SSL_clear(ssl->ssl);
+        if (impl->ssl) SSL_clear(impl->ssl);
     }
     // failed?
     else if (ok < 0)
     {
         // save state
-        if (ssl->state == TB_STATE_OK)
-            ssl->state = TB_STATE_SOCK_SSL_FAILED;
+        if (impl->state == TB_STATE_OK)
+            impl->state = TB_STATE_SOCK_SSL_FAILED;
     }
 
     // trace
@@ -665,14 +665,14 @@ tb_long_t tb_ssl_clos_try(tb_handle_t handle)
     // ok?
     return ok;
 }
-tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_ssl_read(tb_ssl_ref_t ssl, tb_byte_t* data, tb_size_t size)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl && ssl->ssl && ssl->bopened && data, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl && impl->ssl && impl->bopened && data, -1);
 
     // read it
-    tb_long_t real = SSL_read(ssl->ssl, data, size);
+    tb_long_t real = SSL_read(impl->ssl, data, size);
 
     // trace
     tb_trace_d("read: %ld", real);
@@ -681,7 +681,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
     if (real < 0)
     {
         // the error
-        tb_long_t error = SSL_get_error(ssl->ssl, real);
+        tb_long_t error = SSL_get_error(impl->ssl, real);
 
         // want read? continue it
         if (error == SSL_ERROR_WANT_READ)
@@ -690,7 +690,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
             tb_trace_d("read: want read");
 
             // save state
-            ssl->state = TB_STATE_SOCK_SSL_WANT_READ;
+            impl->state = TB_STATE_SOCK_SSL_WANT_READ;
             return 0;
         }
         // want writ? continue it
@@ -700,7 +700,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
             tb_trace_d("read: want writ");
 
             // save state
-            ssl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
+            impl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
             return 0;
         }
         // failed?
@@ -710,7 +710,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
             tb_trace_d("read: failed: %ld, %s", real, tb_ssl_error(error));
 
             // save state
-            ssl->state = TB_STATE_SOCK_SSL_FAILED;
+            impl->state = TB_STATE_SOCK_SSL_FAILED;
             return -1;
         }
     }
@@ -721,21 +721,21 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
         tb_trace_d("read: closed");
 
         // save state
-        ssl->state = TB_STATE_CLOSED;
+        impl->state = TB_STATE_CLOSED;
         return -1;
     }
 
     // ok
     return real;
 }
-tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl && ssl->ssl && ssl->bopened && data, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl && impl->ssl && impl->bopened && data, -1);
 
     // writ it
-    tb_long_t real = SSL_write(ssl->ssl, data, size);
+    tb_long_t real = SSL_write(impl->ssl, data, size);
 
     // trace
     tb_trace_d("writ: %ld", real);
@@ -744,7 +744,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
     if (real < 0)
     {
         // the error
-        tb_long_t error = SSL_get_error(ssl->ssl, real);
+        tb_long_t error = SSL_get_error(impl->ssl, real);
 
         // want read? continue it
         if (error == SSL_ERROR_WANT_READ)
@@ -753,7 +753,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
             tb_trace_d("writ: want read");
 
             // save state
-            ssl->state = TB_STATE_SOCK_SSL_WANT_READ;
+            impl->state = TB_STATE_SOCK_SSL_WANT_READ;
             return 0;
         }
         // want writ? continue it
@@ -763,7 +763,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
             tb_trace_d("writ: want writ");
 
             // save state
-            ssl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
+            impl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
             return 0;
         }
         // failed?
@@ -773,7 +773,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
             tb_trace_d("writ: failed: %ld, %s", real, tb_ssl_error(error));
 
             // save state
-            ssl->state = TB_STATE_SOCK_SSL_FAILED;
+            impl->state = TB_STATE_SOCK_SSL_FAILED;
             return -1;
         }
     }
@@ -784,21 +784,21 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
         tb_trace_d("read: closed");
 
         // save state
-        ssl->state = TB_STATE_CLOSED;
+        impl->state = TB_STATE_CLOSED;
         return -1;
     }
 
     // ok
     return real;
 }
-tb_long_t tb_ssl_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+tb_long_t tb_ssl_wait(tb_ssl_ref_t ssl, tb_size_t code, tb_long_t timeout)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl && ssl->wait, -1);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl && impl->wait, -1);
     
     // the ssl state
-    switch (ssl->state)
+    switch (impl->state)
     {
         // wait read
     case TB_STATE_SOCK_SSL_WANT_READ:
@@ -820,25 +820,25 @@ tb_long_t tb_ssl_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
     tb_trace_d("wait: %lu: ..", code);
 
     // wait it
-    ssl->lwait = ssl->wait(ssl->priv, code, timeout);
+    impl->lwait = impl->wait(impl->priv, code, timeout);
 
     // timeout or failed? save state
-    if (ssl->lwait < 0) ssl->state = TB_STATE_SOCK_SSL_WAIT_FAILED;
-    else if (!ssl->lwait) ssl->state = TB_STATE_SOCK_SSL_TIMEOUT;
+    if (impl->lwait < 0) impl->state = TB_STATE_SOCK_SSL_WAIT_FAILED;
+    else if (!impl->lwait) impl->state = TB_STATE_SOCK_SSL_TIMEOUT;
 
     // trace
-    tb_trace_d("wait: %ld", ssl->lwait);
+    tb_trace_d("wait: %ld", impl->lwait);
 
     // ok?
-    return ssl->lwait;
+    return impl->lwait;
 }
-tb_size_t tb_ssl_state(tb_handle_t handle)
+tb_size_t tb_ssl_state(tb_ssl_ref_t ssl)
 {
     // the ssl
-    tb_ssl_t* ssl = (tb_ssl_t*)handle;
-    tb_assert_and_check_return_val(ssl, TB_STATE_UNKNOWN_ERROR);
+    tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;
+    tb_assert_and_check_return_val(impl, TB_STATE_UNKNOWN_ERROR);
 
     // the state
-    return ssl->state;
+    return impl->state;
 }
 

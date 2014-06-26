@@ -80,6 +80,9 @@ typedef tb_long_t   (*tb_ssl_func_writ_t)(tb_cpointer_t priv, tb_byte_t const* d
  */
 typedef tb_long_t   (*tb_ssl_func_wait_t)(tb_cpointer_t priv, tb_size_t code, tb_long_t timeout);
 
+/// the ssl ref type
+typedef struct{}*   tb_ssl_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -90,20 +93,20 @@ typedef tb_long_t   (*tb_ssl_func_wait_t)(tb_cpointer_t priv, tb_size_t code, tb
  *
  * @return          the ssl handle 
  */
-tb_handle_t         tb_ssl_init(tb_bool_t bserver);
+tb_ssl_ref_t        tb_ssl_init(tb_bool_t bserver);
 
 /*! exit ssl
  *
  * @param ssl       the ssl handle
  */
-tb_void_t           tb_ssl_exit(tb_handle_t ssl);
+tb_void_t           tb_ssl_exit(tb_ssl_ref_t ssl);
 
 /*! set ssl bio sock
  *
  * @param ssl       the ssl handle
  * @param sock      the sock handle, non-blocking 
  */
-tb_void_t           tb_ssl_set_bio_sock(tb_handle_t ssl, tb_handle_t sock);
+tb_void_t           tb_ssl_set_bio_sock(tb_ssl_ref_t ssl, tb_handle_t sock);
 
 /*! set ssl bio read and writ func 
  *
@@ -113,14 +116,14 @@ tb_void_t           tb_ssl_set_bio_sock(tb_handle_t ssl, tb_handle_t sock);
  * #param wait      the wait func only for tb_ssl_open and tb_ssl_wait
  * @param priv      the priv data
  */
-tb_void_t           tb_ssl_set_bio_func(tb_handle_t ssl, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv);
+tb_void_t           tb_ssl_set_bio_func(tb_ssl_ref_t ssl, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv);
 
 /*! set ssl timeout for opening
  *
  * @param ssl       the ssl handle
  * @param timeout   the timeout
  */
-tb_void_t           tb_ssl_set_timeout(tb_handle_t ssl, tb_long_t timeout);
+tb_void_t           tb_ssl_set_timeout(tb_ssl_ref_t ssl, tb_long_t timeout);
 
 /*! open ssl using blocking mode
  *
@@ -130,7 +133,7 @@ tb_void_t           tb_ssl_set_timeout(tb_handle_t ssl, tb_long_t timeout);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ssl_open(tb_handle_t ssl);
+tb_bool_t           tb_ssl_open(tb_ssl_ref_t ssl);
 
 /*! try opening ssl using non-blocking mode
  *
@@ -151,7 +154,7 @@ tb_bool_t           tb_ssl_open(tb_handle_t ssl);
  *
  * @return          ok: 1, continue: 0, failed: -1
  */
-tb_long_t           tb_ssl_open_try(tb_handle_t ssl);
+tb_long_t           tb_ssl_open_try(tb_ssl_ref_t ssl);
 
 /*! clos ssl 
  *
@@ -159,7 +162,7 @@ tb_long_t           tb_ssl_open_try(tb_handle_t ssl);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ssl_clos(tb_handle_t ssl);
+tb_bool_t           tb_ssl_clos(tb_ssl_ref_t ssl);
 
 /*! try closing ssl  using non-blocking mode
  *
@@ -180,7 +183,7 @@ tb_bool_t           tb_ssl_clos(tb_handle_t ssl);
  *
  * @return          ok: 1, continue: 0, failed: -1
  */
-tb_long_t           tb_ssl_clos_try(tb_handle_t ssl);
+tb_long_t           tb_ssl_clos_try(tb_ssl_ref_t ssl);
 
 /*! read ssl data
  *
@@ -190,7 +193,7 @@ tb_long_t           tb_ssl_clos_try(tb_handle_t ssl);
  *
  * @return          the real size, no data: 0 and see state for waiting, failed: -1
  */
-tb_long_t           tb_ssl_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size);
+tb_long_t           tb_ssl_read(tb_ssl_ref_t ssl, tb_byte_t* data, tb_size_t size);
 
 /*! writ ssl data
  *
@@ -200,7 +203,7 @@ tb_long_t           tb_ssl_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size
  *
  * @return          the real size, no data: 0 and see state for waiting, failed: -1
  */
-tb_long_t           tb_ssl_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size);
+tb_long_t           tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size);
 
 /*! wait ssl data
  *
@@ -210,7 +213,7 @@ tb_long_t           tb_ssl_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_
  *
  * @return          the real code, no event: 0, failed or closed: -1
  */
-tb_long_t           tb_ssl_wait(tb_handle_t ssl, tb_size_t code, tb_long_t timeout);
+tb_long_t           tb_ssl_wait(tb_ssl_ref_t ssl, tb_size_t code, tb_long_t timeout);
 
 /*! the ssl state see the stream ssl state
  *
@@ -218,7 +221,7 @@ tb_long_t           tb_ssl_wait(tb_handle_t ssl, tb_size_t code, tb_long_t timeo
  *
  * @return          the ssl state
  */
-tb_size_t           tb_ssl_state(tb_handle_t ssl);
+tb_size_t           tb_ssl_state(tb_ssl_ref_t ssl);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
