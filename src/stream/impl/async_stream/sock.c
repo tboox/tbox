@@ -61,7 +61,7 @@ typedef struct __tb_async_stream_sock_impl_t
 
 #ifdef TB_SSL_ENABLE
     // the aicp ssl
-    tb_handle_t                         hssl;
+    tb_aicp_ssl_ref_t                   hssl;
 #endif
 
     // the ipv4 addr
@@ -198,7 +198,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_aico_func(tb_handle_t aico, tb_c
     tb_trace_d("clos: aico: notify: ok");
 }
 #ifdef TB_SSL_ENABLE
-static tb_void_t tb_async_stream_sock_impl_clos_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_impl_clos_ssl_func(tb_aicp_ssl_ref_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
@@ -296,7 +296,7 @@ static tb_bool_t tb_async_stream_sock_impl_clos(tb_async_stream_ref_t stream, tb
     return tb_true;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_impl_open_ssl_func(tb_handle_t ssl, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_impl_open_ssl_func(tb_aicp_ssl_ref_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
@@ -714,7 +714,7 @@ static tb_bool_t tb_async_stream_sock_impl_read_udp_func(tb_aice_t const* aice)
     return tb_true;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_impl_read_ssl_func(tb_handle_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_impl_read_ssl_func(tb_aicp_ssl_ref_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ssl, tb_false);
@@ -908,7 +908,7 @@ static tb_bool_t tb_async_stream_sock_impl_writ_udp_func(tb_aice_t const* aice)
     return tb_true;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_impl_writ_ssl_func(tb_handle_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_impl_writ_ssl_func(tb_aicp_ssl_ref_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ssl, tb_false);
@@ -1040,7 +1040,7 @@ static tb_bool_t tb_async_stream_sock_impl_task_func(tb_aice_t const* aice)
     return tb_true;
 }
 #ifdef TB_SSL_ENABLE
-static tb_bool_t tb_async_stream_sock_impl_task_ssl_func(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_sock_impl_task_ssl_func(tb_aicp_ssl_ref_t ssl, tb_size_t state, tb_size_t delay, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(ssl, tb_false);

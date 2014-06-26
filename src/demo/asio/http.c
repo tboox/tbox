@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_demo_aicp_http_head_func(tb_handle_t http, tb_char_t const* line, tb_cpointer_t priv)
+static tb_bool_t tb_demo_aicp_http_head_func(tb_aicp_http_ref_t http, tb_char_t const* line, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(http && line, tb_false);
@@ -17,8 +17,8 @@ static tb_bool_t tb_demo_aicp_http_head_func(tb_handle_t http, tb_char_t const* 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
-static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_demo_aicp_http_read_func(tb_aicp_http_ref_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv);
+static tb_void_t tb_demo_aicp_http_clos_func(tb_aicp_http_ref_t http, tb_size_t state, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("clos: state: %s", tb_state_cstr(state));
@@ -28,21 +28,21 @@ static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state
     tb_aicp_kill((tb_aicp_ref_t)priv);
 #else
     // reopen and read 
-    tb_aicp_http_open_read(handle, 0, tb_demo_aicp_http_read_func, priv);
+    tb_aicp_http_open_read(http, 0, tb_demo_aicp_http_read_func, priv);
 #endif
 }
-static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_demo_aicp_http_read_func(tb_aicp_http_ref_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("read: %lu, state: %s", real, tb_state_cstr(state));
 
     // failed or closed? close it
-    if (state != TB_STATE_OK) tb_aicp_http_clos(handle, tb_demo_aicp_http_clos_func, priv);
+    if (state != TB_STATE_OK) tb_aicp_http_clos(http, tb_demo_aicp_http_clos_func, priv);
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_aicp_http_post_func(tb_handle_t http, tb_size_t state, tb_hong_t offset, tb_hize_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
+static tb_bool_t tb_demo_aicp_http_post_func(tb_aicp_http_ref_t http, tb_size_t state, tb_hong_t offset, tb_hize_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("post: %llu, rate: %lu bytes/s, state: %s", save, rate, tb_state_cstr(state));
@@ -60,9 +60,9 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // done
-    tb_aicp_ref_t          aicp = tb_null;
-    tb_handle_t         http = tb_null;
-    tb_async_stream_ref_t  post = tb_null;
+    tb_aicp_ref_t           aicp = tb_null;
+    tb_aicp_http_ref_t      http = tb_null;
+    tb_async_stream_ref_t   post = tb_null;
     do
     {
         // init aicp
