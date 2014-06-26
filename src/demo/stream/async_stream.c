@@ -39,7 +39,7 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
+static tb_bool_t tb_demo_http_post_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // percent
     tb_size_t percent = 0;
@@ -159,10 +159,10 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_ref_t stream, tb_size
     // ok?
     return ok;
 }
-static tb_bool_t tb_demo_istream_head_func(tb_handle_t http, tb_char_t const* line, tb_cpointer_t priv)
+static tb_bool_t tb_demo_istream_head_func(tb_char_t const* line, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(http && line, tb_false);
+    tb_assert_and_check_return_val(line, tb_false);
 
     // trace
     tb_trace_i("head: %s", line);

@@ -728,7 +728,7 @@ static tb_bool_t tb_async_stream_http_impl_ctrl(tb_async_stream_ref_t stream, tb
     case TB_STREAM_CTRL_HTTP_SET_COOKIES:
         {
             // cookies
-            tb_handle_t cookies = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+            tb_cookies_ref_t cookies = (tb_cookies_ref_t)tb_va_arg(args, tb_cookies_ref_t);
 
             // set cookies
             return tb_aicp_http_option(impl->http, TB_HTTP_OPTION_SET_COOKIES, cookies);
@@ -737,7 +737,7 @@ static tb_bool_t tb_async_stream_http_impl_ctrl(tb_async_stream_ref_t stream, tb
     case TB_STREAM_CTRL_HTTP_GET_COOKIES:
         {
             // pcookies
-            tb_handle_t* pcookies = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
+            tb_cookies_ref_t* pcookies = (tb_cookies_ref_t*)tb_va_arg(args, tb_cookies_ref_t*);
             tb_assert_and_check_return_val(pcookies, tb_false);
 
             // get version

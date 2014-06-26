@@ -34,7 +34,7 @@
 typedef struct __tb_stream_http_impl_t
 {
     // the http 
-    tb_handle_t         http;
+    tb_http_ref_t         http;
 
 }tb_stream_http_impl_t;
 
@@ -546,7 +546,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
     case TB_STREAM_CTRL_HTTP_SET_COOKIES:
         {
             // cookies
-            tb_handle_t cookies = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+            tb_cookies_ref_t cookies = (tb_cookies_ref_t)tb_va_arg(args, tb_cookies_ref_t);
 
             // set cookies
             return tb_http_option(impl->http, TB_HTTP_OPTION_SET_COOKIES, cookies);
@@ -555,7 +555,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
     case TB_STREAM_CTRL_HTTP_GET_COOKIES:
         {
             // pcookies
-            tb_handle_t* pcookies = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
+            tb_cookies_ref_t* pcookies = (tb_cookies_ref_t*)tb_va_arg(args, tb_cookies_ref_t*);
             tb_assert_and_check_return_val(pcookies, tb_false);
 
             // get version

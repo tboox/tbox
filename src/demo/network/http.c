@@ -6,10 +6,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line, tb_cpointer_t priv)
+static tb_bool_t tb_http_demo_head_func(tb_char_t const* line, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(http && line, tb_false);
+    tb_assert_and_check_return_val(line, tb_false);
 
     // trace
     tb_trace_i("head: %s", line);
@@ -24,7 +24,7 @@ static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line,
 tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 {
     // init http
-    tb_handle_t http = tb_http_init();
+    tb_http_ref_t http = tb_http_init();
     tb_assert_and_check_goto(http, end);
 
     // init cookies

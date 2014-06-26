@@ -132,19 +132,22 @@ typedef struct __tb_http_range_t
 
 }tb_http_range_t;
 
+/// the http ref type
+typedef struct{}*       tb_http_ref_t;
+
 /*! the http head func type
  *
- * @param http          the http handle
+ * @param http          the http 
  * @param line          the http head line
  * @param priv          the func private data
  *
  * @return              tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t       (*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* line, tb_cpointer_t priv);
+typedef tb_bool_t       (*tb_http_head_func_t)(tb_char_t const* line, tb_cpointer_t priv);
 
 /*! the http post func type
  *
- * @param http          the http handle
+ * @param http          the http 
  * @param offset        the istream offset
  * @param size          the istream size, no size: -1
  * @param save          the saved size
@@ -153,7 +156,7 @@ typedef tb_bool_t       (*tb_http_head_func_t)(tb_handle_t http, tb_char_t const
  *
  * @return              tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t       (*tb_http_post_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv);
+typedef tb_bool_t       (*tb_http_post_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv);
 
 /// the http option type
 typedef struct __tb_http_option_t
@@ -183,7 +186,7 @@ typedef struct __tb_http_option_t
     tb_http_range_t     range;
 
     /// the cookies
-    tb_handle_t         cookies;
+    tb_cookies_ref_t    cookies;
 
     /// the priv data
     tb_pointer_t        head_priv;
@@ -258,96 +261,96 @@ typedef struct __tb_http_status_t
 
 /*! init http
  *
- * return               the http handle
+ * return               the http 
  */
-tb_handle_t             tb_http_init(tb_noarg_t);
+tb_http_ref_t           tb_http_init(tb_noarg_t);
 
 /*! exit http
  *
- * @param handle        the http handle
+ * @param http          the http 
  */
-tb_void_t               tb_http_exit(tb_handle_t handle);
+tb_void_t               tb_http_exit(tb_http_ref_t http);
 
 /*! kill http
  *
- * @param handle        the http handle
+ * @param http          the http 
  */
-tb_void_t               tb_http_kill(tb_handle_t handle);
+tb_void_t               tb_http_kill(tb_http_ref_t http);
 
 /*! wait the http 
  *
  * blocking wait the single event object, so need not aiop 
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param handle        the http handle 
+ * @param http          the http 
  * @param aioe          the aioe
  * @param timeout       the timeout value, return immediately if 0, infinity if -1
  *
  * @return              the event type, return 0 if timeout, return -1 if error
  */
-tb_long_t               tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout);
+tb_long_t               tb_http_wait(tb_http_ref_t http, tb_size_t aioe, tb_long_t timeout);
 
 /*! open the http
  *
- * @param handle        the http handle
+ * @param http          the http 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_http_open(tb_handle_t handle);
+tb_bool_t               tb_http_open(tb_http_ref_t http);
 
 /*! close http
  *
- * @param handle        the http handle
+ * @param http          the http 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_http_clos(tb_handle_t handle);
+tb_bool_t               tb_http_clos(tb_http_ref_t http);
 
 /*! seek http
  *
- * @param handle        the http handle
+ * @param http          the http 
  * @param offset        the offset
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_http_seek(tb_handle_t handle, tb_hize_t offset);
+tb_bool_t               tb_http_seek(tb_http_ref_t http, tb_hize_t offset);
 
 /*! read data, non-blocking
  *
- * @param handle        the http handle
+ * @param http          the http 
  * @param data          the data
  * @param size          the size
  *
  * @return              ok: real size, continue: 0, fail: -1
  */
-tb_long_t               tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_long_t               tb_http_read(tb_http_ref_t http, tb_byte_t* data, tb_size_t size);
 
 /*! read data, blocking
  *
- * @param handle        the http handle
+ * @param http          the http 
  * @param data          the data
  * @param size          the size
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_bool_t               tb_http_bread(tb_http_ref_t http, tb_byte_t* data, tb_size_t size);
 
 /*! the http option
  *
- * @param handle        the http handle
+ * @param http          the http 
  * @param option        the option
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_http_option(tb_handle_t handle, tb_size_t option, ...);
+tb_bool_t               tb_http_option(tb_http_ref_t http, tb_size_t option, ...);
 
 /*! the http status
  *
- * @param handle        the http handle
+ * @param http          the http 
  *
  * @return              the http status
  */
-tb_http_status_t const* tb_http_status(tb_handle_t handle);
+tb_http_status_t const* tb_http_status(tb_http_ref_t http);
 
 /*! get the http date from the given cstring
  *
