@@ -336,7 +336,7 @@ static tb_void_t tb_aicp_ssl_clos_clear(tb_aicp_ssl_impl_t* impl)
     if (impl->ssl && impl->aico) 
     {       
         // init bio sock, need some blocking time for closing
-        tb_ssl_set_bio_sock(impl->ssl, tb_aico_handle(impl->aico));
+        tb_ssl_set_bio_sock(impl->ssl, tb_aico_sock(impl->aico));
 
         // close it
         tb_ssl_clos(impl->ssl);

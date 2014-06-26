@@ -41,7 +41,7 @@
 typedef struct __tb_stream_file_impl_t
 {
     // the file handle
-    tb_handle_t         file;
+    tb_file_ref_t       file;
 
     // the file handle is referenced? need not exit it
     tb_size_t           bref;

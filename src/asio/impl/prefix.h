@@ -44,8 +44,8 @@ typedef struct __tb_aioo_impl_t
     // the priv
     tb_cpointer_t               priv;
 
-    // the handle 
-    tb_handle_t                 handle;
+    // the socket
+    tb_socket_ref_t             sock;
 
 }tb_aioo_impl_t;
 
@@ -206,7 +206,7 @@ typedef struct __tb_aiop_impl_t
     tb_aiop_rtor_impl_t*        rtor;
 
     // the spak
-    tb_handle_t                 spak[2];
+    tb_socket_ref_t             spak[2];
     
 }tb_aiop_impl_t;
 

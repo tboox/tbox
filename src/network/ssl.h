@@ -106,7 +106,7 @@ tb_void_t           tb_ssl_exit(tb_ssl_ref_t ssl);
  * @param ssl       the ssl handle
  * @param sock      the sock handle, non-blocking 
  */
-tb_void_t           tb_ssl_set_bio_sock(tb_ssl_ref_t ssl, tb_handle_t sock);
+tb_void_t           tb_ssl_set_bio_sock(tb_ssl_ref_t ssl, tb_socket_ref_t sock);
 
 /*! set ssl bio read and writ func 
  *

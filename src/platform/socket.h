@@ -74,9 +74,9 @@ tb_void_t           tb_socket_exit(tb_noarg_t);
  *
  * @param type      the socket type
  *
- * @return          the socket handle
+ * @return          the socket 
  */
-tb_handle_t         tb_socket_open(tb_size_t type);
+tb_socket_ref_t     tb_socket_open(tb_size_t type);
 
 /*! open socket pair
  *
@@ -85,138 +85,138 @@ tb_handle_t         tb_socket_open(tb_size_t type);
  *
  * @return          the socket handle
  */
-tb_bool_t           tb_socket_pair(tb_size_t type, tb_handle_t pair[2]);
+tb_bool_t           tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2]);
 
 /*! the socket recv buffer size
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  *
  * @return          the recv size
  */
-tb_size_t           tb_socket_recv_buffer_size(tb_handle_t handle);
+tb_size_t           tb_socket_recv_buffer_size(tb_socket_ref_t sock);
 
 /*! the socket send buffer size
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  *
  * @return          the recv size
  */
-tb_size_t           tb_socket_send_buffer_size(tb_handle_t handle);
+tb_size_t           tb_socket_send_buffer_size(tb_socket_ref_t sock);
 
 /*! set the socket block mode
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  * @param block     block it?
  *
  */
-tb_void_t           tb_socket_block(tb_handle_t handle, tb_bool_t block);
+tb_void_t           tb_socket_block(tb_socket_ref_t sock, tb_bool_t block);
 
 /*! connect socket
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  * @param addr      the addr
  * @param port      the port
  *
  * @return          ok: 1, continue: 0; failed: -1
  */
-tb_long_t           tb_socket_connect(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port);
+tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port);
 
 /*! bind socket
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  * @param addr      the addr
  * @param port      the bind port, bind a random port if port == 0
  *
  * @return          the bound port, failed: 0
  */
-tb_size_t           tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port);
+tb_size_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port);
 
 /*! listen socket
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_socket_listen(tb_handle_t handle);
+tb_bool_t           tb_socket_listen(tb_socket_ref_t sock);
 
 /*! accept socket
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  *
  * @return          the client socket handle
  */
-tb_handle_t         tb_socket_accept(tb_handle_t handle);
+tb_handle_t         tb_socket_accept(tb_socket_ref_t sock);
 
 /*! kill socket
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_socket_kill(tb_handle_t handle, tb_size_t mode);
+tb_bool_t           tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode);
 
 /*! close socket
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_socket_clos(tb_handle_t handle);
+tb_bool_t           tb_socket_clos(tb_socket_ref_t sock);
 
 /*! recv the socket data for tcp
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  * @param data      the data
  * @param size      the size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_long_t           tb_socket_recv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size);
 
 /*! send the socket data for tcp
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  * @param data      the data
  * @param size      the size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_send(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
+tb_long_t           tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t size);
 
 /*! recvv the socket data for tcp
  * 
- * @param socket    the socket handle
+ * @param sock      the socket 
  * @param list      the iovec list
  * @param size      the iovec size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size);
 
 /*! sendv the socket data for tcp
  * 
- * @param socket    the socket handle
+ * @param sock      the socket 
  * @param list      the iovec list
  * @param size      the iovec size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size);
 
 /*! sendf the socket data
  * 
- * @param socket    the socket handle
+ * @param sock      the socket 
  * @param file      the file
  * @param offset    the offset
  * @param size      the size
  *
  * @return          the real size or -1
  */
-tb_hong_t           tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size);
+tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_hize_t offset, tb_hize_t size);
 
 /*! recv the socket data for udp
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  * @param addr      the addr
  * @param port      the port
  * @param data      the data
@@ -224,11 +224,11 @@ tb_hong_t           tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hiz
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size);
+tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size);
 
 /*! send the socket data for udp
  *
- * @param handle    the socket handle
+ * @param sock      the socket 
  * @param addr      the addr
  * @param port      the port
  * @param data      the data
@@ -236,11 +236,11 @@ tb_long_t           tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, t
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usend(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size);
+tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size);
     
 /*! urecvv the socket data for udp
  * 
- * @param socket    the socket handle
+ * @param sock      the socket 
  * @param addr      the addr
  * @param port      the port
  * @param list      the iovec list
@@ -248,11 +248,11 @@ tb_long_t           tb_socket_usend(tb_handle_t handle, tb_ipv4_t const* addr, t
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecvv(tb_handle_t socket, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size);
 
 /*! usendv the socket data for udp
  * 
- * @param socket    the socket handle
+ * @param sock      the socket 
  * @param addr      the addr
  * @param port      the port
  * @param list      the iovec list
@@ -260,7 +260,7 @@ tb_long_t           tb_socket_urecvv(tb_handle_t socket, tb_ipv4_t const* addr, 
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usendv(tb_handle_t socket, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

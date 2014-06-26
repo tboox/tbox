@@ -16,10 +16,10 @@
 typedef struct __tb_demo_context_t
 {
     // the sock
-    tb_handle_t         sock;
+    tb_socket_ref_t     sock;
 
     // the file
-    tb_handle_t         file;
+    tb_file_ref_t       file;
 
     // the aico
     tb_aico_ref_t       aico[2];
@@ -72,10 +72,10 @@ static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     tb_assert_and_check_return(aico);
 
     // trace
-    tb_trace_i("aico: file: exit: %p", tb_aico_handle(aico));
+    tb_trace_i("aico: file: exit: %p", tb_aico_file(aico));
 
     // exit it
-    tb_file_exit(tb_aico_handle(aico));
+    tb_file_exit(tb_aico_file(aico));
 
     // kill aicp
     tb_aicp_kill((tb_aicp_ref_t)tb_aico_aicp(aico));
@@ -86,10 +86,10 @@ static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     tb_assert_and_check_return(aico);
 
     // trace
-    tb_trace_i("aico: sock: exit: %p", tb_aico_handle(aico));
+    tb_trace_i("aico: sock: exit: %p", tb_aico_sock(aico));
 
     // exit it
-    tb_socket_clos(tb_aico_handle(aico));
+    tb_socket_clos(tb_aico_sock(aico));
 
     // exit file
     if (priv) tb_aico_exit((tb_handle_t)priv, tb_demo_file_exit_func, tb_null);

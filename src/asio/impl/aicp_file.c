@@ -46,7 +46,12 @@ static tb_bool_t tb_aicp_file_delo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* ai
 }
 static tb_void_t tb_aicp_file_kilo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico)
 {
-    if (aico && aico->handle) tb_file_exit(aico->handle);
+    // check
+    tb_file_ref_t file = tb_aico_file((tb_aico_ref_t)aico);
+    tb_assert_and_check_return(file);
+    
+    // kill it
+    tb_file_exit(file);
 }
 static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
 {
@@ -91,15 +96,15 @@ static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_impl_t* impl, tb_aice_t* ai
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_READ, -1);
     tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size, -1);
 
-    // the handle 
-    tb_handle_t handle = tb_aico_handle(aice->aico);
-    tb_assert_and_check_return_val(handle, -1);
+    // the file 
+    tb_file_ref_t file = tb_aico_file(aice->aico);
+    tb_assert_and_check_return_val(file, -1);
 
     // read it from the given offset
-    tb_long_t real = tb_file_pread(handle, aice->u.read.data, aice->u.read.size, aice->u.read.seek);
+    tb_long_t real = tb_file_pread(file, aice->u.read.data, aice->u.read.size, aice->u.read.seek);
 
     // trace
-    tb_trace_d("read[%p]: %ld", handle, real);
+    tb_trace_d("read[%p]: %ld", file, real);
 
     // ok?
     if (real > 0) 
@@ -121,15 +126,15 @@ static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_impl_t* impl, tb_aice_t* ai
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_WRIT, -1);
     tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size, -1);
 
-    // the handle 
-    tb_handle_t handle = tb_aico_handle(aice->aico);
-    tb_assert_and_check_return_val(handle, -1);
+    // the file 
+    tb_file_ref_t file = tb_aico_file(aice->aico);
+    tb_assert_and_check_return_val(file, -1);
 
     // writ it from the given offset
-    tb_long_t real = tb_file_pwrit(handle, aice->u.writ.data, aice->u.read.size, aice->u.writ.seek);
+    tb_long_t real = tb_file_pwrit(file, aice->u.writ.data, aice->u.read.size, aice->u.writ.seek);
 
     // trace
-    tb_trace_d("writ[%p]: %ld", handle, real);
+    tb_trace_d("writ[%p]: %ld", file, real);
 
     // ok?
     if (real > 0) 
@@ -151,15 +156,15 @@ static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_impl_t* impl, tb_aice_t* a
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_READV, -1);
     tb_assert_and_check_return_val(aice->u.readv.list && aice->u.readv.size, -1);
 
-    // the handle 
-    tb_handle_t handle = tb_aico_handle(aice->aico);
-    tb_assert_and_check_return_val(handle, -1);
+    // the file 
+    tb_file_ref_t file = tb_aico_file(aice->aico);
+    tb_assert_and_check_return_val(file, -1);
 
     // read it from the given offset
-    tb_long_t real = tb_file_preadv(handle, aice->u.readv.list, aice->u.readv.size, aice->u.readv.seek);
+    tb_long_t real = tb_file_preadv(file, aice->u.readv.list, aice->u.readv.size, aice->u.readv.seek);
 
     // trace
-    tb_trace_d("readv[%p]: %ld", handle, real);
+    tb_trace_d("readv[%p]: %ld", file, real);
 
     // ok?
     if (real > 0) 
@@ -181,15 +186,15 @@ static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_impl_t* impl, tb_aice_t* a
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_WRITV, -1);
     tb_assert_and_check_return_val(aice->u.writv.list && aice->u.writv.size, -1);
 
-    // the handle 
-    tb_handle_t handle = tb_aico_handle(aice->aico);
-    tb_assert_and_check_return_val(handle, -1);
+    // the file 
+    tb_file_ref_t file = tb_aico_file(aice->aico);
+    tb_assert_and_check_return_val(file, -1);
 
     // read it from the given offset
-    tb_long_t real = tb_file_pwritv(handle, aice->u.writv.list, aice->u.writv.size, aice->u.writv.seek);
+    tb_long_t real = tb_file_pwritv(file, aice->u.writv.list, aice->u.writv.size, aice->u.writv.seek);
 
     // trace
-    tb_trace_d("writv[%p]: %ld", handle, real);
+    tb_trace_d("writv[%p]: %ld", file, real);
 
     // ok?
     if (real > 0) 
@@ -210,15 +215,15 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_impl_t* impl, tb_aice_t* a
     // check
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_FSYNC, -1);
 
-    // the handle 
-    tb_handle_t handle = tb_aico_handle(aice->aico);
-    tb_assert_and_check_return_val(handle, -1);
+    // the file 
+    tb_file_ref_t file = tb_aico_file(aice->aico);
+    tb_assert_and_check_return_val(file, -1);
 
     // done sync
-    tb_bool_t ok = tb_file_sync(handle);
+    tb_bool_t ok = tb_file_sync(file);
 
     // trace
-    tb_trace_d("fsync[%p]: %s", handle, ok? "ok" : "no");
+    tb_trace_d("fsync[%p]: %s", file, ok? "ok" : "no");
 
     // ok?
     aice->state = ok? TB_STATE_OK : TB_STATE_FAILED;

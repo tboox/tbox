@@ -87,7 +87,7 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_impl_t* impl, tb_aico_impl_t* aico)
     if (aico) 
     {
         // trace
-        tb_trace_d("exit: aico[%p]: type: %lu, handle: %p, state: %s", aico, tb_aico_type((tb_aico_ref_t)aico), tb_aico_handle((tb_aico_ref_t)aico), tb_state_cstr(tb_atomic_get(&aico->state)));
+        tb_trace_d("exit: aico[%p]: type: %lu, handle: %p, state: %s", aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(tb_atomic_get(&aico->state)));
         
         // exit pool
         if (aico->pool) tb_pool_exit(aico->pool);
@@ -108,9 +108,9 @@ static tb_bool_t tb_aicp_aico_wait(tb_pointer_t item, tb_cpointer_t priv)
 
     // trace
 #ifdef __tb_debug__
-    tb_trace_e("aico[%p]: wait exited failed, type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aico, tb_aico_type((tb_aico_ref_t)aico), tb_aico_handle((tb_aico_ref_t)aico), tb_state_cstr(tb_atomic_get(&aico->state)), aico->func, aico->line, aico->file);
+    tb_trace_e("aico[%p]: wait exited failed, type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(tb_atomic_get(&aico->state)), aico->func, aico->line, aico->file);
 #else
-    tb_trace_e("aico[%p]: wait exited failed, type: %lu, handle: %p, state: %s", aico, tb_aico_type((tb_aico_ref_t)aico), tb_aico_handle((tb_aico_ref_t)aico), tb_state_cstr(tb_atomic_get(&aico->state)));
+    tb_trace_e("aico[%p]: wait exited failed, type: %lu, handle: %p, state: %s", aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(tb_atomic_get(&aico->state)));
 #endif
 
     // ok
@@ -439,7 +439,11 @@ tb_void_t tb_aicp_delo(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_aico_exit_func
 {
     // check
     tb_aicp_impl_t* impl = (tb_aicp_impl_t*)aicp;
-    tb_assert_and_check_return(impl && impl->ptor && impl->ptor->delo && aico);
+    tb_assert_and_check_return(impl && impl->ptor && impl->ptor->delo);
+
+    // the aico impl
+    tb_aico_impl_t* aico_impl = (tb_aico_impl_t*)aico;
+    tb_assert_and_check_return(aico_impl);
 
     // no func? wait exiting
     tb_atomic_t wait = 0;
@@ -451,28 +455,28 @@ tb_void_t tb_aicp_delo(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_aico_exit_func
     else tb_atomic_set(&wait, 1);
 
     // save func
-    ((tb_aico_impl_t*)aico)->exit = func;
-    ((tb_aico_impl_t*)aico)->priv = priv;
+    aico_impl->exit = func;
+    aico_impl->priv = priv;
 
     // trace
-    tb_trace_d("exit: aico[%p]: type: %lu, handle: %p: state: %s: ..", aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(tb_atomic_get(&((tb_aico_impl_t*)aico)->state)));
+    tb_trace_d("exit: aico[%p]: type: %lu, handle: %p: state: %s: ..", aico, tb_aico_type(aico), aico_impl->handle, tb_state_cstr(tb_atomic_get(&aico_impl->state)));
 
     // exit it directly if be ok or killed, otherwise wait exiting
     tb_size_t state = TB_STATE_OK;
-    if (TB_STATE_OK == (state = tb_atomic_fetch_and_set(&((tb_aico_impl_t*)aico)->state, TB_STATE_EXITING)) || (state == TB_STATE_KILLED))
+    if (TB_STATE_OK == (state = tb_atomic_fetch_and_set(&aico_impl->state, TB_STATE_EXITING)) || (state == TB_STATE_KILLED))
     {
         // done exit
-        if (((tb_aico_impl_t*)aico)->exit) ((tb_aico_impl_t*)aico)->exit(aico, ((tb_aico_impl_t*)aico)->priv);
+        if (aico_impl->exit) aico_impl->exit(aico, aico_impl->priv);
 
         // clear func
-        ((tb_aico_impl_t*)aico)->exit = tb_null;
-        ((tb_aico_impl_t*)aico)->priv = tb_null;
+        aico_impl->exit = tb_null;
+        aico_impl->priv = tb_null;
  
         // trace
-        tb_trace_d("exit: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), tb_aico_handle(aico));
+        tb_trace_d("exit: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), aico_impl->handle);
 
         // exit it
-        if (impl->ptor->delo(impl->ptor, (tb_aico_impl_t*)aico)) tb_aicp_aico_exit(impl, (tb_aico_impl_t*)aico);
+        if (impl->ptor->delo(impl->ptor, aico_impl)) tb_aicp_aico_exit(impl, aico_impl);
     }
 
     // wait exiting
@@ -497,28 +501,32 @@ tb_void_t tb_aicp_kilo(tb_aicp_ref_t aicp, tb_aico_ref_t aico)
 {
     // check
     tb_aicp_impl_t* impl = (tb_aicp_impl_t*)aicp;
-    tb_assert_and_check_return(impl && impl->ptor && impl->ptor->kilo && aico);
+    tb_assert_and_check_return(impl && impl->ptor && impl->ptor->kilo);
+
+    // the aico impl
+    tb_aico_impl_t* aico_impl = (tb_aico_impl_t*)aico;
+    tb_assert_and_check_return(aico_impl);
 
     // the impl is killed and not worked?
     tb_check_return(!tb_atomic_get(&impl->kill) || tb_atomic_get(&impl->work));
 
     // trace
-    tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: %s: ..", aico, tb_aico_type(aico), tb_aico_handle(aico), tb_state_cstr(tb_atomic_get(&((tb_aico_impl_t*)aico)->state)));
+    tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: %s: ..", aico, tb_aico_type(aico), aico_impl->handle, tb_state_cstr(tb_atomic_get(&((tb_aico_impl_t*)aico)->state)));
 
     // ok? killed
-    if (TB_STATE_OK == tb_atomic_fetch_and_pset(&((tb_aico_impl_t*)aico)->state, TB_STATE_OK, TB_STATE_KILLED))
+    if (TB_STATE_OK == tb_atomic_fetch_and_pset(&aico_impl->state, TB_STATE_OK, TB_STATE_KILLED))
     { 
         // trace
-        tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), tb_aico_handle(aico));
+        tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), aico_impl->handle);
     }
     // pending? kill it
-    else if (TB_STATE_PENDING == tb_atomic_fetch_and_pset(&((tb_aico_impl_t*)aico)->state, TB_STATE_PENDING, TB_STATE_KILLING)) 
+    else if (TB_STATE_PENDING == tb_atomic_fetch_and_pset(&aico_impl->state, TB_STATE_PENDING, TB_STATE_KILLING)) 
     {
         // kill it
-        impl->ptor->kilo(impl->ptor, (tb_aico_impl_t*)aico);
+        impl->ptor->kilo(impl->ptor, aico_impl);
 
         // trace
-        tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: pending: ok", aico, tb_aico_type(aico), tb_aico_handle(aico));
+        tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: pending: ok", aico, tb_aico_type(aico), aico_impl->handle);
     }
 }
 tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_decl__)
@@ -544,9 +552,9 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_dec
         {
             // trace
 #ifdef __tb_debug__
-            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), tb_aico_handle((tb_aico_ref_t)aico), tb_state_cstr(state), func_, line_, file_);
+            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state), func_, line_, file_);
 #else
-            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), tb_aico_handle((tb_aico_ref_t)aico), tb_state_cstr(state));
+            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state));
 #endif
 
             // abort it
@@ -674,7 +682,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t 
             aico->priv = tb_null;
  
             // trace
-            tb_trace_d("loop[%p]: exit: aico[%p]: type: %lu, handle: %p: ok", loop, aico, tb_aico_type((tb_aico_ref_t)aico), tb_aico_handle((tb_aico_ref_t)aico));
+            tb_trace_d("loop[%p]: exit: aico[%p]: type: %lu, handle: %p: ok", loop, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle);
 
             // exit it
             if (ptor->delo(ptor, aico)) tb_aicp_aico_exit(impl, aico);

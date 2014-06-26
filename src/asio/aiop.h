@@ -30,6 +30,7 @@
 #include "prefix.h"
 #include "aioo.h"
 #include "aioe.h"
+#include "../platform/prefix.h"
 #include "../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -76,13 +77,13 @@ tb_void_t           tb_aiop_spak(tb_aiop_ref_t aiop);
 /*! addo the aioo
  *
  * @param aiop      the aiop
- * @param handle    the handle
+ * @param sock      the socket
  * @param code      the code
  * @param priv      the private data
  *
  * @return          the aioo
  */
-tb_handle_t         tb_aiop_addo(tb_aiop_ref_t aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv);
+tb_aioo_ref_t       tb_aiop_addo(tb_aiop_ref_t aiop, tb_socket_ref_t sock, tb_size_t code, tb_cpointer_t priv);
 
 /*! delo the aioo
  *

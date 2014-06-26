@@ -85,7 +85,7 @@ typedef struct __tb_aice_addr_t
 typedef struct __tb_aice_acpt_t
 {
     /// the client socket 
-    tb_handle_t                 sock;
+    tb_socket_ref_t             sock;
 
     /// the private data for using the left space of the union
     tb_handle_t                 priv[5];
@@ -432,7 +432,7 @@ typedef struct __tb_aice_usendv_t
 typedef struct __tb_aice_sendf_t
 {
     /// the file
-    tb_handle_t                 file;
+    tb_file_ref_t               file;
 
     /// the private data for using the left space of the union
     tb_handle_t                 priv[1];

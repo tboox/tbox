@@ -82,10 +82,10 @@ static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
 {
     // check
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->sock, tb_false);
 
     // fd
-    tb_int_t fd = ((tb_int_t)aioo->handle) - 1;
+    tb_int_t fd = ((tb_int_t)aioo->sock) - 1;
 
     // the code
     tb_size_t code = aioo->code;
@@ -110,10 +110,10 @@ static tb_bool_t tb_aiop_rtor_kqueue_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
 {
     // check
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->sock, tb_false);
 
     // fd
-    tb_int_t fd = ((tb_int_t)aioo->handle) - 1;
+    tb_int_t fd = ((tb_int_t)aioo->sock) - 1;
 
     // del event
     struct kevent e[2];
@@ -131,10 +131,10 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
 
     // the aioo
     tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
-    tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(aioo && aioo->sock, tb_false);
 
     // fd
-    tb_int_t fd = ((tb_int_t)aioo->handle) - 1;
+    tb_int_t fd = ((tb_int_t)aioo->sock) - 1;
 
     // change
     tb_size_t adde = aioe->code & ~aioo->code;
@@ -236,13 +236,13 @@ static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
 
         // the aioo
         tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)e->udata;
-        tb_assert_and_check_return_val(aioo && aioo->handle, -1);
+        tb_assert_and_check_return_val(aioo && aioo->sock, -1);
         
-        // the handle 
-        tb_handle_t handle = aioo->handle;
+        // the sock 
+        tb_socket_ref_t sock = aioo->sock;
 
         // spak?
-        if (handle == aiop->spak[1] && e->filter == EVFILT_READ) 
+        if (sock == aiop->spak[1] && e->filter == EVFILT_READ) 
         {
             // read spak
             tb_char_t spak = '\0';
@@ -256,7 +256,7 @@ static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
         }
 
         // skip spak
-        tb_check_continue(handle != aiop->spak[1]);
+        tb_check_continue(sock != aiop->spak[1]);
 
         // init the aioe
         tb_aioe_t* aioe = &list[wait++];

@@ -42,22 +42,22 @@ __tb_extern_c_enter__
  *
  * @param aioo      the aioo
  *
- * @return          the aioo handle
+ * @return          the socket
  */
-tb_handle_t         tb_aioo_handle(tb_aioo_ref_t aioo);
+tb_socket_ref_t     tb_aioo_sock(tb_aioo_ref_t aioo);
 
 /*! wait the aioo
  *
  * blocking wait the single event aioo, so need not aiop 
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param handle    the handle 
+ * @param sock      the sock 
  * @param code      the aioe code
  * @param timeout   the timeout, infinity: -1
  *
  * @return          > 0: the aioe code, 0: timeout, -1: failed
  */
-tb_long_t           tb_aioo_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
+tb_long_t           tb_aioo_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout);
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////

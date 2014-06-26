@@ -31,14 +31,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_aioo_reactor_poll_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+static tb_long_t tb_aioo_rtor_poll_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout)
 {
     // check
-    tb_assert_and_check_return_val(handle, -1);
+    tb_assert_and_check_return_val(sock, -1);
 
     // init
     struct pollfd pfd = {0};
-    pfd.fd = ((tb_long_t)handle) - 1;
+    pfd.fd = tb_sock2fd(sock);
     if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
     if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
 

@@ -91,7 +91,7 @@ static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
 {
     // check
     tb_aiop_rtor_select_impl_t* impl = (tb_aiop_rtor_select_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && rtor->aiop && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && rtor->aiop && aioo && aioo->sock, tb_false);
 
     // the aiop
     tb_aiop_impl_t* aiop = rtor->aiop;
@@ -103,19 +103,19 @@ static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     tb_spinlock_leave(&impl->lock.hash);
     tb_assert_and_check_return_val(size < FD_SETSIZE, tb_false);
 
-    // add handle => aioo
+    // add sock => aioo
     tb_bool_t ok = tb_false;
     tb_spinlock_enter(&impl->lock.hash);
     if (impl->hash) 
     {
-        tb_hash_set(impl->hash, aioo->handle, aioo);
+        tb_hash_set(impl->hash, aioo->sock, aioo);
         ok = tb_true;
     }
     tb_spinlock_leave(&impl->lock.hash);
     tb_assert_and_check_return_val(ok, tb_false);
 
     // the fd
-    tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
+    tb_long_t fd = ((tb_long_t)aioo->sock) - 1;
 
     // the code
     tb_size_t code = aioo->code;
@@ -144,14 +144,14 @@ static tb_bool_t tb_aiop_rtor_select_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
 {
     // check
     tb_aiop_rtor_select_impl_t* impl = (tb_aiop_rtor_select_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && aioo && aioo->sock, tb_false);
 
     // the aiop
     tb_aiop_impl_t* aiop = rtor->aiop;
     tb_assert_and_check_return_val(aiop, tb_false);
 
     // fd
-    tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
+    tb_long_t fd = tb_sock2fd(aioo->sock);
 
     // enter
     tb_spinlock_enter(&impl->lock.pfds);
@@ -164,9 +164,9 @@ static tb_bool_t tb_aiop_rtor_select_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // leave
     tb_spinlock_leave(&impl->lock.pfds);
 
-    // del handle => aioo
+    // del sock => aioo
     tb_spinlock_enter(&impl->lock.hash);
-    if (impl->hash) tb_hash_del(impl->hash, aioo->handle);
+    if (impl->hash) tb_hash_del(impl->hash, aioo->sock);
     tb_spinlock_leave(&impl->lock.hash);
 
     // spak it
@@ -187,14 +187,14 @@ static tb_bool_t tb_aiop_rtor_select_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
 
     // the aioo
     tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
-    tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(aioo && aioo->sock, tb_false);
 
     // save aioo
     aioo->code = aioe->code;
     aioo->priv = aioe->priv;
 
     // fd
-    tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
+    tb_long_t fd = tb_sock2fd(aioo->sock);
 
     // enter
     tb_spinlock_enter(&impl->lock.pfds);
@@ -279,12 +279,12 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
             tb_hash_item_t* item = (tb_hash_item_t*)tb_iterator_item(impl->hash, itor);
             if (item)
             {
-                // the handle
-                tb_handle_t handle = (tb_handle_t)item->name;
-                tb_assert_and_check_return_val(handle, -1);
+                // the sock
+                tb_socket_ref_t sock = (tb_socket_ref_t)item->name;
+                tb_assert_and_check_return_val(sock, -1);
 
                 // spak?
-                if (handle == aiop->spak[1] && FD_ISSET(((tb_long_t)aiop->spak[1] - 1), &impl->rfdo))
+                if (sock == aiop->spak[1] && FD_ISSET(((tb_long_t)aiop->spak[1] - 1), &impl->rfdo))
                 {
                     // read spak
                     tb_char_t spak = '\0';
@@ -302,14 +302,14 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
                 }
 
                 // filter spak
-                tb_check_continue(handle != aiop->spak[1]);
+                tb_check_continue(sock != aiop->spak[1]);
 
                 // the fd
                 tb_long_t fd = (tb_long_t)item->name - 1;
 
                 // the aioo
                 tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)item->data;
-                tb_assert_and_check_return_val(aioo && aioo->handle == handle, -1);
+                tb_assert_and_check_return_val(aioo && aioo->sock == sock, -1);
 
                 // init aioe
                 tb_aioe_t aioe = {0};

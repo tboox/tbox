@@ -43,13 +43,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+static tb_long_t tb_aioo_rtor_select_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout)
 {
     // check
-    tb_assert_and_check_return_val(handle, -1);
+    tb_assert_and_check_return_val(sock, -1);
 
     // fd
-    tb_long_t fd = ((tb_long_t)handle) - 1;
+    tb_long_t fd = tb_sock2fd(sock);
     tb_assert_and_check_return_val(fd >= 0, -1);
     
     // init time

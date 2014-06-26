@@ -46,8 +46,8 @@
 // the file stream type
 typedef struct __tb_async_stream_file_impl_t
 {
-    // the file handle
-    tb_handle_t                         file;
+    // the file 
+    tb_file_ref_t                       file;
 
     // the aico
     tb_aico_ref_t                       aico;
