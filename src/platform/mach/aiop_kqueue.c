@@ -78,7 +78,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_sync(tb_aiop_rtor_impl_t* rtor, struct keve
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
@@ -106,7 +106,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t c
     // ok?
     return n? tb_aiop_rtor_kqueue_sync(rtor, e, n) : tb_true;
 }
-static tb_bool_t tb_aiop_rtor_kqueue_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_kqueue_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
@@ -130,7 +130,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     tb_assert_and_check_return_val(impl && aioe, tb_false);
 
     // the aioo
-    tb_aioo_t* aioo = aioe->aioo;
+    tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
     tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
 
     // fd
@@ -235,7 +235,7 @@ static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
         struct kevent* e = impl->evts + i;
 
         // the aioo
-        tb_aioo_t* aioo = (tb_aioo_t*)e->udata;
+        tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)e->udata;
         tb_assert_and_check_return_val(aioo && aioo->handle, -1);
         
         // the handle 
@@ -261,7 +261,7 @@ static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
         // init the aioe
         tb_aioe_t* aioe = &list[wait++];
         aioe->code = TB_AIOE_CODE_NONE;
-        aioe->aioo = aioo;
+        aioe->aioo = (tb_aioo_ref_t)aioo;
         aioe->priv = aioo->priv;
         if (e->filter == EVFILT_READ) 
         {

@@ -99,7 +99,7 @@ static tb_bool_t tb_poll_walk_sete(tb_iterator_ref_t iterator, tb_pointer_t item
     tb_assert_and_check_return_val(aioe, tb_false);
 
     // the aioo
-    tb_aioo_t const* aioo = aioe->aioo;
+    tb_aioo_impl_t const* aioo = (tb_aioo_impl_t const*)aioe->aioo;
     tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
 
     // is this?
@@ -117,7 +117,7 @@ static tb_bool_t tb_poll_walk_sete(tb_iterator_ref_t iterator, tb_pointer_t item
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_rtor_poll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_poll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_poll_impl_t* impl = (tb_aiop_rtor_poll_impl_t*)rtor;
@@ -158,7 +158,7 @@ static tb_bool_t tb_aiop_rtor_poll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t con
     // ok?
     return ok;
 }
-static tb_bool_t tb_aiop_rtor_poll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_poll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_poll_impl_t* impl = (tb_aiop_rtor_poll_impl_t*)rtor;
@@ -195,7 +195,7 @@ static tb_bool_t tb_aiop_rtor_poll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t con
     tb_assert_and_check_return_val(aiop, tb_false);
 
     // the aioo
-    tb_aioo_t* aioo = aioe->aioo;
+    tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
     tb_assert_and_check_return_val(aioo, tb_false);
 
     // save aioo
@@ -281,11 +281,11 @@ static tb_long_t tb_aiop_rtor_poll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* li
             // the aioo
             tb_size_t       code = TB_AIOE_CODE_NONE;
             tb_cpointer_t   priv = tb_null;
-            tb_aioo_t*      aioo = tb_null;
+            tb_aioo_impl_t*      aioo = tb_null;
             tb_spinlock_enter(&impl->lock.hash);
             if (impl->hash)
             {
-                aioo = (tb_aioo_t*)tb_hash_get(impl->hash, handle);
+                aioo = (tb_aioo_impl_t*)tb_hash_get(impl->hash, handle);
                 if (aioo) 
                 {
                     // save code & data
@@ -306,7 +306,7 @@ static tb_long_t tb_aiop_rtor_poll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* li
             // init aioe
             tb_aioe_t   aioe = {0};
             aioe.priv   = priv;
-            aioe.aioo   = aioo;
+            aioe.aioo   = (tb_aioo_ref_t)aioo;
             if (events & POLLIN)
             {
                 aioe.code |= TB_AIOE_CODE_RECV;

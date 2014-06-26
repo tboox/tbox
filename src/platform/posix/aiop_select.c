@@ -87,7 +87,7 @@ typedef struct __tb_aiop_rtor_select_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_select_impl_t* impl = (tb_aiop_rtor_select_impl_t*)rtor;
@@ -140,7 +140,7 @@ static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t c
     // ok?
     return ok;
 }
-static tb_bool_t tb_aiop_rtor_select_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_select_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_select_impl_t* impl = (tb_aiop_rtor_select_impl_t*)rtor;
@@ -186,7 +186,7 @@ static tb_bool_t tb_aiop_rtor_select_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     tb_assert_and_check_return_val(aiop, tb_false);
 
     // the aioo
-    tb_aioo_t* aioo = aioe->aioo;
+    tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
     tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
 
     // save aioo
@@ -308,13 +308,13 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
                 tb_long_t fd = (tb_long_t)item->name - 1;
 
                 // the aioo
-                tb_aioo_t* aioo = (tb_aioo_t*)item->data;
+                tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)item->data;
                 tb_assert_and_check_return_val(aioo && aioo->handle == handle, -1);
 
                 // init aioe
                 tb_aioe_t aioe = {0};
                 aioe.priv   = aioo->priv;
-                aioe.aioo   = aioo;
+                aioe.aioo   = (tb_aioo_ref_t)aioo;
                 if (FD_ISSET(fd, &impl->rfdo)) 
                 {
                     aioe.code |= TB_AIOE_CODE_RECV;

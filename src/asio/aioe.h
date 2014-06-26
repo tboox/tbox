@@ -55,17 +55,16 @@ typedef enum __tb_aioe_code_e
 /// the aioe type
 typedef struct __tb_aioe_t
 {
-    // the code
-    tb_size_t               code;
+    /// the code
+    tb_size_t                   code;
 
-    // the priv
-    tb_cpointer_t           priv;
+    /// the priv
+    tb_cpointer_t               priv;
 
-    // the aioo
-    tb_aioo_t*              aioo;
+    /// the aioo
+    tb_aioo_ref_t               aioo;
 
 }tb_aioe_t;
-
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

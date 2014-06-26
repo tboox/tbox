@@ -57,7 +57,7 @@ typedef struct __tb_aiop_rtor_epoll_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aiop_rtor_epoll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_epoll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_epoll_impl_t* impl = (tb_aiop_rtor_epoll_impl_t*)rtor;
@@ -86,7 +86,7 @@ static tb_bool_t tb_aiop_rtor_epoll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t co
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_rtor_epoll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_epoll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo)
 {
     // check
     tb_aiop_rtor_epoll_impl_t* impl = (tb_aiop_rtor_epoll_impl_t*)rtor;
@@ -117,7 +117,7 @@ static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t co
     tb_cpointer_t   priv = aioe->priv;
 
     // the aioo
-    tb_aioo_t*      aioo = aioe->aioo;
+    tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
     tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
 
     // init event
@@ -130,7 +130,7 @@ static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t co
     e.data.u64 = (tb_hize_t)aioo;
 
     // save aioo
-    tb_aioo_t prev = *aioo;
+    tb_aioo_impl_t prev = *aioo;
     aioo->code = code;
     aioo->priv = priv;
 
@@ -209,7 +209,7 @@ static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* l
     for (i = 0; i < evtn; i++)
     {
         // the aioo
-        tb_aioo_t* aioo = (tb_aioo_t*)impl->evts[i].data.u64;
+        tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)impl->evts[i].data.u64;
         tb_assert_and_check_return_val(aioo, -1);
 
         // the handle 
@@ -240,7 +240,7 @@ static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* l
         tb_aioe_t* aioe = &list[wait++];
         aioe->code = TB_AIOE_CODE_NONE;
         aioe->priv = aioo->priv;
-        aioe->aioo = aioo;
+        aioe->aioo = (tb_aioo_ref_t)aioo;
         if (events & EPOLLIN) 
         {
             aioe->code |= TB_AIOE_CODE_RECV;

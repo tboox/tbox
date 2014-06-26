@@ -38,20 +38,8 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the aioo type
-typedef struct __tb_aioo_t
-{
-    // the code
-    tb_size_t               code;
-
-    // the priv
-    tb_cpointer_t           priv;
-
-    // the handle 
-    tb_handle_t             handle;
-
-}tb_aioo_t;
-
+/// the aioo ref type
+typedef struct{}*   tb_aioo_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -63,7 +51,7 @@ typedef struct __tb_aioo_t
  *
  * @return          the aioo handle
  */
-tb_handle_t         tb_aioo_handle(tb_handle_t aioo);
+tb_handle_t         tb_aioo_handle(tb_aioo_ref_t aioo);
 
 /*! wait the aioo
  *
