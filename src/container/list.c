@@ -41,7 +41,7 @@
  * types
  */
 
-// the impl item type
+// the list impl item type
 typedef struct __tb_list_item_t
 {
     // the item next
@@ -52,51 +52,7 @@ typedef struct __tb_list_item_t
 
 }tb_list_item_t;
 
-/*!the double impl type
- *
- *
- * <pre>
- * impl:  0 => |-----| => |-------------------------------------------------=> |------| => |------| => 0
- *       tail   head                                                                         last     tail
- *        |                                                                                            |
- *        ---------------------------------------------------------------------------------------------
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
- *
- * performance: 
- *
- * insert:
- * insert midd: fast
- * insert head: fast
- * insert tail: fast
- * insert next: fast
- * 
- * ninsert:
- * ninsert midd: fast
- * ninsert head: fast
- * ninsert tail: fast
- * ninsert next: fast
- *
- * remove:
- * remove midd: fast
- * remove head: fast
- * remove last: fast
- * remove next: fast
- *
- * nremove:
- * nremove midd: fast
- * nremove head: fast
- * nremove last: fast
- * nremove next: fast
- *
- * iterator:
- * next: fast
- * prev: fast
- * </pre>
- *
- */
+// the list impl type
 typedef struct __tb_list_impl_t
 {
     /// the itor

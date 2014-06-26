@@ -25,7 +25,7 @@
  */
 #include "prefix.h"
 #ifdef TB_CONFIG_OS_WINDOWS
-#   include "../../windows/interface/interface.h"
+#   include "../windows/interface/interface.h"
 #else
 #   include <sys/select.h>
 #endif

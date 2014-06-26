@@ -174,7 +174,7 @@ static tb_bool_t tb_async_stream_file_impl_open_try(tb_async_stream_ref_t stream
         }
 
         // the aicp
-        tb_aicp_t* aicp = tb_async_stream_aicp(stream);
+        tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
         tb_assert_and_check_break(aicp);
 
         // addo file
@@ -580,7 +580,7 @@ static tb_bool_t tb_async_stream_file_impl_ctrl(tb_async_stream_ref_t stream, tb
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_async_stream_ref_t tb_async_stream_init_file(tb_aicp_t* aicp)
+tb_async_stream_ref_t tb_async_stream_init_file(tb_aicp_ref_t aicp)
 {
     // init stream
     tb_async_stream_ref_t stream = tb_async_stream_init(    aicp
@@ -613,7 +613,7 @@ tb_async_stream_ref_t tb_async_stream_init_file(tb_aicp_t* aicp)
     // ok?
     return stream;
 }
-tb_async_stream_ref_t tb_async_stream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path, tb_size_t mode)
+tb_async_stream_ref_t tb_async_stream_init_from_file(tb_aicp_ref_t aicp, tb_char_t const* path, tb_size_t mode)
 {
     // check
     tb_assert_and_check_return_val(path, tb_null);

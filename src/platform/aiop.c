@@ -31,38 +31,34 @@
  * includes
  */
 #include "prefix.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
+#include "../asio/impl/impl.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   include "../posix/asio/aiop_select.c"
-    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+#   include "posix/aiop_select.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
     {
-        return tb_aiop_reactor_select_init(aiop);
+        return tb_aiop_rtor_select_init(aiop);
     }
 #elif defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
-#   include "../linux/asio/aiop_epoll.c"
-    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+#   include "linux/aiop_epoll.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
     {
-        return tb_aiop_reactor_epoll_init(aiop);
+        return tb_aiop_rtor_epoll_init(aiop);
     }
 #elif defined(TB_CONFIG_OS_MAC)
-#   include "../mach/asio/aiop_kqueue.c"
-    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+#   include "mach/aiop_kqueue.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
     {
-        return tb_aiop_reactor_kqueue_init(aiop);
+        return tb_aiop_rtor_kqueue_init(aiop);
     }
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-#   include "../posix/asio/aiop_poll.c"
-    tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
+#   include "posix/aiop_poll.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
     {
-        return tb_aiop_reactor_poll_init(aiop);
+        return tb_aiop_rtor_poll_init(aiop);
     }
 #else
 #   error have not available event mode

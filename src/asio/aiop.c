@@ -33,29 +33,25 @@
  */
 #include "aiop.h"
 #include "aioo.h"
+#include "impl/impl.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * aioo
  */
-static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
+static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_impl_t* impl, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->pool, tb_null);
+    tb_assert_and_check_return_val(impl && impl->pool, tb_null);
 
     // enter 
-    tb_spinlock_enter(&aiop->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // make aioo
-    tb_aioo_t* aioo = (tb_aioo_t*)tb_fixed_pool_malloc0(aiop->pool);
+    tb_aioo_t* aioo = (tb_aioo_t*)tb_fixed_pool_malloc0(impl->pool);
 
     // init aioo
     if (aioo)
@@ -66,66 +62,66 @@ static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size
     }
 
     // leave 
-    tb_spinlock_leave(&aiop->lock);
+    tb_spinlock_leave(&impl->lock);
     
     // ok?
     return aioo;
 }
-static tb_void_t tb_aiop_aioo_exit(tb_aiop_t* aiop, tb_handle_t aioo)
+static tb_void_t tb_aiop_aioo_exit(tb_aiop_impl_t* impl, tb_handle_t aioo)
 {
     // check
-    tb_assert_and_check_return(aiop && aiop->pool);
+    tb_assert_and_check_return(impl && impl->pool);
 
     // enter 
-    tb_spinlock_enter(&aiop->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // exit aioo
-    if (aioo) tb_fixed_pool_free(aiop->pool, aioo);
+    if (aioo) tb_fixed_pool_free(impl->pool, aioo);
 
     // leave 
-    tb_spinlock_leave(&aiop->lock);
+    tb_spinlock_leave(&impl->lock);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_aiop_t* tb_aiop_init(tb_size_t maxn)
+tb_aiop_ref_t tb_aiop_init(tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(maxn, tb_null);
 
     // done
-    tb_bool_t  ok = tb_false;
-    tb_aiop_t* aiop = tb_null;
+    tb_bool_t       ok = tb_false;
+    tb_aiop_impl_t* impl = tb_null;
     do
     {
-        // make aiop
-        aiop = tb_malloc0_type(tb_aiop_t);
-        tb_assert_and_check_break(aiop);
+        // make impl
+        impl = tb_malloc0_type(tb_aiop_impl_t);
+        tb_assert_and_check_break(impl);
 
-        // init aiop
-        aiop->maxn = maxn;
+        // init impl
+        impl->maxn = maxn;
 
         // init lock
-        if (!tb_spinlock_init(&aiop->lock)) break;
+        if (!tb_spinlock_init(&impl->lock)) break;
 
         // init pool
-        aiop->pool = tb_fixed_pool_init((maxn >> 4) + 16, sizeof(tb_aioo_t), 0);
-        tb_assert_and_check_break(aiop->pool);
+        impl->pool = tb_fixed_pool_init((maxn >> 4) + 16, sizeof(tb_aioo_t), 0);
+        tb_assert_and_check_break(impl->pool);
 
         // init spak
-        if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, aiop->spak)) break;
+        if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, impl->spak)) break;
 
         // init reactor
-        aiop->rtor = tb_aiop_reactor_init(aiop);
-        tb_assert_and_check_break(aiop->rtor);
+        impl->rtor = tb_aiop_rtor_impl_init(impl);
+        tb_assert_and_check_break(impl->rtor);
 
         // addo spak
-        if (!tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null)) break;  
+        if (!tb_aiop_addo((tb_aiop_ref_t)impl, impl->spak[1], TB_AIOE_CODE_RECV, tb_null)) break;  
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&aiop->lock, TB_TRACE_MODULE_NAME);
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->lock, TB_TRACE_MODULE_NAME);
 #endif
 
         // ok
@@ -137,67 +133,70 @@ tb_aiop_t* tb_aiop_init(tb_size_t maxn)
     if (!ok)
     {
         // exit it
-        if (aiop) tb_aiop_exit(aiop);
-        aiop = tb_null;
+        if (impl) tb_aiop_exit((tb_aiop_ref_t)impl);
+        impl = tb_null;
     }
 
     // ok?
-    return aiop;
+    return (tb_aiop_ref_t)impl;
 }
-tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
+tb_void_t tb_aiop_exit(tb_aiop_ref_t aiop)
 {
     // check
-    tb_assert_and_check_return(aiop);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return(impl);
 
     // exit reactor
-    if (aiop->rtor && aiop->rtor->exit)
-        aiop->rtor->exit(aiop->rtor);
+    if (impl->rtor && impl->rtor->exit)
+        impl->rtor->exit(impl->rtor);
 
     // exit spak
-    if (aiop->spak[0]) tb_socket_clos(aiop->spak[0]);
-    if (aiop->spak[1]) tb_socket_clos(aiop->spak[1]);
-    aiop->spak[0] = tb_null;
-    aiop->spak[1] = tb_null;
+    if (impl->spak[0]) tb_socket_clos(impl->spak[0]);
+    if (impl->spak[1]) tb_socket_clos(impl->spak[1]);
+    impl->spak[0] = tb_null;
+    impl->spak[1] = tb_null;
 
     // exit pool
-    tb_spinlock_enter(&aiop->lock);
-    if (aiop->pool) tb_fixed_pool_exit(aiop->pool);
-    aiop->pool = tb_null;
-    tb_spinlock_leave(&aiop->lock);
+    tb_spinlock_enter(&impl->lock);
+    if (impl->pool) tb_fixed_pool_exit(impl->pool);
+    impl->pool = tb_null;
+    tb_spinlock_leave(&impl->lock);
 
     // exit lock
-    tb_spinlock_exit(&aiop->lock);
+    tb_spinlock_exit(&impl->lock);
 
-    // free aiop
-    tb_free(aiop);
+    // free impl
+    tb_free(impl);
 }
-tb_void_t tb_aiop_cler(tb_aiop_t* aiop)
+tb_void_t tb_aiop_cler(tb_aiop_ref_t aiop)
 {
     // check
-    tb_assert_and_check_return(aiop);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return(impl);
 
     // clear reactor
-    if (aiop->rtor && aiop->rtor->cler)
-        aiop->rtor->cler(aiop->rtor);
+    if (impl->rtor && impl->rtor->cler)
+        impl->rtor->cler(impl->rtor);
 
     // clear pool
-    tb_spinlock_enter(&aiop->lock);
-    if (aiop->pool) tb_fixed_pool_clear(aiop->pool);
-    tb_spinlock_leave(&aiop->lock);
+    tb_spinlock_enter(&impl->lock);
+    if (impl->pool) tb_fixed_pool_clear(impl->pool);
+    tb_spinlock_leave(&impl->lock);
 
     // addo spak
-    if (aiop->spak[1]) tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null);   
+    if (impl->spak[1]) tb_aiop_addo(aiop, impl->spak[1], TB_AIOE_CODE_RECV, tb_null);   
 }
-tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
+tb_void_t tb_aiop_kill(tb_aiop_ref_t aiop)
 {
     // check
-    tb_assert_and_check_return(aiop);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return(impl);
 
     // kill it
-    if (aiop->spak[0]) 
+    if (impl->spak[0]) 
     {
         // post: 'k'
-        tb_long_t ok = tb_socket_send(aiop->spak[0], (tb_byte_t const*)"k", 1);
+        tb_long_t ok = tb_socket_send(impl->spak[0], (tb_byte_t const*)"k", 1);
         if (ok != 1)
         {
             // trace
@@ -208,16 +207,17 @@ tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
         }
     }
 }
-tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
+tb_void_t tb_aiop_spak(tb_aiop_ref_t aiop)
 {
     // check
-    tb_assert_and_check_return(aiop);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return(impl);
 
     // spak it
-    if (aiop->spak[0]) 
+    if (impl->spak[0]) 
     {
         // post: 'p'
-        tb_long_t ok = tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
+        tb_long_t ok = tb_socket_send(impl->spak[0], (tb_byte_t const*)"p", 1);
         if (ok != 1)
         {
             // trace
@@ -228,10 +228,11 @@ tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
         }
     }
 }
-tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
+tb_handle_t tb_aiop_addo(tb_aiop_ref_t aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_null);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->addo && handle, tb_null);
 
     // done
     tb_bool_t   ok = tb_false;
@@ -239,11 +240,11 @@ tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb
     do
     {
         // init aioo
-        aioo = tb_aiop_aioo_init(aiop, handle, code, priv);
+        aioo = tb_aiop_aioo_init(impl, handle, code, priv);
         tb_assert_and_check_break(aioo);
         
         // addo aioo
-        if (!aiop->rtor->addo(aiop->rtor, aioo)) break;
+        if (!impl->rtor->addo(impl->rtor, aioo)) break;
 
         // ok
         ok = tb_true;
@@ -253,33 +254,36 @@ tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb
     // failed? remove aioo
     if (!ok && aioo) 
     {
-        tb_aiop_aioo_exit(aiop, aioo);
+        tb_aiop_aioo_exit(impl, aioo);
         aioo = tb_null;
     }
 
     // ok?
     return (tb_handle_t)aioo;
 }
-tb_void_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t aioo)
+tb_void_t tb_aiop_delo(tb_aiop_ref_t aiop, tb_handle_t aioo)
 {
     // check
-    tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->delo && aioo);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return(impl && impl->rtor && impl->rtor->delo && aioo);
 
     // delo aioo
-    if (aiop->rtor->delo(aiop->rtor, (tb_aioo_t*)aioo)) tb_aiop_aioo_exit(aiop, aioo);
+    if (impl->rtor->delo(impl->rtor, (tb_aioo_t*)aioo)) tb_aiop_aioo_exit(impl, aioo);
 }
-tb_bool_t tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* aioe)
+tb_bool_t tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_t const* aioe)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->post && aioe, tb_false);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->post && aioe, tb_false);
 
     // post
-    return aiop->rtor->post(aiop->rtor, aioe);
+    return impl->rtor->post(impl->rtor, aioe);
 }
-tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_cpointer_t priv)
+tb_bool_t tb_aiop_sete(tb_aiop_ref_t aiop, tb_handle_t aioo, tb_size_t code, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(aiop && aioo && tb_aioo_handle(aioo) && code, tb_false);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return_val(impl && aioo && tb_aioo_handle(aioo) && code, tb_false);
  
     // init aioe
     tb_aioe_t aioe;
@@ -290,12 +294,13 @@ tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_cpo
     // post aioe
     return tb_aiop_post(aiop, &aioe);
 }
-tb_long_t tb_aiop_wait(tb_aiop_t* aiop, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
+tb_long_t tb_aiop_wait(tb_aiop_ref_t aiop, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {   
     // check
-    tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->wait && list, -1);
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->wait && list, -1);
 
     // wait 
-    return aiop->rtor->wait(aiop->rtor, list, maxn, timeout);
+    return impl->rtor->wait(impl->rtor, list, maxn, timeout);
 }
 

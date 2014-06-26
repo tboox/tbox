@@ -347,7 +347,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
 {
     // aicp
-    tb_aicp_t*  aicp = (tb_aicp_t*)priv;
+    tb_aicp_ref_t  aicp = (tb_aicp_ref_t)priv;
     tb_size_t   self = tb_thread_self();
 
     // trace
@@ -373,7 +373,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
 
     // init
     tb_handle_t         sock = tb_null;
-    tb_aicp_t*          aicp = tb_null;
+    tb_aicp_ref_t          aicp = tb_null;
     tb_handle_t         aico = tb_null;
     tb_handle_t         task = tb_null;
     tb_handle_t         loop[16] = {0};

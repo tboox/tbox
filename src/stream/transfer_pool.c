@@ -47,7 +47,7 @@
 typedef struct __tb_transfer_pool_impl_t
 {
     // the aicp
-    tb_aicp_t*                      aicp;
+    tb_aicp_ref_t                   aicp;
 
     // the task maxn
     tb_size_t                       maxn;
@@ -59,10 +59,10 @@ typedef struct __tb_transfer_pool_impl_t
     tb_handle_t                     pool;
 
     // the idle task list
-    tb_vector_ref_t                    idle;
+    tb_vector_ref_t                 idle;
 
     // the work task list
-    tb_list_ref_t                      work;
+    tb_list_ref_t                   work;
 
     /* the state
      *
@@ -297,7 +297,7 @@ tb_transfer_pool_ref_t tb_transfer_pool()
 {
     return (tb_transfer_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_TRANSFER_POOL, tb_transfer_pool_instance_init, tb_transfer_pool_instance_exit, tb_transfer_pool_instance_kill);
 }
-tb_transfer_pool_ref_t tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn)
+tb_transfer_pool_ref_t tb_transfer_pool_init(tb_aicp_ref_t aicp, tb_size_t maxn)
 {
     // done
     tb_bool_t                   ok = tb_false;

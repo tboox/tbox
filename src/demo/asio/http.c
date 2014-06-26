@@ -25,7 +25,7 @@ static tb_void_t tb_demo_aicp_http_clos_func(tb_handle_t handle, tb_size_t state
 
 #if 0
     // kill loop
-    tb_aicp_kill((tb_aicp_t*)priv);
+    tb_aicp_kill((tb_aicp_ref_t)priv);
 #else
     // reopen and read 
     tb_aicp_http_open_read(handle, 0, tb_demo_aicp_http_read_func, priv);
@@ -60,7 +60,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // done
-    tb_aicp_t*          aicp = tb_null;
+    tb_aicp_ref_t          aicp = tb_null;
     tb_handle_t         http = tb_null;
     tb_async_stream_ref_t  post = tb_null;
     do

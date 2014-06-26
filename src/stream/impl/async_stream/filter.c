@@ -671,7 +671,7 @@ static tb_bool_t tb_async_stream_filter_impl_ctrl(tb_async_stream_ref_t stream, 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_async_stream_ref_t tb_async_stream_init_filter(tb_aicp_t* aicp)
+tb_async_stream_ref_t tb_async_stream_init_filter(tb_aicp_ref_t aicp)
 {
     return tb_async_stream_init(    aicp
                                 ,   TB_STREAM_TYPE_FLTR
@@ -697,7 +697,7 @@ tb_async_stream_ref_t tb_async_stream_init_filter_from_null(tb_async_stream_ref_
     tb_assert_and_check_return_val(stream, tb_null);
 
     // the aicp
-    tb_aicp_t* aicp = tb_async_stream_aicp(stream);
+    tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
     tb_assert_and_check_return_val(aicp, tb_null);
 
     // done
@@ -735,7 +735,7 @@ tb_async_stream_ref_t tb_async_stream_init_filter_from_zip(tb_async_stream_ref_t
     tb_assert_and_check_return_val(stream, tb_null);
 
     // the aicp
-    tb_aicp_t* aicp = tb_async_stream_aicp(stream);
+    tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
     tb_assert_and_check_return_val(aicp, tb_null);
 
     // done
@@ -778,7 +778,7 @@ tb_async_stream_ref_t tb_async_stream_init_filter_from_cache(tb_async_stream_ref
     tb_assert_and_check_return_val(stream, tb_null);
 
     // the aicp
-    tb_aicp_t* aicp = tb_async_stream_aicp(stream);
+    tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
     tb_assert_and_check_return_val(aicp, tb_null);
 
     // done
@@ -821,7 +821,7 @@ tb_async_stream_ref_t tb_async_stream_init_filter_from_charset(tb_async_stream_r
     tb_assert_and_check_return_val(stream, tb_null);
 
     // the aicp
-    tb_aicp_t* aicp = tb_async_stream_aicp(stream);
+    tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
     tb_assert_and_check_return_val(aicp, tb_null);
 
     // done
@@ -864,7 +864,7 @@ tb_async_stream_ref_t tb_async_stream_init_filter_from_chunked(tb_async_stream_r
     tb_assert_and_check_return_val(stream, tb_null);
 
     // the aicp
-    tb_aicp_t* aicp = tb_async_stream_aicp(stream);
+    tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
     tb_assert_and_check_return_val(aicp, tb_null);
 
     // done

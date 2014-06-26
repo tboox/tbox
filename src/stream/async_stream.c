@@ -433,7 +433,7 @@ static tb_bool_t tb_async_stream_sync_seek_func(tb_async_stream_ref_t stream, tb
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_async_stream_ref_t tb_async_stream_init( tb_aicp_t* aicp
+tb_async_stream_ref_t tb_async_stream_init( tb_aicp_ref_t aicp
                                         ,   tb_size_t type
                                         ,   tb_size_t type_size
                                         ,   tb_size_t rcache
@@ -523,13 +523,13 @@ tb_async_stream_ref_t tb_async_stream_init( tb_aicp_t* aicp
     // ok?
     return stream;
 }
-tb_async_stream_ref_t tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
+tb_async_stream_ref_t tb_async_stream_init_from_url(tb_aicp_ref_t aicp, tb_char_t const* url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);
 
     // the init
-    static tb_async_stream_ref_t (*s_init[])(tb_aicp_t*) = 
+    static tb_async_stream_ref_t (*s_init[])(tb_aicp_ref_t) = 
     {
         tb_null
     ,   tb_async_stream_init_file
@@ -1299,7 +1299,7 @@ tb_bool_t tb_async_stream_writ_after_(tb_async_stream_ref_t stream, tb_size_t de
     // writ it 
     return tb_async_stream_cache_writ_done(stream, delay, data, size, func, priv);
 }
-tb_aicp_t* tb_async_stream_aicp(tb_async_stream_ref_t stream)
+tb_aicp_ref_t tb_async_stream_aicp(tb_async_stream_ref_t stream)
 {
     // check
     tb_async_stream_impl_t* impl = tb_async_stream_impl(stream);

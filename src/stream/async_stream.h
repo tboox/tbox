@@ -238,7 +238,7 @@ typedef tb_bool_t               (*tb_async_stream_task_func_t)(tb_async_stream_r
 
  * @endcode
  */
-tb_async_stream_ref_t   tb_async_stream_init(   tb_aicp_t* aicp
+tb_async_stream_ref_t   tb_async_stream_init(   tb_aicp_ref_t aicp
                                             ,   tb_size_t type
                                             ,   tb_size_t type_size
                                             ,   tb_size_t rcache
@@ -262,7 +262,7 @@ tb_async_stream_ref_t   tb_async_stream_init(   tb_aicp_t* aicp
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_data(tb_aicp_t* aicp);
+tb_async_stream_ref_t   tb_async_stream_init_data(tb_aicp_ref_t aicp);
 
 /*! init file stream 
  *
@@ -270,7 +270,7 @@ tb_async_stream_ref_t   tb_async_stream_init_data(tb_aicp_t* aicp);
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_file(tb_aicp_t* aicp);
+tb_async_stream_ref_t   tb_async_stream_init_file(tb_aicp_ref_t aicp);
 
 /*! init sock stream 
  *
@@ -278,7 +278,7 @@ tb_async_stream_ref_t   tb_async_stream_init_file(tb_aicp_t* aicp);
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_sock(tb_aicp_t* aicp);
+tb_async_stream_ref_t   tb_async_stream_init_sock(tb_aicp_ref_t aicp);
 
 /*! init http stream 
  *
@@ -286,7 +286,7 @@ tb_async_stream_ref_t   tb_async_stream_init_sock(tb_aicp_t* aicp);
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_http(tb_aicp_t* aicp);
+tb_async_stream_ref_t   tb_async_stream_init_http(tb_aicp_ref_t aicp);
 
 /*! init filter stream 
  *
@@ -294,7 +294,7 @@ tb_async_stream_ref_t   tb_async_stream_init_http(tb_aicp_t* aicp);
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_filter(tb_aicp_t* aicp);
+tb_async_stream_ref_t   tb_async_stream_init_filter(tb_aicp_ref_t aicp);
 
 /*! exit stream
  *
@@ -320,7 +320,7 @@ tb_bool_t               tb_async_stream_exit(tb_async_stream_ref_t stream);
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url);
+tb_async_stream_ref_t   tb_async_stream_init_from_url(tb_aicp_ref_t aicp, tb_char_t const* url);
 
 /*! init stream from data
  *
@@ -330,7 +330,7 @@ tb_async_stream_ref_t   tb_async_stream_init_from_url(tb_aicp_t* aicp, tb_char_t
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_from_data(tb_aicp_t* aicp, tb_byte_t const* data, tb_size_t size);
+tb_async_stream_ref_t   tb_async_stream_init_from_data(tb_aicp_ref_t aicp, tb_byte_t const* data, tb_size_t size);
 
 /*! init stream from file
  *
@@ -340,7 +340,7 @@ tb_async_stream_ref_t   tb_async_stream_init_from_data(tb_aicp_t* aicp, tb_byte_
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path, tb_size_t mode);
+tb_async_stream_ref_t   tb_async_stream_init_from_file(tb_aicp_ref_t aicp, tb_char_t const* path, tb_size_t mode);
 
 /*! init stream from sock
  *
@@ -352,7 +352,7 @@ tb_async_stream_ref_t   tb_async_stream_init_from_file(tb_aicp_t* aicp, tb_char_
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
+tb_async_stream_ref_t   tb_async_stream_init_from_sock(tb_aicp_ref_t aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
 
 /*! init stream from http or https
  *
@@ -364,7 +364,7 @@ tb_async_stream_ref_t   tb_async_stream_init_from_sock(tb_aicp_t* aicp, tb_char_
  *
  * @return              the stream
  */
-tb_async_stream_ref_t   tb_async_stream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
+tb_async_stream_ref_t   tb_async_stream_init_from_http(tb_aicp_ref_t aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
 
 /*! init filter stream from null
  *
@@ -688,7 +688,7 @@ tb_bool_t               tb_async_stream_writ_after_(tb_async_stream_ref_t stream
  *
  * @return              the stream aicp
  */
-tb_aicp_t*              tb_async_stream_aicp(tb_async_stream_ref_t stream);
+tb_aicp_ref_t              tb_async_stream_aicp(tb_async_stream_ref_t stream);
 
 #ifdef __tb_debug__
 /*! the stream func name from post for debug

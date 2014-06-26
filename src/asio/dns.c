@@ -292,7 +292,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_URECV, tb_false);
 
     // the aicp
-    tb_aicp_t* aicp = (tb_aicp_t*)tb_aico_aicp(aice->aico);
+    tb_aicp_ref_t aicp = (tb_aicp_ref_t)tb_aico_aicp(aice->aico);
     tb_assert_and_check_return_val(aicp, tb_false);
     
     // the dns
@@ -360,7 +360,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_USEND, tb_false);
 
     // the aicp
-    tb_aicp_t* aicp = (tb_aicp_t*)tb_aico_aicp(aice->aico);
+    tb_aicp_ref_t aicp = (tb_aicp_ref_t)tb_aico_aicp(aice->aico);
     tb_assert_and_check_return_val(aicp, tb_false);
     
     // the dns
@@ -436,7 +436,7 @@ static tb_void_t tb_aicp_dns_exit_func(tb_handle_t aico, tb_cpointer_t priv)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout)
+tb_handle_t tb_aicp_dns_init(tb_aicp_ref_t aicp, tb_long_t timeout)
 {
     // check
     tb_assert_and_check_return_val(aicp, tb_null);
@@ -577,12 +577,12 @@ tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host, tb_aicp_dn
     // post reqt
     return tb_aico_usend(dns->aico, server, TB_DNS_HOST_PORT, dns->data, size, tb_aicp_dns_reqt_func, (tb_pointer_t)dns);
 }
-tb_aicp_t* tb_aicp_dns_aicp(tb_handle_t handle)
+tb_aicp_ref_t tb_aicp_dns_aicp(tb_handle_t handle)
 {
     // check
     tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
     tb_assert_and_check_return_val(dns && dns->aico, tb_null);
     
     // the aicp
-    return (tb_aicp_t*)tb_aico_aicp(dns->aico);
+    return (tb_aicp_ref_t)tb_aico_aicp(dns->aico);
 }

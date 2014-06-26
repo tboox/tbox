@@ -49,42 +49,7 @@
  * types
  */
 
-/*! the impl type
- *
- * <pre>
- * impl:    1      4      2      6       9       7       8       10       14       16
- *
- *                                          1(head)
- *                               -------------------------
- *                              |                         |
- *                              4                         2
- *                        --------------             -------------
- *                       |              |           |             |
- *                       6       (last / 2 - 1)9    7             8
- *                   ---------       ----
- *                  |         |     |
- *                  10        14    16(last - 1)
- * </pre>
- *
- * head: => the head item
- * last: => the last item
- * tail: => behind the last item, no item
- *
- * performance: 
- *
- * put: O(lgn)
- * pop: O(1)
- * top: O(1)
- *
- * iterator:
- *
- * next: fast
- * prev: fast
- *
- * </pre>
- *
- * @note the itor of the same item is mutable
- */
+// the heap impl type
 typedef struct __tb_heap_impl_t
 {
     // the itor

@@ -65,7 +65,7 @@
  * types
  */
 
-/// the impl item list type
+// the hash impl item list type
 typedef struct __tb_hash_item_list_t
 {
     tb_size_t               size;
@@ -73,34 +73,7 @@ typedef struct __tb_hash_item_list_t
 
 }tb_hash_item_list_t;
 
-/*!the impl type
- *
- * <pre>
- *                 0        1        3       ...     ...                n       n + 1
- * hash_list: |--------|--------|--------|--------|--------|--------|--------|--------|
- *                         |
- *                       -----    
- * item_list:           |     |       key:0                                      
- *                       -----   
- *                      |     |       key:1                                              
- *                       -----               <= insert by binary search algorithm
- *                      |     |       key:2                                               
- *                       -----  
- *                      |     |       key:3                                               
- *                       -----   
- *                      |     |       key:4                                               
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *
- * </pre>
- *
- * @note the itor of the same item is mutable
- */
+// the hash impl type
 typedef struct __tb_hash_impl_t
 {
     // the item itor

@@ -40,7 +40,32 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the stack ref type
+/*! the stack ref type 
+ *
+ * <pre>
+ * stack: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
+ *       head                                                           last    tail
+ *
+ * stack: |||||||||||||||||||||||||||||||||||||||||------|
+ *       head                                   last    tail
+ *
+ * head: => the first item
+ * last: => the last item
+ * tail: => behind the last item, no item
+
+ * performance: 
+ *
+ * push:    fast
+ * pop:     fast
+ *
+ * iterator:
+ * next:    fast
+ * prev:    fast
+ * </pre>
+ *
+ * @note the itor of the same item is fixed
+ *
+ */
 typedef tb_vector_ref_t tb_stack_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

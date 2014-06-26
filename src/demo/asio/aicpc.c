@@ -78,7 +78,7 @@ static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv)
     tb_file_exit(tb_aico_handle(aico));
 
     // kill aicp
-    tb_aicp_kill((tb_aicp_t*)tb_aico_aicp(aico));
+    tb_aicp_kill((tb_aicp_ref_t)tb_aico_aicp(aico));
 }
 static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv)
 {
@@ -229,7 +229,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_aicp_t*          aicp = tb_null;
+    tb_aicp_ref_t          aicp = tb_null;
     tb_demo_context_t   context = {0};
 
     // init aicp

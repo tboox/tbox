@@ -225,7 +225,7 @@ static tb_bool_t tb_async_stream_data_impl_open_try(tb_async_stream_ref_t stream
         tb_assert_and_check_break(impl->data && impl->size);
 
         // the aicp
-        tb_aicp_t* aicp = tb_async_stream_aicp(stream);
+        tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
         tb_assert_and_check_break(aicp);
         
         // init aico
@@ -644,7 +644,7 @@ static tb_bool_t tb_async_stream_data_impl_ctrl(tb_async_stream_ref_t stream, tb
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_async_stream_ref_t tb_async_stream_init_data(tb_aicp_t* aicp)
+tb_async_stream_ref_t tb_async_stream_init_data(tb_aicp_ref_t aicp)
 {
     return tb_async_stream_init(    aicp
                                 ,   TB_STREAM_TYPE_DATA
@@ -664,7 +664,7 @@ tb_async_stream_ref_t tb_async_stream_init_data(tb_aicp_t* aicp)
                                 ,   tb_null
                                 ,   tb_async_stream_data_impl_task);
 }
-tb_async_stream_ref_t tb_async_stream_init_from_data(tb_aicp_t* aicp, tb_byte_t const* data, tb_size_t size)
+tb_async_stream_ref_t tb_async_stream_init_from_data(tb_aicp_ref_t aicp, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(data && size, tb_null);

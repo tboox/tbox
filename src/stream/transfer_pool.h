@@ -60,7 +60,7 @@ tb_transfer_pool_ref_t  tb_transfer_pool(tb_noarg_t);
  *
  * @return              the transfer pool 
  */
-tb_transfer_pool_ref_t  tb_transfer_pool_init(tb_aicp_t* aicp, tb_size_t maxn);
+tb_transfer_pool_ref_t  tb_transfer_pool_init(tb_aicp_ref_t aicp, tb_size_t maxn);
 
 /*! exit transfer pool
  *

@@ -44,34 +44,7 @@
  * types
  */
 
-/*! the impl type
- *
- * <pre>
- * impl: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
- *       head                                                           last    tail
- *
- * impl: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
- *                   last  tail                       head                
- *
- * head: => the head item
- * last: => the last item
- * tail: => behind the last item, no item
- *
- * performance: 
- *
- * put: O(1)
- * pop: O(1)
- *
- * iterator:
- *
- * next: fast
- * prev: fast
- *
- * </pre>
- *
- * @note the index of the same item is mutable
- *
- */
+// the queue impl type
 typedef struct __tb_queue_impl_t
 {
     // the itor

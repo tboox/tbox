@@ -29,46 +29,46 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_file_init(tb_aiop_ptor_t* ptor)
+static tb_bool_t tb_aicp_file_init(tb_aiop_ptor_impl_t* impl)
 {
     return tb_true;
 }
-static tb_void_t tb_aicp_file_exit(tb_aiop_ptor_t* ptor)
+static tb_void_t tb_aicp_file_exit(tb_aiop_ptor_impl_t* impl)
 {
 }
-static tb_bool_t tb_aicp_file_addo(tb_aiop_ptor_t* ptor, tb_aico_t* aico)
-{
-    return tb_true;
-}
-static tb_bool_t tb_aicp_file_delo(tb_aiop_ptor_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_aicp_file_addo(tb_aiop_ptor_impl_t* impl, tb_aico_t* aico)
 {
     return tb_true;
 }
-static tb_void_t tb_aicp_file_kilo(tb_aiop_ptor_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_aicp_file_delo(tb_aiop_ptor_impl_t* impl, tb_aico_t* aico)
+{
+    return tb_true;
+}
+static tb_void_t tb_aicp_file_kilo(tb_aiop_ptor_impl_t* impl, tb_aico_t* aico)
 {
     if (aico && aico->handle) tb_file_exit(aico->handle);
 }
-static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
 {
     // check
-    tb_assert_and_check_return_val(ptor && aice, tb_false);
+    tb_assert_and_check_return_val(impl && aice, tb_false);
         
     // the priority
-    tb_size_t priority = tb_aice_priority(aice);
-    tb_assert_and_check_return_val(priority < tb_object_arrayn(ptor->spak) && ptor->spak[priority], tb_false);
+    tb_size_t priority = tb_aice_impl_priority(aice);
+    tb_assert_and_check_return_val(priority < tb_object_arrayn(impl->spak) && impl->spak[priority], tb_false);
 
     // enter 
-    tb_spinlock_enter(&ptor->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // post aice
     tb_bool_t ok = tb_true;
-    if (!tb_queue_full(ptor->spak[priority])) 
+    if (!tb_queue_full(impl->spak[priority])) 
     {
         // put
-        tb_queue_put(ptor->spak[priority], aice);
+        tb_queue_put(impl->spak[priority], aice);
 
         // trace
-        tb_trace_d("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
+        tb_trace_d("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(impl->spak[priority]));
     }
     else
     {
@@ -80,15 +80,15 @@ static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_t* ptor, tb_aice_t const* aice)
     }
 
     // leave 
-    tb_spinlock_leave(&ptor->lock);
+    tb_spinlock_leave(&impl->lock);
 
     // ok?
     return ok;
 }
-static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 {
     // check
-    tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_READ, -1);
+    tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_READ, -1);
     tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size, -1);
 
     // the handle 
@@ -115,10 +115,10 @@ static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 {
     // check
-    tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_WRIT, -1);
+    tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_WRIT, -1);
     tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size, -1);
 
     // the handle 
@@ -145,10 +145,10 @@ static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 {
     // check
-    tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_READV, -1);
+    tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_READV, -1);
     tb_assert_and_check_return_val(aice->u.readv.list && aice->u.readv.size, -1);
 
     // the handle 
@@ -175,10 +175,10 @@ static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 {
     // check
-    tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_WRITV, -1);
+    tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_WRITV, -1);
     tb_assert_and_check_return_val(aice->u.writv.list && aice->u.writv.size, -1);
 
     // the handle 
@@ -205,10 +205,10 @@ static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 {
     // check
-    tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_FSYNC, -1);
+    tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_FSYNC, -1);
 
     // the handle 
     tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
@@ -226,10 +226,10 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_t* ptor, tb_aice_t* aice)
     // ok?
     return 1;
 }
-static tb_void_t tb_aicp_file_kill(tb_aiop_ptor_t* ptor)
+static tb_void_t tb_aicp_file_kill(tb_aiop_ptor_impl_t* impl)
 {
 }
-static tb_void_t tb_aicp_file_poll(tb_aiop_ptor_t* ptor)
+static tb_void_t tb_aicp_file_poll(tb_aiop_ptor_impl_t* impl)
 {
 }
 
