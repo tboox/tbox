@@ -35,6 +35,20 @@
  * types
  */
 
+// the aioo impl type
+typedef struct __tb_aioo_impl_t
+{
+    // the code
+    tb_size_t                   code;
+
+    // the priv
+    tb_cpointer_t               priv;
+
+    // the handle 
+    tb_handle_t                 handle;
+
+}tb_aioo_impl_t;
+
 // the aicp proactor impl type
 struct __tb_aicp_impl_t;
 typedef struct __tb_aicp_ptor_impl_t
@@ -88,10 +102,10 @@ typedef struct __tb_aiop_rtor_impl_t
     tb_void_t                   (*cler)(struct __tb_aiop_rtor_impl_t* rtor);
 
     // addo
-    tb_bool_t                   (*addo)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo);
+    tb_bool_t                   (*addo)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo);
 
     // delo
-    tb_bool_t                   (*delo)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo);
+    tb_bool_t                   (*delo)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo);
 
     // post
     tb_bool_t                   (*post)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioe_t const* aioe);
