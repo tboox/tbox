@@ -49,6 +49,55 @@ typedef struct __tb_aioo_impl_t
 
 }tb_aioo_impl_t;
 
+// the aico impl type
+typedef struct __tb_aico_impl_t
+{
+    // the aicp
+    tb_aicp_ref_t               aicp;
+
+    // the type
+    tb_size_t                   type;
+
+    // the pool
+    tb_handle_t                 pool;
+
+    // the handle
+    tb_handle_t                 handle;
+
+    /*! the state
+     *
+     * <pre>
+     * TB_STATE_OK
+     * TB_STATE_KILLED
+     * TB_STATE_KILLING
+     * TB_STATE_PENDING
+     * TB_STATE_EXITING
+     * </pre>
+     */
+    tb_atomic_t                 state;
+
+    // the timeout for aice
+    tb_atomic_t                 timeout[TB_AICO_TIMEOUT_MAXN];
+
+    // the exit func
+    tb_aico_exit_func_t         exit;
+
+    // the private data
+    tb_cpointer_t               priv;
+
+#ifdef __tb_debug__
+    // the func
+    tb_char_t const*            func;
+
+    // the file
+    tb_char_t const*            file;
+
+    // the line
+    tb_size_t                   line;
+#endif
+
+}tb_aico_impl_t;
+
 // the aicp proactor impl type
 struct __tb_aicp_impl_t;
 typedef struct __tb_aicp_ptor_impl_t
@@ -66,13 +115,13 @@ typedef struct __tb_aicp_ptor_impl_t
     tb_void_t                   (*exit)(struct __tb_aicp_ptor_impl_t* ptor);
 
     // addo
-    tb_bool_t                   (*addo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico);
+    tb_bool_t                   (*addo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico);
 
     // delo
-    tb_bool_t                   (*delo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico);
+    tb_bool_t                   (*delo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico);
     
     // kilo
-    tb_void_t                   (*kilo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico);
+    tb_void_t                   (*kilo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico);
     
     // post
     tb_bool_t                   (*post)(struct __tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice);
@@ -184,13 +233,13 @@ tb_aiop_rtor_impl_t*    tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop);
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_bool_t tb_aico_impl_is_killed(tb_handle_t aico)
+static __tb_inline__ tb_bool_t tb_aico_impl_is_killed(tb_aico_impl_t* aico)
 {
     // check
     tb_assert_and_check_return_val(aico, tb_false);
 
     // the state
-    tb_size_t state = tb_atomic_get(&((tb_aico_t*)aico)->state);
+    tb_size_t state = tb_atomic_get(&aico->state);
 
     // killing or exiting or killed?
     return (state == TB_STATE_KILLING) || (state == TB_STATE_EXITING) || (state == TB_STATE_KILLED);
@@ -228,5 +277,38 @@ static __tb_inline__ tb_size_t tb_aice_impl_priority(tb_aice_t const* aice)
     // the priority
     return s_priorities[aice->code];
 }
+static __tb_inline__ tb_long_t tb_aico_impl_timeout_from_code(tb_aico_impl_t* aico, tb_size_t code)
+{
+    // init the timeout type
+    static tb_size_t type[] = 
+    {
+        -1
+
+    ,   TB_AICO_TIMEOUT_ACPT
+    ,   TB_AICO_TIMEOUT_CONN
+    ,   TB_AICO_TIMEOUT_RECV
+    ,   TB_AICO_TIMEOUT_SEND
+    ,   TB_AICO_TIMEOUT_RECV
+    ,   TB_AICO_TIMEOUT_SEND
+    ,   TB_AICO_TIMEOUT_RECV
+    ,   TB_AICO_TIMEOUT_SEND
+    ,   TB_AICO_TIMEOUT_RECV
+    ,   TB_AICO_TIMEOUT_SEND
+    ,   TB_AICO_TIMEOUT_SEND
+
+    ,   -1
+    ,   -1
+    ,   -1
+    ,   -1
+    ,   -1
+
+    ,   -1
+    };
+    tb_assert_and_check_return_val(code < tb_object_arrayn(type) && type[code] != (tb_size_t)-1, -1);
+
+    // timeout
+    return tb_aico_timeout((tb_aico_ref_t)aico, type[code]);
+}
+
 
 #endif

@@ -76,7 +76,7 @@ typedef struct __tb_aicp_dns_impl_t
     tb_handle_t             sock;
 
     // the aico
-    tb_handle_t             aico;
+    tb_aico_ref_t           aico;
 
     // the server indx
     tb_size_t               indx;
@@ -413,7 +413,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     // continue 
     return tb_true;
 }
-static tb_void_t tb_aicp_dns_exit_func(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_aicp_dns_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
     tb_aicp_dns_impl_t* impl = (tb_aicp_dns_impl_t*)priv;

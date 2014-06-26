@@ -19,7 +19,6 @@
  * @author      ruki
  * @file        aice.h
  * @ingroup     asio
- *
  */
 #ifndef TB_ASIO_AICE_H
 #define TB_ASIO_AICE_H
@@ -27,7 +26,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
 #include "aico.h"
 #include "../network/ipv4.h"
 
@@ -529,7 +527,7 @@ typedef struct __tb_aice_t
     tb_cpointer_t               priv;
 
     /// the aico
-    tb_aico_t*                  aico;
+    tb_aico_ref_t               aico;
 
     /// the uion
     union

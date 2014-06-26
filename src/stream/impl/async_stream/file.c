@@ -50,7 +50,7 @@ typedef struct __tb_async_stream_file_impl_t
     tb_handle_t                         file;
 
     // the aico
-    tb_handle_t                         aico;
+    tb_aico_ref_t                       aico;
 
     // the file handle is referenced? need not exit it
     tb_bool_t                           bref;
@@ -110,7 +110,7 @@ static tb_void_t tb_async_stream_file_impl_clos_clear(tb_async_stream_file_impl_
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
-static tb_void_t tb_async_stream_file_impl_clos_func(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_file_impl_clos_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast((tb_async_stream_ref_t)priv);

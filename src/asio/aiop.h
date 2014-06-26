@@ -38,23 +38,6 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-/*! the asio poll pool type 
- *
- * @note only for sock and using level triggered mode 
- *
- * <pre>
- * objs: |-----|------|------|--- ... ...---|-------|
- * wait:    |            |
- * evet:   read         writ ...
- * </pre>
- *
- */
-typedef struct{}*   tb_aiop_ref_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 

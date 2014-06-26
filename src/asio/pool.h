@@ -55,28 +55,28 @@ __tb_extern_c_enter__
  */
 
 // malloc
-tb_pointer_t    tb_aico_pool_malloc_(tb_aico_t* aico, tb_size_t size __tb_debug_decl__);
+tb_pointer_t    tb_aico_pool_malloc_(tb_aico_ref_t aico, tb_size_t size __tb_debug_decl__);
 
 // malloc0
-tb_pointer_t    tb_aico_pool_malloc0_(tb_aico_t* aico, tb_size_t size __tb_debug_decl__);
+tb_pointer_t    tb_aico_pool_malloc0_(tb_aico_ref_t aico, tb_size_t size __tb_debug_decl__);
 
 // nalloc
-tb_pointer_t    tb_aico_pool_nalloc_(tb_aico_t* aico, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t    tb_aico_pool_nalloc_(tb_aico_ref_t aico, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 // nalloc0
-tb_pointer_t    tb_aico_pool_nalloc0_(tb_aico_t* aico, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t    tb_aico_pool_nalloc0_(tb_aico_ref_t aico, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 // ralloc
-tb_pointer_t    tb_aico_pool_ralloc_(tb_aico_t* aico, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t    tb_aico_pool_ralloc_(tb_aico_ref_t aico, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 // strdup
-tb_char_t*      tb_aico_pool_strdup_(tb_aico_t* aico, tb_char_t const* data __tb_debug_decl__);
+tb_char_t*      tb_aico_pool_strdup_(tb_aico_ref_t aico, tb_char_t const* data __tb_debug_decl__);
 
 // strndup
-tb_char_t*      tb_aico_pool_strndup_(tb_aico_t* aico, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
+tb_char_t*      tb_aico_pool_strndup_(tb_aico_ref_t aico, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
 
 // free
-tb_bool_t       tb_aico_pool_free_(tb_aico_t* aico, tb_pointer_t data __tb_debug_decl__);
+tb_bool_t       tb_aico_pool_free_(tb_aico_ref_t aico, tb_pointer_t data __tb_debug_decl__);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
