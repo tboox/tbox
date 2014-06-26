@@ -84,10 +84,10 @@ typedef struct __tb_database_sql_t
     tb_bool_t                   (*rollback)(struct __tb_database_sql_t* database);
 
     /// load result
-    tb_iterator_t*              (*result_load)(struct __tb_database_sql_t* database, tb_bool_t try_all);
+    tb_iterator_ref_t              (*result_load)(struct __tb_database_sql_t* database, tb_bool_t try_all);
 
     /// exit result
-    tb_void_t                   (*result_exit)(struct __tb_database_sql_t* database, tb_iterator_t* result);
+    tb_void_t                   (*result_exit)(struct __tb_database_sql_t* database, tb_iterator_ref_t result);
 
     /// statement init
     tb_handle_t                 (*statement_init)(struct __tb_database_sql_t* database, tb_char_t const* sql);
@@ -230,11 +230,11 @@ tb_bool_t           tb_database_sql_done(tb_handle_t database, tb_char_t const* 
     // ..
 
     // load result
-    tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
+    tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_true);
     if (result)
     {
         // walk result
-        tb_for_all_if (tb_iterator_t*, row, result, row)
+        tb_for_all_if (tb_iterator_ref_t, row, result, row)
         {
             // walk values
             tb_for_all_if (tb_database_sql_value_t*, value, row, value)
@@ -248,11 +248,11 @@ tb_bool_t           tb_database_sql_done(tb_handle_t database, tb_char_t const* 
     }
 
     // load result
-    tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+    tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_false);
     if (result)
     {
         // walk result
-        tb_for_all_if (tb_iterator_t*, row, result, row)
+        tb_for_all_if (tb_iterator_ref_t, row, result, row)
         {
             // field count
             tb_trace_i("count: %lu", tb_iterator_size(row));
@@ -312,14 +312,14 @@ tb_bool_t           tb_database_sql_done(tb_handle_t database, tb_char_t const* 
  *
  * @return          the database result
  */
-tb_iterator_t*      tb_database_sql_result_load(tb_handle_t database, tb_bool_t try_all);
+tb_iterator_ref_t      tb_database_sql_result_load(tb_handle_t database, tb_bool_t try_all);
 
 /*! exit the database result
  *
  * @param database  the database handle
  * @param result    the database result
  */
-tb_void_t           tb_database_sql_result_exit(tb_handle_t database, tb_iterator_t* result);
+tb_void_t           tb_database_sql_result_exit(tb_handle_t database, tb_iterator_ref_t result);
 
 /*! init the database statement
  *

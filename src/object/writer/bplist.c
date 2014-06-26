@@ -427,7 +427,7 @@ static tb_uint64_t tb_object_bplist_writer_builder_maxn(tb_object_t* object)
 
     return size + 1;
 }
-static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_t* object, tb_object_t* list, tb_hash_t* hash)
+static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_t* object, tb_object_t* list, tb_hash_ref_t hash)
 {
     // check
     tb_assert_and_check_return_val(object && list && hash, 0);
@@ -455,7 +455,7 @@ static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_t* object, tb_ob
     // ok?
     return index;
 }
-static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_object_t* list, tb_hash_t* hash, tb_size_t item_size)
+static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_object_t* list, tb_hash_ref_t hash, tb_size_t item_size)
 {
     // check
     tb_assert_and_check_return(object && list && hash);
@@ -573,7 +573,7 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
         break;
     }
 }
-static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_t* list, tb_hash_t* hash)
+static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_t* list, tb_hash_ref_t hash)
 {
     // exit hash
     if (hash)
@@ -612,7 +612,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
     tb_size_t       i                   = 0;
     tb_byte_t       pad[6]              = {0};
     tb_object_t*    list                = tb_null;
-    tb_hash_t*      hash                = tb_null;
+    tb_hash_ref_t      hash                = tb_null;
     tb_size_t       object_count        = 0;
     tb_uint64_t     object_maxn         = 0;
     tb_uint64_t     root_object         = 0;

@@ -57,7 +57,7 @@ typedef struct __tb_dns_cache_t
     tb_handle_t             pool;
 
     // the hash
-    tb_hash_t*              hash;
+    tb_hash_ref_t              hash;
 
     // the times
     tb_hize_t               times;
@@ -95,7 +95,7 @@ static __tb_inline__ tb_size_t tb_dns_cache_now()
 {
     return (tb_size_t)(tb_cache_time_spak() / 1000);
 }
-static tb_bool_t tb_dns_cache_cler(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_dns_cache_cler(tb_hash_ref_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(cache && bdel, tb_false);

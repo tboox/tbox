@@ -45,10 +45,10 @@ typedef struct __tb_object_bin_writer_t
     tb_stream_ref_t              stream;
 
     /// the object hash
-    tb_hash_t*                  ohash;
+    tb_hash_ref_t                  ohash;
 
     /// the string hash
-    tb_hash_t*                  shash;
+    tb_hash_ref_t                  shash;
 
     /// the object index
     tb_size_t                   index;

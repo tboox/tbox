@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_size_t tb_iterator_init_ptr_size(tb_iterator_t* iterator)
+static tb_size_t tb_iterator_init_ptr_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_assert_return_val(iterator, 0);
@@ -38,11 +38,11 @@ static tb_size_t tb_iterator_init_ptr_size(tb_iterator_t* iterator)
     // the size
     return (tb_size_t)iterator->priv;
 }
-static tb_size_t tb_iterator_init_ptr_head(tb_iterator_t* iterator)
+static tb_size_t tb_iterator_init_ptr_head(tb_iterator_ref_t iterator)
 {
     return 0;
 }
-static tb_size_t tb_iterator_init_ptr_tail(tb_iterator_t* iterator)
+static tb_size_t tb_iterator_init_ptr_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_assert_return_val(iterator, 0);
@@ -50,7 +50,7 @@ static tb_size_t tb_iterator_init_ptr_tail(tb_iterator_t* iterator)
     // the tail
     return (tb_size_t)iterator->priv;
 }
-static tb_size_t tb_iterator_init_ptr_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_iterator_init_ptr_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_assert_return_val(iterator, 0);
@@ -59,7 +59,7 @@ static tb_size_t tb_iterator_init_ptr_next(tb_iterator_t* iterator, tb_size_t it
     // the next
     return itor + 1;
 }
-static tb_size_t tb_iterator_init_ptr_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_iterator_init_ptr_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_assert_and_check_return_val(itor, 0);
@@ -67,7 +67,7 @@ static tb_size_t tb_iterator_init_ptr_prev(tb_iterator_t* iterator, tb_size_t it
     // the prev
     return itor - 1;
 }
-static tb_pointer_t tb_iterator_init_ptr_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_iterator_init_ptr_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_assert_return_val(iterator, tb_null);
@@ -76,7 +76,7 @@ static tb_pointer_t tb_iterator_init_ptr_item(tb_iterator_t* iterator, tb_size_t
     // the item
     return ((tb_pointer_t*)iterator->data)[itor];
 }
-static tb_void_t tb_iterator_init_ptr_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_iterator_init_ptr_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
     tb_assert_return(iterator);
@@ -85,7 +85,7 @@ static tb_void_t tb_iterator_init_ptr_copy(tb_iterator_t* iterator, tb_size_t it
     // copy
     ((tb_cpointer_t*)iterator->data)[itor] = item;
 }
-static tb_long_t tb_iterator_init_ptr_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_iterator_init_ptr_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     return ((tb_size_t)ltem > (tb_size_t)rtem? 1 : ((tb_size_t)ltem < (tb_size_t)rtem? -1 : 0));
 }

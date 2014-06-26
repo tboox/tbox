@@ -95,7 +95,7 @@ typedef struct __tb_bloom_filter_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bloom_filter_t* tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func)
+tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func)
 {
     // check
     tb_assert_and_check_return_val(func.hash, tb_null);
@@ -207,14 +207,14 @@ tb_bloom_filter_t* tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_co
     if (!ok)
     {
         // exit it
-        if (filter) tb_bloom_filter_exit((tb_bloom_filter_t*)filter);
+        if (filter) tb_bloom_filter_exit((tb_bloom_filter_ref_t)filter);
         filter = tb_null;
     }
 
     // ok?
-    return (tb_bloom_filter_t*)filter;
+    return (tb_bloom_filter_ref_t)filter;
 }
-tb_void_t tb_bloom_filter_exit(tb_bloom_filter_t* handle)
+tb_void_t tb_bloom_filter_exit(tb_bloom_filter_ref_t handle)
 {
     // check
     tb_bloom_filter_impl_t* filter = (tb_bloom_filter_impl_t*)handle;
@@ -227,7 +227,7 @@ tb_void_t tb_bloom_filter_exit(tb_bloom_filter_t* handle)
     // exit it
     tb_free(filter);
 }
-tb_void_t tb_bloom_filter_clear(tb_bloom_filter_t* handle)
+tb_void_t tb_bloom_filter_clear(tb_bloom_filter_ref_t handle)
 {
     // check
     tb_bloom_filter_impl_t* filter = (tb_bloom_filter_impl_t*)handle;
@@ -236,7 +236,7 @@ tb_void_t tb_bloom_filter_clear(tb_bloom_filter_t* handle)
     // clear it
     if (filter->data && filter->size) tb_memset(filter->data, 0, filter->size);
 }
-tb_bool_t tb_bloom_filter_set(tb_bloom_filter_t* handle, tb_cpointer_t data)
+tb_bool_t tb_bloom_filter_set(tb_bloom_filter_ref_t handle, tb_cpointer_t data)
 {
     // check
     tb_bloom_filter_impl_t* filter = (tb_bloom_filter_impl_t*)handle;
@@ -266,7 +266,7 @@ tb_bool_t tb_bloom_filter_set(tb_bloom_filter_t* handle, tb_cpointer_t data)
     // ok?
     return ok;
 }
-tb_bool_t tb_bloom_filter_get(tb_bloom_filter_t* handle, tb_cpointer_t data)
+tb_bool_t tb_bloom_filter_get(tb_bloom_filter_ref_t handle, tb_cpointer_t data)
 {
     // check
     tb_bloom_filter_impl_t* filter = (tb_bloom_filter_impl_t*)handle;

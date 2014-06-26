@@ -88,7 +88,7 @@ typedef struct __tb_timer_t
     tb_handle_t                 pool;
 
     // the heap
-    tb_heap_t*                  heap;
+    tb_heap_ref_t                  heap;
 
     // the event
     tb_handle_t                 event;
@@ -121,7 +121,7 @@ static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata
     // comp
     return (ltask->when > rtask->when? 1 : (ltask->when < rtask->when? -1 : 0));
 }
-static tb_long_t tb_timer_comp_by_task(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_timer_comp_by_task(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     return ((tb_long_t)ltem > (tb_long_t)rtem? 1 : ((tb_long_t)ltem < (tb_long_t)rtem? -1 : 0));
 }

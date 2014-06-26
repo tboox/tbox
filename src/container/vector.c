@@ -107,7 +107,7 @@ typedef struct __tb_vector_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
-static tb_size_t tb_vector_iterator_size(tb_iterator_t* iterator)
+static tb_size_t tb_vector_iterator_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -116,7 +116,7 @@ static tb_size_t tb_vector_iterator_size(tb_iterator_t* iterator)
     // size
     return impl->size;
 }
-static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
+static tb_size_t tb_vector_iterator_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -125,7 +125,7 @@ static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
     // head
     return 0;
 }
-static tb_size_t tb_vector_iterator_tail(tb_iterator_t* iterator)
+static tb_size_t tb_vector_iterator_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -134,7 +134,7 @@ static tb_size_t tb_vector_iterator_tail(tb_iterator_t* iterator)
     // tail
     return impl->size;
 }
-static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_vector_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -144,7 +144,7 @@ static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor
     // next
     return itor + 1;
 }
-static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_vector_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -154,7 +154,7 @@ static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor
     // prev
     return itor - 1;
 }
-static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_vector_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -163,7 +163,7 @@ static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t i
     // data
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
 }
-static tb_void_t tb_vector_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_vector_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -172,7 +172,7 @@ static tb_void_t tb_vector_iterator_copy(tb_iterator_t* iterator, tb_size_t itor
     // copy
     impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
-static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_vector_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -185,7 +185,7 @@ static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
+tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_item_func_t func)
 {
     // check
     tb_assert_and_check_return_val(grow, tb_null);
@@ -233,14 +233,14 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
     if (!ok)
     {
         // exit it
-        if (impl) tb_vector_exit((tb_vector_t*)impl);
+        if (impl) tb_vector_exit((tb_vector_ref_t)impl);
         impl = tb_null;
     }
 
     // ok?
-    return (tb_vector_t*)impl;
+    return (tb_vector_ref_t)impl;
 }
-tb_void_t tb_vector_exit(tb_vector_t* vector)
+tb_void_t tb_vector_exit(tb_vector_ref_t vector)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -256,7 +256,7 @@ tb_void_t tb_vector_exit(tb_vector_t* vector)
     // free it
     tb_free(impl);
 }
-tb_void_t tb_vector_clear(tb_vector_t* vector)
+tb_void_t tb_vector_clear(tb_vector_ref_t vector)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -269,7 +269,7 @@ tb_void_t tb_vector_clear(tb_vector_t* vector)
     // reset size 
     impl->size = 0;
 }
-tb_void_t tb_vector_copy(tb_vector_t* vector, tb_vector_t const* hcopy)
+tb_void_t tb_vector_copy(tb_vector_ref_t vector, tb_vector_ref_t hcopy)
 {
     // check
     tb_vector_impl_t*       impl = (tb_vector_impl_t*)vector;
@@ -301,7 +301,7 @@ tb_void_t tb_vector_copy(tb_vector_t* vector, tb_vector_t const* hcopy)
     // copy size
     impl->size = copy->size;
 }
-tb_pointer_t tb_vector_data(tb_vector_t* vector)
+tb_pointer_t tb_vector_data(tb_vector_ref_t vector)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -310,15 +310,15 @@ tb_pointer_t tb_vector_data(tb_vector_t* vector)
     // data
     return impl->data;
 }
-tb_pointer_t tb_vector_head(tb_vector_t* vector)
+tb_pointer_t tb_vector_head(tb_vector_ref_t vector)
 {
     return tb_iterator_item(vector, tb_iterator_head(vector));
 }
-tb_pointer_t tb_vector_last(tb_vector_t* vector)
+tb_pointer_t tb_vector_last(tb_vector_ref_t vector)
 {
     return tb_iterator_item(vector, tb_iterator_last(vector));
 }
-tb_size_t tb_vector_size(tb_vector_t const* vector)
+tb_size_t tb_vector_size(tb_vector_ref_t vector)
 {
     // check
     tb_vector_impl_t const* impl = (tb_vector_impl_t const*)vector;
@@ -327,7 +327,7 @@ tb_size_t tb_vector_size(tb_vector_t const* vector)
     // size
     return impl->size;
 }
-tb_size_t tb_vector_grow(tb_vector_t const* vector)
+tb_size_t tb_vector_grow(tb_vector_ref_t vector)
 {
     // check
     tb_vector_impl_t const* impl = (tb_vector_impl_t const*)vector;
@@ -336,7 +336,7 @@ tb_size_t tb_vector_grow(tb_vector_t const* vector)
     // grow
     return impl->grow;
 }
-tb_size_t tb_vector_maxn(tb_vector_t const* vector)
+tb_size_t tb_vector_maxn(tb_vector_ref_t vector)
 {
     // check
     tb_vector_impl_t const* impl = (tb_vector_impl_t const*)vector;
@@ -345,7 +345,7 @@ tb_size_t tb_vector_maxn(tb_vector_t const* vector)
     // maxn
     return impl->maxn;
 }
-tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
+tb_bool_t tb_vector_resize(tb_vector_ref_t vector, tb_size_t size)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -383,7 +383,7 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
     impl->size = size;
     return tb_true;
 }
-tb_void_t tb_vector_insert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
+tb_void_t tb_vector_insert_prev(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -405,19 +405,19 @@ tb_void_t tb_vector_insert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer
     // save data
     impl->func.dupl(&impl->func, impl->data + itor * impl->func.size, data);
 }
-tb_void_t tb_vector_insert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
+tb_void_t tb_vector_insert_next(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data)
 {
     tb_vector_insert_prev(vector, tb_iterator_next(vector, itor), data);
 }
-tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t data)
+tb_void_t tb_vector_insert_head(tb_vector_ref_t vector, tb_cpointer_t data)
 {
     tb_vector_insert_prev(vector, 0, data);
 }
-tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_cpointer_t data)
+tb_void_t tb_vector_insert_tail(tb_vector_ref_t vector, tb_cpointer_t data)
 {
     tb_vector_insert_prev(vector, tb_vector_size(vector), data);
 }
-tb_void_t tb_vector_ninsert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_prev(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -439,19 +439,19 @@ tb_void_t tb_vector_ninsert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointe
     // duplicate data
     impl->func.ndupl(&impl->func, impl->data + itor * impl->func.size, data, size);
 }
-tb_void_t tb_vector_ninsert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_next(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
     tb_vector_ninsert_prev(vector, tb_iterator_next(vector, itor), data, size);
 }
-tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_head(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size)
 {
     tb_vector_ninsert_prev(vector, 0, data, size);
 }
-tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_tail(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size)
 {
     tb_vector_ninsert_prev(vector, tb_vector_size(vector), data, size);
 }
-tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
+tb_void_t tb_vector_replace(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -460,11 +460,11 @@ tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t d
     // replace data
     impl->func.repl(&impl->func, impl->data + itor * impl->func.size, data);
 }
-tb_void_t tb_vector_replace_head(tb_vector_t* vector, tb_cpointer_t data)
+tb_void_t tb_vector_replace_head(tb_vector_ref_t vector, tb_cpointer_t data)
 {
     tb_vector_replace(vector, 0, data);
 }
-tb_void_t tb_vector_replace_last(tb_vector_t* vector, tb_cpointer_t data)
+tb_void_t tb_vector_replace_last(tb_vector_ref_t vector, tb_cpointer_t data)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -473,7 +473,7 @@ tb_void_t tb_vector_replace_last(tb_vector_t* vector, tb_cpointer_t data)
     // replace
     tb_vector_replace(vector, impl->size - 1, data);
 }
-tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_nreplace(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -485,11 +485,11 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t 
     // replace data
     impl->func.nrepl(&impl->func, impl->data + itor * impl->func.size, data, size);
 }
-tb_void_t tb_vector_nreplace_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_nreplace_head(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size)
 {
     tb_vector_nreplace(vector, 0, data, size);
 }
-tb_void_t tb_vector_nreplace_last(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_nreplace_last(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -498,7 +498,7 @@ tb_void_t tb_vector_nreplace_last(tb_vector_t* vector, tb_cpointer_t data, tb_si
     // replace
     tb_vector_nreplace(vector, size >= impl->size? 0 : impl->size - size, data, size);
 }
-tb_void_t tb_vector_remove(tb_vector_t* vector, tb_size_t itor)
+tb_void_t tb_vector_remove(tb_vector_ref_t vector, tb_size_t itor)
 {   
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -516,11 +516,11 @@ tb_void_t tb_vector_remove(tb_vector_t* vector, tb_size_t itor)
         impl->size--;
     }
 }
-tb_void_t tb_vector_remove_head(tb_vector_t* vector)
+tb_void_t tb_vector_remove_head(tb_vector_ref_t vector)
 {
     tb_vector_remove(vector, 0);
 }
-tb_void_t tb_vector_remove_last(tb_vector_t* vector)
+tb_void_t tb_vector_remove_last(tb_vector_ref_t vector)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -535,7 +535,7 @@ tb_void_t tb_vector_remove_last(tb_vector_t* vector)
         impl->size--;
     }
 }
-tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t size)
+tb_void_t tb_vector_nremove(tb_vector_ref_t vector, tb_size_t itor, tb_size_t size)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -569,7 +569,7 @@ tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t size)
     // update size
     impl->size -= size;
 }
-tb_void_t tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
+tb_void_t tb_vector_nremove_head(tb_vector_ref_t vector, tb_size_t size)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -585,7 +585,7 @@ tb_void_t tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
     // remove head
     tb_vector_nremove(vector, 0, size);
 }
-tb_void_t tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size)
+tb_void_t tb_vector_nremove_last(tb_vector_ref_t vector, tb_size_t size)
 {   
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
@@ -601,7 +601,7 @@ tb_void_t tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size)
     // remove last
     tb_vector_nremove(vector, impl->size - size, size);
 }
-tb_void_t tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* impl, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
+tb_void_t tb_vector_walk(tb_vector_ref_t vector, tb_bool_t (*func)(tb_vector_ref_t impl, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;

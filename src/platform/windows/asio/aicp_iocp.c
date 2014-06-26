@@ -106,7 +106,7 @@ typedef struct __tb_iocp_ptor_t
      * index: 0: higher priority for conn, acpt and task
      * index: 1: lower priority for io aice 
      */
-    tb_queue_t*                                 post[2];
+    tb_queue_ref_t                                 post[2];
     
     // the post lock
     tb_spinlock_t                               lock;
@@ -157,7 +157,7 @@ typedef struct __tb_iocp_loop_t
     tb_OVERLAPPED_ENTRY_t                       list[TB_IOCP_OLAP_LIST_MAXN];
 
     // the aice spak 
-    tb_queue_t*                                 spak;                   
+    tb_queue_ref_t                                 spak;                   
 
 }tb_iocp_loop_t;
 

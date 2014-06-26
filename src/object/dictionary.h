@@ -103,7 +103,7 @@ tb_void_t               tb_object_dictionary_incr(tb_object_t* dictionary, tb_bo
  * }
  * @endcode
  */
-tb_iterator_t*          tb_object_dictionary_itor(tb_object_t* dictionary);
+tb_iterator_ref_t          tb_object_dictionary_itor(tb_object_t* dictionary);
 
 /*! the dictionary value
  *

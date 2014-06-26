@@ -87,7 +87,7 @@ tb_void_t           tb_object_array_incr(tb_object_t* array, tb_bool_t incr);
  * }
  * @endcode
  */
-tb_iterator_t*      tb_object_array_itor(tb_object_t* array);
+tb_iterator_ref_t      tb_object_array_itor(tb_object_t* array);
 
 /*! remove the item from index
  *

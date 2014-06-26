@@ -45,7 +45,7 @@ typedef struct __tb_object_array_t
     tb_object_t         base;
 
     // the vector
-    tb_vector_t*        vector;
+    tb_vector_ref_t        vector;
 
     // is increase refn?
     tb_bool_t           incr;
@@ -179,14 +179,14 @@ tb_object_t* tb_object_array_item(tb_object_t* object, tb_size_t index)
     // item
     return (tb_object_t*)tb_iterator_item(array->vector, index);
 }
-tb_iterator_t* tb_object_array_itor(tb_object_t* object)
+tb_iterator_ref_t tb_object_array_itor(tb_object_t* object)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
     tb_assert_and_check_return_val(array, tb_null);
 
     // iterator
-    return (tb_iterator_t*)array->vector;
+    return (tb_iterator_ref_t)array->vector;
 }
 tb_void_t tb_object_array_remove(tb_object_t* object, tb_size_t index)
 {

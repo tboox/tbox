@@ -50,7 +50,7 @@ typedef struct __tb_object_string_pool_t
     tb_handle_t             pool;
 
     // the hash cache
-    tb_hash_t*              cache;
+    tb_hash_ref_t              cache;
 
     // the lock
     tb_spinlock_t           lock;

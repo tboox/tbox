@@ -35,7 +35,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+tb_void_t tb_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
     // check
     tb_check_return(iterator && head != tail);
@@ -51,7 +51,7 @@ tb_void_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_it
     }
     else tb_bubble_sort(iterator, head, tail, comp);
 }
-tb_void_t tb_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp)
+tb_void_t tb_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
 {
     tb_sort(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp);
 }

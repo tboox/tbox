@@ -32,7 +32,7 @@
  * head
  */
 #ifdef __tb_debug__
-static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
     // the comparer 
     if (!comp) comp = tb_iterator_comp;
@@ -86,7 +86,7 @@ static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t 
  * </pre>
  */
 #if 0
-static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t top, tb_cpointer_t item, tb_iterator_comp_t comp)
+static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t hole, tb_size_t top, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
     // check
     tb_assert_and_check_return(comp);
@@ -151,7 +151,7 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
  *
  * </pre>
  */
-static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
+static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t hole, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
     // the comparer 
     if (!comp) comp = tb_iterator_comp;
@@ -234,7 +234,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
  *                  2         4     1(tail - 1)
  * </pre>
  */
-static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
     // init
     tb_size_t       step = tb_iterator_step(iterator);
@@ -278,7 +278,7 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t h
  *                                (hole)
  * </pre>
  */   
-static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
+static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
     // top => last
     tb_iterator_copy(iterator, tail - 1, tb_iterator_item(iterator, head));
@@ -399,7 +399,7 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t h
  * result: 1 2 3 4 7 8 9 10 14 16
  * </pre>
  */
-tb_void_t tb_heap_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+tb_void_t tb_heap_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
     // check
     tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS));
@@ -427,7 +427,7 @@ tb_void_t tb_heap_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, 
     // free
     if (last && step > sizeof(tb_pointer_t)) tb_free(last);
 }
-tb_void_t tb_heap_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp)
+tb_void_t tb_heap_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
 {
     tb_heap_sort(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp);
 }

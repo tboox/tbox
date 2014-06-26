@@ -45,7 +45,7 @@ typedef struct __tb_object_bin_reader_t
     tb_stream_ref_t              stream;
 
     /// the object list
-    tb_vector_t*                list;
+    tb_vector_ref_t                list;
 
 }tb_object_bin_reader_t;
 

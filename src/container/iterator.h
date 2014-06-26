@@ -93,8 +93,11 @@ typedef struct __tb_iterator_t
 
 }tb_iterator_t;
 
+/// the iterator ref type
+typedef tb_iterator_t*      tb_iterator_ref_t;
+
 /// the iterator comp func type
-typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
+typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -116,40 +119,40 @@ tb_iterator_t   tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size);
 tb_iterator_t   tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step);
 
 /// the iterator mode
-tb_size_t       tb_iterator_mode(tb_iterator_t* iterator);
+tb_size_t       tb_iterator_mode(tb_iterator_ref_t iterator);
 
 /// the iterator step
-tb_size_t       tb_iterator_step(tb_iterator_t* iterator);
+tb_size_t       tb_iterator_step(tb_iterator_ref_t iterator);
 
 /// the iterator size
-tb_size_t       tb_iterator_size(tb_iterator_t* iterator);
+tb_size_t       tb_iterator_size(tb_iterator_ref_t iterator);
 
 /// the iterator head
-tb_size_t       tb_iterator_head(tb_iterator_t* iterator);
+tb_size_t       tb_iterator_head(tb_iterator_ref_t iterator);
 
 /// the iterator last
-tb_size_t       tb_iterator_last(tb_iterator_t* iterator);
+tb_size_t       tb_iterator_last(tb_iterator_ref_t iterator);
 
 /// the iterator tail
-tb_size_t       tb_iterator_tail(tb_iterator_t* iterator);
+tb_size_t       tb_iterator_tail(tb_iterator_ref_t iterator);
 
 /// the iterator prev
-tb_size_t       tb_iterator_prev(tb_iterator_t* iterator, tb_size_t itor);
+tb_size_t       tb_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /// the iterator next
-tb_size_t       tb_iterator_next(tb_iterator_t* iterator, tb_size_t itor);
+tb_size_t       tb_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /// the iterator item
-tb_pointer_t    tb_iterator_item(tb_iterator_t* iterator, tb_size_t itor);
+tb_pointer_t    tb_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /// the iterator delt
-tb_void_t       tb_iterator_delt(tb_iterator_t* iterator, tb_size_t itor);
+tb_void_t       tb_iterator_delt(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /// the iterator copy
-tb_void_t       tb_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
+tb_void_t       tb_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item);
 
 /// the iterator comp
-tb_long_t       tb_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
+tb_long_t       tb_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

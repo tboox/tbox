@@ -138,7 +138,7 @@ typedef struct __tb_database_mysql_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_iterator_t* result);
+static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_iterator_ref_t result);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * library implementation
@@ -383,7 +383,7 @@ static tb_bool_t tb_database_mysql_stream_impl_set_value(tb_database_sql_value_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator implementation
  */
-static tb_size_t tb_database_mysql_result_row_iterator_size(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_row_iterator_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -392,12 +392,12 @@ static tb_size_t tb_database_mysql_result_row_iterator_size(tb_iterator_t* itera
     // size
     return result->count;
 }
-static tb_size_t tb_database_mysql_result_row_iterator_head(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_row_iterator_head(tb_iterator_ref_t iterator)
 {
     // head
     return 0;
 }
-static tb_size_t tb_database_mysql_result_row_iterator_tail(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_row_iterator_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -406,7 +406,7 @@ static tb_size_t tb_database_mysql_result_row_iterator_tail(tb_iterator_t* itera
     // tail
     return result->count;
 }
-static tb_size_t tb_database_mysql_result_row_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_row_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -419,7 +419,7 @@ static tb_size_t tb_database_mysql_result_row_iterator_prev(tb_iterator_t* itera
     // prev
     return itor - 1;
 }
-static tb_size_t tb_database_mysql_result_row_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_row_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -476,7 +476,7 @@ static tb_size_t tb_database_mysql_result_row_iterator_next(tb_iterator_t* itera
     // next
     return itor + 1;
 }
-static tb_pointer_t tb_database_mysql_result_row_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_database_mysql_result_row_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_database_mysql_result_t* result = (tb_database_mysql_result_t*)iterator;
@@ -536,7 +536,7 @@ static tb_pointer_t tb_database_mysql_result_row_iterator_item(tb_iterator_t* it
     // the row iterator
     return (tb_pointer_t)&result->row;
 }
-static tb_size_t tb_database_mysql_result_col_iterator_size(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_col_iterator_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -545,7 +545,7 @@ static tb_size_t tb_database_mysql_result_col_iterator_size(tb_iterator_t* itera
     // size
     return row->count;
 }
-static tb_size_t tb_database_mysql_result_col_iterator_head(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_col_iterator_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -554,7 +554,7 @@ static tb_size_t tb_database_mysql_result_col_iterator_head(tb_iterator_t* itera
     // head
     return 0;
 }
-static tb_size_t tb_database_mysql_result_col_iterator_tail(tb_iterator_t* iterator)
+static tb_size_t tb_database_mysql_result_col_iterator_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -563,7 +563,7 @@ static tb_size_t tb_database_mysql_result_col_iterator_tail(tb_iterator_t* itera
     // tail
     return row->count;
 }
-static tb_size_t tb_database_mysql_result_col_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_col_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -572,7 +572,7 @@ static tb_size_t tb_database_mysql_result_col_iterator_prev(tb_iterator_t* itera
     // prev
     return itor - 1;
 }
-static tb_size_t tb_database_mysql_result_col_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_database_mysql_result_col_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -581,7 +581,7 @@ static tb_size_t tb_database_mysql_result_col_iterator_next(tb_iterator_t* itera
     // next
     return itor + 1;
 }
-static tb_pointer_t tb_database_mysql_result_col_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_database_mysql_result_col_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_database_mysql_result_row_t* row = (tb_database_mysql_result_row_t*)iterator;
@@ -952,7 +952,7 @@ static tb_bool_t tb_database_mysql_done(tb_database_sql_t* database, tb_char_t c
     tb_assert_and_check_return_val(mysql && mysql->database && sql, tb_false);
 
     // exit the last result first
-    tb_database_mysql_result_exit(database, (tb_iterator_t*)&mysql->result);
+    tb_database_mysql_result_exit(database, (tb_iterator_ref_t)&mysql->result);
 
     // done query
     if (mysql_query(mysql->database, sql))
@@ -971,7 +971,7 @@ static tb_bool_t tb_database_mysql_done(tb_database_sql_t* database, tb_char_t c
     // ok
     return tb_true;
 }
-static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_iterator_t* result)
+static tb_void_t tb_database_mysql_result_exit(tb_database_sql_t* database, tb_iterator_ref_t result)
 {
     // check
     tb_database_mysql_result_t* mysql_result = (tb_database_mysql_result_t*)result;
@@ -1221,7 +1221,7 @@ static tb_bool_t tb_database_mysql_result_bind(tb_database_mysql_t* mysql, tb_bo
     // ok?
     return ok;
 }
-static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database, tb_bool_t try_all)
+static tb_iterator_ref_t tb_database_mysql_result_load(tb_database_sql_t* database, tb_bool_t try_all)
 {
     // check
     tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
@@ -1305,11 +1305,11 @@ static tb_iterator_t* tb_database_mysql_result_load(tb_database_sql_t* database,
     if (!ok)
     {
         // exit result
-        tb_database_mysql_result_exit(database, (tb_iterator_t*)&mysql->result);
+        tb_database_mysql_result_exit(database, (tb_iterator_ref_t)&mysql->result);
     }
 
     // ok?
-    return ok? (tb_iterator_t*)&mysql->result : tb_null;
+    return ok? (tb_iterator_ref_t)&mysql->result : tb_null;
 }
 static tb_handle_t tb_database_mysql_statement_init(tb_database_sql_t* database, tb_char_t const* sql)
 {
@@ -1377,7 +1377,7 @@ static tb_bool_t tb_database_mysql_statement_done(tb_database_sql_t* database, t
     do
     {
         // exit the last result first
-        tb_database_mysql_result_exit(database, (tb_iterator_t*)&mysql->result);
+        tb_database_mysql_result_exit(database, (tb_iterator_ref_t)&mysql->result);
 
         // done stmt
         if (mysql_stmt_execute((MYSQL_STMT*)stmt))

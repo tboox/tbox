@@ -9,7 +9,7 @@
 static tb_size_t tb_queue_put_and_pop_test()
 {
     // init
-    tb_queue_t* queue = tb_queue_init(10, tb_item_func_long());
+    tb_queue_ref_t queue = tb_queue_init(10, tb_item_func_long());
     tb_assert_and_check_return_val(queue, 0);
 
     tb_queue_put(queue, (tb_pointer_t)0);
@@ -55,7 +55,7 @@ static tb_size_t tb_queue_iterator_next_test()
 {
     // init
     tb_size_t n = 1000000;
-    tb_queue_t* queue = tb_queue_init(n, tb_item_func_long());
+    tb_queue_ref_t queue = tb_queue_init(n, tb_item_func_long());
     tb_assert_and_check_return_val(queue, 0);
 
     while (n--) tb_queue_put(queue, (tb_pointer_t)0xf);
@@ -75,7 +75,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 {
     // init
     tb_size_t n = 1000000;
-    tb_queue_t* queue = tb_queue_init(n, tb_item_func_long());
+    tb_queue_ref_t queue = tb_queue_init(n, tb_item_func_long());
     tb_assert_and_check_return_val(queue, 0);
 
     while (n--) tb_queue_put(queue, (tb_pointer_t)0xf);
@@ -91,7 +91,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 
     return n / ((tb_uint32_t)(t) + 1);
 }
-static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
+static tb_void_t tb_queue_int_dump(tb_queue_ref_t queue)
 {
     tb_trace_i("tb_int_t size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
     tb_for_all (tb_char_t*, item, queue)
@@ -101,7 +101,7 @@ static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_int_test()
 {
-    tb_queue_t* queue = tb_queue_init(10, tb_item_func_long());
+    tb_queue_ref_t queue = tb_queue_init(10, tb_item_func_long());
     tb_assert_and_check_return(queue);
 
     tb_trace_i("=============================================================");
@@ -142,7 +142,7 @@ static tb_void_t tb_queue_int_test()
     tb_queue_int_dump(queue);
     tb_queue_exit(queue);
 }
-static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
+static tb_void_t tb_queue_str_dump(tb_queue_ref_t queue)
 {
     tb_trace_i("str size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
     tb_for_all (tb_char_t*, item, queue)
@@ -152,7 +152,7 @@ static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_str_test()
 {
-    tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(tb_true, tb_pool_init(TB_POOL_GROW_SMALL, 0)));
+    tb_queue_ref_t queue = tb_queue_init(10, tb_item_func_str(tb_true, tb_pool_init(TB_POOL_GROW_SMALL, 0)));
     tb_assert_and_check_return(queue);
 
     tb_trace_i("=============================================================");
@@ -197,7 +197,7 @@ static tb_void_t tb_queue_mem_free(tb_item_func_t* func, tb_pointer_t item)
 {
     tb_trace_i("ifm free: %s, priv: %s", item, func->priv);
 }
-static tb_void_t tb_queue_mem_dump(tb_queue_t const* queue)
+static tb_void_t tb_queue_mem_dump(tb_queue_ref_t queue)
 {
     tb_trace_i("ifm size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
     tb_for_all (tb_char_t*, item, queue)
@@ -207,7 +207,7 @@ static tb_void_t tb_queue_mem_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_mem_test()
 {
-    tb_queue_t* queue = tb_queue_init(10, tb_item_func_mem(11, tb_queue_mem_free, "ifm"));
+    tb_queue_ref_t queue = tb_queue_init(10, tb_item_func_mem(11, tb_queue_mem_free, "ifm"));
     tb_assert_and_check_return(queue);
 
     tb_trace_i("=============================================================");

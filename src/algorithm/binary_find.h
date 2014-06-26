@@ -48,7 +48,7 @@ __tb_extern_c_enter__
  *
  * @return          the iterator itor
  */
-tb_size_t           tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t priv, tb_iterator_comp_t comp);
+tb_size_t           tb_binary_find(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t priv, tb_iterator_comp_t comp);
 
 /*! the binary finder for all
  *
@@ -58,7 +58,7 @@ tb_size_t           tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_s
  *
  * @return          the iterator itor
  */
-tb_size_t           tb_bfind_all(tb_iterator_t* iterator, tb_cpointer_t priv, tb_iterator_comp_t comp);
+tb_size_t           tb_bfind_all(tb_iterator_ref_t iterator, tb_cpointer_t priv, tb_iterator_comp_t comp);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

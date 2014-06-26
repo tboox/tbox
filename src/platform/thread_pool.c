@@ -146,13 +146,13 @@ typedef struct __tb_thread_pool_worker_t
     tb_handle_t             loop;
 
     // the jobs
-    tb_vector_t*            jobs;
+    tb_vector_ref_t            jobs;
 
     // the pull time
     tb_size_t               pull;
 
     // the stats
-    tb_hash_t*              stats;
+    tb_hash_ref_t              stats;
 
     // is stoped?
     tb_atomic_t             bstoped;
@@ -175,13 +175,13 @@ typedef struct __tb_thread_pool_t
     tb_handle_t             jobs_pool;
 
     // the urgent jobs
-    tb_single_list_t*       jobs_urgent;
+    tb_single_list_ref_t       jobs_urgent;
     
     // the waiting jobs
-    tb_single_list_t*       jobs_waiting;
+    tb_single_list_ref_t       jobs_waiting;
     
     // the pending jobs
-    tb_list_t*              jobs_pending;
+    tb_list_ref_t              jobs_pending;
 
     // is stoped
     tb_bool_t               bstoped;
@@ -224,7 +224,7 @@ static tb_void_t tb_thread_pool_instance_kill(tb_handle_t handle, tb_cpointer_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * worker implementation
  */
-static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_ref_t jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(jobs && bdel, tb_false);
@@ -271,7 +271,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull(tb_single_list_t* jobs, tb_poin
     // ok
     return tb_true;
 }
-static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_ref_t jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(jobs && bdel, tb_false);
@@ -336,7 +336,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_t* jobs, tb_p
     // ok
     return tb_true;
 }
-static tb_bool_t tb_thread_pool_worker_walk_clean(tb_list_t* jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_thread_pool_worker_walk_clean(tb_list_ref_t jobs, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(jobs && bdel, tb_false);

@@ -111,7 +111,7 @@ __tb_extern_c_enter__
  * c = p^(1/k)
  * s = m / n = 2k / (2c + c * c)
  */
-typedef tb_void_t       tb_bloom_filter_t;
+typedef struct{}* tb_bloom_filter_ref_t;
 
 /// the probability of false positives
 typedef enum __tb_bloom_filter_probability_e
@@ -140,19 +140,19 @@ typedef enum __tb_bloom_filter_probability_e
  *
  * @return              the bloom_filter
  */
-tb_bloom_filter_t*      tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func);
+tb_bloom_filter_ref_t   tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func);
 
 /*! exit bloom filter
  *
  * @param bloom_filter  the bloom filter
  */
-tb_void_t               tb_bloom_filter_exit(tb_bloom_filter_t* bloom_filter);
+tb_void_t               tb_bloom_filter_exit(tb_bloom_filter_ref_t bloom_filter);
 
 /*! clear bloom filter
  *
  * @param bloom_filter  the bloom filter
  */
-tb_void_t               tb_bloom_filter_clear(tb_bloom_filter_t* bloom_filter);
+tb_void_t               tb_bloom_filter_clear(tb_bloom_filter_ref_t bloom_filter);
 
 /*! set data to the bloom filter 
  *
@@ -174,7 +174,7 @@ tb_void_t               tb_bloom_filter_clear(tb_bloom_filter_t* bloom_filter);
  *
  * @return              return tb_false if the data have been existed, otherwise set it and return tb_true
  */
-tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_t* bloom_filter, tb_cpointer_t data);
+tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_ref_t bloom_filter, tb_cpointer_t data);
 
 /*! get data to the bloom filter 
  *
@@ -196,7 +196,7 @@ tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_t* bloom_filter, tb_
  *
  * @return              return tb_true if the data exists, otherwise return tb_false
  */
-tb_bool_t               tb_bloom_filter_get(tb_bloom_filter_t* bloom_filter, tb_cpointer_t data);
+tb_bool_t               tb_bloom_filter_get(tb_bloom_filter_ref_t bloom_filter, tb_cpointer_t data);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

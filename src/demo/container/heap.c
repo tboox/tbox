@@ -13,7 +13,7 @@ static tb_long_t tb_test_heap_max_comp(tb_item_func_t* func, tb_cpointer_t ldata
 static tb_void_t tb_test_heap_min_func()
 {
     // init heap
-    tb_heap_t* heap = tb_heap_init(16, tb_item_func_uint32());
+    tb_heap_ref_t heap = tb_heap_init(16, tb_item_func_uint32());
     tb_assert_and_check_return(heap);
 
     // clear rand
@@ -55,7 +55,7 @@ static tb_void_t tb_test_heap_min_func()
 static tb_void_t tb_test_heap_min_perf()
 {
     // init heap
-    tb_heap_t* heap = tb_heap_init(4096, tb_item_func_uint32());
+    tb_heap_ref_t heap = tb_heap_init(4096, tb_item_func_uint32());
     tb_assert_and_check_return(heap);
 
     // clear rand
@@ -85,7 +85,7 @@ static tb_void_t tb_test_heap_max_func()
     tb_item_func_t func = tb_item_func_uint32(); func.comp = tb_test_heap_max_comp;
 
     // init heap
-    tb_heap_t* heap = tb_heap_init(16, func);
+    tb_heap_ref_t heap = tb_heap_init(16, func);
     tb_assert_and_check_return(heap);
 
     // clear rand
@@ -130,7 +130,7 @@ static tb_void_t tb_test_heap_max_perf()
     tb_item_func_t func = tb_item_func_uint32(); func.comp = tb_test_heap_max_comp;
 
     // init heap
-    tb_heap_t* heap = tb_heap_init(4096, func);
+    tb_heap_ref_t heap = tb_heap_init(4096, func);
     tb_assert_and_check_return(heap);
 
     // clear rand

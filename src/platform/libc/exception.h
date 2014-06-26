@@ -46,7 +46,7 @@ typedef struct __tb_exception_list_t
     tb_thread_store_data_t  base;
 
     // the stack
-    tb_stack_t*             stack;
+    tb_stack_ref_t             stack;
 
 }tb_exception_list_t;
 
