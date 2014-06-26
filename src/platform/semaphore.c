@@ -41,35 +41,31 @@
 #elif defined(TB_CONFIG_API_HAVE_SYSTEMV)
 #   include "systemv/semaphore.c"
 #else 
-tb_handle_t tb_semaphore_init(tb_size_t init)
+tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 {
     // make
-    tb_atomic_t* semaphore = tb_malloc0(sizeof(tb_atomic_t));
+    tb_atomic_t* semaphore = tb_malloc0_type(tb_atomic_t);
     tb_assert_and_check_return_val(semaphore, tb_null);
 
     // init
     *semaphore = init;
 
     // ok
-    return (tb_handle_t)semaphore;
-
-fail:
-    if (semaphore) tb_free(semaphore);
-    return tb_null;
+    return (tb_semaphore_ref_t)semaphore;
 }
-tb_void_t tb_semaphore_exit(tb_handle_t handle)
+tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
-    tb_assert_and_check_return(handle);
+    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
+    tb_assert_and_check_return(semaphore);
 
     // free it
     tb_free(semaphore);
 }
-tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
+tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
+    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
     tb_assert_and_check_return_val(semaphore && post, tb_false);
 
     // post it
@@ -78,19 +74,19 @@ tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
     // ok
     return value >= 0? tb_true : tb_false;
 }
-tb_long_t tb_semaphore_value(tb_handle_t handle)
+tb_long_t tb_semaphore_value(tb_semaphore_ref_t semaphore)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
+    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
     tb_assert_and_check_return_val(semaphore, tb_false);
 
     // get value
     return (tb_long_t)tb_atomic_get(semaphore);
 }
-tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)handle;
+    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
     tb_assert_and_check_return_val(semaphore, -1);
 
     // init

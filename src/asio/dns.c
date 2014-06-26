@@ -73,7 +73,7 @@ typedef struct __tb_aicp_dns_impl_t
     tb_aicp_dns_exit_t      exit;
 
     // the sock
-    tb_handle_t             sock;
+    tb_socket_ref_t         sock;
 
     // the aico
     tb_aico_ref_t           aico;

@@ -145,7 +145,7 @@ tb_bool_t           tb_socket_listen(tb_socket_ref_t sock);
  *
  * @return          the client socket handle
  */
-tb_handle_t         tb_socket_accept(tb_socket_ref_t sock);
+tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock);
 
 /*! kill socket
  *

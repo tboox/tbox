@@ -21,7 +21,7 @@ features
 ### the database library
 -	supports mysql and sqlite3 database and enumerates data using the iterator mode
 
-### the xml parser library. 
+### the xml parser library
 -	supports DOM and SAX mode and supports xpath.
 
 ### the serialization and deserialization library. 

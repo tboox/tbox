@@ -196,7 +196,7 @@ tb_long_t               tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list
  *
  * @return              the real size or -1
  */
-tb_hong_t               tb_file_writf(tb_file_ref_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size);
+tb_hong_t               tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size);
 
 /*! preadv the file data 
  * 

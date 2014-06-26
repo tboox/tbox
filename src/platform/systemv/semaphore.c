@@ -33,7 +33,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_semaphore_init(tb_size_t init)
+tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 {
     // init semaphore
     tb_long_t h = semget((key_t)IPC_PRIVATE, 1, IPC_CREAT | IPC_EXCL | 0666);
@@ -64,28 +64,28 @@ tb_handle_t tb_semaphore_init(tb_size_t init)
 #endif
     if (semctl(h, 0, SETVAL, opts) < 0)
     {
-        tb_semaphore_exit((tb_handle_t)(h + 1));
+        tb_semaphore_exit((tb_semaphore_ref_t)(h + 1));
         return tb_null;
     }
 
     // ok
-    return (tb_handle_t)(h + 1);
+    return (tb_semaphore_ref_t)(h + 1);
 }
-tb_void_t tb_semaphore_exit(tb_handle_t handle)
+tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
 {
     // check
-    tb_long_t h = (tb_long_t)handle - 1;
-    tb_assert_and_check_return(handle);
+    tb_long_t h = (tb_long_t)semaphore - 1;
+    tb_assert_and_check_return(semaphore);
 
     // remove semaphore
     tb_long_t r = semctl(h, 0, IPC_RMID);
     tb_assert(r != -1);
 }
-tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
+tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
 {
     // check
-    tb_long_t h = (tb_long_t)handle - 1;
-    tb_assert_and_check_return_val(handle && post, tb_false);
+    tb_long_t h = (tb_long_t)semaphore - 1;
+    tb_assert_and_check_return_val(semaphore && post, tb_false);
 
     // post
     while (post--)
@@ -103,20 +103,20 @@ tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
     // ok
     return tb_true;
 }
-tb_long_t tb_semaphore_value(tb_handle_t handle)
+tb_long_t tb_semaphore_value(tb_semaphore_ref_t semaphore)
 {
     // check
-    tb_long_t h = (tb_long_t)handle - 1;
-    tb_assert_and_check_return_val(handle, -1);
+    tb_long_t h = (tb_long_t)semaphore - 1;
+    tb_assert_and_check_return_val(semaphore, -1);
 
     // get value
     return semctl(h, 0, GETVAL, 0);
 }
-tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 {
     // check
-    tb_long_t h = (tb_long_t)handle - 1;
-    tb_assert_and_check_return_val(handle, -1);
+    tb_long_t h = (tb_long_t)semaphore - 1;
+    tb_assert_and_check_return_val(semaphore, -1);
 
     // init time
     struct timeval t = {0};

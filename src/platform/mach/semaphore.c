@@ -36,90 +36,104 @@
  */
 
 // the semaphore type
-typedef struct __tb_semaphore_t
+typedef struct __tb_semaphore_impl_t
 {
-    // the handle
-    semaphore_t         handle;
+    // the semaphore
+    semaphore_t         semaphore;
 
     // the value
     tb_atomic_t         value;
 
-}tb_semaphore_t;
+}tb_semaphore_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_semaphore_init(tb_size_t init)
+tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 {
-    // make semaphore
-    tb_semaphore_t* semaphore = tb_malloc0(sizeof(tb_semaphore_t));
-    tb_assert_and_check_return_val(semaphore, tb_null);
+    // done
+    tb_bool_t               ok = tb_false;
+    tb_semaphore_impl_t*    impl = tb_null;
+    do
+    {
+        // make semaphore
+        impl = tb_malloc0_type(tb_semaphore_impl_t);
+        tb_assert_and_check_break(impl);
 
-    // init semaphore 
-    if (KERN_SUCCESS != semaphore_create(mach_task_self(), &(semaphore->handle), SYNC_POLICY_FIFO, init)) goto fail;
+        // init semaphore 
+        if (KERN_SUCCESS != semaphore_create(mach_task_self(), &(impl->semaphore), SYNC_POLICY_FIFO, init)) break;
 
-    // init value
-    semaphore->value = init;
+        // init value
+        impl->value = init;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (impl) tb_semaphore_exit((tb_semaphore_ref_t)impl);
+        impl = tb_null;
+    }
 
     // ok
-    return semaphore;
-
-fail:
-    if (semaphore) tb_semaphore_exit(semaphore);
-    return tb_null;
+    return (tb_semaphore_ref_t)impl;
 }
-tb_void_t tb_semaphore_exit(tb_handle_t handle)
+tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
 {
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     if (semaphore) 
     {
         // exit semaphore
-        semaphore_destroy(mach_task_self(), semaphore->handle);
+        semaphore_destroy(mach_task_self(), impl->semaphore);
 
         // exit it
         tb_free(semaphore);
     }
 }
-tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
+tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
 {
     // check
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     tb_assert_and_check_return_val(semaphore && post, tb_false);
 
     // post
     while (post--)
     {
         // +2 first
-        tb_atomic_fetch_and_add(&semaphore->value, 2);
+        tb_atomic_fetch_and_add(&impl->value, 2);
 
         // signal
-        if (KERN_SUCCESS != semaphore_signal(semaphore->handle)) 
+        if (KERN_SUCCESS != semaphore_signal(impl->semaphore)) 
         {
             // restore
-            tb_atomic_fetch_and_sub(&semaphore->value, 2);
+            tb_atomic_fetch_and_sub(&impl->value, 2);
             return tb_false;
         }
 
         // -1
-        tb_atomic_fetch_and_dec(&semaphore->value);
+        tb_atomic_fetch_and_dec(&impl->value);
     }
 
     // ok
     return tb_true;
 }
-tb_long_t tb_semaphore_value(tb_handle_t handle)
+tb_long_t tb_semaphore_value(tb_semaphore_ref_t semaphore)
 {
     // check
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     tb_assert_and_check_return_val(semaphore, -1);
 
     // get value
-    return (tb_long_t)tb_atomic_get(&semaphore->value);
+    return (tb_long_t)tb_atomic_get(&impl->value);
 }
-tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 {
     // check
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     tb_assert_and_check_return_val(semaphore, -1);
 
     // init timespec
@@ -132,7 +146,7 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
     else if (timeout < 0) spec.tv_sec += 12 * 30 * 24 * 3600; // infinity: one year
 
     // wait
-    tb_long_t ok = semaphore_timedwait(semaphore->handle, spec);
+    tb_long_t ok = semaphore_timedwait(impl->semaphore, spec);
 
     // timeout?
     tb_check_return_val(ok != KERN_OPERATION_TIMED_OUT, 0);
@@ -141,10 +155,10 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
     tb_check_return_val(ok == KERN_SUCCESS, -1);
 
     // check value
-    tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&semaphore->value) > 0, -1);
+    tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&impl->value) > 0, -1);
     
     // value--
-    tb_atomic_fetch_and_dec(&semaphore->value);
+    tb_atomic_fetch_and_dec(&impl->value);
     
     // ok
     return 1;

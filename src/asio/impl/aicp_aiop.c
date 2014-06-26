@@ -49,7 +49,7 @@ typedef struct __tb_aiop_ptor_impl_t
     tb_spinlock_t               lock;
 
     // the spak wait
-    tb_handle_t                 wait;
+    tb_semaphore_ref_t          wait;
 
     // the spak loop
     tb_handle_t                 loop;

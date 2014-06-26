@@ -250,7 +250,7 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock)
     // listen
     return (listen(tb_sock2fd(sock), 20) < 0)? tb_false : tb_true;
 }
-tb_handle_t tb_socket_accept(tb_socket_ref_t sock)
+tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);

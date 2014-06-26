@@ -91,7 +91,7 @@ typedef struct __tb_iocp_func_t
 typedef struct __tb_iocp_ptor_impl_t
 {
     // the ptor base
-    tb_aicp_ptor_impl_t                          base;
+    tb_aicp_ptor_impl_t                         base;
 
     // the i/o completion port
     HANDLE                                      port;
@@ -1880,9 +1880,9 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     }
 
     // sock: kill
-    if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
+    if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) tb_socket_kill((tb_socket_ref_t)aico->handle, TB_SOCKET_KILL_RW);
     // file: kill
-    else if (aico->type == TB_AICO_TYPE_FILE && aico->handle) tb_file_exit(aico->handle);
+    else if (aico->type == TB_AICO_TYPE_FILE && aico->handle) tb_file_exit((tb_file_ref_t)aico->handle);
 }
 static tb_bool_t tb_iocp_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice)
 {

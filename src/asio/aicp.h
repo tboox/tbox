@@ -79,7 +79,7 @@ tb_bool_t           tb_aicp_exit(tb_aicp_ref_t aicp);
  *
  * @return          the aico
  */
-tb_handle_t         tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type);
+tb_aico_ref_t       tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type);
 
 /*! remove the aico, will call the exit callback func if ok
  *

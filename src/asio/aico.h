@@ -165,7 +165,7 @@ tb_void_t           tb_aico_exit(tb_aico_ref_t aico, tb_aico_exit_func_t func, t
  *
  * @return          the aico aicp
  */
-tb_handle_t         tb_aico_aicp(tb_aico_ref_t aico);
+tb_aicp_ref_t       tb_aico_aicp(tb_aico_ref_t aico);
 
 /*! the aico type
  *
@@ -353,7 +353,7 @@ tb_bool_t           tb_aico_usendv_(tb_aico_ref_t aico, tb_ipv4_t const* addr, t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aico_sendf_(tb_aico_ref_t aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+tb_bool_t           tb_aico_sendf_(tb_aico_ref_t aico, tb_file_ref_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the read for file
  *
@@ -565,7 +565,7 @@ tb_bool_t           tb_aico_usendv_after_(tb_aico_ref_t aico, tb_size_t delay, t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aico_sendf_after_(tb_aico_ref_t aico, tb_size_t delay, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+tb_bool_t           tb_aico_sendf_after_(tb_aico_ref_t aico, tb_size_t delay, tb_file_ref_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the read for file after the delay time
  *

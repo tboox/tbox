@@ -195,16 +195,16 @@ static tb_bool_t tb_stream_file_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
         }
     case TB_STREAM_CTRL_FILE_SET_HANDLE:
         {
-            tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
-            impl->file = handle;
-            impl->bref = handle? 1 : 0;
+            tb_file_ref_t file = (tb_file_ref_t)tb_va_arg(args, tb_file_ref_t);
+            impl->file = file;
+            impl->bref = file? 1 : 0;
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_GET_HANDLE:
         {
-            tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
-            tb_assert_and_check_return_val(phandle, tb_false);
-            *phandle = impl->file;
+            tb_file_ref_t* pfile = (tb_file_ref_t*)tb_va_arg(args, tb_file_ref_t*);
+            tb_assert_and_check_return_val(pfile, tb_false);
+            *pfile = impl->file;
             return tb_true;
         }
     default:

@@ -14,13 +14,13 @@
 typedef struct __tb_demo_context_t
 {
     // the aioo
-    tb_handle_t         aioo;
+    tb_aioo_ref_t       aioo;
 
     // the sock
-    tb_handle_t         sock;
+    tb_socket_ref_t     sock;
 
     // the file
-    tb_handle_t         file;
+    tb_file_ref_t       file;
 
     // the left
     tb_hize_t           left;

@@ -557,18 +557,18 @@ static tb_bool_t tb_async_stream_file_impl_ctrl(tb_async_stream_ref_t stream, tb
             // exit file first if exists
             if (!impl->bref && impl->file) tb_file_exit(impl->file);
 
-            // set handle
-            tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
-            impl->file = handle;
-            impl->bref = handle? tb_true : tb_false;
+            // set file
+            tb_file_ref_t file = (tb_file_ref_t)tb_va_arg(args, tb_file_ref_t);
+            impl->file = file;
+            impl->bref = file? tb_true : tb_false;
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_GET_HANDLE:
         {
-            // get handle
-            tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
-            tb_assert_and_check_return_val(phandle, tb_false);
-            *phandle = impl->file;
+            // get file
+            tb_file_ref_t* pfile = (tb_file_ref_t*)tb_va_arg(args, tb_file_ref_t*);
+            tb_assert_and_check_return_val(pfile, tb_false);
+            *pfile = impl->file;
             return tb_true;
         }
     default:

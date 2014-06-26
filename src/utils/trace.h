@@ -88,7 +88,7 @@ tb_handle_t         tb_trace_file(tb_noarg_t);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_trace_file_set(tb_handle_t file);
+tb_bool_t           tb_trace_file_set(tb_file_ref_t file);
 
 /*! set the trace file path
  *
