@@ -57,7 +57,7 @@ typedef struct __tb_async_stream_sock_impl_t
     tb_handle_t                         aico;
 
     // the aicp dns
-    tb_handle_t                         hdns;
+    tb_aicp_dns_ref_t                   hdns;
 
 #ifdef TB_SSL_ENABLE
     // the aicp ssl
@@ -156,7 +156,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_func(tb_handle_t aico, tb_cpoint
     // trace
     tb_trace_d("clos: notify: ok");
 }
-static tb_void_t tb_async_stream_sock_impl_clos_dns_func(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_impl_clos_dns_func(tb_aicp_dns_ref_t dns, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
@@ -395,11 +395,11 @@ static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_void_t tb_async_stream_sock_impl_dns_func(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
-    tb_assert_and_check_return(haddr && impl && impl->func.open);
+    tb_assert_and_check_return(dns && impl && impl->func.open);
 
     // done
     tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
