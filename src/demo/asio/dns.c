@@ -6,12 +6,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_sock_dns_exit_func(tb_handle_t dns, tb_cpointer_t priv)
+static tb_void_t tb_demo_sock_dns_exit_func(tb_aicp_dns_ref_t dns, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("dns: exit");
 }
-static tb_void_t tb_demo_sock_dns_done_func(tb_handle_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
+static tb_void_t tb_demo_sock_dns_done_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return(dns);
@@ -49,8 +49,8 @@ tb_int_t tb_demo_asio_dns_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_aicp_ref_t          aicp = tb_null;
-    tb_handle_t         dns = tb_null;
+    tb_aicp_ref_t       aicp = tb_null;
+    tb_aicp_dns_ref_t   dns = tb_null;
 
     // init aicp
     aicp = tb_aicp_init(2);
