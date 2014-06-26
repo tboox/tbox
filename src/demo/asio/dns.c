@@ -17,7 +17,7 @@ static tb_void_t tb_demo_sock_dns_done_func(tb_handle_t dns, tb_char_t const* ho
     tb_assert_and_check_return(dns);
 
     // the aicp
-    tb_aicp_t* aicp = tb_aicp_dns_aicp(dns);
+    tb_aicp_ref_t aicp = tb_aicp_dns_aicp(dns);
     tb_assert_and_check_return(aicp);
 
     // addr ok?
@@ -49,7 +49,7 @@ tb_int_t tb_demo_asio_dns_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_aicp_t*          aicp = tb_null;
+    tb_aicp_ref_t          aicp = tb_null;
     tb_handle_t         dns = tb_null;
 
     // init aicp

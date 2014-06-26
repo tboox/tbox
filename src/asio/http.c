@@ -1435,11 +1435,8 @@ static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, t
         http->clos_opening.priv   = priv;
         http->clos_opening.state  = state;
 
-        tb_trace_d("tb_aicp_http_open_func b");
         // close it
         ok = tb_aicp_http_clos(http, tb_aicp_http_clos_opening_func, tb_null);
-
-        tb_trace_d("tb_aicp_http_open_func e: %d", ok);
     }
 
     // ok?
@@ -1449,7 +1446,7 @@ static tb_bool_t tb_aicp_http_open_func(tb_aicp_http_t* http, tb_size_t state, t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
+tb_handle_t tb_aicp_http_init(tb_aicp_ref_t aicp)
 {
     // check
     tb_assert_and_check_return_val(aicp, tb_null);
@@ -1823,7 +1820,7 @@ tb_bool_t tb_aicp_http_open_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_h
     // open and seek
     return tb_aicp_http_seek(http, offset, func, priv);
 }
-tb_aicp_t* tb_aicp_http_aicp(tb_handle_t handle)
+tb_aicp_ref_t tb_aicp_http_aicp(tb_handle_t handle)
 {
     // check
     tb_aicp_http_t* http = (tb_aicp_http_t*)handle;

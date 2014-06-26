@@ -30,33 +30,6 @@
 #include "../memory/memory.h"
 #include "../platform/platform.h"
 
-/*! the stack 
- *
- * <pre>
- * stack: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
- *       head                                                           last    tail
- *
- * stack: |||||||||||||||||||||||||||||||||||||||||------|
- *       head                                   last    tail
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
-
- * performance: 
- *
- * push:    fast
- * pop:     fast
- *
- * iterator:
- * next:    fast
- * prev:    fast
- * </pre>
- *
- * @note the itor of the same item is fixed
- *
- */
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */

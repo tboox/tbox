@@ -40,7 +40,48 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the single list ref type
+/*! the single list ref type
+ *
+ * <pre>
+ * list:  |-----| => |-------------------------------------------------=> |------| => |------| => 0
+ *         head                                                                         last      tail
+ *
+ * head: => the first item
+ * last: => the last item
+ * tail: => behind the last item, no item
+ 
+ * performance: 
+ *
+ * insert:
+ * insert midd: slow
+ * insert head: fast
+ * insert tail: fast
+ * insert next: fast
+ * 
+ * ninsert:
+ * ninsert midd: slow
+ * ninsert head: fast
+ * ninsert tail: fast
+ * ninsert next: fast
+ *
+ * remove:
+ * remove midd: slow
+ * remove head: fast
+ * remove last: slow
+ * remove next: fast
+ *
+ * nremove:
+ * nremove midd: slow
+ * nremove head: fast
+ * nremove last: slow
+ * nremove next: fast
+ *
+ * iterator:
+ * next: fast
+ * prev: slow
+ * </pre>
+ *
+ */
 typedef tb_iterator_ref_t tb_single_list_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

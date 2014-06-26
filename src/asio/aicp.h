@@ -50,46 +50,7 @@ __tb_extern_c_enter__
  * types
  */
 
-struct __tb_aicp_t;
-/// the aico pool proactor type
-typedef struct __tb_aicp_proactor_t
-{
-    /// aicp
-    struct __tb_aicp_t*     aicp;
-
-    /// the aico step
-    tb_size_t               step;
-
-    /// kill
-    tb_void_t               (*kill)(struct __tb_aicp_proactor_t* proactor);
-
-    /// exit
-    tb_void_t               (*exit)(struct __tb_aicp_proactor_t* proactor);
-
-    /// addo
-    tb_bool_t               (*addo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
-
-    /// delo
-    tb_bool_t               (*delo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
-    
-    /// kilo
-    tb_void_t               (*kilo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
-    
-    /// post
-    tb_bool_t               (*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* aice);
-
-    /// loop: init
-    tb_handle_t             (*loop_init)(struct __tb_aicp_proactor_t* proactor);
-
-    /// loop: exit
-    tb_void_t               (*loop_exit)(struct __tb_aicp_proactor_t* proactor, tb_handle_t loop);
-
-    /// loop: spak
-    tb_long_t               (*loop_spak)(struct __tb_aicp_proactor_t* proactor, tb_handle_t loop, tb_aice_t* resp, tb_long_t timeout);
-
-}tb_aicp_proactor_t;
-
-/*! the aico pool type
+/*! the aico pool ref type
  *
  * <pre>
  *       |------------------------------------------------|
@@ -169,30 +130,7 @@ typedef struct __tb_aicp_proactor_t
  * </pre>
  *
  */
-typedef struct __tb_aicp_t
-{
-    /// the object maxn
-    tb_size_t               maxn;
-
-    /// the proactor
-    tb_aicp_proactor_t*     ptor;
-
-    /// the worker size
-    tb_atomic_t             work;
-
-    /// the pool
-    tb_handle_t             pool;
-
-    /// the pool lock
-    tb_spinlock_t           lock;
-
-    /// kill it?
-    tb_atomic_t             kill;
-
-    /// killall it?
-    tb_atomic_t             kill_all;
-
-}tb_aicp_t;
+typedef struct{}*   tb_aicp_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -202,7 +140,7 @@ typedef struct __tb_aicp_t
  *
  * @return          the aicp
  */
-tb_aicp_t*          tb_aicp(tb_noarg_t);
+tb_aicp_ref_t       tb_aicp(tb_noarg_t);
 
 /*! init the aicp
  *
@@ -210,7 +148,7 @@ tb_aicp_t*          tb_aicp(tb_noarg_t);
  *
  * @return          the aicp
  */
-tb_aicp_t*          tb_aicp_init(tb_size_t maxn);
+tb_aicp_ref_t       tb_aicp_init(tb_size_t maxn);
 
 /*! exit the aicp
  *
@@ -218,7 +156,7 @@ tb_aicp_t*          tb_aicp_init(tb_size_t maxn);
  *
  * @return          tb_true or tb_false
  */     
-tb_bool_t           tb_aicp_exit(tb_aicp_t* aicp);
+tb_bool_t           tb_aicp_exit(tb_aicp_ref_t aicp);
 
 /*! add the aico
  *
@@ -228,7 +166,7 @@ tb_bool_t           tb_aicp_exit(tb_aicp_t* aicp);
  *
  * @return          the aico
  */
-tb_handle_t         tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
+tb_handle_t         tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type);
 
 /*! remove the aico, will call the exit callback func if ok
  *
@@ -237,14 +175,14 @@ tb_handle_t         tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t 
  * @param func      the exiting func, wait exiting if be null
  * @param priv      the private data for exiting func
  */
-tb_void_t           tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
+tb_void_t           tb_aicp_delo(tb_aicp_ref_t aicp, tb_handle_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
 
 /*! kill the aico
  *
  * @param aicp      the aicp
  * @param aico      the aico
  */
-tb_void_t           tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico);
+tb_void_t           tb_aicp_kilo(tb_aicp_ref_t aicp, tb_handle_t aico);
 
 /*! post the aice 
  *
@@ -253,7 +191,7 @@ tb_void_t           tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_post_(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__);
+tb_bool_t           tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_decl__);
 
 /*! post the aice 
  *
@@ -263,7 +201,7 @@ tb_bool_t           tb_aicp_post_(tb_aicp_t* aicp, tb_aice_t const* aice __tb_de
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_post_after_(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__);
+tb_bool_t           tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__);
 
 /*! loop aicp for the external thread
  *
@@ -276,7 +214,7 @@ tb_bool_t           tb_aicp_post_after_(tb_aicp_t* aicp, tb_size_t delay, tb_aic
  *
  * @param aicp      the aicp
  */
-tb_void_t           tb_aicp_loop(tb_aicp_t* aicp);
+tb_void_t           tb_aicp_loop(tb_aicp_ref_t aicp);
 
 /*! loop aicp util ... for the external thread
  *
@@ -294,19 +232,19 @@ tb_void_t           tb_aicp_loop(tb_aicp_t* aicp);
  *
  * @param aicp      the aicp
  */
-tb_void_t           tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_cpointer_t priv), tb_cpointer_t priv);
+tb_void_t           tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t priv), tb_cpointer_t priv);
 
 /*! kill loop
  *
  * @param aicp      the aicp
  */
-tb_void_t           tb_aicp_kill(tb_aicp_t* aicp);
+tb_void_t           tb_aicp_kill(tb_aicp_ref_t aicp);
 
 /*! kill all and cannot continue to post it, but not kill loop
  *
  * @param aicp      the aicp
  */
-tb_void_t           tb_aicp_kill_all(tb_aicp_t* aicp);
+tb_void_t           tb_aicp_kill_all(tb_aicp_ref_t aicp);
 
 /*! wait all exiting
  *
@@ -315,7 +253,7 @@ tb_void_t           tb_aicp_kill_all(tb_aicp_t* aicp);
  * 
  * @return          ok: > 0, timeout: 0, failed: -1
  */
-tb_long_t           tb_aicp_wait_all(tb_aicp_t* aicp, tb_long_t timeout);
+tb_long_t           tb_aicp_wait_all(tb_aicp_ref_t aicp, tb_long_t timeout);
 
 /*! the spak time
  *
@@ -323,7 +261,7 @@ tb_long_t           tb_aicp_wait_all(tb_aicp_t* aicp, tb_long_t timeout);
  *
  * @return          the time
  */
-tb_hong_t           tb_aicp_time(tb_aicp_t* aicp);
+tb_hong_t           tb_aicp_time(tb_aicp_ref_t aicp);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

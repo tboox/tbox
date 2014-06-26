@@ -236,8 +236,8 @@ tbox_C_FILES 			+= \
 						platform/cache_time \
 						platform/thread_pool \
 						platform/thread_store \
-						platform/asio/aioo \
-						platform/asio/aiop 
+						platform/aioo \
+						platform/aiop 
 
 
 # arm
@@ -287,7 +287,7 @@ tbox_C_FILES 			+= \
 						stream/impl/async_stream/prefix \
 						stream/async_transfer \
 						stream/transfer_pool \
-						platform/asio/aicp
+						platform/aicp
 
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
 						asio/ssl 

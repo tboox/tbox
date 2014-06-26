@@ -47,7 +47,34 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the queue ref type
+/*! the queue ref type
+ *
+ * <pre>
+ * queue: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
+ *       head                                                           last    tail
+ *
+ * queue: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
+ *                   last  tail                       head                
+ *
+ * head: => the head item
+ * last: => the last item
+ * tail: => behind the last item, no item
+ *
+ * performance: 
+ *
+ * put: O(1)
+ * pop: O(1)
+ *
+ * iterator:
+ *
+ * next: fast
+ * prev: fast
+ *
+ * </pre>
+ *
+ * @note the index of the same item is mutable
+ *
+ */
 typedef tb_iterator_ref_t   tb_queue_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

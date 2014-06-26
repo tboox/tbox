@@ -105,7 +105,7 @@ typedef tb_bool_t   (*tb_aicp_ssl_task_func_t)(tb_handle_t ssl, tb_size_t state,
  *
  * @return          the ssl handle
  */
-tb_handle_t         tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver);
+tb_handle_t         tb_aicp_ssl_init(tb_aicp_ref_t aicp, tb_bool_t bserver);
 
 /*! kill the ssl
  *
@@ -254,7 +254,7 @@ tb_bool_t           tb_aicp_ssl_open_writ(tb_handle_t handle, tb_byte_t const* d
  *
  * @return          the aicp
  */
-tb_aicp_t*          tb_aicp_ssl_aicp(tb_handle_t handle);
+tb_aicp_ref_t          tb_aicp_ssl_aicp(tb_handle_t handle);
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////

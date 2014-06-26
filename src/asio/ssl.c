@@ -132,7 +132,7 @@ typedef struct __tb_aicp_ssl_t
     tb_handle_t                 ssl;
 
     // the aicp
-    tb_aicp_t*                  aicp;
+    tb_aicp_ref_t                  aicp;
 
     // the aico
     tb_handle_t                 aico;
@@ -850,7 +850,7 @@ static tb_bool_t tb_aicp_ssl_done_clos(tb_aice_t const* aice)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_aicp_ssl_init(tb_aicp_t* aicp, tb_bool_t bserver)
+tb_handle_t tb_aicp_ssl_init(tb_aicp_ref_t aicp, tb_bool_t bserver)
 {
     // check
     tb_assert_and_check_return_val(aicp, tb_null);
@@ -1352,7 +1352,7 @@ tb_bool_t tb_aicp_ssl_open_writ(tb_handle_t handle, tb_byte_t const* data, tb_si
     // writ it
     return tb_aicp_ssl_writ(handle, data, size, func, priv);
 }
-tb_aicp_t* tb_aicp_ssl_aicp(tb_handle_t handle)
+tb_aicp_ref_t tb_aicp_ssl_aicp(tb_handle_t handle)
 {
     // check
     tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;

@@ -41,13 +41,13 @@ tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t tim
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   include "../posix/asio/aioo_select.c"
+#   include "posix/aioo_select.c"
     tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
     {
         return tb_aioo_reactor_select_wait(handle, code, timeout);
     }
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
-#   include "../posix/asio/aioo_poll.c"
+#   include "posix/aioo_poll.c"
     tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
     {
         return tb_aioo_reactor_poll_wait(handle, code, timeout);

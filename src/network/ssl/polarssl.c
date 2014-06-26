@@ -384,7 +384,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
     } while (0);
 
     // ok?
-    if (ok > 0)
+    if (ok > 0 && !ssl->bopened)
     {
         // done ssl verify
 #if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)

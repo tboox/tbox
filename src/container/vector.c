@@ -48,46 +48,7 @@
  * types
  */
 
-/*!the impl type
- *
- * <pre>
- * impl: |-----|--------------------------------------------------------|------|
- *       head                                                           last    tail
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
- *
- * performance: 
- *
- * insert:
- * insert midd: slow
- * insert head: slow
- * insert tail: fast
- *
- * ninsert:
- * ninsert midd: fast
- * ninsert head: fast
- * ninsert tail: fast
- *
- * remove:
- * remove midd: slow
- * remove head: slow
- * remove last: fast
- *
- * nremove:
- * nremove midd: fast
- * nremove head: fast
- * nremove last: fast
- *
- * iterator:
- * next: fast
- * prev: fast
- * </pre>
- *
- * @note the itor of the same item is mutable
- *
- */
+// the vector impl type
 typedef struct __tb_vector_impl_t
 {
     // the itor

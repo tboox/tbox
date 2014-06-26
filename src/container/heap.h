@@ -40,7 +40,42 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the heap ref type
+/*! the head impl type
+ *
+ * <pre>
+ * heap:    1      4      2      6       9       7       8       10       14       16
+ *
+ *                                          1(head)
+ *                               -------------------------
+ *                              |                         |
+ *                              4                         2
+ *                        --------------             -------------
+ *                       |              |           |             |
+ *                       6       (last / 2 - 1)9    7             8
+ *                   ---------       ----
+ *                  |         |     |
+ *                  10        14    16(last - 1)
+ * </pre>
+ *
+ * head: => the head item
+ * last: => the last item
+ * tail: => behind the last item, no item
+ *
+ * performance: 
+ *
+ * put: O(lgn)
+ * pop: O(1)
+ * top: O(1)
+ *
+ * iterator:
+ *
+ * next: fast
+ * prev: fast
+ *
+ * </pre>
+ *
+ * @note the itor of the same item is mutable
+ */
 typedef tb_iterator_ref_t tb_heap_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

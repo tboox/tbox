@@ -94,7 +94,7 @@ typedef struct{}*       tb_async_transfer_ref_t;
  *
  * @return              the async transfer 
  */
-tb_async_transfer_ref_t tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autoclosing);
+tb_async_transfer_ref_t tb_async_transfer_init(tb_aicp_ref_t aicp, tb_bool_t autoclosing);
 
 /*! init istream
  *

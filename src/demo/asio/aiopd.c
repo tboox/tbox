@@ -39,7 +39,7 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_context_exit(tb_aiop_t* aiop, tb_demo_context_t* context)
+static tb_void_t tb_demo_context_exit(tb_aiop_ref_t aiop, tb_demo_context_t* context)
 {
     if (context)
     {
@@ -74,7 +74,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 
     // init
     tb_handle_t sock = tb_null;
-    tb_aiop_t*  aiop = tb_null;
+    tb_aiop_ref_t  aiop = tb_null;
 
     // init sock
     sock = tb_socket_open(TB_SOCKET_TYPE_TCP);

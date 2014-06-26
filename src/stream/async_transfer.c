@@ -126,7 +126,7 @@ typedef struct __tb_async_transfer_clos_opening_t_t
 typedef struct __tb_async_transfer_impl_t
 {
     // the aicp
-    tb_aicp_t*                          aicp;
+    tb_aicp_ref_t                       aicp;
 
     // the istream
     tb_async_stream_ref_t               istream;
@@ -674,7 +674,7 @@ static tb_void_t tb_async_transfer_istream_clos_func(tb_async_stream_ref_t strea
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_async_transfer_ref_t tb_async_transfer_init(tb_aicp_t* aicp, tb_bool_t autoclosing)
+tb_async_transfer_ref_t tb_async_transfer_init(tb_aicp_ref_t aicp, tb_bool_t autoclosing)
 {
     // using the default aicp
     if (!aicp) aicp = tb_aicp();

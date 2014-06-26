@@ -56,7 +56,7 @@ typedef tb_void_t   (*tb_aicp_dns_exit_func_t)(tb_handle_t handle, tb_cpointer_t
  *
  * @return          the dns handle
  */
-tb_handle_t         tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout);
+tb_handle_t         tb_aicp_dns_init(tb_aicp_ref_t aicp, tb_long_t timeout);
 
 /*! kill the dns
  *
@@ -90,7 +90,7 @@ tb_bool_t           tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host, 
  *
  * @return          the aicp
  */
-tb_aicp_t*          tb_aicp_dns_aicp(tb_handle_t handle);
+tb_aicp_ref_t          tb_aicp_dns_aicp(tb_handle_t handle);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

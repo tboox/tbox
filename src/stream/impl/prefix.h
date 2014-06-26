@@ -254,7 +254,7 @@ typedef struct __tb_async_stream_impl_t
     tb_long_t                           timeout;
 
     // the aicp
-    tb_aicp_t*                          aicp;
+    tb_aicp_ref_t                       aicp;
 
 #ifdef __tb_debug__
     // the func

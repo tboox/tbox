@@ -24,6 +24,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../asio/impl/impl.h"
 #include <errno.h>
 #include <sys/event.h>
 #include <sys/time.h>
@@ -45,11 +46,11 @@
  * types
  */
 
-// the kqueue reactor type
-typedef struct __tb_aiop_reactor_kqueue_t
+// the kqueue impl impl type
+typedef struct __tb_aiop_rtor_kqueue_impl_t
 {
-    // the reactor base
-    tb_aiop_reactor_t       base;
+    // the rtor base
+    tb_aiop_rtor_impl_t     base;
 
     // the kqueue fd
     tb_long_t               kqfd;
@@ -58,30 +59,30 @@ typedef struct __tb_aiop_reactor_kqueue_t
     struct kevent*          evts;
     tb_size_t               evtn;
     
-}tb_aiop_reactor_kqueue_t;
+}tb_aiop_rtor_kqueue_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aiop_reactor_kqueue_sync(tb_aiop_reactor_t* reactor, struct kevent* evts, tb_size_t evtn)
+static tb_bool_t tb_aiop_rtor_kqueue_sync(tb_aiop_rtor_impl_t* rtor, struct kevent* evts, tb_size_t evtn)
 {
     // check
-    tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-    tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0, tb_false);
+    tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
+    tb_assert_and_check_return_val(impl && impl->kqfd >= 0, tb_false);
     tb_assert_and_check_return_val(evts && evtn, tb_false);
 
     // change events
     struct timespec t = {0};
-    if (kevent(rtor->kqfd, evts, evtn, tb_null, 0, &t) < 0) return tb_false;
+    if (kevent(impl->kqfd, evts, evtn, tb_null, 0, &t) < 0) return tb_false;
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
 {
     // check
-    tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-    tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && aioo && aioo->handle, tb_false);
+    tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
+    tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->handle, tb_false);
 
     // fd
     tb_int_t fd = ((tb_int_t)aioo->handle) - 1;
@@ -103,13 +104,13 @@ static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_aioo
     }
 
     // ok?
-    return n? tb_aiop_reactor_kqueue_sync(reactor, e, n) : tb_true;
+    return n? tb_aiop_rtor_kqueue_sync(rtor, e, n) : tb_true;
 }
-static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_aioo_t const* aioo)
+static tb_bool_t tb_aiop_rtor_kqueue_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_t const* aioo)
 {
     // check
-    tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-    tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && aioo && aioo->handle, tb_false);
+    tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
+    tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->handle, tb_false);
 
     // fd
     tb_int_t fd = ((tb_int_t)aioo->handle) - 1;
@@ -120,13 +121,13 @@ static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_aioo
     EV_SET(&e[1], fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
 
     // ok?
-    return tb_aiop_reactor_kqueue_sync(reactor, e, 2);
+    return tb_aiop_rtor_kqueue_sync(rtor, e, 2);
 }
-static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
+static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t const* aioe)
 {
     // check
-    tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-    tb_assert_and_check_return_val(rtor && aioe, tb_false);
+    tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
+    tb_assert_and_check_return_val(impl && aioe, tb_false);
 
     // the aioo
     tb_aioo_t* aioo = aioe->aioo;
@@ -171,16 +172,16 @@ static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe
     }
 
     // ok?
-    return n? tb_aiop_reactor_kqueue_sync(reactor, e, n) : tb_true;
+    return n? tb_aiop_rtor_kqueue_sync(rtor, e, n) : tb_true;
 }
-static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
+static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {   
     // check
-    tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-    tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && reactor->aiop && list && maxn, -1);
+    tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
+    tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && rtor->aiop && list && maxn, -1);
 
     // the aiop
-    tb_aiop_t* aiop = reactor->aiop;
+    tb_aiop_impl_t* aiop = rtor->aiop;
     tb_assert_and_check_return_val(aiop, -1);
 
     // init time
@@ -192,35 +193,35 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
     }
 
     // init grow
-    tb_size_t grow = tb_align8((reactor->aiop->maxn >> 3) + 1);
+    tb_size_t grow = tb_align8((rtor->aiop->maxn >> 3) + 1);
 
     // init events
-    if (!rtor->evts)
+    if (!impl->evts)
     {
-        rtor->evtn = grow;
-        rtor->evts = tb_nalloc0(rtor->evtn, sizeof(struct kevent));
-        tb_assert_and_check_return_val(rtor->evts, -1);
+        impl->evtn = grow;
+        impl->evts = tb_nalloc0(impl->evtn, sizeof(struct kevent));
+        tb_assert_and_check_return_val(impl->evts, -1);
     }
 
     // wait events
-    tb_long_t evtn = kevent(rtor->kqfd, tb_null, 0, rtor->evts, rtor->evtn, timeout >= 0? &t : tb_null);
-    tb_assert_and_check_return_val(evtn >= 0 && evtn <= rtor->evtn, -1);
+    tb_long_t evtn = kevent(impl->kqfd, tb_null, 0, impl->evts, impl->evtn, timeout >= 0? &t : tb_null);
+    tb_assert_and_check_return_val(evtn >= 0 && evtn <= impl->evtn, -1);
     
     // timeout?
     tb_check_return_val(evtn, 0);
 
     // grow it if events is full
-    if (evtn == rtor->evtn)
+    if (evtn == impl->evtn)
     {
         // grow size
-        rtor->evtn += grow;
-        if (rtor->evtn > reactor->aiop->maxn) rtor->evtn = reactor->aiop->maxn;
+        impl->evtn += grow;
+        if (impl->evtn > rtor->aiop->maxn) impl->evtn = rtor->aiop->maxn;
 
         // grow data
-        rtor->evts = tb_ralloc(rtor->evts, rtor->evtn * sizeof(struct kevent));
-        tb_assert_and_check_return_val(rtor->evts, -1);
+        impl->evts = tb_ralloc(impl->evts, impl->evtn * sizeof(struct kevent));
+        tb_assert_and_check_return_val(impl->evts, -1);
     }
-    tb_assert(evtn <= rtor->evtn);
+    tb_assert(evtn <= impl->evtn);
 
     // limit 
     evtn = tb_min(evtn, maxn);
@@ -231,7 +232,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
     for (i = 0; i < evtn; i++)
     {
         // the kevents 
-        struct kevent* e = rtor->evts + i;
+        struct kevent* e = impl->evts + i;
 
         // the aioo
         tb_aioo_t* aioo = (tb_aioo_t*)e->udata;
@@ -286,61 +287,75 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
     // ok
     return wait;
 }
-static tb_void_t tb_aiop_reactor_kqueue_exit(tb_aiop_reactor_t* reactor)
+static tb_void_t tb_aiop_rtor_kqueue_exit(tb_aiop_rtor_impl_t* rtor)
 {
-    tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-    if (rtor)
+    tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
+    if (impl)
     {
         // free events
-        if (rtor->evts) tb_free(rtor->evts);
+        if (impl->evts) tb_free(impl->evts);
 
         // close kqfd
-        if (rtor->kqfd >= 0) close(rtor->kqfd);
+        if (impl->kqfd >= 0) close(impl->kqfd);
 
         // free it
-        tb_free(rtor);
+        tb_free(impl);
     }
 }
-static tb_void_t tb_aiop_reactor_kqueue_cler(tb_aiop_reactor_t* reactor)
+static tb_void_t tb_aiop_rtor_kqueue_cler(tb_aiop_rtor_impl_t* rtor)
 {
-    tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-    if (rtor)
+    tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
+    if (impl)
     {
         // close kqfd
-        if (rtor->kqfd >= 0)
+        if (impl->kqfd >= 0)
         {
-            close(rtor->kqfd);
-            rtor->kqfd = kqueue();
+            close(impl->kqfd);
+            impl->kqfd = kqueue();
         }
     }
 }
-static tb_aiop_reactor_t* tb_aiop_reactor_kqueue_init(tb_aiop_t* aiop)
+static tb_aiop_rtor_impl_t* tb_aiop_rtor_kqueue_init(tb_aiop_impl_t* aiop)
 {
     // check
     tb_assert_and_check_return_val(aiop && aiop->maxn, tb_null);
 
-    // alloc reactor
-    tb_aiop_reactor_kqueue_t* rtor = tb_malloc0(sizeof(tb_aiop_reactor_kqueue_t));
-    tb_assert_and_check_return_val(rtor, tb_null);
+    // done
+    tb_bool_t                   ok = tb_false;
+    tb_aiop_rtor_kqueue_impl_t* impl = tb_null;
+    do
+    {
+        // make impl
+        impl = tb_malloc0(sizeof(tb_aiop_rtor_kqueue_impl_t));
+        tb_assert_and_check_break(impl);
 
-    // init base
-    rtor->base.aiop = aiop;
-    rtor->base.exit = tb_aiop_reactor_kqueue_exit;
-    rtor->base.cler = tb_aiop_reactor_kqueue_cler;
-    rtor->base.addo = tb_aiop_reactor_kqueue_addo;
-    rtor->base.delo = tb_aiop_reactor_kqueue_delo;
-    rtor->base.post = tb_aiop_reactor_kqueue_post;
-    rtor->base.wait = tb_aiop_reactor_kqueue_wait;
+        // init base
+        impl->base.aiop = aiop;
+        impl->base.exit = tb_aiop_rtor_kqueue_exit;
+        impl->base.cler = tb_aiop_rtor_kqueue_cler;
+        impl->base.addo = tb_aiop_rtor_kqueue_addo;
+        impl->base.delo = tb_aiop_rtor_kqueue_delo;
+        impl->base.post = tb_aiop_rtor_kqueue_post;
+        impl->base.wait = tb_aiop_rtor_kqueue_wait;
 
-    // init kqueue
-    rtor->kqfd = kqueue();
-    tb_assert_and_check_goto(rtor->kqfd >= 0, fail);
+        // init kqueue
+        impl->kqfd = kqueue();
+        tb_assert_and_check_break(impl->kqfd >= 0);
 
-    // ok
-    return (tb_aiop_reactor_t*)rtor;
+        // ok
+        ok = tb_true;
 
-fail:
-    if (rtor) tb_aiop_reactor_kqueue_exit((tb_aiop_reactor_t*)rtor);
-    return tb_null;
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (impl) tb_aiop_rtor_kqueue_exit((tb_aiop_rtor_impl_t*)impl);
+        impl = tb_null;
+    }
+
+    // ok?
+    return (tb_aiop_rtor_impl_t*)impl;
 }
 

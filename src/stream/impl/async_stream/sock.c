@@ -1249,7 +1249,7 @@ static tb_bool_t tb_async_stream_sock_impl_ctrl(tb_async_stream_ref_t stream, tb
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_async_stream_ref_t tb_async_stream_init_sock(tb_aicp_t* aicp)
+tb_async_stream_ref_t tb_async_stream_init_sock(tb_aicp_ref_t aicp)
 {
     // init stream
     tb_async_stream_ref_t stream = tb_async_stream_init(    aicp
@@ -1282,7 +1282,7 @@ tb_async_stream_ref_t tb_async_stream_init_sock(tb_aicp_t* aicp)
     // ok?
     return stream;
 }
-tb_async_stream_ref_t tb_async_stream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
+tb_async_stream_ref_t tb_async_stream_init_from_sock(tb_aicp_ref_t aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
 {
     // check
     tb_assert_and_check_return_val(host && port, tb_null);

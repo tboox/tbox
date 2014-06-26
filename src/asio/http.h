@@ -104,7 +104,7 @@ typedef tb_bool_t   (*tb_aicp_http_task_func_t)(tb_handle_t http, tb_size_t stat
  *
  * @return          the http handle
  */
-tb_handle_t         tb_aicp_http_init(tb_aicp_t* aicp);
+tb_handle_t         tb_aicp_http_init(tb_aicp_ref_t aicp);
 
 /*! kill the http
  *
@@ -221,7 +221,7 @@ tb_bool_t           tb_aicp_http_open_seek(tb_handle_t handle, tb_hize_t offset,
  *
  * @return          the aicp
  */
-tb_aicp_t*          tb_aicp_http_aicp(tb_handle_t handle);
+tb_aicp_ref_t          tb_aicp_http_aicp(tb_handle_t handle);
 
 /*! the http option
  *

@@ -49,48 +49,7 @@ typedef struct __tb_single_list_item_t
 
 }tb_single_list_item_t;
 
-/*! the single impl type
- *
- * <pre>
- * impl:  |-----| => |-------------------------------------------------=> |------| => |------| => 0
- *         head                                                                         last      tail
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
- 
- * performance: 
- *
- * insert:
- * insert midd: slow
- * insert head: fast
- * insert tail: fast
- * insert next: fast
- * 
- * ninsert:
- * ninsert midd: slow
- * ninsert head: fast
- * ninsert tail: fast
- * ninsert next: fast
- *
- * remove:
- * remove midd: slow
- * remove head: fast
- * remove last: slow
- * remove next: fast
- *
- * nremove:
- * nremove midd: slow
- * nremove head: fast
- * nremove last: slow
- * nremove next: fast
- *
- * iterator:
- * next: fast
- * prev: slow
- * </pre>
- *
- */
+// the single list impl type
 typedef struct __tb_single_list_impl_t
 {
     /// the itor
