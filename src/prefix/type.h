@@ -140,6 +140,12 @@ typedef __tb_volatile__ tb_hong_t   tb_atomic64_t __tb_aligned__(8);
 /// the spinlock type
 typedef tb_atomic_t                 tb_spinlock_t;
 
+/// the file ref type
+typedef struct{}*                   tb_file_ref_t;
+
+/// the socket ref type
+typedef struct{}*                   tb_socket_ref_t;
+
 /// the time type
 typedef tb_hong_t                   tb_time_t;
 
@@ -235,6 +241,12 @@ typedef union __tb_value_t
 
     /// const pointer
     tb_cpointer_t                   cptr;
+
+    /// sock
+    tb_socket_ref_t                 sock;
+
+    /// file
+    tb_file_ref_t                   file;
 
     /// handle
     tb_handle_t                     handle;

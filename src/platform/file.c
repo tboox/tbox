@@ -40,77 +40,77 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/file.c"
 #else
-tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
+tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
     tb_trace_noimpl();
     return tb_null;
 }
-tb_bool_t tb_file_exit(tb_handle_t file)
+tb_bool_t tb_file_exit(tb_file_ref_t file)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writf(tb_file_ref_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_bool_t tb_file_sync(tb_handle_t file)
+tb_bool_t tb_file_sync(tb_file_ref_t file)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_hong_t tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode)
+tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_hong_t tb_file_offset(tb_handle_t file)
+tb_hong_t tb_file_offset(tb_file_ref_t file)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_hize_t tb_file_size(tb_handle_t file)
+tb_hize_t tb_file_size(tb_file_ref_t file)
 {
     tb_trace_noimpl();
     return 0;

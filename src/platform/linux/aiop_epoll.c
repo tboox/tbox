@@ -61,7 +61,7 @@ static tb_bool_t tb_aiop_rtor_epoll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl
 {
     // check
     tb_aiop_rtor_epoll_impl_t* impl = (tb_aiop_rtor_epoll_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && impl->epfd > 0 && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && impl->epfd > 0 && aioo && aioo->sock, tb_false);
 
     // the code
     tb_size_t code = aioo->code;
@@ -76,7 +76,7 @@ static tb_bool_t tb_aiop_rtor_epoll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl
     e.data.u64 = (tb_hize_t)aioo;
 
     // add aioo
-    if (epoll_ctl(impl->epfd, EPOLL_CTL_ADD, tb_handle2fd(aioo->handle), &e) < 0)
+    if (epoll_ctl(impl->epfd, EPOLL_CTL_ADD, tb_sock2fd(aioo->sock), &e) < 0)
     {
         // trace
         tb_trace_e("addo aioo[%p], code: %lu failed, errno: %d", aioo, code, errno);
@@ -90,11 +90,11 @@ static tb_bool_t tb_aiop_rtor_epoll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl
 {
     // check
     tb_aiop_rtor_epoll_impl_t* impl = (tb_aiop_rtor_epoll_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && impl->epfd > 0 && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && impl->epfd > 0 && aioo && aioo->sock, tb_false);
 
     // init event
     struct epoll_event e = {0};
-    if (epoll_ctl(impl->epfd, EPOLL_CTL_DEL, ((tb_long_t)aioo->handle) - 1, &e) < 0)
+    if (epoll_ctl(impl->epfd, EPOLL_CTL_DEL, ((tb_long_t)aioo->sock) - 1, &e) < 0)
     {
         // trace
 //        tb_trace_e("delo aioo[%p] failed, errno: %d", aioo, errno);
@@ -118,7 +118,7 @@ static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t co
 
     // the aioo
     tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
-    tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(aioo && aioo->sock, tb_false);
 
     // init event
     struct epoll_event e = {0};
@@ -135,11 +135,11 @@ static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t co
     aioo->priv = priv;
 
     // sete
-    if (epoll_ctl(impl->epfd, EPOLL_CTL_MOD, tb_handle2fd(aioo->handle), &e) < 0) 
+    if (epoll_ctl(impl->epfd, EPOLL_CTL_MOD, tb_sock2fd(aioo->sock), &e) < 0) 
     {
         // re-add it 
 #ifndef EPOLLONESHOT 
-        if (errno == ENOENT && epoll_ctl(impl->epfd, EPOLL_CTL_ADD, tb_handle2fd(aioo->handle), &e) >= 0) 
+        if (errno == ENOENT && epoll_ctl(impl->epfd, EPOLL_CTL_ADD, tb_sock2fd(aioo->sock), &e) >= 0) 
             return tb_true;
 #endif
 
@@ -212,15 +212,15 @@ static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* l
         tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)impl->evts[i].data.u64;
         tb_assert_and_check_return_val(aioo, -1);
 
-        // the handle 
-        tb_handle_t handle = aioo->handle;
-        tb_assert_and_check_return_val(handle, -1);
+        // the sock 
+        tb_socket_ref_t sock = aioo->sock;
+        tb_assert_and_check_return_val(sock, -1);
 
         // the events
         tb_size_t events = impl->evts[i].events;
 
         // spak?
-        if (handle == aiop->spak[1] && (events & EPOLLIN)) 
+        if (sock == aiop->spak[1] && (events & EPOLLIN)) 
         {
             // read spak
             tb_char_t spak = '\0';
@@ -234,7 +234,7 @@ static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* l
         }
 
         // skip spak
-        tb_check_continue(handle != aiop->spak[1]);
+        tb_check_continue(sock != aiop->spak[1]);
 
         // save aioe
         tb_aioe_t* aioe = &list[wait++];
@@ -264,7 +264,7 @@ static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* l
             // clear events manually if no epoll oneshot
 #ifndef EPOLLONESHOT
             struct epoll_event e = {0};
-            if (epoll_ctl(impl->epfd, EPOLL_CTL_DEL, tb_handle2fd(aioo->handle), &e) < 0) 
+            if (epoll_ctl(impl->epfd, EPOLL_CTL_DEL, tb_sock2fd(aioo->sock), &e) < 0) 
             {
                 // trace
                 tb_trace_e("clear aioo[%p] failed manually for oneshot, error: %d", aioo, errno);

@@ -113,79 +113,79 @@ typedef struct __tb_file_info_t
  * @param path          the file path
  * @param mode          the file mode
  *
- * @return              the file handle
+ * @return              the file 
  */
-tb_handle_t             tb_file_init(tb_char_t const* path, tb_size_t mode);
+tb_file_ref_t           tb_file_init(tb_char_t const* path, tb_size_t mode);
 
 /*! exit the file
  * 
- * @param file          the file handle
+ * @param file          the file 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_file_exit(tb_handle_t file);
+tb_bool_t               tb_file_exit(tb_file_ref_t file);
 
 /*! read the file data
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param data          the data
  * @param size          the size
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size);
+tb_long_t               tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size);
 
 /*! writ the file data
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param data          the data
  * @param size          the size
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size);
+tb_long_t               tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size);
 
 /*! pread the file data
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param data          the data
  * @param size          the size
  * @param offset        the offset, the file offset will not be changed
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset);
+tb_long_t               tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset);
 
 /*! pwrit the file data
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param data          the data
  * @param size          the size
  * @param offset        the offset, the file offset will not be changed
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset);
+tb_long_t               tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset);
 
 /*! readv the file data
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param list          the iovec list
  * @param size          the iovec size
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size);
+tb_long_t               tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size);
 
 /*! writv the file data
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param list          the iovec list
  * @param size          the iovec size
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size);
+tb_long_t               tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size);
 
 /*! writf the file data
  * 
@@ -196,61 +196,61 @@ tb_long_t               tb_file_writv(tb_handle_t file, tb_iovec_t const* list, 
  *
  * @return              the real size or -1
  */
-tb_hong_t               tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size);
+tb_hong_t               tb_file_writf(tb_file_ref_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size);
 
 /*! preadv the file data 
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param list          the iovec list
  * @param size          the iovec size
  * @param offset        the offset, the file offset will not be changed
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
+tb_long_t               tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
 
 /*! pwritv the file data 
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param list          the iovec list
  * @param size          the iovec size
  * @param offset        the offset, the file offset will not be changed
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
+tb_long_t               tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
 
 /*! seek the file offset
  * 
- * @param file          the file handle
+ * @param file          the file 
  * @param offset        the file offset
  * @param mode          the seek mode
  *
  * @return              the real offset or -1
  */
-tb_hong_t               tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode);
+tb_hong_t               tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode);
 
 /*! fsync the file 
  * 
- * @param file          the file handle
+ * @param file          the file 
  */
-tb_bool_t               tb_file_sync(tb_handle_t file);
+tb_bool_t               tb_file_sync(tb_file_ref_t file);
 
 /*! the file size
  * 
- * @param file          the file handle
+ * @param file          the file 
  *
  * @return              the file size
  */
-tb_hize_t               tb_file_size(tb_handle_t file);
+tb_hize_t               tb_file_size(tb_file_ref_t file);
 
 /*! the file offset
  * 
- * @param file          the file handle
+ * @param file          the file 
  *
  * @return              the file offset or -1
  */
-tb_hong_t               tb_file_offset(tb_handle_t file);
+tb_hong_t               tb_file_offset(tb_file_ref_t file);
 
 /*! the file info for file or directory
  * 

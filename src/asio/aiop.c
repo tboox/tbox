@@ -42,7 +42,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * aioo
  */
-static tb_aioo_ref_t tb_aiop_aioo_init(tb_aiop_impl_t* impl, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
+static tb_aioo_ref_t tb_aiop_aioo_init(tb_aiop_impl_t* impl, tb_socket_ref_t sock, tb_size_t code, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->pool, tb_null);
@@ -58,7 +58,7 @@ static tb_aioo_ref_t tb_aiop_aioo_init(tb_aiop_impl_t* impl, tb_handle_t handle,
     {
         aioo->code = code;
         aioo->priv = priv;
-        aioo->handle = handle;
+        aioo->sock = sock;
     }
 
     // leave 
@@ -228,11 +228,11 @@ tb_void_t tb_aiop_spak(tb_aiop_ref_t aiop)
         }
     }
 }
-tb_handle_t tb_aiop_addo(tb_aiop_ref_t aiop, tb_handle_t handle, tb_size_t code, tb_cpointer_t priv)
+tb_aioo_ref_t tb_aiop_addo(tb_aiop_ref_t aiop, tb_socket_ref_t sock, tb_size_t code, tb_cpointer_t priv)
 {
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
-    tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->addo && handle, tb_null);
+    tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->addo && sock, tb_null);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -240,7 +240,7 @@ tb_handle_t tb_aiop_addo(tb_aiop_ref_t aiop, tb_handle_t handle, tb_size_t code,
     do
     {
         // init aioo
-        aioo = tb_aiop_aioo_init(impl, handle, code, priv);
+        aioo = tb_aiop_aioo_init(impl, sock, code, priv);
         tb_assert_and_check_break(aioo);
         
         // addo aioo
@@ -259,7 +259,7 @@ tb_handle_t tb_aiop_addo(tb_aiop_ref_t aiop, tb_handle_t handle, tb_size_t code,
     }
 
     // ok?
-    return (tb_handle_t)aioo;
+    return aioo;
 }
 tb_void_t tb_aiop_delo(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo)
 {
@@ -283,7 +283,7 @@ tb_bool_t tb_aiop_sete(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo, tb_size_t code, t
 {
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
-    tb_assert_and_check_return_val(impl && aioo && tb_aioo_handle(aioo) && code, tb_false);
+    tb_assert_and_check_return_val(impl && aioo && tb_aioo_sock(aioo) && code, tb_false);
  
     // init aioe
     tb_aioe_t aioe;

@@ -100,11 +100,11 @@ static tb_bool_t tb_poll_walk_sete(tb_iterator_ref_t iterator, tb_pointer_t item
 
     // the aioo
     tb_aioo_impl_t const* aioo = (tb_aioo_impl_t const*)aioe->aioo;
-    tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(aioo && aioo->sock, tb_false);
 
     // is this?
     struct pollfd* pfd = (struct pollfd*)item;
-    if (pfd && pfd->fd == ((tb_long_t)aioo->handle - 1)) 
+    if (pfd && pfd->fd == ((tb_long_t)aioo->sock - 1)) 
     {
         pfd->events = 0;
         if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) pfd->events |= POLLIN;
@@ -121,18 +121,18 @@ static tb_bool_t tb_aiop_rtor_poll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_
 {
     // check
     tb_aiop_rtor_poll_impl_t* impl = (tb_aiop_rtor_poll_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && impl->pfds && impl->cfds && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && impl->pfds && impl->cfds && aioo && aioo->sock, tb_false);
 
     // the aiop
     tb_aiop_impl_t* aiop = rtor->aiop;
     tb_assert_and_check_return_val(aiop, tb_false);
 
-    // add handle => aioo
+    // add sock => aioo
     tb_bool_t ok = tb_false;
     tb_spinlock_enter(&impl->lock.hash);
     if (impl->hash) 
     {
-        tb_hash_set(impl->hash, aioo->handle, aioo);
+        tb_hash_set(impl->hash, aioo->sock, aioo);
         ok = tb_true;
     }
     tb_spinlock_leave(&impl->lock.hash);
@@ -143,7 +143,7 @@ static tb_bool_t tb_aiop_rtor_poll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_
 
     // init pfd
     struct pollfd pfd = {0};
-    pfd.fd = ((tb_long_t)aioo->handle) - 1;
+    pfd.fd = ((tb_long_t)aioo->sock) - 1;
     if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
     if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
 
@@ -162,7 +162,7 @@ static tb_bool_t tb_aiop_rtor_poll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_
 {
     // check
     tb_aiop_rtor_poll_impl_t* impl = (tb_aiop_rtor_poll_impl_t*)rtor;
-    tb_assert_and_check_return_val(impl && impl->pfds && impl->cfds && aioo && aioo->handle, tb_false);
+    tb_assert_and_check_return_val(impl && impl->pfds && impl->cfds && aioo && aioo->sock, tb_false);
 
     // the aiop
     tb_aiop_impl_t* aiop = rtor->aiop;
@@ -170,12 +170,12 @@ static tb_bool_t tb_aiop_rtor_poll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_
 
     // delo it, TODO: delo by binary search
     tb_spinlock_enter(&impl->lock.pfds);
-    tb_vector_walk(impl->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)aioo->handle) - 1));
+    tb_vector_walk(impl->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)aioo->sock) - 1));
     tb_spinlock_leave(&impl->lock.pfds);
 
-    // del handle => aioo
+    // del sock => aioo
     tb_spinlock_enter(&impl->lock.hash);
-    if (impl->hash) tb_hash_del(impl->hash, aioo->handle);
+    if (impl->hash) tb_hash_del(impl->hash, aioo->sock);
     tb_spinlock_leave(&impl->lock.hash);
 
     // spak it
@@ -250,16 +250,16 @@ static tb_long_t tb_aiop_rtor_poll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* li
         tb_size_t i = 0;
         for (i = 0; i < cfdm && wait < maxn; i++)
         {
-            // the handle
-            tb_handle_t handle = tb_fd2handle(cfds[i].fd);
-            tb_assert_and_check_return_val(handle, -1);
+            // the sock
+            tb_socket_ref_t sock = tb_fd2sock(cfds[i].fd);
+            tb_assert_and_check_return_val(sock, -1);
 
             // the events
             tb_size_t events = cfds[i].revents;
             tb_check_continue(events);
 
             // spak?
-            if (handle == aiop->spak[1] && (events & POLLIN))
+            if (sock == aiop->spak[1] && (events & POLLIN))
             {
                 // read spak
                 tb_char_t spak = '\0';
@@ -276,7 +276,7 @@ static tb_long_t tb_aiop_rtor_poll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* li
             }
 
             // skip spak
-            tb_check_continue(handle != aiop->spak[1]);
+            tb_check_continue(sock != aiop->spak[1]);
 
             // the aioo
             tb_size_t       code = TB_AIOE_CODE_NONE;
@@ -285,7 +285,7 @@ static tb_long_t tb_aiop_rtor_poll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* li
             tb_spinlock_enter(&impl->lock.hash);
             if (impl->hash)
             {
-                aioo = (tb_aioo_impl_t*)tb_hash_get(impl->hash, handle);
+                aioo = (tb_aioo_impl_t*)tb_hash_get(impl->hash, sock);
                 if (aioo) 
                 {
                     // save code & data

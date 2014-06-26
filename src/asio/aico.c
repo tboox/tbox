@@ -33,15 +33,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_aico_ref_t tb_aico_init_sock(tb_aicp_ref_t aicp, tb_handle_t handle)
+tb_aico_ref_t tb_aico_init_sock(tb_aicp_ref_t aicp, tb_socket_ref_t sock)
 {
     // addo
-    return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_SOCK);
+    return tb_aicp_addo(aicp, (tb_handle_t)sock, TB_AICO_TYPE_SOCK);
 }
-tb_aico_ref_t tb_aico_init_file(tb_aicp_ref_t aicp, tb_handle_t handle)
+tb_aico_ref_t tb_aico_init_file(tb_aicp_ref_t aicp, tb_file_ref_t file)
 {
     // addo
-    return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_FILE);
+    return tb_aicp_addo(aicp, (tb_handle_t)file, TB_AICO_TYPE_FILE);
 }
 tb_aico_ref_t tb_aico_init_task(tb_aicp_ref_t aicp, tb_bool_t bltimer)
 {
@@ -93,43 +93,23 @@ tb_handle_t tb_aico_pool(tb_aico_ref_t aico)
     // the pool handle
     return impl->pool;
 }
-#ifdef __tb_debug__
-tb_char_t const* tb_aico_func(tb_aico_ref_t aico)
+tb_socket_ref_t tb_aico_sock(tb_aico_ref_t aico)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl, tb_null);
+    tb_assert_and_check_return_val(impl && impl->type == TB_AICO_TYPE_SOCK, tb_null);
 
-    // the func
-    return impl->func;
+    // the socket handle
+    return (tb_socket_ref_t)impl->handle;
 }
-tb_char_t const* tb_aico_file(tb_aico_ref_t aico)
+tb_file_ref_t tb_aico_file(tb_aico_ref_t aico)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl, tb_null);
+    tb_assert_and_check_return_val(impl && impl->type == TB_AICO_TYPE_FILE, tb_null);
 
-    // the file
-    return impl->file;
-}
-tb_size_t tb_aico_line(tb_aico_ref_t aico)
-{
-    // check
-    tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl, 0);
-
-    // the line
-    return impl->line;
-}
-#endif
-tb_handle_t tb_aico_handle(tb_aico_ref_t aico)
-{
-    // check
-    tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl, tb_null);
-
-    // the impl handle
-    return impl->handle;
+    // the file handle
+    return (tb_file_ref_t)impl->handle;
 }
 tb_long_t tb_aico_timeout(tb_aico_ref_t aico, tb_size_t type)
 {

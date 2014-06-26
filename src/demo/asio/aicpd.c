@@ -19,10 +19,10 @@
 typedef struct __tb_demo_context_t
 {
     // the sock
-    tb_handle_t         sock;
+    tb_socket_ref_t     sock;
 
     // the file
-    tb_handle_t         file;
+    tb_file_ref_t       file;
 
     // the aico
     tb_aico_ref_t       aico[2];
@@ -168,10 +168,10 @@ static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     tb_assert_and_check_return(aico);
 
     // trace
-    tb_trace_i("aico: sock: exit: %p", tb_aico_handle(aico));
+    tb_trace_i("aico: sock: exit: %p", tb_aico_sock(aico));
 
     // exit it
-    tb_socket_clos(tb_aico_handle(aico));
+    tb_socket_clos(tb_aico_sock(aico));
 }
 #ifdef TB_DEMO_MODE_SENDF
 static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)

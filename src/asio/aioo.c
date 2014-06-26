@@ -32,26 +32,26 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
+tb_long_t tb_aioo_rtor_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_aioo_handle(tb_aioo_ref_t aioo)
+tb_socket_ref_t tb_aioo_sock(tb_aioo_ref_t aioo)
 {
     // check
     tb_aioo_impl_t const* impl = (tb_aioo_impl_t const*)aioo;
     tb_assert_and_check_return_val(impl, tb_null);
 
-    // the handle
-    return impl->handle;
+    // the sock
+    return impl->sock;
 }
-tb_long_t tb_aioo_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+tb_long_t tb_aioo_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout)
 {
     // check
-    tb_assert_and_check_return_val(handle && code, 0);
+    tb_assert_and_check_return_val(sock && code, 0);
 
     // wait aioo
-    return tb_aioo_reactor_wait(handle, code, timeout);
+    return tb_aioo_rtor_wait(sock, code, timeout);
 }
 

@@ -33,7 +33,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
+tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
     // check
     tb_assert_and_check_return_val(path, tb_null);
@@ -111,7 +111,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     // ok?
     return file != INVALID_HANDLE_VALUE? (tb_handle_t)file : tb_null;
 }
-tb_bool_t tb_file_exit(tb_handle_t file)
+tb_bool_t tb_file_exit(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, tb_false);
@@ -119,7 +119,7 @@ tb_bool_t tb_file_exit(tb_handle_t file)
     // close it
     return CloseHandle(file)? tb_true : tb_false;
 }
-tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
@@ -131,7 +131,7 @@ tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
     DWORD real_size = 0;
     return ReadFile(file, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
-tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
@@ -143,7 +143,7 @@ tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
     DWORD real_size = 0;
     return WriteFile(file, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
-tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
@@ -164,7 +164,7 @@ tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hi
     // ok
     return real;
 }
-tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
@@ -185,7 +185,7 @@ tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size,
     // ok
     return real;
 }
-tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -223,7 +223,7 @@ tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
     // ok?
     return read;
 }
-tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -261,7 +261,7 @@ tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
     // ok?
     return writ;
 }
-tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writf(tb_file_ref_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     // check
     tb_assert_and_check_return_val(file && ifile && size, -1);
@@ -283,7 +283,7 @@ tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, t
     // ok?
     return writ == read? writ : -1;
 }
-tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -304,7 +304,7 @@ tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
     // ok
     return real;
 }
-tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -325,7 +325,7 @@ tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
     // ok
     return real;
 }
-tb_bool_t tb_file_sync(tb_handle_t file)
+tb_bool_t tb_file_sync(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, tb_false);
@@ -333,7 +333,7 @@ tb_bool_t tb_file_sync(tb_handle_t file)
     // sync it
     return FlushFileBuffers(file)? tb_true : tb_false;
 }
-tb_hong_t tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode)
+tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
@@ -344,7 +344,7 @@ tb_hong_t tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode)
     o.QuadPart = (LONGLONG)offset;
     return SetFilePointerEx(file, o, &p, mode)? (tb_hong_t)p.QuadPart : -1;
 }
-tb_hong_t tb_file_offset(tb_handle_t file)
+tb_hong_t tb_file_offset(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
@@ -352,7 +352,7 @@ tb_hong_t tb_file_offset(tb_handle_t file)
     // the file size
     return tb_file_seek(file, (tb_hong_t)0, TB_FILE_SEEK_CUR);
 }
-tb_hize_t tb_file_size(tb_handle_t file)
+tb_hize_t tb_file_size(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, 0);

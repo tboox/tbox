@@ -50,8 +50,8 @@
 // the sock stream type
 typedef struct __tb_async_stream_sock_impl_t
 {
-    // the sock handle
-    tb_handle_t                         sock;
+    // the sock 
+    tb_socket_ref_t                     sock;
 
     // the aico
     tb_aico_ref_t                       aico;
@@ -1205,7 +1205,7 @@ static tb_bool_t tb_async_stream_sock_impl_ctrl(tb_async_stream_ref_t stream, tb
             tb_assert_and_check_return_val(tb_async_stream_is_closed(stream), tb_false);
 
             // the sock
-            tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+            tb_socket_ref_t sock = (tb_socket_ref_t)tb_va_arg(args, tb_socket_ref_t);
 
             // changed? exit the old sock
             if (impl->sock != sock)
@@ -1227,10 +1227,10 @@ static tb_bool_t tb_async_stream_sock_impl_ctrl(tb_async_stream_ref_t stream, tb
         }
     case TB_STREAM_CTRL_SOCK_GET_HANDLE:
         {
-            // get handle
-            tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
-            tb_assert_and_check_return_val(phandle, tb_false);
-            *phandle = impl->sock;
+            // get sock
+            tb_socket_ref_t* psock = (tb_socket_ref_t*)tb_va_arg(args, tb_socket_ref_t*);
+            tb_assert_and_check_return_val(psock, tb_false);
+            *psock = impl->sock;
             return tb_true;
         }
     case TB_STREAM_CTRL_SOCK_KEEP_ALIVE:

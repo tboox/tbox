@@ -35,22 +35,22 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
+tb_long_t tb_aioo_rtor_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "posix/aioo_select.c"
-    tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+    tb_long_t tb_aioo_rtor_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout)
     {
-        return tb_aioo_reactor_select_wait(handle, code, timeout);
+        return tb_aioo_rtor_select_wait(sock, code, timeout);
     }
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/aioo_poll.c"
-    tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+    tb_long_t tb_aioo_rtor_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout)
     {
-        return tb_aioo_reactor_poll_wait(handle, code, timeout);
+        return tb_aioo_rtor_poll_wait(sock, code, timeout);
     }
 #else
 #   error have not available event mode

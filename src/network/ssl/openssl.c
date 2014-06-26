@@ -436,7 +436,7 @@ tb_void_t tb_ssl_exit(tb_ssl_ref_t ssl)
     // exit it
     tb_free(impl);
 }
-tb_void_t tb_ssl_set_bio_sock(tb_ssl_ref_t ssl, tb_handle_t sock)
+tb_void_t tb_ssl_set_bio_sock(tb_ssl_ref_t ssl, tb_socket_ref_t sock)
 {
     // the ssl
     tb_ssl_impl_t* impl = (tb_ssl_impl_t*)ssl;

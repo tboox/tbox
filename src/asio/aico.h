@@ -29,7 +29,6 @@
  */
 #include "prefix.h"
 #include "../network/ipv4.h"
-#include "../platform/prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -75,7 +74,6 @@ __tb_extern_c_enter__
 
 #define tb_aico_task_run(aico, delay, func, priv)                               tb_aico_task_run_(aico, delay, func, priv __tb_debug_vals__)
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -116,24 +114,24 @@ typedef tb_void_t       (*tb_aico_exit_func_t)(tb_aico_ref_t aico, tb_cpointer_t
 /*! init the sock aico
  *
  * @param aicp      the aicp
- * @param handle    the handle
+ * @param sock      the sock
  * @param exit      the exit func
  * @param priv      the private data for exit func
  *
  * @return          the aico
  */
-tb_aico_ref_t       tb_aico_init_sock(tb_aicp_ref_t aicp, tb_handle_t handle);
+tb_aico_ref_t       tb_aico_init_sock(tb_aicp_ref_t aicp, tb_socket_ref_t sock);
 
 /*! init the file aico
  *
  * @param aicp      the aicp
- * @param handle    the handle
+ * @param file      the file
  * @param exit      the exit func
  * @param priv      the private data for exit func
  *
  * @return          the aico
  */
-tb_aico_ref_t       tb_aico_init_file(tb_aicp_ref_t aicp, tb_handle_t handle);
+tb_aico_ref_t       tb_aico_init_file(tb_aicp_ref_t aicp, tb_file_ref_t file);
 
 /*! init the task aico
  *
@@ -185,39 +183,21 @@ tb_size_t           tb_aico_type(tb_aico_ref_t aico);
  */
 tb_handle_t         tb_aico_pool(tb_aico_ref_t aico);
 
-/*! the aico handle
+/*! get the socket if the aico is socket type
  *
  * @param aico      the aico
  *
- * @return          the aico handle
+ * @return          the socket
  */
-tb_handle_t         tb_aico_handle(tb_aico_ref_t aico);
+tb_socket_ref_t     tb_aico_sock(tb_aico_ref_t aico);
 
-#ifdef __tb_debug__
-/*! the aico func name from post for debug
+/*! get the file if the aico is file type
  *
  * @param aico      the aico
  *
- * @return          the aico func name
+ * @return          the file
  */
-tb_char_t const*    tb_aico_func(tb_aico_ref_t aico);
-
-/*! the aico file name from post for debug
- *
- * @param aico      the aico
- *
- * @return          the aico file name
- */
-tb_char_t const*    tb_aico_file(tb_aico_ref_t aico);
-
-/*! the aico line number from post for debug
- *
- * @param aico      the aico
- *
- * @return          the aico line number
- */
-tb_size_t           tb_aico_line(tb_aico_ref_t aico);
-#endif
+tb_file_ref_t       tb_aico_file(tb_aico_ref_t aico);
 
 /*! the aico timeout
  *

@@ -43,8 +43,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
+tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
     // check
     tb_assert_and_check_return_val(path, tb_null);
@@ -114,12 +113,12 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     }
  
     // trace
-    tb_trace_d("open: %p", tb_fd2handle(fd));
+    tb_trace_d("open: %p", tb_fd2file(fd));
 
     // ok?
-    return tb_fd2handle(fd);
+    return tb_fd2file(fd);
 }
-tb_bool_t tb_file_exit(tb_handle_t file)
+tb_bool_t tb_file_exit(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, tb_false);
@@ -128,7 +127,7 @@ tb_bool_t tb_file_exit(tb_handle_t file)
     tb_trace_d("clos: %p", file);
 
     // close it
-    tb_bool_t ok = !close(tb_handle2fd(file))? tb_true : tb_false;
+    tb_bool_t ok = !close(tb_file2fd(file))? tb_true : tb_false;
     
     // failed?
     if (!ok)
@@ -140,47 +139,47 @@ tb_bool_t tb_file_exit(tb_handle_t file)
     // ok?
     return ok;
 }
-tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
 
     // read it
-    return read(tb_handle2fd(file), data, size);
+    return read(tb_file2fd(file), data, size);
 }
-tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
 
     // writ it
-    return write(tb_handle2fd(file), data, size);
+    return write(tb_file2fd(file), data, size);
 }
-tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
 
     // read it
 #ifdef TB_CONFIG_OS_LINUX
-    return pread64(tb_handle2fd(file), data, (size_t)size, offset);
+    return pread64(tb_file2fd(file), data, (size_t)size, offset);
 #else
-    return pread(tb_handle2fd(file), data, (size_t)size, offset);
+    return pread(tb_file2fd(file), data, (size_t)size, offset);
 #endif
 }
-tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
 
     // writ it
 #ifdef TB_CONFIG_OS_LINUX
-    return pwrite64(tb_handle2fd(file), data, (size_t)size, offset);
+    return pwrite64(tb_file2fd(file), data, (size_t)size, offset);
 #else
-    return pwrite(tb_handle2fd(file), data, (size_t)size, offset);
+    return pwrite(tb_file2fd(file), data, (size_t)size, offset);
 #endif
 }
-tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -191,9 +190,9 @@ tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
     tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
 
     // read it
-    return readv(tb_handle2fd(file), (struct iovec const*)list, size);
+    return readv(tb_file2fd(file), (struct iovec const*)list, size);
 }
-tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -204,9 +203,9 @@ tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
     tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
 
     // writ it
-    return writev(tb_handle2fd(file), (struct iovec const*)list, size);
+    return writev(tb_file2fd(file), (struct iovec const*)list, size);
 }
-tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writf(tb_file_ref_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     // check
     tb_assert_and_check_return_val(file && ifile && size, -1);
@@ -215,7 +214,7 @@ tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, t
 
     // writ it
     off_t       seek = offset;
-    tb_hong_t   real = sendfile(tb_handle2fd(file), tb_handle2fd(ifile), &seek, (size_t)size);
+    tb_hong_t   real = sendfile(tb_file2fd(file), tb_file2fd(ifile), &seek, (size_t)size);
 
     // ok?
     if (real >= 0) return real;
@@ -246,7 +245,7 @@ tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, t
     return writ == read? writ : -1;
 #endif
 }
-tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -258,7 +257,7 @@ tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
 
     // read it
 #ifdef TB_CONFIG_OS_LINUX
-    return preadv(tb_handle2fd(file), (struct iovec const*)list, size, offset);
+    return preadv(tb_file2fd(file), (struct iovec const*)list, size, offset);
 #else
  
     // FIXME: lock it
@@ -280,7 +279,7 @@ tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
     return real;
 #endif
 }
-tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -292,7 +291,7 @@ tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
 
     // writ it
 #ifdef TB_CONFIG_OS_LINUX
-    return pwritev(tb_handle2fd(file), (struct iovec const*)list, size, offset);
+    return pwritev(tb_file2fd(file), (struct iovec const*)list, size, offset);
 #else
 
     // FIXME: lock it
@@ -314,27 +313,27 @@ tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
     return real;
 #endif
 }
-tb_bool_t tb_file_sync(tb_handle_t file)
+tb_bool_t tb_file_sync(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, tb_false);
 
     // sync
 #ifdef TB_CONFIG_OS_LINUX
-    return !fdatasync(tb_handle2fd(file))? tb_true : tb_false;
+    return !fdatasync(tb_file2fd(file))? tb_true : tb_false;
 #else
-    return !fsync(tb_handle2fd(file))? tb_true : tb_false;
+    return !fsync(tb_file2fd(file))? tb_true : tb_false;
 #endif
 }
-tb_hong_t tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode)
+tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
 
     // seek
-    return lseek(tb_handle2fd(file), offset, mode);
+    return lseek(tb_file2fd(file), offset, mode);
 }
-tb_hong_t tb_file_offset(tb_handle_t file)
+tb_hong_t tb_file_offset(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, -1);
@@ -342,14 +341,14 @@ tb_hong_t tb_file_offset(tb_handle_t file)
     // the offset
     return tb_file_seek(file, (tb_hong_t)0, TB_FILE_SEEK_CUR);
 }
-tb_hize_t tb_file_size(tb_handle_t file)
+tb_hize_t tb_file_size(tb_file_ref_t file)
 {
     // check
     tb_assert_and_check_return_val(file, 0);
 
     // the file size
     struct stat st = {0};
-    return !fstat(tb_handle2fd(file), &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
+    return !fstat(tb_file2fd(file), &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
