@@ -59,10 +59,10 @@ typedef struct __tb_transfer_pool_impl_t
     tb_handle_t                     pool;
 
     // the idle task list
-    tb_vector_t*                    idle;
+    tb_vector_ref_t                    idle;
 
     // the work task list
-    tb_list_t*                      work;
+    tb_list_ref_t                      work;
 
     /* the state
      *
@@ -218,7 +218,7 @@ static tb_bool_t tb_transfer_task_done(tb_size_t state, tb_hize_t offset, tb_hon
     // ok?
     return ok;
 }
-static tb_bool_t tb_transfer_pool_work_kill(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_transfer_pool_work_kill(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the task 
     tb_transfer_task_t* task = (tb_transfer_task_t*)item;
@@ -233,20 +233,20 @@ static tb_bool_t tb_transfer_pool_work_kill(tb_iterator_t* iterator, tb_pointer_
     // ok
     return tb_true;
 }
-static tb_bool_t tb_transfer_pool_work_copy(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_transfer_pool_work_copy(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the task 
     tb_transfer_task_t* task = (tb_transfer_task_t*)item;
     tb_check_return_val(task && priv, tb_false);
 
     // save it
-    tb_list_insert_tail((tb_list_t*)priv, task);
+    tb_list_insert_tail((tb_list_ref_t)priv, task);
 
     // ok
     return tb_true;
 }
 #ifdef __tb_debug__
-static tb_bool_t tb_transfer_pool_work_wait(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_transfer_pool_work_wait(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // check
     tb_transfer_task_t* task = (tb_transfer_task_t*)item;
@@ -367,7 +367,7 @@ tb_void_t tb_transfer_pool_kill_all(tb_transfer_pool_ref_t pool)
     tb_trace_d("kill_all: %lu, ..", impl->work? tb_list_size(impl->work) : 0);
 
     // kill it
-    tb_list_t* copy = tb_null;
+    tb_list_ref_t copy = tb_null;
     if (impl->work && tb_list_size(impl->work))
     {
         // init the work list

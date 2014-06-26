@@ -60,8 +60,8 @@ typedef struct __tb_hash_item_t
 
 }tb_hash_item_t;
 
-/// the hash type
-typedef tb_iterator_t       tb_hash_t;
+/// the hash ref type
+typedef tb_iterator_ref_t tb_hash_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -75,19 +75,19 @@ typedef tb_iterator_t       tb_hash_t;
  *
  * @return              the hash
  */
-tb_hash_t*              tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_func_t data_func);
+tb_hash_ref_t           tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_item_func_t data_func);
 
 /*! exit hash
  *
  * @param hash          the hash
  */
-tb_void_t               tb_hash_exit(tb_hash_t* hash);
+tb_void_t               tb_hash_exit(tb_hash_ref_t hash);
 
 /*! clear hash
  *
  * @param hash          the hash
  */
-tb_void_t               tb_hash_clear(tb_hash_t* hash);
+tb_void_t               tb_hash_clear(tb_hash_ref_t hash);
 
 /*! get hash item itor
  *
@@ -96,7 +96,7 @@ tb_void_t               tb_hash_clear(tb_hash_t* hash);
  *
  * @return              the hash itor, @note: itor => item maybe changed if insert or remove item
  */
-tb_size_t               tb_hash_itor(tb_hash_t const* hash, tb_cpointer_t name);
+tb_size_t               tb_hash_itor(tb_hash_ref_t hash, tb_cpointer_t name);
 
 /*! get hash item data
  *
@@ -105,14 +105,14 @@ tb_size_t               tb_hash_itor(tb_hash_t const* hash, tb_cpointer_t name);
  *
  * @return              the hash item data
  */
-tb_pointer_t            tb_hash_get(tb_hash_t const* hash, tb_cpointer_t name);
+tb_pointer_t            tb_hash_get(tb_hash_ref_t hash, tb_cpointer_t name);
 
 /*! del hash item
  *
  * @param hash          the hash
  * @param name          the hash item name
  */
-tb_void_t               tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
+tb_void_t               tb_hash_del(tb_hash_ref_t hash, tb_cpointer_t name);
 
 /*! set hash item
  *
@@ -122,7 +122,7 @@ tb_void_t               tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
  *
  * @return              the hash itor, @note: itor => item maybe changed if insert or remove item
  */
-tb_size_t               tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data);
+tb_size_t               tb_hash_set(tb_hash_ref_t hash, tb_cpointer_t name, tb_cpointer_t data);
 
 /*! the hash size
  *
@@ -130,7 +130,7 @@ tb_size_t               tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpoi
  *
  * @return              the hash size
  */
-tb_size_t               tb_hash_size(tb_hash_t const* hash);
+tb_size_t               tb_hash_size(tb_hash_ref_t hash);
 
 /*! the hash maxn
  *
@@ -138,14 +138,14 @@ tb_size_t               tb_hash_size(tb_hash_t const* hash);
  *
  * @return              the hash maxn
  */
-tb_size_t               tb_hash_maxn(tb_hash_t const* hash);
+tb_size_t               tb_hash_maxn(tb_hash_ref_t hash);
 
 /*! walk hash items
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
+ * tb_bool_t tb_hash_item_func(tb_hash_ref_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
  * {
  *      tb_assert_and_check_return_val(hash && bdel, tb_false);
  *
@@ -162,14 +162,14 @@ tb_size_t               tb_hash_maxn(tb_hash_t const* hash);
  * @param priv          the walk callback data
  *
  */
-tb_void_t               tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
+tb_void_t               tb_hash_walk(tb_hash_ref_t hash, tb_bool_t (*func)(tb_hash_ref_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
 
 #ifdef __tb_debug__
 /*! dump hash
  *
  * @param hash          the hash
  */
-tb_void_t               tb_hash_dump(tb_hash_t const* hash);
+tb_void_t               tb_hash_dump(tb_hash_ref_t hash);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

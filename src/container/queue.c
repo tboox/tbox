@@ -97,7 +97,7 @@ typedef struct __tb_queue_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
-static tb_size_t tb_queue_iterator_size(tb_iterator_t* iterator)
+static tb_size_t tb_queue_iterator_size(tb_iterator_ref_t iterator)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -106,7 +106,7 @@ static tb_size_t tb_queue_iterator_size(tb_iterator_t* iterator)
     // the size
     return ((impl->tail + impl->maxn - impl->head) & (impl->maxn - 1));
 }
-static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
+static tb_size_t tb_queue_iterator_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -115,7 +115,7 @@ static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
     // head
     return impl->head;
 }
-static tb_size_t tb_queue_iterator_tail(tb_iterator_t* iterator)
+static tb_size_t tb_queue_iterator_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -124,7 +124,7 @@ static tb_size_t tb_queue_iterator_tail(tb_iterator_t* iterator)
     // tail
     return impl->tail;
 }
-static tb_size_t tb_queue_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_queue_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -133,7 +133,7 @@ static tb_size_t tb_queue_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
     // next
     return ((itor + 1) & (impl->maxn - 1));
 }
-static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_queue_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -142,7 +142,7 @@ static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
     // prev
     return ((itor + impl->maxn - 1) & (impl->maxn - 1));
 }
-static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_queue_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -151,7 +151,7 @@ static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t it
     // item
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
 }
-static tb_void_t tb_queue_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_queue_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -160,7 +160,7 @@ static tb_void_t tb_queue_iterator_copy(tb_iterator_t* iterator, tb_size_t itor,
     // copy
     impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
-static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_queue_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -173,7 +173,7 @@ static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t l
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
+tb_queue_ref_t tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 {
     // check
     tb_assert_and_check_return_val(func.size && func.dupl && func.data, tb_null);
@@ -220,14 +220,14 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
     // failed?
     if (!ok)
     {
-        if (impl) tb_queue_exit((tb_queue_t*)impl);
+        if (impl) tb_queue_exit((tb_queue_ref_t)impl);
         impl = tb_null;
     }
 
     // ok?
-    return (tb_queue_t*)impl;
+    return (tb_queue_ref_t)impl;
 }
-tb_void_t tb_queue_exit(tb_queue_t* queue)
+tb_void_t tb_queue_exit(tb_queue_ref_t queue)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
@@ -242,7 +242,7 @@ tb_void_t tb_queue_exit(tb_queue_t* queue)
     // free it
     tb_free(impl);
 }
-tb_void_t tb_queue_clear(tb_queue_t* queue)
+tb_void_t tb_queue_clear(tb_queue_ref_t queue)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
@@ -253,7 +253,7 @@ tb_void_t tb_queue_clear(tb_queue_t* queue)
     impl->head = 0;
     impl->tail = 0;
 }
-tb_void_t tb_queue_put(tb_queue_t* queue, tb_cpointer_t data)
+tb_void_t tb_queue_put(tb_queue_ref_t queue, tb_cpointer_t data)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
@@ -263,7 +263,7 @@ tb_void_t tb_queue_put(tb_queue_t* queue, tb_cpointer_t data)
     impl->func.dupl(&impl->func, impl->data + impl->tail * impl->func.size, data);
     impl->tail = ((impl->tail + 1) & (impl->maxn - 1));
 }
-tb_void_t tb_queue_pop(tb_queue_t* queue)
+tb_void_t tb_queue_pop(tb_queue_ref_t queue)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
@@ -273,19 +273,19 @@ tb_void_t tb_queue_pop(tb_queue_t* queue)
     if (impl->func.free) impl->func.free(&impl->func, impl->data + impl->head * impl->func.size);
     impl->head = ((impl->head + 1) & (impl->maxn - 1));
 }
-tb_pointer_t tb_queue_get(tb_queue_t const* queue)
+tb_pointer_t tb_queue_get(tb_queue_ref_t queue)
 {
     return tb_queue_head(queue);
 }
-tb_pointer_t tb_queue_head(tb_queue_t const* queue)
+tb_pointer_t tb_queue_head(tb_queue_ref_t queue)
 {
-    return tb_iterator_item((tb_iterator_t*)queue, tb_iterator_head((tb_iterator_t*)queue));
+    return tb_iterator_item((tb_iterator_ref_t)queue, tb_iterator_head((tb_iterator_ref_t)queue));
 }
-tb_pointer_t tb_queue_last(tb_queue_t const* queue)
+tb_pointer_t tb_queue_last(tb_queue_ref_t queue)
 {
-    return tb_iterator_item((tb_iterator_t*)queue, tb_iterator_last((tb_iterator_t*)queue));
+    return tb_iterator_item((tb_iterator_ref_t)queue, tb_iterator_last((tb_iterator_ref_t)queue));
 }
-tb_size_t tb_queue_size(tb_queue_t const* queue)
+tb_size_t tb_queue_size(tb_queue_ref_t queue)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
@@ -293,7 +293,7 @@ tb_size_t tb_queue_size(tb_queue_t const* queue)
 
     return ((impl->tail + impl->maxn - impl->head) & (impl->maxn - 1));
 }
-tb_size_t tb_queue_maxn(tb_queue_t const* queue)
+tb_size_t tb_queue_maxn(tb_queue_ref_t queue)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
@@ -301,7 +301,7 @@ tb_size_t tb_queue_maxn(tb_queue_t const* queue)
 
     return (impl->maxn? impl->maxn - 1 : 0);
 }
-tb_bool_t tb_queue_full(tb_queue_t const* queue)
+tb_bool_t tb_queue_full(tb_queue_ref_t queue)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;
@@ -309,7 +309,7 @@ tb_bool_t tb_queue_full(tb_queue_t const* queue)
 
     return ((impl->head == ((impl->tail + 1) & (impl->maxn - 1)))? tb_true : tb_false);
 }
-tb_bool_t tb_queue_null(tb_queue_t const* queue)
+tb_bool_t tb_queue_null(tb_queue_ref_t queue)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)queue;

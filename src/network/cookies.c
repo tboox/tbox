@@ -88,7 +88,7 @@ typedef struct __tb_cookies_t
     tb_handle_t         string_pool;
     
     // the cookie pool, key: "domain+path+name"
-    tb_hash_t*          cookie_pool;
+    tb_hash_ref_t          cookie_pool;
 
 }tb_cookies_t;
 
@@ -433,7 +433,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_t
     // ok
     return tb_true;
 }
-static tb_bool_t tb_cookies_entry_walk(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_cookies_entry_walk(tb_hash_ref_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_value_t* tuple = (tb_value_t*)priv;

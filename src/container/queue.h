@@ -47,8 +47,8 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the queue type
-typedef tb_iterator_t   tb_queue_t;
+/// the queue ref type
+typedef tb_iterator_ref_t   tb_queue_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -61,13 +61,13 @@ typedef tb_iterator_t   tb_queue_t;
  *
  * @return          the queue
  */
-tb_queue_t*         tb_queue_init(tb_size_t maxn, tb_item_func_t func);
+tb_queue_ref_t      tb_queue_init(tb_size_t maxn, tb_item_func_t func);
 
 /*! exit queue
  *
  * @param queue     the queue
  */
-tb_void_t           tb_queue_exit(tb_queue_t* queue);
+tb_void_t           tb_queue_exit(tb_queue_ref_t queue);
 
 /*! the queue head item
  *
@@ -75,7 +75,7 @@ tb_void_t           tb_queue_exit(tb_queue_t* queue);
  *
  * @return          the head item
  */
-tb_pointer_t        tb_queue_head(tb_queue_t const* queue);
+tb_pointer_t        tb_queue_head(tb_queue_ref_t queue);
 
 /*! the queue last item
  *
@@ -83,26 +83,26 @@ tb_pointer_t        tb_queue_head(tb_queue_t const* queue);
  *
  * @return          the last item
  */
-tb_pointer_t        tb_queue_last(tb_queue_t const* queue);
+tb_pointer_t        tb_queue_last(tb_queue_ref_t queue);
 
 /*! clear the queue
  *
  * @param queue     the queue
  */
-tb_void_t           tb_queue_clear(tb_queue_t* queue);
+tb_void_t           tb_queue_clear(tb_queue_ref_t queue);
 
 /*! put the queue item
  *
  * @param queue     the queue
  * @param data      the item data
  */
-tb_void_t           tb_queue_put(tb_queue_t* queue, tb_cpointer_t data);
+tb_void_t           tb_queue_put(tb_queue_ref_t queue, tb_cpointer_t data);
 
 /*! pop the queue item
  *
  * @param queue     the queue
  */
-tb_void_t           tb_queue_pop(tb_queue_t* queue);
+tb_void_t           tb_queue_pop(tb_queue_ref_t queue);
 
 /*! get the queue item
  *
@@ -110,7 +110,7 @@ tb_void_t           tb_queue_pop(tb_queue_t* queue);
  *
  * @return          the queue item
  */
-tb_pointer_t        tb_queue_get(tb_queue_t const* queue);
+tb_pointer_t        tb_queue_get(tb_queue_ref_t queue);
 
 /*! the queue size
  *
@@ -118,7 +118,7 @@ tb_pointer_t        tb_queue_get(tb_queue_t const* queue);
  *
  * @return          the queue size
  */
-tb_size_t           tb_queue_size(tb_queue_t const* queue);
+tb_size_t           tb_queue_size(tb_queue_ref_t queue);
 
 /*! the queue maxn
  *
@@ -126,7 +126,7 @@ tb_size_t           tb_queue_size(tb_queue_t const* queue);
  *
  * @return          the queue maxn
  */
-tb_size_t           tb_queue_maxn(tb_queue_t const* queue);
+tb_size_t           tb_queue_maxn(tb_queue_ref_t queue);
 
 /*! the queue full?
  *
@@ -134,7 +134,7 @@ tb_size_t           tb_queue_maxn(tb_queue_t const* queue);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_queue_full(tb_queue_t const* queue);
+tb_bool_t           tb_queue_full(tb_queue_ref_t queue);
 
 /*! the queue null?
  *
@@ -142,7 +142,7 @@ tb_bool_t           tb_queue_full(tb_queue_t const* queue);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_queue_null(tb_queue_t const* queue);
+tb_bool_t           tb_queue_null(tb_queue_ref_t queue);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

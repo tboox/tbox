@@ -58,7 +58,7 @@ typedef struct __tb_object_dictionary_t
     tb_size_t           size;
 
     // the object hash
-    tb_hash_t*          hash;
+    tb_hash_ref_t          hash;
 
     // increase refn?
     tb_bool_t           incr;
@@ -188,13 +188,13 @@ tb_size_t tb_object_dictionary_size(tb_object_t* object)
     // size
     return tb_hash_size(dictionary->hash);
 }
-tb_iterator_t* tb_object_dictionary_itor(tb_object_t* object)
+tb_iterator_ref_t tb_object_dictionary_itor(tb_object_t* object)
 {
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
     tb_assert_and_check_return_val(dictionary, tb_null);
 
     // iterator
-    return (tb_iterator_t*)dictionary->hash;
+    return (tb_iterator_ref_t)dictionary->hash;
 }
 tb_object_t* tb_object_dictionary_val(tb_object_t* object, tb_char_t const* key)
 {

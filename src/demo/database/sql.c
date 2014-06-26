@@ -23,8 +23,8 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
         }
 
         // load result
-//      tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
-        tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+//      tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_true);
+        tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_false);
         tb_check_break(result);
 
         // trace
@@ -32,7 +32,7 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
         tb_trace_i("row: size: %lu", tb_iterator_size(result));
 
         // walk result
-        tb_for_all_if (tb_iterator_t*, row, result, row)
+        tb_for_all_if (tb_iterator_ref_t, row, result, row)
         {
             // trace
             tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
@@ -79,8 +79,8 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
         }
 
         // load result
-//      tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
-        tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+//      tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_true);
+        tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_false);
         tb_check_break(result);
 
         // trace
@@ -88,7 +88,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
         tb_trace_i("row: size: %lu", tb_iterator_size(result));
 
         // walk result
-        tb_for_all_if (tb_iterator_t*, row, result, row)
+        tb_for_all_if (tb_iterator_ref_t, row, result, row)
         {
             // trace
             tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));

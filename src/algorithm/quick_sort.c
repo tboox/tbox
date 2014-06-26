@@ -32,7 +32,7 @@
  * implementation
  */
 
-tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {   
     // check
     tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS));
@@ -86,7 +86,7 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail,
     // free
     if (key && step > sizeof(tb_pointer_t)) tb_free(key);
 }
-tb_void_t tb_quick_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp)
+tb_void_t tb_quick_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
 {
     tb_quick_sort(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp);
 }

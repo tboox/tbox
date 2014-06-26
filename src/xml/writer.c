@@ -61,10 +61,10 @@ typedef struct __tb_xml_writer_t
     tb_handle_t             pool;
 
     // stack
-    tb_stack_t*             elements;
+    tb_stack_ref_t             elements;
 
     // attributes
-    tb_hash_t*              attributes;
+    tb_hash_ref_t              attributes;
 
 }tb_xml_writer_t;
 

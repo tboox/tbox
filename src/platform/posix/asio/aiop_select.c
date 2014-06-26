@@ -76,7 +76,7 @@ typedef struct __tb_aiop_reactor_select_t
     fd_set                  efdo;
 
     // the hash
-    tb_hash_t*              hash;
+    tb_hash_ref_t              hash;
 
     // the lock
     tb_select_lock_t        lock;

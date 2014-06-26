@@ -153,7 +153,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
-static tb_size_t tb_heap_iterator_size(tb_iterator_t* iterator)
+static tb_size_t tb_heap_iterator_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -162,7 +162,7 @@ static tb_size_t tb_heap_iterator_size(tb_iterator_t* iterator)
     // size
     return impl->size;
 }
-static tb_size_t tb_heap_iterator_head(tb_iterator_t* iterator)
+static tb_size_t tb_heap_iterator_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -171,7 +171,7 @@ static tb_size_t tb_heap_iterator_head(tb_iterator_t* iterator)
     // head
     return 0;
 }
-static tb_size_t tb_heap_iterator_tail(tb_iterator_t* iterator)
+static tb_size_t tb_heap_iterator_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -180,7 +180,7 @@ static tb_size_t tb_heap_iterator_tail(tb_iterator_t* iterator)
     // tail
     return impl->size;
 }
-static tb_size_t tb_heap_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_heap_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -190,7 +190,7 @@ static tb_size_t tb_heap_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
     // next
     return itor + 1;
 }
-static tb_size_t tb_heap_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+static tb_size_t tb_heap_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -200,7 +200,7 @@ static tb_size_t tb_heap_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
     // prev
     return itor - 1;
 }
-static tb_pointer_t tb_heap_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+static tb_pointer_t tb_heap_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -209,7 +209,7 @@ static tb_pointer_t tb_heap_iterator_item(tb_iterator_t* iterator, tb_size_t ito
     // data
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
 }
-static tb_void_t tb_heap_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_heap_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -218,7 +218,7 @@ static tb_void_t tb_heap_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, 
     // copy
     impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
-static tb_long_t tb_heap_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_heap_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -271,7 +271,7 @@ static tb_long_t tb_heap_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t lt
  * 
  * </pre>
  */
-static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
+static tb_void_t tb_heap_iterator_delt(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -425,7 +425,7 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
  * implementation
  */
 
-tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
+tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
 {
     // check
     tb_assert_and_check_return_val(grow, tb_null);
@@ -474,14 +474,14 @@ tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
     if (!ok)
     {
         // exit it
-        if (impl) tb_heap_exit((tb_heap_t*)impl);
+        if (impl) tb_heap_exit((tb_heap_ref_t)impl);
         impl = tb_null;
     }
 
     // ok?
-    return (tb_heap_t*)impl;
+    return (tb_heap_ref_t)impl;
 }
-tb_void_t tb_heap_exit(tb_heap_t* heap)
+tb_void_t tb_heap_exit(tb_heap_ref_t heap)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
@@ -497,7 +497,7 @@ tb_void_t tb_heap_exit(tb_heap_t* heap)
     // free it
     tb_free(impl);
 }
-tb_void_t tb_heap_clear(tb_heap_t* heap)
+tb_void_t tb_heap_clear(tb_heap_ref_t heap)
 {   
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
@@ -510,7 +510,7 @@ tb_void_t tb_heap_clear(tb_heap_t* heap)
     // reset size 
     impl->size = 0;
 }
-tb_size_t tb_heap_size(tb_heap_t const* heap)
+tb_size_t tb_heap_size(tb_heap_ref_t heap)
 {
     // check
     tb_heap_impl_t const* impl = (tb_heap_impl_t const*)heap;
@@ -519,7 +519,7 @@ tb_size_t tb_heap_size(tb_heap_t const* heap)
     // size
     return impl->size;
 }
-tb_size_t tb_heap_grow(tb_heap_t const* heap)
+tb_size_t tb_heap_grow(tb_heap_ref_t heap)
 {
     // check
     tb_heap_impl_t const* impl = (tb_heap_impl_t const*)heap;
@@ -528,7 +528,7 @@ tb_size_t tb_heap_grow(tb_heap_t const* heap)
     // grow
     return impl->grow;
 }
-tb_size_t tb_heap_maxn(tb_heap_t const* heap)
+tb_size_t tb_heap_maxn(tb_heap_ref_t heap)
 {
     // check
     tb_heap_impl_t const* impl = (tb_heap_impl_t const*)heap;
@@ -537,7 +537,7 @@ tb_size_t tb_heap_maxn(tb_heap_t const* heap)
     // maxn
     return impl->maxn;
 }
-tb_pointer_t tb_heap_top(tb_heap_t* heap)
+tb_pointer_t tb_heap_top(tb_heap_ref_t heap)
 {
     return tb_iterator_item(heap, tb_iterator_head(heap));
 }
@@ -570,7 +570,7 @@ tb_pointer_t tb_heap_top(tb_heap_t* heap)
  *                  10(last)  6(last)
  * </pre>
  */
-tb_void_t tb_heap_put(tb_heap_t* heap, tb_cpointer_t data)
+tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
@@ -681,11 +681,11 @@ tb_void_t tb_heap_put(tb_heap_t* heap, tb_cpointer_t data)
     // check
 //  tb_heap_check(impl);
 }
-tb_void_t tb_heap_pop(tb_heap_t* heap)
+tb_void_t tb_heap_pop(tb_heap_ref_t heap)
 {
     tb_heap_iterator_delt(heap, 0);
 }
-tb_void_t tb_heap_del(tb_heap_t* heap, tb_size_t itor)
+tb_void_t tb_heap_del(tb_heap_ref_t heap, tb_size_t itor)
 {
     tb_heap_iterator_delt(heap, itor);
 }

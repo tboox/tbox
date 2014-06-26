@@ -297,7 +297,7 @@ tb_bool_t tb_database_sql_done(tb_handle_t handle, tb_char_t const* sql)
     // ok?
     return ok;
 }
-tb_iterator_t* tb_database_sql_result_load(tb_handle_t handle, tb_bool_t ball)
+tb_iterator_ref_t tb_database_sql_result_load(tb_handle_t handle, tb_bool_t ball)
 {
     // check
     tb_database_sql_t* database = (tb_database_sql_t*)handle;
@@ -310,7 +310,7 @@ tb_iterator_t* tb_database_sql_result_load(tb_handle_t handle, tb_bool_t ball)
     tb_assert_and_check_return_val(database->bopened, tb_null);
 
     // load it
-    tb_iterator_t* result = database->result_load(database, ball);
+    tb_iterator_ref_t result = database->result_load(database, ball);
 
     // save state
     if (result) database->state = TB_STATE_OK;
@@ -318,7 +318,7 @@ tb_iterator_t* tb_database_sql_result_load(tb_handle_t handle, tb_bool_t ball)
     // ok?
     return result;
 }
-tb_void_t tb_database_sql_result_exit(tb_handle_t handle, tb_iterator_t* result)
+tb_void_t tb_database_sql_result_exit(tb_handle_t handle, tb_iterator_ref_t result)
 {
     // check
     tb_database_sql_t* database = (tb_database_sql_t*)handle;

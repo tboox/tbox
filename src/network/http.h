@@ -174,7 +174,7 @@ typedef struct __tb_http_option_t
     tb_url_t            url;
 
     /// the request head 
-    tb_hash_t*          head;
+    tb_hash_ref_t          head;
 
     /// timeout: ms
     tb_long_t           timeout;

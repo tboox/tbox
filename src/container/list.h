@@ -40,8 +40,8 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the list type
-typedef tb_iterator_t   tb_list_t;
+/// the list ref type
+typedef tb_iterator_ref_t   tb_list_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -54,19 +54,19 @@ typedef tb_iterator_t   tb_list_t;
  *
  * @return          the list
  */
-tb_list_t*          tb_list_init(tb_size_t grow, tb_item_func_t func);
+tb_list_ref_t       tb_list_init(tb_size_t grow, tb_item_func_t func);
 
 /*! exit list
  *
  * @param list      the list
  */
-tb_void_t           tb_list_exit(tb_list_t* list);
+tb_void_t           tb_list_exit(tb_list_ref_t list);
 
 /*! clear list
  *
  * @param list      the list
  */
-tb_void_t           tb_list_clear(tb_list_t* list);
+tb_void_t           tb_list_clear(tb_list_ref_t list);
 
 /*! the list head item
  *
@@ -74,7 +74,7 @@ tb_void_t           tb_list_clear(tb_list_t* list);
  *
  * @return          the head item
  */
-tb_pointer_t        tb_list_head(tb_list_t const* list);
+tb_pointer_t        tb_list_head(tb_list_ref_t list);
 
 /*! the list last item
  *
@@ -82,7 +82,7 @@ tb_pointer_t        tb_list_head(tb_list_t const* list);
  *
  * @return          the last item
  */
-tb_pointer_t        tb_list_last(tb_list_t const* list);
+tb_pointer_t        tb_list_last(tb_list_ref_t list);
 
 /*! insert the prev item
  *
@@ -92,7 +92,7 @@ tb_pointer_t        tb_list_last(tb_list_t const* list);
  *
  * @return          the item itor
  */
-tb_size_t           tb_list_insert_prev(tb_list_t* list, tb_size_t itor, tb_cpointer_t data);
+tb_size_t           tb_list_insert_prev(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t data);
 
 /*! insert the next item
  *
@@ -102,7 +102,7 @@ tb_size_t           tb_list_insert_prev(tb_list_t* list, tb_size_t itor, tb_cpoi
  *
  * @return          the item itor
  */
-tb_size_t           tb_list_insert_next(tb_list_t* list, tb_size_t itor, tb_cpointer_t data);
+tb_size_t           tb_list_insert_next(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t data);
 
 /*! insert the head item
  *
@@ -111,7 +111,7 @@ tb_size_t           tb_list_insert_next(tb_list_t* list, tb_size_t itor, tb_cpoi
  *
  * @return          the item itor
  */
-tb_size_t           tb_list_insert_head(tb_list_t* list, tb_cpointer_t data);
+tb_size_t           tb_list_insert_head(tb_list_ref_t list, tb_cpointer_t data);
 
 /*! insert the tail item
  *
@@ -120,7 +120,7 @@ tb_size_t           tb_list_insert_head(tb_list_t* list, tb_cpointer_t data);
  *
  * @return          the item itor
  */
-tb_size_t           tb_list_insert_tail(tb_list_t* list, tb_cpointer_t data);
+tb_size_t           tb_list_insert_tail(tb_list_ref_t list, tb_cpointer_t data);
 
 /*! insert the prev items
  *
@@ -131,7 +131,7 @@ tb_size_t           tb_list_insert_tail(tb_list_t* list, tb_cpointer_t data);
  *
  * @return          the first item itor
  */
-tb_size_t           tb_list_ninsert_prev(tb_list_t* list, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+tb_size_t           tb_list_ninsert_prev(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 
 /*! insert the next items
  *
@@ -142,7 +142,7 @@ tb_size_t           tb_list_ninsert_prev(tb_list_t* list, tb_size_t itor, tb_cpo
  *
  * @return          the first item itor
  */
-tb_size_t           tb_list_ninsert_next(tb_list_t* list, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+tb_size_t           tb_list_ninsert_next(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 
 /*! insert the head items
  *
@@ -152,7 +152,7 @@ tb_size_t           tb_list_ninsert_next(tb_list_t* list, tb_size_t itor, tb_cpo
  *
  * @return          the first item itor
  */
-tb_size_t           tb_list_ninsert_head(tb_list_t* list, tb_cpointer_t data, tb_size_t size);
+tb_size_t           tb_list_ninsert_head(tb_list_ref_t list, tb_cpointer_t data, tb_size_t size);
 
 /*! insert the tail items
  *
@@ -162,7 +162,7 @@ tb_size_t           tb_list_ninsert_head(tb_list_t* list, tb_cpointer_t data, tb
  *
  * @return          the first item itor
  */
-tb_size_t           tb_list_ninsert_tail(tb_list_t* list, tb_cpointer_t data, tb_size_t size);
+tb_size_t           tb_list_ninsert_tail(tb_list_ref_t list, tb_cpointer_t data, tb_size_t size);
 
 /*! replace the item
  *
@@ -172,7 +172,7 @@ tb_size_t           tb_list_ninsert_tail(tb_list_t* list, tb_cpointer_t data, tb
  *
  * @return          the item itor
  */
-tb_size_t           tb_list_replace(tb_list_t* list, tb_size_t itor, tb_cpointer_t data);
+tb_size_t           tb_list_replace(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t data);
 
 /*! replace the head item
  *
@@ -181,7 +181,7 @@ tb_size_t           tb_list_replace(tb_list_t* list, tb_size_t itor, tb_cpointer
  *
  * @return          the item itor
  */
-tb_size_t           tb_list_replace_head(tb_list_t* list, tb_cpointer_t data);
+tb_size_t           tb_list_replace_head(tb_list_ref_t list, tb_cpointer_t data);
 
 /*! replace the tail item
  *
@@ -190,7 +190,7 @@ tb_size_t           tb_list_replace_head(tb_list_t* list, tb_cpointer_t data);
  *
  * @return          the item itor
  */
-tb_size_t           tb_list_replace_last(tb_list_t* list, tb_cpointer_t data);
+tb_size_t           tb_list_replace_last(tb_list_ref_t list, tb_cpointer_t data);
 
 /*! replace the items
  *
@@ -201,7 +201,7 @@ tb_size_t           tb_list_replace_last(tb_list_t* list, tb_cpointer_t data);
  *
  * @return          the first item itor
  */
-tb_size_t           tb_list_nreplace(tb_list_t* list, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+tb_size_t           tb_list_nreplace(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 
 /*! replace the head items
  *
@@ -211,7 +211,7 @@ tb_size_t           tb_list_nreplace(tb_list_t* list, tb_size_t itor, tb_cpointe
  *
  * @return          the first item itor
  */
-tb_size_t           tb_list_nreplace_head(tb_list_t* list, tb_cpointer_t data, tb_size_t size);
+tb_size_t           tb_list_nreplace_head(tb_list_ref_t list, tb_cpointer_t data, tb_size_t size);
 
 /*! replace the tail items
  *
@@ -221,7 +221,7 @@ tb_size_t           tb_list_nreplace_head(tb_list_t* list, tb_cpointer_t data, t
  *
  * @return          the first item itor
  */
-tb_size_t           tb_list_nreplace_last(tb_list_t* list, tb_cpointer_t data, tb_size_t size);
+tb_size_t           tb_list_nreplace_last(tb_list_ref_t list, tb_cpointer_t data, tb_size_t size);
 
 /*! remove the item
  *
@@ -230,7 +230,7 @@ tb_size_t           tb_list_nreplace_last(tb_list_t* list, tb_cpointer_t data, t
  *
  * @return          the prev item itor
  */
-tb_size_t           tb_list_remove(tb_list_t* list, tb_size_t itor);
+tb_size_t           tb_list_remove(tb_list_ref_t list, tb_size_t itor);
 
 /*! remove the next item
  *
@@ -239,7 +239,7 @@ tb_size_t           tb_list_remove(tb_list_t* list, tb_size_t itor);
  *
  * @return          the prev item itor
  */
-tb_size_t           tb_list_remove_next(tb_list_t* list, tb_size_t itor);
+tb_size_t           tb_list_remove_next(tb_list_ref_t list, tb_size_t itor);
 
 /*! remove the head item
  *
@@ -247,7 +247,7 @@ tb_size_t           tb_list_remove_next(tb_list_t* list, tb_size_t itor);
  *
  * @return          the head item itor
  */
-tb_size_t           tb_list_remove_head(tb_list_t* list);
+tb_size_t           tb_list_remove_head(tb_list_ref_t list);
 
 /*! remove the last item
  *
@@ -255,7 +255,7 @@ tb_size_t           tb_list_remove_head(tb_list_t* list);
  *
  * @return          the last item itor
  */
-tb_size_t           tb_list_remove_last(tb_list_t* list);
+tb_size_t           tb_list_remove_last(tb_list_ref_t list);
 
 /*! remove the next items
  *
@@ -265,7 +265,7 @@ tb_size_t           tb_list_remove_last(tb_list_t* list);
  *
  * @return          the prev item itor
  */
-tb_size_t           tb_list_nremove(tb_list_t* list, tb_size_t itor, tb_size_t size);
+tb_size_t           tb_list_nremove(tb_list_ref_t list, tb_size_t itor, tb_size_t size);
 
 /*! remove the next items
  *
@@ -275,7 +275,7 @@ tb_size_t           tb_list_nremove(tb_list_t* list, tb_size_t itor, tb_size_t s
  *
  * @return          the prev item itor
  */
-tb_size_t           tb_list_nremove_next(tb_list_t* list, tb_size_t itor, tb_size_t size);
+tb_size_t           tb_list_nremove_next(tb_list_ref_t list, tb_size_t itor, tb_size_t size);
 
 /*! remove the head items
  *
@@ -284,7 +284,7 @@ tb_size_t           tb_list_nremove_next(tb_list_t* list, tb_size_t itor, tb_siz
  *
  * @return          the head item itor
  */
-tb_size_t           tb_list_nremove_head(tb_list_t* list, tb_size_t size);
+tb_size_t           tb_list_nremove_head(tb_list_ref_t list, tb_size_t size);
 
 /*! remove the last items
  *
@@ -293,7 +293,7 @@ tb_size_t           tb_list_nremove_head(tb_list_t* list, tb_size_t size);
  *
  * @return          the last item itor
  */
-tb_size_t           tb_list_nremove_last(tb_list_t* list, tb_size_t size);
+tb_size_t           tb_list_nremove_last(tb_list_ref_t list, tb_size_t size);
 
 /*! moveto the prev item
  *
@@ -303,7 +303,7 @@ tb_size_t           tb_list_nremove_last(tb_list_t* list, tb_size_t size);
  *
  * @return          the move itor
  */
-tb_size_t           tb_list_moveto_prev(tb_list_t* list, tb_size_t itor, tb_size_t move);
+tb_size_t           tb_list_moveto_prev(tb_list_ref_t list, tb_size_t itor, tb_size_t move);
 
 /*! moveto the next item
  *
@@ -313,7 +313,7 @@ tb_size_t           tb_list_moveto_prev(tb_list_t* list, tb_size_t itor, tb_size
  *
  * @return          the move itor
  */
-tb_size_t           tb_list_moveto_next(tb_list_t* list, tb_size_t itor, tb_size_t move);
+tb_size_t           tb_list_moveto_next(tb_list_ref_t list, tb_size_t itor, tb_size_t move);
 
 /*! moveto the head item
  *
@@ -322,7 +322,7 @@ tb_size_t           tb_list_moveto_next(tb_list_t* list, tb_size_t itor, tb_size
  *
  * @return          the move itor
  */
-tb_size_t           tb_list_moveto_head(tb_list_t* list, tb_size_t move);
+tb_size_t           tb_list_moveto_head(tb_list_ref_t list, tb_size_t move);
 
 /*! moveto the tail item
  *
@@ -331,7 +331,7 @@ tb_size_t           tb_list_moveto_head(tb_list_t* list, tb_size_t move);
  *
  * @return          the move itor
  */
-tb_size_t           tb_list_moveto_tail(tb_list_t* list, tb_size_t move);
+tb_size_t           tb_list_moveto_tail(tb_list_ref_t list, tb_size_t move);
 
 /*! the item count
  *
@@ -339,7 +339,7 @@ tb_size_t           tb_list_moveto_tail(tb_list_t* list, tb_size_t move);
  *
  * @return          the item count
  */
-tb_size_t           tb_list_size(tb_list_t const* list);
+tb_size_t           tb_list_size(tb_list_ref_t list);
 
 /*! the item max count
  *
@@ -347,14 +347,14 @@ tb_size_t           tb_list_size(tb_list_t const* list);
  *
  * @return          the item max count
  */
-tb_size_t           tb_list_maxn(tb_list_t const* list);
+tb_size_t           tb_list_maxn(tb_list_ref_t list);
 
 /*! walk list items
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_list_item_func(tb_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+ * tb_bool_t tb_list_item_func(tb_list_ref_t list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
  * {
  *      // check
  *      tb_assert_and_check_return_val(list && bdel, tb_false);
@@ -372,7 +372,7 @@ tb_size_t           tb_list_maxn(tb_list_t const* list);
  * @param priv      the walk priv
  *
  */
-tb_void_t           tb_list_walk(tb_list_t* list, tb_bool_t (*func)(tb_list_t* list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
+tb_void_t           tb_list_walk(tb_list_ref_t list, tb_bool_t (*func)(tb_list_ref_t list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

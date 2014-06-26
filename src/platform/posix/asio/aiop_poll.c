@@ -50,13 +50,13 @@ typedef struct __tb_aiop_reactor_poll_t
     tb_aiop_reactor_t       base;
 
     // the poll fds
-    tb_vector_t*            pfds;
+    tb_vector_ref_t            pfds;
 
     // the copy fds
-    tb_vector_t*            cfds;
+    tb_vector_ref_t            cfds;
 
     // the hash
-    tb_hash_t*              hash;
+    tb_hash_ref_t              hash;
 
     // the lock
     tb_poll_lock_t          lock;
@@ -66,7 +66,7 @@ typedef struct __tb_aiop_reactor_poll_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_poll_walk_delo(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_poll_walk_delo(tb_vector_ref_t vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(vector && bdel && priv, tb_false);
@@ -88,7 +88,7 @@ static tb_bool_t tb_poll_walk_delo(tb_vector_t* vector, tb_pointer_t item, tb_bo
     // ok
     return tb_true;
 }
-static tb_bool_t tb_poll_walk_sete(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_poll_walk_sete(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iterator, tb_false);

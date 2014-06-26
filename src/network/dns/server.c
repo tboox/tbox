@@ -67,7 +67,7 @@ typedef struct __tb_dns_server_list_t
     tb_bool_t               sort;
 
     // the server list
-    tb_vector_t*            list;
+    tb_vector_ref_t            list;
 
 }tb_dns_server_list_t;
 
@@ -271,7 +271,7 @@ end:
     // ok
     return rate;
 }
-static tb_bool_t tb_dns_server_rate(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_bool_t tb_dns_server_rate(tb_vector_ref_t vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(vector && bdel, tb_false);
@@ -393,7 +393,7 @@ tb_void_t tb_dns_server_sort()
     tb_spinlock_enter(&g_lock);
 
     // done
-    tb_vector_t* list = tb_null;
+    tb_vector_ref_t list = tb_null;
     do
     {
         // check

@@ -54,7 +54,7 @@
  */
 #define tb_rfor(type, item, head, tail, iterator) \
             /* iterator */ \
-            tb_iterator_t* item##_iterator = (tb_iterator_t*)iterator; \
+            tb_iterator_ref_t item##_iterator = (tb_iterator_ref_t)iterator; \
             tb_assert(!item##_iterator || (tb_iterator_mode(item##_iterator) & TB_ITERATOR_MODE_REVERSE)); \
             /* init */ \
             type item; \
@@ -88,6 +88,6 @@
  * @endcode
  */
 #define tb_rfor_all(type, item, iterator) \
-            tb_rfor(type, item, tb_iterator_head((tb_iterator_t*)iterator), tb_iterator_tail((tb_iterator_t*)iterator), iterator)
+            tb_rfor(type, item, tb_iterator_head((tb_iterator_ref_t)iterator), tb_iterator_tail((tb_iterator_ref_t)iterator), iterator)
 
 #endif

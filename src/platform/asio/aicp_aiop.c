@@ -44,7 +44,7 @@ typedef struct __tb_aiop_ptor_t
      * index: 0: higher priority for conn, acpt and task
      * index: 1: lower priority for io aice 
      */
-    tb_queue_t*                 spak[2];
+    tb_queue_ref_t                 spak[2];
     
     // the spak lock
     tb_spinlock_t               lock;

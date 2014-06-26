@@ -124,10 +124,10 @@ typedef struct __tb_ltimer_t
     tb_handle_t                 pool;
 
     // the expired tasks
-    tb_vector_t*                expired;
+    tb_vector_ref_t                expired;
 
     // the wheel
-    tb_vector_t*                wheel[TB_LTIMER_WHEEL_MAXN];
+    tb_vector_ref_t                wheel[TB_LTIMER_WHEEL_MAXN];
 
     // the wheel base
     tb_size_t                   wbase;
@@ -186,7 +186,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
         tb_trace_d("add: windx: %lu", windx);
 
         // the wheel list
-        tb_vector_t* wlist = timer->wheel[windx];
+        tb_vector_ref_t wlist = timer->wheel[windx];
         if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
         tb_assert_and_check_break(wlist);
 
@@ -221,7 +221,7 @@ static tb_bool_t tb_ltimer_del_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
         tb_assert_and_check_break(task->windx != -1 && task->windx < tb_object_arrayn(timer->wheel));
 
         // the wheel list
-        tb_vector_t* wlist = timer->wheel[task->windx];
+        tb_vector_ref_t wlist = timer->wheel[task->windx];
         tb_assert_and_check_break(wlist);
 
         // find the task from the wheel list
@@ -242,7 +242,7 @@ static tb_bool_t tb_ltimer_del_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
     // ok?
     return ok;
 }
-static tb_bool_t tb_ltimer_expired_init(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_ltimer_expired_init(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the timer
     tb_ltimer_t* timer = (tb_ltimer_t*)priv;
@@ -262,7 +262,7 @@ static tb_bool_t tb_ltimer_expired_init(tb_iterator_t* iterator, tb_pointer_t it
     // ok
     return tb_true;
 }
-static tb_bool_t tb_ltimer_expired_done(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_ltimer_expired_done(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the task
     tb_ltimer_task_t const* task = (tb_ltimer_task_t const*)item;
@@ -280,7 +280,7 @@ static tb_bool_t tb_ltimer_expired_done(tb_iterator_t* iterator, tb_pointer_t it
     // ok
     return tb_true;
 }
-static tb_bool_t tb_ltimer_expired_exit(tb_iterator_t* iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_ltimer_expired_exit(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the timer
     tb_ltimer_t*    timer = priv? (tb_ltimer_t*)(((tb_pointer_t*)priv)[0]) : tb_null;
@@ -495,7 +495,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
             tb_size_t indx = (timer->wbase + i) & (TB_LTIMER_WHEEL_MAXN - 1);
 
             // the wheel list
-            tb_vector_t* list = timer->wheel[indx];
+            tb_vector_ref_t list = timer->wheel[indx];
             tb_check_continue(list && tb_vector_size(list));
 
             // init the expired task 
