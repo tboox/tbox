@@ -48,7 +48,7 @@
 static tb_size_t        g_mode = TB_TRACE_MODE_PRINT;
 
 // the file
-static tb_handle_t      g_file = tb_null;
+static tb_file_ref_t    g_file = tb_null;
 
 // the file is referenced?
 static tb_bool_t        g_bref = tb_false;
@@ -131,7 +131,7 @@ tb_handle_t tb_trace_file()
     // ok?
     return file;
 }
-tb_bool_t tb_trace_file_set(tb_handle_t file)
+tb_bool_t tb_trace_file_set(tb_file_ref_t file)
 {
     // check
     tb_check_return_val(file, tb_false);

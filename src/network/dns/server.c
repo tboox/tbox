@@ -67,7 +67,7 @@ typedef struct __tb_dns_server_list_t
     tb_bool_t               sort;
 
     // the server list
-    tb_vector_ref_t            list;
+    tb_vector_ref_t         list;
 
 }tb_dns_server_list_t;
 
@@ -102,7 +102,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
     tb_assert_and_check_return_val(addr && addr->u32, -1);
 
     // init sock
-    tb_handle_t sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
+    tb_socket_ref_t sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
     tb_assert_and_check_return_val(sock, -1);
 
     // init rate

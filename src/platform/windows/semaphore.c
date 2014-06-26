@@ -37,71 +37,85 @@
  */
 
 // the semaphore type
-typedef struct __tb_semaphore_t
+typedef struct __tb_semaphore_impl_t
 {
-    // the semaphore handle
-    HANDLE          handle;
+    // the semaphore semaphore
+    HANDLE          semaphore;
 
     // the semaphore value
     tb_atomic_t     value;
 
-}tb_semaphore_t;
+}tb_semaphore_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 
-tb_handle_t tb_semaphore_init(tb_size_t init)
+tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 {
     // check
     tb_assert_and_check_return_val(init <= TB_SEMAPHORE_VALUE_MAXN, tb_null);
 
-    // make semaphore
-    tb_semaphore_t* semaphore = tb_malloc0_type(tb_semaphore_t);
-    tb_assert_and_check_return_val(semaphore, tb_null);
+    // done
+    tb_bool_t               ok = tb_false;
+    tb_semaphore_impl_t*    impl = tb_null;
+    do
+    {
+        // make semaphore
+        impl = tb_malloc0_type(tb_semaphore_impl_t);
+        tb_assert_and_check_break(impl);
 
-    // init semaphore 
-    semaphore->handle = CreateSemaphoreA(tb_null, (DWORD)init, TB_SEMAPHORE_VALUE_MAXN, tb_null);
-    tb_assert_and_check_goto(semaphore->handle && semaphore->handle != INVALID_HANDLE_VALUE, fail);
+        // init semaphore 
+        impl->semaphore = CreateSemaphoreA(tb_null, (DWORD)init, TB_SEMAPHORE_VALUE_MAXN, tb_null);
+        tb_assert_and_check_break(impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE);
 
-    // init value
-    semaphore->value = init;
+        // init value
+        impl->value = init;
 
-    // ok
-    return semaphore;
+        // ok
+        ok = tb_true;
 
-fail:
-    if (semaphore) tb_semaphore_exit(semaphore);
-    return tb_null;
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (impl) tb_semaphore_exit((tb_semaphore_ref_t)impl);
+        impl = tb_null;
+    }
+
+    // ok?
+    return (tb_semaphore_ref_t)impl;
 }
-tb_void_t tb_semaphore_exit(tb_handle_t handle)
+tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
 {
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     if (semaphore) 
     {
         // exit semaphore
-        if (semaphore->handle && semaphore->handle != INVALID_HANDLE_VALUE) CloseHandle(semaphore->handle);
-        semaphore->handle = INVALID_HANDLE_VALUE;
+        if (impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE) CloseHandle(impl->semaphore);
+        impl->semaphore = INVALID_HANDLE_VALUE;
 
         // exit it
         tb_free(semaphore);
     }
 }
-tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
+tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
 {
     // check
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
-    tb_assert_and_check_return_val(semaphore && semaphore->handle && semaphore->handle != INVALID_HANDLE_VALUE && post, tb_false);
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
+    tb_assert_and_check_return_val(semaphore && impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE && post, tb_false);
     
     // += post
-    tb_atomic_fetch_and_add(&semaphore->value, post);
+    tb_atomic_fetch_and_add(&impl->value, post);
     
     // post
     LONG prev = 0;
-    if (!ReleaseSemaphore(semaphore->handle, (LONG)post, &prev) && prev >= 0) 
+    if (!ReleaseSemaphore(impl->semaphore, (LONG)post, &prev) && prev >= 0) 
     {
         // restore
-        tb_atomic_fetch_and_sub(&semaphore->value, (tb_long_t)post);
+        tb_atomic_fetch_and_sub(&impl->value, (tb_long_t)post);
         return tb_false;
     }
 
@@ -109,28 +123,28 @@ tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
     tb_assert_and_check_return_val(prev + post <= TB_SEMAPHORE_VALUE_MAXN, tb_false);
     
     // save value
-    tb_atomic_set(&semaphore->value, prev + post);
+    tb_atomic_set(&impl->value, prev + post);
     
     // ok
     return tb_true;
 }
-tb_long_t tb_semaphore_value(tb_handle_t handle)
+tb_long_t tb_semaphore_value(tb_semaphore_ref_t semaphore)
 {
     // check
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     tb_assert_and_check_return_val(semaphore, -1);
 
     // get value
-    return (tb_long_t)tb_atomic_get(&semaphore->value);
+    return (tb_long_t)tb_atomic_get(&impl->value);
 }
-tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 {
     // check
-    tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
-    tb_assert_and_check_return_val(semaphore && semaphore->handle && semaphore->handle != INVALID_HANDLE_VALUE, -1);
+    tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
+    tb_assert_and_check_return_val(semaphore && impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE, -1);
 
     // wait
-    tb_long_t r = WaitForSingleObject(semaphore->handle, timeout >= 0? timeout : INFINITE);
+    tb_long_t r = WaitForSingleObject(impl->semaphore, timeout >= 0? timeout : INFINITE);
     tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
     // timeout?
@@ -140,10 +154,10 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
     tb_check_return_val(r >= WAIT_OBJECT_0, -1);
 
     // check value
-    tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&semaphore->value) > 0, -1);
+    tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&impl->value) > 0, -1);
     
     // value--
-    tb_atomic_fetch_and_dec(&semaphore->value);
+    tb_atomic_fetch_and_dec(&impl->value);
     
     // ok
     return 1;

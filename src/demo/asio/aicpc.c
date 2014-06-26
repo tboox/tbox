@@ -92,7 +92,7 @@ static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     tb_socket_clos(tb_aico_sock(aico));
 
     // exit file
-    if (priv) tb_aico_exit((tb_handle_t)priv, tb_demo_file_exit_func, tb_null);
+    if (priv) tb_aico_exit((tb_aico_ref_t)priv, tb_demo_file_exit_func, tb_null);
 }
 static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice);
 static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)

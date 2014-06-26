@@ -350,7 +350,7 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock)
     // listen
     return (tb_ws2_32()->listen((SOCKET)((tb_long_t)sock - 1), 20) < 0)? tb_false : tb_true;
 }
-tb_handle_t tb_socket_accept(tb_socket_ref_t sock)
+tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
@@ -368,7 +368,7 @@ tb_handle_t tb_socket_accept(tb_socket_ref_t sock)
     if (tb_ws2_32()->ioctlsocket(r, FIONBIO, &nb) == SOCKET_ERROR) goto fail;
 
     // ok
-    return (tb_handle_t)(r + 1);
+    return (tb_socket_ref_t)(r + 1);
 
 fail: 
     if (r >= 0) tb_ws2_32()->closesocket(r);

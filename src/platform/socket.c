@@ -87,7 +87,7 @@ tb_bool_t tb_socket_listen(tb_handle_t handle)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_handle_t tb_socket_accept(tb_handle_t handle)
+tb_socket_ref_t tb_socket_accept(tb_handle_t handle)
 {
     tb_trace_noimpl();
     return tb_null;

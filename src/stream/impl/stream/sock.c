@@ -120,7 +120,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
         tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
 
         // save state
-        tb_stream_state_set(stream, TB_STATE_SOCK_SSL_NOT_SUPPORTED;
+        tb_stream_state_set(stream, TB_STATE_SOCK_SSL_NOT_SUPPORTED);
         return tb_false;
     }
 #endif

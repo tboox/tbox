@@ -146,13 +146,13 @@ typedef struct __tb_thread_pool_worker_t
     tb_handle_t             loop;
 
     // the jobs
-    tb_vector_ref_t            jobs;
+    tb_vector_ref_t         jobs;
 
     // the pull time
     tb_size_t               pull;
 
     // the stats
-    tb_hash_ref_t              stats;
+    tb_hash_ref_t           stats;
 
     // is stoped?
     tb_atomic_t             bstoped;
@@ -175,19 +175,19 @@ typedef struct __tb_thread_pool_t
     tb_handle_t             jobs_pool;
 
     // the urgent jobs
-    tb_single_list_ref_t       jobs_urgent;
+    tb_single_list_ref_t    jobs_urgent;
     
     // the waiting jobs
-    tb_single_list_ref_t       jobs_waiting;
+    tb_single_list_ref_t    jobs_waiting;
     
     // the pending jobs
-    tb_list_ref_t              jobs_pending;
+    tb_list_ref_t           jobs_pending;
 
     // is stoped
     tb_bool_t               bstoped;
 
     // the semaphore
-    tb_handle_t             semaphore;
+    tb_semaphore_ref_t      semaphore;
     
     // the worker size
     tb_size_t               worker_size;

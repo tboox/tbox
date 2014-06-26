@@ -146,6 +146,18 @@ typedef struct{}*                   tb_file_ref_t;
 /// the socket ref type
 typedef struct{}*                   tb_socket_ref_t;
 
+/// the event ref type
+typedef struct{}*                   tb_event_ref_t;
+
+/// the mutex ref type
+typedef struct{}*                   tb_mutex_ref_t;
+
+/// the thread ref type
+typedef struct{}*                   tb_thread_ref_t;
+
+/// the semaphore ref type
+typedef struct{}*                   tb_semaphore_ref_t;
+
 /// the time type
 typedef tb_hong_t                   tb_time_t;
 

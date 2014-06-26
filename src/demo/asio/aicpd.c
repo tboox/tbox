@@ -225,7 +225,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
     tb_assert_and_check_return_val(path, tb_false);
 
     // the aicp
-    tb_handle_t aicp = tb_aico_aicp(aice->aico);
+    tb_aicp_ref_t aicp = tb_aico_aicp(aice->aico);
     tb_assert_and_check_return_val(aicp, tb_false);
 
     // acpt ok?
@@ -347,8 +347,8 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
 {
     // aicp
-    tb_aicp_ref_t  aicp = (tb_aicp_ref_t)priv;
-    tb_size_t   self = tb_thread_self();
+    tb_aicp_ref_t   aicp = (tb_aicp_ref_t)priv;
+    tb_size_t       self = tb_thread_self();
 
     // trace
     tb_trace_i("[loop: %lu]: init", self);
@@ -372,10 +372,10 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_handle_t         sock = tb_null;
-    tb_aicp_ref_t          aicp = tb_null;
-    tb_handle_t         aico = tb_null;
-    tb_handle_t         task = tb_null;
+    tb_socket_ref_t     sock = tb_null;
+    tb_aicp_ref_t       aicp = tb_null;
+    tb_aico_ref_t       aico = tb_null;
+    tb_aico_ref_t       task = tb_null;
     tb_handle_t         loop[16] = {0};
 
     // open sock
@@ -452,6 +452,5 @@ end:
 
     // exit aicp
     if (aicp) tb_aicp_exit(aicp);
-
     return 0;
 }

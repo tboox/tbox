@@ -688,7 +688,7 @@ tb_bool_t               tb_async_stream_writ_after_(tb_async_stream_ref_t stream
  *
  * @return              the stream aicp
  */
-tb_aicp_ref_t              tb_async_stream_aicp(tb_async_stream_ref_t stream);
+tb_aicp_ref_t           tb_async_stream_aicp(tb_async_stream_ref_t stream);
 
 #ifdef __tb_debug__
 /*! the stream func name from post for debug

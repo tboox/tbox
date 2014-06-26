@@ -82,7 +82,7 @@ typedef struct __tb_dns_looker_t
     tb_size_t               tryn;
 
     // the socket
-    tb_handle_t             sock;
+    tb_socket_ref_t         sock;
 
     // the server list
     tb_ipv4_t               list[2];

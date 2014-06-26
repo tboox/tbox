@@ -44,13 +44,13 @@ __tb_extern_c_enter__
  * 
  * @return          the semaphore handle
  */
-tb_handle_t         tb_semaphore_init(tb_size_t init);
+tb_semaphore_ref_t  tb_semaphore_init(tb_size_t init);
 
 /*! exit semaphore
  * 
  * @param handle    the semaphore handle
  */
-tb_void_t           tb_semaphore_exit(tb_handle_t handle);
+tb_void_t           tb_semaphore_exit(tb_semaphore_ref_t semaphore);
 
 /*! post semaphore
  * 
@@ -59,7 +59,7 @@ tb_void_t           tb_semaphore_exit(tb_handle_t handle);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_semaphore_post(tb_handle_t handle, tb_size_t post);
+tb_bool_t           tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post);
 
 /*! the semaphore value
  * 
@@ -67,7 +67,7 @@ tb_bool_t           tb_semaphore_post(tb_handle_t handle, tb_size_t post);
  *
  * @return          >= 0: the semaphore value, -1: failed
  */
-tb_long_t           tb_semaphore_value(tb_handle_t handle);
+tb_long_t           tb_semaphore_value(tb_semaphore_ref_t semaphore);
 
 /*! wait semaphore
  * 
@@ -76,7 +76,7 @@ tb_long_t           tb_semaphore_value(tb_handle_t handle);
  *
  * @return          ok: 1, timeout: 0, fail: -1
  */
-tb_long_t           tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout);
+tb_long_t           tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

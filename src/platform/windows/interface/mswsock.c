@@ -49,7 +49,7 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
     tb_assert_and_check_return_val(mswsock, tb_false);
 
     // done
-    tb_handle_t sock = tb_null;
+    tb_socket_ref_t sock = tb_null;
     do
     {
         // init sock

@@ -97,19 +97,19 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     if (file != INVALID_HANDLE_VALUE && (mode & TB_FILE_MODE_APPEND))
     {
         // seek to end
-        tb_hize_t size = tb_file_size((tb_handle_t)file);
+        tb_hize_t size = tb_file_size((tb_file_ref_t)file);
         if (size) 
         {
-            if (size != tb_file_seek((tb_handle_t)file, size, TB_FILE_SEEK_BEG)) 
+            if (size != tb_file_seek((tb_file_ref_t)file, size, TB_FILE_SEEK_BEG)) 
             {
-                tb_file_exit((tb_handle_t)file);
+                tb_file_exit((tb_file_ref_t)file);
                 file = INVALID_HANDLE_VALUE;
             }
         }
     }
 
     // ok?
-    return file != INVALID_HANDLE_VALUE? (tb_handle_t)file : tb_null;
+    return file != INVALID_HANDLE_VALUE? (tb_file_ref_t)file : tb_null;
 }
 tb_bool_t tb_file_exit(tb_file_ref_t file)
 {
@@ -261,7 +261,7 @@ tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
     // ok?
     return writ;
 }
-tb_hong_t tb_file_writf(tb_file_ref_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     // check
     tb_assert_and_check_return_val(file && ifile && size, -1);
@@ -423,7 +423,7 @@ tb_bool_t tb_file_create(tb_char_t const* path)
     tb_assert_and_check_return_val(path, tb_false);
 
     // make it
-    tb_handle_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
+    tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
     if (file) tb_file_exit(file);
 
     // ok?

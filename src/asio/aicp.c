@@ -402,15 +402,15 @@ tb_bool_t tb_aicp_exit(tb_aicp_ref_t aicp)
     // ok
     return tb_true;
 }
-tb_handle_t tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type)
+tb_aico_ref_t tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type)
 {
     // check
     tb_aicp_impl_t* impl = (tb_aicp_impl_t*)aicp;
     tb_assert_and_check_return_val(impl && impl->ptor && impl->ptor->addo && type, tb_null);
 
     // done
-    tb_bool_t   ok = tb_false;
-    tb_aico_impl_t*  aico = tb_null;
+    tb_bool_t       ok = tb_false;
+    tb_aico_impl_t* aico = tb_null;
     do
     {
         // init aico
@@ -433,7 +433,7 @@ tb_handle_t tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type)
     }
 
     // ok?
-    return (tb_handle_t)aico;
+    return (tb_aico_ref_t)aico;
 }
 tb_void_t tb_aicp_delo(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv)
 {

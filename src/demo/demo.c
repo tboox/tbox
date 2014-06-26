@@ -214,7 +214,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
     if (!name)
     {
         // init file
-        tb_handle_t file = tb_file_init(".demo", TB_FILE_MODE_RO);
+        tb_file_ref_t file = tb_file_init(".demo", TB_FILE_MODE_RO);
         if (file)
         {
             // read line

@@ -205,7 +205,7 @@ tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
     // writ it
     return writev(tb_file2fd(file), (struct iovec const*)list, size);
 }
-tb_hong_t tb_file_writf(tb_file_ref_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     // check
     tb_assert_and_check_return_val(file && ifile && size, -1);
@@ -398,9 +398,9 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 
 #if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
     // copy it using sendfile
-    tb_bool_t   ok = tb_false;
-    tb_handle_t ifile = tb_file_init(path, TB_FILE_MODE_RW | TB_FILE_MODE_BINARY);
-    tb_handle_t ofile = tb_file_init(dest, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+    tb_bool_t       ok = tb_false;
+    tb_file_ref_t   ifile = tb_file_init(path, TB_FILE_MODE_RW | TB_FILE_MODE_BINARY);
+    tb_file_ref_t   ofile = tb_file_init(dest, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
     if (ifile && ofile)
     {
         // writ
@@ -434,7 +434,7 @@ tb_bool_t tb_file_create(tb_char_t const* path)
     tb_assert_and_check_return_val(path, tb_false);
 
     // make it
-    tb_handle_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
+    tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
     if (file) tb_file_exit(file);
 
     // ok?
