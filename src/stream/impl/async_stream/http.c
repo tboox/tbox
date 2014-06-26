@@ -40,7 +40,7 @@
 typedef struct __tb_async_stream_http_impl_t
 {
     // the http 
-    tb_handle_t                         http;
+    tb_aicp_http_ref_t                  http;
 
     // the size
     tb_atomic64_t                       size;
@@ -90,7 +90,7 @@ static tb_void_t tb_async_stream_http_impl_clos_clear(tb_async_stream_http_impl_
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
-static tb_void_t tb_async_stream_http_impl_clos_func(tb_handle_t http, tb_size_t state, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_http_impl_clos_func(tb_aicp_http_ref_t http, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_http_impl_t* impl = tb_async_stream_http_impl_cast((tb_async_stream_ref_t)priv);
@@ -146,7 +146,7 @@ static tb_bool_t tb_async_stream_http_impl_clos(tb_async_stream_ref_t stream, tb
     // close it
     return tb_aicp_http_clos(impl->http, tb_async_stream_http_impl_clos_func, impl);
 }
-static tb_bool_t tb_async_stream_http_impl_open_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_http_impl_open_func(tb_aicp_http_ref_t http, tb_size_t state, tb_http_status_t const* status, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(http && status, tb_false);
@@ -179,7 +179,7 @@ static tb_bool_t tb_async_stream_http_impl_open(tb_async_stream_ref_t stream, tb
     // post open
     return tb_aicp_http_open(impl->http, tb_async_stream_http_impl_open_func, stream);
 }
-static tb_bool_t tb_async_stream_http_impl_read_func(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_http_impl_read_func(tb_aicp_http_ref_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(http, tb_false);
@@ -234,7 +234,7 @@ static tb_bool_t tb_async_stream_http_impl_read(tb_async_stream_ref_t stream, tb
     // post read
     return tb_aicp_http_read_after(impl->http, delay, size, tb_async_stream_http_impl_read_func, stream);
 }
-static tb_bool_t tb_async_stream_http_impl_seek_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_http_impl_seek_func(tb_aicp_http_ref_t http, tb_size_t state, tb_hize_t offset, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(http, tb_false);
@@ -262,7 +262,7 @@ static tb_bool_t tb_async_stream_http_impl_seek(tb_async_stream_ref_t stream, tb
     // post seek
     return tb_aicp_http_seek(impl->http, offset, tb_async_stream_http_impl_seek_func, stream);
 }
-static tb_bool_t tb_async_stream_http_impl_task_func(tb_handle_t http, tb_size_t state, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_http_impl_task_func(tb_aicp_http_ref_t http, tb_size_t state, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(http, tb_false);
