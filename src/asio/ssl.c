@@ -101,7 +101,7 @@ typedef struct __tb_aicp_ssl_writ_t
 }tb_aicp_ssl_writ_t;
 
 // the aicp impl task type
-typedef struct __tb_aicp_ssl_impl_task_t
+typedef struct __tb_aicp_ssl_task_t
 {
     // the func
     tb_aicp_ssl_task_func_t     func;
@@ -109,7 +109,7 @@ typedef struct __tb_aicp_ssl_impl_task_t
     // the priv 
     tb_cpointer_t               priv;
 
-}tb_aicp_ssl_impl_task_t;
+}tb_aicp_ssl_task_t;
 
 /// the aicp impl close opening type
 typedef struct __tb_aicp_ssl_clos_opening_t
@@ -135,7 +135,7 @@ typedef struct __tb_aicp_ssl_impl_t
     tb_aicp_ref_t               aicp;
 
     // the aico
-    tb_handle_t                 aico;
+    tb_aico_ref_t               aico;
 
     // the func
     union
@@ -143,7 +143,7 @@ typedef struct __tb_aicp_ssl_impl_t
         tb_aicp_ssl_open_t      open;
         tb_aicp_ssl_read_t      read;
         tb_aicp_ssl_writ_t      writ;
-        tb_aicp_ssl_impl_task_t      task;
+        tb_aicp_ssl_task_t      task;
         tb_aicp_ssl_clos_t      clos;
 
     }                           func;

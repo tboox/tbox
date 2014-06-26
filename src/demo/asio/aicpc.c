@@ -22,7 +22,7 @@ typedef struct __tb_demo_context_t
     tb_handle_t         file;
 
     // the aico
-    tb_handle_t         aico[2];
+    tb_aico_ref_t       aico[2];
 
     // the size
     tb_hize_t           size;
@@ -47,8 +47,8 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv);
-static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv);
+static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
+static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
 static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 {
     if (context)
@@ -66,7 +66,7 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
         context->data = tb_null;
     }
 }
-static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return(aico);
@@ -80,7 +80,7 @@ static tb_void_t tb_demo_file_exit_func(tb_handle_t aico, tb_cpointer_t priv)
     // kill aicp
     tb_aicp_kill((tb_aicp_ref_t)tb_aico_aicp(aico));
 }
-static tb_void_t tb_demo_sock_exit_func(tb_handle_t aico, tb_cpointer_t priv)
+static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return(aico);

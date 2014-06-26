@@ -174,7 +174,7 @@ typedef struct __tb_http_option_t
     tb_url_t            url;
 
     /// the request head 
-    tb_hash_ref_t          head;
+    tb_hash_ref_t       head;
 
     /// timeout: ms
     tb_long_t           timeout;
@@ -245,10 +245,10 @@ typedef struct __tb_http_status_t
     tb_hong_t           content_size;
 
     /// the content type
-    tb_string_t  content_type;
+    tb_string_t         content_type;
 
     /// the location
-    tb_string_t  location;
+    tb_string_t         location;
 
 }tb_http_status_t;
 

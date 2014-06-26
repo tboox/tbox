@@ -29,7 +29,6 @@
  */
 #include "prefix.h"
 #include "aice.h"
-#include "aico.h"
 #include "../platform/timer.h"
 #include "../container/container.h"
 
@@ -45,92 +44,6 @@ __tb_extern_c_enter__
 /// post
 #define tb_aicp_post(aicp, aice)                tb_aicp_post_(aicp, aice __tb_debug_vals__)
 #define tb_aicp_post_after(aicp, delay, aice)   tb_aicp_post_after_(aicp, delay, aice __tb_debug_vals__)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-/*! the aico pool ref type
- *
- * <pre>
- *       |------------------------------------------------|
- *       |                   astream                      |
- *       |------------------------------------------------|
- *       |  addr  | http | file | sock |      ..          | 
- *       '------------------------------------------------'
- *                             |
- * init:                    [aicp]
- *                             |
- *       |------------------------------------------------|
- * addo: | aico0   aico1   aico2   aico3      ...         | <= sock, file, and task aico
- *       '------------------------------------------------'
- *                             | 
- *                          [aicp]
- *                             |
- * post: |------------------------------------------------| <= only post one aice for the same aico util the aice is finished
- * aice: | aice0   aice1   aice2   aice3      ...         | <---------------------------------------------------------------------------------
- *       '------------------------------------------------'                                                                                  |
- *                             |                                                                                                             |
- *                          [aicp]                                                                                                           |
- *                             |         <= input aices                                                                                      |
- *                             |                                                                                                             |
- *                             '--------------------------------------------------------------                                               | 
- *                                                                |                          |                                               |
- *       |--------------------------------------------------------------------------------------------------|                                |
- *       |                         unix proactor                  |              |     windows proactor     |                                |
- *       |-----------------------------------------------------------------------|--------------------------|                                |
- *       |                                                        |              |           |              |                                |
- *       |                           continue to spak aice        |              |           |-----         |                                |
- *       |                      ------------------------------->  |              |           |     |        |                                |
- *       |                     |                                 \/    [lock]    |          \/     |        |                                |
- * aiop: |------|-------|-------|-------|---- ... --|-----|    |-----|           |         done  post       |                                |
- * aico: | aico0  aico1   aico2   aico3       ...         |    |  |  |           |          |      |        |                                |
- * wait: |------|-------|-------|-------|---- ... --|-----|    |aice4|           |    |----------------|    |                                |
- *       |   |              |                             |    |  |  |           |    |                |    |                                |
- *       | aice0           aice2                          |    |aice5|           |    |                |    |                                |
- *       |   |              |                             |    |  |  |           |    |                |    |                                |
- *       | aice1           ...                            |    |aice6|           |    |      iocp      |    |                                |
- *       |   |                                            |    |  |  |           |    |                |    |                                |
- *       | aice3                                          |    |aice7|           |    |                |    |                                |
- *       |   |                                            |    |  |  |           |    |                |    |                                |
- *       |  ...                                           |    | ... |           |    |                |    |                                |
- *       |   |                                            |    |  |  |           |    | wait0 wait1 .. |    |                                |
- *       |                                                |    |     |           |     ----------------     |                                |
- *       |                 wait poll                      |    |queue|           |      |         |         |                                |
- *       '------------------------------------------------'    '-----'-----------'--------------------------'                                |
- *                             /\                                 |    [lock]           |         |                                          |
- *                             |                                  |                     |         |                                          |              
- *                             |     no data? wait aice        --------------------------->-----------------                                 |
- *                             |<-----------------------------|    worker0   |   worker1    |    ...        | <= done loop for workers       |
- *                                                             -------------------<-------------------------                                 |
- *                                                                   |             |              |                                          |
- *                                                            |---------------------------------------------|                                |
- *                                                            |    aice0    |    aice2     |     ...        |                                |
- *                                                            |    aice1    |    aice3     |     ...        | <= output aices                |
- *                                                            |     ...     |    aice4     |     ...        |                                |
- *                                                            |     ...     |     ...      |     ...        |                                |
- *                                                            '---------------------------------------------'                                |
- *                                                                   |              |              |                                         |         
- *                                                            |---------------------------------------------|                                |
- *                                                            |   caller0   |   caller2    |     ...        |                                |
- *                                                            |   caller1   |     ...      |     ...        | <= done callers                |
- *                                                            |     ...     |   caller3    |     ...        |                                |
- *                                                            |     ...     |     ...      |     ...        |                                |
- *                                                            '---------------------------------------------'                                |
- *                                                                   |              |                                                        | 
- *                                                                  ...            ...                                                       |
- *                                                              post aice          end ----                                                  |
- *                                                                   |                     |                                                 |
- *                                                                   '---------------------|------------------------------------------------>'
- *                                                                                         |
- * kill:                                                                  ...              |
- *                                                                         |               |
- * exit:                                                                  ...    <---------'
- *
- * </pre>
- *
- */
-typedef struct{}*   tb_aicp_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -175,14 +88,14 @@ tb_handle_t         tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size
  * @param func      the exiting func, wait exiting if be null
  * @param priv      the private data for exiting func
  */
-tb_void_t           tb_aicp_delo(tb_aicp_ref_t aicp, tb_handle_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
+tb_void_t           tb_aicp_delo(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
 
 /*! kill the aico
  *
  * @param aicp      the aicp
  * @param aico      the aico
  */
-tb_void_t           tb_aicp_kilo(tb_aicp_ref_t aicp, tb_handle_t aico);
+tb_void_t           tb_aicp_kilo(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
 
 /*! post the aice 
  *

@@ -138,7 +138,7 @@ typedef struct __tb_iocp_olap_t
 typedef struct __tb_iocp_aico_t
 {
     // the base
-    tb_aico_t                                   base;
+    tb_aico_impl_t                              base;
 
     // the impl
     tb_iocp_ptor_impl_t*                        impl;
@@ -279,7 +279,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     }
 
     // exit data
-    if (resp->u.acpt.priv[0]) tb_aico_pool_free((tb_aico_t*)resp->aico, resp->u.acpt.priv[0]);
+    if (resp->u.acpt.priv[0]) tb_aico_pool_free(resp->aico, resp->u.acpt.priv[0]);
     resp->u.acpt.priv[0] = tb_null;
 
     // ok
@@ -500,7 +500,7 @@ static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     tb_check_return_val(resp->state == TB_STATE_PENDING, 1);
 
     // killed?
-    if (tb_aico_impl_is_killed(resp->aico))
+    if (tb_aico_impl_is_killed((tb_aico_impl_t*)resp->aico))
     {
         // save state
         resp->state = TB_STATE_KILLED;
@@ -554,7 +554,7 @@ static tb_void_t tb_iocp_post_timeout(tb_iocp_ptor_impl_t* impl, tb_iocp_aico_t*
     tb_check_return(aico->base.type == TB_AICO_TYPE_SOCK);
 
     // add timeout task
-    tb_long_t timeout = tb_aico_timeout_from_code(aico, aico->olap.aice.code);
+    tb_long_t timeout = tb_aico_impl_timeout_from_code((tb_aico_impl_t*)aico, aico->olap.aice.code);
     if (timeout >= 0)
     {
         // trace
@@ -609,7 +609,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // init aice, hack: sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1)
         aico->olap.aice                 = *aice;
         aico->olap.aice.u.acpt.sock     = tb_socket_open(TB_SOCKET_TYPE_TCP);
-        aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_aico_pool_malloc0((tb_aico_t*)aico, ((sizeof(SOCKADDR_IN) + 16) << 1));
+        aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_aico_pool_malloc0((tb_aico_ref_t)aico, ((sizeof(SOCKADDR_IN) + 16) << 1));
         tb_assert_static(tb_object_arrayn(aico->olap.aice.u.acpt.priv));
         tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.sock);
         init_ok = tb_true;
@@ -664,7 +664,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     if (!ok)
     {
         // exit data
-        if (aico->olap.aice.u.acpt.priv[0]) tb_aico_pool_free((tb_aico_t*)aico, aico->olap.aice.u.acpt.priv[0]);
+        if (aico->olap.aice.u.acpt.priv[0]) tb_aico_pool_free((tb_aico_ref_t)aico, aico->olap.aice.u.acpt.priv[0]);
         aico->olap.aice.u.acpt.priv[0] = tb_null;
 
         // exit sock
@@ -1616,7 +1616,7 @@ static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     }
     
     // killed?
-    if (tb_aico_impl_is_killed(aico) || tb_atomic_get(&impl->base.aicp->kill))
+    if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico) || tb_atomic_get(&impl->base.aicp->kill))
     {
         // trace
         tb_trace_d("post: done: aico: %p, code: %u, type: %lu: killed", aico, aice->code, aico->base.type);
@@ -1775,7 +1775,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
@@ -1833,7 +1833,7 @@ static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_iocp_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_iocp_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
@@ -1857,7 +1857,7 @@ static tb_bool_t tb_iocp_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
     // ok
     return tb_true;
 }
-static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
+static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;

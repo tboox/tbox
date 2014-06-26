@@ -75,7 +75,7 @@ typedef struct __tb_aiop_ptor_impl_t
 typedef struct __tb_aiop_aico_impl_t
 {
     // the base
-    tb_aico_t                   base;
+    tb_aico_impl_t              base;
 
     // the impl
     tb_aiop_ptor_impl_t*        impl;
@@ -107,9 +107,9 @@ typedef struct __tb_aiop_aico_impl_t
  */
 static tb_bool_t    tb_aicp_file_init(tb_aiop_ptor_impl_t* impl);
 static tb_void_t    tb_aicp_file_exit(tb_aiop_ptor_impl_t* impl);
-static tb_bool_t    tb_aicp_file_addo(tb_aiop_ptor_impl_t* impl, tb_aico_t* aico);
-static tb_bool_t    tb_aicp_file_delo(tb_aiop_ptor_impl_t* impl, tb_aico_t* aico);
-static tb_void_t    tb_aicp_file_kilo(tb_aiop_ptor_impl_t* impl, tb_aico_t* aico);
+static tb_bool_t    tb_aicp_file_addo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico);
+static tb_bool_t    tb_aicp_file_delo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico);
+static tb_void_t    tb_aicp_file_kilo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico);
 static tb_bool_t    tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice);
 static tb_void_t    tb_aicp_file_kill(tb_aiop_ptor_impl_t* impl);
 static tb_void_t    tb_aicp_file_poll(tb_aiop_ptor_impl_t* impl);
@@ -257,7 +257,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             tb_assert_and_check_goto(priority < tb_object_arrayn(impl->spak) && impl->spak[priority], end);
 
             // this aico is killed? post to higher priority queue
-            if (tb_aico_impl_is_killed(aico)) priority = 0;
+            if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico)) priority = 0;
 
             // trace
             tb_trace_d("wait: aico: %p, handle: %p, code: %lu, priority: %lu, size: %lu", aico, aico->base.handle, aice->code, priority, tb_queue_size(impl->spak[priority]));
@@ -395,7 +395,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
         }
 
         // add timeout task
-        tb_long_t timeout = tb_aico_timeout_from_code(aico, aice->code);
+        tb_long_t timeout = tb_aico_impl_timeout_from_code((tb_aico_impl_t*)aico, aice->code);
         if (timeout >= 0) 
         {
             // add it
@@ -1097,7 +1097,7 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     }
 
     // killed?
-    if (tb_aico_impl_is_killed(aico))
+    if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico))
     {
         // reset wait
         aico->waiting = 0;
@@ -1149,7 +1149,7 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aiop_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_aiop_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
@@ -1196,7 +1196,7 @@ static tb_bool_t tb_aiop_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
     // ok?
     return ok;
 }
-static tb_bool_t tb_aiop_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
+static tb_bool_t tb_aiop_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
@@ -1248,7 +1248,7 @@ static tb_bool_t tb_aiop_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
     // ok?
     return ok;
 }
-static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_t* aico)
+static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
@@ -1304,7 +1304,7 @@ static tb_bool_t tb_aiop_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* a
 
     // done
     tb_bool_t           ok = tb_true;
-    tb_aico_t const*    aico = aice->aico;
+    tb_aico_impl_t*     aico = (tb_aico_impl_t*)aice->aico;
     switch (aico->type)
     {
     case TB_AICO_TYPE_SOCK:
