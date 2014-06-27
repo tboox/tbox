@@ -82,5 +82,8 @@ typedef struct __tb_zip_t
 
 }tb_zip_t;
 
+/// the zip ref type
+typedef tb_zip_t*           tb_zip_ref_t;           
+
 
 #endif

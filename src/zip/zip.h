@@ -48,13 +48,13 @@ __tb_extern_c_enter__
  *
  * @return          the zip
  */
-tb_zip_t*           tb_zip_init(tb_size_t algo, tb_size_t action);
+tb_zip_ref_t        tb_zip_init(tb_size_t algo, tb_size_t action);
 
 /*! exit zip
  *
  * @param zip       the zip
  */
-tb_void_t           tb_zip_exit(tb_zip_t* zip);
+tb_void_t           tb_zip_exit(tb_zip_ref_t zip);
 
 /*! spak
  *
@@ -65,7 +65,7 @@ tb_void_t           tb_zip_exit(tb_zip_t* zip);
  *
  * @return          1: ok, 0: continue, -1: end
  */
-tb_long_t           tb_zip_spak(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync);
+tb_long_t           tb_zip_spak(tb_zip_ref_t zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

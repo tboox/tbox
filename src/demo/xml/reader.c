@@ -13,7 +13,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
     if (stream && tb_stream_open(stream))
     {
         // init reader
-        tb_handle_t reader = tb_xml_reader_init(stream);
+        tb_xml_reader_ref_t reader = tb_xml_reader_init(stream);
         if (reader)
         {
             // goto
@@ -40,7 +40,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
                 case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
                     {
                         tb_char_t const*        name = tb_xml_reader_element(reader);
-                        tb_xml_node_t const*    attr = tb_xml_reader_attributes(reader);
+                        tb_xml_node_ref_t    attr = tb_xml_reader_attributes(reader);
                         tb_size_t               t = tb_xml_reader_level(reader);
                         while (t--) tb_printf("\t");
                         if (!attr) tb_printf("<%s/>\n", name);
@@ -56,7 +56,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
                 case TB_XML_READER_EVENT_ELEMENT_BEG: 
                     {
                         tb_char_t const*        name = tb_xml_reader_element(reader);
-                        tb_xml_node_t const*    attr = tb_xml_reader_attributes(reader);    
+                        tb_xml_node_ref_t    attr = tb_xml_reader_attributes(reader);    
                         tb_size_t               t = tb_xml_reader_level(reader) - 1;
                         while (t--) tb_printf("\t");
                         if (!attr) tb_printf("<%s>\n", name);

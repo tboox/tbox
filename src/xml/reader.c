@@ -47,8 +47,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
-// the xml reader type
-typedef struct __tb_xml_reader_t
+
+// the xml reader impl type
+typedef struct __tb_xml_reader_impl_t
 {
     // the event
     tb_size_t               event;
@@ -56,35 +57,39 @@ typedef struct __tb_xml_reader_t
     // the level
     tb_size_t               level;
     
-    // the stream
-    tb_stream_ref_t      istream;
-    tb_stream_ref_t      filter;
-    tb_stream_ref_t      rstream;
+    // the input stream
+    tb_stream_ref_t         istream;
+
+    // the filter stream
+    tb_stream_ref_t         fstream;
+
+    // the reader stream
+    tb_stream_ref_t         rstream;
 
     // the version
-    tb_string_t      version;
+    tb_string_t             version;
 
     // the charset
-    tb_string_t      charset;
+    tb_string_t             charset;
 
     // the element
-    tb_string_t      element;
+    tb_string_t             element;
 
     // the element name
-    tb_string_t      name;
+    tb_string_t             name;
 
     // the text
-    tb_string_t      text;
+    tb_string_t             text;
 
     // the attributes
     tb_xml_attribute_t      attributes[TB_XML_READER_ATTRIBUTES_MAXN];
 
-}tb_xml_reader_t;
+}tb_xml_reader_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * parser implementation
  */
-static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_t* reader)
+static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_impl_t* reader)
 {
     // clear element
     tb_string_clear(&reader->element);
@@ -104,7 +109,7 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_t* reader)
     }
     return tb_null;
 }
-static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
+static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_impl_t* reader)
 {
     // clear text
     tb_string_clear(&reader->text);
@@ -127,13 +132,13 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_xml_reader_init(tb_stream_ref_t stream)
+tb_xml_reader_ref_t tb_xml_reader_init(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
 
     // alloc
-    tb_xml_reader_t* reader = tb_malloc0_type(tb_xml_reader_t);
+    tb_xml_reader_impl_t* reader = tb_malloc0_type(tb_xml_reader_impl_t);
     tb_assert_and_check_return_val(reader, tb_null);
 
     // init stream
@@ -153,154 +158,154 @@ tb_handle_t tb_xml_reader_init(tb_stream_ref_t stream)
     tb_size_t i = 0;
     for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAXN; i++)
     {
-        tb_xml_node_t* node = (tb_xml_node_t*)(reader->attributes + i);
+        tb_xml_node_ref_t node = (tb_xml_node_ref_t)(reader->attributes + i);
         tb_string_init(&node->name);
         tb_string_init(&node->data);
     }
 
     // ok
-    return reader;
+    return (tb_xml_reader_ref_t)reader;
 }
-tb_void_t tb_xml_reader_exit(tb_handle_t reader)
-{
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    if (xreader)
-    {
-        // exit stream
-        if (xreader->filter) tb_stream_exit(xreader->filter);
-
-        // exit version
-        tb_string_exit(&xreader->version);
-
-        // exit charset
-        tb_string_exit(&xreader->charset);
-
-        // exit element
-        tb_string_exit(&xreader->element);
-
-        // exit name
-        tb_string_exit(&xreader->name);
-
-        // exit text
-        tb_string_exit(&xreader->text);
-
-        // exit attributes
-        tb_long_t i = 0;
-        for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAXN; i++)
-        {
-            tb_xml_node_t* node = (tb_xml_node_t*)(xreader->attributes + i);
-            tb_string_exit(&node->name);
-            tb_string_exit(&node->data);
-        }
-
-        // free it
-        tb_free(xreader);
-    }
-}
-tb_void_t tb_xml_reader_clear(tb_handle_t reader)
+tb_void_t tb_xml_reader_exit(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return(xreader);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return(impl);
+
+    // exit stream
+    if (impl->fstream) tb_stream_exit(impl->fstream);
+
+    // exit version
+    tb_string_exit(&impl->version);
+
+    // exit charset
+    tb_string_exit(&impl->charset);
+
+    // exit element
+    tb_string_exit(&impl->element);
+
+    // exit name
+    tb_string_exit(&impl->name);
+
+    // exit text
+    tb_string_exit(&impl->text);
+
+    // exit attributes
+    tb_long_t i = 0;
+    for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAXN; i++)
+    {
+        tb_xml_node_ref_t node = (tb_xml_node_ref_t)(impl->attributes + i);
+        tb_string_exit(&node->name);
+        tb_string_exit(&node->data);
+    }
+
+    // free it
+    tb_free(impl);
+}
+tb_void_t tb_xml_reader_clear(tb_xml_reader_ref_t reader)
+{
+    // check
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return(impl);
 
     // reinit level
-    xreader->level = 0;
+    impl->level = 0;
 
     // reset stream
-    if (xreader->rstream) tb_stream_seek(xreader->rstream, 0);
+    if (impl->rstream) tb_stream_seek(impl->rstream, 0);
 
     // clear element
-    tb_string_clear(&xreader->element);
+    tb_string_clear(&impl->element);
 
     // clear name
-    tb_string_clear(&xreader->name);
+    tb_string_clear(&impl->name);
 
     // clear text
-    tb_string_clear(&xreader->text);
+    tb_string_clear(&impl->text);
 
     // clear attributes
     tb_long_t i = 0;
     for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAXN; i++)
     {
-        tb_xml_node_t* node = (tb_xml_node_t*)(xreader->attributes + i);
+        tb_xml_node_ref_t node = (tb_xml_node_ref_t)(impl->attributes + i);
         tb_string_clear(&node->name);
         tb_string_clear(&node->data);
     }
 }
-tb_stream_ref_t tb_xml_reader_stream(tb_handle_t reader)
+tb_stream_ref_t tb_xml_reader_stream(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader, tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl, tb_null);
 
-    return xreader->rstream;
+    return impl->rstream;
 }
-tb_size_t tb_xml_reader_level(tb_handle_t reader)
+tb_size_t tb_xml_reader_level(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader, 0);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl, 0);
 
-    return xreader->level;
+    return impl->level;
 }
-tb_size_t tb_xml_reader_next(tb_handle_t reader)
+tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && xreader->rstream, TB_XML_READER_EVENT_NONE);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && impl->rstream, TB_XML_READER_EVENT_NONE);
 
     // reset event
-    xreader->event = TB_XML_READER_EVENT_NONE;
+    impl->event = TB_XML_READER_EVENT_NONE;
 
     // next
-    while (!xreader->event)
+    while (!impl->event)
     {
         // peek character
         tb_char_t* pc = tb_null;
-        if (!tb_stream_need(xreader->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
+        if (!tb_stream_need(impl->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
 
         // is element?
         if (*pc == '<') 
         {
             // parse element: <...>
-            tb_char_t const* element = tb_xml_reader_element_parse(xreader);
+            tb_char_t const* element = tb_xml_reader_element_parse(impl);
             tb_assert_and_check_break(element);
 
             // is document begin: <?xml version="..." charset=".." ?>
-            tb_size_t size = tb_string_size(&xreader->element);
+            tb_size_t size = tb_string_size(&impl->element);
             if (size > 4 && !tb_strnicmp(element, "?xml", 4))
             {
                 // update event
-                xreader->event = TB_XML_READER_EVENT_DOCUMENT;
+                impl->event = TB_XML_READER_EVENT_DOCUMENT;
 
                 // remove ?xml, @note: overlap buffer
-                tb_string_cstrncpy(&xreader->element, element + 4, size - 4);
+                tb_string_cstrncpy(&impl->element, element + 4, size - 4);
 
                 // update version & charset
-                tb_xml_node_t* attr = (tb_xml_node_t*)tb_xml_reader_attributes(reader); 
+                tb_xml_node_ref_t attr = (tb_xml_node_ref_t)tb_xml_reader_attributes(reader); 
                 for (; attr; attr = attr->next)
                 {
-                    if (!tb_string_cstricmp(&attr->name, "version")) tb_string_strcpy(&xreader->version, &attr->data);
-                    if (!tb_string_cstricmp(&attr->name, "encoding")) tb_string_strcpy(&xreader->charset, &attr->data);
+                    if (!tb_string_cstricmp(&attr->name, "version")) tb_string_strcpy(&impl->version, &attr->data);
+                    if (!tb_string_cstricmp(&attr->name, "encoding")) tb_string_strcpy(&impl->charset, &attr->data);
                 }
 
                 // transform stream => utf-8
-                if (tb_string_cstricmp(&xreader->charset, "utf-8") && tb_string_cstricmp(&xreader->charset, "utf8"))
+                if (tb_string_cstricmp(&impl->charset, "utf-8") && tb_string_cstricmp(&impl->charset, "utf8"))
                 {
                     // charset
                     tb_size_t charset = TB_CHARSET_TYPE_UTF8;
-                    if (!tb_string_cstricmp(&xreader->charset, "gb2312") || !tb_string_cstricmp(&xreader->charset, "gbk")) 
+                    if (!tb_string_cstricmp(&impl->charset, "gb2312") || !tb_string_cstricmp(&impl->charset, "gbk")) 
                         charset = TB_CHARSET_TYPE_GB2312;
-                    else tb_trace_e("the charset: %s is not supported", tb_string_cstr(&xreader->charset));
+                    else tb_trace_e("the charset: %s is not supported", tb_string_cstr(&impl->charset));
 
                     // init transform stream
                     if (charset != TB_CHARSET_TYPE_UTF8)
                     {
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
-                        xreader->filter = tb_stream_init_filter_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
-                        if (xreader->filter && tb_stream_open(xreader->filter))
-                            xreader->rstream = xreader->filter;
-                        tb_string_cstrcpy(&xreader->charset, "utf-8");
+                        impl->fstream = tb_stream_init_filter_from_charset(impl->istream, charset, TB_CHARSET_TYPE_UTF8);
+                        if (impl->fstream && tb_stream_open(impl->fstream))
+                            impl->rstream = impl->fstream;
+                        tb_string_cstrcpy(&impl->charset, "utf-8");
 #else
                         // trace
                         tb_trace_e("unicode type is not supported, please enable charset module config if you want to use it!");
@@ -312,19 +317,19 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
             else if (size > 8 && !tb_strnicmp(element, "!DOCTYPE", 8))
             {
                 // update event
-                xreader->event = TB_XML_READER_EVENT_DOCUMENT_TYPE;
+                impl->event = TB_XML_READER_EVENT_DOCUMENT_TYPE;
             }
             // is element end: </name>
             else if (size > 1 && element[0] == '/')
             {
                 // check
-                tb_check_break(xreader->level);
+                tb_check_break(impl->level);
 
                 // update event
-                xreader->event = TB_XML_READER_EVENT_ELEMENT_END;
+                impl->event = TB_XML_READER_EVENT_ELEMENT_END;
 
                 // leave
-                xreader->level--;
+                impl->level--;
             }
             // is comment: <!-- text -->
             else if (size >= 3 && !tb_strncmp(element, "!--", 3))
@@ -333,19 +338,19 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
                 if (element[size - 2] != '-' || element[size - 1] != '-')
                 {
                     // patch '>'
-                    tb_string_chrcat(&xreader->element, '>');
+                    tb_string_chrcat(&impl->element, '>');
 
                     // seek to comment end
                     tb_char_t ch = '\0';
                     tb_int_t n = 0;
-                    while ((ch = tb_stream_bread_s8(xreader->rstream)))
+                    while ((ch = tb_stream_bread_s8(impl->rstream)))
                     {
                         // -->
                         if (n == 2 && ch == '>') break;
                         else
                         {
                             // append it
-                            tb_string_chrcat(&xreader->element, ch);
+                            tb_string_chrcat(&impl->element, ch);
 
                             if (ch == '-') n++;
                             else n = 0;
@@ -353,9 +358,9 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
                     }
 
                     // update event
-                    if (ch != '\0') xreader->event = TB_XML_READER_EVENT_COMMENT;
+                    if (ch != '\0') impl->event = TB_XML_READER_EVENT_COMMENT;
                 }
-                else xreader->event = TB_XML_READER_EVENT_COMMENT;
+                else impl->event = TB_XML_READER_EVENT_COMMENT;
             }
             // is cdata: <![CDATA[ text ]]>
             else if (size >= 8 && !tb_strnicmp(element, "![CDATA[", 8))
@@ -363,19 +368,19 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
                 if (element[size - 2] != ']' || element[size - 1] != ']')
                 {
                     // patch '>'
-                    tb_string_chrcat(&xreader->element, '>');
+                    tb_string_chrcat(&impl->element, '>');
 
                     // seek to cdata end
                     tb_char_t ch = '\0';
                     tb_int_t n = 0;
-                    while ((ch = tb_stream_bread_s8(xreader->rstream)))
+                    while ((ch = tb_stream_bread_s8(impl->rstream)))
                     {
                         // ]]>
                         if (n == 2 && ch == '>') break;
                         else
                         {
                             // append it
-                            tb_string_chrcat(&xreader->element, ch);
+                            tb_string_chrcat(&impl->element, ch);
 
                             if (ch == ']') n++;
                             else n = 0;
@@ -383,24 +388,24 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
                     }
 
                     // update event
-                    if (ch != '\0') xreader->event = TB_XML_READER_EVENT_CDATA;
+                    if (ch != '\0') impl->event = TB_XML_READER_EVENT_CDATA;
                 }
-                else xreader->event = TB_XML_READER_EVENT_CDATA;
+                else impl->event = TB_XML_READER_EVENT_CDATA;
             }
             // is empty element: <name/>
             else if (size > 1 && element[size - 1] == '/')
             {
                 // update event
-                xreader->event = TB_XML_READER_EVENT_ELEMENT_EMPTY;
+                impl->event = TB_XML_READER_EVENT_ELEMENT_EMPTY;
             }
             // is element begin: <name>
             else
             {
                 // update event
-                xreader->event = TB_XML_READER_EVENT_ELEMENT_BEG;
+                impl->event = TB_XML_READER_EVENT_ELEMENT_BEG;
 
                 // enter
-                xreader->level++;
+                impl->level++;
             }
 
             // trace
@@ -410,9 +415,9 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
         else if (*pc)
         {
             // parse text: <> ... <>
-            tb_char_t const* text = tb_xml_reader_text_parse(xreader);
-            if (text && tb_string_cstrcmp(&xreader->text, "\r\n") && tb_string_cstrcmp(&xreader->text, "\n"))
-                xreader->event = TB_XML_READER_EVENT_TEXT;
+            tb_char_t const* text = tb_xml_reader_text_parse(impl);
+            if (text && tb_string_cstrcmp(&impl->text, "\r\n") && tb_string_cstrcmp(&impl->text, "\n"))
+                impl->event = TB_XML_READER_EVENT_TEXT;
 
             // trace
 //          tb_trace_d("%s", text);
@@ -420,18 +425,18 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
     }
 
     // ok?
-    return xreader->event;
+    return impl->event;
 }
-tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
+tb_bool_t tb_xml_reader_goto(tb_xml_reader_ref_t reader, tb_char_t const* path)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && xreader->rstream && path, tb_false);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && impl->rstream && path, tb_false);
     tb_trace_d("goto: %s", path);
 
     // reset
-    xreader->level = 0;
-    if (!tb_stream_seek(xreader->rstream, 0)) return tb_false;
+    impl->level = 0;
+    if (!tb_stream_seek(impl->rstream, 0)) return tb_false;
 
     // init
     tb_static_string_t  s;
@@ -441,7 +446,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
     // walk
     tb_bool_t ok = tb_false;
     tb_size_t e = TB_XML_READER_EVENT_NONE;
-    tb_hize_t save = tb_stream_offset(xreader->rstream);
+    tb_hize_t save = tb_stream_offset(impl->rstream);
     while (!ok && (e = tb_xml_reader_next(reader)))
     {
         switch (e)
@@ -465,7 +470,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
                 tb_static_string_strip(&s, n);
 
                 // restore
-                if (ok) if (!(ok = tb_stream_seek(xreader->rstream, save))) goto end;
+                if (ok) if (!(ok = tb_stream_seek(impl->rstream, save))) goto end;
             }
             break;
         case TB_XML_READER_EVENT_ELEMENT_BEG: 
@@ -483,7 +488,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
                 // restore
-                if (ok) if (!(ok = tb_stream_seek(xreader->rstream, save))) goto end;
+                if (ok) if (!(ok = tb_stream_seek(impl->rstream, save))) goto end;
             }
             break;
         case TB_XML_READER_EVENT_ELEMENT_END: 
@@ -497,7 +502,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
                 // restore
-                if (ok) if (!(ok = tb_stream_seek(xreader->rstream, save))) goto end;
+                if (ok) if (!(ok = tb_stream_seek(impl->rstream, save))) goto end;
             }
             break;
         default:
@@ -505,22 +510,22 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
         }
 
         // save
-        save = tb_stream_offset(xreader->rstream);
+        save = tb_stream_offset(impl->rstream);
     }
 
 end:
     tb_static_string_exit(&s);
-    xreader->level = 0;
-    if (!ok) tb_stream_seek(xreader->rstream, 0);
+    impl->level = 0;
+    if (!ok) tb_stream_seek(impl->rstream, 0);
     return ok;
 }
-tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
+tb_xml_node_ref_t tb_xml_reader_load(tb_xml_reader_ref_t reader)
 {
     // check
     tb_assert_and_check_return_val(reader, tb_null);
 
     // node
-    tb_xml_node_t*  node = tb_null;
+    tb_xml_node_ref_t  node = tb_null;
     
     // walk
     tb_size_t e = TB_XML_READER_EVENT_NONE;
@@ -540,7 +545,7 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
         case TB_XML_READER_EVENT_DOCUMENT_TYPE:
             {
                 // init
-                tb_xml_node_t* doctype = tb_xml_node_init_document_type(tb_xml_reader_doctype(reader));
+                tb_xml_node_ref_t doctype = tb_xml_node_init_document_type(tb_xml_reader_doctype(reader));
                 tb_assert_and_check_goto(doctype, fail);
                 
                 // append
@@ -551,11 +556,11 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
         case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
             {
                 // init
-                tb_xml_node_t* element = tb_xml_node_init_element(tb_xml_reader_element(reader));
+                tb_xml_node_ref_t element = tb_xml_node_init_element(tb_xml_reader_element(reader));
                 tb_assert_and_check_goto(element, fail);
                 
                 // attributes
-                tb_xml_node_t const* attr = tb_xml_reader_attributes(reader);
+                tb_xml_node_ref_t attr = tb_xml_reader_attributes(reader);
                 for (; attr; attr = attr->next)
                     tb_xml_node_append_atail(element, tb_xml_node_init_attribute(tb_string_cstr(&attr->name), tb_string_cstr(&attr->data)));
                 
@@ -567,11 +572,11 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
         case TB_XML_READER_EVENT_ELEMENT_BEG: 
             {
                 // init
-                tb_xml_node_t* element = tb_xml_node_init_element(tb_xml_reader_element(reader));
+                tb_xml_node_ref_t element = tb_xml_node_init_element(tb_xml_reader_element(reader));
                 tb_assert_and_check_goto(element, fail);
 
                 // attributes
-                tb_xml_node_t const* attr = tb_xml_reader_attributes(reader);
+                tb_xml_node_ref_t attr = tb_xml_reader_attributes(reader);
                 for (; attr; attr = attr->next)
                     tb_xml_node_append_atail(element, tb_xml_node_init_attribute(tb_string_cstr(&attr->name), tb_string_cstr(&attr->data)));
                 
@@ -592,7 +597,7 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
         case TB_XML_READER_EVENT_TEXT: 
             {
                 // init
-                tb_xml_node_t* text = tb_xml_node_init_text(tb_xml_reader_text(reader));
+                tb_xml_node_ref_t text = tb_xml_node_init_text(tb_xml_reader_text(reader));
                 tb_assert_and_check_goto(text, fail);
                 
                 // append
@@ -603,7 +608,7 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
         case TB_XML_READER_EVENT_CDATA: 
             {
                 // init
-                tb_xml_node_t* cdata = tb_xml_node_init_cdata(tb_xml_reader_cdata(reader));
+                tb_xml_node_ref_t cdata = tb_xml_node_init_cdata(tb_xml_reader_cdata(reader));
                 tb_assert_and_check_goto(cdata, fail);
                 
                 // append
@@ -615,7 +620,7 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
         case TB_XML_READER_EVENT_COMMENT: 
             {
                 // init
-                tb_xml_node_t* comment = tb_xml_node_init_comment(tb_xml_reader_comment(reader));
+                tb_xml_node_ref_t comment = tb_xml_node_init_comment(tb_xml_reader_comment(reader));
                 tb_assert_and_check_goto(comment, fail);
                 
                 // append
@@ -635,75 +640,75 @@ fail:
     if (node) tb_xml_node_exit(node);
     return tb_null;
 }
-tb_char_t const* tb_xml_reader_version(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_version(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader, tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl, tb_null);
 
     // text
-    return tb_string_cstr(&xreader->version);
+    return tb_string_cstr(&impl->version);
 }
-tb_char_t const* tb_xml_reader_charset(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_charset(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader, tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl, tb_null);
 
     // text
-    return tb_string_cstr(&xreader->charset);
+    return tb_string_cstr(&impl->charset);
 }
-tb_char_t const* tb_xml_reader_comment(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_comment(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && xreader->event == TB_XML_READER_EVENT_COMMENT, tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && impl->event == TB_XML_READER_EVENT_COMMENT, tb_null);
 
     // init
-    tb_char_t const*    p = tb_string_cstr(&xreader->element);
-    tb_size_t           n = tb_string_size(&xreader->element);
+    tb_char_t const*    p = tb_string_cstr(&impl->element);
+    tb_size_t           n = tb_string_size(&impl->element);
     tb_assert_and_check_return_val(p && n >= 6, tb_null);
 
     // comment
-    tb_string_cstrncpy(&xreader->text, p + 3, n - 5);
-    return tb_string_cstr(&xreader->text);
+    tb_string_cstrncpy(&impl->text, p + 3, n - 5);
+    return tb_string_cstr(&impl->text);
 }
-tb_char_t const* tb_xml_reader_cdata(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_cdata(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && xreader->event == TB_XML_READER_EVENT_CDATA, tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && impl->event == TB_XML_READER_EVENT_CDATA, tb_null);
 
     // init
-    tb_char_t const*    p = tb_string_cstr(&xreader->element);
-    tb_size_t           n = tb_string_size(&xreader->element);
+    tb_char_t const*    p = tb_string_cstr(&impl->element);
+    tb_size_t           n = tb_string_size(&impl->element);
     tb_assert_and_check_return_val(p && n >= 11, tb_null);
 
     // comment
-    tb_string_cstrncpy(&xreader->text, p + 8, n - 10);
-    return tb_string_cstr(&xreader->text);
+    tb_string_cstrncpy(&impl->text, p + 8, n - 10);
+    return tb_string_cstr(&impl->text);
 }
-tb_char_t const* tb_xml_reader_text(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_text(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && xreader->event == TB_XML_READER_EVENT_TEXT, tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && impl->event == TB_XML_READER_EVENT_TEXT, tb_null);
 
     // text
-    return tb_string_cstr(&xreader->text);
+    return tb_string_cstr(&impl->text);
 }
-tb_char_t const* tb_xml_reader_element(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_element(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && ( xreader->event == TB_XML_READER_EVENT_ELEMENT_BEG
-                                            ||  xreader->event == TB_XML_READER_EVENT_ELEMENT_END
-                                            ||  xreader->event == TB_XML_READER_EVENT_ELEMENT_EMPTY), tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && ( impl->event == TB_XML_READER_EVENT_ELEMENT_BEG
+                                            ||  impl->event == TB_XML_READER_EVENT_ELEMENT_END
+                                            ||  impl->event == TB_XML_READER_EVENT_ELEMENT_EMPTY), tb_null);
 
     // init
     tb_char_t const* p = tb_null;
-    tb_char_t const* b = tb_string_cstr(&xreader->element);
-    tb_char_t const* e = b + tb_string_size(&xreader->element);
+    tb_char_t const* b = tb_string_cstr(&impl->element);
+    tb_char_t const* e = b + tb_string_size(&impl->element);
     tb_assert_and_check_return_val(b, tb_null);
 
     // </name> or <name ... />
@@ -711,33 +716,33 @@ tb_char_t const* tb_xml_reader_element(tb_handle_t reader)
     for (p = b; p < e && *p && !tb_isspace(*p) && *p != '/'; p++) ;
 
     // ok?
-    return p > b? tb_string_cstrncpy(&xreader->name, b, p - b) : tb_null;
+    return p > b? tb_string_cstrncpy(&impl->name, b, p - b) : tb_null;
 }
-tb_char_t const* tb_xml_reader_doctype(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_doctype(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && xreader->event == TB_XML_READER_EVENT_DOCUMENT_TYPE, tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && impl->event == TB_XML_READER_EVENT_DOCUMENT_TYPE, tb_null);
 
     // doctype
-    tb_char_t const* p = tb_string_cstr(&xreader->element);
+    tb_char_t const* p = tb_string_cstr(&impl->element);
     tb_assert_and_check_return_val(p, tb_null);
 
     // skip !DOCTYPE
     return (p + 9);
 }
-tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
+tb_xml_node_ref_t tb_xml_reader_attributes(tb_xml_reader_ref_t reader)
 {
     // check
-    tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
-    tb_assert_and_check_return_val(xreader && ( xreader->event == TB_XML_READER_EVENT_DOCUMENT
-                                            ||  xreader->event == TB_XML_READER_EVENT_ELEMENT_BEG
-                                            ||  xreader->event == TB_XML_READER_EVENT_ELEMENT_END
-                                            ||  xreader->event == TB_XML_READER_EVENT_ELEMENT_EMPTY), tb_null);
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && ( impl->event == TB_XML_READER_EVENT_DOCUMENT
+                                            ||  impl->event == TB_XML_READER_EVENT_ELEMENT_BEG
+                                            ||  impl->event == TB_XML_READER_EVENT_ELEMENT_END
+                                            ||  impl->event == TB_XML_READER_EVENT_ELEMENT_EMPTY), tb_null);
 
     // init
-    tb_char_t const* p = tb_string_cstr(&xreader->element);
-    tb_char_t const* e = p + tb_string_size(&xreader->element);
+    tb_char_t const* p = tb_string_cstr(&impl->element);
+    tb_char_t const* e = p + tb_string_size(&impl->element);
 
     // init name & data
     tb_string_t name;
@@ -770,8 +775,8 @@ tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
         if (tb_string_cstr(&name) && tb_string_cstr(&data))
         {
             // node
-            tb_xml_node_t* prev = n > 0? (tb_xml_node_t*)&xreader->attributes[n - 1] : tb_null;
-            tb_xml_node_t* node = (tb_xml_node_t*)&xreader->attributes[n];
+            tb_xml_node_ref_t prev = n > 0? (tb_xml_node_ref_t)&impl->attributes[n - 1] : tb_null;
+            tb_xml_node_ref_t node = (tb_xml_node_ref_t)&impl->attributes[n];
 
             // init node
             tb_string_strcpy(&node->name, &name);
@@ -791,5 +796,5 @@ tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
     tb_string_exit(&data);
 
     // ok?
-    return n? (tb_xml_node_t*)&xreader->attributes[0] : tb_null;
+    return n? (tb_xml_node_ref_t)&impl->attributes[0] : tb_null;
 }

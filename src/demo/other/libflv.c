@@ -17,14 +17,14 @@
 typedef struct __tb_flv_t
 {
     // the stream
-    tb_stream_ref_t              stream;
+    tb_stream_ref_t                 stream;
 
     // the spank type
     tb_size_t                       spank_type;
     tb_size_t                       spank_type_ok;
 
     // the string data
-    tb_string_t              string;
+    tb_string_t                     string;
 
     // the sdata path
     tb_char_t                       spath[TB_FLV_SDATA_STRING_MAX];

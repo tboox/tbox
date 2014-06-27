@@ -68,8 +68,8 @@ typedef struct __tb_zip_rlc_t
  * interfaces
  */
 
-tb_zip_t*   tb_zip_rlc_init(tb_size_t action);
-tb_void_t   tb_zip_rlc_exit(tb_zip_t* zip);
+tb_zip_ref_t   tb_zip_rlc_init(tb_size_t action);
+tb_void_t   tb_zip_rlc_exit(tb_zip_ref_t zip);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
