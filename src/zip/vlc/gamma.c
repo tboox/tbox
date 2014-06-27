@@ -30,7 +30,7 @@
  * details
  */
 
-static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_t* sstream)
+static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_ref_t sstream)
 {
 #if 0
     tb_assert(vlc && val);
@@ -49,19 +49,19 @@ static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_sta
     for (i = 0; i < q; i++, r >>= 1) tb_static_stream_writ_u1(sstream, r & 0x1);
 #endif
 }
-static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream)
+static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_static_stream_ref_t sstream)
 {
     tb_assert(vlc);
 
     // get q
     tb_uint32_t q = 0;
-    while (tb_static_stream_read_u1((tb_static_stream_t*)sstream)) q++;
+    while (tb_static_stream_read_u1((tb_static_stream_ref_t)sstream)) q++;
     tb_assert(q < 32);
 
     // get r
     tb_uint32_t i = 0;
     tb_uint32_t r = 0;
-    for (i = 0; i < q; i++) r |= tb_static_stream_read_u1((tb_static_stream_t*)sstream) << i;
+    for (i = 0; i < q; i++) r |= tb_static_stream_read_u1((tb_static_stream_ref_t)sstream) << i;
 
     //tb_trace_d("x: %d, q: %d, r: %d", r + (1 << q), q, r);
 

@@ -32,7 +32,7 @@
 #include "static_stream.h"
 #include "transfer.h"
 #include "transfer_pool.h"
-#include "filter/filter.h"
+#include "filter.h"
 
 /*!architecture
  *

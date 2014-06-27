@@ -31,15 +31,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_charset_ascii_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ascii_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_ascii_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ascii_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch)
 {
     *ch = tb_static_stream_read_u8(sstream);
     return 1;
 }
 
-tb_long_t tb_charset_ascii_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_ascii_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_ascii_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ascii_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch)
 {
     if (ch <= 0xff) tb_static_stream_writ_u8(sstream, (tb_uint8_t)ch);
     return 1;

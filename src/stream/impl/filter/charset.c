@@ -18,16 +18,13 @@
  *
  * @author      ruki
  * @file        charset.c
- * @ingroup     stream
- *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "filter.h"
-#include "impl.h"
-#include "../../charset/charset.h"
+#include "prefix.h"
+#include "../../../charset/charset.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -56,7 +53,7 @@ static __tb_inline__ tb_stream_filter_charset_t* tb_stream_filter_charset_cast(t
     tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHARSET, tb_null);
     return (tb_stream_filter_charset_t*)filter;
 }
-static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_impl_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
+static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_impl_t* filter, tb_static_stream_ref_t istream, tb_static_stream_ref_t ostream, tb_long_t sync)
 {
     // check
     tb_stream_filter_charset_t* cfilter = tb_stream_filter_charset_cast(filter);

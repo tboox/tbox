@@ -32,36 +32,36 @@
  */
 
 // ascii
-tb_long_t tb_charset_ascii_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ascii_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ascii_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ascii_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 // utf8
-tb_long_t tb_charset_utf8_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf8_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf8_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 // utf16
-tb_long_t tb_charset_utf16_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf16_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf16_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf16_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 // utf32
-tb_long_t tb_charset_utf32_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf32_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf32_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf32_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 // ucs2
-tb_long_t tb_charset_ucs2_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ucs2_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ucs2_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ucs2_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 // ucs4
-tb_long_t tb_charset_ucs4_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ucs4_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ucs4_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ucs4_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 // gb2312
-tb_long_t tb_charset_gb2312_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_gb2312_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_gb2312_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_gb2312_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 // iso8859
-tb_long_t tb_charset_iso8859_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_iso8859_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_iso8859_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_iso8859_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -90,7 +90,7 @@ static tb_long_t tb_charset_comp_by_name(tb_iterator_ref_t iterator, tb_cpointer
     tb_assert_return_val(item, 0);
 
     // comp
-    return tb_stricmp(((tb_charset_t const*)item)->name, (tb_char_t const*)name);
+    return tb_stricmp(((tb_charset_ref_t)item)->name, (tb_char_t const*)name);
 }
 static tb_long_t tb_charset_comp_by_type(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t type)
 {
@@ -98,9 +98,9 @@ static tb_long_t tb_charset_comp_by_type(tb_iterator_ref_t iterator, tb_cpointer
     tb_assert_return_val(item && type, 0);
 
     // comp
-    return (tb_long_t)((tb_charset_t const*)item)->type - (tb_long_t)type;
+    return (tb_long_t)((tb_charset_ref_t)item)->type - (tb_long_t)type;
 }
-static tb_charset_t const* tb_charset_find_by_name(tb_char_t const* name)
+static tb_charset_ref_t tb_charset_find_by_name(tb_char_t const* name)
 {
     // init iterator
     tb_iterator_t   iterator = tb_iterator_init_mem(g_charsets, tb_object_arrayn(g_charsets), sizeof(tb_charset_t));
@@ -111,10 +111,10 @@ static tb_charset_t const* tb_charset_find_by_name(tb_char_t const* name)
 
     // ok?
     if (itor != tb_iterator_tail(&iterator))
-        return (tb_charset_t const*)tb_iterator_item(&iterator, itor);
+        return (tb_charset_ref_t)tb_iterator_item(&iterator, itor);
     else return tb_null;
 }
-static tb_charset_t const* tb_charset_find_by_type(tb_size_t type)
+static tb_charset_ref_t tb_charset_find_by_type(tb_size_t type)
 {
     // init iterator
     tb_iterator_t   iterator = tb_iterator_init_mem(g_charsets, tb_object_arrayn(g_charsets), sizeof(tb_charset_t));
@@ -125,7 +125,7 @@ static tb_charset_t const* tb_charset_find_by_type(tb_size_t type)
 
     // ok?
     if (itor != tb_iterator_tail(&iterator))
-        return (tb_charset_t const*)tb_iterator_item(&iterator, itor);
+        return (tb_charset_ref_t)tb_iterator_item(&iterator, itor);
     else return tb_null;
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +134,7 @@ static tb_charset_t const* tb_charset_find_by_type(tb_size_t type)
 tb_char_t const* tb_charset_name(tb_size_t type)
 {
     // find
-    tb_charset_t const* charset = tb_charset_find_by_type(type);
+    tb_charset_ref_t charset = tb_charset_find_by_type(type);
     tb_assert_and_check_return_val(charset, tb_null);
 
     // type
@@ -143,25 +143,25 @@ tb_char_t const* tb_charset_name(tb_size_t type)
 tb_size_t tb_charset_type(tb_char_t const* name)
 {
     // find
-    tb_charset_t const* charset = tb_charset_find_by_name(name);
+    tb_charset_ref_t charset = tb_charset_find_by_name(name);
     tb_assert_and_check_return_val(charset, TB_CHARSET_TYPE_NONE);
 
     // type
     return charset->type;
 }
-tb_charset_t const* tb_charset_find(tb_size_t type)
+tb_charset_ref_t tb_charset_find(tb_size_t type)
 {
     return tb_charset_find_by_type(type);
 }
-tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_static_stream_t* fst, tb_static_stream_t* tst)
+tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_static_stream_ref_t fst, tb_static_stream_ref_t tst)
 {
     // check
     tb_assert_and_check_return_val(TB_CHARSET_TYPE_OK(ftype) && TB_CHARSET_TYPE_OK(ttype) && fst && tst, -1);
     tb_assert_and_check_return_val(tb_static_stream_valid(fst) && tb_static_stream_valid(tst), -1);
 
     // init the charset
-    tb_charset_t const* fr = tb_charset_find_by_type(ftype);
-    tb_charset_t const* to = tb_charset_find_by_type(ttype);
+    tb_charset_ref_t fr = tb_charset_find_by_type(ftype);
+    tb_charset_ref_t to = tb_charset_find_by_type(ttype);
     tb_assert_and_check_return_val(fr && to && fr->get && fr->set, -1);
 
     // no data? 

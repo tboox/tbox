@@ -32,7 +32,7 @@
  * includes
  */
 #include "async_stream.h"
-#include "impl/impl.h"
+#include "impl/async_stream/prefix.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 

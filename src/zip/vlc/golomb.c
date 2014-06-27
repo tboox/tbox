@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * details
  */
-static tb_void_t tb_zip_vlc_golomb_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_t* sstream)
+static tb_void_t tb_zip_vlc_golomb_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_ref_t sstream)
 {
     tb_assert(vlc && val);
 
@@ -65,7 +65,7 @@ static tb_void_t tb_zip_vlc_golomb_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_st
 
 #endif
 }
-static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_static_stream_t const* sstream)
+static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_static_stream_ref_t sstream)
 {
     tb_assert(vlc);
 
@@ -84,7 +84,7 @@ static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_static_stream_t c
 
     // get q
     tb_uint32_t q = 0;
-    while (tb_static_stream_read_u1((tb_static_stream_t*)sstream)) q++;
+    while (tb_static_stream_read_u1((tb_static_stream_ref_t)sstream)) q++;
 
     // get b
     tb_int_t b = 1 << m;
@@ -92,7 +92,7 @@ static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_static_stream_t c
     // get r
     tb_uint32_t i = 0;
     tb_uint32_t r = 0;
-    for (i = 0; i < m; i++) r |= tb_static_stream_read_u1((tb_static_stream_t*)sstream) << i;
+    for (i = 0; i < m; i++) r |= tb_static_stream_read_u1((tb_static_stream_ref_t)sstream) << i;
 
     // compute value
     tb_uint32_t val = (r + q * b + 1);

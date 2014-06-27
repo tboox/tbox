@@ -76,15 +76,15 @@ tbox_C_FILES 			+= \
 						asio/aiop \
 						stream/static_stream \
 						stream/stream \
+						stream/filter \
 						stream/impl/stream/http \
 						stream/impl/stream/file \
 						stream/impl/stream/data \
 						stream/impl/stream/sock \
 						stream/impl/stream/filter \
+						stream/impl/filter/cache \
+						stream/impl/filter/chunked \
 						stream/transfer \
-						stream/filter/filter \
-						stream/filter/cache \
-						stream/filter/chunked \
 						utils/bits \
 						utils/md5 \
 						utils/sha \
@@ -268,7 +268,7 @@ tbox_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
 						charset/ucs4 \
 						charset/gb2312 \
 						charset/iso8859 \
-						stream/filter/charset
+						stream/impl/filter/charset
 
 # asio
 ifeq ($(TB_CONFIG_MODULE_HAVE_ASIO),y)
@@ -334,7 +334,7 @@ tbox_C_FILES 			+= \
 						zip/vlc/golomb \
 						zip/vlc/gamma \
 						zip/rlc \
-						stream/filter/zip 
+						stream/impl/filter/zip 
 
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_ZLIB) += \
 						zip/zlib \
@@ -596,8 +596,7 @@ INC_FILES 				= \
 						stream/async_transfer.h \
 						stream/transfer.h \
 						stream/transfer.h \
-						stream/filter/prefix.h \
-						stream/filter/filter.h \
+						stream/filter.h \
 						object/prefix.h \
 						object/object.h \
 						object/null.h \

@@ -486,7 +486,7 @@ static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t*
     return tb_true;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_t* sstream)
+static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_ref_t sstream)
 {
     tb_size_t nbits = 0;
     tb_size_t b = 1;
