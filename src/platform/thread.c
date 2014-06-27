@@ -34,16 +34,16 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/thread.c"
 #else
-tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_cpointer_t priv, tb_size_t stack)
+tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_cpointer_t priv, tb_size_t stack)
 {
     tb_trace_noimpl();
     return tb_null;
 }
-tb_void_t tb_thread_exit(tb_handle_t handle)
+tb_void_t tb_thread_exit(tb_thread_ref_t thread)
 {
     tb_trace_noimpl();
 }
-tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout)
 {
     tb_trace_noimpl();
     return -1;
@@ -52,12 +52,12 @@ tb_void_t tb_thread_return(tb_pointer_t value)
 {
     tb_trace_noimpl();
 }
-tb_bool_t tb_thread_suspend(tb_handle_t handle)
+tb_bool_t tb_thread_suspend(tb_thread_ref_t thread)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_thread_resume(tb_handle_t handle)
+tb_bool_t tb_thread_resume(tb_thread_ref_t thread)
 {
     tb_trace_noimpl();
     return tb_false;

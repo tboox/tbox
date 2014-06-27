@@ -32,7 +32,7 @@ typedef struct __tb_demo_context_t
     tb_async_transfer_ref_t transfer;
 
     // the event
-    tb_handle_t             event;
+    tb_event_ref_t          event;
 
 }tb_demo_context_t;
 

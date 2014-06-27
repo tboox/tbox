@@ -34,21 +34,21 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/dynamic.c"
 #else
-tb_handle_t tb_dynamic_init(tb_char_t const* name)
+tb_dynamic_ref_t tb_dynamic_init(tb_char_t const* name)
 {
     tb_trace_noimpl();
     return tb_null;
 }
-tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
+tb_void_t tb_dynamic_exit(tb_dynamic_ref_t dynamic)
 {
     tb_trace_noimpl();
 }
-tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
+tb_pointer_t tb_dynamic_func(tb_dynamic_ref_t dynamic, tb_char_t const* name)
 {
     tb_trace_noimpl();
     return tb_null;
 }
-tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
+tb_pointer_t tb_dynamic_pvar(tb_dynamic_ref_t dynamic, tb_char_t const* name)
 {
     tb_trace_noimpl();
     return tb_null;

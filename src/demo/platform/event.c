@@ -16,10 +16,10 @@
  */
 typedef struct __tb_test_item_t
 {
-    tb_handle_t     e;
-    tb_handle_t     t;
-    tb_size_t       i   : 24;
-    tb_size_t       q   : 8;
+    tb_event_ref_t      e;
+    tb_thread_ref_t     t;
+    tb_size_t           i   : 24;
+    tb_size_t           q   : 8;
 
 }tb_test_item_t;
 

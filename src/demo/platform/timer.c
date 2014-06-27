@@ -22,7 +22,7 @@ static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t priv)
 static tb_pointer_t tb_demo_timer_loop(tb_cpointer_t priv)
 {
     // the timer
-    tb_handle_t timer = (tb_handle_t)priv;
+    tb_timer_ref_t timer = (tb_timer_ref_t)priv;
 
     // wait
     if (timer) tb_timer_loop(timer);
@@ -38,8 +38,8 @@ static tb_pointer_t tb_demo_timer_loop(tb_cpointer_t priv)
 tb_int_t tb_demo_platform_timer_main(tb_int_t argc, tb_char_t** argv)
 {
     // init timer
-//  tb_handle_t timer = tb_timer_init(3, tb_true);
-    tb_handle_t timer = tb_timer_init(3, tb_false);
+//  tb_timer_ref_t timer = tb_timer_init(3, tb_true);
+    tb_timer_ref_t timer = tb_timer_init(3, tb_false);
 
     if (timer)
     {
@@ -47,10 +47,10 @@ tb_int_t tb_demo_platform_timer_main(tb_int_t argc, tb_char_t** argv)
         tb_timer_task_post(timer, 1000, tb_true, tb_demo_timer_task_func, "every");
     
         // add task: one
-        tb_handle_t one = tb_timer_task_init(timer, 10000, tb_false, tb_demo_timer_task_func, "one");
+        tb_timer_task_ref_t one = tb_timer_task_init(timer, 10000, tb_false, tb_demo_timer_task_func, "one");
         
         // add task: after
-        tb_handle_t after = tb_timer_task_init_after(timer, 10000, 5000, tb_true, tb_demo_timer_task_func, "after");
+        tb_timer_task_ref_t after = tb_timer_task_init_after(timer, 10000, 5000, tb_true, tb_demo_timer_task_func, "after");
 
         // init loop
         tb_thread_init(tb_null, tb_demo_timer_loop, timer, 0);

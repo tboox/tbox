@@ -97,16 +97,16 @@ typedef struct __tb_iocp_ptor_impl_t
     HANDLE                                      port;
 
     // the timer for task
-    tb_handle_t                                 timer;
+    tb_timer_ref_t                              timer;
 
     // the low precision timer for timeout
-    tb_handle_t                                 ltimer;
+    tb_ltimer_ref_t                             ltimer;
 
     // the post loop
-    tb_handle_t                                 loop;
+    tb_thread_ref_t                             loop;
 
     // the post wait
-    tb_handle_t                                 wait;
+    tb_event_ref_t                              wait;
 
     /* the aice post
      *
@@ -576,8 +576,8 @@ static tb_void_t tb_iocp_post_timeout_cancel(tb_iocp_ptor_impl_t* impl, tb_iocp_
     // remove timeout task
     if (aico->task) 
     {
-        if (aico->bltimer) tb_ltimer_task_exit(impl->ltimer, aico->task);
-        else tb_timer_task_exit(impl->timer, aico->task);
+        if (aico->bltimer) tb_ltimer_task_exit(impl->ltimer, (tb_ltimer_task_ref_t)aico->task);
+        else tb_timer_task_exit(impl->timer, (tb_timer_task_ref_t)aico->task);
         aico->bltimer = 0;
     }
     aico->task = tb_null;
@@ -1870,8 +1870,8 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     if (((tb_iocp_aico_t*)aico)->task) 
     {
         // kill it
-        if (((tb_iocp_aico_t*)aico)->bltimer) tb_ltimer_task_kill(impl->ltimer, ((tb_iocp_aico_t*)aico)->task);
-        else tb_timer_task_kill(impl->timer, ((tb_iocp_aico_t*)aico)->task);
+        if (((tb_iocp_aico_t*)aico)->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)((tb_iocp_aico_t*)aico)->task);
+        else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)((tb_iocp_aico_t*)aico)->task);
 
         /* the iocp will wait long time if the lastest task wait period is too long
          * so spak the iocp manually for spak the timer
@@ -2194,8 +2194,8 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
             // remove task
             if (aico->task) 
             {
-                if (aico->bltimer) tb_ltimer_task_exit(impl->ltimer, aico->task);
-                else tb_timer_task_exit(impl->timer, aico->task);
+                if (aico->bltimer) tb_ltimer_task_exit(impl->ltimer, (tb_ltimer_task_ref_t)aico->task);
+                else tb_timer_task_exit(impl->timer, (tb_timer_task_ref_t)aico->task);
                 aico->bltimer = 0;
             }
             aico->task = tb_null;

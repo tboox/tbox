@@ -40,8 +40,8 @@
  * types
  */
 
-// the timer task type
-typedef struct __tb_timer_task_t
+// the timer task impl type
+typedef struct __tb_timer_task_impl_t
 {
     // the func
     tb_timer_task_func_t        func;
@@ -64,10 +64,10 @@ typedef struct __tb_timer_task_t
     // the refn, <= 2
     tb_uint32_t                 refn    : 2;
 
-}tb_timer_task_t;
+}tb_timer_task_impl_t;
 
-/// the timer type
-typedef struct __tb_timer_t
+/// the timer impl type
+typedef struct __tb_timer_impl_t
 {
     // the maxn
     tb_size_t                   maxn;
@@ -88,20 +88,20 @@ typedef struct __tb_timer_t
     tb_handle_t                 pool;
 
     // the heap
-    tb_heap_ref_t                  heap;
+    tb_heap_ref_t               heap;
 
     // the event
-    tb_handle_t                 event;
+    tb_event_ref_t              event;
 
-}tb_timer_t;
+}tb_timer_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_hong_t tb_timer_now(tb_timer_t* timer)
+static __tb_inline__ tb_hong_t tb_timer_now(tb_timer_impl_t* impl)
 {
     // using the real time?
-    if (!timer->ctime)
+    if (!impl->ctime)
     {
         // get the time
         tb_timeval_t tv = {0};
@@ -114,8 +114,8 @@ static __tb_inline__ tb_hong_t tb_timer_now(tb_timer_t* timer)
 static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // check
-    tb_timer_task_t const* ltask = (tb_timer_task_t const*)ldata;
-    tb_timer_task_t const* rtask = (tb_timer_task_t const*)rdata;
+    tb_timer_task_impl_t const* ltask = (tb_timer_task_impl_t const*)ldata;
+    tb_timer_task_impl_t const* rtask = (tb_timer_task_impl_t const*)rdata;
     tb_assert_and_check_return_val(ltask && rtask, -1);
 
     // comp
@@ -129,177 +129,191 @@ static tb_long_t tb_timer_comp_by_task(tb_iterator_ref_t iterator, tb_cpointer_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
+tb_timer_ref_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 {
-    // make timer
-    tb_timer_t* timer = tb_malloc0_type(tb_timer_t);
-    tb_assert_and_check_return_val(timer, tb_null);
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_timer_impl_t*    impl = tb_null;
+    do
+    {
+        // make timer
+        impl = tb_malloc0_type(tb_timer_impl_t);
+        tb_assert_and_check_break(impl);
 
-    // init func
-    tb_item_func_t func = tb_item_func_ptr(tb_null, tb_null); func.comp = tb_timer_comp_by_when;
+        // init func
+        tb_item_func_t func = tb_item_func_ptr(tb_null, tb_null); func.comp = tb_timer_comp_by_when;
 
-    // init timer
-    timer->maxn         = tb_max(maxn, 16);
-    timer->ctime        = ctime;
+        // init timer
+        impl->maxn         = tb_max(maxn, 16);
+        impl->ctime        = ctime;
 
-    // init lock
-    if (!tb_spinlock_init(&timer->lock)) goto fail;
+        // init lock
+        if (!tb_spinlock_init(&impl->lock)) break;
 
-    // init pool
-    timer->pool         = tb_fixed_pool_init((maxn >> 2) + 16, sizeof(tb_timer_task_t), 0);
-    tb_assert_and_check_goto(timer->pool, fail);
-    
-    // init heap
-    timer->heap         = tb_heap_init((maxn >> 2) + 16, func);
-    tb_assert_and_check_goto(timer->heap, fail);
+        // init pool
+        impl->pool         = tb_fixed_pool_init((maxn >> 2) + 16, sizeof(tb_timer_task_impl_t), 0);
+        tb_assert_and_check_break(impl->pool);
+        
+        // init heap
+        impl->heap         = tb_heap_init((maxn >> 2) + 16, func);
+        tb_assert_and_check_break(impl->heap);
 
-    // register lock profiler
+        // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-    tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&timer->lock, TB_TRACE_MODULE_NAME);
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->lock, TB_TRACE_MODULE_NAME);
 #endif
+        // ok
+        ok = tb_true;
 
-    // ok
-    return (tb_handle_t)timer;
-fail:
-    if (timer) tb_timer_exit(timer);
-    return tb_null;
-}
-tb_void_t tb_timer_exit(tb_handle_t handle)
-{
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    if (timer)
+    } while (0);
+
+    // failed?
+    if (!ok)
     {
-        // stop it
-        tb_atomic_set(&timer->stop, 1);
-
-        // wait loop exit
-        tb_size_t tryn = 10;
-        while (tb_atomic_get(&timer->work) && tryn--) tb_msleep(500);
-
-        // warning
-        if (!tryn && tb_atomic_get(&timer->work)) tb_trace_w("[timer]: the loop has been not exited now!");
-
-        // post event
-        tb_spinlock_enter(&timer->lock);
-        tb_handle_t event = timer->event;
-        tb_spinlock_leave(&timer->lock);
-        if (event) tb_event_post(event);
-
-        // enter
-        tb_spinlock_enter(&timer->lock);
-
-        // exit heap
-        if (timer->heap) tb_heap_exit(timer->heap);
-        timer->heap = tb_null;
-
-        // exit pool
-        if (timer->pool) tb_fixed_pool_exit(timer->pool);
-        timer->pool = tb_null;
-
-        // exit event
-        if (timer->event) tb_event_exit(timer->event);
-        timer->event = tb_null;
-
-        // leave
-        tb_spinlock_leave(&timer->lock);
-
-        // exit lock
-        tb_spinlock_exit(&timer->lock);
-
         // exit it
-        tb_free(timer);
+        if (impl) tb_timer_exit((tb_timer_ref_t)impl);
+        impl = tb_null;
     }
+
+    // ok?
+    return (tb_timer_ref_t)impl;
 }
-tb_void_t tb_timer_clear(tb_handle_t handle)
-{
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    if (timer)
-    {
-        // enter
-        tb_spinlock_enter(&timer->lock);
-
-        // clear heap
-        if (timer->heap) tb_heap_clear(timer->heap);
-
-        // clear pool
-        if (timer->pool) tb_fixed_pool_clear(timer->pool);
-
-        // leave
-        tb_spinlock_leave(&timer->lock);
-    }
-}
-tb_hize_t tb_timer_top(tb_handle_t handle)
+tb_void_t tb_timer_exit(tb_timer_ref_t timer)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && timer->heap, -1);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return(impl);
 
-    // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), -1);
+    // stop it
+    tb_atomic_set(&impl->stop, 1);
+
+    // wait loop exit
+    tb_size_t tryn = 10;
+    while (tb_atomic_get(&impl->work) && tryn--) tb_msleep(500);
+
+    // warning
+    if (!tryn && tb_atomic_get(&impl->work)) tb_trace_w("[timer]: the loop has been not exited now!");
+
+    // post event
+    tb_spinlock_enter(&impl->lock);
+    tb_event_ref_t event = impl->event;
+    tb_spinlock_leave(&impl->lock);
+    if (event) tb_event_post(event);
 
     // enter
-    tb_spinlock_enter(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
+
+    // exit heap
+    if (impl->heap) tb_heap_exit(impl->heap);
+    impl->heap = tb_null;
+
+    // exit pool
+    if (impl->pool) tb_fixed_pool_exit(impl->pool);
+    impl->pool = tb_null;
+
+    // exit event
+    if (impl->event) tb_event_exit(impl->event);
+    impl->event = tb_null;
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // exit lock
+    tb_spinlock_exit(&impl->lock);
+
+    // exit it
+    tb_free(impl);
+}
+tb_void_t tb_timer_clear(tb_timer_ref_t timer)
+{
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    if (impl)
+    {
+        // enter
+        tb_spinlock_enter(&impl->lock);
+
+        // clear heap
+        if (impl->heap) tb_heap_clear(impl->heap);
+
+        // clear pool
+        if (impl->pool) tb_fixed_pool_clear(impl->pool);
+
+        // leave
+        tb_spinlock_leave(&impl->lock);
+    }
+}
+tb_hize_t tb_timer_top(tb_timer_ref_t timer)
+{
+    // check
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return_val(impl && impl->heap, -1);
+
+    // stoped?
+    tb_assert_and_check_return_val(!tb_atomic_get(&impl->stop), -1);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
 
     // done
     tb_hize_t when = -1; 
-    if (tb_heap_size(timer->heap))
+    if (tb_heap_size(impl->heap))
     {
         // the task
-        tb_timer_task_t const* task = (tb_timer_task_t const*)tb_heap_top(timer->heap);
-        if (task) when = task->when;
+        tb_timer_task_impl_t const* task_impl = (tb_timer_task_impl_t const*)tb_heap_top(impl->heap);
+        if (task_impl) when = task_impl->when;
     }
 
     // leave
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_leave(&impl->lock);
 
     // ok?
     return when;
 }
-tb_size_t tb_timer_delay(tb_handle_t handle)
+tb_size_t tb_timer_delay(tb_timer_ref_t timer)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && timer->heap, -1);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return_val(impl && impl->heap, -1);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), -1);
+    tb_assert_and_check_return_val(!tb_atomic_get(&impl->stop), -1);
 
     // enter
-    tb_spinlock_enter(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // done
     tb_size_t delay = -1; 
-    if (tb_heap_size(timer->heap))
+    if (tb_heap_size(impl->heap))
     {
         // the task
-        tb_timer_task_t const* task = (tb_timer_task_t const*)tb_heap_top(timer->heap);
-        if (task)
+        tb_timer_task_impl_t const* task_impl = (tb_timer_task_impl_t const*)tb_heap_top(impl->heap);
+        if (task_impl)
         {
             // the now
-            tb_hong_t now = tb_timer_now(timer);
+            tb_hong_t now = tb_timer_now(impl);
 
             // the delay
-            delay = task->when > now? (tb_size_t)(task->when - now) : 0;
+            delay = task_impl->when > now? (tb_size_t)(task_impl->when - now) : 0;
         }
     }
 
     // leave
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_leave(&impl->lock);
 
     // ok?
     return delay;
 }
-tb_bool_t tb_timer_spak(tb_handle_t handle)
+tb_bool_t tb_timer_spak(tb_timer_ref_t timer)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && timer->pool && timer->heap, tb_false);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return_val(impl && impl->pool && impl->heap, tb_false);
 
     // stoped?
-    tb_check_return_val(!tb_atomic_get(&timer->stop), tb_false);
+    tb_check_return_val(!tb_atomic_get(&impl->stop), tb_false);
 
     // enter
-    tb_spinlock_enter(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // done
     tb_bool_t               ok = tb_false;
@@ -309,50 +323,50 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
     do
     {
         // empty? 
-        if (!tb_heap_size(timer->heap))
+        if (!tb_heap_size(impl->heap))
         {
             ok = tb_true;
             break;
         }
 
         // the top task
-        tb_timer_task_t* task = (tb_timer_task_t*)tb_heap_top(timer->heap);
-        tb_assert_and_check_break(task);
+        tb_timer_task_impl_t* task_impl = (tb_timer_task_impl_t*)tb_heap_top(impl->heap);
+        tb_assert_and_check_break(task_impl);
 
         // check refn
-        tb_assert(task->refn);
+        tb_assert(task_impl->refn);
 
         // the now
-        tb_hong_t now = tb_timer_now(timer);
+        tb_hong_t now = tb_timer_now(impl);
 
         // timeout?
-        if (task->when <= now)
+        if (task_impl->when <= now)
         {
             // pop it
-            tb_heap_pop(timer->heap);
+            tb_heap_pop(impl->heap);
 
             // save func and data for calling it later
-            func = task->func;
-            priv = task->priv;
+            func = task_impl->func;
+            priv = task_impl->priv;
 
             // killed?
-            killed = task->killed? tb_true : tb_false;
+            killed = task_impl->killed? tb_true : tb_false;
 
             // repeat?
-            if (task->repeat)
+            if (task_impl->repeat)
             {
                 // update when
-                task->when = now + task->period;
+                task_impl->when = now + task_impl->period;
 
-                // continue task
-                tb_heap_put(timer->heap, task);
+                // continue task_impl
+                tb_heap_put(impl->heap, task_impl);
             }
             else 
             {
                 // refn--
-                if (task->refn > 1) task->refn--;
+                if (task_impl->refn > 1) task_impl->refn--;
                 // remove it from pool directly
-                else tb_fixed_pool_free(timer->pool, task);
+                else tb_fixed_pool_free(impl->pool, task_impl);
             }
         }
 
@@ -362,7 +376,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
     } while (0);
 
     // leave
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_leave(&impl->lock);
 
     // done func
     if (func) func(killed, priv);
@@ -370,31 +384,31 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
     // ok?
     return ok;
 }
-tb_void_t tb_timer_loop(tb_handle_t handle)
+tb_void_t tb_timer_loop(tb_timer_ref_t timer)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return(timer);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return(impl);
 
     // work++
-    tb_atomic_fetch_and_inc(&timer->work);
+    tb_atomic_fetch_and_inc(&impl->work);
 
     // init event 
-    tb_spinlock_enter(&timer->lock);
-    if (!timer->event) timer->event = tb_event_init();
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
+    if (!impl->event) impl->event = tb_event_init();
+    tb_spinlock_leave(&impl->lock);
 
     // loop
-    while (!tb_atomic_get(&timer->stop))
+    while (!tb_atomic_get(&impl->stop))
     {
         // the delay
-        tb_size_t delay = tb_timer_delay(handle);
+        tb_size_t delay = tb_timer_delay(timer);
         if (delay)
         {
             // the event
-            tb_spinlock_enter(&timer->lock);
-            tb_handle_t event = timer->event;
-            tb_spinlock_leave(&timer->lock);
+            tb_spinlock_enter(&impl->lock);
+            tb_event_ref_t event = impl->event;
+            tb_spinlock_leave(&impl->lock);
             tb_check_break(event);
 
             // wait some time
@@ -402,218 +416,218 @@ tb_void_t tb_timer_loop(tb_handle_t handle)
         }
 
         // spak ctime
-        if (timer->ctime) tb_cache_time_spak();
+        if (impl->ctime) tb_cache_time_spak();
 
         // spak it
-        if (!tb_timer_spak(handle)) break;
+        if (!tb_timer_spak(timer)) break;
     }
 
     // work--
-    tb_atomic_fetch_and_dec(&timer->work);
+    tb_atomic_fetch_and_dec(&impl->work);
 }
-tb_handle_t tb_timer_task_init(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
+tb_timer_task_ref_t tb_timer_task_init(tb_timer_ref_t timer, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && func, tb_null);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return_val(impl && func, tb_null);
 
-    // add task
-    return tb_timer_task_init_at(handle, tb_timer_now(timer) + delay, delay, repeat, func, priv);
+    // add task_impl
+    return tb_timer_task_init_at(timer, tb_timer_now(impl) + delay, delay, repeat, func, priv);
 }
-tb_handle_t tb_timer_task_init_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
+tb_timer_task_ref_t tb_timer_task_init_at(tb_timer_ref_t timer, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && timer->pool && timer->heap && func, tb_null);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return_val(impl && impl->pool && impl->heap && func, tb_null);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_null);
+    tb_assert_and_check_return_val(!tb_atomic_get(&impl->stop), tb_null);
 
     // enter
-    tb_spinlock_enter(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // make task
-    tb_handle_t         event = tb_null;
-    tb_hize_t           when_top = -1;
-    tb_timer_task_t*    task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
-    if (task)
+    tb_event_ref_t          event = tb_null;
+    tb_hize_t               when_top = -1;
+    tb_timer_task_impl_t*   task_impl = (tb_timer_task_impl_t*)tb_fixed_pool_malloc0(impl->pool);
+    if (task_impl)
     {
         // the top when 
-        if (tb_heap_size(timer->heap))
+        if (tb_heap_size(impl->heap))
         {
-            tb_timer_task_t* task = (tb_timer_task_t*)tb_heap_top(timer->heap);
-            if (task) when_top = task->when;
+            tb_timer_task_impl_t* task_impl = (tb_timer_task_impl_t*)tb_heap_top(impl->heap);
+            if (task_impl) when_top = task_impl->when;
         }
 
         // init task
-        task->refn      = 2;
-        task->func      = func;
-        task->priv      = priv;
-        task->when      = when;
-        task->period    = period;
-        task->repeat    = repeat? 1 : 0;
+        task_impl->refn      = 2;
+        task_impl->func      = func;
+        task_impl->priv      = priv;
+        task_impl->when      = when;
+        task_impl->period    = period;
+        task_impl->repeat    = repeat? 1 : 0;
 
         // add task
-        tb_heap_put(timer->heap, task);
+        tb_heap_put(impl->heap, task_impl);
 
         // the event
-        event = timer->event;
+        event = impl->event;
     }
 
     // leave
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_leave(&impl->lock);
 
     // post event if the top task is changed
-    if (event && task && when < when_top)
+    if (event && task_impl && when < when_top)
         tb_event_post(event);
 
     // ok?
-    return task;
+    return (tb_timer_task_ref_t)task_impl;
 }
-tb_handle_t tb_timer_task_init_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
+tb_timer_task_ref_t tb_timer_task_init_after(tb_timer_ref_t timer, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return_val(timer && func, tb_null);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return_val(impl && func, tb_null);
 
     // add task
-    return tb_timer_task_init_at(handle, tb_timer_now(timer) + after, period, repeat, func, priv);
+    return tb_timer_task_init_at(timer, tb_timer_now(impl) + after, period, repeat, func, priv);
 }
-tb_void_t tb_timer_task_post(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
+tb_void_t tb_timer_task_post(tb_timer_ref_t timer, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return(timer && func);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return(impl && func);
 
     // run task
-    tb_timer_task_post_at(handle, tb_timer_now(timer) + delay, delay, repeat, func, priv);
+    tb_timer_task_post_at(timer, tb_timer_now(impl) + delay, delay, repeat, func, priv);
 }
-tb_void_t tb_timer_task_post_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
+tb_void_t tb_timer_task_post_at(tb_timer_ref_t timer, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return(timer && timer->pool && timer->heap && func);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return(impl && impl->pool && impl->heap && func);
 
     // stoped?
-    tb_assert_and_check_return(!tb_atomic_get(&timer->stop));
+    tb_assert_and_check_return(!tb_atomic_get(&impl->stop));
 
     // enter
-    tb_spinlock_enter(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // make task
-    tb_handle_t         event = tb_null;
-    tb_hize_t           when_top = -1;
-    tb_timer_task_t*    task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
-    if (task)
+    tb_event_ref_t          event = tb_null;
+    tb_hize_t               when_top = -1;
+    tb_timer_task_impl_t*   task_impl = (tb_timer_task_impl_t*)tb_fixed_pool_malloc0(impl->pool);
+    if (task_impl)
     {
         // the top when 
-        if (tb_heap_size(timer->heap))
+        if (tb_heap_size(impl->heap))
         {
-            tb_timer_task_t* task = (tb_timer_task_t*)tb_heap_top(timer->heap);
-            if (task) when_top = task->when;
+            tb_timer_task_impl_t* task_impl = (tb_timer_task_impl_t*)tb_heap_top(impl->heap);
+            if (task_impl) when_top = task_impl->when;
         }
 
         // init task
-        task->refn      = 1;
-        task->func      = func;
-        task->priv      = priv;
-        task->when      = when;
-        task->period    = period;
-        task->repeat    = repeat? 1 : 0;
+        task_impl->refn      = 1;
+        task_impl->func      = func;
+        task_impl->priv      = priv;
+        task_impl->when      = when;
+        task_impl->period    = period;
+        task_impl->repeat    = repeat? 1 : 0;
 
         // add task
-        tb_heap_put(timer->heap, task);
+        tb_heap_put(impl->heap, task_impl);
 
         // the event
-        event = timer->event;
+        event = impl->event;
     }
 
     // leave
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_leave(&impl->lock);
 
     // post event if the top task is changed
-    if (event && task && when < when_top)
+    if (event && task_impl && when < when_top)
         tb_event_post(event);
 }
-tb_void_t tb_timer_task_post_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
+tb_void_t tb_timer_task_post_after(tb_timer_ref_t timer, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return(timer && func);
+    tb_timer_impl_t* impl = (tb_timer_impl_t*)timer;
+    tb_assert_and_check_return(impl && func);
 
-    // run task
-    tb_timer_task_post_at(handle, tb_timer_now(timer) + after, period, repeat, func, priv);
+    // run task 
+    tb_timer_task_post_at(timer, tb_timer_now(impl) + after, period, repeat, func, priv);
 }
-tb_void_t tb_timer_task_exit(tb_handle_t handle, tb_handle_t htask)
+tb_void_t tb_timer_task_exit(tb_timer_ref_t timer, tb_timer_task_ref_t task)
 {
     // check
-    tb_timer_t*         timer = (tb_timer_t*)handle;
-    tb_timer_task_t*    task = (tb_timer_task_t*)htask;
-    tb_assert_and_check_return(timer && timer->pool && task);
+    tb_timer_impl_t*         impl = (tb_timer_impl_t*)timer;
+    tb_timer_task_impl_t*    task_impl = (tb_timer_task_impl_t*)task;
+    tb_assert_and_check_return(impl && impl->pool && task_impl);
 
     // trace
-    tb_trace_d("exit: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+    tb_trace_d("exit: when: %lld, period: %u, refn: %u", task_impl->when, task_impl->period, task_impl->refn);
 
     // enter
-    tb_spinlock_enter(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // remove it?
-    if (task->refn > 1)
+    if (task_impl->refn > 1)
     {
         // refn--
-        task->refn--;
+        task_impl->refn--;
 
-        // cancel task
-        task->func      = tb_null;
-        task->priv      = tb_null;
-        task->repeat    = 0;
+        // cancel task 
+        task_impl->func      = tb_null;
+        task_impl->priv      = tb_null;
+        task_impl->repeat    = 0;
     }
-    // remove it from pool directly if the task have been expired 
-    else tb_fixed_pool_free(timer->pool, task);
+    // remove it from pool directly if the task_impl have been expired 
+    else tb_fixed_pool_free(impl->pool, task_impl);
 
     // leave
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_leave(&impl->lock);
 }
-tb_void_t tb_timer_task_kill(tb_handle_t handle, tb_handle_t htask)
+tb_void_t tb_timer_task_kill(tb_timer_ref_t timer, tb_timer_task_ref_t task)
 {
     // check
-    tb_timer_t*         timer = (tb_timer_t*)handle;
-    tb_timer_task_t*    task = (tb_timer_task_t*)htask;
-    tb_assert_and_check_return(timer && timer->pool && task);
+    tb_timer_impl_t*        impl = (tb_timer_impl_t*)timer;
+    tb_timer_task_impl_t*   task_impl = (tb_timer_task_impl_t*)task;
+    tb_assert_and_check_return(impl && impl->pool && task_impl);
 
     // trace
-    tb_trace_d("kill: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+    tb_trace_d("kill: when: %lld, period: %u, refn: %u", task_impl->when, task_impl->period, task_impl->refn);
 
     // enter
-    tb_spinlock_enter(&timer->lock);
+    tb_spinlock_enter(&impl->lock);
 
     // done
     do
     {
         // expired or removed?
-        tb_check_break(task->refn == 2);
+        tb_check_break(task_impl->refn == 2);
 
         // find it
-        tb_size_t itor = tb_find_all(timer->heap, task, tb_timer_comp_by_task);
-        tb_assert_and_check_break(itor != tb_iterator_tail(timer->heap));
+        tb_size_t itor = tb_find_all(impl->heap, task_impl, tb_timer_comp_by_task);
+        tb_assert_and_check_break(itor != tb_iterator_tail(impl->heap));
 
-        // del this task
-        tb_heap_del(timer->heap, itor);
+        // del this task_impl
+        tb_heap_del(impl->heap, itor);
 
         // killed
-        task->killed = 1;
+        task_impl->killed = 1;
 
         // no repeat
-        task->repeat = 0;
+        task_impl->repeat = 0;
                 
         // modify when => now
-        task->when = tb_timer_now(timer);
+        task_impl->when = tb_timer_now(impl);
 
-        // re-add task
-        tb_heap_put(timer->heap, task);
+        // re-add task_impl
+        tb_heap_put(impl->heap, task_impl);
 
     } while (0);
 
     // leave
-    tb_spinlock_leave(&timer->lock);
+    tb_spinlock_leave(&impl->lock);
 }

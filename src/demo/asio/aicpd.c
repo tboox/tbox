@@ -376,7 +376,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
     tb_aicp_ref_t       aicp = tb_null;
     tb_aico_ref_t       aico = tb_null;
     tb_aico_ref_t       task = tb_null;
-    tb_handle_t         loop[16] = {0};
+    tb_thread_ref_t     loop[16] = {tb_null};
 
     // open sock
     sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
@@ -441,7 +441,7 @@ end:
     // wait exit
     {
         // exit loop
-        tb_handle_t* l = loop;
+        tb_thread_ref_t* l = loop;
         for (; *l; l++)
         {
             tb_thread_wait(*l, -1);

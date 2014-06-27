@@ -252,7 +252,7 @@ static tb_handle_t tb_aicp_instance_init(tb_cpointer_t* ppriv)
 static tb_void_t tb_aicp_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
     // exit loop
-    tb_handle_t loop = (tb_handle_t)priv;
+    tb_thread_ref_t loop = (tb_thread_ref_t)priv;
     if (loop)
     {
         // wait it

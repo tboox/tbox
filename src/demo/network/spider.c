@@ -39,7 +39,7 @@ typedef struct __tb_demo_spider_t
     tb_spinlock_t               lock;
 
     // the filter
-    tb_bloom_filter_ref_t          filter;
+    tb_bloom_filter_ref_t       filter;
 
     // the state
     tb_atomic_t                 state;

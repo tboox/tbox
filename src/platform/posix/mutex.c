@@ -34,7 +34,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_mutex_init()
+tb_mutex_ref_t tb_mutex_init()
 {
     // make mutex
     pthread_mutex_t* pmutex = tb_malloc0(sizeof(pthread_mutex_t));
@@ -44,47 +44,47 @@ tb_handle_t tb_mutex_init()
     if (pthread_mutex_init(pmutex, tb_null)) return tb_null;
     
     // ok
-    return ((tb_handle_t)pmutex);
+    return ((tb_mutex_ref_t)pmutex);
 }
-tb_void_t tb_mutex_exit(tb_handle_t handle)
+tb_void_t tb_mutex_exit(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return(handle);
+    tb_assert_and_check_return(mutex);
 
     // exit it
-    pthread_mutex_t* pmutex = (pthread_mutex_t*)handle;
+    pthread_mutex_t* pmutex = (pthread_mutex_t*)mutex;
     if (pmutex)
     {
         pthread_mutex_destroy(pmutex);
         tb_free((tb_pointer_t)pmutex);
     }
 }
-tb_bool_t tb_mutex_enter(tb_handle_t handle)
+tb_bool_t tb_mutex_enter(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_false);
+    tb_assert_and_check_return_val(mutex, tb_false);
 
     // try to enter for profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-    if (tb_mutex_enter_try(handle)) return tb_true;
+    if (tb_mutex_enter_try(mutex)) return tb_true;
 #endif
 
     // enter
-    if (pthread_mutex_lock((pthread_mutex_t*)handle)) return tb_false;
+    if (pthread_mutex_lock((pthread_mutex_t*)mutex)) return tb_false;
     // ok
     else return tb_true;
 }
-tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
+tb_bool_t tb_mutex_enter_try(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_false);
+    tb_assert_and_check_return_val(mutex, tb_false);
 
     // try to enter
-    if (pthread_mutex_trylock((pthread_mutex_t*)handle))
+    if (pthread_mutex_trylock((pthread_mutex_t*)mutex))
     {
         // occupied
 #ifdef TB_LOCK_PROFILER_ENABLE
-        tb_lock_profiler_occupied(tb_lock_profiler(), handle);
+        tb_lock_profiler_occupied(tb_lock_profiler(), (tb_handle_t)mutex);
 #endif
 
         // failed
@@ -93,12 +93,12 @@ tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
     // ok
     else return tb_true;
 }
-tb_bool_t tb_mutex_leave(tb_handle_t handle)
+tb_bool_t tb_mutex_leave(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_false);
+    tb_assert_and_check_return_val(mutex, tb_false);
 
     // leave
-    if (pthread_mutex_unlock((pthread_mutex_t*)handle)) return tb_false;
+    if (pthread_mutex_unlock((pthread_mutex_t*)mutex)) return tb_false;
     else return tb_true;
 }

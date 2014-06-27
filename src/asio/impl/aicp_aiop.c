@@ -52,7 +52,7 @@ typedef struct __tb_aiop_ptor_impl_t
     tb_semaphore_ref_t          wait;
 
     // the spak loop
-    tb_handle_t                 loop;
+    tb_thread_ref_t             loop;
 
     // the aioe list
     tb_aioe_t*                  list;
@@ -61,10 +61,10 @@ typedef struct __tb_aiop_ptor_impl_t
     tb_size_t                   maxn;
 
     // the timer for task
-    tb_handle_t                 timer;
+    tb_timer_ref_t              timer;
 
     // the low precision timer for timeout
-    tb_handle_t                 ltimer;
+    tb_ltimer_ref_t             ltimer;
 
     // the private data for file
     tb_handle_t                 fpriv;
@@ -81,7 +81,7 @@ typedef struct __tb_aiop_aico_impl_t
     tb_aiop_ptor_impl_t*        impl;
 
     // the aioo
-    tb_handle_t                 aioo;
+    tb_aioo_ref_t               aioo;
 
     // the aice
     tb_aice_t                   aice;
