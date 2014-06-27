@@ -52,7 +52,7 @@ typedef struct __tb_object_date_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_object_date_t* tb_object_date_cast(tb_object_t* object)
+static __tb_inline__ tb_object_date_t* tb_object_date_cast(tb_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DATE, tb_null);
@@ -60,15 +60,15 @@ static __tb_inline__ tb_object_date_t* tb_object_date_cast(tb_object_t* object)
     // cast
     return (tb_object_date_t*)object;
 }
-static tb_object_t* tb_object_date_copy(tb_object_t* object)
+static tb_object_ref_t tb_object_date_copy(tb_object_ref_t object)
 {
     return tb_object_date_init_from_time(tb_object_date_time(object));
 }
-static tb_void_t tb_object_date_exit(tb_object_t* object)
+static tb_void_t tb_object_date_exit(tb_object_ref_t object)
 {
     if (object) tb_object_pool_del(tb_object_pool(), object);
 }
-static tb_void_t tb_object_date_cler(tb_object_t* object)
+static tb_void_t tb_object_date_cler(tb_object_ref_t object)
 {
     tb_object_date_t* date = tb_object_date_cast(object);
     if (date) date->time = 0;
@@ -91,7 +91,7 @@ static tb_object_date_t* tb_object_date_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* tb_object_date_init_from_now()
+tb_object_ref_t tb_object_date_init_from_now()
 {
     // make
     tb_object_date_t* date = tb_object_date_init_base();
@@ -101,9 +101,9 @@ tb_object_t* tb_object_date_init_from_now()
     date->time = tb_time();
 
     // ok
-    return (tb_object_t*)date;
+    return (tb_object_ref_t)date;
 }
-tb_object_t* tb_object_date_init_from_time(tb_time_t time)
+tb_object_ref_t tb_object_date_init_from_time(tb_time_t time)
 {
     // make
     tb_object_date_t* date = tb_object_date_init_base();
@@ -113,9 +113,9 @@ tb_object_t* tb_object_date_init_from_time(tb_time_t time)
     if (time > 0) date->time = time;
 
     // ok
-    return (tb_object_t*)date;
+    return (tb_object_ref_t)date;
 }
-tb_time_t tb_object_date_time(tb_object_t* object)
+tb_time_t tb_object_date_time(tb_object_ref_t object)
 {
     // check
     tb_object_date_t* date = tb_object_date_cast(object);
@@ -124,7 +124,7 @@ tb_time_t tb_object_date_time(tb_object_t* object)
     // time
     return date->time;
 }
-tb_bool_t tb_object_date_time_set(tb_object_t* object, tb_time_t time)
+tb_bool_t tb_object_date_time_set(tb_object_ref_t object, tb_time_t time)
 {
     // check
     tb_object_date_t* date = tb_object_date_cast(object);
@@ -136,7 +136,7 @@ tb_bool_t tb_object_date_time_set(tb_object_t* object, tb_time_t time)
     // ok
     return tb_true;
 }
-tb_bool_t tb_object_date_time_set_now(tb_object_t* object)
+tb_bool_t tb_object_date_time_set_now(tb_object_ref_t object)
 {
     // check
     tb_object_date_t* date = tb_object_date_cast(object);

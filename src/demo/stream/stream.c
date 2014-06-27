@@ -83,7 +83,7 @@ static tb_option_item_t g_options[] =
 tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t         option = tb_null;
+    tb_option_ref_t     option = tb_null;
     tb_stream_ref_t     istream = tb_null;
     tb_stream_ref_t     ostream = tb_null;
     tb_stream_ref_t     pstream = tb_null;

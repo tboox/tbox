@@ -58,7 +58,7 @@ typedef struct __tb_object_dictionary_t
     tb_size_t           size;
 
     // the object hash
-    tb_hash_ref_t          hash;
+    tb_hash_ref_t       hash;
 
     // increase refn?
     tb_bool_t           incr;
@@ -68,7 +68,7 @@ typedef struct __tb_object_dictionary_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_object_dictionary_t* tb_object_dictionary_cast(tb_object_t* object)
+static __tb_inline__ tb_object_dictionary_t* tb_object_dictionary_cast(tb_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DICTIONARY, tb_null);
@@ -76,7 +76,7 @@ static __tb_inline__ tb_object_dictionary_t* tb_object_dictionary_cast(tb_object
     // cast
     return (tb_object_dictionary_t*)object;
 }
-static tb_object_t* tb_object_dictionary_copy(tb_object_t* object)
+static tb_object_ref_t tb_object_dictionary_copy(tb_object_ref_t object)
 {
     // check
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
@@ -87,7 +87,7 @@ static tb_object_t* tb_object_dictionary_copy(tb_object_t* object)
     tb_assert_and_check_return_val(copy, tb_null);
 
     // walk copy
-    tb_for_all (tb_object_dictionary_item_t*, item, tb_object_dictionary_itor((tb_object_t*)dictionary))
+    tb_for_all (tb_object_dictionary_item_t*, item, tb_object_dictionary_itor((tb_object_ref_t)dictionary))
     {
         if (item && item->key) 
         {
@@ -95,14 +95,14 @@ static tb_object_t* tb_object_dictionary_copy(tb_object_t* object)
             if (item->val) tb_object_inc(item->val);
 
             // copy
-            tb_object_dictionary_set((tb_object_t*)copy, item->key, item->val);
+            tb_object_dictionary_set((tb_object_ref_t)copy, item->key, item->val);
         }
     }
 
     // ok
-    return (tb_object_t*)copy;
+    return (tb_object_ref_t)copy;
 }
-static tb_void_t tb_object_dictionary_exit(tb_object_t* object)
+static tb_void_t tb_object_dictionary_exit(tb_object_ref_t object)
 {
     // check
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
@@ -113,9 +113,9 @@ static tb_void_t tb_object_dictionary_exit(tb_object_t* object)
     dictionary->hash = tb_null;
 
     // exit it
-    tb_object_pool_del(tb_object_pool(), (tb_object_t*)dictionary);
+    tb_object_pool_del(tb_object_pool(), (tb_object_ref_t)dictionary);
 }
-static tb_void_t tb_object_dictionary_cler(tb_object_t* object)
+static tb_void_t tb_object_dictionary_cler(tb_object_ref_t object)
 {
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
     tb_assert_and_check_return(dictionary);
@@ -141,7 +141,7 @@ static tb_object_dictionary_t* tb_object_dictionary_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* tb_object_dictionary_init(tb_size_t size, tb_size_t incr)
+tb_object_ref_t tb_object_dictionary_init(tb_size_t size, tb_size_t incr)
 {
     // done
     tb_bool_t           ok = tb_false;
@@ -172,14 +172,14 @@ tb_object_t* tb_object_dictionary_init(tb_size_t size, tb_size_t incr)
     if (!ok)
     {
         // exit it
-        if (dictionary) tb_object_dictionary_exit((tb_object_t*)dictionary);
+        if (dictionary) tb_object_dictionary_exit((tb_object_ref_t)dictionary);
         dictionary = tb_null;
     }
 
     // ok?
-    return (tb_object_t*)dictionary;
+    return (tb_object_ref_t)dictionary;
 }
-tb_size_t tb_object_dictionary_size(tb_object_t* object)
+tb_size_t tb_object_dictionary_size(tb_object_ref_t object)
 {
     // check
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
@@ -188,7 +188,7 @@ tb_size_t tb_object_dictionary_size(tb_object_t* object)
     // size
     return tb_hash_size(dictionary->hash);
 }
-tb_iterator_ref_t tb_object_dictionary_itor(tb_object_t* object)
+tb_iterator_ref_t tb_object_dictionary_itor(tb_object_ref_t object)
 {
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
     tb_assert_and_check_return_val(dictionary, tb_null);
@@ -196,16 +196,16 @@ tb_iterator_ref_t tb_object_dictionary_itor(tb_object_t* object)
     // iterator
     return (tb_iterator_ref_t)dictionary->hash;
 }
-tb_object_t* tb_object_dictionary_val(tb_object_t* object, tb_char_t const* key)
+tb_object_ref_t tb_object_dictionary_val(tb_object_ref_t object, tb_char_t const* key)
 {
     // check
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
     tb_assert_and_check_return_val(dictionary && dictionary->hash && key, tb_null);
 
     // value
-    return (tb_object_t*)tb_hash_get(dictionary->hash, key);
+    return (tb_object_ref_t)tb_hash_get(dictionary->hash, key);
 }
-tb_void_t tb_object_dictionary_del(tb_object_t* object, tb_char_t const* key)
+tb_void_t tb_object_dictionary_del(tb_object_ref_t object, tb_char_t const* key)
 {
     // check
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
@@ -214,7 +214,7 @@ tb_void_t tb_object_dictionary_del(tb_object_t* object, tb_char_t const* key)
     // del
     return tb_hash_del(dictionary->hash, key);
 }
-tb_void_t tb_object_dictionary_set(tb_object_t* object, tb_char_t const* key, tb_object_t* val)
+tb_void_t tb_object_dictionary_set(tb_object_ref_t object, tb_char_t const* key, tb_object_ref_t val)
 {
     // check
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);
@@ -226,7 +226,7 @@ tb_void_t tb_object_dictionary_set(tb_object_t* object, tb_char_t const* key, tb
     // refn--
     if (!dictionary->incr) tb_object_dec(val);
 }
-tb_void_t tb_object_dictionary_incr(tb_object_t* object, tb_bool_t incr)
+tb_void_t tb_object_dictionary_incr(tb_object_ref_t object, tb_bool_t incr)
 {
     // check
     tb_object_dictionary_t* dictionary = tb_object_dictionary_cast(object);

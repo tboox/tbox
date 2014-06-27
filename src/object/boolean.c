@@ -51,7 +51,7 @@ typedef struct __tb_object_boolean_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_object_boolean_t* tb_object_boolean_cast(tb_object_t const* object)
+static __tb_inline__ tb_object_boolean_t* tb_object_boolean_cast(tb_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_BOOLEAN, tb_null);
@@ -60,7 +60,7 @@ static __tb_inline__ tb_object_boolean_t* tb_object_boolean_cast(tb_object_t con
     return (tb_object_boolean_t*)object;
 }
 
-static tb_object_t* tb_object_boolean_copy(tb_object_t* object)
+static tb_object_ref_t tb_object_boolean_copy(tb_object_ref_t object)
 {
     // check
     tb_object_boolean_t* boolean = (tb_object_boolean_t*)object;
@@ -109,19 +109,19 @@ static tb_object_boolean_t const g_boolean_false =
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* tb_object_boolean_init(tb_bool_t value)
+tb_object_ref_t tb_object_boolean_init(tb_bool_t value)
 {
     return value? tb_object_boolean_true() : tb_object_boolean_false();
 }
-tb_object_t* tb_object_boolean_true()
+tb_object_ref_t tb_object_boolean_true()
 {
-    return (tb_object_t*)&g_boolean_true;
+    return (tb_object_ref_t)&g_boolean_true;
 }
-tb_object_t* tb_object_boolean_false()
+tb_object_ref_t tb_object_boolean_false()
 {
-    return (tb_object_t*)&g_boolean_false;
+    return (tb_object_ref_t)&g_boolean_false;
 }
-tb_bool_t tb_object_boolean_bool(tb_object_t const* object)
+tb_bool_t tb_object_boolean_bool(tb_object_ref_t object)
 {
     tb_object_boolean_t* boolean = tb_object_boolean_cast(object);
     tb_assert_and_check_return_val(boolean, tb_false);

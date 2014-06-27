@@ -66,7 +66,7 @@ tb_void_t           tb_object_context_exit(tb_noarg_t);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type);
+tb_bool_t           tb_object_init(tb_object_ref_t object, tb_size_t flag, tb_size_t type);
 
 /*! exit object
  *
@@ -74,13 +74,13 @@ tb_bool_t           tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_
  *
  * @note the reference count must be one
  */
-tb_void_t           tb_object_exit(tb_object_t* object);
+tb_void_t           tb_object_exit(tb_object_ref_t object);
 
 /*! cler object
  *
  * @param object    the object
  */
-tb_void_t           tb_object_cler(tb_object_t* object);
+tb_void_t           tb_object_cler(tb_object_ref_t object);
 
 /*! set the object private data
  *
@@ -88,7 +88,7 @@ tb_void_t           tb_object_cler(tb_object_t* object);
  * @param priv      the private data
  *
  */
-tb_void_t           tb_object_setp(tb_object_t* object, tb_cpointer_t priv);
+tb_void_t           tb_object_setp(tb_object_ref_t object, tb_cpointer_t priv);
 
 /*! get the object private data
  *
@@ -96,7 +96,7 @@ tb_void_t           tb_object_setp(tb_object_t* object, tb_cpointer_t priv);
  *
  * @return          the private data
  */
-tb_cpointer_t       tb_object_getp(tb_object_t* object);
+tb_cpointer_t       tb_object_getp(tb_object_ref_t object);
 
 /*! read object
  *
@@ -104,7 +104,7 @@ tb_cpointer_t       tb_object_getp(tb_object_t* object);
  *
  * @return          the object
  */
-tb_object_t*        tb_object_read(tb_stream_ref_t stream);
+tb_object_ref_t     tb_object_read(tb_stream_ref_t stream);
 
 /*! read object from url
  *
@@ -112,7 +112,7 @@ tb_object_t*        tb_object_read(tb_stream_ref_t stream);
  *
  * @return          the object
  */
-tb_object_t*        tb_object_read_from_url(tb_char_t const* url);
+tb_object_ref_t        tb_object_read_from_url(tb_char_t const* url);
 
 /*! read object from data
  *
@@ -121,7 +121,7 @@ tb_object_t*        tb_object_read_from_url(tb_char_t const* url);
  *
  * @return          the object
  */
-tb_object_t*        tb_object_read_from_data(tb_byte_t const* data, tb_size_t size);
+tb_object_ref_t     tb_object_read_from_data(tb_byte_t const* data, tb_size_t size);
 
 /*! writ object
  *
@@ -131,7 +131,7 @@ tb_object_t*        tb_object_read_from_data(tb_byte_t const* data, tb_size_t si
  *
  * @return          the writed size, failed: -1
  */
-tb_long_t           tb_object_writ(tb_object_t* object, tb_stream_ref_t stream, tb_size_t format);
+tb_long_t           tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format);
 
 /*! writ object to url
  *
@@ -141,7 +141,7 @@ tb_long_t           tb_object_writ(tb_object_t* object, tb_stream_ref_t stream, 
  *
  * @return          the writed size, failed: -1
  */
-tb_long_t           tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_size_t format);
+tb_long_t           tb_object_writ_to_url(tb_object_ref_t object, tb_char_t const* url, tb_size_t format);
 
 /*! writ object to data
  *
@@ -152,7 +152,7 @@ tb_long_t           tb_object_writ_to_url(tb_object_t* object, tb_char_t const* 
  *
  * @return          the writed size, failed: -1
  */
-tb_long_t           tb_object_writ_to_data(tb_object_t* object, tb_byte_t* data, tb_size_t size, tb_size_t format);
+tb_long_t           tb_object_writ_to_data(tb_object_ref_t object, tb_byte_t* data, tb_size_t size, tb_size_t format);
 
 /*! copy object
  *
@@ -160,7 +160,7 @@ tb_long_t           tb_object_writ_to_data(tb_object_t* object, tb_byte_t* data,
  *
  * @return          the object copy
  */
-tb_object_t*        tb_object_copy(tb_object_t* object);
+tb_object_ref_t        tb_object_copy(tb_object_ref_t object);
 
 /*! the object type
  *
@@ -168,7 +168,7 @@ tb_object_t*        tb_object_copy(tb_object_t* object);
  *
  * @return          the object type
  */
-tb_size_t           tb_object_type(tb_object_t* object);
+tb_size_t           tb_object_type(tb_object_ref_t object);
 
 /*! the object data
  *
@@ -177,7 +177,7 @@ tb_size_t           tb_object_type(tb_object_t* object);
  *
  * @return          the data object
  */
-tb_object_t*        tb_object_data(tb_object_t* object, tb_size_t format);
+tb_object_ref_t     tb_object_data(tb_object_ref_t object, tb_size_t format);
 
 /*! seek to the object for the gived path
  *
@@ -224,7 +224,7 @@ tb_object_t*        tb_object_data(tb_object_t* object, tb_size_t format);
  *
  *
  * <code>
- * tb_object_t*     object = tb_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
+ * tb_object_ref_t     object = tb_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
  * if (object)
  * {
  *      tb_trace_d("%s", tb_object_string_cstr(object));
@@ -234,7 +234,7 @@ tb_object_t*        tb_object_data(tb_object_t* object, tb_size_t format);
  *
  * @return          the object
  */
-tb_object_t*        tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_t type);
+tb_object_ref_t        tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_size_t type);
 
 /*! dump the object
  *
@@ -242,7 +242,7 @@ tb_object_t*        tb_object_seek(tb_object_t* object, tb_char_t const* path, t
  *
  * @return          the object
  */
-tb_object_t*        tb_object_dump(tb_object_t* object);
+tb_object_ref_t     tb_object_dump(tb_object_ref_t object);
 
 /*! the object reference count
  *
@@ -250,19 +250,19 @@ tb_object_t*        tb_object_dump(tb_object_t* object);
  *
  * @return          the object reference count
  */
-tb_size_t           tb_object_ref(tb_object_t* object);
+tb_size_t           tb_object_ref(tb_object_ref_t object);
 
 /*! increase the object reference count
  *
  * @param object    the object
  */
-tb_void_t           tb_object_inc(tb_object_t* object);
+tb_void_t           tb_object_inc(tb_object_ref_t object);
 
 /*! decrease the object reference count, will free it if --refn == 0
  *
  * @param object    the object
  */
-tb_void_t           tb_object_dec(tb_object_t* object);
+tb_void_t           tb_object_dec(tb_object_ref_t object);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

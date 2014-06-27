@@ -11,7 +11,7 @@
 typedef struct __tb_demo_context_t
 {
     // the option
-    tb_handle_t             option;
+    tb_option_ref_t         option;
 
     // the base
     tb_hong_t               base;

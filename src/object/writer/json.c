@@ -38,7 +38,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_object_json_writer_func_null(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level)
+static tb_bool_t tb_object_json_writer_func_null(tb_object_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
 {
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
@@ -50,7 +50,7 @@ static tb_bool_t tb_object_json_writer_func_null(tb_object_json_writer_t* writer
     // ok
     return tb_true;
 }
-static tb_bool_t tb_object_json_writer_func_array(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level)
+static tb_bool_t tb_object_json_writer_func_array(tb_object_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
 {
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
@@ -63,7 +63,7 @@ static tb_bool_t tb_object_json_writer_func_array(tb_object_json_writer_t* write
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
         // walk
-        tb_for_all (tb_object_t*, item, tb_object_array_itor(object))
+        tb_for_all (tb_object_ref_t, item, tb_object_array_itor(object))
         {
             // item
             if (item)
@@ -100,7 +100,7 @@ static tb_bool_t tb_object_json_writer_func_array(tb_object_json_writer_t* write
     // ok
     return tb_true;
 }
-static tb_bool_t tb_object_json_writer_func_string(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level)
+static tb_bool_t tb_object_json_writer_func_string(tb_object_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
 {
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
@@ -116,7 +116,7 @@ static tb_bool_t tb_object_json_writer_func_string(tb_object_json_writer_t* writ
     // ok
     return tb_true;
 }
-static tb_bool_t tb_object_json_writer_func_number(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level)
+static tb_bool_t tb_object_json_writer_func_number(tb_object_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
 {
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
@@ -173,7 +173,7 @@ static tb_bool_t tb_object_json_writer_func_number(tb_object_json_writer_t* writ
     // ok
     return tb_true;
 }
-static tb_bool_t tb_object_json_writer_func_boolean(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level)
+static tb_bool_t tb_object_json_writer_func_boolean(tb_object_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
 {
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
@@ -185,7 +185,7 @@ static tb_bool_t tb_object_json_writer_func_boolean(tb_object_json_writer_t* wri
     // ok
     return tb_true;
 }
-static tb_bool_t tb_object_json_writer_func_dictionary(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level)
+static tb_bool_t tb_object_json_writer_func_dictionary(tb_object_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
 {
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
@@ -246,7 +246,7 @@ static tb_bool_t tb_object_json_writer_func_dictionary(tb_object_json_writer_t* 
     // ok
     return tb_true;
 }
-static tb_long_t tb_object_json_writer_done(tb_stream_ref_t stream, tb_object_t* object, tb_bool_t deflate)
+static tb_long_t tb_object_json_writer_done(tb_stream_ref_t stream, tb_object_ref_t object, tb_bool_t deflate)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);

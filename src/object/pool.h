@@ -77,14 +77,14 @@ tb_void_t           tb_object_pool_clear(tb_handle_t pool);
  *
  * @return          the object pointer
  */
-tb_object_t*        tb_object_pool_get_(tb_handle_t pool, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__);
+tb_object_ref_t     tb_object_pool_get_(tb_handle_t pool, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__);
 
 /*! del object from object_pool
  *
  * @param pool      the object pool
  * @param object    the object pointer
  */
-tb_void_t           tb_object_pool_del_(tb_handle_t pool, tb_object_t* object __tb_debug_decl__);
+tb_void_t           tb_object_pool_del_(tb_handle_t pool, tb_object_ref_t object __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! dump object pool
