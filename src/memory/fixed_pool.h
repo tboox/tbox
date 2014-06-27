@@ -42,6 +42,13 @@ __tb_extern_c_enter__
 #define TB_FIXED_POOL_GROW_LARGE                (4096)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the fixed pool ref type
+typedef struct{}*   tb_fixed_pool_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -51,63 +58,63 @@ __tb_extern_c_enter__
  * @param step      the step
  * @param align     the align
  *
- * @return          the pool handle
+ * @return          the pool 
  */
-tb_handle_t         tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align);
+tb_fixed_pool_ref_t tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align);
 
 /*! exit fixed pool
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  */
-tb_void_t           tb_fixed_pool_exit(tb_handle_t handle);
+tb_void_t           tb_fixed_pool_exit(tb_fixed_pool_ref_t pool);
 
 /*! the fixed pool item count
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  *
  * @return          the item count
  */
-tb_size_t           tb_fixed_pool_size(tb_handle_t handle);
+tb_size_t           tb_fixed_pool_size(tb_fixed_pool_ref_t pool);
 
 /*! clear fixed pool
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  */
-tb_void_t           tb_fixed_pool_clear(tb_handle_t handle);
+tb_void_t           tb_fixed_pool_clear(tb_fixed_pool_ref_t pool);
 
 /*! malloc fixed pool data
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * 
  * @return          the data pointer
  */
-tb_pointer_t        tb_fixed_pool_malloc(tb_handle_t handle);
+tb_pointer_t        tb_fixed_pool_malloc(tb_fixed_pool_ref_t pool);
 
 /*! malloc fixed pool data and clear it
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  *
  * @return          the data pointer
  */
-tb_pointer_t        tb_fixed_pool_malloc0(tb_handle_t handle);
+tb_pointer_t        tb_fixed_pool_malloc0(tb_fixed_pool_ref_t pool);
 
 /*! duplicate fixed pool data 
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param data      the data pointer
  *
  * @return          the duplicated data pointer
  */
-tb_pointer_t        tb_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data);
+tb_pointer_t        tb_fixed_pool_memdup(tb_fixed_pool_ref_t pool, tb_cpointer_t data);
 
 /*! free fixed pool data
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param data      the pool item data
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
+tb_bool_t           tb_fixed_pool_free(tb_fixed_pool_ref_t pool, tb_pointer_t data);
 
 /*! walk fixed pool item
  *
@@ -119,19 +126,19 @@ tb_bool_t           tb_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
     }
  * @endcode
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param func      the walk func
  * @param priv      the walk data
  *
  */
-tb_void_t           tb_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_cpointer_t data), tb_cpointer_t priv);
+tb_void_t           tb_fixed_pool_walk(tb_fixed_pool_ref_t pool, tb_bool_t (*func)(tb_pointer_t item, tb_cpointer_t data), tb_cpointer_t priv);
 
 #ifdef __tb_debug__
 /*! dump fixed pool
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  */
-tb_void_t           tb_fixed_pool_dump(tb_handle_t handle);
+tb_void_t           tb_fixed_pool_dump(tb_fixed_pool_ref_t pool);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

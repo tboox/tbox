@@ -78,6 +78,7 @@ tb_item_func_t tb_item_func_true()
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_TRUE;
+    func.flag   = 0;
     func.hash   = tb_item_func_true_hash;
     func.comp   = tb_item_func_true_comp;
     func.data   = tb_item_func_true_data;

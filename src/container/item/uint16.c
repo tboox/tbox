@@ -101,6 +101,7 @@ tb_item_func_t tb_item_func_uint16()
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_UINT16;
+    func.flag   = 0;
     func.hash   = tb_item_func_uint16_hash;
     func.comp   = tb_item_func_uint16_comp;
     func.data   = tb_item_func_uint16_data;

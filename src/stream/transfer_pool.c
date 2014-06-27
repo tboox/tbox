@@ -56,7 +56,7 @@ typedef struct __tb_transfer_pool_impl_t
     tb_spinlock_t                   lock;
 
     // the task pool
-    tb_handle_t                     pool;
+    tb_fixed_pool_ref_t             pool;
 
     // the idle task list
     tb_vector_ref_t                 idle;

@@ -147,9 +147,13 @@ static tb_void_t tb_item_func_mem_ncopy(tb_item_func_t* func, tb_pointer_t item,
  */
 tb_item_func_t tb_item_func_mem(tb_size_t size, tb_item_func_free_t free, tb_cpointer_t priv)
 {
+    // check
+    tb_assert(size < TB_MAXU16);
+
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_MEM;
+    func.flag   = 0;
     func.hash   = tb_item_func_mem_hash;
     func.comp   = tb_item_func_mem_comp;
     func.data   = tb_item_func_mem_data;
@@ -162,7 +166,7 @@ tb_item_func_t tb_item_func_mem(tb_size_t size, tb_item_func_free_t free, tb_cpo
     func.ndupl  = tb_item_func_mem_ndupl;
     func.nrepl  = tb_item_func_mem_nrepl;
     func.ncopy  = tb_item_func_mem_ncopy;
-    func.size   = size;
+    func.size   = (tb_uint16_t)size;
     func.priv   = priv;
 
     // ok?

@@ -138,10 +138,10 @@ static tb_demo_t g_demo[] =
 
     // memory
 ,   TB_DEMO_MAIN_ITEM(memory_check)
+,   TB_DEMO_MAIN_ITEM(memory_static_tiny_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_static_fixed_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_global_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_pool)
-,   TB_DEMO_MAIN_ITEM(memory_tiny_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_static_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_fixed_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_memops)

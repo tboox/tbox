@@ -117,10 +117,10 @@ TB_DEMO_MAIN_DECL(string_static_string);
 
 // memory
 TB_DEMO_MAIN_DECL(memory_check);
+TB_DEMO_MAIN_DECL(memory_static_tiny_pool);
 TB_DEMO_MAIN_DECL(memory_static_fixed_pool);
 TB_DEMO_MAIN_DECL(memory_global_pool);
 TB_DEMO_MAIN_DECL(memory_pool);
-TB_DEMO_MAIN_DECL(memory_tiny_pool);
 TB_DEMO_MAIN_DECL(memory_static_pool);
 TB_DEMO_MAIN_DECL(memory_fixed_pool);
 TB_DEMO_MAIN_DECL(memory_memops);

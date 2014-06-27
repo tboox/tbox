@@ -160,7 +160,7 @@ tb_object_ref_t tb_object_dictionary_init(tb_size_t size, tb_size_t incr)
         dictionary->incr = incr;
 
         // init hash
-        dictionary->hash = tb_hash_init(size, tb_item_func_string_pool(tb_object_string_pool()), tb_item_func_obj());
+        dictionary->hash = tb_hash_init(size, tb_item_func_string_pool(tb_string_pool()), tb_item_func_obj());
         tb_assert_and_check_break(dictionary->hash);
 
         // ok

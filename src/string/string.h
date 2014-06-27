@@ -27,8 +27,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "string_pool.h"
+#include "pool.h"
 #include "static_string.h"
 #include "../memory/memory.h"
 

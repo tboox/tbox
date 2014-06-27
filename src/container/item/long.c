@@ -99,6 +99,7 @@ tb_item_func_t tb_item_func_long()
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_LONG;
+    func.flag   = 0;
     func.hash   = func_size.hash;
     func.comp   = tb_item_func_long_comp;
     func.data   = tb_item_func_long_data;

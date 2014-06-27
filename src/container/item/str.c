@@ -41,7 +41,7 @@ static tb_long_t tb_item_func_str_comp(tb_item_func_t* func, tb_cpointer_t ldata
     tb_assert_and_check_return_val(func && ldata && rdata, 0);
 
     // compare it
-    return func->priv? tb_strcmp((tb_char_t const*)ldata, (tb_char_t const*)rdata) : tb_stricmp((tb_char_t const*)ldata, (tb_char_t const*)rdata);
+    return func->flag? tb_strcmp((tb_char_t const*)ldata, (tb_char_t const*)rdata) : tb_stricmp((tb_char_t const*)ldata, (tb_char_t const*)rdata);
 }
 static tb_pointer_t tb_item_func_str_data(tb_item_func_t* func, tb_cpointer_t item)
 {
@@ -64,7 +64,7 @@ static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_pointer_t item)
     if (*((tb_pointer_t*)item)) 
     {
         // free it
-        if (func->pool) tb_pool_free(func->pool, *((tb_pointer_t*)item));
+        if (func->pool) tb_pool_free((tb_pool_ref_t)func->pool, *((tb_pointer_t*)item));
         else tb_free(*((tb_pointer_t*)item));
 
         // clear it
@@ -77,7 +77,7 @@ static tb_void_t tb_item_func_str_dupl(tb_item_func_t* func, tb_pointer_t item, 
     tb_assert_and_check_return(func && item);
 
     // duplicate it
-    if (data) *((tb_char_t const**)item) = func->pool? tb_pool_strdup(func->pool, (tb_char_t const*)data) : tb_strdup((tb_char_t const*)data);
+    if (data) *((tb_char_t const**)item) = func->pool? tb_pool_strdup((tb_pool_ref_t)func->pool, (tb_char_t const*)data) : tb_strdup((tb_char_t const*)data);
     // clear it
     else *((tb_char_t const**)item) = tb_null;
 }
@@ -146,11 +146,12 @@ static tb_void_t tb_item_func_str_ncopy(tb_item_func_t* func, tb_pointer_t item,
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t bpool)
+tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_pool_ref_t pool)
 {
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_STR;
+    func.flag   = !!bcase;
     func.hash   = tb_item_func_str_hash;
     func.comp   = tb_item_func_str_comp;
     func.data   = tb_item_func_str_data;
@@ -163,8 +164,7 @@ tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t bpool)
     func.ndupl  = tb_item_func_str_ndupl;
     func.nrepl  = tb_item_func_str_nrepl;
     func.ncopy  = tb_item_func_str_ncopy;
-    func.pool   = bpool;
-    func.priv   = tb_b2p(bcase);
+    func.pool   = (tb_handle_t)pool;
     func.size   = sizeof(tb_char_t*);
 
     // ok?

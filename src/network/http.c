@@ -71,7 +71,7 @@ typedef struct __tb_http_impl_t
     tb_bool_t           bopened;
 
     // the pool for string
-    tb_handle_t         pool;
+    tb_pool_ref_t       pool;
 
     // the request data
     tb_string_t         request;

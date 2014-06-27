@@ -30,7 +30,6 @@
 #include "prefix.h"
 #include "static_pool.h"
 #include "static_fixed_pool.h"
-#include "static_tiny_pool.h"
 #include "global_pool.h"
 #include "pool.h"
 #include "fixed_pool.h"
