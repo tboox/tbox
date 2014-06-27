@@ -32,7 +32,7 @@
  * includes
  */
 #include "filter.h"
-#include "impl.h"
+#include "impl/filter/prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

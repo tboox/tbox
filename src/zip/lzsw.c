@@ -303,7 +303,7 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inflate
  */
-static tb_static_stream_t* tb_stream_filter_zip_inflate_lzsw_transform(tb_stream_filter_t* st)
+static tb_static_stream_ref_t tb_stream_filter_zip_inflate_lzsw_transform(tb_stream_filter_t* st)
 {
     tb_lzsw_inflate_stream_filter_zip_t* zst = (tb_lzsw_inflate_stream_filter_zip_t*)st;
     tb_assert(zst);
@@ -317,7 +317,7 @@ static tb_static_stream_t* tb_stream_filter_zip_inflate_lzsw_transform(tb_stream
     if (!dp || !de) return tb_null;
 
     // get src
-    tb_static_stream_t* src = tb_stream_filter_src(st);
+    tb_static_stream_ref_t src = tb_stream_filter_src(st);
 
     // get vlc
     tb_stream_filter_zip_vlc_t* vlc = zst->vlc;
@@ -408,7 +408,7 @@ static tb_void_t tb_stream_filter_zip_inflate_lzsw_clos(tb_stream_filter_t* st)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * deflate
  */
-static tb_static_stream_t* tb_stream_filter_zip_deflate_lzsw_transform(tb_stream_filter_t* st)
+static tb_static_stream_ref_t tb_stream_filter_zip_deflate_lzsw_transform(tb_stream_filter_t* st)
 {
     tb_lzsw_deflate_stream_filter_zip_t* zst = (tb_lzsw_deflate_stream_filter_zip_t*)st;
     tb_assert(zst);
@@ -422,7 +422,7 @@ static tb_static_stream_t* tb_stream_filter_zip_deflate_lzsw_transform(tb_stream
     if (!sp || !se) return tb_null;
 
     // get dst
-    tb_static_stream_t* dst = tb_stream_filter_dst(st);
+    tb_static_stream_ref_t dst = tb_stream_filter_dst(st);
 
     // get vlc
     tb_stream_filter_zip_vlc_t* vlc = zst->vlc;

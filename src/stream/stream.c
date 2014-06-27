@@ -32,7 +32,7 @@
  * includes
  */
 #include "stream.h"
-#include "impl/impl.h"
+#include "impl/stream/prefix.h"
 #include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"

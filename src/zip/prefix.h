@@ -69,7 +69,7 @@ typedef struct __tb_zip_t
     tb_uint16_t             action;
 
     // spak
-    tb_long_t               (*spak)(struct __tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync);
+    tb_long_t               (*spak)(struct __tb_zip_t* zip, tb_static_stream_ref_t ist, tb_static_stream_ref_t ost, tb_long_t sync);
 
     // the vlc 
     union __tb_zip_vlc_union_t

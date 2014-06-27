@@ -18,16 +18,14 @@
  *
  * @author      ruki
  * @file        zip.c
- * @ingroup     stream
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "filter.h"
-#include "impl.h"
-#include "../../zip/zip.h"
+#include "prefix.h"
+#include "../../../zip/zip.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -82,7 +80,7 @@ static tb_void_t tb_stream_filter_zip_clos(tb_stream_filter_impl_t* filter)
     if (zfilter->zip) tb_zip_exit(zfilter->zip);
     zfilter->zip = tb_null;
 }
-static tb_long_t tb_stream_filter_zip_spak(tb_stream_filter_impl_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
+static tb_long_t tb_stream_filter_zip_spak(tb_stream_filter_impl_t* filter, tb_static_stream_ref_t istream, tb_static_stream_ref_t ostream, tb_long_t sync)
 {
     // check
     tb_stream_filter_zip_t* zfilter = tb_stream_filter_zip_cast(filter);

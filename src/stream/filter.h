@@ -30,9 +30,45 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the stream filter ctrl
+#define TB_STREAM_FILTER_CTRL(type, ctrl)               (((type) << 16) | (ctrl))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the filter type enum
+typedef enum __tb_stream_filter_type_e
+{
+    TB_STREAM_FILTER_TYPE_NONE      = 0
+,   TB_STREAM_FILTER_TYPE_ZIP       = 1
+,   TB_STREAM_FILTER_TYPE_CACHE     = 2
+,   TB_STREAM_FILTER_TYPE_CHARSET   = 3
+,   TB_STREAM_FILTER_TYPE_CHUNKED   = 4
+
+}tb_stream_filter_type_e;
+
+/// the filter ctrl enum
+typedef enum __tb_stream_filter_ctrl_e
+{
+    TB_STREAM_FILTER_CTRL_NONE                  = 0
+,   TB_STREAM_FILTER_CTRL_ZIP_GET_ALGO          = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 1)
+,   TB_STREAM_FILTER_CTRL_ZIP_GET_ACTION        = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 2)
+,   TB_STREAM_FILTER_CTRL_ZIP_SET_ALGO          = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 3)
+,   TB_STREAM_FILTER_CTRL_ZIP_SET_ACTION        = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 4)
+
+}tb_stream_filter_ctrl_e;
+
+/// the stream filter ref type
+typedef struct{}*       tb_stream_filter_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

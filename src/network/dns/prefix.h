@@ -162,7 +162,7 @@ static __tb_inline__ tb_char_t const* tb_dns_decode_name_impl(tb_char_t const* s
     *pd = q;
     return p;
 }
-static __tb_inline__ tb_char_t const* tb_dns_decode_name(tb_static_stream_t* sstream, tb_char_t* name)
+static __tb_inline__ tb_char_t const* tb_dns_decode_name(tb_static_stream_ref_t sstream, tb_char_t* name)
 {
     tb_char_t* q = name;
     tb_char_t* p = (tb_char_t*)tb_dns_decode_name_impl((tb_char_t const*)tb_static_stream_beg(sstream), (tb_char_t const*)tb_static_stream_end(sstream), (tb_char_t const*)tb_static_stream_pos(sstream), &q);

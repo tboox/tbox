@@ -65,7 +65,7 @@ tb_void_t           tb_zip_exit(tb_zip_ref_t zip);
  *
  * @return          1: ok, 0: continue, -1: end
  */
-tb_long_t           tb_zip_spak(tb_zip_ref_t zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync);
+tb_long_t           tb_zip_spak(tb_zip_ref_t zip, tb_static_stream_ref_t ist, tb_static_stream_ref_t ost, tb_long_t sync);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

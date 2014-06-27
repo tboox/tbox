@@ -31,8 +31,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_charset_utf16_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf16_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_utf16_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf16_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch)
 {
     // init
     tb_byte_t const*    p = tb_static_stream_pos(sstream);
@@ -71,8 +71,8 @@ tb_long_t tb_charset_utf16_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uin
     return p > q? 1 : 0;
 }
 
-tb_long_t tb_charset_utf16_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_utf16_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_utf16_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf16_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch)
 {
     // init
     tb_size_t n = tb_static_stream_left(sstream);

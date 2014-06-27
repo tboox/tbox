@@ -40,8 +40,8 @@
  * 0x00200000 - 0x03ffffff:  111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
  * 0x04000000 - 0x7fffffff:  1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
  */
-tb_long_t tb_charset_utf8_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf8_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t* ch)
+tb_long_t tb_charset_utf8_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf8_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch)
 {
     // init
     tb_byte_t const*    p = tb_static_stream_pos(sstream);
@@ -126,8 +126,8 @@ tb_long_t tb_charset_utf8_get(tb_static_stream_t* sstream, tb_bool_t be, tb_uint
     return p > q? 1 : 0;
 }
 
-tb_long_t tb_charset_utf8_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch);
-tb_long_t tb_charset_utf8_set(tb_static_stream_t* sstream, tb_bool_t be, tb_uint32_t ch)
+tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch)
 {
     // init
     tb_byte_t*  p = (tb_byte_t*)tb_static_stream_pos(sstream);

@@ -28,5 +28,84 @@
  */
 #include "../prefix.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the stream impl
+#define tb_stream_impl(stream)          ((stream)? &(((tb_stream_impl_t*)(stream))[-1]) : tb_null)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the stream impl type
+typedef struct __tb_stream_impl_t
+{   
+    // the stream type
+    tb_uint8_t          type;
+
+    // is writed?
+    tb_uint8_t          bwrited;
+
+    // the url
+    tb_url_t            url;
+
+    /* internal state
+     *
+     * <pre>
+     * TB_STATE_CLOSED
+     * TB_STATE_OPENED
+     * TB_STATE_KILLED
+     * TB_STATE_OPENING
+     * TB_STATE_KILLING
+     * </pre>
+     */
+    tb_atomic_t         istate;
+
+    // the timeout
+    tb_long_t           timeout;
+
+    // the state
+    tb_size_t           state;
+
+    // the offset
+    tb_hize_t           offset;
+
+    // the cache
+    tb_queue_buffer_t   cache;
+
+    // wait 
+    tb_long_t           (*wait)(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout);
+
+    // open
+    tb_bool_t           (*open)(tb_stream_ref_t stream);
+
+    // clos
+    tb_bool_t           (*clos)(tb_stream_ref_t stream);
+
+    // read
+    tb_long_t           (*read)(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size);
+
+    // writ
+    tb_long_t           (*writ)(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
+
+    // seek
+    tb_bool_t           (*seek)(tb_stream_ref_t stream, tb_hize_t offset);
+
+    // sync
+    tb_bool_t           (*sync)(tb_stream_ref_t stream, tb_bool_t bclosing);
+
+    // ctrl 
+    tb_bool_t           (*ctrl)(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args);
+
+    // exit
+    tb_void_t           (*exit)(tb_stream_ref_t stream);
+
+    // kill
+    tb_void_t           (*kill)(tb_stream_ref_t stream);
+
+}tb_stream_impl_t;
+
 
 #endif

@@ -17,18 +17,19 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
+ * @file        prefix.h
  *
  */
-#ifndef TB_STREAM_FILTER_IMPL_H
-#define TB_STREAM_FILTER_IMPL_H
+#ifndef TB_STREAM_IMPL_FILTER_PREFIX_H
+#define TB_STREAM_IMPL_FILTER_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "../static_stream.h"
-#include "../../memory/memory.h"
+#include "../../filter.h"
+#include "../../static_stream.h"
+#include "../../../memory/memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -65,7 +66,7 @@ typedef struct __tb_stream_filter_impl_t
     tb_void_t           (*clos)(struct __tb_stream_filter_impl_t* impl);
 
     // the spak
-    tb_long_t           (*spak)(struct __tb_stream_filter_impl_t* impl, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
+    tb_long_t           (*spak)(struct __tb_stream_filter_impl_t* impl, tb_static_stream_ref_t istream, tb_static_stream_ref_t ostream, tb_long_t sync);
 
     // the ctrl
     tb_bool_t           (*ctrl)(struct __tb_stream_filter_impl_t* impl, tb_size_t ctrl, tb_va_list_t args);

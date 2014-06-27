@@ -139,6 +139,9 @@ typedef struct __tb_static_stream_t
 
 }tb_static_stream_t;
 
+/// the static stream ref type
+typedef tb_static_stream_t*    tb_static_stream_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -151,7 +154,7 @@ typedef struct __tb_static_stream_t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_init(tb_static_stream_t* stream, tb_byte_t* data, tb_size_t size);
+tb_bool_t           tb_static_stream_init(tb_static_stream_ref_t stream, tb_byte_t* data, tb_size_t size);
 
 /*! goto the new data address for updating the stream position
  *
@@ -160,7 +163,7 @@ tb_bool_t           tb_static_stream_init(tb_static_stream_t* stream, tb_byte_t*
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_goto(tb_static_stream_t* stream, tb_byte_t* data);
+tb_bool_t           tb_static_stream_goto(tb_static_stream_ref_t stream, tb_byte_t* data);
 
 /*! sync the stream position if update some bits offset
  *
@@ -168,7 +171,7 @@ tb_bool_t           tb_static_stream_goto(tb_static_stream_t* stream, tb_byte_t*
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_sync(tb_static_stream_t* stream);
+tb_bool_t           tb_static_stream_sync(tb_static_stream_ref_t stream);
 
 /*! the stream start data address
  *
@@ -176,7 +179,7 @@ tb_bool_t           tb_static_stream_sync(tb_static_stream_t* stream);
  *
  * @return          the start data address
  */
-tb_byte_t const*    tb_static_stream_beg(tb_static_stream_t* stream);
+tb_byte_t const*    tb_static_stream_beg(tb_static_stream_ref_t stream);
 
 /*! the stream current data address
  *
@@ -184,7 +187,7 @@ tb_byte_t const*    tb_static_stream_beg(tb_static_stream_t* stream);
  *
  * @return          the current data address
  */
-tb_byte_t const*    tb_static_stream_pos(tb_static_stream_t* stream);
+tb_byte_t const*    tb_static_stream_pos(tb_static_stream_ref_t stream);
 
 /*! the stream end data address
  *
@@ -192,7 +195,7 @@ tb_byte_t const*    tb_static_stream_pos(tb_static_stream_t* stream);
  *
  * @return          the end data address
  */
-tb_byte_t const*    tb_static_stream_end(tb_static_stream_t* stream);
+tb_byte_t const*    tb_static_stream_end(tb_static_stream_ref_t stream);
 
 /*! the stream offset
  *
@@ -200,7 +203,7 @@ tb_byte_t const*    tb_static_stream_end(tb_static_stream_t* stream);
  *
  * @return          the offset
  */
-tb_size_t           tb_static_stream_offset(tb_static_stream_t* stream);
+tb_size_t           tb_static_stream_offset(tb_static_stream_ref_t stream);
 
 /*! the stream data size
  *
@@ -208,7 +211,7 @@ tb_size_t           tb_static_stream_offset(tb_static_stream_t* stream);
  *
  * @return          the data size
  */
-tb_size_t           tb_static_stream_size(tb_static_stream_t* stream);
+tb_size_t           tb_static_stream_size(tb_static_stream_ref_t stream);
 
 /*! the stream left size
  *
@@ -216,7 +219,7 @@ tb_size_t           tb_static_stream_size(tb_static_stream_t* stream);
  *
  * @return          the left size
  */
-tb_size_t           tb_static_stream_left(tb_static_stream_t* stream);
+tb_size_t           tb_static_stream_left(tb_static_stream_ref_t stream);
 
 /*! the stream left bits
  *
@@ -224,7 +227,7 @@ tb_size_t           tb_static_stream_left(tb_static_stream_t* stream);
  *
  * @return          the left bits
  */
-tb_size_t           tb_static_stream_left_bits(tb_static_stream_t* stream);
+tb_size_t           tb_static_stream_left_bits(tb_static_stream_ref_t stream);
 
 /*! the stream is valid?
  *
@@ -232,7 +235,7 @@ tb_size_t           tb_static_stream_left_bits(tb_static_stream_t* stream);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_valid(tb_static_stream_t* stream);
+tb_bool_t           tb_static_stream_valid(tb_static_stream_ref_t stream);
 
 /*! skip the given size 
  *
@@ -241,7 +244,7 @@ tb_bool_t           tb_static_stream_valid(tb_static_stream_t* stream);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_skip(tb_static_stream_t* stream, tb_size_t size);
+tb_bool_t           tb_static_stream_skip(tb_static_stream_ref_t stream, tb_size_t size);
 
 /*! skip the given bits 
  *
@@ -250,7 +253,7 @@ tb_bool_t           tb_static_stream_skip(tb_static_stream_t* stream, tb_size_t 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_skip_bits(tb_static_stream_t* stream, tb_size_t nbits);
+tb_bool_t           tb_static_stream_skip_bits(tb_static_stream_ref_t stream, tb_size_t nbits);
 
 /*! skip the given c-string 
  *
@@ -258,7 +261,7 @@ tb_bool_t           tb_static_stream_skip_bits(tb_static_stream_t* stream, tb_si
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_skip_cstr(tb_static_stream_t* stream);
+tb_bool_t           tb_static_stream_skip_cstr(tb_static_stream_ref_t stream);
 
 /*! peek ubits value for uint32
  *
@@ -267,7 +270,7 @@ tb_bool_t           tb_static_stream_skip_cstr(tb_static_stream_t* stream);
  *
  * @return          the ubits value
  */
-tb_uint32_t         tb_static_stream_peek_ubits32(tb_static_stream_t* stream, tb_size_t nbits);
+tb_uint32_t         tb_static_stream_peek_ubits32(tb_static_stream_ref_t stream, tb_size_t nbits);
 
 /*! peek sbits value for sint32
  *
@@ -276,7 +279,7 @@ tb_uint32_t         tb_static_stream_peek_ubits32(tb_static_stream_t* stream, tb
  *
  * @return          the sbits value
  */
-tb_sint32_t         tb_static_stream_peek_sbits32(tb_static_stream_t* stream, tb_size_t nbits);
+tb_sint32_t         tb_static_stream_peek_sbits32(tb_static_stream_ref_t stream, tb_size_t nbits);
 
 /*! read c-string
  *
@@ -284,7 +287,7 @@ tb_sint32_t         tb_static_stream_peek_sbits32(tb_static_stream_t* stream, tb
  *
  * @return          the c-string
  */
-tb_char_t const*    tb_static_stream_read_cstr(tb_static_stream_t* stream);
+tb_char_t const*    tb_static_stream_read_cstr(tb_static_stream_ref_t stream);
 
 /*! read data
  *
@@ -294,7 +297,7 @@ tb_char_t const*    tb_static_stream_read_cstr(tb_static_stream_t* stream);
  *
  * @return          the data real size
  */
-tb_size_t           tb_static_stream_read_data(tb_static_stream_t* stream, tb_byte_t* data, tb_size_t size);
+tb_size_t           tb_static_stream_read_data(tb_static_stream_ref_t stream, tb_byte_t* data, tb_size_t size);
 
 /*! read ubits value for uint32
  *
@@ -303,7 +306,7 @@ tb_size_t           tb_static_stream_read_data(tb_static_stream_t* stream, tb_by
  *
  * @return          the ubits value
  */
-tb_uint32_t         tb_static_stream_read_ubits32(tb_static_stream_t* stream, tb_size_t nbits);
+tb_uint32_t         tb_static_stream_read_ubits32(tb_static_stream_ref_t stream, tb_size_t nbits);
 
 /*! read sbits value for sint32
  *
@@ -312,7 +315,7 @@ tb_uint32_t         tb_static_stream_read_ubits32(tb_static_stream_t* stream, tb
  *
  * @return          the sbits value
  */
-tb_sint32_t         tb_static_stream_read_sbits32(tb_static_stream_t* stream, tb_size_t nbits);
+tb_sint32_t         tb_static_stream_read_sbits32(tb_static_stream_ref_t stream, tb_size_t nbits);
 
 /*! read ubits1 value
  *
@@ -320,7 +323,7 @@ tb_sint32_t         tb_static_stream_read_sbits32(tb_static_stream_t* stream, tb
  *
  * @return          the ubits1 value
  */
-tb_uint8_t          tb_static_stream_read_u1(tb_static_stream_t* stream);
+tb_uint8_t          tb_static_stream_read_u1(tb_static_stream_ref_t stream);
 
 /*! read uint8 integer
  *
@@ -328,7 +331,7 @@ tb_uint8_t          tb_static_stream_read_u1(tb_static_stream_t* stream);
  *
  * @return          the uint8 integer
  */
-tb_uint8_t          tb_static_stream_read_u8(tb_static_stream_t* stream);
+tb_uint8_t          tb_static_stream_read_u8(tb_static_stream_ref_t stream);
 
 /*! read sint8 integer
  *
@@ -336,7 +339,7 @@ tb_uint8_t          tb_static_stream_read_u8(tb_static_stream_t* stream);
  *
  * @return          the sint8 integer
  */
-tb_sint8_t          tb_static_stream_read_s8(tb_static_stream_t* stream);
+tb_sint8_t          tb_static_stream_read_s8(tb_static_stream_ref_t stream);
 
 /*! read uint16-be integer
  *
@@ -344,7 +347,7 @@ tb_sint8_t          tb_static_stream_read_s8(tb_static_stream_t* stream);
  *
  * @return          the uint16-be integer
  */
-tb_uint16_t         tb_static_stream_read_u16_be(tb_static_stream_t* stream);
+tb_uint16_t         tb_static_stream_read_u16_be(tb_static_stream_ref_t stream);
 
 /*! read sint16-be integer
  *
@@ -352,7 +355,7 @@ tb_uint16_t         tb_static_stream_read_u16_be(tb_static_stream_t* stream);
  *
  * @return          the sint16-be integer
  */
-tb_sint16_t         tb_static_stream_read_s16_be(tb_static_stream_t* stream);
+tb_sint16_t         tb_static_stream_read_s16_be(tb_static_stream_ref_t stream);
 
 /*! read uint16-le integer
  *
@@ -360,7 +363,7 @@ tb_sint16_t         tb_static_stream_read_s16_be(tb_static_stream_t* stream);
  *
  * @return          the uint16-le integer
  */
-tb_uint16_t         tb_static_stream_read_u16_le(tb_static_stream_t* stream);
+tb_uint16_t         tb_static_stream_read_u16_le(tb_static_stream_ref_t stream);
 
 /*! read sint16-le integer
  *
@@ -368,7 +371,7 @@ tb_uint16_t         tb_static_stream_read_u16_le(tb_static_stream_t* stream);
  *
  * @return          the sint16-le integer
  */
-tb_sint16_t         tb_static_stream_read_s16_le(tb_static_stream_t* stream);
+tb_sint16_t         tb_static_stream_read_s16_le(tb_static_stream_ref_t stream);
 
 /*! read uint24-be integer
  *
@@ -376,7 +379,7 @@ tb_sint16_t         tb_static_stream_read_s16_le(tb_static_stream_t* stream);
  *
  * @return          the uint24-be integer
  */
-tb_uint32_t         tb_static_stream_read_u24_be(tb_static_stream_t* stream);
+tb_uint32_t         tb_static_stream_read_u24_be(tb_static_stream_ref_t stream);
 
 /*! read sint24-be integer
  *
@@ -384,7 +387,7 @@ tb_uint32_t         tb_static_stream_read_u24_be(tb_static_stream_t* stream);
  *
  * @return          the sint24-be integer
  */
-tb_sint32_t         tb_static_stream_read_s24_be(tb_static_stream_t* stream);
+tb_sint32_t         tb_static_stream_read_s24_be(tb_static_stream_ref_t stream);
 
 /*! read uint24-le integer
  *
@@ -392,7 +395,7 @@ tb_sint32_t         tb_static_stream_read_s24_be(tb_static_stream_t* stream);
  *
  * @return          the uint24-le integer
  */
-tb_uint32_t         tb_static_stream_read_u24_le(tb_static_stream_t* stream);
+tb_uint32_t         tb_static_stream_read_u24_le(tb_static_stream_ref_t stream);
 
 /*! read sint24-le integer
  *
@@ -400,7 +403,7 @@ tb_uint32_t         tb_static_stream_read_u24_le(tb_static_stream_t* stream);
  *
  * @return          the sint24-le integer
  */
-tb_sint32_t         tb_static_stream_read_s24_le(tb_static_stream_t* stream);
+tb_sint32_t         tb_static_stream_read_s24_le(tb_static_stream_ref_t stream);
 
 /*! read uint32-be integer
  *
@@ -408,7 +411,7 @@ tb_sint32_t         tb_static_stream_read_s24_le(tb_static_stream_t* stream);
  *
  * @return          the uint32-be integer
  */
-tb_uint32_t         tb_static_stream_read_u32_be(tb_static_stream_t* stream);
+tb_uint32_t         tb_static_stream_read_u32_be(tb_static_stream_ref_t stream);
 
 /*! read sint32-be integer
  *
@@ -416,7 +419,7 @@ tb_uint32_t         tb_static_stream_read_u32_be(tb_static_stream_t* stream);
  *
  * @return          the sint32-be integer
  */
-tb_sint32_t         tb_static_stream_read_s32_be(tb_static_stream_t* stream);
+tb_sint32_t         tb_static_stream_read_s32_be(tb_static_stream_ref_t stream);
 
 /*! read uint32-le integer
  *
@@ -424,7 +427,7 @@ tb_sint32_t         tb_static_stream_read_s32_be(tb_static_stream_t* stream);
  *
  * @return          the uint32-le integer
  */
-tb_uint32_t         tb_static_stream_read_u32_le(tb_static_stream_t* stream);
+tb_uint32_t         tb_static_stream_read_u32_le(tb_static_stream_ref_t stream);
 
 /*! read sint32-le integer
  *
@@ -432,7 +435,7 @@ tb_uint32_t         tb_static_stream_read_u32_le(tb_static_stream_t* stream);
  *
  * @return          the sint32-le integer
  */
-tb_sint32_t         tb_static_stream_read_s32_le(tb_static_stream_t* stream);
+tb_sint32_t         tb_static_stream_read_s32_le(tb_static_stream_ref_t stream);
 
 /*! read uint64-be integer
  *
@@ -440,7 +443,7 @@ tb_sint32_t         tb_static_stream_read_s32_le(tb_static_stream_t* stream);
  *
  * @return          the uint64-be integer
  */
-tb_uint64_t         tb_static_stream_read_u64_be(tb_static_stream_t* stream);
+tb_uint64_t         tb_static_stream_read_u64_be(tb_static_stream_ref_t stream);
 
 /*! read sint64-be integer
  *
@@ -448,7 +451,7 @@ tb_uint64_t         tb_static_stream_read_u64_be(tb_static_stream_t* stream);
  *
  * @return          the sint64-be integer
  */
-tb_sint64_t         tb_static_stream_read_s64_be(tb_static_stream_t* stream);
+tb_sint64_t         tb_static_stream_read_s64_be(tb_static_stream_ref_t stream);
 
 /*! read uint64-le integer
  *
@@ -456,7 +459,7 @@ tb_sint64_t         tb_static_stream_read_s64_be(tb_static_stream_t* stream);
  *
  * @return          the uint64-le integer
  */
-tb_uint64_t         tb_static_stream_read_u64_le(tb_static_stream_t* stream);
+tb_uint64_t         tb_static_stream_read_u64_le(tb_static_stream_ref_t stream);
 
 /*! read sint64-le integer
  *
@@ -464,7 +467,7 @@ tb_uint64_t         tb_static_stream_read_u64_le(tb_static_stream_t* stream);
  *
  * @return          the sint64-le integer
  */
-tb_sint64_t         tb_static_stream_read_s64_le(tb_static_stream_t* stream);
+tb_sint64_t         tb_static_stream_read_s64_le(tb_static_stream_ref_t stream);
 
 /*! writ c-string
  *
@@ -473,7 +476,7 @@ tb_sint64_t         tb_static_stream_read_s64_le(tb_static_stream_t* stream);
  *
  * @return          the writed c-string address
  */
-tb_char_t*          tb_static_stream_writ_cstr(tb_static_stream_t* stream, tb_char_t const* cstr);
+tb_char_t*          tb_static_stream_writ_cstr(tb_static_stream_ref_t stream, tb_char_t const* cstr);
 
 /*! writ data
  *
@@ -483,7 +486,7 @@ tb_char_t*          tb_static_stream_writ_cstr(tb_static_stream_t* stream, tb_ch
  *
  * @return          the writed data size
  */
-tb_size_t           tb_static_stream_writ_data(tb_static_stream_t* stream, tb_byte_t const* data, tb_size_t size);
+tb_size_t           tb_static_stream_writ_data(tb_static_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
 
 /*! writ ubits for uint32
  *
@@ -493,7 +496,7 @@ tb_size_t           tb_static_stream_writ_data(tb_static_stream_t* stream, tb_by
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_ubits32(tb_static_stream_t* stream, tb_uint32_t val, tb_size_t nbits);
+tb_bool_t           tb_static_stream_writ_ubits32(tb_static_stream_ref_t stream, tb_uint32_t val, tb_size_t nbits);
 
 /*! writ sbits for sint32
  *
@@ -503,7 +506,7 @@ tb_bool_t           tb_static_stream_writ_ubits32(tb_static_stream_t* stream, tb
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_sbits32(tb_static_stream_t* stream, tb_sint32_t val, tb_size_t nbits);
+tb_bool_t           tb_static_stream_writ_sbits32(tb_static_stream_ref_t stream, tb_sint32_t val, tb_size_t nbits);
 
 /*! writ ubits1 value
  *
@@ -512,7 +515,7 @@ tb_bool_t           tb_static_stream_writ_sbits32(tb_static_stream_t* stream, tb
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u1(tb_static_stream_t* stream, tb_uint8_t val);
+tb_bool_t           tb_static_stream_writ_u1(tb_static_stream_ref_t stream, tb_uint8_t val);
 
 /*! writ uint8 integer
  *
@@ -521,7 +524,7 @@ tb_bool_t           tb_static_stream_writ_u1(tb_static_stream_t* stream, tb_uint
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u8(tb_static_stream_t* stream, tb_uint8_t val);
+tb_bool_t           tb_static_stream_writ_u8(tb_static_stream_ref_t stream, tb_uint8_t val);
 
 /*! writ sint8 integer
  *
@@ -530,7 +533,7 @@ tb_bool_t           tb_static_stream_writ_u8(tb_static_stream_t* stream, tb_uint
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s8(tb_static_stream_t* stream, tb_sint8_t val);
+tb_bool_t           tb_static_stream_writ_s8(tb_static_stream_ref_t stream, tb_sint8_t val);
 
 /*! writ uint16-be integer
  *
@@ -539,7 +542,7 @@ tb_bool_t           tb_static_stream_writ_s8(tb_static_stream_t* stream, tb_sint
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u16_be(tb_static_stream_t* stream, tb_uint16_t val);
+tb_bool_t           tb_static_stream_writ_u16_be(tb_static_stream_ref_t stream, tb_uint16_t val);
 
 /*! writ sint16-be integer
  *
@@ -548,7 +551,7 @@ tb_bool_t           tb_static_stream_writ_u16_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s16_be(tb_static_stream_t* stream, tb_sint16_t val);
+tb_bool_t           tb_static_stream_writ_s16_be(tb_static_stream_ref_t stream, tb_sint16_t val);
 
 /*! writ uint16-le integer
  *
@@ -557,7 +560,7 @@ tb_bool_t           tb_static_stream_writ_s16_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u16_le(tb_static_stream_t* stream, tb_uint16_t val);
+tb_bool_t           tb_static_stream_writ_u16_le(tb_static_stream_ref_t stream, tb_uint16_t val);
 
 /*! writ sint16-le integer
  *
@@ -566,7 +569,7 @@ tb_bool_t           tb_static_stream_writ_u16_le(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s16_le(tb_static_stream_t* stream, tb_sint16_t val);
+tb_bool_t           tb_static_stream_writ_s16_le(tb_static_stream_ref_t stream, tb_sint16_t val);
 
 /*! writ uint24-be integer
  *
@@ -575,7 +578,7 @@ tb_bool_t           tb_static_stream_writ_s16_le(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u24_be(tb_static_stream_t* stream, tb_uint32_t val);
+tb_bool_t           tb_static_stream_writ_u24_be(tb_static_stream_ref_t stream, tb_uint32_t val);
 
 /*! writ sint24-be integer
  *
@@ -584,7 +587,7 @@ tb_bool_t           tb_static_stream_writ_u24_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s24_be(tb_static_stream_t* stream, tb_sint32_t val);
+tb_bool_t           tb_static_stream_writ_s24_be(tb_static_stream_ref_t stream, tb_sint32_t val);
 
 /*! writ uint24-le integer
  *
@@ -593,7 +596,7 @@ tb_bool_t           tb_static_stream_writ_s24_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u24_le(tb_static_stream_t* stream, tb_uint32_t val);
+tb_bool_t           tb_static_stream_writ_u24_le(tb_static_stream_ref_t stream, tb_uint32_t val);
 
 /*! writ sint24-le integer
  *
@@ -602,7 +605,7 @@ tb_bool_t           tb_static_stream_writ_u24_le(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s24_le(tb_static_stream_t* stream, tb_sint32_t val);
+tb_bool_t           tb_static_stream_writ_s24_le(tb_static_stream_ref_t stream, tb_sint32_t val);
 
 /*! writ uint32-be integer
  *
@@ -611,7 +614,7 @@ tb_bool_t           tb_static_stream_writ_s24_le(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u32_be(tb_static_stream_t* stream, tb_uint32_t val);
+tb_bool_t           tb_static_stream_writ_u32_be(tb_static_stream_ref_t stream, tb_uint32_t val);
 
 /*! writ sint32-be integer
  *
@@ -620,7 +623,7 @@ tb_bool_t           tb_static_stream_writ_u32_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s32_be(tb_static_stream_t* stream, tb_sint32_t val);
+tb_bool_t           tb_static_stream_writ_s32_be(tb_static_stream_ref_t stream, tb_sint32_t val);
 
 /*! writ uint32-le integer
  *
@@ -629,7 +632,7 @@ tb_bool_t           tb_static_stream_writ_s32_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u32_le(tb_static_stream_t* stream, tb_uint32_t val);
+tb_bool_t           tb_static_stream_writ_u32_le(tb_static_stream_ref_t stream, tb_uint32_t val);
 
 /*! writ sint32-le integer
  *
@@ -638,7 +641,7 @@ tb_bool_t           tb_static_stream_writ_u32_le(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s32_le(tb_static_stream_t* stream, tb_sint32_t val);
+tb_bool_t           tb_static_stream_writ_s32_le(tb_static_stream_ref_t stream, tb_sint32_t val);
 
 /*! writ uint64-be integer
  *
@@ -647,7 +650,7 @@ tb_bool_t           tb_static_stream_writ_s32_le(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u64_be(tb_static_stream_t* stream, tb_uint64_t val);
+tb_bool_t           tb_static_stream_writ_u64_be(tb_static_stream_ref_t stream, tb_uint64_t val);
 
 /*! writ sint64-be integer
  *
@@ -656,7 +659,7 @@ tb_bool_t           tb_static_stream_writ_u64_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s64_be(tb_static_stream_t* stream, tb_sint64_t val);
+tb_bool_t           tb_static_stream_writ_s64_be(tb_static_stream_ref_t stream, tb_sint64_t val);
 
 /*! writ uint64-le integer
  *
@@ -665,7 +668,7 @@ tb_bool_t           tb_static_stream_writ_s64_be(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_u64_le(tb_static_stream_t* stream, tb_uint64_t val);
+tb_bool_t           tb_static_stream_writ_u64_le(tb_static_stream_ref_t stream, tb_uint64_t val);
 
 /*! writ sint64-le integer
  *
@@ -674,7 +677,7 @@ tb_bool_t           tb_static_stream_writ_u64_le(tb_static_stream_t* stream, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_s64_le(tb_static_stream_t* stream, tb_sint64_t val);
+tb_bool_t           tb_static_stream_writ_s64_le(tb_static_stream_ref_t stream, tb_sint64_t val);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 
@@ -684,7 +687,7 @@ tb_bool_t           tb_static_stream_writ_s64_le(tb_static_stream_t* stream, tb_
  *
  * @return          the float-le number
  */
-tb_float_t          tb_static_stream_read_float_le(tb_static_stream_t* stream);
+tb_float_t          tb_static_stream_read_float_le(tb_static_stream_ref_t stream);
 
 /*! read float-be number
  *
@@ -692,7 +695,7 @@ tb_float_t          tb_static_stream_read_float_le(tb_static_stream_t* stream);
  *
  * @return          the float-be number
  */
-tb_float_t          tb_static_stream_read_float_be(tb_static_stream_t* stream);
+tb_float_t          tb_static_stream_read_float_be(tb_static_stream_ref_t stream);
 
 /*! read double-ble number
  *
@@ -700,7 +703,7 @@ tb_float_t          tb_static_stream_read_float_be(tb_static_stream_t* stream);
  *
  * @return          the double-ble number
  */
-tb_double_t         tb_static_stream_read_double_ble(tb_static_stream_t* stream);
+tb_double_t         tb_static_stream_read_double_ble(tb_static_stream_ref_t stream);
 
 /*! read double-bbe number
  *
@@ -708,7 +711,7 @@ tb_double_t         tb_static_stream_read_double_ble(tb_static_stream_t* stream)
  *
  * @return          the double-bbe number
  */
-tb_double_t         tb_static_stream_read_double_bbe(tb_static_stream_t* stream);
+tb_double_t         tb_static_stream_read_double_bbe(tb_static_stream_ref_t stream);
 
 /*! read double-lle number
  *
@@ -716,7 +719,7 @@ tb_double_t         tb_static_stream_read_double_bbe(tb_static_stream_t* stream)
  *
  * @return          the double-lle number
  */
-tb_double_t         tb_static_stream_read_double_lle(tb_static_stream_t* stream);
+tb_double_t         tb_static_stream_read_double_lle(tb_static_stream_ref_t stream);
 
 /*! read double-lbe number
  *
@@ -724,7 +727,7 @@ tb_double_t         tb_static_stream_read_double_lle(tb_static_stream_t* stream)
  *
  * @return          the double-lbe number
  */
-tb_double_t         tb_static_stream_read_double_lbe(tb_static_stream_t* stream);
+tb_double_t         tb_static_stream_read_double_lbe(tb_static_stream_ref_t stream);
 
 /*! writ float-le number
  *
@@ -733,7 +736,7 @@ tb_double_t         tb_static_stream_read_double_lbe(tb_static_stream_t* stream)
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_float_le(tb_static_stream_t* stream, tb_float_t val);
+tb_bool_t           tb_static_stream_writ_float_le(tb_static_stream_ref_t stream, tb_float_t val);
 
 /*! writ float-be number
  *
@@ -742,7 +745,7 @@ tb_bool_t           tb_static_stream_writ_float_le(tb_static_stream_t* stream, t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_float_be(tb_static_stream_t* stream, tb_float_t val);
+tb_bool_t           tb_static_stream_writ_float_be(tb_static_stream_ref_t stream, tb_float_t val);
 
 /*! writ double-ble number
  *
@@ -751,7 +754,7 @@ tb_bool_t           tb_static_stream_writ_float_be(tb_static_stream_t* stream, t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_double_ble(tb_static_stream_t* stream, tb_double_t val);
+tb_bool_t           tb_static_stream_writ_double_ble(tb_static_stream_ref_t stream, tb_double_t val);
 
 /*! writ double-bbe number
  *
@@ -760,7 +763,7 @@ tb_bool_t           tb_static_stream_writ_double_ble(tb_static_stream_t* stream,
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_double_bbe(tb_static_stream_t* stream, tb_double_t val);
+tb_bool_t           tb_static_stream_writ_double_bbe(tb_static_stream_ref_t stream, tb_double_t val);
 
 /*! writ double-lle number
  *
@@ -769,7 +772,7 @@ tb_bool_t           tb_static_stream_writ_double_bbe(tb_static_stream_t* stream,
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_double_lle(tb_static_stream_t* stream, tb_double_t val);
+tb_bool_t           tb_static_stream_writ_double_lle(tb_static_stream_ref_t stream, tb_double_t val);
 
 /*! writ double-lbe number
  *
@@ -778,7 +781,7 @@ tb_bool_t           tb_static_stream_writ_double_lle(tb_static_stream_t* stream,
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_static_stream_writ_double_lbe(tb_static_stream_t* stream, tb_double_t val);
+tb_bool_t           tb_static_stream_writ_double_lbe(tb_static_stream_ref_t stream, tb_double_t val);
 
 #endif
 
