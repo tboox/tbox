@@ -57,8 +57,8 @@ typedef struct __tb_zip_zlib_t
  * interfaces
  */
 
-tb_zip_t*   tb_zip_zlib_init(tb_size_t action);
-tb_void_t   tb_zip_zlib_exit(tb_zip_t* zip);
+tb_zip_ref_t   tb_zip_zlib_init(tb_size_t action);
+tb_void_t   tb_zip_zlib_exit(tb_zip_ref_t zip);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

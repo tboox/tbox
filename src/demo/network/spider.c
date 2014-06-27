@@ -190,7 +190,7 @@ static tb_size_t tb_demo_spider_parser_get_url(tb_handle_t reader, tb_char_t* da
                     ||  !tb_stricmp(name, "source"))
                 {
                     // walk attributes
-                    tb_xml_node_t* attr = (tb_xml_node_t*)tb_xml_reader_attributes(reader); 
+                    tb_xml_node_ref_t attr = (tb_xml_node_ref_t)tb_xml_reader_attributes(reader); 
                     for (; attr; attr = attr->next)
                     {
                         // href or src?

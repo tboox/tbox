@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * types
  */
 
-/*!the xml node type
+/*! the xml node type
  *
  * @note see http://www.w3.org/TR/REC-DOM-Level-1/
  *
@@ -68,26 +68,30 @@ typedef struct __tb_xml_node_t
     tb_size_t                   type;
 
     /// the node name
-    tb_string_t          name;
+    tb_string_t                 name;
 
     /// the node data
-    tb_string_t          data;
+    tb_string_t                 data;
 
     /// the next
     struct __tb_xml_node_t*     next;
 
-    // the childs head
+    /// the childs head
     struct __tb_xml_node_t*     chead;
-    // the childs tail
+
+    /// the childs tail
     struct __tb_xml_node_t*     ctail;
-    // the childs size
+
+    /// the childs size
     tb_size_t                   csize;
 
-    // the attributes head
+    /// the attributes head
     struct __tb_xml_node_t*     ahead;
-    // the attributes tail
+
+    /// the attributes tail
     struct __tb_xml_node_t*     atail;
-    // the attributes size
+
+    /// the attributes size
     tb_size_t                   asize;
 
     /// the parent
@@ -149,10 +153,10 @@ typedef struct __tb_xml_document_t
     tb_xml_node_t               base;
 
     /// the version
-    tb_string_t          version;
+    tb_string_t                 version;
 
     /// the charset 
-    tb_string_t          charset;
+    tb_string_t                 charset;
 
 }tb_xml_document_t;
 
@@ -163,9 +167,12 @@ typedef struct __tb_xml_document_type_t
     tb_xml_node_t               base;
 
     /// the type 
-    tb_string_t          type;
+    tb_string_t                 type;
 
 }tb_xml_document_type_t;
+
+/// the xml node ref type
+typedef tb_xml_node_t*          tb_xml_node_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -176,28 +183,28 @@ typedef struct __tb_xml_document_type_t
  * @param name      the element name
  * @return          the element node
  */
-tb_xml_node_t*      tb_xml_node_init_element(tb_char_t const* name);
+tb_xml_node_ref_t   tb_xml_node_init_element(tb_char_t const* name);
 
 /*! init text node 
  *
  * @param data      the element text
  * @return          the element node
  */
-tb_xml_node_t*      tb_xml_node_init_text(tb_char_t const* data);
+tb_xml_node_ref_t   tb_xml_node_init_text(tb_char_t const* data);
 
 /*! init cdata node 
  *
  * @param cdata     the element cdata
  * @return          the element node
  */
-tb_xml_node_t*      tb_xml_node_init_cdata(tb_char_t const* cdata);
+tb_xml_node_ref_t   tb_xml_node_init_cdata(tb_char_t const* cdata);
 
 /*! init comment node 
  *
  * @param comment   the element comment
  * @return          the element node
  */
-tb_xml_node_t*      tb_xml_node_init_comment(tb_char_t const* comment);
+tb_xml_node_ref_t   tb_xml_node_init_comment(tb_char_t const* comment);
 
 /*! init attribute node 
  *
@@ -205,7 +212,7 @@ tb_xml_node_t*      tb_xml_node_init_comment(tb_char_t const* comment);
  * @param data      the attribute data
  * @return          the element node
  */
-tb_xml_node_t*      tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const* data);
+tb_xml_node_ref_t   tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const* data);
 
 /*! init document node 
  *
@@ -213,108 +220,108 @@ tb_xml_node_t*      tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t 
  * @param encoding  the xml encoding
  * @return          the element node
  */
-tb_xml_node_t*      tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* encoding);
+tb_xml_node_ref_t   tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* encoding);
 
 /*! init document type node 
  *
  * @param type      the document type
  * @return          the element node
  */
-tb_xml_node_t*      tb_xml_node_init_document_type(tb_char_t const* type);
+tb_xml_node_ref_t   tb_xml_node_init_document_type(tb_char_t const* type);
 
 /*! exit the xml node 
  *
  * @param node      the element node
  */
-tb_void_t           tb_xml_node_exit(tb_xml_node_t* node);
+tb_void_t           tb_xml_node_exit(tb_xml_node_ref_t node);
 
 /*! goto node by the gived path
  *
  * @param node      the root node
  * @return          the goto node
  */
-tb_xml_node_t*      tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path);
+tb_xml_node_ref_t   tb_xml_node_goto(tb_xml_node_ref_t node, tb_char_t const* path);
 
 /*! the xml childs head node
  *
  * @param node      the xml node
  * @return          the xml childs head node
  */
-tb_xml_node_t*      tb_xml_node_chead(tb_xml_node_t const* node);
+tb_xml_node_ref_t   tb_xml_node_chead(tb_xml_node_ref_t node);
 
 /*! the xml childs count
  *
  * @param node      the xml node
  * @return          the xml childs count
  */
-tb_size_t           tb_xml_node_csize(tb_xml_node_t const* node);
+tb_size_t           tb_xml_node_csize(tb_xml_node_ref_t node);
 
 /*! the xml attributes head node
  *
  * @param node      the xml node
  * @return          the xml attributes head node
  */
-tb_xml_node_t*      tb_xml_node_ahead(tb_xml_node_t const* node);
+tb_xml_node_ref_t   tb_xml_node_ahead(tb_xml_node_ref_t node);
 
 /*! the xml attributes count
  *
  * @param node      the xml node
  * @return          the xml attributes count
  */
-tb_size_t           tb_xml_node_asize(tb_xml_node_t const* node);
+tb_size_t           tb_xml_node_asize(tb_xml_node_ref_t node);
 
 /*! insert to the next node
  *
  * @param node      the xml node
  * @param next      the xml next node
  */
-tb_void_t           tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next);
+tb_void_t           tb_xml_node_insert_next(tb_xml_node_ref_t node, tb_xml_node_ref_t next);
 
 /*! remove the next node
  *
  * @param node      the xml node
  */
-tb_void_t           tb_xml_node_remove_next(tb_xml_node_t* node);
+tb_void_t           tb_xml_node_remove_next(tb_xml_node_ref_t node);
 
 /*! append the node to the childs head
  *
  * @param node      the xml node
  * @param child     the xml child node
  */
-tb_void_t           tb_xml_node_append_chead(tb_xml_node_t* node, tb_xml_node_t* child);
+tb_void_t           tb_xml_node_append_chead(tb_xml_node_ref_t node, tb_xml_node_ref_t child);
 
 /*! append the node to the childs tail
  *
  * @param node      the xml node
  * @param child     the xml child node
  */
-tb_void_t           tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child);
+tb_void_t           tb_xml_node_append_ctail(tb_xml_node_ref_t node, tb_xml_node_ref_t child);
 
 /*! remove the node from the childs head
  *
  * @param node      the xml node
  */
-tb_void_t           tb_xml_node_remove_chead(tb_xml_node_t* node);
+tb_void_t           tb_xml_node_remove_chead(tb_xml_node_ref_t node);
 
 /*! remove the node from the childs tail
  *
  * @param node      the xml node
  */
-tb_void_t           tb_xml_node_remove_ctail(tb_xml_node_t* node);
+tb_void_t           tb_xml_node_remove_ctail(tb_xml_node_ref_t node);
 
 /*! append the node to the attributes head
  *
  * @param node      the xml node
  * @param attribute the xml attribute node
  */
-tb_void_t           tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute);
+tb_void_t           tb_xml_node_append_ahead(tb_xml_node_ref_t node, tb_xml_node_ref_t attribute);
 
 /*! append the node to the attributes tail
  *
  * @param node      the xml node
  * @param attribute the xml attribute node
  */
-tb_void_t           tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute);
+tb_void_t           tb_xml_node_append_atail(tb_xml_node_ref_t node, tb_xml_node_ref_t attribute);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

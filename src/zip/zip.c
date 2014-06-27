@@ -30,10 +30,10 @@
  * interfaces
  */
 
-tb_zip_t* tb_zip_init(tb_size_t algo, tb_size_t action)
+tb_zip_ref_t tb_zip_init(tb_size_t algo, tb_size_t action)
 {
     // table
-    static tb_zip_t* (*s_init[])(tb_size_t action) =
+    static tb_zip_ref_t (*s_init[])(tb_size_t action) =
     {
         tb_null
     ,   tb_zip_rlc_init
@@ -56,13 +56,13 @@ tb_zip_t* tb_zip_init(tb_size_t algo, tb_size_t action)
     // init
     return s_init[algo](action);
 }
-tb_void_t tb_zip_exit(tb_zip_t* zip)
+tb_void_t tb_zip_exit(tb_zip_ref_t zip)
 {
     // check
     tb_assert_and_check_return(zip);
 
     // table
-    static tb_void_t (*s_exit[])(tb_zip_t* zip) =
+    static tb_void_t (*s_exit[])(tb_zip_ref_t zip) =
     {
         tb_null
     ,   tb_zip_rlc_exit
@@ -85,7 +85,7 @@ tb_void_t tb_zip_exit(tb_zip_t* zip)
     // exit
     s_exit[zip->algo](zip);
 }
-tb_long_t tb_zip_spak(tb_zip_t* zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
+tb_long_t tb_zip_spak(tb_zip_ref_t zip, tb_static_stream_t* ist, tb_static_stream_t* ost, tb_long_t sync)
 {
     tb_assert_and_check_return_val(zip && zip->spak && ist && ost, -1);
     return zip->spak(zip, ist, ost, sync);

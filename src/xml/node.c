@@ -36,13 +36,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_xml_node_t* tb_xml_node_init_element(tb_char_t const* name)
+tb_xml_node_ref_t tb_xml_node_init_element(tb_char_t const* name)
 {
     // check
     tb_assert_and_check_return_val(name, tb_null);
 
     // make node
-    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0_type(tb_xml_element_t);
+    tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_element_t);
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -54,10 +54,10 @@ tb_xml_node_t* tb_xml_node_init_element(tb_char_t const* name)
     // ok
     return node;
 }
-tb_xml_node_t* tb_xml_node_init_text(tb_char_t const* data)
+tb_xml_node_ref_t tb_xml_node_init_text(tb_char_t const* data)
 {
     // make node
-    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0_type(tb_xml_text_t);
+    tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_text_t);
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -70,10 +70,10 @@ tb_xml_node_t* tb_xml_node_init_text(tb_char_t const* data)
     // ok
     return node;
 }
-tb_xml_node_t* tb_xml_node_init_cdata(tb_char_t const* cdata)
+tb_xml_node_ref_t tb_xml_node_init_cdata(tb_char_t const* cdata)
 {
     // make node
-    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0_type(tb_xml_cdata_t);
+    tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_cdata_t);
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -86,10 +86,10 @@ tb_xml_node_t* tb_xml_node_init_cdata(tb_char_t const* cdata)
     // ok
     return node;
 }
-tb_xml_node_t* tb_xml_node_init_comment(tb_char_t const* comment)
+tb_xml_node_ref_t tb_xml_node_init_comment(tb_char_t const* comment)
 {
     // make node
-    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0_type(tb_xml_comment_t);
+    tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_comment_t);
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -102,10 +102,10 @@ tb_xml_node_t* tb_xml_node_init_comment(tb_char_t const* comment)
     // ok
     return node;
 }
-tb_xml_node_t* tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const* data)
+tb_xml_node_ref_t tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const* data)
 {
     // make node
-    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0_type(tb_xml_attribute_t);
+    tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_attribute_t);
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -118,10 +118,10 @@ tb_xml_node_t* tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const
     // ok
     return node;
 }
-tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* charset)
+tb_xml_node_ref_t tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* charset)
 {
     // make node
-    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0_type(tb_xml_document_t);
+    tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_document_t);
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -137,10 +137,10 @@ tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t con
     // ok
     return node;
 }
-tb_xml_node_t* tb_xml_node_init_document_type(tb_char_t const* type)
+tb_xml_node_ref_t tb_xml_node_init_document_type(tb_char_t const* type)
 {
     // make node
-    tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc0_type(tb_xml_document_type_t);
+    tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_document_type_t);
     tb_assert_and_check_return_val(node, tb_null);
 
     // init 
@@ -154,7 +154,7 @@ tb_xml_node_t* tb_xml_node_init_document_type(tb_char_t const* type)
     // ok
     return node;
 }
-tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
+tb_void_t tb_xml_node_exit(tb_xml_node_ref_t node)
 {
     if (node)
     {
@@ -176,8 +176,8 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
         // free childs
         if (node->chead)
         {
-            tb_xml_node_t* save = tb_null;
-            tb_xml_node_t* next = node->chead;
+            tb_xml_node_ref_t save = tb_null;
+            tb_xml_node_ref_t next = node->chead;
             while (next)
             {
                 // save
@@ -194,8 +194,8 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
         // free attributes
         if (node->ahead)
         {
-            tb_xml_node_t* save = tb_null;
-            tb_xml_node_t* next = node->ahead;
+            tb_xml_node_ref_t save = tb_null;
+            tb_xml_node_ref_t next = node->ahead;
             while (next)
             {
                 // save
@@ -214,27 +214,27 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
     }
 }
 
-tb_xml_node_t* tb_xml_node_chead(tb_xml_node_t const* node)
+tb_xml_node_ref_t tb_xml_node_chead(tb_xml_node_ref_t node)
 {
     tb_assert_and_check_return_val(node, tb_null);
     return node->chead;
 }
-tb_size_t tb_xml_node_csize(tb_xml_node_t const* node)
+tb_size_t tb_xml_node_csize(tb_xml_node_ref_t node)
 {
     tb_assert_and_check_return_val(node, 0);
     return node->csize;
 }
-tb_xml_node_t* tb_xml_node_ahead(tb_xml_node_t const* node)
+tb_xml_node_ref_t tb_xml_node_ahead(tb_xml_node_ref_t node)
 {
     tb_assert_and_check_return_val(node, tb_null);
     return node->ahead;
 }
-tb_size_t tb_xml_node_asize(tb_xml_node_t const* node)
+tb_size_t tb_xml_node_asize(tb_xml_node_ref_t node)
 {
     tb_assert_and_check_return_val(node, 0);
     return node->asize;
 }
-tb_void_t tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next)
+tb_void_t tb_xml_node_insert_next(tb_xml_node_ref_t node, tb_xml_node_ref_t next)
 {
     // check
     tb_assert_and_check_return(node && next);
@@ -246,16 +246,16 @@ tb_void_t tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next)
     // next
     node->next = next;
 }
-tb_void_t tb_xml_node_remove_next(tb_xml_node_t* node)
+tb_void_t tb_xml_node_remove_next(tb_xml_node_ref_t node)
 {
     // check
     tb_assert_and_check_return(node);
 
     // next
-    tb_xml_node_t* next = node->next;
+    tb_xml_node_ref_t next = node->next;
 
     // save
-    tb_xml_node_t* save = next? next->next : tb_null;
+    tb_xml_node_ref_t save = next? next->next : tb_null;
 
     // exit
     if (next) tb_xml_node_exit(next);
@@ -263,7 +263,7 @@ tb_void_t tb_xml_node_remove_next(tb_xml_node_t* node)
     // next
     node->next = save;
 }
-tb_void_t tb_xml_node_append_chead(tb_xml_node_t* node, tb_xml_node_t* child)
+tb_void_t tb_xml_node_append_chead(tb_xml_node_ref_t node, tb_xml_node_ref_t child)
 {
     // check
     tb_assert_and_check_return(node && child);
@@ -285,7 +285,7 @@ tb_void_t tb_xml_node_append_chead(tb_xml_node_t* node, tb_xml_node_t* child)
         node->csize = 1;
     }
 }
-tb_void_t tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child)
+tb_void_t tb_xml_node_append_ctail(tb_xml_node_ref_t node, tb_xml_node_ref_t child)
 {
     // check
     tb_assert_and_check_return(node && child);
@@ -308,7 +308,7 @@ tb_void_t tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child)
         node->csize = 1;
     }
 }
-tb_void_t tb_xml_node_remove_chead(tb_xml_node_t* node)
+tb_void_t tb_xml_node_remove_chead(tb_xml_node_ref_t node)
 {
     // check
     tb_assert_and_check_return(node);
@@ -320,7 +320,7 @@ tb_void_t tb_xml_node_remove_chead(tb_xml_node_t* node)
     if (node->chead != node->ctail) 
     {
         // save
-        tb_xml_node_t* save = node->chead;
+        tb_xml_node_ref_t save = node->chead;
 
         // remove
         node->chead = save->next;
@@ -334,7 +334,7 @@ tb_void_t tb_xml_node_remove_chead(tb_xml_node_t* node)
     else
     {
         // save
-        tb_xml_node_t* save = node->chead;
+        tb_xml_node_ref_t save = node->chead;
 
         // remove
         node->chead = tb_null;
@@ -347,11 +347,11 @@ tb_void_t tb_xml_node_remove_chead(tb_xml_node_t* node)
         node->csize--;
     }
 }
-tb_void_t tb_xml_node_remove_ctail(tb_xml_node_t* node)
+tb_void_t tb_xml_node_remove_ctail(tb_xml_node_ref_t node)
 {
     tb_trace_noimpl();
 }
-tb_void_t tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute)
+tb_void_t tb_xml_node_append_ahead(tb_xml_node_ref_t node, tb_xml_node_ref_t attribute)
 {
     // check
     tb_assert_and_check_return(node && attribute);
@@ -373,7 +373,7 @@ tb_void_t tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute
         node->asize = 1;
     }
 }
-tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute)
+tb_void_t tb_xml_node_append_atail(tb_xml_node_ref_t node, tb_xml_node_ref_t attribute)
 {
     // check
     tb_assert_and_check_return(node && attribute);
@@ -397,7 +397,7 @@ tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute
     }
 }
 
-tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
+tb_xml_node_ref_t tb_xml_node_goto(tb_xml_node_ref_t node, tb_char_t const* path)
 {
     tb_assert_and_check_return_val(node && path, tb_null);
     tb_trace_d("root: %s goto: %s", tb_string_cstr(&node->name), path);
@@ -412,7 +412,7 @@ tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
     tb_size_t n = tb_strlen(p);
 
     // walk the child nodes
-    tb_xml_node_t* head = node->chead;
+    tb_xml_node_ref_t head = node->chead;
     for (node = head; node; node = node->next)
     {
         if (node->type == TB_XML_NODE_TYPE_ELEMENT)
@@ -437,7 +437,7 @@ tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
                     if (*q == '/')
                     {
                         // goto the child node
-                        tb_xml_node_t* c = tb_xml_node_goto(node, q);
+                        tb_xml_node_ref_t c = tb_xml_node_goto(node, q);
                         if (c) return c;
                     }
                 }

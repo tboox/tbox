@@ -48,11 +48,11 @@
  * types
  */
 
-// the xml writer type
-typedef struct __tb_xml_writer_t
+// the xml writer impl type
+typedef struct __tb_xml_writer_impl_t
 {
     // stream
-    tb_stream_ref_t      wstream;
+    tb_stream_ref_t         wstream;
 
     // is format?
     tb_bool_t               bformat;
@@ -60,29 +60,29 @@ typedef struct __tb_xml_writer_t
     // the block pool
     tb_handle_t             pool;
 
-    // stack
-    tb_stack_ref_t             elements;
+    // the elements stack
+    tb_stack_ref_t          elements;
 
-    // attributes
-    tb_hash_ref_t              attributes;
+    // the attributes hash
+    tb_hash_ref_t           attributes;
 
-}tb_xml_writer_t;
+}tb_xml_writer_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_xml_writer_init(tb_stream_ref_t wstream, tb_bool_t bformat)
+tb_xml_writer_ref_t tb_xml_writer_init(tb_stream_ref_t wstream, tb_bool_t bformat)
 {
     // check
     tb_assert_and_check_return_val(wstream, tb_null);
 
     // done
-    tb_bool_t           ok = tb_false;
-    tb_xml_writer_t*    writer = tb_null;
+    tb_bool_t               ok = tb_false;
+    tb_xml_writer_impl_t*   writer = tb_null;
     do
     {
         // make writer
-        writer = tb_malloc0_type(tb_xml_writer_t);
+        writer = tb_malloc0_type(tb_xml_writer_impl_t);
         tb_assert_and_check_break(writer);
 
         // init writer
@@ -110,35 +110,35 @@ tb_handle_t tb_xml_writer_init(tb_stream_ref_t wstream, tb_bool_t bformat)
     if (!ok)
     {
         // exit it
-        if (writer) tb_xml_writer_exit(writer);
+        if (writer) tb_xml_writer_exit((tb_xml_writer_ref_t)writer);
         writer = tb_null;
     }
 
     // ok?
-    return writer;
+    return (tb_xml_writer_ref_t)writer;
 }
-tb_void_t tb_xml_writer_exit(tb_handle_t writer)
+tb_void_t tb_xml_writer_exit(tb_xml_writer_ref_t writer)
 {
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    if (xwriter)
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    if (impl)
     {
         // exit attributes
-        if (xwriter->attributes) tb_hash_exit(xwriter->attributes);
-        xwriter->attributes = tb_null;
+        if (impl->attributes) tb_hash_exit(impl->attributes);
+        impl->attributes = tb_null;
 
         // exit elements
-        if (xwriter->elements) tb_stack_exit(xwriter->elements);
-        xwriter->elements = tb_null;
+        if (impl->elements) tb_stack_exit(impl->elements);
+        impl->elements = tb_null;
 
         // exit pool
-        if (xwriter->pool) tb_pool_exit(xwriter->pool);
-        xwriter->pool = tb_null;
+        if (impl->pool) tb_pool_exit(impl->pool);
+        impl->pool = tb_null;
 
         // free it
-        tb_free(xwriter);
+        tb_free(impl);
     }
 }
-tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
+tb_void_t tb_xml_writer_save(tb_xml_writer_ref_t writer, tb_xml_node_ref_t node)
 {
     // check
     tb_assert_and_check_return(writer && node);
@@ -153,7 +153,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
             tb_xml_writer_document(writer, tb_string_cstr(&document->version), tb_string_cstr(&document->charset));
 
             // childs
-            tb_xml_node_t* next = node->chead;
+            tb_xml_node_ref_t next = node->chead;
             while (next)
             {
                 // save
@@ -174,7 +174,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
     case TB_XML_NODE_TYPE_ELEMENT:
         {
             // attributes
-            tb_xml_node_t* attr = node->ahead;
+            tb_xml_node_ref_t attr = node->ahead;
             while (attr)
             {
                 // save
@@ -185,7 +185,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
             }
 
             // childs
-            tb_xml_node_t* next = node->chead;
+            tb_xml_node_ref_t next = node->chead;
             if (next)
             {
                 // enter
@@ -220,220 +220,220 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
         break;
     }
 }
-tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* charset)
+tb_void_t tb_xml_writer_document(tb_xml_writer_ref_t writer, tb_char_t const* version, tb_char_t const* charset)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream);
 
-    tb_stream_printf(xwriter->wstream, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "2.0", charset? charset : "utf-8");
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "2.0", charset? charset : "utf-8");
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 }
-tb_void_t tb_xml_writer_document_type(tb_handle_t writer, tb_char_t const* type)
+tb_void_t tb_xml_writer_document_type(tb_xml_writer_ref_t writer, tb_char_t const* type)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream);
 
-    tb_stream_printf(xwriter->wstream, "<!DOCTYPE %s>", type? type : "");
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, "<!DOCTYPE %s>", type? type : "");
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 }
-tb_void_t tb_xml_writer_cdata(tb_handle_t writer, tb_char_t const* data)
+tb_void_t tb_xml_writer_cdata(tb_xml_writer_ref_t writer, tb_char_t const* data)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream && data);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream && data);
 
     // writ tabs
-    if (xwriter->bformat)
+    if (impl->bformat)
     {
-        tb_size_t t = tb_stack_size(xwriter->elements);
-        while (t--) tb_stream_printf(xwriter->wstream, "\t");
+        tb_size_t t = tb_stack_size(impl->elements);
+        while (t--) tb_stream_printf(impl->wstream, "\t");
     }
 
-    tb_stream_printf(xwriter->wstream, "<![CDATA[%s]]>", data);
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, "<![CDATA[%s]]>", data);
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 }
-tb_void_t tb_xml_writer_text(tb_handle_t writer, tb_char_t const* text)
+tb_void_t tb_xml_writer_text(tb_xml_writer_ref_t writer, tb_char_t const* text)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream && text);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream && text);
 
     // writ tabs
-    if (xwriter->bformat)
+    if (impl->bformat)
     {
-        tb_size_t t = tb_stack_size(xwriter->elements);
-        while (t--) tb_stream_printf(xwriter->wstream, "\t");
+        tb_size_t t = tb_stack_size(impl->elements);
+        while (t--) tb_stream_printf(impl->wstream, "\t");
     }
 
-    tb_stream_printf(xwriter->wstream, "%s", text);
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, "%s", text);
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 }
-tb_void_t tb_xml_writer_comment(tb_handle_t writer, tb_char_t const* comment)
+tb_void_t tb_xml_writer_comment(tb_xml_writer_ref_t writer, tb_char_t const* comment)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream && comment);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream && comment);
 
     // writ tabs
-    if (xwriter->bformat)
+    if (impl->bformat)
     {
-        tb_size_t t = tb_stack_size(xwriter->elements);
-        while (t--) tb_stream_printf(xwriter->wstream, "\t");
+        tb_size_t t = tb_stack_size(impl->elements);
+        while (t--) tb_stream_printf(impl->wstream, "\t");
     }
 
-    tb_stream_printf(xwriter->wstream, "<!--%s-->", comment);
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, "<!--%s-->", comment);
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 }
-tb_void_t tb_xml_writer_element_empty(tb_handle_t writer, tb_char_t const* name)
+tb_void_t tb_xml_writer_element_empty(tb_xml_writer_ref_t writer, tb_char_t const* name)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->attributes && name);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream && impl->attributes && name);
 
     // writ tabs
-    if (xwriter->bformat)
+    if (impl->bformat)
     {
-        tb_size_t t = tb_stack_size(xwriter->elements);
-        while (t--) tb_stream_printf(xwriter->wstream, "\t");
+        tb_size_t t = tb_stack_size(impl->elements);
+        while (t--) tb_stream_printf(impl->wstream, "\t");
     }
 
     // writ name
-    tb_stream_printf(xwriter->wstream, "<%s", name);
+    tb_stream_printf(impl->wstream, "<%s", name);
 
     // writ attributes
-    if (tb_hash_size(xwriter->attributes))
+    if (tb_hash_size(impl->attributes))
     {
-        tb_for_all (tb_hash_item_t*, item, xwriter->attributes)
+        tb_for_all (tb_hash_item_t*, item, impl->attributes)
         {
             if (item && item->name && item->data)
-                tb_stream_printf(xwriter->wstream, " %s=\"%s\"", item->name, item->data);
+                tb_stream_printf(impl->wstream, " %s=\"%s\"", item->name, item->data);
         }
-        tb_hash_clear(xwriter->attributes);
+        tb_hash_clear(impl->attributes);
     }
 
     // writ end
-    tb_stream_printf(xwriter->wstream, "/>");
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, "/>");
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 }
-tb_void_t tb_xml_writer_element_enter(tb_handle_t writer, tb_char_t const* name)
+tb_void_t tb_xml_writer_element_enter(tb_xml_writer_ref_t writer, tb_char_t const* name)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->elements && xwriter->attributes && name);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream && impl->elements && impl->attributes && name);
 
     // writ tabs
-    if (xwriter->bformat)
+    if (impl->bformat)
     {
-        tb_size_t t = tb_stack_size(xwriter->elements);
-        while (t--) tb_stream_printf(xwriter->wstream, "\t");
+        tb_size_t t = tb_stack_size(impl->elements);
+        while (t--) tb_stream_printf(impl->wstream, "\t");
     }
 
     // writ name
-    tb_stream_printf(xwriter->wstream, "<%s", name);
+    tb_stream_printf(impl->wstream, "<%s", name);
 
     // writ attributes
-    if (tb_hash_size(xwriter->attributes))
+    if (tb_hash_size(impl->attributes))
     {
-        tb_for_all (tb_hash_item_t*, item, xwriter->attributes)
+        tb_for_all (tb_hash_item_t*, item, impl->attributes)
         {
             if (item && item->name && item->data)
-                tb_stream_printf(xwriter->wstream, " %s=\"%s\"", item->name, item->data);
+                tb_stream_printf(impl->wstream, " %s=\"%s\"", item->name, item->data);
         }
-        tb_hash_clear(xwriter->attributes);
+        tb_hash_clear(impl->attributes);
     }
 
     // writ end
-    tb_stream_printf(xwriter->wstream, ">");
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, ">");
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 
     // put name
-    tb_stack_put(xwriter->elements, name);
+    tb_stack_put(impl->elements, name);
 }
-tb_void_t tb_xml_writer_element_leave(tb_handle_t writer)
+tb_void_t tb_xml_writer_element_leave(tb_xml_writer_ref_t writer)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->elements && xwriter->attributes);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->wstream && impl->elements && impl->attributes);
 
     // writ tabs
-    if (xwriter->bformat)
+    if (impl->bformat)
     {
-        tb_size_t t = tb_stack_size(xwriter->elements);
+        tb_size_t t = tb_stack_size(impl->elements);
         if (t) t--;
-        while (t--) tb_stream_printf(xwriter->wstream, "\t");
+        while (t--) tb_stream_printf(impl->wstream, "\t");
     }
 
     // writ name
-    tb_char_t const* name = (tb_char_t const*)tb_stack_top(xwriter->elements);
+    tb_char_t const* name = (tb_char_t const*)tb_stack_top(impl->elements);
     tb_assert_and_check_return(name);
 
-    tb_stream_printf(xwriter->wstream, "</%s>", name);
-    if (xwriter->bformat) tb_stream_printf(xwriter->wstream, "\n");
+    tb_stream_printf(impl->wstream, "</%s>", name);
+    if (impl->bformat) tb_stream_printf(impl->wstream, "\n");
 
     // pop name
-    tb_stack_pop(xwriter->elements);
+    tb_stack_pop(impl->elements);
 }
-tb_void_t tb_xml_writer_attributes_long(tb_handle_t writer, tb_char_t const* name, tb_long_t value)
+tb_void_t tb_xml_writer_attributes_long(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_long_t value)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->attributes && name);
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%ld", value);
-    tb_hash_set(xwriter->attributes, name, data);
+    tb_hash_set(impl->attributes, name, data);
 }
-tb_void_t tb_xml_writer_attributes_bool(tb_handle_t writer, tb_char_t const* name, tb_bool_t value)
+tb_void_t tb_xml_writer_attributes_bool(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_bool_t value)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->attributes && name);
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%s", value? "true" : "false");
-    tb_hash_set(xwriter->attributes, name, data);
+    tb_hash_set(impl->attributes, name, data);
 }
-tb_void_t tb_xml_writer_attributes_cstr(tb_handle_t writer, tb_char_t const* name, tb_char_t const* value)
+tb_void_t tb_xml_writer_attributes_cstr(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_char_t const* value)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->attributes && name && value);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->attributes && name && value);
 
-    tb_hash_set(xwriter->attributes, name, value);
+    tb_hash_set(impl->attributes, name, value);
 }
-tb_void_t tb_xml_writer_attributes_format(tb_handle_t writer, tb_char_t const* name, tb_char_t const* format, ...)
+tb_void_t tb_xml_writer_attributes_format(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_char_t const* format, ...)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->attributes && name && format);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->attributes && name && format);
 
     tb_size_t size = 0;
     tb_char_t data[8192] = {0};
     tb_vsnprintf_format(data, 8192, format, &size);
-    tb_hash_set(xwriter->attributes, name, data);
+    tb_hash_set(impl->attributes, name, data);
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_void_t tb_xml_writer_attributes_float(tb_handle_t writer, tb_char_t const* name, tb_float_t value)
+tb_void_t tb_xml_writer_attributes_float(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_float_t value)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->attributes && name);
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%f", value);
-    tb_hash_set(xwriter->attributes, name, data);
+    tb_hash_set(impl->attributes, name, data);
 }
-tb_void_t tb_xml_writer_attributes_double(tb_handle_t writer, tb_char_t const* name, tb_double_t value)
+tb_void_t tb_xml_writer_attributes_double(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_double_t value)
 {
     // check
-    tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
-    tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+    tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
+    tb_assert_and_check_return(impl && impl->attributes && name);
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%lf", value);
-    tb_hash_set(xwriter->attributes, name, data);
+    tb_hash_set(impl->attributes, name, data);
 }
 #endif
 

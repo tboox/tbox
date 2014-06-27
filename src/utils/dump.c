@@ -40,18 +40,18 @@ tb_void_t tb_dump_data(tb_byte_t const* data, tb_size_t size)
     tb_assert_and_check_return(data && size);
 
     // init stream
-    tb_stream_ref_t gst = tb_stream_init_from_data(data, size);
-    if (gst)
+    tb_stream_ref_t stream = tb_stream_init_from_data(data, size);
+    if (stream)
     {
         // open stream
-        if (tb_stream_open(gst))
+        if (tb_stream_open(stream))
         {
             // dump stream
-            tb_dump_data_from_stream(gst);
+            tb_dump_data_from_stream(stream);
         }
     
         // exit stream
-        tb_stream_exit(gst);
+        tb_stream_exit(stream);
     }
 }
 tb_void_t tb_dump_data_from_url(tb_char_t const* url)
@@ -60,24 +60,24 @@ tb_void_t tb_dump_data_from_url(tb_char_t const* url)
     tb_assert_and_check_return(url);
 
     // init stream
-    tb_stream_ref_t gst = tb_stream_init_from_url(url);
-    if (gst)
+    tb_stream_ref_t stream = tb_stream_init_from_url(url);
+    if (stream)
     {
         // open stream
-        if (tb_stream_open(gst))
+        if (tb_stream_open(stream))
         {
             // dump stream
-            tb_dump_data_from_stream(gst);
+            tb_dump_data_from_stream(stream);
         }
     
         // exit stream
-        tb_stream_exit(gst);
+        tb_stream_exit(stream);
     }
 }
-tb_void_t tb_dump_data_from_stream(tb_stream_ref_t gst)
+tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
 {
     // check
-    tb_assert_and_check_return(gst);
+    tb_assert_and_check_return(stream);
 
     // init 
     tb_size_t offset = 0;
@@ -90,7 +90,7 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t gst)
     tb_tracet_i(__tb_newline__);
 
     // walk
-    while (!tb_stream_beof(gst))
+    while (!tb_stream_beof(stream))
     {
         // read line
         tb_long_t read = 0;
@@ -98,14 +98,14 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t gst)
         while (read < 0x20)
         {
             // read data
-            tb_long_t real = tb_stream_read(gst, line + read, 0x20 - read);
+            tb_long_t real = tb_stream_read(stream, line + read, 0x20 - read);
             // has data?
             if (real > 0) read += real;
             // no data?
             else if (!real)
             {
                 // wait
-                tb_long_t e = tb_stream_wait(gst, TB_AIOE_CODE_RECV, tb_stream_timeout(gst));
+                tb_long_t e = tb_stream_wait(stream, TB_AIOE_CODE_RECV, tb_stream_timeout(stream));
                 tb_assert_and_check_break(e >= 0);
 
                 // timeout?

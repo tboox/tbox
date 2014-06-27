@@ -82,7 +82,7 @@ typedef struct __tb_stream_filter_t
     tb_hize_t           offset;
 
     /// the input data
-    tb_buffer_t  idata;
+    tb_buffer_t         idata;
 
     /// the output data 
     tb_queue_buffer_t   odata;

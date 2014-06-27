@@ -45,7 +45,7 @@ typedef struct __tb_stream_filter_zip_t
     tb_size_t                   action;
 
     // the zip 
-    tb_zip_t*                   zip;
+    tb_zip_ref_t                zip;
 
 }tb_stream_filter_zip_t;
 

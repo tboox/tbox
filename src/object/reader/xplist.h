@@ -42,12 +42,12 @@ __tb_extern_c_enter__
 typedef struct __tb_object_xplist_reader_t
 {
     /// the xplist reader
-    tb_handle_t                 reader;
+    tb_xml_reader_ref_t         reader;
 
 }tb_object_xplist_reader_t;
 
 /// the xplist reader func type
-typedef tb_object_ref_t            (*tb_object_xplist_reader_func_t)(tb_object_xplist_reader_t* reader, tb_size_t event);
+typedef tb_object_ref_t         (*tb_object_xplist_reader_func_t)(tb_object_xplist_reader_t* reader, tb_size_t event);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
