@@ -52,19 +52,19 @@ typedef struct __tb_single_list_item_t
 // the single list impl type
 typedef struct __tb_single_list_impl_t
 {
-    /// the itor
+    // the itor
     tb_iterator_t           itor;
 
-    /// the rpool
-    tb_handle_t             pool;
+    // the pool
+    tb_fixed_pool_ref_t     pool;
 
-    /// the head item 
+    // the head item 
     tb_size_t               head;
 
-    /// the last item
+    // the last item
     tb_size_t               last;
 
-    /// the item func
+    // the item func
     tb_item_func_t          func;
 
 }tb_single_list_impl_t;
@@ -669,13 +669,14 @@ tb_void_t tb_single_list_walk(tb_single_list_ref_t list, tb_bool_t (*func)(tb_si
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)list;
-    tb_assert_and_check_return(impl && impl->pool && func);
+    tb_assert_and_check_return(impl && func);
 
     // pool
-    tb_handle_t pool = impl->pool;
+    tb_fixed_pool_ref_t pool = impl->pool;
+    tb_assert_and_check_return(pool);
 
     // step
-    tb_size_t   step = impl->func.size;
+    tb_size_t step = impl->func.size;
     tb_assert_and_check_return(step);
 
     // check

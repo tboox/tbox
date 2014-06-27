@@ -139,8 +139,8 @@ typedef struct __tb_thread_pool_worker_t
     // the worker id
     tb_size_t               id;
 
-    // the thread pool handle
-    tb_handle_t             pool;
+    // the thread pool 
+    tb_thread_pool_ref_t    pool;
 
     // the loop
     tb_thread_ref_t         loop;
@@ -172,7 +172,7 @@ typedef struct __tb_thread_pool_impl_t
     tb_spinlock_t           lock;
 
     // the jobs pool
-    tb_handle_t             jobs_pool;
+    tb_fixed_pool_ref_t     jobs_pool;
 
     // the urgent jobs
     tb_single_list_ref_t    jobs_urgent;
@@ -714,7 +714,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
 
                 // init worker
                 worker->id          = i;
-                worker->pool        = impl;
+                worker->pool        = (tb_thread_pool_ref_t)impl;
                 worker->bstoped     = 0;
                 worker->jobs        = tb_null;
                 worker->pull        = 0;

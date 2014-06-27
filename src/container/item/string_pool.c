@@ -32,27 +32,27 @@
 static tb_void_t tb_item_func_string_pool_free(tb_item_func_t* func, tb_pointer_t item)
 {
     // check
-    tb_assert_and_check_return(func && item);
+    tb_assert_and_check_return(func && func->pool && item);
 
     // free item
-    if (*((tb_pointer_t*)item)) tb_object_string_pool_del(tb_object_string_pool(), *((tb_char_t const**)item));
+    if (*((tb_pointer_t*)item)) tb_string_pool_del((tb_string_pool_ref_t)func->pool, *((tb_char_t const**)item));
 }
 static tb_void_t tb_item_func_string_pool_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && item);
+    tb_assert_and_check_return(func && func->pool && item);
  
     // dupl item
-    if (data) *((tb_pointer_t*)item) = (tb_pointer_t)tb_object_string_pool_put(tb_object_string_pool(), (tb_char_t const*)data);
+    if (data) *((tb_pointer_t*)item) = (tb_pointer_t)tb_string_pool_put((tb_string_pool_ref_t)func->pool, (tb_char_t const*)data);
     else *((tb_pointer_t*)item) = tb_null;
 }
 static tb_void_t tb_item_func_string_pool_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && item);
+    tb_assert_and_check_return(func && func->pool && item);
  
     // copy it, refn++
-    tb_pointer_t copy = data? (tb_pointer_t)tb_object_string_pool_put(tb_object_string_pool(), (tb_char_t const*)data) : tb_null;
+    tb_pointer_t copy = data? (tb_pointer_t)tb_string_pool_put((tb_string_pool_ref_t)func->pool, (tb_char_t const*)data) : tb_null;
  
     // free it, refn--
     if (func->free) func->free(func, item);
@@ -64,10 +64,10 @@ static tb_void_t tb_item_func_string_pool_repl(tb_item_func_t* func, tb_pointer_
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_item_func_t tb_item_func_string_pool(tb_handle_t spool)
+tb_item_func_t tb_item_func_string_pool(tb_string_pool_ref_t pool)
 {
     // check
-    tb_assert(spool);
+    tb_assert(pool);
 
     // the str func
     tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
@@ -75,6 +75,7 @@ tb_item_func_t tb_item_func_string_pool(tb_handle_t spool)
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_STRING_POOL;
+    func.flag   = 0;
     func.hash   = func_str.hash;
     func.comp   = func_str.comp;
     func.data   = func_str.data;
@@ -87,7 +88,7 @@ tb_item_func_t tb_item_func_string_pool(tb_handle_t spool)
     func.ndupl  = func_str.ndupl;
     func.nrepl  = func_str.nrepl;
     func.ncopy  = func_str.ncopy;
-    func.pool   = spool;
+    func.pool   = (tb_handle_t)pool;
     func.size   = sizeof(tb_char_t*);
 
     // ok?

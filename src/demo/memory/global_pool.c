@@ -9,7 +9,7 @@
 tb_int_t tb_demo_memory_global_pool_main(tb_int_t argc, tb_char_t** argv)
 {
     // init
-    tb_handle_t gpool = tb_global_pool_init((tb_byte_t*)malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 0);
+    tb_global_pool_ref_t gpool = tb_global_pool_init((tb_byte_t*)malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 0);
     tb_assert_and_check_return_val(gpool, 0);
 
 #if 0

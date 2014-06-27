@@ -115,7 +115,7 @@ typedef struct __tb_aicp_http_impl_t
     tb_async_transfer_ref_t         transfer;
 
     // the pool for string
-    tb_handle_t                     pool;
+    tb_pool_ref_t                   pool;
 
     /* the state
      *

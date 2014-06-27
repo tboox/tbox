@@ -113,8 +113,8 @@ static tb_void_t tb_hash_test_s2i_func()
 static tb_void_t tb_hash_test_s2i_perf()
 {
     // init hash
-    tb_handle_t     pool = tb_pool_init(TB_POOL_GROW_SMALL, 0);
-    tb_hash_ref_t      hash = tb_hash_init(0, tb_item_func_str(tb_true, pool), tb_item_func_long());
+    tb_pool_ref_t pool = tb_pool_init(TB_POOL_GROW_SMALL, 0);
+    tb_hash_ref_t hash = tb_hash_init(0, tb_item_func_str(tb_true, pool), tb_item_func_long());
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -209,8 +209,8 @@ static tb_void_t tb_hash_test_i2s_func()
 static tb_void_t tb_hash_test_i2s_perf()
 {
     // init hash
-    tb_handle_t pool = tb_pool_init(TB_POOL_GROW_SMALL, 0);
-    tb_hash_ref_t  hash = tb_hash_init(0, tb_item_func_long(), tb_item_func_str(tb_true, pool));
+    tb_pool_ref_t pool = tb_pool_init(TB_POOL_GROW_SMALL, 0);
+    tb_hash_ref_t hash = tb_hash_init(0, tb_item_func_long(), tb_item_func_str(tb_true, pool));
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -345,10 +345,10 @@ static tb_void_t tb_hash_test_m2m_func()
 static tb_void_t tb_hash_test_m2m_perf()
 {
     // init hash: mem => mem
-    tb_size_t const step = 12;
-    tb_byte_t       item[step];
-    tb_handle_t     pool = tb_fixed_pool_init(256, step, 0);
-    tb_hash_ref_t      hash = tb_hash_init(0, tb_item_func_mem(step, tb_null, tb_null), tb_item_func_mem(step, tb_null, tb_null));
+    tb_size_t const     step = 12;
+    tb_byte_t           item[step];
+    tb_fixed_pool_ref_t pool = tb_fixed_pool_init(256, step, 0);
+    tb_hash_ref_t       hash = tb_hash_init(0, tb_item_func_mem(step, tb_null, tb_null), tb_item_func_mem(step, tb_null, tb_null));
     tb_assert_and_check_return(hash);
 
     // clear rand

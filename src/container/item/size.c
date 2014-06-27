@@ -108,6 +108,7 @@ tb_item_func_t tb_item_func_size()
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_SIZE;
+    func.flag   = 0;
     func.hash   = tb_item_func_size_hash;
     func.comp   = tb_item_func_size_comp;
     func.data   = tb_item_func_size_data;

@@ -36,9 +36,9 @@ demo_C_FILES 								+= \
 											memory/fixed_pool \
 											memory/pool \
 											memory/global_pool \
+											memory/static_tiny_pool \
 											memory/static_fixed_pool \
 											memory/static_pool \
-											memory/static_tiny_pool \
 											memory/memops \
 											memory/queue_buffer \
 											memory/buffer \

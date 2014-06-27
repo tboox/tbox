@@ -85,7 +85,7 @@ typedef struct __tb_timer_impl_t
     tb_spinlock_t               lock;
 
     // the pool
-    tb_handle_t                 pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the heap
     tb_heap_ref_t               heap;

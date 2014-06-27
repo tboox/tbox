@@ -45,10 +45,10 @@
 typedef struct __tb_list_item_t
 {
     // the item next
-    tb_size_t           next;
+    tb_size_t               next;
 
     // the item prev
-    tb_size_t           prev;
+    tb_size_t               prev;
 
 }tb_list_item_t;
 
@@ -59,7 +59,7 @@ typedef struct __tb_list_impl_t
     tb_iterator_t           itor;
 
     // the pool
-    tb_handle_t             pool;
+    tb_fixed_pool_ref_t     pool;
 
     // the head item
     tb_size_t               head;
@@ -639,13 +639,14 @@ tb_void_t tb_list_walk(tb_list_ref_t list, tb_bool_t (*func)(tb_list_ref_t impl,
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)list;
-    tb_assert_and_check_return(impl && impl->pool && func);
+    tb_assert_and_check_return(impl && func);
 
     // pool
-    tb_handle_t pool = impl->pool;
+    tb_fixed_pool_ref_t pool = impl->pool;
+    tb_assert_and_check_return(pool);
 
     // step
-    tb_size_t   step = impl->func.size;
+    tb_size_t step = impl->func.size;
     tb_assert_and_check_return(step);
 
     // check

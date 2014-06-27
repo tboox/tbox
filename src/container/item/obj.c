@@ -97,6 +97,7 @@ tb_item_func_t tb_item_func_obj()
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_OBJ;
+    func.flag   = 0;
     func.hash   = func_ptr.hash;
     func.comp   = func_ptr.comp;
     func.data   = func_ptr.data;

@@ -33,7 +33,7 @@
 typedef struct __tb_demo_spider_t
 {
     // the pool
-    tb_handle_t                 pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the lock
     tb_spinlock_t               lock;
@@ -158,7 +158,7 @@ static tb_stream_ref_t tb_demo_spider_parser_open_html(tb_char_t const* url)
     // ok?
     return stream;
 }
-static tb_size_t tb_demo_spider_parser_get_url(tb_handle_t reader, tb_char_t* data, tb_size_t maxn, tb_bool_t* html)
+static tb_size_t tb_demo_spider_parser_get_url(tb_xml_reader_ref_t reader, tb_char_t* data, tb_size_t maxn, tb_bool_t* html)
 {
     // check
     tb_assert_and_check_return_val(reader && data && maxn && html, tb_false);
@@ -249,7 +249,7 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
     if (stream)
     {
         // init reader
-        tb_handle_t reader = tb_xml_reader_init(stream);
+        tb_xml_reader_ref_t reader = tb_xml_reader_init(stream);
         if (reader)
         {
             // parse url

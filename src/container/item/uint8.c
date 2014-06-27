@@ -101,6 +101,7 @@ tb_item_func_t tb_item_func_uint8()
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_UINT8;
+    func.flag   = 0;
     func.hash   = tb_item_func_uint8_hash;
     func.comp   = tb_item_func_uint8_comp;
     func.data   = tb_item_func_uint8_data;

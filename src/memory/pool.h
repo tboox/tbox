@@ -54,113 +54,120 @@ __tb_extern_c_enter__
 #define TB_POOL_GROW_LARGE                            (256 * 1024)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the pool ref type
+typedef struct{}*   tb_pool_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init the block pool
+/*! init the pool
  * 
  * @param grow      the pool grow size, using the default grow
  * @param align     the pool bytes align, using the cpu-aligned if be zero
  *
- * @return          the pool handle
+ * @return          the pool 
  */
-tb_handle_t         tb_pool_init(tb_size_t grow, tb_size_t align);
+tb_pool_ref_t       tb_pool_init(tb_size_t grow, tb_size_t align);
 
-/*! exit the block pool
+/*! exit the pool
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  */
-tb_void_t           tb_pool_exit(tb_handle_t handle);
+tb_void_t           tb_pool_exit(tb_pool_ref_t pool);
 
-/*! clear the block pool
+/*! clear the pool
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  */
-tb_void_t           tb_pool_clear(tb_handle_t handle);
+tb_void_t           tb_pool_clear(tb_pool_ref_t pool);
 
 /*! malloc the memory
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param size      the size
  *
  * @return          the data address
  */
-tb_pointer_t        tb_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_malloc_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory and fill zero 
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param size      the size
  *
  * @return          the data address
  */
-tb_pointer_t        tb_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_malloc0_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param item      the item count
  * @param size      the item size
  *
  * @return          the data address
  */
-tb_pointer_t        tb_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! malloc the memory with the item count and fill zero
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param item      the item count
  * @param size      the item size
  *
  * @return          the data address
  */
-tb_pointer_t        tb_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! realloc the memory
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param data      the data address
  * @param size      the data size
  *
  * @return          the new data address
  */
-tb_pointer_t        tb_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t        tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /*! duplicate the string memory
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param data      the string data address
  *
  * @return          the new string address
  */
-tb_char_t*          tb_pool_strdup_(tb_handle_t handle, tb_char_t const* data __tb_debug_decl__);
+tb_char_t*          tb_pool_strdup_(tb_pool_ref_t pool, tb_char_t const* data __tb_debug_decl__);
 
 /*! duplicate the string memory with the given size
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param data      the string data address
  * @param size      the string size
  *
  * @return          the new string address
  */
-tb_char_t*          tb_pool_strndup_(tb_handle_t handle, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
+tb_char_t*          tb_pool_strndup_(tb_pool_ref_t pool, tb_char_t const* data, tb_size_t size __tb_debug_decl__);
 
 /*! free the memory
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param data      the data address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
+tb_bool_t           tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
-/*! dump the block pool
+/*! dump the pool
  *
- * @param handle    the pool handle
+ * @param pool      the pool 
  * @param prefix    the trace prefix
  */
-tb_void_t           tb_pool_dump(tb_handle_t handle, tb_char_t const* prefix);
+tb_void_t           tb_pool_dump(tb_pool_ref_t pool, tb_char_t const* prefix);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

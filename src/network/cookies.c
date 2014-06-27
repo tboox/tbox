@@ -50,28 +50,28 @@
 typedef struct __tb_cookies_entry_t
 {
     // the domain 
-    tb_char_t const*    domain;
+    tb_char_t const*        domain;
 
     // the path
-    tb_char_t const*    path;
+    tb_char_t const*        path;
 
     // the name
-    tb_char_t const*    name;
+    tb_char_t const*        name;
 
     // the value
-    tb_char_t const*    value;
+    tb_char_t const*        value;
 
     // the expires
-    tb_time_t           expires;
+    tb_time_t               expires;
 
     // the max-age, default: 1 and storage: 0
-    tb_uint32_t         maxage  : 30;
+    tb_uint32_t             maxage  : 30;
 
     // storage impl to file? remove it immediately if maxage == 0 and storage: 0
-    tb_uint32_t         storage : 1;
+    tb_uint32_t             storage : 1;
 
     // is secure?
-    tb_uint32_t         secure  : 1;
+    tb_uint32_t             secure  : 1;
 
 }tb_cookies_entry_t;
 
@@ -79,16 +79,16 @@ typedef struct __tb_cookies_entry_t
 typedef struct __tb_cookies_impl_t
 {
     // the lock
-    tb_spinlock_t       lock;
+    tb_spinlock_t           lock;
 
     // the string func
-    tb_item_func_t      string_func;
+    tb_item_func_t          string_func;
 
     // the string pool
-    tb_handle_t         string_pool;
+    tb_string_pool_ref_t    string_pool;
     
     // the cookie pool, key: "domain+path+name"
-    tb_hash_ref_t       cookie_pool;
+    tb_hash_ref_t           cookie_pool;
 
 }tb_cookies_impl_t;
 
@@ -201,19 +201,19 @@ static tb_void_t tb_cookies_entry_exit(tb_cookies_impl_t* impl, tb_cookies_entry
     tb_assert_and_check_return(impl && entry);
 
     // exit domain
-    if (entry->domain) tb_object_string_pool_del(impl->string_pool, entry->domain);
+    if (entry->domain) tb_string_pool_del(impl->string_pool, entry->domain);
     entry->domain = tb_null;
     
     // exit path
-    if (entry->path) tb_object_string_pool_del(impl->string_pool, entry->path);
+    if (entry->path) tb_string_pool_del(impl->string_pool, entry->path);
     entry->path = tb_null;
     
     // exit name
-    if (entry->name) tb_object_string_pool_del(impl->string_pool, entry->name);
+    if (entry->name) tb_string_pool_del(impl->string_pool, entry->name);
     entry->name = tb_null;
     
     // exit value
-    if (entry->value) tb_object_string_pool_del(impl->string_pool, entry->value);
+    if (entry->value) tb_string_pool_del(impl->string_pool, entry->value);
     entry->value = tb_null;
 }
 static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
@@ -324,7 +324,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->domain = tb_object_string_pool_put(impl->string_pool, data[0] == '.'? data + 1 : data);
+                    entry->domain = tb_string_pool_put(impl->string_pool, data[0] == '.'? data + 1 : data);
                 }
             }
             else if (!tb_strnicmp(b, "path", 4))
@@ -337,7 +337,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->path = tb_object_string_pool_put(impl->string_pool, data);
+                    entry->path = tb_string_pool_put(impl->string_pool, data);
                 }
             }   
             else if (!tb_strnicmp(b, "version", 7))
@@ -361,7 +361,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 // save name
                 tb_assert_and_check_return_val(v - b - 1 < sizeof(data) - 1, tb_false);
                 tb_strlcpy(data, b, v - b - 1); data[v - b - 1] = '\0';
-                entry->name = tb_object_string_pool_put(impl->string_pool, data);
+                entry->name = tb_string_pool_put(impl->string_pool, data);
                 tb_assert_and_check_return_val(entry->name, tb_false);
 
                 // save value
@@ -369,7 +369,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->value = tb_object_string_pool_put(impl->string_pool, data);
+                    entry->value = tb_string_pool_put(impl->string_pool, data);
                     tb_assert_and_check_return_val(entry->value, tb_false);
                 }
             }
@@ -414,7 +414,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
         if (n && *domain == '.') domain++;
 
         // save domain
-        entry->domain = tb_object_string_pool_put(impl->string_pool, domain);
+        entry->domain = tb_string_pool_put(impl->string_pool, domain);
     }
     if (!entry->domain)
     {
@@ -424,7 +424,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
     }
 
     // path not exists? using the given path
-    if (!entry->path) entry->path = tb_object_string_pool_put(impl->string_pool, path? path : "/");
+    if (!entry->path) entry->path = tb_string_pool_put(impl->string_pool, path? path : "/");
     tb_assert_and_check_return_val(entry->path, tb_false);
 
     // no secure? using the given secure value
@@ -521,7 +521,7 @@ tb_cookies_ref_t tb_cookies_init()
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init string pool
-        impl->string_pool = tb_object_string_pool_init(tb_true, 0);
+        impl->string_pool = tb_string_pool_init(tb_true, 0);
         tb_assert_and_check_break(impl->string_pool);
 
         // init cookie pool
@@ -569,7 +569,7 @@ tb_void_t tb_cookies_exit(tb_cookies_ref_t cookies)
     impl->cookie_pool = tb_null;
     
     // exit string pool
-    if (impl->string_pool) tb_object_string_pool_exit(impl->string_pool);
+    if (impl->string_pool) tb_string_pool_exit(impl->string_pool);
     impl->string_pool = tb_null;
 
     // leave
@@ -594,7 +594,7 @@ tb_void_t tb_cookies_clear(tb_cookies_ref_t cookies)
     if (impl->cookie_pool) tb_hash_clear(impl->cookie_pool);
     
     // clear string pool
-    if (impl->string_pool) tb_object_string_pool_clear(impl->string_pool);
+    if (impl->string_pool) tb_string_pool_clear(impl->string_pool);
 
     // leave
     tb_spinlock_leave(&impl->lock);

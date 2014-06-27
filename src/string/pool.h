@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        string_pool.h
+ * @file        pool.h
  * @ingroup     memory
  *
  */
@@ -35,60 +35,67 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the string pool ref type
+typedef struct{}*           tb_string_pool_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 /*! the string pool instance
  *
- * @return pool     the string pool instance
+ * @return pool             the string pool instance
  */
-tb_handle_t         tb_object_string_pool(tb_noarg_t);
+tb_string_pool_ref_t        tb_string_pool(tb_noarg_t);
 
 /*! init string pool for small, readonly and repeat strings
  *
  * readonly, strip repeat strings and decrease memory fragmens
  *
- * @param bcase     is case?
- * @param align     the cpu align bytes
+ * @param bcase             is case?
+ * @param align             the cpu align bytes
  *
- * @return          the string pool
+ * @return                  the string pool
  */
-tb_handle_t         tb_object_string_pool_init(tb_bool_t bcase, tb_size_t align);
+tb_string_pool_ref_t         tb_string_pool_init(tb_bool_t bcase, tb_size_t align);
 
 /*! exit the string pool
  *
- * @param pool      the string pool
+ * @param pool              the string pool
  */
-tb_void_t           tb_object_string_pool_exit(tb_handle_t pool);
+tb_void_t                   tb_string_pool_exit(tb_string_pool_ref_t pool);
 
 /*! clear the string pool
  *
- * @param pool      the string pool
+ * @param pool              the string pool
  */
-tb_void_t           tb_object_string_pool_clear(tb_handle_t pool);
+tb_void_t                   tb_string_pool_clear(tb_string_pool_ref_t pool);
 
 /*! put string to the pool and increase the reference count
  *
- * @param pool      the string pool
- * @param data      the string data
+ * @param pool              the string pool
+ * @param data              the string data
  *
- * @return          the string data
+ * @return                  the string data
  */
-tb_char_t const*    tb_object_string_pool_put(tb_handle_t pool, tb_char_t const* data);
+tb_char_t const*            tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* data);
 
 /*! remove string from the pool if the reference count be zero
  *
- * @param pool      the string pool
- * @param data      the string data
+ * @param pool              the string pool
+ * @param data              the string data
  */
-tb_void_t           tb_object_string_pool_del(tb_handle_t pool, tb_char_t const* data);
+tb_void_t                   tb_string_pool_del(tb_string_pool_ref_t pool, tb_char_t const* data);
 
 #ifdef __tb_debug__
 /*! dump the string pool
  *
- * @param pool      the string pool
+ * @param pool              the string pool
  */
-tb_void_t           tb_object_string_pool_dump(tb_handle_t pool);
+tb_void_t                   tb_string_pool_dump(tb_string_pool_ref_t pool);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

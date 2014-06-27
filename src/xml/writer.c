@@ -57,8 +57,8 @@ typedef struct __tb_xml_writer_impl_t
     // is format?
     tb_bool_t               bformat;
     
-    // the block pool
-    tb_handle_t             pool;
+    // the pool
+    tb_pool_ref_t           pool;
 
     // the elements stack
     tb_stack_ref_t          elements;

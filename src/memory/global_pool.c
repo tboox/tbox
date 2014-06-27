@@ -26,7 +26,6 @@
  * includes
  */
 #include "global_pool.h"
-#include "static_tiny_pool.h"
 #include "static_pool.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
@@ -50,40 +49,30 @@
  * types
  */
 
-/// the generic pool type
-typedef struct __tb_global_pool_t
+// the global pool impl type
+typedef struct __tb_global_pool_impl_t
 {
-    /// the magic 
-    tb_size_t       magic   : 16;
+    // the magic 
+    tb_size_t               magic   : 16;
 
-    /// the align
-    tb_size_t       align   : 8;
+    // the align
+    tb_size_t               align   : 8;
 
-    /// the data
-    tb_byte_t*      data;
+    // the data
+    tb_byte_t*              data;
 
-    /// the size
-    tb_size_t       size;
+    // the size
+    tb_size_t               size;
 
-    /// the tdata
-    tb_byte_t*      tdata;
+    // the pool
+    tb_static_pool_ref_t    bpool;
 
-    /// the tsize
-    tb_size_t       tsize;
-
-    /// the tpool
-    tb_handle_t     tpool;
-
-    /// the bpool
-    tb_handle_t     bpool;
-
-}tb_global_pool_t;
-
+}tb_global_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * the implementation
  */
-tb_handle_t tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
+tb_global_pool_ref_t tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
     // check
     tb_assert_and_check_return_val(data && size, tb_null);
@@ -100,224 +89,137 @@ tb_handle_t tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align
     data += byte;
 
     // init pool
-    tb_global_pool_t* pool = (tb_global_pool_t*)data;
-    tb_memset(pool, 0, sizeof(tb_global_pool_t));
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)data;
+    tb_memset(impl, 0, sizeof(tb_global_pool_impl_t));
 
     // init magic
-    pool->magic = TB_GLOBAL_POOL_MAGIC;
+    impl->magic = TB_GLOBAL_POOL_MAGIC;
 
     // init align
-    pool->align = align;
+    impl->align = align;
 
     // init data
-    pool->data = (tb_byte_t*)tb_align((tb_size_t)&pool[1], pool->align);
-    tb_assert_and_check_return_val(data + size > pool->data, tb_null);
+    impl->data = (tb_byte_t*)tb_align((tb_size_t)&impl[1], impl->align);
+    tb_assert_and_check_return_val(data + size > impl->data, tb_null);
 
     // init size
-    pool->size = (tb_byte_t*)data + size - pool->data;
-    tb_assert_and_check_return_val(pool->size, tb_null);
+    impl->size = (tb_byte_t*)data + size - impl->data;
+    tb_assert_and_check_return_val(impl->size, tb_null);
 
     // init bpool
-    pool->bpool = tb_static_pool_init(pool->data, pool->size, pool->align);
-    tb_assert_and_check_return_val(pool->bpool, tb_null);
-    
-    // FIXME: alloc will be too slower now if space is small
-#if 0
-    // init tpool
-    pool->tsize = pool->size >> 3;
-    if (pool->tsize >= TB_GLOBAL_POOL_TPOOL_MINN)
-    {
-        pool->tdata = tb_static_pool_malloc(pool->bpool, pool->tsize);
-        if (pool->tdata)
-        {
-            pool->tpool = tb_tiny_pool_init(pool->tdata, pool->tsize, pool->align);
-            tb_assert_and_check_return_val(pool->tpool, tb_null);
-        }
-    }
-#endif
+    impl->bpool = tb_static_pool_init(impl->data, impl->size, impl->align);
+    tb_assert_and_check_return_val(impl->bpool, tb_null);
 
+    // TODO: using tiny pool
+    // ..
+   
     // ok
-    return ((tb_handle_t)pool);
+    return (tb_global_pool_ref_t)impl;
 }
-tb_void_t tb_global_pool_exit(tb_handle_t handle)
+tb_void_t tb_global_pool_exit(tb_global_pool_ref_t pool)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return(pool && pool->magic == TB_GLOBAL_POOL_MAGIC);
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl && impl->magic == TB_GLOBAL_POOL_MAGIC);
 
     // clear body
-    tb_global_pool_clear(handle);
+    tb_global_pool_clear(pool);
 
     // exit bpool
-    if (pool->bpool) tb_static_pool_exit(pool->bpool);
+    if (impl->bpool) tb_static_pool_exit(impl->bpool);
 
     // clear pool
-    tb_memset(pool, 0, sizeof(tb_global_pool_t));   
+    tb_memset(impl, 0, sizeof(tb_global_pool_impl_t));   
 }
-tb_void_t tb_global_pool_clear(tb_handle_t handle)
+tb_void_t tb_global_pool_clear(tb_global_pool_ref_t pool)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return(pool && pool->magic == TB_GLOBAL_POOL_MAGIC);
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl && impl->magic == TB_GLOBAL_POOL_MAGIC);
 
     // clear bpool
-    if (pool->bpool) tb_static_pool_clear(pool->bpool);
-
-    // reinit tpool
-    pool->tdata = tb_null;
-    pool->tpool = tb_null;
-    if (pool->tsize >= TB_GLOBAL_POOL_TPOOL_MINN)
-    {
-        pool->tdata = (tb_byte_t*)tb_static_pool_malloc(pool->bpool, pool->tsize);
-        if (pool->tdata) pool->tpool = tb_tiny_pool_init(pool->tdata, pool->tsize, pool->align);
-    }
+    if (impl->bpool) tb_static_pool_clear(impl->bpool);
 }
-
-tb_pointer_t tb_global_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_global_pool_malloc_(tb_global_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
-
-    // try malloc it from tpool
-    if (pool->tpool && size <= tb_tiny_pool_limit(pool->tpool))
-    {
-        tb_pointer_t data = tb_tiny_pool_malloc(pool->tpool, size);
-        if (data) return data;
-    }
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool, tb_null);
 
     // malloc it from bpool
-    return tb_static_pool_malloc_(pool->bpool, size __tb_debug_args__);
+    return tb_static_pool_malloc_(impl->bpool, size __tb_debug_args__);
 }
-
-tb_pointer_t tb_global_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_global_pool_malloc0_(tb_global_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
-
-    // try malloc it from tpool
-    if (pool->tpool && size <= tb_tiny_pool_limit(pool->tpool))
-    {
-        tb_pointer_t data = tb_tiny_pool_malloc0(pool->tpool, size);
-        if (data) return data;
-    }
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool, tb_null);
 
     // malloc it from bpool
-    return tb_static_pool_malloc0_(pool->bpool, size __tb_debug_args__);
+    return tb_static_pool_malloc0_(impl->bpool, size __tb_debug_args__);
 }
-
-tb_pointer_t tb_global_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_global_pool_nalloc_(tb_global_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
-
-    // try malloc it from tpool
-    if (pool->tpool && item * size <= tb_tiny_pool_limit(pool->tpool))
-    {
-        tb_pointer_t data = tb_tiny_pool_nalloc(pool->tpool, item, size);
-        if (data) return data;
-    }
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool, tb_null);
 
     // malloc it from bpool
-    return tb_static_pool_nalloc_(pool->bpool, item, size __tb_debug_args__);
+    return tb_static_pool_nalloc_(impl->bpool, item, size __tb_debug_args__);
 }
-
-tb_pointer_t tb_global_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_global_pool_nalloc0_(tb_global_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
-
-    // try malloc it from tpool
-    if (pool->tpool && item * size <= tb_tiny_pool_limit(pool->tpool))
-    {
-        tb_pointer_t data = tb_tiny_pool_nalloc0(pool->tpool, item, size);
-        if (data) return data;
-    }
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool, tb_null);
 
     // malloc it from bpool
-    return tb_static_pool_nalloc0_(pool->bpool, item, size __tb_debug_args__);
+    return tb_static_pool_nalloc0_(impl->bpool, item, size __tb_debug_args__);
 }
-tb_pointer_t tb_global_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_global_pool_ralloc_(tb_global_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
-
-    // try ralloc it from tpool
-    if (pool->tpool && (tb_byte_t*)data > pool->tdata && (tb_byte_t*)data < pool->tdata + pool->tsize)
-    {
-        // ralloc it
-        tb_pointer_t pdata = tb_null;
-        if (size <= tb_tiny_pool_limit(pool->tpool) && (pdata = tb_tiny_pool_ralloc(pool->tpool, data, size))) return pdata;
-        else
-        {
-            // malloc it
-            pdata = tb_static_pool_malloc_(pool->bpool, size __tb_debug_args__);
-            tb_check_return_val(pdata, tb_null);
-            tb_assert_and_check_return_val(pdata != data, pdata);
-
-            // copy data
-            tb_size_t osize = tb_min(tb_tiny_pool_limit(pool->tpool), size);
-            tb_memcpy(pdata, data, osize);
-            
-            // free it
-            tb_tiny_pool_free(pool->tpool, data);
-
-            // ok
-            return pdata;
-        }
-    }
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool, tb_null);
 
     // ralloc it from bpool
-    return tb_static_pool_ralloc_(pool->bpool, data, size __tb_debug_args__);
+    return tb_static_pool_ralloc_(impl->bpool, data, size __tb_debug_args__);
 }
-
-tb_bool_t tb_global_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
+tb_bool_t tb_global_pool_free_(tb_global_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_false);
-
-    // free it to tpool
-    if (pool->tpool && (tb_byte_t*)data > pool->tdata && (tb_byte_t*)data < pool->tdata + pool->tsize)
-        return tb_tiny_pool_free(pool->tpool, data);
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool, tb_false);
 
     // free it to bpool
-    return tb_static_pool_free_(pool->bpool, data __tb_debug_args__);
+    return tb_static_pool_free_(impl->bpool, data __tb_debug_args__);
 }
-
 #ifdef __tb_debug__
-tb_size_t tb_global_pool_data_size(tb_handle_t handle, tb_cpointer_t data)
+tb_size_t tb_global_pool_data_size(tb_global_pool_ref_t pool, tb_cpointer_t data)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, 0);
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool, 0);
 
     // the data size
-    return tb_static_pool_data_size(pool->bpool, data);
+    return tb_static_pool_data_size(impl->bpool, data);
 }
-tb_void_t tb_global_pool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix)
+tb_void_t tb_global_pool_data_dump(tb_global_pool_ref_t pool, tb_cpointer_t data, tb_char_t const* prefix)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool);
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool);
 
     // the data dump
-    tb_static_pool_data_dump(pool->bpool, data, prefix);
+    tb_static_pool_data_dump(impl->bpool, data, prefix);
 }
-tb_void_t tb_global_pool_dump(tb_handle_t handle)
+tb_void_t tb_global_pool_dump(tb_global_pool_ref_t pool)
 {
     // check 
-    tb_global_pool_t* pool = (tb_global_pool_t*)handle;
-    tb_assert_and_check_return(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool);
-
-    // dump tpool
-    if (pool->tpool) tb_tiny_pool_dump(pool->tpool);
+    tb_global_pool_impl_t* impl = (tb_global_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl && impl->magic == TB_GLOBAL_POOL_MAGIC && impl->bpool);
 
     // dump bpool
-    tb_static_pool_dump(pool->bpool, "pool");
+    tb_static_pool_dump(impl->bpool, "pool");
 }
 #endif

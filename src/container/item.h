@@ -28,6 +28,8 @@
  * includes
  */
 #include "prefix.h"
+#include "../memory/pool.h"
+#include "../string/pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -79,10 +81,13 @@ typedef enum __tb_item_type_t
 typedef struct __tb_item_func_t
 {
     /// the item type
-    tb_size_t               type;
+    tb_uint16_t             type;
+
+    /// the item flag
+    tb_uint16_t             flag;
 
     /// the item size
-    tb_size_t               size;
+    tb_uint16_t             size;
 
     /// the item pool
     tb_handle_t             pool;
@@ -174,11 +179,11 @@ tb_item_func_t      tb_item_func_uint32(tb_noarg_t);
  * using tb_pool_strdup if the bpool exists
  *
  * @param bcase     is case?
- * @param bpool     the block pool
+ * @param pool      the pool
 
  * @return          the item func
  */
-tb_item_func_t      tb_item_func_str(tb_bool_t bcase, tb_handle_t bpool); 
+tb_item_func_t      tb_item_func_str(tb_bool_t bcase, tb_pool_ref_t pool); 
 
 /*! the pointer item function
  *
@@ -197,20 +202,6 @@ tb_item_func_t      tb_item_func_ptr(tb_item_func_free_t free, tb_cpointer_t pri
  */
 tb_item_func_t      tb_item_func_obj(tb_noarg_t);
 
-/*! the external fixed memory item function
- *
- * storing the index value in the internal item of the container
- *
- * using tb_malloc if the fpool is null, 
- * using tb_fixed_pool_malloc if the fpool exists
- *
- * @param size      the item size
- * @param rpool     the item rpool
- *
- * @return          the item func
- */
-tb_item_func_t      tb_item_func_efm(tb_size_t size, tb_handle_t fpool);
-
 /*! the internal fixed memory item function
  *
  * storing it in the internal item of the container directly for saving memory
@@ -225,11 +216,11 @@ tb_item_func_t      tb_item_func_mem(tb_size_t size, tb_item_func_free_t free, t
 
 /*! the string item function for scache
  *
- * @param bcase     is case?
+ * @param pool      the string pool
 
  * @return          the item func
  */
-tb_item_func_t      tb_item_func_string_pool(tb_handle_t spool); 
+tb_item_func_t      tb_item_func_string_pool(tb_string_pool_ref_t pool); 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

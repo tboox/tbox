@@ -616,8 +616,8 @@ static tb_void_t tb_list_str_dump(tb_list_ref_t list)
 }
 static tb_void_t tb_list_str_test()
 {
-    tb_handle_t bpool = tb_pool_init(TB_POOL_GROW_SMALL, 0);
-    tb_list_ref_t list = tb_list_init(TB_LIST_GROW_SIZE, tb_item_func_str(tb_true, bpool));
+    tb_pool_ref_t pool = tb_pool_init(TB_POOL_GROW_SMALL, 0);
+    tb_list_ref_t list = tb_list_init(TB_LIST_GROW_SIZE, tb_item_func_str(tb_true, pool));
     tb_assert_and_check_return(list);
 
     tb_size_t           i = 0;
@@ -685,7 +685,7 @@ static tb_void_t tb_list_str_test()
     tb_list_str_dump(list);
 
     tb_list_exit(list);
-    tb_pool_exit(bpool);
+    tb_pool_exit(pool);
 }
 static tb_void_t tb_list_mem_free(tb_item_func_t* func, tb_pointer_t item)
 {

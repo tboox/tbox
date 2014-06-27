@@ -144,6 +144,7 @@ tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_cpointer_t priv)
     // init func
     tb_item_func_t func = {0};
     func.type   = TB_ITEM_TYPE_PTR;
+    func.flag   = 0;
     func.hash   = func_size.hash;
     func.comp   = tb_item_func_ptr_comp;
     func.data   = tb_item_func_ptr_data;

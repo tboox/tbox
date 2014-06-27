@@ -51,93 +51,87 @@
  */
 
 #ifdef __tb_debug__
-/// the static fixed pool info type
+// the static fixed pool info type
 typedef struct __tb_static_fixed_pool_info_t
 {
-    /// the peak size
+    // the peak size
     tb_size_t                   peak;
 
-    /// the fail count
+    // the fail count
     tb_size_t                   fail;
 
-    /// the pred count
+    // the pred count
     tb_size_t                   pred;
 
-    /// the aloc count
+    // the aloc count
     tb_size_t                   aloc;
 
 }tb_static_fixed_pool_info_t;
 #endif
 
-/*!the static fixed pool type
- *
- * <pre>
- * |---------|-----------------|-----------------------------------------------|
- *    head          used                            data     
- * </pre>
- */
-typedef struct __tb_static_fixed_pool_t
+// the static fixed pool impl type
+typedef struct __tb_static_fixed_pool_impl_t
 {
-    /// the magic 
+    // the magic 
     tb_uint16_t                 magic;
 
-    /// the align
+    // the align
     tb_uint16_t                 align;
 
-    /// the step
+    // the step
     tb_size_t                   step;
 
-    /// the maxn
+    // the maxn
     tb_size_t                   maxn;
 
-    /// the size
+    // the size
     tb_size_t                   size;
 
-    /// the data
+    // the data
     tb_byte_t*                  data;
 
-    /// the used
+    // the used
     tb_byte_t*                  used;
 
-    /// the pred
+    // the pred
     tb_byte_t*                  pred;
 
 #ifdef __tb_debug__
-    /// the info
+    // the info
     tb_static_fixed_pool_info_t info;
 #endif
 
-}tb_static_fixed_pool_t;
+}tb_static_fixed_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_pointer_t tb_static_fixed_pool_malloc_pred(tb_static_fixed_pool_t* pool)
+static tb_pointer_t tb_static_fixed_pool_malloc_pred(tb_static_fixed_pool_impl_t* impl)
 {
     // init data
     tb_pointer_t data = tb_null;
 
     // has pred?
-    if (pool->pred)
+    if (impl->pred)
     {
         // init index
-        tb_size_t i = (pool->pred - pool->data) / pool->step;
-        tb_assert_and_check_return_val(!((pool->pred - pool->data) % pool->step), tb_null);
+        tb_size_t i = (impl->pred - impl->data) / impl->step;
+        tb_assert_and_check_return_val(!((impl->pred - impl->data) % impl->step), tb_null);
 
         // is free?
-        if (!tb_static_fixed_pool_used_bset(pool->used, i)) 
+        if (!tb_static_fixed_pool_used_bset(impl->used, i)) 
         {
             // ok
-            data = pool->pred;
-            tb_static_fixed_pool_used_set1(pool->used, i);
+            data = impl->pred;
+            tb_static_fixed_pool_used_set1(impl->used, i);
 
             // predict the next block
-            if (i + 1 < pool->maxn && !tb_static_fixed_pool_used_bset(pool->used, i + 1))
-                pool->pred = pool->data + (i + 1) * pool->step;
+            if (i + 1 < impl->maxn && !tb_static_fixed_pool_used_bset(impl->used, i + 1))
+                impl->pred = impl->data + (i + 1) * impl->step;
 
 #ifdef __tb_debug__
             // pred++
-            pool->info.pred++;
+            impl->info.pred++;
 #endif
         }
     }
@@ -147,16 +141,16 @@ static tb_pointer_t tb_static_fixed_pool_malloc_pred(tb_static_fixed_pool_t* poo
 }
 
 #if 1
-static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* pool)
+static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_impl_t* impl)
 {
     tb_size_t   i = 0;
 #if TB_CPU_BIT64
-    tb_size_t   m = tb_align(pool->maxn, 64) >> 6;
+    tb_size_t   m = tb_align(impl->maxn, 64) >> 6;
 #elif TB_CPU_BIT32
-    tb_size_t   m = tb_align(pool->maxn, 32) >> 5;
+    tb_size_t   m = tb_align(impl->maxn, 32) >> 5;
 #endif
-    tb_size_t*  p = (tb_size_t*)pool->used;
-    tb_size_t*  e = (tb_size_t*)pool->used + m;
+    tb_size_t*  p = (tb_size_t*)impl->used;
+    tb_size_t*  e = (tb_size_t*)impl->used + m;
     tb_byte_t*  d = tb_null;
 
     // check align
@@ -185,27 +179,27 @@ static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* poo
     tb_check_return_val(p < e, tb_null);
 
     // find the free bit index
-    m = pool->maxn;
-    i = (((tb_byte_t*)p - pool->used) << 3) + tb_bits_fb0_le(*p);
+    m = impl->maxn;
+    i = (((tb_byte_t*)p - impl->used) << 3) + tb_bits_fb0_le(*p);
     tb_check_return_val(i < m, tb_null);
 
     // alloc it
-    d = pool->data + i * pool->step;
-    tb_static_fixed_pool_used_set1(pool->used, i);
+    d = impl->data + i * impl->step;
+    tb_static_fixed_pool_used_set1(impl->used, i);
 
     // predict the next block
-    if (i + 1 < m && !tb_static_fixed_pool_used_bset(pool->used, i + 1))
-        pool->pred = pool->data + (i + 1) * pool->step;
+    if (i + 1 < m && !tb_static_fixed_pool_used_bset(impl->used, i + 1))
+        impl->pred = impl->data + (i + 1) * impl->step;
 
     // ok?
     return d;
 }
 #else
-static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* pool)
+static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_impl_t* impl)
 {
     tb_size_t   i = 0;
-    tb_size_t   m = pool->maxn;
-    tb_byte_t*  p = pool->used;
+    tb_size_t   m = impl->maxn;
+    tb_byte_t*  p = impl->used;
     tb_byte_t   u = *p;
     tb_byte_t   b = 0;
     tb_byte_t*  d = tb_null;
@@ -229,17 +223,17 @@ static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* poo
         }
 
         // is free?
-        // if (!tb_static_fixed_pool_used_bset(pool->used, i))
+        // if (!tb_static_fixed_pool_used_bset(impl->used, i))
         if (!(u & (0x01 << b)))
         {
             // ok
-            d = pool->data + i * pool->step;
-            // tb_static_fixed_pool_used_set1(pool->used, i);
+            d = impl->data + i * impl->step;
+            // tb_static_fixed_pool_used_set1(impl->used, i);
             *(p - 1) |= (0x01 << b);
 
             // predict the next block
-            if (i + 1 < m && !tb_static_fixed_pool_used_bset(pool->used, i + 1))
-                pool->pred = pool->data + (i + 1) * pool->step;
+            if (i + 1 < m && !tb_static_fixed_pool_used_bset(impl->used, i + 1))
+                impl->pred = impl->data + (i + 1) * impl->step;
 
             break;
         }
@@ -254,7 +248,7 @@ static tb_pointer_t tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_t* poo
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align)
+tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align)
 {
     // check
     tb_assert_and_check_return_val(data && step && size, tb_null);
@@ -275,20 +269,20 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
     tb_memset(data, 0, size);
 
     // init pool
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)data;
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)data;
 
     // init magic
-    pool->magic = TB_STATIC_FIXED_POOL_MAGIC;
+    impl->magic = TB_STATIC_FIXED_POOL_MAGIC;
 
     // init align
-    pool->align = (tb_uint16_t)align;
+    impl->align = (tb_uint16_t)align;
 
     // init step
-    pool->step = tb_align(step, pool->align);
+    impl->step = tb_align(step, impl->align);
 
     // init used
-    pool->used = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)&pool[1], (tb_hize_t)pool->align);
-    tb_assert_and_check_return_val(data + size > pool->used, tb_null);
+    impl->used = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)&impl[1], (tb_hize_t)impl->align);
+    tb_assert_and_check_return_val(data + size > impl->used, tb_null);
 
     /* init maxn
      *
@@ -300,133 +294,132 @@ tb_handle_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t
      * maxn < (left - (7 / 8)) / (1 / 8 + step)
      * maxn < (left * 8 - 7) / (1 + step * 8)
      */
-    pool->maxn = (((data + size - pool->used) << 3) - 7) / (1 + (pool->step << 3));
-    tb_assert_and_check_return_val(pool->maxn, tb_null);
+    impl->maxn = (((data + size - impl->used) << 3) - 7) / (1 + (impl->step << 3));
+    tb_assert_and_check_return_val(impl->maxn, tb_null);
 
     // init data
-    pool->data = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)pool->used + (tb_align8(pool->maxn) >> 3), (tb_hize_t)pool->align);
-    tb_assert_and_check_return_val(data + size > pool->data, tb_null);
-    tb_assert_and_check_return_val(pool->maxn * pool->step <= (tb_size_t)(data + size - pool->data), tb_null);
+    impl->data = (tb_byte_t*)(tb_size_t)tb_align((tb_hize_t)(tb_size_t)impl->used + (tb_align8(impl->maxn) >> 3), (tb_hize_t)impl->align);
+    tb_assert_and_check_return_val(data + size > impl->data, tb_null);
+    tb_assert_and_check_return_val(impl->maxn * impl->step <= (tb_size_t)(data + size - impl->data), tb_null);
 
     // init size
-    pool->size = 0;
+    impl->size = 0;
 
     // init pred
-    pool->pred = pool->data;
+    impl->pred = impl->data;
 
     // init info
 #ifdef __tb_debug__
-    pool->info.peak = 0;
-    pool->info.fail = 0;
-    pool->info.pred = 0;
-    pool->info.aloc = 0;
+    impl->info.peak = 0;
+    impl->info.fail = 0;
+    impl->info.pred = 0;
+    impl->info.aloc = 0;
 #endif
 
     // ok
-    return ((tb_handle_t)pool);
+    return (tb_static_fixed_pool_ref_t)impl;
 }
-tb_void_t tb_static_fixed_pool_exit(tb_handle_t handle)
+tb_void_t tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t pool)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl && impl->magic == TB_STATIC_FIXED_POOL_MAGIC);
 
     // clear body
-    tb_static_fixed_pool_clear(handle);
+    tb_static_fixed_pool_clear(pool);
 
     // clear head
-    tb_memset(pool, 0, sizeof(tb_static_fixed_pool_t));
+    tb_memset(impl, 0, sizeof(tb_static_fixed_pool_impl_t));
 }
-
-tb_void_t tb_static_fixed_pool_clear(tb_handle_t handle)
+tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl && impl->magic == TB_STATIC_FIXED_POOL_MAGIC);
 
     // clear data
-    if (pool->data) tb_memset(pool->data, 0, pool->maxn * pool->step);
+    if (impl->data) tb_memset(impl->data, 0, impl->maxn * impl->step);
     
     // clear used
-    if (pool->used) tb_memset(pool->used, 0, (tb_align8(pool->maxn) >> 3));
+    if (impl->used) tb_memset(impl->used, 0, (tb_align8(impl->maxn) >> 3));
 
     // reinit size
-    pool->size = 0;
+    impl->size = 0;
     
     // reinit pred
-    pool->pred = pool->data;
+    impl->pred = impl->data;
     
     // reinit info
 #ifdef __tb_debug__
-    pool->info.peak = 0;
-    pool->info.fail = 0;
-    pool->info.pred = 0;
-    pool->info.aloc = 0;
+    impl->info.peak = 0;
+    impl->info.fail = 0;
+    impl->info.pred = 0;
+    impl->info.aloc = 0;
 #endif
 }
-tb_size_t tb_static_fixed_pool_size(tb_handle_t handle)
+tb_size_t tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t pool)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC, 0);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_STATIC_FIXED_POOL_MAGIC, 0);
 
     // size
-    return pool->size;
+    return impl->size;
 }
-tb_pointer_t tb_static_fixed_pool_malloc(tb_handle_t handle)
+tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_null);
-    tb_assert_and_check_return_val(pool->step, tb_null);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_null);
+    tb_assert_and_check_return_val(impl->step, tb_null);
 
     // no space?
-    tb_check_return_val(pool->size < pool->maxn, tb_null);
+    tb_check_return_val(impl->size < impl->maxn, tb_null);
 
     // predict it?
 //  tb_pointer_t data = tb_null;
-    tb_pointer_t data = tb_static_fixed_pool_malloc_pred(pool);
+    tb_pointer_t data = tb_static_fixed_pool_malloc_pred(impl);
 
     // find the free block
-    if (!data) data = tb_static_fixed_pool_malloc_find(pool);
+    if (!data) data = tb_static_fixed_pool_malloc_find(impl);
 
     // size++
-    if (data) pool->size++;
+    if (data) impl->size++;
 
     // update info
 #ifdef __tb_debug__
-    if (pool->size > pool->info.peak) pool->info.peak = pool->size;
-    pool->info.fail += data? 0 : 1;
-    pool->info.aloc++;
+    if (impl->size > impl->info.peak) impl->info.peak = impl->size;
+    impl->info.fail += data? 0 : 1;
+    impl->info.aloc++;
 #endif
 
     // ok?
     return data;
 }
-tb_pointer_t tb_static_fixed_pool_malloc0(tb_handle_t handle)
+tb_pointer_t tb_static_fixed_pool_malloc0(tb_static_fixed_pool_ref_t pool)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_null);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_STATIC_FIXED_POOL_MAGIC, tb_null);
 
     // malloc
-    tb_pointer_t p = tb_static_fixed_pool_malloc(handle);
+    tb_pointer_t p = tb_static_fixed_pool_malloc(pool);
 
     // clear
-    if (p) tb_memset(p, 0, pool->step);
+    if (p) tb_memset(p, 0, impl->step);
 
     // ok?
     return p;
 }
-tb_pointer_t tb_static_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data)
+tb_pointer_t tb_static_fixed_pool_memdup(tb_static_fixed_pool_ref_t pool, tb_cpointer_t data)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && data, tb_null);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && data, tb_null);
 
     // init
-    tb_size_t       n = pool->step;
-    tb_pointer_t    p = tb_static_fixed_pool_malloc(handle);
+    tb_size_t       n = impl->step;
+    tb_pointer_t    p = tb_static_fixed_pool_malloc(pool);
 
     // copy
     if (p) tb_memcpy(p, data, n);
@@ -434,48 +427,48 @@ tb_pointer_t tb_static_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data)
     // ok?
     return p;
 }
-tb_bool_t tb_static_fixed_pool_free(tb_handle_t handle, tb_pointer_t data)
+tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_t data)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC && pool->step, tb_false);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl && impl->magic == TB_STATIC_FIXED_POOL_MAGIC && impl->step, tb_false);
 
     // check size
-    tb_check_return_val(pool->size, tb_false);
+    tb_check_return_val(impl->size, tb_false);
 
     // check data
-    tb_check_return_val((tb_byte_t*)data >= pool->data && (tb_byte_t*)data + pool->step <= pool->data + pool->maxn * pool->step, tb_false); 
-    tb_check_return_val(!(((tb_size_t)data) & (pool->align - 1)), tb_false);
-    tb_check_return_val(!(((tb_byte_t*)data - pool->data) % pool->step), tb_false);
+    tb_check_return_val((tb_byte_t*)data >= impl->data && (tb_byte_t*)data + impl->step <= impl->data + impl->maxn * impl->step, tb_false); 
+    tb_check_return_val(!(((tb_size_t)data) & (impl->align - 1)), tb_false);
+    tb_check_return_val(!(((tb_byte_t*)data - impl->data) % impl->step), tb_false);
 
     // item
-    tb_size_t i = ((tb_byte_t*)data - pool->data) / pool->step;
+    tb_size_t i = ((tb_byte_t*)data - impl->data) / impl->step;
 
     // double free?
-    tb_assert_return_val(tb_static_fixed_pool_used_bset(pool->used, i), tb_true);
+    tb_assert_return_val(tb_static_fixed_pool_used_bset(impl->used, i), tb_true);
 
     // free it
-    tb_static_fixed_pool_used_set0(pool->used, i);
+    tb_static_fixed_pool_used_set0(impl->used, i);
     
     // predict it
-    pool->pred = (tb_byte_t*)data;
+    impl->pred = (tb_byte_t*)data;
 
     // size--
-    pool->size--;
+    impl->size--;
 
     // ok
     return tb_true;
 }
-tb_void_t tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t , tb_cpointer_t ), tb_cpointer_t priv)
+tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_bool_t (*func)(tb_pointer_t , tb_cpointer_t ), tb_cpointer_t priv)
 {
     // check 
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return(pool && pool->magic == TB_STATIC_FIXED_POOL_MAGIC && pool->maxn && pool->step && func);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl && impl->magic == TB_STATIC_FIXED_POOL_MAGIC && impl->maxn && impl->step && func);
 
     // walk
     tb_size_t   i = 0;
-    tb_size_t   m = pool->maxn;
-    tb_byte_t*  p = pool->used;
+    tb_size_t   m = impl->maxn;
+    tb_byte_t*  p = impl->used;
     tb_byte_t   u = *p;
     tb_byte_t   b = 0;
     for (i = 0; i < m; ++i)
@@ -493,14 +486,14 @@ tb_void_t tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_poi
             if (!(u + 1))
             {
                 // done func
-                func(pool->data + (i + 0) * pool->step, priv);
-                func(pool->data + (i + 1) * pool->step, priv);
-                func(pool->data + (i + 2) * pool->step, priv);
-                func(pool->data + (i + 3) * pool->step, priv);
-                func(pool->data + (i + 4) * pool->step, priv);
-                func(pool->data + (i + 5) * pool->step, priv);
-                func(pool->data + (i + 6) * pool->step, priv);
-                func(pool->data + (i + 7) * pool->step, priv);
+                func(impl->data + (i + 0) * impl->step, priv);
+                func(impl->data + (i + 1) * impl->step, priv);
+                func(impl->data + (i + 2) * impl->step, priv);
+                func(impl->data + (i + 3) * impl->step, priv);
+                func(impl->data + (i + 4) * impl->step, priv);
+                func(impl->data + (i + 5) * impl->step, priv);
+                func(impl->data + (i + 6) * impl->step, priv);
+                func(impl->data + (i + 7) * impl->step, priv);
 
                 // skip this byte and continue it
                 i += 7;
@@ -509,40 +502,40 @@ tb_void_t tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_poi
         }
 
         // is occupied?
-        // if (tb_static_fixed_pool_used_bset(pool->used, i))
+        // if (tb_static_fixed_pool_used_bset(impl->used, i))
         if ((u & (0x01 << b)))
         {
             // done func
-            func(pool->data + i * pool->step, priv);
+            func(impl->data + i * impl->step, priv);
         }
     }
 }
 
 #ifdef __tb_debug__
-tb_void_t tb_static_fixed_pool_dump(tb_handle_t handle)
+tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
 {
-    tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)handle;
-    tb_assert_and_check_return(pool);
+    tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return(impl);
 
     tb_trace_i("======================================================================");
-    tb_trace_i("pool: magic: %#lx", pool->magic);
-    tb_trace_i("pool: align: %lu",  pool->align);
-    tb_trace_i("pool: head: %lu",   pool->data - (tb_byte_t*)pool);
-    tb_trace_i("pool: data: %p",    pool->data);
-    tb_trace_i("pool: size: %lu",   pool->size);
-    tb_trace_i("pool: step: %lu",   pool->step);
-    tb_trace_i("pool: maxn: %lu",   pool->maxn);
-    tb_trace_i("pool: peak: %lu",   pool->info.peak);
-    tb_trace_i("pool: wast: %lu%%", (pool->data - (tb_byte_t*)pool) * 100 / (pool->maxn * pool->step));
-    tb_trace_i("pool: fail: %lu",   pool->info.fail);
-    tb_trace_i("pool: pred: %lu%%", pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
+    tb_trace_i("pool: magic: %#lx", impl->magic);
+    tb_trace_i("pool: align: %lu",  impl->align);
+    tb_trace_i("pool: head: %lu",   impl->data - (tb_byte_t*)pool);
+    tb_trace_i("pool: data: %p",    impl->data);
+    tb_trace_i("pool: size: %lu",   impl->size);
+    tb_trace_i("pool: step: %lu",   impl->step);
+    tb_trace_i("pool: maxn: %lu",   impl->maxn);
+    tb_trace_i("pool: peak: %lu",   impl->info.peak);
+    tb_trace_i("pool: wast: %lu%%", (impl->data - (tb_byte_t*)pool) * 100 / (impl->maxn * impl->step));
+    tb_trace_i("pool: fail: %lu",   impl->info.fail);
+    tb_trace_i("pool: pred: %lu%%", impl->info.aloc? ((impl->info.pred * 100) / impl->info.aloc) : 0);
 
     tb_size_t   i = 0;
-    tb_size_t   m = pool->maxn;
+    tb_size_t   m = impl->maxn;
     for (i = 0; i < m; ++i)
     {
-        if (!(i & 0x7) && pool->used[i >> 3]) 
-            tb_trace_i("\tpool: block[%lu]: %08b", i >> 3, pool->used[i >> 3]);
+        if (!(i & 0x7) && impl->used[i >> 3]) 
+            tb_trace_i("\tpool: block[%lu]: %08b", i >> 3, impl->used[i >> 3]);
     }
 }
 #endif

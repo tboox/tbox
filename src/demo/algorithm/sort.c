@@ -304,7 +304,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init pool
-    tb_handle_t pool = tb_pool_init(0, 0);
+    tb_pool_ref_t pool = tb_pool_init(0, 0);
     tb_assert_and_check_return(pool);
     
     // init iterator
@@ -346,7 +346,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init pool
-    tb_handle_t pool = tb_pool_init(0, 0);
+    tb_pool_ref_t pool = tb_pool_init(0, 0);
     tb_assert_and_check_return(pool);
     
     // init iterator
@@ -388,7 +388,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init pool
-    tb_handle_t pool = tb_pool_init(0, 0);
+    tb_pool_ref_t pool = tb_pool_init(0, 0);
     tb_assert_and_check_return(pool);
     
     // init iterator
@@ -430,7 +430,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init pool
-    tb_handle_t pool = tb_pool_init(0, 0);
+    tb_pool_ref_t pool = tb_pool_init(0, 0);
     tb_assert_and_check_return(pool);
     
     // init iterator
@@ -472,7 +472,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init pool
-    tb_handle_t pool = tb_pool_init(0, 0);
+    tb_pool_ref_t pool = tb_pool_init(0, 0);
     tb_assert_and_check_return(pool);
     
     // init iterator

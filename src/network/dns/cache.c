@@ -54,10 +54,10 @@
 typedef struct __tb_dns_cache_t
 {
     // the pool
-    tb_handle_t             pool;
+    tb_pool_ref_t           pool;
 
     // the hash
-    tb_hash_ref_t              hash;
+    tb_hash_ref_t           hash;
 
     // the times
     tb_hize_t               times;

@@ -121,7 +121,7 @@ typedef struct __tb_ltimer_impl_t
     tb_spinlock_t               lock;
 
     // the pool
-    tb_handle_t                 pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the expired tasks
     tb_vector_ref_t             expired;

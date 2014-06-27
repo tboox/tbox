@@ -47,44 +47,120 @@ __tb_extern_c_enter__
 #define tb_global_pool_free(handle, data)               tb_global_pool_free_(handle, data __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the global pool ref type
+typedef struct{}*   tb_global_pool_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// init
-tb_handle_t     tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
+/*! init the global pool
+ * 
+ * @param data          the pool data
+ * @param size          the pool size
+ * @param align         the pool bytes align, using the cpu-aligned if be zero
+ *
+ * @return              the pool 
+ */
+tb_global_pool_ref_t     tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
-// exit
-tb_void_t       tb_global_pool_exit(tb_handle_t handle);
+/*! exit the pool
+ *
+ * @param pool          the pool 
+ */
+tb_void_t               tb_global_pool_exit(tb_global_pool_ref_t pool);
 
-// clear
-tb_void_t       tb_global_pool_clear(tb_handle_t handle);
+/*! clear the pool
+ *
+ * @param pool          the pool 
+ */
+tb_void_t               tb_global_pool_clear(tb_global_pool_ref_t pool);
 
-// malloc
-tb_pointer_t    tb_global_pool_malloc_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory
+ *
+ * @param pool          the pool 
+ * @param size          the size
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_global_pool_malloc_(tb_global_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
 
-// malloc0
-tb_pointer_t    tb_global_pool_malloc0_(tb_handle_t handle, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory and fill zero 
+ *
+ * @param pool          the pool 
+ * @param size          the size
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_global_pool_malloc0_(tb_global_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
 
-// nalloc
-tb_pointer_t    tb_global_pool_nalloc_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory with the item count
+ *
+ * @param pool          the pool 
+ * @param item          the item count
+ * @param size          the item size
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_global_pool_nalloc_(tb_global_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
-// nalloc0
-tb_pointer_t    tb_global_pool_nalloc0_(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
+/*! malloc the memory with the item count and fill zero
+ *
+ * @param pool          the pool 
+ * @param item          the item count
+ * @param size          the item size
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_global_pool_nalloc0_(tb_global_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
-// ralloc
-tb_pointer_t    tb_global_pool_ralloc_(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+/*! realloc the memory
+ *
+ * @param pool          the pool 
+ * @param data          the data address
+ * @param size          the data size
+ *
+ * @return              the new data address
+ */
+tb_pointer_t            tb_global_pool_ralloc_(tb_global_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
-// free
-tb_bool_t       tb_global_pool_free_(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
+/*! free the memory
+ *
+ * @param pool          the pool 
+ * @param data          the data address
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_global_pool_free_(tb_global_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
-// data size
-tb_size_t       tb_global_pool_data_size(tb_handle_t handle, tb_cpointer_t data);
+#ifdef __tb_debug__
+/*! the memory data size
+ *
+ * @param handle        the pool handle
+ * @param data          the data address
+ *
+ * @return              the data size
+ */
+tb_size_t               tb_global_pool_data_size(tb_global_pool_ref_t pool, tb_cpointer_t data);
 
-// data dump
-tb_void_t       tb_global_pool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix);
+/*! dump the memory data 
+ *
+ * @param handle        the pool handle
+ * @param data          the data address
+ * @param prefix        the trace prefix
+ */
+tb_void_t               tb_global_pool_data_dump(tb_global_pool_ref_t pool, tb_cpointer_t data, tb_char_t const* prefix);
 
-// dump
-tb_void_t       tb_global_pool_dump(tb_handle_t handle);
+/*! dump the pool
+ *
+ * @param handle        the pool handle
+ * @param prefix        the trace prefix
+ */
+tb_void_t               tb_global_pool_dump(tb_global_pool_ref_t pool);
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

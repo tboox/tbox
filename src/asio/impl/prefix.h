@@ -29,6 +29,7 @@
 #include "../prefix.h"
 #include "../aicp.h"
 #include "../aiop.h"
+#include "../../memory/memory.h"
 #include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +60,7 @@ typedef struct __tb_aico_impl_t
     tb_size_t                   type;
 
     // the pool
-    tb_handle_t                 pool;
+    tb_pool_ref_t               pool;
 
     // the handle
     tb_handle_t                 handle;
@@ -177,7 +178,7 @@ typedef struct __tb_aicp_impl_t
     tb_atomic_t                 work;
 
     // the pool
-    tb_handle_t                 pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the pool lock
     tb_spinlock_t               lock;
@@ -197,7 +198,7 @@ typedef struct __tb_aiop_impl_t
     tb_size_t                   maxn;
 
     // the aioo pool
-    tb_handle_t                 pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the pool lock
     tb_spinlock_t               lock;
