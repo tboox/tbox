@@ -30,20 +30,19 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack)
+tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack)
 {
-    HANDLE handle = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)priv, 0, NULL);
-    return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
+    HANDLE thread = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)priv, 0, NULL);
+    return ((thread != INVALID_HANDLE_VALUE)? (tb_thread_ref_t)thread : tb_null);
 }
-tb_void_t tb_thread_exit(tb_handle_t handle)
+tb_void_t tb_thread_exit(tb_thread_ref_t thread)
 {
-    if (handle) CloseHandle(handle);
+    if (thread) CloseHandle((HANDLE)thread);
 }
-tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout)
 {
     // wait
-    tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
+    tb_long_t r = WaitForSingleObject((HANDLE)thread, timeout >= 0? timeout : INFINITE);
     tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
     // timeout?
@@ -59,14 +58,14 @@ tb_void_t tb_thread_return(tb_pointer_t value)
 {
     ExitThread(0);
 }
-tb_bool_t tb_thread_suspend(tb_handle_t handle)
+tb_bool_t tb_thread_suspend(tb_thread_ref_t thread)
 {
-    if (handle) return ((DWORD)-1 != SuspendThread(handle))? tb_true : tb_false;
+    if (thread) return ((DWORD)-1 != SuspendThread((HANDLE)thread))? tb_true : tb_false;
     return tb_false;
 }
-tb_bool_t tb_thread_resume(tb_handle_t handle)
+tb_bool_t tb_thread_resume(tb_thread_ref_t thread)
 {
-    if (handle) return ((DWORD)-1 != ResumeThread(handle))? tb_true : tb_false;
+    if (thread) return ((DWORD)-1 != ResumeThread((HANDLE)thread))? tb_true : tb_false;
     return tb_false;
 }
 tb_size_t tb_thread_self()

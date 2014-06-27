@@ -31,7 +31,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_dynamic_init(tb_char_t const* name)
+tb_dynamic_ref_t tb_dynamic_init(tb_char_t const* name)
 {
     // check
     tb_assert_and_check_return_val(name, tb_null);
@@ -50,21 +50,30 @@ tb_handle_t tb_dynamic_init(tb_char_t const* name)
     }
 
     // ok?
-    return dynamic;
+    return (tb_dynamic_ref_t)dynamic;
 }
-tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
+tb_void_t tb_dynamic_exit(tb_dynamic_ref_t dynamic)
 {
+    // check
     tb_assert_and_check_return(dynamic);
-    dlclose(dynamic);
+
+    // close it
+    dlclose((tb_handle_t)dynamic);
     tb_assert(!dlerror());
 }
-tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
+tb_pointer_t tb_dynamic_func(tb_dynamic_ref_t dynamic, tb_char_t const* name)
 {
+    // check
     tb_assert_and_check_return_val(dynamic && name, tb_null);
-    return (tb_pointer_t)dlsym(dynamic, name);
+
+    // the func
+    return (tb_pointer_t)dlsym((tb_handle_t)dynamic, name);
 }
-tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
+tb_pointer_t tb_dynamic_pvar(tb_dynamic_ref_t dynamic, tb_char_t const* name)
 {
+    // check
     tb_assert_and_check_return_val(dynamic && name, tb_null);
-    return (tb_pointer_t)dlsym(dynamic, name);
+
+    // the variable address
+    return (tb_pointer_t)dlsym((tb_handle_t)dynamic, name);
 }

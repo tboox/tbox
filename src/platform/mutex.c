@@ -35,7 +35,7 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/mutex.c"
 #else
-tb_handle_t tb_mutex_init()
+tb_mutex_ref_t tb_mutex_init()
 {
     // done
     tb_bool_t       ok = tb_false;
@@ -63,15 +63,15 @@ tb_handle_t tb_mutex_init()
     }
 
     // ok?
-    return (tb_handle_t)lock;
+    return (tb_mutex_ref_t)lock;
 }
-tb_void_t tb_mutex_exit(tb_handle_t handle)
+tb_void_t tb_mutex_exit(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return(handle);
+    tb_assert_and_check_return(mutex);
 
     // exit it
-    tb_spinlock_t* lock = (tb_spinlock_t*)handle;
+    tb_spinlock_t* lock = (tb_spinlock_t*)mutex;
     if (pmutex)
     {
         // exit lock
@@ -81,32 +81,32 @@ tb_void_t tb_mutex_exit(tb_handle_t handle)
         tb_free(lock);
     }
 }
-tb_bool_t tb_mutex_enter(tb_handle_t handle)
+tb_bool_t tb_mutex_enter(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_false);
+    tb_assert_and_check_return_val(mutex, tb_false);
 
     // enter
-    tb_spinlock_enter((tb_spinlock_t*)handle);
+    tb_spinlock_enter((tb_spinlock_t*)mutex);
 
     // ok
     return tb_true;
 }
-tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
+tb_bool_t tb_mutex_enter_try(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_false);
+    tb_assert_and_check_return_val(mutex, tb_false);
 
     // try to enter
-    return tb_spinlock_enter_try((tb_spinlock_t*)handle);
+    return tb_spinlock_enter_try((tb_spinlock_t*)mutex);
 }
-tb_bool_t tb_mutex_leave(tb_handle_t handle)
+tb_bool_t tb_mutex_leave(tb_mutex_ref_t mutex)
 {
     // check
-    tb_assert_and_check_return_val(handle, tb_false);
+    tb_assert_and_check_return_val(mutex, tb_false);
 
     // leave
-    tb_spinlock_leave((tb_spinlock_t*)handle);
+    tb_spinlock_leave((tb_spinlock_t*)mutex);
 
     // ok
     return tb_true;

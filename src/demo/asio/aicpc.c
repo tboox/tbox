@@ -229,7 +229,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(argv[1], 0);
 
     // init
-    tb_aicp_ref_t          aicp = tb_null;
+    tb_aicp_ref_t       aicp = tb_null;
     tb_demo_context_t   context = {0};
 
     // init aicp

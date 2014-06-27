@@ -38,41 +38,41 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/event.c"
 #else 
-tb_handle_t tb_event_init()
+tb_event_ref_t tb_event_init()
 {
     // make 
-    tb_handle_t event = tb_malloc0_type(tb_atomic_t);
+    tb_event_ref_t event = (tb_event_ref_t)tb_malloc0_type(tb_atomic_t);
     tb_assert_and_check_return_val(event, tb_null);
 
     // ok
     return event;
 }
-tb_void_t tb_event_exit(tb_handle_t handle)
+tb_void_t tb_event_exit(tb_event_ref_t event)
 {
     // check
-    tb_atomic_t* event = (tb_atomic_t*)handle;
-    tb_assert_and_check_return(handle);
+    tb_atomic_t* impl = (tb_atomic_t*)event;
+    tb_assert_and_check_return(impl);
 
     // free it
-    tb_free(event);
+    tb_free(impl);
 }
-tb_bool_t tb_event_post(tb_handle_t handle)
+tb_bool_t tb_event_post(tb_event_ref_t event)
 {
     // check
-    tb_atomic_t* event = (tb_atomic_t*)handle;
-    tb_assert_and_check_return_val(event, tb_false);
+    tb_atomic_t* impl = (tb_atomic_t*)event;
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // post signal
-    tb_atomic_set(event, 1);
+    tb_atomic_set(impl, 1);
 
     // ok
     return tb_true;
 }
-tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_event_wait(tb_event_ref_t event, tb_long_t timeout)
 {
     // check
-    tb_atomic_t* event = (tb_atomic_t*)handle;
-    tb_assert_and_check_return_val(event, -1);
+    tb_atomic_t* impl = (tb_atomic_t*)event;
+    tb_assert_and_check_return_val(impl, -1);
 
     // init
     tb_long_t   r = 0;
@@ -82,7 +82,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
     while (1)
     {
         // get post
-        tb_atomic_t post = tb_atomic_fetch_and_set0(event);
+        tb_atomic_t post = tb_atomic_fetch_and_set0(impl);
 
         // has signal?
         if (post == 1) 

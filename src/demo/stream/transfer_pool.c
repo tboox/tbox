@@ -13,7 +13,7 @@
  * globals
  */ 
 #if TB_DEMO_TEST_AICP
-static tb_handle_t g_event = tb_null;
+static tb_event_ref_t g_event = tb_null;
 #endif
     
 /* //////////////////////////////////////////////////////////////////////////////////////

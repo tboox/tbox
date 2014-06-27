@@ -47,38 +47,38 @@ __tb_extern_c_enter__
  *
  * @return              the thread handle
  */
-tb_handle_t             tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack);
+tb_thread_ref_t         tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack);
 
 /*! exit thread
  *
- * @param handle        the thread handle
+ * @param thread        the thread 
  */
-tb_void_t               tb_thread_exit(tb_handle_t handle);
+tb_void_t               tb_thread_exit(tb_thread_ref_t thread);
 
 /*! wait thread
  *
- * @param handle        the thread handle
+ * @param thread        the thread 
  * @param timeout       the timeout
  *
  * @return              ok: 1, timeout: 0, error: -1
  */
-tb_long_t               tb_thread_wait(tb_handle_t handle, tb_long_t timeout);
+tb_long_t               tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout);
 
 /*! suspend thread
  *
- * @param handle        the thread handle
+ * @param thread        the thread 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_thread_suspend(tb_handle_t handle);
+tb_bool_t               tb_thread_suspend(tb_thread_ref_t thread);
 
 /*! resume thread
  *
- * @param handle        the thread handle
+ * @param thread        the thread 
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_thread_resume(tb_handle_t handle);
+tb_bool_t               tb_thread_resume(tb_thread_ref_t thread);
 
 /*! the self thread identifier
  *

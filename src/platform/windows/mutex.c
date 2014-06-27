@@ -32,43 +32,43 @@
  * implementation
  */
 
-tb_handle_t tb_mutex_init()
+tb_mutex_ref_t tb_mutex_init()
 {
-    HANDLE handle = CreateMutex(tb_null, FALSE, tb_null);
-    return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
+    HANDLE mutex = CreateMutex(tb_null, FALSE, tb_null);
+    return ((mutex != INVALID_HANDLE_VALUE)? (tb_mutex_ref_t)mutex : tb_null);
 }
-tb_void_t tb_mutex_exit(tb_handle_t handle)
+tb_void_t tb_mutex_exit(tb_mutex_ref_t mutex)
 {
-    if (handle) CloseHandle(handle);
+    if (mutex) CloseHandle(mutex);
 }
-tb_bool_t tb_mutex_enter(tb_handle_t handle)
+tb_bool_t tb_mutex_enter(tb_mutex_ref_t mutex)
 {
     // try to enter for profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-    if (tb_mutex_enter_try(handle)) return tb_true;
+    if (tb_mutex_enter_try(mutex)) return tb_true;
 #endif
     
     // enter
-    if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return tb_true;
+    if (mutex && WAIT_OBJECT_0 == WaitForSingleObject((HANDLE)mutex, INFINITE)) return tb_true;
 
     // failed
     return tb_false;
 }
-tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
+tb_bool_t tb_mutex_enter_try(tb_mutex_ref_t mutex)
 {
     // try to enter
-    if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, 0)) return tb_true;
+    if (mutex && WAIT_OBJECT_0 == WaitForSingleObject((HANDLE)mutex, 0)) return tb_true;
     
     // occupied
 #ifdef TB_LOCK_PROFILER_ENABLE
-    tb_lock_profiler_occupied(tb_lock_profiler(), handle);
+    tb_lock_profiler_occupied(tb_lock_profiler(), (tb_handle_t)mutex);
 #endif
 
     // failed
     return tb_false;
 }
-tb_bool_t tb_mutex_leave(tb_handle_t handle)
+tb_bool_t tb_mutex_leave(tb_mutex_ref_t mutex)
 {
-    if (handle) return ReleaseMutex(handle)? tb_true : tb_false;
+    if (mutex) return ReleaseMutex((HANDLE)mutex)? tb_true : tb_false;
     return tb_false;
 }

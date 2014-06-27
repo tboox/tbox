@@ -40,32 +40,32 @@ __tb_extern_c_enter__
 
 /*! init event
  * 
- * @return          the event handle
+ * @return          the event 
  */
-tb_handle_t         tb_event_init(tb_noarg_t);
+tb_event_ref_t      tb_event_init(tb_noarg_t);
 
 /*! exit event
  * 
- * @param handle    the event handle
+ * @param event     the event 
  */
-tb_void_t           tb_event_exit(tb_handle_t handle);
+tb_void_t           tb_event_exit(tb_event_ref_t event);
 
 /*! post event
  * 
- * @param handle    the event handle
+ * @param event     the event 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_event_post(tb_handle_t handle);
+tb_bool_t           tb_event_post(tb_event_ref_t event);
 
 /*! wait event
  * 
- * @param handle    the event handle
+ * @param event     the event 
  * @param timeout   the timeout
  *
  * @return          ok: 1, timeout: 0, fail: -1
  */
-tb_long_t           tb_event_wait(tb_handle_t handle, tb_long_t timeout);
+tb_long_t           tb_event_wait(tb_event_ref_t event, tb_long_t timeout);
 
  
 /* //////////////////////////////////////////////////////////////////////////////////////
