@@ -180,7 +180,7 @@ tb_void_t tb_object_pool_dump(tb_handle_t handle)
     tb_spinlock_leave(&pool->lock);
 }
 #endif
-tb_object_t* tb_object_pool_get_(tb_handle_t handle, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__)
+tb_object_ref_t tb_object_pool_get_(tb_handle_t handle, tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__)
 {
     // check
     tb_object_pool_t* pool = (tb_object_pool_t*)handle;
@@ -190,7 +190,7 @@ tb_object_t* tb_object_pool_get_(tb_handle_t handle, tb_size_t size, tb_size_t f
     tb_spinlock_enter(&pool->lock);
 
     // make object
-    tb_object_t* object = pool->pool? (tb_object_t*)tb_pool_malloc0_(pool->pool, size __tb_debug_args__) : tb_null;
+    tb_object_ref_t object = pool->pool? (tb_object_ref_t)tb_pool_malloc0_(pool->pool, size __tb_debug_args__) : tb_null;
 
     // init object
     if (object) 
@@ -208,7 +208,7 @@ tb_object_t* tb_object_pool_get_(tb_handle_t handle, tb_size_t size, tb_size_t f
     // ok?
     return object;
 }
-tb_void_t tb_object_pool_del_(tb_handle_t handle, tb_object_t* object __tb_debug_decl__)
+tb_void_t tb_object_pool_del_(tb_handle_t handle, tb_object_ref_t object __tb_debug_decl__)
 {
     // check
     tb_object_pool_t* pool = (tb_object_pool_t*)handle;

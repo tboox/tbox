@@ -80,6 +80,9 @@ typedef struct __tb_option_item_t
 
 }tb_option_item_t;
 
+/// the option ref type
+typedef struct{}*       tb_option_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -90,156 +93,156 @@ typedef struct __tb_option_item_t
  * @param help          the command help
  * @param opts          the option list
  *
- * @return              the option handle
+ * @return              the option 
  */
-tb_handle_t             tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_option_item_t const* opts);
+tb_option_ref_t         tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_option_item_t const* opts);
 
 /*! exit option
  *
- * @param option        the option handle
+ * @param option        the option 
  */
-tb_void_t               tb_option_exit(tb_handle_t option);
+tb_void_t               tb_option_exit(tb_option_ref_t option);
 
 /*! find the option item 
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_option_find(tb_handle_t option, tb_char_t const* name);
+tb_bool_t               tb_option_find(tb_option_ref_t option, tb_char_t const* name);
 
 /*! done option
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param argc          the arguments count
  * @param argv          the arguments value
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_option_done(tb_handle_t option, tb_size_t argc, tb_char_t** argv);
+tb_bool_t               tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** argv);
 
 /*! dump option
  *
- * @param option        the option handle
+ * @param option        the option 
  */
-tb_void_t               tb_option_dump(tb_handle_t option);
+tb_void_t               tb_option_dump(tb_option_ref_t option);
 
 /*! help option
  *
- * @param option        the option handle
+ * @param option        the option 
  */
-tb_void_t               tb_option_help(tb_handle_t option);
+tb_void_t               tb_option_help(tb_option_ref_t option);
 
 /*! the option item - cstr
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the c-string pointer
  */
-tb_char_t const*        tb_option_item_cstr(tb_handle_t option, tb_char_t const* name);
+tb_char_t const*        tb_option_item_cstr(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - bool
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_option_item_bool(tb_handle_t option, tb_char_t const* name);
+tb_bool_t               tb_option_item_bool(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - uint8
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_uint8_t              tb_option_item_uint8(tb_handle_t option, tb_char_t const* name);
+tb_uint8_t              tb_option_item_uint8(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - sint8
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_sint8_t              tb_option_item_sint8(tb_handle_t option, tb_char_t const* name);
+tb_sint8_t              tb_option_item_sint8(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - uint16
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_uint16_t             tb_option_item_uint16(tb_handle_t option, tb_char_t const* name);
+tb_uint16_t             tb_option_item_uint16(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - sint16
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_sint16_t             tb_option_item_sint16(tb_handle_t option, tb_char_t const* name);
+tb_sint16_t             tb_option_item_sint16(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - uint32
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_uint32_t             tb_option_item_uint32(tb_handle_t option, tb_char_t const* name);
+tb_uint32_t             tb_option_item_uint32(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - sint32
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_sint32_t             tb_option_item_sint32(tb_handle_t option, tb_char_t const* name);
+tb_sint32_t             tb_option_item_sint32(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - uint64
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_uint64_t             tb_option_item_uint64(tb_handle_t option, tb_char_t const* name);
+tb_uint64_t             tb_option_item_uint64(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - sint64
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_sint64_t             tb_option_item_sint64(tb_handle_t option, tb_char_t const* name);
+tb_sint64_t             tb_option_item_sint64(tb_option_ref_t option, tb_char_t const* name);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 
 /*! the option item - float
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_float_t              tb_option_item_float(tb_handle_t option, tb_char_t const* name);
+tb_float_t              tb_option_item_float(tb_option_ref_t option, tb_char_t const* name);
 
 /*! the option item - sint64
  *
- * @param option        the option handle
+ * @param option        the option 
  * @param name          the option name, long name or short name
  *
  * @return              the integer value
  */
-tb_double_t             tb_option_item_double(tb_handle_t option, tb_char_t const* name);
+tb_double_t             tb_option_item_double(tb_option_ref_t option, tb_char_t const* name);
 
 #endif
 

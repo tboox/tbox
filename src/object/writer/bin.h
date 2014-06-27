@@ -62,7 +62,7 @@ typedef struct __tb_object_bin_writer_t
 }tb_object_bin_writer_t;
 
 /// the bin writer func type
-typedef tb_bool_t               (*tb_object_bin_writer_func_t)(tb_object_bin_writer_t* writer, tb_object_t* object);
+typedef tb_bool_t               (*tb_object_bin_writer_func_t)(tb_object_bin_writer_t* writer, tb_object_ref_t object);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

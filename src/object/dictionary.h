@@ -52,7 +52,7 @@ typedef struct __tb_object_dictionary_item_t
     tb_char_t const*        key;
 
     /// the value
-    tb_object_t*            val;
+    tb_object_ref_t         val;
 
 }tb_object_dictionary_item_t;
 
@@ -67,7 +67,7 @@ typedef struct __tb_object_dictionary_item_t
  *
  * @return              the dictionary object
  */
-tb_object_t*            tb_object_dictionary_init(tb_size_t size, tb_size_t incr);
+tb_object_ref_t         tb_object_dictionary_init(tb_size_t size, tb_size_t incr);
 
 /*! the dictionary size
  *
@@ -75,14 +75,14 @@ tb_object_t*            tb_object_dictionary_init(tb_size_t size, tb_size_t incr
  *
  * @return              the dictionary size
  */
-tb_size_t               tb_object_dictionary_size(tb_object_t* dictionary);
+tb_size_t               tb_object_dictionary_size(tb_object_ref_t dictionary);
 
 /*! set the dictionary incr
  *
  * @param dictionary    the dictionary object
  * @param incr          is increase refn?
  */
-tb_void_t               tb_object_dictionary_incr(tb_object_t* dictionary, tb_bool_t incr);
+tb_void_t               tb_object_dictionary_incr(tb_object_ref_t dictionary, tb_bool_t incr);
 
 /*! the dictionary iterator
  *
@@ -96,14 +96,14 @@ tb_void_t               tb_object_dictionary_incr(tb_object_t* dictionary, tb_bo
  *      if (item)
  *      {
  *          tb_char_t const*    key = item->key;
- *          tb_object_t*        val = item->val;
+ *          tb_object_ref_t        val = item->val;
  *
  *          // ...
  *      }
  * }
  * @endcode
  */
-tb_iterator_ref_t          tb_object_dictionary_itor(tb_object_t* dictionary);
+tb_iterator_ref_t       tb_object_dictionary_itor(tb_object_ref_t dictionary);
 
 /*! the dictionary value
  *
@@ -112,14 +112,14 @@ tb_iterator_ref_t          tb_object_dictionary_itor(tb_object_t* dictionary);
  *
  * @return              the dictionary value
  */
-tb_object_t*            tb_object_dictionary_val(tb_object_t* dictionary, tb_char_t const* key);
+tb_object_ref_t         tb_object_dictionary_val(tb_object_ref_t dictionary, tb_char_t const* key);
 
 /*! del dictionary item
  *
  * @param dictionary    the dictionary object
  * @param key           the key
  */
-tb_void_t               tb_object_dictionary_del(tb_object_t* dictionary, tb_char_t const* key);
+tb_void_t               tb_object_dictionary_del(tb_object_ref_t dictionary, tb_char_t const* key);
 
 /*! set dictionary item
  *
@@ -127,7 +127,7 @@ tb_void_t               tb_object_dictionary_del(tb_object_t* dictionary, tb_cha
  * @param key           the key
  * @param val           the value
  */
-tb_void_t               tb_object_dictionary_set(tb_object_t* dictionary, tb_char_t const* key, tb_object_t* val);
+tb_void_t               tb_object_dictionary_set(tb_object_ref_t dictionary, tb_char_t const* key, tb_object_ref_t val);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

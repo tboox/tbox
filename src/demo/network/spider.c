@@ -45,7 +45,7 @@ typedef struct __tb_demo_spider_t
     tb_atomic_t                 state;
 
     // the option
-    tb_handle_t                 option;
+    tb_option_ref_t             option;
 
     // the home
     tb_char_t const*            home;

@@ -48,15 +48,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_object_t* tb_object_xml_reader_func_null(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_null(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // ok
-    return (tb_object_t*)tb_object_null_init();
+    return (tb_object_ref_t)tb_object_null_init();
 }
-static tb_object_t* tb_object_xml_reader_func_date(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_date(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -66,7 +66,7 @@ static tb_object_t* tb_object_xml_reader_func_date(tb_object_xml_reader_t* reade
         return tb_object_date_init_from_time(0);
 
     // walk
-    tb_object_t* date = tb_null;
+    tb_object_ref_t date = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -151,7 +151,7 @@ end:
     // ok?
     return date;
 }
-static tb_object_t* tb_object_xml_reader_func_data(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_data(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -162,7 +162,7 @@ static tb_object_t* tb_object_xml_reader_func_data(tb_object_xml_reader_t* reade
 
     // walk
     tb_char_t*      base64  = tb_null;
-    tb_object_t*    data    = tb_null;
+    tb_object_ref_t    data    = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -227,7 +227,7 @@ end:
     // ok?
     return data;
 }
-static tb_object_t* tb_object_xml_reader_func_array(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_array(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -237,7 +237,7 @@ static tb_object_t* tb_object_xml_reader_func_array(tb_object_xml_reader_t* read
         return tb_object_array_init(TB_OBJECT_XML_READER_ARRAY_GROW, tb_false);
 
     // init array
-    tb_object_t* array = tb_object_array_init(TB_OBJECT_XML_READER_ARRAY_GROW, tb_false);
+    tb_object_ref_t array = tb_object_array_init(TB_OBJECT_XML_READER_ARRAY_GROW, tb_false);
     tb_assert_and_check_return_val(array, tb_null);
 
     // walk
@@ -259,7 +259,7 @@ static tb_object_t* tb_object_xml_reader_func_array(tb_object_xml_reader_t* read
                 tb_assert_and_check_goto(func, end);
 
                 // read
-                tb_object_t* object = func(reader, event);
+                tb_object_ref_t object = func(reader, event);
 
                 // append object
                 if (object) tb_object_array_append(array, object);
@@ -295,7 +295,7 @@ end:
     // ok?
     return array;
 }
-static tb_object_t* tb_object_xml_reader_func_string(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_string(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -305,7 +305,7 @@ static tb_object_t* tb_object_xml_reader_func_string(tb_object_xml_reader_t* rea
         return tb_object_string_init_from_cstr(tb_null);
 
     // walk
-    tb_object_t* string = tb_null;
+    tb_object_ref_t string = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -347,7 +347,7 @@ end:
     // ok?
     return string;
 }
-static tb_object_t* tb_object_xml_reader_func_number(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_number(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -357,7 +357,7 @@ static tb_object_t* tb_object_xml_reader_func_number(tb_object_xml_reader_t* rea
         return tb_object_number_init_from_uint32(0);
 
     // walk
-    tb_object_t* number = tb_null;
+    tb_object_ref_t number = tb_null;
     while ((event = tb_xml_reader_next(reader->reader)))
     {
         switch (event)
@@ -410,7 +410,7 @@ end:
     // ok?
     return number;
 }
-static tb_object_t* tb_object_xml_reader_func_boolean(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_boolean(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -427,9 +427,9 @@ static tb_object_t* tb_object_xml_reader_func_boolean(tb_object_xml_reader_t* re
     else return tb_null;
 
     // ok?
-    return (tb_object_t*)tb_object_boolean_init(val);
+    return (tb_object_ref_t)tb_object_boolean_init(val);
 }
-static tb_object_t* tb_object_xml_reader_func_dictionary(tb_object_xml_reader_t* reader, tb_size_t event)
+static tb_object_ref_t tb_object_xml_reader_func_dictionary(tb_object_xml_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -444,7 +444,7 @@ static tb_object_t* tb_object_xml_reader_func_dictionary(tb_object_xml_reader_t*
     if (!tb_static_string_init(&kname, kdata, 8192)) return tb_null;
 
     // init dictionary
-    tb_object_t* dictionary = tb_object_dictionary_init(0, tb_false);
+    tb_object_ref_t dictionary = tb_object_dictionary_init(0, tb_false);
     tb_assert_and_check_return_val(dictionary, tb_null);
 
     // walk
@@ -471,7 +471,7 @@ static tb_object_t* tb_object_xml_reader_func_dictionary(tb_object_xml_reader_t*
                     tb_assert_and_check_goto(func, end);
 
                     // read
-                    tb_object_t* object = func(reader, event);
+                    tb_object_ref_t object = func(reader, event);
                     tb_trace_d("%s => %p", tb_static_string_cstr(&kname), object);
                     tb_assert_and_check_goto(object, end);
 
@@ -531,7 +531,7 @@ end:
     // ok?
     return dictionary;
 }
-static tb_object_t* tb_object_xml_reader_done(tb_stream_ref_t stream)
+static tb_object_ref_t tb_object_xml_reader_done(tb_stream_ref_t stream)
 {
     // init reader 
     tb_object_xml_reader_t reader = {0};
@@ -539,7 +539,7 @@ static tb_object_t* tb_object_xml_reader_done(tb_stream_ref_t stream)
     tb_assert_and_check_return_val(reader.reader, tb_null);
 
     // init object
-    tb_object_t* object = tb_null;
+    tb_object_ref_t object = tb_null;
 
     // walk
     tb_size_t event = TB_XML_READER_EVENT_NONE;
