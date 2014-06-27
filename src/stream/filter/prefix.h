@@ -63,75 +63,7 @@ typedef enum __tb_stream_filter_ctrl_e
 
 }tb_stream_filter_ctrl_e;
 
-/// the filter type
-typedef struct __tb_stream_filter_t
-{
-    /// the type
-    tb_size_t           type;
-
-    /// the input is eof?
-    tb_bool_t           beof;
-
-    /// is opened?
-    tb_bool_t           bopened;
-
-    /// the input limit size 
-    tb_hong_t           limit;
-    
-    /// the input offset 
-    tb_hize_t           offset;
-
-    /// the input data
-    tb_buffer_t         idata;
-
-    /// the output data 
-    tb_queue_buffer_t   odata;
-
-    /// the open
-    tb_bool_t           (*open)(struct __tb_stream_filter_t* filter);
-
-    /// the clos
-    tb_void_t           (*clos)(struct __tb_stream_filter_t* filter);
-
-    /// the spak
-    tb_long_t           (*spak)(struct __tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync);
-
-    /// the ctrl
-    tb_bool_t           (*ctrl)(struct __tb_stream_filter_t* filter, tb_size_t ctrl, tb_va_list_t args);
-
-    /// the exit
-    tb_void_t           (*exit)(struct __tb_stream_filter_t* filter);
-
-}tb_stream_filter_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-static __tb_inline__ tb_bool_t tb_stream_filter_init(tb_stream_filter_t* filter, tb_size_t type)
-{
-    // check
-    tb_assert_and_check_return_val(filter, tb_false);
-    
-    // init type
-    filter->type = type;
-
-    // init the input eof
-    filter->beof = tb_false;
-
-    // init input limit size
-    filter->limit = -1;
-
-    // init the input offset
-    filter->offset = 0;
-
-    // init idata
-    if (!tb_buffer_init(&filter->idata)) return tb_false;
-
-    // init odata
-    if (!tb_queue_buffer_init(&filter->odata, 8192)) return tb_false;
-
-    // ok
-    return tb_true;
-}
+/// the stream filter ref type
+typedef struct{}*       tb_stream_filter_ref_t;
 
 #endif

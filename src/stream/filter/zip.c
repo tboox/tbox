@@ -26,6 +26,7 @@
  * includes
  */
 #include "filter.h"
+#include "impl.h"
 #include "../../zip/zip.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +37,7 @@
 typedef struct __tb_stream_filter_zip_t
 {
     // the filter base
-    tb_stream_filter_t          base;
+    tb_stream_filter_impl_t          base;
 
     // the algo
     tb_size_t                   algo;
@@ -52,13 +53,13 @@ typedef struct __tb_stream_filter_zip_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_stream_filter_zip_t* tb_stream_filter_zip_cast(tb_stream_filter_t* filter)
+static __tb_inline__ tb_stream_filter_zip_t* tb_stream_filter_zip_cast(tb_stream_filter_impl_t* filter)
 {
     // check
     tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_ZIP, tb_null);
     return (tb_stream_filter_zip_t*)filter;
 }
-static tb_bool_t tb_stream_filter_zip_open(tb_stream_filter_t* filter)
+static tb_bool_t tb_stream_filter_zip_open(tb_stream_filter_impl_t* filter)
 {
     // check
     tb_stream_filter_zip_t* zfilter = tb_stream_filter_zip_cast(filter);
@@ -71,7 +72,7 @@ static tb_bool_t tb_stream_filter_zip_open(tb_stream_filter_t* filter)
     // ok
     return tb_true;
 }
-static tb_void_t tb_stream_filter_zip_clos(tb_stream_filter_t* filter)
+static tb_void_t tb_stream_filter_zip_clos(tb_stream_filter_impl_t* filter)
 {
     // check
     tb_stream_filter_zip_t* zfilter = tb_stream_filter_zip_cast(filter);
@@ -81,7 +82,7 @@ static tb_void_t tb_stream_filter_zip_clos(tb_stream_filter_t* filter)
     if (zfilter->zip) tb_zip_exit(zfilter->zip);
     zfilter->zip = tb_null;
 }
-static tb_long_t tb_stream_filter_zip_spak(tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
+static tb_long_t tb_stream_filter_zip_spak(tb_stream_filter_impl_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
 {
     // check
     tb_stream_filter_zip_t* zfilter = tb_stream_filter_zip_cast(filter);
@@ -90,7 +91,7 @@ static tb_long_t tb_stream_filter_zip_spak(tb_stream_filter_t* filter, tb_static
     // spak it
     return tb_zip_spak(zfilter->zip, istream, ostream, sync);
 }
-static tb_void_t tb_stream_filter_zip_exit(tb_stream_filter_t* filter)
+static tb_void_t tb_stream_filter_zip_exit(tb_stream_filter_impl_t* filter)
 {
     // check
     tb_stream_filter_zip_t* zfilter = tb_stream_filter_zip_cast(filter);
@@ -100,7 +101,7 @@ static tb_void_t tb_stream_filter_zip_exit(tb_stream_filter_t* filter)
     if (zfilter->zip) tb_zip_exit(zfilter->zip);
     zfilter->zip = tb_null;
 }
-static tb_bool_t tb_stream_filter_zip_ctrl(tb_stream_filter_t* filter, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_stream_filter_zip_ctrl(tb_stream_filter_impl_t* filter, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
     tb_stream_filter_zip_t* zfilter = tb_stream_filter_zip_cast(filter);
@@ -158,7 +159,7 @@ static tb_bool_t tb_stream_filter_zip_ctrl(tb_stream_filter_t* filter, tb_size_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_stream_filter_t* tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t action)
+tb_stream_filter_ref_t tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t action)
 {
     // done
     tb_bool_t               ok = tb_false;
@@ -170,7 +171,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t act
         tb_assert_and_check_break(filter);
 
         // init filter 
-        if (!tb_stream_filter_init((tb_stream_filter_t*)filter, TB_STREAM_FILTER_TYPE_ZIP)) break;
+        if (!tb_stream_filter_impl_init((tb_stream_filter_impl_t*)filter, TB_STREAM_FILTER_TYPE_ZIP)) break;
         filter->base.open   = tb_stream_filter_zip_open;
         filter->base.clos   = tb_stream_filter_zip_clos;
         filter->base.spak   = tb_stream_filter_zip_spak;
@@ -188,11 +189,11 @@ tb_stream_filter_t* tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t act
     if (!ok)
     {
         // exit filter
-        tb_stream_filter_exit((tb_stream_filter_t*)filter);
+        tb_stream_filter_exit((tb_stream_filter_ref_t)filter);
         filter = tb_null;
     }
 
     // ok?
-    return (tb_stream_filter_t*)filter;
+    return (tb_stream_filter_ref_t)filter;
 }
 

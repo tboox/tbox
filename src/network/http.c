@@ -717,7 +717,7 @@ static tb_bool_t tb_http_response(tb_http_impl_t* impl)
                     tb_assert_and_check_break(impl->zstream);
 
                     // the filter
-                    tb_stream_filter_t* filter = tb_null;
+                    tb_stream_filter_ref_t filter = tb_null;
                     if (!tb_stream_ctrl(impl->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 

@@ -40,7 +40,7 @@
 typedef struct __tb_async_stream_filter_impl_t
 {
     // the filter 
-    tb_stream_filter_t*                 filter;
+    tb_stream_filter_ref_t              filter;
 
     // the filter is referenced? need not exit it
     tb_uint32_t                         bref    : 1;
@@ -641,7 +641,7 @@ static tb_bool_t tb_async_stream_filter_impl_ctrl(tb_async_stream_ref_t stream, 
             if (!impl->bref && impl->filter) tb_stream_filter_exit(impl->filter);
 
             // set filter
-            tb_stream_filter_t* filter = (tb_stream_filter_t*)tb_va_arg(args, tb_stream_filter_t*);
+            tb_stream_filter_ref_t filter = (tb_stream_filter_ref_t)tb_va_arg(args, tb_stream_filter_ref_t);
             impl->filter = filter;
             impl->bref = filter? 1 : 0;
 
@@ -651,7 +651,7 @@ static tb_bool_t tb_async_stream_filter_impl_ctrl(tb_async_stream_ref_t stream, 
     case TB_STREAM_CTRL_FLTR_GET_FILTER:
         {
             // the pfilter
-            tb_stream_filter_t** pfilter = (tb_stream_filter_t**)tb_va_arg(args, tb_stream_filter_t**);
+            tb_stream_filter_ref_t* pfilter = (tb_stream_filter_ref_t*)tb_va_arg(args, tb_stream_filter_ref_t*);
             tb_assert_and_check_break(pfilter);
 
             // get filter
