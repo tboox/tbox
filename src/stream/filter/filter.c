@@ -32,81 +32,86 @@
  * includes
  */
 #include "filter.h"
+#include "impl.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_stream_filter_open(tb_stream_filter_t* filter)
+tb_bool_t tb_stream_filter_open(tb_stream_filter_ref_t filter)
 {
     // check
-    tb_assert_and_check_return_val(filter, tb_false);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // opened?
-    tb_check_return_val(!filter->bopened, tb_true);
+    tb_check_return_val(!impl->bopened, tb_true);
 
     // open it
-    filter->bopened = filter->open? filter->open(filter) : tb_true;
+    impl->bopened = impl->open? impl->open(impl) : tb_true;
 
     // ok?
-    return filter->bopened;
+    return impl->bopened;
 }
-tb_void_t tb_stream_filter_clos(tb_stream_filter_t* filter)
+tb_void_t tb_stream_filter_clos(tb_stream_filter_ref_t filter)
 {
     // check
-    tb_assert_and_check_return(filter);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return(impl);
 
     // opened?
-    tb_check_return(filter->bopened);
+    tb_check_return(impl->bopened);
 
     // clos it
-    if (filter->clos) filter->clos(filter);
+    if (impl->clos) impl->clos(impl);
 
     // clear eof
-    filter->beof = tb_false;
+    impl->beof = tb_false;
     
     // clear limit
-    filter->limit = -1;
+    impl->limit = -1;
     
     // clear offset
-    filter->offset = 0;
+    impl->offset = 0;
     
     // exit idata
-    tb_buffer_clear(&filter->idata);
+    tb_buffer_clear(&impl->idata);
 
     // exit odata
-    tb_queue_buffer_clear(&filter->odata);
+    tb_queue_buffer_clear(&impl->odata);
 
     // closed
-    filter->bopened = tb_false;
+    impl->bopened = tb_false;
 }
-tb_void_t tb_stream_filter_exit(tb_stream_filter_t* filter)
+tb_void_t tb_stream_filter_exit(tb_stream_filter_ref_t filter)
 {
     // check
-    tb_assert_and_check_return(filter);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return(impl);
     
     // exit it
-    if (filter->exit) filter->exit(filter);
+    if (impl->exit) impl->exit(impl);
 
     // exit idata
-    tb_buffer_exit(&filter->idata);
+    tb_buffer_exit(&impl->idata);
 
     // exit odata
-    tb_queue_buffer_exit(&filter->odata);
+    tb_queue_buffer_exit(&impl->odata);
 
     // free it
-    tb_free(filter);
+    tb_free(impl);
 }
-tb_bool_t tb_stream_filter_ctrl(tb_stream_filter_t* filter, tb_size_t ctrl, ...)
+tb_bool_t tb_stream_filter_ctrl(tb_stream_filter_ref_t filter, tb_size_t ctrl, ...)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->ctrl && ctrl, tb_false);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return_val(impl && impl->ctrl && ctrl, tb_false);
 
     // init args
     tb_va_list_t args;
     tb_va_start(args, ctrl);
 
     // ctrl it
-    tb_bool_t ok = filter->ctrl(filter, ctrl, args);
+    tb_bool_t ok = impl->ctrl(impl, ctrl, args);
 
     // exit args
     tb_va_end(args);
@@ -114,35 +119,36 @@ tb_bool_t tb_stream_filter_ctrl(tb_stream_filter_t* filter, tb_size_t ctrl, ...)
     // ok?
     return ok;
 }
-tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
+tb_long_t tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->spak && pdata, -1);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return_val(impl && impl->spak && pdata, -1);
 
     // init odata
     *pdata = tb_null;
 
     // save the input offset
-    filter->offset += size;
+    impl->offset += size;
 
     // eof?
-    if (filter->limit >= 0 && filter->offset == filter->limit)
-        filter->beof = tb_true;
+    if (impl->limit >= 0 && impl->offset == impl->limit)
+        impl->beof = tb_true;
 
     // eof? sync it
-    if (filter->beof) sync = -1;
+    if (impl->beof) sync = -1;
 
     // the idata
-    tb_byte_t const*    idata = tb_buffer_data(&filter->idata);
-    tb_size_t           isize = tb_buffer_size(&filter->idata);
+    tb_byte_t const*    idata = tb_buffer_data(&impl->idata);
+    tb_size_t           isize = tb_buffer_size(&impl->idata);
     if (data && size)
     {
         // append data to cache if have the cache data
         if (idata && isize) 
         {
             // append data
-            idata = tb_buffer_memncat(&filter->idata, data, size);
-            isize = tb_buffer_size(&filter->idata);
+            idata = tb_buffer_memncat(&impl->idata, data, size);
+            isize = tb_buffer_size(&impl->idata);
         }
         // using the data directly if no cache data
         else
@@ -159,19 +165,19 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     }
 
     // the need
-    if (!need) need = tb_max(size, tb_queue_buffer_maxn(&filter->odata));
+    if (!need) need = tb_max(size, tb_queue_buffer_maxn(&impl->odata));
     tb_assert_and_check_return_val(need, -1);
 
     // init pull
     tb_size_t   omaxn = 0;
-    tb_byte_t*  odata = tb_queue_buffer_pull_init(&filter->odata, &omaxn);
+    tb_byte_t*  odata = tb_queue_buffer_pull_init(&impl->odata, &omaxn);
     if (odata)
     {
         // the osize
         tb_long_t osize = omaxn >= need? need : 0;
 
         // exit pull
-        if (odata) tb_queue_buffer_pull_exit(&filter->odata, osize > 0? osize : 0);
+        if (odata) tb_queue_buffer_pull_exit(&impl->odata, osize > 0? osize : 0);
 
         // enough? return it directly 
         if (osize > 0)
@@ -182,12 +188,12 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     }
 
     // grow odata maxn if not enough
-    if (need > tb_queue_buffer_maxn(&filter->odata))
-        tb_queue_buffer_resize(&filter->odata, need);
+    if (need > tb_queue_buffer_maxn(&impl->odata))
+        tb_queue_buffer_resize(&impl->odata, need);
 
     // the odata
     omaxn = 0;
-    odata = tb_queue_buffer_push_init(&filter->odata, &omaxn);
+    odata = tb_queue_buffer_push_init(&impl->odata, &omaxn);
     tb_assert_and_check_return_val(odata && omaxn, -1);
 
     // init stream
@@ -201,35 +207,35 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
     if (!tb_static_stream_init(&ostream, (tb_byte_t*)odata, omaxn)) return -1;
 
     // spak data
-    tb_long_t osize = filter->spak(filter, &istream, &ostream, sync);
+    tb_long_t osize = impl->spak(impl, &istream, &ostream, sync);
 
     // eof?
-    if (osize < 0) filter->beof = tb_true;
+    if (osize < 0) impl->beof = tb_true;
 
     // no data and eof?
-    if (!osize && !tb_static_stream_left(&istream) && filter->beof) osize = -1;
+    if (!osize && !tb_static_stream_left(&istream) && impl->beof) osize = -1;
 
     // eof? sync it
-    if (filter->beof) sync = -1;
+    if (impl->beof) sync = -1;
 
     // exit odata
-    tb_queue_buffer_push_exit(&filter->odata, osize > 0? osize : 0);
+    tb_queue_buffer_push_exit(&impl->odata, osize > 0? osize : 0);
 
     // have the left idata? 
     tb_size_t left = tb_static_stream_left(&istream);
     if (left) 
     {
         // move to the cache head if idata is belong to the cache
-        if (idata != data) tb_buffer_memnmov(&filter->idata, tb_static_stream_offset(&istream), left);
+        if (idata != data) tb_buffer_memnmov(&impl->idata, tb_static_stream_offset(&istream), left);
         // append to the cache if idata is not belong to the cache
-        else tb_buffer_memncat(&filter->idata, tb_static_stream_pos(&istream), left);
+        else tb_buffer_memncat(&impl->idata, tb_static_stream_pos(&istream), left);
     }
     // clear the cache
-    else tb_buffer_clear(&filter->idata);
+    else tb_buffer_clear(&impl->idata);
 
     // init pull
     omaxn = 0;
-    odata = tb_queue_buffer_pull_init(&filter->odata, &omaxn);
+    odata = tb_queue_buffer_pull_init(&impl->odata, &omaxn);
 
     // no sync? cache the output data
     if (!sync) osize = omaxn >= need? need : 0;
@@ -239,44 +245,47 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_t* filter, tb_byte_t const* dat
 //  else osize = osize;
 
     // exit pull
-    if (odata) tb_queue_buffer_pull_exit(&filter->odata, osize > 0? osize : 0);
+    if (odata) tb_queue_buffer_pull_exit(&impl->odata, osize > 0? osize : 0);
 
     // return it if have the odata
     if (osize > 0) *pdata = odata;
 
     // trace
-    tb_trace_d("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_buffer_size(&filter->idata), tb_queue_buffer_size(&filter->odata), filter->offset, filter->limit);
+    tb_trace_d("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_buffer_size(&impl->idata), tb_queue_buffer_size(&impl->odata), impl->offset, impl->limit);
 
     // ok?
     return osize;
 }
-tb_bool_t tb_stream_filter_push(tb_stream_filter_t* filter, tb_byte_t const* data, tb_size_t size)
+tb_bool_t tb_stream_filter_push(tb_stream_filter_ref_t filter, tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(filter && data && size, tb_false);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return_val(impl && data && size, tb_false);
 
     // push data
-    tb_bool_t ok = tb_buffer_memncat(&filter->idata, data, size)? tb_true : tb_false;
+    tb_bool_t ok = tb_buffer_memncat(&impl->idata, data, size)? tb_true : tb_false;
 
     // save the input offset
-    if (ok) filter->offset += size;
+    if (ok) impl->offset += size;
 
     // ok?
     return ok;
 }
-tb_bool_t tb_stream_filter_beof(tb_stream_filter_t* filter)
+tb_bool_t tb_stream_filter_beof(tb_stream_filter_ref_t filter)
 {
     // check
-    tb_assert_and_check_return_val(filter, tb_false);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // is eof?
-    return filter->beof;
+    return impl->beof;
 }
-tb_void_t tb_stream_filter_limit(tb_stream_filter_t* filter, tb_hong_t limit)
+tb_void_t tb_stream_filter_limit(tb_stream_filter_ref_t filter, tb_hong_t limit)
 {
     // check
-    tb_assert_and_check_return(filter);
+    tb_stream_filter_impl_t* impl = (tb_stream_filter_impl_t*)filter;
+    tb_assert_and_check_return(impl);
 
     // limit the input size
-    filter->limit = limit;
+    impl->limit = limit;
 }

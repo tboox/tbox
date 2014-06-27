@@ -888,7 +888,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
                 if (p < e)
                 {
                     // the filter
-                    tb_stream_filter_t* filter = tb_null;
+                    tb_stream_filter_ref_t filter = tb_null;
                     if (!tb_async_stream_ctrl(impl->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 
@@ -920,7 +920,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
                 tb_assert_and_check_break(impl->zstream);
 
                 // the filter
-                tb_stream_filter_t* filter = tb_null;
+                tb_stream_filter_ref_t filter = tb_null;
                 if (!tb_async_stream_ctrl(impl->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                 tb_assert_and_check_break(filter);
 

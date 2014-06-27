@@ -34,7 +34,7 @@
 typedef struct __tb_stream_filter_impl_t
 {
     // the filter 
-    tb_stream_filter_t*     filter;
+    tb_stream_filter_ref_t  filter;
 
     // the filter is referenced? need not exit it
     tb_bool_t               bref;
@@ -342,7 +342,7 @@ static tb_bool_t tb_stream_filter_impl_ctrl(tb_stream_ref_t stream, tb_size_t ct
             if (!impl->bref && impl->filter) tb_stream_filter_exit(impl->filter);
 
             // set filter
-            tb_stream_filter_t* filter = (tb_stream_filter_t*)tb_va_arg(args, tb_stream_filter_t*);
+            tb_stream_filter_ref_t filter = (tb_stream_filter_ref_t)tb_va_arg(args, tb_stream_filter_ref_t);
             impl->filter = filter;
             impl->bref = filter? tb_true : tb_false;
 
@@ -352,7 +352,7 @@ static tb_bool_t tb_stream_filter_impl_ctrl(tb_stream_ref_t stream, tb_size_t ct
     case TB_STREAM_CTRL_FLTR_GET_FILTER:
         {
             // the pfilter
-            tb_stream_filter_t** pfilter = (tb_stream_filter_t**)tb_va_arg(args, tb_stream_filter_t**);
+            tb_stream_filter_ref_t* pfilter = (tb_stream_filter_ref_t*)tb_va_arg(args, tb_stream_filter_ref_t*);
             tb_assert_and_check_break(pfilter);
 
             // set filter

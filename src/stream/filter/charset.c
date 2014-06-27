@@ -26,6 +26,7 @@
  * includes
  */
 #include "filter.h"
+#include "impl.h"
 #include "../../charset/charset.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +37,7 @@
 typedef struct __tb_stream_filter_charset_t
 {
     // the filter base
-    tb_stream_filter_t          base;
+    tb_stream_filter_impl_t     base;
 
     // the from type
     tb_size_t                   ftype;
@@ -49,13 +50,13 @@ typedef struct __tb_stream_filter_charset_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_stream_filter_charset_t* tb_stream_filter_charset_cast(tb_stream_filter_t* filter)
+static __tb_inline__ tb_stream_filter_charset_t* tb_stream_filter_charset_cast(tb_stream_filter_impl_t* filter)
 {
     // check
     tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHARSET, tb_null);
     return (tb_stream_filter_charset_t*)filter;
 }
-static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
+static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_impl_t* filter, tb_static_stream_t* istream, tb_static_stream_t* ostream, tb_long_t sync)
 {
     // check
     tb_stream_filter_charset_t* cfilter = tb_stream_filter_charset_cast(filter);
@@ -74,7 +75,7 @@ static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_t* filter, tb_st
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_stream_filter_t* tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t to)
+tb_stream_filter_ref_t tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t to)
 {
     // done
     tb_bool_t                       ok = tb_false;
@@ -86,7 +87,7 @@ tb_stream_filter_t* tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t t
         tb_assert_and_check_break(filter);
 
         // init filter 
-        if (!tb_stream_filter_init((tb_stream_filter_t*)filter, TB_STREAM_FILTER_TYPE_CHARSET)) break;
+        if (!tb_stream_filter_impl_init((tb_stream_filter_impl_t*)filter, TB_STREAM_FILTER_TYPE_CHARSET)) break;
         filter->base.spak = tb_stream_filter_charset_spak;
 
         // init the from and to charset
@@ -102,11 +103,11 @@ tb_stream_filter_t* tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t t
     if (!ok)
     {
         // exit filter
-        tb_stream_filter_exit((tb_stream_filter_t*)filter);
+        tb_stream_filter_exit((tb_stream_filter_ref_t)filter);
         filter = tb_null;
     }
 
     // ok?
-    return (tb_stream_filter_t*)filter;
+    return (tb_stream_filter_ref_t)filter;
 }
 
