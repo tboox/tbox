@@ -348,10 +348,10 @@ tbox_C_FILES 			+= \
 						database/value 
 
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_MYSQL) += \
-						database/mysql
+						database/impl/mysql
 
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_SQLITE3) += \
-						database/sqlite3
+						database/impl/sqlite3
 endif
 
 # ios

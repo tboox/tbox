@@ -17,11 +17,10 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        sqlite3.h
- * @ingroup     database
+ * @file        mysql.h
  */
-#ifndef TB_DATABASE_SQLITE3_H
-#define TB_DATABASE_SQLITE3_H
+#ifndef TB_DATABASE_IMPL_MYSQL_H
+#define TB_DATABASE_IMPL_MYSQL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -37,21 +36,21 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* probe sqlite3 from the url
+/* probe mysql from the url
  *
- * @param url       the database url
+ * @param url           the database url
  *
- * @return          the score
+ * @return              the score
  */
-tb_size_t           tb_database_sqlite3_probe(tb_url_t const* url);
+tb_size_t               tb_database_mysql_probe(tb_url_t const* url);
 
-/* init sqlite3
+/* init mysql
  *
- * @param url       the database url
+ * @param url           the database url
  *
- * @return          the database handle
+ * @return              the database handle
  */
-tb_database_sql_t*  tb_database_sqlite3_init(tb_url_t const* url);
+tb_database_sql_ref_t   tb_database_mysql_init(tb_url_t const* url);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
