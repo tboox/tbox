@@ -18,7 +18,6 @@
  *
  * @author      ruki
  * @file        sqlite3.c
- * @ingroup     database
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -30,10 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "sql.h"
-#include "sqlite3.h"
-#include "../libc/libc.h"
-#include "../stream/stream.h"
+#include "prefix.h"
 #include <sqlite3.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -66,8 +62,8 @@ typedef struct __tb_database_sqlite3_result_t
     // the result
     tb_char_t**                         result;
 
-    // the stmt
-    sqlite3_stmt*                       stmt;
+    // the statement
+    sqlite3_stmt*                       statement;
 
     // the row count
     tb_size_t                           count;
@@ -81,7 +77,7 @@ typedef struct __tb_database_sqlite3_result_t
 typedef struct __tb_database_sqlite3_t
 {
     // the base
-    tb_database_sql_t                   base;
+    tb_database_sql_impl_t              base;
 
     // the database
     sqlite3*                            database;
@@ -179,8 +175,8 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_prev(tb_iterator_ref_t 
     tb_assert_return_val(result, 0);
     tb_assert_and_check_return_val(itor && itor <= result->count, result->count);
 
-    // cannot be the stmt result
-    tb_assert_and_check_return_val(!result->stmt, result->count);
+    // cannot be the statement result
+    tb_assert_and_check_return_val(!result->statement, result->count);
 
     // prev
     return itor - 1;
@@ -192,11 +188,11 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_next(tb_iterator_ref_t 
     tb_assert_return_val(result, 0);
     tb_assert_and_check_return_val(itor < result->count, result->count);
 
-    // stmt result?
-    if (result->stmt)
+    // statement result?
+    if (result->statement)
     {
-        // step stmt
-        tb_int_t ok = sqlite3_step(result->stmt);
+        // step statement
+        tb_int_t ok = sqlite3_step(result->statement);
         tb_check_return_val(ok == SQLITE_ROW, result->count);
     }
 
@@ -207,7 +203,7 @@ static tb_pointer_t tb_database_sqlite3_result_row_iterator_item(tb_iterator_ref
 {
     // check
     tb_database_sqlite3_result_t* result = (tb_database_sqlite3_result_t*)iterator;
-    tb_assert_and_check_return_val(result && (result->result || result->stmt) && itor < result->count, tb_null);
+    tb_assert_and_check_return_val(result && (result->result || result->statement) && itor < result->count, tb_null);
 
     // save the row
     result->row.row = itor;
@@ -278,25 +274,25 @@ static tb_pointer_t tb_database_sqlite3_result_col_iterator_item(tb_iterator_ref
         tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite->result.result[((1 + sqlite->result.row.row) * row->count) + itor], 0);
         return (tb_pointer_t)&row->value;
     }
-    // stmt result?
-    else if (sqlite->result.stmt)
+    // statement result?
+    else if (sqlite->result.statement)
     {
         // init name
-        tb_database_sql_value_name_set(&row->value, sqlite3_column_name(sqlite->result.stmt, itor));
+        tb_database_sql_value_name_set(&row->value, sqlite3_column_name(sqlite->result.statement, itor));
 
         // init type
-        tb_size_t type = sqlite3_column_type(sqlite->result.stmt, itor);
+        tb_size_t type = sqlite3_column_type(sqlite->result.statement, itor);
         switch (type)
         {
         case SQLITE_INTEGER:
-            tb_database_sql_value_set_int32(&row->value, sqlite3_column_int(sqlite->result.stmt, itor));
+            tb_database_sql_value_set_int32(&row->value, sqlite3_column_int(sqlite->result.statement, itor));
             break;
         case SQLITE_TEXT:
-            tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite3_column_text(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor));
+            tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite3_column_text(sqlite->result.statement, itor), sqlite3_column_bytes(sqlite->result.statement, itor));
             break;
         case SQLITE_FLOAT:
 #ifdef TB_CONFIG_TYPE_FLOAT
-            tb_database_sql_value_set_double(&row->value, sqlite3_column_double(sqlite->result.stmt, itor));
+            tb_database_sql_value_set_double(&row->value, sqlite3_column_double(sqlite->result.statement, itor));
             break;
 #else
             // trace
@@ -304,7 +300,7 @@ static tb_pointer_t tb_database_sqlite3_result_col_iterator_item(tb_iterator_ref
             return tb_null;
 #endif
         case SQLITE_BLOB:
-            tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)sqlite3_column_blob(sqlite->result.stmt, itor), sqlite3_column_bytes(sqlite->result.stmt, itor), tb_null);
+            tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)sqlite3_column_blob(sqlite->result.statement, itor), sqlite3_column_bytes(sqlite->result.statement, itor), tb_null);
             break;
         case SQLITE_NULL:
             tb_database_sql_value_set_null(&row->value);
@@ -326,7 +322,7 @@ static tb_pointer_t tb_database_sqlite3_result_col_iterator_item(tb_iterator_ref
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_database_sqlite3_t* tb_database_sqlite3_cast(tb_database_sql_t* database)
+static __tb_inline__ tb_database_sqlite3_t* tb_database_sqlite3_cast(tb_database_sql_impl_t* database)
 {
     // check
     tb_assert_and_check_return_val(database && database->type == TB_DATABASE_SQL_TYPE_SQLITE3, tb_null);
@@ -334,7 +330,7 @@ static __tb_inline__ tb_database_sqlite3_t* tb_database_sqlite3_cast(tb_database
     // cast
     return (tb_database_sqlite3_t*)database;
 }
-static tb_bool_t tb_database_sqlite3_open(tb_database_sql_t* database)
+static tb_bool_t tb_database_sqlite3_open(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -378,7 +374,7 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_sql_t* database)
     // ok?
     return ok;
 }
-static tb_void_t tb_database_sqlite3_clos(tb_database_sql_t* database)
+static tb_void_t tb_database_sqlite3_clos(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -392,7 +388,7 @@ static tb_void_t tb_database_sqlite3_clos(tb_database_sql_t* database)
     if (sqlite->database) sqlite3_close(sqlite->database);
     sqlite->database = tb_null;
 }
-static tb_void_t tb_database_sqlite3_exit(tb_database_sql_t* database)
+static tb_void_t tb_database_sqlite3_exit(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -407,7 +403,7 @@ static tb_void_t tb_database_sqlite3_exit(tb_database_sql_t* database)
     // exit it
     tb_free(sqlite);
 }
-static tb_bool_t tb_database_sqlite3_begin(tb_database_sql_t* database)
+static tb_bool_t tb_database_sqlite3_begin(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -427,7 +423,7 @@ static tb_bool_t tb_database_sqlite3_begin(tb_database_sql_t* database)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_database_sqlite3_commit(tb_database_sql_t* database)
+static tb_bool_t tb_database_sqlite3_commit(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -447,7 +443,7 @@ static tb_bool_t tb_database_sqlite3_commit(tb_database_sql_t* database)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_database_sqlite3_rollback(tb_database_sql_t* database)
+static tb_bool_t tb_database_sqlite3_rollback(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -467,7 +463,7 @@ static tb_bool_t tb_database_sqlite3_rollback(tb_database_sql_t* database)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_database_sqlite3_done(tb_database_sql_t* database, tb_char_t const* sql)
+static tb_bool_t tb_database_sqlite3_done(tb_database_sql_impl_t* database, tb_char_t const* sql)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -481,8 +477,8 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_sql_t* database, tb_char_t
         if (sqlite->result.result) sqlite3_free_table(sqlite->result.result);
         sqlite->result.result = tb_null;
 
-        // clear the lasr stmt first
-        sqlite->result.stmt = tb_null;
+        // clear the lasr statement first
+        sqlite->result.statement = tb_null;
 
         // clear the result row count first
         sqlite->result.count = 0;
@@ -542,7 +538,7 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_sql_t* database, tb_char_t
     // ok?
     return ok;
 }
-static tb_void_t tb_database_sqlite3_result_exit(tb_database_sql_t* database, tb_iterator_ref_t result)
+static tb_void_t tb_database_sqlite3_result_exit(tb_database_sql_impl_t* database, tb_iterator_ref_t result)
 {
     // check
     tb_database_sqlite3_result_t* sqlite3_result = (tb_database_sqlite3_result_t*)result;
@@ -552,52 +548,52 @@ static tb_void_t tb_database_sqlite3_result_exit(tb_database_sql_t* database, tb
     if (sqlite3_result->result) sqlite3_free_table(sqlite3_result->result);
     sqlite3_result->result = tb_null;
 
-    // clear the stmt
-    sqlite3_result->stmt = tb_null;
+    // clear the statement
+    sqlite3_result->statement = tb_null;
 
     // clear result
     sqlite3_result->count = 0;
     sqlite3_result->row.count = 0;
 }
-static tb_iterator_ref_t tb_database_sqlite3_result_load(tb_database_sql_t* database, tb_bool_t try_all)
+static tb_iterator_ref_t tb_database_sqlite3_result_load(tb_database_sql_impl_t* database, tb_bool_t try_all)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
     tb_assert_and_check_return_val(sqlite && sqlite->database, tb_null);
 
     // ok?
-    return (sqlite->result.result || sqlite->result.stmt)? (tb_iterator_ref_t)&sqlite->result : tb_null;
+    return (sqlite->result.result || sqlite->result.statement)? (tb_iterator_ref_t)&sqlite->result : tb_null;
 }
-static tb_void_t tb_database_sqlite3_statement_exit(tb_database_sql_t* database, tb_handle_t stmt)
+static tb_void_t tb_database_sqlite3_statement_exit(tb_database_sql_impl_t* database, tb_database_sql_statement_ref_t statement)
 {
-    // exit stmt
-    if (stmt) sqlite3_finalize((sqlite3_stmt*)stmt);
+    // exit statement
+    if (statement) sqlite3_finalize((sqlite3_stmt*)statement);
 }
-static tb_handle_t tb_database_sqlite3_statement_init(tb_database_sql_t* database, tb_char_t const* sql)
+static tb_database_sql_statement_ref_t tb_database_sqlite3_statement_init(tb_database_sql_impl_t* database, tb_char_t const* sql)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
     tb_assert_and_check_return_val(sqlite && sqlite->database && sql, tb_null);
 
-    // init stmt
-    sqlite3_stmt* stmt = tb_null;
-    if (SQLITE_OK != sqlite3_prepare_v2(sqlite->database, sql, -1, &stmt, 0))
+    // init statement
+    sqlite3_stmt* statement = tb_null;
+    if (SQLITE_OK != sqlite3_prepare_v2(sqlite->database, sql, -1, &statement, 0))
     {
         // save state
         sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
 
         // trace
-        tb_trace_e("stmt: init %s failed, error[%d]: %s", sql, sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+        tb_trace_e("statement: init %s failed, error[%d]: %s", sql, sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
     }
 
     // ok?
-    return (tb_handle_t)stmt;
+    return (tb_database_sql_statement_ref_t)statement;
 }
-static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_t* database, tb_handle_t stmt)
+static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_impl_t* database, tb_database_sql_statement_ref_t statement)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
-    tb_assert_and_check_return_val(sqlite && sqlite->database && stmt, tb_false);
+    tb_assert_and_check_return_val(sqlite && sqlite->database && statement, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
@@ -607,8 +603,8 @@ static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_t* database,
         if (sqlite->result.result) sqlite3_free_table(sqlite->result.result);
         sqlite->result.result = tb_null;
 
-        // clear the last stmt first
-        sqlite->result.stmt = tb_null;
+        // clear the last statement first
+        sqlite->result.statement = tb_null;
 
         // clear the result row count first
         sqlite->result.count = 0;
@@ -616,8 +612,8 @@ static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_t* database,
         // clear the result col count first
         sqlite->result.row.count = 0;
 
-        // step stmt
-        tb_int_t result = sqlite3_step((sqlite3_stmt*)stmt);
+        // step statement
+        tb_int_t result = sqlite3_step((sqlite3_stmt*)statement);
         tb_assert_and_check_break(result == SQLITE_DONE || result == SQLITE_ROW);
 
         // exists result?
@@ -626,14 +622,14 @@ static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_t* database,
             // save the result iterator mode
             sqlite->result.itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_READONLY;
 
-            // save stmt for iterating it
-            sqlite->result.stmt = (sqlite3_stmt*)stmt;
+            // save statement for iterating it
+            sqlite->result.statement = (sqlite3_stmt*)statement;
 
             // save result row count
             sqlite->result.count = (tb_size_t)-1;
 
             // save result col count
-            sqlite->result.row.count = sqlite3_column_count((sqlite3_stmt*)stmt);
+            sqlite->result.row.count = sqlite3_column_count((sqlite3_stmt*)statement);
         }
 
         // ok
@@ -652,14 +648,14 @@ static tb_void_t tb_database_sqlite3_statement_bind_exit(tb_pointer_t data)
     // exit it
     if (data) tb_free(data);
 }
-static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_t* database, tb_handle_t stmt, tb_database_sql_value_t const* list, tb_size_t size)
+static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_impl_t* database, tb_database_sql_statement_ref_t statement, tb_database_sql_value_t const* list, tb_size_t size)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
-    tb_assert_and_check_return_val(sqlite && sqlite->database && stmt && list && size, tb_false);
+    tb_assert_and_check_return_val(sqlite && sqlite->database && statement && list && size, tb_false);
 
     // the param count
-    tb_size_t param_count = (tb_size_t)sqlite3_bind_parameter_count((sqlite3_stmt*)stmt);
+    tb_size_t param_count = (tb_size_t)sqlite3_bind_parameter_count((sqlite3_stmt*)statement);
     tb_assert_and_check_return_val(size == param_count, tb_false);
 
     // walk
@@ -675,11 +671,11 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_t* database,
         switch (value->type)
         {
         case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
-            ok = sqlite3_bind_text((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->u.text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
+            ok = sqlite3_bind_text((sqlite3_stmt*)statement, (tb_int_t)(i + 1), value->u.text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
             break;
         case TB_DATABASE_SQL_VALUE_TYPE_INT64:
         case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
-            ok = sqlite3_bind_int64((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), tb_database_sql_value_int64(value));
+            ok = sqlite3_bind_int64((sqlite3_stmt*)statement, (tb_int_t)(i + 1), tb_database_sql_value_int64(value));
             break;
         case TB_DATABASE_SQL_VALUE_TYPE_INT32:
         case TB_DATABASE_SQL_VALUE_TYPE_INT16:
@@ -687,11 +683,11 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_t* database,
         case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
         case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
         case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
-            ok = sqlite3_bind_int((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), (tb_int_t)tb_database_sql_value_int32(value));
+            ok = sqlite3_bind_int((sqlite3_stmt*)statement, (tb_int_t)(i + 1), (tb_int_t)tb_database_sql_value_int32(value));
             break;
         case TB_DATABASE_SQL_VALUE_TYPE_BLOB16:
         case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
-            ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
+            ok = sqlite3_bind_blob((sqlite3_stmt*)statement, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
             break;
         case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
             {
@@ -712,24 +708,24 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_t* database,
                         if (!tb_stream_bread(value->u.blob.stream, data, (tb_size_t)size)) break;
 
                         // bind it
-                        ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), data, (tb_int_t)size, tb_database_sqlite3_statement_bind_exit);
+                        ok = sqlite3_bind_blob((sqlite3_stmt*)statement, (tb_int_t)(i + 1), data, (tb_int_t)size, tb_database_sqlite3_statement_bind_exit);
 
                     } while (0);
                 }
-                else ok = sqlite3_bind_blob((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
+                else ok = sqlite3_bind_blob((sqlite3_stmt*)statement, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
             }
             break;
 #ifdef TB_CONFIG_TYPE_FLOAT
         case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
         case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
-            ok = sqlite3_bind_double((sqlite3_stmt*)stmt, (tb_int_t)(i + 1), (tb_double_t)tb_database_sql_value_double(value));
+            ok = sqlite3_bind_double((sqlite3_stmt*)statement, (tb_int_t)(i + 1), (tb_double_t)tb_database_sql_value_double(value));
             break;
 #endif
         case TB_DATABASE_SQL_VALUE_TYPE_NULL:
-            ok = sqlite3_bind_null((sqlite3_stmt*)stmt, (tb_int_t)(i + 1));
+            ok = sqlite3_bind_null((sqlite3_stmt*)statement, (tb_int_t)(i + 1));
             break;
         default:
-            tb_trace_e("stmt: bind: unknown value type: %lu", value->type);
+            tb_trace_e("statement: bind: unknown value type: %lu", value->type);
             break;
         }
 
@@ -744,7 +740,7 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_t* database,
             sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
 
             // trace
-            tb_trace_e("stmt: bind value[%lu] failed, error[%d]: %s", i, sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+            tb_trace_e("statement: bind value[%lu] failed, error[%d]: %s", i, sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
             break;
         }
     }
@@ -816,7 +812,7 @@ tb_size_t tb_database_sqlite3_probe(tb_url_t const* url)
     // ok?
     return score;
 }
-tb_database_sql_t* tb_database_sqlite3_init(tb_url_t const* url)
+tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_t const* url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);
@@ -890,11 +886,11 @@ tb_database_sql_t* tb_database_sqlite3_init(tb_url_t const* url)
     if (!ok) 
     {
         // exit database
-        if (sqlite) tb_database_sqlite3_exit((tb_database_sql_t*)sqlite);
+        if (sqlite) tb_database_sqlite3_exit((tb_database_sql_impl_t*)sqlite);
         sqlite = tb_null;
     }
 
     // ok?
-    return (tb_database_sql_t*)sqlite;
+    return (tb_database_sql_ref_t)sqlite;
 }
 

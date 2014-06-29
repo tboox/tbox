@@ -81,6 +81,15 @@ features
 -	implements lightweight libm library interfaces, the interface name contains tb_xxx prefix for avoiding conflict.
 -	supports float and double type.
 
+contact
+-------
+
+- email:   	    waruqi@gmail.com
+- source:  	    https://github.com/waruqi/tbox
+- website: 	    http://www.tboox.org or http://www.tboox.net
+- download:     https://github.com/waruqi/tbox/archive/master.zip
+- qq(group):    343118190
+
 usage
 -----
 
@@ -264,15 +273,5 @@ example
         return 0;
     }
 </code></pre>
-
-
-contact
--------
-
-- email:   	    waruqi@gmail.com
-- source:  	    https://github.com/waruqi/tbox
-- website: 	    http://www.tboox.org or http://www.tboox.net
-- download:     https://github.com/waruqi/tbox/archive/master.zip
-- qq(group):    343118190
 
 

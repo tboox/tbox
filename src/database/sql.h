@@ -47,61 +47,11 @@ typedef enum __tb_database_sql_type_e
 
 }tb_database_sql_type_e;
 
-/// the database type
-typedef struct __tb_database_sql_t
-{
-    /// the url
-    tb_url_t                    url;
+/// the database sql ref type
+typedef struct{}*       tb_database_sql_ref_t;
 
-    /// the type
-    tb_size_t                   type;
-
-    /// the state
-    tb_size_t                   state;
-
-    /// is opened?
-    tb_bool_t                   bopened;
-
-    /// open
-    tb_bool_t                   (*open)(struct __tb_database_sql_t* database);
-
-    /// clos
-    tb_void_t                   (*clos)(struct __tb_database_sql_t* database);
-
-    /// exit
-    tb_void_t                   (*exit)(struct __tb_database_sql_t* database);
-
-    /// done
-    tb_bool_t                   (*done)(struct __tb_database_sql_t* database, tb_char_t const* sql);
-
-    /// begin
-    tb_bool_t                   (*begin)(struct __tb_database_sql_t* database);
-
-    /// commit
-    tb_bool_t                   (*commit)(struct __tb_database_sql_t* database);
-
-    /// rollback
-    tb_bool_t                   (*rollback)(struct __tb_database_sql_t* database);
-
-    /// load result
-    tb_iterator_ref_t              (*result_load)(struct __tb_database_sql_t* database, tb_bool_t try_all);
-
-    /// exit result
-    tb_void_t                   (*result_exit)(struct __tb_database_sql_t* database, tb_iterator_ref_t result);
-
-    /// statement init
-    tb_handle_t                 (*statement_init)(struct __tb_database_sql_t* database, tb_char_t const* sql);
-
-    /// statement exit
-    tb_void_t                   (*statement_exit)(struct __tb_database_sql_t* database, tb_handle_t statement);
-
-    /// statement done
-    tb_bool_t                   (*statement_done)(struct __tb_database_sql_t* database, tb_handle_t statement);
-
-    /// statement bind
-    tb_bool_t                   (*statement_bind)(struct __tb_database_sql_t* database, tb_handle_t statement, tb_database_sql_value_t const* list, tb_size_t size);
-
-}tb_database_sql_t;
+/// the database sql statement ref type
+typedef struct{}*       tb_database_sql_statement_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -109,36 +59,36 @@ typedef struct __tb_database_sql_t
 
 /*! init sql database
  *
- * @param url       the database url
- *                  "sql://localhost/?type=mysql&username=xxxx&password=xxxx"
- *                  "sql://localhost:3306/?type=mysql&username=xxxx&password=xxxx&database=xxxx"
- *                  "sql:///home/file.sqlitedb?type=sqlite3"
- *                  "/home/file.sqlite3"
- *                  "file:///home/file.sqlitedb"
- *                  "C://home/file.sqlite3"
+ * @param url                       the database url
+ *                                  "sql://localhost/?type=mysql&username=xxxx&password=xxxx"
+ *                                  "sql://localhost:3306/?type=mysql&username=xxxx&password=xxxx&database=xxxx"
+ *                                  "sql:///home/file.sqlitedb?type=sqlite3"
+ *                                  "/home/file.sqlite3"
+ *                                  "file:///home/file.sqlitedb"
+ *                                  "C://home/file.sqlite3"
  *
- * @return          tb_true or tb_false
+ * @return                          the database 
  */
-tb_handle_t         tb_database_sql_init(tb_char_t const* url);
+tb_database_sql_ref_t               tb_database_sql_init(tb_char_t const* url);
 
 /*! exit database
  *
- * @param database  the database handle
+ * @param database                  the database handle
  */
-tb_void_t           tb_database_sql_exit(tb_handle_t database);
+tb_void_t                           tb_database_sql_exit(tb_database_sql_ref_t database);
 
 /*! the database type
  *
- * @param database  the database handle
+ * @param database                  the database handle
  *
- * @return          the database type
+ * @return                          the database type
  */
-tb_size_t           tb_database_sql_type(tb_handle_t database);
+tb_size_t                           tb_database_sql_type(tb_database_sql_ref_t database);
 
 /*! open database
  *
  * @code
-    tb_handle_t database = tb_database_sql_init("sql://localhost/?type=mysql&username=xxxx&password=xxxx");
+    tb_database_sql_ref_t database = tb_database_sql_init("sql://localhost/?type=mysql&username=xxxx&password=xxxx");
     if (database)
     {
         // open it
@@ -154,49 +104,49 @@ tb_size_t           tb_database_sql_type(tb_handle_t database);
     }
  * @endcode
  *
- * @param database  the database handle
+ * @param database                  the database handle
  *
- * @return          tb_true or tb_false
+ * @return                          tb_true or tb_false
  */
-tb_bool_t           tb_database_sql_open(tb_handle_t database);
+tb_bool_t                           tb_database_sql_open(tb_database_sql_ref_t database);
 
 /*! clos database
  *
- * @param database  the database handle
+ * @param database                  the database handle
  */
-tb_void_t           tb_database_sql_clos(tb_handle_t database);
+tb_void_t                           tb_database_sql_clos(tb_database_sql_ref_t database);
 
 /*! begin transaction
  *
- * @param database  the database handle
+ * @param database                  the database handle
  *
- * @return          tb_true or tb_false
+ * @return                          tb_true or tb_false
  */
-tb_bool_t           tb_database_sql_begin(tb_handle_t database);
+tb_bool_t                           tb_database_sql_begin(tb_database_sql_ref_t database);
 
 /*! commit transaction
  *
- * @param database  the database handle
+ * @param database                  the database handle
  *
- * @return          tb_true or tb_false
+ * @return                          tb_true or tb_false
  */
-tb_bool_t           tb_database_sql_commit(tb_handle_t database);
+tb_bool_t                           tb_database_sql_commit(tb_database_sql_ref_t database);
 
 /*! rollback transaction
  *
- * @param database  the database handle
+ * @param database                  the database handle
  *
- * @return          tb_true or tb_false
+ * @return                          tb_true or tb_false
  */
-tb_bool_t           tb_database_sql_rollback(tb_handle_t database);
+tb_bool_t                           tb_database_sql_rollback(tb_database_sql_ref_t database);
 
 /*! the database state
  *
- * @param database  the database handle
+ * @param database                  the database handle
  *
- * @return          the database state
+ * @return                          the database state
  */
-tb_size_t           tb_database_sql_state(tb_handle_t database);
+tb_size_t                           tb_database_sql_state(tb_database_sql_ref_t database);
 
 /*! done database
  *
@@ -215,12 +165,12 @@ tb_size_t           tb_database_sql_state(tb_handle_t database);
  *
  * @endcode
  *
- * @param database  the database handle
- * @param sql       the sql command
+ * @param database                  the database handle
+ * @param sql                       the sql command
  *
- * @return          tb_true or tb_false
+ * @return                          tb_true or tb_false
  */
-tb_bool_t           tb_database_sql_done(tb_handle_t database, tb_char_t const* sql);
+tb_bool_t                           tb_database_sql_done(tb_database_sql_ref_t database, tb_char_t const* sql);
 
 /*! load the database result
  *
@@ -307,40 +257,40 @@ tb_bool_t           tb_database_sql_done(tb_handle_t database, tb_char_t const* 
 
  * @endcode
  *
- * @param database  the database handle
- * @param try_all   try loading all result into memory
+ * @param database                  the database handle
+ * @param try_all                   try loading all result into memory
  *
- * @return          the database result
+ * @return                          the database result
  */
-tb_iterator_ref_t      tb_database_sql_result_load(tb_handle_t database, tb_bool_t try_all);
+tb_iterator_ref_t                   tb_database_sql_result_load(tb_database_sql_ref_t database, tb_bool_t try_all);
 
 /*! exit the database result
  *
- * @param database  the database handle
- * @param result    the database result
+ * @param database                  the database handle
+ * @param result                    the database result
  */
-tb_void_t           tb_database_sql_result_exit(tb_handle_t database, tb_iterator_ref_t result);
+tb_void_t                           tb_database_sql_result_exit(tb_database_sql_ref_t database, tb_iterator_ref_t result);
 
 /*! init the database statement
  *
- * @param database  the database handle
- * @param sql       the sql command
+ * @param database                  the database handle
+ * @param sql                       the sql command
  *
- * @return          the statement handle
+ * @return                          the statement handle
  */
-tb_handle_t         tb_database_sql_statement_init(tb_handle_t database, tb_char_t const* sql);
+tb_database_sql_statement_ref_t     tb_database_sql_statement_init(tb_database_sql_ref_t database, tb_char_t const* sql);
 
 /*! exit the database statement
  *
- * @param database  the database handle
- * @param statement the statement handle
+ * @param database                  the database handle
+ * @param statement                 the statement handle
  */
-tb_void_t           tb_database_sql_statement_exit(tb_handle_t database, tb_handle_t statement);
+tb_void_t                           tb_database_sql_statement_exit(tb_database_sql_ref_t database, tb_database_sql_statement_ref_t statement);
 
 /*! done the database statement
  *
  * @code
-    tb_handle_t statement = tb_database_sql_statement_init(database, "select * from table where id=?");
+    tb_database_sql_statement_ref_t statement = tb_database_sql_statement_init(database, "select * from table where id=?");
     if (statement)
     {
         // bind arguments
@@ -361,23 +311,23 @@ tb_void_t           tb_database_sql_statement_exit(tb_handle_t database, tb_hand
     }
  * @endcode
  *
- * @param database  the database handle
- * @param statement the statement handle
+ * @param database                  the database handle
+ * @param statement                 the statement handle
  *
- * @return          tb_true or tb_false
+ * @return                          tb_true or tb_false
  */
-tb_bool_t           tb_database_sql_statement_done(tb_handle_t database, tb_handle_t statement);
+tb_bool_t                           tb_database_sql_statement_done(tb_database_sql_ref_t database, tb_database_sql_statement_ref_t statement);
 
 /*! bind the database statement argument
  *
- * @param database  the database handle
- * @param statement the statement handle
- * @param list      the argument value list
- * @param size      the argument value count
+ * @param database                  the database handle
+ * @param statement                 the statement handle
+ * @param list                      the argument value list
+ * @param size                      the argument value count
  *
- * @return          tb_true or tb_false
+ * @return                          tb_true or tb_false
  */
-tb_bool_t           tb_database_sql_statement_bind(tb_handle_t database, tb_handle_t statement, tb_database_sql_value_t const* list, tb_size_t size);
+tb_bool_t                           tb_database_sql_statement_bind(tb_database_sql_ref_t database, tb_database_sql_statement_ref_t statement, tb_database_sql_value_t const* list, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

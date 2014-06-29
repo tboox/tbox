@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t const* sql)
+static tb_void_t tb_demo_database_sql_test_done(tb_database_sql_ref_t database, tb_char_t const* sql)
 {
     // check
     tb_assert_and_check_return(database && sql);
@@ -53,28 +53,28 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
 
     } while (0);
 }
-static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, tb_char_t const* sql)
+static tb_void_t tb_demo_database_sql_test_statement_done(tb_database_sql_ref_t database, tb_char_t const* sql)
 {
     // check
     tb_assert_and_check_return(database && sql);
 
     // done
-    tb_handle_t stmt = tb_null;
+    tb_database_sql_statement_ref_t statement = tb_null;
     do
     {
-        // init stmt
-        if (!(stmt = tb_database_sql_statement_init(database, sql)))
+        // init statement
+        if (!(statement = tb_database_sql_statement_init(database, sql)))
         {
             // trace
-            tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
-        // done stmt
-        if (!tb_database_sql_statement_done(database, stmt))
+        // done statement
+        if (!tb_database_sql_statement_done(database, statement))
         {
             // trace
-            tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
@@ -184,24 +184,24 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
 
     } while (0);
 
-    // exit stmt
-    if (stmt) tb_database_sql_statement_exit(database, stmt);
+    // exit statement
+    if (statement) tb_database_sql_statement_exit(database, statement);
 }
-static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_char_t const* tdata, tb_char_t const* ldata1, tb_char_t const* ldata2, tb_size_t number, tb_uint16_t snumber)
+static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_database_sql_ref_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_char_t const* tdata, tb_char_t const* ldata1, tb_char_t const* ldata2, tb_size_t number, tb_uint16_t snumber)
 {
     // check
     tb_assert_and_check_return(database && sql);
 
     // done
-    tb_handle_t         stmt = tb_null;
-    tb_stream_ref_t  stream = tb_null;
+    tb_stream_ref_t                 stream = tb_null;
+    tb_database_sql_statement_ref_t statement = tb_null;
     do
     {
-        // init stmt
-        if (!(stmt = tb_database_sql_statement_init(database, sql)))
+        // init statement
+        if (!(statement = tb_database_sql_statement_init(database, sql)))
         {
             // trace
-            tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
@@ -216,7 +216,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
             if (!tb_stream_open(stream)) break;
         }
 
-        // bind stmt
+        // bind statement
         tb_database_sql_value_t list[7];
         tb_database_sql_value_set_text(&list[0], name, 0);
         tb_database_sql_value_set_blob16(&list[1], (tb_byte_t const*)data, tb_strlen(data) + 1);
@@ -225,25 +225,25 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
         tb_database_sql_value_set_blob32(&list[4], tb_null, 0, stream);
         tb_database_sql_value_set_int32(&list[5], number);
         tb_database_sql_value_set_int16(&list[6], snumber);
-        if (!tb_database_sql_statement_bind(database, stmt, list, tb_object_arrayn(list)))
+        if (!tb_database_sql_statement_bind(database, statement, list, tb_object_arrayn(list)))
         {
             // trace
-            tb_trace_e("stmt: bind %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: bind %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
-        // done stmt
-        if (!tb_database_sql_statement_done(database, stmt))
+        // done statement
+        if (!tb_database_sql_statement_done(database, statement))
         {
             // trace
-            tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
     } while (0);
 
-    // exit stmt
-    if (stmt) tb_database_sql_statement_exit(database, stmt);
+    // exit statement
+    if (statement) tb_database_sql_statement_exit(database, statement);
 
     // exit stream
     if (stream) tb_stream_exit(stream);
@@ -255,7 +255,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
 tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 {
     // init database
-    tb_handle_t database = tb_database_sql_init(argv[1]);
+    tb_database_sql_ref_t database = tb_database_sql_init(argv[1]);
     if (database)
     {
         // open database
