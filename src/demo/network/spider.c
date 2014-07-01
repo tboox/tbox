@@ -366,12 +366,14 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
     tb_assert_and_check_return_val(task && task->spider, tb_false);
 
     // percent
+#ifdef __tb_debug__
     tb_size_t percent = 0;
     if (size > 0) percent = (tb_size_t)((offset * 100) / size);
     else if (state == TB_STATE_OK) percent = 100;
 
     // trace
     tb_trace_d("save[%s]: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", task->iurl, save, rate, percent, tb_state_cstr(state));
+#endif
 
     // ok? continue it
     tb_bool_t ok = tb_false;

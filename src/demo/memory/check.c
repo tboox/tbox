@@ -46,8 +46,9 @@ tb_void_t tb_demo_leak()
 tb_void_t tb_demo_stack(tb_noarg_t);
 tb_void_t tb_demo_stack()
 {
-    __tb_volatile__ tb_size_t data[10] = {0};
-    *(data + 11) = 0;
+    __tb_volatile__ tb_size_t   data[10] = {0};
+    __tb_volatile__ tb_size_t*  p = (__tb_volatile__ tb_size_t*)data;
+    *(p + 11) = 0;
 }
 tb_void_t tb_demo_overlap(tb_noarg_t);
 tb_void_t tb_demo_overlap()
