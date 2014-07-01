@@ -369,7 +369,7 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         if (!tb_ssl_library_load()) break;
 
         // make ssl
-        impl = tb_malloc_type(tb_ssl_impl_t);
+        impl = tb_malloc0_type(tb_ssl_impl_t);
         tb_assert_and_check_break(impl);
 
         // init timeout, 30s

@@ -378,5 +378,5 @@ config : .null
 
 # make help
 help : .null
-	@cat ./HELP
+	@cat ./INSTALL
 

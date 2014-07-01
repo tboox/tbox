@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "stream_filter"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -146,6 +146,9 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* 
         // append data to cache if have the cache data
         if (idata && isize) 
         {
+            // trace
+            tb_trace_d("[%p]: append idata: %lu", filter, size);
+
             // append data
             idata = tb_buffer_memncat(&impl->idata, data, size);
             isize = tb_buffer_size(&impl->idata);
@@ -153,6 +156,10 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* 
         // using the data directly if no cache data
         else
         {
+            // trace
+            tb_trace_d("[%p]: using idata directly: %lu", filter, size);
+
+            // using it directly
             idata = data;
             isize = size;
         }
@@ -179,9 +186,13 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* 
         // exit pull
         if (odata) tb_queue_buffer_pull_exit(&impl->odata, osize > 0? osize : 0);
 
-        // enough? return it directly 
+        // enough? 
         if (osize > 0)
         {
+            // append to the cache if idata is not belong to the cache
+            if (size && idata == data) tb_buffer_memncat(&impl->idata, data, size);
+
+            // return it directly 
             *pdata = odata;
             return osize;
         }
@@ -206,6 +217,9 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* 
     }
     if (!tb_static_stream_init(&ostream, (tb_byte_t*)odata, omaxn)) return -1;
 
+    // trace
+    tb_trace_d("[%p]: spak: ileft: %lu, oleft: %lu, offset: %llu, limit: %lld, beof: %d: ..", filter, tb_buffer_size(&impl->idata), tb_queue_buffer_size(&impl->odata), impl->offset, impl->limit, impl->beof);
+
     // spak data
     tb_long_t osize = impl->spak(impl, &istream, &ostream, sync);
 
@@ -226,9 +240,21 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* 
     if (left) 
     {
         // move to the cache head if idata is belong to the cache
-        if (idata != data) tb_buffer_memnmov(&impl->idata, tb_static_stream_offset(&istream), left);
+        if (idata != data) 
+        {
+            // trace
+            tb_trace_d("[%p]: move to the cache head: %lu", filter, left);
+
+            tb_buffer_memnmov(&impl->idata, tb_static_stream_offset(&istream), left);
+        }
         // append to the cache if idata is not belong to the cache
-        else tb_buffer_memncat(&impl->idata, tb_static_stream_pos(&istream), left);
+        else 
+        {
+            // trace
+            tb_trace_d("[%p]: append to the cache: %lu", filter, left);
+
+            tb_buffer_memncat(&impl->idata, tb_static_stream_pos(&istream), left);
+        }
     }
     // clear the cache
     else tb_buffer_clear(&impl->idata);
@@ -251,7 +277,7 @@ tb_long_t tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* 
     if (osize > 0) *pdata = odata;
 
     // trace
-    tb_trace_d("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_buffer_size(&impl->idata), tb_queue_buffer_size(&impl->odata), impl->offset, impl->limit);
+    tb_trace_d("[%p]: spak: ileft: %lu, oleft: %lu, offset: %llu, limit: %lld, beof: %d: %ld", filter, tb_buffer_size(&impl->idata), tb_queue_buffer_size(&impl->odata), impl->offset, impl->limit, impl->beof, osize);
 
     // ok?
     return osize;

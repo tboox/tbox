@@ -35,7 +35,7 @@
 typedef struct __tb_stream_filter_zip_t
 {
     // the filter base
-    tb_stream_filter_impl_t          base;
+    tb_stream_filter_impl_t     base;
 
     // the algo
     tb_size_t                   algo;

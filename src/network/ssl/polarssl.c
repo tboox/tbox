@@ -176,7 +176,7 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
     do
     {
         // make impl
-        impl = tb_malloc_type(tb_ssl_impl_t);
+        impl = tb_malloc0_type(tb_ssl_impl_t);
         tb_assert_and_check_break(impl);
 
         // init timeout, 30s
@@ -192,14 +192,14 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         tb_long_t r = 0;
         if ((r = ctr_drbg_init(&impl->ctr_drbg, entropy_func, &impl->entropy, tb_null, 0)))
         {
-            tb_tracef_d("init ctr_drbg failed: %ld", r);
+            tb_trace_e("init ctr_drbg failed: %ld", r);
             break;
         }
 
 #ifdef POLARSSL_CERTS_C
         if ((r = x509_crt_parse(&impl->x509_crt, (tb_byte_t const*)test_ca_list, tb_strlen(test_ca_list))))
         {
-            tb_tracef_d("parse x509_crt failed: %ld", r);
+            tb_trace_e("parse x509_crt failed: %ld", r);
             break;
         }
 #endif
@@ -207,7 +207,7 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         // init ssl context
         if ((r = ssl_init(&impl->ssl)))
         {
-            tb_tracef_d("init impl failed: %ld", r);
+            tb_trace_e("init impl failed: %ld", r);
             break;
         }
 
