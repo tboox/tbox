@@ -88,7 +88,7 @@ tb_socket_ref_t tb_socket_open(tb_size_t type)
         return tb_null;
     }
 
-    // socket
+    // sock
     tb_int_t fd = socket(AF_INET, t, p);
     tb_assert_and_check_return_val(fd >= 0, tb_null);
 
@@ -354,7 +354,7 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
 tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(socket && list && size, -1);
+    tb_assert_and_check_return_val(sock && list && size, -1);
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
@@ -362,7 +362,7 @@ tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
     tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
 
     // read it
-    tb_long_t real = readv(tb_sock2fd(socket), (struct iovec const*)list, size);
+    tb_long_t real = readv(tb_sock2fd(sock), (struct iovec const*)list, size);
 
     // ok?
     if (real >= 0) return real;
@@ -376,7 +376,7 @@ tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
 tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(socket && list && size, -1);
+    tb_assert_and_check_return_val(sock && list && size, -1);
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
@@ -384,7 +384,7 @@ tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
     tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
 
     // writ it
-    tb_long_t real = writev(tb_sock2fd(socket), (struct iovec const*)list, size);
+    tb_long_t real = writev(tb_sock2fd(sock), (struct iovec const*)list, size);
 
     // ok?
     if (real >= 0) return real;
@@ -398,13 +398,13 @@ tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
 tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
 {
     // check
-    tb_assert_and_check_return_val(socket && file && size, -1);
+    tb_assert_and_check_return_val(sock && file && size, -1);
 
 #if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
 
     // send it
     off_t       seek = offset;
-    tb_hong_t   real = sendfile(tb_sock2fd(socket), tb_sock2fd(file), &seek, (size_t)size);
+    tb_hong_t   real = sendfile(tb_sock2fd(sock), tb_sock2fd(file), &seek, (size_t)size);
 
     // ok?
     if (real >= 0) return real;
@@ -419,7 +419,7 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_hize_t offs
 
     // send it
     off_t real = (off_t)size;
-    if (!sendfile(tb_sock2fd(file), tb_sock2fd(socket), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
+    if (!sendfile(tb_sock2fd(file), tb_sock2fd(sock), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
 
     // continue?
     if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
@@ -437,7 +437,7 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_hize_t offs
     tb_size_t writ = 0;
     while (writ < read)
     {
-        tb_long_t real = tb_socket_send(socket, data + writ, read - writ);
+        tb_long_t real = tb_socket_send(sock, data + writ, read - writ);
         if (real > 0) writ += real;
         else break;
     }
