@@ -85,8 +85,18 @@ typedef struct __tb_ssl_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+static __tb_inline__ tb_void_t tb_ssl_error(tb_char_t const* info, tb_long_t error)
+{
+#ifdef POLARSSL_ERROR_C
+    tb_char_t error_info[256] = {0};
+    polarssl_strerror(error, error_info, sizeof(error_info));
+    tb_trace_e("%s: error: %ld, %s", info, error, error_info);
+#else
+    tb_trace_e("%s: error: %ld", info, error);
+#endif
+}
 #ifdef __tb_debug__
-static tb_void_t tb_ssl_impl_trace_info(tb_pointer_t priv, tb_int_t level, tb_char_t const* info)
+static tb_void_t tb_ssl_trace_info(tb_pointer_t priv, tb_int_t level, tb_char_t const* info)
 {
     // trace
     if (level < 1) tb_printf("%s", info);
@@ -192,14 +202,14 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         tb_long_t r = 0;
         if ((r = ctr_drbg_init(&impl->ctr_drbg, entropy_func, &impl->entropy, tb_null, 0)))
         {
-            tb_trace_e("init ctr_drbg failed: %ld", r);
+            tb_ssl_error("init ctr_drbg failed", r);
             break;
         }
 
 #ifdef POLARSSL_CERTS_C
         if ((r = x509_crt_parse(&impl->x509_crt, (tb_byte_t const*)test_ca_list, tb_strlen(test_ca_list))))
         {
-            tb_trace_e("parse x509_crt failed: %ld", r);
+            tb_ssl_error("parse x509_crt failed", r);
             break;
         }
 #endif
@@ -207,7 +217,7 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         // init ssl context
         if ((r = ssl_init(&impl->ssl)))
         {
-            tb_trace_e("init impl failed: %ld", r);
+            tb_ssl_error("init impl failed", r);
             break;
         }
 
@@ -225,7 +235,7 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
 
         // enable ssl debug?
 #if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-        ssl_set_dbg(&impl->ssl, tb_ssl_impl_trace_info, tb_null);
+        ssl_set_dbg(&impl->ssl, tb_ssl_trace_info, tb_null);
 #endif
 
         // init state
@@ -368,15 +378,8 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t ssl)
         else
         {
             // trace
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-#   ifdef POLARSSL_ERROR_C
-            tb_char_t error[256] = {0};
-            polarssl_strerror(r, error, sizeof(error));
-            tb_trace_d("open: handshake: failed: %ld, %s", r, error);
-#   else
-            tb_trace_d("open: handshake: failed: %ld", r);
-#   endif
-#endif
+            tb_ssl_error("open: handshake: failed", r);
+
             // save state
             impl->state = TB_STATE_SOCK_SSL_FAILED;
         }
@@ -395,7 +398,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t ssl)
             if ((r & BADCERT_REVOKED)) tb_trace_d("server certificate has been revoked");
             if ((r & BADCERT_CN_MISMATCH)) tb_trace_d("cn mismatch");
             if ((r & BADCERT_NOT_TRUSTED)) tb_trace_d("self-signed or not signed by a trusted ca");
-            tb_trace_d("verify: failed: %ld", r);
+            tb_ssl_error("verify: failed", r);
         }
 #endif
 
@@ -478,15 +481,8 @@ tb_long_t tb_ssl_clos_try(tb_ssl_ref_t ssl)
         else
         {
             // trace
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-#   ifdef POLARSSL_ERROR_C
-            tb_char_t error[256] = {0};
-            polarssl_strerror(r, error, sizeof(error));
-            tb_trace_d("clos: close_notify: failed: %ld, %s", r, error);
-#   else
-            tb_trace_d("clos: close_notify: failed: %ld", r);
-#   endif
-#endif
+            tb_ssl_error("clos: close_notify: failed", r);
+
             // save state
             impl->state = TB_STATE_SOCK_SSL_FAILED;
         }
@@ -559,15 +555,7 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t ssl, tb_byte_t* data, tb_size_t size)
     else if (real < 0)
     {
         // trace
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-#   ifdef POLARSSL_ERROR_C
-        tb_char_t error[256] = {0};
-        polarssl_strerror(real, error, sizeof(error));
-        tb_trace_d("read: failed: %ld, %s", real, error);
-#   else
-        tb_trace_d("read: failed: %ld", real);
-#   endif
-#endif
+        tb_ssl_error("read: failed:", real);
 
         // save state
         impl->state = TB_STATE_SOCK_SSL_FAILED;
@@ -623,15 +611,7 @@ tb_long_t tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size)
     else if (real < 0)
     {
         // trace
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-#   ifdef POLARSSL_ERROR_C
-        tb_char_t error[256] = {0};
-        polarssl_strerror(real, error, sizeof(error));
-        tb_trace_d("writ: failed: %ld, %s", real, error);
-#   else
-        tb_trace_d("writ: failed: %ld", real);
-#   endif
-#endif
+        tb_ssl_error("writ: failed", real);
 
         // save state
         impl->state = TB_STATE_SOCK_SSL_FAILED;
