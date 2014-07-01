@@ -1627,7 +1627,7 @@ tb_database_sql_ref_t tb_database_mysql_init(tb_url_t const* url)
     do
     {
         // make database
-        mysql = tb_malloc_type(tb_database_mysql_t);
+        mysql = tb_malloc0_type(tb_database_mysql_t);
         tb_assert_and_check_break(mysql);
 
         // init database

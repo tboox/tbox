@@ -64,7 +64,7 @@ static tb_long_t tb_zip_zlibraw_spak_deflate(tb_zip_ref_t zip, tb_static_stream_
 
     // deflate 
     tb_int_t r = deflate(&zlibraw->zst, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
-    tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
+    tb_assertf_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1, "sync: %ld, error: %d", sync, r);
     tb_trace_d("deflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlibraw->zst.next_out - op, sync);
 
     // update 
@@ -101,7 +101,7 @@ static tb_long_t tb_zip_zlibraw_spak_inflate(tb_zip_ref_t zip, tb_static_stream_
 
     // inflate 
     tb_int_t r = inflate(&zlibraw->zst, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
-    tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
+    tb_assertf_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1, "sync: %ld, error: %d", sync, r);
     tb_trace_d("inflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlibraw->zst.next_out - op, sync);
 
     // update 

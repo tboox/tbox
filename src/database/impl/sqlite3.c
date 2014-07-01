@@ -823,7 +823,7 @@ tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_t const* url)
     do
     {
         // make database
-        sqlite = tb_malloc_type(tb_database_sqlite3_t);
+        sqlite = tb_malloc0_type(tb_database_sqlite3_t);
         tb_assert_and_check_break(sqlite);
 
         // init database
