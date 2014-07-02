@@ -34,14 +34,6 @@
  */
 #ifdef TB_ASSEMBLER_IS_GAS
 
-#ifndef tb_atomic_set
-#   define tb_atomic_set(a, v)                  tb_atomic_set_x86(a, v)
-#endif
-
-#ifndef tb_atomic_pset
-#   define tb_atomic_pset(a, p, v)              tb_atomic_pset_x86(a, p, v)
-#endif
-
 #ifndef tb_atomic_fetch_and_set
 #   define tb_atomic_fetch_and_set(a, v)        tb_atomic_fetch_and_set_x86(a, v)
 #endif
@@ -57,20 +49,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_void_t tb_atomic_set_x86(tb_atomic_t* a, tb_long_t v)
-{
-    __tb_asm__ __tb_volatile__ 
-    (
-#if TB_CPU_BITSIZE == 64
-        "lock xchgq %1, %0\n"   //!< xchgq v, [a]
-#else
-        "lock xchgl %1, %0\n"   //!< xchgl v, [a]
-#endif
-        :
-        : "m" (*a), "r"(v) 
-        : "memory"
-    );
-}
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_long_t v)
 {
     __tb_asm__ __tb_volatile__ 
@@ -87,35 +65,6 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_lo
     );
 
     return v;
-}
-static __tb_inline__ tb_void_t tb_atomic_pset_x86(tb_atomic_t* a, tb_long_t p, tb_long_t v)
-{
-    /*
-     * cmpxchgl v, [a]:
-     *
-     * if (eax == [a]) 
-     * {
-     *      zf = 1;
-     *      [a] = v;
-     * } 
-     * else 
-     * {
-     *      zf = 0;
-     *      eax = [a];
-     * }
-     *
-     */
-    __tb_asm__ __tb_volatile__ 
-    (
-#if TB_CPU_BITSIZE == 64
-        "lock cmpxchgq  %2, %0  \n"     //!< cmpxchgq v, [a]
-#else
-        "lock cmpxchgl  %2, %0  \n"     //!< cmpxchgl v, [a]
-#endif
-        :
-        : "m" (*a), "a" (p), "r" (v) 
-        : "cc", "memory"                //!< "cc" means that flags were changed.
-    );
 }
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_long_t p, tb_long_t v)
 {
