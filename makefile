@@ -39,6 +39,7 @@ all : .null
 # make rebuild
 rebuild : .null
 	@$(MAKE) c
+	$(if $(findstring msys,$(HOST)),,-@$(MAKE) -j4)
 	@$(MAKE)
 	@$(MAKE) i
 	@$(MAKE) p
@@ -261,16 +262,16 @@ config : .null
 	@echo "config: prof:     " 							$(PROF)
 	@echo "config: debug:    " 							$(DEBUG)
 	@echo "config: small:    " 							$(SMALL)
-	@echo "config: cflag:  " 							$(CFLAG)
-	@echo "config: ccflag:  " 							$(CCFLAG)
-	@echo "config: cxflag:  " 							$(CXFLAG)
-	@echo "config: mflag:  " 							$(MFLAG)
-	@echo "config: mmflag:  " 							$(MMFLAG)
-	@echo "config: mxflag:  " 							$(MXFLAG)
-	@echo "config: ldflag:  " 							$(LDFLAG)
-	@echo "config: asflag:  " 							$(ASFLAG)
-	@echo "config: arflag:  " 							$(ARFLAG)
-	@echo "config: shflag:  " 							$(SHFLAG)
+	@echo "config: cflag:    " 							$(CFLAG)
+	@echo "config: ccflag:   " 							$(CCFLAG)
+	@echo "config: cxflag:   " 							$(CXFLAG)
+	@echo "config: mflag:    " 							$(MFLAG)
+	@echo "config: mmflag:   " 							$(MMFLAG)
+	@echo "config: mxflag:   " 							$(MXFLAG)
+	@echo "config: ldflag:   " 							$(LDFLAG)
+	@echo "config: asflag:   " 							$(ASFLAG)
+	@echo "config: arflag:   " 							$(ARFLAG)
+	@echo "config: shflag:   " 							$(SHFLAG)
 	@echo "config: ccache:   " 							$(CCACHE)
 	@echo "config: distcc:   " 							$(DISTCC)
 	@echo "config: prefix:   " 							$(PREFIX)

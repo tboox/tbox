@@ -24,7 +24,7 @@ CC_ 				:= $(if $(findstring y,$(PROF)),gcc,$(CC_))
 CC 					= $(PRE_)$(CC_)
 ifeq ($(CXFLAGS_CHECK),)
 CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
+CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) $(call CC_CHECK,-Qunused-arguments,) 
 export CXFLAGS_CHECK
 endif
 
@@ -34,7 +34,7 @@ LD_ 				:= $(if $(findstring y,$(PROF)),g++,$(LD_))
 LD 					= $(PRE_)$(LD_)
 ifeq ($(LDFLAGS_CHECK),)
 LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) #-fsanitize=thread
+LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) 
 export LDFLAGS_CHECK
 endif
 
@@ -57,7 +57,7 @@ MAKE 				= make -r
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -freg-struct-return -fvisibility=hidden
+CXFLAGS_RELEASE 	= -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -mssse3
 CXFLAGS-I 			= -I
