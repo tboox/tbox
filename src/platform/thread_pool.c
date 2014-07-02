@@ -435,7 +435,6 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                 worker->pull = 0;
 
                 // pull from the urgent jobs
-                tb_size_t jobs_urgent_size = 0;
                 if (impl->jobs_urgent && tb_single_list_size(impl->jobs_urgent))
                 {
                     // trace
@@ -443,13 +442,9 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
                     // pull it
                     tb_single_list_walk(impl->jobs_urgent, tb_thread_pool_worker_walk_pull, worker);
-
-                    // update the jobs urgent size
-                    jobs_urgent_size = tb_single_list_size(impl->jobs_urgent);
                 }
 
                 // pull from the waiting jobs
-                tb_size_t jobs_waiting_size = 0;
                 if (impl->jobs_waiting && tb_single_list_size(impl->jobs_waiting))
                 {
                     // trace
@@ -457,13 +452,9 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
                     // pull it
                     tb_single_list_walk(impl->jobs_waiting, tb_thread_pool_worker_walk_pull, worker);
-
-                    // update the jobs waiting size
-                    jobs_waiting_size = tb_single_list_size(impl->jobs_waiting);
                 }
 
                 // pull from the pending jobs and clean some finished and killed jobs
-                tb_size_t jobs_pending_size = 0;
                 if (impl->jobs_pending && tb_list_size(impl->jobs_pending))
                 {
                     // trace
@@ -474,9 +465,6 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                         tb_list_walk(impl->jobs_pending, tb_thread_pool_worker_walk_pull_and_clean, worker);
                     // clean some finished and killed jobs
                     else tb_list_walk(impl->jobs_pending, tb_thread_pool_worker_walk_clean, worker);
-
-                    // update the jobs pending size
-                    jobs_pending_size = tb_list_size(impl->jobs_pending);
                 }
 
                 // leave 
@@ -503,8 +491,22 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                 }
                 else
                 {
+#ifdef TB_TRACE_DEBUG
+                    // update the jobs urgent size
+                    tb_size_t jobs_urgent_size = 0;
+                    if (impl->jobs_urgent) jobs_urgent_size = tb_single_list_size(impl->jobs_urgent);
+
+                    // update the jobs waiting size
+                    tb_size_t jobs_waiting_size = 0;
+                    if (impl->jobs_waiting) jobs_waiting_size = tb_single_list_size(impl->jobs_waiting);
+
+                    // update the jobs pending size
+                    tb_size_t jobs_pending_size = 0;
+                    if (impl->jobs_pending) jobs_pending_size = tb_list_size(impl->jobs_pending);
+
                     // trace
                     tb_trace_d("worker[%lu]: pull: jobs: %lu, time: %lu ms, waiting: %lu, pending: %lu, urgent: %lu", worker->id, tb_vector_size(worker->jobs), worker->pull, jobs_waiting_size, jobs_pending_size, jobs_urgent_size);
+#endif
                 }
             }
 
@@ -532,46 +534,48 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                     // computate the time
                     time = tb_cache_time_spak() - time;
 
-                    // update the stats
-                    tb_size_t done_count = 1;
-                    tb_hize_t total_time = time;
+                    // exists? update time and count
+                    tb_size_t               itor;
+                    tb_hash_item_t const*   item = tb_null;
+                    if (    ((itor = tb_hash_itor(worker->stats, job->task.done)) != tb_iterator_tail(worker->stats))
+                        &&  (item = (tb_hash_item_t const*)tb_iterator_item(worker->stats, itor)))
                     {
-                        // exists? update time and count
-                        tb_size_t               itor;
-                        tb_hash_item_t const*   item = tb_null;
-                        if (    ((itor = tb_hash_itor(worker->stats, job->task.done)) != tb_iterator_tail(worker->stats))
-                            &&  (item = (tb_hash_item_t const*)tb_iterator_item(worker->stats, itor)))
-                        {
-                            // the stats
-                            tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)item->data;
-                            tb_assert_and_check_break(stats);
+                        // the stats
+                        tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)item->data;
+                        tb_assert_and_check_break(stats);
 
-                            // update the done count
-                            stats->done_count++;
+                        // update the done count
+                        stats->done_count++;
 
-                            // update the total time 
-                            stats->total_time += time;
+                        // update the total time 
+                        stats->total_time += time;
+                    }
+                    
+                    // no item? add it
+                    if (!item) 
+                    {
+                        // init stats
+                        tb_thread_pool_job_stats_t stats = {0};
+                        stats.done_count = 1;
+                        stats.total_time = time;
 
-                            // save them
-                            done_count = stats->done_count;
-                            total_time = stats->total_time;
-                        }
-                        
-                        // no item? add it
-                        if (!item) 
-                        {
-                            // init stats
-                            tb_thread_pool_job_stats_t stats = {0};
-                            stats.done_count = 1;
-                            stats.total_time = time;
+                        // add stats
+                        tb_hash_set(worker->stats, job->task.done, &stats);
+                    }
 
-                            // add stats
-                            tb_hash_set(worker->stats, job->task.done, &stats);
-                        }
+#ifdef TB_TRACE_DEBUG
+                    tb_size_t done_count = 0;
+                    tb_hize_t total_time = 0;
+                    tb_thread_pool_job_stats_t* stats = tb_hash_get(worker->stats, job->task.done);
+                    if (stats)
+                    {
+                        done_count = stats->done_count;
+                        total_time = stats->total_time;
                     }
 
                     // trace
                     tb_trace_d("worker[%lu]: done: task[%p:%s]: time: %lld ms, average: %lld ms, count: %lu", worker->id, job->task.done, job->task.name, time, (total_time / (tb_hize_t)done_count), done_count);
+#endif
 
                     // update the job state
                     tb_atomic_set(&job->state, TB_STATE_FINISHED);

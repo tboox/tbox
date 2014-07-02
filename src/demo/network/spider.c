@@ -366,7 +366,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
     tb_assert_and_check_return_val(task && task->spider, tb_false);
 
     // percent
-#ifdef __tb_debug__
+#ifdef TB_TRACE_DEBUG
     tb_size_t percent = 0;
     if (size > 0) percent = (tb_size_t)((offset * 100) / size);
     else if (state == TB_STATE_OK) percent = 100;
