@@ -24,7 +24,7 @@ CC_ 				:= $(if $(findstring y,$(PROF)),gcc,$(CC_))
 CC 					= $(PRE_)$(CC_)
 ifeq ($(CXFLAGS_CHECK),)
 CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) $(call CC_CHECK,-Qunused-arguments,) 
+CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,)
 export CXFLAGS_CHECK
 endif
 
@@ -62,6 +62,9 @@ CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
+
+# suppress warning for ccache + clang bug
+CXFLAGS 			+= $(if $(findstring clang,$(CC)),-Qunused-arguments,)
 
 # arch
 ifeq ($(ARCH),x86)
