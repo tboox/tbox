@@ -135,10 +135,12 @@ __tb_extern_c_enter__
  */
 #if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__) 
 #   if defined(TB_COMPILER_IS_GCC)
+#       define TB_TRACE_DEBUG
 #       define tb_trace_d(fmt, arg ...)                 tb_trace_p(__tb_prefix__, fmt, ## arg)
 #       define tb_tracef_d(fmt, arg ...)                tb_tracef_p(__tb_prefix__, fmt, ## arg)
 #       define tb_tracet_d(fmt, arg ...)                tb_trace_tail(fmt, ## arg)
 #   elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
+#       define TB_TRACE_DEBUG
 #       define tb_trace_d(fmt, ...)                     tb_trace_p(__tb_prefix__, fmt, __VA_ARGS__)
 #       define tb_tracef_d(fmt, ...)                    tb_tracef_p(__tb_prefix__, fmt, __VA_ARGS__)
 #       define tb_tracet_d(fmt, ...)                    tb_trace_tail(fmt, __VA_ARGS__)
