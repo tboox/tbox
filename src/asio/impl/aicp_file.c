@@ -60,7 +60,7 @@ static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
         
     // the priority
     tb_size_t priority = tb_aice_impl_priority(aice);
-    tb_assert_and_check_return_val(priority < tb_object_arrayn(impl->spak) && impl->spak[priority], tb_false);
+    tb_assert_and_check_return_val(priority < tb_arrayn(impl->spak) && impl->spak[priority], tb_false);
 
     // enter 
     tb_spinlock_enter(&impl->lock);

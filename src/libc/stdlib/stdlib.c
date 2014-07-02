@@ -240,7 +240,7 @@ tb_uint64_t tb_sbtou64(tb_char_t const* s, tb_int_t base)
     ,   tb_null
     ,   tb_s16tou64
     };
-    tb_assert_and_check_return_val(base < tb_object_arrayn(s_conv) && s_conv[base], 0);
+    tb_assert_and_check_return_val(base < tb_arrayn(s_conv) && s_conv[base], 0);
 
     // convect it
     return s_conv[base](s);
@@ -686,7 +686,7 @@ tb_double_t tb_sbtod(tb_char_t const* s, tb_int_t base)
     ,   tb_null
     ,   tb_s16tod
     };
-    tb_assert_and_check_return_val(base < tb_object_arrayn(s_conv) && s_conv[base], 0);
+    tb_assert_and_check_return_val(base < tb_arrayn(s_conv) && s_conv[base], 0);
 
     // convect it
     return s_conv[base](s);

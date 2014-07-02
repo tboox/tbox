@@ -148,7 +148,7 @@ static tb_void_t tb_http_option_dump(tb_http_impl_t* impl)
     tb_trace_i("option: ");
     tb_trace_i("option: url: %s",               tb_url_get(&impl->option.url));
     tb_trace_i("option: version: HTTP/1.%1u",   impl->option.version);
-    tb_trace_i("option: method: %s",            impl->option.method < tb_object_arrayn(g_http_methods)? g_http_methods[impl->option.method] : "none");
+    tb_trace_i("option: method: %s",            impl->option.method < tb_arrayn(g_http_methods)? g_http_methods[impl->option.method] : "none");
     tb_trace_i("option: redirect: %d",          impl->option.redirect);
     tb_trace_i("option: range: %llu-%llu",      impl->option.range.bof, impl->option.range.eof);
     tb_trace_i("option: bunzip: %s",            impl->option.bunzip? "true" : "false");
@@ -321,7 +321,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         if (!tb_static_string_init(&value, data, 64)) break;
 
         // init method
-        tb_assert_and_check_break(impl->option.method < tb_object_arrayn(g_http_methods));
+        tb_assert_and_check_break(impl->option.method < tb_arrayn(g_http_methods));
         tb_char_t const* method = g_http_methods[impl->option.method];
         tb_assert_and_check_break(method);
 

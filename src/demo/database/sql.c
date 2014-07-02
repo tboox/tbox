@@ -225,7 +225,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_database_sql
         tb_database_sql_value_set_blob32(&list[4], tb_null, 0, stream);
         tb_database_sql_value_set_int32(&list[5], number);
         tb_database_sql_value_set_int16(&list[6], snumber);
-        if (!tb_database_sql_statement_bind(database, statement, list, tb_object_arrayn(list)))
+        if (!tb_database_sql_statement_bind(database, statement, list, tb_arrayn(list)))
         {
             // trace
             tb_trace_e("statement: bind %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));

@@ -222,7 +222,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
             if (tb_file_read(file, (tb_byte_t*)line, sizeof(line) - 1))
             {
                 tb_size_t i = 0;
-                tb_size_t n = tb_object_arrayn(g_demo);
+                tb_size_t n = tb_arrayn(g_demo);
                 for (i = 0; i < n; i++)
                 {
                     // find it?
@@ -247,7 +247,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
     if (!name && argc > 1 && argv[1])
     {
         tb_size_t i = 0;
-        tb_size_t n = tb_object_arrayn(g_demo);
+        tb_size_t n = tb_arrayn(g_demo);
         for (i = 0; i < n; i++)
         {
             // find it?
@@ -281,7 +281,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
         // walk name
         tb_size_t i = 0;
-        tb_size_t n = tb_object_arrayn(g_demo);
+        tb_size_t n = tb_arrayn(g_demo);
         for (i = 0; i < n; i++) tb_trace_i("help: name: %s", g_demo[i].name);
     }
 

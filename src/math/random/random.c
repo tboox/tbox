@@ -61,7 +61,7 @@ tb_handle_t tb_random_init(tb_size_t type, tb_size_t seed)
         tb_null
     ,   tb_random_linear_init
     };
-    tb_assert_and_check_return_val(type < tb_object_arrayn(s_init) && s_init[type], tb_null);
+    tb_assert_and_check_return_val(type < tb_arrayn(s_init) && s_init[type], tb_null);
 
     // init it
     return s_init[type](seed);

@@ -114,7 +114,7 @@ tb_void_t tb_lock_profiler_dump(tb_handle_t handle)
     // walk
     tb_size_t c = 0;
     tb_size_t i = 0;
-    tb_size_t n = tb_object_arrayn(profiler->list);
+    tb_size_t n = tb_arrayn(profiler->list);
     for (i = 0; i < n; i++)
     {
         // the item

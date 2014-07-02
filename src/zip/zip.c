@@ -51,7 +51,7 @@ tb_zip_ref_t tb_zip_init(tb_size_t algo, tb_size_t action)
 #endif
     ,   tb_null
     };
-    tb_assert_and_check_return_val(algo < tb_object_arrayn(s_init) && s_init[algo], tb_null);
+    tb_assert_and_check_return_val(algo < tb_arrayn(s_init) && s_init[algo], tb_null);
 
     // init
     return s_init[algo](action);
@@ -80,7 +80,7 @@ tb_void_t tb_zip_exit(tb_zip_ref_t zip)
 #endif
     ,   tb_null
     };
-    tb_assert_and_check_return(zip->algo < tb_object_arrayn(s_exit) && s_exit[zip->algo]);
+    tb_assert_and_check_return(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo]);
 
     // exit
     s_exit[zip->algo](zip);

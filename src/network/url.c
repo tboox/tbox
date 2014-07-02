@@ -440,7 +440,7 @@ tb_char_t const* tb_url_protocol_cstr(tb_url_t const* url)
     ,   "rtsp"
     ,   "sql"
     };
-    tb_assert_and_check_return_val(url->poto < tb_object_arrayn(s_protocols), tb_null);
+    tb_assert_and_check_return_val(url->poto < tb_arrayn(s_protocols), tb_null);
 
     // ok
     return s_protocols[url->poto];
