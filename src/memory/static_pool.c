@@ -144,7 +144,7 @@ static tb_void_t tb_static_pool_dump_backtrace(tb_char_t const* prefix, tb_stati
     {
         // the frames count
         tb_size_t nframe = 0;
-        while (nframe < tb_object_arrayn(block->frames) && block->frames[nframe]) nframe++;
+        while (nframe < tb_arrayn(block->frames) && block->frames[nframe]) nframe++;
 
         // dump backtrace
         tb_backtrace_dump(prefix, block->frames, nframe);
@@ -555,8 +555,8 @@ end:
         if (block->real < block->size) tb_memset(p + block->real, 0xcc, block->size - block->real);
 
         // set frames
-        tb_size_t nframe = tb_backtrace_frames(block->frames, tb_object_arrayn(block->frames), 5);
-        if (nframe < tb_object_arrayn(block->frames)) tb_memset(block->frames + nframe, 0, (tb_object_arrayn(block->frames) - nframe) * sizeof(tb_cpointer_t));
+        tb_size_t nframe = tb_backtrace_frames(block->frames, tb_arrayn(block->frames), 5);
+        if (nframe < tb_arrayn(block->frames)) tb_memset(block->frames + nframe, 0, (tb_arrayn(block->frames) - nframe) * sizeof(tb_cpointer_t));
 
         // update the used size
         impl->info.used += block->size;

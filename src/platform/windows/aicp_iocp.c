@@ -534,7 +534,7 @@ static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     ,   tb_iocp_spak_fsync
     ,   tb_iocp_spak_runtask
     };
-    tb_assert_and_check_return_val(resp->code < tb_object_arrayn(s_spak), -1);
+    tb_assert_and_check_return_val(resp->code < tb_arrayn(s_spak), -1);
 
     // trace
     tb_trace_d("spak: aico: %p, code: %u: done: ..", resp->aico, resp->code);
@@ -610,7 +610,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         aico->olap.aice                 = *aice;
         aico->olap.aice.u.acpt.sock     = tb_socket_open(TB_SOCKET_TYPE_TCP);
         aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_aico_pool_malloc0((tb_aico_ref_t)aico, ((sizeof(SOCKADDR_IN) + 16) << 1));
-        tb_assert_static(tb_object_arrayn(aico->olap.aice.u.acpt.priv));
+        tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv));
         tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.sock);
         init_ok = tb_true;
 
@@ -1649,7 +1649,7 @@ static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     ,   tb_iocp_post_fsync
     ,   tb_iocp_post_runtask
     };
-    tb_assert_and_check_return_val(aice->code < tb_object_arrayn(s_post) && s_post[aice->code], tb_false);
+    tb_assert_and_check_return_val(aice->code < tb_arrayn(s_post) && s_post[aice->code], tb_false);
 
     // trace
     tb_trace_d("post: done: aico: %p, code: %u, type: %lu: ..", aico, aice->code, aico->base.type);
@@ -1892,7 +1892,7 @@ static tb_bool_t tb_iocp_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* a
     
     // the priority
     tb_size_t priority = tb_aice_impl_priority(aice);
-    tb_assert_and_check_return_val(priority < tb_object_arrayn(impl->post) && impl->post[priority], tb_false);
+    tb_assert_and_check_return_val(priority < tb_arrayn(impl->post) && impl->post[priority], tb_false);
 
     // enter 
     tb_spinlock_enter(&impl->lock);
@@ -2114,7 +2114,7 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
         {
             // wait
             DWORD       size = 0;
-            BOOL        wait = impl->func.GetQueuedCompletionStatusEx(impl->port, loop->list, tb_object_arrayn(loop->list), &size, timeout, FALSE);
+            BOOL        wait = impl->func.GetQueuedCompletionStatusEx(impl->port, loop->list, tb_arrayn(loop->list), &size, timeout, FALSE);
 
             // the last error
             tb_size_t   error = (tb_size_t)GetLastError();

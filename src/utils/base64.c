@@ -88,7 +88,7 @@ tb_size_t tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_
     tb_int_t    i = 0;
     tb_int_t    v = 0;
     tb_byte_t*  op = ob;
-    tb_size_t   tn = tb_object_arrayn(table);
+    tb_size_t   tn = tb_arrayn(table);
     for (i = 0; i < in && ib[i] && ib[i] != '='; i++) 
     {
         tb_uint32_t idx = ib[i] - 43;

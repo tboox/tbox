@@ -296,7 +296,7 @@ tb_void_t                           tb_database_sql_statement_exit(tb_database_s
         // bind arguments
         tb_database_sql_value_t list[1] = {0};
         tb_database_sql_value_set_int32(&list[0], 12345);
-        if (tb_database_sql_statement_bind(database, statement, list, tb_object_arrayn(list)))
+        if (tb_database_sql_statement_bind(database, statement, list, tb_arrayn(list)))
         {
             // done statement
             if (tb_database_sql_statement_done(database, statement))

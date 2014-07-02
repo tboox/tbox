@@ -115,7 +115,7 @@ tb_long_t tb_aico_timeout(tb_aico_ref_t aico, tb_size_t type)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl && type < tb_object_arrayn(impl->timeout), -1);
+    tb_assert_and_check_return_val(impl && type < tb_arrayn(impl->timeout), -1);
 
     // the impl timeout
     return tb_atomic_get((tb_atomic_t*)(impl->timeout + type));
@@ -124,7 +124,7 @@ tb_void_t tb_aico_timeout_set(tb_aico_ref_t aico, tb_size_t type, tb_long_t time
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return(impl && type < tb_object_arrayn(impl->timeout));
+    tb_assert_and_check_return(impl && type < tb_arrayn(impl->timeout));
 
     // set the impl timeout
     tb_atomic_set((tb_atomic_t*)(impl->timeout + type), timeout);

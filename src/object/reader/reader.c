@@ -41,7 +41,7 @@ tb_bool_t tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return_val(reader && (format < tb_object_arrayn(g_reader)), tb_false);
+    tb_assert_and_check_return_val(reader && (format < tb_arrayn(g_reader)), tb_false);
 
     // exit the older reader if exists
     tb_object_reader_del(format);
@@ -56,7 +56,7 @@ tb_void_t tb_object_reader_del(tb_size_t format)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return((format < tb_object_arrayn(g_reader)));
+    tb_assert_and_check_return((format < tb_arrayn(g_reader)));
 
     // exit it
     if (g_reader[format])
@@ -73,7 +73,7 @@ tb_object_reader_t* tb_object_reader_get(tb_size_t format)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return_val((format < tb_object_arrayn(g_reader)), tb_null);
+    tb_assert_and_check_return_val((format < tb_arrayn(g_reader)), tb_null);
 
     // ok
     return g_reader[format];
@@ -85,7 +85,7 @@ tb_object_ref_t tb_object_reader_done(tb_stream_ref_t stream)
 
     // probe it
     tb_size_t i = 0;
-    tb_size_t n = tb_object_arrayn(g_reader);
+    tb_size_t n = tb_arrayn(g_reader);
     tb_size_t m = 0;
     tb_size_t f = 0;
     for (i = 0; i < n && m < 100; i++)

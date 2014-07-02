@@ -41,7 +41,7 @@ tb_bool_t tb_object_writer_set(tb_size_t format, tb_object_writer_t* writer)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return_val(writer && (format < tb_object_arrayn(g_writer)), tb_false);
+    tb_assert_and_check_return_val(writer && (format < tb_arrayn(g_writer)), tb_false);
 
     // exit the older writer if exists
     tb_object_writer_del(format);
@@ -56,7 +56,7 @@ tb_void_t tb_object_writer_del(tb_size_t format)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return((format < tb_object_arrayn(g_writer)));
+    tb_assert_and_check_return((format < tb_arrayn(g_writer)));
 
     // exit it
     if (g_writer[format])
@@ -73,7 +73,7 @@ tb_object_writer_t* tb_object_writer_get(tb_size_t format)
 {
     // check
     format &= 0x00ff;
-    tb_assert_and_check_return_val((format < tb_object_arrayn(g_writer)), tb_null);
+    tb_assert_and_check_return_val((format < tb_arrayn(g_writer)), tb_null);
 
     // ok
     return g_writer[format];

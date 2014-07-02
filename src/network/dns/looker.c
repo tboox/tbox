@@ -524,7 +524,7 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
 
     // get the dns server list
     looker->maxn = tb_dns_server_get(looker->list);
-    tb_check_goto(looker->maxn && looker->maxn <= tb_object_arrayn(looker->list), fail);
+    tb_check_goto(looker->maxn && looker->maxn <= tb_arrayn(looker->list), fail);
 
     // init name
     if (!tb_static_string_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) goto fail;

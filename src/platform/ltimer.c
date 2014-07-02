@@ -218,7 +218,7 @@ static tb_bool_t tb_ltimer_del_task(tb_ltimer_impl_t* impl, tb_ltimer_task_impl_
     do
     {
         // check
-        tb_assert_and_check_break(task_impl->windx != -1 && task_impl->windx < tb_object_arrayn(impl->wheel));
+        tb_assert_and_check_break(task_impl->windx != -1 && task_impl->windx < tb_arrayn(impl->wheel));
 
         // the wheel list
         tb_vector_ref_t wlist = impl->wheel[task_impl->windx];

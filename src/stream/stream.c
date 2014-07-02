@@ -148,7 +148,7 @@ tb_stream_ref_t tb_stream_init_from_url(tb_char_t const* url)
         tb_trace_e("unknown stream for url: %s", url);
         return tb_null;
     }
-    tb_assert_and_check_return_val(type && type < tb_object_arrayn(s_init) && s_init[type], tb_null);
+    tb_assert_and_check_return_val(type && type < tb_arrayn(s_init) && s_init[type], tb_null);
 
     // done
     tb_bool_t           ok = tb_false;

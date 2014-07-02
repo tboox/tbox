@@ -650,7 +650,7 @@ static tb_bool_t tb_thread_pool_jobs_walk_dump_all(tb_pointer_t item, tb_cpointe
     ,   "killed"
     ,   "finished"
     };
-    tb_assert_and_check_return_val(job->state < tb_object_arrayn(s_state_cstr), tb_false);
+    tb_assert_and_check_return_val(job->state < tb_arrayn(s_state_cstr), tb_false);
 
     // trace
     tb_trace_d("    task[%p:%s]: refn: %lu, state: %s", job->task.done, job->task.name, job->refn, s_state_cstr[job->state]);

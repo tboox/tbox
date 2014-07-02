@@ -149,7 +149,7 @@ static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
 
     ,   TB_AIOE_CODE_NONE
     };
-    tb_assert_and_check_return_val(aice->code && aice->code < tb_object_arrayn(s_code), TB_AIOE_CODE_NONE);
+    tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_code), TB_AIOE_CODE_NONE);
 
     // the aioe code
     return s_code[aice->code];
@@ -254,7 +254,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
 
             // the priority
             tb_size_t priority = tb_aice_impl_priority(aice);
-            tb_assert_and_check_goto(priority < tb_object_arrayn(impl->spak) && impl->spak[priority], end);
+            tb_assert_and_check_goto(priority < tb_arrayn(impl->spak) && impl->spak[priority], end);
 
             // this aico is killed? post to higher priority queue
             if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico)) priority = 0;
@@ -329,7 +329,7 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t priv)
     {
         // the priority
         tb_size_t priority = tb_aice_impl_priority(&aico->aice);
-        tb_assert_and_check_return(priority < tb_object_arrayn(impl->spak) && impl->spak[priority]);
+        tb_assert_and_check_return(priority < tb_arrayn(impl->spak) && impl->spak[priority]);
 
         // trace
         tb_trace_d("wait: timeout: code: %lu, priority: %lu, size: %lu, time: %lld", aico->aice.code, priority, tb_queue_size(impl->spak[priority]), tb_cache_time_mclock());
@@ -975,7 +975,7 @@ static tb_void_t tb_aiop_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t pr
 
     // the priority
     tb_size_t priority = tb_aice_impl_priority(&aico->aice);
-    tb_assert_and_check_return(priority < tb_object_arrayn(impl->spak) && impl->spak[priority]);
+    tb_assert_and_check_return(priority < tb_arrayn(impl->spak) && impl->spak[priority]);
 
     // enter 
     tb_spinlock_enter(&impl->lock);
@@ -1140,7 +1140,7 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 
     ,   tb_aiop_spak_runtask
     };
-    tb_assert_and_check_return_val(aice->code && aice->code < tb_object_arrayn(s_spak) && s_spak[aice->code], -1);
+    tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_spak) && s_spak[aice->code], -1);
 
     // done spak 
     return s_spak[aice->code](impl, aice);
@@ -1300,7 +1300,7 @@ static tb_bool_t tb_aiop_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* a
     
     // the priority
     tb_size_t priority = tb_aice_impl_priority(aice);
-    tb_assert_and_check_return_val(priority < tb_object_arrayn(impl->spak) && impl->spak[priority], tb_false);
+    tb_assert_and_check_return_val(priority < tb_arrayn(impl->spak) && impl->spak[priority], tb_false);
 
     // done
     tb_bool_t           ok = tb_true;

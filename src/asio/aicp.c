@@ -64,7 +64,7 @@ static tb_aico_impl_t* tb_aicp_aico_init(tb_aicp_impl_t* impl, tb_handle_t handl
 
         // init timeout 
         tb_size_t i = 0;
-        tb_size_t n = tb_object_arrayn(aico->timeout);
+        tb_size_t n = tb_arrayn(aico->timeout);
         for (i = 0; i < n; i++) aico->timeout[i] = -1;
     }
 

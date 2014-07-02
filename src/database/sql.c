@@ -86,7 +86,7 @@ tb_database_sql_ref_t tb_database_sql_init(tb_char_t const* url)
 
         // probe the database type
         tb_size_t i = 1;
-        tb_size_t n = tb_object_arrayn(s_probe);
+        tb_size_t n = tb_arrayn(s_probe);
         tb_size_t s = 0;
         tb_size_t m = 0;
         for (; i < n; i++)

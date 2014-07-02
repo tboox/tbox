@@ -273,7 +273,7 @@ static __tb_inline__ tb_size_t tb_aice_impl_priority(tb_aice_t const* aice)
 
     ,   0   // task
     };
-    tb_assert_and_check_return_val(aice->code && aice->code < tb_object_arrayn(s_priorities), 1);
+    tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_priorities), 1);
     
     // the priority
     return s_priorities[aice->code];
@@ -305,7 +305,7 @@ static __tb_inline__ tb_long_t tb_aico_impl_timeout_from_code(tb_aico_impl_t* ai
 
     ,   -1
     };
-    tb_assert_and_check_return_val(code < tb_object_arrayn(type) && type[code] != (tb_size_t)-1, -1);
+    tb_assert_and_check_return_val(code < tb_arrayn(type) && type[code] != (tb_size_t)-1, -1);
 
     // timeout
     return tb_aico_timeout((tb_aico_ref_t)aico, type[code]);
