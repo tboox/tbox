@@ -135,7 +135,7 @@ static tb_object_ref_t tb_object_number_copy(tb_object_ref_t object)
 }
 static tb_void_t tb_object_number_exit(tb_object_ref_t object)
 {
-    if (object) tb_object_pool_del(tb_object_pool(), object);
+    if (object) tb_free(object);
 }
 static tb_void_t tb_object_number_cler(tb_object_ref_t object)
 {
@@ -184,19 +184,39 @@ static tb_void_t tb_object_number_cler(tb_object_ref_t object)
 }
 static tb_object_number_t* tb_object_number_init_base()
 {
-    // make
-    tb_object_number_t* number = (tb_object_number_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_number_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_NUMBER);
-    tb_assert_and_check_return_val(number, tb_null);
+    // done
+    tb_bool_t               ok = tb_false;
+    tb_object_number_t*     number = tb_null;
+    do
+    {
+        // make number
+        number = tb_malloc0_type(tb_object_number_t);
+        tb_assert_and_check_break(number);
 
-    // init base
-    number->base.copy = tb_object_number_copy;
-    number->base.cler = tb_object_number_cler;
-    number->base.exit = tb_object_number_exit;
+        // init number
+        if (!tb_object_init((tb_object_ref_t)number, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_NUMBER)) break;
 
-    // ok
+        // init base
+        number->base.copy = tb_object_number_copy;
+        number->base.cler = tb_object_number_cler;
+        number->base.exit = tb_object_number_exit;
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (number) tb_object_exit((tb_object_ref_t)number);
+        number = tb_null;
+    }
+
+    // ok?
     return number;
 }
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */

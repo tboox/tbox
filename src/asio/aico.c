@@ -84,15 +84,6 @@ tb_size_t tb_aico_type(tb_aico_ref_t aico)
     // the impl type
     return impl->type;
 }
-tb_handle_t tb_aico_pool(tb_aico_ref_t aico)
-{
-    // check
-    tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl, tb_null);
-
-    // the pool handle
-    return impl->pool;
-}
 tb_socket_ref_t tb_aico_sock(tb_aico_ref_t aico)
 {
     // check

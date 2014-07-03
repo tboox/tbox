@@ -59,7 +59,6 @@ static tb_aico_impl_t* tb_aicp_aico_init(tb_aicp_impl_t* impl, tb_handle_t handl
         aico->aicp      = (tb_aicp_ref_t)impl;
         aico->type      = type;
         aico->handle    = handle;
-        aico->pool      = tb_null;
         aico->state     = TB_STATE_OK;
 
         // init timeout 
@@ -89,10 +88,6 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_impl_t* impl, tb_aico_impl_t* aico)
         // trace
         tb_trace_d("exit: aico[%p]: type: %lu, handle: %p, state: %s", aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(tb_atomic_get(&aico->state)));
         
-        // exit pool
-        if (aico->pool) tb_pool_exit(aico->pool);
-        aico->pool = tb_null;
-
         // exit it
         tb_fixed_pool_free(impl->pool, aico);
     }
@@ -188,7 +183,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
     }
 
     // exit the posted aice
-    tb_aico_pool_free(aice->aico, posted_aice);
+    tb_free(posted_aice);
 
     // ok?
     return ok;
@@ -591,7 +586,7 @@ tb_bool_t tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_t con
     tb_assert_and_check_return_val(aico, tb_false);
 
     // make the posted aice
-    tb_aice_t* posted_aice = (tb_aice_t*)tb_aico_pool_malloc0((tb_aico_ref_t)aico, sizeof(tb_aice_t));
+    tb_aice_t* posted_aice = tb_malloc0_type(tb_aice_t);
     tb_assert_and_check_return_val(posted_aice, tb_false);
 
     // init the posted aice

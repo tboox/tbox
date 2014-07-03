@@ -89,7 +89,7 @@ static tb_void_t tb_object_string_exit(tb_object_ref_t object)
         tb_string_exit(&string->str);
 
         // exit the object
-        tb_object_pool_del(tb_object_pool(), object);
+        tb_free(object);
     }
 }
 static tb_void_t tb_object_string_cler(tb_object_ref_t object)
@@ -108,16 +108,37 @@ static tb_void_t tb_object_string_cler(tb_object_ref_t object)
 }
 static tb_object_string_t* tb_object_string_init_base()
 {
-    // make
-    tb_object_string_t* string = (tb_object_string_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
-    tb_assert_and_check_return_val(string, tb_null);
+    // done
+    tb_bool_t            ok = tb_false;
+    tb_object_string_t*  string = tb_null;
+    do
+    {
+        // make string
+        string = tb_malloc0_type(tb_object_string_t);
+        tb_assert_and_check_break(string);
 
-    // init base
-    string->base.copy = tb_object_string_copy;
-    string->base.cler = tb_object_string_cler;
-    string->base.exit = tb_object_string_exit;
+        // init string
+        if (!tb_object_init((tb_object_ref_t)string, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING)) break;
 
-    // ok
+        // init base
+        string->base.copy = tb_object_string_copy;
+        string->base.cler = tb_object_string_cler;
+        string->base.exit = tb_object_string_exit;
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (string) tb_object_exit((tb_object_ref_t)string);
+        string = tb_null;
+    }
+
+    // ok?
     return string;
 }
 

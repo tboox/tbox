@@ -28,7 +28,6 @@
  * includes
  */
 #include "prefix.h"
-#include "../memory/pool.h"
 #include "../string/pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -175,15 +174,11 @@ tb_item_func_t      tb_item_func_uint32(tb_noarg_t);
 
 /*! the string item function
  *
- * using tb_strdup if the bpool is null, 
- * using tb_pool_strdup if the bpool exists
- *
  * @param bcase     is case?
- * @param pool      the pool
 
  * @return          the item func
  */
-tb_item_func_t      tb_item_func_str(tb_bool_t bcase, tb_pool_ref_t pool); 
+tb_item_func_t      tb_item_func_str(tb_bool_t bcase); 
 
 /*! the pointer item function
  *

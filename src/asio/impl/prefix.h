@@ -59,9 +59,6 @@ typedef struct __tb_aico_impl_t
     // the type
     tb_size_t                   type;
 
-    // the pool
-    tb_pool_ref_t               pool;
-
     // the handle
     tb_handle_t                 handle;
 

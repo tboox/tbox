@@ -70,9 +70,6 @@ typedef struct __tb_http_impl_t
     // is opened?
     tb_bool_t           bopened;
 
-    // the pool for string
-    tb_pool_ref_t       pool;
-
     // the request data
     tb_string_t         request;
 
@@ -116,7 +113,7 @@ static tb_bool_t tb_http_option_init(tb_http_impl_t* impl)
     if (!tb_url_init(&impl->option.post_url)) return tb_false;
 
     // init head
-    impl->option.head = tb_hash_init(8, tb_item_func_str(tb_false, impl->pool), tb_item_func_str(tb_false, impl->pool));
+    impl->option.head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
     tb_assert_and_check_return_val(impl->option.head, tb_false);
 
     // ok
@@ -852,10 +849,6 @@ tb_http_ref_t tb_http_init()
         impl->stream = impl->sstream = tb_stream_init_sock();
         tb_assert_and_check_break(impl->stream);
 
-        // init pool
-        impl->pool = tb_pool_init(TB_POOL_GROW_MICRO, 0);
-        tb_assert_and_check_break(impl->pool);
-
         // init request data
         if (!tb_string_init(&impl->request)) break;
 
@@ -927,10 +920,6 @@ tb_void_t tb_http_exit(tb_http_ref_t http)
 
     // exit request data
     tb_string_exit(&impl->request);
-
-    // exit pool
-    if (impl->pool) tb_pool_exit(impl->pool);
-    impl->pool = tb_null;
 
     // free it
     tb_free(impl);

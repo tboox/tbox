@@ -70,7 +70,7 @@ tb_item_func_t tb_item_func_string_pool(tb_string_pool_ref_t pool)
     tb_assert(pool);
 
     // the str func
-    tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
+    tb_item_func_t func_str = tb_item_func_str(tb_true);
 
     // init func
     tb_item_func_t func = {0};

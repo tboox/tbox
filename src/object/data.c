@@ -70,7 +70,7 @@ static tb_void_t tb_object_data_exit(tb_object_ref_t object)
     if (data) 
     {
         tb_buffer_exit(&data->buffer);
-        tb_object_pool_del(tb_object_pool(), (tb_object_ref_t)data);
+        tb_free(data);
     }
 }
 static tb_void_t tb_object_data_cler(tb_object_ref_t object)
@@ -80,16 +80,37 @@ static tb_void_t tb_object_data_cler(tb_object_ref_t object)
 }
 static tb_object_data_t* tb_object_data_init_base()
 {
-    // make
-    tb_object_data_t* data = (tb_object_data_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_data_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA);
-    tb_assert_and_check_return_val(data, tb_null);
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_object_data_t*   data = tb_null;
+    do
+    {
+        // make data
+        data = tb_malloc0_type(tb_object_data_t);
+        tb_assert_and_check_break(data);
 
-    // init base
-    data->base.copy = tb_object_data_copy;
-    data->base.cler = tb_object_data_cler;
-    data->base.exit = tb_object_data_exit;
+        // init data
+        if (!tb_object_init((tb_object_ref_t)data, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA)) break;
 
-    // ok
+        // init base
+        data->base.copy = tb_object_data_copy;
+        data->base.cler = tb_object_data_cler;
+        data->base.exit = tb_object_data_exit;
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (data) tb_object_exit((tb_object_ref_t)data);
+        data = tb_null;
+    }
+
+    // ok?
     return data;
 }
 

@@ -175,14 +175,6 @@ tb_aicp_ref_t       tb_aico_aicp(tb_aico_ref_t aico);
  */
 tb_size_t           tb_aico_type(tb_aico_ref_t aico);
 
-/*! the aico pool
- *
- * @param aico      the aico
- *
- * @return          the pool handle
- */
-tb_handle_t         tb_aico_pool(tb_aico_ref_t aico);
-
 /*! get the socket if the aico is socket type
  *
  * @param aico      the aico

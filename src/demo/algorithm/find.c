@@ -75,10 +75,6 @@ static tb_void_t tb_find_str_test()
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
-    // init pool
-    tb_pool_ref_t pool = tb_pool_init(0, 0);
-    tb_assert_and_check_return(pool);
-    
     // init iterator
     tb_iterator_t iterator = tb_iterator_init_str(data, n);
 
@@ -88,7 +84,7 @@ static tb_void_t tb_find_str_test()
     {
         tb_long_t r = tb_snprintf(s, 256, "%04lu", i); 
         s[r] = '\0'; 
-        data[i] = tb_pool_strdup(pool, s);
+        data[i] = tb_strdup(s);
     }
 
     // find
@@ -103,9 +99,6 @@ static tb_void_t tb_find_str_test()
     // time
     tb_trace_i("tb_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
 
-    // exit pool
-    tb_pool_exit(pool);
-
     // free data
     tb_free(data);
 }
@@ -118,10 +111,6 @@ static tb_void_t tb_find_str_test_binary()
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
-    // init pool
-    tb_pool_ref_t pool = tb_pool_init(0, 0);
-    tb_assert_and_check_return(pool);
-    
     // init iterator
     tb_iterator_t iterator = tb_iterator_init_str(data, n);
 
@@ -131,7 +120,7 @@ static tb_void_t tb_find_str_test_binary()
     {
         tb_long_t r = tb_snprintf(s, 256, "%04lu", i); 
         s[r] = '\0'; 
-        data[i] = tb_pool_strdup(pool, s);
+        data[i] = tb_strdup(s);
     }
 
     // find
@@ -145,9 +134,6 @@ static tb_void_t tb_find_str_test_binary()
 
     // time
     tb_trace_i("tb_bfind_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
-
-    // exit pool
-    tb_pool_exit(pool);
 
     // free data
     tb_free(data);

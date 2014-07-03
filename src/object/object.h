@@ -28,7 +28,6 @@
  * includes
  */
 #include "prefix.h"
-#include "pool.h"
 #include "null.h"
 #include "data.h"
 #include "date.h"

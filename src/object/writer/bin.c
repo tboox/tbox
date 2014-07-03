@@ -347,7 +347,7 @@ static tb_long_t tb_object_bin_writer_done(tb_stream_ref_t stream, tb_object_ref
         // init writer
         writer.stream           = stream;
         writer.ohash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
-        writer.shash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_true, tb_null), tb_item_func_uint32());
+        writer.shash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_true), tb_item_func_uint32());
         tb_assert_and_check_break(writer.shash && writer.ohash);
 
         // writ
