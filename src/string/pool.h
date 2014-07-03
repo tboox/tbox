@@ -56,11 +56,10 @@ tb_string_pool_ref_t        tb_string_pool(tb_noarg_t);
  * readonly, strip repeat strings and decrease memory fragmens
  *
  * @param bcase             is case?
- * @param align             the cpu align bytes
  *
  * @return                  the string pool
  */
-tb_string_pool_ref_t         tb_string_pool_init(tb_bool_t bcase, tb_size_t align);
+tb_string_pool_ref_t        tb_string_pool_init(tb_bool_t bcase);
 
 /*! exit the string pool
  *

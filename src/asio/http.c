@@ -114,9 +114,6 @@ typedef struct __tb_aicp_http_impl_t
     // the transfer for post
     tb_async_transfer_ref_t         transfer;
 
-    // the pool for string
-    tb_pool_ref_t                   pool;
-
     /* the state
      *
      * TB_STATE_CLOSED
@@ -210,7 +207,7 @@ static tb_bool_t tb_aicp_http_option_init(tb_aicp_http_impl_t* impl)
     if (!tb_url_init(&impl->option.post_url)) return tb_false;
 
     // init head
-    impl->option.head = tb_hash_init(8, tb_item_func_str(tb_false, impl->pool), tb_item_func_str(tb_false, impl->pool));
+    impl->option.head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
     tb_assert_and_check_return_val(impl->option.head, tb_false);
 
     // ok
@@ -1467,10 +1464,6 @@ tb_aicp_http_ref_t tb_aicp_http_init(tb_aicp_ref_t aicp)
         impl->stream = impl->sstream = tb_async_stream_init_sock(aicp);
         tb_assert_and_check_break(impl->stream);
 
-        // init pool
-        impl->pool = tb_pool_init(TB_POOL_GROW_MICRO, 0);
-        tb_assert_and_check_break(impl->pool);
-
         // init cookies data
         if (!tb_string_init(&impl->cookies)) break;
 
@@ -1583,10 +1576,6 @@ tb_bool_t tb_aicp_http_exit(tb_aicp_http_ref_t http)
 
     // exit cookies data
     tb_string_exit(&impl->cookies);
-
-    // exit pool
-    if (impl->pool) tb_pool_exit(impl->pool);
-    impl->pool = tb_null;
 
     // free it
     tb_free(impl);

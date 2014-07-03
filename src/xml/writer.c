@@ -57,9 +57,6 @@ typedef struct __tb_xml_writer_impl_t
     // is format?
     tb_bool_t               bformat;
     
-    // the pool
-    tb_pool_ref_t           pool;
-
     // the elements stack
     tb_stack_ref_t          elements;
 
@@ -89,16 +86,12 @@ tb_xml_writer_ref_t tb_xml_writer_init(tb_stream_ref_t wstream, tb_bool_t bforma
         writer->wstream     = wstream;
         writer->bformat     = bformat;
 
-        // init pool
-        writer->pool        = tb_pool_init(TB_POOL_GROW_SMALL, 0);
-        tb_assert_and_check_break(writer->pool);
-        
         // init elements
-        writer->elements    = tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false, writer->pool));
+        writer->elements    = tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false));
         tb_assert_and_check_break(writer->elements);
 
         // init attributes
-        writer->attributes  = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false, writer->pool), tb_item_func_str(tb_false, writer->pool));
+        writer->attributes  = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
         tb_assert_and_check_break(writer->attributes);
 
         // ok
@@ -129,10 +122,6 @@ tb_void_t tb_xml_writer_exit(tb_xml_writer_ref_t writer)
         // exit elements
         if (impl->elements) tb_stack_exit(impl->elements);
         impl->elements = tb_null;
-
-        // exit pool
-        if (impl->pool) tb_pool_exit(impl->pool);
-        impl->pool = tb_null;
 
         // free it
         tb_free(impl);

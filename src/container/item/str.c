@@ -64,8 +64,7 @@ static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_pointer_t item)
     if (*((tb_pointer_t*)item)) 
     {
         // free it
-        if (func->pool) tb_pool_free((tb_pool_ref_t)func->pool, *((tb_pointer_t*)item));
-        else tb_free(*((tb_pointer_t*)item));
+        tb_free(*((tb_pointer_t*)item));
 
         // clear it
         *((tb_pointer_t*)item) = tb_null;
@@ -77,7 +76,7 @@ static tb_void_t tb_item_func_str_dupl(tb_item_func_t* func, tb_pointer_t item, 
     tb_assert_and_check_return(func && item);
 
     // duplicate it
-    if (data) *((tb_char_t const**)item) = func->pool? tb_pool_strdup((tb_pool_ref_t)func->pool, (tb_char_t const*)data) : tb_strdup((tb_char_t const*)data);
+    if (data) *((tb_char_t const**)item) = tb_strdup((tb_char_t const*)data);
     // clear it
     else *((tb_char_t const**)item) = tb_null;
 }
@@ -146,7 +145,7 @@ static tb_void_t tb_item_func_str_ncopy(tb_item_func_t* func, tb_pointer_t item,
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_pool_ref_t pool)
+tb_item_func_t tb_item_func_str(tb_bool_t bcase)
 {
     // init func
     tb_item_func_t func = {0};
@@ -164,7 +163,7 @@ tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_pool_ref_t pool)
     func.ndupl  = tb_item_func_str_ndupl;
     func.nrepl  = tb_item_func_str_nrepl;
     func.ncopy  = tb_item_func_str_ncopy;
-    func.pool   = (tb_handle_t)pool;
+    func.pool   = tb_null;
     func.size   = sizeof(tb_char_t*);
 
     // ok?

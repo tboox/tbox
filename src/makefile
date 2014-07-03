@@ -274,7 +274,6 @@ ifeq ($(TB_CONFIG_MODULE_HAVE_ASIO),y)
 tbox_C_FILES 			+= \
 						asio/aico \
 						asio/aicp \
-						asio/pool \
 						asio/http \
 						asio/dns \
 						stream/async_stream \
@@ -303,7 +302,6 @@ tbox_C_FILES 			+= \
 						object/null \
 						object/data \
 						object/date \
-						object/pool \
 						object/array \
 						object/string \
 						object/number \
@@ -453,7 +451,6 @@ INC_FILES 				= \
 						asio/aicp.h \
 						asio/aico.h \
 						asio/aice.h \
-						asio/pool.h \
 						asio/http.h \
 						asio/dns.h \
 						asio/ssl.h \
@@ -605,7 +602,6 @@ INC_FILES 				= \
 						object/string.h \
 						object/boolean.h \
 						object/dictionary.h \
-						object/pool.h \
 						object/reader/prefix.h \
 						object/reader/reader.h \
 						object/reader/xml.h \

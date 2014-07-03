@@ -96,7 +96,7 @@ static tb_void_t tb_object_array_exit(tb_object_ref_t object)
     array->vector = tb_null;
 
     // exit it
-    tb_object_pool_del(tb_object_pool(), object);
+    tb_free(array);
 }
 static tb_void_t tb_object_array_cler(tb_object_ref_t object)
 {
@@ -108,16 +108,37 @@ static tb_void_t tb_object_array_cler(tb_object_ref_t object)
 }
 static tb_object_array_t* tb_object_array_init_base()
 {
-    // make
-    tb_object_array_t* array = (tb_object_array_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_array_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY);
-    tb_assert_and_check_return_val(array, tb_null);
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_object_array_t*  array = tb_null;
+    do
+    {
+        // make array
+        array = tb_malloc0_type(tb_object_array_t);
+        tb_assert_and_check_break(array);
 
-    // init base
-    array->base.copy = tb_object_array_copy;
-    array->base.cler = tb_object_array_cler;
-    array->base.exit = tb_object_array_exit;
+        // init array
+        if (!tb_object_init((tb_object_ref_t)array, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY)) break;
 
-    // ok
+        // init base
+        array->base.copy = tb_object_array_copy;
+        array->base.cler = tb_object_array_cler;
+        array->base.exit = tb_object_array_exit;
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (array) tb_object_exit((tb_object_ref_t)array);
+        array = tb_null;
+    }
+
+    // ok?
     return array;
 }
 

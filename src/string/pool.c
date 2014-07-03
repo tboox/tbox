@@ -46,10 +46,7 @@
 // the string pool impl type
 typedef struct __tb_string_pool_impl_t
 {
-    // the pool
-    tb_pool_ref_t           pool;
-
-    // the hash cache
+    // the cache
     tb_hash_ref_t           cache;
 
     // the lock
@@ -62,7 +59,7 @@ typedef struct __tb_string_pool_impl_t
  */
 static tb_handle_t tb_string_pool_instance_init(tb_cpointer_t* ppriv)
 {
-    return tb_string_pool_init(tb_true, 0);
+    return tb_string_pool_init(tb_true);
 }
 static tb_void_t tb_string_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
@@ -85,7 +82,7 @@ tb_string_pool_ref_t tb_string_pool()
 {
     return (tb_string_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_string_pool_instance_init, tb_string_pool_instance_exit, tb_null);
 }
-tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
+tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase)
 {
     // done
     tb_bool_t               ok = tb_false;
@@ -99,12 +96,8 @@ tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase, tb_size_t align)
         // init lock
         if (!tb_spinlock_init(&impl->lock)) break;
 
-        // init pool
-        impl->pool = tb_pool_init(0, align);
-        tb_assert_and_check_break(impl->pool);
-
         // init hash
-        impl->cache = tb_hash_init(0, tb_item_func_str(bcase, impl->pool), tb_item_func_size());
+        impl->cache = tb_hash_init(0, tb_item_func_str(bcase), tb_item_func_size());
         tb_assert_and_check_break(impl->cache);
 
         // register lock profiler
@@ -141,10 +134,6 @@ tb_void_t tb_string_pool_exit(tb_string_pool_ref_t pool)
     if (impl->cache) tb_hash_exit(impl->cache);
     impl->cache = tb_null;
 
-    // exit pool
-    if (impl->pool) tb_pool_exit(impl->pool);
-    impl->pool = tb_null;
-
     // leave
     tb_spinlock_leave(&impl->lock);
 
@@ -165,9 +154,6 @@ tb_void_t tb_string_pool_clear(tb_string_pool_ref_t pool)
 
     // clear cache
     if (impl->cache) tb_hash_clear(impl->cache);
-
-    // clear pool
-    if (impl->pool) tb_pool_clear(impl->pool);
 
     // leave
     tb_spinlock_leave(&impl->lock);

@@ -92,7 +92,7 @@ tb_item_func_t tb_item_func_obj()
     tb_item_func_t func_ptr = tb_item_func_ptr(tb_null, tb_null);
 
     // the str func
-    tb_item_func_t func_str = tb_item_func_str(tb_true, tb_null);
+    tb_item_func_t func_str = tb_item_func_str(tb_true);
 
     // init func
     tb_item_func_t func = {0};

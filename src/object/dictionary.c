@@ -113,7 +113,7 @@ static tb_void_t tb_object_dictionary_exit(tb_object_ref_t object)
     dictionary->hash = tb_null;
 
     // exit it
-    tb_object_pool_del(tb_object_pool(), (tb_object_ref_t)dictionary);
+    tb_free(dictionary);
 }
 static tb_void_t tb_object_dictionary_cler(tb_object_ref_t object)
 {
@@ -125,16 +125,37 @@ static tb_void_t tb_object_dictionary_cler(tb_object_ref_t object)
 }
 static tb_object_dictionary_t* tb_object_dictionary_init_base()
 {
-    // make
-    tb_object_dictionary_t* dictionary = (tb_object_dictionary_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_dictionary_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY);
-    tb_assert_and_check_return_val(dictionary, tb_null);
+    // done
+    tb_bool_t                   ok = tb_false;
+    tb_object_dictionary_t*     dictionary = tb_null;
+    do
+    {
+        // make dictionary
+        dictionary = tb_malloc0_type(tb_object_dictionary_t);
+        tb_assert_and_check_break(dictionary);
 
-    // init base
-    dictionary->base.copy = tb_object_dictionary_copy;
-    dictionary->base.cler = tb_object_dictionary_cler;
-    dictionary->base.exit = tb_object_dictionary_exit;
+        // init dictionary
+        if (!tb_object_init((tb_object_ref_t)dictionary, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY)) break;
 
-    // ok
+        // init base
+        dictionary->base.copy = tb_object_dictionary_copy;
+        dictionary->base.cler = tb_object_dictionary_cler;
+        dictionary->base.exit = tb_object_dictionary_exit;
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (dictionary) tb_object_exit((tb_object_ref_t)dictionary);
+        dictionary = tb_null;
+    }
+
+    // ok?
     return dictionary;
 }
 
@@ -144,8 +165,8 @@ static tb_object_dictionary_t* tb_object_dictionary_init_base()
 tb_object_ref_t tb_object_dictionary_init(tb_size_t size, tb_size_t incr)
 {
     // done
-    tb_bool_t           ok = tb_false;
-    tb_object_dictionary_t*    dictionary = tb_null;
+    tb_bool_t               ok = tb_false;
+    tb_object_dictionary_t* dictionary = tb_null;
     do
     {
         // make dictionary

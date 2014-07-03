@@ -34,7 +34,6 @@
 #include "aico.h"
 #include "aice.h"
 #include "aicp.h"
-#include "pool.h"
 #include "http.h"
 #include "dns.h"
 #include "ssl.h"

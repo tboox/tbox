@@ -53,9 +53,6 @@
 // the dns cache type
 typedef struct __tb_dns_cache_t
 {
-    // the pool
-    tb_pool_ref_t           pool;
-
     // the hash
     tb_hash_ref_t           hash;
 
@@ -143,12 +140,8 @@ tb_bool_t tb_dns_cache_init()
     tb_bool_t ok = tb_false;
     do
     {
-        // init pool
-        if (!g_cache.pool) g_cache.pool = tb_pool_init(0, 0);
-        tb_assert_and_check_break(g_cache.pool);
-
         // init hash
-        if (!g_cache.hash) g_cache.hash = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false, g_cache.pool), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
+        if (!g_cache.hash) g_cache.hash = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
         tb_assert_and_check_break(g_cache.hash);
 
         // ok
@@ -173,10 +166,6 @@ tb_void_t tb_dns_cache_exit()
     // exit hash
     if (g_cache.hash) tb_hash_exit(g_cache.hash);
     g_cache.hash = tb_null;
-
-    // exit pool
-    if (g_cache.pool) tb_pool_exit(g_cache.pool);
-    g_cache.pool = tb_null;
 
     // exit times
     g_cache.times = 0;

@@ -66,7 +66,7 @@ static tb_object_ref_t tb_object_date_copy(tb_object_ref_t object)
 }
 static tb_void_t tb_object_date_exit(tb_object_ref_t object)
 {
-    if (object) tb_object_pool_del(tb_object_pool(), object);
+    if (object) tb_free(object);
 }
 static tb_void_t tb_object_date_cler(tb_object_ref_t object)
 {
@@ -75,19 +75,39 @@ static tb_void_t tb_object_date_cler(tb_object_ref_t object)
 }
 static tb_object_date_t* tb_object_date_init_base()
 {
-    // make
-    tb_object_date_t* date = (tb_object_date_t*)tb_object_pool_get(tb_object_pool(), sizeof(tb_object_date_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE);
-    tb_assert_and_check_return_val(date, tb_null);
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_object_date_t*   date = tb_null;
+    do
+    {
+        // make date
+        date = tb_malloc0_type(tb_object_date_t);
+        tb_assert_and_check_break(date);
 
-    // init base
-    date->base.copy = tb_object_date_copy;
-    date->base.cler = tb_object_date_cler;
-    date->base.exit = tb_object_date_exit;
+        // init date
+        if (!tb_object_init((tb_object_ref_t)date, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE)) break;
 
-    // ok
+        // init base
+        date->base.copy = tb_object_date_copy;
+        date->base.cler = tb_object_date_cler;
+        date->base.exit = tb_object_date_exit;
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (date) tb_object_exit((tb_object_ref_t)date);
+        date = tb_null;
+    }
+
+    // ok?
     return date;
 }
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */

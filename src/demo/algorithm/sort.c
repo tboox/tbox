@@ -303,10 +303,6 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
-    // init pool
-    tb_pool_ref_t pool = tb_pool_init(0, 0);
-    tb_assert_and_check_return(pool);
-    
     // init iterator
     tb_iterator_t iterator = tb_iterator_init_str(data, n);
 
@@ -317,7 +313,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     {
         tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
         s[r] = '\0'; 
-        data[i] = tb_pool_strdup(pool, s);
+        data[i] = tb_strdup(s);
     }
 
     // sort
@@ -331,9 +327,6 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     // check
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
-    // exit pool
-    tb_pool_exit(pool);
-
     // free data
     tb_free(data);
 }
@@ -345,10 +338,6 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
-    // init pool
-    tb_pool_ref_t pool = tb_pool_init(0, 0);
-    tb_assert_and_check_return(pool);
-    
     // init iterator
     tb_iterator_t iterator = tb_iterator_init_str(data, n);
 
@@ -359,7 +348,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     {
         tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
         s[r] = '\0'; 
-        data[i] = tb_pool_strdup(pool, s);
+        data[i] = tb_strdup(s);
     }
 
     // sort
@@ -373,9 +362,6 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     // check
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
-    // exit pool
-    tb_pool_exit(pool);
-
     // free data
     tb_free(data);
 }
@@ -387,10 +373,6 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
-    // init pool
-    tb_pool_ref_t pool = tb_pool_init(0, 0);
-    tb_assert_and_check_return(pool);
-    
     // init iterator
     tb_iterator_t iterator = tb_iterator_init_str(data, n);
 
@@ -401,7 +383,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     {
         tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
         s[r] = '\0'; 
-        data[i] = tb_pool_strdup(pool, s);
+        data[i] = tb_strdup(s);
     }
 
     // sort
@@ -415,9 +397,6 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     // check
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
-    // exit pool
-    tb_pool_exit(pool);
-
     // free data
     tb_free(data);
 }
@@ -429,10 +408,6 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
-    // init pool
-    tb_pool_ref_t pool = tb_pool_init(0, 0);
-    tb_assert_and_check_return(pool);
-    
     // init iterator
     tb_iterator_t iterator = tb_iterator_init_str(data, n);
 
@@ -443,7 +418,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     {
         tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
         s[r] = '\0'; 
-        data[i] = tb_pool_strdup(pool, s);
+        data[i] = tb_strdup(s);
     }
 
     // sort
@@ -457,9 +432,6 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     // check
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
-    // exit pool
-    tb_pool_exit(pool);
-
     // free data
     tb_free(data);
 }
@@ -471,10 +443,6 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
     tb_assert_and_check_return(data);
 
-    // init pool
-    tb_pool_ref_t pool = tb_pool_init(0, 0);
-    tb_assert_and_check_return(pool);
-    
     // init iterator
     tb_iterator_t iterator = tb_iterator_init_str(data, n);
 
@@ -485,7 +453,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
     {
         tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
         s[r] = '\0'; 
-        data[i] = tb_pool_strdup(pool, s);
+        data[i] = tb_strdup(s);
     }
 
     // sort
@@ -498,9 +466,6 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 
     // check
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
-
-    // exit pool
-    tb_pool_exit(pool);
 
     // free data
     tb_free(data);

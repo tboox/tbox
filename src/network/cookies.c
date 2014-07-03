@@ -521,7 +521,7 @@ tb_cookies_ref_t tb_cookies_init()
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init string pool
-        impl->string_pool = tb_string_pool_init(tb_true, 0);
+        impl->string_pool = tb_string_pool_init(tb_true);
         tb_assert_and_check_break(impl->string_pool);
 
         // init cookie pool
@@ -532,7 +532,7 @@ tb_cookies_ref_t tb_cookies_init()
         tb_assert_and_check_break(impl->cookie_pool);
 
         // init string func
-        impl->string_func = tb_item_func_str(tb_true, tb_null);
+        impl->string_func = tb_item_func_str(tb_true);
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
