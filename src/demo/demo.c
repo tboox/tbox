@@ -132,7 +132,6 @@ static tb_demo_t g_demo[] =
 #endif
 
     // string
-,   TB_DEMO_MAIN_ITEM(string_pool)
 ,   TB_DEMO_MAIN_ITEM(string_string)
 ,   TB_DEMO_MAIN_ITEM(string_static_string)
 
@@ -143,6 +142,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(memory_global_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_static_pool)
+,   TB_DEMO_MAIN_ITEM(memory_string_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_fixed_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_memops)
 ,   TB_DEMO_MAIN_ITEM(memory_buffer)

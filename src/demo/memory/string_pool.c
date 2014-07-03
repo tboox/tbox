@@ -6,8 +6,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_string_pool_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_memory_string_pool_main(tb_int_t argc, tb_char_t** argv)
 {
+#if 0
     // hello
     tb_char_t const* hello = tb_string_pool_put(tb_string_pool(), "hello world");
     tb_trace_i("hello: %s", hello);
@@ -35,5 +36,6 @@ tb_int_t tb_demo_string_pool_main(tb_int_t argc, tb_char_t** argv)
 
     // del hello
     tb_string_pool_del(tb_string_pool(), hello);
+#endif
     return 0;
 }

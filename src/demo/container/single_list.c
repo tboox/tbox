@@ -616,7 +616,7 @@ static tb_void_t tb_single_list_str_dump(tb_single_list_ref_t list)
 }
 static tb_void_t tb_single_list_str_test()
 {
-    tb_single_list_ref_t list = tb_single_list_init(TB_SINGLE_LIST_GROW_SIZE, tb_item_func_str(tb_true, tb_null));
+    tb_single_list_ref_t list = tb_single_list_init(TB_SINGLE_LIST_GROW_SIZE, tb_item_func_str(tb_true));
     tb_assert_and_check_return(list);
 
     tb_size_t           i = 0;

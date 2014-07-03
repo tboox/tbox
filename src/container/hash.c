@@ -393,16 +393,16 @@ tb_hash_ref_t tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_ite
     if (!bulk_size) bulk_size = TB_HASH_BULK_SIZE_DEFAULT;
     tb_assert_and_check_return_val(bulk_size <= TB_HASH_BULK_SIZE_LARGE, tb_null);
 
-    // make impl
+    // done
     tb_bool_t       ok = tb_false;
     tb_hash_impl_t* impl = tb_null;
     do
     {
-        // make impl
+        // make hash
         impl = tb_malloc0_type(tb_hash_impl_t);
         tb_assert_and_check_break(impl);
 
-        // init impl func
+        // init hash func
         impl->name_func = name_func;
         impl->data_func = data_func;
 
@@ -420,11 +420,11 @@ tb_hash_ref_t tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_ite
         impl->item_itor.delt = tb_hash_iterator_delt;
         impl->item_itor.comp = tb_hash_iterator_comp;
 
-        // init impl size
+        // init hash size
         impl->hash_size = tb_align_pow2(bulk_size);
         tb_assert_and_check_break(impl->hash_size <= 65536);
 
-        // init impl list
+        // init hash list
         impl->hash_list = (tb_hash_item_list_t**)tb_nalloc0(impl->hash_size, sizeof(tb_size_t));
         tb_assert_and_check_break(impl->hash_list);
 

@@ -45,12 +45,6 @@ typedef struct{}*           tb_string_pool_ref_t;
  * interfaces
  */
 
-/*! the string pool instance
- *
- * @return pool             the string pool instance
- */
-tb_string_pool_ref_t        tb_string_pool(tb_noarg_t);
-
 /*! init string pool for small, readonly and repeat strings
  *
  * readonly, strip repeat strings and decrease memory fragmens
