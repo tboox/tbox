@@ -39,7 +39,7 @@
 static tb_void_t tb_hash_test_s2i_func()
 {
     // init hash
-    tb_hash_ref_t hash = tb_hash_init(8, tb_item_func_str(tb_true), tb_item_func_long());
+    tb_hash_ref_t hash = tb_hash_init(8, tb_item_func_str(tb_true, tb_null), tb_item_func_long());
     tb_assert_and_check_return(hash);
 
     // set
@@ -113,7 +113,7 @@ static tb_void_t tb_hash_test_s2i_func()
 static tb_void_t tb_hash_test_s2i_perf()
 {
     // init hash
-    tb_hash_ref_t hash = tb_hash_init(0, tb_item_func_str(tb_true), tb_item_func_long());
+    tb_hash_ref_t hash = tb_hash_init(0, tb_item_func_str(tb_true, tb_null), tb_item_func_long());
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -138,7 +138,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 static tb_void_t tb_hash_test_i2s_func()
 {
     // init hash
-    tb_hash_ref_t hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_str(tb_true));
+    tb_hash_ref_t hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_str(tb_true, tb_null));
     tb_assert_and_check_return(hash);
 
     // set
@@ -207,7 +207,7 @@ static tb_void_t tb_hash_test_i2s_func()
 static tb_void_t tb_hash_test_i2s_perf()
 {
     // init hash
-    tb_hash_ref_t hash = tb_hash_init(0, tb_item_func_long(), tb_item_func_str(tb_true));
+    tb_hash_ref_t hash = tb_hash_init(0, tb_item_func_long(), tb_item_func_str(tb_true, tb_null));
     tb_assert_and_check_return(hash);
 
     // clear rand

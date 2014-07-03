@@ -591,7 +591,7 @@ static tb_void_t tb_vector_str_dump(tb_vector_ref_t vector)
 }
 static tb_void_t tb_vector_str_test()
 {
-    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(tb_true));
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(tb_true, tb_null));
     tb_assert_and_check_return(vector);
 
     tb_trace_i("=============================================================");

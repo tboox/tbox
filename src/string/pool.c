@@ -97,7 +97,7 @@ tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init hash
-        impl->cache = tb_hash_init(0, tb_item_func_str(bcase), tb_item_func_size());
+        impl->cache = tb_hash_init(0, tb_item_func_str(bcase, tb_null), tb_item_func_size());
         tb_assert_and_check_break(impl->cache);
 
         // register lock profiler

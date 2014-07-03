@@ -141,7 +141,7 @@ tb_bool_t tb_dns_cache_init()
     do
     {
         // init hash
-        if (!g_cache.hash) g_cache.hash = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
+        if (!g_cache.hash) g_cache.hash = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false, tb_null), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
         tb_assert_and_check_break(g_cache.hash);
 
         // ok

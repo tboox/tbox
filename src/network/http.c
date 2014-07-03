@@ -37,6 +37,7 @@
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
+#include "../string/string.h"
 #include "../stream/stream.h"
 #include "../platform/platform.h"
 #include "../algorithm/algorithm.h"
@@ -113,7 +114,7 @@ static tb_bool_t tb_http_option_init(tb_http_impl_t* impl)
     if (!tb_url_init(&impl->option.post_url)) return tb_false;
 
     // init head
-    impl->option.head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
+    impl->option.head = tb_hash_init(8, tb_item_func_str(tb_false, tb_null), tb_item_func_str(tb_false, tb_null));
     tb_assert_and_check_return_val(impl->option.head, tb_false);
 
     // ok

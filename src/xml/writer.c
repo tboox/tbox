@@ -87,11 +87,11 @@ tb_xml_writer_ref_t tb_xml_writer_init(tb_stream_ref_t wstream, tb_bool_t bforma
         writer->bformat     = bformat;
 
         // init elements
-        writer->elements    = tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false));
+        writer->elements    = tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false, tb_null));
         tb_assert_and_check_break(writer->elements);
 
         // init attributes
-        writer->attributes  = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
+        writer->attributes  = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false, tb_null), tb_item_func_str(tb_false, tb_null));
         tb_assert_and_check_break(writer->attributes);
 
         // ok
