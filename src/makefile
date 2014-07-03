@@ -20,11 +20,11 @@ tbox_C_FILES 			+= \
 						memory/pool \
 						memory/fixed_pool \
 						memory/global_pool \
+						memory/string_pool \
 						memory/memory \
 						memory/buffer \
 						memory/static_buffer \
 						memory/queue_buffer \
-						string/pool \
 						string/string \
 						string/static_string \
 						algorithm/sort \
@@ -437,6 +437,7 @@ INC_FILES 				= \
  						memory/global_pool.h \
 						memory/pool.h \
 						memory/fixed_pool.h \
+						memory/string_pool.h \
 						memory/prefix.h \
 						memory/memory.h \
 						memory/buffer.h \
@@ -471,7 +472,6 @@ INC_FILES 				= \
 						math/opt/fixed30_sh4.h \
 						string/prefix.h \
 						string/string.h \
-						string/pool.h \
 						string/string.h \
 						string/static_string.h \
 						algorithm/prefix.h \

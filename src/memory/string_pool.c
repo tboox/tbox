@@ -32,9 +32,9 @@
  * includes
  */
 #include "pool.h"
+#include "memory.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
-#include "../memory/memory.h"
 #include "../platform/platform.h"
 #include "../container/container.h"
 #include "../algorithm/algorithm.h"
@@ -55,33 +55,8 @@ typedef struct __tb_string_pool_impl_t
 }tb_string_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * instance implementation
- */
-static tb_handle_t tb_string_pool_instance_init(tb_cpointer_t* ppriv)
-{
-    return tb_string_pool_init(tb_true);
-}
-static tb_void_t tb_string_pool_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
-{
-    if (handle)
-    {
-#ifdef __tb_debug__
-        // dump it
-        tb_string_pool_dump((tb_string_pool_ref_t)handle);
-#endif
-
-        // exit it
-        tb_string_pool_exit((tb_string_pool_ref_t)handle);
-    }
-}
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_string_pool_ref_t tb_string_pool()
-{
-    return (tb_string_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STRING_POOL, tb_string_pool_instance_init, tb_string_pool_instance_exit, tb_null);
-}
 tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase)
 {
     // done
@@ -97,7 +72,7 @@ tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init hash
-        impl->cache = tb_hash_init(0, tb_item_func_str(bcase, tb_null), tb_item_func_size());
+        impl->cache = tb_hash_init(0, tb_item_func_str(bcase), tb_item_func_size());
         tb_assert_and_check_break(impl->cache);
 
         // register lock profiler

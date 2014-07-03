@@ -29,13 +29,13 @@ demo_C_FILES 								+= \
 											other/libflv \
 											stream/stream/null \
 											stream/stream/cache \
-											string/string_pool \
 											string/string \
 											string/static_string \
 											memory/check \
 											memory/fixed_pool \
 											memory/pool \
 											memory/global_pool \
+											memory/string_pool \
 											memory/static_tiny_pool \
 											memory/static_fixed_pool \
 											memory/static_pool \

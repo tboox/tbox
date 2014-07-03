@@ -28,7 +28,6 @@
  * includes
  */
 #include "prefix.h"
-#include "../string/pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -86,9 +85,6 @@ typedef struct __tb_item_func_t
 
     /// the item size
     tb_uint16_t             size;
-
-    /// the item pool
-    tb_handle_t             pool;
 
     /// the priv data
     tb_cpointer_t           priv;
@@ -174,11 +170,10 @@ tb_item_func_t      tb_item_func_uint32(tb_noarg_t);
 /*! the string item function
  *
  * @param bcase     is case?
- * @param pool      the string pool, only for casing
  *
  * @return          the item func
  */
-tb_item_func_t      tb_item_func_str(tb_bool_t bcase, tb_string_pool_ref_t pool); 
+tb_item_func_t      tb_item_func_str(tb_bool_t bcase); 
 
 /*! the pointer item function
  *
