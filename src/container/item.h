@@ -71,8 +71,7 @@ typedef enum __tb_item_type_t
 ,   TB_ITEM_TYPE_MEM            = 8     //!< memory
 ,   TB_ITEM_TYPE_OBJ            = 9     //!< object
 ,   TB_ITEM_TYPE_TRUE           = 10    //!< true
-,   TB_ITEM_TYPE_STRING_POOL    = 11    //!< string pool
-,   TB_ITEM_TYPE_OTHER          = 12    //!< other
+,   TB_ITEM_TYPE_OTHER          = 11    //!< other
 
 }tb_item_type_t;
 
@@ -175,10 +174,11 @@ tb_item_func_t      tb_item_func_uint32(tb_noarg_t);
 /*! the string item function
  *
  * @param bcase     is case?
-
+ * @param pool      the string pool, only for casing
+ *
  * @return          the item func
  */
-tb_item_func_t      tb_item_func_str(tb_bool_t bcase); 
+tb_item_func_t      tb_item_func_str(tb_bool_t bcase, tb_string_pool_ref_t pool); 
 
 /*! the pointer item function
  *
@@ -208,14 +208,6 @@ tb_item_func_t      tb_item_func_obj(tb_noarg_t);
  * @return          the item func
  */
 tb_item_func_t      tb_item_func_mem(tb_size_t size, tb_item_func_free_t free, tb_cpointer_t priv);
-
-/*! the string item function for scache
- *
- * @param pool      the string pool
-
- * @return          the item func
- */
-tb_item_func_t      tb_item_func_string_pool(tb_string_pool_ref_t pool); 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

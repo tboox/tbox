@@ -62,7 +62,6 @@ tbox_C_FILES 			+= \
 						container/item/uint8 \
 						container/item/uint16 \
 						container/item/uint32 \
-						container/item/string_pool \
 						network/network \
 						network/dns/cache \
 						network/dns/server \

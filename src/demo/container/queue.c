@@ -152,7 +152,7 @@ static tb_void_t tb_queue_str_dump(tb_queue_ref_t queue)
 }
 static tb_void_t tb_queue_str_test()
 {
-    tb_queue_ref_t queue = tb_queue_init(10, tb_item_func_str(tb_true));
+    tb_queue_ref_t queue = tb_queue_init(10, tb_item_func_str(tb_true, tb_null));
     tb_assert_and_check_return(queue);
 
     tb_trace_i("=============================================================");
