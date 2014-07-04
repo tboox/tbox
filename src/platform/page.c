@@ -17,66 +17,36 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.c
+ * @file        page.c
  * @ingroup     platform
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * includes
+ * trace
  */
-#include "platform.h"
-#include "../network/network.h"
-#ifdef TB_CONFIG_OS_ANDROID
-#   include "linux/android/android.h"
-#endif
+#define TB_TRACE_MODULE_NAME            "page"
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-tb_bool_t tb_platform_init(tb_handle_t priv)
+#include "page.h"
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include "windows/page.c"
+#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#   include "posix/page.c"
+#else
+tb_bool_t tb_page_init()
 {
-    // init android
-#ifdef TB_CONFIG_OS_ANDROID
-    if (!tb_android_init(priv)) return tb_false;
-#endif
-
-    // init page
-    if (!tb_page_init()) return tb_false;
-
-    // init socket
-    if (!tb_socket_init()) return tb_false;
-
-    // init tstore
-    if (!tb_thread_store_init()) return tb_false;
-
-    // init dns
-    if (!tb_dns_init()) return tb_false;
-
-    // spak ctime
-    tb_cache_time_spak();
-
-    // ok
     return tb_true;
 }
-tb_void_t tb_platform_exit()
+tb_void_t tb_page_exit()
 {
-    // exit dns
-    tb_dns_exit();
-
-    // exit tstore
-    tb_thread_store_exit();
-
-    // exit socket
-    tb_socket_exit();
-
-    // exit page
-    tb_page_exit();
-
-    // exit android
-#ifdef TB_CONFIG_OS_ANDROID
-    tb_android_exit();
-#endif
 }
-
+tb_size_t tb_page_size()
+{
+    // default: 4KB
+    return 4096;
+}
+#endif

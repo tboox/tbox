@@ -211,6 +211,7 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 # platform
 tbox_C_FILES 			+= \
 						platform/dns \
+						platform/page \
 						platform/path \
 						platform/file \
 						platform/time \
@@ -506,6 +507,7 @@ INC_FILES 				= \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/dns.h \
+						platform/page.h \
 						platform/file.h \
 						platform/path.h \
 						platform/time.h \
