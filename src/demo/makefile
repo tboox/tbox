@@ -32,6 +32,7 @@ demo_C_FILES 								+= \
 											string/string \
 											string/static_string \
 											memory/check \
+											memory/page_pool \
 											memory/fixed_pool \
 											memory/pool \
 											memory/global_pool \
