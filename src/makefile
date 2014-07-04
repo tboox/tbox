@@ -506,6 +506,7 @@ INC_FILES 				= \
 						container/stack.h \
 						container/vector.h \
 						container/iterator.h \
+						container/list_entry.h \
 						container/single_list.h \
 						container/bloom_filter.h \
 						platform/platform.h \

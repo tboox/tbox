@@ -64,6 +64,9 @@
 #   define tb_offsetof(s, m)            (tb_size_t)&(((s const*)0)->m)
 #endif
 
+// container of
+#define tb_container_of(s, m, p)        ((s*)(((tb_byte_t*)(p)) - tb_offsetof(s, m)))
+
 // memsizeof
 #define tb_memsizeof(s, m)              sizeof(((s const*)0)->m)
 

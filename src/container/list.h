@@ -49,7 +49,7 @@ __tb_extern_c_enter__
  *        |                                                                                            |
  *        ---------------------------------------------------------------------------------------------
  *
- * head: => the first item
+ * head: => the head item
  * last: => the last item
  * tail: => behind the last item, no item
  *
