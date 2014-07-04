@@ -17,66 +17,48 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.c
- * @ingroup     platform
+ * @file        page.c
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "platform.h"
-#include "../network/network.h"
-#ifdef TB_CONFIG_OS_ANDROID
-#   include "linux/android/android.h"
-#endif
+#include "prefix.h"
+#include "../platform.h"
+#include <unistd.h>
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+
+// the page size
+static tb_size_t g_page_size = 0;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-tb_bool_t tb_platform_init(tb_handle_t priv)
+tb_bool_t tb_page_init()
 {
-    // init android
-#ifdef TB_CONFIG_OS_ANDROID
-    if (!tb_android_init(priv)) return tb_false;
+    // init page size
+    if (!g_page_size)
+    {
+#if _BSD_SOURCE || !(_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)
+        g_page_size = (tb_size_t)getpagesize();
+#else
+        g_page_size = (tb_size_t)sysconf(_SC_PAGESIZE);
 #endif
+    }
 
-    // init page
-    if (!tb_page_init()) return tb_false;
-
-    // init socket
-    if (!tb_socket_init()) return tb_false;
-
-    // init tstore
-    if (!tb_thread_store_init()) return tb_false;
-
-    // init dns
-    if (!tb_dns_init()) return tb_false;
-
-    // spak ctime
-    tb_cache_time_spak();
-
-    // ok
-    return tb_true;
+    // ok?
+    return g_page_size? tb_true : tb_false;
 }
-tb_void_t tb_platform_exit()
+tb_void_t tb_page_exit()
 {
-    // exit dns
-    tb_dns_exit();
-
-    // exit tstore
-    tb_thread_store_exit();
-
-    // exit socket
-    tb_socket_exit();
-
-    // exit page
-    tb_page_exit();
-
-    // exit android
-#ifdef TB_CONFIG_OS_ANDROID
-    tb_android_exit();
-#endif
 }
+tb_size_t tb_page_size()
+{
+    return g_page_size;
+}
+
 

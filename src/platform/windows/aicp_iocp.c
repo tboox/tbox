@@ -279,7 +279,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     }
 
     // exit data
-    if (resp->u.acpt.priv[0]) tb_aico_pool_free(resp->aico, resp->u.acpt.priv[0]);
+    if (resp->u.acpt.priv[0]) tb_free(resp->u.acpt.priv[0]);
     resp->u.acpt.priv[0] = tb_null;
 
     // ok
@@ -609,7 +609,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // init aice, hack: sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1)
         aico->olap.aice                 = *aice;
         aico->olap.aice.u.acpt.sock     = tb_socket_open(TB_SOCKET_TYPE_TCP);
-        aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_aico_pool_malloc0((tb_aico_ref_t)aico, ((sizeof(SOCKADDR_IN) + 16) << 1));
+        aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_malloc0(((sizeof(SOCKADDR_IN) + 16) << 1));
         tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv));
         tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.sock);
         init_ok = tb_true;
@@ -664,7 +664,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     if (!ok)
     {
         // exit data
-        if (aico->olap.aice.u.acpt.priv[0]) tb_aico_pool_free((tb_aico_ref_t)aico, aico->olap.aice.u.acpt.priv[0]);
+        if (aico->olap.aice.u.acpt.priv[0]) tb_free(aico->olap.aice.u.acpt.priv[0]);
         aico->olap.aice.u.acpt.priv[0] = tb_null;
 
         // exit sock

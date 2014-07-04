@@ -29,12 +29,12 @@
  */
 #include "prefix.h"
 #include "dns.h"
+#include "page.h"
 #include "path.h"
 #include "file.h"
 #include "time.h"
 #include "mutex.h"
 #include "event.h"
-#include "cache_time.h"
 #include "timer.h"
 #include "print.h"
 #include "ltimer.h"
@@ -52,6 +52,7 @@
 #include "backtrace.h"
 #include "directory.h"
 #include "exception.h"
+#include "cache_time.h"
 #include "thread_pool.h"
 #include "thread_store.h"
 
