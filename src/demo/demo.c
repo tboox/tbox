@@ -187,6 +187,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(container_queue)
 ,   TB_DEMO_MAIN_ITEM(container_stack)
 ,   TB_DEMO_MAIN_ITEM(container_vector)
+,   TB_DEMO_MAIN_ITEM(container_list_entry)
 ,   TB_DEMO_MAIN_ITEM(container_single_list)
 ,   TB_DEMO_MAIN_ITEM(container_bloom_filter)
 
