@@ -72,7 +72,7 @@ typedef struct __tb_single_list_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
-static tb_size_t tb_single_list_iterator_size(tb_iterator_ref_t iterator)
+static tb_size_t tb_single_list_itor_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -81,7 +81,7 @@ static tb_size_t tb_single_list_iterator_size(tb_iterator_ref_t iterator)
     // the size
     return tb_fixed_pool_size(impl->pool);
 }
-static tb_size_t tb_single_list_iterator_head(tb_iterator_ref_t iterator)
+static tb_size_t tb_single_list_itor_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -90,7 +90,7 @@ static tb_size_t tb_single_list_iterator_head(tb_iterator_ref_t iterator)
     // head
     return impl->head;
 }
-static tb_size_t tb_single_list_iterator_tail(tb_iterator_ref_t iterator)
+static tb_size_t tb_single_list_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -99,7 +99,7 @@ static tb_size_t tb_single_list_iterator_tail(tb_iterator_ref_t iterator)
     // tail
     return 0;
 }
-static tb_size_t tb_single_list_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_size_t tb_single_list_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -108,7 +108,7 @@ static tb_size_t tb_single_list_iterator_next(tb_iterator_ref_t iterator, tb_siz
     // next
     return ((tb_single_list_item_t const*)itor)->next;
 }
-static tb_size_t tb_single_list_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_size_t tb_single_list_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -122,14 +122,14 @@ static tb_size_t tb_single_list_iterator_prev(tb_iterator_ref_t iterator, tb_siz
     // find it
     else
     {
-        tb_size_t node = tb_single_list_iterator_head(iterator);
-        tb_size_t tail = tb_single_list_iterator_tail(iterator);
-        for (prev = node; node != tail && node != itor; prev = node, node = tb_single_list_iterator_next(iterator, node)) ;
+        tb_size_t node = tb_single_list_itor_head(iterator);
+        tb_size_t tail = tb_single_list_itor_tail(iterator);
+        for (prev = node; node != tail && node != itor; prev = node, node = tb_single_list_itor_next(iterator, node)) ;
     }
 
     return prev;
 }
-static tb_pointer_t tb_single_list_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_pointer_t tb_single_list_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -138,7 +138,7 @@ static tb_pointer_t tb_single_list_iterator_item(tb_iterator_ref_t iterator, tb_
     // data
     return impl->func.data(&impl->func, &((tb_single_list_item_t const*)itor)[1]);
 }
-static tb_void_t tb_single_list_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_single_list_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -147,7 +147,7 @@ static tb_void_t tb_single_list_iterator_copy(tb_iterator_ref_t iterator, tb_siz
     // copy
     impl->func.copy(&impl->func, (tb_pointer_t)&((tb_single_list_item_t const*)itor)[1], item);
 }
-static tb_long_t tb_single_list_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_single_list_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
@@ -311,14 +311,14 @@ tb_single_list_ref_t tb_single_list_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
         impl->itor.priv = tb_null;
         impl->itor.step = func.size;
-        impl->itor.size = tb_single_list_iterator_size;
-        impl->itor.head = tb_single_list_iterator_head;
-        impl->itor.tail = tb_single_list_iterator_tail;
-        impl->itor.prev = tb_single_list_iterator_prev;
-        impl->itor.next = tb_single_list_iterator_next;
-        impl->itor.item = tb_single_list_iterator_item;
-        impl->itor.copy = tb_single_list_iterator_copy;
-        impl->itor.comp = tb_single_list_iterator_comp;
+        impl->itor.size = tb_single_list_itor_size;
+        impl->itor.head = tb_single_list_itor_head;
+        impl->itor.tail = tb_single_list_itor_tail;
+        impl->itor.prev = tb_single_list_itor_prev;
+        impl->itor.next = tb_single_list_itor_next;
+        impl->itor.item = tb_single_list_itor_item;
+        impl->itor.copy = tb_single_list_itor_copy;
+        impl->itor.comp = tb_single_list_itor_comp;
 
         // init pool, step = next + data
         impl->pool = tb_fixed_pool_init(grow, sizeof(tb_single_list_item_t) + func.size, 0);

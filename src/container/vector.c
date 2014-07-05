@@ -68,7 +68,7 @@ typedef struct __tb_vector_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
-static tb_size_t tb_vector_iterator_size(tb_iterator_ref_t iterator)
+static tb_size_t tb_vector_itor_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -77,7 +77,7 @@ static tb_size_t tb_vector_iterator_size(tb_iterator_ref_t iterator)
     // size
     return impl->size;
 }
-static tb_size_t tb_vector_iterator_head(tb_iterator_ref_t iterator)
+static tb_size_t tb_vector_itor_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -86,7 +86,7 @@ static tb_size_t tb_vector_iterator_head(tb_iterator_ref_t iterator)
     // head
     return 0;
 }
-static tb_size_t tb_vector_iterator_tail(tb_iterator_ref_t iterator)
+static tb_size_t tb_vector_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -95,7 +95,7 @@ static tb_size_t tb_vector_iterator_tail(tb_iterator_ref_t iterator)
     // tail
     return impl->size;
 }
-static tb_size_t tb_vector_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_size_t tb_vector_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -105,7 +105,7 @@ static tb_size_t tb_vector_iterator_next(tb_iterator_ref_t iterator, tb_size_t i
     // next
     return itor + 1;
 }
-static tb_size_t tb_vector_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_size_t tb_vector_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -115,7 +115,7 @@ static tb_size_t tb_vector_iterator_prev(tb_iterator_ref_t iterator, tb_size_t i
     // prev
     return itor - 1;
 }
-static tb_pointer_t tb_vector_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_pointer_t tb_vector_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -124,7 +124,7 @@ static tb_pointer_t tb_vector_iterator_item(tb_iterator_ref_t iterator, tb_size_
     // data
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
 }
-static tb_void_t tb_vector_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_vector_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -133,7 +133,7 @@ static tb_void_t tb_vector_iterator_copy(tb_iterator_ref_t iterator, tb_size_t i
     // copy
     impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
-static tb_long_t tb_vector_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_vector_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
@@ -172,14 +172,14 @@ tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
         impl->itor.priv = tb_null;
         impl->itor.step = func.size;
-        impl->itor.size = tb_vector_iterator_size;
-        impl->itor.head = tb_vector_iterator_head;
-        impl->itor.tail = tb_vector_iterator_tail;
-        impl->itor.prev = tb_vector_iterator_prev;
-        impl->itor.next = tb_vector_iterator_next;
-        impl->itor.item = tb_vector_iterator_item;
-        impl->itor.copy = tb_vector_iterator_copy;
-        impl->itor.comp = tb_vector_iterator_comp;
+        impl->itor.size = tb_vector_itor_size;
+        impl->itor.head = tb_vector_itor_head;
+        impl->itor.tail = tb_vector_itor_tail;
+        impl->itor.prev = tb_vector_itor_prev;
+        impl->itor.next = tb_vector_itor_next;
+        impl->itor.item = tb_vector_itor_item;
+        impl->itor.copy = tb_vector_itor_copy;
+        impl->itor.comp = tb_vector_itor_comp;
 
         // make data
         impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, func.size);

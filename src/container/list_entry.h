@@ -28,98 +28,14 @@
  * includes
  */
 #include "prefix.h"
+#include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
 /// the list entry
-#define tb_list_entry(type, member, entry)                  tb_container_of(type, member, entry)
-
-/// the list entry for the head position
-#define tb_list_entry0(type, entry)                         ((type*)entry)
-
-/// walk the list entries
-#define tb_list_entry_for(type, member, entry, head, tail) \
-    type* entry = (head)? tb_list_entry(type, member, (head)) : tb_null; \
-    type* entry##_tail = (tail)? tb_list_entry(type, member, (tail)) : tb_null; \
-        for (; entry && entry != entry##_tail; entry = tb_list_entry(type, member, entry->member.next))
-
-/// reverse walk the list entries
-#define tb_list_entry_rfor(type, member, entry, head, tail) \
-    type* entry = ((tail) && (tail)->prev)? tb_list_entry(type, member, (tail)->prev) : tb_null; \
-    type* entry##_tail = ((head) && (head)->prev)? tb_list_entry(type, member, (head)->prev) : tb_null; \
-        for (; entry && entry != entry##_tail; entry = tb_list_entry(type, member, entry->member.prev))
-
-/// walk the list entries for the head position
-#define tb_list_entry0_for(type, entry, head, tail) \
-    type* entry = (head)? tb_list_entry0(type, (head)) : tb_null; \
-    type* entry##_tail = (tail)? tb_list_entry0(type, (tail)) : tb_null; \
-        for (; entry && entry != entry##_tail; entry = tb_list_entry0(type, ((tb_list_entry_t*)entry)->next))
-
-/// reverse walk the list entries for the head position
-#define tb_list_entry0_rfor(type, entry, head, tail) \
-    type* entry = ((tail) && (tail)->prev)? tb_list_entry0(type, (tail)->prev) : tb_null; \
-    type* entry##_tail = ((head) && (head)->prev)? tb_list_entry0(type, (head)->prev) : tb_null; \
-        for (; entry && entry != entry##_tail; entry = tb_list_entry0(type, ((tb_list_entry_t*)entry)->prev))
-
-/*! walk all the list entries
- *
- * @code
- *
-    // the xxxx entry type
-    typedef struct __tb_xxxx_entry_t 
-    {
-        // the data
-        tb_size_t           data;
-
-        // the list entry
-        tb_list_entry_t     entry;
-
-    }tb_xxxx_entry_t;
-
-    // walk entries
-    tb_list_entry_for_all(tb_xxxx_entry_t, entry, item, &list)
-    {
-        tb_trace_i("%lu", item->data);
-    }
-
-    @endcode
- *
- */
-#define tb_list_entry_for_all(type, member, entry, list)    tb_list_entry_for(type, member, entry, (list? (list)->next : tb_null), list)
-
-/// reverse walk all the list entries
-#define tb_list_entry_rfor_all(type, member, entry, list)   tb_list_entry_rfor(type, member, entry, (list? (list)->next : tb_null), list)
-
-/*! walk all the list entries for the head position
- *
- * @code
- *
-    // the xxxx entry type
-    typedef struct __tb_xxxx_entry_t 
-    {
-        // the list entry at the head position
-        tb_list_entry_t     entry;
-
-        // the data
-        tb_size_t           data;
-
-    }tb_xxxx_entry_t;
-
-    // walk entries
-    tb_list_entry0_for_all(tb_xxxx_entry_t, item, &list)
-    {
-        tb_trace_i("%lu", item->data);
-    }
-
-    @endcode
- *
- */
-#define tb_list_entry0_for_all(type, entry, list)    tb_list_entry0_for(type, entry, (list? (list)->next : tb_null), list)
-
-/// reverse walk all the list entries for the head position
-#define tb_list_entry0_rfor_all(type, entry, list)   tb_list_entry0_rfor(type, entry, (list? (list)->next : tb_null), list)
+#define tb_list_entry(list, entry)                  ((((tb_byte_t*)(entry)) - (list)->eoff))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -161,6 +77,12 @@ typedef struct __tb_list_entry_head_t
     /// the list size
     tb_size_t                   size;
 
+    /// the entry offset
+    tb_size_t                   eoff;
+
+    /// the iterator 
+    tb_iterator_t               itor;
+
 }tb_list_entry_head_t;
 
 /// the list entry ref type
@@ -173,35 +95,26 @@ typedef tb_list_entry_head_t*   tb_list_entry_head_ref_t;
  * interfaces
  */
 
+/*! the list iterator
+ *
+ * @param list                              the list
+ *
+ * @return                                  the list iterator
+ */
+tb_iterator_ref_t                           tb_list_entry_itor(tb_list_entry_head_ref_t list);
+
 /*! init list
  *
  * @param list                              the list
+ * @param offset                            the entry offset
  */
-static __tb_inline__ tb_void_t              tb_list_entry_init(tb_list_entry_head_ref_t list)
-{
-    // check
-    tb_assert(list);
-
-    // init it
-    list->next = (tb_list_entry_ref_t)list;
-    list->prev = (tb_list_entry_ref_t)list;
-    list->size = 0;
-}
+tb_void_t                                   tb_list_entry_init(tb_list_entry_head_ref_t list, tb_size_t offset);
 
 /*! exit list
  *
  * @param list                              the list
- */
-static __tb_inline__ tb_void_t              tb_list_entry_exit(tb_list_entry_head_ref_t list)
-{
-    // check
-    tb_assert(list);
-
-    // exit it
-    list->next = (tb_list_entry_ref_t)list;
-    list->prev = (tb_list_entry_ref_t)list;
-    list->size = 0;
-}
+ */ 
+tb_void_t                                   tb_list_entry_exit(tb_list_entry_head_ref_t list);
 
 /*! clear list
  *
@@ -416,10 +329,10 @@ static __tb_inline__ tb_void_t              tb_list_entry_replace(tb_list_entry_
     tb_assert(node != entry);
 
     // replace it
-    entry->next = node->next;
-    entry->next->prev = entry;
-    entry->prev = node->prev;
-    entry->prev->next = entry;
+    entry->next         = node->next;
+    entry->next->prev   = entry;
+    entry->prev         = node->prev;
+    entry->prev->next   = entry;
 }
 
 /*! replace the next entry
