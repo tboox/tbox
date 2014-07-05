@@ -47,6 +47,7 @@ tbox_C_FILES 			+= \
 						container/queue \
 						container/stack \
 						container/vector \
+						container/list_entry \
 						container/single_list \
 						container/bloom_filter \
 						container/iterator \

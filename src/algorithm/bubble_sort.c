@@ -47,7 +47,7 @@ tb_void_t tb_bubble_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t t
     if (!comp) comp = tb_iterator_comp;
 
     // bubble_sort
-    tb_size_t       itor1, itor2;
+    tb_size_t itor1, itor2;
     for (itor1 = head; itor1 != tail; itor1 = tb_iterator_next(iterator, itor1))
     {
         for (itor2 = itor1, itor2 = tb_iterator_next(iterator, itor2); itor2 != tail; itor2 = tb_iterator_next(iterator, itor2))

@@ -69,7 +69,9 @@
 tb_void_t tb_insert_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {   
     // check
-    tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_BDIRECT));
+    tb_assert_and_check_return(iterator);
+    tb_assert_and_check_return((tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD));
+    tb_assert_and_check_return((tb_iterator_mode(iterator) & TB_ITERATOR_MODE_REVERSE));
     tb_check_return(head != tail);
     
     // init

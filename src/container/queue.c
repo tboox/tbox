@@ -70,7 +70,7 @@ typedef struct __tb_queue_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * iterator
  */
-static tb_size_t tb_queue_iterator_size(tb_iterator_ref_t iterator)
+static tb_size_t tb_queue_itor_size(tb_iterator_ref_t iterator)
 {   
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -79,7 +79,7 @@ static tb_size_t tb_queue_iterator_size(tb_iterator_ref_t iterator)
     // the size
     return ((impl->tail + impl->maxn - impl->head) & (impl->maxn - 1));
 }
-static tb_size_t tb_queue_iterator_head(tb_iterator_ref_t iterator)
+static tb_size_t tb_queue_itor_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -88,7 +88,7 @@ static tb_size_t tb_queue_iterator_head(tb_iterator_ref_t iterator)
     // head
     return impl->head;
 }
-static tb_size_t tb_queue_iterator_tail(tb_iterator_ref_t iterator)
+static tb_size_t tb_queue_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -97,7 +97,7 @@ static tb_size_t tb_queue_iterator_tail(tb_iterator_ref_t iterator)
     // tail
     return impl->tail;
 }
-static tb_size_t tb_queue_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_size_t tb_queue_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -106,7 +106,7 @@ static tb_size_t tb_queue_iterator_next(tb_iterator_ref_t iterator, tb_size_t it
     // next
     return ((itor + 1) & (impl->maxn - 1));
 }
-static tb_size_t tb_queue_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_size_t tb_queue_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -115,7 +115,7 @@ static tb_size_t tb_queue_iterator_prev(tb_iterator_ref_t iterator, tb_size_t it
     // prev
     return ((itor + impl->maxn - 1) & (impl->maxn - 1));
 }
-static tb_pointer_t tb_queue_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_pointer_t tb_queue_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -124,7 +124,7 @@ static tb_pointer_t tb_queue_iterator_item(tb_iterator_ref_t iterator, tb_size_t
     // item
     return impl->func.data(&impl->func, impl->data + itor * iterator->step);
 }
-static tb_void_t tb_queue_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_queue_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -133,7 +133,7 @@ static tb_void_t tb_queue_iterator_copy(tb_iterator_ref_t iterator, tb_size_t it
     // copy
     impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
-static tb_long_t tb_queue_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_queue_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
     tb_queue_impl_t* impl = (tb_queue_impl_t*)iterator;
@@ -172,14 +172,14 @@ tb_queue_ref_t tb_queue_init(tb_size_t maxn, tb_item_func_t func)
         impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
         impl->itor.priv = tb_null;
         impl->itor.step = func.size;
-        impl->itor.size = tb_queue_iterator_size;
-        impl->itor.head = tb_queue_iterator_head;
-        impl->itor.tail = tb_queue_iterator_tail;
-        impl->itor.prev = tb_queue_iterator_prev;
-        impl->itor.next = tb_queue_iterator_next;
-        impl->itor.item = tb_queue_iterator_item;
-        impl->itor.copy = tb_queue_iterator_copy;
-        impl->itor.comp = tb_queue_iterator_comp;
+        impl->itor.size = tb_queue_itor_size;
+        impl->itor.head = tb_queue_itor_head;
+        impl->itor.tail = tb_queue_itor_tail;
+        impl->itor.prev = tb_queue_itor_prev;
+        impl->itor.next = tb_queue_itor_next;
+        impl->itor.item = tb_queue_itor_item;
+        impl->itor.copy = tb_queue_itor_copy;
+        impl->itor.comp = tb_queue_itor_comp;
 
         // make data
         impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, func.size);
