@@ -38,6 +38,7 @@
 #include "iterator.h"
 #include "list_entry.h"
 #include "single_list.h"
+#include "single_list_entry.h"
 #include "bloom_filter.h"
 
 #endif

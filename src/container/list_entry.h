@@ -172,21 +172,6 @@ static __tb_inline__ tb_void_t              tb_list_entry_clear(tb_list_entry_he
     list->size = 0;
 }
 
-/*! the list is null?
- *
- * @param list                              the list
- *
- * @return                                  tb_true or tb_false
- */
-static __tb_inline__ tb_bool_t              tb_list_entry_null(tb_list_entry_head_ref_t list)
-{ 
-    // check
-    tb_assert(list);
-
-    // done
-    return list->next == (tb_list_entry_ref_t)list? tb_true : tb_false;
-}
-
 /*! the list entry count
  *
  * @param list                              the list
@@ -264,6 +249,21 @@ static __tb_inline__ tb_list_entry_ref_t    tb_list_entry_last(tb_list_entry_hea
     return list->prev;
 }
 
+/*! the list is null?
+ *
+ * @param list                              the list
+ *
+ * @return                                  tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t              tb_list_entry_is_null(tb_list_entry_head_ref_t list)
+{ 
+    // check
+    tb_assert(list);
+
+    // done
+    return list->size? tb_false : tb_true;
+}
+
 /*! is the list head entry?
  *
  * @param list                              the list
@@ -333,7 +333,7 @@ static __tb_inline__ tb_void_t              tb_list_entry_insert_prev(tb_list_en
     tb_list_entry_insert_next(list, node->prev, entry);
 }
 
-/*! insert entry to the list 
+/*! insert entry to the head 
  *
  * @param list                              the list
  * @param entry                             the inserted list entry
@@ -480,7 +480,7 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove_prev(tb_list_en
     tb_list_entry_remove(list, entry->prev);
 }
 
-/*! remove the list entry
+/*! remove the head entry
  *
  * @param list                              the list
  */
