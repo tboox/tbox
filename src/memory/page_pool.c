@@ -78,6 +78,7 @@ tb_pointer_t tb_page_pool_malloc_(tb_page_pool_ref_t pool, tb_size_t size __tb_d
     tb_assert_and_check_return_val(pagesize, tb_null);
 
     // check size
+    tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
     tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // malloc data
@@ -100,6 +101,7 @@ tb_pointer_t tb_page_pool_malloc0_(tb_page_pool_ref_t pool, tb_size_t size __tb_
     tb_assert_and_check_return_val(pagesize, tb_null);
 
     // check size
+    tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
     tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // malloc0 data
@@ -125,6 +127,7 @@ tb_pointer_t tb_page_pool_nalloc_(tb_page_pool_ref_t pool, tb_size_t item, tb_si
     tb_assert_and_check_return_val(pagesize, tb_null);
 
     // check size
+    tb_assert_and_check_return_val((item * size) <= TB_POOL_DATA_SIZE_MAXN, tb_null);
     tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // nalloc data
@@ -147,6 +150,7 @@ tb_pointer_t tb_page_pool_nalloc0_(tb_page_pool_ref_t pool, tb_size_t item, tb_s
     tb_assert_and_check_return_val(pagesize, tb_null);
 
     // check size
+    tb_assert_and_check_return_val((item * size) <= TB_POOL_DATA_SIZE_MAXN, tb_null);
     tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // nalloc0 data
@@ -172,6 +176,7 @@ tb_pointer_t tb_page_pool_ralloc_(tb_page_pool_ref_t pool, tb_pointer_t data, tb
     tb_assert_and_check_return_val(pagesize, tb_null);
 
     // check size
+    tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
     tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // check data
@@ -202,6 +207,8 @@ tb_bool_t tb_page_pool_free_(tb_page_pool_ref_t pool, tb_pointer_t data __tb_deb
     // free data
     tb_bool_t ok = tb_page_pool_is_native(pool)? tb_native_page_pool_free(pool, data __tb_debug_args__) : tb_static_page_pool_free(pool, data __tb_debug_args__);
     tb_assertf_and_check_return_val(ok, tb_false, "free(%p) failed!", data);
+
+    // TODO: dump source backtrace
 
     // ok
     return ok;
