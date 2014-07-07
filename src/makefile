@@ -49,6 +49,7 @@ tbox_C_FILES 			+= \
 						container/vector \
 						container/list_entry \
 						container/single_list \
+						container/single_list_entry \
 						container/bloom_filter \
 						container/iterator \
 						container/iterator/str \
@@ -509,6 +510,7 @@ INC_FILES 				= \
 						container/iterator.h \
 						container/list_entry.h \
 						container/single_list.h \
+						container/single_list_entry.h \
 						container/bloom_filter.h \
 						platform/platform.h \
 						platform/prefix.h \

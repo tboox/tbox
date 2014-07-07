@@ -78,6 +78,7 @@ demo_C_FILES 								+= \
 											container/vector \
 											container/list_entry \
 											container/single_list \
+											container/single_list_entry \
 											container/bloom_filter \
 											algorithm/find \
 											algorithm/sort 
