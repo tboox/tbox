@@ -53,13 +53,6 @@ tb_bool_t tb_dns_init()
         tb_dns_server_add(dns);
     }
 
-    // no server? add the default server
-    if (!count) 
-    {
-        tb_dns_server_add("8.8.8.8");
-        tb_dns_server_add("8.8.8.4");
-    }
-
     // ok
     return tb_true;
 }
