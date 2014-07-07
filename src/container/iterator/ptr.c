@@ -54,7 +54,7 @@ static tb_size_t tb_iterator_init_ptr_next(tb_iterator_ref_t iterator, tb_size_t
 {
     // check
     tb_assert_return_val(iterator, 0);
-    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, (tb_size_t)iterator->priv);
+    tb_assert_return_val(itor < (tb_size_t)iterator->priv, (tb_size_t)iterator->priv);
 
     // the next
     return itor + 1;
@@ -71,7 +71,7 @@ static tb_pointer_t tb_iterator_init_ptr_item(tb_iterator_ref_t iterator, tb_siz
 {
     // check
     tb_assert_return_val(iterator, tb_null);
-    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
+    tb_assert_return_val(itor < (tb_size_t)iterator->priv, tb_null);
 
     // the item
     return ((tb_pointer_t*)iterator->data)[itor];
@@ -80,7 +80,7 @@ static tb_void_t tb_iterator_init_ptr_copy(tb_iterator_ref_t iterator, tb_size_t
 {
     // check
     tb_assert_return(iterator);
-    tb_assert_and_check_return(itor < (tb_size_t)iterator->priv);
+    tb_assert_return(itor < (tb_size_t)iterator->priv);
 
     // copy
     ((tb_cpointer_t*)iterator->data)[itor] = item;

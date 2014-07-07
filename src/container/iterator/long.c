@@ -33,8 +33,7 @@
 static tb_pointer_t tb_iterator_init_long_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_return_val(iterator, tb_null);
-    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
+    tb_assert_return_val(iterator && itor < (tb_size_t)iterator->priv, tb_null);
 
     // the item
     return (tb_pointer_t)((tb_long_t*)iterator->data)[itor];
@@ -42,8 +41,7 @@ static tb_pointer_t tb_iterator_init_long_item(tb_iterator_ref_t iterator, tb_si
 static tb_void_t tb_iterator_init_long_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_assert_return(iterator);
-    tb_assert_and_check_return(itor < (tb_size_t)iterator->priv);
+    tb_assert_return(iterator && itor < (tb_size_t)iterator->priv);
 
     // copy
     ((tb_long_t*)iterator->data)[itor] = (tb_long_t)item;

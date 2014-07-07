@@ -24,7 +24,7 @@ typedef struct __tb_demo_entry_t
 static tb_long_t tb_demo_entry_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
-    tb_assert_and_check_return_val(ltem && rtem, 0);
+    tb_assert_return_val(ltem && rtem, 0);
 
     // the data
     tb_size_t ldata = ((tb_demo_entry_t*)ltem)->data;
@@ -32,6 +32,14 @@ static tb_long_t tb_demo_entry_comp(tb_iterator_ref_t iterator, tb_cpointer_t lt
 
     // comp
     return (ldata > rdata? 1 : (ldata < rdata? -1 : 0));
+}
+static tb_void_t tb_demo_entry_copy(tb_pointer_t ltem, tb_pointer_t rtem)
+{
+    // check
+    tb_assert_return(ltem && rtem);
+
+    // copy it
+    ((tb_demo_entry_t*)ltem)->data = ((tb_demo_entry_t*)rtem)->data;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +66,7 @@ tb_int_t tb_demo_container_list_entry_main(tb_int_t argc, tb_char_t** argv)
 
     // init the list
     tb_list_entry_head_t list;
-    tb_list_entry_init(&list, tb_offsetof(tb_demo_entry_t, entry));
+    tb_list_entry_init(&list, tb_demo_entry_t, entry, tb_demo_entry_copy);
 
     // insert entries
     tb_list_entry_insert_tail(&list, &entries[5].entry);

@@ -35,7 +35,40 @@
  */
 
 /// the list entry
-#define tb_list_entry(list, entry)                  ((((tb_byte_t*)(entry)) - (list)->eoff))
+#define tb_list_entry(list, entry)                      ((((tb_byte_t*)(entry)) - (list)->eoff))
+
+/*! init the list entry 
+ *
+ * @code
+ *
+    // the xxxx entry type
+    typedef struct __tb_xxxx_entry_t 
+    {
+        // the list entry
+        tb_list_entry_t     entry;
+
+        // the data
+        tb_size_t           data;
+
+    }tb_xxxx_entry_t;
+
+    // the xxxx entry copy func
+    static tb_void_t tb_xxxx_entry_copy(tb_pointer_t ltem, tb_pointer_t rtem)
+    {
+        // check
+        tb_assert_return(ltem && rtem);
+
+        // copy it
+        ((tb_xxxx_entry_t*)ltem)->data = ((tb_xxxx_entry_t*)rtem)->data;
+    }
+
+    // init the list
+    tb_list_entry_head_t list;
+    tb_list_entry_init(&list, tb_xxxx_entry_t, entry, tb_xxxx_entry_copy);
+
+ * @endcode
+ */
+#define tb_list_entry_init(list, type, entry, copy)     tb_list_entry_init_(list, tb_offsetof(type, entry), sizeof(type), copy)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -45,6 +78,9 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
+
+/// the list entry copy func type
+typedef tb_void_t               (*tb_list_entry_copy_t)(tb_pointer_t ltem, tb_pointer_t rtem);
 
 /*! the double list entry type
  * 
@@ -77,11 +113,14 @@ typedef struct __tb_list_entry_head_t
     /// the list size
     tb_size_t                   size;
 
+    /// the iterator 
+    tb_iterator_t               itor;
+
     /// the entry offset
     tb_size_t                   eoff;
 
-    /// the iterator 
-    tb_iterator_t               itor;
+    /// the entry copy func
+    tb_list_entry_copy_t        copy;
 
 }tb_list_entry_head_t;
 
@@ -106,9 +145,11 @@ tb_iterator_ref_t                           tb_list_entry_itor(tb_list_entry_hea
 /*! init list
  *
  * @param list                              the list
- * @param offset                            the entry offset
+ * @param entry_offset                      the entry offset 
+ * @param entry_size                        the entry size 
+ * @param copy                              the copy func of the entry for algorithm, .e.g sort
  */
-tb_void_t                                   tb_list_entry_init(tb_list_entry_head_ref_t list, tb_size_t offset);
+tb_void_t                                   tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_list_entry_copy_t copy);
 
 /*! exit list
  *

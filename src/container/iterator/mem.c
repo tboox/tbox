@@ -34,7 +34,7 @@ static tb_pointer_t tb_iterator_init_mem_item(tb_iterator_ref_t iterator, tb_siz
 {
     // check
     tb_assert_return_val(iterator, tb_null);
-    tb_assert_and_check_return_val(itor < (tb_size_t)iterator->priv, tb_null);
+    tb_assert_return_val(itor < (tb_size_t)iterator->priv, tb_null);
 
     // the item
     return (tb_pointer_t)((tb_byte_t*)iterator->data + itor * iterator->step);
@@ -43,7 +43,7 @@ static tb_void_t tb_iterator_init_mem_copy(tb_iterator_ref_t iterator, tb_size_t
 {
     // check
     tb_assert_return(iterator);
-    tb_assert_and_check_return(itor < (tb_size_t)iterator->priv && item);
+    tb_assert_return(itor < (tb_size_t)iterator->priv && item);
 
     // copy
     tb_memcpy((tb_byte_t*)iterator->data + itor * iterator->step, item, iterator->step);
@@ -51,7 +51,7 @@ static tb_void_t tb_iterator_init_mem_copy(tb_iterator_ref_t iterator, tb_size_t
 static tb_long_t tb_iterator_init_mem_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
-    tb_assert_and_check_return_val(ltem && rtem, 0);
+    tb_assert_return_val(ltem && rtem, 0);
 
     // compare it
     return tb_memcmp(ltem, rtem, iterator->step);
