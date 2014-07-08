@@ -16,6 +16,7 @@ tbox_C_FILES 			+= \
 						math/random/linear \
 						prefix/state \
 						memory/page_pool \
+						memory/impl/prefix \
 						memory/impl/static_page_pool \
 						memory/impl/native_page_pool \
 						memory/static_pool \

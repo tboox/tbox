@@ -85,9 +85,6 @@ tb_pointer_t tb_page_pool_malloc_(tb_page_pool_ref_t pool, tb_size_t size __tb_d
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, size __tb_debug_args__) : tb_static_page_pool_malloc(pool, size __tb_debug_args__);
     tb_assertf_and_check_return_val(data, tb_null, "malloc(%lu) failed!", size);
 
-    // check data
-    tb_assert_and_check_return_val(!(((tb_size_t)data) & (pagesize - 1)), tb_null);
-
     // ok
     return data;
 }
@@ -107,9 +104,6 @@ tb_pointer_t tb_page_pool_malloc0_(tb_page_pool_ref_t pool, tb_size_t size __tb_
     // malloc0 data
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, size __tb_debug_args__) : tb_static_page_pool_malloc(pool, size __tb_debug_args__);
     tb_assertf_and_check_return_val(data, tb_null, "malloc0(%lu) failed!", size);
-
-    // check data
-    tb_assert_and_check_return_val(!(((tb_size_t)data) & (pagesize - 1)), tb_null);
 
     // clear it
     tb_memset(data, 0, size);
@@ -134,9 +128,6 @@ tb_pointer_t tb_page_pool_nalloc_(tb_page_pool_ref_t pool, tb_size_t item, tb_si
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, item * size __tb_debug_args__) : tb_static_page_pool_malloc(pool, item * size __tb_debug_args__);
     tb_assertf_and_check_return_val(data, tb_null, "nalloc(%lu, %lu) failed!", item, size);
 
-    // check data
-    tb_assert_and_check_return_val(!(((tb_size_t)data) & (pagesize - 1)), tb_null);
-
     // ok
     return data;
 }
@@ -157,9 +148,6 @@ tb_pointer_t tb_page_pool_nalloc0_(tb_page_pool_ref_t pool, tb_size_t item, tb_s
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, item * size __tb_debug_args__) : tb_static_page_pool_malloc(pool, item * size __tb_debug_args__);
     tb_assertf_and_check_return_val(data, tb_null, "nalloc0(%lu, %lu) failed!", item, size);
 
-    // check data
-    tb_assert_and_check_return_val(!(((tb_size_t)data) & (pagesize - 1)), tb_null);
-
     // clear it
     tb_memset(data, 0, item * size);
 
@@ -179,15 +167,9 @@ tb_pointer_t tb_page_pool_ralloc_(tb_page_pool_ref_t pool, tb_pointer_t data, tb
     tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
     tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
-    // check data
-    tb_assert_and_check_return_val(!(((tb_size_t)data) & (pagesize - 1)), tb_null);
-
     // ralloc data
     tb_pointer_t p = tb_page_pool_is_native(pool)? tb_native_page_pool_ralloc(pool, data, size __tb_debug_args__) : tb_static_page_pool_ralloc(pool, data, size __tb_debug_args__);
     tb_assertf_and_check_return_val(p, tb_null, "ralloc(%p, %lu) failed!", data, size);
-
-    // check data
-    tb_assert_and_check_return_val(!(((tb_size_t)p) & (pagesize - 1)), tb_null);
 
     // ok
     return p;
@@ -197,39 +179,28 @@ tb_bool_t tb_page_pool_free_(tb_page_pool_ref_t pool, tb_pointer_t data __tb_deb
     // check
     tb_assert_and_check_return_val(pool && data, tb_false);
 
-    // the page size
-    tb_size_t pagesize = tb_page_size();
-    tb_assert_and_check_return_val(pagesize, tb_false);
-
-    // check data
-    tb_assert_and_check_return_val(!(((tb_size_t)data) & (pagesize - 1)), tb_false);
-
     // free data
     tb_bool_t ok = tb_page_pool_is_native(pool)? tb_native_page_pool_free(pool, data __tb_debug_args__) : tb_static_page_pool_free(pool, data __tb_debug_args__);
-    tb_assertf_and_check_return_val(ok, tb_false, "free(%p) failed!", data);
 
-    // TODO: dump source backtrace
+    // failed? dump it
+#ifdef __tb_debug__
+    if (!ok) 
+    {
+        // trace
+        tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
+
+        // dump data
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[page_pool]: [error]: ");
+
+        // abort
+        tb_abort();
+    }
+#endif
 
     // ok
     return ok;
 }
 #ifdef __tb_debug__
-tb_size_t tb_page_pool_data_size(tb_page_pool_ref_t pool, tb_cpointer_t data)
-{
-    // check
-    tb_assert_and_check_return_val(pool && data, 0);
-
-    // the data size
-    return tb_page_pool_is_native(pool)? tb_native_page_pool_data_size(pool, data) : tb_static_page_pool_data_size(pool, data);
-}
-tb_void_t tb_page_pool_data_dump(tb_page_pool_ref_t pool, tb_cpointer_t data, tb_char_t const* prefix)
-{
-    // check
-    tb_assert_and_check_return(pool && data);
-
-    // dump the data size
-    return tb_page_pool_is_native(pool)? tb_native_page_pool_data_dump(pool, data, prefix) : tb_static_page_pool_data_dump(pool, data, prefix);
-}
 tb_void_t tb_page_pool_dump(tb_page_pool_ref_t pool)
 {
     // check

@@ -51,6 +51,8 @@
 #ifndef __tb_cacheline_aligned__
 #   if defined(TB_COMPILER_IS_GCC)
 #       define __tb_cacheline_aligned__     __attribute__((__aligned__(TB_SMP_CACHE_BYTES)))
+#   elif defined(TB_COMPILER_IS_MSVC)
+#       define __tb_cacheline_aligned__     __declspec(align(TB_SMP_CACHE_BYTES))
 #   else
 #       define __tb_cacheline_aligned__
 #   endif

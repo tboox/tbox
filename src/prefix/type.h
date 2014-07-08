@@ -132,10 +132,10 @@ typedef tb_int32_t                  tb_fixed30_t;
 typedef tb_fixed16_t                tb_fixed_t;
 
 /// the atomic type
-typedef __tb_volatile__ tb_long_t   tb_atomic_t;
+typedef __tb_volatile__ __tb_aligned__(4) tb_long_t     tb_atomic_t;
 
 /// the atomic64 type, need be aligned for arm, ..
-typedef __tb_volatile__ tb_hong_t   tb_atomic64_t __tb_aligned__(8);
+typedef __tb_volatile__  __tb_aligned__(8) tb_hong_t    tb_atomic64_t;
 
 /// the spinlock type
 typedef tb_atomic_t                 tb_spinlock_t;
