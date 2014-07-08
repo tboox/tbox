@@ -41,7 +41,7 @@
  */
 
 // the atomic64 lock type
-typedef struct __tb_atomic64_lock_t
+typedef __tb_cacheline_aligned__ struct __tb_atomic64_lock_t
 {
     // the lock
     tb_spinlock_t           lock;
@@ -49,7 +49,7 @@ typedef struct __tb_atomic64_lock_t
     // the padding
     tb_byte_t               padding[TB_L1_CACHE_BYTES];
 
-}tb_atomic64_lock_t __tb_cacheline_aligned__;
+}__tb_cacheline_aligned__ tb_atomic64_lock_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals

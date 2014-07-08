@@ -37,14 +37,14 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_page_pool_malloc(handle, size)             tb_page_pool_malloc_(handle, size __tb_debug_vals__)
-#define tb_page_pool_malloc0(handle, size)            tb_page_pool_malloc0_(handle, size __tb_debug_vals__)
+#define tb_page_pool_malloc(pool, size)             tb_page_pool_malloc_(pool, size __tb_debug_vals__)
+#define tb_page_pool_malloc0(pool, size)            tb_page_pool_malloc0_(pool, size __tb_debug_vals__)
 
-#define tb_page_pool_nalloc(handle, item, size)       tb_page_pool_nalloc_(handle, item, size __tb_debug_vals__)
-#define tb_page_pool_nalloc0(handle, item, size)      tb_page_pool_nalloc0_(handle, item, size __tb_debug_vals__)
+#define tb_page_pool_nalloc(pool, item, size)       tb_page_pool_nalloc_(pool, item, size __tb_debug_vals__)
+#define tb_page_pool_nalloc0(pool, item, size)      tb_page_pool_nalloc0_(pool, item, size __tb_debug_vals__)
 
-#define tb_page_pool_ralloc(handle, data, size)       tb_page_pool_ralloc_(handle, data, size __tb_debug_vals__)
-#define tb_page_pool_free(handle, data)               tb_page_pool_free_(handle, data __tb_debug_vals__)
+#define tb_page_pool_ralloc(pool, data, size)       tb_page_pool_ralloc_(pool, data, size __tb_debug_vals__)
+#define tb_page_pool_free(pool, data)               tb_page_pool_free_(pool, data __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -152,26 +152,9 @@ tb_pointer_t            tb_page_pool_ralloc_(tb_page_pool_ref_t pool, tb_pointer
 tb_bool_t               tb_page_pool_free_(tb_page_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
-/*! the data size
- *
- * @param handle        the pool
- * @param data          the data address
- *
- * @return              the data size
- */
-tb_size_t               tb_page_pool_data_size(tb_page_pool_ref_t pool, tb_cpointer_t data);
-
-/*! dump the data 
- *
- * @param handle        the pool
- * @param data          the data address
- * @param prefix        the trace prefix
- */
-tb_void_t               tb_page_pool_data_dump(tb_page_pool_ref_t pool, tb_cpointer_t data, tb_char_t const* prefix);
-
 /*! dump the pool
  *
- * @param handle        the pool
+ * @param pool        the pool
  * @param prefix        the trace prefix
  */
 tb_void_t               tb_page_pool_dump(tb_page_pool_ref_t pool);

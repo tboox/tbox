@@ -84,23 +84,6 @@ tb_pointer_t            tb_native_page_pool_ralloc(tb_page_pool_ref_t pool, tb_p
 tb_bool_t               tb_native_page_pool_free(tb_page_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
-/* the data size
- *
- * @param handle        the pool
- * @param data          the data address
- *
- * @return              the data size
- */
-tb_size_t               tb_native_page_pool_data_size(tb_page_pool_ref_t pool, tb_cpointer_t data);
-
-/* dump the data 
- *
- * @param handle        the pool
- * @param data          the data address
- * @param prefix        the trace prefix
- */
-tb_void_t               tb_native_page_pool_data_dump(tb_page_pool_ref_t pool, tb_cpointer_t data, tb_char_t const* prefix);
-
 /* dump the pool
  *
  * @param handle        the pool

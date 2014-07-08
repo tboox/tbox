@@ -31,6 +31,8 @@
 #include "../../math/math.h"
 #include "../../utils/utils.h"
 #include "../../platform/platform.h"
+#include "../../container/container.h"
+#include "../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -45,34 +47,17 @@
 // the pool data size maximum 
 #define TB_POOL_DATA_SIZE_MAXN      (1 << 19)
 
-// save backtrace for the pool data
-#define tb_pool_data_save_backtrace(pool_data, skip_frames) \
-    do \
-    { \
-        tb_pool_data_t* _data = (tb_pool_data_t*)(pool_data); \
-        tb_size_t nframe = tb_backtrace_frames(_data->backtrace, tb_arrayn(_data->backtrace), skip_frames); \
-        if (nframe < tb_arrayn(_data->backtrace)) tb_memset(_data->backtrace + nframe, 0, (tb_arrayn(_data->backtrace) - nframe) * sizeof(tb_cpointer_t)); \
- \
-    } while (0) \
+// the pool data address alignment 
+#define TB_POOL_DATA_ALIGN          TB_CPU_BITBYTE
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the pool data type enum
-typedef enum __tb_pool_data_type_e
-{
-    TB_POOL_DATA_TYPE_PAGE      = 0
-,   TB_POOL_DATA_TYPE_TINY      = 1
-,   TB_POOL_DATA_TYPE_CSTR      = 2
-
-}tb_pool_data_type_e;
-
-// the pool data type
-typedef struct __tb_pool_data_t
-{
 #ifdef __tb_debug__
-
+// the pool data debug head type
+typedef struct __tb_pool_data_debug_head_t
+{
     // the magic
     tb_uint16_t                 magic;
 
@@ -80,7 +65,8 @@ typedef struct __tb_pool_data_t
     tb_uint16_t                 line;
 
     /* the real data size
-     * contains the info size and the padding size for alignment
+     * includes the info size and the padding size for alignment
+     * excludes the self debug head size
      */
     tb_uint32_t                 real;
 
@@ -93,20 +79,53 @@ typedef struct __tb_pool_data_t
     // the backtrace frames
     tb_pointer_t                backtrace[16];
 
+}tb_pool_data_debug_head_t;
 #endif
 
-    // the data address
-    tb_pointer_t                data;
+// the pool data head type
+typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_pool_data_head_t
+{
+#ifdef __tb_debug__
+    // the debug head
+    tb_pool_data_debug_head_t   debug;
+#endif
 
-    // the data size, <= 512MB
-    tb_uint32_t                 size    : 29;
+    // the size
+    tb_uint32_t                 size : 29;
 
-    // the data type
-    tb_uint32_t                 type    : 2;
+    // is cstr?
+    tb_uint32_t                 cstr : 1;
 
-    // free?
-    tb_uint32_t                 free    : 1;
+    // is free?
+    tb_uint32_t                 free : 1;
 
-}tb_pool_data_t;
+}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_pool_data_head_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+#ifdef __tb_debug__
+/* dump data info
+ *
+ * @param data                  the data address
+ * @param verbose               dump verbose info?
+ * @param prefix                the prefix info
+ */
+tb_void_t                       tb_pool_data_dump(tb_byte_t const* data, tb_bool_t verbose, tb_char_t const* prefix);
+
+/* save backtrace
+ *
+ * @param data_head             the data head
+ * @param skip_frames           the skiped frame count
+ */
+static tb_void_t __tb_inline__  tb_pool_data_save_backtrace(tb_pool_data_head_t* data_head, tb_size_t skip_frames)
+{ 
+    tb_size_t nframe = tb_backtrace_frames(data_head->debug.backtrace, tb_arrayn(data_head->debug.backtrace), skip_frames); 
+    if (nframe < tb_arrayn(data_head->debug.backtrace)) tb_memset(data_head->debug.backtrace + nframe, 0, (tb_arrayn(data_head->debug.backtrace) - nframe) * sizeof(tb_cpointer_t)); 
+}
+
+#endif
+
 
 #endif

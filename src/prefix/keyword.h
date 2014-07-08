@@ -48,7 +48,7 @@
 #   define __tb_fastcall__                      __fastcall
 #   define __tb_thiscall__                      __thiscall
 #   define __tb_packed__ 
-#   define __tb_aligned__(a) 
+#   define __tb_aligned__(a)                    __declspec(align(a))
 
 #elif defined(TB_COMPILER_IS_GCC)
 

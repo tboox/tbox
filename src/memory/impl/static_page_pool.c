@@ -59,14 +59,6 @@ tb_bool_t tb_static_page_pool_free(tb_page_pool_ref_t pool, tb_pointer_t data __
     return tb_false;
 }
 #ifdef __tb_debug__
-tb_size_t tb_static_page_pool_data_size(tb_page_pool_ref_t pool, tb_cpointer_t data)
-{
-    return 0;
-}
-tb_void_t tb_static_page_pool_data_dump(tb_page_pool_ref_t pool, tb_cpointer_t data, tb_char_t const* prefix)
-{
-
-}
 tb_void_t tb_static_page_pool_dump(tb_page_pool_ref_t pool)
 {
 }
