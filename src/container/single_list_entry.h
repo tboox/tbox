@@ -228,6 +228,17 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_last(tb_sin
     return list->last;
 }
 
+/*! the single list tail entry
+ *
+ * @param list                                  the single list
+ *
+ * @return                                      the tail entry
+ */
+static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_tail(tb_single_list_entry_head_ref_t list)
+{ 
+    return tb_null;
+}
+
 /*! the single list is null?
  *
  * @param list                                  the single list

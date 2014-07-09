@@ -249,6 +249,18 @@ static __tb_inline__ tb_list_entry_ref_t    tb_list_entry_last(tb_list_entry_hea
     return list->prev;
 }
 
+/*! the list tail entry
+ *
+ * @param list                              the list
+ *
+ * @return                                  the tail entry
+ */
+static __tb_inline__ tb_list_entry_ref_t    tb_list_entry_tail(tb_list_entry_head_ref_t list)
+{ 
+    // done
+    return (tb_list_entry_ref_t)list;
+}
+
 /*! the list is null?
  *
  * @param list                              the list

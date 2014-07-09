@@ -64,12 +64,6 @@ typedef struct __tb_pool_data_debug_head_t
     // the line 
     tb_uint16_t                 line;
 
-    /* the real data size
-     * includes the info size and the padding size for alignment
-     * excludes the self debug head size
-     */
-    tb_uint32_t                 real;
-
     // the file
     tb_char_t const*            file;
 
