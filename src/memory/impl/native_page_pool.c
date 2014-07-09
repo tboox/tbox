@@ -116,7 +116,7 @@ static tb_void_t tb_native_page_pool_check_data(tb_native_page_pool_impl_t* impl
     do
     {
         // check
-        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "data have been freed: %p", data);
+        tb_assertf_break(!data_head->base.free, "data have been freed: %p", data);
         tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
         tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
 
@@ -331,7 +331,7 @@ tb_pointer_t tb_native_page_pool_malloc(tb_page_pool_ref_t pool, tb_size_t size 
 
 #ifdef __tb_debug__
         // update the occupied size
-        tb_size_t occupied_size = need - sizeof(tb_pool_data_debug_head_t);
+        tb_size_t occupied_size = need - sizeof(tb_pool_data_debug_head_t) - patch;
         impl->occupied_size += occupied_size;
 
         // update total size
@@ -340,7 +340,7 @@ tb_pointer_t tb_native_page_pool_malloc(tb_page_pool_ref_t pool, tb_size_t size 
         // update peak size
         if (occupied_size > impl->peak_size) impl->peak_size = occupied_size;
 
-        // update ralloc count
+        // update malloc count
         impl->malloc_count++;
 #endif
 
@@ -380,12 +380,9 @@ tb_pointer_t tb_native_page_pool_ralloc(tb_page_pool_ref_t pool, tb_pointer_t da
     tb_native_page_data_head_t* data_head = tb_null;
     do
     {
-        // no data?
-        tb_assert_and_check_break(data);
-
         // the data head
         data_head = &(((tb_native_page_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "ralloc freed data: %p", data);
+        tb_assertf_and_check_break(!data_head->base.free, "ralloc freed data: %p", data);
         tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
         tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)pool, "the data: %p not belong to pool: %p", data, pool);
         tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
@@ -437,7 +434,7 @@ tb_pointer_t tb_native_page_pool_ralloc(tb_page_pool_ref_t pool, tb_pointer_t da
 
 #ifdef __tb_debug__
         // update the occupied size
-        tb_size_t occupied_size = need - sizeof(tb_pool_data_debug_head_t);
+        tb_size_t occupied_size = need - sizeof(tb_pool_data_debug_head_t) - patch;
         impl->occupied_size += occupied_size;
 
         // update total size
@@ -485,7 +482,7 @@ tb_bool_t tb_native_page_pool_free(tb_page_pool_ref_t pool, tb_pointer_t data __
 
         // the data head
         data_head = &(((tb_native_page_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
+        tb_assertf_and_check_break(!data_head->base.free, "double free data: %p", data);
         tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
         tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)pool, "the data: %p not belong to pool: %p", data, pool);
         tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
@@ -504,12 +501,8 @@ tb_bool_t tb_native_page_pool_free(tb_page_pool_ref_t pool, tb_pointer_t data __
         // remove the data from the pages
         tb_list_entry_remove(&impl->pages, &data_head->entry);
 
-#ifdef __tb_debug__
-        // clear magic for checking double-free
-        data_head->base.debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
-#endif
-
         // free it
+        data_head->base.free = 1;
         tb_native_memory_free(data_head);
 
 #ifdef __tb_debug__
