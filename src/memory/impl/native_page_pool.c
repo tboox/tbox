@@ -60,7 +60,16 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_page_data_head_t
 
 }__tb_aligned__(TB_POOL_DATA_ALIGN) tb_native_page_data_head_t;
 
-// the native page pool impl type
+/*! the native page pool impl type
+ *
+ * <pre>
+ *        -----------       -----------               -----------
+ * pool: |||  pages  | <=> |||  pages  | <=> ... <=> |||  pages  | <=> |
+ *        -----------       -----------               -----------      |
+ *              |                                                      |
+ *              `------------------------------------------------------`
+ * </pre>
+ */
 typedef struct __tb_native_page_pool_impl_t
 {
     // the pages

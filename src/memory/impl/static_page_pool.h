@@ -18,7 +18,6 @@
  *
  * @author      ruki
  * @file        static_page_pool.h
- *
  */
 #ifndef TB_MEMORY_IMPL_STATIC_PAGE_POOL_H
 #define TB_MEMORY_IMPL_STATIC_PAGE_POOL_H
