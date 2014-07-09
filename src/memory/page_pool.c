@@ -83,7 +83,7 @@ tb_pointer_t tb_page_pool_malloc_(tb_page_pool_ref_t pool, tb_size_t size __tb_d
 
     // malloc data
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, size __tb_debug_args__) : tb_static_page_pool_malloc(pool, size __tb_debug_args__);
-    tb_assertf_and_check_return_val(data, tb_null, "malloc(%lu) failed!", size);
+    tb_assertf_abort(data, "malloc(%lu) failed!", size);
 
     // ok
     return data;
@@ -103,7 +103,7 @@ tb_pointer_t tb_page_pool_malloc0_(tb_page_pool_ref_t pool, tb_size_t size __tb_
 
     // malloc0 data
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, size __tb_debug_args__) : tb_static_page_pool_malloc(pool, size __tb_debug_args__);
-    tb_assertf_and_check_return_val(data, tb_null, "malloc0(%lu) failed!", size);
+    tb_assertf_abort(data, "malloc0(%lu) failed!", size);
 
     // clear it
     tb_memset(data, 0, size);
@@ -126,7 +126,7 @@ tb_pointer_t tb_page_pool_nalloc_(tb_page_pool_ref_t pool, tb_size_t item, tb_si
 
     // nalloc data
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, item * size __tb_debug_args__) : tb_static_page_pool_malloc(pool, item * size __tb_debug_args__);
-    tb_assertf_and_check_return_val(data, tb_null, "nalloc(%lu, %lu) failed!", item, size);
+    tb_assertf_abort(data, "nalloc(%lu, %lu) failed!", item, size);
 
     // ok
     return data;
@@ -146,7 +146,7 @@ tb_pointer_t tb_page_pool_nalloc0_(tb_page_pool_ref_t pool, tb_size_t item, tb_s
 
     // nalloc0 data
     tb_pointer_t data = tb_page_pool_is_native(pool)? tb_native_page_pool_malloc(pool, item * size __tb_debug_args__) : tb_static_page_pool_malloc(pool, item * size __tb_debug_args__);
-    tb_assertf_and_check_return_val(data, tb_null, "nalloc0(%lu, %lu) failed!", item, size);
+    tb_assertf_abort(data, "nalloc0(%lu, %lu) failed!", item, size);
 
     // clear it
     tb_memset(data, 0, item * size);
@@ -169,7 +169,21 @@ tb_pointer_t tb_page_pool_ralloc_(tb_page_pool_ref_t pool, tb_pointer_t data, tb
 
     // ralloc data
     tb_pointer_t p = tb_page_pool_is_native(pool)? tb_native_page_pool_ralloc(pool, data, size __tb_debug_args__) : tb_static_page_pool_ralloc(pool, data, size __tb_debug_args__);
-    tb_assertf_and_check_return_val(p, tb_null, "ralloc(%p, %lu) failed!", data, size);
+
+    // failed? dump it
+#ifdef __tb_debug__
+    if (!p) 
+    {
+        // trace
+        tb_trace_e("ralloc(%p, %lu) failed! at %s(): %lu, %s", data, size, func_, line_, file_);
+
+        // dump data
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[page_pool]: [error]: ");
+
+        // abort
+        tb_abort();
+    }
+#endif
 
     // ok
     return p;

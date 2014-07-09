@@ -61,9 +61,7 @@ static tb_size_t tb_list_entry_itor_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_list_entry_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_list_entry_head_ref_t list = tb_container_of(tb_list_entry_head_t, itor, iterator);
-    tb_assert_return_val(list, 0);
-    tb_assert_return_val(itor, (tb_size_t)list);
+    tb_assert_return_val(itor, (tb_size_t)tb_container_of(tb_list_entry_head_t, itor, iterator));
 
     // next
     return (tb_size_t)((tb_list_entry_ref_t)itor)->next;
@@ -71,9 +69,7 @@ static tb_size_t tb_list_entry_itor_next(tb_iterator_ref_t iterator, tb_size_t i
 static tb_size_t tb_list_entry_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_list_entry_head_ref_t list = tb_container_of(tb_list_entry_head_t, itor, iterator);
-    tb_assert_return_val(list, 0);
-    tb_assert_return_val(list, 0);
+    tb_assert_return_val(itor, 0);
 
     // prev
     return (tb_size_t)((tb_list_entry_ref_t)itor)->prev;

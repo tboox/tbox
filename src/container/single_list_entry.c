@@ -57,8 +57,7 @@ static tb_size_t tb_single_list_entry_itor_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_single_list_entry_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_single_list_entry_head_ref_t list = tb_container_of(tb_single_list_entry_head_t, itor, iterator);
-    tb_assert_return_val(list && itor, 0);
+    tb_assert_return_val(itor, 0);
 
     // next
     return (tb_size_t)((tb_single_list_entry_ref_t)itor)->next;
