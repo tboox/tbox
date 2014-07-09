@@ -157,7 +157,7 @@ tb_pointer_t tb_page_pool_nalloc0_(tb_page_pool_ref_t pool, tb_size_t item, tb_s
 tb_pointer_t tb_page_pool_ralloc_(tb_page_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(pool && size, tb_null);
+    tb_assert_and_check_return_val(pool && data && size, tb_null);
 
     // the page size
     tb_size_t pagesize = tb_page_size();

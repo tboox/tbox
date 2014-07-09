@@ -179,9 +179,9 @@ tb_void_t tb_demo_page_pool_perf()
  */ 
 tb_int_t tb_demo_memory_page_pool_main(tb_int_t argc, tb_char_t** argv)
 {
-    tb_demo_page_pool_perf();
+//    tb_demo_page_pool_perf();
 //    tb_demo_page_pool_leak();
-//    tb_demo_page_pool_free2();
+    tb_demo_page_pool_free2();
 //    tb_demo_page_pool_underflow();
 //    tb_demo_page_pool_underflow2();
     return 0;
