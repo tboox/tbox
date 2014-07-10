@@ -138,7 +138,7 @@ tb_void_t tb_demo_large_pool_real(tb_size_t size)
         tb_size_t       real = 0;
         tb_pointer_t    data = tb_large_pool_malloc(pool, size, &real);
         tb_assert_and_check_break(data);
-   
+
         // trace
         tb_trace_i("size: %lu => real: %lu", size, real);
 
@@ -224,22 +224,19 @@ tb_int_t tb_demo_memory_large_pool_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-    tb_demo_large_pool_real(1 << 1);
-    tb_demo_large_pool_real(1 << 2);
-    tb_demo_large_pool_real(1 << 3);
-    tb_demo_large_pool_real(1 << 4);
-    tb_demo_large_pool_real(1 << 5);
-    tb_demo_large_pool_real(1 << 6);
-    tb_demo_large_pool_real(1 << 7);
-    tb_demo_large_pool_real(1 << 8);
-    tb_demo_large_pool_real(1 << 9);
-    tb_demo_large_pool_real(1 << 10);
-    tb_demo_large_pool_real(1 << 11);
-    tb_demo_large_pool_real(1 << 12);
-    tb_demo_large_pool_real(1 << 13);
-    tb_demo_large_pool_real(1 << 14);
-    tb_demo_large_pool_real(1 << 15);
-    tb_demo_large_pool_real(1 << 16);
+    tb_demo_large_pool_real(16 * 256);
+    tb_demo_large_pool_real(32 * 256);
+    tb_demo_large_pool_real(64 * 256);
+    tb_demo_large_pool_real(96 * 256);
+    tb_demo_large_pool_real(128 * 256);
+    tb_demo_large_pool_real(192 * 256);
+    tb_demo_large_pool_real(256 * 256);
+    tb_demo_large_pool_real(384 * 256);
+    tb_demo_large_pool_real(512 * 256);
+    tb_demo_large_pool_real(1024 * 256);
+    tb_demo_large_pool_real(2048 * 256);
+    tb_demo_large_pool_real(3072 * 256);
 #endif
+
     return 0;
 }
