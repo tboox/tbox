@@ -68,107 +68,76 @@ tb_void_t tb_large_pool_clear(tb_large_pool_ref_t pool)
     if (tb_large_pool_is_native(pool)) tb_native_large_pool_clear(pool);
     else tb_static_large_pool_clear(pool);
 }
-tb_pointer_t tb_large_pool_malloc_(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_large_pool_malloc_(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
-
-    // the page size
-    tb_size_t pagesize = tb_page_size();
-    tb_assert_and_check_return_val(pagesize, tb_null);
-
-    // check size
     tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
-    tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // malloc data
-    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, size __tb_debug_args__) : tb_static_large_pool_malloc(pool, size __tb_debug_args__);
+    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, size, real __tb_debug_args__);
     tb_assertf_abort(data, "malloc(%lu) failed!", size);
+    tb_assert_abort(!real || *real >= size);
 
     // ok
     return data;
 }
-tb_pointer_t tb_large_pool_malloc0_(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_large_pool_malloc0_(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
-
-    // the page size
-    tb_size_t pagesize = tb_page_size();
-    tb_assert_and_check_return_val(pagesize, tb_null);
-
-    // check size
     tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
-    tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // malloc0 data
-    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, size __tb_debug_args__) : tb_static_large_pool_malloc(pool, size __tb_debug_args__);
+    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, size, real __tb_debug_args__);
     tb_assertf_abort(data, "malloc0(%lu) failed!", size);
+    tb_assert_abort(!real || *real >= size);
 
     // clear it
-    tb_memset(data, 0, size);
+    tb_memset(data, 0, real? *real : size);
 
     // ok
     return data;
 }
-tb_pointer_t tb_large_pool_nalloc_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_large_pool_nalloc_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
-
-    // the page size
-    tb_size_t pagesize = tb_page_size();
-    tb_assert_and_check_return_val(pagesize, tb_null);
-
-    // check size
     tb_assert_and_check_return_val((item * size) <= TB_POOL_DATA_SIZE_MAXN, tb_null);
-    tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // nalloc data
-    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, item * size __tb_debug_args__) : tb_static_large_pool_malloc(pool, item * size __tb_debug_args__);
+    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, item * size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, item * size, real __tb_debug_args__);
     tb_assertf_abort(data, "nalloc(%lu, %lu) failed!", item, size);
+    tb_assert_abort(!real || *real >= item * size);
 
     // ok
     return data;
 }
-tb_pointer_t tb_large_pool_nalloc0_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_large_pool_nalloc0_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
-
-    // the page size
-    tb_size_t pagesize = tb_page_size();
-    tb_assert_and_check_return_val(pagesize, tb_null);
-
-    // check size
     tb_assert_and_check_return_val((item * size) <= TB_POOL_DATA_SIZE_MAXN, tb_null);
-    tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // nalloc0 data
-    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, item * size __tb_debug_args__) : tb_static_large_pool_malloc(pool, item * size __tb_debug_args__);
+    tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, item * size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, item * size, real __tb_debug_args__);
     tb_assertf_abort(data, "nalloc0(%lu, %lu) failed!", item, size);
+    tb_assert_abort(!real || *real >= item * size);
 
     // clear it
-    tb_memset(data, 0, item * size);
+    tb_memset(data, 0, real? *real : item * size);
 
     // ok
     return data;
 }
-tb_pointer_t tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && data && size, tb_null);
-
-    // the page size
-    tb_size_t pagesize = tb_page_size();
-    tb_assert_and_check_return_val(pagesize, tb_null);
-
-    // check size
     tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
-    tb_assert_and_check_return_val(!(size & (pagesize - 1)), tb_null);
 
     // ralloc data
-    tb_pointer_t p = tb_large_pool_is_native(pool)? tb_native_large_pool_ralloc(pool, data, size __tb_debug_args__) : tb_static_large_pool_ralloc(pool, data, size __tb_debug_args__);
+    tb_pointer_t p = tb_large_pool_is_native(pool)? tb_native_large_pool_ralloc(pool, data, size, real __tb_debug_args__) : tb_static_large_pool_ralloc(pool, data, size, real __tb_debug_args__);
 
     // failed? dump it
 #ifdef __tb_debug__
@@ -184,6 +153,9 @@ tb_pointer_t tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, 
         tb_abort();
     }
 #endif
+
+    // check
+    tb_assert_abort(!real || *real >= size);
 
     // ok
     return p;

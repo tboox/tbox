@@ -36,7 +36,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* init the page pool and the allocated data will be aligned by the page size
+/* init the large pool and the allocated data will be aligned by the page size
  * 
  * @param data          the pool data
  * @param size          the pool size
@@ -60,21 +60,23 @@ tb_void_t               tb_static_large_pool_clear(tb_large_pool_ref_t pool);
 /* malloc data
  *
  * @param pool          the pool 
- * @param size          the size and must be aligned by the page size
+ * @param size          the size 
+ * @param real          the real allocated size >= size, optional
  *
  * @return              the data 
  */
-tb_pointer_t            tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
 /* realloc data
  *
  * @param pool          the pool 
  * @param data          the data address
- * @param size          the size and must be aligned by the page size
+ * @param size          the data size 
+ * @param real          the real allocated size >= size, optional
  *
  * @return              the new data address 
  */
-tb_pointer_t            tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
 /* free data
  *

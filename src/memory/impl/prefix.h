@@ -45,7 +45,7 @@
 #define TB_POOL_DATA_PATCH          (0xcc)
 
 // the pool data size maximum 
-#define TB_POOL_DATA_SIZE_MAXN      (1 << 19)
+#define TB_POOL_DATA_SIZE_MAXN      (1 << 31)
 
 // the pool data address alignment 
 #define TB_POOL_DATA_ALIGN          TB_CPU_BITBYTE
@@ -76,7 +76,7 @@ typedef struct __tb_pool_data_debug_head_t
 }tb_pool_data_debug_head_t;
 #endif
 
-// the pool data head type
+// TODO remove align, the pool data head type
 typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_pool_data_head_t
 {
 #ifdef __tb_debug__
@@ -85,13 +85,10 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_pool_data_head_t
 #endif
 
     // the size
-    tb_uint32_t                 size : 29;
+    tb_uint32_t                 size : 31;
 
     // is cstr?
     tb_uint32_t                 cstr : 1;
-
-    // is free?
-    tb_uint32_t                 free : 1;
 
 }__tb_aligned__(TB_POOL_DATA_ALIGN) tb_pool_data_head_t;
 

@@ -37,20 +37,20 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_large_pool_malloc(pool, size)             tb_large_pool_malloc_(pool, size __tb_debug_vals__)
-#define tb_large_pool_malloc0(pool, size)            tb_large_pool_malloc0_(pool, size __tb_debug_vals__)
+#define tb_large_pool_malloc(pool, size, real)             tb_large_pool_malloc_(pool, size, real __tb_debug_vals__)
+#define tb_large_pool_malloc0(pool, size, real)            tb_large_pool_malloc0_(pool, size, real __tb_debug_vals__)
 
-#define tb_large_pool_nalloc(pool, item, size)       tb_large_pool_nalloc_(pool, item, size __tb_debug_vals__)
-#define tb_large_pool_nalloc0(pool, item, size)      tb_large_pool_nalloc0_(pool, item, size __tb_debug_vals__)
+#define tb_large_pool_nalloc(pool, item, size, real)       tb_large_pool_nalloc_(pool, item, size, real __tb_debug_vals__)
+#define tb_large_pool_nalloc0(pool, item, size, real)      tb_large_pool_nalloc0_(pool, item, size, real __tb_debug_vals__)
 
-#define tb_large_pool_ralloc(pool, data, size)       tb_large_pool_ralloc_(pool, data, size __tb_debug_vals__)
-#define tb_large_pool_free(pool, data)               tb_large_pool_free_(pool, data __tb_debug_vals__)
+#define tb_large_pool_ralloc(pool, data, size, real)       tb_large_pool_ralloc_(pool, data, size, real __tb_debug_vals__)
+#define tb_large_pool_free(pool, data)                      tb_large_pool_free_(pool, data __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-/*! the page pool ref type
+/*! the large pool ref type
  *
  *  -------------------------      ----------------------
  * |       native memory     |    |         data         |
@@ -63,7 +63,7 @@ __tb_extern_c_enter__
  *  -----------------------------------------------------
  * |  if (pool address & 1)     |           else         |
  * |-----------------------------------------------------|
- * |                       page pool                     |
+ * |                       large pool                    |
  *  ----------------------------------------------------- 
  *
  */
@@ -73,14 +73,14 @@ typedef struct{}*       tb_large_pool_ref_t;
  * interfaces
  */
 
-/*! init the page pool and the allocated data will be aligned by the page size
+/*! init the large pool and the allocated data will be aligned by the page size
  * 
  * @param data          the pool data, using the native memory if be null
  * @param size          the pool size
  *
  * @return              the pool 
  */
-tb_large_pool_ref_t      tb_large_pool_init(tb_byte_t* data, tb_size_t size);
+tb_large_pool_ref_t     tb_large_pool_init(tb_byte_t* data, tb_size_t size);
 
 /*! exit the pool
  *
@@ -101,46 +101,50 @@ tb_void_t               tb_large_pool_clear(tb_large_pool_ref_t pool);
  *
  * @return              the data address
  */
-tb_pointer_t            tb_large_pool_malloc_(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_large_pool_malloc_(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
 /*! malloc data and fill zero 
  *
  * @param pool          the pool 
- * @param size          the size and must be aligned by the page size
+ * @param size          the size 
+ * @param real          the real allocated size >= size, optional
  *
  * @return              the data address
  */
-tb_pointer_t            tb_large_pool_malloc0_(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_large_pool_malloc0_(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
 /*! malloc data with the item count
  *
  * @param pool          the pool 
  * @param item          the item count
- * @param size          the item size and must be aligned by the page size
+ * @param size          the item size 
+ * @param real          the real allocated size >= item * size, optional
  *
  * @return              the data address
  */
-tb_pointer_t            tb_large_pool_nalloc_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_large_pool_nalloc_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
 /*! malloc data with the item count and fill zero
  *
  * @param pool          the pool 
  * @param item          the item count
- * @param size          the item size and must be aligned by the page size
+ * @param size          the item size 
+ * @param real          the real allocated size >= item * size, optional
  *
  * @return              the data address
  */
-tb_pointer_t            tb_large_pool_nalloc0_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_large_pool_nalloc0_(tb_large_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
 /*! realloc data
  *
  * @param pool          the pool 
  * @param data          the data address
- * @param size          the data size and must be aligned by the page size
+ * @param size          the data size
+ * @param real          the real allocated size >= size, optional
  *
  * @return              the new data address
  */
-tb_pointer_t            tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
 /*! free data
  *

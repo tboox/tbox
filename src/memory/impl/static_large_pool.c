@@ -31,7 +31,7 @@
  */
 #include "static_large_pool.h"
 
-/*! the static page pool impl type
+/*! the static large pool impl type
  *
  * <pre>
  *
@@ -118,6 +118,7 @@ static tb_pool_data_head_t* tb_static_large_pool_malloc_find(tb_static_large_poo
     // check
     tb_assert_and_check_return_val(impl && data_head && size, tb_null);
 
+#if 0
     // the data tail
     tb_pool_data_head_t* data_tail = impl->data_tail;
     tb_check_return_val(data_head < data_tail, tb_null);
@@ -178,6 +179,7 @@ static tb_pool_data_head_t* tb_static_large_pool_malloc_find(tb_static_large_poo
         // skip it if the data is non-free or too small
         data_head = (tb_pool_data_head_t*)((tb_byte_t*)(data_head + 1) + data_size);
     }
+#endif
 
     // fail
     return tb_null;
@@ -272,7 +274,7 @@ tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size)
 
     // init data head 
     impl->data_head = (tb_pool_data_head_t*)&impl[1];
-    impl->data_head->free = 1;
+//    impl->data_head->free = 1;
     impl->data_head->cstr = 0;
     impl->data_head->size = impl->data_size;
     tb_assert_and_check_return_val(!((tb_size_t)impl->data_head & (TB_POOL_DATA_ALIGN - 1)), tb_null);
@@ -299,11 +301,11 @@ tb_void_t tb_static_large_pool_clear(tb_large_pool_ref_t pool)
     tb_assert_and_check_return(impl && impl->data_head && impl->data_size > impl->pagesize);
 
     // clear it
-    impl->data_head->free = 1;
+//    impl->data_head->free = 1;
     impl->data_head->cstr = 0;
     impl->data_head->size = impl->data_size;
 }
-tb_pointer_t tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
@@ -312,7 +314,7 @@ tb_pointer_t tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
     // done
     return tb_static_large_pool_malloc_done(impl, size __tb_debug_args__);
 }
-tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     return tb_null;
 }

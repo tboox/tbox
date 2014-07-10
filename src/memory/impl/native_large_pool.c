@@ -36,10 +36,10 @@
  * macros
  */
 
-// the native page pool ref 
+// the native large pool ref 
 #define tb_native_large_pool_ref(pool)   ((tb_large_pool_ref_t)((tb_size_t)(pool) | 0x1))
 
-// the native page pool impl 
+// the native large pool impl 
 #define tb_native_large_pool_impl(pool)  ((tb_native_large_pool_impl_t*)((tb_size_t)(pool) & ~0x1))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@
  */
 
 // the native page data head type
-typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_page_data_head_t
+typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_large_data_head_t
 {
     // the pool reference
     tb_pointer_t                    pool;
@@ -58,13 +58,13 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_page_data_head_t
     // the data head base
     tb_pool_data_head_t             base;
 
-}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_native_page_data_head_t;
+}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_native_large_data_head_t;
 
-/*! the native page pool impl type
+/*! the native large pool impl type
  *
  * <pre>
  *        -----------       -----------               -----------
- * pool: |||  pages  | <=> |||  pages  | <=> ... <=> |||  pages  | <=> |
+ * pool: |||  data   | <=> |||  data   | <=> ... <=> |||  data   | <=> |
  *        -----------       -----------               -----------      |
  *              |                                                      |
  *              `------------------------------------------------------`
@@ -72,11 +72,8 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_page_data_head_t
  */
 typedef struct __tb_native_large_pool_impl_t
 {
-    // the pages
-    tb_list_entry_head_t            pages;
-
-    // the page size
-    tb_size_t                       pagesize;
+    // the data list
+    tb_list_entry_head_t            data_list;
 
 #ifdef __tb_debug__
 
@@ -105,7 +102,7 @@ typedef struct __tb_native_large_pool_impl_t
  * checker implementation
  */
 #ifdef __tb_debug__
-static tb_void_t tb_native_large_pool_check_data(tb_native_large_pool_impl_t* impl, tb_native_page_data_head_t const* data_head)
+static tb_void_t tb_native_large_pool_check_data(tb_native_large_pool_impl_t* impl, tb_native_large_data_head_t const* data_head)
 {
     // check
     tb_assert_and_check_return(impl && data_head);
@@ -116,7 +113,7 @@ static tb_void_t tb_native_large_pool_check_data(tb_native_large_pool_impl_t* im
     do
     {
         // check
-        tb_assertf_break(!data_head->base.free, "data have been freed: %p", data);
+        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "data have been freed: %p", data);
         tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
         tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
 
@@ -143,52 +140,52 @@ static tb_void_t tb_native_large_pool_check_last(tb_native_large_pool_impl_t* im
     tb_assert_and_check_return(impl);
 
     // non-empty?
-    if (!tb_list_entry_is_null(&impl->pages))
+    if (!tb_list_entry_is_null(&impl->data_list))
     {
         // the last entry
-        tb_list_entry_ref_t data_last = tb_list_entry_last(&impl->pages);
+        tb_list_entry_ref_t data_last = tb_list_entry_last(&impl->data_list);
         tb_assert_and_check_return(data_last);
 
         // check it
-        tb_native_large_pool_check_data(impl, (tb_native_page_data_head_t*)tb_list_entry(&impl->pages, data_last));
+        tb_native_large_pool_check_data(impl, (tb_native_large_data_head_t*)tb_list_entry(&impl->data_list, data_last));
     }
 }
-static tb_void_t tb_native_large_pool_check_prev(tb_native_large_pool_impl_t* impl, tb_native_page_data_head_t const* data_head)
+static tb_void_t tb_native_large_pool_check_prev(tb_native_large_pool_impl_t* impl, tb_native_large_data_head_t const* data_head)
 {
     // check
     tb_assert_and_check_return(impl && data_head);
 
     // non-empty?
-    if (!tb_list_entry_is_null(&impl->pages))
+    if (!tb_list_entry_is_null(&impl->data_list))
     {
         // the prev entry
-        tb_list_entry_ref_t data_prev = tb_list_entry_prev(&impl->pages, (tb_list_entry_ref_t)&data_head->entry);
+        tb_list_entry_ref_t data_prev = tb_list_entry_prev(&impl->data_list, (tb_list_entry_ref_t)&data_head->entry);
         tb_assert_and_check_return(data_prev);
 
         // not tail entry
-        tb_check_return(data_prev != tb_list_entry_tail(&impl->pages));
+        tb_check_return(data_prev != tb_list_entry_tail(&impl->data_list));
 
         // check it
-        tb_native_large_pool_check_data(impl, (tb_native_page_data_head_t*)tb_list_entry(&impl->pages, data_prev));
+        tb_native_large_pool_check_data(impl, (tb_native_large_data_head_t*)tb_list_entry(&impl->data_list, data_prev));
     }
 }
-static tb_void_t tb_native_large_pool_check_next(tb_native_large_pool_impl_t* impl, tb_native_page_data_head_t const* data_head)
+static tb_void_t tb_native_large_pool_check_next(tb_native_large_pool_impl_t* impl, tb_native_large_data_head_t const* data_head)
 {
     // check
     tb_assert_and_check_return(impl && data_head);
 
     // non-empty?
-    if (!tb_list_entry_is_null(&impl->pages))
+    if (!tb_list_entry_is_null(&impl->data_list))
     {
         // the next entry
-        tb_list_entry_ref_t data_next = tb_list_entry_next(&impl->pages, (tb_list_entry_ref_t)&data_head->entry);
+        tb_list_entry_ref_t data_next = tb_list_entry_next(&impl->data_list, (tb_list_entry_ref_t)&data_head->entry);
         tb_assert_and_check_return(data_next);
 
         // not tail entry
-        tb_check_return(data_next != tb_list_entry_tail(&impl->pages));
+        tb_check_return(data_next != tb_list_entry_tail(&impl->data_list));
 
         // check it
-        tb_native_large_pool_check_data(impl, (tb_native_page_data_head_t*)tb_list_entry(&impl->pages, data_next));
+        tb_native_large_pool_check_data(impl, (tb_native_large_data_head_t*)tb_list_entry(&impl->data_list, data_next));
     }
 }
 #endif
@@ -204,18 +201,14 @@ tb_large_pool_ref_t tb_native_large_pool_init()
     do
     {
         // check
-        tb_assert_static(!(sizeof(tb_native_page_data_head_t) & (TB_POOL_DATA_ALIGN - 1)));
+        tb_assert_static(!(sizeof(tb_native_large_data_head_t) & (TB_POOL_DATA_ALIGN - 1)));
 
         // make pool
         impl = (tb_native_large_pool_impl_t*)tb_native_memory_malloc0(sizeof(tb_native_large_pool_impl_t));
         tb_assert_and_check_break(impl);
 
-        // init pages
-        tb_list_entry_init(&impl->pages, tb_native_page_data_head_t, entry, tb_null);
-
-        // init pagesize
-        impl->pagesize = tb_page_size();
-        tb_assert_and_check_break(impl->pagesize);
+        // init data_list
+        tb_list_entry_init(&impl->data_list, tb_native_large_data_head_t, entry, tb_null);
 
         // ok
         ok = tb_true;
@@ -252,7 +245,7 @@ tb_void_t tb_native_large_pool_clear(tb_large_pool_ref_t pool)
     tb_assert_and_check_return(impl);
 
     // the iterator
-    tb_iterator_ref_t iterator = tb_list_entry_itor(&impl->pages);
+    tb_iterator_ref_t iterator = tb_list_entry_itor(&impl->data_list);
     tb_assert_and_check_return(iterator);
 
     // walk it
@@ -260,7 +253,7 @@ tb_void_t tb_native_large_pool_clear(tb_large_pool_ref_t pool)
     while (itor != tb_iterator_tail(iterator))
     {
         // the data head
-        tb_native_page_data_head_t* data_head = (tb_native_page_data_head_t*)tb_iterator_item(iterator, itor);
+        tb_native_large_data_head_t* data_head = (tb_native_large_data_head_t*)tb_iterator_item(iterator, itor);
         tb_assert_and_check_break(data_head);
 
         // save next
@@ -273,11 +266,11 @@ tb_void_t tb_native_large_pool_clear(tb_large_pool_ref_t pool)
         itor = next;
     }
 }
-tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return_val(impl && impl->pagesize, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
 
     // done 
 #ifdef __tb_debug__
@@ -286,10 +279,10 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
     tb_size_t                   patch = 0;
 #endif
     tb_bool_t                   ok = tb_false;
-    tb_size_t                   need = sizeof(tb_native_page_data_head_t) + size + patch;
+    tb_size_t                   need = sizeof(tb_native_large_data_head_t) + size + patch;
     tb_byte_t*                  data = tb_null;
     tb_byte_t*                  data_real = tb_null;
-    tb_native_page_data_head_t* data_head = tb_null;
+    tb_native_large_data_head_t* data_head = tb_null;
     do
     {
 #ifdef __tb_debug__
@@ -303,13 +296,12 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         tb_assert_and_check_break(!(((tb_size_t)data) & 0x1));
 
         // make the real data
-        data_real = data + sizeof(tb_native_page_data_head_t);
+        data_real = data + sizeof(tb_native_large_data_head_t);
 
         // init the data head
-        data_head = (tb_native_page_data_head_t*)data;
+        data_head = (tb_native_large_data_head_t*)data;
         data_head->base.size            = (tb_uint32_t)size;
         data_head->base.cstr            = 0;
-        data_head->base.free            = 0;
 #ifdef __tb_debug__
         data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
         data_head->base.debug.file      = file_;
@@ -326,8 +318,11 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         // save pool reference for checking data range
         data_head->pool = (tb_pointer_t)pool;
 
-        // save the data to the pages
-        tb_list_entry_insert_tail(&impl->pages, &data_head->entry);
+        // save the data to the data_list
+        tb_list_entry_insert_tail(&impl->data_list, &data_head->entry);
+
+        // save the real size
+        if (real) *real = size;
 
 #ifdef __tb_debug__
         // update the occupied size
@@ -361,11 +356,11 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
     // ok?
     return (tb_pointer_t)data_real;
 }
-tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return_val(impl && impl->pagesize, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
 
     // done 
 #ifdef __tb_debug__
@@ -375,14 +370,14 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 #endif
     tb_bool_t                   ok = tb_false;
     tb_bool_t                   removed = tb_false;
-    tb_size_t                   need = sizeof(tb_native_page_data_head_t) + size + patch;
+    tb_size_t                   need = sizeof(tb_native_large_data_head_t) + size + patch;
     tb_byte_t*                  data_real = tb_null;
-    tb_native_page_data_head_t* data_head = tb_null;
+    tb_native_large_data_head_t* data_head = tb_null;
     do
     {
         // the data head
-        data_head = &(((tb_native_page_data_head_t*)data)[-1]);
-        tb_assertf_and_check_break(!data_head->base.free, "ralloc freed data: %p", data);
+        data_head = &(((tb_native_large_data_head_t*)data)[-1]);
+        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "ralloc freed data: %p", data);
         tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
         tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)pool, "the data: %p not belong to pool: %p", data, pool);
         tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
@@ -398,8 +393,8 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         tb_native_large_pool_check_next(impl, data_head);
 #endif
 
-        // remove the data from the pages
-        tb_list_entry_remove(&impl->pages, &data_head->entry);
+        // remove the data from the data_list
+        tb_list_entry_remove(&impl->data_list, &data_head->entry);
         removed = tb_true;
 
         // ralloc data
@@ -408,10 +403,10 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         tb_assert_and_check_break(!(((tb_size_t)data) & 0x1));
 
         // update the real data
-        data_real = data + sizeof(tb_native_page_data_head_t);
+        data_real = data + sizeof(tb_native_large_data_head_t);
 
         // update the data head
-        data_head = (tb_native_page_data_head_t*)data;
+        data_head = (tb_native_large_data_head_t*)data;
         data_head->base.size            = (tb_uint32_t)size;
 #ifdef __tb_debug__
         data_head->base.debug.file      = file_;
@@ -428,9 +423,12 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         tb_memset(data_real, TB_POOL_DATA_PATCH, size + 1);
 #endif
 
-        // save the data to the pages
-        tb_list_entry_insert_tail(&impl->pages, &data_head->entry);
+        // save the data to the data_list
+        tb_list_entry_insert_tail(&impl->data_list, &data_head->entry);
         removed = tb_false;
+
+        // save the real size
+        if (real) *real = size;
 
 #ifdef __tb_debug__
         // update the occupied size
@@ -455,8 +453,8 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
     // failed?
     if (!ok)
     {
-        // restore data to pages
-        if (data_head && removed) tb_list_entry_insert_tail(&impl->pages, &data_head->entry);
+        // restore data to data_list
+        if (data_head && removed) tb_list_entry_insert_tail(&impl->data_list, &data_head->entry);
 
         // clear it
         data = tb_null;
@@ -470,19 +468,19 @@ tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
 {
     // check
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return_val(impl && impl->pagesize, tb_false);
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // done
     tb_bool_t                   ok = tb_false;
-    tb_native_page_data_head_t* data_head = tb_null;
+    tb_native_large_data_head_t* data_head = tb_null;
     do
     {
         // no data?
         tb_assert_and_check_break(data);
 
         // the data head
-        data_head = &(((tb_native_page_data_head_t*)data)[-1]);
-        tb_assertf_and_check_break(!data_head->base.free, "double free data: %p", data);
+        data_head = &(((tb_native_large_data_head_t*)data)[-1]);
+        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
         tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
         tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)pool, "the data: %p not belong to pool: %p", data, pool);
         tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
@@ -496,13 +494,15 @@ tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
 
         // check the next data
         tb_native_large_pool_check_next(impl, data_head);
+
+        // for checking double-free
+        data_head->base.debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
 #endif
 
-        // remove the data from the pages
-        tb_list_entry_remove(&impl->pages, &data_head->entry);
+        // remove the data from the data_list
+        tb_list_entry_remove(&impl->data_list, &data_head->entry);
 
         // free it
-        data_head->base.free = 1;
         tb_native_memory_free(data_head);
 
 #ifdef __tb_debug__
@@ -528,8 +528,8 @@ tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
     // trace
     tb_trace_i("======================================================================");
 
-    // exit all pages
-    tb_for_all_if (tb_native_page_data_head_t*, data_head, tb_list_entry_itor(&impl->pages), data_head)
+    // exit all data_list
+    tb_for_all_if (tb_native_large_data_head_t*, data_head, tb_list_entry_itor(&impl->data_list), data_head)
     {
         // check it
         tb_native_large_pool_check_data(impl, data_head);
