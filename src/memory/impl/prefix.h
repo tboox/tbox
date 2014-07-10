@@ -45,7 +45,7 @@
 #define TB_POOL_DATA_PATCH          (0xcc)
 
 // the pool data size maximum 
-#define TB_POOL_DATA_SIZE_MAXN      (1 << 31)
+#define TB_POOL_DATA_SIZE_MAXN      (TB_MAXU32)
 
 // the pool data address alignment 
 #define TB_POOL_DATA_ALIGN          TB_CPU_BITBYTE
@@ -76,8 +76,8 @@ typedef struct __tb_pool_data_debug_head_t
 }tb_pool_data_debug_head_t;
 #endif
 
-// TODO remove align, the pool data head type
-typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_pool_data_head_t
+// the pool data head type
+typedef struct __tb_pool_data_head_t
 {
 #ifdef __tb_debug__
     // the debug head
@@ -85,12 +85,9 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_pool_data_head_t
 #endif
 
     // the size
-    tb_uint32_t                 size : 31;
+    tb_uint32_t                 size;
 
-    // is cstr?
-    tb_uint32_t                 cstr : 1;
-
-}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_pool_data_head_t;
+}tb_pool_data_head_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -110,11 +107,7 @@ tb_void_t                       tb_pool_data_dump(tb_byte_t const* data, tb_bool
  * @param data_head             the data head
  * @param skip_frames           the skiped frame count
  */
-static tb_void_t __tb_inline__  tb_pool_data_save_backtrace(tb_pool_data_head_t* data_head, tb_size_t skip_frames)
-{ 
-    tb_size_t nframe = tb_backtrace_frames(data_head->debug.backtrace, tb_arrayn(data_head->debug.backtrace), skip_frames); 
-    if (nframe < tb_arrayn(data_head->debug.backtrace)) tb_memset(data_head->debug.backtrace + nframe, 0, (tb_arrayn(data_head->debug.backtrace) - nframe) * sizeof(tb_cpointer_t)); 
-}
+tb_void_t                       tb_pool_data_save_backtrace(tb_pool_data_head_t* data_head, tb_size_t skip_frames);
 
 #endif
 

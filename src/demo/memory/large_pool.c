@@ -8,8 +8,8 @@
  */ 
 
 // init pool
-#if 0
-#   define tb_demo_init_pool()      tb_large_pool_init((tb_byte_t*)malloc(10 * 1024 * 1024), 10 * 1024 * 1024)
+#if 1
+#   define tb_demo_init_pool()      tb_large_pool_init((tb_byte_t*)malloc(500 * 1024 * 1024), 500 * 1024 * 1024)
 #else
 #   define tb_demo_init_pool()      tb_large_pool_init(tb_null, 0)
 #endif
@@ -163,7 +163,7 @@ tb_void_t tb_demo_large_pool_perf()
 
         // done 
         __tb_volatile__ tb_byte_t*  data = tb_null;
-        __tb_volatile__ tb_size_t   maxn = 100000;
+        __tb_volatile__ tb_size_t   maxn = 10000;
         __tb_volatile__ tb_size_t   size = 0;
         __tb_volatile__ tb_size_t   pagesize = tb_page_size();
         __tb_volatile__ tb_hong_t   time = tb_mclock();
