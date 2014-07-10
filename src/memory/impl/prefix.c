@@ -189,4 +189,9 @@ tb_void_t tb_pool_data_dump(tb_byte_t const* data, tb_bool_t verbose, tb_char_t 
 
     } while (0);
 }
+tb_void_t tb_pool_data_save_backtrace(tb_pool_data_head_t* data_head, tb_size_t skip_frames)
+{ 
+    tb_size_t nframe = tb_backtrace_frames(data_head->debug.backtrace, tb_arrayn(data_head->debug.backtrace), skip_frames + 2); 
+    if (nframe < tb_arrayn(data_head->debug.backtrace)) tb_memset(data_head->debug.backtrace + nframe, 0, (tb_arrayn(data_head->debug.backtrace) - nframe) * sizeof(tb_cpointer_t)); 
+}
 #endif

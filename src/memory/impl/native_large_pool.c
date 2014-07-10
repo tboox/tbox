@@ -46,7 +46,7 @@
  * types
  */
 
-// the native page data head type
+// the native large data head type
 typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_large_data_head_t
 {
     // the pool reference
@@ -196,8 +196,8 @@ static tb_void_t tb_native_large_pool_check_next(tb_native_large_pool_impl_t* im
 tb_large_pool_ref_t tb_native_large_pool_init()
 {
     // done
-    tb_bool_t                   ok = tb_false;
-    tb_native_large_pool_impl_t* impl = tb_null;
+    tb_bool_t                       ok = tb_false;
+    tb_native_large_pool_impl_t*    impl = tb_null;
     do
     {
         // check
@@ -274,15 +274,15 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
 
     // done 
 #ifdef __tb_debug__
-    tb_size_t                   patch = 1; // patch 0xcc
+    tb_size_t                       patch = 1; // patch 0xcc
 #else
-    tb_size_t                   patch = 0;
+    tb_size_t                       patch = 0;
 #endif
-    tb_bool_t                   ok = tb_false;
-    tb_size_t                   need = sizeof(tb_native_large_data_head_t) + size + patch;
-    tb_byte_t*                  data = tb_null;
-    tb_byte_t*                  data_real = tb_null;
-    tb_native_large_data_head_t* data_head = tb_null;
+    tb_bool_t                       ok = tb_false;
+    tb_size_t                       need = sizeof(tb_native_large_data_head_t) + size + patch;
+    tb_byte_t*                      data = tb_null;
+    tb_byte_t*                      data_real = tb_null;
+    tb_native_large_data_head_t*    data_head = tb_null;
     do
     {
 #ifdef __tb_debug__
@@ -301,7 +301,6 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         // init the data head
         data_head = (tb_native_large_data_head_t*)data;
         data_head->base.size            = (tb_uint32_t)size;
-        data_head->base.cstr            = 0;
 #ifdef __tb_debug__
         data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
         data_head->base.debug.file      = file_;
@@ -312,7 +311,7 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         tb_pool_data_save_backtrace(&data_head->base, 2);
 
         // make the dirty data and patch 0xcc for checking underflow
-        tb_memset(data_real, TB_POOL_DATA_PATCH, size + 1);
+        tb_memset(data_real, TB_POOL_DATA_PATCH, size + patch);
 #endif
 
         // save pool reference for checking data range
@@ -326,16 +325,15 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
 
 #ifdef __tb_debug__
         // update the occupied size
-        tb_size_t occupied_size = need - sizeof(tb_pool_data_debug_head_t) - patch;
-        impl->occupied_size += occupied_size;
+        impl->occupied_size += need - sizeof(tb_pool_data_debug_head_t) - patch;
 
-        // update total size
+        // update the total size
         impl->total_size    += size;
 
-        // update peak size
-        if (occupied_size > impl->peak_size) impl->peak_size = occupied_size;
+        // update the peak size
+        if (impl->total_size > impl->peak_size) impl->peak_size = impl->total_size;
 
-        // update malloc count
+        // update the malloc count
         impl->malloc_count++;
 #endif
 
@@ -364,15 +362,15 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 
     // done 
 #ifdef __tb_debug__
-    tb_size_t                   patch = 1; // patch 0xcc
+    tb_size_t                       patch = 1; // patch 0xcc
 #else
-    tb_size_t                   patch = 0;
+    tb_size_t                       patch = 0;
 #endif
-    tb_bool_t                   ok = tb_false;
-    tb_bool_t                   removed = tb_false;
-    tb_size_t                   need = sizeof(tb_native_large_data_head_t) + size + patch;
-    tb_byte_t*                  data_real = tb_null;
-    tb_native_large_data_head_t* data_head = tb_null;
+    tb_bool_t                       ok = tb_false;
+    tb_bool_t                       removed = tb_false;
+    tb_size_t                       need = sizeof(tb_native_large_data_head_t) + size + patch;
+    tb_byte_t*                      data_real = tb_null;
+    tb_native_large_data_head_t*    data_head = tb_null;
     do
     {
         // the data head
@@ -391,6 +389,12 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 
         // check the next data
         tb_native_large_pool_check_next(impl, data_head);
+
+        // update the occupied size
+        impl->occupied_size -= data_head->base.size;
+ 
+        // update the total size
+        impl->total_size    -= data_head->base.size;
 #endif
 
         // remove the data from the data_list
@@ -432,16 +436,15 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 
 #ifdef __tb_debug__
         // update the occupied size
-        tb_size_t occupied_size = need - sizeof(tb_pool_data_debug_head_t) - patch;
-        impl->occupied_size += occupied_size;
+        impl->occupied_size += size;
 
-        // update total size
+        // update the total size
         impl->total_size    += size;
 
-        // update peak size
-        if (occupied_size > impl->peak_size) impl->peak_size = occupied_size;
+        // update the peak size
+        if (impl->total_size > impl->peak_size) impl->peak_size = impl->total_size;
 
-        // update ralloc count
+        // update the ralloc count
         impl->ralloc_count++;
 #endif
 
@@ -468,16 +471,13 @@ tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
 {
     // check
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return_val(impl, tb_false);
+    tb_assert_and_check_return_val(impl && data, tb_false);
 
     // done
-    tb_bool_t                   ok = tb_false;
-    tb_native_large_data_head_t* data_head = tb_null;
+    tb_bool_t                       ok = tb_false;
+    tb_native_large_data_head_t*    data_head = tb_null;
     do
     {
-        // no data?
-        tb_assert_and_check_break(data);
-
         // the data head
         data_head = &(((tb_native_large_data_head_t*)data)[-1]);
         tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
@@ -497,6 +497,15 @@ tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
 
         // for checking double-free
         data_head->base.debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
+
+        // update the occupied size
+        impl->occupied_size -= sizeof(tb_native_large_data_head_t) - sizeof(tb_pool_data_debug_head_t) + data_head->base.size;
+ 
+        // update the total size
+        impl->total_size    -= data_head->base.size;
+   
+        // update the free count
+        impl->free_count++;
 #endif
 
         // remove the data from the data_list
@@ -504,11 +513,6 @@ tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
 
         // free it
         tb_native_memory_free(data_head);
-
-#ifdef __tb_debug__
-        // update free count
-        impl->free_count++;
-#endif
 
         // ok
         ok = tb_true;
