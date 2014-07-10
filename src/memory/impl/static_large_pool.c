@@ -17,19 +17,19 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        static_page_pool.c
+ * @file        static_large_pool.c
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME            "static_page_pool"
+#define TB_TRACE_MODULE_NAME            "static_large_pool"
 #define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "static_page_pool.h"
+#include "static_large_pool.h"
 
 /*! the static page pool impl type
  *
@@ -74,7 +74,7 @@
  *
  * </pre>
  */
-typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_page_pool_impl_t
+typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_large_pool_impl_t
 {
     // the data size
     tb_size_t                       data_size;
@@ -108,12 +108,12 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_page_pool_impl_t
     tb_size_t                       free_count;
 #endif
 
-}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_static_page_pool_impl_t;
+}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_static_large_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * malloc implementation
  */
-static tb_pool_data_head_t* tb_static_page_pool_malloc_find(tb_static_page_pool_impl_t* impl, tb_pool_data_head_t* data_head, tb_size_t walk_size, tb_size_t size)
+static tb_pool_data_head_t* tb_static_large_pool_malloc_find(tb_static_large_pool_impl_t* impl, tb_pool_data_head_t* data_head, tb_size_t walk_size, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(impl && data_head && size, tb_null);
@@ -182,7 +182,7 @@ static tb_pool_data_head_t* tb_static_page_pool_malloc_find(tb_static_page_pool_
     // fail
     return tb_null;
 }
-static tb_pointer_t tb_static_page_pool_malloc_done(tb_static_page_pool_impl_t* impl, tb_size_t size __tb_debug_decl__)
+static tb_pointer_t tb_static_large_pool_malloc_done(tb_static_large_pool_impl_t* impl, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->data_head, tb_null);
@@ -203,7 +203,7 @@ static tb_pointer_t tb_static_page_pool_malloc_done(tb_static_page_pool_impl_t* 
         // ...
 
         // find the free data from the first data head 
-        data_head = tb_static_page_pool_malloc_find(impl, impl->data_head, -1, need);
+        data_head = tb_static_large_pool_malloc_find(impl, impl->data_head, -1, need);
         tb_check_break(data_head);
 
         // the real data
@@ -245,29 +245,29 @@ static tb_pointer_t tb_static_page_pool_malloc_done(tb_static_page_pool_impl_t* 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_page_pool_ref_t tb_static_page_pool_init(tb_byte_t* data, tb_size_t size)
+tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(data && size, tb_null);
     tb_assert_static(!(sizeof(tb_pool_data_head_t) & (TB_POOL_DATA_ALIGN - 1)));
-    tb_assert_static(!(sizeof(tb_static_page_pool_impl_t) & (TB_POOL_DATA_ALIGN - 1)));
+    tb_assert_static(!(sizeof(tb_static_large_pool_impl_t) & (TB_POOL_DATA_ALIGN - 1)));
 
     // align data and size
     tb_size_t diff = tb_align((tb_size_t)data, TB_POOL_DATA_ALIGN) - (tb_size_t)data;
-    tb_assert_and_check_return_val(size > diff + sizeof(tb_static_page_pool_impl_t) + sizeof(tb_pool_data_head_t), tb_null);
+    tb_assert_and_check_return_val(size > diff + sizeof(tb_static_large_pool_impl_t) + sizeof(tb_pool_data_head_t), tb_null);
     size -= diff;
     data += diff;
 
     // init pool
-    tb_static_page_pool_impl_t* impl = (tb_static_page_pool_impl_t*)data;
-    tb_memset(impl, 0, sizeof(tb_static_page_pool_impl_t));
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)data;
+    tb_memset(impl, 0, sizeof(tb_static_large_pool_impl_t));
 
     // init pagesize
     impl->pagesize = tb_page_size();
     tb_assert_and_check_return_val(impl->pagesize, tb_null);
 
     // init data size
-    impl->data_size = size - sizeof(tb_static_page_pool_impl_t) - sizeof(tb_pool_data_head_t);
+    impl->data_size = size - sizeof(tb_static_large_pool_impl_t) - sizeof(tb_pool_data_head_t);
     tb_assert_and_check_return_val(impl->data_size > impl->pagesize, tb_null);
 
     // init data head 
@@ -281,21 +281,21 @@ tb_page_pool_ref_t tb_static_page_pool_init(tb_byte_t* data, tb_size_t size)
     impl->data_tail = (tb_pool_data_head_t*)((tb_byte_t*)&impl->data_head[1] + impl->data_head->size);
 
     // ok
-    return (tb_page_pool_ref_t)impl;
+    return (tb_large_pool_ref_t)impl;
 }
-tb_void_t tb_static_page_pool_exit(tb_page_pool_ref_t pool)
+tb_void_t tb_static_large_pool_exit(tb_large_pool_ref_t pool)
 {
     // check
-    tb_static_page_pool_impl_t* impl = (tb_static_page_pool_impl_t*)pool;
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
     tb_assert_and_check_return(impl);
 
     // clear it
-    tb_static_page_pool_clear(pool);
+    tb_static_large_pool_clear(pool);
 }
-tb_void_t tb_static_page_pool_clear(tb_page_pool_ref_t pool)
+tb_void_t tb_static_large_pool_clear(tb_large_pool_ref_t pool)
 {
     // check
-    tb_static_page_pool_impl_t* impl = (tb_static_page_pool_impl_t*)pool;
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
     tb_assert_and_check_return(impl && impl->data_head && impl->data_size > impl->pagesize);
 
     // clear it
@@ -303,28 +303,28 @@ tb_void_t tb_static_page_pool_clear(tb_page_pool_ref_t pool)
     impl->data_head->cstr = 0;
     impl->data_head->size = impl->data_size;
 }
-tb_pointer_t tb_static_page_pool_malloc(tb_page_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_static_page_pool_impl_t* impl = (tb_static_page_pool_impl_t*)pool;
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl, tb_null);
 
     // done
-    return tb_static_page_pool_malloc_done(impl, size __tb_debug_args__);
+    return tb_static_large_pool_malloc_done(impl, size __tb_debug_args__);
 }
-tb_pointer_t tb_static_page_pool_ralloc(tb_page_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     return tb_null;
 }
-tb_bool_t tb_static_page_pool_free(tb_page_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
+tb_bool_t tb_static_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
 {
     return tb_false;
 }
 #ifdef __tb_debug__
-tb_void_t tb_static_page_pool_dump(tb_page_pool_ref_t pool)
+tb_void_t tb_static_large_pool_dump(tb_large_pool_ref_t pool)
 {
     // check
-    tb_static_page_pool_impl_t* impl = (tb_static_page_pool_impl_t*)pool;
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
     tb_assert_and_check_return(impl);
 
     // trace

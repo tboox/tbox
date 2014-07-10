@@ -17,10 +17,10 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        static_page_pool.h
+ * @file        static_large_pool.h
  */
-#ifndef TB_MEMORY_IMPL_STATIC_PAGE_POOL_H
-#define TB_MEMORY_IMPL_STATIC_PAGE_POOL_H
+#ifndef TB_MEMORY_IMPL_STATIC_LARGE_POOL_H
+#define TB_MEMORY_IMPL_STATIC_LARGE_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -43,19 +43,19 @@ __tb_extern_c_enter__
  *
  * @return              the pool 
  */
-tb_page_pool_ref_t      tb_static_page_pool_init(tb_byte_t* data, tb_size_t size);
+tb_large_pool_ref_t      tb_static_large_pool_init(tb_byte_t* data, tb_size_t size);
 
 /* exit the pool
  *
  * @param pool          the pool 
  */
-tb_void_t               tb_static_page_pool_exit(tb_page_pool_ref_t pool);
+tb_void_t               tb_static_large_pool_exit(tb_large_pool_ref_t pool);
 
 /* clear the pool
  *
  * @param pool          the pool 
  */
-tb_void_t               tb_static_page_pool_clear(tb_page_pool_ref_t pool);
+tb_void_t               tb_static_large_pool_clear(tb_large_pool_ref_t pool);
 
 /* malloc data
  *
@@ -64,7 +64,7 @@ tb_void_t               tb_static_page_pool_clear(tb_page_pool_ref_t pool);
  *
  * @return              the data 
  */
-tb_pointer_t            tb_static_page_pool_malloc(tb_page_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
 
 /* realloc data
  *
@@ -74,7 +74,7 @@ tb_pointer_t            tb_static_page_pool_malloc(tb_page_pool_ref_t pool, tb_s
  *
  * @return              the new data address 
  */
-tb_pointer_t            tb_static_page_pool_ralloc(tb_page_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_pointer_t            tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /* free data
  *
@@ -83,7 +83,7 @@ tb_pointer_t            tb_static_page_pool_ralloc(tb_page_pool_ref_t pool, tb_p
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_static_page_pool_free(tb_page_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
+tb_bool_t               tb_static_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /* dump the pool
@@ -91,7 +91,7 @@ tb_bool_t               tb_static_page_pool_free(tb_page_pool_ref_t pool, tb_poi
  * @param handle        the pool
  * @param prefix        the trace prefix
  */
-tb_void_t               tb_static_page_pool_dump(tb_page_pool_ref_t pool);
+tb_void_t               tb_static_large_pool_dump(tb_large_pool_ref_t pool);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
