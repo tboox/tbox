@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        static_fixed_pool.h
+ * @file        static_fixed_pool_old.h
  * @ingroup     memory
  *
  */
-#ifndef TB_MEMORY_STATIC_FIXED_POOL_H
-#define TB_MEMORY_STATIC_FIXED_POOL_H
+#ifndef TB_MEMORY_STATIC_FIXED_POOL_OLD_H
+#define TB_MEMORY_STATIC_FIXED_POOL_OLD_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -45,7 +45,7 @@ __tb_extern_c_enter__
  *    head          used                            data     
  * </pre>
  */
-typedef struct{}*           tb_static_fixed_pool_ref_t;
+typedef struct{}*           tb_static_fixed_pool_old_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -60,13 +60,13 @@ typedef struct{}*           tb_static_fixed_pool_ref_t;
  *
  * @return                  the pool handle
  */
-tb_static_fixed_pool_ref_t  tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align);
+tb_static_fixed_pool_old_ref_t  tb_static_fixed_pool_old_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align);
 
 /*! exit pool
  *
  * @param handle            the pool handle
  */
-tb_void_t                   tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t pool);
+tb_void_t                   tb_static_fixed_pool_old_exit(tb_static_fixed_pool_old_ref_t pool);
 
 /*! the pool item count
  *
@@ -74,13 +74,13 @@ tb_void_t                   tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t
  *
  * @return                  the item count
  */
-tb_size_t                   tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t pool);
+tb_size_t                   tb_static_fixed_pool_old_size(tb_static_fixed_pool_old_ref_t pool);
 
 /*! clear pool
  *
  * @param handle            the pool handle
  */
-tb_void_t                   tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool);
+tb_void_t                   tb_static_fixed_pool_old_clear(tb_static_fixed_pool_old_ref_t pool);
 
 /*! malloc pool data
  *
@@ -88,7 +88,7 @@ tb_void_t                   tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_
  * 
  * @return                  the data pointer
  */
-tb_pointer_t                tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool);
+tb_pointer_t                tb_static_fixed_pool_old_malloc(tb_static_fixed_pool_old_ref_t pool);
 
 /*! malloc pool data and clear it
  *
@@ -96,7 +96,7 @@ tb_pointer_t                tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref
  *
  * @return                  the data pointer
  */
-tb_pointer_t                tb_static_fixed_pool_malloc0(tb_static_fixed_pool_ref_t pool);
+tb_pointer_t                tb_static_fixed_pool_old_malloc0(tb_static_fixed_pool_old_ref_t pool);
 
 /*! duplicate pool data 
  *
@@ -105,7 +105,7 @@ tb_pointer_t                tb_static_fixed_pool_malloc0(tb_static_fixed_pool_re
  *
  * @return                  the duplicated data pointer
  */
-tb_pointer_t                tb_static_fixed_pool_memdup(tb_static_fixed_pool_ref_t pool, tb_cpointer_t data);
+tb_pointer_t                tb_static_fixed_pool_old_memdup(tb_static_fixed_pool_old_ref_t pool, tb_cpointer_t data);
 
 /*! free pool data
  *
@@ -114,12 +114,12 @@ tb_pointer_t                tb_static_fixed_pool_memdup(tb_static_fixed_pool_ref
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_t data);
+tb_bool_t                   tb_static_fixed_pool_old_free(tb_static_fixed_pool_old_ref_t pool, tb_pointer_t data);
 
 /*! walk pool item
  *
  * @code
- * tb_bool_t tb_static_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
+ * tb_bool_t tb_static_fixed_pool_old_item_func(tb_pointer_t item, tb_cpointer_t priv)
  * {
  *      // ok or break
  *      return tb_true;
@@ -131,14 +131,14 @@ tb_bool_t                   tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t
  * @param priv              the walk data
  *
  */
-tb_void_t                   tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_bool_t (*func)(tb_pointer_t , tb_cpointer_t ), tb_cpointer_t priv);
+tb_void_t                   tb_static_fixed_pool_old_walk(tb_static_fixed_pool_old_ref_t pool, tb_bool_t (*func)(tb_pointer_t , tb_cpointer_t ), tb_cpointer_t priv);
 
 #ifdef __tb_debug__
 /*! dump pool
  *
  * @param handle            the pool handle
  */
-tb_void_t                   tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool);
+tb_void_t                   tb_static_fixed_pool_old_dump(tb_static_fixed_pool_old_ref_t pool);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

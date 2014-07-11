@@ -28,16 +28,19 @@
  * includes
  */
 #include "prefix.h"
-#include "large_pool.h"
-#include "global_pool.h"
-#include "static_pool.h"
-#include "static_fixed_pool.h"
 #include "pool.h"
 #include "fixed_pool.h"
+#include "large_pool.h"
 #include "string_pool.h"
 #include "buffer.h"
 #include "queue_buffer.h"
 #include "static_buffer.h"
+
+// discarded
+#include "global_pool.h"
+#include "static_pool.h"
+#include "static_fixed_pool_old.h"
+#include "fixed_pool_old.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

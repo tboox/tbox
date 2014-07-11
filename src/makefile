@@ -15,16 +15,18 @@ tbox_C_FILES 			+= \
 						math/random/random \
 						math/random/linear \
 						prefix/state \
+						memory/pool \
+						memory/fixed_pool \
 						memory/large_pool \
+						memory/string_pool \
 						memory/impl/prefix \
+						memory/impl/static_fixed_pool \
 						memory/impl/static_large_pool \
 						memory/impl/native_large_pool \
 						memory/static_pool \
-						memory/static_fixed_pool \
-						memory/pool \
-						memory/fixed_pool \
+						memory/static_fixed_pool_old \
+						memory/fixed_pool_old \
 						memory/global_pool \
-						memory/string_pool \
 						memory/memory \
 						memory/buffer \
 						memory/static_buffer \
@@ -439,12 +441,10 @@ INC_FILES 				= \
 						prefix/asm/cache.h \
 						prefix/asm/arm/prefix.h \
 						prefix/asm/arm/prefix.S \
-						memory/large_pool.h \
-						memory/static_pool.h \
-						memory/static_fixed_pool.h \
- 						memory/global_pool.h \
 						memory/pool.h \
 						memory/fixed_pool.h \
+						memory/large_pool.h \
+						memory/static_pool.h \
 						memory/string_pool.h \
 						memory/prefix.h \
 						memory/memory.h \

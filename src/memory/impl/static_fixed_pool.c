@@ -17,21 +17,24 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        fixed_pool.c
- * @ingroup     memory
+ * @file        static_fixed_pool.c
+ *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME            "fixed_pool"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_NAME            "static_fixed_pool"
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "fixed_pool.h"
-#include "impl/static_fixed_pool.h"
+#include "static_fixed_pool.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -40,35 +43,35 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_fixed_pool_ref_t tb_fixed_pool_init(tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
+tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
 {
     return tb_null;
 }
-tb_void_t tb_fixed_pool_exit(tb_fixed_pool_ref_t pool)
+tb_void_t tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t pool)
 {
 }
-tb_size_t tb_fixed_pool_size(tb_fixed_pool_ref_t pool)
+tb_size_t tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t pool)
 {
     return 0;
 }
-tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t pool)
+tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool)
 {
 }
-tb_pointer_t tb_fixed_pool_malloc_(tb_fixed_pool_ref_t pool __tb_debug_decl__)
-{
-    return tb_null;
-}
-tb_pointer_t tb_fixed_pool_malloc0_(tb_fixed_pool_ref_t pool __tb_debug_decl__)
+tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_debug_decl__)
 {
     return tb_null;
 }
-tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t item __tb_debug_decl__)
+tb_pointer_t tb_static_fixed_pool_malloc0(tb_static_fixed_pool_ref_t pool __tb_debug_decl__)
+{
+    return tb_null;
+}
+tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_t item __tb_debug_decl__)
 {
     return tb_false;
 }
-tb_void_t tb_fixed_pool_walk(tb_fixed_pool_ref_t pool, tb_fixed_pool_item_walk_func_t func, tb_cpointer_t priv)
+tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_fixed_pool_item_walk_func_t func, tb_cpointer_t priv)
 {
 }
-tb_void_t tb_fixed_pool_dump(tb_fixed_pool_ref_t pool)
+tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
 {
 }

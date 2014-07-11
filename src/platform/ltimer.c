@@ -121,7 +121,7 @@ typedef struct __tb_ltimer_impl_t
     tb_spinlock_t               lock;
 
     // the pool
-    tb_fixed_pool_ref_t         pool;
+    tb_fixed_pool_old_ref_t         pool;
 
     // the expired tasks
     tb_vector_ref_t             expired;
@@ -164,7 +164,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_impl_t* impl, tb_ltimer_task_impl_
     do
     {
         // empty? move to the wheel head
-        if (!tb_fixed_pool_size(impl->pool)) 
+        if (!tb_fixed_pool_old_size(impl->pool)) 
         {
             impl->btime = tb_ltimer_now(impl);
             impl->wbase = 0;
@@ -309,7 +309,7 @@ static tb_bool_t tb_ltimer_expired_exit(tb_iterator_ref_t iterator, tb_pointer_t
             // refn--
             if (task_impl->refn > 1) task_impl->refn--;
             // remove it from pool directly
-            else tb_fixed_pool_free(impl->pool, task_impl);
+            else tb_fixed_pool_old_free(impl->pool, task_impl);
         }
     }
 
@@ -344,7 +344,7 @@ tb_ltimer_ref_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init pool
-        impl->pool         = tb_fixed_pool_init((maxn >> 2) + 16, sizeof(tb_ltimer_task_impl_t), 0);
+        impl->pool         = tb_fixed_pool_old_init((maxn >> 2) + 16, sizeof(tb_ltimer_task_impl_t), 0);
         tb_assert_and_check_break(impl->pool);
 
         // init the expired tasks
@@ -402,7 +402,7 @@ tb_void_t tb_ltimer_exit(tb_ltimer_ref_t timer)
     }
 
     // exit pool
-    if (impl->pool) tb_fixed_pool_exit(impl->pool);
+    if (impl->pool) tb_fixed_pool_old_exit(impl->pool);
     impl->pool = tb_null;
 
     // leave
@@ -440,7 +440,7 @@ tb_void_t tb_ltimer_clear(tb_ltimer_ref_t timer)
         }
 
         // clear pool
-        if (impl->pool) tb_fixed_pool_clear(impl->pool);
+        if (impl->pool) tb_fixed_pool_old_clear(impl->pool);
 
         // leave
         tb_spinlock_leave(&impl->lock);
@@ -487,7 +487,7 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t timer)
     do
     {
         // empty? move to the wheel head
-        if (!tb_fixed_pool_size(impl->pool))
+        if (!tb_fixed_pool_old_size(impl->pool))
         {
             impl->btime = now;
             impl->wbase = 0;
@@ -605,7 +605,7 @@ tb_ltimer_task_ref_t tb_ltimer_task_init_at(tb_ltimer_ref_t timer, tb_hize_t whe
     tb_spinlock_enter(&impl->lock);
 
     // make task
-    tb_ltimer_task_impl_t* task_impl = (tb_ltimer_task_impl_t*)tb_fixed_pool_malloc0(impl->pool);
+    tb_ltimer_task_impl_t* task_impl = (tb_ltimer_task_impl_t*)tb_fixed_pool_old_malloc0(impl->pool);
     if (task_impl)
     {
         // init task
@@ -621,7 +621,7 @@ tb_ltimer_task_ref_t tb_ltimer_task_init_at(tb_ltimer_ref_t timer, tb_hize_t whe
         // add task_impl
         if (!tb_ltimer_add_task(impl, task_impl))
         {
-            tb_fixed_pool_free(impl->pool, task_impl);
+            tb_fixed_pool_old_free(impl->pool, task_impl);
             task_impl = tb_null;
         }
     }
@@ -663,7 +663,7 @@ tb_void_t tb_ltimer_task_post_at(tb_ltimer_ref_t timer, tb_hize_t when, tb_size_
     tb_spinlock_enter(&impl->lock);
 
     // make task
-    tb_ltimer_task_impl_t* task_impl = (tb_ltimer_task_impl_t*)tb_fixed_pool_malloc0(impl->pool);
+    tb_ltimer_task_impl_t* task_impl = (tb_ltimer_task_impl_t*)tb_fixed_pool_old_malloc0(impl->pool);
     if (task_impl)
     {
         // init task
@@ -678,7 +678,7 @@ tb_void_t tb_ltimer_task_post_at(tb_ltimer_ref_t timer, tb_hize_t when, tb_size_
 
         // add task
         if (!tb_ltimer_add_task(impl, task_impl))
-            tb_fixed_pool_free(impl->pool, task_impl);
+            tb_fixed_pool_old_free(impl->pool, task_impl);
     }
 
     // leave
@@ -717,7 +717,7 @@ tb_void_t tb_ltimer_task_exit(tb_ltimer_ref_t timer, tb_ltimer_task_ref_t task)
         task_impl->repeat    = 0;
     }
     // remove it from pool directly if the task have been expired 
-    else tb_fixed_pool_free(impl->pool, task_impl);
+    else tb_fixed_pool_old_free(impl->pool, task_impl);
 
     // leave
     tb_spinlock_leave(&impl->lock);

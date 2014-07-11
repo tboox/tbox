@@ -37,16 +37,101 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_FIXED_POOL_GROW_MICRO                (128)
-#define TB_FIXED_POOL_GROW_SMALL                (1024)
-#define TB_FIXED_POOL_GROW_LARGE                (4096)
+#define tb_fixed_pool_malloc(pool)              tb_fixed_pool_malloc_(pool __tb_debug_vals__)
+#define tb_fixed_pool_malloc0(pool)             tb_fixed_pool_malloc0_(pool __tb_debug_vals__)
+#define tb_fixed_pool_free(pool, item)          tb_fixed_pool_free_(pool, item __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-/// the fixed pool ref type
-typedef struct{}*   tb_fixed_pool_ref_t;
+/*! the fixed pool ref type
+ * 
+ * <pre>
+ *
+ * current:
+ *         -----------
+ *        |           |
+ *  --------------    |
+ * |     slot     |<--
+ * |--------------|
+ * ||||||||||||||||  
+ * |--------------| 
+ * |              | 
+ * |--------------| 
+ * |              | 
+ * |--------------| 
+ * ||||||||||||||||  
+ * |--------------| 
+ * |||||||||||||||| 
+ * |--------------| 
+ * |              | 
+ *  --------------  
+ *
+ * partial:
+ *
+ *  --------------       --------------               --------------
+ * |     slot     | <=> |     slot     | <=> ... <=> |     slot     |
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     |              |             |              |
+ * |--------------|     |--------------|             |--------------|
+ * |              |     ||||||||||||||||             |              |
+ * |--------------|     |--------------|             |--------------|
+ * |              |     ||||||||||||||||             ||||||||||||||||
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     ||||||||||||||||             |              |
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     |              |             |              |
+ * |--------------|     |--------------|             |--------------|
+ * |              |     |              |             ||||||||||||||||
+ *  --------------       --------------               --------------
+ *
+ * full:
+ *
+ *  --------------       --------------               --------------
+ * |     slot     | <=> |     slot     | <=> ... <=> |     slot     |
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     ||||||||||||||||             ||||||||||||||||
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     ||||||||||||||||             ||||||||||||||||
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     ||||||||||||||||             ||||||||||||||||
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     ||||||||||||||||             ||||||||||||||||
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     ||||||||||||||||             ||||||||||||||||
+ * |--------------|     |--------------|             |--------------|
+ * ||||||||||||||||     ||||||||||||||||             ||||||||||||||||
+ *  --------------       --------------               --------------
+ *
+ * slot:
+ *
+ *  -------------- ------------------------>|
+ * |     head     |                         |
+ * |--------------|                         |
+ * |||   item     |                         |  
+ * |--------------|                         |
+ * |||   item     |                         |  
+ * |--------------|                         | data
+ * |||   item     |                         |  
+ * |--------------|                         | 
+ * |      ...     |                         |  
+ * |--------------|                         | 
+ * |||   item     |                         | 
+ *  -------------- ------------------------>|
+ *
+ * </pre>
+ */
+typedef struct{}*       tb_fixed_pool_ref_t;
+
+/// the item init func type
+typedef tb_bool_t       (*tb_fixed_pool_item_init_func_t)(tb_pointer_t item, tb_cpointer_t priv);
+
+/// the item exit func type
+typedef tb_void_t       (*tb_fixed_pool_item_exit_func_t)(tb_pointer_t item, tb_cpointer_t priv);
+
+/// the item walk func type
+typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t item, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -54,91 +139,83 @@ typedef struct{}*   tb_fixed_pool_ref_t;
 
 /*! init fixed pool
  *
- * @param grow      the grow, using the default grow if be zero
- * @param step      the step
- * @param align     the align
+ * @param slot_size     the item count per-slot, using the default size if be zero
+ * @param item_size     the item size
+ * @param item_init     the item init func
+ * @param item_exit     the item exit func
+ * @param priv          the private data
  *
- * @return          the pool 
+ * @return              the pool 
  */
-tb_fixed_pool_ref_t tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align);
+tb_fixed_pool_ref_t     tb_fixed_pool_init(tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
 
-/*! exit fixed pool
+/*! exit pool
  *
- * @param pool      the pool 
+ * @param pool          the pool 
  */
-tb_void_t           tb_fixed_pool_exit(tb_fixed_pool_ref_t pool);
+tb_void_t               tb_fixed_pool_exit(tb_fixed_pool_ref_t pool);
 
-/*! the fixed pool item count
+/*! the item count
  *
- * @param pool      the pool 
+ * @param pool          the pool 
  *
- * @return          the item count
+ * @return              the item count
  */
-tb_size_t           tb_fixed_pool_size(tb_fixed_pool_ref_t pool);
+tb_size_t               tb_fixed_pool_size(tb_fixed_pool_ref_t pool);
 
-/*! clear fixed pool
+/*! clear pool
  *
- * @param pool      the pool 
+ * @param pool          the pool 
  */
-tb_void_t           tb_fixed_pool_clear(tb_fixed_pool_ref_t pool);
+tb_void_t               tb_fixed_pool_clear(tb_fixed_pool_ref_t pool);
 
-/*! malloc fixed pool data
+/*! malloc item
  *
- * @param pool      the pool 
+ * @param pool          the pool 
  * 
- * @return          the data pointer
+ * @return              the item
  */
-tb_pointer_t        tb_fixed_pool_malloc(tb_fixed_pool_ref_t pool);
+tb_pointer_t            tb_fixed_pool_malloc_(tb_fixed_pool_ref_t pool __tb_debug_decl__);
 
-/*! malloc fixed pool data and clear it
+/*! malloc item and clear it
  *
- * @param pool      the pool 
+ * @param pool          the pool 
  *
- * @return          the data pointer
+ * @return              the item
  */
-tb_pointer_t        tb_fixed_pool_malloc0(tb_fixed_pool_ref_t pool);
+tb_pointer_t            tb_fixed_pool_malloc0_(tb_fixed_pool_ref_t pool __tb_debug_decl__);
 
-/*! duplicate fixed pool data 
+/*! free item
  *
- * @param pool      the pool 
- * @param data      the data pointer
+ * @param pool          the pool 
+ * @param item          the item
  *
- * @return          the duplicated data pointer
+ * @return              tb_true or tb_false
  */
-tb_pointer_t        tb_fixed_pool_memdup(tb_fixed_pool_ref_t pool, tb_cpointer_t data);
+tb_bool_t               tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t item __tb_debug_decl__);
 
-/*! free fixed pool data
- *
- * @param pool      the pool 
- * @param data      the pool item data
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_fixed_pool_free(tb_fixed_pool_ref_t pool, tb_pointer_t data);
-
-/*! walk fixed pool item
+/*! walk item
  *
  * @code
     tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
     {
-       // ok or break
-       return tb_true;
+        // ok or break
+        return tb_true;
     }
  * @endcode
  *
- * @param pool      the pool 
- * @param func      the walk func
- * @param priv      the walk data
- *
+ * @param pool          the pool 
+ * @param func          the walk func
+ * @param priv          the private data
  */
-tb_void_t           tb_fixed_pool_walk(tb_fixed_pool_ref_t pool, tb_bool_t (*func)(tb_pointer_t item, tb_cpointer_t data), tb_cpointer_t priv);
+tb_void_t               tb_fixed_pool_walk(tb_fixed_pool_ref_t pool, tb_fixed_pool_item_walk_func_t func, tb_cpointer_t priv);
 
 #ifdef __tb_debug__
-/*! dump fixed pool
+/*! dump pool
  *
- * @param pool      the pool 
+ * @param pool          the pool 
  */
-tb_void_t           tb_fixed_pool_dump(tb_fixed_pool_ref_t pool);
+tb_void_t               tb_fixed_pool_dump(tb_fixed_pool_ref_t pool);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

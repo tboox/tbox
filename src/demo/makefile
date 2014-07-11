@@ -32,16 +32,14 @@ demo_C_FILES 								+= \
 											string/string \
 											string/static_string \
 											memory/check \
-											memory/large_pool \
-											memory/fixed_pool \
 											memory/pool \
-											memory/global_pool \
+											memory/fixed_pool \
+											memory/large_pool \
+											memory/small_pool \
 											memory/string_pool \
-											memory/static_fixed_pool \
-											memory/static_pool \
 											memory/memops \
-											memory/queue_buffer \
 											memory/buffer \
+											memory/queue_buffer \
 											memory/static_buffer \
 											network/dns \
 											network/url \
