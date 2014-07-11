@@ -41,7 +41,7 @@ __tb_extern_c_enter__
  * 
  * @return              the pool 
  */
-tb_large_pool_ref_t      tb_native_large_pool_init(tb_noarg_t);
+tb_large_pool_ref_t     tb_native_large_pool_init(tb_noarg_t);
 
 /* exit the pool
  *

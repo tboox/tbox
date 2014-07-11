@@ -43,7 +43,7 @@ __tb_extern_c_enter__
  *
  * @return              the pool 
  */
-tb_large_pool_ref_t      tb_static_large_pool_init(tb_byte_t* data, tb_size_t size);
+tb_large_pool_ref_t     tb_static_large_pool_init(tb_byte_t* data, tb_size_t size);
 
 /* exit the pool
  *

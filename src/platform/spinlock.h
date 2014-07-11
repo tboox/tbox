@@ -49,7 +49,7 @@
  *
  * @return          tb_true or tb_false
  */
-static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_t* lock)
+static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert_and_check_return_val(lock, tb_false);
@@ -65,7 +65,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_t* lock)
  *
  * @param lock      the lock
  */
-static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_t* lock)
+static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert_and_check_return(lock);
@@ -78,7 +78,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_t* lock)
  *
  * @param lock      the lock
  */
-static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_t* lock)
+static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert_and_check_return(lock);
@@ -126,7 +126,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_t* lock)
  *
  * @param lock      the lock
  */
-static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinlock_t* lock)
+static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert_and_check_return(lock);
@@ -156,7 +156,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
  *
  * @return          tb_true or tb_false
  */
-static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_t* lock)
+static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert_and_check_return_val(lock, tb_false);
@@ -182,7 +182,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_t* lock)
  *
  * @return          tb_true or tb_false
  */
-static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_spinlock_t* lock)
+static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert_and_check_return_val(lock, tb_false);
@@ -195,7 +195,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_s
  *
  * @param lock      the lock
  */
-static __tb_inline_force__ tb_void_t tb_spinlock_leave(tb_spinlock_t* lock)
+static __tb_inline_force__ tb_void_t tb_spinlock_leave(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert_and_check_return(lock);

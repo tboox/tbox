@@ -140,6 +140,9 @@ typedef __tb_volatile__  __tb_aligned__(8) tb_hong_t    tb_atomic64_t;
 /// the spinlock type
 typedef tb_atomic_t                 tb_spinlock_t;
 
+/// the spinlock ref type
+typedef tb_spinlock_t*              tb_spinlock_ref_t;
+
 /// the file ref type
 typedef struct{}*                   tb_file_ref_t;
 

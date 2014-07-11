@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  */
 #define tb_fixed_pool_malloc(pool)              tb_fixed_pool_malloc_(pool __tb_debug_vals__)
 #define tb_fixed_pool_malloc0(pool)             tb_fixed_pool_malloc0_(pool __tb_debug_vals__)
-#define tb_fixed_pool_free(pool, item)          tb_fixed_pool_free_(pool, item __tb_debug_vals__)
+#define tb_fixed_pool_free(pool, item)          tb_fixed_pool_free_(pool, (tb_pointer_t)(item) __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types

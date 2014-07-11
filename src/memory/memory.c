@@ -40,10 +40,16 @@
  */
 
 // the pool
-static tb_global_pool_ref_t     g_pool = tb_null;
+static tb_global_pool_ref_t         g_pool = tb_null;
 
 // the lock
-static tb_spinlock_t            g_lock = TB_SPINLOCK_INIT; 
+static tb_spinlock_t                g_lock = TB_SPINLOCK_INIT; 
+
+// the large pool data
+__tb_extern_c__ extern tb_byte_t*   g_large_pool_data;
+
+// the large pool size
+__tb_extern_c__ extern tb_size_t    g_large_pool_size;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -57,6 +63,10 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
         // init the native memory
         if (!tb_native_memory_init()) break;
 
+        // init the large pool data
+        g_large_pool_data = data;
+        g_large_pool_size = size;
+
         // using pool?
         if (data && size)
         {
@@ -67,7 +77,7 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
             tb_assert(!g_pool);
 
             // init pool
-            tb_global_pool_ref_t pool = g_pool = tb_global_pool_init(data, size, align);
+            tb_global_pool_ref_t pool = g_pool = tb_global_pool_init(tb_null, 0, align);
 
             // leave
             tb_spinlock_leave(&g_lock);

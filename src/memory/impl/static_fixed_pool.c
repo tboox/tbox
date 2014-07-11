@@ -72,6 +72,8 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
 tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_fixed_pool_item_walk_func_t func, tb_cpointer_t priv)
 {
 }
+#ifdef __tb_debug__
 tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
 {
 }
+#endif
