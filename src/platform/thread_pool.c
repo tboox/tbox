@@ -172,7 +172,7 @@ typedef struct __tb_thread_pool_impl_t
     tb_spinlock_t           lock;
 
     // the jobs pool
-    tb_fixed_pool_ref_t     jobs_pool;
+    tb_fixed_pool_old_ref_t     jobs_pool;
 
     // the urgent jobs
     tb_single_list_ref_t    jobs_urgent;
@@ -329,7 +329,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_list_ref_t jobs, t
             tb_assert_and_check_return_val(impl, tb_false);
 
             // remove it from the jobs pool
-            tb_fixed_pool_free(impl->jobs_pool, job);
+            tb_fixed_pool_old_free(impl->jobs_pool, job);
         }
     }
 
@@ -374,7 +374,7 @@ static tb_bool_t tb_thread_pool_worker_walk_clean(tb_list_ref_t jobs, tb_pointer
             tb_assert_and_check_return_val(impl, tb_false);
 
             // remove it from the jobs pool
-            tb_fixed_pool_free(impl->jobs_pool, job);
+            tb_fixed_pool_old_free(impl->jobs_pool, job);
         }
     }
 
@@ -674,7 +674,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
         tb_assert_and_check_break(tb_single_list_size(impl->jobs_waiting) + tb_single_list_size(impl->jobs_urgent) + 1 < TB_THREAD_POOL_JOBS_WAITING_MAXN);
 
         // make job
-        job = (tb_thread_pool_job_t*)tb_fixed_pool_malloc0(impl->jobs_pool);
+        job = (tb_thread_pool_job_t*)tb_fixed_pool_old_malloc0(impl->jobs_pool);
         tb_assert_and_check_break(job);
 
         // init job
@@ -740,7 +740,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
     if (!ok)
     {
         // exit it
-        tb_fixed_pool_free(impl->jobs_pool, job);
+        tb_fixed_pool_old_free(impl->jobs_pool, job);
         job = tb_null;
     }
 
@@ -788,7 +788,7 @@ tb_thread_pool_ref_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
         impl->worker_maxn   = worker_maxn;
 
         // init jobs pool
-        impl->jobs_pool     = tb_fixed_pool_init(TB_THREAD_POOL_JOBS_POOL_GROW, sizeof(tb_thread_pool_job_t), 0);
+        impl->jobs_pool     = tb_fixed_pool_old_init(TB_THREAD_POOL_JOBS_POOL_GROW, sizeof(tb_thread_pool_job_t), 0);
         tb_assert_and_check_break(impl->jobs_pool);
 
         // init jobs urgent
@@ -892,7 +892,7 @@ tb_bool_t tb_thread_pool_exit(tb_thread_pool_ref_t pool)
     impl->jobs_urgent = tb_null;
 
     // exit jobs pool
-    if (impl->jobs_pool) tb_fixed_pool_exit(impl->jobs_pool);
+    if (impl->jobs_pool) tb_fixed_pool_old_exit(impl->jobs_pool);
     impl->jobs_pool = tb_null;
 
     // leave
@@ -939,7 +939,7 @@ tb_void_t tb_thread_pool_kill(tb_thread_pool_ref_t pool)
         for (i = 0; i < n; i++) tb_atomic_set(&impl->worker_list[i].bstoped, 1);
 
         // kill all jobs
-        if (impl->jobs_pool) tb_fixed_pool_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_kill_all, tb_null);
+        if (impl->jobs_pool) tb_fixed_pool_old_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_kill_all, tb_null);
 
         // post it
         post = impl->worker_size;
@@ -979,7 +979,7 @@ tb_size_t tb_thread_pool_task_size(tb_thread_pool_ref_t pool)
     tb_spinlock_enter(&impl->lock);
 
     // the task size
-    tb_size_t task_size = impl->jobs_pool? tb_fixed_pool_size(impl->jobs_pool) : 0;
+    tb_size_t task_size = impl->jobs_pool? tb_fixed_pool_old_size(impl->jobs_pool) : 0;
 
     // leave
     tb_spinlock_leave(&impl->lock);
@@ -1139,7 +1139,7 @@ tb_void_t tb_thread_pool_task_kill_all(tb_thread_pool_ref_t pool)
 
     // kill all jobs
     if (!impl->bstoped && impl->jobs_pool) 
-        tb_fixed_pool_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_kill_all, tb_null);
+        tb_fixed_pool_old_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_kill_all, tb_null);
 
     // leave
     tb_spinlock_leave(&impl->lock);
@@ -1182,7 +1182,7 @@ tb_long_t tb_thread_pool_task_wait_all(tb_thread_pool_ref_t pool, tb_long_t time
         tb_spinlock_enter(&impl->lock);
 
         // the jobs count
-        size = impl->jobs_pool? tb_fixed_pool_size(impl->jobs_pool) : 0;
+        size = impl->jobs_pool? tb_fixed_pool_old_size(impl->jobs_pool) : 0;
 
         // trace
         tb_trace_d("wait: jobs: %lu, waiting: %lu, pending: %lu, urgent: %lu: .."
@@ -1220,7 +1220,7 @@ tb_void_t tb_thread_pool_task_exit(tb_thread_pool_ref_t pool, tb_thread_pool_tas
     // refn--
     if (job->refn > 1) job->refn--;
     // remove it from pool directly
-    else tb_fixed_pool_free(impl->jobs_pool, job);
+    else tb_fixed_pool_old_free(impl->jobs_pool, job);
 
     // leave
     tb_spinlock_leave(&impl->lock);
@@ -1257,10 +1257,10 @@ tb_void_t tb_thread_pool_dump(tb_thread_pool_ref_t pool)
         if (impl->jobs_pool) 
         {
             // trace
-            tb_trace_i("jobs: size: %lu", tb_fixed_pool_size(impl->jobs_pool));
+            tb_trace_i("jobs: size: %lu", tb_fixed_pool_old_size(impl->jobs_pool));
 
             // dump jobs
-            tb_fixed_pool_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_dump_all, tb_null);
+            tb_fixed_pool_old_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_dump_all, tb_null);
         }
         tb_trace_i("======================================================================");
     }

@@ -56,7 +56,7 @@ typedef struct __tb_transfer_pool_impl_t
     tb_spinlock_t                   lock;
 
     // the task pool
-    tb_fixed_pool_ref_t             pool;
+    tb_fixed_pool_old_ref_t             pool;
 
     // the idle task list
     tb_vector_ref_t                 idle;
@@ -118,7 +118,7 @@ static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_impl_t* impl, 
     do
     {
         // init task pool
-        if (!impl->pool) impl->pool = tb_fixed_pool_init((impl->maxn >> 2) + 16, sizeof(tb_transfer_task_t), 0);
+        if (!impl->pool) impl->pool = tb_fixed_pool_old_init((impl->maxn >> 2) + 16, sizeof(tb_transfer_task_t), 0);
         tb_assert_and_check_break(impl->pool);
 
         // init idle task list
@@ -146,7 +146,7 @@ static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_impl_t* impl, 
         else
         {
             // make task
-            task = (tb_transfer_task_t*)tb_fixed_pool_malloc0(impl->pool);
+            task = (tb_transfer_task_t*)tb_fixed_pool_old_malloc0(impl->pool);
             tb_assert_and_check_break(task);
 
             // init transfer
@@ -471,10 +471,10 @@ tb_bool_t tb_transfer_pool_exit(tb_transfer_pool_ref_t pool)
     if (impl->pool) 
     {
         // exit all task
-        tb_fixed_pool_walk(impl->pool, tb_transfer_pool_walk_exit, tb_null);
+        tb_fixed_pool_old_walk(impl->pool, tb_transfer_pool_walk_exit, tb_null);
 
         // exit it
-        tb_fixed_pool_exit(impl->pool);
+        tb_fixed_pool_old_exit(impl->pool);
         impl->pool = tb_null;
     }
 

@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_memory_pool_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_memory_small_pool_main(tb_int_t argc, tb_char_t** argv)
 {
 
     return 0;

@@ -31,6 +31,10 @@
  */
 #include "static_large_pool.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
 // the static large data head type
 typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_large_data_head_t
 {
