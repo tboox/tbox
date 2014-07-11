@@ -64,7 +64,11 @@ tb_void_t tb_demo_large_pool_free2()
         // exit data
         tb_large_pool_free(pool, data);
         tb_large_pool_free(pool, data);
-    
+     
+#ifdef __tb_debug__
+        // dump pool
+        tb_large_pool_dump(pool);
+#endif
     } while (0);
 
     // exit pool
@@ -90,7 +94,11 @@ tb_void_t tb_demo_large_pool_underflow()
 
         // exit data
         tb_large_pool_free(pool, data);
-
+ 
+#ifdef __tb_debug__
+        // dump pool
+        tb_large_pool_dump(pool);
+#endif
     } while (0);
 
     // exit pool
@@ -117,7 +125,11 @@ tb_void_t tb_demo_large_pool_underflow2()
         // make data2
         data = tb_large_pool_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
-
+ 
+#ifdef __tb_debug__
+        // dump pool
+        tb_large_pool_dump(pool);
+#endif
     } while (0);
 
     // exit pool
