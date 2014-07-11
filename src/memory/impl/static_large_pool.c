@@ -24,7 +24,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "static_large_pool"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -82,27 +82,27 @@ typedef struct __tb_static_large_data_pred_t
  *       | tb_static_large_data_head_t | data space |
  *        ------------------------------------------
  *                                                
- *        -----------------------
- * pred: | <=4KB :      4KB      |
- *       |-----------------------|
- *       | <=8KB :      8KB      |
- *       |-----------------------|
- *       | <=16KB :   12-16KB    |
- *       |-----------------------|
- *       | <=32KB :   20-32KB    |
- *       |-----------------------|
- *       | <=64KB :   36-64KB    |
- *       |-----------------------|
- *       | <=128KB :  68-128KB   |
- *       |-----------------------|
- *       | <=256KB :  132-256KB  |
- *       |-----------------------|
- *       | <=512KB :  260-512KB  |
- *       |-----------------------|
- *       | <=1024KB : 516-1024KB |
- *       |-----------------------|
- *       | >1024KB :  1028-...KB |
- *        -----------------------
+ *        --------------------------------------
+ * pred: | >0KB :      4KB       | > 0*page     | 1
+ *       |-----------------------|--------------
+ *       | >4KB :      8KB       | > 1*page     | 2
+ *       |-----------------------|--------------
+ *       | >8KB :    12-16KB     | > 2*page     | 3-4
+ *       |-----------------------|--------------
+ *       | >16KB :   20-32KB     | > 4*page     | 5-8
+ *       |-----------------------|--------------
+ *       | >32KB :   36-64KB     | > 8*page     | 9-16
+ *       |-----------------------|--------------
+ *       | >64KB :   68-128KB    | > 16*page    | 17-32
+ *       |-----------------------|--------------
+ *       | >128KB :  132-256KB   | > 32*page    | 33-64
+ *       |-----------------------|--------------
+ *       | >256KB :  260-512KB   | > 64*page    | 65 - 128
+ *       |-----------------------|--------------
+ *       | >512KB :  516-1024KB  | > 128*page   | 129 - 256
+ *       |-----------------------|--------------
+ *       | >1024KB : 1028-...KB  | > 256*page   | 257 - ..
+ *        --------------------------------------
  *
  * </pre>
  */
@@ -202,15 +202,23 @@ static __tb_inline__ tb_size_t tb_static_large_pool_pred_idx(tb_static_large_poo
     tb_size_t size = sizeof(tb_static_large_data_head_t) + space;
     tb_assert_abort(!(size & (impl->page_size - 1)));
 
+    // the page count
+    size /= impl->page_size;
+
     // the pred index
-    tb_size_t indx = tb_ilog2i(size / impl->page_size);
+#if 0
+    tb_size_t indx = tb_ilog2i(tb_align_pow2(size));
+#else
+    // faster
+    tb_size_t indx = size > 1? tb_ilog2i(size - 1) + 1 : 0;
+#endif
     if (indx >= tb_arrayn(impl->data_pred)) indx = tb_arrayn(impl->data_pred) - 1;
     return indx;
 }
 static __tb_inline__ tb_void_t tb_static_large_pool_pred_add(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t* data_head)
 {
     // check
-    tb_assert_and_check_return(impl && data_head && data_head->bfree);
+    tb_assert_abort(impl && data_head && data_head->bfree);
 
     // cannot be tail
     tb_check_return(data_head != impl->data_tail);
@@ -224,7 +232,7 @@ static __tb_inline__ tb_void_t tb_static_large_pool_pred_add(tb_static_large_poo
 static __tb_inline__ tb_void_t tb_static_large_pool_pred_del(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t* data_head)
 {
     // check
-    tb_assert_and_check_return(impl && data_head && !data_head->bfree);
+    tb_assert_abort(impl && data_head);
 
     // the pred index
     tb_size_t indx = tb_static_large_pool_pred_idx(impl, data_head->space);
@@ -264,6 +272,9 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
                 // split it if this free data is too large
                 if (data_space > sizeof(tb_static_large_data_head_t) + space)
                 {
+                    // remove this free data from the pred cache
+                    tb_static_large_pool_pred_del(impl, data_head);
+
                     // split this free data 
                     tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + space);
                     next_head->space = data_space - space - sizeof(tb_static_large_data_head_t);
@@ -272,9 +283,10 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
  
                     // add next free data to the pred cache
                     tb_static_large_pool_pred_add(impl, next_head);
+
+                    // add this free data to the pred cache
+                    tb_static_large_pool_pred_add(impl, data_head);
                 }
-                // use the whole data
-                else data_head->space = data_space;
 
                 // allocate the data 
                 data_head->bfree = 0;
@@ -299,8 +311,17 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
                     // remove next free data from the pred cache
                     tb_static_large_pool_pred_del(impl, next_head);
 
+                    // remove this free data from the pred cache
+                    tb_static_large_pool_pred_del(impl, data_head);
+
+                    // trace
+                    tb_trace_d("malloc: find: merge: %lu", next_head->space);
+
                     // merge next data
                     data_head->space += sizeof(tb_static_large_data_head_t) + next_head->space;
+
+                    // add this free data to the pred cache
+                    tb_static_large_pool_pred_add(impl, data_head);
 
                     // continue handle this data 
                     continue ;
@@ -348,6 +369,9 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_pred(tb_static_l
         }
     }
    
+    // trace
+    tb_trace_d("malloc: pred: %lu: %s", space, data_head? "ok" : "no");
+
     // ok?
     return data_head;
 }
@@ -420,6 +444,9 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_done(tb_static_l
 
     } while (0);
 
+    // trace
+    tb_trace_d("malloc: %lu: %s", size, ok? "ok" : "no");
+
     // failed? clear it
     if (!ok) data_head = tb_null;
 
@@ -448,8 +475,12 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
         // the prev space
         tb_size_t prev_space = data_head->space;
 
+        // compile the need space for the page alignment
+        tb_size_t need_space = tb_align(size + patch, impl->page_size) - sizeof(tb_static_large_data_head_t);
+        if (size + patch > need_space) need_space = tb_align(size + patch + impl->page_size, impl->page_size) - sizeof(tb_static_large_data_head_t);
+
         // this data space is not enough?
-        if (size + patch > data_head->space)
+        if (need_space > data_head->space)
         {
             // attempt to merge the next free data
             tb_static_large_data_head_t* data_tail = impl->data_tail;
@@ -458,6 +489,9 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
             {
                 // remove next free data from the pred cache
                 tb_static_large_pool_pred_del(impl, next_head);
+
+                // trace
+                tb_trace_d("ralloc: fast: merge: %lu", next_head->space);
 
                 // merge it
                 data_head->space += sizeof(tb_static_large_data_head_t) + next_head->space;
@@ -468,7 +502,20 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
         }
 
         // enough?
-        tb_check_break(size + patch <= data_head->space);
+        tb_check_break(need_space <= data_head->space);
+
+        // split it if this data is too large after merging 
+        if (data_head->space > sizeof(tb_static_large_data_head_t) + need_space)
+        {
+            // split this free data 
+            tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + need_space);
+            next_head->space = data_head->space - need_space - sizeof(tb_static_large_data_head_t);
+            next_head->bfree = 1;
+            data_head->space = need_space;
+
+            // add next free data to the pred cache
+            tb_static_large_pool_pred_add(impl, next_head);
+        }
 
         // the real size
         tb_size_t size_real = real? (data_head->space - patch) : size;
@@ -512,6 +559,9 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
 
     // failed? clear it
     if (!ok) data_head = tb_null;
+
+    // trace
+    tb_trace_d("ralloc: fast: %lu: %s", size, ok? "ok" : "no");
 
     // ok?
     return data_head;
@@ -659,6 +709,9 @@ tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 
     } while (0);
 
+    // trace
+    tb_trace_d("ralloc: %lu: %s", size, ok? "ok" : "no");
+
     // failed? clear it
     if (!ok) data_real = tb_null;
 
@@ -697,12 +750,18 @@ tb_bool_t tb_static_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
         impl->free_count++;
 #endif
 
+        // trace
+        tb_trace_d("free: %lu: %s", data_head->base.size, ok? "ok" : "no");
+
         // attempt merge the next free data
         tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)&(data_head[1]) + data_head->space);
         if (next_head < impl->data_tail && next_head->bfree) 
         {
             // remove next free data from the pred cache
             tb_static_large_pool_pred_del(impl, next_head);
+
+            // trace
+            tb_trace_d("free: merge: %lu", next_head->space);
 
             // merge it
             data_head->space += sizeof(tb_static_large_data_head_t) + next_head->space;
@@ -776,8 +835,7 @@ tb_void_t tb_static_large_pool_dump(tb_large_pool_ref_t pool)
         tb_static_large_data_pred_t const* pred = &impl->data_pred[i];
 
         // trace
-        if (i < pred_size - 1) tb_trace_i("pred[<=%04luKB]: data: %p, space: %lu, total_count: %lu, failed_count: %lu", ((impl->page_size << i) >> 10), pred->data_head? &pred->data_head[1] : tb_null, pred->data_head? pred->data_head->space : 0, pred->total_count, pred->failed_count);
-        else tb_trace_i("pred[> %04luKB]: data: %p, space: %lu, total_count: %lu, failed_count: %lu", ((impl->page_size << (i - 1)) >> 10), pred->data_head? &pred->data_head[1] : tb_null, pred->data_head? pred->data_head->space : 0, pred->total_count, pred->failed_count);
+        tb_trace_i("pred[>%04luKB]: data: %p, space: %lu, total_count: %lu, failed_count: %lu", ((impl->page_size << (i - 1)) >> 10), pred->data_head? &pred->data_head[1] : tb_null, pred->data_head? pred->data_head->space : 0, pred->total_count, pred->failed_count);
     }
 
     // trace
