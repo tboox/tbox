@@ -43,8 +43,8 @@ __tb_extern_c_enter__
 #define tb_large_pool_nalloc(pool, item, size, real)       tb_large_pool_nalloc_(pool, item, size, real __tb_debug_vals__)
 #define tb_large_pool_nalloc0(pool, item, size, real)      tb_large_pool_nalloc0_(pool, item, size, real __tb_debug_vals__)
 
-#define tb_large_pool_ralloc(pool, data, size, real)       tb_large_pool_ralloc_(pool, data, size, real __tb_debug_vals__)
-#define tb_large_pool_free(pool, data)                      tb_large_pool_free_(pool, data __tb_debug_vals__)
+#define tb_large_pool_ralloc(pool, data, size, real)       tb_large_pool_ralloc_(pool, (tb_pointer_t)(data), size, real __tb_debug_vals__)
+#define tb_large_pool_free(pool, data)                     tb_large_pool_free_(pool, (tb_pointer_t)(data) __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -72,6 +72,12 @@ typedef struct{}*       tb_large_pool_ref_t;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+
+/*! the large pool instance
+ * 
+ * @return              the pool 
+ */
+tb_large_pool_ref_t     tb_large_pool(tb_noarg_t);
 
 /*! init the large pool and the allocated data will be aligned by the page size
  * 

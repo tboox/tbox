@@ -65,7 +65,7 @@ static tb_atomic64_lock_t   g_locks[TB_ATOMIC64_LOCK_MAXN] =
  * implementation
  */
 
-static __tb_inline_force__ tb_spinlock_t* tb_atomic64_lock(tb_atomic64_t* a)
+static __tb_inline_force__ tb_spinlock_ref_t tb_atomic64_lock(tb_atomic64_t* a)
 {
     // trace
     tb_trace1_w("using generic atomic64, maybe slower!");
@@ -87,7 +87,7 @@ static __tb_inline_force__ tb_spinlock_t* tb_atomic64_lock(tb_atomic64_t* a)
 tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
     // the lock
-    tb_spinlock_t* lock = tb_atomic64_lock(a);
+    tb_spinlock_ref_t lock = tb_atomic64_lock(a);
 
     // enter
     tb_spinlock_enter(lock);
