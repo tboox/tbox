@@ -161,23 +161,43 @@ tb_void_t tb_demo_large_pool_perf()
         // clear random
         tb_random_clear(tb_random_generator());
 
+        // make data list
+        tb_size_t       maxn = 10000;
+        tb_pointer_t*   list = (tb_pointer_t*)tb_large_pool_nalloc0(pool, maxn, sizeof(tb_pointer_t), tb_null);
+        tb_assert_and_check_break(list);
+
         // done 
-        __tb_volatile__ tb_byte_t*  data = tb_null;
-        __tb_volatile__ tb_size_t   maxn = 10000;
-        __tb_volatile__ tb_size_t   size = 0;
-        __tb_volatile__ tb_size_t   pagesize = tb_page_size();
-        __tb_volatile__ tb_hong_t   time = tb_mclock();
-        while (maxn--)
+        __tb_volatile__ tb_size_t indx = 0;
+        __tb_volatile__ tb_size_t pagesize = tb_page_size();
+        __tb_volatile__ tb_hong_t time = tb_mclock();
+        for (indx = 0; indx < maxn; indx++)
         {
-            size = tb_random_range(tb_random_generator(), 0, pagesize << 4);
-            data = (__tb_volatile__ tb_byte_t*)tb_large_pool_malloc0(pool, size, tb_null);
-            if (!(maxn & 31)) 
+            // make data
+            list[indx] = tb_large_pool_malloc0(pool, tb_random_range(tb_random_generator(), 1, pagesize << 4), tb_null);
+            tb_assert_and_check_break(list[indx]);
+
+            // re-make data
+            if (!(indx & 31)) 
             {
-                size = tb_random_range(tb_random_generator(), 0, pagesize << 4);
-                data = (__tb_volatile__ tb_byte_t*)tb_large_pool_ralloc(pool, (tb_pointer_t)data, size, tb_null);
+                list[indx] = tb_large_pool_ralloc(pool, list[indx], tb_random_range(tb_random_generator(), 1, pagesize << 4), tb_null);
+                tb_assert_and_check_break(list[indx]);
             }
-            if (!(maxn & 15)) tb_large_pool_free(pool, (tb_pointer_t)data);
-            tb_check_break(data);
+
+            // free data
+            __tb_volatile__ tb_size_t size = tb_random_range(tb_random_generator(), 0, 10);
+            if (size > 5 && indx)
+            {
+                size -= 5;
+                while (size--) 
+                {
+                    // the free index
+                    tb_size_t free_indx = tb_random_range(tb_random_generator(), 0, indx);
+
+                    // free it
+                    if (list[free_indx]) tb_large_pool_free(pool, list[free_indx]);
+                    list[free_indx] = tb_null;
+                }
+            }
         }
         time = tb_mclock() - time;
 
