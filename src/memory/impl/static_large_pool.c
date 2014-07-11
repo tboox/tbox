@@ -226,8 +226,11 @@ static __tb_inline__ tb_void_t tb_static_large_pool_pred_add(tb_static_large_poo
     // the pred index
     tb_size_t indx = tb_static_large_pool_pred_idx(impl, data_head->space);
 
+    // the pred head
+    tb_static_large_data_head_t* pred_head = impl->data_pred[indx].data_head;
+
     // cache this data head
-    impl->data_pred[indx].data_head = data_head;
+    if (!pred_head || data_head->space > pred_head->space) impl->data_pred[indx].data_head = data_head;
 }
 static __tb_inline__ tb_void_t tb_static_large_pool_pred_del(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t* data_head)
 {
@@ -269,12 +272,12 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
             // is enough?           
             if (data_space >= space)
             {
+                // remove this free data from the pred cache
+                tb_static_large_pool_pred_del(impl, data_head);
+
                 // split it if this free data is too large
                 if (data_space > sizeof(tb_static_large_data_head_t) + space)
                 {
-                    // remove this free data from the pred cache
-                    tb_static_large_pool_pred_del(impl, data_head);
-
                     // split this free data 
                     tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + space);
                     next_head->space = data_space - space - sizeof(tb_static_large_data_head_t);
@@ -283,16 +286,22 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
  
                     // add next free data to the pred cache
                     tb_static_large_pool_pred_add(impl, next_head);
-
-                    // add this free data to the pred cache
-                    tb_static_large_pool_pred_add(impl, data_head);
+                }
+                else
+                {
+                    // the next data head
+                    tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + data_space);
+            
+                    // the next data is free?
+                    if (next_head + 1 < data_tail && next_head->bfree)
+                    {
+                        // add next free data to the pred cache
+                        tb_static_large_pool_pred_add(impl, next_head);
+                    }
                 }
 
                 // allocate the data 
                 data_head->bfree = 0;
-
-                // remove this free data from the pred cache
-                tb_static_large_pool_pred_del(impl, data_head);
 
                 // return the data head
                 return data_head;
