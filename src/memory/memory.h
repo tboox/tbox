@@ -31,6 +31,7 @@
 #include "pool.h"
 #include "fixed_pool.h"
 #include "large_pool.h"
+#include "small_pool.h"
 #include "string_pool.h"
 #include "buffer.h"
 #include "queue_buffer.h"
