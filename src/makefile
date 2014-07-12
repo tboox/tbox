@@ -18,6 +18,7 @@ tbox_C_FILES 			+= \
 						memory/pool \
 						memory/fixed_pool \
 						memory/large_pool \
+						memory/small_pool \
 						memory/string_pool \
 						memory/impl/prefix \
 						memory/impl/static_fixed_pool \
@@ -444,13 +445,14 @@ INC_FILES 				= \
 						memory/pool.h \
 						memory/fixed_pool.h \
 						memory/large_pool.h \
+						memory/small_pool.h \
 						memory/static_pool.h \
 						memory/string_pool.h \
 						memory/prefix.h \
 						memory/memory.h \
 						memory/buffer.h \
-						memory/static_buffer.h \
 						memory/queue_buffer.h \
+						memory/static_buffer.h \
 						asio/asio.h \
 						asio/prefix.h \
 						asio/aioo.h \
