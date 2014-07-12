@@ -119,7 +119,29 @@ static tb_void_t tb_pool_data_dump_data(tb_byte_t const* data, tb_size_t size)
         else break;
     }
 }
-tb_void_t tb_pool_data_dump(tb_byte_t const* data, tb_bool_t verbose, tb_char_t const* prefix)
+tb_size_t tb_pool_data_size(tb_cpointer_t data)
+{
+    // check
+    tb_check_return_val(data, 0);
+
+    // done
+    tb_size_t               size = 0;
+    tb_pool_data_head_t*    data_head = tb_null;
+    do
+    {
+        // the data head
+        data_head = &(((tb_pool_data_head_t*)data)[-1]);
+        tb_check_break(data_head->debug.magic == TB_POOL_DATA_MAGIC);
+
+        // ok
+        size = data_head->size;
+
+    } while (0);
+
+    // ok?
+    return size;
+}
+tb_void_t tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t const* prefix)
 {
     // done
     tb_pool_data_head_t* data_head = tb_null;
@@ -149,7 +171,7 @@ tb_void_t tb_pool_data_dump(tb_byte_t const* data, tb_bool_t verbose, tb_char_t 
             tb_backtrace_dump(backtrace_prefix, data_head->debug.backtrace, nframe);
 
             // dump the data info
-            tb_trace_i("%sdata: %p, size: %lu, patch: %x", prefix? prefix : "", data, data_size, data[data_size]);
+            tb_trace_i("%sdata: %p, size: %lu, patch: %x", prefix? prefix : "", data, data_size, ((tb_byte_t const*)data)[data_size]);
 
             // dump the first 256-bytes data 
             if (data_size && verbose) 
@@ -165,7 +187,7 @@ tb_void_t tb_pool_data_dump(tb_byte_t const* data, tb_bool_t verbose, tb_char_t 
                 if (data_size > dump_size)
                 {
                     // the last data
-                    tb_byte_t const* data_last = tb_max(data + data_size - data_limit, data + dump_size);
+                    tb_byte_t const* data_last = tb_max((tb_byte_t const*)data + data_size - data_limit, (tb_byte_t const*)data + dump_size);
                     
                     // update the dump size
                     dump_size = (tb_byte_t const*)data + data_size - data_last;
@@ -184,7 +206,7 @@ tb_void_t tb_pool_data_dump(tb_byte_t const* data, tb_bool_t verbose, tb_char_t 
 
             // dump the first 256-bytes data 
             tb_trace_i("%sdata: first %lu-bytes:", prefix? prefix : "", data_limit);
-            tb_pool_data_dump_data(data, data_limit);
+            tb_pool_data_dump_data((tb_byte_t const*)data, data_limit);
         }
 
     } while (0);

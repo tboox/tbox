@@ -26,13 +26,14 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "small_pool"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "small_pool.h"
 #include "large_pool.h"
+#include "fixed_pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -53,40 +54,51 @@ tb_void_t tb_small_pool_clear(tb_small_pool_ref_t pool)
     tb_assert_and_check_return(pool);
 
 }
-tb_pointer_t tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+tb_pointer_t tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
+    tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
+
     return tb_null;
 }
-tb_pointer_t tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+tb_pointer_t tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
+    tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
+    
     return tb_null;
 }
-tb_pointer_t tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+tb_pointer_t tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
+    tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
+
     return tb_null;
 }
-tb_pointer_t tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+tb_pointer_t tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && size, tb_null);
+    tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
+
     return tb_null;
 }
-tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && data && size, tb_null);
+    tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
+
     return tb_null;
 }
 tb_bool_t tb_small_pool_free_(tb_small_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(pool && data, tb_false);
+
     return tb_false;
 }
 #ifdef __tb_debug__

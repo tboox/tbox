@@ -24,10 +24,6 @@ tbox_C_FILES 			+= \
 						memory/impl/static_fixed_pool \
 						memory/impl/static_large_pool \
 						memory/impl/native_large_pool \
-						memory/static_pool \
-						memory/static_fixed_pool_old \
-						memory/fixed_pool_old \
-						memory/global_pool \
 						memory/memory \
 						memory/buffer \
 						memory/static_buffer \

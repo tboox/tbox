@@ -175,7 +175,7 @@ typedef struct __tb_aicp_impl_t
     tb_atomic_t                 work;
 
     // the pool
-    tb_fixed_pool_old_ref_t         pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the pool lock
     tb_spinlock_t               lock;
@@ -195,7 +195,7 @@ typedef struct __tb_aiop_impl_t
     tb_size_t                   maxn;
 
     // the aioo pool
-    tb_fixed_pool_old_ref_t         pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the pool lock
     tb_spinlock_t               lock;

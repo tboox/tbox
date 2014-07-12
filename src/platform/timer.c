@@ -85,7 +85,7 @@ typedef struct __tb_timer_impl_t
     tb_spinlock_t               lock;
 
     // the pool
-    tb_fixed_pool_old_ref_t         pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the heap
     tb_heap_ref_t               heap;
@@ -151,7 +151,7 @@ tb_timer_ref_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init pool
-        impl->pool         = tb_fixed_pool_old_init((maxn >> 2) + 16, sizeof(tb_timer_task_impl_t), 0);
+        impl->pool         = tb_fixed_pool_init((maxn >> 2) + 16, sizeof(tb_timer_task_impl_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
         
         // init heap
@@ -208,7 +208,7 @@ tb_void_t tb_timer_exit(tb_timer_ref_t timer)
     impl->heap = tb_null;
 
     // exit pool
-    if (impl->pool) tb_fixed_pool_old_exit(impl->pool);
+    if (impl->pool) tb_fixed_pool_exit(impl->pool);
     impl->pool = tb_null;
 
     // exit event
@@ -236,7 +236,7 @@ tb_void_t tb_timer_clear(tb_timer_ref_t timer)
         if (impl->heap) tb_heap_clear(impl->heap);
 
         // clear pool
-        if (impl->pool) tb_fixed_pool_old_clear(impl->pool);
+        if (impl->pool) tb_fixed_pool_clear(impl->pool);
 
         // leave
         tb_spinlock_leave(&impl->lock);
@@ -366,7 +366,7 @@ tb_bool_t tb_timer_spak(tb_timer_ref_t timer)
                 // refn--
                 if (task_impl->refn > 1) task_impl->refn--;
                 // remove it from pool directly
-                else tb_fixed_pool_old_free(impl->pool, task_impl);
+                else tb_fixed_pool_free(impl->pool, task_impl);
             }
         }
 
@@ -449,7 +449,7 @@ tb_timer_task_ref_t tb_timer_task_init_at(tb_timer_ref_t timer, tb_hize_t when, 
     // make task
     tb_event_ref_t          event = tb_null;
     tb_hize_t               when_top = -1;
-    tb_timer_task_impl_t*   task_impl = (tb_timer_task_impl_t*)tb_fixed_pool_old_malloc0(impl->pool);
+    tb_timer_task_impl_t*   task_impl = (tb_timer_task_impl_t*)tb_fixed_pool_malloc0(impl->pool);
     if (task_impl)
     {
         // the top when 
@@ -517,7 +517,7 @@ tb_void_t tb_timer_task_post_at(tb_timer_ref_t timer, tb_hize_t when, tb_size_t 
     // make task
     tb_event_ref_t          event = tb_null;
     tb_hize_t               when_top = -1;
-    tb_timer_task_impl_t*   task_impl = (tb_timer_task_impl_t*)tb_fixed_pool_old_malloc0(impl->pool);
+    tb_timer_task_impl_t*   task_impl = (tb_timer_task_impl_t*)tb_fixed_pool_malloc0(impl->pool);
     if (task_impl)
     {
         // the top when 
@@ -583,7 +583,7 @@ tb_void_t tb_timer_task_exit(tb_timer_ref_t timer, tb_timer_task_ref_t task)
         task_impl->repeat    = 0;
     }
     // remove it from pool directly if the task_impl have been expired 
-    else tb_fixed_pool_old_free(impl->pool, task_impl);
+    else tb_fixed_pool_free(impl->pool, task_impl);
 
     // leave
     tb_spinlock_leave(&impl->lock);

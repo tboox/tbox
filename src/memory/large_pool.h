@@ -52,6 +52,8 @@ __tb_extern_c_enter__
 
 /*! the large pool ref type
  *
+ * <pre>
+ *
  *  -------------------------      ----------------------
  * |       native memory     |    |         data         |
  *  -------------------------      ---------------------- 
@@ -65,6 +67,8 @@ __tb_extern_c_enter__
  * |-----------------------------------------------------|
  * |                       large pool                    |
  *  ----------------------------------------------------- 
+ *
+ *  </pre>
  *
  */
 typedef struct{}*       tb_large_pool_ref_t;
@@ -104,6 +108,7 @@ tb_void_t               tb_large_pool_clear(tb_large_pool_ref_t pool);
  *
  * @param pool          the pool 
  * @param size          the size
+ * @param real          the real allocated size >= size, optional
  *
  * @return              the data address
  */

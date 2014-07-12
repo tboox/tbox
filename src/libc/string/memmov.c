@@ -26,7 +26,7 @@
  * includes
  */
 #include "string.h"
-#include "../../memory/memory.h"
+#include "../../memory/impl/prefix.h"
 
 #ifndef TB_CONFIG_LIBC_HAVE_MEMMOV
 #   if defined(TB_ARCH_x86)
@@ -88,22 +88,22 @@ tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 #ifdef __tb_debug__
     {
         // overflow dst?
-        tb_size_t n1 = tb_memory_data_size(s1);
+        tb_size_t n1 = tb_pool_data_size(s1);
         if (n1 && n > n1)
         {
             tb_trace_i("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
             tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
-            tb_memory_data_dump(s1, "\t[malloc]: [from]: ");
+            tb_pool_data_dump(s1, tb_true, "\t[malloc]: [from]: ");
             tb_abort();
         }
 
         // overflow src?
-        tb_size_t n2 = tb_memory_data_size(s2);
+        tb_size_t n2 = tb_pool_data_size(s2);
         if (n2 && n > n2)
         {
             tb_trace_i("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
             tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
-            tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
+            tb_pool_data_dump(s2, tb_true, "\t[malloc]: [from]: ");
             tb_abort();
         }
     }

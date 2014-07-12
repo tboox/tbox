@@ -163,7 +163,7 @@ tb_bool_t tb_init_and_check(tb_handle_t priv, tb_byte_t* data, tb_size_t size, t
     if (!tb_singleton_init()) return tb_false;
 
     // init memory
-    if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
+    if (!tb_memory_init(data, size)) return tb_false;
 
     // init platform
     if (!tb_platform_init(priv)) return tb_false;

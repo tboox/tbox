@@ -37,12 +37,6 @@
 #include "queue_buffer.h"
 #include "static_buffer.h"
 
-// discarded
-#include "global_pool.h"
-#include "static_pool.h"
-#include "static_fixed_pool_old.h"
-#include "fixed_pool_old.h"
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
@@ -121,85 +115,13 @@ __tb_extern_c_enter__
  *
  * @param data          the memory pool data
  * @param size          the memory pool size
- * @param align         the memory pool data align bytes
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
+tb_bool_t               tb_memory_init(tb_byte_t* data, tb_size_t size);
 
 /// exit memory
 tb_void_t               tb_memory_exit(tb_noarg_t);
-
-/*! malloc the memory
- *
- * @param size          the size
- *
- * @return              the data address
- */
-tb_pointer_t            tb_memory_malloc_(tb_size_t size __tb_debug_decl__);
-
-/*! malloc the memory and fill zero 
- *
- * @param size          the size
- *
- * @return              the data address
- */
-tb_pointer_t            tb_memory_malloc0_(tb_size_t size __tb_debug_decl__);
-
-/*! malloc the memory with the item count
- *
- * @param item          the item count
- * @param size          the item size
- *
- * @return              the data address
- */
-tb_pointer_t            tb_memory_nalloc_(tb_size_t item, tb_size_t size __tb_debug_decl__);
-
-/*! malloc the memory with the item count and fill zero
- *
- * @param item          the item count
- * @param size          the item size
- *
- * @return              the data address
- */
-tb_pointer_t            tb_memory_nalloc0_(tb_size_t item, tb_size_t size __tb_debug_decl__);
-
-/*! realloc the memory
- *
- * @param data          the data address
- * @param size          the size
- *
- * @return              the new data address
- */
-tb_pointer_t            tb_memory_ralloc_(tb_pointer_t data, tb_size_t size __tb_debug_decl__);
-
-/*! free the memory
- *
- * @param data          the data address
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_memory_free_(tb_pointer_t data __tb_debug_decl__);
-
-#ifdef __tb_debug__
-/// dump memory
-tb_void_t               tb_memory_dump(tb_noarg_t);
-
-/*! the data size in the memory only for the pool mode
- *
- * @param data          the data address
- *
- * @return              the data size, return zero if using the native memory
- */
-tb_size_t               tb_memory_data_size(tb_cpointer_t data);
-
-/*! dump the memory data only for the pool mode
- *
- * @param data          the data address
- * @param prefix        the dump prefix info
- */
-tb_void_t               tb_memory_data_dump(tb_cpointer_t data, tb_char_t const* prefix);
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
