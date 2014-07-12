@@ -143,6 +143,9 @@ typedef tb_atomic_t                 tb_spinlock_t;
 /// the spinlock ref type
 typedef tb_spinlock_t*              tb_spinlock_ref_t;
 
+/// the pool ref type
+typedef struct{}*                   tb_pool_ref_t;
+
 /// the file ref type
 typedef struct{}*                   tb_file_ref_t;
 

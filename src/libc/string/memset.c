@@ -27,6 +27,7 @@
  */
 #include "string.h"
 #include "../../utils/utils.h"
+#include "../../memory/impl/prefix.h"
 #ifndef TB_CONFIG_LIBC_HAVE_MEMSET
 #   if defined(TB_ARCH_x86)
 #       include "opt/x86/memset.c"
@@ -240,12 +241,12 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 #ifdef __tb_debug__
     {
         // overflow?
-        tb_size_t size = tb_memory_data_size(s);
+        tb_size_t size = tb_pool_data_size(s);
         if (size && n > size)
         {
             tb_trace_i("[memset]: [overflow]: [%#x x %lu] => [%p, %lu]", c, n, s, size);
             tb_backtrace_dump("[memset]: [overflow]: ", tb_null, 10);
-            tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+            tb_pool_data_dump(s, tb_true, "\t[malloc]: [from]: ");
             tb_abort();
         }
     }
@@ -260,12 +261,12 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 #ifdef __tb_debug__
     {
         // overflow?
-        tb_size_t size = tb_memory_data_size(s);
+        tb_size_t size = tb_pool_data_size(s);
         if (size && (n << 1) > size)
         {
             tb_trace_i("[memset_u16]: [overflow]: [%#x x %lu x 2] => [%p, %lu]", c, n, s, size);
             tb_backtrace_dump("[memset_u16]: [overflow]: ", tb_null, 10);
-            tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+            tb_pool_data_dump(s, tb_true, "\t[malloc]: [from]: ");
             tb_abort();
         }
     }
@@ -280,11 +281,11 @@ tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 #ifdef __tb_debug__
     {
         // overflow?
-        tb_size_t size = tb_memory_data_size(s);
+        tb_size_t size = tb_pool_data_size(s);
         if (size && (n * 3) > size)
         {
             tb_trace_i("[memset_u24]: [overflow]: [%#x x %lu x 3] => [%p, %lu]", c, n, s, size);
-            tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+            tb_pool_data_dump(s, tb_true, "\t[malloc]: [from]: ");
             tb_abort();
         }
     }
@@ -299,12 +300,12 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 #ifdef __tb_debug__
     {
         // overflow?
-        tb_size_t size = tb_memory_data_size(s);
+        tb_size_t size = tb_pool_data_size(s);
         if (size && (n << 2) > size)
         {
             tb_trace_i("[memset_u32]: [overflow]: [%#x x %lu x 4] => [%p, %lu]", c, n, s, size);
             tb_backtrace_dump("[memset_u32]: [overflow]: ", tb_null, 10);
-            tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+            tb_pool_data_dump(s, tb_true, "\t[malloc]: [from]: ");
             tb_abort();
         }
     }
@@ -319,12 +320,12 @@ tb_pointer_t tb_memset_u64(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
 #ifdef __tb_debug__
     {
         // overflow?
-        tb_size_t size = tb_memory_data_size(s);
+        tb_size_t size = tb_pool_data_size(s);
         if (size && (n << 3) > size)
         {
             tb_trace_i("[memset_u64]: [overflow]: [%#llx x %lu x 4] => [%p, %lu]", c, n, s, size);
             tb_backtrace_dump("[memset_u64]: [overflow]: ", tb_null, 10);
-            tb_memory_data_dump(s, "\t[malloc]: [from]: ");
+            tb_pool_data_dump(s, tb_true, "\t[malloc]: [from]: ");
             tb_abort();
         }
     }

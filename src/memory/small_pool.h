@@ -37,14 +37,18 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_small_pool_malloc(pool, size, real)             tb_small_pool_malloc_(pool, size, real __tb_debug_vals__)
-#define tb_small_pool_malloc0(pool, size, real)            tb_small_pool_malloc0_(pool, size, real __tb_debug_vals__)
 
-#define tb_small_pool_nalloc(pool, item, size, real)       tb_small_pool_nalloc_(pool, item, size, real __tb_debug_vals__)
-#define tb_small_pool_nalloc0(pool, item, size, real)      tb_small_pool_nalloc0_(pool, item, size, real __tb_debug_vals__)
+// the data size maximum
+#define TB_SMALL_POOL_DATA_SIZE_MAXN                        (3072)
 
-#define tb_small_pool_ralloc(pool, data, size, real)       tb_small_pool_ralloc_(pool, (tb_pointer_t)(data), size, real __tb_debug_vals__)
-#define tb_small_pool_free(pool, data)                     tb_small_pool_free_(pool, (tb_pointer_t)(data) __tb_debug_vals__)
+#define tb_small_pool_malloc(pool, size, real)              tb_small_pool_malloc_(pool, size, real __tb_debug_vals__)
+#define tb_small_pool_malloc0(pool, size, real)             tb_small_pool_malloc0_(pool, size, real __tb_debug_vals__)
+
+#define tb_small_pool_nalloc(pool, item, size, real)        tb_small_pool_nalloc_(pool, item, size, real __tb_debug_vals__)
+#define tb_small_pool_nalloc0(pool, item, size, real)       tb_small_pool_nalloc0_(pool, item, size, real __tb_debug_vals__)
+
+#define tb_small_pool_ralloc(pool, data, size, real)        tb_small_pool_ralloc_(pool, (tb_pointer_t)(data), size, real __tb_debug_vals__)
+#define tb_small_pool_free(pool, data)                      tb_small_pool_free_(pool, (tb_pointer_t)(data) __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -52,20 +56,35 @@ __tb_extern_c_enter__
 
 /*! the small pool ref type
  *
- *  -------------------------      ----------------------
- * |       native memory     |    |         data         |
- *  -------------------------      ---------------------- 
- *              |                             |
- *  -------------------------      ----------------------
- * |       native pool       |    |      static pool     |
- *  -------------------------      ---------------------- 
- *              |                             |
- *  -----------------------------------------------------
- * |  if (pool address & 1)     |           else         |
- * |-----------------------------------------------------|
- * |                       small pool                    |
- *  ----------------------------------------------------- 
+ * <pre>
  *
+ *  ----------------------
+ * |    fixed pool:16B    |
+ * |----------------------|
+ * |    fixed pool:32B    |
+ * |----------------------|
+ * |    fixed pool:64B    |
+ * |----------------------|
+ * |    fixed pool:96B*   |
+ * |----------------------|
+ * |    fixed pool:128B   |
+ * |----------------------|
+ * |    fixed pool:192B*  |
+ * |----------------------|
+ * |    fixed pool:256B   |
+ * |----------------------|
+ * |    fixed pool:384B*  |
+ * |----------------------|
+ * |    fixed pool:512B   |
+ * |----------------------|
+ * |    fixed pool:1024B  |
+ * |----------------------|
+ * |    fixed pool:2048B  |
+ * |----------------------|
+ * |    fixed pool:3072B* |
+ *  ---------------------- 
+ *
+ * </pre>
  */
 typedef struct{}*       tb_small_pool_ref_t;
 
@@ -73,7 +92,7 @@ typedef struct{}*       tb_small_pool_ref_t;
  * interfaces
  */
 
-/*! init the small pool 
+/*! init the small pool only for size <=3KB
  * 
  * @return              the pool 
  */
@@ -98,50 +117,46 @@ tb_void_t               tb_small_pool_clear(tb_small_pool_ref_t pool);
  *
  * @return              the data address
  */
-tb_pointer_t            tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t            tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
 
 /*! malloc data and fill zero 
  *
  * @param pool          the pool 
  * @param size          the size 
- * @param real          the real allocated size >= size, optional
  *
  * @return              the data address
  */
-tb_pointer_t            tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t            tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size __tb_debug_decl__);
 
 /*! malloc data with the item count
  *
  * @param pool          the pool 
  * @param item          the item count
  * @param size          the item size 
- * @param real          the real allocated size >= item * size, optional
  *
  * @return              the data address
  */
-tb_pointer_t            tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t            tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! malloc data with the item count and fill zero
  *
  * @param pool          the pool 
  * @param item          the item count
  * @param size          the item size 
- * @param real          the real allocated size >= item * size, optional
  *
  * @return              the data address
  */
-tb_pointer_t            tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t            tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! realloc data
  *
  * @param pool          the pool 
  * @param data          the data address
  * @param size          the data size
- * @param real          the real allocated size >= size, optional
  *
  * @return              the new data address
  */
-tb_pointer_t            tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t            tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /*! free data
  *

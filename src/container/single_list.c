@@ -56,7 +56,7 @@ typedef struct __tb_single_list_impl_t
     tb_iterator_t           itor;
 
     // the pool
-    tb_fixed_pool_old_ref_t     pool;
+    tb_fixed_pool_ref_t     pool;
 
     // the head item 
     tb_size_t               head;
@@ -79,7 +79,7 @@ static tb_size_t tb_single_list_itor_size(tb_iterator_ref_t iterator)
     tb_assert_and_check_return_val(impl && impl->pool, 0);
 
     // the size
-    return tb_fixed_pool_old_size(impl->pool);
+    return tb_fixed_pool_size(impl->pool);
 }
 static tb_size_t tb_single_list_itor_head(tb_iterator_ref_t iterator)
 {
@@ -321,7 +321,7 @@ tb_single_list_ref_t tb_single_list_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.comp = tb_single_list_itor_comp;
 
         // init pool, step = next + data
-        impl->pool = tb_fixed_pool_old_init(grow, sizeof(tb_single_list_item_t) + func.size, 0);
+        impl->pool = tb_fixed_pool_init(grow, sizeof(tb_single_list_item_t) + func.size, tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
 
         // ok
@@ -350,7 +350,7 @@ tb_void_t tb_single_list_exit(tb_single_list_ref_t list)
     tb_single_list_clear(list);
 
     // free pool
-    if (impl->pool) tb_fixed_pool_old_exit(impl->pool);
+    if (impl->pool) tb_fixed_pool_exit(impl->pool);
 
     // free it
     tb_free(impl);
@@ -379,7 +379,7 @@ tb_void_t tb_single_list_clear(tb_single_list_ref_t list)
     }
 
     // clear pool
-    if (impl->pool) tb_fixed_pool_old_clear(impl->pool);
+    if (impl->pool) tb_fixed_pool_clear(impl->pool);
 
     // reset it
     impl->head = 0;
@@ -400,7 +400,7 @@ tb_size_t tb_single_list_size(tb_single_list_ref_t list)
     tb_assert_and_check_return_val(impl && impl->pool, 0);
 
     // the size
-    return tb_fixed_pool_old_size(impl->pool);
+    return tb_fixed_pool_size(impl->pool);
 }
 tb_size_t tb_single_list_maxn(tb_single_list_ref_t list)
 {
@@ -446,7 +446,7 @@ tb_size_t tb_single_list_insert_next(tb_single_list_ref_t list, tb_size_t itor, 
     tb_assert_and_check_return_val(impl && impl->pool, 0);
 
     // make the node data
-    tb_single_list_item_t* pnode = (tb_single_list_item_t*)tb_fixed_pool_old_malloc(impl->pool);
+    tb_single_list_item_t* pnode = (tb_single_list_item_t*)tb_fixed_pool_malloc(impl->pool);
     tb_assert_and_check_return_val(pnode, 0);
 
     // init node, inode => 0
@@ -590,7 +590,7 @@ tb_size_t tb_single_list_remove_next(tb_single_list_ref_t list, tb_size_t itor)
         impl->func.free(&impl->func, &((tb_single_list_item_t*)node)[1]);
 
     // free node
-    tb_fixed_pool_old_free(impl->pool, (tb_pointer_t)node);
+    tb_fixed_pool_free(impl->pool, (tb_pointer_t)node);
 
     // return next node
     return next;
@@ -672,7 +672,7 @@ tb_void_t tb_single_list_walk(tb_single_list_ref_t list, tb_bool_t (*func)(tb_si
     tb_assert_and_check_return(impl && func);
 
     // pool
-    tb_fixed_pool_old_ref_t pool = impl->pool;
+    tb_fixed_pool_ref_t pool = impl->pool;
     tb_assert_and_check_return(pool);
 
     // step
@@ -680,7 +680,7 @@ tb_void_t tb_single_list_walk(tb_single_list_ref_t list, tb_bool_t (*func)(tb_si
     tb_assert_and_check_return(step);
 
     // check
-    tb_assert_and_check_return((tb_fixed_pool_old_size(pool) && impl->head) || !tb_fixed_pool_old_size(pool));
+    tb_assert_and_check_return((tb_fixed_pool_size(pool) && impl->head) || !tb_fixed_pool_size(pool));
 
     // walk
     tb_size_t   base = -1;
@@ -717,7 +717,7 @@ tb_void_t tb_single_list_walk(tb_single_list_ref_t list, tb_bool_t (*func)(tb_si
                 impl->func.free(&impl->func, &((tb_single_list_item_t*)itor)[1]);
 
             // free item
-            tb_fixed_pool_old_free(pool, (tb_pointer_t)itor);
+            tb_fixed_pool_free(pool, (tb_pointer_t)itor);
         }
         
         // trace

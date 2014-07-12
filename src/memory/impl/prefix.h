@@ -94,13 +94,21 @@ typedef struct __tb_pool_data_head_t
  */
 
 #ifdef __tb_debug__
+/* the data size
+ *
+ * @param data                  the data address
+ *
+ * @return                      the data size
+ */
+tb_size_t                       tb_pool_data_size(tb_cpointer_t data);
+
 /* dump data info
  *
  * @param data                  the data address
  * @param verbose               dump verbose info?
  * @param prefix                the prefix info
  */
-tb_void_t                       tb_pool_data_dump(tb_byte_t const* data, tb_bool_t verbose, tb_char_t const* prefix);
+tb_void_t                       tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t const* prefix);
 
 /* save backtrace
  *

@@ -33,7 +33,7 @@
 typedef struct __tb_demo_spider_t
 {
     // the pool
-    tb_fixed_pool_old_ref_t         pool;
+    tb_fixed_pool_ref_t         pool;
 
     // the lock
     tb_spinlock_t               lock;
@@ -351,10 +351,10 @@ static tb_void_t tb_demo_spider_task_exit(tb_demo_spider_task_t* task)
     tb_spinlock_enter(&spider->lock);
 
     // trace
-    tb_trace_d("task: size: %lu, exit: %s", spider->pool? tb_fixed_pool_old_size(spider->pool) : 0, task->iurl);
+    tb_trace_d("task: size: %lu, exit: %s", spider->pool? tb_fixed_pool_size(spider->pool) : 0, task->iurl);
 
     // exit task
-    if (spider->pool) tb_fixed_pool_old_free(spider->pool, task);
+    if (spider->pool) tb_fixed_pool_free(spider->pool, task);
 
     // leave
     tb_spinlock_leave(&spider->lock);
@@ -457,7 +457,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
         tb_assert_and_check_break(spider->filter && spider->pool);
 
         // the task count
-        size = tb_fixed_pool_old_size(spider->pool);
+        size = tb_fixed_pool_size(spider->pool);
         
         // have been done already?
         if (!tb_bloom_filter_set(spider->filter, url)) 
@@ -476,7 +476,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
         tb_check_break(size < TB_DEMO_SPIDER_TASK_MAXN);
 
         // make task
-        task = (tb_demo_spider_task_t*)tb_fixed_pool_old_malloc0(spider->pool);
+        task = (tb_demo_spider_task_t*)tb_fixed_pool_malloc0(spider->pool);
         tb_assert_and_check_break(task);
 
         // init task
@@ -594,7 +594,7 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         if (!tb_spinlock_init(&spider->lock)) break;
 
         // init pool
-        spider->pool = tb_fixed_pool_old_init(TB_DEMO_SPIDER_TASK_MAXN, sizeof(tb_demo_spider_task_t), 0);
+        spider->pool = tb_fixed_pool_init(TB_DEMO_SPIDER_TASK_MAXN, sizeof(tb_demo_spider_task_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(spider->pool);
 
         // init filter
@@ -650,7 +650,7 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
     spider->filter = tb_null;
 
     // exit pool
-    if (spider->pool) tb_fixed_pool_old_exit(spider->pool);
+    if (spider->pool) tb_fixed_pool_exit(spider->pool);
     spider->pool = tb_null;
 
     // leave

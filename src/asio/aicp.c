@@ -51,7 +51,7 @@ static tb_aico_impl_t* tb_aicp_aico_init(tb_aicp_impl_t* impl, tb_handle_t handl
     tb_spinlock_enter(&impl->lock);
 
     // make aico
-    tb_aico_impl_t* aico = (tb_aico_impl_t*)tb_fixed_pool_old_malloc0(impl->pool);
+    tb_aico_impl_t* aico = (tb_aico_impl_t*)tb_fixed_pool_malloc0(impl->pool);
 
     // init aico
     if (aico)
@@ -89,7 +89,7 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_impl_t* impl, tb_aico_impl_t* aico)
         tb_trace_d("exit: aico[%p]: type: %lu, handle: %p, state: %s", aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(tb_atomic_get(&aico->state)));
         
         // exit it
-        tb_fixed_pool_old_free(impl->pool, aico);
+        tb_fixed_pool_free(impl->pool, aico);
     }
 
     // leave 
@@ -324,7 +324,7 @@ tb_aicp_ref_t tb_aicp_init(tb_size_t maxn)
         tb_assert_and_check_break(impl->ptor && impl->ptor->step >= sizeof(tb_aico_impl_t));
 
         // init aico pool
-        impl->pool = tb_fixed_pool_old_init((impl->maxn >> 2) + 16, impl->ptor->step, 0);
+        impl->pool = tb_fixed_pool_init((impl->maxn >> 2) + 16, impl->ptor->step, tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
 
         // register lock profiler
@@ -362,7 +362,7 @@ tb_bool_t tb_aicp_exit(tb_aicp_ref_t aicp)
     {
         // wait failed, trace left aicos
         tb_spinlock_enter(&impl->lock);
-        if (impl->pool) tb_fixed_pool_old_walk(impl->pool, tb_aicp_aico_wait, tb_null);
+        if (impl->pool) tb_fixed_pool_walk(impl->pool, tb_aicp_aico_wait, tb_null);
         tb_spinlock_leave(&impl->lock);
         return tb_false;
     }
@@ -384,7 +384,7 @@ tb_bool_t tb_aicp_exit(tb_aicp_ref_t aicp)
 
     // exit aico pool
     tb_spinlock_enter(&impl->lock);
-    if (impl->pool) tb_fixed_pool_old_exit(impl->pool);
+    if (impl->pool) tb_fixed_pool_exit(impl->pool);
     impl->pool = tb_null;
     tb_spinlock_leave(&impl->lock);
 
@@ -730,7 +730,7 @@ tb_void_t tb_aicp_kill_all(tb_aicp_ref_t aicp)
     if (!tb_atomic_fetch_and_set(&impl->kill_all, 1))
     {
         tb_spinlock_enter(&impl->lock);
-        if (impl->pool) tb_fixed_pool_old_walk(impl->pool, tb_aicp_aico_kill, impl);
+        if (impl->pool) tb_fixed_pool_walk(impl->pool, tb_aicp_aico_kill, impl);
         tb_spinlock_leave(&impl->lock);
     }
 }
@@ -752,7 +752,7 @@ tb_long_t tb_aicp_wait_all(tb_aicp_ref_t aicp, tb_long_t timeout)
         tb_spinlock_enter(&impl->lock);
 
         // the aico count
-        size = impl->pool? tb_fixed_pool_old_size(impl->pool) : 0;
+        size = impl->pool? tb_fixed_pool_size(impl->pool) : 0;
 
         // trace
         tb_trace_d("wait: count: %lu: ..", size);
