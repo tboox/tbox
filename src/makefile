@@ -442,7 +442,6 @@ INC_FILES 				= \
 						memory/fixed_pool.h \
 						memory/large_pool.h \
 						memory/small_pool.h \
-						memory/static_pool.h \
 						memory/string_pool.h \
 						memory/prefix.h \
 						memory/memory.h \
