@@ -54,7 +54,7 @@ typedef struct __tb_small_pool_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static __tb_inline__ tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, tb_size_t size)
+static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, tb_size_t size)
 {
     // check
     tb_assert_return_val(impl && size && size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
@@ -65,11 +65,97 @@ static __tb_inline__ tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_
     {
         // the fixed pool index
         tb_size_t index = 0;
-        tb_assert_and_check_break(index < tb_arrayn(impl->fixed_pool));
-
-        // the fixed pool space
         tb_size_t space = 0;
-        tb_assert_and_check_break(space && space <= TB_SMALL_POOL_DATA_SIZE_MAXN);
+        if (size < 512)
+        {
+            if (size < 128)
+            {
+                if (size < 64)
+                {
+                    if (size < 32)
+                    {
+                        index = 0;
+                        space = 16;
+                    }
+                    else
+                    {
+                        index = 1;
+                        space = 32;
+                    }
+                }
+                else
+                {
+                    if (size < 96)
+                    {
+                        index = 2;
+                        space = 64;
+                    }
+                    else
+                    {
+                        index = 3;
+                        space = 96;
+                    }
+                }
+            }
+            else
+            {
+                if (size < 256)
+                {
+                    if (size < 192)
+                    {
+                        index = 4;
+                        space = 128;
+                    }
+                    else
+                    {
+                        index = 5;
+                        space = 192;
+                    }
+                }
+                else
+                {
+                    if (size < 384)
+                    {
+                        index = 6;
+                        space = 256;
+                    }
+                    else
+                    {
+                        index = 7;
+                        space = 384;
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (size < 2048)
+            {
+                if (size < 1024)
+                {
+                    index = 8;
+                    space = 512;
+                }
+                else
+                {
+                    index = 9;
+                    space = 1024;
+                }
+            }
+            else
+            {
+                if (size < 3072)
+                {
+                    index = 10;
+                    space = 2048;
+                }
+                else
+                {
+                    index = 11;
+                    space = 3072;
+                }
+            }
+        }
 
         // make fixed pool if not exists
         if (!impl->fixed_pool[index]) impl->fixed_pool[index] = tb_fixed_pool_init(impl->large_pool, 0, space, tb_null, tb_null, tb_null);
