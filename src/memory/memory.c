@@ -60,9 +60,6 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size)
         g_large_pool_data = data;
         g_large_pool_size = size;
 
-        // init the large pool
-        tb_assert_and_check_break(tb_large_pool());
-
         // init the pool
         tb_assert_and_check_break(tb_pool());
 
