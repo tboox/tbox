@@ -146,6 +146,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(memory_buffer)
 ,   TB_DEMO_MAIN_ITEM(memory_queue_buffer)
 ,   TB_DEMO_MAIN_ITEM(memory_static_buffer)
+,   TB_DEMO_MAIN_ITEM(memory_impl_static_fixed_pool)
 
     // network
 ,   TB_DEMO_MAIN_ITEM(network_dns)

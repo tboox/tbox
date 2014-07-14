@@ -125,6 +125,7 @@ TB_DEMO_MAIN_DECL(memory_memops);
 TB_DEMO_MAIN_DECL(memory_buffer);
 TB_DEMO_MAIN_DECL(memory_queue_buffer);
 TB_DEMO_MAIN_DECL(memory_static_buffer);
+TB_DEMO_MAIN_DECL(memory_impl_static_fixed_pool);
 
 // network
 TB_DEMO_MAIN_DECL(network_dns);
