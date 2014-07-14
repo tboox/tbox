@@ -41,6 +41,7 @@ demo_C_FILES 								+= \
 											memory/buffer \
 											memory/queue_buffer \
 											memory/static_buffer \
+											memory/impl/static_fixed_pool \
 											network/dns \
 											network/url \
 											network/ipv4 \
