@@ -43,7 +43,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
+tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_pointer_t data, tb_size_t size, tb_size_t item_size)
 {
     return tb_null;
 }
@@ -54,14 +54,22 @@ tb_size_t tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t pool)
 {
     return 0;
 }
+tb_size_t tb_static_fixed_pool_maxn(tb_static_fixed_pool_ref_t pool)
+{
+    return 0;
+}
+tb_bool_t tb_static_fixed_pool_full(tb_static_fixed_pool_ref_t pool)
+{
+    return tb_false;
+}
+tb_bool_t tb_static_fixed_pool_null(tb_static_fixed_pool_ref_t pool)
+{
+    return tb_false;
+}
 tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool)
 {
 }
 tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_debug_decl__)
-{
-    return tb_null;
-}
-tb_pointer_t tb_static_fixed_pool_malloc0(tb_static_fixed_pool_ref_t pool __tb_debug_decl__)
 {
     return tb_null;
 }

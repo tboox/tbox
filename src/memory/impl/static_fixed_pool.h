@@ -59,13 +59,10 @@ typedef struct{}*           tb_static_fixed_pool_ref_t;
  * @param data              the data address
  * @param size              the data size
  * @param item_size         the item size
- * @param item_init         the item init func
- * @param item_exit         the item exit func
- * @param priv              the private data
  *
  * @return                  the pool
  */
-tb_static_fixed_pool_ref_t  tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
+tb_static_fixed_pool_ref_t  tb_static_fixed_pool_init(tb_pointer_t data, tb_size_t size, tb_size_t item_size);
 
 /*! exit pool
  *
@@ -81,6 +78,30 @@ tb_void_t                   tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t
  */
 tb_size_t                   tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t pool);
 
+/*! the item maxn
+ *
+ * @param pool              the pool
+ *
+ * @return                  the item count
+ */
+tb_size_t                   tb_static_fixed_pool_maxn(tb_static_fixed_pool_ref_t pool);
+
+/*! is full?
+ *
+ * @param pool              the pool
+ *
+ * @return                  tb_true or tb_false
+ */
+tb_bool_t                   tb_static_fixed_pool_full(tb_static_fixed_pool_ref_t pool);
+
+/*! is null?
+ *
+ * @param pool              the pool
+ *
+ * @return                  tb_true or tb_false
+ */
+tb_bool_t                   tb_static_fixed_pool_null(tb_static_fixed_pool_ref_t pool);
+
 /*! clear pool
  *
  * @param pool              the pool
@@ -94,14 +115,6 @@ tb_void_t                   tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_
  * @return                  the item
  */
 tb_pointer_t                tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_debug_decl__);
-
-/*! malloc item and clear it
- *
- * @param pool              the pool
- *
- * @return                  the item
- */
-tb_pointer_t                tb_static_fixed_pool_malloc0(tb_static_fixed_pool_ref_t pool __tb_debug_decl__);
 
 /*! free item
  *
