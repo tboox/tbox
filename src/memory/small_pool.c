@@ -59,6 +59,7 @@ static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, 
     // check
     tb_assert_return_val(impl && size && size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
+    // TODO: optimizate using log2 + if 
     // done
     tb_fixed_pool_ref_t fixed_pool = tb_null;
     do
