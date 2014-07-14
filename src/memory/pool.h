@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "large_pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -86,25 +87,21 @@ __tb_extern_c_enter__
  * 
  * @return              the pool 
  */
-tb_pool_ref_t           tb_pool(tb_noarg_t);
+tb_pool_ref_t           tb_pool();
 
 /*! init the pool
  * 
+ * @param large_pool    the large pool, using the default large pool if be null
+ *
  * @return              the pool 
  */
-tb_pool_ref_t           tb_pool_init(tb_noarg_t);
+tb_pool_ref_t           tb_pool_init(tb_large_pool_ref_t large_pool);
 
 /*! exit the pool
  *
  * @param pool          the pool 
  */
 tb_void_t               tb_pool_exit(tb_pool_ref_t pool);
-
-/*! clear the pool
- *
- * @param pool          the pool 
- */
-tb_void_t               tb_pool_clear(tb_pool_ref_t pool);
 
 /*! malloc data
  *

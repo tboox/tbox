@@ -62,11 +62,6 @@ static tb_handle_t tb_large_pool_instance_init(tb_cpointer_t* ppriv)
 }
 static tb_void_t tb_large_pool_instance_exit(tb_handle_t pool, tb_cpointer_t priv)
 {
-    // dump it
-#ifdef __tb_debug__
-    tb_large_pool_dump((tb_large_pool_ref_t)pool);
-#endif
-
     // exit it
     tb_large_pool_exit((tb_large_pool_ref_t)pool);
 }
@@ -170,11 +165,11 @@ tb_pointer_t tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, 
     tb_assert_and_check_return_val(size <= TB_POOL_DATA_SIZE_MAXN, tb_null);
 
     // ralloc data
-    tb_pointer_t p = tb_large_pool_is_native(pool)? tb_native_large_pool_ralloc(pool, data, size, real __tb_debug_args__) : tb_static_large_pool_ralloc(pool, data, size, real __tb_debug_args__);
+    tb_pointer_t data_new = tb_large_pool_is_native(pool)? tb_native_large_pool_ralloc(pool, data, size, real __tb_debug_args__) : tb_static_large_pool_ralloc(pool, data, size, real __tb_debug_args__);
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!p) 
+    if (!data_new) 
     {
         // trace
         tb_trace_e("ralloc(%p, %lu) failed! at %s(): %lu, %s", data, size, func_, line_, file_);
@@ -191,7 +186,7 @@ tb_pointer_t tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, 
     tb_assert_abort(!real || *real >= size);
 
     // ok
-    return p;
+    return data_new;
 }
 tb_bool_t tb_large_pool_free_(tb_large_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
 {

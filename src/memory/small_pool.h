@@ -27,7 +27,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "large_pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -94,9 +94,11 @@ typedef struct{}*       tb_small_pool_ref_t;
 
 /*! init the small pool only for size <=3KB
  * 
+ * @param large_pool    the large pool, using the default large pool if be null
+ *
  * @return              the pool 
  */
-tb_small_pool_ref_t     tb_small_pool_init(tb_noarg_t);
+tb_small_pool_ref_t     tb_small_pool_init(tb_large_pool_ref_t large_pool);
 
 /*! exit the pool
  *
