@@ -364,7 +364,7 @@ tb_list_ref_t tb_list_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.comp = tb_list_itor_comp;
 
         // init pool, step = next + prev + data
-        impl->pool = tb_fixed_pool_init(grow, sizeof(tb_list_item_t) + func.size, tb_null, tb_null, tb_null);
+        impl->pool = tb_fixed_pool_init(tb_null, grow, sizeof(tb_list_item_t) + func.size, tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
 
         // ok

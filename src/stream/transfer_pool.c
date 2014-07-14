@@ -118,7 +118,7 @@ static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_impl_t* impl, 
     do
     {
         // init task pool
-        if (!impl->pool) impl->pool = tb_fixed_pool_init((impl->maxn >> 2) + 16, sizeof(tb_transfer_task_t), tb_null, tb_null, tb_null);
+        if (!impl->pool) impl->pool = tb_fixed_pool_init(tb_null, (impl->maxn >> 2) + 16, sizeof(tb_transfer_task_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
 
         // init idle task list

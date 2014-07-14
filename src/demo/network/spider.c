@@ -594,7 +594,7 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         if (!tb_spinlock_init(&spider->lock)) break;
 
         // init pool
-        spider->pool = tb_fixed_pool_init(TB_DEMO_SPIDER_TASK_MAXN, sizeof(tb_demo_spider_task_t), tb_null, tb_null, tb_null);
+        spider->pool = tb_fixed_pool_init(tb_null, TB_DEMO_SPIDER_TASK_MAXN, sizeof(tb_demo_spider_task_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(spider->pool);
 
         // init filter

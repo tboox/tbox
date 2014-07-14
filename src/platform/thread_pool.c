@@ -788,7 +788,7 @@ tb_thread_pool_ref_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
         impl->worker_maxn   = worker_maxn;
 
         // init jobs pool
-        impl->jobs_pool     = tb_fixed_pool_init(TB_THREAD_POOL_JOBS_POOL_GROW, sizeof(tb_thread_pool_job_t), tb_null, tb_null, tb_null);
+        impl->jobs_pool     = tb_fixed_pool_init(tb_null, TB_THREAD_POOL_JOBS_POOL_GROW, sizeof(tb_thread_pool_job_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->jobs_pool);
 
         // init jobs urgent

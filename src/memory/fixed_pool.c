@@ -41,14 +41,17 @@
 // the fixed pool impl type
 typedef struct __tb_fixed_pool_impl_t
 {
-    // the allocated size
-    tb_size_t                       size;
+    // the large pool
+    tb_large_pool_ref_t             large_pool;
 
     // the slot size
     tb_size_t                       slot_size;
 
     // the item size
     tb_size_t                       item_size;
+
+    // the item count
+    tb_size_t                       item_count;
 
     // the init func
     tb_fixed_pool_item_init_func_t  func_init;
@@ -64,23 +67,28 @@ typedef struct __tb_fixed_pool_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_fixed_pool_ref_t tb_fixed_pool_init(tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
+tb_fixed_pool_ref_t tb_fixed_pool_init(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
 {
     // done
     tb_bool_t               ok = tb_false;
     tb_fixed_pool_impl_t*   impl = tb_null;
     do
     {
+        // using the default large pool 
+        if (!large_pool) large_pool = tb_large_pool();
+        tb_assert_and_check_break(large_pool);
+
         // make pool
-        impl = (tb_fixed_pool_impl_t*)tb_large_pool_malloc0(tb_large_pool(), sizeof(tb_fixed_pool_impl_t), tb_null);
+        impl = (tb_fixed_pool_impl_t*)tb_large_pool_malloc0(large_pool, sizeof(tb_fixed_pool_impl_t), tb_null);
         tb_assert_and_check_break(impl);
 
         // init pool
-        impl->slot_size = slot_size;
-        impl->item_size = item_size;
-        impl->func_init = item_init;
-        impl->func_exit = item_exit;
-        impl->func_priv = priv;
+        impl->large_pool    = large_pool;
+        impl->slot_size     = slot_size;
+        impl->item_size     = item_size;
+        impl->func_init     = item_init;
+        impl->func_exit     = item_exit;
+        impl->func_priv     = priv;
 
         // ok
         ok = tb_true;
@@ -116,8 +124,17 @@ tb_size_t tb_fixed_pool_size(tb_fixed_pool_ref_t pool)
     tb_fixed_pool_impl_t* impl = (tb_fixed_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl, 0);
 
-    // the size
-    return impl->size;
+    // the item count
+    return impl->item_count;
+}
+tb_size_t tb_fixed_pool_item_size(tb_fixed_pool_ref_t pool)
+{
+    // check
+    tb_fixed_pool_impl_t* impl = (tb_fixed_pool_impl_t*)pool;
+    tb_assert_and_check_return_val(impl, 0);
+
+    // the item size
+    return impl->item_size;
 }
 tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t pool)
 {
