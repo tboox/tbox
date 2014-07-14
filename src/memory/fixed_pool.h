@@ -27,7 +27,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "large_pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -139,6 +139,7 @@ typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t item, tb_
 
 /*! init fixed pool
  *
+ * @param large_pool    the large pool, using the default large pool if be null
  * @param slot_size     the item count per-slot, using the default size if be zero
  * @param item_size     the item size
  * @param item_init     the item init func
@@ -147,7 +148,7 @@ typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t item, tb_
  *
  * @return              the pool 
  */
-tb_fixed_pool_ref_t     tb_fixed_pool_init(tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
+tb_fixed_pool_ref_t     tb_fixed_pool_init(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
 
 /*! exit pool
  *
@@ -162,6 +163,14 @@ tb_void_t               tb_fixed_pool_exit(tb_fixed_pool_ref_t pool);
  * @return              the item count
  */
 tb_size_t               tb_fixed_pool_size(tb_fixed_pool_ref_t pool);
+
+/*! the item size
+ *
+ * @param pool          the pool 
+ *
+ * @return              the item size
+ */
+tb_size_t               tb_fixed_pool_item_size(tb_fixed_pool_ref_t pool);
 
 /*! clear pool
  *

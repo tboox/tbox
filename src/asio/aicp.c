@@ -324,7 +324,7 @@ tb_aicp_ref_t tb_aicp_init(tb_size_t maxn)
         tb_assert_and_check_break(impl->ptor && impl->ptor->step >= sizeof(tb_aico_impl_t));
 
         // init aico pool
-        impl->pool = tb_fixed_pool_init((impl->maxn >> 2) + 16, impl->ptor->step, tb_null, tb_null, tb_null);
+        impl->pool = tb_fixed_pool_init(tb_null, (impl->maxn >> 2) + 16, impl->ptor->step, tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
 
         // register lock profiler

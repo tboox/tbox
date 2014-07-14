@@ -344,7 +344,7 @@ tb_ltimer_ref_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init pool
-        impl->pool         = tb_fixed_pool_init((maxn >> 2) + 16, sizeof(tb_ltimer_task_impl_t), tb_null, tb_null, tb_null);
+        impl->pool         = tb_fixed_pool_init(tb_null, (maxn >> 2) + 16, sizeof(tb_ltimer_task_impl_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
 
         // init the expired tasks

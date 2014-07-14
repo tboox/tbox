@@ -106,7 +106,7 @@ tb_aiop_ref_t tb_aiop_init(tb_size_t maxn)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init pool
-        impl->pool = tb_fixed_pool_init((maxn >> 4) + 16, sizeof(tb_aioo_impl_t), tb_null, tb_null, tb_null);
+        impl->pool = tb_fixed_pool_init(tb_null, (maxn >> 4) + 16, sizeof(tb_aioo_impl_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->pool);
 
         // init spak
