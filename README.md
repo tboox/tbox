@@ -233,18 +233,13 @@ example
          * @param priv      the platform private data
          *                  pass JNIEnv* env for android
          *                  pass tb_null for other platform
-         * @param data      the memory data for the memory pool, using the native memory if be tb_null
-         * @param size      the memory size for the memory pool, using the native memory if be zero
+         * @param data      the memory data for the memory pool, uses the native memory if be tb_null
+         * @param size      the memory size for the memory pool, uses the native memory if be zero
          *
          * for android:     tb_init(jenv, tb_null, 0)
          * for memory pool: tb_init(tb_null, malloc(10 * 1024 * 1024), 10 * 1024 * 1024);
          */
-#ifdef __tb_debug__
-        // for checking memory leaks and overflow
-        if (!tb_init(tb_null, malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
-#else
         if (!tb_init(tb_null, tb_null, 0)) return 0;
-#endif
 
         // print info with tag
         // output: [tag]: hello tbox
