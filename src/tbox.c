@@ -169,11 +169,11 @@ tb_bool_t tb_init_and_check(tb_handle_t priv, tb_byte_t* data, tb_size_t size, t
     if (!tb_platform_init(priv)) return tb_false;
 
     // init network 
-//    if (!tb_network_init()) return tb_false;
+    if (!tb_network_init()) return tb_false;
 
     // init object
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
-//    if (!tb_object_context_init()) return tb_false;
+    if (!tb_object_context_init()) return tb_false;
 #endif
 
     // check version
@@ -199,11 +199,11 @@ tb_void_t tb_exit()
 
     // exit object
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
-//    tb_object_context_exit();
+    tb_object_context_exit();
 #endif
     
     // exit network
-//    tb_network_exit();
+    tb_network_exit();
     
     // exit platform
     tb_platform_exit();

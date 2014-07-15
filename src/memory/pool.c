@@ -186,7 +186,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
             tb_assert_and_check_break(data_new);
 
             // copy the old data
-            tb_memcpy(data_new, data, tb_min(data_head->size, size));
+            tb_memcpy_(data_new, data, tb_min(data_head->size, size));
 
             // free the old data
             tb_small_pool_free_(impl->small_pool, data __tb_debug_args__);
@@ -199,7 +199,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
             tb_assert_and_check_break(data_new);
 
             // copy the old data
-            tb_memcpy(data_new, data, tb_min(data_head->size, size));
+            tb_memcpy_(data_new, data, tb_min(data_head->size, size));
 
             // free the old data
             tb_large_pool_free_(impl->large_pool, data __tb_debug_args__);
@@ -273,6 +273,5 @@ tb_void_t tb_pool_dump(tb_pool_ref_t pool)
 
     // dump pool
     tb_small_pool_dump(impl->small_pool);
-
 }
 #endif

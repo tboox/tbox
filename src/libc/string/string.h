@@ -51,6 +51,7 @@ __tb_extern_c_enter__
 
 // memset
 tb_pointer_t        tb_memset(tb_pointer_t s, tb_byte_t c, tb_size_t n);
+tb_pointer_t        tb_memset_(tb_pointer_t s, tb_byte_t c, tb_size_t n);
 tb_pointer_t        tb_memset_u16(tb_pointer_t s, tb_uint16_t c, tb_size_t n);
 tb_pointer_t        tb_memset_u24(tb_pointer_t s, tb_uint32_t c, tb_size_t n);
 tb_pointer_t        tb_memset_u32(tb_pointer_t s, tb_uint32_t c, tb_size_t n);
@@ -58,15 +59,19 @@ tb_pointer_t        tb_memset_u64(tb_pointer_t s, tb_uint64_t c, tb_size_t n);
 
 // memdup
 tb_pointer_t        tb_memdup(tb_cpointer_t s, tb_size_t n);
+tb_pointer_t        tb_memdup_(tb_cpointer_t s, tb_size_t n);
 
 // memcpy
 tb_pointer_t        tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
+tb_pointer_t        tb_memcpy_(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
 
 // memmov
 tb_pointer_t        tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
+tb_pointer_t        tb_memmov_(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
 
 // memcmp
 tb_long_t           tb_memcmp(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n);
+tb_long_t           tb_memcmp_(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n);
 
 // strlen
 tb_size_t           tb_strlen(tb_char_t const* s);

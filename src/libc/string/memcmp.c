@@ -27,7 +27,6 @@
  */
 #include "string.h"
 #include "../../memory/impl/prefix.h"
-
 #ifndef TB_CONFIG_LIBC_HAVE_MEMCMP
 #   if defined(TB_ARCH_x86)
 #       include "opt/x86/memcmp.c"
@@ -66,6 +65,11 @@ static tb_long_t tb_memcmp_impl(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces 
  */
+tb_long_t tb_memcmp_(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
+{
+    // done
+    return tb_memcmp_impl(s1, s2, n);
+}
 tb_long_t tb_memcmp(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
     // check

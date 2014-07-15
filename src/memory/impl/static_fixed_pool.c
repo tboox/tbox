@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "static_fixed_pool"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -331,7 +331,7 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
 
     // init pool
     tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)data;
-    tb_memset(impl, 0, sizeof(tb_static_fixed_pool_impl_t));
+    tb_memset_(impl, 0, sizeof(tb_static_fixed_pool_impl_t));
 
 #ifdef __tb_debug__
     // init patch for checking underflow
@@ -363,12 +363,12 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
     tb_assert_and_check_return_val(impl->item_maxn, tb_null);
  
     // clear the used info
-    tb_memset(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
+    tb_memset_(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
 
     // init data
     impl->data = (tb_byte_t*)tb_align((tb_size_t)impl->used_info + (tb_align8(impl->item_maxn) >> 3), TB_POOL_DATA_ALIGN);
     tb_assert_and_check_return_val(data + size > impl->data, tb_null);
-    tb_assert_and_check_return_val(impl->item_maxn * impl->item_space <= (tb_size_t)(data + size - impl->data), tb_null);
+    tb_assert_and_check_return_val(impl->item_maxn * impl->item_space <= (tb_size_t)(data + size - impl->data + 1), tb_null);
 
     // init data tail
     impl->tail = impl->data + impl->item_maxn * impl->item_space;
@@ -398,7 +398,7 @@ tb_void_t tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t pool)
     tb_static_fixed_pool_clear(pool);
 
     // exit it
-    tb_memset(impl, 0, sizeof(tb_static_fixed_pool_impl_t));
+    tb_memset_(impl, 0, sizeof(tb_static_fixed_pool_impl_t));
 }
 tb_size_t tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t pool)
 {
@@ -443,7 +443,7 @@ tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool)
     tb_assert_and_check_return(impl);
 
     // clear used_info
-    if (impl->used_info) tb_memset(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
+    if (impl->used_info) tb_memset_(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
 
     // clear size
     impl->item_count = 0;
@@ -503,7 +503,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
         tb_pool_data_save_backtrace(data_head, 2);
 
         // make the dirty data and patch 0xcc for checking underflow
-        tb_memset((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, impl->item_space - sizeof(tb_pool_data_head_t));
+        tb_memset_((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, impl->item_space - sizeof(tb_pool_data_head_t));
  
         // update the occupied size
         impl->occupied_size += impl->item_space - TB_POOL_DATA_HEAD_DIFF_SIZE - 1;
@@ -613,6 +613,7 @@ tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_fixed_po
     tb_size_t   i = 0;
     tb_size_t   m = impl->item_maxn;
     tb_byte_t*  p = impl->used_info;
+    tb_byte_t*  d = impl->data + sizeof(tb_pool_data_head_t);
     tb_byte_t   u = *p;
     tb_byte_t   b = 0;
     for (i = 0; i < m; ++i)
@@ -630,14 +631,14 @@ tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_fixed_po
             if (!(u + 1))
             {
                 // done func
-                func(impl->data + (i + 0) * impl->item_space, priv);
-                func(impl->data + (i + 1) * impl->item_space, priv);
-                func(impl->data + (i + 2) * impl->item_space, priv);
-                func(impl->data + (i + 3) * impl->item_space, priv);
-                func(impl->data + (i + 4) * impl->item_space, priv);
-                func(impl->data + (i + 5) * impl->item_space, priv);
-                func(impl->data + (i + 6) * impl->item_space, priv);
-                func(impl->data + (i + 7) * impl->item_space, priv);
+                func(d + (i + 0) * impl->item_space, priv);
+                func(d + (i + 1) * impl->item_space, priv);
+                func(d + (i + 2) * impl->item_space, priv);
+                func(d + (i + 3) * impl->item_space, priv);
+                func(d + (i + 4) * impl->item_space, priv);
+                func(d + (i + 5) * impl->item_space, priv);
+                func(d + (i + 6) * impl->item_space, priv);
+                func(d + (i + 7) * impl->item_space, priv);
 
                 // skip this byte and continue it
                 i += 7;
@@ -650,7 +651,7 @@ tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_fixed_po
         if ((u & (0x01 << b)))
         {
             // done func
-            func(impl->data + i * impl->item_space, priv);
+            func(d + i * impl->item_space, priv);
         }
     }
 }
@@ -660,9 +661,6 @@ tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
     // check
     tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
     tb_assert_and_check_return(impl && impl->used_info);
-
-    // trace
-    tb_trace_i("");
 
     // dump 
     tb_size_t index = 0;
@@ -685,17 +683,15 @@ tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
         }
     }
 
-    // trace
-    tb_trace_i("");
-
     // trace debug info
-    tb_trace_i("peak_size: %lu",            impl->peak_size);
-    tb_trace_i("wast_rate: %llu/10000",     impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->total_size) * 10000) / (tb_hize_t)impl->occupied_size : 0);
-    tb_trace_i("item_size: %lu",            impl->item_size);
-    tb_trace_i("item_maxn: %lu",            impl->item_maxn);
-    tb_trace_i("item_space: %lu",           impl->item_space);
-    tb_trace_i("free_count: %lu",           impl->free_count);
-    tb_trace_i("malloc_count: %lu",         impl->malloc_count);
-    tb_trace_i("pred_failed: %lu",          impl->pred_failed);
+    tb_trace_i("[%lu]: peak_size: %lu, wast_rate: %llu/10000, pred_failed: %lu, item_maxn: %lu, free_count: %lu, malloc_count: %lu"
+            ,   impl->item_size
+            ,   impl->peak_size
+            ,   impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->total_size) * 10000) / (tb_hize_t)impl->occupied_size : 0
+            ,   impl->pred_failed
+            ,   impl->item_maxn
+            ,   impl->free_count
+            ,   impl->malloc_count);
+
 }
 #endif
