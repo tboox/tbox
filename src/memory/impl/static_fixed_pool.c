@@ -272,7 +272,7 @@ static tb_void_t tb_static_fixed_pool_check_data(tb_static_fixed_pool_impl_t* im
         tb_assertf_break(!(((tb_byte_t*)data_head - impl->data) % impl->item_space), "the invalid data: %p", data);
         tb_assertf_break(tb_static_fixed_pool_used_bset(impl->used_info, index), "data have been freed: %p", data);
         tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[data_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(((tb_byte_t*)data)[impl->item_size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;
@@ -509,7 +509,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
         impl->occupied_size += impl->item_space - TB_POOL_DATA_HEAD_DIFF_SIZE - 1;
 
         // update the total size
-        impl->total_size    += data_head->size;
+        impl->total_size    += impl->item_size;
 
         // update the peak size
         if (impl->total_size > impl->peak_size) impl->peak_size = impl->total_size;
@@ -552,7 +552,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
         tb_assertf_break(!(((tb_byte_t*)data_head - impl->data) % impl->item_space), "free the invalid data: %p", data);
         tb_assertf_and_check_break(tb_static_fixed_pool_used_bset(impl->used_info, index), "double free data: %p", data);
         tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[data_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(((tb_byte_t*)data)[impl->item_size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the prev data
@@ -565,7 +565,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
         impl->occupied_size -= impl->item_space - TB_POOL_DATA_HEAD_DIFF_SIZE - 1;
 
         // update the total size
-        impl->total_size -= data_head->size;
+        impl->total_size -= impl->item_size;
 
         // update the free count
         impl->free_count++;

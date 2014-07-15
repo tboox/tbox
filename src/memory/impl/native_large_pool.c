@@ -482,7 +482,10 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         impl->occupied_size -= data_head->base.size;
  
         // update the total size
-        impl->total_size    -= data_head->base.size;
+        impl->total_size -= data_head->base.size;
+
+        // the previous size
+        tb_size_t prev_size = data_head->base.size;
 #endif
 
         // remove the data from the data_list
@@ -511,8 +514,11 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         // update backtrace
         tb_pool_data_save_backtrace(&data_head->base, 2);
 
-        // make the dirty data and patch 0xcc for checking underflow
-        tb_memset_(data_real, TB_POOL_DATA_PATCH, size + 1);
+        // make the dirty data 
+        if (size > prev_size) tb_memset_(data_real + prev_size, TB_POOL_DATA_PATCH, size - prev_size);
+
+        // patch 0xcc for checking underflow
+        data_real[size] = TB_POOL_DATA_PATCH;
 #endif
 
         // save the data to the data_list
