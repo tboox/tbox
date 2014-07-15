@@ -64,7 +64,7 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
         nframe = tb_min(nframe, size - nskip);
 
         // save to frames
-        tb_memcpy(frames, temp + nskip, nframe * sizeof(tb_pointer_t));
+        tb_memcpy_(frames, temp + nskip, nframe * sizeof(tb_pointer_t));
     }
     // backtrace
     else nframe = backtrace(frames, nframe);

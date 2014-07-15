@@ -423,6 +423,9 @@ tb_pointer_t tb_fixed_pool_malloc_(tb_fixed_pool_ref_t pool __tb_debug_decl__)
         // done init
         if (impl->func_init && !impl->func_init(data, impl->func_priv)) break;
 
+        // update the item count
+        impl->item_count++;
+
         // ok
         ok = tb_true;
 
@@ -499,6 +502,9 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t data __tb_d
                 tb_fixed_pool_slot_exit(impl, slot);
             }
         }
+
+        // update the item count
+        impl->item_count--;
  
         // ok
         ok = tb_true;

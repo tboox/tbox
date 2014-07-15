@@ -37,6 +37,13 @@
 #include "impl/prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// only for debuging pool bug
+//#define TB_SMALL_POOL_DISABLE
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -263,6 +270,11 @@ tb_pointer_t tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size __tb
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
+    // disable small pool for debug
+#ifdef TB_SMALL_POOL_DISABLE
+    return tb_large_pool_malloc(impl->large_pool, size, tb_null);
+#endif
+
     // done
     tb_pointer_t data = tb_null;
     do
@@ -302,6 +314,11 @@ tb_pointer_t tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size __t
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
    
+    // disable small pool for debug
+#ifdef TB_SMALL_POOL_DISABLE
+    return tb_large_pool_malloc0(impl->large_pool, size, tb_null);
+#endif
+
     // done
     tb_pointer_t data = tb_null;
     do
@@ -340,6 +357,11 @@ tb_pointer_t tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
+
+    // disable small pool for debug
+#ifdef TB_SMALL_POOL_DISABLE
+    return tb_large_pool_nalloc(impl->large_pool, item, size, tb_null);
+#endif
 
     // done
     tb_pointer_t data = tb_null;
@@ -380,6 +402,11 @@ tb_pointer_t tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
+    // disable small pool for debug
+#ifdef TB_SMALL_POOL_DISABLE
+    return tb_large_pool_nalloc0(impl->large_pool, item, size, tb_null);
+#endif
+
     // done
     tb_pointer_t data = tb_null;
     do
@@ -418,6 +445,11 @@ tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, 
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && data && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
+
+    // disable small pool for debug
+#ifdef TB_SMALL_POOL_DISABLE
+    return tb_large_pool_ralloc(impl->large_pool, data, size, tb_null);
+#endif
 
     // done
     tb_pointer_t data_new = tb_null;
@@ -504,6 +536,11 @@ tb_bool_t tb_small_pool_free_(tb_small_pool_ref_t pool, tb_pointer_t data __tb_d
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && data, tb_false);
+
+    // disable small pool for debug
+#ifdef TB_SMALL_POOL_DISABLE
+    return tb_large_pool_free(impl->large_pool, data);
+#endif
 
     // done
     tb_bool_t ok = tb_false;
