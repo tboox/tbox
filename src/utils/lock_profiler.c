@@ -111,8 +111,10 @@ tb_void_t tb_lock_profiler_dump(tb_handle_t handle)
     tb_lock_profiler_t* profiler = (tb_lock_profiler_t*)handle;
     tb_assert_and_check_return(profiler);
 
+    // trace
+    tb_trace_i("");
+
     // walk
-    tb_size_t c = 0;
     tb_size_t i = 0;
     tb_size_t n = tb_arrayn(profiler->list);
     for (i = 0; i < n; i++)
@@ -124,23 +126,10 @@ tb_void_t tb_lock_profiler_dump(tb_handle_t handle)
         tb_pointer_t lock = tb_null;
         if ((lock = (tb_pointer_t)tb_atomic_get(&item->lock)))
         {
-            // dump header
-            if (!c)
-            {
-                // trace
-                tb_trace_i("======================================================================");
-            }
-
             // dump lock
             tb_trace_i("lock: %p, name: %s, occupied: %ld", lock, (tb_char_t const*)tb_atomic_get(&item->name), tb_atomic_get(&item->size));
-
-            // count++
-            c++;
         }
     }
-
-    // trace end
-    if (c) tb_trace_i("======================================================================");
 }
 tb_void_t tb_lock_profiler_register(tb_handle_t handle, tb_pointer_t lock, tb_char_t const* name)
 {

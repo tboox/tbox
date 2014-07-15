@@ -587,7 +587,7 @@ tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
     tb_spinlock_enter(&impl->lock);
 
     // trace
-    tb_trace_i("======================================================================");
+    tb_trace_i("");
 
     // exit all data_list
     tb_for_all_if (tb_native_large_data_head_t*, data_head, tb_list_entry_itor(&impl->data_list), data_head)
@@ -608,9 +608,6 @@ tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
     tb_trace_i("free_count: %lu",           impl->free_count);
     tb_trace_i("malloc_count: %lu",         impl->malloc_count);
     tb_trace_i("ralloc_count: %lu",         impl->ralloc_count);
-
-    // trace
-    tb_trace_i("======================================================================");
 
     // leave
     tb_spinlock_leave(&impl->lock);
