@@ -53,6 +53,9 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size)
     tb_bool_t ok = tb_false;
     do
     {   
+        // init page
+        if (!tb_page_init()) break;
+
         // init the native memory
         if (!tb_native_memory_init()) break;
 
@@ -78,4 +81,7 @@ tb_void_t tb_memory_exit()
 {
     // exit the native memory
     tb_native_memory_exit();
+
+    // exit page
+    tb_page_exit();
 }

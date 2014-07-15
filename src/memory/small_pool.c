@@ -170,6 +170,7 @@ static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, 
     // ok?
     return fixed_pool;
 }
+#ifdef __tb_debug__
 static tb_bool_t tb_small_pool_item_check(tb_pointer_t data, tb_cpointer_t priv)
 {
     // check
@@ -199,6 +200,7 @@ static tb_bool_t tb_small_pool_item_check(tb_pointer_t data, tb_cpointer_t priv)
     // continue?
     return ok;
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

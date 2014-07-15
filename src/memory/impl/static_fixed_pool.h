@@ -62,7 +62,7 @@ typedef struct{}*           tb_static_fixed_pool_ref_t;
  *
  * @return                  the pool
  */
-tb_static_fixed_pool_ref_t  tb_static_fixed_pool_init(tb_pointer_t data, tb_size_t size, tb_size_t item_size);
+tb_static_fixed_pool_ref_t  tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size);
 
 /*! exit pool
  *
@@ -78,11 +78,11 @@ tb_void_t                   tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t
  */
 tb_size_t                   tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t pool);
 
-/*! the item maxn
+/*! the item maximum count
  *
  * @param pool              the pool
  *
- * @return                  the item count
+ * @return                  the item maximum count
  */
 tb_size_t                   tb_static_fixed_pool_maxn(tb_static_fixed_pool_ref_t pool);
 
@@ -108,27 +108,27 @@ tb_bool_t                   tb_static_fixed_pool_null(tb_static_fixed_pool_ref_t
  */
 tb_void_t                   tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool);
 
-/*! malloc item
+/*! malloc data
  *
  * @param pool              the pool
  * 
- * @return                  the item
+ * @return                  the data
  */
 tb_pointer_t                tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_debug_decl__);
 
-/*! free item
+/*! free data
  *
  * @param pool              the pool
- * @param item              the item
+ * @param data              the data
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_t item __tb_debug_decl__);
+tb_bool_t                   tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
-/*! walk item
+/*! walk data
  *
  * @code
- * tb_bool_t tb_static_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
+ * tb_bool_t tb_static_fixed_pool_item_func(tb_pointer_t data, tb_cpointer_t priv)
  * {
  *      // ok or break
  *      return tb_true;

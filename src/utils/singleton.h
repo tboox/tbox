@@ -41,38 +41,38 @@ __tb_extern_c_enter__
 /// the singleton type enum
 typedef enum __tb_singleton_type_e
 {
-    /// the pool type
-    TB_SINGLETON_TYPE_POOL                  = 0
-
     /// the large pool type
-,   TB_SINGLETON_TYPE_LARGE_POOL            = 1
+    TB_SINGLETON_TYPE_LARGE_POOL            = 0
 
-    /// the thread pool type
-,   TB_SINGLETON_TYPE_THREAD_POOL           = 2
-
-    /// the transfer pool type
-,   TB_SINGLETON_TYPE_TRANSFER_POOL         = 3
+    /// the pool type
+,   TB_SINGLETON_TYPE_POOL                  = 1
 
     /// the lock profiler type
-,   TB_SINGLETON_TYPE_LOCK_PROFILER         = 4
-
-    /// the aicp type
-,   TB_SINGLETON_TYPE_AICP                  = 5
+,   TB_SINGLETON_TYPE_LOCK_PROFILER         = 2
 
     /// the random type
-,   TB_SINGLETON_TYPE_RANDOM                = 6
+,   TB_SINGLETON_TYPE_RANDOM                = 3
 
-    /// the cookies type
-,   TB_SINGLETON_TYPE_COOKIES               = 7
+    /// the aicp type
+,   TB_SINGLETON_TYPE_AICP                  = 4
 
     /// the openssl library type
-,   TB_SINGLETON_TYPE_LIBRARY_OPENSSL       = 8
+,   TB_SINGLETON_TYPE_LIBRARY_OPENSSL       = 5
 
     /// the mysql library type
-,   TB_SINGLETON_TYPE_LIBRARY_MYSQL         = 9
+,   TB_SINGLETON_TYPE_LIBRARY_MYSQL         = 6
 
     /// the sqlite3 library type
-,   TB_SINGLETON_TYPE_LIBRARY_SQLITE3       = 10
+,   TB_SINGLETON_TYPE_LIBRARY_SQLITE3       = 7
+
+    /// the thread pool type
+,   TB_SINGLETON_TYPE_THREAD_POOL           = 8
+
+    /// the transfer pool type
+,   TB_SINGLETON_TYPE_TRANSFER_POOL         = 9
+
+    /// the cookies type
+,   TB_SINGLETON_TYPE_COOKIES               = 10
 
     /// the user defined type
 ,   TB_SINGLETON_TYPE_USER                  = 11

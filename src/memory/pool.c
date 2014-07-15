@@ -273,7 +273,6 @@ tb_void_t tb_pool_dump(tb_pool_ref_t pool)
 
     // dump pool
     tb_small_pool_dump(impl->small_pool);
-    tb_large_pool_dump(impl->large_pool);
 
 }
 #endif

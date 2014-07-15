@@ -39,16 +39,21 @@
  */
 
 // the pool data magic number
-#define TB_POOL_DATA_MAGIC          (0xdead)
+#define TB_POOL_DATA_MAGIC                  (0xdead)
 
 // the pool data patch value 
-#define TB_POOL_DATA_PATCH          (0xcc)
+#define TB_POOL_DATA_PATCH                  (0xcc)
 
 // the pool data size maximum 
-#define TB_POOL_DATA_SIZE_MAXN      (TB_MAXU32)
+#define TB_POOL_DATA_SIZE_MAXN              (TB_MAXU32)
 
 // the pool data address alignment 
-#define TB_POOL_DATA_ALIGN          TB_CPU_BITBYTE
+#define TB_POOL_DATA_ALIGN                  TB_CPU_BITBYTE
+
+// the pool data head different size for computing the wasted space size
+#ifdef __tb_debug__
+#   define TB_POOL_DATA_HEAD_DIFF_SIZE      (sizeof(tb_pool_data_head_t) - sizeof(tb_uint32_t))
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types

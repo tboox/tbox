@@ -177,7 +177,6 @@ static tb_void_t tb_static_large_pool_check_data(tb_static_large_pool_impl_t* im
     } while (0);
 
     // failed? dump it
-#ifdef __tb_debug__
     if (!ok) 
     {
         // dump data
@@ -186,7 +185,6 @@ static tb_void_t tb_static_large_pool_check_data(tb_static_large_pool_impl_t* im
         // abort
         tb_abort();
     }
-#endif
 }
 static tb_void_t tb_static_large_pool_check_next(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t const* data_head)
 {
@@ -443,7 +441,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_done(tb_static_l
         tb_memset((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, size_real + patch);
  
         // update the occupied size
-        impl->occupied_size += sizeof(tb_static_large_data_head_t) + data_head->space - 1 - sizeof(tb_pool_data_debug_head_t);
+        impl->occupied_size += sizeof(tb_static_large_data_head_t) + data_head->space - 1 - TB_POOL_DATA_HEAD_DIFF_SIZE;
 
         // update the total size
         impl->total_size    += data_head->base.size;
@@ -481,15 +479,17 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
 #ifdef __tb_debug__
         // patch 0xcc
         tb_size_t patch = 1;
-#else
-        tb_size_t patch = 0;
-#endif
 
         // the prev size
         tb_size_t prev_size = data_head->base.size;
 
         // the prev space
         tb_size_t prev_space = data_head->space;
+
+#else
+        // no patch
+        tb_size_t patch = 0;
+#endif
 
         // compile the need space for the page alignment
         tb_size_t need_space = tb_align(size + patch, impl->page_size) - sizeof(tb_static_large_data_head_t);
@@ -604,10 +604,10 @@ static tb_bool_t tb_static_large_pool_free_done(tb_static_large_pool_impl_t* imp
         tb_static_large_pool_check_next(impl, data_head);
 
         // update the occupied size
-        impl->occupied_size -= sizeof(tb_static_large_data_head_t) + data_head->space - 1 - sizeof(tb_pool_data_debug_head_t);
+        impl->occupied_size -= sizeof(tb_static_large_data_head_t) + data_head->space - 1 - TB_POOL_DATA_HEAD_DIFF_SIZE;
 
         // update the total size
-        impl->total_size    -= data_head->base.size;
+        impl->total_size -= data_head->base.size;
 
         // update the free count
         impl->free_count++;
