@@ -472,9 +472,12 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t data __tb_d
     tb_bool_t ok = tb_false;
     do
     {
+        // check
+        tb_assertf_and_check_break(impl->item_count, "double free data: %p", data);
+
         // find the slot 
         tb_fixed_pool_slot_t* slot = tb_fixed_pool_slot_find(impl, data);
-        tb_assertf_abort(slot, "the data: %p not belong to pool: %p", data, pool);
+        tb_assertf_and_check_break(slot, "the data: %p not belong to pool: %p", data, pool);
         tb_assert_and_check_break(slot->pool);
 
         // the slot is full?
@@ -511,8 +514,20 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t data __tb_d
 
     } while (0);
 
-    // check
-    tb_assertf_abort(ok, "free(%p) failed!", data);
+    // failed? dump it
+#ifdef __tb_debug__
+    if (!ok) 
+    {
+        // trace
+        tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
+
+        // dump data
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[fixed_pool]: [error]: ");
+
+        // abort
+        tb_abort();
+    }
+#endif
 
     // ok?
     return ok;

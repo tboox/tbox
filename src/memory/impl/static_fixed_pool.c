@@ -550,6 +550,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
         // check
         tb_assertf_and_check_break((tb_byte_t*)data_head >= impl->data && (tb_byte_t*)data_head + impl->item_space <= impl->tail, "the data: %p not belong to pool: %p", data, impl);
         tb_assertf_break(!(((tb_byte_t*)data_head - impl->data) % impl->item_space), "free the invalid data: %p", data);
+        tb_assertf_and_check_break(impl->item_count, "double free data: %p", data);
         tb_assertf_and_check_break(tb_static_fixed_pool_used_bset(impl->used_info, index), "double free data: %p", data);
         tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
         tb_assertf_break(((tb_byte_t*)data)[impl->item_size] == TB_POOL_DATA_PATCH, "data underflow");
