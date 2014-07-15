@@ -27,7 +27,6 @@
  */
 #include "string.h"
 #include "../../memory/impl/prefix.h"
-
 #ifndef TB_CONFIG_LIBC_HAVE_MEMMOV
 #   if defined(TB_ARCH_x86)
 #       include "opt/x86/memmov.c"
@@ -82,6 +81,12 @@ static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces 
  */
+tb_pointer_t tb_memmov_(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
+{
+    // done
+    return tb_memmov_impl(s1, s2, n);
+}
+
 tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
     // check

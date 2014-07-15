@@ -438,7 +438,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_done(tb_static_l
         tb_pool_data_save_backtrace(&data_head->base, 3);
 
         // make the dirty data and patch 0xcc for checking underflow
-        tb_memset((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, size_real + patch);
+        tb_memset_((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, size_real + patch);
  
         // update the occupied size
         impl->occupied_size += sizeof(tb_static_large_data_head_t) + data_head->space - 1 - TB_POOL_DATA_HEAD_DIFF_SIZE;
@@ -551,7 +551,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
         tb_pool_data_save_backtrace(&data_head->base, 3);
 
         // make the dirty data 
-        if (size_real > prev_size) tb_memset((tb_byte_t*)&(data_head[1]) + prev_size, TB_POOL_DATA_PATCH, size_real - prev_size);
+        if (size_real > prev_size) tb_memset_((tb_byte_t*)&(data_head[1]) + prev_size, TB_POOL_DATA_PATCH, size_real - prev_size);
 
         // patch 0xcc for checking underflow
         ((tb_byte_t*)&(data_head[1]))[size_real] = TB_POOL_DATA_PATCH;
@@ -663,7 +663,7 @@ tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size)
 
     // init pool
     tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)data;
-    tb_memset(impl, 0, sizeof(tb_static_large_pool_impl_t));
+    tb_memset_(impl, 0, sizeof(tb_static_large_pool_impl_t));
 
     // init lock
     if (!tb_spinlock_init(&impl->lock)) return tb_null;
@@ -726,7 +726,7 @@ tb_void_t tb_static_large_pool_clear(tb_large_pool_ref_t pool)
     impl->data_head->space = impl->data_size - sizeof(tb_static_large_data_head_t);
 
     // clear the pred cache
-    tb_memset(impl->data_pred, 0, sizeof(impl->data_pred));
+    tb_memset_(impl->data_pred, 0, sizeof(impl->data_pred));
  
     // add this free data to the pred cache
     tb_static_large_pool_pred_add(impl, impl->data_head);
@@ -792,7 +792,7 @@ tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
             if (aloc_head != data_head)
             {
                 // copy the real data
-                tb_memcpy((tb_pointer_t)&aloc_head[1], data, tb_min(size, data_head->base.size));
+                tb_memcpy_((tb_pointer_t)&aloc_head[1], data, tb_min(size, data_head->base.size));
                 
                 // free the previous data
                 tb_static_large_pool_free_done(impl, data __tb_debug_args__);

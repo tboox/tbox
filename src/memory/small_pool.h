@@ -41,13 +41,13 @@ __tb_extern_c_enter__
 // the data size maximum
 #define TB_SMALL_POOL_DATA_SIZE_MAXN                        (3072)
 
-#define tb_small_pool_malloc(pool, size, real)              tb_small_pool_malloc_(pool, size, real __tb_debug_vals__)
-#define tb_small_pool_malloc0(pool, size, real)             tb_small_pool_malloc0_(pool, size, real __tb_debug_vals__)
+#define tb_small_pool_malloc(pool, size)                    tb_small_pool_malloc_(pool, size __tb_debug_vals__)
+#define tb_small_pool_malloc0(pool, size)                   tb_small_pool_malloc0_(pool, size __tb_debug_vals__)
 
-#define tb_small_pool_nalloc(pool, item, size, real)        tb_small_pool_nalloc_(pool, item, size, real __tb_debug_vals__)
-#define tb_small_pool_nalloc0(pool, item, size, real)       tb_small_pool_nalloc0_(pool, item, size, real __tb_debug_vals__)
+#define tb_small_pool_nalloc(pool, item, size)              tb_small_pool_nalloc_(pool, item, size __tb_debug_vals__)
+#define tb_small_pool_nalloc0(pool, item, size)             tb_small_pool_nalloc0_(pool, item, size __tb_debug_vals__)
 
-#define tb_small_pool_ralloc(pool, data, size, real)        tb_small_pool_ralloc_(pool, (tb_pointer_t)(data), size, real __tb_debug_vals__)
+#define tb_small_pool_ralloc(pool, data, size)              tb_small_pool_ralloc_(pool, (tb_pointer_t)(data), size __tb_debug_vals__)
 #define tb_small_pool_free(pool, data)                      tb_small_pool_free_(pool, (tb_pointer_t)(data) __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -58,31 +58,31 @@ __tb_extern_c_enter__
  *
  * <pre>
  *
- *  ----------------------
- * |    fixed pool:16B    |
- * |----------------------|
- * |    fixed pool:32B    |
- * |----------------------|
- * |    fixed pool:64B    |
- * |----------------------|
- * |    fixed pool:96B*   |
- * |----------------------|
- * |    fixed pool:128B   |
- * |----------------------|
- * |    fixed pool:192B*  |
- * |----------------------|
- * |    fixed pool:256B   |
- * |----------------------|
- * |    fixed pool:384B*  |
- * |----------------------|
- * |    fixed pool:512B   |
- * |----------------------|
- * |    fixed pool:1024B  |
- * |----------------------|
- * |    fixed pool:2048B  |
- * |----------------------|
- * |    fixed pool:3072B* |
- *  ---------------------- 
+ *  --------------------------------------
+ * |    fixed pool: 16B    |  1-16B       | 
+ * |--------------------------------------|
+ * |    fixed pool: 32B    |  17-32B      |  
+ * |--------------------------------------|
+ * |    fixed pool: 64B    |  33-64B      | 
+ * |--------------------------------------|
+ * |    fixed pool: 96B*   |  65-96B*     | 
+ * |--------------------------------------|
+ * |    fixed pool: 128B   |  97-128B     |  
+ * |--------------------------------------|
+ * |    fixed pool: 192B*  |  129-192B*   |  
+ * |--------------------------------------|
+ * |    fixed pool: 256B   |  193-256B    |  
+ * |--------------------------------------|
+ * |    fixed pool: 384B*  |  257-384B*   |  
+ * |--------------------------------------|
+ * |    fixed pool: 512B   |  385-512B    |  
+ * |--------------------------------------|
+ * |    fixed pool: 1024B  |  513-1024B   |  
+ * |--------------------------------------|
+ * |    fixed pool: 2048B  |  1025-2048B  |  
+ * |--------------------------------------|
+ * |    fixed pool: 3072B* |  2049-3072B* |  
+ *  -------------------------------------- 
  *
  * </pre>
  */

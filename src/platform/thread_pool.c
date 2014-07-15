@@ -1239,7 +1239,7 @@ tb_void_t tb_thread_pool_dump(tb_thread_pool_ref_t pool)
     if (impl->worker_size)
     {
         // trace
-        tb_trace_i("======================================================================");
+        tb_trace_i("");
         tb_trace_i("workers: size: %lu, maxn: %lu", impl->worker_size, impl->worker_maxn);
 
         // walk
@@ -1253,6 +1253,9 @@ tb_void_t tb_thread_pool_dump(tb_thread_pool_ref_t pool)
             tb_trace_i("    worker: id: %lu, stoped: %ld", worker->id, (tb_long_t)tb_atomic_get(&worker->bstoped));
         }
 
+        // trace
+        tb_trace_i("");
+
         // dump all jobs
         if (impl->jobs_pool) 
         {
@@ -1262,7 +1265,6 @@ tb_void_t tb_thread_pool_dump(tb_thread_pool_ref_t pool)
             // dump jobs
             tb_fixed_pool_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_dump_all, tb_null);
         }
-        tb_trace_i("======================================================================");
     }
 
     // leave

@@ -31,7 +31,16 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces 
  */
+tb_pointer_t tb_memdup_(tb_cpointer_t s, tb_size_t n)
+{
+    // check
+    tb_assert_and_check_return_val(s, tb_null);
 
+    // done
+    __tb_register__ tb_pointer_t p = tb_malloc(n);
+    if (p) tb_memcpy_(p, s, n);
+    return p;
+}
 tb_pointer_t tb_memdup(tb_cpointer_t s, tb_size_t n)
 {
     // check

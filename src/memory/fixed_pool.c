@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "fixed_pool"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -437,6 +437,9 @@ tb_pointer_t tb_fixed_pool_malloc_(tb_fixed_pool_ref_t pool __tb_debug_decl__)
         data = tb_null;
     }
 
+    // check
+    tb_assertf_abort(data, "malloc(%lu) failed!", impl->item_size);
+
     // ok?
     return data;
 }
@@ -451,7 +454,7 @@ tb_pointer_t tb_fixed_pool_malloc0_(tb_fixed_pool_ref_t pool __tb_debug_decl__)
     tb_assert_and_check_return_val(data, tb_null);
 
     // clear it
-    tb_memset(data, 0, impl->item_size);
+    tb_memset_(data, 0, impl->item_size);
 
     // ok
     return data;
@@ -502,6 +505,9 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t data __tb_d
 
     } while (0);
 
+    // check
+    tb_assertf_abort(ok, "free(%p) failed!", data);
+
     // ok?
     return ok;
 }
@@ -543,11 +549,11 @@ tb_void_t tb_fixed_pool_dump(tb_fixed_pool_ref_t pool)
     tb_assert_and_check_return(impl);
 
     // dump the current slot first
-    if (impl->current_slot && impl->current_slot->pool && !tb_static_fixed_pool_null(impl->current_slot->pool))
+    if (impl->current_slot && impl->current_slot->pool)
         tb_static_fixed_pool_dump(impl->current_slot->pool);
 
     // dump the partial slots
-    tb_for_all_if(tb_fixed_pool_slot_t*, partial_slot, tb_list_entry_itor(&impl->partial_slots), partial_slot && partial_slot->pool && !tb_static_fixed_pool_null(partial_slot->pool))
+    tb_for_all_if(tb_fixed_pool_slot_t*, partial_slot, tb_list_entry_itor(&impl->partial_slots), partial_slot && partial_slot->pool)
     {
         // check
         tb_assert_abort(!tb_static_fixed_pool_full(partial_slot->pool));

@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "native_large_pool"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -393,7 +393,7 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         tb_pool_data_save_backtrace(&data_head->base, 2);
 
         // make the dirty data and patch 0xcc for checking underflow
-        tb_memset(data_real, TB_POOL_DATA_PATCH, size + patch);
+        tb_memset_(data_real, TB_POOL_DATA_PATCH, size + patch);
 #endif
 
         // save pool reference for checking data range
@@ -512,7 +512,7 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         tb_pool_data_save_backtrace(&data_head->base, 2);
 
         // make the dirty data and patch 0xcc for checking underflow
-        tb_memset(data_real, TB_POOL_DATA_PATCH, size + 1);
+        tb_memset_(data_real, TB_POOL_DATA_PATCH, size + 1);
 #endif
 
         // save the data to the data_list

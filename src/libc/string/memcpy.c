@@ -27,7 +27,6 @@
  */
 #include "string.h"
 #include "../../memory/impl/prefix.h"
-
 #ifndef TB_CONFIG_LIBC_HAVE_MEMCPY
 #   if defined(TB_ARCH_x86)
 #       include "opt/x86/memcpy.c"
@@ -86,6 +85,11 @@ static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_pointer_t tb_memcpy_(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
+{
+    // done
+    return tb_memcpy_impl(s1, s2, n);
+}
 tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
     // check

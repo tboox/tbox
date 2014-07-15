@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "small_pool"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -59,7 +59,6 @@ static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, 
     // check
     tb_assert_return_val(impl && size && size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
-    // TODO: optimizate using log2 + if 
     // done
     tb_fixed_pool_ref_t fixed_pool = tb_null;
     do
@@ -67,96 +66,81 @@ static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, 
         // the fixed pool index
         tb_size_t index = 0;
         tb_size_t space = 0;
-        if (size < 512)
+        if (size > 64 && size < 193)
         {
-            if (size < 128)
+            if (size < 97)
             {
-                if (size < 64)
-                {
-                    if (size < 32)
-                    {
-                        index = 0;
-                        space = 16;
-                    }
-                    else
-                    {
-                        index = 1;
-                        space = 32;
-                    }
-                }
-                else
-                {
-                    if (size < 96)
-                    {
-                        index = 2;
-                        space = 64;
-                    }
-                    else
-                    {
-                        index = 3;
-                        space = 96;
-                    }
-                }
+                index = 3;
+                space = 96;
             }
-            else
+            else if (size > 128)
             {
-                if (size < 256)
-                {
-                    if (size < 192)
-                    {
-                        index = 4;
-                        space = 128;
-                    }
-                    else
-                    {
-                        index = 5;
-                        space = 192;
-                    }
-                }
-                else
-                {
-                    if (size < 384)
-                    {
-                        index = 6;
-                        space = 256;
-                    }
-                    else
-                    {
-                        index = 7;
-                        space = 384;
-                    }
-                }
+                index = 5;
+                space = 192;
+            }
+            else 
+            {
+                index = 4;
+                space = 128;
             }
         }
-        else
+        else if (size > 192 && size < 513)
         {
-            if (size < 2048)
+            if (size < 257)
             {
-                if (size < 1024)
-                {
-                    index = 8;
-                    space = 512;
-                }
-                else
-                {
-                    index = 9;
-                    space = 1024;
-                }
+                index = 6;
+                space = 256;
             }
-            else
+            else if (size > 384)
             {
-                if (size < 3072)
-                {
-                    index = 10;
-                    space = 2048;
-                }
-                else
-                {
-                    index = 11;
-                    space = 3072;
-                }
+                index = 8;
+                space = 512;
+            }
+            else 
+            {
+                index = 7;
+                space = 384;
             }
         }
+        else if (size < 65)
+        {
+            if (size < 17)
+            {
+                index = 0;
+                space = 16;
+            }
+            else if (size > 32)
+            {
+                index = 2;
+                space = 64;
+            }
+            else 
+            {
+                index = 1;
+                space = 32;
+            }
+        }
+        else 
+        {
+            if (size < 1025)
+            {
+                index = 9;
+                space = 1024;
+            }
+            else if (size > 2048)
+            {
+                index = 11;
+                space = 3072;
+            }
+            else 
+            {
+                index = 10;
+                space = 2048;
+            }
+        }
+
+        // trace
+        tb_trace_d("find: size: %lu => index: %lu, space: %lu", size, index, space);
 
         // make fixed pool if not exists
         if (!impl->fixed_pool[index]) impl->fixed_pool[index] = tb_fixed_pool_init(impl->large_pool, 0, space, tb_null, tb_null, tb_null);
@@ -279,27 +263,36 @@ tb_pointer_t tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size __tb
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
-    // the fixed pool
-    tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, size);
-    tb_assert_and_check_return_val(fixed_pool, tb_null);
-
     // done
-    tb_pointer_t data = tb_fixed_pool_malloc_(fixed_pool __tb_debug_args__);
-    tb_assert_and_check_return_val(data, tb_null);
+    tb_pointer_t data = tb_null;
+    do
+    {
+        // the fixed pool
+        tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, size);
+        tb_assert_and_check_break(fixed_pool);
 
-    // the data head
-    tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-    tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
+        // done
+        data = tb_fixed_pool_malloc_(fixed_pool __tb_debug_args__);
+        tb_assert_and_check_break(data);
+
+        // the data head
+        tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
+        tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
 
 #ifdef __tb_debug__
-    // fill the patch bytes
-    if (data_head->size > size) tb_memset((tb_byte_t*)data + size, TB_POOL_DATA_PATCH, data_head->size - size);
+        // fill the patch bytes
+        if (data_head->size > size) tb_memset_((tb_byte_t*)data + size, TB_POOL_DATA_PATCH, data_head->size - size);
 #endif
 
-    // update size
-    data_head->size = size;
+        // update size
+        data_head->size = size;
 
-    // ok
+    } while (0);
+
+    // check
+    tb_assertf_abort(data, "malloc(%lu) failed!", size);
+
+    // ok?
     return data;
 }
 tb_pointer_t tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
@@ -309,27 +302,36 @@ tb_pointer_t tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size __t
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
    
-    // the fixed pool
-    tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, size);
-    tb_assert_and_check_return_val(fixed_pool, tb_null);
-
     // done
-    tb_pointer_t data = tb_fixed_pool_malloc0_(fixed_pool __tb_debug_args__);
-    tb_assert_and_check_return_val(data, tb_null);
+    tb_pointer_t data = tb_null;
+    do
+    {
+        // the fixed pool
+        tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, size);
+        tb_assert_and_check_break(fixed_pool);
 
-    // the data head
-    tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-    tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
+        // done
+        data = tb_fixed_pool_malloc0_(fixed_pool __tb_debug_args__);
+        tb_assert_and_check_break(data);
+
+        // the data head
+        tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
+        tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
 
 #ifdef __tb_debug__
-    // fill the patch bytes
-    if (data_head->size > size) tb_memset((tb_byte_t*)data + size, TB_POOL_DATA_PATCH, data_head->size - size);
+        // fill the patch bytes
+        if (data_head->size > size) tb_memset_((tb_byte_t*)data + size, TB_POOL_DATA_PATCH, data_head->size - size);
 #endif
 
-    // update size
-    data_head->size = size;
+        // update size
+        data_head->size = size;
 
-    // ok
+    } while (0);
+
+    // check
+    tb_assertf_abort(data, "malloc0(%lu) failed!", size);
+
+    // ok?
     return data;
 }
 tb_pointer_t tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
@@ -339,27 +341,36 @@ tb_pointer_t tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
-    // the fixed pool
-    tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, item * size);
-    tb_assert_and_check_return_val(fixed_pool, tb_null);
-
     // done
-    tb_pointer_t data = tb_fixed_pool_malloc_(fixed_pool __tb_debug_args__);
-    tb_assert_and_check_return_val(data, tb_null);
+    tb_pointer_t data = tb_null;
+    do
+    {
+        // the fixed pool
+        tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, item * size);
+        tb_assert_and_check_break(fixed_pool);
 
-    // the data head
-    tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-    tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
+        // done
+        data = tb_fixed_pool_malloc_(fixed_pool __tb_debug_args__);
+        tb_assert_and_check_break(data);
+
+        // the data head
+        tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
+        tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
 
 #ifdef __tb_debug__
-    // fill the patch bytes
-    if (data_head->size > (item * size)) tb_memset((tb_byte_t*)data + (item * size), TB_POOL_DATA_PATCH, data_head->size - (item * size));
+        // fill the patch bytes
+        if (data_head->size > (item * size)) tb_memset_((tb_byte_t*)data + (item * size), TB_POOL_DATA_PATCH, data_head->size - (item * size));
 #endif
 
-    // update size
-    data_head->size = item * size;
+        // update size
+        data_head->size = item * size;
+   
+    } while (0);
 
-    // ok
+    // check
+    tb_assertf_abort(data, "nalloc(%lu, %lu) failed!", item, size);
+
+    // ok?
     return data;
 }
 tb_pointer_t tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
@@ -369,27 +380,36 @@ tb_pointer_t tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb
     tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
     tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
-    // the fixed pool
-    tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, item * size);
-    tb_assert_and_check_return_val(fixed_pool, tb_null);
-
     // done
-    tb_pointer_t data = tb_fixed_pool_malloc0_(fixed_pool __tb_debug_args__);
-    tb_assert_and_check_return_val(data, tb_null);
+    tb_pointer_t data = tb_null;
+    do
+    {
+        // the fixed pool
+        tb_fixed_pool_ref_t fixed_pool = tb_small_pool_find_fixed(impl, item * size);
+        tb_assert_and_check_break(fixed_pool);
 
-    // the data head
-    tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-    tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
+        // done
+        data = tb_fixed_pool_malloc0_(fixed_pool __tb_debug_args__);
+        tb_assert_and_check_break(data);
+
+        // the data head
+        tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
+        tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
 
 #ifdef __tb_debug__
-    // fill the patch bytes
-    if (data_head->size > (item * size)) tb_memset((tb_byte_t*)data + (item * size), TB_POOL_DATA_PATCH, data_head->size - (item * size));
+        // fill the patch bytes
+        if (data_head->size > (item * size)) tb_memset_((tb_byte_t*)data + (item * size), TB_POOL_DATA_PATCH, data_head->size - (item * size));
 #endif
 
-    // update size
-    data_head->size = item * size;
+        // update size
+        data_head->size = item * size;
+ 
+    } while (0);
 
-    // ok
+    // check
+    tb_assertf_abort(data, "nalloc(%lu, %lu) failed!", item, size);
+
+    // ok?
     return data;
 }
 tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
@@ -427,7 +447,7 @@ tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, 
         {
 #ifdef __tb_debug__
             // fill the patch bytes
-            if (data_head_old->size > size) tb_memset((tb_byte_t*)data + size, TB_POOL_DATA_PATCH, data_head_old->size - size);
+            if (data_head_old->size > size) tb_memset_((tb_byte_t*)data + size, TB_POOL_DATA_PATCH, data_head_old->size - size);
 #endif
             // only update size
             data_head_old->size = size;
@@ -447,14 +467,14 @@ tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, 
 
 #ifdef __tb_debug__
         // fill the patch bytes
-        if (data_head_new->size > size) tb_memset((tb_byte_t*)data_new + size, TB_POOL_DATA_PATCH, data_head_new->size - size);
+        if (data_head_new->size > size) tb_memset_((tb_byte_t*)data_new + size, TB_POOL_DATA_PATCH, data_head_new->size - size);
 #endif
 
         // update size
         data_head_new->size = size;
 
         // copy the old data
-        tb_memcpy(data_new, data, tb_min(data_head_old->size, size));
+        tb_memcpy_(data_new, data, tb_min(data_head_old->size, size));
 
         // free the old data
         tb_fixed_pool_free_(fixed_pool_old, data __tb_debug_args__);
@@ -533,6 +553,9 @@ tb_void_t tb_small_pool_dump(tb_small_pool_ref_t pool)
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
     tb_assert_and_check_return(impl && impl->large_pool);
+
+    // trace
+    tb_trace_i("");
 
     // dump fixed pool
     tb_size_t i = 0;

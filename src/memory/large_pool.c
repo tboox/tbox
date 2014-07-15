@@ -129,7 +129,7 @@ tb_pointer_t tb_large_pool_malloc0_(tb_large_pool_ref_t pool, tb_size_t size, tb
     tb_assert_abort(!real || *real >= size);
 
     // clear it
-    tb_memset(data, 0, real? *real : size);
+    tb_memset_(data, 0, real? *real : size);
 
     // ok
     return data;
@@ -162,7 +162,7 @@ tb_pointer_t tb_large_pool_nalloc0_(tb_large_pool_ref_t pool, tb_size_t item, tb
     tb_assert_abort(!real || *real >= item * size);
 
     // clear it
-    tb_memset(data, 0, real? *real : item * size);
+    tb_memset_(data, 0, real? *real : item * size);
 
     // ok
     return data;
