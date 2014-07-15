@@ -361,6 +361,9 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
      */
     impl->item_maxn = (((data + size - impl->used_info) << 3) - 7) / (1 + (impl->item_space << 3));
     tb_assert_and_check_return_val(impl->item_maxn, tb_null);
+ 
+    // clear the used info
+    tb_memset(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
 
     // init data
     impl->data = (tb_byte_t*)tb_align((tb_size_t)impl->used_info + (tb_align8(impl->item_maxn) >> 3), TB_POOL_DATA_ALIGN);
@@ -439,9 +442,6 @@ tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool)
     tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)pool;
     tb_assert_and_check_return(impl);
 
-    // clear data
-    if (impl->data) tb_memset(impl->data, 0, impl->item_maxn * impl->item_space);
-    
     // clear used_info
     if (impl->used_info) tb_memset(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
 
@@ -492,6 +492,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
         impl->item_count++;
 
 #ifdef __tb_debug__
+
         // init the debug info
         data_head->debug.magic     = TB_POOL_DATA_MAGIC;
         data_head->debug.file      = file_;

@@ -130,19 +130,32 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
     tb_fixed_pool_slot_t*   slot = tb_null;
     do
     {
+#ifdef __tb_debug__
+        // init patch for checking underflow
+        tb_size_t patch = 1;
+#else
+        tb_size_t patch = 0;
+#endif
+
+        // the item space
+        tb_size_t item_space = sizeof(tb_pool_data_head_t) + impl->item_size + patch;
+
+        // the need space
+        tb_size_t need_space = sizeof(tb_fixed_pool_slot_t) + impl->slot_size * item_space;
+
         // make slot
-        tb_size_t size = 0;
-        slot = tb_large_pool_malloc(impl->large_pool, sizeof(tb_fixed_pool_slot_t) + impl->slot_size * impl->item_size, &size);
+        tb_size_t real_space = 0;
+        slot = tb_large_pool_malloc(impl->large_pool, need_space, &real_space);
         tb_assert_and_check_break(slot);
-        tb_assert_and_check_break(size > sizeof(tb_fixed_pool_slot_t) + impl->item_size);
+        tb_assert_and_check_break(real_space > sizeof(tb_fixed_pool_slot_t) + item_space);
 
         // init slot
-        slot->size = size;
-        slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], size - sizeof(tb_fixed_pool_slot_t), impl->item_size); 
+        slot->size = real_space;
+        slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], real_space - sizeof(tb_fixed_pool_slot_t), impl->item_size); 
         tb_assert_and_check_break(slot->pool);
 
         // trace
-        tb_trace_d("slot[%lu]: init: size: %lu, item: %lu => %lu", impl->item_size, size, impl->slot_size, tb_static_fixed_pool_maxn(slot->pool));
+        tb_trace_d("slot[%lu]: init: size: %lu => %lu, item: %lu => %lu", impl->item_size, need_space, real_space, impl->slot_size, tb_static_fixed_pool_maxn(slot->pool));
 
         // ok
         ok = tb_true;
@@ -299,6 +312,56 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t pool)
     // exit items
     if (impl->func_exit) tb_fixed_pool_walk(pool, tb_fixed_pool_item_exit, (tb_pointer_t)impl);
 
+    // exit the current slot first
+    if (impl->current_slot) tb_fixed_pool_slot_exit(impl, impl->current_slot);
+    impl->current_slot = tb_null;
+
+    // exit the partial slots 
+    tb_iterator_ref_t partial_iterator = tb_list_entry_itor(&impl->partial_slots);
+    if (partial_iterator)
+    {
+        // walk it
+        tb_size_t itor = tb_iterator_head(partial_iterator);
+        while (itor != tb_iterator_tail(partial_iterator))
+        {
+            // the slot
+            tb_fixed_pool_slot_t* slot = (tb_fixed_pool_slot_t*)tb_iterator_item(partial_iterator, itor);
+            tb_assert_and_check_break(slot);
+
+            // save next
+            tb_size_t next = tb_iterator_next(partial_iterator, itor);
+
+            // exit data
+            tb_fixed_pool_slot_exit(impl, slot);
+
+            // next
+            itor = next;
+        }
+    }
+
+    // exit the full slots 
+    tb_iterator_ref_t full_iterator = tb_list_entry_itor(&impl->full_slots);
+    if (full_iterator)
+    {
+        // walk it
+        tb_size_t itor = tb_iterator_head(full_iterator);
+        while (itor != tb_iterator_tail(full_iterator))
+        {
+            // the slot
+            tb_fixed_pool_slot_t* slot = (tb_fixed_pool_slot_t*)tb_iterator_item(full_iterator, itor);
+            tb_assert_and_check_break(slot);
+
+            // save next
+            tb_size_t next = tb_iterator_next(full_iterator, itor);
+
+            // exit data
+            tb_fixed_pool_slot_exit(impl, slot);
+
+            // next
+            itor = next;
+        }
+    }
+
     // clear item count
     impl->item_count = 0;
 
@@ -325,8 +388,10 @@ tb_pointer_t tb_fixed_pool_malloc_(tb_fixed_pool_ref_t pool __tb_debug_decl__)
         // no current slot or the current slot is full? update the current slot
         if (!impl->current_slot || tb_static_fixed_pool_full(impl->current_slot->pool))
         {
-            // move the current slot to the full slots
-            tb_list_entry_insert_tail(&impl->full_slots, &impl->current_slot->entry);
+            // move the current slot to the full slots if exists
+            if (impl->current_slot) tb_list_entry_insert_tail(&impl->full_slots, &impl->current_slot->entry);
+
+            // clear the current slot
             impl->current_slot = tb_null;
 
             // attempt to get a slot from the partial slots
