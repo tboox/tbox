@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "pool"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -48,6 +48,9 @@ typedef struct __tb_pool_impl_t
 
     // the small pool
     tb_small_pool_ref_t     small_pool;
+
+    // the lock
+    tb_spinlock_t           lock;
 
 }tb_pool_impl_t;
 
@@ -92,10 +95,18 @@ tb_pool_ref_t tb_pool_init(tb_large_pool_ref_t large_pool)
         impl = (tb_pool_impl_t*)tb_large_pool_malloc0(large_pool, sizeof(tb_pool_impl_t), tb_null);
         tb_assert_and_check_break(impl);
 
+        // init lock
+        if (!tb_spinlock_init(&impl->lock)) break;
+
         // init pool
         impl->large_pool = large_pool;
         impl->small_pool = tb_small_pool_init(large_pool);
         tb_assert_and_check_break(impl->small_pool);
+
+        // register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->lock, TB_TRACE_MODULE_NAME);
+#endif
 
         // ok
         ok = tb_true;
@@ -118,9 +129,18 @@ tb_void_t tb_pool_exit(tb_pool_ref_t pool)
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return(impl && impl->large_pool);
 
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
     // exit small pool
     if (impl->small_pool) tb_small_pool_exit(impl->small_pool);
     impl->small_pool = tb_null;
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // exit lock
+    tb_spinlock_exit(&impl->lock);
 
     // exit pool
     tb_large_pool_free(impl->large_pool, impl);
@@ -131,8 +151,17 @@ tb_pointer_t tb_pool_malloc_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl_
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
 
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
     // done
-    return size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc_(impl->small_pool, size __tb_debug_args__) : tb_large_pool_malloc_(impl->large_pool, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc_(impl->small_pool, size __tb_debug_args__) : tb_large_pool_malloc_(impl->large_pool, size, tb_null __tb_debug_args__);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // ok?
+    return data;
 }
 tb_pointer_t tb_pool_malloc0_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
 {
@@ -140,8 +169,17 @@ tb_pointer_t tb_pool_malloc0_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
     
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
     // done
-    return size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc0_(impl->small_pool, size __tb_debug_args__) : tb_large_pool_malloc0_(impl->large_pool, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc0_(impl->small_pool, size __tb_debug_args__) : tb_large_pool_malloc0_(impl->large_pool, size, tb_null __tb_debug_args__);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // ok?
+    return data;
 }
 tb_pointer_t tb_pool_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
@@ -149,8 +187,17 @@ tb_pointer_t tb_pool_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size 
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
 
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
     // done
-    return (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc_(impl->small_pool, item, size __tb_debug_args__) : tb_large_pool_nalloc_(impl->large_pool, item, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc_(impl->small_pool, item, size __tb_debug_args__) : tb_large_pool_nalloc_(impl->large_pool, item, size, tb_null __tb_debug_args__);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // ok?
+    return data;
 }
 tb_pointer_t tb_pool_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
@@ -158,14 +205,26 @@ tb_pointer_t tb_pool_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
 
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
     // done
-    return (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc0_(impl->small_pool, item, size __tb_debug_args__) : tb_large_pool_nalloc0_(impl->large_pool, item, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc0_(impl->small_pool, item, size __tb_debug_args__) : tb_large_pool_nalloc0_(impl->large_pool, item, size, tb_null __tb_debug_args__);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // ok?
+    return data;
 }
 tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && data && size, tb_null);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
 
     // done
     tb_pointer_t data_new = tb_null;
@@ -224,6 +283,9 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
     }
 #endif
 
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
     // ok?
     return data_new;
 }
@@ -232,6 +294,9 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && data, tb_false);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
 
     // done
     tb_bool_t ok = tb_false;
@@ -261,6 +326,9 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
     }
 #endif
 
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
     // ok?
     return ok;
 }
@@ -271,7 +339,13 @@ tb_void_t tb_pool_dump(tb_pool_ref_t pool)
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return(impl && impl->large_pool && impl->small_pool);
 
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
     // dump pool
     tb_small_pool_dump(impl->small_pool);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
 }
 #endif
