@@ -97,14 +97,14 @@ typedef struct __tb_fixed_pool_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_bool_t tb_fixed_pool_item_exit(tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_fixed_pool_item_exit(tb_pointer_t data, tb_cpointer_t priv)
 {
     // check
     tb_fixed_pool_impl_t* impl = (tb_fixed_pool_impl_t*)priv;
     tb_assert_return_val(impl && impl->func_exit, tb_false);
 
     // done exit
-    impl->func_exit(item, impl->func_priv);
+    impl->func_exit(data, impl->func_priv);
 
     // continue
     return tb_true;
@@ -138,7 +138,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
 
         // init slot
         slot->size = size;
-        slot->pool = tb_static_fixed_pool_init((tb_pointer_t)&slot[1], size - sizeof(tb_fixed_pool_slot_t), impl->item_size); 
+        slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], size - sizeof(tb_fixed_pool_slot_t), impl->item_size); 
         tb_assert_and_check_break(slot->pool);
 
         // trace
@@ -160,10 +160,10 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
     // ok?
     return slot;
 }
-static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl, tb_pointer_t item)
+static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl, tb_pointer_t data)
 {
     // check
-    tb_assert_and_check_return_val(impl && item, tb_null);
+    tb_assert_and_check_return_val(impl && data, tb_null);
 
     // TODO: optimizate it
     // done
@@ -171,7 +171,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl,
     do
     {
         // belong to the current slot?
-        if (impl->current_slot && tb_fixed_pool_slot_exists(impl->current_slot, item))
+        if (impl->current_slot && tb_fixed_pool_slot_exists(impl->current_slot, data))
         {
             slot = impl->current_slot;
             break;
@@ -181,7 +181,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl,
         tb_for_all_if(tb_fixed_pool_slot_t*, partial_slot, tb_list_entry_itor(&impl->partial_slots), partial_slot)
         {
             // is this?
-            if (tb_fixed_pool_slot_exists(partial_slot, item))
+            if (tb_fixed_pool_slot_exists(partial_slot, data))
             {
                 slot = partial_slot;
                 break;
@@ -195,7 +195,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl,
         tb_for_all_if(tb_fixed_pool_slot_t*, full_slot, tb_list_entry_itor(&impl->full_slots), full_slot)
         {
             // is this?
-            if (tb_fixed_pool_slot_exists(full_slot, item))
+            if (tb_fixed_pool_slot_exists(full_slot, data))
             {
                 slot = full_slot;
                 break;
@@ -391,7 +391,7 @@ tb_pointer_t tb_fixed_pool_malloc0_(tb_fixed_pool_ref_t pool __tb_debug_decl__)
     // ok
     return data;
 }
-tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t item __tb_debug_decl__)
+tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
 { 
     // check
     tb_fixed_pool_impl_t* impl = (tb_fixed_pool_impl_t*)pool;
@@ -402,18 +402,18 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t item __tb_d
     do
     {
         // find the slot 
-        tb_fixed_pool_slot_t* slot = tb_fixed_pool_slot_find(impl, item);
-        tb_assertf_abort(slot, "the data: %p not belong to pool: %p", item, pool);
+        tb_fixed_pool_slot_t* slot = tb_fixed_pool_slot_find(impl, data);
+        tb_assertf_abort(slot, "the data: %p not belong to pool: %p", data, pool);
         tb_assert_and_check_break(slot->pool);
 
         // the slot is full?
         tb_bool_t full = tb_static_fixed_pool_full(slot->pool);
 
         // done exit
-        if (impl->func_exit) impl->func_exit(item, impl->func_priv);
+        if (impl->func_exit) impl->func_exit(data, impl->func_priv);
 
         // free it
-        if (!tb_static_fixed_pool_free(slot->pool, item __tb_debug_args__)) break;
+        if (!tb_static_fixed_pool_free(slot->pool, data __tb_debug_args__)) break;
 
         // not the current slot?
         if (slot != impl->current_slot)

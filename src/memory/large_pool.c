@@ -62,6 +62,11 @@ static tb_handle_t tb_large_pool_instance_init(tb_cpointer_t* ppriv)
 }
 static tb_void_t tb_large_pool_instance_exit(tb_handle_t pool, tb_cpointer_t priv)
 {
+#ifdef __tb_debug__
+    // dump it
+    tb_large_pool_dump((tb_large_pool_ref_t)pool);
+#endif
+
     // exit it
     tb_large_pool_exit((tb_large_pool_ref_t)pool);
 }
@@ -105,6 +110,7 @@ tb_pointer_t tb_large_pool_malloc_(tb_large_pool_ref_t pool, tb_size_t size, tb_
     // malloc data
     tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, size, real __tb_debug_args__);
     tb_assertf_abort(data, "malloc(%lu) failed!", size);
+    tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
     tb_assert_abort(!real || *real >= size);
 
     // ok
@@ -119,6 +125,7 @@ tb_pointer_t tb_large_pool_malloc0_(tb_large_pool_ref_t pool, tb_size_t size, tb
     // malloc0 data
     tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, size, real __tb_debug_args__);
     tb_assertf_abort(data, "malloc0(%lu) failed!", size);
+    tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc0(%lu): unaligned data: %p", size, data);
     tb_assert_abort(!real || *real >= size);
 
     // clear it
@@ -136,6 +143,7 @@ tb_pointer_t tb_large_pool_nalloc_(tb_large_pool_ref_t pool, tb_size_t item, tb_
     // nalloc data
     tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, item * size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, item * size, real __tb_debug_args__);
     tb_assertf_abort(data, "nalloc(%lu, %lu) failed!", item, size);
+    tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "nalloc(%lu, %lu): unaligned data: %p", item, size, data);
     tb_assert_abort(!real || *real >= item * size);
 
     // ok
@@ -150,6 +158,7 @@ tb_pointer_t tb_large_pool_nalloc0_(tb_large_pool_ref_t pool, tb_size_t item, tb
     // nalloc0 data
     tb_pointer_t data = tb_large_pool_is_native(pool)? tb_native_large_pool_malloc(pool, item * size, real __tb_debug_args__) : tb_static_large_pool_malloc(pool, item * size, real __tb_debug_args__);
     tb_assertf_abort(data, "nalloc0(%lu, %lu) failed!", item, size);
+    tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "nalloc0(%lu, %lu): unaligned data: %p", item, size, data);
     tb_assert_abort(!real || *real >= item * size);
 
     // clear it
@@ -184,6 +193,7 @@ tb_pointer_t tb_large_pool_ralloc_(tb_large_pool_ref_t pool, tb_pointer_t data, 
 
     // check
     tb_assert_abort(!real || *real >= size);
+    tb_assertf_abort(!(((tb_size_t)data_new) & (TB_POOL_DATA_ALIGN - 1)), "ralloc(%lu): unaligned data: %p", size, data);
 
     // ok
     return data_new;

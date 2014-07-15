@@ -76,8 +76,8 @@ tb_bool_t tb_singleton_init()
 }
 tb_void_t tb_singleton_kill()
 {
-    tb_size_t i = 0;
-    for (i = 0; i < TB_SINGLETON_TYPE_MAXN; i++)
+    tb_size_t i = TB_SINGLETON_TYPE_MAXN;
+    while (i--)
     {
         if (g_singletons[i].kill) 
         {
@@ -96,8 +96,8 @@ tb_void_t tb_singleton_kill()
 }
 tb_void_t tb_singleton_exit()
 {
-    tb_size_t i = 0;
-    for (i = 0; i < TB_SINGLETON_TYPE_MAXN; i++)
+    tb_size_t i = TB_SINGLETON_TYPE_MAXN;
+    while (i--)
     {
         if (g_singletons[i].exit) 
         {

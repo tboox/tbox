@@ -237,8 +237,9 @@ static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t 
  */
 tb_pointer_t tb_memset(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
+    // TODO
     // check
-#ifdef __tb_debug__
+#if 0//def __tb_debug__
     {
         // overflow?
         tb_size_t size = tb_pool_data_size(s);

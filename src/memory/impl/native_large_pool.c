@@ -223,7 +223,7 @@ static tb_bool_t tb_native_large_pool_free_done(tb_native_large_pool_impl_t* imp
         data_head->base.debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
 
         // update the occupied size
-        impl->occupied_size -= sizeof(tb_native_large_data_head_t) - sizeof(tb_pool_data_debug_head_t) + data_head->base.size;
+        impl->occupied_size -= sizeof(tb_native_large_data_head_t) - TB_POOL_DATA_HEAD_DIFF_SIZE + data_head->base.size;
  
         // update the total size
         impl->total_size    -= data_head->base.size;
@@ -407,7 +407,7 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
 
 #ifdef __tb_debug__
         // update the occupied size
-        impl->occupied_size += need - sizeof(tb_pool_data_debug_head_t) - patch;
+        impl->occupied_size += need - TB_POOL_DATA_HEAD_DIFF_SIZE - patch;
 
         // update the total size
         impl->total_size    += size;

@@ -57,7 +57,9 @@
 #define tb_align2(x)                    (((x) + 1) >> 1 << 1)
 #define tb_align4(x)                    (((x) + 3) >> 2 << 2)
 #define tb_align8(x)                    (((x) + 7) >> 3 << 3)
-#define tb_align(x, b)                  (((x) + ((b) - 1)) & ~((b) - 1))
+#define tb_align(x, b)                  (((tb_size_t)(x) + ((tb_size_t)(b) - 1)) & ~((tb_size_t)(b) - 1))
+#define tb_align_u32(x, b)              (((tb_uint32_t)(x) + ((tb_uint32_t)(b) - 1)) & ~((tb_uint32_t)(b) - 1))
+#define tb_align_u64(x, b)              (((tb_uint64_t)(x) + ((tb_uint64_t)(b) - 1)) & ~((tb_uint64_t)(b) - 1))
 #define tb_align_pow2(x)                (((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_bits_cl0_u32_be((tb_uint32_t)(x))))) : 1)
 
 /// offsetof

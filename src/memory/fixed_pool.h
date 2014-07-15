@@ -125,13 +125,13 @@ __tb_extern_c_enter__
 typedef struct{}*       tb_fixed_pool_ref_t;
 
 /// the item init func type
-typedef tb_bool_t       (*tb_fixed_pool_item_init_func_t)(tb_pointer_t item, tb_cpointer_t priv);
+typedef tb_bool_t       (*tb_fixed_pool_item_init_func_t)(tb_pointer_t data, tb_cpointer_t priv);
 
 /// the item exit func type
-typedef tb_void_t       (*tb_fixed_pool_item_exit_func_t)(tb_pointer_t item, tb_cpointer_t priv);
+typedef tb_void_t       (*tb_fixed_pool_item_exit_func_t)(tb_pointer_t data, tb_cpointer_t priv);
 
 /// the item walk func type
-typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t item, tb_cpointer_t priv);
+typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t data, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -178,35 +178,35 @@ tb_size_t               tb_fixed_pool_item_size(tb_fixed_pool_ref_t pool);
  */
 tb_void_t               tb_fixed_pool_clear(tb_fixed_pool_ref_t pool);
 
-/*! malloc item
+/*! malloc data
  *
  * @param pool          the pool 
  * 
- * @return              the item
+ * @return              the data
  */
 tb_pointer_t            tb_fixed_pool_malloc_(tb_fixed_pool_ref_t pool __tb_debug_decl__);
 
-/*! malloc item and clear it
+/*! malloc data and clear it
  *
  * @param pool          the pool 
  *
- * @return              the item
+ * @return              the data
  */
 tb_pointer_t            tb_fixed_pool_malloc0_(tb_fixed_pool_ref_t pool __tb_debug_decl__);
 
-/*! free item
+/*! free data
  *
  * @param pool          the pool 
- * @param item          the item
+ * @param data          the data
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t item __tb_debug_decl__);
+tb_bool_t               tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
 /*! walk item
  *
  * @code
-    tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_cpointer_t priv)
+    tb_bool_t tb_fixed_pool_item_func(tb_pointer_t data, tb_cpointer_t priv)
     {
         // ok or break
         return tb_true;
