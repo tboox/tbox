@@ -17,37 +17,39 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        algorithm.h
- * @defgroup    algorithm
+ * @file        remove.c
+ * @ingroup     algorithm
  *
  */
-#ifndef TB_ALGORITHM_H
-#define TB_ALGORITHM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "for.h"
-#include "for_if.h"
-#include "rfor.h"
-#include "rfor_if.h"
-#include "sort.h"
-#include "heap_sort.h"
-#include "quick_sort.h"
-#include "insert_sort.h"
-#include "bubble_sort.h"
-#include "find.h"
-#include "find_if.h"
-#include "rfind.h"
-#include "rfind_if.h"
-#include "binary_find.h"
-#include "binary_find_if.h"
-#include "walk.h"
-#include "rwalk.h"
-#include "count.h"
-#include "count_if.h"
 #include "remove.h"
-#include "remove_if.h"
 
-#endif
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_void_t tb_remove_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
+{
+    // check
+    tb_assert_and_check_return(iterator);
+    tb_assert_and_check_return((tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD));
+    tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
+
+    // done
+    tb_size_t itor = tb_iterator_head(iterator);
+    while (itor != tb_iterator_tail(iterator))
+    {
+        // save next
+        tb_size_t next = tb_iterator_next(iterator, itor);
+
+        // remove it?
+        if (!tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), item))
+            tb_iterator_delt(iterator, itor);
+
+        // next
+        itor = next;
+    }
+}
+

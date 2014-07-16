@@ -45,6 +45,8 @@ tbox_C_FILES 			+= \
 						algorithm/rwalk \
 						algorithm/count \
 						algorithm/count_if \
+						algorithm/remove \
+						algorithm/remove_if \
 						container/hash \
 						container/heap \
 						container/list \
@@ -504,6 +506,8 @@ INC_FILES 				= \
 						algorithm/rwalk.h \
 						algorithm/count.h \
 						algorithm/count_if.h \
+						algorithm/remove.h \
+						algorithm/remove_if.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \
