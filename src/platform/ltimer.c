@@ -225,7 +225,7 @@ static tb_bool_t tb_ltimer_del_task(tb_ltimer_impl_t* impl, tb_ltimer_task_impl_
         tb_assert_and_check_break(wlist);
 
         // find the task from the wheel list
-        tb_size_t itor = tb_find_all(wlist, task_impl, tb_null);
+        tb_size_t itor = tb_find_all(wlist, task_impl);
         tb_assert_and_check_break(itor != tb_iterator_tail(wlist));
 
         // del the task from the wheel list

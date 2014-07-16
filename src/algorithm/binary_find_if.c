@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        find.c
+ * @file        binary_find_if.c
  * @ingroup     algorithm
  *
  */
@@ -25,30 +25,38 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "find.h"
+#include "binary_find_if.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_find(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
+tb_size_t tb_binary_find_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
+    tb_assert_and_check_return_val(comp && iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS), tail);
 
     // null?
     tb_check_return_val(head != tail, tail);
 
     // find
-    tb_long_t find = -1;
-    tb_size_t itor = head;
-    for (; itor != tail; itor = tb_iterator_next(iterator, itor)) 
-        if (!(find = tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), item))) break;
+    tb_size_t l = head;
+    tb_size_t r = tail;
+    tb_size_t m = (l + r) >> 1;
+    tb_long_t c = -1;
+    while (l < r)
+    {
+        c = comp(iterator, tb_iterator_item(iterator, m), priv);
+        if (c > 0) r = m;
+        else if (c < 0) l = m + 1;
+        else break;
+        m = (l + r) >> 1;
+    }
 
     // ok?
-    return !find? itor : tail;
-} 
-tb_size_t tb_find_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
+    return !c? m : tail;
+}
+tb_size_t tb_binary_find_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {
-    return tb_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
+    return tb_binary_find_if(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp, priv);
 }
 
