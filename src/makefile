@@ -38,11 +38,13 @@ tbox_C_FILES 			+= \
 						algorithm/find \
 						algorithm/find_if \
 						algorithm/rfind \
+						algorithm/rfind_if \
 						algorithm/binary_find \
 						algorithm/binary_find_if \
 						algorithm/walk \
 						algorithm/rwalk \
 						algorithm/count \
+						algorithm/count_if \
 						container/hash \
 						container/heap \
 						container/list \
@@ -495,11 +497,13 @@ INC_FILES 				= \
 						algorithm/find.h \
 						algorithm/find_if.h \
 						algorithm/rfind.h \
+						algorithm/rfind_if.h \
 						algorithm/binary_find.h \
 						algorithm/binary_find_if.h \
 						algorithm/walk.h \
 						algorithm/rwalk.h \
 						algorithm/count.h \
+						algorithm/count_if.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \

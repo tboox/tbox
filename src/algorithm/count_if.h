@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        rfind.h
+ * @file        count_if.h
  * @ingroup     algorithm
  *
  */
-#ifndef TB_ALGORITHM_RFIND_H
-#define TB_ALGORITHM_RFIND_H
+#ifndef TB_ALGORITHM_COUNT_IF_H
+#define TB_ALGORITHM_COUNT_IF_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,25 +38,27 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! the reverse finder
+/*! the counter if !comp(item, priv)
  *
  * @param iterator  the iterator
  * @param head      the iterator head
  * @param tail      the iterator tail
- * @param item      the finded item
+ * @param comp      the comparer func
+ * @param priv      the comparer data
  *
- * @return          the iterator itor
+ * @return          the real count
  */
-tb_size_t           tb_rfind(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
+tb_size_t           tb_count_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv);
 
-/*! the reverse finder for all
+/*! the counter for all if !comp(item, priv)
  *
  * @param iterator  the iterator
- * @param item      the finded item
+ * @param comp      the comparer func
+ * @param priv      the comparer data
  *
- * @return          the iterator itor
+ * @return          the real count
  */
-tb_size_t           tb_rfind_all(tb_iterator_ref_t iterator, tb_cpointer_t item);
+tb_size_t           tb_count_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

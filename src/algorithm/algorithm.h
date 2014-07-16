@@ -40,10 +40,12 @@
 #include "find.h"
 #include "find_if.h"
 #include "rfind.h"
+#include "rfind_if.h"
 #include "binary_find.h"
 #include "binary_find_if.h"
 #include "walk.h"
 #include "rwalk.h"
 #include "count.h"
+#include "count_if.h"
 
 #endif

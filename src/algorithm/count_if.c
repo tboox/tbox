@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        count.c
+ * @file        count_if.c
  * @ingroup     algorithm
  *
  */
@@ -25,30 +25,30 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "count.h"
+#include "count_if.h"
 #include "for.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_count(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
+tb_size_t tb_count_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
+    tb_assert_and_check_return_val(comp && iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
 
     // null?
     tb_check_return_val(head != tail, tail);
 
     // count
     tb_size_t count = 0;
-    tb_for (tb_pointer_t, ltem, head, tail, iterator) 
-        if (!tb_iterator_comp(iterator, ltem, item)) count++;
+    tb_for (tb_pointer_t, item, head, tail, iterator) 
+        if (!comp(iterator, item, priv)) count++;
 
     // ok?
     return count;
 } 
-tb_size_t tb_count_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
+tb_size_t tb_count_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {
-    return tb_count(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
+    return tb_count_if(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp, priv);
 }
 

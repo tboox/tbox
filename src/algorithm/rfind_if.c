@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        count.c
+ * @file        rfind_if.c
  * @ingroup     algorithm
  *
  */
@@ -25,30 +25,36 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "count.h"
-#include "for.h"
+#include "rfind_if.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_count(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
+tb_size_t tb_rfind_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
+    tb_assert_and_check_return_val(comp && iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_REVERSE), tail);
 
     // null?
     tb_check_return_val(head != tail, tail);
 
-    // count
-    tb_size_t count = 0;
-    tb_for (tb_pointer_t, ltem, head, tail, iterator) 
-        if (!tb_iterator_comp(iterator, ltem, item)) count++;
+    // find
+    tb_long_t find = -1;
+    tb_size_t itor = tb_iterator_prev(iterator, tail);
+    for (; itor != tail; itor = tb_iterator_prev(iterator, itor)) 
+    {
+        // comp
+        if (!(find = comp(iterator, tb_iterator_item(iterator, itor), priv))) break;
+
+        // end?
+        tb_check_break(itor != head);
+    }
 
     // ok?
-    return count;
+    return !find? itor : tail;
 } 
-tb_size_t tb_count_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
+tb_size_t tb_rfind_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {
-    return tb_count(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
+    return tb_rfind_if(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp, priv);
 }
 
