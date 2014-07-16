@@ -308,6 +308,63 @@ static __tb_inline__ tb_bool_t              tb_list_entry_is_last(tb_list_entry_
     return list->prev == entry? tb_true : tb_false;
 }
 
+/*! splice the spliced_list to list[prev, next]
+ *
+ * @param list                              the list
+ * @param prev                              the prev
+ * @param next                              the next
+ * @param spliced_list                      the spliced list
+ */
+static __tb_inline__ tb_void_t              tb_list_entry_splice(tb_list_entry_head_ref_t list, tb_list_entry_ref_t prev, tb_list_entry_ref_t next, tb_list_entry_head_ref_t spliced_list)
+{
+    // check
+    tb_assert(list && prev && next);
+    tb_assert(spliced_list && spliced_list->next && spliced_list->prev);
+
+    // empty?
+    tb_check_return(!tb_list_entry_is_null(spliced_list));
+
+    // done
+    spliced_list->next->prev    = prev;
+    prev->next                  = spliced_list->next;
+    spliced_list->prev->next    = next;
+    next->prev                  = spliced_list->prev;
+
+    // update size
+    list->size += spliced_list->size;
+    
+    // clear the spliced list
+    tb_list_entry_clear(spliced_list);
+}
+
+/*! splice the spliced_list at the list head
+ *
+ * @param list                              the list
+ * @param spliced_list                      the spliced list
+ */
+static __tb_inline__ tb_void_t              tb_list_entry_splice_head(tb_list_entry_head_ref_t list, tb_list_entry_head_ref_t spliced_list)
+{
+    // check
+    tb_assert(list);
+
+    // done
+    tb_list_entry_splice(list, (tb_list_entry_ref_t)list, list->next, spliced_list);
+}
+
+/*! splice the spliced_list at the list tail
+ *
+ * @param list                              the list
+ * @param spliced_list                      the spliced list
+ */
+static __tb_inline__ tb_void_t              tb_list_entry_splice_tail(tb_list_entry_head_ref_t list, tb_list_entry_head_ref_t spliced_list)
+{
+    // check
+    tb_assert(list);
+
+    // done
+    tb_list_entry_splice(list, list->prev, (tb_list_entry_ref_t)list, spliced_list);
+}
+
 /*! insert entry to the next
  *
  * @param list                              the list
