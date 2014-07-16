@@ -117,19 +117,18 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fixed_poo
         // clear the pred index
         impl->pred_index = 0;
 
-        // is free?
-        if (!tb_static_fixed_pool_used_bset(impl->used_info, index)) 
-        {
-            // ok
-            data_head = (tb_pool_data_head_t*)(impl->data + index * impl->item_space);
+        // check
+        tb_assert_abort(!tb_static_fixed_pool_used_bset(impl->used_info, index));
 
-            // allocate it
-            tb_static_fixed_pool_used_set1(impl->used_info, index);
+        // the data head
+        data_head = (tb_pool_data_head_t*)(impl->data + index * impl->item_space);
 
-            // predict the next index
-            if (index + 1 < impl->item_maxn && !tb_static_fixed_pool_used_bset(impl->used_info, index + 1))
-                impl->pred_index = index + 2;
-        }
+        // allocate it
+        tb_static_fixed_pool_used_set1(impl->used_info, index);
+
+        // predict the next index
+        if (index + 1 < impl->item_maxn && !tb_static_fixed_pool_used_bset(impl->used_info, index + 1))
+            impl->pred_index = index + 2;
 
     } while (0);
 
