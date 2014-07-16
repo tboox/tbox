@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        count_if.h
+ * @file        remove_if.h
  * @ingroup     algorithm
  *
  */
-#ifndef TB_ALGORITHM_COUNT_IF_H
-#define TB_ALGORITHM_COUNT_IF_H
+#ifndef TB_ALGORITHM_REMOVE_IF_H
+#define TB_ALGORITHM_REMOVE_IF_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,27 +38,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! count item if !comp(item, priv)
- *
- * @param iterator  the iterator
- * @param head      the iterator head
- * @param tail      the iterator tail
- * @param comp      the comparer func
- * @param priv      the comparer data
- *
- * @return          the real count
- */
-tb_size_t           tb_count_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv);
-
-/*! count item for all if !comp(item, priv)
+/*! remove item for all if !comp(item, priv)
  *
  * @param iterator  the iterator
  * @param comp      the comparer func
  * @param priv      the comparer data
- *
- * @return          the real count
  */
-tb_size_t           tb_count_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
+tb_void_t           tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

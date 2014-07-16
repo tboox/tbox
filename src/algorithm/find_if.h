@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! the finder if !comp(item, priv)
+/*! find item if !comp(item, priv)
  *
  * @param iterator  the iterator
  * @param head      the iterator head
@@ -50,7 +50,7 @@ __tb_extern_c_enter__
  */
 tb_size_t           tb_find_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv);
 
-/*! the finder for all if !comp(item, priv)
+/*! find item for all if !comp(item, priv)
  *
  * @param iterator  the iterator
  * @param comp      the comparer func

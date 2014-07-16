@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! the counter
+/*! count item
  *
  * @param iterator  the iterator
  * @param head      the iterator head
@@ -49,7 +49,7 @@ __tb_extern_c_enter__
  */
 tb_size_t           tb_count(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
 
-/*! the counter for all
+/*! count item for all
  *
  * @param iterator  the iterator
  * @param item      the counted item

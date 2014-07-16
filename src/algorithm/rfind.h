@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! the reverse finder
+/*! reverse find item
  *
  * @param iterator  the iterator
  * @param head      the iterator head
@@ -49,7 +49,7 @@ __tb_extern_c_enter__
  */
 tb_size_t           tb_rfind(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
 
-/*! the reverse finder for all
+/*! reverse find item for all
  *
  * @param iterator  the iterator
  * @param item      the finded item
