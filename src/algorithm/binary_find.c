@@ -58,7 +58,7 @@ tb_size_t tb_binary_find(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t t
     // ok?
     return !c? m : tail;
 }
-tb_size_t tb_bfind_all(tb_iterator_ref_t iterator, tb_cpointer_t priv, tb_iterator_comp_t comp)
+tb_size_t tb_binary_find_all(tb_iterator_ref_t iterator, tb_cpointer_t priv, tb_iterator_comp_t comp)
 {
     return tb_binary_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), priv, comp);
 }

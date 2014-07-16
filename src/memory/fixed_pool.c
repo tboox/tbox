@@ -92,6 +92,15 @@ typedef struct __tb_fixed_pool_impl_t
     // the full slot
     tb_list_entry_head_t            full_slots;
 
+    // the slot list
+    tb_fixed_pool_slot_t**          slot_list;
+
+    // the slot count
+    tb_size_t                       slot_count;
+
+    // the slot space
+    tb_size_t                       slot_space;
+
 }tb_fixed_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -113,9 +122,24 @@ static tb_void_t tb_fixed_pool_slot_exit(tb_fixed_pool_impl_t* impl, tb_fixed_po
 {
     // check
     tb_assert_and_check_return(impl && impl->large_pool && slot);
+    tb_assert_and_check_return(impl->slot_list && impl->slot_count);
 
     // trace
     tb_trace_d("slot[%lu]: exit: size: %lu", impl->item_size, slot->size);
+
+    // init the iterator
+    tb_iterator_t iterator = tb_iterator_init_ptr((tb_pointer_t*)impl->slot_list, impl->slot_count);
+
+    // find the slot from the slot list
+    tb_size_t itor = tb_binary_find_all(&iterator, (tb_cpointer_t)slot, tb_null);
+    tb_assert_abort(itor != tb_iterator_tail(&iterator) && itor < impl->slot_count && impl->slot_list[itor]);
+    tb_check_return(itor != tb_iterator_tail(&iterator) && itor < impl->slot_count && impl->slot_list[itor]);
+    
+    // remove the slot
+    if (itor + 1 < impl->slot_count) tb_memmov_(impl->slot_list + itor, impl->slot_list + itor + 1, (impl->slot_count - itor - 1) * sizeof(tb_fixed_pool_slot_t*));
+
+    // update the slot count
+    impl->slot_count--;
 
     // exit slot
     tb_large_pool_free(impl->large_pool, slot);
@@ -154,6 +178,47 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
         slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], real_space - sizeof(tb_fixed_pool_slot_t), impl->item_size); 
         tb_assert_and_check_break(slot->pool);
 
+        // no list?
+        if (!impl->slot_list)
+        {
+            // init the slot list
+            tb_size_t size = 0;
+            impl->slot_list = (tb_fixed_pool_slot_t**)tb_large_pool_nalloc(impl->large_pool, 64, sizeof(tb_fixed_pool_slot_t*), &size);
+            tb_assert_and_check_break(impl->slot_list && size);
+
+            // init the slot count
+            impl->slot_count = 0;
+
+            // init the slot space
+            impl->slot_space = size / sizeof(tb_fixed_pool_slot_t*);
+            tb_assert_and_check_break(impl->slot_space);
+        }
+        // no enough space?
+        else if (impl->slot_count == impl->slot_space)
+        {
+            // grow the slot list
+            tb_size_t size = 0;
+            impl->slot_list = (tb_fixed_pool_slot_t**)tb_large_pool_ralloc(impl->large_pool, impl->slot_list, (impl->slot_space << 1) * sizeof(tb_fixed_pool_slot_t*), &size);
+            tb_assert_and_check_break(impl->slot_list && size);
+
+            // update the slot space
+            impl->slot_space = size / sizeof(tb_fixed_pool_slot_t*);
+            tb_assert_and_check_break(impl->slot_space);
+        }
+
+        // check
+        tb_assert_and_check_break(impl->slot_count < impl->slot_space);
+
+        // insert the slot to the slot list in the increasing order
+        tb_size_t i = 0;
+        tb_size_t n = impl->slot_count;
+        for (i = 0; i < n; i++) if (slot <= impl->slot_list[i]) break;
+        if (i < n) tb_memmov_(impl->slot_list + i + 1, impl->slot_list + i, (n - i) * sizeof(tb_fixed_pool_slot_t*));
+        impl->slot_list[i] = slot;
+
+        // update the slot count
+        impl->slot_count++;
+
         // trace
         tb_trace_d("slot[%lu]: init: size: %lu => %lu, item: %lu => %lu", impl->item_size, need_space, real_space, impl->slot_size, tb_static_fixed_pool_maxn(slot->pool));
 
@@ -173,12 +238,12 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
     // ok?
     return slot;
 }
+#if 0
 static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl, tb_pointer_t data)
 {
     // check
     tb_assert_and_check_return_val(impl && data, tb_null);
 
-    // TODO: optimizate it
     // done
     tb_fixed_pool_slot_t* slot = tb_null;
     do
@@ -220,6 +285,39 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl,
     // ok?
     return slot;
 }
+#else
+static tb_long_t tb_fixed_pool_slot_comp(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t data)
+{
+    // the slot
+    tb_fixed_pool_slot_t* slot = (tb_fixed_pool_slot_t*)item;
+    tb_assert_return_val(slot, -1);
+
+    // comp
+    return (tb_byte_t*)data < (tb_byte_t*)slot? 1 : ((tb_byte_t*)data >= (tb_byte_t*)slot + slot->size? -1 : 0);
+}
+static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl, tb_pointer_t data)
+{
+    // check
+    tb_assert_and_check_return_val(impl && data, tb_null);
+
+    // init the iterator
+    tb_iterator_t iterator = tb_iterator_init_ptr((tb_pointer_t*)impl->slot_list, impl->slot_count);
+
+    // find it
+    tb_size_t itor = tb_binary_find_all(&iterator, data, tb_fixed_pool_slot_comp);
+    tb_check_return_val(itor != tb_iterator_tail(&iterator), tb_null);
+
+    // the slot
+    tb_fixed_pool_slot_t* slot = impl->slot_list[itor];
+    tb_assert_and_check_return_val(slot, tb_null);
+
+    // check
+    tb_assert_abort(tb_fixed_pool_slot_exists(slot, data));
+
+    // ok?
+    return slot;
+}
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -281,6 +379,12 @@ tb_void_t tb_fixed_pool_exit(tb_fixed_pool_ref_t pool)
 
     // clear it
     tb_fixed_pool_clear(pool);
+
+    // exit the slot list
+    if (impl->slot_list) tb_large_pool_free(tb_large_pool(), impl->slot_list);
+    impl->slot_list = tb_null;
+    impl->slot_count = 0;
+    impl->slot_space = 0;
 
     // exit it
     tb_large_pool_free(tb_large_pool(), impl);
