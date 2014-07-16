@@ -104,10 +104,9 @@ static tb_charset_ref_t tb_charset_find_by_name(tb_char_t const* name)
 {
     // init iterator
     tb_iterator_t   iterator = tb_iterator_init_mem(g_charsets, tb_arrayn(g_charsets), sizeof(tb_charset_t));
-    iterator.comp = tb_charset_comp_by_name;
 
     // find it by the binary search
-    tb_size_t       itor = tb_binary_find_all(&iterator, name, tb_null);
+    tb_size_t       itor = tb_binary_find_all_if(&iterator, tb_charset_comp_by_name, name);
 
     // ok?
     if (itor != tb_iterator_tail(&iterator))
@@ -118,10 +117,9 @@ static tb_charset_ref_t tb_charset_find_by_type(tb_size_t type)
 {
     // init iterator
     tb_iterator_t   iterator = tb_iterator_init_mem(g_charsets, tb_arrayn(g_charsets), sizeof(tb_charset_t));
-    iterator.comp = tb_charset_comp_by_type;
 
     // find it by the binary search
-    tb_size_t       itor = tb_binary_find_all(&iterator, (tb_cpointer_t)TB_CHARSET_TYPE(type), tb_null);
+    tb_size_t       itor = tb_binary_find_all_if(&iterator, tb_charset_comp_by_type, (tb_cpointer_t)TB_CHARSET_TYPE(type));
 
     // ok?
     if (itor != tb_iterator_tail(&iterator))

@@ -608,7 +608,7 @@ tb_void_t tb_timer_task_kill(tb_timer_ref_t timer, tb_timer_task_ref_t task)
         tb_check_break(task_impl->refn == 2);
 
         // find it
-        tb_size_t itor = tb_find_all(impl->heap, task_impl, tb_timer_comp_by_task);
+        tb_size_t itor = tb_find_all_if(impl->heap, tb_timer_comp_by_task, task_impl);
         tb_assert_and_check_break(itor != tb_iterator_tail(impl->heap));
 
         // del this task_impl

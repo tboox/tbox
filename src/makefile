@@ -36,8 +36,10 @@ tbox_C_FILES 			+= \
 						algorithm/insert_sort \
 						algorithm/bubble_sort \
 						algorithm/find \
+						algorithm/find_if \
 						algorithm/rfind \
 						algorithm/binary_find \
+						algorithm/binary_find_if \
 						algorithm/walk \
 						algorithm/rwalk \
 						algorithm/count \
@@ -491,8 +493,10 @@ INC_FILES 				= \
 						algorithm/insert_sort.h \
 						algorithm/bubble_sort.h \
 						algorithm/find.h \
+						algorithm/find_if.h \
 						algorithm/rfind.h \
 						algorithm/binary_find.h \
+						algorithm/binary_find_if.h \
 						algorithm/walk.h \
 						algorithm/rwalk.h \
 						algorithm/count.h \
