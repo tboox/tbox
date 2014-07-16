@@ -38,14 +38,15 @@ tb_void_t tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, 
     tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
 
     // done
+    tb_long_t ok = 1;
     tb_size_t itor = tb_iterator_head(iterator);
-    while (itor != tb_iterator_tail(iterator))
+    while (itor != tb_iterator_tail(iterator) && ok > 0)
     {
         // save next
         tb_size_t next = tb_iterator_next(iterator, itor);
 
         // remove it?
-        if (!comp(iterator, tb_iterator_item(iterator, itor), priv))
+        if (!(ok = comp(iterator, tb_iterator_item(iterator, itor), priv)))
             tb_iterator_delt(iterator, itor);
 
         // next

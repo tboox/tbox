@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! remove item for all if !comp(item, priv)
+/*! remove item for all if !comp(item, priv), break it if comp(item, priv) < 0
  *
  * @param iterator  the iterator
  * @param comp      the comparer func

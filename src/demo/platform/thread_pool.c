@@ -25,7 +25,7 @@ static tb_void_t tb_demo_task_time_exit(tb_cpointer_t priv)
  */ 
 tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 {
-#if 0
+#if 1
     // post task: 60s
     tb_thread_pool_task_post(tb_thread_pool(), "60000ms", tb_demo_task_time_done, tb_null, (tb_cpointer_t)60000, tb_false);
 
