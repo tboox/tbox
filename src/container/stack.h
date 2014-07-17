@@ -153,31 +153,6 @@ tb_size_t           tb_stack_size(tb_stack_ref_t stack);
  */
 tb_size_t           tb_stack_maxn(tb_stack_ref_t stack);
 
-/*! walk the stack
- *
- * be faster than the iterator mode, optimizate to remove items for walking
- *
- * @code
- * tb_bool_t tb_stack_item_func(tb_stack_ref_t stack, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
- * {
- *      // check
- *      tb_assert_and_check_return_val(stack && bdel, tb_false);
- *
- *      // delete it?
- *      // *bdel = tb_true;
- *
- *      // continue or break
- *      return tb_true;
- * }
- * @endcode
- *
- * @param stack     the stack
- * @param func      the walk func
- * @param data      the walk data
- *
- */
-tb_void_t           tb_stack_walk(tb_stack_ref_t stack, tb_bool_t (*func)(tb_stack_ref_t stack, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
