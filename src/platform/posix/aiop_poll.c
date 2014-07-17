@@ -67,27 +67,20 @@ typedef struct __tb_aiop_rtor_poll_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_poll_walk_delo(tb_vector_ref_t vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_long_t tb_poll_walk_delo(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(vector && bdel && priv, tb_false);
+    tb_assert_and_check_return_val(priv, -1);
 
     // the fd
     tb_long_t fd = (tb_long_t)priv;
 
-    // is this?
+    // is this? remove it
     struct pollfd* pfd = (struct pollfd*)item;
-    if (pfd && pfd->fd == fd) 
-    {
-        // remove it
-        *bdel = tb_true;
-
-        // break
-        return tb_false;
-    }
+    if (pfd && pfd->fd == fd) return 0;
 
     // ok
-    return tb_true;
+    return 1;
 }
 static tb_bool_t tb_poll_walk_sete(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
@@ -170,7 +163,7 @@ static tb_bool_t tb_aiop_rtor_poll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_
 
     // delo it, TODO: delo by binary search
     tb_spinlock_enter(&impl->lock.pfds);
-    tb_vector_walk(impl->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)aioo->sock) - 1));
+    tb_remove_first_if(impl->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)aioo->sock) - 1));
     tb_spinlock_leave(&impl->lock.pfds);
 
     // del sock => aioo

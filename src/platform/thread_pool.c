@@ -412,7 +412,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                     tb_trace_d("worker[%lu]: try pulling from urgent: %lu", worker->id, tb_list_entry_size(&impl->jobs_urgent));
 
                     // pull it
-                    tb_remove_all_if(tb_list_entry_itor(&impl->jobs_urgent), tb_thread_pool_worker_walk_pull, worker);
+                    tb_remove_if(tb_list_entry_itor(&impl->jobs_urgent), tb_thread_pool_worker_walk_pull, worker);
                 }
 
                 // pull from the waiting jobs
@@ -422,7 +422,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                     tb_trace_d("worker[%lu]: try pulling from waiting: %lu", worker->id, tb_list_entry_size(&impl->jobs_waiting));
 
                     // pull it
-                    tb_remove_all_if(tb_list_entry_itor(&impl->jobs_waiting), tb_thread_pool_worker_walk_pull, worker);
+                    tb_remove_if(tb_list_entry_itor(&impl->jobs_waiting), tb_thread_pool_worker_walk_pull, worker);
                 }
 
                 // pull from the pending jobs and clean some finished and killed jobs
@@ -433,9 +433,9 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
                     // no jobs? try to pull from the pending jobs
                     if (!tb_vector_size(worker->jobs))
-                        tb_remove_all_if(tb_list_entry_itor(&impl->jobs_pending), tb_thread_pool_worker_walk_pull_and_clean, worker);
+                        tb_remove_if(tb_list_entry_itor(&impl->jobs_pending), tb_thread_pool_worker_walk_pull_and_clean, worker);
                     // clean some finished and killed jobs
-                    else tb_remove_all_if(tb_list_entry_itor(&impl->jobs_pending), tb_thread_pool_worker_walk_clean, worker);
+                    else tb_remove_if(tb_list_entry_itor(&impl->jobs_pending), tb_thread_pool_worker_walk_clean, worker);
                 }
 
                 // leave 

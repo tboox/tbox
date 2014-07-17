@@ -271,17 +271,15 @@ end:
     // ok
     return rate;
 }
-static tb_bool_t tb_dns_server_rate(tb_vector_ref_t vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_long_t tb_dns_server_rate(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
-    // check
-    tb_assert_and_check_return_val(vector && bdel, tb_false);
-
     // the server
-    tb_dns_server_t* server = (tb_dns_server_t*)item;
+    tb_long_t           ok = 1;
+    tb_dns_server_t*    server = (tb_dns_server_t*)item;
     if (server && !server->rate)
     {
         // done
-        tb_bool_t ok = tb_false;
+        tb_bool_t done = tb_false;
         do
         {
             // the server rate
@@ -292,16 +290,16 @@ static tb_bool_t tb_dns_server_rate(tb_vector_ref_t vector, tb_pointer_t item, t
             server->rate = rate;
 
             // ok
-            ok = tb_true;
+            done = tb_true;
 
         } while (0);
 
         // failed? remove it
-        if (!ok) *bdel = tb_true;
+        if (!done) ok = 0;
     }
 
-    // ok
-    return tb_true;
+    // ok?
+    return ok;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -427,7 +425,7 @@ tb_void_t tb_dns_server_sort()
     tb_check_return(list);
 
     // rate list and remove no-rate servers
-    tb_vector_walk(list, tb_dns_server_rate, tb_null);
+    tb_remove_if(list, tb_dns_server_rate, tb_null);
 
     // sort list
     tb_sort_all(list, tb_null);

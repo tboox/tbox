@@ -26,37 +26,17 @@
  * includes
  */
 #include "binary_find.h"
+#include "binary_find_if.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_size_t tb_binary_find(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
 {
-    // check
-    tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS), tail);
-
-    // null?
-    tb_check_return_val(head != tail, tail);
-
-    // find
-    tb_size_t l = head;
-    tb_size_t r = tail;
-    tb_size_t m = (l + r) >> 1;
-    tb_long_t c = -1;
-    while (l < r)
-    {
-        c = tb_iterator_comp(iterator, tb_iterator_item(iterator, m), item);
-        if (c > 0) r = m;
-        else if (c < 0) l = m + 1;
-        else break;
-        m = (l + r) >> 1;
-    }
-
-    // ok?
-    return !c? m : tail;
+    return tb_binary_find_if(iterator, head, tail, tb_iterator_comp, item);
 }
 tb_size_t tb_binary_find_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
 {
-    return tb_binary_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
+    return tb_binary_find_all_if(iterator, tb_iterator_comp, item);
 }
 

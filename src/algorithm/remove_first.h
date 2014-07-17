@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        remove.h
+ * @file        remove_first.h
  * @ingroup     algorithm
  *
  */
-#ifndef TB_ALGORITHM_REMOVE_H
-#define TB_ALGORITHM_REMOVE_H
+#ifndef TB_ALGORITHM_REMOVE_FIRST_H
+#define TB_ALGORITHM_REMOVE_FIRST_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,12 +38,12 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! remove items
+/*! remove the first item
  *
  * @param iterator  the iterator
  * @param item      the removed item
  */
-tb_void_t           tb_remove(tb_iterator_ref_t iterator, tb_cpointer_t item);
+tb_void_t           tb_remove_first(tb_iterator_ref_t iterator, tb_cpointer_t item);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -38,13 +38,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! remove item for all if !comp(item, priv), break it if comp(item, priv) < 0
+/*! remove items if !comp(item, priv), break it if comp(item, priv) < 0
  *
  * @param iterator  the iterator
  * @param comp      the comparer func
  * @param priv      the comparer data
  */
-tb_void_t           tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
+tb_void_t           tb_remove_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -589,7 +589,7 @@ static tb_void_t tb_hash_test_walk_perf()
     // performance
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[3] = {0};
-    tb_remove_all_if(hash, tb_hash_test_walk_item, (tb_cpointer_t)test);
+    tb_remove_if(hash, tb_hash_test_walk_item, (tb_cpointer_t)test);
     t = tb_mclock() - t;
     tb_trace_i("name: %llx, data: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], test[2], tb_hash_size(hash), t);
 

@@ -820,7 +820,7 @@ static tb_void_t tb_vector_test_walk_perf()
     // done
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[2] = {0};
-    tb_remove_all_if(vector, tb_vector_test_walk_item, (tb_pointer_t)test);
+    tb_remove_if(vector, tb_vector_test_walk_item, (tb_pointer_t)test);
     t = tb_mclock() - t;
 
     // trace
