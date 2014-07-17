@@ -54,12 +54,18 @@
 #   define TB_HASH_INDEX_ITEM(index)                (((index) >> 16) & 0xffff)
 #endif
 
-// the impl bulk default size
+// the hash bulk default size
 #ifdef __tb_small__
 #   define TB_HASH_BULK_SIZE_DEFAULT                TB_HASH_BULK_SIZE_MICRO
 #else
 #   define TB_HASH_BULK_SIZE_DEFAULT                TB_HASH_BULK_SIZE_SMALL
 #endif
+
+// the hash bulk maximum size
+#define TB_HASH_BULK_MAXN                           (1 << 16)
+
+// the hash bulk item maximum size
+#define TB_HASH_BULK_ITEM_MAXN                      (1 << 16)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -234,7 +240,7 @@ static tb_size_t tb_hash_itor_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_return_val(impl, 0);
 
     // the size
     return impl->item_size;
@@ -243,7 +249,7 @@ static tb_size_t tb_hash_itor_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_return_val(impl, 0);
 
     // find the head
     tb_size_t i = 0;
@@ -257,25 +263,27 @@ static tb_size_t tb_hash_itor_head(tb_iterator_ref_t iterator)
 }
 static tb_size_t tb_hash_itor_tail(tb_iterator_ref_t iterator)
 {
+    // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_return_val(impl, 0);
 
     return 0;
 }
 static tb_size_t tb_hash_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
+    // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && impl->hash_list && impl->hash_size, 0);
+    tb_assert_return_val(impl && impl->hash_list && impl->hash_size, 0);
 
-    // buck & item
+    // the current bucket and item
     tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
     tb_size_t item = TB_HASH_INDEX_ITEM(itor);
-    tb_assert_and_check_return_val(buck && item, 0);
+    tb_assert_return_val(buck && item, 0);
 
-    // the current bucket & item
+    // compute index
     buck--;
     item--;
-    tb_assert_and_check_return_val(buck < impl->hash_size && (item + 1) < 65536, 0);
+    tb_assert_return_val(buck < impl->hash_size && (item + 1) < TB_HASH_BULK_ITEM_MAXN, 0);
 
     // find the next from the current bucket first
     if (impl->hash_list[buck] && item + 1 < impl->hash_list[buck]->size) return TB_HASH_INDEX_MAKE(buck + 1, item + 2);
@@ -288,14 +296,17 @@ static tb_size_t tb_hash_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
         tb_hash_item_list_t* list = impl->hash_list[i];
         if (list && list->size) return TB_HASH_INDEX_MAKE(i + 1, 1);
     }
+
+    // tail
     return 0;
 }
 static tb_pointer_t tb_hash_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
+    // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && itor, 0);
+    tb_assert_return_val(impl && itor, 0);
 
-    // get buck & item
+    // get the buck and item
     tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
     tb_size_t item = TB_HASH_INDEX_ITEM(itor);
     tb_assert_and_check_return_val(buck && item, tb_null);
@@ -307,10 +318,11 @@ static tb_pointer_t tb_hash_itor_item(tb_iterator_ref_t iterator, tb_size_t itor
 }
 static tb_void_t tb_hash_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
+    // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
     tb_assert_return(impl && impl->hash_list && impl->hash_size);
     
-    // buck & item
+    // the buck and item
     tb_size_t b = TB_HASH_INDEX_BUCK(itor);
     tb_size_t i = TB_HASH_INDEX_ITEM(itor);
     tb_assert_return(b && i); b--; i--;
@@ -318,7 +330,7 @@ static tb_void_t tb_hash_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, t
 
     // step
     tb_size_t step = impl->name_func.size + impl->data_func.size;
-    tb_assert_and_check_return(step);
+    tb_assert_return(step);
 
     // list
     tb_hash_item_list_t* list = impl->hash_list[b];
@@ -329,9 +341,11 @@ static tb_void_t tb_hash_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, t
 }
 static tb_long_t tb_hash_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
+    // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && impl->name_func.comp && ltem && rtem, 0);
+    tb_assert_return_val(impl && impl->name_func.comp && ltem && rtem, 0);
     
+    // done
     return impl->name_func.comp(&impl->name_func, ((tb_hash_item_t*)ltem)->name, ((tb_hash_item_t*)rtem)->name);
 }
 static tb_void_t tb_hash_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
@@ -343,16 +357,16 @@ static tb_void_t tb_hash_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     // buck & item
     tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
     tb_size_t item = TB_HASH_INDEX_ITEM(itor);
-    tb_assert_and_check_return(buck && item); buck--; item--;
-    tb_assert_and_check_return(buck < impl->hash_size);
+    tb_assert_return(buck && item); buck--; item--;
+    tb_assert_return(buck < impl->hash_size);
 
     // the step
     tb_size_t step = impl->name_func.size + impl->data_func.size;
-    tb_assert_and_check_return(step);
+    tb_assert_return(step);
 
     // get list
     tb_hash_item_list_t* list = impl->hash_list[buck];
-    tb_assert_and_check_return(list && list->size && item < list->size);
+    tb_assert_return(list && list->size && item < list->size);
 
     // free item
     if (impl->name_func.free) impl->name_func.free(&impl->name_func, ((tb_byte_t*)&list[1]) + item * step);
@@ -385,6 +399,78 @@ static tb_void_t tb_hash_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t
     // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
     tb_assert_return(impl && impl->hash_list && impl->hash_size);
+
+    // no size
+    tb_check_return(size);
+
+    // the step
+    tb_size_t step = impl->name_func.size + impl->data_func.size;
+    tb_assert_return(step);
+
+    // the first itor
+    tb_size_t itor = prev? tb_hash_itor_next(iterator, prev) : tb_hash_itor_head(iterator);
+
+    // the head buck and item
+    tb_size_t buck_head = TB_HASH_INDEX_BUCK(itor);
+    tb_size_t item_head = TB_HASH_INDEX_ITEM(itor);
+    tb_assert_return(buck_head && item_head);
+
+    // compute index
+    buck_head--;
+    item_head--;
+    tb_assert_return(buck_head < impl->hash_size && item_head < TB_HASH_BULK_ITEM_MAXN);
+
+    // the last buck and the tail item
+    tb_size_t buck_last;
+    tb_size_t item_tail;
+    if (next)
+    {
+        // next => buck and item
+        buck_last = TB_HASH_INDEX_BUCK(next);
+        item_tail = TB_HASH_INDEX_ITEM(next);
+        tb_assert_return(buck_last && item_tail);
+
+        // compute index
+        buck_last--;
+        item_tail--;
+        tb_assert_return(buck_last < impl->hash_size && item_tail < TB_HASH_BULK_ITEM_MAXN);
+    }
+    else 
+    {
+        buck_last = impl->hash_size - 1;
+        item_tail = -1;
+    }
+
+    // remove items: [itor, next)
+    tb_size_t buck;
+    tb_size_t item;
+    for (buck = buck_head, item = item_head; buck <= buck_last; buck++, item = 0)
+    {
+        // the list
+        tb_hash_item_list_t* list = impl->hash_list[buck];
+        tb_check_continue(list && list->size);
+
+        // the tail
+        tb_size_t tail = (buck == buck_last && next)? item_tail : list->size;
+        tb_assert_abort(tail != -1);
+        tb_check_continue(item < tail);
+
+        // the data
+        tb_byte_t* data = (tb_byte_t*)&list[1];
+
+        // free items
+        if (impl->name_func.nfree) impl->name_func.nfree(&impl->name_func, data + item * step, tail - item);
+        if (impl->data_func.nfree) impl->data_func.nfree(&impl->data_func, data + item * step + impl->name_func.size, tail - item);
+
+        // move items
+        if (buck == buck_last && tail < list->size) tb_memmov(data + item * step, data + tail * step, (list->size - tail) * step);
+
+        // update the list size
+        list->size -= tail - item;
+
+        // update the item size
+        impl->item_size -= tail - item;
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -430,7 +516,7 @@ tb_hash_ref_t tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_ite
 
         // init hash size
         impl->hash_size = tb_align_pow2(bulk_size);
-        tb_assert_and_check_break(impl->hash_size <= 65536);
+        tb_assert_and_check_break(impl->hash_size <= TB_HASH_BULK_MAXN);
 
         // init hash list
         impl->hash_list = (tb_hash_item_list_t**)tb_nalloc0(impl->hash_size, sizeof(tb_size_t));
@@ -671,6 +757,7 @@ tb_size_t tb_hash_maxn(tb_hash_ref_t hash)
     // the maxn
     return impl->item_maxn;
 }
+#if 0
 tb_void_t tb_hash_walk(tb_hash_ref_t hash, tb_bool_t (*func)(tb_hash_ref_t impl, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv)
 {
     // check
@@ -783,6 +870,8 @@ end:
 
     return ;
 }
+#endif
+
 #ifdef __tb_debug__
 tb_void_t tb_hash_dump(tb_hash_ref_t hash)
 {

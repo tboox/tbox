@@ -757,7 +757,7 @@ static tb_void_t tb_vector_test_itor_perf()
     __tb_volatile__ tb_size_t n = 100000;
     while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
 
-    // performance
+    // done
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[2] = {0};
     __tb_volatile__ tb_size_t itor = tb_iterator_head(vector);
@@ -783,6 +783,7 @@ static tb_void_t tb_vector_test_itor_perf()
     t = tb_mclock() - t;
     tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
 
+    // exit
     tb_vector_exit(vector);
 }
 static tb_long_t tb_vector_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)

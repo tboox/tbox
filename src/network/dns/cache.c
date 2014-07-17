@@ -34,6 +34,7 @@
 #include "cache.h"
 #include "../../platform/platform.h"
 #include "../../container/container.h"
+#include "../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -92,40 +93,38 @@ static __tb_inline__ tb_size_t tb_dns_cache_now()
 {
     return (tb_size_t)(tb_cache_time_spak() / 1000);
 }
-static tb_bool_t tb_dns_cache_cler(tb_hash_ref_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_long_t tb_dns_cache_cler(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(cache && bdel, tb_false);
+    tb_assert_and_check_return_val(item, -1);
 
-    if (item)
+    // the dns cache address
+    tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_item_t*)item)->data;
+    tb_assert_and_check_return_val(caddr, -1);
+
+    // is expired?
+    tb_long_t ok = 1;
+    if (caddr->time < g_cache.expired)
     {
-        // the dns cache address
-        tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)item->data;
-        tb_assert_and_check_return_val(caddr, tb_false);
+        // remove it
+        ok = 0;
 
-        // is expired?
-        if (caddr->time < g_cache.expired)
-        {
-            // remove it
-            *bdel = tb_true;
+        // trace
+        tb_trace_d("del: %s => %u.%u.%u.%u, time: %u, size: %u", (tb_char_t const*)item->name
+                                                                ,   caddr->ipv4.u8[0]
+                                                                ,   caddr->ipv4.u8[1]
+                                                                ,   caddr->ipv4.u8[2]
+                                                                ,   caddr->ipv4.u8[3]
+                                                                ,   caddr->time
+                                                                ,   tb_hash_size(g_cache.hash));
 
-            // trace
-            tb_trace_d("del: %s => %u.%u.%u.%u, time: %u, size: %u", (tb_char_t const*)item->name
-                                                                    ,   caddr->ipv4.u8[0]
-                                                                    ,   caddr->ipv4.u8[1]
-                                                                    ,   caddr->ipv4.u8[2]
-                                                                    ,   caddr->ipv4.u8[3]
-                                                                    ,   caddr->time
-                                                                    ,   tb_hash_size(g_cache.hash));
-
-            // update times
-            tb_assert_and_check_return_val(g_cache.times >= caddr->time, tb_false);
-            g_cache.times -= caddr->time;
-        }
+        // update times
+        tb_assert_and_check_return_val(g_cache.times >= caddr->time, -1);
+        g_cache.times -= caddr->time;
     }
 
-    // ok
-    return tb_true;
+    // ok?
+    return ok;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -276,7 +275,7 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
             tb_trace_d("expired: %lu", g_cache.expired);
 
             // remove the expired times
-            tb_hash_walk(g_cache.hash, tb_dns_cache_cler, tb_null);
+            tb_remove_if(g_cache.hash, tb_dns_cache_cler, tb_null);
         }
 
         // check
