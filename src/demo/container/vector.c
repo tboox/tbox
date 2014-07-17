@@ -785,27 +785,24 @@ static tb_void_t tb_vector_test_itor_perf()
 
     tb_vector_exit(vector);
 }
-static tb_bool_t tb_vector_test_walk_item(tb_vector_ref_t vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_long_t tb_vector_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(vector && bdel && priv, tb_false);
+    tb_assert_and_check_return_val(priv, -1);
 
     // done
-    tb_hize_t* test = (tb_hize_t*)priv;
+    tb_hize_t*  test = (tb_hize_t*)priv;
     tb_size_t   i = (tb_size_t)item;
-    if (!((i >> 25) & 0x1))
-//  if (!(i & 0x7))
-//  if (1)
-//  if (!(tb_random_range(tb_random_generator(), 0, TB_MAXU32) & 0x1))
-        *bdel = tb_true;
+    tb_long_t   ok = 1;
+    if (!((i >> 25) & 0x1)) ok = 0;
     else
     {
         test[0] += i;
         test[1]++;
     }
 
-    // ok
-    return tb_true;
+    // ok?
+    return ok;
 }
 static tb_void_t tb_vector_test_walk_perf()
 {
@@ -820,13 +817,16 @@ static tb_void_t tb_vector_test_walk_perf()
     __tb_volatile__ tb_size_t n = 100000;
     while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
 
-    // performance
+    // done
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[2] = {0};
-    tb_vector_walk(vector, tb_vector_test_walk_item, (tb_pointer_t)test);
+    tb_remove_all_if(vector, tb_vector_test_walk_item, (tb_pointer_t)test);
     t = tb_mclock() - t;
+
+    // trace
     tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
 
+    // exit
     tb_vector_exit(vector);
 }
 /* //////////////////////////////////////////////////////////////////////////////////////

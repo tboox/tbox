@@ -380,6 +380,13 @@ static tb_void_t tb_hash_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     // update the impl item size
     impl->item_size--;
 }
+static tb_void_t tb_hash_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
+{
+    // check
+    tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
+    tb_assert_return(impl && impl->hash_list && impl->hash_size);
+}
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -407,18 +414,19 @@ tb_hash_ref_t tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_ite
         impl->data_func = data_func;
 
         // init item itor
-        impl->item_itor.mode    = TB_ITERATOR_MODE_FORWARD;
-        impl->item_itor.priv    = tb_null;
-        impl->item_itor.step    = sizeof(tb_hash_item_t);
-        impl->item_itor.size    = tb_hash_itor_size;
-        impl->item_itor.head    = tb_hash_itor_head;
-        impl->item_itor.tail    = tb_hash_itor_tail;
-        impl->item_itor.prev    = tb_null;
-        impl->item_itor.next    = tb_hash_itor_next;
-        impl->item_itor.item    = tb_hash_itor_item;
-        impl->item_itor.copy    = tb_hash_itor_copy;
-        impl->item_itor.comp    = tb_hash_itor_comp;
-        impl->item_itor.remove  = tb_hash_itor_remove;
+        impl->item_itor.mode            = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_MUTABLE;
+        impl->item_itor.priv            = tb_null;
+        impl->item_itor.step            = sizeof(tb_hash_item_t);
+        impl->item_itor.size            = tb_hash_itor_size;
+        impl->item_itor.head            = tb_hash_itor_head;
+        impl->item_itor.tail            = tb_hash_itor_tail;
+        impl->item_itor.prev            = tb_null;
+        impl->item_itor.next            = tb_hash_itor_next;
+        impl->item_itor.item            = tb_hash_itor_item;
+        impl->item_itor.copy            = tb_hash_itor_copy;
+        impl->item_itor.comp            = tb_hash_itor_comp;
+        impl->item_itor.remove          = tb_hash_itor_remove;
+        impl->item_itor.remove_range    = tb_hash_itor_remove_range;
 
         // init hash size
         impl->hash_size = tb_align_pow2(bulk_size);

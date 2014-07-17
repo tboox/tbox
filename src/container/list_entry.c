@@ -105,7 +105,7 @@ static tb_void_t tb_list_entry_itor_remove(tb_iterator_ref_t iterator, tb_size_t
 static tb_void_t tb_list_entry_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
 {
     // check
-    tb_list_entry_head_ref_t list = tb_container_of(tb_list_entry_head_t, next, iterator);
+    tb_list_entry_head_ref_t list = tb_container_of(tb_list_entry_head_t, itor, iterator);
     tb_assert_return(list && prev && next);
 
     // no size?

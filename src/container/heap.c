@@ -386,6 +386,7 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     // check
 //  tb_heap_check(impl);
 }
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -413,18 +414,18 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
         tb_assert_and_check_break(impl->maxn < TB_HEAP_ITEM_MAXN);
 
         // init iterator
-        impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-        impl->itor.priv = tb_null;
-        impl->itor.step = func.size;
-        impl->itor.size = tb_heap_itor_size;
-        impl->itor.head = tb_heap_itor_head;
-        impl->itor.tail = tb_heap_itor_tail;
-        impl->itor.prev = tb_heap_itor_prev;
-        impl->itor.next = tb_heap_itor_next;
-        impl->itor.item = tb_heap_itor_item;
-        impl->itor.copy = tb_heap_itor_copy;
-        impl->itor.comp = tb_heap_itor_comp;
-        impl->itor.remove = tb_heap_itor_remove;
+        impl->itor.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
+        impl->itor.priv     = tb_null;
+        impl->itor.step     = func.size;
+        impl->itor.size     = tb_heap_itor_size;
+        impl->itor.head     = tb_heap_itor_head;
+        impl->itor.tail     = tb_heap_itor_tail;
+        impl->itor.prev     = tb_heap_itor_prev;
+        impl->itor.next     = tb_heap_itor_next;
+        impl->itor.item     = tb_heap_itor_item;
+        impl->itor.copy     = tb_heap_itor_copy;
+        impl->itor.comp     = tb_heap_itor_comp;
+        impl->itor.remove   = tb_heap_itor_remove;
 
         // make data
         impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, func.size);

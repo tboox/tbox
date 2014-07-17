@@ -156,6 +156,21 @@ static tb_long_t tb_single_list_itor_comp(tb_iterator_ref_t iterator, tb_cpointe
     // comp
     return impl->func.comp(&impl->func, ltem, rtem);
 }
+static tb_void_t tb_single_list_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
+{
+    // remove it
+    tb_single_list_remove((tb_single_list_ref_t)iterator, itor);
+}
+static tb_void_t tb_single_list_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
+{
+    // no size?
+    tb_check_return(size);
+
+    // remove the body items
+    if (prev) tb_single_list_nremove_next((tb_single_list_ref_t)iterator, prev, size);
+    // remove the head items
+    else tb_single_list_nremove_head((tb_single_list_ref_t)iterator, size);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -308,17 +323,19 @@ tb_single_list_ref_t tb_single_list_init(tb_size_t grow, tb_item_func_t func)
         impl->func = func;
 
         // init iterator
-        impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-        impl->itor.priv = tb_null;
-        impl->itor.step = func.size;
-        impl->itor.size = tb_single_list_itor_size;
-        impl->itor.head = tb_single_list_itor_head;
-        impl->itor.tail = tb_single_list_itor_tail;
-        impl->itor.prev = tb_single_list_itor_prev;
-        impl->itor.next = tb_single_list_itor_next;
-        impl->itor.item = tb_single_list_itor_item;
-        impl->itor.copy = tb_single_list_itor_copy;
-        impl->itor.comp = tb_single_list_itor_comp;
+        impl->itor.mode         = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
+        impl->itor.priv         = tb_null;
+        impl->itor.step         = func.size;
+        impl->itor.size         = tb_single_list_itor_size;
+        impl->itor.head         = tb_single_list_itor_head;
+        impl->itor.tail         = tb_single_list_itor_tail;
+        impl->itor.prev         = tb_single_list_itor_prev;
+        impl->itor.next         = tb_single_list_itor_next;
+        impl->itor.item         = tb_single_list_itor_item;
+        impl->itor.copy         = tb_single_list_itor_copy;
+        impl->itor.comp         = tb_single_list_itor_comp;
+        impl->itor.remove       = tb_single_list_itor_remove;
+        impl->itor.remove_range = tb_single_list_itor_remove_range;
 
         // init pool, step = next + data
         impl->pool = tb_fixed_pool_init(tb_null, grow, sizeof(tb_single_list_item_t) + func.size, tb_null, tb_null, tb_null);

@@ -169,7 +169,7 @@ tb_queue_ref_t tb_queue_init(tb_size_t maxn, tb_item_func_t func)
         tb_assert_and_check_break(tb_ispow2(impl->maxn));
 
         // init iterator
-        impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
+        impl->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_MUTABLE;
         impl->itor.priv = tb_null;
         impl->itor.step = func.size;
         impl->itor.size = tb_queue_itor_size;
