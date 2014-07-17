@@ -47,7 +47,7 @@ tb_void_t tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, 
 
         // remove it?
         if (!(ok = comp(iterator, tb_iterator_item(iterator, itor), priv)))
-            tb_iterator_delt(iterator, itor);
+            tb_iterator_remove(iterator, itor);
 
         // next
         itor = next;

@@ -46,7 +46,7 @@ tb_void_t tb_remove_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
 
         // remove it?
         if (!tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), item))
-            tb_iterator_delt(iterator, itor);
+            tb_iterator_remove(iterator, itor);
 
         // next
         itor = next;

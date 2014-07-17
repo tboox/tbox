@@ -163,7 +163,7 @@ tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* 
                 tb_assert(0);
 
                 // del it
-                tb_iterator_delt(impl->cache, itor);
+                tb_iterator_remove(impl->cache, itor);
                 item = tb_null;
             }
         }
@@ -209,7 +209,7 @@ tb_void_t tb_string_pool_del(tb_string_pool_ref_t pool, tb_char_t const* data)
             // refn--
             if (refn > 1) tb_iterator_copy(impl->cache, itor, (tb_pointer_t)(refn - 1));
             // del it
-            else tb_iterator_delt(impl->cache, itor);
+            else tb_iterator_remove(impl->cache, itor);
         }
     }
 

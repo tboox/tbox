@@ -99,13 +99,21 @@ tb_pointer_t tb_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
     // item
     return iterator->item(iterator, itor);
 }
-tb_void_t tb_iterator_delt(tb_iterator_ref_t iterator, tb_size_t itor)
+tb_void_t tb_iterator_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_return(iterator && iterator->delt);
+    tb_assert_return(iterator && iterator->remove);
 
     // remove
-    return iterator->delt(iterator, itor);
+    return iterator->remove(iterator, itor);
+}
+tb_void_t tb_iterator_remove_range(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
+{
+    // check
+    tb_assert_return(iterator && iterator->remove_range);
+
+    // remove range
+    return iterator->remove_range(iterator, prev, next, size);
 }
 tb_void_t tb_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
