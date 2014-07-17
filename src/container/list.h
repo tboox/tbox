@@ -393,31 +393,6 @@ tb_size_t           tb_list_size(tb_list_ref_t list);
  */
 tb_size_t           tb_list_maxn(tb_list_ref_t list);
 
-/*! walk list items
- *
- * be faster than the iterator mode, optimizate to remove items for walking
- *
- * @code
- * tb_bool_t tb_list_item_func(tb_list_ref_t list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
- * {
- *      // check
- *      tb_assert_and_check_return_val(list && bdel, tb_false);
- *
- *      // delete it?
- *      // *bdel = tb_true;
- *
- *      // continue or break
- *      return tb_true;
- * }
- * @endcode
- *
- * @param list      the list
- * @param func      the walk func
- * @param priv      the walk priv
- *
- */
-tb_void_t           tb_list_walk(tb_list_ref_t list, tb_bool_t (*func)(tb_list_ref_t list, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

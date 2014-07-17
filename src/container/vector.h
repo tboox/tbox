@@ -331,30 +331,6 @@ tb_size_t           tb_vector_grow(tb_vector_ref_t vector);
  */
 tb_size_t           tb_vector_maxn(tb_vector_ref_t vector);
 
-/*!walk
- *
- * be faster than the iterator mode, optimizate to remove items for walking
- *
- * @code
- * tb_bool_t tb_vector_item_func(tb_vector_ref_t vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
- * {
- *      // check
- *      tb_assert_and_check_return_val(vector && bdel, tb_false);
- *
- *      // delete it?
- *      // *bdel = tb_true;
- *
- *      // continue or break
- *      return tb_true;
- * }
- * @endcode
- *
- * @param vector    the vector
- * @param func      the walk func
- * @param priv      the walk priv
- */
-tb_void_t           tb_vector_walk(tb_vector_ref_t vector, tb_bool_t (*func)(tb_vector_ref_t vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
