@@ -38,19 +38,61 @@ tb_void_t tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, 
     tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
 
     // done
-    tb_long_t ok = 1;
-    tb_size_t itor = tb_iterator_head(iterator);
-    while (itor != tb_iterator_tail(iterator) && ok > 0)
+    tb_long_t   ok = 1;
+    tb_size_t   size = 0;
+    tb_size_t   base = tb_iterator_tail(iterator);
+    tb_size_t   prev = tb_iterator_tail(iterator);
+    tb_size_t   itor = tb_iterator_head(iterator);
+    tb_bool_t   stop = tb_false;
+    tb_bool_t   need = tb_false;
+    while (itor != tb_iterator_tail(iterator))
     {
         // save next
         tb_size_t next = tb_iterator_next(iterator, itor);
+   
+        // done func
+        if ((ok = comp(iterator, tb_iterator_item(iterator, itor), priv)) < 0) stop = tb_true;
 
-        // remove it?
-        if (!(ok = comp(iterator, tb_iterator_item(iterator, itor), priv)))
-            tb_iterator_remove(iterator, itor);
+        // remove it? 
+        if (!ok)
+        {
+            // is the first removed item?
+            if (!need)
+            {
+                // save the removed range base
+                base = prev;
 
+                // need remove items
+                need = tb_true;
+            }
+
+            // update size
+            size++;
+        }
+       
+        // the removed range have been passed or stop or end?
+        if (ok || next == tb_iterator_tail(iterator))
+        {
+            // need remove items?
+            if (need) 
+            {
+                // check
+                tb_assert_abort(size);
+
+                // remove items
+                tb_iterator_remove_range(iterator, base, !ok? next : itor, size);
+
+                // reset state
+                need = tb_false;
+                size = 0;
+            }
+
+            // stop?
+            tb_check_break(!stop);
+        }
+    
         // next
+        prev = itor;
         itor = next;
     }
 }
-
