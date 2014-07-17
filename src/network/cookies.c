@@ -433,15 +433,15 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
     // ok
     return tb_true;
 }
-static tb_bool_t tb_cookies_entry_walk(tb_hash_ref_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
     // check
     tb_value_t* tuple = (tb_value_t*)priv;
-    tb_assert_and_check_return_val(hash && item && bdel && tuple, tb_false);
+    tb_assert_and_check_return_val(item && tuple, -1);
 
     // the entry
-    tb_cookies_entry_t* entry = (tb_cookies_entry_t*)item->name;
-    tb_assert_and_check_return_val(entry && entry->domain && entry->path && entry->name, tb_false);
+    tb_cookies_entry_t* entry = (tb_cookies_entry_t*)((tb_hash_item_t*)item)->name;
+    tb_assert_and_check_return_val(entry && entry->domain && entry->path && entry->name, -1);
 
     // the domain
     tb_char_t const* domain = tuple[0].cstr;
@@ -454,7 +454,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_ref_t hash, tb_hash_item_t* item,
 
     // the data and maxn
     tb_string_t* value = (tb_string_t*)tuple[3].ptr;
-    tb_assert_and_check_return_val(value, tb_false);
+    tb_assert_and_check_return_val(value, -1);
 
     // expired?
     if (entry->expires && tb_cache_time() >= entry->expires)
@@ -463,8 +463,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_ref_t hash, tb_hash_item_t* item,
         tb_trace_d("expired: %s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "");
 
         // remove it
-        *bdel = tb_true;
-        return tb_true;
+        return 0;
     }
 
     // this impl is at domain/path?
@@ -478,7 +477,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_hash_ref_t hash, tb_hash_item_t* item,
 
     // ok
     tuple[4].b = tb_true;
-    return tb_true;
+    return 1;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -713,7 +712,7 @@ tb_char_t const* tb_cookies_get(tb_cookies_ref_t cookies, tb_char_t const* domai
         tuple[2].ul     = secure? 1 : 0;
         tuple[3].ptr    = value;
         tuple[4].b      = tb_false;
-        tb_hash_walk(impl->cookie_pool, tb_cookies_entry_walk, tuple);
+        tb_remove_if(impl->cookie_pool, tb_cookies_entry_walk, tuple);
         tb_check_break(tuple[4].b);
 
         // ok

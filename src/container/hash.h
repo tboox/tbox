@@ -167,6 +167,7 @@ tb_size_t               tb_hash_size(tb_hash_ref_t hash);
  */
 tb_size_t               tb_hash_maxn(tb_hash_ref_t hash);
 
+#if 0
 /*! walk hash items
  *
  * be faster than the iterator mode, optimizate to remove items for walking
@@ -190,6 +191,7 @@ tb_size_t               tb_hash_maxn(tb_hash_ref_t hash);
  *
  */
 tb_void_t               tb_hash_walk(tb_hash_ref_t hash, tb_bool_t (*func)(tb_hash_ref_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_cpointer_t priv), tb_cpointer_t priv);
+#endif
 
 #ifdef __tb_debug__
 /*! dump hash
