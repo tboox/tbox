@@ -47,6 +47,8 @@ tbox_C_FILES 			+= \
 						algorithm/count_if \
 						algorithm/remove \
 						algorithm/remove_if \
+						algorithm/remove_first \
+						algorithm/remove_first_if \
 						container/hash \
 						container/heap \
 						container/list \
@@ -508,6 +510,8 @@ INC_FILES 				= \
 						algorithm/count_if.h \
 						algorithm/remove.h \
 						algorithm/remove_if.h \
+						algorithm/remove_first.h \
+						algorithm/remove_first_if.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \

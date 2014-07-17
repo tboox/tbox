@@ -893,7 +893,7 @@ static tb_void_t tb_list_test_walk_perf()
     // performance
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[2] = {0};
-    tb_remove_all_if(list, tb_list_test_walk_item, (tb_pointer_t)test);
+    tb_remove_if(list, tb_list_test_walk_item, (tb_pointer_t)test);
     t = tb_mclock() - t;
     tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_list_size(list), t);
 

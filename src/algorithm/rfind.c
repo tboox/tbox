@@ -26,35 +26,17 @@
  * includes
  */
 #include "rfind.h"
+#include "rfind_if.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_size_t tb_rfind(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
 {
-    // check
-    tb_assert_and_check_return_val(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_REVERSE), tail);
-
-    // null?
-    tb_check_return_val(head != tail, tail);
-
-    // find
-    tb_long_t find = -1;
-    tb_size_t itor = tb_iterator_prev(iterator, tail);
-    for (; itor != tail; itor = tb_iterator_prev(iterator, itor)) 
-    {
-        // comp
-        if (!(find = tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), item))) break;
-
-        // end?
-        tb_check_break(itor != head);
-    }
-
-    // ok?
-    return !find? itor : tail;
+    return tb_rfind_if(iterator, head, tail, tb_iterator_comp, item);
 } 
 tb_size_t tb_rfind_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
 {
-    return tb_rfind(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
+    return tb_rfind_all_if(iterator, tb_iterator_comp, item);
 }
 
