@@ -87,8 +87,11 @@ typedef struct __tb_iterator_t
     /// the iterator copy
     tb_void_t               (*copy)(struct __tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
 
-    /// the iterator delt
-    tb_void_t               (*delt)(struct __tb_iterator_t* iterator, tb_size_t itor);
+    /// the iterator remove
+    tb_void_t               (*remove)(struct __tb_iterator_t* iterator, tb_size_t itor);
+
+    /// the iterator remove range
+    tb_void_t               (*remove_range)(struct __tb_iterator_t* iterator, tb_size_t prev, tb_size_t next, tb_size_t size);
 
 }tb_iterator_t;
 
@@ -227,7 +230,16 @@ tb_pointer_t        tb_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor)
  * @param iterator  the iterator
  * @param itor      the item itor
  */
-tb_void_t           tb_iterator_delt(tb_iterator_ref_t iterator, tb_size_t itor);
+tb_void_t           tb_iterator_remove(tb_iterator_ref_t iterator, tb_size_t itor);
+
+/*! remove the iterator items from range(prev, next)
+ * 
+ * @param iterator  the iterator
+ * @param prev      the prev item
+ * @param next      the next item
+ * @param size      the removed size
+ */
+tb_void_t           tb_iterator_remove_range(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size);
 
 /*! copy the iterator item
  * 

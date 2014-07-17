@@ -236,7 +236,7 @@ static tb_long_t tb_heap_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t lte
  * 
  * </pre>
  */
-static tb_void_t tb_heap_itor_delt(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
@@ -424,7 +424,7 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.item = tb_heap_itor_item;
         impl->itor.copy = tb_heap_itor_copy;
         impl->itor.comp = tb_heap_itor_comp;
-        impl->itor.delt = tb_heap_itor_delt;
+        impl->itor.remove = tb_heap_itor_remove;
 
         // make data
         impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, func.size);
@@ -648,10 +648,10 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
 }
 tb_void_t tb_heap_pop(tb_heap_ref_t heap)
 {
-    tb_heap_itor_delt(heap, 0);
+    tb_heap_itor_remove(heap, 0);
 }
 tb_void_t tb_heap_del(tb_heap_ref_t heap, tb_size_t itor)
 {
-    tb_heap_itor_delt(heap, itor);
+    tb_heap_itor_remove(heap, itor);
 }
 

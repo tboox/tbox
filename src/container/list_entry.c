@@ -93,7 +93,7 @@ static tb_void_t tb_list_entry_itor_copy(tb_iterator_ref_t iterator, tb_size_t i
     // copy it
     list->copy((tb_pointer_t)(itor - list->eoff), (tb_pointer_t)item);
 }
-static tb_void_t tb_list_entry_itor_delt(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_void_t tb_list_entry_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_list_entry_head_ref_t list = tb_container_of(tb_list_entry_head_t, itor, iterator);
@@ -137,7 +137,7 @@ tb_void_t tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_off
     list->itor.next = tb_list_entry_itor_next;
     list->itor.item = tb_list_entry_itor_item;
     list->itor.copy = tb_list_entry_itor_copy;
-    list->itor.delt = tb_list_entry_itor_delt;
+    list->itor.remove = tb_list_entry_itor_remove;
     list->itor.comp = tb_null;
 }
 tb_void_t tb_list_entry_exit(tb_list_entry_head_ref_t list)

@@ -305,7 +305,7 @@ static tb_pointer_t tb_hash_itor_item(tb_iterator_ref_t iterator, tb_size_t itor
         return &(impl->hash_item);
     return tb_null;
 }
-static tb_void_t tb_hash_itor_delt(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_void_t tb_hash_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
@@ -417,7 +417,7 @@ tb_hash_ref_t tb_hash_init(tb_size_t bulk_size, tb_item_func_t name_func, tb_ite
         impl->item_itor.next = tb_hash_itor_next;
         impl->item_itor.item = tb_hash_itor_item;
         impl->item_itor.copy = tb_hash_itor_copy;
-        impl->item_itor.delt = tb_hash_itor_delt;
+        impl->item_itor.remove = tb_hash_itor_remove;
         impl->item_itor.comp = tb_hash_itor_comp;
 
         // init hash size
@@ -543,7 +543,7 @@ tb_void_t tb_hash_del(tb_hash_ref_t hash, tb_cpointer_t name)
     tb_size_t buck = 0;
     tb_size_t item = 0;
     if (tb_hash_item_find(impl, name, &buck, &item))
-        tb_hash_itor_delt((tb_iterator_ref_t)impl, TB_HASH_INDEX_MAKE(buck + 1, item + 1));
+        tb_hash_itor_remove((tb_iterator_ref_t)impl, TB_HASH_INDEX_MAKE(buck + 1, item + 1));
 }
 tb_size_t tb_hash_set(tb_hash_ref_t hash, tb_cpointer_t name, tb_cpointer_t data)
 {
