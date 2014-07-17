@@ -444,6 +444,8 @@ static tb_void_t tb_hash_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t
     // remove items: [itor, next)
     tb_size_t buck;
     tb_size_t item;
+    tb_item_func_free_t name_free = impl->name_func.free;
+    tb_item_func_free_t data_free = impl->data_func.free;
     for (buck = buck_head, item = item_head; buck <= buck_last; buck++, item = 0)
     {
         // the list
@@ -459,8 +461,12 @@ static tb_void_t tb_hash_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t
         tb_byte_t* data = (tb_byte_t*)&list[1];
 
         // free items
-        if (impl->name_func.nfree) impl->name_func.nfree(&impl->name_func, data + item * step, tail - item);
-        if (impl->data_func.nfree) impl->data_func.nfree(&impl->data_func, data + item * step + impl->name_func.size, tail - item);
+        tb_size_t i = 0;
+        for (i = item; i < tail; i++)
+        {
+            if (name_free) name_free(&impl->name_func, data + i * step);
+            if (data_free) data_free(&impl->data_func, data + i * step + impl->name_func.size);
+        }
 
         // move items
         if (buck == buck_last && tail < list->size) tb_memmov(data + item * step, data + tail * step, (list->size - tail) * step);
