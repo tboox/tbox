@@ -227,7 +227,7 @@ static tb_long_t tb_thread_pool_worker_walk_pull(tb_iterator_ref_t iterator, tb_
     tb_list_entry_insert_tail(&impl->jobs_pending, &job->entry);  
 
     // append the job to the working jobs
-    tb_vector_insert_tail(worker->jobs, &job->entry);   
+    tb_vector_insert_tail(worker->jobs, job);   
 
     // computate the job average time 
     tb_size_t average_time = 200;
