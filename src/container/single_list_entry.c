@@ -106,7 +106,7 @@ tb_void_t tb_single_list_entry_init_(tb_single_list_entry_head_ref_t list, tb_si
     list->copy          = copy;
  
     // init iterator
-    list->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_READONLY;
+    list->itor.mode = TB_ITERATOR_MODE_FORWARD;
     list->itor.priv = tb_null;
     list->itor.step = entry_size;
     list->itor.size = tb_single_list_entry_itor_size;

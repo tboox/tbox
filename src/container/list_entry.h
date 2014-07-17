@@ -503,6 +503,25 @@ static __tb_inline__ tb_void_t              tb_list_entry_replace_last(tb_list_e
     tb_list_entry_replace(list, list->prev, entry);
 }
 
+/*! remove the entry safely
+ *
+ * @param list                              the list
+ * @param prev                              the prev entry
+ * @param next                              the next entry
+ */
+static __tb_inline__ tb_void_t              tb_list_entry_remove_safe(tb_list_entry_head_ref_t list, tb_list_entry_ref_t prev, tb_list_entry_ref_t next)
+{
+    // check
+    tb_assert(list && list->size && prev && next);
+
+    // remove entries
+    prev->next = next;
+    next->prev = prev;
+
+    // update size
+    list->size--;
+}
+
 /*! remove the entry
  *
  * @param list                              the list
@@ -511,42 +530,38 @@ static __tb_inline__ tb_void_t              tb_list_entry_replace_last(tb_list_e
 static __tb_inline__ tb_void_t              tb_list_entry_remove(tb_list_entry_head_ref_t list, tb_list_entry_ref_t entry)
 {
     // check
-    tb_assert(list && entry && entry->next && entry->prev);
+    tb_assert(entry);
 
-    // remove entry
-    entry->next->prev = entry->prev;
-    entry->prev->next = entry->next;
-
-    // size--
-    list->size--;
+    // remove it
+    tb_list_entry_remove_safe(list, entry->prev, entry->next);
 }
 
 /*! remove the next entry
  *
  * @param list                              the list
- * @param entry                             the prev entry
+ * @param prev                              the prev entry
  */
-static __tb_inline__ tb_void_t              tb_list_entry_remove_next(tb_list_entry_head_ref_t list, tb_list_entry_ref_t entry)
+static __tb_inline__ tb_void_t              tb_list_entry_remove_next(tb_list_entry_head_ref_t list, tb_list_entry_ref_t prev)
 {
     // check
-    tb_assert(list && entry);
+    tb_assert(prev && prev->next);
 
     // remove it
-    tb_list_entry_remove(list, entry->next);
+    tb_list_entry_remove_safe(list, prev, prev->next->next);
 }
 
 /*! remove the prev entry
  *
  * @param list                              the list
- * @param entry                             the next entry
+ * @param next                              the next entry
  */
-static __tb_inline__ tb_void_t              tb_list_entry_remove_prev(tb_list_entry_head_ref_t list, tb_list_entry_ref_t entry)
+static __tb_inline__ tb_void_t              tb_list_entry_remove_prev(tb_list_entry_head_ref_t list, tb_list_entry_ref_t next)
 {
     // check
-    tb_assert(list && entry);
+    tb_assert(next && next->prev);
 
     // remove it
-    tb_list_entry_remove(list, entry->prev);
+    tb_list_entry_remove_safe(list, next->prev->prev, next);
 }
 
 /*! remove the head entry
@@ -556,10 +571,10 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove_prev(tb_list_en
 static __tb_inline__ tb_void_t              tb_list_entry_remove_head(tb_list_entry_head_ref_t list)
 {
     // check
-    tb_assert(list);
+    tb_assert(list && list->next);
 
     // remove it
-    tb_list_entry_remove(list, list->next);
+    tb_list_entry_remove_safe(list, (tb_list_entry_ref_t)list, list->next->next);
 }
 
 /*! remove the last entry
@@ -569,10 +584,10 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove_head(tb_list_en
 static __tb_inline__ tb_void_t              tb_list_entry_remove_last(tb_list_entry_head_ref_t list)
 {
     // check
-    tb_assert(list);
+    tb_assert(list && list->prev);
 
     // remove it
-    tb_list_entry_remove(list, list->prev);
+    tb_list_entry_remove_safe(list, list->prev->prev, (tb_list_entry_ref_t)list);
 }
 
 /*! moveto the next entry

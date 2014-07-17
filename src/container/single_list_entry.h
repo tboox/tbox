@@ -365,21 +365,39 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_replace_hea
     tb_single_list_entry_replace_next(list, (tb_single_list_entry_ref_t)list, entry);
 }
 
+/*! remove the entry safely
+ *
+ * @param list                                  the single list
+ * @param prev                                  the prev entry
+ * @param next                                  the next entry
+ */
+static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_safe(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t prev, tb_single_list_entry_ref_t next)
+{
+    // check
+    tb_assert(list && list->size && prev);
+
+    // update last
+    if (prev->next == list->last) list->last = next;
+
+    // remove entries
+    prev->next = next;
+
+    // update size
+    list->size--;
+}
+
 /*! remove the next entry
  *
  * @param list                                  the single list
  * @param entry                                 the prev entry
  */
-static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_next(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t entry)
+static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_next(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t prev)
 {
     // check
-    tb_assert(list && entry && entry->next);
-
-    // update last
-    if (entry->next == list->last) list->last = entry;
+    tb_assert(prev && prev->next);
 
     // remove it
-    entry->next = entry->next->next;
+    tb_single_list_entry_remove_safe(list, prev, prev->next->next);
 }
 
 /*! remove the head entry
@@ -388,8 +406,11 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_next
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_head(tb_single_list_entry_head_ref_t list)
 {
+    // check
+    tb_assert(list->next);
+
     // remove it
-    tb_single_list_entry_remove_next(list, (tb_single_list_entry_ref_t)list);
+    tb_single_list_entry_remove_safe(list, (tb_single_list_entry_ref_t)list, list->next->next);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
