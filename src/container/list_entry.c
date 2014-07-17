@@ -102,7 +102,27 @@ static tb_void_t tb_list_entry_itor_remove(tb_iterator_ref_t iterator, tb_size_t
     // remove it
     tb_list_entry_remove(list, (tb_list_entry_ref_t)itor);
 }
- 
+static tb_void_t tb_list_entry_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
+{
+    // check
+    tb_list_entry_head_ref_t list = tb_container_of(tb_list_entry_head_t, next, iterator);
+    tb_assert_return(list && prev && next);
+
+    // no size?
+    tb_check_return(size);
+
+    // the entry
+    tb_list_entry_ref_t prev_entry = (tb_list_entry_ref_t)prev;
+    tb_list_entry_ref_t next_entry = (tb_list_entry_ref_t)next;
+
+    // remove entries
+    prev_entry->next = next_entry;
+    next_entry->prev = prev_entry;
+
+    // update size
+    list->size -= size;
+}
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -127,17 +147,18 @@ tb_void_t tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_off
     list->copy          = copy;
  
     // init iterator
-    list->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-    list->itor.priv = tb_null;
-    list->itor.step = entry_size;
-    list->itor.size = tb_list_entry_itor_size;
-    list->itor.head = tb_list_entry_itor_head;
-    list->itor.tail = tb_list_entry_itor_tail;
-    list->itor.prev = tb_list_entry_itor_prev;
-    list->itor.next = tb_list_entry_itor_next;
-    list->itor.item = tb_list_entry_itor_item;
-    list->itor.copy = tb_list_entry_itor_copy;
-    list->itor.remove = tb_list_entry_itor_remove;
+    list->itor.mode         = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
+    list->itor.priv         = tb_null;
+    list->itor.step         = entry_size;
+    list->itor.size         = tb_list_entry_itor_size;
+    list->itor.head         = tb_list_entry_itor_head;
+    list->itor.tail         = tb_list_entry_itor_tail;
+    list->itor.prev         = tb_list_entry_itor_prev;
+    list->itor.next         = tb_list_entry_itor_next;
+    list->itor.item         = tb_list_entry_itor_item;
+    list->itor.copy         = tb_list_entry_itor_copy;
+    list->itor.remove       = tb_list_entry_itor_remove;
+    list->itor.remove_range = tb_list_entry_itor_remove_range;
     list->itor.comp = tb_null;
 }
 tb_void_t tb_list_entry_exit(tb_list_entry_head_ref_t list)
