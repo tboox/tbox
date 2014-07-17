@@ -100,7 +100,7 @@ tb_iterator_t tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size)
 
     // init
     tb_iterator_t itor = {0};
-    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
     itor.data = (tb_pointer_t)data;
     itor.priv = tb_u2p(size);
     itor.step = sizeof(tb_pointer_t);

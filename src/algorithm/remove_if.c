@@ -34,8 +34,11 @@ tb_void_t tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, 
 {
     // check
     tb_assert_and_check_return(iterator && comp);
-    tb_assert_and_check_return((tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD));
-    tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
+
+    // the iterator mode
+    tb_size_t   mode = tb_iterator_mode(iterator);
+    tb_assert_and_check_return((mode & TB_ITERATOR_MODE_FORWARD));
+    tb_assert_and_check_return(!(mode & TB_ITERATOR_MODE_READONLY));
 
     // done
     tb_long_t   ok = 1;
@@ -45,6 +48,7 @@ tb_void_t tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, 
     tb_size_t   itor = tb_iterator_head(iterator);
     tb_bool_t   stop = tb_false;
     tb_bool_t   need = tb_false;
+    tb_bool_t   mutable = (mode & TB_ITERATOR_MODE_MUTABLE)? tb_true : tb_false;
     while (itor != tb_iterator_tail(iterator))
     {
         // save next
@@ -85,6 +89,29 @@ tb_void_t tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, 
                 // reset state
                 need = tb_false;
                 size = 0;
+
+                // is the mutable iterator?
+                if (mutable)
+                {
+                    // update itor
+                    prev = base;
+
+                    // the next itor
+                    itor = tb_iterator_next(iterator, base);
+
+                    // the last item be not removed? skip the last walked item
+                    if (ok)
+                    {
+                        prev = itor;
+                        itor = tb_iterator_next(iterator, itor);
+                    }
+
+                    // stop?
+                    tb_check_break(!stop);
+
+                    // continue?
+                    continue ;
+                }
             }
 
             // stop?
@@ -96,3 +123,4 @@ tb_void_t tb_remove_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, 
         itor = next;
     }
 }
+

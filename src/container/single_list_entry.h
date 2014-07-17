@@ -45,7 +45,7 @@
     typedef struct __tb_xxxx_entry_t 
     {
         // the single list entry
-        tb_single_list_entry_t     entry;
+        tb_single_list_entry_t      entry;
 
         // the data
         tb_size_t                   data;

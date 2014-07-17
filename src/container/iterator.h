@@ -41,10 +41,11 @@ __tb_extern_c_enter__
 /// the iterator mode type
 typedef enum __tb_iterator_mode_t
 {
-    TB_ITERATOR_MODE_FORWARD        = 1 //!< forward iterator
-,   TB_ITERATOR_MODE_REVERSE        = 2 //!< reverse iterator
-,   TB_ITERATOR_MODE_RACCESS        = 4 //!< random access iterator
-,   TB_ITERATOR_MODE_READONLY       = 8 //!< readonly iterator
+    TB_ITERATOR_MODE_FORWARD        = 1     //!< forward iterator
+,   TB_ITERATOR_MODE_REVERSE        = 2     //!< reverse iterator
+,   TB_ITERATOR_MODE_RACCESS        = 4     //!< random access iterator
+,   TB_ITERATOR_MODE_MUTABLE        = 8     //!< mutable iterator, the item of the same iterator is mutable for removing and moving, .e.g vector, hash, ...
+,   TB_ITERATOR_MODE_READONLY       = 16    //!< readonly iterator
 
 }tb_iterator_mode_t;
 
