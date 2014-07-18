@@ -219,7 +219,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
         if (real == impl->maxn)
         {
             // grow size
-            impl->maxn += tb_align8((aicp->maxn >> 3) + 1);
+            impl->maxn += (aicp->maxn >> 4) + 16;
             if (impl->maxn > aicp->maxn) impl->maxn = aicp->maxn;
 
             // grow list
@@ -1569,12 +1569,12 @@ static tb_aicp_ptor_impl_t* tb_aiop_ptor_init(tb_aicp_impl_t* aicp)
         if (!tb_aicp_file_init(impl)) break;
 
         // init list
-        impl->maxn = tb_align8((aicp->maxn >> 3) + 1);
+        impl->maxn = (aicp->maxn >> 4) + 16;
         impl->list = tb_nalloc0(impl->maxn, sizeof(tb_aioe_t));
         tb_assert_and_check_break(impl->list);
 
         // init timer and using cache time
-        impl->timer = tb_timer_init(aicp->maxn >> 3, tb_true);
+        impl->timer = tb_timer_init((aicp->maxn >> 4) + 16, tb_true);
         tb_assert_and_check_break(impl->timer);
 
         // init ltimer and using cache time

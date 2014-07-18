@@ -259,7 +259,7 @@ static tb_bool_t tb_transfer_pool_walk_exit(tb_pointer_t item, tb_cpointer_t pri
 static tb_handle_t tb_transfer_pool_instance_init(tb_cpointer_t* ppriv)
 {
     // init it
-    return (tb_handle_t)tb_transfer_pool_init(tb_null, 0);
+    return (tb_handle_t)tb_transfer_pool_init(tb_null);
 }
 static tb_void_t tb_transfer_pool_instance_exit(tb_handle_t pool, tb_cpointer_t priv)
 {
@@ -277,13 +277,17 @@ tb_transfer_pool_ref_t tb_transfer_pool()
 {
     return (tb_transfer_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_TRANSFER_POOL, tb_transfer_pool_instance_init, tb_transfer_pool_instance_exit, tb_transfer_pool_instance_kill);
 }
-tb_transfer_pool_ref_t tb_transfer_pool_init(tb_aicp_ref_t aicp, tb_size_t maxn)
+tb_transfer_pool_ref_t tb_transfer_pool_init(tb_aicp_ref_t aicp)
 {
     // done
     tb_bool_t                   ok = tb_false;
     tb_transfer_pool_impl_t*    impl = tb_null;
     do
     {
+        // using the default aicp if be null
+        if (!aicp) aicp = tb_aicp();
+        tb_assert_and_check_break(aicp);
+
         // make impl
         impl = tb_malloc0_type(tb_transfer_pool_impl_t);
         tb_assert_and_check_break(impl);
@@ -292,10 +296,10 @@ tb_transfer_pool_ref_t tb_transfer_pool_init(tb_aicp_ref_t aicp, tb_size_t maxn)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // init pool
-        impl->aicp      = aicp? aicp : tb_aicp();
-        impl->maxn      = maxn? maxn : (1 << 16);
+        impl->aicp      = aicp;
+        impl->maxn      = tb_aicp_maxn(aicp);
         impl->state     = TB_STATE_OK;
-        tb_assert_and_check_break(impl->aicp);
+        tb_assert_and_check_break(impl->maxn);
 
         // init idle task list
         tb_list_entry_init(&impl->idle, tb_transfer_task_t, entry, tb_null);

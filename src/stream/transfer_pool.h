@@ -56,11 +56,10 @@ tb_transfer_pool_ref_t  tb_transfer_pool(tb_noarg_t);
 /*! init transfer pool
  *
  * @param aicp          the aicp, using the default aicp if be null
- * @param maxn          the transfer task max count, no limit if be zero
  *
  * @return              the transfer pool 
  */
-tb_transfer_pool_ref_t  tb_transfer_pool_init(tb_aicp_ref_t aicp, tb_size_t maxn);
+tb_transfer_pool_ref_t  tb_transfer_pool_init(tb_aicp_ref_t aicp);
 
 /*! exit transfer pool
  *

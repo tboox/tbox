@@ -37,17 +37,6 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-#ifdef __tb_small__
-#   define TB_URL_HOST_MAXN         (64)
-#   define TB_URL_PATH_MAXN         (1024)
-#else
-#   define TB_URL_HOST_MAXN         (128)
-#   define TB_URL_PATH_MAXN         (4096)
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -86,19 +75,16 @@ typedef struct __tb_url_t
     tb_ipv4_t           ipv4;
 
     // the host
-    tb_static_string_t  host;
+    tb_string_t         host;
 
     // the path
-    tb_static_string_t  path;
+    tb_string_t         path;
 
     // the urls
-    tb_string_t  urls;
+    tb_string_t         urls;
 
     // the args
-    tb_string_t  args;
-
-    // the data
-    tb_char_t           data[TB_URL_HOST_MAXN + TB_URL_PATH_MAXN];
+    tb_string_t         args;
 
 }tb_url_t;
 

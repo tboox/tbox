@@ -663,8 +663,8 @@ tb_bool_t tb_cookies_set_from_url(tb_cookies_ref_t cookies, tb_char_t const* url
     
     // get domain and path from the given url
     tb_bool_t secure = tb_false;
-    tb_char_t path[TB_URL_PATH_MAXN] = {0};
-    tb_char_t domain[TB_URL_HOST_MAXN] = {0};
+    tb_char_t domain[256] = {0};
+    tb_char_t path[TB_PATH_MAXN] = {0};
     if (tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure))
     {
         // trace
@@ -737,8 +737,8 @@ tb_char_t const* tb_cookies_get_from_url(tb_cookies_ref_t cookies, tb_char_t con
     
     // get domain and path from the given url
     tb_bool_t secure = tb_false;
-    tb_char_t path[TB_URL_PATH_MAXN] = {0};
-    tb_char_t domain[TB_URL_HOST_MAXN] = {0};
+    tb_char_t domain[256] = {0};
+    tb_char_t path[TB_PATH_MAXN] = {0};
     if (!tb_cookies_get_domain_and_path_from_url(url, domain, sizeof(domain) - 1, path, sizeof(path) - 1, &secure)) return tb_null;
 
     // trace

@@ -311,9 +311,9 @@ tb_aicp_ref_t tb_aicp_init(tb_size_t maxn)
 
         // init impl
 #ifdef __tb_small__
-        impl->maxn = maxn? maxn : (1 << 8);
+        impl->maxn = maxn? maxn : (1 << 4);
 #else
-        impl->maxn = maxn? maxn : (1 << 16);
+        impl->maxn = maxn? maxn : (1 << 8);
 #endif
 
         // init lock
@@ -396,6 +396,15 @@ tb_bool_t tb_aicp_exit(tb_aicp_ref_t aicp)
 
     // ok
     return tb_true;
+}
+tb_size_t tb_aicp_maxn(tb_aicp_ref_t aicp)
+{
+    // check
+    tb_aicp_impl_t* impl = (tb_aicp_impl_t*)aicp;
+    tb_assert_and_check_return_val(impl, 0);
+
+    // the maxn
+    return impl->maxn;
 }
 tb_aico_ref_t tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type)
 {
