@@ -71,6 +71,14 @@ tb_aicp_ref_t       tb_aicp_init(tb_size_t maxn);
  */     
 tb_bool_t           tb_aicp_exit(tb_aicp_ref_t aicp);
 
+/*! the aico maxn
+ *
+ * @param aicp      the aicp
+ *
+ * @return          the aico maxn 
+ */     
+tb_size_t           tb_aicp_maxn(tb_aicp_ref_t aicp);
+
 /*! add the aico
  *
  * @param aicp      the aicp

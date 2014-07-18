@@ -51,8 +51,8 @@ tb_bool_t tb_url_init(tb_url_t* url)
         url->port = 0;
         url->bssl = 0;
         tb_ipv4_clr(&url->ipv4);
-        if (!tb_static_string_init(&url->host, url->data, TB_URL_HOST_MAXN)) break;
-        if (!tb_static_string_init(&url->path, url->data + TB_URL_HOST_MAXN, TB_URL_PATH_MAXN)) break;
+        if (!tb_string_init(&url->host)) break;
+        if (!tb_string_init(&url->path)) break;
         if (!tb_string_init(&url->args)) break;
         if (!tb_string_init(&url->urls)) break;
 
@@ -71,8 +71,8 @@ tb_void_t tb_url_exit(tb_url_t* url)
 {
     if (url)
     {
-        tb_static_string_exit(&url->host);
-        tb_static_string_exit(&url->path);
+        tb_string_exit(&url->host);
+        tb_string_exit(&url->path);
         tb_string_exit(&url->args);
         tb_string_exit(&url->urls);
     }
@@ -89,8 +89,8 @@ tb_void_t tb_url_clear(tb_url_t* url)
     url->bwin = 0;
     url->pwin = 0;
     tb_ipv4_clr(&url->ipv4);
-    tb_static_string_clear(&url->host);
-    tb_static_string_clear(&url->path);
+    tb_string_clear(&url->host);
+    tb_string_clear(&url->path);
     tb_string_clear(&url->args);
     tb_string_clear(&url->urls);
 }
@@ -108,7 +108,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     case TB_URL_PROTOCOL_FILE:
         {
             // check
-            tb_check_return_val(tb_static_string_size(&url->path), tb_null);
+            tb_check_return_val(tb_string_size(&url->path), tb_null);
 
             // add protocol
             if (!url->bwin)
@@ -123,7 +123,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
             }
 
             // add path
-            tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
+            tb_string_cstrncat(&url->urls, tb_string_cstr(&url->path), tb_string_size(&url->path));
         }
         break;
     case TB_URL_PROTOCOL_SOCK:
@@ -131,7 +131,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
     case TB_URL_PROTOCOL_RTSP:
         {   
             // check
-            tb_check_return_val(url->port && tb_static_string_size(&url->host), tb_null);
+            tb_check_return_val(url->port && tb_string_size(&url->host), tb_null);
 
             // add protocol
             if (url->poto == TB_URL_PROTOCOL_HTTP) tb_string_cstrcpy(&url->urls, "http");
@@ -146,7 +146,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
             tb_string_cstrncat(&url->urls, "://", 3);
 
             // add host
-            tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->host), tb_static_string_size(&url->host));
+            tb_string_cstrncat(&url->urls, tb_string_cstr(&url->host), tb_string_size(&url->host));
 
             // add port
             if (    (url->poto != TB_URL_PROTOCOL_HTTP)
@@ -157,8 +157,8 @@ tb_char_t const* tb_url_get(tb_url_t* url)
             }
 
             // add path
-            if (tb_static_string_size(&url->path)) 
-                tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
+            if (tb_string_size(&url->path)) 
+                tb_string_cstrncat(&url->urls, tb_string_cstr(&url->path), tb_string_size(&url->path));
 
             // add args
             if (tb_string_size(&url->args)) 
@@ -174,18 +174,18 @@ tb_char_t const* tb_url_get(tb_url_t* url)
             tb_string_cstrcpy(&url->urls, "sql://");
 
             // add host and port
-            if (tb_static_string_size(&url->host))
+            if (tb_string_size(&url->host))
             {
                 // add host
-                tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->host), tb_static_string_size(&url->host));
+                tb_string_cstrncat(&url->urls, tb_string_cstr(&url->host), tb_string_size(&url->host));
 
                 // add port
                 if (url->port) tb_string_cstrfcat(&url->urls, ":%u", url->port);
             }
 
             // add path
-            if (tb_static_string_size(&url->path)) 
-                tb_string_cstrncat(&url->urls, tb_static_string_cstr(&url->path), tb_static_string_size(&url->path));
+            if (tb_string_size(&url->path)) 
+                tb_string_cstrncat(&url->urls, tb_string_cstr(&url->path), tb_string_size(&url->path));
 
             // add args
             if (tb_string_size(&url->args)) 
@@ -307,10 +307,10 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
             ||  url->poto == TB_URL_PROTOCOL_SQL)
         {
             // parse host
-            while (*p && *p != '/' && *p != '\\' && *p != ':' && *p != '?') tb_static_string_chrcat(&url->host, *p++);
+            while (*p && *p != '/' && *p != '\\' && *p != ':' && *p != '?') tb_string_chrcat(&url->host, *p++);
 
             // try set ipv4
-            if (tb_static_string_size(&url->host)) tb_ipv4_set(&url->ipv4, tb_static_string_cstr(&url->host));
+            if (tb_string_size(&url->host)) tb_ipv4_set(&url->ipv4, tb_string_cstr(&url->host));
         
             // parse port
             if (*p == ':')
@@ -331,18 +331,18 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
             if (*p == '/' || *p == '\\') p++;
 
             // trim the right spaces
-            tb_static_string_rtrim(&url->host);
+            tb_string_rtrim(&url->host);
         }
 
         // done path and args 
         if (url->poto != TB_URL_PROTOCOL_DATA)
         {
             // parse path
-            if (*p != '/' && *p != '\\' && !url->bwin) tb_static_string_chrcat(&url->path, '/');
-            while (*p && *p != '?' && *p != '&' && *p != '=') tb_static_string_chrcat(&url->path, *p++);
+            if (*p != '/' && *p != '\\' && !url->bwin) tb_string_chrcat(&url->path, '/');
+            while (*p && *p != '?' && *p != '&' && *p != '=') tb_string_chrcat(&url->path, *p++);
 
             // trim the right spaces
-            tb_static_string_rtrim(&url->path);
+            tb_string_rtrim(&url->path);
 
             // parse args
             while (*p && (*p == '?' || *p == '=' || tb_isspace(*p))) p++;
@@ -387,8 +387,8 @@ tb_void_t tb_url_copy(tb_url_t* url, tb_url_t const* copy)
     url->bssl = copy->bssl;
     url->bwin = copy->bwin;
     url->pwin = copy->pwin;
-    tb_static_string_strcpy(&url->host, &copy->host);
-    tb_static_string_strcpy(&url->path, &copy->path);
+    tb_string_strcpy(&url->host, &copy->host);
+    tb_string_strcpy(&url->path, &copy->path);
     tb_string_strcpy(&url->args, &copy->args);
     tb_string_strcpy(&url->urls, &copy->urls);
 }
@@ -495,7 +495,7 @@ tb_char_t const* tb_url_host_get(tb_url_t const* url)
     tb_assert_and_check_return_val(url, tb_null);
 
     // get host
-    return tb_static_string_size(&url->host)? tb_static_string_cstr(&url->host) : tb_null;
+    return tb_string_size(&url->host)? tb_string_cstr(&url->host) : tb_null;
 }
 tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 {
@@ -505,7 +505,7 @@ tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
     if (host) 
     {
         // set host
-        tb_static_string_cstrcpy(&url->host, host);
+        tb_string_cstrcpy(&url->host, host);
 
         // try set ipv4
         tb_ipv4_set(&url->ipv4, host);
@@ -513,7 +513,7 @@ tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
     else 
     {
         // clear host
-        tb_static_string_clear(&url->host);
+        tb_string_clear(&url->host);
 
         // clear ipv4
         tb_ipv4_clr(&url->ipv4);
@@ -542,12 +542,12 @@ tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
         url->ipv4 = *ipv4;
 
         // set it if the host not exists
-        if (!tb_static_string_size(&url->host)) 
+        if (!tb_string_size(&url->host)) 
         {
             // ipv4 => host
             tb_char_t           data[16];
             tb_char_t const*    host = tb_ipv4_get(ipv4, data, 16);
-            if (host) tb_static_string_cstrcpy(&url->host, host);
+            if (host) tb_string_cstrcpy(&url->host, host);
  
             // clear url
             tb_string_clear(&url->urls);
@@ -560,7 +560,7 @@ tb_char_t const* tb_url_path_get(tb_url_t const* url)
     tb_assert_and_check_return_val(url, tb_null);
 
     // get path
-    return tb_static_string_size(&url->path)? tb_static_string_cstr(&url->path) : tb_null;
+    return tb_string_size(&url->path)? tb_string_cstr(&url->path) : tb_null;
 }
 tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
 {
@@ -568,13 +568,13 @@ tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
     tb_assert_and_check_return(url);
 
     // clear path
-    tb_static_string_clear(&url->path);
+    tb_string_clear(&url->path);
 
     // set path
     if (path) 
     {
-        if (path[0] != '/') tb_static_string_chrcat(&url->path, '/');
-        tb_static_string_cstrcat(&url->path, path);
+        if (path[0] != '/') tb_string_chrcat(&url->path, '/');
+        tb_string_cstrcat(&url->path, path);
  
         // clear url
         tb_string_clear(&url->urls);
