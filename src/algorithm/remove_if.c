@@ -48,7 +48,7 @@ tb_void_t tb_remove_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_c
     tb_size_t   prev = tb_iterator_tail(iterator);
     tb_size_t   itor = tb_iterator_head(iterator);
     tb_size_t   base = tb_iterator_tail(iterator);
-    tb_bool_t   mutable = (mode & TB_ITERATOR_MODE_MUTABLE)? tb_true : tb_false;
+    tb_bool_t   bmutable = (mode & TB_ITERATOR_MODE_MUTABLE)? tb_true : tb_false;
     while (itor != tb_iterator_tail(iterator))
     {
         // save next
@@ -91,7 +91,7 @@ tb_void_t tb_remove_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_c
                 size = 0;
 
                 // is the mutable iterator?
-                if (mutable)
+                if (bmutable)
                 {
                     // update itor
                     prev = base;

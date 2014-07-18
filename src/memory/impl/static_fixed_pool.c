@@ -45,7 +45,7 @@
  */
 
 // the static fixed pool impl type
-typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_fixed_pool_impl_t
+typedef __tb_pool_data_aligned__ struct __tb_static_fixed_pool_impl_t
 {
     // the real data address after the used_info info
     tb_byte_t*                  data;
@@ -93,7 +93,7 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_fixed_pool_impl_t
 
 #endif
 
-}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_static_fixed_pool_impl_t;
+}__tb_pool_data_aligned__ tb_static_fixed_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -496,7 +496,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
         data_head->debug.magic     = TB_POOL_DATA_MAGIC;
         data_head->debug.file      = file_;
         data_head->debug.func      = func_;
-        data_head->debug.line      = line_;
+        data_head->debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
         tb_pool_data_save_backtrace(data_head, 2);

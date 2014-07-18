@@ -129,7 +129,7 @@ tb_bool_t           tb_aicp_ssl_exit(tb_aicp_ssl_ref_t ssl);
  * @param ssl       the ssl
  * @param aico      the aico
  */
-tb_void_t           tb_aicp_ssl_set_aico(tb_aicp_ssl_ref_t ssl, tb_handle_t aico);
+tb_void_t           tb_aicp_ssl_set_aico(tb_aicp_ssl_ref_t ssl, tb_aico_ref_t aico);
 
 /*! set the ssl timeout
  * 

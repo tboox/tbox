@@ -534,7 +534,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 #ifdef TB_TRACE_DEBUG
                     tb_size_t done_count = 0;
                     tb_hize_t total_time = 0;
-                    tb_thread_pool_job_stats_t* stats = tb_hash_get(worker->stats, job->task.done);
+                    tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_get(worker->stats, job->task.done);
                     if (stats)
                     {
                         done_count = stats->done_count;

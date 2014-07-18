@@ -169,7 +169,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
 
         // make slot
         tb_size_t real_space = 0;
-        slot = tb_large_pool_malloc(impl->large_pool, need_space, &real_space);
+        slot = (tb_fixed_pool_slot_t*)tb_large_pool_malloc(impl->large_pool, need_space, &real_space);
         tb_assert_and_check_break(slot);
         tb_assert_and_check_break(real_space > sizeof(tb_fixed_pool_slot_t) + item_space);
 
