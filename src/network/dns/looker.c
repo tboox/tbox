@@ -515,37 +515,51 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
     // must be not ipv4
     tb_assert_return_val(!tb_ipv4_set(tb_null, name), tb_null);
 
-    // make looker
-    tb_dns_looker_t* looker = tb_malloc0_type(tb_dns_looker_t);
-    tb_assert_and_check_return_val(looker, tb_null);
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_dns_looker_t*    looker = tb_null;
+    do
+    {
+        // make looker
+        looker = tb_malloc0_type(tb_dns_looker_t);
+        tb_assert_and_check_return_val(looker, tb_null);
 
-    // dump server
-//  tb_dns_server_dump();
+        // dump server
+//      tb_dns_server_dump();
 
-    // get the dns server list
-    looker->maxn = tb_dns_server_get(looker->list);
-    tb_check_goto(looker->maxn && looker->maxn <= tb_arrayn(looker->list), fail);
+        // get the dns server list
+        looker->maxn = tb_dns_server_get(looker->list);
+        tb_check_break(looker->maxn && looker->maxn <= tb_arrayn(looker->list));
 
-    // init name
-    if (!tb_static_string_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) goto fail;
-    tb_static_string_cstrcpy(&looker->name, name);
+        // init name
+        if (!tb_static_string_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) break;
+        tb_static_string_cstrcpy(&looker->name, name);
 
-    // init rpkt
-    if (!tb_static_buffer_init(&looker->rpkt, looker->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
+        // init rpkt
+        if (!tb_static_buffer_init(&looker->rpkt, looker->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) break;
 
-    // init sock
-    looker->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
-    tb_assert_and_check_goto(looker->sock, fail);
+        // init sock
+        looker->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
+        tb_assert_and_check_break(looker->sock);
 
-    // init itor
-    looker->itor = 1;
+        // init itor
+        looker->itor = 1;
 
-    // ok
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (looker) tb_dns_looker_exit(looker);
+        looker = tb_null;
+    }
+
+    // ok?
     return (tb_handle_t)looker;
-
-fail:
-    if (looker) tb_dns_looker_exit(looker);
-    return tb_null;
 }
 tb_long_t tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_t* addr)
 {
@@ -555,41 +569,42 @@ tb_long_t tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_t* addr)
 
     // init 
     tb_long_t r = -1;
-    
-    // request
-    r = tb_dns_looker_reqt(looker);
-    tb_check_goto(r >= 0, fail);
-    tb_check_return_val(r > 0, r);
-        
-    // response
-    r = tb_dns_looker_resp(looker, addr);
-    tb_check_goto(r >= 0, fail);
-    tb_check_return_val(r > 0, r);
-
-    // ok
-    return r;
-
-fail:
-    
-    // next
-    if (looker->itor + 1 <= looker->maxn) looker->itor++;
-    else looker->itor = 0;
-
-    // has next?
-    if (looker->itor)
+    do
     {
-        // reset step, no event now, need not wait
-        looker->step = TB_DNS_LOOKER_STEP_NONE | TB_DNS_LOOKER_STEP_NEVT;
+        // request
+        r = tb_dns_looker_reqt(looker);
+        tb_check_break(r > 0);
+            
+        // response
+        r = tb_dns_looker_resp(looker, addr);
+        tb_check_break(r > 0);
 
-        // reset rpkt
-        looker->size = 0;
-        tb_static_buffer_clear(&looker->rpkt);
+    } while (0);
 
-        // continue 
-        return 0;
+    // failed?
+    if (r < 0)
+    {
+        // next
+        if (looker->itor + 1 <= looker->maxn) looker->itor++;
+        else looker->itor = 0;
+
+        // has next?
+        if (looker->itor)
+        {
+            // reset step, no event now, need not wait
+            looker->step = TB_DNS_LOOKER_STEP_NONE | TB_DNS_LOOKER_STEP_NEVT;
+
+            // reset rpkt
+            looker->size = 0;
+            tb_static_buffer_clear(&looker->rpkt);
+
+            // continue 
+            r = 0;
+        }
     }
 
-    return -1;
+    // ok?
+    return r;
 }
 tb_long_t tb_dns_looker_wait(tb_handle_t handle, tb_long_t timeout)
 {
@@ -651,10 +666,8 @@ tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_ipv4_t* addr)
     {
         // wait
         r = tb_dns_looker_wait(looker, TB_DNS_LOOKER_TIMEOUT);
-        tb_assert_and_check_goto(r >= 0, end);
+        tb_assert_and_check_break(r >= 0);
     }
-
-end:
 
     // exit
     tb_dns_looker_exit(looker);

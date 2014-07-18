@@ -377,50 +377,51 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
     tb_aico_ref_t       aico = tb_null;
     tb_aico_ref_t       task = tb_null;
     tb_thread_ref_t     loop[16] = {tb_null};
+    do
+    {
+        // open sock
+        sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+        tb_assert_and_check_break(sock);
 
-    // open sock
-    sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-    tb_assert_and_check_goto(sock, end);
+        // bind port
+        if (!tb_socket_bind(sock, tb_null, 9090)) break;
 
-    // bind port
-    if (!tb_socket_bind(sock, tb_null, 9090)) goto end;
+        // listen sock
+        if (!tb_socket_listen(sock)) break;
 
-    // listen sock
-    if (!tb_socket_listen(sock)) goto end;
+        // init aicp
+        aicp = tb_aicp_init(16);
+        tb_assert_and_check_break(aicp);
 
-    // init aicp
-    aicp = tb_aicp_init(16);
-    tb_assert_and_check_goto(aicp, end);
+        // addo sock
+        aico = tb_aico_init_sock(aicp, sock);
+        tb_assert_and_check_break(aico);
 
-    // addo sock
-    aico = tb_aico_init_sock(aicp, sock);
-    tb_assert_and_check_goto(aico, end);
+        // addo task
+        task = tb_aico_init_task(aicp, tb_false);
+        tb_assert_and_check_break(task);
 
-    // addo task
-    task = tb_aico_init_task(aicp, tb_false);
-    tb_assert_and_check_goto(task, end);
+        // run task
+//      if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) break;
+//      if (!tb_aico_task_run(aico, 0, tb_demo_task_func, tb_null)) break;
 
-    // run task
-//  if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) goto end;
-//  if (!tb_aico_task_run(aico, 0, tb_demo_task_func, tb_null)) goto end;
+        // init acpt timeout
+        tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_ACPT, 10000);
 
-    // init acpt timeout
-    tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_ACPT, 10000);
+        // post acpt
+        if (!tb_aico_acpt(aico, tb_demo_sock_acpt_func, argv[1])) break;
+//      if (!tb_aico_acpt_after(aico, 5000, tb_demo_sock_acpt_func, argv[1])) break;
 
-    // post acpt
-    if (!tb_aico_acpt(aico, tb_demo_sock_acpt_func, argv[1])) goto end;
-//  if (!tb_aico_acpt_after(aico, 5000, tb_demo_sock_acpt_func, argv[1])) goto end;
+        // done loop
+        loop[0] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
+        loop[1] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
+        loop[2] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
+        loop[3] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
 
-    // done loop
-    loop[0] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
-    loop[1] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
-    loop[2] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
-    loop[3] = tb_thread_init(tb_null, tb_demo_loop, aicp, 0);
+        // wait exit
+        getchar();
 
-    // wait exit
-    getchar();
-
-end:
+    } while (0);
 
     // trace
     tb_trace_i("end");

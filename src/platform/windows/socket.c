@@ -84,41 +84,52 @@ tb_socket_ref_t tb_socket_open(tb_size_t type)
     // check
     tb_assert_and_check_return_val(type, tb_null);
     
-    // init type & protocol
-    tb_int_t t = 0;
-    tb_int_t p = 0;
-    switch (type)
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_socket_ref_t sock = tb_null;
+    do
     {
-    case TB_SOCKET_TYPE_TCP:
+        // init type and protocol
+        tb_int_t t = 0;
+        tb_int_t p = 0;
+        if (type == TB_SOCKET_TYPE_TCP)
         {
             t = SOCK_STREAM;
             p = IPPROTO_TCP;
         }
-        break;
-    case TB_SOCKET_TYPE_UDP:
+        else if(type == TB_SOCKET_TYPE_UDP)
         {
             t = SOCK_DGRAM;
             p = IPPROTO_UDP;
         }
-        break;
-    default:
-        return tb_null;
+        else break;
+
+        // init sock
+        SOCKET fd = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
+        tb_assert_and_check_break(fd >= 0);
+
+        // save sock
+        sock = (tb_socket_ref_t)(fd + 1);
+
+        // non-block
+        tb_ulong_t nb = 1;
+        if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) break;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (sock) tb_socket_clos(sock);
+        sock = tb_null;
     }
 
-    // socket
-    SOCKET fd = tb_ws2_32()->WSASocketA(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
-    tb_assert_and_check_return_val(fd >= 0, tb_null);
-
-    // non-block
-    tb_ulong_t nb = 1;
-    if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) goto fail;
-
-    // ok
-    return (tb_socket_ref_t)(fd + 1);
-
-fail: 
-    if (fd >= 0) tb_ws2_32()->closesocket(fd);
-    return tb_null;
+    // ok?
+    return sock;
 }
 tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
 {
@@ -355,24 +366,41 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock)
     // check
     tb_assert_and_check_return_val(sock, tb_null);
 
-    // accept  
-    SOCKADDR_IN d;
-    tb_int_t    n = sizeof(SOCKADDR_IN);
-    tb_long_t   r = tb_ws2_32()->accept((SOCKET)((tb_long_t)sock - 1), (struct sockaddr *)&d, &n);
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_socket_ref_t acpt = tb_null;
+    do
+    {
+        // accept  
+        SOCKADDR_IN d;
+        tb_int_t    n = sizeof(SOCKADDR_IN);
+        tb_long_t   r = tb_ws2_32()->accept((SOCKET)((tb_long_t)sock - 1), (struct sockaddr *)&d, &n);
 
-    // no client?
-    tb_check_return_val(r > 0, tb_null);
+        // no client?
+        tb_check_break(r > 0);
 
-    // non-block
-    tb_ulong_t nb = 1;
-    if (tb_ws2_32()->ioctlsocket(r, FIONBIO, &nb) == SOCKET_ERROR) goto fail;
+        // save sock
+        acpt = (tb_socket_ref_t)(r + 1);
 
-    // ok
-    return (tb_socket_ref_t)(r + 1);
+        // non-block
+        tb_ulong_t nb = 1;
+        if (tb_ws2_32()->ioctlsocket(r, FIONBIO, &nb) == SOCKET_ERROR) break;
+        
+        // ok
+        ok = tb_true;
 
-fail: 
-    if (r >= 0) tb_ws2_32()->closesocket(r);
-    return tb_null;
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (acpt) tb_socket_clos(acpt);
+        acpt = tb_null;
+    }
+
+    // ok?
+    return acpt;
 }
 tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
 {

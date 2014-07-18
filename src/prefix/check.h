@@ -41,6 +41,7 @@
 #define tb_check_break(x)                               { if (!(x)) break ; }
 #define tb_check_abort(x)                               do { if (!(x)) tb_abort(); } while (0)
 #define tb_check_continue(x)                            { if (!(x)) continue ; }
+#define tb_check_break_state(x, s, v)                   { if (!(x)) { (s) = (v); break ;} }
 
 
 #endif

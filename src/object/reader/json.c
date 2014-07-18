@@ -56,43 +56,52 @@ static tb_object_ref_t tb_object_json_reader_func_null(tb_object_json_reader_t* 
 
     // init data
     tb_static_string_t  data;
-    tb_char_t       buff[256];
+    tb_char_t           buff[256];
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
-    // init 
+    // done 
     tb_object_ref_t null = tb_null;
-
-    // append character
-    tb_static_string_chrcat(&data, type);
-
-    // walk
-    while (tb_stream_left(reader->stream)) 
+    do
     {
-        // need one character
-        tb_byte_t* p = tb_null;
-        if (!tb_stream_need(reader->stream, &p, 1) && p) goto end;
-
-        // the character
-        tb_char_t ch = *p;
-
         // append character
-        if (tb_isalpha(ch)) tb_static_string_chrcat(&data, ch);
-        else break;
+        tb_static_string_chrcat(&data, type);
 
-        // skip it
-        tb_stream_skip(reader->stream, 1);
-    }
+        // walk
+        tb_bool_t failed = tb_false;
+        while (!failed && tb_stream_left(reader->stream)) 
+        {
+            // need one character
+            tb_byte_t* p = tb_null;
+            if (!tb_stream_need(reader->stream, &p, 1) && p) 
+            {
+                failed = tb_true;
+                break;
+            }
 
-    // check
-    tb_assert_and_check_goto(tb_static_string_size(&data), end);
+            // the character
+            tb_char_t ch = *p;
 
-    // trace
-    tb_trace_d("null: %s", tb_static_string_cstr(&data));
+            // append character
+            if (tb_isalpha(ch)) tb_static_string_chrcat(&data, ch);
+            else break;
 
-    // null?
-    if (!tb_stricmp(tb_static_string_cstr(&data), "null")) null = tb_object_null_init();
+            // skip it
+            tb_stream_skip(reader->stream, 1);
+        }
 
-end:
+        // failed?
+        tb_check_break(!failed);
+
+        // check
+        tb_assert_and_check_break(tb_static_string_size(&data));
+
+        // trace
+        tb_trace_d("null: %s", tb_static_string_cstr(&data));
+
+        // null?
+        if (!tb_stricmp(tb_static_string_cstr(&data), "null")) null = tb_object_null_init();
+
+    } while (0);
 
     // exit data
     tb_static_string_exit(&data);
@@ -109,10 +118,10 @@ static tb_object_ref_t tb_object_json_reader_func_array(tb_object_json_reader_t*
     tb_object_ref_t array = tb_object_array_init(TB_OBJECT_JSON_READER_ARRAY_GROW, tb_false);
     tb_assert_and_check_return_val(array, tb_null);
 
-    // walk
+    // done
     tb_char_t ch;
-    tb_bool_t ok = tb_false;
-    while (tb_stream_left(reader->stream)) 
+    tb_bool_t ok = tb_true;
+    while (ok && tb_stream_left(reader->stream)) 
     {
         // read one character
         ch = tb_stream_bread_s8(reader->stream);
@@ -124,26 +133,22 @@ static tb_object_ref_t tb_object_json_reader_func_array(tb_object_json_reader_t*
         {
             // the func
             tb_object_json_reader_func_t func = tb_object_json_reader_func(ch);
-            tb_assert_and_check_goto(func, end);
+            tb_assert_and_check_break_state(func, ok, tb_false);
 
             // read item
             tb_object_ref_t item = func(reader, ch);
-            tb_assert_and_check_goto(item, end);
+            tb_assert_and_check_break_state(item, ok, tb_false);
 
             // append item
             tb_object_array_append(array, item);
         }
     }
 
-    // ok
-    ok = tb_true;
-
-end:
-
     // failed?
-    if (!ok && array)
+    if (!ok)
     {
-        tb_object_exit(array);
+        // exit it
+        if (array) tb_object_exit(array);
         array = tb_null;
     }
 
@@ -234,81 +239,94 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
 
     // init data
     tb_static_string_t  data;
-    tb_char_t       buff[256];
+    tb_char_t           buff[256];
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
-    // init
+    // done
     tb_object_ref_t number = tb_null;
-
-    // append character
-    tb_static_string_chrcat(&data, type);
-
-    // walk
-    tb_bool_t bs = (type == '-')? tb_true : tb_false;
-    tb_bool_t bf = (type == '.')? tb_true : tb_false;
-    while (tb_stream_left(reader->stream)) 
+    do
     {
-        // need one character
-        tb_byte_t* p = tb_null;
-        if (!tb_stream_need(reader->stream, &p, 1) && p) goto end;
-
-        // the character
-        tb_char_t ch = *p;
-
-        // is float?
-        if (!bf && ch == '.') bf = tb_true;
-        else if (bf && ch == '.') goto end;
-
         // append character
-        if (tb_isdigit10(ch) || ch == '.' || ch == 'e' || ch == 'E' || ch == '-' || ch == '+') 
-            tb_static_string_chrcat(&data, ch);
-        else break;
+        tb_static_string_chrcat(&data, type);
 
-        // skip it
-        tb_stream_skip(reader->stream, 1);
-    }
+        // walk
+        tb_bool_t bs = (type == '-')? tb_true : tb_false;
+        tb_bool_t bf = (type == '.')? tb_true : tb_false;
+        tb_bool_t failed = tb_false;
+        while (!failed && tb_stream_left(reader->stream)) 
+        {
+            // need one character
+            tb_byte_t* p = tb_null;
+            if (!tb_stream_need(reader->stream, &p, 1) && p) 
+            {
+                failed = tb_true;
+                break;
+            }
 
-    // check
-    tb_assert_and_check_goto(tb_static_string_size(&data), end);
+            // the character
+            tb_char_t ch = *p;
 
-    // trace
-    tb_trace_d("number: %s", tb_static_string_cstr(&data));
+            // is float?
+            if (!bf && ch == '.') bf = tb_true;
+            else if (bf && ch == '.') 
+            {
+                failed = tb_true;
+                break;
+            }
 
-    // init number 
+            // append character
+            if (tb_isdigit10(ch) || ch == '.' || ch == 'e' || ch == 'E' || ch == '-' || ch == '+') 
+                tb_static_string_chrcat(&data, ch);
+            else break;
+
+            // skip it
+            tb_stream_skip(reader->stream, 1);
+        }
+
+        // failed?
+        tb_check_break(!failed);
+
+        // check
+        tb_assert_and_check_break(tb_static_string_size(&data));
+
+        // trace
+        tb_trace_d("number: %s", tb_static_string_cstr(&data));
+
+        // init number 
 #ifdef TB_CONFIG_TYPE_FLOAT
-    if (bf) number = tb_object_number_init_from_float(tb_stof(tb_static_string_cstr(&data)));
+        if (bf) number = tb_object_number_init_from_float(tb_stof(tb_static_string_cstr(&data)));
 #else
-    if (bf) tb_trace_noimpl();
+        if (bf) tb_trace_noimpl();
 #endif
-    else if (bs) 
-    {
-        tb_sint64_t value = tb_stoi64(tb_static_string_cstr(&data));
-        tb_size_t   bytes = tb_object_reader_need_bytes(-value);
-        switch (bytes)
+        else if (bs) 
         {
-        case 1: number = tb_object_number_init_from_sint8((tb_sint8_t)value); break;
-        case 2: number = tb_object_number_init_from_sint16((tb_sint16_t)value); break;
-        case 4: number = tb_object_number_init_from_sint32((tb_sint32_t)value); break;
-        case 8: number = tb_object_number_init_from_sint64((tb_sint64_t)value); break;
-        default: break;
+            tb_sint64_t value = tb_stoi64(tb_static_string_cstr(&data));
+            tb_size_t   bytes = tb_object_reader_need_bytes(-value);
+            switch (bytes)
+            {
+            case 1: number = tb_object_number_init_from_sint8((tb_sint8_t)value); break;
+            case 2: number = tb_object_number_init_from_sint16((tb_sint16_t)value); break;
+            case 4: number = tb_object_number_init_from_sint32((tb_sint32_t)value); break;
+            case 8: number = tb_object_number_init_from_sint64((tb_sint64_t)value); break;
+            default: break;
+            }
+            
         }
-        
-    }
-    else 
-    {
-        tb_uint64_t value = tb_stou64(tb_static_string_cstr(&data));
-        tb_size_t   bytes = tb_object_reader_need_bytes(value);
-        switch (bytes)
+        else 
         {
-        case 1: number = tb_object_number_init_from_uint8((tb_uint8_t)value); break;
-        case 2: number = tb_object_number_init_from_uint16((tb_uint16_t)value); break;
-        case 4: number = tb_object_number_init_from_uint32((tb_uint32_t)value); break;
-        case 8: number = tb_object_number_init_from_uint64((tb_uint64_t)value); break;
-        default: break;
+            tb_uint64_t value = tb_stou64(tb_static_string_cstr(&data));
+            tb_size_t   bytes = tb_object_reader_need_bytes(value);
+            switch (bytes)
+            {
+            case 1: number = tb_object_number_init_from_uint8((tb_uint8_t)value); break;
+            case 2: number = tb_object_number_init_from_uint16((tb_uint16_t)value); break;
+            case 4: number = tb_object_number_init_from_uint32((tb_uint32_t)value); break;
+            case 8: number = tb_object_number_init_from_uint64((tb_uint64_t)value); break;
+            default: break;
+            }
         }
-    }
 
-end:
+    } while (0);
 
     // exit data
     tb_static_string_exit(&data);
@@ -323,45 +341,54 @@ static tb_object_ref_t tb_object_json_reader_func_boolean(tb_object_json_reader_
 
     // init data
     tb_static_string_t  data;
-    tb_char_t       buff[256];
+    tb_char_t           buff[256];
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
-    // init 
+    // done 
     tb_object_ref_t boolean = tb_null;
-
-    // append character
-    tb_static_string_chrcat(&data, type);
-
-    // walk
-    while (tb_stream_left(reader->stream)) 
+    do
     {
-        // need one character
-        tb_byte_t* p = tb_null;
-        if (!tb_stream_need(reader->stream, &p, 1) && p) goto end;
-
-        // the character
-        tb_char_t ch = *p;
-
         // append character
-        if (tb_isalpha(ch)) tb_static_string_chrcat(&data, ch);
-        else break;
+        tb_static_string_chrcat(&data, type);
 
-        // skip it
-        tb_stream_skip(reader->stream, 1);
-    }
+        // walk
+        tb_bool_t failed = tb_false;
+        while (!failed && tb_stream_left(reader->stream)) 
+        {
+            // need one character
+            tb_byte_t* p = tb_null;
+            if (!tb_stream_need(reader->stream, &p, 1) && p)
+            {
+                failed = tb_true;
+                break;
+            }
 
-    // check
-    tb_assert_and_check_goto(tb_static_string_size(&data), end);
+            // the character
+            tb_char_t ch = *p;
 
-    // trace
-    tb_trace_d("boolean: %s", tb_static_string_cstr(&data));
+            // append character
+            if (tb_isalpha(ch)) tb_static_string_chrcat(&data, ch);
+            else break;
 
-    // true?
-    if (!tb_stricmp(tb_static_string_cstr(&data), "true")) boolean = tb_object_boolean_init(tb_true);
-    // false?
-    else if (!tb_stricmp(tb_static_string_cstr(&data), "false")) boolean = tb_object_boolean_init(tb_false);
+            // skip it
+            tb_stream_skip(reader->stream, 1);
+        }
 
-end:
+        // failed?
+        tb_check_break(!failed);
+
+        // check
+        tb_assert_and_check_break(tb_static_string_size(&data));
+
+        // trace
+        tb_trace_d("boolean: %s", tb_static_string_cstr(&data));
+
+        // true?
+        if (!tb_stricmp(tb_static_string_cstr(&data), "true")) boolean = tb_object_boolean_init(tb_true);
+        // false?
+        else if (!tb_stricmp(tb_static_string_cstr(&data), "false")) boolean = tb_object_boolean_init(tb_false);
+
+    } while (0);
 
     // exit data
     tb_static_string_exit(&data);
@@ -376,7 +403,7 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
 
     // init key name
     tb_static_string_t  kname;
-    tb_char_t       kdata[8192];
+    tb_char_t           kdata[8192];
     if (!tb_static_string_init(&kname, kdata, 8192)) return tb_null;
 
     // init dictionary
@@ -385,10 +412,10 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
 
     // walk
     tb_char_t ch;
-    tb_bool_t ok = tb_false;
+    tb_bool_t ok = tb_true;
     tb_bool_t bkey = tb_false;
     tb_size_t bstr = 0;
-    while (tb_stream_left(reader->stream)) 
+    while (ok && tb_stream_left(reader->stream)) 
     {
         // read one character
         ch = tb_stream_bread_s8(reader->stream);
@@ -416,11 +443,11 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
 
                 // the func
                 tb_object_json_reader_func_t func = tb_object_json_reader_func(ch);
-                tb_assert_and_check_goto(func, end);
+                tb_assert_and_check_break_state(func, ok, tb_false);
 
                 // read val
                 tb_object_ref_t val = func(reader, ch);
-                tb_assert_and_check_goto(val, end);
+                tb_assert_and_check_break_state(val, ok, tb_false);
 
                 // set key => val
                 tb_object_dictionary_set(dictionary, tb_static_string_cstr(&kname), val);
@@ -433,15 +460,11 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
         }
     }
 
-    // ok
-    ok = tb_true;
-
-end:
-
     // failed?
-    if (!ok && dictionary)
+    if (!ok)
     {
-        tb_object_exit(dictionary);
+        // exit it
+        if (dictionary) tb_object_exit(dictionary);
         dictionary = tb_null;
     }
 

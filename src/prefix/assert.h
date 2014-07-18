@@ -149,12 +149,14 @@ __tb_extern_c_enter__
 #   define tb_assert_goto(x, b)                             do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); goto b; } } while(0)
 #   define tb_assert_break(x)                               { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); break ; } }
 #   define tb_assert_continue(x)                            { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); continue ; } }
+#   define tb_assert_break_state(x, s, v)                   { if (!(x)) { (s) = (v); tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); break ; } }
 #   define tb_assert_and_check_abort(x)                     tb_assert_abort(x)
 #   define tb_assert_and_check_return(x)                    tb_assert_return(x)
 #   define tb_assert_and_check_return_val(x, v)             tb_assert_return_val(x, v)
 #   define tb_assert_and_check_goto(x, b)                   tb_assert_goto(x, b)
 #   define tb_assert_and_check_break(x)                     tb_assert_break(x)
 #   define tb_assert_and_check_continue(x)                  tb_assert_continue(x)
+#   define tb_assert_and_check_break_state(x, s, v)         tb_assert_break_state(x, s, v)
 #else
 #   define tb_assert(x)
 #   define tb_assert_abort(x)
@@ -163,12 +165,14 @@ __tb_extern_c_enter__
 #   define tb_assert_goto(x, b)
 #   define tb_assert_break(x)
 #   define tb_assert_continue(x)
+#   define tb_assert_break_state(x, s, v)
 #   define tb_assert_and_check_abort(x)                     tb_check_abort(x)
 #   define tb_assert_and_check_return(x)                    tb_check_return(x)
 #   define tb_assert_and_check_return_val(x, v)             tb_check_return_val(x, v)
 #   define tb_assert_and_check_goto(x, b)                   tb_check_goto(x, b)
 #   define tb_assert_and_check_break(x)                     tb_check_break(x)
 #   define tb_assert_and_check_continue(x)                  tb_check_continue(x)
+#   define tb_assert_and_check_break_state(x, s, v)         tb_check_break_state(x, s, v)
 #endif
 
 #define tb_assert_static(x)                                 do { typedef int __tb_static_assert__[(x)? 1 : -1]; __tb_volatile__ __tb_static_assert__ __a; tb_used(__a); } while(0)

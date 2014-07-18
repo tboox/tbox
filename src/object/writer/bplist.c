@@ -607,71 +607,70 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
     // check
     tb_assert_and_check_return_val(object && stream, -1);
 
-    // init 
-    tb_bool_t       ok                  = tb_false;
-    tb_size_t       i                   = 0;
-    tb_byte_t       pad[6]              = {0};
-    tb_object_ref_t    list                = tb_null;
-    tb_hash_ref_t      hash                = tb_null;
-    tb_size_t       object_count        = 0;
-    tb_uint64_t     object_maxn         = 0;
-    tb_uint64_t     root_object         = 0;
-    tb_uint64_t     offset_table_index  = 0;
-    tb_size_t       offset_size         = 0;
-    tb_size_t       item_size           = 0;
-    tb_uint64_t*    offsets             = tb_null;
-    tb_hize_t       bof                 = 0;
-    tb_hize_t       eof                 = 0;
-
-    // init writer
-    tb_object_bplist_writer_t writer = {0};
-    writer.stream = stream;
-    
-    // init list
-    list = tb_object_array_init(TB_OBJECT_BPLIST_LIST_GROW, tb_true);
-    tb_assert_and_check_goto(list, end);
-
-    // init hash
-    hash = tb_hash_init(0, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
-    tb_assert_and_check_goto(hash, end);
-
-    // object maxn
-    object_maxn = tb_object_bplist_writer_builder_maxn(object);
-    item_size   = tb_object_bplist_writer_need_bytes(object_maxn);
-    tb_trace_d("object_maxn: %llu", object_maxn);
-    tb_trace_d("item_size: %lu", item_size);
-
-    // add root object to builder
-    tb_object_bplist_writer_builder_addo(object, list, hash);
-
-    // init object builder
-    tb_object_bplist_writer_builder_init(object, list, hash, item_size);
-
-    // init object count
-    object_count = tb_object_array_size(list);
-    tb_trace_d("object_count: %lu", object_count);
-
-    // init offsets
-    offsets = (tb_uint64_t*)tb_malloc0(object_count * sizeof(tb_uint64_t));
-    tb_assert_and_check_goto(offsets, end);
-
-    // the begin offset
-    bof = tb_stream_offset(stream);
-
-    // writ magic & version
-    if (!tb_stream_bwrit(stream, (tb_byte_t const*)"bplist00", 8)) goto end;
-
-    // writ objects
-    if (object_count)
+    // done 
+    tb_bool_t           ok                  = tb_false;
+    tb_size_t           i                   = 0;
+    tb_byte_t           pad[6]              = {0};
+    tb_object_ref_t     list                = tb_null;
+    tb_hash_ref_t       hash                = tb_null;
+    tb_size_t           object_count        = 0;
+    tb_uint64_t         object_maxn         = 0;
+    tb_uint64_t         root_object         = 0;
+    tb_uint64_t         offset_table_index  = 0;
+    tb_size_t           offset_size         = 0;
+    tb_size_t           item_size           = 0;
+    tb_uint64_t*        offsets             = tb_null;
+    tb_hize_t           bof                 = 0;
+    tb_hize_t           eof                 = 0;
+    do
     {
-        i = 0;
-        tb_for_all (tb_object_ref_t, item, tb_object_array_itor(list))
+        // init writer
+        tb_object_bplist_writer_t writer = {0};
+        writer.stream = stream;
+        
+        // init list
+        list = tb_object_array_init(TB_OBJECT_BPLIST_LIST_GROW, tb_true);
+        tb_assert_and_check_break(list);
+
+        // init hash
+        hash = tb_hash_init(0, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
+        tb_assert_and_check_break(hash);
+
+        // object maxn
+        object_maxn = tb_object_bplist_writer_builder_maxn(object);
+        item_size   = tb_object_bplist_writer_need_bytes(object_maxn);
+        tb_trace_d("object_maxn: %llu", object_maxn);
+        tb_trace_d("item_size: %lu", item_size);
+
+        // add root object to builder
+        tb_object_bplist_writer_builder_addo(object, list, hash);
+
+        // init object builder
+        tb_object_bplist_writer_builder_init(object, list, hash, item_size);
+
+        // init object count
+        object_count = tb_object_array_size(list);
+        tb_trace_d("object_count: %lu", object_count);
+
+        // init offsets
+        offsets = (tb_uint64_t*)tb_malloc0(object_count * sizeof(tb_uint64_t));
+        tb_assert_and_check_break(offsets);
+
+        // the begin offset
+        bof = tb_stream_offset(stream);
+
+        // writ magic & version
+        if (!tb_stream_bwrit(stream, (tb_byte_t const*)"bplist00", 8)) break;
+
+        // writ objects
+        if (object_count)
         {
-            // item
-            if (item) 
+            i = 0;
+            tb_bool_t failed = tb_false;
+            tb_for_all_if (tb_object_ref_t, item, tb_object_array_itor(list), item && !failed)
             {
                 // check
-                tb_assert_and_check_goto(i < object_count, end);
+                tb_assert_and_check_break_state(i < object_count, failed, tb_true);
 
                 // save offset
                 offsets[i++] = tb_stream_offset(stream);
@@ -681,60 +680,70 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
                 tb_assert_and_check_continue(func);
 
                 // writ object
-                if (!func(&writer, item, item_size)) goto end;
+                if (!func(&writer, item, item_size)) 
+                {
+                    failed = tb_true;
+                    break;
+                }
+            }
+
+            // failed?
+            tb_check_break(!failed);
+        }
+
+        // offset table index
+        offset_table_index = tb_stream_offset(stream);
+        offset_size = tb_object_bplist_writer_need_bytes(offset_table_index);
+        tb_trace_d("offset_table_index: %llu", offset_table_index);
+        tb_trace_d("offset_size: %lu", offset_size);
+
+        // writ offset table
+        tb_bool_t failed = tb_false;
+        for (i = 0; !failed && i < object_count; i++)
+        {
+            switch (offset_size)
+            {
+            case 1:
+                if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)offsets[i])) failed = tb_true;
+                break;
+            case 2:
+                if (!tb_stream_bwrit_u16_be(stream, (tb_uint16_t)offsets[i])) failed = tb_true;
+                break;
+            case 4:
+                if (!tb_stream_bwrit_u32_be(stream, (tb_uint32_t)offsets[i])) failed = tb_true;
+                break;
+            case 8:
+                if (!tb_stream_bwrit_u64_be(stream, (tb_uint64_t)offsets[i])) failed = tb_true;
+                break;
+            default:
+                tb_assert_and_check_break_state(0, failed, tb_true);
+                break;
             }
         }
-    }
 
-    // offset table index
-    offset_table_index = tb_stream_offset(stream);
-    offset_size = tb_object_bplist_writer_need_bytes(offset_table_index);
-    tb_trace_d("offset_table_index: %llu", offset_table_index);
-    tb_trace_d("offset_size: %lu", offset_size);
+        // failed?
+        tb_check_break(!failed);
 
-    // writ offset table
-    for (i = 0; i < object_count; i++)
-    {
-        switch (offset_size)
-        {
-        case 1:
-            if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)offsets[i])) goto end;
-            break;
-        case 2:
-            if (!tb_stream_bwrit_u16_be(stream, (tb_uint16_t)offsets[i])) goto end;
-            break;
-        case 4:
-            if (!tb_stream_bwrit_u32_be(stream, (tb_uint32_t)offsets[i])) goto end;
-            break;
-        case 8:
-            if (!tb_stream_bwrit_u64_be(stream, (tb_uint64_t)offsets[i])) goto end;
-            break;
-        default:
-            tb_assert_and_check_goto(0, end);
-            break;
-        }
-    }
+        // writ pad, like apple?
+        if (!tb_stream_bwrit(stream, pad, 6)) break;
+        
+        // writ tail
+        if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)offset_size)) break;
+        if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)item_size)) break;
+        if (!tb_stream_bwrit_u64_be(stream, object_count)) break;
+        if (!tb_stream_bwrit_u64_be(stream, root_object)) break;
+        if (!tb_stream_bwrit_u64_be(stream, offset_table_index)) break;
 
-    // writ pad, like apple?
-    if (!tb_stream_bwrit(stream, pad, 6)) goto end;
-    
-    // writ tail
-    if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)offset_size)) goto end;
-    if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)item_size)) goto end;
-    if (!tb_stream_bwrit_u64_be(stream, object_count)) goto end;
-    if (!tb_stream_bwrit_u64_be(stream, root_object)) goto end;
-    if (!tb_stream_bwrit_u64_be(stream, offset_table_index)) goto end;
+        // sync stream
+        if (!tb_stream_sync(stream, tb_true)) break;
 
-    // flush
-    if (!tb_stream_sync(stream, tb_true)) goto end;
+        // the end offset
+        eof = tb_stream_offset(stream);
 
-    // the end offset
-    eof = tb_stream_offset(stream);
+        // ok
+        ok = tb_true;
 
-    // ok
-    ok = tb_true;
-
-end:
+    } while (0);
 
     // exit offsets
     if (offsets) tb_free(offsets);
