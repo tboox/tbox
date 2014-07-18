@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * types
  */
 
-// the scoped buffer type
+// the buffer type
 typedef struct __tb_buffer_t
 {
     // the buffer data

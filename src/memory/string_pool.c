@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        pool.c
+ * @file        string_pool.c
  * @ingroup     memory
  *
  */
@@ -49,9 +49,6 @@ typedef struct __tb_string_pool_impl_t
     // the cache
     tb_hash_ref_t           cache;
 
-    // the lock
-    tb_spinlock_t           lock;
-
 }tb_string_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -68,17 +65,9 @@ tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase)
         impl = tb_malloc0_type(tb_string_pool_impl_t);
         tb_assert_and_check_break(impl);
 
-        // init lock
-        if (!tb_spinlock_init(&impl->lock)) break;
-
         // init hash
         impl->cache = tb_hash_init(0, tb_item_func_str(bcase), tb_item_func_size());
         tb_assert_and_check_break(impl->cache);
-
-        // register lock profiler
-#ifdef TB_LOCK_PROFILER_ENABLE
-        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->lock, TB_TRACE_MODULE_NAME);
-#endif
 
         // ok
         ok = tb_true;
@@ -102,18 +91,9 @@ tb_void_t tb_string_pool_exit(tb_string_pool_ref_t pool)
     tb_string_pool_impl_t* impl = (tb_string_pool_impl_t*)pool;
     tb_assert_and_check_return(impl);
 
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
     // exit cache
     if (impl->cache) tb_hash_exit(impl->cache);
     impl->cache = tb_null;
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
-    // exit lock
-    tb_spinlock_exit(&impl->lock);
 
     // exit it
     tb_free(impl);
@@ -124,23 +104,14 @@ tb_void_t tb_string_pool_clear(tb_string_pool_ref_t pool)
     tb_string_pool_impl_t* impl = (tb_string_pool_impl_t*)pool;
     tb_assert_and_check_return(impl);
 
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
     // clear cache
     if (impl->cache) tb_hash_clear(impl->cache);
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
 }
 tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* data)
 {
     // check
     tb_string_pool_impl_t* impl = (tb_string_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && data, tb_null);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
 
     // done
     tb_char_t const* cstr = tb_null;
@@ -180,9 +151,6 @@ tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* 
         if (item) cstr = (tb_char_t const*)item->name;
     }
 
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
     // ok?
     return cstr;
 }
@@ -191,9 +159,6 @@ tb_void_t tb_string_pool_del(tb_string_pool_ref_t pool, tb_char_t const* data)
     // check
     tb_string_pool_impl_t* impl = (tb_string_pool_impl_t*)pool;
     tb_assert_and_check_return(impl && data);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
 
     // done
     tb_hash_item_t const* item = tb_null;
@@ -212,36 +177,19 @@ tb_void_t tb_string_pool_del(tb_string_pool_ref_t pool, tb_char_t const* data)
             else tb_iterator_remove(impl->cache, itor);
         }
     }
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
 }
 #ifdef __tb_debug__
 tb_void_t tb_string_pool_dump(tb_string_pool_ref_t pool)
 {
     // check
     tb_string_pool_impl_t* impl = (tb_string_pool_impl_t*)pool;
-    tb_assert_and_check_return(impl);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
+    tb_assert_and_check_return(impl && impl->cache);
 
     // dump cache
-    if (impl->cache && tb_hash_size(impl->cache))
+    tb_for_all_if (tb_hash_item_t*, item, impl->cache, item)
     {
         // trace
-        tb_trace_i("======================================================================");
-        tb_trace_i("size: %lu", tb_hash_size(impl->cache));
-
-        // walk
-        tb_for_all (tb_hash_item_t*, item, impl->cache)
-        {
-            if (item) tb_trace_i("item: refn: %lu, cstr: %s", (tb_size_t)item->data, item->name);
-        }
-        tb_trace_i("======================================================================");
+        tb_trace_i("item: refn: %lu, cstr: %s", (tb_size_t)item->data, item->name);
     }
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
 }
 #endif
