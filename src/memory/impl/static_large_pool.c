@@ -36,7 +36,7 @@
  */
 
 // the static large data head type
-typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_large_data_head_t
+typedef __tb_pool_data_aligned__ struct __tb_static_large_data_head_t
 {
     // the data space size: the allocated size + left size
     tb_uint32_t                     space : 31;
@@ -47,7 +47,7 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_large_data_head_t
     // the data head base
     tb_pool_data_head_t             base;
 
-}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_static_large_data_head_t;
+}__tb_pool_data_aligned__ tb_static_large_data_head_t;
 
 // the static large data pred type
 typedef struct __tb_static_large_data_pred_t
@@ -110,7 +110,7 @@ typedef struct __tb_static_large_data_pred_t
  *
  * </pre>
  */
-typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_large_pool_impl_t
+typedef __tb_pool_data_aligned__ struct __tb_static_large_pool_impl_t
 {
     // the lock
     tb_spinlock_t                   lock;
@@ -150,7 +150,7 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_static_large_pool_impl_t
     tb_size_t                       free_count;
 #endif
 
-}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_static_large_pool_impl_t;
+}__tb_pool_data_aligned__ tb_static_large_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * checker implementation
@@ -432,7 +432,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_done(tb_static_l
         data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
         data_head->base.debug.file      = file_;
         data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = line_;
+        data_head->base.debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
         tb_pool_data_save_backtrace(&data_head->base, 3);
@@ -545,7 +545,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
         data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
         data_head->base.debug.file      = file_;
         data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = line_;
+        data_head->base.debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
         tb_pool_data_save_backtrace(&data_head->base, 3);

@@ -47,7 +47,7 @@
  */
 
 // the native large data head type
-typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_large_data_head_t
+typedef __tb_pool_data_aligned__ struct __tb_native_large_data_head_t
 {
     // the pool reference
     tb_pointer_t                    pool;
@@ -58,7 +58,7 @@ typedef __tb_aligned__(TB_POOL_DATA_ALIGN) struct __tb_native_large_data_head_t
     // the data head base
     tb_pool_data_head_t             base;
 
-}__tb_aligned__(TB_POOL_DATA_ALIGN) tb_native_large_data_head_t;
+}__tb_pool_data_aligned__ tb_native_large_data_head_t;
 
 /*! the native large pool impl type
  *
@@ -387,7 +387,7 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
         data_head->base.debug.file      = file_;
         data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = line_;
+        data_head->base.debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
         tb_pool_data_save_backtrace(&data_head->base, 2);
@@ -498,7 +498,7 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         tb_assert_and_check_break(!(((tb_size_t)data) & 0x1));
 
         // update the real data
-        data_real = data + sizeof(tb_native_large_data_head_t);
+        data_real = (tb_byte_t*)data + sizeof(tb_native_large_data_head_t);
 
         // update the data head
         data_head = (tb_native_large_data_head_t*)data;
@@ -506,7 +506,7 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 #ifdef __tb_debug__
         data_head->base.debug.file      = file_;
         data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = line_;
+        data_head->base.debug.line      = (tb_uint16_t)line_;
 
         // check
         tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "ralloc data have been changed: %p", data);

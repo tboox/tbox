@@ -955,7 +955,7 @@ tb_bool_t tb_aicp_ssl_exit(tb_aicp_ssl_ref_t ssl)
     // ok
     return tb_true;
 }
-tb_void_t tb_aicp_ssl_set_aico(tb_aicp_ssl_ref_t ssl, tb_handle_t aico)
+tb_void_t tb_aicp_ssl_set_aico(tb_aicp_ssl_ref_t ssl, tb_aico_ref_t aico)
 {
     // check
     tb_aicp_ssl_impl_t* impl = (tb_aicp_ssl_impl_t*)ssl;
