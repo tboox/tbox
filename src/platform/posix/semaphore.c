@@ -34,18 +34,33 @@
  */
 tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 {
-    // alloc
-    sem_t* h = tb_malloc0_type(sem_t);
-    tb_assert_and_check_return_val(h, tb_null);
+    // done
+    tb_bool_t           ok = tb_false;
+    sem_t*              semaphore = tb_null;
+    do
+    {
+        // make semaphore
+        semaphore = tb_malloc0_type(sem_t);
+        tb_assert_and_check_break(semaphore);
 
-    // init
-    if (sem_init(h, 0, init) < 0) goto fail;
+        // init
+        if (sem_init(semaphore, 0, init) < 0) break;
 
-    // ok
-    return (tb_semaphore_ref_t)h;
+        // ok
+        ok = tb_true;
 
-fail:
-    return tb_null;
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (semaphore) tb_free(semaphore);
+        semaphore = tb_null;
+    }
+
+    // ok?
+    return (tb_semaphore_ref_t)semaphore;
 }
 tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
 {

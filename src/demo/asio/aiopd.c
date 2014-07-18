@@ -72,179 +72,140 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
     // check
     tb_assert_and_check_return_val(argv[1], 0);
 
-    // init
+    // done
     tb_socket_ref_t sock = tb_null;
     tb_aiop_ref_t   aiop = tb_null;
-
-    // init sock
-    sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-    tb_assert_and_check_goto(sock, end);
-
-    // init aiop
-    aiop = tb_aiop_init(16);
-    tb_assert_and_check_goto(aiop, end);
-
-    // bind 
-    if (!tb_socket_bind(sock, tb_null, 9090)) goto end;
-
-    // listen sock
-    if (!tb_socket_listen(sock)) goto end;
-
-    // addo sock
-    if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) goto end;
-
-    // accept
-    tb_aioe_t list[16];
-    while (1)
+    do
     {
-        // wait
-        tb_long_t objn = tb_aiop_wait(aiop, list, 16, -1);
-        tb_assert_and_check_break(objn >= 0);
+        // init sock
+        sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+        tb_assert_and_check_break(sock);
 
-        // walk list
-        tb_size_t i = 0;
-        for (i = 0; i < objn; i++)
+        // init aiop
+        aiop = tb_aiop_init(16);
+        tb_assert_and_check_break(aiop);
+
+        // bind 
+        if (!tb_socket_bind(sock, tb_null, 9090)) break;
+
+        // listen sock
+        if (!tb_socket_listen(sock)) break;
+
+        // addo sock
+        if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) break;
+
+        // accept
+        tb_aioe_t list[16];
+        while (1)
         {
-            // the aioo 
-            tb_aioo_ref_t aioo = list[i].aioo;
+            // wait
+            tb_long_t objn = tb_aiop_wait(aiop, list, 16, -1);
+            tb_assert_and_check_break(objn >= 0);
 
-            // check
-            tb_assert_and_check_break(aioo && tb_aioo_sock(aioo));
-
-            // acpt?
-            if (list[i].code & TB_AIOE_CODE_ACPT)
+            // walk list
+            tb_size_t i = 0;
+            for (i = 0; i < objn; i++)
             {
-                // done acpt
-                tb_bool_t           ok = tb_false;
-                tb_demo_context_t*  context = tb_null;
-                do
+                // the aioo 
+                tb_aioo_ref_t aioo = list[i].aioo;
+
+                // check
+                tb_assert_and_check_break(aioo && tb_aioo_sock(aioo));
+
+                // acpt?
+                if (list[i].code & TB_AIOE_CODE_ACPT)
                 {
-                    // make context
-                    context = tb_malloc0_type(tb_demo_context_t);
-                    tb_assert_and_check_break(context);
-
-                    // init sock
-                    context->sock = tb_socket_accept(tb_aioo_sock(aioo));
-                    tb_assert_and_check_break(context->sock);
-
-                    // init file
-                    context->file = tb_file_init(argv[1], TB_FILE_MODE_RO);
-                    tb_assert_and_check_break(context->file);
-
-                    // init data
-                    context->data = tb_malloc_bytes(TB_DEMO_FILE_READ_MAXN);
-                    tb_assert_and_check_break(context->data);
-
-                    // addo sock
-                    context->aioo = tb_aiop_addo(aiop, context->sock, TB_AIOE_CODE_SEND, context);
-                    tb_assert_and_check_break(context->aioo);
-
-                    // trace
-                    tb_trace_i("acpt[%p]: ok", context->sock);
-
-                    // init left
-                    context->left = tb_file_size(context->file);
-
-                    // done read
-                    tb_long_t real = tb_file_read(context->file, context->data, tb_min((tb_size_t)context->left, TB_DEMO_FILE_READ_MAXN));
-                    tb_assert_and_check_break(real > 0);
-
-                    // save size
-                    context->left -= real;
-
-                    // trace
-//                  tb_trace_i("read[%p]: real: %ld", context->file, real);
-
-                    // done send
-                    context->send = real;
-                    real = tb_socket_send(context->sock, context->data + context->real, context->send - context->real);
-                    if (real >= 0)
+                    // done acpt
+                    tb_bool_t           ok = tb_false;
+                    tb_demo_context_t*  context = tb_null;
+                    do
                     {
-                        // save real
-                        context->real += real;
+                        // make context
+                        context = tb_malloc0_type(tb_demo_context_t);
+                        tb_assert_and_check_break(context);
+
+                        // init sock
+                        context->sock = tb_socket_accept(tb_aioo_sock(aioo));
+                        tb_assert_and_check_break(context->sock);
+
+                        // init file
+                        context->file = tb_file_init(argv[1], TB_FILE_MODE_RO);
+                        tb_assert_and_check_break(context->file);
+
+                        // init data
+                        context->data = tb_malloc_bytes(TB_DEMO_FILE_READ_MAXN);
+                        tb_assert_and_check_break(context->data);
+
+                        // addo sock
+                        context->aioo = tb_aiop_addo(aiop, context->sock, TB_AIOE_CODE_SEND, context);
+                        tb_assert_and_check_break(context->aioo);
 
                         // trace
-//                      tb_trace_i("send[%p]: real: %ld", context->sock, real);
-                    }
-                    else
-                    {
-                        // trace
-                        tb_trace_i("send[%p]: closed", context->sock);
-                        break;
-                    }
+                        tb_trace_i("acpt[%p]: ok", context->sock);
 
-                    // ok
-                    ok = tb_true;
+                        // init left
+                        context->left = tb_file_size(context->file);
 
-                } while (0);
+                        // done read
+                        tb_long_t real = tb_file_read(context->file, context->data, tb_min((tb_size_t)context->left, TB_DEMO_FILE_READ_MAXN));
+                        tb_assert_and_check_break(real > 0);
 
-                // failed or closed?
-                if (!ok)
-                {
-                    // exit context
-                    tb_demo_context_exit(aiop, context);
-                    break;
-                }
-            }
-            // writ?
-            else if (list[i].code & TB_AIOE_CODE_SEND)
-            {
-                // the context
-                tb_demo_context_t* context = (tb_demo_context_t*)list[i].priv;
-                tb_assert_and_check_break(context);
-
-                // continue to send it if not finished
-                if (context->real < context->send)
-                {
-                    // done send
-                    tb_long_t real = tb_socket_send(tb_aioo_sock(aioo), context->data + context->real, context->send - context->real);
-                    if (real > 0)
-                    {
-                        // save real
-                        context->real += real;
-
-                        // trace
-//                      tb_trace_i("send[%p]: real: %ld", tb_aioo_sock(aioo), real);
-                    }
-                    else
-                    {
-                        // trace
-                        tb_trace_i("send[%p]: closed", tb_aioo_sock(aioo));
-
-                        // exit context
-                        tb_demo_context_exit(aiop, context);
-                        break;
-                    }
-                }
-                // finished? read file
-                else if (context->left)
-                {
-                    // init
-                    context->real = 0;
-                    context->send = 0;
-
-                    // done read
-                    tb_size_t tryn = 1;
-                    tb_long_t real = 0;
-                    while (!(real = tb_file_read(context->file, context->data, tb_min((tb_size_t)context->left, TB_DEMO_FILE_READ_MAXN))) && tryn--);
-                    if (real > 0)
-                    {
-                        // save left
+                        // save size
                         context->left -= real;
 
                         // trace
-//                      tb_trace_i("read[%p]: real: %ld", context->file, real);
+    //                  tb_trace_i("read[%p]: real: %ld", context->file, real);
 
                         // done send
                         context->send = real;
-                        real = tb_socket_send(tb_aioo_sock(aioo), context->data, context->send);
+                        real = tb_socket_send(context->sock, context->data + context->real, context->send - context->real);
                         if (real >= 0)
                         {
                             // save real
                             context->real += real;
 
                             // trace
-//                          tb_trace_i("send[%p]: real: %ld", tb_aioo_sock(aioo), real);
+    //                      tb_trace_i("send[%p]: real: %ld", context->sock, real);
+                        }
+                        else
+                        {
+                            // trace
+                            tb_trace_i("send[%p]: closed", context->sock);
+                            break;
+                        }
+
+                        // ok
+                        ok = tb_true;
+
+                    } while (0);
+
+                    // failed or closed?
+                    if (!ok)
+                    {
+                        // exit context
+                        tb_demo_context_exit(aiop, context);
+                        break;
+                    }
+                }
+                // writ?
+                else if (list[i].code & TB_AIOE_CODE_SEND)
+                {
+                    // the context
+                    tb_demo_context_t* context = (tb_demo_context_t*)list[i].priv;
+                    tb_assert_and_check_break(context);
+
+                    // continue to send it if not finished
+                    if (context->real < context->send)
+                    {
+                        // done send
+                        tb_long_t real = tb_socket_send(tb_aioo_sock(aioo), context->data + context->real, context->send - context->real);
+                        if (real > 0)
+                        {
+                            // save real
+                            context->real += real;
+
+                            // trace
+    //                      tb_trace_i("send[%p]: real: %ld", tb_aioo_sock(aioo), real);
                         }
                         else
                         {
@@ -256,7 +217,57 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
                             break;
                         }
                     }
-                    else
+                    // finished? read file
+                    else if (context->left)
+                    {
+                        // init
+                        context->real = 0;
+                        context->send = 0;
+
+                        // done read
+                        tb_size_t tryn = 1;
+                        tb_long_t real = 0;
+                        while (!(real = tb_file_read(context->file, context->data, tb_min((tb_size_t)context->left, TB_DEMO_FILE_READ_MAXN))) && tryn--);
+                        if (real > 0)
+                        {
+                            // save left
+                            context->left -= real;
+
+                            // trace
+    //                      tb_trace_i("read[%p]: real: %ld", context->file, real);
+
+                            // done send
+                            context->send = real;
+                            real = tb_socket_send(tb_aioo_sock(aioo), context->data, context->send);
+                            if (real >= 0)
+                            {
+                                // save real
+                                context->real += real;
+
+                                // trace
+    //                          tb_trace_i("send[%p]: real: %ld", tb_aioo_sock(aioo), real);
+                            }
+                            else
+                            {
+                                // trace
+                                tb_trace_i("send[%p]: closed", tb_aioo_sock(aioo));
+
+                                // exit context
+                                tb_demo_context_exit(aiop, context);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            // trace
+                            tb_trace_i("read[%p]: closed", tb_aioo_sock(aioo));
+
+                            // exit context
+                            tb_demo_context_exit(aiop, context);
+                            break;
+                        }
+                    }
+                    else 
                     {
                         // trace
                         tb_trace_i("read[%p]: closed", tb_aioo_sock(aioo));
@@ -266,26 +277,15 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
                         break;
                     }
                 }
+                // error?
                 else 
                 {
-                    // trace
-                    tb_trace_i("read[%p]: closed", tb_aioo_sock(aioo));
-
-                    // exit context
-                    tb_demo_context_exit(aiop, context);
+                    tb_trace_i("aioe[%p]: unknown code: %lu", tb_aioo_sock(aioo), list[i].code);
                     break;
                 }
             }
-            // error?
-            else 
-            {
-                tb_trace_i("aioe[%p]: unknown code: %lu", tb_aioo_sock(aioo), list[i].code);
-                break;
-            }
         }
-    }
-
-end:
+    } while (0);
 
     // trace
     tb_trace_i("end");
@@ -296,5 +296,6 @@ end:
     // exit aiop
     if (aiop) tb_aiop_exit(aiop);
 
+    // end
     return 0;
 }

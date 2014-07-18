@@ -515,153 +515,170 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
     tb_object_ref_t* object_hash = (tb_object_ref_t*)tb_malloc0(sizeof(tb_object_ref_t) * object_count);
     tb_assert_and_check_return_val(object_hash, tb_null);
 
-    // walk
-    tb_size_t i = 0;
-    for (i = 0; i < object_count; i++)
+    // done
+    tb_bool_t failed = tb_false;
+    do
     {
-        // seek to the offset entry
-        if (!tb_stream_seek(stream, offset_table_index + i * offset_size)) goto end;
-
-        // read the object offset
-        tb_hize_t offset = 0;
-        switch (offset_size)
+        // walk
+        tb_size_t i = 0;
+        for (i = 0; i < object_count; i++)
         {
-        case 1:
-            offset = tb_stream_bread_u8(stream);
-            break;
-        case 2:
-            offset = tb_stream_bread_u16_be(stream);
-            break;
-        case 4:
-            offset = tb_stream_bread_u32_be(stream);
-            break;
-        case 8:
-            offset = tb_stream_bread_u64_be(stream);
-            break;
-        default:
-            return tb_null;
-            break;
+            // seek to the offset entry
+            if (!tb_stream_seek(stream, offset_table_index + i * offset_size)) 
+            {
+                failed = tb_true;
+                break;
+            }
+
+            // read the object offset
+            tb_hize_t offset = 0;
+            switch (offset_size)
+            {
+            case 1:
+                offset = tb_stream_bread_u8(stream);
+                break;
+            case 2:
+                offset = tb_stream_bread_u16_be(stream);
+                break;
+            case 4:
+                offset = tb_stream_bread_u32_be(stream);
+                break;
+            case 8:
+                offset = tb_stream_bread_u64_be(stream);
+                break;
+            default:
+                return tb_null;
+                break;
+            }
+
+            // seek to the object offset 
+            if (!tb_stream_seek(stream, offset)) 
+            {
+                failed = tb_true;
+                break;
+            }
+
+            // read object
+            object_hash[i] = tb_object_bplist_reader_func_object(&reader, item_size);
+    //      if (object_hash[i]) tb_object_dump(object_hash[i]);
         }
 
-        // seek to the object offset 
-        if (!tb_stream_seek(stream, offset)) goto end;
+        // failed?
+        tb_check_break(!failed);
 
-        // read object
-        object_hash[i] = tb_object_bplist_reader_func_object(&reader, item_size);
-//      if (object_hash[i]) tb_object_dump(object_hash[i]);
-    }
-
-    // build array & dictionary items
-    for (i = 0; i < object_count; i++)
-    {
-        tb_object_ref_t object = object_hash[i];
-        if (object)
+        // build array & dictionary items
+        for (i = 0; i < object_count; i++)
         {
-            switch (tb_object_type(object))
+            tb_object_ref_t object = object_hash[i];
+            if (object)
             {
-            case TB_OBJECT_TYPE_ARRAY:
+                switch (tb_object_type(object))
                 {
-                    // the priv data
-                    tb_byte_t* priv = (tb_byte_t*)tb_object_getp(object);
-                    if (priv)
+                case TB_OBJECT_TYPE_ARRAY:
                     {
-                        // count
-                        tb_size_t count = (tb_size_t)tb_bits_get_u32_ne(priv);
-                        if (count)
+                        // the priv data
+                        tb_byte_t* priv = (tb_byte_t*)tb_object_getp(object);
+                        if (priv)
                         {
-                            // goto item data
-                            tb_byte_t const* p = priv + sizeof(tb_uint32_t);
-
-                            // walk items
-                            tb_size_t j = 0;
-                            for (i = 0; j < count; j++)
+                            // count
+                            tb_size_t count = (tb_size_t)tb_bits_get_u32_ne(priv);
+                            if (count)
                             {
-                                // the item index
-                                tb_size_t item = tb_object_bplist_bits_get(p + j * item_size, item_size);
-                                tb_assert(item < object_count && object_hash[item]);
-//                              tb_trace_d("item: %d", item);
+                                // goto item data
+                                tb_byte_t const* p = priv + sizeof(tb_uint32_t);
 
-                                // append item
-                                if (item < object_count && object_hash[item])
+                                // walk items
+                                tb_size_t j = 0;
+                                for (i = 0; j < count; j++)
                                 {
-                                    tb_object_inc(object_hash[item]);
-                                    tb_object_array_append(object, object_hash[item]);
-                                }
-                            }
-                        }
+                                    // the item index
+                                    tb_size_t item = tb_object_bplist_bits_get(p + j * item_size, item_size);
+                                    tb_assert(item < object_count && object_hash[item]);
+    //                              tb_trace_d("item: %d", item);
 
-                        // exit priv
-                        tb_free(priv);
-                        tb_object_setp(object, tb_null);
-//                      tb_object_dump(object);
-                    }
-                }
-                break;
-            case TB_OBJECT_TYPE_DICTIONARY:
-                { 
-                    // the priv data
-                    tb_byte_t* priv = (tb_byte_t*)tb_object_getp(object);
-                    if (priv)
-                    {
-                        // count
-                        tb_size_t count = (tb_size_t)tb_bits_get_u32_ne(priv);
-                        if (count)
-                        {
-                            // goto item data
-                            tb_byte_t const* p = priv + sizeof(tb_uint32_t);
-
-                            // walk items
-                            tb_size_t j = 0;
-                            for (i = 0; j < count; j++)
-                            {
-                                // the key & val
-                                tb_size_t key = tb_object_bplist_bits_get(p + j * item_size, item_size);
-                                tb_size_t val = tb_object_bplist_bits_get(p + (count + j) * item_size, item_size);
-                                tb_assert(key < object_count && object_hash[key]);
-                                tb_assert(val < object_count && object_hash[val]);
-//                              tb_trace_d("key_val: %u => %lu", key, val);
-
-                                // append the key & val
-                                if (key < object_count && val < object_count && object_hash[key] && object_hash[val])
-                                {
-                                    // key must be string now.
-                                    tb_assert(tb_object_type(object_hash[key]) == TB_OBJECT_TYPE_STRING);
-                                    if (tb_object_type(object_hash[key]) == TB_OBJECT_TYPE_STRING)
+                                    // append item
+                                    if (item < object_count && object_hash[item])
                                     {
-                                        // set key => val
-                                        tb_char_t const* skey = tb_object_string_cstr(object_hash[key]);
-                                        if (skey) 
-                                        {
-                                            tb_object_inc(object_hash[val]);
-                                            tb_object_dictionary_set(object, skey, object_hash[val]);
-                                        }
-                                        tb_assert(skey);
+                                        tb_object_inc(object_hash[item]);
+                                        tb_object_array_append(object, object_hash[item]);
                                     }
                                 }
                             }
+
+                            // exit priv
+                            tb_free(priv);
+                            tb_object_setp(object, tb_null);
+    //                      tb_object_dump(object);
                         }
-
-                        // exit priv
-                        tb_free(priv);
-                        tb_object_setp(object, tb_null);
-//                      tb_object_dump(object);
                     }
+                    break;
+                case TB_OBJECT_TYPE_DICTIONARY:
+                    { 
+                        // the priv data
+                        tb_byte_t* priv = (tb_byte_t*)tb_object_getp(object);
+                        if (priv)
+                        {
+                            // count
+                            tb_size_t count = (tb_size_t)tb_bits_get_u32_ne(priv);
+                            if (count)
+                            {
+                                // goto item data
+                                tb_byte_t const* p = priv + sizeof(tb_uint32_t);
+
+                                // walk items
+                                tb_size_t j = 0;
+                                for (i = 0; j < count; j++)
+                                {
+                                    // the key & val
+                                    tb_size_t key = tb_object_bplist_bits_get(p + j * item_size, item_size);
+                                    tb_size_t val = tb_object_bplist_bits_get(p + (count + j) * item_size, item_size);
+                                    tb_assert(key < object_count && object_hash[key]);
+                                    tb_assert(val < object_count && object_hash[val]);
+    //                              tb_trace_d("key_val: %u => %lu", key, val);
+
+                                    // append the key & val
+                                    if (key < object_count && val < object_count && object_hash[key] && object_hash[val])
+                                    {
+                                        // key must be string now.
+                                        tb_assert(tb_object_type(object_hash[key]) == TB_OBJECT_TYPE_STRING);
+                                        if (tb_object_type(object_hash[key]) == TB_OBJECT_TYPE_STRING)
+                                        {
+                                            // set key => val
+                                            tb_char_t const* skey = tb_object_string_cstr(object_hash[key]);
+                                            if (skey) 
+                                            {
+                                                tb_object_inc(object_hash[val]);
+                                                tb_object_dictionary_set(object, skey, object_hash[val]);
+                                            }
+                                            tb_assert(skey);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // exit priv
+                            tb_free(priv);
+                            tb_object_setp(object, tb_null);
+//                          tb_object_dump(object);
+                        }
+                    }
+                    break;
+                default:
+                    break;
                 }
-                break;
-            default:
-                break;
             }
-        }
-    }   
+        }   
 
-end:
+    } while (0);
 
+    // exit object hash
     if (object_hash)
     {
         // root
         if (root_object < object_count) root = object_hash[root_object];
 
         // refn--
+        tb_size_t i;
         for (i = 0; i < object_count; i++)
         {
             if (object_hash[i] && i != root_object)
