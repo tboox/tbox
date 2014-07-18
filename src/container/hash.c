@@ -263,10 +263,6 @@ static tb_size_t tb_hash_itor_head(tb_iterator_ref_t iterator)
 }
 static tb_size_t tb_hash_itor_tail(tb_iterator_ref_t iterator)
 {
-    // check
-    tb_hash_impl_t* impl = (tb_hash_impl_t*)iterator;
-    tb_assert_return_val(impl, 0);
-
     return 0;
 }
 static tb_size_t tb_hash_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)

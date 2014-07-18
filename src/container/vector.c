@@ -79,10 +79,6 @@ static tb_size_t tb_vector_itor_size(tb_iterator_ref_t iterator)
 }
 static tb_size_t tb_vector_itor_head(tb_iterator_ref_t iterator)
 {
-    // check
-    tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return_val(impl, 0);
-
     // head
     return 0;
 }
@@ -100,7 +96,7 @@ static tb_size_t tb_vector_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
     tb_assert_return_val(impl, 0);
-    tb_assert_return_val(itor < impl->size, impl->size);
+    tb_assert_and_check_return_val(itor < impl->size, impl->size);
 
     // next
     return itor + 1;
@@ -110,7 +106,7 @@ static tb_size_t tb_vector_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
     tb_assert_return_val(impl, 0);
-    tb_assert_return_val(itor && itor <= impl->size, 0);
+    tb_assert_and_check_return_val(itor && itor <= impl->size, 0);
 
     // prev
     return itor - 1;
