@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the scoped string type
+/// the string type
 typedef tb_buffer_t  tb_string_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

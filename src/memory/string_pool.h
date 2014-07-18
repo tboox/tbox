@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        pool.h
+ * @file        string_pool.h
  * @ingroup     memory
  *
  */
