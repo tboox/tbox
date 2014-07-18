@@ -79,6 +79,9 @@ typedef __tb_pool_data_aligned__ struct __tb_static_fixed_pool_impl_t
     // the total size
     tb_size_t                   total_size;
 
+    // the real size
+    tb_size_t                   real_size;
+
     // the occupied size
     tb_size_t                   occupied_size;
 
@@ -454,6 +457,7 @@ tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool)
 #ifdef __tb_debug__
     impl->peak_size     = 0;
     impl->total_size    = 0;
+    impl->real_size     = 0;
     impl->occupied_size = 0;
     impl->malloc_count  = 0;
     impl->free_count    = 0;
@@ -504,6 +508,9 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, impl->item_space - sizeof(tb_pool_data_head_t));
  
+        // update the real size
+        impl->real_size     += impl->item_size;
+
         // update the occupied size
         impl->occupied_size += impl->item_space - TB_POOL_DATA_HEAD_DIFF_SIZE - 1;
 
@@ -560,9 +567,6 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
 
         // check the next data
         tb_static_fixed_pool_check_next(impl, data_head);
-
-        // update the occupied size
-        impl->occupied_size -= impl->item_space - TB_POOL_DATA_HEAD_DIFF_SIZE - 1;
 
         // update the total size
         impl->total_size -= impl->item_size;
@@ -687,7 +691,7 @@ tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
     tb_trace_i("[%lu]: peak_size: %lu, wast_rate: %llu/10000, pred_failed: %lu, item_maxn: %lu, free_count: %lu, malloc_count: %lu"
             ,   impl->item_size
             ,   impl->peak_size
-            ,   impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->total_size) * 10000) / (tb_hize_t)impl->occupied_size : 0
+            ,   impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->real_size) * 10000) / (tb_hize_t)impl->occupied_size : 0
             ,   impl->pred_failed
             ,   impl->item_maxn
             ,   impl->free_count

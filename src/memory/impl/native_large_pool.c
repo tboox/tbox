@@ -86,6 +86,9 @@ typedef struct __tb_native_large_pool_impl_t
     // the total size
     tb_size_t                       total_size;
 
+    // the real size
+    tb_size_t                       real_size;
+
     // the occupied size
     tb_size_t                       occupied_size;
 
@@ -222,9 +225,6 @@ static tb_bool_t tb_native_large_pool_free_done(tb_native_large_pool_impl_t* imp
         // for checking double-free
         data_head->base.debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
 
-        // update the occupied size
-        impl->occupied_size -= sizeof(tb_native_large_data_head_t) - TB_POOL_DATA_HEAD_DIFF_SIZE + data_head->base.size;
- 
         // update the total size
         impl->total_size    -= data_head->base.size;
    
@@ -342,6 +342,17 @@ tb_void_t tb_native_large_pool_clear(tb_large_pool_ref_t pool)
 
     } while (0);
 
+    // clear info
+#ifdef __tb_debug__
+    impl->peak_size     = 0;
+    impl->total_size    = 0;
+    impl->real_size     = 0;
+    impl->occupied_size = 0;
+    impl->malloc_count  = 0;
+    impl->ralloc_count  = 0;
+    impl->free_count    = 0;
+#endif
+
     // leave
     tb_spinlock_leave(&impl->lock);
 }
@@ -406,6 +417,9 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         if (real) *real = size;
 
 #ifdef __tb_debug__
+        // update the real size
+        impl->real_size     += size;
+
         // update the occupied size
         impl->occupied_size += need - TB_POOL_DATA_HEAD_DIFF_SIZE - patch;
 
@@ -477,6 +491,9 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 
         // check the next data
         tb_native_large_pool_check_next(impl, data_head);
+ 
+        // update the real size
+        impl->real_size -= data_head->base.size;
 
         // update the occupied size
         impl->occupied_size -= data_head->base.size;
@@ -529,6 +546,9 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         if (real) *real = size;
 
 #ifdef __tb_debug__
+        // update the real size
+        impl->real_size     += size;
+
         // update the occupied size
         impl->occupied_size += size;
 
@@ -610,7 +630,7 @@ tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
 
     // trace debug info
     tb_trace_i("peak_size: %lu",            impl->peak_size);
-    tb_trace_i("wast_rate: %llu/10000",     impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->total_size) * 10000) / (tb_hize_t)impl->occupied_size : 0);
+    tb_trace_i("wast_rate: %llu/10000",     impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->real_size) * 10000) / (tb_hize_t)impl->occupied_size : 0);
     tb_trace_i("free_count: %lu",           impl->free_count);
     tb_trace_i("malloc_count: %lu",         impl->malloc_count);
     tb_trace_i("ralloc_count: %lu",         impl->ralloc_count);
