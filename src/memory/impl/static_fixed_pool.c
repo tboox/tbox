@@ -36,9 +36,39 @@
  * macros
  */
 
-#define tb_static_fixed_pool_used_set1(used, i)             do {(used)[(i) >> 3] |= (0x1 << ((i) & 7));} while (0)
-#define tb_static_fixed_pool_used_set0(used, i)             do {(used)[(i) >> 3] &= ~(0x1 << ((i) & 7));} while (0)
-#define tb_static_fixed_pool_used_bset(used, i)             ((used)[(i) >> 3] & (0x1 << ((i) & 7)))
+#ifdef TB_WORDS_BIGENDIAN
+
+// allocate the index 
+#   define tb_static_fixed_pool_used_set1(used, i)          do {(used)[(i) >> 3] |= (0x1 << (7 - ((i) & 7)));} while (0)
+
+// free the index
+#   define tb_static_fixed_pool_used_set0(used, i)          do {(used)[(i) >> 3] &= ~(0x1 << (7 - ((i) & 7)));} while (0)
+
+// the index have been allocated?
+#   define tb_static_fixed_pool_used_bset(used, i)          ((used)[(i) >> 3] & (0x1 << (7 - ((i) & 7))))
+
+// find the first free index
+#   define tb_static_fixed_pool_find_free(v)                tb_bits_fb0_be(v)
+
+#else
+
+// allocate the index 
+#   define tb_static_fixed_pool_used_set1(used, i)          do {(used)[(i) >> 3] |= (0x1 << ((i) & 7));} while (0)
+
+// free the index
+#   define tb_static_fixed_pool_used_set0(used, i)          do {(used)[(i) >> 3] &= ~(0x1 << ((i) & 7));} while (0)
+
+// the index have been allocated?
+#   define tb_static_fixed_pool_used_bset(used, i)          ((used)[(i) >> 3] & (0x1 << ((i) & 7)))
+
+// find the first free index
+#   define tb_static_fixed_pool_find_free(v)                tb_bits_fb0_le(v)
+
+#endif
+
+// cache the predicted index
+#define tb_static_fixed_pool_cache_pred(impl, i)            do { (impl)->pred_index = ((i) >> TB_CPU_SHIFT) + 1; } while (0)
+
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -55,6 +85,9 @@ typedef __tb_pool_data_aligned__ struct __tb_static_fixed_pool_impl_t
 
     // the used info
     tb_byte_t*                  used_info;
+
+    // the used info size
+    tb_size_t                   info_size;
 
     // the predict index
     tb_size_t                   pred_index;
@@ -112,13 +145,27 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fixed_poo
     {
         // exists the predict index?
         tb_check_break(impl->pred_index);
-    
-        // the index
-        tb_size_t index = impl->pred_index - 1;
-        tb_assert_and_check_break(index < impl->item_maxn);
 
-        // clear the pred index
-        impl->pred_index = 0;
+        // the predict index
+        tb_size_t pred_index = impl->pred_index - 1;
+        tb_assert_abort((pred_index << TB_CPU_SHIFT) < impl->item_maxn);
+    
+        // the predict data
+        tb_size_t* data = (tb_size_t*)impl->used_info + pred_index;
+
+        // full?
+        tb_check_break((*data) + 1);
+
+        // the free bit index
+        tb_size_t index = (pred_index << TB_CPU_SHIFT) + tb_static_fixed_pool_find_free(*data);
+        
+        // out of range?
+        if (index >= impl->item_maxn)
+        {
+            // clear the pred index
+            impl->pred_index = 0;
+            break;
+        }
 
         // check
         tb_assert_abort(!tb_static_fixed_pool_used_bset(impl->used_info, index));
@@ -129,9 +176,16 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fixed_poo
         // allocate it
         tb_static_fixed_pool_used_set1(impl->used_info, index);
 
-        // predict the next index
-        if (index + 1 < impl->item_maxn && !tb_static_fixed_pool_used_bset(impl->used_info, index + 1))
-            impl->pred_index = index + 2;
+        // the predict data is full
+        if (!((*data) + 1)) 
+        {
+            // clear the predict index
+            impl->pred_index = 0;
+
+            // predict the next index
+            if (index + 1 < impl->item_maxn && !tb_static_fixed_pool_used_bset(impl->used_info, index + 1))
+                tb_static_fixed_pool_cache_pred(impl, index + 1);
+        }
 
     } while (0);
 
@@ -151,14 +205,9 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_poo
     tb_assert_and_check_return_val(impl, tb_null);
 
     // init
-#if TB_CPU_BIT64
-    tb_size_t   m = tb_align(impl->item_maxn, 64) >> 6;
-#elif TB_CPU_BIT32
-    tb_size_t   m = tb_align(impl->item_maxn, 32) >> 5;
-#endif
     tb_size_t   i = 0;
     tb_size_t*  p = (tb_size_t*)impl->used_info;
-    tb_size_t*  e = (tb_size_t*)impl->used_info + m;
+    tb_size_t*  e = (tb_size_t*)(impl->used_info + impl->info_size);
     tb_byte_t*  d = tb_null;
 
     // check align
@@ -168,7 +217,7 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_poo
 #ifdef __tb_small__ 
 //  while (p < e && *p == 0xffffffff) p++;
 //  while (p < e && *p == 0xffffffffffffffffL) p++;
-    while (p < e && !(*p + 1)) p++;
+    while (p < e && !((*p) + 1)) p++;
 #else
     while (p + 7 < e)
     {
@@ -187,17 +236,16 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_poo
     tb_check_return_val(p < e, tb_null);
 
     // find the free bit index
-    m = impl->item_maxn;
-    i = (((tb_byte_t*)p - impl->used_info) << 3) + tb_bits_fb0_le(*p);
+    tb_size_t m = impl->item_maxn;
+    i = (((tb_byte_t*)p - impl->used_info) << 3) + tb_static_fixed_pool_find_free(*p);
     tb_check_return_val(i < m, tb_null);
 
     // allocate it
     d = impl->data + i * impl->item_space;
     tb_static_fixed_pool_used_set1(impl->used_info, i);
 
-    // predict the next index
-    if (i + 1 < m && !tb_static_fixed_pool_used_bset(impl->used_info, i + 1))
-        impl->pred_index = i + 2;
+    // predict this index if no full?
+    if ((*p) + 1) tb_static_fixed_pool_cache_pred(impl, i);
 
     // ok?
     return (tb_pool_data_head_t*)d;
@@ -245,7 +293,7 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_poo
 
             // predict the next block
             if (i + 1 < m && !tb_static_fixed_pool_used_bset(impl->used_info, i + 1))
-                impl->pred_index = i + 2;
+                tb_static_fixed_pool_cache_pred(impl, i + 1);
 
             break;
         }
@@ -363,12 +411,16 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
      */
     impl->item_maxn = (((data + size - impl->used_info) << 3) - 7) / (1 + (impl->item_space << 3));
     tb_assert_and_check_return_val(impl->item_maxn, tb_null);
+
+    // init the used info size
+    impl->info_size = tb_align(impl->item_maxn, TB_CPU_BITSIZE) >> 3;
+    tb_assert_and_check_return_val(impl->info_size && !(impl->info_size & (TB_CPU_BITBYTE - 1)), tb_null);
  
     // clear the used info
-    tb_memset_(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
+    tb_memset_(impl->used_info, 0, impl->info_size);
 
     // init data
-    impl->data = (tb_byte_t*)tb_align((tb_size_t)impl->used_info + (tb_align8(impl->item_maxn) >> 3), TB_POOL_DATA_ALIGN);
+    impl->data = (tb_byte_t*)tb_align((tb_size_t)impl->used_info + impl->info_size, TB_POOL_DATA_ALIGN);
     tb_assert_and_check_return_val(data + size > impl->data, tb_null);
     tb_assert_and_check_return_val(impl->item_maxn * impl->item_space <= (tb_size_t)(data + size - impl->data + 1), tb_null);
 
@@ -445,7 +497,7 @@ tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t pool)
     tb_assert_and_check_return(impl);
 
     // clear used_info
-    if (impl->used_info) tb_memset_(impl->used_info, 0, (tb_align8(impl->item_maxn) >> 3));
+    if (impl->used_info) tb_memset_(impl->used_info, 0, impl->info_size);
 
     // clear size
     impl->item_count = 0;
@@ -579,7 +631,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
         tb_static_fixed_pool_used_set0(impl->used_info, index);
         
         // predict it if no cache
-        if (!impl->pred_index) impl->pred_index = index + 1;
+        if (!impl->pred_index) tb_static_fixed_pool_cache_pred(impl, index);
 
         // size--
         impl->item_count--;
