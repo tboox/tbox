@@ -474,7 +474,7 @@ tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, 
         tb_fixed_pool_ref_t fixed_pool_new = tb_small_pool_find_fixed(impl, size);
         tb_assert_and_check_break(fixed_pool_new);
 
-        // small space?
+        // same space?
         if (fixed_pool_old == fixed_pool_new) 
         {
 #ifdef __tb_debug__

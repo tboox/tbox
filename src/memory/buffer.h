@@ -50,6 +50,13 @@ typedef struct __tb_buffer_t
     // the buffer maxn
     tb_size_t       maxn;
 
+    // the static buffer
+#ifdef __tb_small__
+    tb_byte_t       buff[32];
+#else
+    tb_byte_t       buff[64];
+#endif
+
 }tb_buffer_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
