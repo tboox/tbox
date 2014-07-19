@@ -48,23 +48,20 @@ tb_bool_t tb_buffer_init(tb_buffer_t* buffer)
     tb_assert_and_check_return_val(buffer, tb_false);
 
     // init
-    tb_memset(buffer, 0, sizeof(tb_buffer_t));
+    buffer->data = buffer->buff;
+    buffer->size = 0;
+    buffer->maxn = sizeof(buffer->buff);
 
     // ok
     return tb_true;
 }
 tb_void_t tb_buffer_exit(tb_buffer_t* buffer)
 {
-    if (buffer)
-    {
-        // exit data
-        if (buffer->data) tb_free(buffer->data);
-        buffer->data = tb_null;
+    // check
+    tb_assert_and_check_return(buffer);
 
-        // clear size
-        buffer->size = 0;
-        buffer->maxn = 0;
-    }
+    // clear it
+    tb_buffer_clear(buffer);
 }
 tb_byte_t* tb_buffer_data(tb_buffer_t* buffer)
 {
@@ -95,69 +92,95 @@ tb_void_t tb_buffer_clear(tb_buffer_t* buffer)
     // check
     tb_assert_and_check_return(buffer);
 
-    // clear it
+    // clear data
+    if (buffer->data && buffer->data != buffer->buff) tb_free(buffer->data);
+    buffer->data = buffer->buff;
+
+    // clear size
     buffer->size = 0;
+    buffer->maxn = sizeof(buffer->buff);
 }
 tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(buffer, tb_null);
+    tb_assert_and_check_return_val(buffer && size, tb_null);
 
-    // save it
-    tb_buffer_t b = *buffer;
-    
     // done
-    tb_bool_t ok = tb_false;
+    tb_bool_t   ok = tb_false;
+    tb_byte_t*  buff_data = buffer->data;
+    tb_size_t   buff_size = buffer->size;
+    tb_size_t   buff_maxn = buffer->maxn;
     do
     {
-        // null?
-        if (!buffer->data) 
-        {
-            // check size
-            tb_assert_and_check_break(!buffer->size && size);
+        // check
+        tb_assert_and_check_break(buff_data);
 
-            // compute size
-            buffer->size = size;
-            buffer->maxn = tb_align8(size + TB_BUFFER_GROW_SIZE);
-            tb_assert_and_check_break(size < buffer->maxn);
-
-            // alloc data
-            buffer->data = tb_malloc_bytes(buffer->maxn);
-            tb_assert_and_check_break(buffer->data);
-        }
-        // decrease
-        else if (size < buffer->maxn)
+        // using static buffer?
+        if (buff_data == buffer->buff)
         {
-            buffer->size = size;
+            // grow?
+            if (size > buff_maxn)
+            {
+                // grow maxn
+                buff_maxn = tb_align8(size + TB_BUFFER_GROW_SIZE);
+                tb_assert_and_check_break(size <= buff_maxn);
+
+                // grow data
+                buff_data = tb_malloc_bytes(buff_maxn);
+                tb_assert_and_check_break(buff_data);
+
+                // copy data
+                tb_memcpy(buff_data, buffer->buff, buff_size);
+            }
+
+            // update the size
+            buff_size = size;
         }
-        // increase
         else
         {
-            // compute size
-            buffer->maxn = tb_align8(size + TB_BUFFER_GROW_SIZE);
-            tb_assert_and_check_break(size < buffer->maxn);
+            // grow?
+            if (size > buff_maxn)
+            {
+                // grow maxn
+                buff_maxn = tb_align8(size + TB_BUFFER_GROW_SIZE);
+                tb_assert_and_check_break(size <= buff_maxn);
 
-            // realloc
-            buffer->size = size;
-            buffer->data = (tb_byte_t*)tb_ralloc(buffer->data, buffer->maxn);
-            tb_assert_and_check_break(buffer->data);
+                // grow data
+                buff_data = (tb_byte_t*)tb_ralloc(buff_data, buff_maxn);
+                tb_assert_and_check_break(buff_data);
+            }
+            // decrease to the static buffer
+            else if (size <= sizeof(buffer->buff))
+            {
+                // update the maxn
+                buff_maxn = sizeof(buffer->buff);
+
+                // copy data
+                tb_memcpy(buffer->buff, buff_data, size);
+
+                // free data
+                tb_free(buff_data);
+
+                // using the static buffer
+                buff_data = buffer->buff;
+            }
+
+            // update the size
+            buff_size = size;
         }
+
+        // update the buffer
+        buffer->data = buff_data;
+        buffer->size = buff_size;
+        buffer->maxn = buff_maxn;
 
         // ok 
         ok = tb_true;
 
     } while (0);
 
-    // failed?
-    if (!ok)
-    {
-        // restore it
-        *buffer = b;
-        return tb_null;
-    }
-
     // ok
-    return (tb_byte_t*)buffer->data;
+    return ok? (tb_byte_t*)buffer->data : tb_null;
 }
 tb_byte_t* tb_buffer_memset(tb_buffer_t* buffer, tb_byte_t b)
 {
