@@ -8,13 +8,12 @@
  */ 
 tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 {
-    // init stream
-    tb_stream_ref_t stream = tb_stream_init_from_url(argv[1]);
-    if (stream && tb_stream_open(stream))
+    // init reader
+    tb_xml_reader_ref_t reader = tb_xml_reader_init();
+    if (reader)
     {
-        // init reader
-        tb_xml_reader_ref_t reader = tb_xml_reader_init(stream);
-        if (reader)
+        // open reader
+        if (tb_xml_reader_open(reader, tb_stream_init_from_url(argv[1]), tb_true))
         {
             // goto
             tb_bool_t ok = tb_true;
@@ -104,13 +103,10 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
                     break;
                 }
             }
-
-            // exit reader
-            tb_xml_reader_exit(reader);
         }
-    
-        // exit stream
-        tb_stream_exit(stream);
+
+        // exit reader
+        tb_xml_reader_exit(reader);
     }
     
     return 0;

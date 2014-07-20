@@ -287,6 +287,10 @@ static tb_demo_spider_parser_t* tb_demo_spider_parser_init(tb_thread_pool_worker
             // init stream
             parser->stream = tb_stream_init_file();
             tb_assert_and_check_break(parser->stream);
+
+            // init reader
+            parser->reader = tb_xml_reader_init();
+            tb_assert_and_check_break(parser->reader);
         }
 
         // ok
@@ -313,20 +317,19 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
 
     // init parser
     tb_demo_spider_parser_t* parser = tb_demo_spider_parser_init(worker);
-    tb_assert_and_check_return(parser && parser->stream);
+    tb_assert_and_check_return(parser && parser->stream && parser->reader);
 
-    // init stream
+    // open stream
     if (tb_demo_spider_parser_open_html(parser->stream, task->ourl))
     {
-        // init reader
-        tb_xml_reader_ref_t reader = tb_xml_reader_init(parser->stream);
-        if (reader)
+        // open reader
+        if (tb_xml_reader_open(parser->reader, parser->stream, tb_false))
         {
             // parse url
             tb_char_t data[TB_DEMO_SPIDER_URL_MAXN] = {0};
             tb_bool_t html = tb_true;
             while (     TB_STATE_OK == tb_atomic_get(&task->spider->state)
-                    &&  tb_demo_spider_parser_get_url(reader, data, sizeof(data) - 1, &html))
+                    &&  tb_demo_spider_parser_get_url(parser->reader, data, sizeof(data) - 1, &html))
             {
                 // trace
                 tb_trace_d("parser: done: %s => %s", task->iurl, data);
@@ -339,8 +342,8 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
                 html = tb_true;
             }
 
-            // exit reader
-            tb_xml_reader_exit(reader);
+            // clos reader
+            tb_xml_reader_clos(parser->reader);
         }
 
         // clos stream

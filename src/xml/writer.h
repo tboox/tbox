@@ -48,18 +48,32 @@ typedef struct{}*       tb_xml_writer_ref_t;
 
 /*! init the xml writer
  *
- * @param stream        the stream
- * @param bformat       is format xml?
- *
  * @return              the writer 
  */
-tb_xml_writer_ref_t     tb_xml_writer_init(tb_stream_ref_t stream, tb_bool_t bformat);
+tb_xml_writer_ref_t     tb_xml_writer_init(tb_noarg_t);
 
 /*! exit the xml writer
  *
  * @param writer        the xml writer
  */
 tb_void_t               tb_xml_writer_exit(tb_xml_writer_ref_t writer);
+
+/*! open the xml writer
+ *
+ * @param writer        the xml writer
+ * @param bformat       is format xml?
+ * @param stream        the stream, will open it if be not opened
+ * @param bowner        the xml writer is owner of the stream?
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_xml_writer_open(tb_xml_writer_ref_t writer, tb_bool_t bformat, tb_stream_ref_t stream, tb_bool_t bowner);
+
+/*! clos the xml writer
+ *
+ * @param writer        the xml writer
+ */
+tb_void_t               tb_xml_writer_clos(tb_xml_writer_ref_t writer);
 
 /*! save the xml document or node
  *

@@ -521,38 +521,42 @@ static tb_object_ref_t tb_object_xplist_reader_done(tb_stream_ref_t stream)
 {
     // init reader 
     tb_object_xplist_reader_t reader = {0};
-    reader.reader = tb_xml_reader_init(stream);
+    reader.reader = tb_xml_reader_init();
     tb_assert_and_check_return_val(reader.reader, tb_null);
 
-    // done
-    tb_bool_t       leave = tb_false;
-    tb_size_t       event = TB_XML_READER_EVENT_NONE;
+    // open reader
     tb_object_ref_t object = tb_null;
-    while (!leave && !object && (event = tb_xml_reader_next(reader.reader)))
+    if (tb_xml_reader_open(reader.reader, stream, tb_false))
     {
-        switch (event)
+        // done
+        tb_bool_t       leave = tb_false;
+        tb_size_t       event = TB_XML_READER_EVENT_NONE;
+        while (!leave && !object && (event = tb_xml_reader_next(reader.reader)))
         {
-        case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
-        case TB_XML_READER_EVENT_ELEMENT_BEG: 
+            switch (event)
             {
-                // name
-                tb_char_t const* name = tb_xml_reader_element(reader.reader);
-                tb_assert_and_check_break_state(name, leave, tb_true);
-
-                // <plist/> ?
-                if (tb_stricmp(name, "plist"))
+            case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+            case TB_XML_READER_EVENT_ELEMENT_BEG: 
                 {
-                    // func
-                    tb_object_xplist_reader_func_t func = tb_object_xplist_reader_func(name);
-                    tb_assert_and_check_break_state(func, leave, tb_true);
+                    // name
+                    tb_char_t const* name = tb_xml_reader_element(reader.reader);
+                    tb_assert_and_check_break_state(name, leave, tb_true);
 
-                    // read
-                    object = func(&reader, event);
+                    // <plist/> ?
+                    if (tb_stricmp(name, "plist"))
+                    {
+                        // func
+                        tb_object_xplist_reader_func_t func = tb_object_xplist_reader_func(name);
+                        tb_assert_and_check_break_state(func, leave, tb_true);
+
+                        // read
+                        object = func(&reader, event);
+                    }
                 }
+                break;
+            default:
+                break;
             }
-            break;
-        default:
-            break;
         }
     }
 
