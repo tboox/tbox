@@ -68,6 +68,60 @@ static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_impl_t* filter, 
     // ok?
     return real;
 }
+static tb_bool_t tb_stream_filter_charset_ctrl(tb_stream_filter_impl_t* filter, tb_size_t ctrl, tb_va_list_t args)
+{
+    // check
+    tb_stream_filter_charset_t* cfilter = tb_stream_filter_charset_cast(filter);
+    tb_assert_and_check_return_val(cfilter && ctrl, tb_false);
+
+    // ctrl
+    switch (ctrl)
+    {
+    case TB_STREAM_FILTER_CTRL_CHARSET_GET_FTYPE:
+        {
+            // the pftype
+            tb_size_t* pftype = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+            tb_assert_and_check_break(pftype);
+
+            // get ftype
+            *pftype = cfilter->ftype;
+
+            // ok
+            return tb_true;
+        }
+    case TB_STREAM_FILTER_CTRL_CHARSET_SET_FTYPE:
+        {
+            // set ftype
+            cfilter->ftype = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+            // ok
+            return tb_true;
+        }
+    case TB_STREAM_FILTER_CTRL_CHARSET_GET_TTYPE:
+        {
+            // the pttype
+            tb_size_t* pttype = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+            tb_assert_and_check_break(pttype);
+
+            // get ttype
+            *pttype = cfilter->ttype;
+
+            // ok
+            return tb_true;
+        }
+    case TB_STREAM_FILTER_CTRL_CHARSET_SET_TTYPE:
+        {
+            // set ttype
+            cfilter->ttype = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+            // ok
+            return tb_true;
+        }
+    default:
+        break;
+    }
+    return tb_false;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -86,6 +140,7 @@ tb_stream_filter_ref_t tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_
         // init filter 
         if (!tb_stream_filter_impl_init((tb_stream_filter_impl_t*)filter, TB_STREAM_FILTER_TYPE_CHARSET)) break;
         filter->base.spak = tb_stream_filter_charset_spak;
+        filter->base.ctrl = tb_stream_filter_charset_ctrl;
 
         // init the from and to charset
         filter->ftype = fr;

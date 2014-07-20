@@ -56,6 +56,9 @@ typedef struct __tb_xml_reader_impl_t
 
     // the level
     tb_size_t               level;
+
+    // is bowner of the input stream?
+    tb_bool_t               bowner;
     
     // the input stream
     tb_stream_ref_t         istream;
@@ -132,18 +135,11 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_impl_t* reader)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_xml_reader_ref_t tb_xml_reader_init(tb_stream_ref_t stream)
+tb_xml_reader_ref_t tb_xml_reader_init()
 {
-    // check
-    tb_assert_and_check_return_val(stream, tb_null);
-
-    // alloc
+    // init reader
     tb_xml_reader_impl_t* reader = tb_malloc0_type(tb_xml_reader_impl_t);
     tb_assert_and_check_return_val(reader, tb_null);
-
-    // init stream
-    reader->istream = stream;
-    reader->rstream = stream;
 
     // init string
     tb_string_init(&reader->version);
@@ -172,7 +168,10 @@ tb_void_t tb_xml_reader_exit(tb_xml_reader_ref_t reader)
     tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
     tb_assert_and_check_return(impl);
 
-    // exit stream
+    // clos it first
+    tb_xml_reader_clos(reader);
+
+    // exit the filter stream
     if (impl->fstream) tb_stream_exit(impl->fstream);
 
     // exit version
@@ -202,17 +201,82 @@ tb_void_t tb_xml_reader_exit(tb_xml_reader_ref_t reader)
     // free it
     tb_free(impl);
 }
-tb_void_t tb_xml_reader_clear(tb_xml_reader_ref_t reader)
+tb_bool_t tb_xml_reader_open(tb_xml_reader_ref_t reader, tb_stream_ref_t stream, tb_bool_t bowner)
+{
+    // check
+    tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
+    tb_assert_and_check_return_val(impl && stream, tb_false);
+
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // check
+        tb_assert_and_check_break(!impl->rstream && !impl->istream);
+
+        // init level
+        impl->level = 0;
+
+        // init owner
+        impl->bowner = bowner;
+        
+        // init the input stream 
+        impl->istream = stream;
+
+        // init the reader stream
+        impl->rstream = stream;
+
+        // open the reader stream if be not opened
+        if (!tb_stream_is_opened(impl->rstream) && !tb_stream_open(impl->rstream)) break;
+
+        // clear element
+        tb_string_clear(&impl->element);
+
+        // clear name
+        tb_string_clear(&impl->name);
+
+        // clear text
+        tb_string_clear(&impl->text);
+
+        // clear attributes
+        tb_long_t i = 0;
+        for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAXN; i++)
+        {
+            tb_xml_node_ref_t node = (tb_xml_node_ref_t)(impl->attributes + i);
+            tb_string_clear(&node->name);
+            tb_string_clear(&node->data);
+        }
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? close it
+    if (!ok) tb_xml_reader_clos(reader);
+
+    // ok?
+    return ok;
+}
+tb_void_t tb_xml_reader_clos(tb_xml_reader_ref_t reader)
 {
     // check
     tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
     tb_assert_and_check_return(impl);
 
-    // reinit level
+    // clos the reader stream
+    if (impl->rstream) tb_stream_clos(impl->rstream);
+    impl->rstream = tb_null;
+
+    // exit the input stream
+    if (impl->istream && impl->bowner) tb_stream_exit(impl->istream);
+    impl->istream = tb_null;
+
+    // clear level
     impl->level = 0;
 
-    // reset stream
-    if (impl->rstream) tb_stream_seek(impl->rstream, 0);
+    // clear owner
+    impl->bowner = tb_false;
 
     // clear element
     tb_string_clear(&impl->element);
@@ -302,7 +366,23 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
                     if (charset != TB_CHARSET_TYPE_UTF8)
                     {
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
-                        impl->fstream = tb_stream_init_filter_from_charset(impl->istream, charset, TB_CHARSET_TYPE_UTF8);
+                        // init the filter stream
+                        if (!impl->fstream) impl->fstream = tb_stream_init_filter_from_charset(impl->istream, charset, TB_CHARSET_TYPE_UTF8);
+                        else
+                        {
+                            // ctrl stream
+                            if (!tb_stream_ctrl(impl->fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, impl->istream)) break;
+
+                            // the filter
+                            tb_stream_filter_ref_t filter = tb_null;
+                            if (!tb_stream_ctrl(impl->fstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+                            tb_assert_and_check_break(filter);
+
+                            // ctrl filter
+                            if (!tb_stream_filter_ctrl(filter, TB_STREAM_FILTER_CTRL_CHARSET_SET_FTYPE, charset)) break;
+                        }
+
+                        // open the filter stream
                         if (impl->fstream && tb_stream_open(impl->fstream))
                             impl->rstream = impl->fstream;
                         tb_string_cstrcpy(&impl->charset, "utf-8");
