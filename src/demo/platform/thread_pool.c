@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */ 
-static tb_void_t tb_demo_task_time_done(tb_cpointer_t priv)
+static tb_void_t tb_demo_task_time_done(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("done: %u ms", tb_p2u32(priv));
@@ -14,7 +14,7 @@ static tb_void_t tb_demo_task_time_done(tb_cpointer_t priv)
     // wait some time
     tb_msleep(tb_p2u32(priv));
 }
-static tb_void_t tb_demo_task_time_exit(tb_cpointer_t priv)
+static tb_void_t tb_demo_task_time_exit(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("exit: %u ms", tb_p2u32(priv));

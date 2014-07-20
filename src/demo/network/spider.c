@@ -64,6 +64,17 @@ typedef struct __tb_demo_spider_t
 
 }tb_demo_spider_t;
 
+// the demo spider parser type
+typedef struct __tb_demo_spider_parser_t
+{
+    // the stream
+    tb_stream_ref_t             stream;
+
+    // the reader
+    tb_xml_reader_ref_t         reader;
+
+}tb_demo_spider_parser_t;
+
 // the demo spider task type
 typedef struct __tb_demo_spider_task_t
 {
@@ -106,22 +117,20 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 #if defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
     && defined(TB_CONFIG_MODULE_HAVE_ASIO) \
     && defined(TB_CONFIG_MODULE_HAVE_XML)
-static tb_stream_ref_t tb_demo_spider_parser_open_html(tb_char_t const* url)
+static tb_bool_t tb_demo_spider_parser_open_html(tb_stream_ref_t stream, tb_char_t const* url)
 {
     // check
-    tb_assert_and_check_return_val(url, tb_null);
+    tb_assert_and_check_return_val(stream && url, tb_false);
 
     // done
-    tb_bool_t           ok = tb_false;
-    tb_stream_ref_t  stream = tb_null;
+    tb_bool_t ok = tb_false;
     do
     {
         // the file path contains /html/?
         if (!tb_strstr(url, "html")) break;
 
-        // init stream
-        stream = tb_stream_init_from_url(url);
-        tb_assert_and_check_break(stream);
+        // ctrl stream
+        if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_URL, url)) break;
 
         // open stream
         if (!tb_stream_open(stream)) break;
@@ -150,13 +159,12 @@ static tb_stream_ref_t tb_demo_spider_parser_open_html(tb_char_t const* url)
     // failed?
     if (!ok) 
     {
-        // exit stream
-        if (stream) tb_stream_exit(stream);
-        stream = tb_null;
+        // clos stream
+        if (stream) tb_stream_clos(stream);
     }
 
     // ok?
-    return stream;
+    return ok;
 }
 static tb_size_t tb_demo_spider_parser_get_url(tb_xml_reader_ref_t reader, tb_char_t* data, tb_size_t maxn, tb_bool_t* html)
 {
@@ -238,18 +246,80 @@ static tb_size_t tb_demo_spider_parser_get_url(tb_xml_reader_ref_t reader, tb_ch
     // ok?
     return ok;
 }
-static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
+static tb_void_t tb_demo_spider_parser_exit(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv)
+{
+    // check
+    tb_demo_spider_parser_t* parser = (tb_demo_spider_parser_t*)priv;
+    tb_assert_and_check_return(parser);
+
+    // exit stream
+    if (parser->stream) tb_stream_exit(parser->stream);
+    parser->stream = tb_null;
+
+    // exit reader
+    if (parser->reader) tb_xml_reader_exit(parser->reader);
+    parser->reader = tb_null;
+
+    // exit it
+    tb_free(parser);
+}
+static tb_demo_spider_parser_t* tb_demo_spider_parser_init(tb_thread_pool_worker_ref_t worker)
+{
+    // check 
+    tb_assert_and_check_return_val(worker, tb_null);
+
+    // done
+    tb_bool_t                   ok = tb_false;
+    tb_demo_spider_parser_t*    parser = tb_null;
+    do
+    {
+        // attempt to get the parser
+        parser = (tb_demo_spider_parser_t*)tb_thread_pool_worker_getp(worker, 0);
+        if (!parser)
+        {
+            // make parser
+            parser = tb_malloc0_type(tb_demo_spider_parser_t);
+            tb_assert_and_check_break(parser);
+
+            // save parser
+            tb_thread_pool_worker_setp(worker, 0, tb_demo_spider_parser_exit, (tb_cpointer_t)parser);
+
+            // init stream
+            parser->stream = tb_stream_init_file();
+            tb_assert_and_check_break(parser->stream);
+        }
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (parser) tb_demo_spider_parser_exit(worker, (tb_cpointer_t)parser);
+        parser = tb_null;
+    }
+
+    // ok
+    return parser;
+}
+static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv)
 {
     // check
     tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;
-    tb_assert_and_check_return(task && task->spider);
+    tb_assert_and_check_return(worker && task && task->spider);
+
+    // init parser
+    tb_demo_spider_parser_t* parser = tb_demo_spider_parser_init(worker);
+    tb_assert_and_check_return(parser && parser->stream);
 
     // init stream
-    tb_stream_ref_t stream = tb_demo_spider_parser_open_html(task->ourl);
-    if (stream)
+    if (tb_demo_spider_parser_open_html(parser->stream, task->ourl))
     {
         // init reader
-        tb_xml_reader_ref_t reader = tb_xml_reader_init(stream);
+        tb_xml_reader_ref_t reader = tb_xml_reader_init(parser->stream);
         if (reader)
         {
             // parse url
@@ -273,16 +343,16 @@ static tb_void_t tb_demo_spider_parser_done(tb_cpointer_t priv)
             tb_xml_reader_exit(reader);
         }
 
-        // exit stream
-        tb_stream_exit(stream);
+        // clos stream
+        tb_stream_clos(parser->stream);
     }
 }
-static tb_void_t tb_demo_spider_parser_exit(tb_cpointer_t priv)
+static tb_void_t tb_demo_spider_parser_task_exit(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv)
 {
     // check
     tb_demo_spider_task_t* task = (tb_demo_spider_task_t*)priv;
-    tb_assert_and_check_return(task);
-
+    tb_assert_and_check_return(worker && task);
+   
     // exit task
     tb_demo_spider_task_exit(task);
 }
@@ -385,7 +455,7 @@ static tb_bool_t tb_demo_spider_task_save(tb_size_t state, tb_hize_t offset, tb_
         tb_trace_i("task: done: %s: ok", task->iurl);
 
         // post parser task
-        tb_thread_pool_task_post(tb_thread_pool(), "parser_task", tb_demo_spider_parser_done, tb_demo_spider_parser_exit, task, tb_false);
+        tb_thread_pool_task_post(tb_thread_pool(), "parser_task", tb_demo_spider_parser_task_done, tb_demo_spider_parser_task_exit, task, tb_false);
     }
     // failed or killed?
     else 
