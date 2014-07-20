@@ -84,10 +84,10 @@
 typedef struct __tb_thread_pool_job_t
 {
     // the task
-    tb_thread_pool_task_t   task;
+    tb_thread_pool_task_t               task;
 
     // the reference count, must be <= 2
-    tb_atomic_t             refn;
+    tb_atomic_t                         refn;
 
     /* the state
      *
@@ -97,10 +97,10 @@ typedef struct __tb_thread_pool_job_t
      * TB_STATE_KILLING
      * TB_STATE_FINISHED
      */
-    tb_atomic_t             state;
+    tb_atomic_t                         state;
 
     // the entry
-    tb_list_entry_t         entry;
+    tb_list_entry_t                     entry;
 
 }tb_thread_pool_job_t;
 
@@ -108,36 +108,50 @@ typedef struct __tb_thread_pool_job_t
 typedef struct __tb_thread_pool_job_stats_t
 {
     // the done count
-    tb_size_t               done_count;
+    tb_size_t                           done_count;
 
     // the done total time
-    tb_hize_t               total_time;
+    tb_hize_t                           total_time;
 
 }tb_thread_pool_job_stats_t;
+
+// the thread pool worker priv type
+typedef struct __tb_thread_pool_worker_priv_t
+{
+    // the exit func
+    tb_thread_pool_priv_exit_func_t     exit;
+
+    // the private data
+    tb_cpointer_t                       priv;
+
+}tb_thread_pool_worker_priv_t;
 
 // the thread pool worker type
 typedef struct __tb_thread_pool_worker_t
 {
     // the worker id
-    tb_size_t               id;
+    tb_size_t                           id;
 
     // the thread pool 
-    tb_thread_pool_ref_t    pool;
+    tb_thread_pool_ref_t                pool;
 
     // the loop
-    tb_thread_ref_t         loop;
+    tb_thread_ref_t                     loop;
 
     // the jobs
-    tb_vector_ref_t         jobs;
+    tb_vector_ref_t                     jobs;
 
     // the pull time
-    tb_size_t               pull;
+    tb_size_t                           pull;
 
     // the stats
-    tb_hash_ref_t           stats;
+    tb_hash_ref_t                       stats;
 
     // is stoped?
-    tb_atomic_t             bstoped;
+    tb_atomic_t                         bstoped;
+
+    // the private data 
+    tb_thread_pool_worker_priv_t        priv[TB_THREAD_POOL_WORKER_PRIV_MAXN];
 
 }tb_thread_pool_worker_t;
 
@@ -145,37 +159,37 @@ typedef struct __tb_thread_pool_worker_t
 typedef struct __tb_thread_pool_impl_t
 {
     // the thread stack size
-    tb_size_t               stack;
+    tb_size_t                           stack;
 
     // the worker maxn
-    tb_size_t               worker_maxn;
+    tb_size_t                           worker_maxn;
 
     // the lock
-    tb_spinlock_t           lock;
+    tb_spinlock_t                       lock;
 
     // the jobs pool
-    tb_fixed_pool_ref_t     jobs_pool;
+    tb_fixed_pool_ref_t                 jobs_pool;
 
     // the urgent jobs
-    tb_list_entry_head_t    jobs_urgent;
+    tb_list_entry_head_t                jobs_urgent;
     
     // the waiting jobs
-    tb_list_entry_head_t    jobs_waiting;
+    tb_list_entry_head_t                jobs_waiting;
     
     // the pending jobs
-    tb_list_entry_head_t    jobs_pending;
+    tb_list_entry_head_t                jobs_pending;
 
     // is stoped
-    tb_bool_t               bstoped;
+    tb_bool_t                           bstoped;
 
     // the semaphore
-    tb_semaphore_ref_t      semaphore;
+    tb_semaphore_ref_t                  semaphore;
     
     // the worker size
-    tb_size_t               worker_size;
+    tb_size_t                           worker_size;
 
     // the worker list
-    tb_thread_pool_worker_t worker_list[TB_THREAD_POOL_WORKER_MAXN];
+    tb_thread_pool_worker_t             worker_list[TB_THREAD_POOL_WORKER_MAXN];
 
 }tb_thread_pool_impl_t;
 
@@ -287,7 +301,7 @@ static tb_long_t tb_thread_pool_worker_walk_pull_and_clean(tb_iterator_ref_t ite
         tb_trace_d("worker[%lu]: remove: task[%p:%s] from pending", worker->id, job->task.done, job->task.name);
 
         // exit the job
-        if (job->task.exit) job->task.exit(job->task.priv);
+        if (job->task.exit) job->task.exit((tb_thread_pool_worker_ref_t)worker, job->task.priv);
 
         // remove it from the waiting or urgent jobs
         ok = 0;
@@ -330,7 +344,7 @@ static tb_long_t tb_thread_pool_worker_walk_clean(tb_iterator_ref_t iterator, tb
         tb_trace_d("worker[%lu]: remove: task[%p:%s] from pending", worker->id, job->task.done, job->task.name);
 
         // exit the job
-        if (job->task.exit) job->task.exit(job->task.priv);
+        if (job->task.exit) job->task.exit((tb_thread_pool_worker_ref_t)worker, job->task.priv);
 
         // remove it from the pending jobs
         ok = 0;
@@ -497,7 +511,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                     tb_hong_t time = tb_cache_time_spak();
 
                     // done the job
-                    job->task.done(job->task.priv);
+                    job->task.done((tb_thread_pool_worker_ref_t)worker, job->task.priv);
 
                     // computate the time
                     time = tb_cache_time_spak() - time;
@@ -570,6 +584,22 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
         // stoped
         tb_atomic_set(&worker->bstoped, 1);
+
+        // exit all private data
+        tb_size_t i = 0;
+        tb_size_t n = tb_arrayn(worker->priv);
+        for (i = 0; i < n; i++)
+        {
+            // the private data
+            tb_thread_pool_worker_priv_t* priv = &worker->priv[n - i - 1];
+
+            // exit it
+            if (priv->exit) priv->exit((tb_thread_pool_worker_ref_t)worker, priv->priv);
+
+            // clear it
+            priv->exit = tb_null;
+            priv->priv = tb_null;
+        }
 
         // exit stats
         if (worker->stats) tb_hash_exit(worker->stats);
@@ -681,13 +711,12 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
                 // the worker 
                 tb_thread_pool_worker_t* worker = &impl->worker_list[i];
 
+                // clear worker
+                tb_memset(worker, 0, sizeof(tb_thread_pool_worker_t));
+
                 // init worker
                 worker->id          = i;
                 worker->pool        = (tb_thread_pool_ref_t)impl;
-                worker->bstoped     = 0;
-                worker->jobs        = tb_null;
-                worker->pull        = 0;
-                worker->stats       = tb_null;
                 worker->loop        = tb_thread_init(__tb_lstring__("thread_pool"), tb_thread_pool_worker_loop, worker, impl->stack);
                 tb_assert_and_check_continue(worker->loop);
             }
@@ -927,6 +956,25 @@ tb_size_t tb_thread_pool_worker_size(tb_thread_pool_ref_t pool)
 
     // ok?
     return worker_size;
+}
+tb_void_t tb_thread_pool_worker_setp(tb_thread_pool_worker_ref_t worker, tb_size_t index, tb_thread_pool_priv_exit_func_t exit, tb_cpointer_t priv)
+{
+    // check
+    tb_thread_pool_worker_t* worker_impl = (tb_thread_pool_worker_t*)worker;
+    tb_assert_and_check_return(worker_impl && index < tb_arrayn(worker_impl->priv));
+
+    // set the private data
+    worker_impl->priv[index].exit = exit;
+    worker_impl->priv[index].priv = priv;
+}
+tb_cpointer_t tb_thread_pool_worker_getp(tb_thread_pool_worker_ref_t worker, tb_size_t index)
+{
+    // check
+    tb_thread_pool_worker_t* worker_impl = (tb_thread_pool_worker_t*)worker;
+    tb_assert_and_check_return_val(worker_impl && index < tb_arrayn(worker_impl->priv), tb_null);
+
+    // get the private data
+    return worker_impl->priv[index].priv;
 }
 tb_size_t tb_thread_pool_task_size(tb_thread_pool_ref_t pool)
 {

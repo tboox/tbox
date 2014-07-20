@@ -35,14 +35,37 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the thread pool worker private data maximum count
+#ifdef __tb_small__
+#   define TB_THREAD_POOL_WORKER_PRIV_MAXN      (16)
+#else
+#   define TB_THREAD_POOL_WORKER_PRIV_MAXN      (32)
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
+/// the thread pool ref type
+typedef struct{}*                       tb_thread_pool_ref_t;
+
+/// the thread pool task ref type
+typedef struct{}*                       tb_thread_pool_task_ref_t;
+
+/// the thread pool worker ref type
+typedef struct{}*                       tb_thread_pool_worker_ref_t;
+
+/// the thread pool priv exit func type
+typedef tb_void_t                       (*tb_thread_pool_priv_exit_func_t)(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv);
+
 /// the thread pool task done func type
-typedef tb_void_t                       (*tb_thread_pool_task_done_func_t)(tb_cpointer_t priv);
+typedef tb_void_t                       (*tb_thread_pool_task_done_func_t)(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv);
 
 /// the thread pool task exit func type
-typedef tb_void_t                       (*tb_thread_pool_task_exit_func_t)(tb_cpointer_t priv);
+typedef tb_void_t                       (*tb_thread_pool_task_exit_func_t)(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv);
 
 /// the thread pool task type
 typedef struct __tb_thread_pool_task_t
@@ -63,12 +86,6 @@ typedef struct __tb_thread_pool_task_t
     tb_bool_t                           urgent;
 
 }tb_thread_pool_task_t;
-
-/// the thread pool ref type
-typedef struct{}*                       tb_thread_pool_ref_t;
-
-/// the thread pool task ref type
-typedef struct{}*                       tb_thread_pool_task_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -110,6 +127,24 @@ tb_void_t                   tb_thread_pool_kill(tb_thread_pool_ref_t pool);
  * @return                  the current worker count
  */
 tb_size_t                   tb_thread_pool_worker_size(tb_thread_pool_ref_t pool);
+
+/*! set the worker private data
+ *
+ * @param worker            the thread pool worker
+ * @param index             the private data index
+ * @param exit              the private data exit func
+ * @param priv              the private data
+ */
+tb_void_t                   tb_thread_pool_worker_setp(tb_thread_pool_worker_ref_t worker, tb_size_t index, tb_thread_pool_priv_exit_func_t exit, tb_cpointer_t priv);
+
+/*! get the worker private data
+ *
+ * @param worker            the thread pool worker
+ * @param index             the private data index
+ *
+ * @return                  the private data
+ */
+tb_cpointer_t               tb_thread_pool_worker_getp(tb_thread_pool_worker_ref_t worker, tb_size_t index);
 
 /*! the current waiting task count
  *
