@@ -83,6 +83,9 @@ tb_void_t tb_remove_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_c
                 // check
                 tb_assert_abort(size);
 
+                // the previous tail
+                tb_size_t prev_tail = tb_iterator_tail(iterator);
+
                 // remove items
                 tb_iterator_remove_range(iterator, base, !ok? next : itor, size);
 
@@ -96,15 +99,21 @@ tb_void_t tb_remove_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_c
                     // update itor
                     prev = base;
 
-                    // the next itor
-                    itor = tb_iterator_next(iterator, base);
-
-                    // the last item be not removed? skip the last walked item
-                    if (ok)
+                    // the body items are removed?
+                    if (base != prev_tail)
                     {
-                        prev = itor;
-                        itor = tb_iterator_next(iterator, itor);
+                        // the next itor
+                        itor = tb_iterator_next(iterator, base);
+
+                        // the last item be not removed? skip the last walked item
+                        if (ok)
+                        {
+                            prev = itor;
+                            itor = tb_iterator_next(iterator, itor);
+                        }
                     }
+                    // the head items are removed?
+                    else itor = tb_iterator_head(iterator);
 
                     // stop?
                     tb_check_break(!stop);
