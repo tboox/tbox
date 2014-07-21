@@ -420,11 +420,11 @@ static tb_void_t tb_demo_spider_task_exit(tb_demo_spider_task_t* task)
     tb_demo_spider_t* spider = task->spider;
     tb_assert_and_check_return(spider);
 
+    // trace
+    tb_trace_d("task: exit: %s", task->iurl);
+
     // enter
     tb_spinlock_enter(&spider->lock);
-
-    // trace
-    tb_trace_d("task: size: %lu, exit: %s", spider->pool? tb_fixed_pool_size(spider->pool) : 0, task->iurl);
 
     // exit task
     if (spider->pool) tb_fixed_pool_free(spider->pool, task);
@@ -562,6 +562,9 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 
     } while (0);
 
+    // leave
+    tb_spinlock_leave(&spider->lock);
+
     // failed?
     if (!ok)
     {
@@ -569,9 +572,6 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
         if (task) tb_demo_spider_task_exit(task);
         task = tb_null;
     }
-
-    // leave
-    tb_spinlock_leave(&spider->lock);
 
     // ok? done task
     if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, spider->limited_rate, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;

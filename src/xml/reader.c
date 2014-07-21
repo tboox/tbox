@@ -79,10 +79,16 @@ typedef struct __tb_xml_reader_impl_t
     tb_string_t             element;
 
     // the element name
-    tb_string_t             name;
+    tb_string_t             element_name;
 
     // the text
     tb_string_t             text;
+
+    // the attribute name
+    tb_string_t             attribute_name;
+
+    // the attribute data
+    tb_string_t             attribute_data;
 
     // the attributes
     tb_xml_attribute_t      attributes[TB_XML_READER_ATTRIBUTES_MAXN];
@@ -142,11 +148,13 @@ tb_xml_reader_ref_t tb_xml_reader_init()
     tb_assert_and_check_return_val(reader, tb_null);
 
     // init string
+    tb_string_init(&reader->text);
     tb_string_init(&reader->version);
     tb_string_init(&reader->charset);
     tb_string_init(&reader->element);
-    tb_string_init(&reader->name);
-    tb_string_init(&reader->text);
+    tb_string_init(&reader->element_name);
+    tb_string_init(&reader->attribute_name);
+    tb_string_init(&reader->attribute_data);
     tb_string_cstrcpy(&reader->version, "2.0");
     tb_string_cstrcpy(&reader->charset, "utf-8");
 
@@ -174,6 +182,9 @@ tb_void_t tb_xml_reader_exit(tb_xml_reader_ref_t reader)
     // exit the filter stream
     if (impl->fstream) tb_stream_exit(impl->fstream);
 
+    // exit text
+    tb_string_exit(&impl->text);
+
     // exit version
     tb_string_exit(&impl->version);
 
@@ -183,11 +194,14 @@ tb_void_t tb_xml_reader_exit(tb_xml_reader_ref_t reader)
     // exit element
     tb_string_exit(&impl->element);
 
-    // exit name
-    tb_string_exit(&impl->name);
+    // exit element name
+    tb_string_exit(&impl->element_name);
 
-    // exit text
-    tb_string_exit(&impl->text);
+    // exit attribute name
+    tb_string_exit(&impl->attribute_name);
+
+    // exit attribute data
+    tb_string_exit(&impl->attribute_data);
 
     // exit attributes
     tb_long_t i = 0;
@@ -229,14 +243,20 @@ tb_bool_t tb_xml_reader_open(tb_xml_reader_ref_t reader, tb_stream_ref_t stream,
         // open the reader stream if be not opened
         if (!tb_stream_is_opened(impl->rstream) && !tb_stream_open(impl->rstream)) break;
 
+        // clear text
+        tb_string_clear(&impl->text);
+
         // clear element
         tb_string_clear(&impl->element);
 
         // clear name
-        tb_string_clear(&impl->name);
+        tb_string_clear(&impl->element_name);
 
-        // clear text
-        tb_string_clear(&impl->text);
+        // clear attribute name
+        tb_string_clear(&impl->attribute_name);
+
+        // clear attribute data
+        tb_string_clear(&impl->attribute_data);
 
         // clear attributes
         tb_long_t i = 0;
@@ -278,14 +298,20 @@ tb_void_t tb_xml_reader_clos(tb_xml_reader_ref_t reader)
     // clear owner
     impl->bowner = tb_false;
 
+    // clear text
+    tb_string_clear(&impl->text);
+
     // clear element
     tb_string_clear(&impl->element);
 
     // clear name
-    tb_string_clear(&impl->name);
+    tb_string_clear(&impl->element_name);
 
-    // clear text
-    tb_string_clear(&impl->text);
+    // clear attribute name
+    tb_string_clear(&impl->attribute_name);
+
+    // clear attribute data
+    tb_string_clear(&impl->attribute_data);
 
     // clear attributes
     tb_long_t i = 0;
@@ -341,9 +367,6 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
             {
                 // update event
                 impl->event = TB_XML_READER_EVENT_DOCUMENT;
-
-                // remove ?xml, @note: overlap buffer
-                tb_string_cstrncpy(&impl->element, element + 4, size - 4);
 
                 // update version & charset
                 tb_xml_node_ref_t attr = (tb_xml_node_ref_t)tb_xml_reader_attributes(reader); 
@@ -813,7 +836,7 @@ tb_char_t const* tb_xml_reader_element(tb_xml_reader_ref_t reader)
     for (p = b; p < e && *p && !tb_isspace(*p) && *p != '/'; p++) ;
 
     // ok?
-    return p > b? tb_string_cstrncpy(&impl->name, b, p - b) : tb_null;
+    return p > b? tb_string_cstrncpy(&impl->element_name, b, p - b) : tb_null;
 }
 tb_char_t const* tb_xml_reader_doctype(tb_xml_reader_ref_t reader)
 {
@@ -841,12 +864,6 @@ tb_xml_node_ref_t tb_xml_reader_attributes(tb_xml_reader_ref_t reader)
     tb_char_t const* p = tb_string_cstr(&impl->element);
     tb_char_t const* e = p + tb_string_size(&impl->element);
 
-    // init name & data
-    tb_string_t name;
-    tb_string_t data;
-    tb_string_init(&name);
-    tb_string_init(&data);
-
     // skip name
     while (p < e && *p && !tb_isspace(*p)) p++;
     while (p < e && *p && tb_isspace(*p)) p++;
@@ -856,28 +873,28 @@ tb_xml_node_ref_t tb_xml_reader_attributes(tb_xml_reader_ref_t reader)
     while (p < e)
     {
         // parse name
-        tb_string_clear(&name);
-        for (; p < e && *p != '='; p++) if (!tb_isspace(*p)) tb_string_chrcat(&name, *p);
+        tb_string_clear(&impl->attribute_name);
+        for (; p < e && *p != '='; p++) if (!tb_isspace(*p)) tb_string_chrcat(&impl->attribute_name, *p);
         if (*p != '=') break;
 
         // parse data
-        tb_string_clear(&data);
+        tb_string_clear(&impl->attribute_data);
         for (p++; p < e && (*p != '\'' && *p != '\"'); p++) ;
         if (*p != '\'' && *p != '\"') break;
-        for (p++; p < e && (*p != '\'' && *p != '\"'); p++) tb_string_chrcat(&data, *p);
+        for (p++; p < e && (*p != '\'' && *p != '\"'); p++) tb_string_chrcat(&impl->attribute_data, *p);
         if (*p != '\'' && *p != '\"') break;
         p++;
 
         // append node
-        if (tb_string_cstr(&name) && tb_string_cstr(&data))
+        if (tb_string_cstr(&impl->attribute_name) && tb_string_cstr(&impl->attribute_data))
         {
             // node
             tb_xml_node_ref_t prev = n > 0? (tb_xml_node_ref_t)&impl->attributes[n - 1] : tb_null;
             tb_xml_node_ref_t node = (tb_xml_node_ref_t)&impl->attributes[n];
 
             // init node
-            tb_string_strcpy(&node->name, &name);
-            tb_string_strcpy(&node->data, &data);
+            tb_string_strcpy(&node->name, &impl->attribute_name);
+            tb_string_strcpy(&node->data, &impl->attribute_data);
 
             // append node
             if (prev) prev->next = node;
@@ -887,10 +904,6 @@ tb_xml_node_ref_t tb_xml_reader_attributes(tb_xml_reader_ref_t reader)
             n++;
         }
     }
-
-    // exit name & data
-    tb_string_exit(&name);
-    tb_string_exit(&data);
 
     // ok?
     return n? (tb_xml_node_ref_t)&impl->attributes[0] : tb_null;

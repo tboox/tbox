@@ -62,6 +62,14 @@ tb_void_t tb_buffer_exit(tb_buffer_t* buffer)
 
     // clear it
     tb_buffer_clear(buffer);
+
+    // exit data
+    if (buffer->data && buffer->data != buffer->buff) tb_free(buffer->data);
+    buffer->data = buffer->buff;
+
+    // exit size
+    buffer->size = 0;
+    buffer->maxn = sizeof(buffer->buff);
 }
 tb_byte_t* tb_buffer_data(tb_buffer_t* buffer)
 {
@@ -92,13 +100,8 @@ tb_void_t tb_buffer_clear(tb_buffer_t* buffer)
     // check
     tb_assert_and_check_return(buffer);
 
-    // clear data
-    if (buffer->data && buffer->data != buffer->buff) tb_free(buffer->data);
-    buffer->data = buffer->buff;
-
-    // clear size
+    // clear it
     buffer->size = 0;
-    buffer->maxn = sizeof(buffer->buff);
 }
 tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
 {
@@ -149,6 +152,7 @@ tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
                 buff_data = (tb_byte_t*)tb_ralloc(buff_data, buff_maxn);
                 tb_assert_and_check_break(buff_data);
             }
+#if 0
             // decrease to the static buffer
             else if (size <= sizeof(buffer->buff))
             {
@@ -164,6 +168,7 @@ tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
                 // using the static buffer
                 buff_data = buffer->buff;
             }
+#endif
 
             // update the size
             buff_size = size;
@@ -236,8 +241,8 @@ tb_byte_t* tb_buffer_memncpyp(tb_buffer_t* buffer, tb_size_t p, tb_byte_t const*
     tb_byte_t* d = tb_buffer_resize(buffer, p + n);
     tb_assert_and_check_return_val(d, tb_null);
 
-    // safer than memcpy, buffer maybe overlap
-    tb_memmov(d + p, b, n);
+    // copy it
+    tb_memcpy(d + p, b, n);
 
     // ok
     return d;

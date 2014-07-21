@@ -61,10 +61,11 @@ static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_pointer_t item)
     tb_assert_and_check_return(func && item);
 
     // exists?
-    if (*((tb_pointer_t*)item)) 
+    tb_pointer_t cstr = *((tb_pointer_t*)item);
+    if (cstr) 
     {
         // free it
-        tb_free(*((tb_pointer_t*)item));
+        tb_free(cstr);
 
         // clear it
         *((tb_pointer_t*)item) = tb_null;
@@ -83,13 +84,54 @@ static tb_void_t tb_item_func_str_dupl(tb_item_func_t* func, tb_pointer_t item, 
 static tb_void_t tb_item_func_str_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && item);
+    tb_assert_and_check_return(func && func->dupl && item);
 
+#if 0
     // free it
     if (func->free) func->free(func, item);
 
     // dupl it
-    if (func->dupl) func->dupl(func, item, data);
+    func->dupl(func, item, data);
+#else
+    // replace it
+    tb_pointer_t cstr = *((tb_pointer_t*)item);
+    if (cstr && data)
+    {
+        // attempt to replace it
+        tb_char_t*          p = (tb_char_t*)cstr;
+        tb_char_t const*    q = (tb_char_t const*)data;
+        while (*p && *q) *p++ = *q++;
+
+        // not enough space?
+        if (!*p && *q)
+        {
+            // the left size
+            tb_size_t left = tb_strlen(q);
+            tb_assert_abort(left);
+
+            // the copy size
+            tb_size_t copy = p - (tb_char_t*)cstr;
+
+            // grow size
+            cstr = tb_ralloc(cstr, copy + left + 1);
+            tb_assert_abort(cstr);
+
+            // copy the left data
+            tb_strlcpy((tb_char_t*)cstr + copy, q, left + 1); 
+
+            // update the cstr
+            *((tb_pointer_t*)item) = cstr;
+        }
+        // end
+        else *p = '\0';
+    }
+    // duplicate it
+    else if (data) func->dupl(func, item, data);
+    // free it
+    else if (func->free) func->free(func, item);
+    // clear it
+    else *((tb_char_t const**)item) = tb_null;
+#endif
 }
 static tb_void_t tb_item_func_str_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
