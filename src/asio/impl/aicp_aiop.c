@@ -227,9 +227,6 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             tb_assert_and_check_break(impl->list);
         }
 
-        // enter 
-        tb_spinlock_enter(&impl->lock);
-
         // walk aioe list
         tb_size_t i = 0;
         for (i = 0; i < real; i++)
@@ -260,11 +257,14 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico)) priority = 0;
 
             // trace
-            tb_trace_d("wait: aico: %p, handle: %p, code: %lu, priority: %lu, size: %lu", aico, aico->base.handle, aice->code, priority, tb_queue_size(impl->spak[priority]));
+            tb_trace_d("wait: aico: %p, handle: %p, code: %lu, priority: %lu", aico, aico->base.handle, aice->code, priority);
 
             // sock?
             if (aico->base.type == TB_AICO_TYPE_SOCK)
             {
+                // enter 
+                tb_spinlock_enter(&impl->lock);
+
                 // spak aice
                 if (!tb_queue_full(impl->spak[priority])) 
                 {
@@ -272,6 +272,9 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
                     aico->wait_ok = 1;
                 }
                 else tb_assert(0);
+ 
+                // leave 
+                tb_spinlock_leave(&impl->lock);
             }
             else if (aico->base.type == TB_AICO_TYPE_FILE)
             {
@@ -280,10 +283,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             }
             else tb_assert(0);
         }
-            
-        // leave 
-        tb_spinlock_leave(&impl->lock);
-
+           
         // work it
         tb_aiop_spak_work(impl);
     }
@@ -320,9 +320,6 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t priv)
         aico->aioo = tb_null;
     }
 
-    // enter 
-    tb_spinlock_enter(&impl->lock);
-
     // have been waited ok for the spak loop? need not spak it repeatly
     tb_bool_t ok = tb_false;
     if (!aico->wait_ok)
@@ -332,7 +329,10 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t priv)
         tb_assert_and_check_return(priority < tb_arrayn(impl->spak) && impl->spak[priority]);
 
         // trace
-        tb_trace_d("wait: timeout: code: %lu, priority: %lu, size: %lu, time: %lld", aico->aice.code, priority, tb_queue_size(impl->spak[priority]), tb_cache_time_mclock());
+        tb_trace_d("wait: timeout: code: %lu, priority: %lu, time: %lld", aico->aice.code, priority, tb_cache_time_mclock());
+
+        // enter 
+        tb_spinlock_enter(&impl->lock);
 
         // spak aice
         if (!tb_queue_full(impl->spak[priority])) 
@@ -348,10 +348,10 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t priv)
             aico->wait_ok = 1;
         }
         else tb_assert(0);
-    }
 
-    // leave 
-    tb_spinlock_leave(&impl->lock);
+        // leave 
+        tb_spinlock_leave(&impl->lock);
+    }
 
     // work it
     if (ok) tb_aiop_spak_work(impl);
