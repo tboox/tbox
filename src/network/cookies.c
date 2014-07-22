@@ -466,7 +466,7 @@ static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
         return 0;
     }
 
-    // this impl is at domain/path?
+    // this cookies is at domain/path?
     if (    tb_cookies_is_child_domain(entry->domain, domain)
         &&  tb_cookies_is_child_path(entry->path, path)
         &&  entry->secure == secure)

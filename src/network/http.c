@@ -68,6 +68,9 @@ typedef struct __tb_http_impl_t
     // the zstream for gzip/deflate
     tb_stream_ref_t     zstream;
 
+    // the head
+    tb_hash_ref_t       head;
+
     // is opened?
     tb_bool_t           bopened;
 
@@ -113,24 +116,22 @@ static tb_bool_t tb_http_option_init(tb_http_impl_t* impl)
     // init post url
     if (!tb_url_init(&impl->option.post_url)) return tb_false;
 
-    // init head
-    impl->option.head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
-    tb_assert_and_check_return_val(impl->option.head, tb_false);
+    // init head data
+    if (!tb_buffer_init(&impl->option.head_data)) return tb_false;
 
     // ok
     return tb_true;
 }
 static tb_void_t tb_http_option_exit(tb_http_impl_t* impl)
 {
-    // exit head
-    if (impl->option.head) tb_hash_exit(impl->option.head);
-    impl->option.head = tb_null;
-
     // exit url
     tb_url_exit(&impl->option.url);
 
     // exit post url
     tb_url_exit(&impl->option.post_url);
+
+    // exit head data
+    tb_buffer_exit(&impl->option.head_data);
 
     // clear cookies
     impl->option.cookies = tb_null;
@@ -152,9 +153,20 @@ static tb_void_t tb_http_option_dump(tb_http_impl_t* impl)
     tb_trace_i("option: bunzip: %s",            impl->option.bunzip? "true" : "false");
 
     // dump head 
-    tb_for_all (tb_hash_item_t*, item, impl->option.head)
+    tb_char_t const*    head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
+    tb_char_t const*    head_tail = head_data + tb_buffer_size(&impl->option.head_data);
+    while (head_data < head_tail)
     {
-        if (item) tb_trace_i("option: head: %s: %s", item->name, item->data);
+        // the name and data
+        tb_char_t const* name = head_data;
+        tb_char_t const* data = head_data + tb_strlen(name) + 1;
+        tb_check_break(data < head_tail);
+
+        // trace
+        tb_trace_i("option: head: %s: %s", name, data);
+
+        // next
+        head_data = data + tb_strlen(data) + 1;
     }
 
     // dump end
@@ -333,19 +345,17 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         // init host
         tb_char_t const* host = tb_url_host_get(&impl->option.url);
         tb_assert_and_check_break(host);
-        tb_hash_set(impl->option.head, "Host", host);
+        tb_hash_set(impl->head, "Host", host);
 
         // init accept
-        if (!tb_hash_get(impl->option.head, "Accept")) 
-            tb_hash_set(impl->option.head, "Accept", "*/*");
+        tb_hash_set(impl->head, "Accept", "*/*");
 
         // init connection
-        if (!tb_hash_get(impl->option.head, "Connection")) 
-            tb_hash_set(impl->option.head, "Connection", "close");
-        else if (impl->status.balived) tb_hash_set(impl->option.head, "Connection", "keep-alive");
+        tb_hash_set(impl->head, "Connection", impl->status.balived? "keep-alive" : "close");
 
         // init cookies
-        if (impl->option.cookies && !tb_hash_get(impl->option.head, "Cookie"))
+        tb_bool_t cookie = tb_false;
+        if (impl->option.cookies)
         {
             // the host
             tb_char_t const* host = tb_null;
@@ -361,8 +371,14 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
                 
             // set cookie
             if (tb_cookies_get(impl->option.cookies, host, path, bssl, &impl->cookies))
-                tb_hash_set(impl->option.head, "Cookie", tb_string_cstr(&impl->cookies));
+            {
+                tb_hash_set(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
+                cookie = tb_true;
+            }
         }
+
+        // no cookie? remove it
+        if (!cookie) tb_hash_del(impl->head, "Cookie");
 
         // init range
         if (impl->option.range.bof && impl->option.range.eof >= impl->option.range.bof)
@@ -377,8 +393,11 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             break;
         }
 
+        // update range
         if (tb_static_string_size(&value)) 
-            tb_hash_set(impl->option.head, "Range", tb_static_string_cstr(&value));
+            tb_hash_set(impl->head, "Range", tb_static_string_cstr(&value));
+        // remove range
+        else tb_hash_del(impl->head, "Range");
 
         // init post
         if (impl->option.method == TB_HTTP_METHOD_POST)
@@ -403,7 +422,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
 
                 // append post size
                 tb_static_string_cstrfcpy(&value, "%lld", post_size);
-                tb_hash_set(impl->option.head, "Content-Length", tb_static_string_cstr(&value));
+                tb_hash_set(impl->head, "Content-Length", tb_static_string_cstr(&value));
 
                 // ok
                 post_ok = tb_true;
@@ -417,9 +436,28 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
                 break;
             }
         }
+        // remove post
+        else tb_hash_del(impl->head, "Content-Length");
+
+        // replace the custom head 
+        tb_char_t const* head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
+        tb_char_t const* head_tail = head_data + tb_buffer_size(&impl->option.head_data);
+        while (head_data < head_tail)
+        {
+            // the name and data
+            tb_char_t const* name = head_data;
+            tb_char_t const* data = head_data + tb_strlen(name) + 1;
+            tb_check_break(data < head_tail);
+
+            // replace it
+            tb_hash_set(impl->head, name, data);
+
+            // next
+            head_data = data + tb_strlen(data) + 1;
+        }
 
         // check head
-        tb_assert_and_check_break(tb_hash_size(impl->option.head));
+        tb_assert_and_check_break(tb_hash_size(impl->head));
 
         // append method
         tb_string_cstrcat(&impl->request, method);
@@ -444,7 +482,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_string_cstrfcat(&impl->request, "HTTP/1.%1u\r\n", impl->status.balived? impl->status.version : impl->option.version);
 
         // append key: value
-        tb_for_all (tb_hash_item_t*, item, impl->option.head)
+        tb_for_all (tb_hash_item_t*, item, impl->head)
         {
             if (item && item->name && item->data) 
                 tb_string_cstrfcat(&impl->request, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
@@ -456,16 +494,16 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         // exit the head value
         tb_static_string_exit(&value);
 
-        // the head data and size
-        tb_char_t const*    head_data = tb_string_cstr(&impl->request);
-        tb_size_t           head_size = tb_string_size(&impl->request);
-        tb_assert_and_check_break(head_data && head_size);
+        // the request data and size
+        tb_char_t const*    request_data = tb_string_cstr(&impl->request);
+        tb_size_t           request_size = tb_string_size(&impl->request);
+        tb_assert_and_check_break(request_data && request_size);
         
         // trace
-        tb_trace_d("request[%lu]:\n%s", head_size, head_data);
+        tb_trace_d("request[%lu]:\n%s", request_size, request_data);
 
         // writ request
-        if (!tb_stream_bwrit(impl->stream, (tb_byte_t const*)head_data, head_size)) break;
+        if (!tb_stream_bwrit(impl->stream, (tb_byte_t const*)request_data, request_size)) break;
 
         // writ post
         if (impl->option.method == TB_HTTP_METHOD_POST)
@@ -517,16 +555,23 @@ static tb_bool_t tb_http_response_done(tb_http_impl_t* impl, tb_char_t const* li
     tb_char_t const* p = line;
     if (!indx)
     {
-        // seek to the impl version
-        while (*p && *p != '.') p++; 
+        // check http response
+        if (tb_strnicmp(p, "HTTP/1.", 7))
+        {
+            // failed
+            tb_assert_abort(0);
+            return tb_false;
+        }
+
+        // seek to the http version
+        p += 7;
         tb_assert_and_check_return_val(*p, tb_false);
-        p++;
 
         // parse version
         tb_assert_and_check_return_val((*p - '0') < 2, tb_false);
         impl->status.version = *p - '0';
     
-        // seek to the impl code
+        // seek to the http code
         p++; while (tb_isspace(*p)) p++;
 
         // parse code
@@ -850,6 +895,10 @@ tb_http_ref_t tb_http_init()
         impl->stream = impl->sstream = tb_stream_init_sock();
         tb_assert_and_check_break(impl->stream);
 
+        // init head
+        impl->head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
+        tb_assert_and_check_return_val(impl->head, tb_false);
+
         // init request data
         if (!tb_string_init(&impl->request)) break;
 
@@ -921,6 +970,10 @@ tb_void_t tb_http_exit(tb_http_ref_t http)
 
     // exit request data
     tb_string_exit(&impl->request);
+
+    // exit head
+    if (impl->head) tb_hash_exit(impl->head);
+    impl->head = tb_null;
 
     // free it
     tb_free(impl);
@@ -1238,12 +1291,9 @@ tb_bool_t tb_http_option(tb_http_ref_t http, tb_size_t option, ...)
         }
         break;
     case TB_HTTP_OPTION_SET_HEAD:
-        {   
-            // is opened?
+        {
+             // is opened?
             tb_assert_and_check_return_val(!impl->bopened, tb_false);
-
-            // check
-            tb_assert_and_check_return_val(impl->option.head, tb_false);
 
             // key
             tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -1253,15 +1303,47 @@ tb_bool_t tb_http_option(tb_http_ref_t http, tb_size_t option, ...)
             tb_char_t const* val = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(val, tb_false);
  
+            // remove the previous key and value 
+            tb_bool_t           head_same = tb_false;
+            tb_char_t const*    head_head = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
+            tb_char_t const*    head_data = head_head;
+            tb_char_t const*    head_tail = head_data + tb_buffer_size(&impl->option.head_data);
+            while (head_data < head_tail)
+            {
+                // the name and data
+                tb_char_t const* name = head_data;
+                tb_char_t const* data = head_data + tb_strlen(name) + 1;
+                tb_char_t const* next = data + tb_strlen(data) + 1;
+                tb_check_break(data < head_tail);
+
+                // is this? 
+                if (!tb_stricmp(name, key)) 
+                {
+                    // value is different? remove it
+                    if (tb_stricmp(val, data)) tb_buffer_memmovp(&impl->option.head_data, name - head_head, next - head_head);
+                    else head_same = tb_true;
+                    break;
+                }
+
+                // next
+                head_data = next;
+            }
+
             // set head
-            tb_hash_set(impl->option.head, key, val);
+            if (!head_same)
+            {
+                tb_buffer_memncat(&impl->option.head_data, (tb_byte_t const*)key, tb_strlen(key) + 1);
+                tb_buffer_memncat(&impl->option.head_data, (tb_byte_t const*)val, tb_strlen(val) + 1);
+            }
+
+            // ok
             return tb_true;
         }
         break;
     case TB_HTTP_OPTION_GET_HEAD:
         {
             // check
-            tb_assert_and_check_return_val(impl->option.head, tb_false);
+            tb_assert_and_check_return_val(impl->head, tb_false);
 
             // key
             tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -1271,13 +1353,30 @@ tb_bool_t tb_http_option(tb_http_ref_t http, tb_size_t option, ...)
             tb_char_t const** pval = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             tb_assert_and_check_return_val(pval, tb_false);
 
-            // get val
-            tb_char_t const* val = (tb_char_t const*)tb_hash_get(impl->option.head, key);
-            tb_assert_and_check_return_val(val, tb_false);
+            // find head 
+            tb_char_t const*    head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
+            tb_char_t const*    head_tail = head_data + tb_buffer_size(&impl->option.head_data);
+            while (head_data < head_tail)
+            {
+                // the name and data
+                tb_char_t const* name = head_data;
+                tb_char_t const* data = head_data + tb_strlen(name) + 1;
+                tb_check_break(data < head_tail);
 
-            // ok
-            *pval = val;
-            return tb_true;
+                // is this?
+                if (!tb_stricmp(name, key)) 
+                {
+                    // ok
+                    *pval = data;
+                    return tb_true;
+                }
+
+                // next
+                head_data = data + tb_strlen(data) + 1;
+            }
+
+            // failed
+            return tb_false;
         }
         break;
     case TB_HTTP_OPTION_SET_HEAD_FUNC:

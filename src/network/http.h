@@ -176,9 +176,6 @@ typedef struct __tb_http_option_t
     /// the url
     tb_url_t            url;
 
-    /// the request head 
-    tb_hash_ref_t       head;
-
     /// timeout: ms
     tb_long_t           timeout;
 
@@ -193,6 +190,9 @@ typedef struct __tb_http_option_t
 
     /// the head func
     tb_http_head_func_t head_func;
+
+    /// the head data
+    tb_buffer_t         head_data;
 
     /// the post url
     tb_url_t            post_url;

@@ -103,6 +103,8 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_impl_t* reader
     // clear element
     tb_string_clear(&reader->element);
 
+    tb_assert_abort(!tb_stream_beof(reader->rstream));
+
     // parse element
     tb_char_t ch = '\0';
     tb_size_t in = 0;
@@ -116,6 +118,9 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_impl_t* reader
             else return tb_string_cstr(&reader->element);
         }
     }
+
+    // failed
+    tb_assert_abort(0);
     return tb_null;
 }
 static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_impl_t* reader)
