@@ -475,8 +475,7 @@ static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
         tb_string_cstrfcat(value, "%s=%s; ", entry->name, entry->value? entry->value : "");
     }
 
-    // ok
-    tuple[4].b = tb_true;
+    // continue 
     return 1;
 }
 
@@ -706,14 +705,12 @@ tb_char_t const* tb_cookies_get(tb_cookies_ref_t cookies, tb_char_t const* domai
         tb_cache_time_spak();
 
         // get the matched values
-        tb_value_t tuple[6];
+        tb_value_t tuple[4];
         tuple[0].cstr   = domain;
         tuple[1].cstr   = path;
         tuple[2].ul     = secure? 1 : 0;
         tuple[3].ptr    = value;
-        tuple[4].b      = tb_false;
         tb_remove_if(impl->cookie_pool, tb_cookies_entry_walk, tuple);
-        tb_check_break(tuple[4].b);
 
         // ok
         ok = tb_true;
@@ -727,7 +724,7 @@ tb_char_t const* tb_cookies_get(tb_cookies_ref_t cookies, tb_char_t const* domai
     tb_spinlock_leave(&impl->lock);
 
     // ok?
-    return tb_string_cstr(value);
+    return tb_string_size(value)? tb_string_cstr(value) : tb_null;
 }
 tb_char_t const* tb_cookies_get_from_url(tb_cookies_ref_t cookies, tb_char_t const* url, tb_string_t* value)
 {
