@@ -21,8 +21,8 @@
  * @ingroup     network
  *
  */
-#ifndef TB_NETWORK_COOKIES_H
-#define TB_NETWORK_COOKIES_H
+#ifndef TB_NETWORK_HTTP_COOKIES_H
+#define TB_NETWORK_HTTP_COOKIES_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * INTRODUCTION 

@@ -32,31 +32,31 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(http);
 
         // init cookies
-        if (!tb_http_option(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) break;
+        if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) break;
         
         // init head func
-        if (!tb_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_http_demo_head_func)) break;
+        if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_http_demo_head_func)) break;
         
         // init url
-        if (!tb_http_option(http, TB_HTTP_OPTION_SET_URL, argv[1])) break;
+        if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_URL, argv[1])) break;
         
         // init post 
         if (argv[2])
         {
             // init post url
-            if (!tb_http_option(http, TB_HTTP_OPTION_SET_POST_URL, argv[2])) break;
+            if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_POST_URL, argv[2])) break;
 
             // init method
-            if (!tb_http_option(http, TB_HTTP_OPTION_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+            if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_METHOD, TB_HTTP_METHOD_POST)) break;
         }
 
         // init timeout 
         tb_size_t timeout = 0;
-    //  if (!tb_http_option(http, TB_HTTP_OPTION_SET_TIMEOUT, 10000)) break;
-        if (!tb_http_option(http, TB_HTTP_OPTION_GET_TIMEOUT, &timeout)) break;
+    //  if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_TIMEOUT, 10000)) break;
+        if (!tb_http_ctrl(http, TB_HTTP_OPTION_GET_TIMEOUT, &timeout)) break;
 
         // init redirect maxn
-    //  if (!tb_http_option(http, TB_HTTP_OPTION_SET_REDIRECT, 0)) break;
+    //  if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_REDIRECT, 0)) break;
 
         // open http
         tb_hong_t t = tb_mclock();

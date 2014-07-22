@@ -28,6 +28,7 @@
 #include "url.h"
 #include "ipv4.h"
 #include "http.h"
+#include "impl/http/prefix.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"

@@ -27,11 +27,23 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "url.h"
 #include "cookies.h"
+#include "url.h"
 #include "../string/string.h"
 #include "../container/container.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the http option code: get
+#define TB_HTTP_OPTION_CODE_GET(x)          ((x) + 1)
+
+/// the http option code: set
+#define TB_HTTP_OPTION_CODE_SET(x)          (0xff00 | ((x) + 1))
+
+/// the http option code is setter?
+#define TB_HTTP_OPTION_CODE_IS_SET(x)       ((x) & 0xff00)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -39,25 +51,8 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/// the http default timeout, 10s
-#define TB_HTTP_DEFAULT_TIMEOUT                 (10000)
-
-/// the http default redirect maxn
-#define TB_HTTP_DEFAULT_REDIRECT                (10)
-
-/// the http default port
-#define TB_HTTP_DEFAULT_PORT                    (80)
-
-/// the http default port for ssl
-#define TB_HTTP_DEFAULT_PORT_SSL                (443)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
-
 /// the http method enum
 typedef enum __tb_http_method_e
 {
@@ -77,47 +72,47 @@ typedef enum __tb_http_option_e
 {
     TB_HTTP_OPTION_NONE                 = 0
 
-,   TB_HTTP_OPTION_GET_SSL              = 1
-,   TB_HTTP_OPTION_GET_URL              = 2
-,   TB_HTTP_OPTION_GET_HOST             = 3
-,   TB_HTTP_OPTION_GET_PORT             = 4
-,   TB_HTTP_OPTION_GET_PATH             = 5
-,   TB_HTTP_OPTION_GET_HEAD             = 6
-,   TB_HTTP_OPTION_GET_RANGE            = 7 
-,   TB_HTTP_OPTION_GET_METHOD           = 8
-,   TB_HTTP_OPTION_GET_VERSION          = 9 
-,   TB_HTTP_OPTION_GET_TIMEOUT          = 10
-,   TB_HTTP_OPTION_GET_COOKIES          = 11
-,   TB_HTTP_OPTION_GET_REDIRECT         = 12 
-,   TB_HTTP_OPTION_GET_HEAD_FUNC        = 13
-,   TB_HTTP_OPTION_GET_HEAD_PRIV        = 14
-,   TB_HTTP_OPTION_GET_AUTO_UNZIP       = 15
-,   TB_HTTP_OPTION_GET_POST_URL         = 16
-,   TB_HTTP_OPTION_GET_POST_DATA        = 17
-,   TB_HTTP_OPTION_GET_POST_FUNC        = 18
-,   TB_HTTP_OPTION_GET_POST_PRIV        = 19
-,   TB_HTTP_OPTION_GET_POST_LRATE       = 20
+,   TB_HTTP_OPTION_GET_SSL              = TB_HTTP_OPTION_CODE_GET(1)
+,   TB_HTTP_OPTION_GET_URL              = TB_HTTP_OPTION_CODE_GET(2)
+,   TB_HTTP_OPTION_GET_HOST             = TB_HTTP_OPTION_CODE_GET(3)
+,   TB_HTTP_OPTION_GET_PORT             = TB_HTTP_OPTION_CODE_GET(4)
+,   TB_HTTP_OPTION_GET_PATH             = TB_HTTP_OPTION_CODE_GET(5)
+,   TB_HTTP_OPTION_GET_HEAD             = TB_HTTP_OPTION_CODE_GET(6)
+,   TB_HTTP_OPTION_GET_RANGE            = TB_HTTP_OPTION_CODE_GET(7)
+,   TB_HTTP_OPTION_GET_METHOD           = TB_HTTP_OPTION_CODE_GET(8)
+,   TB_HTTP_OPTION_GET_VERSION          = TB_HTTP_OPTION_CODE_GET(9) 
+,   TB_HTTP_OPTION_GET_TIMEOUT          = TB_HTTP_OPTION_CODE_GET(10)
+,   TB_HTTP_OPTION_GET_COOKIES          = TB_HTTP_OPTION_CODE_GET(11)
+,   TB_HTTP_OPTION_GET_REDIRECT         = TB_HTTP_OPTION_CODE_GET(12) 
+,   TB_HTTP_OPTION_GET_HEAD_FUNC        = TB_HTTP_OPTION_CODE_GET(13)
+,   TB_HTTP_OPTION_GET_HEAD_PRIV        = TB_HTTP_OPTION_CODE_GET(14)
+,   TB_HTTP_OPTION_GET_AUTO_UNZIP       = TB_HTTP_OPTION_CODE_GET(15)
+,   TB_HTTP_OPTION_GET_POST_URL         = TB_HTTP_OPTION_CODE_GET(16)
+,   TB_HTTP_OPTION_GET_POST_DATA        = TB_HTTP_OPTION_CODE_GET(17)
+,   TB_HTTP_OPTION_GET_POST_FUNC        = TB_HTTP_OPTION_CODE_GET(18)
+,   TB_HTTP_OPTION_GET_POST_PRIV        = TB_HTTP_OPTION_CODE_GET(19)
+,   TB_HTTP_OPTION_GET_POST_LRATE       = TB_HTTP_OPTION_CODE_GET(20)
 
-,   TB_HTTP_OPTION_SET_SSL              = 51
-,   TB_HTTP_OPTION_SET_URL              = 52
-,   TB_HTTP_OPTION_SET_HOST             = 53
-,   TB_HTTP_OPTION_SET_PORT             = 54
-,   TB_HTTP_OPTION_SET_PATH             = 55
-,   TB_HTTP_OPTION_SET_HEAD             = 56
-,   TB_HTTP_OPTION_SET_RANGE            = 57
-,   TB_HTTP_OPTION_SET_METHOD           = 58
-,   TB_HTTP_OPTION_SET_VERSION          = 59
-,   TB_HTTP_OPTION_SET_TIMEOUT          = 60
-,   TB_HTTP_OPTION_SET_COOKIES          = 61
-,   TB_HTTP_OPTION_SET_REDIRECT         = 62
-,   TB_HTTP_OPTION_SET_HEAD_FUNC        = 63
-,   TB_HTTP_OPTION_SET_HEAD_PRIV        = 64
-,   TB_HTTP_OPTION_SET_AUTO_UNZIP       = 65
-,   TB_HTTP_OPTION_SET_POST_URL         = 66
-,   TB_HTTP_OPTION_SET_POST_DATA        = 67
-,   TB_HTTP_OPTION_SET_POST_FUNC        = 68
-,   TB_HTTP_OPTION_SET_POST_PRIV        = 69
-,   TB_HTTP_OPTION_SET_POST_LRATE       = 70
+,   TB_HTTP_OPTION_SET_SSL              = TB_HTTP_OPTION_CODE_SET(1)
+,   TB_HTTP_OPTION_SET_URL              = TB_HTTP_OPTION_CODE_SET(2)
+,   TB_HTTP_OPTION_SET_HOST             = TB_HTTP_OPTION_CODE_SET(3)
+,   TB_HTTP_OPTION_SET_PORT             = TB_HTTP_OPTION_CODE_SET(4)
+,   TB_HTTP_OPTION_SET_PATH             = TB_HTTP_OPTION_CODE_SET(5)
+,   TB_HTTP_OPTION_SET_HEAD             = TB_HTTP_OPTION_CODE_SET(6)
+,   TB_HTTP_OPTION_SET_RANGE            = TB_HTTP_OPTION_CODE_SET(7)
+,   TB_HTTP_OPTION_SET_METHOD           = TB_HTTP_OPTION_CODE_SET(8)
+,   TB_HTTP_OPTION_SET_VERSION          = TB_HTTP_OPTION_CODE_SET(9)
+,   TB_HTTP_OPTION_SET_TIMEOUT          = TB_HTTP_OPTION_CODE_SET(10)
+,   TB_HTTP_OPTION_SET_COOKIES          = TB_HTTP_OPTION_CODE_SET(11)
+,   TB_HTTP_OPTION_SET_REDIRECT         = TB_HTTP_OPTION_CODE_SET(12)
+,   TB_HTTP_OPTION_SET_HEAD_FUNC        = TB_HTTP_OPTION_CODE_SET(13)
+,   TB_HTTP_OPTION_SET_HEAD_PRIV        = TB_HTTP_OPTION_CODE_SET(14)
+,   TB_HTTP_OPTION_SET_AUTO_UNZIP       = TB_HTTP_OPTION_CODE_SET(15)
+,   TB_HTTP_OPTION_SET_POST_URL         = TB_HTTP_OPTION_CODE_SET(16)
+,   TB_HTTP_OPTION_SET_POST_DATA        = TB_HTTP_OPTION_CODE_SET(17)
+,   TB_HTTP_OPTION_SET_POST_FUNC        = TB_HTTP_OPTION_CODE_SET(18)
+,   TB_HTTP_OPTION_SET_POST_PRIV        = TB_HTTP_OPTION_CODE_SET(19)
+,   TB_HTTP_OPTION_SET_POST_LRATE       = TB_HTTP_OPTION_CODE_SET(20)
 
 }tb_http_option_e;
 
@@ -137,7 +132,6 @@ typedef struct{}*       tb_http_ref_t;
 
 /*! the http head func type
  *
- * @param http          the http 
  * @param line          the http head line
  * @param priv          the func private data
  *
@@ -147,7 +141,6 @@ typedef tb_bool_t       (*tb_http_head_func_t)(tb_char_t const* line, tb_cpointe
 
 /*! the http post func type
  *
- * @param http          the http 
  * @param offset        the istream offset
  * @param size          the istream size, no size: -1
  * @param save          the saved size
@@ -214,7 +207,7 @@ typedef struct __tb_http_option_t
 
 }tb_http_option_t;
 
-// the http status type
+/// the http status type
 typedef struct __tb_http_status_t
 {
     /// the http code
@@ -335,14 +328,14 @@ tb_long_t               tb_http_read(tb_http_ref_t http, tb_byte_t* data, tb_siz
  */
 tb_bool_t               tb_http_bread(tb_http_ref_t http, tb_byte_t* data, tb_size_t size);
 
-/*! the http option
+/*! ctrl the http option
  *
  * @param http          the http 
- * @param option        the option
+ * @param option        the ctrl option
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_http_option(tb_http_ref_t http, tb_size_t option, ...);
+tb_bool_t               tb_http_ctrl(tb_http_ref_t http, tb_size_t option, ...);
 
 /*! the http status
  *
@@ -351,26 +344,6 @@ tb_bool_t               tb_http_option(tb_http_ref_t http, tb_size_t option, ...
  * @return              the http status
  */
 tb_http_status_t const* tb_http_status(tb_http_ref_t http);
-
-/*! get the http date from the given cstring
- *
- * <pre>
- * supports format:
- *    Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
- *    Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
- *    Sun Nov 6 08:49:37 1994        ; ANSI C's asctime() format
- *
- * for cookies(RFC 822, RFC 850, RFC 1036, and RFC 1123):
- *    Sun, 06-Nov-1994 08:49:37 GMT
- *
- * </pre>
- *
- * @param cstr          the cstring
- * @param size          the cstring length
- *
- * @return              the date
- */
-tb_time_t               tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size);
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////

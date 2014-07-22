@@ -32,8 +32,8 @@
  * includes
  */
 #include "cookies.h"
+#include "impl/http/date.h"
 #include "url.h"
-#include "http.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
