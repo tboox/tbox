@@ -41,6 +41,10 @@
 #include "../platform/platform.h"
 #include "../algorithm/algorithm.h"
 #include "../container/container.h"
+#include "../network/impl/http/date.h"
+#include "../network/impl/http/option.h"
+#include "../network/impl/http/status.h"
+#include "../network/impl/http/method.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -173,21 +177,6 @@ typedef struct __tb_aicp_http_impl_t
 }tb_aicp_http_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * globals
- */
-static tb_char_t const* g_http_methods[] = 
-{
-    "GET"
-,   "POST"
-,   "HEAD"
-,   "PUT"
-,   "OPTIONS"
-,   "DELETE"
-,   "TRACE"
-,   "CONNECT"
-};
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
 static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_impl_t* impl);
@@ -195,145 +184,6 @@ static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_impl_t* impl);
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_http_option_init(tb_aicp_http_impl_t* impl)
-{
-    // init option using the default value
-    impl->option.method     = TB_HTTP_METHOD_GET;
-    impl->option.redirect   = TB_HTTP_DEFAULT_REDIRECT;
-    impl->option.timeout    = TB_HTTP_DEFAULT_TIMEOUT;
-    impl->option.version    = 1; // HTTP/1.1
-    impl->option.bunzip     = 0;
-
-    // init url
-    if (!tb_url_init(&impl->option.url)) return tb_false;
-
-    // init post url
-    if (!tb_url_init(&impl->option.post_url)) return tb_false;
-
-    // init head data
-    if (!tb_buffer_init(&impl->option.head_data)) return tb_false;
-
-    // ok
-    return tb_true;
-}
-static tb_void_t tb_aicp_http_option_exit(tb_aicp_http_impl_t* impl)
-{
-    // exit url
-    tb_url_exit(&impl->option.url);
-
-    // exit post url
-    tb_url_exit(&impl->option.post_url);
-
-    // exit head data
-    tb_buffer_exit(&impl->option.head_data);
-}
-#ifdef __tb_debug__
-static tb_void_t tb_aicp_http_option_dump(tb_aicp_http_impl_t* impl)
-{
-    // check
-    tb_assert_and_check_return(impl);
-
-    // dump option
-    tb_trace_i("======================================================================");
-    tb_trace_i("option: ");
-    tb_trace_i("option: url: %s", tb_url_get(&impl->option.url));
-    tb_trace_i("option: version: HTTP/1.%1u", impl->option.version);
-    tb_trace_i("option: method: %s", impl->option.method < tb_arrayn(g_http_methods)? g_http_methods[impl->option.method] : "none");
-    tb_trace_i("option: redirect: %d", impl->option.redirect);
-    tb_trace_i("option: range: %llu-%llu", impl->option.range.bof, impl->option.range.eof);
-    tb_trace_i("option: bunzip: %s", impl->option.bunzip? "true" : "false");
-
-    // dump head 
-    tb_char_t const*    head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
-    tb_char_t const*    head_tail = head_data + tb_buffer_size(&impl->option.head_data);
-    while (head_data < head_tail)
-    {
-        // the name and data
-        tb_char_t const* name = head_data;
-        tb_char_t const* data = head_data + tb_strlen(name) + 1;
-        tb_check_break(data < head_tail);
-
-        // trace
-        tb_trace_i("option: head: %s: %s", name, data);
-
-        // next
-        head_data = data + tb_strlen(data) + 1;
-    }
-
-    // dump end
-    tb_trace_i("");
-}
-#endif
-static tb_bool_t tb_aicp_http_status_init(tb_aicp_http_impl_t* impl)
-{
-    // init status using the default value
-    impl->status.version = 1;
-
-    // init content type 
-    if (!tb_string_init(&impl->status.content_type)) return tb_false;
-
-    // init location
-    if (!tb_string_init(&impl->status.location)) return tb_false;
-    return tb_true;
-}
-static tb_void_t tb_aicp_http_status_exit(tb_aicp_http_impl_t* impl)
-{
-    // exit the content type
-    tb_string_exit(&impl->status.content_type);
-
-    // exit location
-    tb_string_exit(&impl->status.location);
-}
-static tb_void_t tb_aicp_http_status_cler(tb_aicp_http_impl_t* impl, tb_bool_t host_changed)
-{
-    // clear status
-    impl->status.code = 0;
-    impl->status.bgzip = 0;
-    impl->status.bdeflate = 0;
-    impl->status.bchunked = 0;
-    impl->status.content_size = -1;
-    impl->status.document_size = -1;
-    impl->status.state = TB_STATE_OK;
-
-    // clear content type
-    tb_string_clear(&impl->status.content_type);
-
-    // clear location
-    tb_string_clear(&impl->status.location);
-
-    // host is changed? clear the alived state
-    if (host_changed)
-    {
-        impl->status.version = 1;
-        impl->status.balived = 0;
-        impl->status.bseeked = 0;
-    }
-}
-#ifdef __tb_debug__
-static tb_void_t tb_aicp_http_status_dump(tb_aicp_http_impl_t* impl)
-{
-    // check
-    tb_assert_and_check_return(impl);
-
-    // dump status
-    tb_trace_i("======================================================================");
-    tb_trace_i("status: ");
-    tb_trace_i("status: code: %d",              impl->status.code);
-    tb_trace_i("status: version: HTTP/1.%1u",   impl->status.version);
-    tb_trace_i("status: content:type: %s",      tb_string_cstr(&impl->status.content_type));
-    tb_trace_i("status: content:size: %lld",    impl->status.content_size);
-    tb_trace_i("status: document:size: %lld",   impl->status.document_size);
-    tb_trace_i("status: location: %s",          tb_string_cstr(&impl->status.location));
-    tb_trace_i("status: bgzip: %s",             impl->status.bgzip? "true" : "false");
-    tb_trace_i("status: bdeflate: %s",          impl->status.bdeflate? "true" : "false");
-    tb_trace_i("status: balived: %s",           impl->status.balived? "true" : "false");
-    tb_trace_i("status: bseeked: %s",           impl->status.bseeked? "true" : "false");
-    tb_trace_i("status: bchunked: %s",          impl->status.bchunked? "true" : "false");
-
-    // dump end
-    tb_trace_i("");
-}
-#endif
 static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_hize_t post_size, tb_size_t* head_size, tb_size_t* state)
 {
     // check
@@ -348,8 +198,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     if (!tb_static_string_init(&value, data, 64)) return tb_null;
 
     // init method
-    tb_assert_and_check_return_val(impl->option.method < tb_arrayn(g_http_methods), tb_null);
-    tb_char_t const* method = g_http_methods[impl->option.method];
+    tb_char_t const* method = tb_http_method_cstr(impl->option.method);
     tb_assert_and_check_return_val(method, tb_null);
 
     // init path
@@ -376,15 +225,15 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     {
         // the host
         tb_char_t const* host = tb_null;
-        tb_aicp_http_option((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_HOST, &host);
+        tb_aicp_http_ctrl((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_HOST, &host);
 
         // the path
         tb_char_t const* path = tb_null;
-        tb_aicp_http_option((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_PATH, &path);
+        tb_aicp_http_ctrl((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_PATH, &path);
 
         // is ssl?
         tb_bool_t bssl = tb_false;
-        tb_aicp_http_option((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_SSL, &bssl);
+        tb_aicp_http_ctrl((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_SSL, &bssl);
             
         // update cookie
         if (tb_cookies_get(impl->option.cookies, host, path, bssl, &impl->cookies))
@@ -712,15 +561,15 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_impl_t* impl)
         {
             // the host
             tb_char_t const* host = tb_null;
-            tb_aicp_http_option((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_HOST, &host);
+            tb_aicp_http_ctrl((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_HOST, &host);
 
             // the path
             tb_char_t const* path = tb_null;
-            tb_aicp_http_option((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_PATH, &path);
+            tb_aicp_http_ctrl((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_PATH, &path);
 
             // is ssl?
             tb_bool_t bssl = tb_false;
-            tb_aicp_http_option((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_SSL, &bssl);
+            tb_aicp_http_ctrl((tb_aicp_http_ref_t)impl, TB_HTTP_OPTION_GET_SSL, &bssl);
                 
             // set cookies
             tb_cookies_set(impl->option.cookies, host, path, bssl, p);
@@ -1007,7 +856,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
 
             // dump status
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
-            tb_aicp_http_status_dump(impl);
+            tb_http_status_dump(&impl->status);
 #endif
         }
         // error?
@@ -1416,11 +1265,11 @@ static tb_void_t tb_aicp_http_open_clos(tb_async_stream_ref_t stream, tb_size_t 
 
         // dump option
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
-        tb_aicp_http_option_dump(impl);
+        tb_http_option_dump(&impl->option);
 #endif
 
         // clear status
-        tb_aicp_http_status_cler(impl, host_changed);
+        tb_http_status_cler(&impl->status, host_changed);
 
         // open the stream
         ok = tb_async_stream_open(impl->stream, tb_aicp_http_sock_open_func, impl);
@@ -1524,10 +1373,10 @@ tb_aicp_http_ref_t tb_aicp_http_init(tb_aicp_ref_t aicp)
         impl->cache_read = 0;
 
         // init option
-        if (!tb_aicp_http_option_init(impl)) break;
+        if (!tb_http_option_init(&impl->option)) break;
 
         // init status
-        if (!tb_aicp_http_status_init(impl)) break;
+        if (!tb_http_status_init(&impl->status)) break;
 
         // ok
         ok = tb_true;
@@ -1612,10 +1461,10 @@ tb_bool_t tb_aicp_http_exit(tb_aicp_http_ref_t http)
     impl->stream = tb_null;
 
     // exit status
-    tb_aicp_http_status_exit(impl);
+    tb_http_status_exit(&impl->status);
 
     // exit option
-    tb_aicp_http_option_exit(impl);
+    tb_http_option_exit(&impl->option);
 
     // exit line data
     tb_string_exit(&impl->line_data);
@@ -1871,598 +1720,30 @@ tb_aicp_ref_t tb_aicp_http_aicp(tb_aicp_http_ref_t http)
     // the aicp 
     return tb_async_stream_aicp(impl->stream);
 }
-tb_bool_t tb_aicp_http_option(tb_aicp_http_ref_t http, tb_size_t option, ...)
+tb_bool_t tb_aicp_http_ctrl(tb_aicp_http_ref_t http, tb_size_t option, ...)
 {
     // check
     tb_aicp_http_impl_t* impl = (tb_aicp_http_impl_t*)http;
     tb_assert_and_check_return_val(impl && impl->sstream && option, tb_false);
+
+    // check
+    if (TB_HTTP_OPTION_CODE_IS_SET(option) && !tb_async_stream_is_closed(impl->sstream))
+    {
+        // abort
+        tb_assert_abort(0);
+        return tb_false;
+    }
 
     // init args
     tb_va_list_t args;
     tb_va_start(args, option);
 
     // done
-    switch (option)
-    {
-    case TB_HTTP_OPTION_SET_URL:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
+    tb_bool_t ok = tb_http_option_ctrl(&impl->option, option, args);
 
-            // url
-            tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(url, tb_false);
-            
-            // set url
-            if (tb_url_set(&impl->option.url, url)) return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_URL:
-        {
-            // purl
-            tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-            tb_assert_and_check_return_val(purl, tb_false);
-
-            // get url
-            tb_char_t const* url = tb_url_get(&impl->option.url);
-            tb_assert_and_check_return_val(url, tb_false);
-
-            // ok
-            *purl = url;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_HOST:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // host
-            tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(host, tb_false);
-
-            // set host
-            tb_url_host_set(&impl->option.url, host);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_HOST:
-        {
-            // phost
-            tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-            tb_assert_and_check_return_val(phost, tb_false); 
-
-            // get host
-            tb_char_t const* host = tb_url_host_get(&impl->option.url);
-            tb_assert_and_check_return_val(host, tb_false);
-
-            // ok
-            *phost = host;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_PORT:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // port
-            tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
-            tb_assert_and_check_return_val(port, tb_false);
-
-            // set port
-            tb_url_port_set(&impl->option.url, port);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_PORT:
-        {
-            // pport
-            tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-            tb_assert_and_check_return_val(pport, tb_false);
-
-            // get port
-            *pport = tb_url_port_get(&impl->option.url);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_PATH:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // path
-            tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(path, tb_false);
+    // exit args
+    tb_va_end(args);
  
-            // set path
-            tb_url_path_set(&impl->option.url, path);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_PATH:
-        {
-            // ppath
-            tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-            tb_assert_and_check_return_val(ppath, tb_false);
-
-            // get path
-            tb_char_t const* path = tb_url_path_get(&impl->option.url);
-            tb_assert_and_check_return_val(path, tb_false);
-
-            // ok
-            *ppath = path;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_METHOD:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // method
-            tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // set method
-            impl->option.method = method;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_METHOD:
-        {
-            // pmethod
-            tb_size_t* pmethod = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-            tb_assert_and_check_return_val(pmethod, tb_false);
-
-            // get method
-            *pmethod = impl->option.method;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_HEAD:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // key
-            tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(key, tb_false);
-
-            // val
-            tb_char_t const* val = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(val, tb_false);
- 
-            // remove the previous key and value 
-            tb_bool_t           head_same = tb_false;
-            tb_char_t const*    head_head = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
-            tb_char_t const*    head_data = head_head;
-            tb_char_t const*    head_tail = head_data + tb_buffer_size(&impl->option.head_data);
-            while (head_data < head_tail)
-            {
-                // the name and data
-                tb_char_t const* name = head_data;
-                tb_char_t const* data = head_data + tb_strlen(name) + 1;
-                tb_char_t const* next = data + tb_strlen(data) + 1;
-                tb_check_break(data < head_tail);
-
-                // is this? 
-                if (!tb_stricmp(name, key)) 
-                {
-                    // value is different? remove it
-                    if (tb_stricmp(val, data)) tb_buffer_memmovp(&impl->option.head_data, name - head_head, next - head_head);
-                    else head_same = tb_true;
-                    break;
-                }
-
-                // next
-                head_data = next;
-            }
-
-            // set head
-            if (!head_same)
-            {
-                tb_buffer_memncat(&impl->option.head_data, (tb_byte_t const*)key, tb_strlen(key) + 1);
-                tb_buffer_memncat(&impl->option.head_data, (tb_byte_t const*)val, tb_strlen(val) + 1);
-            }
-
-            // ok
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_HEAD:
-        {
-            // check
-            tb_assert_and_check_return_val(impl->head, tb_false);
-
-            // key
-            tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(key, tb_false);
-
-            // pval
-            tb_char_t const** pval = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-            tb_assert_and_check_return_val(pval, tb_false);
-
-            // find head 
-            tb_char_t const* head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
-            tb_char_t const* head_tail = head_data + tb_buffer_size(&impl->option.head_data);
-            while (head_data < head_tail)
-            {
-                // the name and data
-                tb_char_t const* name = head_data;
-                tb_char_t const* data = head_data + tb_strlen(name) + 1;
-                tb_check_break(data < head_tail);
-
-                // is this?
-                if (!tb_stricmp(name, key)) 
-                {
-                    // ok
-                    *pval = data;
-                    return tb_true;
-                }
-
-                // next
-                head_data = data + tb_strlen(data) + 1;
-            }
-
-            // failed
-            return tb_false;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_HEAD_FUNC:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // head_func
-            tb_http_head_func_t head_func = (tb_http_head_func_t)tb_va_arg(args, tb_http_head_func_t);
-
-            // set head_func
-            impl->option.head_func = head_func;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_HEAD_FUNC:
-        {
-            // phead_func
-            tb_http_head_func_t* phead_func = (tb_http_head_func_t*)tb_va_arg(args, tb_http_head_func_t*);
-            tb_assert_and_check_return_val(phead_func, tb_false);
-
-            // get head_func
-            *phead_func = impl->option.head_func;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_HEAD_PRIV:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // head priv
-            tb_pointer_t head_priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
-
-            // set head priv
-            impl->option.head_priv = head_priv;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_HEAD_PRIV:
-        {
-            // phead priv
-            tb_pointer_t* phead_priv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
-            tb_assert_and_check_return_val(phead_priv, tb_false);
-
-            // get head priv
-            *phead_priv = impl->option.head_priv;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_RANGE:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // set range
-            impl->option.range.bof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
-            impl->option.range.eof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_RANGE:
-        {
-            // pbof
-            tb_hize_t* pbof = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
-            tb_assert_and_check_return_val(pbof, tb_false);
-
-            // peof
-            tb_hize_t* peof = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
-            tb_assert_and_check_return_val(peof, tb_false);
-
-            // ok
-            *pbof = impl->option.range.bof;
-            *peof = impl->option.range.eof;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_SSL:
-        {       
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // bssl
-            tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-
-            // set ssl
-            tb_url_ssl_set(&impl->option.url, bssl);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_SSL:
-        {
-            // pssl
-            tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
-            tb_assert_and_check_return_val(pssl, tb_false);
-
-            // get ssl
-            *pssl = tb_url_ssl_get(&impl->option.url);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_TIMEOUT:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // the timeout
-            tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
-
-            // set timeout
-            impl->option.timeout = timeout? timeout : TB_HTTP_DEFAULT_TIMEOUT;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_TIMEOUT:
-        {
-            // ptimeout
-            tb_long_t* ptimeout = (tb_long_t*)tb_va_arg(args, tb_long_t*);
-            tb_assert_and_check_return_val(ptimeout, tb_false);
-
-            // get timeout
-            *ptimeout = impl->option.timeout;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_COOKIES:
-        {   
-            // is opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // set cookies
-            impl->option.cookies = (tb_cookies_ref_t)tb_va_arg(args, tb_cookies_ref_t);
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_COOKIES:
-        {
-            // pcookies
-            tb_cookies_ref_t* pcookies = (tb_cookies_ref_t*)tb_va_arg(args, tb_cookies_ref_t*);
-            tb_assert_and_check_return_val(pcookies, tb_false);
-
-            // get cookies
-            *pcookies = impl->option.cookies;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_POST_URL:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // url
-            tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(url, tb_false);
-
-            // clear post data and size
-            impl->option.post_data = tb_null;
-            impl->option.post_size = 0;
-            
-            // set url
-            if (tb_url_set(&impl->option.post_url, url)) return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_POST_URL:
-        {
-            // purl
-            tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-            tb_assert_and_check_return_val(purl, tb_false);
-
-            // get url
-            tb_char_t const* url = tb_url_get(&impl->option.post_url);
-            tb_assert_and_check_return_val(url, tb_false);
-
-            // ok
-            *purl = url;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_POST_DATA:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // post data
-            tb_byte_t const*    data = (tb_byte_t const*)tb_va_arg(args, tb_byte_t const*);
-
-            // post size
-            tb_size_t           size = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // clear post url
-            tb_url_clear(&impl->option.post_url);
-            
-            // set post data
-            impl->option.post_data = data;
-            impl->option.post_size = size;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_POST_DATA:
-        {
-            // pdata and psize
-            tb_byte_t const**   pdata = (tb_byte_t const**)tb_va_arg(args, tb_byte_t const**);
-            tb_size_t*          psize = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-            tb_assert_and_check_return_val(pdata && psize, tb_false);
-
-            // get post data and size
-            *pdata = impl->option.post_data;
-            *psize = impl->option.post_size;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_POST_FUNC:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // func
-            tb_http_post_func_t func = (tb_http_post_func_t)tb_va_arg(args, tb_http_post_func_t);
-
-            // set post func
-            impl->option.post_func = func;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_POST_FUNC:
-        {
-            // pfunc
-            tb_http_post_func_t* pfunc = (tb_http_post_func_t*)tb_va_arg(args, tb_http_post_func_t*);
-            tb_assert_and_check_return_val(pfunc, tb_false);
-
-            // get post func
-            *pfunc = impl->option.post_func;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_POST_PRIV:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // post priv
-            tb_cpointer_t priv = (tb_cpointer_t)tb_va_arg(args, tb_cpointer_t);
-
-            // set post priv
-            impl->option.post_priv = priv;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_POST_PRIV:
-        {
-            // ppost priv
-            tb_cpointer_t* ppriv = (tb_cpointer_t*)tb_va_arg(args, tb_cpointer_t*);
-            tb_assert_and_check_return_val(ppriv, tb_false);
-
-            // get post priv
-            *ppriv = impl->option.post_priv;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_POST_LRATE:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // post lrate
-            tb_size_t lrate = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // set post lrate
-            impl->option.post_lrate = lrate;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_POST_LRATE:
-        {
-            // ppost lrate
-            tb_size_t* plrate = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-            tb_assert_and_check_return_val(plrate, tb_false);
- 
-            // get post lrate
-            *plrate = impl->option.post_lrate;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_AUTO_UNZIP:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // bunzip
-            tb_bool_t bunzip = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-
-            // set bunzip
-            impl->option.bunzip = bunzip? 1 : 0;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_AUTO_UNZIP:
-        {
-            // pbunzip
-            tb_bool_t* pbunzip = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
-            tb_assert_and_check_return_val(pbunzip, tb_false);
-
-            // get bunzip
-            *pbunzip = impl->option.bunzip? tb_true : tb_false;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_REDIRECT:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // redirect
-            tb_size_t redirect = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // set redirect
-            impl->option.redirect = redirect;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_REDIRECT:
-        {
-            // predirect
-            tb_size_t* predirect = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-            tb_assert_and_check_return_val(predirect, tb_false);
-
-            // get redirect
-            *predirect = impl->option.redirect;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_SET_VERSION:
-        {
-            // check opened?
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(impl->sstream), tb_false);
-
-            // version
-            tb_size_t version = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // set version
-            impl->option.version = version;
-            return tb_true;
-        }
-        break;
-    case TB_HTTP_OPTION_GET_VERSION:
-        {
-            // pversion
-            tb_size_t* pversion = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-            tb_assert_and_check_return_val(pversion, tb_false);
-
-            // get version
-            *pversion = impl->option.version;
-            return tb_true;
-        }
-        break;
-    default:
-        break;
-    }
-    return tb_false;
+    // ok?
+    return ok;
 }

@@ -74,42 +74,42 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(http);
 
         // init cookies
-        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) break;
+        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_COOKIES, tb_cookies())) break;
 
         // init url
-        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_URL, argv[1])) break;
+        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_URL, argv[1])) break;
 
         // init head 
-//        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Connection", "keep-alive")) break;
+//        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Connection", "keep-alive")) break;
 
         // init cookie
-        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Cookie", "H_PS_PSSID=6622_1459_7649_7570_6997_7444_7540_6018_7694_7673_7254_7633_7584_7416_7688_7777_7474; BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; BDSVRTM=0; BAIDUID=335452A3C469824C45FC0C4F66244949:FG=1; ")) break;
+        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Cookie", "H_PS_PSSID=6622_1459_7649_7570_6997_7444_7540_6018_7694_7673_7254_7633_7584_7416_7688_7777_7474; BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; BDSVRTM=0; BAIDUID=335452A3C469824C45FC0C4F66244949:FG=1; ")) break;
 
         // init head func
-        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_demo_aicp_http_head_func)) break;
+        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_demo_aicp_http_head_func)) break;
 
 #if defined(TB_CONFIG_MODULE_HAVE_ZIP) && defined(TB_CONFIG_THIRD_HAVE_ZLIB)
         // need gzip
-        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
+        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
 
         // auto unzip
-        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_AUTO_UNZIP, 1)) break;
+        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_AUTO_UNZIP, 1)) break;
 #endif
 
         // user agent
-        if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD, "User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36")) break;
+        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36")) break;
 
         // init post
         if (argv[2])
         {
             // init post url
-            if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_POST_URL, argv[2])) break;
+            if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_POST_URL, argv[2])) break;
 
             // init post func
-            if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_POST_FUNC, tb_demo_aicp_http_post_func)) break;
+            if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_POST_FUNC, tb_demo_aicp_http_post_func)) break;
 
             // init method
-            if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+            if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_METHOD, TB_HTTP_METHOD_POST)) break;
         }
 
         // open and read 

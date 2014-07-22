@@ -83,6 +83,10 @@ tbox_C_FILES 			+= \
 						network/ipv4 \
 						network/http \
 						network/cookies \
+						network/impl/http/date \
+						network/impl/http/option \
+						network/impl/http/status \
+						network/impl/http/method \
 						asio/aioo \
 						asio/aiop \
 						stream/static_stream \
@@ -257,11 +261,11 @@ tbox_ASM_FILES-$(ARM) 	+= utils/opt/arm/crc
 
 # openssl
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
-						network/ssl/openssl 
+						network/impl/ssl/openssl 
 
 # polarssl
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_POLARSSL) += \
-						network/ssl/polarssl 
+						network/impl/ssl/polarssl 
 
 # xml
 tbox_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) += \
@@ -593,7 +597,6 @@ INC_FILES 				= \
 						platform/mach/barrier.h \
 						network/prefix.h \
 						network/network.h \
-						network/http.h \
 						network/ipv4.h \
 						network/url.h \
 						network/ssl.h \
@@ -602,6 +605,8 @@ INC_FILES 				= \
 						network/dns/looker.h \
 						network/dns/server.h \
 						network/dns/prefix.h \
+						network/http.h \
+						network/prefix.h \
 						network/cookies.h \
 						charset/charset.h \
 						charset/prefix.h \

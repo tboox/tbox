@@ -32,9 +32,9 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/x509v3.h>
-#include "../../asio/asio.h"
-#include "../../utils/utils.h"
-#include "../../platform/platform.h"
+#include "../../../asio/asio.h"
+#include "../../../utils/utils.h"
+#include "../../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types

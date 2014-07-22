@@ -153,10 +153,10 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(network_url)
 ,   TB_DEMO_MAIN_ITEM(network_ipv4)
 ,   TB_DEMO_MAIN_ITEM(network_http)
-,   TB_DEMO_MAIN_ITEM(network_date)
 ,   TB_DEMO_MAIN_ITEM(network_whois)
 ,   TB_DEMO_MAIN_ITEM(network_spider)
 ,   TB_DEMO_MAIN_ITEM(network_cookies)
+,   TB_DEMO_MAIN_ITEM(network_impl_date)
 
     // platform
 ,   TB_DEMO_MAIN_ITEM(platform_file)

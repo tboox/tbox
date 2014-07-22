@@ -226,15 +226,14 @@ tb_bool_t           tb_aicp_http_open_seek(tb_aicp_http_ref_t http, tb_hize_t of
  */
 tb_aicp_ref_t       tb_aicp_http_aicp(tb_aicp_http_ref_t http);
 
-/*! the http option
+/*! ctrl the http option
  *
  * @param http      the http
  * @param option    the http option
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_http_option(tb_aicp_http_ref_t http, tb_size_t option, ...);
-
+tb_bool_t           tb_aicp_http_ctrl(tb_aicp_http_ref_t http, tb_size_t option, ...);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
