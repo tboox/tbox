@@ -339,7 +339,14 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* cstr)
         {
             // parse path
             if (*p != '/' && *p != '\\' && !url->bwin) tb_string_chrcat(&url->path, '/');
-            while (*p && *p != '?' && *p != '&' && *p != '=') tb_string_chrcat(&url->path, *p++);
+            while (*p && *p != '?' && *p != '&' && *p != '=') 
+            {
+                // append path
+                if (*p != '\\') tb_string_chrcat(&url->path, *p);
+                // replace '\\' => '/'
+                else tb_string_chrcat(&url->path, '/');
+                p++;
+            }
 
             // trim the right spaces
             tb_string_rtrim(&url->path);
@@ -573,8 +580,16 @@ tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
     // set path
     if (path) 
     {
+        // append root: '/'
         if (path[0] != '/') tb_string_chrcat(&url->path, '/');
-        tb_string_cstrcat(&url->path, path);
+        while (*path)
+        {
+            // append path
+            if (*path != '\\') tb_string_chrcat(&url->path, *path);
+            // replace '\\' => '/'
+            else tb_string_chrcat(&url->path, '/');
+            path++;
+        }
  
         // clear url
         tb_string_clear(&url->urls);

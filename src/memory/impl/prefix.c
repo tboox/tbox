@@ -119,7 +119,7 @@ static tb_void_t tb_pool_data_dump_data(tb_byte_t const* data, tb_size_t size)
         else break;
     }
 }
-tb_size_t tb_pool_data_size(tb_cpointer_t data)
+__tb_no_sanitize_address__ tb_size_t tb_pool_data_size(tb_cpointer_t data)
 {
     // check
     tb_check_return_val(data, 0);
