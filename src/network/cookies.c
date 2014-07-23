@@ -164,7 +164,7 @@ static tb_bool_t tb_cookies_is_child_domain(tb_char_t const* parent, tb_char_t c
     tb_char_t const*    cb = child;
     tb_size_t           pn = tb_strlen(pb);
     tb_size_t           cn = tb_strlen(cb);
-    tb_assert_and_check_return_val(pn > 3 && cn > 3, tb_false);
+    tb_assert_and_check_return_val(pn && cn, tb_false);
 
     // is child?
     tb_size_t           n = 0;

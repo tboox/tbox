@@ -80,11 +80,11 @@ typedef struct __tb_url_t
     // the path
     tb_string_t         path;
 
-    // the urls
-    tb_string_t         urls;
-
     // the args
     tb_string_t         args;
+
+    // the url cache
+    tb_string_t         cache;
 
 }tb_url_t;
 
@@ -256,7 +256,6 @@ tb_char_t const*    tb_url_args_get(tb_url_t const* url);
  * @param args      the url arguments
  */
 tb_void_t           tb_url_args_set(tb_url_t* url, tb_char_t const* args);
-
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
