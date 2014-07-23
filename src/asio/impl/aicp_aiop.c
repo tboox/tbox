@@ -72,7 +72,7 @@ typedef struct __tb_aiop_ptor_impl_t
 }tb_aiop_ptor_impl_t;
 
 // the aiop aico type
-typedef struct __tb_aiop_aico_impl_t
+typedef struct __tb_aiop_aico_t
 {
     // the base
     tb_aico_impl_t              base;
@@ -88,6 +88,12 @@ typedef struct __tb_aiop_aico_impl_t
 
     // the task
     tb_handle_t                 task;
+
+    // the accepted socket list
+    tb_socket_ref_t*            acpt_list;
+
+    // the accepted socket maximum count
+    tb_size_t                   acpt_maxn;
 
     /* wait ok? avoid spak double aice when wait killed/timeout and ok at same time
      * need lock it using impl->lock
@@ -434,13 +440,34 @@ static tb_long_t tb_aiop_spak_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
     // accept it
-    tb_handle_t sock = tb_socket_accept(aico->base.handle);
+    tb_size_t       size = 0;
+    tb_socket_ref_t sock = tb_null;
+    while ((sock = tb_socket_accept(aico->base.handle)))
+    {
+        // trace
+        tb_trace_d("acpt[%p]: %p", aico->base.handle, sock);
 
-    // trace
-    tb_trace_d("acpt[%p]: %p", aico->base.handle, sock);
+        // init list
+        if (!aico->acpt_list) 
+        {
+            aico->acpt_maxn = 16;
+            aico->acpt_list = tb_nalloc_type(aico->acpt_maxn, tb_socket_ref_t);
+            tb_assert_and_check_break(aico->acpt_list);
+        }
+        // grow list
+        else if (size >= aico->acpt_maxn)
+        {
+            aico->acpt_maxn = size + 16;
+            aico->acpt_list = tb_ralloc_type(aico->acpt_list, aico->acpt_maxn, tb_socket_ref_t);
+            tb_assert_and_check_break(aico->acpt_list);
+        }
+
+        // save socket
+        aico->acpt_list[size++] = sock;
+    }
 
     // no accepted? wait it
-    if (!sock) 
+    if (!size) 
     {
         // wait it
         if (!aico->waiting)
@@ -456,7 +483,8 @@ static tb_long_t tb_aiop_spak_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
 
     // save it
     aice->state = TB_STATE_OK;
-    aice->u.acpt.sock = sock;
+    aice->u.acpt.list = aico->acpt_list;
+    aice->u.acpt.size = size;
 
     // reset wait
     aico->waiting = 0;
@@ -1224,6 +1252,11 @@ static tb_bool_t tb_aiop_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
             // delo
             if (aiop_aico->aioo) tb_aiop_delo(impl->aiop, aiop_aico->aioo);
             aiop_aico->aioo = tb_null;
+
+            // exit accept socket list
+            if (aiop_aico->acpt_list) tb_free(aiop_aico->acpt_list);
+            aiop_aico->acpt_list = tb_null;
+            aiop_aico->acpt_maxn = 0;
 
             // ok
             ok = tb_true;
