@@ -103,8 +103,6 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_impl_t* reader
     // clear element
     tb_string_clear(&reader->element);
 
-    tb_assert_abort(!tb_stream_beof(reader->rstream));
-
     // parse element
     tb_char_t ch = '\0';
     tb_size_t in = 0;
@@ -120,7 +118,7 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_impl_t* reader
     }
 
     // failed
-    tb_assert_abort(0);
+    tb_assertf_abort(0, "invalid element: %s", tb_string_cstr(&reader->element));
     return tb_null;
 }
 static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_impl_t* reader)
@@ -529,6 +527,11 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
 
             // trace
 //          tb_trace_d("%s", text);
+        }
+        else 
+        {
+            // skip the invalid character
+            if (!tb_stream_skip(impl->rstream, 1)) break;
         }
     }
 

@@ -171,9 +171,9 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_string_clear(&impl->request);
 
         // init the head value
-        tb_char_t           data[64];
+        tb_char_t           data[8192];
         tb_static_string_t  value;
-        if (!tb_static_string_init(&value, data, 64)) break;
+        if (!tb_static_string_init(&value, data, sizeof(data))) break;
 
         // init method
         tb_char_t const* method = tb_http_method_cstr(impl->option.method);
@@ -201,20 +201,8 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_bool_t cookie = tb_false;
         if (impl->option.cookies)
         {
-            // the host
-            tb_char_t const* host = tb_null;
-            tb_http_ctrl((tb_http_ref_t)impl, TB_HTTP_OPTION_GET_HOST, &host);
-
-            // the path
-            tb_char_t const* path = tb_null;
-            tb_http_ctrl((tb_http_ref_t)impl, TB_HTTP_OPTION_GET_PATH, &path);
-
-            // is ssl?
-            tb_bool_t bssl = tb_false;
-            tb_http_ctrl((tb_http_ref_t)impl, TB_HTTP_OPTION_GET_SSL, &bssl);
-                
             // set cookie
-            if (tb_cookies_get(impl->option.cookies, host, path, bssl, &impl->cookies))
+            if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl_get(&impl->option.url), &impl->cookies))
             {
                 tb_hash_set(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
                 cookie = tb_true;
@@ -300,6 +288,9 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             head_data = data + tb_strlen(data) + 1;
         }
 
+        // exit the head value
+        tb_static_string_exit(&value);
+
         // check head
         tb_assert_and_check_break(tb_hash_size(impl->head));
 
@@ -309,13 +300,24 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         // append ' '
         tb_string_chrcat(&impl->request, ' ');
 
+        // encode path
+        tb_url_encode2(path, tb_strlen(path), data, sizeof(data) - 1);
+        path = data;
+
         // append path
         tb_string_cstrcat(&impl->request, path);
 
         // append args if exists
         if (args) 
         {
+            // append '?'
             tb_string_chrcat(&impl->request, '?');
+
+            // encode args
+            tb_url_encode2(args, tb_strlen(args), data, sizeof(data) - 1);
+            args = data;
+
+            // append args
             tb_string_cstrcat(&impl->request, args);
         }
 
@@ -334,9 +336,6 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
 
         // append end
         tb_string_cstrcat(&impl->request, "\r\n");
-
-        // exit the head value
-        tb_static_string_exit(&value);
 
         // the request data and size
         tb_char_t const*    request_data = tb_string_cstr(&impl->request);
