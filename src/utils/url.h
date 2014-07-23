@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! encode url
+/*! encode the url, not encode: -_. and ' ' => '+'
  *
  * @param ib        the input data
  * @param in        the input size
@@ -49,7 +49,7 @@ __tb_extern_c_enter__
  */
 tb_size_t           tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
 
-/*! decode url
+/*! decode the url
  *
  * @param ib        the input data
  * @param in        the input size
@@ -59,6 +59,28 @@ tb_size_t           tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* 
  * @return          the real size
  */
 tb_size_t           tb_url_decode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
+
+/*! encode the url, not encode: -_.!~*'();/?:@&=+$,#
+ *
+ * @param ib        the input data
+ * @param in        the input size
+ * @param ob        the output data
+ * @param on        the output size
+ *
+ * @return          the real size
+ */
+tb_size_t           tb_url_encode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
+
+/*! decode the url
+ *
+ * @param ib        the input data
+ * @param in        the input size
+ * @param ob        the output data
+ * @param on        the output size
+ *
+ * @return          the real size
+ */
+tb_size_t           tb_url_decode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

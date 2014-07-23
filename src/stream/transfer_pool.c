@@ -124,8 +124,8 @@ static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_impl_t* impl, 
         // init task from the idle list first
         if (tb_list_entry_size(&impl->idle))
         {
-            // get the last entry
-            tb_list_entry_ref_t entry = tb_list_entry_last(&impl->idle);
+            // get the head entry
+            tb_list_entry_ref_t entry = tb_list_entry_head(&impl->idle);
             tb_assert_and_check_break(entry);
 
             // the task
