@@ -38,7 +38,7 @@
 #if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
 #   if defined(TB_ASSEMBLER_IS_MASM)
 //#       define tb_abort_done()                          do { __tb_asm__ { ud2 } } while (0)
-#       define tb_abort_done()                          do { __tb_asm__ { int3 } } while (0)
+#       define tb_abort_done()                          do { __tb_asm__ { int 3 } } while (0)
 #   elif defined(TB_ASSEMBLER_IS_GAS)
 //#       define tb_abort_done()                          do { __tb_asm__ __tb_volatile__ ("ud2"); } while (0)
 #     define tb_abort_done()                            do { __tb_asm__ __tb_volatile__ ("int3"); } while (0)
