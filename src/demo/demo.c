@@ -61,10 +61,12 @@ static tb_demo_t g_demo[] =
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
 ,   TB_DEMO_MAIN_ITEM(asio_dns)
 ,   TB_DEMO_MAIN_ITEM(asio_http)
+,   TB_DEMO_MAIN_ITEM(asio_httpd)
 ,   TB_DEMO_MAIN_ITEM(asio_aiopc)
 ,   TB_DEMO_MAIN_ITEM(asio_aiopd)
 ,   TB_DEMO_MAIN_ITEM(asio_aicpc)
 ,   TB_DEMO_MAIN_ITEM(asio_aicpd)
+,   TB_DEMO_MAIN_ITEM(asio_spider)
 #endif
 
     // math
@@ -154,7 +156,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(network_ipv4)
 ,   TB_DEMO_MAIN_ITEM(network_http)
 ,   TB_DEMO_MAIN_ITEM(network_whois)
-,   TB_DEMO_MAIN_ITEM(network_spider)
 ,   TB_DEMO_MAIN_ITEM(network_cookies)
 ,   TB_DEMO_MAIN_ITEM(network_impl_date)
 
@@ -162,11 +163,9 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_file)
 ,   TB_DEMO_MAIN_ITEM(platform_lock)
 ,   TB_DEMO_MAIN_ITEM(platform_path)
-,   TB_DEMO_MAIN_ITEM(platform_cache_time)
 ,   TB_DEMO_MAIN_ITEM(platform_event)
 ,   TB_DEMO_MAIN_ITEM(platform_utils)
 ,   TB_DEMO_MAIN_ITEM(platform_timer)
-,   TB_DEMO_MAIN_ITEM(platform_thread_store)
 ,   TB_DEMO_MAIN_ITEM(platform_ltimer)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic)
 ,   TB_DEMO_MAIN_ITEM(platform_process)
@@ -176,7 +175,9 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_directory)
 ,   TB_DEMO_MAIN_ITEM(platform_exception)
 ,   TB_DEMO_MAIN_ITEM(platform_semaphore)
+,   TB_DEMO_MAIN_ITEM(platform_cache_time)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
+,   TB_DEMO_MAIN_ITEM(platform_thread_store)
 
     // container
 ,   TB_DEMO_MAIN_ITEM(container_heap)

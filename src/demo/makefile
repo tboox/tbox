@@ -47,7 +47,6 @@ demo_C_FILES 								+= \
 											network/ipv4 \
 											network/http \
 											network/whois \
-											network/spider \
 											network/cookies \
 											network/impl/date \
 											platform/file \
@@ -115,10 +114,12 @@ ifeq ($(TB_CONFIG_MODULE_HAVE_ASIO),y)
 demo_C_FILES 								+= \
 											asio/dns \
 											asio/http \
+											asio/httpd \
 											asio/aiopc \
 											asio/aiopd \
 											asio/aicpc \
 											asio/aicpd \
+											asio/spider \
 											stream/async_stream/null \
 											stream/async_stream/cache \
 											stream/async_transfer \

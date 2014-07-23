@@ -63,10 +63,12 @@ TB_DEMO_MAIN_DECL(libm_integer);
 // asio
 TB_DEMO_MAIN_DECL(asio_dns);
 TB_DEMO_MAIN_DECL(asio_http);
+TB_DEMO_MAIN_DECL(asio_httpd);
 TB_DEMO_MAIN_DECL(asio_aiopc);
 TB_DEMO_MAIN_DECL(asio_aiopd);
 TB_DEMO_MAIN_DECL(asio_aicpc);
 TB_DEMO_MAIN_DECL(asio_aicpd);
+TB_DEMO_MAIN_DECL(asio_spider);
 
 // math
 TB_DEMO_MAIN_DECL(math_fixed);
@@ -133,7 +135,6 @@ TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_http);
 TB_DEMO_MAIN_DECL(network_whois);
-TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
 TB_DEMO_MAIN_DECL(network_impl_date);
 
@@ -141,11 +142,9 @@ TB_DEMO_MAIN_DECL(network_impl_date);
 TB_DEMO_MAIN_DECL(platform_file);
 TB_DEMO_MAIN_DECL(platform_lock);
 TB_DEMO_MAIN_DECL(platform_path);
-TB_DEMO_MAIN_DECL(platform_cache_time);
 TB_DEMO_MAIN_DECL(platform_event);
 TB_DEMO_MAIN_DECL(platform_utils);
 TB_DEMO_MAIN_DECL(platform_timer);
-TB_DEMO_MAIN_DECL(platform_thread_store);
 TB_DEMO_MAIN_DECL(platform_ltimer);
 TB_DEMO_MAIN_DECL(platform_atomic);
 TB_DEMO_MAIN_DECL(platform_process);
@@ -155,7 +154,9 @@ TB_DEMO_MAIN_DECL(platform_backtrace);
 TB_DEMO_MAIN_DECL(platform_directory);
 TB_DEMO_MAIN_DECL(platform_exception);
 TB_DEMO_MAIN_DECL(platform_semaphore);
+TB_DEMO_MAIN_DECL(platform_cache_time);
 TB_DEMO_MAIN_DECL(platform_thread_pool);
+TB_DEMO_MAIN_DECL(platform_thread_store);
 
 // container
 TB_DEMO_MAIN_DECL(container_heap);
