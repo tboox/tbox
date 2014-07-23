@@ -1198,6 +1198,13 @@ tb_long_t tb_thread_pool_task_wait_all(tb_thread_pool_ref_t pool, tb_long_t time
                     , tb_list_entry_size(&impl->jobs_pending) 
                     , tb_list_entry_size(&impl->jobs_urgent));
 
+#if 0
+        tb_for_all_if (tb_thread_pool_job_t*, job, tb_list_entry_itor(&impl->jobs_pending), job)
+        {
+            tb_trace_d("wait: job: %s from pending", tb_state_cstr(tb_atomic_get(&job->state)));
+        }
+#endif
+
         // leave
         tb_spinlock_leave(&impl->lock);
 

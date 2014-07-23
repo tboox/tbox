@@ -76,9 +76,6 @@ typedef struct __tb_demo_spider_parser_t
     // the url 
     tb_char_t                   url[8192];
 
-    // the encoded url 
-    tb_char_t                   url_encoded[8192];
-
 }tb_demo_spider_parser_t;
 
 // the demo spider task type
@@ -339,15 +336,12 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
             while (     TB_STATE_OK == tb_atomic_get(&task->spider->state)
                     &&  tb_demo_spider_parser_get_url(parser->reader, parser->url, sizeof(parser->url) - 1, &html))
             {
-                // encode url
-                tb_url_encode2(parser->url, tb_strlen(parser->url), parser->url_encoded, sizeof(parser->url_encoded) - 1);
-
                 // trace
-                tb_trace_d("parser: done: %s => %s, encoded: %s", task->iurl, parser->url, parser->url_encoded);
+                tb_trace_d("parser: done: %s => %s", task->iurl, parser->url);
 
                 // done
                 tb_bool_t full = tb_false;
-                if (!tb_demo_spider_task_done(task->spider, parser->url_encoded, html, &full) && full) break;
+                if (!tb_demo_spider_task_done(task->spider, parser->url, html, &full) && full) break;
 
                 // reset html
                 html = tb_true;

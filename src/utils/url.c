@@ -165,3 +165,42 @@ tb_size_t tb_url_decode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_si
     // ok
     return op - ob;
 }
+tb_size_t tb_url_encode_args(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on)
+{
+    // init
+    tb_char_t const*    ip = ib;
+    tb_char_t*          op = ob;
+    tb_char_t const*    ie = ib + in;
+    tb_char_t const*    oe = ob + on;
+    static tb_char_t    ht[] = "0123456789ABCDEF";
+
+    // done
+    while (ip < ie && op < oe) 
+    {
+        // character
+        tb_byte_t c = *ip++;
+
+        // %xx?
+        if (    (c < '0' && c != '-' && c != '.' && c != '!' && c != '(' && c != ')' && c != '*' && c != '\'') 
+            ||  (c < 'A' && c > '9')
+            ||  (c > 'Z' && c < 'a' && c != '_') 
+            ||  (c > 'z' && c != '~'))
+        {
+            op[0] = '%';
+            op[1] = ht[c >> 4];
+            op[2] = ht[c & 15];
+            op += 3;
+        } 
+        else *op++ = c;
+    }
+
+    // end
+    *op = '\0';
+
+    // ok
+    return op - ob;
+}
+tb_size_t tb_url_decode_args(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on)
+{
+    return tb_url_decode2(ib, in, ob, on);
+}
