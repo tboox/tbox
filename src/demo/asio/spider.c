@@ -118,7 +118,6 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
  * implementation
  */ 
 #if defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
-    && defined(TB_CONFIG_MODULE_HAVE_ASIO) \
     && defined(TB_CONFIG_MODULE_HAVE_XML)
 static tb_bool_t tb_demo_spider_parser_open_html(tb_stream_ref_t stream, tb_char_t const* url)
 {
@@ -750,7 +749,7 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_asio_spider_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
     tb_demo_spider_t spider = {0};
@@ -774,7 +773,7 @@ tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
     return 0;
 }
 #else
-tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_asio_spider_main(tb_int_t argc, tb_char_t** argv)
 {
     return 0;
 }
