@@ -149,6 +149,9 @@ typedef struct __tb_iocp_aico_t
     // the task
     tb_handle_t                                 task;
 
+    // the accepted socket list
+    tb_socket_ref_t                             acpt_list[1];
+
     // is ltimer?
     tb_uint8_t                                  bltimer : 1;
 
@@ -234,6 +237,9 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // check?
     tb_assert_and_check_return_val(impl && resp && resp->aico, -1);
 
+    // the aico
+    tb_iocp_aico_t* aico = (tb_iocp_aico_t*)resp->aico;
+
     // done
     switch (error)
     {
@@ -247,7 +253,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
             {
             case TB_STATE_OK:
             case TB_STATE_PENDING:
-                resp->state = resp->u.acpt.sock? TB_STATE_OK : TB_STATE_FAILED;
+                resp->state = aico->acpt_list[0]? TB_STATE_OK : TB_STATE_FAILED;
                 break;
             default:
                 // using the self state here
@@ -271,11 +277,19 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
         break;
     }
 
-    // failed? exit sock
+    // ok?
     if (resp->state != TB_STATE_OK)
     {
-        if (resp->u.acpt.sock) tb_socket_clos(resp->u.acpt.sock);
-        resp->u.acpt.sock = tb_null;
+        // save socket
+        resp->u.acpt.size = 1;
+        resp->u.acpt.list = aico->acpt_list;
+    }
+    // failed? 
+    else
+    {
+        // exit sock
+        if (aico->acpt_list[0]) tb_socket_clos(aico->acpt_list[0]);
+        aico->acpt_list[0] = tb_null;
     }
 
     // exit data
@@ -606,12 +620,15 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // init olap
         tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
 
+        // init sock
+        aico->acpt_list[0] = tb_socket_open(TB_SOCKET_TYPE_TCP);
+        tb_assert_and_check_break(aico->acpt_list[0]);
+
         // init aice, hack: sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1)
         aico->olap.aice                 = *aice;
-        aico->olap.aice.u.acpt.sock     = tb_socket_open(TB_SOCKET_TYPE_TCP);
         aico->olap.aice.u.acpt.priv[0] = (tb_handle_t)tb_malloc0(((sizeof(SOCKADDR_IN) + 16) << 1));
         tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv));
-        tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.sock);
+        tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0]);
         init_ok = tb_true;
 
         // post timeout first
@@ -620,7 +637,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // done AcceptEx
         DWORD real = 0;
         AcceptEx_ok = impl->func.AcceptEx(  (SOCKET)aico->base.handle - 1
-                                        ,   (SOCKET)aico->olap.aice.u.acpt.sock - 1
+                                        ,   (SOCKET)aico->acpt_list[0] - 1
                                         ,   (tb_byte_t*)aico->olap.aice.u.acpt.priv[0]
                                         ,   0
                                         ,   sizeof(SOCKADDR_IN) + 16
@@ -668,8 +685,8 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         aico->olap.aice.u.acpt.priv[0] = tb_null;
 
         // exit sock
-        if (aico->olap.aice.u.acpt.sock) tb_socket_clos(aico->olap.aice.u.acpt.sock);
-        aico->olap.aice.u.acpt.sock = tb_null;
+        if (aico->acpt_list[0]) tb_socket_clos(aico->acpt_list[0]);
+        aico->acpt_list[0] = tb_null;
 
         // remove timeout task
         tb_iocp_post_timeout_cancel(impl, aico);

@@ -84,11 +84,14 @@ typedef struct __tb_aice_addr_t
 /// the acpt aice type
 typedef struct __tb_aice_acpt_t
 {
-    /// the client socket 
-    tb_socket_ref_t             sock;
+    /// the client socket list
+    tb_socket_ref_t*            list;
+
+    /// the client socket count
+    tb_size_t                   size;
 
     /// the private data for using the left space of the union
-    tb_handle_t                 priv[5];
+    tb_handle_t                 priv[4];
 
 }tb_aice_acpt_t;
 
