@@ -96,7 +96,7 @@ static tb_char_t const* tb_url_parse_host(tb_string_t* host, tb_char_t const* p)
 
     // parse host
     tb_char_t ch;
-    while ((ch = *p) && (tb_isalpha(ch) || tb_isdigit(ch) || ch == '.')) 
+    while ((ch = *p) && !tb_isspace(ch) && ch != '/' && ch != '\\' && ch != '?' && ch != '&')
     {
         // append character
         tb_string_chrcat(host, ch);
@@ -525,10 +525,10 @@ tb_char_t const* tb_url_protocol_cstr(tb_url_t const* url)
     static tb_char_t const* s_protocols[] = 
     {
         tb_null
-    ,   "data"
     ,   "file"
     ,   "sock"
     ,   "http"
+    ,   "data"
     ,   "rtsp"
     ,   "sql"
     };

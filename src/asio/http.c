@@ -143,11 +143,11 @@ typedef struct __tb_aicp_http_impl_t
     // the cache read
     tb_size_t                       cache_read;
 
-    // the redirect read
-    tb_hize_t                       redirect_read;
-
     // the redirect tryn
     tb_size_t                       redirect_tryn;
+
+    // the content read 
+    tb_hize_t                       content_read;
 
     // the clos opening
     tb_aicp_http_clos_opening_t     clos_opening;
@@ -600,10 +600,10 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_ref_t stream, tb_si
         if (state == TB_STATE_OK)
         {
             // save read
-            impl->redirect_read += real;
+            impl->content_read += real;
 
             // continue?
-            if (impl->status.content_size < 0 || impl->redirect_read < (tb_hize_t)impl->status.content_size) return tb_true;
+            if (impl->status.content_size < 0 || impl->content_read < (tb_hize_t)impl->status.content_size) return tb_true;
         }
 
         // ok? 
@@ -749,10 +749,10 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
             if (tb_string_size(&impl->status.location) && impl->redirect_tryn++ < impl->option.redirect)
             {
                 // save the redirect read
-                impl->redirect_read = e - p;
+                impl->content_read = e - p;
 
                 // read the left data
-                if (impl->status.content_size < 0 || impl->redirect_read < (tb_hize_t)impl->status.content_size)
+                if (impl->status.content_size < 0 || impl->content_read < (tb_hize_t)impl->status.content_size)
                 {
                     if (!tb_async_stream_read(impl->stream, 0, tb_aicp_http_head_redt_func, impl)) break;
                 }
@@ -1145,11 +1145,27 @@ static tb_bool_t tb_aicp_http_read_func(tb_async_stream_ref_t stream, tb_size_t 
     tb_aicp_http_impl_t* impl = (tb_aicp_http_impl_t*)priv;
     tb_assert_and_check_return_val(impl && impl->stream && impl->func.read, tb_false);
 
+    // ok? update the content read 
+    if (state == TB_STATE_OK) impl->content_read += real;
+
     // trace
-    tb_trace_d("read: %s, real: %lu, state: %s", tb_url_get(&impl->option.url), real, tb_state_cstr(state));
+    tb_trace_d("read: %s, real: %lu, offset: %llu <? %llu, state: %s", tb_url_get(&impl->option.url), real, impl->content_read, impl->status.content_size, tb_state_cstr(state));
 
     // done func
-    return impl->func.read((tb_aicp_http_ref_t)impl, state, data, real, size, impl->priv);
+    tb_bool_t ok = impl->func.read((tb_aicp_http_ref_t)impl, state, data, real, size, impl->priv);
+
+    // end?
+    if (ok && state == TB_STATE_OK && impl->status.content_size >= 0 && impl->content_read >= (tb_hize_t)impl->status.content_size)
+    {
+        // done func: closed
+        impl->func.read((tb_aicp_http_ref_t)impl, TB_STATE_CLOSED, data, 0, size, impl->priv);
+
+        // break reading
+        ok = tb_false;
+    }
+
+    // ok?
+    return ok;
 }
 static tb_bool_t tb_aicp_http_task_func(tb_async_stream_ref_t stream, tb_size_t state, tb_cpointer_t priv)
 {
@@ -1170,6 +1186,9 @@ static tb_void_t tb_aicp_http_clos_clear(tb_aicp_http_impl_t* impl)
 
     // reset stream
     impl->stream = impl->sstream;
+
+    // clear the content read size
+    impl->content_read = 0;
 
     // closed
     tb_atomic_set(&impl->state, TB_STATE_CLOSED);
@@ -1606,6 +1625,9 @@ tb_bool_t tb_aicp_http_read_after(tb_aicp_http_ref_t http, tb_size_t delay, tb_s
     {
         // read cache
         impl->cache_read = cache_size;
+
+        // update the content read 
+        impl->content_read += cache_size;
 
         // done func
         tb_bool_t ok = func(http, TB_STATE_OK, cache_data, cache_size, cache_size, priv);

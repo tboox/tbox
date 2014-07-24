@@ -39,7 +39,10 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
         
         // init url
         if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_URL, argv[1])) break;
-        
+
+        // init head 
+//        if (!tb_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Connection", "keep-alive")) break;
+
         // init post 
         if (argv[2])
         {

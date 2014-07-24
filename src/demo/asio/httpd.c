@@ -13,6 +13,9 @@
 // the httpd session maximum count
 #define TB_DEMO_HTTPD_SESSION_MAXN                      (100000)
 
+// the httpd session timeout: 15s
+#define TB_DEMO_HTTPD_SESSION_TIMEOUT                   (15000)
+
 // the httpd session buffer maximum size
 #define TB_DEMO_HTTPD_SESSION_BUFF_MAXN                 (8192)
 
@@ -166,6 +169,31 @@ static tb_void_t tb_demo_httpd_session_exit(tb_demo_httpd_session_t* session)
     // exit it
     tb_free(session);
 }
+static tb_void_t tb_demo_httpd_session_keep(tb_demo_httpd_session_t* session)
+{
+    // check
+    tb_assert_and_check_return(session);
+
+    // exit file
+    if (session->file) tb_file_exit(session->file);
+    session->file = tb_null;
+
+    // clear cache
+    tb_buffer_clear(&session->cache);
+    
+    // clear line
+    tb_string_clear(&session->line);
+ 
+    // clear path
+    tb_string_clear(&session->path);
+
+    // clear some status
+    session->code           = TB_HTTP_CODE_OK;
+    session->index          = 0;
+    session->method         = TB_HTTP_METHOD_GET;
+    session->file_offset    = 0;
+    session->content_size   = 0;
+}
 static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* httpd, tb_socket_ref_t sock)
 {
     // check
@@ -203,6 +231,10 @@ static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* http
         session->aico = tb_aico_init_sock(httpd->aicp, sock);
         tb_assert_and_check_break(session->aico);
 
+        // init timeout
+        tb_aico_timeout_set(session->aico, TB_AICO_TIMEOUT_SEND, TB_DEMO_HTTPD_SESSION_TIMEOUT);
+        tb_aico_timeout_set(session->aico, TB_AICO_TIMEOUT_RECV, TB_DEMO_HTTPD_SESSION_TIMEOUT);
+
         // ok
         ok = tb_true;
 
@@ -218,6 +250,23 @@ static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* http
 
     // ok?
     return session;
+}
+static tb_bool_t tb_demo_httpd_session_head_recv(tb_aice_t const* aice);
+static tb_void_t tb_demo_httpd_session_resp_exit(tb_demo_httpd_session_t* session)
+{
+    // keep-alived?
+    tb_bool_t ok = tb_false;
+    if (session->balived && session->aico)
+    {
+        // keep session
+        tb_demo_httpd_session_keep(session);
+
+        // recv the header
+        ok = tb_aico_recv(session->aico, session->buffer, sizeof(session->buffer), tb_demo_httpd_session_head_recv, session);
+    }
+
+    // exit session
+    if (!ok) tb_demo_httpd_session_exit(session);
 }
 static tb_bool_t tb_demo_httpd_session_resp_send_file(tb_aice_t const* aice)
 {
@@ -256,8 +305,8 @@ static tb_bool_t tb_demo_httpd_session_resp_send_file(tb_aice_t const* aice)
         // trace
         tb_trace_d("resp_send_file[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 
-        // exit session
-        tb_demo_httpd_session_exit(session);
+        // exit response
+        tb_demo_httpd_session_resp_exit(session);
     }
 
     // ok
@@ -306,8 +355,8 @@ static tb_bool_t tb_demo_httpd_session_resp_send_head(tb_aice_t const* aice)
         // trace
         tb_trace_d("resp_send_head[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 
-        // exit session
-        tb_demo_httpd_session_exit(session);
+        // exit response
+        tb_demo_httpd_session_resp_exit(session);
     }
 
     // ok
@@ -321,14 +370,16 @@ static tb_bool_t tb_demo_httpd_session_resp_send_done(tb_demo_httpd_session_t* s
     // format the error info
     tb_long_t size = tb_snprintf(   (tb_char_t*)session->buffer
                                 ,   sizeof(session->buffer) - 1
-                                ,   "HTTP/1.1 %lu %s\r\n"
+                                ,   "HTTP/1.%u %lu %s\r\n"
                                     "Content-Type: text/html\r\n"
                                     "Content-Length: %llu\r\n"
-                                    "Connection: close\r\n"
+                                    "Connection: %s\r\n"
                                     "\r\n"
+                                ,   session->version
                                 ,   session->code
                                 ,   tb_demo_httpd_code_cstr(session->code)
-                                ,   session->file? tb_file_size(session->file) : 0);
+                                ,   session->file? tb_file_size(session->file) : 0
+                                ,   session->balived? "keep-alive" : "close");
 
     tb_assert_and_check_return_val(size > 0, tb_false);
 
@@ -495,9 +546,6 @@ static tb_bool_t tb_demo_httpd_session_head_done(tb_demo_httpd_session_t* sessio
         {
             // keep-alive?
             session->balived = !tb_stricmp(p, "keep-alive")? 1 : 0;
-
-            // save code
-            if (session->balived) session->code = TB_HTTP_CODE_NOT_IMPLEMENTED;
         }
         // parse accept-encoding
         else if (!tb_strnicmp(line, "Accept-Encoding", 15))
