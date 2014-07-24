@@ -96,7 +96,7 @@ static tb_char_t const* tb_url_parse_host(tb_string_t* host, tb_char_t const* p)
 
     // parse host
     tb_char_t ch;
-    while ((ch = *p) && !tb_isspace(ch) && ch != '/' && ch != '\\' && ch != '?' && ch != '&')
+    while ((ch = *p) && !tb_isspace(ch) && ch != ':' && ch != '/' && ch != '\\' && ch != '?' && ch != '&')
     {
         // append character
         tb_string_chrcat(host, ch);
