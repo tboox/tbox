@@ -27,8 +27,11 @@ demo_C_FILES 								+= \
 											other/test \
 											other/flv \
 											other/libflv \
+											stream/stream \
+											stream/stream/zip \
 											stream/stream/null \
 											stream/stream/cache \
+											stream/stream/charset \
 											string/string \
 											string/static_string \
 											memory/check \
@@ -47,6 +50,7 @@ demo_C_FILES 								+= \
 											network/ipv4 \
 											network/http \
 											network/whois \
+											network/spider \
 											network/cookies \
 											network/impl/date \
 											platform/file \
@@ -85,9 +89,6 @@ demo_C_FILES-$(TB_CONFIG_TYPE_FLOAT) 		+= \
 											libm/float \
 											libm/double
 
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ZIP) 	+= \
-											stream/stream/zip
-
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 											xml/reader \
 											xml/writer \
@@ -95,7 +96,6 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 											utils/option \
-											stream/stream \
 											object/json \
 											object/bin \
 											object/xml \
@@ -104,14 +104,13 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 											object/dump 
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
-											other/charset \
-											stream/stream/charset 
+											other/charset
+											
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_DATABASE) += \
 											database/sql 
 
-ifeq ($(TB_CONFIG_MODULE_HAVE_ASIO),y)
-demo_C_FILES 								+= \
+demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ASIO) 	+= \
 											asio/dns \
 											asio/http \
 											asio/httpd \
@@ -119,21 +118,13 @@ demo_C_FILES 								+= \
 											asio/aiopd \
 											asio/aicpc \
 											asio/aicpd \
-											asio/spider \
+											stream/async_stream \
+											stream/async_stream/zip \
 											stream/async_stream/null \
 											stream/async_stream/cache \
+											stream/async_stream/charset \
 											stream/async_transfer \
 											stream/transfer_pool 
-
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
-											stream/async_stream/charset 
-
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
-											stream/async_stream
-
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ZIP) 	+= \
-											stream/async_stream/zip 
-endif
 
 
 # libs

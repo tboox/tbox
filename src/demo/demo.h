@@ -68,7 +68,6 @@ TB_DEMO_MAIN_DECL(asio_aiopc);
 TB_DEMO_MAIN_DECL(asio_aiopd);
 TB_DEMO_MAIN_DECL(asio_aicpc);
 TB_DEMO_MAIN_DECL(asio_aicpd);
-TB_DEMO_MAIN_DECL(asio_spider);
 
 // math
 TB_DEMO_MAIN_DECL(math_fixed);
@@ -135,6 +134,7 @@ TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_http);
 TB_DEMO_MAIN_DECL(network_whois);
+TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
 TB_DEMO_MAIN_DECL(network_impl_date);
 

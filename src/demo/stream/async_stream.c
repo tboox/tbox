@@ -37,8 +37,9 @@ typedef struct __tb_demo_context_t
 }tb_demo_context_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * func
+ * implementation
  */
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 static tb_bool_t tb_demo_http_post_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // percent
@@ -405,3 +406,9 @@ tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
 
     return 0;
 }
+#else
+tb_int_t tb_demo_stream_async_stream_main(tb_int_t argc, tb_char_t** argv)
+{
+    return 0;
+}
+#endif
