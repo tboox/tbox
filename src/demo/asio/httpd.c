@@ -550,8 +550,6 @@ static tb_bool_t tb_demo_httpd_session_head_done(tb_demo_httpd_session_t* sessio
         // parse accept-encoding
         else if (!tb_strnicmp(line, "Accept-Encoding", 15))
         {
-            // save code
-            session->code = TB_HTTP_CODE_NOT_IMPLEMENTED;
         }
         // parse accept
         else if (!tb_strnicmp(line, "Accept", 6))
