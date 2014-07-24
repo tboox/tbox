@@ -246,17 +246,21 @@ static tb_handle_t tb_aicp_instance_init(tb_cpointer_t* ppriv)
 }
 static tb_void_t tb_aicp_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
+    // check
+    tb_assert_and_check_return(handle);
+
+    // wait all
+    if (!tb_aicp_wait_all((tb_aicp_ref_t)handle, 5000)) return ;
+
+    // kill aicp
+    tb_aicp_kill((tb_aicp_ref_t)handle);
+
     // exit loop
     tb_thread_ref_t loop = (tb_thread_ref_t)priv;
     if (loop)
     {
         // wait it
-        tb_long_t wait = 0;
-        if (!(wait = tb_thread_wait(loop, 5000)))
-        {
-            // trace
-            tb_trace_e("loop[%p]: wait failed: %ld!", loop, wait);
-        }
+        if (!tb_thread_wait(loop, 5000)) return ;
 
         // exit it
         tb_thread_exit(loop);
@@ -267,8 +271,11 @@ static tb_void_t tb_aicp_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 }
 static tb_void_t tb_aicp_instance_kill(tb_handle_t handle, tb_cpointer_t priv)
 {
-    // kill it
-    tb_aicp_kill((tb_aicp_ref_t)handle);
+    // check
+    tb_assert_and_check_return(handle);
+
+    // kill all
+    tb_aicp_kill_all((tb_aicp_ref_t)handle);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

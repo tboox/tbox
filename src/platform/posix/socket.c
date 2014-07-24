@@ -214,7 +214,7 @@ tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t 
     {
         tb_int_t reuseaddr = 1;
         if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
-            tb_trace_d("reuseaddr: failed");
+            tb_trace_e("reuseaddr: failed");
     }
 #endif
 
@@ -224,7 +224,7 @@ tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t 
     {
         tb_int_t reuseport = 1;
         if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
-            tb_trace_d("reuseport: %lu failed", port);
+            tb_trace_e("reuseport: %lu failed", port);
     }
 #endif
 

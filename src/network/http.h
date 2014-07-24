@@ -53,19 +53,79 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
+
 /// the http method enum
 typedef enum __tb_http_method_e
 {
-    TB_HTTP_METHOD_GET                      = 0
-,   TB_HTTP_METHOD_POST                     = 1
-,   TB_HTTP_METHOD_HEAD                     = 2
-,   TB_HTTP_METHOD_PUT                      = 3
-,   TB_HTTP_METHOD_OPTIONS                  = 4
-,   TB_HTTP_METHOD_DELETE                   = 5
-,   TB_HTTP_METHOD_TRACE                    = 6
-,   TB_HTTP_METHOD_CONNECT                  = 7
+    TB_HTTP_METHOD_GET                          = 0
+,   TB_HTTP_METHOD_POST                         = 1
+,   TB_HTTP_METHOD_HEAD                         = 2
+,   TB_HTTP_METHOD_PUT                          = 3
+,   TB_HTTP_METHOD_OPTIONS                      = 4
+,   TB_HTTP_METHOD_DELETE                       = 5
+,   TB_HTTP_METHOD_TRACE                        = 6
+,   TB_HTTP_METHOD_CONNECT                      = 7
 
 }tb_http_method_e;
+
+/// the http code enum
+typedef enum __tb_http_code_e
+{
+    TB_HTTP_CODE_CONTINUE                       = 100
+,   TB_HTTP_CODE_SWITCHING_PROTOCOLS            = 101
+,   TB_HTTP_CODE_PROCESSING                     = 102
+
+,   TB_HTTP_CODE_OK                             = 200
+,   TB_HTTP_CODE_CREATED                        = 201
+,   TB_HTTP_CODE_ACCEPTED                       = 202
+,   TB_HTTP_CODE_NON_AUTHORITATIVE_INFORMATION  = 203
+,   TB_HTTP_CODE_NO_CONTENT                     = 204
+,   TB_HTTP_CODE_RESET_CONTENT                  = 205
+,   TB_HTTP_CODE_PARTIAL_CONTENT                = 206
+,   TB_HTTP_CODE_MULTI_STATUS                   = 207
+
+,   TB_HTTP_CODE_MULTIPLE_CHOICES               = 300
+,   TB_HTTP_CODE_MOVED_PERMANENTLY              = 301
+,   TB_HTTP_CODE_MOVED_TEMPORARILY              = 302
+,   TB_HTTP_CODE_SEE_OTHER                      = 303
+,   TB_HTTP_CODE_NOT_MODIFIED                   = 304
+,   TB_HTTP_CODE_USE_PROXY                      = 305
+,   TB_HTTP_CODE_SWITCH_PROXY                   = 306
+,   TB_HTTP_CODE_TEMPORARY_REDIRECT             = 307
+
+,   TB_HTTP_CODE_BAD_REQUEST                    = 400
+,   TB_HTTP_CODE_UNAUTHORIZED                   = 401
+,   TB_HTTP_CODE_FORBIDDEN                      = 403
+,   TB_HTTP_CODE_NOT_FOUND                      = 404
+,   TB_HTTP_CODE_METHOD_NOT_ALLOWED             = 405
+,   TB_HTTP_CODE_NOT_ACCEPTABLE                 = 406
+,   TB_HTTP_CODE_REQUEST_TIMEOUT                = 408
+,   TB_HTTP_CODE_CONFLICT                       = 409
+,   TB_HTTP_CODE_GONE                           = 410
+,   TB_HTTP_CODE_LENGTH_REQUIRED                = 411
+,   TB_HTTP_CODE_PRECONDITION_FAILED            = 412
+,   TB_HTTP_CODE_REQUEST_ENTITY_TOO_LONG        = 413
+,   TB_HTTP_CODE_REQUEST_URI_TOO_LONG           = 414
+,   TB_HTTP_CODE_UNSUPPORTED_MEDIA_TYPE         = 415
+,   TB_HTTP_CODE_RANGE_NOT_SATISFIABLE          = 416
+,   TB_HTTP_CODE_EXPECTATION_FAILED             = 417
+,   TB_HTTP_CODE_UNPROCESSABLE_ENTITY           = 422
+,   TB_HTTP_CODE_LOCKED                         = 423
+,   TB_HTTP_CODE_FAILED_DEPENDENCY              = 424
+,   TB_HTTP_CODE_UNORDERED_COLLECTION           = 425
+,   TB_HTTP_CODE_UPGRADE_REQUIRED               = 426
+,   TB_HTTP_CODE_RETRY_WITH                     = 449
+
+,   TB_HTTP_CODE_INTERNAL_SERVER_ERROR          = 500
+,   TB_HTTP_CODE_NOT_IMPLEMENTED                = 501
+,   TB_HTTP_CODE_BAD_GATEWAY                    = 502
+,   TB_HTTP_CODE_SERVICE_UNAVAILABLE            = 503
+,   TB_HTTP_CODE_GATEWAY_TIMEOUT                = 504
+,   TB_HTTP_CODE_INSUFFICIENT_STORAGE           = 507
+,   TB_HTTP_CODE_LOOP_DETECTED                  = 508
+,   TB_HTTP_CODE_NOT_EXTENDED                   = 510
+
+}tb_http_code_e;
 
 /// the http option enum
 typedef enum __tb_http_option_e

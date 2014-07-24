@@ -115,10 +115,10 @@ static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     tb_assert_and_check_return(aico);
 
     // trace
-    tb_trace_i("aico: file: exit: %p", tb_aico_handle(aico));
+    tb_trace_i("aico: file: exit: %p", tb_aico_file(aico));
 
     // exit it
-    tb_file_exit(tb_aico_handle(aico));
+    tb_file_exit(tb_aico_file(aico));
 }
 static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 {
