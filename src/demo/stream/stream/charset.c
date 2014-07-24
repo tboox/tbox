@@ -6,6 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 tb_int_t tb_demo_stream_charset_main(tb_int_t argc, tb_char_t** argv)
 {
     // init istream
@@ -43,3 +44,9 @@ tb_int_t tb_demo_stream_charset_main(tb_int_t argc, tb_char_t** argv)
     tb_stream_exit(ostream);
     return 0;
 }
+#else
+tb_int_t tb_demo_stream_charset_main(tb_int_t argc, tb_char_t** argv)
+{
+    return 0;
+}
+#endif

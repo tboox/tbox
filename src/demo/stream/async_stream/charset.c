@@ -6,6 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 static tb_bool_t tb_demo_async_stream_charset_done_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // trace
@@ -99,3 +100,9 @@ tb_int_t tb_demo_stream_async_stream_charset_main(tb_int_t argc, tb_char_t** arg
     event = tb_null;
     return 0;
 }
+#else
+tb_int_t tb_demo_stream_async_stream_charset_main(tb_int_t argc, tb_char_t** argv)
+{
+    return 0;
+}
+#endif

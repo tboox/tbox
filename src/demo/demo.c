@@ -66,7 +66,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(asio_aiopd)
 ,   TB_DEMO_MAIN_ITEM(asio_aicpc)
 ,   TB_DEMO_MAIN_ITEM(asio_aicpd)
-,   TB_DEMO_MAIN_ITEM(asio_spider)
 #endif
 
     // math
@@ -106,31 +105,19 @@ static tb_demo_t g_demo[] =
 #endif
 
     // stream
-#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 ,   TB_DEMO_MAIN_ITEM(stream)
-#endif
 ,   TB_DEMO_MAIN_ITEM(stream_null)
 ,   TB_DEMO_MAIN_ITEM(stream_cache)
-#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,   TB_DEMO_MAIN_ITEM(stream_charset)
-#endif
-#ifdef TB_CONFIG_MODULE_HAVE_ZIP
 ,   TB_DEMO_MAIN_ITEM(stream_zip)
-#endif
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
 ,   TB_DEMO_MAIN_ITEM(stream_transfer_pool)
 ,   TB_DEMO_MAIN_ITEM(stream_async_transfer)
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_null)
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_cache)
-#   ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream)
-#   endif
-#   ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_charset)
-#   endif
-#   ifdef TB_CONFIG_MODULE_HAVE_ZIP
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_zip)
-#   endif
 #endif
 
     // string
@@ -156,6 +143,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(network_ipv4)
 ,   TB_DEMO_MAIN_ITEM(network_http)
 ,   TB_DEMO_MAIN_ITEM(network_whois)
+,   TB_DEMO_MAIN_ITEM(network_spider)
 ,   TB_DEMO_MAIN_ITEM(network_cookies)
 ,   TB_DEMO_MAIN_ITEM(network_impl_date)
 
