@@ -1290,6 +1290,16 @@ static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // trace
     tb_trace_d("kilo: aico: %p, type: %u: ..", aico, aico->type);
 
+    tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
+
+    // add timeout task for killing the accept socket
+    if (aico->type == TB_AICO_TYPE_SOCK && aiop_aico->aice.code == TB_AICE_CODE_ACPT) 
+    {
+        // add task
+        if (!aiop_aico->task) aiop_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_aiop_spak_wait_timeout, aico);
+        aiop_aico->bltimer = 1;
+    }
+
     // kill the task
     if (((tb_aiop_aico_t*)aico)->task) 
     {

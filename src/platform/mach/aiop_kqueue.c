@@ -94,11 +94,11 @@ static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     struct kevent   e[2];
     tb_size_t       n = 0;
     tb_size_t       oneshot = (code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
-    if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) 
+    if ((code & TB_AIOE_CODE_RECV) || (code & TB_AIOE_CODE_ACPT)) 
     {
         EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
     }
-    if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN)
+    if ((code & TB_AIOE_CODE_SEND) || (code & TB_AIOE_CODE_CONN))
     {
         EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
     }

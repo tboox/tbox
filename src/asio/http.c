@@ -420,15 +420,13 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_impl_t* impl)
     // check
     tb_assert_and_check_return_val(impl && impl->sstream, tb_false);
 
-    // line && size
+    // the line and size
     tb_char_t const*    line = tb_string_cstr(&impl->line_data);
     tb_size_t           size = tb_string_size(&impl->line_data);
     tb_assert_and_check_return_val(line && size, tb_false);
 
-    // init 
-    tb_char_t const* p = line;
-
     // the first line? 
+    tb_char_t const* p = line;
     if (!impl->line_size)
     {
         // check http response
