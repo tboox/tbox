@@ -142,6 +142,9 @@ typedef struct __tb_aiop_rtor_impl_t
     // aiop
     struct __tb_aiop_impl_t*    aiop;
 
+    // the supported aioe code
+    tb_size_t                   code;
+
     // exit
     tb_void_t                   (*exit)(struct __tb_aiop_rtor_impl_t* rtor);
 

@@ -90,17 +90,21 @@ static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // the code
     tb_size_t code = aioo->code;
 
+    // init the add event
+    tb_size_t add_event = EV_ADD | EV_ENABLE;
+    if (code & TB_AIOE_CODE_CLEAR) add_event |= EV_CLEAR;
+    if (code & TB_AIOE_CODE_ONESHOT) add_event |= EV_ONESHOT;
+
     // add event
     struct kevent   e[2];
     tb_size_t       n = 0;
-    tb_size_t       oneshot = (code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
     if ((code & TB_AIOE_CODE_RECV) || (code & TB_AIOE_CODE_ACPT)) 
     {
-        EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
+        EV_SET(&e[n], fd, EVFILT_READ, add_event, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
     }
     if ((code & TB_AIOE_CODE_SEND) || (code & TB_AIOE_CODE_CONN))
     {
-        EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
+        EV_SET(&e[n], fd, EVFILT_WRITE, add_event, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
     }
 
     // ok?
@@ -140,8 +144,10 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     tb_size_t adde = aioe->code & ~aioo->code;
     tb_size_t dele = ~aioe->code & aioo->code;
 
-    // oneshot?
-    tb_size_t oneshot = (aioe->code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
+    // init the add event
+    tb_size_t add_event = EV_ADD | EV_ENABLE;
+    if (aioe->code & TB_AIOE_CODE_CLEAR) add_event |= EV_CLEAR;
+    if (aioe->code & TB_AIOE_CODE_ONESHOT) add_event |= EV_ONESHOT;
 
     // save aioo
     aioo->code = aioe->code;
@@ -152,7 +158,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     tb_size_t       n = 0;
     if (adde & TB_AIOE_CODE_RECV || adde & TB_AIOE_CODE_ACPT) 
     {
-        EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
+        EV_SET(&e[n], fd, EVFILT_READ, add_event, NOTE_EOF, 0, aioo);
         n++;
     }
     else if (dele & TB_AIOE_CODE_RECV || dele & TB_AIOE_CODE_ACPT) 
@@ -162,7 +168,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     }
     if (adde & TB_AIOE_CODE_SEND || adde & TB_AIOE_CODE_CONN)
     {
-        EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
+        EV_SET(&e[n], fd, EVFILT_WRITE, add_event, NOTE_EOF, 0, aioo);
         n++;
     }
     else if (dele & TB_AIOE_CODE_SEND || dele & TB_AIOE_CODE_CONN)
@@ -331,6 +337,7 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_kqueue_init(tb_aiop_impl_t* aiop)
 
         // init base
         impl->base.aiop = aiop;
+        impl->base.code = TB_AIOE_CODE_EALL | TB_AIOE_CODE_CLEAR | TB_AIOE_CODE_ONESHOT;
         impl->base.exit = tb_aiop_rtor_kqueue_exit;
         impl->base.cler = tb_aiop_rtor_kqueue_cler;
         impl->base.addo = tb_aiop_rtor_kqueue_addo;

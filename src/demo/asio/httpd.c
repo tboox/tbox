@@ -847,6 +847,7 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_t const* aice)
         // check
         tb_assert_and_check_return_val(aice->u.acpt.size && aice->u.acpt.list, tb_true);
 
+#if 1
         // done
         tb_size_t i = 0;
         tb_size_t n = aice->u.acpt.size;
@@ -866,6 +867,10 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_t const* aice)
             // recv the header
             if (!tb_aico_recv(session->aico, session->buffer, sizeof(session->buffer), tb_demo_httpd_session_head_recv, session)) break;
         }
+#else
+        tb_used(tb_demo_httpd_session_init);
+        tb_used(tb_demo_httpd_session_head_recv);
+#endif
 
         // continue it
         if (!tb_aico_acpt(aice->aico, tb_demo_httpd_acpt, httpd)) return tb_false;

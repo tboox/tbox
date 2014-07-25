@@ -70,6 +70,7 @@ static tb_bool_t tb_aiop_rtor_epoll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl
     struct epoll_event e = {0};
     if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
     if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
+    if (code & TB_AIOE_CODE_CLEAR) e.events |= EPOLLET;
 #ifdef EPOLLONESHOT 
     if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 #endif
@@ -124,6 +125,7 @@ static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t co
     struct epoll_event e = {0};
     if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
     if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
+    if (code & TB_AIOE_CODE_CLEAR) e.events |= EPOLLET;
 #ifdef EPOLLONESHOT 
     if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 #endif
@@ -323,6 +325,7 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_epoll_init(tb_aiop_impl_t* aiop)
 
         // init base
         impl->base.aiop = aiop;
+        impl->base.code = TB_AIOE_CODE_EALL | TB_AIOE_CODE_CLEAR | TB_AIOE_CODE_ONESHOT;
         impl->base.exit = tb_aiop_rtor_epoll_exit;
         impl->base.cler = tb_aiop_rtor_epoll_cler;
         impl->base.addo = tb_aiop_rtor_epoll_addo;

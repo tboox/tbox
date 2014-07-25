@@ -395,6 +395,7 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_poll_init(tb_aiop_impl_t* aiop)
 
         // init base
         impl->base.aiop = aiop;
+        impl->base.code = TB_AIOE_CODE_EALL | TB_AIOE_CODE_ONESHOT;
         impl->base.exit = tb_aiop_rtor_poll_exit;
         impl->base.cler = tb_aiop_rtor_poll_cler;
         impl->base.addo = tb_aiop_rtor_poll_addo;
