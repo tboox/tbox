@@ -246,6 +246,7 @@ tbox_C_FILES 			+= \
 						platform/atomic64 \
 						platform/platform \
 						platform/hostname \
+						platform/processor \
 						platform/directory \
 						platform/semaphore \
 						platform/backtrace \
@@ -553,6 +554,7 @@ INC_FILES 				= \
 						platform/hostname.h \
 						platform/spinlock.h \
 						platform/atomic64.h \
+						platform/processor.h \
 						platform/directory.h \
 						platform/exception.h \
 						platform/backtrace.h \

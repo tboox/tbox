@@ -763,16 +763,9 @@ tb_thread_pool_ref_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
         // init lock
         if (!tb_spinlock_init(&impl->lock)) break;
 
-        // computate the worker maxn if be zero
-        if (!worker_maxn)
-        {
-            // TODO: using cpu count * 4
-#ifdef __tb_small__
-            worker_maxn = 4;
-#else
-            worker_maxn = 8;
-#endif
-        }
+        // computate the default worker maxn if be zero
+        if (!worker_maxn) worker_maxn = tb_processor_count() << 2;
+        tb_assert_and_check_break(worker_maxn);
 
         // init thread stack
         impl->stack         = stack;

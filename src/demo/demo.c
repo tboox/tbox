@@ -159,6 +159,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_process)
 ,   TB_DEMO_MAIN_ITEM(platform_barrier)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic64)
+,   TB_DEMO_MAIN_ITEM(platform_processor)
 ,   TB_DEMO_MAIN_ITEM(platform_backtrace)
 ,   TB_DEMO_MAIN_ITEM(platform_directory)
 ,   TB_DEMO_MAIN_ITEM(platform_exception)
