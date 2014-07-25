@@ -740,7 +740,7 @@ tb_http_ref_t tb_http_init()
 
         // init head
         impl->head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
-        tb_assert_and_check_return_val(impl->head, tb_false);
+        tb_assert_and_check_break(impl->head);
 
         // init request data
         if (!tb_string_init(&impl->request)) break;

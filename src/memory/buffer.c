@@ -184,6 +184,9 @@ tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
 
     } while (0);
 
+    // trace
+    if (!ok) tb_trace_e("resize buffer failed: %lu => %lu", buff_size, size);
+
     // ok
     return ok? (tb_byte_t*)buffer->data : tb_null;
 }
@@ -309,6 +312,7 @@ tb_byte_t* tb_buffer_memncat(tb_buffer_t* buffer, tb_byte_t const* b, tb_size_t 
     // memcat
     tb_memcpy(d + p, b, n);
 
+    // ok?
     return d;
 }
 

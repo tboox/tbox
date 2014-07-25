@@ -633,7 +633,7 @@ tb_bool_t tb_cookies_set(tb_cookies_ref_t cookies, tb_char_t const* domain, tb_c
         if (entry.storage)
         {
             // TODO
-            tb_trace1_w("not supports storaging impl to file now!");
+            tb_trace1_w("not supports storaging cookies to file now!");
         }
 
         // ok

@@ -37,10 +37,13 @@
  */
 
 // the native large pool ref 
-#define tb_native_large_pool_ref(pool)   ((tb_large_pool_ref_t)((tb_size_t)(pool) | 0x1))
+#define tb_native_large_pool_ref(pool)              ((tb_large_pool_ref_t)((tb_size_t)(pool) | 0x1))
 
 // the native large pool impl 
-#define tb_native_large_pool_impl(pool)  ((tb_native_large_pool_impl_t*)((tb_size_t)(pool) & ~0x1))
+#define tb_native_large_pool_impl(pool)             ((tb_native_large_pool_impl_t*)((tb_size_t)(pool) & ~0x1))
+
+// the native large pool data size
+#define tb_native_large_pool_data_base(data_head)   (&(((tb_pool_data_head_t*)((tb_native_large_data_head_t*)(data_head) + 1))[-1]))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -56,7 +59,7 @@ typedef __tb_pool_data_aligned__ struct __tb_native_large_data_head_t
     tb_list_entry_t                 entry;
 
     // the data head base
-    tb_pool_data_head_t             base;
+    tb_byte_t                       base[sizeof(tb_pool_data_head_t)];
 
 }__tb_pool_data_aligned__ tb_native_large_data_head_t;
 
@@ -118,10 +121,13 @@ static tb_void_t tb_native_large_pool_check_data(tb_native_large_pool_impl_t* im
     tb_byte_t const*    data = (tb_byte_t const*)&(data_head[1]);
     do
     {
+        // the base head
+        tb_pool_data_head_t* base_head = tb_native_large_pool_data_base(data_head);
+
         // check
-        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "data have been freed: %p", data);
-        tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "data have been freed: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;
@@ -207,10 +213,17 @@ static tb_bool_t tb_native_large_pool_free_done(tb_native_large_pool_impl_t* imp
     {
         // the data head
         data_head = &(((tb_native_large_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
-        tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
+
+#ifdef __tb_debug__
+        // the base head
+        tb_pool_data_head_t* base_head = tb_native_large_pool_data_base(data_head);
+#endif
+
+        // check
+        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
         tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)tb_native_large_pool_ref(impl), "the data: %p not belong to pool: %p", data, tb_native_large_pool_ref(impl));
-        tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the last data
@@ -223,10 +236,10 @@ static tb_bool_t tb_native_large_pool_free_done(tb_native_large_pool_impl_t* imp
         tb_native_large_pool_check_next(impl, data_head);
 
         // for checking double-free
-        data_head->base.debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
+        base_head->debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
 
         // update the total size
-        impl->total_size    -= data_head->base.size;
+        impl->total_size    -= base_head->size;
    
         // update the free count
         impl->free_count++;
@@ -393,15 +406,21 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
 
         // init the data head
         data_head = (tb_native_large_data_head_t*)data;
-        data_head->base.size            = (tb_uint32_t)size;
+
+        // the base head
+        tb_pool_data_head_t* base_head = tb_native_large_pool_data_base(data_head);
+
+        // save the real size
+        base_head->size = (tb_uint32_t)size;
+
 #ifdef __tb_debug__
-        data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
-        data_head->base.debug.file      = file_;
-        data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = (tb_uint16_t)line_;
+        base_head->debug.magic     = TB_POOL_DATA_MAGIC;
+        base_head->debug.file      = file_;
+        base_head->debug.func      = func_;
+        base_head->debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
-        tb_pool_data_save_backtrace(&data_head->base, 2);
+        tb_pool_data_save_backtrace(base_head, 2);
 
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_(data_real, TB_POOL_DATA_PATCH, size + patch);
@@ -477,10 +496,15 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
     {
         // the data head
         data_head = &(((tb_native_large_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->base.debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "ralloc freed data: %p", data);
-        tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+
+        // the base head
+        tb_pool_data_head_t* base_head = tb_native_large_pool_data_base(data_head);
+
+        // check
+        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "ralloc freed data: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
         tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)pool, "the data: %p not belong to pool: %p", data, pool);
-        tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the last data
@@ -493,16 +517,16 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         tb_native_large_pool_check_next(impl, data_head);
  
         // update the real size
-        impl->real_size -= data_head->base.size;
+        impl->real_size -= base_head->size;
 
         // update the occupied size
-        impl->occupied_size -= data_head->base.size;
+        impl->occupied_size -= base_head->size;
  
         // update the total size
-        impl->total_size -= data_head->base.size;
+        impl->total_size -= base_head->size;
 
         // the previous size
-        tb_size_t prev_size = data_head->base.size;
+        tb_size_t prev_size = base_head->size;
 #endif
 
         // remove the data from the data_list
@@ -519,17 +543,23 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
 
         // update the data head
         data_head = (tb_native_large_data_head_t*)data;
-        data_head->base.size            = (tb_uint32_t)size;
+
+        // update the base head
+        base_head = tb_native_large_pool_data_base(data_head);
+
+        // save the real size
+        base_head->size = (tb_uint32_t)size;
+
 #ifdef __tb_debug__
-        data_head->base.debug.file      = file_;
-        data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = (tb_uint16_t)line_;
+        base_head->debug.file      = file_;
+        base_head->debug.func      = func_;
+        base_head->debug.line      = (tb_uint16_t)line_;
 
         // check
-        tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "ralloc data have been changed: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc data have been changed: %p", data);
 
         // update backtrace
-        tb_pool_data_save_backtrace(&data_head->base, 2);
+        tb_pool_data_save_backtrace(base_head, 2);
 
         // make the dirty data 
         if (size > prev_size) tb_memset_(data_real + prev_size, TB_POOL_DATA_PATCH, size - prev_size);

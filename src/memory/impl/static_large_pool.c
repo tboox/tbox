@@ -32,6 +32,13 @@
 #include "static_large_pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the static large pool data size
+#define tb_static_large_pool_data_base(data_head)   (&(((tb_pool_data_head_t*)((tb_static_large_data_head_t*)(data_head) + 1))[-1]))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -45,7 +52,7 @@ typedef __tb_pool_data_aligned__ struct __tb_static_large_data_head_t
     tb_uint32_t                     bfree : 1;
 
     // the data head base
-    tb_pool_data_head_t             base;
+    tb_byte_t                       base[sizeof(tb_pool_data_head_t)];
 
 }__tb_pool_data_aligned__ tb_static_large_data_head_t;
 
@@ -169,10 +176,13 @@ static tb_void_t tb_static_large_pool_check_data(tb_static_large_pool_impl_t* im
     tb_byte_t const*    data = (tb_byte_t const*)&(data_head[1]);
     do
     {
+        // the base head
+        tb_pool_data_head_t* base_head = tb_static_large_pool_data_base(data_head);
+
         // check
         tb_assertf_break(!data_head->bfree, "data have been freed: %p", data);
-        tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;
@@ -423,34 +433,37 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_done(tb_static_l
         }
         tb_assert_abort(data_head->space >= size + patch);
 
+        // the base head
+        tb_pool_data_head_t* base_head = tb_static_large_pool_data_base(data_head);
+
         // the real size
         tb_size_t size_real = real? (data_head->space - patch) : size;
 
         // save the real size
         if (real) *real = size_real;
-        data_head->base.size = size_real;
+        base_head->size = (tb_uint32_t)size_real;
 
 #ifdef __tb_debug__
         // init the debug info
-        data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
-        data_head->base.debug.file      = file_;
-        data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = (tb_uint16_t)line_;
+        base_head->debug.magic     = TB_POOL_DATA_MAGIC;
+        base_head->debug.file      = file_;
+        base_head->debug.func      = func_;
+        base_head->debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
-        tb_pool_data_save_backtrace(&data_head->base, 3);
+        tb_pool_data_save_backtrace(base_head, 3);
 
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, size_real + patch);
  
         // update the real size
-        impl->real_size     += data_head->base.size;
+        impl->real_size     += base_head->size;
 
         // update the occupied size
         impl->occupied_size += sizeof(tb_static_large_data_head_t) + data_head->space - 1 - TB_POOL_DATA_HEAD_DIFF_SIZE;
 
         // update the total size
-        impl->total_size    += data_head->base.size;
+        impl->total_size    += base_head->size;
 
         // update the peak size
         if (impl->total_size > impl->peak_size) impl->peak_size = impl->total_size;
@@ -482,12 +495,15 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
     tb_bool_t ok = tb_false;
     do
     {
+        // the base head
+        tb_pool_data_head_t* base_head = tb_static_large_pool_data_base(data_head);
+
 #ifdef __tb_debug__
         // patch 0xcc
         tb_size_t patch = 1;
 
         // the prev size
-        tb_size_t prev_size = data_head->base.size;
+        tb_size_t prev_size = base_head->size;
 
         // the prev space
         tb_size_t prev_space = data_head->space;
@@ -544,17 +560,17 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
 
         // save the real size
         if (real) *real = size_real;
-        data_head->base.size = size_real;
+        base_head->size = (tb_uint32_t)size_real;
 
 #ifdef __tb_debug__
         // init the debug info
-        data_head->base.debug.magic     = TB_POOL_DATA_MAGIC;
-        data_head->base.debug.file      = file_;
-        data_head->base.debug.func      = func_;
-        data_head->base.debug.line      = (tb_uint16_t)line_;
+        base_head->debug.magic     = TB_POOL_DATA_MAGIC;
+        base_head->debug.file      = file_;
+        base_head->debug.func      = func_;
+        base_head->debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
-        tb_pool_data_save_backtrace(&data_head->base, 3);
+        tb_pool_data_save_backtrace(base_head, 3);
 
         // make the dirty data 
         if (size_real > prev_size) tb_memset_((tb_byte_t*)&(data_head[1]) + prev_size, TB_POOL_DATA_PATCH, size_real - prev_size);
@@ -604,24 +620,31 @@ static tb_bool_t tb_static_large_pool_free_done(tb_static_large_pool_impl_t* imp
     {
         // the data head
         data_head = &(((tb_static_large_data_head_t*)data)[-1]);
+
+#ifdef __tb_debug__
+        // the base head
+        tb_pool_data_head_t* base_head = tb_static_large_pool_data_base(data_head);
+#endif
+
+        // check
         tb_assertf_and_check_break(!data_head->bfree, "double free data: %p", data);
-        tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
         tb_assertf_and_check_break(data_head >= impl->data_head && data_head < impl->data_tail, "the data: %p not belong to pool: %p", data, impl);
-        tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the next data
         tb_static_large_pool_check_next(impl, data_head);
 
         // update the total size
-        impl->total_size -= data_head->base.size;
+        impl->total_size -= base_head->size;
 
         // update the free count
         impl->free_count++;
 #endif
 
         // trace
-        tb_trace_d("free: %lu: %s", data_head->base.size, ok? "ok" : "no");
+        tb_trace_d("free: %lu: %s", base_head->size, ok? "ok" : "no");
 
         // attempt merge the next free data
         tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)&(data_head[1]) + data_head->space);
@@ -788,10 +811,17 @@ tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
     {
         // the data head
         data_head = &(((tb_static_large_data_head_t*)data)[-1]);
+
+#ifdef __tb_debug__
+        // the base head
+        tb_pool_data_head_t* base_head = tb_static_large_pool_data_base(data_head);
+#endif
+
+        // check
         tb_assertf_and_check_break(!data_head->bfree, "ralloc freed data: %p", data);
-        tb_assertf_break(data_head->base.debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
         tb_assertf_and_check_break(data_head >= impl->data_head && data_head < impl->data_tail, "the data: %p not belong to pool: %p", data, pool);
-        tb_assertf_break(((tb_byte_t*)data)[data_head->base.size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the next data
@@ -810,7 +840,7 @@ tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
             if (aloc_head != data_head)
             {
                 // copy the real data
-                tb_memcpy_((tb_pointer_t)&aloc_head[1], data, tb_min(size, data_head->base.size));
+                tb_memcpy_((tb_pointer_t)&aloc_head[1], data, tb_min(size, (((tb_pool_data_head_t*)(data_head + 1))[-1]).size));
                 
                 // free the previous data
                 tb_static_large_pool_free_done(impl, data __tb_debug_args__);
