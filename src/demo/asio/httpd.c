@@ -754,16 +754,15 @@ static tb_pointer_t tb_demo_httpd_loop(tb_cpointer_t priv)
 {
     // aicp
     tb_aicp_ref_t   aicp = (tb_aicp_ref_t)priv;
-    tb_uint16_t     self = (tb_uint16_t)tb_thread_self();
 
     // trace
-    tb_trace_d("[loop: %u]: init", self);
+    tb_trace_d("[loop: %u]: init", (tb_uint16_t)tb_thread_self());
 
     // loop aicp
     if (aicp) tb_aicp_loop(aicp);
     
     // trace
-    tb_trace_d("[loop: %u]: exit", self);
+    tb_trace_d("[loop: %u]: exit", (tb_uint16_t)tb_thread_self());
 
     // exit
     tb_thread_return(tb_null);

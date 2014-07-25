@@ -233,6 +233,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
         // the data head
         tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
         tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+        tb_assert_and_check_break(data_head->size);
 
         // small => small
         if (data_head->size <= TB_SMALL_POOL_DATA_SIZE_MAXN && size <= TB_SMALL_POOL_DATA_SIZE_MAXN)
