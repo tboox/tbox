@@ -47,7 +47,8 @@ typedef enum __tb_aioe_code_e
 ,   TB_AIOE_CODE_RECV       = 0x0004
 ,   TB_AIOE_CODE_SEND       = 0x0008
 ,   TB_AIOE_CODE_EALL       = TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND | TB_AIOE_CODE_ACPT | TB_AIOE_CODE_CONN
-,   TB_AIOE_CODE_ONESHOT    = 0x0010
+,   TB_AIOE_CODE_CLEAR      = 0x0010 //!< edge trigger. after the event is retrieved by the user, its state is reset
+,   TB_AIOE_CODE_ONESHOT    = 0x0020 //!< causes the event to return only the first occurrence of the filter being triggered
 
 }tb_aioe_code_e;
 

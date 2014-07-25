@@ -186,6 +186,15 @@ tb_void_t tb_aiop_cler(tb_aiop_ref_t aiop)
     // addo spak
     if (impl->spak[1]) tb_aiop_addo(aiop, impl->spak[1], TB_AIOE_CODE_RECV, tb_null);   
 }
+tb_bool_t tb_aiop_have(tb_aiop_ref_t aiop, tb_size_t code)
+{
+    // check
+    tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
+    tb_assert_and_check_return_val(impl && impl->rtor, tb_false);
+
+    // have this code?
+    return ((impl->rtor->code & code) == code)? tb_true : tb_false;
+}
 tb_void_t tb_aiop_kill(tb_aiop_ref_t aiop)
 {
     // check
@@ -233,6 +242,7 @@ tb_aioo_ref_t tb_aiop_addo(tb_aiop_ref_t aiop, tb_socket_ref_t sock, tb_size_t c
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
     tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->addo && sock, tb_null);
+    tb_assert_return_val(tb_aiop_have(aiop, code), tb_null);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -275,6 +285,7 @@ tb_bool_t tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_t const* aioe)
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
     tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->post && aioe, tb_false);
+    tb_assert_return_val(tb_aiop_have(aiop, aioe->code), tb_false);
 
     // post
     return impl->rtor->post(impl->rtor, aioe);

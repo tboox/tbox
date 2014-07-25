@@ -74,6 +74,14 @@ tb_void_t           tb_aiop_kill(tb_aiop_ref_t aiop);
  */
 tb_void_t           tb_aiop_spak(tb_aiop_ref_t aiop);
 
+/*! the aioe code is supported for the aiop?
+ *
+ * @param aiop      the aiop
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aiop_have(tb_aiop_ref_t aiop, tb_size_t code);
+
 /*! addo the aioo
  *
  * @param aiop      the aiop
