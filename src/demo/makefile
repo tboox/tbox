@@ -64,6 +64,7 @@ demo_C_FILES 								+= \
 											platform/process \
 											platform/barrier \
 											platform/atomic64 \
+											platform/processor \
 											platform/backtrace \
 											platform/directory \
 											platform/exception \
