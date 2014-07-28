@@ -253,15 +253,25 @@ example
         // output: [tag]: [error]: hello tbox
         tb_trace_e("hello tbox");
 
-        // print warning info
-        // output: [tag]: [warning]: hello tbox
-        tb_trace_w("hello tbox");
+        // init stream
+        tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxxx.com/index.html");
+        if (stream)
+        {
+            // save stream data to file
+            tb_transfer_done_stream_to_url(stream, "/home/file/index.html", 0, tb_null, tb_null);
 
-        // print info without prefix tag
-        // output: hello tbox
-        tb_printf("hello tbox\n");
+            // exit stream
+            tb_stream_exit(stream);
+        }
 
-        // ..
+        // block: save http to file
+        tb_transfer_done_url_to_url("http://www.xxxx.com/index.html", "/home/file/index.html", 0, tb_null, tb_null);
+
+        // async: save http to file
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index0.html", "/home/file/index0.html", 0, 0, tb_null, tb_null);
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index1.html", "/home/file/index2.html", 0, 0, tb_null, tb_null);
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index2.html", "/home/file/index3.html", 0, 0, tb_null, tb_null);
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index3.html", "/home/file/index4.html", 0, 0, tb_null, tb_null);
 
         // exit tbox
         tb_exit();
