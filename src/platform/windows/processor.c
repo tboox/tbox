@@ -32,8 +32,11 @@
  */
 tb_size_t tb_processor_count()
 {
+    // clear the system info
+    SYSTEM_INFO info;
+    tb_memset(&info, 0, sizeof(SYSTEM_INFO));
+
     // get the system info
-    SYSTEM_INFO info = {0};
     GetSystemInfo(&info);
     
     // the processor count

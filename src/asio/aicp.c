@@ -296,6 +296,10 @@ tb_aicp_ref_t tb_aicp_init(tb_size_t maxn)
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_read_t, size, tb_iovec_t, size), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, data, tb_iovec_t, data), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, size, tb_iovec_t, size), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_urecv_t, data, tb_iovec_t, data), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_urecv_t, size, tb_iovec_t, size), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_usend_t, data, tb_iovec_t, data), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_usend_t, size, tb_iovec_t, size), tb_null);
 
     // check real
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_send_t, real), tb_null);
@@ -306,6 +310,10 @@ tb_aicp_ref_t tb_aicp_init(tb_size_t maxn)
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_recvv_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_readv_t, real), tb_null);
     tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_writv_t, real), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_urecv_t, real), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_usend_t, real), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_urecvv_t, real), tb_null);
+    tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, real, tb_aice_usendv_t, real), tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
