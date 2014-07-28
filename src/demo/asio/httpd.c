@@ -371,6 +371,7 @@ static tb_bool_t tb_demo_httpd_session_resp_send_done(tb_demo_httpd_session_t* s
     tb_long_t size = tb_snprintf(   (tb_char_t*)session->buffer
                                 ,   sizeof(session->buffer) - 1
                                 ,   "HTTP/1.%u %lu %s\r\n"
+                                    "Server: %s\r\n"
                                     "Content-Type: text/html\r\n"
                                     "Content-Length: %llu\r\n"
                                     "Connection: %s\r\n"
@@ -378,6 +379,7 @@ static tb_bool_t tb_demo_httpd_session_resp_send_done(tb_demo_httpd_session_t* s
                                 ,   session->version
                                 ,   session->code
                                 ,   tb_demo_httpd_code_cstr(session->code)
+                                ,   TB_VERSION_SHORT_STRING
                                 ,   session->file? tb_file_size(session->file) : 0
                                 ,   session->balived? "keep-alive" : "close");
 
