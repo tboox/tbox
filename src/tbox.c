@@ -34,7 +34,7 @@
 static tb_atomic_t  g_init = 0;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
 static __tb_inline__ tb_bool_t tb_check_order_word()
 {
@@ -125,10 +125,9 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
-
-tb_bool_t tb_init_and_check(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build)
+tb_bool_t tb_init_(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build)
 {
     // is inited?
     if (tb_atomic_fetch_and_inc(&g_init)) return tb_true;
@@ -220,7 +219,6 @@ tb_void_t tb_exit()
     // exit trace
     tb_trace_exit();
 }
-
 tb_version_t const* tb_version()
 {
     // init version tag for binary search

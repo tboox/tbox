@@ -84,15 +84,12 @@
         if (!tb_init(tb_null, tb_null, 0)) return 0;
 
         // print info with tag
-        // output: [tag]: hello tbox
         tb_trace_i("hello tbox");
 
         // print info only for debug
-        // output: [tag]: hello tbox
         tb_trace_d("hello tbox"); 
 
         // print error info
-        // output: [tag]: [error]: hello tbox
         tb_trace_e("hello tbox");
 
         // init stream
@@ -115,13 +112,15 @@
         tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index2.html", "/home/file/index3.html", 0, 0, tb_null, tb_null);
         tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index3.html", "/home/file/index4.html", 0, 0, tb_null, tb_null);
 
+        // ...
+
         // exit tbox
         tb_exit();
         return 0;
     }
  * @endcode
  */
-#define tb_init(priv, data, size)     tb_init_and_check(priv, data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD)
+#define tb_init(priv, data, size)     tb_init_(priv, data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -140,12 +139,15 @@ __tb_extern_c_enter__
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_init_and_check(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build);
+tb_bool_t           tb_init_(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build);
 
 /// exit the tbox library
 tb_void_t           tb_exit(tb_noarg_t);
 
-/// the tbox version string
+/*! the tbox version
+ *
+ * @return          the tbox version
+ */
 tb_version_t const* tb_version(tb_noarg_t);
 
 __tb_extern_c_leave__
