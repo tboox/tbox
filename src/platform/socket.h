@@ -134,10 +134,11 @@ tb_size_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, 
 /*! listen socket
  *
  * @param sock      the socket 
+ * @param backlog   the maximum length for the queue of pending connections
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_socket_listen(tb_socket_ref_t sock);
+tb_bool_t           tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog);
 
 /*! accept socket
  *

@@ -810,7 +810,7 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
         if (!tb_socket_bind(httpd->sock, tb_null, httpd->port)) break;
 
         // listen sock
-        if (!tb_socket_listen(httpd->sock)) break;
+        if (!tb_socket_listen(httpd->sock, TB_DEMO_HTTPD_SESSION_MAXN >> 2)) break;
 
         // init aico
         httpd->aico = tb_aico_init_sock(httpd->aicp, httpd->sock);
@@ -841,45 +841,45 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_t const* aice)
     tb_demo_httpd_t* httpd = (tb_demo_httpd_t*)aice->priv;
     tb_assert_and_check_return_val(httpd && httpd->aicp, tb_false);
 
-    // ok?
-    if (aice->state == TB_STATE_OK)
+    // done
+    tb_bool_t                   ok = tb_false;
+    tb_demo_httpd_session_t*    session = tb_null;
+    do
     {
+        // ok?
+        tb_check_break(aice->state == TB_STATE_OK);
+    
         // check
-        tb_assert_and_check_return_val(aice->u.acpt.size && aice->u.acpt.list, tb_true);
+        tb_assert_and_check_break(aice->u.acpt.sock);
 
+        // trace
+        tb_trace_d("acpt[%p]: %p", aice->aico, aice->u.acpt.sock);
 #if 1
-        // done
-        tb_size_t i = 0;
-        tb_size_t n = aice->u.acpt.size;
-        for (i = 0; i < n; i++)
-        {
-            // the client sock
-            tb_socket_ref_t sock = aice->u.acpt.list[i];
-            tb_assert_and_check_break(sock);
+        // init the session
+        session = tb_demo_httpd_session_init(httpd, aice->u.acpt.sock);
+        tb_assert_and_check_break(session && session->aico);
 
-            // trace
-            tb_trace_d("acpt[%p]: %p", aice->aico, sock);
-
-            // init the session
-            tb_demo_httpd_session_t* session = tb_demo_httpd_session_init(httpd, sock);
-            tb_assert_and_check_break(session && session->aico);
- 
-            // recv the header
-            if (!tb_aico_recv(session->aico, session->buffer, sizeof(session->buffer), tb_demo_httpd_session_head_recv, session)) break;
-        }
+        // recv the header
+        if (!tb_aico_recv(session->aico, session->buffer, sizeof(session->buffer), tb_demo_httpd_session_head_recv, session)) break;
 #else
         tb_used(tb_demo_httpd_session_init);
         tb_used(tb_demo_httpd_session_head_recv);
 #endif
 
-        // continue it
-        if (!tb_aico_acpt(aice->aico, tb_demo_httpd_acpt, httpd)) return tb_false;
-    }
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
     // failed?
-    else
+    if (!ok)
     {
         // trace
         tb_trace_d("acpt[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
+
+        // exit session
+        if (session) tb_demo_httpd_session_exit(session);
+        session = tb_null;
 
         // exit it
         tb_aico_exit(aice->aico, tb_demo_httpd_sock_exit, tb_null);

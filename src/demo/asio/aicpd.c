@@ -231,92 +231,59 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
     // acpt ok?
     if (aice->state == TB_STATE_OK)
     {
+        // trace
+        tb_trace_i("acpt[%p]: %p", aice->aico, aice->u.acpt.sock);
+
         // done
-        tb_size_t i = 0;
-        for (i = 0; i < aice->u.acpt.size; i++)
+        tb_bool_t           ok = tb_false;
+        tb_demo_context_t*  context = tb_null;
+        do
         {
-            // check
-            tb_assert_and_check_break(aice->u.acpt.list);
-
-            // the client sock
-            tb_socket_ref_t sock = aice->u.acpt.list[i];
-            tb_assert_and_check_break(sock);
-
-            // trace
-            tb_trace_i("acpt[%p]: %p", aice->aico, sock);
-
-            // done
-            tb_bool_t           ok = tb_false;
-            tb_demo_context_t*  context = tb_null;
-            do
-            {
-                // make context
-                context = tb_malloc0_type(tb_demo_context_t);
-                tb_assert_and_check_break(context);
+            // make context
+            context = tb_malloc0_type(tb_demo_context_t);
+            tb_assert_and_check_break(context);
 
 #ifdef TB_DEMO_MODE_SENDF
-                // init context
-                context->sock = sock;
-                context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_ASIO);
-                tb_assert_and_check_break(context->file);
+            // init context
+            context->sock = aice->u.acpt.sock;
+            context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_ASIO);
+            tb_assert_and_check_break(context->file);
 
-                // addo sock
-                context->aico[0] = tb_aico_init_sock(aicp, context->sock);
-                tb_assert_and_check_break(context->aico[0]);
+            // addo sock
+            context->aico[0] = tb_aico_init_sock(aicp, context->sock);
+            tb_assert_and_check_break(context->aico[0]);
 
-                // post sendf from file
-                if (!tb_aico_sendf(context->aico[0], context->file, 0ULL, tb_file_size(context->file), tb_demo_sock_sendf_func, context)) break;
+            // post sendf from file
+            if (!tb_aico_sendf(context->aico[0], context->file, 0ULL, tb_file_size(context->file), tb_demo_sock_sendf_func, context)) break;
 #else
-                // init context
-                context->sock = aice->u.acpt.sock;
-                context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_ASIO);
-                context->data = tb_malloc_bytes(TB_DEMO_FILE_READ_MAXN);
-                tb_assert_and_check_break(context->file && context->data);
+            // init context
+            context->sock = aice->u.acpt.sock;
+            context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_ASIO);
+            context->data = tb_malloc_bytes(TB_DEMO_FILE_READ_MAXN);
+            tb_assert_and_check_break(context->file && context->data);
 
-                // addo sock
-                context->aico[0] = tb_aico_init_sock(aicp, context->sock);
-                tb_assert_and_check_break(context->aico[0]);
+            // addo sock
+            context->aico[0] = tb_aico_init_sock(aicp, context->sock);
+            tb_assert_and_check_break(context->aico[0]);
 
-                // addo file
-                context->aico[1] = tb_aico_init_file(aicp, context->file);
-                tb_assert_and_check_break(context->aico[1]);
+            // addo file
+            context->aico[1] = tb_aico_init_file(aicp, context->file);
+            tb_assert_and_check_break(context->aico[1]);
 
-                // post read from file
-                if (!tb_aico_read(context->aico[1], context->size, context->data, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) break;
+            // post read from file
+            if (!tb_aico_read(context->aico[1], context->size, context->data, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) break;
 #endif
-                // ok
-                ok = tb_true;
+            // ok
+            ok = tb_true;
 
-            } while (0);
-
-            // failed?
-            if (!ok)
-            {
-                // exit context
-                if (context) tb_demo_context_exit(context);
-            }
-        }
+        } while (0);
 
         // failed?
-        if (i != aice->u.acpt.size)
+        if (!ok)
         {
-            // exit aico
-            tb_aico_exit(aice->aico, tb_demo_sock_exit_func, tb_null);
+            // exit context
+            if (context) tb_demo_context_exit(context);
         }
-        else
-        {
-            // continue it
-            if (!tb_aico_acpt(aice->aico, tb_demo_sock_acpt_func, (tb_pointer_t)path)) return tb_false;
-        }
-    }
-    // timeout?
-    else if (aice->state == TB_STATE_TIMEOUT)
-    {
-        // trace
-        tb_trace_i("acpt[%p]: timeout", aice->aico);
-    
-        // continue it
-        if (!tb_aico_acpt(aice->aico, tb_demo_sock_acpt_func, (tb_pointer_t)path)) return tb_false;
     }
     // failed?
     else
@@ -400,7 +367,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_socket_bind(sock, tb_null, 9090)) break;
 
         // listen sock
-        if (!tb_socket_listen(sock)) break;
+        if (!tb_socket_listen(sock, 20)) break;
 
         // init aicp
         aicp = tb_aicp_init(16);
@@ -417,9 +384,6 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
         // run task
 //      if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) break;
 //      if (!tb_aico_task_run(aico, 0, tb_demo_task_func, tb_null)) break;
-
-        // init acpt timeout
-        tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_ACPT, 10000);
 
         // post acpt
         if (!tb_aico_acpt(aico, tb_demo_sock_acpt_func, argv[1])) break;

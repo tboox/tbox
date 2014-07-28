@@ -89,7 +89,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_socket_bind(sock, tb_null, 9090)) break;
 
         // listen sock
-        if (!tb_socket_listen(sock)) break;
+        if (!tb_socket_listen(sock, 20)) break;
 
         // addo sock
         if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) break;
