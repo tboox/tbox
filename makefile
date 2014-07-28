@@ -250,7 +250,7 @@ endif
 # config
 config : .null
 	-@cp ./plat/$(PLAT)/config.h ./src/config.h
-	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%Mull`/g" ./src/config.h
+	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/config.h
 	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/config.h
 	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/config.h
 	@echo "config: ==================================================================="
