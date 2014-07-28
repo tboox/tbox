@@ -96,11 +96,10 @@ typedef enum __tb_aico_type_e
 /// the aico timeout enum, only for sock
 typedef enum __tb_aico_timeout_e
 {
-    TB_AICO_TIMEOUT_ACPT    = 0
-,   TB_AICO_TIMEOUT_CONN    = 1
-,   TB_AICO_TIMEOUT_RECV    = 2
-,   TB_AICO_TIMEOUT_SEND    = 3
-,   TB_AICO_TIMEOUT_MAXN    = 4
+    TB_AICO_TIMEOUT_CONN    = 0
+,   TB_AICO_TIMEOUT_RECV    = 1
+,   TB_AICO_TIMEOUT_SEND    = 2
+,   TB_AICO_TIMEOUT_MAXN    = 3
 
 }tb_aico_timeout_e;
 

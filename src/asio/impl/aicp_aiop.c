@@ -89,12 +89,6 @@ typedef struct __tb_aiop_aico_t
     // the task
     tb_handle_t                 task;
 
-    // the accepted socket list
-    tb_socket_ref_t*            acpt_list;
-
-    // the accepted socket maximum count
-    tb_size_t                   acpt_maxn;
-
     /* wait ok? avoid spak double aice when wait killed/timeout and ok at same time
      * need lock it using impl->lock
      */
@@ -174,127 +168,227 @@ static tb_void_t tb_aiop_spak_work(tb_aiop_ptor_impl_t* impl)
     // post wait
     if (value >= 0 && value < work) tb_semaphore_post(impl->wait, work - value);
 }
+static tb_bool_t tb_aiop_push_sock(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
+{
+    // check 
+    tb_assert_and_check_return_val(impl && aice && aice->aico, tb_false);
+
+    // the priority
+    tb_size_t priority = tb_aice_impl_priority(aice);
+    tb_assert_and_check_return_val(priority < tb_arrayn(impl->spak) && impl->spak[priority], tb_false);
+
+    // this aico is killed? post to higher priority queue
+    if (tb_aico_impl_is_killed((tb_aico_impl_t*)aice->aico)) priority = 0;
+
+    // trace
+    tb_trace_d("push: aico: %p, handle: %p, code: %lu, priority: %lu", aice->aico, tb_aico_sock(aice->aico), aice->code, priority);
+
+    // enter 
+    tb_spinlock_enter(&impl->lock);
+
+    // not full?
+    if (!tb_queue_full(impl->spak[priority])) 
+    {
+        // push aice to the spak queue
+        tb_queue_put(impl->spak[priority], aice);
+
+        // wait ok if be not acpt aice
+        if (aice->code != TB_AICE_CODE_ACPT) ((tb_aiop_aico_t*)aice->aico)->wait_ok = 1;
+    }
+    else 
+    {
+        // trace
+        tb_trace_e("push: failed, the spak queue is full!");
+    }
+
+    // leave 
+    tb_spinlock_leave(&impl->lock);
+
+    // ok
+    return tb_true;
+}
+static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
+{
+    // check
+    tb_assert_and_check_return_val(impl && aice, tb_false);
+    tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_ACPT, tb_false);
+
+    // the aico
+    tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
+    tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
+
+    // the priority
+    tb_size_t priority = tb_aice_impl_priority(aice);
+    tb_assert_and_check_return_val(priority < tb_arrayn(impl->spak) && impl->spak[priority], tb_false);
+
+    // init the acpt aice
+    tb_aice_t acpt_aice = *aice;
+    acpt_aice.state = TB_STATE_OK;
+
+    // done
+    tb_size_t       indx = 0;
+    tb_size_t       size = 0;
+    tb_socket_ref_t list[4096];
+    tb_size_t       maxn = tb_arrayn(list);
+    tb_socket_ref_t acpt = (tb_socket_ref_t)aico->base.handle;
+    tb_queue_ref_t  spak = impl->spak[priority];
+    do
+    {
+        // accept it
+        for (size = 0; size < maxn && (list[size] = tb_socket_accept(acpt)); size++) ;
+
+        // enter 
+        tb_spinlock_enter(&impl->lock);
+
+        // push some acpt aice
+        for (indx = 0; indx < size && (acpt_aice.u.acpt.sock = list[indx]); indx++)
+        {
+            // trace
+            tb_trace_d("push: acpt[%p]: %p", aico->base.handle, acpt_aice.u.acpt.sock);
+
+            // push the acpt aice if not full?
+            if (!tb_queue_full(spak)) 
+            {
+                // push to the spak queue
+                tb_queue_put(spak, &acpt_aice);
+            }
+            else 
+            {
+                // close the left sock
+                tb_size_t i;
+                for (i = indx; i < size; i++) 
+                {
+                    // close it
+                    if (list[i]) tb_socket_clos(list[i]);
+                    list[i] = tb_null;
+                }
+
+                // trace
+                tb_trace_e("push: failed, the spak queue is full!");
+                break;
+            }
+        }
+
+        // leave 
+        tb_spinlock_leave(&impl->lock);
+
+    } while (indx == maxn);
+
+    // ok
+    return tb_true;
+}
 static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
 {
     // check
     tb_aiop_ptor_impl_t*    impl = (tb_aiop_ptor_impl_t*)priv;
     tb_aicp_impl_t*         aicp = impl? impl->base.aicp : tb_null;
-    tb_assert_and_check_goto(impl && impl->aiop && impl->list && impl->timer && impl->ltimer && aicp, end);
 
-    // trace
-    tb_trace_d("loop: init");
-
-    // loop 
-    while (!tb_atomic_get(&aicp->kill))
+    // done
+    do
     {
-        // the delay
-        tb_size_t delay = tb_timer_delay(impl->timer);
-
-        // the ldelay
-        tb_size_t ldelay = tb_ltimer_delay(impl->ltimer);
-        tb_assert_and_check_break(ldelay != -1);
+        // check
+        tb_assert_and_check_break(impl && impl->aiop && impl->list && impl->timer && impl->ltimer && aicp);
 
         // trace
-        tb_trace_d("loop: wait: ..");
+        tb_trace_d("loop: init");
 
-        // wait aioe
-        tb_long_t real = tb_aiop_wait(impl->aiop, impl->list, impl->maxn, tb_min(delay, ldelay));
-
-        // trace
-        tb_trace_d("loop: wait: %ld", real);
-
-        // spak ctime
-        tb_cache_time_spak();
-
-        // spak timer
-        if (!tb_timer_spak(impl->timer)) break;
-
-        // spak ltimer
-        if (!tb_ltimer_spak(impl->ltimer)) break;
-
-        // killed?
-        tb_check_break(real >= 0);
-
-        // error? out of range
-        tb_assert_and_check_break(real <= impl->maxn);
-        
-        // timeout?
-        tb_check_continue(real);
-    
-        // grow it if aioe is full
-        if (real == impl->maxn)
+        // loop 
+        while (!tb_atomic_get(&aicp->kill))
         {
-            // grow size
-            impl->maxn += (aicp->maxn >> 4) + 16;
-            if (impl->maxn > aicp->maxn) impl->maxn = aicp->maxn;
+            // the delay
+            tb_size_t delay = tb_timer_delay(impl->timer);
 
-            // grow list
-            impl->list = tb_ralloc(impl->list, impl->maxn * sizeof(tb_aioe_t));
-            tb_assert_and_check_break(impl->list);
-        }
-
-        // walk aioe list
-        tb_size_t i = 0;
-        for (i = 0; i < real; i++)
-        {
-            // the aioe
-            tb_aioe_t const* aioe = &impl->list[i];
-            tb_assert_and_check_goto(aioe, end);
-
-            // the aice
-            tb_aice_t const* aice = aioe->priv;
-            tb_assert_and_check_goto(aice, end);
-
-            // the aico
-            tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
-            tb_assert_and_check_goto(aico, end);
-
-            // have wait?
-            tb_check_continue(aice->code);
-
-            // have been waited ok for the timer timeout/killed func? need not spak it repeatly
-            tb_check_continue(!aico->wait_ok);
-
-            // the priority
-            tb_size_t priority = tb_aice_impl_priority(aice);
-            tb_assert_and_check_goto(priority < tb_arrayn(impl->spak) && impl->spak[priority], end);
-
-            // this aico is killed? post to higher priority queue
-            if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico)) priority = 0;
+            // the ldelay
+            tb_size_t ldelay = tb_ltimer_delay(impl->ltimer);
+            tb_assert_and_check_break(ldelay != -1);
 
             // trace
-            tb_trace_d("wait: aico: %p, handle: %p, code: %lu, priority: %lu", aico, aico->base.handle, aice->code, priority);
+            tb_trace_d("loop: wait: ..");
 
-            // sock?
-            if (aico->base.type == TB_AICO_TYPE_SOCK)
+            // wait aioe
+            tb_long_t real = tb_aiop_wait(impl->aiop, impl->list, impl->maxn, tb_min(delay, ldelay));
+
+            // trace
+            tb_trace_d("loop: wait: %ld", real);
+
+            // spak ctime
+            tb_cache_time_spak();
+
+            // spak timer
+            if (!tb_timer_spak(impl->timer)) break;
+
+            // spak ltimer
+            if (!tb_ltimer_spak(impl->ltimer)) break;
+
+            // killed?
+            tb_check_break(real >= 0);
+
+            // error? out of range
+            tb_assert_and_check_break(real <= impl->maxn);
+            
+            // timeout?
+            tb_check_continue(real);
+        
+            // grow it if aioe is full
+            if (real == impl->maxn)
             {
-                // enter 
-                tb_spinlock_enter(&impl->lock);
+                // grow size
+                impl->maxn += (aicp->maxn >> 4) + 16;
+                if (impl->maxn > aicp->maxn) impl->maxn = aicp->maxn;
 
-                // spak aice
-                if (!tb_queue_full(impl->spak[priority])) 
+                // grow list
+                impl->list = tb_ralloc(impl->list, impl->maxn * sizeof(tb_aioe_t));
+                tb_assert_and_check_break(impl->list);
+            }
+
+            // walk aioe list
+            tb_size_t i = 0;
+            tb_bool_t end = tb_false;
+            for (i = 0; i < real && !end; i++)
+            {
+                // the aioe
+                tb_aioe_t const* aioe = &impl->list[i];
+                tb_assert_and_check_break_state(aioe, end, tb_true);
+
+                // the aice
+                tb_aice_t const* aice = aioe->priv;
+                tb_assert_and_check_break_state(aice, end, tb_true);
+
+                // the aico
+                tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
+                tb_assert_and_check_break_state(aico, end, tb_true);
+
+                // have wait?
+                tb_check_continue(aice->code);
+
+                // have been waited ok for the timer timeout/killed func? need not spak it repeatly
+                tb_check_continue(!aico->wait_ok);
+
+                // sock?
+                if (aico->base.type == TB_AICO_TYPE_SOCK)
                 {
-                    tb_queue_put(impl->spak[priority], aice);
-                    aico->wait_ok = 1;
+                    // push the acpt aice
+                    if (aice->code == TB_AICE_CODE_ACPT) end = tb_aiop_push_acpt(impl, aice)? tb_false : tb_true;
+                    // push the sock aice
+                    else end = tb_aiop_push_sock(impl, aice)? tb_false : tb_true;
+                }
+                else if (aico->base.type == TB_AICO_TYPE_FILE)
+                {
+                    // poll file
+                    tb_aicp_file_poll(impl);
                 }
                 else tb_assert(0);
- 
-                // leave 
-                tb_spinlock_leave(&impl->lock);
             }
-            else if (aico->base.type == TB_AICO_TYPE_FILE)
-            {
-                // poll file
-                tb_aicp_file_poll(impl);
-            }
-            else tb_assert(0);
-        }
-           
-        // work it
-        tb_aiop_spak_work(impl);
-    }
 
-end:
+            // end?
+            tb_check_break(!end);
+
+            // work it
+            tb_aiop_spak_work(impl);
+        }
+
+    } while (0);
+
     // trace
     tb_trace_d("loop: exit");
 
@@ -388,16 +482,23 @@ static tb_bool_t tb_aiop_spak_wait(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
         aico->waiting = 1;
         aico->wait_ok = 0;
 
+        // wait once if not accept 
+        if (aice->code != TB_AICE_CODE_ACPT) code |= TB_AIOE_CODE_ONESHOT;
+
+        // using the edge triggered mode
+        if (tb_aiop_have(impl->aiop, TB_AIOE_CODE_CLEAR))
+            code |= TB_AIOE_CODE_CLEAR;
+
         // have aioo?
         if (!aico->aioo) 
         {
             // addo wait
-            if (!(aico->aioo = tb_aiop_addo(impl->aiop, aico->base.handle, code | TB_AIOE_CODE_ONESHOT, &aico->aice))) break;
+            if (!(aico->aioo = tb_aiop_addo(impl->aiop, aico->base.handle, code, &aico->aice))) break;
         }
         else
         {
             // sete wait
-            if (!tb_aiop_sete(impl->aiop, aico->aioo, code | TB_AIOE_CODE_ONESHOT, &aico->aice)) break;
+            if (!tb_aiop_sete(impl->aiop, aico->aioo, code, &aico->aice)) break;
         }
 
         // add timeout task
@@ -438,53 +539,18 @@ static tb_long_t tb_aiop_spak_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // the aico
     tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
+    tb_assert_and_check_return_val(!aico->waiting, -1);
 
-    // accept it
-    tb_size_t       size = 0;
-    tb_socket_ref_t sock = tb_null;
-    while ((sock = tb_socket_accept(aico->base.handle)))
-    {
-        // trace
-        tb_trace_d("acpt[%p]: %p", aico->base.handle, sock);
+    // trace
+    tb_trace_d("acpt[%p]: wait: ..", aico->base.handle);
 
-        // init list
-        if (!aico->acpt_list) 
-        {
-            aico->acpt_maxn = 16;
-            aico->acpt_list = tb_nalloc_type(aico->acpt_maxn, tb_socket_ref_t);
-            tb_assert_and_check_break(aico->acpt_list);
-        }
-        // grow list
-        else if (size >= aico->acpt_maxn)
-        {
-            aico->acpt_maxn = size + 16;
-            aico->acpt_list = tb_ralloc_type(aico->acpt_list, aico->acpt_maxn, tb_socket_ref_t);
-            tb_assert_and_check_break(aico->acpt_list);
-        }
-
-        // save socket
-        aico->acpt_list[size++] = sock;
-    }
-
-    // no accepted? wait it
-    if (!size) 
-    {
-        // wait it
-        if (!aico->waiting)
-        {
-            // wait ok?
-            if (tb_aiop_spak_wait(impl, aice)) return 0;
-            // wait failed
-            else aice->state = TB_STATE_FAILED;
-        }
-        // closed
-        else aice->state = TB_STATE_CLOSED;
-    }
-
-    // save it
-    aice->state = TB_STATE_OK;
-    aice->u.acpt.list = aico->acpt_list;
-    aice->u.acpt.size = size;
+    // wait ok?
+    if (tb_aiop_spak_wait(impl, aice)) return 0;
+    // wait failed
+    else aice->state = TB_STATE_FAILED;
+ 
+    // trace
+    tb_trace_d("acpt[%p]: wait: failed", aico->base.handle);
 
     // reset wait
     aico->waiting = 0;
@@ -1111,33 +1177,35 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     }
     aico->task = tb_null;
 
-    // no pending? spak it directly
-    if (aice->state != TB_STATE_PENDING)
-    {
-        // reset wait
-        aico->waiting = 0;
-
-        // reset code
-        aico->aice.code = TB_AICE_CODE_NONE;
-
-        // ok
-        return 1;
-    }
-
     // killed?
     if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico))
     {
-        // reset wait
-        aico->waiting = 0;
-
-        // reset code
-        aico->aice.code = TB_AICE_CODE_NONE;
+        // clear wait state if not accept
+        if (aice->code != TB_AICE_CODE_ACPT)
+        {
+            aico->waiting = 0;
+            aico->aice.code = TB_AICE_CODE_NONE;
+        }
 
         // save state
         aice->state = TB_STATE_KILLED;
 
         // trace
         tb_trace_d("spak: aico: %p, code: %u: killed", aico, aice->code);
+
+        // ok
+        return 1;
+    }
+
+    // no pending? spak it directly
+    if (aice->state != TB_STATE_PENDING)
+    {
+       // clear wait state if not accept
+        if (aice->code != TB_AICE_CODE_ACPT)
+        {
+            aico->waiting = 0;
+            aico->aice.code = TB_AICE_CODE_NONE;
+        }
 
         // ok
         return 1;
@@ -1252,11 +1320,6 @@ static tb_bool_t tb_aiop_ptor_delo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
             // delo
             if (aiop_aico->aioo) tb_aiop_delo(impl->aiop, aiop_aico->aioo);
             aiop_aico->aioo = tb_null;
-
-            // exit accept socket list
-            if (aiop_aico->acpt_list) tb_free(aiop_aico->acpt_list);
-            aiop_aico->acpt_list = tb_null;
-            aiop_aico->acpt_maxn = 0;
 
             // ok
             ok = tb_true;

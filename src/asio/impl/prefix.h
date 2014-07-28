@@ -285,7 +285,7 @@ static __tb_inline__ tb_long_t tb_aico_impl_timeout_from_code(tb_aico_impl_t* ai
     {
         -1
 
-    ,   TB_AICO_TIMEOUT_ACPT
+    ,   -1
     ,   TB_AICO_TIMEOUT_CONN
     ,   TB_AICO_TIMEOUT_RECV
     ,   TB_AICO_TIMEOUT_SEND
@@ -305,7 +305,10 @@ static __tb_inline__ tb_long_t tb_aico_impl_timeout_from_code(tb_aico_impl_t* ai
 
     ,   -1
     };
-    tb_assert_and_check_return_val(code < tb_arrayn(type) && type[code] != (tb_size_t)-1, -1);
+    tb_assert_and_check_return_val(code < tb_arrayn(type), -1);
+
+    // no timeout?
+    tb_check_return_val(type[code] != -1, -1);
 
     // timeout
     return tb_aico_timeout((tb_aico_ref_t)aico, type[code]);

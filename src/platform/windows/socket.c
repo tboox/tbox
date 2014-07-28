@@ -353,13 +353,13 @@ tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t 
     // ok?
     return port;
 }
-tb_bool_t tb_socket_listen(tb_socket_ref_t sock)
+tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_false);
 
     // listen
-    return (tb_ws2_32()->listen((SOCKET)((tb_long_t)sock - 1), 20) < 0)? tb_false : tb_true;
+    return (tb_ws2_32()->listen((SOCKET)((tb_long_t)sock - 1), backlog) < 0)? tb_false : tb_true;
 }
 tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock)
 {

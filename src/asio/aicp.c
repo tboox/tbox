@@ -663,9 +663,9 @@ tb_void_t tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t 
         // trace
         tb_trace_d("loop[%p]: spak: code: %lu, aico: %p, state: %s: %ld", loop, resp.code, aico, aico? tb_state_cstr(tb_atomic_get(&aico->state)) : "null", ok);
 
-        // pending? clear state
+        // pending? clear state if be not accept
         tb_size_t state = TB_STATE_OK;
-        state = tb_atomic_fetch_and_pset(&aico->state, TB_STATE_PENDING, state);
+        state = (resp.code != TB_AICE_CODE_ACPT)? tb_atomic_fetch_and_pset(&aico->state, TB_STATE_PENDING, state) : tb_atomic_get(&aico->state);
 
         // killed? update the aice state 
         if ((state == TB_STATE_KILLING) || (state == TB_STATE_EXITING) || (state == TB_STATE_KILLED))
