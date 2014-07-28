@@ -66,7 +66,7 @@ typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedCompareExchange64_t)(LONG
 typedef struct __tb_kernel32_t
 {
     // CancelIoEx
-    tb_kernel32_CancelIoEx_t                    CancelIoEx;
+//    tb_kernel32_CancelIoEx_t                    CancelIoEx;
 
     // CaptureStackBackTrace
     tb_kernel32_RtlCaptureStackBackTrace_t      RtlCaptureStackBackTrace;

@@ -41,7 +41,7 @@ static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance)
     tb_assert_and_check_return_val(module, tb_false);
 
     // init interfaces
-    TB_INTERFACE_LOAD(kernel32, CancelIoEx);
+//    TB_INTERFACE_LOAD(kernel32, CancelIoEx);
     TB_INTERFACE_LOAD(kernel32, RtlCaptureStackBackTrace);
     TB_INTERFACE_LOAD(kernel32, GetFileSizeEx);
     TB_INTERFACE_LOAD(kernel32, GetQueuedCompletionStatusEx);
