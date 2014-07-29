@@ -372,12 +372,12 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_dec
     tb_aico_impl_t* aico = (tb_aico_impl_t*)aice->aico;
     tb_assert_and_check_return_val(aico, tb_false);
 
-    // ok? pending it
-    tb_size_t state = tb_atomic_fetch_and_pset(&aico->state, TB_STATE_OK, TB_STATE_PENDING);
-    if (state != TB_STATE_OK)
+    // opened? pending it
+    tb_size_t state = tb_atomic_fetch_and_pset(&aico->state, TB_STATE_OPENED, TB_STATE_PENDING);
+    if (state != TB_STATE_OPENED)
     {
-        // pending? error
-        if (state == TB_STATE_PENDING)
+        // closed or pending? error
+        if (state == TB_STATE_CLOSED || state == TB_STATE_PENDING)
         {
             // trace
 #ifdef __tb_debug__

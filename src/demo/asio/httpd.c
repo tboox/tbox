@@ -122,7 +122,7 @@ static tb_bool_t tb_demo_httpd_aico_clos(tb_aice_t const* aice)
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
 
     // trace
-    tb_trace_d("aico[%p]: clos: %p, state: %s", aice->aico, tb_aico_sock(aice->aico), tb_state_cstr(aice->state));
+    tb_trace_d("aico[%p]: clos: %s", aice->aico, tb_state_cstr(aice->state));
 
     // exit aico
     tb_aico_exit(aice->aico);

@@ -40,10 +40,6 @@ static tb_bool_t tb_aicp_file_addo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* ai
 {
     return tb_true;
 }
-static tb_bool_t tb_aicp_file_delo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico)
-{
-    return tb_true;
-}
 static tb_void_t tb_aicp_file_kilo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico)
 {
     // check
