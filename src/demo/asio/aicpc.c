@@ -15,14 +15,11 @@
  */
 typedef struct __tb_demo_context_t
 {
-    // the sock
-    tb_socket_ref_t     sock;
+    // the sock aico
+    tb_aico_ref_t       sock;
 
-    // the file
-    tb_file_ref_t       file;
-
-    // the aico
-    tb_aico_ref_t       aico[2];
+    // the file aico
+    tb_aico_ref_t       file;
 
     // the size
     tb_hize_t           size;
@@ -47,56 +44,58 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-//static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
-//static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
+static tb_bool_t tb_demo_sock_aico_clos(tb_aice_t const* aice)
+{
+    // check
+    tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
+
+    // trace
+    tb_trace_d("aico[%p]: clos: %s", aice->aico, tb_state_cstr(aice->state));
+
+    // exit aico
+    tb_aico_exit(aice->aico);
+
+    // kill aicp
+    tb_aicp_kill(tb_aico_aicp(aice->aico));
+
+    // ok
+    return tb_true;
+}
+static tb_bool_t tb_demo_file_aico_clos(tb_aice_t const* aice)
+{
+    // check
+    tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
+
+    // the context
+    tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
+    tb_assert_and_check_return_val(context, tb_false);
+
+    // trace
+    tb_trace_d("aico[%p]: clos: %s", aice->aico, tb_state_cstr(aice->state));
+
+    // exit aico
+    tb_aico_exit(aice->aico);
+
+    // exit sock aico
+    if (context->sock) tb_aico_clos(context->sock, tb_demo_sock_aico_clos, tb_null);
+    context->sock = tb_null;
+
+    // ok
+    return tb_true;
+}
 static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 {
     if (context)
     {
-#if 0
         // exit aico
-        if (context->aico[0]) tb_aico_exit(context->aico[0], tb_demo_sock_exit_func, tb_null);
-        context->aico[0] = tb_null;
+        if (context->file) tb_aico_clos(context->file, tb_demo_file_aico_clos, context);
+        context->file = tb_null;
 
-        // exit aico
-        if (context->aico[1]) tb_aico_exit(context->aico[1], tb_demo_file_exit_func, tb_null);
-        context->aico[1] = tb_null;
-#endif
         // exit data
         if (context->data) tb_free(context->data);
         context->data = tb_null;
     }
 }
-#if 0
-static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_assert_and_check_return(aico);
-
-    // trace
-    tb_trace_i("aico: file: exit: %p", tb_aico_file(aico));
-
-    // exit it
-    tb_file_exit(tb_aico_file(aico));
-
-    // kill aicp
-    tb_aicp_kill((tb_aicp_ref_t)tb_aico_aicp(aico));
-}
-static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
-{
-    // check
-    tb_assert_and_check_return(aico);
-
-    // trace
-    tb_trace_i("aico: sock: exit: %p", tb_aico_sock(aico));
-
-    // exit it
-    tb_socket_clos(tb_aico_sock(aico));
-
-    // exit file
-//    if (priv) tb_aico_exit((tb_aico_ref_t)priv, tb_demo_file_exit_func, tb_null);
-}
-#endif
 static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice);
 static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 {
@@ -123,7 +122,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
         else
         {
             // post recv from server
-            if (!tb_aico_recv(context->aico[0], context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+            if (!tb_aico_recv(context->sock, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
         }
     }
     // closed or failed?
@@ -155,7 +154,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
         tb_trace_d("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
 
         // post writ to file
-        if (!tb_aico_writ(context->aico[1], context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
+        if (!tb_aico_writ(context->file, context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
 
         // save size
         context->size += aice->u.recv.real;
@@ -234,48 +233,45 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     // init
     tb_aicp_ref_t       aicp = tb_null;
     tb_demo_context_t   context = {0};
+    do
+    {
+        // init aicp
+        aicp = tb_aicp_init(2);
+        tb_assert_and_check_break(aicp);
 
-    // init aicp
-    aicp = tb_aicp_init(2);
-    tb_assert_and_check_goto(aicp, end);
+        // init data
+        context.data = tb_malloc_bytes(TB_DEMO_SOCK_RECV_MAXN);
+        tb_assert_and_check_break(context.data);
 
-    // init sock
-    context.sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-    tb_assert_and_check_goto(context.sock, end);
+        // init sock aico
+        context.sock = tb_aico_init(aicp);
+        tb_assert_and_check_break(context.sock);
 
-    // init file
-    context.file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC | TB_FILE_MODE_ASIO);
-    tb_assert_and_check_goto(context.file, end);
+        // open sock aico
+        if (!tb_aico_open_sock_from_type(context.sock, TB_SOCKET_TYPE_TCP)) break;
 
-    // init data
-    context.data = tb_malloc_bytes(TB_DEMO_SOCK_RECV_MAXN);
-    tb_assert_and_check_goto(context.data, end);
+        // init file aico
+        context.file = tb_aico_init(aicp);
+        tb_assert_and_check_break(context.file);
 
-#if 0
-    // addo sock
-    context.aico[0] = tb_aico_init_sock(aicp, context.sock);
-    tb_assert_and_check_goto(context.aico[0], end);
+        // open file aico
+        if (!tb_aico_open_file_from_path(context.file, argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 
-    // addo file
-    context.aico[1] = tb_aico_init_file(aicp, context.file);
-    tb_assert_and_check_goto(context.aico[1], end);
-#endif
+        // init conn timeout
+        tb_aico_timeout_set(context.sock, TB_AICO_TIMEOUT_CONN, 10000);
 
-    // init conn timeout
-    tb_aico_timeout_set(context.aico[0], TB_AICO_TIMEOUT_CONN, 10000);
+        // post conn
+        tb_trace_i("conn: ..");
+        tb_ipv4_t addr; tb_ipv4_set(&addr, "127.0.0.1");
+        if (!tb_aico_conn(context.sock, &addr, 9090, tb_demo_sock_conn_func, &context)) break;
 
-    // post conn
-    tb_trace_i("conn: ..");
-    tb_ipv4_t addr; tb_ipv4_set(&addr, "127.0.0.1");
-    if (!tb_aico_conn(context.aico[0], &addr, 9090, tb_demo_sock_conn_func, &context)) goto end;
-
-    // loop aicp
-    tb_aicp_loop(aicp);
+        // loop aicp
+        tb_aicp_loop(aicp);
         
-    // trace
-    if (tb_mclock() > context.base) tb_trace_i("recv[%p]: size: %llu, sped: %llu KB/s", context.sock, context.size, context.size / (tb_mclock() - context.base));
+        // trace
+        if (tb_mclock() > context.base) tb_trace_i("size: %llu, sped: %llu KB/s", context.size, context.size / (tb_mclock() - context.base));
 
-end:
+    } while (0);
 
     // trace
     tb_trace_i("end");

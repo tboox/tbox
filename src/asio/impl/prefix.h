@@ -68,6 +68,7 @@ typedef struct __tb_aico_impl_t
      * TB_STATE_CLOSED
      * TB_STATE_OPENED
      * TB_STATE_KILLED
+     * TB_STATE_KILLING
      * TB_STATE_PENDING
      * </pre>
      */
@@ -224,6 +225,17 @@ tb_aiop_rtor_impl_t*    tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop);
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
+static __tb_inline__ tb_bool_t tb_aico_impl_is_killed(tb_aico_impl_t* aico)
+{
+    // check
+    tb_assert_and_check_return_val(aico, tb_false);
+
+    // the state
+    tb_size_t state = tb_atomic_get(&aico->state);
+
+    // killing or exiting or killed?
+    return (state == TB_STATE_KILLING) || (state == TB_STATE_KILLED);
+}
 static __tb_inline__ tb_size_t tb_aice_impl_priority(tb_aice_t const* aice)
 {
     // the priorities

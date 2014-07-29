@@ -177,7 +177,7 @@ static tb_bool_t tb_aiop_push_sock(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
     tb_assert_and_check_return_val(priority < tb_arrayn(impl->spak) && impl->spak[priority], tb_false);
 
     // this aico is killed? post to higher priority queue
-    if (tb_atomic_get(&((tb_aico_impl_t*)aice->aico)->state) == TB_STATE_KILLED) priority = 0;
+    if (tb_aico_impl_is_killed((tb_aico_impl_t*)aice->aico)) priority = 0;
 
     // trace
     tb_trace_d("push: aico: %p, handle: %p, code: %lu, priority: %lu", aice->aico, tb_aico_sock(aice->aico), aice->code, priority);
@@ -1247,8 +1247,8 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     }
     aico->task = tb_null;
 
-    // killed?
-    if (tb_atomic_get(&aico->base.state) == TB_STATE_KILLED)
+    // spak the killed aice if not closing
+    if (tb_aico_impl_is_killed(&aico->base) && aice->code != TB_AICE_CODE_CLOS)
     {
         // clear waiting state if not accept
         if (aice->code != TB_AICE_CODE_ACPT)
