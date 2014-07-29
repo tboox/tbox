@@ -79,39 +79,6 @@ tb_bool_t           tb_aicp_exit(tb_aicp_ref_t aicp);
  */     
 tb_size_t           tb_aicp_maxn(tb_aicp_ref_t aicp);
 
-/*! init the aico
- *
- * @param aicp      the aicp
- *
- * @return          the aico
- */
-tb_aico_ref_t       tb_aicp_init_aico(tb_aicp_ref_t aicp);
-
-/*! bind the aico 
- *
- * @param aicp      the aicp
- * @param aico      the aico
- * @param type      the aico type
- * @param handle    the aico handle
- *
- * @return          the aico
- */
-tb_bool_t           tb_aicp_bind_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_size_t type, tb_handle_t handle);
-
-/*! kill the aico
- *
- * @param aicp      the aicp
- * @param aico      the aico
- */
-tb_void_t           tb_aicp_kill_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
-
-/*! remove the aico
- *
- * @param aicp      the aicp
- * @param aico      the aico
- */
-tb_void_t           tb_aicp_exit_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
-
 /*! post the aice 
  *
  * @param aicp      the aicp

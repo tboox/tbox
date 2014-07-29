@@ -109,9 +109,6 @@ typedef struct __tb_aicp_ptor_impl_t
     // addo
     tb_bool_t                   (*addo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico);
 
-    // delo
-    tb_bool_t                   (*delo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico);
-    
     // kilo
     tb_void_t                   (*kilo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico);
     
