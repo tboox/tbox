@@ -101,8 +101,7 @@ typedef enum __tb_aico_timeout_e
     TB_AICO_TIMEOUT_CONN    = 0
 ,   TB_AICO_TIMEOUT_RECV    = 1
 ,   TB_AICO_TIMEOUT_SEND    = 2
-,   TB_AICO_TIMEOUT_CLOS    = 3
-,   TB_AICO_TIMEOUT_MAXN    = 4
+,   TB_AICO_TIMEOUT_MAXN    = 3
 
 }tb_aico_timeout_e;
 
