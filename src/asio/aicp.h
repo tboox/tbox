@@ -79,31 +79,38 @@ tb_bool_t           tb_aicp_exit(tb_aicp_ref_t aicp);
  */     
 tb_size_t           tb_aicp_maxn(tb_aicp_ref_t aicp);
 
-/*! add the aico
+/*! init the aico
  *
  * @param aicp      the aicp
- * @param handle    the handle
- * @param type      the aico type
  *
  * @return          the aico
  */
-tb_aico_ref_t       tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type);
+tb_aico_ref_t       tb_aicp_init_aico(tb_aicp_ref_t aicp);
 
-/*! remove the aico, will call the exit callback func if ok
+/*! bind the aico 
  *
  * @param aicp      the aicp
  * @param aico      the aico
- * @param func      the exiting func, wait exiting if be null
- * @param priv      the private data for exiting func
+ * @param type      the aico type
+ * @param handle    the aico handle
+ *
+ * @return          the aico
  */
-tb_void_t           tb_aicp_delo(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
+tb_bool_t           tb_aicp_bind_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_size_t type, tb_handle_t handle);
 
 /*! kill the aico
  *
  * @param aicp      the aicp
  * @param aico      the aico
  */
-tb_void_t           tb_aicp_kilo(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
+tb_void_t           tb_aicp_kill_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
+
+/*! remove the aico
+ *
+ * @param aicp      the aicp
+ * @param aico      the aico
+ */
+tb_void_t           tb_aicp_exit_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
 
 /*! post the aice 
  *

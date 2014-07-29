@@ -110,6 +110,7 @@ static tb_void_t tb_async_stream_file_impl_clos_clear(tb_async_stream_file_impl_
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
+#if 0
 static tb_void_t tb_async_stream_file_impl_clos_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
@@ -131,6 +132,7 @@ static tb_void_t tb_async_stream_file_impl_clos_func(tb_aico_ref_t aico, tb_cpoi
     // trace
     tb_trace_d("clos: notify: ok");
 }
+#endif
 static tb_bool_t tb_async_stream_file_impl_clos_try(tb_async_stream_ref_t stream)
 {   
     // check
@@ -177,9 +179,11 @@ static tb_bool_t tb_async_stream_file_impl_open_try(tb_async_stream_ref_t stream
         tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
         tb_assert_and_check_break(aicp);
 
+#if 0
         // addo file
         impl->aico = tb_aico_init_file(aicp, impl->file);
         tb_assert_and_check_break(impl->aico);
+#endif
 
         // killed?
         tb_check_break(!tb_async_stream_is_killed(stream));
@@ -259,6 +263,7 @@ static tb_bool_t tb_async_stream_file_impl_clos(tb_async_stream_ref_t stream, tb
     impl->func.clos  = func;
     impl->priv       = priv;
 
+#if 0
     /* exit aico
      *
      * note: cannot use this stream after exiting, the stream may be exited after calling clos func
@@ -266,6 +271,7 @@ static tb_bool_t tb_async_stream_file_impl_clos(tb_async_stream_ref_t stream, tb
     if (impl->aico) tb_aico_exit(impl->aico, tb_async_stream_file_impl_clos_func, impl);
     // done func directly
     else tb_async_stream_file_impl_clos_func(tb_null, impl);
+#endif
 
     // ok
     return tb_true;

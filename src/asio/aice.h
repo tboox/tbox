@@ -62,8 +62,9 @@ typedef enum __tb_aice_code_e
 ,   TB_AICE_CODE_FSYNC          = 16    //!< for file, flush data to file
 
 ,   TB_AICE_CODE_RUNTASK        = 17    //!< for task or sock or file, run task with the given delay
+,   TB_AICE_CODE_CLOS           = 18    //!< for task or sock or file
 
-,   TB_AICE_CODE_MAXN           = 18
+,   TB_AICE_CODE_MAXN           = 19
 
 }tb_aice_code_e;
 
@@ -81,11 +82,8 @@ typedef struct __tb_aice_addr_t
 /// the acpt aice type
 typedef struct __tb_aice_acpt_t
 {
-    /// the client socket 
-    tb_socket_ref_t             sock;
-
-    /// the client socket count
-    tb_size_t                   size;
+    /// the client aico 
+    tb_aico_ref_t               aico;
 
     /// the private data for using the left space of the union
     tb_handle_t                 priv[1];

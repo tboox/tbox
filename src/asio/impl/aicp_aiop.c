@@ -231,7 +231,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
     tb_socket_ref_t list[4096];
     tb_size_t       maxn = tb_arrayn(list);
     tb_socket_ref_t acpt = (tb_socket_ref_t)aico->base.handle;
-    tb_queue_ref_t  spak = impl->spak[priority];
+//    tb_queue_ref_t  spak = impl->spak[priority];
     do
     {
         // accept it
@@ -240,6 +240,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
         // enter 
         tb_spinlock_enter(&impl->lock);
 
+#if 0
         // push some acpt aice
         for (indx = 0; indx < size && (acpt_aice.u.acpt.sock = list[indx]); indx++)
         {
@@ -268,6 +269,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
                 break;
             }
         }
+#endif
 
         // leave 
         tb_spinlock_leave(&impl->lock);

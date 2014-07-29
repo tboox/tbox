@@ -38,6 +38,7 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
+#define tb_aico_clos(aico, func, priv)                                          tb_aico_clos_(aico, func, priv __tb_debug_vals__)
 #define tb_aico_acpt(aico, func, priv)                                          tb_aico_acpt_(aico, func, priv __tb_debug_vals__)
 #define tb_aico_conn(aico, addr, port, func, priv)                              tb_aico_conn_(aico, addr, port, func, priv __tb_debug_vals__)
 #define tb_aico_recv(aico, data, size, func, priv)                              tb_aico_recv_(aico, data, size, func, priv __tb_debug_vals__)
@@ -55,6 +56,7 @@ __tb_extern_c_enter__
 #define tb_aico_writv(aico, seek, list, size, func, priv)                       tb_aico_writv_(aico, seek, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_fsync(aico, func, priv)                                         tb_aico_fsync_(aico, func, priv __tb_debug_vals__)
 
+#define tb_aico_clos_after(aico, delay, func, priv)                             tb_aico_clos_after_(aico, delay, func, priv __tb_debug_vals__)
 #define tb_aico_acpt_after(aico, delay, func, priv)                             tb_aico_acpt_after_(aico, delay, func, priv __tb_debug_vals__)
 #define tb_aico_conn_after(aico, delay, addr, port, func, priv)                 tb_aico_conn_after_(aico, delay, addr, port, func, priv __tb_debug_vals__)
 #define tb_aico_recv_after(aico, delay, data, size, func, priv)                 tb_aico_recv_after_(aico, delay, data, size, func, priv __tb_debug_vals__)
@@ -99,50 +101,68 @@ typedef enum __tb_aico_timeout_e
     TB_AICO_TIMEOUT_CONN    = 0
 ,   TB_AICO_TIMEOUT_RECV    = 1
 ,   TB_AICO_TIMEOUT_SEND    = 2
-,   TB_AICO_TIMEOUT_MAXN    = 3
+,   TB_AICO_TIMEOUT_CLOS    = 3
+,   TB_AICO_TIMEOUT_MAXN    = 4
 
 }tb_aico_timeout_e;
-
-/// the aico exit func type
-typedef tb_void_t       (*tb_aico_exit_func_t)(tb_aico_ref_t aico, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init the sock aico
+/*! init the aico
  *
  * @param aicp      the aicp
- * @param sock      the sock
- * @param exit      the exit func
- * @param priv      the private data for exit func
  *
  * @return          the aico
  */
-tb_aico_ref_t       tb_aico_init_sock(tb_aicp_ref_t aicp, tb_socket_ref_t sock);
+tb_aico_ref_t       tb_aico_init(tb_aicp_ref_t aicp);
 
-/*! init the file aico
+/*! open the sock aico
  *
  * @param aicp      the aicp
- * @param file      the file
- * @param exit      the exit func
- * @param priv      the private data for exit func
+ * @param sock      the socket
  *
- * @return          the aico
+ * @return          tb_true or tb_false
  */
-tb_aico_ref_t       tb_aico_init_file(tb_aicp_ref_t aicp, tb_file_ref_t file);
+tb_bool_t           tb_aico_open_sock(tb_aico_ref_t aico, tb_socket_ref_t sock);
 
-/*! init the task aico
+/*! open the sock aico from the socket type
  *
  * @param aicp      the aicp
- * @param handle    the handle
- * @param bltimer   is lower precision timer?
- * @param exit      the exit func
- * @param priv      the private data for exit func
+ * @param type      the socket type
  *
- * @return          the aico
+ * @return          tb_true or tb_false
  */
-tb_aico_ref_t       tb_aico_init_task(tb_aicp_ref_t aicp, tb_bool_t bltimer);
+tb_bool_t           tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type);
+
+/*! open the file aico
+ *
+ * @param aicp      the aicp
+ * @param file      the file 
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aico_open_file(tb_aico_ref_t aico, tb_file_ref_t file);
+
+/*! open the file aico from path
+ *
+ * @param aicp      the aicp
+ * @param path      the file path
+ * @param mode      the file mode
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aico_open_file_from_path(tb_aico_ref_t aico, tb_char_t const* path, tb_size_t mode);
+
+/*! open the task aico 
+ *
+ * @param aicp      the aicp
+ * @param ltimer    is the lower precision timer? 
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aico_open_task(tb_aico_ref_t aico, tb_bool_t ltimer);
 
 /*! kill the aico
  *
@@ -150,13 +170,11 @@ tb_aico_ref_t       tb_aico_init_task(tb_aicp_ref_t aicp, tb_bool_t bltimer);
  */
 tb_void_t           tb_aico_kill(tb_aico_ref_t aico);
 
-/*! exit the aico, will call the callback func if ok
+/*! exit the aico
  *
  * @param aico      the aico
- * @param func      the func
- * @param priv      the func private data
  */
-tb_void_t           tb_aico_exit(tb_aico_ref_t aico, tb_aico_exit_func_t func, tb_cpointer_t priv);
+tb_void_t           tb_aico_exit(tb_aico_ref_t aico);
 
 /*! the aico aicp
  *
@@ -206,6 +224,16 @@ tb_long_t           tb_aico_timeout(tb_aico_ref_t aico, tb_size_t type);
  * @param timeout   the timeout
  */
 tb_void_t           tb_aico_timeout_set(tb_aico_ref_t aico, tb_size_t type, tb_long_t timeout);
+
+/*! post the clos
+ *
+ * @param aicp      the aicp
+ * @param func      the func
+ * @param priv      the func private data
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aico_clos_(tb_aico_ref_t aico, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the acpt
  *
@@ -407,6 +435,17 @@ tb_bool_t           tb_aico_writv_(tb_aico_ref_t aico, tb_hize_t seek, tb_iovec_
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_aico_fsync_(tb_aico_ref_t aico, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+
+/*! post the clos after the delay time
+ *
+ * @param aico      the aico
+ * @param delay     the delay time, ms
+ * @param func      the callback func
+ * @param priv      the callback data
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aico_clos_after_(tb_aico_ref_t aico, tb_size_t delay, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the acpt after the delay time
  *

@@ -42,6 +42,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * aico implementation
  */
+#if 0
 static tb_aico_impl_t* tb_aicp_aico_init(tb_aicp_impl_t* impl, tb_handle_t handle, tb_size_t type)
 {
     // check
@@ -73,6 +74,7 @@ static tb_aico_impl_t* tb_aicp_aico_init(tb_aicp_impl_t* impl, tb_handle_t handl
     // ok?
     return aico;
 }
+#endif
 static tb_void_t tb_aicp_aico_exit(tb_aicp_impl_t* impl, tb_aico_impl_t* aico)
 {
     // check
@@ -115,15 +117,16 @@ static tb_bool_t tb_aicp_aico_kill(tb_pointer_t item, tb_cpointer_t priv)
 {
     // check
     tb_aico_impl_t* aico = (tb_aico_impl_t*)item;
-    tb_aicp_ref_t impl = (tb_aicp_ref_t)priv;
+    tb_aicp_ref_t   impl = (tb_aicp_ref_t)priv;
     tb_assert_and_check_return_val(aico && impl, tb_false);
 
     // kill it
-    tb_aicp_kilo(impl, (tb_aico_ref_t)aico);
+    tb_aicp_kill_aico(impl, (tb_aico_ref_t)aico);
 
     // ok
     return tb_true;
 }
+#if 0
 static tb_void_t tb_aicp_aico_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
@@ -133,6 +136,7 @@ static tb_void_t tb_aicp_aico_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     // exit ok
     tb_atomic_set(wait, 1);
 }
+#endif
 static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 {
     // check
@@ -421,6 +425,7 @@ tb_size_t tb_aicp_maxn(tb_aicp_ref_t aicp)
     // the maxn
     return impl->maxn;
 }
+#if 0
 tb_aico_ref_t tb_aicp_addo(tb_aicp_ref_t aicp, tb_handle_t handle, tb_size_t type)
 {
     // check
@@ -548,6 +553,22 @@ tb_void_t tb_aicp_kilo(tb_aicp_ref_t aicp, tb_aico_ref_t aico)
         tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: pending: ok", aico, tb_aico_type(aico), aico_impl->handle);
     }
 }
+#else
+tb_aico_ref_t tb_aicp_init_aico(tb_aicp_ref_t aicp)
+{
+    return tb_null;
+}
+tb_bool_t tb_aicp_bind_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_size_t type, tb_handle_t handle)
+{
+    return tb_false;
+}
+tb_void_t tb_aicp_exit_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico)
+{
+}
+tb_void_t tb_aicp_kill_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico)
+{
+}
+#endif
 tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_decl__)
 {
     // check
@@ -693,13 +714,6 @@ tb_void_t tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t 
         // exiting? exit it
         if (state == TB_STATE_EXITING || (state == TB_STATE_KILLING && tb_atomic_get(&aico->state) == TB_STATE_EXITING))
         {
-            // done exit
-            if (aico->exit) aico->exit((tb_aico_ref_t)aico, aico->priv);
-
-            // clear func
-            aico->exit = tb_null;
-            aico->priv = tb_null;
- 
             // trace
             tb_trace_d("loop[%p]: exit: aico[%p]: type: %lu, handle: %p: ok", loop, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle);
 

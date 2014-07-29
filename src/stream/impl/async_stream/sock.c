@@ -156,6 +156,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_func(tb_aico_ref_t aico, tb_cpoi
     // trace
     tb_trace_d("clos: notify: ok");
 }
+#if 0
 static tb_void_t tb_async_stream_sock_impl_clos_dns_func(tb_aicp_dns_ref_t dns, tb_cpointer_t priv)
 {
     // check
@@ -197,6 +198,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_aico_func(tb_aico_ref_t aico, tb
     // trace
     tb_trace_d("clos: aico: notify: ok");
 }
+#endif
 #ifdef TB_SSL_ENABLE
 static tb_void_t tb_async_stream_sock_impl_clos_ssl_func(tb_aicp_ssl_ref_t ssl, tb_size_t state, tb_cpointer_t priv)
 {
@@ -210,12 +212,14 @@ static tb_void_t tb_async_stream_sock_impl_clos_ssl_func(tb_aicp_ssl_ref_t ssl, 
     // close it if be not alived
     if (!impl->balived && !impl->bref)
     {
+#if 0
         // exit aico 
         if (impl->aico) tb_aico_exit(impl->aico, tb_async_stream_sock_impl_clos_aico_func, impl);
         // exit dns
         else if (impl->hdns) tb_aicp_dns_exit(impl->hdns, tb_async_stream_sock_impl_clos_dns_func, impl);
         // done func directly
         else tb_async_stream_sock_impl_clos_func(tb_null, impl);
+#endif
     }
     // done func directly
     else tb_async_stream_sock_impl_clos_func(tb_null, impl);
@@ -282,12 +286,14 @@ static tb_bool_t tb_async_stream_sock_impl_clos(tb_async_stream_ref_t stream, tb
 #endif
     if (!impl->balived && !impl->bref)
     {
+#if 0
         // exit aico 
         if (impl->aico) tb_aico_exit(impl->aico, tb_async_stream_sock_impl_clos_aico_func, impl);
         // exit dns
         else if (impl->hdns) tb_aicp_dns_exit(impl->hdns, tb_async_stream_sock_impl_clos_dns_func, impl);
         // done func directly
         else tb_async_stream_sock_impl_clos_func(tb_null, impl);
+#endif
     }
     // done func directly
     else tb_async_stream_sock_impl_clos_func(tb_null, impl);
@@ -430,9 +436,11 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
                 }
             }
 
+#if 0
             // init aico
             if (!impl->aico) impl->aico = tb_aico_init_sock(tb_async_stream_aicp((tb_async_stream_ref_t)impl), impl->sock);
             tb_assert_and_check_break(impl->aico);
+#endif
 
             // init timeout
             tb_long_t timeout = tb_async_stream_timeout((tb_async_stream_ref_t)impl);
@@ -1121,9 +1129,11 @@ static tb_bool_t tb_async_stream_sock_impl_exit(tb_async_stream_ref_t stream)
     // alived? exit it
     if (impl->balived || impl->bref)
     {
+#if 0
         // exit aico
         if (impl->aico) tb_aico_exit(impl->aico, tb_null, tb_null);
         impl->aico = tb_null;
+#endif
 
         // exit hdns
         if (impl->hdns) tb_aicp_dns_exit(impl->hdns, tb_null, tb_null);
@@ -1176,9 +1186,11 @@ static tb_bool_t tb_async_stream_sock_impl_ctrl(tb_async_stream_ref_t stream, tb
             // changed? exit the old sock
             if (impl->type != type)
             {
+#if 0
                 // exit aico
                 if (impl->aico) tb_aico_exit(impl->aico, tb_null, tb_null);
                 impl->aico = tb_null;
+#endif
 
                 // exit it
                 if (!impl->bref && impl->sock) tb_socket_clos(impl->sock);
@@ -1210,9 +1222,11 @@ static tb_bool_t tb_async_stream_sock_impl_ctrl(tb_async_stream_ref_t stream, tb
             // changed? exit the old sock
             if (impl->sock != sock)
             {
+#if 0
                 // exit aico
                 if (impl->aico) tb_aico_exit(impl->aico, tb_null, tb_null);
                 impl->aico = tb_null;
+#endif
 
                 // exit it
                 if (!impl->bref && impl->sock) tb_socket_clos(impl->sock);
