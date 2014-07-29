@@ -23,6 +23,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME                "aico"
+#define TB_TRACE_MODULE_DEBUG               (1)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "aico.h"
@@ -31,48 +37,63 @@
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-__tb_extern_c_enter__
-
-// init aico
-tb_aico_ref_t       tb_aicp_init_aico(tb_aicp_ref_t aicp);
-
-// bind aico
-tb_bool_t           tb_aicp_bind_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_size_t type, tb_handle_t handle);
-
-// kill aico
-tb_void_t           tb_aicp_kill_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
-
-// exit aico
-tb_void_t           tb_aicp_exit_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
-
-__tb_extern_c_leave__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_aico_ref_t tb_aico_init(tb_aicp_ref_t aicp)
 {
-    return tb_aicp_init_aico(aicp);
+    // check
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)aicp;
+    tb_assert_and_check_return_val(aicp_impl && aicp_impl->pool, tb_null);
+
+    // enter 
+    tb_spinlock_enter(&aicp_impl->lock);
+
+    // make aico
+    tb_aico_impl_t* aico = (tb_aico_impl_t*)tb_fixed_pool_malloc0(aicp_impl->pool);
+
+    // init aico
+    if (aico)
+    {
+        aico->aicp      = aicp;
+        aico->type      = TB_AICO_TYPE_NONE;
+        aico->handle    = tb_null;
+        aico->state     = TB_STATE_OK;
+
+        // init timeout 
+        tb_size_t i = 0;
+        tb_size_t n = tb_arrayn(aico->timeout);
+        for (i = 0; i < n; i++) aico->timeout[i] = -1;
+    }
+
+    // leave 
+    tb_spinlock_leave(&aicp_impl->lock);
+    
+    // ok?
+    return (tb_aico_ref_t)aico;
 }
 tb_bool_t tb_aico_open_sock(tb_aico_ref_t aico, tb_socket_ref_t sock)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl && impl->aicp && sock, tb_false);
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
+    tb_assert_and_check_return_val(impl && sock && aicp_impl && aicp_impl->ptor && aicp_impl->ptor->addo, tb_false);
 
     // closed?
     tb_assert_and_check_return_val(!impl->handle, tb_false);
 
+    // bind type and handle
+    impl->type     = TB_AICO_TYPE_SOCK;
+    impl->handle   = (tb_handle_t)sock;
+
     // bind aico
-    return tb_aicp_bind_aico(impl->aicp, aico, TB_AICO_TYPE_SOCK, sock);
+    return aicp_impl->ptor->addo(aicp_impl->ptor, impl);
 }
 tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl && impl->aicp, tb_false);
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
+    tb_assert_and_check_return_val(impl && aicp_impl && aicp_impl->ptor && aicp_impl->ptor->addo, tb_false);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -86,8 +107,12 @@ tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type)
         sock = tb_socket_open(type);
         tb_assert_and_check_break(sock);
 
-        // bind aico
-        ok = tb_aicp_bind_aico(impl->aicp, aico, TB_AICO_TYPE_SOCK, sock);
+        // bind type and handle
+        impl->type     = TB_AICO_TYPE_SOCK;
+        impl->handle   = (tb_handle_t)sock;
+
+        // addo aico
+        ok = aicp_impl->ptor->addo(aicp_impl->ptor, impl);
 
     } while (0);
 
@@ -106,19 +131,25 @@ tb_bool_t tb_aico_open_file(tb_aico_ref_t aico, tb_file_ref_t file)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl && impl->aicp && file, tb_false);
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
+    tb_assert_and_check_return_val(impl && file && aicp_impl && aicp_impl->ptor && aicp_impl->ptor->addo, tb_false);
 
     // closed?
     tb_assert_and_check_return_val(!impl->handle, tb_false);
 
+    // bind type and handle
+    impl->type     = TB_AICO_TYPE_FILE;
+    impl->handle   = (tb_handle_t)file;
+
     // bind aico
-    return tb_aicp_bind_aico(impl->aicp, aico, TB_AICO_TYPE_FILE, file);
+    return aicp_impl->ptor->addo(aicp_impl->ptor, impl);
 }
 tb_bool_t tb_aico_open_file_from_path(tb_aico_ref_t aico, tb_char_t const* path, tb_size_t mode)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl && impl->aicp && path, tb_false);
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
+    tb_assert_and_check_return_val(impl && path && aicp_impl && aicp_impl->ptor && aicp_impl->ptor->addo, tb_false);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -132,8 +163,12 @@ tb_bool_t tb_aico_open_file_from_path(tb_aico_ref_t aico, tb_char_t const* path,
         file = tb_file_init(path, mode);
         tb_assert_and_check_break(file);
 
-        // bind aico
-        ok = tb_aicp_bind_aico(impl->aicp, aico, TB_AICO_TYPE_FILE, file);
+        // bind type and handle
+        impl->type     = TB_AICO_TYPE_FILE;
+        impl->handle   = (tb_handle_t)file;
+
+        // addo aico
+        ok = aicp_impl->ptor->addo(aicp_impl->ptor, impl);
 
     } while (0);
 
@@ -152,31 +187,71 @@ tb_bool_t tb_aico_open_task(tb_aico_ref_t aico, tb_bool_t ltimer)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return_val(impl && impl->aicp, tb_false);
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
+    tb_assert_and_check_return_val(impl && aicp_impl && aicp_impl->ptor && aicp_impl->ptor->addo, tb_false);
 
-    // closed?
-    tb_assert_and_check_return_val(!impl->handle, tb_false);
+    // bind type and handle, hack: handle != null? using higher precision timer for being compatible with sock/file task
+    impl->type     = TB_AICO_TYPE_TASK;
+    impl->handle   = (tb_handle_t)(tb_size_t)!ltimer;
 
-    // bind aico, hack: handle != null? using higher precision timer for being compatible with sock/file task
-    return tb_aicp_bind_aico(impl->aicp, aico, TB_AICO_TYPE_TASK, (tb_handle_t)(tb_size_t)!ltimer);
+    // bind aico
+    return aicp_impl->ptor->addo(aicp_impl->ptor, impl);
 }
 tb_void_t tb_aico_exit(tb_aico_ref_t aico)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return(impl && impl->aicp);
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
+    tb_assert_and_check_return(impl && aicp_impl && aicp_impl->pool);
 
-    // exit aico
-    tb_aicp_exit_aico(impl->aicp, aico);
+    // trace
+    tb_trace_d("exit[%p]: type: %lu, handle: %p: state: %s: ..", aico, tb_aico_type(aico), impl->handle, tb_state_cstr(tb_atomic_get(&impl->state)));
+
+    // exit it directly if be ok or killed, otherwise wait exiting
+    tb_size_t state = TB_STATE_OK;
+    if (TB_STATE_OK == (state = tb_atomic_fetch_and_set(&impl->state, TB_STATE_EXITING)) || (state == TB_STATE_KILLED))
+    {
+        // enter 
+        tb_spinlock_enter(&aicp_impl->lock);
+
+        // trace
+        tb_trace_d("free[%p]: type: %lu, handle: %p, state: %s", aico, tb_aico_type(aico), impl->handle, tb_state_cstr(tb_atomic_get(&impl->state)));
+        
+        // free it
+        tb_fixed_pool_free(aicp_impl->pool, aico);
+
+        // leave 
+        tb_spinlock_leave(&aicp_impl->lock);
+    }
 }
 tb_void_t tb_aico_kill(tb_aico_ref_t aico)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
-    tb_assert_and_check_return(impl && impl->aicp);
+    tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
+    tb_assert_and_check_return(impl && aicp_impl && aicp_impl->ptor && aicp_impl->ptor->kilo);
 
-    // kill aico
-    tb_aicp_kill_aico(impl->aicp, aico);
+    // the impl is killed and not worked?
+    tb_check_return(!tb_atomic_get(&aicp_impl->kill) || tb_atomic_get(&aicp_impl->work));
+
+    // trace
+    tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: %s: ..", aico, tb_aico_type(aico), impl->handle, tb_state_cstr(tb_atomic_get(&((tb_aico_impl_t*)aico)->state)));
+
+    // ok? killed
+    if (TB_STATE_OK == tb_atomic_fetch_and_pset(&impl->state, TB_STATE_OK, TB_STATE_KILLED))
+    { 
+        // trace
+        tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), impl->handle);
+    }
+    // pending? kill it
+    else if (TB_STATE_PENDING == tb_atomic_fetch_and_pset(&impl->state, TB_STATE_PENDING, TB_STATE_KILLING)) 
+    {
+        // kill aico
+        aicp_impl->ptor->kilo(aicp_impl->ptor, impl);
+
+        // trace
+        tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: state: pending: ok", aico, tb_aico_type(aico), impl->handle);
+    }
 }
 tb_aicp_ref_t tb_aico_aicp(tb_aico_ref_t aico)
 {
