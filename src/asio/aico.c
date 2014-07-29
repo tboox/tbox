@@ -31,6 +31,25 @@
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+
+// init aico
+tb_aico_ref_t       tb_aicp_init_aico(tb_aicp_ref_t aicp);
+
+// bind aico
+tb_bool_t           tb_aicp_bind_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico, tb_size_t type, tb_handle_t handle);
+
+// kill aico
+tb_void_t           tb_aicp_kill_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
+
+// exit aico
+tb_void_t           tb_aicp_exit_aico(tb_aicp_ref_t aicp, tb_aico_ref_t aico);
+
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_aico_ref_t tb_aico_init(tb_aicp_ref_t aicp)

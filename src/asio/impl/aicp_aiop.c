@@ -1652,10 +1652,11 @@ static tb_aicp_ptor_impl_t* tb_aiop_ptor_init(tb_aicp_impl_t* aicp)
         impl->base.kill         = tb_aiop_ptor_kill;
         impl->base.exit         = tb_aiop_ptor_exit;
         impl->base.addo         = tb_aiop_ptor_addo;
-        impl->base.delo         = tb_aiop_ptor_delo;
+//        impl->base.delo         = tb_aiop_ptor_delo;
         impl->base.kilo         = tb_aiop_ptor_kilo;
         impl->base.post         = tb_aiop_ptor_post;
         impl->base.loop_spak    = tb_aiop_ptor_spak;
+        tb_used(tb_aiop_ptor_delo);
 
         // init lock
         if (!tb_spinlock_init(&impl->lock)) break;
