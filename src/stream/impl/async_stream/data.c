@@ -150,6 +150,7 @@ static tb_void_t tb_async_stream_data_impl_clos_clear(tb_async_stream_data_impl_
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
+#if 0
 static tb_void_t tb_async_stream_data_impl_clos_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
@@ -171,6 +172,7 @@ static tb_void_t tb_async_stream_data_impl_clos_func(tb_aico_ref_t aico, tb_cpoi
     // trace
     tb_trace_d("clos: notify: ok");
 }
+#endif
 static tb_bool_t tb_async_stream_data_impl_clos_try(tb_async_stream_ref_t stream)
 {   
     // check
@@ -203,10 +205,12 @@ static tb_bool_t tb_async_stream_data_impl_clos(tb_async_stream_ref_t stream, tb
     impl->func.clos.func = func;
     impl->func.clos.priv = priv;
 
+#if 0
     // exit it
     if (impl->aico) tb_aico_exit(impl->aico, tb_async_stream_data_impl_clos_func, impl);
     // done func directly
     else tb_async_stream_data_impl_clos_func(tb_null, impl);
+#endif
 
     // ok
     return tb_true;
@@ -227,11 +231,11 @@ static tb_bool_t tb_async_stream_data_impl_open_try(tb_async_stream_ref_t stream
         // the aicp
         tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
         tb_assert_and_check_break(aicp);
-        
+#if 0
         // init aico
         if (!impl->aico) impl->aico = tb_aico_init_task(aicp, tb_false);
         tb_assert_and_check_break(impl->aico);
-
+#endif
         // killed?
         tb_check_break(!tb_async_stream_is_killed(stream));
 

@@ -413,6 +413,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     // continue 
     return tb_true;
 }
+#if 0
 static tb_void_t tb_aicp_dns_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
@@ -432,6 +433,7 @@ static tb_void_t tb_aicp_dns_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     // exit it
     tb_free(impl);
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -454,9 +456,11 @@ tb_aicp_dns_ref_t tb_aicp_dns_init(tb_aicp_ref_t aicp, tb_long_t timeout)
         impl->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
         tb_assert_and_check_break(impl->sock);
 
+#if 0
         // init aico
         impl->aico = tb_aico_init_sock(aicp, impl->sock);
         tb_assert_and_check_break(impl->aico);
+#endif
 
         // init timeout
         tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_SEND, timeout);
@@ -505,10 +509,11 @@ tb_void_t tb_aicp_dns_exit(tb_aicp_dns_ref_t dns, tb_aicp_dns_exit_func_t func, 
     // no func? wait exiting
     if (!func)
     {
+#if 0
         // exit aico
         if (impl->aico) tb_aico_exit(impl->aico, tb_null, tb_null);
         impl->aico = tb_null;
-
+#endif
         // exit sock
         if (impl->sock) tb_socket_clos(impl->sock);
         impl->sock = tb_null;
@@ -524,11 +529,12 @@ tb_void_t tb_aicp_dns_exit(tb_aicp_dns_ref_t dns, tb_aicp_dns_exit_func_t func, 
         // save func
         impl->exit.func = func;
         impl->exit.priv = priv;
-
+#if 0
         // exit aico
         if (impl->aico) tb_aico_exit(impl->aico, tb_aicp_dns_exit_func, impl);
         // done func directly
         else tb_aicp_dns_exit_func(tb_null, impl);
+#endif
     }
 }
 tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_aicp_dns_done_func_t func, tb_cpointer_t priv)

@@ -32,9 +32,6 @@ typedef struct __tb_demo_httpd_t
     // the listen port
     tb_size_t           port;
 
-    // the listen socket
-    tb_socket_ref_t     sock;
-
     // the listen aico
     tb_aico_ref_t       aico;
 
@@ -51,9 +48,6 @@ typedef struct __tb_demo_httpd_t
 // the httpd session type
 typedef struct __tb_demo_httpd_session_t
 {
-    // the sock
-    tb_socket_ref_t     sock;
-
     // the aico
     tb_aico_ref_t       aico;
 
@@ -122,26 +116,28 @@ static tb_char_t const* tb_demo_httpd_code_cstr(tb_size_t code)
     // ok?
     return cstr;
 }
-static tb_void_t tb_demo_httpd_sock_exit(tb_aico_ref_t aico, tb_cpointer_t priv)
+static tb_bool_t tb_demo_httpd_aico_clos(tb_aice_t const* aice)
 {
     // check
-    tb_assert_and_check_return(aico);
+    tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
 
     // trace
-    tb_trace_d("aico[%p]: sock: exit: %p", aico, tb_aico_sock(aico));
+    tb_trace_d("aico[%p]: clos: %p, state: %s", aice->aico, tb_aico_sock(aice->aico), tb_state_cstr(aice->state));
 
-    // exit it
-    tb_socket_clos(tb_aico_sock(aico));
+    // exit aico
+    tb_aico_exit(aice->aico);
+
+    // ok
+    return tb_true;
 }
 static tb_void_t tb_demo_httpd_session_exit(tb_demo_httpd_session_t* session)
 {
     // check
     tb_assert_and_check_return(session);
 
-    // exit sock aico
-    if (session->aico) tb_aico_exit(session->aico, tb_demo_httpd_sock_exit, tb_null);
-    session->sock       = tb_null;
-    session->aico  = tb_null;
+    // clos aico
+    if (session->aico) tb_aico_clos(session->aico, tb_demo_httpd_aico_clos, tb_null);
+    session->aico = tb_null;
 
     // exit file
     if (session->file) tb_file_exit(session->file);
@@ -194,10 +190,10 @@ static tb_void_t tb_demo_httpd_session_keep(tb_demo_httpd_session_t* session)
     session->file_offset    = 0;
     session->content_size   = 0;
 }
-static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* httpd, tb_socket_ref_t sock)
+static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* httpd, tb_aico_ref_t aico)
 {
     // check
-    tb_assert_and_check_return_val(httpd && httpd->aicp && sock, tb_null);
+    tb_assert_and_check_return_val(httpd && httpd->aicp && aico, tb_null);
 
     // done
     tb_bool_t                   ok = tb_false;
@@ -210,7 +206,7 @@ static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* http
 
         // init session
         session->httpd          = httpd;
-        session->sock           = sock;
+        session->aico           = aico;
         session->code           = TB_HTTP_CODE_OK;
         session->version        = 1;
         session->balived        = 0;
@@ -226,10 +222,6 @@ static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* http
 
         // init cache
         if (!tb_buffer_init(&session->cache)) break;
-
-        // init sock aico
-        session->aico = tb_aico_init_sock(httpd->aicp, sock);
-        tb_assert_and_check_break(session->aico);
 
         // init timeout
         tb_aico_timeout_set(session->aico, TB_AICO_TIMEOUT_SEND, TB_DEMO_HTTPD_SESSION_TIMEOUT);
@@ -745,9 +737,6 @@ static tb_void_t tb_demo_httpd_exit(tb_demo_httpd_t* httpd)
     // clear aico
     httpd->aico = tb_null;
 
-    // clear sock
-    httpd->sock = tb_null;
-
     // exit it
     tb_free(httpd);
 }
@@ -804,19 +793,18 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
         tb_assert_and_check_break(httpd->aicp);
 #endif
 
-        // init sock
-        httpd->sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-        tb_assert_and_check_break(httpd->sock);
+        // init aico
+        httpd->aico = tb_aico_init(httpd->aicp);
+        tb_assert_and_check_break(httpd->aico);
+
+        // open aico
+        if (!tb_aico_open_sock_from_type(httpd->aico, TB_SOCKET_TYPE_TCP)) break;
 
         // bind port
-        if (!tb_socket_bind(httpd->sock, tb_null, httpd->port)) break;
+        if (!tb_socket_bind(tb_aico_sock(httpd->aico), tb_null, httpd->port)) break;
 
         // listen sock
-        if (!tb_socket_listen(httpd->sock, TB_DEMO_HTTPD_SESSION_MAXN >> 2)) break;
-
-        // init aico
-        httpd->aico = tb_aico_init_sock(httpd->aicp, httpd->sock);
-        tb_assert_and_check_break(httpd->aico);
+        if (!tb_socket_listen(tb_aico_sock(httpd->aico), TB_DEMO_HTTPD_SESSION_MAXN >> 2)) break;
 
         // ok
         ok = tb_true;
@@ -852,13 +840,13 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_t const* aice)
         tb_check_break(aice->state == TB_STATE_OK);
     
         // check
-        tb_assert_and_check_break(aice->u.acpt.sock);
+        tb_assert_and_check_break(aice->u.acpt.aico);
 
         // trace
-        tb_trace_d("acpt[%p]: %p", aice->aico, aice->u.acpt.sock);
+        tb_trace_d("acpt[%p]: %p", aice->aico, aice->u.acpt.aico);
 #if 1
         // init the session
-        session = tb_demo_httpd_session_init(httpd, aice->u.acpt.sock);
+        session = tb_demo_httpd_session_init(httpd, aice->u.acpt.aico);
         tb_assert_and_check_break(session && session->aico);
 
         // recv the header
@@ -883,8 +871,8 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_t const* aice)
         if (session) tb_demo_httpd_session_exit(session);
         session = tb_null;
 
-        // exit it
-        tb_aico_exit(aice->aico, tb_demo_httpd_sock_exit, tb_null);
+        // clos aico
+        if (aice->aico) tb_aico_clos(aice->aico, tb_demo_httpd_aico_clos, tb_null);
     }
 
     // ok

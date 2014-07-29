@@ -47,12 +47,13 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
-static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
+//static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
+//static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv);
 static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 {
     if (context)
     {
+#if 0
         // exit aico
         if (context->aico[0]) tb_aico_exit(context->aico[0], tb_demo_sock_exit_func, tb_null);
         context->aico[0] = tb_null;
@@ -60,12 +61,13 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
         // exit aico
         if (context->aico[1]) tb_aico_exit(context->aico[1], tb_demo_file_exit_func, tb_null);
         context->aico[1] = tb_null;
-
+#endif
         // exit data
         if (context->data) tb_free(context->data);
         context->data = tb_null;
     }
 }
+#if 0
 static tb_void_t tb_demo_file_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
 {
     // check
@@ -92,8 +94,9 @@ static tb_void_t tb_demo_sock_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
     tb_socket_clos(tb_aico_sock(aico));
 
     // exit file
-    if (priv) tb_aico_exit((tb_aico_ref_t)priv, tb_demo_file_exit_func, tb_null);
+//    if (priv) tb_aico_exit((tb_aico_ref_t)priv, tb_demo_file_exit_func, tb_null);
 }
+#endif
 static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice);
 static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 {
@@ -248,6 +251,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     context.data = tb_malloc_bytes(TB_DEMO_SOCK_RECV_MAXN);
     tb_assert_and_check_goto(context.data, end);
 
+#if 0
     // addo sock
     context.aico[0] = tb_aico_init_sock(aicp, context.sock);
     tb_assert_and_check_goto(context.aico[0], end);
@@ -255,6 +259,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
     // addo file
     context.aico[1] = tb_aico_init_file(aicp, context.file);
     tb_assert_and_check_goto(context.aico[1], end);
+#endif
 
     // init conn timeout
     tb_aico_timeout_set(context.aico[0], TB_AICO_TIMEOUT_CONN, 10000);

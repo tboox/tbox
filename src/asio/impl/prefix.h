@@ -77,12 +77,6 @@ typedef struct __tb_aico_impl_t
     // the timeout for aice
     tb_atomic_t                 timeout[TB_AICO_TIMEOUT_MAXN];
 
-    // the exit func
-    tb_aico_exit_func_t         exit;
-
-    // the private data
-    tb_cpointer_t               priv;
-
 #ifdef __tb_debug__
     // the func
     tb_char_t const*            func;
@@ -272,6 +266,7 @@ static __tb_inline__ tb_size_t tb_aice_impl_priority(tb_aice_t const* aice)
     ,   1
 
     ,   0   // task
+    ,   1   // clos
     };
     tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_priorities), 1);
     
@@ -304,6 +299,7 @@ static __tb_inline__ tb_long_t tb_aico_impl_timeout_from_code(tb_aico_impl_t* ai
     ,   -1
 
     ,   -1
+    ,   TB_AICO_TIMEOUT_CLOS
     };
     tb_assert_and_check_return_val(code < tb_arrayn(type), -1);
 
