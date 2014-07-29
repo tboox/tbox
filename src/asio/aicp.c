@@ -365,9 +365,6 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_dec
     tb_assert_and_check_return_val(impl && impl->ptor && impl->ptor->post, tb_false);
     tb_assert_and_check_return_val(aice && aice->aico, tb_false);
 
-    // killed?
-    tb_check_return_val(!tb_atomic_get(&impl->kill_all), tb_false);
-
     // the aico
     tb_aico_impl_t* aico = (tb_aico_impl_t*)aice->aico;
     tb_assert_and_check_return_val(aico, tb_false);
@@ -376,20 +373,24 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_dec
     tb_size_t state = tb_atomic_fetch_and_pset(&aico->state, TB_STATE_OPENED, TB_STATE_PENDING);
     if (state != TB_STATE_OPENED)
     {
-        // closed or pending? error
-        if (state == TB_STATE_CLOSED || state == TB_STATE_PENDING)
+        // not close it?
+        if (aice->code != TB_AICE_CODE_CLOS || TB_STATE_KILLED != tb_atomic_fetch_and_pset(&aico->state, TB_STATE_KILLED, TB_STATE_PENDING))
         {
-            // trace
+            // closed or pending? error
+            if (state == TB_STATE_CLOSED || state == TB_STATE_PENDING)
+            {
+                // trace
 #ifdef __tb_debug__
-            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state), func_, line_, file_);
+                tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state), func_, line_, file_);
 #else
-            tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state));
+                tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state));
 #endif
 
-            // abort it
-            tb_assert_abort(0);
+                // abort it
+                tb_assert_abort(0);
+            }
+            return tb_false;
         }
-        return tb_false;
     }
 
     // save debug info
@@ -485,8 +486,15 @@ tb_void_t tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t 
         tb_size_t state = TB_STATE_OPENED;
         state = (resp.code != TB_AICE_CODE_ACPT)? tb_atomic_fetch_and_pset(&aico->state, TB_STATE_PENDING, state) : tb_atomic_get(&aico->state);
 
-        // killed? update the aice state 
-        if (state == TB_STATE_KILLED) resp.state = TB_STATE_KILLED;
+        // killed or killing?
+        if (state == TB_STATE_KILLED || state == TB_STATE_KILLING)
+        {
+            // update the aice state 
+            resp.state = TB_STATE_KILLED;
+
+            // killing? update to the killed state
+            tb_atomic_fetch_and_pset(&aico->state, TB_STATE_KILLING, TB_STATE_KILLED);
+        }
 
         // done func, @note maybe the aico exit will be called
         if (resp.func && !resp.func(&resp)) 
@@ -498,6 +506,9 @@ tb_void_t tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t 
             tb_trace_e("loop[%p]: done aice func failed with code: %lu!", loop, resp.code);
 #endif
         }
+
+        // killing? update to the killed state
+        tb_atomic_fetch_and_pset(&aico->state, TB_STATE_KILLING, TB_STATE_KILLED);
 
         // stop it?
         if (stop && stop(priv)) tb_aicp_kill(aicp);

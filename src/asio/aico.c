@@ -191,7 +191,7 @@ tb_bool_t tb_aico_open_file_from_path(tb_aico_ref_t aico, tb_char_t const* path,
         tb_assert_and_check_break(!impl->type && !impl->handle);
 
         // init file
-        file = tb_file_init(path, mode);
+        file = tb_file_init(path, mode | TB_FILE_MODE_ASIO);
         tb_assert_and_check_break(file);
 
         // bind type and handle
@@ -290,7 +290,7 @@ tb_void_t tb_aico_kill(tb_aico_ref_t aico)
         tb_trace_d("kill: aico[%p]: type: %lu, handle: %p: ok", aico, tb_aico_type(aico), impl->handle);
     }
     // pending? kill it
-    else if (TB_STATE_PENDING == tb_atomic_fetch_and_pset(&impl->state, TB_STATE_PENDING, TB_STATE_KILLED)) 
+    else if (TB_STATE_PENDING == tb_atomic_fetch_and_pset(&impl->state, TB_STATE_PENDING, TB_STATE_KILLING)) 
     {
         // kill aico
         aicp_impl->ptor->kilo(aicp_impl->ptor, impl);
