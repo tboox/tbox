@@ -264,7 +264,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
                 for (i = indx; i < size; i++) 
                 {
                     // close it
-                    if (list[i]) tb_socket_clos(list[i]);
+                    if (list[i]) tb_socket_exit(list[i]);
                     list[i] = tb_null;
                 }
 
@@ -1198,7 +1198,7 @@ static tb_long_t tb_aiop_spak_clos(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
         aico->aioo = tb_null;
 
         // close the socket handle
-        if (aico->base.handle) tb_socket_clos((tb_socket_ref_t)aico->base.handle);
+        if (aico->base.handle) tb_socket_exit((tb_socket_ref_t)aico->base.handle);
         aico->base.handle = tb_null;
     }
     // exit file
@@ -1372,6 +1372,7 @@ static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // trace
     tb_trace_d("kilo: aico: %p, type: %u: ..", aico, aico->type);
 
+    // the aiop aico
     tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
 
     // add timeout task for killing the accept socket

@@ -63,22 +63,21 @@ typedef enum __tb_socket_kill_e
 
 /*! init socket
  *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_socket_init(tb_noarg_t);
-
-/// exit socket
-tb_void_t           tb_socket_exit(tb_noarg_t);
-
-/*! open socket
- *
  * @param type      the socket type
  *
  * @return          the socket 
  */
-tb_socket_ref_t     tb_socket_open(tb_size_t type);
+tb_socket_ref_t     tb_socket_init(tb_size_t type);
 
-/*! open socket pair
+/*! exit socket
+ *
+ * @param sock      the socket 
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_socket_exit(tb_socket_ref_t sock);
+
+/*! init socket pair
  *
  * @param type      the socket type
  * @param pair      the socket pair
@@ -155,14 +154,6 @@ tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock);
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode);
-
-/*! close socket
- *
- * @param sock      the socket 
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_socket_clos(tb_socket_ref_t sock);
 
 /*! recv the socket data for tcp
  *

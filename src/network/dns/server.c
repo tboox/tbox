@@ -102,7 +102,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
     tb_assert_and_check_return_val(addr && addr->u32, -1);
 
     // init sock
-    tb_socket_ref_t sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
+    tb_socket_ref_t sock = tb_socket_init(TB_SOCKET_TYPE_UDP);
     tb_assert_and_check_return_val(sock, -1);
 
     // init rate
@@ -266,7 +266,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 
 end:
     // exit sock
-    tb_socket_clos(sock);
+    tb_socket_exit(sock);
 
     // ok
     return rate;

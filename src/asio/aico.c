@@ -118,7 +118,7 @@ tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type)
         tb_assert_and_check_break(!impl->type && !impl->handle);
 
         // init sock
-        sock = tb_socket_open(type);
+        sock = tb_socket_init(type);
         tb_assert_and_check_break(sock);
 
         // bind type and handle
@@ -137,7 +137,7 @@ tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type)
     if (!ok)
     {
         // exit it
-        if (sock) tb_socket_clos(sock);
+        if (sock) tb_socket_exit(sock);
         sock = tb_null;
     }
 

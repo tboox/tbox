@@ -40,15 +40,17 @@
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/socket.c"
 #else
-tb_bool_t tb_socket_init()
+tb_bool_t tb_socket_context_init(tb_noarg_t);
+tb_bool_t tb_socket_context_init(tb_noarg_t)
 {
     // ok
     return tb_true;
 }
-tb_void_t tb_socket_exit()
+tb_void_t tb_socket_context_exit(tb_noarg_t);
+tb_void_t tb_socket_context_exit(tb_noarg_t)
 {
 }
-tb_handle_t tb_socket_open(tb_size_t type)
+tb_handle_t tb_socket_init(tb_size_t type)
 {
     tb_trace_noimpl();
     return tb_null;
@@ -97,7 +99,7 @@ tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_socket_clos(tb_socket_ref_t sock)
+tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 {
     tb_trace_noimpl();
     return tb_false;

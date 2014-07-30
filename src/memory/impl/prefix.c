@@ -167,7 +167,7 @@ tb_void_t tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t con
             // dump backtrace
             tb_size_t nframe = 0;
             while (nframe < tb_arrayn(data_head->debug.backtrace) && data_head->debug.backtrace[nframe]) nframe++;
-            tb_trace_i("%sdata: from:", prefix? prefix : "");
+            tb_trace_i("%sdata: from: %s(): %u, %s", prefix? prefix : "", data_head->debug.func, data_head->debug.line, data_head->debug.file);
             tb_backtrace_dump(backtrace_prefix, data_head->debug.backtrace, nframe);
 
             // dump the data info
