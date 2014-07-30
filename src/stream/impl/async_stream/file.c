@@ -146,7 +146,7 @@ static tb_bool_t tb_async_stream_file_impl_open_try(tb_async_stream_ref_t stream
 {
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && !impl->aico, tb_false);
+    tb_assert_and_check_return_val(impl, tb_false);
 
     // done
     tb_bool_t ok = tb_false;

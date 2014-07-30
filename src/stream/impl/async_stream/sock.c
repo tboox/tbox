@@ -1029,6 +1029,21 @@ static tb_void_t tb_async_stream_sock_impl_kill(tb_async_stream_ref_t stream)
     // kill aico
     if (impl->aico) tb_aico_kill(impl->aico);
 }
+static tb_bool_t tb_async_stream_sock_impl_exit_aico_func(tb_aice_t const* aice)
+{
+    // check
+    tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CLOS, tb_false);
+
+    // the wait
+    tb_atomic_t* wait = (tb_atomic_t*)aice->priv;
+    tb_assert_and_check_return_val(wait, tb_false);
+
+    // wait ok
+    tb_atomic_set(wait, 1);
+
+    // ok
+    return tb_true;
+}
 static tb_bool_t tb_async_stream_sock_impl_exit(tb_async_stream_ref_t stream)
 {   
     // check
@@ -1040,6 +1055,29 @@ static tb_bool_t tb_async_stream_sock_impl_exit(tb_async_stream_ref_t stream)
     if (impl->hssl) tb_aicp_ssl_exit(impl->hssl);
     impl->hssl = tb_null;
 #endif
+
+    // alived? wait closing it
+    if (impl->balived && impl->aico)
+    {
+        // post to clos
+        tb_atomic_t wait = 0;
+        if (!tb_aico_clos(impl->aico, tb_async_stream_sock_impl_exit_aico_func, (tb_cpointer_t)&wait)) return tb_false;
+
+        // wait closing?
+        tb_size_t tryn = 15;
+        while (!tb_atomic_get(&wait) && tryn--)
+        {
+            // trace
+            tb_trace_d("exit: %s: aico: %p: wait: ..", tb_url_get(tb_async_stream_url(stream)), impl->aico);
+        
+            // wait some time
+            tb_msleep(200);
+        }
+
+        // check
+        tb_assert_abort(tb_atomic_get(&wait));
+        tb_check_return_val(tb_atomic_get(&wait), tb_false);
+    }
 
     // exit aico
     if (impl->aico) tb_aico_exit(impl->aico);

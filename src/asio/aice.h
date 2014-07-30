@@ -86,7 +86,7 @@ typedef struct __tb_aice_acpt_t
     tb_aico_ref_t               aico;
 
     /// the private data for using the left space of the union
-    tb_handle_t                 priv[1];
+    tb_handle_t                 priv[2];
 
 }tb_aice_acpt_t;
 

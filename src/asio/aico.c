@@ -255,8 +255,20 @@ tb_void_t tb_aico_exit(tb_aico_ref_t aico)
     tb_aicp_impl_t* aicp_impl = (tb_aicp_impl_t*)impl->aicp;
     tb_assert_and_check_return(impl && aicp_impl && aicp_impl->pool);
 
-    // closed?
-    tb_assert_and_check_return(tb_atomic_get(&impl->state) == TB_STATE_CLOSED);
+    // wait closing?
+    tb_size_t tryn = 15;
+    while (tb_atomic_get(&impl->state) != TB_STATE_CLOSED && tryn--)
+    {
+        // trace
+        tb_trace_d("exit[%p]: type: %lu, handle: %p, state: %s: wait: ..", aico, tb_aico_type(aico), impl->handle, tb_state_cstr(tb_atomic_get(&impl->state)));
+    
+        // wait some time
+        tb_msleep(200);
+    }
+
+    // check
+    tb_assert_abort(tb_atomic_get(&impl->state) == TB_STATE_CLOSED);
+    tb_check_return(tb_atomic_get(&impl->state) == TB_STATE_CLOSED);
 
     // enter 
     tb_spinlock_enter(&aicp_impl->lock);

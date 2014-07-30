@@ -263,7 +263,7 @@ static __tb_inline__ tb_size_t tb_aice_impl_priority(tb_aice_t const* aice)
     ,   1
 
     ,   0   // task
-    ,   1   // clos
+    ,   0   // clos
     };
     tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_priorities), 1);
     
