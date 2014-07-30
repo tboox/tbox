@@ -207,6 +207,14 @@ tb_socket_ref_t     tb_aico_sock(tb_aico_ref_t aico);
  */
 tb_file_ref_t       tb_aico_file(tb_aico_ref_t aico);
 
+/*! try to close it
+ *
+ * @param aico      the aico
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_aico_clos_try(tb_aico_ref_t aico);
+
 /*! the aico timeout
  *
  * @param aico      the aico

@@ -138,9 +138,6 @@ static tb_void_t tb_async_stream_data_impl_clos_clear(tb_async_stream_data_impl_
     // check
     tb_assert_and_check_return(impl);
 
-    // clear aico
-    impl->aico = tb_null;
-
     // clear head
     impl->head = tb_null;
 
@@ -150,12 +147,14 @@ static tb_void_t tb_async_stream_data_impl_clos_clear(tb_async_stream_data_impl_
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
-#if 0
-static tb_void_t tb_async_stream_data_impl_clos_func(tb_aico_ref_t aico, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_data_impl_clos_func(tb_aice_t const* aice)
 {
     // check
-    tb_async_stream_data_impl_t* impl = tb_async_stream_data_impl_cast((tb_async_stream_ref_t)priv);
-    tb_assert_and_check_return(impl && impl->func.clos.func);
+    tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CLOS, tb_false);
+
+    // the impl
+    tb_async_stream_data_impl_t* impl = tb_async_stream_data_impl_cast((tb_async_stream_ref_t)aice->priv);
+    tb_assert_and_check_return_val(impl && impl->func.clos.func, tb_false);
 
     // trace
     tb_trace_d("clos: notify: ..");
@@ -171,16 +170,18 @@ static tb_void_t tb_async_stream_data_impl_clos_func(tb_aico_ref_t aico, tb_cpoi
 
     // trace
     tb_trace_d("clos: notify: ok");
+
+    // ok
+    return tb_true;
 }
-#endif
 static tb_bool_t tb_async_stream_data_impl_clos_try(tb_async_stream_ref_t stream)
 {   
     // check
     tb_async_stream_data_impl_t* impl = tb_async_stream_data_impl_cast(stream);
     tb_assert_and_check_return_val(impl, tb_false);
 
-    // no aico? closed 
-    if (!impl->aico)
+    // no aico or closed?
+    if (!impl->aico || tb_aico_clos_try(impl->aico))
     {
         // clear it
         tb_async_stream_data_impl_clos_clear(impl);
@@ -196,7 +197,7 @@ static tb_bool_t tb_async_stream_data_impl_clos(tb_async_stream_ref_t stream, tb
 {   
     // check
     tb_async_stream_data_impl_t* impl = tb_async_stream_data_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && func, tb_false);
+    tb_assert_and_check_return_val(impl && impl->aico && func, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
@@ -205,12 +206,8 @@ static tb_bool_t tb_async_stream_data_impl_clos(tb_async_stream_ref_t stream, tb
     impl->func.clos.func = func;
     impl->func.clos.priv = priv;
 
-#if 0
-    // exit it
-    if (impl->aico) tb_aico_exit(impl->aico, tb_async_stream_data_impl_clos_func, impl);
-    // done func directly
-    else tb_async_stream_data_impl_clos_func(tb_null, impl);
-#endif
+    // clos it
+    tb_aico_clos(impl->aico, tb_async_stream_data_impl_clos_func, impl);
 
     // ok
     return tb_true;
@@ -231,11 +228,14 @@ static tb_bool_t tb_async_stream_data_impl_open_try(tb_async_stream_ref_t stream
         // the aicp
         tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
         tb_assert_and_check_break(aicp);
-#if 0
+
         // init aico
-        if (!impl->aico) impl->aico = tb_aico_init_task(aicp, tb_false);
+        if (!impl->aico) impl->aico = tb_aico_init(aicp);
         tb_assert_and_check_break(impl->aico);
-#endif
+
+        // open aico
+        if (!tb_aico_open_task(impl->aico, tb_false)) break;
+
         // killed?
         tb_check_break(!tb_async_stream_is_killed(stream));
 
@@ -529,8 +529,9 @@ static tb_bool_t tb_async_stream_data_impl_exit(tb_async_stream_ref_t stream)
     tb_async_stream_data_impl_t* impl = tb_async_stream_data_impl_cast(stream);
     tb_assert_and_check_return_val(impl, tb_false);
 
-    // aico has been not closed already?
-    tb_assert_and_check_return_val(!impl->aico, tb_false);
+    // exit the task aico
+    if (impl->aico) tb_aico_exit(impl->aico);
+    impl->aico = tb_null;
 
     // clear head
     impl->head = tb_null;

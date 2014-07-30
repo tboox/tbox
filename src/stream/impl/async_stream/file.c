@@ -46,14 +46,8 @@
 // the file stream type
 typedef struct __tb_async_stream_file_impl_t
 {
-    // the file 
-    tb_file_ref_t                       file;
-
     // the aico
     tb_aico_ref_t                       aico;
-
-    // the file handle is referenced? need not exit it
-    tb_bool_t                           bref;
 
     // the file mode
     tb_size_t                           mode;
@@ -96,26 +90,20 @@ static tb_void_t tb_async_stream_file_impl_clos_clear(tb_async_stream_file_impl_
     // check
     tb_assert_and_check_return(impl);
 
-    // exit it
-    if (!impl->bref && impl->file) tb_file_exit(impl->file);
-    impl->file = tb_null;
-    impl->bref = tb_false;
-
     // clear the offset
     tb_atomic64_set0(&impl->offset);
-
-    // clear aico
-    impl->aico = tb_null;
 
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
-#if 0
-static tb_void_t tb_async_stream_file_impl_clos_func(tb_aico_ref_t aico, tb_cpointer_t priv)
+static tb_bool_t tb_async_stream_file_impl_clos_func(tb_aice_t const* aice)
 {
     // check
-    tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast((tb_async_stream_ref_t)priv);
-    tb_assert_and_check_return(impl && impl->func.clos);
+    tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CLOS, tb_false);
+
+    // the impl
+    tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast((tb_async_stream_ref_t)aice->priv);
+    tb_assert_and_check_return_val(impl && impl->func.clos, tb_false);
 
     // trace
     tb_trace_d("clos: notify: ..");
@@ -131,16 +119,18 @@ static tb_void_t tb_async_stream_file_impl_clos_func(tb_aico_ref_t aico, tb_cpoi
 
     // trace
     tb_trace_d("clos: notify: ok");
+
+    // ok
+    return tb_true;
 }
-#endif
 static tb_bool_t tb_async_stream_file_impl_clos_try(tb_async_stream_ref_t stream)
 {   
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl, tb_false);
 
-    // no aico? closed 
-    if (!impl->aico)
+    // no aico or closed?
+    if (!impl->aico || tb_aico_clos_try(impl->aico))
     {
         // clear it
         tb_async_stream_file_impl_clos_clear(impl);
@@ -162,28 +152,20 @@ static tb_bool_t tb_async_stream_file_impl_open_try(tb_async_stream_ref_t stream
     tb_bool_t ok = tb_false;
     do
     {
-        // init file
-        if (!impl->file)
-        {
-            // the url
-            tb_char_t const* url = tb_url_get(tb_async_stream_url(stream));
-            tb_assert_and_check_break(url);
-
-            // open file
-            impl->file = tb_file_init(url, impl->mode | TB_FILE_MODE_ASIO);
-            impl->bref = tb_false;
-            tb_check_break(impl->file);
-        }
-
         // the aicp
         tb_aicp_ref_t aicp = tb_async_stream_aicp(stream);
         tb_assert_and_check_break(aicp);
 
-#if 0
-        // addo file
-        impl->aico = tb_aico_init_file(aicp, impl->file);
+        // init aico
+        if (!impl->aico) impl->aico = tb_aico_init(tb_async_stream_aicp(stream));
         tb_assert_and_check_break(impl->aico);
-#endif
+
+        // the url
+        tb_char_t const* url = tb_url_get(tb_async_stream_url(stream));
+        tb_assert_and_check_break(url);
+
+        // open aico
+        if (!tb_aico_open_file_from_path(impl->aico, url, impl->mode)) break;
 
         // killed?
         tb_check_break(!tb_async_stream_is_killed(stream));
@@ -226,19 +208,15 @@ static tb_bool_t tb_async_stream_file_impl_open(tb_async_stream_ref_t stream, tb
                 break;
             }
 
-            // open file failed?
-            if (!impl->file)
-            {
-                // the url
-                tb_char_t const* url = tb_url_get(tb_async_stream_url(stream));
-                tb_assert_and_check_break(url);
+            // the url
+            tb_char_t const* url = tb_url_get(tb_async_stream_url(stream));
+            tb_assert_and_check_break(url);
 
-                // trace
-                tb_trace_e("open %s: failed", url);
+            // trace
+            tb_trace_e("open %s: failed", url);
 
-                // save state
-                state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
-            }
+            // save state
+            state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
             break;
         }
 
@@ -254,7 +232,7 @@ static tb_bool_t tb_async_stream_file_impl_clos(tb_async_stream_ref_t stream, tb
 {   
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && func, tb_false);
+    tb_assert_and_check_return_val(impl && impl->aico && func, tb_false);
 
     // trace
     tb_trace_d("clos: ..");
@@ -263,15 +241,11 @@ static tb_bool_t tb_async_stream_file_impl_clos(tb_async_stream_ref_t stream, tb
     impl->func.clos  = func;
     impl->priv       = priv;
 
-#if 0
-    /* exit aico
+    /* clos aico
      *
      * note: cannot use this stream after exiting, the stream may be exited after calling clos func
      */
-    if (impl->aico) tb_aico_exit(impl->aico, tb_async_stream_file_impl_clos_func, impl);
-    // done func directly
-    else tb_async_stream_file_impl_clos_func(tb_null, impl);
-#endif
+    tb_aico_clos(impl->aico, tb_async_stream_file_impl_clos_func, impl);
 
     // ok
     return tb_true;
@@ -325,7 +299,7 @@ static tb_bool_t tb_async_stream_file_impl_read(tb_async_stream_ref_t stream, tb
 {
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->file && impl->aico && data && size && func, tb_false);
+    tb_assert_and_check_return_val(impl && impl->aico && data && size && func, tb_false);
 
     // save func and priv
     impl->priv       = priv;
@@ -384,7 +358,7 @@ static tb_bool_t tb_async_stream_file_impl_writ(tb_async_stream_ref_t stream, tb
 {
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->file && impl->aico && data && size && func, tb_false);
+    tb_assert_and_check_return_val(impl && impl->aico && data && size && func, tb_false);
 
     // save func and priv
     impl->priv       = priv;
@@ -404,7 +378,7 @@ static tb_bool_t tb_async_stream_file_impl_seek(tb_async_stream_ref_t stream, tb
     do
     {
         // check
-        tb_assert_and_check_break(impl->file);
+        tb_assert_and_check_break(impl->aico);
 
         // update offset
         tb_atomic64_set(&impl->offset, offset);
@@ -439,7 +413,7 @@ static tb_bool_t tb_async_stream_file_impl_sync(tb_async_stream_ref_t stream, tb
 {
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->file && impl->aico && func, tb_false);
+    tb_assert_and_check_return_val(impl && impl->aico && func, tb_false);
 
     // save func and priv
     impl->priv       = priv;
@@ -475,7 +449,7 @@ static tb_bool_t tb_async_stream_file_impl_task(tb_async_stream_ref_t stream, tb
 {
     // check
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->file && impl->aico && func, tb_false);
+    tb_assert_and_check_return_val(impl && impl->aico && func, tb_false);
 
     // save func and priv
     impl->priv       = priv;
@@ -502,8 +476,9 @@ static tb_bool_t tb_async_stream_file_impl_exit(tb_async_stream_ref_t stream)
     tb_async_stream_file_impl_t* impl = tb_async_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl, tb_false);
 
-    // aico has been not closed already?
-    tb_assert_and_check_return_val(!impl->aico, tb_false);
+    // exit aico
+    if (impl->aico) tb_aico_exit(impl->aico);
+    impl->aico = tb_null;
 
     // ok
     return tb_true;
@@ -520,23 +495,35 @@ static tb_bool_t tb_async_stream_file_impl_ctrl(tb_async_stream_ref_t stream, tb
     case TB_STREAM_CTRL_GET_SIZE:
         {
             // check
-            tb_assert_and_check_return_val(tb_async_stream_is_opened(stream) && impl->file, tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_opened(stream) && impl->aico, tb_false);
 
-            // get size
+            // the file
+            tb_file_ref_t file = tb_aico_file(impl->aico);
+            tb_assert_and_check_return_val(file, tb_false);
+
+            // the psize
             tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
             tb_assert_and_check_return_val(psize, tb_false);
-            *psize = tb_file_size(impl->file);
+
+            // get size
+            *psize = tb_file_size(file);
+
+            // ok
             return tb_true;
         }
     case TB_STREAM_CTRL_GET_OFFSET:
         {
             // check
-            tb_assert_and_check_return_val(tb_async_stream_is_opened(stream) && impl->file, tb_false);
+            tb_assert_and_check_return_val(tb_async_stream_is_opened(stream), tb_false);
 
-            // get offset
+            // the poffset
             tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
             tb_assert_and_check_return_val(poffset, tb_false);
+
+            // get offset
             *poffset = (tb_hize_t)tb_atomic64_get(&impl->offset);
+
+            // ok
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_SET_MODE:
@@ -553,28 +540,6 @@ static tb_bool_t tb_async_stream_file_impl_ctrl(tb_async_stream_ref_t stream, tb
             tb_size_t* pmode = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(pmode, tb_false);
             *pmode = impl->mode;
-            return tb_true;
-        }
-    case TB_STREAM_CTRL_FILE_SET_HANDLE:
-        {
-            // check
-            tb_assert_and_check_return_val(tb_async_stream_is_closed(stream), tb_false);
-
-            // exit file first if exists
-            if (!impl->bref && impl->file) tb_file_exit(impl->file);
-
-            // set file
-            tb_file_ref_t file = (tb_file_ref_t)tb_va_arg(args, tb_file_ref_t);
-            impl->file = file;
-            impl->bref = file? tb_true : tb_false;
-            return tb_true;
-        }
-    case TB_STREAM_CTRL_FILE_GET_HANDLE:
-        {
-            // get file
-            tb_file_ref_t* pfile = (tb_file_ref_t*)tb_va_arg(args, tb_file_ref_t*);
-            tb_assert_and_check_return_val(pfile, tb_false);
-            *pfile = impl->file;
             return tb_true;
         }
     default:

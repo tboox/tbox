@@ -353,6 +353,15 @@ tb_void_t tb_aico_timeout_set(tb_aico_ref_t aico, tb_size_t type, tb_long_t time
     // set the impl timeout
     tb_atomic_set((tb_atomic_t*)(impl->timeout + type), timeout);
 }
+tb_bool_t tb_aico_clos_try(tb_aico_ref_t aico)
+{
+    // check
+    tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
+    tb_assert_and_check_return_val(impl && impl->aicp, tb_false);
+
+    // closed?
+    return (tb_atomic_get(&impl->state) == TB_STATE_CLOSED)? tb_true : tb_false;
+}
 tb_bool_t tb_aico_clos_(tb_aico_ref_t aico, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
@@ -368,7 +377,7 @@ tb_bool_t tb_aico_clos_(tb_aico_ref_t aico, tb_aico_func_t func, tb_cpointer_t p
     aice.aico               = aico;
 
     // closed?
-    if (tb_atomic_get(&impl->state) == TB_STATE_CLOSED)
+    if (tb_aico_clos_try(aico))
     {
         // close ok
         aice.state = TB_STATE_OK;
