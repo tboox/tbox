@@ -1305,7 +1305,7 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     ,   tb_aicp_file_spak_fsync
 
     ,   tb_aiop_spak_runtask
-    ,   tb_aiop_spak_clos
+    ,   tb_null
     };
     tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_spak) && s_spak[aice->code], -1);
 
@@ -1363,6 +1363,7 @@ static tb_bool_t tb_aiop_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // ok?
     return ok;
 }
+#if 1
 static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
@@ -1384,14 +1385,14 @@ static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     }
 
     // kill the task
-    if (((tb_aiop_aico_t*)aico)->task) 
+    if (aiop_aico->task) 
     {
         // trace
-        tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, ((tb_aiop_aico_t*)aico)->task);
+        tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, aiop_aico->task);
 
         // kill task
-        if (((tb_aiop_aico_t*)aico)->bltimer) tb_ltimer_task_kill(impl->ltimer, ((tb_aiop_aico_t*)aico)->task);
-        else tb_timer_task_kill(impl->timer, ((tb_aiop_aico_t*)aico)->task);
+        if (aiop_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, aiop_aico->task);
+        else tb_timer_task_kill(impl->timer, aiop_aico->task);
     }
 
     // kill sock
@@ -1418,11 +1419,65 @@ static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // trace
     tb_trace_d("kilo: aico: %p, type: %u: ok", aico, aico->type);
 }
+#else
+static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
+{
+    // check
+    tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
+    tb_assert_and_check_return(impl && impl->timer && impl->ltimer && impl->aiop && aico);
+
+    // TODO
+    tb_used(tb_aicp_file_kilo);
+
+    // trace
+    tb_trace_d("kilo: aico: %p, type: %u: ..", aico, aico->type);
+
+    // the aiop aico
+    tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
+
+    // add task if no timeout task
+    if (!aiop_aico->task) aiop_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_aiop_spak_wait_timeout, aico);
+    aiop_aico->bltimer = 1;
+
+    // kill the task
+    if (aiop_aico->task) 
+    {
+        // trace
+        tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, aiop_aico->task);
+
+        // kill task
+        if (aiop_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, aiop_aico->task);
+        else tb_timer_task_kill(impl->timer, aiop_aico->task);
+    }
+
+    /* the aiop will wait long time if the lastest task wait period is too long
+     * so spak the aiop manually for spak the ltimer
+     */
+    tb_aiop_spak(impl->aiop);
+
+    // trace
+    tb_trace_d("kilo: aico: %p, type: %u: ok", aico, aico->type);
+}
+#endif
 static tb_bool_t tb_aiop_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice)
 {
     // check
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
     tb_assert_and_check_return_val(impl && aice && aice->aico, tb_false);
+
+    // optimizate to spak the clos aice 
+    if (aice->code == TB_AICE_CODE_CLOS)
+    {
+        // spak the clos
+        tb_aice_t resp = *aice;
+        if (tb_aiop_spak_clos(impl, &resp) <= 0) return tb_false;
+
+        // done the aice response function
+        aice->func(&resp);
+
+        // post ok
+        return tb_true;
+    }
     
     // the priority
     tb_size_t priority = tb_aice_impl_priority(aice);
