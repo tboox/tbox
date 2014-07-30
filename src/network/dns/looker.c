@@ -539,7 +539,7 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
         if (!tb_static_buffer_init(&looker->rpkt, looker->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) break;
 
         // init sock
-        looker->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
+        looker->sock = tb_socket_init(TB_SOCKET_TYPE_UDP);
         tb_assert_and_check_break(looker->sock);
 
         // init itor
@@ -641,7 +641,7 @@ tb_void_t tb_dns_looker_exit(tb_handle_t handle)
     if (looker)
     {
         // exit sock
-        if (looker->sock) tb_socket_clos(looker->sock);
+        if (looker->sock) tb_socket_exit(looker->sock);
         looker->sock = tb_null;
 
         // exit it

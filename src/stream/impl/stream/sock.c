@@ -152,7 +152,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     }
 
     // make sock
-    impl->sock = tb_socket_open(impl->type);
+    impl->sock = tb_socket_init(impl->type);
     
     // open sock failed?
     if (!impl->sock)
@@ -276,7 +276,7 @@ static tb_bool_t tb_stream_sock_impl_clos(tb_stream_ref_t stream)
     tb_check_return_val(!impl->balived, tb_true);
 
     // exit sock
-    if (impl->sock && !tb_socket_clos(impl->sock)) return tb_false;
+    if (impl->sock && !tb_socket_exit(impl->sock)) return tb_false;
     impl->sock = tb_null;
 
     // clear 
@@ -302,7 +302,7 @@ static tb_void_t tb_stream_sock_impl_exit(tb_stream_ref_t stream)
 #endif
 
     // exit sock
-    if (impl->sock) tb_socket_clos(impl->sock);
+    if (impl->sock) tb_socket_exit(impl->sock);
     impl->sock = tb_null;
 
     // clear 

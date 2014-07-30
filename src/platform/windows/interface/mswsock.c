@@ -53,7 +53,7 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
     do
     {
         // init sock
-        sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP);
         tb_assert_and_check_break(sock);
 
         // init AcceptEx
@@ -97,7 +97,7 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
     } while (0);
 
     // exit sock
-    if (sock) tb_socket_clos(sock);
+    if (sock) tb_socket_exit(sock);
 
     // ok
     return tb_true;

@@ -151,8 +151,8 @@ tb_void_t tb_aiop_exit(tb_aiop_ref_t aiop)
         impl->rtor->exit(impl->rtor);
 
     // exit spak
-    if (impl->spak[0]) tb_socket_clos(impl->spak[0]);
-    if (impl->spak[1]) tb_socket_clos(impl->spak[1]);
+    if (impl->spak[0]) tb_socket_exit(impl->spak[0]);
+    if (impl->spak[1]) tb_socket_exit(impl->spak[1]);
     impl->spak[0] = tb_null;
     impl->spak[1] = tb_null;
 

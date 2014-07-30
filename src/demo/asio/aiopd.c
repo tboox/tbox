@@ -48,7 +48,7 @@ static tb_void_t tb_demo_context_exit(tb_aiop_ref_t aiop, tb_demo_context_t* con
         context->aioo = tb_null;
 
         // exit sock
-        if (context->sock) tb_socket_clos(context->sock);
+        if (context->sock) tb_socket_exit(context->sock);
         context->sock = tb_null;
 
         // exit file
@@ -78,7 +78,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
     do
     {
         // init sock
-        sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP);
         tb_assert_and_check_break(sock);
 
         // init aiop
@@ -291,7 +291,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("end");
 
     // exit socket
-    if (sock) tb_socket_clos(sock);
+    if (sock) tb_socket_exit(sock);
 
     // exit aiop
     if (aiop) tb_aiop_exit(aiop);

@@ -32,7 +32,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_socket_init()
+tb_bool_t tb_socket_context_init(tb_noarg_t);
+tb_bool_t tb_socket_context_init(tb_noarg_t)
 {
     // load WSA* interfaces
     tb_ws2_32_t* ws2_32 = tb_ws2_32();
@@ -75,11 +76,12 @@ tb_bool_t tb_socket_init()
     }
     return tb_true;
 }
-tb_void_t tb_socket_exit()
+tb_void_t tb_socket_context_exit();
+tb_void_t tb_socket_context_exit()
 {
     tb_ws2_32()->WSACleanup();
 }
-tb_socket_ref_t tb_socket_open(tb_size_t type)
+tb_socket_ref_t tb_socket_init(tb_size_t type)
 {
     // check
     tb_assert_and_check_return_val(type, tb_null);
@@ -124,7 +126,7 @@ tb_socket_ref_t tb_socket_open(tb_size_t type)
     if (!ok)
     {
         // exit it
-        if (sock) tb_socket_clos(sock);
+        if (sock) tb_socket_exit(sock);
         sock = tb_null;
     }
 
@@ -395,7 +397,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock)
     if (!ok)
     {
         // exit it
-        if (acpt) tb_socket_clos(acpt);
+        if (acpt) tb_socket_exit(acpt);
         acpt = tb_null;
     }
 
@@ -427,7 +429,7 @@ tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
     // kill it
     return !tb_ws2_32()->shutdown((SOCKET)((tb_long_t)sock - 1), how)? tb_true : tb_false;
 }
-tb_bool_t tb_socket_clos(tb_socket_ref_t sock)
+tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_false);

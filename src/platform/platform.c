@@ -32,6 +32,18 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+
+// init socket context
+tb_bool_t   tb_socket_context_init(tb_noarg_t);
+// exit socket context
+tb_void_t   tb_socket_context_exit(tb_noarg_t);
+
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 
@@ -42,11 +54,11 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
     if (!tb_android_init(priv)) return tb_false;
 #endif
 
-    // init socket
-    if (!tb_socket_init()) return tb_false;
-
-    // init tstore
+    // init thread store
     if (!tb_thread_store_init()) return tb_false;
+
+    // init socket context
+    if (!tb_socket_context_init()) return tb_false;
 
     // init dns
     if (!tb_dns_init()) return tb_false;
@@ -62,11 +74,11 @@ tb_void_t tb_platform_exit()
     // exit dns
     tb_dns_exit();
 
-    // exit tstore
-    tb_thread_store_exit();
+    // exit socket context
+    tb_socket_context_exit();
 
-    // exit socket
-    tb_socket_exit();
+    // exit thread store
+    tb_thread_store_exit();
 
     // exit android
 #ifdef TB_CONFIG_OS_ANDROID

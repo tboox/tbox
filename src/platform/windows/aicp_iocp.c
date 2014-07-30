@@ -295,7 +295,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     if (resp->state != TB_STATE_OK)
     {
         // exit sock
-        if (resp->u.acpt.priv[1]) tb_socket_clos((tb_socket_ref_t)resp->u.acpt.priv[1]);
+        if (resp->u.acpt.priv[1]) tb_socket_exit((tb_socket_ref_t)resp->u.acpt.priv[1]);
         resp->u.acpt.priv[1] = tb_null;
     }
 
@@ -303,8 +303,9 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     if (resp->u.acpt.priv[0]) tb_free(resp->u.acpt.priv[0]);
     resp->u.acpt.priv[0] = tb_null;
 
-    // continue to post acpt
-    tb_iocp_post_acpt(impl, resp);
+    // continue to post acpt if not killed
+    if (!tb_aico_impl_is_killed((tb_aico_impl_t*)resp->aico))
+        tb_iocp_post_acpt(impl, resp);
 
     // ok
     return 1;
@@ -635,7 +636,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         aico->olap.aice                 = *aice;
         aico->olap.aice.state           = TB_STATE_PENDING;
         aico->olap.aice.u.acpt.priv[0]  = (tb_handle_t)tb_malloc0(((sizeof(SOCKADDR_IN) + 16) << 1));
-        aico->olap.aice.u.acpt.priv[1]  = tb_socket_open(TB_SOCKET_TYPE_TCP);
+        aico->olap.aice.u.acpt.priv[1]  = tb_socket_init(TB_SOCKET_TYPE_TCP);
         tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv) > 1);
         tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.priv[1]);
         init_ok = tb_true;
@@ -694,7 +695,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         aico->olap.aice.u.acpt.priv[0] = tb_null;
 
         // exit sock
-        if (aico->olap.aice.u.acpt.priv[1]) tb_socket_clos((tb_socket_ref_t)aico->olap.aice.u.acpt.priv[1]);
+        if (aico->olap.aice.u.acpt.priv[1]) tb_socket_exit((tb_socket_ref_t)aico->olap.aice.u.acpt.priv[1]);
         aico->olap.aice.u.acpt.priv[1] = tb_null;
 
         // remove timeout task
@@ -1633,12 +1634,6 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico, tb_false);
 
-    // init olap
-    tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-
-    // init aice
-    aico->olap.aice = *aice;
-
     // trace
     tb_trace_d("clos: aico: %p, handle: %p", aico, aico->base.handle);
 
@@ -1649,7 +1644,7 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     if (aico->base.type == TB_AICO_TYPE_SOCK)
     {
         // close the socket handle
-        if (aico->base.handle) tb_socket_clos((tb_socket_ref_t)aico->base.handle);
+        if (aico->base.handle) tb_socket_exit((tb_socket_ref_t)aico->base.handle);
         aico->base.handle = tb_null;
     }
     // exit file
@@ -1658,6 +1653,14 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // exit the file handle
         if (aico->base.handle) tb_file_exit((tb_file_ref_t)aico->base.handle);
         aico->base.handle = tb_null;
+    }
+
+    // exit the private data for acpt aice
+    if (aico->olap.aice.code == TB_AICE_CODE_ACPT)
+    {
+        // exit data
+        if (aico->olap.aice.u.acpt.priv[0]) tb_free(aico->olap.aice.u.acpt.priv[0]);
+        aico->olap.aice.u.acpt.priv[0] = tb_null;
     }
  
     // clear impl
@@ -1673,6 +1676,12 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
 
     // closed
     tb_atomic_set(&aico->base.state, TB_STATE_CLOSED);
+
+    // init olap
+    tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
+
+    // init aice
+    aico->olap.aice = *aice;
 
     // post ok
     aico->olap.aice.state = TB_STATE_OK;
@@ -1929,12 +1938,23 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // trace
     tb_trace_d("kilo: aico: %p, handle: %p, type: %u", aico, aico->handle, aico->type);
 
+    // the iocp aico
+    tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
+
+    // add timeout task for killing the accept socket
+    if (aico->type == TB_AICO_TYPE_SOCK && iocp_aico->olap.aice.code == TB_AICE_CODE_ACPT) 
+    {
+        // add task
+        if (!iocp_aico->task) iocp_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_iocp_spak_timeout, aico);
+        iocp_aico->bltimer = 1;
+    }
+
     // task: kill
-    if (((tb_iocp_aico_t*)aico)->task) 
+    if (iocp_aico->task) 
     {
         // kill it
-        if (((tb_iocp_aico_t*)aico)->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)((tb_iocp_aico_t*)aico)->task);
-        else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)((tb_iocp_aico_t*)aico)->task);
+        if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)iocp_aico->task);
+        else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)iocp_aico->task);
 
         /* the iocp will wait long time if the lastest task wait period is too long
          * so spak the iocp manually for spak the timer

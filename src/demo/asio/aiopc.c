@@ -23,7 +23,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
     do
     {
         // init sock
-        sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP);
         tb_assert_and_check_break(sock);
 
         // init file
@@ -144,7 +144,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("end");
 
     // exit sock
-    if (sock) tb_socket_clos(sock);
+    if (sock) tb_socket_exit(sock);
 
     // exit file
     if (file) tb_file_exit(file);
