@@ -581,7 +581,7 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
         tb_ipv4_clr(&impl->ipv4);
 
         // init dns
-        if (!impl->hdns) impl->hdns = tb_aicp_dns_init(tb_async_stream_aicp(stream), tb_async_stream_timeout(stream));
+        if (!impl->hdns) impl->hdns = tb_aicp_dns_init(tb_async_stream_aicp(stream));
         tb_assert(impl->hdns);
 
         // killed?
@@ -593,7 +593,7 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
         }
 
         // done addr
-        if (!impl->hdns || !tb_aicp_dns_done(impl->hdns, host, tb_async_stream_sock_impl_dns_func, stream))
+        if (!impl->hdns || !tb_aicp_dns_done(impl->hdns, host, tb_async_stream_timeout(stream), tb_async_stream_sock_impl_dns_func, stream))
         {
             // save state
             state = TB_STATE_SOCK_DNS_FAILED;
@@ -1136,7 +1136,7 @@ static tb_bool_t tb_async_stream_sock_impl_exit(tb_async_stream_ref_t stream)
 #endif
 
         // exit hdns
-        if (impl->hdns) tb_aicp_dns_exit(impl->hdns, tb_null, tb_null);
+        if (impl->hdns) tb_aicp_dns_exit(impl->hdns);
         impl->hdns = tb_null;
     }
     else

@@ -45,9 +45,6 @@ typedef struct{}*   tb_aicp_dns_ref_t;
 /// the aicp dns done func type
 typedef tb_void_t   (*tb_aicp_dns_done_func_t)(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv);
 
-/// the aicp dns exit func type
-typedef tb_void_t   (*tb_aicp_dns_exit_func_t)(tb_aicp_dns_ref_t dns, tb_cpointer_t priv);
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -55,11 +52,10 @@ typedef tb_void_t   (*tb_aicp_dns_exit_func_t)(tb_aicp_dns_ref_t dns, tb_cpointe
 /*! init the dns 
  *
  * @param aicp      the aicp
- * @param timeout   the timeout, ms
  *
  * @return          the dns 
  */
-tb_aicp_dns_ref_t   tb_aicp_dns_init(tb_aicp_ref_t aicp, tb_long_t timeout);
+tb_aicp_dns_ref_t   tb_aicp_dns_init(tb_aicp_ref_t aicp);
 
 /*! kill the dns
  *
@@ -69,23 +65,21 @@ tb_void_t           tb_aicp_dns_kill(tb_aicp_dns_ref_t dns);
 
 /*! exit the dns
  *
- * @param func      the exit func, wait exiting if be null
- * @param priv      the func private data
- *
  * @param dns       the dns 
  */
-tb_void_t           tb_aicp_dns_exit(tb_aicp_dns_ref_t dns, tb_aicp_dns_exit_func_t func, tb_cpointer_t priv);
+tb_void_t           tb_aicp_dns_exit(tb_aicp_dns_ref_t dns);
 
 /*! done the dns
  *
  * @param dns       the dns 
  * @param host      the host
+ * @param timeout   the timeout, ms
  * @param func      the done func
  * @param priv      the func private data
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_aicp_dns_done_func_t func, tb_cpointer_t priv);
+tb_bool_t           tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long_t timeout, tb_aicp_dns_done_func_t func, tb_cpointer_t priv);
 
 /*! the dns aicp
  *

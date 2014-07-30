@@ -367,6 +367,19 @@ tb_bool_t tb_aico_clos_(tb_aico_ref_t aico, tb_aico_func_t func, tb_cpointer_t p
     aice.priv               = priv;
     aice.aico               = aico;
 
+    // closed?
+    if (tb_atomic_get(&impl->state) == TB_STATE_CLOSED)
+    {
+        // close ok
+        aice.state = TB_STATE_OK;
+
+        // done func directly
+        func(&aice);
+
+        // ok
+        return tb_true;
+    }
+
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
 }

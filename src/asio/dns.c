@@ -52,28 +52,14 @@ typedef struct __tb_aicp_dns_done_t
 
 }tb_aicp_dns_done_t;
 
-// the aicp impl exit type
-typedef struct __tb_aicp_dns_exit_t
-{
-    // the func
-    tb_aicp_dns_exit_func_t func;
-
-    // the priv
-    tb_cpointer_t           priv;
-
-}tb_aicp_dns_exit_t;
-
 // the aicp impl type
 typedef struct __tb_aicp_dns_impl_t
 {
     // the done 
     tb_aicp_dns_done_t      done;
 
-    // the exit 
-    tb_aicp_dns_exit_t      exit;
-
-    // the sock
-    tb_socket_ref_t         sock;
+    // the aicp
+    tb_aicp_ref_t           aicp;
 
     // the aico
     tb_aico_ref_t           aico;
@@ -96,7 +82,7 @@ typedef struct __tb_aicp_dns_impl_t
 }tb_aicp_dns_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
 static tb_size_t tb_aicp_dns_reqt_init(tb_aicp_dns_impl_t* impl)
 {
@@ -413,32 +399,25 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     // continue 
     return tb_true;
 }
-#if 0
-static tb_void_t tb_aicp_dns_exit_func(tb_aico_ref_t aico, tb_cpointer_t priv)
+static tb_bool_t tb_aicp_dns_clos_func(tb_aice_t const* aice)
 {
     // check
-    tb_aicp_dns_impl_t* impl = (tb_aicp_dns_impl_t*)priv;
-    tb_assert_and_check_return(impl);
-
-    // done exit
-    if (impl->exit.func) impl->exit.func((tb_aicp_dns_ref_t)impl, impl->exit.priv);
-
-    // exit sock
-    if (impl->sock) tb_socket_clos(impl->sock);
-    impl->sock = tb_null;
+    tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
 
     // trace
-    tb_trace_d("exit: aico: %p: ok", impl->aico);
+    tb_trace_d("exit: aico: %p: ok", aice->aico);
 
-    // exit it
-    tb_free(impl);
+    // exit aico
+    tb_aico_exit(aice->aico);
+
+    // ok
+    return tb_true;
 }
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
-tb_aicp_dns_ref_t tb_aicp_dns_init(tb_aicp_ref_t aicp, tb_long_t timeout)
+tb_aicp_dns_ref_t tb_aicp_dns_init(tb_aicp_ref_t aicp)
 {
     // check
     tb_assert_and_check_return_val(aicp, tb_null);
@@ -452,22 +431,8 @@ tb_aicp_dns_ref_t tb_aicp_dns_init(tb_aicp_ref_t aicp, tb_long_t timeout)
         impl = tb_malloc0_type(tb_aicp_dns_impl_t);
         tb_assert_and_check_break(impl);
 
-        // init sock
-        impl->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
-        tb_assert_and_check_break(impl->sock);
-
-#if 0
-        // init aico
-        impl->aico = tb_aico_init_sock(aicp, impl->sock);
-        tb_assert_and_check_break(impl->aico);
-#endif
-
-        // init timeout
-        tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_SEND, timeout);
-        tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_RECV, timeout);
-
-        // trace
-        tb_trace_d("init: aico: %p, sock: %p: ok", impl->aico, impl->sock);
+        // init aicp
+        impl->aicp = aicp;
 
         // ok
         ok = tb_true;
@@ -478,7 +443,7 @@ tb_aicp_dns_ref_t tb_aicp_dns_init(tb_aicp_ref_t aicp, tb_long_t timeout)
     if (!ok)
     {
         // exit it
-        if (impl) tb_aicp_dns_exit((tb_aicp_dns_ref_t)impl, tb_null, tb_null);
+        if (impl) tb_aicp_dns_exit((tb_aicp_dns_ref_t)impl);
         impl = tb_null;
     }
 
@@ -497,7 +462,7 @@ tb_void_t tb_aicp_dns_kill(tb_aicp_dns_ref_t dns)
     // kill it
     if (impl->aico) tb_aico_kill(impl->aico);
 }
-tb_void_t tb_aicp_dns_exit(tb_aicp_dns_ref_t dns, tb_aicp_dns_exit_func_t func, tb_cpointer_t priv)
+tb_void_t tb_aicp_dns_exit(tb_aicp_dns_ref_t dns)
 {
     // check
     tb_aicp_dns_impl_t* impl = (tb_aicp_dns_impl_t*)dns;
@@ -506,42 +471,18 @@ tb_void_t tb_aicp_dns_exit(tb_aicp_dns_ref_t dns, tb_aicp_dns_exit_func_t func, 
     // trace
     tb_trace_d("exit: aico: %p ..", impl->aico);
 
-    // no func? wait exiting
-    if (!func)
-    {
-#if 0
-        // exit aico
-        if (impl->aico) tb_aico_exit(impl->aico, tb_null, tb_null);
-        impl->aico = tb_null;
-#endif
-        // exit sock
-        if (impl->sock) tb_socket_clos(impl->sock);
-        impl->sock = tb_null;
+    // clos aico
+    if (impl->aico) tb_aico_clos(impl->aico, tb_aicp_dns_clos_func, tb_null);
+    impl->aico = tb_null;
 
-        // trace
-        tb_trace_d("exit: aico: %p: ok", impl->aico);
-
-        // exit it
-        tb_free(impl);
-    }
-    else
-    {
-        // save func
-        impl->exit.func = func;
-        impl->exit.priv = priv;
-#if 0
-        // exit aico
-        if (impl->aico) tb_aico_exit(impl->aico, tb_aicp_dns_exit_func, impl);
-        // done func directly
-        else tb_aicp_dns_exit_func(tb_null, impl);
-#endif
-    }
+    // exit it
+    tb_free(impl);
 }
-tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_aicp_dns_done_func_t func, tb_cpointer_t priv)
+tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long_t timeout, tb_aicp_dns_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_aicp_dns_impl_t* impl = (tb_aicp_dns_impl_t*)dns;
-    tb_assert_and_check_return_val(impl && impl->aico && func && host && host[0], tb_false);
+    tb_assert_and_check_return_val(impl && func && host && host[0], tb_false);
     
     // trace
     tb_trace_d("done: aico: %p, host: %s: ..", impl->aico, host);
@@ -580,6 +521,21 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_aicp
     tb_size_t size = tb_aicp_dns_reqt_init(impl);
     tb_assert_and_check_return_val(size, tb_false);
 
+    // init it first if no aico
+    if (!impl->aico)
+    {
+        // init aico
+        impl->aico = tb_aico_init(impl->aicp);
+        tb_assert_and_check_return_val(impl->aico, tb_false);
+
+        // open aico
+        if (!tb_aico_open_sock_from_type(impl->aico, TB_SOCKET_TYPE_UDP)) return tb_false;
+
+        // init timeout
+        tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_SEND, timeout);
+        tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_RECV, timeout);
+    }
+
     // post reqt
     return tb_aico_usend(impl->aico, server, TB_DNS_HOST_PORT, impl->data, size, tb_aicp_dns_reqt_func, (tb_pointer_t)impl);
 }
@@ -590,5 +546,5 @@ tb_aicp_ref_t tb_aicp_dns_aicp(tb_aicp_dns_ref_t dns)
     tb_assert_and_check_return_val(impl && impl->aico, tb_null);
     
     // the aicp
-    return (tb_aicp_ref_t)tb_aico_aicp(impl->aico);
+    return impl->aicp;
 }
