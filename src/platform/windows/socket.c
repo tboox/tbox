@@ -32,8 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_socket_context_init(tb_noarg_t);
-tb_bool_t tb_socket_context_init(tb_noarg_t)
+tb_bool_t tb_socket_context_init()
 {
     // load WSA* interfaces
     tb_ws2_32_t* ws2_32 = tb_ws2_32();
@@ -76,7 +75,6 @@ tb_bool_t tb_socket_context_init(tb_noarg_t)
     }
     return tb_true;
 }
-tb_void_t tb_socket_context_exit();
 tb_void_t tb_socket_context_exit()
 {
     tb_ws2_32()->WSACleanup();

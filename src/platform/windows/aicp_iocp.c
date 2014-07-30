@@ -1677,18 +1677,20 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // closed
     tb_atomic_set(&aico->base.state, TB_STATE_CLOSED);
 
-    // init olap
+    // clear olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
 
     // init aice
     aico->olap.aice = *aice;
 
-    // post ok
+    // clos ok
     aico->olap.aice.state = TB_STATE_OK;
-    if (PostQueuedCompletionStatus(impl->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
 
-    // failed
-    return tb_false;
+    // done the aice response function
+    aice->func(&aico->olap.aice);
+
+    // post ok
+    return tb_true;
 }
 static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
 {
@@ -1698,6 +1700,18 @@ static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // the aico
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico, tb_false);
+ 
+    // killed?
+    if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico) && aice->code != TB_AICE_CODE_CLOS)
+    {
+        // trace
+        tb_trace_d("post: done: aico: %p, code: %u, type: %lu: killed", aico, aice->code, aico->base.type);
+
+        // post the killed state
+        aico->olap.aice = *aice;
+        aico->olap.aice.state = TB_STATE_KILLED;
+        return PostQueuedCompletionStatus(impl->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;  
+    }
 
     // no pending? post it directly
     if (aice->state != TB_STATE_PENDING)
@@ -1707,18 +1721,6 @@ static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
 
         // post it directly
         aico->olap.aice = *aice;
-        return PostQueuedCompletionStatus(impl->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;  
-    }
-    
-    // killed?
-    if (tb_aico_impl_is_killed((tb_aico_impl_t*)aico) || tb_atomic_get(&impl->base.aicp->kill))
-    {
-        // trace
-        tb_trace_d("post: done: aico: %p, code: %u, type: %lu: killed", aico, aice->code, aico->base.type);
-
-        // post the killed state
-        aico->olap.aice = *aice;
-        aico->olap.aice.state = TB_STATE_KILLED;
         return PostQueuedCompletionStatus(impl->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;  
     }
 
@@ -1929,6 +1931,7 @@ static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // ok
     return tb_true;
 }
+#if 0
 static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
@@ -1967,6 +1970,37 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // file: kill
     else if (aico->type == TB_AICO_TYPE_FILE && aico->handle) tb_file_exit((tb_file_ref_t)aico->handle);
 }
+#else
+static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
+{
+    // check
+    tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
+    tb_assert_and_check_return(impl && impl->wait && aico);
+        
+    // trace
+    tb_trace_d("kilo: aico: %p, handle: %p, type: %u", aico, aico->handle, aico->type);
+
+    // the iocp aico
+    tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
+
+    // add task if no timeout task
+    if (!iocp_aico->task) iocp_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_iocp_spak_timeout, aico);
+    iocp_aico->bltimer = 1;
+
+    // kill the task and force to cancel it
+    if (iocp_aico->task) 
+    {
+        // kill it
+        if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)iocp_aico->task);
+        else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)iocp_aico->task);
+
+        /* the iocp will wait long time if the lastest task wait period is too long
+         * so spak the iocp manually for spak the timer
+         */
+        tb_event_post(impl->wait);
+    }
+}
+#endif
 static tb_bool_t tb_iocp_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice)
 {
     // check

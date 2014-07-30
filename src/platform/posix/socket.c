@@ -45,8 +45,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_socket_context_init(tb_noarg_t);
-tb_bool_t tb_socket_context_init(tb_noarg_t)
+tb_bool_t tb_socket_context_init()
 {
     // ignore sigpipe
 #if 1
@@ -60,8 +59,7 @@ tb_bool_t tb_socket_context_init(tb_noarg_t)
     // ok
     return tb_true;
 }
-tb_void_t tb_socket_context_exit(tb_noarg_t);
-tb_void_t tb_socket_context_exit(tb_noarg_t)
+tb_void_t tb_socket_context_exit()
 {
 }
 tb_socket_ref_t tb_socket_init(tb_size_t type)
