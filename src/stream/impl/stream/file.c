@@ -43,9 +43,6 @@ typedef struct __tb_stream_file_impl_t
     // the file handle
     tb_file_ref_t       file;
 
-    // the file handle is referenced? need not exit it
-    tb_size_t           bref;
-
     // the file mode
     tb_size_t           mode;
 
@@ -96,11 +93,8 @@ static tb_bool_t tb_stream_file_impl_clos(tb_stream_ref_t stream)
     tb_assert_and_check_return_val(impl, tb_false);
 
     // exit file
-    if (!impl->bref)
-    {
-        if (impl->file && !tb_file_exit(impl->file)) return tb_false;
-        impl->file = tb_null;
-    }
+    if (impl->file && !tb_file_exit(impl->file)) return tb_false;
+    impl->file = tb_null;
 
     // ok
     return tb_true;
@@ -191,20 +185,6 @@ static tb_bool_t tb_stream_file_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_size_t* pmode = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(pmode, tb_false);
             *pmode = impl->mode;
-            return tb_true;
-        }
-    case TB_STREAM_CTRL_FILE_SET_HANDLE:
-        {
-            tb_file_ref_t file = (tb_file_ref_t)tb_va_arg(args, tb_file_ref_t);
-            impl->file = file;
-            impl->bref = file? 1 : 0;
-            return tb_true;
-        }
-    case TB_STREAM_CTRL_FILE_GET_HANDLE:
-        {
-            tb_file_ref_t* pfile = (tb_file_ref_t*)tb_va_arg(args, tb_file_ref_t*);
-            tb_assert_and_check_return_val(pfile, tb_false);
-            *pfile = impl->file;
             return tb_true;
         }
     default:

@@ -59,13 +59,10 @@ typedef struct __tb_stream_sock_impl_t
 #endif
 
     // the sock type
-    tb_uint32_t             type    : 22;
+    tb_uint32_t             type    : 23;
 
     // the try number
     tb_uint32_t             tryn    : 8;
-
-    // the sock bref
-    tb_uint32_t             bref    : 1;
 
     // keep alive after being closed?
     tb_uint32_t             balived : 1;
@@ -156,7 +153,6 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
 
     // make sock
     impl->sock = tb_socket_open(impl->type);
-    impl->bref = 0;
     
     // open sock failed?
     if (!impl->sock)
@@ -279,12 +275,9 @@ static tb_bool_t tb_stream_sock_impl_clos(tb_stream_ref_t stream)
     // keep alive? not close it
     tb_check_return_val(!impl->balived, tb_true);
 
-    // close sock
-    if (!impl->bref) 
-    {
-        if (impl->sock && !tb_socket_clos(impl->sock)) return tb_false;
-        impl->sock = tb_null;
-    }
+    // exit sock
+    if (impl->sock && !tb_socket_clos(impl->sock)) return tb_false;
+    impl->sock = tb_null;
 
     // clear 
     impl->wait = 0;
@@ -308,16 +301,9 @@ static tb_void_t tb_stream_sock_impl_exit(tb_stream_ref_t stream)
     impl->hssl = tb_null;
 #endif
 
-    // close sock
-    if (!impl->bref) 
-    {
-        if (impl->sock && !tb_socket_clos(impl->sock))
-        {
-            // trace
-            tb_trace_d("[sock]: exit failed");
-        }
-        impl->sock = tb_null;
-    }
+    // exit sock
+    if (impl->sock) tb_socket_clos(impl->sock);
+    impl->sock = tb_null;
 
     // clear 
     impl->wait = 0;
@@ -571,20 +557,12 @@ static tb_bool_t tb_stream_sock_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
         {
             // check
             tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
+            tb_assert_and_check_return_val(!impl->balived, tb_false);
 
             // the type
             tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
             tb_assert_and_check_return_val(type == TB_SOCKET_TYPE_TCP || type == TB_SOCKET_TYPE_UDP, tb_false);
             
-            // changed? exit the old sock
-            if (impl->type != type)
-            {
-                // exit it
-                if (!impl->bref && impl->sock) tb_socket_clos(impl->sock);
-                impl->sock = tb_null;
-                impl->bref = 0;
-            }
-
             // set type
             impl->type = type;
 
@@ -596,35 +574,6 @@ static tb_bool_t tb_stream_sock_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_size_t* ptype = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(ptype, tb_false);
             *ptype = impl->type;
-            return tb_true;
-        }
-    case TB_STREAM_CTRL_SOCK_SET_HANDLE:
-        {
-            // check
-            tb_assert_and_check_return_val(tb_stream_is_closed(stream), tb_false);
-            
-            // the sock
-            tb_socket_ref_t sock = (tb_socket_ref_t)tb_va_arg(args, tb_socket_ref_t);
-
-            // changed? exit the old sock
-            if (impl->sock != sock)
-            {
-                // exit it
-                if (!impl->bref && impl->sock) tb_socket_clos(impl->sock);
-            }
-
-            // set sock
-            impl->sock = sock;
-            impl->bref = sock? 1 : 0;
-
-            // ok
-            return tb_true;
-        }
-    case TB_STREAM_CTRL_SOCK_GET_HANDLE:
-        {
-            tb_socket_ref_t* psock = (tb_socket_ref_t*)tb_va_arg(args, tb_socket_ref_t*);
-            tb_assert_and_check_return_val(psock, tb_false);
-            *psock = impl->sock;
             return tb_true;
         }
     case TB_STREAM_CTRL_SOCK_KEEP_ALIVE:

@@ -80,10 +80,10 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_URL, argv[1])) break;
 
         // init head 
-        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Connection", "keep-alive")) break;
+ //       if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Connection", "keep-alive")) break;
 
         // init cookie
-        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Cookie", "H_PS_PSSID=6622_1459_7649_7570_6997_7444_7540_6018_7694_7673_7254_7633_7584_7416_7688_7777_7474; BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; BDSVRTM=0; BAIDUID=335452A3C469824C45FC0C4F66244949:FG=1; ")) break;
+//        if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Cookie", "H_PS_PSSID=6622_1459_7649_7570_6997_7444_7540_6018_7694_7673_7254_7633_7584_7416_7688_7777_7474; BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; BDSVRTM=0; BAIDUID=335452A3C469824C45FC0C4F66244949:FG=1; ")) break;
 
         // init head func
         if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_demo_aicp_http_head_func)) break;
