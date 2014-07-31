@@ -143,7 +143,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(port, tb_false);
 
             // set port
-            tb_url_port_set(&option->url, port);
+            tb_url_port_set(&option->url, (tb_uint16_t)port);
             return tb_true;
         }
         break;

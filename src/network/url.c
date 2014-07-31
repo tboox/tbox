@@ -562,7 +562,7 @@ tb_size_t tb_url_protocol_probe(tb_char_t const* url)
     // ok?
     return protocol;
 }
-tb_size_t tb_url_port_get(tb_url_t const* url)
+tb_uint16_t tb_url_port_get(tb_url_t const* url)
 {
     // check
     tb_assert_and_check_return_val(url, 0);
@@ -570,13 +570,13 @@ tb_size_t tb_url_port_get(tb_url_t const* url)
     // get port
     return url->port;
 }
-tb_void_t tb_url_port_set(tb_url_t* url, tb_size_t port)
+tb_void_t tb_url_port_set(tb_url_t* url, tb_uint16_t port)
 {
     // check
     tb_assert_and_check_return(url);
 
     // set port
-    url->port = (tb_uint16_t)port;
+    url->port = port;
 
     // clear url
     tb_string_clear(&url->cache);

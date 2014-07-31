@@ -2,6 +2,9 @@
 TB_CONFIG_DEMO_LIBS 					= rt m dl pthread
 TB_CONFIG_DEMO_CMD1 					=
 
+# os
+TB_CONFIG_OS_LINUX 						= y
+
 # float
 TB_CONFIG_TYPE_FLOAT 					= y
 

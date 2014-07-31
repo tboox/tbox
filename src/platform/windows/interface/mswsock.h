@@ -43,8 +43,14 @@ typedef BOOL (WINAPI* tb_mswsock_AcceptEx_t)(SOCKET sListenSocket, SOCKET sAccep
 // the ConnectEx func type 
 typedef BOOL (WINAPI* tb_mswsock_ConnectEx_t)(SOCKET s, struct sockaddr const* name, tb_int_t namelen, PVOID lpSendBuffer, DWORD dwSendDataLength, LPDWORD lpdwBytesSent, LPOVERLAPPED lpOverlapped);
 
+// the DisconnectEx func type 
+typedef BOOL (WINAPI* tb_mswsock_DisconnectEx_t)(SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD reserved);
+
 // the TransmitFile func type 
 typedef BOOL (WINAPI* tb_mswsock_TransmitFile_t)(SOCKET hSocket, HANDLE hFile, DWORD nNumberOfBytesToWrite, DWORD nNumberOfBytesPerSend, LPOVERLAPPED lpOverlapped, LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers, DWORD dwReserved);
+
+// the GetAcceptExSockaddrs func type 
+typedef tb_void_t (WINAPI* tb_mswsock_GetAcceptExSockaddrs_t)(PVOID lpOutputBuffer, DWORD dwReceiveDataLength, DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPSOCKADDR *LocalSockaddr, LPINT LocalSockaddrLength, LPSOCKADDR *RemoteSockaddr, LPINT RemoteSockaddrLength);
 
 // the mswsock interfaces type
 typedef struct __tb_mswsock_t
@@ -55,8 +61,14 @@ typedef struct __tb_mswsock_t
     // ConnectEx
     tb_mswsock_ConnectEx_t                      ConnectEx;
 
+    // DisconnectEx
+    tb_mswsock_DisconnectEx_t                   DisconnectEx;
+
     // TransmitFile
     tb_mswsock_TransmitFile_t                   TransmitFile;
+
+    // GetAcceptExSockaddrs
+    tb_mswsock_GetAcceptExSockaddrs_t           GetAcceptExSockaddrs;
 
 }tb_mswsock_t;
 

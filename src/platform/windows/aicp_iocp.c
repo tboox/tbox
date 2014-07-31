@@ -61,8 +61,14 @@ typedef struct __tb_iocp_func_t
     // the ConnectEx func
     tb_mswsock_ConnectEx_t                      ConnectEx;
 
+    // the DisconnectEx func
+    tb_mswsock_DisconnectEx_t                   DisconnectEx;
+
     // the TransmitFile func
     tb_mswsock_TransmitFile_t                   TransmitFile;
+
+    // the GetAcceptExSockaddrs func
+    tb_mswsock_GetAcceptExSockaddrs_t           GetAcceptExSockaddrs;
 
     // the GetQueuedCompletionStatusEx func
     tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
@@ -271,6 +277,47 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
                 {
                     resp->state = TB_STATE_FAILED;
                     break;
+                }
+
+
+                // done GetAcceptExSockaddrs
+                INT         server_size = 0;
+                INT         client_size = 0;
+                LPSOCKADDR  server_addr = tb_null;
+                LPSOCKADDR  client_addr = tb_null;
+                if (impl->func.GetAcceptExSockaddrs)
+                {
+                    // done it
+                    impl->func.GetAcceptExSockaddrs(    (tb_byte_t*)resp->u.acpt.priv[0]
+                                                        ,   0
+                                                        ,   sizeof(SOCKADDR_IN) + 16
+                                                        ,   sizeof(SOCKADDR_IN) + 16
+                                                        ,   (LPSOCKADDR*)&server_addr
+                                                        ,   &server_size
+                                                        ,   (LPSOCKADDR*)&client_addr
+                                                        ,   &client_size);
+
+#if 0
+                    // exists server address?
+                    if (server_addr)
+                    {
+                        // trace
+                        tb_trace_d("acpt: server_addr: %s: %u", inet_ntoa(((SOCKADDR_IN*)server_addr)->sin_addr), tb_bits_be_to_ne_u16(((SOCKADDR_IN*)server_addr)->sin_port));
+                    }
+#endif
+
+                    // exists client address?
+                    if (client_addr)
+                    {
+                        // trace
+                        tb_trace_d("acpt: client_addr: %s: %u", inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr), tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port));
+
+                        // save addr
+                        tb_ipv4_set(&resp->u.acpt.addr, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr));
+
+                        // save port
+                        resp->u.acpt.port = tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port);
+                    }
                 }
             }
         }
@@ -2334,16 +2381,18 @@ static tb_aicp_ptor_impl_t* tb_iocp_ptor_init(tb_aicp_impl_t* aicp)
         impl->base.loop_spak    = tb_iocp_ptor_loop_spak;
 
         // init func
-        impl->func.AcceptEx                      = tb_mswsock()->AcceptEx;
-        impl->func.ConnectEx                     = tb_mswsock()->ConnectEx;
-        impl->func.TransmitFile                  = tb_mswsock()->TransmitFile;
-        impl->func.GetQueuedCompletionStatusEx   = tb_kernel32()->GetQueuedCompletionStatusEx;
-        impl->func.WSAGetLastError               = tb_ws2_32()->WSAGetLastError;
-        impl->func.WSASend                       = tb_ws2_32()->WSASend;
-        impl->func.WSARecv                       = tb_ws2_32()->WSARecv;
-        impl->func.WSASendTo                     = tb_ws2_32()->WSASendTo;
-        impl->func.WSARecvFrom                   = tb_ws2_32()->WSARecvFrom;
-        impl->func.bind                          = tb_ws2_32()->bind;
+        impl->func.AcceptEx                         = tb_mswsock()->AcceptEx;
+        impl->func.ConnectEx                        = tb_mswsock()->ConnectEx;
+        impl->func.DisconnectEx                     = tb_mswsock()->DisconnectEx;
+        impl->func.TransmitFile                     = tb_mswsock()->TransmitFile;
+        impl->func.GetAcceptExSockaddrs             = tb_mswsock()->GetAcceptExSockaddrs;
+        impl->func.GetQueuedCompletionStatusEx      = tb_kernel32()->GetQueuedCompletionStatusEx;
+        impl->func.WSAGetLastError                  = tb_ws2_32()->WSAGetLastError;
+        impl->func.WSASend                          = tb_ws2_32()->WSASend;
+        impl->func.WSARecv                          = tb_ws2_32()->WSARecv;
+        impl->func.WSASendTo                        = tb_ws2_32()->WSASendTo;
+        impl->func.WSARecvFrom                      = tb_ws2_32()->WSARecvFrom;
+        impl->func.bind                             = tb_ws2_32()->bind;
         tb_assert_and_check_break(impl->func.AcceptEx);
         tb_assert_and_check_break(impl->func.ConnectEx);
         tb_assert_and_check_break(impl->func.WSAGetLastError);

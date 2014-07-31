@@ -2,6 +2,9 @@
 TB_CONFIG_DEMO_LIBS						= ws2_32
 TB_CONFIG_DEMO_CMD1 					=
 
+# os
+TB_CONFIG_OS_WINDOWS 					= y
+
 # float
 TB_CONFIG_TYPE_FLOAT 					= y
 

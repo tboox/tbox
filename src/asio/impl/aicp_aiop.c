@@ -225,35 +225,43 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
     acpt_aice.state = TB_STATE_OK;
 
     // done
-    tb_size_t       indx = 0;
-    tb_size_t       size = 0;
-    tb_socket_ref_t list[4096];
-    tb_size_t       maxn = tb_arrayn(list);
+    tb_size_t       list_indx = 0;
+    tb_size_t       list_size = 0;
+    tb_socket_ref_t list_sock[2048];
+    tb_ipv4_t       list_addr[2048];
+    tb_uint16_t     list_port[2048];
+    tb_size_t       list_maxn = tb_arrayn(list_sock);
     tb_socket_ref_t acpt = (tb_socket_ref_t)aico->base.handle;
     tb_queue_ref_t  spak = impl->spak[priority];
     tb_socket_ref_t sock = tb_null;
     do
     {
         // accept it
-        for (size = 0; size < maxn && (list[size] = tb_socket_accept(acpt)); size++) ;
+        for (list_size = 0; list_size < list_maxn && (list_sock[list_size] = tb_socket_accept(acpt, list_addr + list_size, list_port + list_size)); list_size++) ;
 
         // enter 
         tb_spinlock_enter(&impl->lock);
 
         // push some acpt aice
-        for (indx = 0; indx < size && (sock = list[indx]); indx++)
+        for (list_indx = 0; list_indx < list_size && (sock = list_sock[list_indx]); list_indx++)
         {
             // init aico
             acpt_aice.u.acpt.aico = tb_aico_init(aico->base.aicp);
 
             // trace
-            tb_trace_d("push: acpt[%p]: %p", aico->base.handle, acpt_aice.u.acpt.aico);
+            tb_trace_d("push: acpt[%p]: aico: %p", aico->base.handle, acpt_aice.u.acpt.aico);
 
             // open aico and push the acpt aice if not full?
             if (    acpt_aice.u.acpt.aico 
                 &&  tb_aico_open_sock(acpt_aice.u.acpt.aico, sock) 
                 &&  !tb_queue_full(spak)) 
             {
+                // save addr
+                acpt_aice.u.acpt.addr = list_addr[list_indx];
+
+                // save port
+                acpt_aice.u.acpt.port = list_port[list_indx];
+
                 // push to the spak queue
                 tb_queue_put(spak, &acpt_aice);
             }
@@ -261,11 +269,11 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
             {
                 // close the left sock
                 tb_size_t i;
-                for (i = indx; i < size; i++) 
+                for (i = list_indx; i < list_size; i++) 
                 {
                     // close it
-                    if (list[i]) tb_socket_exit(list[i]);
-                    list[i] = tb_null;
+                    if (list_sock[i]) tb_socket_exit(list_sock[i]);
+                    list_sock[i] = tb_null;
                 }
 
                 // exit aico
@@ -281,7 +289,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
         // leave 
         tb_spinlock_leave(&impl->lock);
 
-    } while (indx == maxn);
+    } while (list_indx == list_maxn);
 
     // ok
     return tb_true;
