@@ -2289,26 +2289,41 @@ static tb_handle_t tb_iocp_ptor_loop_init(tb_aicp_ptor_impl_t* ptor)
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
     tb_assert_and_check_return_val(impl, tb_null);
 
-    // make loop
-    tb_iocp_loop_t* loop = tb_malloc0_type(tb_iocp_loop_t);
-    tb_assert_and_check_return_val(loop, tb_null);
-
-    // init self
-    loop->self = tb_thread_self();
-    tb_assert_and_check_goto(loop->self, fail);
-
-    // init spak
-    if (impl->func.GetQueuedCompletionStatusEx)
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_iocp_loop_t* loop = tb_null;
+    do
     {
-        loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_mem(sizeof(tb_OVERLAPPED_ENTRY_t), tb_null, tb_null));
-        tb_assert_and_check_goto(loop->spak, fail);
+        // make loop
+        loop = tb_malloc0_type(tb_iocp_loop_t);
+        tb_assert_and_check_break(loop);
+
+        // init self
+        loop->self = tb_thread_self();
+        tb_assert_and_check_break(loop->self);
+
+        // init spak
+        if (impl->func.GetQueuedCompletionStatusEx)
+        {
+            loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_mem(sizeof(tb_OVERLAPPED_ENTRY_t), tb_null, tb_null));
+            tb_assert_and_check_break(loop->spak);
+        }
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (loop) tb_iocp_ptor_loop_exit(ptor, (tb_handle_t)loop);
+        loop = tb_null;
     }
 
-    // ok
+    // ok?
     return (tb_handle_t)loop;
-fail:
-    tb_iocp_ptor_loop_exit(ptor, (tb_handle_t)loop);
-    return tb_null;
 }
 static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t hloop, tb_aice_t* resp, tb_long_t timeout)
 {

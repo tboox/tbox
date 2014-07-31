@@ -101,170 +101,177 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
     // check
     tb_assert_and_check_return_val(addr && addr->u32, -1);
 
-    // init sock
-    tb_socket_ref_t sock = tb_socket_init(TB_SOCKET_TYPE_UDP);
-    tb_assert_and_check_return_val(sock, -1);
-
-    // init rate
-    tb_long_t rate = -1;
- 
-    // format query
+    // done
     tb_static_stream_t  sstream;
     tb_byte_t           rpkt[TB_DNS_RPKT_MAXN];
     tb_size_t           size = 0;
-    tb_static_stream_init(&sstream, rpkt, TB_DNS_RPKT_MAXN);
+    tb_long_t           rate = -1;
+    tb_socket_ref_t     sock = tb_null;
+    do
+    {
+        // init sock
+        sock = tb_socket_init(TB_SOCKET_TYPE_UDP);
+        tb_assert_and_check_break(sock);
 
-    // identification number
-    tb_static_stream_writ_u16_be(&sstream, TB_DNS_HEADER_MAGIC);
+        // init stream
+        tb_static_stream_init(&sstream, rpkt, TB_DNS_RPKT_MAXN);
 
-    /* 0x2104: 0 0000 001 0000 0000
-     *
-     * tb_uint16_t qr     :1;       // query/response flag
-     * tb_uint16_t opcode :4;       // purpose of message
-     * tb_uint16_t aa     :1;       // authoritive answer
-     * tb_uint16_t tc     :1;       // truncated message
-     * tb_uint16_t rd     :1;       // recursion desired
+        // identification number
+        tb_static_stream_writ_u16_be(&sstream, TB_DNS_HEADER_MAGIC);
 
-     * tb_uint16_t ra     :1;       // recursion available
-     * tb_uint16_t z      :1;       // its z! reserved
-     * tb_uint16_t ad     :1;       // authenticated data
-     * tb_uint16_t cd     :1;       // checking disabled
-     * tb_uint16_t rcode  :4;       // response code
-     *
-     * this is a query 
-     * this is a standard query 
-     * not authoritive answer 
-     * not truncated 
-     * recursion desired
-     *
-     * recursion not available! hey we dont have it (lol)
-     *
-     */
+        /* 0x2104: 0 0000 001 0000 0000
+         *
+         * tb_uint16_t qr     :1;       // query/response flag
+         * tb_uint16_t opcode :4;       // purpose of message
+         * tb_uint16_t aa     :1;       // authoritive answer
+         * tb_uint16_t tc     :1;       // truncated message
+         * tb_uint16_t rd     :1;       // recursion desired
+
+         * tb_uint16_t ra     :1;       // recursion available
+         * tb_uint16_t z      :1;       // its z! reserved
+         * tb_uint16_t ad     :1;       // authenticated data
+         * tb_uint16_t cd     :1;       // checking disabled
+         * tb_uint16_t rcode  :4;       // response code
+         *
+         * this is a query 
+         * this is a standard query 
+         * not authoritive answer 
+         * not truncated 
+         * recursion desired
+         *
+         * recursion not available! hey we dont have it (lol)
+         *
+         */
 #if 1
-    tb_static_stream_writ_u16_be(&sstream, 0x0100);
+        tb_static_stream_writ_u16_be(&sstream, 0x0100);
 #else
-    tb_static_stream_writ_u1(&sstream, 0);          // this is a query
-    tb_static_stream_writ_ubits32(&sstream, 0, 4);  // this is a standard query
-    tb_static_stream_writ_u1(&sstream, 0);          // not authoritive answer
-    tb_static_stream_writ_u1(&sstream, 0);          // not truncated
-    tb_static_stream_writ_u1(&sstream, 1);          // recursion desired
+        tb_static_stream_writ_u1(&sstream, 0);          // this is a query
+        tb_static_stream_writ_ubits32(&sstream, 0, 4);  // this is a standard query
+        tb_static_stream_writ_u1(&sstream, 0);          // not authoritive answer
+        tb_static_stream_writ_u1(&sstream, 0);          // not truncated
+        tb_static_stream_writ_u1(&sstream, 1);          // recursion desired
 
-    tb_static_stream_writ_u1(&sstream, 0);          // recursion not available! hey we dont have it (lol)
-    tb_static_stream_writ_u1(&sstream, 0);
-    tb_static_stream_writ_u1(&sstream, 0);
-    tb_static_stream_writ_u1(&sstream, 0);
-    tb_static_stream_writ_ubits32(&sstream, 0, 4);
+        tb_static_stream_writ_u1(&sstream, 0);          // recursion not available! hey we dont have it (lol)
+        tb_static_stream_writ_u1(&sstream, 0);
+        tb_static_stream_writ_u1(&sstream, 0);
+        tb_static_stream_writ_u1(&sstream, 0);
+        tb_static_stream_writ_ubits32(&sstream, 0, 4);
 #endif
 
-    /* we have only one question
-     *
-     * tb_uint16_t question;        // number of question entries
-     * tb_uint16_t answer;          // number of answer entries
-     * tb_uint16_t authority;       // number of authority entries
-     * tb_uint16_t resource;        // number of resource entries
-     *
-     */
-    tb_static_stream_writ_u16_be(&sstream, 1); 
-    tb_static_stream_writ_u16_be(&sstream, 0);
-    tb_static_stream_writ_u16_be(&sstream, 0);
-    tb_static_stream_writ_u16_be(&sstream, 0);
+        /* we have only one question
+         *
+         * tb_uint16_t question;        // number of question entries
+         * tb_uint16_t answer;          // number of answer entries
+         * tb_uint16_t authority;       // number of authority entries
+         * tb_uint16_t resource;        // number of resource entries
+         *
+         */
+        tb_static_stream_writ_u16_be(&sstream, 1); 
+        tb_static_stream_writ_u16_be(&sstream, 0);
+        tb_static_stream_writ_u16_be(&sstream, 0);
+        tb_static_stream_writ_u16_be(&sstream, 0);
 
-    // set questions, see as tb_dns_question_t
-    // name + question1 + question2 + ...
-    tb_static_stream_writ_u8(&sstream, 3);
-    tb_static_stream_writ_u8(&sstream, 'w');
-    tb_static_stream_writ_u8(&sstream, 'w');
-    tb_static_stream_writ_u8(&sstream, 'w');
-    tb_static_stream_writ_u8(&sstream, 5);
-    tb_static_stream_writ_u8(&sstream, 't');
-    tb_static_stream_writ_u8(&sstream, 'b');
-    tb_static_stream_writ_u8(&sstream, 'o');
-    tb_static_stream_writ_u8(&sstream, 'o');
-    tb_static_stream_writ_u8(&sstream, 'x');
-    tb_static_stream_writ_u8(&sstream, 3);
-    tb_static_stream_writ_u8(&sstream, 'c');
-    tb_static_stream_writ_u8(&sstream, 'o');
-    tb_static_stream_writ_u8(&sstream, 'm');
-    tb_static_stream_writ_u8(&sstream, '\0');
+        // set questions, see as tb_dns_question_t
+        // name + question1 + question2 + ...
+        tb_static_stream_writ_u8(&sstream, 3);
+        tb_static_stream_writ_u8(&sstream, 'w');
+        tb_static_stream_writ_u8(&sstream, 'w');
+        tb_static_stream_writ_u8(&sstream, 'w');
+        tb_static_stream_writ_u8(&sstream, 5);
+        tb_static_stream_writ_u8(&sstream, 't');
+        tb_static_stream_writ_u8(&sstream, 'b');
+        tb_static_stream_writ_u8(&sstream, 'o');
+        tb_static_stream_writ_u8(&sstream, 'o');
+        tb_static_stream_writ_u8(&sstream, 'x');
+        tb_static_stream_writ_u8(&sstream, 3);
+        tb_static_stream_writ_u8(&sstream, 'c');
+        tb_static_stream_writ_u8(&sstream, 'o');
+        tb_static_stream_writ_u8(&sstream, 'm');
+        tb_static_stream_writ_u8(&sstream, '\0');
 
-    // only one question now.
-    tb_static_stream_writ_u16_be(&sstream, 1);      // we are requesting the ipv4 address
-    tb_static_stream_writ_u16_be(&sstream, 1);      // it's internet (lol)
+        // only one question now.
+        tb_static_stream_writ_u16_be(&sstream, 1);      // we are requesting the ipv4 address
+        tb_static_stream_writ_u16_be(&sstream, 1);      // it's internet (lol)
 
-    // size
-    size = tb_static_stream_offset(&sstream);
-    tb_assert_and_check_goto(size, end);
+        // size
+        size = tb_static_stream_offset(&sstream);
+        tb_assert_and_check_break(size);
 
-    // init time
-    tb_hong_t time = tb_cache_time_spak();
+        // init time
+        tb_hong_t time = tb_cache_time_spak();
 
-    // se/nd request
-    tb_size_t writ = 0;
-    while (writ < size)
-    {
-        // writ data
-        tb_long_t real = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
-        tb_trace_d("writ %ld", real);
-        tb_check_goto(real >= 0, end);
-        
-        // no data?
-        if (!real)
+        // se/nd request
+        tb_size_t writ = 0;
+        tb_bool_t fail = tb_false;
+        while (writ < size)
         {
-            // abort?
-            tb_check_goto(!writ, end);
- 
-            // wait
-            real = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
+            // writ data
+            tb_long_t real = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
+            tb_trace_d("writ %ld", real);
+            tb_check_break_state(real >= 0, fail, tb_true);
+            
+            // no data?
+            if (!real)
+            {
+                // abort?
+                tb_check_break_state(!writ, fail, tb_true);
+     
+                // wait
+                real = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
 
-            // fail or timeout?
-            tb_check_goto(real > 0, end);
+                // fail or timeout?
+                tb_check_break_state(real > 0, fail, tb_true);
+            }
+            else writ += real;
         }
-        else writ += real;
-    }
 
-    // only recv id & answer, 8 bytes 
-    tb_long_t read = 0;
-    while (read < 8)
-    {
-        // read data
-        tb_long_t r = tb_socket_urecv(sock, addr, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
-        tb_trace_d("read %d", r);
-        tb_check_break(r >= 0);
-        
-        // no data?
-        if (!r)
+        // failed?
+        tb_check_break(!fail);
+
+        // only recv id & answer, 8 bytes 
+        tb_long_t read = 0;
+        while (read < 8)
         {
-            // end?
-            tb_check_break(!read);
+            // read data
+            tb_long_t r = tb_socket_urecv(sock, addr, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
+            tb_trace_d("read %d", r);
+            tb_check_break(r >= 0);
+            
+            // no data?
+            if (!r)
+            {
+                // end?
+                tb_check_break(!read);
 
-            // wait
-            r = tb_aioo_wait(sock, TB_AIOE_CODE_RECV, TB_DNS_SERVER_TEST_TIMEOUT);
-            tb_trace_d("wait %d", r);
+                // wait
+                r = tb_aioo_wait(sock, TB_AIOE_CODE_RECV, TB_DNS_SERVER_TEST_TIMEOUT);
+                tb_trace_d("wait %d", r);
 
-            // fail or timeout?
-            tb_check_break(r > 0);
+                // fail or timeout?
+                tb_check_break(r > 0);
+            }
+            else read += r;
         }
-        else read += r;
-    }
 
-    // check
-    tb_check_goto(read >= 8, end);
+        // check
+        tb_check_break(read >= 8);
 
-    // check protocol
-    tb_size_t id = tb_bits_get_u16_be(rpkt);
-    tb_check_goto(id == TB_DNS_HEADER_MAGIC, end);
+        // check protocol
+        tb_size_t id = tb_bits_get_u16_be(rpkt);
+        tb_check_break(id == TB_DNS_HEADER_MAGIC);
 
-    // check answer
-    tb_size_t answer = tb_bits_get_u16_be(rpkt + 6);
-    tb_check_goto(answer > 0, end);
+        // check answer
+        tb_size_t answer = tb_bits_get_u16_be(rpkt + 6);
+        tb_check_break(answer > 0);
 
-    // rate
-    rate = (tb_long_t)(tb_cache_time_spak() - time);
+        // rate
+        rate = (tb_long_t)(tb_cache_time_spak() - time);
 
-    // ok
-    tb_trace_d("addr: %u.%u.%u.%u ok, rate: %u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3], rate);
+        // ok
+        tb_trace_d("test: %u.%u.%u.%u ok, rate: %u", tb_ipv4_u8x4(*addr), rate);
 
-end:
+    } while (0);
+
     // exit sock
     tb_socket_exit(sock);
 
