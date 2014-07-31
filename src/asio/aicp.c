@@ -369,39 +369,35 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_dec
     tb_aico_impl_t* aico = (tb_aico_impl_t*)aice->aico;
     tb_assert_and_check_return_val(aico, tb_false);
 
-    // opened? pending it
+    // opened or killed or closed? pending it
     tb_size_t state = tb_atomic_fetch_and_pset(&aico->state, TB_STATE_OPENED, TB_STATE_PENDING);
-    if (state != TB_STATE_OPENED)
+    if (    state == TB_STATE_OPENED
+        || (state == TB_STATE_KILLED && aice->code != TB_AICE_CODE_CLOS)
+        || (aice->code == TB_AICE_CODE_CLOS && TB_STATE_KILLED == tb_atomic_fetch_and_pset(&aico->state, TB_STATE_KILLED, TB_STATE_PENDING)))
     {
-        // not close it?
-        if (aice->code != TB_AICE_CODE_CLOS || TB_STATE_KILLED != tb_atomic_fetch_and_pset(&aico->state, TB_STATE_KILLED, TB_STATE_PENDING))
-        {
-            // closed or pending? error
-            if (state == TB_STATE_CLOSED || state == TB_STATE_PENDING)
-            {
-                // trace
+        // save debug info
 #ifdef __tb_debug__
-                tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state), func_, line_, file_);
-#else
-                tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state));
+        aico->func = func_;
+        aico->file = file_;
+        aico->line = line_;
 #endif
 
-                // abort it
-                tb_assert_abort(0);
-            }
-            return tb_false;
-        }
+        // post aice
+        return impl->ptor->post(impl->ptor, aice);
     }
 
-    // save debug info
+    // trace
 #ifdef __tb_debug__
-    aico->func = func_;
-    aico->file = file_;
-    aico->line = line_;
+    tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s for func: %s, line: %lu, file: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state), func_, line_, file_);
+#else
+    tb_trace_e("post aice[%lu] failed, the aico[%p]: type: %lu, handle: %p, state: %s", aice->code, aico, tb_aico_type((tb_aico_ref_t)aico), aico->handle, tb_state_cstr(state));
 #endif
 
-    // post aice
-    return impl->ptor->post(impl->ptor, aice);
+    // abort it
+    tb_assert_abort(0);
+
+    // post failed
+    return tb_false;
 }
 tb_bool_t tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__)
 {

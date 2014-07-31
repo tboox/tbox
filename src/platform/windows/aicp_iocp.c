@@ -1931,7 +1931,6 @@ static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // ok
     return tb_true;
 }
-#if 0
 static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
 {
     // check
@@ -1948,8 +1947,11 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     if (aico->type == TB_AICO_TYPE_SOCK && iocp_aico->olap.aice.code == TB_AICE_CODE_ACPT) 
     {
         // add task
-        if (!iocp_aico->task) iocp_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_iocp_spak_timeout, aico);
-        iocp_aico->bltimer = 1;
+        if (!iocp_aico->task)
+        {
+            iocp_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_iocp_spak_timeout, aico);
+            iocp_aico->bltimer = 1;
+        }
     }
 
     // task: kill
@@ -1970,37 +1972,6 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // file: kill
     else if (aico->type == TB_AICO_TYPE_FILE && aico->handle) tb_file_exit((tb_file_ref_t)aico->handle);
 }
-#else
-static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico)
-{
-    // check
-    tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
-    tb_assert_and_check_return(impl && impl->wait && aico);
-        
-    // trace
-    tb_trace_d("kilo: aico: %p, handle: %p, type: %u", aico, aico->handle, aico->type);
-
-    // the iocp aico
-    tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
-
-    // add task if no timeout task
-    if (!iocp_aico->task) iocp_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_iocp_spak_timeout, aico);
-    iocp_aico->bltimer = 1;
-
-    // kill the task and force to cancel it
-    if (iocp_aico->task) 
-    {
-        // kill it
-        if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)iocp_aico->task);
-        else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)iocp_aico->task);
-
-        /* the iocp will wait long time if the lastest task wait period is too long
-         * so spak the iocp manually for spak the timer
-         */
-        tb_event_post(impl->wait);
-    }
-}
-#endif
 static tb_bool_t tb_iocp_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice)
 {
     // check

@@ -579,7 +579,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     }
 
     // ok? done task
-    if (ok && !repeat) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, spider->limited_rate, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
+    if (ok && !repeat && TB_STATE_OK == tb_atomic_get(&spider->state)) ok = task? tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, spider->limited_rate, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task) : tb_false;
 
     // failed?
     if (!ok && size < TB_DEMO_SPIDER_TASK_MAXN)
