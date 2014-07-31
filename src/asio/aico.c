@@ -92,6 +92,7 @@ tb_bool_t tb_aico_open_sock(tb_aico_ref_t aico, tb_socket_ref_t sock)
 
         // addo aico
         ok = aicp_impl->ptor->addo(aicp_impl->ptor, impl);
+        tb_assert_and_check_break(ok);
 
         // opened
         tb_atomic_set(&impl->state, TB_STATE_OPENED);
@@ -127,6 +128,7 @@ tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type)
 
         // addo aico
         ok = aicp_impl->ptor->addo(aicp_impl->ptor, impl);
+        tb_assert_and_check_break(ok);
 
         // opened
         tb_atomic_set(&impl->state, TB_STATE_OPENED);
@@ -165,6 +167,7 @@ tb_bool_t tb_aico_open_file(tb_aico_ref_t aico, tb_file_ref_t file)
 
         // addo aico
         ok = aicp_impl->ptor->addo(aicp_impl->ptor, impl);
+        tb_assert_and_check_break(ok);
 
         // opened
         tb_atomic_set(&impl->state, TB_STATE_OPENED);
@@ -200,6 +203,7 @@ tb_bool_t tb_aico_open_file_from_path(tb_aico_ref_t aico, tb_char_t const* path,
 
         // addo aico
         ok = aicp_impl->ptor->addo(aicp_impl->ptor, impl);
+        tb_assert_and_check_break(ok);
 
         // opened
         tb_atomic_set(&impl->state, TB_STATE_OPENED);
@@ -239,6 +243,7 @@ tb_bool_t tb_aico_open_task(tb_aico_ref_t aico, tb_bool_t ltimer)
 
         // addo aico
         ok = aicp_impl->ptor->addo(aicp_impl->ptor, impl);
+        tb_assert_and_check_break(ok);
 
         // opened
         tb_atomic_set(&impl->state, TB_STATE_OPENED);
