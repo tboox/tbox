@@ -429,12 +429,12 @@ static tb_object_ref_t tb_object_bin_reader_done(tb_stream_ref_t stream)
 
     // the func
     tb_object_bin_reader_func_t func = tb_object_bin_reader_func(type);
-    tb_assert_and_check_goto(func, end);
+
+    // check
+    tb_assert(func);
 
     // read it
-    object = func(&reader, type, size);
-
-end:
+    if (func) object = func(&reader, type, size);
 
     // exit the list
     if (reader.list) tb_vector_exit(reader.list);
