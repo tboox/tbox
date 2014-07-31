@@ -241,6 +241,9 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // check?
     tb_assert_and_check_return_val(impl && resp && resp->aico, -1);
 
+    // trace
+    tb_trace_d("acpt[%p]: spak: %lu", resp->aico, error);
+
     // done
     switch (error)
     {
@@ -310,7 +313,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
                     if (client_addr)
                     {
                         // trace
-                        tb_trace_d("acpt: client_addr: %s: %u", inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr), tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port));
+                        tb_trace_d("acpt[%p]: client_addr: %s: %u", resp->aico, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr), tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port));
 
                         // save addr
                         tb_ipv4_set(&resp->u.acpt.addr, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr));
@@ -333,7 +336,9 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     default:
         {
             resp->state = TB_STATE_FAILED;
-            tb_trace_d("acpt: unknown error: %u", error);
+
+            // trace
+            tb_trace_e("acpt[%p]: unknown error: %u", resp->aico, error);
         }
         break;
     }
@@ -361,6 +366,9 @@ static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
+
+    // trace
+    tb_trace_d("conn[%p]: spak: %lu", resp->aico, error);
 
     // done
     switch (error)
@@ -403,7 +411,9 @@ static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     default:
         {
             resp->state = TB_STATE_FAILED;
-            tb_trace_d("conn: unknown error: %u", error);
+
+            // trace
+            tb_trace_e("conn: unknown error: %u", error);
         }
         break;
     }
@@ -420,7 +430,7 @@ static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     if (real)
     {
         // trace
-        tb_trace_d("iorw: aico: %p, code: %lu, real: %lu", resp->aico, resp->code, real);
+        tb_trace_d("iorw[%p]: code: %lu, real: %lu", resp->aico, resp->code, real);
 
         // save the real size, @note: hack the real offset for the other io aice
         resp->u.recv.real = real;
@@ -471,7 +481,7 @@ static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     default:
         {
             // trace
-            tb_trace_e("iorw: code: %lu, unknown error: %lu", resp->code, error);
+            tb_trace_e("iorw[%p]: code: %lu, unknown error: %lu", resp->aico, resp->code, error);
 
             // failed
             resp->state = TB_STATE_FAILED;
@@ -486,6 +496,9 @@ static tb_long_t tb_iocp_spak_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, 
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
+
+    // trace
+    tb_trace_d("fsync[%p]: spak: %lu", resp->aico, error);
 
     // done 
     switch (error)
@@ -518,7 +531,7 @@ static tb_long_t tb_iocp_spak_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, 
     default:
         {
             resp->state = TB_STATE_FAILED;
-            tb_trace_d("fsync: unknown error: %u", error);
+            tb_trace_e("fsync: unknown error: %u", error);
         }
         break;
     }
@@ -530,6 +543,9 @@ static tb_long_t tb_iocp_spak_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
+
+    // trace
+    tb_trace_d("runtask[%p]: spak: %lu", resp->aico, error);
 
     // done 
     switch (error)
@@ -555,12 +571,75 @@ static tb_long_t tb_iocp_spak_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp
     default:
         {
             resp->state = TB_STATE_FAILED;
-            tb_trace_d("runtask: unknown error: %u", error);
+
+            // trace
+            tb_trace_e("runtask: unknown error: %u", error);
         }
         break;
     }
 
     // ok
+    return 1;
+}
+static tb_long_t tb_iocp_spak_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+{
+    // check?
+    tb_assert_and_check_return_val(resp, -1);
+
+    // the aico
+    tb_iocp_aico_t* aico = (tb_iocp_aico_t*)resp->aico;
+    tb_assert_and_check_return_val(aico, -1);
+
+    // trace
+    tb_trace_d("clos[%p]: spak: %lu", resp->aico, error);
+
+    // done 
+    switch (error)
+    {   
+        // ok or pending?
+    case ERROR_SUCCESS:
+    case WAIT_TIMEOUT:
+    case ERROR_IO_PENDING:
+        {
+            // trace
+            tb_trace_d("clos[%p]: push to the socket cache", resp->aico);
+
+            // cache socket
+            // ...
+        }
+        break;
+        // unknown error
+    default:
+        {
+            // trace
+            tb_trace_e("clos[%p]: unknown error: %u", resp->aico, error);
+
+            // close the socket handle
+            if (aico->base.handle) tb_socket_exit((tb_socket_ref_t)aico->base.handle);
+            aico->base.handle = tb_null;
+        }
+        break;
+    }
+
+    // clear impl
+    aico->impl = tb_null;
+
+    // clear type
+    aico->base.type = TB_AICO_TYPE_NONE;
+
+    // clear timeout
+    tb_size_t i = 0;
+    tb_size_t n = tb_arrayn(aico->base.timeout);
+    for (i = 0; i < n; i++) aico->base.timeout[i] = -1;
+
+    // closed
+    tb_atomic_set(&aico->base.state, TB_STATE_CLOSED);
+
+    // clear olap
+    tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
+
+    // ok
+    resp->state = TB_STATE_OK;
     return 1;
 }
 static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
@@ -572,7 +651,7 @@ static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     tb_check_return_val(resp->state == TB_STATE_PENDING, 1);
 
     // killed?
-    if (tb_aico_impl_is_killed((tb_aico_impl_t*)resp->aico))
+    if (tb_aico_impl_is_killed((tb_aico_impl_t*)resp->aico) && resp->code != TB_AICE_CODE_CLOS)
     {
         // save state
         resp->state = TB_STATE_KILLED;
@@ -605,7 +684,7 @@ static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     ,   tb_iocp_spak_iorw
     ,   tb_iocp_spak_fsync
     ,   tb_iocp_spak_runtask
-    ,   tb_null
+    ,   tb_iocp_spak_clos
     };
     tb_assert_and_check_return_val(resp->code < tb_arrayn(s_spak), -1);
 
@@ -1687,6 +1766,45 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // remove the timeout task
     tb_iocp_post_timeout_cancel(impl, aico);
 
+    // exit the private data for acpt aice
+    if (aico->olap.aice.code == TB_AICE_CODE_ACPT)
+    {
+        // exit data
+        if (aico->olap.aice.u.acpt.priv[0]) tb_free(aico->olap.aice.u.acpt.priv[0]);
+        aico->olap.aice.u.acpt.priv[0] = tb_null;
+    }
+#if 0
+    // disconnect the socket for reusing it
+    else if (   aico->base.type == TB_AICO_TYPE_SOCK
+            &&  (   aico->olap.aice.code == TB_AICE_CODE_RECV
+                ||  aico->olap.aice.code == TB_AICE_CODE_SEND
+                ||  aico->olap.aice.code == TB_AICE_CODE_SENDF
+                ||  aico->olap.aice.code == TB_AICE_CODE_SENDV
+                ||  aico->olap.aice.code == TB_AICE_CODE_RECVV))
+    {
+        // init aice
+        aico->olap.aice = *aice;
+
+        // disconnect it
+        tb_bool_t ok = impl->func.DisconnectEx((SOCKET)aico->base.handle - 1, (LPOVERLAPPED)&aico->olap, TF_REUSE_SOCKET, 0);
+        tb_trace_d("DisconnectEx: aico: %p, ok: %d, error: %d", aico, ok, impl->func.WSAGetLastError());
+        if (!ok)
+        { 
+            // pending? continue it
+            if (WSA_IO_PENDING == impl->func.WSAGetLastError()) return tb_true;
+
+            // trace
+            tb_trace_d("DisconnectEx: unknown error: %d", impl->func.WSAGetLastError());
+        }
+        else
+        {
+            // post ok
+            aico->olap.aice.state = TB_STATE_OK;
+            if (PostQueuedCompletionStatus(impl->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
+        }
+    }
+#endif
+ 
     // exit the sock 
     if (aico->base.type == TB_AICO_TYPE_SOCK)
     {
@@ -1702,14 +1820,6 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         aico->base.handle = tb_null;
     }
 
-    // exit the private data for acpt aice
-    if (aico->olap.aice.code == TB_AICE_CODE_ACPT)
-    {
-        // exit data
-        if (aico->olap.aice.u.acpt.priv[0]) tb_free(aico->olap.aice.u.acpt.priv[0]);
-        aico->olap.aice.u.acpt.priv[0] = tb_null;
-    }
- 
     // clear impl
     aico->impl = tb_null;
 
