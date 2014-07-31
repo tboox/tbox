@@ -383,38 +383,14 @@ tbox_C_FILES 			+= \
 						platform/linux/android/directory 
 endif
 
-# msvc
-ifeq ($(PLAT),msvc)
-tbox_C_FILES 			+= \
+# windows
+tbox_C_FILES-$(TB_CONFIG_OS_WINDOWS) += \
 						platform/windows/interface/interface \
 						platform/windows/interface/ws2_32 \
 						platform/windows/interface/dbghelp \
 						platform/windows/interface/mswsock \
 						platform/windows/interface/kernel32 \
 						platform/windows/interface/iphlpapi 
-endif
-
-# mingw
-ifeq ($(PLAT),mingw)
-tbox_C_FILES 			+= \
-						platform/windows/interface/interface \
-						platform/windows/interface/ws2_32 \
-						platform/windows/interface/dbghelp \
-						platform/windows/interface/mswsock \
-						platform/windows/interface/kernel32 \
-						platform/windows/interface/iphlpapi 
-endif
-
-# cygwin
-ifeq ($(PLAT),cygwin)
-tbox_C_FILES 			+= \
-						platform/windows/interface/interface \
-						platform/windows/interface/ws2_32 \
-						platform/windows/interface/dbghelp \
-						platform/windows/interface/mswsock \
-						platform/windows/interface/kernel32 \
-						platform/windows/interface/iphlpapi 
-endif
 
 # flags
 tbox_CXFLAGS 			+= -D__tb_prefix__=\"tbox\"

@@ -402,7 +402,7 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
             tb_assert_and_check_break(url);
 
             // port
-            tb_size_t port = tb_url_port_get(url);
+            tb_uint16_t port = tb_url_port_get(url);
             tb_assert_and_check_break(port);
             
             // the sock type: tcp or udp? for url: sock://ip:port/?udp=
@@ -1185,7 +1185,7 @@ tb_async_stream_ref_t tb_async_stream_init_sock(tb_aicp_ref_t aicp)
     // ok?
     return stream;
 }
-tb_async_stream_ref_t tb_async_stream_init_from_sock(tb_aicp_ref_t aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
+tb_async_stream_ref_t tb_async_stream_init_from_sock(tb_aicp_ref_t aicp, tb_char_t const* host, tb_uint16_t port, tb_size_t type, tb_bool_t bssl)
 {
     // check
     tb_assert_and_check_return_val(host && port, tb_null);

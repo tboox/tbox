@@ -356,7 +356,7 @@ tb_stream_ref_t         tb_stream_init_from_file(tb_char_t const* path, tb_size_
  *
  * @return              the stream
  */
-tb_stream_ref_t         tb_stream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
+tb_stream_ref_t         tb_stream_init_from_sock(tb_char_t const* host, tb_uint16_t port, tb_size_t type, tb_bool_t bssl);
 
 /*! init stream from http or https
  *
@@ -367,7 +367,7 @@ tb_stream_ref_t         tb_stream_init_from_sock(tb_char_t const* host, tb_size_
  *
  * @return              the stream
  */
-tb_stream_ref_t         tb_stream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
+tb_stream_ref_t         tb_stream_init_from_http(tb_char_t const* host, tb_uint16_t port, tb_char_t const* path, tb_bool_t bssl);
 
 /*! init filter stream from null
  *

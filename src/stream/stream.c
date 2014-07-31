@@ -464,7 +464,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
             tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
             if (port)
             {
-                tb_url_port_set(&impl->url, port);
+                tb_url_port_set(&impl->url, (tb_uint16_t)port);
                 ok = tb_true;
             }
         }

@@ -118,7 +118,7 @@ tb_void_t           tb_socket_block(tb_socket_ref_t sock, tb_bool_t block);
  *
  * @return          ok: 1, continue: 0; failed: -1
  */
-tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port);
+tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port);
 
 /*! bind socket
  *
@@ -128,7 +128,7 @@ tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* add
  *
  * @return          the bound port, failed: 0
  */
-tb_size_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port);
+tb_size_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port);
 
 /*! listen socket
  *
@@ -142,10 +142,12 @@ tb_bool_t           tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog);
 /*! accept socket
  *
  * @param sock      the socket 
+ * @param addr      the client address
+ * @param port      the client port
  *
- * @return          the client socket handle
+ * @return          the client socket 
  */
-tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock);
+tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_t* addr, tb_uint16_t* port);
 
 /*! kill socket
  *
@@ -216,7 +218,7 @@ tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_h
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size);
+tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
 
 /*! send the socket data for udp
  *
@@ -228,7 +230,7 @@ tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr,
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size);
+tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size);
     
 /*! urecvv the socket data for udp
  * 
@@ -240,7 +242,7 @@ tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr,
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size);
 
 /*! usendv the socket data for udp
  * 
@@ -252,7 +254,7 @@ tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

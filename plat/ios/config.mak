@@ -2,6 +2,9 @@
 TB_CONFIG_DEMO_LIBS					= stdc++ m dl pthread
 #TB_CONFIG_DEMO_CMD1				= -@ldid -S $(1)$(BIN_SUFFIX)
 
+# os
+TB_CONFIG_OS_IOS 					= y
+
 # float
 TB_CONFIG_TYPE_FLOAT 				= y
 

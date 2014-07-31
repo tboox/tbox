@@ -38,6 +38,8 @@
 #define TB_MSWSOCK_WSAID_TRANSMITFILE               {0xb5367df0, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
 #define TB_MSWSOCK_WSAID_GETACCEPTEXSOCKADDRS       {0xb5367df2, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
 #define TB_MSWSOCK_WSAID_CONNECTEX                  {0x25a207b9, 0xddf3, 0x4660, {0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e}}
+#define TB_MSWSOCK_WSAID_DISCONNECTEX               {0x7fda2e11, 0x8630, 0x436f, {0xa0, 0x31, 0xf5, 0x36, 0xa6, 0xee, 0xc1, 0x57}}
+#define TB_MSWSOCK_WSAID_GETACCEPTEXSOCKADDRS       {0xb5367df2, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -82,6 +84,19 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
                             ,   tb_null
                             ,   tb_null);
 
+        // init DisconnectEx
+        DWORD   DisconnectEx_real = 0;
+        GUID    DisconnectEx_guid = TB_MSWSOCK_WSAID_DISCONNECTEX;
+        tb_ws2_32()->WSAIoctl(  (SOCKET)sock - 1
+                            ,   SIO_GET_EXTENSION_FUNCTION_POINTER
+                            ,   &DisconnectEx_guid
+                            ,   sizeof(GUID)
+                            ,   &mswsock->DisconnectEx
+                            ,   sizeof(tb_mswsock_DisconnectEx_t)
+                            ,   &DisconnectEx_real
+                            ,   tb_null
+                            ,   tb_null);
+
         // init TransmitFile
         DWORD   TransmitFile_real = 0;
         GUID    TransmitFile_guid = TB_MSWSOCK_WSAID_TRANSMITFILE;
@@ -92,6 +107,19 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
                             ,   &mswsock->TransmitFile
                             ,   sizeof(tb_mswsock_TransmitFile_t)
                             ,   &TransmitFile_real
+                            ,   tb_null
+                            ,   tb_null);
+
+        // init GetAcceptExSockaddrs
+        DWORD   GetAcceptExSockaddrs_real = 0;
+        GUID    GetAcceptExSockaddrs_guid = TB_MSWSOCK_WSAID_GETACCEPTEXSOCKADDRS;
+        tb_ws2_32()->WSAIoctl(  (SOCKET)sock - 1
+                            ,   SIO_GET_EXTENSION_FUNCTION_POINTER
+                            ,   &GetAcceptExSockaddrs_guid
+                            ,   sizeof(GUID)
+                            ,   &mswsock->GetAcceptExSockaddrs
+                            ,   sizeof(tb_mswsock_GetAcceptExSockaddrs_t)
+                            ,   &GetAcceptExSockaddrs_real
                             ,   tb_null
                             ,   tb_null);
     } while (0);

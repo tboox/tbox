@@ -30,7 +30,7 @@ typedef struct __tb_demo_httpd_t
     tb_char_t           root[TB_PATH_MAXN];
 
     // the listen port
-    tb_size_t           port;
+    tb_uint16_t         port;
 
     // the listen aico
     tb_aico_ref_t       aico;
@@ -781,7 +781,7 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
         httpd->port = TB_DEMO_HTTPD_PORT;
 
         // trace
-        tb_trace_d("init: %s: %lu", httpd->root, httpd->port);
+        tb_trace_d("init: %s: %u", httpd->root, httpd->port);
 
 #ifdef TB_DEMO_HTTPD_SESSION_MAXN
         // init aicp
@@ -843,7 +843,7 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_t const* aice)
         tb_assert_and_check_break(aice->u.acpt.aico);
 
         // trace
-        tb_trace_d("acpt[%p]: %p", aice->aico, aice->u.acpt.aico);
+        tb_trace_d("acpt[%p]: aico: %p, addr: %u.%u.%u.%u, port: %u", aice->aico, aice->u.acpt.aico, tb_ipv4_u8x4(aice->u.acpt.addr), aice->u.acpt.port);
 #if 1
         // init the session
         session = tb_demo_httpd_session_init(httpd, aice->u.acpt.aico);

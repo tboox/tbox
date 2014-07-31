@@ -188,14 +188,14 @@ tb_size_t           tb_url_protocol_probe(tb_char_t const* url);
  *
  * @return          the url port
  */
-tb_size_t           tb_url_port_get(tb_url_t const* url);
+tb_uint16_t         tb_url_port_get(tb_url_t const* url);
 
 /*! set the port to the url
  *
  * @param url       the url
  * @param port      the url port
  */
-tb_void_t           tb_url_port_set(tb_url_t* url, tb_size_t port);
+tb_void_t           tb_url_port_set(tb_url_t* url, tb_uint16_t port);
 
 /*! get the ipv4 from the url
  *

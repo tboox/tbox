@@ -70,8 +70,10 @@ typedef struct __tb_stream_sock_impl_t
     // the wait event
     tb_long_t               wait;
 
-    // the read and writ
+    // the read size
     tb_size_t               read;
+
+    // the writ size
     tb_size_t               writ;
     
     // the host address
@@ -123,7 +125,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
 #endif
 
     // port
-    tb_size_t port = tb_url_port_get(url);
+    tb_uint16_t port = tb_url_port_get(url);
     tb_assert_and_check_return_val(port, tb_false);
 
     // ipv4
@@ -383,7 +385,7 @@ static tb_long_t tb_stream_sock_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
     case TB_SOCKET_TYPE_UDP:
         {
             // port
-            tb_size_t port = tb_url_port_get(url);
+            tb_uint16_t port = tb_url_port_get(url);
             tb_assert_and_check_return_val(port, -1);
 
             // ipv4
@@ -477,7 +479,7 @@ static tb_long_t tb_stream_sock_impl_writ(tb_stream_ref_t stream, tb_byte_t cons
     case TB_SOCKET_TYPE_UDP:
         {
             // port
-            tb_size_t port = tb_url_port_get(url);
+            tb_uint16_t port = tb_url_port_get(url);
             tb_assert_and_check_return_val(port, -1);
 
             // ipv4
@@ -621,7 +623,7 @@ tb_stream_ref_t tb_stream_init_sock()
     // ok?
     return stream;
 }
-tb_stream_ref_t tb_stream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
+tb_stream_ref_t tb_stream_init_from_sock(tb_char_t const* host, tb_uint16_t port, tb_size_t type, tb_bool_t bssl)
 {
     // check
     tb_assert_and_check_return_val(host && port, tb_null);
