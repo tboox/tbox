@@ -23,6 +23,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME            "url"
+#define TB_TRACE_MODULE_DEBUG           (0)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "url.h"
@@ -33,8 +39,6 @@
 #include "../math/math.h"
 #include "../utils/utils.h"
 #include "../platform/platform.h"
-
-// http://graph.renren.com/oauth/authorize?response_type=code&scope=publish_feed status_update read_user_status read_user_blog publish_comment operate_like read_user_photo read_user_album photo_upload&client_id=7747ba1b94914c099491561476e4f658&redirect_uri=http://open.denglu.cc/receiver&state=31482_renren_55738
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
