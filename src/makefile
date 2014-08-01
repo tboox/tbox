@@ -371,20 +371,17 @@ tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_SQLITE3) += \
 endif
 
 # ios
-ifeq ($(PLAT),ios)
-tbox_M_FILES 			+= \
+tbox_M_FILES-$(TB_CONFIG_OS_IOS) += \
 						platform/mach/ios/directory
-endif
 
 # android
-ifeq ($(PLAT),android)
-tbox_C_FILES 			+= \
+tbox_C_FILES-$(TB_CONFIG_OS_ANDROID) += \
 						platform/linux/android/android \
 						platform/linux/android/directory 
-endif
 
 # windows
 tbox_C_FILES-$(TB_CONFIG_OS_WINDOWS) += \
+						platform/windows/socket_pool \
 						platform/windows/interface/interface \
 						platform/windows/interface/ws2_32 \
 						platform/windows/interface/dbghelp \

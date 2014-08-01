@@ -298,7 +298,17 @@ tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
     }
 
     // kill it
-    return !shutdown(tb_sock2fd(sock), how)? tb_true : tb_false;
+    tb_bool_t ok = !shutdown(tb_sock2fd(sock), how)? tb_true : tb_false;
+ 
+    // failed?
+    if (!ok)
+    {
+        // trace
+        tb_trace_e("kill: %p failed, errno: %d", sock, errno);
+    }
+
+    // ok?
+    return ok;
 }
 tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 {
@@ -315,7 +325,7 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     if (!ok)
     {
         // trace
-        tb_trace_e("close: %p failed, errno: %d", sock, errno);
+        tb_trace_e("clos: %p failed, errno: %d", sock, errno);
     }
 
     // ok?

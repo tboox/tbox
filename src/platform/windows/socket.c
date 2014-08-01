@@ -28,6 +28,7 @@
 #include "../socket.h"
 #include "../../utils/utils.h"
 #include "interface/interface.h"
+#include "socket_pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -66,7 +67,7 @@ tb_bool_t tb_socket_context_init()
     tb_assert_and_check_return_val(ws2_32->gethostname, tb_false);
     tb_assert_and_check_return_val(ws2_32->__WSAFDIsSet, tb_false);
 
-    // init it
+    // init socket context
     WSADATA WSAData = {0};
     if (ws2_32->WSAStartup(MAKEWORD(2, 2), &WSAData))
     {
@@ -74,11 +75,18 @@ tb_bool_t tb_socket_context_init()
         return tb_false;
     }
 
+    // init socket pool
+    if (!tb_socket_pool_init()) return tb_false;
+
     // ok
     return tb_true;
 }
 tb_void_t tb_socket_context_exit()
 {
+    // exit socket pool
+    tb_socket_pool_exit();
+
+    // exit socket context
     tb_ws2_32()->WSACleanup();
 }
 tb_socket_ref_t tb_socket_init(tb_size_t type)
@@ -91,6 +99,9 @@ tb_socket_ref_t tb_socket_init(tb_size_t type)
     tb_socket_ref_t sock = tb_null;
     do
     {
+        // attempt to get the socket from the socket pool
+        if (type == TB_SOCKET_TYPE_TCP && (sock = tb_socket_pool_get())) return sock;
+
         // init type and protocol
         tb_int_t t = 0;
         tb_int_t p = 0;
@@ -433,7 +444,17 @@ tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
     }
 
     // kill it
-    return !tb_ws2_32()->shutdown((SOCKET)((tb_long_t)sock - 1), how)? tb_true : tb_false;
+    tb_bool_t ok = !tb_ws2_32()->shutdown((SOCKET)((tb_long_t)sock - 1), how)? tb_true : tb_false;
+ 
+    // failed?
+    if (!ok)
+    {
+        // trace
+        tb_trace_e("kill: %p failed, errno: %d", sock, GetLastError());
+    }
+
+    // ok?
+    return ok;
 }
 tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 {
@@ -441,7 +462,17 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     tb_assert_and_check_return_val(sock, tb_false);
 
     // close it
-    return !tb_ws2_32()->closesocket((SOCKET)((tb_long_t)sock - 1))? tb_true : tb_false;
+    tb_bool_t ok = !tb_ws2_32()->closesocket((SOCKET)((tb_long_t)sock - 1))? tb_true : tb_false;
+
+    // failed?
+    if (!ok)
+    {
+        // trace
+        tb_trace_e("clos: %p failed, errno: %d", sock, GetLastError());
+    }
+
+    // ok?
+    return ok;
 }
 tb_long_t tb_socket_recv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
 {

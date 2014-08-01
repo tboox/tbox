@@ -273,7 +273,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
     {
         // exit loop
         tb_trace_i("acpt[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
- 
+
         // clos aico
         if (aice->aico) tb_aico_clos(aice->aico, tb_demo_aico_clos, tb_null);
     }
@@ -340,7 +340,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
     // init
     tb_aicp_ref_t       aicp = tb_null;
     tb_aico_ref_t       aico = tb_null;
-    tb_aico_ref_t       task = tb_null;
+//    tb_aico_ref_t       task = tb_null;
     tb_thread_ref_t     loop[16] = {tb_null};
     do
     {
@@ -361,6 +361,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
         // listen sock
         if (!tb_socket_listen(tb_aico_sock(aico), 20)) break;
 
+#if 0
         // init task aico
         task = tb_aico_init(aicp);
         tb_assert_and_check_break(task);
@@ -368,7 +369,6 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
         // open task aico
         if (!tb_aico_open_task(task, tb_false)) break;
 
-#if 0
         // run task
         if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) break;
         if (!tb_aico_task_run(aico, 0, tb_demo_task_func, tb_null)) break;
@@ -392,14 +392,17 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("end");
  
 #if 1
-    // kill all
-    if (aicp) tb_aicp_kill_all(aicp);
+    if (aicp)
+    {
+        // kill all
+        tb_aicp_kill_all(aicp);
    
-    // wait all
-    tb_aicp_wait_all(aicp, -1);
+        // wait all
+        tb_aicp_wait_all(aicp, -1);
 
-    // kill aicp
-    tb_aicp_kill(aicp);
+        // kill aicp
+        tb_aicp_kill(aicp);
+    }
 
     // wait exit
     {

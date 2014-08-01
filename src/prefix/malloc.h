@@ -59,7 +59,7 @@ __tb_extern_c_enter__
 #define tb_malloc0_type(type)               (type*)tb_pool_malloc0_(tb_pool(), sizeof(type) __tb_debug_vals__)
 #define tb_nalloc_type(item, type)          (type*)tb_pool_nalloc_(tb_pool(), item, sizeof(type) __tb_debug_vals__)
 #define tb_nalloc0_type(item, type)         (type*)tb_pool_nalloc0_(tb_pool(), item, sizeof(type) __tb_debug_vals__)
-#define tb_ralloc_type(data, item, type)    (type*)tb_pool_ralloc_(tb_pool(), (tb_pointer_t)data, ((item) * (size)) __tb_debug_vals__)
+#define tb_ralloc_type(data, item, type)    (type*)tb_pool_ralloc_(tb_pool(), (tb_pointer_t)data, ((item) * sizeof(type)) __tb_debug_vals__)
 
 #define tb_free(data)                       tb_pool_free_(tb_pool(), (tb_pointer_t)data __tb_debug_vals__)
 
