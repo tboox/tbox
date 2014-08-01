@@ -48,7 +48,7 @@ __tb_extern_c_enter__
 /// the ipv4
 typedef union __tb_ipv4_t
 {
-    // u32 for bigendian
+    // u32 for little endian
     tb_uint32_t u32;
 
     // bytes
