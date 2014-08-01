@@ -92,7 +92,7 @@ typedef struct __tb_aice_acpt_t
     tb_uint16_t                 port;
 
     /// the private data for using the left space of the union
-    tb_handle_t                 priv[2];
+    tb_cpointer_t               priv[2];
 
 }tb_aice_acpt_t;
 

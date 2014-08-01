@@ -77,7 +77,7 @@ tb_uint32_t tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip)
             else 
             {
                 // trace
-                tb_trace_e("invalid addr: %s", ip);
+//                tb_trace_e("invalid addr: %s", ip);
 
                 // clear it
                 v4 = 0;
