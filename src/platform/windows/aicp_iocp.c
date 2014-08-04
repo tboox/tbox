@@ -60,7 +60,7 @@
 #   define SO_UPDATE_ACCEPT_CONTEXT                 (0x700B)
 #endif
 
-// enable socket pool?
+// enable socket pool? only for the accepted socket
 #define TB_IOCP_SOCKET_POOL_ENABLE
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -176,8 +176,8 @@ typedef struct __tb_iocp_aico_t
     // is ltimer?
     tb_uint8_t                                  bltimer : 1;
 
-    // connected for the tcp socket?
-    tb_uint8_t                                  connected : 1;
+    // DisconnectEx it
+    tb_uint8_t                                  bDisconnectEx : 1;
 
 }tb_iocp_aico_t;
 
@@ -300,6 +300,11 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
                     break;
                 }
 
+#ifdef TB_IOCP_SOCKET_POOL_ENABLE
+                // DisconnectEx it
+                ((tb_iocp_aico_t*)resp->u.acpt.aico)->bDisconnectEx = 1;
+#endif
+
                 // open aico
                 if (!tb_aico_open_sock(resp->u.acpt.aico, (tb_socket_ref_t)resp->u.acpt.priv[1])) 
                 {
@@ -316,6 +321,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
 
                 // clear sock
                 resp->u.acpt.priv[1] = tb_null;
+
 
                 // done GetAcceptExSockaddrs
                 INT         server_size = 0;
@@ -450,10 +456,10 @@ static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
         // update the connect context, otherwise shutdown will be failed
         tb_long_t update_ok = setsockopt((SOCKET)tb_aico_sock(resp->aico)- 1, SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, tb_null, 0);
         tb_assert_abort(!update_ok); tb_used(update_ok);
-#endif
 
-        // connected
-        aico->connected = 1;
+        // DisconnectEx it
+        aico->bDisconnectEx = 1;
+#endif
     }
 
     // ok
@@ -678,8 +684,8 @@ static tb_long_t tb_iocp_spak_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // closed
     tb_atomic_set(&aico->base.state, TB_STATE_CLOSED);
 
-    // clear connected
-    aico->connected = 0;
+    // clear bDisconnectEx
+    aico->bDisconnectEx = 0;
 
     // clear olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
@@ -808,11 +814,14 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // init olap
         tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
 
+        // attempt to get the socket from the socket pool
+        tb_socket_ref_t sock = tb_socket_pool_get();
+
         // init aice, hack: sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1)
         aico->olap.aice                 = *aice;
         aico->olap.aice.state           = TB_STATE_PENDING;
         aico->olap.aice.u.acpt.priv[0]  = data;
-        aico->olap.aice.u.acpt.priv[1]  = tb_socket_init(TB_SOCKET_TYPE_TCP);
+        aico->olap.aice.u.acpt.priv[1]  = sock? sock : tb_socket_init(TB_SOCKET_TYPE_TCP);
         tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv) > 1);
         tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.priv[1]);
         init_ok = tb_true;
@@ -892,7 +901,7 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     
     // the aico
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
-    tb_assert_and_check_return_val(aico && aico->base.handle && !aico->connected, tb_false);
+    tb_assert_and_check_return_val(aico && aico->base.handle && !aico->bDisconnectEx, tb_false);
 
     // trace
     tb_trace_d("connect[%p]: %u.%u.%u.%u: %u: ..", aico, tb_ipv4_u8x4(aice->u.conn.addr), aice->u.conn.port);
@@ -914,16 +923,12 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         local.sin_family = AF_INET;
         local.sin_addr.S_un.S_addr = INADDR_ANY;
         local.sin_port = 0;
-#ifdef TB_IOCP_SOCKET_POOL_ENABLE
-        impl->func.bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&local, sizeof(local));
-#else
         if (SOCKET_ERROR == impl->func.bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&local, sizeof(local))) 
         {
             // trace
             tb_trace_e("connect[%p]: bind failed, error: %u", aico, GetLastError());
             break;
         }
-#endif
         init_ok = tb_true;
 
         // post timeout first
@@ -1839,11 +1844,9 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         if (aico->olap.aice.u.acpt.priv[1]) tb_socket_exit((tb_socket_ref_t)aico->olap.aice.u.acpt.priv[1]);
         aico->olap.aice.u.acpt.priv[1] = tb_null;
     }
-#ifdef TB_IOCP_SOCKET_POOL_ENABLE
     // disconnect the socket for reusing it
     else if (   impl->func.DisconnectEx
-            &&  aico->base.type == TB_AICO_TYPE_SOCK
-            &&  aico->connected
+            &&  aico->bDisconnectEx
             &&  !tb_aico_impl_is_killed((tb_aico_impl_t*)aico)) //< disable it if be killed, because DisconnectEx maybe cannot return immediately after calling CancelIo
     {
         // init aice
@@ -1867,7 +1870,6 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
             if (PostQueuedCompletionStatus(impl->port, 0, (ULONG_PTR)aico, (LPOVERLAPPED)&aico->olap)) return tb_true;
         }
     }
-#endif
  
     // exit the sock 
     if (aico->base.type == TB_AICO_TYPE_SOCK)
@@ -1898,8 +1900,8 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // closed
     tb_atomic_set(&aico->base.state, TB_STATE_CLOSED);
 
-    // clear connected
-    aico->connected = 0;
+    // clear bDisconnectEx
+    aico->bDisconnectEx = 0;
 
     // clear olap
     tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
@@ -2133,16 +2135,14 @@ static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
 
             // add aico to port
             HANDLE port = CreateIoCompletionPort((HANDLE)((SOCKET)aico->handle - 1), impl->port, (ULONG_PTR)aico, 0);
-#ifndef TB_IOCP_SOCKET_POOL_ENABLE
-            if (port != impl->port)
+            if (    port != impl->port
+                &&  !(   impl->func.DisconnectEx
+                    &&  ((tb_iocp_aico_t*)aico)->bDisconnectEx))
             {
                 // trace
                 tb_trace_e("CreateIoCompletionPort failed: %d, aico: %p, handle: %p", GetLastError(), aico, aico->handle);
                 return tb_false;
             }
-#else
-            tb_used(port);
-#endif
         }
         break;
     case TB_AICO_TYPE_FILE:
@@ -2450,7 +2450,7 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
 
             // init 
             tb_size_t           real = (tb_size_t)entry->dwNumberOfBytesTransferred;
-            tb_iocp_aico_t*     aico = (tb_iocp_aico_t* )entry->lpCompletionKey;
+            tb_iocp_aico_t*     aico = (tb_iocp_aico_t*)entry->lpCompletionKey;
             tb_iocp_olap_t*     olap = (tb_iocp_olap_t*)entry->lpOverlapped;
             tb_size_t           error = tb_ntstatus_to_winerror((tb_size_t)entry->Internal);
             tb_trace_d("spak[%lu]: aico: %p, ntstatus: %lx, winerror: %lu", loop->self, aico, (tb_size_t)entry->Internal, error);
@@ -2492,11 +2492,25 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
             tb_size_t i = 0;
             for (i = 0; i < size; i++) 
             {
-                // the aico
+                // the aico and olap
                 tb_iocp_aico_t* aico = (tb_iocp_aico_t* )loop->list[i].lpCompletionKey;
+                tb_iocp_olap_t* olap = (tb_iocp_olap_t*)loop->list[i].lpOverlapped;
 
                 // aicp killed?
                 tb_check_return_val(aico, -1);
+
+                /* update aico
+                 *
+                 * the aico cannot be binded again if using DisconnectEx
+                 */
+                if (    impl->func.DisconnectEx
+                    &&  olap
+                    &&  olap->aice.aico
+                    &&  ((tb_iocp_aico_t*)olap->aice.aico)->bDisconnectEx)
+                {
+                    aico = (tb_iocp_aico_t*)olap->aice.aico;
+                    loop->list[i].lpCompletionKey = (ULONG_PTR)aico;
+                }
 
                 // remove task first
                 tb_iocp_post_timeout_cancel(impl, aico);
@@ -2541,6 +2555,18 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
         // aicp killed?
         if (wait && !aico) return -1;
 
+        /* update aico
+         *
+         * the aico cannot be binded again if using DisconnectEx
+         */
+        if (    impl->func.DisconnectEx
+            &&  olap
+            &&  olap->aice.aico
+            &&  ((tb_iocp_aico_t*)olap->aice.aico)->bDisconnectEx)
+        {
+            aico = (tb_iocp_aico_t*)olap->aice.aico;
+        }
+
         // exit the aico task
         if (aico)
         {
@@ -2556,6 +2582,9 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
 
         // check
         tb_assert_and_check_return_val(olap, -1);
+
+        // check
+        tb_assert_abort(aico == (tb_iocp_aico_t*)olap->aice.aico);
 
         // save resp
         *resp = olap->aice;
