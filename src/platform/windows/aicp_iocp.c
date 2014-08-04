@@ -36,6 +36,7 @@
 #include "../../utils/utils.h"
 #include "../../memory/memory.h"
 #include "../../platform/platform.h"
+#include "../../algorithm/algorithm.h"
 #include "../../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -135,6 +136,9 @@ typedef struct __tb_iocp_ptor_impl_t
      */
     tb_queue_ref_t                              post[2];
     
+    // the killed list
+    tb_vector_ref_t                             kill;
+
     // the post lock
     tb_spinlock_t                               lock;
 
@@ -1989,7 +1993,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
     tb_aicp_impl_t*         aicp = impl? impl->base.aicp : tb_null;
     tb_assert_and_check_return_val(impl && impl->wait && aicp, tb_null);
     tb_assert_and_check_return_val(impl->timer && impl->ltimer, tb_null);
-    tb_assert_and_check_return_val(impl->post[0] && impl->post[1], tb_null);
+    tb_assert_and_check_return_val(impl->kill && impl->post[0] && impl->post[1], tb_null);
 
     // trace
     tb_trace_d("loop: init");
@@ -2039,6 +2043,23 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
                 tb_queue_pop(impl->post[1]);
             }
         }
+
+        // kill some handles
+        tb_for_all (HANDLE, handle, impl->kill)
+        {
+            // trace
+            tb_trace_d("loop: cancel[%p]: ..", handle);
+
+            // CancelIo it
+            if (!CancelIo(handle))
+            {
+                // trace
+                tb_trace_e("loop: cancel[%p]: failed: %u", handle, GetLastError());
+            }
+        }
+
+        // clear the killed list
+        tb_vector_clear(impl->kill);
 
         // leave 
         tb_spinlock_leave(&impl->lock);
@@ -2158,42 +2179,27 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
 {
     // check
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
-    tb_assert_and_check_return(impl && impl->wait && aico);
+    tb_assert_and_check_return(impl && impl->wait && impl->kill && aico);
         
     // trace
     tb_trace_d("kilo[%p]: handle: %p, type: %u", aico, aico->handle, aico->type);
 
-    // the iocp aico
-    tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
+    // the handle
+    HANDLE handle = aico->type == TB_AICO_TYPE_SOCK? (HANDLE)((SOCKET)aico->handle - 1) : aico->handle;
 
-    // add timeout task for killing the accept socket
-    if (aico->type == TB_AICO_TYPE_SOCK && iocp_aico->olap.aice.code == TB_AICE_CODE_ACPT) 
-    {
-        // add task
-        if (!iocp_aico->task)
-        {
-            iocp_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_iocp_spak_timeout, aico);
-            iocp_aico->bltimer = 1;
-        }
-    }
+    // enter
+    tb_spinlock_enter(&impl->lock);
 
-    // task: kill
-    if (iocp_aico->task) 
-    {
-        // kill it
-        if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)iocp_aico->task);
-        else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)iocp_aico->task);
+    // appned the killed handle
+    tb_vector_insert_tail(impl->kill, (tb_cpointer_t)handle);
 
-        /* the iocp will wait long time if the lastest task wait period is too long
-         * so spak the iocp manually for spak the timer
-         */
-        tb_event_post(impl->wait);
-    }
+    // leave
+    tb_spinlock_leave(&impl->lock);
 
-    // sock: kill
-    if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) tb_socket_kill((tb_socket_ref_t)aico->handle, TB_SOCKET_KILL_RW);
-    // file: kill
-    else if (aico->type == TB_AICO_TYPE_FILE && aico->handle) tb_file_exit((tb_file_ref_t)aico->handle);
+    /* the iocp will wait long time if the lastest task wait period is too long
+     * so spak the iocp manually for spak the timer
+     */
+    tb_event_post(impl->wait);
 }
 static tb_bool_t tb_iocp_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice)
 {
@@ -2298,12 +2304,20 @@ static tb_void_t tb_iocp_ptor_exit(tb_aicp_ptor_impl_t* ptor)
             impl->loop = tb_null;
         }
 
-        // exit post
+        // enter
         tb_spinlock_enter(&impl->lock);
+
+        // exit post
         if (impl->post[0]) tb_queue_exit(impl->post[0]);
         if (impl->post[1]) tb_queue_exit(impl->post[1]);
         impl->post[0] = tb_null;
         impl->post[1] = tb_null;
+
+        // exit kill
+        if (impl->kill) tb_vector_exit(impl->kill);
+        impl->kill = tb_null;
+
+        // leave
         tb_spinlock_leave(&impl->lock);
 
         // exit port
@@ -2616,6 +2630,10 @@ static tb_aicp_ptor_impl_t* tb_iocp_ptor_init(tb_aicp_impl_t* aicp)
         impl->post[0] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
         impl->post[1] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
         tb_assert_and_check_break(impl->post[0] && impl->post[1]);
+
+        // init kill
+        impl->kill = tb_vector_init((aicp->maxn >> 4) + 16, tb_item_func_ptr(tb_null, tb_null));
+        tb_assert_and_check_break(impl->kill);
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
