@@ -249,7 +249,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
             acpt_aice.u.acpt.aico = tb_aico_init(aico->base.aicp);
 
             // trace
-            tb_trace_d("push: acpt[%p]: aico: %p", aico->base.handle, acpt_aice.u.acpt.aico);
+            tb_trace_d("push: acpt[%p]: sock: %p, aico: %p", aico->base.handle, sock, acpt_aice.u.acpt.aico);
 
             // open aico and push the acpt aice if not full?
             if (    acpt_aice.u.acpt.aico 
