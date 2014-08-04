@@ -61,7 +61,7 @@
 #endif
 
 // enable socket pool?
-//#define TB_IOCP_SOCKET_POOL_ENABLE
+#define TB_IOCP_SOCKET_POOL_ENABLE
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -307,7 +307,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
                     break;
                 }
 
-#if 1
+#if 0
                 // update the accept context, otherwise shutdown will be failed
                 SOCKET acpt = (SOCKET)tb_aico_sock(resp->aico) - 1;
                 tb_long_t update_ok = setsockopt((SOCKET)resp->u.acpt.priv[1] - 1, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
@@ -446,7 +446,7 @@ static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // ok?
     if (resp->state == TB_STATE_OK)
     {
-#if 1
+#if 0
         // update the connect context, otherwise shutdown will be failed
         tb_long_t update_ok = setsockopt((SOCKET)tb_aico_sock(resp->aico)- 1, SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, tb_null, 0);
         tb_assert_abort(!update_ok); tb_used(update_ok);
@@ -693,9 +693,6 @@ static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // check?
     tb_assert_and_check_return_val(resp && resp->aico, -1);
 
-    // no pending? spak it directly
-    tb_check_return_val(resp->state == TB_STATE_PENDING, 1);
-
     // killed?
     if (tb_aico_impl_is_killed((tb_aico_impl_t*)resp->aico) && resp->code != TB_AICE_CODE_CLOS)
     {
@@ -708,6 +705,9 @@ static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
         // ok
         return 1;
     }
+
+    // no pending? spak it directly
+    tb_check_return_val(resp->state == TB_STATE_PENDING, 1);
 
     // init spak
     static tb_long_t (*s_spak[])(tb_iocp_ptor_impl_t* , tb_aice_t* , tb_size_t , tb_size_t ) = 
@@ -1823,7 +1823,7 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     tb_assert_and_check_return_val(aico, tb_false);
 
     // trace
-    tb_trace_d("clos[%p]: handle: %p", aico, aico->base.handle);
+    tb_trace_d("clos[%p]: handle: %p, state: %s", aico, aico->base.handle, tb_state_cstr(tb_atomic_get(&aico->base.state)));
 
     // remove the timeout task
     tb_iocp_post_timeout_cancel(impl, aico);
@@ -1843,7 +1843,8 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // disconnect the socket for reusing it
     else if (   impl->func.DisconnectEx
             &&  aico->base.type == TB_AICO_TYPE_SOCK
-            &&  aico->connected)
+            &&  aico->connected
+            &&  !tb_aico_impl_is_killed((tb_aico_impl_t*)aico)) //< disable it if be killed, because DisconnectEx maybe cannot return immediately after calling CancelIo
     {
         // init aice
         aico->olap.aice = *aice;
@@ -2187,14 +2188,30 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // the handle
     HANDLE handle = aico->type == TB_AICO_TYPE_SOCK? (HANDLE)((SOCKET)aico->handle - 1) : aico->handle;
 
-    // enter
-    tb_spinlock_enter(&impl->lock);
+    // the iocp aico
+    tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
 
-    // appned the killed handle
-    tb_vector_insert_tail(impl->kill, (tb_cpointer_t)handle);
+    // kill the task
+    if (iocp_aico->task) 
+    {
+        // trace
+        tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, iocp_aico->task);
 
-    // leave
-    tb_spinlock_leave(&impl->lock);
+        // kill task
+        if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, iocp_aico->task);
+        else tb_timer_task_kill(impl->timer, iocp_aico->task);
+    }
+    // append the killed handle
+    else 
+    {
+        // trace
+        tb_trace_d("kilo: aico: %p, type: %u, handle: %p: ..", aico, aico->type, handle);
+
+        // kill handle
+        tb_spinlock_enter(&impl->lock);
+        tb_vector_insert_tail(impl->kill, (tb_cpointer_t)handle);
+        tb_spinlock_leave(&impl->lock);
+    }
 
     /* the iocp will wait long time if the lastest task wait period is too long
      * so spak the iocp manually for spak the timer

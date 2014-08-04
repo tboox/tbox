@@ -371,9 +371,7 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_dec
 
     // opened or killed or closed? pending it
     tb_size_t state = tb_atomic_fetch_and_pset(&aico->state, TB_STATE_OPENED, TB_STATE_PENDING);
-    if (    state == TB_STATE_OPENED
-        || (state == TB_STATE_KILLED && aice->code != TB_AICE_CODE_CLOS)
-        || (aice->code == TB_AICE_CODE_CLOS && TB_STATE_KILLED == tb_atomic_fetch_and_pset(&aico->state, TB_STATE_KILLED, TB_STATE_PENDING)))
+    if (state == TB_STATE_OPENED || state == TB_STATE_KILLED)
     {
         // save debug info
 #ifdef __tb_debug__
