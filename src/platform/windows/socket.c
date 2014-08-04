@@ -99,9 +99,6 @@ tb_socket_ref_t tb_socket_init(tb_size_t type)
     tb_socket_ref_t sock = tb_null;
     do
     {
-        // attempt to get the socket from the socket pool
-        if (type == TB_SOCKET_TYPE_TCP && (sock = tb_socket_pool_get())) return sock;
-
         // init type and protocol
         tb_int_t t = 0;
         tb_int_t p = 0;
