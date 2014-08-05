@@ -164,6 +164,12 @@ typedef struct{}*                   tb_thread_ref_t;
 /// the semaphore ref type
 typedef struct{}*                   tb_semaphore_ref_t;
 
+/// the stream ref type
+typedef struct{}*                   tb_stream_ref_t;
+
+/// the async stream ref type
+typedef struct{}*                   tb_async_stream_ref_t;
+
 /// the time type
 typedef tb_hong_t                   tb_time_t;
 
@@ -289,6 +295,12 @@ typedef union __tb_value_t
 
     /// spinlock
     tb_spinlock_t                   lock;
+
+    /// stream
+    tb_stream_ref_t                 stream;
+
+    /// async stream
+    tb_async_stream_ref_t           astream;
 
 #ifdef TB_CONFIG_TYPE_FLOAT
     /// float
