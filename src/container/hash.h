@@ -167,6 +167,24 @@ tb_size_t               tb_hash_size(tb_hash_ref_t hash);
  */
 tb_size_t               tb_hash_maxn(tb_hash_ref_t hash);
 
+/*! load hash from the stream
+ *
+ * @param hash          the hash
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_hash_load(tb_hash_ref_t hash, tb_stream_ref_t stream);
+
+/*! save hash to the stream
+ *
+ * @param hash          the hash
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_hash_save(tb_hash_ref_t hash, tb_stream_ref_t stream);
+
 #ifdef __tb_debug__
 /*! dump hash
  *
