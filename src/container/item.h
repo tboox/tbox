@@ -38,23 +38,152 @@ __tb_extern_c_enter__
  * types
  */
 
-// the callback type
 struct __tb_item_func_t;
+
+/*! the item data hash func type
+ *
+ * @param func                  the item func
+ * @param data                  the item data
+ * @param mask                  the hash mask
+ * @param index                 the hash index
+ *
+ * @return                      the hash value
+ */
 typedef tb_size_t               (*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index);
+
+/*! the item data compare func type
+ *
+ * @param func                  the item func
+ * @param ldata                 the left-hand data
+ * @param rdata                 the right-hand data
+ *
+ * @return                      equal: 0, 1: >, -1: <
+ */
 typedef tb_long_t               (*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata);
 
-typedef tb_pointer_t            (*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_cpointer_t item);
+/*! the item data func type
+ *
+ * @param func                  the item func
+ * @param buff                 the item data address
+ *
+ * @return                      the item data
+ */
+typedef tb_pointer_t            (*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_cpointer_t buff);
+
+/*! the item data string func type
+ *
+ * @param func                  the item func
+ * @param data                  the item data
+ * @param cstr                  the string buffer
+ * @param maxn                  the string buffer maximum size
+ *
+ * @return                      the string pointer
+ */
 typedef tb_char_t const*        (*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn);
 
-typedef tb_void_t               (*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_pointer_t item);
-typedef tb_void_t               (*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
-typedef tb_void_t               (*tb_item_func_repl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
-typedef tb_void_t               (*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
+/*! the item data load func type
+ *
+ * load data to the item from the stream
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ * @param stream                the stream
+ *
+ * @return                      tb_true or tb_false
+ */
+typedef tb_bool_t               (*tb_item_func_load_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream);
 
-typedef tb_void_t               (*tb_item_func_nfree_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_size_t size);
-typedef tb_void_t               (*tb_item_func_ndupl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
-typedef tb_void_t               (*tb_item_func_nrepl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
-typedef tb_void_t               (*tb_item_func_ncopy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
+/*! the item data save func type
+ *
+ * save data to the stream
+ *
+ * @param func                  the item func
+ * @param data                  the item data
+ * @param stream                the stream
+ *
+ * @return                      tb_true or tb_false
+ */
+typedef tb_bool_t               (*tb_item_func_save_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream);
+
+/*! the item free func type
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ */
+typedef tb_void_t               (*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_pointer_t buff);
+
+/*! the item duplicate func type
+ *
+ * allocate a new item and copy the item data
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ * @param data                  the item data
+ */
+typedef tb_void_t               (*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data);
+
+/*! the item replace func type
+ *
+ * free the previous item data and duplicate the new data
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ * @param data                  the item data
+ */
+typedef tb_void_t               (*tb_item_func_repl_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data);
+
+/*! the item copy func type
+ *
+ * only copy the item data and not allocate new item
+ *
+ * @param func                  the item func
+ * @param buff                 the item data address
+ * @param data                  the item data
+ */
+typedef tb_void_t               (*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data);
+
+/*! the items free func type
+ *
+ * free some items
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ * @param size                  the item count
+ */
+typedef tb_void_t               (*tb_item_func_nfree_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_size_t size);
+
+/*! the items duplicate func type
+ *
+ * duplicate some items
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ * @param data                  the item data
+ * @param size                  the item count
+ */
+typedef tb_void_t               (*tb_item_func_ndupl_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size);
+
+/*! the items replace func type
+ *
+ * replace some items
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ * @param data                  the item data
+ * @param size                  the item count
+ */
+typedef tb_void_t               (*tb_item_func_nrepl_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size);
+
+/*! the items copy func type
+ *
+ * copy some items
+ *
+ * @param func                  the item func
+ * @param buff                  the item buffer
+ * @param data                  the item data
+ * @param size                  the item count
+ */
+typedef tb_void_t               (*tb_item_func_ncopy_t)(struct __tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size);
 
 /// the item type
 typedef enum __tb_item_type_t
@@ -70,7 +199,7 @@ typedef enum __tb_item_type_t
 ,   TB_ITEM_TYPE_MEM            = 8     //!< memory
 ,   TB_ITEM_TYPE_OBJ            = 9     //!< object
 ,   TB_ITEM_TYPE_TRUE           = 10    //!< true
-,   TB_ITEM_TYPE_OTHER          = 11    //!< other
+,   TB_ITEM_TYPE_USER           = 11    //!< the user defined type
 
 }tb_item_type_t;
 
@@ -95,22 +224,28 @@ typedef struct __tb_item_func_t
     /// the compare func
     tb_item_func_comp_t     comp;
 
-    /// the data func of the item 
+    /// the data func
     tb_item_func_data_t     data;
 
-    /// the c-string func of the item 
+    /// the string func 
     tb_item_func_cstr_t     cstr;
+
+    /// the load func
+    tb_item_func_load_t     load;
+
+    /// the save func
+    tb_item_func_save_t     save;
 
     /// the free item func
     tb_item_func_free_t     free;
 
-    /// the duplicate func, duplicate data to item
+    /// the duplicate func
     tb_item_func_dupl_t     dupl;
 
-    /// the replace func, free the prev item and copy data to item, replace it
+    /// the replace func
     tb_item_func_repl_t     repl;
 
-    /// the copy func, only copy data to item
+    /// the copy func
     tb_item_func_copy_t     copy; 
 
     /// the free items func

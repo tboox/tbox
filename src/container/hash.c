@@ -36,6 +36,7 @@
 #include "../math/math.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
+#include "../stream/stream.h"
 #include "../platform/platform.h"
 #include "../algorithm/algorithm.h"
 
@@ -758,6 +759,156 @@ tb_size_t tb_hash_maxn(tb_hash_ref_t hash)
 
     // the maxn
     return impl->item_maxn;
+}
+tb_bool_t tb_hash_load(tb_hash_ref_t hash, tb_stream_ref_t stream)
+{
+    // check
+    tb_hash_impl_t* impl = (tb_hash_impl_t*)hash;
+    tb_assert_and_check_return_val(impl && stream, tb_false);
+    tb_assert_and_check_return_val(impl->name_func.load && impl->data_func.load, tb_false);
+    tb_assert_and_check_return_val(impl->name_func.free && impl->data_func.free, tb_false);
+
+    // clear the hash first
+    tb_hash_clear(hash);
+  
+    // the offset
+    tb_hize_t offset = tb_stream_offset(stream);
+
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_pointer_t    name_buff = tb_null;
+    tb_pointer_t    data_buff = tb_null;
+    do
+    {
+        // load type
+        tb_uint32_t type = tb_stream_bread_u32_be(stream);
+        tb_assert_and_check_break(type == 'hash');
+
+        // load item type 
+        tb_uint16_t name_type = tb_stream_bread_u16_be(stream);
+        tb_uint16_t data_type = tb_stream_bread_u16_be(stream);
+        tb_assert_and_check_break(name_type == impl->name_func.type);
+        tb_assert_and_check_break(data_type == impl->data_func.type);
+
+        // load item size 
+        tb_uint16_t name_size = tb_stream_bread_u16_be(stream);
+        tb_uint16_t data_size = tb_stream_bread_u16_be(stream);
+        tb_assert_and_check_break(name_size == impl->name_func.size);
+        tb_assert_and_check_break(data_size == impl->data_func.size);
+
+        // make name buffer
+        name_buff = impl->name_func.size? tb_malloc(impl->name_func.size) : tb_null;
+
+        // make data buffer
+        data_buff = impl->data_func.size? tb_malloc(impl->data_func.size) : tb_null;
+
+        // load size
+        tb_uint32_t size = tb_stream_bread_u32_be(stream);
+
+        // load hash
+        tb_uint32_t load = 0;
+        for (load = 0; load < size; load++)
+        {
+            // load name
+            if (!impl->name_func.load(&impl->name_func, name_buff, stream)) break;
+
+            // load data
+            if (!impl->data_func.load(&impl->data_func, data_buff, stream)) break;
+
+            // save name and data
+            tb_hash_set(hash, impl->name_func.data(&impl->name_func, name_buff), impl->data_func.data(&impl->data_func, data_buff));
+
+            // free name
+            impl->name_func.free(&impl->name_func, name_buff);
+
+            // free data
+            impl->data_func.free(&impl->data_func, data_buff);
+        }
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? 
+    if (!ok) 
+    {
+        // restore it
+        tb_stream_seek(stream, offset);
+
+        // clear it
+        tb_hash_clear(hash);
+    }
+
+    // exit name buffer
+    if (name_buff) tb_free(name_buff);
+    name_buff = tb_null;
+
+    // exit data buffer
+    if (data_buff) tb_free(data_buff);
+    data_buff = tb_null;
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_hash_save(tb_hash_ref_t hash, tb_stream_ref_t stream)
+{
+    // check
+    tb_hash_impl_t* impl = (tb_hash_impl_t*)hash;
+    tb_assert_and_check_return_val(impl && stream, tb_false);
+    tb_assert_and_check_return_val(impl->name_func.save && impl->data_func.save, tb_false);
+    
+    // the offset
+    tb_hize_t offset = tb_stream_offset(stream);
+
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // the size
+        tb_uint32_t size = (tb_uint32_t)tb_hash_size(hash);
+
+        // save type
+        if (!tb_stream_bwrit_u32_be(stream, 'hash')) break;
+       
+        // save item type
+        if (!tb_stream_bwrit_u16_be(stream, impl->name_func.type)) break;
+        if (!tb_stream_bwrit_u16_be(stream, impl->data_func.type)) break;
+        
+        // save item size
+        if (!tb_stream_bwrit_u16_be(stream, impl->name_func.size)) break;
+        if (!tb_stream_bwrit_u16_be(stream, impl->data_func.size)) break;
+        
+        // save size
+        if (!tb_stream_bwrit_u32_be(stream, size)) break;
+        
+        // save hash
+        tb_uint32_t save = 0;
+        tb_for_all_if (tb_hash_item_t*, item, hash, item)
+        {
+            // save name
+            if (!impl->name_func.save(&impl->name_func, item->name, stream)) break;
+
+            // save data
+            if (!impl->data_func.save(&impl->data_func, item->data, stream)) break;
+
+            // update the save count
+            save++;
+        }
+
+        // check
+        tb_assert_and_check_break(save == size); 
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? restore it
+    if (!ok) tb_stream_seek(stream, offset);
+
+    // ok?
+    return ok;
 }
 #ifdef __tb_debug__
 tb_void_t tb_hash_dump(tb_hash_ref_t hash)
