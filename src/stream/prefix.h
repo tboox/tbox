@@ -152,10 +152,4 @@ typedef enum __tb_stream_ctrl_e
 
 }tb_stream_ctrl_e;
 
-/// the stream ref type
-typedef struct{}*           tb_stream_ref_t;
-
-/// the async stream ref type
-typedef struct{}*           tb_async_stream_ref_t;
-
 #endif
