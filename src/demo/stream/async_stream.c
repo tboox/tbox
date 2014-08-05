@@ -146,6 +146,10 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_ref_t stream, tb_size
         if (!tb_async_transfer_init_istream(context->transfer, stream)) break;
         if (!tb_async_transfer_init_ostream(context->transfer, context->ostream)) break;
 
+        // the limit rate
+        if (tb_option_find(context->option, "limitrate"))
+            tb_async_transfer_limitrate(context->transfer, tb_option_item_uint32(context->option, "limitrate"));
+
         // open and done transfer
         if (!tb_async_transfer_open_done(context->transfer, 0, tb_demo_transfer_done_func, context)) break;
 
@@ -186,6 +190,7 @@ static tb_option_item_t g_options[] =
 ,   {'-',   "post-file",    TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_CSTR,        "set the post file"         }
 ,   {'-',   "range",        TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_CSTR,        "set the range"             }
 ,   {'-',   "timeout",      TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set the timeout"           }
+,   {'-',   "limitrate",    TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set the limitrate"         }
 ,   {'h',   "help",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "display this help and exit"}
 ,   {'-',   "url",          TB_OPTION_MODE_VAL,         TB_OPTION_TYPE_CSTR,        "the url"                   }
 ,   {'-',   tb_null,        TB_OPTION_MODE_MORE,        TB_OPTION_TYPE_NONE,        tb_null                     }
