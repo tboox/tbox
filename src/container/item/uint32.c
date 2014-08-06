@@ -40,13 +40,13 @@ static tb_long_t tb_item_func_uint32_comp(tb_item_func_t* func, tb_cpointer_t ld
     // compare it
     return (tb_p2u32(ldata) > tb_p2u32(rdata)? 1 : (tb_p2u32(ldata) < tb_p2u32(rdata)? -1 : 0));
 }
-static tb_pointer_t tb_item_func_uint32_data(tb_item_func_t* func, tb_cpointer_t item)
+static tb_pointer_t tb_item_func_uint32_data(tb_item_func_t* func, tb_cpointer_t buff)
 {
     // check
-    tb_assert_and_check_return_val(item, tb_null);
+    tb_assert_and_check_return_val(buff, tb_null);
 
     // the item data
-    return tb_u2p(*((tb_uint32_t*)item));
+    return tb_u2p(*((tb_uint32_t*)buff));
 }
 static tb_char_t const* tb_item_func_uint32_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
@@ -60,37 +60,56 @@ static tb_char_t const* tb_item_func_uint32_cstr(tb_item_func_t* func, tb_cpoint
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_void_t tb_item_func_uint32_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_bool_t tb_item_func_uint32_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
 {
     // check
-    tb_assert_and_check_return(item);
+    tb_assert_and_check_return_val(buff && stream, tb_false);
+
+    // load it
+    *((tb_uint32_t*)buff) = tb_stream_bread_u32_be(stream);
+
+    // ok
+    return tb_true;
+}
+static tb_bool_t tb_item_func_uint32_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
+{
+    // check
+    tb_assert_and_check_return_val(stream, tb_false);
+
+    // save it
+    return tb_stream_bwrit_u32_be(stream, (tb_uint32_t)data);
+}
+static tb_void_t tb_item_func_uint32_free(tb_item_func_t* func, tb_pointer_t buff)
+{
+    // check
+    tb_assert_and_check_return(buff);
 
     // clear
-    *((tb_uint32_t*)item) = 0;
+    *((tb_uint32_t*)buff) = 0;
 }
-static tb_void_t tb_item_func_uint32_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_uint32_copy(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(item);
+    tb_assert_and_check_return(buff);
 
     // copy item
-    *((tb_uint32_t*)item) = tb_p2u32(data);
+    *((tb_uint32_t*)buff) = tb_p2u32(data);
 }
-static tb_void_t tb_item_func_uint32_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
+static tb_void_t tb_item_func_uint32_nfree(tb_item_func_t* func, tb_pointer_t buff, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return(item);
+    tb_assert_and_check_return(buff);
 
     // clear items
-    if (size) tb_memset(item, 0, size * sizeof(tb_uint32_t));
+    if (size) tb_memset(buff, 0, size * sizeof(tb_uint32_t));
 }
-static tb_void_t tb_item_func_uint32_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
+static tb_void_t tb_item_func_uint32_ncopy(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return(item);
+    tb_assert_and_check_return(buff);
 
     // copy items
-    tb_memset_u16(item, tb_p2u32(data), size);
+    tb_memset_u16(buff, tb_p2u32(data), size);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +125,8 @@ tb_item_func_t tb_item_func_uint32()
     func.comp   = tb_item_func_uint32_comp;
     func.data   = tb_item_func_uint32_data;
     func.cstr   = tb_item_func_uint32_cstr;
+    func.load   = tb_item_func_uint32_load;
+    func.save   = tb_item_func_uint32_save;
     func.free   = tb_item_func_uint32_free;
     func.dupl   = tb_item_func_uint32_copy;
     func.repl   = tb_item_func_uint32_copy;
