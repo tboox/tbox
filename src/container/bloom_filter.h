@@ -198,6 +198,24 @@ tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_ref_t bloom_filter, 
  */
 tb_bool_t               tb_bloom_filter_get(tb_bloom_filter_ref_t bloom_filter, tb_cpointer_t data);
 
+/*! load bloom_filter from the stream
+ *
+ * @param bloom_filter  the bloom filter
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_bloom_filter_load(tb_bloom_filter_ref_t bloom_filter, tb_stream_ref_t stream);
+
+/*! save bloom_filter to the stream
+ *
+ * @param bloom_filter  the bloom filter
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_bloom_filter_save(tb_bloom_filter_ref_t bloom_filter, tb_stream_ref_t stream);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

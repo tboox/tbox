@@ -374,6 +374,24 @@ tb_size_t               tb_single_list_moveto_head(tb_single_list_ref_t list, tb
  */
 tb_size_t               tb_single_list_moveto_tail(tb_single_list_ref_t list, tb_size_t move);
 
+/*! load list from the stream
+ *
+ * @param list          the list
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_single_list_load(tb_single_list_ref_t list, tb_stream_ref_t stream);
+
+/*! save list to the stream
+ *
+ * @param list          the list
+ * @param stream        the stream
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_single_list_save(tb_single_list_ref_t list, tb_stream_ref_t stream);
+
 /*! the item count
  *
  * @param list          the list
