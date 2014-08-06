@@ -581,7 +581,7 @@ tb_bool_t tb_vector_load(tb_vector_ref_t vector, tb_stream_ref_t stream)
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
     tb_assert_and_check_return_val(impl && stream, tb_false);
-    tb_assert_and_check_return_val(impl->func.load && impl->func.free, tb_false);
+    tb_assert_and_check_return_val(impl->func.hash && impl->func.load && impl->func.free, tb_false);
 
     // clear the vector first
     tb_vector_clear(vector);
@@ -630,7 +630,7 @@ tb_bool_t tb_vector_load(tb_vector_ref_t vector, tb_stream_ref_t stream)
             // calc item
             crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, hash);
 
-            // save name and data
+            // save item
             tb_vector_insert_tail(vector, data);
 
             // free name
@@ -671,7 +671,7 @@ tb_bool_t tb_vector_save(tb_vector_ref_t vector, tb_stream_ref_t stream)
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
     tb_assert_and_check_return_val(impl && stream, tb_false);
-    tb_assert_and_check_return_val(impl->func.save, tb_false);
+    tb_assert_and_check_return_val(impl->func.hash && impl->func.save, tb_false);
     
     // the offset
     tb_hize_t offset = tb_stream_offset(stream);
