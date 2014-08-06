@@ -27,7 +27,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
 #include "vector.h"
 #include "item.h"
 
@@ -136,6 +135,24 @@ tb_void_t           tb_stack_pop(tb_stack_ref_t stack);
  * @return          the stack top item
  */
 tb_pointer_t        tb_stack_top(tb_stack_ref_t stack);
+
+/*! load stack from the stream
+ *
+ * @param stack    the stack
+ * @param stream    the stream
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_stack_load(tb_stack_ref_t stack, tb_stream_ref_t stream);
+
+/*! save stack to the stream
+ *
+ * @param stack    the stack
+ * @param stream    the stream
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_stack_save(tb_stack_ref_t stack, tb_stream_ref_t stream);
 
 /*! the stack size
  *

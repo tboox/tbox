@@ -307,6 +307,24 @@ tb_void_t           tb_vector_nremove_head(tb_vector_ref_t vector, tb_size_t siz
  */
 tb_void_t           tb_vector_nremove_last(tb_vector_ref_t vector, tb_size_t size);
 
+/*! load vector from the stream
+ *
+ * @param vector    the vector
+ * @param stream    the stream
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_vector_load(tb_vector_ref_t vector, tb_stream_ref_t stream);
+
+/*! save vector to the stream
+ *
+ * @param vector    the vector
+ * @param stream    the stream
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_vector_save(tb_vector_ref_t vector, tb_stream_ref_t stream);
+
 /*! the vector size
  *
  * @param vector    the vector

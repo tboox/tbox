@@ -35,7 +35,9 @@
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
+#include "../stream/stream.h"
 #include "../platform/platform.h"
+#include "../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -574,4 +576,160 @@ tb_void_t tb_vector_nremove_last(tb_vector_ref_t vector, tb_size_t size)
     // remove last
     tb_vector_nremove(vector, impl->size - size, size);
 }
+tb_bool_t tb_vector_load(tb_vector_ref_t vector, tb_stream_ref_t stream)
+{
+    // check
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return_val(impl && stream, tb_false);
+    tb_assert_and_check_return_val(impl->func.load && impl->func.free, tb_false);
 
+    // clear the vector first
+    tb_vector_clear(vector);
+  
+    // the offset
+    tb_hize_t offset = tb_stream_offset(stream);
+
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_uint32_t     crc32 = 0;
+    tb_pointer_t    buff = tb_null;
+    do
+    {
+        // calc type
+        crc32 = tb_crc_encode_cstr(TB_CRC_MODE_32_IEEE_LE, crc32, "vector");
+
+        // calc item type
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->func.type);
+
+        // calc item size
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->func.size);
+
+        // load the head crc32
+        tb_uint32_t crc32_head = tb_stream_bread_u32_be(stream);
+        tb_assert_and_check_break(crc32_head == crc32);
+
+        // make item buffer
+        buff = impl->func.size? tb_malloc(impl->func.size) : tb_null;
+
+        // load size
+        tb_uint32_t size = tb_stream_bread_u32_be(stream);
+
+        // load vector
+        tb_uint32_t load = 0;
+        for (load = 0; load < size; load++)
+        {
+            // load item
+            if (!impl->func.load(&impl->func, buff, stream)) break;
+
+            // the item data
+            tb_cpointer_t data = impl->func.data(&impl->func, buff);
+
+            // hash item
+            tb_size_t hash = impl->func.hash(&impl->func, data, -1, 0);
+
+            // calc item
+            crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, hash);
+
+            // save name and data
+            tb_vector_insert_tail(vector, data);
+
+            // free name
+            impl->func.free(&impl->func, buff);
+        }
+
+        // check
+        tb_assert_and_check_break(load == size);
+
+        // load the body crc32
+        tb_uint32_t crc32_body = tb_stream_bread_u32_be(stream);
+        tb_assert_and_check_break(crc32_body == crc32);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? 
+    if (!ok) 
+    {
+        // restore it
+        tb_stream_seek(stream, offset);
+
+        // clear it
+        tb_vector_clear(vector);
+    }
+
+    // exit buffer
+    if (buff) tb_free(buff);
+    buff = tb_null;
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_vector_save(tb_vector_ref_t vector, tb_stream_ref_t stream)
+{
+    // check
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return_val(impl && stream, tb_false);
+    tb_assert_and_check_return_val(impl->func.save, tb_false);
+    
+    // the offset
+    tb_hize_t offset = tb_stream_offset(stream);
+
+    // done
+    tb_bool_t   ok = tb_false;
+    tb_uint32_t crc32 = 0;
+    do
+    {
+        // calc type
+        crc32 = tb_crc_encode_cstr(TB_CRC_MODE_32_IEEE_LE, crc32, "vector");
+
+        // calc item type
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->func.type);
+
+        // calc item size
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->func.size);
+
+        // save the head crc32
+        if (!tb_stream_bwrit_u32_be(stream, crc32)) break;
+
+        // the size
+        tb_size_t size = tb_vector_size(vector);
+
+        // save size
+        if (!tb_stream_bwrit_u32_be(stream, (tb_uint32_t)size)) break;
+        
+        // save vector
+        tb_size_t save = 0;
+        tb_for_all (tb_cpointer_t, item, vector)
+        {
+            // save item
+            if (!impl->func.save(&impl->func, item, stream)) break;
+
+            // hash item
+            tb_size_t hash = impl->func.hash(&impl->func, item, -1, 0);
+
+            // calc item
+            crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, hash);
+
+            // update the save count
+            save++;
+        }
+
+        // check
+        tb_assert_and_check_break(save == size); 
+ 
+        // save the body crc32
+        if (!tb_stream_bwrit_u32_be(stream, crc32)) break;
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? restore it
+    if (!ok) tb_stream_seek(stream, offset);
+
+    // ok?
+    return ok;
+}
