@@ -93,7 +93,7 @@ contact
 usage
 -----
 
-<pre><code>
+```bash
 	// configure
     make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=]
     make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]
@@ -124,12 +124,12 @@ usage
 
 	// help
     make help|h
-</code></pre>
+```
 
 build
 -----
 
-<pre><code>
+```bash
 	// build for linux-x86 debug
     cd ./tbox
     [make f PLAT=linux ARCH=x86 DEBUG=y] => optional
@@ -192,7 +192,7 @@ build
     cd ./tbox
     make f PLAT=mingw ARCH=x86 BIN="/home/xxx/bin" PRE="i386-mingw32-"
     make r
-</code></pre>
+```
 
 development
 -----------
@@ -223,7 +223,7 @@ development
 
 example
 -----------
-<pre><code>
+```c
     #include "tbox/tbox.h"
 
     int main(int argc, char** argv)
@@ -276,6 +276,6 @@ example
         tb_exit();
         return 0;
     }
-</code></pre>
+```
 
 

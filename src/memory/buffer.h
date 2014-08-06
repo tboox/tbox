@@ -38,19 +38,19 @@ __tb_extern_c_enter__
  * types
  */
 
-// the buffer type
+/// the buffer type
 typedef struct __tb_buffer_t
 {
-    // the buffer data
+    /// the buffer data
     tb_byte_t*      data;
 
-    // the buffer size
+    /// the buffer size
     tb_size_t       size;
 
-    // the buffer maxn
+    /// the buffer maxn
     tb_size_t       maxn;
 
-    // the static buffer
+    /// the static buffer
 #ifdef __tb_small__
     tb_byte_t       buff[32];
 #else
