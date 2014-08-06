@@ -43,13 +43,13 @@ static tb_long_t tb_item_func_mem_comp(tb_item_func_t* func, tb_cpointer_t ldata
     // comp
     return tb_memcmp(ldata, rdata, func->size);
 }
-static tb_pointer_t tb_item_func_mem_data(tb_item_func_t* func, tb_cpointer_t item)
+static tb_pointer_t tb_item_func_mem_data(tb_item_func_t* func, tb_cpointer_t buff)
 {
     // check
-    tb_assert_and_check_return_val(func && item, tb_null);
+    tb_assert_and_check_return_val(func && buff, tb_null);
 
     // the item data
-    return (tb_pointer_t)item;
+    return (tb_pointer_t)buff;
 }
 static tb_char_t const* tb_item_func_mem_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
@@ -63,83 +63,99 @@ static tb_char_t const* tb_item_func_mem_cstr(tb_item_func_t* func, tb_cpointer_
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_bool_t tb_item_func_mem_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item);
+    tb_assert_and_check_return_val(func && func->size && buff && stream, tb_false);
+
+    // load data
+    return tb_stream_bread(stream, (tb_byte_t*)buff, func->size);
+}
+static tb_bool_t tb_item_func_mem_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
+{
+    // check
+    tb_assert_and_check_return_val(func && func->size && stream && data, tb_false);
+ 
+    // save data
+    return tb_stream_bwrit(stream, (tb_byte_t const*)data, func->size);
+}
+static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_pointer_t buff)
+{
+    // check
+    tb_assert_and_check_return(func && func->size && buff);
 
     // clear it
-    tb_memset(item, 0, func->size);
+    tb_memset(buff, 0, func->size);
 }
-static tb_void_t tb_item_func_mem_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_mem_dupl(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item && data);
+    tb_assert_and_check_return(func && func->size && buff && data);
 
     // copy item
-    tb_memcpy(item, data, func->size);
+    tb_memcpy(buff, data, func->size);
 }
-static tb_void_t tb_item_func_mem_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_mem_repl(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item && data);
+    tb_assert_and_check_return(func && func->size && buff && data);
 
     // the free is hooked? free it 
     if (func->free != tb_item_func_mem_free && func->free)
-        func->free(func, item);
+        func->free(func, buff);
 
     // copy item
-    tb_memcpy(item, data, func->size);
+    tb_memcpy(buff, data, func->size);
 }
-static tb_void_t tb_item_func_mem_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_mem_copy(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item && data);
+    tb_assert_and_check_return(func && func->size && buff && data);
 
     // copy item
-    tb_memcpy(item, data, func->size);
+    tb_memcpy(buff, data, func->size);
 }
-static tb_void_t tb_item_func_mem_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
+static tb_void_t tb_item_func_mem_nfree(tb_item_func_t* func, tb_pointer_t buff, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item);
+    tb_assert_and_check_return(func && func->size && buff);
 
     // the free is hooked? free it 
     if (func->free != tb_item_func_mem_free && func->free)
     {
         tb_size_t n = size;
-        while (n--) func->free(func, (tb_byte_t*)item + n * func->size);
+        while (n--) func->free(func, (tb_byte_t*)buff + n * func->size);
     }
 
     // clear
-    if (size) tb_memset(item, 0, size * func->size);
+    if (size) tb_memset(buff, 0, size * func->size);
 }
-static tb_void_t tb_item_func_mem_ndupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
+static tb_void_t tb_item_func_mem_ndupl(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item && data);
+    tb_assert_and_check_return(func && func->size && buff && data);
 
     // copy items
-    if (func->ncopy) func->ncopy(func, item, data, size);
+    if (func->ncopy) func->ncopy(func, buff, data, size);
 }
-static tb_void_t tb_item_func_mem_nrepl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
+static tb_void_t tb_item_func_mem_nrepl(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item && data);
+    tb_assert_and_check_return(func && func->size && buff && data);
 
     // free items
-    if (func->nfree) func->nfree(func, item, size);
+    if (func->nfree) func->nfree(func, buff, size);
 
     // copy items
-    if (func->ncopy) func->ncopy(func, item, data, size);
+    if (func->ncopy) func->ncopy(func, buff, data, size);
 }
-static tb_void_t tb_item_func_mem_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
+static tb_void_t tb_item_func_mem_ncopy(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return(func && func->size && item && data);
+    tb_assert_and_check_return(func && func->size && buff && data);
 
     // copy items
-    while (size--) tb_memcpy((tb_byte_t*)item + size * func->size, data, func->size);
+    while (size--) tb_memcpy((tb_byte_t*)buff + size * func->size, data, func->size);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +174,8 @@ tb_item_func_t tb_item_func_mem(tb_size_t size, tb_item_func_free_t free, tb_cpo
     func.comp   = tb_item_func_mem_comp;
     func.data   = tb_item_func_mem_data;
     func.cstr   = tb_item_func_mem_cstr;
+    func.load   = tb_item_func_mem_load;
+    func.save   = tb_item_func_mem_save;
     func.free   = free? free : tb_item_func_mem_free;
     func.dupl   = tb_item_func_mem_dupl;
     func.repl   = tb_item_func_mem_repl;

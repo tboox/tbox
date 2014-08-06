@@ -32,6 +32,7 @@
 #include "../../utils/utils.h"
 #include "../../memory/memory.h"
 #include "../../object/object.h"
+#include "../../stream/stream.h"
 #include "../../platform/platform.h"
 
 

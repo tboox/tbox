@@ -94,3 +94,4 @@ tb_uint32_t tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t co
     // ok?
     return crc;
 }
+

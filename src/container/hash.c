@@ -767,6 +767,7 @@ tb_bool_t tb_hash_load(tb_hash_ref_t hash, tb_stream_ref_t stream)
     tb_assert_and_check_return_val(impl && stream, tb_false);
     tb_assert_and_check_return_val(impl->name_func.load && impl->data_func.load, tb_false);
     tb_assert_and_check_return_val(impl->name_func.free && impl->data_func.free, tb_false);
+    tb_assert_and_check_return_val(impl->name_func.hash && impl->data_func.hash, tb_false);
 
     // clear the hash first
     tb_hash_clear(hash);
@@ -776,25 +777,29 @@ tb_bool_t tb_hash_load(tb_hash_ref_t hash, tb_stream_ref_t stream)
 
     // done
     tb_bool_t       ok = tb_false;
+    tb_uint32_t     crc32 = 0;
     tb_pointer_t    name_buff = tb_null;
     tb_pointer_t    data_buff = tb_null;
     do
     {
-        // load type
-        tb_uint32_t type = tb_stream_bread_u32_be(stream);
-        tb_assert_and_check_break(type == 'hash');
+        // calc type
+        crc32 = tb_crc_encode_cstr(TB_CRC_MODE_32_IEEE_LE, crc32, "hash");
 
-        // load item type 
-        tb_uint16_t name_type = tb_stream_bread_u16_be(stream);
-        tb_uint16_t data_type = tb_stream_bread_u16_be(stream);
-        tb_assert_and_check_break(name_type == impl->name_func.type);
-        tb_assert_and_check_break(data_type == impl->data_func.type);
+        // calc name type
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->name_func.type);
 
-        // load item size 
-        tb_uint16_t name_size = tb_stream_bread_u16_be(stream);
-        tb_uint16_t data_size = tb_stream_bread_u16_be(stream);
-        tb_assert_and_check_break(name_size == impl->name_func.size);
-        tb_assert_and_check_break(data_size == impl->data_func.size);
+        // calc data type
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->data_func.type);
+       
+        // calc name size
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->name_func.size);
+
+        // calc data size
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->data_func.size);
+       
+        // load the head crc32
+        tb_uint32_t crc32_head = tb_stream_bread_u32_be(stream);
+        tb_assert_and_check_break(crc32_head == crc32);
 
         // make name buffer
         name_buff = impl->name_func.size? tb_malloc(impl->name_func.size) : tb_null;
@@ -815,8 +820,26 @@ tb_bool_t tb_hash_load(tb_hash_ref_t hash, tb_stream_ref_t stream)
             // load data
             if (!impl->data_func.load(&impl->data_func, data_buff, stream)) break;
 
+            // the name data
+            tb_cpointer_t name_data = impl->name_func.data(&impl->name_func, name_buff);
+
+            // the data data
+            tb_cpointer_t data_data = impl->data_func.data(&impl->data_func, data_buff);
+
+            // hash name
+            tb_size_t name_hash = impl->name_func.hash(&impl->name_func, name_data, -1, 0);
+
+            // hash data
+            tb_size_t data_hash = impl->data_func.hash(&impl->data_func, data_data, -1, 0);
+
+            // calc name
+            crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, name_hash);
+
+            // calc data
+            crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, data_hash);
+
             // save name and data
-            tb_hash_set(hash, impl->name_func.data(&impl->name_func, name_buff), impl->data_func.data(&impl->data_func, data_buff));
+            tb_hash_set(hash, name_data, data_data);
 
             // free name
             impl->name_func.free(&impl->name_func, name_buff);
@@ -824,6 +847,13 @@ tb_bool_t tb_hash_load(tb_hash_ref_t hash, tb_stream_ref_t stream)
             // free data
             impl->data_func.free(&impl->data_func, data_buff);
         }
+
+        // check
+        tb_assert_and_check_break(load == size);
+
+        // load the body crc32
+        tb_uint32_t crc32_body = tb_stream_bread_u32_be(stream);
+        tb_assert_and_check_break(crc32_body == crc32);
 
         // ok
         ok = tb_true;
@@ -857,33 +887,42 @@ tb_bool_t tb_hash_save(tb_hash_ref_t hash, tb_stream_ref_t stream)
     tb_hash_impl_t* impl = (tb_hash_impl_t*)hash;
     tb_assert_and_check_return_val(impl && stream, tb_false);
     tb_assert_and_check_return_val(impl->name_func.save && impl->data_func.save, tb_false);
+    tb_assert_and_check_return_val(impl->name_func.hash && impl->data_func.hash, tb_false);
     
     // the offset
     tb_hize_t offset = tb_stream_offset(stream);
 
     // done
-    tb_bool_t ok = tb_false;
+    tb_bool_t   ok = tb_false;
+    tb_uint32_t crc32 = 0;
     do
     {
-        // the size
-        tb_uint32_t size = (tb_uint32_t)tb_hash_size(hash);
+        // calc type
+        crc32 = tb_crc_encode_cstr(TB_CRC_MODE_32_IEEE_LE, crc32, "hash");
 
-        // save type
-        if (!tb_stream_bwrit_u32_be(stream, 'hash')) break;
+        // calc name type
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->name_func.type);
+
+        // calc data type
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->data_func.type);
        
-        // save item type
-        if (!tb_stream_bwrit_u16_be(stream, impl->name_func.type)) break;
-        if (!tb_stream_bwrit_u16_be(stream, impl->data_func.type)) break;
-        
-        // save item size
-        if (!tb_stream_bwrit_u16_be(stream, impl->name_func.size)) break;
-        if (!tb_stream_bwrit_u16_be(stream, impl->data_func.size)) break;
-        
+        // calc name size
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->name_func.size);
+
+        // calc data size
+        crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, impl->data_func.size);
+       
+        // save the head crc32
+        if (!tb_stream_bwrit_u32_be(stream, crc32)) break;
+
+        // the size
+        tb_size_t size = tb_hash_size(hash);
+
         // save size
-        if (!tb_stream_bwrit_u32_be(stream, size)) break;
+        if (!tb_stream_bwrit_u32_be(stream, (tb_uint32_t)size)) break;
         
         // save hash
-        tb_uint32_t save = 0;
+        tb_size_t save = 0;
         tb_for_all_if (tb_hash_item_t*, item, hash, item)
         {
             // save name
@@ -892,13 +931,28 @@ tb_bool_t tb_hash_save(tb_hash_ref_t hash, tb_stream_ref_t stream)
             // save data
             if (!impl->data_func.save(&impl->data_func, item->data, stream)) break;
 
+            // hash name
+            tb_size_t name_hash = impl->name_func.hash(&impl->name_func, item->name, -1, 0);
+
+            // hash data
+            tb_size_t data_hash = impl->data_func.hash(&impl->data_func, item->data, -1, 0);
+
+            // calc name
+            crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, name_hash);
+
+            // calc data
+            crc32 = tb_crc_encode_value(TB_CRC_MODE_32_IEEE_LE, crc32, data_hash);
+
             // update the save count
             save++;
         }
 
         // check
         tb_assert_and_check_break(save == size); 
-
+ 
+        // save the body crc32
+        if (!tb_stream_bwrit_u32_be(stream, crc32)) break;
+        
         // ok
         ok = tb_true;
 
