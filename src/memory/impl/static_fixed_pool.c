@@ -649,7 +649,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
         tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
 
         // dump data
-        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[stat_fixed_pool]: [error]: ");
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[static_fixed_pool]: [error]: ");
 
         // abort
         tb_abort();

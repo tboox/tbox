@@ -38,29 +38,24 @@
  *
  *
  * <pre>   
- *                                                                  wait - loop
- *                                                                   | 
- *                                                                   |                                          - data
- *                                                                 [aioo]                                       |
- *                                                           ----- stream -------- stream ----------------------- file
- *                                                           |                        |                         |
- *                                                           |                        |                         - sock 
- *                                                           |                        |                         |
- *                                                           |                        |                         - http
- *                                                           |                        |           - charset
- *                                                           |                        |          |
- *                                                           |                        - filter - |- chunked 
- *                                       transfer ---------  |                                   |        
- *                                                           |                                   |- cache
- *                                                           |                                   |
- *                                                           |                                    - zip
- *                                                           |
- *                                                           ----- stream
- *
- *
- *
- *
- *                                                            
+ *                             wait - loop
+ *                              | 
+ *                              |                                          - data
+ *                            [aioo]                                       |
+ *                      ----- stream -------- stream ----------------------- file
+ *                      |                        |                         |
+ *                      |                        |                         - sock 
+ *                      |                        |                         |
+ *                      |                        |                         - http
+ *                      |                        |           - charset
+ *                      |                        |          |
+ *                      |                        - filter - |- chunked 
+ *  transfer ---------  |                                   |        
+ *                      |                                   |- cache
+ *                      |                                   |
+ *                      |                                    - zip
+ *                      |
+ *                      ----- stream                
  *                                                            
  *                                                                        - loop
  *                                                                 [asio] |
