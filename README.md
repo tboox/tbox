@@ -181,7 +181,7 @@ build
     [make f PLAT=mingw ARCH=x86] => optional
     make r
 
-	// build for windows using cygwin and need link libgcc.a from mingw
+	// build for windows using cygwin 
     run cygwin
     cd ./tbox
     [make f PLAT=cygwin ARCH=x86] => optional
