@@ -156,7 +156,7 @@ tb_hong_t tb_transfer_done(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_
     // ok?
     return writ;
 }
-tb_hong_t tb_transfer_done_stream_to_url(tb_stream_ref_t istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_to_url(tb_stream_ref_t istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(istream && ourl, -1);
@@ -189,7 +189,7 @@ tb_hong_t tb_transfer_done_stream_to_url(tb_stream_ref_t istream, tb_char_t cons
     // ok?
     return size;
 }
-tb_hong_t tb_transfer_done_stream_to_data(tb_stream_ref_t istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_to_data(tb_stream_ref_t istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(istream && odata && osize, -1);
@@ -215,7 +215,7 @@ tb_hong_t tb_transfer_done_stream_to_data(tb_stream_ref_t istream, tb_byte_t* od
     // ok?
     return size;
 }
-tb_hong_t tb_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
+tb_hong_t tb_transfer_done_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(iurl && ourl, -1);

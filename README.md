@@ -255,14 +255,14 @@ example
         if (stream)
         {
             // save stream data to file
-            tb_transfer_done_stream_to_url(stream, "/home/file/index.html", 0, tb_null, tb_null);
+            tb_transfer_done_to_url(stream, "/home/file/index.html", 0, tb_null, tb_null);
 
             // exit stream
             tb_stream_exit(stream);
         }
 
         // block: save http to file
-        tb_transfer_done_url_to_url("http://www.xxxx.com/index.html", "/home/file/index.html", 0, tb_null, tb_null);
+        tb_transfer_done_url("http://www.xxxx.com/index.html", "/home/file/index.html", 0, tb_null, tb_null);
 
         // async: save http to file
         tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index0.html", "/home/file/index0.html", 0, 0, tb_null, tb_null);

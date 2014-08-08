@@ -63,6 +63,10 @@ ASFLAGS_RELEASE += $(ASFLAGS_RELEASE-y)
 ARFLAGS_RELEASE += $(ARFLAGS_RELEASE-y)
 SHFLAGS_RELEASE += $(SHFLAGS_RELEASE-y)
 
+# append projects
+DEP_PROS += $(DEP_PROS-y)
+SUB_PROS += $(SUB_PROS-y)
+
 # append debug flags
 ifeq ($(DEBUG),y)
 CFLAGS += $(CFLAGS_DEBUG)
@@ -120,7 +124,6 @@ $(1)_INC_DIR := $(sort $($(1)_INC_DIR))
 $(1)_LIB_DIR := $(sort $($(1)_LIB_DIR))
 endef
 $(foreach name, $(NAMES), $(eval $(call REMOVE_REPEAT_FILES,$(name))))
-
 
 # cflags & ldflags
 define MAKE_DEFINE_FLAGS
