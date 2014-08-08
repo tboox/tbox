@@ -19,7 +19,7 @@
 .ccache
 .demo
 .config.mak
-src/config.h
+src/tbox/config.h
 .svn
 .DS_Store
 tool/msys
