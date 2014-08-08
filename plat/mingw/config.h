@@ -1,6 +1,15 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// major version
+#define TB_CONFIG_VERSION_MAJOR         [major]
+
+// minor version
+#define TB_CONFIG_VERSION_MINOR         [minor]
+
+// alter version
+#define TB_CONFIG_VERSION_ALTER         [alter]
+
 // build version
 #define TB_CONFIG_VERSION_BUILD         [build]
 

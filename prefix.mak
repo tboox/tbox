@@ -1,7 +1,7 @@
 # prefix makefile
 
-# the project name
-PRO_NAME 		= tbox
+# include project
+include 		$(PRO_DIR)/project.mak
 
 # the source directory
 SRC_DIR 		= $(PRO_DIR)/src
@@ -21,6 +21,6 @@ LIB_DIR 		= $(PRO_DIR)/lib/$(PLAT)/$(ARCH)
 # the platform directory
 PLAT_DIR 		= $(PRO_DIR)/plat/$(PLAT)
 
-# platform prefix
+# include platform prefix
 -include 		$(PLAT_DIR)/prefix.mak
 

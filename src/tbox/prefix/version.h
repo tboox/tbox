@@ -34,9 +34,9 @@
  */
 
 // version: v1.4.7
-#define TB_VERSION_MAJOR            1
-#define TB_VERSION_MINOR            4
-#define TB_VERSION_ALTER            7
+#define TB_VERSION_MAJOR            TB_CONFIG_VERSION_MAJOR
+#define TB_VERSION_MINOR            TB_CONFIG_VERSION_MINOR
+#define TB_VERSION_ALTER            TB_CONFIG_VERSION_ALTER
 #define TB_VERSION_BUILD            TB_CONFIG_VERSION_BUILD
 #define TB_VERSION_BUILD_STRING     __tb_mstring_ex__(TB_CONFIG_VERSION_BUILD)
 #define TB_VERSION_STRING           __tb_mstrcat6__("tbox_", __tb_mstring_ex__(__tb_mconcat8_ex__(v, TB_VERSION_MAJOR, _, TB_VERSION_MINOR, _, TB_VERSION_ALTER, _, TB_CONFIG_VERSION_BUILD)), "_", TB_ARCH_VERSION_STRING, " by ", TB_COMPILER_VERSION_STRING)
