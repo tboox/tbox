@@ -691,6 +691,9 @@ INC_FILES 				= \
 						libm/ceil.h \
 						libm/floor.h
 
+# demo
+SUB_PROS-$(DEMO) 		+= ../demo
+
 # suffix
 include $(PRO_DIR)/suffix.mak
 
