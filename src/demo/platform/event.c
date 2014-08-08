@@ -4,56 +4,90 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_TEST_ITEM_MAX    (10)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
-typedef struct __tb_test_item_t
+typedef struct __tb_demo_loop_t
 {
-    tb_handle_t     e;
-    tb_handle_t     t;
-    tb_size_t       i   : 24;
-    tb_size_t       q   : 8;
+    // the event
+    tb_event_ref_t      event;
 
-}tb_test_item_t;
+    // the loop
+    tb_thread_ref_t     loop;
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-tb_char_t* gets(tb_char_t*);
+    // the index
+    tb_size_t           index;
+
+    // is stoped?
+    tb_atomic_t         bstoped;
+
+}tb_demo_loop_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * thread
  */
-static tb_pointer_t tb_test_thread(tb_cpointer_t priv)
+static tb_char_t const* tb_demo_gets(tb_char_t* line, tb_size_t maxn)
 {
-    tb_test_item_t* it = (tb_test_item_t*)priv;
-    tb_assert_and_check_goto(it, end);
-    tb_trace_i("[thread: %u]: init", it->i);
+    // check
+    tb_assert_and_check_return_val(line && maxn, tb_null);
 
-    // loop
-    while (1)
+    // done
+    tb_char_t* p = line;
+    tb_char_t* e = line + maxn;
+    while (p < e)
     {
-        // wait
-        tb_trace_i("[event: %u]: wait", it->i);
-        tb_long_t r = tb_event_wait(it->e, -1);
-        tb_assert_and_check_goto(r >= 0, end);
+        // get character
+        tb_char_t ch = getchar(); if (ch == '\r') getchar();
+        tb_check_break(ch != '\r' && ch != '\n');
 
-        // quit?
-        tb_check_goto(!it->q, end);
-
-        // timeout?
-        tb_check_continue(r);
-
-        // signal
-        tb_trace_i("[event: %u]: signal", it->i);
+        // append digit
+        if (tb_isdigit(ch)) *p++ = ch;
+        else
+        {
+            // trace
+            tb_trace_e("invalid character: %x, please input digit!", ch);
+        }
     }
 
-end:
-    tb_trace_i("[thread: %u]: exit", it? it->i : 0);
+    // end
+    if (p < e) *p = '\0';
+
+    // ok?
+    return line;
+}
+static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
+{
+    // check
+    tb_demo_loop_t* loop = (tb_demo_loop_t*)priv;
+
+    // done
+    do
+    {
+        // check
+        tb_assert_and_check_break(loop);
+
+        // trace
+        tb_trace_i("[thread: %lu]: init", loop->index);
+
+        // loop
+        while (!tb_atomic_get(&loop->bstoped))
+        {
+            // wait
+            tb_long_t wait = tb_event_wait(loop->event, -1);
+            tb_assert_and_check_break(wait >= 0);
+
+            // timeout?
+            tb_check_continue(wait);
+
+            // trace
+            tb_trace_i("[event: %lu]: wait: ok", loop->index);
+        }
+
+    } while (0);
+
+    // trace
+    tb_trace_i("[thread: %lu]: exit", loop? loop->index : 0);
+
+    // end
     tb_thread_return(tb_null);
     return tb_null;
 }
@@ -63,71 +97,106 @@ end:
  */ 
 tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
 {
-    // init item
-    tb_test_item_t it[TB_TEST_ITEM_MAX] = {{0}};
-
-    // init thread
-    tb_size_t i = 0;
-    for (i = 0; i < TB_TEST_ITEM_MAX; i++)
+    // init loop
+    tb_demo_loop_t  loop[10];
+    tb_size_t       i = 0;
+    tb_size_t       n = tb_arrayn(loop);
+    for (i = 0; i < n; i++)
     {
-        it[i].i = i;
-        it[i].e = tb_event_init(); tb_event_post(it[i].e);
-        it[i].t = tb_thread_init(tb_null, tb_test_thread, it + i, 0);
-        tb_assert_and_check_goto(it[i].t, end);
+        // init event
+        loop[i].event = tb_event_init(); 
+        tb_assert_and_check_break(loop[i].event);
+
+        // post event
+        tb_event_post(loop[i].event);
+
+        // init index
+        loop[i].index = i;
+
+        // init stoped
+        loop[i].bstoped = 0;
+
+        // init loop
+        loop[i].loop = tb_thread_init(tb_null, tb_demo_loop, loop + i, 0);
+        tb_assert_and_check_break(loop[i].loop);
     }
+
+    // check
+    tb_assert_and_check_return_val(i == n, 0);
+
+    // wait some time
     tb_msleep(100);
 
     // post
-    tb_char_t s[256];
-    while (1)
+    tb_char_t line[256];
+    tb_bool_t stop = tb_false;
+    while (!stop)
     {
-        tb_char_t const* p = gets(s);
-        if (p)
+        // get line
+        tb_char_t const* p = tb_demo_gets(line, sizeof(line));
+        tb_assert_and_check_break(p);
+
+        // trace
+        tb_trace_i("post: %s", p);
+
+        // done
+        while (*p && !stop)
         {
-            while (*p)
+            tb_char_t ch = *p++;
+            switch (ch)
             {
-                tb_char_t ch = *p++;
-                switch (ch)
+            case 'q':
+                stop = tb_true;
+                break;
+            default:
                 {
-                case 'q':
-                    goto end;
-                default:
+                    if (ch >= '0' && ch <= '9')
                     {
-                        if (ch >= '0' && ch <= '9')
-                        {
-                            // post event
-                            tb_size_t i = ch - '0';
-                            if (it[i].e) tb_event_post(it[i].e);
-                        }
+                        // the index
+                        tb_size_t index = ch - '0';
+                        tb_assert_and_check_break(index < n && index == loop[index].index);
+
+                        // post event
+                        if (loop[index].event) tb_event_post(loop[index].event);
                     }
-                    break;
                 }
+                break;
             }
         }
     }
 
-end:
-    // exit thread
-    for (i = 0; i < TB_TEST_ITEM_MAX; i++)
+    // post loop
+    for (i = 0; i < n; i++)
     {
         // quit thread
-        it[i].q = 1;
+        tb_atomic_set(&loop[i].bstoped, 1);
 
         // post event
-        if (it[i].e) tb_event_post(it[i].e);
+        if (loop[i].event) tb_event_post(loop[i].event);
+    }
 
-        // kill thread
-        if (it[i].t) 
+    // exit loop
+    for (i = 0; i < n; i++)
+    {
+        // exit loop
+        if (loop[i].loop) 
         {
-            tb_thread_wait(it[i].t, 5000);
-            tb_thread_exit(it[i].t);
+            // wait it
+            if (!tb_thread_wait(loop[i].loop, 5000))
+            {
+                // trace
+                tb_trace_e("wait loop[%lu]: timeout", i);
+            }
+
+            // exit it
+            tb_thread_exit(loop[i].loop);
         }
 
         // exit event
-        if (it[i].e) tb_event_exit(it[i].e);
+        if (loop[i].event) tb_event_exit(loop[i].event);
     }
 
-    tb_trace_i("quit");
-
+    // exit
+    tb_trace_i("exit");
     return 0;
 }

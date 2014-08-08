@@ -15,7 +15,7 @@
 static tb_size_t tb_vector_insert_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -44,7 +44,7 @@ static tb_size_t tb_vector_insert_test()
 static tb_size_t tb_vector_insert_head_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -73,7 +73,7 @@ static tb_size_t tb_vector_insert_head_test()
 static tb_size_t tb_vector_insert_tail_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -102,7 +102,7 @@ static tb_size_t tb_vector_insert_tail_test()
 static tb_size_t tb_vector_ninsert_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     // insert one first
@@ -133,7 +133,7 @@ static tb_size_t tb_vector_ninsert_test()
 static tb_size_t tb_vector_ninsert_head_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -161,7 +161,7 @@ static tb_size_t tb_vector_ninsert_head_test()
 static tb_size_t tb_vector_ninsert_tail_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -190,7 +190,7 @@ static tb_size_t tb_vector_ninsert_tail_test()
 static tb_size_t tb_vector_remove_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -214,7 +214,7 @@ static tb_size_t tb_vector_remove_test()
 static tb_size_t tb_vector_remove_head_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -238,7 +238,7 @@ static tb_size_t tb_vector_remove_head_test()
 static tb_size_t tb_vector_remove_last_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -262,7 +262,7 @@ static tb_size_t tb_vector_remove_last_test()
 static tb_size_t tb_vector_nremove_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -285,7 +285,7 @@ static tb_size_t tb_vector_nremove_test()
 static tb_size_t tb_vector_nremove_head_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -308,7 +308,7 @@ static tb_size_t tb_vector_nremove_head_test()
 static tb_size_t tb_vector_nremove_last_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -331,7 +331,7 @@ static tb_size_t tb_vector_nremove_last_test()
 static tb_size_t tb_vector_replace_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -358,7 +358,7 @@ static tb_size_t tb_vector_replace_test()
 static tb_size_t tb_vector_replace_head_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -383,7 +383,7 @@ static tb_size_t tb_vector_replace_head_test()
 static tb_size_t tb_vector_replace_last_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
@@ -409,7 +409,7 @@ static tb_size_t tb_vector_replace_last_test()
 static tb_size_t tb_vector_nreplace_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -434,7 +434,7 @@ static tb_size_t tb_vector_nreplace_test()
 static tb_size_t tb_vector_nreplace_head_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -459,7 +459,7 @@ static tb_size_t tb_vector_nreplace_head_test()
 static tb_size_t tb_vector_nreplace_last_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -486,7 +486,7 @@ static tb_size_t tb_vector_nreplace_last_test()
 static tb_size_t tb_vector_iterator_next_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -506,7 +506,7 @@ static tb_size_t tb_vector_iterator_next_test()
 static tb_size_t tb_vector_iterator_prev_test()
 {
     // init
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return_val(vector, 0);
 
     tb_size_t n = 1000000;
@@ -523,7 +523,7 @@ static tb_size_t tb_vector_iterator_prev_test()
 
     return n / ((tb_uint32_t)(t) + 1);
 }
-static tb_void_t tb_vector_int_dump(tb_vector_t const* vector)
+static tb_void_t tb_vector_int_dump(tb_vector_ref_t vector)
 {
     tb_trace_i("tb_int_t size: %lu, maxn: %lu", tb_vector_size(vector), tb_vector_maxn(vector));
     tb_for_all (tb_char_t*, item, vector)
@@ -533,7 +533,7 @@ static tb_void_t tb_vector_int_dump(tb_vector_t const* vector)
 }
 static tb_void_t tb_vector_int_test()
 {
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return(vector);
 
     tb_trace_i("=============================================================");
@@ -583,7 +583,7 @@ static tb_void_t tb_vector_int_test()
 
     tb_vector_exit(vector);
 }
-static tb_void_t tb_vector_str_dump(tb_vector_t const* vector)
+static tb_void_t tb_vector_str_dump(tb_vector_ref_t vector)
 {
     tb_trace_i("str size: %lu, maxn: %lu", tb_vector_size(vector), tb_vector_maxn(vector));
     tb_for_all (tb_char_t*, item, vector)
@@ -591,7 +591,7 @@ static tb_void_t tb_vector_str_dump(tb_vector_t const* vector)
 }
 static tb_void_t tb_vector_str_test()
 {
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(tb_true, tb_null));
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(tb_true));
     tb_assert_and_check_return(vector);
 
     tb_trace_i("=============================================================");
@@ -641,7 +641,7 @@ static tb_void_t tb_vector_str_test()
 
     tb_vector_exit(vector);
 }
-static tb_void_t tb_vector_mem_dump(tb_vector_t const* vector)
+static tb_void_t tb_vector_mem_dump(tb_vector_ref_t vector)
 {
     tb_trace_i("ifm size: %lu, maxn: %lu", tb_vector_size(vector), tb_vector_maxn(vector));
     tb_for_all (tb_char_t*, item, vector)
@@ -655,7 +655,7 @@ static tb_void_t tb_vector_mem_free(tb_item_func_t* func, tb_pointer_t item)
 }
 static tb_void_t tb_vector_mem_test()
 {
-    tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_mem(11, tb_vector_mem_free, "ifm"));
+    tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_mem(11, tb_vector_mem_free, "ifm"));
     tb_assert_and_check_return(vector);
 
     tb_trace_i("=============================================================");
@@ -747,7 +747,7 @@ static tb_void_t tb_vector_perf_test()
 static tb_void_t tb_vector_test_itor_perf()
 {
     // init vector
-    tb_vector_t*    vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_size());
+    tb_vector_ref_t    vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_size());
     tb_assert_and_check_return(vector);
 
     // clear rand
@@ -757,7 +757,7 @@ static tb_void_t tb_vector_test_itor_perf()
     __tb_volatile__ tb_size_t n = 100000;
     while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
 
-    // performance
+    // done
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[2] = {0};
     __tb_volatile__ tb_size_t itor = tb_iterator_head(vector);
@@ -783,34 +783,32 @@ static tb_void_t tb_vector_test_itor_perf()
     t = tb_mclock() - t;
     tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
 
+    // exit
     tb_vector_exit(vector);
 }
-static tb_bool_t tb_vector_test_walk_item(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_cpointer_t priv)
+static tb_long_t tb_vector_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(vector && bdel && priv, tb_false);
+    tb_assert_and_check_return_val(priv, -1);
 
     // done
-    tb_hize_t* test = (tb_hize_t*)priv;
+    tb_hize_t*  test = (tb_hize_t*)priv;
     tb_size_t   i = (tb_size_t)item;
-    if (!((i >> 25) & 0x1))
-//  if (!(i & 0x7))
-//  if (1)
-//  if (!(tb_random_range(tb_random_generator(), 0, TB_MAXU32) & 0x1))
-        *bdel = tb_true;
+    tb_long_t   ok = 1;
+    if (!((i >> 25) & 0x1)) ok = 0;
     else
     {
         test[0] += i;
         test[1]++;
     }
 
-    // ok
-    return tb_true;
+    // ok?
+    return ok;
 }
 static tb_void_t tb_vector_test_walk_perf()
 {
     // init vector
-    tb_vector_t*    vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
+    tb_vector_ref_t    vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
     tb_assert_and_check_return(vector);
 
     // clear rand
@@ -820,13 +818,16 @@ static tb_void_t tb_vector_test_walk_perf()
     __tb_volatile__ tb_size_t n = 100000;
     while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_range(tb_random_generator(), 0, TB_MAXU32)); 
 
-    // performance
+    // done
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[2] = {0};
-    tb_vector_walk(vector, tb_vector_test_walk_item, (tb_pointer_t)test);
+    tb_remove_if(vector, tb_vector_test_walk_item, (tb_pointer_t)test);
     t = tb_mclock() - t;
+
+    // trace
     tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
 
+    // exit
     tb_vector_exit(vector);
 }
 /* //////////////////////////////////////////////////////////////////////////////////////

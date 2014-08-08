@@ -6,18 +6,19 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+#ifdef TB_CONFIG_MODULE_HAVE_ZIP
 static tb_bool_t tb_demo_async_stream_zip_done_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // percent
     tb_size_t percent = 0;
-    if (size > 0) percent = (offset * 100) / size;
+    if (size > 0) percent = (tb_size_t)((offset * 100) / size);
     else if (state == TB_STATE_OK) percent = 100;
 
     // trace
     tb_trace_i("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_state_cstr(state));
 
     // exit wait
-    if (state != TB_STATE_OK) tb_event_post((tb_handle_t)priv);
+    if (state != TB_STATE_OK) tb_event_post((tb_event_ref_t)priv);
 
     // ok
     return tb_true;
@@ -29,11 +30,11 @@ static tb_bool_t tb_demo_async_stream_zip_done_func(tb_size_t state, tb_hize_t o
 tb_int_t tb_demo_stream_async_stream_zip_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t         event = tb_null;
-    tb_handle_t         transfer = tb_null;
-    tb_async_stream_t*  istream = tb_null;
-    tb_async_stream_t*  ostream = tb_null;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_event_ref_t              event = tb_null;
+    tb_async_transfer_ref_t     transfer = tb_null;
+    tb_async_stream_ref_t       istream = tb_null;
+    tb_async_stream_ref_t       ostream = tb_null;
+    tb_async_stream_ref_t       fstream = tb_null;
     do
     {
         // init event
@@ -49,8 +50,8 @@ tb_int_t tb_demo_stream_async_stream_zip_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(ostream);
 
         // filter istream or ostream?
-        tb_async_stream_t* iostream = istream;
-//      tb_async_stream_t* iostream = ostream;
+        tb_async_stream_ref_t iostream = istream;
+//      tb_async_stream_ref_t iostream = ostream;
 
         // init fstream
 //      fstream = tb_async_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_INFLATE);
@@ -111,3 +112,9 @@ tb_int_t tb_demo_stream_async_stream_zip_main(tb_int_t argc, tb_char_t** argv)
     event = tb_null;
     return 0;
 }
+#else 
+tb_int_t tb_demo_stream_async_stream_zip_main(tb_int_t argc, tb_char_t** argv)
+{
+    return 0;
+}
+#endif

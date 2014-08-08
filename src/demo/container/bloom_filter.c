@@ -23,14 +23,14 @@ static tb_void_t tb_demo_test_cstr_h(tb_size_t index)
 
     // save func
     g_func_indx = index;
-    g_func_prev = tb_item_func_str(tb_true, tb_null);
+    g_func_prev = tb_item_func_str(tb_true);
 
     // the func
     tb_item_func_t func = g_func_prev; 
     func.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
     if (filter)
     {
         // clear random
@@ -71,7 +71,7 @@ static tb_void_t tb_demo_test_cstr_p()
     tb_size_t count = 10000000;
 
     // init filter
-    tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_item_func_str(tb_true, tb_null));
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_item_func_str(tb_true));
     if (filter)
     {
         // clear random
@@ -122,7 +122,7 @@ static tb_void_t tb_demo_test_uint8_h(tb_size_t index)
     func.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
     if (filter)
     {
         // clear random
@@ -167,7 +167,7 @@ static tb_void_t tb_demo_test_uint16_h(tb_size_t index)
     func.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
     if (filter)
     {
         // clear random
@@ -212,7 +212,7 @@ static tb_void_t tb_demo_test_uint32_h(tb_size_t index)
     func.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
     if (filter)
     {
         // clear random
@@ -257,7 +257,7 @@ static tb_void_t tb_demo_test_long_h(tb_size_t index)
     func.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
     if (filter)
     {
         // clear random
@@ -294,7 +294,7 @@ static tb_void_t tb_demo_test_long_p()
     tb_size_t count = 10000000;
 
     // init filter
-    tb_bloom_filter_t* filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_item_func_long());
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_item_func_long());
     if (filter)
     {
         // clear random

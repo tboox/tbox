@@ -1,11 +1,17 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// major version
+#define TB_CONFIG_VERSION_MAJOR         [major]
+
+// minor version
+#define TB_CONFIG_VERSION_MINOR         [minor]
+
+// alter version
+#define TB_CONFIG_VERSION_ALTER         [alter]
+
 // build version
 #define TB_CONFIG_VERSION_BUILD         [build]
-
-// debug
-#define TB_CONFIG_DEBUG                 [debug]
 
 // small
 #define TB_CONFIG_SMALL                 [small]
@@ -17,13 +23,6 @@
 // api
 #define TB_CONFIG_API_HAVE_POSIX
 //#define TB_CONFIG_API_HAVE_SYSTEMV
-
-// assembler
-#if defined(_MSC_VER)
-#   define TB_CONFIG_ASSEMBLER_MASM
-#elif defined(__GNUC__)
-#   define TB_CONFIG_ASSEMBLER_GAS
-#endif
 
 // type
 #define TB_CONFIG_TYPE_FLOAT
@@ -45,20 +44,20 @@
 //#define TB_CONFIG_LIBC_HAVE_STRNCPY
 //#define TB_CONFIG_LIBC_HAVE_STRLCPY
 #define TB_CONFIG_LIBC_HAVE_STRLEN 
-#define TB_CONFIG_LIBC_HAVE_STRNLEN
+//#define TB_CONFIG_LIBC_HAVE_STRNLEN
 #define TB_CONFIG_LIBC_HAVE_STRSTR
-#define TB_CONFIG_LIBC_HAVE_STRISTR
+//#define TB_CONFIG_LIBC_HAVE_STRISTR
 #define TB_CONFIG_LIBC_HAVE_STRCMP
-#define TB_CONFIG_LIBC_HAVE_STRICMP
+//#define TB_CONFIG_LIBC_HAVE_STRICMP
 #define TB_CONFIG_LIBC_HAVE_STRNCMP
-#define TB_CONFIG_LIBC_HAVE_STRNICMP
+//#define TB_CONFIG_LIBC_HAVE_STRNICMP
 #define TB_CONFIG_LIBC_HAVE_WCSCAT
 #define TB_CONFIG_LIBC_HAVE_WCSNCAT
 //#define TB_CONFIG_LIBC_HAVE_WCSCPY
 //#define TB_CONFIG_LIBC_HAVE_WCSNCPY
 //#define TB_CONFIG_LIBC_HAVE_WCSLCPY
 #define TB_CONFIG_LIBC_HAVE_WCSLEN 
-#define TB_CONFIG_LIBC_HAVE_WCSNLEN
+//#define TB_CONFIG_LIBC_HAVE_WCSNLEN
 #define TB_CONFIG_LIBC_HAVE_WCSSTR
 //#define TB_CONFIG_LIBC_HAVE_WCSISTR
 #define TB_CONFIG_LIBC_HAVE_WCSCMP
@@ -74,7 +73,7 @@
 
 // libm
 #define TB_CONFIG_LIBM_HAVE_SINCOS
-#define TB_CONFIG_LIBM_HAVE_SINCOSF
+//#define TB_CONFIG_LIBM_HAVE_SINCOSF
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
 

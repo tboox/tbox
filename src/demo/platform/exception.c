@@ -10,7 +10,7 @@ tb_pointer_t tb_exception_test(tb_cpointer_t priv);
 tb_pointer_t tb_exception_test(tb_cpointer_t priv)
 {
     // self
-    tb_size_t self = tb_thread_self();
+    __tb_volatile__ tb_size_t self = tb_thread_self();
     
     // trace
     tb_trace_i("thread[%lu]: init", self);

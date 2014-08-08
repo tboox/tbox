@@ -26,7 +26,7 @@ static tb_bool_t tb_demo_transfer_done_func(tb_size_t state, tb_hize_t offset, t
 tb_int_t tb_demo_stream_async_transfer_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t transfer = tb_null;
+    tb_async_transfer_ref_t transfer = tb_null;
     do
     {
         // init transfer

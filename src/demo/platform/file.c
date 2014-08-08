@@ -10,8 +10,8 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 0
     // init file
-//  tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
-    tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_DIRECT | TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+//  tb_file_ref_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+    tb_file_ref_t file = tb_file_init(argv[1], TB_FILE_MODE_DIRECT | TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
     if (file)
     {
         // done
@@ -58,7 +58,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
     }
 #elif 0
     // init file
-    tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+    tb_file_ref_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
     if (file)
     {
         // done
@@ -119,7 +119,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
     }
 #elif 0
     // init file
-    tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+    tb_file_ref_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
     if (file)
     {
         // done
@@ -181,8 +181,8 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
         tb_file_exit(file);
     }
 #elif 0
-    tb_handle_t ifile = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_BINARY);
-    tb_handle_t ofile = tb_file_init(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+    tb_file_ref_t ifile = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_BINARY);
+    tb_file_ref_t ofile = tb_file_init(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
     if (ifile && ofile)
     {
         tb_hize_t writ = 0;

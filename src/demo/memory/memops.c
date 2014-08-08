@@ -66,10 +66,10 @@ tb_int_t tb_demo_memory_memops_main(tb_int_t argc, tb_char_t** argv)
     __tb_volatile__ tb_hong_t dt = 0;
 
     tb_size_t   size = 15 * 1024 * 1024;
-    tb_byte_t*  data = tb_malloc(size);
+    tb_byte_t*  data = tb_malloc_bytes(size);
 
     tb_size_t   size2 = 15 * 1024 * 1024;
-    tb_byte_t*  data2 = tb_malloc(size2);
+    tb_byte_t*  data2 = tb_malloc_bytes(size2);
 
     // test: u8 x 1024
     memset(data, 0, size);

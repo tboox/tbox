@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t const* sql)
+static tb_void_t tb_demo_database_sql_test_done(tb_database_sql_ref_t database, tb_char_t const* sql)
 {
     // check
     tb_assert_and_check_return(database && sql);
@@ -23,8 +23,8 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
         }
 
         // load result
-//      tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
-        tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+//      tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_true);
+        tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_false);
         tb_check_break(result);
 
         // trace
@@ -32,7 +32,7 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
         tb_trace_i("row: size: %lu", tb_iterator_size(result));
 
         // walk result
-        tb_for_all_if (tb_iterator_t*, row, result, row)
+        tb_for_all_if (tb_iterator_ref_t, row, result, row)
         {
             // trace
             tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
@@ -53,34 +53,34 @@ static tb_void_t tb_demo_database_sql_test_done(tb_handle_t database, tb_char_t 
 
     } while (0);
 }
-static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, tb_char_t const* sql)
+static tb_void_t tb_demo_database_sql_test_statement_done(tb_database_sql_ref_t database, tb_char_t const* sql)
 {
     // check
     tb_assert_and_check_return(database && sql);
 
     // done
-    tb_handle_t stmt = tb_null;
+    tb_database_sql_statement_ref_t statement = tb_null;
     do
     {
-        // init stmt
-        if (!(stmt = tb_database_sql_statement_init(database, sql)))
+        // init statement
+        if (!(statement = tb_database_sql_statement_init(database, sql)))
         {
             // trace
-            tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
-        // done stmt
-        if (!tb_database_sql_statement_done(database, stmt))
+        // done statement
+        if (!tb_database_sql_statement_done(database, statement))
         {
             // trace
-            tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
         // load result
-//      tb_iterator_t* result = tb_database_sql_result_load(database, tb_true);
-        tb_iterator_t* result = tb_database_sql_result_load(database, tb_false);
+//      tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_true);
+        tb_iterator_ref_t result = tb_database_sql_result_load(database, tb_false);
         tb_check_break(result);
 
         // trace
@@ -88,49 +88,49 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
         tb_trace_i("row: size: %lu", tb_iterator_size(result));
 
         // walk result
-        tb_for_all_if (tb_iterator_t*, row, result, row)
+        tb_for_all_if (tb_iterator_ref_t, row, result, row)
         {
             // trace
             tb_tracef_i("[row: %lu, col: size: %lu]: ", row_itor, tb_iterator_size(row));
 
             // trace id
-            tb_database_sql_value_t const* id = tb_iterator_item(row, 0);
+            tb_database_sql_value_t const* id = (tb_database_sql_value_t const*)tb_iterator_item(row, 0);
             tb_assert_and_check_break(id);
             tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(id), tb_database_sql_value_int32(id));
 
 #ifdef TB_CONFIG_TYPE_FLOAT
             // trace fval
-            tb_database_sql_value_t const* fval = tb_iterator_item(row, 1);
+            tb_database_sql_value_t const* fval = (tb_database_sql_value_t const*)tb_iterator_item(row, 1);
             tb_assert_and_check_break(fval);
             tb_tracet_i("[%s:%f] ", tb_database_sql_value_name(fval), tb_database_sql_value_float(fval));
 #endif
 
             // trace name
-            tb_database_sql_value_t const* name = tb_iterator_item(row, 2);
+            tb_database_sql_value_t const* name = (tb_database_sql_value_t const*)tb_iterator_item(row, 2);
             tb_assert_and_check_break(name);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(name), tb_database_sql_value_text(name));
 
             // trace data
-            tb_database_sql_value_t const* data = tb_iterator_item(row, 3);
+            tb_database_sql_value_t const* data = (tb_database_sql_value_t const*)tb_iterator_item(row, 3);
             tb_assert_and_check_break(data);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(data), tb_database_sql_value_blob(data));
 
             // trace tdata
-            tb_database_sql_value_t const* tdata = tb_iterator_item(row, 4);
+            tb_database_sql_value_t const* tdata = (tb_database_sql_value_t const*)tb_iterator_item(row, 4);
             tb_assert_and_check_break(tdata);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(tdata), tb_database_sql_value_blob(tdata));
 
             // trace ldata
-            tb_database_sql_value_t const* ldata = tb_iterator_item(row, 5);
+            tb_database_sql_value_t const* ldata = (tb_database_sql_value_t const*)tb_iterator_item(row, 5);
             tb_assert_and_check_break(ldata);
             tb_tracet_i("[%s:%s] ", tb_database_sql_value_name(ldata), tb_database_sql_value_blob(ldata));
 
             // trace ldata2
-            tb_database_sql_value_t const* ldata2 = tb_iterator_item(row, 6);
+            tb_database_sql_value_t const* ldata2 = (tb_database_sql_value_t const*)tb_iterator_item(row, 6);
             tb_assert_and_check_break(ldata2);
             {
                 // data?
-                tb_basic_stream_t*  stream = tb_null;
+                tb_stream_ref_t  stream = tb_null;
                 if (tb_database_sql_value_blob(ldata2))
                 {
                     // trace
@@ -144,14 +144,14 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
                     tb_assert_and_check_break(size >= 0);
 
                     // make data
-                    tb_byte_t* data = (tb_byte_t*)tb_malloc0(size);
+                    tb_byte_t* data = tb_malloc0_bytes((tb_size_t)size);
                     tb_assert_and_check_break(data);
 
                     // read data
-                    if (tb_basic_stream_bread(stream, data, size))
+                    if (tb_stream_bread(stream, data, (tb_size_t)size))
                     {
                         // trace
-                        tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, data, size)));
+                        tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, data, (tb_size_t)size)));
                     }
 
                     // exit data
@@ -166,12 +166,12 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
             }
 
             // trace number
-            tb_database_sql_value_t const* number = tb_iterator_item(row, 7);
+            tb_database_sql_value_t const* number = (tb_database_sql_value_t const*)tb_iterator_item(row, 7);
             tb_assert_and_check_break(number);
             tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(number), tb_database_sql_value_int32(number));
 
             // trace snumber
-            tb_database_sql_value_t const* snumber = tb_iterator_item(row, 8);
+            tb_database_sql_value_t const* snumber = (tb_database_sql_value_t const*)tb_iterator_item(row, 8);
             tb_assert_and_check_break(snumber);
             tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(snumber), tb_database_sql_value_int32(snumber));
 
@@ -184,24 +184,24 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_handle_t database, 
 
     } while (0);
 
-    // exit stmt
-    if (stmt) tb_database_sql_statement_exit(database, stmt);
+    // exit statement
+    if (statement) tb_database_sql_statement_exit(database, statement);
 }
-static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_char_t const* tdata, tb_char_t const* ldata1, tb_char_t const* ldata2, tb_size_t number, tb_uint16_t snumber)
+static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_database_sql_ref_t database, tb_char_t const* sql, tb_char_t const* name, tb_char_t const* data, tb_char_t const* tdata, tb_char_t const* ldata1, tb_char_t const* ldata2, tb_size_t number, tb_uint16_t snumber)
 {
     // check
     tb_assert_and_check_return(database && sql);
 
     // done
-    tb_handle_t         stmt = tb_null;
-    tb_basic_stream_t*  stream = tb_null;
+    tb_stream_ref_t                 stream = tb_null;
+    tb_database_sql_statement_ref_t statement = tb_null;
     do
     {
-        // init stmt
-        if (!(stmt = tb_database_sql_statement_init(database, sql)))
+        // init statement
+        if (!(statement = tb_database_sql_statement_init(database, sql)))
         {
             // trace
-            tb_trace_e("stmt: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: init %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
@@ -209,14 +209,14 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
         if (ldata2)
         {
             // init it
-            stream = tb_basic_stream_init_from_url(ldata2);
+            stream = tb_stream_init_from_url(ldata2);
             tb_assert_and_check_break(stream);
 
             // open it
-            if (!tb_basic_stream_open(stream)) break;
+            if (!tb_stream_open(stream)) break;
         }
 
-        // bind stmt
+        // bind statement
         tb_database_sql_value_t list[7];
         tb_database_sql_value_set_text(&list[0], name, 0);
         tb_database_sql_value_set_blob16(&list[1], (tb_byte_t const*)data, tb_strlen(data) + 1);
@@ -225,28 +225,28 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
         tb_database_sql_value_set_blob32(&list[4], tb_null, 0, stream);
         tb_database_sql_value_set_int32(&list[5], number);
         tb_database_sql_value_set_int16(&list[6], snumber);
-        if (!tb_database_sql_statement_bind(database, stmt, list, tb_arrayn(list)))
+        if (!tb_database_sql_statement_bind(database, statement, list, tb_arrayn(list)))
         {
             // trace
-            tb_trace_e("stmt: bind %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: bind %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
-        // done stmt
-        if (!tb_database_sql_statement_done(database, stmt))
+        // done statement
+        if (!tb_database_sql_statement_done(database, statement))
         {
             // trace
-            tb_trace_e("stmt: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
+            tb_trace_e("statement: done %s failed, error: %s", sql, tb_state_cstr(tb_database_sql_state(database)));
             break ;
         }
 
     } while (0);
 
-    // exit stmt
-    if (stmt) tb_database_sql_statement_exit(database, stmt);
+    // exit statement
+    if (statement) tb_database_sql_statement_exit(database, statement);
 
     // exit stream
-    if (stream) tb_basic_stream_exit(stream);
+    if (stream) tb_stream_exit(stream);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -255,7 +255,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_handle_t dat
 tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
 {
     // init database
-    tb_handle_t database = tb_database_sql_init(argv[1]);
+    tb_database_sql_ref_t database = tb_database_sql_init(argv[1]);
     if (database)
     {
         // open database
@@ -290,8 +290,8 @@ tb_int_t tb_demo_database_sql_main(tb_int_t argc, tb_char_t** argv)
                 tb_demo_database_sql_test_statement_done_insert(database, "insert into table2 values(7, 100.098, ?, ?, ?, ?, ?, ?, ?)", "name7", "data7", "ldata7", "tdata7", argv[2], 21600, 1600);
                 
                 // commit
-//              tb_database_sql_commit(database);
-                tb_database_sql_rollback(database);
+                tb_database_sql_commit(database);
+//                tb_database_sql_rollback(database);
 
                 // select
                 tb_demo_database_sql_test_statement_done(database, "select * from table2");

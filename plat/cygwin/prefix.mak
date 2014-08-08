@@ -2,16 +2,16 @@
 
 # prefix & suffix
 BIN_PREFIX 			= 
-BIN_SUFFIX 			= .b
+BIN_SUFFIX 			= .exe
 
 OBJ_PREFIX 			= 
-OBJ_SUFFIX 			= .o
+OBJ_SUFFIX 			= .obj
 
-LIB_PREFIX 			= lib
-LIB_SUFFIX 			= .a
+LIB_PREFIX 			= 
+LIB_SUFFIX 			= .lib
 
-DLL_PREFIX 			= lib
-DLL_SUFFIX 			= .so
+DLL_PREFIX 			= 
+DLL_SUFFIX 			= .dll
 
 ASM_SUFFIX 			= .S
 
@@ -22,21 +22,11 @@ PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),)
 CC_ 				:= ${shell if [ -f "/usr/bin/clang" ]; then echo "clang"; elif [ -f "/usr/local/bin/clang" ]; then echo "clang"; else echo "gcc"; fi }
 CC_ 				:= $(if $(findstring y,$(PROF)),gcc,$(CC_))
 CC 					= $(PRE_)$(CC_)
-ifeq ($(CXFLAGS_CHECK),)
-CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
-export CXFLAGS_CHECK
-endif
 
 # ld
 LD_ 				:= ${shell if [ -f "/usr/bin/clang++" ]; then echo "clang++"; elif [ -f "/usr/local/bin/clang++" ]; then echo "clang++"; else echo "g++"; fi }
 LD_ 				:= $(if $(findstring y,$(PROF)),g++,$(LD_))
 LD 					= $(PRE_)$(LD_)
-ifeq ($(LDFLAGS_CHECK),)
-LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) #-fsanitize=thread
-export LDFLAGS_CHECK
-endif
 
 # cpu bits
 BITS 				:= $(if $(findstring x64,$(ARCH)),64,)
@@ -53,13 +43,13 @@ RMDIR 				= rm -rf
 CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
-MAKE 				= make
+MAKE 				= make -r
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g 
-CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -mssse3
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Wno-error=cpp -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -75,7 +65,7 @@ ifeq ($(PROF),y)
 CXFLAGS 			+= -g -pg -fno-omit-frame-pointer 
 else
 CXFLAGS_RELEASE 	+= -fomit-frame-pointer 
-CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer $(CXFLAGS_CHECK)
+CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer 
 endif
 
 # cflags: .c files
@@ -97,6 +87,7 @@ LDFLAGS_DEBUG 		= -rdynamic
 LDFLAGS 			= -m$(BITS) 
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
+LDFLAGS-f 			=
 LDFLAGS-o 			= -o
 
 # prof
@@ -104,7 +95,7 @@ ifeq ($(PROF),y)
 LDFLAGS 			+= -pg 
 else
 LDFLAGS_RELEASE 	+= -s
-LDFLAGS_DEBUG 		+= $(LDFLAGS_CHECK)
+LDFLAGS_DEBUG 		+= 
 endif
 
 # asflags
@@ -115,7 +106,10 @@ ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
 # arflags
+ARFLAGS_RELEASE 	= 
+ARFLAGS_DEBUG 		= 
 ARFLAGS 			= -cr
+ARFLAGS-o 			= 
 
 # shflags
 SHFLAGS_RELEASE 	= -s

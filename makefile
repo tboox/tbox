@@ -39,7 +39,7 @@ all : .null
 # make rebuild
 rebuild : .null
 	@$(MAKE) c
-	-@$(MAKE) -j4
+	$(if $(findstring msys,$(HOST)),,-@$(MAKE) -j4)
 	@$(MAKE)
 	@$(MAKE) i
 	@$(MAKE) p
@@ -60,12 +60,12 @@ install : .null
 prefix : .null
 	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)
 	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)
-	-@$(CPDIR) $(BIN_DIR)/inc/* $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
-	-@$(CP) $(BIN_DIR)/lib/* $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/
+	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
+	-@$(CP) $(BIN_DIR)/lib/$(PRO_NAME)/* $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/
 	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/inc/$(PLAT)/$(ARCH),)
 	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/lib/$(PLAT)/$(ARCH),)
-	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/* $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
-	$(if $(PREFIX),-@$(CP) $(BIN_DIR)/lib/* $(PREFIX)/lib/$(PLAT)/$(ARCH)/,)
+	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
+	$(if $(PREFIX),-@$(CP) $(BIN_DIR)/lib/$(PRO_NAME)/* $(PREFIX)/lib/$(PLAT)/$(ARCH)/,)
 
 # make lipo
 lipo : .null
@@ -107,40 +107,43 @@ doc : .null
 
 else
 
+# include project
+include project.mak
+
 # ######################################################################################
 # no-config
 # #
 all : 
-	make f
-	make r
+	make -r f
+	make -r r
 
 rebuild :
-	make f
-	make r
+	make -r f
+	make -r r
 
 install :
-	make f
-	make i
+	make -r f
+	make -r i
 
 prefix :
-	make f
-	make p
+	make -r f
+	make -r p
 
 lipo : help
 clean :
-	make f
-	make c
+	make -r f
+	make -r c
 
 update :
-	make f
-	make u
+	make -r f
+	make -r u
 
 output : 	
 error : 	
 warning : 	
 doc :
-	make f
-	make d
+	make -r f
+	make -r d
 
 endif
 
@@ -157,18 +160,23 @@ endif
 # host
 HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i linux},linux,))
 HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i darwin},mac,))
-HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i cygwin},windows,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i cygwin},cygwin,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i mingw},msys,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i msvc},msys,))
 HOST :=$(if $(HOST),$(HOST),linux)
 
 # platform
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
-PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},mingw,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},cygwin,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i mingw},mingw,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i msvc},msvc,))
 PLAT :=$(if $(PLAT),$(PLAT),linux)
 
 # architecture
 ifeq ($(ARCH),)
 
+ARCH :=$(if $(findstring msvc,$(PLAT)),x86,$(ARCH))
 ARCH :=$(if $(findstring mingw,$(PLAT)),x86,$(ARCH))
 ARCH :=$(if $(findstring mac,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
 ARCH :=$(if $(findstring linux,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
@@ -185,7 +193,9 @@ DEBUG :=$(if $(DEBUG),$(DEBUG),y)
 DTYPE :=$(if $(findstring y,$(DEBUG)),d,r)
 
 # small
-SMALL :=$(if $(SMALL),$(SMALL),y)
+SMALL :=$(if $(SMALL),$(SMALL),n)
+SMALL :=$(if $(findstring ios,$(PLAT)),y,$(SMALL))
+SMALL :=$(if $(findstring android,$(PLAT)),y,$(SMALL))
 
 # demo
 DEMO :=$(if $(DEMO),$(DEMO),y)
@@ -211,9 +221,8 @@ MIPS :=$(if $(findstring mips,$(ARCH)),y,n)
 # sparc
 SPARC :=$(if $(findstring sparc,$(ARCH)),y,n)
 
-# project
+# the project directory
 PRO_DIR 	:=${shell pwd}
-PRO_NAME 	:=${shell basename ${shell pwd}}
 
 # flag
 CXFLAG 		:= $(if $(CXFLAG),$(CXFLAG),)
@@ -232,13 +241,24 @@ else
 DISTCC 		:= 
 endif
 
+# sed
+ifeq ($(HOST),mac)
+SED 		:= sed -i ''
+#SED 		:= perl -pi -e
+else
+SED 		:= sed -i
+endif
+
+# config
 config : .null
-	-@cp ./plat/$(PLAT)/config.h ./src/config.h
-	-@perl -pi -e "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/config.h
-	-@perl -pi -e "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/config.h
-	-@perl -pi -e "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/config.h
+	-@cp ./plat/$(PLAT)/config.h ./src/$(PRO_NAME)/config.h
+	-@$(SED) "s/\[major\]/$(PRO_VERSION_MAJOR)/g" ./src/$(PRO_NAME)/config.h
+	-@$(SED) "s/\[minor\]/$(PRO_VERSION_MINOR)/g" ./src/$(PRO_NAME)/config.h
+	-@$(SED) "s/\[alter\]/$(PRO_VERSION_ALTER)/g" ./src/$(PRO_NAME)/config.h
+	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/$(PRO_NAME)/config.h
+	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
+	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
 	@echo "config: ==================================================================="
-	@echo "config: name:     " 							$(PRO_NAME)
 	@echo "config: plat:     " 							$(PLAT)
 	@echo "config: arch:     " 							$(ARCH)
 	@echo "config: host:     " 							$(HOST)
@@ -246,16 +266,16 @@ config : .null
 	@echo "config: prof:     " 							$(PROF)
 	@echo "config: debug:    " 							$(DEBUG)
 	@echo "config: small:    " 							$(SMALL)
-	@echo "config: cflag:  " 							$(CFLAG)
-	@echo "config: ccflag:  " 							$(CCFLAG)
-	@echo "config: cxflag:  " 							$(CXFLAG)
-	@echo "config: mflag:  " 							$(MFLAG)
-	@echo "config: mmflag:  " 							$(MMFLAG)
-	@echo "config: mxflag:  " 							$(MXFLAG)
-	@echo "config: ldflag:  " 							$(LDFLAG)
-	@echo "config: asflag:  " 							$(ASFLAG)
-	@echo "config: arflag:  " 							$(ARFLAG)
-	@echo "config: shflag:  " 							$(SHFLAG)
+	@echo "config: cflag:    " 							$(CFLAG)
+	@echo "config: ccflag:   " 							$(CCFLAG)
+	@echo "config: cxflag:   " 							$(CXFLAG)
+	@echo "config: mflag:    " 							$(MFLAG)
+	@echo "config: mmflag:   " 							$(MMFLAG)
+	@echo "config: mxflag:   " 							$(MXFLAG)
+	@echo "config: ldflag:   " 							$(LDFLAG)
+	@echo "config: asflag:   " 							$(ASFLAG)
+	@echo "config: arflag:   " 							$(ARFLAG)
+	@echo "config: shflag:   " 							$(SHFLAG)
 	@echo "config: ccache:   " 							$(CCACHE)
 	@echo "config: distcc:   " 							$(DISTCC)
 	@echo "config: prefix:   " 							$(PREFIX)
@@ -270,7 +290,6 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# project"              						>> .config.mak
 	@echo "PRO_DIR ="$(PRO_DIR) 						>> .config.mak
-	@echo "PRO_NAME ="$(PRO_NAME) 						>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# profile"              						>> .config.mak
 	@echo "PROF ="$(PROF) 								>> .config.mak
@@ -325,7 +344,6 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# export"									>> .config.mak
 	@echo "export PRO_DIR" 		 						>> .config.mak
-	@echo "export PRO_NAME" 		 					>> .config.mak
 	@echo "export DEBUG" 			 					>> .config.mak
 	@echo "export DTYPE" 			 					>> .config.mak
 	@echo "export SMALL" 			 					>> .config.mak
@@ -363,5 +381,5 @@ config : .null
 
 # make help
 help : .null
-	@cat ./README
+	@cat ./INSTALL
 

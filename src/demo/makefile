@@ -27,30 +27,32 @@ demo_C_FILES 								+= \
 											other/test \
 											other/flv \
 											other/libflv \
-											stream/basic_stream/null \
-											stream/basic_stream/cache \
-											string/string_pool \
-											string/scoped_string \
+											stream/stream \
+											stream/stream/zip \
+											stream/stream/null \
+											stream/stream/cache \
+											stream/stream/charset \
+											string/string \
 											string/static_string \
 											memory/check \
+											memory/pool \
 											memory/fixed_pool \
-											memory/block_pool \
-											memory/global_pool \
-											memory/static_fixed_pool \
-											memory/static_block_pool \
-											memory/static_tiny_pool \
+											memory/large_pool \
+											memory/small_pool \
+											memory/string_pool \
 											memory/memops \
+											memory/buffer \
 											memory/queue_buffer \
-											memory/scoped_buffer \
 											memory/static_buffer \
+											memory/impl/static_fixed_pool \
 											network/dns \
 											network/url \
 											network/ipv4 \
 											network/http \
-											network/date \
 											network/whois \
 											network/spider \
 											network/cookies \
+											network/impl/date \
 											platform/file \
 											platform/lock \
 											platform/path \
@@ -62,6 +64,7 @@ demo_C_FILES 								+= \
 											platform/process \
 											platform/barrier \
 											platform/atomic64 \
+											platform/processor \
 											platform/backtrace \
 											platform/directory \
 											platform/exception \
@@ -75,7 +78,9 @@ demo_C_FILES 								+= \
 											container/queue \
 											container/stack \
 											container/vector \
+											container/list_entry \
 											container/single_list \
+											container/single_list_entry \
 											container/bloom_filter \
 											algorithm/find \
 											algorithm/sort 
@@ -85,9 +90,6 @@ demo_C_FILES-$(TB_CONFIG_TYPE_FLOAT) 		+= \
 											libm/float \
 											libm/double
 
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ZIP) 	+= \
-											stream/basic_stream/zip
-
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 											xml/reader \
 											xml/writer \
@@ -95,7 +97,6 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 											utils/option \
-											stream/basic_stream \
 											object/json \
 											object/bin \
 											object/xml \
@@ -104,34 +105,27 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 											object/dump 
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
-											other/charset \
-											stream/basic_stream/charset 
+											other/charset
+											
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_DATABASE) += \
 											database/sql 
 
-ifeq ($(TB_CONFIG_MODULE_HAVE_ASIO),y)
-demo_C_FILES 								+= \
+demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ASIO) 	+= \
 											asio/dns \
 											asio/http \
+											asio/httpd \
 											asio/aiopc \
 											asio/aiopd \
 											asio/aicpc \
 											asio/aicpd \
+											stream/async_stream \
+											stream/async_stream/zip \
 											stream/async_stream/null \
 											stream/async_stream/cache \
+											stream/async_stream/charset \
 											stream/async_transfer \
 											stream/transfer_pool 
-
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_CHARSET) += \
-											stream/async_stream/charset 
-
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
-											stream/async_stream
-
-demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ZIP) 	+= \
-											stream/async_stream/zip 
-endif
 
 
 # libs
@@ -144,10 +138,10 @@ demo_LIBS-$(TB_CONFIG_THIRD_HAVE_ZLIB) 		+= z
 demo_LIBS-y 								+= $(TB_CONFIG_DEMO_LIBS)
 
 # path
-demo_LIB_DIR 								+= ..
+demo_LIB_DIR 								+= ../tbox
 
 # flags
-demo_CXFLAGS 								+= -DTB_TRACE_PREFIX=\"demo\"
+demo_CXFLAGS 								+= -D__tb_prefix__=\"demo\"
 
 # command
 demo_SUFFIX_CMD1 							+= $(TB_CONFIG_DEMO_CMD1)

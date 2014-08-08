@@ -61,6 +61,7 @@ static tb_demo_t g_demo[] =
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
 ,   TB_DEMO_MAIN_ITEM(asio_dns)
 ,   TB_DEMO_MAIN_ITEM(asio_http)
+,   TB_DEMO_MAIN_ITEM(asio_httpd)
 ,   TB_DEMO_MAIN_ITEM(asio_aiopc)
 ,   TB_DEMO_MAIN_ITEM(asio_aiopd)
 ,   TB_DEMO_MAIN_ITEM(asio_aicpc)
@@ -104,80 +105,68 @@ static tb_demo_t g_demo[] =
 #endif
 
     // stream
-#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream)
-#endif
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_null)
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_cache)
-#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_charset)
-#endif
-#ifdef TB_CONFIG_MODULE_HAVE_ZIP
-,   TB_DEMO_MAIN_ITEM(stream_basic_stream_zip)
-#endif
+,   TB_DEMO_MAIN_ITEM(stream)
+,   TB_DEMO_MAIN_ITEM(stream_null)
+,   TB_DEMO_MAIN_ITEM(stream_cache)
+,   TB_DEMO_MAIN_ITEM(stream_charset)
+,   TB_DEMO_MAIN_ITEM(stream_zip)
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
 ,   TB_DEMO_MAIN_ITEM(stream_transfer_pool)
 ,   TB_DEMO_MAIN_ITEM(stream_async_transfer)
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_null)
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_cache)
-#   ifdef TB_CONFIG_MODULE_HAVE_OBJECT
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream)
-#   endif
-#   ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_charset)
-#   endif
-#   ifdef TB_CONFIG_MODULE_HAVE_ZIP
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_zip)
-#   endif
 #endif
 
     // string
-,   TB_DEMO_MAIN_ITEM(string_pool)
-,   TB_DEMO_MAIN_ITEM(string_scoped_string)
+,   TB_DEMO_MAIN_ITEM(string_string)
 ,   TB_DEMO_MAIN_ITEM(string_static_string)
 
     // memory
 ,   TB_DEMO_MAIN_ITEM(memory_check)
-,   TB_DEMO_MAIN_ITEM(memory_static_fixed_pool)
-,   TB_DEMO_MAIN_ITEM(memory_global_pool)
-,   TB_DEMO_MAIN_ITEM(memory_block_pool)
-,   TB_DEMO_MAIN_ITEM(memory_tiny_pool)
-,   TB_DEMO_MAIN_ITEM(memory_static_block_pool)
+,   TB_DEMO_MAIN_ITEM(memory_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_fixed_pool)
+,   TB_DEMO_MAIN_ITEM(memory_large_pool)
+,   TB_DEMO_MAIN_ITEM(memory_small_pool)
+,   TB_DEMO_MAIN_ITEM(memory_string_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_memops)
-,   TB_DEMO_MAIN_ITEM(memory_scoped_buffer)
+,   TB_DEMO_MAIN_ITEM(memory_buffer)
 ,   TB_DEMO_MAIN_ITEM(memory_queue_buffer)
 ,   TB_DEMO_MAIN_ITEM(memory_static_buffer)
+,   TB_DEMO_MAIN_ITEM(memory_impl_static_fixed_pool)
 
     // network
 ,   TB_DEMO_MAIN_ITEM(network_dns)
 ,   TB_DEMO_MAIN_ITEM(network_url)
 ,   TB_DEMO_MAIN_ITEM(network_ipv4)
 ,   TB_DEMO_MAIN_ITEM(network_http)
-,   TB_DEMO_MAIN_ITEM(network_date)
 ,   TB_DEMO_MAIN_ITEM(network_whois)
 ,   TB_DEMO_MAIN_ITEM(network_spider)
 ,   TB_DEMO_MAIN_ITEM(network_cookies)
+,   TB_DEMO_MAIN_ITEM(network_impl_date)
 
     // platform
 ,   TB_DEMO_MAIN_ITEM(platform_file)
 ,   TB_DEMO_MAIN_ITEM(platform_lock)
 ,   TB_DEMO_MAIN_ITEM(platform_path)
-,   TB_DEMO_MAIN_ITEM(platform_cache_time)
 ,   TB_DEMO_MAIN_ITEM(platform_event)
 ,   TB_DEMO_MAIN_ITEM(platform_utils)
 ,   TB_DEMO_MAIN_ITEM(platform_timer)
-,   TB_DEMO_MAIN_ITEM(platform_thread_store)
 ,   TB_DEMO_MAIN_ITEM(platform_ltimer)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic)
 ,   TB_DEMO_MAIN_ITEM(platform_process)
 ,   TB_DEMO_MAIN_ITEM(platform_barrier)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic64)
+,   TB_DEMO_MAIN_ITEM(platform_processor)
 ,   TB_DEMO_MAIN_ITEM(platform_backtrace)
 ,   TB_DEMO_MAIN_ITEM(platform_directory)
 ,   TB_DEMO_MAIN_ITEM(platform_exception)
 ,   TB_DEMO_MAIN_ITEM(platform_semaphore)
+,   TB_DEMO_MAIN_ITEM(platform_cache_time)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
+,   TB_DEMO_MAIN_ITEM(platform_thread_store)
 
     // container
 ,   TB_DEMO_MAIN_ITEM(container_heap)
@@ -186,7 +175,9 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(container_queue)
 ,   TB_DEMO_MAIN_ITEM(container_stack)
 ,   TB_DEMO_MAIN_ITEM(container_vector)
+,   TB_DEMO_MAIN_ITEM(container_list_entry)
 ,   TB_DEMO_MAIN_ITEM(container_single_list)
+,   TB_DEMO_MAIN_ITEM(container_single_list_entry)
 ,   TB_DEMO_MAIN_ITEM(container_bloom_filter)
 
     // algorithm
@@ -200,8 +191,8 @@ static tb_demo_t g_demo[] =
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
     // init tbox
-#ifdef __tb_debug__
-    if (!tb_init(tb_null, malloc(200 * 1024 * 1024), 200 * 1024 * 1024)) return 0;
+#if 0
+    if (!tb_init(tb_null, (tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024)) return 0;
 #else
     if (!tb_init(tb_null, tb_null, 0)) return 0;
 #endif
@@ -214,7 +205,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
     if (!name)
     {
         // init file
-        tb_handle_t file = tb_file_init(".demo", TB_FILE_MODE_RO);
+        tb_file_ref_t file = tb_file_init(".demo", TB_FILE_MODE_RO);
         if (file)
         {
             // read line
@@ -272,11 +263,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
         tb_trace_i("help: or");
         tb_trace_i("help: ./demo.b name args ...");
         tb_trace_i("help: ");
-        tb_trace_i("help: example: echo \"stream_basic_stream\" > ./.demo");
+        tb_trace_i("help: example: echo \"stream\" > ./.demo");
         tb_trace_i("help: example:     ./demo.b --help");
         tb_trace_i("help: example:     ./demo.b http://www.xxxxx.com /tmp/a");
         tb_trace_i("help: example: or");
-        tb_trace_i("help: example: ./demo.b stream_basic_stream http://www.xxxxx.com /tmp/a");
+        tb_trace_i("help: example: ./demo.b stream http://www.xxxxx.com /tmp/a");
         tb_trace_i("help: ");
 
         // walk name

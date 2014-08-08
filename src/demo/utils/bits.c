@@ -788,11 +788,11 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_double_lle(3.1415926);
 
     tb_trace_i("");
-    tb_test_bits_float_be(3.1415926);
-    tb_test_bits_float_le(3.1415926);
+    tb_test_bits_float_be(3.1415926f);
+    tb_test_bits_float_le(3.1415926f);
 
-    tb_test_bits_float_be(3.1415926);
-    tb_test_bits_float_le(3.1415926);
+    tb_test_bits_float_be(3.1415926f);
+    tb_test_bits_float_le(3.1415926f);
 #endif
 #endif
 
@@ -840,13 +840,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_cl0_u64_be(123456);
     tb_test_bits_cl0_u64_be(800000);
     tb_test_bits_cl0_u64_be(31415926);
-    tb_test_bits_cl0_u64_be(0xffffffffffffffff);
-    tb_test_bits_cl0_u64_be(0xfffffffffffffff0);
-    tb_test_bits_cl0_u64_be(0x0fffffffffffffff);
-    tb_test_bits_cl0_u64_be(0xfff00ffffff00fff);
-    tb_test_bits_cl0_u64_be(0x0ffffff00ffffff0);
-    tb_test_bits_cl0_u64_be(0x000000000000000f);
-    tb_test_bits_cl0_u64_be(0xf000000000000000);
+    tb_test_bits_cl0_u64_be(0xffffffffffffffffull);
+    tb_test_bits_cl0_u64_be(0xfffffffffffffff0ull);
+    tb_test_bits_cl0_u64_be(0x0fffffffffffffffull);
+    tb_test_bits_cl0_u64_be(0xfff00ffffff00fffull);
+    tb_test_bits_cl0_u64_be(0x0ffffff00ffffff0ull);
+    tb_test_bits_cl0_u64_be(0x000000000000000full);
+    tb_test_bits_cl0_u64_be(0xf000000000000000ull);
 
     tb_trace_i("");
     tb_test_bits_cl0_u64_le(0);
@@ -857,13 +857,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_cl0_u64_le(123456);
     tb_test_bits_cl0_u64_le(800000);
     tb_test_bits_cl0_u64_le(31415926);
-    tb_test_bits_cl0_u64_le(0xffffffffffffffff);
-    tb_test_bits_cl0_u64_le(0xfffffffffffffff0);
-    tb_test_bits_cl0_u64_le(0x0fffffffffffffff);
-    tb_test_bits_cl0_u64_le(0xfff00ffffff00fff);
-    tb_test_bits_cl0_u64_le(0x0ffffff00ffffff0);
-    tb_test_bits_cl0_u64_le(0x000000000000000f);
-    tb_test_bits_cl0_u64_le(0xf000000000000000);
+    tb_test_bits_cl0_u64_le(0xffffffffffffffffull);
+    tb_test_bits_cl0_u64_le(0xfffffffffffffff0ull);
+    tb_test_bits_cl0_u64_le(0x0fffffffffffffffull);
+    tb_test_bits_cl0_u64_le(0xfff00ffffff00fffull);
+    tb_test_bits_cl0_u64_le(0x0ffffff00ffffff0ull);
+    tb_test_bits_cl0_u64_le(0x000000000000000full);
+    tb_test_bits_cl0_u64_le(0xf000000000000000ull);
 #endif
 
 #if 1
@@ -910,13 +910,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_cl1_u64_be(123456);
     tb_test_bits_cl1_u64_be(800000);
     tb_test_bits_cl1_u64_be(31415926);
-    tb_test_bits_cl1_u64_be(0xffffffffffffffff);
-    tb_test_bits_cl1_u64_be(0xfffffffffffffff0);
-    tb_test_bits_cl1_u64_be(0x0fffffffffffffff);
-    tb_test_bits_cl1_u64_be(0xfff00ffffff00fff);
-    tb_test_bits_cl1_u64_be(0x0ffffff00ffffff0);
-    tb_test_bits_cl1_u64_be(0x000000000000000f);
-    tb_test_bits_cl1_u64_be(0xf000000000000000);
+    tb_test_bits_cl1_u64_be(0xffffffffffffffffull);
+    tb_test_bits_cl1_u64_be(0xfffffffffffffff0ull);
+    tb_test_bits_cl1_u64_be(0x0fffffffffffffffull);
+    tb_test_bits_cl1_u64_be(0xfff00ffffff00fffull);
+    tb_test_bits_cl1_u64_be(0x0ffffff00ffffff0ull);
+    tb_test_bits_cl1_u64_be(0x000000000000000full);
+    tb_test_bits_cl1_u64_be(0xf000000000000000ull);
 
     tb_trace_i("");
     tb_test_bits_cl1_u64_le(0);
@@ -927,13 +927,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_cl1_u64_le(123456);
     tb_test_bits_cl1_u64_le(800000);
     tb_test_bits_cl1_u64_le(31415926);
-    tb_test_bits_cl1_u64_le(0xffffffffffffffff);
-    tb_test_bits_cl1_u64_le(0xfffffffffffffff0);
-    tb_test_bits_cl1_u64_le(0x0fffffffffffffff);
-    tb_test_bits_cl1_u64_le(0xfff00ffffff00fff);
-    tb_test_bits_cl1_u64_le(0x0ffffff00ffffff0);
-    tb_test_bits_cl1_u64_le(0x000000000000000f);
-    tb_test_bits_cl1_u64_le(0xf000000000000000);
+    tb_test_bits_cl1_u64_le(0xffffffffffffffffull);
+    tb_test_bits_cl1_u64_le(0xfffffffffffffff0ull);
+    tb_test_bits_cl1_u64_le(0x0fffffffffffffffull);
+    tb_test_bits_cl1_u64_le(0xfff00ffffff00fffull);
+    tb_test_bits_cl1_u64_le(0x0ffffff00ffffff0ull);
+    tb_test_bits_cl1_u64_le(0x000000000000000full);
+    tb_test_bits_cl1_u64_le(0xf000000000000000ull);
 #endif
 
 #if 1
@@ -963,13 +963,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_cb0_u64(123456);
     tb_test_bits_cb0_u64(800000);
     tb_test_bits_cb0_u64(31415926);
-    tb_test_bits_cb0_u64(0xffffffffffffffff);
-    tb_test_bits_cb0_u64(0xfffffffffffffff0);
-    tb_test_bits_cb0_u64(0x0fffffffffffffff);
-    tb_test_bits_cb0_u64(0xfff00ffffff00fff);
-    tb_test_bits_cb0_u64(0x0ffffff00ffffff0);
-    tb_test_bits_cb0_u64(0x000000000000000f);
-    tb_test_bits_cb0_u64(0xf000000000000000);
+    tb_test_bits_cb0_u64(0xffffffffffffffffull);
+    tb_test_bits_cb0_u64(0xfffffffffffffff0ull);
+    tb_test_bits_cb0_u64(0x0fffffffffffffffull);
+    tb_test_bits_cb0_u64(0xfff00ffffff00fffull);
+    tb_test_bits_cb0_u64(0x0ffffff00ffffff0ull);
+    tb_test_bits_cb0_u64(0x000000000000000full);
+    tb_test_bits_cb0_u64(0xf000000000000000ull);
 #endif
 
 #if 1
@@ -999,13 +999,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_cb1_u64(123456);
     tb_test_bits_cb1_u64(800000);
     tb_test_bits_cb1_u64(31415926);
-    tb_test_bits_cb1_u64(0xffffffffffffffff);
-    tb_test_bits_cb1_u64(0xfffffffffffffff0);
-    tb_test_bits_cb1_u64(0x0fffffffffffffff);
-    tb_test_bits_cb1_u64(0xfff00ffffff00fff);
-    tb_test_bits_cb1_u64(0x0ffffff00ffffff0);
-    tb_test_bits_cb1_u64(0x000000000000000f);
-    tb_test_bits_cb1_u64(0xf000000000000000);
+    tb_test_bits_cb1_u64(0xffffffffffffffffull);
+    tb_test_bits_cb1_u64(0xfffffffffffffff0ull);
+    tb_test_bits_cb1_u64(0x0fffffffffffffffull);
+    tb_test_bits_cb1_u64(0xfff00ffffff00fffull);
+    tb_test_bits_cb1_u64(0x0ffffff00ffffff0ull);
+    tb_test_bits_cb1_u64(0x000000000000000full);
+    tb_test_bits_cb1_u64(0xf000000000000000ull);
 #endif
 
 
@@ -1053,13 +1053,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_fb0_u64_be(123456);
     tb_test_bits_fb0_u64_be(800000);
     tb_test_bits_fb0_u64_be(31415926);
-    tb_test_bits_fb0_u64_be(0xffffffffffffffff);
-    tb_test_bits_fb0_u64_be(0xfffffffffffffff0);
-    tb_test_bits_fb0_u64_be(0x0fffffffffffffff);
-    tb_test_bits_fb0_u64_be(0xfff00ffffff00fff);
-    tb_test_bits_fb0_u64_be(0x0ffffff00ffffff0);
-    tb_test_bits_fb0_u64_be(0x000000000000000f);
-    tb_test_bits_fb0_u64_be(0xf000000000000000);
+    tb_test_bits_fb0_u64_be(0xffffffffffffffffull);
+    tb_test_bits_fb0_u64_be(0xfffffffffffffff0ull);
+    tb_test_bits_fb0_u64_be(0x0fffffffffffffffull);
+    tb_test_bits_fb0_u64_be(0xfff00ffffff00fffull);
+    tb_test_bits_fb0_u64_be(0x0ffffff00ffffff0ull);
+    tb_test_bits_fb0_u64_be(0x000000000000000full);
+    tb_test_bits_fb0_u64_be(0xf000000000000000ull);
 
     tb_trace_i("");
     tb_test_bits_fb0_u64_le(0);
@@ -1070,13 +1070,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_fb0_u64_le(123456);
     tb_test_bits_fb0_u64_le(800000);
     tb_test_bits_fb0_u64_le(31415926);
-    tb_test_bits_fb0_u64_le(0xffffffffffffffff);
-    tb_test_bits_fb0_u64_le(0xfffffffffffffff0);
-    tb_test_bits_fb0_u64_le(0x0fffffffffffffff);
-    tb_test_bits_fb0_u64_le(0xfff00ffffff00fff);
-    tb_test_bits_fb0_u64_le(0x0ffffff00ffffff0);
-    tb_test_bits_fb0_u64_le(0x000000000000000f);
-    tb_test_bits_fb0_u64_le(0xf000000000000000);
+    tb_test_bits_fb0_u64_le(0xffffffffffffffffull);
+    tb_test_bits_fb0_u64_le(0xfffffffffffffff0ull);
+    tb_test_bits_fb0_u64_le(0x0fffffffffffffffull);
+    tb_test_bits_fb0_u64_le(0xfff00ffffff00fffull);
+    tb_test_bits_fb0_u64_le(0x0ffffff00ffffff0ull);
+    tb_test_bits_fb0_u64_le(0x000000000000000full);
+    tb_test_bits_fb0_u64_le(0xf000000000000000ull);
 #endif
 
 #if 1
@@ -1123,13 +1123,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_fb1_u64_be(123456);
     tb_test_bits_fb1_u64_be(800000);
     tb_test_bits_fb1_u64_be(31415926);
-    tb_test_bits_fb1_u64_be(0xffffffffffffffff);
-    tb_test_bits_fb1_u64_be(0xfffffffffffffff0);
-    tb_test_bits_fb1_u64_be(0x0fffffffffffffff);
-    tb_test_bits_fb1_u64_be(0xfff00ffffff00fff);
-    tb_test_bits_fb1_u64_be(0x0ffffff00ffffff0);
-    tb_test_bits_fb1_u64_be(0x000000000000000f);
-    tb_test_bits_fb1_u64_be(0xf000000000000000);
+    tb_test_bits_fb1_u64_be(0xffffffffffffffffull);
+    tb_test_bits_fb1_u64_be(0xfffffffffffffff0ull);
+    tb_test_bits_fb1_u64_be(0x0fffffffffffffffull);
+    tb_test_bits_fb1_u64_be(0xfff00ffffff00fffull);
+    tb_test_bits_fb1_u64_be(0x0ffffff00ffffff0ull);
+    tb_test_bits_fb1_u64_be(0x000000000000000full);
+    tb_test_bits_fb1_u64_be(0xf000000000000000ull);
 
     tb_trace_i("");
     tb_test_bits_fb1_u64_le(0);
@@ -1140,13 +1140,13 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_fb1_u64_le(123456);
     tb_test_bits_fb1_u64_le(800000);
     tb_test_bits_fb1_u64_le(31415926);
-    tb_test_bits_fb1_u64_le(0xffffffffffffffff);
-    tb_test_bits_fb1_u64_le(0xfffffffffffffff0);
-    tb_test_bits_fb1_u64_le(0x0fffffffffffffff);
-    tb_test_bits_fb1_u64_le(0xfff00ffffff00fff);
-    tb_test_bits_fb1_u64_le(0x0ffffff00ffffff0);
-    tb_test_bits_fb1_u64_le(0x000000000000000f);
-    tb_test_bits_fb1_u64_le(0xf000000000000000);
+    tb_test_bits_fb1_u64_le(0xffffffffffffffffull);
+    tb_test_bits_fb1_u64_le(0xfffffffffffffff0ull);
+    tb_test_bits_fb1_u64_le(0x0fffffffffffffffull);
+    tb_test_bits_fb1_u64_le(0xfff00ffffff00fffull);
+    tb_test_bits_fb1_u64_le(0x0ffffff00ffffff0ull);
+    tb_test_bits_fb1_u64_le(0x000000000000000full);
+    tb_test_bits_fb1_u64_le(0xf000000000000000ull);
 #endif
 
     return 0;

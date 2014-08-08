@@ -15,21 +15,23 @@ DLL_SUFFIX 			= .dylib
 
 ASM_SUFFIX 			= .S
 
+# prefix
+PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),xcrun -sdk iphoneos )
+
 # toolchain
-PRE 				= xcrun -sdk iphoneos 
-CC 					= $(PRE)gcc 
-MM 					= $(PRE)gcc
-AR 					= $(PRE)ar
-STRIP 				= $(PRE)strip
-RANLIB 				= $(PRE)ranlib
-LD 					= $(PRE)gcc
-AS					= $(PLAT_DIR)/gas-preprocessor.pl $(PRE)gcc
+CC 					= $(PRE_)clang
+MM 					= $(PRE_)clang
+AR 					= $(PRE_)ar
+STRIP 				= $(PRE_)strip
+RANLIB 				= $(PRE_)ranlib
+LD 					= $(PRE_)clang
+AS					= $(PLAT_DIR)/gas-preprocessor.pl $(PRE_)clang
 RM 					= rm -f
 RMDIR 				= rm -rf
 CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
-MAKE 				= make
+MAKE 				= make -r
 PWD 				= pwd
 
 # cpu flags
@@ -47,7 +49,7 @@ endif
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fomit-frame-pointer -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g 
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= \
 					-arch $(ARCH) -c -Wall -mthumb $(CPU_CXFLAGS) \
 					-Werror -Wno-error=deprecated-declarations -Qunused-arguments \
@@ -74,7 +76,7 @@ CCFLAGS 			=
 
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -fomit-frame-pointer -fvisibility=hidden
-MXFLAGS_DEBUG 		= -g 
+MXFLAGS_DEBUG 		= -g -D__tb_debug__
 MXFLAGS 			= \
 					-arch $(ARCH) -c -Wall -mthumb $(CPU_CXFLAGS) \
 					-Werror -Wno-error=deprecated-declarations -Qunused-arguments \
@@ -111,6 +113,7 @@ LDFLAGS_DEBUG 		=
 LDFLAGS 			= -arch $(ARCH) -framework Foundation
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
+LDFLAGS-f 			=
 LDFLAGS-o 			= -o
 
 # asflags
@@ -121,7 +124,10 @@ ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
 # arflags
+ARFLAGS_RELEASE 	= 
+ARFLAGS_DEBUG 		= 
 ARFLAGS 			= -cr
+ARFLAGS-o 			= 
 
 # shflags
 SHFLAGS_RELEASE 	= -s

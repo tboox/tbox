@@ -164,7 +164,7 @@ tb_int_t tb_demo_libc_stdlib_main(tb_int_t argc, tb_char_t** argv)
     tb_test_sbtof("0.1415926", 10, 0.1415926);
     tb_test_sbtof("3.123456789123456789", 10, 3.123456789123456789);
     tb_test_sbtof("00003.0001415926000", 10, 00003.0001415926000);
-    tb_test_sbtof("4294967295", 10, 4294967295);
+    tb_test_sbtof("4294967295", 10, 4294967295ul);
     tb_test_sbtof("4294967295.", 10, 4294967295.);
     tb_test_sbtof("01234567", 8, 01234567);
     tb_test_sbtof("0xb14ac01c", 16, 0xb14ac01c);
@@ -181,7 +181,6 @@ tb_int_t tb_demo_libc_stdlib_main(tb_int_t argc, tb_char_t** argv)
     tb_test_sbtof("-0.1415926", 10, -0.1415926);
     tb_test_sbtof("-3.123456789123456789", 10, -3.123456789123456789);
     tb_test_sbtof("-00003.0001415926000", 10, -00003.0001415926000);
-    tb_test_sbtof("-4294967295", 10, -4294967295);
     tb_test_sbtof("-4294967295.", 10, -4294967295.f);
 
     tb_printf("===============================\n");

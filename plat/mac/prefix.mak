@@ -27,7 +27,7 @@ PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),xcrun -sdk macosx )
 CC 					= $(PRE_)clang
 ifeq ($(CXFLAGS_CHECK),)
 CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
+CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,)
 export CXFLAGS_CHECK
 endif
 
@@ -35,7 +35,7 @@ endif
 LD 					= $(PRE_)clang
 ifeq ($(LDFLAGS_CHECK),)
 LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) #-fsanitize=thread
+LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) 
 export LDFLAGS_CHECK
 endif
 
@@ -50,12 +50,12 @@ RMDIR 				= rm -rf
 CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
-MAKE 				= make
+MAKE 				= make -r
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g  
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
@@ -92,7 +92,7 @@ CCFLAGS 			= \
 
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -fvisibility=hidden
-MXFLAGS_DEBUG 		= -g  
+MXFLAGS_DEBUG 		= -g -D__tb_debug__
 MXFLAGS 			= \
 					-m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments \
 					-mssse3 $(ARCH_CXFLAGS) -fmessage-length=0 -pipe -fpascal-strings \
@@ -133,6 +133,7 @@ LDFLAGS_DEBUG 		=
 LDFLAGS 			= -m$(BITS) -all_load
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
+LDFLAGS-f 			=
 LDFLAGS-o 			= -o
 
 # prof
@@ -150,7 +151,10 @@ ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
 # arflags
+ARFLAGS_RELEASE 	= 
+ARFLAGS_DEBUG 		= 
 ARFLAGS 			= -cr
+ARFLAGS-o 			= 
 
 # shflags
 SHFLAGS_RELEASE 	= -s

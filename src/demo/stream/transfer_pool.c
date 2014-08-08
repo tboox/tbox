@@ -13,7 +13,7 @@
  * globals
  */ 
 #if TB_DEMO_TEST_AICP
-static tb_handle_t g_event = tb_null;
+static tb_event_ref_t g_event = tb_null;
 #endif
     
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ tb_int_t tb_demo_stream_transfer_pool_main(tb_int_t argc, tb_char_t** argv)
     g_event = tb_null;
 #else
     tb_char_t** p = &argv[2];
-    for (; p && *p; p++) tb_basic_transfer_done_url_to_url(argv[1], *p, 0, tb_demo_transfer_done_func, *p);
+    for (; p && *p; p++) tb_transfer_done_url(argv[1], *p, 0, tb_demo_transfer_done_func, *p);
 #endif
     return 0;
 }

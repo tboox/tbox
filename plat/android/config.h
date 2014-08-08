@@ -1,11 +1,17 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// major version
+#define TB_CONFIG_VERSION_MAJOR         [major]
+
+// minor version
+#define TB_CONFIG_VERSION_MINOR         [minor]
+
+// alter version
+#define TB_CONFIG_VERSION_ALTER         [alter]
+
 // build version
 #define TB_CONFIG_VERSION_BUILD 		[build]
-
-// debug
-#define TB_CONFIG_DEBUG					[debug]
 
 // small
 #define TB_CONFIG_SMALL					[small]
@@ -17,12 +23,6 @@
 // api
 #define TB_CONFIG_API_HAVE_POSIX
 #define TB_CONFIG_API_HAVE_SYSTEMV
-
-// assembler
-#define TB_CONFIG_ASSEMBLER_GAS
-//#define TB_CONFIG_ASSEMBLER_MASM
-//#define TB_CONFIG_ASSEMBLER_NASM
-//#define TB_CONFIG_ASSEMBLER_YASM
 
 // type
 #define TB_CONFIG_TYPE_FLOAT

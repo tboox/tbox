@@ -12,7 +12,7 @@ static tb_bool_t tb_demo_async_stream_null_done_func(tb_size_t state, tb_hize_t 
     tb_trace_i("save: %llu bytes, rate: %lu bytes/s, state: %s", save, rate, tb_state_cstr(state));
 
     // exit wait
-    if (state != TB_STATE_OK) tb_event_post((tb_handle_t)priv);
+    if (state != TB_STATE_OK) tb_event_post((tb_event_ref_t)priv);
 
     // ok
     return tb_true;
@@ -24,11 +24,11 @@ static tb_bool_t tb_demo_async_stream_null_done_func(tb_size_t state, tb_hize_t 
 tb_int_t tb_demo_stream_async_stream_null_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
-    tb_handle_t         event = tb_null;
-    tb_handle_t         transfer = tb_null;
-    tb_async_stream_t*  istream = tb_null;
-    tb_async_stream_t*  ostream = tb_null;
-    tb_async_stream_t*  fstream = tb_null;
+    tb_event_ref_t              event = tb_null;
+    tb_async_transfer_ref_t     transfer = tb_null;
+    tb_async_stream_ref_t       istream = tb_null;
+    tb_async_stream_ref_t       ostream = tb_null;
+    tb_async_stream_ref_t       fstream = tb_null;
     do
     {
         // init event

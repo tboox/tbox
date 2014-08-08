@@ -16,9 +16,12 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # prefix
-PRE 				:= $(if $(findstring x86,$(ARCH)),$(if $(findstring mac,$(HOST)),i386-mingw32-,i686-w64-mingw32-),$(PRE))
+ifeq ($(PRE_),)
+PRE 				:= $(if $(findstring x86,$(ARCH)),$(if $(findstring mac,$(HOST)),i386-mingw32-,$(if $(findstring msys,$(HOST)),,i686-w64-mingw32-)),$(PRE))
 PRE 				:= $(if $(findstring x64,$(ARCH)),x86_64-w64-mingw32-,$(PRE))
 PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),$(PRE))
+export PRE_
+endif
 
 # cpu bits
 BITS 				:= $(if $(findstring x64,$(ARCH)),64,)
@@ -36,13 +39,13 @@ RMDIR 				= rm -rf
 CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
-MAKE 				= make
+MAKE 				= make -r
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -freg-struct-return -fvisibility=hidden 
-CXFLAGS_DEBUG 		= -g 
-CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -Qunused-arguments 
+CXFLAGS_RELEASE 	= -freg-struct-return 
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -70,7 +73,7 @@ endif
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
-					-std=c99 \
+					-std=gnu99 \
 					-D_GNU_SOURCE=1 -D_REENTRANT -fno-math-errno
 
 # ccflags: .cc/.cpp files
@@ -86,6 +89,7 @@ LDFLAGS_DEBUG 		=
 LDFLAGS 			= -m$(BITS) -static
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
+LDFLAGS-f 			= 
 LDFLAGS-o 			= -o
 
 # asflags
@@ -96,7 +100,10 @@ ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
 # arflags
+ARFLAGS_RELEASE 	= 
+ARFLAGS_DEBUG 		= 
 ARFLAGS 			= -cr
+ARFLAGS-o 			= 
 
 # shflags
 SHFLAGS_RELEASE 	= -s

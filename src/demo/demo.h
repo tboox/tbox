@@ -26,7 +26,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../tbox.h"
+#include "../tbox/tbox.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -63,6 +63,7 @@ TB_DEMO_MAIN_DECL(libm_integer);
 // asio
 TB_DEMO_MAIN_DECL(asio_dns);
 TB_DEMO_MAIN_DECL(asio_http);
+TB_DEMO_MAIN_DECL(asio_httpd);
 TB_DEMO_MAIN_DECL(asio_aiopc);
 TB_DEMO_MAIN_DECL(asio_aiopd);
 TB_DEMO_MAIN_DECL(asio_aicpc);
@@ -100,63 +101,63 @@ TB_DEMO_MAIN_DECL(object_dump);
 TB_DEMO_MAIN_DECL(stream_transfer_pool);
 TB_DEMO_MAIN_DECL(stream_async_transfer);
 TB_DEMO_MAIN_DECL(stream_async_stream);
-TB_DEMO_MAIN_DECL(stream_basic_stream);
-TB_DEMO_MAIN_DECL(stream_basic_stream_zip);
-TB_DEMO_MAIN_DECL(stream_basic_stream_null);
-TB_DEMO_MAIN_DECL(stream_basic_stream_cache);
-TB_DEMO_MAIN_DECL(stream_basic_stream_charset);
+TB_DEMO_MAIN_DECL(stream);
+TB_DEMO_MAIN_DECL(stream_zip);
+TB_DEMO_MAIN_DECL(stream_null);
+TB_DEMO_MAIN_DECL(stream_cache);
+TB_DEMO_MAIN_DECL(stream_charset);
 TB_DEMO_MAIN_DECL(stream_async_stream_zip);
 TB_DEMO_MAIN_DECL(stream_async_stream_null);
 TB_DEMO_MAIN_DECL(stream_async_stream_cache);
 TB_DEMO_MAIN_DECL(stream_async_stream_charset);
 
 // string
-TB_DEMO_MAIN_DECL(string_pool);
-TB_DEMO_MAIN_DECL(string_scoped_string);
+TB_DEMO_MAIN_DECL(string_string);
 TB_DEMO_MAIN_DECL(string_static_string);
 
 // memory
 TB_DEMO_MAIN_DECL(memory_check);
-TB_DEMO_MAIN_DECL(memory_static_fixed_pool);
-TB_DEMO_MAIN_DECL(memory_global_pool);
-TB_DEMO_MAIN_DECL(memory_block_pool);
-TB_DEMO_MAIN_DECL(memory_tiny_pool);
-TB_DEMO_MAIN_DECL(memory_static_block_pool);
+TB_DEMO_MAIN_DECL(memory_pool);
 TB_DEMO_MAIN_DECL(memory_fixed_pool);
+TB_DEMO_MAIN_DECL(memory_large_pool);
+TB_DEMO_MAIN_DECL(memory_small_pool);
+TB_DEMO_MAIN_DECL(memory_string_pool);
 TB_DEMO_MAIN_DECL(memory_memops);
-TB_DEMO_MAIN_DECL(memory_scoped_buffer);
+TB_DEMO_MAIN_DECL(memory_buffer);
 TB_DEMO_MAIN_DECL(memory_queue_buffer);
 TB_DEMO_MAIN_DECL(memory_static_buffer);
+TB_DEMO_MAIN_DECL(memory_impl_static_fixed_pool);
 
 // network
 TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_http);
-TB_DEMO_MAIN_DECL(network_date);
 TB_DEMO_MAIN_DECL(network_whois);
 TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
+TB_DEMO_MAIN_DECL(network_impl_date);
 
 // platform
 TB_DEMO_MAIN_DECL(platform_file);
 TB_DEMO_MAIN_DECL(platform_lock);
 TB_DEMO_MAIN_DECL(platform_path);
-TB_DEMO_MAIN_DECL(platform_cache_time);
 TB_DEMO_MAIN_DECL(platform_event);
 TB_DEMO_MAIN_DECL(platform_utils);
 TB_DEMO_MAIN_DECL(platform_timer);
-TB_DEMO_MAIN_DECL(platform_thread_store);
 TB_DEMO_MAIN_DECL(platform_ltimer);
 TB_DEMO_MAIN_DECL(platform_atomic);
 TB_DEMO_MAIN_DECL(platform_process);
 TB_DEMO_MAIN_DECL(platform_barrier);
 TB_DEMO_MAIN_DECL(platform_atomic64);
+TB_DEMO_MAIN_DECL(platform_processor);
 TB_DEMO_MAIN_DECL(platform_backtrace);
 TB_DEMO_MAIN_DECL(platform_directory);
 TB_DEMO_MAIN_DECL(platform_exception);
 TB_DEMO_MAIN_DECL(platform_semaphore);
+TB_DEMO_MAIN_DECL(platform_cache_time);
 TB_DEMO_MAIN_DECL(platform_thread_pool);
+TB_DEMO_MAIN_DECL(platform_thread_store);
 
 // container
 TB_DEMO_MAIN_DECL(container_heap);
@@ -165,7 +166,9 @@ TB_DEMO_MAIN_DECL(container_list);
 TB_DEMO_MAIN_DECL(container_queue);
 TB_DEMO_MAIN_DECL(container_stack);
 TB_DEMO_MAIN_DECL(container_vector);
+TB_DEMO_MAIN_DECL(container_list_entry);
 TB_DEMO_MAIN_DECL(container_single_list);
+TB_DEMO_MAIN_DECL(container_single_list_entry);
 TB_DEMO_MAIN_DECL(container_bloom_filter);
 
 // algorithm

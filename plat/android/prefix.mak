@@ -28,12 +28,12 @@ RMDIR 				= rm -rf
 CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
-MAKE 				= make
+MAKE 				= make -r
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g 
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -c -Wall -fomit-frame-pointer -march=$(ARCH) \
 					  -I$(NDK)/platforms/android-8/arch-arm/usr/include 
 CXFLAGS-I 			= -I
@@ -76,6 +76,7 @@ LDFLAGS 			= -nostdlib \
 					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtend_android.o
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
+LDFLAGS-f 			=
 LDFLAGS-o 			= -o
 
 # asflags
@@ -86,7 +87,10 @@ ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
 # arflags
+ARFLAGS_RELEASE 	= 
+ARFLAGS_DEBUG 		= 
 ARFLAGS 			= -cr
+ARFLAGS-o 			= 
 
 # shflags
 SHFLAGS_RELEASE 	= -s

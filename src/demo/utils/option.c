@@ -38,7 +38,7 @@ static tb_option_item_t g_options[] =
 tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
 {
     // init option
-    tb_handle_t option = tb_option_init("option", "the option command test demo", g_options);
+    tb_option_ref_t option = tb_option_init("option", "the option command test demo", g_options);
     if (option)
     {
         // done option
