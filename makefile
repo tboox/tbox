@@ -218,9 +218,8 @@ MIPS :=$(if $(findstring mips,$(ARCH)),y,n)
 # sparc
 SPARC :=$(if $(findstring sparc,$(ARCH)),y,n)
 
-# project
+# the project directory
 PRO_DIR 	:=${shell pwd}
-PRO_NAME 	:=${shell basename ${shell pwd}}
 
 # flag
 CXFLAG 		:= $(if $(CXFLAG),$(CXFLAG),)
@@ -254,7 +253,6 @@ config : .null
 	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
 	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
 	@echo "config: ==================================================================="
-	@echo "config: name:     " 							$(PRO_NAME)
 	@echo "config: plat:     " 							$(PLAT)
 	@echo "config: arch:     " 							$(ARCH)
 	@echo "config: host:     " 							$(HOST)
@@ -286,7 +284,6 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# project"              						>> .config.mak
 	@echo "PRO_DIR ="$(PRO_DIR) 						>> .config.mak
-	@echo "PRO_NAME ="$(PRO_NAME) 						>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# profile"              						>> .config.mak
 	@echo "PROF ="$(PROF) 								>> .config.mak
@@ -341,7 +338,6 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# export"									>> .config.mak
 	@echo "export PRO_DIR" 		 						>> .config.mak
-	@echo "export PRO_NAME" 		 					>> .config.mak
 	@echo "export DEBUG" 			 					>> .config.mak
 	@echo "export DTYPE" 			 					>> .config.mak
 	@echo "export SMALL" 			 					>> .config.mak

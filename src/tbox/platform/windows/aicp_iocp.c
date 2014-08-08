@@ -2198,8 +2198,8 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
         tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, iocp_aico->task);
 
         // kill task
-        if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, iocp_aico->task);
-        else tb_timer_task_kill(impl->timer, iocp_aico->task);
+        if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)iocp_aico->task);
+        else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)iocp_aico->task);
     }
     // append the killed handle
     else 
