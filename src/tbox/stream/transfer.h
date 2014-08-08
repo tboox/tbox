@@ -79,7 +79,7 @@ tb_hong_t           tb_transfer_done(tb_stream_ref_t istream, tb_stream_ref_t os
  *
  * @return          the saved size, failed: -1
  */
-tb_hong_t           tb_transfer_done_stream_to_url(tb_stream_ref_t istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv);
+tb_hong_t           tb_transfer_done_to_url(tb_stream_ref_t istream, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv);
 
 /*! done transfer from stream to data
  *
@@ -92,7 +92,7 @@ tb_hong_t           tb_transfer_done_stream_to_url(tb_stream_ref_t istream, tb_c
  *
  * @return          the saved size, failed: -1
  */
-tb_hong_t           tb_transfer_done_stream_to_data(tb_stream_ref_t istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv);
+tb_hong_t           tb_transfer_done_to_data(tb_stream_ref_t istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv);
 
 /*! done transfer from url to url
  *
@@ -104,7 +104,7 @@ tb_hong_t           tb_transfer_done_stream_to_data(tb_stream_ref_t istream, tb_
  *
  * @return          the saved size, failed: -1
  */
-tb_hong_t           tb_transfer_done_url_to_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv);
+tb_hong_t           tb_transfer_done_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_transfer_done_func_t func, tb_cpointer_t priv);
 
 /*! done transfer from url to stream
  *

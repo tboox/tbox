@@ -2,7 +2,7 @@
  * includes
  */
 #include "../../demo.h"
-#include "../../../memory/impl/static_fixed_pool.h"
+#include "../../../tbox/memory/impl/static_fixed_pool.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * demo
