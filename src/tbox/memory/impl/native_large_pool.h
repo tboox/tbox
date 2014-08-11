@@ -86,6 +86,13 @@ tb_pointer_t            tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb
 tb_bool_t               tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
+/* diff the pool
+ *
+ * @param pool          the pool
+ * @param diff          the different size for the debug info
+ */
+tb_void_t               tb_native_large_pool_diff(tb_large_pool_ref_t pool, tb_long_t diff);
+
 /* dump the pool
  *
  * @param handle        the pool
