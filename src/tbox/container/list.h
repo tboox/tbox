@@ -56,24 +56,12 @@ __tb_extern_c_enter__
  * insert head: fast
  * insert tail: fast
  * insert next: fast
- * 
- * ninsert:
- * ninsert midd: fast
- * ninsert head: fast
- * ninsert tail: fast
- * ninsert next: fast
  *
  * remove:
  * remove midd: fast
  * remove head: fast
  * remove last: fast
  * remove next: fast
- *
- * nremove:
- * nremove midd: fast
- * nremove head: fast
- * nremove last: fast
- * nremove next: fast
  *
  * iterator:
  * next: fast
@@ -196,18 +184,14 @@ tb_size_t           tb_list_remove(tb_list_ref_t list, tb_size_t itor);
 /*! remove the head item
  *
  * @param list      the list
- *
- * @return          the next item
  */
-tb_size_t           tb_list_remove_head(tb_list_ref_t list);
+tb_void_t           tb_list_remove_head(tb_list_ref_t list);
 
 /*! remove the last item
  *
  * @param list      the list
- *
- * @return          the next item
  */
-tb_size_t           tb_list_remove_last(tb_list_ref_t list);
+tb_void_t           tb_list_remove_last(tb_list_ref_t list);
 
 /*! moveto the prev item
  *
