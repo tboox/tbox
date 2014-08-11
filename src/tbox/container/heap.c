@@ -142,6 +142,15 @@ static tb_size_t tb_heap_itor_head(tb_iterator_ref_t iterator)
     // head
     return 0;
 }
+static tb_size_t tb_heap_itor_last(tb_iterator_ref_t iterator)
+{
+    // check
+    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
+
+    // last
+    return impl->size? impl->size - 1 : 0;
+}
 static tb_size_t tb_heap_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
@@ -425,6 +434,7 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.step     = func.size;
         impl->itor.size     = tb_heap_itor_size;
         impl->itor.head     = tb_heap_itor_head;
+        impl->itor.last     = tb_heap_itor_last;
         impl->itor.tail     = tb_heap_itor_tail;
         impl->itor.prev     = tb_heap_itor_prev;
         impl->itor.next     = tb_heap_itor_next;
