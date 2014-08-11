@@ -48,10 +48,6 @@ __tb_extern_c_enter__
  * stack: |||||||||||||||||||||||||||||||||||||||||------|
  *       head                                   last    tail
  *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
-
  * performance: 
  *
  * push:    fast

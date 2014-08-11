@@ -44,12 +44,8 @@ __tb_extern_c_enter__
 /*! the queue ref type
  *
  * <pre>
- * queue: |-----| => |-----| => ...                                 => |-----| => null
- *         head                                                          last     tail
- *
- * head: => the head item
- * last: => the last item
- * tail: => behind the last item, no item
+ * queue: |-----| => |-----| => ...                                 => |-----| => tail
+ *         head                                                          last     
  *
  * performance: 
  *

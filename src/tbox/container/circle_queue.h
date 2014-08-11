@@ -49,10 +49,6 @@ __tb_extern_c_enter__
  * queue: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
  *                   last  tail                       head                
  *
- * head: => the head item
- * last: => the last item
- * tail: => behind the last item, no item
- *
  * performance: 
  *
  * put: O(1)

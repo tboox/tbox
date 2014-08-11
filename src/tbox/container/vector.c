@@ -43,8 +43,12 @@
  * macros
  */
 
-// the item maxn
-#define TB_VECTOR_ITEM_MAXN             (1 << 30)
+// the vector maxn
+#ifdef __tb_small__
+#   define TB_VECTOR_MAXN             (1 << 16)
+#else
+#   define TB_VECTOR_MAXN             (1 << 30)
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -178,7 +182,7 @@ tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_item_func_t func)
         impl->grow = grow;
         impl->maxn = grow;
         impl->func = func;
-        tb_assert_and_check_break(impl->maxn < TB_VECTOR_ITEM_MAXN);
+        tb_assert_and_check_break(impl->maxn < TB_VECTOR_MAXN);
 
         // init iterator
         impl->itor.mode         = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
@@ -338,7 +342,7 @@ tb_bool_t tb_vector_resize(tb_vector_ref_t vector, tb_size_t size)
     if (size > impl->maxn)
     {
         tb_size_t maxn = tb_align4(size + impl->grow);
-        tb_assert_and_check_return_val(maxn < TB_VECTOR_ITEM_MAXN, tb_false);
+        tb_assert_and_check_return_val(maxn < TB_VECTOR_MAXN, tb_false);
 
         // realloc data
         impl->data = (tb_byte_t*)tb_ralloc(impl->data, maxn * impl->func.size);
