@@ -96,6 +96,15 @@ static tb_size_t tb_list_itor_head(tb_iterator_ref_t iterator)
     // head
     return (tb_size_t)tb_list_entry_head(&impl->head);
 }
+static tb_size_t tb_list_itor_last(tb_iterator_ref_t iterator)
+{
+    // check
+    tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
+    tb_assert_and_check_return_val(impl, 0);
+
+    // last
+    return (tb_size_t)tb_list_entry_last(&impl->head);
+}
 static tb_size_t tb_list_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
@@ -220,6 +229,7 @@ tb_list_ref_t tb_list_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.step         = func.size;
         impl->itor.size         = tb_list_itor_size;
         impl->itor.head         = tb_list_itor_head;
+        impl->itor.last         = tb_list_itor_last;
         impl->itor.tail         = tb_list_itor_tail;
         impl->itor.prev         = tb_list_itor_prev;
         impl->itor.next         = tb_list_itor_next;
@@ -383,13 +393,13 @@ tb_size_t tb_list_remove(tb_list_ref_t list, tb_size_t itor)
     // the next node
     return (tb_size_t)next;
 }
-tb_size_t tb_list_remove_head(tb_list_ref_t list)
+tb_void_t tb_list_remove_head(tb_list_ref_t list)
 {
-    return tb_list_remove(list, tb_iterator_head(list));
+    tb_list_remove(list, tb_iterator_head(list));
 }
-tb_size_t tb_list_remove_last(tb_list_ref_t list)
+tb_void_t tb_list_remove_last(tb_list_ref_t list)
 {
-    return tb_list_remove(list, tb_iterator_last(list));
+    tb_list_remove(list, tb_iterator_last(list));
 }
 tb_void_t tb_list_moveto_prev(tb_list_ref_t list, tb_size_t itor, tb_size_t move)
 {
@@ -405,7 +415,7 @@ tb_void_t tb_list_moveto_prev(tb_list_ref_t list, tb_size_t itor, tb_size_t move
     tb_list_entry_ref_t entry = (tb_list_entry_ref_t)move;
     tb_assert_and_check_return(entry);
 
-    // move to the previous node
+    // move to the prev node
     tb_list_entry_moveto_prev(&impl->head, node, entry);
 }
 tb_void_t tb_list_moveto_next(tb_list_ref_t list, tb_size_t itor, tb_size_t move)

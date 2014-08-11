@@ -65,7 +65,11 @@ tb_size_t tb_iterator_head(tb_iterator_ref_t iterator)
 }
 tb_size_t tb_iterator_last(tb_iterator_ref_t iterator)
 {
-    return tb_iterator_prev(iterator, tb_iterator_tail(iterator));
+    // check
+    tb_assert_and_check_return_val(iterator && iterator->last, 0);
+    
+    // last
+    return iterator->last(iterator);
 }
 tb_size_t tb_iterator_tail(tb_iterator_ref_t iterator)
 {

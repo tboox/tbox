@@ -70,6 +70,9 @@ typedef struct __tb_iterator_t
     /// the iterator head
     tb_size_t               (*head)(struct __tb_iterator_t* iterator);
 
+    /// the iterator last
+    tb_size_t               (*last)(struct __tb_iterator_t* iterator);
+
     /// the iterator tail
     tb_size_t               (*tail)(struct __tb_iterator_t* iterator);
 

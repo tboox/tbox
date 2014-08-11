@@ -49,7 +49,7 @@ static tb_void_t tb_list_insert_next_test()
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
     tb_hong_t t = tb_mclock();
-    for (i = 0; i < n; i++) tb_list_insert_prev(list, itor, (tb_pointer_t)0xd);
+    for (i = 0; i < n; i++) tb_list_insert_next(list, itor, (tb_pointer_t)0xd);
     t = tb_mclock() - t;
 
     // trace
