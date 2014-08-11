@@ -39,7 +39,10 @@
  */
 
 // the item belong to this slot?
-#define tb_fixed_pool_slot_exists(slot, item)   (((tb_byte_t*)(item) > (tb_byte_t*)(slot)) && ((tb_byte_t*)(item) < (tb_byte_t*)slot + (slot)->size))
+#define tb_fixed_pool_slot_exists(slot, item)               (((tb_byte_t*)(item) > (tb_byte_t*)(slot)) && ((tb_byte_t*)(item) < (tb_byte_t*)slot + (slot)->size))
+
+// malloc for large pool
+#define tb_large_pool_malloc_diff(pool, size, real, diff)   tb_large_pool_malloc_diff_(pool, size, real, diff __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -172,6 +175,11 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
         slot = (tb_fixed_pool_slot_t*)tb_large_pool_malloc(impl->large_pool, need_space, &real_space);
         tb_assert_and_check_break(slot);
         tb_assert_and_check_break(real_space > sizeof(tb_fixed_pool_slot_t) + item_space);
+
+#ifdef __tb_debug__
+        // remove the debug space size
+        tb_large_pool_diff(impl->large_pool, -(tb_long_t)(impl->slot_size * (TB_POOL_DATA_HEAD_DIFF_SIZE + patch)));
+#endif
 
         // init slot
         slot->size = real_space;

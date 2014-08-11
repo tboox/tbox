@@ -6,12 +6,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_size_t tb_circle_queue_put_and_pop_test()
+static tb_void_t tb_circle_queue_put_and_pop_test()
 {
     // init
     tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_item_func_long());
-    tb_assert_and_check_return_val(queue, 0);
+    tb_assert_and_check_return(queue);
 
+    // make queue
     tb_circle_queue_put(queue, (tb_pointer_t)0);
     tb_circle_queue_put(queue, (tb_pointer_t)1);
     tb_circle_queue_put(queue, (tb_pointer_t)2);
@@ -23,6 +24,7 @@ static tb_size_t tb_circle_queue_put_and_pop_test()
     tb_circle_queue_put(queue, (tb_pointer_t)8);
     tb_circle_queue_put(queue, (tb_pointer_t)9);
 
+    // done
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
@@ -33,7 +35,7 @@ static tb_size_t tb_circle_queue_put_and_pop_test()
     }
     t = tb_mclock() - t;
 
-    // time
+    // trace
     tb_trace_i("tb_circle_queue_put_and_pop(%lu): %lld ms, size: %lu, maxn: %lu", n, t, tb_circle_queue_size(queue), tb_circle_queue_maxn(queue));
 
     // check
@@ -47,29 +49,27 @@ static tb_size_t tb_circle_queue_put_and_pop_test()
 
     // exit
     tb_circle_queue_exit(queue);
-
-    return n / ((tb_uint32_t)(t) + 1);
 }
-
-static tb_size_t tb_circle_queue_iterator_next_test()
+static tb_void_t tb_circle_queue_iterator_next_test()
 {
     // init
     tb_size_t n = 1000000;
     tb_circle_queue_ref_t queue = tb_circle_queue_init(n, tb_item_func_long());
-    tb_assert_and_check_return_val(queue, 0);
+    tb_assert_and_check_return(queue);
 
+    // make queue
     while (n--) tb_circle_queue_put(queue, (tb_pointer_t)0xf);
+
+    // done
     tb_hong_t t = tb_mclock();
     tb_for_all (tb_char_t*, item, queue) tb_used(item);
     t = tb_mclock() - t;
 
-    // time
+    // trace
     tb_trace_i("tb_circle_queue_iterator_next(%lu): %lld ms, size: %lu, maxn: %lu", 1000000, t, tb_circle_queue_size(queue), tb_circle_queue_maxn(queue));
 
     // exit
     tb_circle_queue_exit(queue);
-
-    return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_void_t tb_circle_queue_int_dump(tb_circle_queue_ref_t queue)
 {
@@ -231,18 +231,8 @@ static tb_void_t tb_circle_queue_mem_test()
 
 static tb_void_t tb_circle_queue_perf_test()
 {
-    tb_size_t score = 0;
-    tb_trace_i("=============================================================");
-    tb_trace_i("put & pop performance:");
-    score += tb_circle_queue_put_and_pop_test();
-
-    tb_trace_i("=============================================================");
-    tb_trace_i("iterator performance:");
-    score += tb_circle_queue_iterator_next_test();
-
-    tb_trace_i("=============================================================");
-    tb_trace_i("score: %lu", score / 100);
-
+    tb_circle_queue_put_and_pop_test();
+    tb_circle_queue_iterator_next_test();
 }
 
 

@@ -258,7 +258,7 @@ tb_void_t tb_single_list_exit(tb_single_list_ref_t list)
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)list;
     tb_assert_and_check_return(impl);
-    
+   
     // clear data
     tb_single_list_clear((tb_single_list_ref_t)impl);
 
