@@ -1714,8 +1714,8 @@ static tb_aicp_ptor_impl_t* tb_aiop_ptor_init(tb_aicp_impl_t* aicp)
         tb_assert_and_check_break(tb_aiop_have(impl->aiop, TB_AIOE_CODE_EALL | TB_AIOE_CODE_ONESHOT));
 
         // init spak
-        impl->spak[0] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
-        impl->spak[1] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
+        impl->spak[0] = tb_queue_init((aicp->maxn >> 4) + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
+        impl->spak[1] = tb_queue_init((aicp->maxn >> 4) + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
         tb_assert_and_check_break(impl->spak[0] && impl->spak[1]);
 
         // init file
