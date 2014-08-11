@@ -46,10 +46,6 @@ __tb_extern_c_enter__
  * vector: |-----|--------------------------------------------------------|------|
  *       head                                                           last    tail
  *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
- *
  * performance: 
  *
  * insert:

@@ -57,10 +57,6 @@ __tb_extern_c_enter__
  *                  10        14    16(last - 1)
  * </pre>
  *
- * head: => the head item
- * last: => the last item
- * tail: => behind the last item, no item
- *
  * performance: 
  *
  * put: O(lgn)
