@@ -40,7 +40,7 @@ __tb_extern_c_enter__
  * types
  */
 
-/*! the head impl type
+/*! the head ref type
  *
  * <pre>
  * heap:    1      4      2      6       9       7       8       10       14       16

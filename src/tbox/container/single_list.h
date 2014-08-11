@@ -90,7 +90,7 @@ typedef tb_iterator_ref_t tb_single_list_ref_t;
 
 /*! init list
  *
- * @param grow          the item grow
+ * @param grow          the grow size
  * @param func          the item func
  *
  * @return              the list

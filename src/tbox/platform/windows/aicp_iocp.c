@@ -43,13 +43,6 @@
  * macros
  */
 
-// the olap list maxn for GetQueuedCompletionStatusEx and adapter to queue 
-#ifdef __tb_small__
-#   define TB_IOCP_OLAP_LIST_MAXN                   (63)
-#else
-#   define TB_IOCP_OLAP_LIST_MAXN                   (255)
-#endif
-
 // update connect context
 #ifndef SO_UPDATE_CONNECT_CONTEXT
 #   define SO_UPDATE_CONNECT_CONTEXT                (0x7010)
@@ -2402,7 +2395,7 @@ static tb_handle_t tb_iocp_ptor_loop_init(tb_aicp_ptor_impl_t* ptor)
         // init spak
         if (impl->func.GetQueuedCompletionStatusEx)
         {
-            loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_mem(sizeof(tb_OVERLAPPED_ENTRY_t), tb_null, tb_null));
+            loop->spak = tb_queue_init(64, tb_item_func_mem(sizeof(tb_OVERLAPPED_ENTRY_t), tb_null, tb_null));
             tb_assert_and_check_break(loop->spak);
         }
 
@@ -2673,8 +2666,8 @@ static tb_aicp_ptor_impl_t* tb_iocp_ptor_init(tb_aicp_impl_t* aicp)
         tb_assert_and_check_break(impl->wait);
 
         // init post
-        impl->post[0] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
-        impl->post[1] = tb_queue_init(aicp->maxn + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
+        impl->post[0] = tb_queue_init((aicp->maxn >> 4) + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
+        impl->post[1] = tb_queue_init((aicp->maxn >> 4) + 16, tb_item_func_mem(sizeof(tb_aice_t), tb_null, tb_null));
         tb_assert_and_check_break(impl->post[0] && impl->post[1]);
 
         // init kill

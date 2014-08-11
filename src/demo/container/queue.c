@@ -71,26 +71,6 @@ static tb_size_t tb_queue_iterator_next_test()
 
     return n / ((tb_uint32_t)(t) + 1);
 }
-static tb_size_t tb_queue_iterator_prev_test()
-{
-    // init
-    tb_size_t n = 1000000;
-    tb_queue_ref_t queue = tb_queue_init(n, tb_item_func_long());
-    tb_assert_and_check_return_val(queue, 0);
-
-    while (n--) tb_queue_put(queue, (tb_pointer_t)0xf);
-    tb_hong_t t = tb_mclock();
-    tb_rfor_all (tb_char_t*, item, queue) tb_used(item);
-    t = tb_mclock() - t;
-
-    // time
-    tb_trace_i("tb_queue_iterator_prev(%lu): %lld ms, size: %lu, maxn: %lu", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
-
-    // exit
-    tb_queue_exit(queue);
-
-    return n / ((tb_uint32_t)(t) + 1);
-}
 static tb_void_t tb_queue_int_dump(tb_queue_ref_t queue)
 {
     tb_trace_i("tb_int_t size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
@@ -259,7 +239,6 @@ static tb_void_t tb_queue_perf_test()
     tb_trace_i("=============================================================");
     tb_trace_i("iterator performance:");
     score += tb_queue_iterator_next_test();
-    score += tb_queue_iterator_prev_test();
 
     tb_trace_i("=============================================================");
     tb_trace_i("score: %lu", score / 100);

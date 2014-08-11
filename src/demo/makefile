@@ -74,10 +74,11 @@ demo_C_FILES 								+= \
 											platform/thread_store \
 											container/heap \
 											container/hash \
-											container/list \
-											container/queue \
 											container/stack \
 											container/vector \
+											container/queue \
+											container/circle_queue \
+											container/list \
 											container/list_entry \
 											container/single_list \
 											container/single_list_entry \

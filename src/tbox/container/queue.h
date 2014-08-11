@@ -30,18 +30,12 @@
 #include "prefix.h"
 #include "item.h"
 #include "iterator.h"
+#include "single_list.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_enter__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_QUEUE_SIZE_MICRO                 (63)
-#define TB_QUEUE_SIZE_SMALL                 (255)
-#define TB_QUEUE_SIZE_LARGE                 (65535)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -50,11 +44,8 @@ __tb_extern_c_enter__
 /*! the queue ref type
  *
  * <pre>
- * queue: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
- *       head                                                           last    tail
- *
- * queue: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
- *                   last  tail                       head                
+ * queue: |-----| => |-----| => ...                                 => |-----| => null
+ *         head                                                          last     tail
  *
  * head: => the head item
  * last: => the last item
@@ -71,11 +62,8 @@ __tb_extern_c_enter__
  * prev: fast
  *
  * </pre>
- *
- * @note the index of the same item is mutable
- *
  */
-typedef tb_iterator_ref_t   tb_queue_ref_t;
+typedef tb_single_list_ref_t   tb_queue_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -83,12 +71,12 @@ typedef tb_iterator_ref_t   tb_queue_ref_t;
 
 /*! init queue
  *
- * @param maxn      the item maxn, using the default maxn if be zero
+ * @param grow      the grow size, using the default grow size if be zero
  * @param func      the item func
  *
  * @return          the queue
  */
-tb_queue_ref_t      tb_queue_init(tb_size_t maxn, tb_item_func_t func);
+tb_queue_ref_t      tb_queue_init(tb_size_t grow, tb_item_func_t func);
 
 /*! exit queue
  *
