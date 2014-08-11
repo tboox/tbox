@@ -77,7 +77,7 @@ static tb_bool_t tb_item_func_uint32_save(tb_item_func_t* func, tb_cpointer_t da
     tb_assert_and_check_return_val(stream, tb_false);
 
     // save it
-    return tb_stream_bwrit_u32_be(stream, (tb_uint32_t)data);
+    return tb_stream_bwrit_u32_be(stream, tb_p2u32(data));
 }
 static tb_void_t tb_item_func_uint32_free(tb_item_func_t* func, tb_pointer_t buff)
 {
