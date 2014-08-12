@@ -104,7 +104,15 @@ typedef struct __tb_fixed_pool_impl_t
     // the slot space
     tb_size_t                       slot_space;
 
+    // for small pool
+    tb_bool_t                       for_small_pool;
+
 }tb_fixed_pool_impl_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c__ tb_fixed_pool_ref_t tb_fixed_pool_init_(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_bool_t for_small_pool, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -183,7 +191,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
 
         // init slot
         slot->size = real_space;
-        slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], real_space - sizeof(tb_fixed_pool_slot_t), impl->item_size); 
+        slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], real_space - sizeof(tb_fixed_pool_slot_t), impl->item_size, impl->for_small_pool); 
         tb_assert_and_check_break(slot->pool);
 
         // no list?
@@ -330,7 +338,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl,
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_fixed_pool_ref_t tb_fixed_pool_init(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
+tb_fixed_pool_ref_t tb_fixed_pool_init_(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_bool_t for_small_pool, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(item_size, tb_null);
@@ -349,12 +357,13 @@ tb_fixed_pool_ref_t tb_fixed_pool_init(tb_large_pool_ref_t large_pool, tb_size_t
         tb_assert_and_check_break(impl);
 
         // init pool
-        impl->large_pool    = large_pool;
-        impl->slot_size     = slot_size? slot_size : (tb_page_size() >> 4);
-        impl->item_size     = item_size;
-        impl->func_init     = item_init;
-        impl->func_exit     = item_exit;
-        impl->func_priv     = priv;
+        impl->large_pool        = large_pool;
+        impl->slot_size         = slot_size? slot_size : (tb_page_size() >> 4);
+        impl->item_size         = item_size;
+        impl->func_init         = item_init;
+        impl->func_exit         = item_exit;
+        impl->func_priv         = priv;
+        impl->for_small_pool    = for_small_pool;
         tb_assert_and_check_break(impl->slot_size);
 
         // init partial slots
@@ -378,6 +387,10 @@ tb_fixed_pool_ref_t tb_fixed_pool_init(tb_large_pool_ref_t large_pool, tb_size_t
 
     // ok?
     return (tb_fixed_pool_ref_t)impl;
+}
+tb_fixed_pool_ref_t tb_fixed_pool_init(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv)
+{
+    return tb_fixed_pool_init_(large_pool, slot_size, item_size, tb_false, item_init, item_exit, priv);
 }
 tb_void_t tb_fixed_pool_exit(tb_fixed_pool_ref_t pool)
 {

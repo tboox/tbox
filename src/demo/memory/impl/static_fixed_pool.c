@@ -16,7 +16,7 @@ tb_void_t tb_demo_static_fixed_pool_leak()
     do
     {
         // init pool
-        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t));
+        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t), tb_false);
         tb_assert_and_check_break(pool);
 
         // make data0
@@ -46,7 +46,7 @@ tb_void_t tb_demo_static_fixed_pool_free2()
     do
     {
         // init pool
-        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t));
+        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t), tb_false);
         tb_assert_and_check_break(pool);
 
         // make data
@@ -75,7 +75,7 @@ tb_void_t tb_demo_static_fixed_pool_underflow()
     do
     {
         // init pool
-        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t));
+        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t), tb_false);
         tb_assert_and_check_break(pool);
 
         // make data
@@ -106,7 +106,7 @@ tb_void_t tb_demo_static_fixed_pool_underflow2()
     do
     {
         // init pool
-        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t));
+        pool = tb_static_fixed_pool_init(buff, sizeof(buff), sizeof(tb_size_t), tb_false);
         tb_assert_and_check_break(pool);
 
         // make data
@@ -137,7 +137,7 @@ tb_void_t tb_demo_static_fixed_pool_perf(tb_size_t item_size)
     do
     {
         // init pool
-        pool = tb_static_fixed_pool_init((tb_byte_t*)malloc(50 * 1024 * 1024), 50 * 1024 * 1024, item_size);
+        pool = tb_static_fixed_pool_init((tb_byte_t*)malloc(50 * 1024 * 1024), 50 * 1024 * 1024, item_size, tb_false);
         tb_assert_and_check_break(pool);
 
         // make data list

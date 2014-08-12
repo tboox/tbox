@@ -42,6 +42,9 @@
 // the pool data magic number
 #define TB_POOL_DATA_MAGIC                  (0xdead)
 
+// the pool data empty magic number
+#define TB_POOL_DATA_EMPTY_MAGIC            (0xdeaf)
+
 // the pool data patch value 
 #define TB_POOL_DATA_PATCH                  (0xcc)
 
@@ -106,6 +109,16 @@ typedef struct __tb_pool_data_head_t
 
 }tb_pool_data_head_t;
 
+// the pool data empty head type
+typedef struct __tb_pool_data_empty_head_t
+{
+#ifdef __tb_debug__
+    // the debug head
+    tb_pool_data_debug_head_t   debug;
+#endif
+
+}tb_pool_data_empty_head_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -133,7 +146,7 @@ tb_void_t                       tb_pool_data_dump(tb_cpointer_t data, tb_bool_t 
  * @param data_head             the data head
  * @param skip_frames           the skiped frame count
  */
-tb_void_t                       tb_pool_data_save_backtrace(tb_pool_data_head_t* data_head, tb_size_t skip_frames);
+tb_void_t                       tb_pool_data_save_backtrace(tb_pool_data_debug_head_t* debug_head, tb_size_t skip_frames);
 
 #endif
 
