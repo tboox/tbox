@@ -417,7 +417,7 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_t* spider, tb_char_t co
     tb_assert_and_check_return_val(spider && url && data && maxn, tb_false);
 
     // skip protocol
-	tb_char_t const* p = url;
+	tb_char_t* p = (tb_char_t*)url;
 	if (!tb_strnicmp(p, "http://", 7)) p += 7;
 	else if (!tb_strnicmp(p, "https://", 8)) p += 8;
 
@@ -441,6 +441,17 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_t* spider, tb_char_t co
 
     // end
 	data[n] = '\0';
+
+    // replace '?' => '_'
+    p = data;
+    while (*p)
+    {
+        // replace
+        if (*p == '?') *p = '_';
+
+        // next
+        p++;
+    }
 
 	// trace
 	tb_trace_d("make: %s => %s", url, data);
