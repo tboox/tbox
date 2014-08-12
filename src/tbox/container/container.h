@@ -31,7 +31,6 @@
 #include "item.h"
 #include "iterator.h"
 #include "hash.h"
-#include "heap.h"
 #include "stack.h"
 #include "vector.h"
 #include "queue.h"
@@ -40,6 +39,9 @@
 #include "list_entry.h"
 #include "single_list.h"
 #include "single_list_entry.h"
+#include "heap.h"
+#include "heap_entry.h"
+#include "binary_tree_entry.h"
 #include "bloom_filter.h"
 
 #endif

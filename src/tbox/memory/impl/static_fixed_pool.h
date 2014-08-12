@@ -59,7 +59,7 @@ typedef struct{}*           tb_static_fixed_pool_ref_t;
  * @param data              the data address
  * @param size              the data size
  * @param item_size         the item size
- * @param for_small_pool    only for small pool?
+ * @param for_small_pool    add data size field at head for the small pool 
  *
  * @return                  the pool
  */

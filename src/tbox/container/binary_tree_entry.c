@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        heap_entry.c
+ * @file        binary_tree_entry.c
  * @ingroup     container
  *
  */
@@ -25,42 +25,42 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "heap_entry.h"
+#include "binary_tree_entry.h"
 #include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_iterator_ref_t tb_heap_entry_itor(tb_heap_entry_head_ref_t heap)
+tb_iterator_ref_t tb_binary_tree_entry_itor(tb_binary_tree_entry_head_ref_t binary_tree)
 {
     // check
-    tb_assert_and_check_return_val(heap, tb_null);
+    tb_assert_and_check_return_val(binary_tree, tb_null);
 
     // the iterator
-    return &heap->itor;
+    return &binary_tree->itor;
 }
-tb_void_t tb_heap_entry_init_(tb_heap_entry_head_ref_t heap, tb_size_t entry_offset, tb_size_t entry_size, tb_entry_copy_t copy)
+tb_void_t tb_binary_tree_entry_init_(tb_binary_tree_entry_head_ref_t binary_tree, tb_size_t entry_offset, tb_size_t entry_size, tb_entry_copy_t copy)
 {
     // check
-    tb_assert_and_check_return(heap && entry_size > sizeof(tb_heap_entry_t));
+    tb_assert_and_check_return(binary_tree && entry_size > sizeof(tb_binary_tree_entry_t));
 
     // init it
-    heap->next          = (tb_heap_entry_ref_t)heap;
-    heap->prev          = (tb_heap_entry_ref_t)heap;
-    heap->size          = 0;
-    heap->eoff          = entry_offset;
-    heap->copy          = copy;
+    binary_tree->left          = (tb_binary_tree_entry_ref_t)binary_tree;
+    binary_tree->right          = (tb_binary_tree_entry_ref_t)binary_tree;
+    binary_tree->size          = 0;
+    binary_tree->eoff          = entry_offset;
+    binary_tree->copy          = copy;
 
 }
-tb_void_t tb_heap_entry_exit(tb_heap_entry_head_ref_t heap)
+tb_void_t tb_binary_tree_entry_exit(tb_binary_tree_entry_head_ref_t binary_tree)
 {
     // check
-    tb_assert_and_check_return(heap);
+    tb_assert_and_check_return(binary_tree);
 
     // exit it
-    heap->next = (tb_heap_entry_ref_t)heap;
-    heap->prev = (tb_heap_entry_ref_t)heap;
-    heap->size = 0;
+    binary_tree->left = (tb_binary_tree_entry_ref_t)binary_tree;
+    binary_tree->right = (tb_binary_tree_entry_ref_t)binary_tree;
+    binary_tree->size = 0;
 }
 
 

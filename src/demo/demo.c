@@ -169,7 +169,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_thread_store)
 
     // container
-,   TB_DEMO_MAIN_ITEM(container_heap)
 ,   TB_DEMO_MAIN_ITEM(container_hash)
 ,   TB_DEMO_MAIN_ITEM(container_stack)
 ,   TB_DEMO_MAIN_ITEM(container_vector)
@@ -179,6 +178,8 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(container_list_entry)
 ,   TB_DEMO_MAIN_ITEM(container_single_list)
 ,   TB_DEMO_MAIN_ITEM(container_single_list_entry)
+,   TB_DEMO_MAIN_ITEM(container_heap)
+,   TB_DEMO_MAIN_ITEM(container_heap_entry)
 ,   TB_DEMO_MAIN_ITEM(container_bloom_filter)
 
     // algorithm

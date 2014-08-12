@@ -35,7 +35,7 @@
  */
 
 /// the single list entry
-#define tb_single_list_entry(list, entry)                      ((((tb_byte_t*)(entry)) - (list)->eoff))
+#define tb_single_list_entry(head, entry)   ((((tb_byte_t*)(entry)) - (head)->eoff))
 
 /*! init the single list entry 
  *
@@ -79,9 +79,6 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the single list entry copy func type
-typedef tb_void_t                       (*tb_single_list_entry_copy_t)(tb_pointer_t ltem, tb_pointer_t rtem);
-
 /*! the single list entry type
  * 
  * <pre>
@@ -115,7 +112,7 @@ typedef struct __tb_single_list_entry_head_t
     tb_size_t                           eoff;
 
     /// the entry copy func
-    tb_single_list_entry_copy_t         copy;
+    tb_entry_copy_t                     copy;
 
 }tb_single_list_entry_head_t;
 
@@ -144,7 +141,7 @@ tb_iterator_ref_t                               tb_single_list_entry_itor(tb_sin
  * @param entry_size                            the entry size 
  * @param copy                                  the copy func of the entry for algorithm, .e.g sort
  */
-tb_void_t                                       tb_single_list_entry_init_(tb_single_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_single_list_entry_copy_t copy);
+tb_void_t                                       tb_single_list_entry_init_(tb_single_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_entry_copy_t copy);
 
 /*! exit list
  *
