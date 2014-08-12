@@ -69,7 +69,6 @@
 // cache the predicted index
 #define tb_static_fixed_pool_cache_pred(impl, i)            do { (impl)->pred_index = ((i) >> TB_CPU_SHIFT) + 1; } while (0)
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -104,6 +103,12 @@ typedef __tb_pool_data_aligned__ struct __tb_static_fixed_pool_impl_t
     // the item maximum count
     tb_size_t                   item_maxn;
 
+    // the data head size
+    tb_uint16_t                 data_head_size;
+
+    // for small pool?
+    tb_uint16_t                 for_small_pool;
+
 #ifdef __tb_debug__
 
     // the peak size
@@ -134,13 +139,13 @@ typedef __tb_pool_data_aligned__ struct __tb_static_fixed_pool_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_pool_data_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fixed_pool_impl_t* impl)
+static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fixed_pool_impl_t* impl)
 {
     // check
     tb_assert_and_check_return_val(impl, tb_null);
 
     // done
-    tb_pool_data_head_t* data_head = tb_null;
+    tb_pool_data_empty_head_t* data_head = tb_null;
     do
     {
         // exists the predict index?
@@ -171,7 +176,7 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fixed_poo
         tb_assert_abort(!tb_static_fixed_pool_used_bset(impl->used_info, index));
 
         // the data head
-        data_head = (tb_pool_data_head_t*)(impl->data + index * impl->item_space);
+        data_head = (tb_pool_data_empty_head_t*)(impl->data + index * impl->item_space);
 
         // allocate it
         tb_static_fixed_pool_used_set1(impl->used_info, index);
@@ -199,7 +204,7 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fixed_poo
 }
 
 #if 1
-static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_impl_t* impl)
+static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_impl_t* impl)
 {
     // check
     tb_assert_and_check_return_val(impl, tb_null);
@@ -248,10 +253,10 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_poo
     if ((*p) + 1) tb_static_fixed_pool_cache_pred(impl, i);
 
     // ok?
-    return (tb_pool_data_head_t*)d;
+    return (tb_pool_data_empty_head_t*)d;
 }
 #else
-static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_impl_t* impl)
+static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_pool_impl_t* impl)
 {
     // check
     tb_assert_and_check_return_val(impl, tb_null);
@@ -300,19 +305,19 @@ static tb_pool_data_head_t* tb_static_fixed_pool_malloc_find(tb_static_fixed_poo
     }
 
     // ok?
-    return (tb_pool_data_head_t*)d;
+    return (tb_pool_data_empty_head_t*)d;
 }
 #endif
 
 #ifdef __tb_debug__
-static tb_void_t tb_static_fixed_pool_check_data(tb_static_fixed_pool_impl_t* impl, tb_pool_data_head_t const* data_head)
+static tb_void_t tb_static_fixed_pool_check_data(tb_static_fixed_pool_impl_t* impl, tb_pool_data_empty_head_t const* data_head)
 {
     // check
     tb_assert_and_check_return(impl && data_head);
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_byte_t const*    data = (tb_byte_t const*)&(data_head[1]);
+    tb_byte_t const*    data = (tb_byte_t const*)data_head + impl->data_head_size;
     do
     {
         // the index
@@ -321,7 +326,7 @@ static tb_void_t tb_static_fixed_pool_check_data(tb_static_fixed_pool_impl_t* im
         // check
         tb_assertf_break(!(((tb_byte_t*)data_head - impl->data) % impl->item_space), "the invalid data: %p", data);
         tb_assertf_break(tb_static_fixed_pool_used_bset(impl->used_info, index), "data have been freed: %p", data);
-        tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
+        tb_assertf_break(data_head->debug.magic == (impl->for_small_pool? TB_POOL_DATA_MAGIC : TB_POOL_DATA_EMPTY_MAGIC), "the invalid data: %p", data);
         tb_assertf_break(((tb_byte_t*)data)[impl->item_size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
@@ -339,7 +344,7 @@ static tb_void_t tb_static_fixed_pool_check_data(tb_static_fixed_pool_impl_t* im
         tb_abort();
     }
 }
-static tb_void_t tb_static_fixed_pool_check_next(tb_static_fixed_pool_impl_t* impl, tb_pool_data_head_t const* data_head)
+static tb_void_t tb_static_fixed_pool_check_next(tb_static_fixed_pool_impl_t* impl, tb_pool_data_empty_head_t const* data_head)
 {
     // check
     tb_assert_and_check_return(impl && data_head);
@@ -349,9 +354,9 @@ static tb_void_t tb_static_fixed_pool_check_next(tb_static_fixed_pool_impl_t* im
 
     // check the next data
     if (index + 1 < impl->item_maxn && tb_static_fixed_pool_used_bset(impl->used_info, index + 1))
-        tb_static_fixed_pool_check_data(impl, (tb_pool_data_head_t*)((tb_byte_t*)data_head + impl->item_space));
+        tb_static_fixed_pool_check_data(impl, (tb_pool_data_empty_head_t*)((tb_byte_t*)data_head + impl->item_space));
 }
-static tb_void_t tb_static_fixed_pool_check_prev(tb_static_fixed_pool_impl_t* impl, tb_pool_data_head_t const* data_head)
+static tb_void_t tb_static_fixed_pool_check_prev(tb_static_fixed_pool_impl_t* impl, tb_pool_data_empty_head_t const* data_head)
 {
     // check
     tb_assert_and_check_return(impl && data_head);
@@ -361,14 +366,14 @@ static tb_void_t tb_static_fixed_pool_check_prev(tb_static_fixed_pool_impl_t* im
 
     // check the prev data
     if (index && tb_static_fixed_pool_used_bset(impl->used_info, index - 1))
-        tb_static_fixed_pool_check_data(impl, (tb_pool_data_head_t*)((tb_byte_t*)data_head - impl->item_space));
+        tb_static_fixed_pool_check_data(impl, (tb_pool_data_empty_head_t*)((tb_byte_t*)data_head - impl->item_space));
 }
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size)
+tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size, tb_bool_t for_small_pool)
 {
     // check
     tb_assert_and_check_return_val(data && size && item_size, tb_null);
@@ -383,6 +388,10 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
     tb_static_fixed_pool_impl_t* impl = (tb_static_fixed_pool_impl_t*)data;
     tb_memset_(impl, 0, sizeof(tb_static_fixed_pool_impl_t));
 
+    // for small pool?
+    impl->for_small_pool = !!for_small_pool;
+    impl->data_head_size = for_small_pool? sizeof(tb_pool_data_head_t) : sizeof(tb_pool_data_empty_head_t);
+
 #ifdef __tb_debug__
     // init patch for checking underflow
     tb_size_t patch = 1;
@@ -391,9 +400,9 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
 #endif
 
     // init the item space
-    impl->item_space = sizeof(tb_pool_data_head_t) + item_size + patch;
+    impl->item_space = impl->data_head_size + item_size + patch;
     impl->item_space = tb_align(impl->item_space, TB_POOL_DATA_ALIGN);
-    tb_assert_and_check_return_val(impl->item_space > sizeof(tb_pool_data_head_t), tb_null);
+    tb_assert_and_check_return_val(impl->item_space > impl->data_head_size, tb_null);
 
     // init the used info
     impl->used_info = (tb_byte_t*)tb_align((tb_size_t)&impl[1], TB_POOL_DATA_ALIGN);
@@ -523,8 +532,8 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
     tb_assert_and_check_return_val(impl && impl->item_space, tb_null);
 
     // done
-    tb_pointer_t            data = tb_null;
-    tb_pool_data_head_t*    data_head = tb_null;
+    tb_pointer_t                data = tb_null;
+    tb_pool_data_empty_head_t*  data_head = tb_null;
     do
     {
         // full?
@@ -538,10 +547,10 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
         tb_check_break(data_head);
 
         // the real data
-        data = (tb_pointer_t)&data_head[1];
+        data = (tb_byte_t*)data_head + impl->data_head_size;
 
         // save the real size
-        data_head->size = impl->item_size;
+        if (impl->for_small_pool) ((tb_pool_data_head_t*)data_head)->size = impl->item_size;
 
         // count++
         impl->item_count++;
@@ -549,16 +558,16 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
 #ifdef __tb_debug__
 
         // init the debug info
-        data_head->debug.magic     = TB_POOL_DATA_MAGIC;
+        data_head->debug.magic     = impl->for_small_pool? TB_POOL_DATA_MAGIC : TB_POOL_DATA_EMPTY_MAGIC;
         data_head->debug.file      = file_;
         data_head->debug.func      = func_;
         data_head->debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
-        tb_pool_data_save_backtrace(data_head, 2);
+        tb_pool_data_save_backtrace(&data_head->debug, 2);
 
         // make the dirty data and patch 0xcc for checking underflow
-        tb_memset_((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, impl->item_space - sizeof(tb_pool_data_head_t));
+        tb_memset_(data, TB_POOL_DATA_PATCH, impl->item_space - impl->data_head_size);
  
         // update the real size
         impl->real_size     += impl->item_size;
@@ -598,8 +607,8 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
     tb_assert_and_check_return_val(impl && impl->item_space, tb_false);
 
     // done
-    tb_bool_t               ok = tb_false;
-    tb_pool_data_head_t*    data_head = &(((tb_pool_data_head_t*)data)[-1]);
+    tb_bool_t                   ok = tb_false;
+    tb_pool_data_empty_head_t*  data_head = (tb_pool_data_empty_head_t*)((tb_byte_t*)data - impl->data_head_size);
     do
     {
         // the index
@@ -610,7 +619,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t pool, tb_pointer_
         tb_assertf_break(!(((tb_byte_t*)data_head - impl->data) % impl->item_space), "free the invalid data: %p", data);
         tb_assertf_and_check_break(impl->item_count, "double free data: %p", data);
         tb_assertf_and_check_break(tb_static_fixed_pool_used_bset(impl->used_info, index), "double free data: %p", data);
-        tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
+        tb_assertf_break(data_head->debug.magic == (impl->for_small_pool? TB_POOL_DATA_MAGIC : TB_POOL_DATA_EMPTY_MAGIC), "the invalid data: %p", data);
         tb_assertf_break(((tb_byte_t*)data)[impl->item_size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
@@ -669,7 +678,7 @@ tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t pool, tb_fixed_po
     tb_size_t   i = 0;
     tb_size_t   m = impl->item_maxn;
     tb_byte_t*  p = impl->used_info;
-    tb_byte_t*  d = impl->data + sizeof(tb_pool_data_head_t);
+    tb_byte_t*  d = impl->data + impl->data_head_size;
     tb_byte_t   u = *p;
     tb_byte_t   b = 0;
     for (i = 0; i < m; ++i)
@@ -726,7 +735,7 @@ tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
         if (tb_static_fixed_pool_used_bset(impl->used_info, index)) 
         {
             // the data head
-            tb_pool_data_head_t* data_head = (tb_pool_data_head_t*)(impl->data + index * impl->item_space);
+            tb_pool_data_empty_head_t* data_head = (tb_pool_data_empty_head_t*)(impl->data + index * impl->item_space);
 
             // check it
             tb_static_fixed_pool_check_data(impl, data_head);

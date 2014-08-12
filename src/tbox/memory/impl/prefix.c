@@ -198,6 +198,22 @@ tb_void_t tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t con
                 }
             }
         }
+        // for the public fixed_pool
+        else if (data_head->debug.magic == TB_POOL_DATA_EMPTY_MAGIC)
+        {
+            // format the backtrace prefix
+            tb_char_t backtrace_prefix[256] = {0};
+            tb_snprintf(backtrace_prefix, sizeof(backtrace_prefix), "%s    ", prefix? prefix : "");
+
+            // dump backtrace
+            tb_size_t nframe = 0;
+            while (nframe < tb_arrayn(data_head->debug.backtrace) && data_head->debug.backtrace[nframe]) nframe++;
+            tb_trace_i("%sdata: from: %s(): %u, %s", prefix? prefix : "", data_head->debug.func, data_head->debug.line, data_head->debug.file);
+            tb_backtrace_dump(backtrace_prefix, data_head->debug.backtrace, nframe);
+
+            // dump the data info
+            tb_trace_i("%sdata: %p, size: fixed", prefix? prefix : "", data);
+        }
         else
         {
             // dump the data head
@@ -211,9 +227,9 @@ tb_void_t tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t con
 
     } while (0);
 }
-tb_void_t tb_pool_data_save_backtrace(tb_pool_data_head_t* data_head, tb_size_t skip_frames)
+tb_void_t tb_pool_data_save_backtrace(tb_pool_data_debug_head_t* debug_head, tb_size_t skip_frames)
 { 
-    tb_size_t nframe = tb_backtrace_frames(data_head->debug.backtrace, tb_arrayn(data_head->debug.backtrace), skip_frames + 2); 
-    if (nframe < tb_arrayn(data_head->debug.backtrace)) tb_memset_(data_head->debug.backtrace + nframe, 0, (tb_arrayn(data_head->debug.backtrace) - nframe) * sizeof(tb_cpointer_t)); 
+    tb_size_t nframe = tb_backtrace_frames(debug_head->backtrace, tb_arrayn(debug_head->backtrace), skip_frames + 2); 
+    if (nframe < tb_arrayn(debug_head->backtrace)) tb_memset_(debug_head->backtrace + nframe, 0, (tb_arrayn(debug_head->backtrace) - nframe) * sizeof(tb_cpointer_t)); 
 }
 #endif

@@ -59,6 +59,11 @@ typedef struct __tb_small_pool_impl_t
 }tb_small_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c__ tb_fixed_pool_ref_t tb_fixed_pool_init_(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_bool_t for_small_pool, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, tb_size_t size)
@@ -150,7 +155,7 @@ static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, 
         tb_trace_d("find: size: %lu => index: %lu, space: %lu", size, index, space);
 
         // make fixed pool if not exists
-        if (!impl->fixed_pool[index]) impl->fixed_pool[index] = tb_fixed_pool_init(impl->large_pool, 0, space, tb_null, tb_null, tb_null);
+        if (!impl->fixed_pool[index]) impl->fixed_pool[index] = tb_fixed_pool_init_(impl->large_pool, 0, space, tb_true, tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->fixed_pool[index]);
 
         // ok
