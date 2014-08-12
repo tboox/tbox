@@ -143,7 +143,7 @@ tb_iterator_ref_t tb_list_entry_itor(tb_list_entry_head_ref_t list)
     // the iterator
     return &list->itor;
 }
-tb_void_t tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_list_entry_copy_t copy)
+tb_void_t tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_entry_copy_t copy)
 {
     // check
     tb_assert_and_check_return(list && entry_size > sizeof(tb_list_entry_t));

@@ -35,7 +35,7 @@
  */
 
 /// the heap entry
-#define tb_heap_entry(heap, entry)                      ((((tb_byte_t*)(entry)) - (heap)->eoff))
+#define tb_heap_entry(head, entry)   ((((tb_byte_t*)(entry)) - (head)->eoff))
 
 /*! init the heap entry 
  *
@@ -128,7 +128,7 @@ typedef struct __tb_heap_entry_head_t
     tb_size_t                   eoff;
 
     /// the entry copy func
-    tb_heap_entry_copy_t        copy;
+    tb_entry_copy_t             copy;
 
 }tb_heap_entry_head_t;
 
@@ -157,7 +157,7 @@ tb_iterator_ref_t                           tb_heap_entry_itor(tb_heap_entry_hea
  * @param entry_size                        the entry size 
  * @param copy                              the copy func of the entry for algorithm, .e.g sort
  */
-tb_void_t                                   tb_heap_entry_init_(tb_heap_entry_head_ref_t heap, tb_size_t entry_offset, tb_size_t entry_size, tb_heap_entry_copy_t copy);
+tb_void_t                                   tb_heap_entry_init_(tb_heap_entry_head_ref_t heap, tb_size_t entry_offset, tb_size_t entry_size, tb_entry_copy_t copy);
 
 /*! exit heap
  *
@@ -193,127 +193,6 @@ static __tb_inline__ tb_size_t              tb_heap_entry_size(tb_heap_entry_hea
 
     // done
     return heap->size;
-}
-
-/*! the heap next entry
- *
- * @param heap                              the heap
- * @param entry                             the entry
- *
- * @return                                  the next entry
- */
-static __tb_inline__ tb_heap_entry_ref_t    tb_heap_entry_next(tb_heap_entry_head_ref_t heap, tb_heap_entry_ref_t entry)
-{
-    // check
-    tb_assert(entry);
-
-    // done
-    return entry->next;
-}
-
-/*! the heap prev entry
- *
- * @param heap                              the heap
- * @param entry                             the entry
- *
- * @return                                  the prev entry
- */
-static __tb_inline__ tb_heap_entry_ref_t    tb_heap_entry_prev(tb_heap_entry_head_ref_t heap, tb_heap_entry_ref_t entry)
-{ 
-    // check
-    tb_assert(entry);
-
-    // done
-    return entry->prev;
-}
-
-/*! the heap head entry
- *
- * @param heap                              the heap
- *
- * @return                                  the head entry
- */
-static __tb_inline__ tb_heap_entry_ref_t    tb_heap_entry_head(tb_heap_entry_head_ref_t heap)
-{
-    // check
-    tb_assert(heap);
-
-    // done
-    return heap->next;
-}
-
-/*! the heap last entry
- *
- * @param heap                              the heap
- *
- * @return                                  the last entry
- */
-static __tb_inline__ tb_heap_entry_ref_t    tb_heap_entry_last(tb_heap_entry_head_ref_t heap)
-{ 
-    // check
-    tb_assert(heap);
-
-    // done
-    return heap->prev;
-}
-
-/*! the heap tail entry
- *
- * @param heap                              the heap
- *
- * @return                                  the tail entry
- */
-static __tb_inline__ tb_heap_entry_ref_t    tb_heap_entry_tail(tb_heap_entry_head_ref_t heap)
-{ 
-    // done
-    return (tb_heap_entry_ref_t)heap;
-}
-
-/*! the heap is null?
- *
- * @param heap                              the heap
- *
- * @return                                  tb_true or tb_false
- */
-static __tb_inline__ tb_bool_t              tb_heap_entry_is_null(tb_heap_entry_head_ref_t heap)
-{ 
-    // check
-    tb_assert(heap);
-
-    // done
-    return heap->size? tb_false : tb_true;
-}
-
-/*! is the heap head entry?
- *
- * @param heap                              the heap
- * @param entry                             the entry
- *
- * @return                                  tb_true or tb_false
- */
-static __tb_inline__ tb_bool_t              tb_heap_entry_is_head(tb_heap_entry_head_ref_t heap, tb_heap_entry_ref_t entry)
-{
-    // check
-    tb_assert(heap);
-
-    // done
-    return heap->next == entry? tb_true : tb_false;
-}
-
-/*! is the heap last entry?
- *
- * @param heap                              the heap
- * @param entry                             the entry
- *
- * @return                                  tb_true or tb_false
- */
-static __tb_inline__ tb_bool_t              tb_heap_entry_is_last(tb_heap_entry_head_ref_t heap, tb_heap_entry_ref_t entry)
-{
-    // check
-    tb_assert(heap);
-
-    // done
-    return heap->prev == entry? tb_true : tb_false;
 }
 
 

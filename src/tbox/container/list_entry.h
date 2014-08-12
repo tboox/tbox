@@ -35,7 +35,7 @@
  */
 
 /// the list entry
-#define tb_list_entry(list, entry)                      ((((tb_byte_t*)(entry)) - (list)->eoff))
+#define tb_list_entry(head, entry)   ((((tb_byte_t*)(entry)) - (head)->eoff))
 
 /*! init the list entry 
  *
@@ -120,7 +120,7 @@ typedef struct __tb_list_entry_head_t
     tb_size_t                   eoff;
 
     /// the entry copy func
-    tb_list_entry_copy_t        copy;
+    tb_entry_copy_t             copy;
 
 }tb_list_entry_head_t;
 
@@ -149,7 +149,7 @@ tb_iterator_ref_t                           tb_list_entry_itor(tb_list_entry_hea
  * @param entry_size                        the entry size 
  * @param copy                              the copy func of the entry for algorithm, .e.g sort
  */
-tb_void_t                                   tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_list_entry_copy_t copy);
+tb_void_t                                   tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_entry_copy_t copy);
 
 /*! exit list
  *

@@ -28,4 +28,11 @@
  */
 #include "../prefix.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the entry copy func type
+typedef tb_void_t               (*tb_entry_copy_t)(tb_pointer_t ltem, tb_pointer_t rtem);
+
 #endif
