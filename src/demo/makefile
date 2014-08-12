@@ -72,6 +72,7 @@ demo_C_FILES 								+= \
 											platform/cache_time \
 											platform/thread_pool \
 											platform/thread_store \
+											container/heap \
 											container/hash \
 											container/stack \
 											container/vector \
@@ -81,8 +82,6 @@ demo_C_FILES 								+= \
 											container/list_entry \
 											container/single_list \
 											container/single_list_entry \
-											container/heap \
-											container/heap_entry \
 											container/bloom_filter \
 											algorithm/find \
 											algorithm/sort 

@@ -274,6 +274,7 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     tb_pointer_t        data_last = func_data(&impl->func, last);
     switch (step)
     {
+#ifndef __tb_small__
     case sizeof(tb_uint64_t):
         {
             for (; child < tail; child = head + (((child - head) << 1) + step))
@@ -367,6 +368,7 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 
         }
         break;
+#endif
     default:
         {
             for (; child < tail; child = head + (((child - head) << 1) + step))
@@ -594,6 +596,7 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
     tb_size_t           step = impl->func.size;
     switch (step)
     {
+#ifndef __tb_small__
     case sizeof(tb_uint64_t):
         {
             for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->func, func_data(&impl->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
@@ -642,6 +645,7 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
             }
         }
         break;
+#endif
     default:
         for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->func, func_data(&impl->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
         {
