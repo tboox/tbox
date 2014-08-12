@@ -8,22 +8,34 @@
  */ 
 
 // the spider url maxn
-#define TB_DEMO_SPIDER_URL_MAXN         (4096)
+#define TB_DEMO_SPIDER_URL_MAXN             (4096)
 
 // the spider task maxn
-#define TB_DEMO_SPIDER_TASK_MAXN        (100)
+#define TB_DEMO_SPIDER_TASK_MAXN            (100)
 
 // the spider task rate, 256KB/s
-#define TB_DEMO_SPIDER_TASK_RATE        (256000)
+#define TB_DEMO_SPIDER_TASK_RATE            (256000)
 
 // the spider task timeout, 15s
-#define TB_DEMO_SPIDER_TASK_TIMEOUT     (15000)
+#define TB_DEMO_SPIDER_TASK_TIMEOUT         (15000)
 
 // the spider filter maxn
-#define TB_DEMO_SPIDER_FILTER_MAXN      (100000)
+#define TB_DEMO_SPIDER_FILTER_MAXN          (100000)
 
 // the spider user agent
-#define TB_DEMO_SPIDER_USER_AGENT       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36"
+#define TB_DEMO_SPIDER_USER_AGENT           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36"
+
+// create table: tasks 
+#define TB_DEMO_SPIDER_TABLE_TASKS_CREATE   "create table tasks(url text, file text, ok int)"
+
+// insert table: tasks 
+#define TB_DEMO_SPIDER_TABLE_TASKS_INSERT   "insert into tasks values(?, ?, ?)"
+
+// update table: tasks 
+#define TB_DEMO_SPIDER_TABLE_TASKS_UPDATE   "update tasks set file = ?, ok = ? where url = ?"
+
+// select table: tasks 
+#define TB_DEMO_SPIDER_TABLE_TASKS_SELECT   "select url from tasks where ok = 0"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -33,43 +45,52 @@
 typedef struct __tb_demo_spider_t
 {
     // the pool
-    tb_fixed_pool_ref_t         pool;
+    tb_fixed_pool_ref_t             pool;
 
     // the lock
-    tb_spinlock_t               lock;
+    tb_spinlock_t                   lock;
 
     // the filter
-    tb_bloom_filter_ref_t       filter;
+    tb_bloom_filter_ref_t           filter;
 
     // the state
-    tb_atomic_t                 state;
+    tb_atomic_t                     state;
 
     // the option
-    tb_option_ref_t             option;
+    tb_option_ref_t                 option;
 
     // the home
-    tb_url_t                    home;
+    tb_url_t                        home;
 
     // only home website?
-    tb_bool_t                   home_only;
+    tb_bool_t                       home_only;
 
     // the home domain
-    tb_char_t                   home_domain[64];
+    tb_char_t                       home_domain[64];
 
     // the root
-    tb_char_t                   root[256];
+    tb_char_t                       root[256];
 
     // the timeout 
-    tb_long_t                   timeout;
+    tb_long_t                       timeout;
 
     // the user agent
-    tb_char_t const*            user_agent;
+    tb_char_t const*                user_agent;
 
     // the limited rate
-    tb_size_t                   limited_rate;
+    tb_size_t                       limited_rate;
 
     // the sql database
-    tb_database_sql_ref_t       database;
+    tb_database_sql_ref_t           database;
+
+    // the sql database statement: insert_tasks
+    tb_database_sql_statement_ref_t insert_tasks;
+
+    // the sql database statement: update_tasks
+    tb_database_sql_statement_ref_t update_tasks;
+
+    // the sql database statement: select_tasks
+    tb_database_sql_statement_ref_t select_tasks;
 
 }tb_demo_spider_t;
 
@@ -112,6 +133,7 @@ static tb_option_item_t g_options[] =
 {
     {'t',   "timeout",      TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set the timeout"               }
 ,   {'d',   "directory",    TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_CSTR,        "set the root directory"        }
+,   {'-',   "database",     TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_CSTR,        "set database url"                  }
 ,   {'u',   "agent",        TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_CSTR,        "set the user agent"            }
 ,   {'r',   "rate",         TB_OPTION_MODE_KEY_VAL,     TB_OPTION_TYPE_INTEGER,     "set limited rate"              }
 ,   {'h',   "help",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "display this help and exit"    } 
@@ -347,6 +369,7 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
     tb_assert_and_check_return(parser && parser->stream && parser->reader && parser->url_cache);
 
     // open stream
+    tb_bool_t full = tb_false;
     if (tb_demo_spider_parser_open_html(parser->stream, task->ourl))
     {
         // open reader
@@ -359,28 +382,37 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
                 // trace
                 tb_trace_d("parser: done: %s => %s", task->iurl, parser->url);
 
-                // done
-                tb_bool_t full = tb_false;
-                if (!tb_demo_spider_task_done(task->spider, parser->url, &full) && full)
+                // full?
+                if (full)
                 {
-                    // exists database?
-                    if (task->spider->database)
+                    // cache: not full?
+                    if (!tb_circle_queue_full(parser->url_cache))
                     {
-                        // no enough?
-                        if (!tb_circle_queue_full(parser->url_cache))
+                        // trace
+                        tb_trace_d("parser: cache: %s", parser->url);
+
+                        // cache it
+                        tb_circle_queue_put(parser->url_cache, parser->url);
+                    }
+
+                    // cache: full?
+                    if (tb_circle_queue_full(parser->url_cache))
+                    {
+                        // exists database?
+                        if (task->spider->database)
                         {
-                            // cache it
-                            tb_circle_queue_put(parser->url_cache, parser->url);
-                        }
-                        else
-                        {
+                            // trace
+                            tb_trace_d("parser: cache: flush");
+
                             // flush cache to database
                             // TODO
                             tb_circle_queue_clear(parser->url_cache);
                         }
+                        else break;
                     }
-                    else break;
                 }
+                // done
+                else if (!tb_demo_spider_task_done(task->spider, parser->url, &full)) break;
             }
 
             // clos reader
@@ -391,14 +423,39 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
         tb_stream_clos(parser->stream);
     }
 
-    // exists database?
-    if (task->spider->database)
+    // not full? 
+    if (!full)
     {
-        // flush cache to database
-        if (!tb_circle_queue_null(parser->url_cache))
+        // attempt to load url from cache first
+        while (!full && !tb_circle_queue_null(parser->url_cache))
         {
-            // TODO
-            tb_circle_queue_clear(parser->url_cache);
+            // the url
+            tb_char_t const* url = (tb_char_t const*)tb_circle_queue_get(parser->url_cache);
+            tb_assert_and_check_break(url);
+
+            // trace
+            tb_trace_d("parser: cache: done: %s", url);
+
+            // done task
+            if (!tb_demo_spider_task_done(task->spider, url, &full)) return ;
+
+            // pop it
+            tb_circle_queue_pop(parser->url_cache);
+        }
+        
+        // full?
+        tb_check_return(!full);
+
+        // check
+        tb_assert_abort(tb_circle_queue_null(parser->url_cache));
+        
+        // load url from database
+        if (task->spider->database)
+        {
+            // trace
+            tb_trace_d("parser: database: load url");
+
+            // TODO: done task
         }
     }
 }
@@ -599,7 +656,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
         tb_trace_d("task: size: %lu, done: %s: ..", size, url);
 
         // full?
-        tb_check_break(size < TB_DEMO_SPIDER_TASK_MAXN);
+        tb_assert_and_check_break(size < TB_DEMO_SPIDER_TASK_MAXN);
 
         // make task
         task = (tb_demo_spider_task_t*)tb_fixed_pool_malloc0(spider->pool);
@@ -645,6 +702,10 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 
             // done task
             ok = tb_transfer_pool_done(tb_transfer_pool(), url, task->ourl, 0, spider->limited_rate, tb_demo_spider_task_save, tb_demo_spider_task_ctrl, task);
+            tb_assert_and_check_break(ok);
+
+            // update size
+            size++;
 
         } while (0);
     }
@@ -657,15 +718,15 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
         task = tb_null;
 
         // failed?
-        if (!ok && size < TB_DEMO_SPIDER_TASK_MAXN)
+        if (!ok)
         {
             // trace
             tb_trace_e("task: size: %lu, done: %s: post failed", size, url);
         }
-
-        // save full
-        if (full) *full = size < TB_DEMO_SPIDER_TASK_MAXN? tb_false : tb_true;
     }
+
+    // save full
+    if (full) *full = size < TB_DEMO_SPIDER_TASK_MAXN? tb_false : tb_true;
 
     // ok?
     return ok;
@@ -712,6 +773,32 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         // init limited rate
         if (tb_option_find(spider->option, "rate"))
             spider->limited_rate = tb_option_item_uint32(spider->option, "rate");
+
+        // init database
+        if (tb_option_find(spider->option, "database"))
+        {
+            // init database
+            spider->database = tb_database_sql_init(tb_option_item_cstr(spider->option, "database"));
+            tb_assert_and_check_break(spider->database);
+
+            // open database
+            if (!tb_database_sql_open(spider->database)) break;
+
+            // create table: tasks
+            if (!tb_database_sql_done(spider->database, TB_DEMO_SPIDER_TABLE_TASKS_CREATE)) break;
+
+            // init statement: insert tasks
+            spider->insert_tasks = tb_database_sql_statement_init(spider->database, TB_DEMO_SPIDER_TABLE_TASKS_INSERT);
+            tb_assert_and_check_break(spider->insert_tasks);
+
+            // init statement: update tasks
+            spider->update_tasks = tb_database_sql_statement_init(spider->database, TB_DEMO_SPIDER_TABLE_TASKS_UPDATE);
+            tb_assert_and_check_break(spider->update_tasks);
+
+            // init statement: select tasks
+            spider->select_tasks = tb_database_sql_statement_init(spider->database, TB_DEMO_SPIDER_TABLE_TASKS_SELECT);
+            tb_assert_and_check_break(spider->select_tasks);
+        }
 #else
 
         // check
@@ -830,6 +917,22 @@ static tb_void_t tb_demo_spider_exit(tb_demo_spider_t* spider)
 
     // exit lock
     tb_spinlock_exit(&spider->lock);
+
+    // exit statement: insert tasks
+    if (spider->insert_tasks) tb_database_sql_statement_exit(spider->database, spider->insert_tasks);
+    spider->insert_tasks = tb_null;
+
+    // exit statement: update tasks
+    if (spider->update_tasks) tb_database_sql_statement_exit(spider->database, spider->update_tasks);
+    spider->update_tasks = tb_null;
+
+    // exit statement: select tasks
+    if (spider->select_tasks) tb_database_sql_statement_exit(spider->database, spider->select_tasks);
+    spider->select_tasks = tb_null;
+
+    // exit database
+    if (spider->database) tb_database_sql_exit(spider->database);
+    spider->database = tb_null;
 
     // exit home
     tb_url_exit(&spider->home);
