@@ -49,6 +49,7 @@ tbox_C_FILES 			+= \
 						algorithm/remove_if \
 						algorithm/remove_first \
 						algorithm/remove_first_if \
+						container/heap \
 						container/hash \
 						container/stack \
 						container/vector \
@@ -58,9 +59,6 @@ tbox_C_FILES 			+= \
 						container/list_entry \
 						container/single_list \
 						container/single_list_entry \
-						container/heap \
-						container/heap_entry \
-						container/binary_tree_entry \
 						container/bloom_filter \
 						container/iterator \
 						container/iterator/str \
@@ -496,6 +494,7 @@ INC_FILES 				= \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \
+						container/heap.h \
 						container/hash.h \
 						container/stack.h \
 						container/vector.h \
@@ -506,9 +505,6 @@ INC_FILES 				= \
 						container/list_entry.h \
 						container/single_list.h \
 						container/single_list_entry.h \
-						container/heap.h \
-						container/heap_entry.h \
-						container/binary_tree_entry.h \
 						container/bloom_filter.h \
 						platform/platform.h \
 						platform/prefix.h \
