@@ -255,7 +255,7 @@ config : .null
 	-@$(SED) "s/\[major\]/$(PRO_VERSION_MAJOR)/g" ./src/$(PRO_NAME)/config.h
 	-@$(SED) "s/\[minor\]/$(PRO_VERSION_MINOR)/g" ./src/$(PRO_NAME)/config.h
 	-@$(SED) "s/\[alter\]/$(PRO_VERSION_ALTER)/g" ./src/$(PRO_NAME)/config.h
-	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/$(PRO_NAME)/config.h
+	-@$(SED) "s/\[build\]/`date +%Y%m%d%H`/g" ./src/$(PRO_NAME)/config.h
 	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
 	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
 	@echo "config: ==================================================================="

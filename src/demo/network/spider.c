@@ -384,7 +384,7 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
                 if (!tb_demo_spider_task_done(task->spider, tb_url_get(&parser->iurl), &full))
                 {
                     // full?
-                    tb_check_break(full);
+                    tb_assert_and_check_break(full);
 
                     // cache url
                     if (!tb_circle_queue_full(parser->cache)) tb_circle_queue_put(parser->cache, tb_url_get(&parser->iurl));
@@ -582,7 +582,12 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
     tb_check_return_val(TB_STATE_OK == tb_atomic_get(&spider->state), tb_false);
 
     // only for home?
-    if (spider->home_only && !tb_stristr(iurl, spider->home_domain)) return tb_true;
+    if (spider->home_only && !tb_stristr(iurl, spider->home_domain)) 
+    {
+        // trace
+        tb_trace_d("task: done: %s: skip", iurl);
+        return tb_true;
+    }
 
     // enter
     tb_spinlock_enter(&spider->lock);
@@ -752,8 +757,12 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         tb_assert_and_check_break(host);
 
         // init home domain
-        tb_strlcpy(spider->home_domain, tb_stristr(host, "www.")? host + 4 : host, sizeof(spider->home_domain) - 1);
-        spider->home_domain[sizeof(spider->home_domain) - 1] = '\0';
+        tb_char_t const* domain = tb_strchr(host, '.');
+        if (domain)
+        {
+            tb_strlcpy(spider->home_domain, domain, sizeof(spider->home_domain) - 1);
+            spider->home_domain[sizeof(spider->home_domain) - 1] = '\0';
+        }
 
         // using the default root
         if (root) tb_strlcpy(spider->root, root, sizeof(spider->root) - 1);

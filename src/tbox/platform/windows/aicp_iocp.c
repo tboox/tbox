@@ -56,6 +56,13 @@
 // enable socket pool? only for the accepted socket
 #define TB_IOCP_SOCKET_POOL_ENABLE
 
+// the olap list maxn for GetQueuedCompletionStatusEx 
+#ifdef __tb_small__
+#   define TB_IOCP_OLAP_LIST_MAXN                   (63)
+#else
+#   define TB_IOCP_OLAP_LIST_MAXN                   (255)
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
