@@ -193,7 +193,28 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_next(tb_iterator_ref_t 
     {
         // step statement
         tb_int_t ok = sqlite3_step(result->statement);
-        tb_check_return_val(ok == SQLITE_ROW, result->count);
+
+        // end?
+        if (ok != SQLITE_ROW) 
+        {
+            // reset it 
+            if (SQLITE_OK != sqlite3_reset(result->statement))
+            {
+                // the sqlite
+                tb_database_sqlite3_t* sqlite = (tb_database_sqlite3_t*)iterator->priv;
+                if (sqlite)
+                {
+                    // save state
+                    sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
+
+                    // trace
+                    tb_trace_e("statement: reset failed, error[%d]: %s", sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+                }
+            }
+
+            // tail
+            return result->count;
+        }
     }
 
     // next
@@ -631,6 +652,21 @@ static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_impl_t* data
             // save result col count
             sqlite->result.row.count = sqlite3_column_count((sqlite3_stmt*)statement);
         }
+        else
+        {
+            // reset it 
+            if (SQLITE_OK != sqlite3_reset((sqlite3_stmt*)statement))
+            {
+                // save state
+                sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
+
+                // trace
+                tb_trace_e("statement: reset failed, error[%d]: %s", sqlite3_errcode(sqlite->database), sqlite3_errmsg(sqlite->database));
+
+                // failed
+                break;
+            }
+        }
 
         // ok
         ok = tb_true;
@@ -657,7 +693,7 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_impl_t* data
     // the param count
     tb_size_t param_count = (tb_size_t)sqlite3_bind_parameter_count((sqlite3_stmt*)statement);
     tb_assert_and_check_return_val(size == param_count, tb_false);
-
+   
     // walk
     tb_size_t i = 0;
     for (i = 0; i < size; i++)
@@ -671,6 +707,7 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_impl_t* data
         switch (value->type)
         {
         case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
+            tb_trace_i("sqlite3: test %lu %s", i, value->u.text.data);
             ok = sqlite3_bind_text((sqlite3_stmt*)statement, (tb_int_t)(i + 1), value->u.text.data, (tb_int_t)tb_database_sql_value_size(value), tb_null);
             break;
         case TB_DATABASE_SQL_VALUE_TYPE_INT64:

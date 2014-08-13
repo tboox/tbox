@@ -55,7 +55,7 @@
 #define tb_rfor(type, item, head, tail, iterator) \
             /* iterator */ \
             tb_iterator_ref_t item##_iterator = (tb_iterator_ref_t)iterator; \
-            tb_assert(!item##_iterator || (tb_iterator_mode(item##_iterator) & TB_ITERATOR_MODE_REVERSE)); \
+            tb_assert(!item##_iterator || (tb_iterator_mode(item##_iterator) & (TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_RACCESS))); \
             /* init */ \
             type item; \
             tb_size_t item##_itor; \
