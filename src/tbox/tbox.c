@@ -110,7 +110,7 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
     tb_version_t const* version = tb_version(); tb_used(version);
 
     // ok
-    if (build == TB_VERSION_BUILD)
+    if ((build / 100) == (TB_VERSION_BUILD / 100))
     {
         tb_trace_d("version: %s", TB_VERSION_STRING);
         return tb_true;
