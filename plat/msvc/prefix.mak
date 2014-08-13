@@ -32,7 +32,7 @@ PWD 				= pwd
 
 # pdb
 ifeq ($(PDB),)
-PDB 				:= $(subst \,\\,$(HOME)$(PRO_NAME).pdb)
+PDB 				:= $(subst \,\\,$(HOME)$(PRO_NAME)$(DTYPE).pdb)
 export PDB
 endif
 
