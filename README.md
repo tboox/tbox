@@ -152,12 +152,12 @@ build
 
 	// build for ios-armv7, using sdk7.1 framework
     cd ./tbox
-    make f PLAT=ios ARCH=armv7 SDK=7.1
+    make f PLAT=ios ARCH=armv7 SDK=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk
     make r
     
 	// build for ios armv7 and arm64 universal version
     cd ./tbox
-    make lipo ARCH1=armv7 ARCH2=arm64 SDK=7.1
+    make lipo ARCH1=armv7 ARCH2=arm64 SDK=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk
 
 	// build for android-armv5te, need set the ndk and toolchains directory
     cd ./tbox

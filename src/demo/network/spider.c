@@ -124,15 +124,15 @@ static tb_option_item_t g_options[] =
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */ 
+#if defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
+    && defined(TB_CONFIG_MODULE_HAVE_ASIO) \
+    && defined(TB_CONFIG_MODULE_HAVE_XML)
 static tb_void_t tb_demo_spider_task_exit(tb_demo_spider_task_t* task);
 static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t const* iurl, tb_bool_t* full);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-#if defined(TB_CONFIG_MODULE_HAVE_CHARSET) \
-    && defined(TB_CONFIG_MODULE_HAVE_ASIO) \
-    && defined(TB_CONFIG_MODULE_HAVE_XML)
 static tb_bool_t tb_demo_spider_parser_open_html(tb_stream_ref_t stream, tb_char_t const* url)
 {
     // check

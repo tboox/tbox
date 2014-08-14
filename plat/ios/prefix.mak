@@ -34,19 +34,6 @@ MKDIR 				= mkdir -p
 MAKE 				= make -r
 PWD 				= pwd
 
-# cpu flags
-ifeq ($(ARCH),armv6)
-CPU_CXFLAGS 		= -mcpu=arm1176jzf-s
-endif
-
-ifeq ($(ARCH),armv7)
-CPU_CXFLAGS 		= -mcpu=cortex-a8
-endif
-
-ifeq ($(ARCH),armv7s)
-CPU_CXFLAGS 		= -mcpu=cortex-a8
-endif
-
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fomit-frame-pointer -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
@@ -56,13 +43,6 @@ CXFLAGS 			= \
 					-fmessage-length=0 -pipe -fpascal-strings
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
-
-# opti
-ifeq ($(SMALL),y)
-CXFLAGS_RELEASE 	+= -Os
-else
-CXFLAGS_RELEASE 	+= -O3
-endif
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 
@@ -78,7 +58,7 @@ CCFLAGS 			=
 MXFLAGS_RELEASE 	= -fomit-frame-pointer -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g -D__tb_debug__
 MXFLAGS 			= \
-					-arch $(ARCH) -c -Wall -mthumb $(CPU_CXFLAGS) \
+					-arch $(ARCH) -c -Wall -mthumb \
 					-Werror -Wno-error=deprecated-declarations -Qunused-arguments \
 					-fmessage-length=0 -pipe -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \
@@ -86,13 +66,6 @@ MXFLAGS 			= \
 					"-DIBAction=void)__attribute__((ibaction)"
 MXFLAGS-I 			= -I
 MXFLAGS-o 			= -o
-
-# opti
-ifeq ($(SMALL),y)
-MXFLAGS_RELEASE 	+= -Os
-else
-MXFLAGS_RELEASE 	+= -O3
-endif
 
 # small
 MXFLAGS-$(SMALL) 	+= 
@@ -121,7 +94,7 @@ ASFLAGS_RELEASE 	=
 ASFLAGS_DEBUG 		= 
 ASFLAGS 			= -arch $(ARCH) -c -fPIC
 ASFLAGS-I 			= -I
-ASFLAGS-o 			= -o
+ASFLAGS-o 			= -o 
 
 # arflags
 ARFLAGS_RELEASE 	= 
@@ -133,6 +106,39 @@ ARFLAGS-o 			=
 SHFLAGS_RELEASE 	= -s
 SHFLAGS_DEBUG 		= 
 SHFLAGS 			= -arch $(ARCH) -dynamiclib -Wl,-single_module
+
+# cpu
+ifeq ($(ARCH),armv6)
+CXFLAGS 			+= -mcpu=arm1176jzf-s
+MXFLAGS 			+= -mcpu=arm1176jzf-s
+endif
+
+ifeq ($(ARCH),armv7)
+CXFLAGS 			+= -mcpu=cortex-a8
+MXFLAGS 			+= -mcpu=cortex-a8
+endif
+
+ifeq ($(ARCH),armv7s)
+CXFLAGS 			+= -mcpu=cortex-a8
+MXFLAGS 			+= -mcpu=cortex-a8
+endif
+
+# optimization
+ifeq ($(SMALL),y)
+CXFLAGS_RELEASE 	+= -Os
+MXFLAGS_RELEASE 	+= -Os
+else
+CXFLAGS_RELEASE 	+= -O3
+MXFLAGS_RELEASE 	+= -O3
+endif
+
+# sdk
+ifneq ($(SDK),)
+CXFLAGS 			+= -isysroot $(SDK) 
+MXFLAGS 			+= -isysroot $(SDK) 
+LDFLAGS 			+= -isysroot $(SDK) 
+SHFLAGS 			+= -isysroot $(SDK) 
+endif
 
 # config
 include 			$(PLAT_DIR)/config.mak
