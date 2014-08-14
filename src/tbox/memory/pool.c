@@ -340,7 +340,7 @@ tb_pointer_t tb_pool_align_malloc_(tb_pool_ref_t pool, tb_size_t size, tb_size_t
     tb_check_return_val(!(align & 3), tb_null);
 
     // malloc it
-    tb_byte_t* data = tb_pool_malloc_(pool, size + align __tb_debug_args__);
+    tb_byte_t* data = (tb_byte_t*)tb_pool_malloc_(pool, size + align __tb_debug_args__);
     tb_check_return_val(data, tb_null);
 
     // the different bytes
@@ -403,7 +403,7 @@ tb_pointer_t tb_pool_align_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_siz
     tb_byte_t diff = ((tb_byte_t*)data)[-1];
 
     // adjust the address
-    data -= diff;
+    data = (tb_byte_t*)data - diff;
 
     // ralloc it
     data = tb_pool_ralloc_(pool, data, size + align __tb_debug_args__);
@@ -434,7 +434,7 @@ tb_bool_t tb_pool_align_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_d
     tb_byte_t diff = ((tb_byte_t*)data)[-1];
 
     // adjust the address
-    data -= diff;
+    data = (tb_byte_t*)data - diff;
 
     // free it
     return tb_pool_free_(pool, data __tb_debug_args__);
