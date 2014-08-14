@@ -24,7 +24,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "chunked"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

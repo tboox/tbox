@@ -686,6 +686,9 @@ tb_async_stream_ref_t tb_async_stream_init_from_data(tb_aicp_ref_t aicp, tb_byte
         // set data
         if (!tb_async_stream_ctrl(stream, TB_STREAM_CTRL_DATA_SET_DATA, data, size)) break;
 
+        // check
+        tb_assert_static(!(tb_offsetof(tb_async_stream_data_impl_t, offset) & (sizeof(tb_atomic64_t) - 1)));
+
         // ok
         ok = tb_true;
 

@@ -133,10 +133,10 @@ $(1)_CXFLAGS := $(CXFLAGS) $(addprefix $(CXFLAGS-I), $(INC_DIR)) $(addprefix $(C
 $(1)_MFLAGS := $(MFLAGS) $($(1)_MFLAGS) $($(1)_MFLAGS-y)
 $(1)_MMFLAGS := $(MMFLAGS) $($(1)_MMFLAGS) $($(1)_MMFLAGS-y)
 $(1)_MXFLAGS := $(MXFLAGS) $(addprefix $(MXFLAGS-I), $(INC_DIR)) $(addprefix $(MXFLAGS-I), $($(1)_INC_DIR)) $($(1)_MXFLAGS) $($(1)_MXFLAGS-y)
-$(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS))) $($(1)_LDFLAGS) $($(1)_LDFLAGS-y)
+$(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $($(1)_LDFLAGS) $($(1)_LDFLAGS-y) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS))) 
 $(1)_ASFLAGS := $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIR)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIR)) $($(1)_ASFLAGS) $($(1)_ASFLAGS-y)
 $(1)_ARFLAGS := $(ARFLAGS) $($(1)_ARFLAGS-y)
-$(1)_SHFLAGS := $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS))) $($(1)_SHFLAGS) $($(1)_SHFLAGS-y)
+$(1)_SHFLAGS := $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $($(1)_SHFLAGS) $($(1)_SHFLAGS-y) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS)))
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FLAGS,$(name))))
 

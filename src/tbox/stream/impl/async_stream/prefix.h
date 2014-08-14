@@ -154,7 +154,7 @@ typedef struct __tb_async_stream_sync_seek_t
 }tb_async_stream_sync_seek_t;
 
 // the asio stream type
-typedef struct __tb_async_stream_impl_t
+typedef __tb_aligned__(8) struct __tb_async_stream_impl_t
 {   
     // the stream type
     tb_uint8_t                          type;
@@ -352,7 +352,7 @@ typedef struct __tb_async_stream_impl_t
      */
     tb_void_t                           (*kill)(tb_async_stream_ref_t stream);
 
-}tb_async_stream_impl_t;
+}__tb_aligned__(8) tb_async_stream_impl_t;
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////

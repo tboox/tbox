@@ -463,7 +463,7 @@ tb_async_stream_ref_t tb_async_stream_init( tb_aicp_ref_t aicp
     do
     {
         // make impl
-        impl = (tb_async_stream_impl_t*)tb_malloc0(sizeof(tb_async_stream_impl_t) + type_size);
+        impl = (tb_async_stream_impl_t*)tb_align8_malloc0(sizeof(tb_async_stream_impl_t) + type_size);
         tb_assert_and_check_break(impl);
 
         // init stream
@@ -624,7 +624,7 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_ref_t stream)
     tb_buffer_exit(&impl->wcache_data);
 
     // free it
-    tb_free(impl);
+    tb_align8_free(impl);
 
     // trace
     tb_trace_d("exit: ok");

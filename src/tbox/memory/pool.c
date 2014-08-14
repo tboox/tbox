@@ -333,6 +333,112 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
     // ok?
     return ok;
 }
+tb_pointer_t tb_pool_align_malloc_(tb_pool_ref_t pool, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // check
+    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
+    tb_check_return_val(!(align & 3), tb_null);
+
+    // malloc it
+    tb_byte_t* data = tb_pool_malloc_(pool, size + align __tb_debug_args__);
+    tb_check_return_val(data, tb_null);
+
+    // the different bytes
+    tb_byte_t diff = (tb_byte_t)((~(tb_long_t)data) & (align - 1)) + 1;
+
+    // adjust the address
+    data += diff;
+
+    // check
+    tb_assert_abort(!((tb_size_t)data & (align - 1)));
+
+    // save the different bytes
+    data[-1] = diff;
+
+    // ok?
+    return (tb_pointer_t)data;
+}
+tb_pointer_t tb_pool_align_malloc0_(tb_pool_ref_t pool, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // malloc it
+    tb_pointer_t data = tb_pool_align_malloc_(pool, size, align __tb_debug_args__);
+    tb_assert_and_check_return_val(data, tb_null);
+
+    // clear it
+    tb_memset(data, 0, size);
+
+    // ok
+    return data;
+}
+tb_pointer_t tb_pool_align_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    return tb_pool_align_malloc_(pool, item * size, align __tb_debug_args__);
+}
+tb_pointer_t tb_pool_align_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // nalloc it
+    tb_pointer_t data = tb_pool_align_nalloc_(pool, item, size, align __tb_debug_args__);
+    tb_assert_and_check_return_val(data, tb_null);
+
+    // clear it
+    tb_memset(data, 0, item * size);
+
+    // ok
+    return data;
+}
+tb_pointer_t tb_pool_align_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(data, tb_null);
+
+    // check align
+    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
+    tb_check_return_val(!(align & 3), tb_null);
+
+    // check address 
+    tb_assertf_abort(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
+    tb_check_return_val(!((tb_size_t)data & (align - 1)), tb_null);
+
+    // the different bytes
+    tb_byte_t diff = ((tb_byte_t*)data)[-1];
+
+    // adjust the address
+    data -= diff;
+
+    // ralloc it
+    data = tb_pool_ralloc_(pool, data, size + align __tb_debug_args__);
+    tb_check_return_val(data, tb_null);
+
+    // the different bytes
+    diff = (tb_byte_t)((~(tb_long_t)data) & (align - 1)) + 1;
+
+    // adjust the address
+    data = (tb_byte_t*)data + diff;
+
+    // check
+    tb_assert_abort(!((tb_size_t)data & (align - 1)));
+
+    // save the different bytes
+    ((tb_byte_t*)data)[-1] = diff;
+
+    // ok?
+    return data;
+}
+tb_bool_t tb_pool_align_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(data, tb_false);
+    tb_assert_abort(!((tb_size_t)data & 3));
+
+    // the different bytes
+    tb_byte_t diff = ((tb_byte_t*)data)[-1];
+
+    // adjust the address
+    data -= diff;
+
+    // free it
+    return tb_pool_free_(pool, data __tb_debug_args__);
+}
 #ifdef __tb_debug__
 tb_void_t tb_pool_dump(tb_pool_ref_t pool)
 {

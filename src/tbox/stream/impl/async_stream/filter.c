@@ -721,6 +721,9 @@ tb_async_stream_ref_t tb_async_stream_init_filter_from_null(tb_async_stream_ref_
         // set stream
         if (!tb_async_stream_ctrl(impl, TB_STREAM_CTRL_FLTR_SET_STREAM, stream)) break;
 
+        // check
+        tb_assert_static(!(tb_offsetof(tb_async_stream_filter_impl_t, offset) & (sizeof(tb_atomic64_t) - 1)));
+
         // ok 
         ok = tb_true;
 

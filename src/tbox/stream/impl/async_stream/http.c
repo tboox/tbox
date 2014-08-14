@@ -824,6 +824,10 @@ tb_async_stream_ref_t tb_async_stream_init_from_http(tb_aicp_ref_t aicp, tb_char
         if (!tb_async_stream_ctrl(stream, TB_STREAM_CTRL_SET_PATH, path)) break;
         if (!tb_async_stream_ctrl(stream, TB_STREAM_CTRL_SET_SSL, bssl)) break;
     
+        // check
+        tb_assert_static(!(tb_offsetof(tb_async_stream_http_impl_t, size) & (sizeof(tb_atomic64_t) - 1)));
+        tb_assert_static(!(tb_offsetof(tb_async_stream_http_impl_t, offset) & (sizeof(tb_atomic64_t) - 1)));
+
         // ok
         ok = tb_true;
 
