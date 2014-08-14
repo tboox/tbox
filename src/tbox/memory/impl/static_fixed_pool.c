@@ -740,11 +740,14 @@ tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t pool)
             // check it
             tb_static_fixed_pool_check_data(impl, data_head);
 
+            // the data
+            tb_byte_t const* data = (tb_byte_t const*)data_head + impl->data_head_size;
+
             // trace
-            tb_trace_e("leak: %p", &data_head[1]);
+            tb_trace_e("leak: %p", data);
 
             // dump data
-            tb_pool_data_dump((tb_byte_t const*)&data_head[1], tb_false, "[static_fixed_pool]: [error]: ");
+            tb_pool_data_dump(data, tb_false, "[static_fixed_pool]: [error]: ");
         }
     }
 
