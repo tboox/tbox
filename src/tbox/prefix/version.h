@@ -33,13 +33,25 @@
  * macros
  */
 
-// version: v1.4.7
+/// the major version
 #define TB_VERSION_MAJOR            TB_CONFIG_VERSION_MAJOR
+
+/// the minor version
 #define TB_VERSION_MINOR            TB_CONFIG_VERSION_MINOR
+
+/// the alter version
 #define TB_VERSION_ALTER            TB_CONFIG_VERSION_ALTER
+
+/// the build version
 #define TB_VERSION_BUILD            TB_CONFIG_VERSION_BUILD
+
+/// the build version string
 #define TB_VERSION_BUILD_STRING     __tb_mstring_ex__(TB_CONFIG_VERSION_BUILD)
+
+/// the version string
 #define TB_VERSION_STRING           __tb_mstrcat6__("tbox_", __tb_mstring_ex__(__tb_mconcat8_ex__(v, TB_VERSION_MAJOR, _, TB_VERSION_MINOR, _, TB_VERSION_ALTER, _, TB_CONFIG_VERSION_BUILD)), "_", TB_ARCH_VERSION_STRING, " by ", TB_COMPILER_VERSION_STRING)
+
+/// the short version string
 #define TB_VERSION_SHORT_STRING     __tb_mstrcat__("tbox_", __tb_mstring_ex__(__tb_mconcat8_ex__(v, TB_VERSION_MAJOR, _, TB_VERSION_MINOR, _, TB_VERSION_ALTER, _, TB_CONFIG_VERSION_BUILD)))
 
 #endif
