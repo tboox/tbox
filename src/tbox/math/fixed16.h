@@ -287,13 +287,13 @@ tb_fixed16_t    tb_fixed16_exp_int32(tb_fixed16_t x);
 static __tb_inline__ tb_fixed16_t tb_long_to_fixed16_check(tb_long_t x)
 {
     // check overflow
-    tb_assert(x >= TB_MINS16 && x <= TB_MAXS16);
+    tb_assert_abort(x >= TB_MINS16 && x <= TB_MAXS16);
     return (x << 16);
 }
 static __tb_inline__ tb_long_t tb_fixed16_to_long_check(tb_fixed16_t x)
 {
     // check overflow
-    tb_assert(x != TB_FIXED16_NAN);
+    tb_assert_abort(x != TB_FIXED16_NAN);
     return (x >> 16);
 }
 #endif
