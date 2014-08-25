@@ -90,42 +90,6 @@ contact
 - download:     https://github.com/waruqi/tbox/archive/master.zip
 - qq(group):    343118190
 
-usage
------
-
-```bash
-	// configure
-    make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=]
-    make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]
-    make config|f [PLAT=android] [ARCH=armv5te|armv6] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [NDK=..] [SDK=..]
-
-	// build
-    make [all]
-    make rebuild|r
-    make lipo ARCH1=armv6 ARCH2=armv7 DEBUG=[y|n] SDK=[5.0|5.1|6.0|..] // for ios 
-
-	// update build
-    make update|u
-
-	// clean build
-    make clean|c
-
-	// install
-    make prefix|p
-    make install|i
-
-	// make info
-    make error|e
-    make output|o
-    make warning|w
-
-	// make document
-    make doc|d
-
-	// help
-    make help|h
-```
-
 build
 -----
 
@@ -161,7 +125,7 @@ build
 
 	// build for android-armv5te, need set the ndk and toolchains directory
     cd ./tbox
-    make f PLAT=android ARCH=armv5te NDK=/home/xxxx/android-ndk-r9d BIN=/home/xxxx/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/darwin-x86_64/bin
+    make f PLAT=android ARCH=armv5te SDK=/home/xxxx/android-ndk-r9d BIN=/home/xxxx/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/darwin-x86_64/bin
     make r
     
 	// build for android-armv6, if ndk and toolchains have been setted

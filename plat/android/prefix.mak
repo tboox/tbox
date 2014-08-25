@@ -35,7 +35,7 @@ PWD 				= pwd
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -c -Wall -fomit-frame-pointer -march=$(ARCH) \
-					  -I$(NDK)/platforms/android-8/arch-arm/usr/include 
+					  -I$(SDK)/platforms/android-8/arch-arm/usr/include 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -65,15 +65,15 @@ CCFLAGS_DEBUG 		=
 CCFLAGS 			= \
 					-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 \
-					-I$(NDK)/sources/cxx-stl/stlport/stlport
+					-I$(SDK)/sources/cxx-stl/stlport/stlport
 
 # ldflags
 LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= 
 LDFLAGS 			= -nostdlib \
-					-L$(NDK)/platforms/android-8/arch-arm/usr/lib/ \
-					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtbegin_dynamic.o \
-					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtend_android.o
+					-L$(SDK)/platforms/android-8/arch-arm/usr/lib/ \
+					$(SDK)/platforms/android-8/arch-arm/usr/lib/crtbegin_dynamic.o \
+					$(SDK)/platforms/android-8/arch-arm/usr/lib/crtend_android.o
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-f 			=
@@ -95,9 +95,9 @@ ARFLAGS-o 			=
 # shflags
 SHFLAGS_RELEASE 	= -s
 SHFLAGS 			= -march=$(ARCH) -shared -Wl,-soname -nostdlib \
-					-L$(NDK)/platforms/android-8/arch-arm/usr/lib/ \
-					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtbegin_so.o \
-					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtend_so.o
+					-L$(SDK)/platforms/android-8/arch-arm/usr/lib/ \
+					$(SDK)/platforms/android-8/arch-arm/usr/lib/crtbegin_so.o \
+					$(SDK)/platforms/android-8/arch-arm/usr/lib/crtend_so.o
 
 # include sub-config
 include 			$(PLAT_DIR)/config.mak
