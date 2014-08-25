@@ -282,7 +282,6 @@ config : .null
 	@echo "config: bin:      " 							$(BIN)
 	@echo "config: pre:      " 							$(PRE)
 	@echo "config: sdk:      " 							$(SDK)
-	@echo "config: ndk:      " 							$(NDK)
 	@echo "config: ==================================================================="
 
 	@echo "# config"                      				> .config.mak
@@ -336,7 +335,6 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# toolchain"            						>> .config.mak
 	@echo "SDK ="$(SDK) 								>> .config.mak
-	@echo "NDK ="$(NDK) 								>> .config.mak
 	@echo "BIN ="$(BIN) 								>> .config.mak
 	@echo "PRE ="$(PRE) 								>> .config.mak
 	@echo "CCACHE ="$(CCACHE) 							>> .config.mak
@@ -359,7 +357,6 @@ config : .null
 	@echo "export PROF"					 				>> .config.mak
 	@echo "export DEMO"					 				>> .config.mak
 	@echo "export SDK" 				 					>> .config.mak
-	@echo "export NDK" 				 					>> .config.mak
 	@echo "export BIN" 				 					>> .config.mak
 	@echo "export PRE" 				 					>> .config.mak
 	@echo "export CFLAG" 			 					>> .config.mak
