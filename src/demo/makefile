@@ -143,6 +143,7 @@ demo_LIB_DIR 								+= ../tbox
 
 # flags
 demo_CXFLAGS 								+= -D__tb_prefix__=\"demo\"
+demo_LDFLAGS 								+= $(TB_CONFIG_DEMO_LDFLAGS)
 
 # command
 demo_SUFFIX_CMD1 							+= $(TB_CONFIG_DEMO_CMD1)
