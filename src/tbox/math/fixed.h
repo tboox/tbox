@@ -50,9 +50,6 @@
 #   define tb_float_to_fixed(x)     tb_float_to_fixed16(x)
 #endif
 
-#define tb_int_to_fixed(x)          tb_int_to_fixed16(x)
-#define tb_fixed_to_int(x)          tb_fixed16_to_int(x)
-
 #define tb_long_to_fixed(x)         tb_long_to_fixed16(x)
 #define tb_fixed_to_long(x)         tb_fixed16_to_long(x)
 
@@ -76,6 +73,8 @@
 #define tb_fixed_div(x, y)          tb_fixed16_div(x, y)
 #define tb_fixed_imul(x, y)         tb_fixed16_imul(x, y)
 #define tb_fixed_idiv(x, y)         tb_fixed16_idiv(x, y)
+#define tb_fixed_imuldiv(x, y, z)   tb_fixed16_imuldiv(x, y, z)
+#define tb_fixed_imulsub(x, y, z)   tb_fixed16_imulsub(x, y, z)
 #define tb_fixed_invert(x)          tb_fixed16_invert(x)
 #define tb_fixed_sqre(x)            tb_fixed16_sqre(x)
 #define tb_fixed_sqrt(x)            tb_fixed16_sqrt(x)

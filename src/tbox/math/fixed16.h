@@ -69,15 +69,9 @@ __tb_extern_c_enter__
 #endif
 
 #ifdef __tb_debug__
-#   define tb_int_to_fixed16(x)             tb_long_to_fixed16_check(x)
-#   define tb_fixed16_to_int(x)             tb_fixed16_to_long_check(x)
-
 #   define tb_long_to_fixed16(x)            tb_long_to_fixed16_check(x)
 #   define tb_fixed16_to_long(x)            tb_fixed16_to_long_check(x)
 #else
-#   define tb_int_to_fixed16(x)             (tb_fixed16_t)((x) << 16)
-#   define tb_fixed16_to_int(x)             (tb_int_t)((x) >> 16)
-
 #   define tb_long_to_fixed16(x)            (tb_fixed16_t)((x) << 16)
 #   define tb_fixed16_to_long(x)            (tb_long_t)((x) >> 16)
 #endif
@@ -121,12 +115,34 @@ __tb_extern_c_enter__
     
 // imul
 #ifndef tb_fixed16_imul
-#   define tb_fixed16_imul(x, y)            tb_fixed16_mul(x, tb_int_to_fixed16(y))
+#   ifdef __tb_debug__
+#       define tb_fixed16_imul(x, y)        tb_fixed16_imul_check(x, y)
+#   else
+#       define tb_fixed16_imul(x, y)        ((tb_fixed16_t)((x) * (y)))
+#   endif
 #endif
 
 // idiv
 #ifndef tb_fixed16_idiv
-#   define tb_fixed16_idiv(x, y)            tb_fixed16_div(x, tb_int_to_fixed16(y))
+#   define tb_fixed16_idiv(x, y)            ((tb_fixed16_t)((x) / (y)))
+#endif
+
+// imuldiv
+#ifndef tb_fixed16_imuldiv
+#   ifdef __tb_debug__
+#       define tb_fixed16_imuldiv(x, y, z)  tb_fixed16_imuldiv_check(x, y, z)
+#   else
+#       define tb_fixed16_imuldiv(x, y, z)  ((tb_fixed16_t)(((tb_hong_t)(x) * (y)) / (z)))
+#   endif
+#endif
+
+// imulsub
+#ifndef tb_fixed16_imulsub
+#   ifdef __tb_debug__
+#       define tb_fixed16_imulsub(x, y, z)  tb_fixed16_imulsub_check(x, y, z)
+#   else
+#       define tb_fixed16_imulsub(x, y, z)  ((tb_fixed16_t)(((tb_hong_t)(x) * (y)) - (z)))
+#   endif
 #endif
 
 // lsh
@@ -282,8 +298,6 @@ tb_fixed16_t    tb_fixed16_exp_int32(tb_fixed16_t x);
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-
-#ifdef __tb_debug__
 static __tb_inline__ tb_fixed16_t tb_long_to_fixed16_check(tb_long_t x)
 {
     // check overflow
@@ -296,8 +310,6 @@ static __tb_inline__ tb_long_t tb_fixed16_to_long_check(tb_fixed16_t x)
     tb_assert_abort(x != TB_FIXED16_NAN);
     return (x >> 16);
 }
-#endif
-
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed16_t y)
 {
     return (tb_fixed16_t)((tb_hong_t)x * y >> 16);
@@ -311,7 +323,39 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int64(tb_fixed16_t x)
 {
     return (tb_fixed16_t)((tb_hong_t)x * x >> 16);
 }
+static __tb_inline__ tb_fixed16_t tb_fixed16_imul_check(tb_fixed16_t x, tb_long_t y)
+{
+    // done
+    tb_hong_t v = ((tb_hong_t)x * y);
 
+    // check overflow
+    tb_assert_abort(v >= TB_MINS32 && v <= TB_MAXS32);
+
+    // ok
+    return (tb_fixed16_t)v;
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_imuldiv_check(tb_fixed16_t x, tb_long_t y, tb_long_t z)
+{
+    // done
+    tb_hong_t v = ((tb_hong_t)x * y) / z;
+
+    // check overflow
+    tb_assert_abort(v >= TB_MINS32 && v <= TB_MAXS32);
+
+    // ok
+    return (tb_fixed16_t)v;
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_imulsub_check(tb_fixed16_t x, tb_long_t y, tb_long_t z)
+{
+    // done
+    tb_hong_t v = ((tb_hong_t)x * y) - z;
+
+    // check overflow
+    tb_assert_abort(v >= TB_MINS32 && v <= TB_MAXS32);
+
+    // ok
+    return (tb_fixed16_t)v;
+}
 #ifdef TB_CONFIG_TYPE_FLOAT
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_float(tb_fixed16_t x, tb_fixed16_t y)
 {

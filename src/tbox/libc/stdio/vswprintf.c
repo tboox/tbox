@@ -74,6 +74,7 @@ typedef enum __tb_printf_qual_t
 ,   TB_PRINTF_QUAL_I16              = 5
 ,   TB_PRINTF_QUAL_I32              = 6
 ,   TB_PRINTF_QUAL_I64              = 7
+,   TB_PRINTF_QUAL_FIXED            = 8
 
 }tb_printf_qual_t;
 
@@ -871,9 +872,18 @@ get_qualifier:
         e->base = 2;
         e->type = TB_PRINTF_TYPE_INT;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
     case L'F':
-        e->extra |= TB_PRINTF_EXTRA_UPPER;
+#ifdef TB_CONFIG_TYPE_FLOAT
+        e->type = TB_PRINTF_TYPE_FLOAT;
+        e->extra |= TB_PRINTF_EXTRA_SIGNED;
+#else
+        e->base = 10;
+        e->extra |= TB_PRINTF_EXTRA_SIGNED;
+        e->type = TB_PRINTF_TYPE_INT;
+#endif
+        e->qual = TB_PRINTF_QUAL_FIXED;
+        break;
+#ifdef TB_CONFIG_TYPE_FLOAT
     case L'f':
         e->type = TB_PRINTF_TYPE_FLOAT;
         e->extra |= TB_PRINTF_EXTRA_SIGNED;
@@ -996,6 +1006,7 @@ get_qualifier:
  * tb_printf("|%016.9f|\n", 3.14159);
  * tb_printf("|%lf|\n", 1.0 / 6.0);
  * tb_printf("|%lf|\n", 0.0003141596);
+ * tb_printf("|%F|\n", tb_float_to_fixed(3.1415));
  * @endcode
  *
  */
@@ -1103,6 +1114,13 @@ tb_long_t tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* fmt, tb_va_
                         case TB_PRINTF_QUAL_I8:     num = (tb_int8_t)tb_va_arg(args, tb_int_t); break;
                         case TB_PRINTF_QUAL_I16:    num = (tb_int16_t)tb_va_arg(args, tb_int_t); break;
                         case TB_PRINTF_QUAL_I32:    num = tb_va_arg(args, tb_int32_t); break;
+                        case TB_PRINTF_QUAL_FIXED: 
+                            {
+                                // fixed to int32
+                                tb_int32_t val = tb_va_arg(args, tb_int32_t); 
+                                num = (tb_int32_t)tb_fixed_to_long(val);
+                            }
+                            break;
                         default:                    num = tb_va_arg(args, tb_int_t); break;
                         }
                     }
@@ -1123,11 +1141,19 @@ tb_long_t tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* fmt, tb_va_
 #ifdef TB_CONFIG_TYPE_FLOAT
         case TB_PRINTF_TYPE_FLOAT:
             {
+                // double?
                 if (e.qual == TB_PRINTF_QUAL_L)
                 {
                     tb_double_t num = tb_va_arg(args, tb_double_t);
                     pb = tb_printf_double(pb, pe, e, num);
                 }
+                // fixed?
+                else if (e.qual == TB_PRINTF_QUAL_FIXED)
+                {
+                    tb_fixed_t num = (tb_fixed_t)tb_va_arg(args, tb_fixed_t);
+                    pb = tb_printf_float(pb, pe, e, tb_fixed_to_float(num));
+                }
+                // float?
                 else 
                 {
                     tb_float_t num = (tb_float_t)tb_va_arg(args, tb_double_t);
