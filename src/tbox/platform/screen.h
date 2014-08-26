@@ -17,46 +17,17 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.h
- * @defgroup    platform
+ * @file        screen.h
+ * @ingroup     platform
  *
  */
-#ifndef TB_PLATFORM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_SCREEN_H
+#define TB_PLATFORM_SCREEN_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "page.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "mutex.h"
-#include "event.h"
-#include "timer.h"
-#include "print.h"
-#include "screen.h"
-#include "ltimer.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "memory.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "hostname.h"
-#include "processor.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-#include "cache_time.h"
-#include "thread_pool.h"
-#include "thread_store.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -67,18 +38,17 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init the platform
+/*! the screen width
  *
- * @param priv      the platform private data
- *                  pass JNIEnv* env for android
- *                  pass tb_null for other platform
- *
- * @return          tb_true or tb_false
+ * @return              the screen width
  */
-tb_bool_t           tb_platform_init(tb_handle_t priv);
+tb_size_t               tb_screen_width(tb_noarg_t);
 
-/// exit the platform 
-tb_void_t           tb_platform_exit(tb_noarg_t);
+/*! the screen height
+ *
+ * @return              the screen height
+ */
+tb_size_t               tb_screen_height(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

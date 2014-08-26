@@ -45,5 +45,6 @@ tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("p: %lf, k: %lf, s: %lf, v: %lf", p2, k2, s2, v2);
 #endif
 
+    tb_trace_i("%lux%lu", tb_screen_width(), tb_screen_height());
     return 0;
 }

@@ -1,6 +1,7 @@
 # demo
 TB_CONFIG_DEMO_LIBS					= stdc++ m dl pthread 
 #TB_CONFIG_DEMO_CMD1				= -@ldid -S $(1)$(BIN_SUFFIX)
+TB_CONFIG_DEMO_LDFLAGS 				= -framework UIKit
 
 # os
 TB_CONFIG_OS_IOS 					= y

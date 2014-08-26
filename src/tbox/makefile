@@ -239,6 +239,7 @@ tbox_C_FILES 			+= \
 						platform/print \
 						platform/mutex \
 						platform/event \
+						platform/screen \
 						platform/socket \
 						platform/thread \
 						platform/memory \
@@ -373,7 +374,12 @@ endif
 
 # ios
 tbox_M_FILES-$(TB_CONFIG_OS_IOS) += \
+						platform/mach/ios/screen \
 						platform/mach/ios/directory
+
+# mac
+tbox_M_FILES-$(TB_CONFIG_OS_MAC) += \
+						platform/mach/mac/screen
 
 # android
 tbox_C_FILES-$(TB_CONFIG_OS_ANDROID) += \
@@ -517,6 +523,7 @@ INC_FILES 				= \
 						platform/mutex.h \
 						platform/timer.h \
 						platform/ltimer.h \
+						platform/screen.h \
 						platform/thread.h \
 						platform/socket.h \
 						platform/event.h \
