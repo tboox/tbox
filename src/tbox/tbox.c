@@ -170,6 +170,9 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t 
     // init libc 
     if (!tb_libc_init()) return tb_false;
 
+    // init math
+    if (!tb_math_init()) return tb_false;
+
     // init libm
     if (!tb_libm_init()) return tb_false;
 
@@ -212,6 +215,9 @@ tb_void_t tb_exit()
      
     // exit libm
     tb_libm_exit();
+     
+    // exit math
+    tb_math_exit();
     
     // exit libc
     tb_libc_exit();

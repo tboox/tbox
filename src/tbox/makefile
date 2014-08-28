@@ -10,6 +10,7 @@ tbox_TYPE 				= LIB
 # basic files
 tbox_C_FILES 			+= \
 						tbox \
+						math/math \
 						math/int32 \
 						math/fixed16 \
 						math/random/random \

@@ -136,7 +136,7 @@ static tb_wchar_t* tb_printf_object(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
 
     // find the object func
     tb_printf_object_func_t func = tb_printf_object_find(data);
-    if (func && object)
+    if (func)
     {
         // printf it
         tb_long_t size = func(object, data, tb_arrayn(data) - 1);

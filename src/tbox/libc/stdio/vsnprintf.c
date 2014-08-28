@@ -132,7 +132,7 @@ static tb_char_t* tb_printf_object(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
 {
     // find the object func
     tb_printf_object_func_t func = tb_printf_object_find(e.object);
-    if (func && object)
+    if (func)
     {
         // printf it
         tb_long_t size = func(object, pb, pe - pb);
