@@ -174,7 +174,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     case TB_SOCKET_TYPE_TCP:
         {
             // trace
-            tb_trace_d("connect: %s[%u.%u.%u.%u]:%u: ..", tb_url_host_get(url), tb_ipv4_u8x4(impl->addr), port);
+            tb_trace_d("connect: %s[%{ipv4}]:%u: ..", tb_url_host_get(url), &impl->addr, port);
 
             // connect it
             tb_long_t real = -1;

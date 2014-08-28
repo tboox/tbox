@@ -904,7 +904,7 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     tb_assert_and_check_return_val(aico && aico->base.handle && !aico->bDisconnectEx, tb_false);
 
     // trace
-    tb_trace_d("connect[%p]: %u.%u.%u.%u: %u: ..", aico, tb_ipv4_u8x4(aice->u.conn.addr), aice->u.conn.port);
+    tb_trace_d("connect[%p]: %{ipv4}: %u: ..", aico, &aice->u.conn.addr, aice->u.conn.port);
 
     // done
     tb_bool_t       ok = tb_false;
