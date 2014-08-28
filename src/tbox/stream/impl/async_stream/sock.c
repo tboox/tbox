@@ -374,7 +374,7 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
         if (addr)
         {
             // trace
-            tb_trace_d("open[%p]: addr: %s, %u.%u.%u.%u", impl->aico, host, tb_ipv4_u8x4(*addr));
+            tb_trace_d("open[%p]: addr: %s, %{ipv4}", impl->aico, host, addr);
 
             // init aico
             if (!impl->aico) impl->aico = tb_aico_init(tb_async_stream_aicp((tb_async_stream_ref_t)impl));

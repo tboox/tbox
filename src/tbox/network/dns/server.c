@@ -268,7 +268,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
         rate = (tb_long_t)(tb_cache_time_spak() - time);
 
         // ok
-        tb_trace_d("test: %u.%u.%u.%u ok, rate: %u", tb_ipv4_u8x4(*addr), rate);
+        tb_trace_d("test: %{ipv4} ok, rate: %u", addr, rate);
 
     } while (0);
 

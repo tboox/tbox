@@ -591,7 +591,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     tb_long_t ok = tb_socket_connect(aico->base.handle, &aice->u.conn.addr, aice->u.conn.port);
 
     // trace
-    tb_trace_d("conn[%p]: %u.%u.%u.%u: %lu: %ld", aico, aice->u.conn.addr.u8[0], aice->u.conn.addr.u8[1], aice->u.conn.addr.u8[2], aice->u.conn.addr.u8[3], aice->u.conn.port, ok);
+    tb_trace_d("conn[%p]: %{ipv4}: %lu: %ld", aico, &aice->u.conn.addr, aice->u.conn.port, ok);
 
     // no connected? wait it
     if (!ok) 
@@ -758,7 +758,7 @@ static tb_long_t tb_aiop_spak_urecv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     }
 
     // trace
-    tb_trace_d("urecv[%p]: %u.%u.%u.%u: %lu, %lu", aico, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.port, recv);
+    tb_trace_d("urecv[%p]: %{ipv4}: %lu, %lu", aico, &aice->u.urecv.addr, aice->u.urecv.port, recv);
 
     // no recv? 
     if (!recv) 
@@ -816,7 +816,7 @@ static tb_long_t tb_aiop_spak_usend(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     }
 
     // trace
-    tb_trace_d("usend[%p]: %u.%u.%u.%u: %lu, %lu", aico, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.port, send);
+    tb_trace_d("usend[%p]: %{ipv4}: %lu, %lu", aico, &aice->u.usend.addr, aice->u.usend.port, send);
 
     // no send? 
     if (!send) 
@@ -946,7 +946,7 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, aice->u.urecvv.port, aice->u.urecvv.list, aice->u.urecvv.size);
 
     // trace
-    tb_trace_d("urecvv[%p]: %u.%u.%u%u: %lu, %lu", aico, tb_ipv4_u8x4(aice->u.urecvv.addr), aice->u.urecvv.port, real);
+    tb_trace_d("urecvv[%p]: %{ipv4}: %lu, %lu", aico, &aice->u.urecvv.addr, aice->u.urecvv.port, real);
 
     // ok? 
     if (real > 0) 
@@ -988,7 +988,7 @@ static tb_long_t tb_aiop_spak_usendv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     tb_long_t real = tb_socket_usendv(aico->base.handle, &aice->u.usendv.addr, aice->u.usendv.port, aice->u.usendv.list, aice->u.usendv.size);
 
     // trace
-    tb_trace_d("usendv[%p]: %u.%u.%u%u: %lu, %lu", aico, tb_ipv4_u8x4(aice->u.usendv.addr), aice->u.usendv.port, real);
+    tb_trace_d("usendv[%p]: %{ipv4}: %lu, %lu", aico, &aice->u.usendv.addr, aice->u.usendv.port, real);
 
     // ok? 
     if (real > 0) 

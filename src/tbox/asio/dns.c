@@ -290,7 +290,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-        tb_trace_d("resp[%s]: aico: %p, server: %u.%u.%u.%u, real: %lu", impl->host, impl->aico, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
+        tb_trace_d("resp[%s]: aico: %p, server: %{ipv4}, real: %lu", impl->host, impl->aico, &aice->u.urecv.addr, aice->u.urecv.real);
 
         // check
         tb_assert_and_check_return_val(aice->u.urecv.real, tb_false);
@@ -302,7 +302,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     else
     {
         // trace
-        tb_trace_d("resp[%s]: aico: %p, server: %u.%u.%u.%u, state: %s", impl->host, impl->aico, tb_ipv4_u8x4(aice->u.urecv.addr), tb_state_cstr(aice->state));
+        tb_trace_d("resp[%s]: aico: %p, server: %{ipv4}, state: %s", impl->host, impl->aico, &aice->u.urecv.addr, tb_state_cstr(aice->state));
     }
 
     // ok or try to get ok from cache again if failed or timeout? 
@@ -358,7 +358,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-        tb_trace_d("reqt[%s]: aico: %p, server: %u.%u.%u.%u, real: %lu", impl->host, impl->aico, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
+        tb_trace_d("reqt[%s]: aico: %p, server: %{ipv4}, real: %lu", impl->host, impl->aico, &aice->u.usend.addr, aice->u.usend.real);
 
         // check
         tb_assert_and_check_return_val(aice->u.usend.real, tb_false);
@@ -374,7 +374,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     else
     {
         // trace
-        tb_trace_d("reqt[%s]: aico: %p, server: %u.%u.%u.%u, state: %s", impl->host, impl->aico, tb_ipv4_u8x4(aice->u.usend.addr), tb_state_cstr(aice->state));
+        tb_trace_d("reqt[%s]: aico: %p, server: %{ipv4}, state: %s", impl->host, impl->aico, &aice->u.usend.addr, tb_state_cstr(aice->state));
             
         // the next server 
         tb_ipv4_t const* server = &impl->list[impl->indx + 1];
