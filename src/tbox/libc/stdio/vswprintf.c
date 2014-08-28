@@ -115,7 +115,7 @@ typedef struct __tb_printf_entry_t
     tb_int_t            base;
 
     // the object name
-    tb_wchar_t          object[64];
+    tb_wchar_t          object[TB_PRINTF_OBJECT_NAME_MAXN];
 
 }tb_printf_entry_t;
 

@@ -84,6 +84,7 @@ tb_void_t tb_printf_object_register(tb_char_t const* name, tb_printf_object_func
 {
     // check
     tb_assert_and_check_return(name && g_maxn);
+    tb_assert_and_check_return(tb_strlen(name) < TB_PRINTF_OBJECT_NAME_MAXN);
 
     // init entries
     if (!g_list) g_list = tb_nalloc_type(g_maxn, tb_printf_object_entry_t);
