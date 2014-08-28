@@ -167,6 +167,12 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t 
     // init platform
     if (!tb_platform_init(priv)) return tb_false;
 
+    // init libc 
+    if (!tb_libc_init()) return tb_false;
+
+    // init libm
+    if (!tb_libm_init()) return tb_false;
+
     // init network 
     if (!tb_network_init()) return tb_false;
 
@@ -203,6 +209,12 @@ tb_void_t tb_exit()
     
     // exit network
     tb_network_exit();
+     
+    // exit libm
+    tb_libm_exit();
+    
+    // exit libc
+    tb_libc_exit();
     
     // exit platform
     tb_platform_exit();

@@ -17,44 +17,25 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        libc.h
+ * @file        libc.c
  * @defgroup    libc
  *
  */
-#ifndef TB_LIBC_H
-#define TB_LIBC_H
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "misc/misc.h"
-#include "stdio/stdio.h"
-#include "stdlib/stdlib.h"
-#include "string/string.h"
+#include "libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * implementation
  */
-__tb_extern_c_enter__
+tb_bool_t tb_libc_init()
+{
+    return tb_true;
+}
+tb_void_t tb_libc_exit()
+{
+    // exit the printf format 
+    tb_printf_object_exit();
+}
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/*! init libc
- *
- * @return  tb_true or tb_false
- */
-tb_bool_t   tb_libc_init(tb_noarg_t);
-
-/*! exit libc
- */
-tb_void_t   tb_libc_exit(tb_noarg_t);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
-
-#endif
