@@ -17,31 +17,35 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        network.c
- * @defgroup    network
+ * @file        math.c
+ * @ingroup     math
  *
  */
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "network.h"
+#include "math.h"
 #include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_long_t tb_ipv4_format(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+static tb_long_t tb_fixed_format(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(object && cstr && maxn, -1);
+    tb_assert_and_check_return_val(cstr && maxn, -1);
 
-    // the ipv4
-    tb_ipv4_t const* ipv4 = (tb_ipv4_t const*)object;
+    // the fixed
+    tb_fixed_t fixed = (tb_fixed_t)object;
 
     // format
-    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%u.%u.%u.%u", ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
+#ifdef TB_CONFIG_TYPE_FLOAT
+    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%f", tb_fixed_to_float(fixed));
     if (size >= 0) cstr[size] = '\0';
+#else
+    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%ld", tb_fixed_to_long(fixed));
+    if (size >= 0) cstr[size] = '\0';
+#endif
 
     // ok?
     return size;
@@ -50,25 +54,15 @@ static tb_long_t tb_ipv4_format(tb_cpointer_t object, tb_char_t* cstr, tb_size_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_network_init()
+tb_bool_t tb_math_init()
 {
-    // init dns server
-    if (!tb_dns_server_init()) return tb_false;
-
-    // init dns cache
-    if (!tb_dns_cache_init()) return tb_false;
-
-    // register printf("%{ipv4}", &ipv4);
-    tb_printf_object_register("ipv4", tb_ipv4_format);
+    // register printf("%{fixed}", &fixed);
+    tb_printf_object_register("fixed", tb_fixed_format);
 
     // ok
     return tb_true;
 }
-tb_void_t tb_network_exit()
+tb_void_t tb_math_exit()
 {
-    // exit dns cache
-    tb_dns_cache_exit();
-
-    // exit dns server
-    tb_dns_server_exit();
 }
+
