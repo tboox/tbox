@@ -31,7 +31,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_long_t tb_ipv4_format(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+static tb_long_t tb_network_printf_format_ipv4(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(object && cstr && maxn, -1);
@@ -59,7 +59,7 @@ tb_bool_t tb_network_init()
     if (!tb_dns_cache_init()) return tb_false;
 
     // register printf("%{ipv4}", &ipv4);
-    tb_printf_object_register("ipv4", tb_ipv4_format);
+    tb_printf_object_register("ipv4", tb_network_printf_format_ipv4);
 
     // ok
     return tb_true;
