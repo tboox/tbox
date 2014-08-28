@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_long_t tb_fixed_format(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+static tb_long_t tb_math_printf_format_fixed(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(cstr && maxn, -1);
@@ -56,8 +56,8 @@ static tb_long_t tb_fixed_format(tb_cpointer_t object, tb_char_t* cstr, tb_size_
  */
 tb_bool_t tb_math_init()
 {
-    // register printf("%{fixed}", &fixed);
-    tb_printf_object_register("fixed", tb_fixed_format);
+    // register printf("%{fixed}", fixed);
+    tb_printf_object_register("fixed", tb_math_printf_format_fixed);
 
     // ok
     return tb_true;
