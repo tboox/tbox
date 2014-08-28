@@ -28,6 +28,25 @@
 #include "network.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_long_t tb_ipv4_format(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(object && cstr && maxn, -1);
+
+    // the ipv4
+    tb_ipv4_t const* ipv4 = (tb_ipv4_t const*)object;
+
+    // format
+    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%u.%u.%u.%u", ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
+    if (size >= 0) cstr[size] = '\0';
+
+    // ok?
+    return size;
+}
+    
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_network_init()
@@ -37,6 +56,9 @@ tb_bool_t tb_network_init()
 
     // init dns cache
     if (!tb_dns_cache_init()) return tb_false;
+
+    // register the "ipv4" printf format func
+    tb_printf_object_register("ipv4", tb_ipv4_format);
 
     // ok
     return tb_true;

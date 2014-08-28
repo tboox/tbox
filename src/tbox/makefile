@@ -113,6 +113,7 @@ tbox_C_FILES 			+= \
 						utils/base64 \
 						utils/singleton \
 						utils/lock_profiler \
+						libc/libc \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -127,6 +128,7 @@ tbox_C_FILES 			+= \
 						libc/stdio/swprintf \
 						libc/stdio/vsnprintf \
 						libc/stdio/vswprintf \
+						libc/stdio/printf_object \
 						libc/stdlib/stdlib \
 						libc/stdlib/random \
 						libc/stdlib/mbstowcs \
@@ -188,6 +190,7 @@ tbox_C_FILES 			+= \
 						libc/string/wcsirchr \
 						libc/string/wcsnrchr \
 						libc/string/wcsnirchr \
+						libm/libm \
 						libm/idivi8 \
 						libm/ilog2i \
 						libm/isqrti 
@@ -675,6 +678,7 @@ INC_FILES 				= \
 						libc/stdlib/stdlib.h \
 						libc/stdio/prefix.h \
 						libc/stdio/stdio.h \
+						libc/stdio/printf_object.h \
 						libc/string/prefix.h \
 						libc/string/string.h \
 						libc/misc/misc.h \

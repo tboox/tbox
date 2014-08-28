@@ -31,12 +31,13 @@
 #include "../../libm/libm.h"
 #include "../../utils/utils.h"
 #include "../string/string.h"
+#include "printf_object.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// printf format type
+// the printf type
 typedef enum __tb_printf_type_t
 {
     TB_PRINTF_TYPE_NONE             = 0
@@ -48,11 +49,12 @@ typedef enum __tb_printf_type_t
 ,   TB_PRINTF_TYPE_STRING           = 6
 ,   TB_PRINTF_TYPE_WIDTH            = 7
 ,   TB_PRINTF_TYPE_PRECISION        = 8
-,   TB_PRINTF_TYPE_INVALID          = 9
+,   TB_PRINTF_TYPE_OBJECT           = 9
+,   TB_PRINTF_TYPE_INVALID          = 10
 
 }tb_printf_type_t;
 
-// printf format extra info
+// the printf extra info
 typedef enum __tb_printf_extra_t
 {
     TB_PRINTF_EXTRA_NONE            = 0
@@ -74,7 +76,6 @@ typedef enum __tb_printf_qual_t
 ,   TB_PRINTF_QUAL_I16              = 5
 ,   TB_PRINTF_QUAL_I32              = 6
 ,   TB_PRINTF_QUAL_I64              = 7
-,   TB_PRINTF_QUAL_FIXED            = 8
 
 }tb_printf_qual_t;
 
@@ -113,6 +114,9 @@ typedef struct __tb_printf_entry_t
     // base: 2 8 10 16 
     tb_int_t            base;
 
+    // the object name
+    tb_char_t           object[64];
+
 }tb_printf_entry_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +127,38 @@ static tb_int_t tb_skip_atoi(tb_char_t const** s)
     tb_int_t i = 0;
     while (tb_isdigit(**s)) i = i * 10 + *((*s)++) - '0';
     return i;
+}
+static tb_char_t* tb_printf_object(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_cpointer_t object)
+{
+    // find the object func
+    tb_printf_object_func_t func = tb_printf_object_find(e.object);
+    if (func && object)
+    {
+        // printf it
+        tb_long_t size = func(object, pb, pe - pb);
+        if (size >= 0) pb += size;
+        else
+        {
+            // invalid
+            if (pb < pe) *pb++ = 'i';
+            if (pb < pe) *pb++ = 'n';
+            if (pb < pe) *pb++ = 'v';
+            if (pb < pe) *pb++ = 'a';
+            if (pb < pe) *pb++ = 'l';
+            if (pb < pe) *pb++ = 'i';
+            if (pb < pe) *pb++ = 'd';
+        }
+    }
+    else 
+    {
+        // null
+        if (pb < pe) *pb++ = 'n';
+        if (pb < pe) *pb++ = 'u';
+        if (pb < pe) *pb++ = 'l';
+        if (pb < pe) *pb++ = 'l';
+    }
+
+    return pb;
 }
 static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_char_t const* s)
 {
@@ -148,6 +184,7 @@ static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
     }
     else 
     {
+        // null
         if (pb < pe) *pb++ = 'n';
         if (pb < pe) *pb++ = 'u';
         if (pb < pe) *pb++ = 'l';
@@ -451,16 +488,16 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     if (tb_isinf(num))
     {
         if (pb < pe && num < 0) *pb++ = '-';
-        if (pb < pe) *pb++ = 'i';
-        if (pb < pe) *pb++ = 'n';
-        if (pb < pe) *pb++ = 'f';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'I' : 'i';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'N' : 'n';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'F' : 'f';
         return pb;
     }
     else if (tb_isnanf(num))
     {
-        if (pb < pe) *pb++ = 'n';
-        if (pb < pe) *pb++ = 'a';
-        if (pb < pe) *pb++ = 'n';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'N' : 'n';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'A' : 'a';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'N' : 'n';
         return pb;
     }
 
@@ -580,16 +617,16 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
     if (tb_isin(num))
     {
         if (pb < pe && num < 0) *pb++ = '-';
-        if (pb < pe) *pb++ = 'i';
-        if (pb < pe) *pb++ = 'n';
-        if (pb < pe) *pb++ = 'f';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'I' : 'i';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'N' : 'n';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'F' : 'f';
         return pb;
     }
     else if (tb_isnan(num))
     {
-        if (pb < pe) *pb++ = 'n';
-        if (pb < pe) *pb++ = 'a';
-        if (pb < pe) *pb++ = 'n';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'N' : 'n';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'A' : 'a';
+        if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? 'N' : 'n';
         return pb;
     }
 
@@ -870,18 +907,9 @@ get_qualifier:
         e->base = 2;
         e->type = TB_PRINTF_TYPE_INT;
         break;
+#ifdef TB_CONFIG_TYPE_FLOAT
     case 'F':
-#ifdef TB_CONFIG_TYPE_FLOAT
-        e->type = TB_PRINTF_TYPE_FLOAT;
-        e->extra |= TB_PRINTF_EXTRA_SIGNED;
-#else
-        e->base = 10;
-        e->extra |= TB_PRINTF_EXTRA_SIGNED;
-        e->type = TB_PRINTF_TYPE_INT;
-#endif
-        e->qual = TB_PRINTF_QUAL_FIXED;
-        break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+        e->extra |= TB_PRINTF_EXTRA_UPPER;
     case 'f':
         e->type = TB_PRINTF_TYPE_FLOAT;
         e->extra |= TB_PRINTF_EXTRA_SIGNED;
@@ -894,6 +922,19 @@ get_qualifier:
         e->extra |= TB_PRINTF_EXTRA_EXP;
         break;
 #endif
+    case '{':
+        {
+            // get the object name
+            ++p;
+            tb_size_t indx = 0;
+            tb_size_t maxn = tb_arrayn(e->object);
+            while (*p && *p != '}' && indx < maxn - 1) e->object[indx++] = *p++;
+            e->object[indx] = '\0';
+
+            // save the object type
+            e->type = *p == '}'? TB_PRINTF_TYPE_OBJECT : TB_PRINTF_TYPE_INVALID;
+        }
+        break;
     default:
         e->type = TB_PRINTF_TYPE_INVALID;
         return (p - fmt);
@@ -904,109 +945,6 @@ get_qualifier:
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */
-
-/*! format a string and place it in a buffer
- *
- * @param s     the buffer to place the result into
- * @param n     the size of the buffer, including the trailing null space
- * @param fmt   the format string to use
- * @param args  arguments for the format string
- *
- * @return      the number of characters which would be generated for the given input, excluding the trailing '\0'.
- *
- * - format: %[flags][width][.precision][qualifier]type
- *
- * - flags:
- *   - default: right-justified, left-pad the output with spaces until the required length of output is attained. 
- *              If combined with '0' (see below), 
- *              it will cause the sign to become a space when positive, 
- *              but the remaining characters will be zero-padded
- *   - -:       left-justified, e.g. %-d
- *   - +:       denote the sign '+' or '-' of a number
- *   - 0:       use 0 instead of spaces to left-fill a fixed-length field
- *   - #:       add prefix or suffix    
- *     - %#o => add prefix: 0...
- *     - %#x => add prefix: 0x...
- *     - %#X => add prefix: 0X...
- *     - %#b => add prefix: 0b...
- *     - %#B => add prefix: 0B...
- *     - %#f => add prefix: 0f...
- *     - %#F => add prefix: 0F...
- *
- * - width:
- *   - n:       n = 1, 2, 3, ..., fill spaces
- *   - 0n:      n = 1, 2, 3, ..., fill 0
- *   - *:       causes printf to pad the output until it is n characters wide, 
- *              where n is an integer value stored in the a function argument just preceding 
- *              that represented by the modified type. 
- *              e.g. printf("%*d", 5, 10) will result in "10" being printed with a width of 5.
- *
- * - .precision:
- *   - .n:      for non-integral numeric types, causes the decimal portion of the output to be expressed in at least number digits. 
- *              for the string type, causes the output to be truncated at number characters. 
- *              if the precision is zero, nothing is printed for the corresponding argument.
- *   - *:       same as the above, but uses an integer value in the intaken argument to 
- *              determine the number of decimal places or maximum string length. 
- *              e.g. printf("%.*s", 3, "abcdef") will result in "abc" being printed.
- *
- * - qualifier:
- *   - h:       short integer or single double-point
- *   - l:       long integer or double double-point
- *   - I8:      8-bit integer
- *   - I16:     16-bit integer
- *   - I32:     32-bit integer
- *   - I64/ll:  64-bit integer
- *
- * @note support h, l, I8, I16, I32, I64, ll
- *
- * - type(e.g. %d %x %u %% ...):
- *   - d, i:    print an int as a signed decimal number. 
- *              '%d' and '%i' are synonymous for output, but are different when used with scanf() for input.
- *   - u:       print decimal unsigned int.
- *   - o:       print an unsigned int in octal.
- *   - x/X:     print an unsigned int as a hexadecimal number. 'x' uses lower-case letters and 'X' uses upper-case.
- *   - b/B:     print an unsigned binary interger
- *   - e/E:     print a double value in standard form ([-]d.ddd e[+/-]ddd).
- *              An E conversion uses the letter E (rather than e) to introduce the exponent. 
- *              The exponent always contains at least two digits; if the value is zero, the exponent is 00.
- *              e.g. 3.141593e+00
- *   - f/F:     Print a double in normal (fixed-point) notation. 
- *              'f' and 'F' only differs in how the strings for an infinite number or NaN are printed 
- *              ('inf', 'infinity' and 'nan' for 'f', 'INF', 'INFINITY' and 'NAN' for 'F').
- *   - g/G:     print a double in either normal or exponential notation, whichever is more appropriate for its magnitude. 
- *              'g' uses lower-case letters, 'G' uses upper-case letters. 
- *              This type differs slightly from fixed-point notation in 
- *              that insignificant zeroes to the right of the decimal point are not included. 
- *              Also, the decimal point is not included on whole numbers.
- *   - c:       print a char (character).
- *   - s:       print a character string
- *   - p:       print a void * (pointer to void) in an implementation-defined format.
- *   - n:       print nothing, but write number of characters successfully written so far into an integer pointer parameter.
- *   - %:       %
- *
- * @note support        d, i, u, o, u, x/X, b/B, f/F, c, s
- * @note not support    e/E, g/G, p, n
- *
- * e.g.
- * @code
- * tb_printf("|hello world|\n");
- * tb_printf("|%-10s|%%|%10s|\n", "hello", "world");
- * tb_printf("|%#2c|%2.5c|%*c|\n", 'A', 'B', 5, 'C');
- * tb_printf("|%#2d|%#8.3o|%*.*d|\n", -56, 56, 10, 5, 56);
- * tb_printf("|%#-8.5x|%#2.9X|\n", 0x1f, 0x1f);
- * tb_printf("|%#-8.5b|%#2.9B|\n", 0x1f, 0x1f);
- * tb_printf("|%-6Id|%5I8u|%#I64x|%#llx|\n", 256, 255, (tb_int64_t)0x8fffffffffff, (tb_int64_t)0x8fffffffffff);
- * tb_printf("|%lf|\n", -3.1415926535897932384626433832795);
- * tb_printf("|%lf|%lf|%lf|\n", 3.14, 0, -0);
- * tb_printf("|%0.9f|\n", 3.1415926535897932384626433832795);
- * tb_printf("|%16.9f|\n", 3.1415926535897932384626433832795);
- * tb_printf("|%016.9f|\n", 3.14159);
- * tb_printf("|%lf|\n", 1.0 / 6.0);
- * tb_printf("|%lf|\n", 0.0003141596);
- * tb_printf("|%F|\n", tb_float_to_fixed(3.1415));
- * @endcode
- *
  */
 tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args)
 {
@@ -1113,13 +1051,6 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                         case TB_PRINTF_QUAL_I8:     num = (tb_int8_t)tb_va_arg(args, tb_int_t); break;
                         case TB_PRINTF_QUAL_I16:    num = (tb_int16_t)tb_va_arg(args, tb_int_t); break;
                         case TB_PRINTF_QUAL_I32:    num = (tb_int32_t)tb_va_arg(args, tb_int32_t); break;
-                        case TB_PRINTF_QUAL_FIXED: 
-                            {
-                                // fixed to int32
-                                tb_int32_t val = tb_va_arg(args, tb_int32_t); 
-                                num = (tb_int32_t)tb_fixed_to_long(val);
-                            }
-                            break;
                         default:                    num = tb_va_arg(args, tb_int_t); break;
                         }
                     }
@@ -1146,12 +1077,6 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                     tb_double_t num = tb_va_arg(args, tb_double_t);
                     pb = tb_printf_double(pb, pe, e, num);
                 }
-                // fixed?
-                else if (e.qual == TB_PRINTF_QUAL_FIXED)
-                {
-                    tb_fixed_t num = (tb_fixed_t)tb_va_arg(args, tb_fixed_t);
-                    pb = tb_printf_float(pb, pe, e, tb_fixed_to_float(num));
-                }
                 // float?
                 else 
                 {
@@ -1161,6 +1086,12 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                 break;
             }
 #endif
+            // get object for %{object_name}
+        case TB_PRINTF_TYPE_OBJECT:
+            {
+                pb = tb_printf_object(pb, pe, e, tb_va_arg(args, tb_cpointer_t));
+                break;
+            }
         case TB_PRINTF_TYPE_INVALID:
             {
                 if (pb < pe) *pb++ = '%';
