@@ -17,24 +17,54 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        screen.c
+ * @file        user32.h
  *
  */
+#ifndef TB_PLATFORM_WINDOWS_INTERFACE_USER32_H
+#define TB_PLATFORM_WINDOWS_INTERFACE_USER32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "../platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * extern
  */
-tb_size_t tb_screen_width()
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the GetSystemMetrics func type 
+typedef tb_int_t (WINAPI* tb_user32_GetSystemMetrics_t)(tb_int_t index);
+
+// the user32 interfaces type
+typedef struct __tb_user32_t
 {
-    return tb_user32()->GetSystemMetrics(SM_CXSCREEN);
-}
-tb_size_t tb_screen_height()
-{
-    return tb_user32()->GetSystemMetrics(SM_CYSCREEN);
-}
+    // GetSystemMetrics
+    tb_user32_GetSystemMetrics_t      GetSystemMetrics;
+
+}tb_user32_t;
+
+// the user32 ref type
+typedef tb_user32_t*  tb_user32_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/* the user32 interfaces
+ *
+ * @return          the user32 interfaces pointer
+ */
+tb_user32_ref_t    tb_user32(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+
+#endif

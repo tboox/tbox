@@ -82,15 +82,18 @@ typedef struct __tb_kernel32_t
 
 }tb_kernel32_t;
 
+// the kernel32 ref type
+typedef tb_kernel32_t*  tb_kernel32_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 /* the kernel32 interfaces
  *
- * @return      the kernel32 interfaces pointer
+ * @return          the kernel32 interfaces pointer
  */
-tb_kernel32_t*  tb_kernel32(tb_noarg_t);
+tb_kernel32_ref_t   tb_kernel32(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

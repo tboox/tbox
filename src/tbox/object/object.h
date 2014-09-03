@@ -111,7 +111,7 @@ tb_object_ref_t     tb_object_read(tb_stream_ref_t stream);
  *
  * @return          the object
  */
-tb_object_ref_t        tb_object_read_from_url(tb_char_t const* url);
+tb_object_ref_t     tb_object_read_from_url(tb_char_t const* url);
 
 /*! read object from data
  *
@@ -159,7 +159,7 @@ tb_long_t           tb_object_writ_to_data(tb_object_ref_t object, tb_byte_t* da
  *
  * @return          the object copy
  */
-tb_object_ref_t        tb_object_copy(tb_object_ref_t object);
+tb_object_ref_t     tb_object_copy(tb_object_ref_t object);
 
 /*! the object type
  *
@@ -233,7 +233,7 @@ tb_object_ref_t     tb_object_data(tb_object_ref_t object, tb_size_t format);
  *
  * @return          the object
  */
-tb_object_ref_t        tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_size_t type);
+tb_object_ref_t     tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_size_t type);
 
 /*! dump the object
  *

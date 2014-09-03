@@ -33,11 +33,12 @@
 static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance)
 {
     // check
-    tb_ws2_32_t* ws2_32 = (tb_ws2_32_t*)instance;
+    tb_ws2_32_ref_t ws2_32 = (tb_ws2_32_ref_t)instance;
     tb_assert_and_check_return_val(ws2_32, tb_false);
 
     // the ws2_32 module
-    HANDLE module = tb_dynamic_init("ws2_32.dll");
+    HANDLE module = GetModuleHandleA("ws2_32.dll");
+    if (!module) module = tb_dynamic_init("ws2_32.dll");
     tb_assert_and_check_return_val(module, tb_false);
 
     // init interfaces
@@ -75,7 +76,7 @@ static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_ws2_32_t* tb_ws2_32()
+tb_ws2_32_ref_t tb_ws2_32()
 {
     // init
     static tb_atomic_t      s_binited = 0;
