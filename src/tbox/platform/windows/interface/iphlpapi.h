@@ -48,6 +48,9 @@ typedef struct __tb_iphlpapi_t
 
 }tb_iphlpapi_t;
 
+// the iphlpapi ref type
+typedef tb_iphlpapi_t*  tb_iphlpapi_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -56,7 +59,7 @@ typedef struct __tb_iphlpapi_t
  *
  * @return          the iphlpapi interfaces pointer
  */
-tb_iphlpapi_t*      tb_iphlpapi(tb_noarg_t);
+tb_iphlpapi_ref_t   tb_iphlpapi(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

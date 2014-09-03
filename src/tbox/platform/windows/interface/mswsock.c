@@ -47,7 +47,7 @@
 static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
 {
     // check
-    tb_mswsock_t* mswsock = (tb_mswsock_t*)instance;
+    tb_mswsock_ref_t mswsock = (tb_mswsock_ref_t)instance;
     tb_assert_and_check_return_val(mswsock, tb_false);
 
     // done
@@ -134,7 +134,7 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_mswsock_t* tb_mswsock()
+tb_mswsock_ref_t tb_mswsock()
 {
     // init
     static tb_atomic_t      s_binited = 0;

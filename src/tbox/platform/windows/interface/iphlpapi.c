@@ -33,11 +33,12 @@
 static tb_bool_t tb_iphlpapi_instance_init(tb_handle_t instance)
 {
     // check
-    tb_iphlpapi_t* iphlpapi = (tb_iphlpapi_t*)instance;
+    tb_iphlpapi_ref_t iphlpapi = (tb_iphlpapi_ref_t)instance;
     tb_assert_and_check_return_val(iphlpapi, tb_false);
 
     // the iphlpapi module
-    HANDLE module = tb_dynamic_init("iphlpapi.dll");
+    HANDLE module = GetModuleHandleA("iphlpapi.dll");
+    if (!module) module = tb_dynamic_init("iphlpapi.dll");
     tb_check_return_val(module, tb_false);
 
     // init interfaces
@@ -50,7 +51,7 @@ static tb_bool_t tb_iphlpapi_instance_init(tb_handle_t instance)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_iphlpapi_t* tb_iphlpapi()
+tb_iphlpapi_ref_t tb_iphlpapi()
 {
     // init
     static tb_atomic_t      s_binited = 0;

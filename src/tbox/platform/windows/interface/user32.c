@@ -17,24 +17,50 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        screen.c
+ * @file        user32.c
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../platform.h"
+#include "user32.h"
+#include "../../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_screen_width()
+static tb_bool_t tb_user32_instance_init(tb_handle_t instance)
 {
-    return tb_user32()->GetSystemMetrics(SM_CXSCREEN);
+    // check
+    tb_user32_ref_t user32 = (tb_user32_ref_t)instance;
+    tb_assert_and_check_return_val(user32, tb_false);
+
+    // the user32 module
+    HANDLE module = GetModuleHandleA("user32.dll");
+    if (!module) module = tb_dynamic_init("user32.dll");
+    tb_assert_and_check_return_val(module, tb_false);
+
+    // init interfaces
+    TB_INTERFACE_LOAD(user32, GetSystemMetrics);
+
+    // ok
+    return tb_true;
 }
-tb_size_t tb_screen_height()
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_user32_ref_t tb_user32()
 {
-    return tb_user32()->GetSystemMetrics(SM_CYSCREEN);
+    // init
+    static tb_atomic_t      s_binited = 0;
+    static tb_user32_t      s_user32 = {0};
+
+    // init the static instance
+    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_user32, tb_user32_instance_init);
+    tb_assert(ok); tb_used(ok);
+
+    // ok
+    return &s_user32;
 }

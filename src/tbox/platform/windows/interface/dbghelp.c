@@ -33,11 +33,12 @@
 static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance)
 {
     // check
-    tb_dbghelp_t* dbghelp = (tb_dbghelp_t*)instance;
+    tb_dbghelp_ref_t dbghelp = (tb_dbghelp_ref_t)instance;
     tb_check_return_val(dbghelp, tb_false);
 
     // the dbghelp module
-    HANDLE module = tb_dynamic_init("dbghelp.dll");
+    HANDLE module = GetModuleHandleA("dbghelp.dll");
+    if (!module) module = tb_dynamic_init("dbghelp.dll");
     tb_check_return_val(module, tb_false);
 
     // init interfaces
@@ -58,7 +59,7 @@ static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_dbghelp_t* tb_dbghelp()
+tb_dbghelp_ref_t tb_dbghelp()
 {
     // init
     static tb_atomic_t      s_binited = 0;

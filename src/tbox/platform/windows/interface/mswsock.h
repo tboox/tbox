@@ -72,15 +72,18 @@ typedef struct __tb_mswsock_t
 
 }tb_mswsock_t;
 
+// the mswsock ref type
+typedef tb_mswsock_t*  tb_mswsock_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 /* the mswsock interfaces
  *
- * @return      the mswsock interfaces pointer
+ * @return          the mswsock interfaces pointer
  */
-tb_mswsock_t*   tb_mswsock(tb_noarg_t);
+tb_mswsock_ref_t   tb_mswsock(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

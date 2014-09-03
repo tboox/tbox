@@ -33,11 +33,12 @@
 static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance)
 {
     // check
-    tb_kernel32_t* kernel32 = (tb_kernel32_t*)instance;
+    tb_kernel32_ref_t kernel32 = (tb_kernel32_ref_t)instance;
     tb_assert_and_check_return_val(kernel32, tb_false);
 
     // the kernel32 module
     HANDLE module = GetModuleHandleA("kernel32.dll");
+    if (!module) module = tb_dynamic_init("kernel32.dll");
     tb_assert_and_check_return_val(module, tb_false);
 
     // init interfaces
@@ -54,7 +55,7 @@ static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_kernel32_t* tb_kernel32()
+tb_kernel32_ref_t tb_kernel32()
 {
     // init
     static tb_atomic_t      s_binited = 0;

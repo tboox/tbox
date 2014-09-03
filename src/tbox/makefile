@@ -394,6 +394,7 @@ tbox_C_FILES-$(TB_CONFIG_OS_ANDROID) += \
 tbox_C_FILES-$(TB_CONFIG_OS_WINDOWS) += \
 						platform/windows/socket_pool \
 						platform/windows/interface/interface \
+						platform/windows/interface/user32 \
 						platform/windows/interface/ws2_32 \
 						platform/windows/interface/dbghelp \
 						platform/windows/interface/mswsock \
@@ -574,6 +575,7 @@ INC_FILES 				= \
 						platform/windows/exception.h \
 						platform/windows/interface/prefix.h \
 						platform/windows/interface/interface.h \
+						platform/windows/interface/user32.h \
 						platform/windows/interface/kernel32.h \
 						platform/windows/interface/mswsock.h \
 						platform/windows/interface/dbghelp.h \

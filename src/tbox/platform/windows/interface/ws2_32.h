@@ -198,15 +198,18 @@ typedef struct __tb_ws2_32_t
 
 }tb_ws2_32_t;
 
+// the ws2_32 ref type
+typedef tb_ws2_32_t*  tb_ws2_32_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 /* the ws2_32 interfaces
  *
- * @return      the ws2_32 interfaces pointer
+ * @return          the ws2_32 interfaces pointer
  */
-tb_ws2_32_t*    tb_ws2_32(tb_noarg_t);
+tb_ws2_32_ref_t    tb_ws2_32(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

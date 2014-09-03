@@ -36,7 +36,7 @@
 tb_bool_t tb_socket_context_init()
 {
     // load WSA* interfaces
-    tb_ws2_32_t* ws2_32 = tb_ws2_32();
+    tb_ws2_32_ref_t ws2_32 = tb_ws2_32();
     tb_assert_and_check_return_val(ws2_32, tb_false);
 
     // check WSA* interfaces
