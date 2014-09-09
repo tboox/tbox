@@ -60,11 +60,15 @@ install : .null
 prefix : .null
 	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)
 	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)
-	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
+	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/$(PRO_NAME)/$(PRO_NAME).config.h $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
+	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PRE_DIR)/inc/
+	-@$(RM) $(PRE_DIR)/inc/$(PRO_NAME)/$(PRO_NAME).config.h
 	-@$(CP) $(BIN_DIR)/lib/$(PRO_NAME)/* $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/
 	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/inc/$(PLAT)/$(ARCH),)
 	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/lib/$(PLAT)/$(ARCH),)
-	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
+	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/$(PRO_NAME)/$(PRO_NAME).config.h $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
+	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PREFIX)/inc/,)
+	$(if $(PREFIX),-@$(RM) $(PREFIX)/inc/$(PRO_NAME)/$(PRO_NAME).config.h,)
 	$(if $(PREFIX),-@$(CP) $(BIN_DIR)/lib/$(PRO_NAME)/* $(PREFIX)/lib/$(PLAT)/$(ARCH)/,)
 
 # make lipo
@@ -251,13 +255,13 @@ endif
 
 # config
 config : .null
-	-@cp ./plat/$(PLAT)/config.h ./src/$(PRO_NAME)/config.h
-	-@$(SED) "s/\[major\]/$(PRO_VERSION_MAJOR)/g" ./src/$(PRO_NAME)/config.h
-	-@$(SED) "s/\[minor\]/$(PRO_VERSION_MINOR)/g" ./src/$(PRO_NAME)/config.h
-	-@$(SED) "s/\[alter\]/$(PRO_VERSION_ALTER)/g" ./src/$(PRO_NAME)/config.h
-	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/$(PRO_NAME)/config.h
-	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
-	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/config.h
+	-@cp ./plat/$(PLAT)/config.h ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[major\]/$(PRO_VERSION_MAJOR)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[minor\]/$(PRO_VERSION_MINOR)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[alter\]/$(PRO_VERSION_ALTER)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
 	@echo "config: ==================================================================="
 	@echo "config: plat:     " 							$(PLAT)
 	@echo "config: arch:     " 							$(ARCH)
