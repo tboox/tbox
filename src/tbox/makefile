@@ -407,6 +407,7 @@ tbox_CXFLAGS 			+= -D__tb_prefix__=\"tbox\"
 # header files
 INC_FILES 				= \
 						tbox.h \
+						tbox.config.h \
 						config.h \
 						prefix.h \
 						prefix/prefix.h \
