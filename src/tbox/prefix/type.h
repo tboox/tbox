@@ -310,7 +310,7 @@ typedef union __tb_value_t
     tb_double_t                     d;
 #endif
 
-}tb_value_t;
+}tb_value_t, *tb_value_ref_t;
 
 #endif
 
