@@ -70,11 +70,8 @@ typedef struct __tb_aiop_rtor_select_impl_t
     // the select fds
     fd_set                  rfdi;
     fd_set                  wfdi;
-    fd_set                  efdi;
-
     fd_set                  rfdo;
     fd_set                  wfdo;
-    fd_set                  efdo;
 
     // the hash
     tb_hash_ref_t           hash;
@@ -129,7 +126,6 @@ static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // init fds
     if (code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_ACPT)) FD_SET(fd, &impl->rfdi);
     if (code & (TB_AIOE_CODE_SEND | TB_AIOE_CODE_CONN)) FD_SET(fd, &impl->wfdi);
-    FD_SET(fd, &impl->efdi);
 
     // leave
     tb_spinlock_leave(&impl->lock.pfds);
@@ -159,7 +155,6 @@ static tb_bool_t tb_aiop_rtor_select_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // del fds
     FD_CLR(fd, &impl->rfdi);
     FD_CLR(fd, &impl->wfdi);
-    FD_CLR(fd, &impl->efdi);
 
     // leave
     tb_spinlock_leave(&impl->lock.pfds);
@@ -202,15 +197,6 @@ static tb_bool_t tb_aiop_rtor_select_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     // set fds
     if (aioe->code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_ACPT)) FD_SET(fd, &impl->rfdi); else FD_CLR(fd, &impl->rfdi);
     if (aioe->code & (TB_AIOE_CODE_SEND | TB_AIOE_CODE_CONN)) FD_SET(fd, &impl->wfdi); else FD_CLR(fd, &impl->wfdi);
-    if (    (aioe->code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_ACPT))
-        ||  (aioe->code & (TB_AIOE_CODE_SEND | TB_AIOE_CODE_CONN)))
-    {
-        FD_SET(fd, &impl->efdi); 
-    }
-    else 
-    {
-        FD_CLR(fd, &impl->efdi);
-    }
 
     // leave
     tb_spinlock_leave(&impl->lock.pfds);
@@ -252,16 +238,15 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
         tb_size_t sfdm = impl->sfdm;
         tb_memcpy(&impl->rfdo, &impl->rfdi, sizeof(fd_set));
         tb_memcpy(&impl->wfdo, &impl->wfdi, sizeof(fd_set));
-        tb_memcpy(&impl->efdo, &impl->efdi, sizeof(fd_set));
 
         // leave
         tb_spinlock_leave(&impl->lock.pfds);
 
         // wait
 #ifdef TB_CONFIG_OS_WINDOWS
-        tb_long_t sfdn = tb_ws2_32()->select(sfdm + 1, &impl->rfdo, &impl->wfdo, &impl->efdo, timeout >= 0? &t : tb_null);
+        tb_long_t sfdn = tb_ws2_32()->select(sfdm + 1, &impl->rfdo, &impl->wfdo, tb_null, timeout >= 0? &t : tb_null);
 #else
-        tb_long_t sfdn = select(sfdm + 1, &impl->rfdo, &impl->wfdo, &impl->efdo, timeout >= 0? &t : tb_null);
+        tb_long_t sfdn = select(sfdm + 1, &impl->rfdo, &impl->wfdo, tb_null, timeout >= 0? &t : tb_null);
 #endif
         tb_assert_and_check_return_val(sfdn >= 0, -1);
 
@@ -325,8 +310,6 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
                     aioe.code |= TB_AIOE_CODE_SEND;
                     if (aioo->code & TB_AIOE_CODE_CONN) aioe.code |= TB_AIOE_CODE_CONN;
                 }
-                if (FD_ISSET(fd, &impl->efdo) && !(aioe.code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
-                    aioe.code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
                     
                 // ok?
                 if (aioe.code) 
@@ -345,7 +328,6 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
                         tb_spinlock_enter(&impl->lock.pfds);
                         FD_CLR(fd, &impl->rfdi);
                         FD_CLR(fd, &impl->wfdi);
-                        FD_CLR(fd, &impl->efdi);
                         tb_spinlock_leave(&impl->lock.pfds);
                     }
                 }
@@ -368,10 +350,8 @@ static tb_void_t tb_aiop_rtor_select_exit(tb_aiop_rtor_impl_t* rtor)
         tb_spinlock_enter(&impl->lock.pfds);
         FD_ZERO(&impl->rfdi);
         FD_ZERO(&impl->wfdi);
-        FD_ZERO(&impl->efdi);
         FD_ZERO(&impl->rfdo);
         FD_ZERO(&impl->wfdo);
-        FD_ZERO(&impl->efdo);
         tb_spinlock_leave(&impl->lock.pfds);
 
         // exit hash
@@ -398,10 +378,8 @@ static tb_void_t tb_aiop_rtor_select_cler(tb_aiop_rtor_impl_t* rtor)
         impl->sfdm = 0;
         FD_ZERO(&impl->rfdi);
         FD_ZERO(&impl->wfdi);
-        FD_ZERO(&impl->efdi);
         FD_ZERO(&impl->rfdo);
         FD_ZERO(&impl->wfdo);
-        FD_ZERO(&impl->efdo);
         tb_spinlock_leave(&impl->lock.pfds);
 
         // clear hash
@@ -440,10 +418,8 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_select_init(tb_aiop_impl_t* aiop)
         // init fds
         FD_ZERO(&impl->rfdi);
         FD_ZERO(&impl->wfdi);
-        FD_ZERO(&impl->efdi);
         FD_ZERO(&impl->rfdo);
         FD_ZERO(&impl->wfdo);
-        FD_ZERO(&impl->efdo);
 
         // init lock
         if (!tb_spinlock_init(&impl->lock.pfds)) break;

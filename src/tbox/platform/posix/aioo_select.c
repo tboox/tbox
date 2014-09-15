@@ -63,7 +63,6 @@ static tb_long_t tb_aioo_rtor_select_wait(tb_socket_ref_t sock, tb_size_t code, 
     // init fds
     fd_set  rfds;
     fd_set  wfds;
-    fd_set  efds;
     fd_set* prfds = (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT)? &rfds : tb_null;
     fd_set* pwfds = (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN)? &wfds : tb_null;
 
@@ -78,15 +77,12 @@ static tb_long_t tb_aioo_rtor_select_wait(tb_socket_ref_t sock, tb_size_t code, 
         FD_ZERO(pwfds);
         FD_SET(fd, pwfds);
     }
-    
-    FD_ZERO(&efds);
-    FD_SET(fd, &efds);
-
+   
     // select
 #ifdef TB_CONFIG_OS_WINDOWS
-    tb_long_t r = tb_ws2_32()->select(fd + 1, prfds, pwfds, &efds, timeout >= 0? &t : tb_null);
+    tb_long_t r = tb_ws2_32()->select(fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);
 #else
-    tb_long_t r = select(fd + 1, prfds, pwfds, &efds, timeout >= 0? &t : tb_null);
+    tb_long_t r = select(fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);
 #endif
     tb_assert_and_check_return_val(r >= 0, -1);
 
@@ -116,8 +112,6 @@ static tb_long_t tb_aioo_rtor_select_wait(tb_socket_ref_t sock, tb_size_t code, 
         e |= TB_AIOE_CODE_SEND;
         if (code & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
     }
-    if (FD_ISSET(fd, &efds) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
-        e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
     return e;
 }
 
