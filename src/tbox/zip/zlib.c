@@ -56,21 +56,21 @@ static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_ref_t zip, tb_static_stream_ref
     tb_byte_t* oe = ost->e;
     tb_assert_and_check_return_val(op && oe, -1);
 
-    // attach zst
-    zlib->zst.next_in = (Bytef*)ip;
-    zlib->zst.avail_in = (uInt)(ie - ip);
+    // attach zstream
+    zlib->zstream.next_in = (Bytef*)ip;
+    zlib->zstream.avail_in = (uInt)(ie - ip);
 
-    zlib->zst.next_out = (Bytef*)op;
-    zlib->zst.avail_out = (uInt)(oe - op);
+    zlib->zstream.next_out = (Bytef*)op;
+    zlib->zstream.avail_out = (uInt)(oe - op);
 
     // deflate 
-    tb_int_t r = deflate(&zlib->zst, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
+    tb_int_t r = deflate(&zlib->zstream, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
     tb_assertf_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1, "sync: %ld, error: %d", sync, r);
-    tb_trace_d("deflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlib->zst.next_out - op, sync);
+    tb_trace_d("deflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlib->zstream.next_out - op, sync);
 
     // update 
-    ist->p = (tb_byte_t*)zlib->zst.next_in;
-    ost->p = (tb_byte_t*)zlib->zst.next_out;
+    ist->p = (tb_byte_t*)zlib->zstream.next_in;
+    ost->p = (tb_byte_t*)zlib->zstream.next_out;
 
     // end?
     tb_check_return_val(r != Z_STREAM_END || ost->p > op, -1);
@@ -93,21 +93,21 @@ static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_ref_t zip, tb_static_stream_ref
     tb_byte_t* oe = ost->e;
     tb_assert_and_check_return_val(op && oe, -1);
 
-    // attach zst
-    zlib->zst.next_in = (Bytef*)ip;
-    zlib->zst.avail_in = (uInt)(ie - ip);
+    // attach zstream
+    zlib->zstream.next_in = (Bytef*)ip;
+    zlib->zstream.avail_in = (uInt)(ie - ip);
 
-    zlib->zst.next_out = (Bytef*)op;
-    zlib->zst.avail_out = (uInt)(oe - op);
+    zlib->zstream.next_out = (Bytef*)op;
+    zlib->zstream.avail_out = (uInt)(oe - op);
 
     // inflate 
-    tb_int_t r = inflate(&zlib->zst, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
+    tb_int_t r = inflate(&zlib->zstream, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
     tb_assertf_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1, "sync: %ld, error: %d", sync, r);
-    tb_trace_d("inflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlib->zst.next_out - op, sync);
+    tb_trace_d("inflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlib->zstream.next_out - op, sync);
 
     // update 
-    ist->p = (tb_byte_t*)zlib->zst.next_in;
-    ost->p = (tb_byte_t*)zlib->zst.next_out;
+    ist->p = (tb_byte_t*)zlib->zstream.next_in;
+    ost->p = (tb_byte_t*)zlib->zstream.next_out;
 
     // end?
     tb_check_return_val(r != Z_STREAM_END || ost->p > op, -1);
@@ -119,56 +119,68 @@ static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_ref_t zip, tb_static_stream_ref
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
 tb_zip_ref_t tb_zip_zlib_init(tb_size_t action)
 {   
-    // make zip
-    tb_zip_ref_t zip = (tb_zip_ref_t)tb_malloc0_type(tb_zip_zlib_t);
-    tb_assert_and_check_return_val(zip, tb_null);
-    
-    // init zip
-    zip->algo       = TB_ZIP_ALGO_ZLIB;
-    zip->action     = (tb_uint16_t)action;
-
-    // open zst
-    switch (action)
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_zip_zlib_t*  zip = tb_null;
+    do
     {
-    case TB_ZIP_ACTION_INFLATE:
-        {
-            zip->spak = tb_zip_zlib_spak_inflate;
+        // make zip
+        zip = tb_malloc0_type(tb_zip_zlib_t);
+        tb_assert_and_check_break(zip);
+        
+        // init algo
+        zip->base.algo = TB_ZIP_ALGO_ZLIB;
 
-            // skip zlib header, only inflate raw data
-            if (inflateInit2(&((tb_zip_zlib_t*)zip)->zst, -MAX_WBITS) != Z_OK) goto fail;
-        }
-        break;
-    case TB_ZIP_ACTION_DEFLATE:
+        // open zstream
+        if (action == TB_ZIP_ACTION_INFLATE)
         {
-            zip->spak = tb_zip_zlib_spak_deflate;
-            if (deflateInit(&((tb_zip_zlib_t*)zip)->zst, Z_DEFAULT_COMPRESSION) != Z_OK) goto fail;
+            // init spak
+            zip->base.spak = tb_zip_zlib_spak_inflate;
+
+            // init zstream, skip zlib header, only inflate raw data
+            if (inflateInit2(&((tb_zip_zlib_t*)zip)->zstream, -MAX_WBITS) != Z_OK) break;
         }
-        break;
-    default:
-        break;
+        else if (action == TB_ZIP_ACTION_DEFLATE)
+        {
+            // init spak
+            zip->base.spak = tb_zip_zlib_spak_deflate;
+
+            // init zstream
+            if (deflateInit(&((tb_zip_zlib_t*)zip)->zstream, Z_DEFAULT_COMPRESSION) != Z_OK) break;
+        }
+
+        // init action after initializing zstream
+        zip->base.action = (tb_uint16_t)action;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (zip) tb_zip_zlib_exit((tb_zip_ref_t)zip);
+        zip = tb_null;
     }
 
-    // ok
-    return zip;
-
-fail:
-    if (zip) tb_free(zip);
-    return tb_null;
+    // ok?
+    return (tb_zip_ref_t)zip;
 }
 tb_void_t tb_zip_zlib_exit(tb_zip_ref_t zip)
 {
+    // check
     tb_zip_zlib_t* zlib = tb_zip_zlib_cast(zip);
-    if (zlib) 
-    {
-        // close zst
-        if (zip->action == TB_ZIP_ACTION_INFLATE) inflateEnd(&(zlib->zst));
-        else if (zip->action == TB_ZIP_ACTION_DEFLATE) deflateEnd(&(zlib->zst));
+    tb_assert_and_check_return(zlib);
 
-        // free it
-        tb_free(zlib);
-    }
+    // exit zstream
+    if (zip->action == TB_ZIP_ACTION_INFLATE) inflateEnd(&(zlib->zstream));
+    else if (zip->action == TB_ZIP_ACTION_DEFLATE) deflateEnd(&(zlib->zstream));
+
+    // free it
+    tb_free(zlib);
 }
 
