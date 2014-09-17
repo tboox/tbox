@@ -67,6 +67,7 @@ CCFLAGS 			=
 LDFLAGS_RELEASE 	=
 LDFLAGS_DEBUG 		= -debug
 LDFLAGS 			= \
+					-static \
  					-pdb:"$(PDB)" \
 					-manifest -manifestuac:"level='asInvoker' uiAccess='false'" \
 					-nologo -machine:x86 -dynamicbase -nxcompat -libpath:'$(HOME)lib\msvc\x86' -libpath:'$(HOME)tool\msys\local\lib'
