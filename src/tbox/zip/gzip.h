@@ -47,8 +47,9 @@ typedef struct __tb_zip_gzip_t
     // the zip base
     tb_zip_t        base;
 
+    // the zstream
 #ifdef TB_CONFIG_THIRD_HAVE_ZLIB
-    z_stream        zst;
+    z_stream        zstream;
 #endif
 
 }tb_zip_gzip_t;
@@ -57,8 +58,19 @@ typedef struct __tb_zip_gzip_t
  * interfaces
  */
 
-tb_zip_ref_t    tb_zip_gzip_init(tb_size_t action);
-tb_void_t       tb_zip_gzip_exit(tb_zip_ref_t zip);
+/* init gzip 
+ *
+ * @param action    the action
+ *
+ * @return          the zip
+ */
+tb_zip_ref_t        tb_zip_gzip_init(tb_size_t action);
+
+/* exit gzip
+ *
+ * @param zip       the zip
+ */
+tb_void_t           tb_zip_gzip_exit(tb_zip_ref_t zip);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
