@@ -671,11 +671,6 @@ INC_FILES 				= \
 						database/database.h \
 						zip/prefix.h \
 						zip/zip.h \
-						zip/vlc.h \
-						zip/rlc.h \
-						zip/zlib.h \
-						zip/zlibraw.h \
-						zip/gzip.h \
 						libc/prefix.h \
 						libc/libc.h \
 						libc/stdlib/prefix.h \

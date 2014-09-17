@@ -25,6 +25,10 @@
  * includes
  */
 #include "zip.h"
+#include "rlc.h"
+#include "gzip.h"
+#include "zlib.h"
+#include "zlibraw.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
