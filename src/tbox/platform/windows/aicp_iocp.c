@@ -153,13 +153,16 @@ typedef struct __tb_iocp_olap_t
     // the base
     OVERLAPPED                                  base;
     
-    // the aice
-    tb_aice_t                                   aice;
+    /* the aice
+     *
+     * @note (WSABUF*)&aice.u.xxxx must be aligned
+     */
+    __tb_cpu_aligned__ tb_aice_t                aice;
 
 }tb_iocp_olap_t;
 
 // the iocp aico type
-typedef struct __tb_iocp_aico_t
+typedef __tb_cpu_aligned__ struct __tb_iocp_aico_t
 {
     // the base
     tb_aico_impl_t                              base;
@@ -168,7 +171,7 @@ typedef struct __tb_iocp_aico_t
     tb_iocp_ptor_impl_t*                        impl;
 
     // the olap
-    tb_iocp_olap_t                              olap;
+    __tb_cpu_aligned__ tb_iocp_olap_t           olap;
     
     // the task
     tb_handle_t                                 task;
@@ -2121,6 +2124,9 @@ static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // check
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
     tb_assert_and_check_return_val(impl && aico, tb_false);
+
+    // check alignment
+    tb_assert_and_check_return_val(!((tb_size_t)aico & (TB_CPU_BITBYTE - 1)), tb_false);
 
     // trace
     tb_trace_d("addo[%p], handle: %p", aico, aico->handle);
