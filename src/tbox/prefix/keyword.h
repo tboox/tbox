@@ -28,6 +28,7 @@
  */
 #include "config.h"
 #include "compiler.h"
+#include "cpu.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -77,6 +78,20 @@
 #   define __tb_packed__ 
 #   define __tb_aligned__(a) 
 
+#endif
+
+/*! @def __tb_cpu_aligned__
+ *
+ * the cpu byte alignment
+ */
+#if (TB_CPU_BITBYTE == 8)
+#   define __tb_cpu_aligned__                   __tb_aligned__(8)
+#elif (TB_CPU_BITBYTE == 4)
+#   define __tb_cpu_aligned__                   __tb_aligned__(4)
+#elif (TB_CPU_BITBYTE == 2)
+#   define __tb_cpu_aligned__                   __tb_aligned__(2)
+#else
+#   error unknown cpu bytes
 #endif
 
 // like

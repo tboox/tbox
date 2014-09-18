@@ -31,6 +31,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
+
 // check 64-bits
 #if defined (__LP64__) \
     || defined (__64BIT__) \
@@ -56,7 +57,6 @@
 #   define TB_CPU_BIT64         (0)
 #   define TB_CPU_SHIFT         (5)
 #endif
-
 
 #endif
 

@@ -398,7 +398,7 @@ DEP_PROS_$(1)_update:
 endef
 
 update: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_update) .null $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_update)
-	-@$(RM) *.b *.a *.so
+	-@$(RM) *.b *.a *.so *.exe *.dll *.lib
 
 $(foreach pro, $(DEP_PROS), $(eval $(call MAKE_UPDATE_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_UPDATE_SUB_PROS,$(pro))))

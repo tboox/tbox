@@ -391,6 +391,11 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
     // for small pool?
     impl->for_small_pool = !!for_small_pool;
     impl->data_head_size = for_small_pool? sizeof(tb_pool_data_head_t) : sizeof(tb_pool_data_empty_head_t);
+#ifndef __tb_debug__
+    // fix data alignment, because sizeof(tb_pool_data_empty_head_t) == 1 now.
+    if (!for_small_pool) impl->data_head_size = 0;
+#endif
+    tb_assert_and_check_return_val(!(impl->data_head_size & (TB_POOL_DATA_ALIGN - 1)), tb_null);
 
 #ifdef __tb_debug__
     // init patch for checking underflow

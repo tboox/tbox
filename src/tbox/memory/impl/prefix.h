@@ -55,15 +55,7 @@
 #define TB_POOL_DATA_ALIGN                  TB_CPU_BITBYTE
 
 // the pool data alignment keyword 
-#if (TB_CPU_BITBYTE == 8)
-#   define __tb_pool_data_aligned__         __tb_aligned__(8)
-#elif (TB_CPU_BITBYTE == 4)
-#   define __tb_pool_data_aligned__         __tb_aligned__(4)
-#elif (TB_CPU_BITBYTE == 2)
-#   define __tb_pool_data_aligned__         __tb_aligned__(2)
-#else
-#   error unknown cpu bytes
-#endif
+#define __tb_pool_data_aligned__            __tb_cpu_aligned__
 
 // the pool data head different size for computing the wasted space size
 #ifdef __tb_debug__
@@ -76,7 +68,7 @@
 
 #ifdef __tb_debug__
 // the pool data debug head type
-typedef struct __tb_pool_data_debug_head_t
+typedef __tb_pool_data_aligned__ struct __tb_pool_data_debug_head_t
 {
     // the magic
     tb_uint16_t                 magic;
@@ -93,7 +85,7 @@ typedef struct __tb_pool_data_debug_head_t
     // the backtrace frames
     tb_pointer_t                backtrace[16];
 
-}tb_pool_data_debug_head_t;
+}__tb_pool_data_aligned__ tb_pool_data_debug_head_t;
 #endif
 
 // the pool data head type
@@ -105,7 +97,7 @@ typedef struct __tb_pool_data_head_t
 #endif
 
     // the size
-    tb_uint32_t                 size;
+    tb_size_t                   size;
 
 }tb_pool_data_head_t;
 
