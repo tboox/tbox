@@ -449,12 +449,39 @@ typedef struct __tb_aice_runtask_t
 /// the aice type
 typedef struct __tb_aice_t
 {
+    /// the aice code
+    tb_uint8_t                  code;
+
+    /*! the state
+     *
+     * TB_STATE_OK      
+     * TB_STATE_FAILED  
+     * TB_STATE_KILLED  
+     * TB_STATE_CLOSED  
+     * TB_STATE_PENDING 
+     * TB_STATE_TIMEOUT 
+     * TB_STATE_NOT_SUPPORTED 
+     */
+    tb_size_t                   state;
+
+    /// the aico func
+    tb_aico_func_t              func;
+
+    /// the aico private data
+    tb_cpointer_t               priv;
+
+    /// the aico
+    tb_aico_ref_t               aico;
+
     /*! the events 
      *
-     * puts it in the starting position, 
-     * because tb_iovec_t must be aligned by cpu-bytes for windows WSABUF
+     * tb_iovec_t must be aligned by cpu-bytes for windows WSABUF
      */
+#ifdef TB_CONFIG_OS_WINDOWS
+    __tb_cpu_aligned__ union
+#else
     union
+#endif
     {
         // for sock
         tb_aice_addr_t          addr;
@@ -480,30 +507,6 @@ typedef struct __tb_aice_t
         tb_aice_runtask_t       runtask;
 
     } u;
-
-    /*! the state
-     *
-     * TB_STATE_OK      
-     * TB_STATE_FAILED  
-     * TB_STATE_KILLED  
-     * TB_STATE_CLOSED  
-     * TB_STATE_PENDING 
-     * TB_STATE_TIMEOUT 
-     * TB_STATE_NOT_SUPPORTED 
-     */
-    tb_size_t                   state;
-
-    /// the aico func
-    tb_aico_func_t              func;
-
-    /// the aico private data
-    tb_cpointer_t               priv;
-
-    /// the aico
-    tb_aico_ref_t               aico;
-
-    /// the aice code
-    tb_uint8_t                  code;
 
 }tb_aice_t;
 
