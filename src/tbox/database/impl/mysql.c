@@ -1578,7 +1578,7 @@ static tb_bool_t tb_database_mysql_statement_bind(tb_database_sql_impl_t* databa
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_size_t tb_database_mysql_probe(tb_url_t const* url)
+tb_size_t tb_database_mysql_probe(tb_url_ref_t url)
 {
     // check
     tb_assert_and_check_return_val(url, 0);
@@ -1611,12 +1611,12 @@ tb_size_t tb_database_mysql_probe(tb_url_t const* url)
     } while (0);
 
     // trace
-    tb_trace_d("probe: %s, score: %lu", tb_url_get((tb_url_t*)url), score);
+    tb_trace_d("probe: %s, score: %lu", tb_url_get((tb_url_ref_t)url), score);
 
     // ok?
     return score;
 }
-tb_database_sql_ref_t tb_database_mysql_init(tb_url_t const* url)
+tb_database_sql_ref_t tb_database_mysql_init(tb_url_ref_t url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);

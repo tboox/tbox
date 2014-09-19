@@ -51,13 +51,13 @@ tb_void_t           tb_dns_cache_exit(tb_noarg_t);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr);
+tb_bool_t           tb_dns_cache_get(tb_char_t const* name, tb_ipv4_ref_t addr);
 
 /*! set addr to cache 
  *
  * @param name      the host name 
  * @param addr      the host addr
  */
-tb_void_t           tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr);
+tb_void_t           tb_dns_cache_set(tb_char_t const* name, tb_ipv4_ref_t addr);
 
 #endif

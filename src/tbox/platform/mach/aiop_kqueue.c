@@ -127,7 +127,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // ok?
     return tb_aiop_rtor_kqueue_sync(rtor, e, 2);
 }
-static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t const* aioe)
+static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t aioe)
 {
     // check
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
@@ -180,7 +180,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     // ok?
     return n? tb_aiop_rtor_kqueue_sync(rtor, e, n) : tb_true;
 }
-static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
+static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout)
 {   
     // check
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
@@ -265,7 +265,7 @@ static tb_long_t tb_aiop_rtor_kqueue_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* 
         tb_check_continue(sock != aiop->spak[1]);
 
         // init the aioe
-        tb_aioe_t* aioe = &list[wait++];
+        tb_aioe_ref_t aioe = &list[wait++];
         aioe->code = TB_AIOE_CODE_NONE;
         aioe->aioo = (tb_aioo_ref_t)aioo;
         aioe->priv = aioo->priv;

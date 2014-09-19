@@ -202,7 +202,7 @@ static tb_bool_t tb_demo_spider_parser_open_html(tb_stream_ref_t stream, tb_char
     // ok?
     return ok;
 }
-static tb_size_t tb_demo_spider_parser_get_url(tb_xml_reader_ref_t reader, tb_url_t* url)
+static tb_size_t tb_demo_spider_parser_get_url(tb_xml_reader_ref_t reader, tb_url_ref_t url)
 {
     // check
     tb_assert_and_check_return_val(reader && url, tb_false);

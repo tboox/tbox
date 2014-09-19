@@ -511,7 +511,7 @@ tb_bool_t               tb_stream_is_killed(tb_stream_ref_t stream);
  *
  * @return              the stream url
  */
-tb_url_t*               tb_stream_url(tb_stream_ref_t stream);
+tb_url_ref_t            tb_stream_url(tb_stream_ref_t stream);
 
 /*! the stream timeout
  *

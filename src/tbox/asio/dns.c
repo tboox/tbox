@@ -163,7 +163,7 @@ static tb_size_t tb_aicp_dns_reqt_init(tb_aicp_dns_impl_t* impl)
     // ok?
     return tb_static_stream_offset(&sstream);
 }
-static tb_bool_t tb_aicp_dns_resp_done(tb_aicp_dns_impl_t* impl, tb_size_t size, tb_ipv4_t* ipv4)
+static tb_bool_t tb_aicp_dns_resp_done(tb_aicp_dns_impl_t* impl, tb_size_t size, tb_ipv4_ref_t ipv4)
 {
     // check
     tb_assert_and_check_return_val(impl && ipv4, tb_false);
@@ -271,8 +271,8 @@ static tb_bool_t tb_aicp_dns_resp_done(tb_aicp_dns_impl_t* impl, tb_size_t size,
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice);
-static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_ref_t aice);
+static tb_bool_t tb_aicp_dns_resp_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_URECV, tb_false);
@@ -302,7 +302,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     else
     {
         // trace
-        tb_trace_d("resp[%s]: aico: %p, server: %{ipv4}, state: %s", impl->host, impl->aico, &aice->u.urecv.addr, tb_state_cstr(aice->state));
+        tb_trace_d("resp[%s]: aico: %p, state: %s", impl->host, impl->aico, tb_state_cstr(aice->state));
     }
 
     // ok or try to get ok from cache again if failed or timeout? 
@@ -319,7 +319,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
 
     // try next server?
     tb_bool_t ok = tb_false;
-    tb_ipv4_t const* server = &impl->list[impl->indx + 1];
+    tb_ipv4_ref_t server = &impl->list[impl->indx + 1];
     if (server->u32)
     {   
         // indx++
@@ -340,7 +340,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
     // continue
     return tb_true;
 }
-static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_USEND, tb_false);
@@ -364,11 +364,11 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
         tb_assert_and_check_return_val(aice->u.usend.real, tb_false);
 
         // the server 
-        tb_ipv4_t const* server = &impl->list[impl->indx];
+        tb_ipv4_ref_t server = &impl->list[impl->indx];
         tb_assert_and_check_return_val(server->u32, tb_false);
 
         // post resp
-        ok = tb_aico_urecv(aice->aico, server, TB_DNS_HOST_PORT, impl->data, sizeof(impl->data), tb_aicp_dns_resp_func, (tb_pointer_t)impl);
+        ok = tb_aico_urecv(aice->aico, impl->data, sizeof(impl->data), tb_aicp_dns_resp_func, (tb_pointer_t)impl);
     }
     // timeout or failed?
     else
@@ -377,7 +377,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
         tb_trace_d("reqt[%s]: aico: %p, server: %{ipv4}, state: %s", impl->host, impl->aico, &aice->u.usend.addr, tb_state_cstr(aice->state));
             
         // the next server 
-        tb_ipv4_t const* server = &impl->list[impl->indx + 1];
+        tb_ipv4_ref_t server = &impl->list[impl->indx + 1];
         if (server->u32)
         {   
             // indx++
@@ -399,7 +399,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
     // continue 
     return tb_true;
 }
-static tb_bool_t tb_aicp_dns_clos_func(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_dns_clos_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -514,7 +514,7 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long
     tb_check_return_val(impl->size, tb_false);
 
     // get the server 
-    tb_ipv4_t const* server = &impl->list[impl->indx = 0];
+    tb_ipv4_ref_t server = &impl->list[impl->indx = 0];
     tb_assert_and_check_return_val(server->u32, tb_false);
 
     // init reqt

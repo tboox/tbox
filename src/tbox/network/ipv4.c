@@ -42,11 +42,11 @@
  * interfaces
  */
 
-tb_void_t tb_ipv4_clr(tb_ipv4_t* ipv4)
+tb_void_t tb_ipv4_clr(tb_ipv4_ref_t ipv4)
 {
     if (ipv4) ipv4->u32 = 0;
 }
-tb_uint32_t tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip)
+tb_uint32_t tb_ipv4_set(tb_ipv4_ref_t ipv4, tb_char_t const* ip)
 {
     // done
     tb_uint32_t v4 = 0;
@@ -93,7 +93,7 @@ tb_uint32_t tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip)
     // ok?
     return v4;
 }
-tb_char_t const* tb_ipv4_get(tb_ipv4_t const* ipv4, tb_char_t* data, tb_size_t maxn)
+tb_char_t const* tb_ipv4_get(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(ipv4 && data && maxn > 15, tb_null);

@@ -86,7 +86,7 @@ typedef struct __tb_url_t
     // the url cache
     tb_string_t         cache;
 
-}tb_url_t;
+}tb_url_t, *tb_url_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -98,19 +98,19 @@ typedef struct __tb_url_t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_url_init(tb_url_t* url);
+tb_bool_t           tb_url_init(tb_url_ref_t url);
 
 /*! exit url
  *
  * @param url       the url
  */
-tb_void_t           tb_url_exit(tb_url_t* url);
+tb_void_t           tb_url_exit(tb_url_ref_t url);
 
 /*! clear url
  *
  * @param url       the url
  */
-tb_void_t           tb_url_clear(tb_url_t* url);
+tb_void_t           tb_url_clear(tb_url_ref_t url);
 
 /*! get the url c-string
  *
@@ -118,7 +118,7 @@ tb_void_t           tb_url_clear(tb_url_t* url);
  *
  * @return          the c-string
  */
-tb_char_t const*    tb_url_get(tb_url_t* url);
+tb_char_t const*    tb_url_get(tb_url_ref_t url);
 
 /*! set the url c-string
  *
@@ -127,14 +127,14 @@ tb_char_t const*    tb_url_get(tb_url_t* url);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_url_set(tb_url_t* url, tb_char_t const* cstr);
+tb_bool_t           tb_url_set(tb_url_ref_t url, tb_char_t const* cstr);
 
 /*! copy the url 
  *
  * @param url       the url
  * @param copy      the copied url
  */
-tb_void_t           tb_url_copy(tb_url_t* url, tb_url_t const* copy);
+tb_void_t           tb_url_copy(tb_url_ref_t url, tb_url_ref_t copy);
 
 /*! is ssl?
  *
@@ -142,14 +142,14 @@ tb_void_t           tb_url_copy(tb_url_t* url, tb_url_t const* copy);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_url_ssl_get(tb_url_t const* url);
+tb_bool_t           tb_url_ssl_get(tb_url_ref_t url);
 
 /*! set ssl
  *
  * @param url       the url
  * @param bssl      is ssl?
  */
-tb_void_t           tb_url_ssl_set(tb_url_t* url, tb_bool_t bssl);
+tb_void_t           tb_url_ssl_set(tb_url_ref_t url, tb_bool_t bssl);
 
 /*! get the protocol from the url
  *
@@ -157,14 +157,14 @@ tb_void_t           tb_url_ssl_set(tb_url_t* url, tb_bool_t bssl);
  *
  * @return          the url protocol
  */
-tb_size_t           tb_url_protocol_get(tb_url_t const* url);
+tb_size_t           tb_url_protocol_get(tb_url_ref_t url);
 
 /*! set the protocol to the url
  *
  * @param url       the url
  * @param poto      the url protocol
  */
-tb_void_t           tb_url_protocol_set(tb_url_t* url, tb_size_t protocol);
+tb_void_t           tb_url_protocol_set(tb_url_ref_t url, tb_size_t protocol);
 
 /*! the protocol c-string
  *
@@ -172,7 +172,7 @@ tb_void_t           tb_url_protocol_set(tb_url_t* url, tb_size_t protocol);
  *
  * @return          the url protocol c-string
  */
-tb_char_t const*    tb_url_protocol_cstr(tb_url_t const* url);
+tb_char_t const*    tb_url_protocol_cstr(tb_url_ref_t url);
 
 /*! probe the protocol from the url
  *
@@ -188,14 +188,14 @@ tb_size_t           tb_url_protocol_probe(tb_char_t const* url);
  *
  * @return          the url port
  */
-tb_uint16_t         tb_url_port_get(tb_url_t const* url);
+tb_uint16_t         tb_url_port_get(tb_url_ref_t url);
 
 /*! set the port to the url
  *
  * @param url       the url
  * @param port      the url port
  */
-tb_void_t           tb_url_port_set(tb_url_t* url, tb_uint16_t port);
+tb_void_t           tb_url_port_set(tb_url_ref_t url, tb_uint16_t port);
 
 /*! get the ipv4 from the url
  *
@@ -203,14 +203,14 @@ tb_void_t           tb_url_port_set(tb_url_t* url, tb_uint16_t port);
  *
  * @return          the url ipv4
  */
-tb_ipv4_t const*    tb_url_ipv4_get(tb_url_t const* url);
+tb_ipv4_ref_t       tb_url_ipv4_get(tb_url_ref_t url);
 
 /*! set the ipv4 to the url
  *
  * @param url       the url
  * @param ipv4      the url ipv4
  */
-tb_void_t           tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4);
+tb_void_t           tb_url_ipv4_set(tb_url_ref_t url, tb_ipv4_ref_t ipv4);
 
 /*! get the host from the url
  *
@@ -218,14 +218,14 @@ tb_void_t           tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4);
  *
  * @return          the url host
  */
-tb_char_t const*    tb_url_host_get(tb_url_t const* url);
+tb_char_t const*    tb_url_host_get(tb_url_ref_t url);
 
 /*! set the host to the url
  *
  * @param url       the url
  * @param host      the url host
  */
-tb_void_t           tb_url_host_set(tb_url_t* url, tb_char_t const* host);
+tb_void_t           tb_url_host_set(tb_url_ref_t url, tb_char_t const* host);
 
 /*! get the path from the url
  *
@@ -233,14 +233,14 @@ tb_void_t           tb_url_host_set(tb_url_t* url, tb_char_t const* host);
  *
  * @return          the url path
  */
-tb_char_t const*    tb_url_path_get(tb_url_t const* url);
+tb_char_t const*    tb_url_path_get(tb_url_ref_t url);
 
 /*! set the path to the url
  *
  * @param url       the url
  * @param path      the url path
  */
-tb_void_t           tb_url_path_set(tb_url_t* url, tb_char_t const* path);
+tb_void_t           tb_url_path_set(tb_url_ref_t url, tb_char_t const* path);
 
 /*! get the arguments from the url
  *
@@ -248,14 +248,14 @@ tb_void_t           tb_url_path_set(tb_url_t* url, tb_char_t const* path);
  *
  * @return          the url arguments
  */
-tb_char_t const*    tb_url_args_get(tb_url_t const* url);
+tb_char_t const*    tb_url_args_get(tb_url_ref_t url);
 
 /*! set the arguments to the url
  *
  * @param url       the url
  * @param args      the url arguments
  */
-tb_void_t           tb_url_args_set(tb_url_t* url, tb_char_t const* args);
+tb_void_t           tb_url_args_set(tb_url_ref_t url, tb_char_t const* args);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

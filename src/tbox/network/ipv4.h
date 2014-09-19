@@ -38,16 +38,16 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the ipv4
+/// the ipv4 type
 typedef union __tb_ipv4_t
 {
-    // u32 for little endian
+    /// u32 for little endian
     tb_uint32_t u32;
 
-    // bytes
+    /// bytes
     tb_uint8_t  u8[4];
 
-}tb_ipv4_t;
+}tb_ipv4_t, *tb_ipv4_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -57,7 +57,7 @@ typedef union __tb_ipv4_t
  *
  * @param ipv4      the ipv4
  */
-tb_void_t           tb_ipv4_clr(tb_ipv4_t* ipv4);
+tb_void_t           tb_ipv4_clr(tb_ipv4_ref_t ipv4);
 
 /*! set the ipv4 from the ip address
  *
@@ -66,7 +66,7 @@ tb_void_t           tb_ipv4_clr(tb_ipv4_t* ipv4);
  *
  * @return          the ipv4 value
  */
-tb_uint32_t         tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip);
+tb_uint32_t         tb_ipv4_set(tb_ipv4_ref_t ipv4, tb_char_t const* ip);
 
 /*! get the ipv4 address
  *
@@ -76,7 +76,7 @@ tb_uint32_t         tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip);
  *
  * @return          the ipv4 address
  */
-tb_char_t const*    tb_ipv4_get(tb_ipv4_t const* ipv4, tb_char_t* data, tb_size_t maxn);
+tb_char_t const*    tb_ipv4_get(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t maxn);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

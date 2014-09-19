@@ -108,7 +108,7 @@ tb_void_t           tb_aiop_delo(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_t const* aioe);
+tb_bool_t           tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_ref_t aioe);
 
 /*! set the aioe
  *
@@ -133,7 +133,7 @@ tb_bool_t           tb_aiop_sete(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo, tb_size
  *
  * @return          > 0: the aioe list size, 0: timeout, -1: failed
  */
-tb_long_t           tb_aiop_wait(tb_aiop_ref_t aiop, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout);
+tb_long_t           tb_aiop_wait(tb_aiop_ref_t aiop, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

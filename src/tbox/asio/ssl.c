@@ -163,7 +163,7 @@ typedef struct __tb_aicp_ssl_impl_t
     struct 
     {
         // the post func
-        tb_bool_t               (*func)(tb_aice_t const* aice);
+        tb_bool_t               (*func)(tb_aice_ref_t aice);
 
         // the post delay
         tb_size_t               delay;
@@ -395,7 +395,7 @@ static tb_bool_t tb_aicp_ssl_open_func(tb_aicp_ssl_impl_t* impl, tb_size_t state
     // ok?
     return ok;
 }
-static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_ssl_open_done(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && (aice->code == TB_AICE_CODE_RECV || aice->code == TB_AICE_CODE_SEND), tb_false);
@@ -483,7 +483,7 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_ssl_read_done(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && (aice->code == TB_AICE_CODE_RECV || aice->code == TB_AICE_CODE_SEND), tb_false);
@@ -574,7 +574,7 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && (aice->code == TB_AICE_CODE_RECV || aice->code == TB_AICE_CODE_SEND), tb_false);
@@ -804,7 +804,7 @@ static tb_bool_t tb_aicp_ssl_open_and_writ(tb_aicp_ssl_ref_t ssl, tb_size_t stat
     // ok?
     return ok;
 }
-static tb_bool_t tb_aicp_ssl_done_task(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_ssl_done_task(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
@@ -822,7 +822,7 @@ static tb_bool_t tb_aicp_ssl_done_task(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aicp_ssl_done_clos(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_ssl_done_clos(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);

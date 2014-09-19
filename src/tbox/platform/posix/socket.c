@@ -174,7 +174,7 @@ tb_void_t tb_socket_block(tb_socket_ref_t sock, tb_bool_t block)
     if (block) fcntl(tb_sock2fd(sock), F_SETFL, fcntl(tb_sock2fd(sock), F_GETFL) & ~O_NONBLOCK);
     else fcntl(tb_sock2fd(sock), F_SETFL, fcntl(tb_sock2fd(sock), F_GETFL) | O_NONBLOCK);
 }
-tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port)
+tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port)
 {
     // check
     tb_assert_and_check_return_val(sock && addr && addr->u32 && port, -1);
@@ -197,7 +197,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint
     // error
     return -1;
 }
-tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port)
+tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port)
 {
     // check
     tb_assert_and_check_return_val(sock, 0);
@@ -250,7 +250,7 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
     // listen
     return (listen(tb_sock2fd(sock), backlog) < 0)? tb_false : tb_true;
 }
-tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_t* addr, tb_uint16_t* port)
+tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
@@ -411,7 +411,7 @@ tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
     // error
     return -1;
 }
-tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && file && size, -1);
@@ -462,24 +462,29 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_hize_t offs
     return writ == read? writ : -1;
 #endif
 }
-tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(sock && addr && addr->u32 && port && data, -1);
+    tb_assert_and_check_return_val(sock && data, -1);
     tb_check_return_val(size, 0);
 
-    // init
-    struct sockaddr_in d = {0};
-    d.sin_family = AF_INET;
-    d.sin_port = tb_bits_ne_to_be_u16(port);
-    d.sin_addr.s_addr = addr->u32;
-
     // recv
-    socklen_t   n = sizeof(d);
-    tb_long_t   r = recvfrom(tb_sock2fd(sock), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
+    struct sockaddr_in  d = {0};
+    socklen_t           n = sizeof(d);
+    tb_long_t           r = recvfrom(tb_sock2fd(sock), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
     // ok?
-    if (r >= 0) return r;
+    if (r >= 0) 
+    {
+        // save address
+        if (addr) tb_ipv4_set(addr, inet_ntoa(d.sin_addr));
+
+        // save port
+        if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
+
+        // ok
+        return r;
+    }
 
     // continue?
     if (errno == EINTR || errno == EAGAIN) return 0;
@@ -487,7 +492,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16
     // error
     return -1;
 }
-tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && addr && addr->u32 && port && data, -1);
@@ -511,19 +516,14 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16
     // error
     return -1;
 }
-tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_iovec_t const* list, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(sock && addr && port && list && size, -1);
-
-    // init
-    struct sockaddr_in d = {0};
-    d.sin_family = AF_INET;
-    d.sin_port = tb_bits_ne_to_be_u16(port);
-    d.sin_addr.s_addr = addr->u32;
+    tb_assert_and_check_return_val(sock && list && size, -1);
 
     // init msg
-    struct msghdr msg = {0};
+    struct msghdr       msg = {0};
+    struct sockaddr_in  d = {0};
     msg.msg_name        = (tb_pointer_t)&d;
     msg.msg_namelen     = sizeof(d);
     msg.msg_iov         = (struct iovec*)list;
@@ -536,7 +536,17 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint1
     tb_long_t   r = recvmsg(tb_sock2fd(sock), &msg, 0);
 
     // ok?
-    if (r >= 0) return r;
+    if (r >= 0)
+    {
+        // save address
+        if (addr) tb_ipv4_set(addr, inet_ntoa(d.sin_addr));
+
+        // save port
+        if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
+
+        // ok
+        return r;
+    }
 
     // continue?
     if (errno == EINTR || errno == EAGAIN) return 0;
@@ -544,7 +554,7 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint1
     // error
     return -1;
 }
-tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && addr && port && list && size, -1);

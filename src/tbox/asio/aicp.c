@@ -70,13 +70,13 @@ static tb_bool_t tb_aicp_walk_kill(tb_pointer_t item, tb_cpointer_t priv)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_post_after_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
 
     // the posted aice
-    tb_aice_t* posted_aice = (tb_aice_t*)aice->priv;
+    tb_aice_ref_t posted_aice = (tb_aice_ref_t)aice->priv;
     tb_assert_and_check_return_val(posted_aice && posted_aice->aico, tb_false);
 
     // the impl
@@ -358,7 +358,7 @@ tb_size_t tb_aicp_maxn(tb_aicp_ref_t aicp)
     // the maxn
     return impl->maxn;
 }
-tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_decl__)
+tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_ref_t aice __tb_debug_decl__)
 {
     // check
     tb_aicp_impl_t* impl = (tb_aicp_impl_t*)aicp;
@@ -397,7 +397,7 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_dec
     // post failed
     return tb_false;
 }
-tb_bool_t tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__)
+tb_bool_t tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_ref_t aice __tb_debug_decl__)
 {
     // check
     tb_aicp_impl_t* impl = (tb_aicp_impl_t*)aicp;
@@ -415,7 +415,7 @@ tb_bool_t tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_t con
     tb_assert_and_check_return_val(aico, tb_false);
 
     // make the posted aice
-    tb_aice_t* posted_aice = tb_malloc0_type(tb_aice_t);
+    tb_aice_ref_t posted_aice = tb_malloc0_type(tb_aice_t);
     tb_assert_and_check_return_val(posted_aice, tb_false);
 
     // init the posted aice
@@ -439,7 +439,7 @@ tb_void_t tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t 
     tb_assert_and_check_return(ptor && ptor->loop_spak);
 
     // the loop spak
-    tb_long_t (*loop_spak)(tb_aicp_ptor_impl_t* , tb_handle_t, tb_aice_t* , tb_long_t ) = ptor->loop_spak;
+    tb_long_t (*loop_spak)(tb_aicp_ptor_impl_t* , tb_handle_t, tb_aice_ref_t , tb_long_t ) = ptor->loop_spak;
 
     // worker++
     tb_atomic_fetch_and_inc(&impl->work);

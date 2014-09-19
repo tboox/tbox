@@ -17,36 +17,41 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        network.h
- * @defgroup    network
+ * @file        addr.h
+ * @ingroup     network
  *
  */
-#ifndef TB_NETWORK_H
-#define TB_NETWORK_H
+#ifndef TB_NETWORK_ADDR_H
+#define TB_NETWORK_ADDR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "ssl.h"
-#include "url.h"
-#include "ipv4.h"
-#include "addr.h"
-#include "http.h"
-#include "cookies.h"
-#include "dns/dns.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
  */
 
-/*! init network 
- *
- * @return      tb_true or tb_false
- */
-tb_bool_t       tb_network_init(tb_noarg_t);
+/// the addr4 type
+typedef struct __tb_addr4_t
+{
+    /// the ipv4
+    tb_ipv4_t       ipv4;
 
-/// exit network 
-tb_void_t       tb_network_exit(tb_noarg_t);
+    /// the port
+    tb_uint16_t     port;
+
+}tb_addr4_t, *tb_addr4_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

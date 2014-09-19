@@ -48,7 +48,7 @@ tb_handle_t         tb_dns_looker_init(tb_char_t const* name);
  *
  * @return          1: ok, 0: continue: -1: failed
  */
-tb_long_t           tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_t* addr);
+tb_long_t           tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_ref_t addr);
 
 /*! wait the looker
  *
@@ -74,6 +74,6 @@ tb_void_t           tb_dns_looker_exit(tb_handle_t handle);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_dns_looker_done(tb_char_t const* name, tb_ipv4_t* addr);
+tb_bool_t           tb_dns_looker_done(tb_char_t const* name, tb_ipv4_ref_t addr);
 
 #endif

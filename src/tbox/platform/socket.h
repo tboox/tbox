@@ -118,7 +118,7 @@ tb_void_t           tb_socket_block(tb_socket_ref_t sock, tb_bool_t block);
  *
  * @return          ok: 1, continue: 0; failed: -1
  */
-tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port);
+tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port);
 
 /*! bind socket
  *
@@ -128,7 +128,7 @@ tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* add
  *
  * @return          the bound port, failed: 0
  */
-tb_size_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port);
+tb_size_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port);
 
 /*! listen socket
  *
@@ -147,7 +147,7 @@ tb_bool_t           tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog);
  *
  * @return          the client socket 
  */
-tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_t* addr, tb_uint16_t* port);
+tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port);
 
 /*! kill socket
  *
@@ -206,19 +206,19 @@ tb_long_t           tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list
  *
  * @return          the real size or -1
  */
-tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_handle_t file, tb_hize_t offset, tb_hize_t size);
+tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size);
 
 /*! recv the socket data for udp
  *
  * @param sock      the socket 
- * @param addr      the addr
- * @param port      the port
+ * @param addr      the peer addr
+ * @param port      the peer port
  * @param data      the data
  * @param size      the size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
+tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_byte_t* data, tb_size_t size);
 
 /*! send the socket data for udp
  *
@@ -230,19 +230,19 @@ tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr,
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size);
+tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size);
     
 /*! urecvv the socket data for udp
  * 
  * @param sock      the socket 
- * @param addr      the addr
- * @param port      the port
+ * @param addr      the peer addr
+ * @param port      the peer port
  * @param list      the iovec list
  * @param size      the iovec size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_iovec_t const* list, tb_size_t size);
 
 /*! usendv the socket data for udp
  * 
@@ -254,7 +254,7 @@ tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

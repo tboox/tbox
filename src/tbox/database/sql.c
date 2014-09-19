@@ -61,7 +61,7 @@ tb_database_sql_ref_t tb_database_sql_init(tb_char_t const* url)
         tb_assert_and_check_break(protocol == TB_URL_PROTOCOL_SQL || protocol == TB_URL_PROTOCOL_FILE);
 
         // the probe func
-        static tb_size_t (*s_probe[])(tb_url_t const*) = 
+        static tb_size_t (*s_probe[])(tb_url_ref_t) = 
         {
             tb_null
 #ifdef TB_CONFIG_THIRD_HAVE_MYSQL
@@ -73,7 +73,7 @@ tb_database_sql_ref_t tb_database_sql_init(tb_char_t const* url)
         };
 
         // the init func
-        static tb_database_sql_ref_t (*s_init[])(tb_url_t const*) = 
+        static tb_database_sql_ref_t (*s_init[])(tb_url_ref_t) = 
         {
             tb_null
 #ifdef TB_CONFIG_THIRD_HAVE_MYSQL

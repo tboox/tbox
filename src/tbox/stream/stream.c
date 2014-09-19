@@ -304,7 +304,7 @@ tb_hize_t tb_stream_offset(tb_stream_ref_t stream)
     tb_hize_t offset = 0;
     return tb_stream_ctrl(stream, TB_STREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
 }
-tb_url_t* tb_stream_url(tb_stream_ref_t stream)
+tb_url_ref_t tb_stream_url(tb_stream_ref_t stream)
 {
     // check
     tb_stream_impl_t* impl = tb_stream_impl(stream);

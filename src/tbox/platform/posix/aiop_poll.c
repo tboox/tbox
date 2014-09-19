@@ -88,7 +88,7 @@ static tb_bool_t tb_poll_walk_sete(tb_iterator_ref_t iterator, tb_pointer_t item
     tb_assert_and_check_return_val(iterator, tb_false);
 
     // the aioe
-    tb_aioe_t const* aioe = (tb_aioe_t const*)priv;
+    tb_aioe_ref_t aioe = (tb_aioe_ref_t)priv;
     tb_assert_and_check_return_val(aioe, tb_false);
 
     // the aioo
@@ -177,7 +177,7 @@ static tb_bool_t tb_aiop_rtor_poll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_rtor_poll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t const* aioe)
+static tb_bool_t tb_aiop_rtor_poll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t aioe)
 {
     // check
     tb_aiop_rtor_poll_impl_t* impl = (tb_aiop_rtor_poll_impl_t*)rtor;
@@ -206,7 +206,7 @@ static tb_bool_t tb_aiop_rtor_poll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t con
     // ok
     return tb_true;
 }
-static tb_long_t tb_aiop_rtor_poll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
+static tb_long_t tb_aiop_rtor_poll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout)
 {   
     // check
     tb_aiop_rtor_poll_impl_t* impl = (tb_aiop_rtor_poll_impl_t*)rtor;

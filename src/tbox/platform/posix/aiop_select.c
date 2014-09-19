@@ -170,7 +170,7 @@ static tb_bool_t tb_aiop_rtor_select_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_rtor_select_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t const* aioe)
+static tb_bool_t tb_aiop_rtor_select_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t aioe)
 {
     // check
     tb_aiop_rtor_select_impl_t* impl = (tb_aiop_rtor_select_impl_t*)rtor;
@@ -207,7 +207,7 @@ static tb_bool_t tb_aiop_rtor_select_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t c
     // ok
     return tb_true;
 }
-static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
+static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout)
 {   
     // check
     tb_aiop_rtor_select_impl_t* impl = (tb_aiop_rtor_select_impl_t*)rtor;
