@@ -2006,7 +2006,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
 
     // loop 
     tb_aice_t post = {0};
-    while (!tb_atomic_get(&aicp->kill))
+    while (1)
     {
         // clear post
         post.code = TB_AICE_CODE_NONE;
