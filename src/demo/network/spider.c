@@ -683,7 +683,7 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
         task = tb_null;
 
         // failed?
-        if (!ok)
+        if (!full && !ok)
         {
             // trace
             tb_trace_e("task: size: %lu, done: %s: post failed", size, iurl);
