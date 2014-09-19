@@ -49,7 +49,7 @@ static tb_void_t tb_aicp_file_kilo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* ai
     // kill it
     tb_file_exit(file);
 }
-static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, tb_false);
@@ -86,7 +86,7 @@ static tb_bool_t tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
     // ok?
     return ok;
 }
-static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_READ, -1);
@@ -116,7 +116,7 @@ static tb_long_t tb_aicp_file_spak_read(tb_aiop_ptor_impl_t* impl, tb_aice_t* ai
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_WRIT, -1);
@@ -146,7 +146,7 @@ static tb_long_t tb_aicp_file_spak_writ(tb_aiop_ptor_impl_t* impl, tb_aice_t* ai
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_READV, -1);
@@ -176,7 +176,7 @@ static tb_long_t tb_aicp_file_spak_readv(tb_aiop_ptor_impl_t* impl, tb_aice_t* a
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_WRITV, -1);
@@ -206,7 +206,7 @@ static tb_long_t tb_aicp_file_spak_writv(tb_aiop_ptor_impl_t* impl, tb_aice_t* a
     // ok?
     return 1;
 }
-static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_fsync(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice && aice->code == TB_AICE_CODE_FSYNC, -1);

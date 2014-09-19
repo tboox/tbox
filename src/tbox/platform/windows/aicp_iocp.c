@@ -176,6 +176,9 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_aico_t
     // the task
     tb_handle_t                                 task;
 
+    // the address data for acpt, urecv and urecvv
+    tb_cpointer_t                               addr;
+
     // is ltimer?
     tb_uint8_t                                  bltimer : 1;
 
@@ -260,17 +263,18 @@ static tb_void_t tb_iocp_spak_timeout_runtask(tb_bool_t killed, tb_cpointer_t pr
 /* //////////////////////////////////////////////////////////////////////////////////////
  * spak 
  */
-static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice);
-static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice);
+static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp, tb_size_t real, tb_size_t error)
 {
     // check?
-    tb_assert_and_check_return_val(impl && resp && resp->aico, -1);
+    tb_assert_and_check_return_val(impl && resp, -1);
 
     // trace
     tb_trace_d("acpt[%p]: spak: %lu", resp->aico, error);
 
     // check
-    tb_assert_abort(resp->u.acpt.priv[0] && resp->u.acpt.priv[1]);
+    tb_iocp_aico_t* aico = (tb_iocp_aico_t*)resp->aico;
+    tb_assert_abort(aico && aico->addr && resp->u.acpt.priv[0]);
 
     // done
     switch (error)
@@ -285,7 +289,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
             {
             case TB_STATE_OK:
             case TB_STATE_PENDING:
-                resp->state = resp->u.acpt.priv[1]? TB_STATE_OK : TB_STATE_FAILED;
+                resp->state = resp->u.acpt.priv[0]? TB_STATE_OK : TB_STATE_FAILED;
                 break;
             default:
                 // using the self state here
@@ -309,7 +313,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
 #endif
 
                 // open aico
-                if (!tb_aico_open_sock(resp->u.acpt.aico, (tb_socket_ref_t)resp->u.acpt.priv[1])) 
+                if (!tb_aico_open_sock(resp->u.acpt.aico, (tb_socket_ref_t)resp->u.acpt.priv[0])) 
                 {
                     resp->state = TB_STATE_FAILED;
                     break;
@@ -318,12 +322,12 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
 #if 0
                 // update the accept context, otherwise shutdown will be failed
                 SOCKET acpt = (SOCKET)tb_aico_sock(resp->aico) - 1;
-                tb_long_t update_ok = setsockopt((SOCKET)resp->u.acpt.priv[1] - 1, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
+                tb_long_t update_ok = setsockopt((SOCKET)resp->u.acpt.priv[0] - 1, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
                 tb_assert_abort(!update_ok); tb_used(update_ok);
 #endif
 
                 // clear sock
-                resp->u.acpt.priv[1] = tb_null;
+                resp->u.acpt.priv[0] = tb_null;
 
 
                 // done GetAcceptExSockaddrs
@@ -334,7 +338,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
                 if (impl->func.GetAcceptExSockaddrs)
                 {
                     // done it
-                    impl->func.GetAcceptExSockaddrs(    (tb_byte_t*)resp->u.acpt.priv[0]
+                    impl->func.GetAcceptExSockaddrs(    (tb_byte_t*)aico->addr
                                                         ,   0
                                                         ,   sizeof(SOCKADDR_IN) + 16
                                                         ,   sizeof(SOCKADDR_IN) + 16
@@ -392,7 +396,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // ok
     return 1;
 }
-static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp, tb_size_t real, tb_size_t error)
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
@@ -468,7 +472,7 @@ static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // ok
     return 1;
 }
-static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp, tb_size_t real, tb_size_t error)
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
@@ -478,6 +482,25 @@ static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     {
         // trace
         tb_trace_d("iorw[%p]: code: %lu, real: %lu", resp->aico, resp->code, real);
+
+        // save address for urecv or urecvv
+        if (resp->code == TB_AICE_CODE_URECV || resp->code == TB_AICE_CODE_URECVV)
+        {
+            // the aico
+            tb_iocp_aico_t* aico = (tb_iocp_aico_t*)resp->aico;
+            tb_assert_and_check_return_val(aico, -1);
+
+            // the address
+            SOCKADDR_IN* addr = (SOCKADDR_IN*)aico->addr;
+            tb_assert_and_check_return_val(addr, -1);
+
+            // save address
+            tb_ipv4_set(resp->code == TB_AICE_CODE_URECV? &resp->u.urecv.addr : &resp->u.urecvv.addr, inet_ntoa(addr->sin_addr));
+
+            // save port
+            if (resp->code == TB_AICE_CODE_URECV) resp->u.urecv.port = tb_bits_be_to_ne_u16(addr->sin_port);
+            else resp->u.urecvv.port = tb_bits_be_to_ne_u16(addr->sin_port);
+        }
 
         // save the real size, @note: hack the real offset for the other io aice
         resp->u.recv.real = real;
@@ -539,7 +562,7 @@ static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     // ok
     return 1;
 }
-static tb_long_t tb_iocp_spak_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_long_t tb_iocp_spak_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp, tb_size_t real, tb_size_t error)
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
@@ -586,7 +609,7 @@ static tb_long_t tb_iocp_spak_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, 
     // ok
     return 1;
 }
-static tb_long_t tb_iocp_spak_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_long_t tb_iocp_spak_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp, tb_size_t real, tb_size_t error)
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
@@ -628,7 +651,7 @@ static tb_long_t tb_iocp_spak_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp
     // ok
     return 1;
 }
-static tb_long_t tb_iocp_spak_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_long_t tb_iocp_spak_clos(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp, tb_size_t real, tb_size_t error)
 {
     // check?
     tb_assert_and_check_return_val(resp, -1);
@@ -697,7 +720,7 @@ static tb_long_t tb_iocp_spak_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     resp->state = TB_STATE_OK;
     return 1;
 }
-static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp, tb_size_t real, tb_size_t error)
 {
     // check?
     tb_assert_and_check_return_val(resp && resp->aico, -1);
@@ -719,7 +742,7 @@ static tb_long_t tb_iocp_spak_done(tb_iocp_ptor_impl_t* impl, tb_aice_t* resp, t
     tb_check_return_val(resp->state == TB_STATE_PENDING, 1);
 
     // init spak
-    static tb_long_t (*s_spak[])(tb_iocp_ptor_impl_t* , tb_aice_t* , tb_size_t , tb_size_t ) = 
+    static tb_long_t (*s_spak[])(tb_iocp_ptor_impl_t* , tb_aice_ref_t , tb_size_t , tb_size_t ) = 
     {
         tb_null
     ,   tb_iocp_spak_acpt
@@ -789,7 +812,7 @@ static tb_void_t tb_iocp_post_timeout_cancel(tb_iocp_ptor_impl_t* impl, tb_iocp_
     }
     aico->task = tb_null;
 }
-static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->func.AcceptEx && impl->base.aicp, tb_false);
@@ -810,9 +833,9 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     tb_bool_t       AcceptEx_ok = tb_false;
     do
     {
-        // make data
-        tb_cpointer_t data = aico->olap.aice.u.acpt.priv[0];
-        if (!data) data = tb_malloc0(((sizeof(SOCKADDR_IN) + 16) << 1));
+        // make address
+        if (!aico->addr) aico->addr = tb_malloc0(((sizeof(SOCKADDR_IN) + 16) << 1));
+        tb_assert_and_check_break(aico->addr);
       
         // init olap
         tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
@@ -823,10 +846,9 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // init aice, hack: sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1)
         aico->olap.aice                 = *aice;
         aico->olap.aice.state           = TB_STATE_PENDING;
-        aico->olap.aice.u.acpt.priv[0]  = data;
-        aico->olap.aice.u.acpt.priv[1]  = sock? sock : tb_socket_init(TB_SOCKET_TYPE_TCP);
-        tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv) > 1);
-        tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.priv[1]);
+        aico->olap.aice.u.acpt.priv[0]  = sock? sock : tb_socket_init(TB_SOCKET_TYPE_TCP);
+        tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv));
+        tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0]);
         init_ok = tb_true;
 
         // post timeout first
@@ -835,8 +857,8 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
         // done AcceptEx
         DWORD real = 0;
         AcceptEx_ok = impl->func.AcceptEx(  (SOCKET)aico->base.handle - 1
-                                        ,   (SOCKET)aico->olap.aice.u.acpt.priv[1] - 1
-                                        ,   (tb_byte_t*)data
+                                        ,   (SOCKET)aico->olap.aice.u.acpt.priv[0] - 1
+                                        ,   (tb_byte_t*)aico->addr
                                         ,   0
                                         ,   sizeof(SOCKADDR_IN) + 16
                                         ,   sizeof(SOCKADDR_IN) + 16
@@ -878,13 +900,9 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // error? 
     if (!ok)
     {
-        // exit data
-        if (aico->olap.aice.u.acpt.priv[0]) tb_free(aico->olap.aice.u.acpt.priv[0]);
-        aico->olap.aice.u.acpt.priv[0] = tb_null;
-
         // exit sock
-        if (aico->olap.aice.u.acpt.priv[1]) tb_socket_exit((tb_socket_ref_t)aico->olap.aice.u.acpt.priv[1]);
-        aico->olap.aice.u.acpt.priv[1] = tb_null;
+        if (aico->olap.aice.u.acpt.priv[0]) tb_socket_exit((tb_socket_ref_t)aico->olap.aice.u.acpt.priv[0]);
+        aico->olap.aice.u.acpt.priv[0] = tb_null;
 
         // remove timeout task
         tb_iocp_post_timeout_cancel(impl, aico);
@@ -893,7 +911,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // ok?
     return ok;
 }
-static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -989,7 +1007,7 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // ok?
     return ok;
 }
-static tb_bool_t tb_iocp_post_recv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_recv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1049,7 +1067,7 @@ static tb_bool_t tb_iocp_post_recv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_send(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_send(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1108,7 +1126,7 @@ static tb_bool_t tb_iocp_post_send(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_urecv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_urecv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1116,7 +1134,6 @@ static tb_bool_t tb_iocp_post_urecv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // check aice
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_URECV, tb_false);
     tb_assert_and_check_return_val(aice->u.urecv.data && aice->u.urecv.size, tb_false);
-    tb_assert_and_check_return_val(aice->u.urecv.addr.u32 && aice->u.urecv.port, tb_false);
     
     // the aico
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
@@ -1128,11 +1145,20 @@ static tb_bool_t tb_iocp_post_urecv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // init aice
     aico->olap.aice = *aice;
 
+    // make addr
+    if (!aico->addr) aico->addr = tb_malloc(sizeof(SOCKADDR_IN) + sizeof(tb_int_t) + sizeof(DWORD));
+    tb_assert_and_check_return_val(aico->addr, tb_false);
+
     // init addr
-    SOCKADDR_IN                 addr = {0};
-    addr.sin_family             = AF_INET;
-    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.urecv.port);
-    addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
+    tb_memset((tb_pointer_t)aico->addr, 0, sizeof(SOCKADDR_IN));
+
+    // init size
+    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN));
+    *psize = sizeof(SOCKADDR_IN);
+
+    // init flag
+    DWORD* pflag = (DWORD*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN) + sizeof(tb_int_t));
+    *pflag = 0;
 
     // trace
     tb_trace_d("urecv[%p]: ..", aico);
@@ -1141,9 +1167,7 @@ static tb_bool_t tb_iocp_post_urecv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     tb_iocp_post_timeout(impl, aico);
 
     // done recv
-    DWORD       flag = 0;
-    tb_int_t    size = sizeof(addr);
-    tb_long_t   ok = impl->func.WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.urecv, 1, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_long_t   ok = impl->func.WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.urecv, 1, tb_null, pflag, (struct sockaddr*)aico->addr, psize, (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("urecv[%p]: WSARecvFrom: %ld, error: %d", aico, ok, impl->func.WSAGetLastError());
 
     // ok or pending? continue it
@@ -1176,7 +1200,7 @@ static tb_bool_t tb_iocp_post_urecv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_usend(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_usend(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1242,7 +1266,7 @@ static tb_bool_t tb_iocp_post_usend(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_recvv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_recvv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1302,7 +1326,7 @@ static tb_bool_t tb_iocp_post_recvv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_sendv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_sendv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1361,7 +1385,7 @@ static tb_bool_t tb_iocp_post_sendv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_urecvv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_urecvv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1369,7 +1393,6 @@ static tb_bool_t tb_iocp_post_urecvv(tb_iocp_ptor_impl_t* impl, tb_aice_t const*
     // check aice
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_URECVV, tb_false);
     tb_assert_and_check_return_val(aice->u.urecvv.list && aice->u.urecvv.size, tb_false);
-    tb_assert_and_check_return_val(aice->u.urecvv.addr.u32 && aice->u.urecvv.port, tb_false);
     
     // the aico
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
@@ -1381,11 +1404,20 @@ static tb_bool_t tb_iocp_post_urecvv(tb_iocp_ptor_impl_t* impl, tb_aice_t const*
     // init aice
     aico->olap.aice = *aice;
 
+    // make addr
+    if (!aico->addr) aico->addr = tb_malloc0(sizeof(SOCKADDR_IN) + sizeof(tb_int_t) + sizeof(DWORD));
+    tb_assert_and_check_return_val(aico->addr, tb_false);
+
     // init addr
-    SOCKADDR_IN                 addr = {0};
-    addr.sin_family             = AF_INET;
-    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.urecvv.port);
-    addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
+    tb_memset((tb_pointer_t)aico->addr, 0, sizeof(SOCKADDR_IN));
+
+    // init size
+    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN));
+    *psize = sizeof(SOCKADDR_IN);
+
+    // init flag
+    DWORD* pflag = (DWORD*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN) + sizeof(tb_int_t));
+    *pflag = 0;
 
     // trace
     tb_trace_d("urecvv[%p]: ..", aico);
@@ -1394,9 +1426,7 @@ static tb_bool_t tb_iocp_post_urecvv(tb_iocp_ptor_impl_t* impl, tb_aice_t const*
     tb_iocp_post_timeout(impl, aico);
 
     // done recv
-    DWORD       flag = 0;
-    tb_int_t    size = sizeof(addr);
-    tb_long_t   ok = impl->func.WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.urecvv.list, (DWORD)aico->olap.aice.u.urecvv.size, tb_null, &flag, (struct sockaddr*)&addr, &size, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_long_t   ok = impl->func.WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.urecvv.list, (DWORD)aico->olap.aice.u.urecvv.size, tb_null, pflag, (struct sockaddr*)aico->addr, psize, (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("urecvv[%p]: WSARecvFrom: %ld, error: %d", aico, ok, impl->func.WSAGetLastError());
 
     // ok or pending? continue it
@@ -1429,7 +1459,7 @@ static tb_bool_t tb_iocp_post_urecvv(tb_iocp_ptor_impl_t* impl, tb_aice_t const*
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_usendv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_usendv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1495,7 +1525,7 @@ static tb_bool_t tb_iocp_post_usendv(tb_iocp_ptor_impl_t* impl, tb_aice_t const*
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_sendf(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_sendf(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1570,7 +1600,7 @@ static tb_bool_t tb_iocp_post_sendf(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_read(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_read(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1608,7 +1638,7 @@ static tb_bool_t tb_iocp_post_read(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_writ(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_writ(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1646,7 +1676,7 @@ static tb_bool_t tb_iocp_post_writ(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_readv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_readv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1684,7 +1714,7 @@ static tb_bool_t tb_iocp_post_readv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_writv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_writv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1722,7 +1752,7 @@ static tb_bool_t tb_iocp_post_writv(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp, tb_false);
@@ -1750,7 +1780,7 @@ static tb_bool_t tb_iocp_post_fsync(tb_iocp_ptor_impl_t* impl, tb_aice_t const* 
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->timer && impl->ltimer && impl->wait && impl->base.aicp, tb_false);
@@ -1818,7 +1848,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_iocp_ptor_impl_t* impl, tb_aice_t const
     // failed
     return tb_false;
 }
-static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->timer && impl->ltimer && impl->base.aicp, tb_false);
@@ -1836,16 +1866,16 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // remove the timeout task
     tb_iocp_post_timeout_cancel(impl, aico);
 
+    // exit address
+    if (aico->addr) tb_free(aico->addr);
+    aico->addr = tb_null;
+
     // exit the private data for acpt aice
     if (aico->olap.aice.code == TB_AICE_CODE_ACPT)
     {
-        // exit data
-        if (aico->olap.aice.u.acpt.priv[0]) tb_free(aico->olap.aice.u.acpt.priv[0]);
-        aico->olap.aice.u.acpt.priv[0] = tb_null;
-
         // exit sock
-        if (aico->olap.aice.u.acpt.priv[1]) tb_socket_exit((tb_socket_ref_t)aico->olap.aice.u.acpt.priv[1]);
-        aico->olap.aice.u.acpt.priv[1] = tb_null;
+        if (aico->olap.aice.u.acpt.priv[0]) tb_socket_exit((tb_socket_ref_t)aico->olap.aice.u.acpt.priv[0]);
+        aico->olap.aice.u.acpt.priv[0] = tb_null;
     }
     // disconnect the socket for reusing it
     else if (   impl->func.DisconnectEx
@@ -1921,7 +1951,7 @@ static tb_bool_t tb_iocp_post_clos(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     // post ok
     return tb_true;
 }
-static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->port && impl->base.aicp && aice, tb_false);
@@ -1954,7 +1984,7 @@ static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_t const* a
     }
 
     // init post
-    static tb_bool_t (*s_post[])(tb_iocp_ptor_impl_t* , tb_aice_t const*) = 
+    static tb_bool_t (*s_post[])(tb_iocp_ptor_impl_t* , tb_aice_ref_t) = 
     {
         tb_null
     ,   tb_iocp_post_acpt
@@ -2018,7 +2048,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
         if (!tb_queue_null(impl->post[0])) 
         {
             // get resp
-            tb_aice_t const* aice = (tb_aice_t const*)tb_queue_get(impl->post[0]);
+            tb_aice_ref_t aice = (tb_aice_ref_t)tb_queue_get(impl->post[0]);
             if (aice) 
             {
                 // save post
@@ -2036,7 +2066,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
         if (post.code == TB_AICE_CODE_NONE && !tb_queue_null(impl->post[1]))
         {
             // get resp
-            tb_aice_t const* aice = (tb_aice_t const*)tb_queue_get(impl->post[1]);
+            tb_aice_ref_t aice = (tb_aice_ref_t)tb_queue_get(impl->post[1]);
             if (aice) 
             {
                 // save post
@@ -2175,9 +2205,10 @@ static tb_bool_t tb_iocp_ptor_addo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
         break;
     }
     
-    // the iocp aico
+    // init the iocp aico
     tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
     iocp_aico->impl = impl;
+    iocp_aico->addr = tb_null;
 
     // ok
     return tb_true;
@@ -2224,7 +2255,7 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
      */
     tb_event_post(impl->wait);
 }
-static tb_bool_t tb_iocp_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_ref_t aice)
 {
     // check
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;
@@ -2428,7 +2459,7 @@ static tb_handle_t tb_iocp_ptor_loop_init(tb_aicp_ptor_impl_t* ptor)
     // ok?
     return (tb_handle_t)loop;
 }
-static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t hloop, tb_aice_t* resp, tb_long_t timeout)
+static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t hloop, tb_aice_ref_t resp, tb_long_t timeout)
 {
     // check
     tb_iocp_ptor_impl_t* impl = (tb_iocp_ptor_impl_t*)ptor;

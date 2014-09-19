@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_sock_dns_done_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
+static tb_void_t tb_demo_sock_dns_done_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_ref_t addr, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return(dns);

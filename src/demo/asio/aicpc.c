@@ -44,7 +44,7 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_demo_sock_aico_clos(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_aico_clos(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -61,7 +61,7 @@ static tb_bool_t tb_demo_sock_aico_clos(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_file_aico_clos(tb_aice_t const* aice)
+static tb_bool_t tb_demo_file_aico_clos(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -96,8 +96,8 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
         context->data = tb_null;
     }
 }
-static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice);
-static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_recv_func(tb_aice_ref_t aice);
+static tb_bool_t tb_demo_file_writ_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_WRIT, tb_false);
@@ -138,7 +138,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_recv_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RECV, tb_false);
@@ -190,7 +190,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_conn_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);

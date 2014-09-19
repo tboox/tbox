@@ -199,7 +199,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
     tb_assert_and_check_return_val(data && size && looker->size < size, -1);
 
     // try get addr from the dns list
-    tb_ipv4_t const* addr = tb_null;
+    tb_ipv4_ref_t addr = tb_null;
     if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
         addr = &looker->list[looker->itor - 1];
 
@@ -248,7 +248,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
     tb_trace_d("request: ok");
     return 1;
 }
-static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
+static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_ref_t ipv4)
 {
     // rpkt && size
     tb_byte_t const*    rpkt = tb_static_buffer_data(&looker->rpkt);
@@ -436,13 +436,13 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
     // ok
     return tb_true;
 }
-static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
+static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_ref_t ipv4)
 {
     // check
     tb_check_return_val(!(looker->step & TB_DNS_LOOKER_STEP_RESP), 1);
 
     // try get addr from the dns list
-    tb_ipv4_t const* addr = tb_null;
+    tb_ipv4_ref_t addr = tb_null;
     if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
         addr = &looker->list[looker->itor - 1];
 
@@ -457,7 +457,7 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
     while (1)
     {
         // read data
-        tb_long_t read = tb_socket_urecv(looker->sock, addr, TB_DNS_HOST_PORT, rpkt, 4096);
+        tb_long_t read = tb_socket_urecv(looker->sock, tb_null, 0, rpkt, 4096);
         //tb_trace_d("read %d", read);
         tb_assert_and_check_return_val(read >= 0, -1);
 
@@ -561,7 +561,7 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
     // ok?
     return (tb_handle_t)looker;
 }
-tb_long_t tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_t* addr)
+tb_long_t tb_dns_looker_spak(tb_handle_t handle, tb_ipv4_ref_t addr)
 {
     // check
     tb_dns_looker_t* looker = (tb_dns_looker_t*)handle;
@@ -648,7 +648,7 @@ tb_void_t tb_dns_looker_exit(tb_handle_t handle)
         tb_free(looker);
     }
 }
-tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_ipv4_t* addr)
+tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_ipv4_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(name && addr, tb_false);

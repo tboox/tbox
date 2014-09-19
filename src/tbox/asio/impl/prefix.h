@@ -113,7 +113,7 @@ typedef struct __tb_aicp_ptor_impl_t
     tb_void_t                   (*kilo)(struct __tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* aico);
     
     // post
-    tb_bool_t                   (*post)(struct __tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice);
+    tb_bool_t                   (*post)(struct __tb_aicp_ptor_impl_t* ptor, tb_aice_ref_t aice);
 
     // loop: init
     tb_handle_t                 (*loop_init)(struct __tb_aicp_ptor_impl_t* ptor);
@@ -122,7 +122,7 @@ typedef struct __tb_aicp_ptor_impl_t
     tb_void_t                   (*loop_exit)(struct __tb_aicp_ptor_impl_t* ptor, tb_handle_t loop);
 
     // loop: spak
-    tb_long_t                   (*loop_spak)(struct __tb_aicp_ptor_impl_t* ptor, tb_handle_t loop, tb_aice_t* resp, tb_long_t timeout);
+    tb_long_t                   (*loop_spak)(struct __tb_aicp_ptor_impl_t* ptor, tb_handle_t loop, tb_aice_ref_t resp, tb_long_t timeout);
 
 }tb_aicp_ptor_impl_t;
 
@@ -149,10 +149,10 @@ typedef struct __tb_aiop_rtor_impl_t
     tb_bool_t                   (*delo)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioo_impl_t const* aioo);
 
     // post
-    tb_bool_t                   (*post)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioe_t const* aioe);
+    tb_bool_t                   (*post)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t aioe);
 
     // wait
-    tb_long_t                   (*wait)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout);
+    tb_long_t                   (*wait)(struct __tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout);
 
 }tb_aiop_rtor_impl_t;
 
@@ -236,7 +236,7 @@ static __tb_inline__ tb_bool_t tb_aico_impl_is_killed(tb_aico_impl_t* aico)
     // killing or exiting or killed?
     return (state == TB_STATE_KILLING) || (state == TB_STATE_KILLED);
 }
-static __tb_inline__ tb_size_t tb_aice_impl_priority(tb_aice_t const* aice)
+static __tb_inline__ tb_size_t tb_aice_impl_priority(tb_aice_ref_t aice)
 {
     // the priorities
     static tb_size_t s_priorities[] =

@@ -280,7 +280,7 @@ tb_void_t tb_aiop_delo(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo)
     // delo aioo
     if (impl->rtor->delo(impl->rtor, (tb_aioo_impl_t*)aioo)) tb_aiop_aioo_exit(impl, aioo);
 }
-tb_bool_t tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_t const* aioe)
+tb_bool_t tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_ref_t aioe)
 {
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
@@ -305,7 +305,7 @@ tb_bool_t tb_aiop_sete(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo, tb_size_t code, t
     // post aioe
     return tb_aiop_post(aiop, &aioe);
 }
-tb_long_t tb_aiop_wait(tb_aiop_ref_t aiop, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
+tb_long_t tb_aiop_wait(tb_aiop_ref_t aiop, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout)
 {   
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;

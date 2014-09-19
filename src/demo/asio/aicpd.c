@@ -37,7 +37,7 @@ typedef struct __tb_demo_context_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_demo_aico_clos(tb_aice_t const* aice)
+static tb_bool_t tb_demo_aico_clos(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -85,8 +85,8 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
         tb_free(context);
     }
 }
-static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice);
-static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_send_func(tb_aice_ref_t aice);
+static tb_bool_t tb_demo_file_read_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_READ, tb_false);
@@ -114,7 +114,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_send_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SEND, tb_false);
@@ -157,7 +157,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 }
 #endif
 #ifdef TB_DEMO_MODE_SENDF
-static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_sendf_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDF, tb_false);
@@ -198,7 +198,7 @@ static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
     return tb_true;
 }
 #endif
-static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_acpt_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ACPT, tb_false);
@@ -282,7 +282,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
     return tb_true;
 }
 #if 0
-static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_task_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RUNTASK, tb_false);

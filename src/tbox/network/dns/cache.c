@@ -175,7 +175,7 @@ tb_void_t tb_dns_cache_exit()
     // leave
     tb_spinlock_leave(&g_lock);
 }
-tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
+tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(name && addr, tb_false);
@@ -240,7 +240,7 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
     // ok?
     return ok;
 }
-tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
+tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_ref_t addr)
 {
     // check
     tb_assert_and_check_return(name && addr && addr->u32);

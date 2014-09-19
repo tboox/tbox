@@ -42,7 +42,7 @@ __tb_extern_c_enter__
  *
  * @return                  the score
  */
-tb_size_t                   tb_database_sqlite3_probe(tb_url_t const* url);
+tb_size_t                   tb_database_sqlite3_probe(tb_url_ref_t url);
 
 /* init sqlite3
  *
@@ -50,7 +50,7 @@ tb_size_t                   tb_database_sqlite3_probe(tb_url_t const* url);
  *
  * @return                  the database handle
  */
-tb_database_sql_ref_t       tb_database_sqlite3_init(tb_url_t const* url);
+tb_database_sql_ref_t       tb_database_sqlite3_init(tb_url_ref_t url);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

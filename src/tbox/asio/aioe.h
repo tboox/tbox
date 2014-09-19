@@ -64,7 +64,7 @@ typedef struct __tb_aioe_t
     /// the aioo
     tb_aioo_ref_t               aioo;
 
-}tb_aioe_t;
+}tb_aioe_t, *tb_aioe_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

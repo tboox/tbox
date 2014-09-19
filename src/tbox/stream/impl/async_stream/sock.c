@@ -141,7 +141,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_func(tb_aico_ref_t aico, tb_cpoi
     // trace
     tb_trace_d("clos[%p]: notify: ok", aico);
 }
-static tb_bool_t tb_async_stream_sock_impl_clos_aico_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_clos_aico_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -298,7 +298,7 @@ static tb_size_t tb_async_stream_sock_impl_open_ssl(tb_async_stream_sock_impl_t*
     return TB_STATE_OK;
 }
 #endif
-static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CONN, tb_false);
@@ -360,7 +360,7 @@ static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_t const* addr, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_ref_t addr, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
@@ -398,7 +398,7 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
             tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_SEND, timeout);
 
             // the url
-            tb_url_t* url = tb_async_stream_url((tb_async_stream_ref_t)impl);
+            tb_url_ref_t url = tb_async_stream_url((tb_async_stream_ref_t)impl);
             tb_assert_and_check_break(url);
 
             // port
@@ -485,7 +485,7 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
         impl->func.open  = func;
 
         // the url
-        tb_url_t* url = tb_async_stream_url(stream);
+        tb_url_ref_t url = tb_async_stream_url(stream);
         tb_assert_and_check_break(url);
 
 #ifndef TB_SSL_ENABLE
@@ -564,7 +564,7 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_sock_impl_read_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_read_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RECV, tb_false);
@@ -617,7 +617,7 @@ static tb_bool_t tb_async_stream_sock_impl_read_func(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_sock_impl_read_udp_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_read_udp_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_URECV, tb_false);
@@ -662,7 +662,7 @@ static tb_bool_t tb_async_stream_sock_impl_read_udp_func(tb_aice_t const* aice)
         if (aice->state == TB_STATE_OK)
         {
             // continue to post read
-            if (!tb_aico_urecv(aice->aico, &aice->u.urecv.addr, aice->u.urecv.port, aice->u.urecv.data, aice->u.urecv.size, tb_async_stream_sock_impl_read_udp_func, (tb_async_stream_ref_t)impl))
+            if (!tb_aico_urecv(aice->aico, aice->u.urecv.data, aice->u.urecv.size, tb_async_stream_sock_impl_read_udp_func, (tb_async_stream_ref_t)impl))
                 impl->func.read((tb_async_stream_ref_t)impl, TB_STATE_SOCK_RECV_FAILED, aice->u.urecv.data, 0, aice->u.urecv.size, impl->priv);
         }
     }
@@ -745,7 +745,7 @@ static tb_bool_t tb_async_stream_sock_impl_read(tb_async_stream_ref_t stream, tb
     case TB_SOCKET_TYPE_UDP:
         {
             // post udp read
-            ok = tb_aico_urecv_after(impl->aico, delay, &impl->ipv4, tb_url_port_get(tb_async_stream_url((tb_async_stream_ref_t)impl)), data, size, tb_async_stream_sock_impl_read_udp_func, stream);
+            ok = tb_aico_urecv_after(impl->aico, delay, data, size, tb_async_stream_sock_impl_read_udp_func, stream);
         }
         break;
     default:
@@ -756,7 +756,7 @@ static tb_bool_t tb_async_stream_sock_impl_read(tb_async_stream_ref_t stream, tb
     // ok?
     return ok;
 }
-static tb_bool_t tb_async_stream_sock_impl_writ_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_writ_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_SEND, tb_false);
@@ -810,7 +810,7 @@ static tb_bool_t tb_async_stream_sock_impl_writ_func(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_sock_impl_writ_udp_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_writ_udp_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_USEND, tb_false);
@@ -974,7 +974,7 @@ static tb_bool_t tb_async_stream_sock_impl_sync(tb_async_stream_ref_t stream, tb
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_sock_impl_task_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_task_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
@@ -1032,7 +1032,7 @@ static tb_void_t tb_async_stream_sock_impl_kill(tb_async_stream_ref_t stream)
     // kill aico
     if (impl->aico) tb_aico_kill(impl->aico);
 }
-static tb_bool_t tb_async_stream_sock_impl_exit_aico_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_sock_impl_exit_aico_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CLOS, tb_false);

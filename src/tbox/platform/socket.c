@@ -84,12 +84,12 @@ tb_void_t tb_socket_block(tb_socket_ref_t sock, tb_bool_t block)
 {
     tb_trace_noimpl();
 }
-tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port)
+tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port)
+tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port)
 {
     tb_trace_noimpl();
     return 0;
@@ -99,7 +99,7 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_t* addr, tb_uint16_t* port)
+tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port)
 {
     tb_trace_noimpl();
     return tb_null;
@@ -134,27 +134,27 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
     tb_trace_noimpl();
     return -1;
 }
-tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_byte_t* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_t const* addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;

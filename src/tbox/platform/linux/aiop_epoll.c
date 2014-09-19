@@ -105,7 +105,7 @@ static tb_bool_t tb_aiop_rtor_epoll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t const* aioe)
+static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t aioe)
 {
     // check
     tb_aiop_rtor_epoll_impl_t* impl = (tb_aiop_rtor_epoll_impl_t*)rtor;
@@ -156,7 +156,7 @@ static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_t co
     // ok
     return tb_true;
 }
-static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
+static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout)
 {   
     // check
     tb_aiop_rtor_epoll_impl_t* impl = (tb_aiop_rtor_epoll_impl_t*)rtor;
@@ -239,7 +239,7 @@ static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_t* l
         tb_check_continue(sock != aiop->spak[1]);
 
         // save aioe
-        tb_aioe_t* aioe = &list[wait++];
+        tb_aioe_ref_t aioe = &list[wait++];
         aioe->code = TB_AIOE_CODE_NONE;
         aioe->priv = aioo->priv;
         aioe->aioo = (tb_aioo_ref_t)aioo;

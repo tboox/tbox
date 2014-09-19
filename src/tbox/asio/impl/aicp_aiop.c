@@ -55,7 +55,7 @@ typedef struct __tb_aiop_ptor_impl_t
     tb_thread_ref_t             loop;
 
     // the aioe list
-    tb_aioe_t*                  list;
+    tb_aioe_ref_t                  list;
 
     // the aioe size
     tb_size_t                   maxn;
@@ -109,19 +109,19 @@ static tb_bool_t    tb_aicp_file_init(tb_aiop_ptor_impl_t* impl);
 static tb_void_t    tb_aicp_file_exit(tb_aiop_ptor_impl_t* impl);
 static tb_bool_t    tb_aicp_file_addo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico);
 static tb_void_t    tb_aicp_file_kilo(tb_aiop_ptor_impl_t* impl, tb_aico_impl_t* aico);
-static tb_bool_t    tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice);
+static tb_bool_t    tb_aicp_file_post(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice);
 static tb_void_t    tb_aicp_file_kill(tb_aiop_ptor_impl_t* impl);
 static tb_void_t    tb_aicp_file_poll(tb_aiop_ptor_impl_t* impl);
-static tb_long_t    tb_aicp_file_spak_read(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice);
-static tb_long_t    tb_aicp_file_spak_writ(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice);
-static tb_long_t    tb_aicp_file_spak_readv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice);
-static tb_long_t    tb_aicp_file_spak_writv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice);
-static tb_long_t    tb_aicp_file_spak_fsync(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice);
+static tb_long_t    tb_aicp_file_spak_read(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice);
+static tb_long_t    tb_aicp_file_spak_writ(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice);
+static tb_long_t    tb_aicp_file_spak_readv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice);
+static tb_long_t    tb_aicp_file_spak_writv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice);
+static tb_long_t    tb_aicp_file_spak_fsync(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice);
  
 /* //////////////////////////////////////////////////////////////////////////////////////
  * spak
  */
-static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
+static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_ref_t aice)
 {
     // the aioe code
     static tb_size_t s_code[] =
@@ -167,7 +167,7 @@ static tb_void_t tb_aiop_spak_work(tb_aiop_ptor_impl_t* impl)
     // post wait
     if (value >= 0 && value < work) tb_semaphore_post(impl->wait, work - value);
 }
-static tb_bool_t tb_aiop_push_sock(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_push_sock(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check 
     tb_assert_and_check_return_val(impl && aice && aice->aico, tb_false);
@@ -206,7 +206,7 @@ static tb_bool_t tb_aiop_push_sock(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
     // ok
     return tb_true;
 }
-static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, tb_false);
@@ -364,11 +364,11 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
             for (i = 0; i < real && !end; i++)
             {
                 // the aioe
-                tb_aioe_t const* aioe = &impl->list[i];
+                tb_aioe_ref_t aioe = &impl->list[i];
                 tb_assert_and_check_break_state(aioe, end, tb_true);
 
                 // the aice
-                tb_aice_t const* aice = aioe->priv;
+                tb_aice_ref_t aice = (tb_aice_ref_t)aioe->priv;
                 tb_assert_and_check_break_state(aice, end, tb_true);
 
                 // the aico
@@ -473,7 +473,7 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t priv)
     // work it
     if (ok) tb_aiop_spak_work(impl);
 }
-static tb_bool_t tb_aiop_spak_wait(tb_aiop_ptor_impl_t* impl, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_spak_wait(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {   
     // check
     tb_assert_and_check_return_val(impl && impl->aiop && impl->ltimer && aice, tb_false);
@@ -547,7 +547,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aiop_ptor_impl_t* impl, tb_aice_t const* a
     // ok?
     return ok;
 }
-static tb_long_t tb_aiop_spak_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -576,7 +576,7 @@ static tb_long_t tb_aiop_spak_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_conn(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_conn(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -618,7 +618,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_recv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_recv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -675,7 +675,7 @@ static tb_long_t tb_aiop_spak_recv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_send(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_send(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -732,33 +732,29 @@ static tb_long_t tb_aiop_spak_send(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_urecv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_urecv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
     tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_URECV, -1);
     tb_assert_and_check_return_val(aice->u.urecv.data && aice->u.urecv.size, -1);
-    tb_assert_and_check_return_val(aice->u.urecv.addr.u32 && aice->u.urecv.port, -1);
 
     // the aico
     tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
     // try to recv it
-    tb_size_t recv = 0;
-    tb_long_t real = 0;
+    tb_size_t   recv = 0;
+    tb_long_t   real = 0;
     while (recv < aice->u.urecv.size)
     {
         // recv it
-        real = tb_socket_urecv(aico->base.handle, &aice->u.urecv.addr, aice->u.urecv.port, aice->u.urecv.data + recv, aice->u.urecv.size - recv);
+        real = tb_socket_urecv(aico->base.handle, &aice->u.urecv.addr, &aice->u.urecv.port, aice->u.urecv.data + recv, aice->u.urecv.size - recv);
 
         // save recv
         if (real > 0) recv += real;
         else break;
     }
-
-    // trace
-    tb_trace_d("urecv[%p]: %{ipv4}: %lu, %lu", aico, &aice->u.urecv.addr, aice->u.urecv.port, recv);
 
     // no recv? 
     if (!recv) 
@@ -776,6 +772,9 @@ static tb_long_t tb_aiop_spak_urecv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     }
     else
     {
+        // trace
+        tb_trace_d("urecv[%p]: %{ipv4}: %u, %lu", aico, &aice->u.urecv.addr, aice->u.urecv.port, recv);
+
         // ok or closed?
         aice->state = TB_STATE_OK;
 
@@ -790,7 +789,7 @@ static tb_long_t tb_aiop_spak_urecv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_usend(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_usend(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -848,7 +847,7 @@ static tb_long_t tb_aiop_spak_usend(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_recvv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_recvv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -889,7 +888,7 @@ static tb_long_t tb_aiop_spak_recvv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_sendv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_sendv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -930,7 +929,7 @@ static tb_long_t tb_aiop_spak_sendv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_urecvv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_urecvv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -943,10 +942,10 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
     // recv it
-    tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, aice->u.urecvv.port, aice->u.urecvv.list, aice->u.urecvv.size);
+    tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, &aice->u.urecvv.port, aice->u.urecvv.list, aice->u.urecvv.size);
 
     // trace
-    tb_trace_d("urecvv[%p]: %{ipv4}: %lu, %lu", aico, &aice->u.urecvv.addr, aice->u.urecvv.port, real);
+    tb_trace_d("urecvv[%p]: %{ipv4}: %u, %lu", aico, &aice->u.urecvv.addr, aice->u.urecvv.port, real);
 
     // ok? 
     if (real > 0) 
@@ -972,7 +971,7 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_usendv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_usendv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -1014,7 +1013,7 @@ static tb_long_t tb_aiop_spak_usendv(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     // ok
     return 1;
 }
-static tb_long_t tb_aiop_spak_sendf(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_sendf(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && aice, -1);
@@ -1115,7 +1114,7 @@ static tb_void_t tb_aiop_spak_runtask_timeout(tb_bool_t killed, tb_cpointer_t pr
     // work it
     if (ok) tb_aiop_spak_work(impl);
 }
-static tb_long_t tb_aiop_spak_runtask(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_runtask(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->aiop && impl->ltimer && impl->timer && aice, -1);
@@ -1176,7 +1175,7 @@ static tb_long_t tb_aiop_spak_runtask(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice
     // ok
     return ok;
 }
-static tb_long_t tb_aiop_spak_clos(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_clos(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->aiop && impl->ltimer && impl->timer && aice, -1);
@@ -1237,7 +1236,7 @@ static tb_long_t tb_aiop_spak_clos(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     aice->state = TB_STATE_OK;
     return 1;
 }
-static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->timer && impl->ltimer && aice, -1);
@@ -1290,7 +1289,7 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_t* aice)
     }
 
     // init spak
-    static tb_long_t (*s_spak[])(tb_aiop_ptor_impl_t* , tb_aice_t*) = 
+    static tb_long_t (*s_spak[])(tb_aiop_ptor_impl_t* , tb_aice_ref_t) = 
     {
         tb_null
 
@@ -1429,7 +1428,7 @@ static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     // trace
     tb_trace_d("kilo: aico: %p, type: %u: ok", aico, aico->type);
 }
-static tb_bool_t tb_aiop_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_ref_t aice)
 {
     // check
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
@@ -1580,7 +1579,7 @@ static tb_void_t tb_aiop_ptor_exit(tb_aicp_ptor_impl_t* ptor)
     // exit it
     tb_free(impl);
 }
-static tb_long_t tb_aiop_ptor_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t loop, tb_aice_t* resp, tb_long_t timeout)
+static tb_long_t tb_aiop_ptor_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t loop, tb_aice_ref_t resp, tb_long_t timeout)
 {
     // check
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
@@ -1605,7 +1604,7 @@ static tb_long_t tb_aiop_ptor_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t loop, 
         if (!(null = tb_queue_null(impl->spak[0]))) 
         {
             // get resp
-            tb_aice_t const* aice = tb_queue_get(impl->spak[0]);
+            tb_aice_ref_t aice = tb_queue_get(impl->spak[0]);
             if (aice) 
             {
                 // save resp
@@ -1626,7 +1625,7 @@ static tb_long_t tb_aiop_ptor_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t loop, 
         if (!ok && !(null = tb_queue_null(impl->spak[1]))) 
         {
             // get resp
-            tb_aice_t const* aice = tb_queue_get(impl->spak[1]);
+            tb_aice_ref_t aice = tb_queue_get(impl->spak[1]);
             if (aice) 
             {
                 // save resp

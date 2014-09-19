@@ -96,7 +96,7 @@ static tb_void_t tb_async_stream_file_impl_clos_clear(tb_async_stream_file_impl_
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
-static tb_bool_t tb_async_stream_file_impl_clos_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_file_impl_clos_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -250,7 +250,7 @@ static tb_bool_t tb_async_stream_file_impl_clos(tb_async_stream_ref_t stream, tb
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_file_impl_read_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_file_impl_read_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_READ, tb_false);
@@ -308,7 +308,7 @@ static tb_bool_t tb_async_stream_file_impl_read(tb_async_stream_ref_t stream, tb
     // post read
     return tb_aico_read_after(impl->aico, delay, (tb_hize_t)tb_atomic64_get(&impl->offset), data, size, tb_async_stream_file_impl_read_func, stream);
 }
-static tb_bool_t tb_async_stream_file_impl_writ_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_file_impl_writ_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_WRIT, tb_false);
@@ -394,7 +394,7 @@ static tb_bool_t tb_async_stream_file_impl_seek(tb_async_stream_ref_t stream, tb
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_file_impl_sync_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_file_impl_sync_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_FSYNC, tb_false);
@@ -423,7 +423,7 @@ static tb_bool_t tb_async_stream_file_impl_sync(tb_async_stream_ref_t stream, tb
     // post sync
     return tb_aico_fsync(impl->aico, tb_async_stream_file_impl_sync_func, stream);
 }
-static tb_bool_t tb_async_stream_file_impl_task_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_file_impl_task_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);

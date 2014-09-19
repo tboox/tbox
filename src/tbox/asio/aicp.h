@@ -86,7 +86,7 @@ tb_size_t           tb_aicp_maxn(tb_aicp_ref_t aicp);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb_debug_decl__);
+tb_bool_t           tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_ref_t aice __tb_debug_decl__);
 
 /*! post the aice 
  *
@@ -96,7 +96,7 @@ tb_bool_t           tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_t const* aice __tb
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__);
+tb_bool_t           tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_ref_t aice __tb_debug_decl__);
 
 /*! loop aicp for the external thread
  *

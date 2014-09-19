@@ -37,7 +37,7 @@ static tb_long_t tb_network_printf_format_ipv4(tb_cpointer_t object, tb_char_t* 
     tb_assert_and_check_return_val(object && cstr && maxn, -1);
 
     // the ipv4
-    tb_ipv4_t const* ipv4 = (tb_ipv4_t const*)object;
+    tb_ipv4_ref_t ipv4 = (tb_ipv4_ref_t)object;
 
     // format
     tb_long_t size = tb_snprintf(cstr, maxn - 1, "%u.%u.%u.%u", ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);

@@ -147,7 +147,7 @@ static tb_void_t tb_async_stream_data_impl_clos_clear(tb_async_stream_data_impl_
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
-static tb_bool_t tb_async_stream_data_impl_clos_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_data_impl_clos_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -275,7 +275,7 @@ static tb_bool_t tb_async_stream_data_impl_open(tb_async_stream_ref_t stream, tb
     // done func
     return tb_async_stream_open_func(stream, state, func, priv);
 }
-static tb_bool_t tb_async_stream_data_impl_read_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_data_impl_read_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
@@ -357,7 +357,7 @@ static tb_bool_t tb_async_stream_data_impl_read(tb_async_stream_ref_t stream, tb
     // post read
     return tb_aico_task_run(impl->aico, delay, tb_async_stream_data_impl_read_func, stream);
 }
-static tb_bool_t tb_async_stream_data_impl_writ_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_data_impl_writ_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
@@ -479,7 +479,7 @@ static tb_bool_t tb_async_stream_data_impl_seek(tb_async_stream_ref_t stream, tb
     // ok
     return tb_true;
 }
-static tb_bool_t tb_async_stream_data_impl_task_func(tb_aice_t const* aice)
+static tb_bool_t tb_async_stream_data_impl_task_func(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);

@@ -108,7 +108,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     tb_check_return_val(!impl->sock, tb_true);
 
     // the url
-    tb_url_t* url = tb_stream_url(stream);
+    tb_url_ref_t url = tb_stream_url(stream);
     tb_assert_and_check_return_val(url, tb_false);
 
 #ifndef TB_SSL_ENABLE
@@ -132,7 +132,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     if (!impl->addr.u32)
     {
         // try to get the ipv4 address from url
-        tb_ipv4_t const* ipv4 = tb_url_ipv4_get(url);
+        tb_ipv4_ref_t ipv4 = tb_url_ipv4_get(url);
         if (ipv4 && ipv4->u32) impl->addr = *ipv4;
         else
         {
@@ -330,7 +330,7 @@ static tb_long_t tb_stream_sock_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
     tb_assert_and_check_return_val(impl && impl->sock, -1);
 
     // the url
-    tb_url_t* url = tb_stream_url(stream);
+    tb_url_ref_t url = tb_stream_url(stream);
     tb_assert_and_check_return_val(url, -1);
 
     // check
@@ -392,7 +392,7 @@ static tb_long_t tb_stream_sock_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
             tb_assert_and_check_return_val(impl->addr.u32, -1);
 
             // read data
-            real = tb_socket_urecv(impl->sock, &impl->addr, port, data, size);
+            real = tb_socket_urecv(impl->sock, tb_null, 0, data, size);
 
             // trace
             tb_trace_d("read: %ld <? %lu", real, size);
@@ -424,7 +424,7 @@ static tb_long_t tb_stream_sock_impl_writ(tb_stream_ref_t stream, tb_byte_t cons
     tb_assert_and_check_return_val(impl && impl->sock, -1);
 
     // the url
-    tb_url_t* url = tb_stream_url(stream);
+    tb_url_ref_t url = tb_stream_url(stream);
     tb_assert_and_check_return_val(url, -1);
 
     // check

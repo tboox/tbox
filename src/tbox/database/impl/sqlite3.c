@@ -789,7 +789,7 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_impl_t* data
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_size_t tb_database_sqlite3_probe(tb_url_t const* url)
+tb_size_t tb_database_sqlite3_probe(tb_url_ref_t url)
 {
     // check
     tb_assert_and_check_return_val(url, 0);
@@ -817,7 +817,7 @@ tb_size_t tb_database_sqlite3_probe(tb_url_t const* url)
         if (tb_url_host_get(url) || tb_url_port_get(url)) break;
 
         // the database path
-        tb_char_t const* path = tb_url_get((tb_url_t*)url);
+        tb_char_t const* path = tb_url_get((tb_url_ref_t)url);
         tb_assert_and_check_break(path);
 
         // is file?
@@ -844,12 +844,12 @@ tb_size_t tb_database_sqlite3_probe(tb_url_t const* url)
     stream = tb_null;
 
     // trace
-    tb_trace_d("probe: %s, score: %lu", tb_url_get((tb_url_t*)url), score);
+    tb_trace_d("probe: %s, score: %lu", tb_url_get((tb_url_ref_t)url), score);
 
     // ok?
     return score;
 }
-tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_t const* url)
+tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_ref_t url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);

@@ -116,7 +116,7 @@ static tb_char_t const* tb_demo_httpd_code_cstr(tb_size_t code)
     // ok?
     return cstr;
 }
-static tb_bool_t tb_demo_httpd_aico_clos(tb_aice_t const* aice)
+static tb_bool_t tb_demo_httpd_aico_clos(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_CLOS, tb_false);
@@ -243,7 +243,7 @@ static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* http
     // ok?
     return session;
 }
-static tb_bool_t tb_demo_httpd_session_head_recv(tb_aice_t const* aice);
+static tb_bool_t tb_demo_httpd_session_head_recv(tb_aice_ref_t aice);
 static tb_void_t tb_demo_httpd_session_resp_exit(tb_demo_httpd_session_t* session)
 {
     // keep-alived?
@@ -260,7 +260,7 @@ static tb_void_t tb_demo_httpd_session_resp_exit(tb_demo_httpd_session_t* sessio
     // exit session
     if (!ok) tb_demo_httpd_session_exit(session);
 }
-static tb_bool_t tb_demo_httpd_session_resp_send_file(tb_aice_t const* aice)
+static tb_bool_t tb_demo_httpd_session_resp_send_file(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDF, tb_false);
@@ -304,7 +304,7 @@ static tb_bool_t tb_demo_httpd_session_resp_send_file(tb_aice_t const* aice)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_httpd_session_resp_send_head(tb_aice_t const* aice)
+static tb_bool_t tb_demo_httpd_session_resp_send_head(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_SEND, tb_false);
@@ -568,7 +568,7 @@ static tb_bool_t tb_demo_httpd_session_head_done(tb_demo_httpd_session_t* sessio
     // ok
     return tb_true;
 }
-static tb_bool_t tb_demo_httpd_session_head_recv(tb_aice_t const* aice)
+static tb_bool_t tb_demo_httpd_session_head_recv(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RECV, tb_false);
@@ -822,7 +822,7 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
     // ok?
     return httpd;
 }
-static tb_bool_t tb_demo_httpd_acpt(tb_aice_t const* aice)
+static tb_bool_t tb_demo_httpd_acpt(tb_aice_ref_t aice)
 {
     // check
     tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_ACPT, tb_false);

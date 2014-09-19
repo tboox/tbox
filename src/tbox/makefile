@@ -589,6 +589,7 @@ INC_FILES 				= \
 						network/prefix.h \
 						network/network.h \
 						network/ipv4.h \
+						network/addr.h \
 						network/url.h \
 						network/ssl.h \
 						network/dns/dns.h \

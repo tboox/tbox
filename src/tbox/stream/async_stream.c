@@ -632,7 +632,7 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_ref_t stream)
     // ok
     return tb_true;
 }
-tb_url_t* tb_async_stream_url(tb_async_stream_ref_t stream)
+tb_url_ref_t tb_async_stream_url(tb_async_stream_ref_t stream)
 {
     // check
     tb_async_stream_impl_t* impl = tb_async_stream_impl(stream);

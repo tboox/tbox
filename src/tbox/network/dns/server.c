@@ -96,7 +96,7 @@ static tb_long_t tb_dns_server_comp(tb_item_func_t* func, tb_cpointer_t litem, t
     // comp
     return (lrate > rrate? 1 : (lrate < rrate? -1 : 0));
 }
-static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
+static tb_long_t tb_dns_server_test(tb_ipv4_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(addr && addr->u32, -1);
@@ -233,7 +233,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
         while (read < 8)
         {
             // read data
-            tb_long_t r = tb_socket_urecv(sock, addr, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
+            tb_long_t r = tb_socket_urecv(sock, tb_null, 0, rpkt + read, TB_DNS_RPKT_MAXN - read);
             tb_trace_d("read %d", r);
             tb_check_break(r >= 0);
             
