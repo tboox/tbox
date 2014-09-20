@@ -228,13 +228,16 @@ example
         // block: save http to file
         tb_transfer_done_url("http://www.xxxx.com/index.html", "/home/file/index.html", 0, tb_null, tb_null);
 
-        // async: save http to file
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index0.html", "/home/file/index0.html", 0, 0, tb_null, tb_null);
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index1.html", "/home/file/index2.html", 0, 0, tb_null, tb_null);
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index2.html", "/home/file/index3.html", 0, 0, tb_null, tb_null);
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index3.html", "/home/file/index4.html", 0, 0, tb_null, tb_null);
+        // async: save http to file for windows path
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index3.html", "c:/home/file/index4.html", 0, 0, tb_null, tb_null, tb_null);
 
-        // ...
+        // async: save http to file for unix path
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index0.html", "/home/file/index0.html", 0, 0, tb_null, tb_null, tb_null);
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index1.html", "/home/file/index2.html", 0, 0, tb_null, tb_null, tb_null);
+        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index2.html", "/home/file/index3.html", 0, 0, tb_null, tb_null, tb_null);
+
+        // wait some time
+        getchar();
 
         // exit tbox
         tb_exit();
