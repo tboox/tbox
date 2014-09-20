@@ -110,7 +110,7 @@ static tb_void_t tb_transfer_task_exit(tb_transfer_pool_impl_t* impl, tb_transfe
 static tb_transfer_task_t* tb_transfer_task_init(tb_transfer_pool_impl_t* impl, tb_async_transfer_done_func_t done, tb_async_transfer_ctrl_func_t ctrl, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(impl && done, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
@@ -178,7 +178,7 @@ static tb_bool_t tb_transfer_task_done(tb_size_t state, tb_hize_t offset, tb_hon
 {
     // the task
     tb_transfer_task_t* task = (tb_transfer_task_t*)priv;
-    tb_assert_and_check_return_val(task && task->func && task->transfer, tb_false);
+    tb_assert_and_check_return_val(task && task->transfer, tb_false);
 
     // the pool
     tb_transfer_pool_impl_t* impl = (tb_transfer_pool_impl_t*)task->pool;
@@ -188,7 +188,7 @@ static tb_bool_t tb_transfer_task_done(tb_size_t state, tb_hize_t offset, tb_hon
     tb_trace_d("task[%p]: done: %llu bytes, rate: %lu bytes/s, state: %s", task, save, rate, tb_state_cstr(state));
 
     // done func
-    tb_bool_t ok = task->func(state, offset, size, save, rate, task->priv); 
+    tb_bool_t ok = task->func? task->func(state, offset, size, save, rate, task->priv) : tb_true; 
 
     // failed, killed or closed?
     if (state != TB_STATE_OK && state != TB_STATE_PAUSED)
