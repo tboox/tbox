@@ -70,10 +70,7 @@ typedef struct __tb_mswsock_t
     // GetAcceptExSockaddrs
     tb_mswsock_GetAcceptExSockaddrs_t           GetAcceptExSockaddrs;
 
-}tb_mswsock_t;
-
-// the mswsock ref type
-typedef tb_mswsock_t*  tb_mswsock_ref_t;
+}tb_mswsock_t, *tb_mswsock_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
