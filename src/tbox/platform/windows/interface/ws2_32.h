@@ -196,10 +196,7 @@ typedef struct __tb_ws2_32_t
     // __WSAFDIsSet
     tb_ws2_32___WSAFDIsSet_t        __WSAFDIsSet;
 
-}tb_ws2_32_t;
-
-// the ws2_32 ref type
-typedef tb_ws2_32_t*  tb_ws2_32_ref_t;
+}tb_ws2_32_t, *tb_ws2_32_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

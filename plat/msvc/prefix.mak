@@ -38,10 +38,10 @@ endif
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -MT -Gy -Zi
-CXFLAGS_DEBUG 		= -Od -GS -MTd -ZI -D__tb_debug__
+CXFLAGS_DEBUG 		= -Od -GS -MTd -ZI -RTC1 -D__tb_debug__
 CXFLAGS 			= \
 					-Fd"$(PDB)" -SSE2 \
-					-D_MBCS -D_CRT_SECURE_NO_WARNINGS -DNOCRYPT -DNOGDI -Gd -Gm -W3 -WX -nologo -c -TP \
+					-D_MBCS -D_CRT_SECURE_NO_WARNINGS -DNOCRYPT -DNOGDI -Gd -Gm -W3 -WX -nologo -c -TP -EHsc \
 					-I'/usr/local/inc'
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -Fo

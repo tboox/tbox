@@ -46,10 +46,7 @@ typedef struct __tb_user32_t
     // GetSystemMetrics
     tb_user32_GetSystemMetrics_t      GetSystemMetrics;
 
-}tb_user32_t;
-
-// the user32 ref type
-typedef tb_user32_t*  tb_user32_ref_t;
+}tb_user32_t, *tb_user32_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

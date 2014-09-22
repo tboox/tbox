@@ -46,10 +46,7 @@ typedef struct __tb_iphlpapi_t
     // GetNetworkParams
     tb_iphlpapi_GetNetworkParams_t          GetNetworkParams;
 
-}tb_iphlpapi_t;
-
-// the iphlpapi ref type
-typedef tb_iphlpapi_t*  tb_iphlpapi_ref_t;
+}tb_iphlpapi_t, *tb_iphlpapi_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

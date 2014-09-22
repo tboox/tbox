@@ -162,12 +162,61 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
-tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v);
+
+/* fetch and set the 64bits value 
+ *
+ * @param a                     the atomic value
+ * @param v                     the assigned value
+ *
+ * @return                      the old value
+ */
+tb_hong_t                       tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v);
+
+/* fetch and set the 64bits value if old_value == p
+ *
+ * @param a                     the atomic value
+ * @param p                     the compared value
+ * @param v                     the assigned value
+ *
+ * @return                      the old value
+ */
+tb_hong_t                       tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
+
+/* fetch and add the 64bits value 
+ *
+ * @param a                     the atomic value
+ * @param v                     the added value
+ *
+ * @return                      the old value
+ */
+tb_hong_t                       tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v);
+
+/* fetch and xor the 64bits value 
+ *
+ * @param a                     the atomic value
+ * @param v                     the xor-value
+ *
+ * @return                      the old value
+ */
+tb_hong_t                       tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v);
+
+/* fetch and and the 64bits value 
+ *
+ * @param a                     the atomic value
+ * @param v                     the and-value
+ *
+ * @return                      the old value
+ */
+tb_hong_t                       tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v);
+
+/* fetch and or the 64bits value 
+ *
+ * @param a                     the atomic value
+ * @param v                     the or-value
+ *
+ * @return                      the old value
+ */
+tb_hong_t                       tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

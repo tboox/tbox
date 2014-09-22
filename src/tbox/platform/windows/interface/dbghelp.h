@@ -79,10 +79,7 @@ typedef struct __tb_dbghelp_t
     // SymSetOptions
     tb_dbghelp_SymSetOptions_t          SymSetOptions;
 
-}tb_dbghelp_t;
-
-// the dbghelp ref type
-typedef tb_dbghelp_t*  tb_dbghelp_ref_t;
+}tb_dbghelp_t, *tb_dbghelp_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

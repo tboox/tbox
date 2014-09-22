@@ -49,10 +49,22 @@ tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_h
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_pset_windows(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
+
+/* fetch and set the 64bits value if old_value == p
+ *
+ * @param a                     the atomic value
+ * @param p                     the compared value
+ * @param v                     the assigned value
+ *
+ * @return                      the old value
+ */
+static __tb_inline__ tb_hong_t  tb_atomic64_fetch_and_pset_windows(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
+    // the InterlockedCompareExchange64 func
+    tb_kernel32_InterlockedCompareExchange64_t pInterlockedCompareExchange64 = tb_kernel32()->InterlockedCompareExchange64;
+
     // done
-    if (tb_kernel32()->InterlockedCompareExchange64) return (tb_hong_t)tb_kernel32()->InterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
+    if (pInterlockedCompareExchange64) return (tb_hong_t)pInterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
 
     // using the generic implementation
     return tb_atomic64_fetch_and_pset_generic(a, p, v);

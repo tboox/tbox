@@ -60,7 +60,7 @@ typedef USHORT (WINAPI* tb_kernel32_RtlCaptureStackBackTrace_t)(ULONG FramesToSk
 typedef BOOL (WINAPI* tb_kernel32_GetFileSizeEx_t)(HANDLE hFile, PLARGE_INTEGER lpFileSize);
 
 // the InterlockedCompareExchange64 func type
-typedef LONGLONG (__tb_cdecl__* tb_kernel32_InterlockedCompareExchange64_t)(LONGLONG __tb_volatile__* Destination, LONGLONG Exchange, LONGLONG Comparand);
+typedef LONGLONG (WINAPI* tb_kernel32_InterlockedCompareExchange64_t)(LONGLONG __tb_volatile__* Destination, LONGLONG Exchange, LONGLONG Comparand);
 
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
@@ -80,10 +80,7 @@ typedef struct __tb_kernel32_t
     // InterlockedCompareExchange64
     tb_kernel32_InterlockedCompareExchange64_t  InterlockedCompareExchange64;
 
-}tb_kernel32_t;
-
-// the kernel32 ref type
-typedef tb_kernel32_t*  tb_kernel32_ref_t;
+}tb_kernel32_t,*tb_kernel32_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
