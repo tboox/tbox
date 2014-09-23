@@ -183,6 +183,10 @@
 #           undef TB_COMPILER_VERSION_STRING
 #           define TB_COMPILER_VERSION_STRING       __clang_version__
 #       endif
+        // ignore warning: empty struct has size 0 in C, size 1 in C++
+#       ifdef __cplusplus
+#           pragma clang diagnostic ignored         "-Wextern-c-compat"
+#       endif
 #   endif
 
 // watcom c/c++ 
