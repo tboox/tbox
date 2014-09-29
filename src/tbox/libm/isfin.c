@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        isinf.c
+ * @file        isfin.c
  * @ingroup     libm
  *
  */
@@ -30,11 +30,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-tb_long_t tb_isin(tb_double_t x)
+tb_long_t tb_isfin(tb_double_t x)
 {
-    tb_ieee_double_t e; e.d = x;
-    tb_int32_t      t = e.i.l | ((e.i.h & 0x7fffffff) ^ 0x7ff00000);
-    t |= -t;
-    return (tb_long_t)(~(t >> 31) & (e.i.h >> 30));
+    /* 0 * finite => 0
+     * 0 * infinity => NaN
+     * 0 * NaN => NaN
+     */
+    tb_double_t p = x * 0;
+
+    // p will either be NaN or 0 now, so we can return (prod == prod) or (0 == prod).
+    return p == p;
 }

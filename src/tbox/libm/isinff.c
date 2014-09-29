@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        isnan.c
+ * @file        isinff.c
  * @ingroup     libm
  *
  */
@@ -30,16 +30,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_isnan(tb_double_t x)
+
+tb_long_t tb_isinff(tb_float_t x)
 {
-#if 0
-    tb_ieee_double_t e; e.d = x;
-    tb_int32_t      t = e.i.h & 0x7fffffff;
-    t |= (tb_uint32_t)(e.i.l | (tb_uint32_t)(-(tb_int32_t)e.i.l)) >> 31;
-    t = 0x7ff00000 - t;
-    return (tb_long_t)(((tb_uint32_t)t) >> 31);
-#else
-    // optimization
-    return x != x;
-#endif
+    tb_ieee_float_t e; e.f = x;
+    tb_int32_t      t = e.i & 0x7fffffff;
+    t ^= 0x7f800000;
+    t |= -t;
+    return (tb_long_t)(~(t >> 31) & (e.i >> 30));
 }

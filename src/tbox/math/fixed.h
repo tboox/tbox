@@ -43,6 +43,7 @@
 #define TB_FIXED_INF                TB_FIXED16_INF
 #define TB_FIXED_PI                 TB_FIXED16_PI
 #define TB_FIXED_SQRT2              TB_FIXED16_SQRT2
+#define TB_FIXED_NEAR0              TB_FIXED16_NEAR0
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT

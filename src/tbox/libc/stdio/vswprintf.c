@@ -497,7 +497,7 @@ static tb_wchar_t* tb_printf_float(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_ent
     tb_long_t   ints_i = 0, decs_i = 0;
 
     // for inf nan
-    if (tb_isinf(num))
+    if (tb_isinff(num))
     {
         if (pb < pe && num < 0) *pb++ = L'-';
         if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? L'I' : L'i';
@@ -626,7 +626,7 @@ static tb_wchar_t* tb_printf_double(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
     tb_long_t   ints_i = 0, decs_i = 0;
 
     // for inf nan
-    if (tb_isin(num))
+    if (tb_isinf(num))
     {
         if (pb < pe && num < 0) *pb++ = L'-';
         if (pb < pe) *pb++ = (e.extra & TB_PRINTF_EXTRA_UPPER)? L'I' : L'i';

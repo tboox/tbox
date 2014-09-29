@@ -57,6 +57,7 @@ __tb_extern_c_enter__
 #define TB_FIXED16_INF                      (TB_MAXS32)
 #define TB_FIXED16_PI                       (0x3243f)
 #define TB_FIXED16_SQRT2                    (92682)
+#define TB_FIXED16_NEAR0                    (TB_FIXED16_ONE / (1 << 12))
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT

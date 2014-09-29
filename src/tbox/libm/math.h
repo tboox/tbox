@@ -51,11 +51,15 @@ __tb_extern_c_enter__
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 
-// isin
-tb_long_t       tb_isin(tb_double_t x);
-tb_long_t       tb_isinf(tb_float_t x);
+// is infinite?
+tb_long_t       tb_isinf(tb_double_t x);
+tb_long_t       tb_isinff(tb_float_t x);
 
-// isnan
+// is finite?
+tb_long_t       tb_isfin(tb_double_t x);
+tb_long_t       tb_isfinf(tb_float_t x);
+
+// is nan?
 tb_long_t       tb_isnan(tb_double_t x);
 tb_long_t       tb_isnanf(tb_float_t x);
 
