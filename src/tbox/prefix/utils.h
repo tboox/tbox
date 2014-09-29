@@ -116,7 +116,7 @@
 #define tb_i2p(x)                       ((tb_pointer_t)(tb_long_t)(x))
 
 /// swap
-#define tb_swap(t, l, r)                do { t p = (r); (r) = (l); (l) = p; } while (0)
+#define tb_swap(t, l, r)                do { t __p = (r); (r) = (l); (l) = __p; } while (0)
 
 
 #endif
