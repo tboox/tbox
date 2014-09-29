@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        isnan.c
+ * @file        isfinf.c
  * @ingroup     libm
  *
  */
@@ -30,16 +30,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_isnan(tb_double_t x)
+tb_long_t tb_isfinf(tb_float_t x)
 {
-#if 0
-    tb_ieee_double_t e; e.d = x;
-    tb_int32_t      t = e.i.h & 0x7fffffff;
-    t |= (tb_uint32_t)(e.i.l | (tb_uint32_t)(-(tb_int32_t)e.i.l)) >> 31;
-    t = 0x7ff00000 - t;
-    return (tb_long_t)(((tb_uint32_t)t) >> 31);
-#else
-    // optimization
-    return x != x;
-#endif
+    /* 0 * finite => 0
+     * 0 * infinity => NaN
+     * 0 * NaN => NaN
+     */
+    tb_float_t p = x * 0;
+
+    // p will either be NaN or 0 now, so we can return (prod == prod) or (0 == prod).
+    return p == p;
 }

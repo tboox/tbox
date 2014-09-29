@@ -198,8 +198,10 @@ tbox_C_FILES 			+= \
 
 # float
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
-						libm/isin \
 						libm/isinf \
+						libm/isinff \
+						libm/isfin \
+						libm/isfinf \
 						libm/isnan \
 						libm/isnanf \
 						libm/sqrt \
