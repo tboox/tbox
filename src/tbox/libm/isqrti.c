@@ -26,12 +26,13 @@
  * includes
  */
 #include "math.h"
+#include "../utils/utils.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_uint32_t tb_isqrti_impl(tb_uint64_t x)
+static tb_uint32_t tb_isqrti_impl(tb_uint32_t x)
 {
 #if 0
     // lookup + newton 
