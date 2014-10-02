@@ -194,7 +194,8 @@ tbox_C_FILES 			+= \
 						libm/libm \
 						libm/idivi8 \
 						libm/ilog2i \
-						libm/isqrti 
+						libm/isqrti \
+						libm/isqrti64
 
 # float
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
