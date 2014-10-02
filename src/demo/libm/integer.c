@@ -8,7 +8,6 @@
  */
 static tb_void_t tb_integer_test_isqrti(tb_size_t x)
 {
-    tb_used(tb_isqrti64);
     __tb_volatile__ tb_long_t   n = 10000000;
     __tb_volatile__ tb_uint32_t r = 0;
     tb_hong_t t = tb_mclock();
@@ -29,7 +28,7 @@ static tb_void_t tb_integer_test_isqrti64(tb_uint64_t x)
         r = tb_isqrti64(x);
     }
     t = tb_mclock() - t;
-    tb_printf("[integer]: isqrti(%llu): %u, %lld ms\n", x, r, t);
+    tb_printf("[integer]: isqrti64(%llu): %u, %lld ms\n", x, r, t);
 }
 static tb_void_t tb_integer_test_ilog2i(tb_size_t x)
 {
