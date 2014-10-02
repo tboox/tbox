@@ -26,6 +26,7 @@
  * includes
  */
 #include "math.h"
+#include "../utils/utils.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +53,12 @@ static tb_uint32_t tb_isqrti64_impl(tb_uint64_t x)
             } 
         } 
         while (b >>= 1); 
-        return n;
+
+        // check
+        tb_assert_abort(!(n >> 32));
+
+        // ok
+        return (tb_uint32_t)n;
     }
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
