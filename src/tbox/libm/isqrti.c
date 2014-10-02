@@ -26,11 +26,12 @@
  * includes
  */
 #include "math.h"
+#include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
-tb_uint32_t tb_isqrti(tb_uint32_t x)
+static tb_uint32_t tb_isqrti_impl(tb_uint64_t x)
 {
 #if 0
     // lookup + newton 
@@ -58,7 +59,7 @@ tb_uint32_t tb_isqrti(tb_uint32_t x)
     }; 
 
     tb_uint32_t xn; 
-    if (x >= 0x7FFEA810) return 0xB504; 
+    if (x >= 0x7ffea810) return 0xb504; 
     if (x >= 0x10000) 
     { 
         if (x >= 0x1000000)
@@ -116,7 +117,7 @@ tb_uint32_t tb_isqrti(tb_uint32_t x)
         } 
         else 
         { 
-            if (x >= 0) return (table[x] >> 4);
+            return (table[x] >> 4);
         } 
     } 
     return ((tb_uint32_t)-1);
@@ -181,5 +182,61 @@ tb_uint32_t tb_isqrti(tb_uint32_t x)
         }
     }
     return n;
+#endif
+}
+#ifdef TB_CONFIG_TYPE_FLOAT
+static __tb_inline__ tb_uint32_t tb_isqrti_impl_using_sqrt(tb_uint32_t x)
+{
+    return (tb_uint32_t)tb_sqrtf((tb_float_t)x);
+}
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_uint32_t tb_isqrti(tb_uint32_t x)
+{
+#ifdef TB_CONFIG_TYPE_FLOAT
+
+    // using the sqrt function?
+    static tb_long_t s_using_sqrt = -1;
+
+    // analyze the profile
+    if (s_using_sqrt < 0)
+    {
+        // analyze isqrti
+        tb_hong_t                   t1 = tb_uclock();
+        __tb_volatile__ tb_size_t   n1 = 200;
+        __tb_volatile__ tb_uint32_t v1; tb_used(&v1);
+        while (n1--) 
+        {
+            v1 = tb_isqrti_impl((1 << 4) + 3);
+            v1 = tb_isqrti_impl((1 << 12) + 3);
+            v1 = tb_isqrti_impl((1 << 20) + 3);
+            v1 = tb_isqrti_impl((1 << 28) + 3);
+        }
+        t1 = tb_uclock() - t1;
+
+        // analyze sqrt
+        tb_hong_t                   t2 = tb_uclock();
+        __tb_volatile__ tb_size_t   n2 = 200;
+        __tb_volatile__ tb_uint32_t v2; tb_used(&v2);
+        while (n2--) 
+        {
+            v2 = tb_isqrti_impl_using_sqrt((1 << 4) + 3);
+            v2 = tb_isqrti_impl_using_sqrt((1 << 12) + 3);
+            v2 = tb_isqrti_impl_using_sqrt((1 << 20) + 3);
+            v2 = tb_isqrti_impl_using_sqrt((1 << 28) + 3);
+        }
+        t2 = tb_uclock() - t2;
+
+        // using sqrt?
+        s_using_sqrt = t2 < t1? 1 : 0;
+    }
+    
+    // done
+    return s_using_sqrt > 0? tb_isqrti_impl_using_sqrt(x) : tb_isqrti_impl(x);
+#else
+    return tb_isqrti_impl(x);
 #endif
 }
