@@ -125,6 +125,7 @@ tb_uint32_t     tb_ilog2i(tb_uint32_t x);
 
 // isqrti
 tb_uint32_t     tb_isqrti(tb_uint32_t x);
+tb_uint32_t     tb_isqrti64(tb_uint64_t x);
 
 // idivi8
 tb_uint32_t     tb_idivi8(tb_uint32_t x, tb_uint8_t y);
