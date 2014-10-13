@@ -42,10 +42,10 @@ __tb_extern_c_enter__
 // constant
 #define TB_FIXED6_ONE                   (64)
 #define TB_FIXED6_HALF                  (32)
-#define TB_FIXED6_MAX                   (TB_MAXS16)
-#define TB_FIXED6_MIN                   (-TB_FIXED6_MAX)
-#define TB_FIXED6_NAN                   ((tb_int_t)0x8000)
-#define TB_FIXED6_INF                   (TB_MAXS16)
+#define TB_FIXED6_MAX                   (TB_MAXS32)
+#define TB_FIXED6_MIN                   (TB_MINS32)
+#define TB_FIXED6_NAN                   ((tb_int_t)0x80000000)
+#define TB_FIXED6_INF                   (TB_MAXS32)
 #define TB_FIXED6_PI                    (0xc9)
 #define TB_FIXED6_SQRT2                 (0x5a)
 
@@ -97,13 +97,13 @@ __tb_extern_c_enter__
 static __tb_inline__ tb_fixed6_t tb_long_to_fixed6_check(tb_long_t x)
 {
     // check overflow
-    tb_assert(x >= -1024 && x <= 1024);
+    tb_assert(x >= (TB_MINS32 >> 10) && x <= (TB_MAXS32 >> 10));
     return (x << 6);
 }
 static __tb_inline__ tb_long_t tb_fixed6_to_int_check(tb_fixed6_t x)
 {
-    // no overflow, < int16 ?
-    tb_assert(x == (tb_int16_t)x);
+    // check overflow
+    tb_assert_abort(x >= TB_FIXED6_MIN && x <= TB_FIXED6_MAX);
     return (x >> 6);
 }
 #endif
@@ -111,7 +111,9 @@ static __tb_inline__ tb_long_t tb_fixed6_to_int_check(tb_fixed6_t x)
 // @note the return value is the fixed16 type
 static __tb_inline__ tb_fixed16_t tb_fixed6_div_inline(tb_fixed6_t x, tb_fixed6_t y)
 {
-    tb_assert(y != 0);
+    // check
+    tb_assert_abort(y != 0);
+
     // no overflow, < int16 ?
     if (x == (tb_int16_t)x) return (x << 16) / y;
     else return tb_fixed16_div(x, y);
