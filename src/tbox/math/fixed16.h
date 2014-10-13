@@ -52,12 +52,12 @@ __tb_extern_c_enter__
 #define TB_FIXED16_ONE                      (1 << 16)
 #define TB_FIXED16_HALF                     (1 << 15)
 #define TB_FIXED16_MAX                      (TB_MAXS32)
-#define TB_FIXED16_MIN                      (-TB_FIXED16_MAX)
+#define TB_FIXED16_MIN                      (TB_MINS32)
 #define TB_FIXED16_NAN                      ((tb_int_t)0x80000000)
 #define TB_FIXED16_INF                      (TB_MAXS32)
 #define TB_FIXED16_PI                       (0x3243f)
 #define TB_FIXED16_SQRT2                    (92682)
-#define TB_FIXED16_NEAR0                    (TB_FIXED16_ONE / (1 << 12))
+#define TB_FIXED16_NEAR0                    (1 << 4)
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT
@@ -308,7 +308,7 @@ static __tb_inline__ tb_fixed16_t tb_long_to_fixed16_check(tb_long_t x)
 static __tb_inline__ tb_long_t tb_fixed16_to_long_check(tb_fixed16_t x)
 {
     // check overflow
-    tb_assert_abort(x != TB_FIXED16_NAN);
+    tb_assert_abort(x >= TB_FIXED16_MIN && x <= TB_FIXED16_MAX);
     return (x >> 16);
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed16_t y)
