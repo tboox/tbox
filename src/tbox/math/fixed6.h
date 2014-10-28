@@ -48,6 +48,7 @@ __tb_extern_c_enter__
 #define TB_FIXED6_INF                   (TB_MAXS32)
 #define TB_FIXED6_PI                    (0xc9)
 #define TB_FIXED6_SQRT2                 (0x5a)
+#define TB_FIXED6_NEAR0                 (0)
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT
@@ -84,7 +85,10 @@ __tb_extern_c_enter__
 // operations
 #define tb_fixed6_abs(x)            tb_abs(x)
 #define tb_fixed6_avg(x, y)         (((x) + (y)) >> 1)
-
+ 
+// nearly equal?
+#define tb_fixed6_near_eq(x, y)     (tb_fixed6_abs((x) - (y)) <= TB_FIXED6_NEAR0)
+   
 #ifndef tb_fixed6_div
 #   define tb_fixed6_div(x, y)      tb_fixed6_div_inline(x, y)
 #endif

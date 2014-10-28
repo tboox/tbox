@@ -91,7 +91,10 @@ __tb_extern_c_enter__
 
 // avg
 #define tb_fixed16_avg(x, y)                (((x) + (y)) >> 1)
-    
+   
+// nearly equal?
+#define tb_fixed16_near_eq(x, y)            (tb_fixed16_abs((x) - (y)) <= TB_FIXED16_NEAR0)
+   
 // mul
 #ifndef tb_fixed16_mul
 #   if 1
