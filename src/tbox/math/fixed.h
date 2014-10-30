@@ -65,6 +65,9 @@
 #define tb_fixed_ceil(x)            tb_fixed16_ceil(x)
 #define tb_fixed_floor(x)           tb_fixed16_floor(x)
 
+// nearly equal?
+#define tb_fixed_near_eq(x, y)      tb_fixed16_near_eq(x, y)
+
 // operations
 #define tb_fixed_abs(x)             tb_fixed16_abs(x)
 #define tb_fixed_avg(x, y)          tb_fixed16_avg(x, y)

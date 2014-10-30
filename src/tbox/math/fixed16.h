@@ -97,23 +97,19 @@ __tb_extern_c_enter__
    
 // mul
 #ifndef tb_fixed16_mul
-#   if 1
-#       define tb_fixed16_mul(x, y)         tb_fixed16_mul_int64(x, y)
-#   elif defined(TB_CONFIG_TYPE_FLOAT)
-#       define tb_fixed16_mul(x, y)         tb_fixed16_mul_float(x, y)
+#   ifdef __tb_debug__
+#       define tb_fixed16_mul(x, y)         tb_fixed16_mul_check(x, y)
 #   else
-#       define tb_fixed16_mul(x, y)         tb_fixed16_mul_int32(x, y)
+#       define tb_fixed16_mul(x, y)         ((tb_fixed16_t)(((tb_hong_t)(x) * (y)) >> 16))
 #   endif
 #endif
 
 // div
 #ifndef tb_fixed16_div
-#   if 1
-#       define tb_fixed16_div(x, y)         tb_fixed16_div_int64(x, y)
-#   elif defined(TB_CONFIG_TYPE_FLOAT)
-#       define tb_fixed16_div(x, y)         tb_fixed16_div_float(x, y)
+#   ifdef __tb_debug__
+#       define tb_fixed16_div(x, y)         tb_fixed16_div_check(x, y)
 #   else
-#       define tb_fixed16_div(x, y)         tb_int32_div(x, y, 16)
+#       define tb_fixed16_div(x, y)         ((tb_fixed16_t)((((tb_hong_t)(x)) << 16) / (y)))
 #   endif
 #endif
     
@@ -128,7 +124,11 @@ __tb_extern_c_enter__
 
 // idiv
 #ifndef tb_fixed16_idiv
-#   define tb_fixed16_idiv(x, y)            ((tb_fixed16_t)((x) / (y)))
+#   ifdef __tb_debug__
+#       define tb_fixed16_idiv(x, y)        tb_fixed16_idiv_check(x, y)
+#   else
+#       define tb_fixed16_idiv(x, y)        ((tb_fixed16_t)((x) / (y)))
+#   endif
 #endif
 
 // imuldiv
@@ -161,23 +161,15 @@ __tb_extern_c_enter__
 
 // invert: 1 / x
 #ifndef tb_fixed16_invert
-#   if 1
-#       define tb_fixed16_invert(x)         tb_fixed16_div(TB_FIXED16_ONE, x)
-#   elif defined(TB_CONFIG_TYPE_FLOAT)
-#       define tb_fixed16_invert(x)         tb_fixed16_div(TB_FIXED16_ONE, x)
-#   else
-#       define tb_fixed16_invert(x)         tb_fixed16_invert_int32(x)
-#   endif
+#   define tb_fixed16_invert(x)             tb_fixed16_div(TB_FIXED16_ONE, x)
 #endif
 
 // sqre
 #ifndef tb_fixed16_sqre
-#   if 1
-#       define tb_fixed16_sqre(x)           tb_fixed16_sqre_int64(x)
-#   elif defined(TB_CONFIG_TYPE_FLOAT)
-#       define tb_fixed16_sqre(x)           tb_fixed16_sqre_float(x)
+#   ifdef __tb_debug__
+#       define tb_fixed16_sqre(x)           tb_fixed16_sqre_check(x)
 #   else
-#       define tb_fixed16_sqre(x)           tb_fixed16_sqre_int32(x)
+#       define tb_fixed16_sqre(x)           ((tb_fixed16_t)(((tb_hong_t)(x) * (x)) >> 16))
 #   endif
 #endif
 
@@ -292,11 +284,53 @@ __tb_extern_c_enter__
  * interfaces
  */
 
+/*! compute the invert of the fixed-point value
+ *
+ * @param x     the fixed-point x-value
+ *
+ * @return      the result
+ */
 tb_fixed16_t    tb_fixed16_invert_int32(tb_fixed16_t x);
+
+/*! compute the sin and cos value of the fixed-point value
+ *
+ * @param x     the fixed-point x-value
+ * @param s     the sin fixed-point value
+ * @param c     the cos fixed-point value
+ */
 tb_void_t       tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c);
+
+/*! compute the atan2 value of the fixed-point value
+ *
+ * @param y     the fixed-point y-value
+ * @param x     the fixed-point x-value
+ *
+ * @return      the result
+ */
 tb_fixed16_t    tb_fixed16_atan2_int32(tb_fixed16_t y, tb_fixed16_t x);
+
+/*! compute the asin value of the fixed-point value
+ *
+ * @param x     the fixed-point x-value
+ *
+ * @return      the result
+ */
 tb_fixed16_t    tb_fixed16_asin_int32(tb_fixed16_t x);
+
+/*! compute the atan value of the fixed-point value
+ *
+ * @param x     the fixed-point x-value
+ *
+ * @return      the result
+ */
 tb_fixed16_t    tb_fixed16_atan_int32(tb_fixed16_t x);
+
+/*! compute the exp value of the fixed-point value
+ *
+ * @param x     the fixed-point x-value
+ *
+ * @return      the result
+ */
 tb_fixed16_t    tb_fixed16_exp_int32(tb_fixed16_t x);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -305,27 +339,54 @@ tb_fixed16_t    tb_fixed16_exp_int32(tb_fixed16_t x);
 static __tb_inline__ tb_fixed16_t tb_long_to_fixed16_check(tb_long_t x)
 {
     // check overflow
-    tb_assert_abort(x >= TB_MINS16 && x <= TB_MAXS16);
+    tb_assert_abort(x == (tb_int16_t)x);
+
+    // ok
     return (x << 16);
 }
 static __tb_inline__ tb_long_t tb_fixed16_to_long_check(tb_fixed16_t x)
 {
     // check overflow
     tb_assert_abort(x >= TB_FIXED16_MIN && x <= TB_FIXED16_MAX);
+
+    // ok
     return (x >> 16);
 }
-static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed16_t y)
+static __tb_inline__ tb_fixed16_t tb_fixed16_mul_check(tb_fixed16_t x, tb_fixed16_t y)
 {
-    return (tb_fixed16_t)(((tb_hong_t)x * y) >> 16);
+    // done
+    tb_hong_t v = (((tb_hong_t)x * y) >> 16);
+
+    // check overflow
+    tb_assert_abort(v == (tb_int32_t)v);
+
+    // ok
+    return (tb_fixed16_t)v;
 }
-static __tb_inline__ tb_fixed16_t tb_fixed16_div_int64(tb_fixed16_t x, tb_fixed16_t y)
+static __tb_inline__ tb_fixed16_t tb_fixed16_div_check(tb_fixed16_t x, tb_fixed16_t y)
 {
-    tb_assert(y);
-    return (tb_fixed16_t)((((tb_hong_t)x) << 16) / y);
+    // check
+    tb_assert_abort(y);
+
+    // done
+    tb_hong_t v = ((((tb_hong_t)x) << 16) / y);
+
+    // check overflow
+    tb_assert_abort(v == (tb_int32_t)v);
+
+    // ok
+    return (tb_fixed16_t)v;
 }
-static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int64(tb_fixed16_t x)
+static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_check(tb_fixed16_t x)
 {
-    return (tb_fixed16_t)(((tb_hong_t)x * x) >> 16);
+    // done
+    tb_hong_t v = (((tb_hong_t)x * x) >> 16);
+
+    // check overflow
+    tb_assert_abort(v == (tb_int32_t)v);
+
+    // ok
+    return (tb_fixed16_t)v;
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_imul_check(tb_fixed16_t x, tb_long_t y)
 {
@@ -333,10 +394,18 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_imul_check(tb_fixed16_t x, tb_long_
     tb_hong_t v = ((tb_hong_t)x * y);
 
     // check overflow
-    tb_assert_abort(v >= TB_MINS32 && v <= TB_MAXS32);
+    tb_assert_abort(v == (tb_int32_t)v);
 
     // ok
     return (tb_fixed16_t)v;
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_idiv_check(tb_fixed16_t x, tb_long_t y)
+{
+    // check
+    tb_assert_abort(y);
+
+    // ok
+    return x / y;
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_imuldiv_check(tb_fixed16_t x, tb_long_t y, tb_long_t z)
 {
@@ -344,7 +413,7 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_imuldiv_check(tb_fixed16_t x, tb_lo
     tb_hong_t v = ((tb_hong_t)x * y) / z;
 
     // check overflow
-    tb_assert_abort(v >= TB_MINS32 && v <= TB_MAXS32);
+    tb_assert_abort(v == (tb_int32_t)v);
 
     // ok
     return (tb_fixed16_t)v;
@@ -355,28 +424,12 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_imulsub_check(tb_fixed16_t x, tb_lo
     tb_hong_t v = ((tb_hong_t)x * y) - z;
 
     // check overflow
-    tb_assert_abort(v >= TB_MINS32 && v <= TB_MAXS32);
+    tb_assert_abort(v == (tb_int32_t)v);
 
     // ok
     return (tb_fixed16_t)v;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-static __tb_inline__ tb_fixed16_t tb_fixed16_mul_float(tb_fixed16_t x, tb_fixed16_t y)
-{
-    tb_float_t f = tb_fixed16_to_float(x) * tb_fixed16_to_float(y);
-    return tb_float_to_fixed16(f);
-}
-static __tb_inline__ tb_fixed16_t tb_fixed16_div_float(tb_fixed16_t x, tb_fixed16_t y)
-{
-    tb_assert(y);
-    return tb_float_to_fixed16((tb_float_t)x / y);
-}
-static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_float(tb_fixed16_t x)
-{
-    tb_float_t f = tb_fixed16_to_float(x);
-    f *= f;
-    return tb_float_to_fixed16(f);
-}
 static __tb_inline__ tb_fixed16_t tb_fixed16_sin_float(tb_fixed16_t x)
 {
     return tb_float_to_fixed16(tb_sinf(tb_fixed16_to_float(x)));
@@ -425,32 +478,6 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_expi_float(tb_long_t x)
     return tb_float_to_fixed16(tb_expif(x));
 }
 #endif
-
-static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int32(tb_fixed16_t x, tb_fixed16_t y)
-{
-    // get sign
-    tb_int32_t s = tb_int32_get_sign(x ^ y);
-    x = tb_fixed16_abs(x);
-    y = tb_fixed16_abs(y);
-
-    tb_uint32_t xh = x >> 16;
-    tb_uint32_t xl = x & 0xffff;
-    tb_uint32_t yh = y >> 16;
-    tb_uint32_t yl = y & 0xffff;
-
-    tb_uint32_t r = xh * y + xl * yh + (xl * yl >> 16);
-    return tb_int32_set_sign(r, s);
-}
-
-static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int32(tb_fixed16_t x)
-{
-    x = tb_fixed16_abs(x);
-
-    tb_uint32_t xh = x >> 16;
-    tb_uint32_t xl = x & 0xffff;
-
-    return (xh * x + xl * xh + (xl * xl >> 16));
-}
 static __tb_inline__ tb_fixed16_t tb_fixed16_sqrt_int32(tb_fixed16_t x)
 {
     tb_assert(x > 0);
