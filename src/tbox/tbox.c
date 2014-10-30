@@ -117,7 +117,7 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
     }
     else
     {
-        tb_trace_w("version: %s != %s", TB_VERSION_STRING, TB_VERSION_BUILD_STRING);
+        tb_trace_w("version: %s != %llu", TB_VERSION_STRING, build);
     }
 
     // no
