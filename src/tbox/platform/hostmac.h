@@ -17,47 +17,17 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.h
- * @defgroup    platform
+ * @file        hostmac.h
+ * @ingroup     platform
  *
  */
-#ifndef TB_PLATFORM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_HOSTMAC_H
+#define TB_PLATFORM_HOSTMAC_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "page.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "mutex.h"
-#include "event.h"
-#include "timer.h"
-#include "print.h"
-#include "screen.h"
-#include "ltimer.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "memory.h"
-#include "hostmac.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "hostname.h"
-#include "processor.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-#include "cache_time.h"
-#include "thread_pool.h"
-#include "thread_store.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -68,22 +38,19 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init the platform
+/*! get the host mac address for the given network interface name
  *
- * @param priv      the platform private data
- *                  pass JNIEnv* env for android
- *                  pass tb_null for other platform
+ * @param interface_name    the network interface name, using the first ethernet address if be null
+ * @param mac_address       the raw mac address
  *
- * @return          tb_true or tb_false
+ * @return                  tb_true or tb_false
  */
-tb_bool_t           tb_platform_init(tb_handle_t priv);
-
-/// exit the platform 
-tb_void_t           tb_platform_exit(tb_noarg_t);
+tb_bool_t                   tb_hostmac(tb_char_t const* interface_name, tb_byte_t mac_address[6]);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_leave__
+
 
 #endif

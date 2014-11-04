@@ -253,6 +253,7 @@ tbox_C_FILES 			+= \
 						platform/process \
 						platform/dynamic \
 						platform/atomic64 \
+						platform/hostmac \
 						platform/platform \
 						platform/hostname \
 						platform/processor \
@@ -542,6 +543,7 @@ INC_FILES 				= \
 						platform/barrier.h \
 						platform/dynamic.h \
 						platform/process.h \
+						platform/hostmac.h \
 						platform/hostname.h \
 						platform/spinlock.h \
 						platform/atomic64.h \

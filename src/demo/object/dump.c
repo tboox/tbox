@@ -10,8 +10,6 @@ tb_int_t tb_demo_object_dump_main(tb_int_t argc, tb_char_t** argv)
 {
     // read
     tb_object_ref_t root = tb_object_read_from_url(argv[1]);
-
-    // writ
     if (root)
     {
         // seek?
