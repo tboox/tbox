@@ -17,51 +17,32 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        iphlpapi.c
- *
+ * @file        hostmac.c
+ * @ingroup     platform
  */
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME                "hostmac"
+#define TB_TRACE_MODULE_DEBUG               (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "iphlpapi.h"
-#include "../../../utils/utils.h"
-
+#include "hostmac.h"
+ 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_iphlpapi_instance_init(tb_handle_t instance)
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include "windows/hostmac.c"
+#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#   include "posix/hostmac.c"
+#else
+tb_bool_t tb_hostmac(tb_char_t const* interface_name, tb_byte_t mac_address[6])
 {
-    // check
-    tb_iphlpapi_ref_t iphlpapi = (tb_iphlpapi_ref_t)instance;
-    tb_assert_and_check_return_val(iphlpapi, tb_false);
-
-    // the iphlpapi module
-    HANDLE module = GetModuleHandleA("iphlpapi.dll");
-    if (!module) module = tb_dynamic_init("iphlpapi.dll");
-    tb_check_return_val(module, tb_false);
-
-    // init interfaces
-    TB_INTERFACE_LOAD(iphlpapi, GetNetworkParams);
-    TB_INTERFACE_LOAD(iphlpapi, GetAdaptersInfo);
-
-    // ok
-    return tb_true;
+    tb_trace_noimpl();
+    return tb_false;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_iphlpapi_ref_t tb_iphlpapi()
-{
-    // init
-    static tb_atomic_t      s_binited = 0;
-    static tb_iphlpapi_t    s_iphlpapi = {0};
-
-    // init the static instance
-    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_iphlpapi, tb_iphlpapi_instance_init);
-    tb_assert(ok); tb_used(ok);
-
-    // ok
-    return &s_iphlpapi;
-}
+#endif

@@ -40,11 +40,17 @@ __tb_extern_c_enter__
 // the GetNetworkParams func type
 typedef DWORD (WINAPI* tb_iphlpapi_GetNetworkParams_t)(PFIXED_INFO pFixedInfo, PULONG pOutBufLen);
 
+// the GetAdaptersInfo func type
+typedef DWORD (WINAPI* tb_iphlpapi_GetAdaptersInfo_t)(PIP_ADAPTER_INFO pAdapterInfo, PULONG pOutBufLen);
+
 // the iphlpapi interfaces type
 typedef struct __tb_iphlpapi_t
 {
     // GetNetworkParams
     tb_iphlpapi_GetNetworkParams_t          GetNetworkParams;
+
+    // GetAdaptersInfo
+    tb_iphlpapi_GetAdaptersInfo_t           GetAdaptersInfo;
 
 }tb_iphlpapi_t, *tb_iphlpapi_ref_t;
 
