@@ -594,7 +594,7 @@ static tb_bool_t tb_demo_httpd_session_head_recv(tb_aice_ref_t aice)
         tb_long_t           ok = 0;
         tb_char_t           ch = '\0';
         tb_char_t const*    p = (tb_char_t const*)aice->u.recv.data;
-        tb_char_t const*    e = p + aice->u.recv.size;
+        tb_char_t const*    e = p + aice->u.recv.real;
         while (p < e)
         {
             // the char

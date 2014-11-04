@@ -78,6 +78,10 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
     case TB_STATE_SOCK_SSL_NOT_SUPPORTED:       return "sock: ssl: not supported";
     case TB_STATE_SOCK_SSL_UNKNOWN_ERROR:       return "sock: ssl: unknown error";
 
+    case TB_STATE_HTTP_RESPONSE_100:            return "http: response: 100";
+    case TB_STATE_HTTP_RESPONSE_101:            return "http: response: 101";
+    case TB_STATE_HTTP_RESPONSE_102:            return "http: response: 102";
+    case TB_STATE_HTTP_RESPONSE_200:            return "http: response: 200";
     case TB_STATE_HTTP_RESPONSE_204:            return "http: response: 204";
     case TB_STATE_HTTP_RESPONSE_300:            return "http: response: 300";
     case TB_STATE_HTTP_RESPONSE_301:            return "http: response: 301";

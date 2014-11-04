@@ -391,8 +391,8 @@ tb_long_t tb_object_writ_to_url(tb_object_ref_t object, tb_char_t const* url, tb
     tb_assert_and_check_return_val(object && url, -1);
 
     // make stream
-    tb_long_t       writ = -1;
-    tb_stream_ref_t  stream = tb_stream_init_from_url(url);
+    tb_long_t           writ = -1;
+    tb_stream_ref_t     stream = tb_stream_init_from_url(url);
     if (stream)
     {
         // ctrl stream
@@ -415,8 +415,8 @@ tb_long_t tb_object_writ_to_data(tb_object_ref_t object, tb_byte_t* data, tb_siz
     tb_assert_and_check_return_val(object && data && size, -1);
 
     // make stream
-    tb_long_t       writ = -1;
-    tb_stream_ref_t  stream = tb_stream_init_from_data(data, size);
+    tb_long_t           writ = -1;
+    tb_stream_ref_t     stream = tb_stream_init_from_data(data, size);
     if (stream)
     {
         // open and writ stream
