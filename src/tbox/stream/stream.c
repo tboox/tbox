@@ -665,12 +665,6 @@ tb_bool_t tb_stream_need(tb_stream_ref_t stream, tb_byte_t** data, tb_size_t siz
     // stoped?
     tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&impl->istate), tb_false);
 
-    // no cache? enable it first
-    if (!tb_queue_buffer_maxn(&impl->cache)) tb_queue_buffer_resize(&impl->cache, size);
-
-    // check
-    tb_assert_and_check_return_val(tb_queue_buffer_maxn(&impl->cache) && size <= tb_queue_buffer_maxn(&impl->cache), tb_false);
-
     // have writed cache? sync first
     if (impl->bwrited && !tb_queue_buffer_null(&impl->cache) && !tb_stream_sync(stream, tb_false)) return tb_false;
 
@@ -679,6 +673,12 @@ tb_bool_t tb_stream_need(tb_stream_ref_t stream, tb_byte_t** data, tb_size_t siz
 
     // check the cache mode, must be read cache
     tb_assert_and_check_return_val(!impl->bwrited, tb_false);
+
+    // not enough? grow the cache first
+    if (tb_queue_buffer_maxn(&impl->cache) < size) tb_queue_buffer_resize(&impl->cache, size);
+
+    // check
+    tb_assert_and_check_return_val(tb_queue_buffer_maxn(&impl->cache) && size <= tb_queue_buffer_maxn(&impl->cache), tb_false);
 
     // enough?
     if (size <= tb_queue_buffer_size(&impl->cache)) 
