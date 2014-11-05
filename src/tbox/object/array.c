@@ -148,8 +148,8 @@ static tb_object_array_t* tb_object_array_init_base()
 tb_object_ref_t tb_object_array_init(tb_size_t grow, tb_bool_t incr)
 {
     // done
-    tb_bool_t   ok = tb_false;
-    tb_object_array_t* array = tb_null;
+    tb_bool_t           ok = tb_false;
+    tb_object_array_t*  array = tb_null;
     do
     {
         // make array
