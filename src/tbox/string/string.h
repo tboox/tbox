@@ -40,7 +40,7 @@ __tb_extern_c_enter__
  */
 
 /// the string type
-typedef tb_buffer_t  tb_string_t;
+typedef tb_buffer_t     tb_string_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

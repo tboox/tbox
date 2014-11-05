@@ -46,9 +46,9 @@ __tb_extern_c_enter__
  */
 tb_object_ref_t     tb_object_string_init_from_cstr(tb_char_t const* cstr);
 
-/*! init string from pstring
+/*! init string from string
  *
- * @param str       the pstring
+ * @param str       the string
  *
  * @return          the string object
  */

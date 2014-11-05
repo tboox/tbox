@@ -137,7 +137,10 @@ tb_object_ref_t tb_object_copy(tb_object_ref_t object)
 }
 tb_size_t tb_object_type(tb_object_ref_t object)
 {
+    // check
     tb_assert_and_check_return_val(object, TB_OBJECT_TYPE_NONE);
+
+    // the object type
     return object->type;
 }
 tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
@@ -146,9 +149,9 @@ tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
     tb_assert_and_check_return_val(object, tb_null);
 
     // done
-    tb_object_ref_t    odata = tb_null;
-    tb_size_t       maxn = 4096;
-    tb_byte_t*      data = tb_null;
+    tb_object_ref_t     odata = tb_null;
+    tb_size_t           maxn = 4096;
+    tb_byte_t*          data = tb_null;
     do
     {
         // make data

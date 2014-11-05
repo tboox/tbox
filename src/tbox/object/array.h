@@ -66,8 +66,8 @@ tb_object_ref_t     tb_object_array_item(tb_object_ref_t array, tb_size_t index)
 
 /*! set the array incr
  *
- * @param array the array object
- * @param incr          is increase refn?
+ * @param array     the array object
+ * @param incr      is increase refn?
  */
 tb_void_t           tb_object_array_incr(tb_object_ref_t array, tb_bool_t incr);
 
