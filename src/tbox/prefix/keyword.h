@@ -146,10 +146,9 @@
 #endif
 
 // no_sanitize_address
-#if defined(__has_feature)
-#   if __has_feature(address_sanitizer) && (defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_CLANG))
-#       define __tb_no_sanitize_address__       __attribute__((no_sanitize_address))
-#   endif
+#if (defined(__has_feature) && __has_feature(address_sanitizer)) \
+    || defined(__SANITIZE_ADDRESS__)
+#   define __tb_no_sanitize_address__           __attribute__((no_sanitize_address))
 #endif
 #ifndef __tb_no_sanitize_address__
 #   define __tb_no_sanitize_address__
