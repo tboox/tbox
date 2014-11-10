@@ -74,7 +74,7 @@ static tb_bool_t tb_aiop_rtor_epoll_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl
 #ifdef EPOLLONESHOT 
     if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 #endif
-    e.data.u64 = (tb_hize_t)aioo;
+    e.data.u64 = tb_p2u64(aioo);
 
     // add aioo
     if (epoll_ctl(impl->epfd, EPOLL_CTL_ADD, tb_sock2fd(aioo->sock), &e) < 0)
@@ -129,7 +129,7 @@ static tb_bool_t tb_aiop_rtor_epoll_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_
 #ifdef EPOLLONESHOT 
     if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 #endif
-    e.data.u64 = (tb_hize_t)aioo;
+    e.data.u64 = tb_p2u64(aioo);
 
     // save aioo
     tb_aioo_impl_t prev = *aioo;
@@ -211,7 +211,7 @@ static tb_long_t tb_aiop_rtor_epoll_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_
     for (i = 0; i < evtn; i++)
     {
         // the aioo
-        tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)impl->evts[i].data.u64;
+        tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)tb_u2p(impl->evts[i].data.u64);
         tb_assert_and_check_return_val(aioo, -1);
 
         // the sock 
