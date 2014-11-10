@@ -93,6 +93,12 @@ typedef tb_pointer_t                tb_handle_t;
 #   else
     typedef tb_uint16_t             tb_wchar_t;
 #   endif
+#elif defined(__WCHAR_TYPE__)
+typedef __WCHAR_TYPE__              tb_wchar_t;
+#elif defined(__WCHAR_WIDTH__) && (__WCHAR_WIDTH__ == 2)
+typedef tb_int16_t                  tb_wchar_t;
+#elif defined(__WCHAR_WIDTH__) && (__WCHAR_WIDTH__ == 4)
+typedef tb_int16_t                  tb_wchar_t;
 #else
 typedef tb_int32_t                  tb_wchar_t;
 #endif
