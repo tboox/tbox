@@ -97,6 +97,9 @@
 /// pointer to u32
 #define tb_p2u32(x)                     ((tb_uint32_t)(tb_size_t)(x))
 
+/// pointer to u64
+#define tb_p2u64(x)                     ((tb_uint64_t)(tb_size_t)(x))
+
 /// pointer to s8
 #define tb_p2s8(x)                      ((tb_sint8_t)(tb_long_t)(x))
 
@@ -105,6 +108,9 @@
 
 /// pointer to s32
 #define tb_p2s32(x)                     ((tb_sint32_t)(tb_long_t)(x))
+
+/// pointer to s64
+#define tb_p2s64(x)                     ((tb_sint64_t)(tb_long_t)(x))
 
 /// bool to pointer
 #define tb_b2p(x)                       ((tb_pointer_t)(tb_size_t)(x))
