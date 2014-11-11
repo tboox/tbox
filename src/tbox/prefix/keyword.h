@@ -56,12 +56,24 @@
 #   define __tb_asm__                           __asm__
 #   define __tb_inline__                        __inline__
 #   define __tb_inline_force__                  __inline__ __attribute__((always_inline))
-#   define __tb_cdecl__                         __attribute__((__cdecl__))
-#   define __tb_stdcall__                       __attribute__((__stdcall__))
-#   define __tb_fastcall__                      __attribute__((__fastcall__))
-#   define __tb_thiscall__                      __attribute__((__thiscall__))
 #   define __tb_packed__                        __attribute__((packed, aligned(1)))
 #   define __tb_aligned__(a)                    __attribute__((aligned(a)))
+    // gcc will generate attribute ignored warning
+#   if defined(__x86_64) \
+    || defined(__amd64__) \
+    || defined(__amd64) \
+    || defined(_M_IA64) \
+    || defined(_M_X64)
+#       define __tb_cdecl__                     
+#       define __tb_stdcall__                   
+#       define __tb_fastcall__                  
+#       define __tb_thiscall__                  
+#   else
+#       define __tb_cdecl__                     __attribute__((__cdecl__))
+#       define __tb_stdcall__                   __attribute__((__stdcall__))
+#       define __tb_fastcall__                  __attribute__((__fastcall__))
+#       define __tb_thiscall__                  __attribute__((__thiscall__))
+#   endif
 #else
 
 #   define __tb_asm__               
