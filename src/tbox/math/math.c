@@ -36,7 +36,7 @@ static tb_long_t tb_math_printf_format_fixed(tb_cpointer_t object, tb_char_t* cs
     tb_assert_and_check_return_val(cstr && maxn, -1);
 
     // the fixed
-    tb_fixed_t fixed = (tb_fixed_t)object;
+    tb_fixed_t fixed = (tb_fixed_t)tb_p2s32(object);
 
     // format
 #ifdef TB_CONFIG_TYPE_FLOAT
