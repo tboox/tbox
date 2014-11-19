@@ -22,32 +22,17 @@ PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),)
 CC_ 				:= ${shell if [ -f "/usr/bin/clang" ]; then echo "clang"; elif [ -f "/usr/local/bin/clang" ]; then echo "clang"; else echo "gcc"; fi }
 CC_ 				:= $(if $(findstring y,$(PROF)),gcc,$(CC_))
 CC 					= $(PRE_)$(CC_)
-ifeq ($(CXFLAGS_CHECK),)
-CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,)
-export CXFLAGS_CHECK
-endif
 
 # ld
 LD_ 				:= ${shell if [ -f "/usr/bin/clang++" ]; then echo "clang++"; elif [ -f "/usr/local/bin/clang++" ]; then echo "clang++"; else echo "g++"; fi }
 LD_ 				:= $(if $(findstring y,$(PROF)),g++,$(LD_))
 LD 					= $(PRE_)$(LD_)
-ifeq ($(LDFLAGS_CHECK),)
-LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) 
-export LDFLAGS_CHECK
-endif
-
-# cpu bits
-BITS 				:= $(if $(findstring x64,$(ARCH)),64,)
-BITS 				:= $(if $(findstring x86,$(ARCH)),32,)
-BITS 				:= $(if $(BITS),$(BITS),$(shell getconf LONG_BIT))
 
 # tool
 AR 					= $(PRE_)ar
 STRIP 				= $(PRE_)strip
 RANLIB 				= $(PRE_)ranlib
-AS					= yasm
+AS					= $(if $(PRE_),$(CC) -c -fPIC,yasm -f elf)
 RM 					= rm -f
 RMDIR 				= rm -rf
 CP 					= cp
@@ -56,29 +41,48 @@ MKDIR 				= mkdir -p
 MAKE 				= make -r
 PWD 				= pwd
 
+# architecture flags
+AHFLAGS 			:= $(if $(AHFLAGS),$(AHFLAGS),$(if $(findstring x64,$(ARCH)),-m64,))
+AHFLAGS 			:= $(if $(AHFLAGS),$(AHFLAGS),$(if $(findstring x86,$(ARCH)),-m32,))
+
+# check flags for x64 or x86
+ifneq ($(AHFLAGS),)
+ifeq ($(CXFLAGS_CHECK),)
+CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,)
+export CXFLAGS_CHECK
+endif
+
+ifeq ($(LDFLAGS_CHECK),)
+LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) 
+export LDFLAGS_CHECK
+endif
+endif
+
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
-CXFLAGS 			= -m$(BITS) -c -Wall -Werror -Wno-error=deprecated-declarations -mssse3
+CXFLAGS 			= $(AHFLAGS) -c -Wall -Werror -Wno-error=deprecated-declarations
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
+
+# sse for x64 or x86
+ifneq ($(AHFLAGS),)
+CXFLAGS 			+= -mssse3
+endif
 
 # suppress warning for ccache + clang bug
 CXFLAGS 			+= $(if $(findstring clang,$(CC)),-Qunused-arguments,)
 
-# arch
-ifeq ($(ARCH),x86)
-CXFLAGS 			+= -I/usr/include/i386-linux-gnu 
-endif
-
-# opti
+# optimization
 ifeq ($(SMALL),y)
 CXFLAGS_RELEASE 	+= -Os
 else
 CXFLAGS_RELEASE 	+= -O3
 endif
 
-# prof
+# profile
 ifeq ($(PROF),y)
 CXFLAGS 			+= -g -pg -fno-omit-frame-pointer 
 else
@@ -100,9 +104,9 @@ CCFLAGS_DEBUG 		=
 CCFLAGS 			= -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # ldflags
-LDFLAGS_RELEASE 	= -static
+LDFLAGS_RELEASE 	= 
 LDFLAGS_DEBUG 		= -rdynamic 
-LDFLAGS 			= -m$(BITS) 
+LDFLAGS 			= $(AHFLAGS) 
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-f 			=
@@ -119,7 +123,7 @@ endif
 # asflags
 ASFLAGS_RELEASE 	= 
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= -m$(BITS) -f elf
+ASFLAGS 			= $(AHFLAGS)
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
@@ -131,7 +135,7 @@ ARFLAGS-o 			=
 
 # shflags
 SHFLAGS_RELEASE 	= -s
-SHFLAGS 			= -m$(BITS) -shared -Wl,-soname
+SHFLAGS 			= $(AHFLAGS) -shared -Wl,-soname
 
 # include sub-config
 include 			$(PLAT_DIR)/config.mak
