@@ -29,11 +29,11 @@
 #include "../../memory/impl/prefix.h"
 #ifndef TB_CONFIG_LIBC_HAVE_STRLCPY
 #   if defined(TB_ARCH_x86)
-#       include "opt/x86/strlcpy.c"
+#       include "impl/x86/strlcpy.c"
 #   elif defined(TB_ARCH_ARM)
-#       include "opt/arm/strlcpy.c"
+#       include "impl/arm/strlcpy.c"
 #   elif defined(TB_ARCH_SH4)
-#       include "opt/sh4/strlcpy.c"
+#       include "impl/sh4/strlcpy.c"
 #   endif
 #else
 #   include <string.h>

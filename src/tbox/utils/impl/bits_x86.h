@@ -17,16 +17,16 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        bits.h
+ * @file        bits_x86.h
  *
  */
-#ifndef TB_UTILS_OPT_x86_BITS_H
-#define TB_UTILS_OPT_x86_BITS_H
+#ifndef TB_UTILS_IMPL_BITS_x86_H
+#define TB_UTILS_IMPL_BITS_x86_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros

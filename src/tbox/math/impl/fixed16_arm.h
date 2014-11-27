@@ -17,29 +17,50 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        crc.h
+ * @file        fixed16_arm.h
  *
  */
-#ifndef TB_UTILS_OPT_ARM_CRC_H
-#define TB_UTILS_OPT_ARM_CRC_H
+#ifndef TB_MATH_IMPL_FIXED16_ARM_H
+#define TB_MATH_IMPL_FIXED16_ARM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
+
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifndef TB_ARCH_ARM64
-#   define tb_crc32_encode(crc, ib, in, table)  tb_crc32_encode_asm(crc, ib, in, table)
+
+#ifdef TB_ASSEMBLER_IS_GAS
+
+#if 0
+#   define tb_fixed16_mul(x, y)             tb_fixed16_mul_asm(x, y)
 #endif
+
+#endif /* TB_ASSEMBLER_IS_GAS */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_uint32_t tb_crc32_encode_asm(tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in, tb_uint32_t const* table);
 
+#if defined(TB_ASSEMBLER_IS_GAS) && !defined(TB_ARCH_ARM64)
+static __tb_inline__ tb_fixed16_t tb_fixed16_mul_asm(tb_fixed16_t x, tb_fixed16_t y)
+{
+    __tb_register__ tb_fixed16_t t;
+    __tb_asm__ __tb_volatile__
+    ( 
+        "smull  %0, %2, %1, %3          \n"     // r64 = (l, h) = x * y
+        "mov    %0, %0, lsr #16         \n"     // to fixed16: r64 >>= 16
+        "orr    %0, %0, %2, lsl #16     \n"     // x = l = (h << (32 - 16)) | (l >> 16);
+
+        : "=r"(x), "=&r"(y), "=r"(t)
+        : "r"(x), "1"(y)
+    );
+    return x;
+}
+#endif
 
 #endif
 

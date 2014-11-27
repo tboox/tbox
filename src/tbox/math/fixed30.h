@@ -30,12 +30,8 @@
 #include "prefix.h"
 #include "int32.h"
 #include "../libm/libm.h"
-#if defined(TB_ARCH_x86) || defined(TB_ARCH_x86)
-#   include "opt/fixed16_x86.h"
-#elif defined(TB_ARCH_ARM)
-#   include "opt/fixed16_arm.h"
-#elif defined(TB_ARCH_SH4)
-#   include "opt/fixed16_sh4.h"
+#ifdef TB_ARCH_ARM
+#   include "impl/fixed16_arm.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
