@@ -17,38 +17,29 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        memmov.c
+ * @file        crc_arm.h
  *
  */
+#ifndef TB_UTILS_IMPL_CRC_ARM_H
+#define TB_UTILS_IMPL_CRC_ARM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#if 1//def TB_ASSEMBLER_IS_GAS
-#   define TB_LIBC_STRING_OPT_MEMMOV
+#ifndef TB_ARCH_ARM64
+#   define tb_crc32_encode(crc, ib, in, table)  tb_crc32_encode_asm(crc, ib, in, table)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
+tb_uint32_t tb_crc32_encode_asm(tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in, tb_uint32_t const* table);
 
-#if 1
-static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
-{
-    tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-    return memmove(s1, s2, n);
-}
-#elif defined(TB_ASSEMBLER_IS_GAS)
-static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
-{
-    tb_assert_and_check_return_val(s1 && s2, tb_null);
-
-    return tb_null;
-}
 #endif
+

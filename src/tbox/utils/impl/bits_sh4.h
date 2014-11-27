@@ -17,53 +17,47 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        strcmp.c
+ * @file        bits_sh4.h
  *
  */
+#ifndef TB_UTILS_IMPL_BITS_SH4_H
+#define TB_UTILS_IMPL_BITS_SH4_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_ASSEMBLER_IS_GAS
-//#     define TB_LIBC_STRING_OPT_STRCMP
+// swap
+#ifndef tb_bits_swap_u16
+#   define tb_bits_swap_u16(x)              tb_bits_swap_u16_asm(x)
 #endif
-
+#ifndef tb_bits_swap_u32
+#   define tb_bits_swap_u32(x)              tb_bits_swap_u32_asm(x)
+#endif
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-#if 0//def TB_ASSEMBLER_IS_GAS
-static tb_long_t tb_strcmp_impl(tb_char_t const* s1, tb_char_t const* s2)
+
+// swap
+static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 {
-    tb_assert_and_check_return_val(s1 && s2, 0);
-
-    // FIXME: return is -1, 0, 1
-    tb_size_t d0, d1;
-    tb_size_t r;
-    __tb_asm__ __tb_volatile__
-    (
-        "1:\n"
-        "   lodsb\n"
-        "   scasb\n"
-        "   jne 2f\n"
-        "   testb %%al, %%al\n"
-        "   jne 1b\n"
-        "   xorl %%eax, %%eax\n"
-        "   jmp 3f\n"
-        "2:\n"
-        "   sbbl %%eax, %%eax\n"
-        "   orb $1, %%al\n"
-        "3:"
-
-        : "=a" (r), "=&S" (d0), "=&D" (d1)
-        : "1" (s1), "2" (s2)
-        : "memory"
-    );
-
-    return r;
+    __tb_asm__("swap.b %0,%0" : "+r"(x));
+    return x;
 }
+
+static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
+{
+    __tb_asm__( "swap.b %0,%0\n"
+                "swap.w %0,%0\n"
+                "swap.b %0,%0\n"
+                : "+r"(x));
+    return x;
+}
+
+
 #endif
+

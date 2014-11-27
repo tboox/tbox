@@ -20,8 +20,8 @@
  * @file        prefix.h
  *
  */
-#ifndef TB_MATH_OPT_PREFIX_H
-#define TB_MATH_OPT_PREFIX_H
+#ifndef TB_MATH_IMPL_PREFIX_H
+#define TB_MATH_IMPL_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

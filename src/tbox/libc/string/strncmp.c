@@ -28,11 +28,11 @@
 #include "string.h"
 #ifndef TB_CONFIG_LIBC_HAVE_STRNCMP
 #   if defined(TB_ARCH_x86)
-#       include "opt/x86/strncmp.c"
+#       include "impl/x86/strncmp.c"
 #   elif defined(TB_ARCH_ARM)
-#       include "opt/arm/strncmp.c"
+#       include "impl/arm/strncmp.c"
 #   elif defined(TB_ARCH_SH4)
-#       include "opt/sh4/strncmp.c"
+#       include "impl/sh4/strncmp.c"
 #   endif
 #else
 #   include <string.h>

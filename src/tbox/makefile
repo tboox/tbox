@@ -268,7 +268,7 @@ tbox_C_FILES 			+= \
 
 
 # arm
-tbox_ASM_FILES-$(ARM) 	+= utils/opt/arm/crc
+tbox_ASM_FILES-$(ARM) 	+= utils/impl/crc_arm
 
 # openssl
 tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
@@ -471,13 +471,8 @@ INC_FILES 				= \
 						math/int32.h \
 						math/random/prefix.h \
 						math/random/random.h \
-						math/opt/prefix.h \
-						math/opt/fixed16_x86.h \
-						math/opt/fixed16_arm.h \
-						math/opt/fixed16_sh4.h \
-						math/opt/fixed30_x86.h \
-						math/opt/fixed30_arm.h \
-						math/opt/fixed30_sh4.h \
+						math/impl/fixed16_arm.h \
+						math/impl/fixed30_arm.h \
 						string/prefix.h \
 						string/string.h \
 						string/string.h \
@@ -656,15 +651,10 @@ INC_FILES 				= \
 						utils/base64.h \
 						utils/singleton.h \
 						utils/lock_profiler.h \
-						utils/opt/x86/bits.h \
-						utils/opt/x86/prefix.h \
-						utils/opt/arm/bits.h \
-						utils/opt/arm/prefix.h \
-						utils/opt/sh4/bits.h \
-						utils/opt/sh4/prefix.h \
-						utils/opt/gcc/bits.h \
-						utils/opt/gcc/prefix.h \
-						utils/opt/prefix.h \
+						utils/impl/bits_x86.h \
+						utils/impl/bits_arm.h \
+						utils/impl/bits_sh4.h \
+						utils/impl/bits_gcc.h \
 						utils/base64.h \
 						xml/xml.h \
 						xml/prefix.h \

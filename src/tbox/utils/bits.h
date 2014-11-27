@@ -31,14 +31,14 @@
 #include "../libm/libm.h"
 #if defined(TB_COMPILER_IS_GCC) \
     && TB_COMPILER_VERSION_BE(4, 1)
-#   include "opt/gcc/bits.h"
+#   include "impl/bits_gcc.h"
 #endif
 #if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
-#   include "opt/x86/bits.h"
+#   include "impl/bits_x86.h"
 #elif defined(TB_ARCH_ARM)
-#   include "opt/arm/bits.h"
+#   include "impl/bits_arm.h"
 #elif defined(TB_ARCH_SH4)
-#   include "opt/sh4/bits.h"
+#   include "impl/bits_sh4.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

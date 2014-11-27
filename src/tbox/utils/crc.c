@@ -29,7 +29,7 @@
 #include "crc.g"
 #include "../libc/libc.h"
 #if defined(TB_ARCH_ARM)
-#   include "opt/arm/crc.h"
+#   include "impl/crc_arm.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
