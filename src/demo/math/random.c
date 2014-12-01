@@ -14,11 +14,11 @@ static tb_void_t tb_random_test(tb_long_t b, tb_long_t e)
     __tb_volatile__ tb_long_t   rand = 0;
 
     // clear generator
-    tb_random_clear(tb_random_generator());
+    tb_random_clear(tb_null);
 
     // done
     tb_hong_t t = tb_mclock();
-    for (i = 0; i < n; i++) rand += tb_random_range(tb_random_generator(), b, e);
+    for (i = 0; i < n; i++) rand += tb_random_range(tb_null, b, e);
     t = tb_mclock() - t;
     tb_trace_i("time: %lld, average: %d, range: %ld - %ld", t, (rand + (n >> 1)) / n, b, e);
 }
@@ -31,11 +31,11 @@ static tb_void_t tb_random_test_float(tb_float_t b, tb_float_t e)
     __tb_volatile__ tb_float_t  rand = 0;
 
     // clear generator
-    tb_random_clear(tb_random_generator());
+    tb_random_clear(tb_null);
 
     // done
     tb_hong_t t = tb_mclock();
-    for (i = 0; i < n; i++) rand += tb_random_rangef(tb_random_generator(), b, e);
+    for (i = 0; i < n; i++) rand += tb_random_rangef(tb_null, b, e);
     t = tb_mclock() - t;
     tb_trace_i("time: %lld, average: %f, range: %f - %f", t, rand / n, b, e);
 }
