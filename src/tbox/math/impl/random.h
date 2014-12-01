@@ -17,23 +17,16 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        math.h
- * @defgroup    math
+ * @file        random.h
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
+#ifndef TB_MATH_IMPL_RANDOM_H
+#define TB_MATH_IMPL_RANDOM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
-#include "random.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -41,17 +34,48 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * types
  */
 
-/*! init math 
+// the random type enum
+typedef enum __tb_random_type_e
+{
+    TB_RANDOM_TYPE_NONE       = 0
+,   TB_RANDOM_TYPE_LINEAR     = 1
+
+}tb_random_type_e;
+
+// the random impl type
+typedef struct __tb_random_impl_t
+{
+    // the type
+    tb_size_t           type;
+
+    // exit 
+    tb_void_t           (*exit)(struct __tb_random_impl_t* random);
+
+    // seed
+    tb_void_t           (*seed)(struct __tb_random_impl_t* random, tb_size_t seed);
+
+    // clear
+    tb_void_t           (*clear)(struct __tb_random_impl_t* random);
+
+    // range
+    tb_long_t           (*range)(struct __tb_random_impl_t* random, tb_long_t beg, tb_long_t end);
+
+}tb_random_impl_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+
+/* init the linear random
  *
- * @return      tb_true or tb_false
+ * @param seed          the seed
+ *
+ * @return              the random
  */
-tb_bool_t       tb_math_init(tb_noarg_t);
-
-/// exit math 
-tb_void_t       tb_math_exit(tb_noarg_t);
+tb_random_impl_t*       tb_random_linear_init(tb_size_t seed);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -59,4 +83,3 @@ tb_void_t       tb_math_exit(tb_noarg_t);
 __tb_extern_c_leave__
 
 #endif
-

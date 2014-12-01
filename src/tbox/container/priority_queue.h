@@ -42,9 +42,9 @@ __tb_extern_c_enter__
 
 /*! the priority queue ref type
  *
- * using the min/max queue
+ * using the min/max heap
  */
-typedef tb_heap_ref_t   tb_priority_queue_ref_t;
+typedef tb_heap_ref_t       tb_priority_queue_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

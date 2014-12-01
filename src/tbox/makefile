@@ -13,8 +13,8 @@ tbox_C_FILES 			+= \
 						math/math \
 						math/int32 \
 						math/fixed16 \
-						math/random/random \
-						math/random/linear \
+						math/random \
+						math/impl/random_linear \
 						prefix/state \
 						memory/pool \
 						memory/fixed_pool \
@@ -470,8 +470,7 @@ INC_FILES 				= \
 						math/fixed16.h \
 						math/fixed30.h \
 						math/int32.h \
-						math/random/prefix.h \
-						math/random/random.h \
+						math/random.h \
 						math/impl/fixed16_arm.h \
 						math/impl/fixed30_arm.h \
 						string/prefix.h \

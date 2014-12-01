@@ -25,12 +25,8 @@
  * includes
  */
 #include "random.h"
-#include "../../utils/utils.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-tb_handle_t tb_random_linear_init(tb_size_t seed);
+#include "impl/random.h"
+#include "../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
@@ -38,25 +34,26 @@ tb_handle_t tb_random_linear_init(tb_size_t seed);
 static tb_handle_t tb_random_instance_init(tb_cpointer_t* ppriv)
 {
     // init it
-    return tb_random_init(TB_RANDOM_GENERATOR_TYPE_LINEAR, 2166136261ul);
+    return tb_random_init(TB_RANDOM_TYPE_LINEAR, 2166136261ul);
 }
 static tb_void_t tb_random_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
     // exit it
     tb_random_exit(handle);
 }
+static tb_random_impl_t* tb_random_instance(tb_noarg_t)
+{
+    return (tb_random_impl_t*)tb_singleton_instance(TB_SINGLETON_TYPE_RANDOM, tb_random_instance_init, tb_random_instance_exit, tb_null);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_random_generator()
-{
-    return tb_singleton_instance(TB_SINGLETON_TYPE_RANDOM, tb_random_instance_init, tb_random_instance_exit, tb_null);
-}
-tb_handle_t tb_random_init(tb_size_t type, tb_size_t seed)
+
+tb_random_ref_t tb_random_init(tb_size_t type, tb_size_t seed)
 {
     // the init func
-    static tb_handle_t (*s_init[])(tb_size_t ) = 
+    static tb_random_impl_t* (*s_init[])(tb_size_t ) = 
     {
         tb_null
     ,   tb_random_linear_init
@@ -64,63 +61,63 @@ tb_handle_t tb_random_init(tb_size_t type, tb_size_t seed)
     tb_assert_and_check_return_val(type < tb_arrayn(s_init) && s_init[type], tb_null);
 
     // init it
-    return s_init[type](seed);
+    return (tb_random_ref_t)s_init[type](seed);
 }
-tb_void_t tb_random_exit(tb_handle_t handle)
+tb_void_t tb_random_exit(tb_random_ref_t random)
 {
     // check
-    tb_random_t* random = (tb_random_t*)handle;
-    tb_assert_and_check_return(random);
+    tb_random_impl_t* impl = (tb_random_impl_t*)random;
+    tb_assert_and_check_return(impl);
 
     // exit it
-    if (random->exit) random->exit(random);
+    if (impl->exit) impl->exit(impl);
 }
-tb_void_t tb_random_seed(tb_handle_t handle, tb_size_t seed)
+tb_void_t tb_random_seed(tb_random_ref_t random, tb_size_t seed)
 {
     // check
-    tb_random_t* random = (tb_random_t*)handle;
-    tb_assert_and_check_return(random && random->seed);
+    tb_random_impl_t* impl = random? (tb_random_impl_t*)random : tb_random_instance();
+    tb_assert_and_check_return(impl && impl->seed);
 
     // seed it
-    random->seed(random, seed);
+    impl->seed(impl, seed);
 }
-tb_void_t tb_random_clear(tb_handle_t handle)
+tb_void_t tb_random_clear(tb_random_ref_t random)
 {
     // check
-    tb_random_t* random = (tb_random_t*)handle;
-    tb_assert_and_check_return(random && random->clear);
+    tb_random_impl_t* impl = random? (tb_random_impl_t*)random : tb_random_instance();
+    tb_assert_and_check_return(impl && impl->clear);
 
     // clear it
-    random->clear(random);
+    impl->clear(impl);
 }
-tb_long_t tb_random_range(tb_handle_t handle, tb_long_t beg, tb_long_t end)
+tb_long_t tb_random_range(tb_random_ref_t random, tb_long_t beg, tb_long_t end)
 {
     // check
-    tb_random_t* random = (tb_random_t*)handle;
-    tb_assert_and_check_return_val(random && random->range && beg < end, beg);
+    tb_random_impl_t* impl = random? (tb_random_impl_t*)random : tb_random_instance();
+    tb_assert_and_check_return_val(impl && impl->range && beg < end, beg);
 
     // range it
-    return random->range(random, beg, end);
+    return impl->range(impl, beg, end);
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_float_t tb_random_rangef(tb_handle_t handle, tb_float_t beg, tb_float_t end)
+tb_float_t tb_random_rangef(tb_random_ref_t random, tb_float_t beg, tb_float_t end)
 {
     // check
-    tb_assert_and_check_return_val(handle && beg < end, beg);
+    tb_assert_and_check_return_val(beg < end, beg);
 
     // the factor
-    tb_double_t factor = (tb_double_t)tb_random_range(handle, 0, TB_MAXS32) / (tb_double_t)TB_MAXS32;
+    tb_double_t factor = (tb_double_t)tb_random_range(random, 0, TB_MAXS32) / (tb_double_t)TB_MAXS32;
 
     // the value
     return (tb_float_t)((end - beg) * factor);
 }
 #endif
-tb_long_t tb_random_value(tb_handle_t handle)
+tb_long_t tb_random_value(tb_random_ref_t random)
 {
 #if TB_CPU_BIT64
-    return tb_random_range(handle, 0, TB_MAXS64);
+    return tb_random_range(random, 0, TB_MAXS64);
 #else
-    return tb_random_range(handle, 0, TB_MAXS32);
+    return tb_random_range(random, 0, TB_MAXS32);
 #endif
 }
 

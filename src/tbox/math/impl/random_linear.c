@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        linear.c
+ * @file        random_linear.c
  * @ingroup     math
  */
 
@@ -40,7 +40,7 @@
 typedef struct __tb_random_linear_t
 {
     // the base
-    tb_random_t             base;
+    tb_random_impl_t             base;
 
     // the seed
     tb_size_t               seed;
@@ -53,20 +53,20 @@ typedef struct __tb_random_linear_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_random_linear_t* tb_random_linear_cast(tb_random_t* random)
+static __tb_inline__ tb_random_linear_t* tb_random_linear_cast(tb_random_impl_t* random)
 {
     // check
-    tb_assert_and_check_return_val(random && random->type == TB_RANDOM_GENERATOR_TYPE_LINEAR, tb_null);
+    tb_assert_and_check_return_val(random && random->type == TB_RANDOM_TYPE_LINEAR, tb_null);
 
     // the random
     return (tb_random_linear_t*)random;
 }
-static tb_void_t tb_random_linear_exit(tb_random_t* random)
+static tb_void_t tb_random_linear_exit(tb_random_impl_t* random)
 {
     // exit it
     if (random) tb_free((tb_pointer_t)random);
 }
-static tb_void_t tb_random_linear_seed(tb_random_t* random, tb_size_t seed)
+static tb_void_t tb_random_linear_seed(tb_random_impl_t* random, tb_size_t seed)
 {
     // check
     tb_random_linear_t* lrandom = tb_random_linear_cast(random);
@@ -76,7 +76,7 @@ static tb_void_t tb_random_linear_seed(tb_random_t* random, tb_size_t seed)
     lrandom->seed   = seed;
     lrandom->value  = seed;
 }
-static tb_void_t tb_random_linear_clear(tb_random_t* random)
+static tb_void_t tb_random_linear_clear(tb_random_impl_t* random)
 {
     // check
     tb_random_linear_t* lrandom = tb_random_linear_cast(random);
@@ -85,7 +85,7 @@ static tb_void_t tb_random_linear_clear(tb_random_t* random)
     // clear
     lrandom->value = lrandom->seed;
 }
-static tb_long_t tb_random_linear_range(tb_random_t* random, tb_long_t beg, tb_long_t end)
+static tb_long_t tb_random_linear_range(tb_random_impl_t* random, tb_long_t beg, tb_long_t end)
 {
     // check
     tb_random_linear_t* lrandom = tb_random_linear_cast(random);
@@ -101,8 +101,7 @@ static tb_long_t tb_random_linear_range(tb_random_t* random, tb_long_t beg, tb_l
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_random_linear_init(tb_size_t seed);
-tb_handle_t tb_random_linear_init(tb_size_t seed)
+tb_random_impl_t* tb_random_linear_init(tb_size_t seed)
 {
     // done
     tb_bool_t           ok = tb_false;
@@ -114,7 +113,7 @@ tb_handle_t tb_random_linear_init(tb_size_t seed)
         tb_assert_and_check_break(random);
 
         // init random
-        random->base.type   = TB_RANDOM_GENERATOR_TYPE_LINEAR;
+        random->base.type   = TB_RANDOM_TYPE_LINEAR;
         random->base.exit   = tb_random_linear_exit;
         random->base.seed   = tb_random_linear_seed;
         random->base.clear  = tb_random_linear_clear;
@@ -131,10 +130,10 @@ tb_handle_t tb_random_linear_init(tb_size_t seed)
     if (!ok)
     {
         // exit it
-        if (random) tb_random_exit((tb_handle_t)random);
+        if (random) tb_random_linear_exit((tb_random_impl_t*)random);
         random = tb_null;
     }
 
     // ok?
-    return (tb_handle_t)random;
+    return (tb_random_impl_t*)random;
 }
