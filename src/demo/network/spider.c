@@ -903,6 +903,9 @@ tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
 #else
 tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
 {
+#ifdef TB_CONFIG_MODULE_HAVE_OBJECT
+    tb_used(g_options);
+#endif
     return 0;
 }
 #endif
