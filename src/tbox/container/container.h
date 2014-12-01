@@ -36,6 +36,7 @@
 #include "vector.h"
 #include "queue.h"
 #include "circle_queue.h"
+#include "priority_queue.h"
 #include "list.h"
 #include "list_entry.h"
 #include "single_list.h"
