@@ -34,12 +34,12 @@
 static tb_handle_t tb_random_instance_init(tb_cpointer_t* ppriv)
 {
     // init it
-    return tb_random_init(TB_RANDOM_TYPE_LINEAR, 2166136261ul);
+    return (tb_handle_t)tb_random_init(TB_RANDOM_TYPE_LINEAR, 2166136261ul);
 }
 static tb_void_t tb_random_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 {
     // exit it
-    tb_random_exit(handle);
+    tb_random_exit((tb_random_ref_t)handle);
 }
 static tb_random_impl_t* tb_random_instance(tb_noarg_t)
 {
