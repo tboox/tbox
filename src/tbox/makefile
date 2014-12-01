@@ -56,6 +56,7 @@ tbox_C_FILES 			+= \
 						container/vector \
 						container/queue \
 						container/circle_queue \
+						container/priority_queue \
 						container/list \
 						container/list_entry \
 						container/single_list \
@@ -512,6 +513,7 @@ INC_FILES 				= \
 						container/iterator.h \
 						container/queue.h \
 						container/circle_queue.h \
+						container/priority_queue.h \
 						container/list.h \
 						container/list_entry.h \
 						container/single_list.h \

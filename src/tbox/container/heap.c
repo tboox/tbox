@@ -503,15 +503,6 @@ tb_size_t tb_heap_size(tb_heap_ref_t heap)
     // size
     return impl->size;
 }
-tb_size_t tb_heap_grow(tb_heap_ref_t heap)
-{
-    // check
-    tb_heap_impl_t const* impl = (tb_heap_impl_t const*)heap;
-    tb_assert_and_check_return_val(impl, 0);
-
-    // grow
-    return impl->grow;
-}
 tb_size_t tb_heap_maxn(tb_heap_ref_t heap)
 {
     // check
