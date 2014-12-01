@@ -151,24 +151,6 @@ tb_void_t           tb_heap_pop(tb_heap_ref_t heap);
  */
 tb_void_t           tb_heap_del(tb_heap_ref_t heap, tb_size_t itor);
 
-/*! load heap from the stream
- *
- * @param heap      the heap
- * @param stream    the stream
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_heap_load(tb_heap_ref_t heap, tb_stream_ref_t stream);
-
-/*! save heap to the stream
- *
- * @param heap      the heap
- * @param stream    the stream
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_heap_save(tb_heap_ref_t heap, tb_stream_ref_t stream);
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
