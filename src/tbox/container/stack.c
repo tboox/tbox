@@ -78,12 +78,4 @@ tb_size_t tb_stack_maxn(tb_stack_ref_t stack)
 {
     return tb_vector_maxn(stack);
 }
-tb_bool_t tb_stack_load(tb_stack_ref_t stack, tb_stream_ref_t stream)
-{
-    return tb_vector_load(stack, stream);
-}
-tb_bool_t tb_stack_save(tb_stack_ref_t stack, tb_stream_ref_t stream)
-{
-    return tb_vector_save(stack, stream);
-}
 

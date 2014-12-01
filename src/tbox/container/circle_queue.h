@@ -128,24 +128,6 @@ tb_void_t               tb_circle_queue_pop(tb_circle_queue_ref_t queue);
  */
 tb_pointer_t            tb_circle_queue_get(tb_circle_queue_ref_t queue);
 
-/*! load queue from the stream
- *
- * @param queue         the queue
- * @param stream        the stream
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_circle_queue_load(tb_circle_queue_ref_t queue, tb_stream_ref_t stream);
-
-/*! save queue to the stream
- *
- * @param queue         the queue
- * @param stream        the stream
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_circle_queue_save(tb_circle_queue_ref_t queue, tb_stream_ref_t stream);
-
 /*! the queue size
  *
  * @param queue         the queue
