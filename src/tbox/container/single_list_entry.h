@@ -91,7 +91,7 @@ typedef struct __tb_single_list_entry_t
     /// the next entry
     struct __tb_single_list_entry_t*    next;
 
-}tb_single_list_entry_t;
+}tb_single_list_entry_t, *tb_single_list_entry_ref_t;
 
 /// the single list entry head type
 typedef struct __tb_single_list_entry_head_t 
@@ -114,13 +114,7 @@ typedef struct __tb_single_list_entry_head_t
     /// the entry copy func
     tb_entry_copy_t                     copy;
 
-}tb_single_list_entry_head_t;
-
-/// the single list entry ref type
-typedef tb_single_list_entry_t*         tb_single_list_entry_ref_t;
-
-/// the single list entry head ref type
-typedef tb_single_list_entry_head_t*    tb_single_list_entry_head_ref_t;
+}tb_single_list_entry_head_t, *tb_single_list_entry_head_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

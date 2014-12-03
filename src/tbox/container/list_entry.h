@@ -79,10 +79,7 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the list entry copy func type
-typedef tb_void_t               (*tb_list_entry_copy_t)(tb_pointer_t ltem, tb_pointer_t rtem);
-
-/*! the double list entry type
+/*! the doubly-linked list entry type
  * 
  * <pre>
  * list: list => ... => last
@@ -99,7 +96,7 @@ typedef struct __tb_list_entry_t
     /// the prev entry
     struct __tb_list_entry_t*   prev;
 
-}tb_list_entry_t;
+}tb_list_entry_t, *tb_list_entry_ref_t;
 
 /// the list entry head type
 typedef struct __tb_list_entry_head_t 
@@ -122,13 +119,7 @@ typedef struct __tb_list_entry_head_t
     /// the entry copy func
     tb_entry_copy_t             copy;
 
-}tb_list_entry_head_t;
-
-/// the list entry ref type
-typedef tb_list_entry_t*        tb_list_entry_ref_t;
-
-/// the list entry head ref type
-typedef tb_list_entry_head_t*   tb_list_entry_head_ref_t;
+}tb_list_entry_head_t, *tb_list_entry_head_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
