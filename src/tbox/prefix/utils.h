@@ -26,7 +26,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "config.h"
+#include "cpu.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -53,14 +53,36 @@
 /// ispow2: 1, 2, 4, 8, 16, 32, ...
 #define tb_ispow2(x)                    (!((x) & ((x) - 1)) && (x))
 
-/// align
+/// align2
 #define tb_align2(x)                    (((x) + 1) >> 1 << 1)
+
+/// align4
 #define tb_align4(x)                    (((x) + 3) >> 2 << 2)
+
+/// align8
 #define tb_align8(x)                    (((x) + 7) >> 3 << 3)
+
+/// align
 #define tb_align(x, b)                  (((tb_size_t)(x) + ((tb_size_t)(b) - 1)) & ~((tb_size_t)(b) - 1))
+
+/// align u32
 #define tb_align_u32(x, b)              (((tb_uint32_t)(x) + ((tb_uint32_t)(b) - 1)) & ~((tb_uint32_t)(b) - 1))
+
+/// align u64
 #define tb_align_u64(x, b)              (((tb_uint64_t)(x) + ((tb_uint64_t)(b) - 1)) & ~((tb_uint64_t)(b) - 1))
+
+/// align by pow2
 #define tb_align_pow2(x)                (((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_bits_cl0_u32_be((tb_uint32_t)(x))))) : 1)
+
+/*! @def tb_align_cpu
+ *
+ * align by cpu bytes
+ */
+#if TB_CPU_BIT64
+#   define tb_align_cpu(x)              tb_align8(x)
+#else
+#   define tb_align_cpu(x)              tb_align4(x)
+#endif
 
 /// offsetof
 #if defined(TB_COMPILER_IS_GCC) \

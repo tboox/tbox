@@ -271,10 +271,10 @@ tb_void_t tb_list_exit(tb_list_ref_t list)
     // clear data
     tb_list_clear((tb_list_ref_t)impl);
 
-    // free pool
+    // exit pool
     if (impl->pool) tb_fixed_pool_exit(impl->pool);
 
-    // free it
+    // exit it
     tb_free(impl);
 }
 tb_void_t tb_list_clear(tb_list_ref_t list)

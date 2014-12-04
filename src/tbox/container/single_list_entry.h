@@ -34,17 +34,17 @@
  * macros
  */
 
-/// the single list entry
+/// the list entry
 #define tb_single_list_entry(head, entry)   ((((tb_byte_t*)(entry)) - (head)->eoff))
 
-/*! init the single list entry 
+/*! init the list entry 
  *
  * @code
  *
     // the xxxx entry type
     typedef struct __tb_xxxx_entry_t 
     {
-        // the single list entry
+        // the list entry
         tb_single_list_entry_t      entry;
 
         // the data
@@ -62,7 +62,7 @@
         ((tb_xxxx_entry_t*)ltem)->data = ((tb_xxxx_entry_t*)rtem)->data;
     }
 
-    // init the single list
+    // init the list
     tb_single_list_entry_head_t list;
     tb_single_list_entry_init(&list, tb_xxxx_entry_t, entry, tb_xxxx_entry_copy);
 
@@ -79,10 +79,10 @@ __tb_extern_c_enter__
  * types
  */
 
-/*! the single list entry type
+/*! the single-linked list entry type
  * 
  * <pre>
- * list: list => ... => last => null
+ * list: head => ... => last => null
  *
  * </pre>
  */
@@ -93,7 +93,7 @@ typedef struct __tb_single_list_entry_t
 
 }tb_single_list_entry_t, *tb_single_list_entry_ref_t;
 
-/// the single list entry head type
+/// the single-linked list entry head type
 typedef struct __tb_single_list_entry_head_t 
 {
     /// the next entry
@@ -102,7 +102,7 @@ typedef struct __tb_single_list_entry_head_t
     /// the last entry
     struct __tb_single_list_entry_t*    last;
 
-    /// the single list size
+    /// the list size
     tb_size_t                           size;
 
     /// the iterator 
@@ -120,17 +120,17 @@ typedef struct __tb_single_list_entry_head_t
  * interfaces
  */
 
-/*! the single list iterator
+/*! the list iterator
  *
- * @param list                                  the single list
+ * @param list                                  the list
  *
- * @return                                      the single list iterator
+ * @return                                      the list iterator
  */
 tb_iterator_ref_t                               tb_single_list_entry_itor(tb_single_list_entry_head_ref_t list);
 
 /*! init list
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry_offset                          the entry offset 
  * @param entry_size                            the entry size 
  * @param copy                                  the copy func of the entry for algorithm, .e.g sort
@@ -139,13 +139,13 @@ tb_void_t                                       tb_single_list_entry_init_(tb_si
 
 /*! exit list
  *
- * @param list                                  the single list
+ * @param list                                  the list
  */ 
 tb_void_t                                       tb_single_list_entry_exit(tb_single_list_entry_head_ref_t list);
 
 /*! clear list
  *
- * @param list                                  the single list
+ * @param list                                  the list
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_clear(tb_single_list_entry_head_ref_t list)
 {
@@ -158,11 +158,11 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_clear(tb_si
     list->size = 0;
 }
 
-/*! the single list entry count
+/*! the list entry count
  *
- * @param list                                  the single list
+ * @param list                                  the list
  *
- * @return                                      the single list entry count
+ * @return                                      the list entry count
  */
 static __tb_inline__ tb_size_t                  tb_single_list_entry_size(tb_single_list_entry_head_ref_t list)
 { 
@@ -173,9 +173,9 @@ static __tb_inline__ tb_size_t                  tb_single_list_entry_size(tb_sin
     return list->size;
 }
 
-/*! the single list next entry
+/*! the list next entry
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry                                 the entry
  *
  * @return                                      the next entry
@@ -189,9 +189,9 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_next(tb_sin
     return entry->next;
 }
 
-/*! the single list head entry
+/*! the list head entry
  *
- * @param list                                  the single list
+ * @param list                                  the list
  *
  * @return                                      the head entry
  */
@@ -204,9 +204,9 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_head(tb_sin
     return list->next;
 }
 
-/*! the single list last entry
+/*! the list last entry
  *
- * @param list                                  the single list
+ * @param list                                  the list
  *
  * @return                                      the last entry
  */
@@ -219,9 +219,9 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_last(tb_sin
     return list->last;
 }
 
-/*! the single list tail entry
+/*! the list tail entry
  *
- * @param list                                  the single list
+ * @param list                                  the list
  *
  * @return                                      the tail entry
  */
@@ -230,9 +230,9 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_tail(tb_sin
     return tb_null;
 }
 
-/*! the single list is null?
+/*! the list is null?
  *
- * @param list                                  the single list
+ * @param list                                  the list
  *
  * @return                                      tb_true or tb_false
  */
@@ -244,9 +244,9 @@ static __tb_inline__ tb_bool_t                  tb_single_list_entry_is_null(tb_
     // done
     return !list->size;
 }
-/*! is the single list head entry?
+/*! is the list head entry?
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry                                 the entry
  *
  * @return                                      tb_true or tb_false
@@ -260,9 +260,9 @@ static __tb_inline__ tb_bool_t                  tb_single_list_entry_is_head(tb_
     return list->next == entry;
 }
 
-/*! is the single list last entry?
+/*! is the list last entry?
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry                                 the entry
  *
  * @return                                      tb_true or tb_false
@@ -278,8 +278,8 @@ static __tb_inline__ tb_bool_t                  tb_single_list_entry_is_last(tb_
 
 /*! insert entry to the next
  *
- * @param list                                  the single list
- * @param node                                  the single list node
+ * @param list                                  the list
+ * @param node                                  the list node
  * @param entry                                 the inserted list entry
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_next(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t node, tb_single_list_entry_ref_t entry)
@@ -301,7 +301,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_next
 
 /*! insert entry to the head 
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry                                 the inserted list entry
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_head(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t entry)
@@ -312,7 +312,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_head
 
 /*! insert entry to the tail 
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry                                 the inserted list entry
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_tail(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t entry)
@@ -327,8 +327,8 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_tail
 
 /*! replace the next entry
  *
- * @param list                                  the single list
- * @param node                                  the single list node
+ * @param list                                  the list
+ * @param node                                  the list node
  * @param entry                                 the new list entry
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_replace_next(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t node, tb_single_list_entry_ref_t entry)
@@ -347,7 +347,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_replace_nex
 
 /*! replace the head entry
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry                                 the new list entry
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_replace_head(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t entry)
@@ -358,7 +358,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_replace_hea
 
 /*! remove the entry safely
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param prev                                  the prev entry
  * @param next                                  the next entry
  */
@@ -379,7 +379,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_safe
 
 /*! remove the next entry
  *
- * @param list                                  the single list
+ * @param list                                  the list
  * @param entry                                 the prev entry
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_next(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t prev)
@@ -393,7 +393,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_next
 
 /*! remove the head entry
  *
- * @param list                                  the single list
+ * @param list                                  the list
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_head(tb_single_list_entry_head_ref_t list)
 {
