@@ -52,7 +52,7 @@
 static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_ref_t lock)
 {
     // check
-    tb_assert_and_check_return_val(lock, tb_false);
+    tb_assert_return_val(lock, tb_false);
 
     // init 
     *lock = 0;
@@ -68,7 +68,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_ref_t lock)
 static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_ref_t lock)
 {
     // check
-    tb_assert_and_check_return(lock);
+    tb_assert_return(lock);
 
     // exit 
     *lock = 0;
@@ -81,7 +81,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_ref_t lock)
 static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
 {
     // check
-    tb_assert_and_check_return(lock);
+    tb_assert_return(lock);
 
     // init tryn
     tb_size_t tryn = 5;
@@ -129,7 +129,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
 static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinlock_ref_t lock)
 {
     // check
-    tb_assert_and_check_return(lock);
+    tb_assert_return(lock);
 
     // init tryn
     tb_size_t tryn = 5;
@@ -159,14 +159,14 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
 static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_ref_t lock)
 {
     // check
-    tb_assert_and_check_return_val(lock, tb_false);
+    tb_assert_return_val(lock, tb_false);
 
 #ifndef TB_LOCK_PROFILER_ENABLE
     // try locking it
-    return tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
+    return !tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1);
 #else
     // try locking it
-    tb_bool_t ok = tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
+    tb_bool_t ok = !tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1);
 
     // occupied?
     if (!ok) tb_lock_profiler_occupied(tb_lock_profiler(), (tb_pointer_t)lock);
@@ -185,10 +185,10 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_ref_t loc
 static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_spinlock_ref_t lock)
 {
     // check
-    tb_assert_and_check_return_val(lock, tb_false);
+    tb_assert_return_val(lock, tb_false);
 
     // try locking it
-    return tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
+    return !tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1);
 }
 
 /*! leave spinlock
@@ -198,7 +198,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_s
 static __tb_inline_force__ tb_void_t tb_spinlock_leave(tb_spinlock_ref_t lock)
 {
     // check
-    tb_assert_and_check_return(lock);
+    tb_assert_return(lock);
 
     // leave
     *((tb_atomic_t*)lock) = 0;
