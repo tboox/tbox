@@ -90,6 +90,12 @@ contact
 - download:     https://github.com/waruqi/tbox/archive/master.zip
 - qq(group):    343118190
 
+donate
+------
+
+####alipay
+<img src="http://www.tboox.net/ruki/alipay.png" alt="alipay" width="128" height="128">
+
 build
 -----
 
