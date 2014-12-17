@@ -96,6 +96,11 @@ donate
 ####alipay
 <img src="http://www.tboox.net/ruki/alipay.png" alt="alipay" width="128" height="128">
 
+####paypal
+<a href="http://tboox.net/%E6%8D%90%E5%8A%A9/">
+<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="paypal">
+</a>
+
 build
 -----
 
