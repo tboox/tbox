@@ -409,8 +409,8 @@ tbox_C_FILES-$(TB_CONFIG_OS_WINDOWS) += \
 # flags
 tbox_CXFLAGS 			+= -D__tb_prefix__=\"tbox\"
 
-# header files
-INC_FILES 				= \
+# include files
+tbox_INC_FILES 			= \
 						tbox.h \
 						tbox.config.h \
 						config.h \

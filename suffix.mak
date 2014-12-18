@@ -5,9 +5,6 @@
 # append names
 NAMES 			+= $(NAMES-y)
 
-# append headers 
-INC_FILES 		+= $(INC_FILES-y)
-
 # ccache hook compiler for optimizating make
 ifneq ($(CCACHE),)
 CC 				:= $(CCACHE) $(CC)
@@ -115,6 +112,7 @@ $(1)_M_FILES 	+= $($(1)_M_FILES-y)
 $(1)_MM_FILES 	+= $($(1)_MM_FILES-y)
 $(1)_ASM_FILES 	+= $($(1)_ASM_FILES-y)
 $(1)_OBJ_FILES 	+= $($(1)_OBJ_FILES-y)
+$(1)_INC_FILES 	+= $($(1)_INC_FILES-y)
 $(1)_INC_DIRS 	+= $($(1)_INC_DIRS-y)
 $(1)_LIB_DIRS 	+= $($(1)_LIB_DIRS-y)
 $(1)_LIBS 		+= $($(1)_LIBS-y)
@@ -130,6 +128,7 @@ $(1)_M_FILES 	:= $(sort $($(1)_M_FILES))
 $(1)_MM_FILES 	:= $(sort $($(1)_MM_FILES))
 $(1)_ASM_FILES 	:= $(sort $($(1)_ASM_FILES))
 $(1)_OBJ_FILES 	:= $(sort $($(1)_OBJ_FILES))
+$(1)_INC_FILES 	:= $(sort $($(1)_INC_FILES))
 $(1)_INC_DIRS 	:= $(sort $($(1)_INC_DIRS))
 $(1)_LIB_DIRS 	:= $(sort $($(1)_LIB_DIRS))
 endef
@@ -296,60 +295,78 @@ ifneq ($(INSTALL),)
 BIN_DIR  		:= $(INSTALL)
 endif
 
-# install files
-$(foreach name, $(NAMES), $(eval $(if $(findstring LIB, $($(name)_TYPE)), LIB_FILES += $(LIB_PREFIX)$(name)$(LIB_SUFFIX), )))
-$(foreach name, $(NAMES), $(eval $(if $(findstring DLL, $($(name)_TYPE)), LIB_FILES += $(DLL_PREFIX)$(name)$(DLL_SUFFIX), )))
-$(foreach name, $(NAMES), $(eval $(if $(findstring BIN, $($(name)_TYPE)), BIN_FILES += $(BIN_PREFIX)$(name)$(BIN_SUFFIX), )))
-
-# make full path
-INC_FILES 		:= $(addprefix $(shell $(PWD))/, $(INC_FILES))
-LIB_FILES 		:= $(addprefix $(shell $(PWD))/, $(LIB_FILES))
-BIN_FILES 		:= $(addprefix $(shell $(PWD))/, $(BIN_FILES))
-
-INC_FILES 		:= $(sort $(INC_FILES))
-LIB_FILES 		:= $(sort $(LIB_FILES))
-BIN_FILES 		:= $(sort $(BIN_FILES))
-
-INSTALL_FILES 	:= $(INC_FILES) $(LIB_FILES) $(BIN_FILES)
+# expand install files
+define EXPAND_INSTALL_FILES
+$(1)_INC_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $($(1)_INC_FILES)))
+$(1)_LIB_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $(if $(findstring LIB,$($(1)_TYPE)),$(LIB_PREFIX)$(1)$(LIB_SUFFIX),)))
+$(1)_DLL_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $(if $(findstring DLL,$($(1)_TYPE)),$(DLL_PREFIX)$(1)$(DLL_SUFFIX),)))
+$(1)_BIN_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $(if $(findstring BIN,$($(1)_TYPE)),$(BIN_PREFIX)$(1)$(BIN_SUFFIX),)))
+endef
+$(foreach name, $(NAMES), $(eval $(call EXPAND_INSTALL_FILES,$(name))))
 
 # make include dirs
 define MAKE_INSTALL_INC_DIRS
-$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(PRO_NAME)/inc/%,$(1)))
+$(1)_INC_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/inc/%,$(1)))
 endef
 
 # make library dirs
 define MAKE_INSTALL_LIB_DIRS
-$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/%,$(1)))
+$(1)_LIB_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/lib/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
-# make bin dirs
-define MAKE_INSTALL_BIN_DIRS
-$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(PRO_NAME)/bin/$(PLAT)/$(ARCH)/%,$(1)))
+# make dynamic dirs
+define MAKE_INSTALL_DLL_DIRS
+$(1)_DLL_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/lib/$(PLAT)/$(ARCH)/%,$(1)))
 endef
+
+# make binary dirs
+define MAKE_INSTALL_BIN_DIRS
+$(1)_BIN_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/bin/$(PLAT)/$(ARCH)/%,$(1)))
+endef
+
+# make install files
+define MAKE_INSTALL_FILES
+$(foreach file, $($(1)_INC_FILES), $(eval $(call MAKE_INSTALL_INC_DIRS,$(file),$(1))))
+$(foreach file, $($(1)_LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_DIRS,$(file),$(1))))
+$(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_DIRS,$(file),$(1))))
+$(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_DIRS,$(file),$(1))))
+
+INSTALL_FILES 	+= $($(1)_INC_FILES) $($(1)_LIB_FILES) $($(1)_DLL_FILES) $($(1)_BIN_FILES)
+endef
+$(foreach name, $(NAMES), $(eval $(call MAKE_INSTALL_FILES,$(name))))
 
 define MAKE_INSTALL_INC_FILES
 $(1)_install:
-	-@$(MKDIR) $(call MAKE_INSTALL_INC_DIRS, $(1))
-	-@$(CP) $(1) $(call MAKE_INSTALL_INC_DIRS, $(1))
+	-@$(MKDIR) $($(1)_INC_DIRS_)
+	-@$(CP) $(1) $($(1)_INC_DIRS_)
 endef
 
 define MAKE_INSTALL_LIB_FILES
 $(1)_install:
-	-@$(MKDIR) $(call MAKE_INSTALL_LIB_DIRS, $(1))
-	-@$(CP) $(1) $(call MAKE_INSTALL_LIB_DIRS, $(1))
+	-@$(MKDIR) $($(1)_LIB_DIRS_)
+	-@$(CP) $(1) $($(1)_LIB_DIRS_)
+endef
+
+define MAKE_INSTALL_DLL_FILES
+$(1)_install:
+	-@$(MKDIR) $($(1)_DLL_DIRS_)
+	-@$(CP) $(1) $($(1)_DLL_DIRS_)
 endef
 
 define MAKE_INSTALL_BIN_FILES
 $(1)_install:
-	-@$(MKDIR) $(call MAKE_INSTALL_BIN_DIRS, $(1))
-	-@$(CP) $(1) $(call MAKE_INSTALL_BIN_DIRS, $(1))
+	-@$(MKDIR) $($(1)_BIN_DIRS_)
+	-@$(CP) $(1) $($(1)_BIN_DIRS_)
 endef
 
-define MAKE_INSTALL_SUB_PROS
-SUB_PROS_$(1)_install:
-	@echo install $(1)
-	@$(MAKE) --no-print-directory -C $(1) install
+# make install 
+define MAKE_INSTALL
+$(foreach file, $($(1)_INC_FILES), $(eval $(call MAKE_INSTALL_INC_FILES,$(file))))
+$(foreach file, $($(1)_LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_FILES,$(file))))
+$(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_FILES,$(file))))
+$(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_FILES,$(file))))
 endef
+$(foreach name, $(NAMES), $(eval $(call MAKE_INSTALL,$(name))))
 
 install: $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
 	$(INSTALL_SUFFIX_CMD1)
@@ -358,9 +375,12 @@ install: $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB
 	$(INSTALL_SUFFIX_CMD4)
 	$(INSTALL_SUFFIX_CMD5)
 
-$(foreach file, $(INC_FILES), $(eval $(call MAKE_INSTALL_INC_FILES,$(file))))
-$(foreach file, $(LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_FILES,$(file))))
-$(foreach file, $(BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_FILES,$(file))))
+# make sub-projects
+define MAKE_INSTALL_SUB_PROS
+SUB_PROS_$(1)_install:
+	@echo install $(1)
+	@$(MAKE) --no-print-directory -C $(1) install
+endef
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_INSTALL_SUB_PROS,$(pro))))
 
 # ######################################################################################
