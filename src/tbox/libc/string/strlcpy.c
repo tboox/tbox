@@ -48,7 +48,7 @@ static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n
     tb_assert_and_check_return_val(s1 && s2, 0);
     return strlcpy(s1, s2, n);
 }
-#elif !defined(TB_LIBC_STRING_OPT_STRLCPY)
+#elif !defined(TB_LIBC_STRING_IMPL_STRLCPY)
 static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // check
