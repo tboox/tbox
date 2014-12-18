@@ -13,7 +13,6 @@ a : all
 f : config
 r : rebuild
 i : install
-p : prefix
 c : clean
 u : update
 o : output
@@ -30,6 +29,11 @@ ifeq ($(IS_CONFIG), y)
 # include prefix
 include prefix.mak
 
+# select install path
+ifneq ($(INSTALL),)
+BIN_DIR := $(INSTALL)
+endif
+
 # make all
 all : .null
 	@echo "" > /tmp/$(PRO_NAME).out
@@ -42,34 +46,19 @@ rebuild : .null
 	$(if $(findstring msys,$(HOST)),,-@$(MAKE) -j4)
 	@$(MAKE)
 	@$(MAKE) i
-	@$(MAKE) p
 
 # make install
 install : .null
 	@echo "" > /tmp/$(PRO_NAME).out
 	@echo install $(PRO_NAME)
 	-@$(RMDIR) $(BIN_DIR)
-	-@$(MKDIR) $(BIN_DIR)
-	-@$(MKDIR) $(BIN_DIR)/inc
-	-@$(MKDIR) $(BIN_DIR)/lib
-	-@$(MKDIR) $(BIN_DIR)/obj
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
-
-# make prefix
-prefix : .null
-	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)
-	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)
-	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/$(PRO_NAME)/$(PRO_NAME).config.h $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
-	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PRE_DIR)/inc/
-	-@$(RM) $(PRE_DIR)/inc/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(CP) $(BIN_DIR)/lib/$(PRO_NAME)/* $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/
-	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/inc/$(PLAT)/$(ARCH),)
-	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/lib/$(PLAT)/$(ARCH),)
-	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/$(PRO_NAME)/$(PRO_NAME).config.h $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
-	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME)/* $(PREFIX)/inc/,)
-	$(if $(PREFIX),-@$(RM) $(PREFIX)/inc/$(PRO_NAME)/$(PRO_NAME).config.h,)
-	$(if $(PREFIX),-@$(CP) $(BIN_DIR)/lib/$(PRO_NAME)/* $(PREFIX)/lib/$(PLAT)/$(ARCH)/,)
+	@$(MKDIR) $(BIN_DIR)/$(PRO_NAME)/inc/$(PLAT)/$(ARCH)
+	@$(CP) $(BIN_DIR)/$(PRO_NAME)/inc/$(PRO_NAME)/$(PRO_NAME).config.h $(BIN_DIR)/$(PRO_NAME)/inc/$(PLAT)/$(ARCH)/$(PRO_NAME).config.h 
+	@$(RM) $(BIN_DIR)/$(PRO_NAME)/inc/$(PRO_NAME)/$(PRO_NAME).config.h
+	@$(CP) $(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)/* $(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/ 
+	@$(RMDIR) $(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)
 
 # make lipo
 lipo : .null
@@ -88,7 +77,6 @@ update : .null
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) update
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
-	@$(MAKE) --no-print-directory prefix
 
 # make output
 output : .null
@@ -128,10 +116,6 @@ rebuild :
 install :
 	make -r f
 	make -r i
-
-prefix :
-	make -r f
-	make -r p
 
 lipo : help
 clean :
@@ -282,7 +266,7 @@ config : .null
 	@echo "config: shflag:   " 							$(SHFLAG)
 	@echo "config: ccache:   " 							$(CCACHE)
 	@echo "config: distcc:   " 							$(DISTCC)
-	@echo "config: prefix:   " 							$(PREFIX)
+	@echo "config: install:  " 							$(INSTALL)
 	@echo "config: bin:      " 							$(BIN)
 	@echo "config: pre:      " 							$(PRE)
 	@echo "config: sdk:      " 							$(SDK)
@@ -304,11 +288,11 @@ config : .null
 	@echo "# small"              						>> .config.mak
 	@echo "SMALL ="$(SMALL) 							>> .config.mak
 	@echo ""                              				>> .config.mak
-	@echo "# prefix"              						>> .config.mak
-	@echo "PREFIX ="$(PREFIX) 							>> .config.mak
-	@echo ""                              				>> .config.mak
 	@echo "# host"      		          				>> .config.mak
 	@echo "HOST ="$(HOST) 								>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# install"              						>> .config.mak
+	@echo "INSTALL ="$(INSTALL) 						>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# flags"      		          				>> .config.mak
 	@echo "CFLAG ="$(CFLAG) 							>> .config.mak
@@ -375,6 +359,7 @@ config : .null
 	@echo "export SHFLAG" 			 					>> .config.mak
 	@echo "export CCACHE" 			 					>> .config.mak
 	@echo "export DISTCC" 			 					>> .config.mak
+	@echo "export INSTALL" 			 					>> .config.mak
 
 # ######################################################################################
 # help

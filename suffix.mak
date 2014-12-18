@@ -64,7 +64,6 @@ ARFLAGS_RELEASE += $(ARFLAGS_RELEASE-y)
 SHFLAGS_RELEASE += $(SHFLAGS_RELEASE-y)
 
 # append projects
-DEP_PROS 		+= $(DEP_PROS-y)
 SUB_PROS 		+= $(SUB_PROS-y)
 
 # make suffix
@@ -166,7 +165,6 @@ $(foreach name, $(NAMES), $(eval $(call MAKE_OBJS_AND_SRCS_FILES,$(name))))
 define MAKE_OBJ_C
 $(1)$(OBJ_SUFFIX) : $(1).c
 	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1).c
-	@echo @$(CC) $(2) $(3) $(CXFLAGS-o)$(1)$(OBJ_SUFFIX) $(1).c $(OUT) /tmp/$(PRO_NAME).out
 	@$(CC) $(2) $(3) $(CXFLAGS-o)$(1)$(OBJ_SUFFIX) $(1).c $(OUT) /tmp/$(PRO_NAME).out
 endef
 
@@ -250,15 +248,11 @@ SUB_PROS_$(1)_all:
 	@$(MAKE) --no-print-directory -C $(1) 
 endef
 
-define MAKE_ALL_DEP_PROS
-DEP_PROS_$(1)_all:
-	@echo make $(1)
-	@$(MAKE) --no-print-directory -C $(1)
-endef
+all: \
+	$(foreach name, $(NAMES), $(if $($(name)_FILES), $(name)_$($(name)_TYPE)_all, )) \
+	$(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_all)
 
-all: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_all) $(foreach name, $(NAMES), $(if $($(name)_FILES), $(name)_$($(name)_TYPE)_all, )) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_all)
 $(foreach name, $(NAMES), $(if $($(name)_FILES), $(eval $(call MAKE_ALL,$(name),$($(name)_TYPE))), ))
-$(foreach pro, $(DEP_PROS), $(eval $(call MAKE_ALL_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_ALL_SUB_PROS,$(pro))))
 
 # ######################################################################################
@@ -281,90 +275,74 @@ SUB_PROS_$(1)_clean:
 	@$(MAKE) --no-print-directory -C $(1) clean
 endef
 
-define MAKE_CLEAN_DEP_PROS
-DEP_PROS_$(1)_clean:
-	@echo clean $(1)
-	@$(MAKE) --no-print-directory -C $(1) clean
-endef
-
-# generate full path
+# make full path
 CLEAN_FILES := $(addprefix $(shell $(PWD))/, $(CLEAN_FILES))
 
-clean: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_clean) \
+clean: \
 	$(foreach name, $(NAMES), $(name)_$($(name)_TYPE)_clean) \
 	$(foreach file, $(CLEAN_FILES), $(file)_clean) \
 	$(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_clean)
 
 $(foreach name, $(NAMES), $(eval $(call MAKE_CLEAN,$(name),$($(name)_TYPE))))
 $(foreach file, $(CLEAN_FILES), $(eval $(call MAKE_CLEAN_FILE,$(file))))
-$(foreach pro, $(DEP_PROS), $(eval $(call MAKE_CLEAN_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_CLEAN_SUB_PROS,$(pro))))
 
 # ######################################################################################
 # make install
 # #
 
+# select install path
+ifneq ($(INSTALL),)
+BIN_DIR  		:= $(INSTALL)
+endif
+
 # install files
 $(foreach name, $(NAMES), $(eval $(if $(findstring LIB, $($(name)_TYPE)), LIB_FILES += $(LIB_PREFIX)$(name)$(LIB_SUFFIX), )))
 $(foreach name, $(NAMES), $(eval $(if $(findstring DLL, $($(name)_TYPE)), LIB_FILES += $(DLL_PREFIX)$(name)$(DLL_SUFFIX), )))
 $(foreach name, $(NAMES), $(eval $(if $(findstring BIN, $($(name)_TYPE)), BIN_FILES += $(BIN_PREFIX)$(name)$(BIN_SUFFIX), )))
-$(foreach name, $(NAMES), $(eval OBJ_FILES += $($(name)_OBJS)))
 
-# generate full path
-INC_FILES := $(addprefix $(shell $(PWD))/, $(INC_FILES))
-LIB_FILES := $(addprefix $(shell $(PWD))/, $(LIB_FILES))
-BIN_FILES := $(addprefix $(shell $(PWD))/, $(BIN_FILES))
-OBJ_FILES := $(addprefix $(shell $(PWD))/, $(OBJ_FILES))
+# make full path
+INC_FILES 		:= $(addprefix $(shell $(PWD))/, $(INC_FILES))
+LIB_FILES 		:= $(addprefix $(shell $(PWD))/, $(LIB_FILES))
+BIN_FILES 		:= $(addprefix $(shell $(PWD))/, $(BIN_FILES))
 
-INC_FILES := $(sort $(INC_FILES))
-LIB_FILES := $(sort $(LIB_FILES))
-BIN_FILES := $(sort $(BIN_FILES))
-OBJ_FILES := $(sort $(OBJ_FILES))
+INC_FILES 		:= $(sort $(INC_FILES))
+LIB_FILES 		:= $(sort $(LIB_FILES))
+BIN_FILES 		:= $(sort $(BIN_FILES))
 
-INSTALL_FILES := $(INC_FILES) $(LIB_FILES) $(BIN_FILES) $(OBJ_FILES)
+INSTALL_FILES 	:= $(INC_FILES) $(LIB_FILES) $(BIN_FILES)
 
-# generate include dir
-define BIN_INC_DIRS
-$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/inc/$(PRO_NAME)/%,$(1)))
+# make include dirs
+define MAKE_INSTALL_INC_DIRS
+$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(PRO_NAME)/inc/%,$(1)))
 endef
 
-# generate library dir
-define BIN_LIB_DIRS
-$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/lib/%,$(1)))
+# make library dirs
+define MAKE_INSTALL_LIB_DIRS
+$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
-# generate bin dir
-define BIN_BIN_DIR
-$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/bin/%,$(1)))
-endef
-
-# generate obj dir
-define BIN_OBJ_DIR
-$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/obj/%,$(1)))
+# make bin dirs
+define MAKE_INSTALL_BIN_DIRS
+$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(PRO_NAME)/bin/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
 define MAKE_INSTALL_INC_FILES
 $(1)_install:
-	-@$(MKDIR) $(call BIN_INC_DIRS, $(1))
-	-@$(CP) $(1) $(call BIN_INC_DIRS, $(1))
+	-@$(MKDIR) $(call MAKE_INSTALL_INC_DIRS, $(1))
+	-@$(CP) $(1) $(call MAKE_INSTALL_INC_DIRS, $(1))
 endef
 
 define MAKE_INSTALL_LIB_FILES
 $(1)_install:
-	-@$(MKDIR) $(call BIN_LIB_DIRS, $(1))
-	-@$(CP) $(1) $(call BIN_LIB_DIRS, $(1))
+	-@$(MKDIR) $(call MAKE_INSTALL_LIB_DIRS, $(1))
+	-@$(CP) $(1) $(call MAKE_INSTALL_LIB_DIRS, $(1))
 endef
 
 define MAKE_INSTALL_BIN_FILES
 $(1)_install:
-	-@$(MKDIR) $(call BIN_BIN_DIR, $(1))
-	-@$(CP) $(1) $(call BIN_BIN_DIR, $(1))
-endef
-
-define MAKE_INSTALL_OBJ_FILES
-$(1)_install:
-	-@$(MKDIR) $(call BIN_OBJ_DIR, $(1))
-	-@$(CP) $(1) $(call BIN_OBJ_DIR, $(1))
+	-@$(MKDIR) $(call MAKE_INSTALL_BIN_DIRS, $(1))
+	-@$(CP) $(1) $(call MAKE_INSTALL_BIN_DIRS, $(1))
 endef
 
 define MAKE_INSTALL_SUB_PROS
@@ -373,13 +351,7 @@ SUB_PROS_$(1)_install:
 	@$(MAKE) --no-print-directory -C $(1) install
 endef
 
-define MAKE_INSTALL_DEP_PROS
-DEP_PROS_$(1)_install:
-	@echo install $(1)
-	@$(MAKE) --no-print-directory -C $(1) install
-endef
-
-install: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_install) $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
+install: $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
 	$(INSTALL_SUFFIX_CMD1)
 	$(INSTALL_SUFFIX_CMD2)
 	$(INSTALL_SUFFIX_CMD3)
@@ -389,8 +361,6 @@ install: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_install) $(foreach file, $(
 $(foreach file, $(INC_FILES), $(eval $(call MAKE_INSTALL_INC_FILES,$(file))))
 $(foreach file, $(LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_FILES,$(file))))
 $(foreach file, $(BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_FILES,$(file))))
-$(foreach file, $(OBJ_FILES), $(eval $(call MAKE_INSTALL_OBJ_FILES,$(file))))
-$(foreach pro, $(DEP_PROS), $(eval $(call MAKE_INSTALL_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_INSTALL_SUB_PROS,$(pro))))
 
 # ######################################################################################
@@ -403,16 +373,9 @@ SUB_PROS_$(1)_update:
 	@$(MAKE) --no-print-directory -C $(1) update
 endef
 
-define MAKE_UPDATE_DEP_PROS
-DEP_PROS_$(1)_update:
-	@echo update $(1)
-	@$(MAKE) --no-print-directory -C $(1) update
-endef
+update: .null $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_update)
+	-@$(RM) *.b *.a *.so *.exe *.dll *.lib 
 
-update: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_update) .null $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_update)
-	-@$(RM) *.b *.a *.so *.exe *.dll *.lib
-
-$(foreach pro, $(DEP_PROS), $(eval $(call MAKE_UPDATE_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_UPDATE_SUB_PROS,$(pro))))
 
 # ######################################################################################
