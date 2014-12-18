@@ -7,17 +7,13 @@ include 		$(PRO_DIR)/project.mak
 SRC_DIR 		= $(PRO_DIR)/src
 
 # the binary directory
-BIN_DIR 		= $(PRO_DIR)/bin/$(PLAT)/$(ARCH)
+BIN_DIR 		= $(PRO_DIR)/bin
 
 # the package directory
 PKG_DIR 		= $(PRO_DIR)/pkg
 
 # the platform directory
 PLAT_DIR 		= $(PRO_DIR)/plat/$(PLAT)
-
-# TODO
-# the prefix directory
-PRE_DIR 		= $(PRO_DIR)/pre
 
 # include platform prefix
 -include 		$(PLAT_DIR)/prefix.mak
