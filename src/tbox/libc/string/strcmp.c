@@ -47,7 +47,7 @@ static tb_long_t tb_strcmp_impl(tb_char_t const* s1, tb_char_t const* s2)
     tb_assert_and_check_return_val(s1 && s2, 0);
     return strcmp(s1, s2);
 }
-#elif !defined(TB_LIBC_STRING_OPT_STRCMP)
+#elif !defined(TB_LIBC_STRING_IMPL_STRCMP)
 static tb_long_t tb_strcmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
     tb_assert_and_check_return_val(s1 && s2, 0);

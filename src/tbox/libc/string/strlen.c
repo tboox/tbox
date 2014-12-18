@@ -48,7 +48,7 @@ static tb_size_t tb_strlen_impl(tb_char_t const* s)
     tb_assert_and_check_return_val(s, 0);
     return strlen(s);
 }
-#elif !defined(TB_LIBC_STRING_OPT_STRLEN)
+#elif !defined(TB_LIBC_STRING_IMPL_STRLEN)
 static tb_size_t tb_strlen_impl(tb_char_t const* s)
 {
     // check
