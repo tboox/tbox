@@ -1,61 +1,61 @@
-# suffix makefile
-
-#############################################################
+# ######################################################################################
 # make define
 # #
 
 # append names
-NAMES += $(NAMES-y)
+NAMES 			+= $(NAMES-y)
 
 # append headers 
-INC_FILES += $(INC_FILES-y)
+INC_FILES 		+= $(INC_FILES-y)
 
 # ccache hook compiler for optimizating make
 ifneq ($(CCACHE),)
-CC := $(CCACHE) $(CC)
-MM := $(CCACHE) $(MM)
+CC 				:= $(CCACHE) $(CC)
+MM 				:= $(CCACHE) $(MM)
 endif
 
 # distcc hook compiler for optimizating make
 ifneq ($(DISTCC),)
-CC := $(DISTCC) $(CC)
-MM := $(DISTCC) $(MM)
-AS := $(DISTCC) $(AS)
+CC 				:= $(DISTCC) $(CC)
+MM 				:= $(DISTCC) $(MM)
+AS 				:= $(DISTCC) $(AS)
 endif
 
 # redirect output
 ifeq ($(OUT),)
-OUT := $(if $(findstring msys,$(HOST)),&>,2>)
-export OUT
+OUT 			:= $(if $(findstring msys,$(HOST)),&>,2>)
+export 			OUT
 endif
 
-# append config flags
-CFLAGS += $(CFLAG) $(CFLAGS-y)
-CXFLAGS += $(CXFLAG) $(CXFLAGS-y)
-CCFLAGS += $(CCFLAG) $(CCFLAGS-y)
-MFLAGS += $(MFLAG) $(MFLAGS-y)
-MMFLAGS += $(MMFLAG) $(MMFLAGS-y)
-MXFLAGS += $(MXFLAG) $(MXFLAGS-y)
-LDFLAGS += $(LDFLAG) $(LDFLAGS-y)
-ASFLAGS += $(ASFLAG) $(ASFLAGS-y)
-ARFLAGS += $(ARFLAG) $(ARFLAGS-y)
-SHFLAGS += $(SHFLAG) $(SHFLAGS-y)
+# append flags
+CFLAGS 			+= $(CFLAG) $(CFLAGS-y)
+CXFLAGS 		+= $(CXFLAG) $(CXFLAGS-y)
+CCFLAGS 		+= $(CCFLAG) $(CCFLAGS-y)
+MFLAGS 			+= $(MFLAG) $(MFLAGS-y)
+MMFLAGS 		+= $(MMFLAG) $(MMFLAGS-y)
+MXFLAGS 		+= $(MXFLAG) $(MXFLAGS-y)
+LDFLAGS 		+= $(LDFLAG) $(LDFLAGS-y)
+ASFLAGS 		+= $(ASFLAG) $(ASFLAGS-y)
+ARFLAGS 		+= $(ARFLAG) $(ARFLAGS-y)
+SHFLAGS 		+= $(SHFLAG) $(SHFLAGS-y)
 
-CFLAGS_DEBUG += $(CFLAGS_DEBUG-y)
-CXFLAGS_DEBUG += $(CXFLAGS_DEBUG-y)
-CCFLAGS_DEBUG += $(CCFLAGS_DEBUG-y)
-MFLAGS_DEBUG += $(MFLAGS_DEBUG-y)
-MMFLAGS_DEBUG += $(MMFLAGS_DEBUG-y)
-MXFLAGS_DEBUG += $(MXFLAGS_DEBUG-y)
-LDFLAGS_DEBUG += $(LDFLAGS_DEBUG-y)
-ASFLAGS_DEBUG += $(ASFLAGS_DEBUG-y)
-ARFLAGS_DEBUG += $(ARFLAGS_DEBUG-y)
-SHFLAGS_DEBUG += $(SHFLAGS_DEBUG-y)
+# append debug flags
+CFLAGS_DEBUG 	+= $(CFLAGS_DEBUG-y)
+CXFLAGS_DEBUG 	+= $(CXFLAGS_DEBUG-y)
+CCFLAGS_DEBUG 	+= $(CCFLAGS_DEBUG-y)
+MFLAGS_DEBUG 	+= $(MFLAGS_DEBUG-y)
+MMFLAGS_DEBUG 	+= $(MMFLAGS_DEBUG-y)
+MXFLAGS_DEBUG 	+= $(MXFLAGS_DEBUG-y)
+LDFLAGS_DEBUG 	+= $(LDFLAGS_DEBUG-y)
+ASFLAGS_DEBUG 	+= $(ASFLAGS_DEBUG-y)
+ARFLAGS_DEBUG 	+= $(ARFLAGS_DEBUG-y)
+SHFLAGS_DEBUG 	+= $(SHFLAGS_DEBUG-y)
 
-CFLAGS_RELEASE += $(CFLAGS_RELEASE-y)
+# append release flags
+CFLAGS_RELEASE 	+= $(CFLAGS_RELEASE-y)
 CXFLAGS_RELEASE += $(CXFLAGS_RELEASE-y)
 CCFLAGS_RELEASE += $(CCFLAGS_RELEASE-y)
-MFLAGS_RELEASE += $(MFLAGS_RELEASE-y)
+MFLAGS_RELEASE 	+= $(MFLAGS_RELEASE-y)
 MMFLAGS_RELEASE += $(MMFLAGS_RELEASE-y)
 MXFLAGS_RELEASE += $(MXFLAGS_RELEASE-y)
 LDFLAGS_RELEASE += $(LDFLAGS_RELEASE-y)
@@ -64,97 +64,109 @@ ARFLAGS_RELEASE += $(ARFLAGS_RELEASE-y)
 SHFLAGS_RELEASE += $(SHFLAGS_RELEASE-y)
 
 # append projects
-DEP_PROS += $(DEP_PROS-y)
-SUB_PROS += $(SUB_PROS-y)
+DEP_PROS 		+= $(DEP_PROS-y)
+SUB_PROS 		+= $(SUB_PROS-y)
+
+# make suffix
+LIB_SUFFIX 		:= $(DTYPE)$(LIB_SUFFIX)
+DLL_SUFFIX 		:= $(DTYPE)$(DLL_SUFFIX)
 
 # append debug flags
 ifeq ($(DEBUG),y)
-CFLAGS += $(CFLAGS_DEBUG)
-CXFLAGS += $(CXFLAGS_DEBUG)
-CCFLAGS += $(CCFLAGS_DEBUG)
-MFLAGS += $(MFLAGS_DEBUG)
-MMFLAGS += $(MMFLAGS_DEBUG)
-MXFLAGS += $(MXFLAGS_DEBUG)
-LDFLAGS += $(LDFLAGS_DEBUG)
-ASFLAGS += $(ASFLAGS_DEBUG)
-ARFLAGS += $(ARFLAGS_DEBUG)
-SHFLAGS += $(SHFLAGS_DEBUG)
+CFLAGS 			+= $(CFLAGS_DEBUG)
+CXFLAGS 		+= $(CXFLAGS_DEBUG)
+CCFLAGS 		+= $(CCFLAGS_DEBUG)
+MFLAGS 			+= $(MFLAGS_DEBUG)
+MMFLAGS 		+= $(MMFLAGS_DEBUG)
+MXFLAGS 		+= $(MXFLAGS_DEBUG)
+LDFLAGS 		+= $(LDFLAGS_DEBUG)
+ASFLAGS 		+= $(ASFLAGS_DEBUG)
+ARFLAGS 		+= $(ARFLAGS_DEBUG)
+SHFLAGS 		+= $(SHFLAGS_DEBUG)
 else
-CFLAGS += $(CFLAGS_RELEASE)
-CXFLAGS += $(CXFLAGS_RELEASE)
-CCFLAGS += $(CCFLAGS_RELEASE)
-MFLAGS += $(MFLAGS_RELEASE)
-MMFLAGS += $(MMFLAGS_RELEASE)
-MXFLAGS += $(MXFLAGS_RELEASE)
-LDFLAGS += $(LDFLAGS_RELEASE)
-ASFLAGS += $(ASFLAGS_RELEASE)
-ARFLAGS += $(ARFLAGS_RELEASE)
-SHFLAGS += $(SHFLAGS_RELEASE)
+CFLAGS 			+= $(CFLAGS_RELEASE)
+CXFLAGS 		+= $(CXFLAGS_RELEASE)
+CCFLAGS 		+= $(CCFLAGS_RELEASE)
+MFLAGS 			+= $(MFLAGS_RELEASE)
+MMFLAGS 		+= $(MMFLAGS_RELEASE)
+MXFLAGS 		+= $(MXFLAGS_RELEASE)
+LDFLAGS 		+= $(LDFLAGS_RELEASE)
+ASFLAGS 		+= $(ASFLAGS_RELEASE)
+ARFLAGS 		+= $(ARFLAGS_RELEASE)
+SHFLAGS 		+= $(SHFLAGS_RELEASE)
 endif
 
-# suffix
-LIB_SUFFIX := $(DTYPE)$(LIB_SUFFIX)
-DLL_SUFFIX := $(DTYPE)$(DLL_SUFFIX)
-
-# append source files
-define MAKE_DEFINE_FILES
-$(1)_C_FILES += $($(1)_C_FILES-y)
-$(1)_CC_FILES += $($(1)_CC_FILES-y)
-$(1)_CPP_FILES += $($(1)_CPP_FILES-y)
-$(1)_M_FILES += $($(1)_M_FILES-y)
-$(1)_MM_FILES += $($(1)_MM_FILES-y)
-$(1)_ASM_FILES += $($(1)_ASM_FILES-y)
-$(1)_OBJ_FILES += $($(1)_OBJ_FILES-y)
-$(1)_INC_DIR += $($(1)_INC_DIR-y)
-$(1)_LIB_DIR += $($(1)_LIB_DIR-y)
-$(1)_LIBS += $($(1)_LIBS-y)
+# append package dirs
+ifeq ($(PKG_NAMES),)
+PKG_NAMES 		:= ${shell ls $(PKG_DIR)}
+export 			PKG_NAMES
+endif
+define APPEND_PACKAGE_DIRS
+INC_DIRS 		+= $(PKG_DIR)/$(1)/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1)/inc
+LIB_DIRS 		+= $(PKG_DIR)/$(1)/lib/$(PLAT)/$(ARCH)
 endef
-$(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FILES,$(name))))
+$(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_DIRS,$(name))))
 
-# remove repeat source files
-define REMOVE_REPEAT_FILES
-$(1)_C_FILES := $(sort $($(1)_C_FILES))
-$(1)_CC_FILES := $(sort $($(1)_CC_FILES))
-$(1)_CPP_FILES := $(sort $($(1)_CPP_FILES))
-$(1)_M_FILES := $(sort $($(1)_M_FILES))
-$(1)_MM_FILES := $(sort $($(1)_MM_FILES))
-$(1)_ASM_FILES := $(sort $($(1)_ASM_FILES))
-$(1)_OBJ_FILES := $(sort $($(1)_OBJ_FILES))
-$(1)_INC_DIR := $(sort $($(1)_INC_DIR))
-$(1)_LIB_DIR := $(sort $($(1)_LIB_DIR))
+# append files-y and dirs-y
+define APPEND_FILES_AND_DIRS_y
+$(1)_C_FILES 	+= $($(1)_C_FILES-y)
+$(1)_CC_FILES 	+= $($(1)_CC_FILES-y)
+$(1)_CPP_FILES 	+= $($(1)_CPP_FILES-y)
+$(1)_M_FILES 	+= $($(1)_M_FILES-y)
+$(1)_MM_FILES 	+= $($(1)_MM_FILES-y)
+$(1)_ASM_FILES 	+= $($(1)_ASM_FILES-y)
+$(1)_OBJ_FILES 	+= $($(1)_OBJ_FILES-y)
+$(1)_INC_DIRS 	+= $($(1)_INC_DIRS-y)
+$(1)_LIB_DIRS 	+= $($(1)_LIB_DIRS-y)
+$(1)_LIBS 		+= $($(1)_LIBS-y)
 endef
-$(foreach name, $(NAMES), $(eval $(call REMOVE_REPEAT_FILES,$(name))))
+$(foreach name, $(NAMES), $(eval $(call APPEND_FILES_AND_DIRS_y,$(name))))
 
-# cflags & ldflags
-define MAKE_DEFINE_FLAGS
-$(1)_CFLAGS := $(CFLAGS) $($(1)_CFLAGS) $($(1)_CFLAGS-y)
-$(1)_CCFLAGS := $(CCFLAGS) $($(1)_CCFLAGS) $($(1)_CCFLAGS-y)
-$(1)_CXFLAGS := $(CXFLAGS) $(addprefix $(CXFLAGS-I), $(INC_DIR)) $(addprefix $(CXFLAGS-I), $($(1)_INC_DIR)) $($(1)_CXFLAGS) $($(1)_CXFLAGS-y)
-$(1)_MFLAGS := $(MFLAGS) $($(1)_MFLAGS) $($(1)_MFLAGS-y)
-$(1)_MMFLAGS := $(MMFLAGS) $($(1)_MMFLAGS) $($(1)_MMFLAGS-y)
-$(1)_MXFLAGS := $(MXFLAGS) $(addprefix $(MXFLAGS-I), $(INC_DIR)) $(addprefix $(MXFLAGS-I), $($(1)_INC_DIR)) $($(1)_MXFLAGS) $($(1)_MXFLAGS-y)
-$(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $($(1)_LDFLAGS) $($(1)_LDFLAGS-y) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS))) 
-$(1)_ASFLAGS := $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIR)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIR)) $($(1)_ASFLAGS) $($(1)_ASFLAGS-y)
-$(1)_ARFLAGS := $(ARFLAGS) $($(1)_ARFLAGS-y)
-$(1)_SHFLAGS := $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $($(1)_SHFLAGS) $($(1)_SHFLAGS-y) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS)))
+# remove repeat files and dirs
+define REMOVE_REPEAT_FILES_AND_DIRS
+$(1)_C_FILES 	:= $(sort $($(1)_C_FILES))
+$(1)_CC_FILES 	:= $(sort $($(1)_CC_FILES))
+$(1)_CPP_FILES 	:= $(sort $($(1)_CPP_FILES))
+$(1)_M_FILES 	:= $(sort $($(1)_M_FILES))
+$(1)_MM_FILES 	:= $(sort $($(1)_MM_FILES))
+$(1)_ASM_FILES 	:= $(sort $($(1)_ASM_FILES))
+$(1)_OBJ_FILES 	:= $(sort $($(1)_OBJ_FILES))
+$(1)_INC_DIRS 	:= $(sort $($(1)_INC_DIRS))
+$(1)_LIB_DIRS 	:= $(sort $($(1)_LIB_DIRS))
 endef
-$(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FLAGS,$(name))))
+$(foreach name, $(NAMES), $(eval $(call REMOVE_REPEAT_FILES_AND_DIRS,$(name))))
 
-# generate objects & source files list
-define MAKE_DEFINE_OBJS_SRCS
-$(1)_OBJS := $(addsuffix $(OBJ_SUFFIX), $($(1)_FILES))
-$(1)_SRCS := $(addsuffix .c, $($(1)_C_FILES)) $(addsuffix .cc, $($(1)_CC_FILES)) $(addsuffix .cpp, $($(1)_CPP_FILES)) $(addsuffix .m, $($(1)_M_FILES)) $(addsuffix .mm, $($(1)_MM_FILES)) $(addsuffix $(ASM_SUFFIX), $($(1)_ASM_FILES))
+# make flags
+define MAKE_FLAGS
+$(1)_CFLAGS 	:= $(CFLAGS) $($(1)_CFLAGS) $($(1)_CFLAGS-y)
+$(1)_CCFLAGS 	:= $(CCFLAGS) $($(1)_CCFLAGS) $($(1)_CCFLAGS-y)
+$(1)_CXFLAGS 	:= $(CXFLAGS) $(addprefix $(CXFLAGS-I), $(INC_DIRS)) $(addprefix $(CXFLAGS-I), $($(1)_INC_DIRS)) $($(1)_CXFLAGS) $($(1)_CXFLAGS-y)
+$(1)_MFLAGS 	:= $(MFLAGS) $($(1)_MFLAGS) $($(1)_MFLAGS-y)
+$(1)_MMFLAGS 	:= $(MMFLAGS) $($(1)_MMFLAGS) $($(1)_MMFLAGS-y)
+$(1)_MXFLAGS 	:= $(MXFLAGS) $(addprefix $(MXFLAGS-I), $(INC_DIRS)) $(addprefix $(MXFLAGS-I), $($(1)_INC_DIRS)) $($(1)_MXFLAGS) $($(1)_MXFLAGS-y)
+$(1)_LDFLAGS 	:= $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIRS)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIRS)) $($(1)_LDFLAGS) $($(1)_LDFLAGS-y) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS))) 
+$(1)_ASFLAGS 	:= $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIRS)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIRS)) $($(1)_ASFLAGS) $($(1)_ASFLAGS-y)
+$(1)_ARFLAGS 	:= $(ARFLAGS) $($(1)_ARFLAGS-y)
+$(1)_SHFLAGS 	:= $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIRS)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIRS)) $($(1)_SHFLAGS) $($(1)_SHFLAGS-y) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS)))
+endef
+$(foreach name, $(NAMES), $(eval $(call MAKE_FLAGS,$(name))))
+
+# make objects and source files 
+define MAKE_OBJS_AND_SRCS_FILES
+$(1)_OBJS 		:= $(addsuffix $(OBJ_SUFFIX), $($(1)_FILES))
+$(1)_SRCS 		:= $(addsuffix .c, $($(1)_C_FILES)) $(addsuffix .cc, $($(1)_CC_FILES)) $(addsuffix .cpp, $($(1)_CPP_FILES)) $(addsuffix .m, $($(1)_M_FILES)) $(addsuffix .mm, $($(1)_MM_FILES)) $(addsuffix $(ASM_SUFFIX), $($(1)_ASM_FILES))
 endef
 $(foreach name, $(NAMES), $(eval $(name)_FILES := $($(name)_C_FILES) $($(name)_CC_FILES) $($(name)_CPP_FILES) $($(name)_M_FILES) $($(name)_MM_FILES) $($(name)_ASM_FILES)))
-$(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_OBJS_SRCS,$(name))))
+$(foreach name, $(NAMES), $(eval $(call MAKE_OBJS_AND_SRCS_FILES,$(name))))
 
-#############################################################
+# ######################################################################################
 # make all
 # #
 
 define MAKE_OBJ_C
 $(1)$(OBJ_SUFFIX) : $(1).c
 	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1).c
+	@echo @$(CC) $(2) $(3) $(CXFLAGS-o)$(1)$(OBJ_SUFFIX) $(1).c $(OUT) /tmp/$(PRO_NAME).out
 	@$(CC) $(2) $(3) $(CXFLAGS-o)$(1)$(OBJ_SUFFIX) $(1).c $(OUT) /tmp/$(PRO_NAME).out
 endef
 
@@ -249,7 +261,7 @@ $(foreach name, $(NAMES), $(if $($(name)_FILES), $(eval $(call MAKE_ALL,$(name),
 $(foreach pro, $(DEP_PROS), $(eval $(call MAKE_ALL_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_ALL_SUB_PROS,$(pro))))
 
-#############################################################
+# ######################################################################################
 # make clean
 # #
 define MAKE_CLEAN
@@ -288,7 +300,7 @@ $(foreach file, $(CLEAN_FILES), $(eval $(call MAKE_CLEAN_FILE,$(file))))
 $(foreach pro, $(DEP_PROS), $(eval $(call MAKE_CLEAN_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_CLEAN_SUB_PROS,$(pro))))
 
-#############################################################
+# ######################################################################################
 # make install
 # #
 
@@ -312,12 +324,12 @@ OBJ_FILES := $(sort $(OBJ_FILES))
 INSTALL_FILES := $(INC_FILES) $(LIB_FILES) $(BIN_FILES) $(OBJ_FILES)
 
 # generate include dir
-define BIN_INC_DIR
+define BIN_INC_DIRS
 $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/inc/$(PRO_NAME)/%,$(1)))
 endef
 
 # generate library dir
-define BIN_LIB_DIR
+define BIN_LIB_DIRS
 $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/lib/%,$(1)))
 endef
 
@@ -333,14 +345,14 @@ endef
 
 define MAKE_INSTALL_INC_FILES
 $(1)_install:
-	-@$(MKDIR) $(call BIN_INC_DIR, $(1))
-	-@$(CP) $(1) $(call BIN_INC_DIR, $(1))
+	-@$(MKDIR) $(call BIN_INC_DIRS, $(1))
+	-@$(CP) $(1) $(call BIN_INC_DIRS, $(1))
 endef
 
 define MAKE_INSTALL_LIB_FILES
 $(1)_install:
-	-@$(MKDIR) $(call BIN_LIB_DIR, $(1))
-	-@$(CP) $(1) $(call BIN_LIB_DIR, $(1))
+	-@$(MKDIR) $(call BIN_LIB_DIRS, $(1))
+	-@$(CP) $(1) $(call BIN_LIB_DIRS, $(1))
 endef
 
 define MAKE_INSTALL_BIN_FILES
@@ -381,7 +393,7 @@ $(foreach file, $(OBJ_FILES), $(eval $(call MAKE_INSTALL_OBJ_FILES,$(file))))
 $(foreach pro, $(DEP_PROS), $(eval $(call MAKE_INSTALL_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_INSTALL_SUB_PROS,$(pro))))
 
-#############################################################
+# ######################################################################################
 # make update 
 # #
 
@@ -403,7 +415,7 @@ update: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_update) .null $(foreach pro,
 $(foreach pro, $(DEP_PROS), $(eval $(call MAKE_UPDATE_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_UPDATE_SUB_PROS,$(pro))))
 
-#############################################################
+# ######################################################################################
 # null
 # #
 .null :

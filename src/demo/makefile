@@ -141,7 +141,7 @@ demo_LIBS-$(TB_CONFIG_THIRD_HAVE_ZLIB) 		+= z
 demo_LIBS-y 								+= $(TB_CONFIG_DEMO_LIBS)
 
 # path
-demo_LIB_DIR 								+= ../tbox
+demo_LIB_DIRS 								+= ../tbox
 
 # flags
 demo_CXFLAGS 								+= -D__tb_prefix__=\"demo\"

@@ -161,10 +161,10 @@ SHFLAGS_RELEASE 	= -s
 SHFLAGS 			= $(ARCH_LDFLAGS) -dynamiclib
 
 # include directory
-INC_DIR 			+= /usr/include /usr/local/include
+INC_DIRS 			+= /usr/include /usr/local/include
 
 # library directory
-LIB_DIR 			+= /usr/lib /usr/local/lib
+LIB_DIRS 			+= /usr/lib /usr/local/lib
 
 # config
 include 			$(PLAT_DIR)/config.mak

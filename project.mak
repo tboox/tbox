@@ -10,5 +10,5 @@ PRO_VERSION_MAJOR 	= 1
 PRO_VERSION_MINOR 	= 4
 
 # the project alter version
-PRO_VERSION_ALTER 	= 7
+PRO_VERSION_ALTER 	= 8
 
