@@ -233,8 +233,8 @@ endif
 
 # sed
 ifeq ($(HOST),mac)
-SED			:= sed -i ''
-#SED		:= perl -pi -e
+#SED			:= sed -i ''
+SED			:= perl -pi -e
 else
 SED			:= sed -i
 endif
@@ -251,29 +251,44 @@ ifneq ($(PACKAGE),)
 PKG_DIR 	:= $(PACKAGE)
 endif
 
-# package names
-define MAKE_PACKAGE_NAME
-PKG_NAMES 	+= $(patsubst %.pkg,%,$(1))
+# make upper package name
+ifeq ($(HOST),mac)
+define MAKE_UPPER
+${shell echo $(1) | perl -p -e "s/(.*)/\U\1/g"}
 endef
-ifeq ($(PKG_NAMES),)
-PKG_NAMES_ 	:= ${shell ls $(PKG_DIR) | egrep ".*\.pkg"}
-$(foreach name, $(PKG_NAMES_), $(eval $(call MAKE_PACKAGE_NAME,$(name))))
+else
+define MAKE_UPPER
+${shell echo $(1) | sed "s/\(.*\)/\U\1/g"}
+endef
 endif
+
+# make upper package name
+define MAKE_UPPER_PACKAGE_NAME
+$(1)_upper 	:= $(call MAKE_UPPER,$(1))
+endef
+$(foreach name, $(PKG_NAMES), $(eval $(call MAKE_UPPER_PACKAGE_NAME,$(name))))
 
 # probe packages
 define PROBE_PACKAGE
-$(1) 		:=y
+ifeq ($($($(1)_upper)),)
+$($(1)_upper) :=n
+endif
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call PROBE_PACKAGE,$(name))))
 
 # make package info
 PKG_INFO 	:= "packages:     \n"
 define MAKE_PACKAGE_INFO
-PKG_INFO 	+= "   "$(1)":\t\t"$($(1))"\n"
-PKG_INFO_D 	+= "$(1) ="$($(1))"\n"
-PKG_INFO_E 	+= "export "$(1)"\n"
+PKG_INFO 	+= "   "$(1)":\t\t"$($($(1)_upper))"\n"
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_PACKAGE_INFO,$(name))))
+
+define MAKE_PACKAGE_INFO_
+PKG_INFO_D 	+= "$(1) ="$($(1))"\n"
+PKG_INFO_E 	+= "export "$(1)"\n"
+PKG_INFO_H 	+= __autoconf_head_$(PRO_PREFIX)CONFIG_PACKAGE_HAVE_$(1)_autoconf_tail__
+endef
+$(foreach name, $(PKG_NAMES), $(eval $(call MAKE_PACKAGE_INFO_,$($(name)_upper))))
 
 # config
 config : .null
@@ -284,6 +299,10 @@ config : .null
 	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
 	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
 	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/\/\/.*\[packages\]/$(PKG_INFO_H)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/__autoconf_head_/\#define /g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/_autoconf_tail__\s/\n/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/_autoconf_tail__//g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
 	@$(ECHO) ""
 	@$(ECHO) "============================================================================="
 	@$(ECHO) "compile:"
@@ -345,7 +364,6 @@ config : .null
 	@$(ECHO) "# package"								>> .config.mak
 	@$(ECHO) "PACKAGE ="$(PACKAGE)						>> .config.mak
 	@$(ECHO) "PKG_DIR ="$(PKG_DIR)						>> .config.mak
-	@$(ECHO) "PKG_NAMES ="$(PKG_NAMES)					>> .config.mak
 	@$(ECHO) $(PKG_INFO_D)								>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# flags"									>> .config.mak
@@ -416,7 +434,6 @@ config : .null
 	@$(ECHO) "export INSTALL"							>> .config.mak
 	@$(ECHO) "export PACKAGE"							>> .config.mak
 	@$(ECHO) "export PKG_DIR"							>> .config.mak
-	@$(ECHO) "export PKG_NAMES"							>> .config.mak
 	@$(ECHO) $(PKG_INFO_E)								>> .config.mak
 
 # ######################################################################################

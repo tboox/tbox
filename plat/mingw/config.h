@@ -1,6 +1,9 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// packages
+// [packages]
+
 // major version
 #define TB_CONFIG_VERSION_MAJOR         [major]
 
