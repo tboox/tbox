@@ -99,10 +99,10 @@ endif
 
 # append package dirs
 define APPEND_PACKAGE_DIRS
-INC_DIRS 		+= $(PKG_DIR)/$(1)/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1)/inc
-LIB_DIRS 		+= $(PKG_DIR)/$(1)/lib/$(PLAT)/$(ARCH)
+INC_DIRS 		+= $(PKG_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1).pkg/inc
+LIB_DIRS 		+= $(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)
 endef
-$(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_DIRS,$(name).pkg)))
+$(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_DIRS,$(name))))
 
 # append files-y and dirs-y
 define APPEND_FILES_AND_DIRS_y
