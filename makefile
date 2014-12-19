@@ -270,9 +270,7 @@ $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_UPPER_PACKAGE_NAME,$(name))))
 
 # probe packages
 define PROBE_PACKAGE
-ifeq ($($($(1)_upper)),)
-$($(1)_upper) :=n
-endif
+$($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),n)
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call PROBE_PACKAGE,$(name))))
 
@@ -286,7 +284,7 @@ $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_PACKAGE_INFO,$(name))))
 define MAKE_PACKAGE_INFO_
 PKG_INFO_D 	+= "$(1) ="$($(1))"\n"
 PKG_INFO_E 	+= "export "$(1)"\n"
-PKG_INFO_H 	+= __autoconf_head_$(PRO_PREFIX)CONFIG_PACKAGE_HAVE_$(1)_autoconf_tail__
+PKG_INFO_H 	+=$(if $(findstring y,$($(1))),__autoconf_head_$(PRO_PREFIX)CONFIG_PACKAGE_HAVE_$(1)_autoconf_tail__,)
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_PACKAGE_INFO_,$($(name)_upper))))
 
@@ -301,8 +299,7 @@ config : .null
 	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
 	-@$(SED) "s/\/\/.*\[packages\]/$(PKG_INFO_H)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
 	-@$(SED) "s/__autoconf_head_/\#define /g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/_autoconf_tail__\s/\n/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/_autoconf_tail__//g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@$(SED) "s/_autoconf_tail__\s*/\n/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
 	@$(ECHO) ""
 	@$(ECHO) "============================================================================="
 	@$(ECHO) "compile:"
