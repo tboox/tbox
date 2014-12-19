@@ -92,6 +92,11 @@ ARFLAGS 		+= $(ARFLAGS_RELEASE)
 SHFLAGS 		+= $(SHFLAGS_RELEASE)
 endif
 
+# select package path
+ifneq ($(PACKAGE),)
+PKG_DIR  		:= $(PACKAGE)
+endif
+
 # append package dirs
 ifeq ($(PKG_NAMES),)
 PKG_NAMES 		:= ${shell ls $(PKG_DIR)}
@@ -255,38 +260,6 @@ $(foreach name, $(NAMES), $(if $($(name)_FILES), $(eval $(call MAKE_ALL,$(name),
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_ALL_SUB_PROS,$(pro))))
 
 # ######################################################################################
-# make clean
-# #
-define MAKE_CLEAN
-$(1)_$(2)_clean:
-	-@$(RM) $($(2)_PREFIX)$(1)$($(2)_SUFFIX)
-	-@$(RM) $($(1)_OBJS)
-endef
-
-define MAKE_CLEAN_FILE
-$(1)_clean:
-	-@$(RM) $(1)
-endef
-
-define MAKE_CLEAN_SUB_PROS
-SUB_PROS_$(1)_clean:
-	@echo clean $(1)
-	@$(MAKE) --no-print-directory -C $(1) clean
-endef
-
-# make full path
-CLEAN_FILES := $(addprefix $(shell $(PWD))/, $(CLEAN_FILES))
-
-clean: \
-	$(foreach name, $(NAMES), $(name)_$($(name)_TYPE)_clean) \
-	$(foreach file, $(CLEAN_FILES), $(file)_clean) \
-	$(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_clean)
-
-$(foreach name, $(NAMES), $(eval $(call MAKE_CLEAN,$(name),$($(name)_TYPE))))
-$(foreach file, $(CLEAN_FILES), $(eval $(call MAKE_CLEAN_FILE,$(file))))
-$(foreach pro, $(SUB_PROS), $(eval $(call MAKE_CLEAN_SUB_PROS,$(pro))))
-
-# ######################################################################################
 # make install
 # #
 
@@ -332,6 +305,7 @@ $(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_DIRS,$(file),$
 $(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_DIRS,$(file),$(1))))
 
 INSTALL_FILES 	+= $($(1)_INC_FILES) $($(1)_LIB_FILES) $($(1)_DLL_FILES) $($(1)_BIN_FILES)
+REMOVED_DIRS 	+= $(BIN_DIR)/$(1)
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_INSTALL_FILES,$(name))))
 
@@ -368,7 +342,10 @@ $(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_FILES,$(file))
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_INSTALL,$(name))))
 
-install: $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
+clean_install:
+	-@$(RMDIR) $(REMOVED_DIRS)
+	
+install: clean_install $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
 	$(INSTALL_SUFFIX_CMD1)
 	$(INSTALL_SUFFIX_CMD2)
 	$(INSTALL_SUFFIX_CMD3)
@@ -384,6 +361,29 @@ endef
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_INSTALL_SUB_PROS,$(pro))))
 
 # ######################################################################################
+# make clean
+# #
+define MAKE_CLEAN
+$(1)_$(2)_clean:
+	-@$(RM) $($(2)_PREFIX)$(1)$($(2)_SUFFIX)
+	-@$(RM) $($(1)_OBJS)
+	-@$(RM) *.ilk *.manifest *.pdb *.idb *.dmp
+endef
+
+define MAKE_CLEAN_SUB_PROS
+SUB_PROS_$(1)_clean:
+	@echo clean $(1)
+	@$(MAKE) --no-print-directory -C $(1) clean
+endef
+
+clean: \
+	$(foreach name, $(NAMES), $(name)_$($(name)_TYPE)_clean) \
+	$(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_clean)
+
+$(foreach name, $(NAMES), $(eval $(call MAKE_CLEAN,$(name),$($(name)_TYPE))))
+$(foreach pro, $(SUB_PROS), $(eval $(call MAKE_CLEAN_SUB_PROS,$(pro))))
+
+# ######################################################################################
 # make update 
 # #
 
@@ -394,7 +394,7 @@ SUB_PROS_$(1)_update:
 endef
 
 update: .null $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_update)
-	-@$(RM) *.b *.a *.so *.exe *.dll *.lib 
+	-@$(RM) *.b *.a *.so *.exe *.dll *.lib *.pdb *.ilk
 
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_UPDATE_SUB_PROS,$(pro))))
 
@@ -402,6 +402,5 @@ $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_UPDATE_SUB_PROS,$(pro))))
 # null
 # #
 .null :
-
 
 

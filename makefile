@@ -51,7 +51,6 @@ rebuild : .null
 install : .null
 	@echo "" > /tmp/$(PRO_NAME).out
 	@echo install $(PRO_NAME)
-	-@$(RMDIR) $(BIN_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
 	@$(MKDIR) $(BIN_DIR)/$(PRO_NAME)/inc/$(PLAT)/$(ARCH)
@@ -267,6 +266,7 @@ config : .null
 	@echo "config: ccache:   " 							$(CCACHE)
 	@echo "config: distcc:   " 							$(DISTCC)
 	@echo "config: install:  " 							$(INSTALL)
+	@echo "config: package:  " 							$(PACKAGE)
 	@echo "config: bin:      " 							$(BIN)
 	@echo "config: pre:      " 							$(PRE)
 	@echo "config: sdk:      " 							$(SDK)
@@ -293,6 +293,9 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# install"              						>> .config.mak
 	@echo "INSTALL ="$(INSTALL) 						>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# package"              						>> .config.mak
+	@echo "PACKAGE ="$(PACKAGE) 						>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# flags"      		          				>> .config.mak
 	@echo "CFLAG ="$(CFLAG) 							>> .config.mak
@@ -360,6 +363,7 @@ config : .null
 	@echo "export CCACHE" 			 					>> .config.mak
 	@echo "export DISTCC" 			 					>> .config.mak
 	@echo "export INSTALL" 			 					>> .config.mak
+	@echo "export PACKAGE" 			 					>> .config.mak
 
 # ######################################################################################
 # help
