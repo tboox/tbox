@@ -133,11 +133,11 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ASIO) 	+= \
 
 # libs
 demo_LIBS 									+= tbox$(DTYPE) 
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_OPENSSL) 	+= ssl crypto
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_POLARSSL) 	+= polarssl
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_MYSQL) 	+= mysqlclient
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_SQLITE3) 	+= sqlite3
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_ZLIB) 		+= z
+demo_LIBS-$(OPENSSL) 						+= ssl crypto
+demo_LIBS-$(POLARSSL) 						+= polarssl
+demo_LIBS-$(MYSQL) 							+= mysqlclient
+demo_LIBS-$(SQLITE3) 						+= sqlite3
+demo_LIBS-$(ZLIB) 							+= z
 demo_LIBS-y 								+= $(TB_CONFIG_DEMO_LIBS)
 
 # path
