@@ -98,15 +98,11 @@ PKG_DIR  		:= $(PACKAGE)
 endif
 
 # append package dirs
-ifeq ($(PKG_NAMES),)
-PKG_NAMES 		:= ${shell ls $(PKG_DIR)}
-export 			PKG_NAMES
-endif
 define APPEND_PACKAGE_DIRS
 INC_DIRS 		+= $(PKG_DIR)/$(1)/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1)/inc
 LIB_DIRS 		+= $(PKG_DIR)/$(1)/lib/$(PLAT)/$(ARCH)
 endef
-$(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_DIRS,$(name))))
+$(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_DIRS,$(name).pkg)))
 
 # append files-y and dirs-y
 define APPEND_FILES_AND_DIRS_y
