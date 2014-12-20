@@ -275,22 +275,22 @@ $(foreach name, $(NAMES), $(eval $(call EXPAND_INSTALL_FILES,$(name))))
 
 # make include dirs
 define MAKE_INSTALL_INC_DIRS
-$(1)_INC_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/inc/%,$(1)))
+$(1)_INC_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/inc/%,$(1)))
 endef
 
 # make library dirs
 define MAKE_INSTALL_LIB_DIRS
-$(1)_LIB_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/lib/$(PLAT)/$(ARCH)/%,$(1)))
+$(1)_LIB_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
 # make dynamic dirs
 define MAKE_INSTALL_DLL_DIRS
-$(1)_DLL_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/lib/$(PLAT)/$(ARCH)/%,$(1)))
+$(1)_DLL_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
 # make binary dirs
 define MAKE_INSTALL_BIN_DIRS
-$(1)_BIN_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2)/bin/$(PLAT)/$(ARCH)/%,$(1)))
+$(1)_BIN_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/bin/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
 # make install files

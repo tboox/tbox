@@ -28,11 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include <polarssl/ssl.h>
-#include <polarssl/certs.h>
-#include <polarssl/error.h>
-#include <polarssl/entropy.h>
-#include <polarssl/ctr_drbg.h>
+#include "polarssl/polarssl.h"
 #include "../../../asio/asio.h"
 #include "../../../libc/libc.h"
 #include "../../../platform/platform.h"

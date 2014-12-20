@@ -53,11 +53,11 @@ install : .null
 	@echo install $(PRO_NAME)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
-	@$(MKDIR) $(BIN_DIR)/$(PRO_NAME)/inc/$(PLAT)/$(ARCH)
-	@$(CP) $(BIN_DIR)/$(PRO_NAME)/inc/$(PRO_NAME)/$(PRO_NAME).config.h $(BIN_DIR)/$(PRO_NAME)/inc/$(PLAT)/$(ARCH)/$(PRO_NAME).config.h 
-	@$(RM) $(BIN_DIR)/$(PRO_NAME)/inc/$(PRO_NAME)/$(PRO_NAME).config.h
-	@$(CP) $(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)/* $(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/ 
-	@$(RMDIR) $(BIN_DIR)/$(PRO_NAME)/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)
+	@$(MKDIR) $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PLAT)/$(ARCH)
+	@$(CP) $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PRO_NAME)/$(PRO_NAME).config.h $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PLAT)/$(ARCH)/$(PRO_NAME).config.h 
+	@$(RM) $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PRO_NAME)/$(PRO_NAME).config.h
+	@$(CP) $(BIN_DIR)/$(PRO_NAME).pkg/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)/* $(BIN_DIR)/$(PRO_NAME).pkg/lib/$(PLAT)/$(ARCH)/ 
+	@$(RMDIR) $(BIN_DIR)/$(PRO_NAME).pkg/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)
 
 # make lipo
 lipo : .null
