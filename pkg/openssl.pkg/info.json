@@ -1,0 +1,47 @@
+{
+    "format":
+    {
+        "name":         "The TBOOX Package Format"
+        "version":      "v1.0.1"
+        "website":      "http://www.tboox.org"
+    }
+
+    "package":
+    {
+        "name":         "The OpenSSL Library"
+        "website":      "http://www.openssl.org"
+    }
+
+    "compiler": 
+    {
+        "default":
+        {
+            "debug"
+            {
+            ,   "libs":         "ssl crypto"
+            ,   "libpath":      "/usr/lib/ /usr/local/lib/ /opt/lib/ /opt/local/lib/"
+            ,   "incpath":      "/usr/include/ /usr/local/include/ /opt/include/ /opt/local/include/"
+            ,   "libflags":     ""
+            ,   "incflags":     ""
+            }
+        ,   "release":          ".compiler.default.debug"
+        }
+
+    ,   "linux" :
+        {
+            "x86":      ".compiler.default"
+        ,   "x64":      ".compiler.default"
+        }
+
+    ,   "mac" :
+        {
+            "x86":      ".compiler.default"
+        ,   "x64":      ".compiler.default"
+        }
+
+    ,   "cygwin" :
+        {
+            "x86":      ".compiler.default"
+        }
+    }
+}
