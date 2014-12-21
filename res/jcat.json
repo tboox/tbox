@@ -12,6 +12,7 @@
     ,   { "string": "hello world!" }
     ]
 ,   "macro":        "$.array[2]"
-,   "macro2":       "$.com\.xxx\.xxx"
+,   "macro2":       "$.com\\\.xxx\\\.xxx"
 ,   "macro3":       "$.macro"
+,   "macro4":       "$.array"
 }

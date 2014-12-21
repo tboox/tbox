@@ -1,0 +1,16 @@
+#/bin/bash
+
+# jcat path
+jcat=$_
+
+# the platform
+plat=$1
+
+# the architecture
+arch=$2
+
+# select jcat
+jcat=$jcat"_"$plat"_"$arch
+
+# done it
+$jcat object_jcat $3 $4

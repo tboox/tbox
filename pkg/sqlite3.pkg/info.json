@@ -2,80 +2,80 @@
     "format":
     {
         "name":         "The TBOOX Package Format"
-        "version":      "v1.0.1"
-        "website":      "http://www.tboox.org"
+    ,   "version":      "v1.0.1"
+    ,   "website":      "http://www.tboox.org"
     }
 
-    "package":
+,   "package":
     {
         "name":         "The SQLite Library"
-        "website":      "http://www.sqlite.org"
+    ,   "website":      "http://www.sqlite.org"
     }
 
-    "compiler": 
+,   "compiler": 
     {
         "default":
         {
-            "debug"
+            "debug":
             {
-            ,   "libs":         "sqlite3"
+                "libs":         "sqlite3"
             ,   "libpath":      ""
             ,   "incpath":      ""
             ,   "libflags":     ""
             ,   "incflags":     ""
             }
-        ,   "release":          ".compiler.default.debug"
+        ,   "release":          "$.compiler.default.debug"
         }
 
     ,   "linux" :
         {
             "x86":
             {
-                "debug"
+                "debug":
                 {
-                ,   "libs":         "sqlite3"
+                   "libs":         "sqlite3"
                 ,   "libpath":      "/usr/lib/ /usr/local/lib/ /opt/lib/ /opt/local/lib/"
                 ,   "incpath":      "/usr/include/ /usr/local/include/ /opt/include/ /opt/local/include/"
                 ,   "libflags":     ""
                 ,   "incflags":     ""
                 }
-            ,   "release":          ".compiler.linux.x86.debug"
+            ,   "release":          "$.compiler.linux.x86.debug"
             }
-        ,   "x64":      ".compiler.linux.x86"
+        ,   "x64":      "$.compiler.linux.x86"
         }
 
     ,   "mac" :
         {
-            "x86":      ".compiler.default"
-        ,   "x64":      ".compiler.default"
+            "x86":      "$.compiler.default"
+        ,   "x64":      "$.compiler.default"
         }
 
     ,   "msvc" :
         {
-            "x86":      ".compiler.default"
+            "x86":      "$.compiler.default"
         }
 
     ,   "mingw" :
         {
-            "x86":      ".compiler.default"
+            "x86":      "$.compiler.default"
         }
 
     ,   "cygwin" :
         {
-            "x86":      ".compiler.default"
+            "x86":      "$.compiler.default"
         }
 
     ,   "ios" :
         {
-            "armv7":    ".compiler.default"
-        ,   "armv7s":   ".compiler.default"
-        ,   "arm64":    ".compiler.default"
+            "armv7":    "$.compiler.default"
+        ,   "armv7s":   "$.compiler.default"
+        ,   "arm64":    "$.compiler.default"
         }
 
     ,   "android" :
         {
-            "armv5te":  ".compiler.default"
-        ,   "armv6":    ".compiler.default"
+            "armv5te":  "$.compiler.default"
+        ,   "armv6":    "$.compiler.default"
         }
     }
 }

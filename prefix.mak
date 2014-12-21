@@ -12,6 +12,9 @@ BIN_DIR 		= $(PRO_DIR)/bin
 # the platform directory
 PLAT_DIR 		= $(PRO_DIR)/plat/$(PLAT)
 
+# the tool directory
+TOOL_DIR 		= $(PRO_DIR)/tool
+
 # include platform prefix
 -include 		$(PLAT_DIR)/prefix.mak
 

@@ -2,46 +2,46 @@
     "format":
     {
         "name":         "The TBOOX Package Format"
-        "version":      "v1.0.1"
-        "website":      "http://www.tboox.org"
+    ,   "version":      "v1.0.1"
+    ,   "website":      "http://www.tboox.org"
     }
 
-    "package":
+,   "package":
     {
         "name":         "The MySQL Library"
-        "website":      "http://www.mysql.com"
+    ,   "website":      "http://www.mysql.com"
     }
 
-    "compiler": 
+,   "compiler": 
     {
         "default":
         {
-            "debug"
+            "debug":
             {
-            ,   "libs":         "mysqlclient"
+                "libs":         "mysqlclient"
             ,   "libpath":      "/usr/lib/ /usr/local/lib/ /opt/lib/ /opt/local/lib/"
             ,   "incpath":      "/usr/include/ /usr/local/include/ /opt/include/ /opt/local/include/"
             ,   "libflags":     ""
             ,   "incflags":     ""
             }
-        ,   "release":          ".compiler.default.debug"
+        ,   "release":          "$.compiler.default.debug"
         }
 
     ,   "linux" :
         {
-            "x86":      ".compiler.default"
-        ,   "x64":      ".compiler.default"
+            "x86":      "$.compiler.default"
+        ,   "x64":      "$.compiler.default"
         }
 
     ,   "mac" :
         {
-            "x86":      ".compiler.default"
-        ,   "x64":      ".compiler.default"
+            "x86":      "$.compiler.default"
+        ,   "x64":      "$.compiler.default"
         }
 
     ,   "cygwin" :
         {
-            "x86":      ".compiler.default"
+            "x86":      "$.compiler.default"
         }
     }
 }
