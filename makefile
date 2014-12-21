@@ -214,6 +214,9 @@ PRO_DIR		:=${shell pwd}
 # the package directory
 PKG_DIR 	:= $(if $(PACKAGE),$(PACKAGE),$(PRO_DIR)/pkg)
 
+# the tool directory
+TOOL_DIR 	:= $(PRO_DIR)/tool
+
 # flag
 CXFLAG		:= $(if $(CXFLAG),$(CXFLAG),)
 
@@ -270,7 +273,7 @@ $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_UPPER_PACKAGE_NAME,$(name))))
 
 # probe packages
 define PROBE_PACKAGE
-$($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),${shell if [ -d "$(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)" ]; then echo "y"; else echo "n"; fi })
+$($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),${shell if [ `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH) $(PKG_DIR)/$(1).pkg/info.json` != "" ]; then echo "y"; else echo "n"; fi })
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call PROBE_PACKAGE,$(name))))
 

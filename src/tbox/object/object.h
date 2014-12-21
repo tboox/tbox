@@ -182,48 +182,45 @@ tb_object_ref_t     tb_object_data(tb_object_ref_t object, tb_size_t format);
  *
  * <pre>
  *
- * xml:
- *
- * <dict>
-        <key>string</key>
-        <string>hello world!</string>
+    file:
+    {
+        "string":       "hello world!"
+    ,   "com.xxx.xxx":  "hello world"
+    ,   "integer":      31415926
+    ,   "array":
+        [
+            "hello world!"
+        ,   31415926
+        ,   3.1415926
+        ,   false
+        ,   true
+        ,   { "string": "hello world!" }
+        ]
+    ,   "macro":        "$.array[2]"
+    ,   "macro2":       "$.com\\\\.xxx\\\\.xxx"
+    ,   "macro3":       "$.macro"
+    ,   "macro4":       "$.array"
+    }
 
-        <key>com.xxx.xxx</key>
-        <string>hello world!</string>
+    path:
+        1. ".string"               : hello world!
+        2. ".array[1]"             : 31415926
+        3. ".array[5].string"      : hello world!
+        4. ".com\\.xxx\\.xxx"      : hello world
+        5. ".macro"                : 3.1415926
+        6. ".macro2"               : hello world
+        7. ".macro3"               : 3.1415926
+        8. ".macro4[0]"            : "hello world!"
 
-        <key>integer</key>
-        <number>31415926</number>
-
-        <key>array</key>
-        <array>
-            <string>hello world!</string>
-            <number>31415926</number>
-            <number>3.1415926</number>
-            <false/>
-            <true/>
-            <dict>
-                <key>string</key>
-                <string>hello world!</string>
-            </dict>
-        </array>
-    </dict>
- *
- * path:
- *
- * 1. ".string"             : hello world!
- * 2. ".array[1]"           : 31415926
- * 3. ".array[5].string"    : hello world!
- * 4. ".com\\.xxx\\.xxx"    : hello world!
  * 
  * </pre>
  *
  * @param object    the object
  * @param path      the object path
- * @param type      the object type, check it if not TB_OBJECT_TYPE_NONE
- *
+ * @param bmacro    enable macro(like "$.path")? 
  *
  * <code>
- * tb_object_ref_t     object = tb_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
+ * tb_object_ref_t object = tb_object_seek(root, ".array[5].string", tb_false);
  * if (object)
  * {
  *      tb_trace_d("%s", tb_object_string_cstr(object));
@@ -233,7 +230,7 @@ tb_object_ref_t     tb_object_data(tb_object_ref_t object, tb_size_t format);
  *
  * @return          the object
  */
-tb_object_ref_t     tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_size_t type);
+tb_object_ref_t     tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_bool_t bmacro);
 
 /*! dump the object
  *
