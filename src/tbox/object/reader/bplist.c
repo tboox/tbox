@@ -560,7 +560,7 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
 
             // read object
             object_hash[i] = tb_object_bplist_reader_func_object(&reader, item_size);
-    //      if (object_hash[i]) tb_object_dump(object_hash[i]);
+    //      if (object_hash[i]) tb_object_dump(object_hash[i], TB_OBJECT_FORMAT_XML);
         }
 
         // failed?
@@ -608,7 +608,7 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                             // exit priv
                             tb_free(priv);
                             tb_object_setp(object, tb_null);
-    //                      tb_object_dump(object);
+    //                      tb_object_dump(object, TB_OBJECT_FORMAT_XML);
                         }
                     }
                     break;
@@ -659,7 +659,7 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                             // exit priv
                             tb_free(priv);
                             tb_object_setp(object, tb_null);
-//                          tb_object_dump(object);
+//                          tb_object_dump(object, TB_OBJECT_FORMAT_XML);
                         }
                     }
                     break;

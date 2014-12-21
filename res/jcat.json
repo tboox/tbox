@@ -1,0 +1,17 @@
+{
+    "string":       "hello world!"
+,   "com.xxx.xxx":  "hello world"
+,   "integer":      31415926
+,   "array":
+    [
+        "hello world!"
+    ,   31415926
+    ,   3.1415926
+    ,   false
+    ,   true
+    ,   { "string": "hello world!" }
+    ]
+,   "macro":        "$.array[2]"
+,   "macro2":       "$.com\.xxx\.xxx"
+,   "macro3":       "$.macro"
+}

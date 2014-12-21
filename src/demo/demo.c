@@ -96,6 +96,7 @@ static tb_demo_t g_demo[] =
 
     // object
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
+,   TB_DEMO_MAIN_ITEM(object_jcat)
 ,   TB_DEMO_MAIN_ITEM(object_json)
 ,   TB_DEMO_MAIN_ITEM(object_bin)
 ,   TB_DEMO_MAIN_ITEM(object_xml)

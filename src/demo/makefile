@@ -100,6 +100,7 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 											utils/option \
+											object/jcat \
 											object/json \
 											object/bin \
 											object/xml \

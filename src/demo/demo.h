@@ -90,6 +90,7 @@ TB_DEMO_MAIN_DECL(other_test);
 TB_DEMO_MAIN_DECL(other_charset);
 
 // object
+TB_DEMO_MAIN_DECL(object_jcat);
 TB_DEMO_MAIN_DECL(object_json);
 TB_DEMO_MAIN_DECL(object_bin);
 TB_DEMO_MAIN_DECL(object_xml);

@@ -258,26 +258,27 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
     // ok?
     return object;
 }
-tb_object_ref_t tb_object_dump(tb_object_ref_t object)
+tb_object_ref_t tb_object_dump(tb_object_ref_t object, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object, tb_null);
+    tb_assert_and_check_return_val(format == TB_OBJECT_FORMAT_XML || format == TB_OBJECT_FORMAT_XPLIST || format == TB_OBJECT_FORMAT_JSON, tb_null);
 
     // data
-    tb_object_ref_t odata = tb_object_data(object, TB_OBJECT_FORMAT_XML);
+    tb_object_ref_t odata = tb_object_data(object, format);
     if (odata)
     {
-        // data & size 
+        // the data and size 
         tb_byte_t const*    data = (tb_byte_t const*)tb_object_data_getp(odata);
         tb_size_t           size = tb_object_data_size(odata);
         if (data && size)
         {
-            tb_char_t const*    p = tb_strstr((tb_char_t const*)data, "?>");
+            // done
+            tb_char_t const*    p = (tb_char_t const*)data;
             tb_char_t const*    e = (tb_char_t const*)data + size;
             tb_char_t           b[4096 + 1];
-            if (p && p + 2 < e)
+            if (p && p < e)
             {
-                p += 2;
                 while (p < e && *p && tb_isspace(*p)) p++;
                 while (p < e && *p)
                 {
@@ -295,6 +296,7 @@ tb_object_ref_t tb_object_dump(tb_object_ref_t object)
         tb_object_exit(odata);
     }
 
+    // the object
     return object;
 }
 tb_size_t tb_object_ref(tb_object_ref_t object)
