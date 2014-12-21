@@ -28,10 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include <openssl/bio.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/x509v3.h>
+#include "openssl/openssl.h"
 #include "../../../asio/asio.h"
 #include "../../../utils/utils.h"
 #include "../../../platform/platform.h"

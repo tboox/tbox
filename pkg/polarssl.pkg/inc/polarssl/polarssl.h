@@ -1,6 +1,9 @@
-#ifndef POLARSSL_H
-#define POLARSSL_H
+#ifndef PKG_POLARSSL_H
+#define PKG_POLARSSL_H
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * includes
+ */
 #include "ssl.h"
 #include "certs.h"
 #include "error.h"
