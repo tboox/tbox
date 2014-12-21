@@ -186,34 +186,34 @@ tb_object_ref_t     tb_object_data(tb_object_ref_t object, tb_size_t format);
  *
  * <dict>
         <key>string</key>
-        <string>hello wolrd!</string>
+        <string>hello world!</string>
 
         <key>com.xxx.xxx</key>
-        <string>hello wolrd!</string>
+        <string>hello world!</string>
 
         <key>integer</key>
         <number>31415926</number>
 
         <key>array</key>
         <array>
-            <string>hello wolrd!</string>
+            <string>hello world!</string>
             <number>31415926</number>
             <number>3.1415926</number>
             <false/>
             <true/>
             <dict>
                 <key>string</key>
-                <string>hello wolrd!</string>
+                <string>hello world!</string>
             </dict>
         </array>
     </dict>
  *
  * path:
  *
- * 1. ".string"             : hello wolrd!
+ * 1. ".string"             : hello world!
  * 2. ".array[1]"           : 31415926
- * 3. ".array[5].string"    : hello wolrd!
- * 4. ".com\\.xxx\\.xxx"    : hello wolrd!
+ * 3. ".array[5].string"    : hello world!
+ * 4. ".com\\.xxx\\.xxx"    : hello world!
  * 
  * </pre>
  *
@@ -238,10 +238,11 @@ tb_object_ref_t     tb_object_seek(tb_object_ref_t object, tb_char_t const* path
 /*! dump the object
  *
  * @param object    the object
+ * @param format    the format, support: .xml, .xplist, .json
  *
  * @return          the object
  */
-tb_object_ref_t     tb_object_dump(tb_object_ref_t object);
+tb_object_ref_t     tb_object_dump(tb_object_ref_t object, tb_size_t format);
 
 /*! the object reference count
  *

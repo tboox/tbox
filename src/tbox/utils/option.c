@@ -574,7 +574,7 @@ tb_void_t tb_option_dump(tb_option_ref_t option)
     tb_assert_and_check_return(impl && impl->list);
 
     // dump 
-    tb_object_dump(impl->list);
+    tb_object_dump(impl->list, TB_OBJECT_FORMAT_JSON);
 }
 tb_void_t tb_option_help(tb_option_ref_t option)
 {
