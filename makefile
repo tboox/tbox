@@ -53,11 +53,6 @@ install : .null
 	@echo install $(PRO_NAME)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
-	@$(MKDIR) $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PLAT)/$(ARCH)
-	@$(CP) $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PRO_NAME)/$(PRO_NAME).config.h $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PLAT)/$(ARCH)/$(PRO_NAME).config.h 
-	@$(RM) $(BIN_DIR)/$(PRO_NAME).pkg/inc/$(PRO_NAME)/$(PRO_NAME).config.h
-	@$(CP) $(BIN_DIR)/$(PRO_NAME).pkg/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)/* $(BIN_DIR)/$(PRO_NAME).pkg/lib/$(PLAT)/$(ARCH)/ 
-	@$(RMDIR) $(BIN_DIR)/$(PRO_NAME).pkg/lib/$(PLAT)/$(ARCH)/$(PRO_NAME)
 
 # make lipo
 lipo : .null
@@ -308,16 +303,16 @@ $(foreach name, $(PKG_NAMES), $(eval $(call LOAD_PACKAGE_OPTION,$(name))))
 
 # config
 config : .null
-	-@cp ./plat/$(PLAT)/config.h ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/\[major\]/$(PRO_VERSION_MAJOR)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/\[minor\]/$(PRO_VERSION_MINOR)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/\[alter\]/$(PRO_VERSION_ALTER)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/\/\/.*\[packages\]/$(PKG_INFO_H)/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/__autoconf_head_/\#define /g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
-	-@$(SED) "s/_autoconf_tail__\s*/\n/g" ./src/$(PRO_NAME)/$(PRO_NAME).config.h
+	-@cp $(PRO_DIR)/plat/$(PLAT)/config.h $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[major\]/$(PRO_VERSION_MAJOR)/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[minor\]/$(PRO_VERSION_MINOR)/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[alter\]/$(PRO_VERSION_ALTER)/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\/\/.*\[packages\]/$(PKG_INFO_H)/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/__autoconf_head_/\#define /g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/_autoconf_tail__\s*/\n/g" $(PRO_DIR)/$(PRO_NAME).config.h
 	@$(ECHO) ""
 	@$(ECHO) "============================================================================="
 	@$(ECHO) "compile:"
@@ -457,5 +452,5 @@ config : .null
 
 # make help
 help : .null
-	@cat ./INSTALL
+	@cat $(PRO_DIR)/INSTALL
 

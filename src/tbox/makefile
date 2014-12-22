@@ -7,6 +7,9 @@ NAMES 					= tbox
 # module type
 tbox_TYPE 				= LIB
 
+# config
+tbox_CONFIG 			= y
+
 # basic files
 tbox_C_FILES 			+= \
 						tbox \
@@ -414,7 +417,6 @@ tbox_CXFLAGS 			+= -D__tb_prefix__=\"tbox\"
 # include files
 tbox_INC_FILES 			= \
 						tbox.h \
-						tbox.config.h \
 						config.h \
 						prefix.h \
 						prefix/prefix.h \

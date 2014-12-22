@@ -106,6 +106,7 @@ $(1)_INC_DIRS 	+= $($(1)_INC_DIRS-y)
 $(1)_LIB_DIRS 	+= $($(1)_LIB_DIRS-y)
 $(1)_LIBS 		+= $($(1)_LIBS-y)
 $(1)_PKGS 		+= $($(1)_PKGS-y)
+$(1)_PKG_NAME 	:= $(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1))
 endef
 $(foreach name, $(NAMES), $(eval $(call APPEND_FILES_AND_DIRS_y,$(name))))
 
@@ -290,33 +291,35 @@ $(foreach name, $(NAMES), $(eval $(call EXPAND_INSTALL_FILES,$(name))))
 
 # make include dirs
 define MAKE_INSTALL_INC_DIRS
-$(1)_INC_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/inc/%,$(1)))
+$(1)_INC_DIRS_ := $(dir $(patsubst $(SRC_DIR)/$(2)/%,$(BIN_DIR)/$(2).pkg/inc/$(2)/%,$(1)))
 endef
 
 # make library dirs
 define MAKE_INSTALL_LIB_DIRS
-$(1)_LIB_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)/%,$(1)))
+$(1)_LIB_DIRS_ := $(dir $(patsubst $(SRC_DIR)/$(2)/%,$(BIN_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
 # make dynamic dirs
 define MAKE_INSTALL_DLL_DIRS
-$(1)_DLL_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)/%,$(1)))
+$(1)_DLL_DIRS_ := $(dir $(patsubst $(SRC_DIR)/$(2)/%,$(BIN_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
 # make binary dirs
 define MAKE_INSTALL_BIN_DIRS
-$(1)_BIN_DIRS_ := $(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/$(2).pkg/bin/$(PLAT)/$(ARCH)/%,$(1)))
+$(1)_BIN_DIRS_ := $(dir $(patsubst $(SRC_DIR)/$(2)/%,$(BIN_DIR)/$(2).pkg/bin/$(PLAT)/$(ARCH)/%,$(1)))
 endef
 
 # make install files
 define MAKE_INSTALL_FILES
-$(foreach file, $($(1)_INC_FILES), $(eval $(call MAKE_INSTALL_INC_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
-$(foreach file, $($(1)_LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
-$(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
-$(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
+$(foreach file, $($(1)_INC_FILES), $(eval $(call MAKE_INSTALL_INC_DIRS,$(file),$($(1)_PKG_NAME))))
+$(foreach file, $($(1)_LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_DIRS,$(file),$($(1)_PKG_NAME))))
+$(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_DIRS,$(file),$($(1)_PKG_NAME))))
+$(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_DIRS,$(file),$($(1)_PKG_NAME))))
 
-INSTALL_FILES 	+= $($(1)_INC_FILES) $($(1)_LIB_FILES) $($(1)_DLL_FILES) $($(1)_BIN_FILES)
+INSTALL_FILES 	+= $($(1)_INC_FILES) $($(1)_LIB_FILES) $($(1)_DLL_FILES) $($(1)_BIN_FILES) $(if $(findstring y,$($(1)_CONFIG)),$(CFG_FILE),)
 REMOVED_DIRS 	+= $(BIN_DIR)/$(1)
+
+$(CFG_FILE)_DIRS_ := $(BIN_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH)
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_INSTALL_FILES,$(name))))
 
@@ -343,6 +346,10 @@ $(1)_install:
 	-@$(MKDIR) $($(1)_BIN_DIRS_)
 	-@$(CP) $(1) $($(1)_BIN_DIRS_)
 endef
+
+$(CFG_FILE)_install:
+	-@$(MKDIR) $($(CFG_FILE)_DIRS_)
+	-@$(CP) $(CFG_FILE) $($(CFG_FILE)_DIRS_)
 
 # make install 
 define MAKE_INSTALL
