@@ -322,7 +322,7 @@ config : .null
 	@$(ECHO) "    distcc:\t\t"$(DISTCC)
 	@$(ECHO) ""
 	@$(ECHO) "packages:"
-	@$(ECHO) $(foreach name, $(PKG_NAMES), $(call MAKE_PACKAGE_INFO,$(name)))
+	@$(ECHO) ""$(foreach name, $(PKG_NAMES), $(call MAKE_PACKAGE_INFO,$(name)))
 	@$(ECHO) ""
 	@$(ECHO) "directories:"
 	@$(ECHO) "    install:\t\t"$(INSTALL)
