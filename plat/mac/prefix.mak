@@ -160,12 +160,6 @@ ARFLAGS-o 			=
 SHFLAGS_RELEASE 	= -s
 SHFLAGS 			= $(ARCH_LDFLAGS) -dynamiclib
 
-# include directory
-INC_DIRS 			+= /usr/include /usr/local/include
-
-# library directory
-LIB_DIRS 			+= /usr/lib /usr/local/lib
-
 # config
 include 			$(PLAT_DIR)/config.mak
 

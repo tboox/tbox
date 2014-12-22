@@ -219,12 +219,12 @@ CXFLAG		:= $(if $(CXFLAG),$(CXFLAG),)
 ifeq ($(CCACHE),n)
 CCACHE		:= 
 else
-CCACHE		:=${shell if [ -f "/usr/bin/ccache" ]; then echo "ccache"; elif [ -f "/usr/local/bin/ccache" ]; then echo "ccache"; else echo ""; fi }
+CCACHE		:=$(shell if [ -f "/usr/bin/ccache" ]; then echo "ccache"; elif [ -f "/usr/local/bin/ccache" ]; then echo "ccache"; else echo ""; fi )
 endif
 
 # distcc
 ifeq ($(DISTCC),y)
-DISTCC		:=${shell if [ -f "/usr/bin/distcc" ]; then echo "distcc"; elif [ -f "/usr/local/bin/distcc" ]; then echo "distcc"; else echo ""; fi }
+DISTCC		:=$(shell if [ -f "/usr/bin/distcc" ]; then echo "distcc"; elif [ -f "/usr/local/bin/distcc" ]; then echo "distcc"; else echo ""; fi )
 else
 DISTCC		:= 
 endif
@@ -273,33 +273,28 @@ endef
 $(foreach name, $(PKG_NAMES), $(eval $(call PROBE_PACKAGE,$(name))))
 
 # make package info
-PKG_INFO 	:= "packages:     \n"
 define MAKE_PACKAGE_INFO
-PKG_INFO 	+= "   "$(1)":\t\t"$($($(1)_upper))"\n"
+"   "$(1)":\t\t"$($($(1)_upper))"\n"
 endef
-$(foreach name, $(PKG_NAMES), $(eval $(call MAKE_PACKAGE_INFO,$(name))))
-
 define MAKE_PACKAGE_INFO_
-PKG_INFO_D 	+= "$(1) ="$($(1))"\n"
-PKG_INFO_E 	+= "export "$(1)"\n"
-PKG_INFO_H 	+=$(if $(findstring y,$($(1))),__autoconf_head_$(PRO_PREFIX)CONFIG_PACKAGE_HAVE_$(1)_autoconf_tail__,)
+$(if $(findstring y,$($(1))),__autoconf_head_$(PRO_PREFIX)CONFIG_PACKAGE_HAVE_$(1)_autoconf_tail__,)
 endef
-$(foreach name, $(PKG_NAMES), $(eval $(call MAKE_PACKAGE_INFO_,$($(name)_upper))))
 
-# load package option
-define LOAD_PACKAGE_OPTION
-PKG_INFO_D 	+= "$(1)_INCPATH ="${shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incpath $(PKG_DIR)/$(1).pkg/info.json` }"\n"
-PKG_INFO_D 	+= "$(1)_LIBPATH ="${shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libpath $(PKG_DIR)/$(1).pkg/info.json` }"\n"
-PKG_INFO_D 	+= "$(1)_LIBNAMES ="${shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libs $(PKG_DIR)/$(1).pkg/info.json` }"\n"
-PKG_INFO_D 	+= "$(1)_INCFLAGS ="${shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incflags $(PKG_DIR)/$(1).pkg/info.json` }"\n"
-PKG_INFO_D 	+= "$(1)_LIBFLAGS ="${shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libflags $(PKG_DIR)/$(1).pkg/info.json` }"\n"
-PKG_INFO_E 	+= "export "$(1)_INCPATH"\n"
-PKG_INFO_E 	+= "export "$(1)_LIBPATH"\n"
-PKG_INFO_E 	+= "export "$(1)_LIBNAMES"\n"
-PKG_INFO_E 	+= "export "$(1)_INCFLAGS"\n"
-PKG_INFO_E 	+= "export "$(1)_LIBFLAGS"\n"
+# load package options
+define LOAD_PACKAGE_OPTIONS
+"$($(1)_upper) ="$($($(1)_upper))"\n" \
+"$(1)_INCPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+"$(1)_LIBPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+"$(1)_LIBNAMES ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libs $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+"$(1)_INCFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+"$(1)_LIBFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+"export "$($(1)_upper)"\n" \
+"export "$(1)_INCPATH"\n" \
+"export "$(1)_LIBPATH"\n" \
+"export "$(1)_LIBNAMES"\n" \
+"export "$(1)_INCFLAGS"\n" \
+"export "$(1)_LIBFLAGS"\n\n" 
 endef
-$(foreach name, $(PKG_NAMES), $(eval $(call LOAD_PACKAGE_OPTION,$(name))))
 
 # config
 config : .null
@@ -310,7 +305,7 @@ config : .null
 	-@$(SED) "s/\[build\]/`date +%Y%m%d%H%M`/g" $(PRO_DIR)/$(PRO_NAME).config.h
 	-@$(SED) "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" $(PRO_DIR)/$(PRO_NAME).config.h
 	-@$(SED) "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" $(PRO_DIR)/$(PRO_NAME).config.h
-	-@$(SED) "s/\/\/.*\[packages\]/$(PKG_INFO_H)/g" $(PRO_DIR)/$(PRO_NAME).config.h
+	-@$(SED) "s/\/\/.*\[packages\]/$(foreach name, $(PKG_NAMES), $(call MAKE_PACKAGE_INFO_,$($(name)_upper)))/g" $(PRO_DIR)/$(PRO_NAME).config.h
 	-@$(SED) "s/__autoconf_head_/\#define /g" $(PRO_DIR)/$(PRO_NAME).config.h
 	-@$(SED) "s/_autoconf_tail__\s*/\n/g" $(PRO_DIR)/$(PRO_NAME).config.h
 	@$(ECHO) ""
@@ -326,7 +321,8 @@ config : .null
 	@$(ECHO) "    ccache:\t\t"$(CCACHE)
 	@$(ECHO) "    distcc:\t\t"$(DISTCC)
 	@$(ECHO) ""
-	@$(ECHO) $(PKG_INFO)
+	@$(ECHO) "packages:"
+	@$(ECHO) $(foreach name, $(PKG_NAMES), $(call MAKE_PACKAGE_INFO,$(name)))
 	@$(ECHO) ""
 	@$(ECHO) "directories:"
 	@$(ECHO) "    install:\t\t"$(INSTALL)
@@ -370,11 +366,6 @@ config : .null
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# install"								>> .config.mak
 	@$(ECHO) "INSTALL ="$(INSTALL)						>> .config.mak
-	@$(ECHO) ""											>> .config.mak
-	@$(ECHO) "# package"								>> .config.mak
-	@$(ECHO) "PACKAGE ="$(PACKAGE)						>> .config.mak
-	@$(ECHO) "PKG_DIR ="$(PKG_DIR)						>> .config.mak
-	@$(ECHO) $(PKG_INFO_D)								>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# flags"									>> .config.mak
 	@$(ECHO) "CFLAG ="$(CFLAG)							>> .config.mak
@@ -444,7 +435,11 @@ config : .null
 	@$(ECHO) "export INSTALL"							>> .config.mak
 	@$(ECHO) "export PACKAGE"							>> .config.mak
 	@$(ECHO) "export PKG_DIR"							>> .config.mak
-	@$(ECHO) $(PKG_INFO_E)								>> .config.mak
+	@$(ECHO) ""											>> .config.mak
+	@$(ECHO) "# packages"								>> .config.mak
+	@$(ECHO) "PACKAGE ="$(PACKAGE)						>> .config.mak
+	@$(ECHO) "PKG_DIR ="$(PKG_DIR)						>> .config.mak
+	@$(ECHO) $(foreach name, $(PKG_NAMES), $(call LOAD_PACKAGE_OPTIONS,$(name))) >> .config.mak
 
 # ######################################################################################
 # help

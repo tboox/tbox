@@ -29,7 +29,7 @@
  */
 #include "prefix.h"
 #ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
-#   include <zlib.h>
+#   include "zlib/zlib.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
