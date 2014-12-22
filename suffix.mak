@@ -117,7 +117,7 @@ endif
 
 # append package includes
 define APPEND_PACKAGE_INC_DIRS
-INC_DIRS 		+= $($(1)_INCPATH) $(PKG_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1).pkg/inc/$(PLAT) $(PKG_DIR)/$(1).pkg/inc
+INC_DIRS 		+= $(PKG_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1).pkg/inc/$(PLAT) $(PKG_DIR)/$(1).pkg/inc $($(1)_INCPATH)
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_INC_DIRS,$(name))))
 

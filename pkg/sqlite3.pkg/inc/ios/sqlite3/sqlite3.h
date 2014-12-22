@@ -1,11 +1,9 @@
-#ifndef PKG_MYSQL_H
-#define PKG_MYSQL_H
+#ifndef PKG_SQLITE3_H
+#define PKG_SQLITE3_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include <mysql.h>
-#include <errmsg.h>
-#include <mysqld_error.h>
+#include <sqlite3.h>
 
 #endif

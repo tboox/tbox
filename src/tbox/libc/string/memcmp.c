@@ -48,7 +48,7 @@ static tb_long_t tb_memcmp_impl(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
     tb_assert_and_check_return_val(s1 && s2, 0);
     return memcmp(s1, s2, n);
 }
-#elif !defined(TB_LIBC_STRING_OPT_MEMCMP)
+#elif !defined(TB_LIBC_STRING_IMPL_MEMCMP)
 static tb_long_t tb_memcmp_impl(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
     tb_assert_and_check_return_val(s1 && s2, 0);
