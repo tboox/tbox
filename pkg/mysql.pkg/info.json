@@ -19,29 +19,12 @@
             "debug":
             {
                 "libs":         "mysqlclient"
-            ,   "libpath":      "/usr/lib/ /usr/local/lib/ /opt/lib/ /opt/local/lib/"
-            ,   "incpath":      "/usr/include/ /usr/local/include/ /opt/include/ /opt/local/include/"
+            ,   "libpath":      ""
+            ,   "incpath":      ""
             ,   "libflags":     ""
             ,   "incflags":     ""
             }
         ,   "release":          "$.compiler.default.debug"
-        }
-
-    ,   "linux" :
-        {
-            "x86":      "$.compiler.default"
-        ,   "x64":      "$.compiler.default"
-        }
-
-    ,   "mac" :
-        {
-            "x86":      "$.compiler.default"
-        ,   "x64":      "$.compiler.default"
-        }
-
-    ,   "cygwin" :
-        {
-            "x86":      "$.compiler.default"
         }
     }
 }

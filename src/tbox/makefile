@@ -272,8 +272,10 @@ tbox_C_FILES 			+= \
 tbox_ASM_FILES-$(ARM) 	+= utils/impl/crc_arm
 
 # openssl
+ifneq ($(POLARSSL),y)
 tbox_C_FILES-$(OPENSSL) += \
 						network/impl/ssl/openssl 
+endif
 
 # polarssl
 tbox_C_FILES-$(POLARSSL) += \
