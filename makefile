@@ -249,7 +249,7 @@ else
 ECHO 		:= echo
 endif
 
-# select package path
+# select package directory
 ifneq ($(PACKAGE),)
 PKG_DIR 	:= $(PACKAGE)
 endif
@@ -273,7 +273,7 @@ $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_UPPER_PACKAGE_NAME,$(name))))
 
 # probe packages
 define PROBE_PACKAGE
-$($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),${shell if [ `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH) $(PKG_DIR)/$(1).pkg/info.json` != "" ]; then echo "y"; else echo "n"; fi })
+$($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),${shell if [[ `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` != "" ]]; then echo "y"; else echo "n"; fi })
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call PROBE_PACKAGE,$(name))))
 
@@ -290,6 +290,21 @@ PKG_INFO_E 	+= "export "$(1)"\n"
 PKG_INFO_H 	+=$(if $(findstring y,$($(1))),__autoconf_head_$(PRO_PREFIX)CONFIG_PACKAGE_HAVE_$(1)_autoconf_tail__,)
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_PACKAGE_INFO_,$($(name)_upper))))
+
+# load package option
+define LOAD_PACKAGE_OPTION
+PKG_INFO_D 	+= "$(1)_INCPATH ="${shell echo `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incpath $(PKG_DIR)/$(1).pkg/info.json` }"\n"
+PKG_INFO_D 	+= "$(1)_LIBPATH ="${shell echo `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libpath $(PKG_DIR)/$(1).pkg/info.json` }"\n"
+PKG_INFO_D 	+= "$(1)_LIBNAMES ="${shell echo `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libs $(PKG_DIR)/$(1).pkg/info.json` }"\n"
+PKG_INFO_D 	+= "$(1)_INCFLAGS ="${shell echo `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incflags $(PKG_DIR)/$(1).pkg/info.json` }"\n"
+PKG_INFO_D 	+= "$(1)_LIBFLAGS ="${shell echo `$(TOOL_DIR)/jcat/jcat $(PLAT) $(ARCH) --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libflags $(PKG_DIR)/$(1).pkg/info.json` }"\n"
+PKG_INFO_E 	+= "export "$(1)_INCPATH"\n"
+PKG_INFO_E 	+= "export "$(1)_LIBPATH"\n"
+PKG_INFO_E 	+= "export "$(1)_LIBNAMES"\n"
+PKG_INFO_E 	+= "export "$(1)_INCFLAGS"\n"
+PKG_INFO_E 	+= "export "$(1)_LIBFLAGS"\n"
+endef
+$(foreach name, $(PKG_NAMES), $(eval $(call LOAD_PACKAGE_OPTION,$(name))))
 
 # config
 config : .null

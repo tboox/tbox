@@ -92,19 +92,7 @@ ARFLAGS 		+= $(ARFLAGS_RELEASE)
 SHFLAGS 		+= $(SHFLAGS_RELEASE)
 endif
 
-# select package path
-ifneq ($(PACKAGE),)
-PKG_DIR  		:= $(PACKAGE)
-endif
-
-# append package dirs
-define APPEND_PACKAGE_DIRS
-INC_DIRS 		+= $(PKG_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1).pkg/inc/$(PLAT) $(PKG_DIR)/$(1).pkg/inc
-LIB_DIRS 		+= $(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)
-endef
-$(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_DIRS,$(name))))
-
-# append files-y and dirs-y
+# append files-y, dirs-y, pkgs-y
 define APPEND_FILES_AND_DIRS_y
 $(1)_C_FILES 	+= $($(1)_C_FILES-y)
 $(1)_CC_FILES 	+= $($(1)_CC_FILES-y)
@@ -117,8 +105,35 @@ $(1)_INC_FILES 	+= $($(1)_INC_FILES-y)
 $(1)_INC_DIRS 	+= $($(1)_INC_DIRS-y)
 $(1)_LIB_DIRS 	+= $($(1)_LIB_DIRS-y)
 $(1)_LIBS 		+= $($(1)_LIBS-y)
+$(1)_PKGS 		+= $($(1)_PKGS-y)
 endef
 $(foreach name, $(NAMES), $(eval $(call APPEND_FILES_AND_DIRS_y,$(name))))
+
+# select package directory
+ifneq ($(PACKAGE),)
+PKG_DIR  		:= $(PACKAGE)
+endif
+
+# append package includes
+define APPEND_PACKAGE_INC_DIRS
+INC_DIRS 		+= $($(1)_INCPATH) $(PKG_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1).pkg/inc/$(PLAT) $(PKG_DIR)/$(1).pkg/inc
+endef
+$(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_INC_DIRS,$(name))))
+
+# append package options
+define APPEND_PACKAGE_OPTIONS_FOR_MODULE
+$(1)_LIBS 		+= $($(2)_LIBNAMES)
+$(1)_INC_DIRS 	+= $($(2)_INCPATH)
+$(1)_LIB_DIRS 	+= $($(2)_LIBPATH) $(PKG_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)
+$(1)_CXFLAGS 	+= $($(2)_INCFLAGS)
+$(1)_MXFLAGS 	+= $($(2)_INCFLAGS)
+$(1)_LDFLAGS 	+= $($(2)_LIBFLAGS)
+$(1)_SHFLAGS 	+= $($(2)_LIBFLAGS)
+endef
+define APPEND_PACKAGE_OPTIONS
+$(foreach pkg, $($(1)_PKGS), $(eval $(call APPEND_PACKAGE_OPTIONS_FOR_MODULE,$(1),$(pkg))))
+endef
+$(foreach name, $(NAMES), $(eval $(call APPEND_PACKAGE_OPTIONS,$(name))))
 
 # remove repeat files and dirs
 define REMOVE_REPEAT_FILES_AND_DIRS
@@ -295,10 +310,10 @@ endef
 
 # make install files
 define MAKE_INSTALL_FILES
-$(foreach file, $($(1)_INC_FILES), $(eval $(call MAKE_INSTALL_INC_DIRS,$(file),$(1))))
-$(foreach file, $($(1)_LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_DIRS,$(file),$(1))))
-$(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_DIRS,$(file),$(1))))
-$(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_DIRS,$(file),$(1))))
+$(foreach file, $($(1)_INC_FILES), $(eval $(call MAKE_INSTALL_INC_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
+$(foreach file, $($(1)_LIB_FILES), $(eval $(call MAKE_INSTALL_LIB_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
+$(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
+$(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_DIRS,$(file),$(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1)))))
 
 INSTALL_FILES 	+= $($(1)_INC_FILES) $($(1)_LIB_FILES) $($(1)_DLL_FILES) $($(1)_BIN_FILES)
 REMOVED_DIRS 	+= $(BIN_DIR)/$(1)

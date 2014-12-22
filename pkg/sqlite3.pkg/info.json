@@ -27,23 +27,6 @@
         ,   "release":          "$.compiler.default.debug"
         }
 
-    ,   "linux" :
-        {
-            "x86":
-            {
-                "debug":
-                {
-                   "libs":         "sqlite3"
-                ,   "libpath":      "/usr/lib/ /usr/local/lib/ /opt/lib/ /opt/local/lib/"
-                ,   "incpath":      "/usr/include/ /usr/local/include/ /opt/include/ /opt/local/include/"
-                ,   "libflags":     ""
-                ,   "incflags":     ""
-                }
-            ,   "release":          "$.compiler.linux.x86.debug"
-            }
-        ,   "x64":      "$.compiler.linux.x86"
-        }
-
     ,   "mac" :
         {
             "x86":      "$.compiler.default"
@@ -56,11 +39,6 @@
         }
 
     ,   "mingw" :
-        {
-            "x86":      "$.compiler.default"
-        }
-
-    ,   "cygwin" :
         {
             "x86":      "$.compiler.default"
         }
