@@ -22,31 +22,17 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME                "hostmac"
-#define TB_TRACE_MODULE_DEBUG               (0)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "hostmac.h"
- 
+#include "prefix.h"
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
-#   include "windows/hostmac.c"
-#elif defined(TB_CONFIG_OS_LINUX)
-#   include "linux/hostmac.c"
-#elif defined(TB_CONFIG_OS_ANDROID)
-#   include "linux/android/hostmac.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
-#   include "posix/hostmac.c"
-#else
 tb_bool_t tb_hostmac(tb_char_t const* interface_name, tb_byte_t mac_address[6])
 {
+    // TODO
     tb_trace_noimpl();
     return tb_false;
 }
-#endif
+

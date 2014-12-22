@@ -49,11 +49,5 @@
         ,   "armv7s":   "$.compiler.default"
         ,   "arm64":    "$.compiler.default"
         }
-
-    ,   "android" :
-        {
-            "armv5te":  "$.compiler.default"
-        ,   "armv6":    "$.compiler.default"
-        }
     }
 }

@@ -3,14 +3,31 @@
 # jcat path
 jcat=$_
 
-# the platform
-plat=$1
+# probe host
+if [[ `uname | egrep -i darwin` ]]; then
+    host=mac
+elif [[ `uname` == "MSVC" ]]; then
+    host=windows
+elif [[ `uname | egrep -i msys` ]]; then
+    host=windows
+elif [[ `uname | egrep -i cygwin` ]]; then
+    host=windows
+elif [[ `uname | egrep -i linux` ]]; then
+    host=linux
+else
+    host=linux
+fi
 
-# the architecture
-arch=$2
+# probe arch
+arch=x86
+if [[ $host == "linux" ]]; then
+    if [[ `getconf LONG_BIT` == "64" ]]; then
+        arch=x64
+    fi
+fi
 
 # select jcat
-jcat=$jcat"_"$plat"_"$arch
+jcat=$jcat"_"$host"_"$arch
 
 # done it
-$jcat object_jcat $3 $4
+$jcat object_jcat $1 $2

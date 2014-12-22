@@ -51,7 +51,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
     tb_assert_and_check_return_val(s, tb_null);
     return memset(s, c, n);
 }
-#elif !defined(TB_LIBC_STRING_OPT_MEMSET_U8)
+#elif !defined(TB_LIBC_STRING_IMPL_MEMSET_U8)
 static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {
     // check
@@ -83,7 +83,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 }
 #endif
 
-#ifndef TB_LIBC_STRING_OPT_MEMSET_U16
+#ifndef TB_LIBC_STRING_IMPL_MEMSET_U16
 static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
     // check
@@ -120,7 +120,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
 }
 #endif
 
-#ifndef TB_LIBC_STRING_OPT_MEMSET_U24
+#ifndef TB_LIBC_STRING_IMPL_MEMSET_U24
 static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
     // check
@@ -159,7 +159,7 @@ static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
 }
 #endif
 
-#ifndef TB_LIBC_STRING_OPT_MEMSET_U32
+#ifndef TB_LIBC_STRING_IMPL_MEMSET_U32
 static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
     // check
@@ -196,7 +196,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
 }
 #endif
 
-#ifndef TB_LIBC_STRING_OPT_MEMSET_U64
+#ifndef TB_LIBC_STRING_IMPL_MEMSET_U64
 static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
 {
     // check
