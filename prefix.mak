@@ -15,6 +15,12 @@ PLAT_DIR 		= $(PRO_DIR)/plat/$(PLAT)
 # the tool directory
 TOOL_DIR 		= $(PRO_DIR)/tool
 
+# the default include directory
+INC_DIRS 		= $(PRO_DIR)
+
+# the config file path
+CFG_FILE 		= $(PRO_DIR)/$(PRO_NAME).config.h
+
 # include platform prefix
 -include 		$(PLAT_DIR)/prefix.mak
 
