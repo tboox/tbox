@@ -58,7 +58,7 @@ typedef struct __tb_hash_item_t
     /// the item data
     tb_pointer_t        data;
 
-}tb_hash_item_t;
+}tb_hash_item_t, *tb_hash_item_ref_t;
 
 /*! the hash ref type
  *
