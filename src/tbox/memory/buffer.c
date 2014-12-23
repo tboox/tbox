@@ -185,7 +185,7 @@ tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
     } while (0);
 
     // trace
-    if (!ok) tb_trace_e("resize buffer failed: %lu => %lu", buff_size, size);
+    tb_assertf(ok, "resize buffer failed: %lu => %lu", buff_size, size);
 
     // ok
     return ok? (tb_byte_t*)buffer->data : tb_null;

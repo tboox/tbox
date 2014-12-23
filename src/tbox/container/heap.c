@@ -272,9 +272,9 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     tb_pointer_t        data_child = tb_null;
     tb_pointer_t        data_rchild = tb_null;
     tb_pointer_t        data_last = func_data(&impl->func, last);
+#ifndef __tb_small__
     switch (step)
     {
-#ifndef __tb_small__
     case sizeof(tb_uint64_t):
         {
             for (; child < tail; child = head + (((child - head) << 1) + step))
@@ -368,8 +368,8 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 
         }
         break;
-#endif
     default:
+#endif
         {
             for (; child < tail; child = head + (((child - head) << 1) + step))
             {   
@@ -391,8 +391,10 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
                 hole = child;
             }
         }
+#ifndef __tb_small__
         break;
     }
+#endif
 
     // the last node => hole
     if (hole != last) tb_memcpy(hole, last, step);
@@ -585,9 +587,9 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
     tb_byte_t*          head = impl->data;
     tb_size_t           hole = impl->size;
     tb_size_t           step = impl->func.size;
+#ifndef __tb_small__
     switch (step)
     {
-#ifndef __tb_small__
     case sizeof(tb_uint64_t):
         {
             for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->func, func_data(&impl->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
@@ -636,8 +638,8 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
             }
         }
         break;
-#endif
     default:
+#endif
         for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->func, func_data(&impl->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
         {
             // move item: parent => hole
@@ -646,8 +648,10 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
             // move node: hole => parent
             hole = parent;
         }
+#ifndef __tb_small__
         break;
     }
+#endif
 
     // save data
     impl->func.dupl(&impl->func, head + hole * step, data);

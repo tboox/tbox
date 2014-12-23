@@ -219,6 +219,80 @@ __tb_extern_c_enter__
 #   define tb_trace1_i
 #endif
 
+// trace info only?
+#ifdef TB_CONFIG_TRACE_INFO_ONLY
+#   undef TB_TRACE_DEBUG
+#   undef TB_TRACE_MODULE_DEBUG
+#   undef tb_trace_d
+#   undef tb_trace_e
+#   undef tb_trace_a
+#   undef tb_trace_w
+#   undef tb_tracef_d
+#   undef tb_tracef_e
+#   undef tb_tracef_a
+#   undef tb_tracef_w
+#   undef tb_tracet_d
+#   undef tb_tracet_e
+#   undef tb_tracet_a
+#   undef tb_tracet_w
+#   undef tb_trace1_d
+#   undef tb_trace1_e
+#   undef tb_trace1_a
+#   undef tb_trace1_w
+#   define TB_TRACE_MODULE_DEBUG    (0)
+#   if defined(TB_COMPILER_IS_GCC)
+#       define tb_trace_d(fmt, arg ...)                 
+#       define tb_trace_e(fmt, arg ...)                 
+#       define tb_trace_a(fmt, arg ...)                 
+#       define tb_trace_w(fmt, arg ...)                 
+#       define tb_tracef_d(fmt, arg ...)                
+#       define tb_tracef_e(fmt, arg ...)                
+#       define tb_tracef_a(fmt, arg ...)                
+#       define tb_tracef_w(fmt, arg ...)                
+#       define tb_tracet_d(fmt, arg ...)                
+#       define tb_tracet_e(fmt, arg ...)                
+#       define tb_tracet_a(fmt, arg ...)                
+#       define tb_tracet_w(fmt, arg ...)                
+#       define tb_trace1_d(fmt, arg ...)                
+#       define tb_trace1_e(fmt, arg ...)                
+#       define tb_trace1_a(fmt, arg ...)                
+#       define tb_trace1_w(fmt, arg ...)               
+#   elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
+#       define tb_trace_d(fmt, ...)                     
+#       define tb_trace_e(fmt, ...)                     
+#       define tb_trace_a(fmt, ...)                     
+#       define tb_trace_w(fmt, ...)                     
+#       define tb_tracef_d(fmt, ...)                    
+#       define tb_tracef_e(fmt, ...)                    
+#       define tb_tracef_a(fmt, ...)                    
+#       define tb_tracef_w(fmt, ...)                    
+#       define tb_tracet_d(fmt, ...)                   
+#       define tb_tracet_e(fmt, ...)                    
+#       define tb_tracet_a(fmt, ...)                    
+#       define tb_tracet_w(fmt, ...)                  
+#       define tb_trace1_d(fmt, ...)                   
+#       define tb_trace1_e(fmt, ...)                    
+#       define tb_trace1_a(fmt, ...)                    
+#       define tb_trace1_w(fmt, ...)                     
+#   else
+#       define tb_trace_d
+#       define tb_trace_e
+#       define tb_trace_a
+#       define tb_trace_w
+#       define tb_tracef_d
+#       define tb_tracef_e
+#       define tb_tracef_a
+#       define tb_tracef_w
+#       define tb_tracet_d
+#       define tb_tracet_e
+#       define tb_tracet_a
+#       define tb_tracet_w
+#       define tb_trace1_d
+#       define tb_trace1_e
+#       define tb_trace1_a
+#       define tb_trace1_w
+#   endif
+#endif
 
 // noimpl
 #define tb_trace_noimpl()                           tb_trace1_w("noimpl")
