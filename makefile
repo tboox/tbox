@@ -268,7 +268,14 @@ $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_UPPER_PACKAGE_NAME,$(name))))
 
 # probe packages
 define PROBE_PACKAGE
-$($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),${shell if [[ `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` != "" ]]; then echo "y"; else echo "n"; fi })
+$($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),\
+				$(shell if [[ `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` != "" ]]; then \
+					echo "y"; \
+				elif [ -d "$(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)" ]; then \
+					echo "y"; \
+				else \
+					echo "n"; \
+				fi ))
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call PROBE_PACKAGE,$(name))))
 
@@ -282,18 +289,20 @@ endef
 
 # load package options
 define LOAD_PACKAGE_OPTIONS
-"$($(1)_upper) ="$($($(1)_upper))"\n" \
-"$(1)_INCPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-"$(1)_LIBPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-"$(1)_LIBNAMES ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libs $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-"$(1)_INCFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-"$(1)_LIBFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-"export "$($(1)_upper)"\n" \
-"export "$(1)_INCPATH"\n" \
-"export "$(1)_LIBPATH"\n" \
-"export "$(1)_LIBNAMES"\n" \
-"export "$(1)_INCFLAGS"\n" \
-"export "$(1)_LIBFLAGS"\n\n" 
+$(if $(findstring y,$($($(1)_upper))),\
+	"$($(1)_upper) ="$($($(1)_upper))"\n" \
+	"$(1)_INCPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+	"$(1)_LIBPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+	"$(1)_INCFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+	"$(1)_LIBFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
+	"$(1)_LIBNAMES ="$(shell if [ -f $(PKG_DIR)/$(1).pkg/info.json ]; then echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libs $(PKG_DIR)/$(1).pkg/info.json`; else echo $(1)$(DTYPE); fi)"\n" \
+	"export "$($(1)_upper)"\n" \
+	"export "$(1)_INCPATH"\n" \
+	"export "$(1)_LIBPATH"\n" \
+	"export "$(1)_LIBNAMES"\n" \
+	"export "$(1)_INCFLAGS"\n" \
+	"export "$(1)_LIBFLAGS"\n\n" \
+,)
 endef
 
 # config
