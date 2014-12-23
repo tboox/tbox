@@ -30,6 +30,9 @@
 // type
 #define TB_CONFIG_TYPE_FLOAT
 
+// trace
+//#define TB_CONFIG_TRACE_INFO_ONLY
+
 // memory
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 

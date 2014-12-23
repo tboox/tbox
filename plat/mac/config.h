@@ -33,6 +33,9 @@
 // memory
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 
+// trace
+//#define TB_CONFIG_TRACE_INFO_ONLY
+
 // exception
 #define TB_CONFIG_EXCEPTION_ENABLE
 

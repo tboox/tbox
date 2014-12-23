@@ -1255,6 +1255,7 @@ tb_void_t tb_thread_pool_dump(tb_thread_pool_ref_t pool)
         {
             // the worker
             tb_thread_pool_worker_t* worker = &impl->worker_list[i];
+            tb_assert_and_check_break(worker);
 
             // dump worker
             tb_trace_i("    worker: id: %lu, stoped: %ld", worker->id, (tb_long_t)tb_atomic_get(&worker->bstoped));
