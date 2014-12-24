@@ -121,11 +121,19 @@ INC_DIRS 		+= $(PKG_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1).pkg/inc/$(
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_INC_DIRS,$(name))))
 
+# make native the package directory
+ifeq ($(PLAT),msvc)
+DRIVE_NAME 		:= $(word 1,$(subst /, ,$(PKG_DIR)))
+PKG_DIR_NATIVE 	:= $(patsubst /$(DRIVE_NAME)/%,$(DRIVE_NAME):/%,$(PKG_DIR))
+else
+PKG_DIR_NATIVE 	:= $(PKG_DIR)
+endif
+
 # append package options
 define APPEND_PACKAGE_OPTIONS_FOR_MODULE
 $(1)_LIBS 		+= $($(2)_LIBNAMES)
 $(1)_INC_DIRS 	+= $($(2)_INCPATH)
-$(1)_LIB_DIRS 	+= $($(2)_LIBPATH) $(PKG_DIR)/$(2).pkg/lib/$(PLAT)/$(ARCH)
+$(1)_LIB_DIRS 	+= $($(2)_LIBPATH) $(PKG_DIR_NATIVE)/$(2).pkg/lib/$(PLAT)/$(ARCH)
 $(1)_CXFLAGS 	+= $($(2)_INCFLAGS)
 $(1)_MXFLAGS 	+= $($(2)_INCFLAGS)
 $(1)_LDFLAGS 	+= $($(2)_LIBFLAGS)

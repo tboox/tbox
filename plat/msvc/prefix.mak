@@ -70,7 +70,7 @@ LDFLAGS 			= \
  					-pdb:"$(PDB)" \
 					-nodefaultlib:"msvcrt.lib" \
 					-manifest -manifestuac:"level='asInvoker' uiAccess='false'" \
-					-nologo -machine:x86 -dynamicbase -nxcompat -libpath:'$(HOME)lib\msvc\x86' -libpath:'$(HOME)tool\msys\local\lib'
+					-nologo -machine:x86 -dynamicbase -nxcompat -libpath:'$(HOME)tool\msys\local\lib'
 LDFLAGS-L 			= -libpath:
 LDFLAGS-l 			= 
 LDFLAGS-f 			= .lib
@@ -86,13 +86,13 @@ ASFLAGS-o 			=
 # arflags
 ARFLAGS_RELEASE 	= 
 ARFLAGS_DEBUG 		= -debug 
-ARFLAGS 			= -lib -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)lib\msvc\x86' -libpath:'$(HOME)tool\msys\local\lib'
+ARFLAGS 			= -lib -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)tool\msys\local\lib'
 ARFLAGS-o 			= -out:
 
 # shflags
 SHFLAGS_RELEASE 	= 
 SHFLAGS_DEBUG 		= -debug 
-SHFLAGS 			= -dll -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)lib\msvc\x86' -libpath:'$(HOME)tool\msys\local\lib'
+SHFLAGS 			= -dll -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)tool\msys\local\lib'
 
 # prof
 ifeq ($(PROF),y)
