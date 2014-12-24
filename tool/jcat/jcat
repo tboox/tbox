@@ -3,17 +3,20 @@
 # jcat path
 jcat=$_
 
+# uname
+uname=`uname`
+
 # probe host
-if [[ `uname | egrep -i darwin` ]]; then
-    host=mac
-elif [[ `uname` == "MSVC" ]]; then
+if [[ $uname == "MSVC" ]]; then
     host=windows
+elif [[ $uname == "Darwin" ]] || [[ `uname | egrep -i darwin` ]]; then
+    host=mac
+elif [[ $uname == "Linux" ]] || [[ `uname | egrep -i linux` ]]; then
+    host=linux
 elif [[ `uname | egrep -i msys` ]]; then
     host=windows
 elif [[ `uname | egrep -i cygwin` ]]; then
     host=windows
-elif [[ `uname | egrep -i linux` ]]; then
-    host=linux
 else
     host=linux
 fi
