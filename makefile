@@ -271,7 +271,7 @@ define PROBE_PACKAGE
 $($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),\
 				$(shell if [ -d "$(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)" ]; then \
 					echo "y"; \
-				elif [ -z `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` ]; then \
+				elif [ -z "`$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json`" ]; then \
 					echo "n"; \
 				else \
 					echo "y"; \
