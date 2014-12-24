@@ -30,17 +30,11 @@ MKDIR 				= mkdir -p
 MAKE 				= make -r
 PWD 				= pwd
 
-# pdb
-ifeq ($(PDB),)
-PDB 				:= $(subst \,\\,$(HOME)$(PRO_NAME)$(DTYPE).pdb)
-export PDB
-endif
-
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -MT -Gy -Zi
 CXFLAGS_DEBUG 		= -Od -GS -MTd -ZI -RTC1 -D__tb_debug__
 CXFLAGS 			= \
-					-Fd"$(PDB)" -SSE2 \
+					-SSE2 \
 					-D_MBCS -D_CRT_SECURE_NO_WARNINGS -DNOCRYPT -DNOGDI -Gd -Gm -W3 -WX -nologo -c -TP -EHsc \
 					-I'/usr/local/inc'
 CXFLAGS-I 			= -I
@@ -67,7 +61,6 @@ CCFLAGS 			=
 LDFLAGS_RELEASE 	= 
 LDFLAGS_DEBUG 		= -debug
 LDFLAGS 			= \
- 					-pdb:"$(PDB)" \
 					-nodefaultlib:"msvcrt.lib" \
 					-manifest -manifestuac:"level='asInvoker' uiAccess='false'" \
 					-nologo -machine:x86 -dynamicbase -nxcompat -libpath:'$(HOME)tool\msys\local\lib'
@@ -86,13 +79,13 @@ ASFLAGS-o 			=
 # arflags
 ARFLAGS_RELEASE 	= 
 ARFLAGS_DEBUG 		= -debug 
-ARFLAGS 			= -lib -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)tool\msys\local\lib'
+ARFLAGS 			= -lib -nologo -machine:x86 -libpath:'$(HOME)tool\msys\local\lib'
 ARFLAGS-o 			= -out:
 
 # shflags
 SHFLAGS_RELEASE 	= 
 SHFLAGS_DEBUG 		= -debug 
-SHFLAGS 			= -dll -nologo -machine:x86 -pdb:"$(PDB)" -libpath:'$(HOME)tool\msys\local\lib'
+SHFLAGS 			= -dll -nologo -machine:x86 -libpath:'$(HOME)tool\msys\local\lib'
 
 # prof
 ifeq ($(PROF),y)

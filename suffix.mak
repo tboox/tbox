@@ -110,6 +110,9 @@ $(1)_PKG_NAME 	:= $(if $($(1)_PKG_NAME),$($(1)_PKG_NAME),$(1))
 endef
 $(foreach name, $(NAMES), $(eval $(call APPEND_FILES_AND_DIRS_y,$(name))))
 
+# the current directory
+CUR_DIR 		:= $(shell $(PWD))
+
 # select package directory
 ifneq ($(PACKAGE),)
 PKG_DIR  		:= $(PACKAGE)
@@ -121,12 +124,15 @@ INC_DIRS 		+= $(PKG_DIR)/$(1).pkg/inc/$(PLAT)/$(ARCH) $(PKG_DIR)/$(1).pkg/inc/$(
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call APPEND_PACKAGE_INC_DIRS,$(name))))
 
-# make native the package directory
+# make native directory
 ifeq ($(PLAT),msvc)
-DRIVE_NAME 		:= $(word 1,$(subst /, ,$(PKG_DIR)))
-PKG_DIR_NATIVE 	:= $(patsubst /$(DRIVE_NAME)/%,$(DRIVE_NAME):/%,$(PKG_DIR))
+PKG_DIR_DRIVEN 	:= $(word 1,$(subst /, ,$(PKG_DIR)))
+PKG_DIR_NATIVE 	:= $(patsubst /$(PKG_DIR_DRIVEN)/%,$(PKG_DIR_DRIVEN):/%,$(PKG_DIR))
+CUR_DIR_DRIVEN 	:= $(word 1,$(subst /, ,$(CUR_DIR)))
+CUR_DIR_NATIVE 	:= $(patsubst /$(CUR_DIR_DRIVEN)/%,$(CUR_DIR_DRIVEN):/%,$(CUR_DIR))
 else
 PKG_DIR_NATIVE 	:= $(PKG_DIR)
+CUR_DIR_NATIVE 	:= $(CUR_DIR)
 endif
 
 # append package options
@@ -173,6 +179,17 @@ $(1)_ARFLAGS 	:= $(ARFLAGS) $($(1)_ARFLAGS-y)
 $(1)_SHFLAGS 	:= $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIRS)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIRS)) $($(1)_SHFLAGS) $($(1)_SHFLAGS-y) $(addsuffix $(LDFLAGS-f), $(addprefix $(LDFLAGS-l), $($(1)_LIBS)))
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_FLAGS,$(name))))
+
+# append native flags
+define MAKE_FLAGS_NATIVE
+$(1)_CXFLAGS 	+= -Fd"$(CUR_DIR_NATIVE)/$(1)$(DTYPE).pdb"
+$(1)_LDFLAGS 	+= -pdb:"$(CUR_DIR_NATIVE)/$(1)$(DTYPE).pdb"
+$(1)_ARFLAGS 	+= -pdb:"$(CUR_DIR_NATIVE)/$(1)$(DTYPE).pdb" 
+$(1)_SHFLAGS 	+= -pdb:"$(CUR_DIR_NATIVE)/$(1)$(DTYPE).pdb"
+endef
+ifeq ($(PLAT),msvc)
+$(foreach name, $(NAMES), $(eval $(call MAKE_FLAGS_NATIVE,$(name))))
+endif
 
 # make objects and source files 
 define MAKE_OBJS_AND_SRCS_FILES
@@ -290,12 +307,20 @@ endif
 
 # expand install files
 define EXPAND_INSTALL_FILES
-$(1)_INC_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $($(1)_INC_FILES)))
-$(1)_LIB_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $(if $(findstring LIB,$($(1)_TYPE)),$(LIB_PREFIX)$(1)$(LIB_SUFFIX),)))
-$(1)_DLL_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $(if $(findstring DLL,$($(1)_TYPE)),$(DLL_PREFIX)$(1)$(DLL_SUFFIX),)))
-$(1)_BIN_FILES 	:= $(addprefix $(shell $(PWD))/, $(sort $(if $(findstring BIN,$($(1)_TYPE)),$(BIN_PREFIX)$(1)$(BIN_SUFFIX),)))
+$(1)_INC_FILES 	:= $(addprefix $(CUR_DIR)/, $(sort $($(1)_INC_FILES)))
+$(1)_LIB_FILES 	:= $(addprefix $(CUR_DIR)/, $(sort $(if $(findstring LIB,$($(1)_TYPE)),$(LIB_PREFIX)$(1)$(LIB_SUFFIX),)))
+$(1)_DLL_FILES 	:= $(addprefix $(CUR_DIR)/, $(sort $(if $(findstring DLL,$($(1)_TYPE)),$(DLL_PREFIX)$(1)$(DLL_SUFFIX),)))
+$(1)_BIN_FILES 	:= $(addprefix $(CUR_DIR)/, $(sort $(if $(findstring BIN,$($(1)_TYPE)),$(BIN_PREFIX)$(1)$(BIN_SUFFIX),)))
 endef
 $(foreach name, $(NAMES), $(eval $(call EXPAND_INSTALL_FILES,$(name))))
+
+# append native install files
+define EXPAND_INSTALL_FILES_NATIVE
+$(1)_$($(1)_TYPE)_FILES += $(CUR_DIR)/$(1)$(DTYPE).pdb 
+endef
+ifeq ($(PLAT),msvc)
+$(foreach name, $(NAMES), $(eval $(call EXPAND_INSTALL_FILES_NATIVE,$(name))))
+endif
 
 # make include dirs
 define MAKE_INSTALL_INC_DIRS
