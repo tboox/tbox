@@ -269,9 +269,9 @@ $(foreach name, $(PKG_NAMES), $(eval $(call MAKE_UPPER_PACKAGE_NAME,$(name))))
 # probe packages
 define PROBE_PACKAGE
 $($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),\
-				$(shell if [[ `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` != "" ]]; then \
+				$(shell if [ -d "$(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)" ]; then \
 					echo "y"; \
-				elif [ -d "$(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)" ]; then \
+				elif [[ `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` != "" ]]; then \
 					echo "y"; \
 				else \
 					echo "n"; \
