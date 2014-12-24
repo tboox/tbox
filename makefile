@@ -271,10 +271,10 @@ define PROBE_PACKAGE
 $($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),\
 				$(shell if [ -d "$(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)" ]; then \
 					echo "y"; \
-				elif [[ `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` != "" ]]; then \
-					echo "y"; \
-				else \
+				elif [ -z `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json` ]; then \
 					echo "n"; \
+				else \
+					echo "y"; \
 				fi ))
 endef
 $(foreach name, $(PKG_NAMES), $(eval $(call PROBE_PACKAGE,$(name))))
@@ -302,7 +302,9 @@ $(if $(findstring y,$($($(1)_upper))),\
 	"export "$(1)_LIBNAMES"\n" \
 	"export "$(1)_INCFLAGS"\n" \
 	"export "$(1)_LIBFLAGS"\n\n" \
-,)
+,\
+	"$($(1)_upper) ="$($($(1)_upper))"\n" \
+	"export "$($(1)_upper)"\n")
 endef
 
 # config
