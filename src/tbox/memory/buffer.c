@@ -77,7 +77,7 @@ tb_byte_t* tb_buffer_data(tb_buffer_t* buffer)
     tb_assert_and_check_return_val(buffer, tb_null);
 
     // the buffer data
-    return buffer->data;
+    return buffer->size? buffer->data : tb_null;
 }
 tb_size_t tb_buffer_size(tb_buffer_t const* buffer)
 { 
@@ -185,7 +185,7 @@ tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
     } while (0);
 
     // trace
-    if (!ok) tb_trace_e("resize buffer failed: %lu => %lu", buff_size, size);
+    tb_assertf(ok, "resize buffer failed: %lu => %lu", buff_size, size);
 
     // ok
     return ok? (tb_byte_t*)buffer->data : tb_null;

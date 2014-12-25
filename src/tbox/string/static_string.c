@@ -48,7 +48,13 @@ tb_bool_t tb_static_string_init(tb_static_string_t* string, tb_char_t* data, tb_
     tb_assert_and_check_return_val(string, tb_false);
 
     // init
-    return tb_static_buffer_init(string, (tb_byte_t*)data, maxn);
+    tb_bool_t ok = tb_static_buffer_init(string, (tb_byte_t*)data, maxn);
+
+    // clear it
+    tb_static_string_clear(string);
+
+    // ok?
+    return ok;
 }
 tb_void_t tb_static_string_exit(tb_static_string_t* string)
 {
@@ -60,7 +66,7 @@ tb_char_t const* tb_static_string_cstr(tb_static_string_t const* string)
     tb_assert_and_check_return_val(string, tb_null);
 
     // the cstr
-    return (tb_char_t const*)tb_static_buffer_data((tb_static_buffer_t*)string);
+    return tb_static_buffer_size(string)? (tb_char_t const*)tb_static_buffer_data((tb_static_buffer_t*)string) : tb_null;
 }
 tb_size_t tb_static_string_size(tb_static_string_t const* string)
 {
