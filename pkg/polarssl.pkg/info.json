@@ -29,8 +29,7 @@
 
     ,   "linux" :
         {
-            "x86":      "$.compiler.default"
-        ,   "x64":      "$.compiler.default"
+            "x64":      "$.compiler.default"
         }
 
     ,   "mac" :
