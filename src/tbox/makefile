@@ -672,6 +672,7 @@ tbox_INC_FILES 			= \
 						database/database.h \
 						zip/prefix.h \
 						zip/zip.h \
+						zip/vlc.h \
 						libc/prefix.h \
 						libc/libc.h \
 						libc/stdlib/prefix.h \
