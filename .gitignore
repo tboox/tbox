@@ -6,6 +6,7 @@
 *.dll
 *.lib
 *.out
+*.suo
 *~
 *.swp
 *.swo
