@@ -7,19 +7,19 @@ include 		$(PRO_DIR)/project.mak
 SRC_DIR 		= $(PRO_DIR)/src
 
 # the binary directory
-BIN_DIR 		= $(PRO_DIR)/bin/$(PLAT)/$(ARCH)
-
-# the prefix directory
-PRE_DIR 		= $(PRO_DIR)/pre
-
-# the include directory
-INC_DIR 		= $(PRO_DIR)/inc/$(PLAT)/$(ARCH) $(PRO_DIR)/inc
-
-# the library directory
-LIB_DIR 		= $(PRO_DIR)/lib/$(PLAT)/$(ARCH)
+BIN_DIR 		= $(PRO_DIR)/bin
 
 # the platform directory
 PLAT_DIR 		= $(PRO_DIR)/plat/$(PLAT)
+
+# the tool directory
+TOOL_DIR 		= $(PRO_DIR)/tool
+
+# the default include directory
+INC_DIRS 		= $(PRO_DIR)
+
+# the config file path
+CFG_FILE 		= $(PRO_DIR)/$(PRO_NAME).config.h
 
 # include platform prefix
 -include 		$(PLAT_DIR)/prefix.mak

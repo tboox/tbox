@@ -963,6 +963,7 @@ tb_void_t tb_static_large_pool_dump(tb_large_pool_ref_t pool)
     {
         // the pred info
         tb_static_large_data_pred_t const* pred = &impl->data_pred[i];
+        tb_assert_and_check_break(pred);
 
         // trace
         tb_trace_i("pred[>%04luKB]: data: %p, space: %lu, total_count: %lu, failed_count: %lu", ((impl->page_size << (i - 1)) >> 10), pred->data_head? &pred->data_head[1] : tb_null, pred->data_head? pred->data_head->space : 0, pred->total_count, pred->failed_count);

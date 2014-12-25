@@ -15,7 +15,6 @@ usage:
     make clean|c
 
 5. install
-    make prefix|p
     make install|i
 
 6. make info

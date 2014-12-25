@@ -30,9 +30,7 @@
  * includes
  */
 #include "prefix.h"
-#include <mysql/mysql.h>
-#include <mysql/errmsg.h>
-#include <mysql/mysqld_error.h>
+#include "mysql/mysql.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
