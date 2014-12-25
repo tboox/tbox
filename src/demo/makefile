@@ -100,6 +100,7 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) 	+= \
 
 demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_OBJECT) += \
 											utils/option \
+											object/jcat \
 											object/json \
 											object/bin \
 											object/xml \
@@ -130,24 +131,18 @@ demo_C_FILES-$(TB_CONFIG_MODULE_HAVE_ASIO) 	+= \
 											stream/async_transfer \
 											stream/transfer_pool 
 
+# packages
+demo_PKGS-$(POLARSSL) 						+= polarssl
+demo_PKGS-$(OPENSSL) 						+= $(if $(findstring y,$(POLARSSL)),,openssl)
+demo_PKGS-$(MYSQL) 							+= mysql
+demo_PKGS-$(SQLITE3) 						+= sqlite3
+demo_PKGS-$(ZLIB) 							+= zlib
 
-# libs
-demo_LIBS 									+= tbox$(DTYPE) 
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_OPENSSL) 	+= ssl crypto
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_POLARSSL) 	+= polarssl
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_MYSQL) 	+= mysqlclient
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_SQLITE3) 	+= sqlite3
-demo_LIBS-$(TB_CONFIG_THIRD_HAVE_ZLIB) 		+= z
-demo_LIBS-y 								+= $(TB_CONFIG_DEMO_LIBS)
-
-# path
-demo_LIB_DIR 								+= ../tbox
-
-# flags
+# others
 demo_CXFLAGS 								+= -D__tb_prefix__=\"demo\"
 demo_LDFLAGS 								+= $(TB_CONFIG_DEMO_LDFLAGS)
-
-# command
+demo_LIBS 									+= tbox$(DTYPE) $(TB_CONFIG_DEMO_LIBS)
+demo_LIB_DIRS 								+= ../tbox
 demo_SUFFIX_CMD1 							+= $(TB_CONFIG_DEMO_CMD1)
 
 # suffix

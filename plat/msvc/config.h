@@ -1,6 +1,9 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// packages
+// [packages]
+
 // major version
 #define TB_CONFIG_VERSION_MAJOR         [major]
 
@@ -29,6 +32,9 @@
 
 // memory
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
+
+// trace
+//#define TB_CONFIG_TRACE_INFO_ONLY
 
 // exception
 #define TB_CONFIG_EXCEPTION_ENABLE
@@ -84,12 +90,5 @@
 #define TB_CONFIG_MODULE_HAVE_OBJECT
 #define TB_CONFIG_MODULE_HAVE_CHARSET
 #define TB_CONFIG_MODULE_HAVE_DATABASE
-
-// third party
-#define TB_CONFIG_THIRD_HAVE_ZLIB                 
-//#define TB_CONFIG_THIRD_HAVE_OPENSSL  
-#define TB_CONFIG_THIRD_HAVE_POLARSSL 
-//#define TB_CONFIG_THIRD_HAVE_MYSQL
-#define TB_CONFIG_THIRD_HAVE_SQLITE3
 
 #endif

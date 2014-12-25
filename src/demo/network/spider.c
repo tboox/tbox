@@ -556,7 +556,7 @@ static tb_bool_t tb_demo_spider_task_ctrl(tb_async_stream_ref_t istream, tb_asyn
     // set timeout
     if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_SET_TIMEOUT, task->spider->timeout)) return tb_false;
 
-#if defined(TB_CONFIG_MODULE_HAVE_ZIP) && defined(TB_CONFIG_THIRD_HAVE_ZLIB)
+#if defined(TB_CONFIG_MODULE_HAVE_ZIP) && defined(TB_CONFIG_PACKAGE_HAVE_ZLIB)
     // need gzip
     if (!tb_async_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) return tb_false;
 

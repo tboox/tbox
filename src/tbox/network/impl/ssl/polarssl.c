@@ -28,11 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include <polarssl/ssl.h>
-#include <polarssl/certs.h>
-#include <polarssl/error.h>
-#include <polarssl/entropy.h>
-#include <polarssl/ctr_drbg.h>
+#include "polarssl/polarssl.h"
 #include "../../../asio/asio.h"
 #include "../../../libc/libc.h"
 #include "../../../platform/platform.h"
@@ -95,7 +91,7 @@ static __tb_inline__ tb_void_t tb_ssl_error(tb_char_t const* info, tb_long_t err
     tb_trace_e("%s: error: %ld", info, error);
 #endif
 }
-#ifdef __tb_debug__
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
 static tb_void_t tb_ssl_trace_info(tb_pointer_t priv, tb_int_t level, tb_char_t const* info)
 {
     // trace
@@ -390,7 +386,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t ssl)
     if (ok > 0 && !impl->bopened)
     {
         // done impl verify
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__) 
         tb_long_t r = 0;
         if ((r = ssl_get_verify_result(&impl->ssl)))
         {

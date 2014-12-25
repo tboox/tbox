@@ -175,7 +175,7 @@ tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
     // ok?
     return odata;
 }
-tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_size_t type)
+tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_bool_t bmacro)
 {
     // check
     tb_assert_and_check_return_val(object, tb_null);
@@ -183,9 +183,10 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
     // null?
     tb_check_return_val(path, object);
 
-    // walk
-    tb_char_t const* p = path;
-    tb_char_t const* e = path + tb_strlen(path);
+    // done
+    tb_object_ref_t     root = object;
+    tb_char_t const*    p = path;
+    tb_char_t const*    e = path + tb_strlen(path);
     while (p < e && object)
     {
         // done seek
@@ -246,38 +247,45 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
             p++;
             break;
         }
-    }
 
-    // check it, if not none
-    if (object && type != TB_OBJECT_TYPE_NONE) 
-    {
-        // is this type?
-        if (tb_object_type(object) != type) return tb_null;
+        // is macro? done it if be enabled
+        if (    object
+            &&  bmacro
+            &&  tb_object_type(object) == TB_OBJECT_TYPE_STRING
+            &&  tb_object_string_size(object)
+            &&  tb_object_string_cstr(object)[0] == '$')
+        {
+            // the next path
+            path = tb_object_string_cstr(object) + 1;
+
+            // continue to seek it
+            object = tb_object_seek(root, path, bmacro);
+        }
     }
 
     // ok?
     return object;
 }
-tb_object_ref_t tb_object_dump(tb_object_ref_t object)
+tb_object_ref_t tb_object_dump(tb_object_ref_t object, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object, tb_null);
 
     // data
-    tb_object_ref_t odata = tb_object_data(object, TB_OBJECT_FORMAT_XML);
+    tb_object_ref_t odata = tb_object_data(object, format);
     if (odata)
     {
-        // data & size 
+        // the data and size 
         tb_byte_t const*    data = (tb_byte_t const*)tb_object_data_getp(odata);
         tb_size_t           size = tb_object_data_size(odata);
         if (data && size)
         {
-            tb_char_t const*    p = tb_strstr((tb_char_t const*)data, "?>");
+            // done
+            tb_char_t const*    p = (tb_char_t const*)data;
             tb_char_t const*    e = (tb_char_t const*)data + size;
             tb_char_t           b[4096 + 1];
-            if (p && p + 2 < e)
+            if (p && p < e)
             {
-                p += 2;
                 while (p < e && *p && tb_isspace(*p)) p++;
                 while (p < e && *p)
                 {
@@ -295,6 +303,7 @@ tb_object_ref_t tb_object_dump(tb_object_ref_t object)
         tb_object_exit(odata);
     }
 
+    // the object
     return object;
 }
 tb_size_t tb_object_ref(tb_object_ref_t object)

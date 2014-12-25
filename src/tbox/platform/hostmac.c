@@ -39,6 +39,8 @@
 #   include "windows/hostmac.c"
 #elif defined(TB_CONFIG_OS_LINUX)
 #   include "linux/hostmac.c"
+#elif defined(TB_CONFIG_OS_ANDROID)
+#   include "linux/android/hostmac.c"
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/hostmac.c"
 #else

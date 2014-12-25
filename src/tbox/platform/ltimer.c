@@ -386,7 +386,10 @@ tb_void_t tb_ltimer_exit(tb_ltimer_ref_t timer)
     while (tb_atomic_get(&impl->work) && tryn--) tb_msleep(500);
 
     // warning
-    if (!tryn && tb_atomic_get(&impl->work)) tb_trace_w("[ltimer]: the loop has been not exited now!");
+    if (!tryn && tb_atomic_get(&impl->work))
+    {
+        tb_trace_w("[ltimer]: the loop has been not exited now!");
+    }
 
     // enter
     tb_spinlock_enter(&impl->lock);

@@ -7,6 +7,9 @@ NAMES 					= tbox
 # module type
 tbox_TYPE 				= LIB
 
+# config
+tbox_CONFIG 			= y
+
 # basic files
 tbox_C_FILES 			+= \
 						tbox \
@@ -272,11 +275,13 @@ tbox_C_FILES 			+= \
 tbox_ASM_FILES-$(ARM) 	+= utils/impl/crc_arm
 
 # openssl
-tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
+ifneq ($(POLARSSL),y)
+tbox_C_FILES-$(OPENSSL) += \
 						network/impl/ssl/openssl 
+endif
 
 # polarssl
-tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_POLARSSL) += \
+tbox_C_FILES-$(POLARSSL) += \
 						network/impl/ssl/polarssl 
 
 # xml
@@ -316,9 +321,9 @@ tbox_C_FILES 			+= \
 						stream/transfer_pool \
 						platform/aicp
 
-tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_OPENSSL) += \
+tbox_C_FILES-$(OPENSSL) += \
 						asio/ssl 
-tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_POLARSSL) += \
+tbox_C_FILES-$(POLARSSL) += \
 						asio/ssl 
 endif
 
@@ -362,7 +367,7 @@ tbox_C_FILES 			+= \
 						zip/rlc \
 						stream/impl/filter/zip 
 
-tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_ZLIB) += \
+tbox_C_FILES-$(ZLIB) += \
 						zip/zlib \
 						zip/gzip \
 						zip/zlibraw 
@@ -374,10 +379,10 @@ tbox_C_FILES 			+= \
 						database/sql \
 						database/value 
 
-tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_MYSQL) += \
+tbox_C_FILES-$(MYSQL) 	+= \
 						database/impl/mysql
 
-tbox_C_FILES-$(TB_CONFIG_THIRD_HAVE_SQLITE3) += \
+tbox_C_FILES-$(SQLITE3) += \
 						database/impl/sqlite3
 endif
 
@@ -409,10 +414,9 @@ tbox_C_FILES-$(TB_CONFIG_OS_WINDOWS) += \
 # flags
 tbox_CXFLAGS 			+= -D__tb_prefix__=\"tbox\"
 
-# header files
-INC_FILES 				= \
+# include files
+tbox_INC_FILES 			= \
 						tbox.h \
-						tbox.config.h \
 						config.h \
 						prefix.h \
 						prefix/prefix.h \
