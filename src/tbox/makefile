@@ -250,7 +250,6 @@ tbox_C_FILES 			+= \
 						platform/print \
 						platform/mutex \
 						platform/event \
-						platform/screen \
 						platform/socket \
 						platform/thread \
 						platform/memory \
@@ -387,21 +386,16 @@ tbox_C_FILES-$(SQLITE3) += \
 endif
 
 # ios
-tbox_M_FILES-$(TB_CONFIG_OS_IOS) += \
-						platform/mach/ios/screen \
+tbox_M_FILES-$(IOS) += \
 						platform/mach/ios/directory
 
-# mac
-tbox_M_FILES-$(TB_CONFIG_OS_MAC) += \
-						platform/mach/mac/screen
-
 # android
-tbox_C_FILES-$(TB_CONFIG_OS_ANDROID) += \
+tbox_C_FILES-$(ANDROID) += \
 						platform/linux/android/android \
 						platform/linux/android/directory 
 
 # windows
-tbox_C_FILES-$(TB_CONFIG_OS_WINDOWS) += \
+tbox_C_FILES-$(MSVC)$(MINGW)$(CYGWIN) += \
 						platform/windows/socket_pool \
 						platform/windows/interface/interface \
 						platform/windows/interface/user32 \
@@ -533,7 +527,6 @@ tbox_INC_FILES 			= \
 						platform/mutex.h \
 						platform/timer.h \
 						platform/ltimer.h \
-						platform/screen.h \
 						platform/thread.h \
 						platform/socket.h \
 						platform/event.h \
