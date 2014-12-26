@@ -1,10 +1,3 @@
-# demo
-TB_CONFIG_DEMO_LIBS					= stdc++ log gcc c m dl
-TB_CONFIG_DEMO_CMD1 				=
-
-# os
-TB_CONFIG_OS_ANDROID 				= y
-
 # float
 TB_CONFIG_TYPE_FLOAT 				= y
 
