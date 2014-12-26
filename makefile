@@ -244,12 +244,7 @@ else
 ECHO 		:= echo
 endif
 
-# select package directory
-ifneq ($(PACKAGE),)
-PKG_DIR 	:= $(PACKAGE)
-endif
-
-# make upper package name
+# make upper 
 ifeq ($(HOST),mac)
 define MAKE_UPPER
 ${shell echo $(1) | perl -p -e "s/(.*)/\U\1/g"}
@@ -258,6 +253,11 @@ else
 define MAKE_UPPER
 ${shell echo $(1) | sed "s/\(.*\)/\U\1/g"}
 endef
+endif
+
+# select package directory
+ifneq ($(PACKAGE),)
+PKG_DIR 	:= $(PACKAGE)
 endif
 
 # make upper package name
@@ -271,7 +271,7 @@ define PROBE_PACKAGE
 $($(1)_upper) :=$(if $($($(1)_upper)),$($($(1)_upper)),\
 				$(shell if [ -d "$(PKG_DIR)/$(1).pkg/lib/$(PLAT)/$(ARCH)" ]; then \
 					echo "y"; \
-				elif [ -z "`$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/info.json`" ]; then \
+				elif [ -z "`$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release) $(PKG_DIR)/$(1).pkg/manifest.json`" ]; then \
 					echo "n"; \
 				else \
 					echo "y"; \
@@ -291,11 +291,11 @@ endef
 define LOAD_PACKAGE_OPTIONS
 $(if $(findstring y,$($($(1)_upper))),\
 	"$($(1)_upper) ="$($($(1)_upper))"\n" \
-	"$(1)_INCPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-	"$(1)_LIBPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libpath $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-	"$(1)_INCFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-	"$(1)_LIBFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libflags $(PKG_DIR)/$(1).pkg/info.json` )"\n" \
-	"$(1)_LIBNAMES ="$(shell if [ -f $(PKG_DIR)/$(1).pkg/info.json ]; then echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libs $(PKG_DIR)/$(1).pkg/info.json`; else echo $(1)$(DTYPE); fi)"\n" \
+	"$(1)_INCPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incpath $(PKG_DIR)/$(1).pkg/manifest.json` )"\n" \
+	"$(1)_LIBPATH ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libpath $(PKG_DIR)/$(1).pkg/manifest.json` )"\n" \
+	"$(1)_INCFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).incflags $(PKG_DIR)/$(1).pkg/manifest.json` )"\n" \
+	"$(1)_LIBFLAGS ="$(shell echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libflags $(PKG_DIR)/$(1).pkg/manifest.json` )"\n" \
+	"$(1)_LIBNAMES ="$(shell if [ -f $(PKG_DIR)/$(1).pkg/manifest.json ]; then echo `$(TOOL_DIR)/jcat/jcat --filter=.compiler.$(PLAT).$(ARCH).$(if $(findstring y,$(DEBUG)),debug,release).libs $(PKG_DIR)/$(1).pkg/manifest.json`; else echo $(1)$(DTYPE); fi)"\n" \
 	"export "$($(1)_upper)"\n" \
 	"export "$(1)_INCPATH"\n" \
 	"export "$(1)_LIBPATH"\n" \
@@ -361,22 +361,29 @@ config : .null
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# project"								>> .config.mak
 	@$(ECHO) "PRO_DIR ="$(PRO_DIR)						>> .config.mak
+	@$(ECHO) "export PRO_DIR"							>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# profile"								>> .config.mak
 	@$(ECHO) "PROF ="$(PROF)							>> .config.mak
+	@$(ECHO) "export PROF"								>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# debug"									>> .config.mak
 	@$(ECHO) "DEBUG ="$(DEBUG)							>> .config.mak
 	@$(ECHO) "DTYPE ="$(DTYPE)							>> .config.mak
+	@$(ECHO) "export DEBUG"								>> .config.mak
+	@$(ECHO) "export DTYPE"								>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# small"									>> .config.mak
 	@$(ECHO) "SMALL ="$(SMALL)							>> .config.mak
+	@$(ECHO) "export SMALL"								>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# host"									>> .config.mak
 	@$(ECHO) "HOST ="$(HOST)							>> .config.mak
+	@$(ECHO) "export HOST"								>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# install"								>> .config.mak
 	@$(ECHO) "INSTALL ="$(INSTALL)						>> .config.mak
+	@$(ECHO) "export INSTALL"							>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# flags"									>> .config.mak
 	@$(ECHO) "CFLAG ="$(CFLAG)							>> .config.mak
@@ -389,48 +396,6 @@ config : .null
 	@$(ECHO) "ASFLAG ="$(ASFLAG)						>> .config.mak
 	@$(ECHO) "ARFLAG ="$(ARFLAG)						>> .config.mak
 	@$(ECHO) "SHFLAG ="$(SHFLAG)						>> .config.mak
-	@$(ECHO) ""											>> .config.mak
-	@$(ECHO) "# platform"								>> .config.mak
-	@$(ECHO) "PLAT ="$(PLAT)							>> .config.mak
-	@$(ECHO) ""											>> .config.mak
-	@$(ECHO) "# architecture"							>> .config.mak
-	@$(ECHO) "ARCH ="$(ARCH)							>> .config.mak
-	@$(ECHO) "ARM ="$(ARM)								>> .config.mak
-	@$(ECHO) "x86 ="$(x86)								>> .config.mak
-	@$(ECHO) "x64 ="$(x64)								>> .config.mak
-	@$(ECHO) "SH4 ="$(SH4)								>> .config.mak
-	@$(ECHO) "MIPS ="$(MIPS)							>> .config.mak
-	@$(ECHO) "SPARC ="$(SPARC)							>> .config.mak
-	@$(ECHO) ""											>> .config.mak
-	@$(ECHO) "# demo"									>> .config.mak
-	@$(ECHO) "DEMO ="$(DEMO)							>> .config.mak
-	@$(ECHO) ""											>> .config.mak
-	@$(ECHO) "# toolchain"								>> .config.mak
-	@$(ECHO) "SDK ="$(SDK)								>> .config.mak
-	@$(ECHO) "BIN ="$(BIN)								>> .config.mak
-	@$(ECHO) "PRE ="$(PRE)								>> .config.mak
-	@$(ECHO) "CCACHE ="$(CCACHE)						>> .config.mak
-	@$(ECHO) "DISTCC ="$(DISTCC)						>> .config.mak
-	@$(ECHO) ""											>> .config.mak
-	@$(ECHO) "# export"									>> .config.mak
-	@$(ECHO) "export PRO_DIR"							>> .config.mak
-	@$(ECHO) "export DEBUG"								>> .config.mak
-	@$(ECHO) "export DTYPE"								>> .config.mak
-	@$(ECHO) "export SMALL"								>> .config.mak
-	@$(ECHO) "export HOST"								>> .config.mak
-	@$(ECHO) "export PLAT"								>> .config.mak
-	@$(ECHO) "export ARCH"								>> .config.mak
-	@$(ECHO) "export ARM"								>> .config.mak
-	@$(ECHO) "export x86"								>> .config.mak
-	@$(ECHO) "export x64"								>> .config.mak
-	@$(ECHO) "export SH4"								>> .config.mak
-	@$(ECHO) "export MIPS"								>> .config.mak
-	@$(ECHO) "export SPARC"								>> .config.mak
-	@$(ECHO) "export PROF"								>> .config.mak
-	@$(ECHO) "export DEMO"								>> .config.mak
-	@$(ECHO) "export SDK"								>> .config.mak
-	@$(ECHO) "export BIN"								>> .config.mak
-	@$(ECHO) "export PRE"								>> .config.mak
 	@$(ECHO) "export CFLAG"								>> .config.mak
 	@$(ECHO) "export CCFLAG"							>> .config.mak
 	@$(ECHO) "export CXFLAG"							>> .config.mak
@@ -441,15 +406,45 @@ config : .null
 	@$(ECHO) "export ASFLAG"							>> .config.mak
 	@$(ECHO) "export ARFLAG"							>> .config.mak
 	@$(ECHO) "export SHFLAG"							>> .config.mak
-	@$(ECHO) "export CCACHE"							>> .config.mak
-	@$(ECHO) "export DISTCC"							>> .config.mak
-	@$(ECHO) "export INSTALL"							>> .config.mak
-	@$(ECHO) "export PACKAGE"							>> .config.mak
-	@$(ECHO) "export PKG_DIR"							>> .config.mak
+	@$(ECHO) ""											>> .config.mak
+	@$(ECHO) "# platform"								>> .config.mak
+	@$(ECHO) "PLAT ="$(PLAT)							>> .config.mak
+	@$(ECHO) ""$(call MAKE_UPPER,$(PLAT))" =y" 			>> .config.mak
+	@$(ECHO) "export PLAT"								>> .config.mak
+	@$(ECHO) "export "$(call MAKE_UPPER,$(PLAT)) 		>> .config.mak
+	@$(ECHO) ""											>> .config.mak
+	@$(ECHO) "# architecture"							>> .config.mak
+	@$(ECHO) "ARCH ="$(ARCH)							>> .config.mak
+	@$(ECHO) "ARM ="$(ARM)								>> .config.mak
+	@$(ECHO) "x86 ="$(x86)								>> .config.mak
+	@$(ECHO) "x64 ="$(x64)								>> .config.mak
+	@$(ECHO) "SH4 ="$(SH4)								>> .config.mak
+	@$(ECHO) "MIPS ="$(MIPS)							>> .config.mak
+	@$(ECHO) "SPARC ="$(SPARC)							>> .config.mak
+	@$(ECHO) "export ARCH"								>> .config.mak
+	@$(ECHO) "export ARM"								>> .config.mak
+	@$(ECHO) "export x86"								>> .config.mak
+	@$(ECHO) "export x64"								>> .config.mak
+	@$(ECHO) "export SH4"								>> .config.mak
+	@$(ECHO) "export MIPS"								>> .config.mak
+	@$(ECHO) "export SPARC"								>> .config.mak
+	@$(ECHO) ""											>> .config.mak
+	@$(ECHO) "# demo"									>> .config.mak
+	@$(ECHO) "DEMO ="$(DEMO)							>> .config.mak
+	@$(ECHO) "export DEMO"								>> .config.mak
+	@$(ECHO) ""											>> .config.mak
+	@$(ECHO) "# toolchain"								>> .config.mak
+	@$(ECHO) "SDK ="$(SDK)								>> .config.mak
+	@$(ECHO) "BIN ="$(BIN)								>> .config.mak
+	@$(ECHO) "PRE ="$(PRE)								>> .config.mak
+	@$(ECHO) "CCACHE ="$(CCACHE)						>> .config.mak
+	@$(ECHO) "DISTCC ="$(DISTCC)						>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# packages"								>> .config.mak
 	@$(ECHO) "PACKAGE ="$(PACKAGE)						>> .config.mak
 	@$(ECHO) "PKG_DIR ="$(PKG_DIR)						>> .config.mak
+	@$(ECHO) "export PACKAGE"							>> .config.mak
+	@$(ECHO) "export PKG_DIR"							>> .config.mak
 	@$(ECHO) $(foreach name, $(PKG_NAMES), $(call LOAD_PACKAGE_OPTIONS,$(name))) >> .config.mak
 
 # ######################################################################################

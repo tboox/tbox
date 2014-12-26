@@ -85,8 +85,9 @@
             ,   "release":      "$.compiler.ios.armv6.debug"
             }
 
-        ,   "armv6":            "$.compiler.ios.armv6"
         ,   "armv7":            "$.compiler.ios.armv6"
+        ,   "armv7s":           "$.compiler.ios.armv6"
+        ,   "arm64":            "$.compiler.ios.armv6"
         }
 
     ,   "linux":
