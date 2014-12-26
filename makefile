@@ -439,6 +439,11 @@ config : .null
 	@$(ECHO) "PRE ="$(PRE)								>> .config.mak
 	@$(ECHO) "CCACHE ="$(CCACHE)						>> .config.mak
 	@$(ECHO) "DISTCC ="$(DISTCC)						>> .config.mak
+	@$(ECHO) "export SDK"								>> .config.mak
+	@$(ECHO) "export BIN"								>> .config.mak
+	@$(ECHO) "export PRE"								>> .config.mak
+	@$(ECHO) "export CCACHE"							>> .config.mak
+	@$(ECHO) "export DISTCC"							>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# packages"								>> .config.mak
 	@$(ECHO) "PACKAGE ="$(PACKAGE)						>> .config.mak

@@ -37,7 +37,7 @@
     do \
     { \
         module_name->interface_name = (tb_##module_name##_##interface_name##_t)GetProcAddress((HMODULE)module, #interface_name); \
-        if (!module_name->interface_name) tb_trace_w("load: %s: %s: no", #module_name, #interface_name); \
+        if (!module_name->interface_name) { tb_trace_w("load: %s: %s: no", #module_name, #interface_name); } \
         \
     } while (0)
 

@@ -13,23 +13,21 @@
 
 ,   "compiler": 
     {
-        "default":
+        "mac":
         {
-            "debug":
+            "x64":              
             {
-                "libs":         "m dl pthread"
-            ,   "libpath":      ""
-            ,   "incpath":      ""
-            ,   "libflags":     ""
-            ,   "incflags":     ""
+                "debug":
+                {
+                    "libs":         "m dl pthread"
+                ,   "libpath":      "/usr/local/lib"
+                ,   "incpath":      ""
+                ,   "libflags":     ""
+                ,   "incflags":     ""
+                }
+            ,   "release":          "$.compiler.mac.x64.debug"
             }
-        ,   "release":          "$.compiler.default.debug"
-        }
-
-    ,   "mac":
-        {
-            "x64":              "$.compiler.default"
-        ,   "x86":              "$.compiler.default"
+        ,   "x86":              "$.compiler.mac.x64"
         }
 
     ,   "msvc":

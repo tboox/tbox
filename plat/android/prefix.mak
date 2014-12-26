@@ -16,12 +16,13 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # tool
-PRE 				= $(BIN)/arm-linux-androideabi-
-CC 					= $(PRE)gcc
-AR 					= $(PRE)ar
-STRIP 				= $(PRE)strip
-RANLIB 				= $(PRE)ranlib
-LD 					= $(PRE)g++
+PRE_ 				:= $(if $(PRE),$(PRE),arm-linux-androideabi-)
+PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE_),$(PRE_))
+CC 					= $(PRE_)gcc
+AR 					= $(PRE_)ar
+STRIP 				= $(PRE_)strip
+RANLIB 				= $(PRE_)ranlib
+LD 					= $(PRE_)g++
 AS					= 
 RM 					= rm -f
 RMDIR 				= rm -rf
