@@ -137,13 +137,12 @@ demo_PKGS-$(OPENSSL) 						+= $(if $(findstring y,$(POLARSSL)),,openssl)
 demo_PKGS-$(MYSQL) 							+= mysql
 demo_PKGS-$(SQLITE3) 						+= sqlite3
 demo_PKGS-$(ZLIB) 							+= zlib
+demo_PKGS-$(BASE) 							+= base
 
 # others
-demo_CXFLAGS 								+= -D__tb_prefix__=\"demo\"
-demo_LDFLAGS 								+= $(TB_CONFIG_DEMO_LDFLAGS)
-demo_LIBS 									+= tbox$(DTYPE) $(TB_CONFIG_DEMO_LIBS)
+demo_LIBS 									+= tbox$(DTYPE)
 demo_LIB_DIRS 								+= ../tbox
-demo_SUFFIX_CMD1 							+= $(TB_CONFIG_DEMO_CMD1)
+demo_CXFLAGS 								+= -D__tb_prefix__=\"demo\"
 
 # suffix
 include $(PRO_DIR)/suffix.mak

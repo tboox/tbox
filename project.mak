@@ -16,5 +16,5 @@ PRO_VERSION_ALTER 	= 8
 PRO_PREFIX 			= TB_
 
 # the package names
-PKG_NAMES 			= polarssl openssl sqlite3 mysql zlib
+PKG_NAMES 			= polarssl openssl sqlite3 mysql zlib base
 
