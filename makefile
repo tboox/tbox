@@ -304,7 +304,7 @@ $(if $(findstring y,$($($(1)_upper))),\
 	"export "$(1)_LIBFLAGS"\n\n" \
 ,\
 	"$($(1)_upper) ="$($($(1)_upper))"\n" \
-	"export "$($(1)_upper)"\n")
+	"export "$($(1)_upper)"\n\n")
 endef
 
 # config
