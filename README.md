@@ -172,29 +172,20 @@ build
 development
 -----------
 
-- the installed prefix header and library directory after runing "make r":
- -  inc: ./tbox/pre/inc/$(PLAT)/$(ARCH)/
- -  lib: ./tbox/pre/lib/$(PLAT)/$(ARCH)/
+- the installed files directory after runing "make r" or "make i":
+ -  bin: ./bin/tbox.pkg/
 
 - for linux x64:
- -  inc:                ./tbox/pre/inc/linux/x64/tbox
- -  lib[debug]:         ./tbox/pre/lib/linux/x64/libtboxd.a
- -  lib[release]:       ./tbox/pre/lib/linux/x64/libtboxr.a
- -  CFLAGS[debug]:      -D\_\_tb\_debug\_\_
- -  CFLAGS[release]:    
- -  CFLAGS[optional]:   -D\_\_tb\_prefix\_\_=\"tag\"
- -  LDFLAGS[debug]:     -L./tbox/pre/lib/linux/x64/ -ltboxd
- -  LDFLAGS[release]:   -L./tbox/pre/lib/linux/x64/ -ltboxr
+ -  CFLAGS[debug]:      -I./bin/tbox.pkg/inc/ -I./bin/tbox.pkg/inc/linux/x64/ -D\_\_tb\_debug\_\_
+ -  CFLAGS[release]:    -I./bin/tbox.pkg/inc/ -I./bin/tbox.pkg/inc/linux/x64/
+ -  LDFLAGS[debug]:     -L./bin/tbox.pkg/lib/linux/x64/ -ltboxd
+ -  LDFLAGS[release]:   -L./bin/tbox.pkg/lib/linux/x64/ -ltboxr
 
 - for msvc x86:
- -  inc:                ./tbox/pre/inc/msvc/x64/tbox
- -  lib[debug]:         ./tbox/pre/lib/msvc/x64/tboxd.lib
- -  lib[release]:       ./tbox/pre/lib/msvc/x64/tboxr.lib
- -  CFLAGS[debug]:      -D\_\_tb\_debug\_\_
- -  CFLAGS[release]:    
- -  CFLAGS[optional]:   -D\_\_tb\_prefix\_\_=\"tag\"
- -  LDFLAGS[debug]:     -LIBPATH:.\\tbox\\pre\\lib/msvc\\x86 tboxd.lib
- -  LDFLAGS[release]:   -LIBPATH:.\\tbox\\pre\\lib/msvc\\x86 tboxr.lib
+ -  CFLAGS[debug]:      -I./bin/tbox.pkg/inc/ -I./bin/tbox.pkg/inc/msvc/x86/ -D\_\_tb\_debug\_\_
+ -  CFLAGS[release]:    -I./bin/tbox.pkg/inc/ -I./bin/tbox.pkg/inc/msvc/x86/
+ -  LDFLAGS[debug]:     -LIBPATH:.\\bin\\tbox.pkg\\lib/msvc\\x86 tboxd.lib
+ -  LDFLAGS[release]:   -LIBPATH:.\\bin\\tbox.pkg\\lib/msvc\\x86 tboxr.lib
 
 example
 -----------
