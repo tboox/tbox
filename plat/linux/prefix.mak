@@ -39,7 +39,6 @@ CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
 MAKE 				= make -r
-PWD 				= pwd
 
 # architecture flags
 AHFLAGS 			:= $(if $(AHFLAGS),$(AHFLAGS),$(if $(findstring x64,$(ARCH)),-m64,))

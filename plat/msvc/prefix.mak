@@ -28,7 +28,6 @@ CP 					= cp
 CPDIR 				= cp -r
 MKDIR 				= mkdir -p
 MAKE 				= make -r
-PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -MT -Gy -Zi

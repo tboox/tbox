@@ -111,7 +111,7 @@ endef
 $(foreach name, $(NAMES), $(eval $(call APPEND_FILES_AND_DIRS_y,$(name))))
 
 # the current directory
-CUR_DIR 		:= $(shell $(PWD))
+CUR_DIR 		:= $(abspath .)
 
 # select package directory
 ifneq ($(PACKAGE),)
