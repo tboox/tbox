@@ -336,7 +336,7 @@ config : .null
 	@$(ECHO) ""$(foreach name, $(PKG_NAMES), $(call MAKE_PACKAGE_INFO,$(name)))
 	@$(ECHO) ""
 	@$(ECHO) "directories:"
-	@$(ECHO) "    install:\t\t"$(INSTALL)
+	@$(ECHO) "    install:\t\t"$(abspath $(INSTALL))
 	@$(ECHO) "    package:\t\t"$(PACKAGE)
 	@$(ECHO) ""
 	@$(ECHO) "toolchains:"
@@ -382,7 +382,7 @@ config : .null
 	@$(ECHO) "export HOST"								>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# install"								>> .config.mak
-	@$(ECHO) "INSTALL ="$(INSTALL)						>> .config.mak
+	@$(ECHO) "INSTALL ="$(abspath $(INSTALL))			>> .config.mak
 	@$(ECHO) "export INSTALL"							>> .config.mak
 	@$(ECHO) ""											>> .config.mak
 	@$(ECHO) "# flags"									>> .config.mak
