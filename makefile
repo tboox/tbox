@@ -204,7 +204,7 @@ MIPS 		:=$(if $(findstring mips,$(ARCH)),y,n)
 SPARC 		:=$(if $(findstring sparc,$(ARCH)),y,n)
 
 # the project directory
-PRO_DIR		:=${shell pwd}
+PRO_DIR		:=$(abspath .)
 
 # the package directory
 PKG_DIR 	:= $(if $(PACKAGE),$(PACKAGE),$(PRO_DIR)/pkg)
