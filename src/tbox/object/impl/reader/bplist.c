@@ -32,8 +32,7 @@
  * includes
  */
 #include "bplist.h"
-#include "../object.h"
-#include "../../charset/charset.h"
+#include "reader.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros

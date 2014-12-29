@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        xml.h
+ * @file        xplist.h
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_READER_XML_H
-#define TB_OBJECT_READER_XML_H
+#ifndef TB_OBJECT_IMPL_WRITER_XPLIST_H
+#define TB_OBJECT_IMPL_WRITER_XPLIST_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,43 +38,46 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the xml reader type
-typedef struct __tb_object_xml_reader_t
+/// the object xplist writer type
+typedef struct __tb_object_xplist_writer_t
 {
-    /// the xml reader
-    tb_xml_reader_ref_t         reader;
+    /// the stream
+    tb_stream_ref_t             stream;
 
-}tb_object_xml_reader_t;
+    /// is deflate?
+    tb_bool_t                   deflate;
 
-/// the xml reader func type
-typedef tb_object_ref_t         (*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* reader, tb_size_t event);
+}tb_object_xplist_writer_t;
+
+/// the xplist writer func type
+typedef tb_bool_t               (*tb_object_xplist_writer_func_t)(tb_object_xplist_writer_t* writer, tb_object_ref_t object, tb_size_t level);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the xml object reader
+/*! the xplist object writer
  *
- * @return                      the xml object reader
+ * @return                      the xplist object writer
  */
-tb_object_reader_t*             tb_object_xml_reader(tb_noarg_t);
+tb_object_writer_t*             tb_object_xplist_writer(tb_noarg_t);
 
-/*! hook the xml reader
+/*! hook the xplist writer
  *
- * @param type                  the object type name
- * @param func                  the reader func
+ * @param type                  the object type 
+ * @param func                  the writer func
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_xml_reader_hook(tb_char_t const* type, tb_object_xml_reader_func_t func);
+tb_bool_t                       tb_object_xplist_writer_hook(tb_size_t type, tb_object_xplist_writer_func_t func);
 
-/*! the xml reader func
+/*! the xplist writer func
  *
- * @param type                  the object type name
+ * @param type                  the object type 
  *
- * @return                      the object reader func
+ * @return                      the object writer func
  */
-tb_object_xml_reader_func_t     tb_object_xml_reader_func(tb_char_t const* type);
+tb_object_xplist_writer_func_t  tb_object_xplist_writer_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

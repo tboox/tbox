@@ -32,8 +32,7 @@
  * includes
  */
 #include "json.h"
-#include "../object.h"
-#include "../../charset/charset.h"
+#include "reader.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -301,7 +300,7 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
         else if (bs) 
         {
             tb_sint64_t value = tb_stoi64(tb_static_string_cstr(&data));
-            tb_size_t   bytes = tb_object_reader_need_bytes(-value);
+            tb_size_t   bytes = tb_object_need_bytes(-value);
             switch (bytes)
             {
             case 1: number = tb_object_number_init_from_sint8((tb_sint8_t)value); break;
@@ -315,7 +314,7 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
         else 
         {
             tb_uint64_t value = tb_stou64(tb_static_string_cstr(&data));
-            tb_size_t   bytes = tb_object_reader_need_bytes(value);
+            tb_size_t   bytes = tb_object_need_bytes(value);
             switch (bytes)
             {
             case 1: number = tb_object_number_init_from_uint8((tb_uint8_t)value); break;

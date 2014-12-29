@@ -17,7 +17,7 @@ tb_int_t tb_demo_object_dump_main(tb_int_t argc, tb_char_t** argv)
         if (argv[2]) object = tb_object_seek(root, argv[2], tb_true);
 
         // dump object
-        if (object) tb_object_dump(object, TB_OBJECT_FORMAT_JSON);
+        if (object) tb_object_dump(object, TB_OBJECT_FORMAT_XML);
 
         // exit object
         tb_object_exit(root);

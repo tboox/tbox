@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        bin.h
+ * @file        bplist.h
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_WRITER_BIN_H
-#define TB_OBJECT_WRITER_BIN_H
+#ifndef TB_OBJECT_IMPL_WRITER_BPLIST_H
+#define TB_OBJECT_IMPL_WRITER_BPLIST_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,58 +38,43 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the object bin writer type
-typedef struct __tb_object_bin_writer_t
+/// the object bplist writer type
+typedef struct __tb_object_bplist_writer_t
 {
     /// the stream
     tb_stream_ref_t              stream;
 
-    /// the object hash
-    tb_hash_ref_t                  ohash;
+}tb_object_bplist_writer_t;
 
-    /// the string hash
-    tb_hash_ref_t                  shash;
-
-    /// the object index
-    tb_size_t                   index;
-
-    /// the encoder data
-    tb_byte_t*                  data;
-
-    /// the encoder maxn
-    tb_size_t                   maxn;
-
-}tb_object_bin_writer_t;
-
-/// the bin writer func type
-typedef tb_bool_t               (*tb_object_bin_writer_func_t)(tb_object_bin_writer_t* writer, tb_object_ref_t object);
+/// the bplist writer func type
+typedef tb_bool_t               (*tb_object_bplist_writer_func_t)(tb_object_bplist_writer_t* writer, tb_object_ref_t object, tb_size_t item_size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the bin object writer
+/*! the bplist object writer
  *
- * @return                      the bin object writer
+ * @return                      the bplist object writer
  */
-tb_object_writer_t*             tb_object_bin_writer(tb_noarg_t);
+tb_object_writer_t*             tb_object_bplist_writer(tb_noarg_t);
 
-/*! hook the bin writer
+/*! hook the bplist writer
  *
  * @param type                  the object type 
  * @param func                  the writer func
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_bin_writer_hook(tb_size_t type, tb_object_bin_writer_func_t func);
+tb_bool_t                       tb_object_bplist_writer_hook(tb_size_t type, tb_object_bplist_writer_func_t func);
 
-/*! the bin writer func
+/*! the bplist writer func
  *
  * @param type                  the object type 
  *
  * @return                      the object writer func
  */
-tb_object_bin_writer_func_t     tb_object_bin_writer_func(tb_size_t type);
+tb_object_bplist_writer_func_t  tb_object_bplist_writer_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

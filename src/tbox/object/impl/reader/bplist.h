@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        json.h
+ * @file        bplist.h
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_READER_JSON_H
-#define TB_OBJECT_READER_JSON_H
+#ifndef TB_OBJECT_IMPL_READER_BPLIST_H
+#define TB_OBJECT_IMPL_READER_BPLIST_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,43 +38,43 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the json reader type
-typedef struct __tb_object_json_reader_t
+/// the bplist reader type
+typedef struct __tb_object_bplist_reader_t
 {
     /// the stream
-    tb_stream_ref_t              stream;
+    tb_stream_ref_t             stream;
 
-}tb_object_json_reader_t;
+}tb_object_bplist_reader_t;
 
-/// the json reader func type
-typedef tb_object_ref_t            (*tb_object_json_reader_func_t)(tb_object_json_reader_t* reader, tb_char_t type);
+/// the bplist reader func type
+typedef tb_object_ref_t         (*tb_object_bplist_reader_func_t)(tb_object_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the json object reader
+/*! the bplist object reader
  *
- * @return                      the json object reader
+ * @return                      the bplist object reader
  */
-tb_object_reader_t*             tb_object_json_reader(tb_noarg_t);
+tb_object_reader_t*             tb_object_bplist_reader(tb_noarg_t);
 
-/*! hook the json reader
+/*! hook the bplist reader
  *
- * @param type                  the object type name
+ * @param type                  the object type 
  * @param func                  the reader func
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_json_reader_hook(tb_char_t type, tb_object_json_reader_func_t func);
+tb_bool_t                       tb_object_bplist_reader_hook(tb_size_t type, tb_object_bplist_reader_func_t func);
 
-/*! the json reader func
+/*! the bplist reader func
  *
- * @param type                  the object type name
+ * @param type                  the object type 
  *
  * @return                      the object reader func
  */
-tb_object_json_reader_func_t    tb_object_json_reader_func(tb_char_t type);
+tb_object_bplist_reader_func_t  tb_object_bplist_reader_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

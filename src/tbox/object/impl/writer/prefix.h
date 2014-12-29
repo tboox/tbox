@@ -30,20 +30,8 @@
 #include "../prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// bytes
-#define tb_object_writer_need_bytes(x)              \
-                                                    (((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
-                                                    (((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
-                                                    (((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
-                                                    (((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-
 static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_stream_ref_t stream, tb_bool_t deflate, tb_size_t tab)
 {
     // writ tab
@@ -69,7 +57,7 @@ static __tb_inline__ tb_bool_t tb_object_writer_bin_type_size(tb_stream_ref_t st
     tb_assert_and_check_return_val(stream && type <= 0xff, tb_false);
 
     // byte for size < 64bits
-    tb_size_t sizeb = tb_object_writer_need_bytes(size);
+    tb_size_t sizeb = tb_object_need_bytes(size);
     tb_assert_and_check_return_val(sizeb <= 8, tb_false);
 
     // flag for size

@@ -32,9 +32,8 @@
  * includes
  */
 #include "bplist.h"
-#include "../object.h"
-#include "../../charset/charset.h"
-#include "../../algorithm/algorithm.h"
+#include "writer.h"
+#include "../../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -52,13 +51,6 @@ do { \
     default: break; \
     } \
 } while (0)
-
-// bytes
-#define tb_object_bplist_writer_need_bytes(x) \
-(((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
-(((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
-(((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
-(((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
 
 // number
 #define tb_object_bplist_writer_init_number(x) \
@@ -638,7 +630,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
 
         // object maxn
         object_maxn = tb_object_bplist_writer_builder_maxn(object);
-        item_size   = tb_object_bplist_writer_need_bytes(object_maxn);
+        item_size   = tb_object_need_bytes(object_maxn);
         tb_trace_d("object_maxn: %llu", object_maxn);
         tb_trace_d("item_size: %lu", item_size);
 
@@ -693,7 +685,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
 
         // offset table index
         offset_table_index = tb_stream_offset(stream);
-        offset_size = tb_object_bplist_writer_need_bytes(offset_table_index);
+        offset_size = tb_object_need_bytes(offset_table_index);
         tb_trace_d("offset_table_index: %llu", offset_table_index);
         tb_trace_d("offset_size: %lu", offset_size);
 

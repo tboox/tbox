@@ -21,8 +21,8 @@
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_WRITER_XML_H
-#define TB_OBJECT_WRITER_XML_H
+#ifndef TB_OBJECT_IMPL_WRITER_XML_H
+#define TB_OBJECT_IMPL_WRITER_XML_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

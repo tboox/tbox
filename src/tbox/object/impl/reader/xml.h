@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        json.h
+ * @file        xml.h
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_WRITER_JSON_H
-#define TB_OBJECT_WRITER_JSON_H
+#ifndef TB_OBJECT_IMPL_READER_XML_H
+#define TB_OBJECT_IMPL_READER_XML_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,46 +38,43 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the object json writer type
-typedef struct __tb_object_json_writer_t
+/// the xml reader type
+typedef struct __tb_object_xml_reader_t
 {
-    /// the stream
-    tb_stream_ref_t              stream;
+    /// the xml reader
+    tb_xml_reader_ref_t         reader;
 
-    /// is deflate?
-    tb_bool_t                   deflate;
+}tb_object_xml_reader_t;
 
-}tb_object_json_writer_t;
-
-/// the json writer func type
-typedef tb_bool_t               (*tb_object_json_writer_func_t)(tb_object_json_writer_t* writer, tb_object_ref_t object, tb_size_t level);
+/// the xml reader func type
+typedef tb_object_ref_t         (*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* reader, tb_size_t event);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the json object writer
+/*! the xml object reader
  *
- * @return                      the json object writer
+ * @return                      the xml object reader
  */
-tb_object_writer_t*             tb_object_json_writer(tb_noarg_t);
+tb_object_reader_t*             tb_object_xml_reader(tb_noarg_t);
 
-/*! hook the json writer
+/*! hook the xml reader
  *
- * @param type                  the object type 
- * @param func                  the writer func
+ * @param type                  the object type name
+ * @param func                  the reader func
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_json_writer_hook(tb_size_t type, tb_object_json_writer_func_t func);
+tb_bool_t                       tb_object_xml_reader_hook(tb_char_t const* type, tb_object_xml_reader_func_t func);
 
-/*! the json writer func
+/*! the xml reader func
  *
- * @param type                  the object type 
+ * @param type                  the object type name
  *
- * @return                      the object writer func
+ * @return                      the object reader func
  */
-tb_object_json_writer_func_t    tb_object_json_writer_func(tb_size_t type);
+tb_object_xml_reader_func_t     tb_object_xml_reader_func(tb_char_t const* type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
