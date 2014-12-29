@@ -30,17 +30,6 @@
 #include "../prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// bytes
-#define tb_object_reader_need_bytes(x)              \
-                                                    (((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
-                                                    (((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
-                                                    (((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
-                                                    (((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
 static __tb_inline__ tb_void_t tb_object_reader_bin_type_size(tb_stream_ref_t stream, tb_size_t* ptype, tb_uint64_t* psize)

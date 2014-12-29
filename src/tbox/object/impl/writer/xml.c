@@ -32,8 +32,8 @@
  * includes
  */
 #include "xml.h"
-#include "../object.h"
-#include "../../algorithm/algorithm.h"
+#include "writer.h"
+#include "../../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -122,16 +122,21 @@ static tb_bool_t tb_object_xml_writer_func_data(tb_object_xml_writer_t* writer, 
         {
             if (!(n & 63))
             {
-                if (n) if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
-                if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+                if (n) if (!tb_object_writer_newline(writer->stream, writer->deflate)) break;
+                if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) break;
             }
-            if (tb_stream_printf(writer->stream, "%c", *p) < 0) return tb_false;
+            if (tb_stream_printf(writer->stream, "%c", *p) < 0) break;
         }
-        if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
-        // free it
+        // free the data
         tb_free(ob);
-                    
+               
+        // check
+        tb_check_return_val(p == e, tb_false);
+
+        // writ newline
+        if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
+     
         // writ end
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "</data>") < 0) return tb_false;

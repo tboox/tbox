@@ -340,20 +340,20 @@ tbox_C_FILES 			+= \
 						object/number \
 						object/boolean \
 						object/dictionary \
-						object/reader/bin \
-						object/reader/json \
-						object/reader/bplist \
-						object/reader/reader \
-						object/writer/bin \
-						object/writer/json \
-						object/writer/bplist \
-						object/writer/writer
+						object/impl/reader/bin \
+						object/impl/reader/json \
+						object/impl/reader/bplist \
+						object/impl/reader/reader \
+						object/impl/writer/bin \
+						object/impl/writer/json \
+						object/impl/writer/bplist \
+						object/impl/writer/writer
 
 tbox_C_FILES-$(TB_CONFIG_MODULE_HAVE_XML) += \
-						object/reader/xml \
-						object/writer/xml \
-						object/reader/xplist \
-						object/writer/xplist
+						object/impl/reader/xml \
+						object/impl/writer/xml \
+						object/impl/reader/xplist \
+						object/impl/writer/xplist
 endif
 
 # zip
@@ -620,20 +620,6 @@ tbox_INC_FILES 			= \
 						object/string.h \
 						object/boolean.h \
 						object/dictionary.h \
-						object/reader/prefix.h \
-						object/reader/reader.h \
-						object/reader/xml.h \
-						object/reader/bin.h \
-						object/reader/json.h \
-						object/reader/xplist.h \
-						object/reader/bplist.h \
-						object/writer/prefix.h \
-						object/writer/writer.h \
-						object/writer/xml.h \
-						object/writer/bin.h \
-						object/writer/json.h \
-						object/writer/xplist.h \
-						object/writer/bplist.h \
 						utils/prefix.h \
 						utils/utils.h \
 						utils/bits.h \

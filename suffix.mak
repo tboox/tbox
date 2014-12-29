@@ -350,7 +350,6 @@ $(foreach file, $($(1)_DLL_FILES), $(eval $(call MAKE_INSTALL_DLL_DIRS,$(file),$
 $(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_DIRS,$(file),$($(1)_PKG_NAME))))
 
 INSTALL_FILES 	+= $($(1)_INC_FILES) $($(1)_LIB_FILES) $($(1)_DLL_FILES) $($(1)_BIN_FILES) $(if $(findstring y,$($(1)_CONFIG)),$(CFG_FILE),)
-REMOVED_DIRS 	+= $(BIN_DIR)/$($(1)_PKG_NAME).pkg
 
 $(CFG_FILE)_DIRS_ := $(BIN_DIR)/$($(1)_PKG_NAME).pkg/inc/$(PLAT)/$(ARCH)
 endef
@@ -393,10 +392,7 @@ $(foreach file, $($(1)_BIN_FILES), $(eval $(call MAKE_INSTALL_BIN_FILES,$(file))
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_INSTALL,$(name))))
 
-clean_install:
-	-@$(RMDIR) $(REMOVED_DIRS)
-	
-install: clean_install $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
+install: $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
 	$(INSTALL_SUFFIX_CMD1)
 	$(INSTALL_SUFFIX_CMD2)
 	$(INSTALL_SUFFIX_CMD3)

@@ -21,8 +21,8 @@
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_READER_BIN_H
-#define TB_OBJECT_READER_BIN_H
+#ifndef TB_OBJECT_IMPL_READER_BIN_H
+#define TB_OBJECT_IMPL_READER_BIN_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -42,15 +42,15 @@ __tb_extern_c_enter__
 typedef struct __tb_object_bin_reader_t
 {
     /// the stream
-    tb_stream_ref_t              stream;
+    tb_stream_ref_t             stream;
 
     /// the object list
-    tb_vector_ref_t                list;
+    tb_vector_ref_t             list;
 
 }tb_object_bin_reader_t;
 
 /// the bin reader func type
-typedef tb_object_ref_t            (*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
+typedef tb_object_ref_t         (*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

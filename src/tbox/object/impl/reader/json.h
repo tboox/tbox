@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        xplist.h
+ * @file        json.h
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_WRITER_XPLIST_H
-#define TB_OBJECT_WRITER_XPLIST_H
+#ifndef TB_OBJECT_IMPL_READER_JSON_H
+#define TB_OBJECT_IMPL_READER_JSON_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,46 +38,43 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the object xplist writer type
-typedef struct __tb_object_xplist_writer_t
+/// the json reader type
+typedef struct __tb_object_json_reader_t
 {
     /// the stream
     tb_stream_ref_t              stream;
 
-    /// is deflate?
-    tb_bool_t                   deflate;
+}tb_object_json_reader_t;
 
-}tb_object_xplist_writer_t;
-
-/// the xplist writer func type
-typedef tb_bool_t               (*tb_object_xplist_writer_func_t)(tb_object_xplist_writer_t* writer, tb_object_ref_t object, tb_size_t level);
+/// the json reader func type
+typedef tb_object_ref_t            (*tb_object_json_reader_func_t)(tb_object_json_reader_t* reader, tb_char_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the xplist object writer
+/*! the json object reader
  *
- * @return                      the xplist object writer
+ * @return                      the json object reader
  */
-tb_object_writer_t*             tb_object_xplist_writer(tb_noarg_t);
+tb_object_reader_t*             tb_object_json_reader(tb_noarg_t);
 
-/*! hook the xplist writer
+/*! hook the json reader
  *
- * @param type                  the object type 
- * @param func                  the writer func
+ * @param type                  the object type name
+ * @param func                  the reader func
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_xplist_writer_hook(tb_size_t type, tb_object_xplist_writer_func_t func);
+tb_bool_t                       tb_object_json_reader_hook(tb_char_t type, tb_object_json_reader_func_t func);
 
-/*! the xplist writer func
+/*! the json reader func
  *
- * @param type                  the object type 
+ * @param type                  the object type name
  *
- * @return                      the object writer func
+ * @return                      the object reader func
  */
-tb_object_xplist_writer_func_t  tb_object_xplist_writer_func(tb_size_t type);
+tb_object_json_reader_func_t    tb_object_json_reader_func(tb_char_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

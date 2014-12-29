@@ -32,8 +32,8 @@
  * includes
  */
 #include "bin.h"
-#include "../object.h"
-#include "../../algorithm/algorithm.h"
+#include "writer.h"
+#include "../../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
