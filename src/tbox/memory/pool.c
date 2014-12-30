@@ -221,7 +221,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && data && size, tb_null);
+    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -230,6 +230,14 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
     tb_pointer_t data_new = tb_null;
     do
     {
+        // no data?
+        if (!data)
+        {
+            // malloc it directly
+            data_new = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc_(impl->small_pool, size __tb_debug_args__) : tb_large_pool_malloc_(impl->large_pool, size, tb_null __tb_debug_args__);
+            break;
+        }
+
         // the data head
         tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
         tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
@@ -277,7 +285,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
         tb_trace_e("ralloc(%p, %lu) failed! at %s(): %lu, %s", data, size, func_, line_, file_);
 
         // dump data
-        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[pool]: [error]: ");
+        if (data) tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[pool]: [error]: ");
 
         // abort
         tb_abort();
@@ -388,26 +396,35 @@ tb_pointer_t tb_pool_align_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_
 }
 tb_pointer_t tb_pool_align_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__)
 {
-    // check
-    tb_assert_and_check_return_val(data, tb_null);
-
     // check align
     tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
     tb_check_return_val(!(align & 3), tb_null);
 
-    // check address 
-    tb_assertf_abort(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
-    tb_check_return_val(!((tb_size_t)data & (align - 1)), tb_null);
+    // ralloc?
+    tb_byte_t diff = 0;
+    if (data)
+    {
+        // check address 
+        tb_assertf_abort(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
+        tb_check_return_val(!((tb_size_t)data & (align - 1)), tb_null);
 
-    // the different bytes
-    tb_byte_t diff = ((tb_byte_t*)data)[-1];
+        // the different bytes
+        diff = ((tb_byte_t*)data)[-1];
 
-    // adjust the address
-    data = (tb_byte_t*)data - diff;
+        // adjust the address
+        data = (tb_byte_t*)data - diff;
 
-    // ralloc it
-    data = tb_pool_ralloc_(pool, data, size + align __tb_debug_args__);
-    tb_check_return_val(data, tb_null);
+        // ralloc it
+        data = tb_pool_ralloc_(pool, data, size + align __tb_debug_args__);
+        tb_check_return_val(data, tb_null);
+    }
+    // no data?
+    else
+    {
+        // malloc it directly
+        data = tb_pool_malloc_(pool, size + align __tb_debug_args__);
+        tb_check_return_val(data, tb_null);
+    }
 
     // the different bytes
     diff = (tb_byte_t)((~(tb_long_t)data) & (align - 1)) + 1;
