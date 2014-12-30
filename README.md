@@ -84,11 +84,25 @@ features
 contact
 -------
 
-- email:   	    waruqi@gmail.com
-- source:  	    https://github.com/waruqi/tbox
-- website: 	    http://www.tboox.org or http://www.tboox.net
-- download:     https://github.com/waruqi/tbox/archive/master.zip
-- qq(group):    343118190
+- email:   	    
+	- waruqi@gmail.com
+	- waruqi@126.com
+- source:  	    
+	- [github](https://github.com/waruqi/tbox)
+	- [coding](https://coding.net/u/waruqi/p/tbox/git)
+	- [osc@git](http://git.oschina.net/tboox/tbox)
+- website: 	    
+	- http://www.tboox.org
+	- http://www.tboox.net
+- download:
+ 	- [github](https://github.com/waruqi/tbox/archive/master.zip)
+ 	- [coding](https://coding.net/u/waruqi/p/tbox/git/archive/master)
+ 	- [osc@git](http://git.oschina.net/tboox/tbox/repository/archive?ref=master)
+- document:
+	- [github](https://github.com/waruqi/tbox/wiki/)
+	- [osc@git](http://git.oschina.net/tboox/tbox/wikis/home)
+- qq(group):    
+	- 343118190
 
 donate
 ------
