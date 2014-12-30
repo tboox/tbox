@@ -159,8 +159,8 @@ __tb_extern_c_enter__
 #   define tb_assert_and_check_continue(x)                  tb_assert_continue(x)
 #   define tb_assert_and_check_break_state(x, s, v)         tb_assert_break_state(x, s, v)
 #else
-#   define tb_assert(x)
-#   define tb_assert_abort(x)
+#   define tb_assert(x)                                     tb_assert_empty_impl()
+#   define tb_assert_abort(x)                               tb_assert_empty_impl()
 #   define tb_assert_return(x)
 #   define tb_assert_return_val(x, v)
 #   define tb_assert_goto(x, b)
@@ -252,6 +252,15 @@ static __tb_inline__ tb_bool_t  tb_assert_abort_impl(tb_bool_t x, tb_char_t cons
 
     // ok?
     return x;
+}
+#else
+/* the assert empty implementation
+ *
+ * @return                      only tb_false
+ */
+static __tb_inline__ tb_bool_t  tb_assert_empty_impl(tb_noarg_t) 
+{
+    return tb_false;
 }
 #endif
 
