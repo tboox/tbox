@@ -143,8 +143,8 @@ __tb_extern_c_enter__
 #endif
 
 #ifdef __tb_debug__
-#   define tb_assert(x)                                     do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); } } while(0)
-#   define tb_assert_abort(x)                               do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); tb_abort(); } } while(0)
+#   define tb_assert(x)                                     tb_assert_impl(!!(x), #x)
+#   define tb_assert_abort(x)                               tb_assert_abort_impl(!!(x), #x)
 #   define tb_assert_return(x)                              do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); return ; } } while(0)
 #   define tb_assert_return_val(x, v)                       do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); return (v); } } while(0)
 #   define tb_assert_goto(x, b)                             do { if (!(x)) {tb_trace_a("expr[%s]", #x); tb_assert_backtrace_dump(); goto b; } } while(0)
@@ -181,7 +181,79 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe);
+
+/*! dump backtrace 
+ *
+ * @param prefix    the prefix tag
+ * @pragm frames    the frame list
+ * @param nframe    the frame count
+ */
+tb_void_t           tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inlines
+ */
+
+#ifdef __tb_debug__
+/* the assert implementation
+ *
+ * @code
+ * tb_size_t v = (tb_assert(x), value);
+ * tb_assert(v);
+ * @endcode
+ *
+ * @param x                     the boolean value of the expression 
+ * @param expr                  the expression string 
+ *
+ * @return                      the boolean value of the expression 
+ */
+static __tb_inline__ tb_bool_t  tb_assert_impl(tb_bool_t x, tb_char_t const* expr) 
+{
+    // failed?
+    if (!x)
+    {
+        // trace
+        tb_trace_a("expr[%s]", expr); 
+
+        // dump backtrace
+        tb_assert_backtrace_dump();
+    }
+
+    // ok?
+    return x;
+}
+
+/* the assert and abort implementation
+ *
+ * @code
+ * tb_size_t v = (tb_assert_abort(x), value);
+ * tb_assert_abort(v);
+ * @endcode
+ *
+ * @param x                     the boolean value of the expression 
+ * @param expr                  the expression string 
+ *
+ * @return                      the boolean value of the expression 
+ */
+static __tb_inline__ tb_bool_t  tb_assert_abort_impl(tb_bool_t x, tb_char_t const* expr) 
+{
+    // failed?
+    if (!x)
+    {
+        // trace
+        tb_trace_a("expr[%s]", expr); 
+
+        // dump backtrace
+        tb_assert_backtrace_dump();
+
+        // abort it
+        tb_abort();
+    }
+
+    // ok?
+    return x;
+}
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
