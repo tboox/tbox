@@ -149,6 +149,16 @@ tb_bool_t           tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog);
  */
 tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port);
 
+/*! get local address
+ *
+ * @param sock      the socket 
+ * @param addr      the local address
+ * @param port      the local port pointer
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_socket_local(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port);
+
 /*! kill socket
  *
  * @param sock      the socket 
