@@ -104,6 +104,11 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_ui
     tb_trace_noimpl();
     return tb_null;
 }
+tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
 tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
 {
     tb_trace_noimpl();

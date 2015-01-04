@@ -275,6 +275,25 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_ui
     // ok
     return tb_fd2sock(fd);
 }
+tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port)
+{
+    // check
+    tb_assert_and_check_return_val(sock, tb_false);
+
+    // get local address
+    struct sockaddr_in  d = {0};
+    tb_int_t            n = sizeof(d);
+    if (getsockname(tb_sock2fd(sock), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return tb_false;
+
+    // save address
+    if (addr) tb_ipv4_set(addr, inet_ntoa(d.sin_addr));
+
+    // save port
+    if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
+
+    // ok
+    return tb_true;
+}
 tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
 {
     // check
