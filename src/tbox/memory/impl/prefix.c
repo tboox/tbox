@@ -35,15 +35,13 @@ static tb_void_t tb_pool_data_dump_data(tb_byte_t const* data, tb_size_t size)
     tb_assert_and_check_return(data && size);
 
     // dump head
-    tb_tracef_i("");
-    tb_size_t i = 0;
-    tb_size_t n = 147;
-    for (i = 0; i < n; i++) tb_tracet_i("=");
-    tb_tracet_i(__tb_newline__);
+    tb_trace_i("");
 
     // walk
-    tb_byte_t const* p = data;
-    tb_byte_t const* e = data + size;
+    tb_size_t           i = 0;
+    tb_size_t           n = 147;
+    tb_byte_t const*    p = data;
+    tb_byte_t const*    e = data + size;
     while (p < e)
     {
         // full line?
