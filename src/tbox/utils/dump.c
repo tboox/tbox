@@ -83,16 +83,14 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
     tb_size_t offset = 0;
 
     // dump head
-    tb_tracef_i("");
-    tb_size_t i = 0;
-    tb_size_t n = 147;
-    for (i = 0; i < n; i++) tb_tracet_i("=");
-    tb_tracet_i(__tb_newline__);
+    tb_trace_i("");
 
     // walk
     while (!tb_stream_beof(stream))
     {
         // read line
+        tb_size_t i = 0;
+        tb_size_t n = 147;
         tb_long_t read = 0;
         tb_byte_t line[0x20];
         while (read < 0x20)
