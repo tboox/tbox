@@ -31,6 +31,7 @@
 #include "ssl.h"
 #include "url.h"
 #include "ipv4.h"
+#include "ipv6.h"
 #include "addr.h"
 #include "http.h"
 #include "cookies.h"

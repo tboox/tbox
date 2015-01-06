@@ -168,7 +168,7 @@ tb_bool_t tb_url_init(tb_url_ref_t url)
         url->poto = TB_URL_PROTOCOL_NONE;
         url->port = 0;
         url->bssl = 0;
-        tb_ipv4_clr(&url->ipv4);
+        tb_ipv4_clear(&url->ipv4);
         if (!tb_string_init(&url->host)) break;
         if (!tb_string_init(&url->path)) break;
         if (!tb_string_init(&url->args)) break;
@@ -206,7 +206,7 @@ tb_void_t tb_url_clear(tb_url_ref_t url)
     url->bssl = 0;
     url->bwin = 0;
     url->pwin = 0;
-    tb_ipv4_clr(&url->ipv4);
+    tb_ipv4_clear(&url->ipv4);
     tb_string_clear(&url->host);
     tb_string_clear(&url->path);
     tb_string_clear(&url->args);
@@ -429,7 +429,7 @@ tb_bool_t tb_url_set(tb_url_ref_t url, tb_char_t const* cstr)
             tb_assert_and_check_break(p);
         
             // attempt to parse ipv4
-            tb_ipv4_set(&url->ipv4, tb_string_cstr(&url->host));
+            tb_ipv4_set_cstr(&url->ipv4, tb_string_cstr(&url->host));
 
             // parse port
             if (*p == ':')
@@ -602,13 +602,13 @@ tb_void_t tb_url_host_set(tb_url_ref_t url, tb_char_t const* host)
     tb_string_clear(&url->cache);
 
     // clear ipv4
-    tb_ipv4_clr(&url->ipv4);
+    tb_ipv4_clear(&url->ipv4);
 
     // parse host
     tb_url_parse_host(&url->host, host);
 
     // attempt to parse ipv4
-    tb_ipv4_set(&url->ipv4, tb_string_cstr(&url->host));
+    tb_ipv4_set_cstr(&url->ipv4, tb_string_cstr(&url->host));
 }
 tb_ipv4_ref_t tb_url_ipv4_get(tb_url_ref_t url)
 {
@@ -634,7 +634,7 @@ tb_void_t tb_url_ipv4_set(tb_url_ref_t url, tb_ipv4_ref_t ipv4)
         {
             // ipv4 => host
             tb_char_t           data[16];
-            tb_char_t const*    host = tb_ipv4_get(ipv4, data, 16);
+            tb_char_t const*    host = tb_ipv4_cstr(ipv4, data, 16);
             if (host) tb_string_cstrcpy(&url->host, host);
  
             // clear url

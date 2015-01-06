@@ -267,7 +267,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_ui
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
     // save address
-    if (addr) tb_ipv4_set(addr, inet_ntoa(d.sin_addr));
+    if (addr) tb_ipv4_set_cstr(addr, inet_ntoa(d.sin_addr));
 
     // save port
     if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
@@ -286,7 +286,7 @@ tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t*
     if (getsockname(tb_sock2fd(sock), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return tb_false;
 
     // save address
-    if (addr) tb_ipv4_set(addr, inet_ntoa(d.sin_addr));
+    if (addr) tb_ipv4_set_cstr(addr, inet_ntoa(d.sin_addr));
 
     // save port
     if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
@@ -496,7 +496,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t*
     if (r >= 0) 
     {
         // save address
-        if (addr) tb_ipv4_set(addr, inet_ntoa(d.sin_addr));
+        if (addr) tb_ipv4_set_cstr(addr, inet_ntoa(d.sin_addr));
 
         // save port
         if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
@@ -558,7 +558,7 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t
     if (r >= 0)
     {
         // save address
-        if (addr) tb_ipv4_set(addr, inet_ntoa(d.sin_addr));
+        if (addr) tb_ipv4_set_cstr(addr, inet_ntoa(d.sin_addr));
 
         // save port
         if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);

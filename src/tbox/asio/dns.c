@@ -496,7 +496,7 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long
  
     // only ipv4? ok
     tb_ipv4_t ipv4 = {0};
-    if (tb_ipv4_set(&ipv4, impl->host))
+    if (tb_ipv4_set_cstr(&ipv4, impl->host))
     {
         impl->done.func(dns, impl->host, &ipv4, impl->done.priv);
         return tb_true;

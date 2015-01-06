@@ -262,7 +262,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
 
         // post conn
         tb_trace_i("conn: ..");
-        tb_ipv4_t addr; tb_ipv4_set(&addr, "127.0.0.1");
+        tb_ipv4_t addr; tb_ipv4_set_cstr(&addr, "127.0.0.1");
         if (!tb_aico_conn(context.sock, &addr, 9090, tb_demo_sock_conn_func, &context)) break;
 
         // loop aicp

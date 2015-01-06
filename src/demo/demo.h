@@ -133,6 +133,8 @@ TB_DEMO_MAIN_DECL(memory_impl_static_fixed_pool);
 TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
+TB_DEMO_MAIN_DECL(network_ipv6);
+TB_DEMO_MAIN_DECL(network_addr);
 TB_DEMO_MAIN_DECL(network_http);
 TB_DEMO_MAIN_DECL(network_whois);
 TB_DEMO_MAIN_DECL(network_spider);

@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        ipv4.h
+ * @file        ipv6.h
  * @ingroup     network
  *
  */
-#ifndef TB_NETWORK_IPV4_H
-#define TB_NETWORK_IPV4_H
+#ifndef TB_NETWORK_IPV6_H
+#define TB_NETWORK_IPV6_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,55 +38,62 @@ __tb_extern_c_enter__
  * macros
  */
 
-/// the ipv4 string data maxn
-#define TB_IPV4_CSTR_MAXN           (16)
+/// the ipv6 string data maxn
+#define TB_IPV6_CSTR_MAXN           (40)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-/*! the ipv4 type
+/*! the ipv6 type
  *
- * xxx.xxx.xxx.xxx
+ * <pre>
+ * xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
+ * xxxx::xxxx:xxxx
+ * ::ffff:xxx.xxx.xxx.xxx
+ * </pre>
  */
-typedef union __tb_ipv4_t
+typedef union __tb_ipv6_t
 {
-    /// u32, little-endian 
-    tb_uint32_t     u32;
+    /// u32, little-endian
+    tb_uint32_t     u32[4];
+
+    /// u16, little-endian
+    tb_uint16_t     u16[8];
 
     /// u8
-    tb_uint8_t      u8[4];
+    tb_uint8_t      u8[16];
 
-}tb_ipv4_t, *tb_ipv4_ref_t;
+}tb_ipv6_t, *tb_ipv6_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! clear the ipv4
+/*! clear the ipv6
  *
- * @param ipv4      the ipv4
+ * @param ipv6      the ipv6
  */
-tb_void_t           tb_ipv4_clear(tb_ipv4_ref_t ipv4);
+tb_void_t           tb_ipv6_clear(tb_ipv6_ref_t ipv6);
 
-/*! get the ipv4 string
+/*! get the ipv6 string
  *
- * @param ipv4      the ipv4
- * @param data      the ipv4 data
- * @param maxn      the data maxn
+ * @param ipv6      the ipv6
+ * @param data      the ipv6 string data
+ * @param maxn      the ipv6 string data maxn
  *
- * @return          the ipv4 address
+ * @return          the ipv6 string
  */
-tb_char_t const*    tb_ipv4_cstr(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t maxn);
+tb_char_t const*    tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t maxn);
 
-/*! set the ipv4 from string
+/*! set the ipv6 from string
  *
- * @param ipv4      the ipv4
- * @param cstr      the ipv4 string 
+ * @param ipv6      the ipv6
+ * @param cstr      the ipv6 string
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ipv4_set_cstr(tb_ipv4_ref_t ipv4, tb_char_t const* cstr);
+tb_bool_t           tb_ipv6_set_cstr(tb_ipv6_ref_t ipv6, tb_char_t const* cstr);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -363,7 +363,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
                         tb_trace_d("acpt[%p]: client_addr: %s: %u", resp->aico, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr), tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port));
 
                         // save addr
-                        tb_ipv4_set(&resp->u.acpt.addr, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr));
+                        tb_ipv4_set_cstr(&resp->u.acpt.addr, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr));
 
                         // save port
                         resp->u.acpt.port = tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port);
@@ -495,7 +495,7 @@ static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
             tb_assert_and_check_return_val(addr, -1);
 
             // save address
-            tb_ipv4_set(resp->code == TB_AICE_CODE_URECV? &resp->u.urecv.addr : &resp->u.urecvv.addr, inet_ntoa(addr->sin_addr));
+            tb_ipv4_set_cstr(resp->code == TB_AICE_CODE_URECV? &resp->u.urecv.addr : &resp->u.urecvv.addr, inet_ntoa(addr->sin_addr));
 
             // save port
             if (resp->code == TB_AICE_CODE_URECV) resp->u.urecv.port = tb_bits_be_to_ne_u16(addr->sin_port);

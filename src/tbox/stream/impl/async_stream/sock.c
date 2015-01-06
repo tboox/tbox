@@ -115,7 +115,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_clear(tb_async_stream_sock_impl_
     tb_atomic64_set0(&impl->offset);
 
     // exit ipv4
-    tb_ipv4_clr(&impl->ipv4);
+    tb_ipv4_clear(&impl->ipv4);
 
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
@@ -527,7 +527,7 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
         tb_assert_and_check_break(host);
 
         // clear ipv4
-        tb_ipv4_clr(&impl->ipv4);
+        tb_ipv4_clear(&impl->ipv4);
 
         // init dns
         if (!impl->hdns) impl->hdns = tb_aicp_dns_init(tb_async_stream_aicp(stream));
