@@ -512,7 +512,7 @@ tb_void_t tb_dns_server_add(tb_char_t const* addr)
 
         // init server
         tb_dns_server_t server = {0};
-        if (!tb_ipv4_set(&server.addr, addr)) break;
+        if (!tb_ipv4_set_cstr(&server.addr, addr)) break;
 
         // add server
         tb_vector_insert_tail(g_list.list, &server);

@@ -41,68 +41,70 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
-tb_void_t tb_ipv4_clr(tb_ipv4_ref_t ipv4)
-{
-    if (ipv4) ipv4->u32 = 0;
-}
-tb_uint32_t tb_ipv4_set(tb_ipv4_ref_t ipv4, tb_char_t const* ip)
-{
-    // done
-    tb_uint32_t v4 = 0;
-    if (ip)
-    {
-        tb_uint32_t         b = 0;
-        tb_char_t           c = '\0';
-        tb_size_t           i = 0;
-        tb_char_t const*    p = ip;
-        do
-        {
-            // the character
-            c = *p++;
-
-            // digit?
-            if (c >= '0' && c <= '9' && b < 256)
-            {
-                b *= 10;
-                b += (tb_uint32_t)(c - '0') & 0xff;
-            }
-            // '.'?
-            else if ((c == '.' || !c) && b < 256)
-            {
-                v4 |= ((tb_uint32_t)b) << ((i++) << 3);
-                b = 0;
-            }
-            // failed?
-            else 
-            {
-                // trace
-//                tb_trace_e("invalid addr: %s", ip);
-
-                // clear it
-                v4 = 0;
-                break;
-            }
-
-        } while (c);
-    }
-
-    // save it
-    if (ipv4) ipv4->u32 = v4;
-
-    // ok?
-    return v4;
-}
-tb_char_t const* tb_ipv4_get(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t maxn)
+tb_void_t tb_ipv4_clear(tb_ipv4_ref_t ipv4)
 {
     // check
-    tb_assert_and_check_return_val(ipv4 && data && maxn > 15, tb_null);
+    tb_assert_and_check_return(ipv4);
 
-    // format
-    tb_size_t size = tb_snprintf(data, maxn, "%{ipv4}", ipv4);
-    data[size] = '\0';
+    // clear it
+    ipv4->u32 = 0;
+}
+tb_char_t const* tb_ipv4_cstr(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(ipv4 && data && maxn >= TB_IPV4_CSTR_MAXN, tb_null);
+
+    // make it
+    tb_long_t size = tb_snprintf(data, maxn - 1, "%u.%u.%u.%u", ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
+    if (size >= 0) data[size] = '\0';
 
     // ok
     return data;
 }
+tb_bool_t tb_ipv4_set_cstr(tb_ipv4_ref_t ipv4, tb_char_t const* cstr)
+{
+    // check
+    tb_assert_and_check_return_val(cstr, tb_false);
 
+    // done
+    tb_uint32_t         r = 0;
+    tb_uint32_t         v = 0;
+    tb_char_t           c = '\0';
+    tb_size_t           i = 0;
+    tb_char_t const*    p = cstr;
+    do
+    {
+        // the character
+        c = *p++;
+
+        // digit?
+        if (tb_isdigit10(c) && v <= 0xff)
+        {
+            v *= 10;
+            v += (tb_uint32_t)(c - '0') & 0xff;
+        }
+        // '.' or '\0'?
+        else if ((c == '.' || !c) && v <= 0xff)
+        {
+            r |= ((tb_uint32_t)v) << ((i++) << 3);
+            v = 0;
+        }
+        // failed?
+        else 
+        {
+            // trace
+            tb_trace_d("invalid addr: %s", cstr);
+
+            // clear it
+            r = 0;
+            break;
+        }
+
+    } while (c);
+
+    // save it if ok
+    if (r && ipv4) ipv4->u32 = r;
+
+    // ok?
+    return (tb_bool_t)r;
+}

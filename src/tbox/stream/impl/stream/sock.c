@@ -286,7 +286,7 @@ static tb_bool_t tb_stream_sock_impl_clos(tb_stream_ref_t stream)
     impl->tryn = 0;
     impl->read = 0;
     impl->writ = 0;
-    tb_ipv4_clr(&impl->addr);
+    tb_ipv4_clear(&impl->addr);
 
     // ok
     return tb_true;
@@ -312,7 +312,7 @@ static tb_void_t tb_stream_sock_impl_exit(tb_stream_ref_t stream)
     impl->tryn = 0;
     impl->read = 0;
     impl->writ = 0;
-    tb_ipv4_clr(&impl->addr);
+    tb_ipv4_clear(&impl->addr);
 }
 static tb_void_t tb_stream_sock_impl_kill(tb_stream_ref_t stream)
 {

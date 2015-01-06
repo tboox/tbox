@@ -24,7 +24,7 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
     if (tb_dns_looker_done(name, &ipv4))
     {
         time = tb_mclock() - time;
-        tb_trace_i("[demo]: %s => %s, %lld ms", name, tb_ipv4_get(&ipv4, data, 16), time);
+        tb_trace_i("[demo]: %s => %s, %lld ms", name, tb_ipv4_cstr(&ipv4, data, 16), time);
     }
     else tb_trace_i("[demo]: %s failed", name);
 }

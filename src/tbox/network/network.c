@@ -39,14 +39,43 @@ static tb_long_t tb_network_printf_format_ipv4(tb_cpointer_t object, tb_char_t* 
     // the ipv4
     tb_ipv4_ref_t ipv4 = (tb_ipv4_ref_t)object;
 
+    // make it
+    cstr = (tb_char_t*)tb_ipv4_cstr(ipv4, cstr, maxn);
+
+    // ok?
+    return cstr? tb_strlen(cstr) : -1;
+}
+static tb_long_t tb_network_printf_format_ipv6(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(object && cstr && maxn, -1);
+
+    // the ipv6
+    tb_ipv6_ref_t ipv6 = (tb_ipv6_ref_t)object;
+
+    // make it
+    cstr = (tb_char_t*)tb_ipv6_cstr(ipv6, cstr, maxn);
+
+    // ok?
+    return cstr? tb_strlen(cstr) : -1;
+}
+static tb_long_t tb_network_printf_format_addr(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(object && cstr && maxn, -1);
+
+    // the addr
+    tb_addr_ref_t addr = (tb_addr_ref_t)object;
+
     // format
-    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%u.%u.%u.%u", ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
+    tb_char_t data[128] = {0};
+    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%s(%u)", tb_addr_ip_cstr(addr, data, sizeof(data)), tb_addr_port(addr));
     if (size >= 0) cstr[size] = '\0';
 
     // ok?
     return size;
 }
-    
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -60,6 +89,12 @@ tb_bool_t tb_network_init()
 
     // register printf("%{ipv4}", &ipv4);
     tb_printf_object_register("ipv4", tb_network_printf_format_ipv4);
+
+    // register printf("%{ipv6}", &ipv6);
+    tb_printf_object_register("ipv6", tb_network_printf_format_ipv6);
+
+    // register printf("%{addr}", &addr);
+    tb_printf_object_register("addr", tb_network_printf_format_addr);
 
     // ok
     return tb_true;

@@ -142,6 +142,8 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(network_dns)
 ,   TB_DEMO_MAIN_ITEM(network_url)
 ,   TB_DEMO_MAIN_ITEM(network_ipv4)
+,   TB_DEMO_MAIN_ITEM(network_ipv6)
+,   TB_DEMO_MAIN_ITEM(network_addr)
 ,   TB_DEMO_MAIN_ITEM(network_http)
 ,   TB_DEMO_MAIN_ITEM(network_whois)
 ,   TB_DEMO_MAIN_ITEM(network_spider)

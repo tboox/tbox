@@ -87,6 +87,8 @@ tbox_C_FILES 			+= \
 						network/dns/looker \
 						network/url \
 						network/ipv4 \
+						network/ipv6 \
+						network/addr \
 						network/http \
 						network/cookies \
 						network/impl/http/date \
@@ -587,6 +589,7 @@ tbox_INC_FILES 			= \
 						network/prefix.h \
 						network/network.h \
 						network/ipv4.h \
+						network/ipv6.h \
 						network/addr.h \
 						network/url.h \
 						network/ssl.h \

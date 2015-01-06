@@ -110,11 +110,8 @@ static tb_long_t tb_dns_cache_cler(tb_iterator_ref_t iterator, tb_cpointer_t ite
         ok = 0;
 
         // trace
-        tb_trace_d("del: %s => %u.%u.%u.%u, time: %u, size: %u", (tb_char_t const*)item->name
-                                                                ,   caddr->ipv4.u8[0]
-                                                                ,   caddr->ipv4.u8[1]
-                                                                ,   caddr->ipv4.u8[2]
-                                                                ,   caddr->ipv4.u8[3]
+        tb_trace_d("del: %s => %{ipv4}, time: %u, size: %u", (tb_char_t const*)item->name
+                                                                ,   &caddr->ipv4
                                                                 ,   caddr->time
                                                                 ,   tb_hash_size(g_cache.hash));
 
@@ -184,17 +181,17 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_ref_t addr)
     tb_trace_d("get: %s", name);
 
     // is ipv4?
-    tb_check_return_val(!tb_ipv4_set(addr, name), tb_true);
+    tb_check_return_val(!tb_ipv4_set_cstr(addr, name), tb_true);
 
     // is localhost?
     if (!tb_stricmp(name, "localhost"))
     {
-        tb_ipv4_set(addr, "127.0.0.1");
+        tb_ipv4_set_cstr(addr, "127.0.0.1");
         return tb_true;
     }
 
     // clear addr
-    tb_ipv4_clr(addr);
+    tb_ipv4_clear(addr);
 
     // enter
     tb_spinlock_enter(&g_lock);

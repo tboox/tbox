@@ -210,7 +210,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
     looker->step &= ~TB_DNS_LOOKER_STEP_NEVT;
 
     // send request
-    tb_trace_d("request: try %u.%u.%u.%u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+    tb_trace_d("request: try %{ipv4}", addr);
     while (looker->size < size)
     {
         // writ data
@@ -513,7 +513,7 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
     tb_assert_and_check_return_val(name, tb_null);
 
     // must be not ipv4
-    tb_assert_return_val(!tb_ipv4_set(tb_null, name), tb_null);
+    tb_assert_return_val(!tb_ipv4_set_cstr(tb_null, name), tb_null);
 
     // done
     tb_bool_t           ok = tb_false;

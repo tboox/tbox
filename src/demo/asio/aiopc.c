@@ -37,7 +37,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
         // done conn
         tb_long_t conn = -1;
         tb_ipv4_t addr = {0};
-        tb_ipv4_set(&addr, "127.0.0.1");
+        tb_ipv4_set_cstr(&addr, "127.0.0.1");
         while (!(conn = tb_socket_connect(sock, &addr, 9090)))
         {
             // wait

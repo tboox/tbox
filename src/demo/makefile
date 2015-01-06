@@ -48,6 +48,8 @@ demo_C_FILES 								+= \
 											network/dns \
 											network/url \
 											network/ipv4 \
+											network/ipv6 \
+											network/addr \
 											network/http \
 											network/whois \
 											network/spider \
