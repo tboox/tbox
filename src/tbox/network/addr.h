@@ -136,14 +136,14 @@ tb_void_t           tb_addr_set_ipv6(tb_addr_ref_t addr, tb_ipv6_ref_t ipv6);
  *
  * @return          the family
  */
-tb_uint8_t          tb_addr_family(tb_addr_ref_t addr);
+tb_size_t           tb_addr_family(tb_addr_ref_t addr);
 
 /*! set the address family
  *
  * @param addr      the address
  * @param family    the family
  */
-tb_void_t           tb_addr_set_family(tb_addr_ref_t addr, tb_uint8_t family);
+tb_void_t           tb_addr_set_family(tb_addr_ref_t addr, tb_size_t family);
 
 /*! get the address port
  *

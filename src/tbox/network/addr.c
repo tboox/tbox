@@ -229,7 +229,7 @@ tb_void_t tb_addr_set_ipv6(tb_addr_ref_t addr, tb_ipv6_ref_t ipv6)
     addr->family = TB_ADDR_FAMILY_IPV6;
     addr->u.ipv6 = *ipv6;
 }
-tb_uint8_t tb_addr_family(tb_addr_ref_t addr)
+tb_size_t tb_addr_family(tb_addr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(addr, TB_ADDR_FAMILY_NONE);
@@ -237,7 +237,7 @@ tb_uint8_t tb_addr_family(tb_addr_ref_t addr)
     // the family
     return addr->family;
 }
-tb_void_t tb_addr_set_family(tb_addr_ref_t addr, tb_uint8_t family)
+tb_void_t tb_addr_set_family(tb_addr_ref_t addr, tb_size_t family)
 {
     // check
     tb_assert_and_check_return(addr);
