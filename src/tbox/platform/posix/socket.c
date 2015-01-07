@@ -523,15 +523,15 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
     // listen
     return (listen(tb_sock2fd(sock), backlog) < 0)? tb_false : tb_true;
 }
-tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port)
+tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
 
     // done  
-    struct sockaddr_in  d = {0};
-    socklen_t           n = sizeof(struct sockaddr_in);
-    tb_long_t           fd = accept(tb_sock2fd(sock), (struct sockaddr *)&d, &n);
+    struct sockaddr_storage d = {0};
+    socklen_t               n = sizeof(struct sockaddr_in);
+    tb_long_t               fd = accept(tb_sock2fd(sock), (struct sockaddr *)&d, &n);
 
     // no client?
     tb_check_return_val(fd > 0, tb_null);
@@ -540,29 +540,23 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_ui
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
     // save address
-    if (addr) tb_ipv4_cstr_set(addr, inet_ntoa(d.sin_addr));
-
-    // save port
-    if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
+    if (addr) tb_socket_addr_save(addr, &d);
         
     // ok
     return tb_fd2sock(fd);
 }
-tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port)
+tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_addr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_false);
 
     // get local address
-    struct sockaddr_in  d = {0};
-    tb_int_t            n = sizeof(d);
+    struct sockaddr_storage d = {0};
+    tb_int_t                n = sizeof(d);
     if (getsockname(tb_sock2fd(sock), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return tb_false;
 
     // save address
-    if (addr) tb_ipv4_cstr_set(addr, inet_ntoa(d.sin_addr));
-
-    // save port
-    if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
+    if (addr) tb_socket_addr_save(addr, &d);
 
     // ok
     return tb_true;
@@ -758,6 +752,8 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* d
 {
     // check
     tb_assert_and_check_return_val(sock && data, -1);
+
+    // no size?
     tb_check_return_val(size, 0);
 
     // recv
@@ -806,33 +802,30 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t co
     // error
     return -1;
 }
-tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && list && size, -1);
 
     // init msg
-    struct msghdr       msg = {0};
-    struct sockaddr_in  d = {0};
-    msg.msg_name        = (tb_pointer_t)&d;
-    msg.msg_namelen     = sizeof(d);
-    msg.msg_iov         = (struct iovec*)list;
-    msg.msg_iovlen      = (size_t)size;
-    msg.msg_control     = tb_null;
-    msg.msg_controllen  = 0;
-    msg.msg_flags       = 0;
+    struct msghdr           msg = {0};
+	struct sockaddr_storage d = {0};
+    msg.msg_name            = (tb_pointer_t)&d;
+    msg.msg_namelen         = sizeof(d);
+    msg.msg_iov             = (struct iovec*)list;
+    msg.msg_iovlen          = (size_t)size;
+    msg.msg_control         = tb_null;
+    msg.msg_controllen      = 0;
+    msg.msg_flags           = 0;
 
     // recv
-    tb_long_t   r = recvmsg(tb_sock2fd(sock), &msg, 0);
+    tb_long_t r = recvmsg(tb_sock2fd(sock), &msg, 0);
 
     // ok?
     if (r >= 0)
     {
         // save address
-        if (addr) tb_ipv4_cstr_set(addr, inet_ntoa(d.sin_addr));
-
-        // save port
-        if (port) *port = tb_bits_be_to_ne_u16(d.sin_port);
+        if (addr) tb_socket_addr_save(addr, &d);
 
         // ok
         return r;
@@ -844,21 +837,20 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t
     // error
     return -1;
 }
-tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(sock && addr && port && list && size, -1);
+    tb_assert_and_check_return_val(sock && addr && list && size, -1);
 
-    // init
-    struct sockaddr_in d = {0};
-    d.sin_family = AF_INET;
-    d.sin_port = tb_bits_ne_to_be_u16(port);
-    d.sin_addr.s_addr = addr->u32;
+    // load addr
+    tb_size_t               n = 0;
+	struct sockaddr_storage d = {0};
+    if (!(n = tb_socket_addr_load(&d, addr))) return -1;
 
     // init msg
     struct msghdr msg = {0};
     msg.msg_name        = (tb_pointer_t)&d;
-    msg.msg_namelen     = sizeof(d);
+    msg.msg_namelen     = n;
     msg.msg_iov         = (struct iovec*)list;
     msg.msg_iovlen      = (size_t)size;
     msg.msg_control     = tb_null;

@@ -68,17 +68,6 @@ typedef enum __tb_aice_code_e
 
 }tb_aice_code_e;
 
-/// the addr aice type
-typedef struct __tb_aice_addr_t
-{
-    /// the host
-    tb_char_t const*            host;
-
-    /// the addr
-    tb_ipv4_t                   addr;
-
-}tb_aice_addr_t;
-
 /// the acpt aice type
 typedef struct __tb_aice_acpt_t
 {
@@ -86,10 +75,7 @@ typedef struct __tb_aice_acpt_t
     tb_aico_ref_t               aico;
 
     /// the client addr
-    tb_ipv4_t                   addr;
-
-    /// the client port
-    tb_uint16_t                 port;
+    tb_addr_t                   addr;
 
     /// the private data for using the left space of the union
     tb_cpointer_t               priv[1];
@@ -339,10 +325,7 @@ typedef struct __tb_aice_urecvv_t
     tb_size_t                   real;
 
     /// the peer addr
-    tb_ipv4_t                   addr;
-
-    /// the peer port
-    tb_uint16_t                 port;
+    tb_addr_t                   addr;
 
 }tb_aice_urecvv_t;
 
@@ -359,10 +342,7 @@ typedef struct __tb_aice_usendv_t
     tb_size_t                   real;
 
     /// the addr
-    tb_ipv4_t                   addr;
-
-    /// the port
-    tb_uint16_t                 port;
+    tb_addr_t                   addr;
 
 }tb_aice_usendv_t;
 
@@ -469,7 +449,6 @@ typedef struct __tb_aice_t
 #endif
     {
         // for sock
-        tb_aice_addr_t          addr;
         tb_aice_acpt_t          acpt;
         tb_aice_conn_t          conn;
         tb_aice_recv_t          recv;

@@ -228,8 +228,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice
     tb_size_t       list_indx = 0;
     tb_size_t       list_size = 0;
     tb_socket_ref_t list_sock[2048];
-    tb_ipv4_t       list_addr[2048];
-    tb_uint16_t     list_port[2048];
+    tb_addr_t       list_addr[2048];
     tb_size_t       list_maxn = tb_arrayn(list_sock);
     tb_socket_ref_t acpt = (tb_socket_ref_t)aico->base.handle;
     tb_queue_ref_t  spak = impl->spak[priority];
@@ -237,7 +236,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice
     do
     {
         // accept it
-        for (list_size = 0; list_size < list_maxn && (list_sock[list_size] = tb_socket_accept(acpt, list_addr + list_size, list_port + list_size)); list_size++) ;
+        for (list_size = 0; list_size < list_maxn && (list_sock[list_size] = tb_socket_accept(acpt, list_addr + list_size)); list_size++) ;
 
         // enter 
         tb_spinlock_enter(&impl->lock);
@@ -257,10 +256,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice
                 &&  !tb_queue_full(spak)) 
             {
                 // save addr
-                acpt_aice.u.acpt.addr = list_addr[list_indx];
-
-                // save port
-                acpt_aice.u.acpt.port = list_port[list_indx];
+                tb_addr_copy(&acpt_aice.u.acpt.addr, list_addr + list_indx);
 
                 // push to the spak queue
                 tb_queue_put(spak, &acpt_aice);
@@ -775,7 +771,7 @@ static tb_long_t tb_aiop_spak_urecv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aic
     else
     {
         // trace
-        tb_trace_d("urecv[%p]: %{addr}, %lu", aico, &aice->u.urecv.addr, recv);
+        tb_trace_d("urecv[%p]: %{addr}: %lu", aico, &aice->u.urecv.addr, recv);
 
         // ok or closed?
         aice->state = TB_STATE_OK;
@@ -798,9 +794,6 @@ static tb_long_t tb_aiop_spak_usend(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aic
     tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_USEND, -1);
     tb_assert_and_check_return_val(aice->u.usend.data && aice->u.usend.size, -1);
 
-    // check address
-    tb_assert_abort(!tb_addr_is_empty(&aice->u.usend.addr));
-
     // the aico
     tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
@@ -819,7 +812,7 @@ static tb_long_t tb_aiop_spak_usend(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aic
     }
 
     // trace
-    tb_trace_d("usend[%p]: %{addr}, %lu", aico, &aice->u.usend.addr, send);
+    tb_trace_d("usend[%p]: %{addr}: %lu", aico, &aice->u.usend.addr, send);
 
     // no send? 
     if (!send) 
@@ -939,17 +932,16 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t ai
     tb_assert_and_check_return_val(impl && aice, -1);
     tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_URECVV, -1);
     tb_assert_and_check_return_val(aice->u.urecvv.list && aice->u.urecvv.size, -1);
-    tb_assert_and_check_return_val(aice->u.urecvv.addr.u32 && aice->u.urecvv.port, -1);
 
     // the aico
     tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
     // recv it
-    tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, &aice->u.urecvv.port, aice->u.urecvv.list, aice->u.urecvv.size);
+    tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, aice->u.urecvv.list, aice->u.urecvv.size);
 
     // trace
-    tb_trace_d("urecvv[%p]: %{ipv4}: %u, %lu", aico, &aice->u.urecvv.addr, aice->u.urecvv.port, real);
+    tb_trace_d("urecvv[%p]: %{addr}: %lu", aico, &aice->u.urecvv.addr, real);
 
     // ok? 
     if (real > 0) 
@@ -981,17 +973,16 @@ static tb_long_t tb_aiop_spak_usendv(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t ai
     tb_assert_and_check_return_val(impl && aice, -1);
     tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_USENDV, -1);
     tb_assert_and_check_return_val(aice->u.usendv.list && aice->u.usendv.size, -1);
-    tb_assert_and_check_return_val(aice->u.usendv.addr.u32 && aice->u.usendv.port, -1);
 
     // the aico
     tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
     // send it
-    tb_long_t real = tb_socket_usendv(aico->base.handle, &aice->u.usendv.addr, aice->u.usendv.port, aice->u.usendv.list, aice->u.usendv.size);
+    tb_long_t real = tb_socket_usendv(aico->base.handle, &aice->u.usendv.addr, aice->u.usendv.list, aice->u.usendv.size);
 
     // trace
-    tb_trace_d("usendv[%p]: %{ipv4}: %lu, %lu", aico, &aice->u.usendv.addr, aice->u.usendv.port, real);
+    tb_trace_d("usendv[%p]: %{addr}: %lu", aico, &aice->u.usendv.addr, real);
 
     // ok? 
     if (real > 0) 

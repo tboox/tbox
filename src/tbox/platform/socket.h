@@ -146,21 +146,19 @@ tb_bool_t           tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog);
  *
  * @param sock      the socket 
  * @param addr      the client address
- * @param port      the client port
  *
  * @return          the client socket 
  */
-tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port);
+tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr);
 
 /*! get local address
  *
  * @param sock      the socket 
  * @param addr      the local address
- * @param port      the local port pointer
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_socket_local(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port);
+tb_bool_t           tb_socket_local(tb_socket_ref_t sock, tb_addr_ref_t addr);
 
 /*! kill socket
  *
@@ -246,26 +244,24 @@ tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb
 /*! urecvv the socket data for udp
  * 
  * @param sock      the socket 
- * @param addr      the peer addr
- * @param port      the peer port
+ * @param addr      the peer address(output)
  * @param list      the iovec list
  * @param size      the iovec size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
 
 /*! usendv the socket data for udp
  * 
  * @param sock      the socket 
  * @param addr      the addr
- * @param port      the port
  * @param list      the iovec list
  * @param size      the iovec size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
