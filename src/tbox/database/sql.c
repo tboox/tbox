@@ -54,10 +54,10 @@ tb_database_sql_ref_t tb_database_sql_init(tb_char_t const* url)
         if (!tb_url_init(&database_url)) break;
 
         // make url
-        if (!tb_url_set(&database_url, url)) break;
+        if (!tb_url_cstr_set(&database_url, url)) break;
 
         // check protocol
-        tb_size_t protocol = tb_url_protocol_get(&database_url);
+        tb_size_t protocol = tb_url_protocol(&database_url);
         tb_assert_and_check_break(protocol == TB_URL_PROTOCOL_SQL || protocol == TB_URL_PROTOCOL_FILE);
 
         // the probe func

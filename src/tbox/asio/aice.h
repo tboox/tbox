@@ -27,7 +27,7 @@
  * includes
  */
 #include "aico.h"
-#include "../network/ipv4.h"
+#include "../network/addr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -99,11 +99,8 @@ typedef struct __tb_aice_acpt_t
 /// the conn aice type
 typedef struct __tb_aice_conn_t
 {
-    /// the port
-    tb_uint16_t                 port;
-
     /// the addr
-    tb_ipv4_t                   addr;
+    tb_addr_t                   addr;
 
 }tb_aice_conn_t;
 
@@ -149,10 +146,7 @@ typedef struct __tb_aice_urecv_t
     tb_size_t                   real;
 
     /// the addr
-    tb_ipv4_t                   addr;
-
-    /// the port
-    tb_uint16_t                 port;
+    tb_addr_t                   addr;
 
 }tb_aice_urecv_t;
 
@@ -169,10 +163,7 @@ typedef struct __tb_aice_usend_t
     tb_size_t                   real;
 
     /// the peer addr
-    tb_ipv4_t                   addr;
-
-    /// the peer port
-    tb_uint16_t                 port;
+    tb_addr_t                   addr;
 
 }tb_aice_usend_t;
 
@@ -251,10 +242,7 @@ typedef struct __tb_aice_urecv_t
     tb_size_t                   real;
 
     /// the addr
-    tb_ipv4_t                   addr;
-
-    /// the port
-    tb_uint16_t                 port;
+    tb_addr_t                   addr;
 
 }tb_aice_urecv_t;
 
@@ -271,10 +259,7 @@ typedef struct __tb_aice_usend_t
     tb_size_t                   real;
 
     /// the addr
-    tb_ipv4_t                   addr;
-
-    /// the port
-    tb_uint16_t                 port;
+    tb_addr_t                   addr;
 
 }tb_aice_usend_t;
 

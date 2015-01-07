@@ -92,7 +92,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(url, tb_false);
             
             // set url
-            if (tb_url_set(&option->url, url)) return tb_true;
+            if (tb_url_cstr_set(&option->url, url)) return tb_true;
         }
         break;
     case TB_HTTP_OPTION_GET_URL:
@@ -102,7 +102,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(purl, tb_false);
 
             // get url
-            tb_char_t const* url = tb_url_get(&option->url);
+            tb_char_t const* url = tb_url_cstr(&option->url);
             tb_assert_and_check_return_val(url, tb_false);
 
             // ok
@@ -128,7 +128,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(phost, tb_false); 
 
             // get host
-            tb_char_t const* host = tb_url_host_get(&option->url);
+            tb_char_t const* host = tb_url_host(&option->url);
             tb_assert_and_check_return_val(host, tb_false);
 
             // ok
@@ -154,7 +154,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(pport, tb_false);
 
             // get port
-            *pport = tb_url_port_get(&option->url);
+            *pport = tb_url_port(&option->url);
             return tb_true;
         }
         break;
@@ -176,7 +176,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(ppath, tb_false);
 
             // get path
-            tb_char_t const* path = tb_url_path_get(&option->url);
+            tb_char_t const* path = tb_url_path(&option->url);
             tb_assert_and_check_return_val(path, tb_false);
 
             // ok
@@ -371,7 +371,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(pssl, tb_false);
 
             // get ssl
-            *pssl = tb_url_ssl_get(&option->url);
+            *pssl = tb_url_ssl(&option->url);
             return tb_true;
         }
         break;
@@ -425,7 +425,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             option->post_size = 0;
             
             // set url
-            if (tb_url_set(&option->post_url, url)) return tb_true;
+            if (tb_url_cstr_set(&option->post_url, url)) return tb_true;
         }
         break;
     case TB_HTTP_OPTION_GET_POST_URL:
@@ -435,7 +435,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_assert_and_check_return_val(purl, tb_false);
 
             // get url
-            tb_char_t const* url = tb_url_get(&option->post_url);
+            tb_char_t const* url = tb_url_cstr(&option->post_url);
             tb_assert_and_check_return_val(url, tb_false);
 
             // ok
@@ -616,7 +616,7 @@ tb_void_t tb_http_option_dump(tb_http_option_t* option)
     // dump option
     tb_trace_i("======================================================================");
     tb_trace_i("option: ");
-    tb_trace_i("option: url: %s",               tb_url_get(&option->url));
+    tb_trace_i("option: url: %s",               tb_url_cstr(&option->url));
     tb_trace_i("option: version: HTTP/1.%1u",   option->version);
     tb_trace_i("option: method: %s",            tb_http_method_cstr(option->method));
     tb_trace_i("option: redirect: %d",          option->redirect);

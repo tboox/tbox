@@ -61,9 +61,6 @@ typedef struct __tb_async_stream_sock_impl_t
     tb_aicp_ssl_ref_t                   hssl;
 #endif
 
-    // the ipv4 addr
-    tb_ipv4_t                           ipv4;
-
     // the sock type
     tb_uint32_t                         type    : 31;
 
@@ -114,9 +111,6 @@ static tb_void_t tb_async_stream_sock_impl_clos_clear(tb_async_stream_sock_impl_
     // clear the offset
     tb_atomic64_set0(&impl->offset);
 
-    // exit ipv4
-    tb_ipv4_clear(&impl->ipv4);
-
     // clear base
     tb_async_stream_clear((tb_async_stream_ref_t)impl);
 }
@@ -127,7 +121,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_func(tb_aico_ref_t aico, tb_cpoi
     tb_assert_and_check_return(impl && impl->func.clos);
 
     // trace
-    tb_trace_d("clos[%p]: notify: %s: ..", aico, tb_url_get(tb_async_stream_url((tb_async_stream_ref_t)impl)));
+    tb_trace_d("clos[%p]: notify: %s: ..", aico, tb_url_cstr(tb_async_stream_url((tb_async_stream_ref_t)impl)));
 
     // clear it
     tb_async_stream_sock_impl_clos_clear(impl);
@@ -151,7 +145,7 @@ static tb_bool_t tb_async_stream_sock_impl_clos_aico_func(tb_aice_ref_t aice)
     tb_assert_and_check_return_val(impl, tb_false);
 
     // trace
-    tb_trace_d("clos[%p]: aico: notify: %s: ..", aice->aico, tb_url_get(tb_async_stream_url((tb_async_stream_ref_t)impl)));
+    tb_trace_d("clos[%p]: aico: notify: %s: ..", aice->aico, tb_url_cstr(tb_async_stream_url((tb_async_stream_ref_t)impl)));
 
     // clear aico
 #ifdef TB_SSL_ENABLE
@@ -175,7 +169,7 @@ static tb_void_t tb_async_stream_sock_impl_clos_ssl_func(tb_aicp_ssl_ref_t ssl, 
     tb_assert_and_check_return(impl && impl->aico && impl->func.clos);
 
     // trace
-    tb_trace_d("clos[%p]: ssl: notify: %s: ..", impl->aico, tb_url_get(tb_async_stream_url((tb_async_stream_ref_t)impl)));
+    tb_trace_d("clos[%p]: ssl: notify: %s: ..", impl->aico, tb_url_cstr(tb_async_stream_url((tb_async_stream_ref_t)impl)));
 
     // close it if be not alived
     if (!impl->balived)
@@ -197,7 +191,7 @@ static tb_bool_t tb_async_stream_sock_impl_clos_try(tb_async_stream_ref_t stream
     tb_assert_and_check_return_val(impl, tb_false);
 
     // trace
-    tb_trace_d("clos[%p]: try: %s: ..", impl->aico, tb_url_get(tb_async_stream_url(stream)));
+    tb_trace_d("clos[%p]: try: %s: ..", impl->aico, tb_url_cstr(tb_async_stream_url(stream)));
 
     // try closing ssl first
 #ifdef TB_SSL_ENABLE
@@ -211,7 +205,7 @@ static tb_bool_t tb_async_stream_sock_impl_clos_try(tb_async_stream_ref_t stream
             tb_async_stream_sock_impl_clos_clear(impl);
 
             // trace
-            tb_trace_d("clos[%p]: try: %s: ok", impl->aico, tb_url_get(tb_async_stream_url(stream)));
+            tb_trace_d("clos[%p]: try: %s: ok", impl->aico, tb_url_cstr(tb_async_stream_url(stream)));
 
             // ok
             return tb_true;
@@ -219,7 +213,7 @@ static tb_bool_t tb_async_stream_sock_impl_clos_try(tb_async_stream_ref_t stream
     }
 
     // trace
-    tb_trace_d("clos[%p]: try: %s: no", impl->aico, tb_url_get(tb_async_stream_url(stream)));
+    tb_trace_d("clos[%p]: try: %s: no", impl->aico, tb_url_cstr(tb_async_stream_url(stream)));
 
     // failed
     return tb_false;
@@ -232,9 +226,9 @@ static tb_bool_t tb_async_stream_sock_impl_clos(tb_async_stream_ref_t stream, tb
 
     // trace
 #ifdef TB_SSL_ENABLE
-    tb_trace_d("clos[%p]: %s: balived: %d, hssl: %p, hdns: %p: ..", impl->aico, tb_url_get(tb_async_stream_url(stream)), impl->balived, impl->hssl, impl->hdns);
+    tb_trace_d("clos[%p]: %s: balived: %d, hssl: %p, hdns: %p: ..", impl->aico, tb_url_cstr(tb_async_stream_url(stream)), impl->balived, impl->hssl, impl->hdns);
 #else
-    tb_trace_d("clos[%p]: %s: balived: %d, hdns: %p: ..", impl->aico, tb_url_get(tb_async_stream_url(stream)), impl->balived, impl->hdns);
+    tb_trace_d("clos[%p]: %s: balived: %d, hdns: %p: ..", impl->aico, tb_url_cstr(tb_async_stream_url(stream)), impl->balived, impl->hdns);
 #endif
 
     // init clos
@@ -319,7 +313,7 @@ static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_ref_t aice)
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(tb_async_stream_url((tb_async_stream_ref_t)impl)))
+            if (tb_url_ssl(tb_async_stream_url((tb_async_stream_ref_t)impl)))
             {
                 // open ssl
                 state = tb_async_stream_sock_impl_open_ssl(impl);
@@ -360,7 +354,7 @@ static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_ref_t aice)
     // ok
     return tb_true;
 }
-static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_ref_t addr, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_addr_ref_t addr, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
@@ -374,7 +368,7 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
         if (addr)
         {
             // trace
-            tb_trace_d("open[%p]: addr: %s, %{ipv4}", impl->aico, host, addr);
+            tb_trace_d("open[%p]: host: %s, addr: %{addr}", impl->aico, host, addr);
 
             // init aico
             if (!impl->aico) impl->aico = tb_aico_init(tb_async_stream_aicp((tb_async_stream_ref_t)impl));
@@ -401,12 +395,15 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
             tb_url_ref_t url = tb_async_stream_url((tb_async_stream_ref_t)impl);
             tb_assert_and_check_break(url);
 
-            // port
-            tb_uint16_t port = tb_url_port_get(url);
-            tb_assert_and_check_break(port);
-            
+            // get address from the url
+            tb_addr_ref_t url_addr = tb_url_addr(url);
+            tb_assert_and_check_break(url_addr);
+
+            // update the ip address
+            tb_addr_ip_set(url_addr, addr);
+
             // the sock type: tcp or udp? for url: sock://ip:port/?udp=
-            tb_char_t const* args = tb_url_args_get(url);
+            tb_char_t const* args = tb_url_args(url);
             if (args && !tb_strnicmp(args, "udp=", 4)) impl->type = TB_SOCKET_TYPE_UDP;
             else if (args && !tb_strnicmp(args, "tcp=", 4)) impl->type = TB_SOCKET_TYPE_TCP;
             tb_assert_and_check_break(impl->type == TB_SOCKET_TYPE_TCP || impl->type == TB_SOCKET_TYPE_UDP);
@@ -423,20 +420,17 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
             if (impl->type == TB_SOCKET_TYPE_TCP)
             {
                 // done conn
-                if (!tb_aico_conn(impl->aico, addr, port, tb_async_stream_sock_impl_conn_func, impl)) break;
+                if (!tb_aico_conn(impl->aico, url_addr, tb_async_stream_sock_impl_conn_func, impl)) break;
             }
             // udp?
             else
             {
                 // ssl? not supported
-                if (tb_url_ssl_get(url))
+                if (tb_url_ssl(url))
                 {
                     // trace
                     tb_trace_w("udp ssl is not supported!");
                 }
-
-                // save ipv4
-                impl->ipv4 = *addr;
 
                 // open done
                 tb_async_stream_open_func((tb_async_stream_ref_t)impl, TB_STATE_OK, impl->func.open, impl->priv);
@@ -490,7 +484,7 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
 
 #ifndef TB_SSL_ENABLE
         // ssl? not supported
-        if (tb_url_ssl_get(url))
+        if (tb_url_ssl(url))
         {
             // trace
             tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
@@ -506,7 +500,7 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(url))
+            if (tb_url_ssl(url))
             {
                 // open ssl
                 state = tb_async_stream_sock_impl_open_ssl(impl);
@@ -523,11 +517,8 @@ static tb_bool_t tb_async_stream_sock_impl_open(tb_async_stream_ref_t stream, tb
         }
 
         // get the host from url
-        tb_char_t const* host = tb_url_host_get(url);
+        tb_char_t const* host = tb_url_host(url);
         tb_assert_and_check_break(host);
-
-        // clear ipv4
-        tb_ipv4_clear(&impl->ipv4);
 
         // init dns
         if (!impl->hdns) impl->hdns = tb_aicp_dns_init(tb_async_stream_aicp(stream));
@@ -726,7 +717,7 @@ static tb_bool_t tb_async_stream_sock_impl_read(tb_async_stream_ref_t stream, tb
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(tb_async_stream_url((tb_async_stream_ref_t)impl)))
+            if (tb_url_ssl(tb_async_stream_url((tb_async_stream_ref_t)impl)))
             {
                 // check
                 tb_assert_and_check_break(impl->hssl);
@@ -826,11 +817,17 @@ static tb_bool_t tb_async_stream_sock_impl_writ_udp_func(tb_aice_ref_t aice)
     tb_size_t state = TB_STATE_SOCK_UNKNOWN_ERROR;
     switch (aice->state)
     {
-        // ok
     case TB_STATE_OK:
-        tb_assert_and_check_break(aice->u.usend.data && aice->u.usend.real <= aice->u.usend.size);
-        tb_atomic64_fetch_and_add(&impl->offset, aice->u.usend.real);
-        state = TB_STATE_OK;
+        {
+            // check
+            tb_assert_and_check_break(aice->u.usend.data && aice->u.usend.real <= aice->u.usend.size);
+
+            // update offset
+            tb_atomic64_fetch_and_add(&impl->offset, aice->u.usend.real);
+
+            // ok
+            state = TB_STATE_OK;
+        }
         break;
         // closed
     case TB_STATE_CLOSED:
@@ -845,7 +842,10 @@ static tb_bool_t tb_async_stream_sock_impl_writ_udp_func(tb_aice_ref_t aice)
         state = TB_STATE_SOCK_SEND_TIMEOUT;
         break;
     default:
-        tb_trace_e("writ: unknown state: %s", tb_state_cstr(aice->state));
+        {
+            // trace
+            tb_trace_e("writ: unknown state: %s", tb_state_cstr(aice->state));
+        }
         break;
     }
  
@@ -856,7 +856,7 @@ static tb_bool_t tb_async_stream_sock_impl_writ_udp_func(tb_aice_ref_t aice)
         if (aice->state == TB_STATE_OK && aice->u.usend.real < aice->u.usend.size)
         {
             // continue to post writ
-            if (!tb_aico_usend(aice->aico, &aice->u.usend.addr, aice->u.usend.port, aice->u.usend.data + aice->u.usend.real, aice->u.usend.size - aice->u.usend.real, tb_async_stream_sock_impl_writ_udp_func, (tb_async_stream_ref_t)impl))
+            if (!tb_aico_usend(aice->aico, &aice->u.usend.addr, aice->u.usend.data + aice->u.usend.real, aice->u.usend.size - aice->u.usend.real, tb_async_stream_sock_impl_writ_udp_func, (tb_async_stream_ref_t)impl))
                 impl->func.writ((tb_async_stream_ref_t)impl, TB_STATE_SOCK_SEND_FAILED, aice->u.usend.data, 0, aice->u.usend.size, impl->priv);
         }
     }
@@ -920,7 +920,7 @@ static tb_bool_t tb_async_stream_sock_impl_writ(tb_async_stream_ref_t stream, tb
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(tb_async_stream_url((tb_async_stream_ref_t)impl)))
+            if (tb_url_ssl(tb_async_stream_url((tb_async_stream_ref_t)impl)))
             {
                 // check
                 tb_assert_and_check_break(impl->hssl);
@@ -939,7 +939,7 @@ static tb_bool_t tb_async_stream_sock_impl_writ(tb_async_stream_ref_t stream, tb
     case TB_SOCKET_TYPE_UDP:
         {
             // post udp writ
-            ok = tb_aico_usend_after(impl->aico, delay, &impl->ipv4, tb_url_port_get(tb_async_stream_url((tb_async_stream_ref_t)impl)), data, size, tb_async_stream_sock_impl_writ_udp_func, stream);
+            ok = tb_aico_usend_after(impl->aico, delay, tb_url_addr(tb_async_stream_url((tb_async_stream_ref_t)impl)), data, size, tb_async_stream_sock_impl_writ_udp_func, stream);
         }
         break;
     default:
@@ -1017,9 +1017,9 @@ static tb_void_t tb_async_stream_sock_impl_kill(tb_async_stream_ref_t stream)
 
     // trace
 #ifdef TB_SSL_ENABLE
-    tb_trace_d("kill[%p]: %s: balived: %d, hssl: %p, hdns: %p: ..", impl->aico, tb_url_get(tb_async_stream_url(stream)), impl->balived, impl->hssl, impl->hdns);
+    tb_trace_d("kill[%p]: %s: balived: %d, hssl: %p, hdns: %p: ..", impl->aico, tb_url_cstr(tb_async_stream_url(stream)), impl->balived, impl->hssl, impl->hdns);
 #else
-    tb_trace_d("kill[%p]: %s: balived: %d, hdns: %p: ..", impl->aico, tb_url_get(tb_async_stream_url(stream)), impl->balived, impl->hdns);
+    tb_trace_d("kill[%p]: %s: balived: %d, hdns: %p: ..", impl->aico, tb_url_cstr(tb_async_stream_url(stream)), impl->balived, impl->hdns);
 #endif
 
     // exit ssl
@@ -1071,7 +1071,7 @@ static tb_bool_t tb_async_stream_sock_impl_exit(tb_async_stream_ref_t stream)
         while (!tb_atomic_get(&wait) && tryn--)
         {
             // trace
-            tb_trace_d("exit[%p]: %s: wait: ..", impl->aico, tb_url_get(tb_async_stream_url(stream)));
+            tb_trace_d("exit[%p]: %s: wait: ..", impl->aico, tb_url_cstr(tb_async_stream_url(stream)));
         
             // wait some time
             tb_msleep(200);

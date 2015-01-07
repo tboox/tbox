@@ -42,7 +42,7 @@ static tb_void_t tb_async_stream_clos_opening(tb_async_stream_ref_t stream, tb_s
     tb_assert_and_check_return(impl);
 
     // trace
-    tb_trace_d("clos: opening: %s, state: %s", tb_url_get(&impl->url), tb_state_cstr(impl->clos_opening.state));
+    tb_trace_d("clos: opening: %s, state: %s", tb_url_cstr(&impl->url), tb_state_cstr(impl->clos_opening.state));
 
     // closed
     tb_atomic_set(&impl->istate, TB_STATE_CLOSED);

@@ -69,6 +69,23 @@ typedef union __tb_ipv4_t
  */
 tb_void_t           tb_ipv4_clear(tb_ipv4_ref_t ipv4);
 
+/*! is empty?
+ *
+ * @param ipv4      the ipv4
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv4_is_empty(tb_ipv4_ref_t ipv4);
+
+/*! is equal?
+ *
+ * @param ipv4      the ipv4
+ * @param other     the other ipv4
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv4_is_equal(tb_ipv4_ref_t ipv4, tb_ipv4_ref_t other);
+
 /*! get the ipv4 string
  *
  * @param ipv4      the ipv4
@@ -86,7 +103,7 @@ tb_char_t const*    tb_ipv4_cstr(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ipv4_set_cstr(tb_ipv4_ref_t ipv4, tb_char_t const* cstr);
+tb_bool_t           tb_ipv4_cstr_set(tb_ipv4_ref_t ipv4, tb_char_t const* cstr);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

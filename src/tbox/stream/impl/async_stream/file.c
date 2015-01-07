@@ -161,7 +161,7 @@ static tb_bool_t tb_async_stream_file_impl_open_try(tb_async_stream_ref_t stream
         tb_assert_and_check_break(impl->aico);
 
         // the url
-        tb_char_t const* url = tb_url_get(tb_async_stream_url(stream));
+        tb_char_t const* url = tb_url_cstr(tb_async_stream_url(stream));
         tb_assert_and_check_break(url);
 
         // open aico
@@ -209,7 +209,7 @@ static tb_bool_t tb_async_stream_file_impl_open(tb_async_stream_ref_t stream, tb
             }
 
             // the url
-            tb_char_t const* url = tb_url_get(tb_async_stream_url(stream));
+            tb_char_t const* url = tb_url_cstr(tb_async_stream_url(stream));
             tb_assert_and_check_break(url);
 
             // trace
@@ -465,7 +465,7 @@ static tb_void_t tb_async_stream_file_impl_kill(tb_async_stream_ref_t stream)
     tb_assert_and_check_return(impl);
 
     // trace
-    tb_trace_d("kill: %s: ..", tb_url_get(tb_async_stream_url(stream)));
+    tb_trace_d("kill: %s: ..", tb_url_cstr(tb_async_stream_url(stream)));
 
     // kill it
     if (impl->aico) tb_aico_kill(impl->aico);

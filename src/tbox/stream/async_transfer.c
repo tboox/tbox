@@ -538,7 +538,7 @@ static tb_bool_t tb_async_transfer_ostream_open_func(tb_async_stream_ref_t strea
     tb_assert_and_check_return_val(stream && impl && impl->open.func, tb_false);
 
     // trace
-    tb_trace_d("open: ostream: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("open: ostream: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // done
     tb_bool_t ok = tb_true;
@@ -585,7 +585,7 @@ static tb_bool_t tb_async_transfer_istream_open_func(tb_async_stream_ref_t strea
     tb_assert_and_check_return_val(stream && impl && impl->open.func, tb_false);
 
     // trace
-    tb_trace_d("open: istream: %s, offset: %llu, state: %s", tb_url_get(tb_async_stream_url(stream)), offset, tb_state_cstr(state));
+    tb_trace_d("open: istream: %s, offset: %llu, state: %s", tb_url_cstr(tb_async_stream_url(stream)), offset, tb_state_cstr(state));
 
     // done
     tb_bool_t ok = tb_true;
@@ -629,7 +629,7 @@ static tb_void_t tb_async_transfer_ostream_clos_func(tb_async_stream_ref_t strea
     tb_assert_and_check_return(stream && impl);
 
     // trace
-    tb_trace_d("clos: ostream: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("clos: ostream: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // done func
     tb_async_transfer_clos_func(impl, state);
@@ -641,7 +641,7 @@ static tb_void_t tb_async_transfer_istream_clos_func(tb_async_stream_ref_t strea
     tb_assert_and_check_return(stream && impl);
 
     // trace
-    tb_trace_d("clos: istream: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("clos: istream: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // done
     do

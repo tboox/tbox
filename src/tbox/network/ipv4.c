@@ -49,6 +49,22 @@ tb_void_t tb_ipv4_clear(tb_ipv4_ref_t ipv4)
     // clear it
     ipv4->u32 = 0;
 }
+tb_bool_t tb_ipv4_is_empty(tb_ipv4_ref_t ipv4)
+{
+    // check
+    tb_assert_and_check_return_val(ipv4, tb_true);
+
+    // is empty?
+    return !ipv4->u32;
+}
+tb_bool_t tb_ipv4_is_equal(tb_ipv4_ref_t ipv4, tb_ipv4_ref_t other)
+{
+    // check
+    tb_assert_and_check_return_val(ipv4 && other, tb_false);
+
+    // is equal?
+    return ipv4->u32 == other->u32;
+}
 tb_char_t const* tb_ipv4_cstr(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t maxn)
 {
     // check
@@ -61,7 +77,7 @@ tb_char_t const* tb_ipv4_cstr(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t max
     // ok
     return data;
 }
-tb_bool_t tb_ipv4_set_cstr(tb_ipv4_ref_t ipv4, tb_char_t const* cstr)
+tb_bool_t tb_ipv4_cstr_set(tb_ipv4_ref_t ipv4, tb_char_t const* cstr)
 {
     // check
     tb_assert_and_check_return_val(cstr, tb_false);

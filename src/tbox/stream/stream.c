@@ -387,7 +387,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
     tb_va_list_t args_saved;
     tb_va_copy(args_saved, args);
 
-    // ctrl
+    // done
     tb_bool_t ok = tb_false;
     switch (ctrl)
     {
@@ -399,8 +399,11 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
 
             // get offset
             *poffset = impl->offset;
-            return tb_true;
+
+            // ok
+            ok = tb_true;
         }
+        break;
     case TB_STREAM_CTRL_SET_URL:
         {
             // check
@@ -408,7 +411,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
 
             // set url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            if (url && tb_url_set(&impl->url, url)) ok = tb_true;
+            if (url && tb_url_cstr_set(&impl->url, url)) ok = tb_true;
         }
         break;
     case TB_STREAM_CTRL_GET_URL:
@@ -417,7 +420,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
             tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             if (purl)
             {
-                tb_char_t const* url = tb_url_get(&impl->url);
+                tb_char_t const* url = tb_url_cstr(&impl->url);
                 if (url)
                 {
                     *purl = url;
@@ -446,7 +449,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
             tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             if (phost)
             {
-                tb_char_t const* host = tb_url_host_get(&impl->url);
+                tb_char_t const* host = tb_url_host(&impl->url);
                 if (host)
                 {
                     *phost = host;
@@ -475,7 +478,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
             tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             if (pport)
             {
-                *pport = tb_url_port_get(&impl->url);
+                *pport = tb_url_port(&impl->url);
                 ok = tb_true;
             }
         }
@@ -500,7 +503,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
             tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             if (ppath)
             {
-                tb_char_t const* path = tb_url_path_get(&impl->url);
+                tb_char_t const* path = tb_url_path(&impl->url);
                 if (path)
                 {
                     *ppath = path;
@@ -526,7 +529,7 @@ tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t stream, tb_size_t ctrl, tb_va
             tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
             if (pssl)
             {
-                *pssl = tb_url_ssl_get(&impl->url);
+                *pssl = tb_url_ssl(&impl->url);
                 ok = tb_true;
             }
         }
@@ -573,7 +576,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t stream)
     tb_assert_and_check_return(impl);
 
     // trace
-    tb_trace_d("kill: %s: state: %s: ..", tb_url_get(&impl->url), tb_state_cstr(tb_atomic_get(&impl->istate)));
+    tb_trace_d("kill: %s: state: %s: ..", tb_url_cstr(&impl->url), tb_state_cstr(tb_atomic_get(&impl->istate)));
 
     // opened? kill it
     if (TB_STATE_OPENED == tb_atomic_fetch_and_pset(&impl->istate, TB_STATE_OPENED, TB_STATE_KILLING))
@@ -582,7 +585,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t stream)
         if (impl->kill) impl->kill(stream);
 
         // trace
-        tb_trace_d("kill: %s: ok", tb_url_get(&impl->url));
+        tb_trace_d("kill: %s: ok", tb_url_cstr(&impl->url));
     }
     // opening? kill it
     else if (TB_STATE_OPENING == tb_atomic_fetch_and_pset(&impl->istate, TB_STATE_OPENING, TB_STATE_KILLING))
@@ -591,7 +594,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t stream)
         if (impl->kill) impl->kill(stream);
 
         // trace
-        tb_trace_d("kill: %s: ok", tb_url_get(&impl->url));
+        tb_trace_d("kill: %s: ok", tb_url_cstr(&impl->url));
     }
     else 
     {

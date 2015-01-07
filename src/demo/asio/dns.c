@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_sock_dns_done_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipv4_ref_t addr, tb_cpointer_t priv)
+static tb_void_t tb_demo_sock_dns_done_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_addr_ref_t addr, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return(dns);
@@ -19,7 +19,7 @@ static tb_void_t tb_demo_sock_dns_done_func(tb_aicp_dns_ref_t dns, tb_char_t con
     if (addr)
     {
         // trace
-        tb_trace_i("dns[%s]: %u.%u.%u.%u", host, addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+        tb_trace_i("dns[%s]: %{addr}", host, addr);
     }
     // timeout or failed?
     else

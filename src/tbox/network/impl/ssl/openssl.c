@@ -164,7 +164,7 @@ static tb_long_t tb_ssl_sock_read(tb_cpointer_t priv, tb_byte_t* data, tb_size_t
     tb_assert_and_check_return_val(priv, -1);
 
     // recv it
-    return tb_socket_recv((tb_handle_t)priv, data, size);
+    return tb_socket_recv((tb_socket_ref_t)priv, data, size);
 }
 static tb_long_t tb_ssl_sock_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
 {
@@ -172,7 +172,7 @@ static tb_long_t tb_ssl_sock_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_
     tb_assert_and_check_return_val(priv, -1);
 
     // send it
-    return tb_socket_send((tb_handle_t)priv, data, size);
+    return tb_socket_send((tb_socket_ref_t)priv, data, size);
 }
 static tb_long_t tb_ssl_sock_wait(tb_cpointer_t priv, tb_size_t code, tb_long_t timeout)
 {
@@ -180,7 +180,7 @@ static tb_long_t tb_ssl_sock_wait(tb_cpointer_t priv, tb_size_t code, tb_long_t 
     tb_assert_and_check_return_val(priv, -1);
 
     // wait it
-    return tb_aioo_wait((tb_handle_t)priv, code, timeout);
+    return tb_aioo_wait((tb_aioo_ref_t)priv, code, timeout);
 }
 static tb_int_t tb_ssl_bio_method_init(BIO* bio)
 {

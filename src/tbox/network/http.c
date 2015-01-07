@@ -100,7 +100,7 @@ static tb_bool_t tb_http_connect(tb_http_impl_t* impl)
         // the host is changed?
         tb_bool_t           host_changed = tb_true;
         tb_char_t const*    host_old = tb_null;
-        tb_char_t const*    host_new = tb_url_host_get(&impl->option.url);
+        tb_char_t const*    host_new = tb_url_host(&impl->option.url);
         tb_stream_ctrl(impl->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
         if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
 
@@ -108,7 +108,7 @@ static tb_bool_t tb_http_connect(tb_http_impl_t* impl)
         tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
 
         // ctrl stream
-        if (!tb_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&impl->option.url))) break;
+        if (!tb_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_URL, tb_url_cstr(&impl->option.url))) break;
         if (!tb_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_TIMEOUT, impl->option.timeout)) break;
 
         // dump option
@@ -180,14 +180,14 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_assert_and_check_break(method);
 
         // init path
-        tb_char_t const* path = tb_url_path_get(&impl->option.url);
+        tb_char_t const* path = tb_url_path(&impl->option.url);
         tb_assert_and_check_break(path);
 
         // init args
-        tb_char_t const* args = tb_url_args_get(&impl->option.url);
+        tb_char_t const* args = tb_url_args(&impl->option.url);
 
         // init host
-        tb_char_t const* host = tb_url_host_get(&impl->option.url);
+        tb_char_t const* host = tb_url_host(&impl->option.url);
         tb_assert_and_check_break(host);
         tb_hash_set(impl->head, "Host", host);
 
@@ -202,7 +202,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         if (impl->option.cookies)
         {
             // set cookie
-            if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl_get(&impl->option.url), &impl->cookies))
+            if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl(&impl->option.url), &impl->cookies))
             {
                 tb_hash_set(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
                 cookie = tb_true;
@@ -239,7 +239,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             do
             {
                 // init pstream
-                tb_char_t const* url = tb_url_get(&impl->option.post_url);
+                tb_char_t const* url = tb_url_cstr(&impl->option.post_url);
                 if (impl->option.post_data && impl->option.post_size)
                     pstream = tb_stream_init_from_data(impl->option.post_data, impl->option.post_size);
                 else if (url) pstream = tb_stream_init_from_url(url);
@@ -703,7 +703,7 @@ static tb_bool_t tb_http_redirect(tb_http_impl_t* impl)
         else
         {
             // set url
-            if (!tb_url_set(&impl->option.url, location)) break;
+            if (!tb_url_cstr_set(&impl->option.url, location)) break;
         }
 
         // connect it

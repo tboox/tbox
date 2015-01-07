@@ -137,7 +137,7 @@ static tb_bool_t tb_async_stream_http_impl_clos(tb_async_stream_ref_t stream, tb
     tb_assert_and_check_return_val(impl && impl->http && func, tb_false);
 
     // trace
-    tb_trace_d("clos: %s: ..", tb_url_get(tb_async_stream_url(stream)));
+    tb_trace_d("clos: %s: ..", tb_url_cstr(tb_async_stream_url(stream)));
 
     // init func
     impl->func.clos  = func;
@@ -294,7 +294,7 @@ static tb_void_t tb_async_stream_http_impl_kill(tb_async_stream_ref_t stream)
     tb_assert_and_check_return(impl);
 
     // trace
-    tb_trace_d("kill: %s: ..", tb_url_get(tb_async_stream_url(stream)));
+    tb_trace_d("kill: %s: ..", tb_url_cstr(tb_async_stream_url(stream)));
 
     // kill it
     if (impl->http) tb_aicp_http_kill(impl->http);

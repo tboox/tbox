@@ -76,6 +76,23 @@ typedef union __tb_ipv6_t
  */
 tb_void_t           tb_ipv6_clear(tb_ipv6_ref_t ipv6);
 
+/*! is empty?
+ *
+ * @param ipv6      the ipv6
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv6_is_empty(tb_ipv6_ref_t ipv6);
+
+/*! is equal?
+ *
+ * @param ipv6      the ipv6
+ * @param other     the other ipv6
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv6_is_equal(tb_ipv6_ref_t ipv6, tb_ipv6_ref_t other);
+
 /*! get the ipv6 string
  *
  * @param ipv6      the ipv6
@@ -93,7 +110,7 @@ tb_char_t const*    tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ipv6_set_cstr(tb_ipv6_ref_t ipv6, tb_char_t const* cstr);
+tb_bool_t           tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

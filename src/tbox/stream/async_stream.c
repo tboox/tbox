@@ -589,7 +589,7 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_ref_t stream)
     tb_assert_and_check_return_val(impl, tb_false);
 
     // trace
-    tb_trace_d("exit: %s: ..", tb_url_get(&impl->url));
+    tb_trace_d("exit: %s: ..", tb_url_cstr(&impl->url));
 
     // kill it first
     tb_async_stream_kill(stream);
@@ -607,7 +607,7 @@ tb_bool_t tb_async_stream_exit(tb_async_stream_ref_t stream)
     if (!ok)
     {
         // trace
-        tb_trace_e("exit: %s: failed!", tb_url_get(&impl->url));
+        tb_trace_e("exit: %s: failed!", tb_url_cstr(&impl->url));
         return tb_false;
     }
 
@@ -781,7 +781,7 @@ tb_bool_t tb_async_stream_ctrl_with_args(tb_async_stream_ref_t stream, tb_size_t
 
             // set url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            if (url && tb_url_set(&impl->url, url)) ok = tb_true;
+            if (url && tb_url_cstr_set(&impl->url, url)) ok = tb_true;
         }
         break;
     case TB_STREAM_CTRL_GET_URL:
@@ -790,7 +790,7 @@ tb_bool_t tb_async_stream_ctrl_with_args(tb_async_stream_ref_t stream, tb_size_t
             tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             if (purl)
             {
-                tb_char_t const* url = tb_url_get(&impl->url);
+                tb_char_t const* url = tb_url_cstr(&impl->url);
                 if (url)
                 {
                     *purl = url;
@@ -819,7 +819,7 @@ tb_bool_t tb_async_stream_ctrl_with_args(tb_async_stream_ref_t stream, tb_size_t
             tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             if (phost)
             {
-                tb_char_t const* host = tb_url_host_get(&impl->url);
+                tb_char_t const* host = tb_url_host(&impl->url);
                 if (host)
                 {
                     *phost = host;
@@ -848,7 +848,7 @@ tb_bool_t tb_async_stream_ctrl_with_args(tb_async_stream_ref_t stream, tb_size_t
             tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             if (pport)
             {
-                *pport = tb_url_port_get(&impl->url);
+                *pport = tb_url_port(&impl->url);
                 ok = tb_true;
             }
         }
@@ -873,7 +873,7 @@ tb_bool_t tb_async_stream_ctrl_with_args(tb_async_stream_ref_t stream, tb_size_t
             tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             if (ppath)
             {
-                tb_char_t const* path = tb_url_path_get(&impl->url);
+                tb_char_t const* path = tb_url_path(&impl->url);
                 if (path)
                 {
                     *ppath = path;
@@ -899,7 +899,7 @@ tb_bool_t tb_async_stream_ctrl_with_args(tb_async_stream_ref_t stream, tb_size_t
             tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
             if (pssl)
             {
-                *pssl = tb_url_ssl_get(&impl->url);
+                *pssl = tb_url_ssl(&impl->url);
                 ok = tb_true;
             }
         }
@@ -946,7 +946,7 @@ tb_void_t tb_async_stream_kill(tb_async_stream_ref_t stream)
     tb_assert_and_check_return(impl);
 
     // trace
-    tb_trace_d("kill: %s: state: %s: ..", tb_url_get(&impl->url), tb_state_cstr(tb_atomic_get(&impl->istate)));
+    tb_trace_d("kill: %s: state: %s: ..", tb_url_cstr(&impl->url), tb_state_cstr(tb_atomic_get(&impl->istate)));
 
     // opened? kill it
     if (TB_STATE_OPENED == tb_atomic_fetch_and_pset(&impl->istate, TB_STATE_OPENED, TB_STATE_KILLING))
@@ -955,7 +955,7 @@ tb_void_t tb_async_stream_kill(tb_async_stream_ref_t stream)
         if (impl->kill) impl->kill(stream);
 
         // trace
-        tb_trace_d("kill: %s: ok", tb_url_get(&impl->url));
+        tb_trace_d("kill: %s: ok", tb_url_cstr(&impl->url));
     }
     // opening? kill it
     else if (TB_STATE_OPENING == tb_atomic_fetch_and_pset(&impl->istate, TB_STATE_OPENING, TB_STATE_KILLING))
@@ -964,7 +964,7 @@ tb_void_t tb_async_stream_kill(tb_async_stream_ref_t stream)
         if (impl->kill) impl->kill(stream);
 
         // trace
-        tb_trace_d("kill: %s: ok", tb_url_get(&impl->url));
+        tb_trace_d("kill: %s: ok", tb_url_cstr(&impl->url));
     }
     else 
     {
@@ -982,7 +982,7 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_ref_t stream)
     if (!impl->open_try) return tb_async_stream_is_opened(stream);
      
     // trace
-    tb_trace_d("open: try: %s: ..", tb_url_get(&impl->url));
+    tb_trace_d("open: try: %s: ..", tb_url_cstr(&impl->url));
 
     // set opening
     tb_size_t state = tb_atomic_fetch_and_pset(&impl->istate, TB_STATE_CLOSED, TB_STATE_OPENING);
@@ -997,7 +997,7 @@ tb_bool_t tb_async_stream_open_try(tb_async_stream_ref_t stream)
     tb_bool_t ok = impl->open_try(stream);
 
     // trace
-    tb_trace_d("open: try: %s: %s", tb_url_get(&impl->url), ok? "ok" : "no");
+    tb_trace_d("open: try: %s: %s", tb_url_cstr(&impl->url), ok? "ok" : "no");
 
     // ok?
     return ok;
@@ -1009,7 +1009,7 @@ tb_bool_t tb_async_stream_open_(tb_async_stream_ref_t stream, tb_async_stream_op
     tb_assert_and_check_return_val(impl && impl->open && func, tb_false);
     
     // trace
-    tb_trace_d("open: %s: ..", tb_url_get(&impl->url));
+    tb_trace_d("open: %s: ..", tb_url_cstr(&impl->url));
 
     // try opening ok? done func directly
     if (tb_async_stream_open_try(stream))
@@ -1038,7 +1038,7 @@ tb_bool_t tb_async_stream_clos_try(tb_async_stream_ref_t stream)
     if (!impl->clos_try) return tb_async_stream_is_closed(stream);
      
     // trace
-    tb_trace_d("clos: try: %s: ..", tb_url_get(&impl->url));
+    tb_trace_d("clos: try: %s: ..", tb_url_cstr(&impl->url));
 
     // done
     tb_bool_t ok = tb_false;
@@ -1057,7 +1057,7 @@ tb_bool_t tb_async_stream_clos_try(tb_async_stream_ref_t stream)
     } while (0);
 
     // trace
-    tb_trace_d("clos: try: %s: %s", tb_url_get(&impl->url), ok? "ok" : "no");
+    tb_trace_d("clos: try: %s: %s", tb_url_cstr(&impl->url), ok? "ok" : "no");
          
     // ok?
     return ok;
@@ -1069,7 +1069,7 @@ tb_bool_t tb_async_stream_clos_(tb_async_stream_ref_t stream, tb_async_stream_cl
     tb_assert_and_check_return_val(impl && impl->clos && func, tb_false);
 
     // trace
-    tb_trace_d("clos: %s: ..", tb_url_get(&impl->url));
+    tb_trace_d("clos: %s: ..", tb_url_cstr(&impl->url));
 
     // try closing ok? done func directly
     if (tb_async_stream_clos_try(stream))

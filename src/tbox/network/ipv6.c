@@ -50,6 +50,22 @@ tb_void_t tb_ipv6_clear(tb_ipv6_ref_t ipv6)
     // clear it
     tb_memset(ipv6, 0, sizeof(tb_ipv6_t));
 }
+tb_bool_t tb_ipv6_is_empty(tb_ipv6_ref_t ipv6)
+{
+    // check
+    tb_assert_and_check_return_val(ipv6, tb_true);
+
+    // is empty?
+    return !(ipv6->u32[0] || ipv6->u32[1] || ipv6->u32[2] || ipv6->u32[3]);
+}
+tb_bool_t tb_ipv6_is_equal(tb_ipv6_ref_t ipv6, tb_ipv6_ref_t other)
+{
+    // check
+    tb_assert_and_check_return_val(ipv6 && other, tb_false);
+
+    // is equal?
+    return (ipv6->u32[0] == other->u32[0]) && (ipv6->u32[1] == other->u32[1]) && (ipv6->u32[2] == other->u32[2]) && (ipv6->u32[3] == other->u32[3]);
+}
 tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t maxn)
 {
     // check
@@ -72,7 +88,7 @@ tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t max
     // ok
     return data;
 }
-tb_bool_t tb_ipv6_set_cstr(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
+tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
 {
     // check
     tb_assert_and_check_return_val(cstr, tb_false);
@@ -82,7 +98,7 @@ tb_bool_t tb_ipv6_set_cstr(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
     {
         // attempt to make ipv6 from ipv4
         tb_ipv4_t ipv4;
-        if (tb_ipv4_set_cstr(&ipv4, cstr + 7))
+        if (tb_ipv4_cstr_set(&ipv4, cstr + 7))
         {
             // make ipv6
             ipv6->u32[0] = 0;
