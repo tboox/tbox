@@ -59,7 +59,10 @@ typedef enum __tb_addr_family_e
 typedef struct __tb_addr_t
 {
     /// the family
-    tb_uint8_t              family;
+    tb_uint8_t              family      : 7;
+
+    /// have ip?
+    tb_uint8_t              have_ip     : 1;
 
     /// the port
     tb_uint16_t             port;
@@ -114,13 +117,19 @@ tb_bool_t           tb_addr_is_equal(tb_addr_ref_t addr, tb_addr_ref_t other);
 /*! set the ip address from string
  *
  * @param addr      the address, only analyze format if be null
- * @param cstr      the address string
- * @param port      the port
- * @param family    the address family, will analyze family automaticly if be none
+ * @param cstr      the address string, optional
+ * @param port      the port, optional
+ * @param family    the address family, will analyze family automaticly if be none, optional
  *
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_addr_set(tb_addr_ref_t addr, tb_char_t const* cstr, tb_uint16_t port, tb_uint8_t family);
+
+/*! clear ip
+ *
+ * @param addr      the address
+ */
+tb_void_t           tb_addr_ip_clear(tb_addr_ref_t addr);
 
 /*! the ip is empty?
  *
@@ -162,7 +171,7 @@ tb_bool_t           tb_addr_ip_cstr_set(tb_addr_ref_t addr, tb_char_t const* cst
 /*! only set ip address
  *
  * @param addr      the address
- * @param ip_addr   the ip address
+ * @param ip_addr   the ip address, clear it if be null
  */
 tb_void_t           tb_addr_ip_set(tb_addr_ref_t addr, tb_addr_ref_t ip_addr);
 
@@ -177,7 +186,7 @@ tb_ipv4_ref_t       tb_addr_ipv4(tb_addr_ref_t addr);
 /*! set the address from ipv4
  *
  * @param addr      the address
- * @param ipv4      the ipv4
+ * @param ipv4      the ipv4, clear it if be null
  */
 tb_void_t           tb_addr_ipv4_set(tb_addr_ref_t addr, tb_ipv4_ref_t ipv4);
 
@@ -192,7 +201,7 @@ tb_ipv6_ref_t       tb_addr_ipv6(tb_addr_ref_t addr);
 /*! set the address from ipv6
  *
  * @param addr      the address
- * @param ipv6      the ipv6
+ * @param ipv6      the ipv6, clear it if be null
  */
 tb_void_t           tb_addr_ipv6_set(tb_addr_ref_t addr, tb_ipv6_ref_t ipv6);
 

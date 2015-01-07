@@ -355,8 +355,12 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
         // open sock aico
         if (!tb_aico_open_sock_from_type(aico, TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4)) break;
 
+        // init addr
+        tb_addr_t addr;
+        tb_addr_set(&addr, tb_null, 9090, TB_ADDR_FAMILY_IPV4);
+
         // bind port
-        if (!tb_socket_bind(tb_aico_sock(aico), tb_null, 9090)) break;
+        if (!tb_socket_bind(tb_aico_sock(aico), &addr)) break;
 
         // listen sock
         if (!tb_socket_listen(tb_aico_sock(aico), 20)) break;
