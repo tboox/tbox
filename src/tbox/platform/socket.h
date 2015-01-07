@@ -82,7 +82,7 @@ tb_bool_t           tb_socket_exit(tb_socket_ref_t sock);
  * @param type      the socket type
  * @param pair      the socket pair
  *
- * @return          the socket handle
+ * @return          tb_true or tb_false
  */
 tb_bool_t           tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2]);
 
