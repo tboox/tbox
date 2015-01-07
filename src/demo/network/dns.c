@@ -19,12 +19,11 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
     tb_hong_t time = tb_mclock();
 
     // done
-    tb_ipv4_t ipv4;
-    tb_char_t data[16];
-    if (tb_dns_looker_done(name, &ipv4))
+    tb_addr_t addr;
+    if (tb_dns_looker_done(name, &addr))
     {
         time = tb_mclock() - time;
-        tb_trace_i("[demo]: %s => %s, %lld ms", name, tb_ipv4_cstr(&ipv4, data, 16), time);
+        tb_trace_i("[demo]: %s => %{addr}, %lld ms", name, &addr, time);
     }
     else tb_trace_i("[demo]: %s failed", name);
 }

@@ -34,11 +34,13 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
         data = tb_malloc_bytes(TB_DEMO_SOCK_RECV_MAXN);
         tb_assert_and_check_break(data);
 
+        // init addr
+        tb_addr_t addr;
+        if (!tb_addr_set(&addr, "127.0.0.1", 9090, TB_ADDR_FAMILY_IPV4)) break;
+
         // done conn
         tb_long_t conn = -1;
-        tb_ipv4_t addr = {0};
-        tb_ipv4_set_cstr(&addr, "127.0.0.1");
-        while (!(conn = tb_socket_connect(sock, &addr, 9090)))
+        while (!(conn = tb_socket_connect(sock, &addr)))
         {
             // wait
             conn = tb_aioo_wait(sock, TB_AIOE_CODE_CONN, 20000);

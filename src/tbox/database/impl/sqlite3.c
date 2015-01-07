@@ -363,7 +363,7 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_sql_impl_t* database)
     do
     {
         // the database path
-        path = tb_url_get(&database->url);
+        path = tb_url_cstr(&database->url);
         tb_assert_and_check_break(path);
 
         // load sqlite3 library
@@ -800,7 +800,7 @@ tb_size_t tb_database_sqlite3_probe(tb_url_ref_t url)
     do
     {
         // the url arguments
-        tb_char_t const* args = tb_url_args_get(url);
+        tb_char_t const* args = tb_url_args(url);
         if (args)
         {
             // find the database type
@@ -814,14 +814,14 @@ tb_size_t tb_database_sqlite3_probe(tb_url_ref_t url)
         }
 
         // has host or port? no sqlite3
-        if (tb_url_host_get(url) || tb_url_port_get(url)) break;
+        if (tb_url_host(url) || tb_url_port(url)) break;
 
         // the database path
-        tb_char_t const* path = tb_url_get((tb_url_ref_t)url);
+        tb_char_t const* path = tb_url_cstr((tb_url_ref_t)url);
         tb_assert_and_check_break(path);
 
         // is file?
-        if (tb_url_protocol_get(url) == TB_URL_PROTOCOL_FILE) score += 20;
+        if (tb_url_protocol(url) == TB_URL_PROTOCOL_FILE) score += 20;
 
         // init stream
         stream = tb_stream_init_from_url(path);
@@ -844,7 +844,7 @@ tb_size_t tb_database_sqlite3_probe(tb_url_ref_t url)
     stream = tb_null;
 
     // trace
-    tb_trace_d("probe: %s, score: %lu", tb_url_get((tb_url_ref_t)url), score);
+    tb_trace_d("probe: %s, score: %lu", tb_url_cstr((tb_url_ref_t)url), score);
 
     // ok?
     return score;

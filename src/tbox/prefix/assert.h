@@ -229,7 +229,7 @@ static __tb_inline__ tb_bool_t  tb_assert_impl(tb_bool_t x, tb_char_t const* exp
     if (!x)
     {
         // trace
-        tb_trace_d("[assert]: expr[%s] at %s(): %d, %s", expr __tb_debug_args__); 
+        tb_trace_i("[assert]: expr[%s] at %s(): %d, %s", expr __tb_debug_args__); 
         tb_trace_sync(); 
 
         // dump backtrace
@@ -258,7 +258,7 @@ static __tb_inline__ tb_bool_t  tb_assert_abort_impl(tb_bool_t x, tb_char_t cons
     if (!x)
     {
         // trace
-        tb_trace_d("[assert]: expr[%s] at %s(): %d, %s", expr __tb_debug_args__); 
+        tb_trace_i("[assert]: expr[%s] at %s(): %d, %s", expr __tb_debug_args__); 
         tb_trace_sync(); 
 
         // dump backtrace

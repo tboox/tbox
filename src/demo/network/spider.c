@@ -249,7 +249,7 @@ static tb_size_t tb_demo_spider_parser_get_url(tb_xml_reader_ref_t reader, tb_ur
                             if(protocol == TB_URL_PROTOCOL_HTTP)
                             {
                                 // save url
-                                ok = tb_url_set(url, tb_string_cstr(&attr->data));
+                                ok = tb_url_cstr_set(url, tb_string_cstr(&attr->data));
                             }
                             // file?
                             else if (protocol == TB_URL_PROTOCOL_FILE)
@@ -370,27 +370,27 @@ static tb_void_t tb_demo_spider_parser_task_done(tb_thread_pool_worker_ref_t wor
             tb_trace_d("parser: open: %s", task->ourl);
 
             // init url
-            tb_url_set(&parser->iurl, task->iurl);
+            tb_url_cstr_set(&parser->iurl, task->iurl);
 
             // parse url
             while (     TB_STATE_OK == tb_atomic_get(&task->spider->state)
                     &&  tb_demo_spider_parser_get_url(parser->reader, &parser->iurl))
             {
                 // trace
-                tb_trace_d("parser: done: %s", tb_url_get(&parser->iurl));
+                tb_trace_d("parser: done: %s", tb_url_cstr(&parser->iurl));
 
                 // done task
                 tb_bool_t full = tb_false;
-                if (!tb_demo_spider_task_done(task->spider, tb_url_get(&parser->iurl), &full))
+                if (!tb_demo_spider_task_done(task->spider, tb_url_cstr(&parser->iurl), &full))
                 {
                     // full?
                     tb_assert_and_check_break(full);
 
                     // cache url
-                    if (!tb_circle_queue_full(parser->cache)) tb_circle_queue_put(parser->cache, tb_url_get(&parser->iurl));
+                    if (!tb_circle_queue_full(parser->cache)) tb_circle_queue_put(parser->cache, tb_url_cstr(&parser->iurl));
 
                     // trace
-                    tb_trace_d("parser: cache: save: %s, size: %lu", tb_url_get(&parser->iurl), tb_circle_queue_size(parser->cache));
+                    tb_trace_d("parser: cache: save: %s, size: %lu", tb_url_cstr(&parser->iurl), tb_circle_queue_size(parser->cache));
                 }
             }
 
@@ -718,8 +718,8 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
 
         // init home
         if (!tb_url_init(&spider->home)) break;
-        tb_url_set(&spider->home, tb_option_item_cstr(spider->option, "home"));
-        tb_trace_d("home: %s", tb_url_get(&spider->home));
+        tb_url_cstr_set(&spider->home, tb_option_item_cstr(spider->option, "home"));
+        tb_trace_d("home: %s", tb_url_cstr(&spider->home));
 
         // init only home?
         if (tb_option_find(spider->option, "only"))
@@ -746,14 +746,14 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         // init home
         if (!tb_url_init(&spider->home)) break;
         spider->home = argv[1]? argv[1] : tb_null;
-        tb_trace_d("home: %s", tb_url_get(&spider->home));
+        tb_trace_d("home: %s", tb_url_cstr(&spider->home));
 
         // init root
         tb_char_t const* root = argv[2];
 #endif
 
         // the home host
-        tb_char_t const* host = tb_url_host_get(&spider->home);
+        tb_char_t const* host = tb_url_host(&spider->home);
         tb_assert_and_check_break(host);
 
         // init home domain
@@ -887,7 +887,7 @@ tb_int_t tb_demo_network_spider_main(tb_int_t argc, tb_char_t** argv)
         if (!tb_demo_spider_init(&spider, argc, argv)) break;
 
         // done the home task if exists
-        tb_demo_spider_task_done(&spider, tb_url_get(&spider.home), tb_null);
+        tb_demo_spider_task_done(&spider, tb_url_cstr(&spider.home), tb_null);
 
         // wait 
         getchar();

@@ -34,6 +34,7 @@
 #include "server.h"
 #include "../../utils/utils.h"
 #include "../../stream/stream.h"
+#include "../../network/network.h"
 #include "../../platform/platform.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
@@ -56,7 +57,7 @@ typedef struct __tb_dns_server_t
     tb_size_t               rate;
 
     // the addr
-    tb_ipv4_t               addr;
+    tb_addr_t               addr;
 
 }tb_dns_server_t;
 
@@ -96,10 +97,10 @@ static tb_long_t tb_dns_server_comp(tb_item_func_t* func, tb_cpointer_t litem, t
     // comp
     return (lrate > rrate? 1 : (lrate < rrate? -1 : 0));
 }
-static tb_long_t tb_dns_server_test(tb_ipv4_ref_t addr)
+static tb_long_t tb_dns_server_test(tb_addr_ref_t addr)
 {
     // check
-    tb_assert_and_check_return_val(addr && addr->u32, -1);
+    tb_assert_and_check_return_val(addr && !tb_addr_is_empty(addr), -1);
 
     // done
     tb_static_stream_t  sstream;
@@ -110,7 +111,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_ref_t addr)
     do
     {
         // init sock
-        sock = tb_socket_init(TB_SOCKET_TYPE_UDP);
+        sock = tb_socket_init2(TB_SOCKET_TYPE_UDP, TB_ADDR_FAMILY_IPV4);
         tb_assert_and_check_break(sock);
 
         // init stream
@@ -206,8 +207,12 @@ static tb_long_t tb_dns_server_test(tb_ipv4_ref_t addr)
         while (writ < size)
         {
             // writ data
-            tb_long_t real = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
+            tb_long_t real = tb_socket_usend(sock, addr, rpkt + writ, size - writ);
+
+            // trace
             tb_trace_d("writ %ld", real);
+
+            // check
             tb_check_break_state(real >= 0, fail, tb_true);
             
             // no data?
@@ -233,8 +238,12 @@ static tb_long_t tb_dns_server_test(tb_ipv4_ref_t addr)
         while (read < 8)
         {
             // read data
-            tb_long_t r = tb_socket_urecv(sock, tb_null, 0, rpkt + read, TB_DNS_RPKT_MAXN - read);
+            tb_long_t r = tb_socket_urecv(sock, tb_null, rpkt + read, TB_DNS_RPKT_MAXN - read);
+
+            // trace
             tb_trace_d("read %d", r);
+
+            // check
             tb_check_break(r >= 0);
             
             // no data?
@@ -245,6 +254,8 @@ static tb_long_t tb_dns_server_test(tb_ipv4_ref_t addr)
 
                 // wait
                 r = tb_aioo_wait(sock, TB_AIOE_CODE_RECV, TB_DNS_SERVER_TEST_TIMEOUT);
+
+                // trace
                 tb_trace_d("wait %d", r);
 
                 // fail or timeout?
@@ -268,7 +279,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_ref_t addr)
         rate = (tb_long_t)(tb_cache_time_spak() - time);
 
         // ok
-        tb_trace_d("test: %{ipv4} ok, rate: %u", addr, rate);
+        tb_trace_d("test: %{addr} ok, rate: %u", addr, rate);
 
     } while (0);
 
@@ -380,11 +391,7 @@ tb_void_t tb_dns_server_dump()
             if (server)
             {
                 // trace
-                tb_trace_i("server: %u.%u.%u.%u, rate: %u",     server->addr.u8[0]
-                                                            ,   server->addr.u8[1]
-                                                            ,   server->addr.u8[2]
-                                                            ,   server->addr.u8[3]
-                                                            ,   server->rate);
+                tb_trace_i("server: %{addr}, rate: %u", &server->addr, server->rate);
             }
         }
     }
@@ -454,7 +461,7 @@ tb_void_t tb_dns_server_sort()
     // exit list
     tb_vector_exit(list);
 }
-tb_size_t tb_dns_server_get(tb_ipv4_t addr[2])
+tb_size_t tb_dns_server_get(tb_addr_t addr[2])
 { 
     // check
     tb_assert_and_check_return_val(addr, 0);
@@ -472,14 +479,21 @@ tb_size_t tb_dns_server_get(tb_ipv4_t addr[2])
         // check
         tb_assert_and_check_break(g_list.list && g_list.sort);
 
-        // walk
+        // init
         tb_size_t i = 0;
         tb_size_t n = tb_min(tb_vector_size(g_list.list), 2);
         tb_assert_and_check_break(n <= 2);
+
+        // done
         for (; i < n; i++)
         {
+            // the dns server
             tb_dns_server_t const* server = (tb_dns_server_t const*)tb_iterator_item(g_list.list, i);
-            if (server) addr[ok++] = server->addr;
+            if (server) 
+            {
+                // save addr
+                addr[ok++] = server->addr;
+            }
         }
 
     } while (0);
@@ -512,7 +526,7 @@ tb_void_t tb_dns_server_add(tb_char_t const* addr)
 
         // init server
         tb_dns_server_t server = {0};
-        if (!tb_ipv4_set_cstr(&server.addr, addr)) break;
+        if (!tb_addr_set(&server.addr, addr, TB_DNS_HOST_PORT, TB_ADDR_FAMILY_NONE)) break;
 
         // add server
         tb_vector_insert_tail(g_list.list, &server);

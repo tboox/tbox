@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../network/ipv4.h"
+#include "../network/addr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -42,20 +42,32 @@ __tb_extern_c_enter__
 /// the socket type enum
 typedef enum __tb_socket_type_e
 {
-    TB_SOCKET_TYPE_NUL  = 0
-,   TB_SOCKET_TYPE_TCP  = 1
-,   TB_SOCKET_TYPE_UDP  = 2
+    TB_SOCKET_TYPE_NUL                  = 0
+,   TB_SOCKET_TYPE_TCP                  = 1
+,   TB_SOCKET_TYPE_UDP                  = 2
 
 }tb_socket_type_e;
 
 /// the socket kill enum
 typedef enum __tb_socket_kill_e
 {
-    TB_SOCKET_KILL_RO   = 0
-,   TB_SOCKET_KILL_WO   = 1
-,   TB_SOCKET_KILL_RW   = 2
+    TB_SOCKET_KILL_RO                   = 0
+,   TB_SOCKET_KILL_WO                   = 1
+,   TB_SOCKET_KILL_RW                   = 2
 
 }tb_socket_kill_e;
+
+/// the socket ctrl enum
+typedef enum __tb_socket_ctrl_e
+{
+    TB_SOCKET_CTRL_SET_BLOCK            = 0
+,   TB_SOCKET_CTRL_GET_BLOCK            = 1
+,   TB_SOCKET_CTRL_SET_RECV_BUFF_SIZE   = 2
+,   TB_SOCKET_CTRL_GET_RECV_BUFF_SIZE   = 3
+,   TB_SOCKET_CTRL_SET_SEND_BUFF_SIZE   = 4
+,   TB_SOCKET_CTRL_GET_SEND_BUFF_SIZE   = 5
+
+}tb_socket_ctrl_e;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -68,6 +80,15 @@ typedef enum __tb_socket_kill_e
  * @return          the socket 
  */
 tb_socket_ref_t     tb_socket_init(tb_size_t type);
+
+/*! init socket
+ *
+ * @param type      the socket type
+ * @param family    the address family, default: ipv4
+ *
+ * @return          the socket 
+ */
+tb_socket_ref_t     tb_socket_init2(tb_size_t type, tb_size_t family);
 
 /*! exit socket
  *
@@ -86,39 +107,21 @@ tb_bool_t           tb_socket_exit(tb_socket_ref_t sock);
  */
 tb_bool_t           tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2]);
 
-/*! the socket recv buffer size
+/*! ctrl the socket 
  *
  * @param sock      the socket 
- *
- * @return          the recv size
+ * @param ctrl      the ctrl code
  */
-tb_size_t           tb_socket_recv_buffer_size(tb_socket_ref_t sock);
-
-/*! the socket send buffer size
- *
- * @param sock      the socket 
- *
- * @return          the recv size
- */
-tb_size_t           tb_socket_send_buffer_size(tb_socket_ref_t sock);
-
-/*! set the socket block mode
- *
- * @param sock      the socket 
- * @param block     block it?
- *
- */
-tb_void_t           tb_socket_block(tb_socket_ref_t sock, tb_bool_t block);
+tb_bool_t           tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...);
 
 /*! connect socket
  *
  * @param sock      the socket 
- * @param addr      the addr
- * @param port      the port
+ * @param addr      the address
  *
  * @return          ok: 1, continue: 0; failed: -1
  */
-tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port);
+tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr);
 
 /*! bind socket
  *
@@ -218,30 +221,28 @@ tb_long_t           tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list
  */
 tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size);
 
-/*! recv the socket data for udp
- *
- * @param sock      the socket 
- * @param addr      the peer addr
- * @param port      the peer port
- * @param data      the data
- * @param size      the size
- *
- * @return          the real size or -1
- */
-tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t* port, tb_byte_t* data, tb_size_t size);
-
 /*! send the socket data for udp
  *
  * @param sock      the socket 
- * @param addr      the addr
- * @param port      the port
+ * @param addr      the address
  * @param data      the data
  * @param size      the size
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port, tb_byte_t const* data, tb_size_t size);
+tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t const* data, tb_size_t size);
     
+/*! recv the socket data for udp
+ *
+ * @param sock      the socket 
+ * @param addr      the peer address(output)
+ * @param data      the data
+ * @param size      the size
+ *
+ * @return          the real size or -1
+ */
+tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* data, tb_size_t size);
+
 /*! urecvv the socket data for udp
  * 
  * @param sock      the socket 

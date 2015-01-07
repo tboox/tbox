@@ -260,10 +260,13 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
         // init conn timeout
         tb_aico_timeout_set(context.sock, TB_AICO_TIMEOUT_CONN, 10000);
 
+        // init addr
+        tb_addr_t addr; 
+        if (!tb_addr_set(&addr, "127.0.0.1", 9090, TB_ADDR_FAMILY_IPV4)) break;
+
         // post conn
         tb_trace_i("conn: ..");
-        tb_ipv4_t addr; tb_ipv4_set_cstr(&addr, "127.0.0.1");
-        if (!tb_aico_conn(context.sock, &addr, 9090, tb_demo_sock_conn_func, &context)) break;
+        if (!tb_aico_conn(context.sock, &addr, tb_demo_sock_conn_func, &context)) break;
 
         // loop aicp
         tb_aicp_loop(aicp);

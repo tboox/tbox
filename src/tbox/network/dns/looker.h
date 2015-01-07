@@ -51,11 +51,11 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name);
 /*! spak the looker
  *
  * @param looker    the looker 
- * @param addr      the ipv4 addr
+ * @param addr      the address
  *
  * @return          1: ok, 0: continue: -1: failed
  */
-tb_long_t           tb_dns_looker_spak(tb_dns_looker_ref_t looker, tb_ipv4_ref_t addr);
+tb_long_t           tb_dns_looker_spak(tb_dns_looker_ref_t looker, tb_addr_ref_t addr);
 
 /*! wait the looker
  *
@@ -72,15 +72,15 @@ tb_long_t           tb_dns_looker_wait(tb_dns_looker_ref_t looker, tb_long_t tim
  */
 tb_void_t           tb_dns_looker_exit(tb_dns_looker_ref_t looker);
 
-/*! look ipv4 from the host name, block
+/*! look address from the host name, block
  *
  * try to look it from cache first
  *
  * @param name      the host name
- * @param addr      the ipv4 addr
+ * @param addr      the address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_dns_looker_done(tb_char_t const* name, tb_ipv4_ref_t addr);
+tb_bool_t           tb_dns_looker_done(tb_char_t const* name, tb_addr_ref_t addr);
 
 #endif

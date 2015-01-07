@@ -10,16 +10,16 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 {
     tb_url_t u;
     tb_url_init(&u);
-    if (tb_url_set(&u, url))
+    if (tb_url_cstr_set(&u, url))
     {
         tb_trace_i("=================================================");
         tb_trace_i("irl: %s",   url);
-        tb_trace_i("orl: %s",   tb_url_get(&u));
+        tb_trace_i("orl: %s",   tb_url_cstr(&u));
         tb_trace_i("poto: %s",  tb_url_protocol_cstr(&u));
-        tb_trace_i("port: %u",  tb_url_port_get(&u));
-        tb_trace_i("host: %s",  tb_url_host_get(&u));
-        tb_trace_i("path: %s",  tb_url_path_get(&u));
-        tb_trace_i("args: %s",  tb_url_args_get(&u));
+        tb_trace_i("port: %u",  tb_url_port(&u));
+        tb_trace_i("host: %s",  tb_url_host(&u));
+        tb_trace_i("path: %s",  tb_url_path(&u));
+        tb_trace_i("args: %s",  tb_url_args(&u));
     }
     else tb_trace_i("invalid url: %s", url);
     tb_url_exit(&u);
@@ -42,7 +42,6 @@ tb_int_t tb_demo_network_url_main(tb_int_t argc, tb_char_t** argv)
     tb_url_test_set("http://localhost/ruki/file.txt");
     tb_url_test_set("http://localhost:8080/ruki/file.txt");
 
-    tb_url_test_set("files:///home/ruki/file.txt");
     tb_url_test_set("socks://localhost:8080");
     tb_url_test_set("socks://localhost:8080/ruki/file.txt");
     tb_url_test_set("https://localhost");

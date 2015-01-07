@@ -202,14 +202,14 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     tb_assert_and_check_return_val(method, tb_null);
 
     // init path
-    tb_char_t const* path = tb_url_path_get(&impl->option.url);
+    tb_char_t const* path = tb_url_path(&impl->option.url);
     tb_assert_and_check_return_val(path, tb_null);
 
     // init args
-    tb_char_t const* args = tb_url_args_get(&impl->option.url);
+    tb_char_t const* args = tb_url_args(&impl->option.url);
 
     // init host
-    tb_char_t const* host = tb_url_host_get(&impl->option.url);
+    tb_char_t const* host = tb_url_host(&impl->option.url);
     tb_assert_and_check_return_val(host, tb_null);
     tb_hash_set(impl->head, "Host", host);
 
@@ -224,7 +224,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     if (impl->option.cookies)
     {
         // update cookie
-        if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl_get(&impl->option.url), &impl->cookies))
+        if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl(&impl->option.url), &impl->cookies))
         {
             tb_hash_set(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
             cookie = tb_true;
@@ -625,7 +625,7 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_async_stream_ref_t stream, tb_si
         else
         {
             // set url
-            if (!tb_url_set(&impl->option.url, location)) break;
+            if (!tb_url_cstr_set(&impl->option.url, location)) break;
         }
 
         // done open
@@ -649,7 +649,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
     tb_assert_and_check_return_val(impl && impl->stream && impl->func.open, tb_false);
 
     // trace
-    tb_trace_d("head: read: %s, real: %lu, size: %lu, state: %s", tb_url_get(&impl->option.url), real, size, tb_state_cstr(state));
+    tb_trace_d("head: read: %s, real: %lu, size: %lu, state: %s", tb_url_cstr(&impl->option.url), real, size, tb_state_cstr(state));
 
     // done
     do
@@ -860,7 +860,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
         else 
         {
             // trace
-            tb_trace_d("head: read: %s, error, state: %s", tb_url_get(&impl->option.url), tb_state_cstr(state));
+            tb_trace_d("head: read: %s, error, state: %s", tb_url_cstr(&impl->option.url), tb_state_cstr(state));
         }
 
     } while (0);
@@ -937,7 +937,7 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_async_stream_ref_t stream, tb_si
     tb_assert_and_check_return_val(impl && impl->stream && impl->func.open, tb_false);
 
     // trace
-    tb_trace_d("head: writ: %s, real: %lu, size: %lu, state: %s", tb_url_get(&impl->option.url), real, size, tb_state_cstr(state));
+    tb_trace_d("head: writ: %s, real: %lu, size: %lu, state: %s", tb_url_cstr(&impl->option.url), real, size, tb_state_cstr(state));
 
     // done
     tb_bool_t bwrit = tb_false;
@@ -1103,7 +1103,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_async_stream_ref_t stream, tb_si
             tb_assert_and_check_break(impl->transfer);
 
             // init transfer istream
-            tb_char_t const* url = tb_url_get(&impl->option.post_url);
+            tb_char_t const* url = tb_url_cstr(&impl->option.post_url);
             if (impl->option.post_data && impl->option.post_size)
             {
                 if (!tb_async_transfer_init_istream_from_data(impl->transfer, impl->option.post_data, impl->option.post_size)) break;
@@ -1149,7 +1149,7 @@ static tb_bool_t tb_aicp_http_read_func(tb_async_stream_ref_t stream, tb_size_t 
     if (state == TB_STATE_OK) impl->content_read += real;
 
     // trace
-    tb_trace_d("read: %s, real: %lu, offset: %llu <? %llu, state: %s", tb_url_get(&impl->option.url), real, impl->content_read, impl->status.content_size, tb_state_cstr(state));
+    tb_trace_d("read: %s, real: %lu, offset: %llu <? %llu, state: %s", tb_url_cstr(&impl->option.url), real, impl->content_read, impl->status.content_size, tb_state_cstr(state));
 
     // done func
     tb_bool_t ok = impl->func.read((tb_aicp_http_ref_t)impl, state, data, real, size, impl->priv);
@@ -1268,7 +1268,7 @@ static tb_void_t tb_aicp_http_open_clos(tb_async_stream_ref_t stream, tb_size_t 
         // the host is changed?
         tb_bool_t           host_changed = tb_true;
         tb_char_t const*    host_old = tb_null;
-        tb_char_t const*    host_new = tb_url_host_get(&impl->option.url);
+        tb_char_t const*    host_new = tb_url_host(&impl->option.url);
         tb_async_stream_ctrl(impl->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
         if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
 
@@ -1276,7 +1276,7 @@ static tb_void_t tb_aicp_http_open_clos(tb_async_stream_ref_t stream, tb_size_t 
         tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
 
         // ctrl stream
-        if (!tb_async_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&impl->option.url))) break;
+        if (!tb_async_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_URL, tb_url_cstr(&impl->option.url))) break;
         if (!tb_async_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_TIMEOUT, impl->option.timeout)) break;
 
         // dump option
@@ -1453,7 +1453,7 @@ tb_bool_t tb_aicp_http_exit(tb_aicp_http_ref_t http)
     if (!ok)
     {
         // trace
-        tb_trace_e("exit: %s: failed!", tb_url_get(&impl->option.url));
+        tb_trace_e("exit: %s: failed!", tb_url_cstr(&impl->option.url));
         return tb_false;
     }
 
@@ -1567,7 +1567,7 @@ tb_bool_t tb_aicp_http_clos_try(tb_aicp_http_ref_t http)
     tb_assert_and_check_return_val(impl && impl->stream, tb_false);
 
     // trace
-    tb_trace_d("clos: try: %s: ..", tb_url_get(&impl->option.url));
+    tb_trace_d("clos: try: %s: ..", tb_url_cstr(&impl->option.url));
 
     // done
     tb_bool_t ok = tb_false;
@@ -1595,7 +1595,7 @@ tb_bool_t tb_aicp_http_clos_try(tb_aicp_http_ref_t http)
     } while (0);
 
     // trace
-    tb_trace_d("clos: try: %s: %s", tb_url_get(&impl->option.url), ok? "ok" : "no");
+    tb_trace_d("clos: try: %s: %s", tb_url_cstr(&impl->option.url), ok? "ok" : "no");
 
     // ok?
     return ok;

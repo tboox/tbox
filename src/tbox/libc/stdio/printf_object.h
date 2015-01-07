@@ -88,7 +88,7 @@ typedef tb_long_t       (*tb_printf_object_func_t)(tb_cpointer_t object, tb_char
 
     // init ipv4
     tb_ipv4_t ipv4;
-    tb_ipv4_set_cstr(&ipv4, "127.0.0.1");
+    tb_ipv4_cstr_set(&ipv4, "127.0.0.1");
 
     // trace ipv4, output: "ipv4: 127.0.0.1"
     tb_trace_i("ipv4: %{ipv4}", &ipv4);

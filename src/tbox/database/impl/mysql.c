@@ -733,14 +733,14 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_impl_t* database)
     do
     {
         // the database host
-        host = tb_url_host_get(&database->url);
+        host = tb_url_host(&database->url);
         tb_assert_and_check_break(host);
 
         // the database port
-        port = tb_url_port_get(&database->url);
+        port = tb_url_port(&database->url);
 
         // the database args
-        tb_char_t const* args = tb_url_args_get(&database->url);
+        tb_char_t const* args = tb_url_args(&database->url);
         if (args)
         {
             // the args size
@@ -1586,7 +1586,7 @@ tb_size_t tb_database_mysql_probe(tb_url_ref_t url)
     do
     {
         // the url arguments
-        tb_char_t const* args = tb_url_args_get(url);
+        tb_char_t const* args = tb_url_args(url);
         if (args)
         {
             // find the database type
@@ -1600,16 +1600,16 @@ tb_size_t tb_database_mysql_probe(tb_url_ref_t url)
         }
 
         // the database port, the default port: 3306 
-        if (tb_url_port_get(url) == 3306) score += 20;
+        if (tb_url_port(url) == 3306) score += 20;
 
         // is sql url? 
-        if (tb_url_protocol_get(url) == TB_URL_PROTOCOL_SQL) 
+        if (tb_url_protocol(url) == TB_URL_PROTOCOL_SQL) 
             score += 5;
 
     } while (0);
 
     // trace
-    tb_trace_d("probe: %s, score: %lu", tb_url_get((tb_url_ref_t)url), score);
+    tb_trace_d("probe: %s, score: %lu", tb_url_cstr((tb_url_ref_t)url), score);
 
     // ok?
     return score;

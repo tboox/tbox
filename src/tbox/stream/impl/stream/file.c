@@ -69,7 +69,7 @@ static tb_bool_t tb_stream_file_impl_open(tb_stream_ref_t stream)
     tb_check_return_val(!impl->file, tb_true);
 
     // url
-    tb_char_t const* url = tb_url_get(tb_stream_url(stream));
+    tb_char_t const* url = tb_url_cstr(tb_stream_url(stream));
     tb_assert_and_check_return_val(url, tb_false);
 
     // open file

@@ -171,7 +171,7 @@ static tb_bool_t tb_async_stream_filter_impl_open_func(tb_async_stream_ref_t str
     tb_assert_and_check_return_val(impl && impl->func.open, tb_false);
 
     // trace
-    tb_trace_d("open: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("open: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // open done
     return tb_async_stream_open_func((tb_async_stream_ref_t)impl, state, impl->func.open, impl->priv);
@@ -248,7 +248,7 @@ static tb_bool_t tb_async_stream_filter_impl_sync_read_func(tb_async_stream_ref_
     tb_assert_and_check_return_val(impl && impl->func.read, tb_false);
 
     // trace
-    tb_trace_d("sync_read: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("sync_read: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // killed or failed?
     if (state != TB_STATE_OK && state != TB_STATE_CLOSED)
@@ -297,7 +297,7 @@ static tb_bool_t tb_async_stream_filter_impl_read_func(tb_async_stream_ref_t str
     tb_assert_and_check_return_val(impl && impl->func.read, tb_false);
 
     // trace
-    tb_trace_d("read: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("read: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // done filter
     tb_bool_t ok = tb_false;
@@ -406,7 +406,7 @@ static tb_bool_t tb_async_stream_filter_impl_writ_func(tb_async_stream_ref_t str
     tb_assert_and_check_return_val(impl && impl->func.writ, tb_false);
 
     // trace
-    tb_trace_d("writ: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("writ: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // save offset
     if (real) tb_atomic64_fetch_and_add(&impl->offset, real);
@@ -466,7 +466,7 @@ static tb_bool_t tb_async_stream_filter_impl_sync_func(tb_async_stream_ref_t str
     tb_assert_and_check_return_val(impl && impl->func.sync, tb_false);
 
     // trace
-    tb_trace_d("sync: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("sync: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // done func
     return impl->func.sync((tb_async_stream_ref_t)impl, state, bclosing, impl->priv);
@@ -481,7 +481,7 @@ static tb_bool_t tb_async_stream_filter_impl_writ_sync_func(tb_async_stream_ref_
     tb_assert_and_check_return_val(impl && impl->func.sync, tb_false);
 
     // trace
-    tb_trace_d("writ_sync: %s, state: %s", tb_url_get(tb_async_stream_url(stream)), tb_state_cstr(state));
+    tb_trace_d("writ_sync: %s, state: %s", tb_url_cstr(tb_async_stream_url(stream)), tb_state_cstr(state));
 
     // save offset
     if (real) tb_atomic64_fetch_and_add(&impl->offset, real);
@@ -530,7 +530,7 @@ static tb_bool_t tb_async_stream_filter_impl_sync(tb_async_stream_ref_t stream, 
     if (impl->filter)
     {
         // trace
-        tb_trace_d("sync: spak: %s", tb_url_get(tb_async_stream_url(stream)));
+        tb_trace_d("sync: spak: %s", tb_url_cstr(tb_async_stream_url(stream)));
 
         // spak the filter
         tb_byte_t const*    data = tb_null;

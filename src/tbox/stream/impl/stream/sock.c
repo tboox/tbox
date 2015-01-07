@@ -76,9 +76,6 @@ typedef struct __tb_stream_sock_impl_t
     // the writ size
     tb_size_t               writ;
     
-    // the host address
-    tb_ipv4_t               addr;
-
 }tb_stream_sock_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -113,7 +110,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
 
 #ifndef TB_SSL_ENABLE
     // ssl? not supported
-    if (tb_url_ssl_get(url))
+    if (tb_url_ssl(url))
     {
         // trace
         tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
@@ -124,34 +121,34 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     }
 #endif
 
-    // port
-    tb_uint16_t port = tb_url_port_get(url);
+    // get address from the url
+    tb_addr_ref_t addr = tb_url_addr(url);
+    tb_assert_and_check_return_val(addr, tb_false);
+
+    // get the port
+    tb_uint16_t port = tb_addr_port(addr);
     tb_assert_and_check_return_val(port, tb_false);
 
-    // ipv4
-    if (!impl->addr.u32)
+    // no ip?
+    if (tb_addr_ip_is_empty(addr))
     {
-        // try to get the ipv4 address from url
-        tb_ipv4_ref_t ipv4 = tb_url_ipv4_get(url);
-        if (ipv4 && ipv4->u32) impl->addr = *ipv4;
-        else
+        // look ip 
+        tb_addr_t ip_addr;
+        if (!tb_dns_looker_done(tb_url_host(url), &ip_addr)) 
         {
-            // look addr
-            if (!tb_dns_looker_done(tb_url_host_get(url), &impl->addr)) 
-            {
-                tb_stream_state_set(stream, TB_STATE_SOCK_DNS_FAILED);
-                return tb_false;
-            }
-
-            // save addr
-            tb_url_ipv4_set(url, &impl->addr);
+            // failed
+            tb_stream_state_set(stream, TB_STATE_SOCK_DNS_FAILED);
+            return tb_false;
         }
 
-        // tcp or udp? for url: sock://ip:port/?udp=
-        tb_char_t const* args = tb_url_args_get(url);
-        if (args && !tb_strnicmp(args, "udp=", 4)) impl->type = TB_SOCKET_TYPE_UDP;
-        else if (args && !tb_strnicmp(args, "tcp=", 4)) impl->type = TB_SOCKET_TYPE_TCP;
+        // update address to the url
+        tb_addr_ip_set(addr, &ip_addr);
     }
+
+    // tcp or udp? for url: sock://ip:port/?udp=
+    tb_char_t const* args = tb_url_args(url);
+    if (args && !tb_strnicmp(args, "udp=", 4)) impl->type = TB_SOCKET_TYPE_UDP;
+    else if (args && !tb_strnicmp(args, "tcp=", 4)) impl->type = TB_SOCKET_TYPE_TCP;
 
     // make sock
     impl->sock = tb_socket_init(impl->type);
@@ -174,13 +171,14 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     case TB_SOCKET_TYPE_TCP:
         {
             // trace
-            tb_trace_d("connect: %s[%{ipv4}]:%u: ..", tb_url_host_get(url), &impl->addr, port);
+            tb_trace_d("connect: %s[%{addr}]: ..", tb_url_host(url), addr);
 
             // connect it
             tb_long_t real = -1;
-            while (     !(real = tb_socket_connect(impl->sock, &impl->addr, port))
+            while (     !(real = tb_socket_connect(impl->sock, addr))
                     &&  !tb_stream_is_killed(stream))
             {
+                // wait it
                 real = tb_aioo_wait(impl->sock, TB_AIOE_CODE_CONN, tb_stream_timeout(stream));
                 tb_check_break(real > 0);
             }
@@ -200,7 +198,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
             if (ok)
             {
                 // ssl? init it
-                if (tb_url_ssl_get(url))
+                if (tb_url_ssl(url))
                 {
 #ifdef TB_SSL_ENABLE
                     // done
@@ -238,7 +236,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     case TB_SOCKET_TYPE_UDP:
         {
             // ssl? not supported
-            if (tb_url_ssl_get(url))
+            if (tb_url_ssl(url))
             {
                 // trace
                 tb_trace_w("udp ssl is not supported!");
@@ -255,7 +253,10 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
         }
         break;
     default:
-        tb_trace_e("unknown socket type: %lu", impl->type);
+        {
+            // trace
+            tb_trace_e("unknown socket type: %lu", impl->type);
+        }
         break;
     }
 
@@ -270,7 +271,7 @@ static tb_bool_t tb_stream_sock_impl_clos(tb_stream_ref_t stream)
 
 #ifdef TB_SSL_ENABLE
     // close ssl
-    if (tb_url_ssl_get(tb_stream_url(stream)) && impl->hssl)
+    if (tb_url_ssl(tb_stream_url(stream)) && impl->hssl)
         tb_ssl_clos(impl->hssl);
 #endif
 
@@ -286,7 +287,6 @@ static tb_bool_t tb_stream_sock_impl_clos(tb_stream_ref_t stream)
     impl->tryn = 0;
     impl->read = 0;
     impl->writ = 0;
-    tb_ipv4_clear(&impl->addr);
 
     // ok
     return tb_true;
@@ -312,7 +312,6 @@ static tb_void_t tb_stream_sock_impl_exit(tb_stream_ref_t stream)
     impl->tryn = 0;
     impl->read = 0;
     impl->writ = 0;
-    tb_ipv4_clear(&impl->addr);
 }
 static tb_void_t tb_stream_sock_impl_kill(tb_stream_ref_t stream)
 {
@@ -348,7 +347,7 @@ static tb_long_t tb_stream_sock_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(url))
+            if (tb_url_ssl(url))
             {
                 // check
                 tb_assert_and_check_return_val(impl->hssl, -1);
@@ -384,15 +383,8 @@ static tb_long_t tb_stream_sock_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
         break;
     case TB_SOCKET_TYPE_UDP:
         {
-            // port
-            tb_uint16_t port = tb_url_port_get(url);
-            tb_assert_and_check_return_val(port, -1);
-
-            // ipv4
-            tb_assert_and_check_return_val(impl->addr.u32, -1);
-
             // read data
-            real = tb_socket_urecv(impl->sock, tb_null, 0, data, size);
+            real = tb_socket_urecv(impl->sock, tb_null, data, size);
 
             // trace
             tb_trace_d("read: %ld <? %lu", real, size);
@@ -442,7 +434,7 @@ static tb_long_t tb_stream_sock_impl_writ(tb_stream_ref_t stream, tb_byte_t cons
         {
 #ifdef TB_SSL_ENABLE
             // ssl?
-            if (tb_url_ssl_get(url))
+            if (tb_url_ssl(url))
             {
                 // check
                 tb_assert_and_check_return_val(impl->hssl, -1);
@@ -478,15 +470,12 @@ static tb_long_t tb_stream_sock_impl_writ(tb_stream_ref_t stream, tb_byte_t cons
         break;
     case TB_SOCKET_TYPE_UDP:
         {
-            // port
-            tb_uint16_t port = tb_url_port_get(url);
-            tb_assert_and_check_return_val(port, -1);
-
-            // ipv4
-            tb_assert_and_check_return_val(impl->addr.u32, -1);
+            // get address from the url
+            tb_addr_ref_t addr = tb_url_addr(url);
+            tb_assert_and_check_return_val(addr, -1);
 
             // writ data
-            real = tb_socket_usend(impl->sock, &impl->addr, port, data, size);
+            real = tb_socket_usend(impl->sock, addr, data, size);
 
             // trace
             tb_trace_d("writ: %ld <? %lu", real, size);
@@ -524,7 +513,7 @@ static tb_long_t tb_stream_sock_impl_wait(tb_stream_ref_t stream, tb_size_t wait
 
 #ifdef TB_SSL_ENABLE
     // ssl?
-    if (tb_url_ssl_get(tb_stream_url(stream)))
+    if (tb_url_ssl(tb_stream_url(stream)))
     {
         // check
         tb_assert_and_check_return_val(impl->hssl, -1);
