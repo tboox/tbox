@@ -23,7 +23,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
     do
     {
         // init sock
-        sock = tb_socket_init(TB_SOCKET_TYPE_TCP);
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4);
         tb_assert_and_check_break(sock);
 
         // init file

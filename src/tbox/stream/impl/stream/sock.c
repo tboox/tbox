@@ -151,7 +151,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     else if (args && !tb_strnicmp(args, "tcp=", 4)) impl->type = TB_SOCKET_TYPE_TCP;
 
     // make sock
-    impl->sock = tb_socket_init(impl->type);
+    impl->sock = tb_socket_init(impl->type, tb_addr_family(addr));
     
     // open sock failed?
     if (!impl->sock)

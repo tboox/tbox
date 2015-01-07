@@ -798,7 +798,7 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
         tb_assert_and_check_break(httpd->aico);
 
         // open aico
-        if (!tb_aico_open_sock_from_type(httpd->aico, TB_SOCKET_TYPE_TCP)) break;
+        if (!tb_aico_open_sock_from_type(httpd->aico, TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4)) break;
 
         // bind port
         if (!tb_socket_bind(tb_aico_sock(httpd->aico), tb_null, httpd->port)) break;

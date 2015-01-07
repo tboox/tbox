@@ -189,53 +189,7 @@ tb_bool_t tb_socket_context_init()
 tb_void_t tb_socket_context_exit()
 {
 }
-tb_socket_ref_t tb_socket_init(tb_size_t type)
-{
-    // check
-    tb_assert_and_check_return_val(type, tb_null);
-    
-    // init type & protocol
-    tb_int_t t = 0;
-    tb_int_t p = 0;
-    switch (type)
-    {
-    case TB_SOCKET_TYPE_TCP:
-        {
-            t = SOCK_STREAM;
-            p = IPPROTO_TCP;
-        }
-        break;
-    case TB_SOCKET_TYPE_UDP:
-        {
-            t = SOCK_DGRAM;
-            p = IPPROTO_UDP;
-        }
-        break;
-    default:
-        return tb_null;
-    }
-
-    // sock
-    tb_int_t fd = socket(AF_INET, t, p);
-    tb_assert_and_check_return_val(fd >= 0, tb_null);
-
-    // non-block
-    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
- 
-#if 0
-    int n = 0;
-    int a = sizeof(n);
-    getsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char *)&n, &a);
-    tb_trace_i("n: %d", n);
-#endif
-
-    // trace
-    tb_trace_d("open: %p", tb_fd2sock(fd));
-
-    // ok
-    return tb_fd2sock(fd);
-}
-tb_socket_ref_t tb_socket_init2(tb_size_t type, tb_size_t family)
+tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
 {
     // check
     tb_assert_and_check_return_val(type, tb_null);

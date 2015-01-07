@@ -102,7 +102,7 @@ tb_bool_t tb_aico_open_sock(tb_aico_ref_t aico, tb_socket_ref_t sock)
     // ok?
     return ok;
 }
-tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type)
+tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type, tb_size_t family)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
@@ -119,7 +119,7 @@ tb_bool_t tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type)
         tb_assert_and_check_break(!impl->type && !impl->handle);
 
         // init sock
-        sock = tb_socket_init(type);
+        sock = tb_socket_init(type, family);
         tb_assert_and_check_break(sock);
 
         // bind type and handle

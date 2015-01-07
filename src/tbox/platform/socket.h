@@ -76,19 +76,11 @@ typedef enum __tb_socket_ctrl_e
 /*! init socket
  *
  * @param type      the socket type
- *
- * @return          the socket 
- */
-tb_socket_ref_t     tb_socket_init(tb_size_t type);
-
-/*! init socket
- *
- * @param type      the socket type
  * @param family    the address family, default: ipv4
  *
  * @return          the socket 
  */
-tb_socket_ref_t     tb_socket_init2(tb_size_t type, tb_size_t family);
+tb_socket_ref_t     tb_socket_init(tb_size_t type, tb_size_t family);
 
 /*! exit socket
  *
