@@ -272,6 +272,7 @@ tb_void_t tb_addr_set_family(tb_addr_ref_t addr, tb_size_t family)
             tb_assert_abort(0);
         }
     }
+    else addr->family = family;
 }
 tb_uint16_t tb_addr_port(tb_addr_ref_t addr)
 {
