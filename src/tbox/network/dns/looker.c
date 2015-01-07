@@ -549,7 +549,7 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
         if (!tb_static_buffer_init(&impl->rpkt, impl->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) break;
 
         // init sock
-        impl->sock = tb_socket_init2(TB_SOCKET_TYPE_UDP, TB_ADDR_FAMILY_IPV4);
+        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, TB_ADDR_FAMILY_IPV4);
         tb_assert_and_check_break(impl->sock);
 
         // init itor

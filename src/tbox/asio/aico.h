@@ -130,10 +130,11 @@ tb_bool_t           tb_aico_open_sock(tb_aico_ref_t aico, tb_socket_ref_t sock);
  *
  * @param aicp      the aicp
  * @param type      the socket type
+ * @param family    the address family, default: ipv4
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type);
+tb_bool_t           tb_aico_open_sock_from_type(tb_aico_ref_t aico, tb_size_t type, tb_size_t family);
 
 /*! open the file aico
  *

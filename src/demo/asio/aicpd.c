@@ -353,7 +353,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(aico);
 
         // open sock aico
-        if (!tb_aico_open_sock_from_type(aico, TB_SOCKET_TYPE_TCP)) break;
+        if (!tb_aico_open_sock_from_type(aico, TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4)) break;
 
         // bind port
         if (!tb_socket_bind(tb_aico_sock(aico), tb_null, 9090)) break;

@@ -548,7 +548,7 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long
         tb_assert_and_check_return_val(impl->aico, tb_false);
 
         // open aico
-        if (!tb_aico_open_sock_from_type(impl->aico, TB_SOCKET_TYPE_UDP)) return tb_false;
+        if (!tb_aico_open_sock_from_type(impl->aico, TB_SOCKET_TYPE_UDP, tb_addr_family(server))) return tb_false;
 
         // init timeout
         tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_SEND, timeout);

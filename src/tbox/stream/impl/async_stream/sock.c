@@ -375,7 +375,7 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
             tb_assert_and_check_break(impl->aico);
 
             // open aico
-            if (!tb_aico_open_sock_from_type(impl->aico, impl->type))
+            if (!tb_aico_open_sock_from_type(impl->aico, impl->type, tb_addr_family(addr)))
             {
                 // trace
                 tb_trace_e("open sock failed!");
