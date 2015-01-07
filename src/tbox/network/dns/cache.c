@@ -217,7 +217,7 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_addr_ref_t addr)
         g_cache.times += caddr->time;
 
         // save address
-        *addr = caddr->addr;
+        tb_addr_copy(addr, &caddr->addr);
 
         // ok
         ok = tb_true;
@@ -243,8 +243,8 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_addr_ref_t addr)
 
     // init addr
     tb_dns_cache_addr_t caddr;
-    caddr.addr = *addr;
     caddr.time = tb_dns_cache_now();
+    tb_addr_copy(&caddr.addr, addr);
 
     // enter
     tb_spinlock_enter(&g_lock);

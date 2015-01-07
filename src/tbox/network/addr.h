@@ -87,6 +87,13 @@ typedef struct __tb_addr_t
  */
 tb_void_t           tb_addr_clear(tb_addr_ref_t addr);
 
+/*! copy address, faster than *addr = *other
+ *
+ * @param addr      the address
+ * @param copied    the copied address
+ */
+tb_void_t           tb_addr_copy(tb_addr_ref_t addr, tb_addr_ref_t copied);
+
 /*! is empty?
  *
  * @param addr      the address

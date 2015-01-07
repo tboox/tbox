@@ -843,7 +843,8 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_ref_t aice)
         tb_assert_and_check_break(aice->u.acpt.aico);
 
         // trace
-        tb_trace_d("acpt[%p]: aico: %p, addr: %{ipv4}, port: %u", aice->aico, aice->u.acpt.aico, &aice->u.acpt.addr, aice->u.acpt.port);
+        tb_trace_d("acpt[%p]: aico: %p, addr: %{addr}", aice->aico, aice->u.acpt.aico, &aice->u.acpt.addr);
+
 #if 1
         // init the session
         session = tb_demo_httpd_session_init(httpd, aice->u.acpt.aico);

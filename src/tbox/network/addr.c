@@ -75,6 +75,21 @@ tb_void_t tb_addr_clear(tb_addr_ref_t addr)
     // clear it
     tb_memset(addr, 0, sizeof(tb_addr_t));
 }
+tb_void_t tb_addr_copy(tb_addr_ref_t addr, tb_addr_ref_t copied)
+{
+    // check
+    tb_assert_and_check_return(addr && copied);
+
+    // attempt to copy ipv4 fastly
+    if (copied->family == TB_ADDR_FAMILY_IPV4)
+    {
+        addr->port      = copied->port;
+        addr->family    = TB_ADDR_FAMILY_IPV4;
+        addr->u.ipv4    = copied->u.ipv4;
+    }
+    // copy it
+    else *addr = *copied;
+}
 tb_bool_t tb_addr_is_empty(tb_addr_ref_t addr)
 {
     // check

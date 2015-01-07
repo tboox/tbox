@@ -47,8 +47,8 @@ __tb_extern_c_enter__
 #define tb_aico_usend(aico, addr, data, size, func, priv)                       tb_aico_usend_(aico, addr, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_recvv(aico, list, size, func, priv)                             tb_aico_recvv_(aico, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_sendv(aico, list, size, func, priv)                             tb_aico_sendv_(aico, list, size, func, priv __tb_debug_vals__)
-#define tb_aico_urecvv(aico, addr, port, list, size, func, priv)                tb_aico_urecvv_(aico, addr, port, list, size, func, priv __tb_debug_vals__)
-#define tb_aico_usendv(aico, addr, port, list, size, func, priv)                tb_aico_usendv_(aico, addr, port, list, size, func, priv __tb_debug_vals__)
+#define tb_aico_urecvv(aico, addr, list, size, func, priv)                      tb_aico_urecvv_(aico, addr, list, size, func, priv __tb_debug_vals__)
+#define tb_aico_usendv(aico, addr, list, size, func, priv)                      tb_aico_usendv_(aico, addr, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_sendf(aico, file, seek, size, func, priv)                       tb_aico_sendf_(aico, file, seek, size, func, priv __tb_debug_vals__)
 #define tb_aico_read(aico, seek, data, size, func, priv)                        tb_aico_read_(aico, seek, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_writ(aico, seek, data, size, func, priv)                        tb_aico_writ_(aico, seek, data, size, func, priv __tb_debug_vals__)
@@ -65,8 +65,8 @@ __tb_extern_c_enter__
 #define tb_aico_usend_after(aico, delay, addr, data, size, func, priv)          tb_aico_usend_after_(aico, delay, addr, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_recvv_after(aico, delay, list, size, func, priv)                tb_aico_recvv_after_(aico, delay, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_sendv_after(aico, delay, list, size, func, priv)                tb_aico_sendv_after_(aico, delay, list, size, func, priv __tb_debug_vals__)
-#define tb_aico_urecvv_after(aico, delay, addr, port, list, size, func, priv)   tb_aico_urecvv_after_(aico, delay, addr, port, list, size, func, priv __tb_debug_vals__)
-#define tb_aico_usendv_after(aico, delay, addr, port, list, size, func, priv)   tb_aico_usendv_after_(aico, delay, addr, port, list, size, func, priv __tb_debug_vals__)
+#define tb_aico_urecvv_after(aico, delay, addr, list, size, func, priv)         tb_aico_urecvv_after_(aico, delay, addr, list, size, func, priv __tb_debug_vals__)
+#define tb_aico_usendv_after(aico, delay, addr, list, size, func, priv)         tb_aico_usendv_after_(aico, delay, addr, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_sendf_after(aico, delay, file, seek, size, func, priv)          tb_aico_sendf_after_(aico, delay, file, seek, size, func, priv __tb_debug_vals__)
 #define tb_aico_read_after(aico, delay, seek, data, size, func, priv)           tb_aico_read_after_(aico, delay, seek, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_writ_after(aico, delay, seek, data, size, func, priv)           tb_aico_writ_after_(aico, delay, seek, data, size, func, priv __tb_debug_vals__)
@@ -340,7 +340,6 @@ tb_bool_t           tb_aico_sendv_(tb_aico_ref_t aico, tb_iovec_t const* list, t
  *
  * @param aico      the aico
  * @param addr      the addr
- * @param port      the port
  * @param list      the list
  * @param size      the size
  * @param func      the callback func
@@ -348,13 +347,12 @@ tb_bool_t           tb_aico_sendv_(tb_aico_ref_t aico, tb_iovec_t const* list, t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aico_urecvv_(tb_aico_ref_t aico, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+tb_bool_t           tb_aico_urecvv_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the usendv for sock
  *
  * @param aico      the aico
  * @param addr      the addr
- * @param port      the port
  * @param list      the list
  * @param size      the size
  * @param func      the callback func
@@ -362,7 +360,7 @@ tb_bool_t           tb_aico_urecvv_(tb_aico_ref_t aico, tb_ipv4_ref_t addr, tb_u
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aico_usendv_(tb_aico_ref_t aico, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+tb_bool_t           tb_aico_usendv_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the sendfile for sock
  *
@@ -557,7 +555,6 @@ tb_bool_t           tb_aico_sendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb
  * @param aico      the aico
  * @param delay     the delay time, ms
  * @param addr      the addr
- * @param port      the port
  * @param list      the list
  * @param size      the size
  * @param func      the callback func
@@ -565,14 +562,13 @@ tb_bool_t           tb_aico_sendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aico_urecvv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+tb_bool_t           tb_aico_urecvv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the usendv for sock after the delay time
  *
  * @param aico      the aico
  * @param delay     the delay time, ms
  * @param addr      the addr
- * @param port      the port
  * @param list      the list
  * @param size      the size
  * @param func      the callback func
@@ -580,7 +576,7 @@ tb_bool_t           tb_aico_urecvv_after_(tb_aico_ref_t aico, tb_size_t delay, t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_aico_usendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipv4_ref_t addr, tb_uint16_t port, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
+tb_bool_t           tb_aico_usendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__);
 
 /*! post the sendfile for sock after the delay time
  *
