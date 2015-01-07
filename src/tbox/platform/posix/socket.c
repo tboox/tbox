@@ -110,9 +110,6 @@ static tb_size_t tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref
     // check
     tb_assert_and_check_return_val(saddr && addr, 0);
 
-    // check address
-    tb_assert_abort(!tb_addr_is_empty(addr));
-
     // clear address
     tb_memset(saddr, 0, sizeof(struct sockaddr_storage));
 
@@ -129,7 +126,7 @@ static tb_size_t tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref
             addr4->sin_family = AF_INET;
 
             // save ipv4
-            addr4->sin_addr.s_addr = addr->u.ipv4.u32;
+            addr4->sin_addr.s_addr = tb_addr_ip_is_empty(addr)? INADDR_ANY : addr->u.ipv4.u32;
 
             // save port
             addr4->sin_port = tb_bits_ne_to_be_u16(tb_addr_port(addr));
@@ -151,7 +148,8 @@ static tb_size_t tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref
             addr6->sin6_family = AF_INET6;
 
             // save ipv6
-            tb_memcpy(addr6->sin6_addr.s6_addr, addr->u.ipv6.u8, sizeof(addr6->sin6_addr.s6_addr));
+            if (tb_addr_ip_is_empty(addr)) addr6->sin6_addr = in6addr_any;
+            else tb_memcpy(addr6->sin6_addr.s6_addr, addr->u.ipv6.u8, sizeof(addr6->sin6_addr.s6_addr));
 
             // save port
             addr6->sin6_port = tb_bits_ne_to_be_u16(tb_addr_port(addr));
@@ -406,6 +404,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock && addr, -1);
+    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;
@@ -424,20 +423,18 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr)
     // error
     return -1;
 }
-tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port)
+tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
 {
     // check
-    tb_assert_and_check_return_val(sock, 0);
+    tb_assert_and_check_return_val(sock && addr, tb_false);
 
-    // init
-    struct sockaddr_in d = {0};
-    d.sin_family = AF_INET;
-    d.sin_port = tb_bits_ne_to_be_u16(port);
-    d.sin_addr.s_addr = (addr && addr->u32)? addr->u32 : INADDR_ANY;
+    // load addr
+    tb_int_t                n = 0;
+	struct sockaddr_storage d = {0};
+    if (!(n = (tb_int_t)tb_socket_addr_load(&d, addr))) return tb_false;
 
     // reuse addr
 #ifdef SO_REUSEADDR
-    //if (addr && addr->u32)
     {
         tb_int_t reuseaddr = 1;
         if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
@@ -447,27 +444,16 @@ tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t p
 
     // reuse port
 #ifdef SO_REUSEPORT
-    if (port)
+    if (tb_addr_port(addr))
     {
         tb_int_t reuseport = 1;
         if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
-            tb_trace_e("reuseport: %lu failed", port);
+            tb_trace_e("reuseport: %u failed", tb_addr_port(addr));
     }
 #endif
 
     // bind 
-    if (bind(tb_sock2fd(sock), (struct sockaddr *)&d, sizeof(d)) < 0) return 0;
-    
-    // bind one random port? get the bound port
-    if (!port)
-    {
-        tb_int_t n = sizeof(d);
-        if (getsockname(tb_sock2fd(sock), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return 0;
-        port = tb_bits_be_to_ne_u16(d.sin_port);
-    }
-
-    // ok?
-    return port;
+    return !bind(tb_sock2fd(sock), (struct sockaddr *)&d, n);
 }
 tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
 {
@@ -559,7 +545,7 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     tb_trace_d("clos: %p", sock);
 
     // close it
-    tb_bool_t ok = !close(tb_sock2fd(sock))? tb_true : tb_false;
+    tb_bool_t ok = !close(tb_sock2fd(sock));
     
     // failed?
     if (!ok)
@@ -735,6 +721,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t co
 {
     // check
     tb_assert_and_check_return_val(sock && addr && data, -1);
+    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
 
     // no size?
     tb_check_return_val(size, 0);
@@ -795,6 +782,7 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t 
 {
     // check
     tb_assert_and_check_return_val(sock && addr && list && size, -1);
+    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;

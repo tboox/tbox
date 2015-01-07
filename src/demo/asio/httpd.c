@@ -800,8 +800,12 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
         // open aico
         if (!tb_aico_open_sock_from_type(httpd->aico, TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4)) break;
 
+        // init addr
+        tb_addr_t addr;
+        tb_addr_set(&addr, tb_null, httpd->port, TB_ADDR_FAMILY_IPV4);
+
         // bind port
-        if (!tb_socket_bind(tb_aico_sock(httpd->aico), tb_null, httpd->port)) break;
+        if (!tb_socket_bind(tb_aico_sock(httpd->aico), &addr)) break;
 
         // listen sock
         if (!tb_socket_listen(tb_aico_sock(httpd->aico), TB_DEMO_HTTPD_SESSION_MAXN >> 2)) break;

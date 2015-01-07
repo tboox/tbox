@@ -117,13 +117,16 @@ tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr);
 
 /*! bind socket
  *
- * @param sock      the socket 
- * @param addr      the addr
- * @param port      the bind port, bind a random port if port == 0
+ * you can call tb_socket_local for the bound address
  *
- * @return          the bound port, failed: 0
+ * @param sock      the socket 
+ * @param addr      the address
+ *                  - bind any port if port == 0
+ *                  - bind any ip address if ip is empty
+ *
+ * @return          tb_true or tb_false
  */
-tb_size_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipv4_ref_t addr, tb_uint16_t port);
+tb_bool_t           tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr);
 
 /*! listen socket
  *
