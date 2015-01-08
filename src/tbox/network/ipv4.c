@@ -112,15 +112,15 @@ tb_bool_t tb_ipv4_cstr_set(tb_ipv4_ref_t ipv4, tb_char_t const* cstr)
             tb_trace_d("invalid addr: %s", cstr);
 
             // clear it
-            r = 0;
+            i = 0;
             break;
         }
 
     } while (c);
 
     // save it if ok
-    if (r && ipv4) ipv4->u32 = r;
+    if (ipv4) ipv4->u32 = r;
 
     // ok?
-    return (tb_bool_t)r;
+    return i == 4;
 }

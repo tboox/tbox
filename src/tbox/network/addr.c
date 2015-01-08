@@ -90,8 +90,8 @@ tb_void_t tb_addr_copy(tb_addr_ref_t addr, tb_addr_ref_t copied)
     else if (copied->family == TB_ADDR_FAMILY_IPV4)
     {
         addr->port      = copied->port;
+        addr->have_ip   = 1;
         addr->family    = TB_ADDR_FAMILY_IPV4;
-        addr->have_ip   = copied->have_ip;
         addr->u.ipv4    = copied->u.ipv4;
     }
     // copy it
@@ -143,34 +143,8 @@ tb_bool_t tb_addr_ip_is_empty(tb_addr_ref_t addr)
     // check
     tb_assert_and_check_return_val(addr, tb_true);
 
-    // no ip?
-    if (!addr->have_ip) return tb_true;
-
-    // analyze ip
-    tb_bool_t is_empty = tb_true;
-    switch (addr->family)
-    {
-    case TB_ADDR_FAMILY_IPV4:
-        {
-            // ipv4 is empty?
-            is_empty = tb_ipv4_is_empty(&addr->u.ipv4);
-        }
-        break;
-    case TB_ADDR_FAMILY_IPV6:
-        {
-            // ipv6 is empty?
-            is_empty = tb_ipv6_is_empty(&addr->u.ipv6);
-        }
-        break;
-    default:
-        break;
-    }
-
-    // clear state if be empty
-    if (is_empty) addr->have_ip = 0;
-
     // is empty?
-    return is_empty;
+    return !addr->have_ip;
 }
 tb_bool_t tb_addr_ip_is_equal(tb_addr_ref_t addr, tb_addr_ref_t other)
 {
@@ -222,10 +196,40 @@ tb_char_t const* tb_addr_ip_cstr(tb_addr_ref_t addr, tb_char_t* data, tb_size_t 
     switch (addr->family)
     {
     case TB_ADDR_FAMILY_IPV4:
-        cstr = tb_ipv4_cstr(&addr->u.ipv4, data, maxn);
+        {
+            // make ipv4 cstr
+            if (addr->have_ip) cstr = tb_ipv4_cstr(&addr->u.ipv4, data, maxn);
+            else 
+            {
+                // check
+                tb_assert_abort(maxn >= TB_IPV4_CSTR_MAXN);
+
+                // make empty cstr
+                tb_long_t size = tb_snprintf(data, maxn - 1, "0.0.0.0");
+                if (size >= 0) data[size] = '\0';
+
+                // ok
+                cstr = data;
+            }
+        }
         break;
     case TB_ADDR_FAMILY_IPV6:
-        cstr = tb_ipv6_cstr(&addr->u.ipv6, data, maxn);
+        {
+            // make ipv6 cstr
+            if (addr->have_ip) cstr = tb_ipv6_cstr(&addr->u.ipv6, data, maxn);
+            else
+            {
+                // check
+                tb_assert_abort(maxn >= TB_IPV6_CSTR_MAXN);
+
+                // make empty cstr
+                tb_long_t size = tb_snprintf(data, maxn - 1, "::");
+                if (size >= 0) data[size] = '\0';
+
+                // ok
+                cstr = data;
+            }
+        }
         break;
     default:
         tb_assert_abort(0);
@@ -238,7 +242,7 @@ tb_char_t const* tb_addr_ip_cstr(tb_addr_ref_t addr, tb_char_t* data, tb_size_t 
 tb_bool_t tb_addr_ip_cstr_set(tb_addr_ref_t addr, tb_char_t const* cstr, tb_uint8_t family)
 {
     // no ip? clear it fastly
-    if (!cstr || !family)
+    if (!cstr)
     {
         // check
         tb_assert_abort(addr);
@@ -288,7 +292,7 @@ tb_bool_t tb_addr_ip_cstr_set(tb_addr_ref_t addr, tb_char_t const* cstr, tb_uint
         // save port
         temp.port = addr->port;
 
-        // exist ip
+        // have ip?
         temp.have_ip = 1;
 
         // save addr
@@ -341,6 +345,9 @@ tb_ipv4_ref_t tb_addr_ipv4(tb_addr_ref_t addr)
     // check
     tb_assert_and_check_return_val(addr, tb_null);
 
+    // no ip?
+    tb_check_return_val(addr->have_ip, tb_null);
+
     // done
     tb_ipv4_ref_t ipv4 = tb_null;
     switch (addr->family)
@@ -388,6 +395,9 @@ tb_ipv6_ref_t tb_addr_ipv6(tb_addr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(addr, tb_null);
+
+    // no ip?
+    tb_check_return_val(addr->have_ip, tb_null);
 
     // done
     tb_ipv6_ref_t ipv6 = tb_null;

@@ -320,7 +320,7 @@ tbox_C_FILES 			+= \
 						stream/impl/async_stream/prefix \
 						stream/async_transfer \
 						stream/transfer_pool \
-						platform/aicp
+ 						platform/aicp
 
 tbox_C_FILES-$(OPENSSL) += \
 						asio/ssl 
@@ -398,6 +398,7 @@ tbox_C_FILES-$(ANDROID) += \
 
 # windows
 tbox_C_FILES-$(MSVC)$(MINGW)$(CYGWIN) += \
+						platform/windows/addr \
 						platform/windows/socket_pool \
 						platform/windows/interface/interface \
 						platform/windows/interface/user32 \

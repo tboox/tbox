@@ -75,14 +75,14 @@ tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t max
     tb_long_t size = tb_snprintf(   data
                                 ,   maxn - 1
                                 ,   "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x"
-                                ,   ipv6->u16[0]
-                                ,   ipv6->u16[1]
-                                ,   ipv6->u16[2]
-                                ,   ipv6->u16[3]
-                                ,   ipv6->u16[4]
-                                ,   ipv6->u16[5]
-                                ,   ipv6->u16[6]
-                                ,   ipv6->u16[7]);
+                                ,   tb_bits_swap_u16(ipv6->u16[0])
+                                ,   tb_bits_swap_u16(ipv6->u16[1])
+                                ,   tb_bits_swap_u16(ipv6->u16[2])
+                                ,   tb_bits_swap_u16(ipv6->u16[3])
+                                ,   tb_bits_swap_u16(ipv6->u16[4])
+                                ,   tb_bits_swap_u16(ipv6->u16[5])
+                                ,   tb_bits_swap_u16(ipv6->u16[6])
+                                ,   tb_bits_swap_u16(ipv6->u16[7]));
     if (size >= 0) data[size] = '\0';
 
     // ok
@@ -93,7 +93,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
     // check
     tb_assert_and_check_return_val(cstr, tb_false);
 
-    // is ipv4?
+    // ipv4: ::ffff:xxx.xxx.xxx.xxx?
     if (!tb_strnicmp(cstr, "::ffff:", 7))
     {
         // attempt to make ipv6 from ipv4
@@ -104,6 +104,23 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
             ipv6->u32[0] = 0;
             ipv6->u32[1] = 0;
             ipv6->u32[2] = 0xffff0000;
+            ipv6->u32[3] = ipv4.u32;
+
+            // ok
+            return tb_true;
+        }
+    }
+    // ipv4: ::xxx.xxx.xxx.xxx?
+    else if (!tb_strnicmp(cstr, "::", 2))
+    {
+        // attempt to make ipv6 from ipv4
+        tb_ipv4_t ipv4;
+        if (tb_ipv4_cstr_set(&ipv4, cstr + 2))
+        {
+            // make ipv6
+            ipv6->u32[0] = 0;
+            ipv6->u32[1] = 0;
+            ipv6->u32[2] = 0;
             ipv6->u32[3] = ipv4.u32;
 
             // ok
@@ -152,7 +169,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
         else if (c == ':' && *p == ':' && p[1] != ':' && !stub)
         {
             // save value
-            temp.u16[i++] = v;
+            temp.u16[i++] = tb_bits_swap_u16(v);
 
             // clear value
             v = 0;
@@ -187,7 +204,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
         else if (i < 8 && ((c == ':' && *p != ':') || !c) && v <= 0xffff && prev)
         {
             // save value
-            temp.u16[i++] = v;
+            temp.u16[i++] = tb_bits_swap_u16(v);
 
             // clear value
             v = 0;

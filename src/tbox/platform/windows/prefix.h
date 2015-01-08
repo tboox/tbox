@@ -29,6 +29,8 @@
 #include "../prefix.h"
 #include "../path.h"
 #include "../../libc/libc.h"
+#include "../../utils/utils.h"
+#include "../../network/addr.h"
 #include <winsock2.h>
 #include <mswsock.h>
 #include <windows.h>

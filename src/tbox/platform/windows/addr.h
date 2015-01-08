@@ -17,59 +17,46 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        prefix.h
- *
+ * @file        addr.h
  */
-#ifndef TB_PLATFORM_PREFIX_H
-#define TB_PLATFORM_PREFIX_H
+#ifndef TB_PLATFORM_WINDOWS_ADDR_H
+#define TB_PLATFORM_WINDOWS_ADDR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
+ * extern
  */
-
-// fd to file
-#define tb_fd2file(fd)              ((fd) >= 0? (tb_file_ref_t)((tb_long_t)(fd) + 1) : tb_null)
-
-// file to fd
-#define tb_file2fd(file)            (tb_int_t)((file)? (((tb_long_t)(file)) - 1) : -1)
-
-// fd to sock
-#define tb_fd2sock(fd)              ((fd) >= 0? (tb_socket_ref_t)((tb_long_t)(fd) + 1) : tb_null)
-
-// sock to fd
-#define tb_sock2fd(sock)            (tb_int_t)((sock)? (((tb_long_t)(sock)) - 1) : -1)
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
+ * interfaces
  */
 
-#ifdef TB_CONFIG_OS_WINDOWS
-/// the iovec type for WSASend, WSARecv using WSABUF
-typedef struct __tb_iovec_t
-{
-    /// the size
-    tb_size_t               size;
+/* save the native address to address
+ *
+ * @param addr      the address
+ * @param saddr     the native address
+ *
+ * @return          the native address size
+ */
+tb_size_t           tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage const* saddr);
 
-    /// the data
-    tb_byte_t*              data;
+/* load the address to native address
+ *
+ * @param saddr     the native address
+ * @param addr      the address
+ *
+ * @return          the native address size
+ */
+tb_size_t           tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref_t addr);
 
-}tb_iovec_t;
-#else
-/// the iovec type for readv, preadv, writv, pwritv, recvv, sendv
-typedef struct __tb_iovec_t
-{
-    /// the data
-    tb_byte_t*              data;
-
-    /// the size
-    tb_size_t               size;
-
-}tb_iovec_t;
-#endif
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
