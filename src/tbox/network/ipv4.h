@@ -54,6 +54,9 @@ typedef union __tb_ipv4_t
     /// u32, little-endian 
     tb_uint32_t     u32;
 
+    /// u16
+    tb_uint16_t     u16[2];
+
     /// u8
     tb_uint8_t      u8[4];
 

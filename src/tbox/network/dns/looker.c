@@ -666,21 +666,21 @@ tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_addr_ref_t addr)
     // try to lookup it from cache first
     if (tb_dns_cache_get(name, addr)) return tb_true;
 
-    // init impl
-    tb_handle_t impl = tb_dns_looker_init(name);
-    tb_check_return_val(impl, tb_false);
+    // init looker
+    tb_dns_looker_ref_t looker = tb_dns_looker_init(name);
+    tb_check_return_val(looker, tb_false);
 
     // spak
     tb_long_t r = -1;
-    while (!(r = tb_dns_looker_spak(impl, addr)))
+    while (!(r = tb_dns_looker_spak(looker, addr)))
     {
         // wait
-        r = tb_dns_looker_wait(impl, TB_DNS_LOOKER_TIMEOUT);
+        r = tb_dns_looker_wait(looker, TB_DNS_LOOKER_TIMEOUT);
         tb_assert_and_check_break(r >= 0);
     }
 
     // exit
-    tb_dns_looker_exit(impl);
+    tb_dns_looker_exit(looker);
 
     // ok
     return r > 0? tb_true : tb_false;

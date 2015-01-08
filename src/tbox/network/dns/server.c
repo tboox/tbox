@@ -109,9 +109,12 @@ static tb_long_t tb_dns_server_test(tb_addr_ref_t addr)
     tb_long_t           rate = -1;
     tb_socket_ref_t     sock = tb_null;
     do
-    {
+    { 
+        // trace
+        tb_trace_d("test: %{addr}: ..", addr);
+
         // init sock
-        sock = tb_socket_init(TB_SOCKET_TYPE_UDP, TB_ADDR_FAMILY_IPV4);
+        sock = tb_socket_init(TB_SOCKET_TYPE_UDP, tb_addr_family(addr));
         tb_assert_and_check_break(sock);
 
         // init stream

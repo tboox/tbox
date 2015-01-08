@@ -30,20 +30,4 @@
 #include "../../libc/libc.h"
 #include "../../utils/utils.h"
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// fd to file
-#define tb_fd2file(fd)              ((fd) >= 0? (tb_file_ref_t)((tb_long_t)(fd) + 1) : tb_null)
-
-// file to fd
-#define tb_file2fd(file)            (tb_int_t)((file)? (((tb_long_t)(file)) - 1) : -1)
-
-// fd to sock
-#define tb_fd2sock(fd)              ((fd) >= 0? (tb_socket_ref_t)((tb_long_t)(fd) + 1) : tb_null)
-
-// sock to fd
-#define tb_sock2fd(sock)            (tb_int_t)((sock)? (((tb_long_t)(sock)) - 1) : -1)
-
 #endif

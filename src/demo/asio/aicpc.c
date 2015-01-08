@@ -247,8 +247,12 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
         context.sock = tb_aico_init(aicp);
         tb_assert_and_check_break(context.sock);
 
+        // init addr
+        tb_addr_t addr; 
+        if (!tb_addr_set(&addr, "127.0.0.1", 9090, TB_ADDR_FAMILY_NONE)) break;
+
         // open sock aico
-        if (!tb_aico_open_sock_from_type(context.sock, TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4)) break;
+        if (!tb_aico_open_sock_from_type(context.sock, TB_SOCKET_TYPE_TCP, tb_addr_family(&addr))) break;
 
         // init file aico
         context.file = tb_aico_init(aicp);
@@ -259,10 +263,6 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
 
         // init conn timeout
         tb_aico_timeout_set(context.sock, TB_AICO_TIMEOUT_CONN, 10000);
-
-        // init addr
-        tb_addr_t addr; 
-        if (!tb_addr_set(&addr, "127.0.0.1", 9090, TB_ADDR_FAMILY_IPV4)) break;
 
         // post conn
         tb_trace_i("conn: ..");

@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "interface/interface.h"
+#include "addr.h"
 #include "ntstatus.h"
 #include "socket_pool.h"
 #include "../ltimer.h"
@@ -331,42 +332,30 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
 
 
                 // done GetAcceptExSockaddrs
-                INT         server_size = 0;
-                INT         client_size = 0;
-                LPSOCKADDR  server_addr = tb_null;
-                LPSOCKADDR  client_addr = tb_null;
+                INT                         server_size = 0;
+                INT                         client_size = 0;
+                struct sockaddr_storage*    server_addr = tb_null;
+                struct sockaddr_storage*    client_addr = tb_null;
                 if (impl->func.GetAcceptExSockaddrs)
                 {
                     // done it
                     impl->func.GetAcceptExSockaddrs(    (tb_byte_t*)aico->addr
-                                                        ,   0
-                                                        ,   sizeof(SOCKADDR_IN) + 16
-                                                        ,   sizeof(SOCKADDR_IN) + 16
-                                                        ,   (LPSOCKADDR*)&server_addr
-                                                        ,   &server_size
-                                                        ,   (LPSOCKADDR*)&client_addr
-                                                        ,   &client_size);
-
-#if 0
-                    // exists server address?
-                    if (server_addr)
-                    {
-                        // trace
-                        tb_trace_d("acpt: server_addr: %s: %u", inet_ntoa(((SOCKADDR_IN*)server_addr)->sin_addr), tb_bits_be_to_ne_u16(((SOCKADDR_IN*)server_addr)->sin_port));
-                    }
-#endif
+                                                    ,   0
+                                                    ,   sizeof(struct sockaddr_storage)
+                                                    ,   sizeof(struct sockaddr_storage)
+                                                    ,   (LPSOCKADDR*)&server_addr
+                                                    ,   &server_size
+                                                    ,   (LPSOCKADDR*)&client_addr
+                                                    ,   &client_size);
 
                     // exists client address?
                     if (client_addr)
                     {
+                        // save address
+                        tb_socket_addr_save(&resp->u.acpt.addr, client_addr);
+ 
                         // trace
-                        tb_trace_d("acpt[%p]: client_addr: %s: %u", resp->aico, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr), tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port));
-
-                        // save addr
-                        tb_ipv4_cstr_set(&resp->u.acpt.addr, inet_ntoa(((SOCKADDR_IN*)client_addr)->sin_addr));
-
-                        // save port
-                        resp->u.acpt.port = tb_bits_be_to_ne_u16(((SOCKADDR_IN*)client_addr)->sin_port);
+                        tb_trace_d("acpt[%p]: client_addr: %{addr}", resp->aico, &resp->u.acpt.addr);
                     }
                 }
             }
@@ -491,15 +480,11 @@ static tb_long_t tb_iocp_spak_iorw(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
             tb_assert_and_check_return_val(aico, -1);
 
             // the address
-            SOCKADDR_IN* addr = (SOCKADDR_IN*)aico->addr;
+            struct sockaddr_storage* addr = (struct sockaddr_storage*)aico->addr;
             tb_assert_and_check_return_val(addr, -1);
 
             // save address
-            tb_ipv4_cstr_set(resp->code == TB_AICE_CODE_URECV? &resp->u.urecv.addr : &resp->u.urecvv.addr, inet_ntoa(addr->sin_addr));
-
-            // save port
-            if (resp->code == TB_AICE_CODE_URECV) resp->u.urecv.port = tb_bits_be_to_ne_u16(addr->sin_port);
-            else resp->u.urecvv.port = tb_bits_be_to_ne_u16(addr->sin_port);
+            tb_socket_addr_save(resp->code == TB_AICE_CODE_URECV? &resp->u.urecv.addr : &resp->u.urecvv.addr, addr);
         }
 
         // save the real size, @note: hack the real offset for the other io aice
@@ -834,7 +819,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
     do
     {
         // make address
-        if (!aico->addr) aico->addr = tb_malloc0(((sizeof(SOCKADDR_IN) + 16) << 1));
+        if (!aico->addr) aico->addr = tb_malloc0(((sizeof(struct sockaddr_storage)) << 1));
         tb_assert_and_check_break(aico->addr);
       
         // init olap
@@ -843,10 +828,10 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
         // attempt to get the socket from the socket pool
         tb_socket_ref_t sock = tb_socket_pool_get();
 
-        // init aice, hack: sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1)
+        // init aice, hack: sizeof(tb_iocp_olap_t) >= (sizeof(struct sockaddr_storage) << 1)
         aico->olap.aice                 = *aice;
         aico->olap.aice.state           = TB_STATE_PENDING;
-        aico->olap.aice.u.acpt.priv[0]  = sock? sock : tb_socket_init(TB_SOCKET_TYPE_TCP);
+        aico->olap.aice.u.acpt.priv[0]  = sock? sock : tb_socket_init(TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4);
         tb_assert_static(tb_arrayn(aico->olap.aice.u.acpt.priv));
         tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0]);
         init_ok = tb_true;
@@ -860,8 +845,8 @@ static tb_bool_t tb_iocp_post_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
                                         ,   (SOCKET)aico->olap.aice.u.acpt.priv[0] - 1
                                         ,   (tb_byte_t*)aico->addr
                                         ,   0
-                                        ,   sizeof(SOCKADDR_IN) + 16
-                                        ,   sizeof(SOCKADDR_IN) + 16
+                                        ,   sizeof(struct sockaddr_storage)
+                                        ,   sizeof(struct sockaddr_storage)
                                         ,   &real
                                         ,   (LPOVERLAPPED)&aico->olap)? tb_true : tb_false;
         tb_trace_d("accept[%p]: AcceptEx: %d, error: %d", aico, AcceptEx_ok, impl->func.WSAGetLastError());
@@ -918,14 +903,13 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
 
     // check aice
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
-    tb_assert_and_check_return_val(aice->u.conn.port, tb_false);
     
     // the aico
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
     tb_assert_and_check_return_val(aico && aico->base.handle && !aico->bDisconnectEx, tb_false);
 
     // trace
-    tb_trace_d("connect[%p]: %{ipv4}: %u: ..", aico, &aice->u.conn.addr, aice->u.conn.port);
+    tb_trace_d("connect[%p]: %{addr}: ..", aico, &aice->u.conn.addr);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -939,12 +923,15 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
         // init aice
         aico->olap.aice = *aice;
 
+        // load local address
+        tb_size_t               laddr_size = 0;
+        struct sockaddr_storage laddr_data = {0};
+        tb_addr_t               laddr;
+        if (!tb_addr_set(&laddr, tb_null, 0, (tb_uint8_t)tb_addr_family(&aice->u.conn.addr))) break;
+        if (!(laddr_size = tb_socket_addr_load(&laddr_data, &laddr))) break;
+
         // bind it first for ConnectEx
-        SOCKADDR_IN local;
-        local.sin_family = AF_INET;
-        local.sin_addr.S_un.S_addr = INADDR_ANY;
-        local.sin_port = 0;
-        if (SOCKET_ERROR == impl->func.bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&local, sizeof(local))) 
+        if (SOCKET_ERROR == impl->func.bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&laddr_data, laddr_size)) 
         {
             // trace
             tb_trace_e("connect[%p]: bind failed, error: %u", aico, GetLastError());
@@ -955,15 +942,16 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
         // post timeout first
         tb_iocp_post_timeout(impl, aico);
 
+        // load client address
+        tb_size_t               caddr_size = 0;
+        struct sockaddr_storage caddr_data = {0};
+        if (!(caddr_size = tb_socket_addr_load(&caddr_data, &aice->u.conn.addr))) break;
+
         // done ConnectEx
         DWORD real = 0;
-        SOCKADDR_IN addr = {0};
-        addr.sin_family = AF_INET;
-        addr.sin_port = tb_bits_ne_to_be_u16(aice->u.conn.port);
-        addr.sin_addr.S_un.S_addr = aice->u.conn.addr.u32;
         ConnectEx_ok = impl->func.ConnectEx(    (SOCKET)aico->base.handle - 1
-                                            ,   (struct sockaddr const*)&addr
-                                            ,   sizeof(addr)
+                                            ,   (struct sockaddr const*)&caddr_data
+                                            ,   caddr_size
                                             ,   tb_null
                                             ,   0
                                             ,   &real
@@ -1146,18 +1134,18 @@ static tb_bool_t tb_iocp_post_urecv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aic
     aico->olap.aice = *aice;
 
     // make addr
-    if (!aico->addr) aico->addr = tb_malloc(sizeof(SOCKADDR_IN) + sizeof(tb_int_t) + sizeof(DWORD));
+    if (!aico->addr) aico->addr = tb_malloc(sizeof(struct sockaddr_storage) + sizeof(tb_int_t) + sizeof(DWORD));
     tb_assert_and_check_return_val(aico->addr, tb_false);
 
     // init addr
-    tb_memset((tb_pointer_t)aico->addr, 0, sizeof(SOCKADDR_IN));
+    tb_memset((tb_pointer_t)aico->addr, 0, sizeof(struct sockaddr_storage));
 
     // init size
-    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN));
-    *psize = sizeof(SOCKADDR_IN);
+    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)aico->addr + sizeof(struct sockaddr_storage));
+    *psize = sizeof(struct sockaddr_storage);
 
     // init flag
-    DWORD* pflag = (DWORD*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN) + sizeof(tb_int_t));
+    DWORD* pflag = (DWORD*)((tb_byte_t*)aico->addr + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
     *pflag = 0;
 
     // trace
@@ -1208,7 +1196,6 @@ static tb_bool_t tb_iocp_post_usend(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aic
     // check aice
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_USEND, tb_false);
     tb_assert_and_check_return_val(aice->u.usend.data && aice->u.usend.size, tb_false);
-    tb_assert_and_check_return_val(aice->u.usend.addr.u32 && aice->u.usend.port, tb_false);
     
     // the aico
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
@@ -1220,20 +1207,19 @@ static tb_bool_t tb_iocp_post_usend(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aic
     // init aice
     aico->olap.aice = *aice;
 
-    // init addr
-    SOCKADDR_IN                 addr = {0};
-    addr.sin_family             = AF_INET;
-    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.usend.port);
-    addr.sin_addr.S_un.S_addr   = aice->u.usend.addr.u32;
-
     // trace
     tb_trace_d("usend[%p]: ..", aico);
+
+    // load addr
+    tb_size_t               n = 0;
+	struct sockaddr_storage d = {0};
+    if (!(n = tb_socket_addr_load(&d, &aice->u.usend.addr))) return tb_false;
 
     // post timeout first
     tb_iocp_post_timeout(impl, aico);
 
     // done send
-    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&d, n, (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("usend[%p]: WSASendTo: %ld, error: %d", aico, ok, impl->func.WSAGetLastError());
 
     // ok or pending? continue it
@@ -1405,18 +1391,18 @@ static tb_bool_t tb_iocp_post_urecvv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t ai
     aico->olap.aice = *aice;
 
     // make addr
-    if (!aico->addr) aico->addr = tb_malloc0(sizeof(SOCKADDR_IN) + sizeof(tb_int_t) + sizeof(DWORD));
+    if (!aico->addr) aico->addr = tb_malloc0(sizeof(sockaddr_storage) + sizeof(tb_int_t) + sizeof(DWORD));
     tb_assert_and_check_return_val(aico->addr, tb_false);
 
     // init addr
-    tb_memset((tb_pointer_t)aico->addr, 0, sizeof(SOCKADDR_IN));
+    tb_memset((tb_pointer_t)aico->addr, 0, sizeof(sockaddr_storage));
 
     // init size
-    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN));
-    *psize = sizeof(SOCKADDR_IN);
+    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)aico->addr + sizeof(sockaddr_storage));
+    *psize = sizeof(sockaddr_storage);
 
     // init flag
-    DWORD* pflag = (DWORD*)((tb_byte_t*)aico->addr + sizeof(SOCKADDR_IN) + sizeof(tb_int_t));
+    DWORD* pflag = (DWORD*)((tb_byte_t*)aico->addr + sizeof(sockaddr_storage) + sizeof(tb_int_t));
     *pflag = 0;
 
     // trace
@@ -1467,7 +1453,6 @@ static tb_bool_t tb_iocp_post_usendv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t ai
     // check aice
     tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_USENDV, tb_false);
     tb_assert_and_check_return_val(aice->u.usendv.list && aice->u.usendv.size, tb_false);
-    tb_assert_and_check_return_val(aice->u.usendv.addr.u32 && aice->u.usendv.port, tb_false);
     
     // the aico
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
@@ -1479,20 +1464,19 @@ static tb_bool_t tb_iocp_post_usendv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t ai
     // init aice
     aico->olap.aice = *aice;
 
-    // init addr
-    SOCKADDR_IN                 addr = {0};
-    addr.sin_family             = AF_INET;
-    addr.sin_port               = tb_bits_ne_to_be_u16(aice->u.usendv.port);
-    addr.sin_addr.S_un.S_addr   = aice->u.urecv.addr.u32;
-
     // trace
     tb_trace_d("usendv[%p]: ..", aico);
+
+    // load addr
+    tb_size_t               n = 0;
+	struct sockaddr_storage d = {0};
+    if (!(n = tb_socket_addr_load(&d, &aice->u.usendv.addr))) return tb_false;
 
     // post timeout first
     tb_iocp_post_timeout(impl, aico);
 
     // done send
-    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&addr, sizeof(addr), (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&d, n, (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("usendv[%p]: WSASendTo: %ld, error: %d", aico, ok, impl->func.WSAGetLastError());
 
     // ok or pending? continue it

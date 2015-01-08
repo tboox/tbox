@@ -45,16 +45,16 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_bool_t tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage const* saddr)
+static tb_size_t tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage const* saddr)
 {
     // check
-    tb_assert_and_check_return_val(addr && saddr, tb_false);
+    tb_assert_and_check_return_val(addr && saddr, 0);
 
     // clear address
     tb_addr_clear(addr);
 
     // done
-    tb_bool_t ok = tb_false;
+    tb_size_t size = 0;
     switch (saddr->ss_family)
     {
     case AF_INET:
@@ -71,8 +71,8 @@ static tb_bool_t tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage
             // save port
             tb_addr_port_set(addr, tb_bits_be_to_ne_u16(addr4->sin_port));
 
-            // ok
-            ok = tb_true;
+            // save size
+            size = sizeof(struct sockaddr_in);
         }
         break;
     case AF_INET6:
@@ -93,8 +93,8 @@ static tb_bool_t tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage
             // save port
             tb_addr_port_set(addr, tb_bits_be_to_ne_u16(addr6->sin6_port));
 
-            // ok
-            ok = tb_true;
+            // save size
+            size = sizeof(struct sockaddr_in6);
         }
         break;
     default:
@@ -103,7 +103,7 @@ static tb_bool_t tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage
     }
     
     // ok?
-    return ok;
+    return size;
 }
 static tb_size_t tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref_t addr)
 {
@@ -269,15 +269,6 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
     // ok
     return tb_true;
 }
-tb_void_t tb_socket_block(tb_socket_ref_t sock, tb_bool_t block)
-{
-    // check
-    tb_assert_and_check_return(sock);
-
-    // block it?
-    if (block) fcntl(tb_sock2fd(sock), F_SETFL, fcntl(tb_sock2fd(sock), F_GETFL) & ~O_NONBLOCK);
-    else fcntl(tb_sock2fd(sock), F_SETFL, fcntl(tb_sock2fd(sock), F_GETFL) | O_NONBLOCK);
-}
 tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
 {
     // check
@@ -438,7 +429,10 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
     {
         tb_int_t reuseaddr = 1;
         if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+        {
+            // trace
             tb_trace_e("reuseaddr: failed");
+        }
     }
 #endif
 
@@ -448,9 +442,23 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
     {
         tb_int_t reuseport = 1;
         if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
+        {
+            // trace
             tb_trace_e("reuseport: %u failed", tb_addr_port(addr));
+        }
     }
 #endif
+
+    // only bind ipv6 address
+    if (tb_addr_family(addr) == TB_ADDR_FAMILY_IPV6)
+    {
+        tb_int_t only_ipv6 = 1;
+        if (setsockopt(tb_sock2fd(sock), IPPROTO_IPV6, IPV6_V6ONLY, (tb_int_t *)&only_ipv6, sizeof(only_ipv6)) < 0)
+        {
+            // trace
+            tb_trace_e("set only ipv6 failed");
+        }
+    }
 
     // bind 
     return !bind(tb_sock2fd(sock), (struct sockaddr *)&d, n);
