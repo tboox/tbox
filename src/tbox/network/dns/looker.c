@@ -86,7 +86,7 @@ typedef struct __tb_dns_looker_impl_t
     tb_socket_ref_t         sock;
 
     // the server list
-    tb_addr_t               list[2];
+    tb_ipaddr_t               list[2];
 
     // the server maxn
     tb_size_t               maxn;
@@ -200,18 +200,18 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_impl_t* impl)
     tb_assert_and_check_return_val(data && size && impl->size < size, -1);
 
     // try get addr from the dns list
-    tb_addr_ref_t addr = tb_null;
+    tb_ipaddr_ref_t addr = tb_null;
     if (impl->maxn && impl->itor && impl->itor <= impl->maxn)
         addr = &impl->list[impl->itor - 1];
 
     // check
-    tb_assert_and_check_return_val(addr && !tb_addr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(addr && !tb_ipaddr_is_empty(addr), -1);
 
     // need wait if no data
     impl->step &= ~TB_DNS_LOOKER_STEP_NEVT;
 
     // trace
-    tb_trace_d("request: try %{addr}", addr);
+    tb_trace_d("request: try %{ipaddr}", addr);
 
     // send request
     while (impl->size < size)
@@ -251,7 +251,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_impl_t* impl)
     tb_trace_d("request: ok");
     return 1;
 }
-static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_impl_t* impl, tb_addr_ref_t addr)
+static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_impl_t* impl, tb_ipaddr_ref_t addr)
 {
     // the rpkt and size
     tb_byte_t const*    rpkt = tb_static_buffer_data(&impl->rpkt);
@@ -345,7 +345,7 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_impl_t* impl, tb_addr_ref
                     ipv4.u8[3] = b4;
 
                     // save ipv4
-                    tb_addr_ipv4_set(addr, &ipv4);
+                    tb_ipaddr_ipv4_set(addr, &ipv4);
                 }
 
                 // found it
@@ -454,7 +454,7 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_impl_t* impl, tb_addr_ref
     // ok
     return tb_true;
 }
-static tb_long_t tb_dns_looker_resp(tb_dns_looker_impl_t* impl, tb_addr_ref_t addr)
+static tb_long_t tb_dns_looker_resp(tb_dns_looker_impl_t* impl, tb_ipaddr_ref_t addr)
 {
     // check
     tb_check_return_val(!(impl->step & TB_DNS_LOOKER_STEP_RESP), 1);
@@ -496,7 +496,7 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_impl_t* impl, tb_addr_ref_t ad
     if (!tb_dns_looker_resp_done(impl, addr)) return -1;
 
     // check
-    tb_assert_and_check_return_val(tb_static_string_size(&impl->name) && !tb_addr_ip_is_empty(addr), -1);
+    tb_assert_and_check_return_val(tb_static_string_size(&impl->name) && !tb_ipaddr_ip_is_empty(addr), -1);
 
     // save address to cache
     tb_dns_cache_set(tb_static_string_cstr(&impl->name), addr);
@@ -523,7 +523,7 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
     tb_assert_and_check_return_val(name, tb_null);
 
     // must be not address
-    tb_assert_abort(!tb_addr_ip_cstr_set(tb_null, name, TB_ADDR_FAMILY_NONE));
+    tb_assert_abort(!tb_ipaddr_ip_cstr_set(tb_null, name, TB_IPADDR_FAMILY_NONE));
 
     // done
     tb_bool_t               ok = tb_false;
@@ -549,7 +549,7 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
         if (!tb_static_buffer_init(&impl->rpkt, impl->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) break;
 
         // init sock
-        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, TB_ADDR_FAMILY_IPV4);
+        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, TB_IPADDR_FAMILY_IPV4);
         tb_assert_and_check_break(impl->sock);
 
         // init itor
@@ -571,7 +571,7 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
     // ok?
     return (tb_dns_looker_ref_t)impl;
 }
-tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t looker, tb_addr_ref_t addr)
+tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t looker, tb_ipaddr_ref_t addr)
 {
     // check
     tb_dns_looker_impl_t* impl = (tb_dns_looker_impl_t*)looker;
@@ -658,7 +658,7 @@ tb_void_t tb_dns_looker_exit(tb_dns_looker_ref_t looker)
         tb_free(impl);
     }
 }
-tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_addr_ref_t addr)
+tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(name && addr, tb_false);

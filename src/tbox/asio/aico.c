@@ -426,14 +426,14 @@ tb_bool_t tb_aico_acpt_(tb_aico_ref_t aico, tb_aico_func_t func, tb_cpointer_t p
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_conn_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_conn_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
     tb_assert_and_check_return_val(impl && impl->aicp && addr, tb_false);
 
     // check address
-    tb_assert_abort(!tb_addr_is_empty(addr));
+    tb_assert_abort(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -442,7 +442,7 @@ tb_bool_t tb_aico_conn_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_aico_func_t f
     aice.func               = func;
     aice.priv               = priv;
     aice.aico               = aico;
-    tb_addr_copy(&aice.u.conn.addr, addr);
+    tb_ipaddr_copy(&aice.u.conn.addr, addr);
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -504,14 +504,14 @@ tb_bool_t tb_aico_urecv_(tb_aico_ref_t aico, tb_byte_t* data, tb_size_t size, tb
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usend_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usend_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
     tb_assert_and_check_return_val(impl && impl->aicp && addr && data && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_addr_is_empty(addr));
+    tb_assert_abort(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -522,7 +522,7 @@ tb_bool_t tb_aico_usend_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_byte_t const
     aice.aico               = aico;
     aice.u.usend.data       = data;
     aice.u.usend.size       = size;
-    tb_addr_copy(&aice.u.usend.addr, addr);
+    tb_ipaddr_copy(&aice.u.usend.addr, addr);
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -565,7 +565,7 @@ tb_bool_t tb_aico_sendv_(tb_aico_ref_t aico, tb_iovec_t const* list, tb_size_t s
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_urecvv_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_urecvv_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
@@ -580,19 +580,19 @@ tb_bool_t tb_aico_urecvv_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_iovec_t con
     aice.aico               = aico;
     aice.u.urecvv.list      = list;
     aice.u.urecvv.size      = size;
-    tb_addr_copy(&aice.u.urecvv.addr, addr);
+    tb_ipaddr_copy(&aice.u.urecvv.addr, addr);
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usendv_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usendv_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
     tb_assert_and_check_return_val(impl && impl->aicp && addr && list && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_addr_is_empty(addr));
+    tb_assert_abort(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -603,7 +603,7 @@ tb_bool_t tb_aico_usendv_(tb_aico_ref_t aico, tb_addr_ref_t addr, tb_iovec_t con
     aice.aico               = aico;
     aice.u.usendv.list      = list;
     aice.u.usendv.size      = size;
-    tb_addr_copy(&aice.u.usendv.addr, addr);
+    tb_ipaddr_copy(&aice.u.usendv.addr, addr);
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -759,14 +759,14 @@ tb_bool_t tb_aico_acpt_after_(tb_aico_ref_t aico, tb_size_t delay, tb_aico_func_
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_conn_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_t addr, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_conn_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_ref_t addr, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
     tb_assert_and_check_return_val(impl && impl->aicp && addr, tb_false);
 
     // check address
-    tb_assert_abort(!tb_addr_is_empty(addr));
+    tb_assert_abort(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -775,7 +775,7 @@ tb_bool_t tb_aico_conn_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_t
     aice.func               = func;
     aice.priv               = priv;
     aice.aico               = aico;
-    tb_addr_copy(&aice.u.conn.addr, addr);
+    tb_ipaddr_copy(&aice.u.conn.addr, addr);
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
@@ -837,14 +837,14 @@ tb_bool_t tb_aico_urecv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_byte_t* d
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usend_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_t addr, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usend_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
     tb_assert_and_check_return_val(impl && impl->aicp && addr && data && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_addr_is_empty(addr));
+    tb_assert_abort(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -855,7 +855,7 @@ tb_bool_t tb_aico_usend_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_
     aice.aico               = aico;
     aice.u.usend.data       = data;
     aice.u.usend.size       = size;
-    tb_addr_copy(&aice.u.usend.addr, addr);
+    tb_ipaddr_copy(&aice.u.usend.addr, addr);
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
@@ -898,7 +898,7 @@ tb_bool_t tb_aico_sendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_iovec_t c
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_urecvv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_urecvv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
@@ -913,19 +913,19 @@ tb_bool_t tb_aico_urecvv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref
     aice.aico               = aico;
     aice.u.urecvv.list      = list;
     aice.u.urecvv.size      = size;
-    tb_addr_copy(&aice.u.urecvv.addr, addr);
+    tb_ipaddr_copy(&aice.u.urecvv.addr, addr);
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_usendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_usendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size, tb_aico_func_t func, tb_cpointer_t priv __tb_debug_decl__)
 {
     // check
     tb_aico_impl_t* impl = (tb_aico_impl_t*)aico;
     tb_assert_and_check_return_val(impl && impl->aicp && addr && list && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_addr_is_empty(addr));
+    tb_assert_abort(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -936,7 +936,7 @@ tb_bool_t tb_aico_usendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_addr_ref
     aice.aico               = aico;
     aice.u.usendv.list      = list;
     aice.u.usendv.size      = size;
-    tb_addr_copy(&aice.u.usendv.addr, addr);
+    tb_ipaddr_copy(&aice.u.usendv.addr, addr);
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);

@@ -59,21 +59,33 @@ static tb_long_t tb_network_printf_format_ipv6(tb_cpointer_t object, tb_char_t* 
     // ok?
     return cstr? tb_strlen(cstr) : -1;
 }
-static tb_long_t tb_network_printf_format_addr(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+static tb_long_t tb_network_printf_format_ipaddr(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(object && cstr && maxn, -1);
 
-    // the addr
-    tb_addr_ref_t addr = (tb_addr_ref_t)object;
+    // the ipaddr
+    tb_ipaddr_ref_t ipaddr = (tb_ipaddr_ref_t)object;
 
-    // format
-    tb_char_t data[128] = {0};
-    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%s(%u)", tb_addr_ip_cstr(addr, data, sizeof(data)), tb_addr_port(addr));
-    if (size >= 0) cstr[size] = '\0';
+    // make it
+    cstr = (tb_char_t*)tb_ipaddr_cstr(ipaddr, cstr, maxn);
 
     // ok?
-    return size;
+    return cstr? tb_strlen(cstr) : -1;
+}
+static tb_long_t tb_network_printf_format_hwaddr(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(object && cstr && maxn, -1);
+
+    // the hwaddr
+    tb_hwaddr_ref_t hwaddr = (tb_hwaddr_ref_t)object;
+
+    // make it
+    cstr = (tb_char_t*)tb_hwaddr_cstr(hwaddr, cstr, maxn);
+
+    // ok?
+    return cstr? tb_strlen(cstr) : -1;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -93,8 +105,11 @@ tb_bool_t tb_network_init()
     // register printf("%{ipv6}", &ipv6);
     tb_printf_object_register("ipv6", tb_network_printf_format_ipv6);
 
-    // register printf("%{addr}", &addr);
-    tb_printf_object_register("addr", tb_network_printf_format_addr);
+    // register printf("%{ipaddr}", &ipaddr);
+    tb_printf_object_register("ipaddr", tb_network_printf_format_ipaddr);
+
+    // register printf("%{hwaddr}", &hwaddr);
+    tb_printf_object_register("hwaddr", tb_network_printf_format_hwaddr);
 
     // ok
     return tb_true;

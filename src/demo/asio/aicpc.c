@@ -248,11 +248,11 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(context.sock);
 
         // init addr
-        tb_addr_t addr; 
-        if (!tb_addr_set(&addr, "127.0.0.1", 9090, TB_ADDR_FAMILY_NONE)) break;
+        tb_ipaddr_t addr; 
+        if (!tb_ipaddr_set(&addr, "127.0.0.1", 9090, TB_IPADDR_FAMILY_NONE)) break;
 
         // open sock aico
-        if (!tb_aico_open_sock_from_type(context.sock, TB_SOCKET_TYPE_TCP, tb_addr_family(&addr))) break;
+        if (!tb_aico_open_sock_from_type(context.sock, TB_SOCKET_TYPE_TCP, tb_ipaddr_family(&addr))) break;
 
         // init file aico
         context.file = tb_aico_init(aicp);

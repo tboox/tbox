@@ -168,7 +168,7 @@ tb_bool_t tb_url_init(tb_url_ref_t url)
         url->bssl = 0;
         url->bwin = 0;
         url->pwin = 0;
-        tb_addr_clear(&url->addr);
+        tb_ipaddr_clear(&url->addr);
         if (!tb_string_init(&url->host)) break;
         if (!tb_string_init(&url->path)) break;
         if (!tb_string_init(&url->args)) break;
@@ -205,7 +205,7 @@ tb_void_t tb_url_clear(tb_url_ref_t url)
     url->bssl = 0;
     url->bwin = 0;
     url->pwin = 0;
-    tb_addr_clear(&url->addr);
+    tb_ipaddr_clear(&url->addr);
     tb_string_clear(&url->host);
     tb_string_clear(&url->path);
     tb_string_clear(&url->args);
@@ -248,7 +248,7 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
     case TB_URL_PROTOCOL_RTSP:
         {   
             // the port
-            tb_uint16_t port = tb_addr_port(&url->addr);
+            tb_uint16_t port = tb_ipaddr_port(&url->addr);
 
             // check
             tb_check_return_val(port && tb_string_size(&url->host), tb_null);
@@ -297,7 +297,7 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
             if (tb_string_size(&url->host))
             {
                 // the port
-                tb_uint16_t port = tb_addr_port(&url->addr);
+                tb_uint16_t port = tb_ipaddr_port(&url->addr);
 
                 // add host
                 tb_string_cstrncat(&url->cache, tb_string_cstr(&url->host), tb_string_size(&url->host));
@@ -434,7 +434,7 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
             tb_assert_and_check_break(p);
         
             // attempt to parse address
-            if (tb_string_size(&url->host)) tb_addr_ip_cstr_set(&url->addr, tb_string_cstr(&url->host), TB_ADDR_FAMILY_NONE);
+            if (tb_string_size(&url->host)) tb_ipaddr_ip_cstr_set(&url->addr, tb_string_cstr(&url->host), TB_IPADDR_FAMILY_NONE);
 
             // parse port
             tb_uint16_t port = 0;
@@ -451,7 +451,7 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
             else if (url->poto != TB_URL_PROTOCOL_SQL) break;
 
             // save port
-            tb_addr_port_set(&url->addr, port);
+            tb_ipaddr_port_set(&url->addr, port);
         }
 
         // parse path and args 
@@ -581,7 +581,7 @@ tb_uint16_t tb_url_port(tb_url_ref_t url)
     tb_assert_and_check_return_val(url, 0);
 
     // get port
-    return tb_addr_port(&url->addr);
+    return tb_ipaddr_port(&url->addr);
 }
 tb_void_t tb_url_port_set(tb_url_ref_t url, tb_uint16_t port)
 {
@@ -589,7 +589,7 @@ tb_void_t tb_url_port_set(tb_url_ref_t url, tb_uint16_t port)
     tb_assert_and_check_return(url);
 
     // set port
-    tb_addr_port_set(&url->addr, port);
+    tb_ipaddr_port_set(&url->addr, port);
 
     // clear url
     tb_string_clear(&url->cache);
@@ -611,15 +611,15 @@ tb_void_t tb_url_host_set(tb_url_ref_t url, tb_char_t const* host)
     tb_string_clear(&url->cache);
 
     // clear address
-    tb_addr_clear(&url->addr);
+    tb_ipaddr_clear(&url->addr);
 
     // parse host
     tb_url_parse_host(&url->host, host);
 
     // attempt to parse address
-    tb_addr_ip_cstr_set(&url->addr, tb_string_cstr(&url->host), TB_ADDR_FAMILY_NONE);
+    tb_ipaddr_ip_cstr_set(&url->addr, tb_string_cstr(&url->host), TB_IPADDR_FAMILY_NONE);
 }
-tb_addr_ref_t tb_url_addr(tb_url_ref_t url)
+tb_ipaddr_ref_t tb_url_addr(tb_url_ref_t url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);
@@ -627,13 +627,13 @@ tb_addr_ref_t tb_url_addr(tb_url_ref_t url)
     // get address
     return &(url->addr);
 }
-tb_void_t tb_url_addr_set(tb_url_ref_t url, tb_addr_ref_t addr)
+tb_void_t tb_url_addr_set(tb_url_ref_t url, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return(url && addr);
 
     // changed?
-    if (!tb_addr_is_equal(&url->addr, addr))
+    if (!tb_ipaddr_is_equal(&url->addr, addr))
     {
         // set addr
         url->addr = *addr;
@@ -642,8 +642,8 @@ tb_void_t tb_url_addr_set(tb_url_ref_t url, tb_addr_ref_t addr)
         if (!tb_string_size(&url->host)) 
         {
             // address => host
-            tb_char_t           data[TB_ADDR_CSTR_MAXN];
-            tb_char_t const*    host = tb_addr_ip_cstr(addr, data, sizeof(data));
+            tb_char_t           data[TB_IPADDR_CSTR_MAXN];
+            tb_char_t const*    host = tb_ipaddr_ip_cstr(addr, data, sizeof(data));
             if (host) tb_string_cstrcpy(&url->host, host);
  
             // clear url

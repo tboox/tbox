@@ -25,10 +25,11 @@
  * includes
  */
 #include "prefix.h"
-#include "addr.h"
+#include "ipaddr.h"
 #include "../socket.h"
 #include "interface/interface.h"
 #include "socket_pool.h"
+#include "../posix/sockaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -114,7 +115,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
         else break;
 
         // init socket family
-        tb_int_t f = (family == TB_ADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
+        tb_int_t f = (family == TB_IPADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
 
         // sock
         SOCKET fd = tb_ws2_32()->WSASocketA(f, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
@@ -364,16 +365,16 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
     // ok?
     return ok;
 }
-tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock && addr, -1);
-    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
+    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = tb_socket_addr_load(&d, addr))) return -1;
+    if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // connect
     tb_long_t r = tb_ws2_32()->connect(tb_sock2fd(sock), (struct sockaddr *)&d, n);
@@ -393,7 +394,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr)
     // error
     return -1;
 }
-tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock && addr, tb_false);
@@ -401,7 +402,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
     // load addr
     tb_int_t                n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = (tb_int_t)tb_socket_addr_load(&d, addr))) return tb_false;
+    if (!(n = (tb_int_t)tb_sockaddr_load(&d, addr))) return tb_false;
 
     // reuse addr
 #ifdef SO_REUSEADDR
@@ -417,13 +418,13 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
 
     // reuse port
 #ifdef SO_REUSEPORT
-    if (tb_addr_port(addr))
+    if (tb_ipaddr_port(addr))
     {
         tb_int_t reuseport = 1;
         if (tb_ws2_32()->setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_char_t*)&reuseport, sizeof(reuseport)) < 0) 
         {
             // trace
-            tb_trace_e("reuseport: %u failed", tb_addr_port(addr));
+            tb_trace_e("reuseport: %u failed", tb_ipaddr_port(addr));
         }
     }
 #endif
@@ -439,7 +440,7 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
     // listen
     return (tb_ws2_32()->listen(tb_sock2fd(sock), backlog) < 0)? tb_false : tb_true;
 }
-tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
@@ -465,7 +466,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr)
         if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) break;
 
         // save address
-        if (addr) tb_socket_addr_save(addr, &d);
+        if (addr) tb_sockaddr_save(addr, &d);
         
         // ok
         ok = tb_true;
@@ -483,7 +484,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr)
     // ok?
     return acpt;
 }
-tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_false);
@@ -494,7 +495,7 @@ tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_addr_ref_t addr)
     if (tb_ws2_32()->getsockname(tb_sock2fd(sock), (struct sockaddr *)&d, &n) == -1) return tb_false;
 
     // save address
-    if (addr) tb_socket_addr_save(addr, &d);
+    if (addr) tb_sockaddr_save(addr, &d);
 
     // ok
     return tb_true;
@@ -695,7 +696,7 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
     // error
     return -1;
 }
-tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && data, -1);
@@ -712,7 +713,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* d
     if (r >= 0) 
     {
         // save address
-        if (addr) tb_socket_addr_save(addr, &d);
+        if (addr) tb_sockaddr_save(addr, &d);
         
         // ok
         return r;
@@ -724,11 +725,11 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* d
     // error
     return -1;
 }
-tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && addr && data, -1);
-    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
+    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // no size?
     tb_check_return_val(size, 0);
@@ -736,7 +737,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t co
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = tb_socket_addr_load(&d, addr))) return -1;
+    if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // send
     tb_long_t r = tb_ws2_32()->sendto(tb_sock2fd(sock), (tb_char_t const*)data, (tb_int_t)size, 0, (struct sockaddr*)&d, n);
@@ -750,7 +751,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t co
     // error
     return -1;
 }
-tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && list && size, -1);
@@ -788,21 +789,21 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t 
     }
 
     // save address
-    if (addr) tb_socket_addr_save(addr, &d);
+    if (addr) tb_sockaddr_save(addr, &d);
  
     // ok?
     return read;
 }
-tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && addr && list && size, -1);
-    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
+    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = tb_socket_addr_load(&d, addr))) return -1;
+    if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // done
     tb_size_t i = 0;

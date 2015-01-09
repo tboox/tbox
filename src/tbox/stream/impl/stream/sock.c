@@ -122,18 +122,18 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
 #endif
 
     // get address from the url
-    tb_addr_ref_t addr = tb_url_addr(url);
+    tb_ipaddr_ref_t addr = tb_url_addr(url);
     tb_assert_and_check_return_val(addr, tb_false);
 
     // get the port
-    tb_uint16_t port = tb_addr_port(addr);
+    tb_uint16_t port = tb_ipaddr_port(addr);
     tb_assert_and_check_return_val(port, tb_false);
 
     // no ip?
-    if (tb_addr_ip_is_empty(addr))
+    if (tb_ipaddr_ip_is_empty(addr))
     {
         // look ip 
-        tb_addr_t ip_addr;
+        tb_ipaddr_t ip_addr;
         if (!tb_dns_looker_done(tb_url_host(url), &ip_addr)) 
         {
             // failed
@@ -142,7 +142,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
         }
 
         // update address to the url
-        tb_addr_ip_set(addr, &ip_addr);
+        tb_ipaddr_ip_set(addr, &ip_addr);
     }
 
     // tcp or udp? for url: sock://ip:port/?udp=
@@ -151,7 +151,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     else if (args && !tb_strnicmp(args, "tcp=", 4)) impl->type = TB_SOCKET_TYPE_TCP;
 
     // make sock
-    impl->sock = tb_socket_init(impl->type, tb_addr_family(addr));
+    impl->sock = tb_socket_init(impl->type, tb_ipaddr_family(addr));
     
     // open sock failed?
     if (!impl->sock)
@@ -171,7 +171,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
     case TB_SOCKET_TYPE_TCP:
         {
             // trace
-            tb_trace_d("connect: %s[%{addr}]: ..", tb_url_host(url), addr);
+            tb_trace_d("connect: %s[%{ipaddr}]: ..", tb_url_host(url), addr);
 
             // connect it
             tb_long_t real = -1;
@@ -471,7 +471,7 @@ static tb_long_t tb_stream_sock_impl_writ(tb_stream_ref_t stream, tb_byte_t cons
     case TB_SOCKET_TYPE_UDP:
         {
             // get address from the url
-            tb_addr_ref_t addr = tb_url_addr(url);
+            tb_ipaddr_ref_t addr = tb_url_addr(url);
             tb_assert_and_check_return_val(addr, -1);
 
             // writ data

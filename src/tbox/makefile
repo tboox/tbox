@@ -88,7 +88,8 @@ tbox_C_FILES 			+= \
 						network/url \
 						network/ipv4 \
 						network/ipv6 \
-						network/addr \
+						network/ipaddr \
+						network/hwaddr \
 						network/http \
 						network/cookies \
 						network/impl/http/date \
@@ -258,7 +259,7 @@ tbox_C_FILES 			+= \
 						platform/process \
 						platform/dynamic \
 						platform/atomic64 \
-						platform/hostmac \
+						platform/ifaddrs \
 						platform/platform \
 						platform/hostname \
 						platform/processor \
@@ -398,7 +399,6 @@ tbox_C_FILES-$(ANDROID) += \
 
 # windows
 tbox_C_FILES-$(MSVC)$(MINGW)$(CYGWIN) += \
-						platform/windows/addr \
 						platform/windows/socket_pool \
 						platform/windows/interface/interface \
 						platform/windows/interface/user32 \
@@ -539,7 +539,7 @@ tbox_INC_FILES 			= \
 						platform/barrier.h \
 						platform/dynamic.h \
 						platform/process.h \
-						platform/hostmac.h \
+						platform/ifaddrs.h \
 						platform/hostname.h \
 						platform/spinlock.h \
 						platform/atomic64.h \
@@ -591,7 +591,8 @@ tbox_INC_FILES 			= \
 						network/network.h \
 						network/ipv4.h \
 						network/ipv6.h \
-						network/addr.h \
+						network/hwaddr.h \
+						network/ipaddr.h \
 						network/url.h \
 						network/ssl.h \
 						network/dns/dns.h \

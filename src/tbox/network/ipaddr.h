@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        address.h
+ * @file        ipaddr.h
  * @ingroup     network
  *
  */
-#ifndef TB_NETWORK_ADDR_H
-#define TB_NETWORK_ADDR_H
+#ifndef TB_NETWORK_IPADDR_H
+#define TB_NETWORK_IPADDR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -40,23 +40,23 @@ __tb_extern_c_enter__
  */
 
 /// the address string data maxn
-#define TB_ADDR_CSTR_MAXN           (TB_IPV6_CSTR_MAXN)
+#define TB_IPADDR_CSTR_MAXN           (TB_IPV6_CSTR_MAXN + 20)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-/// the address family enum
-typedef enum __tb_addr_family_e
+/// the ip address family enum
+typedef enum __tb_ipaddr_family_e
 {
-    TB_ADDR_FAMILY_NONE     = 0
-,   TB_ADDR_FAMILY_IPV4     = 1
-,   TB_ADDR_FAMILY_IPV6     = 2
+    TB_IPADDR_FAMILY_NONE     = 0
+,   TB_IPADDR_FAMILY_IPV4     = 1
+,   TB_IPADDR_FAMILY_IPV6     = 2
 
-}tb_addr_family_e;
+}tb_ipaddr_family_e;
 
-/// the address type
-typedef struct __tb_addr_t
+/// the ip address type
+typedef struct __tb_ipaddr_t
 {
     /// the family
     tb_uint8_t              family      : 7;
@@ -78,7 +78,7 @@ typedef struct __tb_addr_t
 
     }u;
 
-}tb_addr_t, *tb_addr_ref_t;
+}tb_ipaddr_t, *tb_ipaddr_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -86,170 +86,180 @@ typedef struct __tb_addr_t
 
 /*! clear the address
  *
- * @param addr      the address
+ * @param ipaddr    the address
  */
-tb_void_t           tb_addr_clear(tb_addr_ref_t addr);
+tb_void_t           tb_ipaddr_clear(tb_ipaddr_ref_t ipaddr);
 
-/*! copy address, faster than *addr = *other
+/*! copy address, faster than *ipaddr = *other
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param copied    the copied address
  */
-tb_void_t           tb_addr_copy(tb_addr_ref_t addr, tb_addr_ref_t copied);
+tb_void_t           tb_ipaddr_copy(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t copied);
 
 /*! is empty?
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_is_empty(tb_addr_ref_t addr);
+tb_bool_t           tb_ipaddr_is_empty(tb_ipaddr_ref_t ipaddr);
 
 /*! is equal?
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param other     the other address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_is_equal(tb_addr_ref_t addr, tb_addr_ref_t other);
+tb_bool_t           tb_ipaddr_is_equal(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other);
+
+/*! get the address string
+ *
+ * @param ipaddr    the address
+ * @param data      the address string data
+ * @param maxn      the address string data maxn
+ *
+ * @return          the address string
+ */
+tb_char_t const*    tb_ipaddr_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_size_t maxn);
 
 /*! set the ip address from string
  *
- * @param addr      the address, only analyze format if be null
+ * @param ipaddr    the address, only analyze format if be null
  * @param cstr      the address string, init any address if be null
  * @param port      the port, optional
  * @param family    the address family, will analyze family automaticly if be none, optional
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_set(tb_addr_ref_t addr, tb_char_t const* cstr, tb_uint16_t port, tb_uint8_t family);
+tb_bool_t           tb_ipaddr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_uint16_t port, tb_uint8_t family);
 
 /*! clear ip
  *
- * @param addr      the address
+ * @param ipaddr    the address
  */
-tb_void_t           tb_addr_ip_clear(tb_addr_ref_t addr);
+tb_void_t           tb_ipaddr_ip_clear(tb_ipaddr_ref_t ipaddr);
 
 /*! the ip is empty?
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_ip_is_empty(tb_addr_ref_t addr);
+tb_bool_t           tb_ipaddr_ip_is_empty(tb_ipaddr_ref_t ipaddr);
 
 /*! the ip is any?
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_ip_is_any(tb_addr_ref_t addr);
+tb_bool_t           tb_ipaddr_ip_is_any(tb_ipaddr_ref_t ipaddr);
 
 /*! the ip is loopback?
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_ip_is_loopback(tb_addr_ref_t addr);
+tb_bool_t           tb_ipaddr_ip_is_loopback(tb_ipaddr_ref_t ipaddr);
 
 /*! the ip is equal?
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param other     the other address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_ip_is_equal(tb_addr_ref_t addr, tb_addr_ref_t other);
+tb_bool_t           tb_ipaddr_ip_is_equal(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other);
 
 /*! get the ip address string
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param data      the address string data
  * @param maxn      the address string data maxn
  *
  * @return          the address string
  */
-tb_char_t const*    tb_addr_ip_cstr(tb_addr_ref_t addr, tb_char_t* data, tb_size_t maxn);
+tb_char_t const*    tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_size_t maxn);
 
 /*! set the ip address from string
  *
- * @param addr      the address, only analyze format if be null
+ * @param ipaddr    the address, only analyze format if be null
  * @param cstr      the address string
  * @param family    the address family, will analyze family automaticly if be none
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_addr_ip_cstr_set(tb_addr_ref_t addr, tb_char_t const* cstr, tb_uint8_t family);
+tb_bool_t           tb_ipaddr_ip_cstr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_uint8_t family);
 
 /*! only set ip address
  *
- * @param addr      the address
- * @param ip_addr   the ip address, clear it if be null
+ * @param ipaddr    the address
+ * @param other     the other address with ip data, clear it if be null
  */
-tb_void_t           tb_addr_ip_set(tb_addr_ref_t addr, tb_addr_ref_t ip_addr);
+tb_void_t           tb_ipaddr_ip_set(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other);
 
 /*! get the ipv4 address
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          the ipv4
  */
-tb_ipv4_ref_t       tb_addr_ipv4(tb_addr_ref_t addr);
+tb_ipv4_ref_t       tb_ipaddr_ipv4(tb_ipaddr_ref_t ipaddr);
 
 /*! set the address from ipv4
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param ipv4      the ipv4, clear it if be null
  */
-tb_void_t           tb_addr_ipv4_set(tb_addr_ref_t addr, tb_ipv4_ref_t ipv4);
+tb_void_t           tb_ipaddr_ipv4_set(tb_ipaddr_ref_t ipaddr, tb_ipv4_ref_t ipv4);
 
 /*! get the ipv6 address
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          the ipv6
  */
-tb_ipv6_ref_t       tb_addr_ipv6(tb_addr_ref_t addr);
+tb_ipv6_ref_t       tb_ipaddr_ipv6(tb_ipaddr_ref_t ipaddr);
 
 /*! set the address from ipv6
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param ipv6      the ipv6, clear it if be null
  */
-tb_void_t           tb_addr_ipv6_set(tb_addr_ref_t addr, tb_ipv6_ref_t ipv6);
+tb_void_t           tb_ipaddr_ipv6_set(tb_ipaddr_ref_t ipaddr, tb_ipv6_ref_t ipv6);
 
 /*! get the address family
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          the family
  */
-tb_size_t           tb_addr_family(tb_addr_ref_t addr);
+tb_size_t           tb_ipaddr_family(tb_ipaddr_ref_t ipaddr);
 
 /*! set the address family
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param family    the family
  */
-tb_void_t           tb_addr_family_set(tb_addr_ref_t addr, tb_size_t family);
+tb_void_t           tb_ipaddr_family_set(tb_ipaddr_ref_t ipaddr, tb_size_t family);
 
 /*! get the address port
  *
- * @param addr      the address
+ * @param ipaddr    the address
  *
  * @return          the port
  */
-tb_uint16_t         tb_addr_port(tb_addr_ref_t addr);
+tb_uint16_t         tb_ipaddr_port(tb_ipaddr_ref_t ipaddr);
 
 /*! set the address family
  *
- * @param addr      the address
+ * @param ipaddr    the address
  * @param port      the port
  */
-tb_void_t           tb_addr_port_set(tb_addr_ref_t addr, tb_uint16_t port);
+tb_void_t           tb_ipaddr_port_set(tb_ipaddr_ref_t ipaddr, tb_uint16_t port);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

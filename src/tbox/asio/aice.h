@@ -27,7 +27,7 @@
  * includes
  */
 #include "aico.h"
-#include "../network/addr.h"
+#include "../network/ipaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -75,7 +75,7 @@ typedef struct __tb_aice_acpt_t
     tb_aico_ref_t               aico;
 
     /// the client addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
     /// the private data for using the left space of the union
     tb_cpointer_t               priv[1];
@@ -86,7 +86,7 @@ typedef struct __tb_aice_acpt_t
 typedef struct __tb_aice_conn_t
 {
     /// the addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
 }tb_aice_conn_t;
 
@@ -132,7 +132,7 @@ typedef struct __tb_aice_urecv_t
     tb_size_t                   real;
 
     /// the addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
 }tb_aice_urecv_t;
 
@@ -149,7 +149,7 @@ typedef struct __tb_aice_usend_t
     tb_size_t                   real;
 
     /// the peer addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
 }tb_aice_usend_t;
 
@@ -228,7 +228,7 @@ typedef struct __tb_aice_urecv_t
     tb_size_t                   real;
 
     /// the addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
 }tb_aice_urecv_t;
 
@@ -245,7 +245,7 @@ typedef struct __tb_aice_usend_t
     tb_size_t                   real;
 
     /// the addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
 }tb_aice_usend_t;
 
@@ -325,7 +325,7 @@ typedef struct __tb_aice_urecvv_t
     tb_size_t                   real;
 
     /// the peer addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
 }tb_aice_urecvv_t;
 
@@ -342,7 +342,7 @@ typedef struct __tb_aice_usendv_t
     tb_size_t                   real;
 
     /// the addr
-    tb_addr_t                   addr;
+    tb_ipaddr_t                   addr;
 
 }tb_aice_usendv_t;
 

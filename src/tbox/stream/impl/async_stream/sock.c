@@ -354,7 +354,7 @@ static tb_bool_t tb_async_stream_sock_impl_conn_func(tb_aice_ref_t aice)
     // ok
     return tb_true;
 }
-static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_addr_ref_t addr, tb_cpointer_t priv)
+static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipaddr_ref_t addr, tb_cpointer_t priv)
 {
     // check
     tb_async_stream_sock_impl_t* impl = tb_async_stream_sock_impl_cast((tb_async_stream_ref_t)priv);
@@ -368,14 +368,14 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
         if (addr)
         {
             // trace
-            tb_trace_d("open[%p]: host: %s, addr: %{addr}", impl->aico, host, addr);
+            tb_trace_d("open[%p]: host: %s, addr: %{ipaddr}", impl->aico, host, addr);
 
             // init aico
             if (!impl->aico) impl->aico = tb_aico_init(tb_async_stream_aicp((tb_async_stream_ref_t)impl));
             tb_assert_and_check_break(impl->aico);
 
             // open aico
-            if (!tb_aico_open_sock_from_type(impl->aico, impl->type, tb_addr_family(addr)))
+            if (!tb_aico_open_sock_from_type(impl->aico, impl->type, tb_ipaddr_family(addr)))
             {
                 // trace
                 tb_trace_e("open sock failed!");
@@ -396,11 +396,11 @@ static tb_void_t tb_async_stream_sock_impl_dns_func(tb_aicp_dns_ref_t dns, tb_ch
             tb_assert_and_check_break(url);
 
             // get address from the url
-            tb_addr_ref_t url_addr = tb_url_addr(url);
+            tb_ipaddr_ref_t url_addr = tb_url_addr(url);
             tb_assert_and_check_break(url_addr);
 
             // update the ip address
-            tb_addr_ip_set(url_addr, addr);
+            tb_ipaddr_ip_set(url_addr, addr);
 
             // the sock type: tcp or udp? for url: sock://ip:port/?udp=
             tb_char_t const* args = tb_url_args(url);

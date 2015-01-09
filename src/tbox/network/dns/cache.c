@@ -69,7 +69,7 @@ typedef struct __tb_dns_cache_t
 typedef struct __tb_dns_cache_addr_t
 {
     // the addr
-    tb_addr_t               addr;
+    tb_ipaddr_t               addr;
 
     // the time
     tb_size_t               time;
@@ -110,7 +110,7 @@ static tb_long_t tb_dns_cache_cler(tb_iterator_ref_t iterator, tb_cpointer_t ite
         ok = 0;
 
         // trace
-        tb_trace_d("del: %s => %{addr}, time: %u, size: %u", (tb_char_t const*)item->name, &caddr->addr, caddr->time, tb_hash_size(g_cache.hash));
+        tb_trace_d("del: %s => %{ipaddr}, time: %u, size: %u", (tb_char_t const*)item->name, &caddr->addr, caddr->time, tb_hash_size(g_cache.hash));
 
         // update times
         tb_assert_and_check_return_val(g_cache.times >= caddr->time, -1);
@@ -169,7 +169,7 @@ tb_void_t tb_dns_cache_exit()
     // leave
     tb_spinlock_leave(&g_lock);
 }
-tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_addr_ref_t addr)
+tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(name && addr, tb_false);
@@ -178,20 +178,20 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_addr_ref_t addr)
     tb_trace_d("get: %s", name);
 
     // is addr?
-    tb_check_return_val(!tb_addr_ip_cstr_set(addr, name, TB_ADDR_FAMILY_NONE), tb_true);
+    tb_check_return_val(!tb_ipaddr_ip_cstr_set(addr, name, TB_IPADDR_FAMILY_NONE), tb_true);
 
     // is localhost?
     if (!tb_stricmp(name, "localhost"))
     {
         // save address
-        tb_addr_ip_cstr_set(addr, "127.0.0.1", TB_ADDR_FAMILY_IPV4);
+        tb_ipaddr_ip_cstr_set(addr, "127.0.0.1", TB_IPADDR_FAMILY_IPV4);
 
         // ok
         return tb_true;
     }
 
     // clear address
-    tb_addr_clear(addr);
+    tb_ipaddr_clear(addr);
 
     // enter
     tb_spinlock_enter(&g_lock);
@@ -208,7 +208,7 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_addr_ref_t addr)
         tb_check_break(caddr);
 
         // trace
-        tb_trace_d("get: %s => %{addr}, time: %u => %u, size: %u", name, &caddr->addr, caddr->time, tb_dns_cache_now(), tb_hash_size(g_cache.hash));
+        tb_trace_d("get: %s => %{ipaddr}, time: %u => %u, size: %u", name, &caddr->addr, caddr->time, tb_dns_cache_now(), tb_hash_size(g_cache.hash));
 
         // update time
         tb_assert_and_check_break(g_cache.times >= caddr->time);
@@ -217,7 +217,7 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_addr_ref_t addr)
         g_cache.times += caddr->time;
 
         // save address
-        tb_addr_copy(addr, &caddr->addr);
+        tb_ipaddr_copy(addr, &caddr->addr);
 
         // ok
         ok = tb_true;
@@ -230,21 +230,21 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_addr_ref_t addr)
     // ok?
     return ok;
 }
-tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_addr_ref_t addr)
+tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return(name && addr);
 
     // check address
-    tb_assert_abort(!tb_addr_ip_is_empty(addr));
+    tb_assert_abort(!tb_ipaddr_ip_is_empty(addr));
 
     // trace
-    tb_trace_d("set: %s => %{addr}", name, addr);
+    tb_trace_d("set: %s => %{ipaddr}", name, addr);
 
     // init addr
     tb_dns_cache_addr_t caddr;
     caddr.time = tb_dns_cache_now();
-    tb_addr_copy(&caddr.addr, addr);
+    tb_ipaddr_copy(&caddr.addr, addr);
 
     // enter
     tb_spinlock_enter(&g_lock);
@@ -281,7 +281,7 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_addr_ref_t addr)
         g_cache.times += caddr.time;
 
         // trace
-        tb_trace_d("set: %s => %{addr}, time: %u, size: %u", name, &caddr.addr, caddr.time, tb_hash_size(g_cache.hash));
+        tb_trace_d("set: %s => %{ipaddr}, time: %u, size: %u", name, &caddr.addr, caddr.time, tb_hash_size(g_cache.hash));
 
     } while (0);
 

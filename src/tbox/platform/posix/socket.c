@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "sockaddr.h"
 #include "../file.h"
 #include "../socket.h"
 #include "../../utils/utils.h"
@@ -41,137 +42,6 @@
 #if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
 #   include <sys/sendfile.h>
 #endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
- */
-static tb_size_t tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage const* saddr)
-{
-    // check
-    tb_assert_and_check_return_val(addr && saddr, 0);
-
-    // clear address
-    tb_addr_clear(addr);
-
-    // done
-    tb_size_t size = 0;
-    switch (saddr->ss_family)
-    {
-    case AF_INET:
-        {
-            // the ipv4 addr
-            struct sockaddr_in* addr4 = (struct sockaddr_in*)saddr;
-
-            // save family
-            tb_addr_family_set(addr, TB_ADDR_FAMILY_IPV4);
-
-            // save ipv4
-            addr->u.ipv4.u32 = (tb_uint32_t)addr4->sin_addr.s_addr;
-
-            // save port
-            tb_addr_port_set(addr, tb_bits_be_to_ne_u16(addr4->sin_port));
-
-            // save size
-            size = sizeof(struct sockaddr_in);
-        }
-        break;
-    case AF_INET6:
-        {
-            // the ipv6 addr
-            struct sockaddr_in6* addr6 = (struct sockaddr_in6*)saddr;
-
-            // check
-            tb_assert_static(sizeof(addr->u.ipv6.addr.u8) == sizeof(addr6->sin6_addr.s6_addr));
-            tb_assert_static(tb_arrayn(addr->u.ipv6.addr.u8) == tb_arrayn(addr6->sin6_addr.s6_addr));
-
-            // save family
-            tb_addr_family_set(addr, TB_ADDR_FAMILY_IPV6);
-
-            // save ipv6
-            tb_memcpy(addr->u.ipv6.addr.u8, addr6->sin6_addr.s6_addr, sizeof(addr->u.ipv6.addr.u8));
-
-            // save port
-            tb_addr_port_set(addr, tb_bits_be_to_ne_u16(addr6->sin6_port));
-
-            // save scope id
-            addr->u.ipv6.scope_id = addr6->sin6_scope_id;
-
-            // save size
-            size = sizeof(struct sockaddr_in6);
-        }
-        break;
-    default:
-        tb_assert_abort(0);
-        break;
-    }
-    
-    // ok?
-    return size;
-}
-static tb_size_t tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref_t addr)
-{
-    // check
-    tb_assert_and_check_return_val(saddr && addr, 0);
-
-    // clear address
-    tb_memset(saddr, 0, sizeof(struct sockaddr_storage));
-
-    // done
-    tb_size_t size = 0;
-    switch (tb_addr_family(addr))
-    {
-    case TB_ADDR_FAMILY_IPV4:
-        {
-            // the ipv4 addr
-            struct sockaddr_in* addr4 = (struct sockaddr_in*)saddr;
-
-            // save family
-            addr4->sin_family = AF_INET;
-
-            // save ipv4
-            addr4->sin_addr.s_addr = tb_addr_ip_is_any(addr)? INADDR_ANY : addr->u.ipv4.u32;
-
-            // save port
-            addr4->sin_port = tb_bits_ne_to_be_u16(tb_addr_port(addr));
-
-            // save size
-            size = sizeof(struct sockaddr_in);
-        }
-        break;
-    case TB_ADDR_FAMILY_IPV6:
-        {
-            // the ipv6 addr
-            struct sockaddr_in6* addr6 = (struct sockaddr_in6*)saddr;
-
-            // check
-            tb_assert_static(sizeof(addr->u.ipv6.addr.u8) == sizeof(addr6->sin6_addr.s6_addr));
-            tb_assert_static(tb_arrayn(addr->u.ipv6.addr.u8) == tb_arrayn(addr6->sin6_addr.s6_addr));
-
-            // save family
-            addr6->sin6_family = AF_INET6;
-
-            // save ipv6
-            if (tb_addr_ip_is_any(addr)) addr6->sin6_addr = in6addr_any;
-            else tb_memcpy(addr6->sin6_addr.s6_addr, addr->u.ipv6.addr.u8, sizeof(addr6->sin6_addr.s6_addr));
-
-            // save port
-            addr6->sin6_port = tb_bits_ne_to_be_u16(tb_addr_port(addr));
-
-            // save scope id
-            addr6->sin6_scope_id = addr->u.ipv6.scope_id;
-
-            // save size
-            size = sizeof(struct sockaddr_in6);
-        }
-        break;
-    default:
-        tb_assert_abort(0);
-        break;
-    }
-    
-    // ok?
-    return size;
-}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -218,7 +88,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
         else break;
 
         // init socket family
-        tb_int_t f = (family == TB_ADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
+        tb_int_t f = (family == TB_IPADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
 
         // sock
         tb_int_t fd = socket(f, t, p);
@@ -397,16 +267,16 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
     // ok?
     return ok;
 }
-tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock && addr, -1);
-    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
+    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = tb_socket_addr_load(&d, addr))) return -1;
+    if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // connect
     tb_long_t r = connect(tb_sock2fd(sock), (struct sockaddr *)&d, n);
@@ -420,7 +290,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr)
     // error
     return -1;
 }
-tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock && addr, tb_false);
@@ -428,7 +298,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
     // load addr
     tb_int_t                n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = (tb_int_t)tb_socket_addr_load(&d, addr))) return tb_false;
+    if (!(n = (tb_int_t)tb_sockaddr_load(&d, addr))) return tb_false;
 
     // reuse addr
 #ifdef SO_REUSEADDR
@@ -444,19 +314,19 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr)
 
     // reuse port
 #ifdef SO_REUSEPORT
-    if (tb_addr_port(addr))
+    if (tb_ipaddr_port(addr))
     {
         tb_int_t reuseport = 1;
         if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
         {
             // trace
-            tb_trace_e("reuseport: %u failed", tb_addr_port(addr));
+            tb_trace_e("reuseport: %u failed", tb_ipaddr_port(addr));
         }
     }
 #endif
 
     // only bind ipv6 address
-    if (tb_addr_family(addr) == TB_ADDR_FAMILY_IPV6)
+    if (tb_ipaddr_family(addr) == TB_IPADDR_FAMILY_IPV6)
     {
         tb_int_t only_ipv6 = 1;
         if (setsockopt(tb_sock2fd(sock), IPPROTO_IPV6, IPV6_V6ONLY, (tb_int_t *)&only_ipv6, sizeof(only_ipv6)) < 0)
@@ -477,7 +347,7 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
     // listen
     return (listen(tb_sock2fd(sock), backlog) < 0)? tb_false : tb_true;
 }
-tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
@@ -494,12 +364,12 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr)
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
     // save address
-    if (addr) tb_socket_addr_save(addr, &d);
+    if (addr) tb_sockaddr_save(addr, &d);
         
     // ok
     return tb_fd2sock(fd);
 }
-tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_addr_ref_t addr)
+tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_false);
@@ -510,7 +380,7 @@ tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_addr_ref_t addr)
     if (getsockname(tb_sock2fd(sock), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return tb_false;
 
     // save address
-    if (addr) tb_socket_addr_save(addr, &d);
+    if (addr) tb_sockaddr_save(addr, &d);
 
     // ok
     return tb_true;
@@ -702,7 +572,7 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
     return writ == read? writ : -1;
 #endif
 }
-tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && data, -1);
@@ -719,7 +589,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* d
     if (r >= 0) 
     {
         // save address
-        if (addr) tb_socket_addr_save(addr, &d);
+        if (addr) tb_sockaddr_save(addr, &d);
 
         // ok
         return r;
@@ -731,11 +601,11 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* d
     // error
     return -1;
 }
-tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && addr && data, -1);
-    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
+    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // no size?
     tb_check_return_val(size, 0);
@@ -743,7 +613,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t co
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = tb_socket_addr_load(&d, addr))) return -1;
+    if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // send
     tb_long_t r = sendto(tb_sock2fd(sock), data, (tb_int_t)size, 0, (struct sockaddr*)&d, n);
@@ -757,7 +627,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t co
     // error
     return -1;
 }
-tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && list && size, -1);
@@ -780,7 +650,7 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t 
     if (r >= 0)
     {
         // save address
-        if (addr) tb_socket_addr_save(addr, &d);
+        if (addr) tb_sockaddr_save(addr, &d);
 
         // ok
         return r;
@@ -792,16 +662,16 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t 
     // error
     return -1;
 }
-tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(sock && addr && list && size, -1);
-    tb_assert_abort_and_check_return_val(!tb_addr_is_empty(addr), -1);
+    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
-    if (!(n = tb_socket_addr_load(&d, addr))) return -1;
+    if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // init msg
     struct msghdr msg = {0};

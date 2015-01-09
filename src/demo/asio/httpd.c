@@ -798,11 +798,11 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
         tb_assert_and_check_break(httpd->aico);
 
         // init addr
-        tb_addr_t addr;
-        tb_addr_set(&addr, tb_null, httpd->port, TB_ADDR_FAMILY_IPV4);
+        tb_ipaddr_t addr;
+        tb_ipaddr_set(&addr, tb_null, httpd->port, TB_IPADDR_FAMILY_IPV4);
 
         // open aico
-        if (!tb_aico_open_sock_from_type(httpd->aico, TB_SOCKET_TYPE_TCP, tb_addr_family(&addr))) break;
+        if (!tb_aico_open_sock_from_type(httpd->aico, TB_SOCKET_TYPE_TCP, tb_ipaddr_family(&addr))) break;
 
         // bind port
         if (!tb_socket_bind(tb_aico_sock(httpd->aico), &addr)) break;
@@ -847,7 +847,7 @@ static tb_bool_t tb_demo_httpd_acpt(tb_aice_ref_t aice)
         tb_assert_and_check_break(aice->u.acpt.aico);
 
         // trace
-        tb_trace_d("acpt[%p]: aico: %p, addr: %{addr}", aice->aico, aice->u.acpt.aico, &aice->u.acpt.addr);
+        tb_trace_d("acpt[%p]: aico: %p, addr: %{ipaddr}", aice->aico, aice->u.acpt.aico, &aice->u.acpt.addr);
 
 #if 1
         // init the session

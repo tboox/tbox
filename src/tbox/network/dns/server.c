@@ -57,7 +57,7 @@ typedef struct __tb_dns_server_t
     tb_size_t               rate;
 
     // the addr
-    tb_addr_t               addr;
+    tb_ipaddr_t               addr;
 
 }tb_dns_server_t;
 
@@ -97,10 +97,10 @@ static tb_long_t tb_dns_server_comp(tb_item_func_t* func, tb_cpointer_t litem, t
     // comp
     return (lrate > rrate? 1 : (lrate < rrate? -1 : 0));
 }
-static tb_long_t tb_dns_server_test(tb_addr_ref_t addr)
+static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
 {
     // check
-    tb_assert_and_check_return_val(addr && !tb_addr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(addr && !tb_ipaddr_is_empty(addr), -1);
 
     // done
     tb_static_stream_t  sstream;
@@ -111,10 +111,10 @@ static tb_long_t tb_dns_server_test(tb_addr_ref_t addr)
     do
     { 
         // trace
-        tb_trace_d("test: %{addr}: ..", addr);
+        tb_trace_d("test: %{ipaddr}: ..", addr);
 
         // init sock
-        sock = tb_socket_init(TB_SOCKET_TYPE_UDP, tb_addr_family(addr));
+        sock = tb_socket_init(TB_SOCKET_TYPE_UDP, tb_ipaddr_family(addr));
         tb_assert_and_check_break(sock);
 
         // init stream
@@ -282,7 +282,7 @@ static tb_long_t tb_dns_server_test(tb_addr_ref_t addr)
         rate = (tb_long_t)(tb_cache_time_spak() - time);
 
         // ok
-        tb_trace_d("test: %{addr} ok, rate: %u", addr, rate);
+        tb_trace_d("test: %{ipaddr} ok, rate: %u", addr, rate);
 
     } while (0);
 
@@ -394,7 +394,7 @@ tb_void_t tb_dns_server_dump()
             if (server)
             {
                 // trace
-                tb_trace_i("server: %{addr}, rate: %u", &server->addr, server->rate);
+                tb_trace_i("server: %{ipaddr}, rate: %u", &server->addr, server->rate);
             }
         }
     }
@@ -464,7 +464,7 @@ tb_void_t tb_dns_server_sort()
     // exit list
     tb_vector_exit(list);
 }
-tb_size_t tb_dns_server_get(tb_addr_t addr[2])
+tb_size_t tb_dns_server_get(tb_ipaddr_t addr[2])
 { 
     // check
     tb_assert_and_check_return_val(addr, 0);
@@ -529,7 +529,7 @@ tb_void_t tb_dns_server_add(tb_char_t const* addr)
 
         // init server
         tb_dns_server_t server = {0};
-        if (!tb_addr_set(&server.addr, addr, TB_DNS_HOST_PORT, TB_ADDR_FAMILY_NONE)) break;
+        if (!tb_ipaddr_set(&server.addr, addr, TB_DNS_HOST_PORT, TB_IPADDR_FAMILY_NONE)) break;
 
         // add server
         tb_vector_insert_tail(g_list.list, &server);
