@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../network/addr.h"
+#include "../network/ipaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -113,7 +113,7 @@ tb_bool_t           tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...);
  *
  * @return          ok: 1, continue: 0; failed: -1
  */
-tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr);
+tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
 /*! bind socket
  *
@@ -126,7 +126,7 @@ tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_addr_ref_t addr);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_socket_bind(tb_socket_ref_t sock, tb_addr_ref_t addr);
+tb_bool_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
 /*! listen socket
  *
@@ -144,7 +144,7 @@ tb_bool_t           tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog);
  *
  * @return          the client socket 
  */
-tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr);
+tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
 /*! get local address
  *
@@ -153,7 +153,7 @@ tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_addr_ref_t addr);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_socket_local(tb_socket_ref_t sock, tb_addr_ref_t addr);
+tb_bool_t           tb_socket_local(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
 /*! kill socket
  *
@@ -223,7 +223,7 @@ tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t const* data, tb_size_t size);
+tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size);
     
 /*! recv the socket data for udp
  *
@@ -234,7 +234,7 @@ tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_addr_ref_t addr, tb
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_byte_t* data, tb_size_t size);
+tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size);
 
 /*! urecvv the socket data for udp
  * 
@@ -245,7 +245,7 @@ tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
 
 /*! usendv the socket data for udp
  * 
@@ -256,7 +256,7 @@ tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_addr_ref_t addr, t
  *
  * @return          the real size or -1
  */
-tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_addr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
+tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -55,7 +55,7 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
     do
     {
         // init sock
-        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_ADDR_FAMILY_IPV4);
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
         tb_assert_and_check_break(sock);
 
         // init AcceptEx

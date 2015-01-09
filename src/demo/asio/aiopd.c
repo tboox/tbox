@@ -78,11 +78,11 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
     do
     {
         // init addr
-        tb_addr_t addr;
-        tb_addr_set(&addr, tb_null, 9090, TB_ADDR_FAMILY_IPV4);
+        tb_ipaddr_t addr;
+        tb_ipaddr_set(&addr, tb_null, 9090, TB_IPADDR_FAMILY_IPV4);
 
         // init sock
-        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, tb_addr_family(&addr));
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, tb_ipaddr_family(&addr));
         tb_assert_and_check_break(sock);
 
         // init aiop

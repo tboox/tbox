@@ -66,7 +66,7 @@ demo_C_FILES 								+= \
 											platform/process \
 											platform/barrier \
 											platform/atomic64 \
-											platform/hostmac \
+											platform/ifaddrs \
 											platform/hostname \
 											platform/processor \
 											platform/backtrace \

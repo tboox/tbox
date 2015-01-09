@@ -54,7 +54,7 @@ tb_void_t           tb_dns_server_sort(tb_noarg_t);
  *
  * @return          the server size
  */
-tb_size_t           tb_dns_server_get(tb_addr_t addr[2]);
+tb_size_t           tb_dns_server_get(tb_ipaddr_t addr[2]);
 
 /*! add the server 
  *

@@ -23,11 +23,11 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
     do
     {
         // init addr
-        tb_addr_t addr;
-        if (!tb_addr_set(&addr, "127.0.0.1", 9090, TB_ADDR_FAMILY_NONE)) break;
+        tb_ipaddr_t addr;
+        if (!tb_ipaddr_set(&addr, "127.0.0.1", 9090, TB_IPADDR_FAMILY_NONE)) break;
 
         // init sock
-        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, tb_addr_family(&addr));
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, tb_ipaddr_family(&addr));
         tb_assert_and_check_break(sock);
 
         // init file

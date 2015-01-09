@@ -68,7 +68,7 @@ typedef struct __tb_aicp_dns_impl_t
     tb_size_t               indx;
 
     // the server list
-    tb_addr_t               list[3];
+    tb_ipaddr_t               list[3];
 
     // the server size
     tb_size_t               size;
@@ -163,7 +163,7 @@ static tb_size_t tb_aicp_dns_reqt_init(tb_aicp_dns_impl_t* impl)
     // ok?
     return tb_static_stream_offset(&stream);
 }
-static tb_bool_t tb_aicp_dns_resp_done(tb_aicp_dns_impl_t* impl, tb_size_t size, tb_addr_ref_t addr)
+static tb_bool_t tb_aicp_dns_resp_done(tb_aicp_dns_impl_t* impl, tb_size_t size, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(impl && addr, tb_false);
@@ -264,7 +264,7 @@ static tb_bool_t tb_aicp_dns_resp_done(tb_aicp_dns_impl_t* impl, tb_size_t size,
                     ipv4.u8[3] = b4;
 
                     // save ipv4
-                    tb_addr_ipv4_set(addr, &ipv4);
+                    tb_ipaddr_ipv4_set(addr, &ipv4);
                 }
 
                 // found it
@@ -309,11 +309,11 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_ref_t aice)
     tb_assert_and_check_return_val(impl, tb_false);
 
     // done
-    tb_addr_t addr = {0};
+    tb_ipaddr_t addr = {0};
     if (aice->state == TB_STATE_OK)
     {
         // trace
-        tb_trace_d("resp[%s]: aico: %p, server: %{addr}, real: %lu", impl->host, impl->aico, &aice->u.urecv.addr, aice->u.urecv.real);
+        tb_trace_d("resp[%s]: aico: %p, server: %{ipaddr}, real: %lu", impl->host, impl->aico, &aice->u.urecv.addr, aice->u.urecv.real);
 
         // check
         tb_assert_and_check_return_val(aice->u.urecv.real, tb_false);
@@ -330,7 +330,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_ref_t aice)
 
     // ok or try to get ok from cache again if failed or timeout? 
     tb_bool_t from_cache = tb_false;
-    if (!tb_addr_ip_is_empty(&addr) || (from_cache = tb_dns_cache_get(impl->host, &addr))) 
+    if (!tb_ipaddr_ip_is_empty(&addr) || (from_cache = tb_dns_cache_get(impl->host, &addr))) 
     {
         // save to cache 
         if (!from_cache) tb_dns_cache_set(impl->host, &addr);
@@ -342,8 +342,8 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_ref_t aice)
 
     // try next server?
     tb_bool_t       ok = tb_false;
-    tb_addr_ref_t   server = &impl->list[impl->indx + 1];
-    if (!tb_addr_is_empty(server))
+    tb_ipaddr_ref_t   server = &impl->list[impl->indx + 1];
+    if (!tb_ipaddr_is_empty(server))
     {   
         // indx++
         impl->indx++;
@@ -381,7 +381,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_ref_t aice)
     if (aice->state == TB_STATE_OK)
     {
         // trace
-        tb_trace_d("reqt[%s]: aico: %p, server: %{addr}, real: %lu", impl->host, impl->aico, &aice->u.usend.addr, aice->u.usend.real);
+        tb_trace_d("reqt[%s]: aico: %p, server: %{ipaddr}, real: %lu", impl->host, impl->aico, &aice->u.usend.addr, aice->u.usend.real);
 
         // check
         tb_assert_and_check_return_val(aice->u.usend.real, tb_false);
@@ -393,11 +393,11 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_ref_t aice)
     else
     {
         // trace
-        tb_trace_d("reqt[%s]: aico: %p, server: %{addr}, state: %s", impl->host, impl->aico, &aice->u.usend.addr, tb_state_cstr(aice->state));
+        tb_trace_d("reqt[%s]: aico: %p, server: %{ipaddr}, state: %s", impl->host, impl->aico, &aice->u.usend.addr, tb_state_cstr(aice->state));
             
         // the next server 
-        tb_addr_ref_t server = &impl->list[impl->indx + 1];
-        if (!tb_addr_is_empty(server))
+        tb_ipaddr_ref_t server = &impl->list[impl->indx + 1];
+        if (!tb_ipaddr_is_empty(server))
         {   
             // indx++
             impl->indx++;
@@ -514,8 +514,8 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long
     tb_strlcpy(impl->host, host, sizeof(impl->host) - 1);
  
     // only address? ok
-    tb_addr_t addr = {0};
-    if (tb_addr_ip_cstr_set(&addr, impl->host, TB_ADDR_FAMILY_NONE))
+    tb_ipaddr_t addr = {0};
+    if (tb_ipaddr_ip_cstr_set(&addr, impl->host, TB_IPADDR_FAMILY_NONE))
     {
         impl->done.func(dns, impl->host, &addr, impl->done.priv);
         return tb_true;
@@ -533,8 +533,8 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long
     tb_check_return_val(impl->size, tb_false);
 
     // get the server 
-    tb_addr_ref_t server = &impl->list[impl->indx = 0];
-    tb_assert_and_check_return_val(!tb_addr_is_empty(server), tb_false);
+    tb_ipaddr_ref_t server = &impl->list[impl->indx = 0];
+    tb_assert_and_check_return_val(!tb_ipaddr_is_empty(server), tb_false);
 
     // init reqt
     tb_size_t size = tb_aicp_dns_reqt_init(impl);
@@ -548,7 +548,7 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long
         tb_assert_and_check_return_val(impl->aico, tb_false);
 
         // open aico
-        if (!tb_aico_open_sock_from_type(impl->aico, TB_SOCKET_TYPE_UDP, tb_addr_family(server))) return tb_false;
+        if (!tb_aico_open_sock_from_type(impl->aico, TB_SOCKET_TYPE_UDP, tb_ipaddr_family(server))) return tb_false;
 
         // init timeout
         tb_aico_timeout_set(impl->aico, TB_AICO_TIMEOUT_SEND, timeout);
