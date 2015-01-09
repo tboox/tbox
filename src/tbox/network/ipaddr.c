@@ -76,6 +76,7 @@ tb_void_t tb_ipaddr_clear(tb_ipaddr_ref_t ipaddr)
     // clear it
     ipaddr->family  = TB_IPADDR_FAMILY_IPV4;
     ipaddr->have_ip = 0;
+    ipaddr->port    = 0;
 }
 tb_void_t tb_ipaddr_copy(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t copied)
 {

@@ -45,9 +45,11 @@ __tb_extern_c_enter__
 typedef enum __tb_ifaddrs_interface_flag_e
 {
     TB_IFADDRS_INTERFACE_FLAG_NONE          = 0
-,   TB_IFADDRS_INTERFACE_FLAG_IS_IPADDR     = 1
-,   TB_IFADDRS_INTERFACE_FLAG_IS_HWADDR     = 2
-,   TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK   = 4
+,   TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4  = 1
+,   TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6  = 2
+,   TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR   = TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4 | TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6
+,   TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR   = 4
+,   TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK   = 8
 
 }tb_ifaddrs_interface_flag_e;
 
@@ -60,16 +62,14 @@ typedef struct __tb_ifaddrs_interface_t
     /// the interface flags
     tb_uint32_t             flags;
 
-    /// the address
-    union
-    {
-        // the ip address
-        tb_ipaddr_t         ip;
+    // the hardware address
+    tb_hwaddr_t             hwaddr;
 
-        // the hardware address
-        tb_hwaddr_t         hw;
+    // the ipv4 address
+    tb_ipv4_t               ipaddr4;
 
-    } addr;
+    // the ipv6 address
+    tb_ipv6_t               ipaddr6;
 
 }tb_ifaddrs_interface_t, *tb_ifaddrs_interface_ref_t;
 
@@ -114,26 +114,38 @@ tb_void_t                   tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs);
  */
 tb_iterator_ref_t           tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload);
 
-/*! the hardware address from the given interface name
+/*! get the interface from the given interface name
  *
  * @param ifaddrs           the ifaddrs
- * @param name              the interface name, get the first ether address if ne null
- * @param hwaddr            the hardware address
+ * @param name              the interface name
+ * @param reload            force to reload the ifaddrs list, will cache list if be false
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_ifaddrs_hwaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_hwaddr_ref_t hwaddr);
+tb_ifaddrs_interface_ref_t  tb_ifaddrs_interface(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_bool_t reload);
 
 /*! the hardware address from the given interface name
  *
  * @param ifaddrs           the ifaddrs
  * @param name              the interface name, get the first ether address if ne null
+ * @param reload            force to reload the ifaddrs list, will cache list if be false
+ * @param hwaddr            the hardware address
+ *
+ * @return                  tb_true or tb_false
+ */
+tb_bool_t                   tb_ifaddrs_hwaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_bool_t reload, tb_hwaddr_ref_t hwaddr);
+
+/*! the hardware address from the given interface name
+ *
+ * @param ifaddrs           the ifaddrs
+ * @param name              the interface name, get the first ether address if ne null
+ * @param reload            force to reload the ifaddrs list, will cache list if be false
  * @param family            the address family 
  * @param ipaddr            the ip address
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_ifaddrs_ipaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_size_t family, tb_ipaddr_ref_t ipaddr);
+tb_bool_t                   tb_ifaddrs_ipaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_bool_t reload, tb_size_t family, tb_ipaddr_ref_t ipaddr);
 
 #ifdef __tb_debug__
 /*! dump the ifaddrs

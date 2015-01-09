@@ -131,7 +131,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     tb_list_ref_t interfaces = (tb_list_ref_t)ifaddrs;
     tb_assert_and_check_return_val(interfaces, tb_null);
 
-    // uses the cached interfaces if be not reload
+    // uses the cached interfaces?
     tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
 
     // clear interfaces first
@@ -146,39 +146,16 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
         for (item = list; item; item = item->ifa_next)
         {
             // check
-            tb_check_continue(item->ifa_addr);
+            tb_check_continue(item->ifa_addr && item->ifa_name);
 
-#if 0
-            // is this address?
-            if (    item->ifa_addr
-                &&  (item->ifa_addr->sa_family == AF_LINK)
-                && (((struct sockaddr_dl const*)item->ifa_addr)->sdl_type == IFT_ETHER)) 
-            {
-                // is this item?
-                if (!interface_name || (item->ifa_name && !tb_strcmp(item->ifa_name, interface_name)))
-                {
-                    // the address data
-                    struct sockaddr_dl const*   addr = (struct sockaddr_dl const*)item->ifa_addr;
-                    tb_byte_t const*            base = (tb_byte_t const*)(addr->sdl_data + addr->sdl_nlen);
-
-                    // save the mac address
-                    if (addr->sdl_alen > 5)
-                    {
-                        // copy it
-                        tb_memcpy(mac_address, base, 6);
-
-                        // ok
-                        ok = tb_true;
-                    }
-
-                    // end
-                    break;
-                }
-            }
-#endif
+            /* attempt to get the interface from the cached interfaces
+             * and make a new interface if no the cached interface
+             */
+            tb_ifaddrs_interface_t      interface_new = {0};
+            tb_ifaddrs_interface_ref_t  interface = tb_ifaddrs_interface_find((tb_iterator_ref_t)interfaces, item->ifa_name);
+            if (!interface) interface = &interface_new;
 
             // done
-            tb_ifaddrs_interface_t interface = {0};
             switch (item->ifa_addr->sa_family)
             {
             case AF_INET:
@@ -186,18 +163,25 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     // the address
                     struct sockaddr_storage const* addr = (struct sockaddr_storage const*)item->ifa_addr;
 
-                    // init flags
-                    interface.flags = TB_IFADDRS_INTERFACE_FLAG_IS_IPADDR;
-                    if (item->ifa_flags & IFF_LOOPBACK) interface.flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+                    // save ipaddr4
+                    tb_ipaddr_t ipaddr4;
+                    if (!tb_sockaddr_save(&ipaddr4, addr)) break;
+                    interface->ipaddr4 = ipaddr4.u.ipv4;
 
-                    // init interface name
-                    interface.name = tb_strdup(item->ifa_name);
+                    // save flags
+                    interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4;
+                    if (item->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
-                    // init ipaddr
-                    tb_sockaddr_save(&interface.addr.ip, addr);
+                    // new interface? save it
+                    if (interface == &interface_new)
+                    {
+                        // save interface name
+                        interface->name = tb_strdup(item->ifa_name);
+                        tb_assert_abort(interface->name);
 
-                    // append interface
-                    tb_list_insert_tail(interfaces, &interface);
+                        // save interface
+                        tb_list_insert_tail(interfaces, interface);
+                    }
                 }
                 break;
             case AF_INET6:
@@ -205,18 +189,25 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     // the address
                     struct sockaddr_storage const* addr = (struct sockaddr_storage const*)item->ifa_addr;
 
-                    // init flags
-                    interface.flags = TB_IFADDRS_INTERFACE_FLAG_IS_IPADDR;
-                    if (item->ifa_flags & IFF_LOOPBACK) interface.flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+                    // save ipaddr6
+                    tb_ipaddr_t ipaddr6;
+                    if (!tb_sockaddr_save(&ipaddr6, addr)) break;
+                    interface->ipaddr6 = ipaddr6.u.ipv6;
 
-                    // init interface name
-                    interface.name = tb_strdup(item->ifa_name);
+                    // save flags
+                    interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6;
+                    if (item->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
-                    // init ipaddr
-                    tb_sockaddr_save(&interface.addr.ip, addr);
+                    // new interface? save it
+                    if (interface == &interface_new)
+                    {
+                        // save interface name
+                        interface->name = tb_strdup(item->ifa_name);
+                        tb_assert_abort(interface->name);
 
-                    // append interface
-                    tb_list_insert_tail(interfaces, &interface);
+                        // save interface
+                        tb_list_insert_tail(interfaces, interface);
+                    }
                 }
             case AF_LINK:
                 {
@@ -225,26 +216,31 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     tb_byte_t const*            base = (tb_byte_t const*)(addr->sdl_data + addr->sdl_nlen);
 
                     // check
-                    tb_check_break(addr->sdl_alen == sizeof(interface.addr.hw.u8));
+                    tb_check_break(addr->sdl_alen == sizeof(interface->hwaddr.u8));
 
-                    // init interface name
-                    interface.name = tb_strdup(item->ifa_name);
+                    // save flags
+                    interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR;
+                    if (item->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
-                    // init flags
-                    interface.flags = TB_IFADDRS_INTERFACE_FLAG_IS_HWADDR;
-                    if (item->ifa_flags & IFF_LOOPBACK) interface.flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+                    // save hwaddr
+                    tb_memcpy(interface->hwaddr.u8, base, sizeof(interface->hwaddr.u8));
 
-                    // init hwaddr
-                    tb_memcpy(interface.addr.hw.u8, base, sizeof(interface.addr.hw.u8));
+                    // new interface? save it
+                    if (interface == &interface_new)
+                    {
+                        // save interface name
+                        interface->name = tb_strdup(item->ifa_name);
+                        tb_assert_abort(interface->name);
 
-                    // append interface
-                    tb_list_insert_tail(interfaces, &interface);
+                        // save interface
+                        tb_list_insert_tail(interfaces, interface);
+                    }
                 }
                 break;
             default:
                 {
                     // trace
-                    //tb_trace_d("unknown family: %d", item->ifa_addr->sa_family);
+                    tb_trace_d("unknown family: %d", item->ifa_addr->sa_family);
                 }
                 break;
             }
