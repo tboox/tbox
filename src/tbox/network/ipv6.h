@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  */
 
 /// the ipv6 string data maxn
-#define TB_IPV6_CSTR_MAXN           (40)
+#define TB_IPV6_CSTR_MAXN           (40 + 20)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -51,18 +51,27 @@ __tb_extern_c_enter__
  * xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
  * xxxx::xxxx:xxxx
  * ::ffff:xxx.xxx.xxx.xxx
+ * ::fe80:1%1
  * </pre>
  */
-typedef union __tb_ipv6_t
+typedef struct __tb_ipv6_t
 {
-    /// u32, little-endian
-    tb_uint32_t     u32[4];
+    /// the scope id
+    tb_uint32_t         scope_id;
 
-    /// u16, little-endian
-    tb_uint16_t     u16[8];
+    /// the address
+    union
+    {
+        /// u32, little-endian
+        tb_uint32_t     u32[4];
 
-    /// u8
-    tb_uint8_t      u8[16];
+        /// u16, little-endian
+        tb_uint16_t     u16[8];
+
+        /// u8
+        tb_uint8_t      u8[16];
+
+    }                   addr;
 
 }tb_ipv6_t, *tb_ipv6_ref_t;
 
@@ -76,13 +85,45 @@ typedef union __tb_ipv6_t
  */
 tb_void_t           tb_ipv6_clear(tb_ipv6_ref_t ipv6);
 
-/*! is empty?
+/*! is any address?
  *
  * @param ipv6      the ipv6
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ipv6_is_empty(tb_ipv6_ref_t ipv6);
+tb_bool_t           tb_ipv6_is_any(tb_ipv6_ref_t ipv6);
+
+/*! is loopback address?
+ *
+ * @param ipv6      the ipv6
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv6_is_loopback(tb_ipv6_ref_t ipv6);
+
+/*! is linklocal address?
+ *
+ * @param ipv6      the ipv6
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv6_is_linklocal(tb_ipv6_ref_t ipv6);
+
+/*! is sitelocal address?
+ *
+ * @param ipv6      the ipv6
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv6_is_sitelocal(tb_ipv6_ref_t ipv6);
+
+/*! is multicast address?
+ *
+ * @param ipv6      the ipv6
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv6_is_multicast(tb_ipv6_ref_t ipv6);
 
 /*! is equal?
  *

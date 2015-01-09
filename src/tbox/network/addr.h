@@ -117,7 +117,7 @@ tb_bool_t           tb_addr_is_equal(tb_addr_ref_t addr, tb_addr_ref_t other);
 /*! set the ip address from string
  *
  * @param addr      the address, only analyze format if be null
- * @param cstr      the address string, optional
+ * @param cstr      the address string, init any address if be null
  * @param port      the port, optional
  * @param family    the address family, will analyze family automaticly if be none, optional
  *
@@ -138,6 +138,22 @@ tb_void_t           tb_addr_ip_clear(tb_addr_ref_t addr);
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_addr_ip_is_empty(tb_addr_ref_t addr);
+
+/*! the ip is any?
+ *
+ * @param addr      the address
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_addr_ip_is_any(tb_addr_ref_t addr);
+
+/*! the ip is loopback?
+ *
+ * @param addr      the address
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_addr_ip_is_loopback(tb_addr_ref_t addr);
 
 /*! the ip is equal?
  *

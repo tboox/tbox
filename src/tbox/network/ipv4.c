@@ -49,13 +49,21 @@ tb_void_t tb_ipv4_clear(tb_ipv4_ref_t ipv4)
     // clear it
     ipv4->u32 = 0;
 }
-tb_bool_t tb_ipv4_is_empty(tb_ipv4_ref_t ipv4)
+tb_bool_t tb_ipv4_is_any(tb_ipv4_ref_t ipv4)
 {
     // check
     tb_assert_and_check_return_val(ipv4, tb_true);
 
     // is empty?
     return !ipv4->u32;
+}
+tb_bool_t tb_ipv4_is_loopback(tb_ipv4_ref_t ipv4)
+{
+    // check
+    tb_assert_and_check_return_val(ipv4, tb_false);
+
+    // is loopback?
+    return (ipv4->u32 == 0x7f000001);
 }
 tb_bool_t tb_ipv4_is_equal(tb_ipv4_ref_t ipv4, tb_ipv4_ref_t other)
 {

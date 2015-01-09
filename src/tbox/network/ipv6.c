@@ -50,13 +50,45 @@ tb_void_t tb_ipv6_clear(tb_ipv6_ref_t ipv6)
     // clear it
     tb_memset(ipv6, 0, sizeof(tb_ipv6_t));
 }
-tb_bool_t tb_ipv6_is_empty(tb_ipv6_ref_t ipv6)
+tb_bool_t tb_ipv6_is_any(tb_ipv6_ref_t ipv6)
 {
     // check
     tb_assert_and_check_return_val(ipv6, tb_true);
 
-    // is empty?
-    return !(ipv6->u32[0] || ipv6->u32[1] || ipv6->u32[2] || ipv6->u32[3]);
+    // is any?
+    return !(ipv6->addr.u32[0] || ipv6->addr.u32[1] || ipv6->addr.u32[2] || ipv6->addr.u32[3]);
+}
+tb_bool_t tb_ipv6_is_loopback(tb_ipv6_ref_t ipv6)
+{
+    // check
+    tb_assert_and_check_return_val(ipv6, tb_true);
+
+    // is loopback?
+    return !(ipv6->addr.u32[0] || ipv6->addr.u32[1] || ipv6->addr.u32[2]) && (ipv6->addr.u32[3] == 1);
+}
+tb_bool_t tb_ipv6_is_linklocal(tb_ipv6_ref_t ipv6)
+{
+    // check
+    tb_assert_and_check_return_val(ipv6, tb_true);
+
+    // is linklocal?
+    return (ipv6->addr.u32[0] == 0xfe) && ((ipv6->addr.u32[1] & 0xc0) == 0x80);
+}
+tb_bool_t tb_ipv6_is_sitelocal(tb_ipv6_ref_t ipv6)
+{
+    // check
+    tb_assert_and_check_return_val(ipv6, tb_true);
+
+    // is sitelocal?
+    return (ipv6->addr.u32[0] == 0xfe) && ((ipv6->addr.u32[1] & 0xc0) == 0xc0);
+}
+tb_bool_t tb_ipv6_is_multicast(tb_ipv6_ref_t ipv6)
+{
+    // check
+    tb_assert_and_check_return_val(ipv6, tb_true);
+
+    // is multicast?
+    return (ipv6->addr.u32[0] == 0xff);
 }
 tb_bool_t tb_ipv6_is_equal(tb_ipv6_ref_t ipv6, tb_ipv6_ref_t other)
 {
@@ -64,25 +96,37 @@ tb_bool_t tb_ipv6_is_equal(tb_ipv6_ref_t ipv6, tb_ipv6_ref_t other)
     tb_assert_and_check_return_val(ipv6 && other, tb_false);
 
     // is equal?
-    return (ipv6->u32[0] == other->u32[0]) && (ipv6->u32[1] == other->u32[1]) && (ipv6->u32[2] == other->u32[2]) && (ipv6->u32[3] == other->u32[3]);
+    return (ipv6->scope_id == other->scope_id)
+        && (ipv6->addr.u32[0] == other->addr.u32[0])
+        && (ipv6->addr.u32[1] == other->addr.u32[1])
+        && (ipv6->addr.u32[2] == other->addr.u32[2])
+        && (ipv6->addr.u32[3] == other->addr.u32[3]);
 }
 tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(ipv6 && data && maxn >= TB_IPV6_CSTR_MAXN, tb_null);
 
-    // make it
+    // is linklocal?
+    tb_bool_t is_linklocal = tb_ipv6_is_linklocal(ipv6);
+
+    // make scope_id
+    tb_char_t scope_id[20] = {0};
+    if (is_linklocal) tb_snprintf(scope_id, sizeof(scope_id) - 1, "%%%u", ipv6->scope_id);
+
+    // make ipv6
     tb_long_t size = tb_snprintf(   data
                                 ,   maxn - 1
-                                ,   "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x"
-                                ,   tb_bits_swap_u16(ipv6->u16[0])
-                                ,   tb_bits_swap_u16(ipv6->u16[1])
-                                ,   tb_bits_swap_u16(ipv6->u16[2])
-                                ,   tb_bits_swap_u16(ipv6->u16[3])
-                                ,   tb_bits_swap_u16(ipv6->u16[4])
-                                ,   tb_bits_swap_u16(ipv6->u16[5])
-                                ,   tb_bits_swap_u16(ipv6->u16[6])
-                                ,   tb_bits_swap_u16(ipv6->u16[7]));
+                                ,   "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x%s"
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[0])
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[1])
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[2])
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[3])
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[4])
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[5])
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[6])
+                                ,   tb_bits_swap_u16(ipv6->addr.u16[7])
+                                ,   is_linklocal? scope_id : "");
     if (size >= 0) data[size] = '\0';
 
     // ok
@@ -101,10 +145,10 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
         if (tb_ipv4_cstr_set(&ipv4, cstr + 7))
         {
             // make ipv6
-            ipv6->u32[0] = 0;
-            ipv6->u32[1] = 0;
-            ipv6->u32[2] = 0xffff0000;
-            ipv6->u32[3] = ipv4.u32;
+            ipv6->addr.u32[0] = 0;
+            ipv6->addr.u32[1] = 0;
+            ipv6->addr.u32[2] = 0xffff0000;
+            ipv6->addr.u32[3] = ipv4.u32;
 
             // ok
             return tb_true;
@@ -118,10 +162,10 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
         if (tb_ipv4_cstr_set(&ipv4, cstr + 2))
         {
             // make ipv6
-            ipv6->u32[0] = 0;
-            ipv6->u32[1] = 0;
-            ipv6->u32[2] = 0;
-            ipv6->u32[3] = ipv4.u32;
+            ipv6->addr.u32[0] = 0;
+            ipv6->addr.u32[1] = 0;
+            ipv6->addr.u32[2] = 0;
+            ipv6->addr.u32[3] = ipv4.u32;
 
             // ok
             return tb_true;
@@ -169,7 +213,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
         else if (c == ':' && *p == ':' && p[1] != ':' && !stub)
         {
             // save value
-            temp.u16[i++] = tb_bits_swap_u16(v);
+            temp.addr.u16[i++] = tb_bits_swap_u16(v);
 
             // clear value
             v = 0;
@@ -192,7 +236,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
             tb_check_break_state(n > 0, ok, tb_false);
 
             // save the stub value
-            while (n-- > 0) temp.u16[i++] = 0;
+            while (n-- > 0) temp.addr.u16[i++] = 0;
 
             // only one "::"
             stub = tb_true;
@@ -204,7 +248,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
         else if (i < 8 && ((c == ':' && *p != ':') || !c) && v <= 0xffff && prev)
         {
             // save value
-            temp.u16[i++] = tb_bits_swap_u16(v);
+            temp.addr.u16[i++] = tb_bits_swap_u16(v);
 
             // clear value
             v = 0;
