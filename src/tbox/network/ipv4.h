@@ -72,13 +72,21 @@ typedef union __tb_ipv4_t
  */
 tb_void_t           tb_ipv4_clear(tb_ipv4_ref_t ipv4);
 
-/*! is empty?
+/*! is any address?
  *
  * @param ipv4      the ipv4
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ipv4_is_empty(tb_ipv4_ref_t ipv4);
+tb_bool_t           tb_ipv4_is_any(tb_ipv4_ref_t ipv4);
+
+/*! is loopback address?
+ *
+ * @param ipv4      the ipv4
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv4_is_loopback(tb_ipv4_ref_t ipv4);
 
 /*! is equal?
  *

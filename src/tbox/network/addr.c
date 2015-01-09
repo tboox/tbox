@@ -37,10 +37,10 @@ static __tb_inline__ tb_bool_t tb_addr_ipv6_to_ipv4(tb_ipv6_ref_t ipv6, tb_ipv4_
     tb_assert_abort(ipv6 && ipv4);
 
     // is ipv4?
-    if (!ipv6->u32[0] && !ipv6->u32[1] && ipv6->u32[2] == 0xffff0000)
+    if (!ipv6->addr.u32[0] && !ipv6->addr.u32[1] && ipv6->addr.u32[2] == 0xffff0000)
     {
         // make ipv4
-        ipv4->u32 = ipv6->u32[3];
+        ipv4->u32 = ipv6->addr.u32[3];
 
         // ok
         return tb_true;
@@ -55,10 +55,11 @@ static __tb_inline__ tb_bool_t tb_addr_ipv4_to_ipv6(tb_ipv4_ref_t ipv4, tb_ipv6_
     tb_assert_abort(ipv6 && ipv4);
 
     // make ipv6
-    ipv6->u32[0] = 0;
-    ipv6->u32[1] = 0;
-    ipv6->u32[2] = 0xffff0000;
-    ipv6->u32[3] = ipv4->u32;
+    ipv6->addr.u32[0]   = 0;
+    ipv6->addr.u32[1]   = 0;
+    ipv6->addr.u32[2]   = 0xffff0000;
+    ipv6->addr.u32[3]   = ipv4->u32;
+    ipv6->scope_id      = 0;
 
     // ok
     return tb_true;
@@ -145,6 +146,53 @@ tb_bool_t tb_addr_ip_is_empty(tb_addr_ref_t addr)
 
     // is empty?
     return !addr->have_ip;
+}
+tb_bool_t tb_addr_ip_is_any(tb_addr_ref_t addr)
+{
+    // check
+    tb_assert_and_check_return_val(addr, tb_true);
+
+    // is empty? ok
+    tb_check_return_val(addr->have_ip, tb_true); 
+
+    // done
+    tb_bool_t is_any = tb_true;
+    switch (addr->family)
+    {
+    case TB_ADDR_FAMILY_IPV4:
+        is_any = tb_ipv4_is_any(&addr->u.ipv4);
+        break;
+    case TB_ADDR_FAMILY_IPV6:
+        is_any = tb_ipv6_is_any(&addr->u.ipv6);
+        break;
+    default:
+        break;
+    }
+
+    // is any?
+    return is_any;
+}
+tb_bool_t tb_addr_ip_is_loopback(tb_addr_ref_t addr)
+{
+    // check
+    tb_assert_and_check_return_val(addr, tb_true);
+
+    // done
+    tb_bool_t is_loopback = tb_false;
+    switch (addr->family)
+    {
+    case TB_ADDR_FAMILY_IPV4:
+        is_loopback = tb_ipv4_is_loopback(&addr->u.ipv4);
+        break;
+    case TB_ADDR_FAMILY_IPV6:
+        is_loopback = tb_ipv6_is_loopback(&addr->u.ipv6);
+        break;
+    default:
+        break;
+    }
+
+    // is loopback?
+    return is_loopback;
 }
 tb_bool_t tb_addr_ip_is_equal(tb_addr_ref_t addr, tb_addr_ref_t other)
 {

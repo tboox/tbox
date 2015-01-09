@@ -81,17 +81,20 @@ static tb_size_t tb_socket_addr_save(tb_addr_ref_t addr, struct sockaddr_storage
             struct sockaddr_in6* addr6 = (struct sockaddr_in6*)saddr;
 
             // check
-            tb_assert_static(sizeof(addr->u.ipv6.u8) == sizeof(addr6->sin6_addr.s6_addr));
-            tb_assert_static(tb_arrayn(addr->u.ipv6.u8) == tb_arrayn(addr6->sin6_addr.s6_addr));
+            tb_assert_static(sizeof(addr->u.ipv6.addr.u8) == sizeof(addr6->sin6_addr.s6_addr));
+            tb_assert_static(tb_arrayn(addr->u.ipv6.addr.u8) == tb_arrayn(addr6->sin6_addr.s6_addr));
 
             // save family
             tb_addr_family_set(addr, TB_ADDR_FAMILY_IPV6);
 
             // save ipv6
-            tb_memcpy(addr->u.ipv6.u8, addr6->sin6_addr.s6_addr, sizeof(addr->u.ipv6.u8));
+            tb_memcpy(addr->u.ipv6.addr.u8, addr6->sin6_addr.s6_addr, sizeof(addr->u.ipv6.addr.u8));
 
             // save port
             tb_addr_port_set(addr, tb_bits_be_to_ne_u16(addr6->sin6_port));
+
+            // save scope id
+            addr->u.ipv6.scope_id = addr6->sin6_scope_id;
 
             // save size
             size = sizeof(struct sockaddr_in6);
@@ -126,7 +129,7 @@ static tb_size_t tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref
             addr4->sin_family = AF_INET;
 
             // save ipv4
-            addr4->sin_addr.s_addr = tb_addr_ip_is_empty(addr)? INADDR_ANY : addr->u.ipv4.u32;
+            addr4->sin_addr.s_addr = tb_addr_ip_is_any(addr)? INADDR_ANY : addr->u.ipv4.u32;
 
             // save port
             addr4->sin_port = tb_bits_ne_to_be_u16(tb_addr_port(addr));
@@ -141,18 +144,21 @@ static tb_size_t tb_socket_addr_load(struct sockaddr_storage* saddr, tb_addr_ref
             struct sockaddr_in6* addr6 = (struct sockaddr_in6*)saddr;
 
             // check
-            tb_assert_static(sizeof(addr->u.ipv6.u8) == sizeof(addr6->sin6_addr.s6_addr));
-            tb_assert_static(tb_arrayn(addr->u.ipv6.u8) == tb_arrayn(addr6->sin6_addr.s6_addr));
+            tb_assert_static(sizeof(addr->u.ipv6.addr.u8) == sizeof(addr6->sin6_addr.s6_addr));
+            tb_assert_static(tb_arrayn(addr->u.ipv6.addr.u8) == tb_arrayn(addr6->sin6_addr.s6_addr));
 
             // save family
             addr6->sin6_family = AF_INET6;
 
             // save ipv6
-            if (tb_addr_ip_is_empty(addr)) addr6->sin6_addr = in6addr_any;
-            else tb_memcpy(addr6->sin6_addr.s6_addr, addr->u.ipv6.u8, sizeof(addr6->sin6_addr.s6_addr));
+            if (tb_addr_ip_is_any(addr)) addr6->sin6_addr = in6addr_any;
+            else tb_memcpy(addr6->sin6_addr.s6_addr, addr->u.ipv6.addr.u8, sizeof(addr6->sin6_addr.s6_addr));
 
             // save port
             addr6->sin6_port = tb_bits_ne_to_be_u16(tb_addr_port(addr));
+
+            // save scope id
+            addr6->sin6_scope_id = addr->u.ipv6.scope_id;
 
             // save size
             size = sizeof(struct sockaddr_in6);
