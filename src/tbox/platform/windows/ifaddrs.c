@@ -1,0 +1,171 @@
+/*!The Treasure Box Library
+ * 
+ * TBox is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ * 
+ * TBox is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with TBox; 
+ * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
+ * 
+ * Copyright (C) 2009 - 2015, ruki All rights reserved.
+ *
+ * @author      ruki
+ * @file        hostmac.c
+ * @ingroup     platform
+ */
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * includes
+ */
+#include "prefix.h"
+#include "../ifaddrs.h"
+#include "../posix/sockaddr.h"
+#include "interface/interface.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_void_t tb_ifaddrs_interface_exit(tb_item_func_t* func, tb_pointer_t buff)
+{
+    // check
+    tb_ifaddrs_interface_ref_t interface = (tb_ifaddrs_interface_ref_t)buff;
+    if (interface)
+    {
+        // exit the interface name
+        if (interface->name) tb_free(interface->name);
+        interface->name = tb_null;
+    }
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_ifaddrs_ref_t tb_ifaddrs_init()
+{
+    // init it
+    return (tb_ifaddrs_ref_t)tb_list_init(8, tb_item_func_mem(sizeof(tb_ifaddrs_interface_t), tb_ifaddrs_interface_exit, tb_null));
+}
+tb_void_t tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs)
+{
+    // exit it
+    if (ifaddrs) tb_list_exit((tb_list_ref_t)ifaddrs);
+}
+tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
+{
+    // check
+    tb_list_ref_t interfaces = (tb_list_ref_t)ifaddrs;
+    tb_assert_and_check_return_val(interfaces, tb_null);
+
+    // uses the cached interfaces?
+    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
+
+    // clear interfaces first
+    tb_list_clear(interfaces);
+
+    // done
+    PIP_ADAPTER_INFO adapter_info = tb_null;
+    do
+    {
+        // make the adapter info 
+        adapter_info = tb_malloc0_type(IP_ADAPTER_INFO);
+        tb_assert_and_check_break(adapter_info);
+
+        // get the real adapter info size
+        ULONG size = sizeof(IP_ADAPTER_INFO);
+        if (tb_iphlpapi()->GetAdaptersInfo(adapter_info, &size) == ERROR_BUFFER_OVERFLOW)
+        {
+            // grow the adapter info buffer
+            adapter_info = (PIP_ADAPTER_INFO)tb_ralloc(adapter_info, size);
+            tb_assert_and_check_break(adapter_info);
+
+            // reclear it
+            tb_memset(adapter_info, 0, size);
+        }
+    
+        // get the adapter info 
+        if (tb_iphlpapi()->GetAdaptersInfo(adapter_info, &size) != NO_ERROR) break;
+
+        // done
+        PIP_ADAPTER_INFO adapter = adapter_info;
+        while (adapter)
+        {
+            // check
+            tb_assert_abort(adapter->AdapterName);
+
+            /* attempt to get the interface from the cached interfaces
+             * and make a new interface if no the cached interface
+             */
+            tb_ifaddrs_interface_t      interface_new = {0};
+            tb_ifaddrs_interface_ref_t  interface = tb_ifaddrs_interface_find((tb_iterator_ref_t)interfaces, adapter->AdapterName);
+            if (!interface) interface = &interface_new;
+
+            // check
+            tb_assert_abort(interface == &interface_new || interface->name);
+
+            // save flags
+            if (adapter->Type == MIB_IF_TYPE_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+
+            // save hwaddr
+            if (adapter->AddressLength == sizeof(interface->hwaddr.u8))
+            {
+                interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR;
+                tb_memcpy(interface->hwaddr.u8, adapter->Address, sizeof(interface->hwaddr.u8));
+            }
+
+            // save ipaddrs
+            PIP_ADDR_STRING ipAddress = &adapter->IpAddressList;
+            while (ipAddress && (interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR) != TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR)
+            {
+                // done
+                tb_ipaddr_t ipaddr;
+                if (    ipAddress->IpAddress.String
+                    &&  tb_ipaddr_ip_cstr_set(&ipaddr, ipAddress->IpAddress.String, TB_IPADDR_FAMILY_NONE))
+                {
+                    if (ipaddr.family == TB_IPADDR_FAMILY_IPV4)
+                    {
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4;
+                        interface->ipaddr4 = ipaddr.u.ipv4;
+                    }
+                    else if (ipaddr.family == TB_IPADDR_FAMILY_IPV6)
+                    {
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6;
+                        interface->ipaddr6 = ipaddr.u.ipv6;
+                    }
+                }
+
+                // the next
+                ipAddress = ipAddress->Next;
+            }
+
+            // new interface? save it
+            if (interface == &interface_new)
+            {
+                // save interface name
+                interface->name = tb_strdup(adapter->AdapterName);
+                tb_assert_abort(interface->name);
+
+                // save interface
+                tb_list_insert_tail(interfaces, interface);
+            }
+
+            // the next adapter
+            adapter = adapter->Next;
+        }
+
+    } while (0);
+
+    // exit the adapter info
+    if (adapter_info) tb_free(adapter_info);
+    adapter_info = tb_null;
+
+    // ok?
+    return (tb_iterator_ref_t)interfaces;
+}
+

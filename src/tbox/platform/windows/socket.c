@@ -25,7 +25,6 @@
  * includes
  */
 #include "prefix.h"
-#include "ipaddr.h"
 #include "../socket.h"
 #include "interface/interface.h"
 #include "socket_pool.h"

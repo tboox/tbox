@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../ifaddrs.h"
 #include <ifaddrs.h>
 #ifdef TB_CONFIG_OS_LINUX
 #   include <linux/if.h>
@@ -34,15 +35,6 @@
 #include <net/if_dl.h>
 #include <netinet/in.h>
 #include "sockaddr.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// Ethernet CSMACD
-#if !defined(IFT_ETHER)
-#   define IFT_ETHER                    (0x6)
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation

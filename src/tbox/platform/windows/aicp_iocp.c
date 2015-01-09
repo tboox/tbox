@@ -26,7 +26,7 @@
  */
 #include "prefix.h"
 #include "interface/interface.h"
-#include "ipaddr.h"
+#include "../posix/sockaddr.h"
 #include "ntstatus.h"
 #include "socket_pool.h"
 #include "../ltimer.h"
