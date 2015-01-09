@@ -88,6 +88,7 @@
  * @endcode
  */
 #define tb_rfor_all(type, item, iterator) \
-            tb_rfor(type, item, tb_iterator_head((tb_iterator_ref_t)iterator), tb_iterator_tail((tb_iterator_ref_t)iterator), iterator)
+            tb_iterator_ref_t item##_iterator_all = (tb_iterator_ref_t)iterator; \
+            tb_rfor(type, item, tb_iterator_head(item##_iterator_all), tb_iterator_tail(item##_iterator_all), item##_iterator_all)
 
 #endif

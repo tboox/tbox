@@ -88,6 +88,7 @@
  * @endcode
  */
 #define tb_for_all_if(type, item, iterator, cond) \
-            tb_for_if(type, item, tb_iterator_head((tb_iterator_ref_t)iterator), tb_iterator_tail((tb_iterator_ref_t)iterator), iterator, cond)
+            tb_iterator_ref_t item##_iterator_all = (tb_iterator_ref_t)iterator; \
+            tb_for_if(type, item, tb_iterator_head(item##_iterator_all), tb_iterator_tail(item##_iterator_all), item##_iterator_all, cond)
 
 #endif

@@ -62,59 +62,6 @@ static tb_void_t tb_ifaddrs_interface_exit(tb_item_func_t* func, tb_pointer_t bu
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if 0
-tb_bool_t tb_ifaddrs(tb_char_t const* interface_name, tb_byte_t mac_address[6])
-{
-    // check
-    tb_assert_and_check_return_val(mac_address, tb_false);
-
-    // clear the mac address
-    tb_memset(mac_address, 0, 6);
-
-    // query the list of interfaces.
-    struct ifaddrs* list = tb_null;
-    if (getifaddrs(&list) < 0 || !list) return tb_false;
-
-    // find the given interface
-    tb_bool_t       ok = tb_false;
-    struct ifaddrs* interface = tb_null;
-    for (interface = list; interface; interface = interface->ifa_next)
-    {
-        // is this address?
-        if (    interface->ifa_addr
-            &&  (interface->ifa_addr->sa_family == AF_LINK)
-            && (((struct sockaddr_dl const*)interface->ifa_addr)->sdl_type == IFT_ETHER)) 
-        {
-            // is this interface?
-            if (!interface_name || (interface->ifa_name && !tb_strcmp(interface->ifa_name, interface_name)))
-            {
-                // the address data
-                struct sockaddr_dl const*   addr = (struct sockaddr_dl const*)interface->ifa_addr;
-                tb_byte_t const*            base = (tb_byte_t const*)(addr->sdl_data + addr->sdl_nlen);
-
-                // save the mac address
-                if (addr->sdl_alen > 5)
-                {
-                    // copy it
-                    tb_memcpy(mac_address, base, 6);
-
-                    // ok
-                    ok = tb_true;
-                }
-
-                // end
-                break;
-            }
-        }
-    }
-
-    // exit the interface list
-    freeifaddrs(list);
-
-    // ok?
-    return ok;
-}
-#endif
 tb_ifaddrs_ref_t tb_ifaddrs_init()
 {
     // init it
@@ -154,6 +101,9 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
             tb_ifaddrs_interface_t      interface_new = {0};
             tb_ifaddrs_interface_ref_t  interface = tb_ifaddrs_interface_find((tb_iterator_ref_t)interfaces, item->ifa_name);
             if (!interface) interface = &interface_new;
+
+            // check
+            tb_assert_abort(interface == &interface_new || interface->name);
 
             // done
             switch (item->ifa_addr->sa_family)
