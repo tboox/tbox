@@ -29,10 +29,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_hostmac(tb_char_t const* interface_name, tb_byte_t mac_address[6])
+tb_ifaddrs_ref_t tb_ifaddrs_init()
 {
-    // TODO
     tb_trace_noimpl();
-    return tb_false;
+    return tb_null;
 }
-
+tb_void_t tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs)
+{
+    tb_trace_noimpl();
+}
+tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
