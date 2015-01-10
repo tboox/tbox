@@ -33,6 +33,7 @@
  */
 #include "ipv6.h"
 #include "ipv4.h"
+#include "ipaddr.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -107,12 +108,9 @@ tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t max
     // check
     tb_assert_and_check_return_val(ipv6 && data && maxn >= TB_IPV6_CSTR_MAXN, tb_null);
 
-    // is linklocal?
-    tb_bool_t is_linklocal = tb_ipv6_is_linklocal(ipv6);
-
     // make scope_id
     tb_char_t scope_id[20] = {0};
-    if (is_linklocal) tb_snprintf(scope_id, sizeof(scope_id) - 1, "%%%u", ipv6->scope_id);
+    if (ipv6->scope_id) tb_snprintf(scope_id, sizeof(scope_id) - 1, "%%%u", ipv6->scope_id);
 
     // make ipv6
     tb_long_t size = tb_snprintf(   data
@@ -126,7 +124,7 @@ tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t max
                                 ,   tb_bits_swap_u16(ipv6->addr.u16[5])
                                 ,   tb_bits_swap_u16(ipv6->addr.u16[6])
                                 ,   tb_bits_swap_u16(ipv6->addr.u16[7])
-                                ,   is_linklocal? scope_id : "");
+                                ,   ipv6->scope_id? scope_id : "");
     if (size >= 0) data[size] = '\0';
 
     // ok
@@ -244,7 +242,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
             // skip ':'
             p++;
         }
-        // ':' or '\0'?
+        // ':' or '\0' or '%'?
         else if (i < 8 && ((c == ':' && *p != ':') || !c) && v <= 0xffff && prev)
         {
             // save value
@@ -255,6 +253,44 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
 
             // clear previous value
             prev = '\0';
+        }
+        // "%xxx"?
+        else if (i == 7 && c == '%' && *p)
+        {
+            // save value
+            temp.addr.u16[i++] = tb_bits_swap_u16(v);
+
+            // is scope id?
+            if (tb_isdigit(*p))
+            {
+                // save the scope id 
+                temp.scope_id = tb_atoi(p);
+ 
+                // trace
+                tb_trace_d("scope_id: %u", temp.scope_id);
+            }
+            // is interface name?
+            else 
+            {
+                // trace
+                tb_trace_d("name: %s", p);
+
+                // get the scope id from the interface name
+                tb_ipaddr_t ipaddr;
+                if (tb_ifaddrs_ipaddr(tb_ifaddrs(), p, tb_false, TB_IPADDR_FAMILY_IPV6, &ipaddr))
+                {
+                    // trace
+                    tb_trace_d("scope_id: %u", ipaddr.u.ipv6.scope_id);
+
+                    // save the scope id
+                    temp.scope_id = ipaddr.u.ipv6.scope_id;
+                }
+                // clear the scope id 
+                else temp.scope_id = 0;
+            }
+
+            // end    
+            break;
         }
         // failed?
         else 

@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME                "ifaddrs"
-#define TB_TRACE_MODULE_DEBUG               (1)
+#define TB_TRACE_MODULE_DEBUG               (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -138,7 +138,6 @@ tb_bool_t tb_ifaddrs_hwaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_
         {
             // is this?
             if (    (interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR)
-                &&  !(interface->flags & TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK)
                 &&  (interface->name && !tb_strcmp(interface->name, name)))
             {
                 // save hwaddr
@@ -194,7 +193,7 @@ tb_bool_t tb_ifaddrs_ipaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_
     tb_for_all_if (tb_ifaddrs_interface_ref_t, interface, iterator, interface)
     {
         // is this?
-        if (    !(interface->flags & TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK)
+        if (    (name || !(interface->flags & TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK))
             &&  (interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR)
             &&  (!name || (interface->name && !tb_strcmp(interface->name, name))))
         {
