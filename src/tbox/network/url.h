@@ -69,7 +69,7 @@ typedef struct __tb_url_t
     tb_uint16_t         pwin:   8;
 
     // the addr
-    tb_ipaddr_t           addr;
+    tb_ipaddr_t         addr;
 
     // the host
     tb_string_t         host;
@@ -200,7 +200,7 @@ tb_void_t           tb_url_port_set(tb_url_ref_t url, tb_uint16_t port);
  *
  * @return          the url address
  */
-tb_ipaddr_ref_t       tb_url_addr(tb_url_ref_t url);
+tb_ipaddr_ref_t     tb_url_addr(tb_url_ref_t url);
 
 /*! set the address to the url
  *
