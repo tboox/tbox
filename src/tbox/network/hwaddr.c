@@ -87,7 +87,66 @@ tb_bool_t tb_hwaddr_cstr_set(tb_hwaddr_ref_t hwaddr, tb_char_t const* cstr)
     // check
     tb_assert_and_check_return_val(cstr, tb_false);
 
+    // done
+    tb_uint32_t         v = 0;
+    tb_char_t           c = '\0';
+    tb_size_t           i = 0;
+    tb_char_t const*    p = cstr;
+    tb_bool_t           ok = tb_true;
+    tb_hwaddr_t         temp;
+    do
+    {
+        // the character
+        c = *p++;
+
+        // digit?
+        if (tb_isdigit16(c) && v <= 0xff)
+        {
+            // update value
+            if (tb_isdigit10(c))
+                v = (v << 4) + (c - '0');
+            else if (c > ('a' - 1) && c < ('f' + 1))
+                v = (v << 4) + (c - 'a') + 10;
+            else if (c > ('A' - 1) && c < ('F' + 1))
+                v = (v << 4) + (c - 'A') + 10;
+            else 
+            {
+                // abort
+                tb_assert_abort(0);
+
+                // failed
+                ok = tb_false;
+                break;
+            }
+        }
+        // ':' or "-" or '\0'?
+        else if (i < 6 && (c == ':' || c == '-' || !c) && v <= 0xff)
+        {
+            // save value
+            temp.u8[i++] = v;
+
+            // clear value
+            v = 0;
+        }
+        // failed?
+        else 
+        {
+            ok = tb_false;
+            break;
+        }
+
+    } while (c);
+
+    // failed
+    if (i != 6) ok = tb_false;
+
+    // save it if ok
+    if (ok && hwaddr) *hwaddr = temp;
+
     // trace
-    tb_trace_noimpl();
-    return tb_false;
+//    tb_assertf(ok, "invalid hwaddr: %s", cstr);
+
+    // ok?
+    return ok;
 }
+

@@ -117,7 +117,7 @@ tb_bool_t tb_ipv4_cstr_set(tb_ipv4_ref_t ipv4, tb_char_t const* cstr)
         else 
         {
             // trace
-            tb_trace_d("invalid addr: %s", cstr);
+            tb_trace_d("invalid ipv4 addr: %s", cstr);
 
             // clear it
             i = 0;
