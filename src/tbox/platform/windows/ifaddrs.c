@@ -63,6 +63,9 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     tb_list_ref_t interfaces = (tb_list_ref_t)ifaddrs;
     tb_assert_and_check_return_val(interfaces, tb_null);
 
+    // TODO for ipv6
+    // GetAdaptersAddresses
+
     // uses the cached interfaces?
     tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
 
