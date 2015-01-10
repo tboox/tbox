@@ -97,15 +97,38 @@ static tb_char_t const* tb_url_parse_host(tb_string_t* host, tb_char_t const* p)
     // clear path
     tb_string_clear(host);
 
-    // parse host
-    tb_char_t ch;
-    while ((ch = *p) && !tb_isspace(ch) && ch != ':' && ch != '/' && ch != '\\' && ch != '?' && ch != '&')
+    // ipv6? [xxxx:xxxx:...]:port
+    if (*p == '[')
     {
-        // append character
-        tb_string_chrcat(host, ch);
-
-        // next
+        // skip '['
         p++;
+
+        // parse host
+        tb_char_t ch;
+        while ((ch = *p) && ch != ']')
+        {
+            // append character
+            tb_string_chrcat(host, ch);
+
+            // next
+            p++;
+        }
+
+        // append ']'
+        if (ch == ']') p++;
+    }
+    else
+    {
+        // parse host
+        tb_char_t ch;
+        while ((ch = *p) && !tb_isspace(ch) && ch != ':' && ch != '/' && ch != '\\' && ch != '?' && ch != '&')
+        {
+            // append character
+            tb_string_chrcat(host, ch);
+
+            // next
+            p++;
+        }
     }
 
     // end
@@ -265,8 +288,15 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
             // add ://
             tb_string_cstrncat(&url->cache, "://", 3);
 
-            // add host
-            tb_string_cstrncat(&url->cache, tb_string_cstr(&url->host), tb_string_size(&url->host));
+            // add host for ipv6
+            if (tb_ipaddr_family(&url->addr) == TB_IPADDR_FAMILY_IPV6)
+            {
+                tb_string_chrcat(&url->cache, '[');
+                tb_string_cstrncat(&url->cache, tb_string_cstr(&url->host), tb_string_size(&url->host));
+                tb_string_chrcat(&url->cache, ']');
+            }
+            // add host for ipv4
+            else tb_string_cstrncat(&url->cache, tb_string_cstr(&url->host), tb_string_size(&url->host));
 
             // add port
             if (    (url->poto != TB_URL_PROTOCOL_HTTP)

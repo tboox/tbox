@@ -41,6 +41,9 @@ tb_int_t tb_demo_network_url_main(tb_int_t argc, tb_char_t** argv)
     tb_url_test_set("http://localhost:8080");
     tb_url_test_set("http://localhost/ruki/file.txt");
     tb_url_test_set("http://localhost:8080/ruki/file.txt");
+    tb_url_test_set("http://[::1]:8080/ruki/file.txt");
+    tb_url_test_set("http://[fe80::7a31:c1ff:fecf:e8ae%en0]:8080/ruki/file.txt");
+    tb_url_test_set("http://[fe80::7a31:c1ff:fecf:e8ae%7]:8080/ruki/file.txt");
 
     tb_url_test_set("socks://localhost:8080");
     tb_url_test_set("socks://localhost:8080/ruki/file.txt");
