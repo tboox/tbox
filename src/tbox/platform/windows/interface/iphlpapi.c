@@ -44,6 +44,7 @@ static tb_bool_t tb_iphlpapi_instance_init(tb_handle_t instance)
     // init interfaces
     TB_INTERFACE_LOAD(iphlpapi, GetNetworkParams);
     TB_INTERFACE_LOAD(iphlpapi, GetAdaptersInfo);
+    TB_INTERFACE_LOAD(iphlpapi, GetAdaptersAddresses);
 
     // ok
     return tb_true;
