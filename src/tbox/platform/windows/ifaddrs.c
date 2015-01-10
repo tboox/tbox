@@ -43,34 +43,10 @@ static tb_void_t tb_ifaddrs_interface_exit(tb_item_func_t* func, tb_pointer_t bu
         interface->name = tb_null;
     }
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_ifaddrs_ref_t tb_ifaddrs_init()
-{
-    // init it
-    return (tb_ifaddrs_ref_t)tb_list_init(8, tb_item_func_mem(sizeof(tb_ifaddrs_interface_t), tb_ifaddrs_interface_exit, tb_null));
-}
-tb_void_t tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs)
-{
-    // exit it
-    if (ifaddrs) tb_list_exit((tb_list_ref_t)ifaddrs);
-}
-tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
+static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
 {
     // check
-    tb_list_ref_t interfaces = (tb_list_ref_t)ifaddrs;
-    tb_assert_and_check_return_val(interfaces, tb_null);
-
-    // TODO for ipv6
-    // GetAdaptersAddresses
-
-    // uses the cached interfaces?
-    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
-
-    // clear interfaces first
-    tb_list_clear(interfaces);
+    tb_assert_and_check_return(interfaces);
 
     // done
     PIP_ADAPTER_INFO adapter_info = tb_null;
@@ -148,7 +124,8 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
             }
 
             // new interface? save it
-            if (interface == &interface_new)
+            if (    interface == &interface_new
+                &&  interface->flags)
             {
                 // save interface name
                 interface->name = tb_strdup(adapter->AdapterName);
@@ -167,6 +144,139 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     // exit the adapter info
     if (adapter_info) tb_free(adapter_info);
     adapter_info = tb_null;
+}
+static tb_void_t tb_ifaddrs_interface_load6(tb_list_ref_t interfaces)
+{
+    // check
+    tb_assert_and_check_return(interfaces);
+
+    // done
+    PIP_ADAPTER_ADDRESSES addresses = tb_null;
+    do
+    {
+        // make the addresses
+        addresses = (PIP_ADAPTER_ADDRESSES)tb_malloc0_type(IP_ADAPTER_ADDRESSES);
+        tb_assert_and_check_break(addresses);
+
+        // get the real adapter info size
+        ULONG size = sizeof(IP_ADAPTER_ADDRESSES);
+        if (tb_iphlpapi()->GetAdaptersAddresses(AF_INET6, GAA_FLAG_SKIP_DNS_SERVER, tb_null, addresses, &size) == ERROR_BUFFER_OVERFLOW)
+        {
+            // grow the adapter info buffer
+            addresses = (PIP_ADAPTER_ADDRESSES)tb_ralloc(addresses, size);
+            tb_assert_and_check_break(addresses);
+
+            // reclear it
+            tb_memset(addresses, 0, size);
+        }
+     
+        // get the addresses
+        if (tb_iphlpapi()->GetAdaptersAddresses(AF_INET6, GAA_FLAG_SKIP_DNS_SERVER, tb_null, addresses, &size) != NO_ERROR) break;
+
+        // done
+        PIP_ADAPTER_ADDRESSES address = addresses;
+        while (address)
+        {
+            // check
+            tb_assert_abort(address->AdapterName);
+
+            /* attempt to get the interface from the cached interfaces
+             * and make a new interface if no the cached interface
+             */
+            tb_ifaddrs_interface_t      interface_new = {0};
+            tb_ifaddrs_interface_ref_t  interface = tb_ifaddrs_interface_find((tb_iterator_ref_t)interfaces, address->AdapterName);
+            if (!interface) interface = &interface_new;
+
+            // check
+            tb_assert_abort(interface == &interface_new || interface->name);
+
+            // save flags
+            if (address->IfType == IF_TYPE_SOFTWARE_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+
+            // save hwaddr
+            if (address->PhysicalAddressLength == sizeof(interface->hwaddr.u8))
+            {
+                interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR;
+                tb_memcpy(interface->hwaddr.u8, address->PhysicalAddress, sizeof(interface->hwaddr.u8));
+            }
+
+            // save ipaddrs
+            PIP_ADAPTER_UNICAST_ADDRESS ipAddress = address->FirstUnicastAddress;
+            while (ipAddress && (interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR) != TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR)
+            {
+                // done
+                tb_ipaddr_t ipaddr;
+                struct sockaddr_storage* saddr = (struct sockaddr_storage*)ipAddress->Address.lpSockaddr;
+                if (saddr && tb_sockaddr_save(&ipaddr, saddr))
+                {
+                    if (ipaddr.family == TB_IPADDR_FAMILY_IPV4)
+                    {
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4;
+                        interface->ipaddr4 = ipaddr.u.ipv4;
+                    }
+                    else if (ipaddr.family == TB_IPADDR_FAMILY_IPV6)
+                    {
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6;
+                        interface->ipaddr6 = ipaddr.u.ipv6;
+                    }
+                }
+
+                // the next
+                ipAddress = ipAddress->Next;
+            }
+
+            // new interface? save it
+            if (    interface == &interface_new
+                &&  interface->flags)
+            {
+                // save interface name
+                interface->name = tb_strdup(address->AdapterName);
+                tb_assert_abort(interface->name);
+
+                // save interface
+                tb_list_insert_tail(interfaces, interface);
+            }
+
+            // the next address
+            address = address->Next;
+        }
+
+    } while (0);
+
+    // exit the addresses
+    if (addresses) tb_free(addresses);
+    addresses = tb_null;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_ifaddrs_ref_t tb_ifaddrs_init()
+{
+    // init it
+    return (tb_ifaddrs_ref_t)tb_list_init(8, tb_item_func_mem(sizeof(tb_ifaddrs_interface_t), tb_ifaddrs_interface_exit, tb_null));
+}
+tb_void_t tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs)
+{
+    // exit it
+    if (ifaddrs) tb_list_exit((tb_list_ref_t)ifaddrs);
+}
+tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
+{
+    // check
+    tb_list_ref_t interfaces = (tb_list_ref_t)ifaddrs;
+    tb_assert_and_check_return_val(interfaces, tb_null);
+
+    // uses the cached interfaces?
+    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
+
+    // clear interfaces first
+    tb_list_clear(interfaces);
+
+    // attempt to load interfaces for ipv6 first
+    if (tb_iphlpapi()->GetAdaptersAddresses) tb_ifaddrs_interface_load6(interfaces);
+    // load interfaces only for ipv4 
+    if (tb_iphlpapi()->GetAdaptersInfo) tb_ifaddrs_interface_load4(interfaces);
 
     // ok?
     return (tb_iterator_ref_t)interfaces;

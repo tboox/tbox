@@ -43,6 +43,9 @@ typedef DWORD (WINAPI* tb_iphlpapi_GetNetworkParams_t)(PFIXED_INFO pFixedInfo, P
 // the GetAdaptersInfo func type
 typedef DWORD (WINAPI* tb_iphlpapi_GetAdaptersInfo_t)(PIP_ADAPTER_INFO pAdapterInfo, PULONG pOutBufLen);
 
+// the GetAdaptersAddresses func type
+typedef ULONG (WINAPI* tb_iphlpapi_GetAdaptersAddresses_t)(ULONG Family, ULONG Flags, PVOID Reserved, PIP_ADAPTER_ADDRESSES AdapterAddresses, PULONG SizePointer);
+
 // the iphlpapi interfaces type
 typedef struct __tb_iphlpapi_t
 {
@@ -51,6 +54,9 @@ typedef struct __tb_iphlpapi_t
 
     // GetAdaptersInfo
     tb_iphlpapi_GetAdaptersInfo_t           GetAdaptersInfo;
+
+    // GetAdaptersAddresses
+    tb_iphlpapi_GetAdaptersAddresses_t      GetAdaptersAddresses;
 
 }tb_iphlpapi_t, *tb_iphlpapi_ref_t;
 
