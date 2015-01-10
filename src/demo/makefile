@@ -49,7 +49,8 @@ demo_C_FILES 								+= \
 											network/url \
 											network/ipv4 \
 											network/ipv6 \
-											network/addr \
+											network/ipaddr \
+											network/hwaddr \
 											network/http \
 											network/whois \
 											network/spider \
