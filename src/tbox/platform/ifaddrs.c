@@ -76,7 +76,11 @@ static tb_ifaddrs_interface_ref_t tb_ifaddrs_interface_find(tb_iterator_ref_t it
 #elif defined(TB_CONFIG_OS_LINUX)
 #   include "linux/ifaddrs.c"
 #elif defined(TB_CONFIG_OS_ANDROID)
-#   include "linux/android/ifaddrs.c"
+#   if __tb_has_include__(<ifaddrs.h>)
+#       include "linux/ifaddrs.c"
+#   else
+#       include "linux/android/ifaddrs.c"
+#   endif
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/ifaddrs.c"
 #else
