@@ -46,6 +46,7 @@ tb_int_t tb_demo_network_dns_main(tb_int_t argc, tb_char_t** argv)
     // test the more host
 #if TB_DNS_TEST_MORE_HOST
     tb_dns_server_add("2001:470:20::2");
+    tb_dns_server_add("fec0:0:0:ffff::1%1");
     tb_dns_server_add("205.252.144.228");
     tb_dns_server_add("208.151.69.65");
     tb_dns_server_add("202.181.202.140");

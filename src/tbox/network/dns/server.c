@@ -57,7 +57,7 @@ typedef struct __tb_dns_server_t
     tb_size_t               rate;
 
     // the addr
-    tb_ipaddr_t               addr;
+    tb_ipaddr_t             addr;
 
 }tb_dns_server_t;
 
@@ -188,9 +188,9 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
         tb_static_stream_writ_u8(&sstream, 'o');
         tb_static_stream_writ_u8(&sstream, 'x');
         tb_static_stream_writ_u8(&sstream, 3);
-        tb_static_stream_writ_u8(&sstream, 'c');
         tb_static_stream_writ_u8(&sstream, 'o');
-        tb_static_stream_writ_u8(&sstream, 'm');
+        tb_static_stream_writ_u8(&sstream, 'r');
+        tb_static_stream_writ_u8(&sstream, 'g');
         tb_static_stream_writ_u8(&sstream, '\0');
 
         // only one question now.
