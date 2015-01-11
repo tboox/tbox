@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        hostmac.c
+ * @file        ifaddrs.c
  * @ingroup     platform
  */
 
@@ -32,80 +32,177 @@
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "../posix/sockaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
+ * private implementation
  */
-
-#ifndef AF_LINK
-#   define AF_LINK     AF_PACKET
-#endif
+static tb_void_t tb_ifaddrs_interface_exit(tb_item_func_t* func, tb_pointer_t buff)
+{
+    // check
+    tb_ifaddrs_interface_ref_t interface = (tb_ifaddrs_interface_ref_t)buff;
+    if (interface)
+    {
+        // exit the interface name
+        if (interface->name) tb_free(interface->name);
+        interface->name = tb_null;
+    }
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_hostmac(tb_char_t const* interface_name, tb_byte_t mac_address[6])
+tb_ifaddrs_ref_t tb_ifaddrs_init()
+{
+    // init it
+    return (tb_ifaddrs_ref_t)tb_list_init(8, tb_item_func_mem(sizeof(tb_ifaddrs_interface_t), tb_ifaddrs_interface_exit, tb_null));
+}
+tb_void_t tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs)
+{
+    // exit it
+    if (ifaddrs) tb_list_exit((tb_list_ref_t)ifaddrs);
+}
+tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
 {
     // check
-    tb_assert_and_check_return_val(mac_address, tb_false);
+    tb_list_ref_t interfaces = (tb_list_ref_t)ifaddrs;
+    tb_assert_and_check_return_val(interfaces, tb_null);
 
-    // clear the mac address
-    tb_memset(mac_address, 0, 6);
+    // uses the cached interfaces?
+    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
 
-    // done
-    tb_bool_t ok = tb_false;
-    tb_long_t sock = 0;
-    do
+    // clear interfaces first
+    tb_list_clear(interfaces);
+
+    // query the list of interfaces.
+    struct ifaddrs* list = tb_null;
+    if (!getifaddrs(&list) && list)
     {
-        // query the list of interfaces.
-        struct ifaddrs* list = tb_null;
-        if (getifaddrs(&list) < 0 || !list) break;
+        // init sock
+        tb_long_t sock = socket(AF_INET, SOCK_DGRAM, 0);
 
-        // find the given interface
-        struct ifaddrs* interface = tb_null;
-        for (interface = list; interface && !ok; interface = interface->ifa_next)
+        // done
+        struct ifaddrs* item = tb_null;
+        for (item = list; item; item = item->ifa_next)
         {
-            // is this address?
-            if (    interface->ifa_addr
-                &&  interface->ifa_addr->sa_family == AF_INET
-                &&  !(interface->ifa_flags & IFF_LOOPBACK))
+            // check
+            tb_check_continue(item->ifa_addr && item->ifa_name);
+
+            /* attempt to get the interface from the cached interfaces
+             * and make a new interface if no the cached interface
+             */
+            tb_ifaddrs_interface_t      interface_new = {0};
+            tb_ifaddrs_interface_ref_t  interface = tb_ifaddrs_interface_find((tb_iterator_ref_t)interfaces, item->ifa_name);
+            if (!interface) interface = &interface_new;
+
+            // check
+            tb_assert_abort(interface == &interface_new || interface->name);
+
+            // done
+            switch (item->ifa_addr->sa_family)
             {
-                // is this interface?
-                if (!interface_name || (interface->ifa_name && !tb_strcmp(interface->ifa_name, interface_name)))
+            case AF_INET:
                 {
-                    // make socket
-                    sock = socket(AF_INET, SOCK_DGRAM, 0);
+                    // the address
+                    struct sockaddr_storage const* addr = (struct sockaddr_storage const*)item->ifa_addr;
 
-                    // init interfaces
-                    struct ifreq ifr;
-                    tb_memset(&ifr, 0, sizeof(struct ifreq));
-                    tb_strcpy(ifr.ifr_name, interface->ifa_name);
+                    // save ipaddr4
+                    tb_ipaddr_t ipaddr4;
+                    if (!tb_sockaddr_save(&ipaddr4, addr)) break;
+                    interface->ipaddr4 = ipaddr4.u.ipv4;
 
-                    // get the mac address
-                    if (ioctl(sock, SIOCGIFHWADDR, &ifr) < 0) break;
+                    // save flags
+                    interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4;
+                    if (item->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
-                    // save the mac address
-                    tb_memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
+                    // no hwaddr? get it
+                    if (!(interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR))
+                    {
+                        // attempt get the hwaddr
+                        struct ifreq ifr;
+                        tb_memset(&ifr, 0, sizeof(ifr));
+                        tb_strcpy(ifr.ifr_name, item->ifa_name);
+                        if (!ioctl(sock, SIOCGIFHWADDR, &ifr))
+                        {
+                            // have hwaddr
+                            interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR;
 
-                    // ok
-                    ok = tb_true;
+                            // save hwaddr
+                            tb_memcpy(interface->hwaddr.u8, ifr.ifr_hwaddr.sa_data, sizeof(interface->hwaddr.u8));
+                        }
+                    }
+                    // new interface? save it
+                    if (interface == &interface_new)
+                    {
+                        // save interface name
+                        interface->name = tb_strdup(item->ifa_name);
+                        tb_assert_abort(interface->name);
 
-                    // end
-                    break;
+                        // save interface
+                        tb_list_insert_tail(interfaces, interface);
+                    }
                 }
+                break;
+            case AF_INET6:
+                {
+                    // the address
+                    struct sockaddr_storage const* addr = (struct sockaddr_storage const*)item->ifa_addr;
+
+                    // save ipaddr6
+                    tb_ipaddr_t ipaddr6;
+                    if (!tb_sockaddr_save(&ipaddr6, addr)) break;
+                    interface->ipaddr6 = ipaddr6.u.ipv6;
+
+                    // save flags
+                    interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6;
+                    if (item->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+
+                    // no hwaddr? get it
+                    if (!(interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR))
+                    {
+                        // attempt get the hwaddr
+                        struct ifreq ifr;
+                        tb_memset(&ifr, 0, sizeof(ifr));
+                        tb_strcpy(ifr.ifr_name, item->ifa_name);
+                        if (!ioctl(sock, SIOCGIFHWADDR, &ifr))
+                        {
+                            // have hwaddr
+                            interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR;
+
+                            // save hwaddr
+                            tb_memcpy(interface->hwaddr.u8, ifr.ifr_hwaddr.sa_data, sizeof(interface->hwaddr.u8));
+                        }
+                    }
+
+                    // new interface? save it
+                    if (interface == &interface_new)
+                    {
+                        // save interface name
+                        interface->name = tb_strdup(item->ifa_name);
+                        tb_assert_abort(interface->name);
+
+                        // save interface
+                        tb_list_insert_tail(interfaces, interface);
+                    }
+                }
+                break;
+            default:
+                {
+                    // trace
+                    tb_trace_d("unknown family: %d", item->ifa_addr->sa_family);
+                }
+                break;
             }
         }
 
+        // exit socket
+        if (sock) close(sock);
+        sock = 0;
+
         // exit the interface list
         freeifaddrs(list);
-
-    } while (0);
-
-    // exit socket
-    if (sock) close(sock);
-    sock = 0;
+    }
 
     // ok?
-    return ok;
+    return (tb_iterator_ref_t)interfaces;
 }
-
