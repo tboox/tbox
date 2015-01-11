@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME        "dns_looker"
-#define TB_TRACE_MODULE_DEBUG       (1)
+#define TB_TRACE_MODULE_DEBUG       (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -67,10 +67,10 @@ typedef struct __tb_dns_looker_impl_t
     // the name
     tb_static_string_t      name;
 
-    // the request & response packet
+    // the request and response packet
     tb_static_buffer_t      rpkt;
     
-    // the size for recv & send packet
+    // the size for recv and send packet
     tb_size_t               size;
 
     // the iterator
@@ -85,8 +85,11 @@ typedef struct __tb_dns_looker_impl_t
     // the socket
     tb_socket_ref_t         sock;
 
+    // the socket family
+    tb_uint8_t              family;
+
     // the server list
-    tb_ipaddr_t               list[2];
+    tb_ipaddr_t             list[2];
 
     // the server maxn
     tb_size_t               maxn;
@@ -206,6 +209,20 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_impl_t* impl)
 
     // check
     tb_assert_and_check_return_val(addr && !tb_ipaddr_is_empty(addr), -1);
+
+    // family have been changed? reinit socket
+    if (tb_ipaddr_family(addr) != impl->family)
+    {
+        // exit the previous socket
+        if (impl->sock) tb_socket_exit(impl->sock);
+
+        // init a new socket for the family
+        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, tb_ipaddr_family(addr));
+        tb_assert_and_check_return_val(impl->sock, -1);
+
+        // update the new family
+        impl->family = (tb_uint8_t)tb_ipaddr_family(addr);
+    }
 
     // need wait if no data
     impl->step &= ~TB_DNS_LOOKER_STEP_NEVT;
@@ -548,8 +565,11 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
         // init rpkt
         if (!tb_static_buffer_init(&impl->rpkt, impl->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) break;
 
+        // init family
+        impl->family = TB_IPADDR_FAMILY_IPV4;
+
         // init sock
-        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, TB_IPADDR_FAMILY_IPV4);
+        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, impl->family);
         tb_assert_and_check_break(impl->sock);
 
         // init itor

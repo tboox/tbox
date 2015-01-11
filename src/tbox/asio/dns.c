@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME                "aicp_dns"
-#define TB_TRACE_MODULE_DEBUG               (1)
+#define TB_TRACE_MODULE_DEBUG               (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -68,7 +68,7 @@ typedef struct __tb_aicp_dns_impl_t
     tb_size_t               indx;
 
     // the server list
-    tb_ipaddr_t               list[3];
+    tb_ipaddr_t             list[3];
 
     // the server size
     tb_size_t               size;
@@ -341,8 +341,8 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_ref_t aice)
     }
 
     // try next server?
-    tb_bool_t       ok = tb_false;
-    tb_ipaddr_ref_t   server = &impl->list[impl->indx + 1];
+    tb_bool_t           ok = tb_false;
+    tb_ipaddr_ref_t     server = &impl->list[impl->indx + 1];
     if (!tb_ipaddr_is_empty(server))
     {   
         // indx++
