@@ -157,15 +157,24 @@
 #   define __tb_extern_c_leave__                
 #endif
 
-// no_sanitize_address
-#if defined(__has_feature) 
-#   if __has_feature(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
-#       define __tb_no_sanitize_address__       __attribute__((no_sanitize_address))
-#   endif
-#elif defined(__SANITIZE_ADDRESS__)
-#       define __tb_no_sanitize_address__       __attribute__((no_sanitize_address))
+// has feature
+#ifdef __has_feature
+#   define __tb_has_feature__(x)                            __has_feature(x)
+#else
+#   define __tb_has_feature__(x)                            0
 #endif
-#ifndef __tb_no_sanitize_address__
+
+// has include
+#ifdef __has_include
+#   define __tb_has_include__(x)                            __has_include(x)
+#else
+#   define __tb_has_include__(x)                            0
+#endif
+
+// no_sanitize_address
+#if __tb_has_feature__(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
+#   define __tb_no_sanitize_address__                       __attribute__((no_sanitize_address))
+#else
 #   define __tb_no_sanitize_address__
 #endif
 
