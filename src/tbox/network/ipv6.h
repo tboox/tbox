@@ -109,6 +109,14 @@ tb_bool_t           tb_ipv6_is_loopback(tb_ipv6_ref_t ipv6);
  */
 tb_bool_t           tb_ipv6_is_linklocal(tb_ipv6_ref_t ipv6);
 
+/*! is mc linklocal address?
+ *
+ * @param ipv6      the ipv6
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipv6_is_mc_linklocal(tb_ipv6_ref_t ipv6);
+
 /*! is sitelocal address?
  *
  * @param ipv6      the ipv6

@@ -73,7 +73,15 @@ tb_bool_t tb_ipv6_is_linklocal(tb_ipv6_ref_t ipv6)
     tb_assert_and_check_return_val(ipv6, tb_true);
 
     // is linklocal?
-    return (ipv6->addr.u32[0] == 0xfe) && ((ipv6->addr.u32[1] & 0xc0) == 0x80);
+    return (ipv6->addr.u8[0] == 0xfe) && ((ipv6->addr.u8[1] & 0xc0) == 0x80);
+}
+tb_bool_t tb_ipv6_is_mc_linklocal(tb_ipv6_ref_t ipv6)
+{
+    // check
+    tb_assert_and_check_return_val(ipv6, tb_true);
+
+    // is mc linklocal?
+    return tb_ipv6_is_multicast(ipv6) && ((ipv6->addr.u8[1] & 0x0f) == 0x02);
 }
 tb_bool_t tb_ipv6_is_sitelocal(tb_ipv6_ref_t ipv6)
 {
@@ -81,7 +89,7 @@ tb_bool_t tb_ipv6_is_sitelocal(tb_ipv6_ref_t ipv6)
     tb_assert_and_check_return_val(ipv6, tb_true);
 
     // is sitelocal?
-    return (ipv6->addr.u32[0] == 0xfe) && ((ipv6->addr.u32[1] & 0xc0) == 0xc0);
+    return (ipv6->addr.u8[0] == 0xfe) && ((ipv6->addr.u8[1] & 0xc0) == 0xc0);
 }
 tb_bool_t tb_ipv6_is_multicast(tb_ipv6_ref_t ipv6)
 {
@@ -89,15 +97,18 @@ tb_bool_t tb_ipv6_is_multicast(tb_ipv6_ref_t ipv6)
     tb_assert_and_check_return_val(ipv6, tb_true);
 
     // is multicast?
-    return (ipv6->addr.u32[0] == 0xff);
+    return (ipv6->addr.u8[0] == 0xff);
 }
 tb_bool_t tb_ipv6_is_equal(tb_ipv6_ref_t ipv6, tb_ipv6_ref_t other)
 {
     // check
     tb_assert_and_check_return_val(ipv6 && other, tb_false);
 
+    // have scope id?
+    tb_bool_t have_scope_id = tb_ipv6_is_linklocal(ipv6) || tb_ipv6_is_mc_linklocal(ipv6);
+
     // is equal?
-    return (ipv6->scope_id == other->scope_id)
+    return (!have_scope_id || (ipv6->scope_id == other->scope_id))
         && (ipv6->addr.u32[0] == other->addr.u32[0])
         && (ipv6->addr.u32[1] == other->addr.u32[1])
         && (ipv6->addr.u32[2] == other->addr.u32[2])
@@ -110,7 +121,8 @@ tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t max
 
     // make scope_id
     tb_char_t scope_id[20] = {0};
-    if (ipv6->scope_id) tb_snprintf(scope_id, sizeof(scope_id) - 1, "%%%u", ipv6->scope_id);
+    tb_bool_t have_scope_id = tb_ipv6_is_linklocal(ipv6) || tb_ipv6_is_mc_linklocal(ipv6);
+    if (have_scope_id) tb_snprintf(scope_id, sizeof(scope_id) - 1, "%%%u", ipv6->scope_id);
 
     // make ipv6
     tb_long_t size = tb_snprintf(   data
@@ -124,7 +136,7 @@ tb_char_t const* tb_ipv6_cstr(tb_ipv6_ref_t ipv6, tb_char_t* data, tb_size_t max
                                 ,   tb_bits_swap_u16(ipv6->addr.u16[5])
                                 ,   tb_bits_swap_u16(ipv6->addr.u16[6])
                                 ,   tb_bits_swap_u16(ipv6->addr.u16[7])
-                                ,   ipv6->scope_id? scope_id : "");
+                                ,   have_scope_id? scope_id : "");
     if (size >= 0) data[size] = '\0';
 
     // ok
