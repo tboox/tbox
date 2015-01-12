@@ -36,7 +36,12 @@
 #include <netinet/in.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
-#include "../../posix/sockaddr.h"
+#include <sys/types.h>
+#include <linux/if.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include "../posix/sockaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -224,11 +229,11 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
     struct ifaddrmsg* info = (struct ifaddrmsg *)NLMSG_DATA(response);
 
     // must be not link 
-    tb_assert_and_check_return_val(info->ifa_family != AF_PACKET, tb_null);
+    tb_assert_and_check_return(info->ifa_family != AF_PACKET);
 
     // attempt to find the interface name
     tb_bool_t   owner = tb_false;
-    tb_char_t*  name = (tb_char_t*)tb_hash_get(names, (tb_cpointer_t)info->ifa_index);
+    tb_char_t*  name = (tb_char_t*)tb_hash_get(names, tb_u2p(info->ifa_index));
     if (!name)
     {
         // get the interface name
@@ -252,7 +257,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
                         name[rta_data_size] = '\0';
 
                         // save name
-                        tb_hash_set(names, (tb_cpointer_t)info->ifa_index, name);
+                        tb_hash_set(names, tb_u2p(info->ifa_index), name);
                         owner = tb_true;
                     }
                     break;
@@ -281,8 +286,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
         tb_assert_abort(interface == &interface_new || interface->name);
 
         // done
-        tb_pointer_t    rta_data = RTA_DATA(rta);
-        tb_size_t       rta_data_size = RTA_PAYLOAD(rta);
+        tb_pointer_t rta_data = RTA_DATA(rta);
         switch(rta->rta_type)
         {
             case IFA_LOCAL:
@@ -352,7 +356,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
 
     // attempt to find the interface name
     tb_bool_t   owner = tb_false;
-    tb_char_t*  name = (tb_char_t*)tb_hash_get(names, (tb_cpointer_t)info->ifa_index);
+    tb_char_t*  name = (tb_char_t*)tb_hash_get(names, tb_u2p(info->ifa_index));
     if (!name)
     {
         // get the interface name
@@ -376,7 +380,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
                         name[rta_data_size] = '\0';
 
                         // save name
-                        tb_hash_set(names, (tb_cpointer_t)info->ifa_index, name);
+                        tb_hash_set(names, tb_u2p(info->ifa_index), name);
                         owner = tb_true;
                     }
                     break;
