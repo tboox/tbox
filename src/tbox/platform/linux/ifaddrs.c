@@ -32,6 +32,7 @@
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <linux/if_packet.h>
 #include "../posix/sockaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +79,10 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     struct ifaddrs* list = tb_null;
     if (!getifaddrs(&list) && list)
     {
+#if 0
         // init sock
         tb_long_t sock = socket(AF_INET, SOCK_DGRAM, 0);
+#endif
 
         // done
         struct ifaddrs* item = tb_null;
@@ -116,6 +119,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     if ((item->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr4)) 
                         interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
+#if 0
                     // no hwaddr? get it
                     if (!(interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR))
                     {
@@ -132,6 +136,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                             tb_memcpy(interface->hwaddr.u8, ifr.ifr_hwaddr.sa_data, sizeof(interface->hwaddr.u8));
                         }
                     }
+#endif
 
                     // new interface? save it
                     if (interface == &interface_new)
@@ -160,6 +165,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     if ((item->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr6))
                         interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
+#if 0
                     // no hwaddr? get it
                     if (!(interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR))
                     {
@@ -176,6 +182,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                             tb_memcpy(interface->hwaddr.u8, ifr.ifr_hwaddr.sa_data, sizeof(interface->hwaddr.u8));
                         }
                     }
+#endif
 
                     // new interface? save it
                     if (interface == &interface_new)
@@ -189,6 +196,36 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     }
                 }
                 break;
+            case AF_PACKET:
+                {
+                    // the address
+                    struct sockaddr_ll const* addr = (struct sockaddr_ll const*)item->ifa_addr;
+
+                    // check
+                    tb_check_break(addr->sll_halen == sizeof(interface->hwaddr.u8));
+
+                    // no hwaddr? get it
+                    if (!(interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR))
+                    {
+                        // have hwaddr
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR;
+
+                        // save hwaddr
+                        tb_memcpy(interface->hwaddr.u8, addr->sll_addr, sizeof(interface->hwaddr.u8));
+
+                        // new interface? save it
+                        if (interface == &interface_new)
+                        {
+                            // save interface name
+                            interface->name = tb_strdup(item->ifa_name);
+                            tb_assert_abort(interface->name);
+
+                            // save interface
+                            tb_list_insert_tail(interfaces, interface);
+                        }
+                    }
+                }
+                break;
             default:
                 {
                     // trace
@@ -198,9 +235,11 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
             }
         }
 
+#if 0
         // exit socket
         if (sock) close(sock);
         sock = 0;
+#endif
 
         // exit the interface list
         freeifaddrs(list);
