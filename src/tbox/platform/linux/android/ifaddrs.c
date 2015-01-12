@@ -589,9 +589,6 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     // clear interfaces first
     tb_list_clear(interfaces);
 
-    // trace
-    tb_trace_d("===============================");
-
     // done
     tb_long_t sock = -1;
     do
