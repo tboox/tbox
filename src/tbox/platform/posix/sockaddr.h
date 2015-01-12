@@ -179,7 +179,8 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
             addr6->sin6_port = tb_bits_ne_to_be_u16(tb_ipaddr_port(ipaddr));
 
             // save scope id
-            addr6->sin6_scope_id = ipaddr->u.ipv6.scope_id;
+            if (tb_ipv6_is_linklocal(&ipaddr->u.ipv6) || tb_ipv6_is_mc_linklocal(&ipaddr->u.ipv6))
+                addr6->sin6_scope_id = ipaddr->u.ipv6.scope_id;
 
             // save size
             size = sizeof(struct sockaddr_in6);
