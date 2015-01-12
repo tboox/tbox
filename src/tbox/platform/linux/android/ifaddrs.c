@@ -342,6 +342,117 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
     if (name && owner) tb_free(name);
     name = tb_null;
 }
+static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_hash_ref_t names, struct nlmsghdr* response)
+{
+    // check
+    tb_assert_and_check_return(interfaces && names && response);
+
+    // the info
+    struct ifaddrmsg* info = (struct ifaddrmsg *)NLMSG_DATA(response);
+
+    // attempt to find the interface name
+    tb_bool_t   owner = tb_false;
+    tb_char_t*  name = (tb_char_t*)tb_hash_get(names, (tb_cpointer_t)info->ifa_index);
+    if (!name)
+    {
+        // get the interface name
+        struct rtattr*  rta = tb_null;
+        tb_size_t       rta_size = NLMSG_PAYLOAD(response, sizeof(struct ifaddrmsg));
+        for(rta = IFLA_RTA(info); RTA_OK(rta, rta_size); rta = RTA_NEXT(rta, rta_size))
+        {
+            // done
+            tb_pointer_t    rta_data = RTA_DATA(rta);
+            tb_size_t       rta_data_size = RTA_PAYLOAD(rta);
+            switch(rta->rta_type)
+            {
+                case IFLA_IFNAME:
+                    {
+                        // make name
+                        name = (tb_char_t*)tb_ralloc(name, rta_data_size + 1);
+                        tb_assert_and_check_break(name);
+
+                        // copy name
+                        tb_strlcpy(name, rta_data, rta_data_size);
+                        name[rta_data_size] = '\0';
+
+                        // save name
+                        tb_hash_set(names, (tb_cpointer_t)info->ifa_index, name);
+                        owner = tb_true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    // check
+    tb_check_return(name);
+
+    // done
+    struct rtattr*  rta = tb_null;
+    tb_size_t       rta_size = NLMSG_PAYLOAD(response, sizeof(struct ifaddrmsg));
+    for(rta = IFLA_RTA(info); RTA_OK(rta, rta_size); rta = RTA_NEXT(rta, rta_size))
+    {
+        /* attempt to get the interface from the cached interfaces
+         * and make a new interface if no the cached interface
+         */
+        tb_ifaddrs_interface_t      interface_new = {0};
+        tb_ifaddrs_interface_ref_t  interface = tb_ifaddrs_interface_find((tb_iterator_ref_t)interfaces, name);
+        if (!interface) interface = &interface_new;
+
+        // check
+        tb_assert_abort(interface == &interface_new || interface->name);
+
+        // done
+        tb_pointer_t    rta_data = RTA_DATA(rta);
+        tb_size_t       rta_data_size = RTA_PAYLOAD(rta);
+        switch(rta->rta_type)
+        {
+            case IFLA_ADDRESS:
+                {
+                    // no hwaddr?
+                    if (!(interface->flags & TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR))
+                    {
+                        // check
+                        tb_check_break(rta_data_size == sizeof(interface->hwaddr.u8));
+
+                        // save flags
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_HWADDR;
+                        if (info->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+
+                        // save hwaddr
+                        tb_memcpy(interface->hwaddr.u8, rta_data, sizeof(interface->hwaddr.u8));
+
+                        // trace
+                        tb_trace_d("name: %s, hwaddr: %{hwaddr}", name, &interface->hwaddr);
+
+                        // new interface? save it
+                        if (interface == &interface_new)
+                        {
+                            // save interface name
+                            interface->name = tb_strdup(name);
+                            tb_assert_abort(interface->name);
+
+                            // save interface
+                            tb_list_insert_tail(interfaces, interface);
+                        }
+                    }
+                }
+                break;
+            case IFLA_IFNAME:
+            case IFLA_BROADCAST:
+            case IFLA_STATS:
+                break;
+            default:
+                break;
+        }
+    }
+
+    // exit name
+    if (name && owner) tb_free(name);
+    name = tb_null;
+}
 static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_ref_t names, tb_long_t sock, tb_long_t request)
 {
     // check
@@ -403,8 +514,8 @@ static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_ref
             // get hwaddr?
             if (request == RTM_GETLINK && response->nlmsg_type == RTM_NEWLINK)
             {
-                // trace
-                tb_trace_d("hwaddr");
+                // done hwaddr
+                tb_ifaddrs_interface_done_hwaddr(interfaces, names, response);
             }
             // get ipaddr?
             else if (request == RTM_GETADDR && response->nlmsg_type == RTM_NEWADDR)
