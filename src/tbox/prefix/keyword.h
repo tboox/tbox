@@ -171,6 +171,13 @@
 #   define __tb_has_include__(x)                            0
 #endif
 
+// has builtin
+#ifdef __has_builtin
+#   define __tb_has_builtin__(x)                            __has_builtin(x)
+#else
+#   define __tb_has_builtin__(x)                            0
+#endif
+
 // no_sanitize_address
 #if __tb_has_feature__(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
 #   define __tb_no_sanitize_address__                       __attribute__((no_sanitize_address))

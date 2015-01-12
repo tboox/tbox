@@ -65,7 +65,7 @@ tb_bool_t tb_ipv6_is_loopback(tb_ipv6_ref_t ipv6)
     tb_assert_and_check_return_val(ipv6, tb_true);
 
     // is loopback?
-    return !(ipv6->addr.u32[0] || ipv6->addr.u32[1] || ipv6->addr.u32[2]) && (ipv6->addr.u32[3] == 1);
+    return !(ipv6->addr.u32[0] || ipv6->addr.u32[1] || ipv6->addr.u32[2]) && (ipv6->addr.u32[3] == 0x01000000);
 }
 tb_bool_t tb_ipv6_is_linklocal(tb_ipv6_ref_t ipv6)
 {

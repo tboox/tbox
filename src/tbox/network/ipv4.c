@@ -63,7 +63,7 @@ tb_bool_t tb_ipv4_is_loopback(tb_ipv4_ref_t ipv4)
     tb_assert_and_check_return_val(ipv4, tb_false);
 
     // is loopback?
-    return (ipv4->u32 == 0x7f000001);
+    return (ipv4->u32 == 0x0100007f);
 }
 tb_bool_t tb_ipv4_is_equal(tb_ipv4_ref_t ipv4, tb_ipv4_ref_t other)
 {
