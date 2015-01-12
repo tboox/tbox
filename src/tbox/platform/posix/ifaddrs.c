@@ -112,7 +112,8 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
 
                     // save flags
                     interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4;
-                    if (item->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+                    if ((item->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr4)) 
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
                     // new interface? save it
                     if (interface == &interface_new)
@@ -138,7 +139,8 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
 
                     // save flags
                     interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6;
-                    if (item->ifa_flags & IFF_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
+                    if ((item->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr6)) 
+                        interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
                     // new interface? save it
                     if (interface == &interface_new)

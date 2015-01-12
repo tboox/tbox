@@ -99,8 +99,12 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
 
             // make ipv6
             tb_ipv6_t ipv6;
-            ipv6.scope_id = addr6->sin6_scope_id;
             tb_memcpy(ipv6.addr.u8, addr6->sin6_addr.s6_addr, sizeof(ipv6.addr.u8));
+
+            // save scope id
+            ipv6.scope_id = 0;
+            if (IN6_IS_ADDR_LINKLOCAL(&addr6->sin6_addr) || IN6_IS_ADDR_MC_LINKLOCAL(&addr6->sin6_addr))
+                ipv6.scope_id = addr6->sin6_scope_id;
 
             // save ipv6
             tb_ipaddr_ipv6_set(ipaddr, &ipv6);

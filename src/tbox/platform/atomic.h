@@ -30,7 +30,8 @@
 #include "prefix.h"
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/atomic.h"
-#elif defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BE(4, 1)
+#elif defined(TB_COMPILER_IS_GCC) \
+        && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) && __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
 #   include "compiler/gcc/atomic.h"
 #endif
 #include "arch/atomic.h"
