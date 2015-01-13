@@ -91,7 +91,7 @@ static tb_size_t tb_list_itor_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_abort(impl);
 
     // head
     return (tb_size_t)tb_list_entry_head(&impl->head);
@@ -100,7 +100,7 @@ static tb_size_t tb_list_itor_last(tb_iterator_ref_t iterator)
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_abort(impl);
 
     // last
     return (tb_size_t)tb_list_entry_last(&impl->head);
@@ -109,7 +109,7 @@ static tb_size_t tb_list_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_assert_abort(impl);
 
     // tail
     return (tb_size_t)tb_list_entry_tail(&impl->head);
@@ -118,8 +118,7 @@ static tb_size_t tb_list_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
-    tb_assert_and_check_return_val(itor, tb_list_itor_tail(iterator));
+    tb_assert_abort(impl && itor);
 
     // next
     return (tb_size_t)tb_list_entry_next(&impl->head, (tb_list_entry_t*)itor);
@@ -128,8 +127,7 @@ static tb_size_t tb_list_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
-    tb_assert_and_check_return_val(itor, tb_list_itor_tail(iterator));
+    tb_assert_abort(impl && itor);
 
     // prev
     return (tb_size_t)tb_list_entry_prev(&impl->head, (tb_list_entry_t*)itor);
@@ -138,7 +136,7 @@ static tb_pointer_t tb_list_itor_item(tb_iterator_ref_t iterator, tb_size_t itor
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && itor, tb_null);
+    tb_assert_abort(impl && itor);
 
     // data
     return impl->func.data(&impl->func, (tb_cpointer_t)(((tb_list_entry_t*)itor) + 1));
@@ -147,7 +145,7 @@ static tb_void_t tb_list_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, t
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return(impl && itor);
+    tb_assert_abort(impl && itor);
 
     // copy
     impl->func.copy(&impl->func, (tb_pointer_t)(((tb_list_entry_t*)itor) + 1), item);
@@ -156,7 +154,7 @@ static tb_long_t tb_list_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t lte
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && impl->func.comp, 0);
+    tb_assert_abort(impl && impl->func.comp);
 
     // comp
     return impl->func.comp(&impl->func, ltem, rtem);
