@@ -321,16 +321,13 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
                     break;
                 }
 
-#if 0
-                // update the accept context, otherwise shutdown will be failed
+                // update the accept context, otherwise shutdown and getsockname will be failed
                 SOCKET acpt = (SOCKET)tb_aico_sock(resp->aico) - 1;
                 tb_long_t update_ok = setsockopt((SOCKET)resp->u.acpt.priv[0] - 1, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
                 tb_assert_abort(!update_ok); tb_used(update_ok);
-#endif
-
+          
                 // clear sock
                 resp->u.acpt.priv[0] = tb_null;
-
 
                 // done GetAcceptExSockaddrs
                 INT                         server_size = 0;
@@ -450,7 +447,7 @@ static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
     if (resp->state == TB_STATE_OK)
     {
 #if 0
-        // update the connect context, otherwise shutdown will be failed
+        // update the connect context, otherwise shutdown and getsockname will be failed
         tb_long_t update_ok = setsockopt((SOCKET)tb_aico_sock(resp->aico)- 1, SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, tb_null, 0);
         tb_assert_abort(!update_ok); tb_used(update_ok);
 
