@@ -66,7 +66,7 @@ tb_char_t const* tb_string_cstr(tb_string_t const* string)
     tb_assert_and_check_return_val(string, tb_null);
 
     // the cstr
-    return tb_buffer_size(string)? (tb_char_t const*)tb_buffer_data((tb_buffer_t*)string) : tb_null;
+    return tb_string_size(string)? (tb_char_t const*)tb_buffer_data((tb_buffer_t*)string) : tb_null;
 }
 tb_size_t tb_string_size(tb_string_t const* string)
 {
