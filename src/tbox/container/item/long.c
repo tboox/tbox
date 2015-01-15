@@ -55,33 +55,6 @@ static tb_char_t const* tb_item_func_long_cstr(tb_item_func_t* func, tb_cpointer
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_bool_t tb_item_func_long_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(buff && stream, tb_false);
-
-    // load it
-#if TB_CPU_BIT64
-    *((tb_long_t*)buff) = (tb_long_t)tb_stream_bread_s64_be(stream);
-#else
-    *((tb_long_t*)buff) = (tb_long_t)tb_stream_bread_s32_be(stream);
-#endif
-
-    // ok
-    return tb_true;
-}
-static tb_bool_t tb_item_func_long_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(stream, tb_false);
-
-    // save it
-#if TB_CPU_BIT64
-    return tb_stream_bwrit_s64_be(stream, (tb_sint64_t)data);
-#else
-    return tb_stream_bwrit_s32_be(stream, (tb_sint32_t)data);
-#endif
-}
 static tb_void_t tb_item_func_long_free(tb_item_func_t* func, tb_pointer_t buff)
 {
     // check
@@ -131,8 +104,6 @@ tb_item_func_t tb_item_func_long()
     func.comp   = tb_item_func_long_comp;
     func.data   = tb_item_func_long_data;
     func.cstr   = tb_item_func_long_cstr;
-    func.load   = tb_item_func_long_load;
-    func.save   = tb_item_func_long_save;
     func.free   = tb_item_func_long_free;
     func.dupl   = tb_item_func_long_copy;
     func.repl   = tb_item_func_long_copy;

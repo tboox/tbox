@@ -63,22 +63,6 @@ static tb_char_t const* tb_item_func_mem_cstr(tb_item_func_t* func, tb_cpointer_
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_bool_t tb_item_func_mem_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(func && func->size && buff && stream, tb_false);
-
-    // load data
-    return tb_stream_bread(stream, (tb_byte_t*)buff, func->size);
-}
-static tb_bool_t tb_item_func_mem_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(func && func->size && stream && data, tb_false);
- 
-    // save data
-    return tb_stream_bwrit(stream, (tb_byte_t const*)data, func->size);
-}
 static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_pointer_t buff)
 {
     // check
@@ -174,8 +158,6 @@ tb_item_func_t tb_item_func_mem(tb_size_t size, tb_item_func_free_t free, tb_cpo
     func.comp   = tb_item_func_mem_comp;
     func.data   = tb_item_func_mem_data;
     func.cstr   = tb_item_func_mem_cstr;
-    func.load   = tb_item_func_mem_load;
-    func.save   = tb_item_func_mem_save;
     func.free   = free? free : tb_item_func_mem_free;
     func.dupl   = tb_item_func_mem_dupl;
     func.repl   = tb_item_func_mem_repl;

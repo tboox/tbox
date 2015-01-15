@@ -66,33 +66,6 @@ static tb_char_t const* tb_item_func_size_cstr(tb_item_func_t* func, tb_cpointer
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_bool_t tb_item_func_size_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(buff && stream, tb_false);
-
-    // load it
-#if TB_CPU_BIT64
-    *((tb_size_t*)buff) = (tb_size_t)tb_stream_bread_u64_be(stream);
-#else
-    *((tb_size_t*)buff) = (tb_size_t)tb_stream_bread_u32_be(stream);
-#endif
-
-    // ok
-    return tb_true;
-}
-static tb_bool_t tb_item_func_size_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(stream, tb_false);
-
-    // save it
-#if TB_CPU_BIT64
-    return tb_stream_bwrit_u64_be(stream, (tb_uint64_t)data);
-#else
-    return tb_stream_bwrit_u32_be(stream, (tb_uint32_t)data);
-#endif
-}
 static tb_void_t tb_item_func_size_free(tb_item_func_t* func, tb_pointer_t buff)
 {
     // check
@@ -140,8 +113,6 @@ tb_item_func_t tb_item_func_size()
     func.comp   = tb_item_func_size_comp;
     func.data   = tb_item_func_size_data;
     func.cstr   = tb_item_func_size_cstr;
-    func.load   = tb_item_func_size_load;
-    func.save   = tb_item_func_size_save;
     func.free   = tb_item_func_size_free;
     func.dupl   = tb_item_func_size_copy;
     func.repl   = tb_item_func_size_copy;

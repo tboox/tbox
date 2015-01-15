@@ -60,25 +60,6 @@ static tb_char_t const* tb_item_func_uint32_cstr(tb_item_func_t* func, tb_cpoint
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_bool_t tb_item_func_uint32_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(buff && stream, tb_false);
-
-    // load it
-    *((tb_uint32_t*)buff) = tb_stream_bread_u32_be(stream);
-
-    // ok
-    return tb_true;
-}
-static tb_bool_t tb_item_func_uint32_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(stream, tb_false);
-
-    // save it
-    return tb_stream_bwrit_u32_be(stream, tb_p2u32(data));
-}
 static tb_void_t tb_item_func_uint32_free(tb_item_func_t* func, tb_pointer_t buff)
 {
     // check
@@ -125,8 +106,6 @@ tb_item_func_t tb_item_func_uint32()
     func.comp   = tb_item_func_uint32_comp;
     func.data   = tb_item_func_uint32_data;
     func.cstr   = tb_item_func_uint32_cstr;
-    func.load   = tb_item_func_uint32_load;
-    func.save   = tb_item_func_uint32_save;
     func.free   = tb_item_func_uint32_free;
     func.dupl   = tb_item_func_uint32_copy;
     func.repl   = tb_item_func_uint32_copy;

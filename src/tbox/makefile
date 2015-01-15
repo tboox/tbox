@@ -76,6 +76,7 @@ tbox_C_FILES 			+= \
 						container/item/mem \
 						container/item/hash \
 						container/item/true \
+						container/item/null \
 						container/item/long \
 						container/item/size \
 						container/item/uint8 \

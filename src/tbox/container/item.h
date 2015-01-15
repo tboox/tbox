@@ -230,12 +230,6 @@ typedef struct __tb_item_func_t
     /// the string func 
     tb_item_func_cstr_t     cstr;
 
-    /// the load func
-    tb_item_func_load_t     load;
-
-    /// the save func
-    tb_item_func_save_t     save;
-
     /// the free item func
     tb_item_func_free_t     free;
 
@@ -266,7 +260,15 @@ typedef struct __tb_item_func_t
  * interfaces
  */
 
-/*! the true item function for hash data: null 
+/*! the null item function, no space
+ *
+ * @return          the item func
+ */
+tb_item_func_t      tb_item_func_null(tb_noarg_t);
+
+/*! the true item function, no space
+ *
+ * .e.g for hash data 
  *
  * @return          the item func
  */
