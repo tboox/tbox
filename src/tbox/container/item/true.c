@@ -55,14 +55,6 @@ static tb_char_t const* tb_item_func_true_cstr(tb_item_func_t* func, tb_cpointer
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_bool_t tb_item_func_true_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
-{
-    return tb_true;
-}
-static tb_bool_t tb_item_func_true_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
-{
-    return tb_true;
-}
 static tb_void_t tb_item_func_true_free(tb_item_func_t* func, tb_pointer_t buff)
 {
 }
@@ -71,11 +63,11 @@ static tb_void_t tb_item_func_true_nfree(tb_item_func_t* func, tb_pointer_t buff
 }
 static tb_void_t tb_item_func_true_repl(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data)
 {
-    tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
+    tb_assert_abort((tb_bool_t)(tb_size_t)data == tb_true);
 }
 static tb_void_t tb_item_func_true_nrepl(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
 {
-    tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
+    tb_assert_abort((tb_bool_t)(tb_size_t)data == tb_true);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -91,8 +83,6 @@ tb_item_func_t tb_item_func_true()
     func.comp   = tb_item_func_true_comp;
     func.data   = tb_item_func_true_data;
     func.cstr   = tb_item_func_true_cstr;
-    func.load   = tb_item_func_true_load;
-    func.save   = tb_item_func_true_save;
     func.free   = tb_item_func_true_free;
     func.dupl   = tb_item_func_true_repl;
     func.repl   = tb_item_func_true_repl;

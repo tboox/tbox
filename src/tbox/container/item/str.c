@@ -56,45 +56,6 @@ static tb_char_t const* tb_item_func_str_cstr(tb_item_func_t* func, tb_cpointer_
     // the c-string
     return (tb_char_t const*)data;
 }
-static tb_bool_t tb_item_func_str_load(tb_item_func_t* func, tb_pointer_t buff, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(buff && stream, tb_false);
-
-    // load size
-    tb_size_t size = tb_stream_bread_u32_be(stream);
-    tb_assert_and_check_return_val(size < TB_MAXU32, tb_false);
-
-    // init data
-    tb_byte_t* data = tb_malloc0_bytes(size + 1);
-    tb_assert_and_check_return_val(data, tb_false);
-
-    // load data
-    if (size && !tb_stream_bread(stream, data, size)) return tb_false;
-
-    // save data to the buffer
-    *((tb_char_t**)buff) = (tb_char_t*)data;
-
-    // ok
-    return tb_true;
-}
-static tb_bool_t tb_item_func_str_save(tb_item_func_t* func, tb_cpointer_t data, tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return_val(stream && data, tb_false);
- 
-    // done
-    tb_size_t size = tb_strlen((tb_char_t const*)data);
-
-    // save size
-    if (!tb_stream_bwrit_u32_be(stream, (tb_uint32_t)size)) return tb_false;
-
-    // save data
-    if (size && !tb_stream_bwrit(stream, (tb_byte_t const*)data, size)) return tb_false;
-
-    // ok
-    return tb_true;
-}
 static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_pointer_t buff)
 {
     // check
@@ -234,8 +195,6 @@ tb_item_func_t tb_item_func_str(tb_bool_t bcase)
     func.comp   = tb_item_func_str_comp;
     func.data   = tb_item_func_str_data;
     func.cstr   = tb_item_func_str_cstr;
-    func.load   = tb_item_func_str_load;
-    func.save   = tb_item_func_str_save;
     func.free   = tb_item_func_str_free;
     func.dupl   = tb_item_func_str_dupl;
     func.repl   = tb_item_func_str_repl;
