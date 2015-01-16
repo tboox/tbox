@@ -30,7 +30,7 @@
 #include "../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * init & exit
+ * implementation
  */
 tb_bool_t tb_queue_buffer_init(tb_queue_buffer_t* buffer, tb_size_t maxn)
 {
@@ -54,57 +54,76 @@ tb_void_t tb_queue_buffer_exit(tb_queue_buffer_t* buffer)
         tb_memset(buffer, 0, sizeof(tb_queue_buffer_t));
     }
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * accessors
- */
 tb_byte_t* tb_queue_buffer_data(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer, tb_null);
+
+    // the data
     return buffer->data;
 }
 tb_byte_t* tb_queue_buffer_head(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer, tb_null);
+
+    // the head
     return buffer->head;
 }
 tb_byte_t* tb_queue_buffer_tail(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer, tb_null);
+
+    // the tail
     return buffer->head? buffer->head + buffer->size : tb_null;
 }
 tb_size_t tb_queue_buffer_size(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer, 0);
+
+    // the size
     return buffer->size;
 }
 tb_size_t tb_queue_buffer_maxn(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer, 0);
+
+    // the maxn
     return buffer->maxn;
 }
 tb_size_t tb_queue_buffer_left(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer && buffer->size <= buffer->maxn, 0);
+
+    // the left
     return buffer->maxn - buffer->size;
 }
 tb_bool_t tb_queue_buffer_full(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer, tb_false);
+
+    // is full?
     return buffer->size == buffer->maxn? tb_true : tb_false;
 }
 tb_bool_t tb_queue_buffer_null(tb_queue_buffer_t const* buffer)
 {
+    // check
     tb_assert_and_check_return_val(buffer, tb_false);
+
+    // is null?
     return buffer->size? tb_false : tb_true;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * modifiors
- */
 tb_void_t tb_queue_buffer_clear(tb_queue_buffer_t* buffer)
 {
+    // check
     tb_assert_and_check_return(buffer);
+
+    // clear it
     buffer->size = 0;
     buffer->head = buffer->data;
 }
@@ -164,9 +183,6 @@ tb_long_t tb_queue_buffer_skip(tb_queue_buffer_t* buffer, tb_size_t size)
     // ok
     return read;
 }
-/* //////////////////////////////////////////////////////////////////////////////////////
- * read & writ
- */
 tb_long_t tb_queue_buffer_read(tb_queue_buffer_t* buffer, tb_byte_t* data, tb_size_t size)
 {
     // check
@@ -225,11 +241,6 @@ tb_long_t tb_queue_buffer_writ(tb_queue_buffer_t* buffer, tb_byte_t const* data,
     // ok
     return writ;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * pull & push
- */
-
 tb_byte_t* tb_queue_buffer_pull_init(tb_queue_buffer_t* buffer, tb_size_t* size)
 {
     // check
@@ -296,6 +307,8 @@ tb_void_t tb_queue_buffer_push_exit(tb_queue_buffer_t* buffer, tb_size_t size)
 {
     // check
     tb_assert_and_check_return(buffer && buffer->head && buffer->size + size <= buffer->maxn);
+
+    // update the size
     buffer->size += size;
 }
 

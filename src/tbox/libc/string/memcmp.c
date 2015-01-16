@@ -89,7 +89,7 @@ tb_long_t tb_memcmp(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
         tb_size_t n2 = tb_pool_data_size(s2);
         if (n2 && n > n2)
         {
-            tb_trace_i("[memcmp]: [overflow]: [%p, %lu] ?= [%p, %lu]", s2, n, s1, n1);
+            tb_trace_i("[memcmp]: [overflow]: [%p, %lu(%lu)] ?= [%p, %lu]", s2, n, n2, s1, n1);
             tb_backtrace_dump("[memcmp]: [overflow]: ", tb_null, 10);
             tb_pool_data_dump(s2, tb_true, "\t[malloc]: [from]: ");
             tb_abort();

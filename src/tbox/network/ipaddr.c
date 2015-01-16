@@ -127,11 +127,28 @@ tb_char_t const* tb_ipaddr_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_size
     // check
     tb_assert_and_check_return_val(ipaddr && data && maxn >= TB_IPADDR_CSTR_MAXN, tb_null);
 
-    // make it
-    tb_char_t buff[TB_IPADDR_CSTR_MAXN];
-    tb_bool_t ipv6 = ipaddr->family == TB_IPADDR_FAMILY_IPV6;
-    tb_long_t size = tb_snprintf(data, maxn - 1, "%s%s%s:%u", ipv6? "[" : "", tb_ipaddr_ip_cstr(ipaddr, buff, sizeof(buff)), ipv6? "]" : "", ipaddr->port);
-    if (size >= 0) data[size] = '\0';
+    // is empty?
+    if (tb_ipaddr_is_empty(ipaddr))
+    {
+        // make it
+        tb_long_t size = tb_snprintf(data, maxn - 1, "0.0.0.0:0");
+        if (size >= 0) data[size] = '\0';
+    }
+    // ip is empty?
+    else if (tb_ipaddr_ip_is_empty(ipaddr))
+    {
+        // make it
+        tb_long_t size = tb_snprintf(data, maxn - 1, "0.0.0.0:%u", ipaddr->port);
+        if (size >= 0) data[size] = '\0';
+    }
+    else
+    {
+        // make it
+        tb_char_t buff[TB_IPADDR_CSTR_MAXN];
+        tb_bool_t ipv6 = ipaddr->family == TB_IPADDR_FAMILY_IPV6;
+        tb_long_t size = tb_snprintf(data, maxn - 1, "%s%s%s:%u", ipv6? "[" : "", tb_ipaddr_ip_cstr(ipaddr, buff, sizeof(buff)), ipv6? "]" : "", ipaddr->port);
+        if (size >= 0) data[size] = '\0';
+    }
 
     // ok
     return data;
