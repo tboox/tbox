@@ -35,6 +35,14 @@
 #include "large_pool.h"
 #include "small_pool.h"
 #include "impl/prefix.h"
+#include "../platform/platform.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// only for debuging pool bug
+//#define TB_POOL_DISABLE
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -150,6 +158,11 @@ tb_pointer_t tb_pool_malloc_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl_
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+ 
+    // done
+#ifdef TB_POOL_DISABLE
+    return tb_native_memory_malloc(size);
+#endif
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -169,6 +182,11 @@ tb_pointer_t tb_pool_malloc0_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
     
+    // done
+#ifdef TB_POOL_DISABLE
+    return tb_native_memory_malloc0(size);
+#endif
+
     // enter
     tb_spinlock_enter(&impl->lock);
 
@@ -186,6 +204,11 @@ tb_pointer_t tb_pool_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size 
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+
+    // done
+#ifdef TB_POOL_DISABLE
+    return tb_native_memory_nalloc(item, size);
+#endif
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -205,6 +228,11 @@ tb_pointer_t tb_pool_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
 
+    // done
+#ifdef TB_POOL_DISABLE
+    return tb_native_memory_nalloc0(item, size);
+#endif
+
     // enter
     tb_spinlock_enter(&impl->lock);
 
@@ -222,6 +250,11 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+
+    // done
+#ifdef TB_POOL_DISABLE
+    return tb_native_memory_ralloc(data, size);
+#endif
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -303,6 +336,11 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && data, tb_false);
+
+    // done
+#ifdef TB_POOL_DISABLE
+    return tb_native_memory_free(data);
+#endif
 
     // enter
     tb_spinlock_enter(&impl->lock);
