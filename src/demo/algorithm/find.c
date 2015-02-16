@@ -16,19 +16,20 @@ static tb_void_t tb_find_int_test()
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
     for (i = 0; i < n; i++) data[i] = i;
 
     // find
-    tb_size_t itor = tb_iterator_tail(&iterator);
+    tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_find_all(&iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_find_all(iterator, (tb_pointer_t)data[8000]);
     time = tb_mclock() - time;
 
     // item
-    tb_long_t item = itor != tb_iterator_tail(&iterator)? (tb_long_t)tb_iterator_item(&iterator, itor) : 0;
+    tb_long_t item = itor != tb_iterator_tail(iterator)? (tb_long_t)tb_iterator_item(iterator, itor) : 0;
 
     // time
     tb_trace_i("tb_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
@@ -46,22 +47,23 @@ static tb_void_t tb_find_int_test_binary()
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
     for (i = 0; i < n; i++) data[i] = i;
 
     // find
-    tb_size_t itor = tb_iterator_tail(&iterator);
+    tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_binary_find_all(&iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_binary_find_all(iterator, (tb_pointer_t)data[8000]);
     time = tb_mclock() - time;
 
     // item
-    tb_long_t item = itor != tb_iterator_tail(&iterator)? (tb_long_t)tb_iterator_item(&iterator, itor) : 0;
+    tb_long_t item = itor != tb_iterator_tail(iterator)? (tb_long_t)tb_iterator_item(iterator, itor) : 0;
 
     // time
-    tb_trace_i("tb_bfind_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
+    tb_trace_i("tb_binary_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
 
     // free
     tb_free(data);
@@ -76,7 +78,8 @@ static tb_void_t tb_find_str_test()
     tb_assert_and_check_return(data);
 
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_str(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
     tb_char_t s[256] = {0};
@@ -88,18 +91,19 @@ static tb_void_t tb_find_str_test()
     }
 
     // find
-    tb_size_t itor = tb_iterator_tail(&iterator);
+    tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_find_all(&iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_find_all(iterator, (tb_pointer_t)data[8000]);
     time = tb_mclock() - time;
 
     // item
-    tb_char_t* item = itor != tb_iterator_tail(&iterator)? (tb_char_t*)tb_iterator_item(&iterator, itor) : 0;
+    tb_char_t* item = itor != tb_iterator_tail(iterator)? (tb_char_t*)tb_iterator_item(iterator, itor) : 0;
 
     // time
     tb_trace_i("tb_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
 
     // free data
+    for (i = 0; i < n; i++) tb_free(data[i]);
     tb_free(data);
 }
 static tb_void_t tb_find_str_test_binary()
@@ -112,7 +116,8 @@ static tb_void_t tb_find_str_test_binary()
     tb_assert_and_check_return(data);
 
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_str(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
     tb_char_t s[256] = {0};
@@ -124,18 +129,19 @@ static tb_void_t tb_find_str_test_binary()
     }
 
     // find
-    tb_size_t itor = tb_iterator_tail(&iterator);
+    tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_binary_find_all(&iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_binary_find_all(iterator, (tb_pointer_t)data[8000]);
     time = tb_mclock() - time;
 
     // item
-    tb_char_t* item = itor != tb_iterator_tail(&iterator)? (tb_char_t*)tb_iterator_item(&iterator, itor) : 0;
+    tb_char_t* item = itor != tb_iterator_tail(iterator)? (tb_char_t*)tb_iterator_item(iterator, itor) : 0;
 
     // time
-    tb_trace_i("tb_bfind_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
+    tb_trace_i("tb_binary_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
 
     // free data
+    for (i = 0; i < n; i++) tb_free(data[i]);
     tb_free(data);
 }
 /* //////////////////////////////////////////////////////////////////////////////////////

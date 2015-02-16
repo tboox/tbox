@@ -138,13 +138,15 @@ static tb_void_t tb_fixed_pool_slot_exit(tb_fixed_pool_impl_t* impl, tb_fixed_po
     // trace
     tb_trace_d("slot[%lu]: exit: size: %lu", impl->item_size, slot->size);
 
-    // init the iterator
-    tb_iterator_t iterator = tb_iterator_init_ptr((tb_pointer_t*)impl->slot_list, impl->slot_count);
+    // make the iterator
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_ptr(&array_iterator, (tb_pointer_t*)impl->slot_list, impl->slot_count);
+    tb_assert_abort(iterator);
 
     // find the slot from the slot list
-    tb_size_t itor = tb_binary_find_all(&iterator, (tb_cpointer_t)slot);
-    tb_assert_abort(itor != tb_iterator_tail(&iterator) && itor < impl->slot_count && impl->slot_list[itor]);
-    tb_check_return(itor != tb_iterator_tail(&iterator) && itor < impl->slot_count && impl->slot_list[itor]);
+    tb_size_t itor = tb_binary_find_all(iterator, (tb_cpointer_t)slot);
+    tb_assert_abort(itor != tb_iterator_tail(iterator) && itor < impl->slot_count && impl->slot_list[itor]);
+    tb_check_return(itor != tb_iterator_tail(iterator) && itor < impl->slot_count && impl->slot_list[itor]);
     
     // remove the slot
     if (itor + 1 < impl->slot_count) tb_memmov_(impl->slot_list + itor, impl->slot_list + itor + 1, (impl->slot_count - itor - 1) * sizeof(tb_fixed_pool_slot_t*));
@@ -311,12 +313,14 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_impl_t* impl,
     // check
     tb_assert_and_check_return_val(impl && data, tb_null);
 
-    // init the iterator
-    tb_iterator_t iterator = tb_iterator_init_ptr((tb_pointer_t*)impl->slot_list, impl->slot_count);
+    // make the iterator
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_ptr(&array_iterator, (tb_pointer_t*)impl->slot_list, impl->slot_count);
+    tb_assert_abort(iterator);
 
     // find it
-    tb_size_t itor = tb_binary_find_all_if(&iterator, tb_fixed_pool_slot_comp, data);
-    tb_check_return_val(itor != tb_iterator_tail(&iterator), tb_null);
+    tb_size_t itor = tb_binary_find_all_if(iterator, tb_fixed_pool_slot_comp, data);
+    tb_check_return_val(itor != tb_iterator_tail(iterator), tb_null);
 
     // the slot
     tb_fixed_pool_slot_t* slot = impl->slot_list[itor];

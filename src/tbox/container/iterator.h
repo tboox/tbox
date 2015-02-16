@@ -58,9 +58,6 @@ typedef struct __tb_iterator_t
     /// the iterator step
     tb_size_t               step;
 
-    /// the iterator data
-    tb_pointer_t            data;
-
     /// the iterator priv
     tb_pointer_t            priv;
 
@@ -99,6 +96,20 @@ typedef struct __tb_iterator_t
 
 }tb_iterator_t;
 
+/// the array iterator type
+typedef struct __tb_array_iterator_t
+{
+    /// the iterator base
+    tb_iterator_t           base;
+
+    /// the elements
+    tb_pointer_t            elements;
+
+    /// the element count
+    tb_size_t               count;
+
+}tb_array_iterator_t, *tb_array_iterator_ref_t;
+
 /// the iterator ref type
 typedef tb_iterator_t*      tb_iterator_ref_t;
 
@@ -109,50 +120,66 @@ typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_ref_t iterator, tb
  * interfaces
  */
 
-/*! init the long iterator
+/*! make iterator for the long array
  * 
- * @param data      the data
- * @param size      the size
+ * @param iterator  the iterator
+ * @param elements  the elements
+ * @param count     the count
  *
  * @return          the iterator
  */
-tb_iterator_t       tb_iterator_init_long(tb_long_t* data, tb_size_t size);
+tb_iterator_ref_t   tb_iterator_make_for_long(tb_array_iterator_ref_t iterator, tb_long_t* elements, tb_size_t count);
 
-/*! init the size iterator
+/*! make iterator for the size array
  * 
- * @param data      the data
- * @param size      the size
+ * @param iterator  the iterator
+ * @param elements  the elements
+ * @param count     the count
  *
  * @return          the iterator
  */
-tb_iterator_t       tb_iterator_init_size(tb_size_t* data, tb_size_t size);
+tb_iterator_ref_t   tb_iterator_make_for_size(tb_array_iterator_ref_t iterator, tb_size_t* elements, tb_size_t count);
 
-/*! init the string iterator
+/*! make iterator for the c-string array
  * 
- * @param data      the data
- * @param size      the size
+ * @param iterator  the iterator
+ * @param elements  the elements
+ * @param count     the count
  *
  * @return          the iterator
  */
-tb_iterator_t       tb_iterator_init_str(tb_char_t** data, tb_size_t size);
+tb_iterator_ref_t   tb_iterator_make_for_str(tb_array_iterator_ref_t iterator, tb_char_t** elements, tb_size_t count);
 
-/*! init the pointer iterator
+/*! make iterator for the c-string array and ignore case
  * 
- * @param data      the data
- * @param size      the size
+ * @param iterator  the iterator
+ * @param elements  the elements
+ * @param count     the count
  *
  * @return          the iterator
  */
-tb_iterator_t       tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size);
+tb_iterator_ref_t   tb_iterator_make_for_istr(tb_array_iterator_ref_t iterator, tb_char_t** elements, tb_size_t count);
 
-/*! init the memory iterator
+/*! make iterator for the pointer array
  * 
- * @param data      the data
- * @param size      the size
+ * @param iterator  the iterator
+ * @param elements  the elements
+ * @param count     the count
  *
  * @return          the iterator
  */
-tb_iterator_t       tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step);
+tb_iterator_ref_t   tb_iterator_make_for_ptr(tb_array_iterator_ref_t iterator, tb_pointer_t* elements, tb_size_t count);
+
+/*! make iterator for the memory array
+ * 
+ * @param iterator  the iterator
+ * @param elements  the elements
+ * @param count     the count
+ * @param size      the element size
+ *
+ * @return          the iterator
+ */
+tb_iterator_ref_t   tb_iterator_make_for_mem(tb_array_iterator_ref_t iterator, tb_pointer_t elements, tb_size_t count, tb_size_t size);
 
 /*! the iterator mode
  * 

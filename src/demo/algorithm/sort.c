@@ -15,7 +15,8 @@ static tb_void_t tb_sort_int_test_perf(tb_size_t n)
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -23,7 +24,7 @@ static tb_void_t tb_sort_int_test_perf(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_sort_all(&iterator, tb_null);
+    tb_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -44,7 +45,8 @@ static tb_void_t tb_sort_int_test_perf_bubble(tb_size_t n)
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -52,7 +54,7 @@ static tb_void_t tb_sort_int_test_perf_bubble(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_bubble_sort_all(&iterator, tb_null);
+    tb_bubble_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -75,7 +77,8 @@ static tb_void_t tb_sort_int_test_func_bubble()
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // trace
     tb_trace_i("");
@@ -89,7 +92,7 @@ static tb_void_t tb_sort_int_test_func_bubble()
     }
 
     // sort
-    tb_heap_sort_all(&iterator, tb_null);
+    tb_heap_sort_all(iterator, tb_null);
 
     // trace
     tb_trace_i("");
@@ -109,7 +112,8 @@ static tb_void_t tb_sort_int_test_perf_insert(tb_size_t n)
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -117,7 +121,7 @@ static tb_void_t tb_sort_int_test_perf_insert(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_insert_sort_all(&iterator, tb_null);
+    tb_insert_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -140,7 +144,8 @@ static tb_void_t tb_sort_int_test_func_insert()
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // trace
     tb_trace_i("");
@@ -154,7 +159,7 @@ static tb_void_t tb_sort_int_test_func_insert()
     }
 
     // sort
-    tb_heap_sort_all(&iterator, tb_null);
+    tb_heap_sort_all(iterator, tb_null);
 
     // trace
     tb_trace_i("");
@@ -174,7 +179,8 @@ static tb_void_t tb_sort_int_test_perf_quick(tb_size_t n)
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -182,7 +188,7 @@ static tb_void_t tb_sort_int_test_perf_quick(tb_size_t n)
     
     // sort
     tb_hong_t time = tb_mclock();
-    tb_quick_sort_all(&iterator, tb_null);
+    tb_quick_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -205,7 +211,8 @@ static tb_void_t tb_sort_int_test_func_quick()
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // trace
     tb_trace_i("");
@@ -219,7 +226,7 @@ static tb_void_t tb_sort_int_test_func_quick()
     }
 
     // sort
-    tb_heap_sort_all(&iterator, tb_null);
+    tb_heap_sort_all(iterator, tb_null);
 
     // trace
     tb_trace_i("");
@@ -239,7 +246,8 @@ static tb_void_t tb_sort_int_test_perf_heap(tb_size_t n)
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -247,7 +255,7 @@ static tb_void_t tb_sort_int_test_perf_heap(tb_size_t n)
     
     // sort
     tb_hong_t time = tb_mclock();
-    tb_heap_sort_all(&iterator, tb_null);
+    tb_heap_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -270,7 +278,8 @@ static tb_void_t tb_sort_int_test_func_heap()
     tb_assert_and_check_return(data);
     
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_long(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // trace
     tb_trace_i("");
@@ -284,7 +293,7 @@ static tb_void_t tb_sort_int_test_func_heap()
     }
 
     // sort
-    tb_heap_sort_all(&iterator, tb_null);
+    tb_heap_sort_all(iterator, tb_null);
 
     // trace
     tb_trace_i("");
@@ -304,7 +313,8 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_str(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -318,7 +328,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_sort_all(&iterator, tb_null);
+    tb_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -328,6 +338,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
     // free data
+    for (i = 0; i < n; i++) tb_free(data[i]);
     tb_free(data);
 }
 static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
@@ -339,7 +350,8 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_str(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -353,7 +365,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_bubble_sort_all(&iterator, tb_null);
+    tb_bubble_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -363,6 +375,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
     // free data
+    for (i = 0; i < n; i++) tb_free(data[i]);
     tb_free(data);
 }
 static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
@@ -374,7 +387,8 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_str(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -388,7 +402,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_insert_sort_all(&iterator, tb_null);
+    tb_insert_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -398,6 +412,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
     // free data
+    for (i = 0; i < n; i++) tb_free(data[i]);
     tb_free(data);
 }
 static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
@@ -409,7 +424,8 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_str(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -423,7 +439,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_quick_sort_all(&iterator, tb_null);
+    tb_quick_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -433,6 +449,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
     // free data
+    for (i = 0; i < n; i++) tb_free(data[i]);
     tb_free(data);
 }
 static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
@@ -444,7 +461,8 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
     tb_assert_and_check_return(data);
 
     // init iterator
-    tb_iterator_t iterator = tb_iterator_init_str(data, n);
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
     tb_random_clear(tb_null);
@@ -458,7 +476,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 
     // sort
     tb_hong_t time = tb_mclock();
-    tb_heap_sort_all(&iterator, tb_null);
+    tb_heap_sort_all(iterator, tb_null);
     time = tb_mclock() - time;
 
     // time
@@ -468,6 +486,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
     for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
     // free data
+    for (i = 0; i < n; i++) tb_free(data[i]);
     tb_free(data);
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
