@@ -184,11 +184,6 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
         tb_assert_and_check_break(slot);
         tb_assert_and_check_break(real_space > sizeof(tb_fixed_pool_slot_t) + item_space);
 
-#ifdef __tb_debug__
-        // remove the debug space size
-        tb_large_pool_diff(impl->large_pool, -(tb_long_t)(impl->slot_size * (TB_POOL_DATA_HEAD_DIFF_SIZE + patch)));
-#endif
-
         // init slot
         slot->size = real_space;
         slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], real_space - sizeof(tb_fixed_pool_slot_t), impl->item_size, impl->for_small_pool); 

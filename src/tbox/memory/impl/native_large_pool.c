@@ -82,9 +82,6 @@ typedef struct __tb_native_large_pool_impl_t
     tb_list_entry_head_t            data_list;
 
 #ifdef __tb_debug__
-    // the diff size
-    tb_long_t                       diff_size;
-
     // the peak size
     tb_size_t                       peak_size;
 
@@ -635,21 +632,6 @@ tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
     return ok;
 }
 #ifdef __tb_debug__
-tb_void_t tb_native_large_pool_diff(tb_large_pool_ref_t pool, tb_long_t diff)
-{
-    // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return(impl);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
-    // diff it
-    impl->diff_size += diff;
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-}
 tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
 {
     // check
@@ -676,7 +658,7 @@ tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
     }
 
     // trace debug info
-    tb_trace_i("peak_size: %ld",            (tb_long_t)impl->peak_size + impl->diff_size);
+    tb_trace_i("peak_size: %lu",            impl->peak_size);
     tb_trace_i("wast_rate: %llu/10000",     impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->real_size) * 10000) / (tb_hize_t)impl->occupied_size : 0);
     tb_trace_i("free_count: %lu",           impl->free_count);
     tb_trace_i("malloc_count: %lu",         impl->malloc_count);
