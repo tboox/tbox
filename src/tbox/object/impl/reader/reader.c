@@ -44,7 +44,7 @@ tb_bool_t tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader)
     tb_assert_and_check_return_val(reader && (format < tb_arrayn(g_reader)), tb_false);
 
     // exit the older reader if exists
-    tb_object_reader_del(format);
+    tb_object_reader_remove(format);
 
     // set
     g_reader[format] = reader;
@@ -52,7 +52,7 @@ tb_bool_t tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader)
     // ok
     return tb_true;
 }
-tb_void_t tb_object_reader_del(tb_size_t format)
+tb_void_t tb_object_reader_remove(tb_size_t format)
 {
     // check
     format &= 0x00ff;

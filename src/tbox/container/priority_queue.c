@@ -61,7 +61,7 @@ tb_void_t tb_priority_queue_pop(tb_priority_queue_ref_t queue)
 {
     tb_heap_pop((tb_heap_ref_t)queue);
 }
-tb_void_t tb_priority_queue_del(tb_priority_queue_ref_t queue, tb_size_t itor)
+tb_void_t tb_priority_queue_remove(tb_priority_queue_ref_t queue, tb_size_t itor)
 {
-    tb_heap_del((tb_heap_ref_t)queue, itor);
+    tb_heap_remove((tb_heap_ref_t)queue, itor);
 }

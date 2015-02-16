@@ -137,12 +137,12 @@ tb_void_t           tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data);
  */
 tb_void_t           tb_heap_pop(tb_heap_ref_t heap);
 
-/*! delete the heap item using iterator only for algorithm(find, ...)
+/*! remove the heap item using iterator only for algorithm(find, ...)
  *
  * @param heap      the heap
  * @param itor      the itor
  */
-tb_void_t           tb_heap_del(tb_heap_ref_t heap, tb_size_t itor);
+tb_void_t           tb_heap_remove(tb_heap_ref_t heap, tb_size_t itor);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

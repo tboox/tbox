@@ -214,7 +214,7 @@ static tb_void_t tb_static_large_pool_check_next(tb_static_large_pool_impl_t* im
 /* //////////////////////////////////////////////////////////////////////////////////////
  * malloc implementation
  */
-static __tb_inline__ tb_size_t tb_static_large_pool_pred_idx(tb_static_large_pool_impl_t* impl, tb_size_t space)
+static __tb_inline__ tb_size_t tb_static_large_pool_pred_index(tb_static_large_pool_impl_t* impl, tb_size_t space)
 {
     // the size
     tb_size_t size = sizeof(tb_static_large_data_head_t) + space;
@@ -233,7 +233,7 @@ static __tb_inline__ tb_size_t tb_static_large_pool_pred_idx(tb_static_large_poo
     if (indx >= tb_arrayn(impl->data_pred)) indx = tb_arrayn(impl->data_pred) - 1;
     return indx;
 }
-static __tb_inline__ tb_void_t tb_static_large_pool_pred_add(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t* data_head)
+static __tb_inline__ tb_void_t tb_static_large_pool_pred_update(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t* data_head)
 {
     // check
     tb_assert_abort(impl && data_head && data_head->bfree);
@@ -242,7 +242,7 @@ static __tb_inline__ tb_void_t tb_static_large_pool_pred_add(tb_static_large_poo
     tb_check_return(data_head != impl->data_tail);
 
     // the pred index
-    tb_size_t indx = tb_static_large_pool_pred_idx(impl, data_head->space);
+    tb_size_t indx = tb_static_large_pool_pred_index(impl, data_head->space);
 
     // the pred head
     tb_static_large_data_head_t* pred_head = impl->data_pred[indx].data_head;
@@ -250,13 +250,13 @@ static __tb_inline__ tb_void_t tb_static_large_pool_pred_add(tb_static_large_poo
     // cache this data head
     if (!pred_head || data_head->space > pred_head->space) impl->data_pred[indx].data_head = data_head;
 }
-static __tb_inline__ tb_void_t tb_static_large_pool_pred_del(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t* data_head)
+static __tb_inline__ tb_void_t tb_static_large_pool_pred_remove(tb_static_large_pool_impl_t* impl, tb_static_large_data_head_t* data_head)
 {
     // check
     tb_assert_abort(impl && data_head);
 
     // the pred index
-    tb_size_t indx = tb_static_large_pool_pred_idx(impl, data_head->space);
+    tb_size_t indx = tb_static_large_pool_pred_index(impl, data_head->space);
 
     // clear this data head
     if (impl->data_pred[indx].data_head == data_head) impl->data_pred[indx].data_head = tb_null;
@@ -291,7 +291,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
             if (data_space >= space)
             {
                 // remove this free data from the pred cache
-                tb_static_large_pool_pred_del(impl, data_head);
+                tb_static_large_pool_pred_remove(impl, data_head);
 
                 // split it if this free data is too large
                 if (data_space > sizeof(tb_static_large_data_head_t) + space)
@@ -303,7 +303,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
                     data_head->space = space;
  
                     // add next free data to the pred cache
-                    tb_static_large_pool_pred_add(impl, next_head);
+                    tb_static_large_pool_pred_update(impl, next_head);
                 }
                 else
                 {
@@ -314,7 +314,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
                     if (next_head + 1 < data_tail && next_head->bfree)
                     {
                         // add next free data to the pred cache
-                        tb_static_large_pool_pred_add(impl, next_head);
+                        tb_static_large_pool_pred_update(impl, next_head);
                     }
                 }
 
@@ -336,10 +336,10 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
                 if (next_head->bfree)
                 {
                     // remove next free data from the pred cache
-                    tb_static_large_pool_pred_del(impl, next_head);
+                    tb_static_large_pool_pred_remove(impl, next_head);
 
                     // remove this free data from the pred cache
-                    tb_static_large_pool_pred_del(impl, data_head);
+                    tb_static_large_pool_pred_remove(impl, data_head);
 
                     // trace
                     tb_trace_d("malloc: find: merge: %lu", next_head->space);
@@ -348,7 +348,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_find(tb_static_l
                     data_head->space += sizeof(tb_static_large_data_head_t) + next_head->space;
 
                     // add this free data to the pred cache
-                    tb_static_large_pool_pred_add(impl, data_head);
+                    tb_static_large_pool_pred_update(impl, data_head);
 
                     // continue handle this data 
                     continue ;
@@ -372,7 +372,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_pred(tb_static_l
     tb_assert_and_check_return_val(impl && impl->data_head, tb_null);
 
     // walk the pred cache
-    tb_size_t                       indx = tb_static_large_pool_pred_idx(impl, space);
+    tb_size_t                       indx = tb_static_large_pool_pred_index(impl, space);
     tb_size_t                       size = tb_arrayn(impl->data_pred);
     tb_static_large_data_pred_t*    pred = impl->data_pred;
     tb_static_large_data_head_t*    data_head = tb_null;
@@ -526,7 +526,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
             while (next_head < data_tail && next_head->bfree) 
             {
                 // remove next free data from the pred cache
-                tb_static_large_pool_pred_del(impl, next_head);
+                tb_static_large_pool_pred_remove(impl, next_head);
 
                 // trace
                 tb_trace_d("ralloc: fast: merge: %lu", next_head->space);
@@ -552,7 +552,7 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
             data_head->space = need_space;
 
             // add next free data to the pred cache
-            tb_static_large_pool_pred_add(impl, next_head);
+            tb_static_large_pool_pred_update(impl, next_head);
         }
 
         // the real size
@@ -651,7 +651,7 @@ static tb_bool_t tb_static_large_pool_free_done(tb_static_large_pool_impl_t* imp
         if (next_head < impl->data_tail && next_head->bfree) 
         {
             // remove next free data from the pred cache
-            tb_static_large_pool_pred_del(impl, next_head);
+            tb_static_large_pool_pred_remove(impl, next_head);
 
             // trace
             tb_trace_d("free: merge: %lu", next_head->space);
@@ -664,7 +664,7 @@ static tb_bool_t tb_static_large_pool_free_done(tb_static_large_pool_impl_t* imp
         data_head->bfree = 1;
 
         // add this free data to the pred cache
-        tb_static_large_pool_pred_add(impl, data_head);
+        tb_static_large_pool_pred_update(impl, data_head);
 
         // ok
         ok = tb_true;
@@ -717,7 +717,7 @@ tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size)
     tb_assert_and_check_return_val(!((tb_size_t)impl->data_head & (TB_POOL_DATA_ALIGN - 1)), tb_null);
  
     // add this free data to the pred cache
-    tb_static_large_pool_pred_add(impl, impl->data_head);
+    tb_static_large_pool_pred_update(impl, impl->data_head);
 
     // init data tail
     impl->data_tail = (tb_static_large_data_head_t*)((tb_byte_t*)&impl->data_head[1] + impl->data_head->space);
@@ -759,7 +759,7 @@ tb_void_t tb_static_large_pool_clear(tb_large_pool_ref_t pool)
     tb_memset_(impl->data_pred, 0, sizeof(impl->data_pred));
  
     // add this free data to the pred cache
-    tb_static_large_pool_pred_add(impl, impl->data_head);
+    tb_static_large_pool_pred_update(impl, impl->data_head);
 
     // clear info
 #ifdef __tb_debug__

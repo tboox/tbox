@@ -647,7 +647,7 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                                             if (skey) 
                                             {
                                                 tb_object_inc(object_hash[val]);
-                                                tb_object_dictionary_set(object, skey, object_hash[val]);
+                                                tb_object_dictionary_insert(object, skey, object_hash[val]);
                                             }
                                             tb_assert(skey);
                                         }

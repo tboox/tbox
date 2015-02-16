@@ -666,7 +666,7 @@ tb_void_t tb_heap_pop(tb_heap_ref_t heap)
 {
     tb_heap_itor_remove(heap, 0);
 }
-tb_void_t tb_heap_del(tb_heap_ref_t heap, tb_size_t itor)
+tb_void_t tb_heap_remove(tb_heap_ref_t heap, tb_size_t itor)
 {
     tb_heap_itor_remove(heap, itor);
 }
