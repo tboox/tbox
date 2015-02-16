@@ -54,14 +54,14 @@ static tb_pointer_t tb_item_func_mem_data(tb_item_func_t* func, tb_cpointer_t bu
 static tb_char_t const* tb_item_func_mem_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(func && func->size && cstr && data, "");
+    tb_assert_and_check_return_val(func && func->size && cstr && data, tb_null);
 
-    // format string
-    tb_long_t n = tb_snprintf(cstr, maxn - 1, "0x%x", tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, (tb_byte_t const*)data, func->size));
-    if (n >= 0 && n < (tb_long_t)maxn) cstr[n] = '\0';
+    // make info
+    tb_long_t size = tb_snprintf(cstr, maxn, "0x%x", tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, (tb_byte_t const*)data, func->size));
+    if (size >= 0) cstr[size] = '\0';
 
     // ok?
-    return (tb_char_t const*)cstr;
+    return cstr;
 }
 static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_pointer_t buff)
 {
