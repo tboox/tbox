@@ -51,12 +51,6 @@ __tb_extern_c_enter__
  */
 tb_bool_t           tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader);
 
-/*! del object reader
- *
- * @param format    the reader format
- */
-tb_void_t           tb_object_reader_del(tb_size_t format);
-
 /*! get object reader
  *
  * @param format    the reader format
@@ -65,13 +59,19 @@ tb_void_t           tb_object_reader_del(tb_size_t format);
  */
 tb_object_reader_t* tb_object_reader_get(tb_size_t format);
 
+/*! remove object reader
+ *
+ * @param format    the reader format
+ */
+tb_void_t           tb_object_reader_remove(tb_size_t format);
+
 /*! done reader
  *
  * @param stream    the stream
  *
  * @return          the object
  */
-tb_object_ref_t        tb_object_reader_done(tb_stream_ref_t stream);
+tb_object_ref_t     tb_object_reader_done(tb_stream_ref_t stream);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

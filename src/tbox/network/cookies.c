@@ -201,19 +201,19 @@ static tb_void_t tb_cookies_entry_exit(tb_cookies_impl_t* impl, tb_cookies_entry
     tb_assert_and_check_return(impl && entry);
 
     // exit domain
-    if (entry->domain) tb_string_pool_del(impl->string_pool, entry->domain);
+    if (entry->domain) tb_string_pool_remove(impl->string_pool, entry->domain);
     entry->domain = tb_null;
     
     // exit path
-    if (entry->path) tb_string_pool_del(impl->string_pool, entry->path);
+    if (entry->path) tb_string_pool_remove(impl->string_pool, entry->path);
     entry->path = tb_null;
     
     // exit name
-    if (entry->name) tb_string_pool_del(impl->string_pool, entry->name);
+    if (entry->name) tb_string_pool_remove(impl->string_pool, entry->name);
     entry->name = tb_null;
     
     // exit value
-    if (entry->value) tb_string_pool_del(impl->string_pool, entry->value);
+    if (entry->value) tb_string_pool_remove(impl->string_pool, entry->value);
     entry->value = tb_null;
 }
 static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
@@ -324,7 +324,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->domain = tb_string_pool_put(impl->string_pool, data[0] == '.'? data + 1 : data);
+                    entry->domain = tb_string_pool_insert(impl->string_pool, data[0] == '.'? data + 1 : data);
                 }
             }
             else if (!tb_strnicmp(b, "path", 4))
@@ -337,7 +337,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->path = tb_string_pool_put(impl->string_pool, data);
+                    entry->path = tb_string_pool_insert(impl->string_pool, data);
                 }
             }   
             else if (!tb_strnicmp(b, "version", 7))
@@ -361,7 +361,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 // save name
                 tb_assert_and_check_return_val(v - b - 1 < sizeof(data) - 1, tb_false);
                 tb_strlcpy(data, b, v - b - 1); data[v - b - 1] = '\0';
-                entry->name = tb_string_pool_put(impl->string_pool, data);
+                entry->name = tb_string_pool_insert(impl->string_pool, data);
                 tb_assert_and_check_return_val(entry->name, tb_false);
 
                 // save value
@@ -369,7 +369,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 if (v < p)
                 {
                     tb_strlcpy(data, v, p - v); data[p - v] = '\0';
-                    entry->value = tb_string_pool_put(impl->string_pool, data);
+                    entry->value = tb_string_pool_insert(impl->string_pool, data);
                     tb_assert_and_check_return_val(entry->value, tb_false);
                 }
             }
@@ -414,7 +414,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
         if (n && *domain == '.') domain++;
 
         // save domain
-        entry->domain = tb_string_pool_put(impl->string_pool, domain);
+        entry->domain = tb_string_pool_insert(impl->string_pool, domain);
     }
     if (!entry->domain)
     {
@@ -424,7 +424,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
     }
 
     // path not exists? using the given path
-    if (!entry->path) entry->path = tb_string_pool_put(impl->string_pool, path? path : "/");
+    if (!entry->path) entry->path = tb_string_pool_insert(impl->string_pool, path? path : "/");
     tb_assert_and_check_return_val(entry->path, tb_false);
 
     // no secure? using the given secure value

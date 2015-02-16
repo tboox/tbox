@@ -615,7 +615,7 @@ tb_void_t tb_timer_task_kill(tb_timer_ref_t timer, tb_timer_task_ref_t task)
         tb_assert_and_check_break(itor != tb_iterator_tail(impl->heap));
 
         // del this task_impl
-        tb_heap_del(impl->heap, itor);
+        tb_heap_remove(impl->heap, itor);
 
         // killed
         task_impl->killed = 1;

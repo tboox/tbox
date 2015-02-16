@@ -107,7 +107,7 @@ tb_void_t tb_string_pool_clear(tb_string_pool_ref_t pool)
     // clear cache
     if (impl->cache) tb_hash_map_clear(impl->cache);
 }
-tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* data)
+tb_char_t const* tb_string_pool_insert(tb_string_pool_ref_t pool, tb_char_t const* data)
 {
     // check
     tb_string_pool_impl_t* impl = (tb_string_pool_impl_t*)pool;
@@ -155,7 +155,7 @@ tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* 
     // ok?
     return cstr;
 }
-tb_void_t tb_string_pool_del(tb_string_pool_ref_t pool, tb_char_t const* data)
+tb_void_t tb_string_pool_remove(tb_string_pool_ref_t pool, tb_char_t const* data)
 {
     // check
     tb_string_pool_impl_t* impl = (tb_string_pool_impl_t*)pool;

@@ -388,7 +388,7 @@ static tb_object_ref_t tb_object_bin_reader_func_dictionary(tb_object_bin_reader
         tb_assert_and_check_break(val);
 
         // set key => val
-        tb_object_dictionary_set(dictionary, tb_object_string_cstr(key), val);
+        tb_object_dictionary_insert(dictionary, tb_object_string_cstr(key), val);
     }
 
     // failed?

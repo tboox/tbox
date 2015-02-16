@@ -467,7 +467,7 @@ static tb_object_ref_t tb_object_xplist_reader_func_dictionary(tb_object_xplist_
 
                     // set key & value
                     if (tb_static_string_size(&kname) && dictionary) 
-                        tb_object_dictionary_set(dictionary, tb_static_string_cstr(&kname), object);
+                        tb_object_dictionary_insert(dictionary, tb_static_string_cstr(&kname), object);
 
                     // clear key name
                     tb_static_string_clear(&kname);

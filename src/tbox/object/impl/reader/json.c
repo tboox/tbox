@@ -449,7 +449,7 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
                 tb_assert_and_check_break_state(val, ok, tb_false);
 
                 // set key => val
-                tb_object_dictionary_set(dictionary, tb_static_string_cstr(&kname), val);
+                tb_object_dictionary_insert(dictionary, tb_static_string_cstr(&kname), val);
 
                 // reset key
                 bstr = 0;

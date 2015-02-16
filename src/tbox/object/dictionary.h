@@ -105,29 +105,29 @@ tb_void_t               tb_object_dictionary_incr(tb_object_ref_t dictionary, tb
  */
 tb_iterator_ref_t       tb_object_dictionary_itor(tb_object_ref_t dictionary);
 
-/*! the dictionary value
+/*! get the dictionary value
  *
  * @param dictionary    the dictionary object
  * @param key           the key
  *
  * @return              the dictionary value
  */
-tb_object_ref_t         tb_object_dictionary_val(tb_object_ref_t dictionary, tb_char_t const* key);
+tb_object_ref_t         tb_object_dictionary_value(tb_object_ref_t dictionary, tb_char_t const* key);
 
-/*! del dictionary item
- *
- * @param dictionary    the dictionary object
- * @param key           the key
- */
-tb_void_t               tb_object_dictionary_del(tb_object_ref_t dictionary, tb_char_t const* key);
-
-/*! set dictionary item
+/*! insert dictionary item
  *
  * @param dictionary    the dictionary object
  * @param key           the key
  * @param val           the value
  */
-tb_void_t               tb_object_dictionary_set(tb_object_ref_t dictionary, tb_char_t const* key, tb_object_ref_t val);
+tb_void_t               tb_object_dictionary_insert(tb_object_ref_t dictionary, tb_char_t const* key, tb_object_ref_t val);
+
+/*! remove dictionary item
+ *
+ * @param dictionary    the dictionary object
+ * @param key           the key
+ */
+tb_void_t               tb_object_dictionary_remove(tb_object_ref_t dictionary, tb_char_t const* key);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

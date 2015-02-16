@@ -63,21 +63,21 @@ tb_bool_t tb_object_context_init()
 tb_void_t tb_object_context_exit()
 {
     // exit reader
-    tb_object_reader_del(TB_OBJECT_FORMAT_BIN);
-    tb_object_reader_del(TB_OBJECT_FORMAT_JSON);
-    tb_object_reader_del(TB_OBJECT_FORMAT_BPLIST);
+    tb_object_reader_remove(TB_OBJECT_FORMAT_BIN);
+    tb_object_reader_remove(TB_OBJECT_FORMAT_JSON);
+    tb_object_reader_remove(TB_OBJECT_FORMAT_BPLIST);
 
     // exit writer
-    tb_object_writer_del(TB_OBJECT_FORMAT_BIN);
-    tb_object_writer_del(TB_OBJECT_FORMAT_JSON);
-    tb_object_writer_del(TB_OBJECT_FORMAT_BPLIST);
+    tb_object_writer_remove(TB_OBJECT_FORMAT_BIN);
+    tb_object_writer_remove(TB_OBJECT_FORMAT_JSON);
+    tb_object_writer_remove(TB_OBJECT_FORMAT_BPLIST);
 
     // for xml
 #ifdef TB_CONFIG_MODULE_HAVE_XML
-    tb_object_reader_del(TB_OBJECT_FORMAT_XML);
-    tb_object_writer_del(TB_OBJECT_FORMAT_XML);
-    tb_object_reader_del(TB_OBJECT_FORMAT_XPLIST);
-    tb_object_writer_del(TB_OBJECT_FORMAT_XPLIST);
+    tb_object_reader_remove(TB_OBJECT_FORMAT_XML);
+    tb_object_writer_remove(TB_OBJECT_FORMAT_XML);
+    tb_object_reader_remove(TB_OBJECT_FORMAT_XPLIST);
+    tb_object_writer_remove(TB_OBJECT_FORMAT_XPLIST);
 #endif
 }
 tb_bool_t tb_object_init(tb_object_ref_t object, tb_size_t flag, tb_size_t type)
@@ -215,7 +215,7 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
                 tb_trace_d("key: %s", key);
             
                 // the value
-                object = tb_object_dictionary_val(object, key);
+                object = tb_object_dictionary_value(object, key);
             }
             break;
         case '[':

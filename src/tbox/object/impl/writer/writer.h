@@ -51,12 +51,6 @@ __tb_extern_c_enter__
  */
 tb_bool_t           tb_object_writer_set(tb_size_t format, tb_object_writer_t* writer);
 
-/*! del object writer
- *
- * @param format    the writer format
- */
-tb_void_t           tb_object_writer_del(tb_size_t format);
-
 /*! get object writer
  *
  * @param format    the writer format
@@ -64,6 +58,12 @@ tb_void_t           tb_object_writer_del(tb_size_t format);
  * @return          the object writer
  */
 tb_object_writer_t* tb_object_writer_get(tb_size_t format);
+
+/*! remove object writer
+ *
+ * @param format    the writer format
+ */
+tb_void_t           tb_object_writer_remove(tb_size_t format);
 
 /*! done writer
  *

@@ -108,12 +108,12 @@ tb_void_t                   tb_priority_queue_put(tb_priority_queue_ref_t queue,
  */
 tb_void_t                   tb_priority_queue_pop(tb_priority_queue_ref_t queue);
 
-/*! del the queue item
+/*! remove the queue item
  *
  * @param queue             the queue
  * @param itor              the itor
  */
-tb_void_t                   tb_priority_queue_del(tb_priority_queue_ref_t queue, tb_size_t itor);
+tb_void_t                   tb_priority_queue_remove(tb_priority_queue_ref_t queue, tb_size_t itor);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
