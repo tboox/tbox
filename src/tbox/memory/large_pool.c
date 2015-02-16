@@ -225,15 +225,6 @@ tb_bool_t tb_large_pool_free_(tb_large_pool_ref_t pool, tb_pointer_t data __tb_d
     return ok;
 }
 #ifdef __tb_debug__
-tb_void_t tb_large_pool_diff(tb_large_pool_ref_t pool, tb_long_t diff)
-{ 
-    // check
-    tb_assert_and_check_return(pool);
-
-    // diff the pool
-    if (tb_large_pool_is_native(pool)) tb_native_large_pool_diff(pool, diff);
-    else tb_static_large_pool_diff(pool, diff);
-}
 tb_void_t tb_large_pool_dump(tb_large_pool_ref_t pool)
 {
     // check
