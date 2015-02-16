@@ -102,28 +102,32 @@ static tb_long_t tb_charset_comp_by_type(tb_iterator_ref_t iterator, tb_cpointer
 }
 static tb_charset_ref_t tb_charset_find_by_name(tb_char_t const* name)
 {
-    // init iterator
-    tb_iterator_t   iterator = tb_iterator_init_mem(g_charsets, tb_arrayn(g_charsets), sizeof(tb_charset_t));
+    // make iterator
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_mem(&array_iterator, g_charsets, tb_arrayn(g_charsets), sizeof(tb_charset_t));
+    tb_assert_and_check_return_val(iterator, tb_null);
 
     // find it by the binary search
-    tb_size_t       itor = tb_binary_find_all_if(&iterator, tb_charset_comp_by_name, name);
+    tb_size_t itor = tb_binary_find_all_if(iterator, tb_charset_comp_by_name, name);
 
     // ok?
-    if (itor != tb_iterator_tail(&iterator))
-        return (tb_charset_ref_t)tb_iterator_item(&iterator, itor);
+    if (itor != tb_iterator_tail(iterator))
+        return (tb_charset_ref_t)tb_iterator_item(iterator, itor);
     else return tb_null;
 }
 static tb_charset_ref_t tb_charset_find_by_type(tb_size_t type)
 {
-    // init iterator
-    tb_iterator_t   iterator = tb_iterator_init_mem(g_charsets, tb_arrayn(g_charsets), sizeof(tb_charset_t));
+    // make iterator
+    tb_array_iterator_t array_iterator;
+    tb_iterator_ref_t   iterator = tb_iterator_make_for_mem(&array_iterator, g_charsets, tb_arrayn(g_charsets), sizeof(tb_charset_t));
+    tb_assert_and_check_return_val(iterator, tb_null);
 
     // find it by the binary search
-    tb_size_t       itor = tb_binary_find_all_if(&iterator, tb_charset_comp_by_type, (tb_cpointer_t)TB_CHARSET_TYPE(type));
+    tb_size_t itor = tb_binary_find_all_if(iterator, tb_charset_comp_by_type, (tb_cpointer_t)TB_CHARSET_TYPE(type));
 
     // ok?
-    if (itor != tb_iterator_tail(&iterator))
-        return (tb_charset_ref_t)tb_iterator_item(&iterator, itor);
+    if (itor != tb_iterator_tail(iterator))
+        return (tb_charset_ref_t)tb_iterator_item(iterator, itor);
     else return tb_null;
 }
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -27,43 +27,47 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
-static tb_long_t tb_iterator_init_str_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_iterator_str_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
-    tb_assert_and_check_return_val(ltem && rtem, 0);
+    tb_assert_abort(ltem && rtem);
 
     // compare it
-    return iterator->priv? tb_strcmp((tb_char_t const*)ltem, (tb_char_t const*)rtem) : tb_stricmp((tb_char_t const*)ltem, (tb_char_t const*)rtem);
+    return tb_strcmp((tb_char_t const*)ltem, (tb_char_t const*)rtem);
+}
+static tb_long_t tb_iterator_istr_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+{
+    // check
+    tb_assert_abort(ltem && rtem);
+
+    // compare it
+    return tb_stricmp((tb_char_t const*)ltem, (tb_char_t const*)rtem);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
-tb_iterator_t tb_iterator_init_str(tb_char_t** data, tb_size_t size)
-{   
-    // check
-    tb_assert(data && size);
-
-    // the ptr iterator
-    tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
+tb_iterator_ref_t tb_iterator_make_for_str(tb_array_iterator_ref_t iterator, tb_char_t** elements, tb_size_t count)
+{
+    // make iterator for the pointer array
+    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count)) return tb_null;
 
     // init
-    tb_iterator_t itor = {0};
-    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
-    itor.data = (tb_pointer_t)data;
-    itor.priv = tb_u2p(size);
-    itor.step = sizeof(tb_char_t*);
-    itor.size = ptr.size;
-    itor.head = ptr.head;
-    itor.tail = ptr.tail;
-    itor.prev = ptr.prev;
-    itor.next = ptr.next;
-    itor.item = ptr.item;
-    itor.copy = ptr.copy;
-    itor.comp = tb_iterator_init_str_comp;
+    iterator->base.comp = tb_iterator_str_comp;
 
     // ok
-    return itor;
+    return (tb_iterator_ref_t)iterator;
+}
+tb_iterator_ref_t tb_iterator_make_for_istr(tb_array_iterator_ref_t iterator, tb_char_t** elements, tb_size_t count)
+{
+    // make iterator for the pointer array
+    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count)) return tb_null;
+
+    // init
+    iterator->base.comp = tb_iterator_istr_comp;
+
+    // ok
+    return (tb_iterator_ref_t)iterator;
 }

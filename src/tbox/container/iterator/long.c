@@ -28,55 +28,24 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
-static tb_pointer_t tb_iterator_init_long_item(tb_iterator_ref_t iterator, tb_size_t itor)
-{
-    // check
-    tb_assert_return_val(iterator && itor < (tb_size_t)iterator->priv, tb_null);
-
-    // the item
-    return (tb_pointer_t)((tb_long_t*)iterator->data)[itor];
-}
-static tb_void_t tb_iterator_init_long_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
-{
-    // check
-    tb_assert_return(iterator && itor < (tb_size_t)iterator->priv);
-
-    // copy
-    ((tb_long_t*)iterator->data)[itor] = (tb_long_t)item;
-}
-static tb_long_t tb_iterator_init_long_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_iterator_long_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     return ((tb_long_t)ltem > (tb_long_t)rtem? 1 : ((tb_long_t)ltem < (tb_long_t)rtem? -1 : 0));
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
-tb_iterator_t tb_iterator_init_long(tb_long_t* data, tb_size_t size)
+tb_iterator_ref_t tb_iterator_make_for_long(tb_array_iterator_ref_t iterator, tb_long_t* elements, tb_size_t count)
 {
-    // check
-    tb_assert(data && size);
-
-    // the ptr iterator
-    tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
+    // make iterator for the pointer array
+    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count)) return tb_null;
 
     // init
-    tb_iterator_t itor = {0};
-    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
-    itor.data = (tb_pointer_t)data;
-    itor.priv = tb_u2p(size);
-    itor.step = sizeof(tb_long_t);
-    itor.size = ptr.size;
-    itor.head = ptr.head;
-    itor.tail = ptr.tail;
-    itor.prev = ptr.prev;
-    itor.next = ptr.next;
-    itor.item = tb_iterator_init_long_item;
-    itor.copy = tb_iterator_init_long_copy;
-    itor.comp = tb_iterator_init_long_comp;
+    iterator->base.comp = tb_iterator_long_comp;
 
     // ok
-    return itor;
+    return (tb_iterator_ref_t)iterator;
 }

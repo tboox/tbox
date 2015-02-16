@@ -28,61 +28,50 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
-static tb_pointer_t tb_iterator_init_mem_item(tb_iterator_ref_t iterator, tb_size_t itor)
+static tb_pointer_t tb_iterator_mem_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_return_val(iterator, tb_null);
-    tb_assert_return_val(itor < (tb_size_t)iterator->priv, tb_null);
+    tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // the item
-    return (tb_pointer_t)((tb_byte_t*)iterator->data + itor * iterator->step);
+    return (tb_pointer_t)((tb_byte_t*)((tb_array_iterator_ref_t)iterator)->elements + itor * iterator->step);
 }
-static tb_void_t tb_iterator_init_mem_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_iterator_mem_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_assert_return(iterator);
-    tb_assert_return(itor < (tb_size_t)iterator->priv && item);
+    tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // copy
-    tb_memcpy((tb_byte_t*)iterator->data + itor * iterator->step, item, iterator->step);
+    tb_memcpy((tb_byte_t*)((tb_array_iterator_ref_t)iterator)->elements + itor * iterator->step, item, iterator->step);
 }
-static tb_long_t tb_iterator_init_mem_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_iterator_mem_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
     // check
-    tb_assert_return_val(ltem && rtem, 0);
+    tb_assert_abort(ltem && rtem);
 
     // compare it
     return tb_memcmp(ltem, rtem, iterator->step);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
-tb_iterator_t tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step)
+tb_iterator_ref_t tb_iterator_make_for_mem(tb_array_iterator_ref_t iterator, tb_pointer_t elements, tb_size_t count, tb_size_t size)
 {
     // check
-    tb_assert(data && size);
+    tb_assert_and_check_return_val(size, tb_null);
 
-    // the ptr iterator
-    tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
+    // make iterator for the pointer array
+    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count)) return tb_null;
 
     // init
-    tb_iterator_t itor = {0};
-    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
-    itor.data = (tb_pointer_t)data;
-    itor.priv = tb_u2p(size);
-    itor.step = step;
-    itor.size = ptr.size;
-    itor.head = ptr.head;
-    itor.tail = ptr.tail;
-    itor.prev = ptr.prev;
-    itor.next = ptr.next;
-    itor.item = tb_iterator_init_mem_item;
-    itor.copy = tb_iterator_init_mem_copy;
-    itor.comp = tb_iterator_init_mem_comp;
+    iterator->base.step = size;
+    iterator->base.item = tb_iterator_mem_item;
+    iterator->base.copy = tb_iterator_mem_copy;
+    iterator->base.comp = tb_iterator_mem_comp;
 
     // ok
-    return itor;
+    return (tb_iterator_ref_t)iterator;
 }

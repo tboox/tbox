@@ -30,55 +30,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_pointer_t tb_iterator_init_size_item(tb_iterator_ref_t iterator, tb_size_t itor)
+tb_iterator_ref_t tb_iterator_make_for_size(tb_array_iterator_ref_t iterator, tb_size_t* elements, tb_size_t count)
 {
-    // check
-    tb_assert_return_val(iterator, tb_null);
-    tb_assert_return_val(itor < (tb_size_t)iterator->priv, tb_null);
-
-    // the item
-    return (tb_pointer_t)((tb_size_t*)iterator->data)[itor];
-}
-static tb_void_t tb_iterator_init_size_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
-{
-    // check
-    tb_assert_return(iterator);
-    tb_assert_return(itor < (tb_size_t)iterator->priv);
-
-    // copy
-    ((tb_size_t*)iterator->data)[itor] = (tb_size_t)item;
-}
-static tb_long_t tb_iterator_init_size_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
-{
-    return ((tb_size_t)ltem > (tb_size_t)rtem? 1 : ((tb_size_t)ltem < (tb_size_t)rtem? -1 : 0));
-}
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_iterator_t tb_iterator_init_size(tb_size_t* data, tb_size_t size)
-{
-    // check
-    tb_assert(data && size);
-
-    // the ptr iterator
-    tb_iterator_t ptr = tb_iterator_init_ptr((tb_pointer_t*)data, size);
-
-    // init
-    tb_iterator_t itor = {0};
-    itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
-    itor.data = (tb_pointer_t)data;
-    itor.priv = tb_u2p(size);
-    itor.step = sizeof(tb_size_t);
-    itor.size = ptr.size;
-    itor.head = ptr.head;
-    itor.tail = ptr.tail;
-    itor.prev = ptr.prev;
-    itor.next = ptr.next;
-    itor.item = tb_iterator_init_size_item;
-    itor.copy = tb_iterator_init_size_copy;
-    itor.comp = tb_iterator_init_size_comp;
-
-    // ok
-    return itor;
+    // make iterator for the pointer array
+    return tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count);
 }
