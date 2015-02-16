@@ -114,7 +114,7 @@ typedef struct __tb_aicp_http_impl_t
     tb_async_stream_ref_t           zstream;
 
     // the request head 
-    tb_hash_ref_t                   head;
+    tb_hash_map_ref_t                   head;
 
     // the cookies
     tb_string_t                     cookies;
@@ -211,13 +211,13 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     // init host
     tb_char_t const* host = tb_url_host(&impl->option.url);
     tb_assert_and_check_return_val(host, tb_null);
-    tb_hash_set(impl->head, "Host", host);
+    tb_hash_map_insert(impl->head, "Host", host);
 
     // init accept
-    tb_hash_set(impl->head, "Accept", "*/*");
+    tb_hash_map_insert(impl->head, "Accept", "*/*");
 
     // init connection
-    tb_hash_set(impl->head, "Connection", impl->status.balived? "keep-alive" : "close");
+    tb_hash_map_insert(impl->head, "Connection", impl->status.balived? "keep-alive" : "close");
 
     // init cookies
     tb_bool_t cookie = tb_false;
@@ -226,13 +226,13 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
         // update cookie
         if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl(&impl->option.url), &impl->cookies))
         {
-            tb_hash_set(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
+            tb_hash_map_insert(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
             cookie = tb_true;
         }
     }
 
     // no cookie? remove it
-    if (!cookie) tb_hash_del(impl->head, "Cookie");
+    if (!cookie) tb_hash_map_remove(impl->head, "Cookie");
 
     // init range
     if (impl->option.range.bof && impl->option.range.eof >= impl->option.range.bof)
@@ -249,19 +249,19 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     }
 
     // update range
-    if (tb_static_string_size(&value)) tb_hash_set(impl->head, "Range", tb_static_string_cstr(&value));
+    if (tb_static_string_size(&value)) tb_hash_map_insert(impl->head, "Range", tb_static_string_cstr(&value));
     // remove range
-    else tb_hash_del(impl->head, "Range");
+    else tb_hash_map_remove(impl->head, "Range");
 
     // init post
     if (impl->option.method == TB_HTTP_METHOD_POST)
     {
         // append post size
         tb_static_string_cstrfcpy(&value, "%llu", post_size);
-        tb_hash_set(impl->head, "Content-Length", tb_static_string_cstr(&value));
+        tb_hash_map_insert(impl->head, "Content-Length", tb_static_string_cstr(&value));
     }
     // remove post
-    else tb_hash_del(impl->head, "Content-Length");
+    else tb_hash_map_remove(impl->head, "Content-Length");
 
     // replace the custom head 
     tb_char_t const* head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
@@ -274,7 +274,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
         tb_check_break(data < head_tail);
 
         // replace it
-        tb_hash_set(impl->head, name, data);
+        tb_hash_map_insert(impl->head, name, data);
 
         // next
         head_data = data + tb_strlen(data) + 1;
@@ -284,7 +284,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     tb_static_string_exit(&value);
 
     // check head
-    tb_assert_and_check_return_val(tb_hash_size(impl->head), tb_null);
+    tb_assert_and_check_return_val(tb_hash_map_size(impl->head), tb_null);
 
     // append method
     tb_string_cstrcat(&impl->line_data, method);
@@ -320,7 +320,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     tb_string_cstrfcat(&impl->line_data, "HTTP/1.%1u\r\n", impl->option.version);
 
     // append key: value
-    tb_for_all (tb_hash_item_t*, item, impl->head)
+    tb_for_all (tb_hash_map_item_ref_t, item, impl->head)
     {
         if (item && item->name && item->data) 
             tb_string_cstrfcat(&impl->line_data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
@@ -1375,7 +1375,7 @@ tb_aicp_http_ref_t tb_aicp_http_init(tb_aicp_ref_t aicp)
         tb_assert_and_check_break(impl->stream);
 
         // init head
-        impl->head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
+        impl->head = tb_hash_map_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
         tb_assert_and_check_break(impl->head);
 
         // init cookies data
@@ -1492,7 +1492,7 @@ tb_bool_t tb_aicp_http_exit(tb_aicp_http_ref_t http)
     tb_string_exit(&impl->cookies);
 
     // exit head
-    if (impl->head) tb_hash_exit(impl->head);
+    if (impl->head) tb_hash_map_exit(impl->head);
     impl->head = tb_null;
 
     // free it

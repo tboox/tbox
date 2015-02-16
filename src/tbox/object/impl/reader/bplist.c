@@ -719,21 +719,21 @@ tb_object_reader_t* tb_object_bplist_reader()
     s_reader.probe  = tb_object_bplist_reader_probe;
 
     // init hooker
-    s_reader.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATE,      tb_object_bplist_reader_func_date);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATA,      tb_object_bplist_reader_func_data);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UID,       tb_object_bplist_reader_func_array);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_ARRAY,     tb_object_bplist_reader_func_array);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_STRING,    tb_object_bplist_reader_func_string);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UNICODE,   tb_object_bplist_reader_func_string);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UINT,      tb_object_bplist_reader_func_number);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_REAL,      tb_object_bplist_reader_func_number);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_NONE,      tb_object_bplist_reader_func_boolean);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_SET,       tb_object_bplist_reader_func_dictionary);
-    tb_hash_set(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DICT,      tb_object_bplist_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATE,      tb_object_bplist_reader_func_date);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATA,      tb_object_bplist_reader_func_data);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UID,       tb_object_bplist_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_ARRAY,     tb_object_bplist_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_STRING,    tb_object_bplist_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UNICODE,   tb_object_bplist_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UINT,      tb_object_bplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_REAL,      tb_object_bplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_NONE,      tb_object_bplist_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_SET,       tb_object_bplist_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DICT,      tb_object_bplist_reader_func_dictionary);
 
     // ok
     return &s_reader;
@@ -748,7 +748,7 @@ tb_bool_t tb_object_bplist_reader_hook(tb_size_t type, tb_object_bplist_reader_f
     tb_assert_and_check_return_val(reader && reader->hooker, tb_false);
 
     // hook it
-    tb_hash_set(reader->hooker, (tb_pointer_t)type, func);
+    tb_hash_map_insert(reader->hooker, (tb_pointer_t)type, func);
 
     // ok
     return tb_true;
@@ -760,6 +760,6 @@ tb_object_bplist_reader_func_t tb_object_bplist_reader_func(tb_size_t type)
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
-    return (tb_object_bplist_reader_func_t)tb_hash_get(reader->hooker, (tb_pointer_t)type);
+    return (tb_object_bplist_reader_func_t)tb_hash_map_get(reader->hooker, (tb_pointer_t)type);
 }
 

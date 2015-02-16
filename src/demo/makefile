@@ -78,7 +78,8 @@ demo_C_FILES 								+= \
 											platform/thread_pool \
 											platform/thread_store \
 											container/heap \
-											container/hash \
+											container/hash_map \
+											container/hash_set \
 											container/stack \
 											container/vector \
 											container/queue \

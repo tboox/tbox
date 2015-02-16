@@ -74,7 +74,7 @@ typedef struct __tb_aiop_rtor_select_impl_t
     fd_set                  wfdo;
 
     // the hash
-    tb_hash_ref_t           hash;
+    tb_hash_map_ref_t       hash;
 
     // the lock
     tb_select_lock_t        lock;
@@ -96,7 +96,7 @@ static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
 
     // check size
     tb_spinlock_enter(&impl->lock.hash);
-    tb_size_t size = tb_hash_size(impl->hash);
+    tb_size_t size = tb_hash_map_size(impl->hash);
     tb_spinlock_leave(&impl->lock.hash);
     tb_assert_and_check_return_val(size < FD_SETSIZE, tb_false);
 
@@ -105,7 +105,7 @@ static tb_bool_t tb_aiop_rtor_select_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     tb_spinlock_enter(&impl->lock.hash);
     if (impl->hash) 
     {
-        tb_hash_set(impl->hash, aioo->sock, aioo);
+        tb_hash_map_insert(impl->hash, aioo->sock, aioo);
         ok = tb_true;
     }
     tb_spinlock_leave(&impl->lock.hash);
@@ -161,7 +161,7 @@ static tb_bool_t tb_aiop_rtor_select_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
 
     // del sock => aioo
     tb_spinlock_enter(&impl->lock.hash);
-    if (impl->hash) tb_hash_del(impl->hash, aioo->sock);
+    if (impl->hash) tb_hash_map_remove(impl->hash, aioo->sock);
     tb_spinlock_leave(&impl->lock.hash);
 
     // spak it
@@ -261,7 +261,7 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref
         tb_size_t tail = tb_iterator_tail(impl->hash);
         for (; itor != tail && wait >= 0 && (tb_size_t)wait < maxn; itor = tb_iterator_next(impl->hash, itor))
         {
-            tb_hash_item_t* item = (tb_hash_item_t*)tb_iterator_item(impl->hash, itor);
+            tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)tb_iterator_item(impl->hash, itor);
             if (item)
             {
                 // the sock
@@ -356,7 +356,7 @@ static tb_void_t tb_aiop_rtor_select_exit(tb_aiop_rtor_impl_t* rtor)
 
         // exit hash
         tb_spinlock_enter(&impl->lock.hash);
-        if (impl->hash) tb_hash_exit(impl->hash);
+        if (impl->hash) tb_hash_map_exit(impl->hash);
         impl->hash = tb_null;
         tb_spinlock_leave(&impl->lock.hash);
 
@@ -384,7 +384,7 @@ static tb_void_t tb_aiop_rtor_select_cler(tb_aiop_rtor_impl_t* rtor)
 
         // clear hash
         tb_spinlock_enter(&impl->lock.hash);
-        if (impl->hash) tb_hash_clear(impl->hash);
+        if (impl->hash) tb_hash_map_clear(impl->hash);
         tb_spinlock_leave(&impl->lock.hash);
 
         // spak it
@@ -426,7 +426,7 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_select_init(tb_aiop_impl_t* aiop)
         if (!tb_spinlock_init(&impl->lock.hash)) break;
 
         // init hash
-        impl->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
+        impl->hash = tb_hash_map_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
         tb_assert_and_check_break(impl->hash);
 
         // ok

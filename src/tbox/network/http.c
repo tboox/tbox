@@ -72,7 +72,7 @@ typedef struct __tb_http_impl_t
     tb_stream_ref_t     zstream;
 
     // the head
-    tb_hash_ref_t       head;
+    tb_hash_map_ref_t   head;
 
     // is opened?
     tb_bool_t           bopened;
@@ -189,13 +189,13 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         // init host
         tb_char_t const* host = tb_url_host(&impl->option.url);
         tb_assert_and_check_break(host);
-        tb_hash_set(impl->head, "Host", host);
+        tb_hash_map_insert(impl->head, "Host", host);
 
         // init accept
-        tb_hash_set(impl->head, "Accept", "*/*");
+        tb_hash_map_insert(impl->head, "Accept", "*/*");
 
         // init connection
-        tb_hash_set(impl->head, "Connection", impl->status.balived? "keep-alive" : "close");
+        tb_hash_map_insert(impl->head, "Connection", impl->status.balived? "keep-alive" : "close");
 
         // init cookies
         tb_bool_t cookie = tb_false;
@@ -204,13 +204,13 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             // set cookie
             if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl(&impl->option.url), &impl->cookies))
             {
-                tb_hash_set(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
+                tb_hash_map_insert(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
                 cookie = tb_true;
             }
         }
 
         // no cookie? remove it
-        if (!cookie) tb_hash_del(impl->head, "Cookie");
+        if (!cookie) tb_hash_map_remove(impl->head, "Cookie");
 
         // init range
         if (impl->option.range.bof && impl->option.range.eof >= impl->option.range.bof)
@@ -227,9 +227,9 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
 
         // update range
         if (tb_static_string_size(&value)) 
-            tb_hash_set(impl->head, "Range", tb_static_string_cstr(&value));
+            tb_hash_map_insert(impl->head, "Range", tb_static_string_cstr(&value));
         // remove range
-        else tb_hash_del(impl->head, "Range");
+        else tb_hash_map_remove(impl->head, "Range");
 
         // init post
         if (impl->option.method == TB_HTTP_METHOD_POST)
@@ -254,7 +254,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
 
                 // append post size
                 tb_static_string_cstrfcpy(&value, "%lld", post_size);
-                tb_hash_set(impl->head, "Content-Length", tb_static_string_cstr(&value));
+                tb_hash_map_insert(impl->head, "Content-Length", tb_static_string_cstr(&value));
 
                 // ok
                 post_ok = tb_true;
@@ -269,7 +269,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             }
         }
         // remove post
-        else tb_hash_del(impl->head, "Content-Length");
+        else tb_hash_map_remove(impl->head, "Content-Length");
 
         // replace the custom head 
         tb_char_t const* head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
@@ -282,7 +282,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             tb_check_break(data < head_tail);
 
             // replace it
-            tb_hash_set(impl->head, name, data);
+            tb_hash_map_insert(impl->head, name, data);
 
             // next
             head_data = data + tb_strlen(data) + 1;
@@ -292,7 +292,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_static_string_exit(&value);
 
         // check head
-        tb_assert_and_check_break(tb_hash_size(impl->head));
+        tb_assert_and_check_break(tb_hash_map_size(impl->head));
 
         // append method
         tb_string_cstrcat(&impl->request, method);
@@ -328,7 +328,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_string_cstrfcat(&impl->request, "HTTP/1.%1u\r\n", impl->status.balived? impl->status.version : impl->option.version);
 
         // append key: value
-        tb_for_all (tb_hash_item_t*, item, impl->head)
+        tb_for_all (tb_hash_map_item_ref_t, item, impl->head)
         {
             if (item && item->name && item->data) 
                 tb_string_cstrfcat(&impl->request, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
@@ -739,7 +739,7 @@ tb_http_ref_t tb_http_init()
         tb_assert_and_check_break(impl->stream);
 
         // init head
-        impl->head = tb_hash_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
+        impl->head = tb_hash_map_init(8, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
         tb_assert_and_check_break(impl->head);
 
         // init request data
@@ -815,7 +815,7 @@ tb_void_t tb_http_exit(tb_http_ref_t http)
     tb_string_exit(&impl->request);
 
     // exit head
-    if (impl->head) tb_hash_exit(impl->head);
+    if (impl->head) tb_hash_map_exit(impl->head);
     impl->head = tb_null;
 
     // free it

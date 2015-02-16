@@ -73,7 +73,7 @@ typedef struct __tb_cookies_entry_t
     // is secure?
     tb_uint32_t             secure  : 1;
 
-}tb_cookies_entry_t;
+}tb_cookies_entry_t, *tb_cookies_entry_ref_t;
 
 // the cookies impl type
 typedef struct __tb_cookies_impl_t
@@ -88,7 +88,7 @@ typedef struct __tb_cookies_impl_t
     tb_string_pool_ref_t    string_pool;
     
     // the cookie pool, key: "domain+path+name"
-    tb_hash_ref_t           cookie_pool;
+    tb_hash_set_ref_t       cookie_pool;
 
 }tb_cookies_impl_t;
 
@@ -195,7 +195,7 @@ static tb_bool_t tb_cookies_is_child_path(tb_char_t const* parent, tb_char_t con
     // ok?
     return (!*p && (!*c || *c == '/'))? tb_true : tb_false;
 }
-static tb_void_t tb_cookies_entry_exit(tb_cookies_impl_t* impl, tb_cookies_entry_t* entry)
+static tb_void_t tb_cookies_entry_exit(tb_cookies_impl_t* impl, tb_cookies_entry_ref_t entry)
 {
     // check
     tb_assert_and_check_return(impl && entry);
@@ -219,7 +219,7 @@ static tb_void_t tb_cookies_entry_exit(tb_cookies_impl_t* impl, tb_cookies_entry
 static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
 {
     // check
-    tb_cookies_entry_t* entry = (tb_cookies_entry_t*)item;
+    tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)item;
     tb_assert_and_check_return(func && entry);
 
     // the impl
@@ -232,7 +232,7 @@ static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
 static tb_size_t tb_cookies_entry_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {
     // check
-    tb_cookies_entry_t* entry = (tb_cookies_entry_t*)data;
+    tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)data;
     tb_assert_and_check_return_val(func && entry && entry->domain && entry->path && entry->name, 0);
 
     // the impl
@@ -250,8 +250,8 @@ static tb_size_t tb_cookies_entry_hash(tb_item_func_t* func, tb_cpointer_t data,
 static tb_long_t tb_cookies_entry_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // check
-    tb_cookies_entry_t* lentry = (tb_cookies_entry_t*)ldata;
-    tb_cookies_entry_t* rentry = (tb_cookies_entry_t*)rdata;
+    tb_cookies_entry_ref_t lentry = (tb_cookies_entry_ref_t)ldata;
+    tb_cookies_entry_ref_t rentry = (tb_cookies_entry_ref_t)rdata;
     tb_assert_and_check_return_val(lentry && lentry->domain && lentry->path && lentry->name, 0);
     tb_assert_and_check_return_val(rentry && rentry->domain && rentry->path && rentry->name, 0);
 
@@ -266,7 +266,7 @@ static tb_long_t tb_cookies_entry_comp(tb_item_func_t* func, tb_cpointer_t ldata
     // compare name
     return tb_strcmp(lentry->name, rentry->name);
 }
-static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry_t* entry, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
+static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry_ref_t entry, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
 {
     // check
     tb_assert_and_check_return_val(impl && impl->string_pool && entry && value, tb_false);
@@ -440,7 +440,7 @@ static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
     tb_assert_and_check_return_val(item && tuple, -1);
 
     // the entry
-    tb_cookies_entry_t* entry = (tb_cookies_entry_t*)((tb_hash_item_t*)item)->name;
+    tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)item;
     tb_assert_and_check_return_val(entry && entry->domain && entry->path && entry->name, -1);
 
     // the domain
@@ -526,7 +526,7 @@ tb_cookies_ref_t tb_cookies_init()
         tb_item_func_t func = tb_item_func_mem(sizeof(tb_cookies_entry_t), tb_cookies_entry_free, impl);
         func.hash = tb_cookies_entry_hash;
         func.comp = tb_cookies_entry_comp;
-        impl->cookie_pool = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, func, tb_item_func_true());
+        impl->cookie_pool = tb_hash_set_init(TB_HASH_SET_BUCKET_SIZE_MICRO, func);
         tb_assert_and_check_break(impl->cookie_pool);
 
         // init string func
@@ -563,7 +563,7 @@ tb_void_t tb_cookies_exit(tb_cookies_ref_t cookies)
     tb_spinlock_enter(&impl->lock);
 
     // exit cookie pool
-    if (impl->cookie_pool) tb_hash_exit(impl->cookie_pool);
+    if (impl->cookie_pool) tb_hash_set_exit(impl->cookie_pool);
     impl->cookie_pool = tb_null;
     
     // exit string pool
@@ -589,7 +589,7 @@ tb_void_t tb_cookies_clear(tb_cookies_ref_t cookies)
     tb_spinlock_enter(&impl->lock);
 
     // clear cookie pool
-    if (impl->cookie_pool) tb_hash_clear(impl->cookie_pool);
+    if (impl->cookie_pool) tb_hash_set_clear(impl->cookie_pool);
     
     // clear string pool
     if (impl->string_pool) tb_string_pool_clear(impl->string_pool);
@@ -621,13 +621,13 @@ tb_bool_t tb_cookies_set(tb_cookies_ref_t cookies, tb_char_t const* domain, tb_c
         if (!entry.maxage && !entry.storage)
         {
             // remove it
-            tb_hash_del(impl->cookie_pool, &entry);
+            tb_hash_set_remove(impl->cookie_pool, &entry);
 
             // exit it
             tb_cookies_entry_exit(impl, &entry);
         }
         // set entry
-        else tb_hash_set(impl->cookie_pool, &entry, (tb_cpointer_t)tb_true);
+        else tb_hash_set_insert(impl->cookie_pool, &entry);
 
         // storage to file?
         if (entry.storage)
@@ -756,12 +756,11 @@ tb_void_t tb_cookies_dump(tb_cookies_ref_t cookies)
 
     // dump
     tb_trace_i("");
-    tb_trace_i("cookie: size: %lu", tb_hash_size(impl->cookie_pool));
-    tb_for_all_if (tb_hash_item_t*, item, impl->cookie_pool, item)
+    tb_trace_i("cookie: size: %lu", tb_hash_set_size(impl->cookie_pool));
+    tb_for_all_if (tb_cookies_entry_ref_t, entry, impl->cookie_pool, entry)
     {
         // the entry
-        tb_cookies_entry_t* entry = (tb_cookies_entry_t*)item->name;
-        tb_assert_and_check_continue(entry && entry->domain && entry->path && entry->name);
+        tb_assert_and_check_continue(entry->domain && entry->path && entry->name);
 
         // the date
         tb_tm_t date = {0};

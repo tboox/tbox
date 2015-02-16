@@ -419,13 +419,13 @@ static tb_uint64_t tb_object_bplist_writer_builder_maxn(tb_object_ref_t object)
 
     return size + 1;
 }
-static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_ref_t object, tb_object_ref_t list, tb_hash_ref_t hash)
+static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_ref_t object, tb_object_ref_t list, tb_hash_map_ref_t hash)
 {
     // check
     tb_assert_and_check_return_val(object && list && hash, 0);
 
     // the object index
-    tb_size_t index = (tb_size_t)tb_hash_get(hash, object);
+    tb_size_t index = (tb_size_t)tb_hash_map_get(hash, object);
 
     // new object?
     if (!index) 
@@ -437,7 +437,7 @@ static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_ref_t object, tb
         index = tb_object_array_size(list);
 
         // set index
-        tb_hash_set(hash, object, (tb_pointer_t)index);
+        tb_hash_map_insert(hash, object, (tb_pointer_t)index);
         tb_object_inc(object);
 
         // check
@@ -447,7 +447,7 @@ static tb_size_t tb_object_bplist_writer_builder_addo(tb_object_ref_t object, tb
     // ok?
     return index;
 }
-static tb_void_t tb_object_bplist_writer_builder_init(tb_object_ref_t object, tb_object_ref_t list, tb_hash_ref_t hash, tb_size_t item_size)
+static tb_void_t tb_object_bplist_writer_builder_init(tb_object_ref_t object, tb_object_ref_t list, tb_hash_map_ref_t hash, tb_size_t item_size)
 {
     // check
     tb_assert_and_check_return(object && list && hash);
@@ -565,13 +565,13 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_ref_t object, tb
         break;
     }
 }
-static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_ref_t list, tb_hash_ref_t hash)
+static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_ref_t list, tb_hash_map_ref_t hash)
 {
     // exit hash
     if (hash)
     {
         // walk
-        tb_for_all (tb_hash_item_t*, item, hash)
+        tb_for_all (tb_hash_map_item_ref_t, item, hash)
         {
             // exit item
             if (item && item->name)
@@ -588,7 +588,7 @@ static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_ref_t list, tb_h
         }
 
         // exit it
-        tb_hash_exit(hash);
+        tb_hash_map_exit(hash);
     }
 
     // exit list
@@ -604,7 +604,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
     tb_size_t           i                   = 0;
     tb_byte_t           pad[6]              = {0};
     tb_object_ref_t     list                = tb_null;
-    tb_hash_ref_t       hash                = tb_null;
+    tb_hash_map_ref_t       hash                = tb_null;
     tb_size_t           object_count        = 0;
     tb_uint64_t         object_maxn         = 0;
     tb_uint64_t         root_object         = 0;
@@ -625,7 +625,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
         tb_assert_and_check_break(list);
 
         // init hash
-        hash = tb_hash_init(0, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
+        hash = tb_hash_map_init(0, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
         tb_assert_and_check_break(hash);
 
         // object maxn
@@ -762,17 +762,17 @@ tb_object_writer_t* tb_object_bplist_writer()
     s_writer.writ = tb_object_bplist_writer_done;
  
     // init hooker
-    s_writer.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
     // hook writer 
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_object_bplist_writer_func_date);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_object_bplist_writer_func_data);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_object_bplist_writer_func_array);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_STRING, tb_object_bplist_writer_func_string);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NUMBER, tb_object_bplist_writer_func_number);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_BOOLEAN, tb_object_bplist_writer_func_boolean);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DICTIONARY, tb_object_bplist_writer_func_dictionary);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_object_bplist_writer_func_date);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_object_bplist_writer_func_data);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_object_bplist_writer_func_array);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_STRING, tb_object_bplist_writer_func_string);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NUMBER, tb_object_bplist_writer_func_number);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_BOOLEAN, tb_object_bplist_writer_func_boolean);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DICTIONARY, tb_object_bplist_writer_func_dictionary);
 
     // ok
     return &s_writer;
@@ -787,7 +787,7 @@ tb_bool_t tb_object_bplist_writer_hook(tb_size_t type, tb_object_bplist_writer_f
     tb_assert_and_check_return_val(writer && writer->hooker, tb_false);
 
     // hook it
-    tb_hash_set(writer->hooker, (tb_pointer_t)type, func);
+    tb_hash_map_insert(writer->hooker, (tb_pointer_t)type, func);
 
     // ok
     return tb_true;
@@ -799,6 +799,6 @@ tb_object_bplist_writer_func_t tb_object_bplist_writer_func(tb_size_t type)
     tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
     // the func
-    return (tb_object_bplist_writer_func_t)tb_hash_get(writer->hooker, (tb_pointer_t)type);
+    return (tb_object_bplist_writer_func_t)tb_hash_map_get(writer->hooker, (tb_pointer_t)type);
 }
 

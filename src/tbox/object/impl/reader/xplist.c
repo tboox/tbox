@@ -604,19 +604,19 @@ tb_object_reader_t* tb_object_xplist_reader()
     s_reader.probe  = tb_object_xplist_reader_probe;
 
     // init hooker
-    s_reader.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false), tb_item_func_ptr(tb_null, tb_null));
+    s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_str(tb_false), tb_item_func_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
-    tb_hash_set(s_reader.hooker, "date", tb_object_xplist_reader_func_date);
-    tb_hash_set(s_reader.hooker, "data", tb_object_xplist_reader_func_data);
-    tb_hash_set(s_reader.hooker, "array", tb_object_xplist_reader_func_array);
-    tb_hash_set(s_reader.hooker, "string", tb_object_xplist_reader_func_string);
-    tb_hash_set(s_reader.hooker, "integer", tb_object_xplist_reader_func_number);
-    tb_hash_set(s_reader.hooker, "real", tb_object_xplist_reader_func_number);
-    tb_hash_set(s_reader.hooker, "true", tb_object_xplist_reader_func_boolean);
-    tb_hash_set(s_reader.hooker, "false", tb_object_xplist_reader_func_boolean);
-    tb_hash_set(s_reader.hooker, "dict", tb_object_xplist_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, "date", tb_object_xplist_reader_func_date);
+    tb_hash_map_insert(s_reader.hooker, "data", tb_object_xplist_reader_func_data);
+    tb_hash_map_insert(s_reader.hooker, "array", tb_object_xplist_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, "string", tb_object_xplist_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, "integer", tb_object_xplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, "real", tb_object_xplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, "true", tb_object_xplist_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, "false", tb_object_xplist_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, "dict", tb_object_xplist_reader_func_dictionary);
 
     // ok
     return &s_reader;
@@ -631,7 +631,7 @@ tb_bool_t tb_object_xplist_reader_hook(tb_char_t const* type, tb_object_xplist_r
     tb_assert_and_check_return_val(reader && reader->hooker, tb_false);
 
     // hook it
-    tb_hash_set(reader->hooker, type, func);
+    tb_hash_map_insert(reader->hooker, type, func);
 
     // ok
     return tb_true;
@@ -646,6 +646,6 @@ tb_object_xplist_reader_func_t tb_object_xplist_reader_func(tb_char_t const* typ
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
-    return (tb_object_xplist_reader_func_t)tb_hash_get(reader->hooker, type);
+    return (tb_object_xplist_reader_func_t)tb_hash_map_get(reader->hooker, type);
 }
 

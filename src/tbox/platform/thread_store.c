@@ -42,10 +42,10 @@
  */
 
 // the store
-static tb_hash_ref_t       g_store = tb_null;
+static tb_hash_map_ref_t        g_store = tb_null;
 
 // the lock
-static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
+static tb_spinlock_t            g_lock = TB_SPINLOCK_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * callback
@@ -74,7 +74,7 @@ tb_bool_t tb_thread_store_init()
     if (!g_store) 
     {
         // init store
-        g_store = tb_hash_init(8, tb_item_func_size(), tb_item_func_ptr(tb_thread_store_free, tb_null));
+        g_store = tb_hash_map_init(8, tb_item_func_size(), tb_item_func_ptr(tb_thread_store_free, tb_null));
     }
 
     // leave lock
@@ -94,7 +94,7 @@ tb_void_t tb_thread_store_exit()
     tb_spinlock_enter(&g_lock);
 
     // exit store
-    if (g_store) tb_hash_exit(g_store);
+    if (g_store) tb_hash_map_exit(g_store);
     g_store = tb_null;
 
     // leave lock
@@ -106,7 +106,7 @@ tb_void_t tb_thread_store_setp(tb_thread_store_data_t const* data)
     tb_spinlock_enter(&g_lock);
 
     // get data
-    if (g_store) tb_hash_set(g_store, (tb_pointer_t)tb_thread_self(), data);
+    if (g_store) tb_hash_map_insert(g_store, (tb_pointer_t)tb_thread_self(), data);
 
     // leave lock
     tb_spinlock_leave(&g_lock);
@@ -120,7 +120,7 @@ tb_thread_store_data_t* tb_thread_store_getp()
     tb_spinlock_enter(&g_lock);
 
     // get data
-    if (g_store) data = tb_hash_get(g_store, (tb_pointer_t)tb_thread_self());
+    if (g_store) data = tb_hash_map_get(g_store, (tb_pointer_t)tb_thread_self());
 
     // leave lock
     tb_spinlock_leave(&g_lock);

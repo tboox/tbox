@@ -92,7 +92,7 @@ static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[16] =
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 
 // |angle| < 90 degrees

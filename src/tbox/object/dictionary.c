@@ -58,7 +58,7 @@ typedef struct __tb_object_dictionary_t
     tb_size_t           size;
 
     // the object hash
-    tb_hash_ref_t       hash;
+    tb_hash_map_ref_t   hash;
 
     // increase refn?
     tb_bool_t           incr;
@@ -109,7 +109,7 @@ static tb_void_t tb_object_dictionary_exit(tb_object_ref_t object)
     tb_assert_and_check_return(dictionary);
 
     // exit hash
-    if (dictionary->hash) tb_hash_exit(dictionary->hash);
+    if (dictionary->hash) tb_hash_map_exit(dictionary->hash);
     dictionary->hash = tb_null;
 
     // exit it
@@ -121,7 +121,7 @@ static tb_void_t tb_object_dictionary_cler(tb_object_ref_t object)
     tb_assert_and_check_return(dictionary);
 
     // clear
-    if (dictionary->hash) tb_hash_clear(dictionary->hash);
+    if (dictionary->hash) tb_hash_map_clear(dictionary->hash);
 }
 static tb_object_dictionary_t* tb_object_dictionary_init_base()
 {
@@ -181,7 +181,7 @@ tb_object_ref_t tb_object_dictionary_init(tb_size_t size, tb_size_t incr)
         dictionary->incr = incr;
 
         // init hash
-        dictionary->hash = tb_hash_init(size, tb_item_func_str(tb_true), tb_item_func_obj());
+        dictionary->hash = tb_hash_map_init(size, tb_item_func_str(tb_true), tb_item_func_obj());
         tb_assert_and_check_break(dictionary->hash);
 
         // ok
@@ -207,7 +207,7 @@ tb_size_t tb_object_dictionary_size(tb_object_ref_t object)
     tb_assert_and_check_return_val(dictionary && dictionary->hash, 0);
 
     // size
-    return tb_hash_size(dictionary->hash);
+    return tb_hash_map_size(dictionary->hash);
 }
 tb_iterator_ref_t tb_object_dictionary_itor(tb_object_ref_t object)
 {
@@ -224,7 +224,7 @@ tb_object_ref_t tb_object_dictionary_val(tb_object_ref_t object, tb_char_t const
     tb_assert_and_check_return_val(dictionary && dictionary->hash && key, tb_null);
 
     // value
-    return (tb_object_ref_t)tb_hash_get(dictionary->hash, key);
+    return (tb_object_ref_t)tb_hash_map_get(dictionary->hash, key);
 }
 tb_void_t tb_object_dictionary_del(tb_object_ref_t object, tb_char_t const* key)
 {
@@ -233,7 +233,7 @@ tb_void_t tb_object_dictionary_del(tb_object_ref_t object, tb_char_t const* key)
     tb_assert_and_check_return(dictionary && dictionary->hash && key);
 
     // del
-    return tb_hash_del(dictionary->hash, key);
+    return tb_hash_map_remove(dictionary->hash, key);
 }
 tb_void_t tb_object_dictionary_set(tb_object_ref_t object, tb_char_t const* key, tb_object_ref_t val)
 {
@@ -242,7 +242,7 @@ tb_void_t tb_object_dictionary_set(tb_object_ref_t object, tb_char_t const* key,
     tb_assert_and_check_return(dictionary && dictionary->hash && key && val);
 
     // add
-    tb_hash_set(dictionary->hash, key, val);
+    tb_hash_map_insert(dictionary->hash, key, val);
 
     // refn--
     if (!dictionary->incr) tb_object_dec(val);

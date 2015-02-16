@@ -55,7 +55,7 @@
 typedef struct __tb_dns_cache_t
 {
     // the hash
-    tb_hash_ref_t           hash;
+    tb_hash_map_ref_t       hash;
 
     // the times
     tb_hize_t               times;
@@ -69,7 +69,7 @@ typedef struct __tb_dns_cache_t
 typedef struct __tb_dns_cache_addr_t
 {
     // the addr
-    tb_ipaddr_t               addr;
+    tb_ipaddr_t             addr;
 
     // the time
     tb_size_t               time;
@@ -99,7 +99,7 @@ static tb_long_t tb_dns_cache_cler(tb_iterator_ref_t iterator, tb_cpointer_t ite
     tb_assert_and_check_return_val(item, -1);
 
     // the dns cache address
-    tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_item_t*)item)->data;
+    tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_map_item_ref_t)item)->data;
     tb_assert_and_check_return_val(caddr, -1);
 
     // is expired?
@@ -110,7 +110,7 @@ static tb_long_t tb_dns_cache_cler(tb_iterator_ref_t iterator, tb_cpointer_t ite
         ok = 0;
 
         // trace
-        tb_trace_d("del: %s => %{ipaddr}, time: %u, size: %u", (tb_char_t const*)item->name, &caddr->addr, caddr->time, tb_hash_size(g_cache.hash));
+        tb_trace_d("del: %s => %{ipaddr}, time: %u, size: %u", (tb_char_t const*)item->name, &caddr->addr, caddr->time, tb_hash_map_size(g_cache.hash));
 
         // update times
         tb_assert_and_check_return_val(g_cache.times >= caddr->time, -1);
@@ -134,7 +134,7 @@ tb_bool_t tb_dns_cache_init()
     do
     {
         // init hash
-        if (!g_cache.hash) g_cache.hash = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
+        if (!g_cache.hash) g_cache.hash = tb_hash_map_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
         tb_assert_and_check_break(g_cache.hash);
 
         // ok
@@ -157,7 +157,7 @@ tb_void_t tb_dns_cache_exit()
     tb_spinlock_enter(&g_lock);
 
     // exit hash
-    if (g_cache.hash) tb_hash_exit(g_cache.hash);
+    if (g_cache.hash) tb_hash_map_exit(g_cache.hash);
     g_cache.hash = tb_null;
 
     // exit times
@@ -204,11 +204,11 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipaddr_ref_t addr)
         tb_assert_and_check_break(g_cache.hash);
 
         // get the host address
-        tb_dns_cache_addr_t* caddr = (tb_dns_cache_addr_t*)tb_hash_get(g_cache.hash, name);
+        tb_dns_cache_addr_t* caddr = (tb_dns_cache_addr_t*)tb_hash_map_get(g_cache.hash, name);
         tb_check_break(caddr);
 
         // trace
-        tb_trace_d("get: %s => %{ipaddr}, time: %u => %u, size: %u", name, &caddr->addr, caddr->time, tb_dns_cache_now(), tb_hash_size(g_cache.hash));
+        tb_trace_d("get: %s => %{ipaddr}, time: %u => %u, size: %u", name, &caddr->addr, caddr->time, tb_dns_cache_now(), tb_hash_map_size(g_cache.hash));
 
         // update time
         tb_assert_and_check_break(g_cache.times >= caddr->time);
@@ -256,10 +256,10 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipaddr_ref_t addr)
         tb_assert_and_check_break(g_cache.hash);
 
         // remove the expired items if full
-        if (tb_hash_size(g_cache.hash) >= TB_DNS_CACHE_MAXN)
+        if (tb_hash_map_size(g_cache.hash) >= TB_DNS_CACHE_MAXN)
         {
             // the expired time
-            g_cache.expired = ((tb_size_t)(g_cache.times / tb_hash_size(g_cache.hash)) + 1);
+            g_cache.expired = ((tb_size_t)(g_cache.times / tb_hash_map_size(g_cache.hash)) + 1);
 
             // check
             tb_assert_and_check_break(g_cache.expired);
@@ -272,16 +272,16 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipaddr_ref_t addr)
         }
 
         // check
-        tb_assert_and_check_break(tb_hash_size(g_cache.hash) < TB_DNS_CACHE_MAXN);
+        tb_assert_and_check_break(tb_hash_map_size(g_cache.hash) < TB_DNS_CACHE_MAXN);
 
         // save addr
-        tb_hash_set(g_cache.hash, name, &caddr);
+        tb_hash_map_insert(g_cache.hash, name, &caddr);
 
         // update times
         g_cache.times += caddr.time;
 
         // trace
-        tb_trace_d("set: %s => %{ipaddr}, time: %u, size: %u", name, &caddr.addr, caddr.time, tb_hash_size(g_cache.hash));
+        tb_trace_d("set: %s => %{ipaddr}, time: %u, size: %u", name, &caddr.addr, caddr.time, tb_hash_map_size(g_cache.hash));
 
     } while (0);
 

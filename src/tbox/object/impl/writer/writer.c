@@ -62,7 +62,7 @@ tb_void_t tb_object_writer_del(tb_size_t format)
     if (g_writer[format])
     {
         // exit hooker
-        if (g_writer[format]->hooker) tb_hash_exit(g_writer[format]->hooker);
+        if (g_writer[format]->hooker) tb_hash_map_exit(g_writer[format]->hooker);
         g_writer[format]->hooker = tb_null;
         
         // clear it

@@ -26,7 +26,7 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 
 static tb_void_t tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_static_stream_ref_t sstream)
