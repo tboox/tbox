@@ -396,6 +396,10 @@ tb_void_t tb_fixed_pool_exit(tb_fixed_pool_ref_t pool)
     // clear it
     tb_fixed_pool_clear(pool);
 
+    // exit the current slot
+    if (impl->current_slot) tb_fixed_pool_slot_exit(impl, impl->current_slot);
+    impl->current_slot = tb_null;
+
     // exit the slot list
     if (impl->slot_list) tb_large_pool_free(tb_large_pool(), impl->slot_list);
     impl->slot_list = tb_null;
@@ -432,10 +436,6 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t pool)
     // exit items
     if (impl->func_exit) tb_fixed_pool_walk(pool, tb_fixed_pool_item_exit, (tb_pointer_t)impl);
 
-    // exit the current slot first
-    if (impl->current_slot) tb_fixed_pool_slot_exit(impl, impl->current_slot);
-    impl->current_slot = tb_null;
-
     // exit the partial slots 
     tb_iterator_ref_t partial_iterator = tb_list_entry_itor(&impl->partial_slots);
     if (partial_iterator)
@@ -448,10 +448,13 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t pool)
             tb_fixed_pool_slot_t* slot = (tb_fixed_pool_slot_t*)tb_iterator_item(partial_iterator, itor);
             tb_assert_and_check_break(slot);
 
+            // check
+            tb_assert_abort(slot != impl->current_slot);
+
             // save next
             tb_size_t next = tb_iterator_next(partial_iterator, itor);
 
-            // exit data
+            // exit slot
             tb_fixed_pool_slot_exit(impl, slot);
 
             // next
@@ -471,10 +474,13 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t pool)
             tb_fixed_pool_slot_t* slot = (tb_fixed_pool_slot_t*)tb_iterator_item(full_iterator, itor);
             tb_assert_and_check_break(slot);
 
+            // check
+            tb_assert_abort(slot != impl->current_slot);
+
             // save next
             tb_size_t next = tb_iterator_next(full_iterator, itor);
 
-            // exit data
+            // exit slot
             tb_fixed_pool_slot_exit(impl, slot);
 
             // next
@@ -482,11 +488,12 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t pool)
         }
     }
 
+    // clear current slot
+    if (impl->current_slot && impl->current_slot->pool)
+        tb_static_fixed_pool_clear(impl->current_slot->pool);
+
     // clear item count
     impl->item_count = 0;
-
-    // clear current slot
-    impl->current_slot = tb_null;
 
     // clear partial slots
     tb_list_entry_clear(&impl->partial_slots);
