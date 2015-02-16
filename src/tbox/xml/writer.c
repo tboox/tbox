@@ -64,7 +64,7 @@ typedef struct __tb_xml_writer_impl_t
     tb_stack_ref_t          elements;
 
     // the attributes hash
-    tb_hash_ref_t           attributes;
+    tb_hash_map_ref_t       attributes;
 
 }tb_xml_writer_impl_t;
 
@@ -87,7 +87,7 @@ tb_xml_writer_ref_t tb_xml_writer_init()
         tb_assert_and_check_break(writer->elements);
 
         // init attributes
-        writer->attributes  = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
+        writer->attributes  = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
         tb_assert_and_check_break(writer->attributes);
 
         // ok
@@ -116,7 +116,7 @@ tb_void_t tb_xml_writer_exit(tb_xml_writer_ref_t writer)
     tb_xml_writer_clos(writer);
 
     // exit attributes
-    if (impl->attributes) tb_hash_exit(impl->attributes);
+    if (impl->attributes) tb_hash_map_exit(impl->attributes);
     impl->attributes = tb_null;
 
     // exit elements
@@ -189,7 +189,7 @@ tb_void_t tb_xml_writer_clos(tb_xml_writer_ref_t writer)
     impl->bformat = tb_false;
 
     // clear attributes
-    if (impl->attributes) tb_hash_clear(impl->attributes);
+    if (impl->attributes) tb_hash_map_clear(impl->attributes);
 
     // clear elements
     if (impl->elements) tb_stack_clear(impl->elements);
@@ -359,14 +359,14 @@ tb_void_t tb_xml_writer_element_empty(tb_xml_writer_ref_t writer, tb_char_t cons
     tb_stream_printf(impl->stream, "<%s", name);
 
     // writ attributes
-    if (tb_hash_size(impl->attributes))
+    if (tb_hash_map_size(impl->attributes))
     {
-        tb_for_all (tb_hash_item_t*, item, impl->attributes)
+        tb_for_all (tb_hash_map_item_ref_t, item, impl->attributes)
         {
             if (item && item->name && item->data)
                 tb_stream_printf(impl->stream, " %s=\"%s\"", item->name, item->data);
         }
-        tb_hash_clear(impl->attributes);
+        tb_hash_map_clear(impl->attributes);
     }
 
     // writ end
@@ -390,14 +390,14 @@ tb_void_t tb_xml_writer_element_enter(tb_xml_writer_ref_t writer, tb_char_t cons
     tb_stream_printf(impl->stream, "<%s", name);
 
     // writ attributes
-    if (tb_hash_size(impl->attributes))
+    if (tb_hash_map_size(impl->attributes))
     {
-        tb_for_all (tb_hash_item_t*, item, impl->attributes)
+        tb_for_all (tb_hash_map_item_ref_t, item, impl->attributes)
         {
             if (item && item->name && item->data)
                 tb_stream_printf(impl->stream, " %s=\"%s\"", item->name, item->data);
         }
-        tb_hash_clear(impl->attributes);
+        tb_hash_map_clear(impl->attributes);
     }
 
     // writ end
@@ -439,7 +439,7 @@ tb_void_t tb_xml_writer_attributes_long(tb_xml_writer_ref_t writer, tb_char_t co
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%ld", value);
-    tb_hash_set(impl->attributes, name, data);
+    tb_hash_map_insert(impl->attributes, name, data);
 }
 tb_void_t tb_xml_writer_attributes_bool(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_bool_t value)
 {
@@ -449,7 +449,7 @@ tb_void_t tb_xml_writer_attributes_bool(tb_xml_writer_ref_t writer, tb_char_t co
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%s", value? "true" : "false");
-    tb_hash_set(impl->attributes, name, data);
+    tb_hash_map_insert(impl->attributes, name, data);
 }
 tb_void_t tb_xml_writer_attributes_cstr(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_char_t const* value)
 {
@@ -457,7 +457,7 @@ tb_void_t tb_xml_writer_attributes_cstr(tb_xml_writer_ref_t writer, tb_char_t co
     tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
     tb_assert_and_check_return(impl && impl->attributes && name && value);
 
-    tb_hash_set(impl->attributes, name, value);
+    tb_hash_map_insert(impl->attributes, name, value);
 }
 tb_void_t tb_xml_writer_attributes_format(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_char_t const* format, ...)
 {
@@ -468,7 +468,7 @@ tb_void_t tb_xml_writer_attributes_format(tb_xml_writer_ref_t writer, tb_char_t 
     tb_size_t size = 0;
     tb_char_t data[8192] = {0};
     tb_vsnprintf_format(data, 8192, format, &size);
-    tb_hash_set(impl->attributes, name, data);
+    tb_hash_map_insert(impl->attributes, name, data);
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_xml_writer_attributes_float(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_float_t value)
@@ -479,7 +479,7 @@ tb_void_t tb_xml_writer_attributes_float(tb_xml_writer_ref_t writer, tb_char_t c
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%f", value);
-    tb_hash_set(impl->attributes, name, data);
+    tb_hash_map_insert(impl->attributes, name, data);
 }
 tb_void_t tb_xml_writer_attributes_double(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_double_t value)
 {
@@ -489,7 +489,7 @@ tb_void_t tb_xml_writer_attributes_double(tb_xml_writer_ref_t writer, tb_char_t 
 
     tb_char_t data[64] = {0};
     tb_snprintf(data, 64, "%lf", value);
-    tb_hash_set(impl->attributes, name, data);
+    tb_hash_map_insert(impl->attributes, name, data);
 }
 #endif
 

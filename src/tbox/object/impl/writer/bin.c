@@ -113,7 +113,7 @@ static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer,
         if (item)
         {
             // exists?
-            tb_size_t index = (tb_size_t)tb_hash_get(writer->ohash, item);
+            tb_size_t index = (tb_size_t)tb_hash_map_get(writer->ohash, item);
             if (index)
             {
                 // writ index
@@ -129,7 +129,7 @@ static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer,
                 if (!func(writer, item)) return tb_false;
 
                 // save index
-                tb_hash_set(writer->ohash, item, (tb_cpointer_t)(++writer->index));
+                tb_hash_map_insert(writer->ohash, item, (tb_cpointer_t)(++writer->index));
             }
         }
     }
@@ -269,7 +269,7 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
                 // writ key
                 {
                     // exists?
-                    tb_size_t index = (tb_size_t)tb_hash_get(writer->shash, key);
+                    tb_size_t index = (tb_size_t)tb_hash_map_get(writer->shash, key);
                     if (index)
                     {
                         // writ index
@@ -292,14 +292,14 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
                         tb_object_exit(okey);
 
                         // save index
-                        tb_hash_set(writer->shash, key, (tb_cpointer_t)(++writer->index));
+                        tb_hash_map_insert(writer->shash, key, (tb_cpointer_t)(++writer->index));
                     }
                 }
 
                 // writ val
                 {
                     // exists?
-                    tb_size_t index = (tb_size_t)tb_hash_get(writer->ohash, val);
+                    tb_size_t index = (tb_size_t)tb_hash_map_get(writer->ohash, val);
                     if (index)
                     {
                         // writ index
@@ -315,7 +315,7 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
                         if (!func(writer, val)) return tb_false;
 
                         // save index
-                        tb_hash_set(writer->ohash, val, (tb_cpointer_t)(++writer->index));
+                        tb_hash_map_insert(writer->ohash, val, (tb_cpointer_t)(++writer->index));
                     }
                 }
             }
@@ -346,8 +346,8 @@ static tb_long_t tb_object_bin_writer_done(tb_stream_ref_t stream, tb_object_ref
     {
         // init writer
         writer.stream           = stream;
-        writer.ohash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
-        writer.shash            = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_str(tb_true), tb_item_func_uint32());
+        writer.ohash            = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
+        writer.shash            = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_str(tb_true), tb_item_func_uint32());
         tb_assert_and_check_break(writer.shash && writer.ohash);
 
         // writ
@@ -359,8 +359,8 @@ static tb_long_t tb_object_bin_writer_done(tb_stream_ref_t stream, tb_object_ref
     } while (0);
 
     // exit the hash
-    if (writer.ohash) tb_hash_exit(writer.ohash);
-    if (writer.shash) tb_hash_exit(writer.shash);
+    if (writer.ohash) tb_hash_map_exit(writer.ohash);
+    if (writer.shash) tb_hash_map_exit(writer.shash);
 
     // exit the data
     if (writer.data) tb_free(writer.data);
@@ -384,18 +384,18 @@ tb_object_writer_t* tb_object_bin_writer()
     s_writer.writ = tb_object_bin_writer_done;
  
     // init hooker
-    s_writer.hooker = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
     // hook writer 
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_object_bin_writer_func_null);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_object_bin_writer_func_date);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_object_bin_writer_func_data);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_object_bin_writer_func_array);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_STRING, tb_object_bin_writer_func_string);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NUMBER, tb_object_bin_writer_func_number);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_BOOLEAN, tb_object_bin_writer_func_boolean);
-    tb_hash_set(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DICTIONARY, tb_object_bin_writer_func_dictionary);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_object_bin_writer_func_null);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_object_bin_writer_func_date);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_object_bin_writer_func_data);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_object_bin_writer_func_array);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_STRING, tb_object_bin_writer_func_string);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NUMBER, tb_object_bin_writer_func_number);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_BOOLEAN, tb_object_bin_writer_func_boolean);
+    tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DICTIONARY, tb_object_bin_writer_func_dictionary);
 
     // ok
     return &s_writer;
@@ -410,7 +410,7 @@ tb_bool_t tb_object_bin_writer_hook(tb_size_t type, tb_object_bin_writer_func_t 
     tb_assert_and_check_return_val(writer && writer->hooker, tb_false);
 
     // hook it
-    tb_hash_set(writer->hooker, (tb_pointer_t)type, func);
+    tb_hash_map_insert(writer->hooker, (tb_pointer_t)type, func);
 
     // ok
     return tb_true;
@@ -422,6 +422,6 @@ tb_object_bin_writer_func_t tb_object_bin_writer_func(tb_size_t type)
     tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
     // the func
-    return (tb_object_bin_writer_func_t)tb_hash_get(writer->hooker, (tb_pointer_t)type);
+    return (tb_object_bin_writer_func_t)tb_hash_map_get(writer->hooker, (tb_pointer_t)type);
 }
 

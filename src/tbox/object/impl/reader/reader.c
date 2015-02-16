@@ -62,7 +62,7 @@ tb_void_t tb_object_reader_del(tb_size_t format)
     if (g_reader[format])
     {
         // exit hooker
-        if (g_reader[format]->hooker) tb_hash_exit(g_reader[format]->hooker);
+        if (g_reader[format]->hooker) tb_hash_map_exit(g_reader[format]->hooker);
         g_reader[format]->hooker = tb_null;
         
         // clear it

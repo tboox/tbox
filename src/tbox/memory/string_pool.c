@@ -47,7 +47,7 @@
 typedef struct __tb_string_pool_impl_t
 {
     // the cache
-    tb_hash_ref_t           cache;
+    tb_hash_map_ref_t           cache;
 
 }tb_string_pool_impl_t;
 
@@ -66,7 +66,7 @@ tb_string_pool_ref_t tb_string_pool_init(tb_bool_t bcase)
         tb_assert_and_check_break(impl);
 
         // init hash
-        impl->cache = tb_hash_init(0, tb_item_func_str(bcase), tb_item_func_size());
+        impl->cache = tb_hash_map_init(0, tb_item_func_str(bcase), tb_item_func_size());
         tb_assert_and_check_break(impl->cache);
 
         // ok
@@ -92,7 +92,7 @@ tb_void_t tb_string_pool_exit(tb_string_pool_ref_t pool)
     tb_assert_and_check_return(impl);
 
     // exit cache
-    if (impl->cache) tb_hash_exit(impl->cache);
+    if (impl->cache) tb_hash_map_exit(impl->cache);
     impl->cache = tb_null;
 
     // exit it
@@ -105,7 +105,7 @@ tb_void_t tb_string_pool_clear(tb_string_pool_ref_t pool)
     tb_assert_and_check_return(impl);
 
     // clear cache
-    if (impl->cache) tb_hash_clear(impl->cache);
+    if (impl->cache) tb_hash_map_clear(impl->cache);
 }
 tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* data)
 {
@@ -119,8 +119,9 @@ tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* 
     {
         // exists?
         tb_size_t               itor;
-        tb_hash_item_t const*   item = tb_null;
-        if (((itor = tb_hash_itor(impl->cache, data)) != tb_iterator_tail(impl->cache)) && (item = (tb_hash_item_t const*)tb_iterator_item(impl->cache, itor)))
+        tb_hash_map_item_ref_t  item = tb_null;
+        if (    ((itor = tb_hash_map_find(impl->cache, data)) != tb_iterator_tail(impl->cache))
+            &&  (item = (tb_hash_map_item_ref_t)tb_iterator_item(impl->cache, itor)))
         {
             // refn
             tb_size_t refn = (tb_size_t)item->data;
@@ -139,12 +140,12 @@ tb_char_t const* tb_string_pool_put(tb_string_pool_ref_t pool, tb_char_t const* 
             }
         }
         
-        // no item? add it
+        // no item? insert it
         if (!item)
         {
-            // add it
-            if ((itor = tb_hash_set(impl->cache, data, (tb_pointer_t)1)) != tb_iterator_tail(impl->cache))
-                item = (tb_hash_item_t const*)tb_iterator_item(impl->cache, itor);
+            // insert it
+            if ((itor = tb_hash_map_insert(impl->cache, data, (tb_pointer_t)1)) != tb_iterator_tail(impl->cache))
+                item = (tb_hash_map_item_ref_t)tb_iterator_item(impl->cache, itor);
         }
 
         // save the cstr
@@ -161,12 +162,13 @@ tb_void_t tb_string_pool_del(tb_string_pool_ref_t pool, tb_char_t const* data)
     tb_assert_and_check_return(impl && data);
 
     // done
-    tb_hash_item_t const* item = tb_null;
+    tb_hash_map_item_ref_t item = tb_null;
     if (impl->cache)
     {
         // exists?
         tb_size_t itor;
-        if (((itor = tb_hash_itor(impl->cache, data)) != tb_iterator_tail(impl->cache)) && (item = (tb_hash_item_t const*)tb_iterator_item(impl->cache, itor)))
+        if (    ((itor = tb_hash_map_find(impl->cache, data)) != tb_iterator_tail(impl->cache))
+            &&  (item = (tb_hash_map_item_ref_t)tb_iterator_item(impl->cache, itor)))
         {
             // refn
             tb_size_t refn = (tb_size_t)item->data;
@@ -186,7 +188,7 @@ tb_void_t tb_string_pool_dump(tb_string_pool_ref_t pool)
     tb_assert_and_check_return(impl && impl->cache);
 
     // dump cache
-    tb_for_all_if (tb_hash_item_t*, item, impl->cache, item)
+    tb_for_all_if (tb_hash_map_item_ref_t, item, impl->cache, item)
     {
         // trace
         tb_trace_i("item: refn: %lu, cstr: %s", (tb_size_t)item->data, item->name);

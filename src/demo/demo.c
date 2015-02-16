@@ -176,9 +176,10 @@ static tb_demo_t g_demo[] =
 
     // container
 ,   TB_DEMO_MAIN_ITEM(container_heap)
-,   TB_DEMO_MAIN_ITEM(container_hash)
 ,   TB_DEMO_MAIN_ITEM(container_stack)
 ,   TB_DEMO_MAIN_ITEM(container_vector)
+,   TB_DEMO_MAIN_ITEM(container_hash_map)
+,   TB_DEMO_MAIN_ITEM(container_hash_set)
 ,   TB_DEMO_MAIN_ITEM(container_queue)
 ,   TB_DEMO_MAIN_ITEM(container_circle_queue)
 ,   TB_DEMO_MAIN_ITEM(container_list)

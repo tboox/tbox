@@ -145,7 +145,7 @@ typedef struct __tb_thread_pool_worker_t
     tb_size_t                           pull;
 
     // the stats
-    tb_hash_ref_t                       stats;
+    tb_hash_map_ref_t                   stats;
 
     // is stoped?
     tb_atomic_t                         bstoped;
@@ -245,9 +245,9 @@ static tb_long_t tb_thread_pool_worker_walk_pull(tb_iterator_ref_t iterator, tb_
 
     // computate the job average time 
     tb_size_t average_time = 200;
-    if (tb_hash_size(worker->stats))
+    if (tb_hash_map_size(worker->stats))
     {
-        tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_get(worker->stats, job->task.done);
+        tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_map_get(worker->stats, job->task.done);
         if (stats && stats->done_count) average_time = (tb_size_t)(stats->total_time / stats->done_count);
     }
 
@@ -282,9 +282,9 @@ static tb_long_t tb_thread_pool_worker_walk_pull_and_clean(tb_iterator_ref_t ite
 
         // computate the job average time 
         tb_size_t average_time = 200;
-        if (tb_hash_size(worker->stats))
+        if (tb_hash_map_size(worker->stats))
         {
-            tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_get(worker->stats, job->task.done);
+            tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_map_get(worker->stats, job->task.done);
             if (stats && stats->done_count) average_time = (tb_size_t)(stats->total_time / stats->done_count);
         }
 
@@ -404,7 +404,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
         tb_assert_and_check_break(worker->jobs);
 
         // init stats
-        worker->stats = tb_hash_init(TB_HASH_BULK_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_mem(sizeof(tb_thread_pool_job_stats_t), tb_null, tb_null));
+        worker->stats = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_mem(sizeof(tb_thread_pool_job_stats_t), tb_null, tb_null));
         tb_assert_and_check_break(worker->stats);
         
         // loop
@@ -518,9 +518,9 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
                     // exists? update time and count
                     tb_size_t               itor;
-                    tb_hash_item_t const*   item = tb_null;
-                    if (    ((itor = tb_hash_itor(worker->stats, job->task.done)) != tb_iterator_tail(worker->stats))
-                        &&  (item = (tb_hash_item_t const*)tb_iterator_item(worker->stats, itor)))
+                    tb_hash_map_item_ref_t  item = tb_null;
+                    if (    ((itor = tb_hash_map_find(worker->stats, job->task.done)) != tb_iterator_tail(worker->stats))
+                        &&  (item = (tb_hash_map_item_ref_t)tb_iterator_item(worker->stats, itor)))
                     {
                         // the stats
                         tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)item->data;
@@ -542,13 +542,13 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                         stats.total_time = time;
 
                         // add stats
-                        tb_hash_set(worker->stats, job->task.done, &stats);
+                        tb_hash_map_insert(worker->stats, job->task.done, &stats);
                     }
 
 #ifdef TB_TRACE_DEBUG
                     tb_size_t done_count = 0;
                     tb_hize_t total_time = 0;
-                    tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_get(worker->stats, job->task.done);
+                    tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)tb_hash_map_get(worker->stats, job->task.done);
                     if (stats)
                     {
                         done_count = stats->done_count;
@@ -602,7 +602,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
         }
 
         // exit stats
-        if (worker->stats) tb_hash_exit(worker->stats);
+        if (worker->stats) tb_hash_map_exit(worker->stats);
         worker->stats = tb_null;
 
         // exit jobs

@@ -220,7 +220,7 @@ static tb_void_t tb_ifaddrs_interface_exit(tb_item_func_t* func, tb_pointer_t bu
         interface->name = tb_null;
     }
 }
-static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_hash_ref_t names, struct nlmsghdr* response)
+static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_hash_map_ref_t names, struct nlmsghdr* response)
 {
     // check
     tb_assert_and_check_return(interfaces && names && response);
@@ -233,7 +233,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
 
     // attempt to find the interface name
     tb_bool_t   owner = tb_false;
-    tb_char_t*  name = (tb_char_t*)tb_hash_get(names, tb_u2p(info->ifa_index));
+    tb_char_t*  name = (tb_char_t*)tb_hash_map_get(names, tb_u2p(info->ifa_index));
     if (!name)
     {
         // get the interface name
@@ -257,7 +257,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
                         name[rta_data_size] = '\0';
 
                         // save name
-                        tb_hash_set(names, tb_u2p(info->ifa_index), name);
+                        tb_hash_map_insert(names, tb_u2p(info->ifa_index), name);
                         owner = tb_true;
                     }
                     break;
@@ -346,7 +346,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
     if (name && owner) tb_free(name);
     name = tb_null;
 }
-static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_hash_ref_t names, struct nlmsghdr* response)
+static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_hash_map_ref_t names, struct nlmsghdr* response)
 {
     // check
     tb_assert_and_check_return(interfaces && names && response);
@@ -356,7 +356,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
 
     // attempt to find the interface name
     tb_bool_t   owner = tb_false;
-    tb_char_t*  name = (tb_char_t*)tb_hash_get(names, tb_u2p(info->ifa_index));
+    tb_char_t*  name = (tb_char_t*)tb_hash_map_get(names, tb_u2p(info->ifa_index));
     if (!name)
     {
         // get the interface name
@@ -380,7 +380,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
                         name[rta_data_size] = '\0';
 
                         // save name
-                        tb_hash_set(names, tb_u2p(info->ifa_index), name);
+                        tb_hash_map_insert(names, tb_u2p(info->ifa_index), name);
                         owner = tb_true;
                     }
                     break;
@@ -457,7 +457,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
     if (name && owner) tb_free(name);
     name = tb_null;
 }
-static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_ref_t names, tb_long_t sock, tb_long_t request)
+static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_map_ref_t names, tb_long_t sock, tb_long_t request)
 {
     // check
     tb_assert_and_check_return_val(interfaces && names && sock >= 0, -1);
@@ -550,7 +550,7 @@ static tb_bool_t tb_ifaddrs_interface_load(tb_list_ref_t interfaces, tb_long_t s
     if (tb_ifaddrs_netlink_socket_send(sock, request) < 0) return tb_false;
 
     // make names
-    tb_hash_ref_t names = tb_hash_init(8, tb_item_func_size(), tb_item_func_str(tb_true));
+    tb_hash_map_ref_t names = tb_hash_map_init(8, tb_item_func_size(), tb_item_func_str(tb_true));
     tb_assert_and_check_return_val(names, tb_false);
 
     // done
@@ -561,7 +561,7 @@ static tb_bool_t tb_ifaddrs_interface_load(tb_list_ref_t interfaces, tb_long_t s
     tb_trace_d("netlink: load: %s", ok > 0? "ok" : "no");
 
     // exit names
-    if (names) tb_hash_exit(names);
+    if (names) tb_hash_map_exit(names);
     names = tb_null;
 
     // ok?

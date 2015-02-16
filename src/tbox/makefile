@@ -54,12 +54,13 @@ tbox_C_FILES 			+= \
 						algorithm/remove_first \
 						algorithm/remove_first_if \
 						container/heap \
-						container/hash \
 						container/stack \
 						container/vector \
 						container/queue \
 						container/circle_queue \
 						container/priority_queue \
+						container/hash_map \
+						container/hash_set \
 						container/list \
 						container/list_entry \
 						container/single_list \
@@ -508,13 +509,14 @@ tbox_INC_FILES 			= \
 						container/container.h \
 						container/item.h \
 						container/heap.h \
-						container/hash.h \
 						container/stack.h \
 						container/vector.h \
 						container/iterator.h \
 						container/queue.h \
 						container/circle_queue.h \
 						container/priority_queue.h \
+						container/hash_map.h \
+						container/hash_set.h \
 						container/list.h \
 						container/list_entry.h \
 						container/single_list.h \

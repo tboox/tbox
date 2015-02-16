@@ -10,7 +10,7 @@
 #define TB_VECTOR_GROW_SIZE             (256)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 static tb_size_t tb_vector_insert_test()
 {

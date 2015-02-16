@@ -62,6 +62,7 @@ __tb_extern_c_enter__
  * put: O(lgn)
  * pop: O(1)
  * top: O(1)
+ * del: O(lgn) + find: O(n)
  *
  * iterator:
  *
@@ -136,7 +137,7 @@ tb_void_t           tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data);
  */
 tb_void_t           tb_heap_pop(tb_heap_ref_t heap);
 
-/*! del the heap item
+/*! delete the heap item using iterator only for algorithm(find, ...)
  *
  * @param heap      the heap
  * @param itor      the itor
