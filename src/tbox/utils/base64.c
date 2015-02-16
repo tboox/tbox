@@ -43,7 +43,7 @@ tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
     // check 
     tb_assert_and_check_return_val(ib && ob && !(in >= TB_MAXU32 / 4 || on < TB_BASE64_OUTPUT_MIN(in)), 0);
 
-    // encode
+    // done
     tb_char_t*      op = ob;
     tb_uint32_t     bits = 0;
     tb_int_t        left = in;
@@ -62,13 +62,19 @@ tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
         while (shift > 6 || (left == 0 && shift > 0));
     }
 
+    // done tail
     while ((op - ob) & 3) *op++ = '=';
     *op = '\0';
 
+    // ok?
     return (op - ob);
 }
 tb_size_t tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on)
 {
+    // check
+    tb_assert_and_check_return_val(ib && ob, 0);
+
+    // the table
     static tb_byte_t table[] =
     {
         0x3e, 0xff, 0xff, 0xff, 0x3f, 0x34, 0x35, 0x36
@@ -83,8 +89,7 @@ tb_size_t tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_
     ,   0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33
     };
 
-    tb_assert_and_check_return_val(ib && ob, 0);
-
+    // done
     tb_int_t    i = 0;
     tb_int_t    v = 0;
     tb_byte_t*  op = ob;
@@ -101,5 +106,6 @@ tb_size_t tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_
         }
     }
 
+    // ok?
     return (op - ob);
 }
