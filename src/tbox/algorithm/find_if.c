@@ -33,10 +33,10 @@
 tb_size_t tb_find_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(comp && iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
+    tb_assert_and_check_return_val(comp && iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tb_iterator_tail(iterator));
 
     // null?
-    tb_check_return_val(head != tail, tail);
+    tb_check_return_val(head != tail, tb_iterator_tail(iterator));
 
     // find
     tb_long_t find = -1;
@@ -45,7 +45,7 @@ tb_size_t tb_find_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail,
         if (!(find = comp(iterator, tb_iterator_item(iterator, itor), priv))) break;
 
     // ok?
-    return !find? itor : tail;
+    return !find? itor : tb_iterator_tail(iterator);
 } 
 tb_size_t tb_find_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv)
 {

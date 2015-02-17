@@ -53,6 +53,7 @@ tbox_C_FILES 			+= \
 						algorithm/remove_if \
 						algorithm/remove_first \
 						algorithm/remove_first_if \
+						algorithm/predicate \
 						container/heap \
 						container/stack \
 						container/vector \
@@ -505,6 +506,7 @@ tbox_INC_FILES 			= \
 						algorithm/remove_if.h \
 						algorithm/remove_first.h \
 						algorithm/remove_first_if.h \
+						algorithm/predicate.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \

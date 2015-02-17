@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "predicate.h"
 #include "for.h"
 #include "for_if.h"
 #include "rfor.h"
