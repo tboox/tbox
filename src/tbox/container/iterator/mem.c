@@ -46,13 +46,13 @@ static tb_void_t tb_iterator_mem_copy(tb_iterator_ref_t iterator, tb_size_t itor
     // copy
     tb_memcpy((tb_byte_t*)((tb_array_iterator_ref_t)iterator)->elements + itor * iterator->step, item, iterator->step);
 }
-static tb_long_t tb_iterator_mem_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_iterator_mem_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_assert_abort(ltem && rtem);
+    tb_assert_abort(litem && ritem);
 
     // compare it
-    return tb_memcmp(ltem, rtem, iterator->step);
+    return tb_memcmp(litem, ritem, iterator->step);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

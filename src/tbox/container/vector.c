@@ -144,14 +144,14 @@ static tb_void_t tb_vector_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor,
     // copy
     impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
 }
-static tb_long_t tb_vector_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_vector_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
     tb_assert_return_val(impl && impl->func.comp, 0);
 
     // comp
-    return impl->func.comp(&impl->func, ltem, rtem);
+    return impl->func.comp(&impl->func, litem, ritem);
 }
 static tb_void_t tb_vector_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {

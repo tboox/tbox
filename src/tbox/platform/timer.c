@@ -121,9 +121,9 @@ static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata
     // comp
     return (ltask->when > rtask->when? 1 : (ltask->when < rtask->when? -1 : 0));
 }
-static tb_long_t tb_timer_comp_by_task(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_timer_comp_by_task(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
-    return ((tb_size_t)ltem < (tb_size_t)rtem)? -1 : ((tb_size_t)ltem > (tb_size_t)rtem);
+    return ((tb_size_t)litem < (tb_size_t)ritem)? -1 : ((tb_size_t)litem > (tb_size_t)ritem);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

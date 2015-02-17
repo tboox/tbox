@@ -83,7 +83,7 @@ typedef struct __tb_iterator_t
     tb_pointer_t            (*item)(struct __tb_iterator_t* iterator, tb_size_t itor);
 
     /// the iterator comp
-    tb_long_t               (*comp)(struct __tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
+    tb_long_t               (*comp)(struct __tb_iterator_t* iterator, tb_cpointer_t litem, tb_cpointer_t ritem);
 
     /// the iterator copy
     tb_void_t               (*copy)(struct __tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
@@ -114,7 +114,7 @@ typedef struct __tb_array_iterator_t
 typedef tb_iterator_t*      tb_iterator_ref_t;
 
 /// the iterator comp func type
-typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
+typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -288,7 +288,7 @@ tb_void_t           tb_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor,
  *
  * @return          =: 0, >: 1, <: -1
  */
-tb_long_t           tb_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
+tb_long_t           tb_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

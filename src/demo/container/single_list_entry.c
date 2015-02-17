@@ -21,25 +21,25 @@ typedef struct __tb_demo_entry_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * comparer
  */
-static tb_long_t tb_demo_entry_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_demo_entry_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_assert_return_val(ltem && rtem, 0);
+    tb_assert_return_val(litem && ritem, 0);
 
     // the data
-    tb_size_t ldata = ((tb_demo_entry_t*)ltem)->data;
-    tb_size_t rdata = ((tb_demo_entry_t*)rtem)->data;
+    tb_size_t ldata = ((tb_demo_entry_t*)litem)->data;
+    tb_size_t rdata = ((tb_demo_entry_t*)ritem)->data;
 
     // comp
     return (ldata > rdata? -1 : (ldata < rdata? 1 : 0));
 }
-static tb_void_t tb_demo_entry_copy(tb_pointer_t ltem, tb_pointer_t rtem)
+static tb_void_t tb_demo_entry_copy(tb_pointer_t litem, tb_pointer_t ritem)
 {
     // check
-    tb_assert_return(ltem && rtem);
+    tb_assert_return(litem && ritem);
 
     // copy it
-    ((tb_demo_entry_t*)ltem)->data = ((tb_demo_entry_t*)rtem)->data;
+    ((tb_demo_entry_t*)litem)->data = ((tb_demo_entry_t*)ritem)->data;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

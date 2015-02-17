@@ -33,6 +33,6 @@
  */
 
 /// the entry copy func type
-typedef tb_void_t               (*tb_entry_copy_t)(tb_pointer_t ltem, tb_pointer_t rtem);
+typedef tb_void_t               (*tb_entry_copy_t)(tb_pointer_t litem, tb_pointer_t ritem);
 
 #endif
