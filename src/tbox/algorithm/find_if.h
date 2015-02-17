@@ -46,7 +46,7 @@ __tb_extern_c_enter__
  * @param comp      the comparer func
  * @param priv      the comparer data
  *
- * @return          the iterator itor
+ * @return          the iterator itor, return tb_iterator_tail(iterator) if not found
  */
 tb_size_t           tb_find_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv);
 
@@ -56,7 +56,7 @@ tb_size_t           tb_find_if(tb_iterator_ref_t iterator, tb_size_t head, tb_si
  * @param comp      the comparer func
  * @param priv      the comparer data
  *
- * @return          the iterator itor
+ * @return          the iterator itor, return tb_iterator_tail(iterator) if not found
  */
 tb_size_t           tb_find_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
 
