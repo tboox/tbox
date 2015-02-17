@@ -148,6 +148,14 @@ tb_size_t           tb_stack_size(tb_stack_ref_t stack);
  */
 tb_size_t           tb_stack_maxn(tb_stack_ref_t stack);
 
+#ifdef __tb_debug__
+/*! dump stack
+ *
+ * @param stack     the stack
+ */
+tb_void_t           tb_stack_dump(tb_stack_ref_t stack);
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

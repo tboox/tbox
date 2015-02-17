@@ -428,4 +428,29 @@ tb_void_t tb_list_moveto_tail(tb_list_ref_t list, tb_size_t move)
 {
     tb_list_moveto_prev(list, tb_iterator_tail(list), move);
 }
+#ifdef __tb_debug__
+tb_void_t tb_list_dump(tb_list_ref_t list)
+{
+    // check
+    tb_list_impl_t* impl = (tb_list_impl_t*)list;
+    tb_assert_and_check_return(impl);
 
+    // trace
+    tb_trace_i("list: size: %lu", tb_list_size(list));
+
+    // done
+    tb_char_t cstr[4096];
+    tb_for_all (tb_pointer_t, data, list)
+    {
+        // trace
+        if (impl->func.cstr) 
+        {
+            tb_trace_i("    %s", impl->func.cstr(&impl->func, data, cstr, sizeof(cstr)));
+        }
+        else
+        {
+            tb_trace_i("    %p", data);
+        }
+    }
+}
+#endif

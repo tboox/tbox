@@ -155,6 +155,14 @@ tb_bool_t           tb_queue_full(tb_queue_ref_t queue);
  */
 tb_bool_t           tb_queue_null(tb_queue_ref_t queue);
 
+#ifdef __tb_debug__
+/*! dump queue
+ *
+ * @param queue     the queue
+ */
+tb_void_t           tb_queue_dump(tb_queue_ref_t queue);
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

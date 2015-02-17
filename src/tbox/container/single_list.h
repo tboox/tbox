@@ -188,6 +188,14 @@ tb_size_t               tb_single_list_size(tb_single_list_ref_t list);
  */
 tb_size_t               tb_single_list_maxn(tb_single_list_ref_t list);
 
+#ifdef __tb_debug__
+/*! dump list
+ *
+ * @param list          the list
+ */
+tb_void_t               tb_single_list_dump(tb_single_list_ref_t list);
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

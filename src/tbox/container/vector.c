@@ -72,7 +72,7 @@ typedef struct __tb_vector_impl_t
 }tb_vector_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * iterator
+ * private implementation
  */
 static tb_size_t tb_vector_itor_size(tb_iterator_ref_t iterator)
 {
@@ -169,7 +169,7 @@ static tb_void_t tb_vector_itor_remove_range(tb_iterator_ref_t iterator, tb_size
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
 tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_item_func_t func)
 {
@@ -590,4 +590,29 @@ tb_void_t tb_vector_nremove_last(tb_vector_ref_t vector, tb_size_t size)
     // remove last
     tb_vector_nremove(vector, impl->size - size, size);
 }
+#ifdef __tb_debug__
+tb_void_t tb_vector_dump(tb_vector_ref_t vector)
+{
+    // check
+    tb_vector_impl_t* impl = (tb_vector_impl_t*)vector;
+    tb_assert_and_check_return(impl);
 
+    // trace
+    tb_trace_i("vector: size: %lu", tb_vector_size(vector));
+
+    // done
+    tb_char_t cstr[4096];
+    tb_for_all (tb_pointer_t, data, vector)
+    {
+        // trace
+        if (impl->func.cstr) 
+        {
+            tb_trace_i("    %s", impl->func.cstr(&impl->func, data, cstr, sizeof(cstr)));
+        }
+        else
+        {
+            tb_trace_i("    %p", data);
+        }
+    }
+}
+#endif
