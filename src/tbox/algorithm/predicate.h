@@ -37,7 +37,7 @@ __tb_extern_c_enter__
  * types
  */
 
-/*! the unary predicate func type
+/*! the unary predicate type
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
@@ -45,9 +45,9 @@ __tb_extern_c_enter__
  *
  * @return          tb_true or tb_false
  */
-typedef tb_bool_t   (*tb_iterator_pred_unary_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
+typedef tb_bool_t   (*tb_predicate_unary_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
-/*! the binary predicate func type
+/*! the binary predicate type
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
@@ -56,7 +56,7 @@ typedef tb_bool_t   (*tb_iterator_pred_unary_t)(tb_iterator_ref_t iterator, tb_c
  *
  * @return          tb_true or tb_false
  */
-typedef tb_bool_t   (*tb_iterator_pred_binary_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value1, tb_cpointer_t value2);
+typedef tb_bool_t   (*tb_predicate_binary_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value1, tb_cpointer_t value2);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -70,7 +70,7 @@ typedef tb_bool_t   (*tb_iterator_pred_binary_t)(tb_iterator_ref_t iterator, tb_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_iterator_pred_eq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
+tb_bool_t           tb_predicate_eq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
 /*! the unary predicate: if (item < value)?
  *
@@ -80,7 +80,7 @@ tb_bool_t           tb_iterator_pred_eq(tb_iterator_ref_t iterator, tb_cpointer_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_iterator_pred_le(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
+tb_bool_t           tb_predicate_le(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
 /*! the unary predicate: if (item > value)?
  *
@@ -90,7 +90,7 @@ tb_bool_t           tb_iterator_pred_le(tb_iterator_ref_t iterator, tb_cpointer_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_iterator_pred_be(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
+tb_bool_t           tb_predicate_be(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
 /*! the unary predicate: if (item <= value)?
  *
@@ -100,7 +100,7 @@ tb_bool_t           tb_iterator_pred_be(tb_iterator_ref_t iterator, tb_cpointer_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_iterator_pred_leq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
+tb_bool_t           tb_predicate_leq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
 /*! the unary predicate: if (item >= value)?
  *
@@ -110,7 +110,7 @@ tb_bool_t           tb_iterator_pred_leq(tb_iterator_ref_t iterator, tb_cpointer
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_iterator_pred_beq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
+tb_bool_t           tb_predicate_beq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

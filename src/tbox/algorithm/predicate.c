@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_iterator_pred_eq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
+tb_bool_t tb_predicate_eq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // check
     tb_assert_abort(iterator);
@@ -37,7 +37,7 @@ tb_bool_t tb_iterator_pred_eq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb
     // item == value?
     return !tb_iterator_comp(iterator, item, value);
 }
-tb_bool_t tb_iterator_pred_le(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
+tb_bool_t tb_predicate_le(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // check
     tb_assert_abort(iterator);
@@ -45,7 +45,7 @@ tb_bool_t tb_iterator_pred_le(tb_iterator_ref_t iterator, tb_cpointer_t item, tb
     // item < value?
     return tb_iterator_comp(iterator, item, value) < 0;
 }
-tb_bool_t tb_iterator_pred_be(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
+tb_bool_t tb_predicate_be(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // check
     tb_assert_abort(iterator);
@@ -53,7 +53,7 @@ tb_bool_t tb_iterator_pred_be(tb_iterator_ref_t iterator, tb_cpointer_t item, tb
     // item > value?
     return tb_iterator_comp(iterator, item, value) > 0;
 }
-tb_bool_t tb_iterator_pred_leq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
+tb_bool_t tb_predicate_leq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // check
     tb_assert_abort(iterator);
@@ -61,7 +61,7 @@ tb_bool_t tb_iterator_pred_leq(tb_iterator_ref_t iterator, tb_cpointer_t item, t
     // item <= value?
     return tb_iterator_comp(iterator, item, value) <= 0;
 }
-tb_bool_t tb_iterator_pred_beq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
+tb_bool_t tb_predicate_beq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // check
     tb_assert_abort(iterator);
