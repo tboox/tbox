@@ -769,88 +769,54 @@ tb_void_t tb_hash_map_dump(tb_hash_map_ref_t hash_map)
     tb_assert_and_check_return(step);
 
     // trace
-    tb_trace_i("=========================================================");
-    tb_trace_i("hash_list: hash_size: %d, item_size: %u, item_maxn: %u", impl->hash_size, impl->item_size, impl->item_maxn);
-    tb_trace_i("=========================================================");
+    tb_trace_i("");
+    tb_trace_i("hash_map: size: %lu", tb_hash_map_size(hash_map));
 
-#if 0
-    // dump
+    // done
     tb_size_t i = 0;
     tb_char_t name[4096];
     tb_char_t data[4096];
     for (i = 0; i < impl->hash_size; i++)
     {
+        // the list
         tb_hash_map_item_list_t* list = impl->hash_list[i];
         if (list)
         {
+            // trace
+            tb_trace_i("bucket[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
+
+            // done 
             tb_size_t j = 0;
             for (j = 0; j < list->size; j++)
             {
+                // the item
                 tb_byte_t const* item = ((tb_byte_t*)&list[1]) + j * step;
+
+                // the item name
                 tb_pointer_t item_name = impl->name_func.data(&impl->name_func, item);
+
+                // the item data
                 tb_pointer_t item_data = impl->data_func.data(&impl->data_func, item + impl->name_func.size);
 
-                if (impl->name_func.cstr && impl->data_func.cstr) 
-                    tb_trace_i("bucket[%d:%d] => [%d]:\t%s\t\t=> %s", i, j
-                        , impl->name_func.hash(&impl->name_func, item_name, impl->hash_size - 1, 0)
-                        , impl->name_func.cstr(&impl->name_func, item_name, name, 4096)
-                        , impl->data_func.cstr(&impl->data_func, item_data, data, 4096));
+                // trace
+                if (impl->name_func.cstr && impl->data_func.cstr)
+                {
+                    tb_trace_i("    %s => %s", impl->name_func.cstr(&impl->name_func, item_name, name, sizeof(name)), impl->data_func.cstr(&impl->data_func, item_data, data, sizeof(data)));
+                }
                 else if (impl->name_func.cstr) 
-                    tb_trace_i("bucket[%d:%d] => [%d]:\t%s\t\t=> %x", i, j
-                        , impl->name_func.hash(&impl->name_func, item_name, impl->hash_size - 1, 0)
-                        , impl->name_func.cstr(&impl->name_func, item_name, name, 4096)
-                        , item_data);
+                {
+                    tb_trace_i("    %s => %p", impl->name_func.cstr(&impl->name_func, item_name, name, sizeof(name)), item_data);
+                }
                 else if (impl->data_func.cstr) 
-                    tb_trace_i("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
-                        , impl->name_func.hash(&impl->name_func, item_name, impl->hash_size - 1, 0)
-                        , item_name
-                        , impl->data_func.cstr(&impl->data_func, item_data, data, 4096));
-                else tb_trace_i("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
-                        , impl->name_func.hash(&impl->name_func, item_name, impl->hash_size - 1, 0)
-                        , item_name
-                        , item_data);
+                {
+                    tb_trace_i("    %x => %p", item_name, impl->data_func.cstr(&impl->data_func, item_data, data, sizeof(data)));
+                }
+                else 
+                {
+                    tb_trace_i("    %p => %p", item_name, item_data);
+                }
             }
-
-            tb_trace_i("bucket[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
         }
     }
-
-    tb_trace_i("");
-    tb_for_all (tb_hash_map_item_ref_t, item, impl)
-    {
-        if (item)
-        {
-            if (impl->name_func.cstr && impl->data_func.cstr) 
-                tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %s", item_itor
-                    , impl->name_func.hash(&impl->name_func, item->name, impl->hash_size - 1, 0)
-                    , impl->name_func.cstr(&impl->name_func, item->name, name, 4096)
-                    , impl->data_func.cstr(&impl->data_func, item->data, data, 4096));
-            else if (impl->name_func.cstr) 
-                tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %x", item_itor
-                    , impl->name_func.hash(&impl->name_func, item->name, impl->hash_size - 1, 0)
-                    , impl->name_func.cstr(&impl->name_func, item->name, name, 4096)
-                    , item->data);
-            else if (impl->data_func.cstr) 
-                tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", item_itor
-                    , impl->name_func.hash(&impl->name_func, item->name, impl->hash_size - 1, 0)
-                    , item->name
-                    , impl->data_func.cstr(&impl->data_func, item->data, data, 4096));
-            else tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", item_itor
-                    , impl->name_func.hash(&impl->name_func, item->name, impl->hash_size - 1, 0)
-                    , item->name
-                    , item->data);
-        }
-    }
-#else
-    tb_size_t i = 0;
-    for (i = 0; i < impl->hash_size; i++)
-    {
-        tb_hash_map_item_list_t* list = impl->hash_list[i];
-        if (list)
-        {
-            tb_trace_i("bucket[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
-        }
-    }
-#endif
 }
 #endif

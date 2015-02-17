@@ -160,6 +160,14 @@ tb_bool_t               tb_circle_queue_full(tb_circle_queue_ref_t queue);
  */
 tb_bool_t               tb_circle_queue_null(tb_circle_queue_ref_t queue);
 
+#ifdef __tb_debug__
+/*! dump queue
+ *
+ * @param queue         the queue
+ */
+tb_void_t               tb_circle_queue_dump(tb_circle_queue_ref_t circle_queue);
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

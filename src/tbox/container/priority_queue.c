@@ -65,3 +65,9 @@ tb_void_t tb_priority_queue_remove(tb_priority_queue_ref_t queue, tb_size_t itor
 {
     tb_heap_remove((tb_heap_ref_t)queue, itor);
 }
+#ifdef __tb_debug__
+tb_void_t tb_priority_queue_dump(tb_priority_queue_ref_t queue)
+{
+    tb_heap_dump((tb_heap_ref_t)queue);
+}
+#endif

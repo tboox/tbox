@@ -327,6 +327,14 @@ tb_size_t           tb_vector_grow(tb_vector_ref_t vector);
  */
 tb_size_t           tb_vector_maxn(tb_vector_ref_t vector);
 
+#ifdef __tb_debug__
+/*! dump vector
+ *
+ * @param vector    the vector
+ */
+tb_void_t           tb_vector_dump(tb_vector_ref_t vector);
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

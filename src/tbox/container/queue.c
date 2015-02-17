@@ -77,4 +77,9 @@ tb_bool_t tb_queue_null(tb_queue_ref_t queue)
 {   
     return tb_single_list_size((tb_single_list_ref_t)queue)? tb_false : tb_true;
 }
-
+#ifdef __tb_debug__
+tb_void_t tb_queue_dump(tb_queue_ref_t queue)
+{
+    tb_single_list_dump((tb_single_list_ref_t)queue);
+}
+#endif

@@ -429,4 +429,29 @@ tb_void_t tb_single_list_remove_head(tb_single_list_ref_t list)
     // free head node
     tb_fixed_pool_free(impl->pool, node);
 }
+#ifdef __tb_debug__
+tb_void_t tb_single_list_dump(tb_single_list_ref_t list)
+{
+    // check
+    tb_single_list_impl_t* impl = (tb_single_list_impl_t*)list;
+    tb_assert_and_check_return(impl);
 
+    // trace
+    tb_trace_i("single_list: size: %lu", tb_single_list_size(list));
+
+    // done
+    tb_char_t cstr[4096];
+    tb_for_all (tb_pointer_t, data, list)
+    {
+        // trace
+        if (impl->func.cstr) 
+        {
+            tb_trace_i("    %s", impl->func.cstr(&impl->func, data, cstr, sizeof(cstr)));
+        }
+        else
+        {
+            tb_trace_i("    %p", data);
+        }
+    }
+}
+#endif

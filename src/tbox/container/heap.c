@@ -44,6 +44,13 @@
  * macros
  */
 
+// the heap grow
+#ifdef __tb_small__ 
+#   define TB_HEAP_GROW             (128)
+#else
+#   define TB_HEAP_GROW             (256)
+#endif
+
 // the heap maxn
 #ifdef __tb_small__
 #   define TB_HEAD_MAXN             (1 << 16)
@@ -81,7 +88,7 @@ typedef struct __tb_heap_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * checker
  */
-#if 0//def __tb_debug__
+#if 0
 static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
 {
     // init
@@ -335,11 +342,9 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
 {
     // check
-    tb_assert_and_check_return_val(grow, tb_null);
     tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_null);
 
     // done
@@ -347,6 +352,9 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
     tb_heap_impl_t* impl = tb_null;
     do
     {
+        // using the default grow
+        if (!grow) grow = TB_HEAP_GROW;
+
         // make impl
         impl = tb_malloc0_type(tb_heap_impl_t);
         tb_assert_and_check_break(impl);
@@ -556,4 +564,29 @@ tb_void_t tb_heap_remove(tb_heap_ref_t heap, tb_size_t itor)
 {
     tb_heap_itor_remove(heap, itor);
 }
+#ifdef __tb_debug__
+tb_void_t tb_heap_dump(tb_heap_ref_t heap)
+{
+    // check
+    tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
+    tb_assert_and_check_return(impl);
 
+    // trace
+    tb_trace_i("heap: size: %lu", tb_heap_size(heap));
+
+    // done
+    tb_char_t cstr[4096];
+    tb_for_all (tb_pointer_t, data, heap)
+    {
+        // trace
+        if (impl->func.cstr) 
+        {
+            tb_trace_i("    %s", impl->func.cstr(&impl->func, data, cstr, sizeof(cstr)));
+        }
+        else
+        {
+            tb_trace_i("    %p", data);
+        }
+    }
+}
+#endif

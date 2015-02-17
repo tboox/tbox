@@ -52,7 +52,7 @@ typedef tb_heap_ref_t       tb_priority_queue_ref_t;
 
 /*! init queue, default: min-priority
  *
- * @param grow              the item grow
+ * @param grow              the item grow, using the default grow if be zero
  * @param func              the item func
  *
  * @return                  the queue
@@ -114,6 +114,14 @@ tb_void_t                   tb_priority_queue_pop(tb_priority_queue_ref_t queue)
  * @param itor              the itor
  */
 tb_void_t                   tb_priority_queue_remove(tb_priority_queue_ref_t queue, tb_size_t itor);
+
+#ifdef __tb_debug__
+/*! dump queue
+ *
+ * @param queue             the queue
+ */
+tb_void_t                   tb_priority_queue_dump(tb_priority_queue_ref_t queue);
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
