@@ -127,12 +127,12 @@ tb_void_t tb_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpoint
     // copy
     return iterator->copy(iterator, itor, item);
 }
-tb_long_t tb_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+tb_long_t tb_iterator_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
     tb_assert_return_val(iterator && iterator->comp, 0);
 
     // comp
-    return iterator->comp(iterator, ltem, rtem);
+    return iterator->comp(iterator, litem, ritem);
 }
 

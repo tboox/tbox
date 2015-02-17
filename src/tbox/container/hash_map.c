@@ -334,14 +334,14 @@ static tb_void_t tb_hash_map_itor_copy(tb_iterator_ref_t iterator, tb_size_t ito
     // note: copy data only, will destroy impl index if copy name
     impl->data_func.copy(&impl->data_func, ((tb_byte_t*)&list[1]) + i * step + impl->name_func.size, item);
 }
-static tb_long_t tb_hash_map_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_hash_map_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
     tb_hash_map_impl_t* impl = (tb_hash_map_impl_t*)iterator;
-    tb_assert_return_val(impl && impl->name_func.comp && ltem && rtem, 0);
+    tb_assert_return_val(impl && impl->name_func.comp && litem && ritem, 0);
     
     // done
-    return impl->name_func.comp(&impl->name_func, ((tb_hash_map_item_ref_t)ltem)->name, ((tb_hash_map_item_ref_t)rtem)->name);
+    return impl->name_func.comp(&impl->name_func, ((tb_hash_map_item_ref_t)litem)->name, ((tb_hash_map_item_ref_t)ritem)->name);
 }
 static tb_void_t tb_hash_map_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {

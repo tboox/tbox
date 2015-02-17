@@ -141,14 +141,14 @@ static tb_void_t tb_single_list_itor_copy(tb_iterator_ref_t iterator, tb_size_t 
     // copy
     impl->func.copy(&impl->func, (tb_pointer_t)(((tb_single_list_entry_t*)itor) + 1), item);
 }
-static tb_long_t tb_single_list_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_long_t tb_single_list_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
     tb_single_list_impl_t* impl = (tb_single_list_impl_t*)iterator;
     tb_assert_abort(impl && impl->func.comp);
 
     // comp
-    return impl->func.comp(&impl->func, ltem, rtem);
+    return impl->func.comp(&impl->func, litem, ritem);
 }
 static tb_void_t tb_single_list_itor_remove_range(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
 {

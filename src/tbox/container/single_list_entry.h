@@ -53,13 +53,13 @@
     }tb_xxxx_entry_t;
 
     // the xxxx entry copy func
-    static tb_void_t tb_xxxx_entry_copy(tb_pointer_t ltem, tb_pointer_t rtem)
+    static tb_void_t tb_xxxx_entry_copy(tb_pointer_t litem, tb_pointer_t ritem)
     {
         // check
-        tb_assert_return(ltem && rtem);
+        tb_assert_return(litem && ritem);
 
         // copy it
-        ((tb_xxxx_entry_t*)ltem)->data = ((tb_xxxx_entry_t*)rtem)->data;
+        ((tb_xxxx_entry_t*)litem)->data = ((tb_xxxx_entry_t*)ritem)->data;
     }
 
     // init the list
