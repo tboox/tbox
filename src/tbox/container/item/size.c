@@ -44,7 +44,7 @@ static tb_size_t tb_item_func_size_hash(tb_item_func_t* func, tb_cpointer_t data
 static tb_long_t tb_item_func_size_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // compare it
-    return ((tb_size_t)ldata > (tb_size_t)rdata? 1 : ((tb_size_t)ldata < (tb_size_t)rdata? -1 : 0));
+    return ((tb_size_t)ldata < (tb_size_t)rdata)? -1 : ((tb_size_t)ldata > (tb_size_t)rdata);
 }
 static tb_pointer_t tb_item_func_size_data(tb_item_func_t* func, tb_cpointer_t buff)
 {
