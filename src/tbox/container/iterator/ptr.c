@@ -84,7 +84,7 @@ static tb_void_t tb_iterator_ptr_copy(tb_iterator_ref_t iterator, tb_size_t itor
 }
 static tb_long_t tb_iterator_ptr_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-    return ((tb_size_t)ltem > (tb_size_t)rtem? 1 : ((tb_size_t)ltem < (tb_size_t)rtem? -1 : 0));
+    return ((tb_size_t)ltem < (tb_size_t)rtem)? -1 : ((tb_size_t)ltem > (tb_size_t)rtem);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

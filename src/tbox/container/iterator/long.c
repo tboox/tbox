@@ -32,7 +32,7 @@
  */
 static tb_long_t tb_iterator_long_comp(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-    return ((tb_long_t)ltem > (tb_long_t)rtem? 1 : ((tb_long_t)ltem < (tb_long_t)rtem? -1 : 0));
+    return ((tb_long_t)ltem < (tb_long_t)rtem)? -1 : ((tb_long_t)ltem > (tb_long_t)rtem);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

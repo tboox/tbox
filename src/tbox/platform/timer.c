@@ -123,7 +123,7 @@ static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata
 }
 static tb_long_t tb_timer_comp_by_task(tb_iterator_ref_t iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-    return ((tb_size_t)ltem > (tb_size_t)rtem? 1 : ((tb_size_t)ltem < (tb_size_t)rtem? -1 : 0));
+    return ((tb_size_t)ltem < (tb_size_t)rtem)? -1 : ((tb_size_t)ltem > (tb_size_t)rtem);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -614,7 +614,7 @@ tb_void_t tb_timer_task_kill(tb_timer_ref_t timer, tb_timer_task_ref_t task)
         tb_size_t itor = tb_find_all_if(impl->heap, tb_timer_comp_by_task, task_impl);
         tb_assert_and_check_break(itor != tb_iterator_tail(impl->heap));
 
-        // del this task_impl
+        // remove this task
         tb_heap_remove(impl->heap, itor);
 
         // killed

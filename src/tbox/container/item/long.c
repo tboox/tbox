@@ -33,7 +33,7 @@
 static tb_long_t tb_item_func_long_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // compare it
-    return ((tb_long_t)ldata > (tb_long_t)rdata? 1 : ((tb_long_t)ldata < (tb_long_t)rdata? -1 : 0));
+    return ((tb_long_t)ldata < (tb_long_t)rdata)? -1 : ((tb_long_t)ldata > (tb_long_t)rdata);
 }
 static tb_pointer_t tb_item_func_long_data(tb_item_func_t* func, tb_cpointer_t buff)
 {

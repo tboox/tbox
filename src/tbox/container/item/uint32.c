@@ -38,7 +38,7 @@ static tb_size_t tb_item_func_uint32_hash(tb_item_func_t* func, tb_cpointer_t da
 static tb_long_t tb_item_func_uint32_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // compare it
-    return (tb_p2u32(ldata) > tb_p2u32(rdata)? 1 : (tb_p2u32(ldata) < tb_p2u32(rdata)? -1 : 0));
+    return ((tb_p2u32(ldata) < tb_p2u32(rdata))? -1 : (tb_p2u32(ldata) > tb_p2u32(rdata)));
 }
 static tb_pointer_t tb_item_func_uint32_data(tb_item_func_t* func, tb_cpointer_t buff)
 {
