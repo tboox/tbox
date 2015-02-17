@@ -31,12 +31,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_find(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
+tb_size_t tb_find(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t value)
 {
-    return tb_find_if(iterator, head, tail, tb_iterator_comp, item);
+    return tb_find_if(iterator, head, tail, tb_predicate_eq, value);
 } 
-tb_size_t tb_find_all(tb_iterator_ref_t iterator, tb_cpointer_t item)
+tb_size_t tb_find_all(tb_iterator_ref_t iterator, tb_cpointer_t value)
 {
-    return tb_find_all_if(iterator, tb_iterator_comp, item);
+    return tb_find_all_if(iterator, tb_predicate_eq, value);
 }
 

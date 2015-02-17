@@ -47,13 +47,13 @@ static tb_void_t tb_ifaddrs_instance_exit(tb_handle_t ifaddrs, tb_cpointer_t pri
     // exit it
     tb_ifaddrs_exit((tb_ifaddrs_ref_t)ifaddrs);
 }
-static tb_long_t tb_ifaddrs_interface_comp(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t name)
+static tb_bool_t tb_ifaddrs_interface_pred(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t name)
 {
     // check
-    tb_assert_return_val(item, 0);
+    tb_assert_abort(item);
 
-    // comp
-    return tb_stricmp(((tb_ifaddrs_interface_ref_t)item)->name, (tb_char_t const*)name);
+    // is equal?
+    return !tb_stricmp(((tb_ifaddrs_interface_ref_t)item)->name, (tb_char_t const*)name);
 }
 static tb_ifaddrs_interface_ref_t tb_ifaddrs_interface_find(tb_iterator_ref_t iterator, tb_char_t const* name)
 {
@@ -61,7 +61,7 @@ static tb_ifaddrs_interface_ref_t tb_ifaddrs_interface_find(tb_iterator_ref_t it
     tb_assert_and_check_return_val(iterator && name, tb_null);
 
     // find it
-    tb_size_t itor = tb_find_all_if(iterator, tb_ifaddrs_interface_comp, name);
+    tb_size_t itor = tb_find_all_if(iterator, tb_ifaddrs_interface_pred, name);
     tb_check_return_val(itor != tb_iterator_tail(iterator), tb_null);
 
     // ok
