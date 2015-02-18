@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! reverse find item if !comp(item, item)
+/*! reverse find item if pred(item, value)
  *
  * @param iterator  the iterator
  * @param head      the iterator head
@@ -49,9 +49,9 @@ __tb_extern_c_enter__
  *
  * @return          the iterator itor, return tb_iterator_tail(iterator) if not found
  */
-tb_size_t           tb_rfind_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_predicate_unary_t pred, tb_cpointer_t value);
+tb_size_t           tb_rfind_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_predicate_ref_t pred, tb_cpointer_t value);
 
-/*! reverse find item for all if !comp(item, item)
+/*! reverse find item for all if pred(item, value)
  *
  * @param iterator  the iterator
  * @param pred      the predicate
@@ -59,7 +59,7 @@ tb_size_t           tb_rfind_if(tb_iterator_ref_t iterator, tb_size_t head, tb_s
  *
  * @return          the iterator itor, return tb_iterator_tail(iterator) if not found
  */
-tb_size_t           tb_rfind_all_if(tb_iterator_ref_t iterator, tb_predicate_unary_t pred, tb_cpointer_t value);
+tb_size_t           tb_rfind_all_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred, tb_cpointer_t value);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

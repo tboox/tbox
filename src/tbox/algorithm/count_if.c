@@ -31,24 +31,24 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_count_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv)
+tb_size_t tb_count_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_predicate_ref_t pred, tb_cpointer_t value)
 {
     // check
-    tb_assert_and_check_return_val(comp && iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), tail);
+    tb_assert_and_check_return_val(pred && iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD), 0);
 
     // null?
-    tb_check_return_val(head != tail, tail);
+    tb_check_return_val(head != tail, 0);
 
     // count
     tb_size_t count = 0;
     tb_for (tb_pointer_t, item, head, tail, iterator) 
-        if (!comp(iterator, item, priv)) count++;
+        if (pred(iterator, item, value)) count++;
 
     // ok?
     return count;
 } 
-tb_size_t tb_count_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv)
+tb_size_t tb_count_all_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred, tb_cpointer_t value)
 {
-    return tb_count_if(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), comp, priv);
+    return tb_count_if(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), pred, value);
 }
 

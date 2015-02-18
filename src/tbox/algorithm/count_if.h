@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "predicate.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -38,27 +39,27 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! count item if !comp(item, priv)
+/*! count items if pred(item, value)
  *
  * @param iterator  the iterator
  * @param head      the iterator head
  * @param tail      the iterator tail
- * @param comp      the comparer func
- * @param priv      the comparer data
+ * @param pred      the predicate
+ * @param value     the value of the predicate
  *
  * @return          the real count
  */
-tb_size_t           tb_count_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp, tb_cpointer_t priv);
+tb_size_t           tb_count_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_predicate_ref_t pred, tb_cpointer_t value);
 
-/*! count item for all if !comp(item, priv)
+/*! count items for all if pred(item, value)
  *
  * @param iterator  the iterator
- * @param comp      the comparer func
- * @param priv      the comparer data
+ * @param pred      the predicate
+ * @param value     the value of the predicate
  *
  * @return          the real count
  */
-tb_size_t           tb_count_all_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
+tb_size_t           tb_count_all_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred, tb_cpointer_t value);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

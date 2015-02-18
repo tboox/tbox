@@ -37,7 +37,7 @@ __tb_extern_c_enter__
  * types
  */
 
-/*! the unary predicate type
+/*! the predicate ref type
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
@@ -45,24 +45,24 @@ __tb_extern_c_enter__
  *
  * @return          tb_true or tb_false
  */
-typedef tb_bool_t   (*tb_predicate_unary_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
+typedef tb_bool_t   (*tb_predicate_ref_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
-/*! the binary predicate type
+/*! the predicate break ref type
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
- * @param value1    the first outer value
- * @param value2    the second outer value
+ * @param value     the outer value
+ * @param is_break  is break now?
  *
  * @return          tb_true or tb_false
  */
-typedef tb_bool_t   (*tb_predicate_binary_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value1, tb_cpointer_t value2);
+typedef tb_bool_t   (*tb_predicate_break_ref_t)(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value, tb_bool_t* is_break);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the unary predicate: if (item == value)?
+/*! the predicate: if (item == value)?
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
@@ -72,7 +72,7 @@ typedef tb_bool_t   (*tb_predicate_binary_t)(tb_iterator_ref_t iterator, tb_cpoi
  */
 tb_bool_t           tb_predicate_eq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
-/*! the unary predicate: if (item < value)?
+/*! the predicate: if (item < value)?
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
@@ -82,7 +82,7 @@ tb_bool_t           tb_predicate_eq(tb_iterator_ref_t iterator, tb_cpointer_t it
  */
 tb_bool_t           tb_predicate_le(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
-/*! the unary predicate: if (item > value)?
+/*! the predicate: if (item > value)?
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
@@ -92,7 +92,7 @@ tb_bool_t           tb_predicate_le(tb_iterator_ref_t iterator, tb_cpointer_t it
  */
 tb_bool_t           tb_predicate_be(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
-/*! the unary predicate: if (item <= value)?
+/*! the predicate: if (item <= value)?
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container
@@ -102,7 +102,7 @@ tb_bool_t           tb_predicate_be(tb_iterator_ref_t iterator, tb_cpointer_t it
  */
 tb_bool_t           tb_predicate_leq(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value);
 
-/*! the unary predicate: if (item >= value)?
+/*! the predicate: if (item >= value)?
  *
  * @param iterator  the iterator
  * @param item      the inner item of the container

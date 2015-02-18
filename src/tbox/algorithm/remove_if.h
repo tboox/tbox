@@ -39,13 +39,21 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! remove items if !comp(item, priv), break it if comp(item, priv) < 0
+/*! remove items if pred(item, value)
  *
  * @param iterator  the iterator
  * @param pred      the predicate
  * @param value     the value of the predicate
  */
-tb_void_t           tb_remove_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
+tb_void_t           tb_remove_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred, tb_cpointer_t value);
+
+/*! remove items if pred(item, value, &is_break) until is_break == tb_true
+ *
+ * @param iterator  the iterator
+ * @param pred      the predicate with break
+ * @param value     the value of the predicate
+ */
+tb_void_t           tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_t pred, tb_cpointer_t value);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
