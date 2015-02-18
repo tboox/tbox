@@ -550,19 +550,19 @@ static tb_void_t tb_hash_map_test_i2t_perf()
     // exit hash
     tb_hash_map_exit(hash);
 }
-static tb_long_t tb_hash_map_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t data, tb_cpointer_t priv)
+static tb_bool_t tb_hash_map_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // done
-    tb_long_t       ok = 1;
-    tb_hize_t*      test = (tb_hize_t*)priv;
-    tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)data;
-    if (item)
+    tb_bool_t               ok = tb_false;
+    tb_hize_t*              test = (tb_hize_t*)value;
+    tb_hash_map_item_ref_t  hash_item = (tb_hash_map_item_ref_t)item;
+    if (hash_item)
     {
-        if (!(((tb_size_t)item->data >> 25) & 0x1)) ok = 0;
+        if (!(((tb_size_t)hash_item->data >> 25) & 0x1)) ok = tb_true;
         else
         {
-            test[0] += (tb_size_t)item->name;
-            test[1] += (tb_size_t)item->data;
+            test[0] += (tb_size_t)hash_item->name;
+            test[1] += (tb_size_t)hash_item->data;
             test[2]++;
         }
     }

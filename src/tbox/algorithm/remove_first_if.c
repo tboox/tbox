@@ -25,46 +25,35 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "remove_if.h"
 #include "remove_first_if.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
- */
-static tb_long_t tb_remove_first_comp(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
-{
-    // the tuple
-    tb_value_t* tuple = (tb_value_t*)priv;
-    tb_assert_and_check_return_val(tuple, -1);
-
-    // have been removed? break it
-    tb_check_return_val(!tuple[2].b, -1);
-
-    // the comp func
-    tb_iterator_comp_t comp = (tb_iterator_comp_t)tuple[0].cptr;
-    tb_assert_and_check_return_val(comp, -1);
-
-    // done comp func
-    tb_long_t ok = comp(iterator, item, tuple[1].cptr);
-
-    // removed?
-    if (!ok) tuple[2].b = tb_true;
-
-    // ok?
-    return ok;
-}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_remove_first_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv)
+tb_void_t tb_remove_first_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred, tb_cpointer_t value)
 {
-    // init tuple
-    tb_value_t tuple[3];
-    tuple[0].cptr   = (tb_cpointer_t)comp;
-    tuple[1].cptr   = priv;
-    tuple[2].b      = tb_false;
+    // check
+    tb_assert_and_check_return(iterator && pred);
 
-    // remove it
-    tb_remove_if(iterator, tb_remove_first_comp, (tb_cpointer_t)tuple);
+    // the iterator mode
+    tb_size_t mode = tb_iterator_mode(iterator);
+    tb_assert_and_check_return((mode & TB_ITERATOR_MODE_FORWARD));
+    tb_assert_and_check_return(!(mode & TB_ITERATOR_MODE_READONLY));
+
+    // done
+    tb_size_t itor = tb_iterator_head(iterator);
+    while (itor != tb_iterator_tail(iterator))
+    {
+        // done predicate
+        if (pred(iterator, tb_iterator_item(iterator, itor), value))
+        {
+            // remove it
+            tb_iterator_remove(iterator, itor);
+            break;
+        }
+    
+        // next
+        itor = tb_iterator_next(iterator, itor);
+    }
 }
+

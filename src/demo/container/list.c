@@ -807,16 +807,13 @@ static tb_void_t tb_list_perf_test()
     tb_list_iterator_next_test();
     tb_list_iterator_prev_test();
 }
-static tb_long_t tb_list_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_list_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
-    // check
-    tb_assert_and_check_return_val(priv, -1);
-
     // done
-    tb_hize_t*  test = (tb_hize_t*)priv;
+    tb_hize_t*  test = (tb_hize_t*)value;
     tb_size_t   i = (tb_size_t)item;
-    tb_long_t   ok = 1;
-    if (!((i >> 25) & 0x1)) ok = 0;
+    tb_bool_t   ok = tb_false;
+    if (!((i >> 25) & 0x1)) ok = tb_true;
     else
     {
         test[0] += i;

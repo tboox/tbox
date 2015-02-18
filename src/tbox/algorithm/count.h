@@ -38,25 +38,25 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! count item
+/*! count items
  *
  * @param iterator  the iterator
  * @param head      the iterator head
  * @param tail      the iterator tail
- * @param item      the counted item
+ * @param value     the value of the predicate
  *
  * @return          the real count
  */
-tb_size_t           tb_count(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
+tb_size_t           tb_count(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t value);
 
-/*! count item for all
+/*! count items for all
  *
  * @param iterator  the iterator
- * @param item      the counted item
+ * @param value     the value of the predicate
  *
  * @return          the real count
  */
-tb_size_t           tb_count_all(tb_iterator_ref_t iterator, tb_cpointer_t item);
+tb_size_t           tb_count_all(tb_iterator_ref_t iterator, tb_cpointer_t value);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

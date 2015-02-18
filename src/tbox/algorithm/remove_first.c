@@ -25,42 +25,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "remove_if.h"
 #include "remove_first.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
- */
-static tb_long_t tb_remove_first_comp(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
-{
-    // the tuple
-    tb_value_t* tuple = (tb_value_t*)priv;
-    tb_assert_and_check_return_val(tuple, -1);
-
-    // have been removed? break it
-    tb_check_return_val(!tuple[1].b, -1);
-
-    // done comp func
-    tb_long_t ok = tb_iterator_comp(iterator, item, tuple[0].cptr);
-
-    // removed?
-    if (!ok) tuple[1].b = tb_true;
-
-    // ok?
-    return ok;
-}
+#include "remove_first_if.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_remove_first(tb_iterator_ref_t iterator, tb_cpointer_t item)
+tb_void_t tb_remove_first(tb_iterator_ref_t iterator, tb_cpointer_t value)
 {
-    // init tuple
-    tb_value_t tuple[3];
-    tuple[0].cptr   = item;
-    tuple[1].b      = tb_false;
-
     // remove it
-    tb_remove_if(iterator, tb_remove_first_comp, (tb_cpointer_t)tuple);
+    tb_remove_first_if(iterator, tb_predicate_eq, value);
 }
 

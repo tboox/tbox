@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "predicate.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -38,13 +39,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! remove the first item if !comp(item, priv), break it if comp(item, priv) < 0
+/*! remove the first item if pred(item, value)
  *
  * @param iterator  the iterator
- * @param comp      the comparer func
- * @param priv      the comparer data
+ * @param pred      the predicate
+ * @param value     the value of the predicate
  */
-tb_void_t           tb_remove_first_if(tb_iterator_ref_t iterator, tb_iterator_comp_t comp, tb_cpointer_t priv);
+tb_void_t           tb_remove_first_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred, tb_cpointer_t value);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

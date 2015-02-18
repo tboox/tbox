@@ -31,9 +31,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_remove(tb_iterator_ref_t iterator, tb_cpointer_t item)
+tb_void_t tb_remove(tb_iterator_ref_t iterator, tb_cpointer_t value)
 {
     // remove it
-    tb_remove_if(iterator, tb_iterator_comp, item);
+    tb_remove_if(iterator, tb_predicate_eq, value);
 }
 

@@ -93,27 +93,27 @@ static __tb_inline__ tb_size_t tb_dns_cache_now()
 {
     return (tb_size_t)(tb_cache_time_spak() / 1000);
 }
-static tb_long_t tb_dns_cache_cler(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_dns_cache_clear(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // check
-    tb_assert_and_check_return_val(item, -1);
+    tb_assert_abort(item);
 
     // the dns cache address
     tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_map_item_ref_t)item)->data;
-    tb_assert_and_check_return_val(caddr, -1);
+    tb_assert_abort(caddr);
 
     // is expired?
-    tb_long_t ok = 1;
+    tb_bool_t ok = tb_false;
     if (caddr->time < g_cache.expired)
     {
         // remove it
-        ok = 0;
+        ok = tb_true;
 
         // trace
         tb_trace_d("del: %s => %{ipaddr}, time: %u, size: %u", (tb_char_t const*)item->name, &caddr->addr, caddr->time, tb_hash_map_size(g_cache.hash));
 
         // update times
-        tb_assert_and_check_return_val(g_cache.times >= caddr->time, -1);
+        tb_assert_abort(g_cache.times >= caddr->time);
         g_cache.times -= caddr->time;
     }
 
@@ -268,7 +268,7 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipaddr_ref_t addr)
             tb_trace_d("expired: %lu", g_cache.expired);
 
             // remove the expired times
-            tb_remove_if(g_cache.hash, tb_dns_cache_cler, tb_null);
+            tb_remove_if(g_cache.hash, tb_dns_cache_clear, tb_null);
         }
 
         // check

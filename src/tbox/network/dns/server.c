@@ -59,7 +59,7 @@ typedef struct __tb_dns_server_t
     // the addr
     tb_ipaddr_t             addr;
 
-}tb_dns_server_t;
+}tb_dns_server_t, *tb_dns_server_ref_t;
 
 // the dns server list type
 typedef struct __tb_dns_server_list_t
@@ -292,11 +292,11 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
     // ok
     return rate;
 }
-static tb_long_t tb_dns_server_rate(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_dns_server_rate(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // the server
-    tb_long_t           ok = 1;
-    tb_dns_server_t*    server = (tb_dns_server_t*)item;
+    tb_bool_t               ok = tb_false;
+    tb_dns_server_ref_t     server = (tb_dns_server_ref_t)item;
     if (server && !server->rate)
     {
         // done
@@ -316,7 +316,7 @@ static tb_long_t tb_dns_server_rate(tb_iterator_ref_t iterator, tb_cpointer_t it
         } while (0);
 
         // failed? remove it
-        if (!done) ok = 0;
+        if (!done) ok = tb_true;
     }
 
     // ok?

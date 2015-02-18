@@ -433,15 +433,15 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
     // ok
     return tb_true;
 }
-static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // check
-    tb_value_t* tuple = (tb_value_t*)priv;
-    tb_assert_and_check_return_val(item && tuple, -1);
+    tb_value_t* tuple = (tb_value_t*)value;
+    tb_assert_abort(item && tuple);
 
     // the entry
     tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)item;
-    tb_assert_and_check_return_val(entry && entry->domain && entry->path && entry->name, -1);
+    tb_assert_abort(entry && entry->domain && entry->path && entry->name);
 
     // the domain
     tb_char_t const* domain = tuple[0].cstr;
@@ -452,9 +452,9 @@ static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
     // the secure
     tb_size_t secure = tuple[2].ul;
 
-    // the data and maxn
-    tb_string_t* value = (tb_string_t*)tuple[3].ptr;
-    tb_assert_and_check_return_val(value, -1);
+    // the value of key
+    tb_string_t* kvalue = (tb_string_t*)tuple[3].ptr;
+    tb_assert_abort(kvalue);
 
     // expired?
     if (entry->expires && tb_cache_time() >= entry->expires)
@@ -463,7 +463,7 @@ static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
         tb_trace_d("expired: %s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "");
 
         // remove it
-        return 0;
+        return tb_true;
     }
 
     // this cookies is at domain/path?
@@ -472,11 +472,11 @@ static tb_long_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
         &&  entry->secure == secure)
     {
         // append "key=value; "
-        tb_string_cstrfcat(value, "%s=%s; ", entry->name, entry->value? entry->value : "");
+        tb_string_cstrfcat(kvalue, "%s=%s; ", entry->name, entry->value? entry->value : "");
     }
 
     // continue 
-    return 1;
+    return tb_false;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
