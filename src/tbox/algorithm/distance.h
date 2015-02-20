@@ -17,41 +17,39 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        algorithm.h
- * @defgroup    algorithm
+ * @file        distance.h
+ * @ingroup     algorithm
  *
  */
-#ifndef TB_ALGORITHM_H
-#define TB_ALGORITHM_H
+#ifndef TB_ALGORITHM_DISTANCE_H
+#define TB_ALGORITHM_DISTANCE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "predicate.h"
-#include "distance.h"
-#include "for.h"
-#include "for_if.h"
-#include "rfor.h"
-#include "rfor_if.h"
-#include "sort.h"
-#include "heap_sort.h"
-#include "quick_sort.h"
-#include "insert_sort.h"
-#include "bubble_sort.h"
-#include "find.h"
-#include "find_if.h"
-#include "rfind.h"
-#include "rfind_if.h"
-#include "binary_find.h"
-#include "binary_find_if.h"
-#include "walk.h"
-#include "rwalk.h"
-#include "count.h"
-#include "count_if.h"
-#include "remove.h"
-#include "remove_if.h"
-#include "remove_first.h"
-#include "remove_first_if.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! compute distance from head to tail
+ *
+ * @param iterator  the iterator
+ * @param head      the iterator head
+ * @param tail      the iterator tail
+ *
+ * @return          the distance
+ */
+tb_size_t           tb_distance(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 #endif

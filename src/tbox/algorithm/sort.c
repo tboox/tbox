@@ -26,6 +26,7 @@
  * includes
  */
 #include "sort.h"
+#include "distance.h"
 #include "heap_sort.h"
 #include "quick_sort.h"
 #include "insert_sort.h"
@@ -38,7 +39,10 @@
 tb_void_t tb_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
     // check
-    tb_check_return(iterator && head != tail);
+    tb_assert_and_check_return(iterator);
+
+    // no elements?
+    tb_check_return(head != tail);
 
     // readonly?
     tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
@@ -46,7 +50,7 @@ tb_void_t tb_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb
     // random access iterator? 
     if (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS) 
     {
-        if (tail > head + 100000) tb_heap_sort(iterator, head, tail, comp);
+        if (tb_distance(iterator, head, tail) > 100000) tb_heap_sort(iterator, head, tail, comp);
         else tb_quick_sort(iterator, head, tail, comp); //!< @note the recursive stack size is limit
     }
     else tb_bubble_sort(iterator, head, tail, comp);
