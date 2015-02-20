@@ -45,6 +45,7 @@ tbox_C_FILES 			+= \
 						algorithm/rfind_if \
 						algorithm/binary_find \
 						algorithm/binary_find_if \
+						algorithm/distance \
 						algorithm/walk \
 						algorithm/rwalk \
 						algorithm/count \
@@ -498,6 +499,7 @@ tbox_INC_FILES 			= \
 						algorithm/rfind_if.h \
 						algorithm/binary_find.h \
 						algorithm/binary_find_if.h \
+						algorithm/distance.h \
 						algorithm/walk.h \
 						algorithm/rwalk.h \
 						algorithm/count.h \
