@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "item.h"
+#include "element.h"
 #include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -72,12 +72,12 @@ typedef tb_iterator_ref_t   tb_circle_queue_ref_t;
 
 /*! init queue
  *
- * @param maxn          the item maxn, using the default maxn if be zero
- * @param func          the item func
+ * @param maxn          the element maxn, using the default maxn if be zero
+ * @param element       the element
  *
  * @return              the queue
  */
-tb_circle_queue_ref_t   tb_circle_queue_init(tb_size_t maxn, tb_item_func_t func);
+tb_circle_queue_ref_t   tb_circle_queue_init(tb_size_t maxn, tb_element_t element);
 
 /*! exit queue
  *

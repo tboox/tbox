@@ -28,7 +28,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * data hash implementation
  */
-static tb_size_t tb_item_func_hash_data_func_0(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_0(tb_byte_t const* data, tb_size_t size)
 {
     // bkdr-hash
     tb_size_t           v = 0;  
@@ -37,7 +37,7 @@ static tb_size_t tb_item_func_hash_data_func_0(tb_byte_t const* data, tb_size_t 
     while (p < e) v = (v * 131313) + (*p++);  
     return v;
 }
-static tb_size_t tb_item_func_hash_data_func_1(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_1(tb_byte_t const* data, tb_size_t size)
 {
     // from stl string
     tb_size_t           v = 2166136261ul;
@@ -46,7 +46,7 @@ static tb_size_t tb_item_func_hash_data_func_1(tb_byte_t const* data, tb_size_t 
     while (p < e) v = 16777619 * v ^ (tb_size_t)(*p++);
     return v;
 }
-static tb_size_t tb_item_func_hash_data_func_2(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_2(tb_byte_t const* data, tb_size_t size)
 {
     // Blizzard One-Way Hash algorithm from MPQ
     // make table
@@ -92,7 +92,7 @@ static tb_size_t tb_item_func_hash_data_func_2(tb_byte_t const* data, tb_size_t 
     // ok
     return seed1;  
 }
-static tb_size_t tb_item_func_hash_data_func_3(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_3(tb_byte_t const* data, tb_size_t size)
 {
     // fnv-1a-hash
     tb_size_t           v = size; v ^= 2166136261ul;
@@ -105,7 +105,7 @@ static tb_size_t tb_item_func_hash_data_func_3(tb_byte_t const* data, tb_size_t 
     }
     return v;
 }
-static tb_size_t tb_item_func_hash_data_func_4(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_4(tb_byte_t const* data, tb_size_t size)
 {
     // one-byte-at-a-time hash based on Murmur's mix
     tb_size_t           v = size;
@@ -119,11 +119,11 @@ static tb_size_t tb_item_func_hash_data_func_4(tb_byte_t const* data, tb_size_t 
     }
     return v;
 }
-static tb_size_t tb_item_func_hash_data_func_5(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_5(tb_byte_t const* data, tb_size_t size)
 {
     return tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, data, size);
 }
-static tb_size_t tb_item_func_hash_data_func_6(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_6(tb_byte_t const* data, tb_size_t size)
 {
     // fnv-1-hash
     tb_size_t           v = 0;  
@@ -136,7 +136,7 @@ static tb_size_t tb_item_func_hash_data_func_6(tb_byte_t const* data, tb_size_t 
     }  
     return v;  
 }
-static tb_size_t tb_item_func_hash_data_func_7(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_7(tb_byte_t const* data, tb_size_t size)
 {
     // ap-hash
     tb_size_t           v = 0xAAAAAAAA;  
@@ -148,7 +148,7 @@ static tb_size_t tb_item_func_hash_data_func_7(tb_byte_t const* data, tb_size_t 
     }
     return v;  
 }
-static tb_size_t tb_item_func_hash_data_func_8(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_8(tb_byte_t const* data, tb_size_t size)
 {
     // MurmurHash2A, by Austin Appleby
     tb_uint32_t const   m = 0x5bd1e995;
@@ -183,7 +183,7 @@ static tb_size_t tb_item_func_hash_data_func_8(tb_byte_t const* data, tb_size_t 
 
     return v;
 }
-static tb_size_t tb_item_func_hash_data_func_9(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_9(tb_byte_t const* data, tb_size_t size)
 {
     // rs-hash
     tb_size_t           v = 0;  
@@ -198,7 +198,7 @@ static tb_size_t tb_item_func_hash_data_func_9(tb_byte_t const* data, tb_size_t 
     }  
     return v;
 }
-static tb_size_t tb_item_func_hash_data_func_10(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_10(tb_byte_t const* data, tb_size_t size)
 {
     // sdbm-hash
     tb_size_t           v = 0;  
@@ -207,31 +207,31 @@ static tb_size_t tb_item_func_hash_data_func_10(tb_byte_t const* data, tb_size_t
     while (p < e) v = (*p++) + (v << 6) + (v << 16) - v;  
     return v;
 }
-static tb_size_t tb_item_func_hash_data_func_11(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_11(tb_byte_t const* data, tb_size_t size)
 {
     // using md5, better but too slower
     tb_byte_t b[16] = {0};
     tb_md5_encode(data, size, b, 16);
     return tb_bits_get_u32_ne(b);
 }
-static tb_size_t tb_item_func_hash_data_func_12(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_12(tb_byte_t const* data, tb_size_t size)
 {
     // using sha, better but too slower
     tb_byte_t b[32] = {0};
     tb_sha_encode(TB_SHA_MODE_SHA1_160, data, size, b, 32);
     return tb_bits_get_u32_ne(b);
 }
-static tb_size_t tb_item_func_hash_data_func_13(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_13(tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return 0;
 }
-static tb_size_t tb_item_func_hash_data_func_14(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_14(tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return 0;
 }
-static tb_size_t tb_item_func_hash_data_func_15(tb_byte_t const* data, tb_size_t size)
+static tb_size_t tb_element_hash_data_func_15(tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return 0;
@@ -240,7 +240,7 @@ static tb_size_t tb_item_func_hash_data_func_15(tb_byte_t const* data, tb_size_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * cstr hash implementation
  */
-static tb_size_t tb_item_func_hash_cstr_func_0(tb_char_t const* data)
+static tb_size_t tb_element_hash_cstr_func_0(tb_char_t const* data)
 {
     // bkdr-hash
     tb_size_t           v = 0;  
@@ -248,7 +248,7 @@ static tb_size_t tb_item_func_hash_cstr_func_0(tb_char_t const* data)
     while (*p) v = (v * 131313) + (*p++);  
     return v;
 }
-static tb_size_t tb_item_func_hash_cstr_func_1(tb_char_t const* data)
+static tb_size_t tb_element_hash_cstr_func_1(tb_char_t const* data)
 {
     // from stl string
     tb_size_t           v = 2166136261ul;
@@ -260,11 +260,11 @@ static tb_size_t tb_item_func_hash_cstr_func_1(tb_char_t const* data)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * uint8 hash implementation
  */
-static tb_size_t tb_item_func_hash_uint8_func_0(tb_uint8_t value)
+static tb_size_t tb_element_hash_uint8_func_0(tb_uint8_t value)
 {
     return (tb_size_t)value;
 }
-static tb_size_t tb_item_func_hash_uint8_func_1(tb_uint8_t value)
+static tb_size_t tb_element_hash_uint8_func_1(tb_uint8_t value)
 {
     return (tb_size_t)(((tb_uint64_t)(value) * 2654435761ul) >> 16);
 }
@@ -272,7 +272,7 @@ static tb_size_t tb_item_func_hash_uint8_func_1(tb_uint8_t value)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * uint16 hash implementation
  */
-static tb_size_t tb_item_func_hash_uint16_func_0(tb_uint16_t value)
+static tb_size_t tb_element_hash_uint16_func_0(tb_uint16_t value)
 {
     return (tb_size_t)(((tb_uint64_t)(value) * 2654435761ul) >> 16);
 }
@@ -280,11 +280,11 @@ static tb_size_t tb_item_func_hash_uint16_func_0(tb_uint16_t value)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * uint32 hash implementation
  */
-static tb_size_t tb_item_func_hash_uint32_func_0(tb_uint32_t value)
+static tb_size_t tb_element_hash_uint32_func_0(tb_uint32_t value)
 {
     return (tb_size_t)(((tb_uint64_t)(value) * 2654435761ul) >> 16);
 }
-static tb_size_t tb_item_func_hash_uint32_func_1(tb_uint32_t value)
+static tb_size_t tb_element_hash_uint32_func_1(tb_uint32_t value)
 {
     // Bob Jenkins' 32 bit integer hash function
     value = (value + 0x7ed55d16) + (value << 12); 
@@ -295,7 +295,7 @@ static tb_size_t tb_item_func_hash_uint32_func_1(tb_uint32_t value)
     value = (value ^ 0xb55a4f09) ^ (value >> 16);  
     return value;
 }
-static tb_size_t tb_item_func_hash_uint32_func_2(tb_uint32_t value)
+static tb_size_t tb_element_hash_uint32_func_2(tb_uint32_t value)
 {
     // Tomas Wang
     value = ~value + (value << 15);
@@ -310,7 +310,7 @@ static tb_size_t tb_item_func_hash_uint32_func_2(tb_uint32_t value)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * uint64 hash implementation
  */
-static tb_size_t tb_item_func_hash_uint64_func_0(tb_uint64_t value)
+static tb_size_t tb_element_hash_uint64_func_0(tb_uint64_t value)
 {
     return (tb_size_t)((value * 2654435761ul) >> 16);
 }
@@ -318,7 +318,7 @@ static tb_size_t tb_item_func_hash_uint64_func_0(tb_uint64_t value)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t index)
+tb_size_t tb_element_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t index)
 {
     // check
     tb_assert_and_check_return_val(mask, 0);
@@ -329,8 +329,8 @@ tb_size_t tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t in
         // the func
         static tb_size_t (*s_func[])(tb_uint8_t) = 
         {
-            tb_item_func_hash_uint8_func_0
-        ,   tb_item_func_hash_uint8_func_1
+            tb_element_hash_uint8_func_0
+        ,   tb_element_hash_uint8_func_1
         };
         tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
 
@@ -340,9 +340,9 @@ tb_size_t tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t in
 
     // using uint32 hash
     tb_uint32_t v = (tb_uint32_t)value;
-    return tb_item_func_hash_uint32(v | (v << 8) | (v << 16) | (v << 24), mask, index - 1);
+    return tb_element_hash_uint32(v | (v << 8) | (v << 16) | (v << 24), mask, index - 1);
 }
-tb_size_t tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t index)
+tb_size_t tb_element_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t index)
 {
     // check
     tb_assert_and_check_return_val(mask, 0);
@@ -353,7 +353,7 @@ tb_size_t tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t 
         // the func
         static tb_size_t (*s_func[])(tb_uint16_t) = 
         {
-            tb_item_func_hash_uint16_func_0
+            tb_element_hash_uint16_func_0
         };
         tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
 
@@ -363,9 +363,9 @@ tb_size_t tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t 
 
     // using uint32 hash
     tb_uint32_t v = (tb_uint32_t)value;
-    return tb_item_func_hash_uint32(v | (v << 16), mask, index);
+    return tb_element_hash_uint32(v | (v << 16), mask, index);
 }
-tb_size_t tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t index)
+tb_size_t tb_element_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t index)
 {
     // check
     tb_assert_and_check_return_val(mask, 0);
@@ -376,9 +376,9 @@ tb_size_t tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t 
         // the func
         static tb_size_t (*s_func[])(tb_uint32_t) = 
         {
-            tb_item_func_hash_uint32_func_0
-        ,   tb_item_func_hash_uint32_func_1
-        ,   tb_item_func_hash_uint32_func_2
+            tb_element_hash_uint32_func_0
+        ,   tb_element_hash_uint32_func_1
+        ,   tb_element_hash_uint32_func_2
         };
         tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
 
@@ -387,9 +387,9 @@ tb_size_t tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t 
     }
 
     // done
-    return tb_item_func_hash_data((tb_byte_t const*)&value, sizeof(tb_uint32_t), mask, index - 3);
+    return tb_element_hash_data((tb_byte_t const*)&value, sizeof(tb_uint32_t), mask, index - 3);
 }
-tb_size_t tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index)
+tb_size_t tb_element_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index)
 {
     // for optimization
     if (index < 1)
@@ -397,7 +397,7 @@ tb_size_t tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t 
         // the func
         static tb_size_t (*s_func[])(tb_uint64_t) = 
         {
-            tb_item_func_hash_uint64_func_0
+            tb_element_hash_uint64_func_0
         };
         tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
 
@@ -406,11 +406,11 @@ tb_size_t tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t 
     }
 
     // using the uint32 hash
-    tb_size_t hash0 = tb_item_func_hash_uint32((tb_uint32_t)value, mask, index);
-    tb_size_t hash1 = tb_item_func_hash_uint32((tb_uint32_t)(value >> 32), mask, index);
+    tb_size_t hash0 = tb_element_hash_uint32((tb_uint32_t)value, mask, index);
+    tb_size_t hash1 = tb_element_hash_uint32((tb_uint32_t)(value >> 32), mask, index);
     return ((hash0 ^ hash1) & mask);
 }
-tb_size_t tb_item_func_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t mask, tb_size_t index)
+tb_size_t tb_element_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t mask, tb_size_t index)
 {
     // check
     tb_assert_and_check_return_val(data && size && mask, 0);
@@ -418,29 +418,29 @@ tb_size_t tb_item_func_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_
     // the func
     static tb_size_t (*s_func[])(tb_byte_t const* , tb_size_t) = 
     {
-        tb_item_func_hash_data_func_0
-    ,   tb_item_func_hash_data_func_1
-    ,   tb_item_func_hash_data_func_2
-    ,   tb_item_func_hash_data_func_3
-    ,   tb_item_func_hash_data_func_4
-    ,   tb_item_func_hash_data_func_5
-    ,   tb_item_func_hash_data_func_6
-    ,   tb_item_func_hash_data_func_7
-    ,   tb_item_func_hash_data_func_8
-    ,   tb_item_func_hash_data_func_9
-    ,   tb_item_func_hash_data_func_10
-    ,   tb_item_func_hash_data_func_11
-    ,   tb_item_func_hash_data_func_12
-    ,   tb_item_func_hash_data_func_13
-    ,   tb_item_func_hash_data_func_14
-    ,   tb_item_func_hash_data_func_15
+        tb_element_hash_data_func_0
+    ,   tb_element_hash_data_func_1
+    ,   tb_element_hash_data_func_2
+    ,   tb_element_hash_data_func_3
+    ,   tb_element_hash_data_func_4
+    ,   tb_element_hash_data_func_5
+    ,   tb_element_hash_data_func_6
+    ,   tb_element_hash_data_func_7
+    ,   tb_element_hash_data_func_8
+    ,   tb_element_hash_data_func_9
+    ,   tb_element_hash_data_func_10
+    ,   tb_element_hash_data_func_11
+    ,   tb_element_hash_data_func_12
+    ,   tb_element_hash_data_func_13
+    ,   tb_element_hash_data_func_14
+    ,   tb_element_hash_data_func_15
     };
     tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
 
     // done
     return s_func[index](data, size) & mask;
 }
-tb_size_t tb_item_func_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t index)
+tb_size_t tb_element_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t index)
 {
     // check
     tb_assert_and_check_return_val(cstr && mask, 0);
@@ -451,8 +451,8 @@ tb_size_t tb_item_func_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_
         // the func
         static tb_size_t (*s_func[])(tb_char_t const*) = 
         {
-            tb_item_func_hash_cstr_func_0
-        ,   tb_item_func_hash_cstr_func_1
+            tb_element_hash_cstr_func_0
+        ,   tb_element_hash_cstr_func_1
         };
         tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
 
@@ -461,5 +461,5 @@ tb_size_t tb_item_func_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_
     }
 
     // using the data hash
-    return tb_item_func_hash_data((tb_byte_t const*)cstr, tb_strlen(cstr), mask, index);
+    return tb_element_hash_data((tb_byte_t const*)cstr, tb_strlen(cstr), mask, index);
 }

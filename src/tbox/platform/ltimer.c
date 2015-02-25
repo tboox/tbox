@@ -187,7 +187,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_impl_t* impl, tb_ltimer_task_impl_
 
         // the wheel list
         tb_vector_ref_t wlist = impl->wheel[windx];
-        if (!wlist) wlist = impl->wheel[windx] = tb_vector_init((impl->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
+        if (!wlist) wlist = impl->wheel[windx] = tb_vector_init((impl->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(wlist);
 
         // save the wheel index
@@ -348,7 +348,7 @@ tb_ltimer_ref_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
         tb_assert_and_check_break(impl->pool);
 
         // init the expired tasks
-        impl->expired      = tb_vector_init((maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
+        impl->expired      = tb_vector_init((maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(impl->expired);
 
         // register lock profiler

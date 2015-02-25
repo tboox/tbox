@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "item.h"
+#include "element.h"
 #include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -81,12 +81,12 @@ typedef tb_iterator_ref_t tb_heap_ref_t;
 
 /*! init heap, default: minheap
  *
- * @param grow      the item grow, using the default grow if be zero
- * @param func      the item func
+ * @param grow      the element grow, using the default grow if be zero
+ * @param element   the element
  *
  * @return          the heap
  */
-tb_heap_ref_t       tb_heap_init(tb_size_t grow, tb_item_func_t func);
+tb_heap_ref_t       tb_heap_init(tb_size_t grow, tb_element_t element);
 
 /*! exit heap
  *

@@ -80,8 +80,8 @@ typedef struct __tb_heap_impl_t
     // the grow
     tb_size_t               grow;
 
-    // the func
-    tb_item_func_t          func;
+    // the element
+    tb_element_t            element;
 
 }tb_heap_impl_t;
 
@@ -94,7 +94,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
     // init
     tb_byte_t*  data = impl->data;
     tb_size_t   tail = impl->size;
-    tb_size_t   step = impl->func.size;
+    tb_size_t   step = impl->element.size;
     tb_size_t   parent = 0;
 
     // walk
@@ -105,10 +105,10 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
         tb_check_break(lchild < tail);
 
         // the parent data
-        tb_pointer_t parent_data = impl->func.data(&impl->func, data + parent * step);
+        tb_pointer_t parent_data = impl->element.data(&impl->element, data + parent * step);
 
         // check?
-        if (impl->func.comp(&impl->func, impl->func.data(&impl->func, data + lchild * step), parent_data) < 0) 
+        if (impl->element.comp(&impl->element, impl->element.data(&impl->element, data + lchild * step), parent_data) < 0) 
         {
             tb_trace_d("lchild[%lu]: invalid, parent: %lu", lchild, parent);
             break;
@@ -119,7 +119,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
         tb_check_break(rchild < tail);
 
         // check?
-        if (impl->func.comp(&impl->func, impl->func.data(&impl->func, data + rchild * step), parent_data) < 0) 
+        if (impl->element.comp(&impl->element, impl->element.data(&impl->element, data + rchild * step), parent_data) < 0) 
         {
             tb_trace_d("rchild[%lu]: invalid, parent: %lu", rchild, parent);
             break;
@@ -194,7 +194,7 @@ static tb_pointer_t tb_heap_itor_item(tb_iterator_ref_t iterator, tb_size_t itor
     tb_assert_and_check_return_val(impl && itor < impl->size, tb_null);
     
     // data
-    return impl->func.data(&impl->func, impl->data + itor * iterator->step);
+    return impl->element.data(&impl->element, impl->data + itor * iterator->step);
 }
 static tb_void_t tb_heap_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
@@ -203,16 +203,16 @@ static tb_void_t tb_heap_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, t
     tb_assert_and_check_return(impl);
 
     // copy
-    impl->func.copy(&impl->func, impl->data + itor * iterator->step, item);
+    impl->element.copy(&impl->element, impl->data + itor * iterator->step, item);
 }
 static tb_long_t tb_heap_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && impl->func.comp, 0);
+    tb_assert_and_check_return_val(impl && impl->element.comp, 0);
 
     // comp
-    return impl->func.comp(&impl->func, litem, ritem);
+    return impl->element.comp(&impl->element, litem, ritem);
 }
 
 /*! remove the impl item
@@ -264,13 +264,13 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
     tb_assert_and_check_return(impl && impl->data && impl->size && itor < impl->size);
 
-    // init func
-    tb_item_func_comp_t func_comp = impl->func.comp;
-    tb_item_func_data_t func_data = impl->func.data;
+    // init element
+    tb_element_comp_func_t func_comp = impl->element.comp;
+    tb_element_data_func_t func_data = impl->element.data;
     tb_assert_and_check_return(func_comp && func_data);
 
     // walk, 2 * hole + 1: the left child node of hole
-    tb_size_t           step = impl->func.size;
+    tb_size_t           step = impl->element.size;
     tb_byte_t*          head = impl->data;
     tb_byte_t*          hole = head + itor * step;
     tb_byte_t*          tail = head + impl->size * step;
@@ -278,7 +278,7 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     tb_byte_t*          child = head + ((itor << 1) + 1) * step;
     tb_pointer_t        data_child = tb_null;
     tb_pointer_t        data_rchild = tb_null;
-    tb_pointer_t        data_last = func_data(&impl->func, last);
+    tb_pointer_t        data_last = func_data(&impl->element, last);
     switch (step)
     {
     case sizeof(tb_size_t):
@@ -286,15 +286,15 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
             for (; child < tail; child = head + (((child - head) << 1) + step))
             {   
                 // the smaller child node
-                data_child = func_data(&impl->func, child);
-                if (child + step < tail && func_comp(&impl->func, data_child, (data_rchild = func_data(&impl->func, child + step))) > 0) 
+                data_child = func_data(&impl->element, child);
+                if (child + step < tail && func_comp(&impl->element, data_child, (data_rchild = func_data(&impl->element, child + step))) > 0) 
                 {
                     child += step;
                     data_child = data_rchild;
                 }
 
                 // end?
-                if (func_comp(&impl->func, data_child, data_last) > 0) break;
+                if (func_comp(&impl->element, data_child, data_last) > 0) break;
 
                 // the smaller child node => hole
                 *((tb_size_t*)hole) = *((tb_size_t*)child);
@@ -309,15 +309,15 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
             for (; child < tail; child = head + (((child - head) << 1) + step))
             {   
                 // the smaller child node
-                data_child = func_data(&impl->func, child);
-                if (child + step < tail && func_comp(&impl->func, data_child, (data_rchild = func_data(&impl->func, child + step))) > 0) 
+                data_child = func_data(&impl->element, child);
+                if (child + step < tail && func_comp(&impl->element, data_child, (data_rchild = func_data(&impl->element, child + step))) > 0) 
                 {
                     child += step;
                     data_child = data_rchild;
                 }
 
                 // end?
-                if (func_comp(&impl->func, data_child, data_last) > 0) break;
+                if (func_comp(&impl->element, data_child, data_last) > 0) break;
 
                 // the smaller child node => hole
                 tb_memcpy(hole, child, step);
@@ -342,10 +342,10 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
+tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_element_t element)
 {
     // check
-    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_null);
+    tb_assert_and_check_return_val(element.size && element.data && element.dupl && element.repl, tb_null);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -363,13 +363,13 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
         impl->size = 0;
         impl->grow = grow;
         impl->maxn = grow;
-        impl->func = func;
+        impl->element = element;
         tb_assert_and_check_break(impl->maxn < TB_HEAD_MAXN);
 
         // init iterator
         impl->itor.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
         impl->itor.priv     = tb_null;
-        impl->itor.step     = func.size;
+        impl->itor.step     = element.size;
         impl->itor.size     = tb_heap_itor_size;
         impl->itor.head     = tb_heap_itor_head;
         impl->itor.last     = tb_heap_itor_last;
@@ -382,7 +382,7 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.remove   = tb_heap_itor_remove;
 
         // make data
-        impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, func.size);
+        impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, element.size);
         tb_assert_and_check_break(impl->data);
 
         // ok
@@ -424,8 +424,8 @@ tb_void_t tb_heap_clear(tb_heap_ref_t heap)
     tb_assert_and_check_return(impl);
 
     // free data
-    if (impl->func.nfree)
-        impl->func.nfree(&impl->func, impl->data, impl->size);
+    if (impl->element.nfree)
+        impl->element.nfree(&impl->element, impl->data, impl->size);
 
     // reset size 
     impl->size = 0;
@@ -495,14 +495,14 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
         tb_assert_and_check_return(maxn < TB_HEAD_MAXN);
 
         // realloc data
-        impl->data = (tb_byte_t*)tb_ralloc(impl->data, maxn * impl->func.size);
+        impl->data = (tb_byte_t*)tb_ralloc(impl->data, maxn * impl->element.size);
         tb_assert_and_check_return(impl->data);
 
         // must be align by 4-bytes
         tb_assert_and_check_return(!(((tb_size_t)(impl->data)) & 3));
 
         // clear the grow data
-        tb_memset(impl->data + impl->size * impl->func.size, 0, (maxn - impl->maxn) * impl->func.size);
+        tb_memset(impl->data + impl->size * impl->element.size, 0, (maxn - impl->maxn) * impl->element.size);
 
         // save maxn
         impl->maxn = maxn;
@@ -511,21 +511,21 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
     // check
     tb_assert_and_check_return(impl->size < impl->maxn);
     
-    // init func
-    tb_item_func_comp_t func_comp = impl->func.comp;
-    tb_item_func_data_t func_data = impl->func.data;
+    // init element
+    tb_element_comp_func_t func_comp = impl->element.comp;
+    tb_element_data_func_t func_data = impl->element.data;
     tb_assert_and_check_return(func_comp && func_data);
 
     // walk, (hole - 1) / 2: the parent node of the hole
     tb_size_t           parent = 0;
     tb_byte_t*          head = impl->data;
     tb_size_t           hole = impl->size;
-    tb_size_t           step = impl->func.size;
+    tb_size_t           step = impl->element.size;
     switch (step)
     {
     case sizeof(tb_size_t):
         {
-            for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->func, func_data(&impl->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+            for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->element, func_data(&impl->element, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
             {
                 // move item: parent => hole
                 *((tb_size_t*)(head + hole * step)) = *((tb_size_t*)(head + parent * step));
@@ -536,7 +536,7 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
         }
         break;
     default:
-        for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->func, func_data(&impl->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+        for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->element, func_data(&impl->element, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
         {
             // move item: parent => hole
             tb_memcpy(head + hole * step, head + parent * step, step);
@@ -548,7 +548,7 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
     }
 
     // save data
-    impl->func.dupl(&impl->func, head + hole * step, data);
+    impl->element.dupl(&impl->element, head + hole * step, data);
 
     // size++
     impl->size++;
@@ -579,9 +579,9 @@ tb_void_t tb_heap_dump(tb_heap_ref_t heap)
     tb_for_all (tb_pointer_t, data, heap)
     {
         // trace
-        if (impl->func.cstr) 
+        if (impl->element.cstr) 
         {
-            tb_trace_i("    %s", impl->func.cstr(&impl->func, data, cstr, sizeof(cstr)));
+            tb_trace_i("    %s", impl->element.cstr(&impl->element, data, cstr, sizeof(cstr)));
         }
         else
         {

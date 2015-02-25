@@ -571,7 +571,7 @@ static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_ref_t list, tb_h
     if (hash)
     {
         // walk
-        tb_for_all (tb_hash_map_item_ref_t, item, hash)
+        tb_for_all (tb_hash_map_element_ref_t, item, hash)
         {
             // exit item
             if (item && item->name)
@@ -625,7 +625,7 @@ static tb_long_t tb_object_bplist_writer_done(tb_stream_ref_t stream, tb_object_
         tb_assert_and_check_break(list);
 
         // init hash
-        hash = tb_hash_map_init(0, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
+        hash = tb_hash_map_init(0, tb_element_ptr(tb_null, tb_null), tb_element_uint32());
         tb_assert_and_check_break(hash);
 
         // object maxn
@@ -762,7 +762,7 @@ tb_object_writer_t* tb_object_bplist_writer()
     s_writer.writ = tb_object_bplist_writer_done;
  
     // init hooker
-    s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
     // hook writer 

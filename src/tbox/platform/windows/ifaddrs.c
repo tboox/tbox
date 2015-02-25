@@ -32,7 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_void_t tb_ifaddrs_interface_exit(tb_item_func_t* func, tb_pointer_t buff)
+static tb_void_t tb_ifaddrs_interface_exit(tb_element_ref_t element, tb_pointer_t buff)
 {
     // check
     tb_ifaddrs_interface_ref_t interface = (tb_ifaddrs_interface_ref_t)buff;
@@ -254,7 +254,7 @@ static tb_void_t tb_ifaddrs_interface_load6(tb_list_ref_t interfaces)
 tb_ifaddrs_ref_t tb_ifaddrs_init()
 {
     // init it
-    return (tb_ifaddrs_ref_t)tb_list_init(8, tb_item_func_mem(sizeof(tb_ifaddrs_interface_t), tb_ifaddrs_interface_exit, tb_null));
+    return (tb_ifaddrs_ref_t)tb_list_init(8, tb_element_mem(sizeof(tb_ifaddrs_interface_t), tb_ifaddrs_interface_exit, tb_null));
 }
 tb_void_t tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs)
 {

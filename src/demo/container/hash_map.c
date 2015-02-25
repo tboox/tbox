@@ -39,7 +39,7 @@
 static tb_void_t tb_hash_map_test_s2i_func()
 {
     // init hash
-    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_item_func_str(tb_true), tb_item_func_long());
+    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_element_str(tb_true), tb_element_long());
     tb_assert_and_check_return(hash);
 
     // set
@@ -113,7 +113,7 @@ static tb_void_t tb_hash_map_test_s2i_func()
 static tb_void_t tb_hash_map_test_s2i_perf()
 {
     // init hash
-    tb_hash_map_ref_t hash = tb_hash_map_init(0, tb_item_func_str(tb_true), tb_item_func_long());
+    tb_hash_map_ref_t hash = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_long());
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -138,7 +138,7 @@ static tb_void_t tb_hash_map_test_s2i_perf()
 static tb_void_t tb_hash_map_test_i2s_func()
 {
     // init hash
-    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_item_func_long(), tb_item_func_str(tb_true));
+    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_element_long(), tb_element_str(tb_true));
     tb_assert_and_check_return(hash);
 
     // set
@@ -208,7 +208,7 @@ static tb_void_t tb_hash_map_test_i2s_func()
 static tb_void_t tb_hash_map_test_i2s_perf()
 {
     // init hash
-    tb_hash_map_ref_t hash = tb_hash_map_init(0, tb_item_func_long(), tb_item_func_str(tb_true));
+    tb_hash_map_ref_t hash = tb_hash_map_init(0, tb_element_long(), tb_element_str(tb_true));
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -233,7 +233,7 @@ static tb_void_t tb_hash_map_test_m2m_func()
     // init hash
     tb_size_t const step = 256;
     tb_byte_t       item[step];
-    tb_hash_map_ref_t  hash = tb_hash_map_init(8, tb_item_func_mem(step, tb_null, tb_null), tb_item_func_mem(step, tb_null, tb_null));
+    tb_hash_map_ref_t  hash = tb_hash_map_init(8, tb_element_mem(step, tb_null, tb_null), tb_element_mem(step, tb_null, tb_null));
     tb_assert_and_check_return(hash);
 
     // set
@@ -344,7 +344,7 @@ static tb_void_t tb_hash_map_test_m2m_perf()
     // init hash: mem => mem
     tb_size_t const     step = 12;
     tb_byte_t           item[step];
-    tb_hash_map_ref_t       hash = tb_hash_map_init(0, tb_item_func_mem(step, tb_null, tb_null), tb_item_func_mem(step, tb_null, tb_null));
+    tb_hash_map_ref_t       hash = tb_hash_map_init(0, tb_element_mem(step, tb_null, tb_null), tb_element_mem(step, tb_null, tb_null));
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -367,7 +367,7 @@ static tb_void_t tb_hash_map_test_m2m_perf()
 static tb_void_t tb_hash_map_test_i2i_func()
 {
     // init hash
-    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_item_func_long(), tb_item_func_long());
+    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_element_long(), tb_element_long());
     tb_assert_and_check_return(hash);
 
     // set
@@ -436,7 +436,7 @@ static tb_void_t tb_hash_map_test_i2i_func()
 static tb_void_t tb_hash_map_test_i2i_perf()
 {
     // init hash
-    tb_hash_map_ref_t  hash = tb_hash_map_init(0, tb_item_func_long(), tb_item_func_long());
+    tb_hash_map_ref_t  hash = tb_hash_map_init(0, tb_element_long(), tb_element_long());
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -459,7 +459,7 @@ static tb_void_t tb_hash_map_test_i2i_perf()
 static tb_void_t tb_hash_map_test_i2t_func()
 {
     // init hash
-    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_item_func_long(), tb_item_func_true());
+    tb_hash_map_ref_t hash = tb_hash_map_init(8, tb_element_long(), tb_element_true());
     tb_assert_and_check_return(hash);
 
     // set
@@ -529,7 +529,7 @@ static tb_void_t tb_hash_map_test_i2t_func()
 static tb_void_t tb_hash_map_test_i2t_perf()
 {
     // init hash
-    tb_hash_map_ref_t  hash = tb_hash_map_init(0, tb_item_func_long(), tb_item_func_true());
+    tb_hash_map_ref_t  hash = tb_hash_map_init(0, tb_element_long(), tb_element_true());
     tb_assert_and_check_return(hash);
 
     // clear rand
@@ -555,7 +555,7 @@ static tb_bool_t tb_hash_map_test_walk_item(tb_iterator_ref_t iterator, tb_cpoin
     // done
     tb_bool_t               ok = tb_false;
     tb_hize_t*              test = (tb_hize_t*)value;
-    tb_hash_map_item_ref_t  hash_item = (tb_hash_map_item_ref_t)item;
+    tb_hash_map_element_ref_t  hash_item = (tb_hash_map_element_ref_t)item;
     if (hash_item)
     {
         if (!(((tb_size_t)hash_item->data >> 25) & 0x1)) ok = tb_true;
@@ -573,7 +573,7 @@ static tb_bool_t tb_hash_map_test_walk_item(tb_iterator_ref_t iterator, tb_cpoin
 static tb_void_t tb_hash_map_test_walk_perf()
 {
     // init hash
-    tb_hash_map_ref_t hash = tb_hash_map_init(0, tb_item_func_long(), tb_item_func_long());
+    tb_hash_map_ref_t hash = tb_hash_map_init(0, tb_element_long(), tb_element_long());
     tb_assert_and_check_return(hash);
 
     // clear rand

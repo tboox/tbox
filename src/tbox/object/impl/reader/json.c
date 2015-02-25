@@ -544,7 +544,7 @@ tb_object_reader_t* tb_object_json_reader()
     s_reader.probe  = tb_object_json_reader_probe;
 
     // init hooker
-    s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_uint8(), tb_item_func_ptr(tb_null, tb_null));
+    s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint8(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 

@@ -27,7 +27,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "item.h"
+#include "element.h"
 #include "heap.h"
 #include "iterator.h"
 
@@ -52,12 +52,12 @@ typedef tb_heap_ref_t       tb_priority_queue_ref_t;
 
 /*! init queue, default: min-priority
  *
- * @param grow              the item grow, using the default grow if be zero
- * @param func              the item func
+ * @param grow              the element grow, using the default grow if be zero
+ * @param element           the element
  *
  * @return                  the queue
  */
-tb_priority_queue_ref_t     tb_priority_queue_init(tb_size_t grow, tb_item_func_t func);
+tb_priority_queue_ref_t     tb_priority_queue_init(tb_size_t grow, tb_element_t element);
 
 /*! exit queue
  *

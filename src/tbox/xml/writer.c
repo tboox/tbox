@@ -83,11 +83,11 @@ tb_xml_writer_ref_t tb_xml_writer_init()
         tb_assert_and_check_break(writer);
 
         // init elements
-        writer->elements    = tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false));
+        writer->elements    = tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_element_str(tb_false));
         tb_assert_and_check_break(writer->elements);
 
         // init attributes
-        writer->attributes  = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_str(tb_false), tb_item_func_str(tb_false));
+        writer->attributes  = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_str(tb_false), tb_element_str(tb_false));
         tb_assert_and_check_break(writer->attributes);
 
         // ok
@@ -361,7 +361,7 @@ tb_void_t tb_xml_writer_element_empty(tb_xml_writer_ref_t writer, tb_char_t cons
     // writ attributes
     if (tb_hash_map_size(impl->attributes))
     {
-        tb_for_all (tb_hash_map_item_ref_t, item, impl->attributes)
+        tb_for_all (tb_hash_map_element_ref_t, item, impl->attributes)
         {
             if (item && item->name && item->data)
                 tb_stream_printf(impl->stream, " %s=\"%s\"", item->name, item->data);
@@ -392,7 +392,7 @@ tb_void_t tb_xml_writer_element_enter(tb_xml_writer_ref_t writer, tb_char_t cons
     // writ attributes
     if (tb_hash_map_size(impl->attributes))
     {
-        tb_for_all (tb_hash_map_item_ref_t, item, impl->attributes)
+        tb_for_all (tb_hash_map_element_ref_t, item, impl->attributes)
         {
             if (item && item->name && item->data)
                 tb_stream_printf(impl->stream, " %s=\"%s\"", item->name, item->data);

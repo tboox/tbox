@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "item.h"
+#include "element.h"
 #include "iterator.h"
 #include "single_list.h"
 
@@ -68,11 +68,11 @@ typedef tb_single_list_ref_t   tb_queue_ref_t;
 /*! init queue
  *
  * @param grow      the grow size, using the default grow size if be zero
- * @param func      the item func
+ * @param element   the element
  *
  * @return          the queue
  */
-tb_queue_ref_t      tb_queue_init(tb_size_t grow, tb_item_func_t func);
+tb_queue_ref_t      tb_queue_init(tb_size_t grow, tb_element_t element);
 
 /*! exit queue
  *

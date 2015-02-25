@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "item.h"
+#include "element.h"
 #include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +78,11 @@ typedef tb_iterator_ref_t   tb_list_ref_t;
 /*! init list
  *
  * @param grow      the grow size
- * @param func      the item func
+ * @param element   the element
  *
  * @return          the list
  */
-tb_list_ref_t       tb_list_init(tb_size_t grow, tb_item_func_t func);
+tb_list_ref_t       tb_list_init(tb_size_t grow, tb_element_t element);
 
 /*! exit list
  *

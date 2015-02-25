@@ -80,8 +80,8 @@ typedef struct __tb_bloom_filter_impl_t
     // the maxn
     tb_size_t           maxn;
 
-    // the func
-    tb_item_func_t      func;
+    // the element
+    tb_element_t        element;
 
     // the size
     tb_size_t           size;
@@ -97,10 +97,10 @@ typedef struct __tb_bloom_filter_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_item_func_t func)
+tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t element_maxn, tb_element_t element)
 {
     // check
-    tb_assert_and_check_return_val(func.hash, tb_null);
+    tb_assert_and_check_return_val(element.hash, tb_null);
 
     // done
     tb_bool_t               ok = tb_false;
@@ -112,16 +112,16 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         tb_assert_and_check_break(hash_count && hash_count < 16);
 
         // check item maxn
-        if (!item_maxn) item_maxn = TB_BLOOM_FILTER_ITEM_MAXN_DEFAULT;
-        tb_assert_and_check_break(item_maxn < TB_MAXU32);
+        if (!element_maxn) element_maxn = TB_BLOOM_FILTER_ITEM_MAXN_DEFAULT;
+        tb_assert_and_check_break(element_maxn < TB_MAXU32);
 
         // make filter
         filter = tb_malloc0_type(tb_bloom_filter_impl_t);
         tb_assert_and_check_break(filter);
     
         // init filter
-        filter->func        = func;
-        filter->maxn        = item_maxn;
+        filter->element        = element;
+        filter->maxn        = element_maxn;
         filter->hash_count  = hash_count;
         filter->probability = probability;
 
@@ -135,7 +135,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         tb_double_t p = 1. / (tb_double_t)(1 << probability);
         tb_double_t c = tb_pow(p, 1 / k);
         tb_double_t s = (k + k) / (c + c + c * c);
-        tb_size_t   n = item_maxn;
+        tb_size_t   n = element_maxn;
         tb_size_t   m = tb_round(s * n);
         tb_trace_d("k: %lf, p: %lf, c: %lf, s: %lf => p: %lf, m: %lu, n: %lu", k, p, c, s, tb_pow((1 - tb_exp(-k / s)), k), m, n);
 #else
@@ -179,7 +179,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         };
 
         // m = (s * n) >> 16
-        tb_size_t m = tb_fixed_mul(s_scale[hash_count - 1][probability], item_maxn);
+        tb_size_t m = tb_fixed_mul(s_scale[hash_count - 1][probability], element_maxn);
 #endif
         
         // init size
@@ -251,7 +251,7 @@ tb_bool_t tb_bloom_filter_set(tb_bloom_filter_ref_t handle, tb_cpointer_t data)
     for (i = 0; i < n; i++)
     {
         // compute the bit index
-        tb_size_t index = filter->func.hash(&filter->func, data, filter->mask, i);
+        tb_size_t index = filter->element.hash(&filter->element, data, filter->mask, i);
         if (index >= (filter->size << 3)) index %= (filter->size << 3);
 
         // not exists? 
@@ -280,7 +280,7 @@ tb_bool_t tb_bloom_filter_get(tb_bloom_filter_ref_t handle, tb_cpointer_t data)
     for (i = 0; i < n; i++)
     {
         // compute the bit index
-        tb_size_t index = filter->func.hash(&filter->func, data, filter->mask, i);
+        tb_size_t index = filter->element.hash(&filter->element, data, filter->mask, i);
         if (index >= (filter->size << 3)) index %= (filter->size << 3);
 
         // not exists? break it

@@ -111,7 +111,7 @@ static __tb_inline__ tb_hong_t tb_timer_now(tb_timer_impl_t* impl)
     // using cached time
     return tb_cache_time_mclock();
 }
-static tb_long_t tb_timer_comp_by_when(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_timer_comp_by_when(tb_element_ref_t element, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // check
     tb_timer_task_impl_t const* ltask = (tb_timer_task_impl_t const*)ldata;
@@ -141,8 +141,8 @@ tb_timer_ref_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
         impl = tb_malloc0_type(tb_timer_impl_t);
         tb_assert_and_check_break(impl);
 
-        // init func
-        tb_item_func_t func = tb_item_func_ptr(tb_null, tb_null); func.comp = tb_timer_comp_by_when;
+        // init element
+        tb_element_t element = tb_element_ptr(tb_null, tb_null); element.comp = tb_timer_comp_by_when;
 
         // init timer
         impl->maxn         = tb_max(maxn, 16);
@@ -156,7 +156,7 @@ tb_timer_ref_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
         tb_assert_and_check_break(impl->pool);
         
         // init heap
-        impl->heap         = tb_heap_init((maxn >> 2) + 16, func);
+        impl->heap         = tb_heap_init((maxn >> 2) + 16, element);
         tb_assert_and_check_break(impl->heap);
 
         // register lock profiler

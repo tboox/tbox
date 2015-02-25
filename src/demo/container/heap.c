@@ -6,14 +6,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-static tb_long_t tb_test_heap_max_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_test_heap_max_comp(tb_element_ref_t element, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     return ((tb_uint32_t)(tb_size_t)ldata < (tb_uint32_t)(tb_size_t)rdata? 1 : ((tb_uint32_t)(tb_size_t)ldata > (tb_uint32_t)(tb_size_t)rdata? -1 : 0));
 }
 static tb_void_t tb_test_heap_min_func()
 {
     // init heap
-    tb_heap_ref_t heap = tb_heap_init(16, tb_item_func_uint32());
+    tb_heap_ref_t heap = tb_heap_init(16, tb_element_uint32());
     tb_assert_and_check_return(heap);
 
     // clear rand
@@ -55,7 +55,7 @@ static tb_void_t tb_test_heap_min_func()
 static tb_void_t tb_test_heap_min_perf()
 {
     // init heap
-    tb_heap_ref_t heap = tb_heap_init(4096, tb_item_func_uint32());
+    tb_heap_ref_t heap = tb_heap_init(4096, tb_element_uint32());
     tb_assert_and_check_return(heap);
 
     // clear rand
@@ -81,11 +81,11 @@ static tb_void_t tb_test_heap_min_perf()
 }
 static tb_void_t tb_test_heap_max_func()
 {
-    // init func
-    tb_item_func_t func = tb_item_func_uint32(); func.comp = tb_test_heap_max_comp;
+    // init element
+    tb_element_t element = tb_element_uint32(); element.comp = tb_test_heap_max_comp;
 
     // init heap
-    tb_heap_ref_t heap = tb_heap_init(16, func);
+    tb_heap_ref_t heap = tb_heap_init(16, element);
     tb_assert_and_check_return(heap);
 
     // clear rand
@@ -126,11 +126,11 @@ static tb_void_t tb_test_heap_max_func()
 }
 static tb_void_t tb_test_heap_max_perf()
 {
-    // init func
-    tb_item_func_t func = tb_item_func_uint32(); func.comp = tb_test_heap_max_comp;
+    // init element
+    tb_element_t element = tb_element_uint32(); element.comp = tb_test_heap_max_comp;
 
     // init heap
-    tb_heap_ref_t heap = tb_heap_init(4096, func);
+    tb_heap_ref_t heap = tb_heap_init(4096, element);
     tb_assert_and_check_return(heap);
 
     // clear rand
@@ -160,7 +160,7 @@ static tb_void_t tb_test_heap_max_perf()
  */
 tb_int_t tb_demo_container_heap_main(tb_int_t argc, tb_char_t** argv)
 {
-    // func
+    // element
     tb_test_heap_min_func();
     tb_test_heap_max_func();
 

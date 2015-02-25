@@ -99,7 +99,7 @@ static tb_bool_t tb_dns_cache_clear(tb_iterator_ref_t iterator, tb_cpointer_t it
     tb_assert_abort(item);
 
     // the dns cache address
-    tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_map_item_ref_t)item)->data;
+    tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_map_element_ref_t)item)->data;
     tb_assert_abort(caddr);
 
     // is expired?
@@ -134,7 +134,7 @@ tb_bool_t tb_dns_cache_init()
     do
     {
         // init hash
-        if (!g_cache.hash) g_cache.hash = tb_hash_map_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false), tb_item_func_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
+        if (!g_cache.hash) g_cache.hash = tb_hash_map_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_element_str(tb_false), tb_element_mem(sizeof(tb_dns_cache_addr_t), tb_null, tb_null));
         tb_assert_and_check_break(g_cache.hash);
 
         // ok

@@ -9,7 +9,7 @@
 static tb_size_t tb_stack_put_and_pop_test()
 {
     // init
-    tb_stack_ref_t stack = tb_stack_init(10, tb_item_func_long());
+    tb_stack_ref_t stack = tb_stack_init(10, tb_element_long());
     tb_assert_and_check_return_val(stack, 0);
 
     tb_stack_put(stack, (tb_pointer_t)0);
@@ -55,7 +55,7 @@ static tb_size_t tb_stack_iterator_next_test()
 {
     // init
     tb_size_t n = 1000000;
-    tb_stack_ref_t stack = tb_stack_init(n, tb_item_func_long());
+    tb_stack_ref_t stack = tb_stack_init(n, tb_element_long());
     tb_assert_and_check_return_val(stack, 0);
 
     tb_size_t i;
@@ -76,7 +76,7 @@ static tb_size_t tb_stack_iterator_prev_test()
 {
     // init
     tb_size_t n = 1000000;
-    tb_stack_ref_t stack = tb_stack_init(n, tb_item_func_long());
+    tb_stack_ref_t stack = tb_stack_init(n, tb_element_long());
     tb_assert_and_check_return_val(stack, 0);
 
     tb_size_t i;

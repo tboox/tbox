@@ -74,8 +74,8 @@ typedef struct __tb_list_impl_t
     // the head
     tb_list_entry_head_t        head;
 
-    // the func
-    tb_item_func_t              func;
+    // the element
+    tb_element_t                element;
 
 }tb_list_impl_t;
 
@@ -139,7 +139,7 @@ static tb_pointer_t tb_list_itor_item(tb_iterator_ref_t iterator, tb_size_t itor
     tb_assert_abort(impl && itor);
 
     // data
-    return impl->func.data(&impl->func, (tb_cpointer_t)(((tb_list_entry_t*)itor) + 1));
+    return impl->element.data(&impl->element, (tb_cpointer_t)(((tb_list_entry_t*)itor) + 1));
 }
 static tb_void_t tb_list_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
@@ -148,16 +148,16 @@ static tb_void_t tb_list_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, t
     tb_assert_abort(impl && itor);
 
     // copy
-    impl->func.copy(&impl->func, (tb_pointer_t)(((tb_list_entry_t*)itor) + 1), item);
+    impl->element.copy(&impl->element, (tb_pointer_t)(((tb_list_entry_t*)itor) + 1), item);
 }
 static tb_long_t tb_list_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)iterator;
-    tb_assert_abort(impl && impl->func.comp);
+    tb_assert_abort(impl && impl->element.comp);
 
     // comp
-    return impl->func.comp(&impl->func, litem, ritem);
+    return impl->element.comp(&impl->element, litem, ritem);
 }
 static tb_void_t tb_list_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
@@ -195,16 +195,16 @@ static tb_void_t tb_list_item_exit(tb_pointer_t data, tb_cpointer_t priv)
     tb_assert_and_check_return(impl);
 
     // free data
-    if (impl->func.free) impl->func.free(&impl->func, (tb_pointer_t)(((tb_list_entry_t*)data) + 1));
+    if (impl->element.free) impl->element.free(&impl->element, (tb_pointer_t)(((tb_list_entry_t*)data) + 1));
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_list_ref_t tb_list_init(tb_size_t grow, tb_item_func_t func)
+tb_list_ref_t tb_list_init(tb_size_t grow, tb_element_t element)
 {
     // check
-    tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_null);
+    tb_assert_and_check_return_val(element.size && element.data && element.dupl && element.repl, tb_null);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -218,13 +218,13 @@ tb_list_ref_t tb_list_init(tb_size_t grow, tb_item_func_t func)
         impl = tb_malloc0_type(tb_list_impl_t);
         tb_assert_and_check_break(impl);
 
-        // init func
-        impl->func = func;
+        // init element
+        impl->element = element;
 
         // init iterator
         impl->itor.mode         = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
         impl->itor.priv         = tb_null;
-        impl->itor.step         = func.size;
+        impl->itor.step         = element.size;
         impl->itor.size         = tb_list_itor_size;
         impl->itor.head         = tb_list_itor_head;
         impl->itor.last         = tb_list_itor_last;
@@ -238,11 +238,11 @@ tb_list_ref_t tb_list_init(tb_size_t grow, tb_item_func_t func)
         impl->itor.remove_range = tb_list_itor_remove_range;
 
         // init pool, item = entry + data
-        impl->pool = tb_fixed_pool_init(tb_null, grow, sizeof(tb_list_entry_t) + func.size, tb_null, tb_list_item_exit, (tb_cpointer_t)impl);
+        impl->pool = tb_fixed_pool_init(tb_null, grow, sizeof(tb_list_entry_t) + element.size, tb_null, tb_list_item_exit, (tb_cpointer_t)impl);
         tb_assert_and_check_break(impl->pool);
 
         // init head
-        tb_list_entry_init_(&impl->head, 0, sizeof(tb_list_entry_t) + func.size, tb_null);
+        tb_list_entry_init_(&impl->head, 0, sizeof(tb_list_entry_t) + element.size, tb_null);
 
         // ok
         ok = tb_true;
@@ -314,7 +314,7 @@ tb_size_t tb_list_insert_prev(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t 
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)list;
-    tb_assert_and_check_return_val(impl && impl->func.dupl && impl->pool, 0);
+    tb_assert_and_check_return_val(impl && impl->element.dupl && impl->pool, 0);
 
     // full?
     tb_assert_and_check_return_val(tb_list_size(list) < tb_list_maxn(list), tb_iterator_tail(list));
@@ -328,7 +328,7 @@ tb_size_t tb_list_insert_prev(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t 
     tb_assert_and_check_return_val(entry, tb_iterator_tail(list));
 
     // init entry data
-    impl->func.dupl(&impl->func, (tb_pointer_t)(((tb_list_entry_t*)entry) + 1), data);
+    impl->element.dupl(&impl->element, (tb_pointer_t)(((tb_list_entry_t*)entry) + 1), data);
 
     // insert it
     tb_list_entry_insert_prev(&impl->head, node, entry);
@@ -352,14 +352,14 @@ tb_void_t tb_list_replace(tb_list_ref_t list, tb_size_t itor, tb_cpointer_t data
 {
     // check
     tb_list_impl_t* impl = (tb_list_impl_t*)list;
-    tb_assert_and_check_return(impl && impl->func.repl && itor);
+    tb_assert_and_check_return(impl && impl->element.repl && itor);
 
     // the node
     tb_list_entry_ref_t node = (tb_list_entry_ref_t)itor;
     tb_assert_and_check_return(node);
 
     // replace data
-    impl->func.repl(&impl->func, (tb_pointer_t)(((tb_list_entry_t*)node) + 1), data);
+    impl->element.repl(&impl->element, (tb_pointer_t)(((tb_list_entry_t*)node) + 1), data);
 }
 tb_void_t tb_list_replace_head(tb_list_ref_t list, tb_cpointer_t data)
 {
@@ -443,9 +443,9 @@ tb_void_t tb_list_dump(tb_list_ref_t list)
     tb_for_all (tb_pointer_t, data, list)
     {
         // trace
-        if (impl->func.cstr) 
+        if (impl->element.cstr) 
         {
-            tb_trace_i("    %s", impl->func.cstr(&impl->func, data, cstr, sizeof(cstr)));
+            tb_trace_i("    %s", impl->element.cstr(&impl->element, data, cstr, sizeof(cstr)));
         }
         else
         {
