@@ -87,28 +87,28 @@ tb_size_t                   tb_priority_queue_size(tb_priority_queue_ref_t queue
  */
 tb_size_t                   tb_priority_queue_maxn(tb_priority_queue_ref_t queue);
 
-/*! get the queue item
+/*! get the queue element
  *
  * @param queue             the queue
  *
- * @return                  the queue top item
+ * @return                  the queue top element
  */
 tb_pointer_t                tb_priority_queue_get(tb_priority_queue_ref_t queue);
 
-/*! put the queue item
+/*! put the queue element
  *
  * @param queue             the queue
- * @param data              the item data
+ * @param data              the element data
  */
 tb_void_t                   tb_priority_queue_put(tb_priority_queue_ref_t queue, tb_cpointer_t data);
 
-/*! pop the queue item
+/*! pop the queue element
  *
  * @param queue             the queue
  */
 tb_void_t                   tb_priority_queue_pop(tb_priority_queue_ref_t queue);
 
-/*! remove the queue item
+/*! remove the queue element
  *
  * @param queue             the queue
  * @param itor              the itor
