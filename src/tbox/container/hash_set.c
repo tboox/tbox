@@ -51,7 +51,7 @@ static tb_pointer_t tb_hash_set_itor_item(tb_iterator_ref_t iterator, tb_size_t 
     gb_hash_map_item_func_t func = (gb_hash_map_item_func_t)iterator->priv;
 
     // get the item of the hash map
-    tb_hash_map_element_ref_t item = func(iterator, itor);
+    tb_hash_map_element_ref_t item = (tb_hash_map_element_ref_t)func(iterator, itor);
     
     // get the item of the hash set
     return item? item->name : tb_null;
