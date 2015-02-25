@@ -58,7 +58,7 @@ __tb_extern_c_enter__
  * prev:    fast
  * </pre>
  *
- * @note the itor of the same item is fixed
+ * @note the itor of the same element is fixed
  *
  */
 typedef tb_vector_ref_t tb_stack_ref_t;
@@ -82,19 +82,19 @@ tb_stack_ref_t      tb_stack_init(tb_size_t grow, tb_element_t element);
  */
 tb_void_t           tb_stack_exit(tb_stack_ref_t stack);
 
-/*! the stack head item
+/*! the stack head element
  *
  * @param stack     the stack
  *
- * @return          the head item
+ * @return          the head element
  */
 tb_pointer_t        tb_stack_head(tb_stack_ref_t stack);
 
-/*! the stack last item
+/*! the stack last element
  *
  * @param stack     the stack
  *
- * @return          the last item
+ * @return          the last element
  */
 tb_pointer_t        tb_stack_last(tb_stack_ref_t stack);
 
@@ -111,24 +111,24 @@ tb_void_t           tb_stack_clear(tb_stack_ref_t stack);
  */
 tb_void_t           tb_stack_copy(tb_stack_ref_t stack, tb_stack_ref_t copy);
 
-/*! put the stack item
+/*! put the stack element
  *
  * @param stack     the stack
- * @param data      the item data
+ * @param data      the element data
  */
 tb_void_t           tb_stack_put(tb_stack_ref_t stack, tb_cpointer_t data);
 
-/*! pop the stack item
+/*! pop the stack element
  *
  * @param stack     the stack
  */
 tb_void_t           tb_stack_pop(tb_stack_ref_t stack);
 
-/*! the stack top item
+/*! the stack top element
  *
  * @param stack     the stack
  *
- * @return          the stack top item
+ * @return          the stack top element
  */
 tb_pointer_t        tb_stack_top(tb_stack_ref_t stack);
 

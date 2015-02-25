@@ -71,7 +71,7 @@ __tb_extern_c_enter__
  *
  * </pre>
  *
- * @note the itor of the same item is mutable
+ * @note the itor of the same element is mutable
  */
 typedef tb_iterator_ref_t tb_heap_ref_t;
 
@@ -116,28 +116,28 @@ tb_size_t           tb_heap_size(tb_heap_ref_t heap);
  */
 tb_size_t           tb_heap_maxn(tb_heap_ref_t heap);
 
-/*! the heap top item
+/*! the heap top element
  *
  * @param heap      the heap
  *
- * @return          the heap top item
+ * @return          the heap top element
  */
 tb_pointer_t        tb_heap_top(tb_heap_ref_t heap);
 
-/*! put the heap item
+/*! put the heap element
  *
  * @param heap      the heap
- * @param data      the item data
+ * @param data      the element data
  */
 tb_void_t           tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data);
 
-/*! pop the heap item
+/*! pop the heap element
  *
  * @param heap      the heap
  */
 tb_void_t           tb_heap_pop(tb_heap_ref_t heap);
 
-/*! remove the heap item using iterator only for algorithm(find, ...)
+/*! remove the heap element using iterator only for algorithm(find, ...)
  *
  * @param heap      the heap
  * @param itor      the itor

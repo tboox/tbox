@@ -53,7 +53,7 @@ __tb_extern_c_enter__
 
 /*! the hash set ref type
  *
- * @note the itor of the same item is mutable
+ * @note the itor of the same element is mutable
  */
 typedef tb_iterator_ref_t tb_hash_set_ref_t;
 
@@ -82,7 +82,7 @@ tb_void_t               tb_hash_set_exit(tb_hash_set_ref_t hash_set);
  */
 tb_void_t               tb_hash_set_clear(tb_hash_set_ref_t hash_set);
 
-/*! get item?
+/*! get element?
  *
  * @code
  * if (tb_hash_set_get(hash_set, name))
@@ -91,17 +91,17 @@ tb_void_t               tb_hash_set_clear(tb_hash_set_ref_t hash_set);
  * @endcode
  *
  * @param hash_set      the hash set
- * @param data          the item data
+ * @param data          the element data
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_hash_set_get(tb_hash_set_ref_t hash_set, tb_cpointer_t data);
 
-/*! find item 
+/*! find element 
  *
  * @code
  *
- * // find item
+ * // find element
  * tb_size_t itor = tb_hash_set_find(hash_set, name);
  * if (itor != tb_iterator_tail(hash_set))
  * {
@@ -111,27 +111,27 @@ tb_bool_t               tb_hash_set_get(tb_hash_set_ref_t hash_set, tb_cpointer_
  * @endcode
  *
  * @param hash_set      the hash set
- * @param data          the item data
+ * @param data          the element data
  *
- * @return              the item itor, @note: the itor of the same item is mutable
+ * @return              the element itor, @note: the itor of the same element is mutable
  */
 tb_size_t               tb_hash_set_find(tb_hash_set_ref_t hash_set, tb_cpointer_t data);
 
-/*! insert item
+/*! insert element
  *
- * @note each item is unique
+ * @note each element is unique
  *
  * @param hash_set      the hash set
- * @param data          the item data
+ * @param data          the element data
  *
- * @return              the item itor, @note: the itor of the same item is mutable
+ * @return              the element itor, @note: the itor of the same element is mutable
  */
 tb_size_t               tb_hash_set_insert(tb_hash_set_ref_t hash_set, tb_cpointer_t data);
 
-/*! remove item
+/*! remove element
  *
  * @param hash_set      the hash set
- * @param data          the item data
+ * @param data          the element data
  */
 tb_void_t               tb_hash_set_remove(tb_hash_set_ref_t hash_set, tb_cpointer_t data);
 

@@ -61,7 +61,7 @@ __tb_extern_c_enter__
  *
  * </pre>
  *
- * @note the index of the same item is mutable
+ * @note the index of the same element is mutable
  *
  */
 typedef tb_iterator_ref_t   tb_circle_queue_ref_t;
@@ -85,19 +85,19 @@ tb_circle_queue_ref_t   tb_circle_queue_init(tb_size_t maxn, tb_element_t elemen
  */
 tb_void_t               tb_circle_queue_exit(tb_circle_queue_ref_t queue);
 
-/*! the queue head item
+/*! the queue head element
  *
  * @param queue         the queue
  *
- * @return              the head item
+ * @return              the head element
  */
 tb_pointer_t            tb_circle_queue_head(tb_circle_queue_ref_t queue);
 
-/*! the queue last item
+/*! the queue last element
  *
  * @param queue         the queue
  *
- * @return              the last item
+ * @return              the last element
  */
 tb_pointer_t            tb_circle_queue_last(tb_circle_queue_ref_t queue);
 
@@ -107,24 +107,24 @@ tb_pointer_t            tb_circle_queue_last(tb_circle_queue_ref_t queue);
  */
 tb_void_t               tb_circle_queue_clear(tb_circle_queue_ref_t queue);
 
-/*! put the queue item
+/*! put the queue element
  *
  * @param queue         the queue
- * @param data          the item data
+ * @param data          the element data
  */
 tb_void_t               tb_circle_queue_put(tb_circle_queue_ref_t queue, tb_cpointer_t data);
 
-/*! pop the queue item
+/*! pop the queue element
  *
  * @param queue         the queue
  */
 tb_void_t               tb_circle_queue_pop(tb_circle_queue_ref_t queue);
 
-/*! get the queue item
+/*! get the queue element
  *
  * @param queue         the queue
  *
- * @return              the queue item
+ * @return              the queue element
  */
 tb_pointer_t            tb_circle_queue_get(tb_circle_queue_ref_t queue);
 

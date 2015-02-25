@@ -93,98 +93,98 @@ tb_void_t               tb_single_list_exit(tb_single_list_ref_t list);
  */
 tb_void_t               tb_single_list_clear(tb_single_list_ref_t list);
 
-/*! the list head item
+/*! the list head element
  *
  * @param list          the list
  *
- * @return              the head item
+ * @return              the head element
  */
 tb_pointer_t            tb_single_list_head(tb_single_list_ref_t list);
 
-/*! the list last item
+/*! the list last element
  *
  * @param list          the list
  *
- * @return              the last item
+ * @return              the last element
  */
 tb_pointer_t            tb_single_list_last(tb_single_list_ref_t list);
 
-/*! insert the next item
+/*! insert the next element
  *
  * @param list          the list
- * @param itor          the item itor
- * @param data          the item data
+ * @param itor          the element itor
+ * @param data          the element data
  *
- * @return              the item itor
+ * @return              the element itor
  */
 tb_size_t               tb_single_list_insert_next(tb_single_list_ref_t list, tb_size_t itor, tb_cpointer_t data);
 
-/*! insert the head item
+/*! insert the head element
  *
  * @param list          the list
- * @param data          the item data
+ * @param data          the element data
  *
- * @return              the item itor
+ * @return              the element itor
  */
 tb_size_t               tb_single_list_insert_head(tb_single_list_ref_t list, tb_cpointer_t data);
 
-/*! insert the tail item
+/*! insert the tail element
  *
  * @param list          the list
- * @param data          the item data
+ * @param data          the element data
  *
- * @return              the item itor
+ * @return              the element itor
  */
 tb_size_t               tb_single_list_insert_tail(tb_single_list_ref_t list, tb_cpointer_t data);
 
-/*! replace the item
+/*! replace the element
  *
  * @param list          the list
- * @param itor          the item itor
- * @param data          the item data
+ * @param itor          the element itor
+ * @param data          the element data
  */
 tb_void_t               tb_single_list_replace(tb_single_list_ref_t list, tb_size_t itor, tb_cpointer_t data);
 
-/*! replace the head item
+/*! replace the head element
  *
  * @param list          the list
- * @param data          the item data
+ * @param data          the element data
  */
 tb_void_t               tb_single_list_replace_head(tb_single_list_ref_t list, tb_cpointer_t data);
 
-/*! replace the tail item
+/*! replace the tail element
  *
  * @param list          the list
- * @param data          the item data
+ * @param data          the element data
  */
 tb_void_t               tb_single_list_replace_last(tb_single_list_ref_t list, tb_cpointer_t data);
 
-/*! remove the next item
+/*! remove the next element
  *
  * @param list          the list
- * @param itor          the item itor
+ * @param itor          the element itor
  */
 tb_void_t               tb_single_list_remove_next(tb_single_list_ref_t list, tb_size_t itor);
 
-/*! remove the head item
+/*! remove the head element
  *
  * @param list          the list
  */
 tb_void_t               tb_single_list_remove_head(tb_single_list_ref_t list);
 
-/*! the item count
+/*! the element count
  *
  * @param list          the list
  *
- * @return              the item count
+ * @return              the element count
  */
 tb_size_t               tb_single_list_size(tb_single_list_ref_t list);
 
-/*! the item max count
+/*! the element max count
  *
  * @param list          the list
  *
- * @return              the item max count
+ * @return              the element max count
  */
 tb_size_t               tb_single_list_maxn(tb_single_list_ref_t list);
 
