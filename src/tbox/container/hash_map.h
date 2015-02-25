@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "item.h"
+#include "element.h"
 #include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -53,16 +53,16 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the hash map item type
-typedef struct __tb_hash_map_item_t
+/// the hash map element type
+typedef struct __tb_hash_map_element_t
 {
-    /// the item name
+    /// the element name
     tb_pointer_t        name;
 
-    /// the item data
+    /// the element data
     tb_pointer_t        data;
 
-}tb_hash_map_item_t, *tb_hash_map_item_ref_t;
+}tb_hash_map_element_t, *tb_hash_map_element_ref_t;
 
 /*! the hash map ref type
  *
@@ -101,12 +101,12 @@ typedef tb_iterator_ref_t tb_hash_map_ref_t;
 /*! init hash map
  *
  * @param bucket_size   the hash bucket size, using the default size if be zero
- * @param name_func     the item name func
- * @param data_func     the item data func
+ * @param element_name  the element for name
+ * @param element_data  the element for data
  *
  * @return              the hash map
  */
-tb_hash_map_ref_t       tb_hash_map_init(tb_size_t bucket_size, tb_item_func_t name_func, tb_item_func_t data_func);
+tb_hash_map_ref_t       tb_hash_map_init(tb_size_t bucket_size, tb_element_t element_name, tb_element_t element_data);
 
 /*! exit hash map
  *

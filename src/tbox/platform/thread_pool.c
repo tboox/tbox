@@ -405,11 +405,11 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
         tb_msleep((worker->id + 1)* 20);
 
         // init jobs
-        worker->jobs = tb_vector_init(TB_THREAD_POOL_JOBS_WORKING_GROW, tb_item_func_ptr(tb_null, tb_null));
+        worker->jobs = tb_vector_init(TB_THREAD_POOL_JOBS_WORKING_GROW, tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(worker->jobs);
 
         // init stats
-        worker->stats = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_mem(sizeof(tb_thread_pool_job_stats_t), tb_null, tb_null));
+        worker->stats = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_ptr(tb_null, tb_null), tb_element_mem(sizeof(tb_thread_pool_job_stats_t), tb_null, tb_null));
         tb_assert_and_check_break(worker->stats);
         
         // loop
@@ -523,9 +523,9 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
                     // exists? update time and count
                     tb_size_t               itor;
-                    tb_hash_map_item_ref_t  item = tb_null;
+                    tb_hash_map_element_ref_t  item = tb_null;
                     if (    ((itor = tb_hash_map_find(worker->stats, job->task.done)) != tb_iterator_tail(worker->stats))
-                        &&  (item = (tb_hash_map_item_ref_t)tb_iterator_item(worker->stats, itor)))
+                        &&  (item = (tb_hash_map_element_ref_t)tb_iterator_item(worker->stats, itor)))
                     {
                         // the stats
                         tb_thread_pool_job_stats_t* stats = (tb_thread_pool_job_stats_t*)item->data;

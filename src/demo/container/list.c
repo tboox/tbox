@@ -9,7 +9,7 @@
 static tb_void_t tb_list_insert_prev_test()
 {
     // init list
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -39,7 +39,7 @@ static tb_void_t tb_list_insert_prev_test()
 static tb_void_t tb_list_insert_next_test()
 {
     // init list
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -69,7 +69,7 @@ static tb_void_t tb_list_insert_next_test()
 static tb_void_t tb_list_insert_head_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // done
@@ -96,7 +96,7 @@ static tb_void_t tb_list_insert_head_test()
 static tb_void_t tb_list_insert_tail_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // done
@@ -123,7 +123,7 @@ static tb_void_t tb_list_insert_tail_test()
 static tb_void_t tb_list_remove_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -149,7 +149,7 @@ static tb_void_t tb_list_remove_test()
 static tb_void_t tb_list_remove_head_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -174,7 +174,7 @@ static tb_void_t tb_list_remove_head_test()
 static tb_void_t tb_list_remove_last_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -199,7 +199,7 @@ static tb_void_t tb_list_remove_last_test()
 static tb_void_t tb_list_replace_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -228,7 +228,7 @@ static tb_void_t tb_list_replace_test()
 static tb_void_t tb_list_replace_head_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -254,7 +254,7 @@ static tb_void_t tb_list_replace_head_test()
 static tb_void_t tb_list_replace_last_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // make list
@@ -280,7 +280,7 @@ static tb_void_t tb_list_replace_last_test()
 static tb_void_t tb_list_iterator_next_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_size());
+    tb_list_ref_t list = tb_list_init(0, tb_element_size());
     tb_assert_and_check_return(list);
 
     // make list
@@ -302,7 +302,7 @@ static tb_void_t tb_list_iterator_next_test()
 static tb_void_t tb_list_iterator_prev_test()
 {
     // init
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_size());
+    tb_list_ref_t list = tb_list_init(0, tb_element_size());
     tb_assert_and_check_return(list);
 
     // make list
@@ -342,7 +342,7 @@ static tb_void_t tb_list_int_test()
     do
     {
         // init list
-        list = tb_list_init(0, tb_item_func_long());
+        list = tb_list_init(0, tb_element_long());
         tb_assert_and_check_break(list);
 
         // trace
@@ -496,7 +496,7 @@ static tb_void_t tb_list_str_test()
     do
     {
         // init list
-        list = tb_list_init(0, tb_item_func_str(tb_true));
+        list = tb_list_init(0, tb_element_str(tb_true));
         tb_assert_and_check_break(list);
 
         // trace
@@ -628,9 +628,9 @@ static tb_void_t tb_list_str_test()
     // exit list
     if (list) tb_list_exit(list);
 }
-static tb_void_t tb_list_mem_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_void_t tb_list_mem_free(tb_element_ref_t element, tb_pointer_t buff)
 {
-    tb_trace_i("ifm free: %s, priv: %s", item, func->priv);
+    tb_trace_i("ifm free: %s, priv: %s", buff, element->priv);
 }
 static tb_void_t tb_list_mem_dump(tb_list_ref_t list)
 {
@@ -653,7 +653,7 @@ static tb_void_t tb_list_mem_test()
     do
     {
         // init list
-        list = tb_list_init(0, tb_item_func_mem(11, tb_list_mem_free, "mem"));
+        list = tb_list_init(0, tb_element_mem(11, tb_list_mem_free, "mem"));
         tb_assert_and_check_break(list);
 
         // trace
@@ -826,7 +826,7 @@ static tb_bool_t tb_list_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_
 static tb_void_t tb_list_walk_perf()
 {
     // init list
-    tb_list_ref_t list = tb_list_init(0, tb_item_func_long());
+    tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
     // clear rand

@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_char_t const* tb_item_func_obj_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
+static tb_char_t const* tb_element_obj_cstr(tb_element_ref_t element, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(cstr, "");
@@ -41,43 +41,43 @@ static tb_char_t const* tb_item_func_obj_cstr(tb_item_func_t* func, tb_cpointer_
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_void_t tb_item_func_obj_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_void_t tb_element_obj_free(tb_element_ref_t element, tb_pointer_t buff)
 {
     // check
-    tb_assert_and_check_return(func && item);
+    tb_assert_and_check_return(element && buff);
 
     // exit
-    tb_object_ref_t object = *((tb_object_ref_t*)item);
+    tb_object_ref_t object = *((tb_object_ref_t*)buff);
     if (object)
     {
         tb_object_exit(object);
-        *((tb_object_ref_t*)item) = tb_null;
+        *((tb_object_ref_t*)buff) = tb_null;
     }
 }
-static tb_void_t tb_item_func_obj_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_element_obj_dupl(tb_element_ref_t element, tb_pointer_t buff, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && item);
+    tb_assert_and_check_return(element && buff);
 
     // refn++
     if (data) tb_object_inc((tb_object_ref_t)data);
 
     // copy it
-    *((tb_cpointer_t*)item) = data;
+    *((tb_cpointer_t*)buff) = data;
 }
-static tb_void_t tb_item_func_obj_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_element_obj_repl(tb_element_ref_t element, tb_pointer_t buff, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(func && item);
+    tb_assert_and_check_return(element && buff);
 
     // save the previous object
-    tb_object_ref_t object = *((tb_object_ref_t*)item);
+    tb_object_ref_t object = *((tb_object_ref_t*)buff);
 
     // refn++
     if (data) tb_object_inc((tb_object_ref_t)data);
 
     // copy it
-    *((tb_cpointer_t*)item) = data;
+    *((tb_cpointer_t*)buff) = data;
 
     // refn--
     if (object) tb_object_dec(object);
@@ -86,32 +86,32 @@ static tb_void_t tb_item_func_obj_repl(tb_item_func_t* func, tb_pointer_t item, 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_item_func_t tb_item_func_obj()
+tb_element_t tb_element_obj()
 {
-    // the ptr func
-    tb_item_func_t func_ptr = tb_item_func_ptr(tb_null, tb_null);
+    // the ptr element
+    tb_element_t element_ptr = tb_element_ptr(tb_null, tb_null);
 
-    // the str func
-    tb_item_func_t func_str = tb_item_func_str(tb_true);
+    // the str element
+    tb_element_t element_str = tb_element_str(tb_true);
 
-    // init func
-    tb_item_func_t func = {0};
-    func.type   = TB_ITEM_TYPE_OBJ;
-    func.flag   = 0;
-    func.hash   = func_ptr.hash;
-    func.comp   = func_ptr.comp;
-    func.data   = func_ptr.data;
-    func.cstr   = tb_item_func_obj_cstr;
-    func.free   = tb_item_func_obj_free;
-    func.dupl   = tb_item_func_obj_dupl;
-    func.repl   = tb_item_func_obj_repl;
-    func.copy   = func_ptr.copy;
-    func.nfree  = func_str.nfree;
-    func.ndupl  = func_str.ndupl;
-    func.nrepl  = func_str.nrepl;
-    func.ncopy  = func_ptr.ncopy;
-    func.size   = sizeof(tb_object_ref_t);
+    // init element
+    tb_element_t element = {0};
+    element.type   = TB_ELEMENT_TYPE_OBJ;
+    element.flag   = 0;
+    element.hash   = element_ptr.hash;
+    element.comp   = element_ptr.comp;
+    element.data   = element_ptr.data;
+    element.cstr   = tb_element_obj_cstr;
+    element.free   = tb_element_obj_free;
+    element.dupl   = tb_element_obj_dupl;
+    element.repl   = tb_element_obj_repl;
+    element.copy   = element_ptr.copy;
+    element.nfree  = element_str.nfree;
+    element.ndupl  = element_str.ndupl;
+    element.nrepl  = element_str.nrepl;
+    element.ncopy  = element_ptr.ncopy;
+    element.size   = sizeof(tb_object_ref_t);
     
     // ok?
-    return func;
+    return element;
 }

@@ -50,16 +50,16 @@ static tb_spinlock_t            g_lock = TB_SPINLOCK_INIT;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * callback
  */
-static tb_void_t tb_thread_store_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_void_t tb_thread_store_free(tb_element_ref_t element, tb_pointer_t buff)
 {
     // data item
-    tb_thread_store_data_t* data = item? *((tb_thread_store_data_t**)item) : tb_null;
+    tb_thread_store_data_t* data = buff? *((tb_thread_store_data_t**)buff) : tb_null;
 
     // free data
     if (data && data->free) data->free(data); 
 
-    // clear item
-    if (item) *((tb_thread_store_data_t**)item) = tb_null;
+    // clear it
+    if (buff) *((tb_thread_store_data_t**)buff) = tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ tb_bool_t tb_thread_store_init()
     if (!g_store) 
     {
         // init store
-        g_store = tb_hash_map_init(8, tb_item_func_size(), tb_item_func_ptr(tb_thread_store_free, tb_null));
+        g_store = tb_hash_map_init(8, tb_element_size(), tb_element_ptr(tb_thread_store_free, tb_null));
     }
 
     // leave lock

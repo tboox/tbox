@@ -156,11 +156,11 @@ tb_object_ref_t tb_object_array_init(tb_size_t grow, tb_bool_t incr)
         array = tb_object_array_init_base();
         tb_assert_and_check_break(array);
 
-        // init item func
-        tb_item_func_t func = tb_item_func_obj();
+        // init element
+        tb_element_t element = tb_element_obj();
 
         // init vector
-        array->vector = tb_vector_init(grow, func);
+        array->vector = tb_vector_init(grow, element);
         tb_assert_and_check_break(array->vector);
 
         // init incr

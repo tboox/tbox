@@ -346,8 +346,8 @@ static tb_long_t tb_object_bin_writer_done(tb_stream_ref_t stream, tb_object_ref
     {
         // init writer
         writer.stream           = stream;
-        writer.ohash            = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
-        writer.shash            = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_str(tb_true), tb_item_func_uint32());
+        writer.ohash            = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_ptr(tb_null, tb_null), tb_element_uint32());
+        writer.shash            = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_str(tb_true), tb_element_uint32());
         tb_assert_and_check_break(writer.shash && writer.ohash);
 
         // writ
@@ -384,7 +384,7 @@ tb_object_writer_t* tb_object_bin_writer()
     s_writer.writ = tb_object_bin_writer_done;
  
     // init hooker
-    s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
     // hook writer 

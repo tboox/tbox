@@ -74,7 +74,7 @@ typedef struct __tb_exception_list_t
             { \
                 __l->base.type = TB_THREAD_STORE_DATA_TYPE_EXCEPTION; \
                 __l->base.free = tb_exception_list_free; \
-                __l->stack = tb_stack_init(16, tb_item_func_mem(sizeof(tb_sigjmpbuf_t), tb_null, tb_null)); \
+                __l->stack = tb_stack_init(16, tb_element_mem(sizeof(tb_sigjmpbuf_t), tb_null, tb_null)); \
                 tb_thread_store_setp((tb_thread_store_data_t const*)__l); \
             } \
         } \

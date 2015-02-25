@@ -81,8 +81,8 @@ typedef struct __tb_cookies_impl_t
     // the lock
     tb_spinlock_t           lock;
 
-    // the string func
-    tb_item_func_t          string_func;
+    // the string element
+    tb_element_t            string_element;
 
     // the string pool
     tb_string_pool_ref_t    string_pool;
@@ -216,38 +216,38 @@ static tb_void_t tb_cookies_entry_exit(tb_cookies_impl_t* impl, tb_cookies_entry
     if (entry->value) tb_string_pool_remove(impl->string_pool, entry->value);
     entry->value = tb_null;
 }
-static tb_void_t tb_cookies_entry_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_void_t tb_cookies_entry_free(tb_element_ref_t element, tb_pointer_t buff)
 {
     // check
-    tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)item;
-    tb_assert_and_check_return(func && entry);
+    tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)buff;
+    tb_assert_and_check_return(element && entry);
 
     // the impl
-    tb_cookies_impl_t* impl = (tb_cookies_impl_t*)func->priv;
+    tb_cookies_impl_t* impl = (tb_cookies_impl_t*)element->priv;
     tb_assert_and_check_return(impl && impl->string_pool);
 
     // exit it
     tb_cookies_entry_exit(impl, entry);
 }
-static tb_size_t tb_cookies_entry_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
+static tb_size_t tb_cookies_entry_hash(tb_element_ref_t element, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
 {
     // check
     tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)data;
-    tb_assert_and_check_return_val(func && entry && entry->domain && entry->path && entry->name, 0);
+    tb_assert_and_check_return_val(element && entry && entry->domain && entry->path && entry->name, 0);
 
     // the impl
-    tb_cookies_impl_t* impl = (tb_cookies_impl_t*)func->priv;
-    tb_assert_and_check_return_val(impl && impl->string_func.hash, 0);
+    tb_cookies_impl_t* impl = (tb_cookies_impl_t*)element->priv;
+    tb_assert_and_check_return_val(impl && impl->string_element.hash, 0);
 
     // compute the three hash values
-    tb_size_t v0 = impl->string_func.hash(&impl->string_func, entry->domain, mask, index);
-    tb_size_t v1 = impl->string_func.hash(&impl->string_func, entry->path, mask, index);
-    tb_size_t v2 = impl->string_func.hash(&impl->string_func, entry->name, mask, index);
+    tb_size_t v0 = impl->string_element.hash(&impl->string_element, entry->domain, mask, index);
+    tb_size_t v1 = impl->string_element.hash(&impl->string_element, entry->path, mask, index);
+    tb_size_t v2 = impl->string_element.hash(&impl->string_element, entry->name, mask, index);
 
     // the hash value
     return (v0 ^ v1 ^ v2) & mask;
 }
-static tb_long_t tb_cookies_entry_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_cookies_entry_comp(tb_element_ref_t element, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // check
     tb_cookies_entry_ref_t lentry = (tb_cookies_entry_ref_t)ldata;
@@ -523,14 +523,14 @@ tb_cookies_ref_t tb_cookies_init()
         tb_assert_and_check_break(impl->string_pool);
 
         // init cookie pool
-        tb_item_func_t func = tb_item_func_mem(sizeof(tb_cookies_entry_t), tb_cookies_entry_free, impl);
-        func.hash = tb_cookies_entry_hash;
-        func.comp = tb_cookies_entry_comp;
-        impl->cookie_pool = tb_hash_set_init(TB_HASH_SET_BUCKET_SIZE_MICRO, func);
+        tb_element_t element = tb_element_mem(sizeof(tb_cookies_entry_t), tb_cookies_entry_free, impl);
+        element.hash = tb_cookies_entry_hash;
+        element.comp = tb_cookies_entry_comp;
+        impl->cookie_pool = tb_hash_set_init(TB_HASH_SET_BUCKET_SIZE_MICRO, element);
         tb_assert_and_check_break(impl->cookie_pool);
 
-        // init string func
-        impl->string_func = tb_item_func_str(tb_true);
+        // init string element
+        impl->string_element = tb_element_str(tb_true);
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE

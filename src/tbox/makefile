@@ -74,17 +74,17 @@ tbox_C_FILES 			+= \
 						container/iterator/mem \
 						container/iterator/long \
 						container/iterator/size \
-						container/item/str \
-						container/item/ptr \
-						container/item/mem \
-						container/item/hash \
-						container/item/true \
-						container/item/null \
-						container/item/long \
-						container/item/size \
-						container/item/uint8 \
-						container/item/uint16 \
-						container/item/uint32 \
+						container/element/str \
+						container/element/ptr \
+						container/element/mem \
+						container/element/hash \
+						container/element/true \
+						container/element/null \
+						container/element/long \
+						container/element/size \
+						container/element/uint8 \
+						container/element/uint16 \
+						container/element/uint32 \
 						network/network \
 						network/dns/cache \
 						network/dns/server \
@@ -337,7 +337,7 @@ endif
 ifeq ($(TB_CONFIG_MODULE_HAVE_OBJECT),y)
 tbox_C_FILES 			+= \
 						utils/option \
-						container/item/obj \
+						container/element/obj \
 						object/object \
 						object/null \
 						object/data \
@@ -511,7 +511,7 @@ tbox_INC_FILES 			= \
 						algorithm/predicate.h \
 						container/prefix.h \
 						container/container.h \
-						container/item.h \
+						container/element.h \
 						container/heap.h \
 						container/stack.h \
 						container/vector.h \

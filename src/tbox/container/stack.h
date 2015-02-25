@@ -28,7 +28,7 @@
  * includes
  */
 #include "vector.h"
-#include "item.h"
+#include "element.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -69,12 +69,12 @@ typedef tb_vector_ref_t tb_stack_ref_t;
 
 /*! init stack
  *
- * @param grow      the item grow
- * @param func      the item func
+ * @param grow      the element grow
+ * @param element   the element
  *
  * @return          the stack
  */
-tb_stack_ref_t      tb_stack_init(tb_size_t grow, tb_item_func_t func);
+tb_stack_ref_t      tb_stack_init(tb_size_t grow, tb_element_t element);
 
 /*! exit stack
  *

@@ -30,23 +30,23 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_item_func_long_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_element_long_comp(tb_element_ref_t element, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
     // compare it
     return ((tb_long_t)ldata < (tb_long_t)rdata)? -1 : ((tb_long_t)ldata > (tb_long_t)rdata);
 }
-static tb_pointer_t tb_item_func_long_data(tb_item_func_t* func, tb_cpointer_t buff)
+static tb_pointer_t tb_element_long_data(tb_element_ref_t element, tb_cpointer_t buff)
 {
     // check
     tb_assert_and_check_return_val(buff, tb_null);
 
-    // the item data
+    // the element data
     return (tb_pointer_t)*((tb_long_t*)buff);
 }
-static tb_char_t const* tb_item_func_long_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
+static tb_char_t const* tb_element_long_cstr(tb_element_ref_t element, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(func && cstr, "");
+    tb_assert_and_check_return_val(element && cstr, "");
 
     // format string
     tb_long_t n = tb_snprintf(cstr, maxn, "%ld", (tb_long_t)data);
@@ -55,7 +55,7 @@ static tb_char_t const* tb_item_func_long_cstr(tb_item_func_t* func, tb_cpointer
     // ok?
     return (tb_char_t const*)cstr;
 }
-static tb_void_t tb_item_func_long_free(tb_item_func_t* func, tb_pointer_t buff)
+static tb_void_t tb_element_long_free(tb_element_ref_t element, tb_pointer_t buff)
 {
     // check
     tb_assert_and_check_return(buff);
@@ -63,57 +63,57 @@ static tb_void_t tb_item_func_long_free(tb_item_func_t* func, tb_pointer_t buff)
     // clear
     *((tb_size_t*)buff) = 0;
 }
-static tb_void_t tb_item_func_long_copy(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data)
+static tb_void_t tb_element_long_copy(tb_element_ref_t element, tb_pointer_t buff, tb_cpointer_t data)
 {
     // check
     tb_assert_and_check_return(buff);
 
-    // copy item
+    // copy element
     *((tb_long_t*)buff) = (tb_long_t)data;
 }
-static tb_void_t tb_item_func_long_nfree(tb_item_func_t* func, tb_pointer_t buff, tb_size_t size)
+static tb_void_t tb_element_long_nfree(tb_element_ref_t element, tb_pointer_t buff, tb_size_t size)
 {
     // check
     tb_assert_and_check_return(buff);
 
-    // clear items
+    // clear elements
     if (size) tb_memset(buff, 0, size * sizeof(tb_long_t));
 }
-static tb_void_t tb_item_func_long_ncopy(tb_item_func_t* func, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
+static tb_void_t tb_element_long_ncopy(tb_element_ref_t element, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return(buff);
 
-    // copy items
+    // copy elements
     if (size) tb_memset_ptr(buff, data, size);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_item_func_t tb_item_func_long()
+tb_element_t tb_element_long()
 {
-    // the size func
-    tb_item_func_t func_size = tb_item_func_size();
+    // the size element
+    tb_element_t element_size = tb_element_size();
 
-    // init func
-    tb_item_func_t func = {0};
-    func.type   = TB_ITEM_TYPE_LONG;
-    func.flag   = 0;
-    func.hash   = func_size.hash;
-    func.comp   = tb_item_func_long_comp;
-    func.data   = tb_item_func_long_data;
-    func.cstr   = tb_item_func_long_cstr;
-    func.free   = tb_item_func_long_free;
-    func.dupl   = tb_item_func_long_copy;
-    func.repl   = tb_item_func_long_copy;
-    func.copy   = tb_item_func_long_copy;
-    func.nfree  = tb_item_func_long_nfree;
-    func.ndupl  = tb_item_func_long_ncopy;
-    func.nrepl  = tb_item_func_long_ncopy;
-    func.ncopy  = tb_item_func_long_ncopy;
-    func.size   = sizeof(tb_long_t);
+    // init element
+    tb_element_t element = {0};
+    element.type   = TB_ELEMENT_TYPE_LONG;
+    element.flag   = 0;
+    element.hash   = element_size.hash;
+    element.comp   = tb_element_long_comp;
+    element.data   = tb_element_long_data;
+    element.cstr   = tb_element_long_cstr;
+    element.free   = tb_element_long_free;
+    element.dupl   = tb_element_long_copy;
+    element.repl   = tb_element_long_copy;
+    element.copy   = tb_element_long_copy;
+    element.nfree  = tb_element_long_nfree;
+    element.ndupl  = tb_element_long_ncopy;
+    element.nrepl  = tb_element_long_ncopy;
+    element.ncopy  = tb_element_long_ncopy;
+    element.size   = sizeof(tb_long_t);
 
     // ok?
-    return func;
+    return element;
 }

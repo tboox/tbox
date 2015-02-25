@@ -20,8 +20,8 @@
  * @file        hash.h
  *
  */
-#ifndef TB_CONTAINER_ITEM_HASH_H
-#define TB_CONTAINER_ITEM_HASH_H
+#ifndef TB_CONTAINER_ELEMENT_HASH_H
+#define TB_CONTAINER_ELEMENT_HASH_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -40,7 +40,7 @@
  *
  * @return          the hash value
  */
-tb_size_t           tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_element_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the uint16 hash 
  *
@@ -50,7 +50,7 @@ tb_size_t           tb_item_func_hash_uint8(tb_uint8_t value, tb_size_t mask, tb
  *
  * @return          the hash value
  */
-tb_size_t           tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_element_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the uint32 hash 
  *
@@ -60,7 +60,7 @@ tb_size_t           tb_item_func_hash_uint16(tb_uint16_t value, tb_size_t mask, 
  *
  * @return          the hash value
  */
-tb_size_t           tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_element_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the uint64 hash 
  *
@@ -70,7 +70,7 @@ tb_size_t           tb_item_func_hash_uint32(tb_uint32_t value, tb_size_t mask, 
  *
  * @return          the hash value
  */
-tb_size_t           tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_element_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index);
 
 /* compute the data hash 
  *
@@ -81,7 +81,7 @@ tb_size_t           tb_item_func_hash_uint64(tb_uint64_t value, tb_size_t mask, 
  *
  * @return          the hash value
  */
-tb_size_t           tb_item_func_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_element_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t mask, tb_size_t index);
 
 /* compute the cstring hash 
  *
@@ -91,6 +91,6 @@ tb_size_t           tb_item_func_hash_data(tb_byte_t const* data, tb_size_t size
  *
  * @return          the hash value
  */
-tb_size_t           tb_item_func_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t index);
+tb_size_t           tb_element_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t index);
 
 #endif

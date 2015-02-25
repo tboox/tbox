@@ -85,7 +85,7 @@ static tb_dns_server_list_t g_list = {0};
 /* //////////////////////////////////////////////////////////////////////////////////////
  * server
  */
-static tb_long_t tb_dns_server_comp(tb_item_func_t* func, tb_cpointer_t litem, tb_cpointer_t ritem)
+static tb_long_t tb_dns_server_comp(tb_element_ref_t element, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
     tb_assert_return_val(litem && ritem, -1);
@@ -339,7 +339,7 @@ tb_bool_t tb_dns_server_init()
         // init list
         if (!g_list.list) 
         {
-            g_list.list = tb_vector_init(8, tb_item_func_mem(sizeof(tb_dns_server_t), tb_null, tb_null));
+            g_list.list = tb_vector_init(8, tb_element_mem(sizeof(tb_dns_server_t), tb_null, tb_null));
             g_list.sort = tb_false;
         }
         tb_assert_and_check_break(g_list.list);
@@ -417,12 +417,12 @@ tb_void_t tb_dns_server_sort()
         // need sort?
         tb_check_break(!g_list.sort);
 
-        // init func
-        tb_item_func_t func = tb_item_func_mem(sizeof(tb_dns_server_t), tb_null, tb_null);
-        func.comp = tb_dns_server_comp;
+        // init element
+        tb_element_t element = tb_element_mem(sizeof(tb_dns_server_t), tb_null, tb_null);
+        element.comp = tb_dns_server_comp;
 
         // init list
-        list = tb_vector_init(8, func);
+        list = tb_vector_init(8, element);
         tb_assert_and_check_break(list);
         
         // copy list

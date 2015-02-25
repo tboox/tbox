@@ -34,9 +34,9 @@
  * interfaces
  */
 
-tb_stack_ref_t tb_stack_init(tb_size_t grow, tb_item_func_t func)
+tb_stack_ref_t tb_stack_init(tb_size_t grow, tb_element_t element)
 {
-    return (tb_stack_ref_t)tb_vector_init(grow, func);
+    return (tb_stack_ref_t)tb_vector_init(grow, element);
 }
 tb_void_t tb_stack_exit(tb_stack_ref_t stack)
 {

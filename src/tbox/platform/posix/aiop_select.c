@@ -261,7 +261,7 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref
         tb_size_t tail = tb_iterator_tail(impl->hash);
         for (; itor != tail && wait >= 0 && (tb_size_t)wait < maxn; itor = tb_iterator_next(impl->hash, itor))
         {
-            tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)tb_iterator_item(impl->hash, itor);
+            tb_hash_map_element_ref_t item = (tb_hash_map_element_ref_t)tb_iterator_item(impl->hash, itor);
             if (item)
             {
                 // the sock
@@ -426,7 +426,7 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_select_init(tb_aiop_impl_t* aiop)
         if (!tb_spinlock_init(&impl->lock.hash)) break;
 
         // init hash
-        impl->hash = tb_hash_map_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
+        impl->hash = tb_hash_map_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_element_ptr(tb_null, tb_null), tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(impl->hash);
 
         // ok

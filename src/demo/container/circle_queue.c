@@ -9,7 +9,7 @@
 static tb_void_t tb_circle_queue_put_and_pop_test()
 {
     // init
-    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_item_func_long());
+    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_element_long());
     tb_assert_and_check_return(queue);
 
     // make queue
@@ -54,7 +54,7 @@ static tb_void_t tb_circle_queue_iterator_next_test()
 {
     // init
     tb_size_t n = 1000000;
-    tb_circle_queue_ref_t queue = tb_circle_queue_init(n, tb_item_func_long());
+    tb_circle_queue_ref_t queue = tb_circle_queue_init(n, tb_element_long());
     tb_assert_and_check_return(queue);
 
     // make queue
@@ -81,7 +81,7 @@ static tb_void_t tb_circle_queue_int_dump(tb_circle_queue_ref_t queue)
 }
 static tb_void_t tb_circle_queue_int_test()
 {
-    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_item_func_long());
+    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_element_long());
     tb_assert_and_check_return(queue);
 
     tb_trace_i("=============================================================");
@@ -132,7 +132,7 @@ static tb_void_t tb_circle_queue_str_dump(tb_circle_queue_ref_t queue)
 }
 static tb_void_t tb_circle_queue_str_test()
 {
-    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_item_func_str(tb_true));
+    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_element_str(tb_true));
     tb_assert_and_check_return(queue);
 
     tb_trace_i("=============================================================");
@@ -173,9 +173,9 @@ static tb_void_t tb_circle_queue_str_test()
     tb_circle_queue_str_dump(queue);
     tb_circle_queue_exit(queue);
 }
-static tb_void_t tb_circle_queue_mem_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_void_t tb_circle_queue_mem_free(tb_element_ref_t element, tb_pointer_t buff)
 {
-    tb_trace_i("ifm free: %s, priv: %s", item, func->priv);
+    tb_trace_i("ifm free: %s, priv: %s", buff, element->priv);
 }
 static tb_void_t tb_circle_queue_mem_dump(tb_circle_queue_ref_t queue)
 {
@@ -187,7 +187,7 @@ static tb_void_t tb_circle_queue_mem_dump(tb_circle_queue_ref_t queue)
 }
 static tb_void_t tb_circle_queue_mem_test()
 {
-    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_item_func_mem(11, tb_circle_queue_mem_free, "ifm"));
+    tb_circle_queue_ref_t queue = tb_circle_queue_init(10, tb_element_mem(11, tb_circle_queue_mem_free, "ifm"));
     tb_assert_and_check_return(queue);
 
     tb_trace_i("=============================================================");

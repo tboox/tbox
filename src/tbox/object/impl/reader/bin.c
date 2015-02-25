@@ -416,7 +416,7 @@ static tb_object_ref_t tb_object_bin_reader_done(tb_stream_ref_t stream)
 
     // init reader
     reader.stream           = stream;
-    reader.list             = tb_vector_init(256, tb_item_func_obj());
+    reader.list             = tb_vector_init(256, tb_element_obj());
     tb_assert_and_check_return_val(reader.list, tb_null);
 
     // the type & size
@@ -469,7 +469,7 @@ tb_object_reader_t* tb_object_bin_reader()
     s_reader.probe  = tb_object_bin_reader_probe;
 
     // init hooker
-    s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+    s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 

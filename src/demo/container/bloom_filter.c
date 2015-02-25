@@ -7,30 +7,30 @@
  * globals
  */
 static tb_size_t        g_func_indx = 0;
-static tb_item_func_t   g_func_prev;
+static tb_element_t   g_func_prev;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-static tb_size_t tb_demo_test_hash_func(tb_item_func_t* func, tb_cpointer_t priv, tb_size_t mask, tb_size_t index)
+static tb_size_t tb_demo_test_hash_func(tb_element_ref_t element, tb_cpointer_t priv, tb_size_t mask, tb_size_t index)
 {
-    return g_func_prev.hash(func, priv, mask, g_func_indx);
+    return g_func_prev.hash(element, priv, mask, g_func_indx);
 }
 static tb_void_t tb_demo_test_cstr_h(tb_size_t index)
 {
     // the count
     tb_size_t count = 1000000;
 
-    // save func
+    // save element
     g_func_indx = index;
-    g_func_prev = tb_item_func_str(tb_true);
+    g_func_prev = tb_element_str(tb_true);
 
-    // the func
-    tb_item_func_t func = g_func_prev; 
-    func.hash = tb_demo_test_hash_func;
+    // the element
+    tb_element_t element = g_func_prev; 
+    element.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
         // clear random
@@ -71,7 +71,7 @@ static tb_void_t tb_demo_test_cstr_p()
     tb_size_t count = 10000000;
 
     // init filter
-    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_item_func_str(tb_true));
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_element_str(tb_true));
     if (filter)
     {
         // clear random
@@ -113,16 +113,16 @@ static tb_void_t tb_demo_test_uint8_h(tb_size_t index)
     // the count
     tb_size_t count = TB_MAXU8;
 
-    // save func
+    // save element
     g_func_indx = index;
-    g_func_prev = tb_item_func_uint8();
+    g_func_prev = tb_element_uint8();
 
-    // the func
-    tb_item_func_t func = g_func_prev; 
-    func.hash = tb_demo_test_hash_func;
+    // the element
+    tb_element_t element = g_func_prev; 
+    element.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
         // clear random
@@ -158,16 +158,16 @@ static tb_void_t tb_demo_test_uint16_h(tb_size_t index)
     // the count
     tb_size_t count = TB_MAXU16;
 
-    // save func
+    // save element
     g_func_indx = index;
-    g_func_prev = tb_item_func_uint16();
+    g_func_prev = tb_element_uint16();
 
-    // the func
-    tb_item_func_t func = g_func_prev; 
-    func.hash = tb_demo_test_hash_func;
+    // the element
+    tb_element_t element = g_func_prev; 
+    element.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
         // clear random
@@ -203,16 +203,16 @@ static tb_void_t tb_demo_test_uint32_h(tb_size_t index)
     // the count
     tb_size_t count = 1000000;
 
-    // save func
+    // save element
     g_func_indx = index;
-    g_func_prev = tb_item_func_uint32();
+    g_func_prev = tb_element_uint32();
 
-    // the func
-    tb_item_func_t func = g_func_prev; 
-    func.hash = tb_demo_test_hash_func;
+    // the element
+    tb_element_t element = g_func_prev; 
+    element.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
         // clear random
@@ -248,16 +248,16 @@ static tb_void_t tb_demo_test_long_h(tb_size_t index)
     // the count
     tb_size_t count = 1000000;
 
-    // save func
+    // save element
     g_func_indx = index;
-    g_func_prev = tb_item_func_long();
+    g_func_prev = tb_element_long();
 
-    // the func
-    tb_item_func_t func = g_func_prev; 
-    func.hash = tb_demo_test_hash_func;
+    // the element
+    tb_element_t element = g_func_prev; 
+    element.hash = tb_demo_test_hash_func;
 
     // init filter
-    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, func);
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
         // clear random
@@ -294,7 +294,7 @@ static tb_void_t tb_demo_test_long_p()
     tb_size_t count = 10000000;
 
     // init filter
-    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_item_func_long());
+    tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_element_long());
     if (filter)
     {
         // clear random

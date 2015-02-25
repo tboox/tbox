@@ -408,15 +408,15 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_poll_init(tb_aiop_impl_t* aiop)
         if (!tb_spinlock_init(&impl->lock.hash)) break;
 
         // init pfds
-        impl->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
+        impl->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_element_mem(sizeof(struct pollfd), tb_null, tb_null));
         tb_assert_and_check_break(impl->pfds);
 
         // init cfds
-        impl->cfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_mem(sizeof(struct pollfd), tb_null, tb_null));
+        impl->cfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_element_mem(sizeof(struct pollfd), tb_null, tb_null));
         tb_assert_and_check_break(impl->cfds);
 
         // init hash
-        impl->hash = tb_hash_map_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_null, tb_null));
+        impl->hash = tb_hash_map_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_element_ptr(tb_null, tb_null), tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(impl->hash);
 
         // ok

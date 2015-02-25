@@ -327,7 +327,7 @@ static tb_demo_spider_parser_t* tb_demo_spider_parser_init(tb_thread_pool_worker
             tb_assert_and_check_break(parser->reader);
 
             // init cache
-            parser->cache = tb_circle_queue_init(255, tb_item_func_str(tb_true));
+            parser->cache = tb_circle_queue_init(255, tb_element_str(tb_true));
             tb_assert_and_check_break(parser->cache);
 
             // init iurl
@@ -800,7 +800,7 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         tb_assert_and_check_break(spider->pool);
 
         // init filter
-        spider->filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 3, TB_DEMO_SPIDER_FILTER_MAXN, tb_item_func_str(tb_true));
+        spider->filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 3, TB_DEMO_SPIDER_FILTER_MAXN, tb_element_str(tb_true));
         tb_assert_and_check_break(spider->filter);
 
         // register lock profiler

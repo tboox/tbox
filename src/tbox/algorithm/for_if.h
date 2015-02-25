@@ -46,7 +46,7 @@
  *      tb_trace_d("item: %lu", item);
  * }
  *
- * tb_for_if(tb_hash_map_item_ref_t, item, tb_iterator_head(iterator), tb_iterator_tail(iterator), iterator, item != tb_null)
+ * tb_for_if(tb_hash_map_element_ref_t, item, tb_iterator_head(iterator), tb_iterator_tail(iterator), iterator, item != tb_null)
  * {
  *      tb_trace_d("item: %p => %p", item->name, item->data);
  * }
@@ -81,7 +81,7 @@
  *      tb_trace_d("item: %lu", item);
  * }
  *
- * tb_for_all_if(tb_hash_map_item_ref_t, item, iterator, item != tb_null)
+ * tb_for_all_if(tb_hash_map_element_ref_t, item, iterator, item != tb_null)
  * {
  *      if (item) tb_trace_d("item: %p => %p", item->name, item->data);
  * }

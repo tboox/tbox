@@ -64,11 +64,11 @@ typedef tb_iterator_ref_t tb_hash_set_ref_t;
 /*! init hash set
  *
  * @param bucket_size   the hash bucket size, using the default size if be zero
- * @param func          the item func
+ * @param element       the element
  *
  * @return              the hash set
  */
-tb_hash_set_ref_t       tb_hash_set_init(tb_size_t bucket_size, tb_item_func_t func);
+tb_hash_set_ref_t       tb_hash_set_init(tb_size_t bucket_size, tb_element_t element);
 
 /*! exit hash set
  *

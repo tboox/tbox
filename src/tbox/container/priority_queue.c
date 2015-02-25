@@ -29,9 +29,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_priority_queue_ref_t tb_priority_queue_init(tb_size_t grow, tb_item_func_t func)
+tb_priority_queue_ref_t tb_priority_queue_init(tb_size_t grow, tb_element_t element)
 {
-    return (tb_priority_queue_ref_t)tb_heap_init(grow, func);
+    return (tb_priority_queue_ref_t)tb_heap_init(grow, element);
 }
 tb_void_t tb_priority_queue_exit(tb_priority_queue_ref_t queue)
 {

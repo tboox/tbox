@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "item.h"
+#include "element.h"
 #include "iterator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -84,12 +84,12 @@ typedef tb_iterator_ref_t tb_vector_ref_t;
 
 /*! init vector
  *
- * @param grow      the item grow
- * @param func      the item func
+ * @param grow      the element grow
+ * @param element   the element
  *
  * @return          the vector
  */
-tb_vector_ref_t     tb_vector_init(tb_size_t grow, tb_item_func_t func);
+tb_vector_ref_t     tb_vector_init(tb_size_t grow, tb_element_t element);
 
 /*! exist vector
  *
