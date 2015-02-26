@@ -67,20 +67,19 @@ typedef struct __tb_aiop_rtor_poll_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_poll_walk_delo(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_poll_walk_delo(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(priv, -1);
+    tb_assert_abort(priv);
 
     // the fd
     tb_long_t fd = (tb_long_t)priv;
 
-    // is this? remove it
+    // the poll fd
     struct pollfd* pfd = (struct pollfd*)item;
-    if (pfd && pfd->fd == fd) return 0;
 
-    // ok
-    return 1;
+    // remove it?
+    return (pfd && pfd->fd == fd);
 }
 static tb_bool_t tb_poll_walk_sete(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
