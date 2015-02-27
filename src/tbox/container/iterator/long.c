@@ -38,10 +38,10 @@ static tb_long_t tb_iterator_long_comp(tb_iterator_ref_t iterator, tb_cpointer_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_iterator_ref_t tb_iterator_make_for_long(tb_array_iterator_ref_t iterator, tb_long_t* elements, tb_size_t count)
+tb_iterator_ref_t tb_iterator_make_for_long(tb_array_iterator_ref_t iterator, tb_long_t* items, tb_size_t count)
 {
     // make iterator for the pointer array
-    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count)) return tb_null;
+    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)items, count)) return tb_null;
 
     // init
     iterator->base.comp = tb_iterator_long_comp;

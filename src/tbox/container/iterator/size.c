@@ -30,8 +30,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_iterator_ref_t tb_iterator_make_for_size(tb_array_iterator_ref_t iterator, tb_size_t* elements, tb_size_t count)
+tb_iterator_ref_t tb_iterator_make_for_size(tb_array_iterator_ref_t iterator, tb_size_t* items, tb_size_t count)
 {
     // make iterator for the pointer array
-    return tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count);
+    return tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)items, count);
 }

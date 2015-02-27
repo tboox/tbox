@@ -36,7 +36,7 @@ static tb_pointer_t tb_iterator_mem_item(tb_iterator_ref_t iterator, tb_size_t i
     tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // the item
-    return (tb_pointer_t)((tb_byte_t*)((tb_array_iterator_ref_t)iterator)->elements + itor * iterator->step);
+    return (tb_pointer_t)((tb_byte_t*)((tb_array_iterator_ref_t)iterator)->items + itor * iterator->step);
 }
 static tb_void_t tb_iterator_mem_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
@@ -44,7 +44,7 @@ static tb_void_t tb_iterator_mem_copy(tb_iterator_ref_t iterator, tb_size_t itor
     tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // copy
-    tb_memcpy((tb_byte_t*)((tb_array_iterator_ref_t)iterator)->elements + itor * iterator->step, item, iterator->step);
+    tb_memcpy((tb_byte_t*)((tb_array_iterator_ref_t)iterator)->items + itor * iterator->step, item, iterator->step);
 }
 static tb_long_t tb_iterator_mem_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
@@ -58,13 +58,13 @@ static tb_long_t tb_iterator_mem_comp(tb_iterator_ref_t iterator, tb_cpointer_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_iterator_ref_t tb_iterator_make_for_mem(tb_array_iterator_ref_t iterator, tb_pointer_t elements, tb_size_t count, tb_size_t size)
+tb_iterator_ref_t tb_iterator_make_for_mem(tb_array_iterator_ref_t iterator, tb_pointer_t items, tb_size_t count, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(size, tb_null);
 
     // make iterator for the pointer array
-    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)elements, count)) return tb_null;
+    if (!tb_iterator_make_for_ptr(iterator, (tb_pointer_t*)items, count)) return tb_null;
 
     // init
     iterator->base.step = size;
