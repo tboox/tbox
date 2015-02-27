@@ -555,7 +555,7 @@ static tb_bool_t tb_hash_map_test_walk_item(tb_iterator_ref_t iterator, tb_cpoin
     // done
     tb_bool_t               ok = tb_false;
     tb_hize_t*              test = (tb_hize_t*)value;
-    tb_hash_map_element_ref_t  hash_item = (tb_hash_map_element_ref_t)item;
+    tb_hash_map_item_ref_t  hash_item = (tb_hash_map_item_ref_t)item;
     if (hash_item)
     {
         if (!(((tb_size_t)hash_item->data >> 25) & 0x1)) ok = tb_true;

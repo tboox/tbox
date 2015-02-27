@@ -261,7 +261,7 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref
         tb_size_t tail = tb_iterator_tail(impl->hash);
         for (; itor != tail && wait >= 0 && (tb_size_t)wait < maxn; itor = tb_iterator_next(impl->hash, itor))
         {
-            tb_hash_map_element_ref_t item = (tb_hash_map_element_ref_t)tb_iterator_item(impl->hash, itor);
+            tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)tb_iterator_item(impl->hash, itor);
             if (item)
             {
                 // the sock

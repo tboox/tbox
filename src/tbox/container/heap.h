@@ -71,7 +71,7 @@ __tb_extern_c_enter__
  *
  * </pre>
  *
- * @note the itor of the same element is mutable
+ * @note the itor of the same item is mutable
  */
 typedef tb_iterator_ref_t tb_heap_ref_t;
 
@@ -81,7 +81,7 @@ typedef tb_iterator_ref_t tb_heap_ref_t;
 
 /*! init heap, default: minheap
  *
- * @param grow      the element grow, using the default grow if be zero
+ * @param grow      the item grow, using the default grow if be zero
  * @param element   the element
  *
  * @return          the heap
@@ -116,28 +116,28 @@ tb_size_t           tb_heap_size(tb_heap_ref_t heap);
  */
 tb_size_t           tb_heap_maxn(tb_heap_ref_t heap);
 
-/*! the heap top element
+/*! the heap top item
  *
  * @param heap      the heap
  *
- * @return          the heap top element
+ * @return          the heap top item
  */
 tb_pointer_t        tb_heap_top(tb_heap_ref_t heap);
 
-/*! put the heap element
+/*! put the heap item
  *
  * @param heap      the heap
- * @param data      the element data
+ * @param data      the item data
  */
 tb_void_t           tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data);
 
-/*! pop the heap element
+/*! pop the heap item
  *
  * @param heap      the heap
  */
 tb_void_t           tb_heap_pop(tb_heap_ref_t heap);
 
-/*! remove the heap element using iterator only for algorithm(find, ...)
+/*! remove the heap item using iterator only for algorithm(find, ...)
  *
  * @param heap      the heap
  * @param itor      the itor

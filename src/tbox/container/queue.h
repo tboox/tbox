@@ -80,19 +80,19 @@ tb_queue_ref_t      tb_queue_init(tb_size_t grow, tb_element_t element);
  */
 tb_void_t           tb_queue_exit(tb_queue_ref_t queue);
 
-/*! the queue head element
+/*! the queue head item
  *
  * @param queue     the queue
  *
- * @return          the head element
+ * @return          the head item
  */
 tb_pointer_t        tb_queue_head(tb_queue_ref_t queue);
 
-/*! the queue last element
+/*! the queue last item
  *
  * @param queue     the queue
  *
- * @return          the last element
+ * @return          the last item
  */
 tb_pointer_t        tb_queue_last(tb_queue_ref_t queue);
 
@@ -102,24 +102,24 @@ tb_pointer_t        tb_queue_last(tb_queue_ref_t queue);
  */
 tb_void_t           tb_queue_clear(tb_queue_ref_t queue);
 
-/*! put the queue element
+/*! put the queue item
  *
  * @param queue     the queue
- * @param data      the element data
+ * @param data      the item data
  */
 tb_void_t           tb_queue_put(tb_queue_ref_t queue, tb_cpointer_t data);
 
-/*! pop the queue element
+/*! pop the queue item
  *
  * @param queue     the queue
  */
 tb_void_t           tb_queue_pop(tb_queue_ref_t queue);
 
-/*! get the queue element
+/*! get the queue item
  *
  * @param queue     the queue
  *
- * @return          the queue element
+ * @return          the queue item
  */
 tb_pointer_t        tb_queue_get(tb_queue_ref_t queue);
 

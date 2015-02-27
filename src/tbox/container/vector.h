@@ -73,7 +73,7 @@ __tb_extern_c_enter__
  * prev: fast
  * </pre>
  *
- * @note the itor of the same element is mutable
+ * @note the itor of the same item is mutable
  *
  */
 typedef tb_iterator_ref_t tb_vector_ref_t;
@@ -84,7 +84,7 @@ typedef tb_iterator_ref_t tb_vector_ref_t;
 
 /*! init vector
  *
- * @param grow      the element grow
+ * @param grow      the item grow
  * @param element   the element
  *
  * @return          the vector
@@ -105,19 +105,19 @@ tb_void_t           tb_vector_exit(tb_vector_ref_t vector);
  */
 tb_pointer_t        tb_vector_data(tb_vector_ref_t vector);
 
-/*! the vector head element
+/*! the vector head item
  *
  * @param vector    the vector
  *
- * @return          the vector head element
+ * @return          the vector head item
  */
 tb_pointer_t        tb_vector_head(tb_vector_ref_t vector);
 
-/*! the vector last element
+/*! the vector last item
  *
  * @param vector    the vector
  *
- * @return          the vector last element
+ * @return          the vector last item
  */
 tb_pointer_t        tb_vector_last(tb_vector_ref_t vector);
 
@@ -143,139 +143,139 @@ tb_void_t           tb_vector_clear(tb_vector_ref_t vector);
  */
 tb_void_t           tb_vector_copy(tb_vector_ref_t vector, tb_vector_ref_t copy);
 
-/*! insert the vector prev element
+/*! insert the vector prev item
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
+ * @param itor      the item itor
+ * @param data      the item data
  */
 tb_void_t           tb_vector_insert_prev(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data);
 
-/*! insert the vector next element
+/*! insert the vector next item
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
+ * @param itor      the item itor
+ * @param data      the item data
  */
 tb_void_t           tb_vector_insert_next(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data);
 
-/*! insert the vector head element
+/*! insert the vector head item
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
+ * @param itor      the item itor
+ * @param data      the item data
  */
 tb_void_t           tb_vector_insert_head(tb_vector_ref_t vector, tb_cpointer_t data);
 
-/*! insert the vector tail element
+/*! insert the vector tail item
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
+ * @param itor      the item itor
+ * @param data      the item data
  */
 tb_void_t           tb_vector_insert_tail(tb_vector_ref_t vector, tb_cpointer_t data);
 
 /*! insert the vector prev items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
- * @param size      the element count
+ * @param itor      the item itor
+ * @param data      the item data
+ * @param size      the item count
  */
 tb_void_t           tb_vector_ninsert_prev(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 
 /*! insert the vector next items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
- * @param size      the element count
+ * @param itor      the item itor
+ * @param data      the item data
+ * @param size      the item count
  */
 tb_void_t           tb_vector_ninsert_next(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 
 /*! insert the vector head items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
- * @param size      the element count
+ * @param itor      the item itor
+ * @param data      the item data
+ * @param size      the item count
  */
 tb_void_t           tb_vector_ninsert_head(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size);
 
 /*! insert the vector tail items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
- * @param size      the element count
+ * @param itor      the item itor
+ * @param data      the item data
+ * @param size      the item count
  */
 tb_void_t           tb_vector_ninsert_tail(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size);
 
-/*! replace the vector element
+/*! replace the vector item
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
+ * @param itor      the item itor
+ * @param data      the item data
  */
 tb_void_t           tb_vector_replace(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data);
 
-/*! replace the vector head element
+/*! replace the vector head item
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
+ * @param itor      the item itor
+ * @param data      the item data
  */
 tb_void_t           tb_vector_replace_head(tb_vector_ref_t vector, tb_cpointer_t data);
 
-/*! replace the vector last element
+/*! replace the vector last item
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
+ * @param itor      the item itor
+ * @param data      the item data
  */
 tb_void_t           tb_vector_replace_last(tb_vector_ref_t vector, tb_cpointer_t data);
 
 /*! replace the vector items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
- * @param size      the element count
+ * @param itor      the item itor
+ * @param data      the item data
+ * @param size      the item count
  */
 tb_void_t           tb_vector_nreplace(tb_vector_ref_t vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 
 /*! replace the vector head items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
- * @param size      the element count
+ * @param itor      the item itor
+ * @param data      the item data
+ * @param size      the item count
  */
 tb_void_t           tb_vector_nreplace_head(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size);
 
 /*! replace the vector last items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param data      the element data
- * @param size      the element count
+ * @param itor      the item itor
+ * @param data      the item data
+ * @param size      the item count
  */
 tb_void_t           tb_vector_nreplace_last(tb_vector_ref_t vector, tb_cpointer_t data, tb_size_t size);
 
-/*! remove the vector element
+/*! remove the vector item
  *
  * @param vector    the vector
- * @param itor      the element itor
+ * @param itor      the item itor
  */
 tb_void_t           tb_vector_remove(tb_vector_ref_t vector, tb_size_t itor);
 
-/*! remove the vector head element
+/*! remove the vector head item
  *
  * @param vector    the vector
  */
 tb_void_t           tb_vector_remove_head(tb_vector_ref_t vector);
 
-/*! remove the vector last element
+/*! remove the vector last item
  *
  * @param vector    the vector
  */
@@ -284,22 +284,22 @@ tb_void_t           tb_vector_remove_last(tb_vector_ref_t vector);
 /*! remove the vector items
  *
  * @param vector    the vector
- * @param itor      the element itor
- * @param size      the element count
+ * @param itor      the item itor
+ * @param size      the item count
  */
 tb_void_t           tb_vector_nremove(tb_vector_ref_t vector, tb_size_t itor, tb_size_t size);
 
 /*! remove the vector head items
  *
  * @param vector    the vector
- * @param size      the element count
+ * @param size      the item count
  */
 tb_void_t           tb_vector_nremove_head(tb_vector_ref_t vector, tb_size_t size);
 
 /*! remove the vector last items
  *
  * @param vector    the vector
- * @param size      the element count
+ * @param size      the item count
  */
 tb_void_t           tb_vector_nremove_last(tb_vector_ref_t vector, tb_size_t size);
 

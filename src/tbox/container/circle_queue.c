@@ -175,8 +175,8 @@ tb_circle_queue_ref_t tb_circle_queue_init(tb_size_t maxn, tb_element_t element)
         if (!maxn) maxn = TB_CIRCLE_QUEUE_SIZE_DEFAULT;
 
         // init impl
-        impl->maxn = tb_align_pow2(maxn + 1); // + tail
-        impl->element = element;
+        impl->maxn      = tb_align_pow2(maxn + 1); // + tail
+        impl->element   = element;
         tb_assert_and_check_break(tb_ispow2(impl->maxn));
 
         // init iterator

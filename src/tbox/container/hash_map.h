@@ -53,16 +53,16 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the hash map element type
-typedef struct __tb_hash_map_element_t
+/// the hash map item type
+typedef struct __tb_hash_map_item_t
 {
-    /// the element name
+    /// the item name
     tb_pointer_t        name;
 
-    /// the element data
+    /// the item data
     tb_pointer_t        data;
 
-}tb_hash_map_element_t, *tb_hash_map_element_ref_t;
+}tb_hash_map_item_t, *tb_hash_map_item_ref_t;
 
 /*! the hash map ref type
  *
@@ -90,7 +90,7 @@ typedef struct __tb_hash_map_element_t
  *
  * </pre>
  *
- * @note the itor of the same element is mutable
+ * @note the itor of the same item is mutable
  */
 typedef tb_iterator_ref_t tb_hash_map_ref_t;
 
@@ -101,8 +101,8 @@ typedef tb_iterator_ref_t tb_hash_map_ref_t;
 /*! init hash map
  *
  * @param bucket_size   the hash bucket size, using the default size if be zero
- * @param element_name  the element for name
- * @param element_data  the element for data
+ * @param element_name  the item for name
+ * @param element_data  the item for data
  *
  * @return              the hash map
  */
@@ -120,15 +120,15 @@ tb_void_t               tb_hash_map_exit(tb_hash_map_ref_t hash_map);
  */
 tb_void_t               tb_hash_map_clear(tb_hash_map_ref_t hash_map);
 
-/*! get element data from name
+/*! get item data from name
  *
  * @note 
- * the return value may be zero if the element type is integer
+ * the return value may be zero if the item type is integer
  * so we need call tb_hash_map_find for judging whether to get value successfully
  *
  * @code
  *
- * // find element and get element data
+ * // find item and get item data
  * tb_xxxx_ref_t data = (tb_xxxx_ref_t)tb_hash_map_get(hash_map, name);
  * if (data)
  * {
@@ -137,17 +137,17 @@ tb_void_t               tb_hash_map_clear(tb_hash_map_ref_t hash_map);
  * @endcode
  *
  * @param hash_map      the hash map
- * @param name          the element name
+ * @param name          the item name
  *
- * @return              the element data
+ * @return              the item data
  */
 tb_pointer_t            tb_hash_map_get(tb_hash_map_ref_t hash_map, tb_cpointer_t name);
 
-/*! find element from name
+/*! find item from name
  *
  * @code
  *
- * // find element
+ * // find item
  * tb_size_t itor = tb_hash_map_find(hash_map, name);
  * if (itor != tb_iterator_tail(hash_map))
  * {
@@ -161,28 +161,28 @@ tb_pointer_t            tb_hash_map_get(tb_hash_map_ref_t hash_map, tb_cpointer_
  * @endcode
  *
  * @param hash_map      the hash map
- * @param name          the element name
+ * @param name          the item name
  *
- * @return              the element itor, @note: the itor of the same element is mutable
+ * @return              the item itor, @note: the itor of the same item is mutable
  */
 tb_size_t               tb_hash_map_find(tb_hash_map_ref_t hash_map, tb_cpointer_t name);
 
-/*! insert element data from name
+/*! insert item data from name
  *
  * @note the pair (name => data) is unique
  *
  * @param hash_map      the hash map
- * @param name          the element name
- * @param data          the element data
+ * @param name          the item name
+ * @param data          the item data
  *
- * @return              the element itor, @note: the itor of the same element is mutable
+ * @return              the item itor, @note: the itor of the same item is mutable
  */
 tb_size_t               tb_hash_map_insert(tb_hash_map_ref_t hash_map, tb_cpointer_t name, tb_cpointer_t data);
 
-/*! remove element from name
+/*! remove item from name
  *
  * @param hash_map      the hash map
- * @param name          the element name
+ * @param name          the item name
  */
 tb_void_t               tb_hash_map_remove(tb_hash_map_ref_t hash_map, tb_cpointer_t name);
 

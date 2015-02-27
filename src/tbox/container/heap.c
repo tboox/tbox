@@ -360,10 +360,10 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_element_t element)
         tb_assert_and_check_break(impl);
 
         // init impl
-        impl->size = 0;
-        impl->grow = grow;
-        impl->maxn = grow;
-        impl->element = element;
+        impl->size      = 0;
+        impl->grow      = grow;
+        impl->maxn      = grow;
+        impl->element   = element;
         tb_assert_and_check_break(impl->maxn < TB_HEAD_MAXN);
 
         // init iterator
