@@ -72,7 +72,7 @@ static tb_pointer_t tb_iterator_ptr_item(tb_iterator_ref_t iterator, tb_size_t i
     tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // the item
-    return ((tb_pointer_t*)((tb_array_iterator_ref_t)iterator)->elements)[itor];
+    return ((tb_pointer_t*)((tb_array_iterator_ref_t)iterator)->items)[itor];
 }
 static tb_void_t tb_iterator_ptr_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
@@ -80,7 +80,7 @@ static tb_void_t tb_iterator_ptr_copy(tb_iterator_ref_t iterator, tb_size_t itor
     tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // copy
-    ((tb_cpointer_t*)((tb_array_iterator_ref_t)iterator)->elements)[itor] = item;
+    ((tb_cpointer_t*)((tb_array_iterator_ref_t)iterator)->items)[itor] = item;
 }
 static tb_long_t tb_iterator_ptr_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
@@ -90,10 +90,10 @@ static tb_long_t tb_iterator_ptr_comp(tb_iterator_ref_t iterator, tb_cpointer_t 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_iterator_ref_t tb_iterator_make_for_ptr(tb_array_iterator_ref_t iterator, tb_pointer_t* elements, tb_size_t count)
+tb_iterator_ref_t tb_iterator_make_for_ptr(tb_array_iterator_ref_t iterator, tb_pointer_t* items, tb_size_t count)
 {
     // check
-    tb_assert(iterator && elements && count);
+    tb_assert(iterator && items && count);
 
     // init
     iterator->base.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
@@ -107,7 +107,7 @@ tb_iterator_ref_t tb_iterator_make_for_ptr(tb_array_iterator_ref_t iterator, tb_
     iterator->base.item     = tb_iterator_ptr_item;
     iterator->base.copy     = tb_iterator_ptr_copy;
     iterator->base.comp     = tb_iterator_ptr_comp;
-    iterator->elements      = elements;
+    iterator->items      = items;
     iterator->count         = count;
 
     // ok
