@@ -320,7 +320,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_impl_t* impl, tb_h
     tb_string_cstrfcat(&impl->line_data, "HTTP/1.%1u\r\n", impl->option.version);
 
     // append key: value
-    tb_for_all (tb_hash_map_element_ref_t, item, impl->head)
+    tb_for_all (tb_hash_map_item_ref_t, item, impl->head)
     {
         if (item && item->name && item->data) 
             tb_string_cstrfcat(&impl->line_data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);

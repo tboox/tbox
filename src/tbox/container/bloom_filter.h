@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  * macros
  */
 
-// the element maxn
+// the item maxn
 #define TB_BLOOM_FILTER_ITEM_MAXN_MICRO                 (1 << 16)
 #define TB_BLOOM_FILTER_ITEM_MAXN_SMALL                 (1 << 20)
 #define TB_BLOOM_FILTER_ITEM_MAXN_LARGE                 (1 << 24)
@@ -135,12 +135,12 @@ typedef enum __tb_bloom_filter_probability_e
  *
  * @param probability   the probability of false positives
  * @param hash_count    the hash count: < 16
- * @param element_maxn  the element maxn
+ * @param item_maxn     the item maxn
  * @param element       the element only for hash
  *
  * @return              the bloom_filter
  */
-tb_bloom_filter_ref_t   tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t element_maxn, tb_element_t element);
+tb_bloom_filter_ref_t   tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_element_t element);
 
 /*! exit bloom filter
  *
@@ -170,7 +170,7 @@ tb_void_t               tb_bloom_filter_clear(tb_bloom_filter_ref_t bloom_filter
  * @endcode
  *
  * @param bloom_filter  the bloom filter
- * @param data          the element data 
+ * @param data          the item data 
  *
  * @return              return tb_false if the data have been existed, otherwise set it and return tb_true
  */
@@ -192,7 +192,7 @@ tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_ref_t bloom_filter, 
  * @endcode
  *
  * @param bloom_filter  the bloom filter
- * @param data          the element data 
+ * @param data          the item data 
  *
  * @return              return tb_true if the data exists, otherwise return tb_false
  */

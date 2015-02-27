@@ -97,7 +97,7 @@ typedef struct __tb_bloom_filter_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t element_maxn, tb_element_t element)
+tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash_count, tb_size_t item_maxn, tb_element_t element)
 {
     // check
     tb_assert_and_check_return_val(element.hash, tb_null);
@@ -112,16 +112,16 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         tb_assert_and_check_break(hash_count && hash_count < 16);
 
         // check item maxn
-        if (!element_maxn) element_maxn = TB_BLOOM_FILTER_ITEM_MAXN_DEFAULT;
-        tb_assert_and_check_break(element_maxn < TB_MAXU32);
+        if (!item_maxn) item_maxn = TB_BLOOM_FILTER_ITEM_MAXN_DEFAULT;
+        tb_assert_and_check_break(item_maxn < TB_MAXU32);
 
         // make filter
         filter = tb_malloc0_type(tb_bloom_filter_impl_t);
         tb_assert_and_check_break(filter);
     
         // init filter
-        filter->element        = element;
-        filter->maxn        = element_maxn;
+        filter->element     = element;
+        filter->maxn        = item_maxn;
         filter->hash_count  = hash_count;
         filter->probability = probability;
 
@@ -135,7 +135,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         tb_double_t p = 1. / (tb_double_t)(1 << probability);
         tb_double_t c = tb_pow(p, 1 / k);
         tb_double_t s = (k + k) / (c + c + c * c);
-        tb_size_t   n = element_maxn;
+        tb_size_t   n = item_maxn;
         tb_size_t   m = tb_round(s * n);
         tb_trace_d("k: %lf, p: %lf, c: %lf, s: %lf => p: %lf, m: %lu, n: %lu", k, p, c, s, tb_pow((1 - tb_exp(-k / s)), k), m, n);
 #else
@@ -179,7 +179,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         };
 
         // m = (s * n) >> 16
-        tb_size_t m = tb_fixed_mul(s_scale[hash_count - 1][probability], element_maxn);
+        tb_size_t m = tb_fixed_mul(s_scale[hash_count - 1][probability], item_maxn);
 #endif
         
         // init size

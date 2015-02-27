@@ -328,7 +328,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_string_cstrfcat(&impl->request, "HTTP/1.%1u\r\n", impl->status.balived? impl->status.version : impl->option.version);
 
         // append key: value
-        tb_for_all (tb_hash_map_element_ref_t, item, impl->head)
+        tb_for_all (tb_hash_map_item_ref_t, item, impl->head)
         {
             if (item && item->name && item->data) 
                 tb_string_cstrfcat(&impl->request, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);

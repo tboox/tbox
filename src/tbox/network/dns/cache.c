@@ -99,7 +99,7 @@ static tb_bool_t tb_dns_cache_clear(tb_iterator_ref_t iterator, tb_cpointer_t it
     tb_assert_abort(item);
 
     // the dns cache address
-    tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_map_element_ref_t)item)->data;
+    tb_dns_cache_addr_t const* caddr = (tb_dns_cache_addr_t const*)((tb_hash_map_item_ref_t)item)->data;
     tb_assert_abort(caddr);
 
     // is expired?

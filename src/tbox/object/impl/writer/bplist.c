@@ -571,7 +571,7 @@ static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_ref_t list, tb_h
     if (hash)
     {
         // walk
-        tb_for_all (tb_hash_map_element_ref_t, item, hash)
+        tb_for_all (tb_hash_map_item_ref_t, item, hash)
         {
             // exit item
             if (item && item->name)
