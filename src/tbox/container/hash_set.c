@@ -85,7 +85,7 @@ tb_void_t tb_hash_set_clear(tb_hash_set_ref_t hash_set)
 }
 tb_bool_t tb_hash_set_get(tb_hash_set_ref_t hash_set, tb_cpointer_t data)
 {
-    return (tb_bool_t)tb_hash_map_get((tb_hash_map_ref_t)hash_set, data);
+    return tb_p2b(tb_hash_map_get((tb_hash_map_ref_t)hash_set, data));
 }
 tb_size_t tb_hash_set_find(tb_hash_set_ref_t hash_set, tb_cpointer_t data)
 {
