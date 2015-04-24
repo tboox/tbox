@@ -284,7 +284,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
 
                     // the path
                     tb_char_t path[TB_PATH_MAXN] = {0};
-                    if (tb_directory_curt(path, TB_PATH_MAXN))
+                    if (tb_directory_current(path, TB_PATH_MAXN))
                         tb_strcat(path, name);
                     else break;
 

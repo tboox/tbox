@@ -769,7 +769,7 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         else 
         {
             // the temporary root
-            tb_directory_temp(spider->root, sizeof(spider->root) - 1);
+            tb_directory_temporary(spider->root, sizeof(spider->root) - 1);
 
             // append spider
             tb_strcat(spider->root, "/spider");

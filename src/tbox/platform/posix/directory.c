@@ -205,7 +205,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     return !remove(path)? tb_true : tb_false;
 }
 #if !defined(TB_CONFIG_OS_IOS) && !defined(TB_CONFIG_OS_ANDROID)
-tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
+tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
@@ -218,7 +218,7 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
     return 4;
 }
 #endif
-tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
+tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(path && maxn, 0);

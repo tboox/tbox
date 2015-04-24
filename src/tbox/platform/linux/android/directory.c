@@ -37,7 +37,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
+tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);

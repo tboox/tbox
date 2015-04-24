@@ -773,7 +773,7 @@ static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)
 
         // init root
         if (root) tb_strlcpy(httpd->root, root, sizeof(httpd->root));
-        else tb_directory_curt(httpd->root, sizeof(httpd->root));
+        else tb_directory_current(httpd->root, sizeof(httpd->root));
         httpd->root[sizeof(httpd->root) - 1] = '\0';
         tb_assert_and_check_break(tb_file_info(httpd->root, tb_null));
 
