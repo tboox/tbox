@@ -47,6 +47,8 @@ static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance)
     TB_INTERFACE_LOAD(kernel32, GetFileSizeEx);
     TB_INTERFACE_LOAD(kernel32, GetQueuedCompletionStatusEx);
     TB_INTERFACE_LOAD(kernel32, InterlockedCompareExchange64);
+    TB_INTERFACE_LOAD(kernel32, GetEnvironmentVariableW);
+    TB_INTERFACE_LOAD(kernel32, SetEnvironmentVariableW);
 
     // ok
     return tb_true;

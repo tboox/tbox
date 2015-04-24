@@ -124,7 +124,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_ref_t stream, tb_size
 
             // the path
             tb_char_t path[TB_PATH_MAXN] = {0};
-            if (tb_directory_curt(path, TB_PATH_MAXN))
+            if (tb_directory_current(path, TB_PATH_MAXN))
             {
                 // append name
                 tb_strcat(path, name);

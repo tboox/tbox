@@ -17,50 +17,20 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        directory.c
+ * @file        environment.c
  * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "directory.h"
+#include "environment.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #ifdef TB_CONFIG_OS_WINDOWS
-#   include "windows/directory.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
-#   include "posix/directory.c"
+#   include "windows/environment.c"
 #else
-tb_bool_t tb_directory_create(tb_char_t const* path)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_bool_t tb_directory_remove(tb_char_t const* path)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-}
-tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
+#   include "libc/environment.c"
 #endif

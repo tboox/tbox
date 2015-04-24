@@ -272,6 +272,7 @@ tbox_C_FILES 			+= \
 						platform/backtrace \
 						platform/cache_time \
 						platform/thread_pool \
+						platform/environment \
 						platform/thread_store \
 						platform/aioo \
 						platform/aiop 
@@ -556,6 +557,7 @@ tbox_INC_FILES 			= \
 						platform/backtrace.h \
 						platform/semaphore.h \
 						platform/cache_time.h \
+						platform/environment.h \
 						platform/thread_pool.h \
 						platform/thread_store.h \
 						platform/compiler/prefix.h \

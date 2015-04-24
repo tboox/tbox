@@ -202,7 +202,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     // remove it
     return RemoveDirectoryW(full)? tb_true : tb_false;
 }
-tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
+tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
@@ -214,7 +214,7 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
     // wtoa
     return tb_wtoa(path, temp, maxn);
 }
-tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
+tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);

@@ -95,7 +95,7 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 
     // the current directory
     tb_size_t size = 0;
-    if (!(size = tb_directory_curt(full, maxn))) return tb_null;
+    if (!(size = tb_directory_current(full, maxn))) return tb_null;
     tb_trace_d("curt: %s", full);
 
     // is windows path?

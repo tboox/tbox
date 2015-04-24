@@ -17,50 +17,47 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        directory.c
+ * @file        environment.c
  * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "directory.h"
+#include "prefix.h"
+#include <stdlib.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
-#   include "windows/directory.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
-#   include "posix/directory.c"
-#else
-tb_bool_t tb_directory_create(tb_char_t const* path)
+tb_size_t tb_environment_get(tb_char_t const* name, tb_char_t* value, tb_size_t maxn)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(name && value && maxn, 0);
+
+    // get it
+    tb_char_t const* data = getenv(name);
+    tb_check_return_val(data, 0);
+
+    // the size
+    tb_size_t size = tb_strlen(data);
+    tb_check_return_val(size, 0);
+
+    // the space is not enough?
+    tb_assert_and_check_return_val(size < maxn, 0);
+
+    // save it
+    tb_strlcpy(value, data, size);
+    value[size] = '\0';
+
+    // ok
+    return size;
 }
-tb_bool_t tb_directory_remove(tb_char_t const* path)
+tb_bool_t tb_environment_set(tb_char_t const* name, tb_char_t const* value)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(name && value, tb_false);
+
+    // set it
+    return !setenv(name, value, 1);
 }
-tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-}
-tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-#endif

@@ -75,6 +75,7 @@ demo_C_FILES 								+= \
 											platform/exception \
 											platform/semaphore \
 											platform/cache_time \
+											platform/environment \
 											platform/thread_pool \
 											platform/thread_store \
 											container/heap \
