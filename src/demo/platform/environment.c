@@ -8,21 +8,40 @@
  */ 
 tb_int_t tb_demo_platform_environment_main(tb_int_t argc, tb_char_t** argv)
 {
-    // get variable
-    tb_char_t value[8192] = {0};
-    if (tb_environment_get(argv[1], value, sizeof(value)))
+    // init environment
+    tb_environment_ref_t environment = tb_environment_init();
+    if (environment)
     {
-        // trace
-        tb_trace_i("get %s: %s", argv[1], value);
-    }
+        // load variable
+        if (tb_environment_load(environment, argv[1]))
+        {
+            // dump it
+            tb_environment_dump(environment, argv[1]);
+        }
 
-    // set variable
-    if (    argv[2] 
-        &&  tb_environment_set(argv[1], argv[2])
-        &&  tb_environment_get(argv[1], value, sizeof(value)))
-    {
-        // trace
-        tb_trace_i("set %s: %s", argv[1], value);
+        // save variable?
+        if (argc > 2)
+        {
+            tb_size_t i = 0;
+            for (i = 2; i < argc && argv[i]; i++)
+            {
+                // set value
+                tb_environment_set(environment, argv[i], tb_false);
+            }
+
+            // save variable
+            tb_environment_save(environment, argv[1]);
+
+            // load variable
+            if (tb_environment_load(environment, argv[1]))
+            {
+                // dump it
+                tb_environment_dump(environment, argv[1]);
+            }
+        }
+
+        // exit environment
+        tb_environment_exit(environment);
     }
     return 0;
 }
