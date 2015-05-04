@@ -17,12 +17,11 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @path        path.h
- * @ingroup     platform
+ * @file        shell32.h
  *
  */
-#ifndef TB_PLATFORM_PATH_H
-#define TB_PLATFORM_PATH_H
+#ifndef TB_PLATFORM_WINDOWS_INTERFACE_SHELL32_H
+#define TB_PLATFORM_WINDOWS_INTERFACE_SHELL32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -35,46 +34,40 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
+ * types
  */
-#define TB_PATH_MAXN        (4096)
+
+// the SHGetSpecialFolderLocation func type
+typedef HRESULT (WINAPI* tb_shell32_SHGetSpecialFolderLocation_t)(HWND hwndOwner, tb_int_t nFolder, tb_handle_t *ppidl);
+
+// the SHGetPathFromIDListW func type
+typedef BOOL (WINAPI* tb_shell32_SHGetPathFromIDListW_t)(tb_handle_t pidl, LPWSTR pszPath);
+
+// the shell32 interfaces type
+typedef struct __tb_shell32_t
+{
+    // SHGetSpecialFolderLocation
+    tb_shell32_SHGetSpecialFolderLocation_t     SHGetSpecialFolderLocation;
+
+    // SHGetPathFromIDListW
+    tb_shell32_SHGetPathFromIDListW_t           SHGetPathFromIDListW;
+
+}tb_shell32_t, *tb_shell32_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the path is absolute?
- * 
- * @param path          the path 
+/* the shell32 interfaces
  *
- * @return              tb_true or tb_false
+ * @return          the shell32 interfaces pointer
  */
-tb_bool_t               tb_path_is_absolute(tb_char_t const* path);
-
-/*! get the absolute path which relative to the current directory
- * 
- * @param path          the path 
- * @param data          the path data
- * @param maxn          the path maxn
- *
- * @return              the absolute path
- */
-tb_char_t const*        tb_path_absolute(tb_char_t const* path, tb_char_t* data, tb_size_t maxn);
-
-/*! get the absolute path which relative to the given root directory
- * 
- * @param root          the root path 
- * @param path          the path 
- * @param data          the path data
- * @param maxn          the path maxn
- *
- * @return              the absolute path
- */
-tb_char_t const*        tb_path_absolute_to(tb_char_t const* root, tb_char_t const* path, tb_char_t* data, tb_size_t maxn);
+tb_shell32_ref_t    tb_shell32(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_leave__
+
 
 #endif

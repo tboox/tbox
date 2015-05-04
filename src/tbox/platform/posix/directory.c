@@ -28,6 +28,7 @@
 #include "../file.h"
 #include "../path.h"
 #include "../directory.h"
+#include "../environment.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -158,7 +159,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 
     // the full path
     tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_full(path, full, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // make it
@@ -195,7 +196,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 {
     // the full path
     tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_full(path, full, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // walk remove
@@ -204,7 +205,32 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     // remove it
     return !remove(path)? tb_true : tb_false;
 }
+tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(path && maxn, 0);
+
+    // the current directory
+    tb_size_t size = 0;
+    if (getcwd(path, maxn - 1)) size = tb_strlen(path);
+
+    // ok?
+    return size;
+}
 #if !defined(TB_CONFIG_OS_IOS) && !defined(TB_CONFIG_OS_ANDROID)
+tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(path && maxn, 0);
+
+    // get the home directory
+    tb_size_t size = 0;
+    if (!(size = tb_environment_get_one("XDG_CONFIG_HOME", path, maxn)))
+        size = tb_environment_get_one("HOME", path, maxn);
+
+    // ok
+    return size;
+}
 tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
     // check
@@ -218,18 +244,6 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     return 4;
 }
 #endif
-tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
-{
-    // check
-    tb_assert_and_check_return_val(path && maxn, 0);
-
-    // the current directory
-    tb_size_t size = 0;
-    if (getcwd(path, maxn - 1)) size = tb_strlen(path);
-
-    // ok?
-    return size;
-}
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
     // check
@@ -243,7 +257,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
     {
         // the full path
         tb_char_t full[TB_PATH_MAXN];
-        path = tb_path_full(path, full, TB_PATH_MAXN);
+        path = tb_path_absolute(path, full, TB_PATH_MAXN);
         tb_assert_and_check_return(path);
 
         // walk
@@ -254,12 +268,12 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
     // the full path
     tb_char_t full0[TB_PATH_MAXN];
-    path = tb_path_full(path, full0, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // the dest path
     tb_char_t full1[TB_PATH_MAXN];
-    dest = tb_path_full(dest, full1, TB_PATH_MAXN);
+    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
     tb_assert_and_check_return_val(dest, tb_false);
 
     // walk copy

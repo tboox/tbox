@@ -29,6 +29,7 @@
 #include "../path.h"
 #include "../print.h"
 #include "../directory.h"
+#include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * callback
@@ -155,7 +156,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
     // make it
     tb_bool_t ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;
@@ -194,7 +195,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
     // walk remove
     tb_directory_walk_impl(full, tb_true, tb_false, tb_directory_walk_remove, tb_null);
@@ -202,17 +203,35 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     // remove it
     return RemoveDirectoryW(full)? tb_true : tb_false;
 }
-tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
+tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(path && maxn > 4, 0);
+    tb_assert_and_check_return_val(path && maxn, 0);
 
-    // the temporary directory
-    tb_wchar_t  temp[TB_PATH_MAXN] = {0};
-    GetTempPathW(TB_PATH_MAXN, temp);
+    // the home directory
+    tb_bool_t   ok = tb_false;
+    tb_handle_t pidl = tb_null;
+    tb_wchar_t  home[TB_PATH_MAXN] = {0};
+    do
+    {
+        // get the special folder location
+        if (S_OK != tb_shell32()->SHGetSpecialFolderLocation(tb_null, 0x23/*CSIDL_COMMON_APPDATA*/, &pidl)) break;
+        tb_check_break(pidl);
 
-    // wtoa
-    return tb_wtoa(path, temp, maxn);
+        // get the home directory   
+        if (!tb_shell32()->SHGetPathFromIDListW(pidl, home)) break;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // exit pidl
+    if (pidl) GlobalFree(pidl);
+    pidl = tb_null;
+
+    // ok?
+    return ok? tb_wtoa(path, home, maxn) : 0;
 }
 tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
 {
@@ -220,11 +239,23 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
     // the current directory
-    tb_wchar_t  curt[TB_PATH_MAXN] = {0};
-    GetCurrentDirectoryW(TB_PATH_MAXN, curt);
+    tb_wchar_t current[TB_PATH_MAXN] = {0};
+    GetCurrentDirectoryW(TB_PATH_MAXN, current);
 
     // wtoa
-    return tb_wtoa(path, curt, maxn);
+    return tb_wtoa(path, current, maxn);
+}
+tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(path && maxn > 4, 0);
+
+    // the temporary directory
+    tb_wchar_t temporary[TB_PATH_MAXN] = {0};
+    GetTempPathW(TB_PATH_MAXN, temporary);
+
+    // wtoa
+    return tb_wtoa(path, temporary, maxn);
 }
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
@@ -233,19 +264,19 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
-    if (tb_path_full_w(path, full, TB_PATH_MAXN))
+    if (tb_path_absolute_w(path, full, TB_PATH_MAXN))
         tb_directory_walk_impl(full, recursion, prefix, func, priv);
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
     // the full path
     tb_char_t full0[TB_PATH_MAXN];
-    path = tb_path_full(path, full0, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // the dest path
     tb_char_t full1[TB_PATH_MAXN];
-    dest = tb_path_full(dest, full1, TB_PATH_MAXN);
+    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
     tb_assert_and_check_return_val(dest, tb_false);
 
     // walk copy
