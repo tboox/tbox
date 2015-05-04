@@ -40,7 +40,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_null;
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_null;
 
     // init access
     DWORD access = GENERIC_READ;
@@ -372,7 +372,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
     // get attributes
     WIN32_FILE_ATTRIBUTE_DATA st = {0};
@@ -408,11 +408,11 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 
     // the full path
     tb_wchar_t full0[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full0, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(path, full0, TB_PATH_MAXN)) return tb_false;
 
     // the dest path
     tb_wchar_t full1[TB_PATH_MAXN];
-    if (!tb_path_full_w(dest, full1, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
     // copy
     return CopyFileW(full0, full1, FALSE)? tb_true : tb_false;
@@ -436,7 +436,7 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
     
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
     // remote it
     return DeleteFileW(full)? tb_true : tb_false;
@@ -448,11 +448,11 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
     
     // the full path
     tb_wchar_t full0[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full0, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(path, full0, TB_PATH_MAXN)) return tb_false;
 
     // the dest path
     tb_wchar_t full1[TB_PATH_MAXN];
-    if (!tb_path_full_w(dest, full1, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
     // rename it
     return MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING);
@@ -465,11 +465,11 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 
     // the full path
     tb_wchar_t full0[TB_PATH_MAXN];
-    if (!tb_path_full_w(path, full0, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(path, full0, TB_PATH_MAXN)) return tb_false;
 
     // the dest path
     tb_wchar_t full1[TB_PATH_MAXN];
-    if (!tb_path_full_w(dest, full1, TB_PATH_MAXN)) return tb_false;
+    if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
     // not exists?
     tb_file_info_t info = {0};

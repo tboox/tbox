@@ -26,11 +26,37 @@
  */
 #include "prefix.h"
 #include "../../directory.h"
+#include "../../environment.h"
 #import <Foundation/Foundation.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(path && maxn, 0);
+
+    // the documents
+    NSString*           documents = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    tb_char_t const*    cstr = [documents UTF8String];
+    tb_size_t           size = [documents length];
+    if (documents)
+    {
+        // copy it
+        if (size >= maxn) size = maxn - 1;
+        tb_strlcpy(path, cstr, size);
+        path[size] = '\0';
+    }
+    else
+    {
+        // get the home directory
+        size = tb_environment_get_one("HOME", path, maxn);
+    }
+
+    // ok?
+    return size;
+}
 tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
     // check

@@ -409,6 +409,7 @@ tbox_C_FILES-$(MSVC)$(MINGW)$(CYGWIN) += \
 						platform/windows/interface/user32 \
 						platform/windows/interface/ws2_32 \
 						platform/windows/interface/dbghelp \
+						platform/windows/interface/shell32 \
 						platform/windows/interface/mswsock \
 						platform/windows/interface/kernel32 \
 						platform/windows/interface/iphlpapi 

@@ -6,6 +6,7 @@
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
  * callback
  */ 
+#if 0
 static tb_void_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
     // check
@@ -27,7 +28,7 @@ static tb_void_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t co
             , mtime.minute
             , mtime.second);
 }
-
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
@@ -35,16 +36,25 @@ static tb_void_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t co
 tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1
+    // home
+    tb_char_t home[TB_PATH_MAXN] = {0};
+    if (tb_directory_home(home, sizeof(home))) tb_trace_i("home: %s", home);
+
+    // current
+    tb_char_t current[TB_PATH_MAXN] = {0};
+    if (tb_directory_current(current, sizeof(current))) tb_trace_i("current: %s", current);
+
     // temporary
-    tb_char_t temp[4096] = {0};
-    if (tb_directory_temporary(temp, 4096)) tb_trace_i("temporary: %s", temp);
+    tb_char_t temporary[TB_PATH_MAXN] = {0};
+    if (tb_directory_temporary(temporary, sizeof(temporary))) tb_trace_i("temporary: %s", temporary);
+#elif 0
 
     // current
-    tb_char_t curt[4096] = {0};
-    if (tb_directory_current(curt, 4096)) tb_trace_i("current: %s", curt);
+    tb_char_t current[TB_PATH_MAXN] = {0};
+    if (tb_directory_current(current, sizeof(current))) tb_trace_i("current: %s", current);
 
     // current
-    tb_directory_walk(argv[1]? argv[1] : curt, tb_true, tb_true, tb_directory_walk_func, tb_null);
+    tb_directory_walk(argv[1]? argv[1] : current, tb_true, tb_true, tb_directory_walk_func, tb_null);
 #elif 0
     tb_directory_remove(argv[1]);
 #else

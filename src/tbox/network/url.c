@@ -421,7 +421,7 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
             p += 6;
         }
         // ./file or /home/file or c:/file or c:\\file ...
-        else if ((p = tb_path_full(cstr, full, TB_PATH_MAXN))) 
+        else if ((p = tb_path_absolute(cstr, full, TB_PATH_MAXN))) 
         {
             // for unix style path
             if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 

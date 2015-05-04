@@ -117,4 +117,12 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     // ok?
     return size;
 }
+tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(path && maxn, 0);
 
+    // trace
+    tb_trace_noimpl();
+    return 0;
+}

@@ -17,55 +17,50 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        directory.c
- * @ingroup     platform
+ * @file        shell32.c
+ *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "directory.h"
+#include "shell32.h"
+#include "../../../utils/singleton.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
-#   include "windows/directory.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
-#   include "posix/directory.c"
-#else
-tb_bool_t tb_directory_create(tb_char_t const* path)
+static tb_bool_t tb_shell32_instance_init(tb_handle_t instance)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_shell32_ref_t shell32 = (tb_shell32_ref_t)instance;
+    tb_check_return_val(shell32, tb_false);
+
+    // the shell32 module
+    HANDLE module = GetModuleHandleA("shell32.dll");
+    if (!module) module = tb_dynamic_init("shell32.dll");
+    tb_check_return_val(module, tb_false);
+
+    // init interfaces
+    TB_INTERFACE_LOAD(shell32, SHGetSpecialFolderLocation);
+    TB_INTERFACE_LOAD(shell32, SHGetPathFromIDListW);
+
+    // ok
+    return tb_true;
 }
-tb_bool_t tb_directory_remove(tb_char_t const* path)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_shell32_ref_t tb_shell32()
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // init
+    static tb_atomic_t      s_binited = 0;
+    static tb_shell32_t     s_shell32 = {0};
+
+    // init the static instance
+    tb_singleton_static_init(&s_binited, &s_shell32, tb_shell32_instance_init);
+
+    // ok
+    return &s_shell32;
 }
-tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-}
-tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-#endif

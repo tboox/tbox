@@ -50,7 +50,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
     // the full path
     tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_full(path, full, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_null);
 
     // flags
@@ -357,7 +357,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
     // the full path
     tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_full(path, full, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // exists?
@@ -447,7 +447,7 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
 
     // the full path
     tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_full(path, full, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // remove it
@@ -460,12 +460,12 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 
     // the full path
     tb_char_t full0[TB_PATH_MAXN];
-    path = tb_path_full(path, full0, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // the dest path
     tb_char_t full1[TB_PATH_MAXN];
-    dest = tb_path_full(dest, full1, TB_PATH_MAXN);
+    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
     tb_assert_and_check_return_val(dest, tb_false);
 
     // rename
@@ -478,12 +478,12 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 
     // the full path
     tb_char_t full0[TB_PATH_MAXN];
-    path = tb_path_full(path, full0, TB_PATH_MAXN);
+    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
     // the dest path
     tb_char_t full1[TB_PATH_MAXN];
-    dest = tb_path_full(dest, full1, TB_PATH_MAXN);
+    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
     tb_assert_and_check_return_val(dest, tb_false);
 
     // symlink
