@@ -47,22 +47,18 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
+ * implementation
  */
-static tb_size_t tb_path_translate(tb_char_t* path, tb_size_t maxn)
+tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(path, 0);
 
-    // file:? skip it
+    // file://?
     tb_char_t* p = path;
-#ifdef TB_CONFIG_OS_WINDOWS
-    if (tb_isalpha(p[0]) && p[1] == ':') p += 2;
-#else
     if (!tb_strnicmp(p, "file:", 5)) p += 5;
-#endif
     // is user directory?
-    else if (p[0] == '~')
+    else if (path[0] == '~')
     {
         // get the home directory
         tb_char_t home[TB_PATH_MAXN];
@@ -70,7 +66,7 @@ static tb_size_t tb_path_translate(tb_char_t* path, tb_size_t maxn)
         tb_assert_and_check_return_val(home_size, 0);
 
         // check the path space
-        tb_size_t path_size = tb_strlen(path);
+        tb_size_t path_size = size? size : tb_strlen(path);
         tb_assert_and_check_return_val(home_size + path_size - 1 < maxn, 0);
 
         // move the path and ensure the enough space for the home directory
@@ -80,9 +76,6 @@ static tb_size_t tb_path_translate(tb_char_t* path, tb_size_t maxn)
         tb_memcpy(path, home, home_size);
         path[home_size + path_size] = '\0';
     }
-
-    // must be absolute path
-    tb_assertf_and_check_return_val(*p == '/' || *p == '\\', 0, "invalid path: %s", path);
 
     // remove repeat '/' and replace '\\'
     tb_char_t*  q = path;
@@ -116,10 +109,6 @@ static tb_size_t tb_path_translate(tb_char_t* path, tb_size_t maxn)
     // ok
     return q - path;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
 tb_bool_t tb_path_is_absolute(tb_char_t const* path)
 {
     // check
@@ -156,7 +145,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
         data[maxn - 1] = '\0';
 
         // translate it
-        return tb_path_translate(data, maxn)? data : tb_null;
+        return tb_path_translate(data, 0, maxn)? data : tb_null;
     }
 
     // get the root directory
@@ -178,7 +167,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     }
 
     // translate the root directory
-    size = tb_path_translate(data, maxn);
+    size = tb_path_translate(data, size, maxn);
 
     // trace
     tb_trace_d("root: %s, size: %lu", data, size);
