@@ -16,7 +16,9 @@ tb_int_t tb_demo_platform_environment_main(tb_int_t argc, tb_char_t** argv)
         if (tb_environment_load(environment, argv[1]))
         {
             // dump it
+#ifdef __tb_debug__
             tb_environment_dump(environment, argv[1]);
+#endif
         }
 
         // save variable?
@@ -36,7 +38,9 @@ tb_int_t tb_demo_platform_environment_main(tb_int_t argc, tb_char_t** argv)
             if (tb_environment_load(environment, argv[1]))
             {
                 // dump it
+#ifdef __tb_debug__
                 tb_environment_dump(environment, argv[1]);
+#endif
             }
         }
 
