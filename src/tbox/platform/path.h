@@ -37,11 +37,27 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
+
+// the path maximum
 #define TB_PATH_MAXN        (4096)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+
+/*! translate the path to the native path
+ * 
+ * - transform the path separator
+ * - remove the repeat path separator
+ * - expand the user directory with the prefix: ~
+ *
+ * @param path          the path 
+ * @param size          the path size, optional
+ * @param maxn          the path maxn
+ *
+ * @return              tb_true or tb_false
+ */
+tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn);
 
 /*! the path is absolute?
  * 
