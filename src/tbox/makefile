@@ -588,6 +588,7 @@ tbox_INC_FILES 			= \
 						platform/windows/interface/prefix.h \
 						platform/windows/interface/interface.h \
 						platform/windows/interface/user32.h \
+						platform/windows/interface/shell32.h \
 						platform/windows/interface/kernel32.h \
 						platform/windows/interface/mswsock.h \
 						platform/windows/interface/dbghelp.h \
