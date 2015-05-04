@@ -46,6 +46,9 @@
 #   define TB_PATH_SEPARATOR        '/'
 #endif
 
+// is path separator?
+#define tb_path_is_separator(c)     ((c) == '/' || (c) == '\\')
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -77,12 +80,12 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
         path[home_size + path_size] = '\0';
     }
 
-    // remove repeat '/' and replace '\\'
+    // remove repeat separator
     tb_char_t*  q = path;
     tb_size_t   repeat = 0;
     for (; *p; p++)
     {
-        if (*p == '/' || *p == '\\')
+        if (tb_path_is_separator(*p))
         {
             // save the separator if not exists
             if (!repeat) *q++ = TB_PATH_SEPARATOR;
@@ -117,7 +120,7 @@ tb_bool_t tb_path_is_absolute(tb_char_t const* path)
     // is absolute?
 #ifdef TB_CONFIG_OS_WINDOWS
     return (    path[0] == '~'
-            ||  (tb_isalpha(path[0]) && path[1] == ':' && (path[2] == '/' || path[2] == '\\')));
+            ||  (tb_isalpha(path[0]) && path[1] == ':' && tb_path_is_separator(path[2])));
 #else
     return (    path[0] == '/'
             ||  path[0] == '\\'
@@ -191,7 +194,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     tb_char_t const*    e = absolute + maxn - 1;
     while (1)
     {
-        if (*p == '/' || *p == '\\' || !*p)
+        if (tb_path_is_separator(*p) || !*p)
         {
             // the item size
             tb_size_t n = p - t;
