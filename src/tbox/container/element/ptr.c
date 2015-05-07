@@ -32,7 +32,7 @@
  */
 static tb_long_t tb_element_ptr_comp(tb_element_ref_t element, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-    return ((tb_size_t)ldata > (tb_size_t)rdata? 1 : ((tb_size_t)ldata < (tb_size_t)rdata? -1 : 0));
+    return (ldata < rdata)? -1 : (ldata > rdata);
 }
 static tb_pointer_t tb_element_ptr_data(tb_element_ref_t element, tb_cpointer_t buff)
 {
