@@ -59,7 +59,11 @@
 #endif
 
 // enable check
-#define TB_HEAP_CHECK_ENABLE        (0)
+#ifdef __tb_debug__
+#   define TB_HEAP_CHECK_ENABLE     (0)
+#else
+#   define TB_HEAP_CHECK_ENABLE     (0)
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -176,7 +180,7 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_impl_t* impl, tb_size_t hole, tb_cp
     tb_element_data_func_t func_data = impl->element.data;
     tb_assert_abort(func_comp && func_data);
 
-    // walk, (hole - 1) / 2: the parent node of the hole
+    // (hole - 1) / 2: the parent node of the hole
     tb_size_t   parent = 0;
     tb_byte_t*  head = impl->data;
     tb_size_t   step = impl->element.size;
@@ -608,11 +612,14 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
     tb_assert_and_check_return(impl->size < impl->maxn);
     
     // shift up the heap from the tail hole
-    tb_pointer_t hole = tb_heap_shift_up(impl, impl->size++, data);
+    tb_pointer_t hole = tb_heap_shift_up(impl, impl->size, data);
     tb_assert_abort(hole);
         
     // save data to the hole
     if (hole) impl->element.dupl(&impl->element, hole, data);
+
+    // update the size
+    impl->size++;
 
     // check
 #if TB_HEAP_CHECK_ENABLE
