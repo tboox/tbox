@@ -424,32 +424,36 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     // free the item first
     if (impl->element.free) impl->element.free(&impl->element, impl->data + itor * step);
 
-    // the last and parent
-    tb_pointer_t last = impl->data + (impl->size - 1) * step;
-    tb_pointer_t parent = impl->data + ((itor - 1) >> 1) * step;
-
-    // the last and parent data
-    tb_pointer_t data_last = impl->element.data(&impl->element, last);
-    tb_pointer_t data_parent = impl->element.data(&impl->element, parent);
-
-    /* we might need to shift it upward if it is less than its parent, 
-     * or downward if it is greater than one or both its children. 
-     *
-     * since the children are known to be less than the parent, 
-     * it can't need to shift both up and down.
-     */
-    tb_pointer_t hole = tb_null;
-    if (itor && impl->element.comp(&impl->element, data_parent, data_last) > 0) 
+    // the removed item is not the last item?
+    if (itor != impl->size - 1)
     {
-        // shift up the heap from the given hole
-        hole = tb_heap_shift_up(impl, itor, data_last);
-    }
-    // shift down the heap from the given hole
-    else hole = tb_heap_shift_down(impl, itor, data_last);
-    tb_assert_abort(hole);
+        // the last and parent
+        tb_pointer_t last = impl->data + (impl->size - 1) * step;
+        tb_pointer_t parent = impl->data + ((itor - 1) >> 1) * step;
 
-    // copy the last data to the hole
-    if (hole != last) tb_memcpy(hole, last, step);
+        // the last and parent data
+        tb_pointer_t data_last = impl->element.data(&impl->element, last);
+        tb_pointer_t data_parent = impl->element.data(&impl->element, parent);
+
+        /* we might need to shift it upward if it is less than its parent, 
+         * or downward if it is greater than one or both its children. 
+         *
+         * since the children are known to be less than the parent, 
+         * it can't need to shift both up and down.
+         */
+        tb_pointer_t hole = tb_null;
+        if (itor && impl->element.comp(&impl->element, data_parent, data_last) > 0) 
+        {
+            // shift up the heap from the given hole
+            hole = tb_heap_shift_up(impl, itor, data_last);
+        }
+        // shift down the heap from the given hole
+        else hole = tb_heap_shift_down(impl, itor, data_last);
+        tb_assert_abort(hole);
+
+        // copy the last data to the hole
+        if (hole != last) tb_memcpy(hole, last, step);
+    }
 
     // size--
     impl->size--;
@@ -621,25 +625,29 @@ tb_void_t tb_heap_pop(tb_heap_ref_t heap)
     tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
     tb_assert_and_check_return(impl && impl->data && impl->size);
 
-    // check the element function
-    tb_assert_abort(impl->element.data);
-
-    // the step
-    tb_size_t step = impl->element.size;
-    tb_assert_abort(step);
-
-    // the last 
-    tb_pointer_t last = impl->data + (impl->size - 1) * step;
-
     // free the top item first
     if (impl->element.free) impl->element.free(&impl->element, impl->data);
 
-    // shift down the heap from the top hole
-    tb_pointer_t hole = tb_heap_shift_down(impl, 0, impl->element.data(&impl->element, last));
-    tb_assert_abort(hole);
+    // the last item is not in top 
+    if (impl->size > 1)
+    {
+        // check the element function
+        tb_assert_abort(impl->element.data);
 
-    // copy the last data to the hole
-    if (hole != last) tb_memcpy(hole, last, step);
+        // the step
+        tb_size_t step = impl->element.size;
+        tb_assert_abort(step);
+
+        // the last 
+        tb_pointer_t last = impl->data + (impl->size - 1) * step;
+
+        // shift down the heap from the top hole
+        tb_pointer_t hole = tb_heap_shift_down(impl, 0, impl->element.data(&impl->element, last));
+        tb_assert_abort(hole);
+
+        // copy the last data to the hole
+        if (hole != last) tb_memcpy(hole, last, step);
+    }
 
     // update the size
     impl->size--;
