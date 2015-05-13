@@ -42,7 +42,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_buffer_init(tb_buffer_t* buffer)
+tb_bool_t tb_buffer_init(tb_buffer_ref_t buffer)
 {
     // check
     tb_assert_and_check_return_val(buffer, tb_false);
@@ -55,7 +55,7 @@ tb_bool_t tb_buffer_init(tb_buffer_t* buffer)
     // ok
     return tb_true;
 }
-tb_void_t tb_buffer_exit(tb_buffer_t* buffer)
+tb_void_t tb_buffer_exit(tb_buffer_ref_t buffer)
 {
     // check
     tb_assert_and_check_return(buffer);
@@ -71,7 +71,7 @@ tb_void_t tb_buffer_exit(tb_buffer_t* buffer)
     buffer->size = 0;
     buffer->maxn = sizeof(buffer->buff);
 }
-tb_byte_t* tb_buffer_data(tb_buffer_t* buffer)
+tb_byte_t* tb_buffer_data(tb_buffer_ref_t buffer)
 {
     // check
     tb_assert_and_check_return_val(buffer, tb_null);
@@ -79,7 +79,7 @@ tb_byte_t* tb_buffer_data(tb_buffer_t* buffer)
     // the buffer data
     return buffer->data;
 }
-tb_size_t tb_buffer_size(tb_buffer_t const* buffer)
+tb_size_t tb_buffer_size(tb_buffer_ref_t buffer)
 { 
     // check
     tb_assert_and_check_return_val(buffer, 0);
@@ -87,7 +87,7 @@ tb_size_t tb_buffer_size(tb_buffer_t const* buffer)
     // the buffer size
     return buffer->size;
 }
-tb_size_t tb_buffer_maxn(tb_buffer_t const* buffer)
+tb_size_t tb_buffer_maxn(tb_buffer_ref_t buffer)
 {
     // check
     tb_assert_and_check_return_val(buffer, 0);
@@ -95,7 +95,7 @@ tb_size_t tb_buffer_maxn(tb_buffer_t const* buffer)
     // the buffer maxn
     return buffer->maxn;
 }
-tb_void_t tb_buffer_clear(tb_buffer_t* buffer)
+tb_void_t tb_buffer_clear(tb_buffer_ref_t buffer)
 {
     // check
     tb_assert_and_check_return(buffer);
@@ -103,7 +103,7 @@ tb_void_t tb_buffer_clear(tb_buffer_t* buffer)
     // clear it
     buffer->size = 0;
 }
-tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
+tb_byte_t* tb_buffer_resize(tb_buffer_ref_t buffer, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(buffer && size, tb_null);
@@ -190,19 +190,19 @@ tb_byte_t* tb_buffer_resize(tb_buffer_t* buffer, tb_size_t size)
     // ok
     return ok? (tb_byte_t*)buffer->data : tb_null;
 }
-tb_byte_t* tb_buffer_memset(tb_buffer_t* buffer, tb_byte_t b)
+tb_byte_t* tb_buffer_memset(tb_buffer_ref_t buffer, tb_byte_t b)
 {
     return tb_buffer_memnsetp(buffer, 0, b, tb_buffer_size(buffer));
 }
-tb_byte_t* tb_buffer_memsetp(tb_buffer_t* buffer, tb_size_t p, tb_byte_t b)
+tb_byte_t* tb_buffer_memsetp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t b)
 {
     return tb_buffer_memnsetp(buffer, p, b, tb_buffer_size(buffer));
 }
-tb_byte_t* tb_buffer_memnset(tb_buffer_t* buffer, tb_byte_t b, tb_size_t n)
+tb_byte_t* tb_buffer_memnset(tb_buffer_ref_t buffer, tb_byte_t b, tb_size_t n)
 {
     return tb_buffer_memnsetp(buffer, 0, b, n);
 }
-tb_byte_t* tb_buffer_memnsetp(tb_buffer_t* buffer, tb_size_t p, tb_byte_t b, tb_size_t n)
+tb_byte_t* tb_buffer_memnsetp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t b, tb_size_t n)
 {
     // check
     tb_assert_and_check_return_val(buffer, tb_null);
@@ -220,19 +220,19 @@ tb_byte_t* tb_buffer_memnsetp(tb_buffer_t* buffer, tb_size_t p, tb_byte_t b, tb_
     // ok?
     return d;
 }
-tb_byte_t* tb_buffer_memcpy(tb_buffer_t* buffer, tb_buffer_t* b)
+tb_byte_t* tb_buffer_memcpy(tb_buffer_ref_t buffer, tb_buffer_ref_t b)
 {
     return tb_buffer_memncpyp(buffer, 0, tb_buffer_data(b), tb_buffer_size(b));
 }
-tb_byte_t* tb_buffer_memcpyp(tb_buffer_t* buffer, tb_size_t p, tb_buffer_t* b)
+tb_byte_t* tb_buffer_memcpyp(tb_buffer_ref_t buffer, tb_size_t p, tb_buffer_ref_t b)
 {
     return tb_buffer_memncpyp(buffer, p, tb_buffer_data(b), tb_buffer_size(b));
 }
-tb_byte_t* tb_buffer_memncpy(tb_buffer_t* buffer, tb_byte_t const* b, tb_size_t n)
+tb_byte_t* tb_buffer_memncpy(tb_buffer_ref_t buffer, tb_byte_t const* b, tb_size_t n)
 {
     return tb_buffer_memncpyp(buffer, 0, b, n);
 }
-tb_byte_t* tb_buffer_memncpyp(tb_buffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n)
+tb_byte_t* tb_buffer_memncpyp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n)
 {
     // check
     tb_assert_and_check_return_val(buffer && b, tb_null);
@@ -250,23 +250,23 @@ tb_byte_t* tb_buffer_memncpyp(tb_buffer_t* buffer, tb_size_t p, tb_byte_t const*
     // ok
     return d;
 }
-tb_byte_t* tb_buffer_memmov(tb_buffer_t* buffer, tb_size_t b)
+tb_byte_t* tb_buffer_memmov(tb_buffer_ref_t buffer, tb_size_t b)
 {
     // check
     tb_assert_and_check_return_val(b <= tb_buffer_size(buffer), tb_null);
     return tb_buffer_memnmovp(buffer, 0, b, tb_buffer_size(buffer) - b);
 }
-tb_byte_t* tb_buffer_memmovp(tb_buffer_t* buffer, tb_size_t p, tb_size_t b)
+tb_byte_t* tb_buffer_memmovp(tb_buffer_ref_t buffer, tb_size_t p, tb_size_t b)
 {
     // check
     tb_assert_and_check_return_val(b <= tb_buffer_size(buffer), tb_null);
     return tb_buffer_memnmovp(buffer, p, b, tb_buffer_size(buffer) - b);
 }
-tb_byte_t* tb_buffer_memnmov(tb_buffer_t* buffer, tb_size_t b, tb_size_t n)
+tb_byte_t* tb_buffer_memnmov(tb_buffer_ref_t buffer, tb_size_t b, tb_size_t n)
 {
     return tb_buffer_memnmovp(buffer, 0, b, n);
 }
-tb_byte_t* tb_buffer_memnmovp(tb_buffer_t* buffer, tb_size_t p, tb_size_t b, tb_size_t n)
+tb_byte_t* tb_buffer_memnmovp(tb_buffer_ref_t buffer, tb_size_t p, tb_size_t b, tb_size_t n)
 {
     // check
     tb_assert_and_check_return_val(buffer && (b + n) <= tb_buffer_size(buffer), tb_null);
@@ -289,11 +289,11 @@ tb_byte_t* tb_buffer_memnmovp(tb_buffer_t* buffer, tb_size_t p, tb_size_t b, tb_
     tb_memmov(d + p, d + b, n);
     return d;
 }
-tb_byte_t* tb_buffer_memcat(tb_buffer_t* buffer, tb_buffer_t* b)
+tb_byte_t* tb_buffer_memcat(tb_buffer_ref_t buffer, tb_buffer_ref_t b)
 {
     return tb_buffer_memncat(buffer, tb_buffer_data(b), tb_buffer_size(b));
 }
-tb_byte_t* tb_buffer_memncat(tb_buffer_t* buffer, tb_byte_t const* b, tb_size_t n)
+tb_byte_t* tb_buffer_memncat(tb_buffer_ref_t buffer, tb_byte_t const* b, tb_size_t n)
 {   
     // check
     tb_assert_and_check_return_val(buffer && b, tb_null);
