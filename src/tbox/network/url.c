@@ -42,7 +42,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_char_t const* tb_url_parse_args(tb_string_t* args, tb_char_t const* p)
+static tb_char_t const* tb_url_parse_args(tb_string_ref_t args, tb_char_t const* p)
 {
     // check
     tb_assert_and_check_return_val(args && p, tb_null);
@@ -59,7 +59,7 @@ static tb_char_t const* tb_url_parse_args(tb_string_t* args, tb_char_t const* p)
     // end
     return p;
 }
-static tb_char_t const* tb_url_parse_path(tb_string_t* path, tb_char_t const* p)
+static tb_char_t const* tb_url_parse_path(tb_string_ref_t path, tb_char_t const* p)
 {
     // check
     tb_assert_and_check_return_val(path && p, tb_null);
@@ -89,7 +89,7 @@ static tb_char_t const* tb_url_parse_path(tb_string_t* path, tb_char_t const* p)
     // end
     return p;
 }
-static tb_char_t const* tb_url_parse_host(tb_string_t* host, tb_char_t const* p)
+static tb_char_t const* tb_url_parse_host(tb_string_ref_t host, tb_char_t const* p)
 {
     // check
     tb_assert_and_check_return_val(host && p, tb_null);
@@ -149,7 +149,7 @@ static tb_char_t const* tb_url_parse_port(tb_uint16_t* port, tb_char_t const* p)
     // end
     return p;
 }
-static tb_char_t const* tb_url_parse_data(tb_string_t* data, tb_char_t const* p)
+static tb_char_t const* tb_url_parse_data(tb_string_ref_t data, tb_char_t const* p)
 {
     // check
     tb_assert_and_check_return_val(data && p, tb_null);

@@ -173,7 +173,7 @@ tb_object_ref_t tb_object_data_init_from_data(tb_pointer_t addr, tb_size_t size)
     // ok
     return (tb_object_ref_t)data;
 }
-tb_object_ref_t tb_object_data_init_from_buffer(tb_buffer_t* pbuf)
+tb_object_ref_t tb_object_data_init_from_buffer(tb_buffer_ref_t pbuf)
 {   
     // make
     tb_object_data_t* data = tb_object_data_init_base();
@@ -222,7 +222,7 @@ tb_size_t tb_object_data_size(tb_object_ref_t object)
     // data
     return tb_buffer_size(&data->buffer);
 }
-tb_buffer_t* tb_object_data_buffer(tb_object_ref_t object)
+tb_buffer_ref_t tb_object_data_buffer(tb_object_ref_t object)
 {
     // check
     tb_object_data_t* data = tb_object_data_cast(object);

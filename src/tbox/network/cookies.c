@@ -453,7 +453,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
     tb_size_t secure = tuple[2].ul;
 
     // the value of key
-    tb_string_t* kvalue = (tb_string_t*)tuple[3].ptr;
+    tb_string_ref_t kvalue = (tb_string_ref_t)tuple[3].ptr;
     tb_assert_abort(kvalue);
 
     // expired?
@@ -676,7 +676,7 @@ tb_bool_t tb_cookies_set_from_url(tb_cookies_ref_t cookies, tb_char_t const* url
     // try to set it without domain and path
     return tb_cookies_set(cookies, tb_null, tb_null, tb_false, value);
 }
-tb_char_t const* tb_cookies_get(tb_cookies_ref_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_string_t* value)
+tb_char_t const* tb_cookies_get(tb_cookies_ref_t cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_string_ref_t value)
 {
     // check
     tb_cookies_impl_t* impl = (tb_cookies_impl_t*)cookies;
@@ -726,7 +726,7 @@ tb_char_t const* tb_cookies_get(tb_cookies_ref_t cookies, tb_char_t const* domai
     // ok?
     return tb_string_size(value)? tb_string_cstr(value) : tb_null;
 }
-tb_char_t const* tb_cookies_get_from_url(tb_cookies_ref_t cookies, tb_char_t const* url, tb_string_t* value)
+tb_char_t const* tb_cookies_get_from_url(tb_cookies_ref_t cookies, tb_char_t const* url, tb_string_ref_t value)
 {
     // check
     tb_cookies_impl_t* impl = (tb_cookies_impl_t*)cookies;
