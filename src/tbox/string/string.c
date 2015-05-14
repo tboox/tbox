@@ -104,18 +104,45 @@ tb_char_t const* tb_string_strip(tb_string_ref_t string, tb_size_t n)
     // ok?
     return p;
 }
+tb_char_t const* tb_string_ltrim(tb_string_ref_t string)
+{
+    // check
+    tb_assert_and_check_return_val(string, tb_null);
+
+    // init
+    tb_char_t*  s = (tb_char_t*)tb_string_cstr(string);
+    tb_size_t   n = tb_string_size(string);
+    tb_check_return_val(s && n, tb_null);
+
+    // done
+    tb_char_t*  p = s;
+    tb_char_t*  e = s + n;
+    while (p < e && tb_isspace(*p)) p++;
+
+    // strip it
+    if (p < e) 
+    {
+        // move it if exists spaces
+        if (p > s) tb_buffer_memmov(string, p - s);
+    }
+    // clear it 
+    else tb_string_clear(string);
+
+    // ok?
+    return tb_string_cstr(string);
+}
 tb_char_t const* tb_string_rtrim(tb_string_ref_t string)
 {
     // check
     tb_assert_and_check_return_val(string, tb_null);
 
     // init
-    tb_char_t*      s = (tb_char_t*)tb_string_cstr(string);
-    tb_size_t       n = tb_string_size(string);
+    tb_char_t*  s = (tb_char_t*)tb_string_cstr(string);
+    tb_size_t   n = tb_string_size(string);
     tb_check_return_val(s && n, tb_null);
 
     // done
-    tb_char_t*      e = s + n - 1;
+    tb_char_t*  e = s + n - 1;
     while (e >= s && tb_isspace(*e)) e--;
 
     // strip it
