@@ -96,6 +96,14 @@ tb_void_t               tb_static_string_clear(tb_static_string_ref_t string);
  */
 tb_char_t const*        tb_static_string_strip(tb_static_string_ref_t string, tb_size_t n);
 
+/*! trim the left spaces for string
+ *
+ * @param string        the string
+ *
+ * @return              the c-string
+ */
+tb_char_t const*        tb_static_string_ltrim(tb_static_string_ref_t string);
+
 /*! trim the right spaces for string
  *
  * @param string        the string
