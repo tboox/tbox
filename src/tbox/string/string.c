@@ -153,6 +153,16 @@ tb_char_t const* tb_string_rtrim(tb_string_ref_t string)
     // ok?
     return tb_string_cstr(string);
 }
+tb_char_t tb_string_charat(tb_string_ref_t string, tb_size_t p)
+{
+    // check
+    tb_char_t const*    s = tb_string_cstr(string);
+    tb_size_t           n = tb_string_size(string);
+    tb_assert_and_check_return_val(s && p < n, '\0');
+
+    // get it
+    return s[p];
+}
 tb_long_t tb_string_strchr(tb_string_ref_t string, tb_size_t p, tb_char_t c)
 {
     // check
@@ -300,9 +310,6 @@ tb_char_t const* tb_string_cstrfcpy(tb_string_ref_t string, tb_char_t const* fmt
     // done
     return tb_string_cstrncpy(string, p, n);
 }
-/* //////////////////////////////////////////////////////////////////////////////////////
- * chrcat
- */
 tb_char_t const* tb_string_chrcat(tb_string_ref_t string, tb_char_t c)
 {
     // check
@@ -323,9 +330,6 @@ tb_char_t const* tb_string_chrncat(tb_string_ref_t string, tb_char_t c, tb_size_
     if (p) p[tb_string_size(string)] = '\0';
     return p;
 }
-/* //////////////////////////////////////////////////////////////////////////////////////
- * strcat
- */
 tb_char_t const* tb_string_strcat(tb_string_ref_t string, tb_string_ref_t s)
 {
     // check

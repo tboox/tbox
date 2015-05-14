@@ -112,6 +112,15 @@ tb_char_t const*        tb_static_string_ltrim(tb_static_string_ref_t string);
  */
 tb_char_t const*        tb_static_string_rtrim(tb_static_string_ref_t string);
 
+/*! get the charactor at the given position
+ *
+ * @param string        the string
+ * @param p             the position
+ *
+ * @return              the c-string
+ */
+tb_char_t               tb_static_string_charat(tb_static_string_ref_t string, tb_size_t p);
+
 /*! find charactor position
  *
  * @param string        the string
