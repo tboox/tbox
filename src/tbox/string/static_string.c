@@ -151,6 +151,16 @@ tb_char_t const* tb_static_string_rtrim(tb_static_string_ref_t string)
     // ok?
     return tb_static_string_cstr(string);
 }
+tb_char_t tb_static_string_charat(tb_static_string_ref_t string, tb_size_t p)
+{
+    // check
+    tb_char_t const*    s = tb_static_string_cstr(string);
+    tb_size_t           n = tb_static_string_size(string);
+    tb_assert_and_check_return_val(s && p < n, '\0');
+
+    // get it
+    return s[p];
+}
 tb_long_t tb_static_string_strchr(tb_static_string_ref_t string, tb_size_t p, tb_char_t c)
 {
     // check
