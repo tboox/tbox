@@ -245,6 +245,15 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
     // wtoa
     return tb_wtoa(path, current, maxn);
 }
+tb_bool_t tb_directory_current_set(tb_char_t const* path)
+{
+    // the full path
+    tb_wchar_t full[TB_PATH_MAXN];
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
+
+    // change to the directory
+    return SetCurrentDirectoryW(full);
+}
 tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
     // check

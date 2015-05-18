@@ -217,6 +217,16 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
     // ok?
     return size;
 }
+tb_bool_t tb_directory_current_set(tb_char_t const* path)
+{
+    // the full path
+    tb_char_t full[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // change to the directory
+    return !chdir(path);
+}
 #if !defined(TB_CONFIG_OS_IOS) && !defined(TB_CONFIG_OS_ANDROID)
 tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
 {
