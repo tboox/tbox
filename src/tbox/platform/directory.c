@@ -54,6 +54,11 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
     tb_trace_noimpl();
     return 0;
 }
+tb_bool_t tb_directory_current_set(tb_char_t const* path)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
 tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
     tb_trace_noimpl();
