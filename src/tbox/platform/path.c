@@ -323,7 +323,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     tb_assert_and_check_return_val(root && root_size && root_size < root_maxn, tb_null);
 
     // trace
-    tb_trace_i("root_absolute: %s", root);
+    tb_trace_d("root_absolute: %s", root);
 
     // same directory? return "."
     if (path_size == root_size && !tb_strncmp(path, root, root_size)) 
@@ -360,7 +360,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     }
 
     // is different directory or outside the windows drive root? using the absolute path
-    if (last < 0 || (last == 2 && root[1] == ':'))
+    if (last <= 0 || (last == 2 && root[1] == ':'))
     {
         // the path size
         tb_size_t size = tb_min(path_size - 1, maxn);
