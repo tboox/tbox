@@ -28,10 +28,13 @@
 #include "string.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation 
  */
 tb_char_t* tb_strrchr(tb_char_t const* s, tb_char_t c)
 {
+    // check
     tb_assert_and_check_return_val(s, tb_null);
+
+    // done
     return tb_strnrchr(s, tb_strlen(s), c);
 }
