@@ -169,7 +169,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
-    // the full path
+    // the absolute path
     tb_char_t full[TB_PATH_MAXN];
     path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
@@ -206,7 +206,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 }
 tb_bool_t tb_directory_remove(tb_char_t const* path)
 {
-    // the full path
+    // the absolute path
     tb_char_t full[TB_PATH_MAXN];
     path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
@@ -231,7 +231,7 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
 }
 tb_bool_t tb_directory_current_set(tb_char_t const* path)
 {
-    // the full path
+    // the absolute path
     tb_char_t full[TB_PATH_MAXN];
     path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
@@ -277,7 +277,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
         tb_directory_walk_impl(path, recursion, prefix, func, priv);
     else
     {
-        // the full path
+        // the absolute path
         tb_char_t full[TB_PATH_MAXN];
         path = tb_path_absolute(path, full, TB_PATH_MAXN);
         tb_assert_and_check_return(path);
@@ -288,7 +288,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
-    // the full path
+    // the absolute path
     tb_char_t full0[TB_PATH_MAXN];
     path = tb_path_absolute(path, full0, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
