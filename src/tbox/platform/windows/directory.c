@@ -166,7 +166,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
-    // the full path
+    // the absolute path
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
@@ -205,7 +205,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
-    // the full path
+    // the absolute path
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
@@ -259,7 +259,7 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
 }
 tb_bool_t tb_directory_current_set(tb_char_t const* path)
 {
-    // the full path
+    // the absolute path
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
@@ -283,14 +283,25 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
     // check
     tb_assert_and_check_return(path && func);
 
-    // the full path
-    tb_wchar_t full[TB_PATH_MAXN];
-    if (tb_path_absolute_w(path, full, TB_PATH_MAXN))
-        tb_directory_walk_impl(full, recursion, prefix, func, priv);
+    // exists?
+    tb_file_info_t info = {0};
+    if (tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
+    {
+        tb_wchar_t path_w[TB_PATH_MAXN] = {0};
+        if (tb_atow(path_w, path, tb_arrayn(path_w)))
+            tb_directory_walk_impl(path_w, recursion, prefix, func, priv);
+    }
+    else
+    {
+        // the absolute path
+        tb_wchar_t full_w[TB_PATH_MAXN];
+        if (tb_path_absolute_w(path, full_w, TB_PATH_MAXN))
+            tb_directory_walk_impl(full_w, recursion, prefix, func, priv);
+    }
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
-    // the full path
+    // the absolute path
     tb_char_t full0[TB_PATH_MAXN];
     path = tb_path_absolute(path, full0, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
