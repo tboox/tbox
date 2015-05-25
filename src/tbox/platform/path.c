@@ -77,7 +77,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
 
         // copy the home directory 
         tb_memcpy(path, home, home_size);
-        path[home_size + path_size] = '\0';
+        path[home_size + path_size - 1] = '\0';
     }
 
     // remove repeat separator
