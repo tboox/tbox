@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../libc/libc.h"
 #include "../../string/string.h"
 #include "../../algorithm/algorithm.h"
 #include <stdlib.h>
