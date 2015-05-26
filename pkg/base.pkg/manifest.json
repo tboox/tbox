@@ -58,17 +58,18 @@
 
     ,   "android":
         {
-            "armv5te":
+            "default":
             {
                 "debug":
                 {
                     "libs":     "stdc++ log gcc c m dl"
                 }
-            ,   "release":      "$.compiler.android.armv5te.debug"
+            ,   "release":      "$.compiler.android.default.debug"
             }
 
-        ,   "armv6":            "$.compiler.android.armv5te"
-        ,   "armv7":            "$.compiler.android.armv5te"
+        ,   "armv5te":          "$.compiler.android.default"
+        ,   "armv6":            "$.compiler.android.default"
+        ,   "armv7-a":          "$.compiler.android.default"
         }
 
     ,   "ios":
