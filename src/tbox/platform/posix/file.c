@@ -48,10 +48,14 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     // check
     tb_assert_and_check_return_val(path, tb_null);
 
+    tb_trace_i("init: %s", path);
+
     // the full path
     tb_char_t full[TB_PATH_MAXN];
     path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_null);
+
+    tb_trace_i("%s %s", path, full);
 
     // flags
     tb_size_t flags = 0;
@@ -91,7 +95,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     {
         // make directory
         tb_char_t           temp[TB_PATH_MAXN] = {0};
-        tb_char_t const*    p = full;
+        tb_char_t const*    p = path;
         tb_char_t*          t = temp;
         tb_char_t const*    e = temp + TB_PATH_MAXN - 1;
         for (; t < e && *p; t++) 
