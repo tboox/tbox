@@ -31,6 +31,7 @@
 #include "../aiop.h"
 #include "../../memory/memory.h"
 #include "../../platform/platform.h"
+#include "../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

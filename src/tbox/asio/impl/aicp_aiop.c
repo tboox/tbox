@@ -55,11 +55,11 @@ typedef struct __tb_aiop_ptor_impl_t
     tb_thread_ref_t             loop;
 
     // the aioe list
-    tb_aioe_ref_t                  list;
+    tb_aioe_ref_t               list;
 
     // the aioe size
     tb_size_t                   maxn;
-
+ 
     // the timer for task
     tb_timer_ref_t              timer;
 
@@ -68,6 +68,12 @@ typedef struct __tb_aiop_ptor_impl_t
 
     // the private data for file
     tb_handle_t                 fpriv;
+
+    // the killing list lock
+    tb_spinlock_t               klock;
+
+    // the killing aico list
+    tb_vector_ref_t             klist;
 
 }tb_aiop_ptor_impl_t;
 
@@ -1314,6 +1320,63 @@ static tb_long_t tb_aiop_spak_done(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice
     // done spak 
     return s_spak[aice->code](impl, aice);
 }
+static tb_void_t tb_aiop_spak_klist(tb_aiop_ptor_impl_t* impl)
+{
+    // check
+    tb_assert_and_check_return(impl && impl->klist);
+
+    // enter
+    tb_spinlock_enter(&impl->klock);
+
+    // kill it if exists the killing aico
+    if (tb_vector_size(impl->klist)) 
+    {
+        // kill all
+        tb_for_all_if (tb_aico_impl_t*, aico, impl->klist, aico)
+        {
+            // the aiop aico
+            tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
+
+            // sock?
+            if (aico->type == TB_AICO_TYPE_SOCK) 
+            {
+                // add it first if do not exists timeout task
+                if (!aiop_aico->task) 
+                {
+                    aiop_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_aiop_spak_wait_timeout, aico);
+                    aiop_aico->bltimer = 1;
+                }
+
+                // kill the task
+                if (aiop_aico->task) 
+                {
+                    // kill task
+                    if (aiop_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, aiop_aico->task);
+                    else tb_timer_task_kill(impl->timer, aiop_aico->task);
+                }
+            }
+            else if (aico->type == TB_AICO_TYPE_FILE)
+            {
+                // kill file
+                tb_aicp_file_kilo(impl, aico);
+            }
+
+            // trace
+            tb_trace_d("kill: aico: %p, type: %u: ok", aico, aico->type);
+        }
+    }
+
+    // clear the killing aico list
+    tb_vector_clear(impl->klist);
+
+    // leave
+    tb_spinlock_leave(&impl->klock);
+
+    /* the aiop will wait long time if the lastest task wait period is too long
+     * so spak the aiop manually for spak the timer
+     */
+    tb_aiop_spak(impl->aiop);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -1369,59 +1432,18 @@ static tb_void_t tb_aiop_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
 {
     // check
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
-    tb_assert_and_check_return(impl && impl->timer && impl->ltimer && impl->aiop && aico);
+    tb_assert_and_check_return(impl && impl->klist && aico);
 
     // trace
-    tb_trace_d("kilo: aico: %p, type: %u: ..", aico, aico->type);
+    tb_trace_d("kill: aico: %p, type: %u: ..", aico, aico->type);
 
-    // the aiop aico
-    tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
+    // append the killing aico
+    tb_spinlock_enter(&impl->klock);
+    tb_vector_insert_tail(impl->klist, aico);
+    tb_spinlock_leave(&impl->klock);
 
-    // add timeout task for killing the accept socket
-    if (aico->type == TB_AICO_TYPE_SOCK && aiop_aico->aice.code == TB_AICE_CODE_ACPT) 
-    {
-        // add task
-        if (!aiop_aico->task) 
-        {
-            aiop_aico->task = tb_ltimer_task_init(impl->ltimer, 10000, tb_false, tb_aiop_spak_wait_timeout, aico);
-            aiop_aico->bltimer = 1;
-        }
-    }
-
-    // kill the task
-    if (aiop_aico->task) 
-    {
-        // trace
-        tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, aiop_aico->task);
-
-        // kill task
-        if (aiop_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, aiop_aico->task);
-        else tb_timer_task_kill(impl->timer, aiop_aico->task);
-    }
-
-    // kill sock
-    if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) 
-    {
-        // trace
-        tb_trace_d("kilo: aico: %p, type: %u, sock: %p: ..", aico, aico->type, aico->handle);
-
-        // kill it
-        tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
-    }
-    // kill file
-    else if (aico->type == TB_AICO_TYPE_FILE)
-    {
-        // kill it
-        tb_aicp_file_kilo(impl, aico);
-    }
-
-    /* the aiop will wait long time if the lastest task wait period is too long
-     * so spak the aiop manually for spak the ltimer
-     */
-    tb_aiop_spak(impl->aiop);
-
-    // trace
-    tb_trace_d("kilo: aico: %p, type: %u: ok", aico, aico->type);
+    // work it
+    tb_aiop_spak_work(impl);
 }
 static tb_bool_t tb_aiop_ptor_post(tb_aicp_ptor_impl_t* ptor, tb_aice_ref_t aice)
 {
@@ -1548,6 +1570,12 @@ static tb_void_t tb_aiop_ptor_exit(tb_aicp_ptor_impl_t* ptor)
     impl->spak[1] = tb_null;
     tb_spinlock_leave(&impl->lock);
 
+    // exit kill
+    tb_spinlock_enter(&impl->klock);
+    if (impl->klist) tb_vector_exit(impl->klist);
+    impl->klist = tb_null;
+    tb_spinlock_leave(&impl->klock);
+
     // exit aiop
     if (impl->aiop) tb_aiop_exit(impl->aiop);
     impl->aiop = tb_null;
@@ -1580,6 +1608,9 @@ static tb_long_t tb_aiop_ptor_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t loop, 
     tb_aiop_ptor_impl_t* impl = (tb_aiop_ptor_impl_t*)ptor;
     tb_aicp_impl_t*      aicp = impl? impl->base.aicp : tb_null;
     tb_assert_and_check_return_val(impl && impl->wait && aicp && resp, -1);
+
+    // spak the killing list
+    tb_aiop_spak_klist(impl);
 
     // enter 
     tb_spinlock_enter(&impl->lock);
@@ -1727,6 +1758,13 @@ static tb_aicp_ptor_impl_t* tb_aiop_ptor_init(tb_aicp_impl_t* aicp)
         // init ltimer and using cache time
         impl->ltimer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
         tb_assert_and_check_break(impl->ltimer);
+
+        // init the killing list lock
+        if (!tb_spinlock_init(&impl->klock)) break;
+
+        // init the killing aico list
+        impl->klist = tb_vector_init((aicp->maxn >> 6) + 16, tb_element_ptr(tb_null, tb_null));
+        tb_assert_and_check_break(impl->klist);
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE

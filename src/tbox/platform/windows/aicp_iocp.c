@@ -138,7 +138,7 @@ typedef struct __tb_iocp_ptor_impl_t
      */
     tb_queue_ref_t                              post[2];
     
-    // the killed list
+    // the killing aico list
     tb_vector_ref_t                             kill;
 
     // the post lock
@@ -2202,7 +2202,7 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     tb_assert_and_check_return(impl && impl->wait && impl->kill && aico);
         
     // trace
-    tb_trace_d("kilo[%p]: handle: %p, type: %u", aico, aico->handle, aico->type);
+    tb_trace_d("kill[%p]: handle: %p, type: %u", aico, aico->handle, aico->type);
 
     // the handle
     HANDLE handle = aico->type == TB_AICO_TYPE_SOCK? (HANDLE)((SOCKET)aico->handle - 1) : aico->handle;
@@ -2214,17 +2214,17 @@ static tb_void_t tb_iocp_ptor_kilo(tb_aicp_ptor_impl_t* ptor, tb_aico_impl_t* ai
     if (iocp_aico->task) 
     {
         // trace
-        tb_trace_d("kilo: aico: %p, type: %u, task: %p: ..", aico, aico->type, iocp_aico->task);
+        tb_trace_d("kill: aico: %p, type: %u, task: %p: ..", aico, aico->type, iocp_aico->task);
 
         // kill task
         if (iocp_aico->bltimer) tb_ltimer_task_kill(impl->ltimer, (tb_ltimer_task_ref_t)iocp_aico->task);
         else tb_timer_task_kill(impl->timer, (tb_timer_task_ref_t)iocp_aico->task);
     }
-    // append the killed handle
+    // append the killing handle
     else 
     {
         // trace
-        tb_trace_d("kilo: aico: %p, type: %u, handle: %p: ..", aico, aico->type, handle);
+        tb_trace_d("kill: aico: %p, type: %u, handle: %p: ..", aico, aico->type, handle);
 
         // kill handle
         tb_spinlock_enter(&impl->lock);
@@ -2697,7 +2697,7 @@ static tb_aicp_ptor_impl_t* tb_iocp_ptor_init(tb_aicp_impl_t* aicp)
         tb_assert_and_check_break(impl->post[0] && impl->post[1]);
 
         // init kill
-        impl->kill = tb_vector_init((aicp->maxn >> 4) + 16, tb_element_ptr(tb_null, tb_null));
+        impl->kill = tb_vector_init((aicp->maxn >> 6) + 16, tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(impl->kill);
 
         // register lock profiler
