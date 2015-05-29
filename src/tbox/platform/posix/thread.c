@@ -79,7 +79,7 @@ tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout)
 
     // wait
     tb_long_t ok = -1;
-    if ((ok = pthread_join(((pthread_t)thread), tb_null)))
+    if ((ok = pthread_join(((pthread_t)thread), tb_null)) && ok != ESRCH)
     {
         // trace
         tb_trace_e("thread[%p]: wait failed: %ld, errno: %d", thread, ok, errno);
