@@ -48,14 +48,10 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     // check
     tb_assert_and_check_return_val(path, tb_null);
 
-    tb_trace_i("init: %s", path);
-
     // the full path
     tb_char_t full[TB_PATH_MAXN];
     path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_null);
-
-    tb_trace_i("%s %s", path, full);
 
     // flags
     tb_size_t flags = 0;
