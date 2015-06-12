@@ -496,7 +496,7 @@ static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_r
         ++nbits;
         b <<= 1;
     }
-    return (b - 1 + tb_static_stream_read_ubits32(sstream, nbits));
+    return (b - 1 + (nbits? tb_static_stream_read_ubits32(sstream, nbits) : 0));
 }
 #endif
 
