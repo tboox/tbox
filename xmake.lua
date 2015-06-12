@@ -5,6 +5,10 @@ set_version("1.5.0")
 -- set warning all as error
 set_warnings("all", "error")
 
+-- TODO for c++
+-- set language: c99
+set_language("c99")
+
 -- the debug mode
 if modes("debug") then
     
@@ -34,6 +38,10 @@ if modes("release", "profile") then
         -- strip all symbols
         set_strip("all")
 
+        -- fomit the frame pointer
+        add_cxflags("-fomit-frame-pointer")
+        add_mxflags("-fomit-frame-pointer")
+
     -- the profile mode
     else
     
@@ -57,8 +65,17 @@ if modes("release", "profile") then
         add_defines("__tb_small__")
     end
 
-    -- attempt to add vector extension 
+    -- attempt to add vector extensions 
     add_vectorexts("sse2", "sse3", "ssse3", "mmx")
+end
+
+-- the macosx platform
+if plats("macosx") then
+
+    -- disable some compiler errors
+    add_cxflags("-Wno-error=deprecated-declarations")
+    add_mxflags("-Wno-error=deprecated-declarations")
+
 end
 
 -- add module: xml
