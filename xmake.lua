@@ -10,7 +10,6 @@ set_languages("c99", "cxx11")
 
 -- add defines to config.h
 add_defines_h("TB_CONFIG_OS_$(OS)")
-add_defines_h("TB_CONFIG_TYPE_FLOAT")
 
 -- add undefines to config.h 
 add_undefines_h("TB_CONFIG_TRACE_INFO_ONLY")
@@ -85,14 +84,22 @@ add_option("demo")
     set_option_enable(true)
     set_option_showmenu(true)
     set_option_category("module")
-    set_option_description("The module: demo")
+    set_option_description("Enable or disable the demo module")
+
+-- add module: float
+add_option("float")
+    set_option_enable(true)
+    set_option_showmenu(true)
+    set_option_category("module")
+    set_option_description("Enable or disable the float type")
+    add_option_defines_h_if_ok("TB_CONFIG_TYPE_FLOAT")
 
 -- add module: xml
 add_option("xml")
     set_option_enable(true)
     set_option_showmenu(true)
     set_option_category("module")
-    set_option_description("The module: xml")
+    set_option_description("Enable or disable the xml module")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_XML")
 
 -- add module: xml
@@ -100,7 +107,7 @@ add_option("zip")
     set_option_enable(true)
     set_option_showmenu(true)
     set_option_category("module")
-    set_option_description("The module: zip")
+    set_option_description("Enable or disable the zip module")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_ZIP")
 
 -- add module: asio
@@ -108,7 +115,7 @@ add_option("asio")
     set_option_enable(true)
     set_option_showmenu(true)
     set_option_category("module")
-    set_option_description("The module: asio")
+    set_option_description("Enable or disable the asio module")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_ASIO")
 
 -- add module: object
@@ -116,7 +123,7 @@ add_option("object")
     set_option_enable(true)
     set_option_showmenu(true)
     set_option_category("module")
-    set_option_description("The module: object")
+    set_option_description("Enable or disable the object module")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_OBJECT")
 
 -- add module: charset
@@ -124,7 +131,7 @@ add_option("charset")
     set_option_enable(true)
     set_option_showmenu(true)
     set_option_category("module")
-    set_option_description("The module: charset")
+    set_option_description("Enable or disable the charset module")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_CHARSET")
 
 -- add module: database
@@ -132,14 +139,14 @@ add_option("database")
     set_option_enable(true)
     set_option_showmenu(true)
     set_option_category("module")
-    set_option_description("The module: database")
+    set_option_description("Enable or disable the database module")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_DATABASE")
 
 -- add package: zlib
 add_option("zlib")
     set_option_showmenu(true)
     set_option_category("package")
-    set_option_description("The package: zlib")
+    set_option_description("Enable or disable the zlib package")
     add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_ZLIB")
     add_option_links("z")
     add_option_linkdirs("pkg/zlib.pkg/lib/$(plat)/$(arch)")
@@ -150,7 +157,7 @@ add_option("zlib")
 add_option("mysql")
     set_option_showmenu(true)
     set_option_category("package")
-    set_option_description("The package: mysql")
+    set_option_description("Enable or disable the mysql package")
     add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_MYSQL")
     add_option_links("mysqlclient")
     add_option_linkdirs("pkg/mysql.pkg/lib/$(plat)/$(arch)")
@@ -161,7 +168,7 @@ add_option("mysql")
 add_option("sqlite3")
     set_option_showmenu(true)
     set_option_category("package")
-    set_option_description("The package: sqlite3")
+    set_option_description("Enable or disable the sqlite3 package")
     add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_SQLITE3")
     add_option_links("sqlite3")
     add_option_linkdirs("pkg/sqlite3.pkg/lib/$(plat)/$(arch)")
@@ -172,7 +179,7 @@ add_option("sqlite3")
 add_option("openssl")
     set_option_showmenu(true)
     set_option_category("package")
-    set_option_description("The package: openssl")
+    set_option_description("Enable or disable the openssl package")
     add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_OPENSSL")
     add_option_links("ssl", "crypto")
     add_option_linkdirs("pkg/openssl.pkg/lib/$(plat)/$(arch)")
@@ -189,7 +196,7 @@ add_option("openssl")
 add_option("polarssl")
     set_option_showmenu(true)
     set_option_category("package")
-    set_option_description("The package: polarssl")
+    set_option_description("Enable or disable the polarssl package")
     add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_POLARSSL")
     add_option_links("polarssl")
     add_option_linkdirs("pkg/polarssl.pkg/lib/$(plat)/$(arch)")
@@ -206,17 +213,17 @@ function add_option_module_interfaces(module, includes, ...)
     local options = {}
     for _, interface in ipairs({...}) do
 
-        -- the option name
+        -- the options name
         local name = string.format("__%s_%s", module, interface)
 
-        -- add option
+        -- add options
         add_option(name)
         set_option_category("interface")
         add_option_cfuncs(interface)
         add_option_cincludes(includes)
         add_option_defines_h_if_ok(string.format("TB_CONFIG_%s_HAVE_%s", module:upper(), interface:upper()))
 
-        -- add option to the libc
+        -- add options to the libc
         table.insert(_G[module], name)
     end
 end
@@ -363,4 +370,4 @@ add_option_module_interfaces(   "systemv"
 
 -- projects
 add_subdirs("src/tbox") 
-if option("demo") then add_subdirs("src/demo") end
+if options("demo") then add_subdirs("src/demo") end
