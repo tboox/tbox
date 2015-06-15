@@ -176,11 +176,9 @@ add_target("tbox")
         if options("sqlite3") then add_files("src/tbox/database/impl/sqlite3.c") end
     end
 
-    -- add the source files for the openssl package
-    if options("openssl") then add_files("src/tbox/network/impl/ssl/openssl.c") end
-
-    -- add the source files for the polarssl package
-    if options("polarssl") then add_files("src/tbox/network/impl/ssl/polarssl.c") end
+    -- add the source files for the ssl package
+    if options("polarssl") then add_files("src/tbox/network/impl/ssl/polarssl.c") 
+    elseif options("openssl") then add_files("src/tbox/network/impl/ssl/openssl.c") end
 
     -- add the source for the windows platform
     if plats("windows", "mingw") then
