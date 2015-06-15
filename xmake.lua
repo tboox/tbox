@@ -5,11 +5,17 @@ set_version("1.5.0")
 -- set warning all as error
 set_warnings("all", "error")
 
--- set language: c99
-set_languages("c99")
+-- set language: c99, c++11
+set_languages("c99", "cxx11")
 
 -- add defines to config.h
+add_defines_h("TB_CONFIG_OS_$(OS)")
 add_defines_h("TB_CONFIG_TYPE_FLOAT")
+
+-- add undefines to config.h 
+add_undefines_h("TB_CONFIG_TRACE_INFO_ONLY")
+add_undefines_h("TB_CONFIG_EXCEPTION_ENABLE")
+add_undefines_h("TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE")
 
 -- the debug mode
 if modes("debug") then

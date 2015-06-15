@@ -38,7 +38,7 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/dns.c"
-#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 #   include "mach/dns.c"
 #elif defined(TB_CONFIG_OS_ANDROID)
 #   include "linux/android/dns.c"

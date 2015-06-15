@@ -541,7 +541,7 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
     // error
     return -1;
 
-#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 
     // send it
     off_t real = (off_t)size;
