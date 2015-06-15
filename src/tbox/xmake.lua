@@ -49,7 +49,9 @@ add_target("tbox")
     add_files("src/tbox/prefix/**.c") 
     add_files("src/tbox/memory/**.c") 
     add_files("src/tbox/string/**.c") 
-    add_files("src/tbox/stream/**.c") 
+    add_files("src/tbox/stream/*.c") 
+    add_files("src/tbox/stream/impl/stream/*.c") 
+    add_files("src/tbox/stream/impl/filter/*.c") 
     add_files("src/tbox/network/**.c") 
     add_files("src/tbox/platform/*.c") 
     add_files("src/tbox/algorithm/**.c") 
@@ -60,3 +62,7 @@ add_target("tbox")
     add_files("src/tbox/libm/isqrti.c") 
     add_files("src/tbox/libm/isqrti64.c") 
     add_files("src/tbox/libm/idivi8.c") 
+
+    -- add the module source files
+    if option("xml") then add_files("src/tbox/xml/**.c") end
+    if option("charset") then add_files("src/tbox/charset/**.c", "src/tbox/stream/impl/filter/charset.c") end

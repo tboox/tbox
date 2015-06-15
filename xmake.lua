@@ -80,6 +80,13 @@ if modes("release", "profile") then
     add_vectorexts("sse2", "sse3", "ssse3", "mmx")
 end
 
+-- add module: demo
+add_option("demo")
+    set_option_enable(true)
+    set_option_showmenu(true)
+    set_option_category("module")
+    set_option_description("The module: demo")
+
 -- add module: xml
 add_option("xml")
     set_option_enable(true)
@@ -355,4 +362,5 @@ add_option_module_interfaces(   "systemv"
                             ,   "semtimedop")
 
 -- projects
-add_subdirs("src/tbox", "src/demo")
+add_subdirs("src/tbox") 
+if option("demo") then add_subdirs("src/demo") end
