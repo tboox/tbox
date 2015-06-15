@@ -48,7 +48,7 @@
     {
         return tb_aiop_rtor_epoll_init(aiop);
     }
-#elif defined(TB_CONFIG_OS_MAC)
+#elif defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/aiop_kqueue.c"
     tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
     {

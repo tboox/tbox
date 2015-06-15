@@ -34,7 +34,7 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/semaphore.c"
-#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 #   include "mach/semaphore.c"
 #elif defined(TB_CONFIG_API_HAVE_POSIX)
 #   include "posix/semaphore.c"
