@@ -281,5 +281,13 @@ add_option_module_interfaces(   "libm"
                             ,   "log2"
                             ,   "log2f")
 
+-- add module interfaces for systemv.sem
+add_option_module_interfaces(   "systemv"
+                            ,   {"sys/sem.h", "sys/ipc.h"}
+                            ,   "semget"
+                            ,   "semop"
+                            ,   "semctl"
+                            ,   "semtimedop")
+
 -- projects
 add_subdirs("src/tbox", "src/demo")
