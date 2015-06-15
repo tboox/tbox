@@ -91,45 +91,89 @@ end
 
 -- add module: xml
 add_option("xml")
-    set_option_enable(true)
     set_option_showmenu(true)
     set_option_description("The module: xml")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_XML")
 
 -- add module: xml
 add_option("zip")
-    set_option_enable(true)
     set_option_showmenu(true)
     set_option_description("The module: zip")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_ZIP")
 
 -- add module: asio
 add_option("asio")
-    set_option_enable(true)
     set_option_showmenu(true)
     set_option_description("The module: asio")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_ASIO")
 
 -- add module: object
 add_option("object")
-    set_option_enable(true)
     set_option_showmenu(true)
     set_option_description("The module: object")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_OBJECT")
 
 -- add module: charset
 add_option("charset")
-    set_option_enable(true)
     set_option_showmenu(true)
     set_option_description("The module: charset")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_CHARSET")
 
 -- add module: database
 add_option("database")
-    set_option_enable(true)
     set_option_showmenu(true)
     set_option_description("The module: database")
     add_option_defines_h_if_ok("TB_CONFIG_MODULE_HAVE_DATABASE")
+
+-- add package: zlib
+add_option("zlib")
+    set_option_showmenu(true)
+    set_option_description("The package: zlib")
+    add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_ZLIB")
+    add_option_links("z")
+    add_option_linkdirs("pkg/zlib.pkg/lib/$(plat)/$(arch)")
+    add_option_cincludes("zlib/zlib.h")
+    add_option_includedirs("pkg/zlib.pkg/inc", "pkg/zlib.pkg/inc/$(plat)/$(arch)")
+
+-- add package: mysql
+add_option("mysql")
+    set_option_showmenu(true)
+    set_option_description("The package: mysql")
+    add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_MYSQL")
+    add_option_links("mysqlclient")
+    add_option_linkdirs("pkg/mysql.pkg/lib/$(plat)/$(arch)")
+    add_option_cincludes("mysql/mysql.h")
+    add_option_includedirs("pkg/mysql.pkg/inc", "pkg/mysql.pkg/inc/$(plat)/$(arch)")
+
+-- add package: sqlite3
+add_option("sqlite3")
+    set_option_showmenu(true)
+    set_option_description("The package: sqlite3")
+    add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_SQLITE3")
+    add_option_links("sqlite3")
+    add_option_linkdirs("pkg/sqlite3.pkg/lib/$(plat)/$(arch)")
+    add_option_cincludes("sqlite3/sqlite3.h")
+    add_option_includedirs("pkg/sqlite3.pkg/inc", "pkg/sqlite3.pkg/inc/$(plat)/$(arch)")
+
+-- add package: openssl
+add_option("openssl")
+    set_option_showmenu(true)
+    set_option_description("The package: openssl")
+    add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_OPENSSL")
+    add_option_links("ssl", "crypto")
+    add_option_linkdirs("pkg/openssl.pkg/lib/$(plat)/$(arch)")
+    add_option_cincludes("openssl/openssl.h")
+    add_option_includedirs("pkg/openssl.pkg/inc", "pkg/openssl.pkg/inc/$(plat)/$(arch)")
+
+-- add package: polarssl
+add_option("polarssl")
+    set_option_showmenu(true)
+    set_option_description("The package: polarssl")
+    add_option_defines_h_if_ok("TB_CONFIG_PACKAGE_HAVE_POLARSSL")
+    add_option_links("polarssl")
+    add_option_linkdirs("pkg/polarssl.pkg/lib/$(plat)/$(arch)")
+    add_option_cincludes("polarssl/polarssl.h")
+    add_option_includedirs("pkg/polarssl.pkg/inc", "pkg/polarssl.pkg/inc/$(plat)/$(arch)")
 
 -- add module interfaces
 function add_option_module_interfaces(module, includes, ...)

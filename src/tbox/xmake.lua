@@ -29,7 +29,13 @@ add_target("tbox")
     add_headers("src/(tbox/prefix/**/prefix.S)")
 
     -- add modules
-    add_options("xml", "zip", "asio", "object", "charset", "database", libc, libm)
+    add_options("xml", "zip", "asio", "object", "charset", "database")
+
+    -- add packages
+    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl")
+
+    -- add interfaces
+    add_options(libc, libm)
 
     -- add the common source files
     add_files("src/tbox/*.c") 
