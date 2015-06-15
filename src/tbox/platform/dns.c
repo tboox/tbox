@@ -42,16 +42,7 @@
 #   include "mach/dns.c"
 #elif defined(TB_CONFIG_OS_ANDROID)
 #   include "linux/android/dns.c"
-#elif defined(TB_CONFIG_OS_LIKE_UNIX)
-#   include "unix/dns.c"
 #else
-tb_bool_t tb_dns_init()
-{
-    tb_trace_noimpl();
-    return tb_true;
-}
-tb_void_t tb_dns_exit()
-{
-}
+#   include "unix/dns.c"
 #endif
 
