@@ -54,7 +54,7 @@
     {
         return tb_aiop_rtor_kqueue_init(aiop);
     }
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_POLL)
 #   include "posix/aiop_poll.c"
     tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
     {

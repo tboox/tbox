@@ -32,7 +32,7 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/mutex.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_MUTEX_INIT)
 #   include "posix/mutex.c"
 #else
 tb_mutex_ref_t tb_mutex_init()

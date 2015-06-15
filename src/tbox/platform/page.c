@@ -34,7 +34,8 @@
 #include "page.h"
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/page.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_GETPAGESIZE) || \
+		defined(TB_CONFIG_POSIX_HAVE_SYSCONF)
 #   include "posix/page.c"
 #else
 tb_bool_t tb_page_init()

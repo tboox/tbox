@@ -35,7 +35,7 @@ add_target("tbox")
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl")
 
     -- add interfaces
-    add_options(libc, libm, systemv)
+    add_options(libc, libm, posix, systemv)
 
     -- add the common source files
     add_files("src/tbox/*.c") 

@@ -31,7 +31,7 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/thread.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_CREATE)
 #   include "posix/thread.c"
 #else
 tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_cpointer_t priv, tb_size_t stack)

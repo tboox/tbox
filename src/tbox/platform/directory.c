@@ -31,7 +31,7 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/directory.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_OPENDIR)
 #   include "posix/directory.c"
 #else
 tb_bool_t tb_directory_create(tb_char_t const* path)

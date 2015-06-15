@@ -43,7 +43,7 @@ tb_bool_t tb_page_init()
     // init page size
     if (!g_page_size)
     {
-#if _BSD_SOURCE || !(_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)
+#ifdef TB_CONFIG_POSIX_HAVE_GETPAGESIZE
         g_page_size = (tb_size_t)getpagesize();
 #else
         g_page_size = (tb_size_t)sysconf(_SC_PAGESIZE);
