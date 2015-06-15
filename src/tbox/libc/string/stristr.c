@@ -26,7 +26,7 @@
  * includes
  */
 #include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_STRISTR
+#ifdef TB_CONFIG_LIBC_HAVE_STRCASESTR
 #   include <string.h>
 #endif
 
@@ -34,7 +34,7 @@
  * interfaces 
  */
 
-#ifdef TB_CONFIG_LIBC_HAVE_STRISTR
+#ifdef TB_CONFIG_LIBC_HAVE_STRCASESTR
 tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
 {
     // check

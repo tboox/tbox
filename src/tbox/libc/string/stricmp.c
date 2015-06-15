@@ -26,14 +26,14 @@
  * includes
  */
 #include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
+#ifdef TB_CONFIG_LIBC_HAVE_STRCASECMP
 #   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation 
  */
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
+#ifdef TB_CONFIG_LIBC_HAVE_STRCASECMP
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
     tb_assert_and_check_return_val(s1 && s2, 0);

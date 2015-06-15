@@ -9,8 +9,8 @@ add_target("tbox")
     add_defines("__tb_prefix__=\"tbox\"")
 
     -- set the auto-generated config.h
-    set_configfile("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)/tbox.config.h")
-    set_configprefix("TB")
+    set_config_h("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)/tbox.config.h")
+    set_config_h_prefix("TB")
 
     -- set the target directory
     set_targetdir("$(buildir)/tbox.pkg/lib/$(plat)/$(arch)")
@@ -29,13 +29,16 @@ add_target("tbox")
     add_headers("src/(tbox/prefix/**/prefix.S)")
 
     -- add modules
-    add_options("xml", "zip", "asio", "object", "charset", "database")
+    add_options("xml", "zip", "asio", "object", "charset", "database", libc, libm)
 
     -- add the common source files
     add_files("src/tbox/*.c") 
-    add_files("src/tbox/asio/**.c") 
+    add_files("src/tbox/asio/*.c") 
     add_files("src/tbox/math/**.c") 
-    add_files("src/tbox/libc/**.c") 
+    add_files("src/tbox/libc/misc/**.c") 
+    add_files("src/tbox/libc/stdio/**.c") 
+    add_files("src/tbox/libc/stdlib/**.c") 
+    add_files("src/tbox/libc/string/*.c") 
     add_files("src/tbox/utils/**.c") 
     add_files("src/tbox/prefix/**.c") 
     add_files("src/tbox/memory/**.c") 
