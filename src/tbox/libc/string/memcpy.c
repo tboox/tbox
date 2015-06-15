@@ -56,14 +56,14 @@ static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t 
     tb_assert_and_check_return_val(s1 && s2, tb_null);
 
 #ifdef __tb_small__
-    __tb_register__ tb_byte_t* p1 = s1;
-    __tb_register__ tb_byte_t* p2 = s2;
+    __tb_register__ tb_byte_t*          p1 = s1;
+    __tb_register__ tb_byte_t const*    p2 = s2;
     if (p1 == p2 || !n) return s1;
     while (n--) *p1++ = *p2++;
     return s1;
 #else
-    __tb_register__ tb_byte_t* p1 = s1;
-    __tb_register__ tb_byte_t* p2 = s2;
+    __tb_register__ tb_byte_t*          p1 = s1;
+    __tb_register__ tb_byte_t const*    p2 = s2;
     if (p1 == p2 || !n) return s1;
     
     tb_size_t l = n & 0x3; n = (n - l) >> 2;

@@ -26,14 +26,14 @@
  * includes
  */
 #include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_STRNICMP
+#ifdef TB_CONFIG_LIBC_HAVE_STRNCASECMP
 #   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation 
  */
-#ifdef TB_CONFIG_LIBC_HAVE_STRNICMP
+#ifdef TB_CONFIG_LIBC_HAVE_STRNCASECMP
 static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
     // check

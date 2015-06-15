@@ -27,7 +27,7 @@
  */
 #include "string.h"
 #include "../../memory/impl/prefix.h"
-#ifndef TB_CONFIG_LIBC_HAVE_MEMMOV
+#ifndef TB_CONFIG_LIBC_HAVE_MEMMOVE
 #   if defined(TB_ARCH_x86)
 #       include "impl/x86/memmov.c"
 #   elif defined(TB_ARCH_ARM)
@@ -43,7 +43,7 @@
  * implementation 
  */
 
-#if defined(TB_CONFIG_LIBC_HAVE_MEMMOV)
+#if defined(TB_CONFIG_LIBC_HAVE_MEMMOVE)
 static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
     tb_assert_and_check_return_val(s1 && s2, tb_null);

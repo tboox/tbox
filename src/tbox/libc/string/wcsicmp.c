@@ -26,14 +26,14 @@
  * includes
  */
 #include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_WCSICMP
+#ifdef TB_CONFIG_LIBC_HAVE_WCSCASECMP
 #   include <wchar.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-#ifdef TB_CONFIG_LIBC_HAVE_WCSICMP
+#ifdef TB_CONFIG_LIBC_HAVE_WCSCASECMP
 tb_long_t tb_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
     // check
