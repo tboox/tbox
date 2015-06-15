@@ -31,7 +31,7 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/processor.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_SYSCONF)
 #   include "posix/processor.c"
 #else
 tb_size_t tb_processor_count()

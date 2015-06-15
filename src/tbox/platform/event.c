@@ -29,83 +29,38 @@
 #include "time.h"
 #include "cache_time.h"
 #include "atomic.h"
+#include "semaphore.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/event.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
-#   include "posix/event.c"
 #else 
 tb_event_ref_t tb_event_init()
 {
-    // make 
-    tb_event_ref_t event = (tb_event_ref_t)tb_malloc0_type(tb_atomic_t);
-    tb_assert_and_check_return_val(event, tb_null);
-
-    // ok
-    return event;
+    return (tb_event_ref_t)tb_semaphore_init(0);
 }
 tb_void_t tb_event_exit(tb_event_ref_t event)
 {
-    // check
-    tb_atomic_t* impl = (tb_atomic_t*)event;
-    tb_assert_and_check_return(impl);
-
-    // free it
-    tb_free(impl);
+    if (event) tb_semaphore_exit((tb_semaphore_ref_t)event);
 }
 tb_bool_t tb_event_post(tb_event_ref_t event)
 {
     // check
-    tb_atomic_t* impl = (tb_atomic_t*)event;
-    tb_assert_and_check_return_val(impl, tb_false);
+    tb_assert_and_check_return_val(event, tb_false);
 
-    // post signal
-    tb_atomic_set(impl, 1);
-
-    // ok
-    return tb_true;
+    // post
+    return tb_semaphore_post((tb_semaphore_ref_t)event, 1);
 }
 tb_long_t tb_event_wait(tb_event_ref_t event, tb_long_t timeout)
 {
     // check
-    tb_atomic_t* impl = (tb_atomic_t*)event;
-    tb_assert_and_check_return_val(impl, -1);
+    tb_assert_and_check_return_val(event, -1);
 
-    // init
-    tb_long_t   r = 0;
-    tb_hong_t   base = tb_cache_time_spak();
-
-    // wait 
-    while (1)
-    {
-        // get post
-        tb_atomic_t post = tb_atomic_fetch_and_set0(impl);
-
-        // has signal?
-        if (post == 1) 
-        {
-            r = 1;
-            break;
-        }
-        // error
-        else if (post != 0) 
-        {
-            r = -1;
-            break;
-        }
-        // no signal?
-        else
-        {
-            // timeout?
-            if (timeout >= 0 && tb_cache_time_spak() - base >= timeout) break;
-            else tb_msleep(200);
-        }
-    }
-
-    return r;
+    // wait
+    return tb_semaphore_wait((tb_semaphore_ref_t)event, timeout);
 }
+
 #endif
 

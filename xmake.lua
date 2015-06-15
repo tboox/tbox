@@ -261,6 +261,11 @@ add_option_module_interfaces(   "libc"
                             ,   "mktime"
                             ,   "localtime")
 
+-- add module interfaces for libc.time
+add_option_module_interfaces(   "libc"
+                            ,   "sys/time.h"
+                            ,   "gettimeofday")
+
 -- add module interfaces for libc.signal
 add_option_module_interfaces(   "libc"
                             ,   {"signal.h", "setjmp.h"}
@@ -273,6 +278,11 @@ add_option_module_interfaces(   "libc"
                             ,   "execinfo.h"
                             ,   "backtrace")
 
+-- add module interfaces for libc.system
+add_option_module_interfaces(   "libc"
+                            ,   "stdlib.h"
+                            ,   "system")
+
 -- add module interfaces for libm
 add_option_module_interfaces(   "libm"
                             ,   "math.h"
@@ -281,12 +291,67 @@ add_option_module_interfaces(   "libm"
                             ,   "log2"
                             ,   "log2f")
 
--- add module interfaces for systemv.sem
+-- add module interfaces for posix.poll
+add_option_module_interfaces(   "posix"
+                            ,   {"sys/poll.h", "sys/socket.h"}
+                            ,   "poll")
+
+-- add module interfaces for posix.pthread
+add_option_module_interfaces(   "posix"
+                            ,   "pthread.h"
+                            ,   "pthread_mutex_init"
+                            ,   "pthread_create")
+
+-- add module interfaces for posix.socket
+add_option_module_interfaces(   "posix"
+                            ,   {"sys/socket.h", "fcntl.h"}
+                            ,   "socket")
+
+-- add module interfaces for posix.dirent
+add_option_module_interfaces(   "posix"
+                            ,   "dirent.h"
+                            ,   "opendir")
+
+-- add module interfaces for posix.dlopen
+add_option_module_interfaces(   "posix"
+                            ,   "dlfcn.h"
+                            ,   "dlopen")
+
+-- add module interfaces for posix.file
+add_option_module_interfaces(   "posix"
+                            ,   {"sys/stat.h", "fcntl.h"}
+                            ,   "open")
+
+-- add module interfaces for posix.gethostname
+add_option_module_interfaces(   "posix"
+                            ,   "unistd.h"
+                            ,   "gethostname")
+
+-- add module interfaces for posix.ifaddrs
+add_option_module_interfaces(   "posix"
+                            ,   "ifaddrs.h"
+                            ,   "getifaddrs")
+
+-- add module interfaces for posix.semaphore
+add_option_module_interfaces(   "posix"
+                            ,   "semaphore.h"
+                            ,   "sem_init")
+
+-- add module interfaces for posix.page
+add_option_module_interfaces(   "posix"
+                            ,   "unistd.h"
+                            ,   "getpagesize"
+                            ,   "sysconf")
+
+-- add module interfaces for posix.sched
+add_option_module_interfaces(   "posix"
+                            ,   "sched.h"
+                            ,   "sched_yield")
+
+-- add module interfaces for systemv.semaphore
 add_option_module_interfaces(   "systemv"
                             ,   {"sys/sem.h", "sys/ipc.h"}
                             ,   "semget"
-                            ,   "semop"
-                            ,   "semctl"
                             ,   "semtimedop")
 
 -- projects

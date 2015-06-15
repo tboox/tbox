@@ -32,7 +32,7 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/sched.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
 #   include "posix/sched.c"
 #else
 tb_bool_t tb_sched_yield()

@@ -31,7 +31,7 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/process.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_LIBC_HAVE_SYSTEM)
 #   include "posix/process.c"
 #else
 tb_bool_t tb_process_done(tb_char_t const* line)

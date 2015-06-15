@@ -36,11 +36,9 @@
 #   include "windows/semaphore.c"
 #elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 #   include "mach/semaphore.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_SEM_INIT)
 #   include "posix/semaphore.c"
-#elif defined(TB_CONFIG_SYSTEMV_HAVE_SEMGET) \
-    && defined(TB_CONFIG_SYSTEMV_HAVE_SEMOP) \
-    && defined(TB_CONFIG_SYSTEMV_HAVE_SEMCTL) \
+#elif defined(TB_CONFIG_SYSTEMV_HAVE_SEMGET) && \
     && defined(TB_CONFIG_SYSTEMV_HAVE_SEMTIMEDOP)
 #   include "systemv/semaphore.c"
 #else 

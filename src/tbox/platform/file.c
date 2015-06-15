@@ -37,7 +37,7 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/file.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_OPEN)
 #   include "posix/file.c"
 #else
 tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)

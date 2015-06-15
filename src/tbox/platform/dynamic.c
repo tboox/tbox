@@ -31,7 +31,7 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/dynamic.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_DLOPEN)
 #   include "posix/dynamic.c"
 #else
 tb_dynamic_ref_t tb_dynamic_init(tb_char_t const* name)

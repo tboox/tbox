@@ -47,7 +47,7 @@ tb_long_t tb_aioo_rtor_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t time
     {
         return tb_aioo_rtor_select_wait(sock, code, timeout);
     }
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_POLL)
 #   include "posix/aioo_poll.c"
     tb_long_t tb_aioo_rtor_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout)
     {

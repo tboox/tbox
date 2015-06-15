@@ -49,7 +49,7 @@ __tb_extern_c_leave__
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/socket.c"
-#elif defined(TB_CONFIG_API_HAVE_POSIX)
+#elif defined(TB_CONFIG_POSIX_HAVE_SOCKET)
 #   include "posix/socket.c"
 #else
 tb_bool_t tb_socket_context_init()
