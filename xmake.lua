@@ -249,7 +249,7 @@ add_option_module_interfaces(   "libc"
                             ,   "strncmp"
                             ,   "strncasecmp")
 
--- add module interfaces for libc.wchar
+-- add module interfaces for libc.wstring
 add_option_module_interfaces(   "libc"
                             ,   {"wchar.h", "stdlib.h"}
                             ,   "wcscat"
@@ -274,8 +274,6 @@ add_option_module_interfaces(   "libc"
                             ,   "gmtime"
                             ,   "mktime"
                             ,   "localtime")
-
--- add module interfaces for libc.time
 add_option_module_interfaces(   "libc"
                             ,   "sys/time.h"
                             ,   "gettimeofday")
