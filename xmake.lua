@@ -16,6 +16,10 @@ add_undefines_h("TB_CONFIG_TRACE_INFO_ONLY")
 add_undefines_h("TB_CONFIG_EXCEPTION_ENABLE")
 add_undefines_h("TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE")
 
+-- disable some compiler errors
+add_cxflags("-Wno-error=deprecated-declarations")
+add_mxflags("-Wno-error=deprecated-declarations")
+
 -- the debug mode
 if modes("debug") then
     
@@ -77,6 +81,47 @@ if modes("release", "profile") then
 
     -- attempt to add vector extensions 
     add_vectorexts("sse2", "sse3", "ssse3", "mmx")
+end
+
+-- for the windows platform (msvc)
+if plats("windows") then 
+
+    -- force to compile all c-files as c++ files 
+    add_cxflags("-TP") 
+
+    -- enable _cdecl
+    add_cxflags("-Gd") 
+
+    -- enable multi-processors for compiling
+    add_cxflags("-MP4") 
+    
+    -- the warnings less than all
+    set_warnings("more", "error")
+
+    -- add some defines only for windows
+    add_defines("_MBCS", "_CRT_SECURE_NO_WARNINGS", "NOCRYPT", "NOGDI")
+
+    -- the release mode
+    if modes("release") then
+
+        -- link libcmt.lib
+        add_cxflags("-MT") 
+
+    -- the debug mode
+    elseif modes("debug") then
+
+        -- enable some checkers
+        add_cxflags("-Gs", "-RTC1") 
+
+        -- link libcmtd.lib
+        add_cxflags("-MTd") 
+    end
+
+    -- no msvcrt.lib
+    add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
+
+    -- add uac
+    add_ldflags("-manifest", "-manifestuac:\"level='asInvoker' uiAccess='false'\"")
 end
 
 -- add module: demo
@@ -185,12 +230,6 @@ add_option("openssl")
     add_option_linkdirs("pkg/openssl.pkg/lib/$(plat)/$(arch)")
     add_option_cincludes("openssl/openssl.h")
     add_option_includedirs("pkg/openssl.pkg/inc", "pkg/openssl.pkg/inc/$(plat)/$(arch)")
-
-    -- disable some compiler errors for macosx
-    if plats("macosx") then
-        add_option_cxflags("-Wno-error=deprecated-declarations")
-        add_option_mxflags("-Wno-error=deprecated-declarations")
-    end
 
 -- add package: polarssl
 add_option("polarssl")
