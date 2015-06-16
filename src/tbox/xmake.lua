@@ -187,8 +187,8 @@ add_target("tbox")
 
     -- add the source for the windows 
     if os("windows") then
-        add_files("src/tbox/windows/socket_pool.c")
-        add_files("src/tbox/windows/interface/*.c")
+        add_files("src/tbox/platform/windows/socket_pool.c")
+        add_files("src/tbox/platform/windows/interface/*.c")
     end
 
     -- add the source for the ios 
