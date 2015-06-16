@@ -2,6 +2,9 @@
 -- add target
 add_target("demo")
 
+    -- add the dependent target
+    add_deps("tbox")
+
     -- make as a binary
     set_kind("binary")
 
