@@ -109,6 +109,11 @@ add_target("tbox")
     add_files("src/tbox/platform/aioo.c")
     add_files("src/tbox/platform/aiop.c")
 
+    -- add the source files for arm
+    if archs("arm.*") then
+        add_files("src/tbox/utils/impl/crc_arm.S")
+    end
+
     -- add the source files for the float type
     if options("float") then add_files("src/tbox/libm/*.c") end
 
@@ -180,18 +185,18 @@ add_target("tbox")
     if options("polarssl") then add_files("src/tbox/network/impl/ssl/polarssl.c") 
     elseif options("openssl") then add_files("src/tbox/network/impl/ssl/openssl.c") end
 
-    -- add the source for the windows platform
-    if plats("windows", "mingw") then
+    -- add the source for the windows 
+    if os("windows") then
         add_files("src/tbox/windows/socket_pool.c")
         add_files("src/tbox/windows/interface/*.c")
     end
 
-    -- add the source for the ios platform
-    if plats("ios") then
+    -- add the source for the ios 
+    if os("ios") then
         add_files("src/tbox/platform/mach/ios/directory.m")
     end
 
-    -- add the source for the android platform
-    if plats("android") then
+    -- add the source for the android 
+    if os("android") then
         add_files("src/tbox/platform/linux/android/*.c")
     end

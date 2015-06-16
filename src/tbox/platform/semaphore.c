@@ -38,7 +38,7 @@
 #   include "mach/semaphore.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_SEM_INIT)
 #   include "posix/semaphore.c"
-#elif defined(TB_CONFIG_SYSTEMV_HAVE_SEMGET) && \
+#elif defined(TB_CONFIG_SYSTEMV_HAVE_SEMGET) \
     && defined(TB_CONFIG_SYSTEMV_HAVE_SEMTIMEDOP)
 #   include "systemv/semaphore.c"
 #else 

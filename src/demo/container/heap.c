@@ -95,7 +95,7 @@ static tb_void_t tb_test_heap_min_perf()
     // profile
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 100000;
-    __tb_volatile__ tb_size_t p;
+    __tb_volatile__ tb_size_t p; tb_used(&p);
     for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_random_range(tb_null, 0, 50));
     for (i = 0; tb_heap_size(heap); i++) 
     {
@@ -208,7 +208,7 @@ static tb_void_t tb_test_heap_max_perf()
     // profile
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 100000;
-    __tb_volatile__ tb_size_t p;
+    __tb_volatile__ tb_size_t p; tb_used(&p);
     for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_random_range(tb_null, 0, 50));
     for (i = 0; tb_heap_size(heap); i++) 
     {
