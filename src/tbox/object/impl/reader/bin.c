@@ -243,7 +243,7 @@ static tb_object_ref_t tb_object_bin_reader_func_number(tb_object_bin_reader_t* 
     case TB_NUMBER_TYPE_SINT8:
         number = tb_object_number_init_from_sint8(tb_stream_bread_s8(reader->stream));
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         {
             tb_byte_t data[4] = {0};

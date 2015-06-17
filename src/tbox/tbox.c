@@ -51,7 +51,7 @@ static __tb_inline__ tb_bool_t tb_check_order_word()
 }
 static __tb_inline__ tb_bool_t tb_check_order_double()
 {
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     union 
     {
         tb_uint32_t i[2];

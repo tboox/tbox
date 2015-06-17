@@ -57,13 +57,13 @@ tb_size_t tb_database_sql_value_size(tb_database_sql_value_t const* value)
         return value->u.blob.size;
     case TB_DATABASE_SQL_VALUE_TYPE_INT32:
     case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
 #endif
         return 4;
     case TB_DATABASE_SQL_VALUE_TYPE_INT64:
     case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
 #endif
         return 8;
@@ -112,7 +112,7 @@ tb_int32_t tb_database_sql_value_int32(tb_database_sql_value_t const* value)
         return (tb_int32_t)value->u.u16;
     case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
         return (tb_int32_t)value->u.u8;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
         return (tb_int32_t)value->u.f;
     case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
@@ -151,7 +151,7 @@ tb_int64_t tb_database_sql_value_int64(tb_database_sql_value_t const* value)
         return (tb_int64_t)value->u.u16;
     case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
         return (tb_int64_t)value->u.u8;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
         return (tb_int64_t)value->u.f;
     case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
@@ -198,7 +198,7 @@ tb_uint32_t tb_database_sql_value_uint32(tb_database_sql_value_t const* value)
         return (tb_uint32_t)value->u.i16;
     case TB_DATABASE_SQL_VALUE_TYPE_INT8:
         return (tb_uint32_t)value->u.i8;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
         return (tb_uint32_t)value->u.f;
     case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
@@ -237,7 +237,7 @@ tb_uint64_t tb_database_sql_value_uint64(tb_database_sql_value_t const* value)
         return (tb_uint64_t)value->u.i16;
     case TB_DATABASE_SQL_VALUE_TYPE_INT8:
         return (tb_uint64_t)value->u.i8;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
         return (tb_uint64_t)value->u.f;
     case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
@@ -252,7 +252,7 @@ tb_uint64_t tb_database_sql_value_uint64(tb_database_sql_value_t const* value)
 
     return 0;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_float_t tb_database_sql_value_float(tb_database_sql_value_t const* value)
 {
     // check
@@ -408,7 +408,7 @@ tb_void_t tb_database_sql_value_set_uint64(tb_database_sql_value_t* value, tb_ui
     value->type         = TB_DATABASE_SQL_VALUE_TYPE_INT64;
     value->u.u64        = number;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_void_t tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_float_t number)
 {
     // check

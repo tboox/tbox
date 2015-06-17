@@ -1429,7 +1429,7 @@ tb_bool_t tb_stream_bwrit_s64_be(tb_stream_ref_t stream, tb_sint64_t val)
     tb_bits_set_s64_be(b, val);
     return tb_stream_bwrit(stream, b, 8);
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_float_t tb_stream_bread_float_le(tb_stream_ref_t stream)
 {
     tb_byte_t b[4];

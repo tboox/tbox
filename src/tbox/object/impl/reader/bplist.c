@@ -333,7 +333,7 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
                 break;
             case TB_OBJECT_BPLIST_TYPE_REAL:
                 {
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                     tb_float_t val = tb_stream_bread_float_be(reader->stream);
                     object = tb_object_number_init_from_float(val);
 #else
@@ -359,7 +359,7 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
                 break;
             case TB_OBJECT_BPLIST_TYPE_REAL:
                 {
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                     tb_double_t val = tb_stream_bread_double_bbe(reader->stream);
                     object = tb_object_number_init_from_double(val);
 #else

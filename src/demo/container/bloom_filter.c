@@ -98,7 +98,7 @@ static tb_void_t tb_demo_test_cstr_p()
         }
 
         // trace
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         tb_trace_i("cstr: count: %lu, repeat: %lu, repeat_p ~= p: %lf", count, r, (tb_double_t)r / count);
 #else
         tb_trace_i("cstr: count: %lu, repeat: %lu", count, r);
@@ -317,7 +317,7 @@ static tb_void_t tb_demo_test_long_p()
         }
 
         // trace
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         tb_trace_i("long: count: %lu, repeat: %lu, repeat_p ~= p: %lf", count, r, (tb_double_t)r / count);
 #else
         tb_trace_i("long: count: %lu, repeat: %lu", count, r);

@@ -110,7 +110,7 @@ static tb_char_t const* tb_flv_sdata_value_to_string(tb_flv_t* flv, tb_flv_sdata
 {
     switch (value->type)
     {
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_FLV_SDATA_TYPE_NUMBER:
         tb_string_cstrfcpy(&flv->string, "%lf", value->u.number);
         break;
@@ -187,7 +187,7 @@ static tb_bool_t tb_flv_sdata_number_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
     // check
     tb_assert_and_check_return_val(tb_static_stream_left(&flv->sdata_bst) >= 8, tb_false);
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     value->type = TB_FLV_SDATA_TYPE_NUMBER;
     value->u.number = tb_static_stream_read_double_bbe(&flv->sdata_bst);
 #else
@@ -337,7 +337,7 @@ static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_valu
     // callback
     tb_flv_sdata_value_t data;
     data.type = TB_FLV_SDATA_TYPE_NUMBER;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     data.u.number = size;
 #endif
     if (flv->sdata_cb_func) flv->sdata_cb_func(flv->spath, &data, flv->sdata_cb_data);
@@ -485,7 +485,7 @@ static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t*
     // ok
     return tb_true;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_static_stream_ref_t sstream)
 {
     tb_size_t nbits = 0;
@@ -1021,7 +1021,7 @@ tb_size_t tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb
     }
     return 0;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size)
 {
     // attach data

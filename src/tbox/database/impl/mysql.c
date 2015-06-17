@@ -665,7 +665,7 @@ static tb_pointer_t tb_database_mysql_result_col_iterator_item(tb_iterator_ref_t
         case MYSQL_TYPE_TINY_BLOB:
             tb_database_sql_value_set_blob8(&row->value, (tb_byte_t const*)result->buffer, (tb_size_t)*result->length);
             break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         case MYSQL_TYPE_FLOAT:
             tb_database_sql_value_set_float(&row->value, *((tb_float_t const*)result->buffer));
             break;
@@ -1012,7 +1012,7 @@ static tb_size_t tb_database_mysql_result_type_size(tb_size_t type)
     case MYSQL_TYPE_MEDIUM_BLOB:
     case MYSQL_TYPE_LONG_BLOB:      size = 65536;   break;
     case MYSQL_TYPE_TINY_BLOB:      size = 256;     break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case MYSQL_TYPE_FLOAT:          size = 4;       break;
     case MYSQL_TYPE_DOUBLE:         size = 8;       break;
 #endif
@@ -1494,7 +1494,7 @@ static tb_bool_t tb_database_mysql_statement_bind(tb_database_sql_impl_t* databa
                 mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value);   
                 mysql->bind_list[i].length          = &mysql->bind_list[i].buffer_length; 
                 break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
             case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
                 mysql->bind_list[i].buffer_type     = MYSQL_TYPE_FLOAT;   
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.f;

@@ -312,7 +312,7 @@ static tb_pointer_t tb_database_sqlite3_result_col_iterator_item(tb_iterator_ref
             tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite3_column_text(sqlite->result.statement, itor), sqlite3_column_bytes(sqlite->result.statement, itor));
             break;
         case SQLITE_FLOAT:
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
             tb_database_sql_value_set_double(&row->value, sqlite3_column_double(sqlite->result.statement, itor));
             break;
 #else
@@ -752,7 +752,7 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_impl_t* data
                 else ok = sqlite3_bind_blob((sqlite3_stmt*)statement, (tb_int_t)(i + 1), value->u.blob.data, (tb_int_t)value->u.blob.size, tb_null);
             }
             break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
         case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
             ok = sqlite3_bind_double((sqlite3_stmt*)statement, (tb_int_t)(i + 1), (tb_double_t)tb_database_sql_value_double(value));

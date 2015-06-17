@@ -156,7 +156,7 @@ static tb_bool_t tb_object_json_writer_func_number(tb_object_json_writer_t* writ
         if (tb_stream_printf(writer->stream, "%d", tb_object_number_sint8(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         if (tb_stream_printf(writer->stream, "%f", tb_object_number_float(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;

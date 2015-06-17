@@ -39,7 +39,7 @@ static tb_long_t tb_math_printf_format_fixed(tb_cpointer_t object, tb_char_t* cs
     tb_fixed_t fixed = (tb_fixed_t)tb_p2s32(object);
 
     // format
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     tb_long_t size = tb_snprintf(cstr, maxn - 1, "%f", tb_fixed_to_float(fixed));
     if (size >= 0) cstr[size] = '\0';
 #else

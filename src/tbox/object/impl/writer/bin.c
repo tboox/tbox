@@ -217,7 +217,7 @@ static tb_bool_t tb_object_bin_writer_func_number(tb_object_bin_writer_t* writer
     case TB_NUMBER_TYPE_SINT8:
         if (!tb_stream_bwrit_s8(writer->stream, tb_object_number_sint8(object))) return tb_false;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         {
             tb_byte_t data[4];

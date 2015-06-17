@@ -97,7 +97,7 @@ static tb_bool_t tb_object_bplist_writer_func_number(tb_object_bplist_writer_t* 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static __tb_inline__ tb_time_t tb_object_bplist_writer_time_host2apple(tb_time_t time)
 {
     tb_tm_t tm = {0};
@@ -150,7 +150,7 @@ static tb_bool_t tb_object_bplist_writer_func_date(tb_object_bplist_writer_t* wr
     // check
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     // writ date time
     if (!tb_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_DATE | 3)) return tb_false;
     if (!tb_stream_bwrit_double_bbe(writer->stream, (tb_double_t)tb_object_bplist_writer_time_host2apple(tb_object_date_time(object)))) return tb_false;
@@ -311,7 +311,7 @@ static tb_bool_t tb_object_bplist_writer_func_number(tb_object_bplist_writer_t* 
         if (!tb_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_UINT)) return tb_false;
         if (!tb_stream_bwrit_s8(writer->stream, tb_object_number_sint8(object))) return tb_false;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         {
             if (!tb_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_REAL | 2)) return tb_false;

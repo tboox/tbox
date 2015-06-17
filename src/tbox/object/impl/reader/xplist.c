@@ -383,7 +383,7 @@ static tb_object_ref_t tb_object_xplist_reader_func_number(tb_object_xplist_read
                 }
                 
                 // number
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                 if (f) number = tb_object_number_init_from_double(tb_atof(text));
 #else
                 if (f) tb_trace_noimpl();

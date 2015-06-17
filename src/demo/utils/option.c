@@ -64,7 +64,7 @@ tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
                 // done string
                 if (tb_option_find(option, "s"))
                     tb_trace_i("string: %s", tb_option_item_cstr(option, "s"));
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                 // done float
                 if (tb_option_find(option, "f"))
                     tb_trace_i("float: %f", tb_option_item_float(option, "f"));

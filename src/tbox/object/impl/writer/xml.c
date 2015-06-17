@@ -261,7 +261,7 @@ static tb_bool_t tb_object_xml_writer_func_number(tb_object_xml_writer_t* writer
         if (tb_stream_printf(writer->stream, "<number>%d</number>", tb_object_number_sint8(object)) < 0) return tb_false;
         if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<number>%f</number>", tb_object_number_float(object)) < 0) return tb_false;
