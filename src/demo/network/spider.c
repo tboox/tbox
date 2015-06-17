@@ -745,7 +745,7 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
 
         // init home
         if (!tb_url_init(&spider->home)) break;
-        spider->home = argv[1]? argv[1] : tb_null;
+        tb_url_cstr_set(&spider->home, argv[1]? argv[1] : tb_null);
         tb_trace_d("home: %s", tb_url_cstr(&spider->home));
 
         // init root
