@@ -488,7 +488,7 @@ static tb_wchar_t* tb_printf_int32(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_ent
 
     return pb;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static tb_wchar_t* tb_printf_float(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_entry_t e, tb_float_t num)
 {
     // digits
@@ -921,7 +921,7 @@ get_qualifier:
         e->base = 2;
         e->type = TB_PRINTF_TYPE_INT;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case L'F':
         e->extra |= TB_PRINTF_EXTRA_UPPER;
     case L'f':
@@ -1081,7 +1081,7 @@ tb_long_t tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* fmt, tb_va_
                 }
                 break;
             }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         case TB_PRINTF_TYPE_FLOAT:
             {
                 // double?

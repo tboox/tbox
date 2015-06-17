@@ -130,7 +130,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
          * c = p^(1/k)
          * s = m / n = 2k / (2c + c * c)
          */
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         tb_double_t k = (tb_double_t)hash_count;
         tb_double_t p = 1. / (tb_double_t)(1 << probability);
         tb_double_t c = tb_pow(p, 1 / k);

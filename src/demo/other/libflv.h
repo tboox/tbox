@@ -139,7 +139,7 @@ typedef struct __tb_flv_sdata_value_t
 
     union 
     {
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         tb_double_t                     number;
 #endif
         tb_bool_t                       boolean;
@@ -213,7 +213,7 @@ tb_bool_t       tb_flv_spak(tb_handle_t hflv);
  */
 
 tb_size_t       tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb_size_t sps_size);
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_double_t     tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size);
 #endif
 

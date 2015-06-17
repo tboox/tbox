@@ -378,7 +378,7 @@ static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 
     tb_trace_i("[bitops]: s16_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static tb_void_t tb_test_bits_double_bbe(tb_double_t x)
 {
     tb_byte_t                   p[8] = {0};
@@ -779,7 +779,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_test_bits_s16_le(4321);
     tb_test_bits_s16_le(-4321);
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     tb_trace_i("");
     tb_test_bits_double_bbe(3.1415926);
     tb_test_bits_double_ble(3.1415926);

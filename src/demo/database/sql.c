@@ -98,7 +98,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_database_sql_ref_t 
             tb_assert_and_check_break(id);
             tb_tracet_i("[%s:%d] ", tb_database_sql_value_name(id), tb_database_sql_value_int32(id));
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
             // trace fval
             tb_database_sql_value_t const* fval = (tb_database_sql_value_t const*)tb_iterator_item(row, 1);
             tb_assert_and_check_break(fval);

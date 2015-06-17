@@ -245,7 +245,7 @@ tb_uint64_t tb_sbtou64(tb_char_t const* s, tb_int_t base)
     // convect it
     return s_conv[base](s);
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_double_t tb_s2tod(tb_char_t const* s)
 {
     // check

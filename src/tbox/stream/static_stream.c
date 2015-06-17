@@ -829,7 +829,7 @@ tb_bool_t tb_static_stream_writ_s64_le(tb_static_stream_ref_t stream, tb_sint64_
     return tb_true;
 }
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_float_t tb_static_stream_read_float_le(tb_static_stream_ref_t stream)
 {
     // check

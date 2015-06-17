@@ -292,7 +292,7 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
         tb_trace_d("number: %s", tb_static_string_cstr(&data));
 
         // init number 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         if (bf) number = tb_object_number_init_from_float(tb_stof(tb_static_string_cstr(&data)));
 #else
         if (bf) tb_trace_noimpl();

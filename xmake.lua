@@ -137,7 +137,7 @@ add_option("float")
     set_option_showmenu(true)
     set_option_category("module")
     set_option_description("Enable or disable the float type")
-    add_option_defines_h_if_ok("TB_CONFIG_TYPE_FLOAT")
+    add_option_defines_h_if_ok("TB_CONFIG_TYPE_HAVE_FLOAT")
 
 -- add module: xml
 add_option("xml")
@@ -242,6 +242,12 @@ add_option("polarssl")
     add_option_cincludes("polarssl/polarssl.h")
     add_option_includedirs("pkg/polarssl.pkg/inc", "pkg/polarssl.pkg/inc/$(plat)/$(arch)")
 
+-- add type: wchar_t
+add_option("wchar_t")
+    set_option_category("type")
+    add_option_ctypes("wchar_t")
+    add_option_defines_h_if_ok("TB_CONFIG_TYPE_HAVE_WCHAR")
+
 -- add module interfaces
 function add_option_module_interfaces(module, includes, ...)
 
@@ -262,7 +268,7 @@ function add_option_module_interfaces(module, includes, ...)
         add_option_cincludes(includes)
         add_option_defines_h_if_ok(string.format("TB_CONFIG_%s_HAVE_%s", module:upper(), interface:upper()))
 
-        -- add options to the libc
+        -- add options 
         table.insert(_G[module], name)
     end
 end

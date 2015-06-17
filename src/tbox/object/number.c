@@ -73,7 +73,7 @@ typedef struct __tb_object_number_t
         // the sint64
         tb_sint64_t     s64;
     
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         // the float
         tb_float_t      f;
     
@@ -121,7 +121,7 @@ static tb_object_ref_t tb_object_number_copy(tb_object_ref_t object)
         return tb_object_number_init_from_uint8(number->v.u8);
     case TB_NUMBER_TYPE_SINT8:
         return tb_object_number_init_from_sint8(number->v.s8);
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         return tb_object_number_init_from_float(number->v.f);
     case TB_NUMBER_TYPE_DOUBLE:
@@ -170,7 +170,7 @@ static tb_void_t tb_object_number_cler(tb_object_ref_t object)
     case TB_NUMBER_TYPE_SINT8:
         number->v.s8 = 0;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         number->v.f = 0.;
         break;
@@ -332,7 +332,7 @@ tb_object_ref_t tb_object_number_init_from_sint64(tb_sint64_t value)
     return (tb_object_ref_t)number;
 }
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_object_ref_t tb_object_number_init_from_float(tb_float_t value)
 {
     // make
@@ -421,7 +421,7 @@ tb_uint64_t tb_object_number_uint64(tb_object_ref_t object)
         return number->v.u8;
     case TB_NUMBER_TYPE_SINT8:
         return number->v.s8;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         return (tb_uint64_t)number->v.f;
     case TB_NUMBER_TYPE_DOUBLE:
@@ -460,7 +460,7 @@ tb_sint64_t tb_object_number_sint64(tb_object_ref_t object)
         return number->v.u8;
     case TB_NUMBER_TYPE_SINT8:
         return number->v.s8;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         return (tb_sint64_t)number->v.f;
     case TB_NUMBER_TYPE_DOUBLE:
@@ -473,7 +473,7 @@ tb_sint64_t tb_object_number_sint64(tb_object_ref_t object)
     tb_assert(0);
     return 0;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_float_t tb_object_number_float(tb_object_ref_t object)
 {
     // check
@@ -651,7 +651,7 @@ tb_bool_t tb_object_number_sint64_set(tb_object_ref_t object, tb_sint64_t value)
     // ok
     return tb_true;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_bool_t tb_object_number_float_set(tb_object_ref_t object, tb_float_t value)
 {   
     // check

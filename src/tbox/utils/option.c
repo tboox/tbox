@@ -82,7 +82,7 @@ static __tb_inline__ tb_bool_t tb_option_is_integer(tb_char_t const* data)
     // ok?
     return *p? tb_false : tb_true;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static __tb_inline__ tb_bool_t tb_option_is_float(tb_char_t const* data)
 {
     // check
@@ -311,7 +311,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                             tb_assert_and_check_return_val(tb_option_is_bool(val), tb_false);
                             object = tb_object_boolean_init(!tb_stricmp(val, "y")? tb_true : tb_false);
                             break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                         case TB_OPTION_TYPE_FLOAT:
                             tb_assert_and_check_return_val(tb_option_is_float(val), tb_false);
                             object = tb_object_number_init_from_double(tb_atof(val));
@@ -422,7 +422,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                             tb_assert_and_check_return_val(tb_option_is_bool(val), tb_false);
                             object = tb_object_boolean_init(!tb_stricmp(val, "y")? tb_true : tb_false);
                             break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                         case TB_OPTION_TYPE_FLOAT:
                             tb_assert_and_check_return_val(tb_option_is_float(val), tb_false);
                             object = tb_object_number_init_from_double(tb_atof(val));
@@ -509,7 +509,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                     tb_assert_and_check_return_val(tb_option_is_bool(p), tb_false);
                     tb_object_dictionary_insert(impl->list, item->lname, tb_object_boolean_init(!tb_stricmp(p, "y")? tb_true : tb_false));
                     break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                 case TB_OPTION_TYPE_FLOAT:
                     tb_assert_and_check_return_val(tb_option_is_float(p), tb_false);
                     tb_object_dictionary_insert(impl->list, item->lname, tb_object_number_init_from_double(tb_atof(p)));
@@ -547,7 +547,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                     tb_assert_and_check_return_val(tb_option_is_bool(p), tb_false);
                     tb_object_dictionary_insert(impl->list, name, tb_object_boolean_init(!tb_stricmp(p, "y")? tb_true : tb_false));
                     break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                 case TB_OPTION_TYPE_FLOAT:
                     tb_assert_and_check_return_val(tb_option_is_float(p), tb_false);
                     tb_object_dictionary_insert(impl->list, name, tb_object_number_init_from_double(tb_atof(p)));
@@ -965,7 +965,7 @@ tb_sint64_t tb_option_item_sint64(tb_option_ref_t option, tb_char_t const* name)
     // the option item value
     return tb_object_number_sint64(item);
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_float_t tb_option_item_float(tb_option_ref_t option, tb_char_t const* name)
 {
     // check

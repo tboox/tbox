@@ -82,7 +82,7 @@ static tb_void_t tb_test_sbtoi32(tb_char_t const* s, tb_int_t base, tb_int32_t v
     tb_printf("s%dtoi32(%s) = %d [?= %d]\n", base, s, tb_sbtoi32(s, base), val);
 }
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static tb_void_t tb_test_sbtof(tb_char_t const* s, tb_int_t base, tb_double_t val)
 {
     tb_printf("s%dtof(%s) = %lf [?= %lf]\n", base, s, tb_sbtof(s, base), val);
@@ -152,7 +152,7 @@ tb_int_t tb_demo_libc_stdlib_main(tb_int_t argc, tb_char_t** argv)
     tb_test_sbtoi32("-0x1dcc666", 16, -31415926);
 #endif
 
-#if TB_TEST_SBTOF && defined(TB_CONFIG_TYPE_FLOAT)
+#if TB_TEST_SBTOF && defined(TB_CONFIG_TYPE_HAVE_FLOAT)
     tb_printf("===============================\n");
     tb_test_sbtof("0", 10, 0);
     tb_test_sbtof("0.", 10, 0.);

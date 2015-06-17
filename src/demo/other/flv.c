@@ -21,7 +21,7 @@ static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value
 {
     switch (value->type)
     {
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_FLV_SDATA_TYPE_NUMBER:
         tb_trace_i("%s = %lf", spath, value->u.number);
         break;
@@ -143,7 +143,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
             tb_assert_return(data);
             tb_static_stream_read_data(&sstream, data, size);
 
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
             // remove emulation bytes
             size = (tb_uint16_t)tb_flv_video_h264_sps_analyze_remove_emulation(data, size);
 

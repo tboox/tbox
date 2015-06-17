@@ -185,7 +185,7 @@ static tb_uint32_t tb_isqrti_impl(tb_uint32_t x)
     return n;
 #endif
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static __tb_inline__ tb_uint32_t tb_isqrti_impl_using_sqrt(tb_uint32_t x)
 {
     return (tb_uint32_t)tb_sqrtf((tb_float_t)x);
@@ -197,7 +197,7 @@ static __tb_inline__ tb_uint32_t tb_isqrti_impl_using_sqrt(tb_uint32_t x)
  */
 tb_uint32_t tb_isqrti(tb_uint32_t x)
 {
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 
     // using the sqrt function?
     static tb_long_t s_using_sqrt = -1;

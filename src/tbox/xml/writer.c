@@ -470,7 +470,7 @@ tb_void_t tb_xml_writer_attributes_format(tb_xml_writer_ref_t writer, tb_char_t 
     tb_vsnprintf_format(data, 8192, format, &size);
     tb_hash_map_insert(impl->attributes, name, data);
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_void_t tb_xml_writer_attributes_float(tb_xml_writer_ref_t writer, tb_char_t const* name, tb_float_t value)
 {
     // check

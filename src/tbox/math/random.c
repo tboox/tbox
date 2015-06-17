@@ -99,7 +99,7 @@ tb_long_t tb_random_range(tb_random_ref_t random, tb_long_t beg, tb_long_t end)
     // range it
     return impl->range(impl, beg, end);
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_float_t tb_random_rangef(tb_random_ref_t random, tb_float_t beg, tb_float_t end)
 {
     // check

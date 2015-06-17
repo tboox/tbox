@@ -39,7 +39,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(libc_stdlib)
 
     // libm
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 ,   TB_DEMO_MAIN_ITEM(libm_float)
 ,   TB_DEMO_MAIN_ITEM(libm_double)
 #endif
@@ -69,7 +69,7 @@ static tb_demo_t g_demo[] =
 #endif
 
     // math
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 ,   TB_DEMO_MAIN_ITEM(math_fixed)
 #endif
 ,   TB_DEMO_MAIN_ITEM(math_random)

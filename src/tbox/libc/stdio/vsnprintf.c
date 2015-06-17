@@ -476,7 +476,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
     return pb;
 }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_float_t num)
 {
     // digits
@@ -907,7 +907,7 @@ get_qualifier:
         e->base = 2;
         e->type = TB_PRINTF_TYPE_INT;
         break;
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case 'F':
         e->extra |= TB_PRINTF_EXTRA_UPPER;
     case 'f':
@@ -1068,7 +1068,7 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                 }
                 break;
             }
-#ifdef TB_CONFIG_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         case TB_PRINTF_TYPE_FLOAT:
             {
                 // double?
