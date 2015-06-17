@@ -320,120 +320,31 @@ add_option_module_interfaces(   "libc"
                             ,   "wcstombs"
                             ,   "mbstowcs")
 
--- add module interfaces for libc.time
-add_option_module_interfaces(   "libc"
-                            ,   nil
-                            ,   "time.h"
-                            ,   "gmtime"
-                            ,   "mktime"
-                            ,   "localtime")
-add_option_module_interfaces(   "libc"
-                            ,   "sys/time.h"
-                            ,   "gettimeofday")
-
--- add module interfaces for libc.signal
-add_option_module_interfaces(   "libc"
-                            ,   nil
-                            ,   {"signal.h", "setjmp.h"}
-                            ,   "signal"
-                            ,   "setjmp"
-                            ,   "sigsetjmp")
-
--- add module interfaces for libc.execinfo
-add_option_module_interfaces(   "libc"
-                            ,   nil
-                            ,   "execinfo.h"
-                            ,   "backtrace")
-
--- add module interfaces for libc.system
-add_option_module_interfaces(   "libc"
-                            ,   nil
-                            ,   "stdlib.h"
-                            ,   "system")
+-- add module interfaces for libc
+add_option_module_interfaces("libc", nil, "time.h", "gmtime", "mktime", "localtime")
+add_option_module_interfaces("libc", nil, "sys/time.h", "gettimeofday")
+add_option_module_interfaces("libc", nil, {"signal.h", "setjmp.h"}, "signal", "setjmp", "sigsetjmp")
+add_option_module_interfaces("libc", nil, "execinfo.h", "backtrace")
+add_option_module_interfaces("libc", nil, "stdlib.h", "system")
 
 -- add module interfaces for libm
-add_option_module_interfaces(   "libm"
-                            ,   nil
-                            ,   "math.h"
-                            ,   "sincos"
-                            ,   "sincosf"
-                            ,   "log2"
-                            ,   "log2f")
+add_option_module_interfaces("libm", nil, "math.h", "sincos", "sincosf", "log2", "log2f")
 
--- add module interfaces for posix.poll
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   {"sys/poll.h", "sys/socket.h"}
-                            ,   "poll")
+-- add module interfaces for posix
+add_option_module_interfaces("posix", nil, {"sys/poll.h", "sys/socket.h"}, "poll")
+add_option_module_interfaces("posix", "pthread", "pthread.h", "pthread_mutex_init", "pthread_create")
+add_option_module_interfaces("posix", nil, {"sys/socket.h", "fcntl.h"}, "socket")
+add_option_module_interfaces("posix", nil, "dirent.h", "opendir")
+add_option_module_interfaces("posix", nil, "dlfcn.h", "dlopen")
+add_option_module_interfaces("posix", nil, {"sys/stat.h", "fcntl.h"}, "open")
+add_option_module_interfaces("posix", nil, "unistd.h", "gethostname")
+add_option_module_interfaces("posix", nil, "ifaddrs.h", "getifaddrs")
+add_option_module_interfaces("posix", "pthread", "semaphore.h", "sem_init")
+add_option_module_interfaces("posix", nil, "unistd.h", "getpagesize", "sysconf")
+add_option_module_interfaces("posix", nil, "sched.h", "sched_yield")
 
--- add module interfaces for posix.pthread
-add_option_module_interfaces(   "posix"
-                            ,   "pthread"
-                            ,   "pthread.h"
-                            ,   "pthread_mutex_init"
-                            ,   "pthread_create")
-
--- add module interfaces for posix.socket
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   {"sys/socket.h", "fcntl.h"}
-                            ,   "socket")
-
--- add module interfaces for posix.dirent
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   "dirent.h"
-                            ,   "opendir")
-
--- add module interfaces for posix.dlopen
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   "dlfcn.h"
-                            ,   "dlopen")
-
--- add module interfaces for posix.file
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   {"sys/stat.h", "fcntl.h"}
-                            ,   "open")
-
--- add module interfaces for posix.gethostname
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   "unistd.h"
-                            ,   "gethostname")
-
--- add module interfaces for posix.ifaddrs
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   "ifaddrs.h"
-                            ,   "getifaddrs")
-
--- add module interfaces for posix.semaphore
-add_option_module_interfaces(   "posix"
-                            ,   "pthread"
-                            ,   "semaphore.h"
-                            ,   "sem_init")
-
--- add module interfaces for posix.page
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   "unistd.h"
-                            ,   "getpagesize"
-                            ,   "sysconf")
-
--- add module interfaces for posix.sched
-add_option_module_interfaces(   "posix"
-                            ,   nil
-                            ,   "sched.h"
-                            ,   "sched_yield")
-
--- add module interfaces for systemv.semaphore
-add_option_module_interfaces(   "systemv"
-                            ,   nil
-                            ,   {"sys/sem.h", "sys/ipc.h"}
-                            ,   "semget"
-                            ,   "semtimedop")
+-- add module interfaces for systemv
+add_option_module_interfaces("systemv", nil, {"sys/sem.h", "sys/ipc.h"}, "semget", "semtimedop")
 
 -- projects
 add_subdirs("src/tbox") 
