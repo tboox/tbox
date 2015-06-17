@@ -1,0 +1,10 @@
+add_option("openssl")
+    set_option_showmenu(true)
+    set_option_category("package")
+    set_option_description("The openssl package")
+    add_option_defines_h_if_ok("CONFIG_PACKAGE_HAVE_OPENSSL")
+    add_option_links("ssl", "crypto")
+    add_option_linkdirs("lib/$(plat)/$(arch)")
+    add_option_cincludes("openssl/openssl.h")
+    add_option_includedirs("inc", "inc/$(plat)/$(arch)")
+ 
