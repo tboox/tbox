@@ -24,14 +24,8 @@ add_target("demo")
     -- add links
     add_links("tbox")
 
-    -- add modules
-    add_options("float", "xml", "zip", "asio", "object", "charset", "database")
-
-    -- add package
-    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl")
-
-    -- add interfaces
-    add_options(libc, libm, posix, systemv)
+    -- add packages
+    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "base")
 
     -- add the source files
     add_files("*.c") 
