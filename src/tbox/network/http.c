@@ -593,7 +593,7 @@ static tb_bool_t tb_http_response(tb_http_impl_t* impl)
                 // switch to zstream if gzip or deflate
                 if (impl->option.bunzip && (impl->status.bgzip || impl->status.bdeflate))
                 {
-#if defined(TB_CONFIG_PACKAGE_HAVE_ZLIB) && defined(TB_CONFIG_MODULE_HAVE_ZIP)
+#if defined(CONFIG_PACKAGE_HAVE_ZLIB) && defined(TB_CONFIG_MODULE_HAVE_ZIP)
                     // init zstream
                     if (impl->zstream)
                     {

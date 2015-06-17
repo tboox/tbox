@@ -1,0 +1,10 @@
+add_option("polarssl")
+    set_option_showmenu(true)
+    set_option_category("package")
+    set_option_description("The polarssl package")
+    add_option_defines_h_if_ok("CONFIG_PACKAGE_HAVE_POLARSSL")
+    add_option_links("polarssl")
+    add_option_linkdirs("lib/$(plat)/$(arch)")
+    add_option_cincludes("polarssl/polarssl.h")
+    add_option_includedirs("inc", "inc/$(plat)/$(arch)")
+
