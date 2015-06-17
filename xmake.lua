@@ -15,8 +15,8 @@ add_defines_h("TB_CONFIG_OS_$(OS)")
 add_undefines_h("TB_CONFIG_TRACE_INFO_ONLY")
 add_undefines_h("TB_CONFIG_EXCEPTION_ENABLE")
 add_undefines_h("TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE")
-
--- add some defines 
+ 
+-- add defines for c files
 add_defines("_GNU_SOURCE=1", "_REENTRANT")
 
 -- disable some compiler errors
