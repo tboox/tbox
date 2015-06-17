@@ -38,6 +38,7 @@ if modes("debug") then
     -- attempt to enable some checkers
     add_cxflags("-fsanitize=address", "-ftrapv")
     add_mxflags("-fsanitize=address", "-ftrapv")
+    add_ldflags("-fsanitize=address")
 end
 
 -- the release or profile modes
