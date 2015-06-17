@@ -25,7 +25,7 @@ add_target("tbox")
     add_includedirs("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)")
 
     -- add the header files for installing
-    add_headers("src/(tbox/**.h)")
+    add_headers("src/(tbox/**.h)|**/impl/**.h")
     add_headers("src/(tbox/prefix/**/prefix.S)")
 
     -- add modules
