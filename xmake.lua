@@ -16,6 +16,9 @@ add_undefines_h("TB_CONFIG_TRACE_INFO_ONLY")
 add_undefines_h("TB_CONFIG_EXCEPTION_ENABLE")
 add_undefines_h("TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE")
 
+-- add some defines 
+add_defines("_GNU_SOURCE=1", "_REENTRANT")
+
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations")
 add_mxflags("-Wno-error=deprecated-declarations")
@@ -249,7 +252,7 @@ add_option("wchar_t")
     add_option_defines_h_if_ok("TB_CONFIG_TYPE_HAVE_WCHAR")
 
 -- add module interfaces
-function add_option_module_interfaces(module, includes, ...)
+function add_option_module_interfaces(module, links, includes, ...)
 
     -- make module
     _G[module] = _G[module] or {}
@@ -265,7 +268,8 @@ function add_option_module_interfaces(module, includes, ...)
         add_option(name)
         set_option_category("interface")
         add_option_cfuncs(interface)
-        add_option_cincludes(includes)
+        if links then add_option_links(links) end
+        if includes then add_option_cincludes(includes) end
         add_option_defines_h_if_ok(string.format("TB_CONFIG_%s_HAVE_%s", module:upper(), interface:upper()))
 
         -- add options 
@@ -275,6 +279,7 @@ end
 
 -- add module interfaces for libc.string
 add_option_module_interfaces(   "libc"
+                            ,   nil
                             ,   {"string.h", "stdlib.h"}
                             ,   "memcpy"
                             ,   "memset"
@@ -296,6 +301,7 @@ add_option_module_interfaces(   "libc"
 
 -- add module interfaces for libc.wstring
 add_option_module_interfaces(   "libc"
+                            ,   nil
                             ,   {"wchar.h", "stdlib.h"}
                             ,   "wcscat"
                             ,   "wcsncat"
@@ -315,6 +321,7 @@ add_option_module_interfaces(   "libc"
 
 -- add module interfaces for libc.time
 add_option_module_interfaces(   "libc"
+                            ,   nil
                             ,   "time.h"
                             ,   "gmtime"
                             ,   "mktime"
@@ -325,6 +332,7 @@ add_option_module_interfaces(   "libc"
 
 -- add module interfaces for libc.signal
 add_option_module_interfaces(   "libc"
+                            ,   nil
                             ,   {"signal.h", "setjmp.h"}
                             ,   "signal"
                             ,   "setjmp"
@@ -332,16 +340,19 @@ add_option_module_interfaces(   "libc"
 
 -- add module interfaces for libc.execinfo
 add_option_module_interfaces(   "libc"
+                            ,   nil
                             ,   "execinfo.h"
                             ,   "backtrace")
 
 -- add module interfaces for libc.system
 add_option_module_interfaces(   "libc"
+                            ,   nil
                             ,   "stdlib.h"
                             ,   "system")
 
 -- add module interfaces for libm
 add_option_module_interfaces(   "libm"
+                            ,   nil
                             ,   "math.h"
                             ,   "sincos"
                             ,   "sincosf"
@@ -350,63 +361,75 @@ add_option_module_interfaces(   "libm"
 
 -- add module interfaces for posix.poll
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   {"sys/poll.h", "sys/socket.h"}
                             ,   "poll")
 
 -- add module interfaces for posix.pthread
 add_option_module_interfaces(   "posix"
+                            ,   "pthread"
                             ,   "pthread.h"
                             ,   "pthread_mutex_init"
                             ,   "pthread_create")
 
 -- add module interfaces for posix.socket
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   {"sys/socket.h", "fcntl.h"}
                             ,   "socket")
 
 -- add module interfaces for posix.dirent
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   "dirent.h"
                             ,   "opendir")
 
 -- add module interfaces for posix.dlopen
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   "dlfcn.h"
                             ,   "dlopen")
 
 -- add module interfaces for posix.file
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   {"sys/stat.h", "fcntl.h"}
                             ,   "open")
 
 -- add module interfaces for posix.gethostname
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   "unistd.h"
                             ,   "gethostname")
 
 -- add module interfaces for posix.ifaddrs
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   "ifaddrs.h"
                             ,   "getifaddrs")
 
 -- add module interfaces for posix.semaphore
 add_option_module_interfaces(   "posix"
+                            ,   "pthread"
                             ,   "semaphore.h"
                             ,   "sem_init")
 
 -- add module interfaces for posix.page
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   "unistd.h"
                             ,   "getpagesize"
                             ,   "sysconf")
 
 -- add module interfaces for posix.sched
 add_option_module_interfaces(   "posix"
+                            ,   nil
                             ,   "sched.h"
                             ,   "sched_yield")
 
 -- add module interfaces for systemv.semaphore
 add_option_module_interfaces(   "systemv"
+                            ,   nil
                             ,   {"sys/sem.h", "sys/ipc.h"}
                             ,   "semget"
                             ,   "semtimedop")

@@ -21,11 +21,17 @@ add_target("demo")
     add_includedirs("$(buildir)/tbox.pkg/inc")
     add_includedirs("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)")
 
-    -- add packages
-    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl")
-
     -- add links
     add_links("tbox")
+
+    -- add modules
+    add_options("float", "xml", "zip", "asio", "object", "charset", "database")
+
+    -- add package
+    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl")
+
+    -- add interfaces
+    add_options(libc, libm, posix, systemv)
 
     -- add the source files
     add_files("src/demo/*.c") 
