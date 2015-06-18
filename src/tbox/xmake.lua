@@ -10,10 +10,10 @@ add_target("tbox")
 
     -- set the auto-generated config.h
     set_config_h("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)/tbox.config.h")
-    set_config_h_prefix("TB")
+    set_config_h_prefix("TB_CONFIG")
 
     -- set the target directory
-    set_targetdir("$(buildir)/tbox.pkg/lib/$(plat)/$(arch)")
+    set_targetdir("$(buildir)/tbox.pkg/lib/$(mode)/$(plat)/$(arch)")
 
     -- set the header files directory
     set_headerdir("$(buildir)/tbox.pkg/inc")

@@ -88,7 +88,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
         // init head func
         if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_demo_aicp_http_head_func)) break;
 
-#if defined(TB_CONFIG_MODULE_HAVE_ZIP) && defined(CONFIG_PACKAGE_HAVE_ZLIB)
+#if defined(TB_CONFIG_MODULE_HAVE_ZIP) && defined(TB_CONFIG_PACKAGE_HAVE_ZLIB)
         // need gzip
         if (!tb_aicp_http_ctrl(http, TB_HTTP_OPTION_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
 

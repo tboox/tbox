@@ -11,7 +11,7 @@ add_option("openssl")
     set_option_description("The openssl package")
 
     -- add defines to config.h if checking ok
-    add_option_defines_h_if_ok("CONFIG_PACKAGE_HAVE_OPENSSL")
+    add_option_defines_h_if_ok("$(prefix)_PACKAGE_HAVE_OPENSSL")
 
     -- add links for checking
     add_option_links("ssl", "crypto")
