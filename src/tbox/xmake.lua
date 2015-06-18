@@ -1,4 +1,28 @@
 
+-- add type: wchar_t
+add_option("wchar_t")
+    set_option_category("type")
+    add_option_ctypes("wchar_t")
+    add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_WCHAR")
+
+-- add option: float
+add_option("float")
+    set_option_enable(true)
+    set_option_showmenu(true)
+    set_option_category("option")
+    set_option_description("Enable or disable the float type")
+    add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_FLOAT")
+
+-- add modules
+for _, module in ipairs({"xml", "zip", "asio", "object", "charset", "database"}) do
+    add_option(module)
+    set_option_enable(true)
+    set_option_showmenu(true)
+    set_option_category("module")
+    set_option_description(string.format("The %s module", module))
+    add_option_defines_h_if_ok(string.format("$(prefix)_MODULE_HAVE_%s", module:upper()))
+end
+
 -- add target
 add_target("tbox")
 
@@ -139,3 +163,60 @@ add_target("tbox")
         add_files("platform/linux/android/*.c")
     end
 
+    -- add the interfaces for libc
+    add_cfuncs("libc", nil,         {"string.h", "stdlib.h"},           "memcpy",
+                                                                        "memset",
+                                                                        "memmove",
+                                                                        "memcmp",
+                                                                        "strcat",
+                                                                        "strncat",
+                                                                        "strcpy",
+                                                                        "strncpy",
+                                                                        "strlcpy",
+                                                                        "strlen",
+                                                                        "strnlen",
+                                                                        "strstr",
+                                                                        "strcasestr",
+                                                                        "strcmp",
+                                                                        "strcasecmp",
+                                                                        "strncmp",
+                                                                        "strncasecmp")
+    add_cfuncs("libc", nil,         {"wchar.h", "stdlib.h"},            "wcscat",
+                                                                        "wcsncat",
+                                                                        "wcscpy",
+                                                                        "wcsncpy",
+                                                                        "wcslcpy",
+                                                                        "wcslen",
+                                                                        "wcsnlen",
+                                                                        "wcsstr",
+                                                                        "wcscasestr",
+                                                                        "wcscmp",
+                                                                        "wcscasecmp",
+                                                                        "wcsncmp",
+                                                                        "wcsncasecmp",
+                                                                        "wcstombs",
+                                                                        "mbstowcs")
+    add_cfuncs("libc", nil,         "time.h",                           "gmtime", "mktime", "localtime")
+    add_cfuncs("libc", nil,         "sys/time.h",                       "gettimeofday")
+    add_cfuncs("libc", nil,         {"signal.h", "setjmp.h"},           "signal", "setjmp", "sigsetjmp")
+    add_cfuncs("libc", nil,         "execinfo.h",                       "backtrace")
+    add_cfuncs("libc", nil,         "stdlib.h",                         "system")
+
+    -- add the interfaces for libm
+    add_cfuncs("libm", nil,         "math.h",                           "sincos", "sincosf", "log2", "log2f")
+
+    -- add the interfaces for posix
+    add_cfuncs("posix", nil,        {"sys/poll.h", "sys/socket.h"},     "poll")
+    add_cfuncs("posix", "pthread",  "pthread.h",                        "pthread_mutex_init", "pthread_create")
+    add_cfuncs("posix", nil,        {"sys/socket.h", "fcntl.h"},        "socket")
+    add_cfuncs("posix", nil,        "dirent.h",                         "opendir")
+    add_cfuncs("posix", nil,        "dlfcn.h",                          "dlopen")
+    add_cfuncs("posix", nil,        {"sys/stat.h", "fcntl.h"},          "open")
+    add_cfuncs("posix", nil,        "unistd.h",                         "gethostname")
+    add_cfuncs("posix", nil,        "ifaddrs.h",                        "getifaddrs")
+    add_cfuncs("posix", "pthread",  "semaphore.h",                      "sem_init")
+    add_cfuncs("posix", nil,        "unistd.h",                         "getpagesize", "sysconf")
+    add_cfuncs("posix", nil,        "sched.h",                          "sched_yield")
+
+    -- add the interfaces for systemv
+    add_cfuncs("systemv", nil,      {"sys/sem.h", "sys/ipc.h"},         "semget", "semtimedop")
