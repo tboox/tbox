@@ -9,12 +9,12 @@ set_warnings("all", "error")
 set_languages("c99", "cxx11")
 
 -- add defines to config.h
-add_defines_h("TB_CONFIG_OS_$(OS)")
+add_defines_h("$(prefix)_OS_$(OS)")
 
 -- add undefines to config.h 
-add_undefines_h("TB_CONFIG_TRACE_INFO_ONLY")
-add_undefines_h("TB_CONFIG_EXCEPTION_ENABLE")
-add_undefines_h("TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE")
+add_undefines_h("$(prefix)_TRACE_INFO_ONLY")
+add_undefines_h("$(prefix)_EXCEPTION_ENABLE")
+add_undefines_h("$(prefix)_MEMORY_UNALIGNED_ACCESS_ENABLE")
  
 -- add defines for c files
 add_defines("_GNU_SOURCE=1", "_REENTRANT")
@@ -80,7 +80,7 @@ if modes("release", "profile") then
         add_defines("__tb_small__")
 
         -- add defines to config.h
-        add_defines_h("TB_CONFIG_SMALL")
+        add_defines_h("$(prefix)_SMALL")
     end
 
     -- attempt to add vector extensions 
@@ -132,7 +132,7 @@ end
 add_option("wchar_t")
     set_option_category("type")
     add_option_ctypes("wchar_t")
-    add_option_defines_h_if_ok("TB_CONFIG_TYPE_HAVE_WCHAR")
+    add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_WCHAR")
 
 -- add option: float
 add_option("float")
@@ -140,7 +140,7 @@ add_option("float")
     set_option_showmenu(true)
     set_option_category("option")
     set_option_description("Enable or disable the float type")
-    add_option_defines_h_if_ok("TB_CONFIG_TYPE_HAVE_FLOAT")
+    add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_FLOAT")
 
 -- add option: demo
 add_option("demo")
@@ -156,7 +156,7 @@ for _, module in ipairs({"xml", "zip", "asio", "object", "charset", "database"})
     set_option_showmenu(true)
     set_option_category("module")
     set_option_description(string.format("The %s module", module))
-    add_option_defines_h_if_ok(string.format("TB_CONFIG_MODULE_HAVE_%s", module:upper()))
+    add_option_defines_h_if_ok(string.format("$(prefix)_MODULE_HAVE_%s", module:upper()))
 end
 
 -- add module interfaces
@@ -178,7 +178,7 @@ function add_option_module_interfaces(module, links, includes, ...)
         add_option_cfuncs(interface)
         if links then add_option_links(links) end
         if includes then add_option_cincludes(includes) end
-        add_option_defines_h_if_ok(string.format("TB_CONFIG_%s_HAVE_%s", module:upper(), interface:upper()))
+        add_option_defines_h_if_ok(string.format("$(prefix)_%s_HAVE_%s", module:upper(), interface:upper()))
 
         -- add options 
         table.insert(_G[module], name)

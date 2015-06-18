@@ -11,7 +11,7 @@ add_option("sqlite3")
     set_option_description("The sqlite3 package")
 
     -- add defines to config.h if checking ok
-    add_option_defines_h_if_ok("CONFIG_PACKAGE_HAVE_SQLITE3")
+    add_option_defines_h_if_ok("$(prefix)_PACKAGE_HAVE_SQLITE3")
 
     -- add links for checking
     add_option_links("sqlite3")

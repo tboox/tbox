@@ -11,7 +11,7 @@ add_option("mysql")
     set_option_description("The mysql package")
 
     -- add defines to config.h if checking ok
-    add_option_defines_h_if_ok("CONFIG_PACKAGE_HAVE_MYSQL")
+    add_option_defines_h_if_ok("$(prefix)_PACKAGE_HAVE_MYSQL")
 
     -- add links for checking
     add_option_links("mysqlclient")

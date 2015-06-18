@@ -44,7 +44,7 @@ tb_zip_ref_t tb_zip_init(tb_size_t algo, tb_size_t action)
     ,   tb_null
     ,   tb_null
     ,   tb_null
-#ifdef CONFIG_PACKAGE_HAVE_ZLIB
+#ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
     ,   tb_zip_zlibraw_init
     ,   tb_zip_zlib_init
     ,   tb_zip_gzip_init
@@ -73,7 +73,7 @@ tb_void_t tb_zip_exit(tb_zip_ref_t zip)
     ,   tb_null
     ,   tb_null
     ,   tb_null
-#ifdef CONFIG_PACKAGE_HAVE_ZLIB
+#ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
     ,   tb_zip_zlibraw_exit
     ,   tb_zip_zlib_exit
     ,   tb_zip_gzip_exit
