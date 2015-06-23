@@ -90,20 +90,8 @@ end
 -- for the windows platform (msvc)
 if plats("windows") then 
 
-    -- force to compile all c-files as c++ files 
-    add_cxflags("-TP") 
-
-    -- enable _cdecl
-    add_cxflags("-Gd") 
-
-    -- enable multi-processors for compiling
-    add_cxflags("-MP4") 
-    
-    -- the warnings less than all
-    set_warnings("more", "error")
-
     -- add some defines only for windows
-    add_defines("_MBCS", "_CRT_SECURE_NO_WARNINGS", "NOCRYPT", "NOGDI")
+    add_defines("NOCRYPT", "NOGDI")
 
     -- the release mode
     if modes("release") then
@@ -123,9 +111,6 @@ if plats("windows") then
 
     -- no msvcrt.lib
     add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
-
-    -- add uac
-    add_ldflags("-manifest", "-manifestuac:\"level='asInvoker' uiAccess='false'\"")
 end
 
 -- add option: demo
