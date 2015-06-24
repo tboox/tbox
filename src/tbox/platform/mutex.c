@@ -72,7 +72,7 @@ tb_void_t tb_mutex_exit(tb_mutex_ref_t mutex)
 
     // exit it
     tb_spinlock_ref_t lock = (tb_spinlock_ref_t)mutex;
-    if (pmutex)
+    if (lock)
     {
         // exit lock
         tb_spinlock_exit(lock);

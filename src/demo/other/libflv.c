@@ -2,7 +2,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME        "flv"
-#define TB_TRACE_MODULE_DEBUG       (0)
+#define TB_TRACE_MODULE_DEBUG       (1)
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -1149,11 +1149,11 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
     
     tb_size_t pic_width_in_mbs_minus1 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&sstream);
     tb_used(pic_width_in_mbs_minus1);
-    tb_trace_d("pic_width_in_mbs_minus1: %x", pic_width_in_mbs_minus1);
+    tb_trace_d("width: %lu", (pic_width_in_mbs_minus1 + 1) << 4);
 
     tb_size_t pic_height_in_map_units_minus1 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&sstream);
     tb_used(pic_height_in_map_units_minus1);
-    tb_trace_d("pic_height_in_map_units_minus1: %x", pic_height_in_map_units_minus1);
+    tb_trace_d("height: %lu", (pic_height_in_map_units_minus1 + 1) << 4);
 
     tb_size_t frame_mbs_only_flag = tb_static_stream_read_u1(&sstream);
     tb_trace_d("frame_mbs_only_flag: %x", frame_mbs_only_flag);
