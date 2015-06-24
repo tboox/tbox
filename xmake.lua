@@ -35,10 +35,12 @@ if modes("debug") then
     -- add defines for debug
     add_defines("__tb_debug__")
 
-    -- attempt to enable some checkers
-    add_cxflags("-fsanitize=address", "-ftrapv")
-    add_mxflags("-fsanitize=address", "-ftrapv")
-    add_ldflags("-fsanitize=address")
+    -- attempt to enable some checkers for pc
+    if archs("i386", "x86_64") then
+        add_cxflags("-fsanitize=address", "-ftrapv")
+        add_mxflags("-fsanitize=address", "-ftrapv")
+        add_ldflags("-fsanitize=address")
+    end
 end
 
 -- the release or profile modes
@@ -75,16 +77,20 @@ if modes("release", "profile") then
     else
         -- enable smallest optimization
         set_optimize("smallest")
-
-        -- add defines for small
-        add_defines("__tb_small__")
-
-        -- add defines to config.h
-        add_defines_h("$(prefix)_SMALL")
     end
 
     -- attempt to add vector extensions 
     add_vectorexts("sse2", "sse3", "ssse3", "mmx")
+end
+
+-- for embed
+if not archs("i386", "x86_64") then
+
+    -- add defines for small
+    add_defines("__tb_small__")
+
+    -- add defines to config.h
+    add_defines_h("$(prefix)_SMALL")
 end
 
 -- for the windows platform (msvc)

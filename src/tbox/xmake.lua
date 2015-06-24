@@ -207,14 +207,14 @@ add_target("tbox")
 
     -- add the interfaces for posix
     add_cfuncs("posix", nil,        {"sys/poll.h", "sys/socket.h"},     "poll")
-    add_cfuncs("posix", "pthread",  "pthread.h",                        "pthread_mutex_init", "pthread_create")
+    add_cfuncs("posix", nil,        "pthread.h",                        "pthread_mutex_init", "pthread_create")
     add_cfuncs("posix", nil,        {"sys/socket.h", "fcntl.h"},        "socket")
     add_cfuncs("posix", nil,        "dirent.h",                         "opendir")
     add_cfuncs("posix", nil,        "dlfcn.h",                          "dlopen")
     add_cfuncs("posix", nil,        {"sys/stat.h", "fcntl.h"},          "open")
     add_cfuncs("posix", nil,        "unistd.h",                         "gethostname")
     add_cfuncs("posix", nil,        "ifaddrs.h",                        "getifaddrs")
-    add_cfuncs("posix", "pthread",  "semaphore.h",                      "sem_init")
+    add_cfuncs("posix", nil,        "semaphore.h",                      "sem_init")
     add_cfuncs("posix", nil,        "unistd.h",                         "getpagesize", "sysconf")
     add_cfuncs("posix", nil,        "sched.h",                          "sched_yield")
 

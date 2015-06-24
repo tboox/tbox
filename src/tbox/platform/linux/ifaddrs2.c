@@ -473,6 +473,9 @@ static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_map
         data = tb_ralloc(data, size);
         tb_assert_and_check_break(data);
         
+        // trace
+        tb_trace_d("netlink: recv: ..");
+
         // recv response
         tb_long_t recv = tb_ifaddrs_netlink_socket_recv(sock, data, size);
 
@@ -491,19 +494,23 @@ static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_map
         tb_assert_and_check_break(recv > 0);
 
         // done
+        tb_bool_t failed = tb_false;
         struct nlmsghdr* response = tb_null;
         for (response = (struct nlmsghdr *)data; NLMSG_OK(response, (tb_uint_t)recv); response = (struct nlmsghdr *)NLMSG_NEXT(response, recv))
         {
             // trace
-            tb_trace_d("type: %d, pid: %lu ?= %lu", response->nlmsg_type, (tb_size_t)response->nlmsg_pid, (tb_size_t)pid);
+            tb_trace_d("type: %d, pid: %ld ?= %ld, sock: %ld ?= %ld", response->nlmsg_type, (tb_long_t)response->nlmsg_pid, (tb_long_t)pid, (tb_long_t)response->nlmsg_seq, (tb_long_t)sock);
+ 
+            // failed?
+            tb_check_break_state(response->nlmsg_type != NLMSG_ERROR, failed, tb_true);
+
+            // invalid pid?
+            tb_assert_and_check_break_state((tb_long_t)response->nlmsg_pid > 0, failed, tb_true);
 
             // isn't it?
             if ((pid_t)response->nlmsg_pid != pid || (tb_long_t)response->nlmsg_seq != sock)
                 continue;
-            
-            // failed?
-            tb_check_break(response->nlmsg_type != NLMSG_ERROR);
-
+           
             // done?
             if (response->nlmsg_type == NLMSG_DONE)
             {
@@ -528,6 +535,9 @@ static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_map
                 tb_ifaddrs_interface_done_ipaddr(interfaces, names, response);
             }
         }
+
+        // failed?
+        tb_check_break(!failed);
 
         // continue if empty?
         if (ok < 0) ok = 0;
