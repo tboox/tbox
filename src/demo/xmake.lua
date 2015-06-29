@@ -15,11 +15,11 @@ add_target("demo")
     set_objectdir("$(buildir)/.objs")
 
     -- add links directory
-    add_linkdirs("$(buildir)/tbox.pkg/lib/$(mode)/$(plat)/$(arch)")
+    add_linkdirs("$(buildir)")
 
     -- add includes directory
-    add_includedirs("$(buildir)/tbox.pkg/inc")
-    add_includedirs("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)")
+    add_includedirs("$(buildir)")
+    add_includedirs("$(buildir)/tbox")
 
     -- add links
     add_links("tbox")

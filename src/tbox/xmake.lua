@@ -33,20 +33,15 @@ add_target("tbox")
     add_defines("__tb_prefix__=\"tbox\"")
 
     -- set the auto-generated config.h
-    set_config_h("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)/tbox.config.h")
+    set_config_h("$(buildir)/tbox/tbox.config.h")
     set_config_h_prefix("TB_CONFIG")
-
-    -- set the target directory
-    set_targetdir("$(buildir)/tbox.pkg/lib/$(mode)/$(plat)/$(arch)")
-
-    -- set the header files directory
-    set_headerdir("$(buildir)/tbox.pkg/inc")
 
     -- set the object files directory
     set_objectdir("$(buildir)/.objs")
 
     -- add includes directory
-    add_includedirs("$(buildir)/tbox.pkg/inc/$(plat)/$(arch)")
+    add_includedirs("$(buildir)")
+    add_includedirs("$(buildir)/tbox")
 
     -- add the header files for installing
     add_headers("../(tbox/**.h)|**/impl/**.h")
