@@ -127,7 +127,7 @@ add_option("demo")
     set_option_description("Enable or disable the demo module")
 
 -- add packages
-add_subdirs("pkg/*.pkg") 
+add_pkgdirs("pkg") 
 
 -- add projects
 add_subdirs("src/tbox") 
