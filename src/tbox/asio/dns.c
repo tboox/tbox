@@ -511,7 +511,7 @@ tb_bool_t tb_aicp_dns_done(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_long
     impl->done.priv = priv;
 
     // save host
-    tb_strlcpy(impl->host, host, sizeof(impl->host) - 1);
+    tb_strlcpy(impl->host, host, sizeof(impl->host));
  
     // only address? ok
     tb_ipaddr_t addr = {0};

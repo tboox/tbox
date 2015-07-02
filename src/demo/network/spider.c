@@ -632,8 +632,8 @@ static tb_bool_t tb_demo_spider_task_done(tb_demo_spider_t* spider, tb_char_t co
 
         // init task
         task->spider = spider;
-        tb_strlcpy(task->iurl, iurl, sizeof(task->iurl) - 1);
-        tb_strlcpy(task->ourl, spider->ourl, sizeof(task->ourl) - 1);
+        tb_strlcpy(task->iurl, iurl, sizeof(task->iurl));
+        tb_strlcpy(task->ourl, spider->ourl, sizeof(task->ourl));
            
         // ok 
         ok = tb_true;
@@ -760,16 +760,16 @@ static tb_bool_t tb_demo_spider_init(tb_demo_spider_t* spider, tb_int_t argc, tb
         tb_char_t const* domain = tb_strchr(host, '.');
         if (domain)
         {
-            tb_strlcpy(spider->home_domain, domain, sizeof(spider->home_domain) - 1);
+            tb_strlcpy(spider->home_domain, domain, sizeof(spider->home_domain));
             spider->home_domain[sizeof(spider->home_domain) - 1] = '\0';
         }
 
         // using the default root
-        if (root) tb_strlcpy(spider->root, root, sizeof(spider->root) - 1);
+        if (root) tb_strlcpy(spider->root, root, sizeof(spider->root));
         else 
         {
             // the temporary root
-            tb_directory_temporary(spider->root, sizeof(spider->root) - 1);
+            tb_directory_temporary(spider->root, sizeof(spider->root));
 
             // append spider
             tb_strcat(spider->root, "/spider");

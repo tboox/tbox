@@ -128,7 +128,7 @@ static tb_bool_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursi
 
             // the item name
             tb_char_t name[1024] = {0};
-            tb_strlcpy(name, item->d_name, tb_min(item->d_reclen, 1023));
+            tb_strncpy(name, item->d_name, tb_min(item->d_reclen, sizeof(name) - 1));
             if (tb_strcmp(name, ".") && tb_strcmp(name, ".."))
             {
                 // the temp path
@@ -259,11 +259,7 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
     // the temporary directory
-    tb_strlcpy(path, "/tmp", maxn - 1);
-    path[4] = '\0';
-
-    // ok
-    return 4;
+    return tb_strlcpy(path, "/tmp", maxn);
 }
 #endif
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)

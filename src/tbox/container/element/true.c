@@ -50,7 +50,7 @@ static tb_char_t const* tb_element_true_cstr(tb_element_ref_t element, tb_cpoint
     tb_assert_and_check_return_val(element && cstr && maxn, "");
 
     // format string
-    tb_strlcpy(cstr, "true", maxn - 1); cstr[maxn - 1] = '\0';
+    tb_strlcpy(cstr, "true", maxn);
 
     // ok?
     return (tb_char_t const*)cstr;

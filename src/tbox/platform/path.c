@@ -161,8 +161,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     if (tb_path_is_absolute(path))
     {
         // copy it
-        tb_strlcpy(data, path, maxn - 1);
-        data[maxn - 1] = '\0';
+        tb_strlcpy(data, path, maxn);
 
         // translate it
         return tb_path_translate(data, 0, maxn)? data : tb_null;
@@ -172,13 +171,9 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     tb_size_t size = 0;
     if (root)
     {
-        // get the root size
-        size = tb_strlen(root);
-        tb_assert_and_check_return_val(size < maxn, tb_null);
-
         // copy it
-        tb_strlcpy(data, root, size);
-        data[size] = '\0';
+        size = tb_strlcpy(data, root, maxn);
+        tb_assert_and_check_return_val(size < maxn, tb_null);
     }
     else
     {
@@ -228,7 +223,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
             else if (n && q + 1 + n < e)
             {
                 *q++ = TB_PATH_SEPARATOR;
-                tb_strlcpy(q, t, n);
+                tb_strncpy(q, t, n);
                 q += n;
             }
             // empty item? remove repeat
@@ -283,8 +278,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     if (!root && !tb_path_is_absolute(path))
     {
         // copy it
-        tb_strlcpy(data, path, maxn - 1);
-        data[maxn - 1] = '\0';
+        tb_strlcpy(data, path, maxn);
 
         // translate it
         return tb_path_translate(data, 0, maxn)? data : tb_null;
@@ -366,7 +360,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
         tb_size_t size = tb_min(path_size - 1, maxn);
 
         // copy it
-        tb_strlcpy(data, path, size);
+        tb_strncpy(data, path, size);
         data[size] = '\0';
     }
     // exists same root?

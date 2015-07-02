@@ -253,8 +253,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
                         tb_assert_and_check_break(name);
 
                         // copy name
-                        tb_strlcpy(name, rta_data, rta_data_size);
-                        name[rta_data_size] = '\0';
+                        tb_strlcpy(name, rta_data, rta_data_size + 1);
 
                         // save name
                         tb_hash_map_insert(names, tb_u2p(info->ifa_index), name);
@@ -376,8 +375,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
                         tb_assert_and_check_break(name);
 
                         // copy name
-                        tb_strlcpy(name, rta_data, rta_data_size);
-                        name[rta_data_size] = '\0';
+                        tb_strlcpy(name, rta_data, rta_data_size + 1);
 
                         // save name
                         tb_hash_map_insert(names, tb_u2p(info->ifa_index), name);
