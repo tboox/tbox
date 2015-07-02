@@ -131,7 +131,7 @@ tb_size_t tb_environment_get_one(tb_char_t const* name, tb_char_t* value, tb_siz
     tb_assert_and_check_return_val(size < maxn, 0);
 
     // copy it
-    tb_strlcpy(value, data, size);
+    tb_strlcpy(value, data, maxn);
     value[size] = '\0';
 
     // only get the first one if exists multiple values

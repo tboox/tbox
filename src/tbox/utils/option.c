@@ -204,7 +204,7 @@ tb_option_ref_t tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_
         tb_assert_and_check_break(impl->list);
 
         // init name
-        tb_strlcpy(impl->name, name, sizeof(impl->name) - 1);
+        tb_strlcpy(impl->name, name, sizeof(impl->name));
 
         // init help
         if (!tb_string_init(&impl->help)) break;

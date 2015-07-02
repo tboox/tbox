@@ -44,8 +44,8 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
     if (documents)
     {
         // copy it
-        if (size >= maxn) size = maxn - 1;
-        tb_strlcpy(path, cstr, size);
+        size = tb_min(size, maxn - 1);
+        tb_strncpy(path, cstr, size);
         path[size] = '\0';
     }
     else
@@ -69,16 +69,14 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     if (temp)
     {
         // copy it
-        if (size >= maxn) size = maxn - 1;
-        tb_strlcpy(path, cstr, size);
+        size = tb_min(size, maxn - 1);
+        tb_strncpy(path, cstr, size);
         path[size] = '\0';
     }
     else
     {
         // copy the default temporary directory
-        tb_strlcpy(path, "/tmp", maxn - 1);
-        path[4] = '\0';
-        size = 4;
+        size = tb_strlcpy(path, "/tmp", maxn);
     }
 
     // ok?

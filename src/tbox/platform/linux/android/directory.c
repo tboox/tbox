@@ -90,9 +90,8 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
                 tb_trace_d("temp: %s", path_cstr);
 
                 // copy it
-                tb_size_t need = tb_min(size, maxn - 1);
+                tb_size_t need = tb_min(size + 1, maxn);
                 tb_strlcpy(path, path_cstr, need);
-                path[need] = '\0';
 
                 // exit the path string
 			    (*jenv)->ReleaseStringUTFChars(jenv, path_jstr, path_cstr);
@@ -109,7 +108,7 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     else
     {
         // the temporary directory
-        tb_strlcpy(path, "/tmp", maxn - 1);
+        tb_strlcpy(path, "/tmp", maxn);
         path[4] = '\0';
         size = 4;
     }

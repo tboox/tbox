@@ -133,7 +133,7 @@ tb_hong_t tb_transfer_done(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_
         else break;
 
         // is end?
-        if (left && writ >= left) break;
+        if (writ >= left) break;
 
     } while(1);
 

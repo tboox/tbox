@@ -45,36 +45,49 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRLCPY)
 static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, 0);
+
+    // copy it
     return strlcpy(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_IMPL_STRLCPY)
+/* copy s2 to s1 of size n
+ *
+ * - at most n - 1 characters will be copied.
+ * - always null terminates (unless n == 0).
+ * 
+ * returns strlen(s2); if retval >= n, truncation occurred.
+ */
 static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // check
     tb_assert_and_check_return_val(s1 && s2, 0);
 
-    // no size or same? 
-    tb_check_return_val(n && s1 != s2, tb_strlen(s1));
+    // init
+    tb_char_t*          d = s1;
+    tb_char_t const*    s = s2;
+    tb_size_t           m = n;
 
-    // copy
-#if 0
-    tb_char_t const* s = s2; --n;
-    while (*s1 = *s2) 
+    // copy as many bytes as will fit 
+    if (m != 0 && --m != 0)
     {
-        if (n) 
+        do 
         {
-            --n;
-            ++s1;
-        }
-        ++s2;
+            if ((*d++ = *s++) == 0) break;
+
+        } while (--m != 0);
     }
-    return s2 - s;
-#else
-    tb_size_t sn = tb_strlen(s2);
-    tb_memcpy(s1, s2, tb_min(sn + 1, n));
-    return tb_min(sn, n);
-#endif
+
+    // not enough room in dst, add null and traverse rest of src 
+    if (m == 0)
+    {
+        if (n != 0) *d = '\0';      
+        while (*s++) ;
+    }
+
+    // count does not include null
+    return (s - s2 - 1);
 }
 #endif
 
@@ -91,9 +104,9 @@ tb_size_t tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 
         // strlcpy overflow? 
         tb_size_t n1 = tb_pool_data_size(s1);
-        if (n1 && tb_min(n2, n) + 1 > n1)
+        if (n1 && tb_min(n2 + 1, n) > n1)
         {
-            tb_trace_i("[strlcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, tb_min(n2, n), s1, n1);
+            tb_trace_i("[strlcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, tb_min(n2 + 1, n), s1, n1);
             tb_backtrace_dump("[strlcpy]: [overflow]: ", tb_null, 10);
             tb_pool_data_dump(s2, tb_true, "\t[malloc]: [from]: ");
             tb_abort();

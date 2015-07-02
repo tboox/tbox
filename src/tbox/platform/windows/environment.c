@@ -260,7 +260,7 @@ tb_size_t tb_environment_get_one(tb_char_t const* name, tb_char_t* value, tb_siz
     if (data && size < maxn)
     {
         // copy it
-        tb_strlcpy(value, data, size);
+        tb_strncpy(value, data, size);
         value[size] = '\0';
 
         // only get the first one if exists multiple values

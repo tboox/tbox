@@ -31,6 +31,31 @@
 #include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_void_t tb_file_mkdir(tb_wchar_t const* path)
+{
+    // make directory
+    tb_wchar_t          temp[TB_PATH_MAXN] = {0};
+    tb_wchar_t const*   p = path;
+    tb_wchar_t*         t = temp;
+    tb_wchar_t const*   e = temp + TB_PATH_MAXN - 1;
+    for (; t < e && *p; t++) 
+    {
+        *t = *p;
+        if (*p == L'\\' || *p == L'/')
+        {
+            // make directory if not exists
+            if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_null);
+
+            // skip repeat '\\' or '/'
+            while (*p && (*p == L'\\' || *p == L'/')) p++;
+        }
+        else p++;
+    }
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
@@ -71,23 +96,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     if (file == INVALID_HANDLE_VALUE && (mode & TB_FILE_MODE_CREAT))
     {
         // make directory
-        tb_wchar_t          temp[TB_PATH_MAXN] = {0};
-        tb_wchar_t const*   p = full;
-        tb_wchar_t*         t = temp;
-        tb_wchar_t const*   e = temp + TB_PATH_MAXN - 1;
-        for (; t < e && *p; t++) 
-        {
-            *t = *p;
-            if (*p == L'\\' || *p == L'/')
-            {
-                // make directory if not exists
-                if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_null);
-
-                // skip repeat '\\' or '/'
-                while (*p && (*p == L'\\' || *p == L'/')) p++;
-            }
-            else p++;
-        }
+        tb_file_mkdir(full);
 
         // init it again
         file = CreateFileW(full, access, share, tb_null, cflag, attr, tb_null);
@@ -414,8 +423,18 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_wchar_t full1[TB_PATH_MAXN];
     if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
-    // copy
-    return CopyFileW(full0, full1, FALSE)? tb_true : tb_false;
+    // copy it
+    if (!CopyFileW(full0, full1, FALSE))
+    {
+        // make directory
+        tb_file_mkdir(full1);
+
+        // copy it again
+        return (tb_bool_t)CopyFileW(full0, full1, FALSE);
+    }
+
+    // ok
+    return tb_true;
 }
 tb_bool_t tb_file_create(tb_char_t const* path)
 {
@@ -455,7 +474,17 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
     if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
     // rename it
-    return MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING);
+    if (!MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING))
+    {
+        // make directory
+        tb_file_mkdir(full1);
+
+        // rename it again
+        return MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING);
+    }
+
+    // ok
+    return tb_true;
 }
 tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 {

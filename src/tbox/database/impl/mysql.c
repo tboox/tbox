@@ -758,7 +758,7 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_impl_t* database)
                 if (!e) e = args + argn;
 
                 // save username
-                if (p < e) tb_strlcpy(username, p, tb_min(e - p, sizeof(username) - 1));
+                if (p < e) tb_strlcpy(username, p, tb_min(e - p, sizeof(username)));
             }
     
             // the database password
@@ -773,7 +773,7 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_impl_t* database)
                 if (!e) e = args + argn;
 
                 // save password
-                if (p < e) tb_strlcpy(password, p, tb_min(e - p, sizeof(password) - 1));
+                if (p < e) tb_strlcpy(password, p, tb_min(e - p, sizeof(password)));
             }
     
             // the database name
@@ -788,7 +788,7 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_impl_t* database)
                 if (!e) e = args + argn;
 
                 // save database name
-                if (p < e) tb_strlcpy(database_sql_name, p, tb_min(e - p, sizeof(database_sql_name) - 1));
+                if (p < e) tb_strlcpy(database_sql_name, p, tb_min(e - p, sizeof(database_sql_name)));
             }
         }
 

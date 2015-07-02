@@ -118,7 +118,7 @@ static tb_void_t tb_element_str_repl(tb_element_ref_t element, tb_pointer_t buff
             tb_assert_abort(cstr);
 
             // copy the left data
-            tb_strlcpy((tb_char_t*)cstr + copy, q, left + 1); 
+            tb_memcpy((tb_char_t*)cstr + copy, q, left + 1); 
 
             // update the cstr
             *((tb_pointer_t*)buff) = cstr;

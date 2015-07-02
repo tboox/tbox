@@ -46,6 +46,7 @@ add_target("tbox")
     -- add the header files for installing
     add_headers("../(tbox/**.h)|**/impl/**.h")
     add_headers("../(tbox/prefix/**/prefix.S)")
+    add_headers("../(tbox/utils/impl/*.h)")
 
     -- add modules
     add_options("float", "xml", "zip", "asio", "object", "charset", "database")

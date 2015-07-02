@@ -45,7 +45,10 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRNCPY)
 static tb_char_t* tb_strncpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, tb_null);
+
+    // copy it
     return strncpy(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_IMPL_STRNCPY)
@@ -57,8 +60,7 @@ static tb_char_t* tb_strncpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t 
     // no size or same? 
     tb_check_return_val(n && s1 != s2, s1);
 
-    // copy
-#if 0
+    // copy it
     tb_char_t* s = s1;
     while (n) 
     {
@@ -67,14 +69,6 @@ static tb_char_t* tb_strncpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t 
         --n;
     }
     return s1;
-#else
-    tb_size_t sn = tb_strlen(s2);
-    tb_size_t cn = tb_min(sn, n);
-    tb_size_t fn = sn < n? n - sn : 0;
-    tb_memcpy(s1, s2, cn);
-    if (fn) tb_memset(s1 + cn, 0, fn);
-    return s1;
-#endif
 }
 #endif
 

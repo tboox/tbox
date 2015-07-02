@@ -320,10 +320,10 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 tb_assert_and_check_return_val(v, tb_false);
 
                 // save value
-                tb_assert_and_check_return_val(p - v < sizeof(data) - 1, tb_false);
+                tb_assert_and_check_return_val(p - v < sizeof(data), tb_false);
                 if (v < p)
                 {
-                    tb_strlcpy(data, v, p - v); data[p - v] = '\0';
+                    tb_strncpy(data, v, p - v); data[p - v] = '\0';
                     entry->domain = tb_string_pool_insert(impl->string_pool, data[0] == '.'? data + 1 : data);
                 }
             }
@@ -333,10 +333,10 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 tb_assert_and_check_return_val(v, tb_false);
 
                 // save value
-                tb_assert_and_check_return_val(p - v < sizeof(data) - 1, tb_false);
+                tb_assert_and_check_return_val(p - v < sizeof(data), tb_false);
                 if (v < p)
                 {
-                    tb_strlcpy(data, v, p - v); data[p - v] = '\0';
+                    tb_strncpy(data, v, p - v); data[p - v] = '\0';
                     entry->path = tb_string_pool_insert(impl->string_pool, data);
                 }
             }   
@@ -359,16 +359,16 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_impl_t* impl, tb_cookies_entry
                 tb_assert_and_check_return_val(v > b, tb_false);
 
                 // save name
-                tb_assert_and_check_return_val(v - b - 1 < sizeof(data) - 1, tb_false);
-                tb_strlcpy(data, b, v - b - 1); data[v - b - 1] = '\0';
+                tb_assert_and_check_return_val(v - b - 1 < sizeof(data), tb_false);
+                tb_strncpy(data, b, v - b - 1); data[v - b - 1] = '\0';
                 entry->name = tb_string_pool_insert(impl->string_pool, data);
                 tb_assert_and_check_return_val(entry->name, tb_false);
 
                 // save value
-                tb_assert_and_check_return_val(p - v < sizeof(data) - 1, tb_false);
+                tb_assert_and_check_return_val(p - v < sizeof(data), tb_false);
                 if (v < p)
                 {
-                    tb_strlcpy(data, v, p - v); data[p - v] = '\0';
+                    tb_strncpy(data, v, p - v); data[p - v] = '\0';
                     entry->value = tb_string_pool_insert(impl->string_pool, data);
                     tb_assert_and_check_return_val(entry->value, tb_false);
                 }
