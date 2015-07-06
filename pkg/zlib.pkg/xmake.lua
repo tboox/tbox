@@ -23,4 +23,4 @@ add_option("zlib")
     add_option_cincludes("zlib/zlib.h")
 
     -- add include directories
-    add_option_includedirs("inc", "inc/$(plat)/$(arch)")
+    add_option_includedirs("inc/$(plat)", "inc")

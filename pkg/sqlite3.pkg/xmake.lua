@@ -23,6 +23,6 @@ add_option("sqlite3")
     add_option_cincludes("sqlite3/sqlite3.h")
 
     -- add include directories
-    add_option_includedirs("inc", "inc/$(plat)/$(arch)")
+    add_option_includedirs("inc/$(plat)", "inc")
 
 
