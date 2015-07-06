@@ -23,5 +23,5 @@ add_option("polarssl")
     add_option_cincludes("polarssl/polarssl.h")
 
     -- add include directories
-    add_option_includedirs("inc", "inc/$(plat)/$(arch)")
+    add_option_includedirs("inc/$(plat)", "inc")
 

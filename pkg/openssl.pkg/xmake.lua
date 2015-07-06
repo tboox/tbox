@@ -23,5 +23,5 @@ add_option("openssl")
     add_option_cincludes("openssl/openssl.h")
 
     -- add include directories
-    add_option_includedirs("inc", "inc/$(plat)/$(arch)")
+    add_option_includedirs("inc/$(plat)", "inc")
  

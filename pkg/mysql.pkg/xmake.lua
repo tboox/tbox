@@ -23,6 +23,6 @@ add_option("mysql")
     add_option_cincludes("mysql/mysql.h")
 
     -- add include directories
-    add_option_includedirs("inc", "inc/$(plat)/$(arch)")
+    add_option_includedirs("inc/$(plat)", "inc")
 
 
