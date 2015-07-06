@@ -33,7 +33,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define __tb_register__                         register
+
+// the register keyword will be deprecated in C++ 
+#ifndef __cplusplus 
+#   define __tb_register__                      register
+#else
+#   define __tb_register__                      
+#endif
 #define __tb_volatile__                         volatile
 #define __tb_func__                             __FUNCTION__
 #define __tb_file__                             __FILE__
