@@ -175,7 +175,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     tb_assert_and_check_return_val(path, tb_false);
 
     // make it
-    tb_bool_t ok = !mkdir(path, S_IRWXU)? tb_true : tb_false;
+    tb_bool_t ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO)? tb_true : tb_false;
     if (!ok)
     {
         // make directory
@@ -189,7 +189,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
             if (*p == '/')
             {
                 // make directory if not exists
-                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU);
+                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU | S_IRWXG | S_IRWXO);
 
                 // skip repeat '/'
                 while (*p && *p == '/') p++;
@@ -198,7 +198,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
         }
 
         // make it again
-        ok = !mkdir(path, S_IRWXU)? tb_true : tb_false;
+        ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO)? tb_true : tb_false;
     }
 
     // ok?
