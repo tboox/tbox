@@ -36,10 +36,10 @@
  * implementation
  */
 
-tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in)
+tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && ib, 0);
+    tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && data, 0);
 
     // done
 #ifdef tb_crc32_encode
@@ -49,18 +49,18 @@ tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* 
     if (mode == TB_CRC_MODE_32_IEEE_LE)
 #   endif
     {
-        crc = tb_crc32_encode(crc, ib, in, (tb_uint32_t const*)&g_crc_table[mode]);
+        crc = tb_crc32_encode(crc, data, size, (tb_uint32_t const*)&g_crc_table[mode]);
     }
     else
     {
-        tb_byte_t const*    ie = ib + in;
+        tb_byte_t const*    ie = data + size;
         tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
-        while (ib < ie) crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
+        while (data < ie) crc = pt[((tb_uint8_t)crc) ^ *data++] ^ (crc >> 8);
     }
 #else
-    tb_byte_t const*    ie = ib + in;
+    tb_byte_t const*    ie = data + size;
     tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
-    while (ib < ie) crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
+    while (data < ie) crc = pt[((tb_uint8_t)crc) ^ *data++] ^ (crc >> 8);
 #endif
 
     // ok?
