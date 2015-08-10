@@ -86,6 +86,7 @@ static tb_demo_t g_demo[] =
 #endif
 ,   TB_DEMO_MAIN_ITEM(utils_base32)
 ,   TB_DEMO_MAIN_ITEM(utils_base64)
+,   TB_DEMO_MAIN_ITEM(utils_adler32)
 
     // other
 ,   TB_DEMO_MAIN_ITEM(other_flv)

@@ -83,6 +83,7 @@ TB_DEMO_MAIN_DECL(utils_dump);
 TB_DEMO_MAIN_DECL(utils_option);
 TB_DEMO_MAIN_DECL(utils_base32);
 TB_DEMO_MAIN_DECL(utils_base64);
+TB_DEMO_MAIN_DECL(utils_adler32);
 
 // other
 TB_DEMO_MAIN_DECL(other_flv);

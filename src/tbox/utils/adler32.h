@@ -17,30 +17,41 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        utils.h
- * @defgroup    utils
+ * @file        adler32.h
+ * @ingroup     utils
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
+#ifndef TB_UTILS_ADLER32_H
+#define TB_UTILS_ADLER32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "dump.h"
-#include "used.h"
-#include "trace.h"
-#include "base32.h"
-#include "base64.h"
-#include "option.h"
-#include "adler32.h"
-#include "singleton.h"
-#include "lock_profiler.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! encode adler32
+ *
+ * @param adler     the initial adler value
+ * @param data      the data
+ * @param size      the size
+ *
+ * @return          the adler32 value
+ */
+tb_uint32_t         tb_adler32_encode(tb_uint32_t adler, tb_byte_t const* data, tb_size_t size);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
+
