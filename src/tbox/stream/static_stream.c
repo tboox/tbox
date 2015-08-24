@@ -272,6 +272,34 @@ tb_sint32_t tb_static_stream_read_sbits32(tb_static_stream_ref_t stream, tb_size
     // ok?
     return val;
 }
+tb_uint64_t tb_static_stream_read_ubits64(tb_static_stream_ref_t stream, tb_size_t nbits)
+{
+    // check
+    tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && nbits, 0);
+
+    // read value
+    tb_uint64_t val = tb_bits_get_ubits64(stream->p, stream->b, nbits);
+
+    // skip bits
+    if (!tb_static_stream_skip_bits(stream, nbits)) return 0;
+
+    // ok?
+    return val;
+}
+tb_sint64_t tb_static_stream_read_sbits64(tb_static_stream_ref_t stream, tb_size_t nbits)
+{
+    // check
+    tb_assert_and_check_return_val(stream && stream->p && stream->p < stream->e && nbits, 0);
+
+    // read value
+    tb_sint64_t val = tb_bits_get_sbits64(stream->p, stream->b, nbits);
+
+    // skip bits
+    if (!tb_static_stream_skip_bits(stream, nbits)) return 0;
+
+    // ok?
+    return val;
+}
 tb_char_t const* tb_static_stream_read_cstr(tb_static_stream_ref_t stream)
 {
     // check
