@@ -33,7 +33,9 @@
 tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(p && n <= 32, 0);
+    tb_assert_abort(p && n <= 32);
+
+    // no bits?
     tb_check_return_val(n, 0);
 
     // done
@@ -104,7 +106,10 @@ tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 tb_sint32_t tb_bits_get_sbits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return_val(p && n > 1 && n <= 32, 0);
+    tb_assert_abort(p && n <= 32);
+
+    // no bits?
+    tb_check_return_val(n, 0);
 
     // done
     p += b >> 3; b &= 0x07;
@@ -118,7 +123,9 @@ tb_sint32_t tb_bits_get_sbits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return(p && n <= 32);
+    tb_assert_abort(p && n <= 32);
+
+    // no bits?
     tb_check_return(n);
 
     // done
@@ -225,7 +232,10 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 tb_void_t tb_bits_set_sbits32(tb_byte_t* p, tb_size_t b, tb_sint32_t x, tb_size_t n)
 {
     // check
-    tb_assert_and_check_return(p && n > 1 && n <= 32);
+    tb_assert_abort(p && n <= 32);
+
+    // no bits?
+    tb_check_return(n);
 
     // done
     p += b >> 3; b &= 0x07;
@@ -236,3 +246,53 @@ tb_void_t tb_bits_set_sbits32(tb_byte_t* p, tb_size_t b, tb_sint32_t x, tb_size_
     }
     else tb_bits_set_ubits32(p, b, x, n);
 }
+tb_uint64_t tb_bits_get_ubits64(tb_byte_t const* p, tb_size_t b, tb_size_t n)
+{
+    // check
+    tb_assert_abort(p && n <= 64);
+
+    // need 32bits only?
+    if (n <= 32) return (tb_uint64_t)tb_bits_get_ubits32(p, b, n);
+
+    // skip bytes
+    p += b >> 3; b &= 0x07;
+
+    // done
+    if (!b && n == 64) return tb_bits_get_u64_be(p);
+    else
+    {
+        tb_uint64_t x = 0;
+        tb_size_t   i = b; 
+        tb_int_t    j = 56;
+
+        b += n;
+        while (b > 7) 
+        {
+            x |= ((tb_uint64_t)*p++) << (i + j);
+            j -= 8;
+            b -= 8;
+        }
+        if (b > 0) x |= j < 0? (*p >> (8 - i)) : ((tb_uint64_t)*p) << (i + j);
+        return (n < 64)? (x >> (64 - n)) : x;
+    }
+}
+tb_sint64_t tb_bits_get_sbits64(tb_byte_t const* p, tb_size_t b, tb_size_t n)
+{
+    // check
+    tb_assert_abort(p && n <= 64);
+
+    // need 32bits only?
+    if (n <= 32) return tb_bits_get_sbits32(p, b, n);
+
+    // skip bytes
+    p += b >> 3; b &= 0x07;
+
+    // done
+    if (n < 64)
+    {
+        tb_sint64_t s = -(tb_sint64_t)tb_bits_get_ubits64(p, b, 1);
+        return ((s << (n - 1)) | tb_bits_get_ubits64(p, b + 1, n - 1));
+    }
+    else return tb_bits_get_ubits64(p, b, n);
+}
+
