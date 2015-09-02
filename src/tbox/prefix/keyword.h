@@ -152,6 +152,13 @@
 #   define __tb_lstring__(x)                    x
 #endif
 
+// the string only for the debug mode
+#ifdef __tb_debug__
+#   define __tb_dstring__(x)                    tb_null
+#else
+#   define __tb_dstring__(x)                    x
+#endif
+
 // extern c
 #ifdef __cplusplus
 #   define __tb_extern_c__                      extern "C" 
