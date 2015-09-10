@@ -55,7 +55,7 @@ typedef struct __tb_object_array_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_object_array_t* tb_object_array_cast(tb_object_ref_t object)
+static __tb_inline__ tb_object_array_t* tb_object_array_cast(tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_ARRAY, tb_null);
@@ -63,7 +63,7 @@ static __tb_inline__ tb_object_array_t* tb_object_array_cast(tb_object_ref_t obj
     // cast
     return (tb_object_array_t*)object;
 }
-static tb_object_ref_t tb_object_array_copy(tb_object_ref_t object)
+static tb_object_refn_t tb_object_array_copy(tb_object_refn_t object)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -74,18 +74,18 @@ static tb_object_ref_t tb_object_array_copy(tb_object_ref_t object)
     tb_assert_and_check_return_val(copy && copy->vector, tb_null);
 
     // refn++
-    tb_for_all (tb_object_ref_t, item, array->vector)
+    tb_for_all (tb_object_refn_t, item, array->vector)
     {
-        if (item) tb_object_inc(item);
+        if (item) tb_object_retain(item);
     }
 
     // copy
     tb_vector_copy(copy->vector, array->vector);
 
     // ok
-    return (tb_object_ref_t)copy;
+    return (tb_object_refn_t)copy;
 }
-static tb_void_t tb_object_array_exit(tb_object_ref_t object)
+static tb_void_t tb_object_array_exit(tb_object_refn_t object)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -98,7 +98,7 @@ static tb_void_t tb_object_array_exit(tb_object_ref_t object)
     // exit it
     tb_free(array);
 }
-static tb_void_t tb_object_array_cler(tb_object_ref_t object)
+static tb_void_t tb_object_array_clear(tb_object_refn_t object)
 {
     tb_object_array_t* array = tb_object_array_cast(object);
     tb_assert_and_check_return(array && array->vector);
@@ -118,12 +118,12 @@ static tb_object_array_t* tb_object_array_init_base()
         tb_assert_and_check_break(array);
 
         // init array
-        if (!tb_object_init((tb_object_ref_t)array, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY)) break;
+        if (!tb_object_init((tb_object_refn_t)array, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY)) break;
 
         // init base
-        array->base.copy = tb_object_array_copy;
-        array->base.cler = tb_object_array_cler;
-        array->base.exit = tb_object_array_exit;
+        array->base.copy    = tb_object_array_copy;
+        array->base.exit    = tb_object_array_exit;
+        array->base.clear   = tb_object_array_clear;
         
         // ok
         ok = tb_true;
@@ -134,7 +134,7 @@ static tb_object_array_t* tb_object_array_init_base()
     if (!ok)
     {
         // exit it
-        if (array) tb_object_exit((tb_object_ref_t)array);
+        if (array) tb_object_exit((tb_object_refn_t)array);
         array = tb_null;
     }
 
@@ -145,7 +145,7 @@ static tb_object_array_t* tb_object_array_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_ref_t tb_object_array_init(tb_size_t grow, tb_bool_t incr)
+tb_object_refn_t tb_object_array_init(tb_size_t grow, tb_bool_t incr)
 {
     // done
     tb_bool_t           ok = tb_false;
@@ -175,14 +175,14 @@ tb_object_ref_t tb_object_array_init(tb_size_t grow, tb_bool_t incr)
     if (!ok)
     {
         // exit it
-        if (array) tb_object_array_exit((tb_object_ref_t)array);
+        if (array) tb_object_array_exit((tb_object_refn_t)array);
         array = tb_null;
     }
 
     // ok?
-    return (tb_object_ref_t)array;
+    return (tb_object_refn_t)array;
 }
-tb_size_t tb_object_array_size(tb_object_ref_t object)
+tb_size_t tb_object_array_size(tb_object_refn_t object)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -191,16 +191,16 @@ tb_size_t tb_object_array_size(tb_object_ref_t object)
     // size
     return tb_vector_size(array->vector);
 }
-tb_object_ref_t tb_object_array_item(tb_object_ref_t object, tb_size_t index)
+tb_object_refn_t tb_object_array_item(tb_object_refn_t object, tb_size_t index)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
     tb_assert_and_check_return_val(array && array->vector, tb_null);
 
     // item
-    return (tb_object_ref_t)tb_iterator_item(array->vector, index);
+    return (tb_object_refn_t)tb_iterator_item(array->vector, index);
 }
-tb_iterator_ref_t tb_object_array_itor(tb_object_ref_t object)
+tb_iterator_ref_t tb_object_array_itor(tb_object_refn_t object)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -209,7 +209,7 @@ tb_iterator_ref_t tb_object_array_itor(tb_object_ref_t object)
     // iterator
     return (tb_iterator_ref_t)array->vector;
 }
-tb_void_t tb_object_array_remove(tb_object_ref_t object, tb_size_t index)
+tb_void_t tb_object_array_remove(tb_object_refn_t object, tb_size_t index)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -218,7 +218,7 @@ tb_void_t tb_object_array_remove(tb_object_ref_t object, tb_size_t index)
     // remove
     tb_vector_remove(array->vector, index);
 }
-tb_void_t tb_object_array_append(tb_object_ref_t object, tb_object_ref_t item)
+tb_void_t tb_object_array_append(tb_object_refn_t object, tb_object_refn_t item)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -228,9 +228,9 @@ tb_void_t tb_object_array_append(tb_object_ref_t object, tb_object_ref_t item)
     tb_vector_insert_tail(array->vector, item);
 
     // refn--
-    if (!array->incr) tb_object_dec(item);
+    if (!array->incr) tb_object_exit(item);
 }
-tb_void_t tb_object_array_insert(tb_object_ref_t object, tb_size_t index, tb_object_ref_t item)
+tb_void_t tb_object_array_insert(tb_object_refn_t object, tb_size_t index, tb_object_refn_t item)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -240,9 +240,9 @@ tb_void_t tb_object_array_insert(tb_object_ref_t object, tb_size_t index, tb_obj
     tb_vector_insert_prev(array->vector, index, item);
 
     // refn--
-    if (!array->incr) tb_object_dec(item);
+    if (!array->incr) tb_object_exit(item);
 }
-tb_void_t tb_object_array_replace(tb_object_ref_t object, tb_size_t index, tb_object_ref_t item)
+tb_void_t tb_object_array_replace(tb_object_refn_t object, tb_size_t index, tb_object_refn_t item)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
@@ -252,9 +252,9 @@ tb_void_t tb_object_array_replace(tb_object_ref_t object, tb_size_t index, tb_ob
     tb_vector_replace(array->vector, index, item);
 
     // refn--
-    if (!array->incr) tb_object_dec(item);
+    if (!array->incr) tb_object_exit(item);
 }
-tb_void_t tb_object_array_incr(tb_object_ref_t object, tb_bool_t incr)
+tb_void_t tb_object_array_incr(tb_object_refn_t object, tb_bool_t incr)
 {
     // check
     tb_object_array_t* array = tb_object_array_cast(object);
