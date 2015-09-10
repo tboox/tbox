@@ -50,7 +50,7 @@ typedef struct __tb_object_xplist_writer_t
 }tb_object_xplist_writer_t;
 
 /// the xplist writer func type
-typedef tb_bool_t               (*tb_object_xplist_writer_func_t)(tb_object_xplist_writer_t* writer, tb_object_ref_t object, tb_size_t level);
+typedef tb_bool_t               (*tb_object_xplist_writer_func_t)(tb_object_xplist_writer_t* writer, tb_object_refn_t object, tb_size_t level);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

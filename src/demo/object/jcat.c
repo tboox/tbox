@@ -66,11 +66,11 @@ tb_int_t tb_demo_object_jcat_main(tb_int_t argc, tb_char_t** argv)
             if (tb_option_find(option, "file"))
             {
                 // load object
-                tb_object_ref_t root = tb_object_read_from_url(tb_option_item_cstr(option, "file"));
+                tb_object_refn_t root = tb_object_read_from_url(tb_option_item_cstr(option, "file"));
                 if (root)
                 {
                     // done filter
-                    tb_object_ref_t object = root;
+                    tb_object_refn_t object = root;
                     if (tb_option_find(option, "filter")) 
                         object = tb_object_seek(root, tb_option_item_cstr(option, "filter"), tb_true);
 

@@ -9,7 +9,7 @@
 tb_int_t tb_demo_object_bin_main(tb_int_t argc, tb_char_t** argv)
 {
     // read object
-    tb_object_ref_t object = tb_object_read_from_url(argv[1]);
+    tb_object_refn_t object = tb_object_read_from_url(argv[1]);
 
     // writ
     if (object) 

@@ -50,7 +50,7 @@ typedef struct __tb_object_bin_reader_t
 }tb_object_bin_reader_t;
 
 /// the bin reader func type
-typedef tb_object_ref_t         (*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
+typedef tb_object_refn_t         (*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

@@ -38,7 +38,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_object_bin_writer_func_null(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_null(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
@@ -46,7 +46,7 @@ static tb_bool_t tb_object_bin_writer_func_null(tb_object_bin_writer_t* writer, 
     // writ type & null
     return tb_object_writer_bin_type_size(writer->stream, object->type, 0);
 }
-static tb_bool_t tb_object_bin_writer_func_date(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_date(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
@@ -54,7 +54,7 @@ static tb_bool_t tb_object_bin_writer_func_date(tb_object_bin_writer_t* writer, 
     // writ type & time
     return tb_object_writer_bin_type_size(writer->stream, object->type, (tb_uint64_t)tb_object_date_time(object));
 }
-static tb_bool_t tb_object_bin_writer_func_data(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_data(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
@@ -99,7 +99,7 @@ static tb_bool_t tb_object_bin_writer_func_data(tb_object_bin_writer_t* writer, 
     // writ it
     return tb_stream_bwrit(writer->stream, writer->data, size);
 }
-static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream && writer->ohash, tb_false);
@@ -108,7 +108,7 @@ static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer,
     if (!tb_object_writer_bin_type_size(writer->stream, object->type, tb_object_array_size(object))) return tb_false;
 
     // walk
-    tb_for_all (tb_object_ref_t, item, tb_object_array_itor(object))
+    tb_for_all (tb_object_refn_t, item, tb_object_array_itor(object))
     {
         if (item)
         {
@@ -137,7 +137,7 @@ static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer,
     // ok
     return tb_true;
 }
-static tb_bool_t tb_object_bin_writer_func_string(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_string(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
@@ -182,7 +182,7 @@ static tb_bool_t tb_object_bin_writer_func_string(tb_object_bin_writer_t* writer
     // writ it
     return tb_stream_bwrit(writer->stream, writer->data, size);
 }
-static tb_bool_t tb_object_bin_writer_func_number(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_number(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
@@ -241,7 +241,7 @@ static tb_bool_t tb_object_bin_writer_func_number(tb_object_bin_writer_t* writer
     // ok
     return tb_true;
 }
-static tb_bool_t tb_object_bin_writer_func_boolean(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_boolean(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
@@ -249,7 +249,7 @@ static tb_bool_t tb_object_bin_writer_func_boolean(tb_object_bin_writer_t* write
     // writ type & bool
     return tb_object_writer_bin_type_size(writer->stream, object->type, tb_object_boolean_bool(object));
 }
-static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* writer, tb_object_ref_t object)
+static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* writer, tb_object_refn_t object)
 {
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream && writer->ohash, tb_false);
@@ -263,7 +263,7 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
         if (item)
         {
             tb_char_t const*    key = item->key;
-            tb_object_ref_t        val = item->val;
+            tb_object_refn_t        val = item->val;
             if (key && val)
             {
                 // writ key
@@ -282,7 +282,7 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
                         tb_assert_and_check_return_val(func, tb_false);
 
                         // make the key object
-                        tb_object_ref_t okey = tb_object_string_init_from_cstr(key);
+                        tb_object_refn_t okey = tb_object_string_init_from_cstr(key);
                         tb_assert_and_check_return_val(okey, tb_false);
 
                         // writ it
@@ -325,7 +325,7 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
     // ok
     return tb_true;
 }
-static tb_long_t tb_object_bin_writer_done(tb_stream_ref_t stream, tb_object_ref_t object, tb_bool_t deflate)
+static tb_long_t tb_object_bin_writer_done(tb_stream_ref_t stream, tb_object_refn_t object, tb_bool_t deflate)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);

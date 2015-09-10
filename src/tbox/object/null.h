@@ -42,7 +42,7 @@ __tb_extern_c_enter__
  *
  * @return          the null object
  */
-tb_object_ref_t     tb_object_null_init(tb_noarg_t);
+tb_object_refn_t     tb_object_null_init(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
