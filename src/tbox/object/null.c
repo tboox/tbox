@@ -36,7 +36,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_object_refn_t tb_object_null_copy(tb_object_refn_t object)
+static tb_object_ref_t tb_object_null_copy(tb_object_ref_t object)
 {
     return object;
 }
@@ -61,8 +61,8 @@ static tb_object_t const g_null =
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_refn_t tb_object_null_init()
+tb_object_ref_t tb_object_null_init()
 {
-    return (tb_object_refn_t)&g_null;
+    return (tb_object_ref_t)&g_null;
 }
 
