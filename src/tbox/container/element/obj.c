@@ -47,11 +47,11 @@ static tb_void_t tb_element_obj_free(tb_element_ref_t element, tb_pointer_t buff
     tb_assert_and_check_return(element && buff);
 
     // exit
-    tb_object_refn_t object = *((tb_object_refn_t*)buff);
+    tb_object_ref_t object = *((tb_object_ref_t*)buff);
     if (object)
     {
         tb_object_exit(object);
-        *((tb_object_refn_t*)buff) = tb_null;
+        *((tb_object_ref_t*)buff) = tb_null;
     }
 }
 static tb_void_t tb_element_obj_dupl(tb_element_ref_t element, tb_pointer_t buff, tb_cpointer_t data)
@@ -60,7 +60,7 @@ static tb_void_t tb_element_obj_dupl(tb_element_ref_t element, tb_pointer_t buff
     tb_assert_and_check_return(element && buff);
 
     // refn++
-    if (data) tb_object_retain((tb_object_refn_t)data);
+    if (data) tb_object_retain((tb_object_ref_t)data);
 
     // copy it
     *((tb_cpointer_t*)buff) = data;
@@ -71,10 +71,10 @@ static tb_void_t tb_element_obj_repl(tb_element_ref_t element, tb_pointer_t buff
     tb_assert_and_check_return(element && buff);
 
     // save the previous object
-    tb_object_refn_t object = *((tb_object_refn_t*)buff);
+    tb_object_ref_t object = *((tb_object_ref_t*)buff);
 
     // refn++
-    if (data) tb_object_retain((tb_object_refn_t)data);
+    if (data) tb_object_retain((tb_object_ref_t)data);
 
     // copy it
     *((tb_cpointer_t*)buff) = data;
@@ -110,7 +110,7 @@ tb_element_t tb_element_obj()
     element.ndupl  = element_str.ndupl;
     element.nrepl  = element_str.nrepl;
     element.ncopy  = element_ptr.ncopy;
-    element.size   = sizeof(tb_object_refn_t);
+    element.size   = sizeof(tb_object_ref_t);
     
     // ok?
     return element;

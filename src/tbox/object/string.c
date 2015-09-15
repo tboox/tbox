@@ -59,7 +59,7 @@ typedef struct __tb_object_string_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_object_string_t* tb_object_string_cast(tb_object_refn_t object)
+static __tb_inline__ tb_object_string_t* tb_object_string_cast(tb_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_STRING, tb_null);
@@ -67,11 +67,11 @@ static __tb_inline__ tb_object_string_t* tb_object_string_cast(tb_object_refn_t 
     // cast
     return (tb_object_string_t*)object;
 }
-static tb_object_refn_t tb_object_string_copy(tb_object_refn_t object)
+static tb_object_ref_t tb_object_string_copy(tb_object_ref_t object)
 {
     return tb_object_string_init_from_cstr(tb_object_string_cstr(object));
 }
-static tb_void_t tb_object_string_exit(tb_object_refn_t object)
+static tb_void_t tb_object_string_exit(tb_object_ref_t object)
 {
     tb_object_string_t* string = tb_object_string_cast(object);
     if (string) 
@@ -83,7 +83,7 @@ static tb_void_t tb_object_string_exit(tb_object_refn_t object)
         tb_free(object);
     }
 }
-static tb_void_t tb_object_string_clear(tb_object_refn_t object)
+static tb_void_t tb_object_string_clear(tb_object_ref_t object)
 {
     tb_object_string_t* string = tb_object_string_cast(object);
     if (string) 
@@ -104,7 +104,7 @@ static tb_object_string_t* tb_object_string_init_base()
         tb_assert_and_check_break(string);
 
         // init string
-        if (!tb_object_init((tb_object_refn_t)string, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING)) break;
+        if (!tb_object_init((tb_object_ref_t)string, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING)) break;
 
         // init base
         string->base.copy   = tb_object_string_copy;
@@ -120,7 +120,7 @@ static tb_object_string_t* tb_object_string_init_base()
     if (!ok)
     {
         // exit it
-        if (string) tb_object_exit((tb_object_refn_t)string);
+        if (string) tb_object_exit((tb_object_ref_t)string);
         string = tb_null;
     }
 
@@ -131,7 +131,7 @@ static tb_object_string_t* tb_object_string_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_refn_t tb_object_string_init_from_cstr(tb_char_t const* cstr)
+tb_object_ref_t tb_object_string_init_from_cstr(tb_char_t const* cstr)
 {
     // done
     tb_bool_t           ok = tb_false;
@@ -157,14 +157,14 @@ tb_object_refn_t tb_object_string_init_from_cstr(tb_char_t const* cstr)
     if (!ok)
     {
         // exit it
-        tb_object_string_exit((tb_object_refn_t)string);
+        tb_object_string_exit((tb_object_ref_t)string);
         string = tb_null;
     }
 
     // ok?
-    return (tb_object_refn_t)string;
+    return (tb_object_ref_t)string;
 }
-tb_object_refn_t tb_object_string_init_from_str(tb_string_ref_t str)
+tb_object_ref_t tb_object_string_init_from_str(tb_string_ref_t str)
 {
     // done
     tb_bool_t           ok = tb_false;
@@ -190,14 +190,14 @@ tb_object_refn_t tb_object_string_init_from_str(tb_string_ref_t str)
     if (!ok)
     {
         // exit it
-        tb_object_string_exit((tb_object_refn_t)string);
+        tb_object_string_exit((tb_object_ref_t)string);
         string = tb_null;
     }
 
     // ok?
-    return (tb_object_refn_t)string;
+    return (tb_object_ref_t)string;
 }
-tb_char_t const* tb_object_string_cstr(tb_object_refn_t object)
+tb_char_t const* tb_object_string_cstr(tb_object_ref_t object)
 {
     // check
     tb_object_string_t* string = tb_object_string_cast(object);
@@ -206,7 +206,7 @@ tb_char_t const* tb_object_string_cstr(tb_object_refn_t object)
     // cstr
     return tb_string_cstr(&string->str);
 }
-tb_size_t tb_object_string_cstr_set(tb_object_refn_t object, tb_char_t const* cstr)
+tb_size_t tb_object_string_cstr_set(tb_object_ref_t object, tb_char_t const* cstr)
 {
     // check
     tb_object_string_t* string = tb_object_string_cast(object);
@@ -218,7 +218,7 @@ tb_size_t tb_object_string_cstr_set(tb_object_refn_t object, tb_char_t const* cs
     // ok?
     return tb_string_size(&string->str);
 }
-tb_size_t tb_object_string_size(tb_object_refn_t object)
+tb_size_t tb_object_string_size(tb_object_ref_t object)
 {
     // check
     tb_object_string_t* string = tb_object_string_cast(object);

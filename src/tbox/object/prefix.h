@@ -102,7 +102,7 @@ typedef struct __tb_object_t
 }tb_object_t;
 
 /// the object ref type
-typedef tb_object_t*        tb_object_refn_t;
+typedef tb_object_t*        tb_object_ref_t;
 
 /// the object reader type
 typedef struct __tb_object_reader_t
@@ -114,7 +114,7 @@ typedef struct __tb_object_reader_t
     tb_size_t               (*probe)(tb_stream_ref_t stream);
 
     /// read it
-    tb_object_refn_t         (*read)(tb_stream_ref_t stream);
+    tb_object_ref_t         (*read)(tb_stream_ref_t stream);
 
 }tb_object_reader_t;
 
@@ -125,7 +125,7 @@ typedef struct __tb_object_writer_t
     tb_hash_map_ref_t       hooker;
 
     /// writ it
-    tb_long_t               (*writ)(tb_stream_ref_t stream, tb_object_refn_t object, tb_bool_t deflate);
+    tb_long_t               (*writ)(tb_stream_ref_t stream, tb_object_ref_t object, tb_bool_t deflate);
 
 }tb_object_writer_t;
 

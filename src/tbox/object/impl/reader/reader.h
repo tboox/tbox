@@ -71,7 +71,7 @@ tb_void_t           tb_object_reader_remove(tb_size_t format);
  *
  * @return          the object
  */
-tb_object_refn_t     tb_object_reader_done(tb_stream_ref_t stream);
+tb_object_ref_t     tb_object_reader_done(tb_stream_ref_t stream);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

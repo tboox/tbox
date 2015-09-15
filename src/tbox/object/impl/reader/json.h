@@ -47,7 +47,7 @@ typedef struct __tb_object_json_reader_t
 }tb_object_json_reader_t;
 
 /// the json reader func type
-typedef tb_object_refn_t            (*tb_object_json_reader_func_t)(tb_object_json_reader_t* reader, tb_char_t type);
+typedef tb_object_ref_t            (*tb_object_json_reader_func_t)(tb_object_json_reader_t* reader, tb_char_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

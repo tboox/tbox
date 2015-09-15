@@ -47,7 +47,7 @@ typedef struct __tb_object_bplist_writer_t
 }tb_object_bplist_writer_t;
 
 /// the bplist writer func type
-typedef tb_bool_t               (*tb_object_bplist_writer_func_t)(tb_object_bplist_writer_t* writer, tb_object_refn_t object, tb_size_t item_size);
+typedef tb_bool_t               (*tb_object_bplist_writer_func_t)(tb_object_bplist_writer_t* writer, tb_object_ref_t object, tb_size_t item_size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
