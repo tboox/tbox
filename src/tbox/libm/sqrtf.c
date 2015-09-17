@@ -33,5 +33,9 @@
  */
 tb_float_t tb_sqrtf(tb_float_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_SQRTF
     return sqrtf(x);
+#else
+    return (tb_float_t)tb_sqrt(x);
+#endif
 }

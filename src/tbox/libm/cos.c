@@ -33,5 +33,10 @@
  */
 tb_double_t tb_cos(tb_double_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_COS
     return cos(x);
+#else
+    tb_assert_abort(0);
+    return 0;
+#endif
 }

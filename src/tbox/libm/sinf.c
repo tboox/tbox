@@ -33,5 +33,9 @@
  */
 tb_float_t tb_sinf(tb_float_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_SINF
     return sinf(x);
+#else
+    return (tb_float_t)tb_sin(x);
+#endif
 }

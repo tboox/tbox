@@ -43,7 +43,7 @@ tb_void_t tb_sincos(tb_double_t x, tb_double_t* s, tb_double_t* c)
 #ifdef TB_CONFIG_LIBM_HAVE_SINCOS
     sincos(x, s, c);
 #else
-    if (s) *s = sin(x);
-    if (c) *c = cos(x);
+    if (s) *s = tb_sin(x);
+    if (c) *c = tb_cos(x);
 #endif
 }

@@ -33,5 +33,9 @@
  */
 tb_float_t tb_acosf(tb_float_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_ACOSF
     return acosf(x);
+#else
+    return (tb_float_t)tb_acos(x);
+#endif
 }

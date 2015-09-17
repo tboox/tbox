@@ -33,5 +33,10 @@
  */
 tb_float_t tb_atanf(tb_float_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_ATANF
     return atanf(x);
+#else
+    tb_assert_abort(0);
+    return 0;
+#endif
 }
