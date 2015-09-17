@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        atan2.c
+ * @file        fmod.c
  * @ingroup     libm
  *
  */
@@ -31,10 +31,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_double_t tb_atan2(tb_double_t y, tb_double_t x)
+tb_double_t tb_fmod(tb_double_t x, tb_double_t y)
 {
-#ifdef TB_CONFIG_LIBM_HAVE_ATAN2
-    return atan2(y, x);
+#ifdef TB_CONFIG_LIBM_HAVE_FMOD
+    return fmod(x, y);
 #else
     tb_assert_abort(0);
     return 0;

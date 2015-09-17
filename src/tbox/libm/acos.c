@@ -33,5 +33,10 @@
  */
 tb_double_t tb_acos(tb_double_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_ACOS
     return acos(x);
+#else
+    tb_assert(0);
+    return 0;
+#endif
 }

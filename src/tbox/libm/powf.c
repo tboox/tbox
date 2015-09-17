@@ -26,11 +26,16 @@
  * includes
  */
 #include "math.h"
+#include <math.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_float_t tb_powf(tb_float_t x, tb_float_t y)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_POWF
+    return powf(x, y);
+#else
     return (tb_float_t)tb_pow(x, y);
+#endif
 }

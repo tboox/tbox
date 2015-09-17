@@ -199,7 +199,30 @@ add_target("tbox")
     add_cfuncs("libc", nil,         "stdlib.h",                         "system")
 
     -- add the interfaces for libm
-    add_cfuncs("libm", nil,         "math.h",                           "sincos", "sincosf", "log2", "log2f")
+    add_cfuncs("libm", nil,         "math.h",                           "sincos", 
+                                                                        "sincosf", 
+                                                                        "log2", 
+                                                                        "log2f",
+                                                                        "sqrt",
+                                                                        "sqrtf",
+                                                                        "acos", 
+                                                                        "acosf",
+                                                                        "asin",
+                                                                        "asinf",
+                                                                        "pow",
+                                                                        "powf",
+                                                                        "fmod",
+                                                                        "fmodf",
+                                                                        "atan",
+                                                                        "atanf",
+                                                                        "atan2",
+                                                                        "atan2f",
+                                                                        "cos",
+                                                                        "cosf",
+                                                                        "sin",
+                                                                        "sinf",
+                                                                        "exp",
+                                                                        "expf")
 
     -- add the interfaces for posix
     add_cfuncs("posix", nil,        {"sys/poll.h", "sys/socket.h"},     "poll")

@@ -36,7 +36,7 @@ tb_void_t tb_sincosf(tb_float_t x, tb_float_t* s, tb_float_t* c)
 #ifdef TB_CONFIG_LIBM_HAVE_SINCOSF
     sincosf(x, s, c);
 #else
-    if (s) *s = sinf(x);
-    if (c) *c = cosf(x);
+    if (s) *s = tb_sinf(x);
+    if (c) *c = tb_cosf(x);
 #endif
 }

@@ -33,5 +33,9 @@
  */
 tb_float_t tb_tanf(tb_float_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_TANF
     return tanf(x);
+#else
+    return (tb_float_t)tb_tan(x);
+#endif
 }

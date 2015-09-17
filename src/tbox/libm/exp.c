@@ -33,7 +33,7 @@
  */
 tb_double_t tb_exp(tb_double_t x)
 {
-#if 0
+#ifdef TB_CONFIG_LIBM_HAVE_EXP
     return exp(x);
 #else
     tb_double_t a = x - (tb_double_t)(tb_long_t)x;

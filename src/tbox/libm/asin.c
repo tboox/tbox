@@ -33,5 +33,10 @@
  */
 tb_double_t tb_asin(tb_double_t x)
 {
+#ifdef TB_CONFIG_LIBM_HAVE_ASIN
     return asin(x);
+#else
+    tb_assert_abort(0);
+    return 0;
+#endif
 }

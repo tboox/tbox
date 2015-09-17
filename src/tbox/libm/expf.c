@@ -33,7 +33,7 @@
  */
 tb_float_t tb_expf(tb_float_t x)
 {
-#if 0
+#ifdef TB_CONFIG_LIBM_HAVE_EXPF
     return expf(x);
 #else
     tb_float_t a = x - (tb_long_t)x;
