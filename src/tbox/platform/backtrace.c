@@ -26,8 +26,10 @@
  * includes
  */
 #include "backtrace.h"
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/backtrace.c"
+#elif defined(TB_CONFIG_OS_ANDROID)
+#   include "linux/android/backtrace.c"
 #else
 #   include "libc/backtrace.c"
 #endif

@@ -17,7 +17,8 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        page.c
+ * @file        backtrace.c
+ * @ingroup     platform
  *
  */
 
@@ -25,40 +26,36 @@
  * includes
  */
 #include "prefix.h"
-#include "../platform.h"
-#include <unistd.h>
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * globals
- */
-
-// the page size
-static tb_size_t g_page_size = 0;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_page_init()
+tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip)
 {
-    // init page size
-    if (!g_page_size)
-    {
-#if defined(TB_CONFIG_POSIX_HAVE_SYSCONF) && defined(_SC_PAGESIZE)
-        g_page_size = (tb_size_t)sysconf(_SC_PAGESIZE);
-#elif defined(TB_CONFIG_POSIX_HAVE_GETPAGESIZE)
-        g_page_size = (tb_size_t)getpagesize();
-#endif
-    }
+    // check
+    tb_check_return_val(frames && nframe, 0);
 
-    // ok?
-    return g_page_size? tb_true : tb_false;
+    // TODO
+    tb_trace_noimpl();
+    return 0;
 }
-tb_void_t tb_page_exit()
+tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {
+    // check
+    tb_check_return_val(frames && nframe, tb_null);
+
+    // TODO
+    tb_trace_noimpl();
+    return tb_null;
 }
-tb_size_t tb_page_size()
+tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
 {
-    return g_page_size;
+    // TODO
+    tb_trace_noimpl();
+    return tb_null;
 }
-
-
+tb_void_t tb_backtrace_symbols_exit(tb_handle_t handle)
+{
+    // TODO
+    tb_trace_noimpl();
+}

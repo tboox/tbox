@@ -335,6 +335,8 @@ tb_stream_ref_t         tb_stream_init_from_data(tb_byte_t const* data, tb_size_
 
 /*! init stream from file
  *
+ * @note cannot read some files without size, e.g. /dev, /proc ...
+ *
  * @param path          the file path
  * @param mode          the file mode, using the default ro mode if zero
  *

@@ -49,12 +49,9 @@
 tb_bool_t tb_socket_context_init()
 {
     // ignore sigpipe
-#if 1
+#if defined(TB_CONFIG_LIBC_HAVE_SIGNAL) \
+    && !defined(TB_CONFIG_OS_ANDROID)
     signal(SIGPIPE, SIG_IGN);
-#else
-    struct sigaction sa;
-    sa.sa_handler = SIG_IGN;
-    sigaction(SIGPIPE, &sa, 0);
 #endif
 
     // ok
