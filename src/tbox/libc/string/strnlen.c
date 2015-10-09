@@ -45,8 +45,18 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRNLEN)
 static tb_size_t tb_strnlen_impl(tb_char_t const* s, tb_size_t n)
 {
+    // check
     tb_assert_and_check_return_val(s, 0);
+
+#ifdef TB_CONFIG_OS_ANDROID
+    /* fix the bug for android
+     *
+     * return -1 if n == (tb_uint32_t)-1
+     */
+    return strnlen(s, (tb_uint16_t)n);
+#else
     return strnlen(s, n);
+#endif
 }
 #elif !defined(TB_LIBC_STRING_IMPL_STRNLEN)
 static tb_size_t tb_strnlen_impl(tb_char_t const* s, tb_size_t n)

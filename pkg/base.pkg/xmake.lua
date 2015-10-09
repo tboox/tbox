@@ -6,5 +6,6 @@ add_option("base")
    
     -- add links
     if os("windows") then add_option_links("ws2_32") 
-    else add_option_links("m", "dl", "pthread") end
+    elseif os("android") then add_option_links("m", "c") 
+    else add_option_links("pthread", "dl", "m", "c") end
 

@@ -75,7 +75,7 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
 #elif   defined(TB_FIRST_FRAME_POINTER) \
     &&  defined(TB_CURRENT_STACK_FRAME) \
     &&  defined(TB_ADVANCE_STACK_FRAME) \
-    &&  defined(TB_STACK_INNER_THAN)
+    &&  defined(TB_STACK_INNER_THAN) \
 //extern tb_pointer_t __libc_stack_end;
 tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip)
 {
