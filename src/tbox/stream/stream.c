@@ -286,14 +286,18 @@ tb_hize_t tb_stream_left(tb_stream_ref_t stream)
 tb_bool_t tb_stream_beof(tb_stream_ref_t stream)
 {
     // check
-    tb_assert_and_check_return_val(stream, tb_true);
+    tb_stream_impl_t* impl = tb_stream_impl(stream);
+    tb_assert_and_check_return_val(impl, tb_true);
+
+    // wait failed? eof
+    tb_check_return_val(impl->state != TB_STATE_WAIT_FAILED, tb_true);
 
     // size
-    tb_hong_t size = tb_stream_size(stream);
-    tb_hize_t offt = tb_stream_offset(stream);
+    tb_hong_t size      = tb_stream_size(stream);
+    tb_hize_t offset    = tb_stream_offset(stream);
 
     // eof?
-    return (size > 0 && offt >= size)? tb_true : tb_false;
+    return (size > 0 && offset >= size)? tb_true : tb_false;
 }
 tb_hize_t tb_stream_offset(tb_stream_ref_t stream)
 {
@@ -1152,8 +1156,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_
         // append char to line
         else 
         {
-            if ((p - data) < size - 1)
-            *p++ = ch;
+            if ((p - data) < size - 1) *p++ = ch;
 
             // no data?
             if (!ch) break;
@@ -1163,8 +1166,11 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_
     // killed?
     if ((TB_STATE_KILLING == tb_atomic_get(&impl->istate))) return -1;
 
-    // end?
-    return tb_stream_beof(stream)? -1 : 0;
+    // end
+    if (p < data + size) *p = '\0';
+
+    // ok?
+    return !tb_stream_beof(stream)? p - data : -1;
 }
 tb_long_t tb_stream_bwrit_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_t size)
 {

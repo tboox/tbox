@@ -43,8 +43,14 @@ typedef struct __tb_stream_file_impl_t
     // the file handle
     tb_file_ref_t       file;
 
+    // the last read size
+    tb_long_t           read;
+
     // the file mode
     tb_size_t           mode;
+
+    // is stream file?
+    tb_bool_t           bstream;
 
 }tb_stream_file_impl_t;
 
@@ -110,7 +116,10 @@ static tb_long_t tb_stream_file_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
     tb_check_return_val(size, 0);
 
     // read 
-    return tb_file_read(impl->file, data, size);
+    impl->read = tb_file_read(impl->file, data, size);
+
+    // ok?
+    return impl->read;
 }
 static tb_long_t tb_stream_file_impl_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
 {
@@ -121,6 +130,9 @@ static tb_long_t tb_stream_file_impl_writ(tb_stream_ref_t stream, tb_byte_t cons
     // check
     tb_check_return_val(size, 0);
 
+    // not support for stream file
+    tb_assert_and_check_return_val(!impl->bstream, -1);
+
     // writ
     return tb_file_writ(impl->file, data, size);
 }
@@ -130,6 +142,9 @@ static tb_bool_t tb_stream_file_impl_sync(tb_stream_ref_t stream, tb_bool_t bclo
     tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && impl->file, tb_false);
 
+    // not support for stream file
+    tb_assert_and_check_return_val(!impl->bstream, -1);
+
     // sync
     return tb_file_sync(impl->file);
 }
@@ -138,6 +153,9 @@ static tb_bool_t tb_stream_file_impl_seek(tb_stream_ref_t stream, tb_hize_t offs
     // check
     tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     tb_assert_and_check_return_val(impl && impl->file, tb_false);
+
+    // is stream file?
+    tb_check_return_val(!impl->bstream, tb_false);
 
     // seek
     return (tb_file_seek(impl->file, offset, TB_FILE_SEEK_BEG) == offset)? tb_true : tb_false;
@@ -156,6 +174,9 @@ static tb_long_t tb_stream_file_impl_wait(tb_stream_ref_t stream, tb_size_t wait
         if (wait & TB_STREAM_WAIT_WRIT) aioe |= TB_STREAM_WAIT_WRIT;
     }
 
+    // end?
+    if (impl->bstream && aioe > 0 && !impl->read) aioe = -1;
+
     // ok?
     return aioe;
 }
@@ -170,21 +191,43 @@ static tb_bool_t tb_stream_file_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
     {
     case TB_STREAM_CTRL_GET_SIZE:
         {
+            // the psize
             tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
             tb_assert_and_check_return_val(psize, tb_false);
-            *psize = impl->file? tb_file_size(impl->file) : 0;
+
+            // get size
+            if (!impl->bstream) *psize = impl->file? tb_file_size(impl->file) : 0;
+            else *psize = -1;
+
+            // ok
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_SET_MODE:
         {
+            // get mode
             impl->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+            // ok
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_GET_MODE:
         {
+            // the pmode
             tb_size_t* pmode = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(pmode, tb_false);
+
+            // get mode
             *pmode = impl->mode;
+
+            // ok
+            return tb_true;
+        }
+    case TB_STREAM_CTRL_FILE_IS_STREAM:
+        {
+            // is stream
+            impl->bstream = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+
+            // ok
             return tb_true;
         }
     default:
@@ -218,8 +261,10 @@ tb_stream_ref_t tb_stream_init_file()
     tb_stream_file_impl_t* impl = tb_stream_file_impl_cast(stream);
     if (impl)
     {
-        // init mode
-        impl->mode = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+        // init it
+        impl->mode      = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+        impl->bstream   = tb_false;
+        impl->read      = 0;
     }
 
     // ok?
