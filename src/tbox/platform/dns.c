@@ -41,7 +41,7 @@
 #elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 #   include "mach/dns.c"
 #elif defined(TB_CONFIG_OS_ANDROID)
-#   include "linux/android/dns.c"
+#   include "android/dns.c"
 #else
 #   include "unix/dns.c"
 #endif

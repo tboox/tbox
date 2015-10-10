@@ -28,7 +28,7 @@
 #include "platform.h"
 #include "../network/network.h"
 #ifdef TB_CONFIG_OS_ANDROID
-#   include "linux/android/android.h"
+#   include "android/android.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -17,45 +17,46 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        backtrace.c
+ * @file        dns.c
  * @ingroup     platform
- *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
+#include "../dns.h"
+#include "../../network/network.h"
+#include <sys/system_properties.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip)
+tb_bool_t tb_dns_init()
 {
-    // check
-    tb_check_return_val(frames && nframe, 0);
+    // done
+    tb_size_t count = 0;
+    for (count = 0; count < 6; count++)
+    {
+        // init the dns property name
+        tb_char_t prop_name[PROP_NAME_MAX] = {0};
+        tb_snprintf(prop_name, sizeof(prop_name) - 1, "net.dns%lu", count + 1);
+        
+        // get dns address name
+        tb_char_t dns[64] = {0};
+        if (!__system_property_get(prop_name, dns)) break;
 
-    // TODO
-    tb_trace_noimpl();
-    return 0;
-}
-tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
-{
-    // check
-    tb_check_return_val(frames && nframe, tb_null);
+        // trace
+        tb_trace_d("addr: %s", dns);
 
-    // TODO
-    tb_trace_noimpl();
-    return tb_null;
+        // add server
+        tb_dns_server_add(dns);
+    }
+
+    // ok
+    return tb_true;
 }
-tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
+tb_void_t tb_dns_exit()
 {
-    // TODO
-    tb_trace_noimpl();
-    return tb_null;
 }
-tb_void_t tb_backtrace_symbols_exit(tb_handle_t handle)
-{
-    // TODO
-    tb_trace_noimpl();
-}
+

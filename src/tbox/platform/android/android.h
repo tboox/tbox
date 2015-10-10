@@ -20,8 +20,8 @@
  * @file        android.h
  * @ingroup     platform
  */
-#ifndef TB_PLATFORM_LINUX_ANDROID_H
-#define TB_PLATFORM_LINUX_ANDROID_H
+#ifndef TB_PLATFORM_ANDROID_H
+#define TB_PLATFORM_ANDROID_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
