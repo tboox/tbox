@@ -20,13 +20,15 @@
  * @file        prefix.h
  * @ingroup     platform
  */
-#ifndef TB_PLATFORM_LINUX_ANDROID_PREFIX_H
-#define TB_PLATFORM_LINUX_ANDROID_PREFIX_H
+#ifndef TB_PLATFORM_ANDROID_PREFIX_H
+#define TB_PLATFORM_ANDROID_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
+#include "../../libc/libc.h"
+#include "../../utils/utils.h"
 #include <jni.h>
 
 #endif

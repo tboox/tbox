@@ -32,7 +32,7 @@
  */
 #include "prefix.h"
 #include "android.h"
-#include "../../directory.h"
+#include "../directory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

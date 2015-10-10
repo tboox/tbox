@@ -157,7 +157,7 @@ add_target("tbox")
 
     -- add the source for the android 
     if os("android") then
-        add_files("platform/linux/android/*.c")
+        add_files("platform/android/*.c")
     end
 
     -- add the interfaces for libc
