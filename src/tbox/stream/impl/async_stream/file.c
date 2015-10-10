@@ -55,6 +55,9 @@ typedef struct __tb_async_stream_file_impl_t
     // the file offset
     tb_atomic64_t                       offset;
 
+    // is stream file?
+    tb_bool_t                           bstream;
+
     // is closing
     tb_bool_t                           bclosing;
 
@@ -380,6 +383,9 @@ static tb_bool_t tb_async_stream_file_impl_seek(tb_async_stream_ref_t stream, tb
         // check
         tb_assert_and_check_break(impl->aico);
 
+        // is stream file?
+        tb_check_break_state(!impl->bstream, state, TB_STATE_NOT_SUPPORTED);
+
         // update offset
         tb_atomic64_set(&impl->offset, offset);
 
@@ -506,7 +512,8 @@ static tb_bool_t tb_async_stream_file_impl_ctrl(tb_async_stream_ref_t stream, tb
             tb_assert_and_check_return_val(psize, tb_false);
 
             // get size
-            *psize = tb_file_size(file);
+            if (!impl->bstream) *psize = tb_file_size(file);
+            else *psize = -1;
 
             // ok
             return tb_true;
@@ -537,9 +544,22 @@ static tb_bool_t tb_async_stream_file_impl_ctrl(tb_async_stream_ref_t stream, tb
         }
     case TB_STREAM_CTRL_FILE_GET_MODE:
         {
+            // the pmode
             tb_size_t* pmode = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(pmode, tb_false);
+
+            // get mode
             *pmode = impl->mode;
+
+            // ok
+            return tb_true;
+        }
+    case TB_STREAM_CTRL_FILE_IS_STREAM:
+        {
+            // is stream
+            impl->bstream = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+
+            // ok
             return tb_true;
         }
     default:
@@ -578,7 +598,8 @@ tb_async_stream_ref_t tb_async_stream_init_file(tb_aicp_ref_t aicp)
     if (impl)
     {
         // init mode
-        impl->mode = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+        impl->mode      = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+        impl->bstream   = tb_false;
     }
 
     // ok?

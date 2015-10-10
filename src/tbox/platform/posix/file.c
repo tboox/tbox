@@ -347,8 +347,13 @@ tb_hize_t tb_file_size(tb_file_ref_t file)
     tb_assert_and_check_return_val(file, 0);
 
     // the file size
+    tb_hize_t size = 0;
     struct stat st = {0};
-    return !fstat(tb_file2fd(file), &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
+    if (!fstat(tb_file2fd(file), &st))
+        size = st.st_size;
+
+    // ok?
+    return size;
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {

@@ -51,7 +51,7 @@ typedef struct __tb_stream_impl_t
     // the url
     tb_url_t            url;
 
-    /* internal state
+    /* the internal state for killing stream in the other thread
      *
      * <pre>
      * TB_STATE_CLOSED
@@ -66,7 +66,13 @@ typedef struct __tb_stream_impl_t
     // the timeout
     tb_long_t           timeout;
 
-    // the state
+    /* the stream state
+     *
+     * <pre>
+     * TB_STATE_KILLED
+     * TB_STATE_WAIT_FAILED
+     * </pre>
+     */
     tb_size_t           state;
 
     // the offset

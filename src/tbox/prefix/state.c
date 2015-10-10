@@ -36,6 +36,7 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
     switch (state)
     {
     case TB_STATE_OK:                           return "ok";
+    case TB_STATE_END:                          return "end";
     case TB_STATE_FAILED:                       return "failed";
     case TB_STATE_KILLED:                       return "killed";
     case TB_STATE_PAUSED:                       return "paused";
