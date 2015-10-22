@@ -136,16 +136,14 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
             
             // get the unwind_backtrace function 
             g_unwind_backtrace = (tb_backtrace_unwind_backtrace_func_t)tb_dynamic_func(dynamic, "unwind_backtrace");
-            tb_check_break(g_unwind_backtrace);
 
             // get the get_backtrace_symbols function 
             g_get_backtrace_symbols = (tb_backtrace_get_backtrace_symbols_func_t)tb_dynamic_func(dynamic, "get_backtrace_symbols");
-            tb_check_break(g_get_backtrace_symbols); 
 
             // get the free_backtrace_symbols function
             g_free_backtrace_symbols = (tb_backtrace_free_backtrace_symbols_func_t)tb_dynamic_func(dynamic, "free_backtrace_symbols");
-            tb_check_break(g_free_backtrace_symbols); 
         }
+        tb_check_break(g_unwind_backtrace && g_get_backtrace_symbols && g_free_backtrace_symbols);
 
         // calculate max frames count which can be storaged
         tb_size_t nframe_maxn = (sizeof(tb_pointer_t) * nframe) / sizeof(tb_backtrace_frame_t);
