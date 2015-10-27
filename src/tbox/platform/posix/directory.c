@@ -124,7 +124,7 @@ static tb_bool_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursi
         while ((item = readdir(directory)))
         {
             // check
-            tb_assert_and_check_continue(item->d_name && item->d_reclen);
+            tb_assert_and_check_continue(item->d_reclen);
 
             // the item name
             tb_char_t name[1024] = {0};

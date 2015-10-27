@@ -43,6 +43,13 @@
  * macros
  */
 
+// the vector grow
+#ifdef __tb_small__ 
+#   define TB_VECTOR_GROW             (128)
+#else
+#   define TB_VECTOR_GROW             (256)
+#endif
+
 // the vector maxn
 #ifdef __tb_small__
 #   define TB_VECTOR_MAXN             (1 << 16)
@@ -180,7 +187,6 @@ static tb_void_t tb_vector_itor_remove_range(tb_iterator_ref_t iterator, tb_size
 tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_element_t element)
 {
     // check
-    tb_assert_and_check_return_val(grow, tb_null);
     tb_assert_and_check_return_val(element.size && element.data && element.dupl && element.repl && element.ndupl && element.nrepl, tb_null);
 
     // done
@@ -188,6 +194,9 @@ tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_element_t element)
     tb_vector_impl_t*   impl = tb_null;
     do
     {
+        // using the default grow
+        if (!grow) grow = TB_VECTOR_GROW;
+
         // make impl
         impl = tb_malloc0_type(tb_vector_impl_t);
         tb_assert_and_check_break(impl);
