@@ -32,17 +32,10 @@
  * includes
  */
 #include "pool.h"
+#include "allocator.h"
 #include "large_pool.h"
 #include "small_pool.h"
 #include "impl/prefix.h"
-#include "../platform/platform.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// only for debuging pool bug
-//#define TB_POOL_DISABLE
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -57,18 +50,28 @@ typedef struct __tb_pool_impl_t
     // the small pool
     tb_small_pool_ref_t     small_pool;
 
+    // the allocator
+    tb_allocator_ref_t      allocator;
+
     // the lock
     tb_spinlock_t           lock;
 
 }tb_pool_impl_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * instance implementation
+ * globals
+ */
+
+// the allocator 
+__tb_extern_c__ tb_allocator_ref_t  g_allocator = tb_null;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
  */
 static tb_handle_t tb_pool_instance_init(tb_cpointer_t* ppriv)
 {
     // init it
-    return tb_pool_init(tb_null);
+    return tb_pool_init(g_allocator, tb_null);
 }
 static tb_void_t tb_pool_instance_exit(tb_handle_t pool, tb_cpointer_t priv)
 {
@@ -88,13 +91,28 @@ tb_pool_ref_t tb_pool()
 {
     return (tb_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_POOL, tb_pool_instance_init, tb_pool_instance_exit, tb_null);
 }
-tb_pool_ref_t tb_pool_init(tb_large_pool_ref_t large_pool)
+tb_pool_ref_t tb_pool_init(tb_allocator_ref_t allocator, tb_large_pool_ref_t large_pool)
 {
     // done
     tb_bool_t       ok = tb_false;
     tb_pool_impl_t* impl = tb_null;
     do
     {
+        // uses allocator?
+        if (allocator)
+        {
+            // make pool
+            impl = (tb_pool_impl_t*)tb_allocator_malloc0(allocator, sizeof(tb_pool_impl_t));
+            tb_assert_and_check_break(impl);
+
+            // save allocator
+            impl->allocator = allocator;
+
+            // ok
+            ok = tb_true;
+            break;
+        }
+
         // using the default large pool 
         if (!large_pool) large_pool = tb_large_pool();
         tb_assert_and_check_break(large_pool);
@@ -135,7 +153,15 @@ tb_void_t tb_pool_exit(tb_pool_ref_t pool)
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return(impl && impl->large_pool);
+    tb_assert_and_check_return(impl);
+
+    // uses allocator?
+    if (impl->allocator)
+    {
+        // exit it
+        tb_allocator_free(impl->allocator, impl);
+        return ;
+    }
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -151,18 +177,19 @@ tb_void_t tb_pool_exit(tb_pool_ref_t pool)
     tb_spinlock_exit(&impl->lock);
 
     // exit pool
-    tb_large_pool_free(impl->large_pool, impl);
+    if (impl->large_pool) tb_large_pool_free(impl->large_pool, impl);
 }
 tb_pointer_t tb_pool_malloc_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
  
-    // done
-#ifdef TB_POOL_DISABLE
-    return tb_native_memory_malloc(size);
-#endif
+    // uses allocator?
+    if (impl->allocator) return tb_allocator_malloc(impl->allocator, size);
+
+    // check
+    tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -180,12 +207,13 @@ tb_pointer_t tb_pool_malloc0_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
     
-    // done
-#ifdef TB_POOL_DISABLE
-    return tb_native_memory_malloc0(size);
-#endif
+    // uses allocator?
+    if (impl->allocator) return tb_allocator_malloc0(impl->allocator, size);
+
+    // check
+    tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -203,12 +231,13 @@ tb_pointer_t tb_pool_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size 
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
+ 
+    // uses allocator?
+    if (impl->allocator) return tb_allocator_nalloc(impl->allocator, item, size);
 
-    // done
-#ifdef TB_POOL_DISABLE
-    return tb_native_memory_nalloc(item, size);
-#endif
+    // check
+    tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -226,12 +255,13 @@ tb_pointer_t tb_pool_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
+ 
+    // uses allocator?
+    if (impl->allocator) return tb_allocator_nalloc0(impl->allocator, item, size);
 
-    // done
-#ifdef TB_POOL_DISABLE
-    return tb_native_memory_nalloc0(item, size);
-#endif
+    // check
+    tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -249,12 +279,13 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl, tb_null);
+ 
+    // uses allocator?
+    if (impl->allocator) return tb_allocator_ralloc(impl->allocator, data, size);
 
-    // done
-#ifdef TB_POOL_DISABLE
-    return tb_native_memory_ralloc(data, size);
-#endif
+    // check
+    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -335,12 +366,13 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && data, tb_false);
+    tb_assert_and_check_return_val(impl, tb_false);
+ 
+    // uses allocator?
+    if (impl->allocator) return tb_allocator_free(impl->allocator, data);
 
-    // done
-#ifdef TB_POOL_DISABLE
-    return tb_native_memory_free(data);
-#endif
+    // check
+    tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && data, tb_false);
 
     // enter
     tb_spinlock_enter(&impl->lock);
@@ -499,7 +531,18 @@ tb_void_t tb_pool_dump(tb_pool_ref_t pool)
 {
     // check
     tb_pool_impl_t* impl = (tb_pool_impl_t*)pool;
-    tb_assert_and_check_return(impl && impl->large_pool && impl->small_pool);
+    tb_assert_and_check_return(impl);
+
+    // uses allocator?
+    if (impl->allocator)
+    {
+        // dump it
+        tb_allocator_dump(impl->allocator);
+        return ;
+    }
+
+    // check
+    tb_assert_and_check_return(impl->large_pool && impl->small_pool);
 
     // enter
     tb_spinlock_enter(&impl->lock);

@@ -14,7 +14,7 @@ tb_void_t tb_demo_pool_leak()
     do
     {
         // init pool
-        pool = tb_pool_init(tb_null);
+        pool = tb_pool_init(tb_null, tb_null);
         tb_assert_and_check_break(pool);
 
         // make data0
@@ -43,7 +43,7 @@ tb_void_t tb_demo_pool_free2()
     do
     {
         // init pool
-        pool = tb_pool_init(tb_null);
+        pool = tb_pool_init(tb_null, tb_null);
         tb_assert_and_check_break(pool);
 
         // make data
@@ -71,7 +71,7 @@ tb_void_t tb_demo_pool_underflow()
     do
     {
         // init pool
-        pool = tb_pool_init(tb_null);
+        pool = tb_pool_init(tb_null, tb_null);
         tb_assert_and_check_break(pool);
 
         // make data
@@ -101,7 +101,7 @@ tb_void_t tb_demo_pool_underflow2()
     do
     {
         // init pool
-        pool = tb_pool_init(tb_null);
+        pool = tb_pool_init(tb_null, tb_null);
         tb_assert_and_check_break(pool);
 
         // make data
@@ -132,7 +132,7 @@ tb_void_t tb_demo_pool_perf()
     do
     {
         // init pool
-        pool = tb_pool_init(tb_null);
+        pool = tb_pool_init(tb_null, tb_null);
         tb_assert_and_check_break(pool);
 
         // make data list

@@ -38,16 +38,19 @@
  * globals
  */
 
+// the allocator 
+__tb_extern_c__ extern tb_allocator_ref_t   g_allocator;
+
 // the large pool data
-__tb_extern_c__ extern tb_byte_t*   g_large_pool_data;
+__tb_extern_c__ extern tb_byte_t*           g_large_pool_data;
 
 // the large pool size
-__tb_extern_c__ extern tb_size_t    g_large_pool_size;
+__tb_extern_c__ extern tb_size_t            g_large_pool_size;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_memory_init(tb_allocator_ref_t allocator, tb_byte_t* data, tb_size_t size)
 {
     // done
     tb_bool_t ok = tb_false;
@@ -58,6 +61,9 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size)
 
         // init the native memory
         if (!tb_native_memory_init()) break;
+
+        // init the allocator
+        g_allocator = allocator;
 
         // init the large pool data
         g_large_pool_data = data;

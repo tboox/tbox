@@ -127,7 +127,7 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_init_(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build)
+tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build)
 {
     // is inited?
     if (tb_atomic_fetch_and_inc(&g_init)) return tb_true;
@@ -162,7 +162,7 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_byte_t* data, tb_size_t size, tb_size_t 
     if (!tb_singleton_init()) return tb_false;
 
     // init memory
-    if (!tb_memory_init(data, size)) return tb_false;
+    if (!tb_memory_init(allocator, data, size)) return tb_false;
 
     // init platform
     if (!tb_platform_init(priv)) return tb_false;
