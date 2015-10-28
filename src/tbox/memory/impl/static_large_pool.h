@@ -40,10 +40,11 @@ __tb_extern_c_enter__
  * 
  * @param data          the pool data
  * @param size          the pool size
+ * @param pagesize      the pagesize
  *
  * @return              the pool 
  */
-tb_large_pool_ref_t     tb_static_large_pool_init(tb_byte_t* data, tb_size_t size);
+tb_large_pool_ref_t     tb_static_large_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t pagesize);
 
 /* exit the pool
  *

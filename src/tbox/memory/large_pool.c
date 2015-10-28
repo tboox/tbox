@@ -81,7 +81,7 @@ tb_large_pool_ref_t tb_large_pool()
 tb_large_pool_ref_t tb_large_pool_init(tb_byte_t* data, tb_size_t size)
 {
     // init pool
-    return (data && size)? tb_static_large_pool_init(data, size) : tb_native_large_pool_init();
+    return (data && size)? tb_static_large_pool_init(data, size, tb_page_size()) : tb_native_large_pool_init();
 }
 tb_void_t tb_large_pool_exit(tb_large_pool_ref_t pool)
 {

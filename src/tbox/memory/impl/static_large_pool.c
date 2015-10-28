@@ -678,7 +678,7 @@ static tb_bool_t tb_static_large_pool_free_done(tb_static_large_pool_impl_t* imp
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size)
+tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t pagesize)
 {
     // check
     tb_assert_and_check_return_val(data && size, tb_null);
@@ -699,7 +699,14 @@ tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size)
     if (!tb_spinlock_init(&impl->lock)) return tb_null;
 
     // init page_size
-    impl->page_size = tb_page_size();
+    impl->page_size = pagesize? pagesize : tb_page_size();
+
+    // page_size must be larger than sizeof(tb_static_large_data_head_t)
+    if (impl->page_size < sizeof(tb_static_large_data_head_t))
+        impl->page_size += sizeof(tb_static_large_data_head_t);
+
+    // page_size must be aligned 
+    impl->page_size = tb_align_pow2(impl->page_size);
     tb_assert_and_check_return_val(impl->page_size, tb_null);
 
     // init data size
