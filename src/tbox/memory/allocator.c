@@ -33,23 +33,33 @@
  */
 #include "allocator.h"
 #include "../libc/libc.h"
+#include "../utils/utils.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_pointer_t tb_allocator_native_malloc(tb_allocator_ref_t allocator, tb_size_t size)
+static tb_pointer_t tb_allocator_native_malloc(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__)
 {
+    // trace
+    tb_trace_d("malloc(%lu) at %s(): %lu, %s", size, func_, line_, file_);
+
     // malloc it
     return tb_native_memory_malloc(size);
 }
-static tb_pointer_t tb_allocator_native_ralloc(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size)
+static tb_pointer_t tb_allocator_native_ralloc(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
+    // trace
+    tb_trace_d("ralloc(%p, %lu) at %s(): %lu, %s", data, size, func_, line_, file_);
+
     // ralloc it
     return tb_native_memory_ralloc(data, size);
 }
-static tb_bool_t tb_allocator_native_free(tb_allocator_ref_t allocator, tb_pointer_t data)
+static tb_bool_t tb_allocator_native_free(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
 {
+    // trace    
+    tb_trace_d("free(%p) at %s(): %lu, %s", data, func_, line_, file_);
+
     // free it
     return tb_native_memory_free(data);
 }
@@ -86,21 +96,21 @@ tb_allocator_ref_t tb_allocator_native()
     // ok
     return &s_allocator;
 }
-tb_pointer_t tb_allocator_malloc(tb_allocator_ref_t allocator, tb_size_t size)
+tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(allocator && allocator->malloc, tb_null);
 
     // malloc it
-    return allocator->malloc(allocator, size);
+    return allocator->malloc(allocator, size __tb_debug_args__);
 }
-tb_pointer_t tb_allocator_malloc0(tb_allocator_ref_t allocator, tb_size_t size)
+tb_pointer_t tb_allocator_malloc0_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // malloc it
-    tb_pointer_t data = tb_allocator_malloc(allocator, size);
+    tb_pointer_t data = tb_allocator_malloc_(allocator, size __tb_debug_args__);
 
     // clear it
     if (data && size) tb_memset_(data, 0, size);
@@ -108,45 +118,45 @@ tb_pointer_t tb_allocator_malloc0(tb_allocator_ref_t allocator, tb_size_t size)
     // ok
     return data;
 }
-tb_pointer_t tb_allocator_nalloc(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size)
+tb_pointer_t tb_allocator_nalloc_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // nalloc it
-    return tb_allocator_malloc(allocator, item * size);
+    return tb_allocator_malloc_(allocator, item * size __tb_debug_args__);
 }
-tb_pointer_t tb_allocator_nalloc0(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size)
+tb_pointer_t tb_allocator_nalloc0_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // nalloc0 it
-    return tb_allocator_malloc0(allocator, item * size);
+    return tb_allocator_malloc0_(allocator, item * size __tb_debug_args__);
 }
-tb_pointer_t tb_allocator_ralloc(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size)
+tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(allocator && allocator->ralloc, tb_null);
 
     // ralloc it
-    return allocator->ralloc(allocator, data, size);
+    return allocator->ralloc(allocator, data, size __tb_debug_args__);
 }
-tb_bool_t tb_allocator_free(tb_allocator_ref_t allocator, tb_pointer_t data)
+tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
 {
     // check
     tb_assert_and_check_return_val(allocator && allocator->free, tb_false);
 
     // free it
-    return allocator->free(allocator, data);
+    return allocator->free(allocator, data __tb_debug_args__);
 }
 #ifdef __tb_debug__
 tb_void_t tb_allocator_dump(tb_allocator_ref_t allocator)
 {
     // check
-    tb_assert_and_check_return(allocator && allocator->dump);
+    tb_assert_and_check_return(allocator);
 
     // dump it
-    return allocator->dump(allocator);
+    if (allocator->dump) allocator->dump(allocator);
 }
 #endif
