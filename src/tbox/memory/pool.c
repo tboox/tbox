@@ -186,7 +186,7 @@ tb_pointer_t tb_pool_malloc_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl_
     tb_assert_and_check_return_val(impl, tb_null);
  
     // uses allocator?
-    if (impl->allocator) return tb_allocator_malloc(impl->allocator, size);
+    if (impl->allocator) return tb_allocator_malloc_(impl->allocator, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
@@ -210,7 +210,7 @@ tb_pointer_t tb_pool_malloc0_(tb_pool_ref_t pool, tb_size_t size __tb_debug_decl
     tb_assert_and_check_return_val(impl, tb_null);
     
     // uses allocator?
-    if (impl->allocator) return tb_allocator_malloc0(impl->allocator, size);
+    if (impl->allocator) return tb_allocator_malloc0_(impl->allocator, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
@@ -234,7 +234,7 @@ tb_pointer_t tb_pool_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size 
     tb_assert_and_check_return_val(impl, tb_null);
  
     // uses allocator?
-    if (impl->allocator) return tb_allocator_nalloc(impl->allocator, item, size);
+    if (impl->allocator) return tb_allocator_nalloc_(impl->allocator, item, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
@@ -258,7 +258,7 @@ tb_pointer_t tb_pool_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size
     tb_assert_and_check_return_val(impl, tb_null);
  
     // uses allocator?
-    if (impl->allocator) return tb_allocator_nalloc0(impl->allocator, item, size);
+    if (impl->allocator) return tb_allocator_nalloc0_(impl->allocator, item, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && size, tb_null);
@@ -282,7 +282,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t si
     tb_assert_and_check_return_val(impl, tb_null);
  
     // uses allocator?
-    if (impl->allocator) return tb_allocator_ralloc(impl->allocator, data, size);
+    if (impl->allocator) return tb_allocator_ralloc_(impl->allocator, data, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(impl && impl->large_pool && impl->small_pool && size, tb_null);
@@ -369,7 +369,7 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
     tb_assert_and_check_return_val(impl, tb_false);
  
     // uses allocator?
-    if (impl->allocator) return tb_allocator_free(impl->allocator, data);
+    if (impl->allocator) return tb_allocator_free_(impl->allocator, data __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(impl->large_pool && impl->small_pool && data, tb_false);

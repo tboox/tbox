@@ -35,6 +35,19 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+#define tb_allocator_malloc(allocator, size)              tb_allocator_malloc_(allocator, size __tb_debug_vals__)
+#define tb_allocator_malloc0(allocator, size)             tb_allocator_malloc0_(allocator, size __tb_debug_vals__)
+
+#define tb_allocator_nalloc(allocator, item, size)        tb_allocator_nalloc_(allocator, item, size __tb_debug_vals__)
+#define tb_allocator_nalloc0(allocator, item, size)       tb_allocator_nalloc0_(allocator, item, size __tb_debug_vals__)
+
+#define tb_allocator_ralloc(allocator, data, size)        tb_allocator_ralloc_(allocator, (tb_pointer_t)(data), size __tb_debug_vals__)
+#define tb_allocator_free(allocator, data)                tb_allocator_free_(allocator, (tb_pointer_t)(data) __tb_debug_vals__)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -48,7 +61,7 @@ typedef struct __tb_allocator_t
      *
      * @return              the data address
      */
-    tb_pointer_t            (*malloc)(struct __tb_allocator_t* allocator, tb_size_t size);
+    tb_pointer_t            (*malloc)(struct __tb_allocator_t* allocator, tb_size_t size __tb_debug_decl__);
 
     /*! realloc data
      *
@@ -58,7 +71,7 @@ typedef struct __tb_allocator_t
      *
      * @return              the new data address
      */
-    tb_pointer_t            (*ralloc)(struct __tb_allocator_t* allocator, tb_pointer_t data, tb_size_t size);
+    tb_pointer_t            (*ralloc)(struct __tb_allocator_t* allocator, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
     /*! free data
      *
@@ -67,7 +80,7 @@ typedef struct __tb_allocator_t
      *
      * @return              tb_true or tb_false
      */
-    tb_bool_t               (*free)(struct __tb_allocator_t* allocator, tb_pointer_t data);
+    tb_bool_t               (*free)(struct __tb_allocator_t* allocator, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
     /*! dump allocator
@@ -96,7 +109,7 @@ tb_allocator_ref_t      tb_allocator_native(tb_noarg_t);
  *
  * @return              the data address
  */
-tb_pointer_t            tb_allocator_malloc(tb_allocator_ref_t allocator, tb_size_t size);
+tb_pointer_t            tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__);
 
 /*! malloc data and fill zero 
  *
@@ -105,7 +118,7 @@ tb_pointer_t            tb_allocator_malloc(tb_allocator_ref_t allocator, tb_siz
  *
  * @return              the data address
  */
-tb_pointer_t            tb_allocator_malloc0(tb_allocator_ref_t allocator, tb_size_t size);
+tb_pointer_t            tb_allocator_malloc0_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__);
 
 /*! malloc data with the item count
  *
@@ -115,7 +128,7 @@ tb_pointer_t            tb_allocator_malloc0(tb_allocator_ref_t allocator, tb_si
  *
  * @return              the data address
  */
-tb_pointer_t            tb_allocator_nalloc(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size);
+tb_pointer_t            tb_allocator_nalloc_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! malloc data with the item count and fill zero
  *
@@ -125,7 +138,7 @@ tb_pointer_t            tb_allocator_nalloc(tb_allocator_ref_t allocator, tb_siz
  *
  * @return              the data address
  */
-tb_pointer_t            tb_allocator_nalloc0(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size);
+tb_pointer_t            tb_allocator_nalloc0_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 /*! realloc data
  *
@@ -135,7 +148,7 @@ tb_pointer_t            tb_allocator_nalloc0(tb_allocator_ref_t allocator, tb_si
  *
  * @return              the new data address
  */
-tb_pointer_t            tb_allocator_ralloc(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size);
+tb_pointer_t            tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 /*! free data
  *
@@ -144,7 +157,7 @@ tb_pointer_t            tb_allocator_ralloc(tb_allocator_ref_t allocator, tb_poi
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_allocator_free(tb_allocator_ref_t allocator, tb_pointer_t data);
+tb_bool_t               tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! dump it
