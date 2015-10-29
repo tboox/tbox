@@ -1046,6 +1046,9 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t stream, tb_hize_t offset)
     // stoped?
     tb_assert_and_check_return_val((TB_STATE_OPENED == tb_atomic_get(&impl->istate)), tb_false);
 
+    // sync writed data first, @note must be called before tb_stream_size()
+    if (impl->bwrited && !tb_stream_sync(stream, tb_false)) return tb_false;
+
     // limit offset
     tb_hong_t size = tb_stream_size(stream);
     if (size >= 0 && offset > size) offset = size;
@@ -1057,9 +1060,6 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t stream, tb_hize_t offset)
     // for writing
     if (impl->bwrited)
     {
-        // sync writed data first
-        if (!tb_stream_sync(stream, tb_false)) return tb_false;
-
         // check cache, must not cache or empty cache
         tb_assert_and_check_return_val(!tb_queue_buffer_maxn(&impl->cache) || tb_queue_buffer_null(&impl->cache), tb_false);
 
