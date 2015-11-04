@@ -36,6 +36,6 @@ tb_float_t tb_asinf(tb_float_t x)
 #ifdef TB_CONFIG_LIBM_HAVE_ASINF
     return asinf(x);
 #else
-    return (tb_float_t)tb_asinf(x);
+    return (tb_float_t)tb_asin(x);
 #endif
 }
