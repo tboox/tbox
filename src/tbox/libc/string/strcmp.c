@@ -44,15 +44,22 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRCMP)
 static tb_long_t tb_strcmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, 0);
+
+    // done
     return strcmp(s1, s2);
 }
 #elif !defined(TB_LIBC_STRING_IMPL_STRCMP)
 static tb_long_t tb_strcmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, 0);
+
+    // same address?
     if (s1 == s2) return 0;
 
+    // done
     tb_long_t r = 0;
     while (((r = ((tb_long_t)(*((tb_byte_t *)s1))) - *((tb_byte_t *)s2++)) == 0) && *s1++);
     return r;
