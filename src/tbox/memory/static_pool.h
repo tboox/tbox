@@ -66,7 +66,7 @@ __tb_extern_c_enter__
  *  </pre>
  *
  */
-typedef tb_large_pool_ref_t     tb_static_pool_ref_t;
+typedef struct{}*       tb_static_pool_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
