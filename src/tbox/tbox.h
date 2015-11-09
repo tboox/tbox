@@ -134,7 +134,7 @@ __tb_extern_c_enter__
 /*! init the tbox library
  *
  * @param priv      the platform private data
- *                  pass JavaVM* jvm for android
+ *                  pass JavaVM* jvm for android jni
  *                  pass tb_null for other platform
  * @param allocator the allocator, uses data and size if be null
  * @param data      the memory data for the memory pool, uses the native memory if be tb_null

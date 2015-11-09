@@ -238,15 +238,16 @@ example
         /* init tbox
          *
          * @param priv      the platform private data
-         *                  pass JNIEnv* env for android
+         *                  pass JavaVM* jvm for android jni
          *                  pass tb_null for other platform
+         * @param allocator the allocator, uses data and size if be null
          * @param data      the memory data for the memory pool, uses the native memory if be tb_null
          * @param size      the memory size for the memory pool, uses the native memory if be zero
          *
-         * for android:     tb_init(jenv, tb_null, 0)
-         * for memory pool: tb_init(tb_null, malloc(10 * 1024 * 1024), 10 * 1024 * 1024);
+         * for android:     tb_init(jvm, tb_null, tb_null, 0)
+         * for memory pool: tb_init(tb_null, tb_null, malloc(10 * 1024 * 1024), 10 * 1024 * 1024);
          */
-        if (!tb_init(tb_null, tb_null, 0)) return 0;
+        if (!tb_init(tb_null, tb_null, tb_null, 0)) return 0;
 
         // print info with tag
         tb_trace_i("hello tbox");
