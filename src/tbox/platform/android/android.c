@@ -31,22 +31,22 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_atomic_t g_jenv = 0;
+static tb_atomic_t g_jvm = 0;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_android_init(JNIEnv* jenv)
+tb_bool_t tb_android_init(JavaVM* jvm)
 {
     // check
-    if (!jenv)
+    if (!jvm)
     {
         // warning
-        tb_trace_w("the jni environment be not inited, please pass it to the tb_init function!");
+        tb_trace_w("the java machine be not inited, please pass it to the tb_init function!");
     }
 
     // init it
-    tb_atomic_set(&g_jenv, (tb_size_t)jenv);
+    tb_atomic_set(&g_jvm, (tb_size_t)jvm);
 
     // ok
     return tb_true;
@@ -54,11 +54,11 @@ tb_bool_t tb_android_init(JNIEnv* jenv)
 tb_void_t tb_android_exit()
 {
     // clear it
-    tb_atomic_set(&g_jenv, 0);
+    tb_atomic_set(&g_jvm, 0);
 }
-JNIEnv* tb_android_jenv()
+JavaVM* tb_android_jvm()
 {
     // get it
-    return (JNIEnv*)tb_atomic_get(&g_jenv);
+    return (JavaVM*)tb_atomic_get(&g_jvm);
 }
 

@@ -34,19 +34,19 @@
 
 /*! init the android platform
  *
- * @param jenv      the jni environment pointer
+ * @param jvm       the java machine pointer
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_android_init(JNIEnv* jenv);
+tb_bool_t           tb_android_init(JavaVM* jvm);
 
 /// exit the android platform 
 tb_void_t           tb_android_exit(tb_noarg_t);
 
-/*! the jni environment pointer
+/*! the java machine pointer
  *
- * @return          the environment pointer
+ * @return          the java machine pointer
  */
-JNIEnv*             tb_android_jenv(tb_noarg_t);
+JavaVM*             tb_android_jvm(tb_noarg_t);
 
 #endif

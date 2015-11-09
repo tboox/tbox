@@ -42,75 +42,87 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
-    // the jni environment
-    tb_size_t   size = 0;
-    JNIEnv*     jenv = tb_android_jenv();
-    if (jenv)
+    // the jvm
+    JavaVM* jvm = tb_android_jvm();
+    tb_assert_and_check_return_val(jvm, 0);
+
+    // attempt to get jni environment first
+    JNIEnv*     jenv = tb_null; 
+    tb_bool_t   jattached = tb_false;
+    if ((*jvm)->GetEnv(jvm, (tb_pointer_t*)&jenv, JNI_VERSION_1_4) != JNI_OK) 
     {
-        // enter
-        if ((*jenv)->PushLocalFrame(jenv, 10) >= 0) 
-        {
-            // done
-            jboolean error = tb_false;
-            do
-            {
-                // get the environment class
-                jclass environment = (*jenv)->FindClass(jenv, "android/os/Environment");
-                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && environment);
+        // bind jni environment
+        if ((*jvm)->AttachCurrentThread(jvm, &jenv, tb_null) != JNI_OK) return 0;
 
-                // get the getDownloadCacheDirectory func
-                jmethodID getDownloadCacheDirectory_func = (*jenv)->GetStaticMethodID(jenv, environment, "getDownloadCacheDirectory", "()Ljava/io/File;");
-                tb_assert_and_check_break(getDownloadCacheDirectory_func);
-
-                // get the download cache directory 
-                jobject directory = (*jenv)->CallStaticObjectMethod(jenv, environment, getDownloadCacheDirectory_func);
-                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && directory);
-
-                // get file class
-                jclass file_class = (*jenv)->GetObjectClass(jenv, directory);
-                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && file_class);
-
-                // get the getPath func
-                jmethodID getPath_func = (*jenv)->GetMethodID(jenv, file_class, "getPath", "()Ljava/lang/String;");
-                tb_assert_and_check_break(getPath_func);
-
-                // get the directory path
-                jstring path_jstr = (jstring)(*jenv)->CallObjectMethod(jenv, directory, getPath_func);
-                tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && path_jstr);
-
-                // get the path string length
-                size = (tb_size_t)(*jenv)->GetStringLength(jenv, path_jstr);
-                tb_assert_and_check_break(size);
-
-                // get the path string
-		        tb_char_t const* path_cstr = (*jenv)->GetStringUTFChars(jenv, path_jstr, tb_null);
-                tb_assert_and_check_break(path_cstr);
-
-                // trace
-                tb_trace_d("temp: %s", path_cstr);
-
-                // copy it
-                tb_size_t need = tb_min(size + 1, maxn);
-                tb_strlcpy(path, path_cstr, need);
-
-                // exit the path string
-			    (*jenv)->ReleaseStringUTFChars(jenv, path_jstr, path_cstr);
-
-            } while (0);
-
-            // exception? clear it
-            if (error) (*jenv)->ExceptionClear(jenv);
-
-            // leave
-            (*jenv)->PopLocalFrame(jenv, tb_null);
-        }
+        // attach ok
+        jattached = tb_true;
     }
-    else
+    tb_assert_and_check_return_val(jenv, 0);
+
+    // enter
+    if ((*jenv)->PushLocalFrame(jenv, 10) < 0) return 0;
+
+    // done
+    tb_size_t   size = 0;
+    jboolean    error = tb_false;
+    do
     {
-        // the temporary directory
-        tb_strlcpy(path, "/tmp", maxn);
-        path[4] = '\0';
-        size = 4;
+        // get the environment class
+        jclass environment = (*jenv)->FindClass(jenv, "android/os/Environment");
+        tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && environment);
+
+        // get the getDownloadCacheDirectory func
+        jmethodID getDownloadCacheDirectory_func = (*jenv)->GetStaticMethodID(jenv, environment, "getDownloadCacheDirectory", "()Ljava/io/File;");
+        tb_assert_and_check_break(getDownloadCacheDirectory_func);
+
+        // get the download cache directory 
+        jobject directory = (*jenv)->CallStaticObjectMethod(jenv, environment, getDownloadCacheDirectory_func);
+        tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && directory);
+
+        // get file class
+        jclass file_class = (*jenv)->GetObjectClass(jenv, directory);
+        tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && file_class);
+
+        // get the getPath func
+        jmethodID getPath_func = (*jenv)->GetMethodID(jenv, file_class, "getPath", "()Ljava/lang/String;");
+        tb_assert_and_check_break(getPath_func);
+
+        // get the directory path
+        jstring path_jstr = (jstring)(*jenv)->CallObjectMethod(jenv, directory, getPath_func);
+        tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && path_jstr);
+
+        // get the path string length
+        size = (tb_size_t)(*jenv)->GetStringLength(jenv, path_jstr);
+        tb_assert_and_check_break(size);
+
+        // get the path string
+        tb_char_t const* path_cstr = (*jenv)->GetStringUTFChars(jenv, path_jstr, tb_null);
+        tb_assert_and_check_break(path_cstr);
+
+        // trace
+        tb_trace_d("temp: %s", path_cstr);
+
+        // copy it
+        tb_size_t need = tb_min(size + 1, maxn);
+        tb_strlcpy(path, path_cstr, need);
+
+        // exit the path string
+        (*jenv)->ReleaseStringUTFChars(jenv, path_jstr, path_cstr);
+
+    } while (0);
+
+    // exception? clear it
+    if (error) (*jenv)->ExceptionClear(jenv);
+
+    // leave
+    (*jenv)->PopLocalFrame(jenv, tb_null);
+
+    // detach it?
+    if (jattached)
+    {
+        // detach jni environment
+        if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK)
+            jattached = tb_false;
     }
 
     // ok?
