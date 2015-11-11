@@ -149,11 +149,13 @@ tb_bool_t           tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_
 /// exit the tbox library
 tb_void_t           tb_exit(tb_noarg_t);
 
+#ifdef TB_INFO_HAVE_VERSION
 /*! the tbox version
  *
  * @return          the tbox version
  */
 tb_version_t const* tb_version(tb_noarg_t);
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

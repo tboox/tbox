@@ -106,8 +106,10 @@ static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
 }
 static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
 {
+#ifdef TB_INFO_HAVE_VERSION
     // the version oly for link the static vtag string
     tb_version_t const* version = tb_version(); tb_used(version);
+#endif
 
     // ok
     if ((build / 100) == (TB_VERSION_BUILD / 100))
@@ -237,6 +239,7 @@ tb_void_t tb_exit()
     // exit trace
     tb_trace_exit();
 }
+#ifdef TB_INFO_HAVE_VERSION
 tb_version_t const* tb_version()
 {
     // init version tag for binary search
@@ -254,3 +257,4 @@ tb_version_t const* tb_version()
 
     return &s_version;
 }
+#endif

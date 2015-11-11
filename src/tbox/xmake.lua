@@ -1,7 +1,6 @@
 
 -- add type: wchar_t
 add_option("wchar_t")
-    set_option_category("type")
     add_option_ctypes("wchar_t")
     add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_WCHAR")
 
@@ -12,6 +11,14 @@ add_option("float")
     set_option_category("option")
     set_option_description("Enable or disable the float type")
     add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_FLOAT")
+
+-- add option: info
+add_option("info")
+    set_option_enable(true)
+    set_option_showmenu(true)
+    set_option_category("option")
+    set_option_description("Enable or disable to get some info, .e.g version ..")
+    add_option_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
 -- add modules
 for _, module in ipairs({"xml", "zip", "asio", "object", "charset", "database"}) do
