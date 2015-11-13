@@ -85,7 +85,8 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
     // dump head
     tb_trace_i("");
 
-    // walk
+    // done
+    tb_char_t info[8192];
     while (!tb_stream_beof(stream))
     {
         // read line
@@ -116,30 +117,38 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
         }
 
         // full line?
+        tb_char_t* p = info;
+        tb_char_t* e = info + sizeof(info);
         if (read == 0x20)
         {
             // dump offset
-            tb_tracef_i("");
-            tb_tracet_i("%08X ", offset);
+            if (p < e) p += tb_snprintf(p, e - p, "%08X ", offset);
 
             // dump data
             for (i = 0; i < 0x20; i++)
             {
-                if (!(i & 3)) tb_tracet_i(" ");
-                tb_tracet_i(" %02X", line[i]);
+                if (!(i & 3) && p < e) p += tb_snprintf(p, e - p, " ");
+                if (p < e) p += tb_snprintf(p, e - p, " %02X", line[i]);
             }
 
             // dump spaces
-            tb_tracet_i("  ");
+            if (p < e) p += tb_snprintf(p, e - p, "  ");
 
             // dump characters
             for (i = 0; i < 0x20; i++)
             {
-                tb_tracet_i("%c", tb_isgraph(line[i])? line[i] : '.');
+                if (p < e) p += tb_snprintf(p, e - p, "%c", tb_isgraph(line[i])? line[i] : '.');
             }
 
-            // dump new line
-            tb_tracet_i(__tb_newline__);
+            // dump it
+            if (p < e)
+            {
+                // end
+                *p = '\0';
+
+                // trace
+                tb_trace_i("%s", info);
+            }
 
             // update offset
             offset += 0x20;
@@ -151,8 +160,7 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
             tb_size_t padding = n - 0x20;
 
             // dump offset
-            tb_tracef_i("");
-            tb_tracet_i("%08X ", offset); 
+            if (p < e) p += tb_snprintf(p, e - p, "%08X ", offset); 
             if (padding >= 9) padding -= 9;
 
             // dump data
@@ -160,25 +168,32 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
             {
                 if (!(i & 3)) 
                 {
-                    tb_tracet_i(" ");
+                    if (p < e) p += tb_snprintf(p, e - p, " ");
                     if (padding) padding--;
                 }
 
-                tb_tracet_i(" %02X", line[i]);
+                if (p < e) p += tb_snprintf(p, e - p, " %02X", line[i]);
                 if (padding >= 3) padding -= 3;
             }
 
             // dump spaces
-            while (padding--) tb_tracet_i(" ");
+            while (padding--) if (p < e) p += tb_snprintf(p, e - p, " ");
                 
             // dump characters
             for (i = 0; i < read; i++)
             {
-                tb_tracet_i("%c", tb_isgraph(line[i])? line[i] : '.');
+                if (p < e) p += tb_snprintf(p, e - p, "%c", tb_isgraph(line[i])? line[i] : '.');
             }
 
-            // dump new line
-            tb_tracet_i(__tb_newline__);
+            // dump it
+            if (p < e)
+            {
+                // end
+                *p = '\0';
+
+                // trace
+                tb_trace_i("%s", info);
+            }
 
             // update offset
             offset += read;
