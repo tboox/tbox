@@ -50,12 +50,14 @@ tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
             // done help
             if (tb_option_find(option, "help"))
                 tb_option_help(option);
+#ifdef TB_INFO_HAVE_VERSION
             // done version
             else if (tb_option_find(option, "version"))
             {
                 tb_version_t const* version = tb_version();
                 if (version) tb_trace_i("version: tbox-v%u.%u.%u.%llu", version->major, version->minor, version->alter, version->build);
             }
+#endif
             else
             {
                 // done integer
