@@ -45,15 +45,22 @@
 #if defined(TB_CONFIG_LIBC_HAVE_MEMCMP)
 static tb_long_t tb_memcmp_impl(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, 0);
+
+    // done
     return memcmp(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_IMPL_MEMCMP)
 static tb_long_t tb_memcmp_impl(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
+    // check
     tb_assert_and_check_return_val(s1 && s2, 0);
+
+    // equal or empty?
     if (s1 == s2 || !n) return 0;
 
+    // done
     tb_long_t r = 0;
     tb_byte_t const* p1 = (tb_byte_t const *)s1;
     tb_byte_t const* p2 = (tb_byte_t const *)s2;

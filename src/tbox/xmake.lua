@@ -172,6 +172,7 @@ add_target("tbox")
                                                                         "memset",
                                                                         "memmove",
                                                                         "memcmp",
+                                                                        "memmem",
                                                                         "strcat",
                                                                         "strncat",
                                                                         "strcpy",
