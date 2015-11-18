@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] = 
+tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] = 
 {
 #ifndef __tb_small__
 	// TB_CRC_MODE_8_ATM
