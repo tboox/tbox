@@ -154,9 +154,9 @@
 
 // the string only for the debug mode
 #ifdef __tb_debug__
-#   define __tb_dstring__(x)                    tb_null
-#else
 #   define __tb_dstring__(x)                    x
+#else
+#   define __tb_dstring__(x)                    tb_null
 #endif
 
 // extern c
