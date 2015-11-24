@@ -9,10 +9,12 @@ It includes asio, stream, network, container, algorithm, object, memory, databas
 features
 --------
 
-### the stream io library
+### the stream library
 -	supports file, data, http and socket source
--	supports the stream filter for gzip charset and ..
--	implements the multi-stream transfer using asio	
+-	supports the stream filter for gzip, charset and ..
+-   implements transfer for two stream
+-   implements transfer pool (asio) for multi-stream
+-   implements the static buffer stream for parsing data
 
 ### the asynchronous io library
 -	supports reactor and proactor mode
@@ -64,8 +66,10 @@ features
 -	implements lzsw, lz77 and rlc algorithm
 
 ### the utils library
--	implements base32, base64, md5 and sha algorithm
+-	implements base32, base64 encoder and decoder
+-	implements crc32, adler32, md5 and sha1 hash algorithm
 -	implements assert and trace output for the debug mode
+-   implements bits operation for parsing u8, u16, u32, u64 data
 
 ### the math library
 -	implements random generator
@@ -170,7 +174,14 @@ TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac
 1. 支持utf8、utf16、gbk、gb2312、uc2、uc4 之间的互相转码，并且支持大小端格式。
 
 ## 实用工具库
-1. 提供base64/32编解码、crc32、md5、sha等hash算法、日志输出、断言、url编解码
+1. 提供base64/32编解码
+2.    实现crc32、adler32、md5、sha1等常用hash算法
+3.    实现日志输出、断言等辅助调试工具
+4.    实现url编解码
+5.    实现位操作相关接口，支持各种数据格式的解析，可以对8bits、16bits、32bits、64bits、float、double以及任意bits的字段进行解析操作，并且同时支持大端、小端和本地端模式，并针对部分操作进行了优化，像static_stream、stream都有相关接口对其进行了封装，方便在流上进行快速数据解析。
+6.    实现swap16、swap32、swap64等位交换操作，并针对各个平台进行了优化。
+7.    实现一些高级的位处理接口，例如：位0的快速统计、前导0和前导1的快速位计数、后导01的快速位计数
+8.    实现单例模块，可以对静态对象、实例对象进行快速的单例封装，实现全局线程安全
 
 contact
 -------
