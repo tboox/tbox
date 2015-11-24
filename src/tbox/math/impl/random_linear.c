@@ -40,7 +40,7 @@
 typedef struct __tb_random_linear_t
 {
     // the base
-    tb_random_impl_t             base;
+    tb_random_impl_t        base;
 
     // the seed
     tb_size_t               seed;
