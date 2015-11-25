@@ -57,7 +57,7 @@ add_target("tbox")
     add_headers("../(tbox/utils/impl/*.h)")
 
     -- add modules
-    add_options("float", "xml", "zip", "asio", "object", "charset", "database")
+    add_options("info", "float", "xml", "zip", "asio", "object", "charset", "database")
 
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "base")

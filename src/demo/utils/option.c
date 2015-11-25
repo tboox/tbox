@@ -50,7 +50,7 @@ tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
             // done help
             if (tb_option_find(option, "help"))
                 tb_option_help(option);
-#ifdef TB_INFO_HAVE_VERSION
+#ifdef TB_CONFIG_INFO_HAVE_VERSION
             // done version
             else if (tb_option_find(option, "version"))
             {
