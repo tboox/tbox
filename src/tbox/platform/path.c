@@ -222,9 +222,15 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
             // append item
             else if (n && q + 1 + n < e)
             {
+                // append separator
                 *q++ = TB_PATH_SEPARATOR;
+
+                // append item
                 tb_strncpy(q, t, n);
                 q += n;
+
+                // strip it
+                *q = '\0';
             }
             // empty item? remove repeat
             else if (!n) ;
