@@ -21,7 +21,7 @@ add_option("info")
     add_option_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "object", "charset", "database"}) do
+for _, module in ipairs({"xml", "zip", "asio", "object", "network", "charset", "database"}) do
     add_option(module)
     set_option_enable(true)
     set_option_showmenu(true)
@@ -57,7 +57,7 @@ add_target("tbox")
     add_headers("../(tbox/utils/impl/*.h)")
 
     -- add modules
-    add_options("info", "float", "xml", "zip", "asio", "object", "charset", "database")
+    add_options("info", "float", "xml", "zip", "asio", "object", "network", "charset", "database")
 
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "base")
@@ -67,16 +67,13 @@ add_target("tbox")
 
     -- add the common source files
     add_files("*.c") 
-    add_files("asio/aioo.c") 
-    add_files("asio/aiop.c") 
     add_files("math/**.c") 
     add_files("libc/**.c|string/impl/**.c") 
     add_files("utils/*.c|option.c") 
     add_files("prefix/**.c") 
     add_files("memory/**.c") 
     add_files("string/**.c") 
-    add_files("stream/**.c|**/charset.c|**/zip.c|**async_**.c|transfer_pool.c") 
-    add_files("network/**.c|impl/ssl/*.c") 
+    add_files("stream/**.c|**/charset.c|**/zip.c|**async_**.c|transfer_pool.c|impl/stream/http.c|impl/stream/sock.c") 
     add_files("algorithm/**.c") 
     add_files("container/**.c") 
     add_files("libm/libm.c") 
@@ -85,7 +82,7 @@ add_target("tbox")
     add_files("libm/isqrti.c") 
     add_files("libm/isqrti64.c") 
     add_files("libm/idivi8.c") 
-    add_files("platform/*.c|aicp.c")
+    add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c")
 
     -- add the source files for arm
     if archs("arm.*") then
@@ -97,6 +94,25 @@ add_target("tbox")
 
     -- add the source files for the xml module
     if options("xml") then add_files("xml/**.c") end
+
+    -- add the source files for the network module
+    if options("network") then
+        add_files("asio/aioo.c") 
+        add_files("asio/aiop.c") 
+        add_files("platform/dns.c") 
+        add_files("platform/aioo.c") 
+        add_files("platform/aiop.c") 
+        add_files("platform/socket.c") 
+        add_files("stream/impl/stream/http.c") 
+        add_files("stream/impl/stream/sock.c") 
+        add_files("network/**.c|impl/ssl/*.c") 
+    else
+        add_files("network/url.c") 
+        add_files("network/ipv4.c") 
+        add_files("network/ipv6.c") 
+        add_files("network/ipaddr.c") 
+        add_files("network/hwaddr.c") 
+    end
 
     -- add the source files for the asio module
     if options("asio") then 
@@ -164,7 +180,10 @@ add_target("tbox")
 
     -- add the source for the android 
     if os("android") then
-        add_files("platform/android/*.c")
+        add_files("platform/android/*.c|dns.c")
+        if options("network") then
+            add_files("platform/android/dns.c")
+        end
     end
 
     -- add the interfaces for libc

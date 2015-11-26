@@ -129,8 +129,10 @@ tb_stream_ref_t tb_stream_init_from_url(tb_char_t const* url)
     {
         tb_null
     ,   tb_stream_init_file
+#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
     ,   tb_stream_init_sock
     ,   tb_stream_init_http
+#endif
     ,   tb_stream_init_data
     };
 

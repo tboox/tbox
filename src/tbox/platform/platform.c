@@ -58,11 +58,13 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
     // init thread store
     if (!tb_thread_store_init()) return tb_false;
 
+#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
     // init socket context
     if (!tb_socket_context_init()) return tb_false;
 
     // init dns
     if (!tb_dns_init()) return tb_false;
+#endif
 
     // spak ctime
     tb_cache_time_spak();
@@ -72,11 +74,13 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
 }
 tb_void_t tb_platform_exit()
 {
+#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
     // exit dns
     tb_dns_exit();
 
     // exit socket context
     tb_socket_context_exit();
+#endif
 
     // exit thread store
     tb_thread_store_exit();

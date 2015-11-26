@@ -131,6 +131,7 @@ TB_DEMO_MAIN_DECL(memory_static_buffer);
 TB_DEMO_MAIN_DECL(memory_impl_static_fixed_pool);
 
 // network
+#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
 TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
@@ -142,6 +143,7 @@ TB_DEMO_MAIN_DECL(network_whois);
 TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
 TB_DEMO_MAIN_DECL(network_impl_date);
+#endif
 
 // platform
 TB_DEMO_MAIN_DECL(platform_file);
