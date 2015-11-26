@@ -55,8 +55,10 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
     if (!tb_android_init(priv)) return tb_false;
 #endif
 
+#ifdef TB_CONFIG_MODULE_HAVE_THREAD
     // init thread store
     if (!tb_thread_store_init()) return tb_false;
+#endif
 
 #ifdef TB_CONFIG_MODULE_HAVE_NETWORK
     // init socket context
@@ -82,8 +84,10 @@ tb_void_t tb_platform_exit()
     tb_socket_context_exit();
 #endif
 
+#ifdef TB_CONFIG_MODULE_HAVE_THREAD
     // exit thread store
     tb_thread_store_exit();
+#endif
 
     // exit android
 #ifdef TB_CONFIG_OS_ANDROID
