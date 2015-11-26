@@ -202,8 +202,10 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
             if (p < e && tb_localtime(tb_time(), &lt))
                 p += tb_snprintf(p, e - p, "[%04ld-%02ld-%02ld %02ld:%02ld:%02ld]: ", lt.year, lt.month, lt.mday, lt.hour, lt.minute, lt.second);
 
+#ifdef TB_CONFIG_MODULE_HAVE_THREAD
             // print self to file
             if (p < e) p += tb_snprintf(p, e - p, "[%lx]: ", tb_thread_self());
+#endif
         }
 
         // append prefix

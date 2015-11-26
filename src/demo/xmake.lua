@@ -36,7 +36,7 @@ add_target("demo")
     add_files("other/*.c|charset.c") 
     add_files("string/*.c") 
     add_files("memory/**.c") 
-    add_files("platform/*.c") 
+    add_files("platform/*.c|thread*.c|semaphore.c|event.c|lock.c|timer.c|ltimer.c|exception.c") 
     add_files("container/*.c") 
     add_files("algorithm/*.c") 
     add_files("stream/stream.c") 
@@ -47,6 +47,17 @@ add_target("demo")
         add_files("math/fixed.c")
         add_files("libm/float.c")
         add_files("libm/double.c")
+    end
+
+    -- add the source files for the thread type
+    if options("thread") then
+        add_files("platform/thread*.c") 
+        add_files("platform/event.c") 
+        add_files("platform/lock.c") 
+        add_files("platform/timer.c") 
+        add_files("platform/ltimer.c") 
+        add_files("platform/exception.c") 
+        add_files("platform/semaphore.c") 
     end
 
     -- add the source files for the xml module

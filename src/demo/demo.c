@@ -156,12 +156,8 @@ static tb_demo_t g_demo[] =
 
     // platform
 ,   TB_DEMO_MAIN_ITEM(platform_file)
-,   TB_DEMO_MAIN_ITEM(platform_lock)
 ,   TB_DEMO_MAIN_ITEM(platform_path)
-,   TB_DEMO_MAIN_ITEM(platform_event)
 ,   TB_DEMO_MAIN_ITEM(platform_utils)
-,   TB_DEMO_MAIN_ITEM(platform_timer)
-,   TB_DEMO_MAIN_ITEM(platform_ltimer)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic)
 ,   TB_DEMO_MAIN_ITEM(platform_process)
 ,   TB_DEMO_MAIN_ITEM(platform_barrier)
@@ -171,12 +167,18 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_processor)
 ,   TB_DEMO_MAIN_ITEM(platform_backtrace)
 ,   TB_DEMO_MAIN_ITEM(platform_directory)
-,   TB_DEMO_MAIN_ITEM(platform_exception)
-,   TB_DEMO_MAIN_ITEM(platform_semaphore)
 ,   TB_DEMO_MAIN_ITEM(platform_cache_time)
 ,   TB_DEMO_MAIN_ITEM(platform_environment)
+#ifdef TB_CONFIG_MODULE_HAVE_THREAD
+,   TB_DEMO_MAIN_ITEM(platform_lock)
+,   TB_DEMO_MAIN_ITEM(platform_timer)
+,   TB_DEMO_MAIN_ITEM(platform_ltimer)
+,   TB_DEMO_MAIN_ITEM(platform_event)
+,   TB_DEMO_MAIN_ITEM(platform_exception)
+,   TB_DEMO_MAIN_ITEM(platform_semaphore)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_store)
+#endif
 
     // container
 ,   TB_DEMO_MAIN_ITEM(container_heap)

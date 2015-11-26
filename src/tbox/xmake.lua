@@ -21,7 +21,7 @@ add_option("info")
     add_option_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "object", "network", "charset", "database"}) do
+for _, module in ipairs({"xml", "zip", "asio", "object", "thread", "network", "charset", "database"}) do
     add_option(module)
     set_option_enable(true)
     set_option_showmenu(true)
@@ -57,7 +57,7 @@ add_target("tbox")
     add_headers("../(tbox/utils/impl/*.h)")
 
     -- add modules
-    add_options("info", "float", "xml", "zip", "asio", "object", "network", "charset", "database")
+    add_options("info", "float", "xml", "zip", "asio", "object", "thread", "network", "charset", "database")
 
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "base")
@@ -73,7 +73,7 @@ add_target("tbox")
     add_files("prefix/**.c") 
     add_files("memory/**.c") 
     add_files("string/**.c") 
-    add_files("stream/**.c|**/charset.c|**/zip.c|**async_**.c|transfer_pool.c|impl/stream/http.c|impl/stream/sock.c") 
+    add_files("stream/**.c|**/charset.c|**/zip.c|**async_**.c|transfer_pool.c|impl/stream/http.c|impl/stream/sock.c|impl/filter/chunked.c") 
     add_files("algorithm/**.c") 
     add_files("container/**.c") 
     add_files("libm/libm.c") 
@@ -82,7 +82,7 @@ add_target("tbox")
     add_files("libm/isqrti.c") 
     add_files("libm/isqrti64.c") 
     add_files("libm/idivi8.c") 
-    add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c")
+    add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c|thread*.c|event.c|semaphore.c|mutex.c|timer.c|ltimer.c")
 
     -- add the source files for arm
     if archs("arm.*") then
@@ -105,6 +105,7 @@ add_target("tbox")
         add_files("platform/socket.c") 
         add_files("stream/impl/stream/http.c") 
         add_files("stream/impl/stream/sock.c") 
+        add_files("stream/impl/filter/chunked.c") 
         add_files("network/**.c|impl/ssl/*.c") 
     else
         add_files("network/url.c") 
@@ -124,6 +125,16 @@ add_target("tbox")
         add_files("stream/transfer_pool.c")
         add_files("platform/aicp.c")
         if options("openssl", "polarssl") then add_files("asio/ssl.c") end
+    end
+
+    -- add the source files for the thread module
+    if options("thread") then
+        add_files("platform/thread*.c") 
+        add_files("platform/event.c") 
+        add_files("platform/mutex.c") 
+        add_files("platform/semaphore.c") 
+        add_files("platform/timer.c") 
+        add_files("platform/ltimer.c") 
     end
 
     -- add the source files for the object module
