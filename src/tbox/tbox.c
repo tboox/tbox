@@ -179,7 +179,9 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_byte_t* da
     if (!tb_libm_init()) return tb_false;
 
     // init network 
+#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
     if (!tb_network_init()) return tb_false;
+#endif
 
     // init object
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
@@ -213,7 +215,9 @@ tb_void_t tb_exit()
 #endif
     
     // exit network
+#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
     tb_network_exit();
+#endif
      
     // exit libm
     tb_libm_exit();

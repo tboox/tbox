@@ -36,7 +36,6 @@ add_target("demo")
     add_files("other/*.c|charset.c") 
     add_files("string/*.c") 
     add_files("memory/**.c") 
-    add_files("network/**.c") 
     add_files("platform/*.c") 
     add_files("container/*.c") 
     add_files("algorithm/*.c") 
@@ -53,6 +52,11 @@ add_target("demo")
     -- add the source files for the xml module
     if options("xml") then
         add_files("xml/*.c")
+    end
+
+    -- add the source files for the network type
+    if options("network") then
+        add_files("network/**.c") 
     end
 
     -- add the source files for the asio module
