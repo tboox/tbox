@@ -26,7 +26,7 @@
  * includes
  */
 #include "time.h"
-#ifdef TB_CONFIG_LIBC_HAVE_GMTIME
+#ifdef TB_CONFIG_LIBC_HAVE_MKTIME
 #   include <time.h>
 #endif
 
@@ -39,7 +39,7 @@ tb_time_t tb_mktime(tb_tm_t const* tm)
     // check
     tb_assert_and_check_return_val(tm, -1);
 
-#ifdef TB_CONFIG_LIBC_HAVE_GMTIME
+#ifdef TB_CONFIG_LIBC_HAVE_MKTIME
     // init
     struct tm t = {0};
     t.tm_sec = tm->second;

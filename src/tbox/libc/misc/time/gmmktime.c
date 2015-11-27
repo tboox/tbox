@@ -36,6 +36,7 @@ tb_time_t tb_gmmktime(tb_tm_t const* tm)
     // check
     tb_assert_and_check_return_val(tm, -1);
 
+    // done
     tb_long_t y = tm->year;
     tb_long_t m = tm->month;
     tb_long_t d = tm->mday;
