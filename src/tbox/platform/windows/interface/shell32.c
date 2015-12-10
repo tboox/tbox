@@ -59,7 +59,7 @@ tb_shell32_ref_t tb_shell32()
     static tb_shell32_t     s_shell32 = {0};
 
     // init the static instance
-    tb_singleton_static_init(&s_binited, &s_shell32, tb_shell32_instance_init);
+    tb_singleton_static_init(&s_binited, &s_shell32, tb_shell32_instance_init, tb_null);
 
     // ok
     return &s_shell32;

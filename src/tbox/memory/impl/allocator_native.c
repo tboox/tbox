@@ -72,11 +72,12 @@ static tb_bool_t tb_allocator_native_instance_init(tb_handle_t instance, tb_cpoi
     if (!tb_native_memory_init()) return tb_false;
 
     // init allocator
-    allocator->malloc   = tb_allocator_native_malloc;
-    allocator->ralloc   = tb_allocator_native_ralloc;
-    allocator->free     = tb_allocator_native_free;
+    allocator->type         = TB_ALLOCATOR_NATIVE;
+    allocator->malloc       = tb_allocator_native_malloc;
+    allocator->ralloc       = tb_allocator_native_ralloc;
+    allocator->free         = tb_allocator_native_free;
 #ifdef __tb_debug__
-    allocator->dump     = tb_null;
+    allocator->dump         = tb_null;
 #endif
 
     // ok

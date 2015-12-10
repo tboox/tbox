@@ -50,6 +50,14 @@ tb_allocator_ref_t tb_allocator()
 {
     return g_allocator;
 }
+tb_size_t tb_allocator_type(tb_allocator_ref_t allocator)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, TB_ALLOCATOR_DEFAULT);
+
+    // get it
+    return allocator->type;
+}
 tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__)
 {
     // check

@@ -138,11 +138,12 @@ static tb_handle_t tb_allocator_buffer_instance_init(tb_cpointer_t* ppriv)
         tb_assert_and_check_break(allocator); 
 
         // init allocator
-        allocator->base.malloc   = tb_allocator_buffer_malloc;
-        allocator->base.ralloc   = tb_allocator_buffer_ralloc;
-        allocator->base.free     = tb_allocator_buffer_free;
+        allocator->base.type    = TB_ALLOCATOR_BUFFER;
+        allocator->base.malloc  = tb_allocator_buffer_malloc;
+        allocator->base.ralloc  = tb_allocator_buffer_ralloc;
+        allocator->base.free    = tb_allocator_buffer_free;
 #ifdef __tb_debug__
-        allocator->base.dump     = tb_allocator_buffer_dump;
+        allocator->base.dump    = tb_allocator_buffer_dump;
 #endif
 
         // save pool

@@ -60,7 +60,7 @@ tb_iphlpapi_ref_t tb_iphlpapi()
     static tb_iphlpapi_t    s_iphlpapi = {0};
 
     // init the static instance
-    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_iphlpapi, tb_iphlpapi_instance_init);
+    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_iphlpapi, tb_iphlpapi_instance_init, tb_null);
     tb_assert(ok); tb_used(ok);
 
     // ok

@@ -450,8 +450,11 @@ static tb_static_large_data_head_t* tb_static_large_pool_malloc_done(tb_static_l
         base_head->debug.func      = func_;
         base_head->debug.line      = (tb_uint16_t)line_;
 
+        // calculate the skip frames
+        tb_size_t skip_nframe = tb_allocator()? (tb_allocator_type(tb_allocator()) == TB_ALLOCATOR_DEFAULT? 6 : 5) : 3;
+
         // save backtrace
-        tb_pool_data_save_backtrace(&base_head->debug, 3);
+        tb_pool_data_save_backtrace(&base_head->debug, skip_nframe);
 
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, size_real + patch);
@@ -569,8 +572,11 @@ static tb_static_large_data_head_t* tb_static_large_pool_ralloc_fast(tb_static_l
         base_head->debug.func      = func_;
         base_head->debug.line      = (tb_uint16_t)line_;
 
+        // calculate the skip frames
+        tb_size_t skip_nframe = tb_allocator()? (tb_allocator_type(tb_allocator()) == TB_ALLOCATOR_DEFAULT? 6 : 5) : 3;
+
         // save backtrace
-        tb_pool_data_save_backtrace(&base_head->debug, 3);
+        tb_pool_data_save_backtrace(&base_head->debug, skip_nframe);
 
         // make the dirty data 
         if (size_real > prev_size) tb_memset_((tb_byte_t*)&(data_head[1]) + prev_size, TB_POOL_DATA_PATCH, size_real - prev_size);

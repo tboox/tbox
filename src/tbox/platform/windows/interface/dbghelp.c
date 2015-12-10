@@ -66,7 +66,7 @@ tb_dbghelp_ref_t tb_dbghelp()
     static tb_dbghelp_t     s_dbghelp = {0};
 
     // init the static instance
-    tb_singleton_static_init(&s_binited, &s_dbghelp, tb_dbghelp_instance_init);
+    tb_singleton_static_init(&s_binited, &s_dbghelp, tb_dbghelp_instance_init, tb_null);
 
     // ok
     return &s_dbghelp;
