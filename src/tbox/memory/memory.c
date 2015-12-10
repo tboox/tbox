@@ -32,6 +32,7 @@
  * includes
  */
 #include "memory.h"
+#include "allocator.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -41,16 +42,10 @@
 // the allocator 
 __tb_extern_c__ extern tb_allocator_ref_t   g_allocator;
 
-// the large pool data
-__tb_extern_c__ extern tb_byte_t*           g_large_pool_data;
-
-// the large pool size
-__tb_extern_c__ extern tb_size_t            g_large_pool_size;
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_memory_init(tb_allocator_ref_t allocator, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_memory_init(tb_allocator_ref_t allocator)
 {
     // done
     tb_bool_t ok = tb_false;
@@ -63,14 +58,8 @@ tb_bool_t tb_memory_init(tb_allocator_ref_t allocator, tb_byte_t* data, tb_size_
         if (!tb_native_memory_init()) break;
 
         // init the allocator
-        g_allocator = allocator;
-
-        // init the large pool data
-        g_large_pool_data = data;
-        g_large_pool_size = size;
-
-        // init the pool
-        tb_assert_and_check_break(tb_pool());
+        g_allocator = allocator? allocator : tb_allocator_default(tb_null, 0);
+        tb_assert_and_check_break(g_allocator);
 
         // ok
         ok = tb_true;
@@ -85,6 +74,11 @@ tb_bool_t tb_memory_init(tb_allocator_ref_t allocator, tb_byte_t* data, tb_size_
 }
 tb_void_t tb_memory_exit()
 {
+    // dump allocator
+#ifdef __tb_debug__
+    tb_allocator_dump(tb_allocator());
+#endif
+
     // exit the native memory
     tb_native_memory_exit();
 

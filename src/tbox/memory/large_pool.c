@@ -43,41 +43,8 @@
 #define tb_large_pool_is_native(pool)        (((tb_size_t)(pool)) & 0x1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * globals
- */
-
-// the large pool data
-__tb_extern_c__ tb_byte_t*          g_large_pool_data = tb_null;
-
-// the large pool size
-__tb_extern_c__ tb_size_t           g_large_pool_size = 0;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * instance implementation
- */
-static tb_handle_t tb_large_pool_instance_init(tb_cpointer_t* ppriv)
-{
-    // init it
-    return tb_large_pool_init(g_large_pool_data, g_large_pool_size);
-}
-static tb_void_t tb_large_pool_instance_exit(tb_handle_t pool, tb_cpointer_t priv)
-{
-#ifdef __tb_debug__
-    // dump it
-    tb_large_pool_dump((tb_large_pool_ref_t)pool);
-#endif
-
-    // exit it
-    tb_large_pool_exit((tb_large_pool_ref_t)pool);
-}
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_large_pool_ref_t tb_large_pool()
-{
-    return (tb_large_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_LARGE_POOL, tb_large_pool_instance_init, tb_large_pool_instance_exit, tb_null);
-}
 tb_large_pool_ref_t tb_large_pool_init(tb_byte_t* data, tb_size_t size)
 {
     // init pool

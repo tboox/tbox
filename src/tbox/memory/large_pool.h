@@ -77,12 +77,6 @@ typedef struct{}*       tb_large_pool_ref_t;
  * interfaces
  */
 
-/*! the large pool instance
- * 
- * @return              the pool 
- */
-tb_large_pool_ref_t     tb_large_pool(tb_noarg_t);
-
 /*! init the large pool
  * 
  * @param data          the pool data, using the native memory if be null

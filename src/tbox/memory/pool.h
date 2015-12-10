@@ -84,20 +84,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! the pool instance
- * 
- * @return              the pool 
- */
-tb_pool_ref_t           tb_pool();
-
 /*! init the pool
  * 
- * @param allocator     the allocator, uses large pool if be null
- * @param large_pool    the large pool, uses the default large pool if be null
+ * @param large_pool    the large pool
  *
  * @return              the pool 
  */
-tb_pool_ref_t           tb_pool_init(tb_allocator_ref_t allocator, tb_large_pool_ref_t large_pool);
+tb_pool_ref_t           tb_pool_init(tb_large_pool_ref_t large_pool);
 
 /*! exit the pool
  *
@@ -161,67 +154,6 @@ tb_pointer_t            tb_pool_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, t
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_pool_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
-
-/*! align malloc data
- *
- * @param pool          the pool 
- * @param size          the size
- * @param align         the alignment bytes
- *
- * @return              the data address
- */
-tb_pointer_t            tb_pool_align_malloc_(tb_pool_ref_t pool, tb_size_t size, tb_size_t align __tb_debug_decl__);
-
-/*! align malloc data and fill zero 
- *
- * @param pool          the pool 
- * @param size          the size 
- * @param align         the alignment bytes
- *
- * @return              the data address
- */
-tb_pointer_t            tb_pool_align_malloc0_(tb_pool_ref_t pool, tb_size_t size, tb_size_t align __tb_debug_decl__);
-
-/*! align malloc data with the item count
- *
- * @param pool          the pool 
- * @param item          the item count
- * @param size          the item size 
- * @param align         the alignment bytes
- *
- * @return              the data address
- */
-tb_pointer_t            tb_pool_align_nalloc_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__);
-
-/*! align malloc data with the item count and fill zero
- *
- * @param pool          the pool 
- * @param item          the item count
- * @param size          the item size 
- * @param align         the alignment bytes
- *
- * @return              the data address
- */
-tb_pointer_t            tb_pool_align_nalloc0_(tb_pool_ref_t pool, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__);
-
-/*! align realloc data
- *
- * @param pool          the pool 
- * @param data          the data address
- * @param size          the data size
- *
- * @return              the new data address
- */
-tb_pointer_t            tb_pool_align_ralloc_(tb_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__);
-
-/*! align free data
- *
- * @param pool          the pool 
- * @param data          the data address
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_pool_align_free_(tb_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! dump the pool

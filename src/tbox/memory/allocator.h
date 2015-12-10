@@ -38,14 +38,23 @@ __tb_extern_c_enter__
  * macros
  */
 
-#define tb_allocator_malloc(allocator, size)              tb_allocator_malloc_(allocator, size __tb_debug_vals__)
-#define tb_allocator_malloc0(allocator, size)             tb_allocator_malloc0_(allocator, size __tb_debug_vals__)
+#define tb_allocator_malloc(allocator, size)                        tb_allocator_malloc_(allocator, size __tb_debug_vals__)
+#define tb_allocator_malloc0(allocator, size)                       tb_allocator_malloc0_(allocator, size __tb_debug_vals__)
 
-#define tb_allocator_nalloc(allocator, item, size)        tb_allocator_nalloc_(allocator, item, size __tb_debug_vals__)
-#define tb_allocator_nalloc0(allocator, item, size)       tb_allocator_nalloc0_(allocator, item, size __tb_debug_vals__)
+#define tb_allocator_nalloc(allocator, item, size)                  tb_allocator_nalloc_(allocator, item, size __tb_debug_vals__)
+#define tb_allocator_nalloc0(allocator, item, size)                 tb_allocator_nalloc0_(allocator, item, size __tb_debug_vals__)
 
-#define tb_allocator_ralloc(allocator, data, size)        tb_allocator_ralloc_(allocator, (tb_pointer_t)(data), size __tb_debug_vals__)
-#define tb_allocator_free(allocator, data)                tb_allocator_free_(allocator, (tb_pointer_t)(data) __tb_debug_vals__)
+#define tb_allocator_ralloc(allocator, data, size)                  tb_allocator_ralloc_(allocator, (tb_pointer_t)(data), size __tb_debug_vals__)
+#define tb_allocator_free(allocator, data)                          tb_allocator_free_(allocator, (tb_pointer_t)(data) __tb_debug_vals__)
+
+#define tb_allocator_align_malloc(allocator, size, align)           tb_allocator_align_malloc_(allocator, size, align __tb_debug_vals__)
+#define tb_allocator_align_malloc0(allocator, size, align)          tb_allocator_align_malloc0_(allocator, size, align __tb_debug_vals__)
+
+#define tb_allocator_align_nalloc(allocator, item, size, align)     tb_allocator_align_nalloc_(allocator, item, size, align __tb_debug_vals__)
+#define tb_allocator_align_nalloc0(allocator, item, size, align)    tb_allocator_align_nalloc0_(allocator, item, size, align __tb_debug_vals__)
+
+#define tb_allocator_align_ralloc(allocator, data, size, align)     tb_allocator_align_ralloc_(allocator, (tb_pointer_t)(data), size, align __tb_debug_vals__)
+#define tb_allocator_align_free(allocator, data)                    tb_allocator_align_free_(allocator, (tb_pointer_t)(data) __tb_debug_vals__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -96,11 +105,48 @@ typedef struct __tb_allocator_t
  * interfaces
  */
 
+/*! the allocator
+ *
+ * @return              the allocator
+ */
+tb_allocator_ref_t      tb_allocator();
+
 /*! the native allocator
+ *
+ * uses system memory directly 
  *
  * @return              the allocator
  */
 tb_allocator_ref_t      tb_allocator_native(tb_noarg_t);
+
+/*! the buffer allocator for the small buffer
+ *
+ * uses static_allocator for managing memory
+ *
+ * @param data          the buffer data
+ * @param size          the buffer size
+ *
+ * @return              the allocator
+ */
+tb_allocator_ref_t      tb_allocator_buffer(tb_byte_t* data, tb_size_t size);
+
+/*! the default allocator for the large buffer
+ *
+ * uses large_allocator and small_allocator for managing memory
+ * and supports memory error detecting after calling tb_exit(). 
+ *
+ * it can detect the following types of bugs for the debug mode:
+ * - out-of-bounds accesses to heap and globals
+ * - use-after-free
+ * - double-free, invalid free
+ * - memory leaks
+ *
+ * @param data          the buffer data, uses the native buffer if be null
+ * @param size          the buffer size
+ *
+ * @return              the allocator
+ */
+tb_allocator_ref_t      tb_allocator_default(tb_byte_t* data, tb_size_t size);
 
 /*! malloc data
  *
@@ -158,6 +204,67 @@ tb_pointer_t            tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_po
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__);
+
+/*! align malloc data
+ *
+ * @param allocator     the allocator 
+ * @param size          the size
+ * @param align         the alignment bytes
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_align_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t align __tb_debug_decl__);
+
+/*! align malloc data and fill zero 
+ *
+ * @param allocator     the allocator 
+ * @param size          the size 
+ * @param align         the alignment bytes
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_align_malloc0_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t align __tb_debug_decl__);
+
+/*! align malloc data with the item count
+ *
+ * @param allocator     the allocator 
+ * @param item          the item count
+ * @param size          the item size 
+ * @param align         the alignment bytes
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_align_nalloc_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__);
+
+/*! align malloc data with the item count and fill zero
+ *
+ * @param allocator     the allocator 
+ * @param item          the item count
+ * @param size          the item size 
+ * @param align         the alignment bytes
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_align_nalloc0_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__);
+
+/*! align realloc data
+ *
+ * @param allocator     the allocator 
+ * @param data          the data address
+ * @param size          the data size
+ *
+ * @return              the new data address
+ */
+tb_pointer_t            tb_allocator_align_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__);
+
+/*! align free data
+ *
+ * @param allocator     the allocator 
+ * @param data          the data address
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_allocator_align_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
 /*! dump it

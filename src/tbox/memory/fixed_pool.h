@@ -139,7 +139,7 @@ typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t data, tb_
 
 /*! init fixed pool
  *
- * @param large_pool    the large pool, using the default large pool if be null
+ * @param large_pool    the large pool
  * @param slot_size     the item count per-slot, using the default size if be zero
  * @param item_size     the item size
  * @param item_init     the item init func

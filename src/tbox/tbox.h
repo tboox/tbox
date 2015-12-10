@@ -86,7 +86,7 @@ __tb_extern_c_enter__
     int main(int argc, char** argv)
     {
         // init tbox
-        if (!tb_init(tb_null, tb_null, tb_null, 0)) return 0;
+        if (!tb_init(tb_null, tb_null)) return 0;
 
         // print info with tag
         tb_trace_i("hello tbox");
@@ -125,7 +125,7 @@ __tb_extern_c_enter__
     }
  * @endcode
  */
-#define tb_init(priv, allocator, data, size)     tb_init_(priv, allocator, data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD)
+#define tb_init(priv, allocator)     tb_init_(priv, allocator, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -136,15 +136,17 @@ __tb_extern_c_enter__
  * @param priv      the platform private data
  *                  pass JavaVM* jvm for android jni
  *                  pass tb_null for other platform
- * @param allocator the allocator, uses data and size if be null
- * @param data      the memory data for the memory pool, uses the native memory if be tb_null
- * @param size      the memory size for the memory pool, uses the native memory if be zero
+ * @param allocator the allocator, supports:
+ *                  - tb_allocator_native(): uses native system memory directly
+ *                  - tb_allocator_buffer(data, size): uses the a static small buffer and we can check memory error and leaking
+ *                  - tb_allocator_default(data, size): uses the pool and we can check memory error and leaking
+ *                  - tb_allocator_default(tb_null, 0): uses it if the allocator is null
  * @param mode      the compile mode for check __tb_small__ and __tb_debug__
  * @param build     the build version
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build);
+tb_bool_t           tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mode, tb_hize_t build);
 
 /// exit the tbox library
 tb_void_t           tb_exit(tb_noarg_t);
