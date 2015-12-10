@@ -52,9 +52,9 @@ __tb_extern_c_enter__
  *
  * <pre>
  *
- *  ----------------      -------------------------------------------------------      ----------------------
- * | native memory  | or |                         data                          | -> |     static_pool      |
- *  ----------------      -------------------------------------------------------      ----------------------
+ *  ----------------      -------------------------------------------------------      ----------------------      ---------------------
+ * | native memory  | or |                         data                          | <- |     static pool      | <- |  buffer allocator   |
+ *  ----------------      -------------------------------------------------------      ----------------------      ---------------------
  *         |             if data be null             |
  *         `---------------------------------------> |
  *                                                   |
@@ -96,7 +96,7 @@ __tb_extern_c_enter__
  *  ------------------------------------------------------------------------------
  *                                       |                                                  
  *  ------------------------------------------------------------------------------         
- * |                        malloc, nalloc, strdup, free ...                      |
+ * |                               default allocator                              |
  *  ------------------------------------------------------------------------------ 
  *                                                                     |
  *                                                          ---------------------- 
@@ -112,13 +112,11 @@ __tb_extern_c_enter__
 
 /*! init memory
  *
- * @param allocator     the allocator, uses data and size if be null
- * @param data          the memory pool data
- * @param size          the memory pool size
+ * @param allocator     the allocator
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_memory_init(tb_allocator_ref_t allocator, tb_byte_t* data, tb_size_t size);
+tb_bool_t               tb_memory_init(tb_allocator_ref_t allocator);
 
 /// exit memory
 tb_void_t               tb_memory_exit(tb_noarg_t);

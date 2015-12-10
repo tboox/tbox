@@ -52,6 +52,9 @@ tb_bool_t tb_native_memory_init()
     tb_bool_t ok = tb_false;
     do
     {
+        // have been inited?
+        tb_check_break_state(!g_heap, ok, tb_true);
+
         // make heap
         g_heap = (tb_handle_t)HeapCreate(0, 0, 0);
         tb_check_break(g_heap);

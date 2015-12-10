@@ -50,73 +50,24 @@ typedef struct __tb_pool_t
     // the small pool
     tb_small_pool_ref_t     small_pool;
 
-    // the allocator
-    tb_allocator_ref_t      allocator;
-
     // the lock
     tb_spinlock_t           lock;
 
 }tb_pool_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * globals
- */
-
-// the allocator 
-__tb_extern_c__ tb_allocator_ref_t  g_allocator = tb_null;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
- */
-static tb_handle_t tb_pool_instance_init(tb_cpointer_t* ppriv)
-{
-    // init it
-    return tb_pool_init(g_allocator, tb_null);
-}
-static tb_void_t tb_pool_instance_exit(tb_handle_t pool, tb_cpointer_t priv)
-{
-#ifdef __tb_debug__
-    // dump it
-    tb_pool_dump((tb_pool_ref_t)pool);
-#endif
-
-    // exit it
-    tb_pool_exit((tb_pool_ref_t)pool);
-}
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_pool_ref_t tb_pool()
+tb_pool_ref_t tb_pool_init(tb_large_pool_ref_t large_pool)
 {
-    return (tb_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_POOL, tb_pool_instance_init, tb_pool_instance_exit, tb_null);
-}
-tb_pool_ref_t tb_pool_init(tb_allocator_ref_t allocator, tb_large_pool_ref_t large_pool)
-{
+    // check
+    tb_assert_and_check_return_val(large_pool, tb_null);
+
     // done
     tb_bool_t   ok = tb_false;
     tb_pool_t*  pool = tb_null;
     do
     {
-        // uses allocator?
-        if (allocator)
-        {
-            // make pool
-            pool = (tb_pool_t*)tb_allocator_malloc0(allocator, sizeof(tb_pool_t));
-            tb_assert_and_check_break(pool);
-
-            // save allocator
-            pool->allocator = allocator;
-
-            // ok
-            ok = tb_true;
-            break;
-        }
-
-        // using the default large pool 
-        if (!large_pool) large_pool = tb_large_pool();
-        tb_assert_and_check_break(large_pool);
-
         // make pool
         pool = (tb_pool_t*)tb_large_pool_malloc0(large_pool, sizeof(tb_pool_t), tb_null);
         tb_assert_and_check_break(pool);
@@ -155,14 +106,6 @@ tb_void_t tb_pool_exit(tb_pool_ref_t self)
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return(pool);
 
-    // uses allocator?
-    if (pool->allocator)
-    {
-        // exit it
-        tb_allocator_free(pool->allocator, pool);
-        return ;
-    }
-
     // enter
     tb_spinlock_enter(&pool->lock);
 
@@ -184,9 +127,6 @@ tb_pointer_t tb_pool_malloc_(tb_pool_ref_t self, tb_size_t size __tb_debug_decl_
     // check
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return_val(pool, tb_null);
- 
-    // uses allocator?
-    if (pool->allocator) return tb_allocator_malloc_(pool->allocator, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
@@ -208,10 +148,7 @@ tb_pointer_t tb_pool_malloc0_(tb_pool_ref_t self, tb_size_t size __tb_debug_decl
     // check
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return_val(pool, tb_null);
-    
-    // uses allocator?
-    if (pool->allocator) return tb_allocator_malloc0_(pool->allocator, size __tb_debug_args__);
-
+   
     // check
     tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
 
@@ -232,9 +169,6 @@ tb_pointer_t tb_pool_nalloc_(tb_pool_ref_t self, tb_size_t item, tb_size_t size 
     // check
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return_val(pool, tb_null);
- 
-    // uses allocator?
-    if (pool->allocator) return tb_allocator_nalloc_(pool->allocator, item, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
@@ -256,9 +190,6 @@ tb_pointer_t tb_pool_nalloc0_(tb_pool_ref_t self, tb_size_t item, tb_size_t size
     // check
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return_val(pool, tb_null);
- 
-    // uses allocator?
-    if (pool->allocator) return tb_allocator_nalloc0_(pool->allocator, item, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
@@ -280,9 +211,6 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t self, tb_pointer_t data, tb_size_t si
     // check
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return_val(pool, tb_null);
- 
-    // uses allocator?
-    if (pool->allocator) return tb_allocator_ralloc_(pool->allocator, data, size __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(pool && pool->large_pool && pool->small_pool && size, tb_null);
@@ -367,9 +295,6 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t self, tb_pointer_t data __tb_debug_decl__)
     // check
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return_val(pool, tb_false);
- 
-    // uses allocator?
-    if (pool->allocator) return tb_allocator_free_(pool->allocator, data __tb_debug_args__);
 
     // check
     tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && data, tb_false);
@@ -411,135 +336,12 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t self, tb_pointer_t data __tb_debug_decl__)
     // ok?
     return ok;
 }
-tb_pointer_t tb_pool_align_malloc_(tb_pool_ref_t self, tb_size_t size, tb_size_t align __tb_debug_decl__)
-{
-    // check
-    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
-    tb_check_return_val(!(align & 3), tb_null);
-
-    // malloc it
-    tb_byte_t* data = (tb_byte_t*)tb_pool_malloc_(self, size + align __tb_debug_args__);
-    tb_check_return_val(data, tb_null);
-
-    // the different bytes
-    tb_byte_t diff = (tb_byte_t)((~(tb_long_t)data) & (align - 1)) + 1;
-
-    // adjust the address
-    data += diff;
-
-    // check
-    tb_assert_abort(!((tb_size_t)data & (align - 1)));
-
-    // save the different bytes
-    data[-1] = diff;
-
-    // ok?
-    return (tb_pointer_t)data;
-}
-tb_pointer_t tb_pool_align_malloc0_(tb_pool_ref_t self, tb_size_t size, tb_size_t align __tb_debug_decl__)
-{
-    // malloc it
-    tb_pointer_t data = tb_pool_align_malloc_(self, size, align __tb_debug_args__);
-    tb_assert_and_check_return_val(data, tb_null);
-
-    // clear it
-    tb_memset(data, 0, size);
-
-    // ok
-    return data;
-}
-tb_pointer_t tb_pool_align_nalloc_(tb_pool_ref_t self, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__)
-{
-    return tb_pool_align_malloc_(self, item * size, align __tb_debug_args__);
-}
-tb_pointer_t tb_pool_align_nalloc0_(tb_pool_ref_t self, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__)
-{
-    // nalloc it
-    tb_pointer_t data = tb_pool_align_nalloc_(self, item, size, align __tb_debug_args__);
-    tb_assert_and_check_return_val(data, tb_null);
-
-    // clear it
-    tb_memset(data, 0, item * size);
-
-    // ok
-    return data;
-}
-tb_pointer_t tb_pool_align_ralloc_(tb_pool_ref_t self, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__)
-{
-    // check align
-    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
-    tb_check_return_val(!(align & 3), tb_null);
-
-    // ralloc?
-    tb_byte_t diff = 0;
-    if (data)
-    {
-        // check address 
-        tb_assertf_abort(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
-        tb_check_return_val(!((tb_size_t)data & (align - 1)), tb_null);
-
-        // the different bytes
-        diff = ((tb_byte_t*)data)[-1];
-
-        // adjust the address
-        data = (tb_byte_t*)data - diff;
-
-        // ralloc it
-        data = tb_pool_ralloc_(self, data, size + align __tb_debug_args__);
-        tb_check_return_val(data, tb_null);
-    }
-    // no data?
-    else
-    {
-        // malloc it directly
-        data = tb_pool_malloc_(self, size + align __tb_debug_args__);
-        tb_check_return_val(data, tb_null);
-    }
-
-    // the different bytes
-    diff = (tb_byte_t)((~(tb_long_t)data) & (align - 1)) + 1;
-
-    // adjust the address
-    data = (tb_byte_t*)data + diff;
-
-    // check
-    tb_assert_abort(!((tb_size_t)data & (align - 1)));
-
-    // save the different bytes
-    ((tb_byte_t*)data)[-1] = diff;
-
-    // ok?
-    return data;
-}
-tb_bool_t tb_pool_align_free_(tb_pool_ref_t self, tb_pointer_t data __tb_debug_decl__)
-{
-    // check
-    tb_assert_and_check_return_val(data, tb_false);
-    tb_assert_abort(!((tb_size_t)data & 3));
-
-    // the different bytes
-    tb_byte_t diff = ((tb_byte_t*)data)[-1];
-
-    // adjust the address
-    data = (tb_byte_t*)data - diff;
-
-    // free it
-    return tb_pool_free_(self, data __tb_debug_args__);
-}
 #ifdef __tb_debug__
 tb_void_t tb_pool_dump(tb_pool_ref_t self)
 {
     // check
     tb_pool_t* pool = (tb_pool_t*)self;
     tb_assert_and_check_return(pool);
-
-    // uses allocator?
-    if (pool->allocator)
-    {
-        // dump it
-        tb_allocator_dump(pool->allocator);
-        return ;
-    }
 
     // check
     tb_assert_and_check_return(pool->large_pool && pool->small_pool);

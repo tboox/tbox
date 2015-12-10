@@ -203,15 +203,14 @@ static tb_bool_t tb_small_pool_item_check(tb_pointer_t data, tb_cpointer_t priv)
  */
 tb_small_pool_ref_t tb_small_pool_init(tb_large_pool_ref_t large_pool)
 {
+    // check
+    tb_assert_and_check_return_val(large_pool, tb_null);
+
     // done
     tb_bool_t               ok = tb_false;
     tb_small_pool_impl_t*   impl = tb_null;
     do
     {
-        // using the default large pool 
-        if (!large_pool) large_pool = tb_large_pool();
-        tb_assert_and_check_break(large_pool);
-
         // make pool
         impl = (tb_small_pool_impl_t*)tb_large_pool_malloc0(large_pool, sizeof(tb_small_pool_impl_t), tb_null);
         tb_assert_and_check_break(impl);

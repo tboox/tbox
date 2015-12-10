@@ -27,6 +27,7 @@
  * includes
  */
 #include "../prefix.h"
+#include "../allocator.h"
 #include "../large_pool.h"
 #include "../../libc/libc.h"
 #include "../../math/math.h"

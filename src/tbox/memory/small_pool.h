@@ -94,7 +94,7 @@ typedef struct{}*       tb_small_pool_ref_t;
 
 /*! init the small pool only for size <=3KB
  * 
- * @param large_pool    the large pool, using the default large pool if be null
+ * @param large_pool    the large pool
  *
  * @return              the pool 
  */

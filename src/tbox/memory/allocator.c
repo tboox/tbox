@@ -37,64 +37,18 @@
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
+ * globals
  */
-static tb_pointer_t tb_allocator_native_malloc(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__)
-{
-    // trace
-    tb_trace_d("malloc(%lu) at %s(): %lu, %s", size, func_, line_, file_);
 
-    // malloc it
-    return tb_native_memory_malloc(size);
-}
-static tb_pointer_t tb_allocator_native_ralloc(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
-{
-    // trace
-    tb_trace_d("ralloc(%p, %lu) at %s(): %lu, %s", data, size, func_, line_, file_);
-
-    // ralloc it
-    return tb_native_memory_ralloc(data, size);
-}
-static tb_bool_t tb_allocator_native_free(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
-{
-    // trace    
-    tb_trace_d("free(%p) at %s(): %lu, %s", data, func_, line_, file_);
-
-    // free it
-    return tb_native_memory_free(data);
-}
-static tb_bool_t tb_allocator_native_instance_init(tb_handle_t instance)
-{
-    // check
-    tb_allocator_ref_t allocator = (tb_allocator_ref_t)instance;
-    tb_check_return_val(allocator, tb_false);
-
-    // init allocator
-    allocator->malloc   = tb_allocator_native_malloc;
-    allocator->ralloc   = tb_allocator_native_ralloc;
-    allocator->free     = tb_allocator_native_free;
-#ifdef __tb_debug__
-    allocator->dump     = tb_null;
-#endif
-
-    // ok
-    return tb_true;
-}
+// the allocator 
+__tb_extern_c__ tb_allocator_ref_t  g_allocator = tb_null;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_allocator_ref_t tb_allocator_native()
+tb_allocator_ref_t tb_allocator()
 {
-    // init
-    static tb_atomic_t      s_is_inited = 0;
-    static tb_allocator_t   s_allocator = {0};
-
-    // init the static instance
-    tb_singleton_static_init(&s_is_inited, &s_allocator, tb_allocator_native_instance_init);
-
-    // ok
-    return &s_allocator;
+    return g_allocator;
 }
 tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__)
 {
@@ -149,6 +103,121 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
 
     // free it
     return allocator->free(allocator, data __tb_debug_args__);
+}
+tb_pointer_t tb_allocator_align_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // check
+    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
+    tb_check_return_val(!(align & 3), tb_null);
+
+    // malloc it
+    tb_byte_t* data = (tb_byte_t*)tb_allocator_malloc_(allocator, size + align __tb_debug_args__);
+    tb_check_return_val(data, tb_null);
+
+    // the different bytes
+    tb_byte_t diff = (tb_byte_t)((~(tb_long_t)data) & (align - 1)) + 1;
+
+    // adjust the address
+    data += diff;
+
+    // check
+    tb_assert_abort(!((tb_size_t)data & (align - 1)));
+
+    // save the different bytes
+    data[-1] = diff;
+
+    // ok?
+    return (tb_pointer_t)data;
+}
+tb_pointer_t tb_allocator_align_malloc0_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // malloc it
+    tb_pointer_t data = tb_allocator_align_malloc_(allocator, size, align __tb_debug_args__);
+    tb_assert_and_check_return_val(data, tb_null);
+
+    // clear it
+    tb_memset(data, 0, size);
+
+    // ok
+    return data;
+}
+tb_pointer_t tb_allocator_align_nalloc_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    return tb_allocator_align_malloc_(allocator, item * size, align __tb_debug_args__);
+}
+tb_pointer_t tb_allocator_align_nalloc0_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // nalloc it
+    tb_pointer_t data = tb_allocator_align_nalloc_(allocator, item, size, align __tb_debug_args__);
+    tb_assert_and_check_return_val(data, tb_null);
+
+    // clear it
+    tb_memset(data, 0, item * size);
+
+    // ok
+    return data;
+}
+tb_pointer_t tb_allocator_align_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__)
+{
+    // check align
+    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
+    tb_check_return_val(!(align & 3), tb_null);
+
+    // ralloc?
+    tb_byte_t diff = 0;
+    if (data)
+    {
+        // check address 
+        tb_assertf_abort(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
+        tb_check_return_val(!((tb_size_t)data & (align - 1)), tb_null);
+
+        // the different bytes
+        diff = ((tb_byte_t*)data)[-1];
+
+        // adjust the address
+        data = (tb_byte_t*)data - diff;
+
+        // ralloc it
+        data = tb_allocator_ralloc_(allocator, data, size + align __tb_debug_args__);
+        tb_check_return_val(data, tb_null);
+    }
+    // no data?
+    else
+    {
+        // malloc it directly
+        data = tb_allocator_malloc_(allocator, size + align __tb_debug_args__);
+        tb_check_return_val(data, tb_null);
+    }
+
+    // the different bytes
+    diff = (tb_byte_t)((~(tb_long_t)data) & (align - 1)) + 1;
+
+    // adjust the address
+    data = (tb_byte_t*)data + diff;
+
+    // check
+    tb_assert_abort(!((tb_size_t)data & (align - 1)));
+
+    // save the different bytes
+    ((tb_byte_t*)data)[-1] = diff;
+
+    // ok?
+    return data;
+}
+tb_bool_t tb_allocator_align_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(data, tb_false);
+    tb_assert_abort(!((tb_size_t)data & 3));
+
+    // the different bytes
+    tb_byte_t diff = ((tb_byte_t*)data)[-1];
+
+    // adjust the address
+    data = (tb_byte_t*)data - diff;
+
+    // free it
+    return tb_allocator_free_(allocator, data __tb_debug_args__);
 }
 #ifdef __tb_debug__
 tb_void_t tb_allocator_dump(tb_allocator_ref_t allocator)

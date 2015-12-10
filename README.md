@@ -32,8 +32,8 @@ features
 ### the memory library
 -	implements some memory pools for optimizating memory.
 -	supports fast memory error detecting. it can detect the following types of bugs for the debug mode:
- - out-of-bounds accesses to heap and globals
- - use-after-free
+ -  out-of-bounds accesses to heap and globals
+ -  use-after-free
  -	double-free, invalid free
  -	memory leaks
 
@@ -252,14 +252,12 @@ example
          * @param priv      the platform private data
          *                  pass JavaVM* jvm for android jni
          *                  pass tb_null for other platform
-         * @param allocator the allocator, uses data and size if be null
-         * @param data      the memory data for the memory pool, uses the native memory if be tb_null
-         * @param size      the memory size for the memory pool, uses the native memory if be zero
-         *
-         * for android:     tb_init(jvm, tb_null, tb_null, 0)
-         * for memory pool: tb_init(tb_null, tb_null, malloc(10 * 1024 * 1024), 10 * 1024 * 1024);
+         * @param allocator the allocator, supports:
+         *                  - tb_allocator_native(): uses native system memory directly
+         *                  - tb_allocator_buffer(data, size): uses the a static small buffer
+         *                  - tb_allocator_default(data, size): uses it if be null and we can check memory error and leaking
          */
-        if (!tb_init(tb_null, tb_null, tb_null, 0)) return 0;
+        if (!tb_init(tb_null, tb_null)) return 0;
 
         // print info with tag
         tb_trace_i("hello tbox");
