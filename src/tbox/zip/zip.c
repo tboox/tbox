@@ -25,7 +25,6 @@
  * includes
  */
 #include "zip.h"
-#include "rlc.h"
 #include "gzip.h"
 #include "zlib.h"
 #include "zlibraw.h"
@@ -40,10 +39,6 @@ tb_zip_ref_t tb_zip_init(tb_size_t algo, tb_size_t action)
     static tb_zip_ref_t (*s_init[])(tb_size_t action) =
     {
         tb_null
-    ,   tb_zip_rlc_init
-    ,   tb_null
-    ,   tb_null
-    ,   tb_null
 #ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
     ,   tb_zip_zlibraw_init
     ,   tb_zip_zlib_init
@@ -53,7 +48,6 @@ tb_zip_ref_t tb_zip_init(tb_size_t algo, tb_size_t action)
     ,   tb_null
     ,   tb_null
 #endif
-    ,   tb_null
     };
     tb_assert_and_check_return_val(algo < tb_arrayn(s_init) && s_init[algo], tb_null);
 
@@ -69,10 +63,6 @@ tb_void_t tb_zip_exit(tb_zip_ref_t zip)
     static tb_void_t (*s_exit[])(tb_zip_ref_t zip) =
     {
         tb_null
-    ,   tb_zip_rlc_exit
-    ,   tb_null
-    ,   tb_null
-    ,   tb_null
 #ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
     ,   tb_zip_zlibraw_exit
     ,   tb_zip_zlib_exit
@@ -82,7 +72,6 @@ tb_void_t tb_zip_exit(tb_zip_ref_t zip)
     ,   tb_null
     ,   tb_null
 #endif
-    ,   tb_null
     };
     tb_assert_and_check_return(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo]);
 
@@ -91,7 +80,10 @@ tb_void_t tb_zip_exit(tb_zip_ref_t zip)
 }
 tb_long_t tb_zip_spak(tb_zip_ref_t zip, tb_static_stream_ref_t ist, tb_static_stream_ref_t ost, tb_long_t sync)
 {
+    // check
     tb_assert_and_check_return_val(zip && zip->spak && ist && ost, -1);
+
+    // spank it
     return zip->spak(zip, ist, ost, sync);
 }
 
