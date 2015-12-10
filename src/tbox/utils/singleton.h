@@ -41,41 +41,44 @@ __tb_extern_c_enter__
 /// the singleton type enum
 typedef enum __tb_singleton_type_e
 {
-    /// the large pool type
-    TB_SINGLETON_TYPE_LARGE_POOL            = 0
+    /// the default allocator
+    TB_SINGLETON_TYPE_ALLOCATOR_DEFAULT     = 0
+
+    /// the default allocator
+,   TB_SINGLETON_TYPE_ALLOCATOR_BUFFER      = 1
 
     /// the lock profiler type
-,   TB_SINGLETON_TYPE_LOCK_PROFILER         = 1
+,   TB_SINGLETON_TYPE_LOCK_PROFILER         = 2
 
     /// the random type
-,   TB_SINGLETON_TYPE_RANDOM                = 2
+,   TB_SINGLETON_TYPE_RANDOM                = 3
 
     /// the ifaddrs type
-,   TB_SINGLETON_TYPE_IFADDRS               = 3
+,   TB_SINGLETON_TYPE_IFADDRS               = 4
 
     /// the aicp type
-,   TB_SINGLETON_TYPE_AICP                  = 4
+,   TB_SINGLETON_TYPE_AICP                  = 5
 
     /// the openssl library type
-,   TB_SINGLETON_TYPE_LIBRARY_OPENSSL       = 5
+,   TB_SINGLETON_TYPE_LIBRARY_OPENSSL       = 6
 
     /// the mysql library type
-,   TB_SINGLETON_TYPE_LIBRARY_MYSQL         = 6
+,   TB_SINGLETON_TYPE_LIBRARY_MYSQL         = 7
 
     /// the sqlite3 library type
-,   TB_SINGLETON_TYPE_LIBRARY_SQLITE3       = 7
+,   TB_SINGLETON_TYPE_LIBRARY_SQLITE3       = 8
 
     /// the thread pool type
-,   TB_SINGLETON_TYPE_THREAD_POOL           = 8
+,   TB_SINGLETON_TYPE_THREAD_POOL           = 9
 
     /// the transfer pool type
-,   TB_SINGLETON_TYPE_TRANSFER_POOL         = 9
+,   TB_SINGLETON_TYPE_TRANSFER_POOL         = 10
 
     /// the cookies type
-,   TB_SINGLETON_TYPE_COOKIES               = 10
+,   TB_SINGLETON_TYPE_COOKIES               = 11
 
     /// the user defined type
-,   TB_SINGLETON_TYPE_USER                  = 11
+,   TB_SINGLETON_TYPE_USER                  = 12
 
     /// the max count of the singleton type
 #ifdef __tb_small__
@@ -122,10 +125,11 @@ tb_void_t           tb_singleton_exit(tb_noarg_t);
  * @param init      the singleton init func 
  * @param exit      the singleton exit func 
  * @param kill      the singleton kill func 
+ * @param priv      the private data
  *
  * @return          the singleton instance handle
  */
-tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill);
+tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill, tb_cpointer_t priv);
 
 /*! the singleton static instance
  *

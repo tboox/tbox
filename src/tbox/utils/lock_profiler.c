@@ -93,7 +93,7 @@ static tb_void_t tb_lock_profiler_instance_exit(tb_handle_t handle, tb_cpointer_
  */
 tb_handle_t tb_lock_profiler()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_LOCK_PROFILER, tb_lock_profiler_instance_init, tb_lock_profiler_instance_exit, tb_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_LOCK_PROFILER, tb_lock_profiler_instance_init, tb_lock_profiler_instance_exit, tb_null, tb_null);
 }
 tb_handle_t tb_lock_profiler_init()
 {

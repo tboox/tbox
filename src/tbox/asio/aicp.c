@@ -220,7 +220,7 @@ static tb_void_t tb_aicp_instance_kill(tb_handle_t handle, tb_cpointer_t priv)
  */
 tb_aicp_ref_t tb_aicp()
 {
-    return (tb_aicp_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_AICP, tb_aicp_instance_init, tb_aicp_instance_exit, tb_aicp_instance_kill);
+    return (tb_aicp_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_AICP, tb_aicp_instance_init, tb_aicp_instance_exit, tb_aicp_instance_kill, tb_null);
 }
 tb_aicp_ref_t tb_aicp_init(tb_size_t maxn)
 {

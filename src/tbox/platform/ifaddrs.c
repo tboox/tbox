@@ -99,7 +99,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
 #endif
 tb_ifaddrs_ref_t tb_ifaddrs()
 {
-    return (tb_ifaddrs_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_IFADDRS, tb_ifaddrs_instance_init, tb_ifaddrs_instance_exit, tb_null);
+    return (tb_ifaddrs_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_IFADDRS, tb_ifaddrs_instance_init, tb_ifaddrs_instance_exit, tb_null, tb_null);
 }
 tb_ifaddrs_interface_ref_t tb_ifaddrs_interface(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_bool_t reload)
 {
