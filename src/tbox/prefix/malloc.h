@@ -69,6 +69,13 @@ __tb_extern_c_enter__
 #define tb_align_nalloc0(item, size, align)         tb_allocator_align_nalloc0_(tb_allocator(), item, size, align __tb_debug_vals__)
 #define tb_align_ralloc(data, size, align)          tb_allocator_align_ralloc_(tb_allocator(), (tb_pointer_t)data, size, align __tb_debug_vals__)
 
+#define tb_large_free(data)                         tb_allocator_large_free_(tb_allocator(), (tb_pointer_t)data __tb_debug_vals__)
+#define tb_large_malloc(size, real)                 tb_allocator_large_malloc_(tb_allocator(), size, real __tb_debug_vals__)
+#define tb_large_malloc0(size, real)                tb_allocator_large_malloc0_(tb_allocator(), size, real __tb_debug_vals__)
+#define tb_large_nalloc(item, size, real)           tb_allocator_large_nalloc_(tb_allocator(), item, size, real __tb_debug_vals__)
+#define tb_large_nalloc0(item, size, real)          tb_allocator_large_nalloc0_(tb_allocator(), item, size, real __tb_debug_vals__)
+#define tb_large_ralloc(data, size, real)           tb_allocator_large_ralloc_(tb_allocator(), (tb_pointer_t)data, size, real __tb_debug_vals__)
+
 #if TB_CPU_BIT64
 #   define tb_align8_free(data)                     tb_free((tb_pointer_t)data)
 #   define tb_align8_malloc(size)                   tb_malloc(size)
@@ -103,6 +110,12 @@ tb_pointer_t                tb_allocator_align_nalloc_(struct __tb_allocator_t* 
 tb_pointer_t                tb_allocator_align_nalloc0_(struct __tb_allocator_t* allocator, tb_size_t item, tb_size_t size, tb_size_t align __tb_debug_decl__);
 tb_pointer_t                tb_allocator_align_ralloc_(struct __tb_allocator_t* allocator, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__);
 tb_bool_t                   tb_allocator_align_free_(struct __tb_allocator_t* allocator, tb_pointer_t data __tb_debug_decl__);
+tb_pointer_t                tb_allocator_large_malloc_(struct __tb_allocator_t* allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t                tb_allocator_large_malloc0_(struct __tb_allocator_t* allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t                tb_allocator_large_nalloc_(struct __tb_allocator_t* allocator, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t                tb_allocator_large_nalloc0_(struct __tb_allocator_t* allocator, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_pointer_t                tb_allocator_large_ralloc_(struct __tb_allocator_t* allocator, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+tb_bool_t                   tb_allocator_large_free_(struct __tb_allocator_t* allocator, tb_pointer_t data __tb_debug_decl__);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

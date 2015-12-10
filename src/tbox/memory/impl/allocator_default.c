@@ -91,6 +91,42 @@ static tb_bool_t tb_allocator_default_free(tb_allocator_ref_t self, tb_pointer_t
     // free it
     return tb_pool_free_(allocator->pool, data __tb_debug_args__);
 }
+static tb_pointer_t tb_allocator_default_large_malloc(tb_allocator_ref_t self, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)self;
+    tb_check_return_val(allocator && allocator->large_pool, tb_null);
+
+    // trace
+    tb_trace_d("large_malloc(%lu) at %s(): %lu, %s", size, func_, line_, file_);
+
+    // malloc it
+    return tb_large_pool_malloc_(allocator->large_pool, size, real __tb_debug_args__);
+}
+static tb_pointer_t tb_allocator_default_large_ralloc(tb_allocator_ref_t self, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)self;
+    tb_check_return_val(allocator && allocator->large_pool, tb_null);
+
+    // trace
+    tb_trace_d("large_ralloc(%p, %lu) at %s(): %lu, %s", data, size, func_, line_, file_);
+
+    // ralloc it
+    return tb_large_pool_ralloc_(allocator->large_pool, data, size, real __tb_debug_args__);
+}
+static tb_bool_t tb_allocator_default_large_free(tb_allocator_ref_t self, tb_pointer_t data __tb_debug_decl__)
+{ 
+    // check
+    tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)self;
+    tb_check_return_val(allocator && allocator->large_pool, tb_false);
+
+    // trace    
+    tb_trace_d("large_free(%p) at %s(): %lu, %s", data, func_, line_, file_);
+
+    // free it
+    return tb_large_pool_free_(allocator->large_pool, data __tb_debug_args__);
+}
 #ifdef __tb_debug__
 static tb_void_t tb_allocator_default_dump(tb_allocator_ref_t self)
 {
@@ -148,12 +184,15 @@ static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
         tb_assert_and_check_break(allocator); 
 
         // init allocator
-        allocator->base.type    = TB_ALLOCATOR_DEFAULT;
-        allocator->base.malloc  = tb_allocator_default_malloc;
-        allocator->base.ralloc  = tb_allocator_default_ralloc;
-        allocator->base.free    = tb_allocator_default_free;
+        allocator->base.type            = TB_ALLOCATOR_DEFAULT;
+        allocator->base.malloc          = tb_allocator_default_malloc;
+        allocator->base.ralloc          = tb_allocator_default_ralloc;
+        allocator->base.free            = tb_allocator_default_free;
+        allocator->base.large_malloc    = tb_allocator_default_large_malloc;
+        allocator->base.large_ralloc    = tb_allocator_default_large_ralloc;
+        allocator->base.large_free      = tb_allocator_default_large_free;
 #ifdef __tb_debug__
-        allocator->base.dump    = tb_allocator_default_dump;
+        allocator->base.dump            = tb_allocator_default_dump;
 #endif
 
         // save pool

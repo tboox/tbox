@@ -69,13 +69,13 @@ tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size _
 tb_pointer_t tb_allocator_malloc0_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(allocator, tb_null);
+    tb_assert_and_check_return_val(allocator && allocator->malloc, tb_null);
 
     // malloc it
-    tb_pointer_t data = tb_allocator_malloc_(allocator, size __tb_debug_args__);
+    tb_pointer_t data = allocator->malloc(allocator, size __tb_debug_args__);
 
     // clear it
-    if (data && size) tb_memset_(data, 0, size);
+    if (data) tb_memset_(data, 0, size);
 
     // ok
     return data;
@@ -83,18 +83,27 @@ tb_pointer_t tb_allocator_malloc0_(tb_allocator_ref_t allocator, tb_size_t size 
 tb_pointer_t tb_allocator_nalloc_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(allocator, tb_null);
+    tb_assert_and_check_return_val(allocator && allocator->malloc, tb_null);
 
     // nalloc it
-    return tb_allocator_malloc_(allocator, item * size __tb_debug_args__);
+    return allocator->malloc(allocator, item * size __tb_debug_args__);
 }
 tb_pointer_t tb_allocator_nalloc0_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
     // check
-    tb_assert_and_check_return_val(allocator, tb_null);
+    tb_assert_and_check_return_val(allocator && allocator->malloc, tb_null);
+
+    // adjust size
+    size *= item;
 
     // nalloc0 it
-    return tb_allocator_malloc0_(allocator, item * size __tb_debug_args__);
+    tb_pointer_t data = allocator->malloc(allocator, size __tb_debug_args__);
+
+    // clear it
+    if (data) tb_memset_(data, 0, size);
+
+    // ok
+    return data;
 }
 tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
@@ -111,6 +120,98 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
 
     // free it
     return allocator->free(allocator, data __tb_debug_args__);
+}
+tb_pointer_t tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, tb_null);
+
+    // no large malloc? 
+    if (!allocator->large_malloc)
+    {
+        // check
+        tb_assert_and_check_return_val(allocator->malloc, tb_null);
+
+        // malloc it
+        if (real) *real = size;
+        return allocator->malloc(allocator, size __tb_debug_args__);
+    }
+
+    // malloc it
+    return allocator->large_malloc(allocator, size, real __tb_debug_args__);
+}
+tb_pointer_t tb_allocator_large_malloc0_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, tb_null);
+
+    // malloc it
+    tb_pointer_t data = tb_allocator_large_malloc_(allocator, size, real __tb_debug_args__);
+
+    // clear it
+    if (data) tb_memset_(data, 0, real? *real : size);
+
+    // ok
+    return data;
+}
+tb_pointer_t tb_allocator_large_nalloc_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, tb_null);
+
+    // malloc it
+    return tb_allocator_large_malloc_(allocator, item * size, real __tb_debug_args__);
+}
+tb_pointer_t tb_allocator_large_nalloc0_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, tb_null);
+
+    // malloc it
+    tb_pointer_t data = tb_allocator_large_malloc_(allocator, item * size, real __tb_debug_args__);
+
+    // clear it
+    if (data) tb_memset_(data, 0, real? *real : (item * size));
+
+    // ok
+    return data;
+}
+tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, tb_null);
+
+    // no large ralloc? 
+    if (!allocator->large_ralloc)
+    {
+        // check
+        tb_assert_and_check_return_val(allocator->ralloc, tb_null);
+
+        // ralloc it
+        if (real) *real = size;
+        return allocator->ralloc(allocator, data, size __tb_debug_args__);
+    }
+
+    // ralloc it
+    return allocator->large_ralloc(allocator, data, size, real __tb_debug_args__);
+}
+tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, tb_false);
+
+    // no large free? 
+    if (!allocator->large_free)
+    {
+        // check
+        tb_assert_and_check_return_val(allocator->free, tb_false);
+
+        // free it
+        return allocator->free(allocator, data __tb_debug_args__);
+    }
+
+    // free it
+    return allocator->large_free(allocator, data __tb_debug_args__);
 }
 tb_pointer_t tb_allocator_align_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t align __tb_debug_decl__)
 {
