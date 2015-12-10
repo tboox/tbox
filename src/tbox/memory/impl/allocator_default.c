@@ -102,47 +102,115 @@ static tb_void_t tb_allocator_default_dump(tb_allocator_ref_t self)
     tb_pool_dump(allocator->pool);
 }
 #endif
-static tb_bool_t tb_allocator_default_instance_init(tb_handle_t instance, tb_cpointer_t priv)
+static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
 {
     // check
-    tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)instance;
-    tb_check_return_val(allocator && priv, tb_false);
+    tb_check_return_val(ppriv, tb_null);
 
     // the data and size
-    tb_value_ref_t  tuple = (tb_value_ref_t)priv;
+    tb_value_ref_t  tuple = (tb_value_ref_t)*ppriv;
     tb_byte_t*      data = (tb_byte_t*)tuple[0].ptr;
     tb_size_t       size = tuple[1].ul;
 
-    /* init the page first
-     *
-     * because this allocator may be called before tb_init()
-     */
-    if (!tb_page_init()) return tb_false;
+    // clear the private data first
+    *ppriv = tb_null;
 
-    /* init the native memory first
-     *
-     * because this allocator may be called before tb_init()
-     */
-    if (!tb_native_memory_init()) return tb_false;
+    // done
+    tb_bool_t                   ok = tb_false;
+    tb_pool_ref_t               pool = tb_null;
+    tb_large_pool_ref_t         large_pool = tb_null;
+    tb_allocator_default_ref_t  allocator = tb_null;
+    do
+    {
 
-    // init allocator
-    allocator->base.malloc   = tb_allocator_default_malloc;
-    allocator->base.ralloc   = tb_allocator_default_ralloc;
-    allocator->base.free     = tb_allocator_default_free;
+        /* init the page first
+         *
+         * because this allocator may be called before tb_init()
+         */
+        if (!tb_page_init()) break ;
+
+        /* init the native memory first
+         *
+         * because this allocator may be called before tb_init()
+         */
+        if (!tb_native_memory_init()) break ;
+
+        // init large pool
+        large_pool = tb_large_pool_init(data, size);
+        tb_assert_and_check_break(large_pool);
+
+        // init pool
+        pool = tb_pool_init(large_pool);
+        tb_assert_and_check_break(pool);
+
+        // make allocator
+        allocator = (tb_allocator_default_ref_t)tb_pool_malloc0(pool, sizeof(tb_allocator_default_t));
+        tb_assert_and_check_break(allocator); 
+
+        // init allocator
+        allocator->base.malloc   = tb_allocator_default_malloc;
+        allocator->base.ralloc   = tb_allocator_default_ralloc;
+        allocator->base.free     = tb_allocator_default_free;
 #ifdef __tb_debug__
-    allocator->base.dump     = tb_allocator_default_dump;
+        allocator->base.dump     = tb_allocator_default_dump;
 #endif
 
-    // init large pool
-    allocator->large_pool = tb_large_pool_init(data, size);
-    tb_check_return_val(allocator->large_pool, tb_false);
+        // save pool
+        allocator->pool = pool;
 
-    // init pool
-    allocator->pool = tb_pool_init(allocator->large_pool);
-    tb_check_return_val(allocator->pool, tb_false);
+        // save large pool
+        allocator->large_pool = large_pool;
 
-    // ok
-    return tb_true;
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit allocator
+        if (allocator && pool) tb_pool_free(pool, allocator);
+        allocator = tb_null;
+
+        // exit pool
+        if (pool) tb_pool_exit(pool);
+        pool= tb_null;
+
+        // exit large pool
+        if (large_pool) tb_large_pool_exit(large_pool);
+        large_pool= tb_null;
+    }
+
+    // ok?
+    return (tb_handle_t)allocator;
+}
+static tb_void_t tb_allocator_default_instance_exit(tb_handle_t self, tb_cpointer_t priv)
+{
+    // check
+    tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)self;
+    tb_assert_and_check_return(allocator);
+
+    // get pool
+    tb_pool_ref_t       pool = allocator->pool;
+    tb_large_pool_ref_t large_pool = allocator->large_pool;
+
+    // exit allocator
+    tb_pool_free(pool, allocator);
+    allocator = tb_null;
+
+    // dump pool
+#ifdef __tb_debug__
+    if (pool) tb_pool_dump(pool);
+#endif
+
+    // exit pool
+    if (pool) tb_pool_exit(pool);
+    pool= tb_null;
+
+    // exit large pool
+    if (large_pool) tb_large_pool_exit(large_pool);
+    large_pool= tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -150,17 +218,17 @@ static tb_bool_t tb_allocator_default_instance_init(tb_handle_t instance, tb_cpo
  */
 tb_allocator_ref_t tb_allocator_default(tb_byte_t* data, tb_size_t size)
 {
-    // init
-    static tb_atomic_t              s_inited = 0;
-    static tb_allocator_default_t   s_allocator = {{0}, 0};
+    /* init singleton first
+     *
+     * because this allocator may be called before tb_init()
+     */
+    if (!tb_singleton_init()) return tb_null;
 
-    // init the static instance
+    // init tuple
     tb_value_t tuple[2];
     tuple[0].ptr    = (tb_pointer_t)data;
     tuple[1].ul     = size;
-    tb_singleton_static_init(&s_inited, &s_allocator, tb_allocator_default_instance_init, tuple);
 
-    // ok
-    return (tb_allocator_ref_t)&s_allocator;
+    // get it
+    return (tb_allocator_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_ALLOCATOR_DEFAULT, tb_allocator_default_instance_init, tb_allocator_default_instance_exit, tb_null, tuple);
 }
-

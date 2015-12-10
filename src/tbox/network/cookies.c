@@ -502,7 +502,7 @@ static tb_void_t tb_cookies_instance_exit(tb_handle_t cookies, tb_cpointer_t pri
  */
 tb_cookies_ref_t tb_cookies()
 {
-    return (tb_cookies_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_COOKIES, tb_cookies_instance_init, tb_cookies_instance_exit, tb_null);
+    return (tb_cookies_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_COOKIES, tb_cookies_instance_init, tb_cookies_instance_exit, tb_null, tb_null);
 }
 tb_cookies_ref_t tb_cookies_init()
 {

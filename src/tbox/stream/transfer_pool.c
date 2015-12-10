@@ -275,7 +275,7 @@ static tb_void_t tb_transfer_pool_instance_kill(tb_handle_t pool, tb_cpointer_t 
  */
 tb_transfer_pool_ref_t tb_transfer_pool()
 {
-    return (tb_transfer_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_TRANSFER_POOL, tb_transfer_pool_instance_init, tb_transfer_pool_instance_exit, tb_transfer_pool_instance_kill);
+    return (tb_transfer_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_TRANSFER_POOL, tb_transfer_pool_instance_init, tb_transfer_pool_instance_exit, tb_transfer_pool_instance_kill, tb_null);
 }
 tb_transfer_pool_ref_t tb_transfer_pool_init(tb_aicp_ref_t aicp)
 {

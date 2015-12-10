@@ -752,7 +752,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
  */
 tb_thread_pool_ref_t tb_thread_pool()
 {
-    return (tb_thread_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_THREAD_POOL, tb_thread_pool_instance_init, tb_thread_pool_instance_exit, tb_thread_pool_instance_kill);
+    return (tb_thread_pool_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_THREAD_POOL, tb_thread_pool_instance_init, tb_thread_pool_instance_exit, tb_thread_pool_instance_kill, tb_null);
 }
 tb_thread_pool_ref_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
 {

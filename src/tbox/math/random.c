@@ -43,7 +43,7 @@ static tb_void_t tb_random_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 }
 static tb_random_impl_t* tb_random_instance(tb_noarg_t)
 {
-    return (tb_random_impl_t*)tb_singleton_instance(TB_SINGLETON_TYPE_RANDOM, tb_random_instance_init, tb_random_instance_exit, tb_null);
+    return (tb_random_impl_t*)tb_singleton_instance(TB_SINGLETON_TYPE_RANDOM, tb_random_instance_init, tb_random_instance_exit, tb_null, tb_null);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

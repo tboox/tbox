@@ -68,8 +68,20 @@ static tb_singleton_t g_singletons[TB_SINGLETON_TYPE_MAXN] = {{0}};
  */
 tb_bool_t tb_singleton_init()
 {
-    // init it
-    tb_memset(&g_singletons, 0, sizeof(g_singletons));
+    /* init it
+     *
+     * @note
+     * this is thread safe, because tb_singleton_init() only will be called in/before the tb_init()
+     */
+    static tb_bool_t binited = tb_false;
+    if (!binited)
+    {
+        // init it
+        tb_memset(&g_singletons, 0, sizeof(g_singletons));
+
+        // ok
+        binited = tb_true;
+    }
 
     // ok
     return tb_true;
@@ -96,6 +108,7 @@ tb_void_t tb_singleton_kill()
 }
 tb_void_t tb_singleton_exit()
 {
+    // done
     tb_size_t i = TB_SINGLETON_TYPE_MAXN;
     while (i--)
     {
@@ -113,8 +126,11 @@ tb_void_t tb_singleton_exit()
             }
         }
     }
+ 
+    // clear it
+    tb_memset(&g_singletons, 0, sizeof(g_singletons));
 }
-tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill)
+tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init, tb_singleton_exit_func_t exit, tb_singleton_kill_func_t kill, tb_cpointer_t priv)
 {
     // check, @note cannot use trace, assert and memory
     tb_check_return_val(type < TB_SINGLETON_TYPE_MAXN, tb_null);
@@ -129,6 +145,9 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
     {
         // check
         tb_check_return_val(init && exit, tb_null);
+
+        // init priv
+        g_singletons[type].priv = priv;
 
         // init it
         instance = init(&g_singletons[type].priv);

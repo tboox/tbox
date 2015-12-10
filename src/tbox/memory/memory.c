@@ -74,11 +74,6 @@ tb_bool_t tb_memory_init(tb_allocator_ref_t allocator)
 }
 tb_void_t tb_memory_exit()
 {
-    // dump allocator
-#ifdef __tb_debug__
-    tb_allocator_dump(tb_allocator());
-#endif
-
     // exit the native memory
     tb_native_memory_exit();
 

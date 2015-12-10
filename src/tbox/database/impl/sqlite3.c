@@ -111,7 +111,7 @@ static tb_void_t tb_database_sqlite3_library_exit(tb_handle_t handle, tb_cpointe
 }
 static tb_handle_t tb_database_sqlite3_library_load()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_SQLITE3, tb_database_sqlite3_library_init, tb_database_sqlite3_library_exit, tb_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_SQLITE3, tb_database_sqlite3_library_init, tb_database_sqlite3_library_exit, tb_null, tb_null);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
