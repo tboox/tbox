@@ -109,7 +109,11 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
     {
         // check 
         tb_assert_and_check_break(probability && probability < 32);
+#ifdef __tb_small__
+        tb_assert_and_check_break(hash_count && hash_count < 4);
+#else
         tb_assert_and_check_break(hash_count && hash_count < 16);
+#endif
 
         // check item maxn
         if (!item_maxn) item_maxn = TB_BLOOM_FILTER_ITEM_MAXN_DEFAULT;

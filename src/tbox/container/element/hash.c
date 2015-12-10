@@ -46,6 +46,21 @@ static tb_size_t tb_element_hash_data_func_1(tb_byte_t const* data, tb_size_t si
     while (p < e) v = 16777619 * v ^ (tb_size_t)(*p++);
     return v;
 }
+#ifdef __tb_small__
+static tb_size_t tb_element_hash_data_func_2(tb_byte_t const* data, tb_size_t size)
+{
+    // fnv-1a-hash
+    tb_size_t           v = size; v ^= 2166136261ul;
+    tb_byte_t const*    p = data;
+    tb_byte_t const*    e = data + size;
+    while (p < e) 
+    {
+        v ^= *p++;
+        v *= 16777619;
+    }
+    return v;
+}
+#else
 static tb_size_t tb_element_hash_data_func_2(tb_byte_t const* data, tb_size_t size)
 {
     // Blizzard One-Way Hash algorithm from MPQ
@@ -236,6 +251,7 @@ static tb_size_t tb_element_hash_data_func_15(tb_byte_t const* data, tb_size_t s
     tb_trace_noimpl();
     return 0;
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * cstr hash implementation
@@ -421,6 +437,7 @@ tb_size_t tb_element_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t 
         tb_element_hash_data_func_0
     ,   tb_element_hash_data_func_1
     ,   tb_element_hash_data_func_2
+#ifndef __tb_small__
     ,   tb_element_hash_data_func_3
     ,   tb_element_hash_data_func_4
     ,   tb_element_hash_data_func_5
@@ -434,6 +451,7 @@ tb_size_t tb_element_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t 
     ,   tb_element_hash_data_func_13
     ,   tb_element_hash_data_func_14
     ,   tb_element_hash_data_func_15
+#endif
     };
     tb_assert_and_check_return_val(index < tb_arrayn(s_func), 0);
 
