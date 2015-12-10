@@ -47,6 +47,15 @@ __tb_extern_c_enter__
 #define tb_allocator_ralloc(allocator, data, size)                  tb_allocator_ralloc_(allocator, (tb_pointer_t)(data), size __tb_debug_vals__)
 #define tb_allocator_free(allocator, data)                          tb_allocator_free_(allocator, (tb_pointer_t)(data) __tb_debug_vals__)
 
+#define tb_allocator_large_malloc(allocator, size, real)            tb_allocator_large_malloc_(allocator, size, real __tb_debug_vals__)
+#define tb_allocator_large_malloc0(allocator, size, real)           tb_allocator_large_malloc0_(allocator, size, real __tb_debug_vals__)
+
+#define tb_allocator_large_nalloc(allocator, item, size, real)      tb_allocator_large_nalloc_(allocator, item, size, real __tb_debug_vals__)
+#define tb_allocator_large_nalloc0(allocator, item, size, real)     tb_allocator_large_nalloc0_(allocator, item, size, real __tb_debug_vals__)
+
+#define tb_allocator_large_ralloc(allocator, data, size, real)      tb_allocator_large_ralloc_(allocator, (tb_pointer_t)(data), size, real __tb_debug_vals__)
+#define tb_allocator_large_free(allocator, data)                    tb_allocator_large_free_(allocator, (tb_pointer_t)(data) __tb_debug_vals__)
+
 #define tb_allocator_align_malloc(allocator, size, align)           tb_allocator_align_malloc_(allocator, size, align __tb_debug_vals__)
 #define tb_allocator_align_malloc0(allocator, size, align)          tb_allocator_align_malloc0_(allocator, size, align __tb_debug_vals__)
 
@@ -102,6 +111,36 @@ typedef struct __tb_allocator_t
      * @return              tb_true or tb_false
      */
     tb_bool_t               (*free)(struct __tb_allocator_t* allocator, tb_pointer_t data __tb_debug_decl__);
+
+    /*! malloc large data
+     *
+     * @param allocator     the allocator 
+     * @param size          the size
+     * @param real          the real allocated size >= size, optional
+     *
+     * @return              the data address
+     */
+    tb_pointer_t            (*large_malloc)(struct __tb_allocator_t* allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+
+    /*! realloc large data
+     *
+     * @param allocator     the allocator 
+     * @param data          the data address
+     * @param size          the data size
+     * @param real          the real allocated size >= size, optional
+     *
+     * @return              the new data address
+     */
+    tb_pointer_t            (*large_ralloc)(struct __tb_allocator_t* allocator, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+
+    /*! free large data
+     *
+     * @param allocator     the allocator 
+     * @param data          the data address
+     *
+     * @return              tb_true or tb_false
+     */
+    tb_bool_t               (*large_free)(struct __tb_allocator_t* allocator, tb_pointer_t data __tb_debug_decl__);
 
 #ifdef __tb_debug__
     /*! dump allocator
@@ -224,6 +263,68 @@ tb_pointer_t            tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_po
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__);
+
+/*! malloc large data
+ *
+ * @param allocator     the allocator 
+ * @param size          the size
+ * @param real          the real allocated size >= size, optional
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+
+/*! malloc large data and fill zero 
+ *
+ * @param allocator     the allocator 
+ * @param size          the size 
+ * @param real          the real allocated size >= size, optional
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_large_malloc0_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+
+/*! malloc large data with the item count
+ *
+ * @param allocator     the allocator 
+ * @param item          the item count
+ * @param size          the item size 
+ * @param real          the real allocated size >= item * size, optional
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_large_nalloc_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+
+/*! malloc large data with the item count and fill zero
+ *
+ * @param allocator     the allocator 
+ * @param item          the item count
+ * @param size          the item size 
+ * @param real          the real allocated size >= item * size, optional
+ *
+ * @return              the data address
+ */
+tb_pointer_t            tb_allocator_large_nalloc0_(tb_allocator_ref_t allocator, tb_size_t item, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+
+/*! realloc large data
+ *
+ * @param allocator     the allocator 
+ * @param data          the data address
+ * @param size          the data size
+ * @param real          the real allocated size >= size, optional
+ *
+ * @return              the new data address
+ */
+tb_pointer_t            tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__);
+
+/*! free large data
+ *
+ * @param allocator     the allocator 
+ * @param data          the data address
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__);
 
 /*! align malloc data
  *

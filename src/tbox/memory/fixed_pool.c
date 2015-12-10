@@ -41,9 +41,6 @@
 // the item belong to this slot?
 #define tb_fixed_pool_slot_exists(slot, item)               (((tb_byte_t*)(item) > (tb_byte_t*)(slot)) && ((tb_byte_t*)(item) < (tb_byte_t*)slot + (slot)->size))
 
-// malloc for large pool
-#define tb_large_pool_malloc_diff(pool, size, real, diff)   tb_large_pool_malloc_diff_(pool, size, real, diff __tb_debug_vals__)
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
