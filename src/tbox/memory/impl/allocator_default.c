@@ -148,11 +148,12 @@ static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
         tb_assert_and_check_break(allocator); 
 
         // init allocator
-        allocator->base.malloc   = tb_allocator_default_malloc;
-        allocator->base.ralloc   = tb_allocator_default_ralloc;
-        allocator->base.free     = tb_allocator_default_free;
+        allocator->base.type    = TB_ALLOCATOR_DEFAULT;
+        allocator->base.malloc  = tb_allocator_default_malloc;
+        allocator->base.ralloc  = tb_allocator_default_ralloc;
+        allocator->base.free    = tb_allocator_default_free;
 #ifdef __tb_debug__
-        allocator->base.dump     = tb_allocator_default_dump;
+        allocator->base.dump    = tb_allocator_default_dump;
 #endif
 
         // save pool
@@ -199,14 +200,19 @@ static tb_void_t tb_allocator_default_instance_exit(tb_handle_t self, tb_cpointe
     tb_pool_free(pool, allocator);
     allocator = tb_null;
 
-    // dump pool
 #ifdef __tb_debug__
+    // dump pool
     if (pool) tb_pool_dump(pool);
 #endif
-
+ 
     // exit pool
     if (pool) tb_pool_exit(pool);
     pool= tb_null;
+
+#ifdef __tb_debug__
+    // dump large pool
+    if (large_pool) tb_large_pool_dump(large_pool);
+#endif
 
     // exit large pool
     if (large_pool) tb_large_pool_exit(large_pool);

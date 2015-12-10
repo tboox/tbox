@@ -569,7 +569,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_de
         data_head->debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
-        tb_pool_data_save_backtrace(&data_head->debug, 2);
+        tb_pool_data_save_backtrace(&data_head->debug, 6);
 
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_(data, TB_POOL_DATA_PATCH, impl->item_space - impl->data_head_size);

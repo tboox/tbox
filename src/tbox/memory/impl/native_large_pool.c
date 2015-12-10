@@ -419,7 +419,7 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
         base_head->debug.line      = (tb_uint16_t)line_;
 
         // save backtrace
-        tb_pool_data_save_backtrace(&base_head->debug, 2);
+        tb_pool_data_save_backtrace(&base_head->debug, 5);
 
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_(data_real, TB_POOL_DATA_PATCH, size + patch);
@@ -558,7 +558,7 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc data have been changed: %p", data);
 
         // update backtrace
-        tb_pool_data_save_backtrace(&base_head->debug, 2);
+        tb_pool_data_save_backtrace(&base_head->debug, 5);
 
         // make the dirty data 
         if (size > prev_size) tb_memset_(data_real + prev_size, TB_POOL_DATA_PATCH, size - prev_size);

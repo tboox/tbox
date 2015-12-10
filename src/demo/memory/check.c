@@ -40,8 +40,10 @@ tb_void_t tb_demo_free2()
 tb_void_t tb_demo_leak(tb_noarg_t);
 tb_void_t tb_demo_leak()
 {
-    tb_pointer_t data = tb_malloc0(10);
+    tb_pointer_t data = tb_malloc0(100);
+    tb_pointer_t data2 = tb_malloc0(10000);
     tb_used(data);
+    tb_used(data2);
 }
 tb_void_t tb_demo_stack(tb_noarg_t);
 tb_void_t tb_demo_stack()

@@ -64,7 +64,7 @@ tb_kernel32_ref_t tb_kernel32()
     static tb_kernel32_t    s_kernel32 = {0};
 
     // init the static instance
-    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_kernel32, tb_kernel32_instance_init);
+    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_kernel32, tb_kernel32_instance_init, tb_null);
     tb_assert(ok); tb_used(ok);
 
     // ok

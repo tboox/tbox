@@ -60,9 +60,21 @@ __tb_extern_c_enter__
  * types
  */
 
+/// the allocator type enum
+typedef enum __tb_allocator_type_e
+{
+    TB_ALLOCATOR_DEFAULT    = 0
+,   TB_ALLOCATOR_NATIVE     = 1
+,   TB_ALLOCATOR_BUFFER     = 2
+
+}tb_allocator_type_e;
+
 /// the allocator type
 typedef struct __tb_allocator_t
 {
+    /// the type
+    tb_size_t               type;
+
     /*! malloc data
      *
      * @param allocator     the allocator 
@@ -147,6 +159,14 @@ tb_allocator_ref_t      tb_allocator_buffer(tb_byte_t* data, tb_size_t size);
  * @return              the allocator
  */
 tb_allocator_ref_t      tb_allocator_default(tb_byte_t* data, tb_size_t size);
+
+/*! the allocator type
+ *
+ * @param allocator     the allocator 
+ *
+ * @return              the allocator type
+ */
+tb_size_t               tb_allocator_type(tb_allocator_ref_t allocator);
 
 /*! malloc data
  *
