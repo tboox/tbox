@@ -78,9 +78,6 @@ typedef struct __tb_native_large_pool_impl_t
     // the base
     tb_allocator_t                  base;
 
-    // the lock
-    tb_spinlock_t                   lock;
-
     // the data list
     tb_list_entry_head_t            data_list;
 
@@ -203,72 +200,11 @@ static tb_void_t tb_native_large_pool_check_next(tb_native_large_pool_impl_t* im
     }
 }
 #endif
-static tb_bool_t tb_native_large_pool_free_done(tb_native_large_pool_impl_t* impl, tb_pointer_t data __tb_debug_decl__)
-{
-    // check
-    tb_assert_and_check_return_val(impl && data, tb_false);
-
-    // done
-    tb_bool_t                       ok = tb_false;
-    tb_native_large_data_head_t*    data_head = tb_null;
-    do
-    {
-        // the data head
-        data_head = &(((tb_native_large_data_head_t*)data)[-1]);
-
-#ifdef __tb_debug__
-        // the base head
-        tb_pool_data_head_t* base_head = tb_native_large_pool_data_base(data_head);
-#endif
-
-        // check
-        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
-        tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)tb_native_large_pool_ref(impl), "the data: %p not belong to pool: %p", data, tb_native_large_pool_ref(impl));
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
-
-#ifdef __tb_debug__
-        // check the last data
-        tb_native_large_pool_check_last(impl);
-
-        // check the prev data
-        tb_native_large_pool_check_prev(impl, data_head);
-
-        // check the next data
-        tb_native_large_pool_check_next(impl, data_head);
-
-        // for checking double-free
-        base_head->debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
-
-        // update the total size
-        impl->total_size    -= base_head->size;
-   
-        // update the free count
-        impl->free_count++;
-#endif
-
-        // remove the data from the data_list
-        tb_list_entry_remove(&impl->data_list, &data_head->entry);
-
-        // free it
-        tb_native_memory_free(data_head);
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // ok?
-    return ok;
-}
 static tb_pointer_t tb_native_large_pool_malloc(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return_val(impl, tb_null);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
 
     // done 
 #ifdef __tb_debug__
@@ -358,9 +294,6 @@ static tb_pointer_t tb_native_large_pool_malloc(tb_allocator_ref_t allocator, tb
         data_real = tb_null;
     }
 
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
     // ok?
     return (tb_pointer_t)data_real;
 }
@@ -369,9 +302,6 @@ static tb_pointer_t tb_native_large_pool_ralloc(tb_allocator_ref_t allocator, tb
     // check
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return_val(impl, tb_null);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
 
     // done 
 #ifdef __tb_debug__
@@ -500,9 +430,6 @@ static tb_pointer_t tb_native_large_pool_ralloc(tb_allocator_ref_t allocator, tb
         data_real = tb_null;
     }
 
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
     // ok?
     return (tb_pointer_t)data_real;
 }
@@ -512,17 +439,114 @@ static tb_bool_t tb_native_large_pool_free(tb_allocator_ref_t allocator, tb_poin
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return_val(impl && data, tb_false);
 
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
     // done
-    tb_bool_t ok = tb_native_large_pool_free_done(impl, data __tb_debug_args__);
+    tb_bool_t                       ok = tb_false;
+    tb_native_large_data_head_t*    data_head = tb_null;
+    do
+    {
+        // the data head
+        data_head = &(((tb_native_large_data_head_t*)data)[-1]);
 
-    // leave
-    tb_spinlock_leave(&impl->lock);
+#ifdef __tb_debug__
+        // the base head
+        tb_pool_data_head_t* base_head = tb_native_large_pool_data_base(data_head);
+#endif
+
+        // check
+        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
+        tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)tb_native_large_pool_ref(impl), "the data: %p not belong to pool: %p", data, tb_native_large_pool_ref(impl));
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+
+#ifdef __tb_debug__
+        // check the last data
+        tb_native_large_pool_check_last(impl);
+
+        // check the prev data
+        tb_native_large_pool_check_prev(impl, data_head);
+
+        // check the next data
+        tb_native_large_pool_check_next(impl, data_head);
+
+        // for checking double-free
+        base_head->debug.magic = (tb_uint16_t)~TB_POOL_DATA_MAGIC;
+
+        // update the total size
+        impl->total_size    -= base_head->size;
+   
+        // update the free count
+        impl->free_count++;
+#endif
+
+        // remove the data from the data_list
+        tb_list_entry_remove(&impl->data_list, &data_head->entry);
+
+        // free it
+        tb_native_memory_free(data_head);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
 
     // ok?
     return ok;
+}
+static tb_void_t tb_native_large_pool_clear(tb_allocator_ref_t allocator)
+{
+    // check
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
+    tb_assert_and_check_return(impl);
+
+    // done
+    do
+    {
+        // the iterator
+        tb_iterator_ref_t iterator = tb_list_entry_itor(&impl->data_list);
+        tb_assert_and_check_break(iterator);
+
+        // walk it
+        tb_size_t itor = tb_iterator_head(iterator);
+        while (itor != tb_iterator_tail(iterator))
+        {
+            // the data head
+            tb_native_large_data_head_t* data_head = (tb_native_large_data_head_t*)tb_iterator_item(iterator, itor);
+            tb_assert_and_check_break(data_head);
+
+            // save next
+            tb_size_t next = tb_iterator_next(iterator, itor);
+
+            // exit data
+            tb_native_large_pool_free(allocator, (tb_pointer_t)&data_head[1] __tb_debug_vals__);
+
+            // next
+            itor = next;
+        }
+
+    } while (0);
+
+    // clear info
+#ifdef __tb_debug__
+    impl->peak_size     = 0;
+    impl->total_size    = 0;
+    impl->real_size     = 0;
+    impl->occupied_size = 0;
+    impl->malloc_count  = 0;
+    impl->ralloc_count  = 0;
+    impl->free_count    = 0;
+#endif
+}
+static tb_void_t tb_native_large_pool_exit(tb_allocator_ref_t allocator)
+{
+    // check
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
+    tb_assert_and_check_return(impl);
+
+    // exit lock
+    tb_spinlock_exit(&impl->base.lock);
+
+    // exit it
+    tb_native_memory_free(impl);
 }
 #ifdef __tb_debug__
 static tb_void_t tb_native_large_pool_dump(tb_allocator_ref_t allocator)
@@ -530,9 +554,6 @@ static tb_void_t tb_native_large_pool_dump(tb_allocator_ref_t allocator)
     // check
     tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return(impl);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
 
     // trace
     tb_trace_i("");
@@ -556,10 +577,6 @@ static tb_void_t tb_native_large_pool_dump(tb_allocator_ref_t allocator)
     tb_trace_i("free_count: %lu",           impl->free_count);
     tb_trace_i("malloc_count: %lu",         impl->malloc_count);
     tb_trace_i("ralloc_count: %lu",         impl->ralloc_count);
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
 }
 #endif
 
@@ -585,19 +602,21 @@ tb_large_pool_ref_t tb_native_large_pool_init()
         impl->base.large_malloc     = tb_native_large_pool_malloc;
         impl->base.large_ralloc     = tb_native_large_pool_ralloc;
         impl->base.large_free       = tb_native_large_pool_free;
+        impl->base.clear            = tb_native_large_pool_clear;
+        impl->base.exit             = tb_native_large_pool_exit;
 #ifdef __tb_debug__
         impl->base.dump             = tb_native_large_pool_dump;
 #endif
 
         // init lock
-        if (!tb_spinlock_init(&impl->lock)) break;
+        if (!tb_spinlock_init(&impl->base.lock)) break;
 
         // init data_list
         tb_list_entry_init(&impl->data_list, tb_native_large_data_head_t, entry, tb_null);
 
         // register lock profiler
 #ifdef TB_LOCK_PROFILER_ENABLE
-        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->lock, TB_TRACE_MODULE_NAME);
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->base.lock, TB_TRACE_MODULE_NAME);
 #endif
 
         // ok
@@ -615,70 +634,5 @@ tb_large_pool_ref_t tb_native_large_pool_init()
 
     // ok?
     return tb_native_large_pool_ref(impl);
-}
-tb_void_t tb_native_large_pool_exit(tb_large_pool_ref_t pool)
-{
-    // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return(impl);
-
-    // clear it
-    tb_native_large_pool_clear(pool);
-
-    // exit lock
-    tb_spinlock_exit(&impl->lock);
-
-    // exit it
-    tb_native_memory_free(impl);
-}
-tb_void_t tb_native_large_pool_clear(tb_large_pool_ref_t pool)
-{
-    // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return(impl);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
-    // done
-    do
-    {
-        // the iterator
-        tb_iterator_ref_t iterator = tb_list_entry_itor(&impl->data_list);
-        tb_assert_and_check_break(iterator);
-
-        // walk it
-        tb_size_t itor = tb_iterator_head(iterator);
-        while (itor != tb_iterator_tail(iterator))
-        {
-            // the data head
-            tb_native_large_data_head_t* data_head = (tb_native_large_data_head_t*)tb_iterator_item(iterator, itor);
-            tb_assert_and_check_break(data_head);
-
-            // save next
-            tb_size_t next = tb_iterator_next(iterator, itor);
-
-            // exit data
-            tb_native_large_pool_free_done(impl, (tb_pointer_t)&data_head[1] __tb_debug_vals__);
-
-            // next
-            itor = next;
-        }
-
-    } while (0);
-
-    // clear info
-#ifdef __tb_debug__
-    impl->peak_size     = 0;
-    impl->total_size    = 0;
-    impl->real_size     = 0;
-    impl->occupied_size = 0;
-    impl->malloc_count  = 0;
-    impl->ralloc_count  = 0;
-    impl->free_count    = 0;
-#endif
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
 }
 

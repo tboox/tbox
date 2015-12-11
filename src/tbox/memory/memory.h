@@ -34,10 +34,10 @@
 #include "fixed_pool.h"
 #include "large_pool.h"
 #include "small_pool.h"
-#include "static_pool.h"
 #include "string_pool.h"
 #include "queue_buffer.h"
 #include "static_buffer.h"
+#include "static_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

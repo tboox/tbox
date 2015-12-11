@@ -44,7 +44,7 @@ tb_void_t tb_demo_large_pool_leak()
     } while (0);
 
     // exit pool
-    if (pool) tb_large_pool_exit(pool);
+    if (pool) tb_allocator_exit(pool);
 }
 tb_void_t tb_demo_large_pool_free2(tb_noarg_t);
 tb_void_t tb_demo_large_pool_free2()
@@ -72,7 +72,7 @@ tb_void_t tb_demo_large_pool_free2()
     } while (0);
 
     // exit pool
-    if (pool) tb_large_pool_exit(pool);
+    if (pool) tb_allocator_exit(pool);
 }
 tb_void_t tb_demo_large_pool_underflow(tb_noarg_t);
 tb_void_t tb_demo_large_pool_underflow()
@@ -102,7 +102,7 @@ tb_void_t tb_demo_large_pool_underflow()
     } while (0);
 
     // exit pool
-    if (pool) tb_large_pool_exit(pool);
+    if (pool) tb_allocator_exit(pool);
 }
 tb_void_t tb_demo_large_pool_underflow2(tb_noarg_t);
 tb_void_t tb_demo_large_pool_underflow2()
@@ -133,7 +133,7 @@ tb_void_t tb_demo_large_pool_underflow2()
     } while (0);
 
     // exit pool
-    if (pool) tb_large_pool_exit(pool);
+    if (pool) tb_allocator_exit(pool);
 }
 tb_void_t tb_demo_large_pool_real(tb_size_t size);
 tb_void_t tb_demo_large_pool_real(tb_size_t size)
@@ -157,7 +157,7 @@ tb_void_t tb_demo_large_pool_real(tb_size_t size)
     } while (0);
 
     // exit pool
-    if (pool) tb_large_pool_exit(pool);
+    if (pool) tb_allocator_exit(pool);
 }
 tb_void_t tb_demo_large_pool_perf(tb_noarg_t);
 tb_void_t tb_demo_large_pool_perf()
@@ -222,12 +222,12 @@ tb_void_t tb_demo_large_pool_perf()
         tb_trace_i("time: %lld ms", time);
 
         // clear pool
-        tb_large_pool_clear(pool);
+        tb_allocator_clear(pool);
 
     } while (0);
 
     // exit pool
-    if (pool) tb_large_pool_exit(pool);
+    if (pool) tb_allocator_exit(pool);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

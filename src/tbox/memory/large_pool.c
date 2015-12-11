@@ -35,13 +35,6 @@
 #include "impl/impl.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// is native pool?
-#define tb_large_pool_is_native(pool)        (((tb_size_t)(pool)) & 0x1)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_large_pool_ref_t tb_large_pool_init(tb_byte_t* data, tb_size_t size)
@@ -49,22 +42,5 @@ tb_large_pool_ref_t tb_large_pool_init(tb_byte_t* data, tb_size_t size)
     // init pool
     return (data && size)? tb_static_large_pool_init(data, size, tb_page_size()) : tb_native_large_pool_init();
 }
-tb_void_t tb_large_pool_exit(tb_large_pool_ref_t pool)
-{
-    // check
-    tb_assert_and_check_return(pool);
 
-    // exit pool
-    if (tb_large_pool_is_native(pool)) tb_native_large_pool_exit(pool);
-    else tb_static_large_pool_exit(pool);
-}
-tb_void_t tb_large_pool_clear(tb_large_pool_ref_t pool)
-{
-    // check
-    tb_assert_and_check_return(pool);
-
-    // clear pool
-    if (tb_large_pool_is_native(pool)) tb_native_large_pool_clear(pool);
-    else tb_static_large_pool_clear(pool);
-}
 

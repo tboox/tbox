@@ -75,18 +75,6 @@ typedef tb_allocator_ref_t       tb_large_pool_ref_t;
  */
 tb_large_pool_ref_t     tb_large_pool_init(tb_byte_t* data, tb_size_t size);
 
-/*! exit the pool
- *
- * @param pool          the pool 
- */
-tb_void_t               tb_large_pool_exit(tb_large_pool_ref_t pool);
-
-/*! clear the pool
- *
- * @param pool          the pool 
- */
-tb_void_t               tb_large_pool_clear(tb_large_pool_ref_t pool);
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
