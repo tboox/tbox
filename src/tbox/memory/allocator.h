@@ -75,8 +75,8 @@ typedef enum __tb_allocator_type_e
     TB_ALLOCATOR_NONE       = 0
 ,   TB_ALLOCATOR_DEFAULT    = 1
 ,   TB_ALLOCATOR_NATIVE     = 2
-,   TB_ALLOCATOR_BUFFER     = 3
-,   TB_ALLOCATOR_LARGE_POOL = 4
+,   TB_ALLOCATOR_STATIC     = 4
+,   TB_ALLOCATOR_LARGE      = 5
 
 }tb_allocator_type_e;
 

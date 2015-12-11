@@ -33,7 +33,7 @@
  */
 #include "pool.h"
 #include "allocator.h"
-#include "large_pool.h"
+#include "large_allocator.h"
 #include "small_pool.h"
 #include "impl/prefix.h"
 
@@ -45,7 +45,7 @@
 typedef struct __tb_pool_t
 {
     // the large pool
-    tb_large_pool_ref_t     large_pool;
+    tb_allocator_ref_t     large_allocator;
 
     // the small pool
     tb_small_pool_ref_t     small_pool;
@@ -58,10 +58,10 @@ typedef struct __tb_pool_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_pool_ref_t tb_pool_init(tb_large_pool_ref_t large_pool)
+tb_pool_ref_t tb_pool_init(tb_allocator_ref_t large_allocator)
 {
     // check
-    tb_assert_and_check_return_val(large_pool, tb_null);
+    tb_assert_and_check_return_val(large_allocator, tb_null);
 
     // done
     tb_bool_t   ok = tb_false;
@@ -69,15 +69,15 @@ tb_pool_ref_t tb_pool_init(tb_large_pool_ref_t large_pool)
     do
     {
         // make pool
-        pool = (tb_pool_t*)tb_allocator_large_malloc0(large_pool, sizeof(tb_pool_t), tb_null);
+        pool = (tb_pool_t*)tb_allocator_large_malloc0(large_allocator, sizeof(tb_pool_t), tb_null);
         tb_assert_and_check_break(pool);
 
         // init lock
         if (!tb_spinlock_init(&pool->lock)) break;
 
         // init pool
-        pool->large_pool = large_pool;
-        pool->small_pool = tb_small_pool_init(large_pool);
+        pool->large_allocator = large_allocator;
+        pool->small_pool = tb_small_pool_init(large_allocator);
         tb_assert_and_check_break(pool->small_pool);
 
         // register lock profiler
@@ -120,7 +120,7 @@ tb_void_t tb_pool_exit(tb_pool_ref_t self)
     tb_spinlock_exit(&pool->lock);
 
     // exit pool
-    if (pool->large_pool) tb_allocator_large_free(pool->large_pool, pool);
+    if (pool->large_allocator) tb_allocator_large_free(pool->large_allocator, pool);
 }
 tb_pointer_t tb_pool_malloc_(tb_pool_ref_t self, tb_size_t size __tb_debug_decl__)
 {
@@ -129,13 +129,13 @@ tb_pointer_t tb_pool_malloc_(tb_pool_ref_t self, tb_size_t size __tb_debug_decl_
     tb_assert_and_check_return_val(pool, tb_null);
 
     // check
-    tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(pool->large_allocator && pool->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_pointer_t data = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc_(pool->small_pool, size __tb_debug_args__) : tb_allocator_large_malloc_(pool->large_pool, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc_(pool->small_pool, size __tb_debug_args__) : tb_allocator_large_malloc_(pool->large_allocator, size, tb_null __tb_debug_args__);
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -150,13 +150,13 @@ tb_pointer_t tb_pool_malloc0_(tb_pool_ref_t self, tb_size_t size __tb_debug_decl
     tb_assert_and_check_return_val(pool, tb_null);
    
     // check
-    tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(pool->large_allocator && pool->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_pointer_t data = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc0_(pool->small_pool, size __tb_debug_args__) : tb_allocator_large_malloc0_(pool->large_pool, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc0_(pool->small_pool, size __tb_debug_args__) : tb_allocator_large_malloc0_(pool->large_allocator, size, tb_null __tb_debug_args__);
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -171,13 +171,13 @@ tb_pointer_t tb_pool_nalloc_(tb_pool_ref_t self, tb_size_t item, tb_size_t size 
     tb_assert_and_check_return_val(pool, tb_null);
 
     // check
-    tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(pool->large_allocator && pool->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_pointer_t data = (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc_(pool->small_pool, item, size __tb_debug_args__) : tb_allocator_large_nalloc_(pool->large_pool, item, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc_(pool->small_pool, item, size __tb_debug_args__) : tb_allocator_large_nalloc_(pool->large_allocator, item, size, tb_null __tb_debug_args__);
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -192,13 +192,13 @@ tb_pointer_t tb_pool_nalloc0_(tb_pool_ref_t self, tb_size_t item, tb_size_t size
     tb_assert_and_check_return_val(pool, tb_null);
 
     // check
-    tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(pool->large_allocator && pool->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
 
     // done
-    tb_pointer_t data = (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc0_(pool->small_pool, item, size __tb_debug_args__) : tb_allocator_large_nalloc0_(pool->large_pool, item, size, tb_null __tb_debug_args__);
+    tb_pointer_t data = (item * size) <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_nalloc0_(pool->small_pool, item, size __tb_debug_args__) : tb_allocator_large_nalloc0_(pool->large_allocator, item, size, tb_null __tb_debug_args__);
 
     // leave
     tb_spinlock_leave(&pool->lock);
@@ -213,7 +213,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t self, tb_pointer_t data, tb_size_t si
     tb_assert_and_check_return_val(pool, tb_null);
 
     // check
-    tb_assert_and_check_return_val(pool && pool->large_pool && pool->small_pool && size, tb_null);
+    tb_assert_and_check_return_val(pool && pool->large_allocator && pool->small_pool && size, tb_null);
 
     // enter
     tb_spinlock_enter(&pool->lock);
@@ -226,7 +226,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t self, tb_pointer_t data, tb_size_t si
         if (!data)
         {
             // malloc it directly
-            data_new = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc_(pool->small_pool, size __tb_debug_args__) : tb_allocator_large_malloc_(pool->large_pool, size, tb_null __tb_debug_args__);
+            data_new = size <= TB_SMALL_POOL_DATA_SIZE_MAXN? tb_small_pool_malloc_(pool->small_pool, size __tb_debug_args__) : tb_allocator_large_malloc_(pool->large_allocator, size, tb_null __tb_debug_args__);
             break;
         }
 
@@ -242,7 +242,7 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t self, tb_pointer_t data, tb_size_t si
         else if (data_head->size <= TB_SMALL_POOL_DATA_SIZE_MAXN)
         {
             // make the new data
-            data_new = tb_allocator_large_malloc_(pool->large_pool, size, tb_null __tb_debug_args__);
+            data_new = tb_allocator_large_malloc_(pool->large_allocator, size, tb_null __tb_debug_args__);
             tb_assert_and_check_break(data_new);
 
             // copy the old data
@@ -262,10 +262,10 @@ tb_pointer_t tb_pool_ralloc_(tb_pool_ref_t self, tb_pointer_t data, tb_size_t si
             tb_memcpy_(data_new, data, tb_min(data_head->size, size));
 
             // free the old data
-            tb_allocator_large_free_(pool->large_pool, data __tb_debug_args__);
+            tb_allocator_large_free_(pool->large_allocator, data __tb_debug_args__);
         }
         // large => large
-        else data_new = tb_allocator_large_ralloc_(pool->large_pool, data, size, tb_null __tb_debug_args__);
+        else data_new = tb_allocator_large_ralloc_(pool->large_allocator, data, size, tb_null __tb_debug_args__);
 
     } while (0);
 
@@ -297,7 +297,7 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t self, tb_pointer_t data __tb_debug_decl__)
     tb_assert_and_check_return_val(pool, tb_false);
 
     // check
-    tb_assert_and_check_return_val(pool->large_pool && pool->small_pool && data, tb_false);
+    tb_assert_and_check_return_val(pool->large_allocator && pool->small_pool && data, tb_false);
 
     // enter
     tb_spinlock_enter(&pool->lock);
@@ -311,7 +311,7 @@ tb_bool_t tb_pool_free_(tb_pool_ref_t self, tb_pointer_t data __tb_debug_decl__)
         tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
 
         // free it
-        ok = (data_head->size <= TB_SMALL_POOL_DATA_SIZE_MAXN)? tb_small_pool_free_(pool->small_pool, data __tb_debug_args__) : tb_allocator_large_free_(pool->large_pool, data __tb_debug_args__);
+        ok = (data_head->size <= TB_SMALL_POOL_DATA_SIZE_MAXN)? tb_small_pool_free_(pool->small_pool, data __tb_debug_args__) : tb_allocator_large_free_(pool->large_allocator, data __tb_debug_args__);
 
     } while (0);
 
@@ -344,7 +344,7 @@ tb_void_t tb_pool_dump(tb_pool_ref_t self)
     tb_assert_and_check_return(pool);
 
     // check
-    tb_assert_and_check_return(pool->large_pool && pool->small_pool);
+    tb_assert_and_check_return(pool->large_allocator && pool->small_pool);
 
     // enter
     tb_spinlock_enter(&pool->lock);

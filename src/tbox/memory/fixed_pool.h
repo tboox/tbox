@@ -27,7 +27,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "large_pool.h"
+#include "large_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -139,7 +139,7 @@ typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t data, tb_
 
 /*! init fixed pool
  *
- * @param large_pool    the large pool
+ * @param large_allocator    the large pool
  * @param slot_size     the item count per-slot, using the default size if be zero
  * @param item_size     the item size
  * @param item_init     the item init func
@@ -148,7 +148,7 @@ typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t data, tb_
  *
  * @return              the pool 
  */
-tb_fixed_pool_ref_t     tb_fixed_pool_init(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
+tb_fixed_pool_ref_t     tb_fixed_pool_init(tb_allocator_ref_t large_allocator, tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
 
 /*! exit pool
  *

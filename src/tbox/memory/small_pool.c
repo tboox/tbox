@@ -32,7 +32,7 @@
  * includes
  */
 #include "small_pool.h"
-#include "large_pool.h"
+#include "large_allocator.h"
 #include "fixed_pool.h"
 #include "impl/prefix.h"
 
@@ -51,7 +51,7 @@
 typedef struct __tb_small_pool_impl_t
 {
     // the large pool
-    tb_large_pool_ref_t     large_pool;
+    tb_allocator_ref_t     large_allocator;
 
     // the fixed pool
     tb_fixed_pool_ref_t     fixed_pool[12];
@@ -61,7 +61,7 @@ typedef struct __tb_small_pool_impl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-__tb_extern_c__ tb_fixed_pool_ref_t tb_fixed_pool_init_(tb_large_pool_ref_t large_pool, tb_size_t slot_size, tb_size_t item_size, tb_bool_t for_small_pool, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
+__tb_extern_c__ tb_fixed_pool_ref_t tb_fixed_pool_init_(tb_allocator_ref_t large_allocator, tb_size_t slot_size, tb_size_t item_size, tb_bool_t for_small_pool, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -155,7 +155,7 @@ static tb_fixed_pool_ref_t tb_small_pool_find_fixed(tb_small_pool_impl_t* impl, 
         tb_trace_d("find: size: %lu => index: %lu, space: %lu", size, index, space);
 
         // make fixed pool if not exists
-        if (!impl->fixed_pool[index]) impl->fixed_pool[index] = tb_fixed_pool_init_(impl->large_pool, 0, space, tb_true, tb_null, tb_null, tb_null);
+        if (!impl->fixed_pool[index]) impl->fixed_pool[index] = tb_fixed_pool_init_(impl->large_allocator, 0, space, tb_true, tb_null, tb_null, tb_null);
         tb_assert_and_check_break(impl->fixed_pool[index]);
 
         // ok
@@ -201,10 +201,10 @@ static tb_bool_t tb_small_pool_item_check(tb_pointer_t data, tb_cpointer_t priv)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_small_pool_ref_t tb_small_pool_init(tb_large_pool_ref_t large_pool)
+tb_small_pool_ref_t tb_small_pool_init(tb_allocator_ref_t large_allocator)
 {
     // check
-    tb_assert_and_check_return_val(large_pool, tb_null);
+    tb_assert_and_check_return_val(large_allocator, tb_null);
 
     // done
     tb_bool_t               ok = tb_false;
@@ -212,11 +212,11 @@ tb_small_pool_ref_t tb_small_pool_init(tb_large_pool_ref_t large_pool)
     do
     {
         // make pool
-        impl = (tb_small_pool_impl_t*)tb_allocator_large_malloc0(large_pool, sizeof(tb_small_pool_impl_t), tb_null);
+        impl = (tb_small_pool_impl_t*)tb_allocator_large_malloc0(large_allocator, sizeof(tb_small_pool_impl_t), tb_null);
         tb_assert_and_check_break(impl);
 
         // init pool
-        impl->large_pool = large_pool;
+        impl->large_allocator = large_allocator;
 
         // ok
         ok = tb_true;
@@ -237,7 +237,7 @@ tb_void_t tb_small_pool_exit(tb_small_pool_ref_t pool)
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return(impl && impl->large_pool);
+    tb_assert_and_check_return(impl && impl->large_allocator);
 
     // exit fixed pool
     tb_size_t i = 0;
@@ -250,13 +250,13 @@ tb_void_t tb_small_pool_exit(tb_small_pool_ref_t pool)
     }
 
     // exit pool
-    tb_allocator_large_free(impl->large_pool, impl);
+    tb_allocator_large_free(impl->large_allocator, impl);
 }
 tb_void_t tb_small_pool_clear(tb_small_pool_ref_t pool)
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return(impl && impl->large_pool);
+    tb_assert_and_check_return(impl && impl->large_allocator);
 
     // clear fixed pool
     tb_size_t i = 0;
@@ -271,12 +271,12 @@ tb_pointer_t tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size __tb
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl && impl->large_allocator && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_allocator_large_malloc(impl->large_pool, size, tb_null);
+    return tb_allocator_large_malloc(impl->large_allocator, size, tb_null);
 #endif
 
     // done
@@ -315,12 +315,12 @@ tb_pointer_t tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size __t
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl && impl->large_allocator && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
    
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_allocator_large_malloc0(impl->large_pool, size, tb_null);
+    return tb_allocator_large_malloc0(impl->large_allocator, size, tb_null);
 #endif
 
     // done
@@ -359,12 +359,12 @@ tb_pointer_t tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl && impl->large_allocator && size, tb_null);
     tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_allocator_large_nalloc(impl->large_pool, item, size, tb_null);
+    return tb_allocator_large_nalloc(impl->large_allocator, item, size, tb_null);
 #endif
 
     // done
@@ -403,12 +403,12 @@ tb_pointer_t tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && size, tb_null);
+    tb_assert_and_check_return_val(impl && impl->large_allocator && size, tb_null);
     tb_assert_and_check_return_val(item * size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_allocator_large_nalloc0(impl->large_pool, item, size, tb_null);
+    return tb_allocator_large_nalloc0(impl->large_allocator, item, size, tb_null);
 #endif
 
     // done
@@ -447,12 +447,12 @@ tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, 
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && data && size, tb_null);
+    tb_assert_and_check_return_val(impl && impl->large_allocator && data && size, tb_null);
     tb_assert_and_check_return_val(size <= TB_SMALL_POOL_DATA_SIZE_MAXN, tb_null);
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_allocator_large_ralloc(impl->large_pool, data, size, tb_null);
+    return tb_allocator_large_ralloc(impl->large_allocator, data, size, tb_null);
 #endif
 
     // done
@@ -539,11 +539,11 @@ tb_bool_t tb_small_pool_free_(tb_small_pool_ref_t pool, tb_pointer_t data __tb_d
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && impl->large_pool && data, tb_false);
+    tb_assert_and_check_return_val(impl && impl->large_allocator && data, tb_false);
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_allocator_large_free(impl->large_pool, data);
+    return tb_allocator_large_free(impl->large_allocator, data);
 #endif
 
     // done
@@ -593,7 +593,7 @@ tb_void_t tb_small_pool_dump(tb_small_pool_ref_t pool)
 {
     // check
     tb_small_pool_impl_t* impl = (tb_small_pool_impl_t*)pool;
-    tb_assert_and_check_return(impl && impl->large_pool);
+    tb_assert_and_check_return(impl && impl->large_allocator);
 
     // trace
     tb_trace_i("");

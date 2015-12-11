@@ -139,7 +139,7 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
         tb_trace_e("ralloc(%p, %lu) failed! at %s(): %lu, %s", data, size, func_, line_, file_);
 
         // dump data
-        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_pool]: [error]: ");
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_allocator]: [error]: ");
 
         // abort
         tb_abort();
@@ -176,7 +176,7 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
         tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
 
         // dump data
-        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_pool]: [error]: ");
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_allocator]: [error]: ");
 
         // abort
         tb_abort();
@@ -280,7 +280,7 @@ tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer
         tb_trace_e("ralloc(%p, %lu) failed! at %s(): %lu, %s", data, size, func_, line_, file_);
 
         // dump data
-        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_pool]: [error]: ");
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_allocator]: [error]: ");
 
         // abort
         tb_abort();
@@ -318,7 +318,7 @@ tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t da
         tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
 
         // dump data
-        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_pool]: [error]: ");
+        tb_pool_data_dump((tb_byte_t const*)data, tb_true, "[large_allocator]: [error]: ");
 
         // abort
         tb_abort();

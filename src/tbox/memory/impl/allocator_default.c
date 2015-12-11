@@ -32,7 +32,7 @@
  */
 #include "prefix.h"
 #include "../pool.h"
-#include "../large_pool.h"
+#include "../large_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -48,7 +48,7 @@ typedef struct __tb_allocator_default_t
     tb_pool_ref_t           pool;
 
     // the large pool   
-    tb_large_pool_ref_t     large_pool;
+    tb_allocator_ref_t     large_allocator;
 
 }tb_allocator_default_t, *tb_allocator_default_ref_t;
 
@@ -95,37 +95,37 @@ static tb_pointer_t tb_allocator_default_large_malloc(tb_allocator_ref_t self, t
 {
     // check
     tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)self;
-    tb_check_return_val(allocator && allocator->large_pool, tb_null);
+    tb_check_return_val(allocator && allocator->large_allocator, tb_null);
 
     // trace
     tb_trace_d("large_malloc(%lu) at %s(): %lu, %s", size, func_, line_, file_);
 
     // malloc it
-    return tb_allocator_large_malloc_(allocator->large_pool, size, real __tb_debug_args__);
+    return tb_allocator_large_malloc_(allocator->large_allocator, size, real __tb_debug_args__);
 }
 static tb_pointer_t tb_allocator_default_large_ralloc(tb_allocator_ref_t self, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
     tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)self;
-    tb_check_return_val(allocator && allocator->large_pool, tb_null);
+    tb_check_return_val(allocator && allocator->large_allocator, tb_null);
 
     // trace
     tb_trace_d("large_ralloc(%p, %lu) at %s(): %lu, %s", data, size, func_, line_, file_);
 
     // ralloc it
-    return tb_allocator_large_ralloc_(allocator->large_pool, data, size, real __tb_debug_args__);
+    return tb_allocator_large_ralloc_(allocator->large_allocator, data, size, real __tb_debug_args__);
 }
 static tb_bool_t tb_allocator_default_large_free(tb_allocator_ref_t self, tb_pointer_t data __tb_debug_decl__)
 { 
     // check
     tb_allocator_default_ref_t allocator = (tb_allocator_default_ref_t)self;
-    tb_check_return_val(allocator && allocator->large_pool, tb_false);
+    tb_check_return_val(allocator && allocator->large_allocator, tb_false);
 
     // trace    
     tb_trace_d("large_free(%p) at %s(): %lu, %s", data, func_, line_, file_);
 
     // free it
-    return tb_allocator_large_free_(allocator->large_pool, data __tb_debug_args__);
+    return tb_allocator_large_free_(allocator->large_allocator, data __tb_debug_args__);
 }
 #ifdef __tb_debug__
 static tb_void_t tb_allocator_default_dump(tb_allocator_ref_t self)
@@ -154,7 +154,7 @@ static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
     // done
     tb_bool_t                   ok = tb_false;
     tb_pool_ref_t               pool = tb_null;
-    tb_large_pool_ref_t         large_pool = tb_null;
+    tb_allocator_ref_t         large_allocator = tb_null;
     tb_allocator_default_ref_t  allocator = tb_null;
     do
     {
@@ -172,11 +172,11 @@ static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
         if (!tb_native_memory_init()) break ;
 
         // init large pool
-        large_pool = tb_large_pool_init(data, size);
-        tb_assert_and_check_break(large_pool);
+        large_allocator = tb_large_allocator_init(data, size);
+        tb_assert_and_check_break(large_allocator);
 
         // init pool
-        pool = tb_pool_init(large_pool);
+        pool = tb_pool_init(large_allocator);
         tb_assert_and_check_break(pool);
 
         // make allocator
@@ -199,7 +199,7 @@ static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
         allocator->pool = pool;
 
         // save large pool
-        allocator->large_pool = large_pool;
+        allocator->large_allocator = large_allocator;
 
         // ok
         ok = tb_true;
@@ -218,8 +218,8 @@ static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
         pool= tb_null;
 
         // exit large pool
-        if (large_pool) tb_allocator_exit(large_pool);
-        large_pool= tb_null;
+        if (large_allocator) tb_allocator_exit(large_allocator);
+        large_allocator= tb_null;
     }
 
     // ok?
@@ -233,7 +233,7 @@ static tb_void_t tb_allocator_default_instance_exit(tb_handle_t self, tb_cpointe
 
     // get pool
     tb_pool_ref_t       pool = allocator->pool;
-    tb_large_pool_ref_t large_pool = allocator->large_pool;
+    tb_allocator_ref_t large_allocator = allocator->large_allocator;
 
     // exit allocator
     tb_pool_free(pool, allocator);
@@ -250,12 +250,12 @@ static tb_void_t tb_allocator_default_instance_exit(tb_handle_t self, tb_cpointe
 
 #ifdef __tb_debug__
     // dump large pool
-    if (large_pool) tb_allocator_dump(large_pool);
+    if (large_allocator) tb_allocator_dump(large_allocator);
 #endif
 
     // exit large pool
-    if (large_pool) tb_allocator_exit(large_pool);
-    large_pool= tb_null;
+    if (large_allocator) tb_allocator_exit(large_allocator);
+    large_allocator= tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

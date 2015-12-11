@@ -29,7 +29,7 @@
  */
 #include "prefix.h"
 #include "allocator.h"
-#include "large_pool.h"
+#include "large_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -86,11 +86,11 @@ __tb_extern_c_enter__
 
 /*! init the pool
  * 
- * @param large_pool    the large pool
+ * @param large_allocator    the large pool
  *
  * @return              the pool 
  */
-tb_pool_ref_t           tb_pool_init(tb_large_pool_ref_t large_pool);
+tb_pool_ref_t           tb_pool_init(tb_allocator_ref_t large_allocator);
 
 /*! exit the pool
  *

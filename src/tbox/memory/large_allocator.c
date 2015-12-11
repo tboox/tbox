@@ -1,4 +1,4 @@
-/*The Treasure Box Library
+/*!The Treasure Box Library
  * 
  * TBox is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,35 +17,25 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        native_large_pool.h
+ * @file        large_allocator.c
+ * @ingroup     memory
  *
  */
-#ifndef TB_MEMORY_IMPL_NATIVE_LARGE_POOL_H
-#define TB_MEMORY_IMPL_NATIVE_LARGE_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "large_allocator.h"
+#include "platform/platform.h"
+#include "impl/impl.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * implementation
  */
-__tb_extern_c_enter__
+tb_allocator_ref_t tb_large_allocator_init(tb_byte_t* data, tb_size_t size)
+{
+    // init pool
+    return (data && size)? tb_static_large_allocator_init(data, size, tb_page_size()) : tb_native_large_allocator_init();
+}
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
 
-/* init the native large pool and the allocated data will be aligned by the page size
- * 
- * @return              the pool 
- */
-tb_large_pool_ref_t     tb_native_large_pool_init(tb_noarg_t);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
-
-#endif

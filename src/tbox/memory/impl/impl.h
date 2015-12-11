@@ -27,8 +27,8 @@
  * includes
  */
 #include "prefix.h"
-#include "native_large_pool.h"
-#include "static_large_pool.h"
+#include "native_large_allocator.h"
+#include "static_large_allocator.h"
 
 
 #endif

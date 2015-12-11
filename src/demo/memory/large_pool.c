@@ -9,19 +9,19 @@
 
 // init pool
 #if 1
-#   define tb_demo_init_pool()      tb_large_pool_init((tb_byte_t*)malloc(500 * 1024 * 1024), 500 * 1024 * 1024)
+#   define tb_demo_init_pool()      tb_large_allocator_init((tb_byte_t*)malloc(500 * 1024 * 1024), 500 * 1024 * 1024)
 #else
-#   define tb_demo_init_pool()      tb_large_pool_init(tb_null, 0)
+#   define tb_demo_init_pool()      tb_large_allocator_init(tb_null, 0)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * demo
  */ 
-tb_void_t tb_demo_large_pool_leak(tb_noarg_t);
-tb_void_t tb_demo_large_pool_leak()
+tb_void_t tb_demo_large_allocator_leak(tb_noarg_t);
+tb_void_t tb_demo_large_allocator_leak()
 {
     // done
-    tb_large_pool_ref_t pool = tb_null;
+    tb_allocator_ref_t pool = tb_null;
     do
     {
         // init pool
@@ -46,11 +46,11 @@ tb_void_t tb_demo_large_pool_leak()
     // exit pool
     if (pool) tb_allocator_exit(pool);
 }
-tb_void_t tb_demo_large_pool_free2(tb_noarg_t);
-tb_void_t tb_demo_large_pool_free2()
+tb_void_t tb_demo_large_allocator_free2(tb_noarg_t);
+tb_void_t tb_demo_large_allocator_free2()
 {
     // done
-    tb_large_pool_ref_t pool = tb_null;
+    tb_allocator_ref_t pool = tb_null;
     do
     {
         // init pool
@@ -74,11 +74,11 @@ tb_void_t tb_demo_large_pool_free2()
     // exit pool
     if (pool) tb_allocator_exit(pool);
 }
-tb_void_t tb_demo_large_pool_underflow(tb_noarg_t);
-tb_void_t tb_demo_large_pool_underflow()
+tb_void_t tb_demo_large_allocator_underflow(tb_noarg_t);
+tb_void_t tb_demo_large_allocator_underflow()
 {
     // done
-    tb_large_pool_ref_t pool = tb_null;
+    tb_allocator_ref_t pool = tb_null;
     do
     {
         // init pool
@@ -104,11 +104,11 @@ tb_void_t tb_demo_large_pool_underflow()
     // exit pool
     if (pool) tb_allocator_exit(pool);
 }
-tb_void_t tb_demo_large_pool_underflow2(tb_noarg_t);
-tb_void_t tb_demo_large_pool_underflow2()
+tb_void_t tb_demo_large_allocator_underflow2(tb_noarg_t);
+tb_void_t tb_demo_large_allocator_underflow2()
 {
     // done
-    tb_large_pool_ref_t pool = tb_null;
+    tb_allocator_ref_t pool = tb_null;
     do
     {
         // init pool
@@ -135,11 +135,11 @@ tb_void_t tb_demo_large_pool_underflow2()
     // exit pool
     if (pool) tb_allocator_exit(pool);
 }
-tb_void_t tb_demo_large_pool_real(tb_size_t size);
-tb_void_t tb_demo_large_pool_real(tb_size_t size)
+tb_void_t tb_demo_large_allocator_real(tb_size_t size);
+tb_void_t tb_demo_large_allocator_real(tb_size_t size)
 {
     // done
-    tb_large_pool_ref_t pool = tb_null;
+    tb_allocator_ref_t pool = tb_null;
     do
     {
         // init pool
@@ -159,11 +159,11 @@ tb_void_t tb_demo_large_pool_real(tb_size_t size)
     // exit pool
     if (pool) tb_allocator_exit(pool);
 }
-tb_void_t tb_demo_large_pool_perf(tb_noarg_t);
-tb_void_t tb_demo_large_pool_perf()
+tb_void_t tb_demo_large_allocator_perf(tb_noarg_t);
+tb_void_t tb_demo_large_allocator_perf()
 {
     // done
-    tb_large_pool_ref_t pool = tb_null;
+    tb_allocator_ref_t pool = tb_null;
     do
     {
         // init pool
@@ -233,41 +233,41 @@ tb_void_t tb_demo_large_pool_perf()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_memory_large_pool_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_memory_large_allocator_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1
-    tb_demo_large_pool_perf();
+    tb_demo_large_allocator_perf();
 #endif
 
 #if 0
-    tb_demo_large_pool_leak();
+    tb_demo_large_allocator_leak();
 #endif
 
 #if 0
-    tb_demo_large_pool_free2();
+    tb_demo_large_allocator_free2();
 #endif
 
 #if 0
-    tb_demo_large_pool_underflow();
+    tb_demo_large_allocator_underflow();
 #endif
 
 #if 0
-    tb_demo_large_pool_underflow2();
+    tb_demo_large_allocator_underflow2();
 #endif
 
 #if 1
-    tb_demo_large_pool_real(16 * 256);
-    tb_demo_large_pool_real(32 * 256);
-    tb_demo_large_pool_real(64 * 256);
-    tb_demo_large_pool_real(96 * 256);
-    tb_demo_large_pool_real(128 * 256);
-    tb_demo_large_pool_real(192 * 256);
-    tb_demo_large_pool_real(256 * 256);
-    tb_demo_large_pool_real(384 * 256);
-    tb_demo_large_pool_real(512 * 256);
-    tb_demo_large_pool_real(1024 * 256);
-    tb_demo_large_pool_real(2048 * 256);
-    tb_demo_large_pool_real(3072 * 256);
+    tb_demo_large_allocator_real(16 * 256);
+    tb_demo_large_allocator_real(32 * 256);
+    tb_demo_large_allocator_real(64 * 256);
+    tb_demo_large_allocator_real(96 * 256);
+    tb_demo_large_allocator_real(128 * 256);
+    tb_demo_large_allocator_real(192 * 256);
+    tb_demo_large_allocator_real(256 * 256);
+    tb_demo_large_allocator_real(384 * 256);
+    tb_demo_large_allocator_real(512 * 256);
+    tb_demo_large_allocator_real(1024 * 256);
+    tb_demo_large_allocator_real(2048 * 256);
+    tb_demo_large_allocator_real(3072 * 256);
 #endif
 
     return 0;

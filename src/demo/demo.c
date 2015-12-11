@@ -130,7 +130,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(memory_check)
 ,   TB_DEMO_MAIN_ITEM(memory_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_fixed_pool)
-,   TB_DEMO_MAIN_ITEM(memory_large_pool)
+,   TB_DEMO_MAIN_ITEM(memory_large_allocator)
 ,   TB_DEMO_MAIN_ITEM(memory_small_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_string_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_memops)
