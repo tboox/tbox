@@ -29,16 +29,16 @@ tb_void_t tb_demo_large_pool_leak()
         tb_assert_and_check_break(pool);
 
         // make data0
-        tb_pointer_t data0 = tb_large_pool_malloc(pool, 10, tb_null);
+        tb_pointer_t data0 = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data0);
     
         // make data1
-        tb_pointer_t data1 = tb_large_pool_malloc(pool, 10, tb_null);
+        tb_pointer_t data1 = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data1);
     
 #ifdef __tb_debug__
         // dump pool
-        tb_large_pool_dump(pool);
+        tb_allocator_dump(pool);
 #endif
 
     } while (0);
@@ -58,16 +58,16 @@ tb_void_t tb_demo_large_pool_free2()
         tb_assert_and_check_break(pool);
 
         // make data
-        tb_pointer_t data = tb_large_pool_malloc(pool, 10, tb_null);
+        tb_pointer_t data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
     
         // exit data
-        tb_large_pool_free(pool, data);
-        tb_large_pool_free(pool, data);
+        tb_allocator_large_free(pool, data);
+        tb_allocator_large_free(pool, data);
      
 #ifdef __tb_debug__
         // dump pool
-        tb_large_pool_dump(pool);
+        tb_allocator_dump(pool);
 #endif
     } while (0);
 
@@ -86,18 +86,18 @@ tb_void_t tb_demo_large_pool_underflow()
         tb_assert_and_check_break(pool);
 
         // make data
-        tb_pointer_t data = tb_large_pool_malloc(pool, 10, tb_null);
+        tb_pointer_t data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
     
         // done underflow
         tb_memset(data, 0, 10 + 1);
 
         // exit data
-        tb_large_pool_free(pool, data);
+        tb_allocator_large_free(pool, data);
  
 #ifdef __tb_debug__
         // dump pool
-        tb_large_pool_dump(pool);
+        tb_allocator_dump(pool);
 #endif
     } while (0);
 
@@ -116,19 +116,19 @@ tb_void_t tb_demo_large_pool_underflow2()
         tb_assert_and_check_break(pool);
 
         // make data
-        tb_pointer_t data = tb_large_pool_malloc(pool, 10, tb_null);
+        tb_pointer_t data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
     
         // done underflow
         tb_memset(data, 0, 10 + 1);
 
         // make data2
-        data = tb_large_pool_malloc(pool, 10, tb_null);
+        data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
  
 #ifdef __tb_debug__
         // dump pool
-        tb_large_pool_dump(pool);
+        tb_allocator_dump(pool);
 #endif
     } while (0);
 
@@ -148,7 +148,7 @@ tb_void_t tb_demo_large_pool_real(tb_size_t size)
 
         // make data
         tb_size_t       real = 0;
-        tb_pointer_t    data = tb_large_pool_malloc(pool, size, &real);
+        tb_pointer_t    data = tb_allocator_large_malloc(pool, size, &real);
         tb_assert_and_check_break(data);
 
         // trace
@@ -175,7 +175,7 @@ tb_void_t tb_demo_large_pool_perf()
 
         // make data list
         tb_size_t       maxn = 10000;
-        tb_pointer_t*   list = (tb_pointer_t*)tb_large_pool_nalloc0(pool, maxn, sizeof(tb_pointer_t), tb_null);
+        tb_pointer_t*   list = (tb_pointer_t*)tb_allocator_large_nalloc0(pool, maxn, sizeof(tb_pointer_t), tb_null);
         tb_assert_and_check_break(list);
 
         // done 
@@ -185,13 +185,13 @@ tb_void_t tb_demo_large_pool_perf()
         for (indx = 0; indx < maxn; indx++)
         {
             // make data
-            list[indx] = tb_large_pool_malloc0(pool, tb_random_range(tb_null, 1, pagesize << 4), tb_null);
+            list[indx] = tb_allocator_large_malloc0(pool, tb_random_range(tb_null, 1, pagesize << 4), tb_null);
             tb_assert_and_check_break(list[indx]);
 
             // re-make data
             if (!(indx & 31)) 
             {
-                list[indx] = tb_large_pool_ralloc(pool, list[indx], tb_random_range(tb_null, 1, pagesize << 4), tb_null);
+                list[indx] = tb_allocator_large_ralloc(pool, list[indx], tb_random_range(tb_null, 1, pagesize << 4), tb_null);
                 tb_assert_and_check_break(list[indx]);
             }
 
@@ -206,7 +206,7 @@ tb_void_t tb_demo_large_pool_perf()
                     tb_size_t free_indx = tb_random_range(tb_null, 0, indx);
 
                     // free it
-                    if (list[free_indx]) tb_large_pool_free(pool, list[free_indx]);
+                    if (list[free_indx]) tb_allocator_large_free(pool, list[free_indx]);
                     list[free_indx] = tb_null;
                 }
             }
@@ -215,7 +215,7 @@ tb_void_t tb_demo_large_pool_perf()
 
 #ifdef __tb_debug__
         // dump pool
-        tb_large_pool_dump(pool);
+        tb_allocator_dump(pool);
 #endif
 
         // trace

@@ -55,45 +55,6 @@ tb_void_t               tb_native_large_pool_exit(tb_large_pool_ref_t pool);
  */
 tb_void_t               tb_native_large_pool_clear(tb_large_pool_ref_t pool);
 
-/* malloc data
- *
- * @param pool          the pool 
- * @param size          the size
- * @param real          the real allocated size >= size, optional
- *
- * @return              the data address
- */
-tb_pointer_t            tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__);
-
-/* realloc data
- *
- * @param pool          the pool 
- * @param data          the data address
- * @param size          the data size
- * @param real          the real allocated size >= size, optional
- *
- * @return              the new data 
- */
-tb_pointer_t            tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__);
-
-/* free data
- *
- * @param pool          the pool 
- * @param data          the data address
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__);
-
-#ifdef __tb_debug__
-/* dump the pool
- *
- * @param handle        the pool
- * @param prefix        the trace prefix
- */
-tb_void_t               tb_native_large_pool_dump(tb_large_pool_ref_t pool);
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

@@ -101,7 +101,7 @@ static tb_pointer_t tb_allocator_default_large_malloc(tb_allocator_ref_t self, t
     tb_trace_d("large_malloc(%lu) at %s(): %lu, %s", size, func_, line_, file_);
 
     // malloc it
-    return tb_large_pool_malloc_(allocator->large_pool, size, real __tb_debug_args__);
+    return tb_allocator_large_malloc_(allocator->large_pool, size, real __tb_debug_args__);
 }
 static tb_pointer_t tb_allocator_default_large_ralloc(tb_allocator_ref_t self, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
@@ -113,7 +113,7 @@ static tb_pointer_t tb_allocator_default_large_ralloc(tb_allocator_ref_t self, t
     tb_trace_d("large_ralloc(%p, %lu) at %s(): %lu, %s", data, size, func_, line_, file_);
 
     // ralloc it
-    return tb_large_pool_ralloc_(allocator->large_pool, data, size, real __tb_debug_args__);
+    return tb_allocator_large_ralloc_(allocator->large_pool, data, size, real __tb_debug_args__);
 }
 static tb_bool_t tb_allocator_default_large_free(tb_allocator_ref_t self, tb_pointer_t data __tb_debug_decl__)
 { 
@@ -125,7 +125,7 @@ static tb_bool_t tb_allocator_default_large_free(tb_allocator_ref_t self, tb_poi
     tb_trace_d("large_free(%p) at %s(): %lu, %s", data, func_, line_, file_);
 
     // free it
-    return tb_large_pool_free_(allocator->large_pool, data __tb_debug_args__);
+    return tb_allocator_large_free_(allocator->large_pool, data __tb_debug_args__);
 }
 #ifdef __tb_debug__
 static tb_void_t tb_allocator_default_dump(tb_allocator_ref_t self)
@@ -250,7 +250,7 @@ static tb_void_t tb_allocator_default_instance_exit(tb_handle_t self, tb_cpointe
 
 #ifdef __tb_debug__
     // dump large pool
-    if (large_pool) tb_large_pool_dump(large_pool);
+    if (large_pool) tb_allocator_dump(large_pool);
 #endif
 
     // exit large pool
