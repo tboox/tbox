@@ -121,7 +121,7 @@ TB_DEMO_MAIN_DECL(string_static_string);
 TB_DEMO_MAIN_DECL(memory_check);
 TB_DEMO_MAIN_DECL(memory_pool);
 TB_DEMO_MAIN_DECL(memory_fixed_pool);
-TB_DEMO_MAIN_DECL(memory_large_pool);
+TB_DEMO_MAIN_DECL(memory_large_allocator);
 TB_DEMO_MAIN_DECL(memory_small_pool);
 TB_DEMO_MAIN_DECL(memory_string_pool);
 TB_DEMO_MAIN_DECL(memory_memops);

@@ -27,7 +27,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "large_pool.h"
+#include "large_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -94,11 +94,11 @@ typedef struct{}*       tb_small_pool_ref_t;
 
 /*! init the small pool only for size <=3KB
  * 
- * @param large_pool    the large pool
+ * @param large_allocator    the large pool
  *
  * @return              the pool 
  */
-tb_small_pool_ref_t     tb_small_pool_init(tb_large_pool_ref_t large_pool);
+tb_small_pool_ref_t     tb_small_pool_init(tb_allocator_ref_t large_allocator);
 
 /*! exit the pool
  *

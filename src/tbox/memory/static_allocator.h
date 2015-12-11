@@ -17,17 +17,16 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        large_pool.h
+ * @file        static_allocator.h
  * @ingroup     memory
  *
  */
-#ifndef TB_MEMORY_LARGE_POOL_H
-#define TB_MEMORY_LARGE_POOL_H
+#ifndef TB_MEMORY_STATIC_ALLOCATOR_H
+#define TB_MEMORY_STATIC_ALLOCATOR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
 #include "allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,44 +35,47 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-/*! the large pool ref type
- *
- * <pre>
- *
- *  -------------------------      ----------------------
- * |       native memory     |    |         data         |
- *  -------------------------      ---------------------- 
- *              |                             |
- *  -------------------------      ----------------------
- * |       native pool       |    |      static pool     |
- *  -------------------------      ---------------------- 
- *              |                             |
- *  -----------------------------------------------------
- * |  if (pool address & 1)     |           else         |
- * |-----------------------------------------------------|
- * |                       large pool                    |
- *  ----------------------------------------------------- 
- *
- *  </pre>
- *
- */
-typedef tb_allocator_ref_t       tb_large_pool_ref_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init the large pool
- * 
- * @param data          the pool data, using the native memory if be null
- * @param size          the pool size
+/*! the global static allocator 
  *
- * @return              the pool 
+ * @note
+ * this allocator may be called before tb_init()
+ *
+ * @param data          the allocator data
+ * @param size          the allocator size
+ *
+ * @return              the allocator 
  */
-tb_large_pool_ref_t     tb_large_pool_init(tb_byte_t* data, tb_size_t size);
+tb_allocator_ref_t      tb_static_allocator(tb_byte_t* data, tb_size_t size);
+
+/*! init the static allocator
+ *
+ * <pre>
+ *
+ *  -----------------------------------------------------
+ * |                         data                        |
+ *  ----------------------------------------------------- 
+ *                             |           
+ *  ----------------------------------------------------- 
+ * |                    static allocator                 |
+ *  ----------------------------------------------------- 
+ *
+ * </pre>
+ * 
+ * @param data          the allocator data
+ * @param size          the allocator size
+ *
+ * @return              the allocator 
+ */
+tb_allocator_ref_t      tb_static_allocator_init(tb_byte_t* data, tb_size_t size);
+
+/*! exit the allocator
+ *
+ * @param allocator     the allocator 
+ */
+tb_void_t               tb_static_allocator_exit(tb_allocator_ref_t allocator);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

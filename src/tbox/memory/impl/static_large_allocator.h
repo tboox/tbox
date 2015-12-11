@@ -17,10 +17,10 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        static_large_pool.h
+ * @file        static_large_allocator.h
  */
-#ifndef TB_MEMORY_IMPL_STATIC_LARGE_POOL_H
-#define TB_MEMORY_IMPL_STATIC_LARGE_POOL_H
+#ifndef TB_MEMORY_IMPL_STATIC_LARGE_ALLOCATOR_H
+#define TB_MEMORY_IMPL_STATIC_LARGE_ALLOCATOR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -36,27 +36,15 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* init the large pool and the allocated data will be aligned by the page size
+/* init the large allocator and the allocated data will be aligned by the page size
  * 
- * @param data          the pool data
- * @param size          the pool size
+ * @param data          the allocator data
+ * @param size          the allocator size
  * @param pagesize      the pagesize
  *
- * @return              the pool 
+ * @return              the allocator 
  */
-tb_large_pool_ref_t     tb_static_large_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t pagesize);
-
-/* exit the pool
- *
- * @param pool          the pool 
- */
-tb_void_t               tb_static_large_pool_exit(tb_large_pool_ref_t pool);
-
-/* clear the pool
- *
- * @param pool          the pool 
- */
-tb_void_t               tb_static_large_pool_clear(tb_large_pool_ref_t pool);
+tb_allocator_ref_t      tb_static_large_allocator_init(tb_byte_t* data, tb_size_t size, tb_size_t pagesize);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

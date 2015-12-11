@@ -32,7 +32,7 @@
 #include "buffer.h"
 #include "allocator.h"
 #include "fixed_pool.h"
-#include "large_pool.h"
+#include "large_allocator.h"
 #include "small_pool.h"
 #include "string_pool.h"
 #include "queue_buffer.h"

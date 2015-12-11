@@ -11,7 +11,7 @@ tb_void_t tb_demo_small_pool_leak()
 {
     // done
     tb_small_pool_ref_t small_pool = tb_null;
-    tb_large_pool_ref_t large_pool = tb_null;
+    tb_allocator_ref_t large_allocator = tb_null;
     do
     {
         // init small pool
@@ -19,8 +19,8 @@ tb_void_t tb_demo_small_pool_leak()
         tb_assert_and_check_break(small_pool);
 
         // init large pool
-        large_pool = tb_large_pool_init(tb_null, 0);
-        tb_assert_and_check_break(large_pool);
+        large_allocator = tb_large_allocator_init(tb_null, 0);
+        tb_assert_and_check_break(large_allocator);
 
         // make data0
         tb_pointer_t data0 = tb_small_pool_malloc(small_pool, 10);
@@ -42,15 +42,15 @@ tb_void_t tb_demo_small_pool_leak()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_allocator_exit(large_pool);
-    large_pool = tb_null;
+    if (large_allocator) tb_allocator_exit(large_allocator);
+    large_allocator = tb_null;
 }
 tb_void_t tb_demo_small_pool_free2(tb_noarg_t);
 tb_void_t tb_demo_small_pool_free2()
 {
     // done
     tb_small_pool_ref_t small_pool = tb_null;
-    tb_large_pool_ref_t large_pool = tb_null;
+    tb_allocator_ref_t large_allocator = tb_null;
     do
     {
         // init small pool
@@ -58,8 +58,8 @@ tb_void_t tb_demo_small_pool_free2()
         tb_assert_and_check_break(small_pool);
 
         // init large pool
-        large_pool = tb_large_pool_init(tb_null, 0);
-        tb_assert_and_check_break(large_pool);
+        large_allocator = tb_large_allocator_init(tb_null, 0);
+        tb_assert_and_check_break(large_allocator);
 
         // make data
         tb_pointer_t data = tb_small_pool_malloc(small_pool, 10);
@@ -80,15 +80,15 @@ tb_void_t tb_demo_small_pool_free2()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_allocator_exit(large_pool);
-    large_pool = tb_null;
+    if (large_allocator) tb_allocator_exit(large_allocator);
+    large_allocator = tb_null;
 }
 tb_void_t tb_demo_small_pool_underflow(tb_noarg_t);
 tb_void_t tb_demo_small_pool_underflow()
 {
     // done
     tb_small_pool_ref_t small_pool = tb_null;
-    tb_large_pool_ref_t large_pool = tb_null;
+    tb_allocator_ref_t large_allocator = tb_null;
     do
     {
         // init small pool
@@ -96,8 +96,8 @@ tb_void_t tb_demo_small_pool_underflow()
         tb_assert_and_check_break(small_pool);
 
         // init large pool
-        large_pool = tb_large_pool_init(tb_null, 0);
-        tb_assert_and_check_break(large_pool);
+        large_allocator = tb_large_allocator_init(tb_null, 0);
+        tb_assert_and_check_break(large_allocator);
 
         // make data
         tb_pointer_t data = tb_small_pool_malloc(small_pool, 10);
@@ -120,15 +120,15 @@ tb_void_t tb_demo_small_pool_underflow()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_allocator_exit(large_pool);
-    large_pool = tb_null;
+    if (large_allocator) tb_allocator_exit(large_allocator);
+    large_allocator = tb_null;
 }
 tb_void_t tb_demo_small_pool_underflow2(tb_noarg_t);
 tb_void_t tb_demo_small_pool_underflow2()
 {
     // done
     tb_small_pool_ref_t small_pool = tb_null;
-    tb_large_pool_ref_t large_pool = tb_null;
+    tb_allocator_ref_t large_allocator = tb_null;
     do
     {
         // init small pool
@@ -136,8 +136,8 @@ tb_void_t tb_demo_small_pool_underflow2()
         tb_assert_and_check_break(small_pool);
 
         // init large pool
-        large_pool = tb_large_pool_init(tb_null, 0);
-        tb_assert_and_check_break(large_pool);
+        large_allocator = tb_large_allocator_init(tb_null, 0);
+        tb_assert_and_check_break(large_allocator);
 
         // make data
         tb_pointer_t data = tb_small_pool_malloc(small_pool, 10);
@@ -161,15 +161,15 @@ tb_void_t tb_demo_small_pool_underflow2()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_allocator_exit(large_pool);
-    large_pool = tb_null;
+    if (large_allocator) tb_allocator_exit(large_allocator);
+    large_allocator = tb_null;
 }
 tb_void_t tb_demo_small_pool_perf(tb_noarg_t);
 tb_void_t tb_demo_small_pool_perf()
 {
     // done
     tb_small_pool_ref_t small_pool = tb_null;
-    tb_large_pool_ref_t large_pool = tb_null;
+    tb_allocator_ref_t large_allocator = tb_null;
     do
     {
         // init small pool
@@ -177,12 +177,12 @@ tb_void_t tb_demo_small_pool_perf()
         tb_assert_and_check_break(small_pool);
 
         // init large pool
-        large_pool = tb_large_pool_init(tb_null, 0);
-        tb_assert_and_check_break(large_pool);
+        large_allocator = tb_large_allocator_init(tb_null, 0);
+        tb_assert_and_check_break(large_allocator);
 
         // make data list
         tb_size_t       maxn = 100000;
-        tb_pointer_t*   list = (tb_pointer_t*)tb_allocator_large_nalloc0(large_pool, maxn, sizeof(tb_pointer_t), tb_null);
+        tb_pointer_t*   list = (tb_pointer_t*)tb_allocator_large_nalloc0(large_allocator, maxn, sizeof(tb_pointer_t), tb_null);
         tb_assert_and_check_break(list);
 
         // done 
@@ -235,7 +235,7 @@ tb_void_t tb_demo_small_pool_perf()
         tb_small_pool_clear(small_pool);
 
         // exit list
-        tb_allocator_large_free(large_pool, list);
+        tb_allocator_large_free(large_allocator, list);
 
     } while (0);
 
@@ -244,8 +244,8 @@ tb_void_t tb_demo_small_pool_perf()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_allocator_exit(large_pool);
-    large_pool = tb_null;
+    if (large_allocator) tb_allocator_exit(large_allocator);
+    large_allocator = tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
