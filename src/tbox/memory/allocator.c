@@ -64,21 +64,20 @@ tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size _
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
     // malloc it
     tb_pointer_t data = tb_null;
     if (allocator->malloc) data = allocator->malloc(allocator, size __tb_debug_args__);
-    else
-    {
-        // check
-        tb_assert_and_check_return_val(allocator->large_malloc, tb_null);
-
-        // malloc it
-        data = allocator->large_malloc(allocator, size, tb_null __tb_debug_args__);
-    }
+    else if (allocator->large_malloc) data = allocator->large_malloc(allocator, size, tb_null __tb_debug_args__);
 
     // check
     tb_assertf_abort(data, "malloc(%lu) failed!", size);
     tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
+
+    // leave
+    tb_spinlock_leave(&allocator->lock);
 
     // ok?
     return data;
@@ -124,17 +123,13 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
     // ralloc it
     tb_pointer_t data_new = tb_null;
     if (allocator->ralloc) data_new = allocator->ralloc(allocator, data, size __tb_debug_args__);
-    else
-    {
-        // check
-        tb_assert_and_check_return_val(allocator->large_ralloc, tb_null);
-
-        // ralloc it
-        data_new = allocator->large_ralloc(allocator, data, size, tb_null __tb_debug_args__);
-    }
+    else if (allocator->large_ralloc) data_new = allocator->large_ralloc(allocator, data, size, tb_null __tb_debug_args__);
 
     // failed? dump it
 #ifdef __tb_debug__
@@ -154,6 +149,9 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
     // check
     tb_assertf_abort(!(((tb_size_t)data_new) & (TB_POOL_DATA_ALIGN - 1)), "ralloc(%lu): unaligned data: %p", size, data);
 
+    // leave
+    tb_spinlock_leave(&allocator->lock);
+
     // ok?
     return data_new;
 }
@@ -162,17 +160,13 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
     // check
     tb_assert_and_check_return_val(allocator, tb_false);
 
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
     // free it
     tb_bool_t ok = tb_false;
     if (allocator->free) ok = allocator->free(allocator, data __tb_debug_args__);
-    else
-    {
-        // check
-        tb_assert_and_check_return_val(allocator->large_free, tb_false);
-    
-        // free it
-        ok = allocator->large_free(allocator, data __tb_debug_args__);
-    }
+    else if (allocator->large_free) ok = allocator->large_free(allocator, data __tb_debug_args__);
 
     // failed? dump it
 #ifdef __tb_debug__
@@ -189,6 +183,9 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
     }
 #endif
 
+    // leave
+    tb_spinlock_leave(&allocator->lock);
+
     // ok?
     return ok;
 }
@@ -197,14 +194,14 @@ tb_pointer_t tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t 
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
     // malloc it
     tb_pointer_t data = tb_null;
     if (allocator->large_malloc) data = allocator->large_malloc(allocator, size, real __tb_debug_args__);
-    else
+    else if (allocator->malloc)
     {
-        // check
-        tb_assert_and_check_return_val(allocator->malloc, tb_null);
-
         // malloc it
         if (real) *real = size;
         data = allocator->malloc(allocator, size __tb_debug_args__);
@@ -214,6 +211,9 @@ tb_pointer_t tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t 
     tb_assertf_abort(data, "malloc(%lu) failed!", size);
     tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
     tb_assert_abort(!real || *real >= size);
+
+    // leave
+    tb_spinlock_leave(&allocator->lock);
 
     // ok?
     return data;
@@ -259,14 +259,14 @@ tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
     // ralloc it
     tb_pointer_t data_new = tb_null;
     if (allocator->large_ralloc) data_new = allocator->large_ralloc(allocator, data, size, real __tb_debug_args__);
-    else
+    else if (allocator->ralloc)
     {
-        // check
-        tb_assert_and_check_return_val(allocator->ralloc, tb_null);
-
         // ralloc it
         if (real) *real = size;
         data_new = allocator->ralloc(allocator, data, size __tb_debug_args__);
@@ -291,6 +291,9 @@ tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer
     tb_assert_abort(!real || *real >= size);
     tb_assertf_abort(!(((tb_size_t)data_new) & (TB_POOL_DATA_ALIGN - 1)), "ralloc(%lu): unaligned data: %p", size, data);
 
+    // leave
+    tb_spinlock_leave(&allocator->lock);
+
     // ok?
     return data_new;
 }
@@ -299,17 +302,13 @@ tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t da
     // check
     tb_assert_and_check_return_val(allocator, tb_false);
 
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
     // free it
     tb_bool_t ok = tb_false;
     if (allocator->large_free) ok = allocator->large_free(allocator, data __tb_debug_args__);
-    else
-    {
-        // check
-        tb_assert_and_check_return_val(allocator->free, tb_false);
-
-        // free it
-        ok = allocator->free(allocator, data __tb_debug_args__);
-    }
+    else if (allocator->free) ok = allocator->free(allocator, data __tb_debug_args__);
 
     // failed? dump it
 #ifdef __tb_debug__
@@ -325,6 +324,9 @@ tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t da
         tb_abort();
     }
 #endif
+
+    // leave
+    tb_spinlock_leave(&allocator->lock);
 
     // ok?
     return ok;
@@ -444,13 +446,44 @@ tb_bool_t tb_allocator_align_free_(tb_allocator_ref_t allocator, tb_pointer_t da
     // free it
     return tb_allocator_free_(allocator, data __tb_debug_args__);
 }
+tb_void_t tb_allocator_clear(tb_allocator_ref_t allocator)
+{
+    // check
+    tb_assert_and_check_return(allocator);
+
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
+    // clear it
+    if (allocator->clear) allocator->clear(allocator);
+
+    // leave
+    tb_spinlock_leave(&allocator->lock);
+}
+tb_void_t tb_allocator_exit(tb_allocator_ref_t allocator)
+{
+    // check
+    tb_assert_and_check_return(allocator);
+
+    // clear it first
+    tb_allocator_clear(allocator);
+
+    // exit it
+    if (allocator->exit) allocator->exit(allocator);
+}
 #ifdef __tb_debug__
 tb_void_t tb_allocator_dump(tb_allocator_ref_t allocator)
 {
     // check
     tb_assert_and_check_return(allocator);
 
+    // enter
+    tb_spinlock_enter(&allocator->lock);
+
     // dump it
     if (allocator->dump) allocator->dump(allocator);
+
+    // leave
+    tb_spinlock_leave(&allocator->lock);
 }
 #endif

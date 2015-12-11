@@ -44,8 +44,8 @@ typedef enum __tb_singleton_type_e
     /// the default allocator
     TB_SINGLETON_TYPE_ALLOCATOR_DEFAULT     = 0
 
-    /// the default allocator
-,   TB_SINGLETON_TYPE_ALLOCATOR_BUFFER      = 1
+    /// the static allocator
+,   TB_SINGLETON_TYPE_STATIC_ALLOCATOR      = 1
 
     /// the lock profiler type
 ,   TB_SINGLETON_TYPE_LOCK_PROFILER         = 2

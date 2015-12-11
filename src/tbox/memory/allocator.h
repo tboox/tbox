@@ -147,6 +147,18 @@ typedef struct __tb_allocator_t
      */
     tb_bool_t               (*large_free)(struct __tb_allocator_t* allocator, tb_pointer_t data __tb_debug_decl__);
 
+    /*! clear allocator
+     *
+     * @param allocator     the allocator 
+     */
+    tb_void_t               (*clear)(struct __tb_allocator_t* allocator);
+
+    /*! exit allocator
+     *
+     * @param allocator     the allocator 
+     */
+    tb_void_t               (*exit)(struct __tb_allocator_t* allocator);
+
 #ifdef __tb_debug__
     /*! dump allocator
      *
@@ -391,6 +403,18 @@ tb_pointer_t            tb_allocator_align_ralloc_(tb_allocator_ref_t allocator,
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_allocator_align_free_(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__);
+
+/*! clear it
+ *
+ * @param allocator     the allocator 
+ */
+tb_void_t               tb_allocator_clear(tb_allocator_ref_t allocator);
+
+/*! exit it
+ *
+ * @param allocator     the allocator 
+ */
+tb_void_t               tb_allocator_exit(tb_allocator_ref_t allocator);
 
 #ifdef __tb_debug__
 /*! dump it

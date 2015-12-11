@@ -218,7 +218,7 @@ static tb_handle_t tb_allocator_default_instance_init(tb_cpointer_t* ppriv)
         pool= tb_null;
 
         // exit large pool
-        if (large_pool) tb_large_pool_exit(large_pool);
+        if (large_pool) tb_allocator_exit(large_pool);
         large_pool= tb_null;
     }
 
@@ -254,7 +254,7 @@ static tb_void_t tb_allocator_default_instance_exit(tb_handle_t self, tb_cpointe
 #endif
 
     // exit large pool
-    if (large_pool) tb_large_pool_exit(large_pool);
+    if (large_pool) tb_allocator_exit(large_pool);
     large_pool= tb_null;
 }
 

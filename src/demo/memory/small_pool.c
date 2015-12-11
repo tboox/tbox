@@ -42,7 +42,7 @@ tb_void_t tb_demo_small_pool_leak()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_large_pool_exit(large_pool);
+    if (large_pool) tb_allocator_exit(large_pool);
     large_pool = tb_null;
 }
 tb_void_t tb_demo_small_pool_free2(tb_noarg_t);
@@ -80,7 +80,7 @@ tb_void_t tb_demo_small_pool_free2()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_large_pool_exit(large_pool);
+    if (large_pool) tb_allocator_exit(large_pool);
     large_pool = tb_null;
 }
 tb_void_t tb_demo_small_pool_underflow(tb_noarg_t);
@@ -120,7 +120,7 @@ tb_void_t tb_demo_small_pool_underflow()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_large_pool_exit(large_pool);
+    if (large_pool) tb_allocator_exit(large_pool);
     large_pool = tb_null;
 }
 tb_void_t tb_demo_small_pool_underflow2(tb_noarg_t);
@@ -161,7 +161,7 @@ tb_void_t tb_demo_small_pool_underflow2()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_large_pool_exit(large_pool);
+    if (large_pool) tb_allocator_exit(large_pool);
     large_pool = tb_null;
 }
 tb_void_t tb_demo_small_pool_perf(tb_noarg_t);
@@ -244,7 +244,7 @@ tb_void_t tb_demo_small_pool_perf()
     small_pool = tb_null;
 
     // exit large pool
-    if (large_pool) tb_large_pool_exit(large_pool);
+    if (large_pool) tb_allocator_exit(large_pool);
     large_pool = tb_null;
 }
 
