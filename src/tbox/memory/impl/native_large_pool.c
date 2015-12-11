@@ -75,6 +75,9 @@ typedef __tb_pool_data_aligned__ struct __tb_native_large_data_head_t
  */
 typedef struct __tb_native_large_pool_impl_t
 {
+    // the base
+    tb_allocator_t                  base;
+
     // the lock
     tb_spinlock_t                   lock;
 
@@ -258,120 +261,10 @@ static tb_bool_t tb_native_large_pool_free_done(tb_native_large_pool_impl_t* imp
     // ok?
     return ok;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_large_pool_ref_t tb_native_large_pool_init()
-{
-    // done
-    tb_bool_t                       ok = tb_false;
-    tb_native_large_pool_impl_t*    impl = tb_null;
-    do
-    {
-        // check
-        tb_assert_static(!(sizeof(tb_native_large_data_head_t) & (TB_POOL_DATA_ALIGN - 1)));
-
-        // make pool
-        impl = (tb_native_large_pool_impl_t*)tb_native_memory_malloc0(sizeof(tb_native_large_pool_impl_t));
-        tb_assert_and_check_break(impl);
-
-        // init lock
-        if (!tb_spinlock_init(&impl->lock)) break;
-
-        // init data_list
-        tb_list_entry_init(&impl->data_list, tb_native_large_data_head_t, entry, tb_null);
-
-        // register lock profiler
-#ifdef TB_LOCK_PROFILER_ENABLE
-        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->lock, TB_TRACE_MODULE_NAME);
-#endif
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed?
-    if (!ok)
-    {
-        // exit it
-        if (impl) tb_native_large_pool_exit(tb_native_large_pool_ref(impl));
-        impl = tb_null;
-    }
-
-    // ok?
-    return tb_native_large_pool_ref(impl);
-}
-tb_void_t tb_native_large_pool_exit(tb_large_pool_ref_t pool)
+static tb_pointer_t tb_native_large_pool_malloc(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return(impl);
-
-    // clear it
-    tb_native_large_pool_clear(pool);
-
-    // exit lock
-    tb_spinlock_exit(&impl->lock);
-
-    // exit it
-    tb_native_memory_free(impl);
-}
-tb_void_t tb_native_large_pool_clear(tb_large_pool_ref_t pool)
-{
-    // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
-    tb_assert_and_check_return(impl);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
-    // done
-    do
-    {
-        // the iterator
-        tb_iterator_ref_t iterator = tb_list_entry_itor(&impl->data_list);
-        tb_assert_and_check_break(iterator);
-
-        // walk it
-        tb_size_t itor = tb_iterator_head(iterator);
-        while (itor != tb_iterator_tail(iterator))
-        {
-            // the data head
-            tb_native_large_data_head_t* data_head = (tb_native_large_data_head_t*)tb_iterator_item(iterator, itor);
-            tb_assert_and_check_break(data_head);
-
-            // save next
-            tb_size_t next = tb_iterator_next(iterator, itor);
-
-            // exit data
-            tb_native_large_pool_free_done(impl, (tb_pointer_t)&data_head[1] __tb_debug_vals__);
-
-            // next
-            itor = next;
-        }
-
-    } while (0);
-
-    // clear info
-#ifdef __tb_debug__
-    impl->peak_size     = 0;
-    impl->total_size    = 0;
-    impl->real_size     = 0;
-    impl->occupied_size = 0;
-    impl->malloc_count  = 0;
-    impl->ralloc_count  = 0;
-    impl->free_count    = 0;
-#endif
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-}
-tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
-{
-    // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return_val(impl, tb_null);
 
     // enter
@@ -426,7 +319,7 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
 #endif
 
         // save pool reference for checking data range
-        data_head->pool = (tb_pointer_t)pool;
+        data_head->pool = (tb_pointer_t)impl;
 
         // save the data to the data_list
         tb_list_entry_insert_tail(&impl->data_list, &data_head->entry);
@@ -471,10 +364,10 @@ tb_pointer_t tb_native_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t siz
     // ok?
     return (tb_pointer_t)data_real;
 }
-tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+static tb_pointer_t tb_native_large_pool_ralloc(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
 {
     // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return_val(impl, tb_null);
 
     // enter
@@ -502,7 +395,7 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
         // check
         tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "ralloc freed data: %p", data);
         tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
-        tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)pool, "the data: %p not belong to pool: %p", data, pool);
+        tb_assertf_and_check_break(data_head->pool == (tb_pointer_t)impl, "the data: %p not belong to pool: %p", data, impl);
         tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
@@ -613,10 +506,10 @@ tb_pointer_t tb_native_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t 
     // ok?
     return (tb_pointer_t)data_real;
 }
-tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
+static tb_bool_t tb_native_large_pool_free(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
 {
     // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return_val(impl && data, tb_false);
 
     // enter
@@ -632,10 +525,10 @@ tb_bool_t tb_native_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data 
     return ok;
 }
 #ifdef __tb_debug__
-tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
+static tb_void_t tb_native_large_pool_dump(tb_allocator_ref_t allocator)
 {
     // check
-    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(allocator);
     tb_assert_and_check_return(impl);
 
     // enter
@@ -669,3 +562,123 @@ tb_void_t tb_native_large_pool_dump(tb_large_pool_ref_t pool)
 
 }
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_large_pool_ref_t tb_native_large_pool_init()
+{
+    // done
+    tb_bool_t                       ok = tb_false;
+    tb_native_large_pool_impl_t*    impl = tb_null;
+    do
+    {
+        // check
+        tb_assert_static(!(sizeof(tb_native_large_data_head_t) & (TB_POOL_DATA_ALIGN - 1)));
+
+        // make pool
+        impl = (tb_native_large_pool_impl_t*)tb_native_memory_malloc0(sizeof(tb_native_large_pool_impl_t));
+        tb_assert_and_check_break(impl);
+
+        // init base
+        impl->base.type             = TB_ALLOCATOR_LARGE_POOL;
+        impl->base.large_malloc     = tb_native_large_pool_malloc;
+        impl->base.large_ralloc     = tb_native_large_pool_ralloc;
+        impl->base.large_free       = tb_native_large_pool_free;
+#ifdef __tb_debug__
+        impl->base.dump             = tb_native_large_pool_dump;
+#endif
+
+        // init lock
+        if (!tb_spinlock_init(&impl->lock)) break;
+
+        // init data_list
+        tb_list_entry_init(&impl->data_list, tb_native_large_data_head_t, entry, tb_null);
+
+        // register lock profiler
+#ifdef TB_LOCK_PROFILER_ENABLE
+        tb_lock_profiler_register(tb_lock_profiler(), (tb_pointer_t)&impl->lock, TB_TRACE_MODULE_NAME);
+#endif
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (impl) tb_native_large_pool_exit(tb_native_large_pool_ref(impl));
+        impl = tb_null;
+    }
+
+    // ok?
+    return tb_native_large_pool_ref(impl);
+}
+tb_void_t tb_native_large_pool_exit(tb_large_pool_ref_t pool)
+{
+    // check
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
+    tb_assert_and_check_return(impl);
+
+    // clear it
+    tb_native_large_pool_clear(pool);
+
+    // exit lock
+    tb_spinlock_exit(&impl->lock);
+
+    // exit it
+    tb_native_memory_free(impl);
+}
+tb_void_t tb_native_large_pool_clear(tb_large_pool_ref_t pool)
+{
+    // check
+    tb_native_large_pool_impl_t* impl = tb_native_large_pool_impl(pool);
+    tb_assert_and_check_return(impl);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
+    // done
+    do
+    {
+        // the iterator
+        tb_iterator_ref_t iterator = tb_list_entry_itor(&impl->data_list);
+        tb_assert_and_check_break(iterator);
+
+        // walk it
+        tb_size_t itor = tb_iterator_head(iterator);
+        while (itor != tb_iterator_tail(iterator))
+        {
+            // the data head
+            tb_native_large_data_head_t* data_head = (tb_native_large_data_head_t*)tb_iterator_item(iterator, itor);
+            tb_assert_and_check_break(data_head);
+
+            // save next
+            tb_size_t next = tb_iterator_next(iterator, itor);
+
+            // exit data
+            tb_native_large_pool_free_done(impl, (tb_pointer_t)&data_head[1] __tb_debug_vals__);
+
+            // next
+            itor = next;
+        }
+
+    } while (0);
+
+    // clear info
+#ifdef __tb_debug__
+    impl->peak_size     = 0;
+    impl->total_size    = 0;
+    impl->real_size     = 0;
+    impl->occupied_size = 0;
+    impl->malloc_count  = 0;
+    impl->ralloc_count  = 0;
+    impl->free_count    = 0;
+#endif
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+}
+

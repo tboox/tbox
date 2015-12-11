@@ -61,7 +61,7 @@ static tb_pointer_t tb_allocator_buffer_malloc(tb_allocator_ref_t self, tb_size_
     tb_trace_d("malloc(%lu) at %s(): %lu, %s", size, func_, line_, file_);
 
     // malloc it
-    return tb_static_pool_malloc_(allocator->pool, size __tb_debug_args__);
+    return tb_allocator_malloc_(allocator->pool, size __tb_debug_args__);
 }
 static tb_pointer_t tb_allocator_buffer_ralloc(tb_allocator_ref_t self, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
@@ -73,7 +73,7 @@ static tb_pointer_t tb_allocator_buffer_ralloc(tb_allocator_ref_t self, tb_point
     tb_trace_d("ralloc(%p, %lu) at %s(): %lu, %s", data, size, func_, line_, file_);
 
     // ralloc it
-    return tb_static_pool_ralloc_(allocator->pool, data, size __tb_debug_args__);
+    return tb_allocator_ralloc_(allocator->pool, data, size __tb_debug_args__);
 }
 static tb_bool_t tb_allocator_buffer_free(tb_allocator_ref_t self, tb_pointer_t data __tb_debug_decl__)
 { 
@@ -85,7 +85,7 @@ static tb_bool_t tb_allocator_buffer_free(tb_allocator_ref_t self, tb_pointer_t 
     tb_trace_d("free(%p) at %s(): %lu, %s", data, func_, line_, file_);
 
     // free it
-    return tb_static_pool_free_(allocator->pool, data __tb_debug_args__);
+    return tb_allocator_free_(allocator->pool, data __tb_debug_args__);
 }
 #ifdef __tb_debug__
 static tb_void_t tb_allocator_buffer_dump(tb_allocator_ref_t self)
@@ -95,7 +95,7 @@ static tb_void_t tb_allocator_buffer_dump(tb_allocator_ref_t self)
     tb_check_return(allocator && allocator->pool);
 
     // dump it
-    tb_static_pool_dump(allocator->pool);
+    tb_allocator_dump(allocator->pool);
 }
 #endif
 static tb_handle_t tb_allocator_buffer_instance_init(tb_cpointer_t* ppriv)
@@ -134,7 +134,7 @@ static tb_handle_t tb_allocator_buffer_instance_init(tb_cpointer_t* ppriv)
         tb_assert_and_check_break(pool);
 
         // make allocator
-        allocator = (tb_allocator_buffer_ref_t)tb_static_pool_malloc0(pool, sizeof(tb_allocator_buffer_t));
+        allocator = (tb_allocator_buffer_ref_t)tb_allocator_malloc0(pool, sizeof(tb_allocator_buffer_t));
         tb_assert_and_check_break(allocator); 
 
         // init allocator
@@ -158,7 +158,7 @@ static tb_handle_t tb_allocator_buffer_instance_init(tb_cpointer_t* ppriv)
     if (!ok)
     {
         // exit allocator
-        if (allocator && pool) tb_static_pool_free(pool, allocator);
+        if (allocator && pool) tb_allocator_free(pool, allocator);
         allocator = tb_null;
 
         // exit pool
@@ -180,12 +180,12 @@ static tb_void_t tb_allocator_buffer_instance_exit(tb_handle_t self, tb_cpointer
     tb_assert_and_check_return(pool);
 
     // exit allocator
-    tb_static_pool_free(pool, allocator);
+    tb_allocator_free(pool, allocator);
     allocator = tb_null;
 
     // dump pool
 #ifdef __tb_debug__
-    if (pool) tb_static_pool_dump(pool);
+    if (pool) tb_allocator_dump(pool);
 #endif
 
     // exit pool

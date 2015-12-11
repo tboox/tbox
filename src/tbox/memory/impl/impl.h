@@ -17,37 +17,18 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        static_pool.c
- * @ingroup     memory
+ * @file        impl.h
  *
  */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME            "static_pool"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#ifndef TB_MEMORY_IMPL_H
+#define TB_MEMORY_IMPL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "allocator.h"
-#include "static_pool.h"
-#include "impl/impl.h"
+#include "prefix.h"
+#include "native_large_pool.h"
+#include "static_large_pool.h"
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_static_pool_ref_t tb_static_pool_init(tb_byte_t* data, tb_size_t size)
-{
-    return tb_static_large_pool_init(data, size, 8);
-}
-tb_void_t tb_static_pool_exit(tb_static_pool_ref_t self)
-{
-    tb_static_large_pool_exit(self);
-}
-tb_void_t tb_static_pool_clear(tb_static_pool_ref_t self)
-{
-    tb_static_large_pool_clear(self);
-}
 
+#endif

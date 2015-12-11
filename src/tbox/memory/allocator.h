@@ -72,9 +72,11 @@ __tb_extern_c_enter__
 /// the allocator type enum
 typedef enum __tb_allocator_type_e
 {
-    TB_ALLOCATOR_DEFAULT    = 0
-,   TB_ALLOCATOR_NATIVE     = 1
-,   TB_ALLOCATOR_BUFFER     = 2
+    TB_ALLOCATOR_NONE       = 0
+,   TB_ALLOCATOR_DEFAULT    = 1
+,   TB_ALLOCATOR_NATIVE     = 2
+,   TB_ALLOCATOR_BUFFER     = 3
+,   TB_ALLOCATOR_LARGE_POOL = 4
 
 }tb_allocator_type_e;
 
@@ -83,6 +85,9 @@ typedef struct __tb_allocator_t
 {
     /// the type
     tb_size_t               type;
+
+    /// the lock
+    tb_spinlock_t           lock;
 
     /*! malloc data
      *

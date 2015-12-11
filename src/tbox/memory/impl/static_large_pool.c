@@ -119,6 +119,9 @@ typedef struct __tb_static_large_data_pred_t
  */
 typedef __tb_pool_data_aligned__ struct __tb_static_large_pool_impl_t
 {
+    // the base
+    tb_allocator_t                  base;
+
     // the lock
     tb_spinlock_t                   lock;
 
@@ -680,6 +683,197 @@ static tb_bool_t tb_static_large_pool_free_done(tb_static_large_pool_impl_t* imp
     // ok?
     return ok;
 }
+static tb_pointer_t tb_static_large_pool_malloc(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)allocator;
+    tb_assert_and_check_return_val(impl && size, tb_null);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
+    // done
+    tb_static_large_data_head_t* data_head = tb_static_large_pool_malloc_done(impl, size, real __tb_debug_args__);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // ok
+    return data_head? (tb_pointer_t)&(data_head[1]) : tb_null;
+}
+static tb_pointer_t tb_static_large_pool_ralloc(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
+{
+    // check
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)allocator;
+    tb_assert_and_check_return_val(impl && data && size, tb_null);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
+    // done
+    tb_bool_t                       ok = tb_false;
+    tb_byte_t*                      data_real = tb_null;
+    tb_static_large_data_head_t*    data_head = tb_null;
+    tb_static_large_data_head_t*    aloc_head = tb_null;
+    do
+    {
+        // the data head
+        data_head = &(((tb_static_large_data_head_t*)data)[-1]);
+
+#ifdef __tb_debug__
+        // the base head
+        tb_pool_data_head_t* base_head = tb_static_large_pool_data_base(data_head);
+#endif
+
+        // check
+        tb_assertf_and_check_break(!data_head->bfree, "ralloc freed data: %p", data);
+        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+        tb_assertf_and_check_break(data_head >= impl->data_head && data_head < impl->data_tail, "the data: %p not belong to pool: %p", data, impl);
+        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+
+#ifdef __tb_debug__
+        // check the next data
+        tb_static_large_pool_check_next(impl, data_head);
+#endif
+
+        // attempt to allocate it fastly if enough
+        aloc_head = tb_static_large_pool_ralloc_fast(impl, data_head, size, real __tb_debug_args__);
+        if (!aloc_head)
+        {
+            // allocate it
+            aloc_head = tb_static_large_pool_malloc_done(impl, size, real __tb_debug_args__);
+            tb_check_break(aloc_head);
+
+            // not same?
+            if (aloc_head != data_head)
+            {
+                // copy the real data
+                tb_memcpy_((tb_pointer_t)&aloc_head[1], data, tb_min(size, (((tb_pool_data_head_t*)(data_head + 1))[-1]).size));
+                
+                // free the previous data
+                tb_static_large_pool_free_done(impl, data __tb_debug_args__);
+            }
+        }
+
+        // the real data
+        data_real = (tb_byte_t*)&aloc_head[1];
+
+#ifdef __tb_debug__
+        // update the ralloc count
+        impl->ralloc_count++;
+#endif
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // trace
+    tb_trace_d("ralloc: %lu: %s", size, ok? "ok" : "no");
+
+    // failed? clear it
+    if (!ok) data_real = tb_null;
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // ok?
+    return (tb_pointer_t)data_real;
+}
+static tb_bool_t tb_static_large_pool_free(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
+{
+    // check
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)allocator;
+    tb_assert_and_check_return_val(impl && data, tb_false);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
+    // done
+    tb_bool_t ok = tb_static_large_pool_free_done(impl, data __tb_debug_args__);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+
+    // ok?
+    return ok;
+}
+#ifdef __tb_debug__
+static tb_void_t tb_static_large_pool_dump(tb_allocator_ref_t allocator)
+{
+    // check
+    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)allocator;
+    tb_assert_and_check_return(impl);
+
+    // enter
+    tb_spinlock_enter(&impl->lock);
+
+    // trace
+    tb_trace_i("");
+
+    // the data head
+    tb_static_large_data_head_t* data_head = impl->data_head;
+    tb_assert_and_check_return(data_head);
+
+    // the data tail
+    tb_static_large_data_head_t* data_tail = impl->data_tail;
+    tb_assert_and_check_return(data_tail);
+
+    // done
+    tb_size_t frag_count = 0;
+    while ((data_head + 1) <= data_tail)
+    {
+        // non-free?
+        if (!data_head->bfree)
+        {
+            // check it
+            tb_static_large_pool_check_data(impl, data_head);
+
+            // trace
+            tb_trace_e("leak: %p", &data_head[1]);
+
+            // dump data
+            tb_pool_data_dump((tb_byte_t const*)&data_head[1], tb_false, "[static_large_pool]: [error]: ");
+        }
+
+        // fragment++
+        frag_count++;
+
+        // the next head
+        data_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + data_head->space);
+    }
+
+    // trace
+    tb_trace_i("");
+
+    // trace pred info
+    tb_size_t i = 0;
+    tb_size_t pred_size = tb_arrayn(impl->data_pred);
+    for (i = 0; i < pred_size; i++)
+    {
+        // the pred info
+        tb_static_large_data_pred_t const* pred = &impl->data_pred[i];
+        tb_assert_and_check_break(pred);
+
+        // trace
+        tb_trace_i("pred[>%04luKB]: data: %p, space: %lu, total_count: %lu, failed_count: %lu", ((impl->page_size << (i - 1)) >> 10), pred->data_head? &pred->data_head[1] : tb_null, pred->data_head? pred->data_head->space : 0, pred->total_count, pred->failed_count);
+    }
+
+    // trace
+    tb_trace_i("");
+
+    // trace debug info
+    tb_trace_i("peak_size: %lu",            impl->peak_size);
+    tb_trace_i("wast_rate: %llu/10000",     impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->real_size) * 10000) / (tb_hize_t)impl->occupied_size : 0);
+    tb_trace_i("frag_count: %lu",           frag_count);
+    tb_trace_i("free_count: %lu",           impl->free_count);
+    tb_trace_i("malloc_count: %lu",         impl->malloc_count);
+    tb_trace_i("ralloc_count: %lu",         impl->ralloc_count);
+
+    // leave
+    tb_spinlock_leave(&impl->lock);
+}
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -700,6 +894,15 @@ tb_large_pool_ref_t tb_static_large_pool_init(tb_byte_t* data, tb_size_t size, t
     // init pool
     tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)data;
     tb_memset_(impl, 0, sizeof(tb_static_large_pool_impl_t));
+
+    // init base
+    impl->base.type             = TB_ALLOCATOR_LARGE_POOL;
+    impl->base.large_malloc     = tb_static_large_pool_malloc;
+    impl->base.large_ralloc     = tb_static_large_pool_ralloc;
+    impl->base.large_free       = tb_static_large_pool_free;
+#ifdef __tb_debug__
+    impl->base.dump             = tb_static_large_pool_dump;
+#endif
 
     // init lock
     if (!tb_spinlock_init(&impl->lock)) return tb_null;
@@ -788,194 +991,4 @@ tb_void_t tb_static_large_pool_clear(tb_large_pool_ref_t pool)
     // leave
     tb_spinlock_leave(&impl->lock);
 }
-tb_pointer_t tb_static_large_pool_malloc(tb_large_pool_ref_t pool, tb_size_t size, tb_size_t* real __tb_debug_decl__)
-{
-    // check
-    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && size, tb_null);
 
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
-    // done
-    tb_static_large_data_head_t* data_head = tb_static_large_pool_malloc_done(impl, size, real __tb_debug_args__);
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
-    // ok
-    return data_head? (tb_pointer_t)&(data_head[1]) : tb_null;
-}
-tb_pointer_t tb_static_large_pool_ralloc(tb_large_pool_ref_t pool, tb_pointer_t data, tb_size_t size, tb_size_t* real __tb_debug_decl__)
-{
-    // check
-    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && data && size, tb_null);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
-    // done
-    tb_bool_t                       ok = tb_false;
-    tb_byte_t*                      data_real = tb_null;
-    tb_static_large_data_head_t*    data_head = tb_null;
-    tb_static_large_data_head_t*    aloc_head = tb_null;
-    do
-    {
-        // the data head
-        data_head = &(((tb_static_large_data_head_t*)data)[-1]);
-
-#ifdef __tb_debug__
-        // the base head
-        tb_pool_data_head_t* base_head = tb_static_large_pool_data_base(data_head);
-#endif
-
-        // check
-        tb_assertf_and_check_break(!data_head->bfree, "ralloc freed data: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
-        tb_assertf_and_check_break(data_head >= impl->data_head && data_head < impl->data_tail, "the data: %p not belong to pool: %p", data, pool);
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
-
-#ifdef __tb_debug__
-        // check the next data
-        tb_static_large_pool_check_next(impl, data_head);
-#endif
-
-        // attempt to allocate it fastly if enough
-        aloc_head = tb_static_large_pool_ralloc_fast(impl, data_head, size, real __tb_debug_args__);
-        if (!aloc_head)
-        {
-            // allocate it
-            aloc_head = tb_static_large_pool_malloc_done(impl, size, real __tb_debug_args__);
-            tb_check_break(aloc_head);
-
-            // not same?
-            if (aloc_head != data_head)
-            {
-                // copy the real data
-                tb_memcpy_((tb_pointer_t)&aloc_head[1], data, tb_min(size, (((tb_pool_data_head_t*)(data_head + 1))[-1]).size));
-                
-                // free the previous data
-                tb_static_large_pool_free_done(impl, data __tb_debug_args__);
-            }
-        }
-
-        // the real data
-        data_real = (tb_byte_t*)&aloc_head[1];
-
-#ifdef __tb_debug__
-        // update the ralloc count
-        impl->ralloc_count++;
-#endif
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // trace
-    tb_trace_d("ralloc: %lu: %s", size, ok? "ok" : "no");
-
-    // failed? clear it
-    if (!ok) data_real = tb_null;
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
-    // ok?
-    return (tb_pointer_t)data_real;
-}
-tb_bool_t tb_static_large_pool_free(tb_large_pool_ref_t pool, tb_pointer_t data __tb_debug_decl__)
-{
-    // check
-    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
-    tb_assert_and_check_return_val(impl && data, tb_false);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
-    // done
-    tb_bool_t ok = tb_static_large_pool_free_done(impl, data __tb_debug_args__);
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-
-    // ok?
-    return ok;
-}
-#ifdef __tb_debug__
-tb_void_t tb_static_large_pool_dump(tb_large_pool_ref_t pool)
-{
-    // check
-    tb_static_large_pool_impl_t* impl = (tb_static_large_pool_impl_t*)pool;
-    tb_assert_and_check_return(impl);
-
-    // enter
-    tb_spinlock_enter(&impl->lock);
-
-    // trace
-    tb_trace_i("");
-
-    // the data head
-    tb_static_large_data_head_t* data_head = impl->data_head;
-    tb_assert_and_check_return(data_head);
-
-    // the data tail
-    tb_static_large_data_head_t* data_tail = impl->data_tail;
-    tb_assert_and_check_return(data_tail);
-
-    // done
-    tb_size_t frag_count = 0;
-    while ((data_head + 1) <= data_tail)
-    {
-        // non-free?
-        if (!data_head->bfree)
-        {
-            // check it
-            tb_static_large_pool_check_data(impl, data_head);
-
-            // trace
-            tb_trace_e("leak: %p", &data_head[1]);
-
-            // dump data
-            tb_pool_data_dump((tb_byte_t const*)&data_head[1], tb_false, "[static_large_pool]: [error]: ");
-        }
-
-        // fragment++
-        frag_count++;
-
-        // the next head
-        data_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + data_head->space);
-    }
-
-    // trace
-    tb_trace_i("");
-
-    // trace pred info
-    tb_size_t i = 0;
-    tb_size_t pred_size = tb_arrayn(impl->data_pred);
-    for (i = 0; i < pred_size; i++)
-    {
-        // the pred info
-        tb_static_large_data_pred_t const* pred = &impl->data_pred[i];
-        tb_assert_and_check_break(pred);
-
-        // trace
-        tb_trace_i("pred[>%04luKB]: data: %p, space: %lu, total_count: %lu, failed_count: %lu", ((impl->page_size << (i - 1)) >> 10), pred->data_head? &pred->data_head[1] : tb_null, pred->data_head? pred->data_head->space : 0, pred->total_count, pred->failed_count);
-    }
-
-    // trace
-    tb_trace_i("");
-
-    // trace debug info
-    tb_trace_i("peak_size: %lu",            impl->peak_size);
-    tb_trace_i("wast_rate: %llu/10000",     impl->occupied_size? (((tb_hize_t)impl->occupied_size - impl->real_size) * 10000) / (tb_hize_t)impl->occupied_size : 0);
-    tb_trace_i("frag_count: %lu",           frag_count);
-    tb_trace_i("free_count: %lu",           impl->free_count);
-    tb_trace_i("malloc_count: %lu",         impl->malloc_count);
-    tb_trace_i("ralloc_count: %lu",         impl->ralloc_count);
-
-    // leave
-    tb_spinlock_leave(&impl->lock);
-}
-#endif

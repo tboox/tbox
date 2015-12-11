@@ -152,7 +152,7 @@ static tb_void_t tb_fixed_pool_slot_exit(tb_fixed_pool_impl_t* impl, tb_fixed_po
     impl->slot_count--;
 
     // exit slot
-    tb_large_pool_free(impl->large_pool, slot);
+    tb_allocator_large_free(impl->large_pool, slot);
 }
 static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
 {
@@ -179,7 +179,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
 
         // make slot
         tb_size_t real_space = 0;
-        slot = (tb_fixed_pool_slot_t*)tb_large_pool_malloc(impl->large_pool, need_space, &real_space);
+        slot = (tb_fixed_pool_slot_t*)tb_allocator_large_malloc(impl->large_pool, need_space, &real_space);
         tb_assert_and_check_break(slot);
         tb_assert_and_check_break(real_space > sizeof(tb_fixed_pool_slot_t) + item_space);
 
@@ -193,7 +193,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
         {
             // init the slot list
             tb_size_t size = 0;
-            impl->slot_list = (tb_fixed_pool_slot_t**)tb_large_pool_nalloc(impl->large_pool, 64, sizeof(tb_fixed_pool_slot_t*), &size);
+            impl->slot_list = (tb_fixed_pool_slot_t**)tb_allocator_large_nalloc(impl->large_pool, 64, sizeof(tb_fixed_pool_slot_t*), &size);
             tb_assert_and_check_break(impl->slot_list && size);
 
             // init the slot count
@@ -208,7 +208,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_impl_t* impl)
         {
             // grow the slot list
             tb_size_t size = 0;
-            impl->slot_list = (tb_fixed_pool_slot_t**)tb_large_pool_ralloc(impl->large_pool, impl->slot_list, (impl->slot_space << 1) * sizeof(tb_fixed_pool_slot_t*), &size);
+            impl->slot_list = (tb_fixed_pool_slot_t**)tb_allocator_large_ralloc(impl->large_pool, impl->slot_list, (impl->slot_space << 1) * sizeof(tb_fixed_pool_slot_t*), &size);
             tb_assert_and_check_break(impl->slot_list && size);
 
             // update the slot space
@@ -345,7 +345,7 @@ tb_fixed_pool_ref_t tb_fixed_pool_init_(tb_large_pool_ref_t large_pool, tb_size_
     do
     {
         // make pool
-        impl = (tb_fixed_pool_impl_t*)tb_large_pool_malloc0(large_pool, sizeof(tb_fixed_pool_impl_t), tb_null);
+        impl = (tb_fixed_pool_impl_t*)tb_allocator_large_malloc0(large_pool, sizeof(tb_fixed_pool_impl_t), tb_null);
         tb_assert_and_check_break(impl);
 
         // init pool
@@ -398,13 +398,13 @@ tb_void_t tb_fixed_pool_exit(tb_fixed_pool_ref_t pool)
     impl->current_slot = tb_null;
 
     // exit the slot list
-    if (impl->slot_list) tb_large_pool_free(impl->large_pool, impl->slot_list);
+    if (impl->slot_list) tb_allocator_large_free(impl->large_pool, impl->slot_list);
     impl->slot_list = tb_null;
     impl->slot_count = 0;
     impl->slot_space = 0;
 
     // exit it
-    tb_large_pool_free(impl->large_pool, impl);
+    tb_allocator_large_free(impl->large_pool, impl);
 }
 tb_size_t tb_fixed_pool_size(tb_fixed_pool_ref_t pool)
 {

@@ -182,7 +182,7 @@ tb_void_t tb_demo_small_pool_perf()
 
         // make data list
         tb_size_t       maxn = 100000;
-        tb_pointer_t*   list = (tb_pointer_t*)tb_large_pool_nalloc0(large_pool, maxn, sizeof(tb_pointer_t), tb_null);
+        tb_pointer_t*   list = (tb_pointer_t*)tb_allocator_large_nalloc0(large_pool, maxn, sizeof(tb_pointer_t), tb_null);
         tb_assert_and_check_break(list);
 
         // done 
@@ -235,7 +235,7 @@ tb_void_t tb_demo_small_pool_perf()
         tb_small_pool_clear(small_pool);
 
         // exit list
-        tb_large_pool_free(large_pool, list);
+        tb_allocator_large_free(large_pool, list);
 
     } while (0);
 

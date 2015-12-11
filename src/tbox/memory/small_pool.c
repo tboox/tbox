@@ -212,7 +212,7 @@ tb_small_pool_ref_t tb_small_pool_init(tb_large_pool_ref_t large_pool)
     do
     {
         // make pool
-        impl = (tb_small_pool_impl_t*)tb_large_pool_malloc0(large_pool, sizeof(tb_small_pool_impl_t), tb_null);
+        impl = (tb_small_pool_impl_t*)tb_allocator_large_malloc0(large_pool, sizeof(tb_small_pool_impl_t), tb_null);
         tb_assert_and_check_break(impl);
 
         // init pool
@@ -250,7 +250,7 @@ tb_void_t tb_small_pool_exit(tb_small_pool_ref_t pool)
     }
 
     // exit pool
-    tb_large_pool_free(impl->large_pool, impl);
+    tb_allocator_large_free(impl->large_pool, impl);
 }
 tb_void_t tb_small_pool_clear(tb_small_pool_ref_t pool)
 {
@@ -276,7 +276,7 @@ tb_pointer_t tb_small_pool_malloc_(tb_small_pool_ref_t pool, tb_size_t size __tb
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_large_pool_malloc(impl->large_pool, size, tb_null);
+    return tb_allocator_large_malloc(impl->large_pool, size, tb_null);
 #endif
 
     // done
@@ -320,7 +320,7 @@ tb_pointer_t tb_small_pool_malloc0_(tb_small_pool_ref_t pool, tb_size_t size __t
    
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_large_pool_malloc0(impl->large_pool, size, tb_null);
+    return tb_allocator_large_malloc0(impl->large_pool, size, tb_null);
 #endif
 
     // done
@@ -364,7 +364,7 @@ tb_pointer_t tb_small_pool_nalloc_(tb_small_pool_ref_t pool, tb_size_t item, tb_
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_large_pool_nalloc(impl->large_pool, item, size, tb_null);
+    return tb_allocator_large_nalloc(impl->large_pool, item, size, tb_null);
 #endif
 
     // done
@@ -408,7 +408,7 @@ tb_pointer_t tb_small_pool_nalloc0_(tb_small_pool_ref_t pool, tb_size_t item, tb
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_large_pool_nalloc0(impl->large_pool, item, size, tb_null);
+    return tb_allocator_large_nalloc0(impl->large_pool, item, size, tb_null);
 #endif
 
     // done
@@ -452,7 +452,7 @@ tb_pointer_t tb_small_pool_ralloc_(tb_small_pool_ref_t pool, tb_pointer_t data, 
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_large_pool_ralloc(impl->large_pool, data, size, tb_null);
+    return tb_allocator_large_ralloc(impl->large_pool, data, size, tb_null);
 #endif
 
     // done
@@ -543,7 +543,7 @@ tb_bool_t tb_small_pool_free_(tb_small_pool_ref_t pool, tb_pointer_t data __tb_d
 
     // disable small pool for debug
 #ifdef TB_SMALL_POOL_DISABLE
-    return tb_large_pool_free(impl->large_pool, data);
+    return tb_allocator_large_free(impl->large_pool, data);
 #endif
 
     // done
