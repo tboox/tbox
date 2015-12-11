@@ -62,8 +62,8 @@ typedef struct __tb_fixed_pool_slot_t
 // the fixed pool impl type
 typedef struct __tb_fixed_pool_impl_t
 {
-    // the large pool
-    tb_allocator_ref_t             large_allocator;
+    // the large allocator
+    tb_allocator_ref_t              large_allocator;
 
     // the slot size
     tb_size_t                       slot_size;

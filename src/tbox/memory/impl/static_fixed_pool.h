@@ -59,11 +59,11 @@ typedef struct{}*           tb_static_fixed_pool_ref_t;
  * @param data              the data address
  * @param size              the data size
  * @param item_size         the item size
- * @param for_small_pool    add data size field at head for the small pool 
+ * @param for_small         add data size field at head for the small allocator 
  *
  * @return                  the pool
  */
-tb_static_fixed_pool_ref_t  tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size, tb_bool_t for_small_pool);
+tb_static_fixed_pool_ref_t  tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t item_size, tb_bool_t for_small);
 
 /*! exit pool
  *
