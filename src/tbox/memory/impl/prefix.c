@@ -142,6 +142,13 @@ __tb_no_sanitize_address__ tb_size_t tb_pool_data_size(tb_cpointer_t data)
     tb_pool_data_head_t*    data_head = tb_null;
     do
     {
+        // get global allocator
+        tb_allocator_ref_t allocator = tb_allocator();;
+        tb_check_break(allocator);
+
+        // have this data address?
+        tb_check_break(tb_allocator_have(allocator, data));
+
         // the data head
         data_head = &(((tb_pool_data_head_t*)data)[-1]);
         tb_check_break(data_head->debug.magic == TB_POOL_DATA_MAGIC);

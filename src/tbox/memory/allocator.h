@@ -166,6 +166,15 @@ typedef struct __tb_allocator_t
      * @param allocator     the allocator 
      */
     tb_void_t               (*dump)(struct __tb_allocator_t* allocator);
+
+    /*! have this given data addess?
+     *
+     * @param allocator     the allocator 
+     * @param data          the data address
+     *
+     * @return              tb_true or tb_false
+     */
+    tb_bool_t               (*have)(struct __tb_allocator_t* allocator, tb_cpointer_t data);
 #endif
 
 }tb_allocator_t, *tb_allocator_ref_t;
@@ -394,6 +403,15 @@ tb_void_t               tb_allocator_exit(tb_allocator_ref_t allocator);
  * @param allocator     the allocator 
  */
 tb_void_t               tb_allocator_dump(tb_allocator_ref_t allocator);
+
+/*! have this given data addess?
+ *
+ * @param allocator     the allocator 
+ * @param data          the data address
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_allocator_have(tb_allocator_ref_t allocator, tb_cpointer_t data);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

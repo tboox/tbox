@@ -486,4 +486,15 @@ tb_void_t tb_allocator_dump(tb_allocator_ref_t allocator)
     // leave
     tb_spinlock_leave(&allocator->lock);
 }
+tb_bool_t tb_allocator_have(tb_allocator_ref_t allocator, tb_cpointer_t data)
+{
+    // check
+    tb_assert_and_check_return_val(allocator, tb_false);
+
+    /* have it?
+     * 
+     * @note cannot use locker and ensure thread safe
+     */
+    return allocator->have? allocator->have(allocator, data) : tb_false;
+}
 #endif

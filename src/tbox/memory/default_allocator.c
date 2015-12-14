@@ -185,13 +185,19 @@ static tb_void_t tb_default_allocator_dump(tb_allocator_ref_t self)
 {
     // check
     tb_default_allocator_ref_t allocator = (tb_default_allocator_ref_t)self;
-    tb_assert_and_check_return(allocator);
-
-    // check
-    tb_assert_and_check_return(allocator->large_allocator && allocator->small_allocator);
+    tb_assert_and_check_return(allocator && allocator->small_allocator);
 
     // dump allocator
     tb_allocator_dump(allocator->small_allocator);
+}
+static tb_bool_t tb_default_allocator_have(tb_allocator_ref_t self, tb_cpointer_t data)
+{
+    // check
+    tb_default_allocator_ref_t allocator = (tb_default_allocator_ref_t)self;
+    tb_assert_and_check_return_val(allocator && allocator->large_allocator, tb_false);
+
+    // have it?
+    return tb_allocator_have(allocator->large_allocator, data);
 }
 #endif
 static tb_handle_t tb_default_allocator_instance_init(tb_cpointer_t* ppriv)
@@ -319,6 +325,7 @@ tb_allocator_ref_t tb_default_allocator_init(tb_allocator_ref_t large_allocator)
         allocator->base.exit            = tb_default_allocator_exit;
 #ifdef __tb_debug__
         allocator->base.dump            = tb_default_allocator_dump;
+        allocator->base.have            = tb_default_allocator_have;
 #endif
 
         // init lock

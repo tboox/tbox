@@ -405,6 +405,14 @@ static tb_void_t tb_small_allocator_dump(tb_allocator_ref_t self)
             tb_fixed_pool_dump(allocator->fixed_pool[i]);
         }
     }
+}static tb_bool_t tb_small_allocator_have(tb_allocator_ref_t self, tb_cpointer_t data)
+{
+    // check
+    tb_small_allocator_ref_t allocator = (tb_small_allocator_ref_t)self;
+    tb_assert_and_check_return_val(allocator && allocator->large_allocator, tb_false);
+
+    // have it?
+    return tb_allocator_have(allocator->large_allocator, data);
 }
 #endif
 
@@ -438,6 +446,7 @@ tb_allocator_ref_t tb_small_allocator_init(tb_allocator_ref_t large_allocator)
         allocator->base.exit            = tb_small_allocator_exit;
 #ifdef __tb_debug__
         allocator->base.dump            = tb_small_allocator_dump;
+        allocator->base.have            = tb_small_allocator_have;
 #endif
 
         // init lock

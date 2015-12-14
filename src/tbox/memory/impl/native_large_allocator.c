@@ -572,6 +572,36 @@ static tb_void_t tb_native_large_allocator_dump(tb_allocator_ref_t self)
     tb_trace_i("malloc_count: %lu",         allocator->malloc_count);
     tb_trace_i("ralloc_count: %lu",         allocator->ralloc_count);
 }
+static tb_bool_t tb_native_large_allocator_have(tb_allocator_ref_t self, tb_cpointer_t data)
+{
+    // check
+    tb_native_large_allocator_ref_t allocator = (tb_native_large_allocator_ref_t)self;
+    tb_assert_and_check_return_val(allocator, tb_false);
+
+    // find this data 
+    tb_bool_t ok = tb_false;
+    tb_for_all_if (tb_native_large_data_head_t*, data_head, tb_list_entry_itor(&allocator->data_list), data_head)
+    {
+        // get data address
+        tb_byte_t const* data_addr = (tb_byte_t const*)&(data_head[1]);
+
+        // the base head
+        tb_pool_data_head_t* base_head = tb_native_large_allocator_data_base(data_head);
+        if (base_head->debug.magic == TB_POOL_DATA_MAGIC)
+        {
+            // found it?
+            if (data > (tb_cpointer_t)data_head && data < (tb_cpointer_t)(data_addr + base_head->size))
+            {
+                // ok
+                ok = tb_true;
+                break;
+            }
+        }
+    }
+
+    // ok?
+    return ok;
+}
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -600,6 +630,7 @@ tb_allocator_ref_t tb_native_large_allocator_init()
         allocator->base.exit             = tb_native_large_allocator_exit;
 #ifdef __tb_debug__
         allocator->base.dump             = tb_native_large_allocator_dump;
+        allocator->base.have             = tb_native_large_allocator_have;
 #endif
 
         // init lock
