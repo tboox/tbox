@@ -75,15 +75,29 @@ __tb_extern_c_enter__
  * @param priv      the platform private data
  *                  pass JavaVM* jvm for android jni
  *                  pass tb_null for other platform
+ *
  * @param allocator the allocator, supports:
- *                  - tb_native_allocator(): uses native system memory directly
- *                  - tb_static_allocator(data, size): uses the a static small buffer and we can check memory error and leaking
- *                  - tb_default_allocator(data, size): uses the pool and we can check memory error and leaking
- *                  - tb_default_allocator(tb_null, 0): uses it if the allocator is null
+ *
+ *                  - tb_native_allocator()
+ *                      uses native memory directly
+ *
+ *                  - tb_static_allocator(data, size)
+ *                      uses the a static small buffer and we can check memory error and leaking
+ *
+ *                  - tb_default_allocator(data, size)
+ *                      uses the a large pool with the static memory and we can check memory error and leaking
+ *
+ *                  - tb_default_allocator(tb_null, 0)
+ *                      uses the a large pool with the native memory and we can check memory error and leaking
+ *
+ *                  - tb_null
+ *                      uses tb_default_allocator(tb_null, 0) for large mode
+ *                      uses tb_native_allocator() for small mode, need define __tb_small__ 
  *
  * @return          tb_true or tb_false
  *
  * @code
+ *
     #include "tbox/tbox.h"
 
     int main(int argc, char** argv)
@@ -139,11 +153,25 @@ __tb_extern_c_enter__
  * @param priv      the platform private data
  *                  pass JavaVM* jvm for android jni
  *                  pass tb_null for other platform
+ *
  * @param allocator the allocator, supports:
- *                  - tb_native_allocator(): uses native system memory directly
- *                  - tb_static_allocator(data, size): uses the a static small buffer and we can check memory error and leaking
- *                  - tb_default_allocator(data, size): uses the pool and we can check memory error and leaking
- *                  - tb_default_allocator(tb_null, 0): uses it if the allocator is null
+ *
+ *                  - tb_native_allocator()
+ *                      uses native memory directly
+ *
+ *                  - tb_static_allocator(data, size)
+ *                      uses the a static small buffer and we can check memory error and leaking
+ *
+ *                  - tb_default_allocator(data, size)
+ *                      uses the a large pool with the static memory and we can check memory error and leaking
+ *
+ *                  - tb_default_allocator(tb_null, 0)
+ *                      uses the a large pool with the native memory and we can check memory error and leaking
+ *
+ *                  - tb_null
+ *                      uses tb_default_allocator(tb_null, 0) for large mode
+ *                      uses tb_native_allocator() for small mode, need define __tb_small__ 
+ *
  * @param mode      the compile mode for check __tb_small__ and __tb_debug__
  * @param build     the build version
  *

@@ -58,7 +58,11 @@ tb_bool_t tb_memory_init(tb_allocator_ref_t allocator)
         if (!tb_native_memory_init()) break;
 
         // init the allocator
+#ifdef __tb_small__
+        g_allocator = allocator? allocator : tb_native_allocator();
+#else
         g_allocator = allocator? allocator : tb_default_allocator(tb_null, 0);
+#endif
         tb_assert_and_check_break(g_allocator);
 
         // ok

@@ -252,10 +252,24 @@ example
          * @param priv      the platform private data
          *                  pass JavaVM* jvm for android jni
          *                  pass tb_null for other platform
+         *
          * @param allocator the allocator, supports:
-         *                  - tb_allocator_native(): uses native system memory directly
-         *                  - tb_allocator_buffer(data, size): uses the a static small buffer
-         *                  - tb_allocator_default(data, size): uses it if be null and we can check memory error and leaking
+         *
+         *                  - tb_native_allocator()
+         *                      uses native memory directly
+         *
+         *                  - tb_static_allocator(data, size)
+         *                      uses the a static small buffer and we can check memory error and leaking
+         *
+         *                  - tb_default_allocator(data, size)
+         *                      uses the a large pool with the static memory and we can check memory error and leaking
+         *
+         *                  - tb_default_allocator(tb_null, 0)
+         *                      uses the a large pool with the native memory and we can check memory error and leaking
+         *
+         *                  - tb_null
+         *                      uses tb_default_allocator(tb_null, 0) for large mode
+         *                      uses tb_native_allocator() for small mode, need define __tb_small__ 
          */
         if (!tb_init(tb_null, tb_null)) return 0;
 
