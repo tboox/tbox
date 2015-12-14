@@ -133,10 +133,15 @@ tb_void_t tb_demo_default_allocator_perf()
 {
     // done
     tb_allocator_ref_t allocator = tb_null;
+    tb_allocator_ref_t large_allocator = tb_null;
     do
     {
+        // init large allocator
+        large_allocator = tb_large_allocator_init(tb_null, 0);
+        tb_assert_and_check_break(large_allocator);
+
         // init allocator
-        allocator = tb_default_allocator_init(tb_null);
+        allocator = tb_default_allocator_init(large_allocator);
         tb_assert_and_check_break(allocator);
 
         // make data list
@@ -198,6 +203,15 @@ tb_void_t tb_demo_default_allocator_perf()
     // exit allocator
     if (allocator) tb_allocator_exit(allocator);
     allocator = tb_null;
+
+#ifdef __tb_debug__
+    // dump large allocator
+    if (large_allocator) tb_allocator_dump(large_allocator);
+#endif
+
+    // exit large allocator
+    if (large_allocator) tb_allocator_exit(large_allocator);
+    large_allocator = tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
