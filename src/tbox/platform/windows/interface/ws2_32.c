@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance)
+static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance, tb_cpointer_t priv)
 {
     // check
     tb_ws2_32_ref_t ws2_32 = (tb_ws2_32_ref_t)instance;

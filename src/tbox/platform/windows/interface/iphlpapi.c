@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_iphlpapi_instance_init(tb_handle_t instance)
+static tb_bool_t tb_iphlpapi_instance_init(tb_handle_t instance, tb_cpointer_t priv)
 {
     // check
     tb_iphlpapi_ref_t iphlpapi = (tb_iphlpapi_ref_t)instance;

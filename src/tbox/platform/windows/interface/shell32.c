@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_shell32_instance_init(tb_handle_t instance)
+static tb_bool_t tb_shell32_instance_init(tb_handle_t instance, tb_cpointer_t priv)
 {
     // check
     tb_shell32_ref_t shell32 = (tb_shell32_ref_t)instance;

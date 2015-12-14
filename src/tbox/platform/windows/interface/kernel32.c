@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance)
+static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance, tb_cpointer_t priv)
 {
     // check
     tb_kernel32_ref_t kernel32 = (tb_kernel32_ref_t)instance;
