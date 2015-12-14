@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance)
+static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance, tb_cpointer_t priv)
 {
     // check
     tb_dbghelp_ref_t dbghelp = (tb_dbghelp_ref_t)instance;

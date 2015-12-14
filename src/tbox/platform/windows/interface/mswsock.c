@@ -44,7 +44,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance)
+static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance, tb_cpointer_t priv)
 {
     // check
     tb_mswsock_ref_t mswsock = (tb_mswsock_ref_t)instance;
