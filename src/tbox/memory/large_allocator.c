@@ -26,8 +26,9 @@
  * includes
  */
 #include "large_allocator.h"
-#include "platform/platform.h"
 #include "impl/impl.h"
+#include "../utils/utils.h"
+#include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

@@ -24,6 +24,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../tbox.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -142,8 +143,11 @@ __tb_no_sanitize_address__ tb_size_t tb_pool_data_size(tb_cpointer_t data)
     tb_pool_data_head_t*    data_head = tb_null;
     do
     {
+        // tbox must be running normally
+        tb_check_break(tb_state() == TB_STATE_OK);
+
         // get global allocator
-        tb_allocator_ref_t allocator = tb_allocator();;
+        tb_allocator_ref_t allocator = tb_allocator();
         tb_check_break(allocator);
 
         // have this data address?

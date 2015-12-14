@@ -31,7 +31,8 @@
  * includes
  */
 #include "native_allocator.h"
-#include "platform/platform.h"
+#include "../utils/utils.h"
+#include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation

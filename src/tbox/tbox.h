@@ -154,6 +154,16 @@ tb_bool_t           tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_
 /// exit the tbox library
 tb_void_t           tb_exit(tb_noarg_t);
 
+/*! the state
+ *
+ * - TB_STATE_OK
+ * - TB_STATE_END
+ * - TB_STATE_EXITING
+ *
+ * @return          the tbox state
+ */
+tb_size_t           tb_state(tb_noarg_t);
+
 #ifdef TB_CONFIG_INFO_HAVE_VERSION
 /*! the tbox version
  *

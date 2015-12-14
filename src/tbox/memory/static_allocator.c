@@ -27,7 +27,7 @@
  */
 #include "static_allocator.h"
 #include "impl/impl.h"
-#include "utils/utils.h"
+#include "../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
