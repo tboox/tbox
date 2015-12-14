@@ -451,7 +451,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_done(tb_sta
         base_head->debug.line      = (tb_uint16_t)line_;
 
         // calculate the skip frames
-        tb_size_t skip_nframe = tb_allocator()? (tb_allocator_type(tb_allocator()) == TB_ALLOCATOR_DEFAULT? 6 : 5) : 3;
+        tb_size_t skip_nframe = (tb_allocator() && tb_allocator_type(tb_allocator()) == TB_ALLOCATOR_DEFAULT)? 6 : 3;
 
         // save backtrace
         tb_pool_data_save_backtrace(&base_head->debug, skip_nframe);
@@ -573,7 +573,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_ralloc_fast(tb_sta
         base_head->debug.line      = (tb_uint16_t)line_;
 
         // calculate the skip frames
-        tb_size_t skip_nframe = tb_allocator()? (tb_allocator_type(tb_allocator()) == TB_ALLOCATOR_DEFAULT? 6 : 5) : 3;
+        tb_size_t skip_nframe = (tb_allocator() && tb_allocator_type(tb_allocator()) == TB_ALLOCATOR_DEFAULT)? 6 : 3;
 
         // save backtrace
         tb_pool_data_save_backtrace(&base_head->debug, skip_nframe);

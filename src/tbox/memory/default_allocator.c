@@ -180,19 +180,6 @@ static tb_bool_t tb_default_allocator_free(tb_allocator_ref_t self, tb_pointer_t
     // ok?
     return ok;
 }
-static tb_void_t tb_default_allocator_clear(tb_allocator_ref_t self)
-{
-    // check
-    tb_default_allocator_ref_t allocator = (tb_default_allocator_ref_t)self;
-    tb_assert_and_check_return(allocator);
-
-    // check
-    tb_assert_and_check_return(allocator->large_allocator && allocator->small_allocator);
-
-    // clear allocator
-    tb_allocator_clear(allocator->small_allocator);
-    tb_allocator_clear(allocator->large_allocator);
-}
 #ifdef __tb_debug__
 static tb_void_t tb_default_allocator_dump(tb_allocator_ref_t self)
 {
@@ -330,7 +317,6 @@ tb_allocator_ref_t tb_default_allocator_init(tb_allocator_ref_t large_allocator)
         allocator->base.ralloc          = tb_default_allocator_ralloc;
         allocator->base.free            = tb_default_allocator_free;
         allocator->base.exit            = tb_default_allocator_exit;
-        allocator->base.clear           = tb_default_allocator_clear;
 #ifdef __tb_debug__
         allocator->base.dump            = tb_default_allocator_dump;
 #endif
