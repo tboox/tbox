@@ -28,16 +28,17 @@
  * includes
  */
 #include "prefix.h"
-#include "pool.h"
 #include "buffer.h"
 #include "allocator.h"
 #include "fixed_pool.h"
-#include "large_allocator.h"
-#include "small_pool.h"
 #include "string_pool.h"
 #include "queue_buffer.h"
 #include "static_buffer.h"
+#include "large_allocator.h"
+#include "small_allocator.h"
+#include "native_allocator.h"
 #include "static_allocator.h"
+#include "default_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

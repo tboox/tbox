@@ -42,7 +42,7 @@ __tb_extern_c_enter__
 typedef enum __tb_singleton_type_e
 {
     /// the default allocator
-    TB_SINGLETON_TYPE_ALLOCATOR_DEFAULT     = 0
+    TB_SINGLETON_TYPE_DEFAULT_ALLOCATOR     = 0
 
     /// the static allocator
 ,   TB_SINGLETON_TYPE_STATIC_ALLOCATOR      = 1

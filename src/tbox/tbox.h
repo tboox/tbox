@@ -73,10 +73,13 @@ __tb_extern_c_enter__
 /*! init tbox
  *
  * @param priv      the platform private data
- *                  pass JNIEnv* env for android
+ *                  pass JavaVM* jvm for android jni
  *                  pass tb_null for other platform
- * @param data      the memory data for the memory pool, uses the native memory if be tb_null
- * @param size      the memory size for the memory pool, uses the native memory if be zero
+ * @param allocator the allocator, supports:
+ *                  - tb_native_allocator(): uses native system memory directly
+ *                  - tb_static_allocator(data, size): uses the a static small buffer and we can check memory error and leaking
+ *                  - tb_default_allocator(data, size): uses the pool and we can check memory error and leaking
+ *                  - tb_default_allocator(tb_null, 0): uses it if the allocator is null
  *
  * @return          tb_true or tb_false
  *
@@ -137,10 +140,10 @@ __tb_extern_c_enter__
  *                  pass JavaVM* jvm for android jni
  *                  pass tb_null for other platform
  * @param allocator the allocator, supports:
- *                  - tb_allocator_native(): uses native system memory directly
- *                  - tb_allocator_buffer(data, size): uses the a static small buffer and we can check memory error and leaking
- *                  - tb_allocator_default(data, size): uses the pool and we can check memory error and leaking
- *                  - tb_allocator_default(tb_null, 0): uses it if the allocator is null
+ *                  - tb_native_allocator(): uses native system memory directly
+ *                  - tb_static_allocator(data, size): uses the a static small buffer and we can check memory error and leaking
+ *                  - tb_default_allocator(data, size): uses the pool and we can check memory error and leaking
+ *                  - tb_default_allocator(tb_null, 0): uses it if the allocator is null
  * @param mode      the compile mode for check __tb_small__ and __tb_debug__
  * @param build     the build version
  *
