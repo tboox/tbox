@@ -871,6 +871,15 @@ static tb_void_t tb_static_large_allocator_dump(tb_allocator_ref_t self)
     tb_trace_i("malloc_count: %lu",         allocator->malloc_count);
     tb_trace_i("ralloc_count: %lu",         allocator->ralloc_count);
 }
+static tb_bool_t tb_static_large_allocator_have(tb_allocator_ref_t self, tb_cpointer_t data)
+{
+    // check
+    tb_static_large_allocator_ref_t allocator = (tb_static_large_allocator_t*)self;
+    tb_assert_and_check_return_val(allocator, tb_false);
+
+    // have it?
+    return ((tb_byte_t const*)data > (tb_byte_t const*)allocator->data_head && (tb_byte_t const*)data < (tb_byte_t const*)allocator->data_head + allocator->data_size)? tb_true : tb_false;
+}
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -902,6 +911,7 @@ tb_allocator_ref_t tb_static_large_allocator_init(tb_byte_t* data, tb_size_t siz
     allocator->base.exit             = tb_static_large_allocator_exit;
 #ifdef __tb_debug__
     allocator->base.dump             = tb_static_large_allocator_dump;
+    allocator->base.have             = tb_static_large_allocator_have;
 #endif
 
     // init lock

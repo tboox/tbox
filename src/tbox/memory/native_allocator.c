@@ -79,6 +79,7 @@ static tb_bool_t tb_native_allocator_instance_init(tb_handle_t instance, tb_cpoi
     allocator->free         = tb_native_allocator_free;
 #ifdef __tb_debug__
     allocator->dump         = tb_null;
+    allocator->have         = tb_null;
 #endif
 
     // ok
