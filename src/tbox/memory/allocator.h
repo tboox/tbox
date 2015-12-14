@@ -77,6 +77,7 @@ typedef enum __tb_allocator_type_e
 ,   TB_ALLOCATOR_NATIVE     = 2
 ,   TB_ALLOCATOR_STATIC     = 4
 ,   TB_ALLOCATOR_LARGE      = 5
+,   TB_ALLOCATOR_SMALL      = 6
 
 }tb_allocator_type_e;
 
@@ -186,35 +187,6 @@ tb_allocator_ref_t      tb_allocator();
  * @return              the allocator
  */
 tb_allocator_ref_t      tb_allocator_native(tb_noarg_t);
-
-/*! the buffer allocator for the small buffer
- *
- * uses static_allocator for managing memory
- *
- * @param data          the buffer data
- * @param size          the buffer size
- *
- * @return              the allocator
- */
-tb_allocator_ref_t      tb_allocator_buffer(tb_byte_t* data, tb_size_t size);
-
-/*! the default allocator for the large buffer
- *
- * uses large_allocator and small_allocator for managing memory
- * and supports memory error detecting after calling tb_exit(). 
- *
- * it can detect the following types of bugs for the debug mode:
- * - out-of-bounds accesses to heap and globals
- * - use-after-free
- * - double-free, invalid free
- * - memory leaks
- *
- * @param data          the buffer data, uses the native buffer if be null
- * @param size          the buffer size
- *
- * @return              the allocator
- */
-tb_allocator_ref_t      tb_allocator_default(tb_byte_t* data, tb_size_t size);
 
 /*! the allocator type
  *

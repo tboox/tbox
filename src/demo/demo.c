@@ -128,11 +128,11 @@ static tb_demo_t g_demo[] =
 
     // memory
 ,   TB_DEMO_MAIN_ITEM(memory_check)
-,   TB_DEMO_MAIN_ITEM(memory_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_fixed_pool)
-,   TB_DEMO_MAIN_ITEM(memory_large_allocator)
-,   TB_DEMO_MAIN_ITEM(memory_small_pool)
 ,   TB_DEMO_MAIN_ITEM(memory_string_pool)
+,   TB_DEMO_MAIN_ITEM(memory_large_allocator)
+,   TB_DEMO_MAIN_ITEM(memory_small_allocator)
+,   TB_DEMO_MAIN_ITEM(memory_default_allocator)
 ,   TB_DEMO_MAIN_ITEM(memory_memops)
 ,   TB_DEMO_MAIN_ITEM(memory_buffer)
 ,   TB_DEMO_MAIN_ITEM(memory_queue_buffer)
@@ -206,9 +206,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
     // init tbox
 #if 0
-    if (!tb_init(tb_null, tb_allocator_default((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return 0;
+    if (!tb_init(tb_null, tb_default_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return 0;
 #elif 0
-    if (!tb_init(tb_null, tb_allocator_buffer((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return 0;
+    if (!tb_init(tb_null, tb_static_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return 0;
+#elif 0
+    if (!tb_init(tb_null, tb_native_allocator())) return 0;
 #else
     if (!tb_init(tb_null, tb_null)) return 0;
 #endif

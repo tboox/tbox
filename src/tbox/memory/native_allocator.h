@@ -17,66 +17,36 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        memory.c
- * @defgroup    memory
+ * @file        native_allocator.h
+ * @ingroup     memory
  *
  */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME                "memory"
-#define TB_TRACE_MODULE_DEBUG               (0)
+#ifndef TB_MEMORY_NATIVE_ALLOCATOR_H
+#define TB_MEMORY_NATIVE_ALLOCATOR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "memory.h"
 #include "allocator.h"
-#include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * globals
+ * extern
  */
-
-// the allocator 
-__tb_extern_c__ extern tb_allocator_ref_t   g_allocator;
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-tb_bool_t tb_memory_init(tb_allocator_ref_t allocator)
-{
-    // done
-    tb_bool_t ok = tb_false;
-    do
-    {   
-        // init page
-        if (!tb_page_init()) break;
 
-        // init the native memory
-        if (!tb_native_memory_init()) break;
+/*! the global native allocator 
+ * 
+ * @return                  the allocator 
+ */
+tb_allocator_ref_t          tb_native_allocator(tb_noarg_t);
 
-        // init the allocator
-        g_allocator = allocator? allocator : tb_default_allocator(tb_null, 0);
-        tb_assert_and_check_break(g_allocator);
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed? exit it
-    if (!ok) tb_memory_exit();
-    
-    // ok?
-    return ok;
-}
-tb_void_t tb_memory_exit()
-{
-    // exit the native memory
-    tb_native_memory_exit();
-
-    // exit page
-    tb_page_exit();
-}
+#endif
