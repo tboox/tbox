@@ -29,6 +29,10 @@
 #include "../atomic.h"
 #include "../memory.h"
 #include "../dynamic.h"
+#if 0
+#   include <unwind.h>
+#   include <dlfcn.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -115,6 +119,57 @@ static tb_backtrace_get_backtrace_symbols_func_t    g_get_backtrace_symbols = tb
 static tb_backtrace_free_backtrace_symbols_func_t   g_free_backtrace_symbols = tb_null;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+#if 0
+static _Unwind_Reason_Code tb_backtrace_unwind(struct _Unwind_Context* context, tb_pointer_t args) 
+{
+    // check
+    tb_value_ref_t info = (tb_value_ref_t)args;
+    tb_check_return_val(context && info, _URC_END_OF_STACK);
+
+    // get info
+    tb_backtrace_frame_ref_t    frames      = (tb_backtrace_frame_ref_t)info[0].ptr;
+    tb_size_t                   nskip       = info[1].ul;
+    tb_size_t                   nframe_maxn = info[2].ul;
+    tb_long_t                   count       = info[3].l;
+    tb_check_return_val(frames && nframe_maxn && count < nframe_maxn, _URC_END_OF_STACK);
+
+    // get ip
+#ifdef HAVE_GETIPINFO
+    tb_int_t ip_before_insn = 0;
+    tb_size_t ip = (tb_size_t)_Unwind_GetIPInfo (context, &ip_before_insn);
+    if (!ip_before_insn) ip--;
+#else
+    tb_size_t ip = (tb_size_t)_Unwind_GetIP (context);
+#endif
+
+    // trace
+    tb_trace_d("unwind: count: %ld, nframe_maxn: %lu, ip: %p", count, nframe_maxn, ip);
+
+    // skip and save frame
+    if (ip) 
+    {
+        if (nskip > 0) nskip--;
+        else
+        {
+            frames[count].absolute_pc   = ip;
+            frames[count].stack_top     = 0;
+            frames[count].stack_size    = 0;
+            count++;
+        }
+    }
+
+    // update info
+    info[1].ul  = nskip;
+    info[3].l   = count;
+
+    // ok
+    return _URC_OK;
+}
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip)
@@ -149,9 +204,20 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
         tb_size_t nframe_maxn = (sizeof(tb_pointer_t) * nframe) / sizeof(tb_backtrace_frame_t);
         tb_check_break(nframe_maxn && nframe_maxn < 64);
 
+#if 1
         // unwind backtrace
         count = g_unwind_backtrace((tb_backtrace_frame_ref_t)frames, nskip, nframe_maxn);  
         tb_check_break_state(count >= 0, count, 0);
+#else
+        // need add cxflags: -funwind-tables
+        tb_value_t info[4];
+        info[0].ptr     = (tb_pointer_t)frames;
+        info[1].ul      = nskip;
+        info[2].ul      = nframe_maxn;
+        info[3].l       = 0;
+        _Unwind_Backtrace(tb_backtrace_unwind, info);
+        count = info[3].l;
+#endif
 
     } while (0);
 
@@ -186,6 +252,7 @@ tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
     // ok?
     return (tb_handle_t)symbols;
 }
+#if 1
 tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
 {
     // check
@@ -199,7 +266,7 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
     tb_char_t const* map_name = symbol->map_name? symbol->map_name : "<unknown>";  
 
     // get symbol name
-    tb_char_t const* symbol_name =symbol->demangled_name? symbol->demangled_name : symbol->symbol_name;  
+    tb_char_t const* symbol_name = symbol->demangled_name? symbol->demangled_name : symbol->symbol_name;  
 
     // make symbol info
     tb_long_t info_size = 0;
@@ -252,6 +319,52 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
     // ok?
     return symbols->info;
 }
+#else
+tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
+{
+    // check
+    tb_backtrace_symbols_ref_t symbols = (tb_backtrace_symbols_ref_t)handle;
+    tb_check_return_val(symbols && frames && iframe < nframe, tb_null);
+
+    // get frame address
+    tb_size_t addr = ((tb_backtrace_frame_ref_t)frames)[iframe].absolute_pc;
+
+    // make symbol info
+    Dl_info     info;
+    tb_long_t   info_size = 0;
+    if (dladdr((tb_pointer_t)addr, &info) && info.dli_sname) 
+    {
+        // make it
+        info_size = tb_snprintf(    symbols->info
+                                ,   sizeof(symbols->info)
+                                ,   "[%08lx]: %2lu   %s %08lx %s + %lu"
+                                ,   addr
+                                ,   iframe
+                                ,   ""
+                                ,   addr
+                                ,   info.dli_sname
+                                ,   0);  
+    }
+    else
+    {  
+        // make it
+        info_size = tb_snprintf(    symbols->info
+                                ,   sizeof(symbols->info)
+                                ,   "[%08lx]: %2lu   %s %08lx"
+                                ,   addr
+                                ,   iframe
+                                ,   ""
+                                ,   addr);     
+    }  
+
+    // end
+    if (info_size >= 0 && info_size < sizeof(symbols->info))
+        symbols->info[info_size] = '\0';
+
+    // ok?
+    return symbols->info;
+}
+#endif
 tb_void_t tb_backtrace_symbols_exit(tb_handle_t handle)
 {
     // check
