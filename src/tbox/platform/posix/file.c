@@ -404,7 +404,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 #if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
     // copy it using sendfile
     tb_bool_t       ok = tb_false;
-    tb_file_ref_t   ifile = tb_file_init(path, TB_FILE_MODE_RW | TB_FILE_MODE_BINARY);
+    tb_file_ref_t   ifile = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
     tb_file_ref_t   ofile = tb_file_init(dest, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
     if (ifile && ofile)
     {
