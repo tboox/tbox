@@ -543,6 +543,8 @@ tb_bool_t tb_xml_reader_goto(tb_xml_reader_ref_t reader, tb_char_t const* path)
     // check
     tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
     tb_assert_and_check_return_val(impl && impl->rstream && path, tb_false);
+
+    // trace
     tb_trace_d("goto: %s", path);
 
     // init level
