@@ -45,7 +45,7 @@ typedef tb_pointer_t (*gb_hash_map_item_func_t)(tb_iterator_ref_t, tb_size_t);
 static tb_pointer_t tb_hash_set_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_abort(iterator && iterator->priv);
+    tb_assert(iterator && iterator->priv);
 
     // the item func for the hash map
     gb_hash_map_item_func_t func = (gb_hash_map_item_func_t)iterator->priv;
@@ -66,7 +66,7 @@ tb_hash_set_ref_t tb_hash_set_init(tb_size_t bucket_size, tb_element_t element)
     tb_iterator_ref_t hash_set = (tb_iterator_ref_t)tb_hash_map_init(bucket_size, element, tb_element_true());
 
     // @note the private data of the hash map iterator cannot be used
-    tb_assert_abort(!hash_set->priv);
+    tb_assert(!hash_set->priv);
 
     // hacking hash_map and hook the item
     hash_set->priv = (tb_pointer_t)hash_set->item;

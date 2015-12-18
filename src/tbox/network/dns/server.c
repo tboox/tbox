@@ -88,7 +88,7 @@ static tb_dns_server_list_t g_list = {0};
 static tb_long_t tb_dns_server_comp(tb_element_ref_t element, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_assert_return_val(litem && ritem, -1);
+    tb_assert(litem && ritem);
 
     // the rate
     tb_size_t lrate = ((tb_dns_server_t const*)litem)->rate;

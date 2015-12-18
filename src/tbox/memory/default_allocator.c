@@ -115,7 +115,7 @@ static tb_pointer_t tb_default_allocator_ralloc(tb_allocator_ref_t self, tb_poin
 
         // the data head
         tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+        tb_assertf(data_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
         tb_assert_and_check_break(data_head->size);
 
         // small => small
@@ -170,7 +170,7 @@ static tb_bool_t tb_default_allocator_free(tb_allocator_ref_t self, tb_pointer_t
     {
         // the data head
         tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
+        tb_assertf(data_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
 
         // free it
         ok = (data_head->size <= TB_SMALL_ALLOCATOR_DATA_MAXN)? tb_allocator_free_(allocator->small_allocator, data __tb_debug_args__) : tb_allocator_large_free_(allocator->large_allocator, data __tb_debug_args__);

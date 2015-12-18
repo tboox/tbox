@@ -33,7 +33,7 @@
 static tb_size_t tb_iterator_ptr_size(tb_iterator_ref_t iterator)
 {
     // check
-    tb_assert_abort(iterator);
+    tb_assert(iterator);
 
     // the size
     return ((tb_array_iterator_ref_t)iterator)->count;
@@ -45,7 +45,7 @@ static tb_size_t tb_iterator_ptr_head(tb_iterator_ref_t iterator)
 static tb_size_t tb_iterator_ptr_tail(tb_iterator_ref_t iterator)
 {
     // check
-    tb_assert_abort(iterator);
+    tb_assert(iterator);
 
     // the tail
     return ((tb_array_iterator_ref_t)iterator)->count;
@@ -53,7 +53,7 @@ static tb_size_t tb_iterator_ptr_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_iterator_ptr_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
+    tb_assert(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // the next
     return itor + 1;
@@ -61,7 +61,7 @@ static tb_size_t tb_iterator_ptr_next(tb_iterator_ref_t iterator, tb_size_t itor
 static tb_size_t tb_iterator_ptr_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_abort(iterator && itor);
+    tb_assert(iterator && itor);
 
     // the prev
     return itor - 1;
@@ -69,7 +69,7 @@ static tb_size_t tb_iterator_ptr_prev(tb_iterator_ref_t iterator, tb_size_t itor
 static tb_pointer_t tb_iterator_ptr_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
+    tb_assert(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // the item
     return ((tb_pointer_t*)((tb_array_iterator_ref_t)iterator)->items)[itor];
@@ -77,7 +77,7 @@ static tb_pointer_t tb_iterator_ptr_item(tb_iterator_ref_t iterator, tb_size_t i
 static tb_void_t tb_iterator_ptr_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_assert_abort(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
+    tb_assert(iterator && itor < ((tb_array_iterator_ref_t)iterator)->count);
 
     // copy
     ((tb_cpointer_t*)((tb_array_iterator_ref_t)iterator)->items)[itor] = item;

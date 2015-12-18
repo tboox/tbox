@@ -112,7 +112,7 @@ tb_bool_t tb_hwaddr_cstr_set(tb_hwaddr_ref_t hwaddr, tb_char_t const* cstr)
             else 
             {
                 // abort
-                tb_assert_abort(0);
+                tb_assert(0);
 
                 // failed
                 ok = tb_false;

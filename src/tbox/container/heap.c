@@ -121,7 +121,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
             tb_heap_dump((tb_heap_ref_t)impl);
 
             // abort
-            tb_assertf_abort(0, "lchild[%lu]: invalid, parent: %lu, tail: %lu", lchild, parent, tail);
+            tb_assertf(0, "lchild[%lu]: invalid, parent: %lu, tail: %lu", lchild, parent, tail);
         }
 
         // the right child node
@@ -135,7 +135,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
             tb_heap_dump((tb_heap_ref_t)impl);
 
             // abort
-            tb_assertf_abort(0, "rchild[%lu]: invalid, parent: %lu, tail: %lu", rchild, parent, tail);
+            tb_assertf(0, "rchild[%lu]: invalid, parent: %lu, tail: %lu", rchild, parent, tail);
         }
     }
 }
@@ -178,7 +178,7 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_impl_t* impl, tb_size_t hole, tb_cp
     // the element function
     tb_element_comp_func_t func_comp = impl->element.comp;
     tb_element_data_func_t func_data = impl->element.data;
-    tb_assert_abort(func_comp && func_data);
+    tb_assert(func_comp && func_data);
 
     // (hole - 1) / 2: the parent node of the hole
     tb_size_t   parent = 0;
@@ -266,7 +266,7 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_impl_t* impl, tb_size_t hole, tb_
     // init element
     tb_element_comp_func_t func_comp = impl->element.comp;
     tb_element_data_func_t func_data = impl->element.data;
-    tb_assert_abort(func_comp && func_data);
+    tb_assert(func_comp && func_data);
 
     // 2 * hole + 1: the left child node of hole
     tb_size_t       step = impl->element.size;
@@ -419,11 +419,11 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     tb_assert_and_check_return(impl && impl->data && impl->size && itor < impl->size);
 
     // check the element function
-    tb_assert_abort(impl->element.comp && impl->element.data);
+    tb_assert(impl->element.comp && impl->element.data);
 
     // the step
     tb_size_t step = impl->element.size;
-    tb_assert_abort(step);
+    tb_assert(step);
 
     // free the item first
     if (impl->element.free) impl->element.free(&impl->element, impl->data + itor * step);
@@ -453,7 +453,7 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
         }
         // shift down the heap from the given hole
         else hole = tb_heap_shift_down(impl, itor, data_last);
-        tb_assert_abort(hole);
+        tb_assert(hole);
 
         // copy the last data to the hole
         if (hole != last) tb_memcpy(hole, last, step);
@@ -613,7 +613,7 @@ tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
     
     // shift up the heap from the tail hole
     tb_pointer_t hole = tb_heap_shift_up(impl, impl->size, data);
-    tb_assert_abort(hole);
+    tb_assert(hole);
         
     // save data to the hole
     if (hole) impl->element.dupl(&impl->element, hole, data);
@@ -639,18 +639,18 @@ tb_void_t tb_heap_pop(tb_heap_ref_t heap)
     if (impl->size > 1)
     {
         // check the element function
-        tb_assert_abort(impl->element.data);
+        tb_assert(impl->element.data);
 
         // the step
         tb_size_t step = impl->element.size;
-        tb_assert_abort(step);
+        tb_assert(step);
 
         // the last 
         tb_pointer_t last = impl->data + (impl->size - 1) * step;
 
         // shift down the heap from the top hole
         tb_pointer_t hole = tb_heap_shift_down(impl, 0, impl->element.data(&impl->element, last));
-        tb_assert_abort(hole);
+        tb_assert(hole);
 
         // copy the last data to the hole
         if (hole != last) tb_memcpy(hole, last, step);

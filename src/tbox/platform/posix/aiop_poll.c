@@ -70,7 +70,7 @@ typedef struct __tb_aiop_rtor_poll_impl_t
 static tb_bool_t tb_poll_walk_delo(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t priv)
 {
     // check
-    tb_assert_abort(priv);
+    tb_assert(priv);
 
     // the fd
     tb_long_t fd = (tb_long_t)priv;

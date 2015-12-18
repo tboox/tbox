@@ -89,7 +89,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(utils_adler32)
 
     // other
-,   TB_DEMO_MAIN_ITEM(other_flv)
 ,   TB_DEMO_MAIN_ITEM(other_test)
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,   TB_DEMO_MAIN_ITEM(other_charset)

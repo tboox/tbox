@@ -91,7 +91,7 @@ static tb_size_t tb_vector_itor_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return_val(impl, 0);
+    tb_assert(impl);
 
     // size
     return impl->size;
@@ -105,7 +105,7 @@ static tb_size_t tb_vector_itor_last(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return_val(impl, 0);
+    tb_assert(impl);
 
     // last
     return impl->size? impl->size - 1 : 0;
@@ -114,7 +114,7 @@ static tb_size_t tb_vector_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return_val(impl, 0);
+    tb_assert(impl);
 
     // tail
     return impl->size;
@@ -123,7 +123,7 @@ static tb_size_t tb_vector_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return_val(impl, 0);
+    tb_assert(impl);
     tb_assert_and_check_return_val(itor < impl->size, impl->size);
 
     // next
@@ -133,7 +133,7 @@ static tb_size_t tb_vector_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return_val(impl, 0);
+    tb_assert(impl);
     tb_assert_and_check_return_val(itor && itor <= impl->size, 0);
 
     // prev
@@ -152,7 +152,7 @@ static tb_void_t tb_vector_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor,
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return(impl);
+    tb_assert(impl);
 
     // copy
     impl->element.copy(&impl->element, impl->data + itor * iterator->step, item);
@@ -161,7 +161,7 @@ static tb_long_t tb_vector_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t l
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return_val(impl && impl->element.comp, 0);
+    tb_assert(impl && impl->element.comp);
 
     // comp
     return impl->element.comp(&impl->element, litem, ritem);
@@ -175,7 +175,7 @@ static tb_void_t tb_vector_itor_remove_range(tb_iterator_ref_t iterator, tb_size
 {
     // check
     tb_vector_impl_t* impl = (tb_vector_impl_t*)iterator;
-    tb_assert_return(impl);
+    tb_assert(impl);
 
     // remove the items
     if (size) tb_vector_nremove((tb_vector_ref_t)iterator, prev != impl->size? prev + 1 : 0, size);

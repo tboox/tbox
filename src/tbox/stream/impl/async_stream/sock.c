@@ -1078,7 +1078,7 @@ static tb_bool_t tb_async_stream_sock_impl_exit(tb_async_stream_ref_t stream)
         }
 
         // check
-        tb_assert_abort(tb_atomic_get(&wait));
+        tb_assert(tb_atomic_get(&wait));
         tb_check_return_val(tb_atomic_get(&wait), tb_false);
     }
 

@@ -272,7 +272,7 @@ tb_void_t tb_aico_exit(tb_aico_ref_t aico)
     }
 
     // check
-    tb_assert_abort(tb_atomic_get(&impl->state) == TB_STATE_CLOSED);
+    tb_assert(tb_atomic_get(&impl->state) == TB_STATE_CLOSED);
     tb_check_return(tb_atomic_get(&impl->state) == TB_STATE_CLOSED);
 
     // enter 
@@ -433,7 +433,7 @@ tb_bool_t tb_aico_conn_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_aico_func_t
     tb_assert_and_check_return_val(impl && impl->aicp && addr, tb_false);
 
     // check address
-    tb_assert_abort(!tb_ipaddr_is_empty(addr));
+    tb_assert(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -511,7 +511,7 @@ tb_bool_t tb_aico_usend_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_byte_t con
     tb_assert_and_check_return_val(impl && impl->aicp && addr && data && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_ipaddr_is_empty(addr));
+    tb_assert(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -592,7 +592,7 @@ tb_bool_t tb_aico_usendv_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_iovec_t c
     tb_assert_and_check_return_val(impl && impl->aicp && addr && list && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_ipaddr_is_empty(addr));
+    tb_assert(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -766,7 +766,7 @@ tb_bool_t tb_aico_conn_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_ref
     tb_assert_and_check_return_val(impl && impl->aicp && addr, tb_false);
 
     // check address
-    tb_assert_abort(!tb_ipaddr_is_empty(addr));
+    tb_assert(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -844,7 +844,7 @@ tb_bool_t tb_aico_usend_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_re
     tb_assert_and_check_return_val(impl && impl->aicp && addr && data && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_ipaddr_is_empty(addr));
+    tb_assert(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};
@@ -925,7 +925,7 @@ tb_bool_t tb_aico_usendv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_r
     tb_assert_and_check_return_val(impl && impl->aicp && addr && list && size, tb_false);
 
     // check address
-    tb_assert_abort(!tb_ipaddr_is_empty(addr));
+    tb_assert(!tb_ipaddr_is_empty(addr));
 
     // init
     tb_aice_t               aice = {0};

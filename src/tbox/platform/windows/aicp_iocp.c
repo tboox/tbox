@@ -276,7 +276,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
 
     // check
     tb_iocp_aico_t* aico = (tb_iocp_aico_t*)resp->aico;
-    tb_assert_abort(aico && aico->addr && resp->u.acpt.priv[0]);
+    tb_assert(aico && aico->addr && resp->u.acpt.priv[0]);
 
     // done
     switch (error)
@@ -324,7 +324,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
                 // update the accept context, otherwise shutdown and getsockname will be failed
                 SOCKET acpt = (SOCKET)tb_aico_sock(resp->aico) - 1;
                 tb_long_t update_ok = setsockopt((SOCKET)resp->u.acpt.priv[0] - 1, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
-                tb_assert_abort(!update_ok); tb_used(update_ok);
+                tb_assert(!update_ok); tb_used(update_ok);
           
                 // clear sock
                 resp->u.acpt.priv[0] = tb_null;
@@ -449,7 +449,7 @@ static tb_long_t tb_iocp_spak_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t resp
 #if 0
         // update the connect context, otherwise shutdown and getsockname will be failed
         tb_long_t update_ok = setsockopt((SOCKET)tb_aico_sock(resp->aico)- 1, SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, tb_null, 0);
-        tb_assert_abort(!update_ok); tb_used(update_ok);
+        tb_assert(!update_ok); tb_used(update_ok);
 
         // DisconnectEx it
         aico->bDisconnectEx = 1;
@@ -2603,7 +2603,7 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
         tb_assert_and_check_return_val(olap, -1);
 
         // check
-        tb_assert_abort(aico == (tb_iocp_aico_t*)olap->aice.aico);
+        tb_assert(aico == (tb_iocp_aico_t*)olap->aice.aico);
 
         // save resp
         *resp = olap->aice;

@@ -153,7 +153,7 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fix
 
         // the predict index
         tb_size_t pred_index = pool->pred_index - 1;
-        tb_assert_abort((pred_index << TB_CPU_SHIFT) < pool->item_maxn);
+        tb_assert((pred_index << TB_CPU_SHIFT) < pool->item_maxn);
     
         // the predict data
         tb_size_t* data = (tb_size_t*)pool->used_info + pred_index;
@@ -173,7 +173,7 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fix
         }
 
         // check
-        tb_assert_abort(!tb_static_fixed_pool_used_bset(pool->used_info, index));
+        tb_assert(!tb_static_fixed_pool_used_bset(pool->used_info, index));
 
         // the data head
         data_head = (tb_pool_data_empty_head_t*)(pool->data + index * pool->item_space);
@@ -324,10 +324,10 @@ static tb_void_t tb_static_fixed_pool_check_data(tb_static_fixed_pool_t* pool, t
         tb_size_t index = ((tb_byte_t*)data_head - pool->data) / pool->item_space;
 
         // check
-        tb_assertf_break(!(((tb_byte_t*)data_head - pool->data) % pool->item_space), "the invalid data: %p", data);
-        tb_assertf_break(tb_static_fixed_pool_used_bset(pool->used_info, index), "data have been freed: %p", data);
-        tb_assertf_break(data_head->debug.magic == (pool->for_small? TB_POOL_DATA_MAGIC : TB_POOL_DATA_EMPTY_MAGIC), "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[pool->item_size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(!(((tb_byte_t*)data_head - pool->data) % pool->item_space), "the invalid data: %p", data);
+        tb_assertf(tb_static_fixed_pool_used_bset(pool->used_info, index), "data have been freed: %p", data);
+        tb_assertf(data_head->debug.magic == (pool->for_small? TB_POOL_DATA_MAGIC : TB_POOL_DATA_EMPTY_MAGIC), "the invalid data: %p", data);
+        tb_assertf(((tb_byte_t*)data)[pool->item_size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;
@@ -599,8 +599,8 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t self __tb_de
     } while (0);
 
     // check
-    tb_assertf_abort(data, "malloc(%lu) failed!", pool->item_size);
-    tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", pool->item_size, data);
+    tb_assertf(data, "malloc(%lu) failed!", pool->item_size);
+    tb_assertf(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", pool->item_size, data);
 
     // ok?
     return data;
@@ -621,11 +621,11 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t self, tb_pointer_
 
         // check
         tb_assertf_and_check_break((tb_byte_t*)data_head >= pool->data && (tb_byte_t*)data_head + pool->item_space <= pool->tail, "the data: %p not belong to pool: %p", data, pool);
-        tb_assertf_break(!(((tb_byte_t*)data_head - pool->data) % pool->item_space), "free the invalid data: %p", data);
+        tb_assertf(!(((tb_byte_t*)data_head - pool->data) % pool->item_space), "free the invalid data: %p", data);
         tb_assertf_and_check_break(pool->item_count, "double free data: %p", data);
         tb_assertf_and_check_break(tb_static_fixed_pool_used_bset(pool->used_info, index), "double free data: %p", data);
-        tb_assertf_break(data_head->debug.magic == (pool->for_small? TB_POOL_DATA_MAGIC : TB_POOL_DATA_EMPTY_MAGIC), "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[pool->item_size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(data_head->debug.magic == (pool->for_small? TB_POOL_DATA_MAGIC : TB_POOL_DATA_EMPTY_MAGIC), "the invalid data: %p", data);
+        tb_assertf(((tb_byte_t*)data)[pool->item_size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the prev data

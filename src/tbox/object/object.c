@@ -393,7 +393,7 @@ tb_long_t tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size
 
     // for xml
 #ifndef TB_CONFIG_MODULE_HAVE_XML
-    tb_assertf_abort(format != TB_OBJECT_FORMAT_XML || format != TB_OBJECT_FORMAT_XPLIST, "please enable xml module first!");
+    tb_assertf(format != TB_OBJECT_FORMAT_XML || format != TB_OBJECT_FORMAT_XPLIST, "please enable xml module first!");
 #endif
 
     // writ it

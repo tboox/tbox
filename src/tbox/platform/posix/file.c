@@ -186,8 +186,8 @@ tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // read it
     return readv(tb_file2fd(file), (struct iovec const*)list, size);
@@ -199,8 +199,8 @@ tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // writ it
     return writev(tb_file2fd(file), (struct iovec const*)list, size);
@@ -252,8 +252,8 @@ tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // read it
 #ifdef TB_CONFIG_OS_LINUX
@@ -286,8 +286,8 @@ tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // writ it
 #ifdef TB_CONFIG_OS_LINUX

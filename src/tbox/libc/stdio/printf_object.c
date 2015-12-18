@@ -71,7 +71,7 @@ static tb_long_t tb_printf_object_comp(tb_iterator_ref_t iterator, tb_cpointer_t
 {
     // the entry
     tb_printf_object_entry_t* entry = (tb_printf_object_entry_t*)item;
-    tb_assert_return_val(entry && data, -1);
+    tb_assert(entry && data);
 
     // comp
     return tb_strcmp(entry->name, (tb_char_t const*)data);

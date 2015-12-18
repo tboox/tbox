@@ -433,7 +433,7 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_impl_t* impl)
         if (tb_strnicmp(p, "HTTP/1.", 7))
         {
             // failed
-            tb_assert_abort(0);
+            tb_assert(0);
             return tb_false;
         }
 
@@ -674,7 +674,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
             if (!ch)
             {
                 ok = -1;
-                tb_assert_abort(0);
+                tb_assert(0);
                 break;
             }
 
@@ -1749,7 +1749,7 @@ tb_bool_t tb_aicp_http_ctrl(tb_aicp_http_ref_t http, tb_size_t option, ...)
     if (TB_HTTP_OPTION_CODE_IS_SET(option) && !tb_async_stream_is_closed(impl->sstream))
     {
         // abort
-        tb_assert_abort(0);
+        tb_assert(0);
         return tb_false;
     }
 

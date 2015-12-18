@@ -35,7 +35,7 @@ static tb_size_t tb_single_list_entry_itor_size(tb_iterator_ref_t iterator)
 {
     // check
     tb_single_list_entry_head_ref_t list = tb_container_of(tb_single_list_entry_head_t, itor, iterator);
-    tb_assert_abort(list);
+    tb_assert(list);
 
     // the size
     return list->size;
@@ -44,7 +44,7 @@ static tb_size_t tb_single_list_entry_itor_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_single_list_entry_head_ref_t list = tb_container_of(tb_single_list_entry_head_t, itor, iterator);
-    tb_assert_abort(list);
+    tb_assert(list);
 
     // head
     return (tb_size_t)list->next;
@@ -53,7 +53,7 @@ static tb_size_t tb_single_list_entry_itor_last(tb_iterator_ref_t iterator)
 {
     // check
     tb_single_list_entry_head_ref_t list = tb_container_of(tb_single_list_entry_head_t, itor, iterator);
-    tb_assert_abort(list);
+    tb_assert(list);
 
     // last
     return (tb_size_t)list->last;
@@ -66,7 +66,7 @@ static tb_size_t tb_single_list_entry_itor_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_single_list_entry_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_assert_abort(itor);
+    tb_assert(itor);
 
     // next
     return (tb_size_t)((tb_single_list_entry_ref_t)itor)->next;
@@ -75,7 +75,7 @@ static tb_pointer_t tb_single_list_entry_itor_item(tb_iterator_ref_t iterator, t
 {
     // check
     tb_single_list_entry_head_ref_t list = tb_container_of(tb_single_list_entry_head_t, itor, iterator);
-    tb_assert_abort(list && list->eoff < itor);
+    tb_assert(list && list->eoff < itor);
 
     // data
     return (tb_pointer_t)(itor - list->eoff);
@@ -84,8 +84,8 @@ static tb_void_t tb_single_list_entry_itor_copy(tb_iterator_ref_t iterator, tb_s
 {
     // check
     tb_single_list_entry_head_ref_t list = tb_container_of(tb_single_list_entry_head_t, itor, iterator);
-    tb_assert_abort(list && list->copy);
-    tb_assert_abort(list->eoff < itor && item);
+    tb_assert(list && list->copy);
+    tb_assert(list->eoff < itor && item);
 
     // copy it
     list->copy((tb_pointer_t)(itor - list->eoff), (tb_pointer_t)item);
@@ -94,7 +94,7 @@ static tb_void_t tb_single_list_entry_itor_remove_range(tb_iterator_ref_t iterat
 {
     // check
     tb_single_list_entry_head_ref_t list = tb_container_of(tb_single_list_entry_head_t, itor, iterator);
-    tb_assert_abort(list && prev && next);
+    tb_assert(list && prev && next);
 
     // no size?
     tb_check_return(size);

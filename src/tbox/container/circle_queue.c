@@ -139,7 +139,7 @@ static tb_void_t tb_circle_queue_itor_copy(tb_iterator_ref_t iterator, tb_size_t
 {
     // check
     tb_circle_queue_impl_t* impl = (tb_circle_queue_impl_t*)iterator;
-    tb_assert_return(impl);
+    tb_assert(impl);
 
     // copy
     impl->element.copy(&impl->element, impl->data + itor * iterator->step, item);

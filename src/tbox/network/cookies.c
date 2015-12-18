@@ -437,11 +437,11 @@ static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
 {
     // check
     tb_value_t* tuple = (tb_value_t*)value;
-    tb_assert_abort(item && tuple);
+    tb_assert(item && tuple);
 
     // the entry
     tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)item;
-    tb_assert_abort(entry && entry->domain && entry->path && entry->name);
+    tb_assert(entry && entry->domain && entry->path && entry->name);
 
     // the domain
     tb_char_t const* domain = tuple[0].cstr;
@@ -454,7 +454,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
 
     // the value of key
     tb_string_ref_t kvalue = (tb_string_ref_t)tuple[3].ptr;
-    tb_assert_abort(kvalue);
+    tb_assert(kvalue);
 
     // expired?
     if (entry->expires && tb_cache_time() >= entry->expires)

@@ -34,7 +34,7 @@
 static __tb_inline__ tb_bool_t tb_ipaddr_ipv6_to_ipv4(tb_ipv6_ref_t ipv6, tb_ipv4_ref_t ipv4)
 {
     // check
-    tb_assert_abort(ipv6 && ipv4);
+    tb_assert(ipv6 && ipv4);
 
     // is ipv4?
     if (!ipv6->addr.u32[0] && !ipv6->addr.u32[1] && ipv6->addr.u32[2] == 0xffff0000)
@@ -52,7 +52,7 @@ static __tb_inline__ tb_bool_t tb_ipaddr_ipv6_to_ipv4(tb_ipv6_ref_t ipv6, tb_ipv
 static __tb_inline__ tb_bool_t tb_ipaddr_ipv4_to_ipv6(tb_ipv4_ref_t ipv4, tb_ipv6_ref_t ipv6)
 {
     // check
-    tb_assert_abort(ipv6 && ipv4);
+    tb_assert(ipv6 && ipv4);
 
     // make ipv6
     ipv6->addr.u32[0]   = 0;
@@ -264,7 +264,7 @@ tb_bool_t tb_ipaddr_ip_is_equal(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
     }
 
     // failed
-    tb_assert_abort(0);
+    tb_assert(0);
     return tb_false;
 }
 tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_size_t maxn)
@@ -283,7 +283,7 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
             else 
             {
                 // check
-                tb_assert_abort(maxn >= TB_IPV4_CSTR_MAXN);
+                tb_assert(maxn >= TB_IPV4_CSTR_MAXN);
 
                 // make empty cstr
                 tb_long_t size = tb_snprintf(data, maxn - 1, "0.0.0.0");
@@ -301,7 +301,7 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
             else
             {
                 // check
-                tb_assert_abort(maxn >= TB_IPV6_CSTR_MAXN);
+                tb_assert(maxn >= TB_IPV6_CSTR_MAXN);
 
                 // make empty cstr
                 tb_long_t size = tb_snprintf(data, maxn - 1, "::");
@@ -313,7 +313,7 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
         }
         break;
     default:
-        tb_assert_abort(0);
+        tb_assert(0);
         break;
     }
 
@@ -326,7 +326,7 @@ tb_bool_t tb_ipaddr_ip_cstr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, t
     if (!cstr)
     {
         // check
-        tb_assert_abort(ipaddr);
+        tb_assert(ipaddr);
 
         // clear it
         ipaddr->family    = family;
@@ -417,7 +417,7 @@ tb_void_t tb_ipaddr_ip_set(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
         }
         break;
     default:
-        tb_assert_abort(0);
+        tb_assert(0);
         break;
     }
 }
@@ -448,7 +448,7 @@ tb_ipv4_ref_t tb_ipaddr_ipv4(tb_ipaddr_ref_t ipaddr)
         }
         break;
     default:
-        tb_assert_abort(0);
+        tb_assert(0);
         break;
     }
 
@@ -499,7 +499,7 @@ tb_ipv6_ref_t tb_ipaddr_ipv6(tb_ipaddr_ref_t ipaddr)
         ipv6 = &ipaddr->u.ipv6;
         break;
     default:
-        tb_assert_abort(0);
+        tb_assert(0);
         break;
     }
 
@@ -548,7 +548,7 @@ tb_void_t tb_ipaddr_family_set(tb_ipaddr_ref_t ipaddr, tb_size_t family)
         else
         {
             // check
-            tb_assert_abort(0);
+            tb_assert(0);
         }
     }
     // ipv6 => ipv4?
@@ -563,7 +563,7 @@ tb_void_t tb_ipaddr_family_set(tb_ipaddr_ref_t ipaddr, tb_size_t family)
         else
         {
             // check
-            tb_assert_abort(0);
+            tb_assert(0);
         }
     }
     else ipaddr->family = family;

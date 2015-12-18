@@ -36,7 +36,7 @@ tb_double_t tb_atan2(tb_double_t y, tb_double_t x)
 #ifdef TB_CONFIG_LIBM_HAVE_ATAN2
     return atan2(y, x);
 #else
-    tb_assert_abort(0);
+    tb_assert(0);
     return 0;
 #endif
 }

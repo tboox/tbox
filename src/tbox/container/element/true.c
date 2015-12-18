@@ -63,11 +63,11 @@ static tb_void_t tb_element_true_nfree(tb_element_ref_t element, tb_pointer_t bu
 }
 static tb_void_t tb_element_true_repl(tb_element_ref_t element, tb_pointer_t buff, tb_cpointer_t data)
 {
-    tb_assert_abort((tb_bool_t)(tb_size_t)data == tb_true);
+    tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
 }
 static tb_void_t tb_element_true_nrepl(tb_element_ref_t element, tb_pointer_t buff, tb_cpointer_t data, tb_size_t size)
 {
-    tb_assert_abort((tb_bool_t)(tb_size_t)data == tb_true);
+    tb_assert((tb_bool_t)(tb_size_t)data == tb_true);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

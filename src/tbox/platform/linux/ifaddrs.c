@@ -99,7 +99,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
             if (!interface) interface = &interface_new;
 
             // check
-            tb_assert_abort(interface == &interface_new || interface->name);
+            tb_assert(interface == &interface_new || interface->name);
 
             // done
             switch (item->ifa_addr->sa_family)
@@ -143,7 +143,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     {
                         // save interface name
                         interface->name = tb_strdup(item->ifa_name);
-                        tb_assert_abort(interface->name);
+                        tb_assert(interface->name);
 
                         // save interface
                         tb_list_insert_tail(interfaces, interface);
@@ -189,7 +189,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                     {
                         // save interface name
                         interface->name = tb_strdup(item->ifa_name);
-                        tb_assert_abort(interface->name);
+                        tb_assert(interface->name);
 
                         // save interface
                         tb_list_insert_tail(interfaces, interface);
@@ -218,7 +218,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                         {
                             // save interface name
                             interface->name = tb_strdup(item->ifa_name);
-                            tb_assert_abort(interface->name);
+                            tb_assert(interface->name);
 
                             // save interface
                             tb_list_insert_tail(interfaces, interface);

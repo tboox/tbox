@@ -118,9 +118,9 @@ static tb_void_t tb_native_large_allocator_check_data(tb_native_large_allocator_
         tb_pool_data_head_t* base_head = tb_native_large_allocator_data_base(data_head);
 
         // check
-        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "data have been freed: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "data have been freed: %p", data);
+        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
+        tb_assertf(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;
@@ -317,10 +317,10 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
         tb_pool_data_head_t* base_head = tb_native_large_allocator_data_base(data_head);
 
         // check
-        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "ralloc freed data: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+        tb_assertf(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "ralloc freed data: %p", data);
+        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
         tb_assertf_and_check_break(data_head->allocator == (tb_pointer_t)allocator, "the data: %p not belong to allocator: %p", data, allocator);
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the last data
@@ -372,7 +372,7 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
         base_head->debug.line      = (tb_uint16_t)line_;
 
         // check
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc data have been changed: %p", data);
+        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc data have been changed: %p", data);
 
         // update backtrace
         tb_pool_data_save_backtrace(&base_head->debug, 5);
@@ -447,10 +447,10 @@ static tb_bool_t tb_native_large_allocator_free(tb_allocator_ref_t self, tb_poin
 #endif
 
         // check
-        tb_assertf_break(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
+        tb_assertf(base_head->debug.magic != (tb_uint16_t)~TB_POOL_DATA_MAGIC, "double free data: %p", data);
+        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
         tb_assertf_and_check_break(data_head->allocator == (tb_pointer_t)allocator, "the data: %p not belong to allocator: %p", data, allocator);
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the last data

@@ -103,7 +103,7 @@ static tb_void_t tb_test_heap_min_perf()
         tb_size_t v = (tb_size_t)tb_heap_top(heap);
 
         // check order
-        tb_assert_abort(!i || p <= v);
+        tb_assert(!i || p <= v);
 
         // save the previous value
         p = v;
@@ -216,7 +216,7 @@ static tb_void_t tb_test_heap_max_perf()
         tb_size_t v = (tb_size_t)tb_heap_top(heap);
 
         // check order
-        tb_assert_abort(!i || p >= v);
+        tb_assert(!i || p >= v);
 
         // save the previous value
         p = v;

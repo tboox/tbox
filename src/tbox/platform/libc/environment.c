@@ -95,7 +95,7 @@ tb_bool_t tb_environment_save(tb_environment_ref_t environment, tb_char_t const*
     tb_for_all_if (tb_char_t const*, value, environment, value)
     {
         // the single value cannot exist ':'
-        tb_assertf_abort(!tb_strchr(value, ':'), "invalid value: %s", value);
+        tb_assertf(!tb_strchr(value, ':'), "invalid value: %s", value);
 
         // append value
         tb_string_cstrcat(&values, value);
@@ -154,7 +154,7 @@ tb_bool_t tb_environment_set_one(tb_char_t const* name, tb_char_t const* value)
     tb_assert_and_check_return_val(name, tb_false);
 
     // the single value cannot exist ':'
-    tb_assertf_abort(!value || !tb_strchr(value, ':'), "invalid value: %s", value);
+    tb_assertf(!value || !tb_strchr(value, ':'), "invalid value: %s", value);
 
     // set it
     return value? !setenv(name, value, 1) : !unsetenv(name);

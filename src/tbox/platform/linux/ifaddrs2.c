@@ -202,7 +202,7 @@ static tb_size_t tb_ifaddrs_netlink_ipaddr_save(tb_ipaddr_ref_t ipaddr, tb_size_
         }
         break;
     default:
-        tb_assert_abort(0);
+        tb_assert(0);
         break;
     }
     
@@ -282,7 +282,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
         if (!interface) interface = &interface_new;
 
         // check
-        tb_assert_abort(interface == &interface_new || interface->name);
+        tb_assert(interface == &interface_new || interface->name);
 
         // done
         tb_pointer_t rta_data = RTA_DATA(rta);
@@ -326,7 +326,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
                     {
                         // save interface name
                         interface->name = tb_strdup(name);
-                        tb_assert_abort(interface->name);
+                        tb_assert(interface->name);
 
                         // save interface
                         tb_list_insert_tail(interfaces, interface);
@@ -404,7 +404,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
         if (!interface) interface = &interface_new;
 
         // check
-        tb_assert_abort(interface == &interface_new || interface->name);
+        tb_assert(interface == &interface_new || interface->name);
 
         // done
         tb_pointer_t    rta_data = RTA_DATA(rta);
@@ -434,7 +434,7 @@ static tb_void_t tb_ifaddrs_interface_done_hwaddr(tb_list_ref_t interfaces, tb_h
                         {
                             // save interface name
                             interface->name = tb_strdup(name);
-                            tb_assert_abort(interface->name);
+                            tb_assert(interface->name);
 
                             // save interface
                             tb_list_insert_tail(interfaces, interface);
