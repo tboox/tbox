@@ -540,7 +540,7 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
     tb_assert_and_check_return_val(name, tb_null);
 
     // must be not address
-    tb_assert_abort(!tb_ipaddr_ip_cstr_set(tb_null, name, TB_IPADDR_FAMILY_NONE));
+    tb_assert(!tb_ipaddr_ip_cstr_set(tb_null, name, TB_IPADDR_FAMILY_NONE));
 
     // done
     tb_bool_t               ok = tb_false;

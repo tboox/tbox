@@ -212,7 +212,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
             else 
             {
                 // abort
-                tb_assert_abort(0);
+                tb_assert(0);
 
                 // failed
                 ok = tb_false;

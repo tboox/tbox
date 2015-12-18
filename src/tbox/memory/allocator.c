@@ -73,8 +73,8 @@ tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size _
     else if (allocator->large_malloc) data = allocator->large_malloc(allocator, size, tb_null __tb_debug_args__);
 
     // check
-    tb_assertf_abort(data, "malloc(%lu) failed!", size);
-    tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
+    tb_assertf(data, "malloc(%lu) failed!", size);
+    tb_assertf(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
 
     // leave
     tb_spinlock_leave(&allocator->lock);
@@ -147,7 +147,7 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
 #endif
 
     // check
-    tb_assertf_abort(!(((tb_size_t)data_new) & (TB_POOL_DATA_ALIGN - 1)), "ralloc(%lu): unaligned data: %p", size, data);
+    tb_assertf(!(((tb_size_t)data_new) & (TB_POOL_DATA_ALIGN - 1)), "ralloc(%lu): unaligned data: %p", size, data);
 
     // leave
     tb_spinlock_leave(&allocator->lock);
@@ -208,9 +208,9 @@ tb_pointer_t tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t 
     }
 
     // check
-    tb_assertf_abort(data, "malloc(%lu) failed!", size);
-    tb_assertf_abort(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
-    tb_assert_abort(!real || *real >= size);
+    tb_assertf(data, "malloc(%lu) failed!", size);
+    tb_assertf(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
+    tb_assert(!real || *real >= size);
 
     // leave
     tb_spinlock_leave(&allocator->lock);
@@ -288,8 +288,8 @@ tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer
 #endif
 
     // check
-    tb_assert_abort(!real || *real >= size);
-    tb_assertf_abort(!(((tb_size_t)data_new) & (TB_POOL_DATA_ALIGN - 1)), "ralloc(%lu): unaligned data: %p", size, data);
+    tb_assert(!real || *real >= size);
+    tb_assertf(!(((tb_size_t)data_new) & (TB_POOL_DATA_ALIGN - 1)), "ralloc(%lu): unaligned data: %p", size, data);
 
     // leave
     tb_spinlock_leave(&allocator->lock);
@@ -334,7 +334,7 @@ tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t da
 tb_pointer_t tb_allocator_align_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t align __tb_debug_decl__)
 {
     // check
-    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
+    tb_assertf(!(align & 3), "invalid alignment size: %lu", align);
     tb_check_return_val(!(align & 3), tb_null);
 
     // malloc it
@@ -348,7 +348,7 @@ tb_pointer_t tb_allocator_align_malloc_(tb_allocator_ref_t allocator, tb_size_t 
     data += diff;
 
     // check
-    tb_assert_abort(!((tb_size_t)data & (align - 1)));
+    tb_assert(!((tb_size_t)data & (align - 1)));
 
     // save the different bytes
     data[-1] = diff;
@@ -387,7 +387,7 @@ tb_pointer_t tb_allocator_align_nalloc0_(tb_allocator_ref_t allocator, tb_size_t
 tb_pointer_t tb_allocator_align_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t data, tb_size_t size, tb_size_t align __tb_debug_decl__)
 {
     // check align
-    tb_assertf_abort(!(align & 3), "invalid alignment size: %lu", align);
+    tb_assertf(!(align & 3), "invalid alignment size: %lu", align);
     tb_check_return_val(!(align & 3), tb_null);
 
     // ralloc?
@@ -395,7 +395,7 @@ tb_pointer_t tb_allocator_align_ralloc_(tb_allocator_ref_t allocator, tb_pointer
     if (data)
     {
         // check address 
-        tb_assertf_abort(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
+        tb_assertf(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
         tb_check_return_val(!((tb_size_t)data & (align - 1)), tb_null);
 
         // the different bytes
@@ -423,7 +423,7 @@ tb_pointer_t tb_allocator_align_ralloc_(tb_allocator_ref_t allocator, tb_pointer
     data = (tb_byte_t*)data + diff;
 
     // check
-    tb_assert_abort(!((tb_size_t)data & (align - 1)));
+    tb_assert(!((tb_size_t)data & (align - 1)));
 
     // save the different bytes
     ((tb_byte_t*)data)[-1] = diff;
@@ -435,7 +435,7 @@ tb_bool_t tb_allocator_align_free_(tb_allocator_ref_t allocator, tb_pointer_t da
 {
     // check
     tb_assert_and_check_return_val(data, tb_false);
-    tb_assert_abort(!((tb_size_t)data & 3));
+    tb_assert(!((tb_size_t)data & 3));
 
     // the different bytes
     tb_byte_t diff = ((tb_byte_t*)data)[-1];

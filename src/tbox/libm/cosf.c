@@ -36,7 +36,7 @@ tb_float_t tb_cosf(tb_float_t x)
 #ifdef TB_CONFIG_LIBM_HAVE_COSF
     return cosf(x);
 #else
-    tb_assert_abort(0);
+    tb_assert(0);
     return 0;
 #endif
 }

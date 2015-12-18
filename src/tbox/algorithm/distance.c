@@ -86,7 +86,7 @@ tb_size_t tb_distance(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail
     else
     {
         // abort
-        tb_assert_abort(0);
+        tb_assert(0);
     }
 
     // ok?

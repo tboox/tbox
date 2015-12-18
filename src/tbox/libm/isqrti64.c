@@ -55,7 +55,7 @@ static tb_uint32_t tb_isqrti64_impl(tb_uint64_t x)
         while (b >>= 1); 
 
         // check
-        tb_assert_abort(!(n >> 32));
+        tb_assert(!(n >> 32));
 
         // ok
         return (tb_uint32_t)n;

@@ -36,7 +36,7 @@ tb_double_t tb_sqrt(tb_double_t x)
 #ifdef TB_CONFIG_LIBM_HAVE_SQRT
     return sqrt(x);
 #else
-    tb_assert_abort(0);
+    tb_assert(0);
     return 0;
 #endif
 }

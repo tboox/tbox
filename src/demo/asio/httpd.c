@@ -111,7 +111,7 @@ static tb_char_t const* tb_demo_httpd_code_cstr(tb_size_t code)
     }
 
     // check
-    tb_assert_abort(cstr);
+    tb_assert(cstr);
 
     // ok?
     return cstr;
@@ -412,7 +412,7 @@ static tb_bool_t tb_demo_httpd_session_reqt_done(tb_demo_httpd_session_t* sessio
             // the full path
             tb_char_t full[TB_PATH_MAXN] = {0};
             tb_long_t size = tb_snprintf(full, sizeof(full) - 1, "%s%s%s", session->httpd->root, path[0] != '/'? "/" : "", path);
-            tb_assert_abort(size > 0);
+            tb_assert(size > 0);
 
             // end
             full[size] = '\0';

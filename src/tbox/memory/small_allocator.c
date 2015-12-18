@@ -65,7 +65,7 @@ __tb_extern_c__ tb_fixed_pool_ref_t tb_fixed_pool_init_(tb_allocator_ref_t large
 static tb_fixed_pool_ref_t tb_small_allocator_find_fixed(tb_small_allocator_ref_t allocator, tb_size_t size)
 {
     // check
-    tb_assert_return_val(allocator && size && size <= TB_SMALL_ALLOCATOR_DATA_MAXN, tb_null);
+    tb_assert(allocator && size && size <= TB_SMALL_ALLOCATOR_DATA_MAXN);
 
     // done
     tb_fixed_pool_ref_t fixed_pool = tb_null;
@@ -167,7 +167,7 @@ static tb_bool_t tb_small_allocator_item_check(tb_pointer_t data, tb_cpointer_t 
 {
     // check
     tb_fixed_pool_ref_t fixed_pool = (tb_fixed_pool_ref_t)priv;
-    tb_assert_return_val(fixed_pool && data, tb_false);
+    tb_assert(fixed_pool && data);
 
     // done 
     tb_bool_t ok = tb_false;
@@ -175,14 +175,14 @@ static tb_bool_t tb_small_allocator_item_check(tb_pointer_t data, tb_cpointer_t 
     {
         // the data head
         tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "invalid data: %p", data);
+        tb_assertf(data_head->debug.magic == TB_POOL_DATA_MAGIC, "invalid data: %p", data);
 
         // the data space
         tb_size_t space = tb_fixed_pool_item_size(fixed_pool);
         tb_assert_and_check_break(space >= data_head->size);
 
         // check underflow
-        tb_assertf_break(space == data_head->size || ((tb_byte_t*)data)[data_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(space == data_head->size || ((tb_byte_t*)data)[data_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;
@@ -257,7 +257,7 @@ static tb_pointer_t tb_small_allocator_malloc(tb_allocator_ref_t self, tb_size_t
 
         // the data head
         tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-        tb_assert_abort(data_head->debug.magic == TB_POOL_DATA_MAGIC);
+        tb_assert(data_head->debug.magic == TB_POOL_DATA_MAGIC);
 
 #ifdef __tb_debug__
         // fill the patch bytes
@@ -270,7 +270,7 @@ static tb_pointer_t tb_small_allocator_malloc(tb_allocator_ref_t self, tb_size_t
     } while (0);
 
     // check
-    tb_assertf_abort(data, "malloc(%lu) failed!", size);
+    tb_assertf(data, "malloc(%lu) failed!", size);
 
     // ok?
     return data;
@@ -288,7 +288,7 @@ static tb_pointer_t tb_small_allocator_ralloc(tb_allocator_ref_t self, tb_pointe
     {
         // the old data head
         tb_pool_data_head_t* data_head_old = &(((tb_pool_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head_old->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+        tb_assertf(data_head_old->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
 
         // the old fixed pool
         tb_fixed_pool_ref_t fixed_pool_old = tb_small_allocator_find_fixed(allocator, data_head_old->size);
@@ -299,7 +299,7 @@ static tb_pointer_t tb_small_allocator_ralloc(tb_allocator_ref_t self, tb_pointe
         tb_assert_and_check_break(space_old >= data_head_old->size);
 
         // check underflow
-        tb_assertf_break(space_old == data_head_old->size || ((tb_byte_t*)data)[data_head_old->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(space_old == data_head_old->size || ((tb_byte_t*)data)[data_head_old->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // the new fixed pool
         tb_fixed_pool_ref_t fixed_pool_new = tb_small_allocator_find_fixed(allocator, size);
@@ -326,7 +326,7 @@ static tb_pointer_t tb_small_allocator_ralloc(tb_allocator_ref_t self, tb_pointe
 
         // the new data head
         tb_pool_data_head_t* data_head_new = &(((tb_pool_data_head_t*)data_new)[-1]);
-        tb_assert_abort(data_head_new->debug.magic == TB_POOL_DATA_MAGIC);
+        tb_assert(data_head_new->debug.magic == TB_POOL_DATA_MAGIC);
 
 #ifdef __tb_debug__
         // fill the patch bytes
@@ -359,7 +359,7 @@ static tb_bool_t tb_small_allocator_free(tb_allocator_ref_t self, tb_pointer_t d
     {
         // the data head
         tb_pool_data_head_t* data_head = &(((tb_pool_data_head_t*)data)[-1]);
-        tb_assertf_break(data_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
+        tb_assertf(data_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
 
         // the fixed pool
         tb_fixed_pool_ref_t fixed_pool = tb_small_allocator_find_fixed(allocator, data_head->size);
@@ -370,7 +370,7 @@ static tb_bool_t tb_small_allocator_free(tb_allocator_ref_t self, tb_pointer_t d
         tb_assert_and_check_break(space >= data_head->size);
 
         // check underflow
-        tb_assertf_break(space == data_head->size || ((tb_byte_t*)data)[data_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(space == data_head->size || ((tb_byte_t*)data)[data_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // done
         ok = tb_fixed_pool_free_(fixed_pool, data __tb_debug_args__);

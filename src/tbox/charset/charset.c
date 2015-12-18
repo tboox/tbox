@@ -87,7 +87,7 @@ static tb_charset_t g_charsets[] =
 static tb_long_t tb_charset_comp_by_name(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t name)
 {
     // check
-    tb_assert_return_val(item, 0);
+    tb_assert(item);
 
     // comp
     return tb_stricmp(((tb_charset_ref_t)item)->name, (tb_char_t const*)name);
@@ -95,7 +95,7 @@ static tb_long_t tb_charset_comp_by_name(tb_iterator_ref_t iterator, tb_cpointer
 static tb_long_t tb_charset_comp_by_type(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t type)
 {
     // check
-    tb_assert_return_val(item && type, 0);
+    tb_assert(item && type);
 
     // comp
     return (tb_long_t)((tb_charset_ref_t)item)->type - (tb_long_t)type;

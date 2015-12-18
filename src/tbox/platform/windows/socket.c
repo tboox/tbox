@@ -368,7 +368,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock && addr, -1);
-    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;
@@ -728,7 +728,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
 {
     // check
     tb_assert_and_check_return_val(sock && addr && data, -1);
-    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // no size?
     tb_check_return_val(size, 0);
@@ -797,7 +797,7 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
 {
     // check
     tb_assert_and_check_return_val(sock && addr && list && size, -1);
-    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;

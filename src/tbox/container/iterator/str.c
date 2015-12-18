@@ -32,7 +32,7 @@
 static tb_long_t tb_iterator_str_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_assert_abort(litem && ritem);
+    tb_assert(litem && ritem);
 
     // compare it
     return tb_strcmp((tb_char_t const*)litem, (tb_char_t const*)ritem);
@@ -40,7 +40,7 @@ static tb_long_t tb_iterator_str_comp(tb_iterator_ref_t iterator, tb_cpointer_t 
 static tb_long_t tb_iterator_istr_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_assert_abort(litem && ritem);
+    tb_assert(litem && ritem);
 
     // compare it
     return tb_stricmp((tb_char_t const*)litem, (tb_char_t const*)ritem);

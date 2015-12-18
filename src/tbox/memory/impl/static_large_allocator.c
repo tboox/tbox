@@ -180,9 +180,9 @@ static tb_void_t tb_static_large_allocator_check_data(tb_static_large_allocator_
         tb_pool_data_head_t* base_head = tb_static_large_allocator_data_base(data_head);
 
         // check
-        tb_assertf_break(!data_head->bfree, "data have been freed: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(!data_head->bfree, "data have been freed: %p", data);
+        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
+        tb_assertf(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;
@@ -218,7 +218,7 @@ static __tb_inline__ tb_size_t tb_static_large_allocator_pred_index(tb_static_la
 {
     // the size
     tb_size_t size = sizeof(tb_static_large_data_head_t) + space;
-    tb_assert_abort(!(size & (allocator->page_size - 1)));
+    tb_assert(!(size & (allocator->page_size - 1)));
 
     // the page count
     size /= allocator->page_size;
@@ -236,7 +236,7 @@ static __tb_inline__ tb_size_t tb_static_large_allocator_pred_index(tb_static_la
 static __tb_inline__ tb_void_t tb_static_large_allocator_pred_update(tb_static_large_allocator_ref_t allocator, tb_static_large_data_head_t* data_head)
 {
     // check
-    tb_assert_abort(allocator && data_head && data_head->bfree);
+    tb_assert(allocator && data_head && data_head->bfree);
 
     // cannot be tail
     tb_check_return(data_head != allocator->data_tail);
@@ -253,7 +253,7 @@ static __tb_inline__ tb_void_t tb_static_large_allocator_pred_update(tb_static_l
 static __tb_inline__ tb_void_t tb_static_large_allocator_pred_remove(tb_static_large_allocator_ref_t allocator, tb_static_large_data_head_t* data_head)
 {
     // check
-    tb_assert_abort(allocator && data_head);
+    tb_assert(allocator && data_head);
 
     // the pred index
     tb_size_t indx = tb_static_large_allocator_pred_index(allocator, data_head->space);
@@ -277,7 +277,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
         tb_size_t data_space = data_head->space;
 
         // check the space size
-        tb_assert_abort(!((sizeof(tb_static_large_data_head_t) + data_space) & (allocator->page_size - 1)));
+        tb_assert(!((sizeof(tb_static_large_data_head_t) + data_space) & (allocator->page_size - 1)));
             
 #ifdef __tb_debug__
         // check the data
@@ -431,7 +431,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_done(tb_sta
             data_head = tb_static_large_allocator_malloc_find(allocator, allocator->data_head, -1, need_space);
             tb_check_break(data_head);
         }
-        tb_assert_abort(data_head->space >= size + patch);
+        tb_assert(data_head->space >= size + patch);
 
         // the base head
         tb_pool_data_head_t* base_head = tb_static_large_allocator_data_base(data_head);
@@ -635,9 +635,9 @@ static tb_bool_t tb_static_large_allocator_free(tb_allocator_ref_t self, tb_poin
 
         // check
         tb_assertf_and_check_break(!data_head->bfree, "double free data: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
+        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "free invalid data: %p", data);
         tb_assertf_and_check_break(data_head >= allocator->data_head && data_head < allocator->data_tail, "the data: %p not belong to allocator: %p", data, allocator);
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the next data
@@ -716,9 +716,9 @@ static tb_pointer_t tb_static_large_allocator_ralloc(tb_allocator_ref_t self, tb
 
         // check
         tb_assertf_and_check_break(!data_head->bfree, "ralloc freed data: %p", data);
-        tb_assertf_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
+        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "ralloc invalid data: %p", data);
         tb_assertf_and_check_break(data_head >= allocator->data_head && data_head < allocator->data_tail, "the data: %p not belong to allocator: %p", data, allocator);
-        tb_assertf_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
 #ifdef __tb_debug__
         // check the next data

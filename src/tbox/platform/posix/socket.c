@@ -268,7 +268,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock && addr, -1);
-    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;
@@ -481,8 +481,8 @@ tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // read it
     tb_long_t real = readv(tb_sock2fd(sock), (struct iovec const*)list, size);
@@ -503,8 +503,8 @@ tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
 
     // check iovec
     tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
-    tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // writ it
     tb_long_t real = writev(tb_sock2fd(sock), (struct iovec const*)list, size);
@@ -602,7 +602,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
 {
     // check
     tb_assert_and_check_return_val(sock && addr && data, -1);
-    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // no size?
     tb_check_return_val(size, 0);
@@ -663,7 +663,7 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
 {
     // check
     tb_assert_and_check_return_val(sock && addr && list && size, -1);
-    tb_assert_abort_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
+    tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // load addr
     tb_size_t               n = 0;

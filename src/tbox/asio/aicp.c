@@ -392,7 +392,7 @@ tb_bool_t tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_ref_t aice __tb_debug_decl__
 #endif
 
     // abort it
-    tb_assert_abort(0);
+    tb_assert(0);
 
     // post failed
     return tb_false;

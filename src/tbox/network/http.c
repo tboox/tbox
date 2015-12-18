@@ -402,7 +402,7 @@ static tb_bool_t tb_http_response_done(tb_http_impl_t* impl, tb_char_t const* li
         if (tb_strnicmp(p, "HTTP/1.", 7))
         {
             // failed
-            tb_assert_abort(0);
+            tb_assert(0);
             return tb_false;
         }
 
@@ -992,7 +992,7 @@ tb_bool_t tb_http_ctrl(tb_http_ref_t http, tb_size_t option, ...)
     if (TB_HTTP_OPTION_CODE_IS_SET(option) && impl->bopened)
     {
         // abort
-        tb_assert_abort(0);
+        tb_assert(0);
         return tb_false;
     }
 

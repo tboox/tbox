@@ -50,7 +50,7 @@ static tb_void_t tb_ifaddrs_instance_exit(tb_handle_t ifaddrs, tb_cpointer_t pri
 static tb_bool_t tb_ifaddrs_interface_pred(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t name)
 {
     // check
-    tb_assert_abort(item);
+    tb_assert(item);
 
     // is equal?
     return !tb_stricmp(((tb_ifaddrs_interface_ref_t)item)->name, (tb_char_t const*)name);

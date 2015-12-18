@@ -149,7 +149,7 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_size(tb_iterator_ref_t 
 {
     // check
     tb_database_sqlite3_result_t* result = (tb_database_sqlite3_result_t*)iterator;
-    tb_assert_return_val(result, 0);
+    tb_assert(result);
 
     // size
     return result->count;
@@ -163,7 +163,7 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_tail(tb_iterator_ref_t 
 {
     // check
     tb_database_sqlite3_result_t* result = (tb_database_sqlite3_result_t*)iterator;
-    tb_assert_return_val(result, 0);
+    tb_assert(result);
 
     // tail
     return result->count;
@@ -172,7 +172,7 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_prev(tb_iterator_ref_t 
 {
     // check
     tb_database_sqlite3_result_t* result = (tb_database_sqlite3_result_t*)iterator;
-    tb_assert_return_val(result, 0);
+    tb_assert(result);
     tb_assert_and_check_return_val(itor && itor <= result->count, result->count);
 
     // cannot be the statement result
@@ -185,7 +185,7 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_next(tb_iterator_ref_t 
 {
     // check
     tb_database_sqlite3_result_t* result = (tb_database_sqlite3_result_t*)iterator;
-    tb_assert_return_val(result, 0);
+    tb_assert(result);
     tb_assert_and_check_return_val(itor < result->count, result->count);
 
     // statement result?

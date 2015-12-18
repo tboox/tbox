@@ -589,7 +589,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice
     tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
     // check address
-    tb_assert_abort(!tb_ipaddr_is_empty(&aice->u.conn.addr));
+    tb_assert(!tb_ipaddr_is_empty(&aice->u.conn.addr));
 
     // try to connect it
     tb_long_t ok = tb_socket_connect(aico->base.handle, &aice->u.conn.addr);

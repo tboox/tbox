@@ -118,7 +118,7 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_impl_t* reader
     }
 
     // failed
-    tb_assertf_abort(0, "invalid element: %s from %s", tb_string_cstr(&reader->element), tb_url_cstr(tb_stream_url(reader->istream)));
+    tb_assertf(0, "invalid element: %s from %s", tb_string_cstr(&reader->element), tb_url_cstr(tb_stream_url(reader->istream)));
     return tb_null;
 }
 static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_impl_t* reader)

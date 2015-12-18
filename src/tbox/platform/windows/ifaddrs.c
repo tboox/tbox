@@ -76,7 +76,7 @@ static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
         while (adapter)
         {
             // check
-            tb_assert_abort(adapter->AdapterName);
+            tb_assert(adapter->AdapterName);
 
             /* attempt to get the interface from the cached interfaces
              * and make a new interface if no the cached interface
@@ -86,7 +86,7 @@ static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
             if (!interface) interface = &interface_new;
 
             // check
-            tb_assert_abort(interface == &interface_new || interface->name);
+            tb_assert(interface == &interface_new || interface->name);
 
             // save flags
             if (adapter->Type == MIB_IF_TYPE_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
@@ -129,7 +129,7 @@ static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
             {
                 // save interface name
                 interface->name = tb_strdup(adapter->AdapterName);
-                tb_assert_abort(interface->name);
+                tb_assert(interface->name);
 
                 // save interface
                 tb_list_insert_tail(interfaces, interface);
@@ -178,7 +178,7 @@ static tb_void_t tb_ifaddrs_interface_load6(tb_list_ref_t interfaces)
         while (address)
         {
             // check
-            tb_assert_abort(address->AdapterName);
+            tb_assert(address->AdapterName);
 
             /* attempt to get the interface from the cached interfaces
              * and make a new interface if no the cached interface
@@ -188,7 +188,7 @@ static tb_void_t tb_ifaddrs_interface_load6(tb_list_ref_t interfaces)
             if (!interface) interface = &interface_new;
 
             // check
-            tb_assert_abort(interface == &interface_new || interface->name);
+            tb_assert(interface == &interface_new || interface->name);
 
             // save flags
             if (address->IfType == IF_TYPE_SOFTWARE_LOOPBACK) interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
@@ -231,7 +231,7 @@ static tb_void_t tb_ifaddrs_interface_load6(tb_list_ref_t interfaces)
             {
                 // save interface name
                 interface->name = tb_strdup(address->AdapterName);
-                tb_assert_abort(interface->name);
+                tb_assert(interface->name);
 
                 // save interface
                 tb_list_insert_tail(interfaces, interface);

@@ -34,7 +34,7 @@ static tb_bool_t tb_remove_if_pred(tb_iterator_ref_t iterator, tb_cpointer_t ite
 {
     // check
     tb_value_ref_t tuple = (tb_value_ref_t)value;
-    tb_assert_abort(tuple && tuple[0].cptr);
+    tb_assert(tuple && tuple[0].cptr);
 
     // the pred
     return ((tb_predicate_ref_t)tuple[0].cptr)(iterator, item, tuple[1].cptr);
@@ -105,7 +105,7 @@ tb_void_t tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_
             if (need) 
             {
                 // check
-                tb_assert_abort(size);
+                tb_assert(size);
 
                 // the previous tail
                 tb_size_t prev_tail = tb_iterator_tail(iterator);

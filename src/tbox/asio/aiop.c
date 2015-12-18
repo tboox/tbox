@@ -212,7 +212,7 @@ tb_void_t tb_aiop_kill(tb_aiop_ref_t aiop)
             tb_trace_e("kill: failed!");
 
             // abort it
-            tb_assert_abort(0);
+            tb_assert(0);
         }
     }
 }
@@ -233,7 +233,7 @@ tb_void_t tb_aiop_spak(tb_aiop_ref_t aiop)
             tb_trace_e("spak: failed!");
 
             // abort it
-            tb_assert_abort(0);
+            tb_assert(0);
         }
     }
 }
@@ -242,7 +242,7 @@ tb_aioo_ref_t tb_aiop_addo(tb_aiop_ref_t aiop, tb_socket_ref_t sock, tb_size_t c
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
     tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->addo && sock, tb_null);
-    tb_assert_return_val(tb_aiop_have(aiop, code), tb_null);
+    tb_assert(tb_aiop_have(aiop, code));
 
     // done
     tb_bool_t       ok = tb_false;
@@ -285,7 +285,7 @@ tb_bool_t tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_ref_t aioe)
     // check
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
     tb_assert_and_check_return_val(impl && impl->rtor && impl->rtor->post && aioe, tb_false);
-    tb_assert_return_val(tb_aiop_have(aiop, aioe->code), tb_false);
+    tb_assert(tb_aiop_have(aiop, aioe->code));
 
     // post
     return impl->rtor->post(impl->rtor, aioe);

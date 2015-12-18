@@ -224,7 +224,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull(tb_iterator_ref_t iterator, tb_
 {
     // the worker pull
     tb_thread_pool_worker_t* worker = (tb_thread_pool_worker_t*)value;
-    tb_assert_abort(worker && worker->jobs && worker->stats && is_break);
+    tb_assert(worker && worker->jobs && worker->stats && is_break);
 
     // full?
     if (worker->pull >= TB_THREAD_POOL_JOBS_PULL_TIME_MAXN)
@@ -236,11 +236,11 @@ static tb_bool_t tb_thread_pool_worker_walk_pull(tb_iterator_ref_t iterator, tb_
 
     // the job
     tb_thread_pool_job_t* job = (tb_thread_pool_job_t*)item;
-    tb_assert_abort(job);
+    tb_assert(job);
 
     // the pool
     tb_thread_pool_impl_t* impl = (tb_thread_pool_impl_t*)worker->pool;
-    tb_assert_abort(impl);
+    tb_assert(impl);
 
     // append the job to the pending jobs
     tb_list_entry_insert_tail(&impl->jobs_pending, &job->entry);  
@@ -269,11 +269,11 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_iterator_ref_t ite
 {
     // the worker pull
     tb_thread_pool_worker_t* worker = (tb_thread_pool_worker_t*)value;
-    tb_assert_abort(worker && worker->jobs && worker->stats);
+    tb_assert(worker && worker->jobs && worker->stats);
 
     // the job
     tb_thread_pool_job_t* job = (tb_thread_pool_job_t*)item;
-    tb_assert_abort(job);
+    tb_assert(job);
 
     // the job state
     tb_size_t state = tb_atomic_get(&job->state);
@@ -318,7 +318,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_iterator_ref_t ite
         {
             // the pool
             tb_thread_pool_impl_t* impl = (tb_thread_pool_impl_t*)worker->pool;
-            tb_assert_abort(impl);
+            tb_assert(impl);
 
             // remove it from the jobs pool
             tb_fixed_pool_free(impl->jobs_pool, job);
@@ -332,11 +332,11 @@ static tb_bool_t tb_thread_pool_worker_walk_clean(tb_iterator_ref_t iterator, tb
 {
     // the worker pull
     tb_thread_pool_worker_t* worker = (tb_thread_pool_worker_t*)value;
-    tb_assert_abort(worker && worker->jobs);
+    tb_assert(worker && worker->jobs);
 
     // the job
     tb_thread_pool_job_t* job = (tb_thread_pool_job_t*)item;
-    tb_assert_abort(job);
+    tb_assert(job);
 
     // the job state
     tb_size_t state = tb_atomic_get(&job->state);
@@ -361,7 +361,7 @@ static tb_bool_t tb_thread_pool_worker_walk_clean(tb_iterator_ref_t iterator, tb
         {
             // the pool
             tb_thread_pool_impl_t* impl = (tb_thread_pool_impl_t*)worker->pool;
-            tb_assert_abort(impl);
+            tb_assert(impl);
 
             // remove it from the jobs pool
             tb_fixed_pool_free(impl->jobs_pool, job);

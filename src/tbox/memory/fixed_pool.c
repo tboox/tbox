@@ -118,7 +118,7 @@ static tb_bool_t tb_fixed_pool_item_exit(tb_pointer_t data, tb_cpointer_t priv)
 {
     // check
     tb_fixed_pool_t* pool = (tb_fixed_pool_t*)priv;
-    tb_assert_return_val(pool && pool->func_exit, tb_false);
+    tb_assert(pool && pool->func_exit);
 
     // done exit
     pool->func_exit(data, pool->func_priv);
@@ -138,11 +138,11 @@ static tb_void_t tb_fixed_pool_slot_exit(tb_fixed_pool_t* pool, tb_fixed_pool_sl
     // make the iterator
     tb_array_iterator_t array_iterator;
     tb_iterator_ref_t   iterator = tb_iterator_make_for_ptr(&array_iterator, (tb_pointer_t*)pool->slot_list, pool->slot_count);
-    tb_assert_abort(iterator);
+    tb_assert(iterator);
 
     // find the slot from the slot list
     tb_size_t itor = tb_binary_find_all(iterator, (tb_cpointer_t)slot);
-    tb_assert_abort(itor != tb_iterator_tail(iterator) && itor < pool->slot_count && pool->slot_list[itor]);
+    tb_assert(itor != tb_iterator_tail(iterator) && itor < pool->slot_count && pool->slot_list[itor]);
     tb_check_return(itor != tb_iterator_tail(iterator) && itor < pool->slot_count && pool->slot_list[itor]);
     
     // remove the slot
@@ -300,7 +300,7 @@ static tb_long_t tb_fixed_pool_slot_comp(tb_iterator_ref_t iterator, tb_cpointer
 {
     // the slot
     tb_fixed_pool_slot_t* slot = (tb_fixed_pool_slot_t*)item;
-    tb_assert_return_val(slot, -1);
+    tb_assert(slot);
 
     // comp
     return (tb_byte_t*)data < (tb_byte_t*)slot? 1 : ((tb_byte_t*)data >= (tb_byte_t*)slot + slot->size? -1 : 0);
@@ -313,7 +313,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_t* pool, tb_p
     // make the iterator
     tb_array_iterator_t array_iterator;
     tb_iterator_ref_t   iterator = tb_iterator_make_for_ptr(&array_iterator, (tb_pointer_t*)pool->slot_list, pool->slot_count);
-    tb_assert_abort(iterator);
+    tb_assert(iterator);
 
     // find it
     tb_size_t itor = tb_binary_find_all_if(iterator, tb_fixed_pool_slot_comp, data);
@@ -324,7 +324,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_t* pool, tb_p
     tb_assert_and_check_return_val(slot, tb_null);
 
     // check
-    tb_assert_abort(tb_fixed_pool_slot_exists(slot, data));
+    tb_assert(tb_fixed_pool_slot_exists(slot, data));
 
     // ok?
     return slot;
@@ -450,7 +450,7 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t self)
             tb_assert_and_check_break(slot);
 
             // check
-            tb_assert_abort(slot != pool->current_slot);
+            tb_assert(slot != pool->current_slot);
 
             // save next
             tb_size_t next = tb_iterator_next(partial_iterator, itor);
@@ -476,7 +476,7 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t self)
             tb_assert_and_check_break(slot);
 
             // check
-            tb_assert_abort(slot != pool->current_slot);
+            tb_assert(slot != pool->current_slot);
 
             // save next
             tb_size_t next = tb_iterator_next(full_iterator, itor);
@@ -569,7 +569,7 @@ tb_pointer_t tb_fixed_pool_malloc_(tb_fixed_pool_ref_t self __tb_debug_decl__)
     }
 
     // check
-    tb_assertf_abort(data, "malloc(%lu) failed!", pool->item_size);
+    tb_assertf(data, "malloc(%lu) failed!", pool->item_size);
 
     // ok?
     return data;
@@ -674,7 +674,7 @@ tb_void_t tb_fixed_pool_walk(tb_fixed_pool_ref_t self, tb_fixed_pool_item_walk_f
     tb_for_all_if(tb_fixed_pool_slot_t*, partial_slot, tb_list_entry_itor(&pool->partial_slots), partial_slot && partial_slot->pool)
     {
         // check
-        tb_assert_abort(!tb_static_fixed_pool_full(partial_slot->pool));
+        tb_assert(!tb_static_fixed_pool_full(partial_slot->pool));
 
         // walk
         tb_static_fixed_pool_walk(partial_slot->pool, func, priv);
@@ -684,7 +684,7 @@ tb_void_t tb_fixed_pool_walk(tb_fixed_pool_ref_t self, tb_fixed_pool_item_walk_f
     tb_for_all_if(tb_fixed_pool_slot_t*, full_slot, tb_list_entry_itor(&pool->full_slots), full_slot && full_slot->pool)
     {
         // check
-        tb_assert_abort(tb_static_fixed_pool_full(full_slot->pool));
+        tb_assert(tb_static_fixed_pool_full(full_slot->pool));
 
         // walk
         tb_static_fixed_pool_walk(full_slot->pool, func, priv);
@@ -705,7 +705,7 @@ tb_void_t tb_fixed_pool_dump(tb_fixed_pool_ref_t self)
     tb_for_all_if(tb_fixed_pool_slot_t*, partial_slot, tb_list_entry_itor(&pool->partial_slots), partial_slot && partial_slot->pool)
     {
         // check
-        tb_assert_abort(!tb_static_fixed_pool_full(partial_slot->pool));
+        tb_assert(!tb_static_fixed_pool_full(partial_slot->pool));
 
         // dump
         tb_static_fixed_pool_dump(partial_slot->pool);
@@ -715,7 +715,7 @@ tb_void_t tb_fixed_pool_dump(tb_fixed_pool_ref_t self)
     tb_for_all_if(tb_fixed_pool_slot_t*, full_slot, tb_list_entry_itor(&pool->full_slots), full_slot && full_slot->pool)
     {
         // check
-        tb_assert_abort(tb_static_fixed_pool_full(full_slot->pool));
+        tb_assert(tb_static_fixed_pool_full(full_slot->pool));
 
         // dump
         tb_static_fixed_pool_dump(full_slot->pool);

@@ -108,14 +108,14 @@ static tb_void_t tb_element_str_repl(tb_element_ref_t element, tb_pointer_t buff
         {
             // the left size
             tb_size_t left = tb_strlen(q);
-            tb_assert_abort(left);
+            tb_assert(left);
 
             // the copy size
             tb_size_t copy = p - (tb_char_t*)cstr;
 
             // grow size
             cstr = tb_ralloc(cstr, copy + left + 1);
-            tb_assert_abort(cstr);
+            tb_assert(cstr);
 
             // copy the left data
             tb_memcpy((tb_char_t*)cstr + copy, q, left + 1); 

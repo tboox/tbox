@@ -86,7 +86,6 @@ TB_DEMO_MAIN_DECL(utils_base64);
 TB_DEMO_MAIN_DECL(utils_adler32);
 
 // other
-TB_DEMO_MAIN_DECL(other_flv);
 TB_DEMO_MAIN_DECL(other_test);
 TB_DEMO_MAIN_DECL(other_charset);
 

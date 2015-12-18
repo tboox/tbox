@@ -36,7 +36,7 @@ tb_double_t tb_pow(tb_double_t x, tb_double_t y)
 #ifdef TB_CONFIG_LIBM_HAVE_POW
     return pow(x, y);
 #else
-    tb_assert_abort(0);
+    tb_assert(0);
     return 0;
 #endif
 }
