@@ -1221,6 +1221,110 @@ tb_long_t tb_stream_printf(tb_stream_ref_t stream, tb_char_t const* fmt, ...)
     // writ data
     return tb_stream_bwrit(stream, (tb_byte_t*)data, size)? size : -1;
 }
+tb_byte_t* tb_stream_bread_all(tb_stream_ref_t stream, tb_bool_t is_cstr, tb_size_t* psize)
+{
+    // attempt to get stream size
+    tb_bool_t   ok = tb_false;
+    tb_byte_t*  data = tb_null;
+    tb_hong_t   size = tb_stream_size(stream);
+    do
+    {
+        // has size?
+        if (size > 0)
+        {
+            // check
+            tb_assert(size < TB_MAXS32);
+
+            // make data
+            data = tb_malloc_bytes((tb_size_t)(is_cstr? size + 1 : size));
+            tb_assert_and_check_break(data);
+
+            // read data
+            if (!tb_stream_bread(stream, data, (tb_size_t)size)) break;
+
+            // append '\0' if be c-string
+            if (is_cstr) data[size] = '\0';
+
+            // save size
+            if (psize) *psize = (tb_size_t)size;
+
+            // ok
+            ok = tb_true;
+        }
+        // no size?
+        else
+        {
+            // init maxn
+            tb_size_t maxn = TB_STREAM_BLOCK_MAXN;
+
+            // make data
+            data = tb_malloc_bytes(is_cstr? maxn + 1 : maxn);
+            tb_assert_and_check_break(data);
+
+            // done
+            tb_long_t read = 0;
+            while (!tb_stream_beof(stream))
+            {
+                // space is too small? grow it first
+                if (maxn - read < TB_STREAM_BLOCK_MAXN)
+                {
+                    // grow maxn
+                    maxn = tb_max(maxn << 1, maxn + TB_STREAM_BLOCK_MAXN);
+
+                    // grow data
+                    data = (tb_byte_t*)tb_ralloc(data, is_cstr? maxn + 1 : maxn);
+                    tb_assert_and_check_break(data);
+                }
+
+                // read data
+                tb_long_t real = tb_stream_read(stream, data + read, maxn - read);    
+
+                // ok?
+                if (real > 0) 
+                {
+                    // update size
+                    read += real;
+                }
+                // no data? continue it
+                else if (!real)
+                {
+                    // wait
+                    real = tb_stream_wait(stream, TB_STREAM_WAIT_READ, tb_stream_timeout(stream));
+                    tb_check_break(real > 0);
+
+                    // has read?
+                    tb_assert_and_check_break(real & TB_STREAM_WAIT_READ);
+                }
+                // failed or end?
+                else break;
+            }
+
+            // check
+            tb_assert_and_check_break(data && read <= maxn);
+            
+            // append '\0' if be c-string
+            if (is_cstr) data[read] = '\0';
+
+            // save size
+            if (psize) *psize = read;
+
+            // ok
+            ok = tb_true;
+        }
+    
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit data
+        if (data) tb_free(data);
+        data = tb_null;
+    }
+
+    // ok?
+    return data;
+}
 tb_uint8_t tb_stream_bread_u8(tb_stream_ref_t stream)
 {
     tb_byte_t b[1];

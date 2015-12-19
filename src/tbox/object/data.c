@@ -130,22 +130,17 @@ tb_object_ref_t tb_object_data_init_from_url(tb_char_t const* url)
     tb_object_ref_t object = tb_null;
     if (tb_stream_open(stream))
     {
-        // size
-        tb_hong_t size = tb_stream_size(stream);
-        if (size > 0 && size < TB_MAXS32)
+        // read all data
+        tb_size_t   size = 0;
+        tb_byte_t*  data = (tb_byte_t*)tb_stream_bread_all(stream, tb_false, &size);
+        if (data)
         {
-            tb_byte_t* data = tb_malloc0_bytes((tb_size_t)size);
-            if (data) 
-            {
-                if (tb_stream_bread(stream, data, (tb_size_t)size))
-                    object = tb_object_data_init_from_data(data, (tb_size_t)size);
-                tb_free(data);
-            }
-        }
-        else object = tb_object_data_init_from_data(tb_null, 0);
+            // make object
+            object = tb_object_data_init_from_data(data, size);
 
-        // check, TODO: read stream if no size
-        tb_assert(size >= 0 && size < TB_MAXS32);
+            // exit data
+            tb_free(data);
+        }
 
         // exit stream
         tb_stream_exit(stream);
