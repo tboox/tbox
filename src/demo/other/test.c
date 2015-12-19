@@ -8,6 +8,7 @@
  */
 tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
 {
+#if 0
     // init stream
     tb_stream_ref_t stream = tb_stream_init_from_url(argv[1]);
     if (stream)
@@ -31,6 +32,7 @@ tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
         // exit stream
         tb_stream_exit(stream);
     }
+#endif
 
     return 0;
 }
