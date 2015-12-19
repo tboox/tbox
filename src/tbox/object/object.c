@@ -161,7 +161,7 @@ tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
 
     // done
     tb_object_ref_t     odata = tb_null;
-    tb_size_t           maxn = 4096;
+    tb_size_t           maxn = TB_STREAM_BLOCK_MAXN;
     tb_byte_t*          data = tb_null;
     do
     {
