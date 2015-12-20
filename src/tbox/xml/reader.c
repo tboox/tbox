@@ -582,6 +582,8 @@ tb_bool_t tb_xml_reader_goto(tb_xml_reader_ref_t reader, tb_char_t const* path)
 
                 // ok?
                 if (!tb_static_string_cstricmp(&s, path)) ok = tb_true;
+                
+                // trace
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
                 // remove 
@@ -603,6 +605,8 @@ tb_bool_t tb_xml_reader_goto(tb_xml_reader_ref_t reader, tb_char_t const* path)
 
                 // ok?
                 if (!tb_static_string_cstricmp(&s, path)) ok = tb_true;
+
+                // trace
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
                 // restore
@@ -617,6 +621,8 @@ tb_bool_t tb_xml_reader_goto(tb_xml_reader_ref_t reader, tb_char_t const* path)
 
                 // ok?
                 if (!tb_static_string_cstricmp(&s, path)) ok = tb_true;
+
+                // trace
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
                 // restore

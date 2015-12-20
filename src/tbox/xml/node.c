@@ -213,25 +213,36 @@ tb_void_t tb_xml_node_exit(tb_xml_node_ref_t node)
         tb_free(node);
     }
 }
-
 tb_xml_node_ref_t tb_xml_node_chead(tb_xml_node_ref_t node)
 {
+    // check
     tb_assert_and_check_return_val(node, tb_null);
+
+    // get it
     return node->chead;
 }
 tb_size_t tb_xml_node_csize(tb_xml_node_ref_t node)
 {
+    // check
     tb_assert_and_check_return_val(node, 0);
+
+    // get it
     return node->csize;
 }
 tb_xml_node_ref_t tb_xml_node_ahead(tb_xml_node_ref_t node)
 {
+    // check
     tb_assert_and_check_return_val(node, tb_null);
+
+    // get it
     return node->ahead;
 }
 tb_size_t tb_xml_node_asize(tb_xml_node_ref_t node)
 {
+    // check
     tb_assert_and_check_return_val(node, 0);
+
+    // get it
     return node->asize;
 }
 tb_void_t tb_xml_node_insert_next(tb_xml_node_ref_t node, tb_xml_node_ref_t next)
@@ -396,10 +407,12 @@ tb_void_t tb_xml_node_append_atail(tb_xml_node_ref_t node, tb_xml_node_ref_t att
         node->asize = 1;
     }
 }
-
 tb_xml_node_ref_t tb_xml_node_goto(tb_xml_node_ref_t node, tb_char_t const* path)
 {
+    // check
     tb_assert_and_check_return_val(node && path, tb_null);
+
+    // trace
     tb_trace_d("root: %s goto: %s", tb_string_cstr(&node->name), path);
 
     // skip '/'
