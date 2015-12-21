@@ -118,7 +118,7 @@ static tb_void_t tb_ssl_library_exit(tb_handle_t ssl, tb_cpointer_t priv)
 }
 static tb_handle_t tb_ssl_library_load()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_OPENSSL, tb_ssl_library_init, tb_ssl_library_exit, tb_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_OPENSSL, tb_ssl_library_init, tb_ssl_library_exit, tb_null, tb_null);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
