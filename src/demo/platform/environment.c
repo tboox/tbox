@@ -28,7 +28,7 @@ tb_int_t tb_demo_platform_environment_main(tb_int_t argc, tb_char_t** argv)
             for (i = 2; i < argc && argv[i]; i++)
             {
                 // set value
-                tb_environment_set(environment, argv[i], tb_false);
+                tb_environment_insert(environment, argv[i], tb_false);
             }
 
             // save variable

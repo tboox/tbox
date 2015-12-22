@@ -56,22 +56,29 @@ tb_char_t const* tb_environment_get(tb_environment_ref_t environment, tb_size_t 
     // get the value
     return (index < tb_vector_size(environment))? (tb_char_t const*)tb_iterator_item(environment, index) : tb_null;
 }
-tb_bool_t tb_environment_set(tb_environment_ref_t environment, tb_char_t const* value, tb_bool_t overwrite)
+tb_bool_t tb_environment_set(tb_environment_ref_t environment, tb_char_t const* value)
 {
     // check
     tb_assert_and_check_return_val(environment, tb_false);
 
-    // exists value?
-    if (value) 
-    {
-        // overwrite? clear it
-        if (overwrite) tb_vector_clear(environment);
+    // clear it first
+    tb_vector_clear(environment);
 
-        // insert value into the head
-        tb_vector_insert_head(environment, value);
-    }
-    // clear it
-    else tb_vector_clear(environment);
+    // insert value
+    if (value) tb_vector_insert_tail(environment, value);
+
+    // ok
+    return tb_true;
+}
+tb_bool_t tb_environment_insert(tb_environment_ref_t environment, tb_char_t const* value, tb_bool_t to_head)
+{
+    // check
+    tb_assert_and_check_return_val(environment && value, tb_false);
+
+    // insert value into the head
+    if (to_head) tb_vector_insert_head(environment, value);
+    // insert value into the tail
+    else tb_vector_insert_tail(environment, value);
 
     // ok
     return tb_true;
