@@ -37,11 +37,11 @@ tb_void_t tb_usleep(tb_size_t us)
 }
 tb_void_t tb_msleep(tb_size_t ms)
 {
-    Sleep(ms);
+    Sleep((DWORD)ms);
 }
 tb_void_t tb_sleep(tb_size_t s)
 {
-    Sleep(s * 1000);
+    Sleep((DWORD)s * 1000);
 }
 tb_hong_t tb_mclock()
 {

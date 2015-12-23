@@ -25,7 +25,7 @@ static tb_void_t tb_test_heap_min_func()
     for (i = 0; i < 100; i++) 
     {
         // the value
-        tb_uint32_t val = tb_random_range(tb_null, 0, 50);
+        tb_uint32_t val = (tb_uint32_t)tb_random_range(tb_null, 0, 50);
 
         // trace
 //      tb_trace_i("heap_min: put: %u", val);
@@ -41,7 +41,7 @@ static tb_void_t tb_test_heap_min_func()
     for (i = 0; i < 100; i++) 
     {
         // the value
-        tb_uint32_t val = tb_random_range(tb_null, 0, 50);
+        tb_uint32_t val = (tb_uint32_t)tb_random_range(tb_null, 0, 50);
 
         // remove it?
         if (!(i & 3))
@@ -55,7 +55,7 @@ static tb_void_t tb_test_heap_min_func()
     for (i = 0; i < 30; i++) 
     {
         // the value
-        tb_uint32_t val = tb_random_range(tb_null, 0, 50);
+        tb_uint32_t val = (tb_uint32_t)tb_random_range(tb_null, 0, 50);
 
         // put it
         tb_heap_put(heap, tb_u2p(val));
@@ -138,7 +138,7 @@ static tb_void_t tb_test_heap_max_func()
     for (i = 0; i < 100; i++) 
     {
         // the value
-        tb_uint32_t val = tb_random_range(tb_null, 0, 50);
+        tb_uint32_t val = (tb_uint32_t)tb_random_range(tb_null, 0, 50);
 
         // trace
 //      tb_trace_i("heap_max: put: %u", val);
@@ -151,7 +151,7 @@ static tb_void_t tb_test_heap_max_func()
     for (i = 0; i < 100; i++) 
     {
         // the value
-        tb_uint32_t val = tb_random_range(tb_null, 0, 50);
+        tb_uint32_t val = (tb_uint32_t)tb_random_range(tb_null, 0, 50);
 
         // remove it?
         if (!(i & 3))
@@ -165,7 +165,7 @@ static tb_void_t tb_test_heap_max_func()
     for (i = 0; i < 30; i++) 
     {
         // the value
-        tb_uint32_t val = tb_random_range(tb_null, 0, 50);
+        tb_uint32_t val = (tb_uint32_t)tb_random_range(tb_null, 0, 50);
 
         // put it
         tb_heap_put(heap, tb_u2p(val));

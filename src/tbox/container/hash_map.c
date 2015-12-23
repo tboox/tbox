@@ -525,7 +525,7 @@ tb_hash_map_ref_t tb_hash_map_init(tb_size_t bucket_size, tb_element_t element_n
         tb_assert_and_check_break(impl->hash_list);
 
         // init item grow
-        impl->item_grow = tb_isqrti(bucket_size);
+        impl->item_grow = tb_isqrti((tb_uint32_t)bucket_size);
         if (impl->item_grow < 8) impl->item_grow = 8;
         impl->item_grow = tb_align_pow2(impl->item_grow);
 

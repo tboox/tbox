@@ -56,7 +56,11 @@ static tb_long_t tb_aioo_rtor_select_wait(tb_socket_ref_t sock, tb_size_t code, 
     struct timeval t = {0};
     if (timeout > 0)
     {
-        t.tv_sec = timeout / 1000;
+#ifdef TB_CONFIG_OS_WINDOWS
+        t.tv_sec = (LONG)(timeout / 1000);
+#else
+        t.tv_sec = (timeout / 1000);
+#endif
         t.tv_usec = (timeout % 1000) * 1000;
     }
 
@@ -80,7 +84,7 @@ static tb_long_t tb_aioo_rtor_select_wait(tb_socket_ref_t sock, tb_size_t code, 
    
     // select
 #ifdef TB_CONFIG_OS_WINDOWS
-    tb_long_t r = tb_ws2_32()->select(fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);
+    tb_long_t r = tb_ws2_32()->select((tb_int_t)fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);
 #else
     tb_long_t r = select(fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);
 #endif

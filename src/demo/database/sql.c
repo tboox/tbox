@@ -223,7 +223,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done_insert(tb_database_sql
         tb_database_sql_value_set_blob8(&list[2], (tb_byte_t const*)tdata, tb_strlen(tdata) + 1);
         tb_database_sql_value_set_blob32(&list[3], (tb_byte_t const*)ldata1, tb_strlen(ldata1) + 1, tb_null);
         tb_database_sql_value_set_blob32(&list[4], tb_null, 0, stream);
-        tb_database_sql_value_set_int32(&list[5], number);
+        tb_database_sql_value_set_int32(&list[5], (tb_int32_t)number);
         tb_database_sql_value_set_int16(&list[6], snumber);
         if (!tb_database_sql_statement_bind(database, statement, list, tb_arrayn(list)))
         {

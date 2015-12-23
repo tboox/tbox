@@ -121,7 +121,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
         tb_assert_and_check_break(fd >= 0 && fd != INVALID_SOCKET);
 
         // set the non-block mode
-        tb_ulong_t nb = 1;
+        ULONG nb = 1;
         if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) break;
 
         // save socket
@@ -216,7 +216,7 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
         tb_assert_and_check_break(sock2 != INVALID_SOCKET);
 
         // set non-block
-        tb_ulong_t nb = 1;
+        ULONG nb = 1;
         if (tb_ws2_32()->ioctlsocket(sock1, FIONBIO, &nb) == SOCKET_ERROR) break;
         if (tb_ws2_32()->ioctlsocket(sock2, FIONBIO, &nb) == SOCKET_ERROR) break;
 
@@ -269,7 +269,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             tb_bool_t is_block = (tb_bool_t)tb_va_arg(args, tb_bool_t);
 
             // block it?
-            tb_ulong_t nb = is_block? 0 : 1;
+            ULONG nb = is_block? 0 : 1;
             tb_ws2_32()->ioctlsocket(tb_sock2fd(sock), FIONBIO, &nb);
 
             // ok 
@@ -376,7 +376,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // connect
-    tb_long_t r = tb_ws2_32()->connect(tb_sock2fd(sock), (struct sockaddr *)&d, n);
+    tb_long_t r = tb_ws2_32()->connect(tb_sock2fd(sock), (struct sockaddr *)&d, (tb_int_t)n);
 
     // ok?
     if (!r) return 1;
@@ -437,7 +437,7 @@ tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
     tb_assert_and_check_return_val(sock, tb_false);
 
     // listen
-    return (tb_ws2_32()->listen(tb_sock2fd(sock), backlog) < 0)? tb_false : tb_true;
+    return (tb_ws2_32()->listen(tb_sock2fd(sock), (tb_int_t)backlog) < 0)? tb_false : tb_true;
 }
 tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
@@ -461,7 +461,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
         acpt = tb_fd2sock(fd);
 
         // non-block
-        tb_ulong_t nb = 1;
+        ULONG nb = 1;
         if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) break;
 
         // save address
@@ -739,7 +739,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
     if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // send
-    tb_long_t r = tb_ws2_32()->sendto(tb_sock2fd(sock), (tb_char_t const*)data, (tb_int_t)size, 0, (struct sockaddr*)&d, n);
+    tb_long_t r = tb_ws2_32()->sendto(tb_sock2fd(sock), (tb_char_t const*)data, (tb_int_t)size, 0, (struct sockaddr*)&d, (tb_int_t)n);
 
     // ok?
     if (r >= 0) return r;
@@ -815,7 +815,7 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
         tb_check_break(data && need);
 
         // writ it
-        tb_long_t real = tb_ws2_32()->sendto(tb_sock2fd(sock), (tb_char_t const*)data, (tb_int_t)need, 0, (struct sockaddr*)&d, n);
+        tb_long_t real = tb_ws2_32()->sendto(tb_sock2fd(sock), (tb_char_t const*)data, (tb_int_t)need, 0, (struct sockaddr*)&d, (tb_int_t)n);
 
         // full? next it
         if (real == need)

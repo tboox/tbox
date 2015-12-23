@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../print.h"
+#include "../thread.h"
 #include <stdio.h>
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include <windows.h>
@@ -48,10 +49,10 @@ tb_void_t tb_print(tb_char_t const* string)
 
 #if defined(TB_CONFIG_OS_ANDROID)
     // print to the android device log
-    __android_log_print(ANDROID_LOG_DEBUG, __tb_prefix__? __tb_prefix__ : "tbox", "%s", string);
+    __android_log_print(ANDROID_LOG_DEBUG, __tb_prefix__? __tb_prefix__ : "tbox", "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
 #elif defined(TB_CONFIG_OS_IOS)
     // print to the ios device log
-    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s", string);
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
 #endif
 
     // print to the stdout
@@ -69,10 +70,10 @@ tb_void_t tb_printl(tb_char_t const* string)
 
 #if defined(TB_CONFIG_OS_ANDROID)
     // print to the android device log
-    __android_log_print(ANDROID_LOG_DEBUG, __tb_prefix__? __tb_prefix__ : "tbox", "%s\n", string);
+    __android_log_print(ANDROID_LOG_DEBUG, __tb_prefix__? __tb_prefix__ : "tbox", "[%08x]: %s\n", (tb_uint32_t)tb_thread_self(), string);
 #elif defined(TB_CONFIG_OS_IOS)
     // print to the ios device log
-    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s\n", string);
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "[%08x]: %s\n", (tb_uint32_t)tb_thread_self(), string);
 #endif
 
     // print string to the stdout

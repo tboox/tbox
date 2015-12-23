@@ -15,75 +15,75 @@
  */
 static tb_void_t tb_test_wcscmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
-    __tb_volatile__ tb_int_t    r = 0;
+    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
     {
         r = tb_wcscmp(s1, s2);
     }
     t = tb_mclock() - t;
-    tb_wprintf(L"%lld ms, tb_test_wcscmp(%s, %s) = %d\n", t, s1, s2, r);
+    tb_wprintf(L"%lld ms, tb_test_wcscmp(%s, %s) = %ld\n", t, s1, s2, r);
 }
 static tb_void_t tb_test_wcsncmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_size_t size)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
-    __tb_volatile__ tb_int_t    r = 0;
+    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
     {
         r = tb_wcsncmp(s1, s2, size);
     }
     t = tb_mclock() - t;
-    tb_wprintf(L"%lld ms, tb_test_wcsncmp(%s, %s, %u) = %d\n", t, s1, s2, size, r);
+    tb_wprintf(L"%lld ms, tb_test_wcsncmp(%s, %s, %lu) = %ld\n", t, s1, s2, size, r);
 }
 static tb_void_t tb_test_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
-    __tb_volatile__ tb_int_t    r = 0;
+    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
     {
         r = tb_wcsicmp(s1, s2);
     }
     t = tb_mclock() - t;
-    tb_wprintf(L"%lld ms, tb_test_wcsicmp(%s, %s) = %d\n", t, s1, s2, r);
+    tb_wprintf(L"%lld ms, tb_test_wcsicmp(%s, %s) = %ld\n", t, s1, s2, r);
 }
 static tb_void_t tb_test_wcsnicmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_size_t size)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
-    __tb_volatile__ tb_int_t    r = 0;
+    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
     {
         r = tb_wcsnicmp(s1, s2, size);
     }
     t = tb_mclock() - t;
-    tb_wprintf(L"%lld ms, tb_test_wcsnicmp(%s, %s, %u) = %d\n", t, s1, s2, size, r);
+    tb_wprintf(L"%lld ms, tb_test_wcsnicmp(%s, %s, %u) = %ld\n", t, s1, s2, size, r);
 }
 static tb_void_t tb_test_wcslen(tb_wchar_t const* s)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
-    __tb_volatile__ tb_int_t    r = 0;
+    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
     {
         r = tb_wcslen(s);
     }
     t = tb_mclock() - t;
-    tb_wprintf(L"%lld ms, tb_test_wcslen(%s) = %d\n", t, s, r);
+    tb_wprintf(L"%lld ms, tb_test_wcslen(%s) = %ld\n", t, s, r);
 }
 static tb_void_t tb_test_wcsnlen(tb_wchar_t const* s, tb_size_t size)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
-    __tb_volatile__ tb_int_t    r = 0;
+    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
     {
         r = tb_wcsnlen(s, size);
     }
     t = tb_mclock() - t;
-    tb_wprintf(L"%lld ms, tb_test_wcsnlen(%s, %u) = %d\n", t, s, size, r);
+    tb_wprintf(L"%lld ms, tb_test_wcsnlen(%s, %ld) = %d\n", t, s, size, r);
 }
 static tb_void_t tb_test_wcscpy(tb_wchar_t const* s2)
 {
@@ -107,7 +107,7 @@ static tb_void_t tb_test_wcsncpy(tb_wchar_t const* s2, tb_size_t size)
         tb_wcslcpy(s1, s2, size);
     }
     t = tb_mclock() - t;
-    tb_wprintf(L"%lld ms, tb_test_wcsncpy(%s, %d) = %s\n", t, s2, size, s1);
+    tb_wprintf(L"%lld ms, tb_test_wcsncpy(%s, %lu) = %s\n", t, s2, size, s1);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

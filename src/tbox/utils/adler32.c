@@ -75,7 +75,8 @@ tb_uint32_t tb_adler32_encode(tb_uint32_t adler, tb_byte_t const* data, tb_size_
         sum2 += adler;
         if (sum2 >= BASE) sum2 -= BASE;
 
-        return adler | (sum2 << 16);
+        // ok?
+        return (tb_uint32_t)(adler | (sum2 << 16));
     }
 
     // initial adler-32 value (deferred check for size == 1 speed) 
@@ -94,7 +95,9 @@ tb_uint32_t tb_adler32_encode(tb_uint32_t adler, tb_byte_t const* data, tb_size_
 
         // only added so many BASE's 
         MOD28(sum2);            
-        return adler | (sum2 << 16);
+
+        // ok?
+        return (tb_uint32_t)(adler | (sum2 << 16));
     }
 
     // do length NMAX blocks -- requires just one modulo operation 
@@ -137,6 +140,6 @@ tb_uint32_t tb_adler32_encode(tb_uint32_t adler, tb_byte_t const* data, tb_size_
     }
 
     // return recombined sums 
-    return adler | (sum2 << 16);
+    return (tb_uint32_t)(adler | (sum2 << 16));
 #endif
 }

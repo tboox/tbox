@@ -33,7 +33,7 @@
  * macros
  */
 #define TB_MAX_SYM_NAME             (2000)
-
+ 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -43,7 +43,7 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
     tb_check_return_val(tb_kernel32()->RtlCaptureStackBackTrace && frames && nframe, 0);
 
     // note: cannot use assert
-    return (tb_size_t)tb_kernel32()->RtlCaptureStackBackTrace((DWORD)nskip, (DWORD)nframe < 63? nframe : 62, frames, tb_null);
+    return (tb_size_t)tb_kernel32()->RtlCaptureStackBackTrace((DWORD)nskip, (DWORD)(nframe < 63? nframe : 62), frames, tb_null);
 }
 tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {

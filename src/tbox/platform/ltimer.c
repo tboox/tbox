@@ -191,7 +191,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_impl_t* t
         tb_assert_and_check_break(wlist);
 
         // save the wheel index
-        task_impl->windx = windx;
+        task_impl->windx = (tb_uint32_t)windx;
 
         // add task to the wheel list
         tb_vector_insert_tail(wlist, task_impl);

@@ -27,7 +27,7 @@
  * includes
  */
 #include "prefix.h"
-#include "interface/interface.h"
+#include "interface/kernel32.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros

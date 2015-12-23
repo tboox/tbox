@@ -306,7 +306,7 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
     tb_object_ref_t object = tb_null;
 
     // read
-    size = 1 << size;
+    size = (tb_size_t)1 << size;
     switch (size)
     {
     case 1:

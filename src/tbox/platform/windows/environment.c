@@ -57,7 +57,7 @@ static tb_char_t* tb_environment_get_impl(tb_char_t const* name, tb_size_t* psiz
         tb_assert_and_check_break(name_n);
 
         // get it
-        size = (tb_size_t)tb_kernel32()->GetEnvironmentVariableW(name_w, value_w, maxn);
+        size = (tb_size_t)tb_kernel32()->GetEnvironmentVariableW(name_w, value_w, (DWORD)maxn);
         if (!size) 
         {
             // error?
@@ -76,7 +76,7 @@ static tb_char_t* tb_environment_get_impl(tb_char_t const* name, tb_size_t* psiz
             tb_assert_and_check_break(value_w);
 
             // get it
-            size = (tb_size_t)tb_kernel32()->GetEnvironmentVariableW(name_w, value_w, size + 1);
+            size = (tb_size_t)tb_kernel32()->GetEnvironmentVariableW(name_w, value_w, (DWORD)size + 1);
             tb_assert_and_check_break(size);
         }
 

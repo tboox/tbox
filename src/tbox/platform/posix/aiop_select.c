@@ -221,7 +221,11 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref
     struct timeval t = {0};
     if (timeout > 0)
     {
-        t.tv_sec = timeout / 1000;
+#ifdef TB_CONFIG_OS_WINDOWS
+        t.tv_sec = (LONG)(timeout / 1000);
+#else
+        t.tv_sec = (timeout / 1000);
+#endif
         t.tv_usec = (timeout % 1000) * 1000;
     }
 
@@ -244,7 +248,7 @@ static tb_long_t tb_aiop_rtor_select_wait(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref
 
         // wait
 #ifdef TB_CONFIG_OS_WINDOWS
-        tb_long_t sfdn = tb_ws2_32()->select(sfdm + 1, &impl->rfdo, &impl->wfdo, tb_null, timeout >= 0? &t : tb_null);
+        tb_long_t sfdn = tb_ws2_32()->select((tb_int_t)sfdm + 1, &impl->rfdo, &impl->wfdo, tb_null, timeout >= 0? &t : tb_null);
 #else
         tb_long_t sfdn = select(sfdm + 1, &impl->rfdo, &impl->wfdo, tb_null, timeout >= 0? &t : tb_null);
 #endif
@@ -426,7 +430,7 @@ static tb_aiop_rtor_impl_t* tb_aiop_rtor_select_init(tb_aiop_impl_t* aiop)
         if (!tb_spinlock_init(&impl->lock.hash)) break;
 
         // init hash
-        impl->hash = tb_hash_map_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_element_ptr(tb_null, tb_null), tb_element_ptr(tb_null, tb_null));
+        impl->hash = tb_hash_map_init(tb_align8(tb_isqrti((tb_uint32_t)aiop->maxn) + 1), tb_element_ptr(tb_null, tb_null), tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(impl->hash);
 
         // ok

@@ -234,7 +234,7 @@ tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)
     if (x <= 2) return tb_int32_set_sign(TB_FIXED16_MAX, s);
 
     // normalize
-    tb_int32_t cl0 = tb_bits_cl0_u32_be(x);
+    tb_int32_t cl0 = (tb_int32_t)tb_bits_cl0_u32_be(x);
     x = x << cl0 >> 16;
  
     // compute 1 / x approximation (0.5 <= x < 1.0) 

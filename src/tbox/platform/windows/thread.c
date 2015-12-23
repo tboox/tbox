@@ -42,7 +42,7 @@ tb_void_t tb_thread_exit(tb_thread_ref_t thread)
 tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout)
 {
     // wait
-    tb_long_t r = WaitForSingleObject((HANDLE)thread, timeout >= 0? timeout : INFINITE);
+    tb_long_t r = WaitForSingleObject((HANDLE)thread, (DWORD)(timeout >= 0? timeout : INFINITE));
     tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
     // timeout?
