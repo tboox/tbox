@@ -658,16 +658,16 @@ static tb_void_t tb_double_test_tan()
 
 static tb_void_t tb_double_test_atan2()
 {
-    __tb_volatile__ tb_long_t       i = 0;
-    __tb_volatile__ tb_long_t       j = 0;
+    __tb_volatile__ tb_double_t     i = 0;
+    __tb_volatile__ tb_double_t     j = 0;
     __tb_volatile__ tb_long_t       n = 10000000 / 100;
     __tb_volatile__ tb_double_t     r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
     {
-        for (i = 50; i < 55; i++)
+        for (i = 50.; i < 55.; i++)
         {
-            for (j = 50; j < 55; j++)
+            for (j = 50.; j < 55.; j++)
             {
                 r = tb_atan2(i, j);
                 r = tb_atan2(i, -j);
@@ -678,9 +678,9 @@ static tb_void_t tb_double_test_atan2()
     }
     t = tb_mclock() - t;
 
-    for (i = 50; i < 55; i++)
+    for (i = 50.; i < 55.; i++)
     {
-        for (j = 50; j < 55; j++)
+        for (j = 50.; j < 55.; j++)
         {
             r = tb_atan2(i, j);
             tb_printf("[double]: atan2(%ld, %ld) = %lf\n", i, j, (r));

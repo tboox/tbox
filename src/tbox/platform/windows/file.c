@@ -138,7 +138,7 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 
     // read
     DWORD real_size = 0;
-    return ReadFile(file, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    return ReadFile(file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
@@ -150,7 +150,7 @@ tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size
 
     // writ
     DWORD real_size = 0;
-    return WriteFile(file, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    return WriteFile(file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {
@@ -351,7 +351,7 @@ tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
     LARGE_INTEGER o = {{0}};
     LARGE_INTEGER p = {{0}};
     o.QuadPart = (LONGLONG)offset;
-    return SetFilePointerEx(file, o, &p, mode)? (tb_hong_t)p.QuadPart : -1;
+    return SetFilePointerEx(file, o, &p, (DWORD)mode)? (tb_hong_t)p.QuadPart : -1;
 }
 tb_hong_t tb_file_offset(tb_file_ref_t file)
 {

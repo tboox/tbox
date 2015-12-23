@@ -174,9 +174,11 @@ static tb_wchar_t* tb_printf_object(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
 }
 static tb_wchar_t* tb_printf_string(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_entry_t e, tb_wchar_t const* s)
 {
+    // done
     if (s)
     {
-        tb_int_t n = tb_wcsnlen(s, e.precision);
+        // get length
+        tb_long_t n = tb_wcsnlen(s, e.precision);
 
         // fill space at left side, e.g. "   abcd"
         if (!(e.flags & TB_PRINTF_FLAG_LEFT)) 
@@ -494,7 +496,7 @@ static tb_wchar_t* tb_printf_float(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_ent
     // digits
     tb_wchar_t  ints[32] = {0};
     tb_wchar_t  decs[32] = {0};
-    tb_long_t   ints_i = 0, decs_i = 0;
+    tb_int_t    ints_i = 0, decs_i = 0;
 
     // for inf nan
     if (tb_isinff(num))
@@ -623,7 +625,7 @@ static tb_wchar_t* tb_printf_double(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
     // digits
     tb_wchar_t  ints[64] = {0};
     tb_wchar_t  decs[64] = {0};
-    tb_long_t   ints_i = 0, decs_i = 0;
+    tb_int_t    ints_i = 0, decs_i = 0;
 
     // for inf nan
     if (tb_isinf(num))
@@ -785,7 +787,7 @@ static tb_int_t tb_printf_entry(tb_wchar_t const* fmt, tb_printf_entry_t* e)
 
     // return non-format string
     if (p != fmt || !*p)
-        return (p - fmt);
+        return (tb_int_t)(p - fmt);
 
     // skip %
     ++p;
@@ -814,7 +816,7 @@ static tb_int_t tb_printf_entry(tb_wchar_t const* fmt, tb_printf_entry_t* e)
     {
         // it's the next argument
         e->type = TB_PRINTF_TYPE_WIDTH;
-        return ++p - fmt;
+        return (tb_int_t)(++p - fmt);
     }
 
 get_precision:
@@ -832,7 +834,7 @@ get_precision:
         {
             // it's the next argument
             e->type = TB_PRINTF_TYPE_PRECISION;
-            return ++p - fmt;
+            return (tb_int_t)(++p - fmt);
         }
     }
 
@@ -882,12 +884,12 @@ get_qualifier:
     {
     case L's':
         e->type = TB_PRINTF_TYPE_STRING;
-        return (++p - fmt);
+        return (tb_int_t)(++p - fmt);
     case L'%':
         e->extra |= TB_PRINTF_EXTRA_PERCENT;
     case L'c':
         e->type = TB_PRINTF_TYPE_CHAR;
-        return (++p - fmt);
+        return (tb_int_t)(++p - fmt);
     case L'd':
     case L'i':
         e->extra |= TB_PRINTF_EXTRA_SIGNED;
@@ -951,10 +953,10 @@ get_qualifier:
         break;
     default:
         e->type = TB_PRINTF_TYPE_INVALID;
-        return (p - fmt);
+        return (tb_int_t)(p - fmt);
     }
 
-    return (++p - fmt);
+    return (tb_int_t)(++p - fmt);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -995,7 +997,7 @@ tb_long_t tb_vswprintf(tb_wchar_t* s, tb_size_t n, tb_wchar_t const* fmt, tb_va_
                 tb_int_t copy_n = en;
                 if (pb < pe) 
                 {
-                    if (copy_n > pe - pb) copy_n = pe - pb;
+                    if (copy_n > pe - pb) copy_n = (tb_int_t)(pe - pb);
                     tb_memcpy(pb, ofmt, copy_n * sizeof(tb_wchar_t));
                     pb += copy_n;
                 }

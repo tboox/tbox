@@ -46,8 +46,8 @@ tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
     // done
     tb_char_t*      op = ob;
     tb_uint32_t     bits = 0;
-    tb_int_t        left = in;
-    tb_int_t        shift = 0;
+    tb_long_t       left = in;
+    tb_long_t       shift = 0;
     while (left) 
     {
         bits = (bits << 8) + *ib++;

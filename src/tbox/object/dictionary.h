@@ -67,7 +67,7 @@ typedef struct __tb_object_dictionary_item_t
  *
  * @return              the dictionary object
  */
-tb_object_ref_t         tb_object_dictionary_init(tb_size_t size, tb_size_t incr);
+tb_object_ref_t         tb_object_dictionary_init(tb_size_t size, tb_bool_t incr);
 
 /*! the dictionary size
  *

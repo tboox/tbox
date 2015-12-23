@@ -135,19 +135,19 @@ static tb_uint32_t tb_isqrti_impl(tb_uint32_t x)
     ,   240,    240,    241,    242,    242,    243,    243,    244,    244,    245,    245,    246,    246,    247,    247,    248,    248,    249,    249,    250,    250,    251,    251,    252,    252,    253,    253,    254,    254,    255,    255,    255
     };
 
-    tb_size_t b = 0;
+    tb_uint32_t b = 0;
     if (x < 255) return (table[x + 1] - 1) >> 4;
     else if (x < (1 << 12)) b = table[x >> 4] >> 2;
     else if (x < (1 << 14)) b = table[x >> 6] >> 1;
     else if (x < (1 << 16)) b = table[x >> 8];
     else 
     {
-        tb_size_t s = tb_ilog2i(x >> 16) >> 1;
-        tb_size_t c = x >> (s + 2);
+        tb_uint32_t s = tb_ilog2i(x >> 16) >> 1;
+        tb_uint32_t c = x >> (s + 2);
         b = table[c >> (s + 8)];
         b = tb_idivi8(c, (tb_uint8_t)b) + (b << s);
     }
-    return b - (x < b * b);
+    return (b - (x < b * b));
 #elif 0
     // lookup bits
     tb_uint32_t t;

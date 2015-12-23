@@ -125,7 +125,7 @@ static tb_void_t tb_hash_map_test_s2i_perf()
     tb_hong_t t = tb_mclock();
     while (n--) 
     {
-        tb_int_t r = tb_snprintf(s, sizeof(s) - 1, "%x", tb_random_range(tb_null, 0, TB_MAXU32)); 
+        tb_long_t r = tb_snprintf(s, sizeof(s) - 1, "%x", tb_random_range(tb_null, 0, TB_MAXU32)); 
         s[r] = '\0'; 
         tb_hash_map_test_insert_s2i(hash, s); 
         tb_hash_map_test_get_s2i(hash, s);
@@ -355,7 +355,7 @@ static tb_void_t tb_hash_map_test_m2m_perf()
     tb_hong_t t = tb_mclock();
     while (n--) 
     {
-        tb_size_t i = tb_random_range(tb_null, 0, TB_MAXU32);
+        tb_uint32_t i = (tb_uint32_t)tb_random_range(tb_null, 0, TB_MAXU32);
         tb_hash_map_test_insert_m2m(hash, i); 
         tb_hash_map_test_get_m2m(hash, i);
     }

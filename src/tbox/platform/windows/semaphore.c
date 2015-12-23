@@ -144,7 +144,7 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     tb_assert_and_check_return_val(semaphore && impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE, -1);
 
     // wait
-    tb_long_t r = WaitForSingleObject(impl->semaphore, timeout >= 0? timeout : INFINITE);
+    tb_long_t r = WaitForSingleObject(impl->semaphore, (DWORD)(timeout >= 0? timeout : INFINITE));
     tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
     // timeout?

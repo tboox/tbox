@@ -111,6 +111,6 @@ tb_uint32_t tb_ilog2i(tb_uint32_t x)
 
     return n;
 #else
-    return (31 - tb_bits_cl0_u32_be(x | 1));
+    return (tb_uint32_t)(31 - tb_bits_cl0_u32_be(x | 1));
 #endif
 }

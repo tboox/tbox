@@ -42,15 +42,15 @@ tb_time_t tb_mktime(tb_tm_t const* tm)
 #ifdef TB_CONFIG_LIBC_HAVE_MKTIME
     // init
     struct tm t = {0};
-    t.tm_sec = tm->second;
-    t.tm_min = tm->minute;
-    t.tm_hour = tm->hour;
-    t.tm_mday = tm->mday;
-    t.tm_mon = tm->month - 1;
-    t.tm_year = tm->year > 1900? tm->year - 1900 : tm->year;
-    t.tm_wday = tm->week;
-    t.tm_yday = tm->yday;
-    t.tm_isdst = tm->isdst;
+    t.tm_sec    = (tb_int_t)tm->second;
+    t.tm_min    = (tb_int_t)tm->minute;
+    t.tm_hour   = (tb_int_t)tm->hour;
+    t.tm_mday   = (tb_int_t)tm->mday;
+    t.tm_mon    = (tb_int_t)tm->month - 1;
+    t.tm_year   = (tb_int_t)(tm->year > 1900? tm->year - 1900 : tm->year);
+    t.tm_wday   = (tb_int_t)tm->week;
+    t.tm_yday   = (tb_int_t)tm->yday;
+    t.tm_isdst  = (tb_int_t)tm->isdst;
     
     // mktime
     return (tb_time_t)mktime(&t);

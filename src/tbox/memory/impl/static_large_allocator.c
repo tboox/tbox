@@ -222,13 +222,13 @@ static __tb_inline__ tb_size_t tb_static_large_allocator_pred_index(tb_static_la
 
     // the page count
     size /= allocator->page_size;
-
+ 
     // the pred index
 #if 0
     tb_size_t indx = tb_ilog2i(tb_align_pow2(size));
 #else
     // faster
-    tb_size_t indx = size > 1? tb_ilog2i(size - 1) + 1 : 0;
+    tb_size_t indx = size > 1? (tb_ilog2i((tb_uint32_t)(size - 1)) + 1) : 0;
 #endif
     if (indx >= tb_arrayn(allocator->data_pred)) indx = tb_arrayn(allocator->data_pred) - 1;
     return indx;

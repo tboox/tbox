@@ -162,9 +162,11 @@ static tb_char_t* tb_printf_object(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
 }
 static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_char_t const* s)
 {
+    // done
     if (s)
     {
-        tb_int_t n = tb_strnlen(s, e.precision);
+        // get length
+        tb_long_t n = tb_strnlen(s, e.precision);
 
         // fill space at left side, e.g. "   abcd"
         if (!(e.flags & TB_PRINTF_FLAG_LEFT)) 
@@ -482,7 +484,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     // digits
     tb_char_t   ints[32] = {0};
     tb_char_t   decs[32] = {0};
-    tb_long_t   ints_i = 0, decs_i = 0;
+    tb_int_t    ints_i = 0, decs_i = 0;
 
     // for inf nan
     if (tb_isinff(num))
@@ -566,7 +568,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
         decs_i = e.precision;
 
     // fill spaces at left side, e.g. "   0.31415926"
-    e.width -= ints_i + 1 + e.precision;
+    e.width -= (tb_int_t)(ints_i + 1 + e.precision);
     if (!(e.flags & (TB_PRINTF_FLAG_LEFT + TB_PRINTF_FLAG_ZERO)))
     {
         while (--e.width >= 0)
@@ -611,7 +613,7 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
     // digits
     tb_char_t   ints[64] = {0};
     tb_char_t   decs[64] = {0};
-    tb_long_t   ints_i = 0, decs_i = 0;
+    tb_int_t    ints_i = 0, decs_i = 0;
 
     // for inf nan
     if (tb_isinf(num))
@@ -696,7 +698,7 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
         decs_i = e.precision;
 
     // fill spaces at left side, e.g. "   0.31415926"
-    e.width -= ints_i + 1 + e.precision;
+    e.width -= (tb_int_t)(ints_i + 1 + e.precision);
     if (!(e.flags & (TB_PRINTF_FLAG_LEFT + TB_PRINTF_FLAG_ZERO)))
     {
         while (--e.width >= 0)
@@ -771,7 +773,7 @@ static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
 
     // return non-format string
     if (p != fmt || !*p)
-        return (p - fmt);
+        return (tb_int_t)(p - fmt);
 
     // skip %
     ++p;
@@ -800,7 +802,7 @@ static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
     {
         // it's the next argument
         e->type = TB_PRINTF_TYPE_WIDTH;
-        return ++p - fmt;
+        return (tb_int_t)(++p - fmt);
     }
 
 get_precision:
@@ -818,7 +820,7 @@ get_precision:
         {
             // it's the next argument
             e->type = TB_PRINTF_TYPE_PRECISION;
-            return ++p - fmt;
+            return (tb_int_t)(++p - fmt);
         }
     }
 
@@ -868,12 +870,12 @@ get_qualifier:
     {
     case 's':
         e->type = TB_PRINTF_TYPE_STRING;
-        return (++p - fmt);
+        return (tb_int_t)(++p - fmt);
     case '%':
         e->extra |= TB_PRINTF_EXTRA_PERCENT;
     case 'c':
         e->type = TB_PRINTF_TYPE_CHAR;
-        return (++p - fmt);
+        return (tb_int_t)(++p - fmt);
     case 'd':
     case 'i':
         e->extra |= TB_PRINTF_EXTRA_SIGNED;
@@ -937,10 +939,10 @@ get_qualifier:
         break;
     default:
         e->type = TB_PRINTF_TYPE_INVALID;
-        return (p - fmt);
+        return (tb_int_t)(p - fmt);
     }
 
-    return (++p - fmt);
+    return (tb_int_t)(++p - fmt);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -982,7 +984,7 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                 tb_int_t copy_n = en;
                 if (pb < pe) 
                 {
-                    if (copy_n > pe - pb) copy_n = pe - pb;
+                    if (copy_n > pe - pb) copy_n = (tb_int_t)(pe - pb);
                     tb_memcpy(pb, ofmt, copy_n);
                     pb += copy_n;
                 }

@@ -36,13 +36,13 @@ static tb_uint32_t tb_charset_gb2312_from_ucs4(tb_uint32_t ch)
     if (ch <= 0x7f) return ch;
 
     // find the gb2312 character
-    tb_int_t left = 0;
-    tb_int_t right = (g_charset_ucs4_to_gb2312_table_size / sizeof(g_charset_ucs4_to_gb2312_table_data[0])) - 1;
+    tb_long_t left = 0;
+    tb_long_t right = (g_charset_ucs4_to_gb2312_table_size / sizeof(g_charset_ucs4_to_gb2312_table_data[0])) - 1;
     while (left <= right)
     {
         // the middle character
-        tb_int_t    mid = (left + right) >> 1;
-        tb_uint16_t mid_ucs4 = g_charset_ucs4_to_gb2312_table_data[mid][0];
+        tb_long_t       mid = (left + right) >> 1;
+        tb_uint16_t     mid_ucs4 = g_charset_ucs4_to_gb2312_table_data[mid][0];
 
         // find it?
         if (mid_ucs4 == ch)

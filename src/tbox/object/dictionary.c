@@ -162,7 +162,7 @@ static tb_object_dictionary_t* tb_object_dictionary_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_ref_t tb_object_dictionary_init(tb_size_t size, tb_size_t incr)
+tb_object_ref_t tb_object_dictionary_init(tb_size_t size, tb_bool_t incr)
 {
     // done
     tb_bool_t               ok = tb_false;

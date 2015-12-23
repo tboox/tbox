@@ -929,7 +929,7 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
         if (!(laddr_size = tb_sockaddr_load(&laddr_data, &laddr))) break;
 
         // bind it first for ConnectEx
-        if (SOCKET_ERROR == impl->func.bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&laddr_data, laddr_size)) 
+        if (SOCKET_ERROR == impl->func.bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size)) 
         {
             // trace
             tb_trace_e("connect[%p]: bind failed, error: %u", aico, GetLastError());
@@ -949,7 +949,7 @@ static tb_bool_t tb_iocp_post_conn(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
         DWORD real = 0;
         ConnectEx_ok = impl->func.ConnectEx(    (SOCKET)aico->base.handle - 1
                                             ,   (struct sockaddr const*)&caddr_data
-                                            ,   caddr_size
+                                            ,   (tb_int_t)caddr_size
                                             ,   tb_null
                                             ,   0
                                             ,   &real
@@ -1217,7 +1217,7 @@ static tb_bool_t tb_iocp_post_usend(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aic
     tb_iocp_post_timeout(impl, aico);
 
     // done send
-    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&d, n, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("usend[%p]: WSASendTo: %ld, error: %d", aico, ok, impl->func.WSAGetLastError());
 
     // ok or pending? continue it
@@ -1474,7 +1474,7 @@ static tb_bool_t tb_iocp_post_usendv(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t ai
     tb_iocp_post_timeout(impl, aico);
 
     // done send
-    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&d, n, (LPOVERLAPPED)&aico->olap, tb_null);
+    tb_long_t ok = impl->func.WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&aico->olap, tb_null);
     tb_trace_d("usendv[%p]: WSASendTo: %ld, error: %d", aico, ok, impl->func.WSAGetLastError());
 
     // ok or pending? continue it
@@ -2493,7 +2493,7 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
 
             // wait
             DWORD       size = 0;
-            BOOL        wait = impl->func.GetQueuedCompletionStatusEx(impl->port, loop->list, tb_arrayn(loop->list), &size, timeout, FALSE);
+            BOOL        wait = impl->func.GetQueuedCompletionStatusEx(impl->port, loop->list, (DWORD)tb_arrayn(loop->list), &size, (DWORD)timeout, FALSE);
 
             // the last error
             tb_size_t   error = (tb_size_t)GetLastError();
@@ -2560,7 +2560,7 @@ static tb_long_t tb_iocp_ptor_loop_spak(tb_aicp_ptor_impl_t* ptor, tb_handle_t h
         DWORD               real = 0;
         tb_iocp_aico_t*     aico = tb_null;
         tb_iocp_olap_t*     olap = tb_null;
-        BOOL                wait = GetQueuedCompletionStatus(impl->port, (LPDWORD)&real, (LPDWORD)&aico, (LPOVERLAPPED*)&olap, timeout < 0? INFINITE : timeout);
+        BOOL                wait = GetQueuedCompletionStatus(impl->port, (LPDWORD)&real, (PULONG_PTR)&aico, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
 
         // the last error
         tb_size_t           error = (tb_size_t)GetLastError();

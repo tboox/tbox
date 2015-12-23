@@ -33,7 +33,10 @@
 
 tb_event_ref_t tb_event_init()
 {
+    // create event
     HANDLE event = CreateEventA(tb_null, FALSE, FALSE, tb_null);
+
+    // ok?
     return ((event != INVALID_HANDLE_VALUE)? (tb_event_ref_t)event : tb_null);
 }
 tb_void_t tb_event_exit(tb_event_ref_t event)
@@ -54,7 +57,7 @@ tb_long_t tb_event_wait(tb_event_ref_t event, tb_long_t timeout)
     tb_assert_and_check_return_val(event, -1);
 
     // wait
-    tb_long_t r = WaitForSingleObject((HANDLE)event, timeout >= 0? timeout : INFINITE);
+    tb_long_t r = WaitForSingleObject((HANDLE)event, (DWORD)(timeout >= 0? timeout : INFINITE));
     tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
     // timeout?

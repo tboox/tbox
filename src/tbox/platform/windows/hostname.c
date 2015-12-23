@@ -34,6 +34,6 @@
 
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
 {
-    return !tb_ws2_32()->gethostname(name, size)? tb_true : tb_false;
+    return !tb_ws2_32()->gethostname(name, (DWORD)size)? tb_true : tb_false;
 }
 
