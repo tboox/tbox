@@ -20,8 +20,8 @@ add_undefines_h("$(prefix)_MEMORY_UNALIGNED_ACCESS_ENABLE")
 add_defines("_GNU_SOURCE=1", "_REENTRANT")
 
 -- disable some compiler errors
-add_cxflags("-Wno-error=deprecated-declarations")
-add_mxflags("-Wno-error=deprecated-declarations")
+add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
+add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 
 -- the debug mode
 if modes("debug") then
