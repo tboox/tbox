@@ -105,17 +105,17 @@ tb_size_t               tb_ltimer_delay(tb_ltimer_ref_t timer);
 /*! spak timer for the external loop at the single thread
  *
  * @code
- * tb_void_t tb_ltimer_loop()
- * {
- *      while (1)
- *      {
- *          // wait
- *          wait(tb_ltimer_delay(timer))
- *
- *          // spak timer
- *          tb_ltimer_spak(timer);
- *      }
- * }
+   tb_void_t tb_ltimer_loop()
+   {
+        while (1)
+        {
+            // wait
+            wait(tb_ltimer_delay(timer))
+  
+            // spak timer
+            tb_ltimer_spak(timer);
+        }
+   }
  * @endcode
  *
  * @param timer         the timer 
@@ -127,11 +127,10 @@ tb_bool_t               tb_ltimer_spak(tb_ltimer_ref_t timer);
 /*! loop timer for the external thread
  *
  * @code
- * tb_void_t tb_ltimer_thread(tb_cpointer_t priv)
-
- * {
- *      tb_ltimer_loop(timer);
- * }
+   tb_void_t tb_ltimer_thread(tb_cpointer_t priv)
+   {
+        tb_ltimer_loop(timer);
+   }
  * @endcode
  *
  * @param timer         the timer 

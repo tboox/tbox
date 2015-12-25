@@ -461,7 +461,7 @@ tb_bool_t tb_aico_recv_(tb_aico_ref_t aico, tb_byte_t* data, tb_size_t size, tb_
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.recv.data        = data;
-    aice.u.recv.size        = size;
+    aice.u.recv.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -480,7 +480,7 @@ tb_bool_t tb_aico_send_(tb_aico_ref_t aico, tb_byte_t const* data, tb_size_t siz
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.send.data        = data;
-    aice.u.send.size        = size;
+    aice.u.send.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -499,7 +499,7 @@ tb_bool_t tb_aico_urecv_(tb_aico_ref_t aico, tb_byte_t* data, tb_size_t size, tb
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.urecv.data       = data;
-    aice.u.urecv.size       = size;
+    aice.u.urecv.size       = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -521,7 +521,7 @@ tb_bool_t tb_aico_usend_(tb_aico_ref_t aico, tb_ipaddr_ref_t addr, tb_byte_t con
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.usend.data       = data;
-    aice.u.usend.size       = size;
+    aice.u.usend.size       = (tb_iovec_size_t)size;
     tb_ipaddr_copy(&aice.u.usend.addr, addr);
 
     // post
@@ -643,7 +643,7 @@ tb_bool_t tb_aico_read_(tb_aico_ref_t aico, tb_hize_t seek, tb_byte_t* data, tb_
     aice.aico               = aico;
     aice.u.read.seek        = seek;
     aice.u.read.data        = data;
-    aice.u.read.size        = size;
+    aice.u.read.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -663,7 +663,7 @@ tb_bool_t tb_aico_writ_(tb_aico_ref_t aico, tb_hize_t seek, tb_byte_t const* dat
     aice.aico               = aico;
     aice.u.writ.seek        = seek;
     aice.u.writ.data        = data;
-    aice.u.writ.size        = size;
+    aice.u.writ.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_(impl->aicp, &aice __tb_debug_args__);
@@ -794,7 +794,7 @@ tb_bool_t tb_aico_recv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_byte_t* da
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.recv.data        = data;
-    aice.u.recv.size        = size;
+    aice.u.recv.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
@@ -813,7 +813,7 @@ tb_bool_t tb_aico_send_after_(tb_aico_ref_t aico, tb_size_t delay, tb_byte_t con
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.send.data        = data;
-    aice.u.send.size        = size;
+    aice.u.send.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
@@ -832,7 +832,7 @@ tb_bool_t tb_aico_urecv_after_(tb_aico_ref_t aico, tb_size_t delay, tb_byte_t* d
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.urecv.data       = data;
-    aice.u.urecv.size       = size;
+    aice.u.urecv.size       = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
@@ -854,7 +854,7 @@ tb_bool_t tb_aico_usend_after_(tb_aico_ref_t aico, tb_size_t delay, tb_ipaddr_re
     aice.priv               = priv;
     aice.aico               = aico;
     aice.u.usend.data       = data;
-    aice.u.usend.size       = size;
+    aice.u.usend.size       = (tb_iovec_size_t)size;
     tb_ipaddr_copy(&aice.u.usend.addr, addr);
 
     // post
@@ -976,7 +976,7 @@ tb_bool_t tb_aico_read_after_(tb_aico_ref_t aico, tb_size_t delay, tb_hize_t see
     aice.aico               = aico;
     aice.u.read.seek        = seek;
     aice.u.read.data        = data;
-    aice.u.read.size        = size;
+    aice.u.read.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
@@ -996,7 +996,7 @@ tb_bool_t tb_aico_writ_after_(tb_aico_ref_t aico, tb_size_t delay, tb_hize_t see
     aice.aico               = aico;
     aice.u.writ.seek        = seek;
     aice.u.writ.data        = data;
-    aice.u.writ.size        = size;
+    aice.u.writ.size        = (tb_iovec_size_t)size;
 
     // post
     return tb_aicp_post_after_(impl->aicp, delay, &aice __tb_debug_args__);
