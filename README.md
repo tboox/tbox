@@ -1,3 +1,5 @@
+<img src="http://www.tboox.net/ruki/tboox.jpg" alt="alipay" width="64" height="64">
+
 The Treasure Box Library
 ========================
 
