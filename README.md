@@ -1,6 +1,4 @@
-<img src="http://www.tboox.net/ruki/tboox.jpg" alt="alipay" width="64" height="64">
-
-The Treasure Box Library
+<img src="http://www.tboox.net/ruki/tboox.jpg" alt="alipay" width="64" height="64"> The Treasure Box Library
 ========================
 
 TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
