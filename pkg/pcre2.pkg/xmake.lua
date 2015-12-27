@@ -17,7 +17,7 @@ add_option("pcre2")
     add_option_defines("PCRE2_CODE_UNIT_WIDTH=8")
 
     -- add links for checking
-    add_option_links("pcre2")
+    add_option_links("pcre2-8")
 
     -- add link directories
     add_option_linkdirs("lib/$(plat)/$(arch)")
