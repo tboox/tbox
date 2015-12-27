@@ -21,7 +21,7 @@ add_option("info")
     add_option_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "object", "thread", "network", "charset", "database"}) do
+for _, module in ipairs({"xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database"}) do
     add_option(module)
     set_option_enable(true)
     set_option_showmenu(true)
@@ -57,7 +57,7 @@ add_target("tbox")
     add_headers("../(tbox/utils/impl/*.h)")
 
     -- add modules
-    add_options("info", "float", "xml", "zip", "asio", "object", "thread", "network", "charset", "database")
+    add_options("info", "float", "xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
 
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
