@@ -60,7 +60,7 @@ add_target("tbox")
     add_options("info", "float", "xml", "zip", "asio", "object", "thread", "network", "charset", "database")
 
     -- add packages
-    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "base")
+    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
 
     -- add interfaces
     add_options(libc, libm, posix, systemv)
