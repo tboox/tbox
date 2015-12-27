@@ -25,7 +25,7 @@ add_target("demo")
     add_links("tbox")
 
     -- add packages
-    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "base")
+    add_options("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "base")
 
     -- add the source files
     add_files("*.c") 
@@ -63,6 +63,11 @@ add_target("demo")
     -- add the source files for the xml module
     if options("xml") then
         add_files("xml/*.c")
+    end
+
+    -- add the source files for the regex module
+    if options("regex") then
+        add_files("regex/*.c")
     end
 
     -- add the source files for the network type

@@ -44,6 +44,9 @@
 // database
 TB_DEMO_MAIN_DECL(database_sql);
 
+// regex
+TB_DEMO_MAIN_DECL(regex);
+
 // xml
 TB_DEMO_MAIN_DECL(xml_reader);
 TB_DEMO_MAIN_DECL(xml_writer);

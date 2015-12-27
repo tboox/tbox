@@ -57,6 +57,11 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(xml_document)
 #endif
 
+    // regex
+#ifdef TB_CONFIG_MODULE_HAVE_REGEX
+,   TB_DEMO_MAIN_ITEM(regex)
+#endif
+
     // asio
 #ifdef TB_CONFIG_MODULE_HAVE_ASIO
 ,   TB_DEMO_MAIN_ITEM(asio_dns)
