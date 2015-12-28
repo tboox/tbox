@@ -180,9 +180,9 @@ static tb_void_t tb_static_large_allocator_check_data(tb_static_large_allocator_
         tb_pool_data_head_t* base_head = tb_static_large_allocator_data_base(data_head);
 
         // check
-        tb_assertf(!data_head->bfree, "data have been freed: %p", data);
-        tb_assertf(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
-        tb_assertf(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
+        tb_assertf_pass_break(!data_head->bfree, "data have been freed: %p", data);
+        tb_assertf_pass_break(base_head->debug.magic == TB_POOL_DATA_MAGIC, "the invalid data: %p", data);
+        tb_assertf_pass_break(((tb_byte_t*)data)[base_head->size] == TB_POOL_DATA_PATCH, "data underflow");
 
         // ok
         ok = tb_true;

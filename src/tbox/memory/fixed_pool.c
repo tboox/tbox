@@ -601,12 +601,12 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t self, tb_pointer_t data __tb_d
     do
     {
         // check
-        tb_assertf_and_check_break(pool->item_count, "double free data: %p", data);
+        tb_assertf_pass_and_check_break(pool->item_count, "double free data: %p", data);
 
         // find the slot 
         tb_fixed_pool_slot_t* slot = tb_fixed_pool_slot_find(pool, data);
-        tb_assertf_and_check_break(slot, "the data: %p not belong to pool: %p", data, self);
-        tb_assert_and_check_break(slot->pool);
+        tb_assertf_pass_and_check_break(slot, "the data: %p not belong to pool: %p", data, self);
+        tb_assert_pass_and_check_break(slot->pool);
 
         // the slot is full?
         tb_bool_t full = tb_static_fixed_pool_full(slot->pool);
