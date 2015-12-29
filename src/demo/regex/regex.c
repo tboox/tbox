@@ -19,7 +19,7 @@ static tb_void_t tb_demo_regex_test_match_simple(tb_char_t const* pattern, tb_ch
         tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
         {
             // trace
-            tb_trace_i("    [%lu, %lu]: %s", entry->start, entry->size, entry->cstr);
+            tb_trace_i("[%lu, %lu]: %s", entry->start, entry->size, entry->cstr);
         }
         
         // exit results
@@ -39,7 +39,7 @@ static tb_void_t tb_demo_regex_test_replace_simple(tb_char_t const* pattern, tb_
     if (results)
     {
         // trace
-        tb_trace_i("    : %s", results);
+        tb_trace_i(": %s", results);
 
         // exit results
         tb_free(results);
@@ -58,16 +58,16 @@ static tb_void_t tb_demo_regex_test_match_global(tb_char_t const* pattern, tb_ch
         tb_long_t       start = 0;
         tb_size_t       length = 0;
         tb_vector_ref_t results = tb_null;
-        while ((start = tb_regex_match_cstr(regex, 0, content, start + length, &length, &results)) >= 0 && results)
+        while ((start = tb_regex_match_cstr(regex, content, start + length, &length, &results)) >= 0 && results)
         {
             // trace
-            tb_trace_i("    [%lu, %lu]: ", start, length);
+            tb_trace_i("[%lu, %lu]: ", start, length);
 
             // show results
             tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
             {
                 // trace
-                tb_trace_i("        [%lu, %lu]: %s", entry->start, entry->size, entry->cstr);
+                tb_trace_i("    [%lu, %lu]: %s", entry->start, entry->size, entry->cstr);
             }
         }
 
@@ -83,6 +83,16 @@ static tb_void_t tb_demo_regex_test_replace_global(tb_char_t const* pattern, tb_
     // trace
     tb_trace_i("replace_global: %s, %s to %s", content, pattern, replacement);
 
+    // done
+    tb_char_t const* results = tb_regex_replace_done_simple(pattern, TB_REGEX_MODE_GLOBAL, content, replacement);
+    if (results)
+    {
+        // trace
+        tb_trace_i(": %s", results);
+
+        // exit results
+        tb_free(results);
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -90,16 +100,19 @@ static tb_void_t tb_demo_regex_test_replace_global(tb_char_t const* pattern, tb_
  */ 
 tb_int_t tb_demo_regex_main(tb_int_t argc, tb_char_t** argv)
 {
+    // test arguments
+    if (argv[1] && argv[2]) tb_demo_regex_test_match_global(argv[1], argv[2]);
+
     // test match
     tb_demo_regex_test_match_simple("\\w+", "hello world");
     tb_demo_regex_test_match_global("\\w+", "hello world");
 
+    tb_demo_regex_test_match_simple("(\\w+)\\s+?(\\w+)", "hello world");
+    tb_demo_regex_test_match_global("(\\w+)\\s+?(\\w+)", "hello world");
+
     // test replace
     tb_demo_regex_test_replace_simple("\\w+", "hello world", "hi");
     tb_demo_regex_test_replace_global("\\w+", "hello world", "hi");
-
-    // test arguments
-    if (argc == 3) tb_demo_regex_test_match_global(argv[1], argv[2]);
 
     // ok
     return 0;

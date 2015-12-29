@@ -55,6 +55,7 @@ typedef enum __tb_regex_mode_e
     TB_REGEX_MODE_NONE              = 0     //!< the default mode
 ,   TB_REGEX_MODE_CASELESS          = 1     //!< do caseless matching
 ,   TB_REGEX_MODE_MULTILINE         = 2     //!< ^ and $ match newlines within data
+,   TB_REGEX_MODE_GLOBAL            = 4     //!< global replace all
 
 }tb_regex_mode_e;
 
@@ -81,7 +82,6 @@ tb_void_t               tb_regex_exit(tb_regex_ref_t regex);
 /*! match the given c-string and size by regex
  *
  * @param regex         the regex
- * @param mode          the match mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param size          the c-string size
  * @param start         the start position
@@ -90,7 +90,7 @@ tb_void_t               tb_regex_exit(tb_regex_ref_t regex);
  *
  * @return              the matched position, not match: -1
  */
-tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults);
+tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults);
 
 /*! match the given c-string by regex
  *
@@ -105,7 +105,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_
         // results: "hello"
         //
         tb_vector_ref_t results = tb_null;
-        if (tb_regex_match_cstr(regex, 0, "hello world", 0, tb_null, &results) >= 0 && results)
+        if (tb_regex_match_cstr(regex, "hello world", 0, tb_null, &results) >= 0 && results)
         {
             // show results
             tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
@@ -123,7 +123,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_
         tb_long_t       start = 0;
         tb_size_t       length = 0;
         tb_vector_ref_t results = tb_null;
-        while ((start = tb_regex_match_cstr(regex, 0, "hello world", start + length, &length, &results)) >= 0 && results)
+        while ((start = tb_regex_match_cstr(regex, "hello world", start + length, &length, &results)) >= 0 && results)
         {
             // show results
             tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
@@ -139,7 +139,6 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_
  * @endcode
  *
  * @param regex         the regex
- * @param mode          the match mode, uses the default mode if be zero
  * @param cstr          the c-string 
  * @param start         the start position
  * @param plength       the matched length pointer, do not get it if be null
@@ -147,7 +146,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_
  *
  * @return              the matched position, not match: -1
  */
-tb_long_t               tb_regex_match_cstr(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults);
+tb_long_t               tb_regex_match_cstr(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults);
 
 /*! simply match the given c-string by regex
  *
@@ -163,7 +162,7 @@ tb_long_t               tb_regex_match_cstr(tb_regex_ref_t regex, tb_size_t mode
         //
         // results: "hello"
         //
-        tb_vector_ref_t results = tb_regex_match_simple(regex, 0, "hello world");
+        tb_vector_ref_t results = tb_regex_match_simple(regex, "hello world");
         if (results)
         {
             // show results
@@ -180,17 +179,15 @@ tb_long_t               tb_regex_match_cstr(tb_regex_ref_t regex, tb_size_t mode
  * @endcode
  *
  * @param regex         the regex
- * @param mode          the match mode, uses the default mode if be zero
  * @param cstr          the c-string 
  *
  * @return              the matched results
  */
-tb_vector_ref_t         tb_regex_match_simple(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr);
+tb_vector_ref_t         tb_regex_match_simple(tb_regex_ref_t regex, tb_char_t const* cstr);
 
 /*! replace the given c-string and size by regex
  *
  * @param regex         the regex
- * @param mode          the match mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param size          the c-string size
  * @param start         the start position
@@ -200,12 +197,11 @@ tb_vector_ref_t         tb_regex_match_simple(tb_regex_ref_t regex, tb_size_t mo
  *
  * @return              the result c-string
  */
-tb_char_t const*        tb_regex_replace(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t replace_size, tb_size_t* plength);
+tb_char_t const*        tb_regex_replace(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t replace_size, tb_size_t* plength);
 
 /*! replace the given c-string by regex
  *
  * @param regex         the regex
- * @param mode          the match mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param start         the start position
  * @param replace_cstr  the replacement c-string data
@@ -213,7 +209,7 @@ tb_char_t const*        tb_regex_replace(tb_regex_ref_t regex, tb_size_t mode, t
  *
  * @return              the result c-string
  */
-tb_char_t const*        tb_regex_replace_cstr(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength);
+tb_char_t const*        tb_regex_replace_cstr(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength);
 
 /*! simply replace the given c-string by regex
  * 
@@ -227,7 +223,7 @@ tb_char_t const*        tb_regex_replace_cstr(tb_regex_ref_t regex, tb_size_t mo
         //
         // results: "hi world"
         //
-        tb_char_t const* results = tb_regex_replace_simple(regex, 0, "hello world", "hi");
+        tb_char_t const* results = tb_regex_replace_simple(regex, "hello world", "hi");
         if (results)
         {
             // trace
@@ -240,18 +236,17 @@ tb_char_t const*        tb_regex_replace_cstr(tb_regex_ref_t regex, tb_size_t mo
  * @endcode
  *
  * @param regex         the regex
- * @param mode          the match mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param replace_cstr  the replacement c-string data
  *
  * @return              the result c-string
  */
-tb_char_t const*        tb_regex_replace_simple(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_char_t const* replace_cstr);
+tb_char_t const*        tb_regex_replace_simple(tb_regex_ref_t regex, tb_char_t const* cstr, tb_char_t const* replace_cstr);
 
 /*! match the given c-string and size by the given regex pattern
  *
  * @param pattern       the regex pattern
- * @param mode          the match mode, uses the default mode if be zero
+ * @param mode          the regex mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param size          the c-string size
  * @param start         the start position
@@ -309,7 +304,7 @@ tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t 
  * @endcode
  *
  * @param pattern       the regex pattern
- * @param mode          the regex and match mode, uses the default mode if be zero
+ * @param mode          the regex mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param start         the start position
  * @param plength       the matched length pointer, do not get it if be null
@@ -347,7 +342,7 @@ tb_long_t               tb_regex_match_done_cstr(tb_char_t const* pattern, tb_si
  * @endcode
  *
  * @param pattern       the regex pattern
- * @param mode          the regex and match mode, uses the default mode if be zero
+ * @param mode          the regex mode, uses the default mode if be zero
  * @param cstr          the c-string data
  *
  * @return              the matched results, we need exit it manually
@@ -357,7 +352,7 @@ tb_vector_ref_t         tb_regex_match_done_simple(tb_char_t const* pattern, tb_
 /*! replace the given c-string and size by the given regex pattern 
  *
  * @param pattern       the regex pattern
- * @param mode          the regex and match mode, uses the default mode if be zero
+ * @param mode          the regex mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param size          the c-string size
  * @param start         the start position
@@ -372,7 +367,7 @@ tb_char_t const*        tb_regex_replace_done(tb_char_t const* pattern, tb_size_
 /*! replace the given c-string by the given regex pattern 
  *
  * @param pattern       the regex pattern
- * @param mode          the regex and match mode, uses the default mode if be zero
+ * @param mode          the regex mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param start         the start position
  * @param replace_cstr  the replacement c-string data
@@ -403,7 +398,7 @@ tb_char_t const*        tb_regex_replace_done_cstr(tb_char_t const* pattern, tb_
  * @endcode
  *
  * @param pattern       the regex pattern
- * @param mode          the regex and match mode, uses the default mode if be zero
+ * @param mode          the regex mode, uses the default mode if be zero
  * @param cstr          the c-string data
  * @param replace_cstr  the replacement c-string data
  *

@@ -25,7 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "regex"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -53,49 +53,49 @@ tb_void_t tb_regex_exit(tb_regex_ref_t regex)
 {
     tb_assert_noimpl();
 }
-tb_long_t tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults)
+tb_long_t tb_regex_match(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults)
 {
     tb_assert_noimpl();
     return -1;
 }
-tb_char_t const* tb_regex_replace(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t replace_size, tb_size_t* plength)
+tb_char_t const* tb_regex_replace(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t replace_size, tb_size_t* plength)
 {
     tb_assert_noimpl();
     return tb_null;
 }
 #endif
-tb_long_t tb_regex_match_cstr(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults)
+tb_long_t tb_regex_match_cstr(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults)
 {
     // check
     tb_assert_and_check_return_val(cstr, -1);
 
     // done
-    return tb_regex_match(regex, mode, cstr, tb_strlen(cstr), start, plength, presults);
+    return tb_regex_match(regex, cstr, tb_strlen(cstr), start, plength, presults);
 }
-tb_vector_ref_t tb_regex_match_simple(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr)
+tb_vector_ref_t tb_regex_match_simple(tb_regex_ref_t regex, tb_char_t const* cstr)
 {
     // check
     tb_assert_and_check_return_val(cstr, tb_null);
 
     // done
     tb_vector_ref_t results = tb_null;
-    return tb_regex_match(regex, mode, cstr, tb_strlen(cstr), 0, tb_null, &results) >= 0? results : tb_null;
+    return tb_regex_match(regex, cstr, tb_strlen(cstr), 0, tb_null, &results) >= 0? results : tb_null;
 }
-tb_char_t const* tb_regex_replace_cstr(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength)
+tb_char_t const* tb_regex_replace_cstr(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength)
 {
     // check
     tb_assert_and_check_return_val(cstr && replace_cstr, tb_null);
 
     // done
-    return tb_regex_replace(regex, mode, cstr, tb_strlen(cstr), start, replace_cstr, tb_strlen(replace_cstr), plength);
+    return tb_regex_replace(regex, cstr, tb_strlen(cstr), start, replace_cstr, tb_strlen(replace_cstr), plength);
 }
-tb_char_t const* tb_regex_replace_simple(tb_regex_ref_t regex, tb_size_t mode, tb_char_t const* cstr, tb_char_t const* replace_cstr)
+tb_char_t const* tb_regex_replace_simple(tb_regex_ref_t regex, tb_char_t const* cstr, tb_char_t const* replace_cstr)
 {
     // check
     tb_assert_and_check_return_val(cstr && replace_cstr, tb_null);
 
     // done
-    return tb_regex_replace(regex, mode, cstr, tb_strlen(cstr), 0, replace_cstr, tb_strlen(replace_cstr), tb_null);
+    return tb_regex_replace(regex, cstr, tb_strlen(cstr), 0, replace_cstr, tb_strlen(replace_cstr), tb_null);
 }
 tb_long_t tb_regex_match_done(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults)
 {
@@ -112,7 +112,7 @@ tb_long_t tb_regex_match_done(tb_char_t const* pattern, tb_size_t mode, tb_char_
         if (results)
         {
             // match regex
-            ok = tb_regex_match(regex, mode, cstr, size, start, plength, &results);
+            ok = tb_regex_match(regex, cstr, size, start, plength, &results);
 
             // ok?
             if (ok >= 0)
@@ -166,17 +166,13 @@ tb_char_t const* tb_regex_replace_done(tb_char_t const* pattern, tb_size_t mode,
     {
         // replace regex
         tb_size_t           result_size = 0;
-        tb_char_t const*    result_cstr = tb_regex_replace(regex, mode, cstr, size, start, replace_cstr, replace_size, &result_size);
+        tb_char_t const*    result_cstr = tb_regex_replace(regex, cstr, size, start, replace_cstr, replace_size, &result_size);
         if (result_cstr && result_size)
         {
             // save result
-            result = tb_malloc_cstr(result_size + 1);
+            result = tb_strndup(result_cstr, result_size);
             if (result)
             {
-                // copy result
-                tb_strncpy(result, result_cstr, result_size);
-                result[result_size] = '\0';
-
                 // save length
                 if (plength) *plength = result_size;
             }
