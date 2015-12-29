@@ -275,6 +275,7 @@ add_target("tbox")
     add_cfuncs("posix", nil,        "semaphore.h",                      "sem_init")
     add_cfuncs("posix", nil,        "unistd.h",                         "getpagesize", "sysconf")
     add_cfuncs("posix", nil,        "sched.h",                          "sched_yield")
+    add_cfuncs("posix", nil,        "regex.h",                          "regcomp", "regexec")
 
     -- add the interfaces for systemv
     add_cfuncs("systemv", nil,      {"sys/sem.h", "sys/ipc.h"},         "semget", "semtimedop")
