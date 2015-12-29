@@ -85,6 +85,11 @@ features
 -	implements lightweight libm library interfaces, the interface name contains tb_xxx prefix for avoiding conflict.
 -	supports float and double type.
 
+### the regex library
+-	supports match and replace
+-	supports global/multiline/caseless mode
+-   uses pcre, pcre2 and posix regex modules
+
 ## 简介
 TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac、ios、android以及其他嵌入式系统。
 
@@ -183,6 +188,11 @@ TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac
 7. 实现一些高级的位处理接口，例如：位0的快速统计、前导0和前导1的快速位计数、后导01的快速位计数
 8. 实现单例模块，可以对静态对象、实例对象进行快速的单例封装，实现全局线程安全
 9. 实现option模块，对命令行参数进行解析，提供快速方便的命令行选项建立和解析操作，对于写终端程序还是很有帮助的   
+
+## 正则表达式库
+1. 支持匹配和替换操作
+2. 支持全局、多行、大小写不敏感等模式
+3. 使用pcre, pcre2和posix正则库
 
 contact
 -------
