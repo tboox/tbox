@@ -236,6 +236,9 @@ __tb_extern_c_enter__
 #   define tb_assert_pass_and_check_break_state(x, s, v)        tb_check_break_state(x, s, v)
 #endif
 
+/// assert: noimpl
+#define tb_assert_noimpl()                                  tb_assertf(0, "noimpl")
+
 /*! the static assert
  *
  * @code

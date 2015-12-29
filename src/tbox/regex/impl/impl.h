@@ -18,18 +18,29 @@
  *
  * @author      ruki
  * @file        prefix.h
- * @ingroup     regex
  *
  */
-#ifndef TB_REGEX_PREFIX_H
-#define TB_REGEX_PREFIX_H
+#ifndef TB_REGEX_IMPL_H
+#define TB_REGEX_IMPL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../libc/libc.h"
-#include "../container/container.h"
+#include "prefix.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_void_t tb_regex_match_exit(tb_element_ref_t element, tb_pointer_t buff)
+{
+    // check
+    tb_regex_match_ref_t match = (tb_regex_match_ref_t)buff;
+    tb_assert_and_check_return(match);
+
+    // exit it
+    if (match->cstr) tb_free(match->cstr);
+    match->cstr = tb_null;
+    match->size = 0;
+}
 
 #endif

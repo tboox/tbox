@@ -95,6 +95,9 @@ add_target("tbox")
     -- add the source files for the xml module
     if options("xml") then add_files("xml/**.c") end
 
+    -- add the source files for the regex module
+    if options("regex") then add_files("regex/*.c") end
+
     -- add the source files for the network module
     if options("network") then
         add_files("asio/aioo.c") 
