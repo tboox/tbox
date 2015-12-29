@@ -58,7 +58,7 @@ static tb_void_t tb_demo_regex_test_match_global(tb_char_t const* pattern, tb_ch
         tb_long_t       start = 0;
         tb_size_t       length = 0;
         tb_vector_ref_t results = tb_null;
-        while ((start = tb_regex_match_cstr(regex, TB_REGEX_MODE_MATCH_GLOBAL, content, start + length, &length, &results)) >= 0 && results)
+        while ((start = tb_regex_match_cstr(regex, 0, content, start + length, &length, &results)) >= 0 && results)
         {
             // trace
             tb_trace_i("    [%lu, %lu]: ", start, length);
@@ -83,16 +83,6 @@ static tb_void_t tb_demo_regex_test_replace_global(tb_char_t const* pattern, tb_
     // trace
     tb_trace_i("replace_global: %s, %s to %s", content, pattern, replacement);
 
-    // done
-    tb_char_t const* results = tb_regex_replace_done_simple(pattern, TB_REGEX_MODE_MATCH_GLOBAL, content, replacement);
-    if (results)
-    {
-        // trace
-        tb_trace_i("    : %s", results);
-
-        // exit results
-        tb_free(results);
-    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
