@@ -53,14 +53,8 @@ typedef struct _tb_regex_match_t
 typedef enum __tb_regex_mode_e
 {
     TB_REGEX_MODE_NONE              = 0     //!< the default mode
-
-    ///@{ the regex mode 
-    // ..
-    ///@{ the regex mode
-
-    ///@{ the match mode 
-,   TB_REGEX_MODE_MATCH_GLOBAL      = 1     //!< the global match
-    ///@}
+,   TB_REGEX_MODE_CASELESS          = 1     //!< do caseless matching
+,   TB_REGEX_MODE_MULTILINE         = 2     //!< ^ and $ match newlines within data
 
 }tb_regex_mode_e;
 
@@ -129,7 +123,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_
         tb_long_t       start = 0;
         tb_size_t       length = 0;
         tb_vector_ref_t results = tb_null;
-        while ((start = tb_regex_match_cstr(regex, TB_REGEX_MODE_MATCH_GLOBAL, "hello world", start + length, &length, &results)) >= 0 && results)
+        while ((start = tb_regex_match_cstr(regex, 0, "hello world", start + length, &length, &results)) >= 0 && results)
         {
             // show results
             tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
@@ -299,7 +293,7 @@ tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t 
     tb_long_t       start = 0;
     tb_size_t       length = 0;
     tb_vector_ref_t results = tb_null;
-    while ((start = tb_regex_match_done_cstr("\\w+", TB_REGEX_MODE_MATCH_GLOBAL, "hello world", start + length, &length, &results)) >= 0 && results)
+    while ((start = tb_regex_match_done_cstr("\\w+", 0, "hello world", start + length, &length, &results)) >= 0 && results)
     {
         // show results
         tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
