@@ -373,7 +373,7 @@ tb_vector_ref_t         tb_regex_match_done_simple(tb_char_t const* pattern, tb_
  *
  * @return              the result c-string
  */
-tb_char_t const*        tb_regex_replace(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t replace_size, tb_size_t* plength);
+tb_char_t const*        tb_regex_replace_done(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t replace_size, tb_size_t* plength);
 
 /*! replace the given c-string by the given regex pattern 
  *
@@ -386,7 +386,7 @@ tb_char_t const*        tb_regex_replace(tb_char_t const* pattern, tb_size_t mod
  *
  * @return              the result c-string
  */
-tb_char_t const*        tb_regex_replace_cstr(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength);
+tb_char_t const*        tb_regex_replace_done_cstr(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength);
 
 /*! simply replace the given c-string by the given regex pattern 
  * 
@@ -396,7 +396,7 @@ tb_char_t const*        tb_regex_replace_cstr(tb_char_t const* pattern, tb_size_
     //
     // results: "hi world"
     //
-    tb_char_t const* results = tb_regex_replace_simple("\w+", 0, "hello world", "hi");
+    tb_char_t const* results = tb_regex_replace_done_simple("\w+", 0, "hello world", "hi");
     if (results)
     {
         // trace
@@ -415,7 +415,7 @@ tb_char_t const*        tb_regex_replace_cstr(tb_char_t const* pattern, tb_size_
  *
  * @return              the result c-string, @note we need free it manually
  */
-tb_char_t const*        tb_regex_replace_simple(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_char_t const* replace_cstr);
+tb_char_t const*        tb_regex_replace_done_simple(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_char_t const* replace_cstr);
 
 
 #endif
