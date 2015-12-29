@@ -103,7 +103,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_
  * @code
     
     // init regex
-    tb_regex_ref_t regex = tb_regex_init("\w+", 0);
+    tb_regex_ref_t regex = tb_regex_init("\\w+", 0);
     if (regex)
     {
         // match single 
@@ -129,7 +129,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_size_t mode, tb_
         tb_long_t       start = 0;
         tb_size_t       length = 0;
         tb_vector_ref_t results = tb_null;
-        while ((start = tb_regex_match_cstr(regex, 0, "hello world", start + length, &length, &results)) >= 0 && results)
+        while ((start = tb_regex_match_cstr(regex, TB_REGEX_MODE_MATCH_GLOBAL, "hello world", start + length, &length, &results)) >= 0 && results)
         {
             // show results
             tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
@@ -162,7 +162,7 @@ tb_long_t               tb_regex_match_cstr(tb_regex_ref_t regex, tb_size_t mode
  * @code
     
     // init regex
-    tb_regex_ref_t regex = tb_regex_init("\w+", 0);
+    tb_regex_ref_t regex = tb_regex_init("\\w+", 0);
     if (regex)
     {
         // match single 
@@ -226,7 +226,7 @@ tb_char_t const*        tb_regex_replace_cstr(tb_regex_ref_t regex, tb_size_t mo
  * @code
     
     // init regex
-    tb_regex_ref_t regex = tb_regex_init("\w+", 0);
+    tb_regex_ref_t regex = tb_regex_init("\\w+", 0);
     if (regex)
     {
         // match single 
@@ -278,7 +278,7 @@ tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t 
     // results: "hello"
     //
     tb_vector_ref_t results = tb_null;
-    if (tb_regex_match_done_cstr("\w+", 0, "hello world", 0, tb_null, &results) >= 0 && results)
+    if (tb_regex_match_done_cstr("\\w+", 0, "hello world", 0, tb_null, &results) >= 0 && results)
     {
         // show results
         tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
@@ -299,7 +299,7 @@ tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t 
     tb_long_t       start = 0;
     tb_size_t       length = 0;
     tb_vector_ref_t results = tb_null;
-    while ((start = tb_regex_match_done_cstr("\w+", 0, "hello world", start + length, &length, &results)) >= 0 && results)
+    while ((start = tb_regex_match_done_cstr("\\w+", TB_REGEX_MODE_MATCH_GLOBAL, "hello world", start + length, &length, &results)) >= 0 && results)
     {
         // show results
         tb_for_all_if (tb_regex_match_ref_t, entry, results, entry)
@@ -336,7 +336,7 @@ tb_long_t               tb_regex_match_done_cstr(tb_char_t const* pattern, tb_si
     //
     // results: "hello"
     //
-    tb_vector_ref_t results = tb_regex_match_done_simple("\w+", 0, "hello world");
+    tb_vector_ref_t results = tb_regex_match_done_simple("\\w+", 0, "hello world");
     if (results)
     {
         // show results
@@ -396,7 +396,7 @@ tb_char_t const*        tb_regex_replace_done_cstr(tb_char_t const* pattern, tb_
     //
     // results: "hi world"
     //
-    tb_char_t const* results = tb_regex_replace_done_simple("\w+", 0, "hello world", "hi");
+    tb_char_t const* results = tb_regex_replace_done_simple("\\w+", 0, "hello world", "hi");
     if (results)
     {
         // trace
