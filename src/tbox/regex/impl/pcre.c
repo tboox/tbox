@@ -251,6 +251,7 @@ tb_char_t const* tb_regex_replace(tb_regex_ref_t self, tb_char_t const* cstr, tb
     tb_regex_t* regex = (tb_regex_t*)self;
     tb_assert_and_check_return_val(regex && regex->code && cstr && replace_cstr, tb_null);
 
+    // noimpl
     tb_assert_noimpl();
 
     // ok?

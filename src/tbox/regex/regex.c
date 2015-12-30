@@ -42,7 +42,7 @@
 #   include "impl/pcre.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_REGCOMP) \
         && defined(TB_CONFIG_POSIX_HAVE_REGEXEC)
-#   include "impl/posix.c"
+#   include "../platform/posix/regex.c"
 #else
 tb_regex_ref_t tb_regex_init(tb_char_t const* pattern, tb_size_t mode)
 {
