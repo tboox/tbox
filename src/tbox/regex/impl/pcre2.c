@@ -171,6 +171,9 @@ tb_long_t tb_regex_match(tb_regex_ref_t self, tb_char_t const* cstr, tb_size_t s
         tb_long_t count = pcre2_match(regex->code, (PCRE2_SPTR)cstr, (PCRE2_SIZE)size, (PCRE2_SIZE)start, options, regex->match_data, tb_null);
         if (count < 0)
         {
+            // no match?
+            tb_check_break(count != PCRE2_ERROR_NOMATCH);
+
 #ifdef __tb_debug__
             // get error info
             PCRE2_UCHAR info[256];
