@@ -143,6 +143,9 @@ tb_long_t tb_regex_match(tb_regex_ref_t self, tb_char_t const* cstr, tb_size_t s
         // clear length first
         if (plength) *plength = 0;
 
+        // end?
+        tb_check_break(start < size);
+
         // init options
 #ifdef __tb_debug__
         tb_uint32_t options = 0;

@@ -378,8 +378,8 @@ tb_void_t tb_ltimer_exit(tb_ltimer_ref_t self)
     tb_ltimer_t* timer = (tb_ltimer_t*)self;
     tb_assert_and_check_return(self);
 
-    // stop it
-    tb_atomic_set(&timer->stop, 1);
+    // kill it first
+    tb_ltimer_kill(self);
 
     // wait loop exit
     tb_size_t tryn = 10;
@@ -420,6 +420,15 @@ tb_void_t tb_ltimer_exit(tb_ltimer_ref_t self)
 
     // exit it
     tb_free(timer);
+}
+tb_void_t tb_ltimer_kill(tb_ltimer_ref_t self)
+{
+    // check
+    tb_ltimer_t* timer = (tb_ltimer_t*)self;
+    tb_assert_and_check_return(self);
+
+    // stop it
+    tb_atomic_set(&timer->stop, 1);
 }
 tb_void_t tb_ltimer_clear(tb_ltimer_ref_t self)
 {

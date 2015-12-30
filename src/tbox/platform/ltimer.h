@@ -80,6 +80,12 @@ tb_ltimer_ref_t         tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t
  */
 tb_void_t               tb_ltimer_exit(tb_ltimer_ref_t timer);
 
+/*! kill timer for tb_ltimer_loop()
+ *
+ * @param timer         the timer 
+ */
+tb_void_t               tb_ltimer_kill(tb_ltimer_ref_t timer);
+
 /*! clear timer
  *
  * @param timer         the timer 

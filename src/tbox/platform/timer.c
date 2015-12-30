@@ -200,12 +200,8 @@ static tb_void_t tb_timer_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
 }
 static tb_void_t tb_timer_instance_kill(tb_handle_t handle, tb_cpointer_t priv)
 {
-    // check
-    tb_timer_t* timer = (tb_timer_t*)handle;
-    tb_assert_and_check_return(timer);
-
-    // stop it
-    tb_atomic_set(&timer->stop, 1);
+    // kill it
+    if (handle) tb_timer_kill((tb_timer_ref_t)handle);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -270,8 +266,8 @@ tb_void_t tb_timer_exit(tb_timer_ref_t self)
     tb_timer_t* timer = (tb_timer_t*)self;
     tb_assert_and_check_return(timer);
 
-    // stop it
-    tb_atomic_set(&timer->stop, 1);
+    // kill it first
+    tb_timer_kill(self);
 
     // wait loop exit
     tb_size_t tryn = 10;
@@ -282,12 +278,6 @@ tb_void_t tb_timer_exit(tb_timer_ref_t self)
     {
         tb_trace_w("[timer]: the loop has been not exited now!");
     }
-
-    // post event
-    tb_spinlock_enter(&timer->lock);
-    tb_event_ref_t event = timer->event;
-    tb_spinlock_leave(&timer->lock);
-    if (event) tb_event_post(event);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -312,6 +302,24 @@ tb_void_t tb_timer_exit(tb_timer_ref_t self)
 
     // exit it
     tb_free(timer);
+}
+tb_void_t tb_timer_kill(tb_timer_ref_t self)
+{
+    // check
+    tb_timer_t* timer = (tb_timer_t*)self;
+    tb_assert_and_check_return(timer);
+
+    // stop it
+    if (!tb_atomic_fetch_and_set(&timer->stop, 1))
+    {
+        // get event
+        tb_spinlock_enter(&timer->lock);
+        tb_event_ref_t event = timer->event;
+        tb_spinlock_leave(&timer->lock);
+
+        // post event
+        if (event) tb_event_post(event);
+    }
 }
 tb_void_t tb_timer_clear(tb_timer_ref_t self)
 {
