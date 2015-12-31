@@ -279,6 +279,11 @@ add_target("tbox")
     add_cfuncs("posix", nil,        "unistd.h",                         "getpagesize", "sysconf")
     add_cfuncs("posix", nil,        "sched.h",                          "sched_yield")
     add_cfuncs("posix", nil,        "regex.h",                          "regcomp", "regexec")
+    add_cfuncs("posix", nil,        "sys/uio.h",                        "readv", "writev", "preadv", "pwritev")
+    add_cfuncs("posix", nil,        "unistd.h",                         "pread64", "pwrite64")
+    add_cfuncs("posix", nil,        "unistd.h",                         "fdatasync")
+    add_cfuncs("posix", nil,        "sys/sendfile.h",                   "sendfile")
+    add_cfuncs("posix", nil,        "sys/epoll.h",                      "epoll_create", "epoll_wait")
 
     -- add the interfaces for systemv
     add_cfuncs("systemv", nil,      {"sys/sem.h", "sys/ipc.h"},         "semget", "semtimedop")

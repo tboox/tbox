@@ -76,9 +76,12 @@ tb_regex_ref_t tb_regex_init(tb_char_t const* pattern, tb_size_t mode)
         tb_assert_and_check_break(regex);
 
         // init options
-        tb_int_t options = REG_EXTENDED | REG_ENHANCED;
+        tb_int_t options = REG_EXTENDED;
         if (mode & TB_REGEX_MODE_CASELESS) options |= REG_ICASE;
         if (mode & TB_REGEX_MODE_MULTILINE) options |= REG_NEWLINE;
+#ifdef REG_ENHANCED
+        options |= REG_ENHANCED;
+#endif
 
         // init code
         tb_int_t error = regcomp(&regex->code, pattern, options);
