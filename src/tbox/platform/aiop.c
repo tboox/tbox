@@ -42,7 +42,8 @@
     {
         return tb_aiop_rtor_select_init(aiop);
     }
-#elif defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
+    && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
 #   include "linux/aiop_epoll.c"
     tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
     {

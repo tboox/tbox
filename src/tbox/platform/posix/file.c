@@ -36,7 +36,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <errno.h>
-#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
 #   include <sys/sendfile.h>
 #endif
 
@@ -161,7 +161,7 @@ tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_
     tb_assert_and_check_return_val(file, -1);
 
     // read it
-#ifdef TB_CONFIG_OS_LINUX
+#ifdef TB_CONFIG_POSIX_HAVE_PREAD64
     return pread64(tb_file2fd(file), data, (size_t)size, offset);
 #else
     return pread(tb_file2fd(file), data, (size_t)size, offset);
@@ -173,7 +173,7 @@ tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t siz
     tb_assert_and_check_return_val(file, -1);
 
     // writ it
-#ifdef TB_CONFIG_OS_LINUX
+#ifdef TB_CONFIG_POSIX_HAVE_PWRITE64
     return pwrite64(tb_file2fd(file), data, (size_t)size, offset);
 #else
     return pwrite(tb_file2fd(file), data, (size_t)size, offset);
@@ -210,7 +210,7 @@ tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offse
     // check
     tb_assert_and_check_return_val(file && ifile && size, -1);
 
-#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
 
     // writ it
     off_t       seek = offset;
@@ -256,7 +256,7 @@ tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
     tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // read it
-#ifdef TB_CONFIG_OS_LINUX
+#ifdef TB_CONFIG_POSIX_HAVE_PREADV
     return preadv(tb_file2fd(file), (struct iovec const*)list, size, offset);
 #else
  
@@ -290,7 +290,7 @@ tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
     tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
 
     // writ it
-#ifdef TB_CONFIG_OS_LINUX
+#ifdef TB_CONFIG_POSIX_HAVE_PWRITEV
     return pwritev(tb_file2fd(file), (struct iovec const*)list, size, offset);
 #else
 
@@ -319,7 +319,7 @@ tb_bool_t tb_file_sync(tb_file_ref_t file)
     tb_assert_and_check_return_val(file, tb_false);
 
     // sync
-#ifdef TB_CONFIG_OS_LINUX
+#ifdef TB_CONFIG_POSIX_HAVE_FDATASYNC
     return !fdatasync(tb_file2fd(file))? tb_true : tb_false;
 #else
     return !fsync(tb_file2fd(file))? tb_true : tb_false;
@@ -401,7 +401,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
 
-#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
     // copy it using sendfile
     tb_bool_t       ok = tb_false;
     tb_file_ref_t   ifile = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);

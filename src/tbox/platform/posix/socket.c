@@ -39,7 +39,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/uio.h>
-#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
 #   include <sys/sendfile.h>
 #endif
 
@@ -523,7 +523,7 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
     // check
     tb_assert_and_check_return_val(sock && file && size, -1);
 
-#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#if defined(TB_CONFIG_POSIX_HAVE_SENDFILE)
 
     // send it
     off_t       seek = offset;
