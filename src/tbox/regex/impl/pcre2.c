@@ -327,17 +327,17 @@ tb_char_t const* tb_regex_replace(tb_regex_ref_t self, tb_char_t const* cstr, tb
         }
 
         // check
-        tb_assert_and_check_break(ok > 0);
+        tb_check_break(ok > 0);
         tb_assert_and_check_break(length < regex->buffer_maxn);
-
-        // trace
-        tb_trace_d("    replaced: [%lu]: %s", length, regex->buffer_data);
-
-        // save length 
-        if (plength) *plength = (tb_size_t)length;
 
         // end
         regex->buffer_data[length] = '\0';
+
+        // trace
+        tb_trace_d("    replace: [%lu]: %s", length, regex->buffer_data);
+
+        // save length 
+        if (plength) *plength = (tb_size_t)length;
 
         // ok
         result = (tb_char_t const*)regex->buffer_data;
