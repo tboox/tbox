@@ -49,6 +49,12 @@ typedef struct __tb_regex_t
     // the ovector maxn
     tb_size_t           ovector_maxn;
 
+    // the buffer data
+    tb_char_t*          buffer_data;
+
+    // the buffer maxn
+    tb_size_t           buffer_maxn;
+
 }tb_regex_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +119,11 @@ tb_void_t tb_regex_exit(tb_regex_ref_t self)
     // check
     tb_regex_t* regex = (tb_regex_t*)self;
     tb_assert_and_check_return(regex);
+
+    // exit buffer data
+    if (regex->buffer_data) tb_free(regex->buffer_data);
+    regex->buffer_data = tb_null;
+    regex->buffer_maxn = 0;
 
     // exit ovector
     if (regex->ovector_data) tb_free(regex->ovector_data);
@@ -252,11 +263,93 @@ tb_char_t const* tb_regex_replace(tb_regex_ref_t self, tb_char_t const* cstr, tb
 {
     // check
     tb_regex_t* regex = (tb_regex_t*)self;
-    tb_assert_and_check_return_val(regex && regex->code && cstr && replace_cstr, tb_null);
+    tb_assert_and_check_return_val(regex && cstr && replace_cstr, tb_null);
 
-    // noimpl
-    tb_assert_noimpl();
+    // done
+    tb_char_t const* result = tb_null;
+    do
+    {
+        // clear length first
+        if (plength) *plength = 0;
+
+        // end?
+        tb_check_break(start < size);
+
+        // init buffer
+        if (!regex->buffer_data)
+        {
+            regex->buffer_maxn = tb_max(size + replace_size + 64, 256);
+            regex->buffer_data = tb_malloc_cstr(regex->buffer_maxn);
+        }
+        tb_assert_and_check_break(regex->buffer_data);
+
+        // copy cstr
+        tb_memcpy(regex->buffer_data, cstr, size);
+        regex->buffer_data[size] = '\0';
+
+        // done
+        tb_size_t       count = 0;
+        tb_long_t       suboffset = start;
+        tb_size_t       sublength = 0;
+        tb_size_t       length = 0;
+        tb_vector_ref_t results = tb_null;
+        while ((suboffset = tb_regex_match(self, regex->buffer_data, size, suboffset + sublength, &sublength, &results)) >= 0 && results)
+        {
+            // trace
+            tb_trace_d("replace: match: [%lu, %lu]", suboffset, sublength);
+
+            // calculate substring end
+            tb_size_t subend = suboffset + sublength;
+            tb_assert_and_check_break(subend <= size);
+
+            // update length
+            length = size - sublength + replace_size;
+
+            // grow buffer
+            if (regex->buffer_maxn < length)
+            {
+                regex->buffer_maxn = tb_max(regex->buffer_maxn << 1, length);
+                regex->buffer_data = tb_ralloc_cstr(regex->buffer_data, regex->buffer_maxn + 1);
+            }
+            tb_assert_and_check_break(regex->buffer_data);
+
+            // replace this match
+            if (subend < size) tb_memmov(regex->buffer_data + suboffset + replace_size, regex->buffer_data + subend, size - subend);
+            tb_memcpy(regex->buffer_data + suboffset, replace_cstr, replace_size);
+            regex->buffer_data[length] = '\0';
+           
+            // trace
+            tb_trace_d("replace: => %s", regex->buffer_data);
+
+            // update matched count
+            count++;
+
+            // global replace?
+            tb_check_break(regex->mode & TB_REGEX_MODE_GLOBAL);
+
+            // update size
+            size        = length;
+            sublength   = replace_size;
+        }
+
+        // check
+        tb_check_break(count);
+        tb_assert_and_check_break(length < regex->buffer_maxn);
+
+        // end
+        regex->buffer_data[length] = '\0';
+
+        // trace
+        tb_trace_d("    replace: [%lu]: %s", length, regex->buffer_data);
+
+        // save length 
+        if (plength) *plength = length;
+
+        // ok
+        result = (tb_char_t const*)regex->buffer_data;
+
+    } while (0);
 
     // ok?
-    return tb_null;
+    return result;
 }
