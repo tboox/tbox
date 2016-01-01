@@ -194,40 +194,6 @@ TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac
 2. 支持全局、多行、大小写不敏感等模式
 3. 使用pcre, pcre2和posix正则库
 
-contact
--------
-
-- email:   	    
-	- waruqi@gmail.com
-	- waruqi@126.com
-- source:  	    
-	- [github](https://github.com/waruqi/tbox)
-	- [coding](https://coding.net/u/waruqi/p/tbox/git)
-	- [oschina](http://git.oschina.net/tboox/tbox)
-- website: 	    
-	- http://www.tboox.org
-	- http://www.tboox.net
-- download:
- 	- [github](https://github.com/waruqi/tbox/archive/master.zip)
- 	- [coding](https://coding.net/u/waruqi/p/tbox/git/archive/master)
- 	- [oschina](http://git.oschina.net/tboox/tbox/repository/archive?ref=master)
-- document:
-	- [github](https://github.com/waruqi/tbox/wiki/)
-	- [oschina](http://git.oschina.net/tboox/tbox/wikis/home)
-- qq(group):    
-	- 343118190
-
-donate
-------
-
-####alipay
-<img src="http://www.tboox.net/ruki/alipay.png" alt="alipay" width="128" height="128">
-
-####paypal
-<a href="http://tboox.net/%E6%8D%90%E5%8A%A9/">
-<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="paypal">
-</a>
-
 build
 -----
 
@@ -348,4 +314,36 @@ example
     }
 ```
 
+contact
+-------
 
+- email:   	    
+	- waruqi@gmail.com
+	- waruqi@126.com
+- source:  	    
+	- [github](https://github.com/waruqi/tbox)
+	- [coding](https://coding.net/u/waruqi/p/tbox/git)
+	- [oschina](http://git.oschina.net/tboox/tbox)
+- website: 	    
+	- http://www.tboox.org
+	- http://www.tboox.net
+- download:
+ 	- [github](https://github.com/waruqi/tbox/archive/master.zip)
+ 	- [coding](https://coding.net/u/waruqi/p/tbox/git/archive/master)
+ 	- [oschina](http://git.oschina.net/tboox/tbox/repository/archive?ref=master)
+- document:
+	- [github](https://github.com/waruqi/tbox/wiki/)
+	- [oschina](http://git.oschina.net/tboox/tbox/wikis/home)
+- qq(group):    
+	- 343118190
+
+donate
+------
+
+####alipay
+<img src="http://www.tboox.net/ruki/alipay.png" alt="alipay" width="128" height="128">
+
+####paypal
+<a href="http://tboox.net/%E6%8D%90%E5%8A%A9/">
+<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="paypal">
+</a>
