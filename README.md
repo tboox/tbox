@@ -3,8 +3,8 @@ The Treasure Box Library
 
 TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
 
-It includes asio, stream, network, container, algorithm, object, memory, database, string, charset, math, libc, libm, utils and other library modules.
-
+It is similar to glibc, but more simple and convenience.
+It includes asio, stream, network, container, algorithm, object, memory, database, string, charset, math, regex, libc, libm, utils and other library modules.
 
 features
 --------
@@ -292,6 +292,36 @@ example
         // print error info
         tb_trace_e("hello tbox");
 
+        // init vector
+        tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
+        if (vector)
+        {
+            // insert item
+            tb_vector_insert_tail(vector, "hello");
+            tb_vector_insert_tail(vector, "tbox");
+
+            // walk items
+            tb_for_all_if (tb_char_t const*, cstr, vector, cstr)
+            {
+                // trace
+                tb_trace_i("%s", cstr);
+            }
+
+            // find item
+            tb_size_t itor = tb_find_all(vector, "tbox");
+            if (itor != tb_iterator_tail(vector))
+            {
+                // trace
+                tb_trace_i("%s", tb_iterator_item(vector, itor));
+            }
+
+            // sort items
+            tb_sort_all(vector, tb_null);
+
+            // exit vector
+            tb_vector_exit(vector);
+        }
+
         // init stream
         tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxxx.com/index.html");
         if (stream)
@@ -306,13 +336,8 @@ example
         // block: save http to file
         tb_transfer_done_url("http://www.xxxx.com/index.html", "/home/file/index.html", 0, tb_null, tb_null);
 
-        // async: save http to file for windows path
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index3.html", "c:/home/file/index4.html", 0, 0, tb_null, tb_null, tb_null);
-
-        // async: save http to file for unix path
+        // async: save http to file 
         tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index0.html", "/home/file/index0.html", 0, 0, tb_null, tb_null, tb_null);
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index1.html", "/home/file/index2.html", 0, 0, tb_null, tb_null, tb_null);
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index2.html", "/home/file/index3.html", 0, 0, tb_null, tb_null, tb_null);
 
         // wait some time
         getchar();
