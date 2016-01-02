@@ -77,6 +77,7 @@ tb_size_t tb_url_decode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
     tb_char_t const*    oe = ob + on;
 
     // done
+    tb_char_t ch[3] = {0};
     while (ip < ie && op < oe) 
     {
         // space?
@@ -84,7 +85,9 @@ tb_size_t tb_url_decode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
         // %xx?
         else if (*ip == '%' && ip + 2 < ie && tb_isdigit16(ip[1]) && tb_isdigit16(ip[2]))
         {
-            *op = (tb_char_t)tb_s16tou32(&ip[1]);
+            ch[0] = ip[1];
+            ch[1] = ip[2];
+            *op = (tb_char_t)tb_s16tou32(ch);
             ip += 2;
         }
         else *op = *ip;
@@ -144,12 +147,15 @@ tb_size_t tb_url_decode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_si
     tb_char_t const*    oe = ob + on;
 
     // done
+    tb_char_t ch[3] = {0};
     while (ip < ie && op < oe) 
     {
         // %xx?
         if (*ip == '%' && ip + 2 < ie && tb_isdigit16(ip[1]) && tb_isdigit16(ip[2]))
         {
-            *op = (tb_char_t)tb_s16tou32(&ip[1]);
+            ch[0] = ip[1];
+            ch[1] = ip[2];
+            *op = (tb_char_t)tb_s16tou32(ch);
             ip += 2;
         }
         else *op = *ip;
