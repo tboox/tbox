@@ -1,16 +1,13 @@
-language: generic
+language: c
 
 cache:
   directories:
     - /tmp/tools
 
-before_install:
+install:
   - git clone git@github.com:waruqi/xmake.git /tmp/tools
   - chmod -R 777 /tmp/tools/xmake
   - /tmp/tools/xmake/install
-
-install:
-  - /tmp/tools/cmake --prefix="$HOME" --exclude-subdir
 
 before_script :
   - xmake f
