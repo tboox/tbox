@@ -2,7 +2,9 @@ language: c
 
 install:
   - git clone --branch=master https://github.com/waruqi/xmake.git waruqi/xmake
-  - ./waruqi/xmake/install
+  - cd ./waruqi/xmake
+  - ./install
+  - cd -
 
 before_script :
   - xmake f
