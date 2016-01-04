@@ -8,7 +8,7 @@ install:
   - cd -
 
 before_script :
-  - xmake f
+  - xmake f -c
 
 script:
-  - xmake r
+  - xmake -r
