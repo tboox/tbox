@@ -42,16 +42,16 @@ POSSIBILITY OF SUCH DAMAGE.
 /* The current PCRE version information. */
 
 #define PCRE2_MAJOR          10
-#define PCRE2_MINOR          20
+#define PCRE2_MINOR          10
 #define PCRE2_PRERELEASE     
-#define PCRE2_DATE           2015-06-30
+#define PCRE2_DATE           2015-03-06
 
 /* When an application links to a PCRE DLL in Windows, the symbols that are
 imported have to be identified as such. When building PCRE2, the appropriate
 export setting is defined in pcre2_internal.h, which includes this file. So we
 don't change existing definitions of PCRE2_EXP_DECL. */
 
-#if defined(_WIN32) && !defined(PCRE2_STATIC)
+#if 0//defined(_WIN32) && !defined(PCRE2_STATIC)
 #  ifndef PCRE2_EXP_DECL
 #    define PCRE2_EXP_DECL  extern __declspec(dllimport)
 #  endif
@@ -72,7 +72,33 @@ uint8_t, UCHAR_MAX, etc are defined. */
 
 #include <limits.h>
 #include <stdlib.h>
+#ifdef _WIN32
+typedef signed char         int8_t;
+typedef signed short        int16_t;
+typedef signed int          int32_t;
+typedef unsigned char       uint8_t;
+typedef unsigned short      uint16_t;
+typedef unsigned int        uint32_t;
+typedef signed __int64      int64_t;
+typedef unsigned __int64    uint64_t;
+typedef uint32_t            size_t;
+
+#define INT8_MIN     ((int8_t)_I8_MIN)
+#define INT8_MAX     _I8_MAX
+#define INT16_MIN    ((int16_t)_I16_MIN)
+#define INT16_MAX    _I16_MAX
+#define INT32_MIN    ((int32_t)_I32_MIN)
+#define INT32_MAX    _I32_MAX
+#define INT64_MIN    ((int64_t)_I64_MIN)
+#define INT64_MAX    _I64_MAX
+#define UINT8_MAX    _UI8_MAX
+#define UINT16_MAX   _UI16_MAX
+#define UINT32_MAX   _UI32_MAX
+#define UINT64_MAX   _UI64_MAX
+
+#else
 #include <stdint.h>
+#endif
 
 /* Allow for C++ users compiling this directly. */
 
@@ -118,8 +144,6 @@ D   is inspected during pcre2_dfa_match() execution
 #define PCRE2_UCP                 0x00020000u  /* C J M D */
 #define PCRE2_UNGREEDY            0x00040000u  /* C       */
 #define PCRE2_UTF                 0x00080000u  /* C J M D */
-#define PCRE2_NEVER_BACKSLASH_C   0x00100000u  /* C       */
-#define PCRE2_ALT_CIRCUMFLEX      0x00200000u  /*   J M D */
 
 /* These are for pcre2_jit_compile(). */
 
@@ -127,10 +151,9 @@ D   is inspected during pcre2_dfa_match() execution
 #define PCRE2_JIT_PARTIAL_SOFT    0x00000002u
 #define PCRE2_JIT_PARTIAL_HARD    0x00000004u
 
-/* These are for pcre2_match(), pcre2_dfa_match(), and pcre2_jit_match(). Note
-that PCRE2_ANCHORED and PCRE2_NO_UTF_CHECK can also be passed to these
-functions (though pcre2_jit_match() ignores the latter since it bypasses all
-sanity checks). */
+/* These are for pcre2_match() and pcre2_dfa_match(). Note that PCRE2_ANCHORED,
+and PCRE2_NO_UTF_CHECK can also be passed to these functions, so take care not
+to define synonyms by mistake. */
 
 #define PCRE2_NOTBOL              0x00000001u
 #define PCRE2_NOTEOL              0x00000002u
@@ -340,24 +363,8 @@ typedef struct pcre2_callout_block { \
   PCRE2_SIZE    current_position;  /* Where we currently are in the subject */ \
   PCRE2_SIZE    pattern_position;  /* Offset to next item in the pattern */ \
   PCRE2_SIZE    next_item_length;  /* Length of next item in the pattern */ \
-  /* ------------------- Added for Version 1 -------------------------- */ \
-  PCRE2_SIZE    callout_string_offset; /* Offset to string within pattern */ \
-  PCRE2_SIZE    callout_string_length; /* Length of string compiled into pattern */ \
-  PCRE2_SPTR    callout_string;    /* String compiled into pattern */ \
   /* ------------------------------------------------------------------ */ \
-} pcre2_callout_block; \
-\
-typedef struct pcre2_callout_enumerate_block { \
-  uint32_t      version;           /* Identifies version of block */ \
-  /* ------------------------ Version 0 ------------------------------- */ \
-  PCRE2_SIZE    pattern_position;  /* Offset to next item in the pattern */ \
-  PCRE2_SIZE    next_item_length;  /* Length of next item in the pattern */ \
-  uint32_t      callout_number;    /* Number compiled into pattern */ \
-  PCRE2_SIZE    callout_string_offset; /* Offset to string within pattern */ \
-  PCRE2_SIZE    callout_string_length; /* Length of string compiled into pattern */ \
-  PCRE2_SPTR    callout_string;    /* String compiled into pattern */ \
-  /* ------------------------------------------------------------------ */ \
-} pcre2_callout_enumerate_block;
+} pcre2_callout_block;
 
 
 /* List the generic forms of all other functions in macros, which will be
@@ -425,9 +432,6 @@ PCRE2_EXP_DECL void      pcre2_code_free(pcre2_code *);
 
 #define PCRE2_PATTERN_INFO_FUNCTIONS \
 PCRE2_EXP_DECL int       pcre2_pattern_info(const pcre2_code *, uint32_t, \
-                           void *); \
-PCRE2_EXP_DECL int       pcre2_callout_enumerate(const pcre2_code *, \
-                           int (*)(pcre2_callout_enumerate_block *, void *), \
                            void *);
 
 
@@ -556,17 +560,15 @@ pcre2_compile are called by application code. */
 
 /* Data blocks */
 
-#define pcre2_callout_block            PCRE2_SUFFIX(pcre2_callout_block_)
-#define pcre2_callout_enumerate_block  PCRE2_SUFFIX(pcre2_callout_enumerate_block_)
-#define pcre2_general_context          PCRE2_SUFFIX(pcre2_general_context_)
-#define pcre2_compile_context          PCRE2_SUFFIX(pcre2_compile_context_)
-#define pcre2_match_context            PCRE2_SUFFIX(pcre2_match_context_)
-#define pcre2_match_data               PCRE2_SUFFIX(pcre2_match_data_)
+#define pcre2_callout_block         PCRE2_SUFFIX(pcre2_callout_block_)
+#define pcre2_general_context       PCRE2_SUFFIX(pcre2_general_context_)
+#define pcre2_compile_context       PCRE2_SUFFIX(pcre2_compile_context_)
+#define pcre2_match_context         PCRE2_SUFFIX(pcre2_match_context_)
+#define pcre2_match_data            PCRE2_SUFFIX(pcre2_match_data_)
 
 
 /* Functions: the complete list in alphabetical order */
 
-#define pcre2_callout_enumerate               PCRE2_SUFFIX(pcre2_callout_enumerate_)
 #define pcre2_code_free                       PCRE2_SUFFIX(pcre2_code_free_)
 #define pcre2_compile                         PCRE2_SUFFIX(pcre2_compile_)
 #define pcre2_compile_context_copy            PCRE2_SUFFIX(pcre2_compile_context_copy_)
@@ -574,6 +576,7 @@ pcre2_compile are called by application code. */
 #define pcre2_compile_context_free            PCRE2_SUFFIX(pcre2_compile_context_free_)
 #define pcre2_config                          PCRE2_SUFFIX(pcre2_config_)
 #define pcre2_dfa_match                       PCRE2_SUFFIX(pcre2_dfa_match_)
+#define pcre2_match                           PCRE2_SUFFIX(pcre2_match_)
 #define pcre2_general_context_copy            PCRE2_SUFFIX(pcre2_general_context_copy_)
 #define pcre2_general_context_create          PCRE2_SUFFIX(pcre2_general_context_create_)
 #define pcre2_general_context_free            PCRE2_SUFFIX(pcre2_general_context_free_)
@@ -589,7 +592,6 @@ pcre2_compile are called by application code. */
 #define pcre2_jit_stack_create                PCRE2_SUFFIX(pcre2_jit_stack_create_)
 #define pcre2_jit_stack_free                  PCRE2_SUFFIX(pcre2_jit_stack_free_)
 #define pcre2_maketables                      PCRE2_SUFFIX(pcre2_maketables_)
-#define pcre2_match                           PCRE2_SUFFIX(pcre2_match_)
 #define pcre2_match_context_copy              PCRE2_SUFFIX(pcre2_match_context_copy_)
 #define pcre2_match_context_create            PCRE2_SUFFIX(pcre2_match_context_create_)
 #define pcre2_match_context_free              PCRE2_SUFFIX(pcre2_match_context_free_)
