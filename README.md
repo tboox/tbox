@@ -1,4 +1,4 @@
-The Treasure Box Library
+The Treasure Box Library [![Build Status](https://api.travis-ci.org/waruqi/tbox.svg)](https://api.travis-ci.org/waruqi)
 ========================
 
 TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
