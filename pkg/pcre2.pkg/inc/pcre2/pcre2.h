@@ -51,11 +51,11 @@ imported have to be identified as such. When building PCRE2, the appropriate
 export setting is defined in pcre2_internal.h, which includes this file. So we
 don't change existing definitions of PCRE2_EXP_DECL. */
 
-#if 0//defined(_WIN32) && !defined(PCRE2_STATIC)
+/*#if defined(_WIN32) && !defined(PCRE2_STATIC)
 #  ifndef PCRE2_EXP_DECL
 #    define PCRE2_EXP_DECL  extern __declspec(dllimport)
 #  endif
-#endif
+#endif*/
 
 /* By default, we use the standard "extern" declarations. */
 
