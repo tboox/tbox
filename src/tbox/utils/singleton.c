@@ -165,7 +165,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
     {
         // try getting it
         tb_size_t tryn = 50;
-        while ((instance = (tb_handle_t)tb_atomic_get(&g_singletons[type].instance)) && (instance != (tb_handle_t)1) && tryn--)
+        while ((instance = (tb_handle_t)tb_atomic_get(&g_singletons[type].instance)) && (instance == (tb_handle_t)1) && tryn--)
         {
             // wait some time
             tb_msleep(100);
@@ -206,7 +206,7 @@ tb_bool_t tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, t
     {
         // try getting it
         tb_size_t tryn = 50;
-        while ((1 != tb_atomic_get(binited)) && tryn--)
+        while ((1 == tb_atomic_get(binited)) && tryn--)
         {
             // wait some time
             tb_msleep(100);

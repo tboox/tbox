@@ -71,12 +71,6 @@
 // the pool data debug head type
 typedef __tb_pool_data_aligned__ struct __tb_pool_data_debug_head_t
 {
-    // the magic
-    tb_uint16_t                 magic;
-
-    // the line 
-    tb_uint16_t                 line;
-
     // the file
     tb_char_t const*            file;
 
@@ -85,6 +79,15 @@ typedef __tb_pool_data_aligned__ struct __tb_pool_data_debug_head_t
 
     // the backtrace frames
     tb_pointer_t                backtrace[16];
+
+    // the line 
+    tb_uint16_t                 line;
+
+    /* the magic
+     *
+     * @note the address may be not accessed if we place the magic to head.
+     */
+    tb_uint16_t                 magic;
 
 }__tb_pool_data_aligned__ tb_pool_data_debug_head_t;
 #endif
