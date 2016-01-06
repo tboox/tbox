@@ -402,7 +402,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
         tb_assert_and_check_break(impl && impl->semaphore);
 
         // wait some time for leaving the lock
-        tb_msleep((worker->id + 1)* 20);
+        tb_msleep((worker->id + 1) * 20);
 
         // init jobs
         worker->jobs = tb_vector_init(TB_THREAD_POOL_JOBS_WORKING_GROW, tb_element_ptr(tb_null, tb_null));
