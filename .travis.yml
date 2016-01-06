@@ -1,5 +1,5 @@
 sudo: required
-language: c
+language: C
 os:
   - linux
   - osx
@@ -13,18 +13,17 @@ install:
 script:
   - xmake  
   - xmake f -m debug
-  - xmake 
+  - xmake -j 4
+  - xmake p
+  - xmake c
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake f -p iphoneos;
       xmake;
       xmake f -m debug;
-      xmake; 
-      xmake f -a arm64;
-      xmake;
-      xmake f -m debug;
-      xmake;
+      xmake -j 4;
+      xmake p -a "armv7,armv7s,arm64"
       xmake f -p iphonesimulator;
       xmake;
       xmake f -m debug;
-      xmake; 
+      xmake -j 4; 
     fi
