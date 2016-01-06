@@ -1,5 +1,8 @@
 sudo: required
 language: c
+os:
+  - linux
+  - osx
 
 install:
   - git clone --branch=master https://github.com/waruqi/xmake.git waruqi/xmake
@@ -8,7 +11,20 @@ install:
   - cd -
 
 script:
-  - xmake f -c
-  - xmake -r
+  - xmake  
   - xmake f -m debug
-  - xmake -r
+  - xmake 
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      xmake f -p iphoneos
+      xmake 
+      xmake f -m debug
+      xmake 
+      xmake f -a arm64
+      xmake 
+      xmake f -m debug
+      xmake 
+      xmake f -p iphonesimulator
+      xmake 
+      xmake f -m debug
+      xmake 
+    fi
