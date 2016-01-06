@@ -21,7 +21,7 @@ script:
       xmake;
       xmake f -m debug;
       xmake -j 4;
-      xmake p -a "armv7,armv7s,arm64"
+      xmake p -a "armv7,armv7s,arm64";
       xmake f -p iphonesimulator;
       xmake;
       xmake f -m debug;
