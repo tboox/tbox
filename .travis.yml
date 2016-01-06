@@ -1,10 +1,6 @@
 sudo: required
 language: c
 
-addons:
-    code_climate:
-        repo_token: 8200c290fad544ca8f488c4dcbfa949686f3715392c0137fb85107859edeaeeb
-
 install:
   - git clone --branch=master https://github.com/waruqi/xmake.git waruqi/xmake
   - cd ./waruqi/xmake
