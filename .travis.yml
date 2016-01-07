@@ -7,7 +7,7 @@ os:
 install:
   - git clone --branch=master https://github.com/waruqi/xmake.git waruqi/xmake
   - cd ./waruqi/xmake
-  - ./install
+  - sudo ./install
   - cd -
 
 script:
