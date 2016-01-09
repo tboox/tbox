@@ -58,6 +58,10 @@ script:
       xmake r demo utils_md5 hello;
       xmake r demo utils_sha hello;
       xmake r demo utils_bits;
+      xmake r demo platform_ifaddrs;
+      xmake r demo platform_hostname;
+      xmake r demo platform_backtrace;
+      xmake r demo platform_thread_pool;
     fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake f -p iphoneos;
