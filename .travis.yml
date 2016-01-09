@@ -28,40 +28,40 @@ script:
       xmake -r -j 4;
       xmake f -m coverage;
       xmake -r -j 4;
-      xmake r demo stream http://tboox.net /tmp/a;
-      xmake r demo stream_async_stream http://www.tboox.org /tmp/a;
-      xmake r demo regex;
-      xmake r demo network_url;
-      xmake r demo network_cookies;
-      xmake r demo libm_float;
-      xmake r demo libm_double;
-      xmake r demo math_fixed;
-      xmake r demo libc_time;
-      xmake r demo libc_wchar;
-      xmake r demo libc_stdlib;
-      xmake r demo libc_string;
-      xmake r demo algorithm_find;
-      xmake r demo algorithm_sort;
-      xmake r demo container_list;
-      xmake r demo container_heap;
-      xmake r demo container_queue;
-      xmake r demo container_vector;
-      xmake r demo container_hash_map;
-      xmake r demo object_dump ./res/object.xml;
-      xmake r demo object_dump ./res/object.bin;
-      xmake r demo object_dump ./res/object.json;
-      xmake r demo object_dump ./res/object.bplist;
-      xmake r demo object_dump ./res/object.xplist;
-      xmake r demo database_sql /tmp/sqlite3.db;
-      xmake r demo utils_dump /tmp/sqlite3.db;
-      xmake r demo utils_crc hello;
-      xmake r demo utils_md5 hello;
-      xmake r demo utils_sha hello;
-      xmake r demo utils_bits;
-      xmake r demo platform_ifaddrs;
-      xmake r demo platform_hostname;
-      xmake r demo platform_backtrace;
-      xmake r demo platform_thread_pool;
+      xmake r demo stream http://tboox.net /tmp/a > ./error.txt;
+      xmake r demo stream_async_stream http://www.tboox.org /tmp/a > ./error.txt;
+      xmake r demo regex > ./error.txt;
+      xmake r demo network_url > ./error.txt;
+      xmake r demo network_cookies > ./error.txt;
+      xmake r demo libm_float > ./error.txt;
+      xmake r demo libm_double > ./error.txt;
+      xmake r demo math_fixed > ./error.txt;
+      xmake r demo libc_time > ./error.txt;
+      xmake r demo libc_wchar > ./error.txt;
+      xmake r demo libc_stdlib > ./error.txt;
+      xmake r demo libc_string > ./error.txt;
+      xmake r demo algorithm_find > ./error.txt;
+      xmake r demo algorithm_sort > ./error.txt;
+      xmake r demo container_list > ./error.txt;
+      xmake r demo container_heap > ./error.txt;
+      xmake r demo container_queue > ./error.txt;
+      xmake r demo container_vector > ./error.txt;
+      xmake r demo container_hash_map > ./error.txt;
+      xmake r demo object_dump ./res/object.xml > ./error.txt;
+      xmake r demo object_dump ./res/object.bin > ./error.txt;
+      xmake r demo object_dump ./res/object.json > ./error.txt;
+      xmake r demo object_dump ./res/object.bplist > ./error.txt;
+      xmake r demo object_dump ./res/object.xplist > ./error.txt;
+      xmake r demo database_sql /tmp/sqlite3.db > ./error.txt;
+      xmake r demo utils_dump /tmp/sqlite3.db > ./error.txt;
+      xmake r demo utils_crc hello > ./error.txt;
+      xmake r demo utils_md5 hello > ./error.txt;
+      xmake r demo utils_sha hello > ./error.txt;
+      xmake r demo utils_bits > ./error.txt;
+      xmake r demo platform_ifaddrs > ./error.txt;
+      xmake r demo platform_hostname > ./error.txt;
+      xmake r demo platform_backtrace > ./error.txt;
+      xmake r demo platform_thread_pool > ./error.txt;
     fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake f -p iphoneos;
@@ -82,3 +82,6 @@ after_success:
       lcov --list coverage.info;
       coveralls-lcov --repo-token ET46Ov7RFtlE1YB13eVq0fWtJg1iY9dXx coverage.info;
     fi
+
+after_failure:
+  - cat ./error.txt
