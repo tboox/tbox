@@ -25,9 +25,9 @@ script:
   - xmake c
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       xmake f -m profile;
-      xmake;
+      xmake -r -j 4;
       xmake f -m coverage;
-      xmake; 
+      xmake -r -j 4;
       xmake r demo stream http://tboox.net /tmp/a;
       xmake r demo stream_async_stream http://www.tboox.org /tmp/a;
       xmake r demo regex;
@@ -48,17 +48,25 @@ script:
       xmake r demo container_vector;
       xmake r demo container_hash_map;
       xmake r demo object_dump ./res/object.xml;
+      xmake r demo object_dump ./res/object.bin;
       xmake r demo object_dump ./res/object.json;
+      xmake r demo object_dump ./res/object.bplist;
+      xmake r demo object_dump ./res/object.xplist;
       xmake r demo database_sql /tmp/sqlite3.db;
+      xmake r demo utils_dump /tmp/sqlite3.db;
+      xmake r demo utils_crc hello;
+      xmake r demo utils_md5 hello;
+      xmake r demo utils_sha hello;
+      xmake r demo utils_bits;
     fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake f -p iphoneos;
       xmake;
       xmake f -m debug;
-      xmake -j 4;
+      xmake -r -j 4;
       xmake p -a "armv7,armv7s,arm64";
       xmake f -p iphonesimulator;
-      xmake;
+      xmake -r -j 4;
       xmake f -m debug;
       xmake -j 4; 
     fi
