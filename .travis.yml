@@ -11,11 +11,20 @@ install:
   - cd -
 
 script:
-  - xmake  
+  - xmake 
+  - xmake r demo
   - xmake f -m debug
   - xmake -j 4
+  - xmake r demo
   - xmake p
   - xmake c
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      xmake f -m profile;
+      xmake;
+      xmake f -m coverage;
+      xmake; 
+      xmake r demo;
+    fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake f -p iphoneos;
       xmake;
