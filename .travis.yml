@@ -10,7 +10,7 @@ install:
   - sudo ./install
   - cd -
   - git clone https://github.com/linux-test-project/lcov.git
-  - make -C ./lcov install
+  - sudo make -C ./lcov install
   - gem install coveralls-lcov
 
 script:
