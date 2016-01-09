@@ -9,9 +9,11 @@ install:
   - cd ./waruqi/xmake
   - sudo ./install
   - cd -
-  - git clone https://github.com/linux-test-project/lcov.git
-  - sudo make -C ./lcov install
-  - gem install coveralls-lcov
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      git clone https://github.com/linux-test-project/lcov.git;
+      sudo make -C ./lcov install;
+      gem install coveralls-lcov;
+    fi
 
 script:
   - xmake 
