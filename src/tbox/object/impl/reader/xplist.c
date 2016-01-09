@@ -584,7 +584,7 @@ static tb_size_t tb_object_xplist_reader_probe(tb_stream_ref_t stream)
         tb_assert_and_check_return_val(p, 5);
 
         // is xplist?
-        return tb_stristr((tb_char_t const*)p, "DOCTYPE plist")? 80 : 10;
+        return tb_strnistr((tb_char_t const*)p, 256, "DOCTYPE plist")? 80 : 10;
     }
 
     // ok?
