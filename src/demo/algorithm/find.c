@@ -9,7 +9,7 @@
 static tb_void_t tb_find_int_test()
 {
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 10000;
+    __tb_volatile__ tb_size_t n = 1000;
 
     // init data
     tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
@@ -25,14 +25,14 @@ static tb_void_t tb_find_int_test()
     // find
     tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_find_all(iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_find_all(iterator, (tb_pointer_t)data[800]);
     time = tb_mclock() - time;
 
     // item
     tb_long_t item = itor != tb_iterator_tail(iterator)? (tb_long_t)tb_iterator_item(iterator, itor) : 0;
 
     // time
-    tb_trace_i("tb_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
+    tb_trace_i("tb_find_int_all[%ld ?= %ld]: %lld ms", item, data[800], time);
 
     // free
     tb_free(data);
@@ -40,7 +40,7 @@ static tb_void_t tb_find_int_test()
 static tb_void_t tb_find_int_test_binary()
 {
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 10000;
+    __tb_volatile__ tb_size_t n = 1000;
 
     // init data
     tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
@@ -56,14 +56,14 @@ static tb_void_t tb_find_int_test_binary()
     // find
     tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_binary_find_all(iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_binary_find_all(iterator, (tb_pointer_t)data[800]);
     time = tb_mclock() - time;
 
     // item
     tb_long_t item = itor != tb_iterator_tail(iterator)? (tb_long_t)tb_iterator_item(iterator, itor) : 0;
 
     // time
-    tb_trace_i("tb_binary_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
+    tb_trace_i("tb_binary_find_int_all[%ld ?= %ld]: %lld ms", item, data[800], time);
 
     // free
     tb_free(data);
@@ -71,7 +71,7 @@ static tb_void_t tb_find_int_test_binary()
 static tb_void_t tb_find_str_test()
 {
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 10000;
+    __tb_volatile__ tb_size_t n = 1000;
 
     // init data
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
@@ -93,14 +93,14 @@ static tb_void_t tb_find_str_test()
     // find
     tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_find_all(iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_find_all(iterator, (tb_pointer_t)data[800]);
     time = tb_mclock() - time;
 
     // item
     tb_char_t* item = itor != tb_iterator_tail(iterator)? (tb_char_t*)tb_iterator_item(iterator, itor) : 0;
 
     // time
-    tb_trace_i("tb_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
+    tb_trace_i("tb_find_str_all[%s ?= %s]: %lld ms", item, data[800], time);
 
     // free data
     for (i = 0; i < n; i++) tb_free(data[i]);
@@ -109,7 +109,7 @@ static tb_void_t tb_find_str_test()
 static tb_void_t tb_find_str_test_binary()
 {
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 10000;
+    __tb_volatile__ tb_size_t n = 1000;
 
     // init data
     tb_char_t** data = (tb_char_t**)tb_nalloc0(n, sizeof(tb_char_t*));
@@ -131,14 +131,14 @@ static tb_void_t tb_find_str_test_binary()
     // find
     tb_size_t itor = tb_iterator_tail(iterator);
     tb_hong_t time = tb_mclock();
-    for (i = 0; i < n; i++) itor = tb_binary_find_all(iterator, (tb_pointer_t)data[8000]);
+    for (i = 0; i < n; i++) itor = tb_binary_find_all(iterator, (tb_pointer_t)data[800]);
     time = tb_mclock() - time;
 
     // item
     tb_char_t* item = itor != tb_iterator_tail(iterator)? (tb_char_t*)tb_iterator_item(iterator, itor) : 0;
 
     // time
-    tb_trace_i("tb_binary_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
+    tb_trace_i("tb_binary_find_str_all[%s ?= %s]: %lld ms", item, data[800], time);
 
     // free data
     for (i = 0; i < n; i++) tb_free(data[i]);

@@ -501,16 +501,16 @@ tb_int_t tb_demo_algorithm_sort_main(tb_int_t argc, tb_char_t** argv)
     tb_sort_int_test_func_insert();
 
     // perf
-    tb_sort_int_test_perf(10000);
-    tb_sort_int_test_perf_heap(10000);
-    tb_sort_int_test_perf_quick(10000);
-    tb_sort_int_test_perf_bubble(10000);
-    tb_sort_int_test_perf_insert(10000);
-    tb_sort_str_test_perf(10000);
-    tb_sort_str_test_perf_heap(10000);
-    tb_sort_str_test_perf_quick(10000);
-    tb_sort_str_test_perf_bubble(10000);
-    tb_sort_str_test_perf_insert(10000);
+    tb_sort_int_test_perf(1000);
+    tb_sort_int_test_perf_heap(1000);
+    tb_sort_int_test_perf_quick(1000);
+    tb_sort_int_test_perf_bubble(1000);
+    tb_sort_int_test_perf_insert(1000);
+    tb_sort_str_test_perf(1000);
+    tb_sort_str_test_perf_heap(1000);
+    tb_sort_str_test_perf_quick(1000);
+    tb_sort_str_test_perf_bubble(1000);
+    tb_sort_str_test_perf_insert(1000);
 
     return 0;
 }
