@@ -43,32 +43,21 @@ if modes("debug") then
     end
 end
 
--- the release or profile modes
-if modes("release", "profile") then
+-- the release mode
+if modes("release") then
 
-    -- the release mode
-    if modes("release") then
-        
-        -- set the symbols visibility: hidden
-        set_symbols("hidden")
+    -- set the symbols visibility: hidden
+    set_symbols("hidden")
 
-        -- strip all symbols
-        set_strip("all")
+    -- strip all symbols
+    set_strip("all")
 
-        -- fomit the frame pointer
-        add_cxflags("-fomit-frame-pointer")
-        add_mxflags("-fomit-frame-pointer")
-
-    -- the profile mode
-    else
-    
-        -- enable the debug symbols
-        set_symbols("debug")
-
-    end
+    -- fomit the frame pointer
+    add_cxflags("-fomit-frame-pointer")
+    add_mxflags("-fomit-frame-pointer")
 
     -- for pc
-    if archs("i386", "x86_64") then
+    if archs("i386", "x86_64") or plats("windows") then
  
         -- enable fastest optimization
         set_optimize("fastest")
@@ -81,6 +70,47 @@ if modes("release", "profile") then
 
     -- attempt to add vector extensions 
     add_vectorexts("sse2", "sse3", "ssse3", "mmx")
+end
+
+-- the profile mode
+if modes("profile") then
+
+    -- enable the debug symbols
+    set_symbols("debug")
+
+    -- for pc
+    if archs("i386", "x86_64") or plats("windows") then
+ 
+        -- enable fastest optimization
+        set_optimize("fastest")
+
+    -- for embed
+    else
+        -- enable smallest optimization
+        set_optimize("smallest")
+    end
+
+    -- enable gprof
+    add_cxflags("-pg")
+    add_ldflags("-pg")
+
+    -- attempt to add vector extensions 
+    add_vectorexts("sse2", "sse3", "ssse3", "mmx")
+end
+
+-- the coverage mode
+if modes("coverage") then
+    
+    -- enable the debug symbols
+    set_symbols("debug")
+
+    -- disable optimization
+    set_optimize("none")
+
+    -- enable coverage
+    add_cxflags("--coverage")
+    add_mxflags("--coverage")
+    add_ldflags("--coverage")
 end
 
 -- for embed
