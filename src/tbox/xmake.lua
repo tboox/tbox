@@ -255,6 +255,8 @@ add_target("tbox")
                                                                         "powf",
                                                                         "fmod",
                                                                         "fmodf",
+                                                                        "tan",
+                                                                        "tanf",
                                                                         "atan",
                                                                         "atanf",
                                                                         "atan2",

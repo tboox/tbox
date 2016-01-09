@@ -28,7 +28,29 @@ script:
       xmake;
       xmake f -m coverage;
       xmake; 
-      xmake r demo;
+      xmake r demo stream http://tboox.net /tmp/a;
+      xmake r demo stream_transfer_pool http://www.tboox.org /tmp/a /tmp/b /tmp/c /tmp/d /tmp/e /tmp/f /tmp/g /tmp/h;
+      xmake r demo regex;
+      xmake r demo network_url;
+      xmake r demo network_cookies;
+      xmake r demo libm_float;
+      xmake r demo libm_double;
+      xmake r demo math_fixed;
+      xmake r demo math_fixed;
+      xmake r demo libc_time;
+      xmake r demo libc_wchar;
+      xmake r demo libc_stdlib;
+      xmake r demo libc_string;
+      xmake r demo algorithm_find;
+      xmake r demo algorithm_sort;
+      xmake r demo container_list;
+      xmake r demo container_heap;
+      xmake r demo container_queue;
+      xmake r demo container_vector;
+      xmake r demo container_hash_map;
+      xmake r demo object_dump ./res/object.xml;
+      xmake r demo object_dump ./res/object.json;
+      xmake r demo database_sql /tmp/sqlite3.db;
     fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake f -p iphoneos;
