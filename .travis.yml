@@ -36,7 +36,6 @@ script:
       xmake r demo libm_float;
       xmake r demo libm_double;
       xmake r demo math_fixed;
-      xmake r demo math_fixed;
       xmake r demo libc_time;
       xmake r demo libc_wchar;
       xmake r demo libc_stdlib;

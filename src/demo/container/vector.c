@@ -19,7 +19,7 @@ static tb_size_t tb_vector_insert_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 100000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_insert_prev(vector, tb_vector_size(vector) >> 1, (tb_pointer_t)0xf);
     t = tb_mclock() - t;
@@ -48,7 +48,7 @@ static tb_size_t tb_vector_insert_head_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 100000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_insert_head(vector, (tb_pointer_t)0xf);
     t = tb_mclock() - t;
@@ -77,7 +77,7 @@ static tb_size_t tb_vector_insert_tail_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 1000000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_insert_tail(vector, (tb_pointer_t)0xf);
     t = tb_mclock() - t;
@@ -108,7 +108,7 @@ static tb_size_t tb_vector_ninsert_test()
     // insert one first
     tb_vector_insert_head(vector, (tb_pointer_t)0xf);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
     tb_vector_ninsert_prev(vector, 1, (tb_pointer_t)0xf, n);
     t = tb_mclock() - t;
@@ -136,7 +136,7 @@ static tb_size_t tb_vector_ninsert_head_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     t = tb_mclock() - t;
@@ -164,7 +164,7 @@ static tb_size_t tb_vector_ninsert_tail_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
     tb_vector_ninsert_tail(vector, (tb_pointer_t)0xf, n);
     t = tb_mclock() - t;
@@ -194,7 +194,7 @@ static tb_size_t tb_vector_remove_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 100000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_remove(vector, tb_vector_size(vector) >> 1);
@@ -218,7 +218,7 @@ static tb_size_t tb_vector_remove_head_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 100000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_remove_head(vector);
@@ -242,7 +242,7 @@ static tb_size_t tb_vector_remove_last_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 1000000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_remove_last(vector);
@@ -265,7 +265,7 @@ static tb_size_t tb_vector_nremove_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_vector_nremove(vector, tb_iterator_head(vector), n);
@@ -288,7 +288,7 @@ static tb_size_t tb_vector_nremove_head_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_vector_nremove_head(vector, n);
@@ -311,7 +311,7 @@ static tb_size_t tb_vector_nremove_last_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_vector_nremove_last(vector, n);
@@ -334,7 +334,7 @@ static tb_size_t tb_vector_replace_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     __tb_volatile__ tb_size_t itor = tb_iterator_head(vector);
     __tb_volatile__ tb_size_t tail = tb_iterator_tail(vector);
@@ -362,7 +362,7 @@ static tb_size_t tb_vector_replace_head_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 1000000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_replace_head(vector, (tb_pointer_t)0xd);
@@ -387,7 +387,7 @@ static tb_size_t tb_vector_replace_last_test()
     tb_assert_and_check_return_val(vector, 0);
 
     __tb_volatile__ tb_size_t i = 0;
-    __tb_volatile__ tb_size_t n = 1000000;
+    __tb_volatile__ tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_vector_replace_last(vector, (tb_pointer_t)0xd);
@@ -412,7 +412,7 @@ static tb_size_t tb_vector_nreplace_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_vector_nreplace(vector, tb_iterator_head(vector), (tb_pointer_t)0xd, n);
@@ -437,7 +437,7 @@ static tb_size_t tb_vector_nreplace_head_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_vector_nreplace_head(vector, (tb_pointer_t)0xd, n);
@@ -462,7 +462,7 @@ static tb_size_t tb_vector_nreplace_last_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_vector_nreplace_last(vector, (tb_pointer_t)0xd, n);
@@ -489,7 +489,7 @@ static tb_size_t tb_vector_iterator_next_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_for_all (tb_char_t*, item, vector) tb_used(item);
@@ -509,7 +509,7 @@ static tb_size_t tb_vector_iterator_prev_test()
     tb_vector_ref_t vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return_val(vector, 0);
 
-    tb_size_t n = 1000000;
+    tb_size_t n = 10000;
     tb_vector_ninsert_head(vector, (tb_pointer_t)0xf, n);
     tb_hong_t t = tb_mclock();
     tb_rfor_all (tb_char_t*, item, vector) tb_used(item);
@@ -754,7 +754,7 @@ static tb_void_t tb_vector_test_itor_perf()
     tb_random_clear(tb_null);
 
     // add items
-    __tb_volatile__ tb_size_t n = 100000;
+    __tb_volatile__ tb_size_t n = 10000;
     while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_range(tb_null, 0, TB_MAXU32)); 
 
     // done
@@ -812,7 +812,7 @@ static tb_void_t tb_vector_test_walk_perf()
     tb_random_clear(tb_null);
 
     // add items
-    __tb_volatile__ tb_size_t n = 100000;
+    __tb_volatile__ tb_size_t n = 10000;
     while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_range(tb_null, 0, TB_MAXU32)); 
 
     // done

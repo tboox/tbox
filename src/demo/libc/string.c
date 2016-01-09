@@ -15,7 +15,7 @@
  */
 static tb_void_t tb_test_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 {
-    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   n = 1000000;
     __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
@@ -27,7 +27,7 @@ static tb_void_t tb_test_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 }
 static tb_void_t tb_test_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t size)
 {
-    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   n = 1000000;
     __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
@@ -39,7 +39,7 @@ static tb_void_t tb_test_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_si
 }
 static tb_void_t tb_test_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 {
-    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   n = 1000000;
     __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
@@ -51,7 +51,7 @@ static tb_void_t tb_test_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 }
 static tb_void_t tb_test_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t size)
 {
-    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   n = 1000000;
     __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
@@ -63,7 +63,7 @@ static tb_void_t tb_test_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_s
 }
 static tb_void_t tb_test_strlen(tb_char_t const* s)
 {
-    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   n = 1000000;
     __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
@@ -75,7 +75,7 @@ static tb_void_t tb_test_strlen(tb_char_t const* s)
 }
 static tb_void_t tb_test_strnlen(tb_char_t const* s, tb_size_t size)
 {
-    __tb_volatile__ tb_long_t   n = 100000000;
+    __tb_volatile__ tb_long_t   n = 1000000;
     __tb_volatile__ tb_long_t   r = 0;
     tb_hong_t t = tb_mclock();
     while (n--)
@@ -87,7 +87,7 @@ static tb_void_t tb_test_strnlen(tb_char_t const* s, tb_size_t size)
 }
 static tb_void_t tb_test_strcpy(tb_char_t const* s2)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
+    __tb_volatile__ tb_int_t    n = 1000000;
     tb_char_t s1[4096];
     tb_hong_t t = tb_mclock();
     while (n--)
@@ -99,7 +99,7 @@ static tb_void_t tb_test_strcpy(tb_char_t const* s2)
 }
 static tb_void_t tb_test_strncpy(tb_char_t const* s2, tb_size_t size)
 {
-    __tb_volatile__ tb_int_t    n = 100000000;
+    __tb_volatile__ tb_int_t    n = 1000000;
     tb_char_t s1[4096];
     tb_hong_t t = tb_mclock();
     while (n--)
