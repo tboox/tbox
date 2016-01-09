@@ -29,7 +29,7 @@ script:
       xmake f -m coverage;
       xmake; 
       xmake r demo stream http://tboox.net /tmp/a;
-      xmake r demo stream_transfer_pool http://www.tboox.org /tmp/a /tmp/b /tmp/c /tmp/d /tmp/e /tmp/f /tmp/g /tmp/h;
+      xmake r demo async_stream http://www.tboox.org /tmp/a;
       xmake r demo regex;
       xmake r demo network_url;
       xmake r demo network_cookies;
