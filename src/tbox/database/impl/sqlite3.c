@@ -832,7 +832,7 @@ tb_size_t tb_database_sqlite3_probe(tb_url_ref_t url)
 
         // read head
         tb_char_t head[16] = {0};
-        if (!tb_stream_bread(stream, (tb_byte_t*)head, sizeof(head))) break;
+        if (!tb_stream_bread(stream, (tb_byte_t*)head, 15)) break;
 
         // is sqlite3?
         if (!tb_stricmp(head, "SQLite format 3")) score = 100;
