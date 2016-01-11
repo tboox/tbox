@@ -1142,7 +1142,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_
     while ((TB_STATE_OPENED == tb_atomic_get(&impl->istate)))
     {
         // read char
-        ch = tb_stream_bread_s8(stream);
+        if (!tb_stream_bread(stream, (tb_byte_t*)&ch, 1)) break;
 
         // is line?
         if (ch == '\n') 
@@ -1160,7 +1160,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_
         {
             if ((p - data) < size - 1) *p++ = ch;
 
-            // no data?
+            // line end?
             if (!ch) break;
         }
     }
