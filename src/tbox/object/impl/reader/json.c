@@ -123,7 +123,7 @@ static tb_object_ref_t tb_object_json_reader_func_array(tb_object_json_reader_t*
     while (ok && tb_stream_left(reader->stream)) 
     {
         // read one character
-        ch = tb_stream_bread_s8(reader->stream);
+        if (!tb_stream_bread_s8(reader->stream, (tb_sint8_t*)&ch)) break;
 
         // end?
         if (ch == ']') break;
@@ -168,7 +168,7 @@ static tb_object_ref_t tb_object_json_reader_func_string(tb_object_json_reader_t
     while (tb_stream_left(reader->stream)) 
     {
         // read one character
-        ch = tb_stream_bread_s8(reader->stream);
+        if (!tb_stream_bread_s8(reader->stream, (tb_sint8_t*)&ch)) break;
 
         // end?
         if (ch == '\"' || ch == '\'') break;
@@ -176,17 +176,15 @@ static tb_object_ref_t tb_object_json_reader_func_string(tb_object_json_reader_t
         else if (ch == '\\')
         {
             // read one character
-            ch = tb_stream_bread_s8(reader->stream);
+            if (!tb_stream_bread_s8(reader->stream, (tb_sint8_t*)&ch)) break;
+
             // unicode?
             if (ch == 'u')
             {
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
                 // the unicode string
                 tb_char_t unicode_str[5];
-                unicode_str[0] = tb_stream_bread_s8(reader->stream);
-                unicode_str[1] = tb_stream_bread_s8(reader->stream);
-                unicode_str[2] = tb_stream_bread_s8(reader->stream);
-                unicode_str[3] = tb_stream_bread_s8(reader->stream);
+                if (!tb_stream_bread(reader->stream, (tb_byte_t*)unicode_str, 4)) break;
                 unicode_str[4] = '\0';
 
                 // the unicode value
@@ -417,7 +415,7 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
     while (ok && tb_stream_left(reader->stream)) 
     {
         // read one character
-        ch = tb_stream_bread_s8(reader->stream);
+        if (!tb_stream_bread_s8(reader->stream, (tb_sint8_t*)&ch)) break;
 
         // end?
         if (ch == '}') break;
@@ -486,7 +484,7 @@ static tb_object_ref_t tb_object_json_reader_done(tb_stream_ref_t stream)
     tb_char_t type = '\0';
     while (tb_stream_left(stream)) 
     {
-        type = tb_stream_bread_s8(stream);
+        if (!tb_stream_bread_s8(stream, (tb_sint8_t*)&type)) break;
         if (!tb_isspace(type)) break;
     }
 

@@ -106,7 +106,7 @@ static tb_char_t const* tb_xml_reader_element_parse(tb_xml_reader_impl_t* reader
     // parse element
     tb_char_t ch = '\0';
     tb_size_t in = 0;
-    while ((ch = tb_stream_bread_s8(reader->rstream)))
+    while (tb_stream_bread_s8(reader->rstream, (tb_sint8_t*)&ch))
     {
         // append element
         if (!in && ch == '<') in = 1;
@@ -449,7 +449,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
                     // seek to comment end
                     tb_char_t ch = '\0';
                     tb_int_t n = 0;
-                    while ((ch = tb_stream_bread_s8(impl->rstream)))
+                    while (tb_stream_bread_s8(impl->rstream, (tb_sint8_t*)&ch))
                     {
                         // -->
                         if (n == 2 && ch == '>') break;
@@ -479,7 +479,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
                     // seek to cdata end
                     tb_char_t ch = '\0';
                     tb_int_t n = 0;
-                    while ((ch = tb_stream_bread_s8(impl->rstream)))
+                    while (tb_stream_bread_s8(impl->rstream, (tb_sint8_t*)&ch))
                     {
                         // ]]>
                         if (n == 2 && ch == '>') break;

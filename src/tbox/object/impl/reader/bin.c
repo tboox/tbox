@@ -216,46 +216,79 @@ static tb_object_ref_t tb_object_bin_reader_func_number(tb_object_bin_reader_t* 
     tb_size_t number_type = (tb_size_t)size;
 
     // read number
+    tb_value_t      value;
     tb_object_ref_t number = tb_null;
     switch (number_type)
     {
     case TB_NUMBER_TYPE_UINT64:
-        number = tb_object_number_init_from_uint64(tb_stream_bread_u64_be(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_u64_be(reader->stream, &value.u64))
+                number = tb_object_number_init_from_uint64(value.u64);
+        }
         break;
     case TB_NUMBER_TYPE_SINT64:
-        number = tb_object_number_init_from_sint64(tb_stream_bread_s64_be(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_s64_be(reader->stream, &value.s64))
+                number = tb_object_number_init_from_sint64(value.s64);
+        }
         break;
     case TB_NUMBER_TYPE_UINT32:
-        number = tb_object_number_init_from_uint32(tb_stream_bread_u32_be(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_u32_be(reader->stream, &value.u32))
+                number = tb_object_number_init_from_uint32(value.u32);
+        }
         break;
     case TB_NUMBER_TYPE_SINT32:
-        number = tb_object_number_init_from_sint32(tb_stream_bread_s32_be(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_s32_be(reader->stream, &value.s32))
+                number = tb_object_number_init_from_sint32(value.s32);
+        }
         break;
     case TB_NUMBER_TYPE_UINT16:
-        number = tb_object_number_init_from_uint16(tb_stream_bread_u16_be(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_u16_be(reader->stream, &value.u16))
+                number = tb_object_number_init_from_uint16(value.u16);
+        }
         break;
     case TB_NUMBER_TYPE_SINT16:
-        number = tb_object_number_init_from_sint16(tb_stream_bread_s16_be(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_s16_be(reader->stream, &value.s16))
+                number = tb_object_number_init_from_sint16(value.s16);
+        }
         break;
     case TB_NUMBER_TYPE_UINT8:
-        number = tb_object_number_init_from_uint8(tb_stream_bread_u8(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_u8(reader->stream, &value.u8))
+                number = tb_object_number_init_from_uint8(value.u8);
+        }
         break;
     case TB_NUMBER_TYPE_SINT8:
-        number = tb_object_number_init_from_sint8(tb_stream_bread_s8(reader->stream));
+        {
+            // read and init number
+            if (tb_stream_bread_s8(reader->stream, &value.s8))
+                number = tb_object_number_init_from_sint8(value.s8);
+        }
         break;
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
     case TB_NUMBER_TYPE_FLOAT:
         {
-            tb_byte_t data[4] = {0};
-            if (!tb_stream_bread(reader->stream, data, 4)) return tb_null;
-            number = tb_object_number_init_from_float(tb_bits_get_float_be(data));
+            // read and init number
+            if (tb_stream_bread_float_be(reader->stream, &value.f))
+                number = tb_object_number_init_from_float(value.f);
         }
         break;
     case TB_NUMBER_TYPE_DOUBLE:
         {
-            tb_byte_t data[8] = {0};
-            if (!tb_stream_bread(reader->stream, data, 8)) return tb_null;
-            number = tb_object_number_init_from_double(tb_bits_get_double_bbe(data));
+            // read and init number
+            if (tb_stream_bread_double_bbe(reader->stream, &value.d))
+                number = tb_object_number_init_from_double(value.d);
         }
         break;
 #endif
