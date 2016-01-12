@@ -100,8 +100,12 @@ static tb_object_ref_t tb_object_bplist_reader_func_object(tb_object_bplist_read
     // check
     tb_assert_and_check_return_val(reader && reader->stream, tb_null);
 
-    // read the object type & size
-    tb_uint8_t type = tb_stream_bread_u8(reader->stream);
+    // read the object type 
+    tb_uint8_t type = 0;
+    tb_bool_t ok = tb_stream_bread_u8(reader->stream, &type);
+    tb_assert_and_check_return_val(ok, tb_null);
+
+    // read the object type and size
     tb_uint8_t size = type & 0x0f; type &= 0xf0;
     tb_trace_d("type: %x, size: %x", type, size);
 
@@ -302,23 +306,26 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
     // check
     tb_assert_and_check_return_val(reader && reader->stream, tb_null);
 
-    // init 
-    tb_object_ref_t object = tb_null;
-
-    // read
+    // adjust size
     size = (tb_size_t)1 << size;
+
+    // done
+    tb_value_t      value;
+    tb_object_ref_t object = tb_null;
     switch (size)
     {
     case 1:
         {
-            tb_uint8_t val = tb_stream_bread_u8(reader->stream);
-            object = tb_object_number_init_from_uint8(val);
+            // read and init object
+            if (tb_stream_bread_u8(reader->stream, &value.u8))
+                object = tb_object_number_init_from_uint8(value.u8);
         }
         break;
     case 2:
         {
-            tb_uint16_t val = tb_stream_bread_u16_be(reader->stream);
-            object = tb_object_number_init_from_uint16(val);
+            // read and init object
+            if (tb_stream_bread_u16_be(reader->stream, &value.u16))
+                object = tb_object_number_init_from_uint16(value.u16);
         }
         break;
     case 4:
@@ -327,15 +334,17 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
             {
             case TB_OBJECT_BPLIST_TYPE_UINT:
                 {
-                    tb_uint32_t val = tb_stream_bread_u32_be(reader->stream);
-                    object = tb_object_number_init_from_uint32(val);
+                    // read and init object
+                    if (tb_stream_bread_u32_be(reader->stream, &value.u32))
+                        object = tb_object_number_init_from_uint32(value.u32);
                 }
                 break;
             case TB_OBJECT_BPLIST_TYPE_REAL:
                 {
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-                    tb_float_t val = tb_stream_bread_float_be(reader->stream);
-                    object = tb_object_number_init_from_float(val);
+                    // read and init object
+                    if (tb_stream_bread_float_be(reader->stream, &value.f))
+                        object = tb_object_number_init_from_float(value.f);
 #else
                     tb_trace_e("real type is not supported! please enable float config.");
 #endif
@@ -353,15 +362,17 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
             {
             case TB_OBJECT_BPLIST_TYPE_UINT:
                 {
-                    tb_uint64_t val = tb_stream_bread_u64_be(reader->stream);
-                    object = tb_object_number_init_from_uint64(val);
+                    // read and init object
+                    if (tb_stream_bread_u64_be(reader->stream, &value.u64))
+                        object = tb_object_number_init_from_uint64(value.u64);
                 }
                 break;
             case TB_OBJECT_BPLIST_TYPE_REAL:
                 {
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-                    tb_double_t val = tb_stream_bread_double_bbe(reader->stream);
-                    object = tb_object_number_init_from_double(val);
+                    // read and init object
+                    if (tb_stream_bread_double_bbe(reader->stream, &value.d))
+                        object = tb_object_number_init_from_double(value.d);
 #else
                     tb_trace_e("real type is not supported! please enable float config.");
 #endif
@@ -488,30 +499,37 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
     if (!tb_stream_seek(stream, size - 26)) return tb_null;
     
     // read offset size
-    tb_size_t offset_size = tb_stream_bread_u8(stream);
-    tb_trace_d("offset_size: %lu", offset_size);
-    
+    tb_uint8_t offset_size = 0;
+    if (!tb_stream_bread_u8(stream, &offset_size)) return tb_null;
+
     // read item size for array and dictionary
-    tb_size_t item_size = tb_stream_bread_u8(stream);
-    tb_trace_d("item_size: %lu", item_size);
+    tb_uint8_t item_size = 0;
+    if (!tb_stream_bread_u8(stream, &item_size)) return tb_null;
     
     // read object count
-    tb_size_t object_count = (tb_size_t)tb_stream_bread_u64_be(stream);
-    tb_trace_d("object_count: %lu", object_count);
+    tb_uint64_t object_count = 0;
+    if (!tb_stream_bread_u64_be(stream, &object_count)) return tb_null;
     
     // read root object
-    tb_size_t root_object = (tb_size_t)tb_stream_bread_u64_be(stream);
-    tb_trace_d("root_object: %lu", root_object);
+    tb_uint64_t root_object = 0;
+    if (!tb_stream_bread_u64_be(stream, &root_object)) return tb_null;
 
     // read offset table index
-    tb_size_t offset_table_index = (tb_size_t)tb_stream_bread_u64_be(stream);
-    tb_trace_d("offset_table_index: %lu", offset_table_index);
+    tb_uint64_t offset_table_index = 0;
+    if (!tb_stream_bread_u64_be(stream, &offset_table_index)) return tb_null;
 
+    // trace
+    tb_trace_d("offset_size: %u",           offset_size);
+    tb_trace_d("item_size: %u",             item_size);
+    tb_trace_d("object_count: %llu",        object_count);
+    tb_trace_d("root_object: %llu",         root_object);
+    tb_trace_d("offset_table_index: %llu",  offset_table_index);
+    
     // check
     tb_assert_and_check_return_val(item_size && offset_size && object_count, tb_null);
 
     // init object hash
-    tb_object_ref_t* object_hash = (tb_object_ref_t*)tb_malloc0(sizeof(tb_object_ref_t) * object_count);
+    tb_object_ref_t* object_hash = (tb_object_ref_t*)tb_malloc0(sizeof(tb_object_ref_t) * (tb_size_t)object_count);
     tb_assert_and_check_return_val(object_hash, tb_null);
 
     // done
@@ -530,25 +548,27 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
             }
 
             // read the object offset
-            tb_hize_t offset = 0;
+            tb_value_t  value;
+            tb_hize_t   offset = 0;
             switch (offset_size)
             {
             case 1:
-                offset = tb_stream_bread_u8(stream);
+                if (tb_stream_bread_u8(stream, &value.u8)) offset = value.u8;
                 break;
             case 2:
-                offset = tb_stream_bread_u16_be(stream);
+                if (tb_stream_bread_u16_be(stream, &value.u16)) offset = value.u16;
                 break;
             case 4:
-                offset = tb_stream_bread_u32_be(stream);
+                if (tb_stream_bread_u32_be(stream, &value.u32)) offset = value.u32;
                 break;
             case 8:
-                offset = tb_stream_bread_u64_be(stream);
+                if (tb_stream_bread_u64_be(stream, &value.u64)) offset = value.u64;
                 break;
             default:
                 return tb_null;
                 break;
             }
+            tb_check_break(!failed);
 
             // seek to the object offset 
             if (!tb_stream_seek(stream, offset)) 
@@ -559,7 +579,6 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
 
             // read object
             object_hash[i] = tb_object_bplist_reader_func_object(&reader, item_size);
-    //      if (object_hash[i]) tb_object_dump(object_hash[i], TB_OBJECT_FORMAT_XML);
         }
 
         // failed?
@@ -593,7 +612,6 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                                     // the item index
                                     tb_size_t item = tb_object_bplist_bits_get(p + j * item_size, item_size);
                                     tb_assert(item < object_count && object_hash[item]);
-    //                              tb_trace_d("item: %d", item);
 
                                     // append item
                                     if (item < object_count && object_hash[item])
@@ -607,7 +625,6 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                             // exit priv
                             tb_free(priv);
                             tb_object_setp(object, tb_null);
-    //                      tb_object_dump(object, TB_OBJECT_FORMAT_XML);
                         }
                     }
                     break;
@@ -628,12 +645,11 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                                 tb_size_t j = 0;
                                 for (i = 0; j < count; j++)
                                 {
-                                    // the key & val
+                                    // the key and val
                                     tb_size_t key = tb_object_bplist_bits_get(p + j * item_size, item_size);
                                     tb_size_t val = tb_object_bplist_bits_get(p + (count + j) * item_size, item_size);
                                     tb_assert(key < object_count && object_hash[key]);
                                     tb_assert(val < object_count && object_hash[val]);
-    //                              tb_trace_d("key_val: %u => %lu", key, val);
 
                                     // append the key & val
                                     if (key < object_count && val < object_count && object_hash[key] && object_hash[val])
@@ -658,7 +674,6 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                             // exit priv
                             tb_free(priv);
                             tb_object_setp(object, tb_null);
-//                          tb_object_dump(object, TB_OBJECT_FORMAT_XML);
                         }
                     }
                     break;

@@ -37,33 +37,46 @@ static __tb_inline__ tb_void_t tb_object_reader_bin_type_size(tb_stream_ref_t st
     // check
     tb_assert_and_check_return(stream);
 
-    // the flag
-    tb_uint8_t flag = tb_stream_bread_u8(stream);
+    // clear it first
+    if (ptype) *ptype = 0;
+    if (psize) *psize = 0;
 
-    // the type & size
+    // the flag
+    tb_uint8_t flag = 0;
+    tb_bool_t ok = tb_stream_bread_u8(stream, &flag);
+    tb_assert_and_check_return(ok);
+
+    // read type and size
     tb_size_t   type = flag >> 4;
     tb_uint64_t size = flag & 0x0f;
-    if (type == 0xf) type = tb_stream_bread_u8(stream);
+    if (type == 0xf)
+    {
+        tb_uint8_t value = 0;
+        if (tb_stream_bread_u8(stream, &value)) type = value;
+    }
+
+    // done
+    tb_value_t value;
     switch (size)
     {
     case 0xc:
-        size = tb_stream_bread_u8(stream);
+        if (tb_stream_bread_u8(stream, &value.u8)) size = value.u8;
         break;
     case 0xd:
-        size = tb_stream_bread_u16_be(stream);
+        if (tb_stream_bread_u16_be(stream, &value.u16)) size = value.u16;
         break;
     case 0xe:
-        size = tb_stream_bread_u32_be(stream);
+        if (tb_stream_bread_u32_be(stream, &value.u32)) size = value.u32;
         break;
     case 0xf:
-        size = tb_stream_bread_u64_be(stream);
+        if (tb_stream_bread_u64_be(stream, &value.u64)) size = value.u64;
         break;
     default:
         break;
     }
 
     // trace
-//  tb_trace("type: %lu, size: %llu", type, size);
+//  tb_trace_d("type: %lu, size: %llu", type, size);
 
     // save
     if (ptype) *ptype = type;

@@ -1142,7 +1142,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_
     while ((TB_STATE_OPENED == tb_atomic_get(&impl->istate)))
     {
         // read char
-        if (!tb_stream_bread(stream, (tb_byte_t*)&ch, 1)) break;
+        if (!tb_stream_bread_s8(stream, (tb_sint8_t*)&ch)) break;
 
         // is line?
         if (ch == '\n') 
@@ -1325,293 +1325,421 @@ tb_byte_t* tb_stream_bread_all(tb_stream_ref_t stream, tb_bool_t is_cstr, tb_siz
     // ok?
     return data;
 }
-tb_uint8_t tb_stream_bread_u8(tb_stream_ref_t stream)
+tb_bool_t tb_stream_bread_u8(tb_stream_ref_t stream, tb_uint8_t* pvalue)
+{
+    return tb_stream_bread(stream, (tb_byte_t*)pvalue, 1);
+}
+tb_bool_t tb_stream_bread_s8(tb_stream_ref_t stream, tb_sint8_t* pvalue)
+{
+    return tb_stream_bread(stream, (tb_byte_t*)pvalue, 1);
+}
+tb_bool_t tb_stream_bread_u16_le(tb_stream_ref_t stream, tb_uint16_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[2];
+    tb_bool_t ok = tb_stream_bread(stream, b, 2);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u16_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s16_le(tb_stream_ref_t stream, tb_sint16_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[2];
+    tb_bool_t ok = tb_stream_bread(stream, b, 2);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s16_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_u24_le(tb_stream_ref_t stream, tb_uint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[3];
+    tb_bool_t ok = tb_stream_bread(stream, b, 3);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u24_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s24_le(tb_stream_ref_t stream, tb_sint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[3];
+    tb_bool_t ok = tb_stream_bread(stream, b, 3);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s24_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_u32_le(tb_stream_ref_t stream, tb_uint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[4];
+    tb_bool_t ok = tb_stream_bread(stream, b, 4);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u32_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s32_le(tb_stream_ref_t stream, tb_sint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[4];
+    tb_bool_t ok = tb_stream_bread(stream, b, 4);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s32_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_u64_le(tb_stream_ref_t stream, tb_uint64_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u64_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s64_le(tb_stream_ref_t stream, tb_sint64_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s64_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_u16_be(tb_stream_ref_t stream, tb_uint16_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[2];
+    tb_bool_t ok = tb_stream_bread(stream, b, 2);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u16_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s16_be(tb_stream_ref_t stream, tb_sint16_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[2];
+    tb_bool_t ok = tb_stream_bread(stream, b, 2);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s16_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_u24_be(tb_stream_ref_t stream, tb_uint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[3];
+    tb_bool_t ok = tb_stream_bread(stream, b, 3);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u24_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s24_be(tb_stream_ref_t stream, tb_sint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[3];
+    tb_bool_t ok = tb_stream_bread(stream, b, 3);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s24_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_u32_be(tb_stream_ref_t stream, tb_uint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[4];
+    tb_bool_t ok = tb_stream_bread(stream, b, 4);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u32_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s32_be(tb_stream_ref_t stream, tb_sint32_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[4];
+    tb_bool_t ok = tb_stream_bread(stream, b, 4);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s32_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_u64_be(tb_stream_ref_t stream, tb_uint64_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_u64_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_s64_be(tb_stream_ref_t stream, tb_sint64_t* pvalue)
+{   
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_s64_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bwrit_u8(tb_stream_ref_t stream, tb_uint8_t value)
 {
     tb_byte_t b[1];
-    if (!tb_stream_bread(stream, b, 1)) return 0;
-    return b[0];
-}
-tb_sint8_t tb_stream_bread_s8(tb_stream_ref_t stream)
-{
-    tb_byte_t b[1];
-    if (!tb_stream_bread(stream, b, 1)) return 0;
-    return b[0];
-}
-tb_uint16_t tb_stream_bread_u16_le(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[2];
-    if (!tb_stream_bread(stream, b, 2)) return 0;
-    return tb_bits_get_u16_le(b);
-}
-tb_sint16_t tb_stream_bread_s16_le(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[2];
-    if (!tb_stream_bread(stream, b, 2)) return 0;
-    return tb_bits_get_s16_le(b);
-}
-tb_uint32_t tb_stream_bread_u24_le(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[3];
-    if (!tb_stream_bread(stream, b, 3)) return 0;
-    return tb_bits_get_u24_le(b);
-}
-tb_sint32_t tb_stream_bread_s24_le(tb_stream_ref_t stream)
-{
-    tb_byte_t b[3];
-    if (!tb_stream_bread(stream, b, 3)) return 0;
-    return tb_bits_get_s24_le(b);
-}
-tb_uint32_t tb_stream_bread_u32_le(tb_stream_ref_t stream)
-{
-    tb_byte_t b[4];
-    if (!tb_stream_bread(stream, b, 4)) return 0;
-    return tb_bits_get_u32_le(b);
-}
-tb_sint32_t tb_stream_bread_s32_le(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[4];
-    if (!tb_stream_bread(stream, b, 4)) return 0;
-    return tb_bits_get_s32_le(b);
-}
-tb_uint64_t tb_stream_bread_u64_le(tb_stream_ref_t stream)
-{
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_u64_le(b);
-}
-tb_sint64_t tb_stream_bread_s64_le(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_s64_le(b);
-}
-tb_uint16_t tb_stream_bread_u16_be(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[2];
-    if (!tb_stream_bread(stream, b, 2)) return 0;
-    return tb_bits_get_u16_be(b);
-}
-tb_sint16_t tb_stream_bread_s16_be(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[2];
-    if (!tb_stream_bread(stream, b, 2)) return 0;
-    return tb_bits_get_s16_be(b);
-}
-tb_uint32_t tb_stream_bread_u24_be(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[3];
-    if (!tb_stream_bread(stream, b, 3)) return 0;
-    return tb_bits_get_u24_be(b);
-}
-tb_sint32_t tb_stream_bread_s24_be(tb_stream_ref_t stream)
-{
-    tb_byte_t b[3];
-    if (!tb_stream_bread(stream, b, 3)) return 0;
-    return tb_bits_get_s24_be(b);
-}
-tb_uint32_t tb_stream_bread_u32_be(tb_stream_ref_t stream)
-{
-    tb_byte_t b[4];
-    if (!tb_stream_bread(stream, b, 4)) return 0;
-    return tb_bits_get_u32_be(b);
-}
-tb_sint32_t tb_stream_bread_s32_be(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[4];
-    if (!tb_stream_bread(stream, b, 4)) return 0;
-    return tb_bits_get_s32_be(b);
-}
-tb_uint64_t tb_stream_bread_u64_be(tb_stream_ref_t stream)
-{
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_u64_be(b);
-}
-tb_sint64_t tb_stream_bread_s64_be(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_s64_be(b);
-}
-tb_bool_t tb_stream_bwrit_u8(tb_stream_ref_t stream, tb_uint8_t val)
-{
-    tb_byte_t b[1];
-    tb_bits_set_u8(b, val);
+    tb_bits_set_u8(b, value);
     return tb_stream_bwrit(stream, b, 1);
 }
-tb_bool_t tb_stream_bwrit_s8(tb_stream_ref_t stream, tb_sint8_t val)
+tb_bool_t tb_stream_bwrit_s8(tb_stream_ref_t stream, tb_sint8_t value)
 {
     tb_byte_t b[1];
-    tb_bits_set_s8(b, val);
+    tb_bits_set_s8(b, value);
     return tb_stream_bwrit(stream, b, 1);
 }
-tb_bool_t tb_stream_bwrit_u16_le(tb_stream_ref_t stream, tb_uint16_t val)
+tb_bool_t tb_stream_bwrit_u16_le(tb_stream_ref_t stream, tb_uint16_t value)
 {
     tb_byte_t b[2];
-    tb_bits_set_u16_le(b, val);
+    tb_bits_set_u16_le(b, value);
     return tb_stream_bwrit(stream, b, 2);
 }
-tb_bool_t tb_stream_bwrit_s16_le(tb_stream_ref_t stream, tb_sint16_t val)
+tb_bool_t tb_stream_bwrit_s16_le(tb_stream_ref_t stream, tb_sint16_t value)
 {
     tb_byte_t b[2];
-    tb_bits_set_s16_le(b, val);
+    tb_bits_set_s16_le(b, value);
     return tb_stream_bwrit(stream, b, 2);
 }
-tb_bool_t tb_stream_bwrit_u24_le(tb_stream_ref_t stream, tb_uint32_t val)
+tb_bool_t tb_stream_bwrit_u24_le(tb_stream_ref_t stream, tb_uint32_t value)
 {   
     tb_byte_t b[3];
-    tb_bits_set_u24_le(b, val);
+    tb_bits_set_u24_le(b, value);
     return tb_stream_bwrit(stream, b, 3);
 }
-tb_bool_t tb_stream_bwrit_s24_le(tb_stream_ref_t stream, tb_sint32_t val)
+tb_bool_t tb_stream_bwrit_s24_le(tb_stream_ref_t stream, tb_sint32_t value)
 {
     tb_byte_t b[3];
-    tb_bits_set_s24_le(b, val);
+    tb_bits_set_s24_le(b, value);
     return tb_stream_bwrit(stream, b, 3);
 }
-tb_bool_t tb_stream_bwrit_u32_le(tb_stream_ref_t stream, tb_uint32_t val)
+tb_bool_t tb_stream_bwrit_u32_le(tb_stream_ref_t stream, tb_uint32_t value)
 {   
     tb_byte_t b[4];
-    tb_bits_set_u32_le(b, val);
+    tb_bits_set_u32_le(b, value);
     return tb_stream_bwrit(stream, b, 4);
 }
-tb_bool_t tb_stream_bwrit_s32_le(tb_stream_ref_t stream, tb_sint32_t val)
+tb_bool_t tb_stream_bwrit_s32_le(tb_stream_ref_t stream, tb_sint32_t value)
 {
     tb_byte_t b[4];
-    tb_bits_set_s32_le(b, val);
+    tb_bits_set_s32_le(b, value);
     return tb_stream_bwrit(stream, b, 4);
 }
-tb_bool_t tb_stream_bwrit_u64_le(tb_stream_ref_t stream, tb_uint64_t val)
+tb_bool_t tb_stream_bwrit_u64_le(tb_stream_ref_t stream, tb_uint64_t value)
 {   
     tb_byte_t b[8];
-    tb_bits_set_u64_le(b, val);
+    tb_bits_set_u64_le(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
-tb_bool_t tb_stream_bwrit_s64_le(tb_stream_ref_t stream, tb_sint64_t val)
+tb_bool_t tb_stream_bwrit_s64_le(tb_stream_ref_t stream, tb_sint64_t value)
 {
     tb_byte_t b[8];
-    tb_bits_set_s64_le(b, val);
+    tb_bits_set_s64_le(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
-tb_bool_t tb_stream_bwrit_u16_be(tb_stream_ref_t stream, tb_uint16_t val)
+tb_bool_t tb_stream_bwrit_u16_be(tb_stream_ref_t stream, tb_uint16_t value)
 {
     tb_byte_t b[2];
-    tb_bits_set_u16_be(b, val);
+    tb_bits_set_u16_be(b, value);
     return tb_stream_bwrit(stream, b, 2);
 }
-tb_bool_t tb_stream_bwrit_s16_be(tb_stream_ref_t stream, tb_sint16_t val)
+tb_bool_t tb_stream_bwrit_s16_be(tb_stream_ref_t stream, tb_sint16_t value)
 {
     tb_byte_t b[2];
-    tb_bits_set_s16_be(b, val);
+    tb_bits_set_s16_be(b, value);
     return tb_stream_bwrit(stream, b, 2);
 }
-tb_bool_t tb_stream_bwrit_u24_be(tb_stream_ref_t stream, tb_uint32_t val)
+tb_bool_t tb_stream_bwrit_u24_be(tb_stream_ref_t stream, tb_uint32_t value)
 {   
     tb_byte_t b[3];
-    tb_bits_set_u24_be(b, val);
+    tb_bits_set_u24_be(b, value);
     return tb_stream_bwrit(stream, b, 3);
 }
-tb_bool_t tb_stream_bwrit_s24_be(tb_stream_ref_t stream, tb_sint32_t val)
+tb_bool_t tb_stream_bwrit_s24_be(tb_stream_ref_t stream, tb_sint32_t value)
 {
     tb_byte_t b[3];
-    tb_bits_set_s24_be(b, val);
+    tb_bits_set_s24_be(b, value);
     return tb_stream_bwrit(stream, b, 3);
 }
-tb_bool_t tb_stream_bwrit_u32_be(tb_stream_ref_t stream, tb_uint32_t val)
+tb_bool_t tb_stream_bwrit_u32_be(tb_stream_ref_t stream, tb_uint32_t value)
 {   
     tb_byte_t b[4];
-    tb_bits_set_u32_be(b, val);
+    tb_bits_set_u32_be(b, value);
     return tb_stream_bwrit(stream, b, 4);
 }
-tb_bool_t tb_stream_bwrit_s32_be(tb_stream_ref_t stream, tb_sint32_t val)
+tb_bool_t tb_stream_bwrit_s32_be(tb_stream_ref_t stream, tb_sint32_t value)
 {
     tb_byte_t b[4];
-    tb_bits_set_s32_be(b, val);
+    tb_bits_set_s32_be(b, value);
     return tb_stream_bwrit(stream, b, 4);
 }
-tb_bool_t tb_stream_bwrit_u64_be(tb_stream_ref_t stream, tb_uint64_t val)
+tb_bool_t tb_stream_bwrit_u64_be(tb_stream_ref_t stream, tb_uint64_t value)
 {   
     tb_byte_t b[8];
-    tb_bits_set_u64_be(b, val);
+    tb_bits_set_u64_be(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
-tb_bool_t tb_stream_bwrit_s64_be(tb_stream_ref_t stream, tb_sint64_t val)
+tb_bool_t tb_stream_bwrit_s64_be(tb_stream_ref_t stream, tb_sint64_t value)
 {
     tb_byte_t b[8];
-    tb_bits_set_s64_be(b, val);
+    tb_bits_set_s64_be(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-tb_float_t tb_stream_bread_float_le(tb_stream_ref_t stream)
+tb_bool_t tb_stream_bread_float_le(tb_stream_ref_t stream, tb_float_t* pvalue)
+{
+    // read data
+    tb_byte_t b[4];
+    tb_bool_t ok = tb_stream_bread(stream, b, 4);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_float_le(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_float_be(tb_stream_ref_t stream, tb_float_t* pvalue)
+{
+    // read data
+    tb_byte_t b[4];
+    tb_bool_t ok = tb_stream_bread(stream, b, 4);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_float_be(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_double_ble(tb_stream_ref_t stream, tb_double_t* pvalue)
+{
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_double_ble(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_double_bbe(tb_stream_ref_t stream, tb_double_t* pvalue)
+{
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_double_bbe(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_double_lle(tb_stream_ref_t stream, tb_double_t* pvalue)
+{
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_double_lle(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bread_double_lbe(tb_stream_ref_t stream, tb_double_t* pvalue)
+{
+    // read data
+    tb_byte_t b[8];
+    tb_bool_t ok = tb_stream_bread(stream, b, 8);
+
+    // save value
+    if (ok && pvalue) *pvalue = tb_bits_get_double_lbe(b);
+
+    // ok?
+    return ok;
+}
+tb_bool_t tb_stream_bwrit_float_le(tb_stream_ref_t stream, tb_float_t value)
 {
     tb_byte_t b[4];
-    if (!tb_stream_bread(stream, b, 4)) return 0;
-    return tb_bits_get_float_le(b);
-}
-tb_float_t tb_stream_bread_float_be(tb_stream_ref_t stream)
-{
-    tb_byte_t b[4];
-    if (!tb_stream_bread(stream, b, 4)) return 0;
-    return tb_bits_get_float_be(b);
-}
-tb_double_t tb_stream_bread_double_ble(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_double_ble(b);
-}
-tb_double_t tb_stream_bread_double_bbe(tb_stream_ref_t stream)
-{   
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_double_bbe(b);
-}
-tb_double_t tb_stream_bread_double_lle(tb_stream_ref_t stream)
-{
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_double_lle(b);
-}
-tb_double_t tb_stream_bread_double_lbe(tb_stream_ref_t stream)
-{
-    tb_byte_t b[8];
-    if (!tb_stream_bread(stream, b, 8)) return 0;
-    return tb_bits_get_double_lbe(b);
-}
-tb_bool_t tb_stream_bwrit_float_le(tb_stream_ref_t stream, tb_float_t val)
-{
-    tb_byte_t b[4];
-    tb_bits_set_float_le(b, val);
+    tb_bits_set_float_le(b, value);
     return tb_stream_bwrit(stream, b, 4);
 }
-tb_bool_t tb_stream_bwrit_float_be(tb_stream_ref_t stream, tb_float_t val)
+tb_bool_t tb_stream_bwrit_float_be(tb_stream_ref_t stream, tb_float_t value)
 {
     tb_byte_t b[4];
-    tb_bits_set_float_be(b, val);
+    tb_bits_set_float_be(b, value);
     return tb_stream_bwrit(stream, b, 4);
 }
-tb_bool_t tb_stream_bwrit_double_ble(tb_stream_ref_t stream, tb_double_t val)
+tb_bool_t tb_stream_bwrit_double_ble(tb_stream_ref_t stream, tb_double_t value)
 {
     tb_byte_t b[8];
-    tb_bits_set_double_ble(b, val);
+    tb_bits_set_double_ble(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
-tb_bool_t tb_stream_bwrit_double_bbe(tb_stream_ref_t stream, tb_double_t val)
+tb_bool_t tb_stream_bwrit_double_bbe(tb_stream_ref_t stream, tb_double_t value)
 {
     tb_byte_t b[8];
-    tb_bits_set_double_bbe(b, val);
+    tb_bits_set_double_bbe(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
-tb_bool_t tb_stream_bwrit_double_lle(tb_stream_ref_t stream, tb_double_t val)
+tb_bool_t tb_stream_bwrit_double_lle(tb_stream_ref_t stream, tb_double_t value)
 {
     tb_byte_t b[8];
-    tb_bits_set_double_lle(b, val);
+    tb_bits_set_double_lle(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
-tb_bool_t tb_stream_bwrit_double_lbe(tb_stream_ref_t stream, tb_double_t val)
+tb_bool_t tb_stream_bwrit_double_lbe(tb_stream_ref_t stream, tb_double_t value)
 {
     tb_byte_t b[8];
-    tb_bits_set_double_lbe(b, val);
+    tb_bits_set_double_lbe(b, value);
     return tb_stream_bwrit(stream, b, 8);
 }
 
