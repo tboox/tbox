@@ -31,7 +31,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {   
     // check
