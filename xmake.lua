@@ -6,7 +6,7 @@ set_version("1.5.1")
 set_warnings("all", "error")
 
 -- set language: c99, c++11
-set_languages("c11", "cxx11")
+set_languages("c99", "cxx11")
 
 -- add defines to config.h
 add_defines_h("$(prefix)_OS_$(OS)")
