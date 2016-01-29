@@ -95,10 +95,10 @@ static tb_bool_t tb_aiop_rtor_epoll_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_impl
 
     // init event
     struct epoll_event e = {0};
-    if (epoll_ctl(impl->epfd, EPOLL_CTL_DEL, ((tb_long_t)aioo->sock) - 1, &e) < 0)
+    if (epoll_ctl(impl->epfd, EPOLL_CTL_DEL, tb_sock2fd(aioo->sock), &e) < 0)
     {
         // trace
-//        tb_trace_e("delo aioo[%p] failed, errno: %d", aioo, errno);
+        tb_trace_e("delo aioo[%p] failed, errno: %d", aioo, errno);
         return tb_false;
     }
 

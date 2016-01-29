@@ -277,8 +277,15 @@ tb_void_t tb_aiop_delo(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo)
     tb_aiop_impl_t* impl = (tb_aiop_impl_t*)aiop;
     tb_assert_and_check_return(impl && impl->rtor && impl->rtor->delo && aioo);
 
-    // delo aioo
-    if (impl->rtor->delo(impl->rtor, (tb_aioo_impl_t*)aioo)) tb_aiop_aioo_exit(impl, aioo);
+    // delete aioo from aiop
+    if (impl->rtor->delo(impl->rtor, (tb_aioo_impl_t*)aioo))
+    {
+        // trace
+        tb_trace_e("delo: aioo[%p] failed!", aioo);
+    }
+    
+    // exit aioo
+    tb_aiop_aioo_exit(impl, aioo);
 }
 tb_bool_t tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_ref_t aioe)
 {
