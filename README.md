@@ -3,92 +3,92 @@ The Treasure Box Library [![Build Status](https://api.travis-ci.org/waruqi/tbox.
 
 TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
 
-It is similar to glibc, but more simple and convenience.
+It is similar to glibc, but simpler and more convenient.
 It includes asio, stream, network, container, algorithm, object, memory, database, string, charset, math, regex, libc, libm, utils and other library modules.
 
 features
 --------
 
 ### the stream library
--	supports file, data, http and socket source
--	supports the stream filter for gzip, charset and ..
--   implements transfer for two stream
--   implements transfer pool (asio) for multi-stream
--   implements the static buffer stream for parsing data
+- supports file, data, http and socket source
+- supports the stream filter for gzip, charset and...
+- implements transfer for two stream
+- implements transfer pool (asio) for multi-stream
+- implements the static buffer stream for parsing data
 
 ### the asynchronous io library
--	supports reactor and proactor mode
--	using epoll, poll, select ,kqueue and iocp os system api
+- supports reactor and proactor mode
+- using epoll, poll, select, kqueue and iocp os system api
 
 ### the database library
--	supports mysql and sqlite3 database and enumerates data using the iterator mode
+- supports mysql and sqlite3 database and enumerates data using the iterator mode
 
 ### the xml parser library
--	supports DOM and SAX mode and supports xpath.
+- supports DOM and SAX mode and supports xpath
 
 ### the serialization and deserialization library. 
--	supports xml, json, bplist, xplist, binary formats
+- supports xml, json, bplist, xplist, binary formats
 
 ### the memory library
--	implements some memory pools for optimizating memory.
--	supports fast memory error detecting. it can detect the following types of bugs for the debug mode:
- -  out-of-bounds accesses to heap and globals
- -  use-after-free
- -	double-free, invalid free
- -	memory leaks
+- implements some memory pools for optimizing memory
+- supports fast memory error detecting. it can detect the following types of bugs for the debug mode:
+  - out-of-bounds accesses to heap and globals
+  - use-after-free
+  - double-free, invalid free
+  - memory leaks
 
 ### the container library
--	implements hash table, single list, double list, vector, stack, queue
-	and min/max heap. supports iterator mode for algorithm.
+- implements hash table, single list, double list, vector, stack, queue
+  and min/max heap. supports iterator mode for algorithm
 
 ### the algorithm library
--	using the iterator mode
--	implements find, binary find and reverse find algorithm.
--	implements sort, bubble sort, quick sort, heap sort and insert sort algorithm. 
--	implements count, walk items, reverse walk items, for_all and rfor_all.
+- using the iterator mode
+- implements find, binary find and reverse find algorithm
+- implements sort, bubble sort, quick sort, heap sort and insert sort algorithm
+- implements count, walk items, reverse walk items, for_all and rfor_all
 
 ### the network library
--	implements dns(cached), ssl(openssl and polarssl), http and cookies
--	supports asynchronous io mode for dns, ssl and http using the asio and stream library
+- implements dns(cached), ssl(openssl and polarssl), http and cookies
+- supports asynchronous io mode for dns, ssl and http using the asio and stream library
 
 ### the platform library
--	implements timer, faster and lower precision timer
--	implements atomic and atomic64 operation
--	implements spinlock, mutex, event, semaphore, thread and thread pool 
--	implements file, socket operation
+- implements timer, fast and low precision timer
+- implements atomic and atomic64 operation
+- implements spinlock, mutex, event, semaphore, thread and thread pool 
+- implements file, socket operation
 
 ### the charset library
--	supports utf8, utf16, gbk, gb2312, uc2 and uc4
--	supports big endian and little endian mode
+- supports utf8, utf16, gbk, gb2312, uc2 and uc4
+- supports big endian and little endian mode
 
 ### the zip library
--	supports gzip, zlibraw, zlib formats using the zlib library if exists
--	implements lzsw, lz77 and rlc algorithm
+- supports gzip, zlibraw, zlib formats using the zlib library if exists
+- implements lzsw, lz77 and rlc algorithm
 
 ### the utils library
--	implements base32, base64 encoder and decoder
--	implements crc32, adler32, md5 and sha1 hash algorithm
--	implements assert and trace output for the debug mode
--   implements bits operation for parsing u8, u16, u32, u64 data
+- implements base32, base64 encoder and decoder
+- implements crc32, adler32, md5 and sha1 hash algorithm
+- implements assert and trace output for the debug mode
+- implements bits operation for parsing u8, u16, u32, u64 data
 
 ### the math library
--	implements random generator
--	implements fast fixed-point calculation, supports 6-bits, 16-bits, 30-bits fixed-point number
+- implements random generator
+- implements fast fixed-point calculation, supports 6-bits, 16-bits, 30-bits fixed-point number
 
 ### the libc library
--	implements lightweight libc library interfaces, the interface name contains tb_xxx prefix for avoiding conflict.
--	implements strixxx strrxxx wcsixxx wcsrxxx interface extension.
--	optimizates some frequently-used interface, .e.g. memset, memcpy, strcpy ... 
--	implements memset_u16, memset_u32, memset_u64 extension interfaces.
+- implements lightweight libc library interfaces, the interface name contains tb_xxx prefix for avoiding conflict
+- implements strixxx strrxxx wcsixxx wcsrxxx interface extension
+- optimizes some frequently-used interface, .e.g. memset, memcpy, strcpy ... 
+- implements memset_u16, memset_u32, memset_u64 extension interfaces
 
 ### the libm library
--	implements lightweight libm library interfaces, the interface name contains tb_xxx prefix for avoiding conflict.
--	supports float and double type.
+- implements lightweight libm library interfaces, the interface name contains tb_xxx prefix for avoiding conflict
+- supports float and double type
 
 ### the regex library
--	supports match and replace
--	supports global/multiline/caseless mode
--   uses pcre, pcre2 and posix regex modules
+- supports match and replace
+- supports global/multiline/caseless mode
+- uses pcre, pcre2 and posix regex modules
 
 ## 简介
 TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac、ios、android以及其他嵌入式系统。
