@@ -38,14 +38,15 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_uint32_t tb_fnv32_encode(tb_byte_t const* data)
+tb_uint32_t tb_fnv32_encode(tb_byte_t const* data, tb_size_t size)
 {
     tb_uint32_t hval = FNV0;
 
-    while (*data)
+    while (size)
     {
         hval *= FNV_32_PRIME;
         hval ^= (unsigned int)*data++;
+        size--;
     }
 
     return hval;
