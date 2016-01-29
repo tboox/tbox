@@ -32,22 +32,24 @@
  */
 
 // FNV prime
-#define FNV_32_PRIME (0x01000193)
-#define FNV0 (0x811c9dc5)
+#define TB_FNV_32_PRIME     (0x01000193)
+#define TB_FNV0             (0x811c9dc5)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_uint32_t tb_fnv32_encode(tb_byte_t const* data, tb_size_t size)
 {
-    tb_uint32_t hval = FNV0;
+    // check
+    tb_assert_and_check_return_val(data && size, 0);
 
+    // done
+    tb_uint32_t hval = TB_FNV0;
     while (size)
     {
-        hval *= FNV_32_PRIME;
-        hval ^= (unsigned int)*data++;
+        hval *= TB_FNV_32_PRIME;
+        hval ^= (tb_uint32_t)*data++;
         size--;
     }
-
     return hval;
 }
