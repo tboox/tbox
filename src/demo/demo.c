@@ -1,6 +1,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ typedef struct __tb_demo_t
  */
 
 // the demos
-static tb_demo_t g_demo[] = 
+static tb_demo_t g_demo[] =
 {
     // libc
     TB_DEMO_MAIN_ITEM(libc_time)
@@ -92,6 +92,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(utils_base32)
 ,   TB_DEMO_MAIN_ITEM(utils_base64)
 ,   TB_DEMO_MAIN_ITEM(utils_adler32)
+,   TB_DEMO_MAIN_ITEM(utils_fnv32)
 
     // other
 ,   TB_DEMO_MAIN_ITEM(other_test)
@@ -219,7 +220,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
     if (!tb_init(tb_null, tb_null)) return 0;
 #endif
 
-    // init 
+    // init
     tb_int_t            ok = 0;
     tb_char_t const*    name = tb_null;
 
