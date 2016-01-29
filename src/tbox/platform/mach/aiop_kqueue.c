@@ -73,7 +73,14 @@ static tb_bool_t tb_aiop_rtor_kqueue_sync(tb_aiop_rtor_impl_t* rtor, struct keve
 
     // change events
     struct timespec t = {0};
-    if (kevent(impl->kqfd, evts, evtn, tb_null, 0, &t) < 0) return tb_false;
+    if (kevent(impl->kqfd, evts, evtn, tb_null, 0, &t) < 0) 
+    {
+        // trace
+        tb_trace_e("sync aioo[%p] failed, errno: %d", aioo, errno);
+
+        // failed
+        return tb_false;
+    }
 
     // ok
     return tb_true;
@@ -83,9 +90,6 @@ static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // check
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
     tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->sock, tb_false);
-
-    // fd
-    tb_int_t fd = ((tb_int_t)aioo->sock) - 1;
 
     // the code
     tb_size_t code = aioo->code;
@@ -98,6 +102,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_addo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     // add event
     struct kevent   e[2];
     tb_size_t       n = 0;
+    tb_int_t        fd = tb_sock2fd(aioo->sock);
     if ((code & TB_AIOE_CODE_RECV) || (code & TB_AIOE_CODE_ACPT)) 
     {
         EV_SET(&e[n], fd, EVFILT_READ, add_event, NOTE_EOF, 0, (tb_pointer_t)aioo); n++;
@@ -116,16 +121,24 @@ static tb_bool_t tb_aiop_rtor_kqueue_delo(tb_aiop_rtor_impl_t* rtor, tb_aioo_imp
     tb_aiop_rtor_kqueue_impl_t* impl = (tb_aiop_rtor_kqueue_impl_t*)rtor;
     tb_assert_and_check_return_val(impl && impl->kqfd >= 0 && aioo && aioo->sock, tb_false);
 
-    // fd
-    tb_int_t fd = ((tb_int_t)aioo->sock) - 1;
+    // the code
+    tb_size_t code = aioo->code;
 
-    // del event
-    struct kevent e[2];
-    EV_SET(&e[0], fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
-    EV_SET(&e[1], fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
+    // delete event
+    struct kevent   e[2];
+    tb_size_t       n = 0;
+    tb_int_t        fd = tb_sock2fd(aioo->sock);
+    if ((code & TB_AIOE_CODE_RECV) || (code & TB_AIOE_CODE_ACPT)) 
+    {
+        EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, (tb_pointer_t)aioo); n++;
+    }
+    if ((code & TB_AIOE_CODE_SEND) || (code & TB_AIOE_CODE_CONN))
+    {
+        EV_SET(&e[n], fd, EVFILT_WRITE, EV_DELETE, 0, 0, (tb_pointer_t)aioo); n++;
+    }
 
     // ok?
-    return tb_aiop_rtor_kqueue_sync(rtor, e, 2);
+    return n? tb_aiop_rtor_kqueue_sync(rtor, e, n) : tb_true;
 }
 static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref_t aioe)
 {
@@ -136,9 +149,6 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref
     // the aioo
     tb_aioo_impl_t* aioo = (tb_aioo_impl_t*)aioe->aioo;
     tb_assert_and_check_return_val(aioo && aioo->sock, tb_false);
-
-    // fd
-    tb_int_t fd = ((tb_int_t)aioo->sock) - 1;
 
     // change
     tb_size_t adde = aioe->code & ~aioo->code;
@@ -156,6 +166,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_post(tb_aiop_rtor_impl_t* rtor, tb_aioe_ref
     // add event
     struct kevent   e[2];
     tb_size_t       n = 0;
+    tb_int_t        fd = tb_sock2fd(aioo->sock);
     if (adde & TB_AIOE_CODE_RECV || adde & TB_AIOE_CODE_ACPT) 
     {
         EV_SET(&e[n], fd, EVFILT_READ, add_event, NOTE_EOF, 0, aioo);
