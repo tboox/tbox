@@ -41,10 +41,11 @@ __tb_extern_c_enter__
 /*! encode fnv32
  *
  * @param data      the data
+ * @param size      the size
  *
  * @return          the fnv32 value
  */
-tb_uint32_t         tb_fnv32_encode(tb_byte_t const* data);
+tb_uint32_t         tb_fnv32_encode(tb_byte_t const* data, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
