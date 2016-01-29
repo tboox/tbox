@@ -76,7 +76,7 @@ static tb_bool_t tb_aiop_rtor_kqueue_sync(tb_aiop_rtor_impl_t* rtor, struct keve
     if (kevent(impl->kqfd, evts, evtn, tb_null, 0, &t) < 0) 
     {
         // trace
-        tb_trace_e("sync aioo[%p] failed, errno: %d", aioo, errno);
+        tb_trace_e("sync failed, errno: %d", errno);
 
         // failed
         return tb_false;
