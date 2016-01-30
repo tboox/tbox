@@ -58,7 +58,7 @@ __tb_extern_c_enter__
 #if defined(TB_COMPILER_IS_GCC)
 #   define tb_trace_p(prefix, fmt, arg ...)                 do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt __tb_newline__, ## arg); } while (0)
 #   define tb_tracef_p(prefix, fmt, arg ...)                do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt, ## arg); } while (0)
-#   ifdef __tb_debug__
+#   if defined(__tb_debug__) || defined(__tb_alloc_trace__)
 #       define tb_trace_error_p(prefix, fmt, arg ...)       do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[error]: " fmt " at %s(): %d, %s" __tb_newline__, ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
 #       define tb_trace_assert_p(prefix, fmt, arg ...)      do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: " fmt " at %s(): %d, %s" __tb_newline__, ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
 #       define tb_trace_warning_p(prefix, fmt, arg ...)     do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: " fmt " at %s(): %d, %s" __tb_newline__, ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
@@ -76,7 +76,7 @@ __tb_extern_c_enter__
 #elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
 #   define tb_trace_p(prefix, fmt, ...)                     do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt __tb_newline__, __VA_ARGS__); } while (0)
 #   define tb_tracef_p(prefix, fmt, ...)                    do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt, __VA_ARGS__); } while (0)
-#   ifdef __tb_debug__
+#   if defined(__tb_debug__) || defined(__tb_alloc_trace__)
 #       define tb_trace_error_p(prefix, fmt, ...)           do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[error]: at %s(): %d, %s: " fmt __tb_newline__, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)
 #       define tb_trace_assert_p(prefix, fmt, ...)          do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: at %s(): %d, %s: " fmt __tb_newline__, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)
 #       define tb_trace_warning_p(prefix, fmt, ...)         do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: at %s(): %d, %s: " fmt __tb_newline__, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)

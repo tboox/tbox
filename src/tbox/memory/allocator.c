@@ -79,6 +79,9 @@ tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size _
     // leave
     tb_spinlock_leave(&allocator->lock);
 
+#ifdef __tb_alloc_trace__
+    tb_trace_w("tb_allocator_malloc_(%p): %lu", data, size, func_, line_, file_);
+#endif
     // ok?
     return data;
 }
@@ -87,8 +90,14 @@ tb_pointer_t tb_allocator_malloc0_(tb_allocator_ref_t allocator, tb_size_t size 
     // check
     tb_assert_and_check_return_val(allocator, tb_null);
 
+#ifdef __tb_alloc_trace__
+    tb_trace_w("tb_allocator_malloc0_(): %lu", size, func_, line_, file_);
+#endif
     // malloc it
     tb_pointer_t data = tb_allocator_malloc_(allocator, size __tb_debug_args__);
+#ifdef __tb_alloc_trace__
+    tb_trace_w("tb_allocator_malloc0_(%p): %lu", data, size, func_, line_, file_);
+#endif
 
     // clear it
     if (data) tb_memset_(data, 0, size);
@@ -152,6 +161,9 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
     // leave
     tb_spinlock_leave(&allocator->lock);
 
+#ifdef __tb_alloc_trace__
+    tb_trace_w("tb_allocator_ralloc_(%p): %lu (%p)", data_new, size, data, func_, line_, file_);
+#endif
     // ok?
     return data_new;
 }
@@ -186,6 +198,9 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
     // leave
     tb_spinlock_leave(&allocator->lock);
 
+#ifdef __tb_alloc_trace__
+    tb_trace_w("tb_allocator_free_(%p)", data, func_, line_, file_);
+#endif
     // ok?
     return ok;
 }
