@@ -92,7 +92,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_ref_t aice)
 #ifdef __tb_debug__
         if (!tb_aicp_post_((tb_aicp_ref_t)impl, posted_aice, ((tb_aico_impl_t*)aice->aico)->func, ((tb_aico_impl_t*)aice->aico)->line, ((tb_aico_impl_t*)aice->aico)->file))
 #else
-        if (!tb_aicp_post_((tb_aicp_ref_t)impl, posted_aice))
+        if (!tb_aicp_post_((tb_aicp_ref_t)impl, posted_aice __tb_debug_vals__))
 #endif
         {
             // not posted
