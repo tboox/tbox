@@ -72,6 +72,9 @@ tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size _
     if (allocator->malloc) data = allocator->malloc(allocator, size __tb_debug_args__);
     else if (allocator->large_malloc) data = allocator->large_malloc(allocator, size, tb_null __tb_debug_args__);
 
+    // trace
+    tb_trace_d("malloc(%lu): %p at %s(): %d, %s", size, data __tb_debug_args__);
+
     // check
     tb_assertf(data, "malloc(%lu) failed!", size);
     tb_assertf(!(((tb_size_t)data) & (TB_POOL_DATA_ALIGN - 1)), "malloc(%lu): unaligned data: %p", size, data);
@@ -131,6 +134,9 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
     if (allocator->ralloc) data_new = allocator->ralloc(allocator, data, size __tb_debug_args__);
     else if (allocator->large_ralloc) data_new = allocator->large_ralloc(allocator, data, size, tb_null __tb_debug_args__);
 
+    // trace
+    tb_trace_d("ralloc(%p, %lu): %p at %s(): %d, %s", data, size, data_new __tb_debug_args__);
+
     // failed? dump it
 #ifdef __tb_debug__
     if (!data_new) 
@@ -162,6 +168,9 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
 
     // enter
     tb_spinlock_enter(&allocator->lock);
+
+    // trace
+    tb_trace_d("free(%p): at %s(): %d, %s", data __tb_debug_args__);
 
     // free it
     tb_bool_t ok = tb_false;
@@ -206,6 +215,9 @@ tb_pointer_t tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t 
         if (real) *real = size;
         data = allocator->malloc(allocator, size __tb_debug_args__);
     }
+
+    // trace
+    tb_trace_d("large_malloc(%lu): %p at %s(): %d, %s", size, data __tb_debug_args__);
 
     // check
     tb_assertf(data, "malloc(%lu) failed!", size);
@@ -272,6 +284,9 @@ tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer
         data_new = allocator->ralloc(allocator, data, size __tb_debug_args__);
     }
 
+    // trace
+    tb_trace_d("large_ralloc(%p, %lu): %p at %s(): %d, %s", data, size, data_new __tb_debug_args__);
+
     // failed? dump it
 #ifdef __tb_debug__
     if (!data_new) 
@@ -304,6 +319,9 @@ tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t da
 
     // enter
     tb_spinlock_enter(&allocator->lock);
+
+    // trace
+    tb_trace_d("large_free(%p): at %s(): %d, %s", data __tb_debug_args__);
 
     // free it
     tb_bool_t ok = tb_false;
