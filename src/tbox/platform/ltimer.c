@@ -242,27 +242,7 @@ static tb_bool_t tb_ltimer_del_task(tb_ltimer_t* timer, tb_ltimer_task_impl_t* t
     // ok?
     return ok;
 }
-static tb_bool_t tb_ltimer_expired_init(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
-{
-    // check
-    tb_ltimer_t* timer = (tb_ltimer_t*)priv;
-    tb_assert_and_check_return_val(timer && timer->expired, tb_false);
-
-    // the task
-    tb_ltimer_task_impl_t const* task_impl = (tb_ltimer_task_impl_t const*)item;
-    if (task_impl)
-    {
-        // check refn
-        tb_assert(task_impl->refn);
-
-        // expired 
-        tb_vector_insert_tail(timer->expired, task_impl);
-    }
-
-    // ok
-    return tb_true;
-}
-static tb_bool_t tb_ltimer_expired_done(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_ltimer_expired_task_done(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the task
     tb_ltimer_task_impl_t const* task_impl = (tb_ltimer_task_impl_t const*)item;
@@ -280,11 +260,11 @@ static tb_bool_t tb_ltimer_expired_done(tb_iterator_ref_t iterator, tb_pointer_t
     // ok
     return tb_true;
 }
-static tb_bool_t tb_ltimer_expired_exit(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_bool_t tb_ltimer_expired_task_exit(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // check
-    tb_ltimer_t*   timer = priv? (tb_ltimer_t*)(((tb_pointer_t*)priv)[0]) : tb_null;
-    tb_hong_t*          now = priv? (tb_hong_t*)(((tb_pointer_t*)priv)[1]) : tb_null;
+    tb_ltimer_t*    timer = priv? (tb_ltimer_t*)(((tb_pointer_t*)priv)[0]) : tb_null;
+    tb_hong_t*      now = priv? (tb_hong_t*)(((tb_pointer_t*)priv)[1]) : tb_null;
     tb_assert_and_check_return_val(timer && now, tb_false);
 
     // the task
@@ -315,6 +295,18 @@ static tb_bool_t tb_ltimer_expired_exit(tb_iterator_ref_t iterator, tb_pointer_t
 
     // ok
     return tb_true;
+}
+static tb_void_t tb_ltimer_expired_list_exit(tb_element_ref_t element, tb_pointer_t buff)
+{
+    // check
+    tb_vector_ref_t list = buff? *((tb_vector_ref_t*)buff) : tb_null;
+    tb_assert_and_check_return(list);
+
+    // exit list
+    tb_vector_exit(list);
+
+    // clear it
+    *((tb_pointer_t*)buff) = tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +340,7 @@ tb_ltimer_ref_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
         tb_assert_and_check_break(timer->pool);
 
         // init the expired tasks
-        timer->expired      = tb_vector_init((maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_element_ptr(tb_null, tb_null));
+        timer->expired      = tb_vector_init((TB_LTIMER_WHEEL_MAXN >> 3) + 8, tb_element_ptr(tb_ltimer_expired_list_exit, tb_null));
         tb_assert_and_check_break(timer->expired);
 
         // register lock profiler
@@ -488,9 +480,6 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
     // the now time
     tb_hong_t now = tb_ltimer_now(timer);
 
-    // clear expired
-    tb_vector_clear(timer->expired);
-
     // enter
     tb_spinlock_enter(&timer->lock);
 
@@ -498,6 +487,13 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
     tb_bool_t ok = tb_false;
     do
     {
+        // less than one tick? continue to wait
+        if (now - timer->btime < timer->tick)
+        {
+            ok = tb_true;
+            break;
+        }
+
         // empty? move to the wheel head
         if (!tb_fixed_pool_size(timer->pool))
         {
@@ -525,11 +521,9 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
             tb_vector_ref_t list = timer->wheel[indx];
             tb_check_continue(list && tb_vector_size(list));
 
-            // init the expired task 
-            tb_walk_all(list, tb_ltimer_expired_init, self);
-
-            // clear the wheel list
-            tb_vector_clear(list);
+            // detach the wheel list to the expired tasks
+            tb_vector_insert_tail(timer->expired, list);
+            timer->wheel[indx] = tb_null;
         }
 
         // update the base time
@@ -546,22 +540,29 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
     // leave
     tb_spinlock_leave(&timer->lock);
 
-    // ok? and exists expired task_impl?
+    // ok? and exists expired tasks?
     if (ok && tb_vector_size(timer->expired))
     {
-        // done the expired task 
-        tb_walk_all(timer->expired, tb_ltimer_expired_done, tb_null);
+        // done all expired list
+        tb_for_all_if (tb_vector_ref_t, list, timer->expired, list)
+        {
+            // done the expired task 
+            tb_walk_all(list, tb_ltimer_expired_task_done, tb_null);
 
-        // enter
-        tb_spinlock_enter(&timer->lock);
+            // enter
+            tb_spinlock_enter(&timer->lock);
 
-        // exit the expired task
-        tb_pointer_t data[2]; data[0] = self; data[1] = &now;
-        tb_walk_all(timer->expired, tb_ltimer_expired_exit, data);
+            // exit the expired task
+            tb_pointer_t data[2]; data[0] = self; data[1] = &now;
+            tb_walk_all(list, tb_ltimer_expired_task_exit, data);
 
-        // leave
-        tb_spinlock_leave(&timer->lock);
+            // leave
+            tb_spinlock_leave(&timer->lock);
+        }
     }
+
+    // clear expired
+    tb_vector_clear(timer->expired);
 
     // ok?
     return ok;
