@@ -14,7 +14,7 @@
 #define TB_DEMO_HTTPD_SESSION_MAXN                      (100000)
 
 // the httpd session timeout: 15s
-#define TB_DEMO_HTTPD_SESSION_TIMEOUT                   (15000)
+//#define TB_DEMO_HTTPD_SESSION_TIMEOUT                   (15000)
 
 // the httpd session buffer maximum size
 #define TB_DEMO_HTTPD_SESSION_BUFF_MAXN                 (8192)
@@ -224,8 +224,10 @@ static tb_demo_httpd_session_t* tb_demo_httpd_session_init(tb_demo_httpd_t* http
         if (!tb_buffer_init(&session->cache)) break;
 
         // init timeout
+#ifdef TB_DEMO_HTTPD_SESSION_TIMEOUT
         tb_aico_timeout_set(session->aico, TB_AICO_TIMEOUT_SEND, TB_DEMO_HTTPD_SESSION_TIMEOUT);
         tb_aico_timeout_set(session->aico, TB_AICO_TIMEOUT_RECV, TB_DEMO_HTTPD_SESSION_TIMEOUT);
+#endif
 
         // ok
         ok = tb_true;
