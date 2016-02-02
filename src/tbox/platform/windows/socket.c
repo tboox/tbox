@@ -282,6 +282,37 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             tb_trace_noimpl();
         }
         break;
+    case TB_SOCKET_CTRL_SET_TCP_NODELAY:
+        {
+            // enable the nagle's algorithm
+            tb_int_t enable = (tb_int_t)tb_va_arg(args, tb_bool_t);
+            if (!tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable)))
+            {
+                // ok
+                ok = tb_true;
+            }
+        }
+        break;
+    case TB_SOCKET_CTRL_GET_TCP_NODELAY:
+        {
+            // the penable
+            tb_bool_t* penable = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+            tb_assert_and_check_return_val(penable, tb_false);
+
+            // the nagle's algorithm is enabled?
+            tb_int_t    enable = 0;
+            tb_int_t    size = sizeof(enable);
+            if (!tb_ws2_32()->getsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, &size))
+            {
+                // save it
+                *penable = (tb_bool_t)enable;
+            
+                // ok
+                ok = tb_true;
+            }
+            else *penable = tb_false;
+        }
+        break;
     case TB_SOCKET_CTRL_SET_RECV_BUFF_SIZE:
         {
             // the buff_size
