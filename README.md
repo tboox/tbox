@@ -96,7 +96,6 @@ TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac
 针对各个平台，封装了统一的接口，简化了各类开发过程中常用操作，使你在开发过程中，更加关注实际应用的开发，而不是把时间浪费在琐碎的接口兼容性上面，并且充分利用了各个平台独有的一些特性进行优化。
 
 * [在线文档](https://github.com/waruqi/tbox/wiki/%E7%9B%AE%E5%BD%95)
-* [在线手册](http://tboox.github.io/doc/tbox/html/index.html)
 * [在线源码](https://github.com/waruqi/tbox)
 
 ## 流库
