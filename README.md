@@ -1,35 +1,38 @@
-The Treasure Box Library [![Build Status](https://api.travis-ci.org/waruqi/tbox.svg)](https://travis-ci.org/waruqi/tbox) [![Coverage Status](https://coveralls.io/repos/waruqi/tbox/badge.svg?branch=master&service=github)](https://coveralls.io/github/waruqi/tbox?branch=master) [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://github.com/waruqi/tbox/wiki/donate)
-========================
+# The Treasure Box Library [![Build Status](https://api.travis-ci.org/waruqi/tbox.svg)](https://travis-ci.org/waruqi/tbox) [![Coverage Status](https://coveralls.io/repos/waruqi/tbox/badge.svg?branch=master&service=github)](https://coveralls.io/github/waruqi/tbox?branch=master) [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://github.com/waruqi/tbox/wiki/donate)
+
+## introduction
 
 TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
 
 It is similar to glibc, but simpler and more convenient.
 It includes asio, stream, network, container, algorithm, object, memory, database, string, charset, math, regex, libc, libm, utils and other library modules.
 
-features
---------
+* [Documents](https://github.com/waruqi/tbox/wiki/documents)
+* [Github](https://github.com/waruqi/tbox)
 
-### the stream library
+## features
+
+#### the stream library
 - supports file, data, http and socket source
 - supports the stream filter for gzip, charset and...
 - implements transfer for two stream
 - implements transfer pool (asio) for multi-stream
 - implements the static buffer stream for parsing data
 
-### the asynchronous io library
+#### the asynchronous io library
 - supports reactor and proactor mode
 - using epoll, poll, select, kqueue and iocp os system api
 
-### the database library
+#### the database library
 - supports mysql and sqlite3 database and enumerates data using the iterator mode
 
-### the xml parser library
+#### the xml parser library
 - supports DOM and SAX mode and supports xpath
 
-### the serialization and deserialization library. 
+#### the serialization and deserialization library. 
 - supports xml, json, bplist, xplist, binary formats
 
-### the memory library
+#### the memory library
 - implements some memory pools for optimizing memory
 - supports fast memory error detecting. it can detect the following types of bugs for the debug mode:
   - out-of-bounds accesses to heap and globals
@@ -37,58 +40,152 @@ features
   - double-free, invalid free
   - memory leaks
 
-### the container library
+#### the container library
 - implements hash table, single list, double list, vector, stack, queue
   and min/max heap. supports iterator mode for algorithm
 
-### the algorithm library
+#### the algorithm library
 - using the iterator mode
 - implements find, binary find and reverse find algorithm
 - implements sort, bubble sort, quick sort, heap sort and insert sort algorithm
 - implements count, walk items, reverse walk items, for_all and rfor_all
 
-### the network library
+#### the network library
 - implements dns(cached), ssl(openssl and polarssl), http and cookies
 - supports asynchronous io mode for dns, ssl and http using the asio and stream library
 
-### the platform library
+#### the platform library
 - implements timer, fast and low precision timer
 - implements atomic and atomic64 operation
 - implements spinlock, mutex, event, semaphore, thread and thread pool 
 - implements file, socket operation
 
-### the charset library
+#### the charset library
 - supports utf8, utf16, gbk, gb2312, uc2 and uc4
 - supports big endian and little endian mode
 
-### the zip library
+#### the zip library
 - supports gzip, zlibraw, zlib formats using the zlib library if exists
 - implements lzsw, lz77 and rlc algorithm
 
-### the utils library
+#### the utils library
 - implements base32, base64 encoder and decoder
 - implements crc32, adler32, md5 and sha1 hash algorithm
 - implements assert and trace output for the debug mode
 - implements bits operation for parsing u8, u16, u32, u64 data
 
-### the math library
+#### the math library
 - implements random generator
 - implements fast fixed-point calculation, supports 6-bits, 16-bits, 30-bits fixed-point number
 
-### the libc library
+#### the libc library
 - implements lightweight libc library interfaces, the interface name contains tb_xxx prefix for avoiding conflict
 - implements strixxx strrxxx wcsixxx wcsrxxx interface extension
 - optimizes some frequently-used interface, .e.g. memset, memcpy, strcpy ... 
 - implements memset_u16, memset_u32, memset_u64 extension interfaces
 
-### the libm library
+#### the libm library
 - implements lightweight libm library interfaces, the interface name contains tb_xxx prefix for avoiding conflict
 - supports float and double type
 
-### the regex library
+#### the regex library
 - supports match and replace
 - supports global/multiline/caseless mode
 - uses pcre, pcre2 and posix regex modules
+
+## projects
+
+some projects using tbox:
+
+* [gbox](https://github.com/waruqi/gbox)
+* [itrace](https://github.com/waruqi/itrace)
+* [more](https://github.com/waruqi/tbox/wiki/tbox-projects)
+
+## build
+
+please install xmake first: [xmake](https://github.com/waruqi/xmake)
+
+    // build for the host platform
+    cd ./tbox
+    xmake
+
+    // build for the iphoneos platform
+    cd ./tbox
+    xmake f -p iphoneos 
+    xmake
+    
+    // build for the android platform
+    cd ./tbox
+    xmake f -p android --ndk=xxxxx
+    xmake
+
+## example
+
+    #include "tbox/tbox.h"
+
+    int main(int argc, char** argv)
+    {
+        // init tbox
+        if (!tb_init(tb_null, tb_null)) return 0;
+
+        // trace
+        tb_trace_i("hello tbox");
+
+        // init vector
+        tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
+        if (vector)
+        {
+            // insert item
+            tb_vector_insert_tail(vector, "hello");
+            tb_vector_insert_tail(vector, "tbox");
+
+            // dump all items
+            tb_for_all (tb_char_t const*, cstr, vector)
+            {
+                // trace
+                tb_trace_i("%s", cstr);
+            }
+
+            // exit vector
+            tb_vector_exit(vector);
+        }
+
+        // init stream
+        tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxx.com/file.txt");
+        if (stream)
+        {
+            // open stream
+            if (tb_stream_open(stream))
+            {
+                // read line
+                tb_long_t size = 0;
+                tb_char_t line[TB_STREAM_BLOCK_MAXN];
+                while ((size = tb_stream_bread_line(stream, line, sizeof(line))) >= 0)
+                {
+                    // trace
+                    tb_trace_i("line: %s", line);
+                }
+            }
+
+            // exit stream
+            tb_stream_exit(stream);
+        }
+
+        // wait some time
+        getchar();
+
+        // exit tbox
+        tb_exit();
+        return 0;
+    }
+
+#### contacts
+
+- email:        
+    - waruqi@gmail.com
+- website:      
+    - http://www.tboox.org
+    - http://www.tboox.net
 
 ## 简介
 TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac、ios、android以及其他嵌入式系统。
@@ -193,69 +290,41 @@ TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac
 2. 支持全局、多行、大小写不敏感等模式
 3. 使用pcre, pcre2和posix正则库
 
-build
------
+## 一些使用tbox的项目：
 
-please install xmake first: [xmake](https://github.com/waruqi/xmake)
+* [gbox](https://github.com/waruqi/gbox)
+* [itrace](https://github.com/waruqi/itrace)
+* [更多项目](https://github.com/waruqi/tbox/wiki/%E4%BD%BF%E7%94%A8tbox%E7%9A%84%E5%BC%80%E6%BA%90%E5%BA%93)
 
+## 编译 
 
-```bash
-	// build for the host platform
+请先安装: [xmake](https://github.com/waruqi/xmake)
+
+    // 默认直接编译当前主机平台
     cd ./tbox
     xmake
 
-	// build for the iphoneos platform
+    // 编译iphoneos平台
     cd ./tbox
     xmake f -p iphoneos 
     xmake
     
-	// build for the android platform
+    // 编译android平台
     cd ./tbox
     xmake f -p android --ndk=xxxxx
     xmake
-```
 
-example
------------
-```c
+## 例子
+
     #include "tbox/tbox.h"
 
     int main(int argc, char** argv)
     {
-        /* init tbox
-         *
-         * @param priv      the platform private data
-         *                  pass JavaVM* jvm for android jni
-         *                  pass tb_null for other platform
-         *
-         * @param allocator the allocator, supports:
-         *
-         *                  - tb_native_allocator()
-         *                      uses native memory directly
-         *
-         *                  - tb_static_allocator(data, size)
-         *                      uses the a static small buffer and we can check memory error and leaking
-         *
-         *                  - tb_default_allocator(data, size)
-         *                      uses the a large pool with the static memory and we can check memory error and leaking
-         *
-         *                  - tb_default_allocator(tb_null, 0)
-         *                      uses the a large pool with the native memory and we can check memory error and leaking
-         *
-         *                  - tb_null
-         *                      uses tb_default_allocator(tb_null, 0) for large mode
-         *                      uses tb_native_allocator() for small mode, need define __tb_small__ 
-         */
+        // init tbox
         if (!tb_init(tb_null, tb_null)) return 0;
 
-        // print info with tag
+        // trace
         tb_trace_i("hello tbox");
-
-        // print info only for debug
-        tb_trace_d("hello tbox"); 
-
-        // print error info
-        tb_trace_e("hello tbox");
 
         // init vector
         tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
@@ -265,44 +334,37 @@ example
             tb_vector_insert_tail(vector, "hello");
             tb_vector_insert_tail(vector, "tbox");
 
-            // walk items
-            tb_for_all_if (tb_char_t const*, cstr, vector, cstr)
+            // dump all items
+            tb_for_all (tb_char_t const*, cstr, vector)
             {
                 // trace
                 tb_trace_i("%s", cstr);
             }
-
-            // find item
-            tb_size_t itor = tb_find_all(vector, "tbox");
-            if (itor != tb_iterator_tail(vector))
-            {
-                // trace
-                tb_trace_i("%s", tb_iterator_item(vector, itor));
-            }
-
-            // sort items
-            tb_sort_all(vector, tb_null);
 
             // exit vector
             tb_vector_exit(vector);
         }
 
         // init stream
-        tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxxx.com/index.html");
+        tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxx.com/file.txt");
         if (stream)
         {
-            // save stream data to file
-            tb_transfer_done_to_url(stream, "/home/file/index.html", 0, tb_null, tb_null);
+            // open stream
+            if (tb_stream_open(stream))
+            {
+                // read line
+                tb_long_t size = 0;
+                tb_char_t line[TB_STREAM_BLOCK_MAXN];
+                while ((size = tb_stream_bread_line(stream, line, sizeof(line))) >= 0)
+                {
+                    // trace
+                    tb_trace_i("line: %s", line);
+                }
+            }
 
             // exit stream
             tb_stream_exit(stream);
         }
-
-        // block: save http to file
-        tb_transfer_done_url("http://www.xxxx.com/index.html", "/home/file/index.html", 0, tb_null, tb_null);
-
-        // async: save http to file 
-        tb_transfer_pool_done(tb_transfer_pool(), "http://www.xxxx.com/index0.html", "/home/file/index0.html", 0, 0, tb_null, tb_null, tb_null);
 
         // wait some time
         getchar();
@@ -311,38 +373,14 @@ example
         tb_exit();
         return 0;
     }
-```
 
-contact
--------
+#### 联系方式
 
-- email:   	    
-	- waruqi@gmail.com
-	- waruqi@126.com
-- source:  	    
-	- [github](https://github.com/waruqi/tbox)
-	- [coding](https://coding.net/u/waruqi/p/tbox/git)
-	- [oschina](http://git.oschina.net/tboox/tbox)
-- website: 	    
-	- http://www.tboox.org
-	- http://www.tboox.net
-- download:
- 	- [github](https://github.com/waruqi/tbox/archive/master.zip)
- 	- [coding](https://coding.net/u/waruqi/p/tbox/git/archive/master)
- 	- [oschina](http://git.oschina.net/tboox/tbox/repository/archive?ref=master)
-- document:
-	- [github](https://github.com/waruqi/tbox/wiki/)
-	- [oschina](http://git.oschina.net/tboox/tbox/wikis/home)
+- email:        
+    - waruqi@gmail.com
+    - waruqi@126.com
+- website:      
+    - http://www.tboox.org
+    - http://www.tboox.net
 - qq(group):    
-	- 343118190
-
-donate
-------
-
-####alipay
-<img src="http://www.tboox.net/ruki/alipay.png" alt="alipay" width="128" height="128">
-
-####paypal
-<a href="http://tboox.net/%E6%8D%90%E5%8A%A9/">
-<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="paypal">
-</a>
+    - 343118190
