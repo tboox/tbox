@@ -24,3 +24,6 @@ add_option("pcre")
 
     -- add include directories
     add_option_includedirs("inc/$(plat)", "inc")
+
+    -- add c functions
+    add_option_cfuncs("pcre_compile")
