@@ -286,7 +286,7 @@ add_target("tbox")
     add_cfuncs("posix", nil,        "sys/sendfile.h",                   "sendfile")
     add_cfuncs("posix", nil,        "sys/epoll.h",                      "epoll_create", "epoll_wait")
     add_cfuncs("posix", nil,        "spawn.h",                          "posix_spawnp")
-    add_cfuncs("posix", nil,        "unistd.h",                         "execvpe", "fork")
+    add_cfuncs("posix", nil,        "unistd.h",                         "execvp", "execvpe", "fork", "vfork")
     add_cfuncs("posix", nil,        "sys/wait.h",                       "waitpid")
 
     -- add the interfaces for systemv
