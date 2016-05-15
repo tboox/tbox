@@ -42,7 +42,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 #if defined(TB_CONFIG_LIBC_HAVE_MEMCPY)
 static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
