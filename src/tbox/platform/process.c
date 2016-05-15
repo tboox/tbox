@@ -38,9 +38,11 @@
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/process.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) && \
-    (defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP) || \
-        (defined(TB_CONFIG_POSIX_HAVE_EXECVPE) && \
-         defined(TB_CONFIG_POSIX_HAVE_FORK)))
+        defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP)
+#   include "posix/process.c"
+#elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) && \
+         (defined(TB_CONFIG_POSIX_HAVE_FORK) || defined(TB_CONFIG_POSIX_HAVE_VFORK)) && \
+            (defined(TB_CONFIG_POSIX_HAVE_EXECVP) || defined(TB_CONFIG_POSIX_HAVE_EXECVPE)) 
 #   include "posix/process.c"
 #else
 tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[], tb_bool_t suspend)

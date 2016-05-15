@@ -21,17 +21,17 @@
  * @ingroup     platform
  */
 
+#undef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
 #include "../process.h"
+#include "../environment.h"
+#include <unistd.h>
 #include <sys/wait.h>
-#if defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP)
+#ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
 #   include <spawn.h>
-#elif defined(TB_CONFIG_POSIX_HAVE_FORK) && \
-        defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
-#   include <unistd.h>
 #endif
 #ifdef TB_CONFIG_LIBC_HAVE_KILL
 #   include <signal.h>
@@ -80,7 +80,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const arg
         if (suspend) posix_spawnattr_setflags(&process->attr, POSIX_SPAWN_START_SUSPENDED);
 
         // spawn the process
-        tb_long_t status = posix_spawnp(&process->pid, pathname, tb_null, &process->attr, argv, (tb_char_t**)envp);
+        tb_long_t status = posix_spawnp(&process->pid, pathname, tb_null, &process->attr, argv, envp);
         tb_check_break(status == 0);
 
         // check pid
@@ -102,12 +102,87 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const arg
     // ok?
     return (tb_process_ref_t)process;
 }
-#elif defined(TB_CONFIG_POSIX_HAVE_FORK) && \
-        defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[])
+#else
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[], tb_bool_t suspend)
 {
-    tb_trace_noimpl();
-    return tb_null;
+    // check
+    tb_assert_and_check_return_val(pathname, tb_null);
+
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_process_t*   process = tb_null;
+    do
+    {
+        // make process
+        process = tb_malloc0_type(tb_process_t);
+        tb_assert_and_check_break(process);
+
+        // fork it
+#ifdef TB_CONFIG_POSIX_HAVE_VFORK
+        switch ((process->pid = vfork()))
+#else
+        switch ((process->pid = fork()))
+#endif
+        {
+        case -1:
+
+            // trace
+            tb_trace_e("fork failed!");
+
+            // exit it
+            _exit(-1);
+
+        case 0: 
+
+            // TODO
+            // check
+            tb_assertf(!suspend, "suspend process not supported!");
+
+#if defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
+            // exec it in the child process
+            execvpe(pathname, argv, envp);
+#elif defined(TB_CONFIG_POSIX_HAVE_EXECVP)
+
+            // TODO
+            // set environment variables
+            if (envp)
+            {
+                while (*envp)
+                {
+                }
+            }
+
+            // exec it in the child process
+            execvp(pathname, argv);
+#else
+#   error 
+#endif
+            // exit it
+            _exit(-1);
+
+        default:
+            // parent
+            break;
+        }
+
+        // check pid
+        tb_assert_and_check_break(process->pid > 0);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (process) tb_process_exit((tb_process_ref_t)process);
+        process = tb_null;
+    }
+
+    // ok?
+    return (tb_process_ref_t)process;
 }
 #endif
 tb_void_t tb_process_exit(tb_process_ref_t self)
