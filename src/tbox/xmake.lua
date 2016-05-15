@@ -236,9 +236,8 @@ add_target("tbox")
                                                                         "mbstowcs")
     add_cfuncs("libc", nil,         "time.h",                           "gmtime", "mktime", "localtime")
     add_cfuncs("libc", nil,         "sys/time.h",                       "gettimeofday")
-    add_cfuncs("libc", nil,         {"signal.h", "setjmp.h"},           "signal", "setjmp", "sigsetjmp")
+    add_cfuncs("libc", nil,         {"signal.h", "setjmp.h"},           "signal", "setjmp", "sigsetjmp", "kill")
     add_cfuncs("libc", nil,         "execinfo.h",                       "backtrace")
-    add_cfuncs("libc", nil,         "stdlib.h",                         "system")
 
     -- add the interfaces for libm
     add_cfuncs("libm", nil,         "math.h",                           "sincos", 
@@ -286,6 +285,9 @@ add_target("tbox")
     add_cfuncs("posix", nil,        "unistd.h",                         "fdatasync")
     add_cfuncs("posix", nil,        "sys/sendfile.h",                   "sendfile")
     add_cfuncs("posix", nil,        "sys/epoll.h",                      "epoll_create", "epoll_wait")
+    add_cfuncs("posix", nil,        "spawn.h",                          "posix_spawnp")
+    add_cfuncs("posix", nil,        "unistd.h",                         "execvpe", "fork")
+    add_cfuncs("posix", nil,        "sys/wait.h",                       "waitpid")
 
     -- add the interfaces for systemv
     add_cfuncs("systemv", nil,      {"sys/sem.h", "sys/ipc.h"},         "semget", "semtimedop")

@@ -22,6 +22,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME                "process"
+#define TB_TRACE_MODULE_DEBUG               (0)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "process.h"
@@ -31,13 +37,55 @@
  */
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/process.c"
-#elif defined(TB_CONFIG_LIBC_HAVE_SYSTEM)
+#elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) && \
+    (defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP) || \
+        (defined(TB_CONFIG_POSIX_HAVE_EXECVPE) && \
+         defined(TB_CONFIG_POSIX_HAVE_FORK)))
 #   include "posix/process.c"
 #else
-tb_bool_t tb_process_done(tb_char_t const* line)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[], tb_bool_t suspend)
 {
     tb_trace_noimpl();
-    return tb_false;
+    return tb_null;
+}
+tb_void_t tb_process_exit(tb_process_ref_t self)
+{
+    tb_trace_noimpl();
+}
+tb_void_t tb_process_kill(tb_process_ref_t self)
+{
+    tb_trace_noimpl();
+}
+tb_void_t tb_process_resume(tb_process_ref_t self);
+{
+    tb_trace_noimpl();
+}
+tb_void_t tb_process_suspend(tb_process_ref_t self)
+{
+    tb_trace_noimpl();
+}
+tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t timeout)
+{
+    tb_trace_noimpl();
+    return 0;
 }
 #endif
+tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[])
+{
+    // init process
+    tb_long_t           ok = -1;
+    tb_process_ref_t    process = tb_process_init(pathname, argv, envp, tb_false);
+    if (process)
+    {
+        // wait process
+        tb_long_t status = 0;
+        if (tb_process_wait(process, &status, -1) > 0)
+            ok = status;
 
+        // exit process
+        tb_process_exit(process);
+    }
+
+    // ok?
+    return ok;
+}
