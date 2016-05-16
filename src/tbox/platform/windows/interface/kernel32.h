@@ -68,6 +68,9 @@ typedef DWORD (WINAPI* tb_kernel32_GetEnvironmentVariableW_t)(LPCWSTR lpName, LP
 // the SetEnvironmentVariableW func type
 typedef BOOL (WINAPI* tb_kernel32_SetEnvironmentVariableW_t)(LPCWSTR lpName, LPCWSTR lpValue);
 
+// the CreateProcessW func type
+typedef BOOL (WINAPI* tb_kernel32_CreateProcessW_t)(LPCWSTR lpApplicationName, LPCWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFO lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -91,6 +94,9 @@ typedef struct __tb_kernel32_t
 
     // SetEnvironmentVariableW
     tb_kernel32_SetEnvironmentVariableW_t       SetEnvironmentVariableW;
+
+    // CreateProcessW
+    tb_kernel32_CreateProcessW_t                CreateProcessW;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 
