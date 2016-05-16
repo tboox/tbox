@@ -49,6 +49,12 @@ static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance, tb_cpointer_t p
     TB_INTERFACE_LOAD(kernel32, GetEnvironmentVariableW);
     TB_INTERFACE_LOAD(kernel32, SetEnvironmentVariableW);
     TB_INTERFACE_LOAD(kernel32, CreateProcessW);
+    TB_INTERFACE_LOAD(kernel32, CloseHandle);
+    TB_INTERFACE_LOAD(kernel32, WaitForSingleObject);
+    TB_INTERFACE_LOAD(kernel32, GetExitCodeProcess);
+    TB_INTERFACE_LOAD(kernel32, TerminateProcess);
+    TB_INTERFACE_LOAD(kernel32, SuspendThread);
+    TB_INTERFACE_LOAD(kernel32, ResumeThread);
 
     // ok
     return tb_true;
