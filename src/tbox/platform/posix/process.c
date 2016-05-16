@@ -262,7 +262,7 @@ tb_void_t tb_process_resume(tb_process_ref_t self)
     tb_process_t* process = (tb_process_t*)self;
     tb_assert_and_check_return(process);
 
-    // kill it
+    // resume it
     if (process->pid > 0)
     {
 #ifdef TB_CONFIG_LIBC_HAVE_KILL
@@ -279,7 +279,7 @@ tb_void_t tb_process_suspend(tb_process_ref_t self)
     tb_process_t* process = (tb_process_t*)self;
     tb_assert_and_check_return(process);
 
-    // kill it
+    // suspend it
     if (process->pid > 0)
     {
 #ifdef TB_CONFIG_LIBC_HAVE_KILL

@@ -11,7 +11,7 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
     // init environments
     tb_char_t const* envp[] = 
     {
-        "PATH=/tmp"
+        "path=/tmp"
     ,   tb_null
     };
 

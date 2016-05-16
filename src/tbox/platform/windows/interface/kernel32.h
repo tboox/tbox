@@ -71,6 +71,24 @@ typedef BOOL (WINAPI* tb_kernel32_SetEnvironmentVariableW_t)(LPCWSTR lpName, LPC
 // the CreateProcessW func type
 typedef BOOL (WINAPI* tb_kernel32_CreateProcessW_t)(LPCWSTR lpApplicationName, LPCWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFO lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 
+// the CloseHandle func type
+typedef BOOL (WINAPI* tb_kernel32_CloseHandle_t)(HANDLE hObject);
+
+// the WaitForSingleObject func type
+typedef DWORD (WINAPI* tb_kernel32_WaitForSingleObject_t)(HANDLE hHandle, DWORD dwMilliseconds);
+
+// the GetExitCodeProcess func type
+typedef BOOL (WINAPI* tb_kernel32_GetExitCodeProcess_t)(HANDLE hProcess, LPDWORD lpExitCode);
+
+// the TerminateProcess func type
+typedef BOOL (WINAPI* tb_kernel32_TerminateProcess_t)(HANDLE hProcess, UINT uExitCode);
+
+// the SuspendThread func type
+typedef DWORD (WINAPI* tb_kernel32_SuspendThread_t)(HANDLE hThread);
+
+// the ResumeThread func type
+typedef DWORD (WINAPI* tb_kernel32_ResumeThread_t)(HANDLE hThread);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -97,6 +115,24 @@ typedef struct __tb_kernel32_t
 
     // CreateProcessW
     tb_kernel32_CreateProcessW_t                CreateProcessW;
+
+    // CloseHandle
+    tb_kernel32_CloseHandle_t                   CloseHandle;
+
+    // WaitForSingleObject
+    tb_kernel32_WaitForSingleObject_t           WaitForSingleObject;
+
+    // GetExitCodeProcess
+    tb_kernel32_GetExitCodeProcess_t            GetExitCodeProcess;
+
+    // TerminateProcess
+    tb_kernel32_TerminateProcess_t              TerminateProcess;
+
+    // SuspendThread
+    tb_kernel32_SuspendThread_t                 SuspendThread;
+
+    // ResumeThread
+    tb_kernel32_ResumeThread_t                  ResumeThread;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 
