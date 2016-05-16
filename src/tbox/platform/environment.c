@@ -229,6 +229,98 @@ tb_bool_t tb_environment_set(tb_char_t const* name, tb_char_t const* values)
     // ok?
     return ok;
 }
+tb_bool_t tb_environment_add(tb_char_t const* name, tb_char_t const* values, tb_bool_t to_head)
+{
+    // check
+    tb_assert_and_check_return_val(name && values, tb_false);
+
+    // find the first separator position
+    tb_bool_t ok = tb_false;
+    tb_char_t const* p = values? tb_strchr(values, TM_ENVIRONMENT_SEP) : tb_null;
+    if (p)
+    {
+        // init filter
+        tb_hash_set_ref_t filter = tb_hash_set_init(8, tb_element_str(tb_true));
+
+        // init environment 
+        tb_char_t               data[TB_PATH_MAXN];
+        tb_environment_ref_t    environment = tb_environment_init();
+        if (environment)
+        {
+            // load the previous values
+            tb_environment_load(environment, name);
+
+            // make environment
+            tb_char_t const* b = values;
+            tb_char_t const* e = b + tb_strlen(values);
+            do
+            {
+                // not empty?
+                if (b < p)
+                {
+                    // the size
+                    tb_size_t size = tb_min(p - b, sizeof(data) - 1);
+
+                    // copy it
+                    tb_strncpy(data, b, size);
+                    data[size] = '\0';
+
+                    // have been not inserted?
+                    if (!filter || !tb_hash_set_get(filter, data)) 
+                    {
+                        // append the environment 
+                        tb_environment_insert(environment, data, to_head);
+
+                        // save it to the filter
+                        tb_hash_set_insert(filter, data);
+                    }
+                }
+
+                // end?
+                tb_check_break(p + 1 < e);
+
+                // find the next separator position
+                b = p + 1;
+                p = tb_strchr(b, TM_ENVIRONMENT_SEP);
+                if (!p) p = e;
+
+            } while (1);
+
+            // set environment variables
+            ok = tb_environment_save(environment, name);
+
+            // exit environment
+            tb_environment_exit(environment);
+        }
+
+        // exit filter
+        if (filter) tb_hash_set_exit(filter);
+        filter = tb_null;
+    }
+    // only one?
+    else
+    {
+        // set environment variables
+        tb_environment_ref_t environment = tb_environment_init();
+        if (environment)
+        {
+            // load the previous values
+            tb_environment_load(environment, name);
+
+            // append the environment 
+            tb_environment_insert(environment, values, to_head);
+
+            // set environment variables
+            ok = tb_environment_save(environment, name);
+
+            // exit environment
+            tb_environment_exit(environment);
+        }
+    }
+
+    // ok?
+    return ok;
+}
 #ifdef __tb_debug__
 tb_void_t tb_environment_dump(tb_environment_ref_t environment, tb_char_t const* name)
 {

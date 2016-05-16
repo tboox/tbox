@@ -21,7 +21,6 @@
  * @ingroup     platform
  */
 
-#undef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -59,7 +58,7 @@ typedef struct __tb_process_t
  * implementation
  */
 #if defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP)
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend)
 {
     // check
     tb_assert_and_check_return_val(pathname, tb_null);
@@ -80,7 +79,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const arg
         if (suspend) posix_spawnattr_setflags(&process->attr, POSIX_SPAWN_START_SUSPENDED);
 
         // spawn the process
-        tb_long_t status = posix_spawnp(&process->pid, pathname, tb_null, &process->attr, argv, envp);
+        tb_long_t status = posix_spawnp(&process->pid, pathname, tb_null, &process->attr, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
         tb_check_break(status == 0);
 
         // check pid
@@ -103,7 +102,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const arg
     return (tb_process_ref_t)process;
 }
 #else
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend)
 {
     // check
     tb_assert_and_check_return_val(pathname, tb_null);
@@ -118,7 +117,8 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const arg
         tb_assert_and_check_break(process);
 
         // fork it
-#ifdef TB_CONFIG_POSIX_HAVE_VFORK
+#if defined(TB_CONFIG_POSIX_HAVE_VFORK) && \
+        defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
         switch ((process->pid = vfork()))
 #else
         switch ((process->pid = fork()))
@@ -140,20 +140,40 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const arg
 
 #if defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
             // exec it in the child process
-            execvpe(pathname, argv, envp);
+            execvpe(pathname, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
 #elif defined(TB_CONFIG_POSIX_HAVE_EXECVP)
 
-            // TODO
-            // set environment variables
+            /* set environment variables
+             *
+             * uses fork because it will modify the parent environment
+             */
             if (envp)
             {
-                while (*envp)
+                // done
+                tb_char_t const* env = tb_null;
+                while ((env = *envp++))
                 {
+                    // get name and values
+                    tb_char_t const* p = tb_strchr(env, '=');
+                    if (p)
+                    {
+                        // get name
+                        tb_char_t name[256];
+                        tb_size_t size = tb_min(p - env, sizeof(name) - 1);
+                        tb_strncpy(name, env, size);
+                        name[size] = '\0';
+
+                        // get values
+                        tb_char_t const* values = p + 1;
+
+                        // add values to the environment
+                        tb_environment_add(name, values, tb_false);
+                    }
                 }
             }
 
             // exec it in the child process
-            execvp(pathname, argv);
+            execvp(pathname, (tb_char_t* const*)argv);
 #else
 #   error 
 #endif
