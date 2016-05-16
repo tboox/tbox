@@ -45,7 +45,7 @@
             (defined(TB_CONFIG_POSIX_HAVE_EXECVP) || defined(TB_CONFIG_POSIX_HAVE_EXECVPE)) 
 #   include "posix/process.c"
 #else
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend)
 {
     tb_trace_noimpl();
     return tb_null;
@@ -72,7 +72,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
     return 0;
 }
 #endif
-tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t* const argv[], tb_char_t* const envp[])
+tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[])
 {
     // init process
     tb_long_t           ok = -1;

@@ -213,7 +213,7 @@ tb_void_t               tb_environment_dump(tb_environment_ref_t environment, tb
  */
 tb_size_t               tb_environment_first(tb_char_t const* name, tb_char_t* value, tb_size_t maxn);
 
-/*! get the all environment variable values 
+/*! get the environment variable values 
  *
  * @code
  
@@ -226,23 +226,33 @@ tb_size_t               tb_environment_first(tb_char_t const* name, tb_char_t* v
  * @endcode
  *
  * @param name          the variable name
- * @param value         the variable values, separator: windows(';') or other(';')
+ * @param values        the variable values, separator: windows(';') or other(';')
  * @param maxn          the variable values maxn
  *
  * @return              the variable values size
  */
 tb_size_t               tb_environment_get(tb_char_t const* name, tb_char_t* values, tb_size_t maxn);
 
-/*! set all environment variable values
+/*! set the environment variable values
  *
  * we will set all values and overwrite it
  *
  * @param name          the variable name
- * @param value         the variable values, separator: windows(';') or other(';')
+ * @param values        the variable values, separator: windows(';') or other(';')
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_environment_set(tb_char_t const* name, tb_char_t const* values);
+
+/*! add the environment variable values and not overwrite it
+ *
+ * @param name          the variable name
+ * @param values        the variable values, separator: windows(';') or other(';')
+ * @param to_head       add value into the head?
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_environment_add(tb_char_t const* name, tb_char_t const* values, tb_bool_t to_head);
 
 /*! remove the given environment variable 
  *
