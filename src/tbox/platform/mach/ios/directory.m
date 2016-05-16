@@ -51,7 +51,7 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
     else
     {
         // get the home directory
-        size = tb_environment_get_one("HOME", path, maxn);
+        size = tb_environment_first("HOME", path, maxn);
     }
 
     // ok?

@@ -114,7 +114,7 @@ tb_bool_t tb_environment_save(tb_environment_ref_t environment, tb_char_t const*
     // ok?
     return ok;
 }
-tb_size_t tb_environment_get_one(tb_char_t const* name, tb_char_t* value, tb_size_t maxn)
+tb_size_t tb_environment_first(tb_char_t const* name, tb_char_t* value, tb_size_t maxn)
 {
     // check
     tb_assert_and_check_return_val(name && value && maxn, 0);
@@ -148,14 +148,11 @@ tb_size_t tb_environment_get_one(tb_char_t const* name, tb_char_t* value, tb_siz
     // ok
     return size;
 }
-tb_bool_t tb_environment_set_one(tb_char_t const* name, tb_char_t const* value)
+tb_bool_t tb_environment_remove(tb_char_t const* name)
 {
     // check
     tb_assert_and_check_return_val(name, tb_false);
 
-    // the single value cannot exist ':'
-    tb_assertf(!value || !tb_strchr(value, ':'), "invalid value: %s", value);
-
-    // set it
-    return value? !setenv(name, value, 1) : !unsetenv(name);
+    // remove it
+    return !unsetenv(name);
 }

@@ -247,8 +247,8 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
 
     // get the home directory
     tb_size_t size = 0;
-    if (!(size = tb_environment_get_one("XDG_CONFIG_HOME", path, maxn)))
-        size = tb_environment_get_one("HOME", path, maxn);
+    if (!(size = tb_environment_first("XDG_CONFIG_HOME", path, maxn)))
+        size = tb_environment_first("HOME", path, maxn);
 
     // ok
     return size;
