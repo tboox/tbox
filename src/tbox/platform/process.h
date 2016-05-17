@@ -135,12 +135,18 @@ tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_char_t const
  * @endcode
  *
  * @param pathname      the process path or name
+ *
  * @param argv          the list of arguments must be terminated by a null pointer
  *                      and must be terminated by a null pointer
  *                      and argv[0] is the self path name
+ *
  * @param envp          the envp argument is an array of pointers to null-terminated strings
  *                      and must be terminated by a null pointer
  *                      and append to the previous environment variables
+ *
+ *                      if the value of envp is null, then the child process inherits 
+ *                      the environment of the parent process.
+ *
  * @param suspend       is suspended?
  *
  * @return              the process 
@@ -151,9 +157,14 @@ tb_process_ref_t        tb_process_init(tb_char_t const* pathname, tb_char_t con
  * 
  *
  * @param cmd           the command line
+ *
  * @param envp          the envp argument is an array of pointers to null-terminated strings
  *                      and must be terminated by a null pointer
  *                      and append to the previous environment variables
+ *
+ *                      if the value of envp is null, then the child process inherits 
+ *                      the environment of the parent process.
+ *
  * @param suspend       is suspended?
  *
  * @return              the process 
