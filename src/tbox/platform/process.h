@@ -92,6 +92,17 @@ typedef struct{}*       tb_process_ref_t;
  */
 tb_long_t               tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[]);
 
+/*! run a given process from the command line 
+ * 
+ * @param cmd           the command line
+ * @param envp          the envp argument is an array of pointers to null-terminated strings
+ *                      and must be terminated by a null pointer
+ *                      and append to the previous environment variables
+ *
+ * @return              the status value, failed: -1, ok: 0, other: error code
+ */
+tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_char_t const* envp[]);
+
 /*! init a given process 
  * 
  * @code
@@ -135,6 +146,19 @@ tb_long_t               tb_process_run(tb_char_t const* pathname, tb_char_t cons
  * @return              the process 
  */
 tb_process_ref_t        tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend);
+
+/*! init a given process from the command line 
+ * 
+ *
+ * @param cmd           the command line
+ * @param envp          the envp argument is an array of pointers to null-terminated strings
+ *                      and must be terminated by a null pointer
+ *                      and append to the previous environment variables
+ * @param suspend       is suspended?
+ *
+ * @return              the process 
+ */
+tb_process_ref_t        tb_process_init_cmd(tb_char_t const* cmd, tb_char_t const* envp[], tb_bool_t suspend);
 
 /*! exit the process
  *

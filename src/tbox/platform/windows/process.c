@@ -91,6 +91,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 //        if (envp) flags |= CREATE_UNICODE_ENVIRONMENT;
 
 #if 0
+        // FIXME no effect
         // make environment
         size = 0;
         tb_size_t maxn = 0;
@@ -125,6 +126,9 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         // end
         if (environment) environment[size++] = '\0';
 #else
+        // FIXME 
+        // will make the environment of the parent process dirty
+
         /* set environment variables
          *
          * uses fork because it will modify the parent environment
