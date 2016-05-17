@@ -90,7 +90,6 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         if (suspend) flags |= CREATE_SUSPENDED;
 //        if (envp) flags |= CREATE_UNICODE_ENVIRONMENT;
 
-#if 0
         // FIXME no effect
         // make environment
         size = 0;
@@ -125,39 +124,6 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 
         // end
         if (environment) environment[size++] = '\0';
-#else
-        // FIXME 
-        // will make the environment of the parent process dirty
-
-        /* set environment variables
-         *
-         * uses fork because it will modify the parent environment
-         */
-        if (envp)
-        {
-            // done
-            tb_char_t const* env = tb_null;
-            while ((env = *envp++))
-            {
-                // get name and values
-                tb_char_t const* p = tb_strchr(env, '=');
-                if (p)
-                {
-                    // get name
-                    tb_char_t name[256];
-                    tb_size_t size = tb_min(p - env, sizeof(name) - 1);
-                    tb_strncpy(name, env, size);
-                    name[size] = '\0';
-
-                    // get values
-                    tb_char_t const* values = p + 1;
-
-                    // add values to the environment
-                    tb_environment_add(name, values, tb_false);
-                }
-            }
-        }
-#endif
 
         // create process
         if (!tb_kernel32()->CreateProcessW(tb_null, cmd, tb_null, tb_null, FALSE, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))

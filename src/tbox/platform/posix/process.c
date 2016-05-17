@@ -55,6 +55,13 @@ typedef struct __tb_process_t
 }tb_process_t; 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+
+// the user environment
+extern tb_char_t**  environ;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP)
@@ -84,6 +91,9 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             tb_assertf(!suspend, "suspend process not supported!");
 #endif
         }
+
+        // no given environment? uses the current user environment
+        if (!envp) envp = (tb_char_t const**)environ;
 
         // spawn the process
         tb_long_t status = posix_spawnp(&process->pid, pathname, tb_null, &process->attr, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
@@ -146,6 +156,9 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             tb_assertf(!suspend, "suspend process not supported!");
 
 #if defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
+            // no given environment? uses the current user environment
+            if (!envp) envp = (tb_char_t const**)environ;
+
             // exec it in the child process
             execvpe(pathname, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
 #elif defined(TB_CONFIG_POSIX_HAVE_EXECVP)
@@ -173,8 +186,8 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
                         // get values
                         tb_char_t const* values = p + 1;
 
-                        // add values to the environment
-                        tb_environment_add(name, values, tb_false);
+                        // set values to the environment
+                        tb_environment_set(name, values, tb_false);
                     }
                 }
             }
