@@ -156,6 +156,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         }
 
         // redirect the stdout
+        BOOL bInheritHandle = FALSE;
         if (attr && attr->outfile)
         {
             // the outmode
@@ -170,6 +171,10 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             // open file
             process->si.hStdOutput = (HANDLE)tb_file_init(attr->outfile, outmode);
             tb_assertf_pass_and_check_break(process->si.hStdOutput, "cannot redirect stdout to file: %s", attr->outfile);
+
+            // enable inherit
+            tb_kernel32()->SetHandleInformation(process->si.hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
+            bInheritHandle = TRUE;
         }
 
         // redirect the stderr
@@ -187,10 +192,26 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             // open file
             process->si.hStdError = (HANDLE)tb_file_init(attr->errfile, errmode);
             tb_assertf_pass_and_check_break(process->si.hStdError, "cannot redirect stderr to file: %s", attr->errfile);
+
+            // enable inherit
+            tb_kernel32()->SetHandleInformation(process->si.hStdError, HANDLE_FLAG_INHERIT, TRUE);
+            bInheritHandle = TRUE;
         }
 
+        // init process security attributes
+        SECURITY_ATTRIBUTES sap     = {0};
+        sap.nLength                 = sizeof(SECURITY_ATTRIBUTES);
+        sap.lpSecurityDescriptor    = tb_null;
+        sap.bInheritHandle          = bInheritHandle;
+
+        // init thread security attributes
+        SECURITY_ATTRIBUTES sat     = {0};
+        sat.nLength                 = sizeof(SECURITY_ATTRIBUTES);
+        sat.lpSecurityDescriptor    = tb_null;
+        sat.bInheritHandle          = bInheritHandle;
+
         // create process
-        if (!tb_kernel32()->CreateProcessW(tb_null, cmd, tb_null, tb_null, FALSE, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
+        if (!tb_kernel32()->CreateProcessW(tb_null, cmd, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
             break;
 
         // check it
