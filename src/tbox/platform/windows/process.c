@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../path.h"
+#include "../file.h"
 #include "../process.h"
 #include "../environment.h"
 #include "../../string/string.h"
@@ -58,9 +59,10 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     tb_assert_and_check_return_val(pathname, tb_null);
 
     // done
-    tb_bool_t       ok = tb_false;
-    tb_process_t*   process = tb_null;
+    tb_bool_t       ok          = tb_false;
+    tb_process_t*   process     = tb_null;
     tb_char_t*      environment = tb_null;
+    tb_bool_t       userenv     = tb_false;
     tb_string_t     args;
     do
     {
@@ -140,6 +142,52 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 
         // end
         if (environment) environment[size++] = '\0';
+        // uses the current user environment if be null
+        else
+        {
+            // uses the unicode environment
+            flags |= CREATE_UNICODE_ENVIRONMENT;
+
+            // get user environment
+            environment = (tb_char_t*)tb_kernel32()->GetEnvironmentStringsW();
+
+            // mark as the user environment
+            userenv = tb_true;
+        }
+
+        // redirect the stdout
+        if (attr && attr->outfile)
+        {
+            // the outmode
+            tb_size_t outmode = attr->outmode;
+
+            // no mode? uses the default mode
+            if (!outmode) outmode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC;
+
+            // enable handles
+            process->si.dwFlags |= STARTF_USESTDHANDLES;
+
+            // open file
+            process->si.hStdOutput = (HANDLE)tb_file_init(attr->outfile, outmode);
+            tb_assertf_pass_and_check_break(process->si.hStdOutput, "cannot redirect stdout to file: %s", attr->outfile);
+        }
+
+        // redirect the stderr
+        if (attr && attr->errfile)
+        {
+            // the errmode
+            tb_size_t errmode = attr->errmode;
+
+            // no mode? uses the default mode
+            if (!errmode) errmode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC;
+
+            // enable handles
+            process->si.dwFlags |= STARTF_USESTDHANDLES;
+
+            // open file
+            process->si.hStdError = (HANDLE)tb_file_init(attr->errfile, errmode);
+            tb_assertf_pass_and_check_break(process->si.hStdError, "cannot redirect stderr to file: %s", attr->errfile);
+        }
 
         // create process
         if (!tb_kernel32()->CreateProcessW(tb_null, cmd, tb_null, tb_null, FALSE, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
@@ -157,9 +205,19 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     // exit arguments
     tb_string_exit(&args);
 
-    // exit environment
-    if (environment) tb_free(environment);
-    environment = tb_null;
+    // uses the user environment?
+    if (userenv)
+    {
+        // exit it
+        if (environment) tb_kernel32()->FreeEnvironmentStringsW((LPWCH)environment);
+        environment = tb_null;
+    }
+    else
+    {
+        // exit it
+        if (environment) tb_free(environment);
+        environment = tb_null;
+    }
 
     // failed?
     if (!ok)
@@ -200,6 +258,14 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
     if (process->pi.hProcess != INVALID_HANDLE_VALUE)
         tb_kernel32()->CloseHandle(process->pi.hProcess);
     process->pi.hProcess = INVALID_HANDLE_VALUE;
+
+    // exit stdout file
+    if (process->si.hStdOutput) tb_file_exit((tb_file_ref_t)process->si.hStdOutput);
+    process->si.hStdOutput = tb_null;
+
+    // exit stderr file
+    if (process->si.hStdError) tb_file_exit((tb_file_ref_t)process->si.hStdError);
+    process->si.hStdError = tb_null;
 
     // exit it
     tb_free(process);

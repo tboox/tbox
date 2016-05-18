@@ -89,6 +89,12 @@ typedef DWORD (WINAPI* tb_kernel32_SuspendThread_t)(HANDLE hThread);
 // the ResumeThread func type
 typedef DWORD (WINAPI* tb_kernel32_ResumeThread_t)(HANDLE hThread);
 
+// the GetEnvironmentStringsW func type
+typedef LPWCH (WINAPI* tb_kernel32_GetEnvironmentStringsW_t)(tb_void_t);
+
+// the FreeEnvironmentStringsW func type
+typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(LPWCH lpszEnvironmentBlock);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -133,6 +139,12 @@ typedef struct __tb_kernel32_t
 
     // ResumeThread
     tb_kernel32_ResumeThread_t                  ResumeThread;
+
+    // GetEnvironmentStringsW
+    tb_kernel32_GetEnvironmentStringsW_t        GetEnvironmentStringsW;
+
+    // FreeEnvironmentStringsW
+    tb_kernel32_FreeEnvironmentStringsW_t       FreeEnvironmentStringsW;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 
