@@ -45,7 +45,7 @@
             (defined(TB_CONFIG_POSIX_HAVE_EXECVP) || defined(TB_CONFIG_POSIX_HAVE_EXECVPE)) 
 #   include "posix/process.c"
 #else
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     tb_trace_noimpl();
     return tb_null;
@@ -72,7 +72,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
     return 0;
 }
 #endif
-tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_char_t const* envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr)
 {
     // check
     tb_assert_and_check_return_val(cmd, tb_null);
@@ -146,7 +146,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_char_t const* envp
         tb_assertf_and_check_break(i <= m - 1, "the command(%s) arguments are too much!", cmd);
 
         // init process
-        process = tb_process_init(argv[0], argv, envp, suspend);
+        process = tb_process_init(argv[0], argv, attr);
     
     } while (0);
 
@@ -157,11 +157,14 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_char_t const* envp
     // ok?
     return process;
 }
-tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[])
+tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
+    // remove suspend
+    if (attr) attr->flags &= ~TB_PROCESS_FLAG_SUSPEND;
+
     // init process
     tb_long_t           ok = -1;
-    tb_process_ref_t    process = tb_process_init(pathname, argv, envp, tb_false);
+    tb_process_ref_t    process = tb_process_init(pathname, argv, attr);
     if (process)
     {
         // wait process
@@ -176,11 +179,14 @@ tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_
     // ok?
     return ok;
 }
-tb_long_t tb_process_run_cmd(tb_char_t const* cmd, tb_char_t const* envp[])
+tb_long_t tb_process_run_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr)
 {
+    // remove suspend
+    if (attr) attr->flags &= ~TB_PROCESS_FLAG_SUSPEND;
+
     // init process
     tb_long_t           ok = -1;
-    tb_process_ref_t    process = tb_process_init_cmd(cmd, envp, tb_false);
+    tb_process_ref_t    process = tb_process_init_cmd(cmd, attr);
     if (process)
     {
         // wait process

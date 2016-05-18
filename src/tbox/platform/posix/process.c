@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../process.h"
 #include "../environment.h"
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
@@ -45,11 +46,17 @@
 typedef struct __tb_process_t
 {
     // the pid
-    pid_t               pid;
+    pid_t                       pid;
+
+    // the attributes
+    tb_process_attr_t           attr;
 
 #ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
-    // the attributes
-    posix_spawnattr_t   attr;
+    // the spawn attributes
+    posix_spawnattr_t           spawn_attr;
+
+    // the spawn action
+    posix_spawn_file_actions_t  spawn_action;
 #endif
 
 }tb_process_t; 
@@ -62,10 +69,42 @@ typedef struct __tb_process_t
 extern tb_char_t**  environ;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_int_t tb_process_file_flags(tb_size_t mode)
+{
+    // no mode? uses the default mode
+    if (!mode) mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC;
+
+    // make flags
+    tb_size_t flags = 0;
+    if (mode & TB_FILE_MODE_RO)         flags |= O_RDONLY;
+    else if (mode & TB_FILE_MODE_WO)    flags |= O_WRONLY;
+    else if (mode & TB_FILE_MODE_RW)    flags |= O_RDWR;
+    if (mode & TB_FILE_MODE_CREAT)      flags |= O_CREAT;
+    if (mode & TB_FILE_MODE_APPEND)     flags |= O_APPEND;
+    if (mode & TB_FILE_MODE_TRUNC)      flags |= O_TRUNC;
+
+    // ok?
+    return flags;
+}
+static tb_int_t tb_process_file_modes(tb_size_t mode)
+{
+    // no mode? uses the default mode
+    if (!mode) mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC;
+
+    // make modes
+    tb_size_t modes = 0;
+    if (mode & TB_FILE_MODE_CREAT) modes = 0777;
+
+    // ok?
+    return modes;
+}
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP)
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     // check
     tb_assert_and_check_return_val(pathname, tb_null);
@@ -80,23 +119,53 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         tb_assert_and_check_break(process);
 
         // init attributes
-        posix_spawnattr_init(&process->attr);
+        if (attr)
+        {
+            // save it
+            process->attr = *attr;
+
+            // do not save envp, maybe stack pointer
+            process->attr.envp = tb_null;
+        }
+
+        // init spawn attributes
+        posix_spawnattr_init(&process->spawn_attr);
+
+        // init spawn action
+        posix_spawn_file_actions_init(&process->spawn_action);
+
+        // redirect the stdout
+        if (attr && attr->outfile)
+        {
+            // open stdout
+            tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDOUT_FILENO, attr->outfile, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
+            tb_assertf_pass_and_check_break(!result, "cannot redirect stdout to file: %s, error: %d", attr->outfile, result);
+        }
+
+        // redirect the stderr
+        if (attr && attr->errfile)
+        {
+            // open stderr
+            tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDERR_FILENO, attr->errfile, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
+            tb_assertf_pass_and_check_break(!result, "cannot redirect stderr to file: %s, error: %d", attr->errfile, result);
+        }
 
         // suspend it first
-        if (suspend)
+        if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND)
         {
 #ifdef POSIX_SPAWN_START_SUSPENDED
-            posix_spawnattr_setflags(&process->attr, POSIX_SPAWN_START_SUSPENDED);
+            posix_spawnattr_setflags(&process->spawn_attr, POSIX_SPAWN_START_SUSPENDED);
 #else
             tb_assertf(!suspend, "suspend process not supported!");
 #endif
         }
 
         // no given environment? uses the current user environment
+        tb_char_t const** envp = attr? attr->envp : tb_null;
         if (!envp) envp = (tb_char_t const**)environ;
 
         // spawn the process
-        tb_long_t status = posix_spawnp(&process->pid, pathname, tb_null, &process->attr, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
+        tb_long_t status = posix_spawnp(&process->pid, pathname, &process->spawn_action, &process->spawn_attr, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
         tb_check_break(status == 0);
 
         // check pid
@@ -119,7 +188,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     return (tb_process_ref_t)process;
 }
 #else
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     // check
     tb_assert_and_check_return_val(pathname, tb_null);
@@ -132,6 +201,16 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         // make process
         process = tb_malloc0_type(tb_process_t);
         tb_assert_and_check_break(process);
+
+        // init attributes
+        if (attr)
+        {
+            // save it
+            process->attr = *attr;
+
+            // do not save envp, maybe stack pointer
+            process->attr.envp = tb_null;
+        }
 
         // fork it
 #if defined(TB_CONFIG_POSIX_HAVE_VFORK) && \
@@ -153,7 +232,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 
             // TODO
             // check
-            tb_assertf(!suspend, "suspend process not supported!");
+            tb_assertf(!attr || !(attr->flags & TB_PROCESS_FLAG_SUSPEND), "suspend process not supported!");
 
 #if defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
             // no given environment? uses the current user environment
@@ -167,6 +246,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
              *
              * uses fork because it will modify the parent environment
              */
+            tb_char_t const** envp = attr? attr->envp : tb_null;
             if (envp)
             {
                 // done
@@ -187,7 +267,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
                         tb_char_t const* values = p + 1;
 
                         // set values to the environment
-                        tb_environment_set(name, values, tb_false);
+                        tb_environment_set(name, values);
                     }
                 }
             }
@@ -244,9 +324,21 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
         tb_process_wait(self, tb_null, -1);
     }
 
-    // exit attributes
 #ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
-    posix_spawnattr_destroy(&process->attr);
+
+    // close the stdout
+    if (process->attr.outfile) posix_spawn_file_actions_addclose(&process->spawn_action, STDOUT_FILENO);
+    process->attr.outfile = tb_null;
+
+    // close the stderr
+    if (process->attr.errfile) posix_spawn_file_actions_addclose(&process->spawn_action, STDERR_FILENO);
+    process->attr.errfile = tb_null;
+
+    // exit spawn attributes
+    posix_spawnattr_destroy(&process->spawn_attr);
+
+    // exit spawn action 
+    posix_spawn_file_actions_destroy(&process->spawn_action);
 #endif
 
     // exit it
