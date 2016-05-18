@@ -38,6 +38,67 @@ __tb_extern_c_enter__
  * types
  */
 
+/// the process flag enum
+typedef enum __tb_process_flag_e
+{
+    TB_PROCESS_FLAG_NONE    = 0
+,   TB_PROCESS_FLAG_SUSPEND = 1     //!< suspend process
+
+}tb_process_flag_e;
+
+/// the process attribute type
+typedef struct __tb_process_attr_t
+{
+    /// the flags
+    tb_size_t           flags;
+
+    /// the stdout filename 
+    tb_char_t const*    outfile;
+
+    /*! the stdout filemode
+     *
+     * default: TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC
+     * 
+     * support:
+     *
+     * - TB_FILE_MODE_WO
+     * - TB_FILE_MODE_RW 
+     * - TB_FILE_MODE_CREAT 
+     * - TB_FILE_MODE_APPEND 
+     * - TB_FILE_MODE_TRUNC
+     */
+    tb_size_t           outmode;
+
+    /// the stderr filename
+    tb_char_t const*    errfile;
+
+    /// the stderr filemode
+    tb_size_t           errmode;
+
+    /*! the environment
+     *
+     * @code
+     
+        tb_char_t const* envp[] = 
+        {
+            "path=/usr/bin"
+        ,   tb_null
+        };
+
+        attr.envp = envp;
+
+     * @endcode
+     *
+     * the envp argument is an array of pointers to null-terminated strings
+     * and must be terminated by a null pointer
+     *
+     * if the value of envp is null, then the child process inherits 
+     * the environment of the parent process.
+     */
+    tb_char_t const**   envp;
+
+}tb_process_attr_t, *tb_process_attr_ref_t;
+
 /// the process ref type
 typedef struct{}*       tb_process_ref_t;
 
@@ -63,9 +124,13 @@ typedef struct{}*       tb_process_ref_t;
         "path=/usr/bin"
     ,   tb_null
     };
+
+    // init attr
+    tb_process_attr_t attr = {0};
+    attr.envp = envp;
     
     // run bash
-    if (tb_process_run("echo", argv, envp) == 0)
+    if (tb_process_run("echo", argv, &attr) == 0)
     {
         // trace
         tb_trace_i("ok");
@@ -84,31 +149,27 @@ typedef struct{}*       tb_process_ref_t;
  * @param argv          the list of arguments must be terminated by a null pointer
  *                      and must be terminated by a null pointer
  *                      and argv[0] is the self path name
- * @param envp          the envp argument is an array of pointers to null-terminated strings
- *                      and must be terminated by a null pointer
- *                      and append to the previous environment variables
+ * @param attr          the process attributes
  *
  * @return              the status value, failed: -1, ok: 0, other: error code
  */
-tb_long_t               tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[]);
+tb_long_t               tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr);
 
 /*! run a given process from the command line 
  * 
  * @param cmd           the command line
- * @param envp          the envp argument is an array of pointers to null-terminated strings
- *                      and must be terminated by a null pointer
- *                      and append to the previous environment variables
+ * @param attr          the process attributes
  *
  * @return              the status value, failed: -1, ok: 0, other: error code
  */
-tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_char_t const* envp[]);
+tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr);
 
 /*! init a given process 
  * 
  * @code
  
     // init process
-    tb_process_ref_t process = tb_process_init("/bin/echo", tb_null, tb_null, tb_false);
+    tb_process_ref_t process = tb_process_init("/bin/echo", tb_null, tb_null);
     if (process)
     {
         // wait process
@@ -140,36 +201,20 @@ tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_char_t const
  *                      and must be terminated by a null pointer
  *                      and argv[0] is the self path name
  *
- * @param envp          the envp argument is an array of pointers to null-terminated strings
- *                      and must be terminated by a null pointer
- *                      and append to the previous environment variables
- *
- *                      if the value of envp is null, then the child process inherits 
- *                      the environment of the parent process.
- *
- * @param suspend       is suspended?
+ * @param attr          the process attributes
  *
  * @return              the process 
  */
-tb_process_ref_t        tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend);
+tb_process_ref_t        tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr);
 
 /*! init a given process from the command line 
  * 
- *
  * @param cmd           the command line
- *
- * @param envp          the envp argument is an array of pointers to null-terminated strings
- *                      and must be terminated by a null pointer
- *                      and append to the previous environment variables
- *
- *                      if the value of envp is null, then the child process inherits 
- *                      the environment of the parent process.
- *
- * @param suspend       is suspended?
+ * @param attr          the process attributes
  *
  * @return              the process 
  */
-tb_process_ref_t        tb_process_init_cmd(tb_char_t const* cmd, tb_char_t const* envp[], tb_bool_t suspend);
+tb_process_ref_t        tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr);
 
 /*! exit the process
  *

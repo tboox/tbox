@@ -44,12 +44,15 @@ typedef struct __tb_process_t
     // the process info
     PROCESS_INFORMATION     pi;
 
+    // the attributes
+    tb_process_attr_t       attr;
+
 }tb_process_t; 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_char_t const* envp[], tb_bool_t suspend)
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     // check
     tb_assert_and_check_return_val(pathname, tb_null);
@@ -71,6 +74,16 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         // init args
         if (!tb_string_init(&args)) break;
 
+        // init attributes
+        if (attr)
+        {
+            // save it
+            process->attr = *attr;
+
+            // do not save envp, maybe stack pointer
+            process->attr.envp = tb_null;
+        }
+
         // make arguments
         tb_char_t const* p = tb_null;
         while ((p = *argv++)) 
@@ -87,13 +100,16 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 
         // init flags
         DWORD flags = 0;
-        if (suspend) flags |= CREATE_SUSPENDED;
-//        if (envp) flags |= CREATE_UNICODE_ENVIRONMENT;
+        if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND) flags |= CREATE_SUSPENDED;
+//        if (attr && attr->envp) flags |= CREATE_UNICODE_ENVIRONMENT;
+
+        // reset size
+        size = 0;
 
         // FIXME no effect
         // make environment
-        size = 0;
-        tb_size_t maxn = 0;
+        tb_size_t           maxn = 0;
+        tb_char_t const**   envp = attr? attr->envp : tb_null;
         while (envp && (p = *envp++))
         {
             // get size
