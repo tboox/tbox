@@ -28,6 +28,7 @@
 #include "../process.h"
 #include "../environment.h"
 #include <fcntl.h>
+#include <errno.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
@@ -57,6 +58,12 @@ typedef struct __tb_process_t
 
     // the spawn action
     posix_spawn_file_actions_t  spawn_action;
+#else
+    // the redirect stdout fd
+    tb_int_t                    outfd;
+
+    // the redirect stderr fd
+    tb_int_t                    errfd;
 #endif
 
 }tb_process_t; 
@@ -234,6 +241,28 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             // check
             tb_assertf(!attr || !(attr->flags & TB_PROCESS_FLAG_SUSPEND), "suspend process not supported!");
 
+            // redirect the stdout
+            if (attr && attr->outfile)
+            {
+                // open file
+                process->outfd = open(attr->outfile, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
+                tb_assertf_pass_and_check_break(process->outfd, "cannot redirect stdout to file: %s, error: %d", attr->outfile, errno);
+
+                // redirect it
+                dup2(process->outfd, STDOUT_FILENO);
+            }
+
+            // redirect the stderr
+            if (attr && attr->outfile)
+            {
+                // open file
+                process->errfd = open(attr->errfile, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
+                tb_assertf_pass_and_check_break(process->errfd, "cannot redirect stderr to file: %s, error: %d", attr->errfile, errno);
+
+                // redirect it
+                dup2(process->errfd, STDOUT_FILENO);
+            }
+
 #if defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
             // no given environment? uses the current user environment
             if (!envp) envp = (tb_char_t const**)environ;
@@ -339,6 +368,15 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
 
     // exit spawn action 
     posix_spawn_file_actions_destroy(&process->spawn_action);
+#else
+
+    // close stdout fd
+    if (process->outfd) close(process->outfd);
+    process->outfd = 0;
+
+    // close stderr fd
+    if (process->errfd) close(process->errfd);
+    process->errfd = 0;
 #endif
 
     // exit it

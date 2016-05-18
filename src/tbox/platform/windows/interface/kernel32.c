@@ -55,6 +55,8 @@ static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance, tb_cpointer_t p
     TB_INTERFACE_LOAD(kernel32, TerminateProcess);
     TB_INTERFACE_LOAD(kernel32, SuspendThread);
     TB_INTERFACE_LOAD(kernel32, ResumeThread);
+    TB_INTERFACE_LOAD(kernel32, GetEnvironmentStringsW);
+    TB_INTERFACE_LOAD(kernel32, FreeEnvironmentStringsW);
 
     // ok
     return tb_true;
