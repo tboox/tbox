@@ -10,6 +10,7 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_process_attr_t attr = {0};
     attr.outfile = "z:\\log.txt";
+    attr.errfile = "z:\\err.txt";
 
     // run bash
     tb_long_t ok = tb_process_run(argv[1], (tb_char_t const**)(argv + 1), &attr);

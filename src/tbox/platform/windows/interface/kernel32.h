@@ -95,6 +95,9 @@ typedef LPWCH (WINAPI* tb_kernel32_GetEnvironmentStringsW_t)(tb_void_t);
 // the FreeEnvironmentStringsW func type
 typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(LPWCH lpszEnvironmentBlock);
 
+// the SetHandleInformation func type
+typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(HANDLE hObject, DWORD dwMask, DWORD dwFlags);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -145,6 +148,9 @@ typedef struct __tb_kernel32_t
 
     // FreeEnvironmentStringsW
     tb_kernel32_FreeEnvironmentStringsW_t       FreeEnvironmentStringsW;
+
+    // SetHandleInformation
+    tb_kernel32_SetHandleInformation_t          SetHandleInformation;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 
