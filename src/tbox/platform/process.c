@@ -83,14 +83,37 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
     tb_char_t*       buffer     = tb_null;
     do
     {
-        // copy command first
-        buffer = tb_strdup(cmd);
+        // make buffer
+        tb_size_t maxn = TB_PATH_MAXN;
+        buffer = (tb_char_t*)tb_malloc(maxn);
         tb_assert_and_check_break(buffer);
 
-        // parse command to the arguments
+        // copy and translate command
         tb_char_t   ch;
-        tb_bool_t   s = 0;
         tb_size_t   i = 0;
+        tb_size_t   j = 0;
+        for (i = 0; j <= maxn && (ch = cmd[i]); i++)
+        {
+            // not enough? grow it
+            if (j == maxn)
+            {
+                // grow it
+                maxn    += TB_PATH_MAXN;
+                buffer  = (tb_char_t*)tb_ralloc(buffer, maxn);
+                tb_assert_and_check_break(buffer);
+            }
+
+            // copy it and translate '\\'
+            if (ch != '\\') buffer[j++] = ch;
+        }
+        tb_assert_and_check_break(j < maxn);
+        buffer[j] = '\0';
+
+        // reset index
+        i = 0;
+
+        // parse command to the arguments
+        tb_bool_t   s = 0;
         tb_size_t   m = tb_arrayn(argv);
         tb_char_t*  p = buffer;
         tb_char_t*  b = tb_null;
