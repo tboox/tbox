@@ -163,7 +163,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 #ifdef POSIX_SPAWN_START_SUSPENDED
             posix_spawnattr_setflags(&process->spawn_attr, POSIX_SPAWN_START_SUSPENDED);
 #else
-            tb_assertf(!suspend, "suspend process not supported!");
+            tb_assertf(0, "suspend process not supported!");
 #endif
         }
 
