@@ -472,7 +472,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
         }
 
         // wait some time
-        tb_msleep(200);
+        if (timeout > 0) tb_msleep(tb_min(timeout, 60));
 
     } while (timeout > 0 && tb_mclock() - time < (tb_hong_t)timeout);
 
