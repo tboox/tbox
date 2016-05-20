@@ -56,14 +56,51 @@ typedef struct __tb_process_t
 tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     // check
-    tb_assert_and_check_return_val(pathname, tb_null);
+    tb_assert_and_check_return_val(pathname || argv, tb_null);
+
+    // done
+    tb_string_t         args;
+    tb_process_ref_t    process = tb_null;
+    do
+    {
+        // init args
+        if (!tb_string_init(&args)) break;
+
+        // make arguments
+        if (argv)
+        {
+            tb_char_t const* p = tb_null;
+            while ((p = *argv++)) 
+            {
+                tb_string_cstrcat(&args, p);
+                tb_string_cstrcat(&args, " ");
+            }
+        }
+        // only path name?
+        else tb_string_cstrcpy(&args, pathname);
+
+        // init process
+        process = tb_process_init_cmd(tb_string_cstr(&args), attr);
+
+    } while (0);
+
+    // exit arguments
+    tb_string_exit(&args);
+
+    // ok?
+    return process;
+}
+tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr)
+{
+    // check
+    tb_assert_and_check_return_val(cmd, tb_null);
 
     // done
     tb_bool_t       ok          = tb_false;
     tb_process_t*   process     = tb_null;
     tb_char_t*      environment = tb_null;
     tb_bool_t       userenv     = tb_false;
-    tb_string_t     args;
+    tb_wchar_t*     command     = tb_null;
     do
     {
         // make process
@@ -72,9 +109,6 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 
         // init startup info
         process->si.cb = sizeof(process->si);
-
-        // init args
-        if (!tb_string_init(&args)) break;
 
         // init attributes
         if (attr)
@@ -86,30 +120,30 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             process->attr.envp = tb_null;
         }
 
-        // make arguments
-        tb_char_t const* p = tb_null;
-        while ((p = *argv++)) 
-        {
-            tb_string_cstrcat(&args, p);
-            tb_string_cstrcat(&args, " ");
-        }
-
-        // make command
-        tb_wchar_t       cmd[TB_PATH_MAXN];
-        tb_char_t const* cstr = tb_string_cstr(&args);
-        tb_size_t size = tb_atow(cmd, cstr, tb_arrayn(cmd));
-        if (size < tb_arrayn(cmd)) cmd[size] = L'\0';
-
         // init flags
         DWORD flags = 0;
         if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND) flags |= CREATE_SUSPENDED;
 //        if (attr && attr->envp) flags |= CREATE_UNICODE_ENVIRONMENT;
+
+        // get the cmd size
+        tb_size_t cmdn = tb_strlen(cmd);
+        tb_assert_and_check_break(cmdn);
+
+        // init unicode command 
+        command = tb_nalloc_type(cmdn + 1, tb_wchar_t);
+        tb_assert_and_check_break(command);
+
+        // make command
+        tb_size_t size = tb_atow(command, cmd, cmdn + 1);
+        tb_assert_and_check_break(size <= cmdn);
+        command[size] = L'\0';
 
         // reset size
         size = 0;
 
         // FIXME no effect
         // make environment
+        tb_char_t const*    p = tb_null;
         tb_size_t           maxn = 0;
         tb_char_t const**   envp = attr? attr->envp : tb_null;
         while (envp && (p = *envp++))
@@ -211,7 +245,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         sat.bInheritHandle          = bInheritHandle;
 
         // create process
-        if (!tb_kernel32()->CreateProcessW(tb_null, cmd, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
+        if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
             break;
 
         // check it
@@ -222,9 +256,6 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         ok = tb_true;
 
     } while (0);
-
-    // exit arguments
-    tb_string_exit(&args);
 
     // uses the user environment?
     if (userenv)
@@ -239,6 +270,10 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         if (environment) tb_free(environment);
         environment = tb_null;
     }
+
+    // exit command 
+    if (command) tb_free(command);
+    command = tb_null;
 
     // failed?
     if (!ok)

@@ -334,6 +334,117 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     return (tb_process_ref_t)process;
 }
 #endif
+tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr)
+{
+    // check
+    tb_assert_and_check_return_val(cmd, tb_null);
+
+    // done
+    tb_process_ref_t process    = tb_null;
+    tb_char_t const* argv[256]  = {tb_null};
+    tb_char_t*       buffer     = tb_null;
+    do
+    {
+        // make buffer
+        tb_size_t maxn = TB_PATH_MAXN;
+        buffer = (tb_char_t*)tb_malloc(maxn);
+        tb_assert_and_check_break(buffer);
+
+        // copy and translate command
+        tb_char_t   ch;
+        tb_size_t   i = 0;
+        tb_size_t   j = 0;
+        for (i = 0; j <= maxn && (ch = cmd[i]); i++)
+        {
+            // not enough? grow it
+            if (j == maxn)
+            {
+                // grow it
+                maxn    += TB_PATH_MAXN;
+                buffer  = (tb_char_t*)tb_ralloc(buffer, maxn);
+                tb_assert_and_check_break(buffer);
+            }
+
+            // translate "\"", "\'", "\\"
+            tb_char_t next = cmd[i + 1];
+            if (ch == '\\' && (next == '\"' || next == '\'' || next == '\\')) /* skip it */ ;
+            // copy it
+            else buffer[j++] = ch;
+        }
+        tb_assert_and_check_break(j < maxn);
+        buffer[j] = '\0';
+
+        // reset index
+        i = 0;
+
+        // parse command to the arguments
+        tb_bool_t   s = 0;
+        tb_size_t   m = tb_arrayn(argv);
+        tb_char_t*  p = buffer;
+        tb_char_t*  b = tb_null;
+        while ((ch = *p))
+        {
+            // enter double quote?
+            if (!s && ch == '\"') s = 2;
+            // enter single quote?
+            else if (!s && ch == '\'') s = 1;
+            // leave quote?
+            else if ((s == 2 && ch == '\"') || (s == 1 && ch == '\'')) s = 0;
+            // is argument end with ' '?
+            else if (!s && tb_isspace(ch))
+            {
+                // fill zero
+                *p = '\0';
+
+                // save this argument 
+                if (b)
+                {
+                    // trace
+                    tb_trace_d("argv: %s", b);
+
+                    // save it
+                    if (i < m - 1) argv[i++] = b;
+
+                    // clear it
+                    b = tb_null;
+                }
+            }
+
+            // get the argument pointer
+            if ((s || !tb_isspace(ch)) && !b) b = p;
+
+            // next 
+            p++;
+        }
+
+        // save this argument 
+        if (b)
+        {
+            // trace
+            tb_trace_d("argv: %s", b);
+
+            // save it
+            if (i < m - 1) argv[i++] = b;
+
+            // clear it
+            b = tb_null;
+        }
+
+        // check
+        tb_assertf_and_check_break(i <= m - 1, "the command(%s) arguments are too much!", cmd);
+
+        // init process
+        process = tb_process_init(argv[0], argv, attr);
+    
+    } while (0);
+
+    // exit buffer
+    if (buffer) tb_free(buffer);
+    buffer = tb_null;
+
+    // ok?
+    return process;
+}
 tb_void_t tb_process_exit(tb_process_ref_t self)
 {
     // check
