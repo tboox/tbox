@@ -25,3 +25,4 @@ build
 cscope.*
 gmon.out
 tags
+Doxyfile

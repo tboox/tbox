@@ -1,37 +1,37 @@
 
 -- add type: wchar_t
-add_option("wchar_t")
-    add_option_ctypes("wchar_t")
-    add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_WCHAR")
+option("wchar_t")
+    add_ctypes("wchar_t")
+    add_defines_h_if_ok("$(prefix)_TYPE_HAVE_WCHAR")
 
 -- add option: float
-add_option("float")
-    set_option_enable(true)
-    set_option_showmenu(true)
-    set_option_category("option")
-    set_option_description("Enable or disable the float type")
-    add_option_defines_h_if_ok("$(prefix)_TYPE_HAVE_FLOAT")
+option("float")
+    set_enable(true)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Enable or disable the float type")
+    add_defines_h_if_ok("$(prefix)_TYPE_HAVE_FLOAT")
 
 -- add option: info
-add_option("info")
-    set_option_enable(true)
-    set_option_showmenu(true)
-    set_option_category("option")
-    set_option_description("Enable or disable to get some info, .e.g version ..")
-    add_option_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
+option("info")
+    set_enable(true)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Enable or disable to get some info, .e.g version ..")
+    add_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
 -- add modules
 for _, module in ipairs({"xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database"}) do
-    add_option(module)
-    set_option_enable(true)
-    set_option_showmenu(true)
-    set_option_category("module")
-    set_option_description(string.format("The %s module", module))
-    add_option_defines_h_if_ok(string.format("$(prefix)_MODULE_HAVE_%s", module:upper()))
+    option(module)
+        set_enable(true)
+        set_showmenu(true)
+        set_category("module")
+        set_description(string.format("The %s module", module))
+        add_defines_h_if_ok(string.format("$(prefix)_MODULE_HAVE_%s", module:upper()))
 end
 
 -- add target
-add_target("tbox")
+target("tbox")
 
     -- make as a static library
     set_kind("static")
@@ -85,21 +85,21 @@ add_target("tbox")
     add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c|thread*.c|event.c|semaphore.c|mutex.c|timer.c|ltimer.c")
 
     -- add the source files for arm
-    if archs("arm.*") then
+    if is_arch("arm.*") then
         add_files("utils/impl/crc_arm.S")
     end
 
     -- add the source files for the float type
-    if options("float") then add_files("libm/*.c") end
+    if is_option("float") then add_files("libm/*.c") end
 
     -- add the source files for the xml module
-    if options("xml") then add_files("xml/**.c") end
+    if is_option("xml") then add_files("xml/**.c") end
 
     -- add the source files for the regex module
-    if options("regex") then add_files("regex/*.c") end
+    if is_option("regex") then add_files("regex/*.c") end
 
     -- add the source files for the network module
-    if options("network") then
+    if is_option("network") then
         add_files("asio/aioo.c") 
         add_files("asio/aiop.c") 
         add_files("platform/dns.c") 
@@ -119,7 +119,7 @@ add_target("tbox")
     end
 
     -- add the source files for the asio module
-    if options("asio") then 
+    if is_option("asio") then 
         add_files("asio/aico.c")
         add_files("asio/aicp.c")
         add_files("asio/http.c")
@@ -127,11 +127,11 @@ add_target("tbox")
         add_files("stream/**async_**.c")
         add_files("stream/transfer_pool.c")
         add_files("platform/aicp.c")
-        if options("openssl", "polarssl") then add_files("asio/ssl.c") end
+        if is_option("openssl", "polarssl") then add_files("asio/ssl.c") end
     end
 
     -- add the source files for the thread module
-    if options("thread") then
+    if is_option("thread") then
         add_files("platform/thread*.c") 
         add_files("platform/event.c") 
         add_files("platform/mutex.c") 
@@ -141,11 +141,11 @@ add_target("tbox")
     end
 
     -- add the source files for the object module
-    if options("object") then 
+    if is_option("object") then 
         add_files("object/**.c|**/xml.c|**/xplist.c")
         add_files("utils/option.c")
         add_files("container/element/obj.c")
-        if options("xml") then
+        if is_option("xml") then
             add_files("object/impl/reader/xml.c")
             add_files("object/impl/reader/xplist.c")
             add_files("object/impl/writer/xml.c")
@@ -154,16 +154,16 @@ add_target("tbox")
     end
 
     -- add the source files for the charset module
-    if options("charset") then 
+    if is_option("charset") then 
         add_files("charset/**.c")
         add_files("stream/impl/filter/charset.c")
     end
 
     -- add the source files for the zip module
-    if options("zip") then 
+    if is_option("zip") then 
         add_files("zip/**.c|gzip.c|zlib.c|zlibraw.c|lzsw.c")
         add_files("stream/impl/filter/zip.c")
-        if options("zlib") then 
+        if is_option("zlib") then 
             add_files("zip/gzip.c") 
             add_files("zip/zlib.c") 
             add_files("zip/zlibraw.c") 
@@ -171,31 +171,31 @@ add_target("tbox")
     end
 
     -- add the source files for the database module
-    if options("database") then 
+    if is_option("database") then 
         add_files("database/*.c")
-        if options("mysql") then add_files("database/impl/mysql.c") end
-        if options("sqlite3") then add_files("database/impl/sqlite3.c") end
+        if is_option("mysql") then add_files("database/impl/mysql.c") end
+        if is_option("sqlite3") then add_files("database/impl/sqlite3.c") end
     end
 
     -- add the source files for the ssl package
-    if options("polarssl") then add_files("network/impl/ssl/polarssl.c") 
-    elseif options("openssl") then add_files("network/impl/ssl/openssl.c") end
+    if is_option("polarssl") then add_files("network/impl/ssl/polarssl.c") 
+    elseif is_option("openssl") then add_files("network/impl/ssl/openssl.c") end
 
     -- add the source for the windows 
-    if os("windows") then
+    if is_os("windows") then
         add_files("platform/windows/socket_pool.c")
         add_files("platform/windows/interface/*.c")
     end
 
     -- add the source for the ios 
-    if os("ios") then
+    if is_os("ios") then
         add_files("platform/mach/ios/directory.m")
     end
 
     -- add the source for the android 
-    if os("android") then
+    if is_os("android") then
         add_files("platform/android/*.c|dns.c")
-        if options("network") then
+        if is_option("network") then
             add_files("platform/android/dns.c")
         end
     end

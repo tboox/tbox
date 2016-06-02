@@ -1,6 +1,6 @@
 
 -- add target
-add_target("demo")
+target("demo")
 
     -- add the dependent target
     add_deps("tbox")
@@ -43,14 +43,14 @@ add_target("demo")
     add_files("stream/stream/*.c") 
 
     -- add the source files for the float type
-    if options("float") then
+    if is_option("float") then
         add_files("math/fixed.c")
         add_files("libm/float.c")
         add_files("libm/double.c")
     end
 
     -- add the source files for the thread type
-    if options("thread") then
+    if is_option("thread") then
         add_files("platform/thread*.c") 
         add_files("platform/event.c") 
         add_files("platform/lock.c") 
@@ -61,22 +61,22 @@ add_target("demo")
     end
 
     -- add the source files for the xml module
-    if options("xml") then
+    if is_option("xml") then
         add_files("xml/*.c")
     end
 
     -- add the source files for the regex module
-    if options("regex") then
+    if is_option("regex") then
         add_files("regex/*.c")
     end
 
     -- add the source files for the network type
-    if options("network") then
+    if is_option("network") then
         add_files("network/**.c") 
     end
 
     -- add the source files for the asio module
-    if options("asio") then
+    if is_option("asio") then
         add_files("asio/*.c")
         add_files("stream/async_stream.c")
         add_files("stream/transfer_pool.c")
@@ -85,14 +85,14 @@ add_target("demo")
     end
 
     -- add the source files for the object module
-    if options("object") then
+    if is_option("object") then
         add_files("utils/option.c")
         add_files("object/*.c")
     end
 
     -- add the source files for the charset module
-    if options("charset") then add_files("other/charset.c") end
+    if is_option("charset") then add_files("other/charset.c") end
 
     -- add the source files for the database module
-    if options("database") then add_files("database/sql.c") end
+    if is_option("database") then add_files("database/sql.c") end
     
