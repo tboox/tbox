@@ -50,6 +50,11 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     tb_trace_noimpl();
     return tb_null;
 }
+tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
 tb_void_t tb_process_exit(tb_process_ref_t self)
 {
     tb_trace_noimpl();
@@ -58,7 +63,7 @@ tb_void_t tb_process_kill(tb_process_ref_t self)
 {
     tb_trace_noimpl();
 }
-tb_void_t tb_process_resume(tb_process_ref_t self);
+tb_void_t tb_process_resume(tb_process_ref_t self)
 {
     tb_trace_noimpl();
 }
