@@ -16,12 +16,9 @@ install:
     fi
 
 script:
-  - xmake 
-  - xmake r demo
-  - xmake f -m debug
-  - xmake -j 4
-  - xmake r demo
-  - xmake p
+  - xmake
+  - xmake m package
+  - xmake m package "-m debug"
   - xmake c
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       xmake f -m profile;
@@ -76,15 +73,14 @@ script:
       xmake r demo platform_thread_pool > ./error.txt;
     fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      xmake f -p iphoneos;
-      xmake;
-      xmake f -m debug;
-      xmake -r -j 4;
-      xmake p -a "armv7,armv7s,arm64";
-      xmake f -p iphonesimulator;
-      xmake -r -j 4;
-      xmake f -m debug;
-      xmake -j 4; 
+      xmake m package iphoneos;
+      xmake m package iphoneos "-m debug";
+      xmake m package iphonesimulator;
+      xmake m package iphonesimulator "-m debug";
+      xmake m package watchos;
+      xmake m package watchos "-m debug";
+      xmake m package watchsimulator;
+      xmake m package watchsimulator "-m debug";
     fi
 
 after_success:
