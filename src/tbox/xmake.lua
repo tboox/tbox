@@ -26,8 +26,8 @@ for _, module in ipairs({"xml", "zip", "asio", "regex", "object", "thread", "net
         set_enable(true)
         set_showmenu(true)
         set_category("module")
-        set_description(string.format("The %s module", module))
-        add_defines_h_if_ok(string.format("$(prefix)_MODULE_HAVE_%s", module:upper()))
+        set_description(format("The %s module", module))
+        add_defines_h_if_ok(format("$(prefix)_MODULE_HAVE_%s", module:upper()))
 end
 
 -- add target
