@@ -1,6 +1,6 @@
 
--- add type: wchar_t
-option("wchar_t")
+-- add type: wchar
+option("wchar")
     add_ctypes("wchar_t")
     add_defines_h_if_ok("$(prefix)_TYPE_HAVE_WCHAR")
 
@@ -56,8 +56,11 @@ target("tbox")
     add_headers("../(tbox/math/impl/*.h)")
     add_headers("../(tbox/utils/impl/*.h)")
 
+    -- add options
+    add_options("info", "float", "wchar")
+
     -- add modules
-    add_options("info", "float", "xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
+    add_options("xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
 
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
