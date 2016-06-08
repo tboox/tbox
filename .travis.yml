@@ -18,7 +18,7 @@ install:
 script:
   - xmake
   - xmake m package
-  - xmake m package "-m debug"
+  - xmake m package . "-m debug"
   - xmake c
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       xmake f -m profile;
