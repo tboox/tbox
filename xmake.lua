@@ -25,8 +25,8 @@ add_defines("_GNU_SOURCE=1", "_REENTRANT")
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 
--- the debug mode
-if is_mode("debug", "coverage") then
+-- the debug or check or coverage mode
+if is_mode("debug", "check", "coverage") then
     
     -- enable the debug symbols
     set_symbols("debug")
@@ -38,7 +38,7 @@ if is_mode("debug", "coverage") then
     add_defines("__tb_debug__")
 
     -- attempt to enable some checkers for pc
-    if is_arch("i386", "x86_64") then
+    if is_mode("check") and is_arch("i386", "x86_64") then
         add_cxflags("-fsanitize=address", "-ftrapv")
         add_mxflags("-fsanitize=address", "-ftrapv")
         add_ldflags("-fsanitize=address")
@@ -52,7 +52,7 @@ if is_mode("debug", "coverage") then
     end
 end
 
--- the release or profile is_mode
+-- the release or profile mode
 if is_mode("release", "profile") then
 
     -- the release mode
