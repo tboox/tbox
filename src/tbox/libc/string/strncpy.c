@@ -64,7 +64,7 @@ static tb_char_t* tb_strncpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t 
     tb_char_t* s = s1;
     while (n) 
     {
-        if (*s = *s2) s2++;
+        if ((*s = *s2)) s2++;
         ++s;
         --n;
     }
