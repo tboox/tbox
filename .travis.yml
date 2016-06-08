@@ -77,10 +77,6 @@ script:
       xmake m package iphoneos "-m debug";
       xmake m package iphonesimulator;
       xmake m package iphonesimulator "-m debug";
-      xmake m package watchos;
-      xmake m package watchos "-m debug";
-      xmake m package watchsimulator;
-      xmake m package watchsimulator "-m debug";
     fi
 
 after_success:
