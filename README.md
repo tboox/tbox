@@ -118,7 +118,13 @@ please install xmake first: [xmake](https://github.com/waruqi/xmake)
     cd ./tbox
     xmake f -p android --ndk=xxxxx
     xmake
-
+    
+    // build for the linux cross-platform
+    cd ./tbox
+    xmake f -p linux --sdk=/home/sdk
+or  xmake f -p linux --toolchains=/home/sdk/bin
+    xmake
+    
 ## example
 
     #include "tbox/tbox.h"
@@ -312,6 +318,12 @@ TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac
     // 编译android平台
     cd ./tbox
     xmake f -p android --ndk=xxxxx
+    xmake
+    
+    // 交叉编译
+    cd ./tbox
+    xmake f -p linux --sdk=/home/sdk
+or  xmake f -p linux --toolchains=/home/sdk/bin
     xmake
 
 ## 例子
