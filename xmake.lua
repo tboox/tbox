@@ -80,24 +80,22 @@ if is_mode("release", "profile") then
 
     end
 
-    -- for pc
-    if is_arch("i386", "x86_64") or is_plat("windows") then
+    -- smallest?
+    if is_option("smallest") then
  
-        -- enable fastest optimization
-        set_optimize("fastest")
-
-    -- for embed
-    else
         -- enable smallest optimization
         set_optimize("smallest")
+    else
+        -- enable fastest optimization
+        set_optimize("fastest")
     end
 
     -- attempt to add vector extensions 
     add_vectorexts("sse2", "sse3", "ssse3", "mmx")
 end
 
--- for embed
-if not is_arch("i386", "x86_64") then
+-- smallest?
+if is_option("smallest") then
 
     -- add defines for small
     add_defines("__tb_small__")

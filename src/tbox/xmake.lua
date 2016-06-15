@@ -20,6 +20,16 @@ option("info")
     set_description("Enable or disable to get some info, .e.g version ..")
     add_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
+-- add option: smallest
+option("smallest")
+    set_enable(false)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Enable the smallest compile mode and disable all modules.")
+    add_rbindings("info")
+    add_rbindings("xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
+    add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
+
 -- add modules
 for _, module in ipairs({"xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database"}) do
     option(module)
