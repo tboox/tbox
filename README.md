@@ -105,25 +105,30 @@ some projects using tbox:
 
 please install xmake first: [xmake](https://github.com/waruqi/xmake)
 
-    // build for the host platform
+    # build for the host platform
     cd ./tbox
     xmake
 
-    // build for the iphoneos platform
+    # build for the mingw platform
+    cd ./tbox
+    xmake f -p mingw --sdk=/home/mingwsdk 
+    xmake
+    
+    # build for the iphoneos platform
     cd ./tbox
     xmake f -p iphoneos 
     xmake
     
-    // build for the android platform
+    # build for the android platform
     cd ./tbox
     xmake f -p android --ndk=xxxxx
     xmake
     
-    // build for the linux cross-platform
+    # build for the linux cross-platform
     cd ./tbox
-    xmake f -p linux --sdk=/home/sdk
-or  xmake f -p linux --toolchains=/home/sdk/bin
+    xmake f -p linux --sdk=/home/sdk # --toolchains=/home/sdk/bin
     xmake
+
     
 ## example
 
@@ -306,25 +311,30 @@ TBOX是一个用c语言实现的多平台开发库，支持windows、linux、mac
 
 请先安装: [xmake](https://github.com/waruqi/xmake)
 
-    // 默认直接编译当前主机平台
+    # 默认直接编译当前主机平台
     cd ./tbox
     xmake
 
-    // 编译iphoneos平台
+    # 编译mingw平台
+    cd ./tbox
+    xmake f -p mingw --sdk=/home/mingwsdk 
+    xmake
+
+    # 编译iphoneos平台
     cd ./tbox
     xmake f -p iphoneos 
     xmake
     
-    // 编译android平台
+    # 编译android平台
     cd ./tbox
     xmake f -p android --ndk=xxxxx
     xmake
     
-    // 交叉编译
+    # 交叉编译
     cd ./tbox
-    xmake f -p linux --sdk=/home/sdk
-or  xmake f -p linux --toolchains=/home/sdk/bin
+    xmake f -p linux --sdk=/home/sdk #--toolchains=/home/sdk/bin
     xmake
+
 
 ## 例子
 
