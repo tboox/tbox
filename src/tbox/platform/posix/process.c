@@ -263,6 +263,9 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
                 dup2(process->errfd, STDOUT_FILENO);
             }
 
+            // get environment 
+            tb_char_t const** envp = attr? attr->envp : tb_null;
+
 #if defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
             // no given environment? uses the current user environment
             if (!envp) envp = (tb_char_t const**)environ;
@@ -275,7 +278,6 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
              *
              * uses fork because it will modify the parent environment
              */
-            tb_char_t const** envp = attr? attr->envp : tb_null;
             if (envp)
             {
                 // done
