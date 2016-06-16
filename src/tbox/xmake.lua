@@ -66,17 +66,14 @@ target("tbox")
     add_headers("../(tbox/math/impl/*.h)")
     add_headers("../(tbox/utils/impl/*.h)")
 
+    -- add packages
+    add_packages("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
+
     -- add options
     add_options("info", "float", "wchar")
 
     -- add modules
     add_options("xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
-
-    -- add packages
-    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
-
-    -- add interfaces
-    add_options(libc, libm, posix, systemv)
 
     -- add the common source files
     add_files("*.c") 
