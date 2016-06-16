@@ -76,8 +76,6 @@ script:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake m package iphoneos;
       xmake m package iphoneos "-m debug";
-      xmake m package iphonesimulator;
-      xmake m package iphonesimulator "-m debug";
     fi
 
 after_success:
