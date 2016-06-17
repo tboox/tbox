@@ -74,8 +74,8 @@ script:
       xmake r demo platform_thread_pool > ./error.txt;
     fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      xmake m package iphoneos;
-      xmake m package iphoneos "-m debug";
+      xmake m package -p iphoneos;
+      xmake m package -p iphoneos -f "-m debug";
     fi
 
 after_success:
