@@ -137,7 +137,7 @@ tb_bool_t tb_path_is_absolute(tb_char_t const* path)
     // is absolute?
 #ifdef TB_CONFIG_OS_WINDOWS
     return (    path[0] == '~'
-            ||  (tb_isalpha(path[0]) && path[1] == ':' && tb_path_is_separator(path[2])));
+            ||  (tb_isalpha(path[0]) && path[1] == ':'));
 #else
     return (    path[0] == '/'
             ||  path[0] == '\\'
