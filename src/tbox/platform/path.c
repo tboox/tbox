@@ -114,13 +114,6 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
     {
         // get the upper drive prefix
         path[0] = tb_toupper(path[0]);
-
-        // append the drive separator if not exists
-        if (q - path == 2)
-        {
-            *q++ = TB_PATH_SEPARATOR;
-            *q = '\0';
-        }
     }
 
     // trace
