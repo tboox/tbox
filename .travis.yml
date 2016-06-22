@@ -9,11 +9,6 @@ install:
   - cd ./waruqi/xmake
   - sudo ./install
   - cd -
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      git clone https://github.com/linux-test-project/lcov.git;
-      sudo make -C ./lcov install;
-      gem install coveralls-lcov;
-    fi
 
 script:
   - xmake
@@ -80,10 +75,7 @@ script:
 
 after_success:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      lcov --directory . --capture --output-file coverage.info;
-      lcov --remove coverage.info 'src/demo/*' '/usr/*' --output-file coverage.info;
-      lcov --list coverage.info;
-      coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
+      bash <(curl -s https://codecov.io/bash);
     fi
 
 after_failure:
