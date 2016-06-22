@@ -28,7 +28,7 @@ option("smallest")
     set_description("Enable the smallest compile mode and disable all modules.")
     add_rbindings("info")
     add_rbindings("xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
-    add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
+    add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
 
 -- add modules
 for _, module in ipairs({"xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database"}) do
