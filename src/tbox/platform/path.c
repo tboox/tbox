@@ -342,19 +342,25 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
         root_absolute[root_size] = '\0';
     }
 
+    // trace
+    tb_trace_d("path: %s, root: %s", path_absolute, root_absolute);
+
     // find the common leading directory
-    tb_char_t const*    p = path;
-    tb_char_t const*    q = root;
+    tb_char_t const*    p = path_absolute;
+    tb_char_t const*    q = root_absolute;
     tb_long_t           last = -1;
     for (; *p && *q && *p == *q; q++, p++)
     {
         // save the last separator
-        if (*p == TB_PATH_SEPARATOR) last = q - root;
+        if (*p == TB_PATH_SEPARATOR) last = q - root_absolute;
     }
 
     // is different directory or outside the windows drive root? using the absolute path
-    if (last <= 0 || (last == 2 && root[1] == ':'))
+    if (last <= 0 || (last == 2 && root_absolute[1] == ':' && root_size > 3))
     {
+        // trace
+        tb_trace_d("no common root: %d", last);
+
         // the path size
         tb_size_t size = tb_min(path_size - 1, maxn);
 
@@ -367,7 +373,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     {
         // count the remaining levels in root
         tb_size_t count = 0;
-        tb_char_t const* l = root + last + 1;
+        tb_char_t const* l = root_absolute + last + 1;
         for (; *l; l++)
         {
             if (*l == TB_PATH_SEPARATOR) count++;
@@ -388,7 +394,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
         }
 
         // append the left path
-        l = path + last + 1;
+        l = path_absolute + last + 1;
         while (*l && d < e) *d++ = *l++;
 
         // remove the last separator
