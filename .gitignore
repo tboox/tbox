@@ -15,6 +15,9 @@
 *.pdb
 *.idb
 *.ilk
+*.gcov
+*.gcda
+*.gcno
 *.stackdump
 *.manifest
 .ccache
