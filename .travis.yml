@@ -18,9 +18,9 @@ script:
   - xmake c
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       xmake f -m profile;
-      xmake -r -j 4;
+      xmake -r;
       xmake f -m coverage;
-      xmake -r -j 4;
+      xmake -r -v;
       echo "testing stream ..";
       xmake r demo stream http://tboox.net /tmp/a > ./error.txt;
       xmake r demo stream_async_stream http://www.tboox.org /tmp/a > ./error.txt;
@@ -75,6 +75,7 @@ script:
 
 after_success:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      find ./ -name "*.gcno";
       bash <(curl -s https://codecov.io/bash);
     fi
 
