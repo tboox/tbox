@@ -16,7 +16,9 @@ script:
   - xmake f -m debug
   - xmake -r
   - xmake c
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      xmake m package -p iphoneos;
+      xmake m package -p iphoneos -f "-m debug";
       xmake f -m profile;
       xmake -r;
       xmake f -m coverage;
@@ -68,13 +70,9 @@ script:
       xmake r demo platform_backtrace > ./error.txt;
       xmake r demo platform_thread_pool > ./error.txt;
     fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      xmake m package -p iphoneos;
-      xmake m package -p iphoneos -f "-m debug";
-    fi
 
 after_success:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       find ./ -name "*.gcno";
       bash <(curl -s https://codecov.io/bash);
     fi
