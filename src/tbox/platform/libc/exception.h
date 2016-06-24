@@ -43,10 +43,10 @@
 typedef struct __tb_exception_list_t
 {
     // the thread store base
-    tb_thread_store_data_t  base;
+    tb_thread_store_data_t      base;
 
     // the stack
-    tb_stack_ref_t             stack;
+    tb_stack_ref_t              stack;
 
 }tb_exception_list_t;
 
@@ -157,6 +157,7 @@ static __tb_inline__ tb_void_t tb_exception_init_impl()
         tb_signal(TB_SIGFPE, tb_exception_func_impl);
         tb_signal(TB_SIGBUS, tb_exception_func_impl);
         tb_signal(TB_SIGSEGV, tb_exception_func_impl);
+        tb_signal(TB_SIGABRT, tb_exception_func_impl);
 //      tb_signal(TB_SIGTRAP, tb_exception_func_impl);
     }
 }

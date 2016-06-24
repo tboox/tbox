@@ -92,7 +92,7 @@ tb_int_t tb_demo_platform_exception_main(tb_int_t argc, tb_char_t** argv)
         __tb_leave;
         tb_trace_i("try: e");
     }
-    __tb_except
+    __tb_except(1)
     {
         tb_trace_i("except");
     }
@@ -103,7 +103,7 @@ tb_int_t tb_demo_platform_exception_main(tb_int_t argc, tb_char_t** argv)
     {
         tb_abort();
     }
-    __tb_except
+    __tb_except(1)
     {
         tb_trace_i("except");
     }
@@ -113,12 +113,11 @@ tb_int_t tb_demo_platform_exception_main(tb_int_t argc, tb_char_t** argv)
     {
         tb_abort();
     }
-    __tb_except
+    __tb_except(0)
     {
         tb_trace_i("except");
     }
     __tb_end
-
 #endif
 
     // wait
