@@ -281,22 +281,16 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
     if (!name)
     {
         tb_trace_i("======================================================================");
-        tb_trace_i("help: echo \"name\" > ./.demo");
-        tb_trace_i("help:     ./demo.b args ...");
-        tb_trace_i("help: or");
-        tb_trace_i("help: ./demo.b name args ...");
-        tb_trace_i("help: ");
-        tb_trace_i("help: example: echo \"stream\" > ./.demo");
-        tb_trace_i("help: example:     ./demo.b --help");
-        tb_trace_i("help: example:     ./demo.b http://www.xxxxx.com /tmp/a");
-        tb_trace_i("help: example: or");
-        tb_trace_i("help: example: ./demo.b stream http://www.xxxxx.com /tmp/a");
-        tb_trace_i("help: ");
+        tb_trace_i("Usages: xmake r demo [testname] arguments ...");
+        tb_trace_i("");
+        tb_trace_i(".e.g");
+        tb_trace_i("    xmake r demo stream http://www.xxxxx.com /tmp/a");
+        tb_trace_i("");
 
         // walk name
         tb_size_t i = 0;
         tb_size_t n = tb_arrayn(g_demo);
-        for (i = 0; i < n; i++) tb_trace_i("help: name: %s", g_demo[i].name);
+        for (i = 0; i < n; i++) tb_trace_i("testname: %s", g_demo[i].name);
     }
 
     // exit tbox
