@@ -41,7 +41,7 @@ tb_long_t tb_wputs(tb_wchar_t const* string)
     // wtoa
     tb_char_t line[8192] = {0};
     tb_long_t size = tb_wtoa(line, string, 8191);
-    if (size >= 0 && size < 8192) line[size] = '\0';
+    tb_assert_and_check_return_val(size != -1, 0);
 
     // print it
     tb_printl(line);

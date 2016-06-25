@@ -47,7 +47,7 @@ tb_long_t tb_wprintf(tb_wchar_t const* format, ...)
     // wtoa
     tb_char_t text[8192] = {0};
     size = tb_wtoa(text, line, 8191);
-    if (size >= 0 && size < 8192) text[size] = '\0';
+    tb_assert_and_check_return_val(size != -1, 0);
 
     // print it
     tb_print(text);

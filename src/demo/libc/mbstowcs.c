@@ -14,6 +14,6 @@ tb_int_t tb_demo_libc_mbstowcs_main(tb_int_t argc, tb_char_t** argv)
     tb_assert_and_check_return_val(size != -1, 0);
 
     // trace
-    tb_wprintf(L"%s\n", data);
+    tb_wprintf(L"中文: %s\n", data);
     return 0;
 }

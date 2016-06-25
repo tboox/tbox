@@ -135,8 +135,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
         // make command
         tb_size_t size = tb_atow(command, cmd, cmdn + 1);
-        tb_assert_and_check_break(size <= cmdn);
-        command[size] = L'\0';
+        tb_assert_and_check_break(size != -1);
 
         // reset size
         size = 0;
