@@ -28,6 +28,9 @@
 #include "stdlib.h"
 #ifdef TB_CONFIG_LIBC_HAVE_WCSTOMBS
 #   include <stdlib.h>
+#   ifdef TB_CONFIG_LIBC_HAVE_SETLOCALE
+#       include <locale.h>
+#   endif
 #else
 #   include "../../charset/charset.h"
 #endif
@@ -38,7 +41,21 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSTOMBS
 tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-    return wcstombs(s1, s2, n);
+    // set local locale
+#ifdef TB_CONFIG_LIBC_HAVE_SETLOCALE
+    setlocale(LC_ALL, "");
+#endif
+
+    // convert it
+    n = wcstombs(s1, s2, n);
+
+    // set default locale
+#ifdef TB_CONFIG_LIBC_HAVE_SETLOCALE
+    setlocale(LC_ALL, "C");
+#endif
+
+    // ok
+    return n;
 }
 #else
 tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
@@ -61,6 +78,6 @@ tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
     if (r >= 0) s1[r] = '\0';
 
     // ok?
-    return r > 0? r : 0;
+    return r > 0? r : -1;
 }
 #endif
