@@ -4,7 +4,7 @@
 
 ## introduction
 
-TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
+TBOX is a multi-platform c library for unix, windows, mac, ios, android, etc.
 
 It is similar to glibc, but simpler and more convenient.
 It includes asio, stream, network, container, algorithm, object, memory, database, string, charset, math, regex, libc, libm, utils and other library modules.
