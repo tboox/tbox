@@ -2,7 +2,7 @@
 set_project("tbox")
 
 -- version
-set_version("1.5.1")
+set_version("1.5.2")
 
 -- set warning all as error
 set_warnings("all", "error")
