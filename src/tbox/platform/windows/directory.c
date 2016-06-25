@@ -44,8 +44,8 @@ static tb_bool_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
     // remvoe directory
     else if (info->type == TB_FILE_TYPE_DIRECTORY)
     {
-        tb_wchar_t temp[TB_PATH_MAXN] = {0};
-        if (tb_atow(temp, path, TB_PATH_MAXN))
+        tb_wchar_t temp[TB_PATH_MAXN];
+        if (tb_atow(temp, path, TB_PATH_MAXN) != -1)
             RemoveDirectoryW(temp);
     }
 
@@ -128,7 +128,7 @@ static tb_bool_t tb_directory_walk_impl(tb_wchar_t const* path, tb_bool_t recurs
 
                 // wtoa temp
                 n = tb_wtoa(temp_a, temp_w, 4095);
-                if (n >= 0 && n < 4096) temp_a[n] = '\0';
+                tb_assert_and_check_break(n != -1);
 
                 // the file info
                 tb_file_info_t info = {0};
@@ -242,8 +242,11 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
     if (pidl) GlobalFree(pidl);
     pidl = tb_null;
 
+    // wtoa
+    tb_size_t size = ok? tb_wtoa(path, home, maxn) : 0;
+
     // ok?
-    return ok? tb_wtoa(path, home, maxn) : 0;
+    return size != -1? size : 0;
 }
 tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
 {
@@ -255,7 +258,10 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
     GetCurrentDirectoryW(TB_PATH_MAXN, current);
 
     // wtoa
-    return tb_wtoa(path, current, maxn);
+    tb_size_t size = tb_wtoa(path, current, maxn);
+
+    // ok?
+    return size != -1? size : 0;
 }
 tb_bool_t tb_directory_current_set(tb_char_t const* path)
 {
@@ -276,7 +282,10 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     GetTempPathW(TB_PATH_MAXN, temporary);
 
     // wtoa
-    return tb_wtoa(path, temporary, maxn);
+    tb_size_t size = tb_wtoa(path, temporary, maxn);
+
+    // ok?
+    return size != -1? size : 0;
 }
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
@@ -287,8 +296,8 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
     tb_file_info_t info = {0};
     if (tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
     {
-        tb_wchar_t path_w[TB_PATH_MAXN] = {0};
-        if (tb_atow(path_w, path, tb_arrayn(path_w)))
+        tb_wchar_t path_w[TB_PATH_MAXN];
+        if (tb_atow(path_w, path, tb_arrayn(path_w)) != -1)
             tb_directory_walk_impl(path_w, recursion, prefix, func, priv);
     }
     else

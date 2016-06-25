@@ -63,7 +63,7 @@ tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
 #elif 0
     tb_directory_copy(argv[1], argv[2]);
 #else
-    tb_directory_walk(argv[1], tb_true, tb_true, tb_directory_walk_func, tb_null);
+    tb_directory_walk(argv[1], tb_false, tb_true, tb_directory_walk_func, tb_null);
 #endif
 
     return 0;

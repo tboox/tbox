@@ -36,8 +36,8 @@ tb_dynamic_ref_t tb_dynamic_init(tb_char_t const* name)
     tb_assert_and_check_return_val(name, tb_null);
 
     // atow
-    tb_wchar_t temp[TB_PATH_MAXN] = {0};
-    if (!tb_atow(temp, name, TB_PATH_MAXN)) return tb_null;
+    tb_wchar_t temp[TB_PATH_MAXN];
+    if (tb_atow(temp, name, TB_PATH_MAXN) == -1) return tb_null;
 
     // load
     return (tb_dynamic_ref_t)LoadLibraryExW(temp, tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);

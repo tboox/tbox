@@ -52,9 +52,9 @@ static tb_char_t* tb_environment_get_impl(tb_char_t const* name, tb_size_t* psiz
         tb_assert_and_check_break(value_w);
 
         // make name
-        tb_wchar_t  name_w[512] = {0};
+        tb_wchar_t  name_w[512];
         tb_size_t   name_n = tb_atow(name_w, name, tb_arrayn(name_w));
-        tb_assert_and_check_break(name_n);
+        tb_assert_and_check_break(name_n != -1);
 
         // get it
         size = (tb_size_t)tb_kernel32()->GetEnvironmentVariableW(name_w, value_w, (DWORD)maxn);
@@ -85,7 +85,7 @@ static tb_char_t* tb_environment_get_impl(tb_char_t const* name, tb_size_t* psiz
         tb_assert_and_check_break(value);
 
         // save value
-        if (!(size = tb_wtoa(value, value_w, size))) break;
+        if ((size = tb_wtoa(value, value_w, size)) == -1) break;
 
         // save size
         if (psize) *psize = size;
@@ -123,9 +123,9 @@ static tb_bool_t tb_environment_set_impl(tb_char_t const* name, tb_char_t const*
     do
     {
         // make name
-        tb_wchar_t  name_w[512] = {0};
+        tb_wchar_t  name_w[512];
         tb_size_t   name_n = tb_atow(name_w, name, tb_arrayn(name_w));
-        tb_assert_and_check_break(name_n);
+        tb_assert_and_check_break(name_n != -1);
 
         // exists value?
         if (value)
@@ -136,7 +136,7 @@ static tb_bool_t tb_environment_set_impl(tb_char_t const* name, tb_char_t const*
             tb_assert_and_check_break(value_w);
 
             // init value
-            if (!tb_atow(value_w, value, value_n + 1)) break;
+            if (tb_atow(value_w, value, value_n + 1) == -1) break;
 
             // set it
             if (!tb_kernel32()->SetEnvironmentVariableW(name_w, value_w)) break;

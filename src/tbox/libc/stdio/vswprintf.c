@@ -147,7 +147,7 @@ static tb_wchar_t* tb_printf_object(tb_wchar_t* pb, tb_wchar_t* pe, tb_printf_en
 
             // atow
             size = tb_atow(pb, data, pe - pb);
-            if (size >= 0) pb += size;
+            if (size != -1) pb += size;
         }
         else
         {
