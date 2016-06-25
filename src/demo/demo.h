@@ -57,6 +57,8 @@ TB_DEMO_MAIN_DECL(libc_time);
 TB_DEMO_MAIN_DECL(libc_wchar);
 TB_DEMO_MAIN_DECL(libc_string);
 TB_DEMO_MAIN_DECL(libc_stdlib);
+TB_DEMO_MAIN_DECL(libc_mbstowcs);
+TB_DEMO_MAIN_DECL(libc_wcstombs);
 
 // libm
 TB_DEMO_MAIN_DECL(libm_float);
