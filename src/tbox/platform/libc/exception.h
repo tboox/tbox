@@ -32,6 +32,9 @@
 #include "../../libc/misc/signal.h"
 #include "../../libc/misc/setjmp.h"
 #include "../../container/container.h"
+#ifdef TB_CONFIG_LIBC_HAVE_KILL
+#   include <unistd.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -145,7 +148,23 @@ static __tb_inline__ tb_void_t tb_exception_func_impl(tb_int_t sig)
         tb_sigjmpbuf_t* jmpbuf = (tb_sigjmpbuf_t*)tb_stack_top(list->stack);
         if (jmpbuf) tb_siglongjmp(*jmpbuf, 1);
     }
-    else tb_trace_e("exception: unknown signal: %d", sig);
+    else 
+    {
+        // trace
+        tb_trace_e("exception: no handler for signal: %d", sig);
+
+        // ignore signal
+        tb_signal(TB_SIGILL, TB_SIG_DFL);
+        tb_signal(TB_SIGFPE, TB_SIG_DFL);
+        tb_signal(TB_SIGBUS, TB_SIG_DFL);
+        tb_signal(TB_SIGSEGV, TB_SIG_DFL);
+        tb_signal(TB_SIGABRT, TB_SIG_DFL);
+
+#ifdef TB_CONFIG_LIBC_HAVE_KILL
+        // kill it
+        kill(getpid(), sig);
+#endif
+    }
 }
 static __tb_inline__ tb_void_t tb_exception_init_impl()
 {
