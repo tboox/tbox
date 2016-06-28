@@ -54,8 +54,8 @@ static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t 
 {
     tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-    __tb_register__ tb_byte_t*          s = s1;
-    __tb_register__ tb_byte_t const*    p = s2;
+    __tb_register__ tb_byte_t*          s = (tb_byte_t*)s1;
+    __tb_register__ tb_byte_t const*    p = (tb_byte_t const*)s2;
 
     if (p >= s) 
     {
