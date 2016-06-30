@@ -29,4 +29,25 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#include "libc/print.c"
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/print.c"
+#elif defined(TB_CONFIG_OS_ANDROID)
+#   include "android/print.c"
+#elif defined(TB_CONFIG_OS_IOS)
+#   include "mach/ios/print.c"
+#elif defined(TB_CONFIG_LIBC_HAVE_FPUTS)
+#   include "libc/print.c"
+#else
+tb_void_t tb_print(tb_char_t const* string)
+{
+    tb_trace_noimpl();
+}
+tb_void_t tb_printl(tb_char_t const* string)
+{
+    tb_trace_noimpl();
+}
+tb_void_t tb_print_sync()
+{
+    tb_trace_noimpl();
+}
+#endif

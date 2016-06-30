@@ -26,32 +26,52 @@
  */
 #include "prefix.h"
 #include <stdio.h>
-#include <unistd.h>
+#include <windows.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
+ */
+
+/* 
+ *@note
+ *
+ * fputs(string, stdout) exists compatibility issue when vs2008 => vs2015 
+ *
+ * error: ___iob_func undefined in vs2015 
  */
 tb_void_t tb_print(tb_char_t const* string)
 {
     // check
     tb_check_return(string);
 
-    // print to the stdout
-    fputs(string, stdout);
+    // get stdout
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    tb_assert_and_check_return(handle != INVALID_HANDLE_VALUE);
+
+    // the data and size
+    tb_byte_t const*    data = (tb_byte_t const*)string;
+    tb_size_t           size = tb_strlen(string) + 1;
+
+    // write string to stdout
+    tb_size_t writ = 0;
+    while (writ < size)
+    {
+        // write to the stdout
+        DWORD real = 0;
+        if (!WriteFile(handle, data + writ, (DWORD)(size - writ), &real, tb_null)) break;
+
+        // update writted size
+        writ += (tb_size_t)real;
+    }
 }
 tb_void_t tb_printl(tb_char_t const* string)
 {
-    // check
-    tb_check_return(string);
+    // print string 
+    tb_print(string);
 
-    // print string to the stdout
-    fputs(string, stdout);
-
-    // print newline to the stdout
-    fputs(__tb_newline__, stdout);
+    // print newline 
+    tb_print(__tb_newline__);
 }
 tb_void_t tb_print_sync()
 {
-    // flush the stdout
-    fflush(stdout);
 }
