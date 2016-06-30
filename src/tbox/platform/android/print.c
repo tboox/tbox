@@ -25,8 +25,10 @@
  * includes
  */
 #include "prefix.h"
+#include "../thread.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <android/log.h>     
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -36,6 +38,9 @@ tb_void_t tb_print(tb_char_t const* string)
     // check
     tb_check_return(string);
 
+    // print to the android device log
+    __android_log_print(ANDROID_LOG_ERROR, __tb_prefix__? __tb_prefix__ : "tbox", "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
+
     // print to the stdout
     fputs(string, stdout);
 }
@@ -43,6 +48,9 @@ tb_void_t tb_printl(tb_char_t const* string)
 {
     // check
     tb_check_return(string);
+
+    // print to the android device log
+    __android_log_print(ANDROID_LOG_ERROR, __tb_prefix__? __tb_prefix__ : "tbox", "[%08x]: %s\n", (tb_uint32_t)tb_thread_self(), string);
 
     // print string to the stdout
     fputs(string, stdout);

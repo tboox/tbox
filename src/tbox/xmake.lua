@@ -249,6 +249,7 @@ target("tbox")
     add_cfuncs("libc", nil,         {"signal.h", "setjmp.h"},           "signal", "setjmp", "sigsetjmp", "kill")
     add_cfuncs("libc", nil,         "execinfo.h",                       "backtrace")
     add_cfuncs("libc", nil,         "locale.h",                         "setlocale")
+    add_cfuncs("libc", nil,         "stdio.h",                          "fputs")
 
     -- add the interfaces for libm
     add_cfuncs("libm", nil,         "math.h",                           "sincos", 
