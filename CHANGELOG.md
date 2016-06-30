@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Bugs fixed
+
+* Fix stdout compatibility issue for vs2015
+
 ## v1.5.2
 
 ### New features
@@ -49,6 +53,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### Bugs修复
+
+* 修复stdout在vs2015以上版本的兼容性问题
 
 ## v1.5.2
 
