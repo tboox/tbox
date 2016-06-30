@@ -9,7 +9,7 @@ TBOX is a glib-like cross-platform C library that is simple to use yet powerful 
 The project focuses on making C development easier and provides many modules (.e.g stream, asio, regex, container, algorithm ...), 
 so that any developer can quickly pick it up and enjoy the productivity boost when developing in C language.
 
-Supports the following platforms:
+It supports the following platforms:
 
 - Windows
 - Macosx
@@ -93,7 +93,7 @@ If you want to know more, please refer to:
 #### The libc library
 - Implements lightweight libc library interfaces, the interface name contains `tb_xxx` prefix for avoiding conflict
 - Implements strixxx strrxxx wcsixxx wcsrxxx interface extension
-- optimizes some frequently-used interface, .e.g. memset, memcpy, strcpy ... 
+- Optimizes some frequently-used interface, .e.g. memset, memcpy, strcpy ... 
 - Implements `memset_u16`, `memset_u32`, `memset_u64` extension interfaces
 
 #### The libm library
@@ -103,7 +103,7 @@ If you want to know more, please refer to:
 #### The regex library
 - Supports match and replace
 - Supports global/multiline/caseless mode
-- uses pcre, pcre2 and posix regex modules
+- Uses pcre, pcre2 and posix regex modules
 
 ## In the Plans
 - Add coroutine module 
