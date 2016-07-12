@@ -102,6 +102,20 @@ typedef struct __tb_process_attr_t
 /// the process ref type
 typedef struct{}*       tb_process_ref_t;
 
+/// the process wait info type
+typedef struct __tb_process_waitinfo_t
+{
+    // the index of the processes
+    tb_size_t           index;
+
+    // the process
+    tb_process_ref_t    process;
+
+    // the status
+    tb_long_t           status;
+
+}tb_process_waitinfo_t, *tb_process_waitinfo_ref_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -249,6 +263,61 @@ tb_void_t               tb_process_suspend(tb_process_ref_t process);
  * @return              wait failed: -1, timeout: 0, ok: 1
  */
 tb_long_t               tb_process_wait(tb_process_ref_t process, tb_long_t* pstatus, tb_long_t timeout);
+
+/*! wait the process list
+ *
+ * @code
+ 
+    // init processes
+    tb_size_t        count = 0;
+    tb_process_ref_t processes[5] = {0};
+    for (; count < 4; count++)
+    {
+        processes[count] = tb_process_init("/bin/echo", tb_null, tb_null);
+        tb_assert_and_check_break(processes[count]);
+    }
+
+    // ok?
+    while (count)
+    {
+        // trace
+        tb_trace_i("waiting: %ld", count);
+
+        // wait processes
+        tb_long_t               infosize = -1;
+        tb_process_waitinfo_t   infolist[4] = {{0}};
+        if ((infosize = tb_process_waitlist(processes, infolist, tb_arrayn(infolist), -1)) > 0)
+        {
+            tb_size_t i = 0;
+            for (i = 0; i < infosize; i++)
+            {
+                // trace
+                tb_trace_i("process(%p) exited: %ld", infolist[i].process, infolist[i].status);
+
+                // exit process
+                if (infolist[i].process) tb_process_exit(infolist[i].process);
+
+                // remove this process
+                tb_size_t index = infolist[i].index;
+                if (count > index + 1) tb_memmov(processes + index, processes + index + 1, (count - index - 1) * sizeof(tb_process_ref_t));
+                count--;
+
+                // fill null-end
+                processes[count] = tb_null;
+            }
+        }
+    }
+
+ * @endcode
+ *
+ * @param processes     the null-terminated process list 
+ * @param infolist      the info list
+ * @param infomaxn      the info maxn
+ * @param timeout       the timeout (ms), infinity: -1
+ *
+ * @return              > 0: the info list size, 0: timeout, -1: failed
+ */
+tb_long_t               tb_process_waitlist(tb_process_ref_t const* processes, tb_process_waitinfo_ref_t infolist, tb_size_t infomaxn, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

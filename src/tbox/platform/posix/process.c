@@ -617,3 +617,47 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
     // ok?
     return ok;
 }
+tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_waitinfo_ref_t infolist, tb_size_t infomaxn, tb_long_t timeout)
+{
+    // check
+    tb_assert_and_check_return_val(processes && infolist && infomaxn, -1);
+
+    // done
+    tb_long_t infosize = -1;
+    tb_hong_t time = tb_mclock();
+    do
+    {
+        // wait it
+        tb_int_t    status = -1;
+        tb_long_t   result = waitpid(-1, &status, timeout < 0? 0 : WNOHANG | WUNTRACED);
+        tb_check_return_val(result != -1, -1);
+
+        // exited?
+        if (result != 0)
+        {
+            // find this process 
+            tb_process_t const** pprocess = (tb_process_t const**)processes;
+            for (; *pprocess && (*pprocess)->pid != result; pprocess++) ;
+
+            // found?
+            if (*pprocess)
+            {
+                // save process info
+                infolist[0].index = (tb_process_ref_t const*)pprocess - processes;
+                infolist[0].process = (tb_process_ref_t)*pprocess;
+                infolist[0].status = WIFEXITED(status)? WEXITSTATUS(status) : -1;
+                infosize = 1;
+
+                // end
+                break;
+            }
+        }
+
+        // wait some time
+        if (timeout > 0) tb_msleep(tb_min(timeout, 60));
+
+    } while (timeout > 0 && tb_mclock() - time < (tb_hong_t)timeout);
+
+    // ok?
+    return infosize;
+}

@@ -43,7 +43,7 @@ tb_void_t tb_printl(tb_char_t const* string)
 {
     // check
     tb_check_return(string);
-
+ 
     // print string to the stdout
     fputs(string, stdout);
 
