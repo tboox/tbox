@@ -403,3 +403,8 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
     // ok?
     return ok;
 }
+tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_waitinfo_ref_t infolist, tb_size_t infomaxn, tb_long_t timeout)
+{
+    tb_trace_noimpl();
+    return -1;
+}

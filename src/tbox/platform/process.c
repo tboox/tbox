@@ -74,7 +74,12 @@ tb_void_t tb_process_suspend(tb_process_ref_t self)
 tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t timeout)
 {
     tb_trace_noimpl();
-    return 0;
+    return -1;
+}
+tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_waitinfo_ref_t infolist, tb_size_t infomaxn, tb_long_t timeout)
+{
+    tb_trace_noimpl();
+    return -1;
 }
 #endif
 tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
