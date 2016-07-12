@@ -623,7 +623,7 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
     tb_assert_and_check_return_val(processes && infolist && infomaxn, -1);
 
     // done
-    tb_long_t infosize = -1;
+    tb_long_t infosize = 0;
     tb_hong_t time = tb_mclock();
     do
     {
@@ -643,10 +643,36 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
             if (*pprocess)
             {
                 // save process info
-                infolist[0].index = (tb_process_ref_t const*)pprocess - processes;
-                infolist[0].process = (tb_process_ref_t)*pprocess;
-                infolist[0].status = WIFEXITED(status)? WEXITSTATUS(status) : -1;
-                infosize = 1;
+                infolist[infosize].index = (tb_process_ref_t const*)pprocess - processes;
+                infolist[infosize].process = (tb_process_ref_t)*pprocess;
+                infolist[infosize].status = WIFEXITED(status)? WEXITSTATUS(status) : -1;
+                infosize++;
+
+                // attempt to wait other processes
+                while (infosize < infomaxn)
+                {
+                    // attempt to wait it
+                    status = -1;
+                    result = waitpid(-1, &status, WNOHANG | WUNTRACED);
+
+                    // error or timeout? end
+                    tb_check_break(result != 0);
+
+                    // find this process 
+                    tb_process_t const** pprocess = (tb_process_t const**)processes;
+                    for (; *pprocess && (*pprocess)->pid != result; pprocess++) ;
+
+                    // found?
+                    if (*pprocess)
+                    {
+                        // save process info
+                        infolist[infosize].index = (tb_process_ref_t const*)pprocess - processes;
+                        infolist[infosize].process = (tb_process_ref_t)*pprocess;
+                        infolist[infosize].status = WIFEXITED(status)? WEXITSTATUS(status) : -1;
+                        infosize++;
+                    }
+                    else break;
+                }
 
                 // end
                 break;
