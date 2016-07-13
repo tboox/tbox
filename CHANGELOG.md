@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* Add wait multi-processes interface
+
 ### Bugs fixed
 
 * Fix stdout compatibility issue for vs2015
@@ -54,6 +58,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* 增加同时等待多个进程接口
 
 ### Bugs修复
 
