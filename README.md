@@ -105,7 +105,7 @@ If you want to know more, please refer to:
 - Supports global/multiline/caseless mode
 - Uses pcre, pcre2 and posix regex modules
 
-## In the Plans
+## Todolist
 - Add coroutine module 
 - Add server module
 - Reconstruction xml module
@@ -336,7 +336,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 2. 支持全局、多行、大小写不敏感等模式
 3. 使用pcre, pcre2和posix正则库
 
-## 在计划中的
+## 后续任务
 - 添加协程模块以及服务器模块支持
 - 重构xml模块
 - 添加更多的容器和算法
