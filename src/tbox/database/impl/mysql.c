@@ -156,7 +156,7 @@ static tb_void_t tb_database_mysql_library_exit(tb_handle_t handle, tb_cpointer_
 }
 static tb_handle_t tb_database_mysql_library_load()
 {
-    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_MYSQL, tb_database_mysql_library_init, tb_database_mysql_library_exit, tb_null);
+    return tb_singleton_instance(TB_SINGLETON_TYPE_LIBRARY_MYSQL, tb_database_mysql_library_init, tb_database_mysql_library_exit, tb_null, tb_null);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
