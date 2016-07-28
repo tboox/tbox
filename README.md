@@ -1,6 +1,6 @@
 # The Treasure Box Library 
 
-[![Build Status](https://api.travis-ci.org/waruqi/tbox.svg)](https://travis-ci.org/waruqi/tbox) [![codecov](https://codecov.io/gh/waruqi/tbox/branch/master/graph/badge.svg)](https://codecov.io/gh/waruqi/tbox) [![Join the chat at https://gitter.im/waruqi/tbox](https://badges.gitter.im/waruqi/tbox.svg)](https://gitter.im/waruqi/tbox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![donate](http://tboox.org/static/img/donate.svg)](http://tboox.org/donation/)
+[![Build Status](https://api.travis-ci.org/waruqi/tbox.svg)](https://travis-ci.org/waruqi/tbox) [![codecov](https://codecov.io/gh/waruqi/tbox/branch/master/graph/badge.svg)](https://codecov.io/gh/waruqi/tbox) [![Join the chat at https://gitter.im/waruqi/tboox](https://badges.gitter.im/waruqi/tboox.svg)](https://gitter.im/waruqi/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![donate](http://tboox.org/static/img/donate.svg)](http://tboox.org/donation/)
 
 ## Introduction
 
