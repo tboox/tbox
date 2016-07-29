@@ -1,0 +1,19 @@
+os: Visual Studio 2015
+
+platform:
+  - Win32
+
+before_build:
+  - cmd: git clone --branch=dev https://github.com/waruqi/xmake.git waruqi\xmake
+  - cmd: cd waruqi\xmake
+  - cmd: install.bat noinput
+  - cmd: cd ..\..
+
+build_script:
+  - cmd: xmake
+  - cmd: xmake p
+  - cmd: xmake f -m debug
+  - cmd: xmake -r
+
+test_script:
+  - cmd: xmake r demo
