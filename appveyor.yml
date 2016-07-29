@@ -6,7 +6,7 @@ platform:
 before_build:
   - cmd: git clone --branch=dev https://github.com/waruqi/xmake.git waruqi\xmake
   - cmd: cd waruqi\xmake
-  - cmd: install.bat noinput
+  - cmd: call install.bat noinput
   - cmd: cd ..\..
 
 build_script:
