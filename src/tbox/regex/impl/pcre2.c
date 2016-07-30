@@ -85,7 +85,7 @@ tb_regex_ref_t tb_regex_init(tb_char_t const* pattern, tb_size_t mode)
         regex->code = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, options, &errornumber, &erroroffset, tb_null);
         if (!regex->code)
         {
-#ifdef __tb_debug__
+#if defined(__tb_debug__) && !defined(TB_CONFIG_OS_WINDOWS) // FIXME: _sprintf undefined link error for vs2015 on windows
             // get error info
             PCRE2_UCHAR info[256];
             pcre2_get_error_message(errornumber, info, sizeof(info));
@@ -177,7 +177,7 @@ tb_long_t tb_regex_match(tb_regex_ref_t self, tb_char_t const* cstr, tb_size_t s
             // no match?
             tb_check_break(count != PCRE2_ERROR_NOMATCH);
 
-#ifdef __tb_debug__
+#if defined(__tb_debug__) && !defined(TB_CONFIG_OS_WINDOWS)
             // get error info
             PCRE2_UCHAR info[256];
             pcre2_get_error_message(count, info, sizeof(info));
@@ -311,7 +311,7 @@ tb_char_t const* tb_regex_replace(tb_regex_ref_t self, tb_char_t const* cstr, tb
             // failed
             else if (ok < 0)
             {
-#ifdef __tb_debug__
+#if defined(__tb_debug__) && !defined(TB_CONFIG_OS_WINDOWS)
                 // get error info
                 PCRE2_UCHAR info[256];
                 pcre2_get_error_message(ok, info, sizeof(info));
