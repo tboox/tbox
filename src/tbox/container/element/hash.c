@@ -31,12 +31,7 @@
  */
 static tb_size_t tb_element_hash_data_func_0(tb_byte_t const* data, tb_size_t size)
 {
-    // bkdr-hash
-    tb_size_t           v = 0;  
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e) v = (v * 131313) + (*p++);  
-    return v;
+    return tb_bkdr_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_1(tb_byte_t const* data, tb_size_t size)
 {
