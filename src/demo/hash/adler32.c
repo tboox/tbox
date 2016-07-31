@@ -6,13 +6,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_utils_adler32_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_hash_adler32_main(tb_int_t argc, tb_char_t** argv)
 {
-    // data
-    tb_byte_t*  p = (tb_byte_t*)argv[1];
-    tb_size_t   n = tb_strlen((tb_char_t const*)p);
-
     // trace
-    tb_printf("[adler32]: %x\n", tb_adler32_encode(0, p, n));
+    tb_trace_i("[adler32]: %x", tb_adler32_make_from_cstr(argv[1], 0));
     return 0;
 }

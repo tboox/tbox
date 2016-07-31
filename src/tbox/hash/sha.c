@@ -18,7 +18,7 @@
  *
  * @author      ruki
  * @file        sha.c
- * @ingroup     utils
+ * @ingroup     hash
  *
  */
 
@@ -26,8 +26,7 @@
  * includes
  */
 #include "sha.h"
-#include "bits.h"
-#include "../libc/libc.h"
+#include "../utils/bits.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -368,7 +367,7 @@ tb_void_t tb_sha_spak(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
     tb_memcpy(&sha->buffer[j], &data[i], size - i);
 #endif
 }
-tb_size_t tb_sha_encode(tb_size_t mode, tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on)
+tb_size_t tb_sha_make(tb_size_t mode, tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on)
 {
     // check
     tb_assert_and_check_return_val(ib && in && ob && on >= 16, 0);

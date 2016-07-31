@@ -18,7 +18,7 @@
  *
  * @author      ruki
  * @file        md5.c
- * @ingroup     utils
+ * @ingroup     hash
  *
  */
 
@@ -26,7 +26,6 @@
  * includes
  */
 #include "md5.h"
-#include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -280,7 +279,7 @@ tb_void_t tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size)
     tb_memcpy(data, md5->data, 16);
 }
 
-tb_size_t tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on)
+tb_size_t tb_md5_make(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on)
 {
     // check
     tb_assert_and_check_return_val(ib && in && ob && on >= 16, 0);

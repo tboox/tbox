@@ -18,11 +18,11 @@
  *
  * @author      ruki
  * @file        adler32.h
- * @ingroup     utils
+ * @ingroup     hash
  *
  */
-#ifndef TB_UTILS_ADLER32_H
-#define TB_UTILS_ADLER32_H
+#ifndef TB_HASH_ADLER32_H
+#define TB_HASH_ADLER32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,15 +38,24 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! encode adler32
+/*! make adler32 hash
  *
- * @param adler     the initial adler value
  * @param data      the data
  * @param size      the size
+ * @param seed      uses this seed if be non-zero
  *
  * @return          the adler32 value
  */
-tb_uint32_t         tb_adler32_encode(tb_uint32_t adler, tb_byte_t const* data, tb_size_t size);
+tb_uint32_t         tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed);
+
+/*! make adler32 hash from c-string
+ *
+ * @param cstr      the c-string
+ * @param seed      uses this seed if be non-zero
+ *
+ * @return          the adler32 value
+ */
+tb_uint32_t         tb_adler32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -21,7 +21,7 @@
  *
  * @author      ruki
  * @file        adler32.c
- * @ingroup     utils
+ * @ingroup     hash
  *
  */
 
@@ -58,13 +58,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_uint32_t tb_adler32_encode(tb_uint32_t adler, tb_byte_t const* data, tb_size_t size)
+tb_uint32_t tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed)
 {
 #ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
-    return adler32(adler, data, size);
+    return adler32(seed, data, size);
 #else
     // split adler-32 into component sums 
-    tb_size_t sum2 = (adler >> 16) & 0xffff; adler &= 0xffff;
+    tb_uint32_t adler = seed;
+    tb_size_t   sum2 = (adler >> 16) & 0xffff; adler &= 0xffff;
 
     // in case user likes doing a byte at a time, keep it fast 
     if (size == 1) 
@@ -142,4 +143,12 @@ tb_uint32_t tb_adler32_encode(tb_uint32_t adler, tb_byte_t const* data, tb_size_
     // return recombined sums 
     return (tb_uint32_t)(adler | (sum2 << 16));
 #endif
+}
+tb_uint32_t tb_adler32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed)
+{
+    // check
+    tb_assert_and_check_return_val(cstr, 0);
+
+    // make it
+    return tb_adler32_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
 }

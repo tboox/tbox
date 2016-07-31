@@ -28,8 +28,11 @@
  * includes
  */
 #include "prefix.h"
+#include "sha.h"
+#include "md5.h"
 #include "uuid.h"
 #include "djb2.h"
 #include "fnv32.h"
+#include "adler32.h"
 
 #endif
