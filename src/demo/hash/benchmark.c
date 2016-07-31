@@ -33,6 +33,7 @@ static tb_demo_hash32_entry_t g_hash32_entries[] =
 {
     { "fnv32",      tb_fnv32_make_from_cstr     }
 ,   { "djb2",       tb_demo_djb2_make_from_cstr }
+,   { "adler32",    tb_adler32_make_from_cstr   }
 ,   { tb_null,      tb_null}
 };
 
