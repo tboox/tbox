@@ -137,7 +137,7 @@ static tb_size_t tb_element_hash_data_func_4(tb_byte_t const* data, tb_size_t si
 }
 static tb_size_t tb_element_hash_data_func_5(tb_byte_t const* data, tb_size_t size)
 {
-    return tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, data, size);
+    return tb_crc_make(TB_CRC_MODE_32_IEEE_LE, data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_6(tb_byte_t const* data, tb_size_t size)
 {

@@ -25,15 +25,20 @@ static tb_uint32_t tb_demo_djb2_make_from_cstr(tb_char_t const* cstr, tb_uint32_
 {
     return (tb_uint32_t)tb_djb2_make_from_cstr(cstr, seed);
 }
+static tb_uint32_t tb_demo_crc32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed)
+{
+    return tb_crc_make_from_cstr(TB_CRC_MODE_32_IEEE_LE, cstr, seed);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
 static tb_demo_hash32_entry_t g_hash32_entries[] =
 {
-    { "fnv32",      tb_fnv32_make_from_cstr     }
-,   { "djb2",       tb_demo_djb2_make_from_cstr }
-,   { "adler32",    tb_adler32_make_from_cstr   }
+    { "fnv32",      tb_fnv32_make_from_cstr         }
+,   { "djb2",       tb_demo_djb2_make_from_cstr     }
+,   { "adler32",    tb_adler32_make_from_cstr       }
+,   { "crc32",      tb_demo_crc32_make_from_cstr    }
 ,   { tb_null,      tb_null}
 };
 

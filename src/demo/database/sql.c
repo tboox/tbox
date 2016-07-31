@@ -134,7 +134,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_database_sql_ref_t 
                 if (tb_database_sql_value_blob(ldata2))
                 {
                     // trace
-                    tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, tb_database_sql_value_blob(ldata2), tb_database_sql_value_size(ldata2))));
+                    tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_make(TB_CRC_MODE_32_IEEE_LE, tb_database_sql_value_blob(ldata2), tb_database_sql_value_size(ldata2), 0xffffffff)));
                 }
                 // stream?
                 else if ((stream = tb_database_sql_value_blob_stream(ldata2)))
@@ -151,7 +151,7 @@ static tb_void_t tb_demo_database_sql_test_statement_done(tb_database_sql_ref_t 
                     if (tb_stream_bread(stream, data, (tb_size_t)size))
                     {
                         // trace
-                        tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0xffffffff, data, (tb_size_t)size)));
+                        tb_tracet_i("[%s:crc(%lx)] ", tb_database_sql_value_name(ldata2), (0xffffffff ^ tb_crc_make(TB_CRC_MODE_32_IEEE_LE, data, (tb_size_t)size, 0xffffffff)));
                     }
 
                     // exit data

@@ -30,7 +30,7 @@
  */
 #ifndef TB_ARCH_ARM64
 
-    /* tb_uint32_t tb_crc32_encode_asm(tb_uint32_t crc, tb_byte_t const* data, tb_size_t size, tb_uint32_t const* table);
+    /* tb_uint32_t tb_crc32_make_asm(tb_uint32_t crc, tb_byte_t const* data, tb_size_t size, tb_uint32_t const* table);
      * 
      * @param crc   r0
      * @param data  r1
@@ -39,7 +39,7 @@
      *
      * @return      crc, r0
      */
-function tb_crc32_encode_asm, export=1
+function tb_crc32_make_asm, export=1
 
     // enter
     mov ip, sp

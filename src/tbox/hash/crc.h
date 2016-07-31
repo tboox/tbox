@@ -18,11 +18,11 @@
  *
  * @author      ruki
  * @file        crc.h
- * @ingroup     utils
+ * @ingroup     hash
  *
  */
-#ifndef TB_UTILS_CRC_H
-#define TB_UTILS_CRC_H
+#ifndef TB_HASH_CRC_H
+#define TB_HASH_CRC_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -34,7 +34,7 @@
  */
 
 // encode value
-#define tb_crc_encode_value(mode, crc, value)       tb_crc_encode(mode, crc, (tb_byte_t const*)&(value), sizeof(value))
+#define tb_crc_make_value(mode, crc, value)       tb_crc_make(mode, crc, (tb_byte_t const*)&(value), sizeof(value))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -67,26 +67,26 @@ typedef enum __tb_crc_mode_t
  * interfaces
  */
 
-/*! encode crc
+/*! make crc
  *
  * @param mode      the crc mode
- * @param crc       the initial crc value
  * @param data      the input data
  * @param size      the input size
+ * @param seed      uses this seed if be non-zero
  *
  * @return          the crc value
  */
-tb_uint32_t         tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* data, tb_size_t size);
+tb_uint32_t         tb_crc_make(tb_crc_mode_t mode, tb_byte_t const* data, tb_size_t size, tb_uint32_t seed);
 
-/*! encode crc for cstr
+/*! make crc for cstr
  *
  * @param mode      the crc mode
- * @param crc       the initial crc value
  * @param cstr      the input cstr
+ * @param seed      uses this seed if be non-zero
  *
  * @return          the crc value
  */
-tb_uint32_t         tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t const* cstr);
+tb_uint32_t         tb_crc_make_from_cstr(tb_crc_mode_t mode, tb_char_t const* cstr, tb_uint32_t seed);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
