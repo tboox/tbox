@@ -17,23 +17,29 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        hash.h
- * @defgroup    hash
+ * @file        crc_arm.h
  *
  */
-#ifndef TB_HASH_H
-#define TB_HASH_H
+#ifndef TB_HASH_IMPL_CRC_ARM_H
+#define TB_HASH_IMPL_CRC_ARM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "uuid.h"
-#include "djb2.h"
-#include "fnv32.h"
-#include "adler32.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifndef TB_ARCH_ARM64
+#   define tb_crc32_make(crc, ib, in, table)  tb_crc32_make_asm(crc, ib, in, table)
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_uint32_t tb_crc32_make_asm(tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in, tb_uint32_t const* table);
+
 
 #endif
+

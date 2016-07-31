@@ -17,29 +17,17 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        crc_arm.h
+ * @file        prefix.h
  *
  */
-#ifndef TB_UTILS_IMPL_CRC_ARM_H
-#define TB_UTILS_IMPL_CRC_ARM_H
+#ifndef TB_UTILS_IMPL_PREFIX_H
+#define TB_UTILS_IMPL_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-#ifndef TB_ARCH_ARM64
-#   define tb_crc32_encode(crc, ib, in, table)  tb_crc32_encode_asm(crc, ib, in, table)
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_uint32_t tb_crc32_encode_asm(tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in, tb_uint32_t const* table);
 
 
 #endif
-

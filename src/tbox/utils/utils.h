@@ -29,7 +29,6 @@
  */
 #include "prefix.h"
 #include "bits.h"
-#include "crc.h"
 #include "url.h"
 #include "dump.h"
 #include "used.h"

@@ -94,11 +94,6 @@ target("tbox")
     add_files("libm/idivi8.c") 
     add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c|thread*.c|event.c|semaphore.c|mutex.c|timer.c|ltimer.c")
 
-    -- add the source files for arm
-    if is_arch("arm.*") then
-        add_files("utils/impl/crc_arm.S")
-    end
-
     -- add the source files for the float type
     if is_option("float") then add_files("libm/*.c") end
 
@@ -111,6 +106,9 @@ target("tbox")
     -- add the source files for the hash module
     if is_option("hash") then
         add_files("hash/*.c") 
+        if is_arch("arm.*") then
+            add_files("hash/impl/crc_arm.S")
+        end
     end
 
     -- add the source files for the network module

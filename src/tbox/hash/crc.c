@@ -18,7 +18,7 @@
  *
  * @author      ruki
  * @file        crc.c
- * @ingroup     utils
+ * @ingroup     hash
  *
  */
 
@@ -27,7 +27,6 @@
  */
 #include "crc.h"
 #include "crc.g"
-#include "../libc/libc.h"
 #if defined(TB_ARCH_ARM)
 #   include "impl/crc_arm.h"
 #endif
@@ -36,20 +35,23 @@
  * implementation
  */
 
-tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* data, tb_size_t size)
+tb_uint32_t tb_crc_make(tb_crc_mode_t mode, tb_byte_t const* data, tb_size_t size, tb_uint32_t seed)
 {
     // check
     tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && data, 0);
 
+    // init value
+    tb_uint32_t crc = seed;
+
     // done
-#ifdef tb_crc32_encode
+#ifdef tb_crc32_make
 #   ifndef __tb_small__
     if (mode == TB_CRC_MODE_32_IEEE_LE || mode == TB_CRC_MODE_32_IEEE)
 #   else
     if (mode == TB_CRC_MODE_32_IEEE_LE)
 #   endif
     {
-        crc = tb_crc32_encode(crc, data, size, (tb_uint32_t const*)&g_crc_table[mode]);
+        crc = tb_crc32_make(crc, data, size, (tb_uint32_t const*)&g_crc_table[mode]);
     }
     else
     {
@@ -66,32 +68,11 @@ tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* 
     // ok?
     return crc;
 }
-tb_uint32_t tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t const* cstr)
+tb_uint32_t tb_crc_make_from_cstr(tb_crc_mode_t mode, tb_char_t const* cstr, tb_uint32_t seed)
 {
     // check
-    tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && cstr, 0);
+    tb_assert_and_check_return_val(cstr, 0);
 
-    // done
-#ifdef tb_crc32_encode
-#   ifndef __tb_small__
-    if (mode == TB_CRC_MODE_32_IEEE_LE || mode == TB_CRC_MODE_32_IEEE)
-#   else
-    if (mode == TB_CRC_MODE_32_IEEE_LE)
-#   endif
-    {
-        crc = tb_crc32_encode(crc, (tb_byte_t const*)cstr, tb_strlen(cstr), (tb_uint32_t const*)&g_crc_table[mode]);
-    }
-    else
-    {
-        tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
-        while (*cstr) crc = pt[((tb_uint8_t)crc) ^ *cstr++] ^ (crc >> 8);
-    }
-#else
-    tb_uint32_t const*  pt = (tb_uint32_t const*)&g_crc_table[mode];
-    while (*cstr) crc = pt[((tb_uint8_t)crc) ^ *cstr++] ^ (crc >> 8);
-#endif
-
-    // ok?
-    return crc;
+    // make it
+    return tb_crc_make(mode, (tb_byte_t const*)cstr, tb_strlen(cstr), seed);
 }
-

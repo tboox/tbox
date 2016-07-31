@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		crc.g
- * @ingroup 	utils
+ * @ingroup 	hash
  *
  */
 

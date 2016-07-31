@@ -83,7 +83,6 @@ static tb_demo_t g_demo[] =
 
     // utils
 ,   TB_DEMO_MAIN_ITEM(utils_url)
-,   TB_DEMO_MAIN_ITEM(utils_crc)
 ,   TB_DEMO_MAIN_ITEM(utils_bits)
 ,   TB_DEMO_MAIN_ITEM(utils_dump)
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
@@ -96,6 +95,7 @@ static tb_demo_t g_demo[] =
 #ifdef TB_CONFIG_MODULE_HAVE_HASH
 ,   TB_DEMO_MAIN_ITEM(hash_md5)
 ,   TB_DEMO_MAIN_ITEM(hash_sha)
+,   TB_DEMO_MAIN_ITEM(hash_crc)
 ,   TB_DEMO_MAIN_ITEM(hash_djb2)
 ,   TB_DEMO_MAIN_ITEM(hash_fnv32)
 ,   TB_DEMO_MAIN_ITEM(hash_adler32)
