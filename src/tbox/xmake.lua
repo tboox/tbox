@@ -27,11 +27,11 @@ option("smallest")
     set_category("option")
     set_description("Enable the smallest compile mode and disable all modules.")
     add_rbindings("info")
-    add_rbindings("xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
+    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database"}) do
+for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database"}) do
     option(module)
         set_enable(true)
         set_showmenu(true)
@@ -107,6 +107,11 @@ target("tbox")
 
     -- add the source files for the regex module
     if is_option("regex") then add_files("regex/*.c") end
+
+    -- add the source files for the hash module
+    if is_option("hash") then
+        add_files("hash/*.c") 
+    end
 
     -- add the source files for the network module
     if is_option("network") then

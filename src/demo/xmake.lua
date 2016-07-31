@@ -42,6 +42,11 @@ target("demo")
     add_files("stream/stream.c") 
     add_files("stream/stream/*.c") 
 
+    -- add the source files for the hash module
+    if is_option("hash") then
+        add_files("hash/*.c") 
+    end
+
     -- add the source files for the float type
     if is_option("float") then
         add_files("math/fixed.c")

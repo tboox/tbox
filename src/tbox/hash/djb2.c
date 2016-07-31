@@ -16,40 +16,42 @@
  * 
  * Copyright (C) 2016, Olexander Yermakov All rights reserved.
  *
- * @author      alexyer
- * @file        fnv32.h
- * @ingroup     utils
+ * @author      ruki
+ * @file        djb2.c
+ * @ingroup     value
  *
  */
-#ifndef TB_UTILS_FNV32_H
-#define TB_UTILS_FNV32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "djb2.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * implementation
  */
-__tb_extern_c_enter__
+tb_size_t tb_djb2_make(tb_byte_t const* data, tb_size_t size, tb_size_t seed)
+{
+    // check
+    tb_assert_and_check_return_val(data && size, 0);
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
+    // init value
+    tb_size_t value = 5381;
+    if (seed) value = value * 33 + seed;
 
-/*! encode fnv32
- *
- * @param data      the data
- * @param size      the size
- *
- * @return          the fnv32 value
- */
-tb_uint32_t         tb_fnv32_encode(tb_byte_t const* data, tb_size_t size);
+    // generate it
+    while (*data) 
+    {
+        value = value * 33 + (*data);
+        data++;
+    }
+    return value;
+}
+tb_size_t tb_djb2_make_from_cstr(tb_char_t const* cstr, tb_size_t seed)
+{
+    // check
+    tb_assert_and_check_return_val(cstr, 0);
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
-
-#endif
+    // make it
+    return tb_djb2_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+}
