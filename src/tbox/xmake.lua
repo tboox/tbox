@@ -73,7 +73,7 @@ target("tbox")
     add_options("info", "float", "wchar")
 
     -- add modules
-    add_options("xml", "zip", "asio", "regex", "object", "thread", "network", "charset", "database")
+    add_options("xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database")
 
     -- add the common source files
     add_files("*.c") 
