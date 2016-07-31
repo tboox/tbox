@@ -24,6 +24,7 @@
  * includes
  */
 #include "hash.h"
+#include "../../hash/hash.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * data hash implementation
@@ -226,14 +227,14 @@ static tb_size_t tb_element_hash_data_func_11(tb_byte_t const* data, tb_size_t s
 {
     // using md5, better but too slower
     tb_byte_t b[16] = {0};
-    tb_md5_encode(data, size, b, 16);
+    tb_md5_make(data, size, b, 16);
     return tb_bits_get_u32_ne(b);
 }
 static tb_size_t tb_element_hash_data_func_12(tb_byte_t const* data, tb_size_t size)
 {
     // using sha, better but too slower
     tb_byte_t b[32] = {0};
-    tb_sha_encode(TB_SHA_MODE_SHA1_160, data, size, b, 32);
+    tb_sha_make(TB_SHA_MODE_SHA1_160, data, size, b, 32);
     return tb_bits_get_u32_ne(b);
 }
 static tb_size_t tb_element_hash_data_func_13(tb_byte_t const* data, tb_size_t size)
