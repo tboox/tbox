@@ -14,42 +14,43 @@
  * along with TBox; 
  * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
- * Copyright (C) 2016, Olexander Yermakov All rights reserved.
+ * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
- * @author      alexyer
- * @file        fnv32.c
- * @ingroup     utils
+ * @author      ruki
+ * @file        uuid.h
+ * @ingroup     hash
  *
  */
+#ifndef TB_HASH_UUID_H
+#define TB_HASH_UUID_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "fnv32.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
+ * extern
  */
-
-// FNV prime
-#define TB_FNV_32_PRIME     (0x01000193)
-#define TB_FNV0             (0x811c9dc5)
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-tb_uint32_t tb_fnv32_encode(tb_byte_t const* data, tb_size_t size)
-{
-    // check
-    tb_assert_and_check_return_val(data && size, 0);
 
-    // done
-    tb_uint32_t hval = TB_FNV0;
-    while (size)
-    {
-        hval *= TB_FNV_32_PRIME;
-        hval ^= (tb_uint32_t)*data++;
-        size--;
-    }
-    return hval;
-}
+/*! make an uuid
+ *
+ * @param uuid      the uuid output buffer
+ * @param name      we only generate it using a simple hashing function for speed if name is supplied 
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+#endif
+

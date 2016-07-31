@@ -94,7 +94,13 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(utils_base32)
 ,   TB_DEMO_MAIN_ITEM(utils_base64)
 ,   TB_DEMO_MAIN_ITEM(utils_adler32)
-,   TB_DEMO_MAIN_ITEM(utils_fnv32)
+
+    // hash
+#ifdef TB_CONFIG_MODULE_HAVE_HASH
+,   TB_DEMO_MAIN_ITEM(hash_djb2)
+,   TB_DEMO_MAIN_ITEM(hash_fnv32)
+,   TB_DEMO_MAIN_ITEM(hash_benchmark)
+#endif
 
     // other
 ,   TB_DEMO_MAIN_ITEM(other_test)

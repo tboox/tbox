@@ -5,6 +5,12 @@
 ### New features
 
 * Add wait multi-processes interface
+* Add uuid generator
+* Add hash module
+
+### Changes
+
+* Move some utils interfaces to the hash module
 
 ### Bugs fixed
 
@@ -62,6 +68,12 @@
 ### 新特性
 
 * 增加同时等待多个进程接口
+* 增加uuid生成器
+* 增加hash模块
+
+### 改进
+
+* 移动部分utils接口到hash模块
 
 ### Bugs修复
 
