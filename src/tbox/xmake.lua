@@ -106,7 +106,7 @@ target("tbox")
 
     -- add the source files for the hash module
     if is_option("hash") then
-        add_files("hash*.c") 
+        add_files("hash/*.c") 
         if is_arch("arm.*") then
             add_files("hash/impl/crc32_arm.S")
         end
