@@ -17,17 +17,19 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        prefix.h
+ * @file        deprecated.h
  *
  */
-#ifndef TB_HASH_IMPL_PREFIX_H
-#define TB_HASH_IMPL_PREFIX_H
+#ifndef TB_HASH_DEPRECATED_H
+#define TB_HASH_DEPRECATED_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-
+#include "crc.h"
+#include "md5.h"
+#include "sha.h"
+#include "deprecated.h"
 
 
 #endif

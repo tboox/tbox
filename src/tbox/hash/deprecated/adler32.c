@@ -16,18 +16,29 @@
  * 
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
+ * This is a modified version based on adler32.c from the zlib library.
+ * Copyright (C) 1995 - 2011 Mark adler
+ *
  * @author      ruki
- * @file        prefix.h
+ * @file        adler32.c
+ * @ingroup     hash
  *
  */
-#ifndef TB_HASH_IMPL_PREFIX_H
-#define TB_HASH_IMPL_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "adler32.h"
+#include "../adler32.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_uint32_t tb_adler32_encode(tb_byte_t const* data, tb_size_t size)
+{
+    // trace
+    tb_trace_deprecated();
 
-
-#endif
+    // make it
+    return tb_adler32_make(data, size, 0);
+}

@@ -20,8 +20,8 @@
  * @file        prefix.h
  *
  */
-#ifndef TB_HASH_IMPL_PREFIX_H
-#define TB_HASH_IMPL_PREFIX_H
+#ifndef TB_HASH_DEPRECATED_PREFIX_H
+#define TB_HASH_DEPRECATED_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

@@ -68,15 +68,15 @@ tb_uint8_t tb_crc8_make(tb_byte_t const* data, tb_size_t size, tb_uint8_t seed)
     tb_assert_and_check_return_val(data, 0);
 
     // init value
-    tb_uint8_t crc = seed;
+    tb_uint32_t crc = seed;
 
     // done
     tb_byte_t const*    ie = data + size;
-    tb_uint8_t const*  pt = (tb_uint8_t const*)g_crc8_table;
+    tb_uint8_t const*   pt = (tb_uint8_t const*)g_crc8_table;
     while (data < ie) crc = pt[((tb_uint8_t)crc) ^ *data++] ^ (crc >> 8);
 
     // ok?
-    return crc;
+    return (tb_uint8_t)crc;
 }
 tb_uint8_t tb_crc8_make_from_cstr(tb_char_t const* cstr, tb_uint8_t seed)
 {

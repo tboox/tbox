@@ -115,7 +115,7 @@ tb_uint16_t tb_crc16_make(tb_byte_t const* data, tb_size_t size, tb_uint16_t see
     tb_assert_and_check_return_val(data, 0);
 
     // init value
-    tb_uint16_t crc = seed;
+    tb_uint32_t crc = seed;
 
     // done
     tb_byte_t const*    ie = data + size;
@@ -123,7 +123,7 @@ tb_uint16_t tb_crc16_make(tb_byte_t const* data, tb_size_t size, tb_uint16_t see
     while (data < ie) crc = pt[((tb_uint8_t)crc) ^ *data++] ^ (crc >> 8);
 
     // ok?
-    return crc;
+    return (tb_uint16_t)crc;
 }
 tb_uint16_t tb_crc16_make_from_cstr(tb_char_t const* cstr, tb_uint16_t seed)
 {
