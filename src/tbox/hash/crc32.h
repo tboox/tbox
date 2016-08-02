@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        crc.h
+ * @file        crc32.h
  * @ingroup     hash
  *
  */
-#ifndef TB_HASH_CRC_H
-#define TB_HASH_CRC_H
+#ifndef TB_HASH_CRC32_H
+#define TB_HASH_CRC32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -34,7 +34,7 @@
  */
 
 // encode value
-#define tb_crc_make_value(mode, crc, value)       tb_crc_make(mode, crc, (tb_byte_t const*)&(value), sizeof(value))
+#define tb_crc32_make_value(mode, crc, value)       tb_crc32_make(mode, crc, (tb_byte_t const*)&(value), sizeof(value))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -42,51 +42,46 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-/// the crc mode type
-typedef enum __tb_crc_mode_t
-{
-#ifdef __tb_small__
-    TB_CRC_MODE_16_CCITT    = 0
-,   TB_CRC_MODE_32_IEEE_LE  = 1
-,   TB_CRC_MODE_MAX         = 2
-#else
-    TB_CRC_MODE_8_ATM       = 0
-,   TB_CRC_MODE_16_ANSI     = 1
-,   TB_CRC_MODE_16_CCITT    = 2
-,   TB_CRC_MODE_32_IEEE     = 3
-,   TB_CRC_MODE_32_IEEE_LE  = 4
-,   TB_CRC_MODE_MAX         = 5
-#endif
-
-}tb_crc_mode_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! make crc
+/*! make crc32 (IEEE)
  *
- * @param mode      the crc mode
  * @param data      the input data
  * @param size      the input size
  * @param seed      uses this seed if be non-zero
  *
  * @return          the crc value
  */
-tb_uint32_t         tb_crc_make(tb_crc_mode_t mode, tb_byte_t const* data, tb_size_t size, tb_uint32_t seed);
+tb_uint32_t         tb_crc32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed);
 
-/*! make crc for cstr
+/*! make crc32 (IEEE) for cstr
  *
- * @param mode      the crc mode
  * @param cstr      the input cstr
  * @param seed      uses this seed if be non-zero
  *
  * @return          the crc value
  */
-tb_uint32_t         tb_crc_make_from_cstr(tb_crc_mode_t mode, tb_char_t const* cstr, tb_uint32_t seed);
+tb_uint32_t         tb_crc32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed);
+
+/*! make crc32 (IEEE LE)
+ *
+ * @param data      the input data
+ * @param size      the input size
+ * @param seed      uses this seed if be non-zero
+ *
+ * @return          the crc value
+ */
+tb_uint32_t         tb_crc32_le_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed);
+
+/*! make crc32 (IEEE LE) for cstr
+ *
+ * @param cstr      the input cstr
+ * @param seed      uses this seed if be non-zero
+ *
+ * @return          the crc value
+ */
+tb_uint32_t         tb_crc32_le_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

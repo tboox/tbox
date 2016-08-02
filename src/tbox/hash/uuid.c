@@ -26,7 +26,7 @@
  * includes
  */
 #include "uuid.h"
-#include "djb2.h"
+#include "bkdr.h"
 #include "../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -41,10 +41,10 @@ tb_bool_t tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name)
     if (name)
     {
         // generate hash values
-        tb_uint32_t h0 = tb_djb2_make_from_cstr(name, 'g');
-        tb_uint32_t h1 = tb_djb2_make_from_cstr(name, 'u');
-        tb_uint32_t h2 = tb_djb2_make_from_cstr(name, 'i');
-        tb_uint32_t h3 = tb_djb2_make_from_cstr(name, 'd');
+        tb_uint32_t h0 = tb_bkdr_make_from_cstr(name, 'g');
+        tb_uint32_t h1 = tb_bkdr_make_from_cstr(name, 'u');
+        tb_uint32_t h2 = tb_bkdr_make_from_cstr(name, 'i');
+        tb_uint32_t h3 = tb_bkdr_make_from_cstr(name, 'd');
 
         // fill uuid
         tb_bits_set_u32_be(uuid + 0,    h0);

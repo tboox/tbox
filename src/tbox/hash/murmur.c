@@ -14,35 +14,44 @@
  * along with TBox; 
  * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
- * Copyright (C) 2009 - 2015, ruki All rights reserved.
+ * Copyright (C) 2016, Olexander Yermakov All rights reserved.
  *
  * @author      ruki
- * @file        hash.h
- * @defgroup    hash
+ * @file        murmur.c
+ * @ingroup     hash
  *
  */
-#ifndef TB_HASH_H
-#define TB_HASH_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "ap.h"
-#include "rs.h"
-#include "sha.h"
-#include "md5.h"
-#include "uuid.h"
-#include "djb2.h"
-#include "sdbm.h"
-#include "bkdr.h"
-#include "crc8.h"
-#include "crc16.h"
-#include "crc32.h"
-#include "fnv32.h"
-#include "fnv64.h"
 #include "murmur.h"
-#include "adler32.h"
-#include "blizzard.h"
 
-#endif
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_size_t tb_murmur_make(tb_byte_t const* data, tb_size_t size, tb_size_t seed)
+{
+    // check
+    tb_assert_and_check_return_val(data && size, 0);
+
+    // init value
+    tb_size_t value = seed;
+
+    // generate it
+    while (size--) 
+    {
+        value ^= (*data++);
+        value *= 0x5bd1e995;
+        value ^= value >> 15;
+    }
+    return value;
+}
+tb_size_t tb_murmur_make_from_cstr(tb_char_t const* cstr, tb_size_t seed)
+{
+    // check
+    tb_assert_and_check_return_val(cstr, 0);
+
+    // make it
+    return tb_murmur_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+}
