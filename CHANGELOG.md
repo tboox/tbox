@@ -6,7 +6,8 @@
 
 * Add wait multi-processes interface
 * Add uuid generator
-* Add hash module
+* Add hash library module
+* Add `__tb_deprecated__` keyword and option
 
 ### Changes
 
@@ -69,7 +70,8 @@
 
 * 增加同时等待多个进程接口
 * 增加uuid生成器
-* 增加hash模块
+* 增加hash库模块
+* 添加`__tb_deprecated__`关键字以及配置选项
 
 ### 改进
 
