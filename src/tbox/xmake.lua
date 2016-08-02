@@ -20,13 +20,21 @@ option("info")
     set_description("Enable or disable to get some info, .e.g version ..")
     add_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
+-- add option: deprecated
+option("deprecated")
+    set_enable(true)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Enable or disable the deprecated interfaces.")
+    add_defines_h_if_ok("$(prefix)_API_HAVE_DEPRECATED")
+
 -- add option: smallest
 option("smallest")
     set_enable(false)
     set_showmenu(true)
     set_category("option")
     set_description("Enable the smallest compile mode and disable all modules.")
-    add_rbindings("info")
+    add_rbindings("info", "deprecated")
     add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
 
@@ -70,7 +78,7 @@ target("tbox")
     add_packages("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
 
     -- add options
-    add_options("info", "float", "wchar")
+    add_options("info", "float", "wchar", "deprecated")
 
     -- add modules
     add_options("xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database")
@@ -109,6 +117,9 @@ target("tbox")
         add_files("hash/*.c") 
         if is_arch("arm.*") then
             add_files("hash/impl/crc32_arm.S")
+        end
+        if is_option("deprecated") then
+            add_files("hash/deprecated/*.c") 
         end
     end
 

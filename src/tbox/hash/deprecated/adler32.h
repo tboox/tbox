@@ -17,17 +17,41 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        prefix.h
+ * @file        adler32.h
+ * @ingroup     hash
  *
  */
-#ifndef TB_HASH_IMPL_PREFIX_H
-#define TB_HASH_IMPL_PREFIX_H
+#ifndef TB_HASH_DEPRECATED_ADLER32_H
+#define TB_HASH_DEPRECATED_ADLER32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! encode adler32 hash
+ *
+ * @param data      the data
+ * @param size      the size
+ *
+ * @return          the adler32 value
+ */
+__tb_deprecated__
+tb_uint32_t         tb_adler32_encode(tb_byte_t const* data, tb_size_t size);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
+
