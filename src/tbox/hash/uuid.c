@@ -56,3 +56,29 @@ tb_bool_t tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name)
     // ok
     return tb_true;
 }
+tb_char_t const* tb_uuid_make_cstr(tb_char_t uuid_cstr[37], tb_char_t const* name)
+{
+    // check
+    tb_assert_and_check_return_val(uuid_cstr, tb_null);
+
+    // make uuid bytes
+    tb_byte_t uuid[16];
+    if (!tb_uuid_make(uuid, name)) return tb_null;
+
+    // make uuid string
+	tb_long_t size = tb_snprintf(   uuid_cstr
+                                ,   37
+                                ,   "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X"
+                                ,   uuid[0], uuid[1], uuid[2], uuid[3]
+                                ,   uuid[4], uuid[5]
+                                ,   uuid[6], uuid[7]
+                                ,   uuid[8], uuid[9]
+                                ,   uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
+    tb_assert_and_check_return_val(size == 36, tb_null);
+
+    // end
+    uuid_cstr[36] = '\0';
+
+    // ok
+    return uuid_cstr;
+}
