@@ -89,6 +89,7 @@ TB_DEMO_MAIN_DECL(utils_base64);
 // hash
 TB_DEMO_MAIN_DECL(hash_md5);
 TB_DEMO_MAIN_DECL(hash_sha);
+TB_DEMO_MAIN_DECL(hash_uuid);
 TB_DEMO_MAIN_DECL(hash_djb2);
 TB_DEMO_MAIN_DECL(hash_sdbm);
 TB_DEMO_MAIN_DECL(hash_crc8);

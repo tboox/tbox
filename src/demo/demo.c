@@ -95,6 +95,7 @@ static tb_demo_t g_demo[] =
 #ifdef TB_CONFIG_MODULE_HAVE_HASH
 ,   TB_DEMO_MAIN_ITEM(hash_md5)
 ,   TB_DEMO_MAIN_ITEM(hash_sha)
+,   TB_DEMO_MAIN_ITEM(hash_uuid)
 ,   TB_DEMO_MAIN_ITEM(hash_djb2)
 ,   TB_DEMO_MAIN_ITEM(hash_sdbm)
 ,   TB_DEMO_MAIN_ITEM(hash_crc8)

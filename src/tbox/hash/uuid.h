@@ -47,6 +47,15 @@ __tb_extern_c_enter__
  */
 tb_bool_t           tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name);
 
+/*! make an uuid string
+ *
+ * @param uuid_cstr the uuid output c-string
+ * @param name      we only generate it using a simple hashing function for speed if name is supplied 
+ *
+ * @return          the uuid c-string or tb_null
+ */
+tb_char_t const*    tb_uuid_make_cstr(tb_char_t uuid_cstr[37], tb_char_t const* name);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
