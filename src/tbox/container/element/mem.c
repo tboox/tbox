@@ -58,7 +58,7 @@ static tb_char_t const* tb_element_mem_cstr(tb_element_ref_t element, tb_cpointe
     tb_assert_and_check_return_val(element && element->size && cstr && data, tb_null);
 
     // make info
-    tb_long_t size = tb_snprintf(cstr, maxn, "0x%x", tb_crc_make(TB_CRC_MODE_32_IEEE_LE, (tb_byte_t const*)data, element->size, 0));
+    tb_long_t size = tb_snprintf(cstr, maxn, "0x%x", tb_adler32_make((tb_byte_t const*)data, element->size, 0));
     if (size >= 0) cstr[size] = '\0';
 
     // ok?

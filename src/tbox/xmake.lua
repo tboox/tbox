@@ -77,6 +77,7 @@ target("tbox")
 
     -- add the common source files
     add_files("*.c") 
+    add_files("hash/bkdr.c", "hash/fnv32.c", "hash/adler32.c")
     add_files("math/**.c") 
     add_files("libc/**.c|string/impl/**.c") 
     add_files("utils/*.c|option.c") 
@@ -105,9 +106,9 @@ target("tbox")
 
     -- add the source files for the hash module
     if is_option("hash") then
-        add_files("hash/*.c") 
+        add_files("hash*.c") 
         if is_arch("arm.*") then
-            add_files("hash/impl/crc_arm.S")
+            add_files("hash/impl/crc32_arm.S")
         end
     end
 

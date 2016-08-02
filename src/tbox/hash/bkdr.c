@@ -18,7 +18,7 @@
  *
  * @author      ruki
  * @file        bkdr.c
- * @ingroup     value
+ * @ingroup     hash
  *
  */
 

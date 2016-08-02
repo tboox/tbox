@@ -17,12 +17,12 @@
  * Copyright (C) 2016, Olexander Yermakov and ruki All rights reserved.
  *
  * @author      alexyer, ruki
- * @file        fnv32.h
+ * @file        fnv64.h
  * @ingroup     hash
  *
  */
-#ifndef TB_HASH_FNV32_H
-#define TB_HASH_FNV32_H
+#ifndef TB_HASH_FNV64_H
+#define TB_HASH_FNV64_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,43 +38,43 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! make fnv32 hash
+/*! make fnv64 hash
  *
  * @param data      the data
  * @param size      the size
  * @param seed      uses this seed if be non-zero
  *
- * @return          the fnv32 value
+ * @return          the fnv64 value
  */
-tb_uint32_t         tb_fnv32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed);
+tb_uint64_t         tb_fnv64_make(tb_byte_t const* data, tb_size_t size, tb_uint64_t seed);
 
-/*! make fnv32 hash from c-string
+/*! make fnv64 hash from c-string
  *
  * @param cstr      the c-string
  * @param seed      uses this seed if be non-zero
  *
- * @return          the fnv32 value
+ * @return          the fnv64 value
  */
-tb_uint32_t         tb_fnv32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed);
+tb_uint64_t         tb_fnv64_make_from_cstr(tb_char_t const* cstr, tb_uint64_t seed);
 
-/*! make fnv32(1a) hash
+/*! make fnv64(1a) hash
  *
  * @param data      the data
  * @param size      the size
  * @param seed      uses this seed if be non-zero
  *
- * @return          the fnv32 value
+ * @return          the fnv64 value
  */
-tb_uint32_t         tb_fnv32_1a_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed);
+tb_uint64_t         tb_fnv64_1a_make(tb_byte_t const* data, tb_size_t size, tb_uint64_t seed);
 
-/*! make fnv32(1a) hash from c-string
+/*! make fnv64(1a) hash from c-string
  *
  * @param cstr      the c-string
  * @param seed      uses this seed if be non-zero
  *
- * @return          the fnv32 value
+ * @return          the fnv64 value
  */
-tb_uint32_t         tb_fnv32_1a_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed);
+tb_uint64_t         tb_fnv64_1a_make_from_cstr(tb_char_t const* cstr, tb_uint64_t seed);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

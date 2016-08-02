@@ -35,188 +35,44 @@ static tb_size_t tb_element_hash_data_func_0(tb_byte_t const* data, tb_size_t si
 }
 static tb_size_t tb_element_hash_data_func_1(tb_byte_t const* data, tb_size_t size)
 {
-    // from stl string
-    tb_size_t           v = 2166136261ul;
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e) v = 16777619 * v ^ (tb_size_t)(*p++);
-    return v;
+    return tb_adler32_make(data, size, 0);
 }
-#ifdef __tb_small__
 static tb_size_t tb_element_hash_data_func_2(tb_byte_t const* data, tb_size_t size)
 {
-    // fnv-1a-hash
-    tb_size_t           v = size; v ^= 2166136261ul;
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e) 
-    {
-        v ^= *p++;
-        v *= 16777619;
-    }
-    return v;
+    return tb_fnv32_1a_make(data, size, 0);
 }
-#else
-static tb_size_t tb_element_hash_data_func_2(tb_byte_t const* data, tb_size_t size)
-{
-    // Blizzard One-Way Hash algorithm from MPQ
-    // make table
-    static tb_size_t s_make = 0;
-    static tb_size_t s_table[1280];
-    if (!s_make)
-    {
-        tb_size_t i = 0;  
-        tb_size_t index1 = 0;
-        tb_size_t index2 = 0;
-        tb_size_t seed = 0x00100001;
-        for (index1 = 0; index1 < 0x100; index1++)  
-        {   
-            for (index2 = index1, i = 0; i < 5; i++, index2 += 0x100)  
-            {   
-                seed = (seed * 125 + 3) % 0x2aaaab; tb_size_t temp1 = (seed & 0xffff) << 0x10;  
-                seed = (seed * 125 + 3) % 0x2aaaab; tb_size_t temp2 = (seed & 0xffff);
-                s_table[index2] = (temp1 | temp2);   
-            }   
-        }
-
-        // ok
-        s_make = 1;
-    }
-
-    // done
-    tb_size_t           b = 0;  
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    tb_size_t           seed1 = 0x7fed7fed;  
-    tb_size_t           seed2 = 0Xeeeeeeee;  
-    while (p < e)
-    {
-        b = *p++;  
-
-        // 0 << 8: hash type: 0
-        // 1 << 8: hash type: 1
-        // 2 << 8: hash type: 2
-        seed1 = s_table[(1 << 8) + b] ^ (seed1 + seed2);  
-        seed2 = b + seed1 + seed2 + (seed2 << 5) + 3;  
-    }
-
-    // ok
-    return seed1;  
-}
+#if !defined(__tb_small__) && defined(TB_CONFIG_MODULE_HAVE_HASH)
 static tb_size_t tb_element_hash_data_func_3(tb_byte_t const* data, tb_size_t size)
 {
-    // fnv-1a-hash
-    tb_size_t           v = size; v ^= 2166136261ul;
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e) 
-    {
-        v ^= *p++;
-        v *= 16777619;
-    }
-    return v;
+    return tb_ap_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_4(tb_byte_t const* data, tb_size_t size)
 {
-    // one-byte-at-a-time hash based on Murmur's mix
-    tb_size_t           v = size;
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e) 
-    {
-        v ^= *p++;
-        v *= 0x5bd1e995;
-        v ^= v >> 15;
-    }
-    return v;
+    return tb_murmur_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_5(tb_byte_t const* data, tb_size_t size)
 {
-    return tb_crc_make(TB_CRC_MODE_32_IEEE_LE, data, size, 0);
+    return tb_crc32_le_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_6(tb_byte_t const* data, tb_size_t size)
 {
-    // fnv-1-hash
-    tb_size_t           v = 0;  
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e) 
-    {
-        v *= 0x811C9DC5;  
-        v ^= (*p++);  
-    }  
-    return v;  
+    return tb_fnv32_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_7(tb_byte_t const* data, tb_size_t size)
 {
-    // ap-hash
-    tb_size_t           v = 0xAAAAAAAA;  
-    tb_size_t           i = 0;
-    tb_byte_t const*    p = data;
-    for (i = 0; i < size; i++, p++) 
-    {  
-        v ^= (!(i & 1)) ? ((v << 7) ^ ((*p) * (v >> 3))) : (~(((v << 11) + (*p)) ^ (v >> 5)));  
-    }
-    return v;  
+    return tb_djb2_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_8(tb_byte_t const* data, tb_size_t size)
 {
-    // MurmurHash2A, by Austin Appleby
-    tb_uint32_t const   m = 0x5bd1e995;
-    tb_uint32_t const   r = 24;
-    tb_uint32_t         l = size;
-    tb_size_t           v = 2166136261ul;
-
-#define mmix(v,k) { k *= m; k ^= k >> r; k *= m; v *= m; v ^= k; }
-    while (size >= 4)
-    {
-        tb_uint32_t k = tb_bits_get_u32_ne(data);
-        mmix(v, k);
-
-        data += 4;
-        size -= 4;
-    }
-
-    tb_uint32_t t = 0;
-    switch (size)
-    {
-    case 3: t ^= data[2] << 16;
-    case 2: t ^= data[1] << 8;
-    case 1: t ^= data[0];
-    };
-
-    mmix(v, t);
-    mmix(v, l);
-
-    v ^= v >> 13;
-    v *= m;
-    v ^= v >> 15;
-
-    return v;
+    return tb_blizzard_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_9(tb_byte_t const* data, tb_size_t size)
 {
-    // rs-hash
-    tb_size_t           v = 0;  
-    tb_size_t           b = 378551;  
-    tb_size_t           a = 63689;  
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e)
-    {  
-        v = v * a + (*p++);  
-        a = a * b;  
-    }  
-    return v;
+    return tb_rs_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_10(tb_byte_t const* data, tb_size_t size)
 {
-    // sdbm-hash
-    tb_size_t           v = 0;  
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    while (p < e) v = (*p++) + (v << 6) + (v << 16) - v;  
-    return v;
+    return tb_sdbm_make(data, size, 0);
 }
 static tb_size_t tb_element_hash_data_func_11(tb_byte_t const* data, tb_size_t size)
 {
@@ -254,19 +110,11 @@ static tb_size_t tb_element_hash_data_func_15(tb_byte_t const* data, tb_size_t s
  */
 static tb_size_t tb_element_hash_cstr_func_0(tb_char_t const* data)
 {
-    // bkdr-hash
-    tb_size_t           v = 0;  
-    tb_byte_t const*    p = (tb_byte_t const*)data;
-    while (*p) v = (v * 131313) + (*p++);  
-    return v;
+    return tb_bkdr_make_from_cstr(data, 0);
 }
 static tb_size_t tb_element_hash_cstr_func_1(tb_char_t const* data)
 {
-    // from stl string
-    tb_size_t           v = 2166136261ul;
-    tb_byte_t const*    p = (tb_byte_t const*)data;
-    while (*p) v = 16777619 * v ^ (tb_size_t)(*p++);
-    return v;
+    return tb_fnv32_1a_make_from_cstr(data, 0);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -433,7 +281,7 @@ tb_size_t tb_element_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t 
         tb_element_hash_data_func_0
     ,   tb_element_hash_data_func_1
     ,   tb_element_hash_data_func_2
-#ifndef __tb_small__
+#if !defined(__tb_small__) && defined(TB_CONFIG_MODULE_HAVE_HASH)
     ,   tb_element_hash_data_func_3
     ,   tb_element_hash_data_func_4
     ,   tb_element_hash_data_func_5

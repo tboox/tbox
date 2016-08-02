@@ -14,14 +14,15 @@
  * along with TBox; 
  * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
- * Copyright (C) 2009 - 2015, ruki All rights reserved.
+ * Copyright (C) 2016, Olexander Yermakov All rights reserved.
  *
  * @author      ruki
- * @file        crc_arm.h
+ * @file        ap.h
+ * @ingroup     hash
  *
  */
-#ifndef TB_HASH_IMPL_CRC_ARM_H
-#define TB_HASH_IMPL_CRC_ARM_H
+#ifndef TB_HASH_AP_H
+#define TB_HASH_AP_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -29,17 +30,36 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
+ * extern
  */
-#ifndef TB_ARCH_ARM64
-#   define tb_crc32_make(crc, ib, in, table)  tb_crc32_make_asm(crc, ib, in, table)
-#endif
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_uint32_t tb_crc32_make_asm(tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in, tb_uint32_t const* table);
 
+/*! make ap hash
+ *
+ * @param data      the data
+ * @param size      the size
+ * @param seed      uses this seed if be non-zero
+ *
+ * @return          the ap value
+ */
+tb_size_t           tb_ap_make(tb_byte_t const* data, tb_size_t size, tb_size_t seed);
+
+/*! make ap hash from c-string
+ *
+ * @param cstr      the c-string
+ * @param seed      uses this seed if be non-zero
+ *
+ * @return          the ap value
+ */
+tb_size_t           tb_ap_make_from_cstr(tb_char_t const* cstr, tb_size_t seed);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
-

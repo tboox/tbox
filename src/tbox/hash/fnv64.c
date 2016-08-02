@@ -17,7 +17,7 @@
  * Copyright (C) 2016, Olexander Yermakov and ruki All rights reserved.
  *
  * @author      alexyer, ruki
- * @file        fnv32.c
+ * @file        fnv64.c
  * @ingroup     hash
  *
  */
@@ -25,68 +25,68 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "fnv32.h"
+#include "fnv64.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
-// the pnv32 prime and offset basis
-#define TB_FNV32_PRIME          (16777619)
-#define TB_FNV32_OFFSET_BASIS   (2166136261)
+// the pnv64 prime and offset basis
+#define TB_FNV64_PRIME          (1099511628211ULL)
+#define TB_FNV64_OFFSET_BASIS   (14695981039346656037ULL)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_uint32_t tb_fnv32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed)
+tb_uint64_t tb_fnv64_make(tb_byte_t const* data, tb_size_t size, tb_uint64_t seed)
 {
     // check
     tb_assert_and_check_return_val(data && size, 0);
 
     // init value
-    tb_uint32_t value = TB_FNV32_OFFSET_BASIS;
-    if (seed) value = (value * TB_FNV32_PRIME) ^ seed;
+    tb_uint64_t value = TB_FNV64_OFFSET_BASIS;
+    if (seed) value = (value * TB_FNV64_PRIME) ^ seed;
 
     // generate it
     while (size)
     {
-        value *= TB_FNV32_PRIME;
-        value ^= (tb_uint32_t)*data++;
+        value *= TB_FNV64_PRIME;
+        value ^= (tb_uint64_t)*data++;
         size--;
     }
     return value;
 }
-tb_uint32_t tb_fnv32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed)
+tb_uint64_t tb_fnv64_make_from_cstr(tb_char_t const* cstr, tb_uint64_t seed)
 {
     // check
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_fnv32_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_fnv64_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
 }
-tb_uint32_t tb_fnv32_1a_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed)
+tb_uint64_t tb_fnv64_1a_make(tb_byte_t const* data, tb_size_t size, tb_uint64_t seed)
 {
     // check
     tb_assert_and_check_return_val(data && size, 0);
 
     // init value
-    tb_uint32_t value = TB_FNV32_OFFSET_BASIS;
-    if (seed) value = (value * TB_FNV32_PRIME) ^ seed;
+    tb_uint64_t value = TB_FNV64_OFFSET_BASIS;
+    if (seed) value = (value * TB_FNV64_PRIME) ^ seed;
 
     // generate it
     while (size)
     {
-        value ^= (tb_uint32_t)*data++;
-        value *= TB_FNV32_PRIME;
+        value ^= (tb_uint64_t)*data++;
+        value *= TB_FNV64_PRIME;
         size--;
     }
     return value;
 }
-tb_uint32_t tb_fnv32_1a_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed)
+tb_uint64_t tb_fnv64_1a_make_from_cstr(tb_char_t const* cstr, tb_uint64_t seed)
 {
     // check
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_fnv32_1a_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_fnv64_1a_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
 }

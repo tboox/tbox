@@ -17,7 +17,7 @@
  * Copyright (C) 2016, Olexander Yermakov All rights reserved.
  *
  * @author      ruki
- * @file        djb2.c
+ * @file        ap.c
  * @ingroup     hash
  *
  */
@@ -25,29 +25,34 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "djb2.h"
+#include "ap.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_djb2_make(tb_byte_t const* data, tb_size_t size, tb_size_t seed)
+tb_size_t tb_ap_make(tb_byte_t const* data, tb_size_t size, tb_size_t seed)
 {
     // check
     tb_assert_and_check_return_val(data && size, 0);
 
     // init value
-    tb_size_t value = 5381;
-    if (seed) value = value * 33 + seed;
+    tb_size_t v = 0xAAAAAAAA;
+    if (seed) v ^= seed;
 
     // generate it
-    while (size--) value = (value * 33) + (*data++);
-    return value;
+    tb_size_t           i = 0;
+    tb_byte_t const*    p = data;
+    for (i = 0; i < size; i++, p++) 
+    {  
+        v ^= (!(i & 1)) ? ((v << 7) ^ ((*p) * (v >> 3))) : (~(((v << 11) + (*p)) ^ (v >> 5)));  
+    }
+    return v;  
 }
-tb_size_t tb_djb2_make_from_cstr(tb_char_t const* cstr, tb_size_t seed)
+tb_size_t tb_ap_make_from_cstr(tb_char_t const* cstr, tb_size_t seed)
 {
     // check
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_djb2_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_ap_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
 }
