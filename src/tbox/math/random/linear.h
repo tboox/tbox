@@ -17,26 +17,43 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        random.c
- * @ingroup     libc
+ * @file        linear.h
+ * @ingroup     math
  *
  */
+#ifndef TB_MATH_RANDOM_LINEAR_H
+#define TB_MATH_RANDOM_LINEAR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "stdlib.h"
-#include "../../math/math.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * extern
  */
-tb_void_t tb_srandom(tb_size_t seed)
-{
-    tb_random_seed(seed);
-}
-tb_long_t tb_random()
-{
-    return tb_random_value();
-}
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! set the linear random seed
+ *
+ * @param seed      the random seed
+ */
+tb_void_t           tb_random_linear_seed(tb_size_t seed);
+
+/*! generate the linear random value
+ *
+ * @return          the random value
+ */
+tb_long_t           tb_random_linear_value(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+#endif
 

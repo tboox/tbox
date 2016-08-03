@@ -17,61 +17,57 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        random.h
- *
+ * @file        random.c
+ * @ingroup     math
  */
-#ifndef TB_MATH_IMPL_RANDOM_H
-#define TB_MATH_IMPL_RANDOM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "random.h"
+#include "../../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * macros
  */
-__tb_extern_c_enter__
+
+// the initial seed
+#define TB_RANDOM_SEED_INIT     (2166136261ul)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
+ * implementation
  */
-
-// the random impl type
-typedef struct __tb_random_impl_t
+tb_void_t tb_random_seed(tb_size_t seed)
 {
-    // the type
-    tb_size_t           type;
+    tb_random_linear_seed(seed);
+}
+tb_void_t tb_random_reset()
+{
+    tb_random_seed(TB_RANDOM_SEED_INIT);
+}
+tb_long_t tb_random_value()
+{
+    return tb_random_linear_value();
+}
+tb_long_t tb_random_range(tb_long_t begin, tb_long_t end)
+{
+    // check
+    tb_assert_and_check_return_val(begin < end, begin);
 
-    // exit 
-    tb_void_t           (*exit)(struct __tb_random_impl_t* random);
+    // make range
+    return (begin + (tb_long_t)((tb_size_t)tb_random_value() % (end - begin)));
+}
+#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
+tb_float_t tb_random_rangef(tb_float_t begin, tb_float_t end)
+{
+    // check
+    tb_assert_and_check_return_val(begin < end, begin);
 
-    // seed
-    tb_void_t           (*seed)(struct __tb_random_impl_t* random, tb_size_t seed);
+    // the factor
+    tb_double_t factor = (tb_double_t)tb_random_range(0, TB_MAXS32) / (tb_double_t)TB_MAXS32;
 
-    // clear
-    tb_void_t           (*clear)(struct __tb_random_impl_t* random);
-
-    // range
-    tb_long_t           (*range)(struct __tb_random_impl_t* random, tb_long_t beg, tb_long_t end);
-
-}tb_random_impl_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-
-/* init the linear random
- *
- * @param seed          the seed
- *
- * @return              the random
- */
-tb_random_impl_t*       tb_random_linear_init(tb_size_t seed);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
-
+    // the value
+    return (tb_float_t)((end - begin) * factor);
+}
 #endif
+

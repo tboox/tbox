@@ -12,6 +12,7 @@
 ### Changes
 
 * Move some utils interfaces to the hash module
+* Rewrite random generator
 
 ### Bugs fixed
 
@@ -76,6 +77,7 @@
 ### 改进
 
 * 移动部分utils接口到hash模块
+* 重写random生成器
 
 ### Bugs修复
 

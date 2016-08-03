@@ -17,26 +17,57 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        random.c
- * @ingroup     libc
- *
+ * @file        linear.c
+ * @ingroup     math
  */
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME            "random_linear"
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "stdlib.h"
-#include "../../math/math.h"
+#include "linear.h"
+#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * globals
  */
-tb_void_t tb_srandom(tb_size_t seed)
-{
-    tb_random_seed(seed);
-}
-tb_long_t tb_random()
-{
-    return tb_random_value();
-}
 
+// the value
+static tb_size_t        g_value = 2166136261ul;
+
+// the lock
+static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_void_t tb_random_linear_seed(tb_size_t seed)
+{
+    // enter 
+    tb_spinlock_enter(&g_lock);
+
+    // update value
+    g_value = seed;
+
+    // leave
+    tb_spinlock_leave(&g_lock);
+}
+tb_long_t tb_random_linear_value()
+{
+    // enter 
+    tb_spinlock_enter(&g_lock);
+
+    // generate the next value
+    g_value = (g_value * 10807 + 1) & 0xffffffff;
+
+    // leave 
+    tb_spinlock_leave(&g_lock);
+
+    // ok
+    return (tb_long_t)g_value;
+}
