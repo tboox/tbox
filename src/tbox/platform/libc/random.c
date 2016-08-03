@@ -18,61 +18,23 @@
  *
  * @author      ruki
  * @file        random.c
- * @ingroup     math
+ * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "random.h"
-#include "../../libc/libc.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// the initial seed
-#define TB_RANDOM_SEED_INIT     (2166136261ul)
+#include "prefix.h"
+#include <stdlib.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_LIBC_HAVE_RANDOM) && \
-        defined(TB_CONFIG_LIBC_HAVE_SRANDOM)
-#   include "../../platform/libc/random.c"
-#else
 tb_void_t tb_random_seed(tb_size_t seed)
 {
-    tb_random_linear_seed(seed);
+    srandom(seed);
 }
 tb_long_t tb_random_value()
 {
-    return tb_random_linear_value();
+    return (tb_long_t)random();
 }
-#endif
-tb_void_t tb_random_reset()
-{
-    tb_random_seed(TB_RANDOM_SEED_INIT);
-}
-tb_long_t tb_random_range(tb_long_t begin, tb_long_t end)
-{
-    // check
-    tb_assert_and_check_return_val(begin < end, begin);
-
-    // make range
-    return (begin + (tb_long_t)((tb_size_t)tb_random_value() % (end - begin)));
-}
-#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-tb_float_t tb_random_rangef(tb_float_t begin, tb_float_t end)
-{
-    // check
-    tb_assert_and_check_return_val(begin < end, begin);
-
-    // the factor
-    tb_double_t factor = (tb_double_t)tb_random_range(0, TB_MAXS32) / (tb_double_t)TB_MAXS32;
-
-    // the value
-    return (tb_float_t)((end - begin) * factor);
-}
-#endif
-

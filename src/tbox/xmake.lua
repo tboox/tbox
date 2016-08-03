@@ -265,6 +265,7 @@ target("tbox")
     add_cfuncs("libc", nil,         "execinfo.h",                       "backtrace")
     add_cfuncs("libc", nil,         "locale.h",                         "setlocale")
     add_cfuncs("libc", nil,         "stdio.h",                          "fputs")
+    add_cfuncs("libc", nil,         "stdlib.h",                         "srandom", "random")
 
     -- add the interfaces for libm
     add_cfuncs("libm", nil,         "math.h",                           "sincos", 
