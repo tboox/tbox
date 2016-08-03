@@ -27,6 +27,7 @@
  */
 #include "uuid.h"
 #include "bkdr.h"
+#include "../libc/libc.h"
 #include "../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -35,11 +36,29 @@
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "../platform/windows/uuid.c"
 #else
+/* we make a fake uuid using random values here.
+ *
+ * TODO we need a full RFC 4122 4.3 implementation later
+ */
 static tb_bool_t tb_uuid_generate(tb_byte_t uuid[16])
 {
-    // TODO
-    tb_trace_noimpl();
-    return tb_false;
+    // init seed
+    tb_srandom((tb_size_t)tb_time());
+
+    // generate random values
+    tb_uint32_t r0 = (tb_uint32_t)tb_random();
+    tb_uint32_t r1 = (tb_uint32_t)tb_random();
+    tb_uint32_t r2 = (tb_uint32_t)tb_random();
+    tb_uint32_t r3 = (tb_uint32_t)tb_random();
+
+    // fill uuid
+    tb_bits_set_u32_be(uuid + 0,    r0);
+    tb_bits_set_u32_be(uuid + 4,    r1);
+    tb_bits_set_u32_be(uuid + 8,    r2);
+    tb_bits_set_u32_be(uuid + 12,   r3);
+
+    // ok
+    return tb_true;
 }
 #endif
 
