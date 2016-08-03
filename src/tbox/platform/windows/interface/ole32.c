@@ -17,61 +17,50 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        random.h
+ * @file        ole32.c
  *
  */
-#ifndef TB_MATH_IMPL_RANDOM_H
-#define TB_MATH_IMPL_RANDOM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "ole32.h"
+#include "../../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * implementation
  */
-__tb_extern_c_enter__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the random impl type
-typedef struct __tb_random_impl_t
+static tb_bool_t tb_ole32_instance_init(tb_handle_t instance, tb_cpointer_t priv)
 {
-    // the type
-    tb_size_t           type;
+    // check
+    tb_ole32_ref_t ole32 = (tb_ole32_ref_t)instance;
+    tb_assert_and_check_return_val(ole32, tb_false);
 
-    // exit 
-    tb_void_t           (*exit)(struct __tb_random_impl_t* random);
+    // the ole32 module
+    HANDLE module = GetModuleHandleA("ole32.dll");
+    if (!module) module = tb_dynamic_init("ole32.dll");
+    tb_assert_and_check_return_val(module, tb_false);
 
-    // seed
-    tb_void_t           (*seed)(struct __tb_random_impl_t* random, tb_size_t seed);
+    // init interfaces
+    TB_INTERFACE_LOAD(ole32, CoCreateGuid);
 
-    // clear
-    tb_void_t           (*clear)(struct __tb_random_impl_t* random);
-
-    // range
-    tb_long_t           (*range)(struct __tb_random_impl_t* random, tb_long_t beg, tb_long_t end);
-
-}tb_random_impl_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-
-/* init the linear random
- *
- * @param seed          the seed
- *
- * @return              the random
- */
-tb_random_impl_t*       tb_random_linear_init(tb_size_t seed);
+    // ok
+    return tb_true;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * interfaces
  */
-__tb_extern_c_leave__
+tb_ole32_ref_t tb_ole32()
+{
+    // init
+    static tb_atomic_t  s_binited = 0;
+    static tb_ole32_t   s_ole32 = {0};
 
-#endif
+    // init the static instance
+    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_ole32, tb_ole32_instance_init, tb_null);
+    tb_assert(ok); tb_used(ok);
+
+    // ok
+    return &s_ole32;
+}
