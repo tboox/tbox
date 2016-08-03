@@ -17,23 +17,21 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        interface.h
+ * @file        uuid.c
  *
  */
-#ifndef TB_PLATFORM_WINDOWS_INTERFACE_H
-#define TB_PLATFORM_WINDOWS_INTERFACE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "ole32.h"
-#include "user32.h"
-#include "ws2_32.h"
-#include "mswsock.h"
-#include "shell32.h"
-#include "dbghelp.h"
-#include "kernel32.h"
-#include "iphlpapi.h"
+#include "interface/interface.h"
 
-#endif
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+static tb_bool_t tb_uuid_generate(tb_byte_t uuid[16])
+{
+    // create guid
+    return tb_ole32()->CoCreateGuid((GUID*)uuid) == S_OK;
+}

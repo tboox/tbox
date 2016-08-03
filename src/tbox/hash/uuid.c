@@ -30,6 +30,20 @@
 #include "../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include "../platform/windows/uuid.c"
+#else
+static tb_bool_t tb_uuid_generate(tb_byte_t uuid[16])
+{
+    // TODO
+    tb_trace_noimpl();
+    return tb_false;
+}
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name)
@@ -38,6 +52,7 @@ tb_bool_t tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name)
     tb_assert_and_check_return_val(uuid, tb_false);
 
     // we only generate it using a simple hashing function for speed if name is supplied 
+    tb_bool_t ok = tb_false;
     if (name)
     {
         // generate hash values
@@ -51,10 +66,14 @@ tb_bool_t tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name)
         tb_bits_set_u32_be(uuid + 4,    h1);
         tb_bits_set_u32_be(uuid + 8,    h2);
         tb_bits_set_u32_be(uuid + 12,   h3);
-    }
 
-    // ok
-    return tb_true;
+        // ok
+        ok = tb_true;
+    }
+    else ok = tb_uuid_generate(uuid);
+
+    // ok?
+    return ok;
 }
 tb_char_t const* tb_uuid_make_cstr(tb_char_t uuid_cstr[37], tb_char_t const* name)
 {

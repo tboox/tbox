@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        random.h
+ * @file        ole32.h
  *
  */
-#ifndef TB_MATH_IMPL_RANDOM_H
-#define TB_MATH_IMPL_RANDOM_H
+#ifndef TB_PLATFORM_WINDOWS_INTERFACE_OLE32_H
+#define TB_PLATFORM_WINDOWS_INTERFACE_OLE32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -37,37 +37,26 @@ __tb_extern_c_enter__
  * types
  */
 
-// the random impl type
-typedef struct __tb_random_impl_t
+// the CoCreateGuid func type
+typedef HRESULT (WSAAPI* tb_ole32_CoCreateGuid_t)(GUID* pguid);
+
+// the ole32 interfaces type
+typedef struct __tb_ole32_t
 {
-    // the type
-    tb_size_t           type;
+    // CoCreateGuid
+    tb_ole32_CoCreateGuid_t     CoCreateGuid;
 
-    // exit 
-    tb_void_t           (*exit)(struct __tb_random_impl_t* random);
-
-    // seed
-    tb_void_t           (*seed)(struct __tb_random_impl_t* random, tb_size_t seed);
-
-    // clear
-    tb_void_t           (*clear)(struct __tb_random_impl_t* random);
-
-    // range
-    tb_long_t           (*range)(struct __tb_random_impl_t* random, tb_long_t beg, tb_long_t end);
-
-}tb_random_impl_t;
+}tb_ole32_t, *tb_ole32_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
+ * interfaces
  */
 
-/* init the linear random
+/* the ole32 interfaces
  *
- * @param seed          the seed
- *
- * @return              the random
+ * @return          the ole32 interfaces pointer
  */
-tb_random_impl_t*       tb_random_linear_init(tb_size_t seed);
+tb_ole32_ref_t      tb_ole32(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

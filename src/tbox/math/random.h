@@ -38,6 +38,14 @@ __tb_extern_c_enter__
  * types
  */
 
+// the random type enum
+typedef enum __tb_random_type_e
+{
+    TB_RANDOM_TYPE_NONE       = 0
+,   TB_RANDOM_TYPE_LINEAR     = 1
+
+}tb_random_type_e;
+
 /// the random ref type
 typedef struct{}*   tb_random_ref_t;
 
