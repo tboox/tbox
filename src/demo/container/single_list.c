@@ -686,12 +686,9 @@ static tb_void_t tb_single_list_walk_perf()
     tb_single_list_ref_t list = tb_single_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // clear rand
-    tb_random_clear(tb_null);
-
     // make list
     __tb_volatile__ tb_size_t n = 100000;
-    while (n--) tb_single_list_insert_tail(list, (tb_pointer_t)(tb_size_t)tb_random_range(tb_null, 0, TB_MAXU32)); 
+    while (n--) tb_single_list_insert_tail(list, (tb_pointer_t)(tb_size_t)tb_random_range(0, TB_MAXU32)); 
 
     // done
     tb_hong_t t = tb_mclock();

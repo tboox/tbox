@@ -17,26 +17,17 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author      ruki
- * @file        random.c
- * @ingroup     libc
+ * @file        prefix.h
  *
  */
+#ifndef TB_MATH_RANDOM_PREFIX_H
+#define TB_MATH_RANDOM_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "stdlib.h"
-#include "../../math/math.h"
+#include "../prefix.h"
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
- */
-tb_void_t tb_srandom(tb_size_t seed)
-{
-    tb_random_seed(seed);
-}
-tb_long_t tb_random()
-{
-    return tb_random_value();
-}
 
+
+#endif

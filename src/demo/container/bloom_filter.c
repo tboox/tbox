@@ -7,7 +7,7 @@
  * globals
  */
 static tb_size_t        g_func_indx = 0;
-static tb_element_t   g_func_prev;
+static tb_element_t     g_func_prev;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
@@ -33,9 +33,6 @@ static tb_void_t tb_demo_test_cstr_h(tb_size_t index)
     tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
-        // clear random
-        tb_random_clear(tb_null);
-
         // done
         tb_size_t i = 0;
         tb_size_t r = 0;
@@ -74,9 +71,6 @@ static tb_void_t tb_demo_test_cstr_p()
     tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_element_str(tb_true));
     if (filter)
     {
-        // clear random
-        tb_random_clear(tb_null);
-
         // done
         tb_size_t i = 0;
         tb_size_t r = 0;
@@ -125,9 +119,6 @@ static tb_void_t tb_demo_test_uint8_h(tb_size_t index)
     tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
-        // clear random
-        tb_random_clear(tb_null);
-
         // done
         tb_size_t i = 0;
         tb_size_t r = 0;
@@ -135,7 +126,7 @@ static tb_void_t tb_demo_test_uint8_h(tb_size_t index)
         for (i = 0; i < count; i++)
         {
             // the value
-            tb_long_t value = tb_random_range(tb_null, 0, TB_MAXU8);
+            tb_long_t value = tb_random_range(0, TB_MAXU8);
 
             // set value to filter
             if (!tb_bloom_filter_set(filter, (tb_cpointer_t)value))
@@ -170,9 +161,6 @@ static tb_void_t tb_demo_test_uint16_h(tb_size_t index)
     tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
-        // clear random
-        tb_random_clear(tb_null);
-
         // done
         tb_size_t i = 0;
         tb_size_t r = 0;
@@ -180,7 +168,7 @@ static tb_void_t tb_demo_test_uint16_h(tb_size_t index)
         for (i = 0; i < count; i++)
         {
             // the value
-            tb_long_t value = tb_random_range(tb_null, 0, TB_MAXU16);
+            tb_long_t value = tb_random_range(0, TB_MAXU16);
 
             // set value to filter
             if (!tb_bloom_filter_set(filter, (tb_cpointer_t)value))
@@ -215,9 +203,6 @@ static tb_void_t tb_demo_test_uint32_h(tb_size_t index)
     tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
-        // clear random
-        tb_random_clear(tb_null);
-
         // done
         tb_size_t i = 0;
         tb_size_t r = 0;
@@ -225,7 +210,7 @@ static tb_void_t tb_demo_test_uint32_h(tb_size_t index)
         for (i = 0; i < count; i++)
         {
             // the value
-            tb_long_t value = tb_random_range(tb_null, 0, TB_MAXU32);
+            tb_long_t value = tb_random_range(0, TB_MAXU32);
 
             // set value to filter
             if (!tb_bloom_filter_set(filter, (tb_cpointer_t)value))
@@ -260,9 +245,6 @@ static tb_void_t tb_demo_test_long_h(tb_size_t index)
     tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_001, 1, count, element);
     if (filter)
     {
-        // clear random
-        tb_random_clear(tb_null);
-
         // done
         tb_size_t i = 0;
         tb_size_t r = 0;
@@ -297,9 +279,6 @@ static tb_void_t tb_demo_test_long_p()
     tb_bloom_filter_ref_t filter = tb_bloom_filter_init(TB_BLOOM_FILTER_PROBABILITY_0_01, 3, count, tb_element_long());
     if (filter)
     {
-        // clear random
-        tb_random_clear(tb_null);
-
         // done
         tb_size_t i = 0;
         tb_size_t r = 0;

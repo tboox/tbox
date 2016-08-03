@@ -19,8 +19,7 @@ static tb_void_t tb_sort_int_test_perf(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
-    for (i = 0; i < n; i++) data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+    for (i = 0; i < n; i++) data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
 
     // sort
     tb_hong_t time = tb_mclock();
@@ -49,8 +48,7 @@ static tb_void_t tb_sort_int_test_perf_bubble(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
-    for (i = 0; i < n; i++) data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+    for (i = 0; i < n; i++) data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
 
     // sort
     tb_hong_t time = tb_mclock();
@@ -84,10 +82,9 @@ static tb_void_t tb_sort_int_test_func_bubble()
     tb_trace_i("");
 
     // put
-    tb_random_clear(tb_null);
     for (i = 0; i < n; i++) 
     {
-        data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+        data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
         tb_trace_i("bubble_put: %ld", data[i]);
     }
 
@@ -116,8 +113,7 @@ static tb_void_t tb_sort_int_test_perf_insert(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
-    for (i = 0; i < n; i++) data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+    for (i = 0; i < n; i++) data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
 
     // sort
     tb_hong_t time = tb_mclock();
@@ -151,10 +147,9 @@ static tb_void_t tb_sort_int_test_func_insert()
     tb_trace_i("");
 
     // put
-    tb_random_clear(tb_null);
     for (i = 0; i < n; i++) 
     {
-        data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+        data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
         tb_trace_i("insert_put: %ld", data[i]);
     }
 
@@ -183,8 +178,7 @@ static tb_void_t tb_sort_int_test_perf_quick(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
-    for (i = 0; i < n; i++) data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+    for (i = 0; i < n; i++) data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
     
     // sort
     tb_hong_t time = tb_mclock();
@@ -218,10 +212,9 @@ static tb_void_t tb_sort_int_test_func_quick()
     tb_trace_i("");
 
     // put
-    tb_random_clear(tb_null);
     for (i = 0; i < n; i++) 
     {
-        data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+        data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
         tb_trace_i("quick_put: %ld", data[i]);
     }
 
@@ -250,8 +243,7 @@ static tb_void_t tb_sort_int_test_perf_heap(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_long(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
-    for (i = 0; i < n; i++) data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+    for (i = 0; i < n; i++) data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
     
     // sort
     tb_hong_t time = tb_mclock();
@@ -285,10 +277,9 @@ static tb_void_t tb_sort_int_test_func_heap()
     tb_trace_i("");
 
     // put
-    tb_random_clear(tb_null);
     for (i = 0; i < n; i++) 
     {
-        data[i] = tb_random_range(tb_null, TB_MINS16, TB_MAXS16);
+        data[i] = tb_random_range(TB_MINS16, TB_MAXS16);
         tb_trace_i("heap_put: %ld", data[i]);
     }
 
@@ -317,11 +308,10 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
     tb_char_t s[256] = {0};
     for (i = 0; i < n; i++) 
     {
-        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_null, 0, TB_MAXU32)); 
+        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(0, TB_MAXU32)); 
         s[r] = '\0'; 
         data[i] = tb_strdup(s);
     }
@@ -354,11 +344,10 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
     tb_char_t s[256] = {0};
     for (i = 0; i < n; i++) 
     {
-        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_null, 0, TB_MAXU32)); 
+        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(0, TB_MAXU32)); 
         s[r] = '\0'; 
         data[i] = tb_strdup(s);
     }
@@ -391,11 +380,10 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
     tb_char_t s[256] = {0};
     for (i = 0; i < n; i++) 
     {
-        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_null, 0, TB_MAXU32)); 
+        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(0, TB_MAXU32)); 
         s[r] = '\0'; 
         data[i] = tb_strdup(s);
     }
@@ -428,11 +416,10 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
     tb_char_t s[256] = {0};
     for (i = 0; i < n; i++) 
     {
-        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_null, 0, TB_MAXU32)); 
+        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(0, TB_MAXU32)); 
         s[r] = '\0'; 
         data[i] = tb_strdup(s);
     }
@@ -465,11 +452,10 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
     tb_iterator_ref_t   iterator = tb_iterator_make_for_str(&array_iterator, data, n);
 
     // make
-    tb_random_clear(tb_null);
     tb_char_t s[256] = {0};
     for (i = 0; i < n; i++) 
     {
-        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(tb_null, 0, TB_MAXU32)); 
+        tb_long_t r = tb_snprintf(s, 256, "%x", tb_random_range(0, TB_MAXU32)); 
         s[r] = '\0'; 
         data[i] = tb_strdup(s);
     }

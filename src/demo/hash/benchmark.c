@@ -80,12 +80,9 @@ static tb_void_t tb_demo_hash32_test()
     tb_byte_t*  data = tb_malloc_bytes(size);
     tb_assert_and_check_return(data);
 
-    // reset random seed first
-    tb_random_clear(tb_null);
-
     // make data
     tb_size_t i = 0;
-    for (i = 0; i < size; i++) data[i] = (tb_byte_t)tb_random_range(tb_null, 0, 0xff);
+    for (i = 0; i < size; i++) data[i] = (tb_byte_t)tb_random_range(0, 0xff);
 
     // done (1M)
     tb_demo_hash32_entry_ref_t entry = g_hash32_entries;
