@@ -18,7 +18,7 @@ static tb_void_t tb_test_heap_min_func()
     tb_assert_and_check_return(heap);
 
     // reset rand
-    tb_random_reset();
+    tb_random_reset(tb_true);
 
     // make heap
     tb_size_t i = 0;
@@ -35,7 +35,7 @@ static tb_void_t tb_test_heap_min_func()
     }
 
     // reset rand
-    tb_random_reset();
+    tb_random_reset(tb_true);
 
     // remove some values
     for (i = 0; i < 100; i++) 
@@ -87,7 +87,7 @@ static tb_void_t tb_test_heap_min_perf()
     tb_assert_and_check_return(heap);
 
     // reset rand
-    tb_random_reset();
+    tb_random_reset(tb_true);
 
     // init time
     tb_hong_t time = tb_mclock();
@@ -131,7 +131,7 @@ static tb_void_t tb_test_heap_max_func()
     tb_assert_and_check_return(heap);
 
     // reset rand
-    tb_random_reset();
+    tb_random_reset(tb_true);
 
     // make heap
     tb_size_t i = 0;

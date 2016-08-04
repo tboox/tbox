@@ -44,8 +44,10 @@ __tb_extern_c_enter__
 tb_void_t           tb_random_seed(tb_size_t seed);
 
 /*! reset value using the initial seed
+ *
+ * @param pseudo    reset to the pseudo random?
  */
-tb_void_t           tb_random_reset(tb_noarg_t);
+tb_void_t           tb_random_reset(tb_bool_t pseudo);
 
 /*! generate the random value
  *
