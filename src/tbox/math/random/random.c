@@ -26,6 +26,7 @@
  */
 #include "random.h"
 #include "../../libc/libc.h"
+#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
