@@ -28,6 +28,7 @@
 #include "uuid.h"
 #include "bkdr.h"
 #include "../libc/libc.h"
+#include "../math/math.h"
 #include "../utils/utils.h"
 #include "../platform/platform.h"
 
@@ -43,31 +44,8 @@
  */
 static tb_bool_t tb_uuid_generate(tb_byte_t uuid[16])
 {
-    // attempt to read it from /dev/urandom
-    tb_size_t       read = 0;
-    tb_file_ref_t   file = tb_file_init("/dev/urandom", TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
-    if (file)
-    {
-        // read uuid
-        while (read < 16)
-        {
-            // read it
-            tb_long_t real = tb_file_read(file, uuid + read, 16 - read);
-            tb_assert_and_check_break(real > 0);
-
-            // update size
-            read += real;
-        }
-
-        // exit file
-        tb_file_exit(file);
-    }
-
-    // ok?
-    tb_check_return_val(read != 16, tb_true);
-
-    // init seed
-    tb_srandom((tb_size_t)tb_uclock() ^ tb_p2u32(uuid));
+    // disable pseudo random
+    tb_random_reset(tb_false);
 
     // generate random values
     tb_uint32_t r0 = (tb_uint32_t)tb_random();

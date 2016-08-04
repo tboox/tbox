@@ -50,9 +50,53 @@ tb_long_t tb_random_value()
     return tb_random_linear_value();
 }
 #endif
-tb_void_t tb_random_reset()
+tb_void_t tb_random_reset(tb_bool_t pseudo)
 {
-    tb_random_seed(TB_RANDOM_SEED_INIT);
+    // init seed
+    tb_size_t seed = TB_RANDOM_SEED_INIT;
+    if (!pseudo)
+    {
+        // init read
+        tb_size_t read = 0;
+
+#ifndef TB_CONFIG_OS_WINDOWS
+        // attempt to read seed from /dev/urandom
+        tb_file_ref_t file = tb_file_init("/dev/urandom", TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
+        if (file)
+        {
+            // read seed
+            tb_byte_t* data = (tb_byte_t*)&seed;
+            while (read < sizeof(tb_size_t))
+            {
+                // read it
+                tb_long_t real = tb_file_read(file, data + read, sizeof(tb_size_t) - read);
+                tb_assert_and_check_break(real > 0);
+
+                // update size
+                read += real;
+            }
+
+            // exit file
+            tb_file_exit(file);
+        }
+#endif
+
+        // init seed using clock if read failed?
+        if (read != sizeof(tb_size_t))
+        {
+            // get clock
+            tb_uint64_t clock = (tb_uint64_t)tb_uclock();
+
+            // init seed using clock
+            seed = (tb_size_t)((clock >> 32) ^ clock);
+
+            // xor the stack address
+            seed ^= (tb_size_t)tb_p2u32(&seed);
+        }
+    }
+
+    // reset seed
+    tb_random_seed(seed);
 }
 tb_long_t tb_random_range(tb_long_t begin, tb_long_t end)
 {
