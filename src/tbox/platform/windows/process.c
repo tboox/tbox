@@ -420,7 +420,7 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
     // wait processes
     DWORD       exitcode = 0;
     tb_long_t   infosize = 0;
-    DWORD result = tb_kernel32()->WaitForMultipleObjects(procsize, proclist, FALSE, timeout < 0? INFINITE : (DWORD)timeout);
+    DWORD result = tb_kernel32()->WaitForMultipleObjects((DWORD)procsize, proclist, FALSE, timeout < 0? INFINITE : (DWORD)timeout);
     switch (result)
     {
     case WAIT_TIMEOUT:
@@ -455,12 +455,12 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
             while (index < procsize)
             {
                 // attempt to wait next process
-                result = tb_kernel32()->WaitForMultipleObjects(procsize - index, proclist + index, FALSE, 0);
+                result = tb_kernel32()->WaitForMultipleObjects((DWORD)(procsize - index), proclist + index, FALSE, 0);
                 switch (result)
                 {
                 case WAIT_TIMEOUT:
                     // no more, exit loop
-                    index = procsize;
+                    index = (DWORD)procsize;
                     break;
                 case WAIT_FAILED:
                     return -1;
