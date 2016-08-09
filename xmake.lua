@@ -11,7 +11,7 @@ set_warnings("all", "error")
 set_languages("c99", "cxx11")
 
 -- add defines to config.h
-add_defines_h("$(prefix)_OS_$(OS)")
+add_defines_h("$(prefix)_OS_$(os:upper)")
 add_defines_h("_GNU_SOURCE=1", "_REENTRANT")
 
 -- add undefines to config.h 
