@@ -130,7 +130,7 @@ end
 
 -- add option: demo
 option("demo")
-    set_enable(true)
+    set_default(true)
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the demo module")
