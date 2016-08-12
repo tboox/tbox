@@ -6,7 +6,7 @@ option("wchar")
 
 -- add option: float
 option("float")
-    set_enable(true)
+    set_default(true)
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the float type")
@@ -14,7 +14,7 @@ option("float")
 
 -- add option: info
 option("info")
-    set_enable(true)
+    set_default(true)
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable to get some info, .e.g version ..")
@@ -22,7 +22,7 @@ option("info")
 
 -- add option: deprecated
 option("deprecated")
-    set_enable(true)
+    set_default(true)
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the deprecated interfaces.")
@@ -30,7 +30,7 @@ option("deprecated")
 
 -- add option: smallest
 option("smallest")
-    set_enable(false)
+    set_default(false)
     set_showmenu(true)
     set_category("option")
     set_description("Enable the smallest compile mode and disable all modules.")
@@ -41,7 +41,7 @@ option("smallest")
 -- add modules
 for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database"}) do
     option(module)
-        set_enable(true)
+        set_default(true)
         set_showmenu(true)
         set_category("module")
         set_description(format("The %s module", module))
