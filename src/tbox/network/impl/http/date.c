@@ -70,7 +70,9 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
 #endif
 
         // skip week
-        while (p < e && *p != ',' && !tb_isspace(*p)) p++; if (p < e && (*p == ',' || tb_isspace(*p))) p++;
+        while (p < e && *p != ',' && !tb_isspace(*p)) p++;
+
+        if (p < e && (*p == ',' || tb_isspace(*p))) p++;
 
         // skip space
         while (p < e && tb_isspace(*p)) p++;
@@ -91,7 +93,9 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
             tm.mday = tb_s10tou32(p);
 
             // skip day
-            while (p < e && *p != '-' && !tb_isspace(*p)) p++; if (p < e && (*p == '-' || tb_isspace(*p))) p++;
+            while (p < e && *p != '-' && !tb_isspace(*p)) p++;
+
+            if (p < e && (*p == '-' || tb_isspace(*p))) p++;
         }
 
         // parse month
@@ -121,7 +125,9 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
             tm.month = 12;
 
         // skip month
-        while (p < e && *p != '-' && !tb_isspace(*p)) p++; if (p < e && (*p == '-' || tb_isspace(*p))) p++;
+        while (p < e && *p != '-' && !tb_isspace(*p)) p++;
+
+        if (p < e && (*p == '-' || tb_isspace(*p))) p++;
 
         // year suffix?
         if (year_suffix)
@@ -144,13 +150,17 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
         tm.hour = tb_s10tou32(p);
 
         // skip hour
-        while (p < e && *p != ':') p++; if (p < e && *p == ':') p++;
+        while (p < e && *p != ':') p++;
+
+        if (p < e && *p == ':') p++;
 
         // parse minute
         tm.minute = tb_s10tou32(p);
 
         // skip minute
-        while (p < e && *p != ':') p++; if (p < e && *p == ':') p++;
+        while (p < e && *p != ':') p++;
+
+        if (p < e && *p == ':') p++;
 
         // parse second
         tm.second = tb_s10tou32(p);
