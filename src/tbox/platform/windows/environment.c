@@ -117,7 +117,6 @@ static tb_bool_t tb_environment_set_impl(tb_char_t const* name, tb_char_t const*
 
     // done
     tb_bool_t   ok = tb_false;
-    tb_size_t   size = 0;
     tb_wchar_t* value_w = tb_null;
     tb_size_t   value_n = 0;
     do
