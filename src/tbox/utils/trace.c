@@ -219,7 +219,8 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
         if (p < e) p += tb_vsnprintf(p, e - p, format, args);
 
         // append end
-        if (p < e) *p = '\0'; e[-1] = '\0';
+        if (p < e) *p = '\0';
+        e[-1] = '\0';
 
         // print it
         if (g_mode & TB_TRACE_MODE_PRINT) tb_print(b);
@@ -285,7 +286,8 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
         if (p < e) p += tb_vsnprintf(p, e - p, format, l);
 
         // append end
-        if (p < e) *p = '\0'; e[-1] = '\0';
+        if (p < e) *p = '\0';
+        e[-1] = '\0';
 
         // print it
         if (g_mode & TB_TRACE_MODE_PRINT) tb_print(g_line);
