@@ -215,7 +215,28 @@
 #   define __tb_no_sanitize_address__
 #endif
 
-// the object reference type, .e.g tb_xxx_ref_t
+/*! the type reference keyword for defining tb_xxxx_ref_t
+ *
+ * typedef __tb_typeref__(xxxx);
+ *
+ *
+ * suppress gcc 4.9 on c++ codes warning: '__tb_yyyy_t' has a field '__tb_yyyy_t::xxxx' whose type uses the anonymous namespace
+ *
+ * @code
+ *
+   typedef struct{}*    tb_xxxx_ref_t;
+  
+   typedef struct __tb_yyyy_t
+   {
+       tb_xxxx_ref_t    xxxx;
+  
+   }__tb_yyyy_t;
+
+ *
+ *
+ * @endcode
+ * 
+ */
 #define __tb_typeref__(object)                              struct __tb_##object##_dummy_t{tb_int_t dummy;}* tb_##object##_ref_t
 
 // macros
