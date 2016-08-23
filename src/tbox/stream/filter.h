@@ -74,7 +74,7 @@ typedef enum __tb_stream_filter_ctrl_e
 }tb_stream_filter_ctrl_e;
 
 /// the stream filter ref type
-typedef struct{}*       tb_stream_filter_ref_t;
+typedef __tb_typeref__(stream_filter);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

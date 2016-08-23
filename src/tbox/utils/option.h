@@ -81,7 +81,7 @@ typedef struct __tb_option_item_t
 }tb_option_item_t;
 
 /// the option ref type
-typedef struct{}*       tb_option_ref_t;
+typedef __tb_typeref__(option);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

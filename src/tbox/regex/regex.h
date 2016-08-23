@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  */
 
 /// the regex ref type
-typedef struct{}*   tb_regex_ref_t;
+typedef __tb_typeref__(regex);
 
 /// the regex match type
 typedef struct _tb_regex_match_t

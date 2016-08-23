@@ -34,10 +34,10 @@
  */
 
 /// the aioo ref type
-typedef struct{}*       tb_aioo_ref_t;
+typedef __tb_typeref__(aioo);
 
 /// the aico ref type
-typedef struct{}*       tb_aico_ref_t;
+typedef __tb_typeref__(aico);
 
 /*! the aico pool ref type
  *
@@ -119,7 +119,7 @@ typedef struct{}*       tb_aico_ref_t;
  * </pre>
  *
  */
-typedef struct{}*       tb_aicp_ref_t;
+typedef __tb_typeref__(aicp);
 
 /*! the asio poll pool type 
  *
@@ -132,6 +132,6 @@ typedef struct{}*       tb_aicp_ref_t;
  * </pre>
  *
  */
-typedef struct{}*       tb_aiop_ref_t;
+typedef __tb_typeref__(aiop);
 
 #endif

@@ -40,7 +40,7 @@ __tb_extern_c_enter__
  */
 
 /// the aicp ssl ref type
-typedef struct{}*   tb_aicp_ssl_ref_t;
+typedef __tb_typeref__(aicp_ssl);
 
 /*! the aicp ssl open func type
  *

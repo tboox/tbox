@@ -53,10 +53,10 @@ typedef enum __tb_ltimer_tick_e
 typedef tb_timer_task_func_t    tb_ltimer_task_func_t;
 
 /// the ltimer ref type
-typedef struct{}*               tb_ltimer_ref_t;
+typedef __tb_typeref__(ltimer);
 
 /// the ltimer task ref type
-typedef struct{}*               tb_ltimer_task_ref_t;
+typedef __tb_typeref__(ltimer_task);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

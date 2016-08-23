@@ -46,10 +46,10 @@ __tb_extern_c_enter__
 typedef tb_void_t   (*tb_timer_task_func_t)(tb_bool_t killed, tb_cpointer_t priv);
 
 /// the timer ref type
-typedef struct{}*   tb_timer_ref_t;
+typedef __tb_typeref__(timer);
 
 /// the timer task ref type
-typedef struct{}*   tb_timer_task_ref_t;
+typedef __tb_typeref__(timer_task);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

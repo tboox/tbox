@@ -188,7 +188,7 @@ typedef struct __tb_http_range_t
 }tb_http_range_t;
 
 /// the http ref type
-typedef struct{}*       tb_http_ref_t;
+typedef __tb_typeref__(http);
 
 /*! the http head func type
  *

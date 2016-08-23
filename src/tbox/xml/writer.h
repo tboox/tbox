@@ -40,7 +40,7 @@ __tb_extern_c_enter__
  */
 
 /// the xml writer ref type
-typedef struct{}*       tb_xml_writer_ref_t;
+typedef __tb_typeref__(xml_writer);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

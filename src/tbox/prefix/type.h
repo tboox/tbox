@@ -161,31 +161,31 @@ typedef tb_atomic_t                 tb_spinlock_t;
 typedef tb_spinlock_t*              tb_spinlock_ref_t;
 
 /// the pool ref type
-typedef struct{}*                   tb_pool_ref_t;
+typedef __tb_typeref__(pool);
 
 /// the file ref type
-typedef struct{}*                   tb_file_ref_t;
+typedef __tb_typeref__(file);
 
 /// the socket ref type
-typedef struct{}*                   tb_socket_ref_t;
+typedef __tb_typeref__(socket);
 
 /// the event ref type
-typedef struct{}*                   tb_event_ref_t;
+typedef __tb_typeref__(event);
 
 /// the mutex ref type
-typedef struct{}*                   tb_mutex_ref_t;
+typedef __tb_typeref__(mutex);
 
 /// the thread ref type
-typedef struct{}*                   tb_thread_ref_t;
+typedef __tb_typeref__(thread);
 
 /// the semaphore ref type
-typedef struct{}*                   tb_semaphore_ref_t;
+typedef __tb_typeref__(semaphore);
 
 /// the stream ref type
-typedef struct{}*                   tb_stream_ref_t;
+typedef __tb_typeref__(stream);
 
 /// the async stream ref type
-typedef struct{}*                   tb_async_stream_ref_t;
+typedef __tb_typeref__(async_stream);
 
 /// the time type
 typedef tb_hong_t                   tb_time_t;

@@ -50,13 +50,13 @@ __tb_extern_c_enter__
  */
 
 /// the thread pool ref type
-typedef struct{}*                       tb_thread_pool_ref_t;
+typedef __tb_typeref__(thread_pool);
 
 /// the thread pool task ref type
-typedef struct{}*                       tb_thread_pool_task_ref_t;
+typedef __tb_typeref__(thread_pool_task);
 
 /// the thread pool worker ref type
-typedef struct{}*                       tb_thread_pool_worker_ref_t;
+typedef __tb_typeref__(thread_pool_worker);
 
 /// the thread pool priv exit func type
 typedef tb_void_t                       (*tb_thread_pool_priv_exit_func_t)(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv);

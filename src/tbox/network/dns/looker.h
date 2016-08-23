@@ -34,7 +34,7 @@
  */
 
 /// the dns looker type
-typedef struct{}*   tb_dns_looker_ref_t;
+typedef __tb_typeref__(dns_looker);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

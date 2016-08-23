@@ -81,7 +81,7 @@ typedef tb_bool_t       (*tb_async_transfer_ctrl_func_t)(tb_async_stream_ref_t i
 typedef tb_bool_t       (*tb_async_transfer_done_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv);
 
 /// the async transfer ref type
-typedef struct{}*       tb_async_transfer_ref_t;
+typedef __tb_typeref__(async_transfer);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

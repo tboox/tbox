@@ -81,7 +81,7 @@ typedef tb_long_t   (*tb_ssl_func_writ_t)(tb_cpointer_t priv, tb_byte_t const* d
 typedef tb_long_t   (*tb_ssl_func_wait_t)(tb_cpointer_t priv, tb_size_t code, tb_long_t timeout);
 
 /// the ssl ref type
-typedef struct{}*   tb_ssl_ref_t;
+typedef __tb_typeref__(ssl);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

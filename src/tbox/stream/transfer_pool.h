@@ -41,7 +41,7 @@ __tb_extern_c_enter__
  */
 
 /// the transfer pool ref type
-typedef struct{}*       tb_transfer_pool_ref_t;
+typedef __tb_typeref__(transfer_pool);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

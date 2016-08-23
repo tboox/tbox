@@ -55,7 +55,7 @@ typedef enum __tb_xml_reader_event_t
 }tb_xml_reader_event_t;
 
 /// the xml reader ref type
-typedef struct{}*       tb_xml_reader_ref_t;
+typedef __tb_typeref__(xml_reader);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

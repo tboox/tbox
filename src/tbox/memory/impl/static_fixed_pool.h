@@ -48,7 +48,7 @@ __tb_extern_c_enter__
  *              pred
  * </pre>
  */
-typedef struct{}*           tb_static_fixed_pool_ref_t;
+typedef __tb_typeref__(static_fixed_pool);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

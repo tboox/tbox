@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  */
 
 /// the string pool ref type
-typedef struct{}*           tb_string_pool_ref_t;
+typedef __tb_typeref__(string_pool);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

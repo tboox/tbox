@@ -111,7 +111,7 @@ __tb_extern_c_enter__
  * c = p^(1/k)
  * s = m / n = 2k / (2c + c * c)
  */
-typedef struct{}* tb_bloom_filter_ref_t;
+typedef __tb_typeref__(bloom_filter);
 
 /// the probability of false positives
 typedef enum __tb_bloom_filter_probability_e

@@ -122,7 +122,7 @@ __tb_extern_c_enter__
  *
  * </pre>
  */
-typedef struct{}*       tb_fixed_pool_ref_t;
+typedef __tb_typeref__(fixed_pool);
 
 /// the item init func type
 typedef tb_bool_t       (*tb_fixed_pool_item_init_func_t)(tb_pointer_t data, tb_cpointer_t priv);

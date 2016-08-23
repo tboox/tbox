@@ -74,7 +74,7 @@ typedef struct __tb_ifaddrs_interface_t
 }tb_ifaddrs_interface_t, *tb_ifaddrs_interface_ref_t;
 
 /// the ifaddrs type
-typedef struct{}*           tb_ifaddrs_ref_t;
+typedef __tb_typeref__(ifaddrs);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

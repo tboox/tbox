@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  */
 
 /// the dynamic ref type
-typedef struct{}*   tb_dynamic_ref_t;
+typedef __tb_typeref__(dynamic);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

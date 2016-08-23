@@ -215,6 +215,9 @@
 #   define __tb_no_sanitize_address__
 #endif
 
+// the object reference type, .e.g tb_xxx_ref_t
+#define __tb_typeref__(object)                              struct __tb_##object##_dummy_t{tb_int_t dummy;}* tb_##object##_ref_t
+
 // macros
 #define __tb_mstring__(x)                                   #x
 #define __tb_mstring_ex__(x)                                __tb_mstring__(x)

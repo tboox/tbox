@@ -48,10 +48,10 @@ typedef enum __tb_database_sql_type_e
 }tb_database_sql_type_e;
 
 /// the database sql ref type
-typedef struct{}*       tb_database_sql_ref_t;
+typedef __tb_typeref__(database_sql);
 
 /// the database sql statement ref type
-typedef struct{}*       tb_database_sql_statement_ref_t;
+typedef __tb_typeref__(database_sql_statement);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

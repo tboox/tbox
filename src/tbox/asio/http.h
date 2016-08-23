@@ -40,7 +40,7 @@ __tb_extern_c_enter__
  */
 
 /// the aicp http ref type
-typedef struct{}*   tb_aicp_http_ref_t;
+typedef __tb_typeref__(aicp_http);
 
 /*! the aicp http open func type
  *

@@ -40,7 +40,7 @@ __tb_extern_c_enter__
  */
 
 /// the aicp dns ref type
-typedef struct{}*   tb_aicp_dns_ref_t;
+typedef __tb_typeref__(aicp_dns);
 
 /// the aicp dns done func type
 typedef tb_void_t   (*tb_aicp_dns_done_func_t)(tb_aicp_dns_ref_t dns, tb_char_t const* host, tb_ipaddr_ref_t addr, tb_cpointer_t priv);
