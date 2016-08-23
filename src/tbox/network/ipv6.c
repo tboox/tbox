@@ -190,7 +190,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
     tb_bool_t           ok = tb_true;
     tb_bool_t           stub = tb_false;
     tb_char_t           prev = '\0';
-    tb_ipv6_t           temp;
+    tb_ipv6_t           temp = {0};
     do
     {
         // save previous character
