@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.5.3
+
 ### New features
 
 * Add wait multi-processes interface
@@ -66,6 +68,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.5.3
 
 ### 新特性
 
