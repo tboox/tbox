@@ -21,6 +21,7 @@ If you want to know more, please refer to:
 
 * [Documents](https://github.com/waruqi/tbox/wiki/documents)
 * [Github](https://github.com/waruqi/tbox)
+* [HomePage](http://tboox.org)
 
 ## Features
 
@@ -237,11 +238,9 @@ Please install xmake first: [xmake](https://github.com/waruqi/xmake)
 
 #### Contacts
 
-- Email:        
-    - waruqi@gmail.com
-- Website: 	    
-	- [tboox.org](http://www.tboox.org)
-	- [tboox.net](http://www.tboox.net)
+* Email：[waruqi@gmail.com](mailto:waruqi@gmail.com)
+* Homepage：[TBOOX Open Source Project](http://www.tboox.org/cn)
+* Community：[TBOOX Open Source Community](http://www.tboox.org/forum)
 
 ## 简介
 
@@ -263,6 +262,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 * [在线文档](https://github.com/waruqi/tbox/wiki/%E7%9B%AE%E5%BD%95)
 * [在线源码](https://github.com/waruqi/tbox)
+* [项目主页](http://www.tboox.org/cn)
 
 ## 特性
 
@@ -485,11 +485,9 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 #### 联系方式
 
-- Email:        
-    - waruqi@gmail.com
-    - waruqi@126.com
-- Website: 	    
-	- [tboox.org](http://www.tboox.org/cn)
-	- [tboox.net](http://www.tboox.net/cn)
-- QQ(group):    
-    - 343118190
+* 邮箱：[waruqi@gmail.com](mailto:waruqi@gmail.com)
+* 主页：[TBOOX开源工程](http://www.tboox.org/cn)
+* 社区：[TBOOX开源社区](http://www.tboox.org/forum)
+* QQ群：343118190
+* 微信公众号：tboox-os
+
