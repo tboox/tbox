@@ -42,9 +42,10 @@ tb_bool_t tb_context_get(tb_context_ref_t context)
     tb_assert_and_check_return_val(ucontext, tb_false);
 
     // init ucontext
-    memset(ucontext, 0, sizeof(ucontext_t));
+    tb_memset(ucontext, 0, sizeof(ucontext_t));
 
     // init sigmask
+    sigset_t zero;
     sigemptyset(&zero);
     sigprocmask(SIG_BLOCK, &zero, &ucontext->uc_sigmask);
 
@@ -75,7 +76,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_context_ref_t context_lin
 
     // make it
     tb_uint64_t value = tb_p2u64(priv);
-    makecontext(ucontext, func, 2, (tb_uint32_t)(value >> 32), (tb_uint32_t)value);
+    makecontext(ucontext, (tb_void_t(*)())func, 2, (tb_uint32_t)(value >> 32), (tb_uint32_t)value);
 
     // ok
     return tb_true;
