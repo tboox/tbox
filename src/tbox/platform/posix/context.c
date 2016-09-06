@@ -24,46 +24,69 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "context.h"
+#include "prefix.h"
+#include <ucontext.h>
+#include <signal.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
-        defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
-        defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
-#   include "posix/context.c"
-#else
 tb_size_t tb_context_size()
 {
-    tb_trace_noimpl();
-    return 0;
+    return sizeof(ucontext_t);
 }
 tb_bool_t tb_context_get(tb_context_ref_t context)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    ucontext_t* ucontext = (ucontext_t*)context;
+    tb_assert_and_check_return_val(ucontext, tb_false);
+
+    // init ucontext
+    memset(ucontext, 0, sizeof(ucontext_t));
+
+    // init sigmask
+    sigemptyset(&zero);
+    sigprocmask(SIG_BLOCK, &zero, &ucontext->uc_sigmask);
+
+    // get it
+    return getcontext(ucontext) == 0;
 }
 tb_bool_t tb_context_set(tb_context_ref_t context)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    ucontext_t* ucontext = (ucontext_t*)context;
+    tb_assert_and_check_return_val(ucontext, tb_false);
+
+    // set it
+    return setcontext(ucontext) == 0;
 }
 tb_bool_t tb_context_make(tb_context_ref_t context, tb_context_ref_t context_link, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv)
 {
-    tb_trace_noimpl();
-    return tb_false;
-}
-#endif
+    // check
+    ucontext_t* ucontext = (ucontext_t*)context;
+    tb_assert_and_check_return_val(ucontext && func, tb_false);
 
-#ifndef TB_CONFIG_POSIX_HAVE_SWAPCONTEXT
-tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
-{
-    // swap it
-    if (tb_context_get(context))
-        tb_context_set(context_new);
+    // init stack and size
+    ucontext->uc_stack.ss_sp    = stack;
+    ucontext->uc_stack.ss_size  = stacksize;
+
+    // init link
+    ucontext->uc_link = (ucontext_t*)context_link;
+
+    // make it
+    tb_uint64_t priv = tb_p2u64(priv);
+    makecontext(ucontext, func, 2, (tb_uint32_t)(priv >> 32), (tb_uint32_t)priv);
 
     // ok
     return tb_true;
+}
+#ifdef TB_CONFIG_POSIX_HAVE_SWAPCONTEXT
+tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
+{
+    // check
+    tb_assert_and_check_return_val(context && context_new, tb_false);
+
+    // swap it
+    return swapcontext((ucontext_t*)context, (ucontext_t*)context_new) == 0;
 }
 #endif

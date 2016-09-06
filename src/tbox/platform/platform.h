@@ -42,6 +42,7 @@
 #include "thread.h"
 #include "atomic.h"
 #include "memory.h"
+#include "context.h"
 #include "ifaddrs.h"
 #include "barrier.h"
 #include "dynamic.h"

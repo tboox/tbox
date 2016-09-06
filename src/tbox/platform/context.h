@@ -35,9 +35,73 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// get the user private data for the context function
+#define tb_context_priv(priv_hi, priv_lo)   ((tb_cpointer_t)(tb_size_t)((((tb_uint64_t)(priv_hi) << 32)) | (priv_lo)))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the context ref type
+typedef __tb_typeref__(context);
+
+/// the context func type
+typedef tb_void_t (*tb_context_func_t)(tb_uint32_t priv_hi, tb_uint32_t priv_lo);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
+/*! get the context buffer size
+ *
+ * @return              the context buffer size
+ */
+tb_size_t               tb_context_size(tb_noarg_t);
+
+/*! saves the current thread's execution context
+ *
+ * @param context       the context
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_context_get(tb_context_ref_t context);
+
+/*! switchs to the given thread's execution context
+ *
+ * @param context       the context
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_context_set(tb_context_ref_t context);
+
+/*! make context with a given function and stack
+ *
+ * modifies the user thread context pointed to by context, which must have previously been initialized by a
+ * call to tb_context_get() and had a stack allocated for it
+ *
+ * @param context       the context
+ * @param context_link  the context link, determines the action to take when func() returns
+ *                      if equal to tb_null, the process exits, otherwise, tb_context_set(context_link) is implicitly invoked.
+ * @param stack         the stack address
+ * @param stacksize     the stack size
+ * @param func          the function
+ * @param priv          the user private data
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_context_make(tb_context_ref_t context, tb_context_ref_t context_link, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv);
+
+/*! saves the current thread context in context and makes context_new the currently active context.
+ *
+ * @param context       the old context
+ * @param context_new   the new context
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
