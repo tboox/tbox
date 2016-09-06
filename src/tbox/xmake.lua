@@ -81,7 +81,7 @@ target("tbox")
     add_options("info", "float", "wchar", "deprecated")
 
     -- add modules
-    add_options("xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database")
+    add_options("xml", "zip", "asio", "hash", "regex", "fiber", "object", "thread", "network", "charset", "database")
 
     -- add the common source files
     add_files("*.c") 
@@ -158,6 +158,7 @@ target("tbox")
     -- add the source files for the fiber module
     if is_option("fiber") then
         add_files("platform/context.c") 
+        add_files("fiber/*.c") 
     end
 
     -- add the source files for the thread module
