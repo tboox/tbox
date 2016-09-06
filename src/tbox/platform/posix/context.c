@@ -74,8 +74,8 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_context_ref_t context_lin
     ucontext->uc_link = (ucontext_t*)context_link;
 
     // make it
-    tb_uint64_t priv = tb_p2u64(priv);
-    makecontext(ucontext, func, 2, (tb_uint32_t)(priv >> 32), (tb_uint32_t)priv);
+    tb_uint64_t value = tb_p2u64(priv);
+    makecontext(ucontext, func, 2, (tb_uint32_t)(value >> 32), (tb_uint32_t)value);
 
     // ok
     return tb_true;
