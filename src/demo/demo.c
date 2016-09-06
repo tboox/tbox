@@ -197,6 +197,9 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_store)
 #endif
+#ifdef TB_CONFIG_MODULE_HAVE_FIBER
+,   TB_DEMO_MAIN_ITEM(platform_context)
+#endif
 
     // container
 ,   TB_DEMO_MAIN_ITEM(container_heap)

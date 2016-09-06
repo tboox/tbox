@@ -36,7 +36,7 @@ target("demo")
     add_files("other/*.c|charset.c") 
     add_files("string/*.c") 
     add_files("memory/**.c") 
-    add_files("platform/*.c|thread*.c|semaphore.c|event.c|lock.c|timer.c|ltimer.c|exception.c") 
+    add_files("platform/*.c|thread*.c|semaphore.c|event.c|lock.c|timer.c|ltimer.c|exception.c|context.c") 
     add_files("container/*.c") 
     add_files("algorithm/*.c") 
     add_files("stream/stream.c") 
@@ -54,7 +54,12 @@ target("demo")
         add_files("libm/double.c")
     end
 
-    -- add the source files for the thread type
+    -- add the source files for the fiber module
+    if is_option("fiber") then
+        add_files("platform/context.c") 
+    end
+
+    -- add the source files for the thread module
     if is_option("thread") then
         add_files("platform/thread*.c") 
         add_files("platform/event.c") 
@@ -75,7 +80,7 @@ target("demo")
         add_files("regex/*.c")
     end
 
-    -- add the source files for the network type
+    -- add the source files for the network module
     if is_option("network") then
         add_files("network/**.c") 
     end

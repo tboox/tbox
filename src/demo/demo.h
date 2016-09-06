@@ -145,7 +145,6 @@ TB_DEMO_MAIN_DECL(memory_static_buffer);
 TB_DEMO_MAIN_DECL(memory_impl_static_fixed_pool);
 
 // network
-#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
 TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
@@ -157,7 +156,6 @@ TB_DEMO_MAIN_DECL(network_whois);
 TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
 TB_DEMO_MAIN_DECL(network_impl_date);
-#endif
 
 // platform
 TB_DEMO_MAIN_DECL(platform_file);
@@ -182,6 +180,7 @@ TB_DEMO_MAIN_DECL(platform_cache_time);
 TB_DEMO_MAIN_DECL(platform_environment);
 TB_DEMO_MAIN_DECL(platform_thread_pool);
 TB_DEMO_MAIN_DECL(platform_thread_store);
+TB_DEMO_MAIN_DECL(platform_context);
 
 // container
 TB_DEMO_MAIN_DECL(container_heap);
