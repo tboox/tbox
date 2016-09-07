@@ -26,6 +26,7 @@
  */
 #include "context.h"
 #include "../libc/libc.h"
+#include "arch/context.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -33,6 +34,23 @@
 #if defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
+
+#   include "posix/context.c"
+
+#elif defined(tb_context_set_impl) && \
+        defined(tb_context_get_impl) && \
+        defined(tb_context_make_impl)
+
+#   undef setcontext
+#   undef getcontext
+#   undef makecontext
+#   undef ucontext_t
+
+#   define setcontext   tb_context_set_impl
+#   define getcontext   tb_context_get_impl
+#   define makecontext  tb_context_make_impl
+#   define ucontext_t   tb_ucontext_t
+
 #   include "posix/context.c"
 #else
 tb_size_t tb_context_size()

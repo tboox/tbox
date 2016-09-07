@@ -158,6 +158,7 @@ target("tbox")
     -- add the source files for the fiber module
     if is_option("fiber") then
         add_files("platform/context.c") 
+        add_files("platform/arch/context.S") 
         add_files("fiber/*.c") 
     end
 

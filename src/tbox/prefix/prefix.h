@@ -43,7 +43,7 @@
 #include "malloc.h"
 #include "utils.h"
 #include "state.h"
-#include "asm.h"
+#include "cache.h"
 
 #endif
 

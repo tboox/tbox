@@ -25,7 +25,11 @@
  * includes
  */
 #include "prefix.h"
-#include <ucontext.h>
+#if defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
+        defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
+        defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
+#   include <ucontext.h>
+#endif
 #include <signal.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////

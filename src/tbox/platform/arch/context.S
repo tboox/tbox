@@ -17,18 +17,21 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        prefix.h
+ * @file        context.S
  *
  */
-#ifndef TB_PREFIX_ASM_ARM_PREFIX_H
-#define TB_PREFIX_ASM_ARM_PREFIX_H
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "../../prefix/prefix.S"
 
-
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+#if defined(TB_ARCH_x86)
+//#   include "x86/context.S"
+#elif defined(TB_ARCH_x64)
+#   include "x64/context.S"
+#elif defined(TB_ARCH_ARM)
+//#   include "arm/context.S"
 #endif
-
-

@@ -17,19 +17,27 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        asm.h
+ * @file        context.h
  *
  */
-#ifndef TB_PREFIX_ASM_ASM_H
-#define TB_PREFIX_ASM_ASM_H
+#ifndef TB_PLATFORM_ARCH_CONTEXT_H
+#define TB_PLATFORM_ARCH_CONTEXT_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "cache.h"
+#if defined(TB_ARCH_x86)
+//#   include "x86/context.h"
+#elif defined(TB_ARCH_x64)
+#   include "x64/context.h"
+#elif defined(TB_ARCH_ARM)
+//#   include "arm/context.h"
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
 
 
 #endif
-
-
