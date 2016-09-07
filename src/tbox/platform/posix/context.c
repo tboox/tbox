@@ -50,7 +50,7 @@ tb_context_ref_t tb_context_init(tb_byte_t* data, tb_size_t size)
     // init sigmask
     sigset_t zero;
     sigemptyset(&zero);
-    sigprocmask(SIG_BLOCK, &zero, &ucontext->uc_sigmask);
+    sigprocmask(SIG_BLOCK, &zero, &((ucontext_t*)context)->uc_sigmask);
 
     // save context
     return tb_context_save(context)? context : tb_null;
