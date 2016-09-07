@@ -25,6 +25,7 @@
  * includes
  */
 #include "context.h"
+#include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -39,12 +40,33 @@ tb_size_t tb_context_size()
     tb_trace_noimpl();
     return 0;
 }
-tb_bool_t tb_context_get(tb_context_ref_t context)
+tb_context_ref_t tb_context_init(tb_byte_t* data, tb_size_t size)
+{
+    // check size
+    tb_size_t context_size = tb_context_size();
+    tb_assert_and_check_return_val(data && context_size && context_size <= size, tb_null);
+
+    // get context
+    tb_context_ref_t context = (tb_context_ref_t)data;
+
+    // init context 
+    tb_memset(data, 0, context_size);
+
+    // save context
+    if (!tb_context_save(context)) return tb_null;
+
+    // ok
+    return context;
+}
+tb_void_t tb_context_exit(tb_context_ref_t context)
+{
+}
+tb_bool_t tb_context_save(tb_context_ref_t context)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_context_set(tb_context_ref_t context)
+tb_bool_t tb_context_switch(tb_context_ref_t context)
 {
     tb_trace_noimpl();
     return tb_false;
@@ -55,13 +77,12 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_context_ref_t context_lin
     return tb_false;
 }
 #endif
-
 #ifndef TB_CONFIG_POSIX_HAVE_SWAPCONTEXT
 tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
 {
     // swap it
-    if (tb_context_get(context))
-        tb_context_set(context_new);
+    if (tb_context_save(context))
+        tb_context_switch(context_new);
 
     // ok
     return tb_true;

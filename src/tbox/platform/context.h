@@ -61,13 +61,28 @@ typedef tb_void_t (*tb_context_func_t)(tb_uint32_t priv_hi, tb_uint32_t priv_lo)
  */
 tb_size_t               tb_context_size(tb_noarg_t);
 
+/*! init the context
+ *
+ * @param data          the context data buffer
+ * @param size          the context data size
+ *
+ * @return              the context
+ */
+tb_context_ref_t        tb_context_init(tb_byte_t* data, tb_size_t size);
+
+/*! exit context 
+ *
+ * @param context       the context
+ */
+tb_void_t               tb_context_exit(tb_context_ref_t context);
+
 /*! saves the current thread's execution context
  *
  * @param context       the context
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_context_get(tb_context_ref_t context);
+tb_bool_t               tb_context_save(tb_context_ref_t context);
 
 /*! switchs to the given thread's execution context
  *
@@ -75,7 +90,7 @@ tb_bool_t               tb_context_get(tb_context_ref_t context);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_context_set(tb_context_ref_t context);
+tb_bool_t               tb_context_switch(tb_context_ref_t context);
 
 /*! make context with a given function and stack
  *
