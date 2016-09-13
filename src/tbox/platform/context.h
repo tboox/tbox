@@ -98,8 +98,6 @@ tb_bool_t               tb_context_switch(tb_context_ref_t context);
  * call to tb_context_get() and had a stack allocated for it
  *
  * @param context       the context
- * @param context_link  the context link, determines the action to take when func() returns
- *                      if equal to tb_null, the process exits, otherwise, tb_context_set(context_link) is implicitly invoked.
  * @param stack         the stack address
  * @param stacksize     the stack size
  * @param func          the function
@@ -107,7 +105,7 @@ tb_bool_t               tb_context_switch(tb_context_ref_t context);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_context_make(tb_context_ref_t context, tb_context_ref_t context_link, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv);
 
 /*! saves the current thread context in context and makes context_new the currently active context.
  *

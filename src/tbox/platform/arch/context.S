@@ -29,7 +29,7 @@
  * implementation
  */
 #if defined(TB_ARCH_x86)
-//#   include "x86/context.S"
+#   include "x86/context.S"
 #elif defined(TB_ARCH_x64)
 #   include "x64/context.S"
 #elif defined(TB_ARCH_ARM)

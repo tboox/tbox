@@ -28,7 +28,7 @@
  */
 #include "prefix.h"
 #if defined(TB_ARCH_x86)
-//#   include "x86/context.h"
+#   include "x86/context.h"
 #elif defined(TB_ARCH_x64)
 #   include "x64/context.h"
 #elif defined(TB_ARCH_ARM)

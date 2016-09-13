@@ -78,10 +78,13 @@ tb_bool_t tb_context_switch(tb_context_ref_t context)
     ucontext_t* ucontext = (ucontext_t*)context;
     tb_assert_and_check_return_val(ucontext, tb_false);
 
-    // set it
-    return setcontext(ucontext) == 0;
+    // set it 
+    setcontext(ucontext);
+
+    // failed
+    return tb_false;
 }
-tb_bool_t tb_context_make(tb_context_ref_t context, tb_context_ref_t context_link, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv)
+tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv)
 {
     // check
     ucontext_t* ucontext = (ucontext_t*)context;
@@ -92,7 +95,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_context_ref_t context_lin
     ucontext->uc_stack.ss_size  = stacksize;
 
     // init link
-    ucontext->uc_link = (ucontext_t*)context_link;
+    ucontext->uc_link = tb_null;
 
     // make it
     tb_uint64_t value = tb_p2u64(priv);

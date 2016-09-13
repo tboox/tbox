@@ -39,7 +39,7 @@ function tb_context_get_asm, export = 1
     movq %rcx, 32(%rdi)     // mcontext.mc_rcx = %rcx 
     movq %r8, 40(%rdi)      // mcontext.mc_r8  = %r8 
     movq %r9, 48(%rdi)      // mcontext.mc_r9  = %r9 
-    movq $1, 56(%rdi)       // mcontext.mc_rax = %rax 
+    movq $1, 56(%rdi)       // mcontext.mc_rax = 1 
     movq %rbx, 64(%rdi)     // mcontext.mc_rbx = %rbx 
     movq %rbp, 72(%rdi)     // mcontext.mc_rbp = %rbp
     movq %r10, 80(%rdi)     // mcontext.mc_r10 = %r10 
@@ -49,10 +49,13 @@ function tb_context_get_asm, export = 1
     movq %r14, 112(%rdi)    // mcontext.mc_r14 = %r14 
     movq %r15, 120(%rdi)    // mcontext.mc_r15 = %r15 
 
-    movq (%rsp), %rcx       // mcontext.mc_rip = %rip 
+    /* rsp + 8: ...         => mcontext.mc_rsp
+     * rsp    : return addr => mcontext.mc_rip
+     */
+    movq (%rsp), %rcx       // mcontext.mc_rip = %eip 
     movq %rcx, 160(%rdi)
 
-    leaq 8(%rsp), %rcx      // mcontext.mc_rsp = %rsp 
+    leaq 8(%rsp), %rcx      // mcontext.mc_rsp = %rsp + 8 
     movq %rcx, 184(%rdi)
     
     movq 32(%rdi), %rcx     // restore %rcx
@@ -66,29 +69,36 @@ endfunc
 /* set mcontext
  *
  * @param mcontext      %rdi
- *
- * @return              %rax
  */
 function tb_context_set_asm, export = 1
 
-    movq 16(%rdi), %rsi
-    movq 24(%rdi), %rdx
-    movq 32(%rdi), %rcx
-    movq 40(%rdi), %r8
-    movq 48(%rdi), %r9
-    movq 56(%rdi), %rax
-    movq 64(%rdi), %rbx
-    movq 72(%rdi), %rbp
-    movq 80(%rdi), %r10
-    movq 88(%rdi), %r11
-    movq 96(%rdi), %r12
-    movq 104(%rdi), %r13
-    movq 112(%rdi), %r14
-    movq 120(%rdi), %r15
-    movq 184(%rdi), %rsp
-    pushq 160(%rdi)   /* new %eip */
-    movq 8(%rdi), %rdi
-    ret
+    movq 16(%rdi), %rsi     // %rsi = mcontext.mc_rsi 
+    movq 24(%rdi), %rdx     // %rdx = mcontext.mc_rdx 
+    movq 32(%rdi), %rcx     // %rcx = mcontext.mc_rcx 
+    movq 40(%rdi), %r8      // %r8 = mcontext.mc_r8
+    movq 48(%rdi), %r9      // %r9 = mcontext.mc_r9 
+    movq 56(%rdi), %rax     // %rax = mcontext.mc_rax
+    movq 64(%rdi), %rbx     // %rbx = mcontext.mc_rbx 
+    movq 72(%rdi), %rbp     // %rbp = mcontext.mc_rbp 
+    movq 80(%rdi), %r10     // %r10 = mcontext.mc_r10 
+    movq 88(%rdi), %r11     // %r11 = mcontext.mc_r11 
+    movq 96(%rdi), %r12     // %r12 = mcontext.mc_r12 
+    movq 104(%rdi), %r13    // %r13 = mcontext.mc_r13 
+    movq 112(%rdi), %r14    // %r14 = mcontext.mc_r14 
+    movq 120(%rdi), %r15    // %r15 = mcontext.mc_r15 
+
+    /* 
+     *          ...
+     * rsp - 8: args 
+     * rsp:     return address      <= mcontext.mc_rsp
+     */
+    movq 184(%rdi), %rsp    // %rsp = mcontext.mc_rsp 
+
+    pushq 160(%rdi)         // push mcontext.mc_rip to the return address
+
+    movq 8(%rdi), %rdi      // %rdi = mcontext.mc_rdi 
+
+    ret                     // return and goto mcontext.mc_rip
 
 endfunc
 

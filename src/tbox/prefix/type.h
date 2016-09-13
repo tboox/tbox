@@ -100,7 +100,7 @@ typedef __WCHAR_TYPE__              tb_wchar_t;
 #elif defined(__WCHAR_WIDTH__) && (__WCHAR_WIDTH__ == 2)
 typedef tb_int16_t                  tb_wchar_t;
 #elif defined(__WCHAR_WIDTH__) && (__WCHAR_WIDTH__ == 4)
-typedef tb_int16_t                  tb_wchar_t;
+typedef tb_int32_t                  tb_wchar_t;
 #else
 typedef tb_int32_t                  tb_wchar_t;
 #endif
