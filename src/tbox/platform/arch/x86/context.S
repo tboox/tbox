@@ -27,7 +27,7 @@
 
 /* get mcontext
  *
- * @param mcontext      %eax
+ * @param mcontext      [%esp + 4]
  *
  * @return              %eax
  */
@@ -46,15 +46,21 @@ function tb_context_get_asm, export = 1
 	movl	%edx, 40(%eax)  // mcontext.mc_edx = %edx
 	movl	%ecx, 44(%eax)  // mcontext.mc_ecx = %ecx
 
-	movl	$1, 48(%eax)	// mcontext.mc_eax = 1
+	movl	$1, 48(%eax)	/* mcontext.mc_eax = 1
+                             * 
+                             * if (getcontext(ctx) == 0) 
+                             *      setcontext(ctx);
+                             *
+                             * getcontext() will return 1 after calling setcontext()
+                             */
 
     /* esp + 4: ...         => mcontext.mc_esp
      * esp    : return addr => mcontext.mc_eip
      */
-	movl	(%esp), %ecx	// mcontext.mc_eip = %eip
+	movl	(%esp), %ecx	// mcontext.mc_eip = %eip (the return address of tb_context_get())
 	movl	%ecx, 60(%eax)
 
-	leal	4(%esp), %ecx	// mcontext.mc_esp = %esp + 4
+	leal	4(%esp), %ecx	// mcontext.mc_esp = %esp + 4 (after ret)
 	movl	%ecx, 72(%eax)
 
 	movl	44(%eax), %ecx	// restore %ecx 
@@ -64,18 +70,9 @@ function tb_context_get_asm, export = 1
 
 endfunc
 
-    /* save function and stack address
-     *
-     *          padding 
-     * sp + 8:  arg1
-     * sp + 4:  arg2                         
-     * sp:      return address(0)   => mc_esp <-------- 16-align for macosx
-     *          ...
-     */
-
 /* set mcontext
  *
- * @param mcontext      %eax
+ * @param mcontext      [%esp + 4]
  */
 function tb_context_set_asm, export = 1
 
