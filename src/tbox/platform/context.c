@@ -33,15 +33,9 @@
 // uses the windows api
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/context.c"
-
-// uses the posix getcontext and setcontext api
-#elif defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
-        defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
-        defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
-#   include "posix/context.c"
 #else
 
-// uses the getcontext and setcontext with asm
+// uses the getcontext and setcontext with asm (faster)
 #include "arch/context.h"
 #if defined(tb_context_set_impl) && \
         defined(tb_context_get_impl) && \
@@ -62,6 +56,12 @@
 #   define makecontext  tb_context_make_impl
 #   define ucontext_t   tb_ucontext_t
 
+#   include "posix/context.c"
+
+// uses the posix getcontext and setcontext api
+#elif defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
+        defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
+        defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
 #   include "posix/context.c"
 
 // stub
