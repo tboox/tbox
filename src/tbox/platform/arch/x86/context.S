@@ -35,10 +35,10 @@ function tb_context_get_asm, export = 1
 
 	movl	4(%esp), %eax   // %eax = [%esp + 4] = mcontext
 
-	movl	%fs, 8(%eax)    // mcontext.mc_fs = %fs
-	movl	%es, 12(%eax)   // mcontext.mc_es = %es
-	movl	%ds, 16(%eax)   // mcontext.mc_ds = %ds
-	movl	%ss, 76(%eax)   // mcontext.mc_ss = %ss
+	movw	%fs, 8(%eax)    // mcontext.mc_fs = %fs
+	movw	%es, 12(%eax)   // mcontext.mc_es = %es
+	movw	%ds, 16(%eax)   // mcontext.mc_ds = %ds
+	movw	%ss, 76(%eax)   // mcontext.mc_ss = %ss
 	movl	%edi, 20(%eax)  // mcontext.mc_edi = %edi
 	movl	%esi, 24(%eax)  // mcontext.mc_esi = %esi
 	movl	%ebp, 28(%eax)  // mcontext.mc_ebp = %ebp
@@ -78,10 +78,10 @@ function tb_context_set_asm, export = 1
 
 	movl 4(%esp), %eax      // %eax = [%esp + 4] = mcontext
 
-	movl 8(%eax), %fs       // %fs = mcontext.mc_fs
-	movl 12(%eax), %es      // %es = mcontext.mc_es
-	movl 16(%eax), %ds      // %ds = mcontext.mc_ds
-	movl 76(%eax), %ss      // %ss = mcontext.mc_ss
+	movw 8(%eax), %fs       // %fs = mcontext.mc_fs
+	movw 12(%eax), %es      // %es = mcontext.mc_es
+	movw 16(%eax), %ds      // %ds = mcontext.mc_ds
+	movw 76(%eax), %ss      // %ss = mcontext.mc_ss
 	movl 20(%eax), %edi     // %edi = mcontext.mc_edi
 	movl 24(%eax), %esi     // %esi = mcontext.mc_esi
 	movl 28(%eax), %ebp     // %ebp = mcontext.mc_ebp
