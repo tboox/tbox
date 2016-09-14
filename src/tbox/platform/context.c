@@ -26,22 +26,21 @@
  */
 #include "context.h"
 #include "../libc/libc.h"
-#include "arch/context.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-
 #   include "windows/context.c"
 
 #elif defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
-
 #   include "posix/context.c"
+#else
 
-#elif defined(tb_context_set_impl) && \
+#include "arch/context.h"
+#if defined(tb_context_set_impl) && \
         defined(tb_context_get_impl) && \
         defined(tb_context_make_impl)
 
@@ -104,3 +103,5 @@ tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new
     return tb_context_save(context)? tb_context_switch(context_new) : tb_false;
 }
 #endif
+#endif
+
