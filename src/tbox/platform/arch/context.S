@@ -28,6 +28,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+
+// only for gas assembler now
 #if defined(TB_ARCH_x86)
 #   include "x86/context.S"
 #elif defined(TB_ARCH_x64)

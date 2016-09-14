@@ -31,7 +31,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
+#if defined(TB_CONFIG_OS_WINDOWS)
+
+#   include "windows/context.c"
+
+#elif defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
 
@@ -94,8 +98,6 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     tb_trace_noimpl();
     return tb_false;
 }
-#endif
-#ifndef TB_CONFIG_POSIX_HAVE_SWAPCONTEXT
 tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
 {
     // swap it

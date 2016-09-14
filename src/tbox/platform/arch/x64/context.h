@@ -163,7 +163,7 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     tb_long_t* sp = (tb_long_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_long_t);
 
     // 16-align for macosx
-    sp = (tb_long_t*)((tb_size_t)sp - ((tb_size_t)sp % 16));
+    sp = (tb_long_t*)((tb_size_t)sp & ~0xf);
 
     // push return address(unused, only reverse the stack space)
     *--sp = 0;

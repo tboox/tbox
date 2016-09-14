@@ -127,4 +127,3 @@ EXTERN_ASM\name:
 \name:
 .endm
 
-

@@ -154,7 +154,7 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     sp -= argc;
 
     // 16-align for macosx
-    sp = (tb_long_t*)((tb_size_t)sp - ((tb_size_t)sp % 16));
+    sp = (tb_long_t*)((tb_size_t)sp & ~0xf);
 
     // push arguments
     sp[0] = arg1;
@@ -166,8 +166,8 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     /* save function and stack address
      *
      *          padding 
-     * sp + 8:  arg1
-     * sp + 4:  arg2                         
+     * sp + 8:  arg2
+     * sp + 4:  arg1                       
      * sp:      return address(0)   => mc_esp <-------- 16-align for macosx
      */
     ucontext->uc_mcontext.mc_eip = (tb_long_t)func;
