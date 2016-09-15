@@ -29,8 +29,8 @@
         defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
 #   include <ucontext.h>
+#   include <signal.h>
 #endif
-#include <signal.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -51,10 +51,14 @@ tb_context_ref_t tb_context_init(tb_byte_t* data, tb_size_t size)
     // init context 
     tb_memset(data, 0, context_size);
 
+#if defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
+        defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
+        defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
     // init sigmask
     sigset_t zero;
     sigemptyset(&zero);
     sigprocmask(SIG_BLOCK, &zero, &((ucontext_t*)context)->uc_sigmask);
+#endif
 
     // save context
     return tb_context_save(context)? context : tb_null;

@@ -26,17 +26,13 @@
  */
 #include "context.h"
 #include "../libc/libc.h"
+#include "arch/context.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-// uses the windows api
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/context.c"
-#else
 
 // uses the getcontext and setcontext with asm (faster)
-#include "arch/context.h"
 #if defined(tb_context_set_impl) && \
         defined(tb_context_get_impl) && \
         defined(tb_context_make_impl)
@@ -57,6 +53,10 @@
 #   define ucontext_t   tb_ucontext_t
 
 #   include "posix/context.c"
+
+// uses the windows api
+#elif defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/context.c"
 
 // uses the posix getcontext and setcontext api
 #elif defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
@@ -112,6 +112,5 @@ tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new
     // swap it
     return tb_context_save(context)? tb_context_switch(context_new) : tb_false;
 }
-#endif
 #endif
 

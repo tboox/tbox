@@ -33,20 +33,20 @@
  */
 function tb_context_get_asm, export = 1
 
-	movl	4(%esp), %eax   // %eax = [%esp + 4] = mcontext
+	movl 4(%esp), %eax      // %eax = [%esp + 4] = mcontext
 
-	movw	%fs, 8(%eax)    // mcontext.mc_fs = %fs
-	movw	%es, 12(%eax)   // mcontext.mc_es = %es
-	movw	%ds, 16(%eax)   // mcontext.mc_ds = %ds
-	movw	%ss, 76(%eax)   // mcontext.mc_ss = %ss
-	movl	%edi, 20(%eax)  // mcontext.mc_edi = %edi
-	movl	%esi, 24(%eax)  // mcontext.mc_esi = %esi
-	movl	%ebp, 28(%eax)  // mcontext.mc_ebp = %ebp
-	movl	%ebx, 36(%eax)  // mcontext.mc_ebx = %ebx
-	movl	%edx, 40(%eax)  // mcontext.mc_edx = %edx
-	movl	%ecx, 44(%eax)  // mcontext.mc_ecx = %ecx
+	movw %fs, 8(%eax)       // mcontext.mc_fs = %fs
+	movw %es, 12(%eax)      // mcontext.mc_es = %es
+	movw %ds, 16(%eax)      // mcontext.mc_ds = %ds
+	movw %ss, 76(%eax)      // mcontext.mc_ss = %ss
+	movl %edi, 20(%eax)     // mcontext.mc_edi = %edi
+	movl %esi, 24(%eax)     // mcontext.mc_esi = %esi
+	movl %ebp, 28(%eax)     // mcontext.mc_ebp = %ebp
+	movl %ebx, 36(%eax)     // mcontext.mc_ebx = %ebx
+	movl %edx, 40(%eax)     // mcontext.mc_edx = %edx
+	movl %ecx, 44(%eax)     // mcontext.mc_ecx = %ecx
 
-	movl	$1, 48(%eax)	/* mcontext.mc_eax = 1
+	movl $1, 48(%eax)	    /* mcontext.mc_eax = 1
                              * 
                              * if (getcontext(ctx) == 0) 
                              *      setcontext(ctx);
@@ -57,15 +57,15 @@ function tb_context_get_asm, export = 1
     /* esp + 4: ...         => mcontext.mc_esp
      * esp    : return addr => mcontext.mc_eip
      */
-	movl	(%esp), %ecx	// mcontext.mc_eip = %eip (the return address of tb_context_get())
-	movl	%ecx, 60(%eax)
+	movl (%esp), %ecx	    // mcontext.mc_eip = %eip (the return address of tb_context_get())
+	movl %ecx, 60(%eax)
 
-	leal	4(%esp), %ecx	// mcontext.mc_esp = %esp + 4 (after ret)
-	movl	%ecx, 72(%eax)
+	leal 4(%esp), %ecx	    // mcontext.mc_esp = %esp + 4 (after ret)
+	movl %ecx, 72(%eax)
 
-	movl	44(%eax), %ecx	// restore %ecx 
+	movl 44(%eax), %ecx	    // restore %ecx 
 
-	movl	$0, %eax        // return 0
+	movl $0, %eax           // return 0
 	ret
 
 endfunc
