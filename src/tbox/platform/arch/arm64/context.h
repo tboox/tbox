@@ -20,8 +20,8 @@
  * @file        context.h
  *
  */
-#ifndef TB_PLATFORM_ARCH_x86_CONTEXT_H
-#define TB_PLATFORM_ARCH_x86_CONTEXT_H
+#ifndef TB_PLATFORM_ARCH_ARM64_CONTEXT_H
+#define TB_PLATFORM_ARCH_ARM64_CONTEXT_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -50,35 +50,41 @@ __tb_extern_c_enter__
  * types
  */
 
-// the mcontext type
+// the mcontext type, @note be incompatible with sigcontext
 typedef struct __tb_mcontext_t
 {
-    tb_uint32_t             mc_onstack;
-    tb_uint32_t             mc_gs;
-    tb_uint32_t             mc_fs;
-    tb_uint32_t             mc_es;
-    tb_uint32_t             mc_ds;
-    tb_uint32_t             mc_edi;
-    tb_uint32_t             mc_esi;
-    tb_uint32_t             mc_ebp;
-    tb_uint32_t             mc_isp;
-    tb_uint32_t             mc_ebx;
-    tb_uint32_t             mc_edx;
-    tb_uint32_t             mc_ecx;
-    tb_uint32_t             mc_eax;
-    tb_uint32_t             mc_trapno;
-    tb_uint32_t             mc_err;
-    tb_uint32_t             mc_eip;
-    tb_uint32_t             mc_cs;
-    tb_uint32_t             mc_eflags;
-    tb_uint32_t             mc_esp; 
-    tb_uint32_t             mc_ss;
-
-#if 0
-    // unused
-    tb_uint32_t             mc_fpregs[28];
-    tb_uint32_t             padding[17];
-#endif
+     tb_uint64_t            mc_x0;
+     tb_uint64_t            mc_x1;
+     tb_uint64_t            mc_x2;
+     tb_uint64_t            mc_x3;
+     tb_uint64_t            mc_x4;
+     tb_uint64_t            mc_x5;
+     tb_uint64_t            mc_x6;
+     tb_uint64_t            mc_x7;
+     tb_uint64_t            mc_x8;
+     tb_uint64_t            mc_x9;
+     tb_uint64_t            mc_x10;
+     tb_uint64_t            mc_x11;
+     tb_uint64_t            mc_x12;
+     tb_uint64_t            mc_x13;
+     tb_uint64_t            mc_x14;
+     tb_uint64_t            mc_x15;
+     tb_uint64_t            mc_x16;
+     tb_uint64_t            mc_x17;
+     tb_uint64_t            mc_x18;
+     tb_uint64_t            mc_x19;
+     tb_uint64_t            mc_x20;
+     tb_uint64_t            mc_x21;
+     tb_uint64_t            mc_x22;
+     tb_uint64_t            mc_x23;
+     tb_uint64_t            mc_x24;
+     tb_uint64_t            mc_x25;
+     tb_uint64_t            mc_x26;
+     tb_uint64_t            mc_x27;
+     tb_uint64_t            mc_x28;
+     tb_uint64_t            mc_fp;
+     tb_uint64_t            mc_lr;
+     tb_uint64_t            mc_sp;
 
 }tb_mcontext_t, *tb_mcontext_ref_t;
 
@@ -141,37 +147,26 @@ tb_int_t                tb_context_set_asm(tb_mcontext_ref_t mcontext);
  *
  * @return              the error code, ok: 0
  */
-static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*func)(tb_void_t), tb_uint32_t argc, tb_uint32_t arg1, tb_uint32_t arg2)
+static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*func)(tb_void_t), tb_int_t argc, tb_int_t arg1, tb_int_t arg2)
 {
     // check
     tb_assert_and_check_return(ucontext && argc == 2);
-    tb_assert_static(sizeof(tb_uint32_t) == 4);
 
     // make stack address
-    tb_uint32_t* sp = (tb_uint32_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_uint32_t);
+    tb_uint64_t* sp = (tb_uint64_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_uint64_t);
 
-    // reserve the arguments space
-    sp -= argc;
-
-    // 16-align for macosx
-    sp = (tb_uint32_t*)((tb_size_t)sp & ~0xf);
-
-    // push arguments
-    sp[0] = arg1;
-    sp[1] = arg2;
-
-    // push return address(unused, only reverse the stack space)
-    *--sp = 0;
+    // save arguments
+    ucontext->uc_mcontext.mc_x0 = arg1;
+    ucontext->uc_mcontext.mc_x1 = arg2;
 
     /* save function and stack address
      *
-     *          padding 
-     * sp + 8:  arg2
-     * sp + 4:  arg1                       
-     * sp:      return address(0)   => mc_esp <-------- 16-align for macosx
+     * x0:     arg1
+     * x1:     arg2
+     * sp:     return address(0)   => mc_sp 
      */
-    ucontext->uc_mcontext.mc_eip = (tb_uint32_t)func;
-    ucontext->uc_mcontext.mc_esp = (tb_uint32_t)sp;
+    ucontext->uc_mcontext.mc_lr = (tb_uint64_t)func;
+    ucontext->uc_mcontext.mc_sp = (tb_uint64_t)sp;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

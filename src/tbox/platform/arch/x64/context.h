@@ -53,41 +53,31 @@ __tb_extern_c_enter__
 // the mcontext type
 typedef struct __tb_mcontext_t
 {
-    tb_long_t               mc_onstack;    
-    tb_long_t               mc_rdi;        
-    tb_long_t               mc_rsi;
-    tb_long_t               mc_rdx;
-    tb_long_t               mc_rcx;
-    tb_long_t               mc_r8;
-    tb_long_t               mc_r9;
-    tb_long_t               mc_rax;
-    tb_long_t               mc_rbx;
-    tb_long_t               mc_rbp;
-    tb_long_t               mc_r10;
-    tb_long_t               mc_r11;
-    tb_long_t               mc_r12;
-    tb_long_t               mc_r13;
-    tb_long_t               mc_r14;
-    tb_long_t               mc_r15;
-    tb_long_t               mc_trapno;
-    tb_long_t               mc_addr;
-    tb_long_t               mc_flags;
-    tb_long_t               mc_err;
-    tb_long_t               mc_rip;
-    tb_long_t               mc_cs;
-    tb_long_t               mc_rflags;
-    tb_long_t               mc_rsp;
-    tb_long_t               mc_ss;
-
-#if 0
-    // unused
-    tb_long_t               mc_len;         
-    tb_long_t               mc_fpformat;
-    tb_long_t               mc_ownedfp;
-
-    tb_long_t               mc_fpstate[64];
-    tb_long_t               padding[8];
-#endif
+//    tb_uint64_t             mc_onstack;    
+    tb_uint64_t             mc_rdi;        
+    tb_uint64_t             mc_rsi;
+    tb_uint64_t             mc_rdx;
+    tb_uint64_t             mc_rcx;
+    tb_uint64_t             mc_r8;
+    tb_uint64_t             mc_r9;
+    tb_uint64_t             mc_rax;
+    tb_uint64_t             mc_rbx;
+    tb_uint64_t             mc_rbp;
+    tb_uint64_t             mc_r10;
+    tb_uint64_t             mc_r11;
+    tb_uint64_t             mc_r12;
+    tb_uint64_t             mc_r13;
+    tb_uint64_t             mc_r14;
+    tb_uint64_t             mc_r15;
+//    tb_uint64_t             mc_trapno;
+//    tb_uint64_t             mc_addr;
+//    tb_uint64_t             mc_flags;
+//    tb_uint64_t             mc_err;
+    tb_uint64_t             mc_rip;
+//    tb_uint64_t             mc_cs;
+//    tb_uint64_t             mc_rflags;
+    tb_uint64_t             mc_rsp;
+//    tb_uint64_t             mc_ss;
 
 }tb_mcontext_t, *tb_mcontext_ref_t;
 
@@ -160,10 +150,10 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     ucontext->uc_mcontext.mc_rsi = arg2;
 
     // make stack address
-    tb_long_t* sp = (tb_long_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_long_t);
+    tb_uint64_t* sp = (tb_uint64_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_uint64_t);
 
     // 16-align for macosx
-    sp = (tb_long_t*)((tb_size_t)sp & ~0xf);
+    sp = (tb_uint64_t*)((tb_size_t)sp & ~0xf);
 
     // push return address(unused, only reverse the stack space)
     *--sp = 0;
@@ -174,8 +164,8 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
      * rsi:     arg2
      * sp:      return address(0)   => mc_rsp <----- 16-align for macosx
      */
-    ucontext->uc_mcontext.mc_rip = (tb_long_t)func;
-    ucontext->uc_mcontext.mc_rsp = (tb_long_t)sp;
+    ucontext->uc_mcontext.mc_rip = (tb_uint64_t)func;
+    ucontext->uc_mcontext.mc_rsp = (tb_uint64_t)sp;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
