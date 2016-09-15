@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
- * @author		ruki
- * @file		prefix.S
+ * @author      ruki
+ * @file        prefix.S
  *
  */
 

@@ -32,6 +32,11 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -132,7 +137,6 @@ typedef struct __tb_ucontext_t
  * declarations
  */
 
-#ifndef TB_COMPILER_IS_MSVC
 /* get mcontext
  *
  * @param mcontext      the mcontext
@@ -148,7 +152,6 @@ tb_int_t                tb_context_get_asm(tb_mcontext_ref_t mcontext);
  * @return              when successful, does not return. 
  */
 tb_int_t                tb_context_set_asm(tb_mcontext_ref_t mcontext);
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -197,86 +200,9 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     ucontext->uc_mcontext.mc_esp = (tb_long_t)sp;
 }
 
-#ifdef TB_COMPILER_IS_MSVC
-/* get mcontext
- *
- * @param mcontext      the mcontext
- *
- * @return              the error code, ok: 0
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
  */
-static __declspec(naked) tb_int_t tb_context_get_asm(tb_mcontext_ref_t mcontext)
-{
-    __tb_asm__ 
-    {
-        mov eax, [esp + 4]      // eax = [esp + 4] = mcontext
-
-        mov [eax + 8], fs      // mcontext.mc_fs = fs
-        mov [eax + 12], es     // mcontext.mc_es = es
-        mov [eax + 16], ds     // mcontext.mc_ds = ds
-        mov [eax + 76], ss     // mcontext.mc_ss = ss
-        mov [eax + 20], edi     // mcontext.mc_edi = edi
-        mov [eax + 24], esi     // mcontext.mc_esi = esi
-        mov [eax + 28], ebp     // mcontext.mc_ebp = ebp
-        mov [eax + 36], ebx     // mcontext.mc_ebx = ebx
-        mov [eax + 40], edx     // mcontext.mc_edx = edx
-        mov [eax + 44], ecx     // mcontext.mc_ecx = ecx
-
-        mov [eax + 48], 1	    /* mcontext.mc_eax = 1
-                                 * 
-                                 * if (getcontext(ctx) == 0) 
-                                 *      setcontext(ctx);
-                                 *
-                                 * getcontext() will return 1 after calling setcontext()
-                                 */
-
-        /* esp + 4: ...         => mcontext.mc_esp
-         * esp    : return addr => mcontext.mc_eip
-         */
-        mov ecx, [esp]	        // mcontext.mc_eip = eip (the return address of tb_context_get())
-        mov [eax + 60], ecx
-
-        lea ecx, [esp + 4]	    // mcontext.mc_esp = esp + 4 (after ret)
-        mov [eax + 72], ecx
-
-        mov ecx, [eax + 44]	    // restore ecx 
-
-        mov eax, 0              // return 0
-        ret
-    }
-}
-
-/* set mcontext
- *
- * @param mcontext      the mcontext
- *
- * @return              when successful, does not return. 
- */
-static __declspec(naked) tb_int_t tb_context_set_asm(tb_mcontext_ref_t mcontext)
-{
-    __tb_asm__
-    {
-        mov eax, [esp + 4]      // eax = [esp + 4] = mcontext
-
-        mov fs, [eax + 8]       // fs = mcontext.mc_fs
-        mov es, [eax + 12]      // es = mcontext.mc_es
-        mov ds, [eax + 16]      // ds = mcontext.mc_ds
-        mov ss, [eax + 76]      // ss = mcontext.mc_ss
-        mov edi, [eax + 20]     // edi = mcontext.mc_edi
-        mov esi, [eax + 24]     // esi = mcontext.mc_esi
-        mov ebp, [eax + 28]     // ebp = mcontext.mc_ebp
-        mov ebx, [eax + 36]     // ebx = mcontext.mc_ebx
-        mov edx, [eax + 40]     // edx = mcontext.mc_edx
-        mov ecx, [eax + 44]     // ecx = mcontext.mc_ecx
-
-        mov esp, [eax + 72]     // esp = mcontext.mc_esp
-
-        push [eax + 60]	        // push mcontext.mc_eip to the return address
-
-        mov eax, [eax + 48]     // eax = mcontext.mc_eax
-
-        ret                     // return and goto mcontext.mc_eip
-    }
-}
-#endif
+__tb_extern_c_leave__
 
 #endif

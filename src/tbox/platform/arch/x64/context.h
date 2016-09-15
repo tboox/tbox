@@ -32,6 +32,11 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
@@ -199,89 +204,9 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     ucontext->uc_mcontext.mc_rsp = (tb_long_t)sp;
 }
 
-#if 0 //def TB_COMPILER_IS_MSVC
-/* get mcontext
- *
- * @param mcontext      the mcontext
- *
- * @return              the error code, ok: 0
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
  */
-static __declspec(naked) tb_int_t tb_context_get_asm(tb_mcontext_ref_t mcontext)
-{
-    __tb_asm__
-    {
-        mov [rdi + 8], rdi      // mcontext.mc_rdi = rdi 
-        mov [rdi + 16], rsi     // mcontext.mc_rsi = rsi
-        mov [rdi + 24], rdx     // mcontext.mc_rdx = rdx 
-        mov [rdi + 32], rcx     // mcontext.mc_rcx = rcx 
-        mov [rdi + 40], r8      // mcontext.mc_r8  = r8 
-        mov [rdi + 48], r9      // mcontext.mc_r9  = r9 
-        mov [rdi + 56], 1       /* mcontext.mc_rax = 1
-                                 * 
-                                 * if (getcontext(ctx) == 0) 
-                                 *      setcontext(ctx);
-                                 *
-                                 * getcontext() will return 1 after calling setcontext()
-                                 */
-        mov [rdi + 64], rbx     // mcontext.mc_rbx = rbx 
-        mov [rdi + 72], rbp     // mcontext.mc_rbp = rbp
-        mov [rdi + 80], r10     // mcontext.mc_r10 = r10 
-        mov [rdi + 88], r11     // mcontext.mc_r11 = r11 
-        mov [rdi + 96], r12     // mcontext.mc_r12 = r12 
-        mov [rdi + 104], r13    // mcontext.mc_r13 = r13 
-        mov [rdi + 112], r14    // mcontext.mc_r14 = r14 
-        mov [rdi + 120], r15    // mcontext.mc_r15 = r15 
-
-        /* rsp + 8: ...         => mcontext.mc_rsp
-         * rsp    : return addr => mcontext.mc_rip
-         */
-        mov rcx, [rsp]          // mcontext.mc_rip = eip (the return address of tb_context_get())
-        mov [rdi + 160], rcx
-
-        lea rcx, [rsp + 8]      // mcontext.mc_rsp = rsp + 8 (after ret)
-        mov [rdi + 184], rcx
-        
-        mov rcx, [rdi + 32]     // restore rcx
-
-        mov rax, 0              // return 0
-        ret
-    }
-}
-
-/* set mcontext
- *
- * @param mcontext      the mcontext
- *
- * @return              when successful, does not return. 
- */
-static __declspec(naked) tb_int_t tb_context_set_asm(tb_mcontext_ref_t mcontext)
-{
-    __tb_asm__
-    {
-        mov rsi, [rdi + 16]     // rsi = mcontext.mc_rsi 
-        mov rdx, [rdi + 24]     // rdx = mcontext.mc_rdx 
-        mov rcx, [rdi + 32]     // rcx = mcontext.mc_rcx 
-        mov r8, [rdi + 40]      // r8 = mcontext.mc_r8
-        mov r9, [rdi + 48]      // r9 = mcontext.mc_r9 
-        mov rax, [rdi + 56]     // rax = mcontext.mc_rax
-        mov rbx, [rdi + 64]     // rbx = mcontext.mc_rbx 
-        mov rbp, [rdi + 72]     // rbp = mcontext.mc_rbp 
-        mov r10, [rdi + 80]     // r10 = mcontext.mc_r10 
-        mov r11, [rdi + 88]     // r11 = mcontext.mc_r11 
-        mov r12, [rdi + 96]     // r12 = mcontext.mc_r12 
-        mov r13, [rdi + 104]    // r13 = mcontext.mc_r13 
-        mov r14, [rdi + 112]    // r14 = mcontext.mc_r14 
-        mov r15, [rdi + 120]    // r15 = mcontext.mc_r15 
-
-        mov rsp, [rdi + 184]    // rsp = mcontext.mc_rsp 
-
-        push [rdi + 160]        // push mcontext.mc_rip to the return address
-
-        mov rdi, [rdi + 8]      // rdi = mcontext.mc_rdi 
-
-        ret                     // return and goto mcontext.mc_rip
-    }
-}
-#endif
+__tb_extern_c_leave__
 
 #endif
