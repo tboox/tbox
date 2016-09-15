@@ -31,7 +31,7 @@
  *
  * @return              %rax
  */
-function tb_context_get_asm, export = 1
+function tb_context_get_asm, export=1
 
     movq %rdi, (%rdi)       // mcontext.mc_rdi = %rdi 
     movq %rsi, 8(%rdi)      // mcontext.mc_rsi = %rsi
@@ -75,7 +75,7 @@ endfunc
  *
  * @param mcontext      %rdi
  */
-function tb_context_set_asm, export = 1
+function tb_context_set_asm, export=1
 
     movq 8(%rdi), %rsi      // %rsi = mcontext.mc_rsi 
     movq 16(%rdi), %rdx     // %rdx = mcontext.mc_rdx 

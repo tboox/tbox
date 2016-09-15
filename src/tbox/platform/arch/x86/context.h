@@ -53,32 +53,19 @@ __tb_extern_c_enter__
 // the mcontext type
 typedef struct __tb_mcontext_t
 {
-    tb_uint32_t             mc_onstack;
-    tb_uint32_t             mc_gs;
     tb_uint32_t             mc_fs;
     tb_uint32_t             mc_es;
     tb_uint32_t             mc_ds;
+    tb_uint32_t             mc_ss;
     tb_uint32_t             mc_edi;
     tb_uint32_t             mc_esi;
     tb_uint32_t             mc_ebp;
-    tb_uint32_t             mc_isp;
     tb_uint32_t             mc_ebx;
     tb_uint32_t             mc_edx;
     tb_uint32_t             mc_ecx;
     tb_uint32_t             mc_eax;
-    tb_uint32_t             mc_trapno;
-    tb_uint32_t             mc_err;
     tb_uint32_t             mc_eip;
-    tb_uint32_t             mc_cs;
-    tb_uint32_t             mc_eflags;
     tb_uint32_t             mc_esp; 
-    tb_uint32_t             mc_ss;
-
-#if 0
-    // unused
-    tb_uint32_t             mc_fpregs[28];
-    tb_uint32_t             padding[17];
-#endif
 
 }tb_mcontext_t, *tb_mcontext_ref_t;
 

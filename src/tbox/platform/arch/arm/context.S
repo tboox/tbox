@@ -31,7 +31,7 @@
  *
  * @return              r0
  */
-function tb_context_get_asm, export = 1
+function tb_context_get_asm, export=1
 
 	str	r1, [r0, #4]        // mcontext.mc_r1 = r1
 	str	r2, [r0, #8]        // mcontext.mc_r2 = r2
@@ -66,7 +66,7 @@ endfunc
  *
  * @param mcontext      r0
  */
-function tb_context_set_asm, export = 1
+function tb_context_set_asm, export=1
 
 	ldr	r1, [r0, #4]        // r1 = mcontext.mc_r1
 	ldr	r2, [r0, #8]        // r2 = mcontext.mc_r2

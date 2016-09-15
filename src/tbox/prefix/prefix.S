@@ -44,7 +44,9 @@
  * arch
  */
 
-#if defined(TB_ARCH_ARM_v7A)
+#if defined(TB_ARCH_ARM_v8)
+        .arch armv8-a
+#elif defined(TB_ARCH_ARM_v7A)
         .arch armv7-a
 #elif defined(TB_ARCH_ARM_v7)
         .arch armv7
@@ -87,12 +89,12 @@
 /*! function
  * 
  * @code
-    function func_xxxx, export = 1
+    function func_xxxx, export=1
         ...
     endfunc
    @endcode
  */
-.macro function name, export = 0
+.macro function name, export=0
     .macro endfunc
 #ifdef TB_ARCH_ELF
         .size \name, . - \name
