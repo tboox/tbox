@@ -27,9 +27,6 @@
  * includes
  */
 #include "prefix.h"
-#ifndef TB_CONFIG_OS_WINDOWS
-#   include <signal.h>
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -81,13 +78,15 @@ typedef struct __tb_mcontext_t
     tb_int_t                mc_esp; 
     tb_int_t                mc_ss;
 
+#if 0
+    // unused
     tb_int_t                mc_fpregs[28];
     tb_int_t                padding[17];
+#endif
 
 }tb_mcontext_t, *tb_mcontext_ref_t;
 
 // the ucontext stack type
-#ifdef TB_CONFIG_OS_WINDOWS
 typedef struct __tb_ucontext_stack_t
 {
     // the stack pointer
@@ -97,24 +96,10 @@ typedef struct __tb_ucontext_stack_t
     tb_size_t               ss_size;
 
 }tb_ucontext_stack_t;
-#endif
 
 // the ucontext type
 typedef struct __tb_ucontext_t
 {
-#ifndef TB_CONFIG_OS_WINDOWS
-    /* the sigmask (unused)
-     *
-     * Keep the order of the first two fields. 
-     * Also, keep them the first two fields in the structure.
-     * This way we can have a union with struct sigcontext and ucontext_t. 
-     * This allows us to support them both at the same time.
-     *
-     * note: the union is not defined, though.
-     */
-    sigset_t                uc_sigmask;
-#endif
-
     // the mcontext
     tb_mcontext_t           uc_mcontext;
 
@@ -122,14 +107,7 @@ typedef struct __tb_ucontext_t
     struct __tb_ucontext_t* uc_link;
 
     // the ucontext stack
-#ifdef TB_CONFIG_OS_WINDOWS
     tb_ucontext_stack_t     uc_stack;
-#else
-    stack_t                 uc_stack;
-#endif
-
-    // the padding data (unused)
-    tb_int_t                padding[8];
 
 }tb_ucontext_t, *tb_ucontext_ref_t;
 
