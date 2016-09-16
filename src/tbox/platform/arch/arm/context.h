@@ -138,6 +138,9 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     // make stack address
     tb_uint32_t* sp = (tb_uint32_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_uint32_t);
 
+    // 16-align
+    sp = (tb_uint32_t*)((tb_size_t)sp & ~0xf);
+
     // save arguments
     ucontext->uc_mcontext.mc_r0 = arg1;
     ucontext->uc_mcontext.mc_r1 = arg2;

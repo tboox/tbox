@@ -39,7 +39,11 @@ tb_void_t tb_print(tb_char_t const* string)
     tb_check_return(string);
 
     // print to the ios device log
+#ifdef TB_CONFIG_MODULE_HAVE_THREAD
     asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
+#else
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s", string);
+#endif
 
     // print to the stdout
     fputs(string, stdout);
@@ -50,7 +54,11 @@ tb_void_t tb_printl(tb_char_t const* string)
     tb_check_return(string);
 
     // print to the ios device log
-    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "[%08x]: %s\n", (tb_uint32_t)tb_thread_self(), string);
+#ifdef TB_CONFIG_MODULE_HAVE_THREAD
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
+#else
+    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s", string);
+#endif
 
     // print string to the stdout
     fputs(string, stdout);
