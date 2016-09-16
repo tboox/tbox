@@ -50,10 +50,9 @@ __tb_extern_c_enter__
  * types
  */
 
-// the mcontext type
+// the mcontext type, @note be incompatible with sigcontext
 typedef struct __tb_mcontext_t
 {
-//    tb_uint64_t             mc_onstack;    
     tb_uint64_t             mc_rdi;        
     tb_uint64_t             mc_rsi;
     tb_uint64_t             mc_rdx;
@@ -69,15 +68,8 @@ typedef struct __tb_mcontext_t
     tb_uint64_t             mc_r13;
     tb_uint64_t             mc_r14;
     tb_uint64_t             mc_r15;
-//    tb_uint64_t             mc_trapno;
-//    tb_uint64_t             mc_addr;
-//    tb_uint64_t             mc_flags;
-//    tb_uint64_t             mc_err;
     tb_uint64_t             mc_rip;
-//    tb_uint64_t             mc_cs;
-//    tb_uint64_t             mc_rflags;
     tb_uint64_t             mc_rsp;
-//    tb_uint64_t             mc_ss;
 
 }tb_mcontext_t, *tb_mcontext_ref_t;
 

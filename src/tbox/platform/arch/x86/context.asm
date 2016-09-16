@@ -44,18 +44,18 @@ tb_context_get_asm proc near
 
     mov eax, [esp + 4]              ; eax = [esp + 4] = mcontext
 
-    mov word ptr [eax + 8], fs      ; mcontext.mc_fs = fs
-    mov word ptr [eax + 12], es     ; mcontext.mc_es = es
-    mov word ptr [eax + 16], ds     ; mcontext.mc_ds = ds
-    mov word ptr [eax + 76], ss     ; mcontext.mc_ss = ss
-    mov [eax + 20], edi             ; mcontext.mc_edi = edi
-    mov [eax + 24], esi             ; mcontext.mc_esi = esi
-    mov [eax + 28], ebp             ; mcontext.mc_ebp = ebp
-    mov [eax + 36], ebx             ; mcontext.mc_ebx = ebx
-    mov [eax + 40], edx             ; mcontext.mc_edx = edx
-    mov [eax + 44], ecx             ; mcontext.mc_ecx = ecx
+    mov word ptr [eax], fs          ; mcontext.mc_fs = fs
+    mov word ptr [eax + 4], es      ; mcontext.mc_es = es
+    mov word ptr [eax + 8], ds      ; mcontext.mc_ds = ds
+    mov word ptr [eax + 12], ss     ; mcontext.mc_ss = ss
+    mov [eax + 16], edi             ; mcontext.mc_edi = edi
+    mov [eax + 20], esi             ; mcontext.mc_esi = esi
+    mov [eax + 24], ebp             ; mcontext.mc_ebp = ebp
+    mov [eax + 28], ebx             ; mcontext.mc_ebx = ebx
+    mov [eax + 32], edx             ; mcontext.mc_edx = edx
+    mov [eax + 36], ecx             ; mcontext.mc_ecx = ecx
 
-    mov dword ptr [eax + 48], 1	    ; mcontext.mc_eax = 1
+    mov dword ptr [eax + 40], 1	    ; mcontext.mc_eax = 1
                                     ; 
                                     ; if (getcontext(ctx) == 0) 
                                     ;      setcontext(ctx);
@@ -67,12 +67,12 @@ tb_context_get_asm proc near
     ; esp    : return addr => mcontext.mc_eip
     ;;
     mov ecx, [esp]	                ; mcontext.mc_eip = eip (the return address of tb_context_get())
-    mov [eax + 60], ecx
+    mov [eax + 44], ecx
 
     lea ecx, [esp + 4]	            ; mcontext.mc_esp = esp + 4 (after ret)
-    mov [eax + 72], ecx
+    mov [eax + 48], ecx
 
-    mov ecx, [eax + 44]	            ; restore ecx 
+    mov ecx, [eax + 36]	            ; restore ecx 
 
     mov eax, 0                      ; return 0
     ret
@@ -89,25 +89,26 @@ tb_context_set_asm proc near
 
     mov eax, [esp + 4]              ; eax = [esp + 4] = mcontext
 
-    mov fs, word ptr [eax + 8]      ; fs = mcontext.mc_fs
-    mov es, word ptr [eax + 12]     ; es = mcontext.mc_es
-    mov ds, word ptr [eax + 16]     ; ds = mcontext.mc_ds
-    mov ss, word ptr [eax + 76]     ; ss = mcontext.mc_ss
-    mov edi, [eax + 20]             ; edi = mcontext.mc_edi
-    mov esi, [eax + 24]             ; esi = mcontext.mc_esi
-    mov ebp, [eax + 28]             ; ebp = mcontext.mc_ebp
-    mov ebx, [eax + 36]             ; ebx = mcontext.mc_ebx
-    mov edx, [eax + 40]             ; edx = mcontext.mc_edx
-    mov ecx, [eax + 44]             ; ecx = mcontext.mc_ecx
+    mov fs, word ptr [eax]          ; fs = mcontext.mc_fs
+    mov es, word ptr [eax + 4]      ; es = mcontext.mc_es
+    mov ds, word ptr [eax + 8]      ; ds = mcontext.mc_ds
+    mov ss, word ptr [eax + 12]     ; ss = mcontext.mc_ss
+    mov edi, [eax + 16]             ; edi = mcontext.mc_edi
+    mov esi, [eax + 20]             ; esi = mcontext.mc_esi
+    mov ebp, [eax + 24]             ; ebp = mcontext.mc_ebp
+    mov ebx, [eax + 28]             ; ebx = mcontext.mc_ebx
+    mov edx, [eax + 32]             ; edx = mcontext.mc_edx
+    mov ecx, [eax + 36]             ; ecx = mcontext.mc_ecx
 
-    mov esp, [eax + 72]             ; esp = mcontext.mc_esp
+    mov esp, [eax + 48]             ; esp = mcontext.mc_esp
 
-    push [eax + 60]	                ; push mcontext.mc_eip to the return address
+    push [eax + 44]	                ; push mcontext.mc_eip to the return address
 
-    mov eax, [eax + 48]             ; eax = mcontext.mc_eax
+    mov eax, [eax + 40]             ; eax = mcontext.mc_eax
 
     ret                             ; return and goto mcontext.mc_eip
 
 tb_context_set_asm endp
 
 end
+

@@ -50,7 +50,7 @@ __tb_extern_c_enter__
  * types
  */
 
-// the mcontext type
+// the mcontext type, @note be incompatible with sigcontext
 typedef struct __tb_mcontext_t
 {
     tb_uint32_t             mc_fs;
