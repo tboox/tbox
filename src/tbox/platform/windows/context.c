@@ -45,8 +45,8 @@ tb_context_ref_t tb_context_init(tb_byte_t* data, tb_size_t size)
     // init context 
     tb_memset(data, 0, context_size);
 
-    // save context
-    return tb_context_save(context)? context : tb_null;
+    // ok
+    return context;
 }
 tb_void_t tb_context_exit(tb_context_ref_t context)
 {
