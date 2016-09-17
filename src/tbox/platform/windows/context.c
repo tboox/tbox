@@ -95,7 +95,9 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     // push return address(unused, only reverse the stack space)
     *--sp = 0;
 
-    // FIXME
+    // FIXME cannot access this argument(priv) in the callback function
+    // ...
+
     // push arguments
     mcontext->Rcx = tb_p2u64(priv);
 
