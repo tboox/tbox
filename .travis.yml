@@ -5,7 +5,7 @@ os:
   - osx
 
 install:
-  - git clone --branch=dev https://github.com/waruqi/xmake.git waruqi/xmake
+  - git clone --branch=dev https://github.com/waruqi/xmake.git waruqi/xmake --depth 1
   - cd ./waruqi/xmake
   - sudo ./install
   - cd -
