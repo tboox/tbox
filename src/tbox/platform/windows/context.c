@@ -96,9 +96,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     *--sp = 0;
 
     // push arguments
-    tb_uint64_t value = tb_p2u64(priv);
-    mcontext->Rcx = (tb_uint64_t)(tb_uint32_t)(value >> 32);
-    mcontext->Rdx = (tb_uint64_t)(tb_uint32_t)(value);
+    mcontext->Rcx = tb_p2u64(priv);
 
     /* save function and stack address
      *
@@ -132,9 +130,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     sp = (tb_uint32_t*)((tb_size_t)sp & ~0xf);
 
     // push arguments
-    tb_uint64_t value = tb_p2u64(priv);
-    *--sp = (tb_uint32_t)(value);
-    *--sp = (tb_uint32_t)(value >> 32);
+    *--sp = tb_p2u32(priv);
 
     // push return address(unused, only reverse the stack space)
     *--sp = 0;
