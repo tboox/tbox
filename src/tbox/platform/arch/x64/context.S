@@ -58,14 +58,12 @@ function tb_context_get_asm, export=1
     /* rsp + 8: ...         => mcontext.mc_rsp
      * rsp    : return addr => mcontext.mc_rip
      */
-    movq (%rsp), %rcx       // mcontext.mc_rip = %eip (the return address of tb_context_get())
-    movq %rcx, 120(%rdi)
+    movq (%rsp), %rax       // mcontext.mc_rip = %eip (the return address of tb_context_get())
+    movq %rax, 120(%rdi)
 
-    leaq 8(%rsp), %rcx      // mcontext.mc_rsp = %rsp + 8 (after ret)
-    movq %rcx, 128(%rdi)
+    leaq 8(%rsp), %rax      // mcontext.mc_rsp = %rsp + 8 (after ret)
+    movq %rax, 128(%rdi)
     
-    movq 24(%rdi), %rcx     // restore %rcx
-
     movq $0, %rax           // return 0
     ret
 
@@ -91,7 +89,6 @@ function tb_context_set_asm, export=1
     movq 96(%rdi), %r13     // %r13 = mcontext.mc_r13 
     movq 104(%rdi), %r14    // %r14 = mcontext.mc_r14 
     movq 112(%rdi), %r15    // %r15 = mcontext.mc_r15 
-
     movq 128(%rdi), %rsp    // %rsp = mcontext.mc_rsp 
 
     pushq 120(%rdi)         // push mcontext.mc_rip to the return address

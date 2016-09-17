@@ -80,16 +80,25 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     LPCONTEXT mcontext = (LPCONTEXT)context;
     tb_assert_and_check_return_val(mcontext && stack && stacksize && func, tb_false);
 
+    // save and restore the full machine context 
+    mcontext->ContextFlags = CONTEXT_FULL;
+
+    // get context first
+    if (!GetThreadContext(GetCurrentThread(), mcontext)) return tb_false;
+
     // make stack address
-    tb_long_t* sp = (tb_long_t*)stack + stacksize / sizeof(tb_long_t);
+    tb_uint64_t* sp = (tb_uint64_t*)stack + stacksize / sizeof(tb_uint64_t);
  
+    // 16-align 
+    sp = (tb_uint64_t*)((tb_size_t)sp & ~0xf);
+
     // push return address(unused, only reverse the stack space)
     *--sp = 0;
 
     // push arguments
     tb_uint64_t value = tb_p2u64(priv);
-    mcontext->Rdi = (tb_long_t)(tb_uint32_t)(value >> 32);
-    mcontext->Rsi = (tb_long_t)(tb_uint32_t)(value);
+    mcontext->Rcx = (tb_uint64_t)(tb_uint32_t)(value >> 32);
+    mcontext->Rdx = (tb_uint64_t)(tb_uint32_t)(value);
 
     /* save function and stack address
      *
@@ -97,12 +106,8 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
      * rsi:     arg2
      * sp:      return address(0)   => rsp 
      */
-    mcontext->Rip = (tb_long_t)func;
-    mcontext->Rsp = (tb_long_t)sp;
-    tb_assert_static(sizeof(tb_long_t) == 8);
-
-    // save and restore the full machine context 
-    mcontext->ContextFlags = CONTEXT_FULL;
+    mcontext->Rip = (tb_uint64_t)func;
+    mcontext->Rsp = (tb_uint64_t)sp;
 
     // ok
     return tb_true;
@@ -114,13 +119,22 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     LPCONTEXT mcontext = (LPCONTEXT)context;
     tb_assert_and_check_return_val(mcontext && stack && stacksize && func, tb_false);
 
+    // save and restore the full machine context 
+    mcontext->ContextFlags = CONTEXT_FULL;
+
+    // get context first
+    if (!GetThreadContext(GetCurrentThread(), mcontext)) return tb_false;
+
     // make stack address
-    tb_long_t* sp = (tb_long_t*)stack + stacksize / sizeof(tb_long_t);
+    tb_uint32_t* sp = (tb_uint32_t*)stack + stacksize / sizeof(tb_uint32_t);
+ 
+    // 16-align 
+    sp = (tb_uint32_t*)((tb_size_t)sp & ~0xf);
 
     // push arguments
     tb_uint64_t value = tb_p2u64(priv);
-    *--sp = (tb_long_t)(tb_uint32_t)(value);
-    *--sp = (tb_long_t)(tb_uint32_t)(value >> 32);
+    *--sp = (tb_uint32_t)(value);
+    *--sp = (tb_uint32_t)(value >> 32);
 
     // push return address(unused, only reverse the stack space)
     *--sp = 0;
@@ -131,12 +145,8 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
      * sp + 4:  arg1                         
      * sp:      return address(0)   => esp 
      */
-    mcontext->Eip = (tb_long_t)func;
-    mcontext->Esp = (tb_long_t)sp;
-    tb_assert_static(sizeof(tb_long_t) == 4);
-
-    // save and restore the full machine context 
-    mcontext->ContextFlags = CONTEXT_FULL;
+    mcontext->Eip = (tb_uint32_t)func;
+    mcontext->Esp = (tb_uint32_t)sp;
 
     // ok
     return tb_true;

@@ -138,8 +138,13 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
     tb_assert_and_check_return(ucontext && argc == 2);
 
     // save arguments
+#ifdef TB_CONFIG_OS_WINDOWS
+    ucontext->uc_mcontext.mc_rcx = arg1;
+    ucontext->uc_mcontext.mc_rdx = arg2;
+#else
     ucontext->uc_mcontext.mc_rdi = arg1;
     ucontext->uc_mcontext.mc_rsi = arg2;
+#endif
 
     // make stack address
     tb_uint64_t* sp = (tb_uint64_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_uint64_t);

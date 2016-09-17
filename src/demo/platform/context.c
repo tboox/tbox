@@ -19,6 +19,7 @@ static tb_void_t tb_demo_platform_context_test_func1(tb_uint32_t priv_hi, tb_uin
     tb_context_ref_t* contexts = (tb_context_ref_t*)tb_context_priv(priv_hi, priv_lo);
     tb_assert_and_check_return(contexts);
 
+    tb_trace_i("%p", contexts);
     // loop
     tb_size_t count = 10;
     while (count--)

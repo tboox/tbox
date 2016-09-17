@@ -36,7 +36,7 @@ option casemap :none
 
 ; get mcontext
 ;
-; @param mcontext      the mcontext
+; @param mcontext      [esp + 4]
 ;
 ; @return              the error code, ok: 0
 ;;
@@ -81,7 +81,7 @@ tb_context_get_asm endp
 
 ; set mcontext
 ;
-; @param mcontext      the mcontext
+; @param mcontext      [esp + 4]
 ;
 ; @return              when successful, does not return. 
 ;;

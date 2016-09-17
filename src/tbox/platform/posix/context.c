@@ -94,16 +94,20 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     ucontext_t* ucontext = (ucontext_t*)context;
     tb_assert_and_check_return_val(ucontext && stack && stacksize && func, tb_false);
 
-    // init stack and size
-    ucontext->uc_stack.ss_sp    = stack;
-    ucontext->uc_stack.ss_size  = stacksize;
+    // get context first
+    if (getcontext(ucontext) == 0)
+    {
+        // init stack and size
+        ucontext->uc_stack.ss_sp    = stack;
+        ucontext->uc_stack.ss_size  = stacksize;
 
-    // init link
-    ucontext->uc_link = tb_null;
+        // init link
+        ucontext->uc_link = tb_null;
 
-    // make it
-    tb_uint64_t value = tb_p2u64(priv);
-    makecontext(ucontext, (tb_void_t(*)())func, 2, (tb_uint32_t)(value >> 32), (tb_uint32_t)value);
+        // make it
+        tb_uint64_t value = tb_p2u64(priv);
+        makecontext(ucontext, (tb_void_t(*)())func, 2, (tb_uint32_t)(value >> 32), (tb_uint32_t)value);
+    }
 
     // ok
     return tb_true;
