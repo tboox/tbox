@@ -126,14 +126,13 @@ tb_int_t                tb_context_set_asm(tb_mcontext_ref_t mcontext);
  * @param func          the function pointer
  * @param argc          the arguments count
  * @param arg1          the first argument
- * @param arg2          the second argument
  *
  * @return              the error code, ok: 0
  */
-static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*func)(tb_void_t), tb_int_t argc, tb_int_t arg1, tb_int_t arg2)
+static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*func)(tb_void_t), tb_int_t argc, tb_size_t arg1)
 {
     // check
-    tb_assert_and_check_return(ucontext && argc == 2);
+    tb_assert_and_check_return(ucontext && argc == 1);
 
     // make stack address
     tb_uint32_t* sp = (tb_uint32_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_uint32_t);
@@ -143,7 +142,6 @@ static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*fun
 
     // save arguments
     ucontext->uc_mcontext.mc_r0 = arg1;
-    ucontext->uc_mcontext.mc_r1 = arg2;
 
     /* save function and stack address
      *

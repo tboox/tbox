@@ -13,13 +13,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_platform_context_test_func1(tb_uint32_t priv_hi, tb_uint32_t priv_lo)
+static tb_void_t tb_demo_platform_context_test_func1(tb_cpointer_t priv)
 {
     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)tb_context_priv(priv_hi, priv_lo);
+    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
     tb_assert_and_check_return(contexts);
 
-    tb_trace_i("%p", contexts);
     // loop
     tb_size_t count = 10;
     while (count--)
@@ -34,10 +33,10 @@ static tb_void_t tb_demo_platform_context_test_func1(tb_uint32_t priv_hi, tb_uin
     // switch to the main function
     tb_context_switch(contexts[0]);
 }
-static tb_void_t tb_demo_platform_context_test_func2(tb_uint32_t priv_hi, tb_uint32_t priv_lo)
+static tb_void_t tb_demo_platform_context_test_func2(tb_cpointer_t priv)
 {
     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)tb_context_priv(priv_hi, priv_lo);
+    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
     tb_assert_and_check_return(contexts);
 
     // loop
@@ -88,10 +87,10 @@ static tb_void_t tb_demo_platform_context_test()
     tb_context_exit(contexts[1]);
     tb_context_exit(contexts[2]);
 }
-static tb_void_t tb_demo_platform_context_perf_func1(tb_uint32_t priv_hi, tb_uint32_t priv_lo)
+static tb_void_t tb_demo_platform_context_perf_func1(tb_cpointer_t priv)
 {
     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)tb_context_priv(priv_hi, priv_lo);
+    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
     tb_assert_and_check_return(contexts);
 
     // loop
@@ -105,10 +104,10 @@ static tb_void_t tb_demo_platform_context_perf_func1(tb_uint32_t priv_hi, tb_uin
     // switch to the main function
     tb_context_switch(contexts[0]);
 }
-static tb_void_t tb_demo_platform_context_perf_func2(tb_uint32_t priv_hi, tb_uint32_t priv_lo)
+static tb_void_t tb_demo_platform_context_perf_func2(tb_cpointer_t priv)
 {
-     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)tb_context_priv(priv_hi, priv_lo);
+    // check
+    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
     tb_assert_and_check_return(contexts);
 
     // loop

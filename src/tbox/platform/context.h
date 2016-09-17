@@ -35,13 +35,6 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/// get the user private data for the context function
-#define tb_context_priv(priv_hi, priv_lo)   ((tb_cpointer_t)(tb_size_t)((((tb_uint64_t)(priv_hi) << 32)) | (priv_lo)))
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -49,7 +42,7 @@ __tb_extern_c_enter__
 typedef __tb_typeref__(context);
 
 /// the context func type
-typedef tb_void_t (*tb_context_func_t)(tb_uint32_t priv_hi, tb_uint32_t priv_lo);
+typedef tb_void_t (*tb_context_func_t)(tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

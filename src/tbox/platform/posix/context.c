@@ -105,8 +105,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
         ucontext->uc_link = tb_null;
 
         // make it
-        tb_uint64_t value = tb_p2u64(priv);
-        makecontext(ucontext, (tb_void_t(*)())func, 2, (tb_uint32_t)(value >> 32), (tb_uint32_t)value);
+        makecontext(ucontext, (tb_void_t(*)())func, 1, (tb_size_t)priv);
     }
 
     // ok

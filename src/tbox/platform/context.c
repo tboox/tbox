@@ -63,7 +63,6 @@
         defined(TB_CONFIG_POSIX_HAVE_SETCONTEXT) && \
         defined(TB_CONFIG_POSIX_HAVE_MAKECONTEXT)
 #   include "posix/context.c"
-
 // stub
 #else
 tb_size_t tb_context_size()
