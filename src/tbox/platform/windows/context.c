@@ -95,13 +95,13 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     // push return address(unused, only reverse the stack space)
     *--sp = 0;
 
+    // FIXME
     // push arguments
     mcontext->Rcx = tb_p2u64(priv);
 
     /* save function and stack address
      *
-     * rdi:     arg1
-     * rsi:     arg2
+     * rcx:     arg1
      * sp:      return address(0)   => rsp 
      */
     mcontext->Rip = (tb_uint64_t)func;
@@ -137,7 +137,6 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
 
     /* save function and stack address
      *
-     * sp + 8:  arg2
      * sp + 4:  arg1                         
      * sp:      return address(0)   => esp 
      */
