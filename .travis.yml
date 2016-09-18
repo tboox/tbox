@@ -3,6 +3,9 @@ language: C
 os:
   - linux
   - osx
+compiler:
+  - gcc
+  - clang
 
 install:
   - git clone --branch=dev https://github.com/waruqi/xmake.git waruqi/xmake --depth 1

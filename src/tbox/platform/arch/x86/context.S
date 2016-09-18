@@ -31,7 +31,7 @@
  *
  * @return              %eax
  */
-function tb_context_get_asm, export=1
+function(tb_context_get_asm)
 
 	movl 4(%esp), %eax      // %eax = [%esp + 4] = mcontext
 
@@ -74,7 +74,7 @@ endfunc
  *
  * @param mcontext      [%esp + 4]
  */
-function tb_context_set_asm, export=1
+function(tb_context_set_asm)
 
 	movl 4(%esp), %eax      // %eax = [%esp + 4] = mcontext
 

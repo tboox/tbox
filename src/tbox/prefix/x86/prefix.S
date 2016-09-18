@@ -22,21 +22,33 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * includes
+ * macros
  */
-#include "config.h"
-#include "arch.h"
-#include "cpu.h"
-#include "endian.h"
-#include "compiler.h"
-#include "cache.h"
-#if defined(TB_ARCH_x86)
-#   include "x86/prefix.S"
-#elif defined(TB_ARCH_x64)
-#   include "x64/prefix.S"
-#elif defined(TB_ARCH_ARM64)
-#   include "arm64/prefix.S"
-#elif defined(TB_ARCH_ARM)
-#   include "arm/prefix.S"
+
+/*! function
+ * 
+ * @code
+    function(func_xxxx)
+        ...
+    endfunc
+   @endcode
+ */
+#ifdef TB_ARCH_ELF
+#   define function(name) \
+    .text ;\
+    .align TB_CPU_BITBYTE ; \
+    .global name ;\
+    .type   name, %function; \
+    .hidden name; \
+name:
+#else
+#   define function(name) \
+    .text ;\
+    .align TB_CPU_BITBYTE ; \
+    .global _##name ;\
+_##name:
 #endif
+
+// end function
+#define endfunc
 
