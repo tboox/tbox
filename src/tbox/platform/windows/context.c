@@ -64,14 +64,14 @@ tb_bool_t tb_context_save(tb_context_ref_t context)
     // get it
     return GetThreadContext(GetCurrentThread(), mcontext);
 }
-tb_bool_t tb_context_switch(tb_context_ref_t context)
+tb_void_t tb_context_switch(tb_context_ref_t context)
 {
     // check
     LPCONTEXT mcontext = (LPCONTEXT)context;
-    tb_assert_and_check_return_val(mcontext, tb_false);
+    tb_assert_and_check_return(mcontext);
 
     // set it
-    return SetThreadContext(GetCurrentThread(), mcontext);
+    SetThreadContext(GetCurrentThread(), mcontext);
 }
 #ifdef TB_ARCH_x64
 tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv)
@@ -149,9 +149,18 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     return tb_true;
 }
 #endif
-tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
+tb_void_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
 {
-    // swap it
-    return tb_context_save(context)? tb_context_switch(context_new) : tb_false;
+    // check
+    tb_assert_and_check_return(context && context_new);
+
+    // save and restore the full machine context 
+    ((LPCONTEXT)context)->ContextFlags      = CONTEXT_FULL;
+    ((LPCONTEXT)context_new)->ContextFlags  = CONTEXT_FULL;
+
+    // get it
+    HANDLE thread = GetCurrentThread();
+    if (GetThreadContext(thread, (LPCONTEXT)context))
+        SetThreadContext(thread, (LPCONTEXT)context_new);
 }
 

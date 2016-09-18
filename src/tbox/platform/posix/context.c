@@ -70,23 +70,18 @@ tb_void_t tb_context_exit(tb_context_ref_t context)
 tb_bool_t tb_context_save(tb_context_ref_t context)
 {
     // check
-    ucontext_t* ucontext = (ucontext_t*)context;
-    tb_assert_and_check_return_val(ucontext, tb_false);
+    tb_assert(context);
 
     // get it
-    return getcontext(ucontext) == 0;
+    return getcontext((ucontext_t*)context) == 0;
 }
-tb_bool_t tb_context_switch(tb_context_ref_t context)
+tb_void_t tb_context_switch(tb_context_ref_t context)
 {
     // check
-    ucontext_t* ucontext = (ucontext_t*)context;
-    tb_assert_and_check_return_val(ucontext, tb_false);
+    tb_assert(context);
 
     // set it 
-    setcontext(ucontext);
-
-    // failed
-    return tb_false;
+    setcontext((ucontext_t*)context);
 }
 tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv)
 {
@@ -112,18 +107,22 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     return tb_true;
 }
 #ifdef TB_CONFIG_POSIX_HAVE_SWAPCONTEXT
-tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
+tb_void_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
 {
     // check
-    tb_assert_and_check_return_val(context && context_new, tb_false);
+    tb_assert(context && context_new);
 
     // swap it
-    return swapcontext((ucontext_t*)context, (ucontext_t*)context_new) == 0;
+    swapcontext((ucontext_t*)context, (ucontext_t*)context_new);
 }
 #else
-tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
+tb_void_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
 {
+    // check
+    tb_assert(context && context_new);
+
     // swap it
-    return tb_context_save(context)? tb_context_switch(context_new) : tb_false;
+    if (getcontext((ucontext_t*)context) == 0) 
+        setcontext((ucontext_t*)context_new);
 }
 #endif

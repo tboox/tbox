@@ -96,20 +96,20 @@ tb_bool_t tb_context_save(tb_context_ref_t context)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_context_switch(tb_context_ref_t context)
+tb_void_t tb_context_switch(tb_context_ref_t context)
 {
     tb_trace_noimpl();
-    return tb_false;
 }
 tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
+tb_void_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new)
 {
     // swap it
-    return tb_context_save(context)? tb_context_switch(context_new) : tb_false;
+    if (tb_context_save(context))
+        tb_context_switch(context_new);
 }
 #endif
 

@@ -80,10 +80,8 @@ tb_bool_t               tb_context_save(tb_context_ref_t context);
 /*! switchs to the given thread's execution context
  *
  * @param context       the context
- *
- * @return              tb_true or tb_false
  */
-tb_bool_t               tb_context_switch(tb_context_ref_t context);
+tb_void_t               tb_context_switch(tb_context_ref_t context);
 
 /*! make context with a given function and stack
  *
@@ -104,10 +102,8 @@ tb_bool_t               tb_context_make(tb_context_ref_t context, tb_pointer_t s
  *
  * @param context       the old context
  * @param context_new   the new context
- *
- * @return              tb_true or tb_false
  */
-tb_bool_t               tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new);
+tb_void_t               tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
