@@ -105,9 +105,6 @@ tb_bool_t tb_ipaddr_is_empty(tb_ipaddr_ref_t ipaddr)
     // check
     tb_assert_and_check_return_val(ipaddr, tb_true);
 
-    // no port?
-    if (!ipaddr->port) return tb_true;
-
     // no ip?
     return tb_ipaddr_ip_is_empty(ipaddr);
 }
