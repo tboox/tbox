@@ -25,77 +25,107 @@
  * implementation
  */
 
-/* get mcontext
+/* make context (refer to boost.context)
  *
- * @param mcontext      %rdi
+ *             -------------------------------------------------------------------------------
+ * stackdata: |                                                |         context        |||||||
+ *             -------------------------------------------------------------------------|-----
+ *                                                                             (16-align for macosx)
  *
- * @return              %rax
+ *
+ *             -------------------------------------------------------------------------------
+ * context:   |   r12   |   r13   |   r14   |   r15   |   rbx   |   rbp   |   rip   |   end   | padding | args ...
+ *             -------------------------------------------------------------------------------
+ *            0         8         16        24        32        40        48        56        |
+ *                                                                                     16-align for macosx
+ *
+ * @param stackdata     the stack data (rdi)
+ * @param stacksize     the stack size (rsi)
+ * @param func          the entry function (rdx)
+ *
+ * @return              the context pointer (rax)
  */
-function(tb_context_get_asm)
+function(tb_context_make)
 
-    movq %rdi, (%rdi)       // mcontext.mc_rdi = %rdi 
-    movq %rsi, 8(%rdi)      // mcontext.mc_rsi = %rsi
-    movq %rdx, 16(%rdi)     // mcontext.mc_rdx = %rdx 
-    movq %rcx, 24(%rdi)     // mcontext.mc_rcx = %rcx 
-    movq %r8, 32(%rdi)      // mcontext.mc_r8  = %r8 
-    movq %r9, 40(%rdi)      // mcontext.mc_r9  = %r9 
-    movq $1, 48(%rdi)       /* mcontext.mc_rax = 1
-                             * 
-                             * if (getcontext(ctx) == 0) 
-                             *      setcontext(ctx);
-                             *
-                             * getcontext() will return 1 after calling setcontext()
-                             */
-    movq %rbx, 56(%rdi)     // mcontext.mc_rbx = %rbx 
-    movq %rbp, 64(%rdi)     // mcontext.mc_rbp = %rbp
-    movq %r10, 72(%rdi)     // mcontext.mc_r10 = %r10 
-    movq %r11, 80(%rdi)     // mcontext.mc_r11 = %r11 
-    movq %r12, 88(%rdi)     // mcontext.mc_r12 = %r12 
-    movq %r13, 96(%rdi)     // mcontext.mc_r13 = %r13 
-    movq %r14, 104(%rdi)    // mcontext.mc_r14 = %r14 
-    movq %r15, 112(%rdi)    // mcontext.mc_r15 = %r15 
+    // save the stack top to rax
+    addq %rsi, %rdi
+    movq %rdi, %rax
 
-    /* rsp + 8: ...         => mcontext.mc_rsp
-     * rsp    : return addr => mcontext.mc_rip
-     */
-    movq (%rsp), %rax       // mcontext.mc_rip = %eip (the return address of tb_context_get())
-    movq %rax, 120(%rdi)
+    // 16-align for the stack top address
+    movabs $-16, %r8
+    andq %r8, %rax
 
-    leaq 8(%rsp), %rax      // mcontext.mc_rsp = %rsp + 8 (after ret)
-    movq %rax, 128(%rdi)
-    
-    movq $0, %rax           // return 0
-    ret
+    // reserve space for context-data on context-stack
+    leaq -64(%rax), %rax
+
+    // context.rip = func
+    movq %rdx, 48(%rax)
+
+    // context.end = the address of label __end
+    leaq __end(%rip), %rcx
+    movq %rcx, 56(%rax)
+
+    // return the context pointer
+    ret 
+
+__end:
+    // exit(0)
+    xorq  %rdi, %rdi
+    call  __exit
+    hlt
 
 endfunc
 
-/* set mcontext
+/* jump context (refer to boost.context)
  *
- * @param mcontext      %rdi
+ * @param context       the to-context (rdi)
+ * @param priv          the passed user private data (rsi)
+ *
+ * @return              the from-context (context: rax, priv: rdx)
  */
-function(tb_context_set_asm)
+function(tb_context_jump)
 
-    movq 8(%rdi), %rsi      // %rsi = mcontext.mc_rsi 
-    movq 16(%rdi), %rdx     // %rdx = mcontext.mc_rdx 
-    movq 24(%rdi), %rcx     // %rcx = mcontext.mc_rcx 
-    movq 32(%rdi), %r8      // %r8 = mcontext.mc_r8
-    movq 40(%rdi), %r9      // %r9 = mcontext.mc_r9 
-    movq 48(%rdi), %rax     // %rax = mcontext.mc_rax
-    movq 56(%rdi), %rbx     // %rbx = mcontext.mc_rbx 
-    movq 64(%rdi), %rbp     // %rbp = mcontext.mc_rbp 
-    movq 72(%rdi), %r10     // %r10 = mcontext.mc_r10 
-    movq 80(%rdi), %r11     // %r11 = mcontext.mc_r11 
-    movq 88(%rdi), %r12     // %r12 = mcontext.mc_r12 
-    movq 96(%rdi), %r13     // %r13 = mcontext.mc_r13 
-    movq 104(%rdi), %r14    // %r14 = mcontext.mc_r14 
-    movq 112(%rdi), %r15    // %r15 = mcontext.mc_r15 
-    movq 128(%rdi), %rsp    // %rsp = mcontext.mc_rsp 
+    /* save registers and construct the current context
+     *
+     *             -------------------------------------------------------------------------------
+     * context:   |   r12   |   r13   |   r14   |   r15   |   rbx   |   rbp   |   rip   |   end   |
+     *             -------------------------------------------------------------------------------
+     *            0         8         16        24        32        40        48        56        |
+     *            |                                                                |
+     *           rsp                                                return address of tb_context_jump()
+     */
+    pushq %rbp
+    pushq %rbx
+    pushq %r15
+    pushq %r14
+    pushq %r13
+    pushq %r12
 
-    pushq 120(%rdi)         // push mcontext.mc_rip to the return address
+    // save the current context(rsp) to rax
+    movq %rsp, %rax
 
-    movq (%rdi), %rdi       // %rdi = mcontext.mc_rdi 
+    // switch to the new context(rsp) and stack
+    movq %rdi, %rsp
 
-    ret                     // return and goto mcontext.mc_rip
+    // restore registers of the new context
+    popq %r12
+    popq %r13
+    popq %r14
+    popq %r15
+    popq %rbx
+    popq %rbp
+
+    // restore the return or function address(rip)
+    popq %r8
+
+    // return from-context(context: rax, priv: rdx) from jump 
+    movq %rsi, %rdx
+
+    // pass from-context(context: rdi, priv: rsi) argument to the context function
+    movq %rax, %rdi
+
+    // jump to the return or function address(rip)
+    jmp *%r8
 
 endfunc
 

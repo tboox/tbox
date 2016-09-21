@@ -25,77 +25,141 @@
  * implementation
  */
 
-/* get mcontext
+/* make context (refer to boost.context)
  *
- * @param mcontext      [%esp + 4]
  *
- * @return              %eax
+ *             --------------------------------------------------------------------------------
+ * stackdata: |                                                |         context        ||||||||
+ *             -------------------------------------------------------------------------|------
+ *                                                                              (16-align for macosx)
+ *
+ *
+ *                                    func     __end   __trampoline                 from
+ *             --------------------------------------------------------------------------------
+ * context:   |   edi   |   esi   |   ebx   |   ebp   |   eip   |  padding  | context |  priv  |
+ *             --------------------------------------------------------------------------------
+ *            0         4         8         12        16        20          24        28
+ *                                                              |
+ *                                                      16-align for macosx
+ *
+ * @param stackdata     the stack data (esp + 4)
+ * @param stacksize     the stack size (esp + 8)
+ * @param func          the entry function (esp + 12)
+ *
+ * @return              the context pointer (eax)
  */
-function(tb_context_get_asm)
+function(tb_context_make)
 
-	movl 4(%esp), %eax      // %eax = [%esp + 4] = mcontext
+    // save the stack top to eax
+    movl 4(%esp), %eax
+    addl 8(%esp), %eax
 
-	movw %fs, (%eax)       // mcontext.mc_fs = %fs
-	movw %es, 4(%eax)      // mcontext.mc_es = %es
-	movw %ds, 8(%eax)      // mcontext.mc_ds = %ds
-	movw %ss, 12(%eax)      // mcontext.mc_ss = %ss
-	movl %edi, 16(%eax)     // mcontext.mc_edi = %edi
-	movl %esi, 20(%eax)     // mcontext.mc_esi = %esi
-	movl %ebp, 24(%eax)     // mcontext.mc_ebp = %ebp
-	movl %ebx, 28(%eax)     // mcontext.mc_ebx = %ebx
-	movl %edx, 32(%eax)     // mcontext.mc_edx = %edx
-	movl %ecx, 36(%eax)     // mcontext.mc_ecx = %ecx
+    // reserve space for first argument(from) of context-function
+    leal -8(%eax), %eax
 
-	movl $1, 40(%eax)	    /* mcontext.mc_eax = 1
-                             * 
-                             * if (getcontext(ctx) == 0) 
-                             *      setcontext(ctx);
-                             *
-                             * getcontext() will return 1 after calling setcontext()
-                             */
+    // 16-align of the stack top address for macosx
+    andl $-16, %eax
 
-    /* esp + 4: ...         => mcontext.mc_esp
-     * esp    : return addr => mcontext.mc_eip
-     */
-	movl (%esp), %ecx	    // mcontext.mc_eip = %eip (the return address of tb_context_get())
-	movl %ecx, 44(%eax)
+    // TODO 40? 20
+    // reserve space for context-data on context-stack 
+    leal -40(%eax), %eax
 
-	leal 4(%esp), %ecx	    // mcontext.mc_esp = %esp + 4 (after ret)
-	movl %ecx, 48(%eax)
+    // context.ebx = func
+    movl 12(%esp), %edx
+    movl %edx, 8(%eax)
 
-	movl 36(%eax), %ecx	    // restore %ecx 
+    // TODO
+    /* return transport_t */
+    /* FCTX == EDI, DATA == ESI */
+    leal (%eax), %ecx
+    movl %ecx, 20(%eax)
 
-	movl $0, %eax           // return 0
-	ret
+    // context.eip = the address of label __trampoline
+    call 1f
+1:  popl %ecx
+    addl $__trampoline - 1b, %ecx
+    movl %ecx, 16(%eax)
+
+    // context.ebp = the address of label __end
+    call 2f
+2:  popl %ecx
+    addl $__end - 2b, %ecx
+    movl %ecx, 12(%eax) 
+
+    // return the context pointer
+    ret 
+
+__trampoline:
+    /* move transport_t for entering context-function */
+    movl  %edi, (%esp)
+    movl  %esi, 4(%esp)
+    pushl %ebp
+
+    // jump to the return or function address(ebx)
+    jmp *%ebx
+
+__end:
+    // exit(0)
+    xorl  %eax, %eax
+    movl  %eax, (%esp)
+    call  __exit
+    hlt
 
 endfunc
 
-/* set mcontext
+/* jump context (refer to boost.context)
  *
- * @param mcontext      [%esp + 4]
+ * @param context       the to-context (rdi)
+ * @param priv          the passed user private data (rsi)
+ *
+ * @return              the from-context (context: rax, priv: rdx)
  */
-function(tb_context_set_asm)
+function(tb_context_jump)
 
-	movl 4(%esp), %eax      // %eax = [%esp + 4] = mcontext
+    /* save registers and construct the current context
+     *
+     *                                    func     __end   __trampoline                 from
+     *             -------------------------------------------------------------------------------
+     * context:   |   edi   |   esi   |   ebx   |   ebp   |   eip   |  padding  |  context   |   priv   |
+     *             -------------------------------------------------------------------------------
+     *            0         4         8         12        16        20                         |
+     *            |                                                                |
+     *           esp                                                return address of tb_context_jump()
+     */
+    pushl %ebp 
+    pushl %ebx 
+    pushl %esi 
+    pushl %edi 
 
-	movw (%eax), %fs       // %fs = mcontext.mc_fs
-	movw 4(%eax), %es      // %es = mcontext.mc_es
-	movw 8(%eax), %ds      // %ds = mcontext.mc_ds
-	movw 12(%eax), %ss      // %ss = mcontext.mc_ss
-	movl 16(%eax), %edi     // %edi = mcontext.mc_edi
-	movl 20(%eax), %esi     // %esi = mcontext.mc_esi
-	movl 24(%eax), %ebp     // %ebp = mcontext.mc_ebp
-	movl 28(%eax), %ebx     // %ebx = mcontext.mc_ebx
-	movl 32(%eax), %edx     // %edx = mcontext.mc_edx
-	movl 36(%eax), %ecx     // %ecx = mcontext.mc_ecx
+    // save the current context(esp) to ecx
+    movl %esp, %ecx
 
-	movl 48(%eax), %esp     // %esp = mcontext.mc_esp
+    // eax = argument(context)
+//    movl 24(%esp), %eax
+    movl 20(%esp), %eax
 
-	pushl 44(%eax)	        // push mcontext.mc_eip to the return address
+    // edx = argument(priv)
+//    movl 28(%esp), %edx
+    movl 24(%esp), %edx
 
-	movl 40(%eax), %eax     // %eax = mcontext.mc_eax
+    // switch to the new context(esp) and stack
+    movl %eax, %esp
 
-	ret                     // return and goto mcontext.mc_eip
+    /* address of returned transport_t */
+    movl 20(%esp), %eax
+    /* return parent fcontext_t */
+    movl %ecx, (%eax)
+    /* return data */
+    movl %edx, 4(%eax)
+
+    // restore registers of the new context
+    popl %edi 
+    popl %esi
+    popl %ebx
+    popl %ebp
+
+    // jump to the address of label __trampoline(eip)
+    ret $4
 
 endfunc
 

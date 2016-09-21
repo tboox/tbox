@@ -29,137 +29,26 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_enter__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
-// set context
-#define tb_context_set_impl(ctx)                    tb_context_set_asm(&(ctx)->uc_mcontext)
-
-// get context
-#define tb_context_get_impl(ctx)                    tb_context_get_asm(&(ctx)->uc_mcontext)
-
-// make context
-#define tb_context_make_impl                        tb_context_make_asm
+// enable arch context implementation
+#define TB_CONTEXT_ARCH_IMPL 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the mcontext type, @note be incompatible with sigcontext
-typedef struct __tb_mcontext_t
+// the context type
+typedef struct __tb_context_t
 {
-    tb_uint32_t             mc_fs;
-    tb_uint32_t             mc_es;
-    tb_uint32_t             mc_ds;
-    tb_uint32_t             mc_ss;
-    tb_uint32_t             mc_edi;
-    tb_uint32_t             mc_esi;
-    tb_uint32_t             mc_ebp;
-    tb_uint32_t             mc_ebx;
-    tb_uint32_t             mc_edx;
-    tb_uint32_t             mc_ecx;
-    tb_uint32_t             mc_eax;
-    tb_uint32_t             mc_eip;
-    tb_uint32_t             mc_esp; 
+    // the registers
+    tb_uint32_t             edi;
+    tb_uint32_t             esi;
+    tb_uint32_t             ebx;
+    tb_uint32_t             ebp;
+    tb_uint32_t             eip;
 
-}tb_mcontext_t, *tb_mcontext_ref_t;
-
-// the ucontext stack type
-typedef struct __tb_ucontext_stack_t
-{
-    // the stack pointer
-    tb_pointer_t            ss_sp;
-
-    // the stack size
-    tb_size_t               ss_size;
-
-}tb_ucontext_stack_t;
-
-// the ucontext type
-typedef struct __tb_ucontext_t
-{
-    // the mcontext
-    tb_mcontext_t           uc_mcontext;
-
-    // the ucontext link (unused)
-    struct __tb_ucontext_t* uc_link;
-
-    // the ucontext stack
-    tb_ucontext_stack_t     uc_stack;
-
-}tb_ucontext_t, *tb_ucontext_ref_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * declarations
- */
-
-/* get mcontext
- *
- * @param mcontext      the mcontext
- *
- * @return              the error code, ok: 0
- */
-tb_int_t                tb_context_get_asm(tb_mcontext_ref_t mcontext);
-
-/* set mcontext
- *
- * @param mcontext      the mcontext
- *
- * @return              when successful, does not return. 
- */
-tb_int_t                tb_context_set_asm(tb_mcontext_ref_t mcontext);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-
-/* make ucontext
- *
- * @param ucontext      the ucontext
- * @param func          the function pointer
- * @param argc          the arguments count
- * @param arg1          the first argument
- *
- * @return              the error code, ok: 0
- */
-static tb_void_t tb_context_make_asm(tb_ucontext_ref_t ucontext, tb_void_t (*func)(tb_void_t), tb_int_t argc, tb_size_t arg1)
-{
-    // check
-    tb_assert_and_check_return(ucontext && argc == 1);
-
-    // make stack address
-    tb_uint32_t* sp = (tb_uint32_t*)ucontext->uc_stack.ss_sp + ucontext->uc_stack.ss_size / sizeof(tb_uint32_t);
-
-    // reserve the arguments space
-    sp -= argc;
-
-    // 16-align for macosx
-    sp = (tb_uint32_t*)((tb_size_t)sp & ~0xf);
-
-    // push arguments
-    sp[0] = arg1;
-
-    // push return address(unused, only reverse the stack space)
-    *--sp = 0;
-
-    /* save function and stack address
-     *
-     *          padding 
-     * sp + 4:  arg1                       
-     * sp:      return address(0)   => mc_esp <-------- 16-align for macosx
-     */
-    ucontext->uc_mcontext.mc_eip = (tb_uint32_t)func;
-    ucontext->uc_mcontext.mc_esp = (tb_uint32_t)sp;
-}
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
+}tb_context_t;
 
 #endif

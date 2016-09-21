@@ -13,11 +13,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_platform_context_test_func1(tb_cpointer_t priv)
+static tb_void_t tb_demo_platform_context_test_func1(tb_context_from_t from)
 {
     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
+    tb_context_ref_t* contexts = (tb_context_ref_t*)from.priv;
     tb_assert_and_check_return(contexts);
+
+    // save main context
+    contexts[0] = from.context;
+
+    // jump to context2
+    from.context = contexts[2];
 
     // loop
     tb_size_t count = 10;
@@ -27,16 +33,16 @@ static tb_void_t tb_demo_platform_context_test_func1(tb_cpointer_t priv)
         tb_trace_i("func1: %lu", count);
 
         // switch to the func2
-        tb_context_swap(contexts[1], contexts[2]);
+        from = tb_context_jump(from.context, contexts);
     }
 
     // switch to the main function
-    tb_context_switch(contexts[0]);
+    tb_context_jump(contexts[0], tb_null);
 }
-static tb_void_t tb_demo_platform_context_test_func2(tb_cpointer_t priv)
+static tb_void_t tb_demo_platform_context_test_func2(tb_context_from_t from)
 {
     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
+    tb_context_ref_t* contexts = (tb_context_ref_t*)from.priv;
     tb_assert_and_check_return(contexts);
 
     // loop
@@ -47,67 +53,61 @@ static tb_void_t tb_demo_platform_context_test_func2(tb_cpointer_t priv)
         tb_trace_i("func2: %lu", count);
 
         // switch to the func1
-        tb_context_swap(contexts[2], contexts[1]);
+        from = tb_context_jump(from.context, contexts);
     }
 
     // switch to the main function
-    tb_context_switch(contexts[0]);
+    tb_context_jump(contexts[0], tb_null);
 }
 static tb_void_t tb_demo_platform_context_test()
 { 
-    // the buffers
-    static tb_byte_t s_buffers[3][8192];
-
     // the stacks
-    static tb_byte_t s_stacks[3][8192];
-
-    // init contexts
-    tb_context_ref_t contexts[3];
-    contexts[0] = tb_context_init(s_buffers[0], sizeof(s_buffers[0]));
-    contexts[1] = tb_context_init(s_buffers[1], sizeof(s_buffers[1]));
-    contexts[2] = tb_context_init(s_buffers[2], sizeof(s_buffers[2]));
+    static tb_context_ref_t contexts[3];
+    static tb_byte_t        stacks1[8192];
+    static tb_byte_t        stacks2[8192];
 
     // make context1
-    tb_context_make(contexts[1], s_stacks[1], sizeof(s_stacks[1]), tb_demo_platform_context_test_func1, contexts);
+    contexts[1] = tb_context_make(stacks1, sizeof(stacks1), tb_demo_platform_context_test_func1);
 
     // make context2
-    tb_context_make(contexts[2], s_stacks[2], sizeof(s_stacks[2]), tb_demo_platform_context_test_func2, contexts);
+    contexts[2] = tb_context_make(stacks2, sizeof(stacks2), tb_demo_platform_context_test_func2);
 
     // trace
     tb_trace_i("test: enter");
 
     // switch to func1
-    tb_context_swap(contexts[0], contexts[1]);
+    tb_context_jump(contexts[1], contexts);
 
     // trace
     tb_trace_i("test: leave");
-
-    // exit contexts
-    tb_context_exit(contexts[0]);
-    tb_context_exit(contexts[1]);
-    tb_context_exit(contexts[2]);
 }
-static tb_void_t tb_demo_platform_context_perf_func1(tb_cpointer_t priv)
+static tb_void_t tb_demo_platform_context_perf_func1(tb_context_from_t from)
 {
     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
+    tb_context_ref_t* contexts = (tb_context_ref_t*)from.priv;
     tb_assert_and_check_return(contexts);
+
+    // save main context
+    contexts[0] = from.context;
+
+    // jump to context2
+    from.context = contexts[2];
 
     // loop
     __tb_volatile__ tb_size_t count = COUNT >> 1;
     while (count--)
     {
         // switch to the func2
-        tb_context_swap(contexts[1], contexts[2]);
+        from = tb_context_jump(from.context, contexts);
     }
 
     // switch to the main function
-    tb_context_switch(contexts[0]);
+    tb_context_jump(contexts[0], tb_null);
 }
-static tb_void_t tb_demo_platform_context_perf_func2(tb_cpointer_t priv)
+static tb_void_t tb_demo_platform_context_perf_func2(tb_context_from_t from)
 {
     // check
-    tb_context_ref_t* contexts = (tb_context_ref_t*)priv;
+    tb_context_ref_t* contexts = (tb_context_ref_t*)from.priv;
     tb_assert_and_check_return(contexts);
 
     // loop
@@ -115,48 +115,36 @@ static tb_void_t tb_demo_platform_context_perf_func2(tb_cpointer_t priv)
     while (count--)
     {
         // switch to the func1
-        tb_context_swap(contexts[2], contexts[1]);
+        from = tb_context_jump(from.context, contexts);
     }
 
     // switch to the main function
-    tb_context_switch(contexts[0]);
+    tb_context_jump(contexts[0], tb_null);
 }
 static tb_void_t tb_demo_platform_context_perf()
 { 
-    // the buffers
-    static tb_byte_t s_buffers[3][8192];
-
     // the stacks
-    static tb_byte_t s_stacks[3][8192];
-
-    // init contexts
-    tb_context_ref_t contexts[3];
-    contexts[0] = tb_context_init(s_buffers[0], sizeof(s_buffers[0]));
-    contexts[1] = tb_context_init(s_buffers[1], sizeof(s_buffers[1]));
-    contexts[2] = tb_context_init(s_buffers[2], sizeof(s_buffers[2]));
+    static tb_context_ref_t contexts[3];
+    static tb_byte_t        stacks1[8192];
+    static tb_byte_t        stacks2[8192];
 
     // make context1
-    tb_context_make(contexts[1], s_stacks[1], sizeof(s_stacks[1]), tb_demo_platform_context_perf_func1, contexts);
+    contexts[1] = tb_context_make(stacks1, sizeof(stacks1), tb_demo_platform_context_perf_func1);
 
     // make context2
-    tb_context_make(contexts[2], s_stacks[2], sizeof(s_stacks[2]), tb_demo_platform_context_perf_func2, contexts);
+    contexts[2] = tb_context_make(stacks2, sizeof(stacks2), tb_demo_platform_context_perf_func2);
 
     // init start time
     tb_hong_t startime = tb_mclock();
 
     // switch to func1
-    tb_context_swap(contexts[0], contexts[1]);
+    tb_context_jump(contexts[1], contexts);
 
     // computing time
     tb_hong_t duration = tb_mclock() - startime;
 
     // trace
     tb_trace_i("perf: %d switches in %lld ms, %lld switches per second", COUNT, duration, (((tb_hong_t)1000 * COUNT) / duration));
-
-    // exit contexts
-    tb_context_exit(contexts[0]);
-    tb_context_exit(contexts[1]);
-    tb_context_exit(contexts[2]);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

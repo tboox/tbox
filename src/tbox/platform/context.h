@@ -41,69 +41,45 @@ __tb_extern_c_enter__
 /// the context ref type
 typedef __tb_typeref__(context);
 
-/// the context func type
-typedef tb_void_t (*tb_context_func_t)(tb_cpointer_t priv);
+// the context-from type
+typedef struct __tb_context_from_t
+{
+    // the from-context
+    tb_context_ref_t    context;
+
+    // the passed user private data
+    tb_cpointer_t       priv;
+
+}tb_context_from_t;
+
+/*! the context entry function type
+ *
+ * @param from          the from-context
+ */
+typedef tb_void_t       (*tb_context_func_t)(tb_context_from_t from);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! get the context buffer size
+/*! make context from the given the stack space and the callback function
  *
- * @return              the context buffer size
- */
-tb_size_t               tb_context_size(tb_noarg_t);
-
-/*! init the context
- *
- * @param data          the context data buffer
- * @param size          the context data size
- *
- * @return              the context
- */
-tb_context_ref_t        tb_context_init(tb_byte_t* data, tb_size_t size);
-
-/*! exit context 
- *
- * @param context       the context
- */
-tb_void_t               tb_context_exit(tb_context_ref_t context);
-
-/*! saves the current thread's execution context
- *
- * @param context       the context
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_context_save(tb_context_ref_t context);
-
-/*! switchs to the given thread's execution context
- *
- * @param context       the context
- */
-tb_void_t               tb_context_switch(tb_context_ref_t context);
-
-/*! make context with a given function and stack
- *
- * modifies the user thread context pointed to by context, which must have previously been initialized by a
- * call to tb_context_get() and had a stack allocated for it
- *
- * @param context       the context
- * @param stack         the stack address
+ * @param stackdata     the stack data
  * @param stacksize     the stack size
- * @param func          the function
- * @param priv          the user private data
+ * @param func          the entry function
  *
- * @return              tb_true or tb_false
+ * @return              the context pointer
  */
-tb_bool_t               tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv);
+tb_context_ref_t        tb_context_make(tb_byte_t* stackdata, tb_size_t stacksize, tb_context_func_t func);
 
-/*! saves the current thread context in context and makes context_new the currently active context.
+/*! jump to the given context 
  *
- * @param context       the old context
- * @param context_new   the new context
+ * @param context       the to-context
+ * @param priv          the passed user private data
+ *
+ * @return              the from-context
  */
-tb_void_t               tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new);
+tb_context_from_t       tb_context_jump(tb_context_ref_t context, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
