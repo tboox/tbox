@@ -82,7 +82,11 @@ __end:
     // exit(0)
     xorl  %eax, %eax
     movl  %eax, (%esp)
+#ifdef TB_ARCH_ELF
+    call  _exit@PLT
+#else
     call  __exit
+#endif
     hlt
 
 endfunc
