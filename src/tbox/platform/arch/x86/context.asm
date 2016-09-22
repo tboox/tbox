@@ -34,81 +34,31 @@ option casemap :none
 ; implementation
 ;;
 
-; get mcontext
+; make context
 ;
-; @param mcontext      [esp + 4]
+; @param stackdata     the stack data (esp + 4)
+; @param stacksize     the stack size (esp + 8)
+; @param func          the entry function (esp + 12)
 ;
-; @return              the error code, ok: 0
+; @return              the context pointer (eax)
 ;;
-tb_context_get_asm proc near
+tb_context_make proc 
 
-    mov eax, [esp + 4]              ; eax = [esp + 4] = mcontext
 
-    mov word ptr [eax], fs          ; mcontext.mc_fs = fs
-    mov word ptr [eax + 4], es      ; mcontext.mc_es = es
-    mov word ptr [eax + 8], ds      ; mcontext.mc_ds = ds
-    mov word ptr [eax + 12], ss     ; mcontext.mc_ss = ss
-    mov [eax + 16], edi             ; mcontext.mc_edi = edi
-    mov [eax + 20], esi             ; mcontext.mc_esi = esi
-    mov [eax + 24], ebp             ; mcontext.mc_ebp = ebp
-    mov [eax + 28], ebx             ; mcontext.mc_ebx = ebx
-    mov [eax + 32], edx             ; mcontext.mc_edx = edx
-    mov [eax + 36], ecx             ; mcontext.mc_ecx = ecx
-
-    mov dword ptr [eax + 40], 1	    ; mcontext.mc_eax = 1
-                                    ; 
-                                    ; if (getcontext(ctx) == 0) 
-                                    ;      setcontext(ctx);
-                                    ;
-                                    ; getcontext() will return 1 after calling setcontext()
-                                    ;;
-
-    ; esp + 4: ...         => mcontext.mc_esp
-    ; esp    : return addr => mcontext.mc_eip
-    ;;
-    mov ecx, [esp]	                ; mcontext.mc_eip = eip (the return address of tb_context_get())
-    mov [eax + 44], ecx
-
-    lea ecx, [esp + 4]	            ; mcontext.mc_esp = esp + 4 (after ret)
-    mov [eax + 48], ecx
-
-    mov ecx, [eax + 36]	            ; restore ecx 
-
-    mov eax, 0                      ; return 0
     ret
+tb_context_make endp 
 
-tb_context_get_asm endp
-
-; set mcontext
+; jump context
 ;
-; @param mcontext      [esp + 4]
+; @param context       the to-context (esp + 4)
+; @param priv          the passed user private data (esp + 8)
 ;
-; @return              when successful, does not return. 
+; @return              the from-context (context: eax, priv: edx)
 ;;
-tb_context_set_asm proc near
+tb_context_jump proc 
 
-    mov eax, [esp + 4]              ; eax = [esp + 4] = mcontext
-
-    mov fs, word ptr [eax]          ; fs = mcontext.mc_fs
-    mov es, word ptr [eax + 4]      ; es = mcontext.mc_es
-    mov ds, word ptr [eax + 8]      ; ds = mcontext.mc_ds
-    mov ss, word ptr [eax + 12]     ; ss = mcontext.mc_ss
-    mov edi, [eax + 16]             ; edi = mcontext.mc_edi
-    mov esi, [eax + 20]             ; esi = mcontext.mc_esi
-    mov ebp, [eax + 24]             ; ebp = mcontext.mc_ebp
-    mov ebx, [eax + 28]             ; ebx = mcontext.mc_ebx
-    mov edx, [eax + 32]             ; edx = mcontext.mc_edx
-    mov ecx, [eax + 36]             ; ecx = mcontext.mc_ecx
-
-    mov esp, [eax + 48]             ; esp = mcontext.mc_esp
-
-    push [eax + 44]	                ; push mcontext.mc_eip to the return address
-
-    mov eax, [eax + 40]             ; eax = mcontext.mc_eax
-
-    ret                             ; return and goto mcontext.mc_eip
-
-tb_context_set_asm endp
+    ret
+tb_context_jump endp 
 
 end
 
