@@ -25,22 +25,24 @@
  * implementation
  */
 
-/* make context (refer to boost.context)
+/* make context
  *
  *
- *             --------------------------------------------------------------------------------
- * stackdata: |                                                |         context        ||||||||
- *             -------------------------------------------------------------------------|------
- *                                                                              (16-align for macosx)
+ *             -----------------------------------------------------------------------------------------
+ * stackdata: |                                                          |         context        |||||||
+ *             -----------------------------------------------------------------------------------|-----
+ *                                                                                       (16-align for macosx)
  *
  *
- *                                    func     __end   __trampoline                 from
- *             --------------------------------------------------------------------------------
- * context:   |   edi   |   esi   |   ebx   |   ebp   |   eip   |  padding  | context |  priv  |
- *             --------------------------------------------------------------------------------
- *            0         4         8         12        16        20          24        28
+ *                                                       func     __end           from
+ *             ------------------------------------------------------------------------------------------
+ * context:   |   edi   |   esi   |   ebx   |   ebp   |   eip   |   end   | context |  priv  |  padding  |
+ *             ------------------------------------------------------------------------------------------
+ *            0         4         8         12        16        20        24    arguments 
+ *                                                              |         |
+ *                                                              | 16-align for macosx
  *                                                              |
- *                                                      16-align for macosx
+ *                                                   esp when jump to function
  *
  * @param stackdata     the stack data (esp + 4)
  * @param stacksize     the stack size (esp + 8)
@@ -60,43 +62,21 @@ function(tb_context_make)
     // 16-align of the stack top address for macosx
     andl $-16, %eax
 
-    // TODO 40? 20
     // reserve space for context-data on context-stack 
-    leal -40(%eax), %eax
+    leal -24(%eax), %eax
 
-    // context.ebx = func
+    // context.eip = func
     movl 12(%esp), %edx
-    movl %edx, 8(%eax)
-
-    // TODO
-    /* return transport_t */
-    /* FCTX == EDI, DATA == ESI */
-    leal (%eax), %ecx
-    movl %ecx, 20(%eax)
-
-    // context.eip = the address of label __trampoline
-    call 1f
-1:  popl %ecx
-    addl $__trampoline - 1b, %ecx
-    movl %ecx, 16(%eax)
+    movl %edx, 16(%eax)
 
     // context.ebp = the address of label __end
-    call 2f
-2:  popl %ecx
-    addl $__end - 2b, %ecx
-    movl %ecx, 12(%eax) 
+    call 1f
+1:  popl %ecx
+    addl $__end - 1b, %ecx
+    movl %ecx, 20(%eax) 
 
     // return the context pointer
-    ret 
-
-__trampoline:
-    /* move transport_t for entering context-function */
-    movl  %edi, (%esp)
-    movl  %esi, 4(%esp)
-    pushl %ebp
-
-    // jump to the return or function address(ebx)
-    jmp *%ebx
+    ret
 
 __end:
     // exit(0)
@@ -107,50 +87,32 @@ __end:
 
 endfunc
 
-/* jump context (refer to boost.context)
+/* jump context
  *
- * @param context       the to-context (rdi)
- * @param priv          the passed user private data (rsi)
+ * @param context       the to-context (esp + 4)
+ * @param priv          the passed user private data (esp + 8)
  *
  * @return              the from-context (context: rax, priv: rdx)
  */
 function(tb_context_jump)
 
-    /* save registers and construct the current context
-     *
-     *                                    func     __end   __trampoline                 from
-     *             -------------------------------------------------------------------------------
-     * context:   |   edi   |   esi   |   ebx   |   ebp   |   eip   |  padding  |  context   |   priv   |
-     *             -------------------------------------------------------------------------------
-     *            0         4         8         12        16        20                         |
-     *            |                                                                |
-     *           esp                                                return address of tb_context_jump()
-     */
+    // edx = argument(priv)
+    movl 8(%esp), %edx
+
+    // save registers and construct the current context
     pushl %ebp 
     pushl %ebx 
     pushl %esi 
     pushl %edi 
 
-    // save the current context(esp) to ecx
-    movl %esp, %ecx
+    // save the old context(esp) to eax
+    movl %esp, %eax
 
-    // eax = argument(context)
-//    movl 24(%esp), %eax
-    movl 20(%esp), %eax
-
-    // edx = argument(priv)
-//    movl 28(%esp), %edx
-    movl 24(%esp), %edx
-
-    // switch to the new context(esp) and stack
-    movl %eax, %esp
-
-    /* address of returned transport_t */
-    movl 20(%esp), %eax
-    /* return parent fcontext_t */
-    movl %ecx, (%eax)
-    /* return data */
-    movl %edx, 4(%eax)
+    /* switch to the new context(esp) and stack
+     *
+     * argument(context): (esp + 4) + 4 * sizeof(dword)
+     */
+    movl 20(%esp), %esp
 
     // restore registers of the new context
     popl %edi 
@@ -158,8 +120,31 @@ function(tb_context_jump)
     popl %ebx
     popl %ebp
 
-    // jump to the address of label __trampoline(eip)
-    ret $4
+    // restore the return or function address(ecx)
+    popl %ecx
+
+    // return from-context(context: eax, priv: edx) from jump 
+    // ...
+
+    // pass old-context(context: eax, priv: edx) argument to the context function
+    movl %eax, 4(%esp)
+    movl %edx, 8(%esp)
+
+    /* jump to the return or function address(eip)
+     *
+     *
+     *                           old-context
+     *              ------------------------------------------
+     * context: .. |   end   | context |   priv   |  padding  |
+     *              ------------------------------------------
+     *             0         4    arguments 
+     *             |         |
+     *            esp  16-align for macosx
+     *           (now)
+     */
+    jmp *%ecx
 
 endfunc
+
+
 

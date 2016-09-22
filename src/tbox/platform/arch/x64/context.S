@@ -34,10 +34,12 @@
  *
  *
  *             -------------------------------------------------------------------------------
- * context:   |   r12   |   r13   |   r14   |   r15   |   rbx   |   rbp   |   rip   |   end   | padding | args ...
+ * context:   |   r12   |   r13   |   r14   |   r15   |   rbx   |   rbp   |   rip   |   end   | args | padding ...
  *             -------------------------------------------------------------------------------
  *            0         8         16        24        32        40        48        56        |
- *                                                                                     16-align for macosx
+ *                                                                                  |  16-align for macosx
+ *                                                                                  |
+ *                                                                       esp when jump to function
  *
  * @param stackdata     the stack data (rdi)
  * @param stacksize     the stack size (rsi)
@@ -85,15 +87,7 @@ endfunc
  */
 function(tb_context_jump)
 
-    /* save registers and construct the current context
-     *
-     *             -------------------------------------------------------------------------------
-     * context:   |   r12   |   r13   |   r14   |   r15   |   rbx   |   rbp   |   rip   |   end   |
-     *             -------------------------------------------------------------------------------
-     *            0         8         16        24        32        40        48        56        |
-     *            |                                                                |
-     *           rsp                                                return address of tb_context_jump()
-     */
+    // save registers and construct the current context
     pushq %rbp
     pushq %rbx
     pushq %r15
@@ -101,7 +95,7 @@ function(tb_context_jump)
     pushq %r13
     pushq %r12
 
-    // save the current context(rsp) to rax
+    // save the old context(rsp) to rax
     movq %rsp, %rax
 
     // switch to the new context(rsp) and stack
@@ -121,10 +115,18 @@ function(tb_context_jump)
     // return from-context(context: rax, priv: rdx) from jump 
     movq %rsi, %rdx
 
-    // pass from-context(context: rdi, priv: rsi) argument to the context function
+    // pass old-context(context: rdi, priv: rsi) argument to the context function
     movq %rax, %rdi
 
-    // jump to the return or function address(rip)
+    /* jump to the return or function address(rip)
+     *
+     *             -------------------------------
+     * context: .. |   end   | args | padding ... |
+     *             -------------------------------
+     *             0         8        
+     *             |         |  
+     *            rsp   16-align for macosx
+     */
     jmp *%r8
 
 endfunc
