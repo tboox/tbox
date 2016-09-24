@@ -132,7 +132,7 @@ function(tb_context_jump)
     // return from-context(context: eax, priv: edx) from jump 
     // ...
 
-    // pass old-context(context: eax, priv: edx) argument to the context function
+    // pass old-context(context: eax, priv: edx) arguments to the context function
     movl %eax, 4(%esp)
     movl %edx, 8(%esp)
 
@@ -160,7 +160,7 @@ endfunc
  *             -----------------------------------------------------------------------------------------
  * stackdata: |                                                          |         context        |||||||
  *             -----------------------------------------------------------------------------------|-----
- *                                                                                       (16-align for macosx)
+ *                                                                                           (16-align)
  *
  *
  *                                    func      __end   __entry                  from
@@ -169,7 +169,7 @@ endfunc
  *             -----------------------------------------------------------------------------------------
  *            0         4         8         12        16        20        24    arguments 
  *                                                              |         |
- *                                                              | 16-align for macosx
+ *                                                              |      16-align
  *                                                              |
  *                                                   esp when jump to function
  *
