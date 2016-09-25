@@ -285,7 +285,7 @@ endfunc
  * @param context       the to-context (esp + 8)
  * @param priv          the passed user private data (esp + 12)
  *
- * @return              the from-context (eax = retval (esp + 4))
+ * @return              the from-context (retval (esp + 4))
  */
 function(tb_context_jump)
 
