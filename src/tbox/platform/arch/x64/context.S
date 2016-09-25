@@ -72,11 +72,11 @@ function(tb_context_make)
 
 __end:
     // exit(0)
-    xorq  %rdi, %rdi
+    xorq %rdi, %rdi
 #ifdef TB_ARCH_ELF
-    call  _exit@PLT
+    call _exit@PLT
 #else
-    call  __exit
+    call __exit
 #endif
     hlt
 
