@@ -68,9 +68,9 @@
  *             -----------------------------------------------
  * context:   |  retval |   r4    |   r5    |   r6   |   r7   |
  *             -----------------------------------------------
- *            0        4    |   8         12        16                                  
- *                          |
- *                           ------------------------------------------------
+ *            0    |   4        8         12        16                                  
+ *                 |        
+ *                  ---------------------------------------------------------
  *                                                                          \|/
  *                                                    __end     func      retval(from)
  *             --------------------------------------------------------------------------------------
@@ -97,8 +97,11 @@ function tb_context_make, export=1
     // 16-align of the stack top address 
     bic r0, r0, #15
 
-    // reserve space for context-data on context-stack
-    sub r0, r0, #52 + TB_CONTEXT_SJLJ_BYTES
+    /* reserve space for context-data on context-stack
+     *
+     * 64 = align8(52 + TB_CONTEXT_SJLJ_BYTES)
+     */
+    sub r0, r0, #64
 
     // context.pc = func
     str r2, [r0, #40 + TB_CONTEXT_SJLJ_BYTES]
