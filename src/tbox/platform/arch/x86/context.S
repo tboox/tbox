@@ -25,7 +25,7 @@
  * implementation
  */
 
-#ifdef TB_CONFIG_OS_MACOSX
+#if defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 
 /* make context
  *
