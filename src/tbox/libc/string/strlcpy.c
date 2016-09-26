@@ -49,7 +49,7 @@
  *
  * TODO: need improve xmake to check this interface more correctly.
  */
-#if defined(TB_CONFIG_LIBC_HAVE_STRLCPY) && defined(TB_CONFIG_OS_MACOSX)
+#if defined(TB_CONFIG_LIBC_HAVE_STRLCPY) 
 #   undef TB_CONFIG_LIBC_HAVE_STRLCPY
 #endif
 
