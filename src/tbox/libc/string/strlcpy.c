@@ -43,13 +43,13 @@
  * macros 
  */
 
-/* suppress warning as error on macosx temporarily:
+/* suppress warning as error for clang compiler temporarily:
  *
  * implicit declaration of function 'strlcpy' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
  *
  * TODO: need improve xmake to check this interface more correctly.
  */
-#if defined(TB_CONFIG_LIBC_HAVE_STRLCPY) 
+#if defined(TB_CONFIG_LIBC_HAVE_STRLCPY) && defined(TB_COMPILER_IS_CLANG)
 #   undef TB_CONFIG_LIBC_HAVE_STRLCPY
 #endif
 
