@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* Add switch context interface into platform module
+
 ## v1.5.3
 
 ### New features
@@ -10,7 +14,6 @@
 * Add uuid generator
 * Add hash library module
 * Add `__tb_deprecated__` keyword and option
-* Add switch context interface into platform module
 
 ### Changes
 
@@ -70,6 +73,10 @@
 
 ## master (开发中)
 
+### 新特性
+
+* 添加切换context上下文接口
+
 ## v1.5.3
 
 ### 新特性
@@ -78,7 +85,6 @@
 * 增加uuid生成器
 * 增加hash库模块
 * 添加`__tb_deprecated__`关键字以及配置选项
-* 添加切换context上下文接口
 
 ### 改进
 
