@@ -46,6 +46,7 @@
 #include "database/database.h"
 #include "algorithm/algorithm.h"
 #include "container/container.h"
+#include "coroutine/coroutine.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
