@@ -197,7 +197,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_store)
 #endif
-#ifdef TB_CONFIG_MODULE_HAVE_FIBER
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 ,   TB_DEMO_MAIN_ITEM(platform_context)
 #endif
 
@@ -218,6 +218,11 @@ static tb_demo_t g_demo[] =
     // algorithm
 ,   TB_DEMO_MAIN_ITEM(algorithm_find)
 ,   TB_DEMO_MAIN_ITEM(algorithm_sort)
+
+    // coroutine
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+,   TB_DEMO_MAIN_ITEM(coroutine_switch)
+#endif
 };
 
 /* //////////////////////////////////////////////////////////////////////////////////////

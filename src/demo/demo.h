@@ -200,6 +200,9 @@ TB_DEMO_MAIN_DECL(container_bloom_filter);
 TB_DEMO_MAIN_DECL(algorithm_find);
 TB_DEMO_MAIN_DECL(algorithm_sort);
 
+// coroutine
+TB_DEMO_MAIN_DECL(coroutine_switch);
+
 #endif
 
 

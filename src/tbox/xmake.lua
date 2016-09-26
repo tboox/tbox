@@ -39,7 +39,7 @@ option("smallest")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "fiber", "object", "thread", "network", "charset", "database"}) do
+for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database", "coroutine"}) do
     option(module)
         set_default(true)
         set_showmenu(true)
@@ -81,7 +81,7 @@ target("tbox")
     add_options("info", "float", "wchar", "deprecated")
 
     -- add modules
-    add_options("xml", "zip", "asio", "hash", "regex", "fiber", "object", "thread", "network", "charset", "database")
+    add_options("xml", "zip", "asio", "hash", "regex", "coroutine", "object", "thread", "network", "charset", "database")
 
     -- add the common source files
     add_files("*.c") 
@@ -155,15 +155,15 @@ target("tbox")
         if is_option("openssl", "polarssl") then add_files("asio/ssl.c") end
     end
 
-    -- add the source files for the fiber module
-    if is_option("fiber") then
+    -- add the source files for the coroutine module
+    if is_option("coroutine") then
         add_files("platform/context.c") 
         if is_plat("windows") then
             add_files("platform/arch/$(arch)/context.asm") 
         else
             add_files("platform/arch/context.S") 
         end
-        add_files("fiber/*.c") 
+        add_files("coroutine/*.c") 
     end
 
     -- add the source files for the thread module

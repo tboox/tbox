@@ -54,8 +54,9 @@ target("demo")
         add_files("libm/double.c")
     end
 
-    -- add the source files for the fiber module
-    if is_option("fiber") then
+    -- add the source files for the coroutine module
+    if is_option("coroutine") then
+        add_files("coroutine/*.c") 
         add_files("platform/context.c") 
     end
 

@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        fiber.h
- * @defgroup    fiber
+ * @file        coroutine.h
+ * @defgroup    coroutine
  *
  */
-#ifndef TB_FIBER_H
-#define TB_FIBER_H
+#ifndef TB_COROUTINE_H
+#define TB_COROUTINE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
