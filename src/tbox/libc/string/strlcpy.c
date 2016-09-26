@@ -40,16 +40,17 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * declaration 
+ * macros 
  */
-#if defined(TB_CONFIG_LIBC_HAVE_STRLCPY) && !defined(strlcpy)
+
 /* suppress warning as error on macosx temporarily:
  *
  * implicit declaration of function 'strlcpy' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
  *
  * TODO: need improve xmake to check this interface more correctly.
  */
-size_t strlcpy(char *, const char *, size_t);
+#if defined(TB_CONFIG_LIBC_HAVE_STRLCPY) && defined(TB_CONFIG_OS_MACOSX)
+#   undef TB_CONFIG_LIBC_HAVE_STRLCPY
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
