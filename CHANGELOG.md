@@ -5,6 +5,11 @@
 ### New features
 
 * Add switch context interface into platform module
+* Support make command
+
+### Bugs fixed
+
+* Fix some warning and errors for compiler
 
 ## v1.5.3
 
@@ -76,6 +81,11 @@
 ### 新特性
 
 * 添加切换context上下文接口
+* 支持make进行编译
+
+### Bugs修复
+
+* 修复一些编译警告和错误
 
 ## v1.5.3
 
