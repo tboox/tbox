@@ -92,6 +92,38 @@ tb_size_t               tb_thread_self(tb_noarg_t);
  */
 tb_void_t               tb_thread_return(tb_pointer_t value);
 
+/*! run the given function only once
+ *
+ * @code
+    
+    // the once function
+    static tb_bool_t tb_thread_once_func(tb_cpointer_t priv)
+    {
+        // trace
+        tb_trace_i("%s", priv);
+
+        // ok
+        return tb_true;
+    }
+ 
+    // run the once function
+    static tb_atomic_t once = 0;
+    if (tb_thread_once(&once, tb_thread_once_func, "hello"))
+    {
+        // ok
+        // ...
+    }
+
+ * @endcode
+ *
+ * @param lock          the global or static atomic lock pointer (need be initialized as zero)
+ * @param func          the function
+ * @param priv          the user private data
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

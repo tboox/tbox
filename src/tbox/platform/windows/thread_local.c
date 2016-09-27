@@ -23,45 +23,83 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME            "thread_local"
-#define TB_TRACE_MODULE_DEBUG           (0)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "thread_local.h"
+#include <windows.h>
+#include "../thread.h"
+#include "../../libc/libc.h"
+ 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+
+// the once function
+static tb_bool_t tb_thread_local_once(tb_cpointer_t priv)
+{
+    // check
+    tb_value_ref_t tuple = (tb_value_ref_t)priv;
+    tb_check_return_val(tuple, tb_false);
+
+    // the thread local
+    tb_thread_local_ref_t local = (tb_thread_local_ref_t)tuple[0].ptr;
+    tb_check_return_val(local, tb_false);
+
+    // save the free function
+    local->free = (tb_thread_local_free_t)tuple[1].ptr;
+
+    // check the pthread key space size
+    tb_assert_static(sizeof(DWORD) <= sizeof(local->priv));
+
+    // init key
+    DWORD key = TlsAlloc();
+    tb_check_return_val(key != TLS_OUT_OF_INDEXES, tb_false);
+
+    // save key
+    *((DWORD*)local->priv) = key;
+
+    // ok
+    return tb_true;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_POSIX_HAVE_PTHREAD_SETSPECIFIC) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_GETSPECIFIC) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_CREATE) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_DELETE)
-#   include "posix/thread_local.c"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/thread_local.c"
-#else
 tb_bool_t tb_thread_local_init(tb_thread_local_ref_t local, tb_thread_local_free_t func)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(local, tb_false);
+
+    // run the once function
+    tb_value_t tuple[2];
+    tuple[0].ptr = (tb_pointer_t)local;
+    tuple[1].ptr = (tb_pointer_t)func;
+    return tb_thread_once(&local->once, tb_thread_local_once, tuple);
 }
 tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
 {
-    tb_trace_noimpl();
+    // check
+    tb_assert(local);
+
+    // exit it
+    TlsFree(*((DWORD*)local->priv));
+
+    // reset it
+    tb_memset(local, 0, sizeof(tb_thread_local_t));
 }
 tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
 {
-    tb_trace_noimpl();
-    return tb_null;
+    // check
+    tb_assert(local);
+
+    // get it
+    return TlsGetValue(*((DWORD*)local->priv));
 }
 tb_bool_t tb_thread_local_set(tb_thread_local_ref_t local, tb_cpointer_t priv)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert(local);
+
+    // set it
+    return TlsSetValue(*((DWORD*)local->priv), (LPVOID)priv);
 }
-#endif
 
