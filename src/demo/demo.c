@@ -195,7 +195,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_exception)
 ,   TB_DEMO_MAIN_ITEM(platform_semaphore)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
-,   TB_DEMO_MAIN_ITEM(platform_thread_store)
+,   TB_DEMO_MAIN_ITEM(platform_thread_local)
 #endif
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 ,   TB_DEMO_MAIN_ITEM(platform_context)

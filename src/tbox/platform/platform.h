@@ -58,7 +58,10 @@
 #include "cache_time.h"
 #include "environment.h"
 #include "thread_pool.h"
-#include "thread_store.h"
+#include "thread_local.h"
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
+#   include "deprecated/deprecated.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

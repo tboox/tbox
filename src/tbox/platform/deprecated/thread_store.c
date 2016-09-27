@@ -32,10 +32,10 @@
  * includes
  */
 #include "thread_store.h"
-#include "atomic.h"
-#include "thread.h"
-#include "spinlock.h"
-#include "../container/container.h"
+#include "../atomic.h"
+#include "../thread.h"
+#include "../spinlock.h"
+#include "../../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals

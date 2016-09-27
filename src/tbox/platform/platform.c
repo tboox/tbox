@@ -55,7 +55,8 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
     if (!tb_android_init(priv)) return tb_false;
 #endif
 
-#ifdef TB_CONFIG_MODULE_HAVE_THREAD
+#if defined(TB_CONFIG_MODULE_HAVE_THREAD) \
+    && defined(TB_CONFIG_API_HAVE_DEPRECATED)
     // init thread store
     if (!tb_thread_store_init()) return tb_false;
 #endif
@@ -84,7 +85,8 @@ tb_void_t tb_platform_exit()
     tb_socket_context_exit();
 #endif
 
-#ifdef TB_CONFIG_MODULE_HAVE_THREAD
+#if defined(TB_CONFIG_MODULE_HAVE_THREAD) \
+    && defined(TB_CONFIG_API_HAVE_DEPRECATED)
     // exit thread store
     tb_thread_store_exit();
 #endif

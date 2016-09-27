@@ -174,6 +174,9 @@ target("tbox")
         add_files("platform/semaphore.c") 
         add_files("platform/timer.c") 
         add_files("platform/ltimer.c") 
+        if is_option("deprecated") then
+            add_files("platform/deprecated/thread_store.c") 
+        end
     end
 
     -- add the source files for the object module

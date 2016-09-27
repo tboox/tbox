@@ -62,11 +62,11 @@ target("demo")
 
     -- add the source files for the thread module
     if is_option("thread") then
-        add_files("platform/thread*.c") 
         add_files("platform/event.c") 
         add_files("platform/lock.c") 
         add_files("platform/timer.c") 
         add_files("platform/ltimer.c") 
+        add_files("platform/thread*.c") 
         add_files("platform/exception.c") 
         add_files("platform/semaphore.c") 
     end
