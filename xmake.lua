@@ -16,7 +16,6 @@ add_defines_h("_GNU_SOURCE=1", "_REENTRANT")
 
 -- add undefines to config.h 
 add_undefines_h("$(prefix)_TRACE_INFO_ONLY")
-add_undefines_h("$(prefix)_EXCEPTION_ENABLE")
 add_undefines_h("$(prefix)_MEMORY_UNALIGNED_ACCESS_ENABLE")
  
 -- disable some compiler errors

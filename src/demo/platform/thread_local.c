@@ -65,7 +65,6 @@ static tb_pointer_t tb_demo_thread_local_test(tb_cpointer_t priv)
  */ 
 tb_int_t tb_demo_platform_thread_local_main(tb_int_t argc, tb_char_t** argv)
 {
-    // done
     tb_thread_init(tb_null, tb_demo_thread_local_test, tb_null, 0);
     tb_thread_init(tb_null, tb_demo_thread_local_test, tb_null, 0);
     tb_thread_init(tb_null, tb_demo_thread_local_test, tb_null, 0);

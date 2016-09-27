@@ -6,8 +6,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-tb_pointer_t tb_exception_test(tb_cpointer_t priv);
-tb_pointer_t tb_exception_test(tb_cpointer_t priv)
+tb_pointer_t tb_demo_exception_test(tb_cpointer_t priv);
+tb_pointer_t tb_demo_exception_test(tb_cpointer_t priv)
 {
     // self
     __tb_volatile__ tb_size_t self = tb_thread_self();
@@ -79,46 +79,11 @@ tb_pointer_t tb_exception_test(tb_cpointer_t priv)
  */ 
 tb_int_t tb_demo_platform_exception_main(tb_int_t argc, tb_char_t** argv)
 {
-#if 1
     // done
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
-    tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
-#elif 0
-    __tb_try 
-    {
-        tb_trace_i("try: b");
-        __tb_leave;
-        tb_trace_i("try: e");
-    }
-    __tb_except(1)
-    {
-        tb_trace_i("except");
-    }
-    __tb_end
-    tb_trace_i("end");
-#else
-    __tb_try 
-    {
-        tb_abort();
-    }
-    __tb_except(1)
-    {
-        tb_trace_i("except");
-    }
-    __tb_end
-
-    __tb_try 
-    {
-        tb_abort();
-    }
-    __tb_except(0)
-    {
-        tb_trace_i("except");
-    }
-    __tb_end
-#endif
+    tb_thread_init(tb_null, tb_demo_exception_test, tb_null, 0);
+    tb_thread_init(tb_null, tb_demo_exception_test, tb_null, 0);
+    tb_thread_init(tb_null, tb_demo_exception_test, tb_null, 0);
+    tb_thread_init(tb_null, tb_demo_exception_test, tb_null, 0);
 
     // wait
     getchar();

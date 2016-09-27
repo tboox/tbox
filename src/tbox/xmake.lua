@@ -20,6 +20,14 @@ option("info")
     set_description("Enable or disable to get some info, .e.g version ..")
     add_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
 
+-- add option: exception
+option("exception")
+    set_default(false)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Enable or disable the exception.")
+    add_defines_h_if_ok("$(prefix)_EXCEPTION_ENABLE")
+
 -- add option: deprecated
 option("deprecated")
     set_default(true)
@@ -35,11 +43,11 @@ option("smallest")
     set_category("option")
     set_description("Enable the smallest compile mode and disable all modules.")
     add_rbindings("info", "deprecated")
-    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database")
+    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "network", "charset", "database")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "thread", "network", "charset", "database", "coroutine"}) do
+for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "network", "charset", "database", "coroutine"}) do
     option(module)
         set_default(true)
         set_showmenu(true)
@@ -78,10 +86,10 @@ target("tbox")
     add_packages("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
 
     -- add options
-    add_options("info", "float", "wchar", "deprecated")
+    add_options("info", "float", "wchar", "exception", "deprecated")
 
     -- add modules
-    add_options("xml", "zip", "asio", "hash", "regex", "coroutine", "object", "thread", "network", "charset", "database")
+    add_options("xml", "zip", "asio", "hash", "regex", "coroutine", "object", "network", "charset", "database")
 
     -- add the common source files
     add_files("*.c") 
@@ -101,7 +109,7 @@ target("tbox")
     add_files("libm/isqrti.c") 
     add_files("libm/isqrti64.c") 
     add_files("libm/idivi8.c") 
-    add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c|thread*.c|event.c|semaphore.c|mutex.c|timer.c|ltimer.c|context.c")
+    add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c|context.c|exception.c")
 
     -- add the source files for the float type
     if is_option("float") then add_files("libm/*.c") end
@@ -166,17 +174,14 @@ target("tbox")
         add_files("coroutine/*.c") 
     end
 
-    -- add the source files for the thread module
-    if is_option("thread") then
-        add_files("platform/thread*.c") 
-        add_files("platform/event.c") 
-        add_files("platform/mutex.c") 
-        add_files("platform/semaphore.c") 
-        add_files("platform/timer.c") 
-        add_files("platform/ltimer.c") 
-        if is_option("deprecated") then
-            add_files("platform/deprecated/thread_store.c") 
-        end
+    -- add the source files for the deprecated module
+    if is_option("deprecated") then
+        add_files("platform/deprecated/thread_store.c") 
+    end
+
+    -- add the source files for the exception module
+    if is_option("exception") then
+        add_files("platform/exception.c") 
     end
 
     -- add the source files for the object module

@@ -36,7 +36,7 @@ target("demo")
     add_files("other/*.c|charset.c") 
     add_files("string/*.c") 
     add_files("memory/**.c") 
-    add_files("platform/*.c|thread*.c|semaphore.c|event.c|lock.c|timer.c|ltimer.c|exception.c|context.c") 
+    add_files("platform/*.c|exception.c|context.c") 
     add_files("container/*.c") 
     add_files("algorithm/*.c") 
     add_files("stream/stream.c") 
@@ -60,15 +60,9 @@ target("demo")
         add_files("platform/context.c") 
     end
 
-    -- add the source files for the thread module
-    if is_option("thread") then
-        add_files("platform/event.c") 
-        add_files("platform/lock.c") 
-        add_files("platform/timer.c") 
-        add_files("platform/ltimer.c") 
-        add_files("platform/thread*.c") 
+    -- add the source files for the exception module
+    if is_option("exception") then
         add_files("platform/exception.c") 
-        add_files("platform/semaphore.c") 
     end
 
     -- add the source files for the xml module

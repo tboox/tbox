@@ -17,49 +17,32 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        print.c
+ * @file        exception.c
  * @ingroup     platform
+ *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../thread.h"
-#include <stdio.h>
-#include <unistd.h>
-#include <android/log.h>     
+#include "platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_print(tb_char_t const* string)
+#if defined(TB_CONFIG_EXCEPTION_ENABLE) && defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/exception.c"
+#elif defined(TB_CONFIG_EXCEPTION_ENABLE) && defined(tb_signal)
+#   include "libc/exception.c"
+#else
+tb_bool_t tb_exception_init()
 {
-    // check
-    tb_check_return(string);
-
-    // print to the android device log
-    __android_log_print(ANDROID_LOG_ERROR, __tb_prefix__? __tb_prefix__ : "tbox", "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
-
-    // print to the stdout
-    fputs(string, stdout);
-}
-tb_void_t tb_printl(tb_char_t const* string)
+    tb_trace_noimpl();
+    return tb_true;
+} 
+tb_void_t tb_exception_exit()
 {
-    // check
-    tb_check_return(string);
-
-    // print to the android device log
-    __android_log_print(ANDROID_LOG_ERROR, __tb_prefix__? __tb_prefix__ : "tbox", "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
-
-    // print string to the stdout
-    fputs(string, stdout);
-
-    // print newline to the stdout
-    fputs(__tb_newline__, stdout);
+    tb_trace_noimpl();
 }
-tb_void_t tb_print_sync()
-{
-    // flush the stdout
-    fflush(stdout);
-}
+#endif
+

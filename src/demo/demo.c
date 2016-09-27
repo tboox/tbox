@@ -187,18 +187,18 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_directory)
 ,   TB_DEMO_MAIN_ITEM(platform_cache_time)
 ,   TB_DEMO_MAIN_ITEM(platform_environment)
-#ifdef TB_CONFIG_MODULE_HAVE_THREAD
 ,   TB_DEMO_MAIN_ITEM(platform_lock)
 ,   TB_DEMO_MAIN_ITEM(platform_timer)
 ,   TB_DEMO_MAIN_ITEM(platform_ltimer)
 ,   TB_DEMO_MAIN_ITEM(platform_event)
-,   TB_DEMO_MAIN_ITEM(platform_exception)
 ,   TB_DEMO_MAIN_ITEM(platform_semaphore)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_local)
-#endif
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 ,   TB_DEMO_MAIN_ITEM(platform_context)
+#endif
+#ifdef TB_CONFIG_EXCEPTION_ENABLE
+,   TB_DEMO_MAIN_ITEM(platform_exception)
 #endif
 
     // container

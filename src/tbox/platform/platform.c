@@ -26,6 +26,7 @@
  * includes
  */
 #include "platform.h"
+#include "exception.h"
 #include "../network/network.h"
 #ifdef TB_CONFIG_OS_ANDROID
 #   include "android/android.h"
@@ -55,8 +56,12 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
     if (!tb_android_init(priv)) return tb_false;
 #endif
 
-#if defined(TB_CONFIG_MODULE_HAVE_THREAD) \
-    && defined(TB_CONFIG_API_HAVE_DEPRECATED)
+    // init exception
+#ifdef TB_CONFIG_EXCEPTION_ENABLE
+    if (!tb_exception_init()) return tb_false;
+#endif
+
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
     // init thread store
     if (!tb_thread_store_init()) return tb_false;
 #endif
@@ -85,10 +90,14 @@ tb_void_t tb_platform_exit()
     tb_socket_context_exit();
 #endif
 
-#if defined(TB_CONFIG_MODULE_HAVE_THREAD) \
-    && defined(TB_CONFIG_API_HAVE_DEPRECATED)
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
     // exit thread store
     tb_thread_store_exit();
+#endif
+
+    // exit exception
+#ifdef TB_CONFIG_EXCEPTION_ENABLE
+    tb_exception_exit();
 #endif
 
     // exit android

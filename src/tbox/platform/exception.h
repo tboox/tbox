@@ -31,10 +31,15 @@
 #   include "../libc/misc/signal.h"
 #   if defined(TB_CONFIG_OS_WINDOWS)
 #       include "windows/exception.h"
-#   elif defined(tb_signal)
+#   elif defined(tb_signal) 
 #       include "libc/exception.h"
 #   endif
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -71,6 +76,24 @@
 #   define tb_assert_leave(x)                       
 #   define tb_assert_and_check_leave(x)                 tb_check_leave(x)
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init the exception
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_exception_init(tb_noarg_t);
+
+/// exit the exception 
+tb_void_t           tb_exception_exit(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
 
