@@ -33,7 +33,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack)
+tb_thread_ref_t tb_thread_init_(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
 {
     // done
     pthread_t       thread;

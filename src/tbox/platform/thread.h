@@ -35,6 +35,13 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the thread func type
+typedef tb_pointer_t (*tb_thread_func_t)(tb_cpointer_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -47,7 +54,7 @@ __tb_extern_c_enter__
  *
  * @return              the thread handle
  */
-tb_thread_ref_t         tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack);
+tb_thread_ref_t         tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack);
 
 /*! exit thread
  *

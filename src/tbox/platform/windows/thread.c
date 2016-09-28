@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_cpointer_t), tb_cpointer_t priv, tb_size_t stack)
+tb_thread_ref_t tb_thread_init_(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
 {
     HANDLE thread = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)priv, 0, NULL);
     return ((thread != INVALID_HANDLE_VALUE)? (tb_thread_ref_t)thread : tb_null);

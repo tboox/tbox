@@ -26,24 +26,12 @@
  * includes
  */
 #include "platform.h"
+#include "socket.h"
 #include "exception.h"
 #include "../network/network.h"
 #ifdef TB_CONFIG_OS_ANDROID
 #   include "android/android.h"
 #endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-__tb_extern_c_enter__
-
-// init socket context
-tb_bool_t   tb_socket_context_init(tb_noarg_t);
-
-// exit socket context
-tb_void_t   tb_socket_context_exit(tb_noarg_t);
-
-__tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
