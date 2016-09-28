@@ -47,15 +47,26 @@ static tb_bool_t tb_thread_local_once(tb_cpointer_t priv)
     local->free = (tb_thread_local_free_t)tuple[1].ptr;
 
     // check the pthread key space size
-    tb_assert_static(sizeof(pthread_key_t) <= sizeof(local->priv));
+    tb_assert_static(sizeof(pthread_key_t) * 2 <= sizeof(local->priv));
 
-    // create the pthread key
-    tb_bool_t ok = pthread_key_create((pthread_key_t*)local->priv, tb_null) == 0;
+    // create the pthread key for data
+    tb_bool_t ok = pthread_key_create(&((pthread_key_t*)local->priv)[0], tb_null) == 0;
+    if (ok)
+    {
+        // create the pthread key for mark
+        ok = pthread_key_create(&((pthread_key_t*)local->priv)[1], tb_null) == 0;
 
-    // save this thread local to list
-    tb_spinlock_enter(&g_thread_local_lock);
-    tb_single_list_entry_insert_tail(&g_thread_local_list, &local->entry);
-    tb_spinlock_leave(&g_thread_local_lock);
+        // failed? remove the data key
+        if (!ok) pthread_key_delete(((pthread_key_t*)local->priv)[0]);
+    }
+
+    // save this thread local to list if ok
+    if (ok)
+    {
+        tb_spinlock_enter(&g_thread_local_lock);
+        tb_single_list_entry_insert_tail(&g_thread_local_list, &local->entry);
+        tb_spinlock_leave(&g_thread_local_lock);
+    }
 
     // ok?
     return ok;
@@ -81,7 +92,16 @@ tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
     tb_assert(local);
 
     // exit it
-    pthread_key_delete(*((pthread_key_t*)local->priv));
+    pthread_key_delete(((pthread_key_t*)local->priv)[0]);
+    pthread_key_delete(((pthread_key_t*)local->priv)[1]);
+}
+tb_bool_t tb_thread_local_has(tb_thread_local_ref_t local)
+{
+    // check
+    tb_assert(local);
+
+    // get it
+    return (tb_bool_t)pthread_getspecific(((pthread_key_t*)local->priv)[1]);
 }
 tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
 {
@@ -89,14 +109,26 @@ tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
     tb_assert(local);
 
     // get it
-    return pthread_getspecific(*((pthread_key_t*)local->priv));
+    return pthread_getspecific(((pthread_key_t*)local->priv)[0]);
 }
 tb_bool_t tb_thread_local_set(tb_thread_local_ref_t local, tb_cpointer_t priv)
 {
     // check
     tb_assert(local);
 
+    // free the previous data first
+    if (local->free && tb_thread_local_has(local))
+        local->free(tb_thread_local_get(local));
+
     // set it
-    return pthread_setspecific(*((pthread_key_t*)local->priv), priv) == 0;
+    tb_bool_t ok = pthread_setspecific(((pthread_key_t*)local->priv)[0], priv) == 0;
+    if (ok)
+    {
+        // mark exists
+        ok = pthread_setspecific(((pthread_key_t*)local->priv)[1], (tb_pointer_t)tb_true) == 0;
+    }
+
+    // ok?
+    return ok;
 }
 

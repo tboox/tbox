@@ -10,10 +10,12 @@
 ### Changes
 
 * Optimize and rewrite thread local store module
+* Modify thread interfaces 
 
 ### Bugs fixed
 
 * Fix some warning and errors for compiler
+* Fix some thread bugs
 
 ## v1.5.3
 
@@ -90,10 +92,12 @@
 ### 改进
 
 * 优化和重构线程局部存储TLS模块
+* 修改部分线程接口
 
 ### Bugs修复
 
 * 修复一些编译警告和错误
+* 修复一些线相关bug
 
 ## v1.5.3
 

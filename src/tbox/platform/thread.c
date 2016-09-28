@@ -55,7 +55,7 @@ static tb_bool_t tb_thread_local_free(tb_iterator_ref_t iterator, tb_pointer_t i
     if (local) 
     { 
         // free the thread local data
-        if (local->free) 
+        if (local->free && tb_thread_local_has(local)) 
         {
             // free it
             local->free(tb_thread_local_get(local));
@@ -65,7 +65,11 @@ static tb_bool_t tb_thread_local_free(tb_iterator_ref_t iterator, tb_pointer_t i
     // ok
     return tb_true;
 }
+#ifdef TB_CONFIG_OS_WINDOWS
+static tb_thread_retval_t __tb_stdcall__ tb_thread_func(tb_pointer_t priv)
+#else
 static tb_thread_retval_t tb_thread_func(tb_pointer_t priv)
+#endif
 {
     // done
     tb_thread_retval_t  retval = (tb_thread_retval_t)0;

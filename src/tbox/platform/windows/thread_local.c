@@ -47,14 +47,24 @@ static tb_bool_t tb_thread_local_once(tb_cpointer_t priv)
     local->free = (tb_thread_local_free_t)tuple[1].ptr;
 
     // check the pthread key space size
-    tb_assert_static(sizeof(DWORD) <= sizeof(local->priv));
+    tb_assert_static(sizeof(DWORD) * 2 <= sizeof(local->priv));
 
-    // init key
-    DWORD key = TlsAlloc();
-    tb_check_return_val(key != TLS_OUT_OF_INDEXES, tb_false);
+    // init data key
+    DWORD key_data = TlsAlloc();
+    tb_check_return_val(key_data != TLS_OUT_OF_INDEXES, tb_false);
 
-    // save key
-    *((DWORD*)local->priv) = key;
+    // init mark key
+    DWORD key_mark = TlsAlloc();
+    if (key_mark == TLS_OUT_OF_INDEXES)
+    {
+        // free the data key
+        TlsFree(key_data);
+        return tb_false;
+    }
+
+    // save keys
+    ((DWORD*)local->priv)[0] = key_data;
+    ((DWORD*)local->priv)[1] = key_mark;
 
     // save this thread local to list
     tb_spinlock_enter(&g_thread_local_lock);
@@ -87,20 +97,40 @@ tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
     // exit it
     TlsFree(*((DWORD*)local->priv));
 }
+tb_bool_t tb_thread_local_has(tb_thread_local_ref_t local)
+{
+    // check
+    tb_assert(local);
+
+    // get it
+    return (tb_bool_t)TlsGetValue(((DWORD*)local->priv)[1]);
+}
 tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
 {
     // check
     tb_assert(local);
 
     // get it
-    return TlsGetValue(*((DWORD*)local->priv));
+    return TlsGetValue(((DWORD*)local->priv)[0]);
 }
 tb_bool_t tb_thread_local_set(tb_thread_local_ref_t local, tb_cpointer_t priv)
 {
     // check
     tb_assert(local);
 
+    // free the previous data first
+    if (local->free && tb_thread_local_has(local))
+        local->free(tb_thread_local_get(local));
+
     // set it
-    return TlsSetValue(*((DWORD*)local->priv), (LPVOID)priv);
+    tb_bool_t ok = TlsSetValue(((DWORD*)local->priv)[0], (LPVOID)priv);
+    if (ok)
+    {
+        // mark exists
+        ok = TlsSetValue(((DWORD*)local->priv)[1], (LPVOID)tb_true);
+    }
+
+    // ok?
+    return ok;
 }
 

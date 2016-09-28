@@ -113,6 +113,11 @@ tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
 {
     tb_trace_noimpl();
 }
+tb_bool_t tb_thread_local_has(tb_thread_local_ref_t local)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
 tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
 {
     tb_trace_noimpl();
