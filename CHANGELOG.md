@@ -7,6 +7,10 @@
 * Add switch context interface into platform module
 * Support make command
 
+### Changes
+
+* Optimize and rewrite thread local store module
+
 ### Bugs fixed
 
 * Fix some warning and errors for compiler
@@ -82,6 +86,10 @@
 
 * 添加切换context上下文接口
 * 支持make进行编译
+
+### 改进
+
+* 优化和重构线程局部存储TLS模块
 
 ### Bugs修复
 
