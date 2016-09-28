@@ -6,8 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
  */
-tb_pointer_t tb_demo_exception_test(tb_cpointer_t priv);
-tb_pointer_t tb_demo_exception_test(tb_cpointer_t priv)
+static tb_int_t tb_demo_exception_test(tb_cpointer_t priv)
 {
     // self
     __tb_volatile__ tb_size_t self = tb_thread_self();
@@ -70,8 +69,7 @@ tb_pointer_t tb_demo_exception_test(tb_cpointer_t priv)
 
     // trace
     tb_trace_i("thread[%lu]: exit: %lu", self, i);
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +85,5 @@ tb_int_t tb_demo_platform_exception_main(tb_int_t argc, tb_char_t** argv)
 
     // wait
     getchar();
-
     return 0;
 }
