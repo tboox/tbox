@@ -56,6 +56,11 @@ static tb_bool_t tb_thread_local_once(tb_cpointer_t priv)
     // save key
     *((DWORD*)local->priv) = key;
 
+    // save this thread local to list
+    tb_spinlock_enter(&g_thread_local_lock);
+    tb_single_list_entry_insert_tail(&g_thread_local_list, &local->entry);
+    tb_spinlock_leave(&g_thread_local_lock);
+
     // ok
     return tb_true;
 }

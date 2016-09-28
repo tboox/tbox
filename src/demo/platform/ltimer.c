@@ -19,7 +19,7 @@ static tb_void_t tb_demo_ltimer_task_func(tb_bool_t killed, tb_cpointer_t priv)
         tb_trace_i("task[%s]: %lld ms, killed: %d", (tb_char_t const*)priv, val, killed);
     }
 }
-static tb_pointer_t tb_demo_ltimer_loop(tb_cpointer_t priv)
+static tb_int_t tb_demo_ltimer_loop(tb_cpointer_t priv)
 {
     // the timer
     tb_ltimer_ref_t timer = (tb_ltimer_ref_t)priv;
@@ -28,8 +28,7 @@ static tb_pointer_t tb_demo_ltimer_loop(tb_cpointer_t priv)
     if (timer) tb_ltimer_loop(timer);
 
     // exit it
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

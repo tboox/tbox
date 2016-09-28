@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../container/single_list_entry.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -39,7 +40,7 @@ __tb_extern_c_enter__
  */
 
 /// the thread local initial value
-#define TB_THREAD_LOCAL_INIT    {0}
+#define TB_THREAD_LOCAL_INIT    {{0}, 0}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -54,6 +55,9 @@ typedef tb_void_t   (*tb_thread_local_free_t)(tb_cpointer_t priv);
 /// the thread local type
 typedef struct __tb_thread_local_t
 {
+    // the list entry
+    tb_single_list_entry_t  entry;
+
     // the atomice lock of once function
     tb_atomic_t             once;
 

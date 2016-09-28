@@ -127,7 +127,7 @@ static tb_bool_t tb_timer_pred_by_task(tb_iterator_ref_t iterator, tb_cpointer_t
     // is equal?
     return item == value;
 }
-static tb_pointer_t tb_timer_instance_loop(tb_cpointer_t priv)
+static tb_int_t tb_timer_instance_loop(tb_cpointer_t priv)
 {
     // timer
     tb_timer_ref_t timer = (tb_timer_ref_t)priv;
@@ -142,8 +142,7 @@ static tb_pointer_t tb_timer_instance_loop(tb_cpointer_t priv)
     tb_trace_d("loop: exit");
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 static tb_handle_t tb_timer_instance_init(tb_cpointer_t* ppriv)
 {
@@ -189,7 +188,7 @@ static tb_void_t tb_timer_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
     if (loop)
     {
         // wait it
-        if (!tb_thread_wait(loop, 5000)) return ;
+        if (!tb_thread_wait(loop, 5000, tb_null)) return ;
 
         // exit it
         tb_thread_exit(loop);

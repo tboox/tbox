@@ -296,7 +296,7 @@ static tb_bool_t tb_aiop_push_acpt(tb_aiop_ptor_impl_t* impl, tb_aice_ref_t aice
     // ok
     return tb_true;
 }
-static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
+static tb_int_t tb_aiop_spak_loop(tb_cpointer_t priv)
 {
     // check
     tb_aiop_ptor_impl_t*    impl = (tb_aiop_ptor_impl_t*)priv;
@@ -415,8 +415,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_cpointer_t priv)
     tb_aicp_kill((tb_aicp_ref_t)aicp);
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_cpointer_t priv)
 {
@@ -1553,7 +1552,7 @@ static tb_void_t tb_aiop_ptor_exit(tb_aicp_ptor_impl_t* ptor)
     if (impl->loop)
     {
         tb_long_t wait = 0;
-        if ((wait = tb_thread_wait(impl->loop, 5000)) <= 0)
+        if ((wait = tb_thread_wait(impl->loop, 5000, tb_null)) <= 0)
         {
             // trace
             tb_trace_e("loop[%p]: wait failed: %ld!", impl->loop, wait);

@@ -310,7 +310,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_ref_t aice)
     return tb_true;
 }
 #endif
-static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
+static tb_int_t tb_demo_loop(tb_cpointer_t priv)
 {
     // aicp
     tb_aicp_ref_t   aicp = (tb_aicp_ref_t)priv;
@@ -326,8 +326,7 @@ static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
     tb_trace_i("[loop: %lu]: exit", self);
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
@@ -414,7 +413,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
         tb_thread_ref_t* l = loop;
         for (; *l; l++)
         {
-            tb_thread_wait(*l, -1);
+            tb_thread_wait(*l, -1, tb_null);
             tb_thread_exit(*l);
         }
     }

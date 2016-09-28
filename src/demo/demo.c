@@ -192,6 +192,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_ltimer)
 ,   TB_DEMO_MAIN_ITEM(platform_event)
 ,   TB_DEMO_MAIN_ITEM(platform_semaphore)
+,   TB_DEMO_MAIN_ITEM(platform_thread)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_pool)
 ,   TB_DEMO_MAIN_ITEM(platform_thread_local)
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE

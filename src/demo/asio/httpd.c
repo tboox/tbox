@@ -727,7 +727,7 @@ static tb_void_t tb_demo_httpd_exit(tb_demo_httpd_t* httpd)
     tb_thread_ref_t* loop = httpd->loop;
     for (; *loop; loop++)
     {
-        tb_thread_wait(*loop, -1);
+        tb_thread_wait(*loop, -1, tb_null);
         tb_thread_exit(*loop);
     }
 
@@ -743,7 +743,7 @@ static tb_void_t tb_demo_httpd_exit(tb_demo_httpd_t* httpd)
     tb_free(httpd);
 }
 #ifdef TB_DEMO_HTTPD_SESSION_MAXN
-static tb_pointer_t tb_demo_httpd_loop(tb_cpointer_t priv)
+static tb_int_t tb_demo_httpd_loop(tb_cpointer_t priv)
 {
     // aicp
     tb_aicp_ref_t   aicp = (tb_aicp_ref_t)priv;
@@ -758,8 +758,7 @@ static tb_pointer_t tb_demo_httpd_loop(tb_cpointer_t priv)
     tb_trace_d("[loop: %u]: exit", (tb_uint16_t)tb_thread_self());
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 #endif
 static tb_demo_httpd_t* tb_demo_httpd_init(tb_char_t const* root)

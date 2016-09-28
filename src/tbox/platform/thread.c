@@ -27,20 +27,49 @@
 #include "thread.h"
 #include "atomic.h"
 #include "time.h"
+#include "thread_local.h"
+#include "impl/thread_local.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the return value type of the thread function
+#ifdef TB_CONFIG_OS_WINDOWS
+typedef tb_uint32_t     tb_thread_retval_t;
+#else
+typedef tb_pointer_t    tb_thread_retval_t;
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_thread_ref_t tb_thread_init_(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_pointer_t tb_thread_func(tb_cpointer_t priv)
+static tb_bool_t tb_thread_local_free(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
+{
+    // the local
+    tb_thread_local_ref_t local = (tb_thread_local_ref_t)item;
+    if (local) 
+    { 
+        // free the thread local data
+        if (local->free) 
+        {
+            // free it
+            local->free(tb_thread_local_get(local));
+        }
+    }
+
+    // ok
+    return tb_true;
+}
+static tb_thread_retval_t tb_thread_func(tb_pointer_t priv)
 {
     // done
-    tb_pointer_t    retval = tb_null;
-    tb_value_ref_t  args = (tb_value_ref_t)priv;
+    tb_thread_retval_t  retval = (tb_thread_retval_t)0;
+    tb_value_ref_t      args = (tb_value_ref_t)priv;
     do
     {
         // check
@@ -51,7 +80,10 @@ static tb_pointer_t tb_thread_func(tb_cpointer_t priv)
         tb_assert_and_check_break(func);
 
         // call the thread function
-        retval = func(args[1].ptr);
+        retval = (tb_thread_retval_t)(tb_size_t)func(args[1].ptr);
+
+        // free all thread local data on the current thread
+        tb_thread_local_walk(tb_thread_local_free, tb_null);
 
     } while (0);
 
@@ -71,7 +103,7 @@ static tb_pointer_t tb_thread_func(tb_cpointer_t priv)
 #elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_CREATE)
 #   include "posix/thread.c"
 #else
-tb_thread_ref_t tb_thread_init_(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
+tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
 {
     tb_trace_noimpl();
     return tb_null;
@@ -80,12 +112,12 @@ tb_void_t tb_thread_exit(tb_thread_ref_t thread)
 {
     tb_trace_noimpl();
 }
-tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout)
+tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout, tb_int_t* retval)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_void_t tb_thread_return(tb_pointer_t value)
+tb_void_t tb_thread_return(tb_int_t value)
 {
     tb_trace_noimpl();
 }
@@ -105,17 +137,6 @@ tb_size_t tb_thread_self()
     return 0;
 }
 #endif
-tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
-{
-    // init args
-    tb_value_ref_t args = tb_nalloc0_type(2, tb_value_t);
-    tb_assert_and_check_return_val(args, tb_null);
-
-    // init thread 
-    args[0].ptr = (tb_pointer_t)func;
-    args[1].ptr = (tb_pointer_t)priv;
-    return tb_thread_init_(name, tb_thread_func, args, stack);
-}
 tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv)
 {
     // check

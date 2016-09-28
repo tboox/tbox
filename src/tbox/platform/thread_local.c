@@ -32,7 +32,66 @@
  * includes
  */
 #include "thread_local.h"
+#include "spinlock.h"
 #include "impl/thread_local.h"
+#include "../algorithm/algorithm.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+
+// the thread local list
+static tb_single_list_entry_head_t  g_thread_local_list;
+
+// the thread local list lock
+static tb_spinlock_t                g_thread_local_lock = TB_SPINLOCK_INIT;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+tb_bool_t tb_thread_local_init_env()
+{
+    // init lock
+    if (!tb_spinlock_init(&g_thread_local_lock)) return tb_false;
+
+    // init the thread local list
+    tb_single_list_entry_init(&g_thread_local_list, tb_thread_local_t, entry, tb_null);
+
+    // ok
+    return tb_true;
+}
+tb_void_t tb_thread_local_exit_env()
+{
+    // enter lock
+    tb_spinlock_enter(&g_thread_local_lock);
+
+    // exit all thread locals
+    tb_for_all_if (tb_thread_local_ref_t, local, tb_single_list_entry_itor(&g_thread_local_list), local)
+    {
+        // exit it
+        tb_thread_local_exit(local);
+    }
+
+    // exit the thread local list
+    tb_single_list_entry_exit(&g_thread_local_list);
+
+    // leave lock
+    tb_spinlock_leave(&g_thread_local_lock);
+
+    // exit lock
+    tb_spinlock_exit(&g_thread_local_lock);
+}
+tb_void_t tb_thread_local_walk(tb_walk_func_t func, tb_cpointer_t priv)
+{
+    // enter lock
+    tb_spinlock_enter(&g_thread_local_lock);
+    
+    // walk all thread locals
+    tb_walk_all(tb_single_list_entry_itor(&g_thread_local_list), func, priv);
+
+    // leave lock
+    tb_spinlock_leave(&g_thread_local_lock);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -65,11 +124,4 @@ tb_bool_t tb_thread_local_set(tb_thread_local_ref_t local, tb_cpointer_t priv)
     return tb_false;
 }
 #endif
-tb_bool_t tb_thread_local_init_env()
-{
-    return tb_true;
-}
-tb_void_t tb_thread_local_exit_env()
-{
-}
 

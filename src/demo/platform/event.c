@@ -54,7 +54,7 @@ static tb_char_t const* tb_demo_gets(tb_char_t* line, tb_size_t maxn)
     // ok?
     return line;
 }
-static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
+static tb_int_t tb_demo_loop(tb_cpointer_t priv)
 {
     // check
     tb_demo_loop_t* loop = (tb_demo_loop_t*)priv;
@@ -88,8 +88,7 @@ static tb_pointer_t tb_demo_loop(tb_cpointer_t priv)
     tb_trace_i("[thread: %lu]: exit", loop? loop->index : 0);
 
     // end
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +181,7 @@ tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
         if (loop[i].loop) 
         {
             // wait it
-            if (!tb_thread_wait(loop[i].loop, 5000))
+            if (!tb_thread_wait(loop[i].loop, 5000, tb_null))
             {
                 // trace
                 tb_trace_e("wait loop[%lu]: timeout", i);

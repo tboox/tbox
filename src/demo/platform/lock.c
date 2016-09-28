@@ -23,7 +23,7 @@ static __tb_volatile__ tb_atomic_t g_value = 0;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * loop
  */
-static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t priv)
+static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
 {
     // check
     tb_uint32_t self = (tb_uint32_t)tb_thread_self();
@@ -68,8 +68,7 @@ static tb_pointer_t tb_test_mutx_loop(tb_cpointer_t priv)
     }
 
     tb_trace_i("[loop: %x]: exit", self);
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +107,7 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
         // kill thread
         if (loop[i]) 
         {
-            tb_thread_wait(loop[i], -1);
+            tb_thread_wait(loop[i], -1, tb_null);
             tb_thread_exit(loop[i]);
             loop[i] = tb_null;
         }

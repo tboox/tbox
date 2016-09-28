@@ -30,16 +30,46 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_thread_ref_t tb_thread_init_(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
+tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
 {
-    HANDLE thread = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)priv, 0, NULL);
-    return ((thread != INVALID_HANDLE_VALUE)? (tb_thread_ref_t)thread : tb_null);
+    // done
+    tb_bool_t       ok = tb_false;
+    HANDLE          thread = INVALID_HANDLE_VALUE;
+    tb_value_ref_t  args = tb_null;
+    do
+    {
+        // init arguments
+        args = tb_nalloc0_type(2, tb_value_t);
+        tb_assert_and_check_break(args);
+
+        // save function and private data
+        args[0].ptr = (tb_pointer_t)func;
+        args[1].ptr = (tb_pointer_t)priv;
+
+        // init thread
+        thread = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)tb_thread_func, (LPVOID)args, 0, NULL);
+        tb_assert_and_check_break(thread != INVALID_HANDLE_VALUE);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // exit arguments if failed
+    if (!ok)
+    {
+        if (args) tb_free(args);
+        args = tb_null;
+    }
+
+    // ok?
+    return ok? ((tb_thread_ref_t)thread) : tb_null;
 }
 tb_void_t tb_thread_exit(tb_thread_ref_t thread)
 {
     if (thread) CloseHandle((HANDLE)thread);
 }
-tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout)
+tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout, tb_int_t* retval)
 {
     // wait
     tb_long_t r = WaitForSingleObject((HANDLE)thread, (DWORD)(timeout >= 0? timeout : INFINITE));
@@ -51,12 +81,18 @@ tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout)
     // error?
     tb_check_return_val(r >= WAIT_OBJECT_0, -1);
 
+    // get the return value
+    DWORD code = 0;
+    if (retval && GetExitCodeThread((HANDLE)thread, &code))
+        *retval = (tb_int_t)code;
+    else *retval = 0;
+
     // ok
     return 1;
 }
-tb_void_t tb_thread_return(tb_pointer_t value)
+tb_void_t tb_thread_return(tb_int_t value)
 {
-    ExitThread(0);
+    ExitThread(value);
 }
 tb_bool_t tb_thread_suspend(tb_thread_ref_t thread)
 {

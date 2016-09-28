@@ -383,7 +383,7 @@ static tb_void_t tb_thread_pool_worker_post(tb_thread_pool_impl_t* impl, tb_size
     if (value >= 0 && (tb_size_t)value < post) 
         tb_semaphore_post(impl->semaphore, post - value);
 }
-static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
+static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 {
     // the worker
     tb_thread_pool_worker_t* worker = (tb_thread_pool_worker_t*)priv;
@@ -616,8 +616,7 @@ static tb_pointer_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
     }
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -852,7 +851,7 @@ tb_bool_t tb_thread_pool_exit(tb_thread_pool_ref_t pool)
         {
             // wait it
             tb_long_t wait = 0;
-            if ((wait = tb_thread_wait(worker->loop, 5000)) <= 0)
+            if ((wait = tb_thread_wait(worker->loop, 5000, tb_null)) <= 0)
             {
                 // trace
                 tb_trace_e("worker[%lu]: wait failed: %ld!", i, wait);

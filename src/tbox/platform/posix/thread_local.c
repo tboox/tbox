@@ -50,7 +50,15 @@ static tb_bool_t tb_thread_local_once(tb_cpointer_t priv)
     tb_assert_static(sizeof(pthread_key_t) <= sizeof(local->priv));
 
     // create the pthread key
-    return pthread_key_create((pthread_key_t*)local->priv, (tb_void_t(*)(tb_pointer_t))local->free) == 0;
+    tb_bool_t ok = pthread_key_create((pthread_key_t*)local->priv, tb_null) == 0;
+
+    // save this thread local to list
+    tb_spinlock_enter(&g_thread_local_lock);
+    tb_single_list_entry_insert_tail(&g_thread_local_list, &local->entry);
+    tb_spinlock_leave(&g_thread_local_lock);
+
+    // ok?
+    return ok;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

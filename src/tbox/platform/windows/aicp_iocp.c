@@ -2004,14 +2004,14 @@ static tb_bool_t tb_iocp_post_done(tb_iocp_ptor_impl_t* impl, tb_aice_ref_t aice
     // ok?
     return ok;
 }
-static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
+static tb_int_t tb_iocp_post_loop(tb_cpointer_t priv)
 {
     // check
     tb_iocp_ptor_impl_t*    impl = (tb_iocp_ptor_impl_t*)priv;
     tb_aicp_impl_t*         aicp = impl? impl->base.aicp : tb_null;
-    tb_assert_and_check_return_val(impl && impl->wait && aicp, tb_null);
-    tb_assert_and_check_return_val(impl->timer && impl->ltimer, tb_null);
-    tb_assert_and_check_return_val(impl->kill && impl->post[0] && impl->post[1], tb_null);
+    tb_assert_and_check_return_val(impl && impl->wait && aicp, -1);
+    tb_assert_and_check_return_val(impl->timer && impl->ltimer, -1);
+    tb_assert_and_check_return_val(impl->kill && impl->post[0] && impl->post[1], -1);
 
     // trace
     tb_trace_d("loop: init");
@@ -2124,8 +2124,7 @@ static tb_pointer_t tb_iocp_post_loop(tb_cpointer_t priv)
     tb_atomic_set(&aicp->kill, 1);
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -2331,7 +2330,7 @@ static tb_void_t tb_iocp_ptor_exit(tb_aicp_ptor_impl_t* ptor)
         if (impl->loop)
         {
             tb_long_t wait = 0;
-            if ((wait = tb_thread_wait(impl->loop, 5000)) <= 0)
+            if ((wait = tb_thread_wait(impl->loop, 5000, tb_null)) <= 0)
             {
                 // trace
                 tb_trace_e("loop[%p]: wait failed: %ld!", impl->loop, wait);

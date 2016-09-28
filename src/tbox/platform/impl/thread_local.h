@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -45,6 +46,13 @@ tb_bool_t           tb_thread_local_init_env(tb_noarg_t);
 
 // exit the thread local envirnoment
 tb_void_t           tb_thread_local_exit_env(tb_noarg_t);
+
+/* walk all thread locals
+ *
+ * @param func      the walk function
+ * @param priv      the user private data
+ */
+tb_void_t           tb_thread_local_walk(tb_walk_func_t func, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

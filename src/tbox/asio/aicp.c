@@ -129,7 +129,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_ref_t aice)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
-static tb_pointer_t tb_aicp_instance_loop(tb_cpointer_t priv)
+static tb_int_t tb_aicp_instance_loop(tb_cpointer_t priv)
 {
     // aicp
     tb_aicp_ref_t aicp = (tb_aicp_ref_t)priv;
@@ -144,8 +144,7 @@ static tb_pointer_t tb_aicp_instance_loop(tb_cpointer_t priv)
     tb_trace_d("loop: exit");
 
     // exit
-    tb_thread_return(tb_null);
-    return tb_null;
+    return 0;
 }
 static tb_handle_t tb_aicp_instance_init(tb_cpointer_t* ppriv)
 {
@@ -197,7 +196,7 @@ static tb_void_t tb_aicp_instance_exit(tb_handle_t handle, tb_cpointer_t priv)
     if (loop)
     {
         // wait it
-        if (!tb_thread_wait(loop, 5000)) return ;
+        if (!tb_thread_wait(loop, 5000, tb_null)) return ;
 
         // exit it
         tb_thread_exit(loop);
