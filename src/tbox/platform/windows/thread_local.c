@@ -103,7 +103,7 @@ tb_bool_t tb_thread_local_has(tb_thread_local_ref_t local)
     tb_assert(local);
 
     // get it
-    return (tb_bool_t)TlsGetValue(((DWORD*)local->priv)[1]);
+    return TlsGetValue(((DWORD*)local->priv)[1]) != tb_null;
 }
 tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
 {

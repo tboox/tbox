@@ -101,7 +101,7 @@ tb_bool_t tb_thread_local_has(tb_thread_local_ref_t local)
     tb_assert(local);
 
     // get it
-    return (tb_bool_t)pthread_getspecific(((pthread_key_t*)local->priv)[1]);
+    return pthread_getspecific(((pthread_key_t*)local->priv)[1]) != tb_null;
 }
 tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
 {
