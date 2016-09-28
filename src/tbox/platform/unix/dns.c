@@ -25,8 +25,8 @@
  * includes
  */
 #include "prefix.h"
-#include "../dns.h"
 #include "../file.h"
+#include "../impl/dns.h"
 #include "../../libc/libc.h"
 #include "../../stream/stream.h"
 #include "../../network/network.h"
