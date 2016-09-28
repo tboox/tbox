@@ -26,7 +26,7 @@
  * includes
  */
 #include "platform.h"
-#include "socket.h"
+#include "impl/impl.h"
 #include "exception.h"
 #include "../network/network.h"
 #ifdef TB_CONFIG_OS_ANDROID
@@ -39,27 +39,30 @@
 
 tb_bool_t tb_platform_init(tb_handle_t priv)
 {
-    // init android
+    // init android envirnoment
 #ifdef TB_CONFIG_OS_ANDROID
-    if (!tb_android_init(priv)) return tb_false;
+    if (!tb_android_init_env(priv)) return tb_false;
 #endif
 
-    // init exception
+    // init thread local envirnoment
+    if (!tb_thread_local_init_env()) return tb_false;
+
+    // init exception envirnoment
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
-    if (!tb_exception_init()) return tb_false;
+    if (!tb_exception_init_env()) return tb_false;
 #endif
 
 #ifdef TB_CONFIG_API_HAVE_DEPRECATED
-    // init thread store
-    if (!tb_thread_store_init()) return tb_false;
+    // init thread store envirnoment
+    if (!tb_thread_store_init_env()) return tb_false;
 #endif
 
 #ifdef TB_CONFIG_MODULE_HAVE_NETWORK
-    // init socket context
-    if (!tb_socket_context_init()) return tb_false;
+    // init socket envirnoment
+    if (!tb_socket_init_env()) return tb_false;
 
-    // init dns
-    if (!tb_dns_init()) return tb_false;
+    // init dns envirnoment
+    if (!tb_dns_init_env()) return tb_false;
 #endif
 
     // spak ctime
@@ -71,26 +74,29 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
 tb_void_t tb_platform_exit()
 {
 #ifdef TB_CONFIG_MODULE_HAVE_NETWORK
-    // exit dns
-    tb_dns_exit();
+    // exit dns envirnoment
+    tb_dns_exit_env();
 
-    // exit socket context
-    tb_socket_context_exit();
+    // exit socket envirnoment
+    tb_socket_exit_env();
 #endif
 
 #ifdef TB_CONFIG_API_HAVE_DEPRECATED
-    // exit thread store
-    tb_thread_store_exit();
+    // exit thread store envirnoment
+    tb_thread_store_exit_env();
 #endif
 
-    // exit exception
+    // exit exception envirnoment
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
-    tb_exception_exit();
+    tb_exception_exit_env();
 #endif
 
-    // exit android
+    // exit thread local envirnoment
+    tb_thread_local_exit_env();
+
+    // exit android envirnoment
 #ifdef TB_CONFIG_OS_ANDROID
-    tb_android_exit();
+    tb_android_exit_env();
 #endif
 }
 

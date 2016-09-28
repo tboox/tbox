@@ -72,16 +72,6 @@ typedef enum __tb_socket_ctrl_e
 }tb_socket_ctrl_e;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * private interfaces
- */
-
-// init socket context
-tb_bool_t   tb_socket_context_init(tb_noarg_t);
-
-// exit socket context
-tb_void_t   tb_socket_context_exit(tb_noarg_t);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 

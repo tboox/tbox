@@ -17,59 +17,51 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @tlocal      thread_local.c
+ * @file        aiop.c
  * @ingroup     platform
- *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME            "thread_local"
+#define TB_TRACE_MODULE_NAME            "platform_aiop"
 #define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "thread_local.h"
-#include "impl/thread_local.h"
+#include "prefix.h"
+#include "../../asio/impl/prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_POSIX_HAVE_PTHREAD_SETSPECIFIC) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_GETSPECIFIC) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_CREATE) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_DELETE)
-#   include "posix/thread_local.c"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/thread_local.c"
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "../posix/aiop_select.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
+    {
+        return tb_aiop_rtor_select_init(aiop);
+    }
+#elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
+    && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
+#   include "../linux/aiop_epoll.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
+    {
+        return tb_aiop_rtor_epoll_init(aiop);
+    }
+#elif defined(TB_CONFIG_OS_MACOSX)
+#   include "../mach/aiop_kqueue.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
+    {
+        return tb_aiop_rtor_kqueue_init(aiop);
+    }
+#elif defined(TB_CONFIG_POSIX_HAVE_POLL)
+#   include "../posix/aiop_poll.c"
+    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
+    {
+        return tb_aiop_rtor_poll_init(aiop);
+    }
 #else
-tb_bool_t tb_thread_local_init(tb_thread_local_ref_t local, tb_thread_local_free_t func)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
-{
-    tb_trace_noimpl();
-}
-tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
-{
-    tb_trace_noimpl();
-    return tb_null;
-}
-tb_bool_t tb_thread_local_set(tb_thread_local_ref_t local, tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
+#   error have not available event mode
 #endif
-tb_bool_t tb_thread_local_init_env()
-{
-    return tb_true;
-}
-tb_void_t tb_thread_local_exit_env()
-{
-}
 

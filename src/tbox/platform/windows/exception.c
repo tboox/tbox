@@ -30,11 +30,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_exception_init()
+tb_bool_t tb_exception_init_env()
 {
     return tb_true;
 } 
-tb_void_t tb_exception_exit()
+tb_void_t tb_exception_exit_env()
 {
 }
 

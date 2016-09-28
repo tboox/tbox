@@ -26,13 +26,14 @@
  */
 #include "prefix.h"
 #include "../dynamic.h"
+#include "../impl/dns.h"
 #include "interface/interface.h"
 #include "../../network/network.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_bool_t tb_dns_init()
+tb_bool_t tb_dns_init_env()
 {
     // done
     FIXED_INFO*             info = tb_null;
@@ -96,7 +97,7 @@ tb_bool_t tb_dns_init()
     // ok
     return tb_true;
 }
-tb_void_t tb_dns_exit()
+tb_void_t tb_dns_exit_env()
 {
 }
 

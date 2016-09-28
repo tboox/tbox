@@ -17,51 +17,32 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        aiop.c
+ * @file        dns.c
  * @ingroup     platform
+ *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME            "platform_aiop"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_NAME            "dns"
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../asio/impl/prefix.h"
+#include "dns.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   include "posix/aiop_select.c"
-    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
-    {
-        return tb_aiop_rtor_select_init(aiop);
-    }
-#elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
-    && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
-#   include "linux/aiop_epoll.c"
-    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
-    {
-        return tb_aiop_rtor_epoll_init(aiop);
-    }
-#elif defined(TB_CONFIG_OS_MACOSX)
-#   include "mach/aiop_kqueue.c"
-    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
-    {
-        return tb_aiop_rtor_kqueue_init(aiop);
-    }
-#elif defined(TB_CONFIG_POSIX_HAVE_POLL)
-#   include "posix/aiop_poll.c"
-    tb_aiop_rtor_impl_t* tb_aiop_rtor_impl_init(tb_aiop_impl_t* aiop)
-    {
-        return tb_aiop_rtor_poll_init(aiop);
-    }
+#   include "../windows/dns.c"
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
+#   include "../mach/dns.c"
+#elif defined(TB_CONFIG_OS_ANDROID)
+#   include "../android/dns.c"
 #else
-#   error have not available event mode
+#   include "../unix/dns.c"
 #endif
 

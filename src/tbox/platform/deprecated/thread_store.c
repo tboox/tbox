@@ -65,7 +65,7 @@ static tb_void_t tb_thread_store_free(tb_element_ref_t element, tb_pointer_t buf
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_thread_store_init()
+tb_bool_t tb_thread_store_init_env()
 {
     // enter lock
     tb_spinlock_enter(&g_lock);
@@ -88,7 +88,7 @@ tb_bool_t tb_thread_store_init()
     // ok?
     return g_store? tb_true : tb_false;
 }
-tb_void_t tb_thread_store_exit()
+tb_void_t tb_thread_store_exit_env()
 {   
     // enter lock
     tb_spinlock_enter(&g_lock);

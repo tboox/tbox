@@ -66,10 +66,10 @@ typedef struct __tb_thread_store_data_t
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_thread_store_init(tb_noarg_t);
+tb_bool_t                   tb_thread_store_init_env(tb_noarg_t);
 
 /// exit thread store
-tb_void_t                   tb_thread_store_exit(tb_noarg_t);
+tb_void_t                   tb_thread_store_exit_env(tb_noarg_t);
 
 /*! set thread store data
  *

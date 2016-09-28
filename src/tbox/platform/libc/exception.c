@@ -76,7 +76,7 @@ static tb_void_t tb_exception_signal_func(tb_int_t sig)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_exception_init()
+tb_bool_t tb_exception_init_env()
 {
     // init the thread local, only once
     if (!tb_thread_local_init(&g_exception_local, tb_exception_stack_exit)) return tb_false;
@@ -93,7 +93,7 @@ tb_bool_t tb_exception_init()
     // ok
     return tb_true;
 } 
-tb_void_t tb_exception_exit()
+tb_void_t tb_exception_exit_env()
 {
     // unregister signal handler
 //  tb_signal(TB_SIGINT, TB_SIG_DFL);
@@ -103,5 +103,8 @@ tb_void_t tb_exception_exit()
     tb_signal(TB_SIGSEGV, TB_SIG_DFL);
     tb_signal(TB_SIGABRT, TB_SIG_DFL);
 //  tb_signal(TB_SIGTRAP, TB_SIG_DFL);
+
+    // exit the thread local
+    tb_thread_local_exit(&g_exception_local);
 }
 

@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        android.h
- * @ingroup     platform
+ * @file        thread_local.h
+ *
  */
-#ifndef TB_PLATFORM_ANDROID_H
-#define TB_PLATFORM_ANDROID_H
+#ifndef TB_PLATFORM_IMPL_THREAD_LOCAL_H
+#define TB_PLATFORM_IMPL_THREAD_LOCAL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -29,24 +29,26 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init the android platform
- *
- * @param jvm       the java machine pointer
+/* init the thread local envirnoment
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_android_init_env(JavaVM* jvm);
+tb_bool_t           tb_thread_local_init_env(tb_noarg_t);
 
-/// exit the android platform 
-tb_void_t           tb_android_exit_env(tb_noarg_t);
+// exit the thread local envirnoment
+tb_void_t           tb_thread_local_exit_env(tb_noarg_t);
 
-/*! the java machine pointer
- *
- * @return          the java machine pointer
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
  */
-JavaVM*             tb_android_jvm(tb_noarg_t);
+__tb_extern_c_leave__
 
 #endif

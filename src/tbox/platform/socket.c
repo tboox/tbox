@@ -31,6 +31,7 @@
  * includes
  */
 #include "socket.h"
+#include "impl/socket.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -40,12 +41,12 @@
 #elif defined(TB_CONFIG_POSIX_HAVE_SOCKET)
 #   include "posix/socket.c"
 #else
-tb_bool_t tb_socket_context_init()
+tb_bool_t tb_socket_init_env()
 {
     // ok
     return tb_true;
 }
-tb_void_t tb_socket_context_exit()
+tb_void_t tb_socket_exit_env()
 {
 }
 tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)

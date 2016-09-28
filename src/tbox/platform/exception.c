@@ -26,6 +26,7 @@
  * includes
  */
 #include "platform.h"
+#include "impl/exception.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -35,12 +36,12 @@
 #elif defined(TB_CONFIG_EXCEPTION_ENABLE) && defined(tb_signal)
 #   include "libc/exception.c"
 #else
-tb_bool_t tb_exception_init()
+tb_bool_t tb_exception_init_env()
 {
     tb_trace_noimpl();
     return tb_true;
 } 
-tb_void_t tb_exception_exit()
+tb_void_t tb_exception_exit_env()
 {
     tb_trace_noimpl();
 }

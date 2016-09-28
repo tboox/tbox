@@ -36,7 +36,7 @@ static tb_atomic_t g_jvm = 0;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_android_init(JavaVM* jvm)
+tb_bool_t tb_android_init_env(JavaVM* jvm)
 {
     // check
     if (!jvm)
@@ -51,7 +51,7 @@ tb_bool_t tb_android_init(JavaVM* jvm)
     // ok
     return tb_true;
 }
-tb_void_t tb_android_exit()
+tb_void_t tb_android_exit_env()
 {
     // clear it
     tb_atomic_set(&g_jvm, 0);

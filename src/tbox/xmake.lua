@@ -109,7 +109,7 @@ target("tbox")
     add_files("libm/isqrti.c") 
     add_files("libm/isqrti64.c") 
     add_files("libm/idivi8.c") 
-    add_files("platform/*.c|aicp.c|aiop.c|aioo.c|socket.c|dns.c|context.c|exception.c")
+    add_files("platform/*.c|impl/aicp.c|impl/aiop.c|impl/aioo.c|impl/dns.c|socket.c|context.c|exception.c")
 
     -- add the source files for the float type
     if is_option("float") then add_files("libm/*.c") end
@@ -135,9 +135,9 @@ target("tbox")
     if is_option("network") then
         add_files("asio/aioo.c") 
         add_files("asio/aiop.c") 
-        add_files("platform/dns.c") 
-        add_files("platform/aioo.c") 
-        add_files("platform/aiop.c") 
+        add_files("platform/impl/dns.c") 
+        add_files("platform/impl/aioo.c") 
+        add_files("platform/impl/aiop.c") 
         add_files("platform/socket.c") 
         add_files("stream/impl/stream/http.c") 
         add_files("stream/impl/stream/sock.c") 
@@ -159,7 +159,7 @@ target("tbox")
         add_files("asio/dns.c")
         add_files("stream/**async_**.c")
         add_files("stream/transfer_pool.c")
-        add_files("platform/aicp.c")
+        add_files("platform/impl/aicp.c")
         if is_option("openssl", "polarssl") then add_files("asio/ssl.c") end
     end
 

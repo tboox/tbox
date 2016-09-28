@@ -47,7 +47,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_socket_context_init()
+tb_bool_t tb_socket_init_env()
 {
     // ignore sigpipe
 #if defined(TB_CONFIG_LIBC_HAVE_SIGNAL) \
@@ -58,7 +58,7 @@ tb_bool_t tb_socket_context_init()
     // ok
     return tb_true;
 }
-tb_void_t tb_socket_context_exit()
+tb_void_t tb_socket_exit_env()
 {
 }
 tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)

@@ -28,7 +28,6 @@
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
 #include "page.h"
 #include "path.h"
 #include "file.h"

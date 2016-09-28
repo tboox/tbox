@@ -17,32 +17,35 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        dns.c
- * @ingroup     platform
+ * @file        socket.h
  *
  */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME            "dns"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#ifndef TB_PLATFORM_IMPL_SOCKET_H
+#define TB_PLATFORM_IMPL_SOCKET_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "dns.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * extern
  */
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/dns.c"
-#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
-#   include "mach/dns.c"
-#elif defined(TB_CONFIG_OS_ANDROID)
-#   include "android/dns.c"
-#else
-#   include "unix/dns.c"
-#endif
+__tb_extern_c_enter__
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+// init socket envirnoment
+tb_bool_t   tb_socket_init_env(tb_noarg_t);
+
+// exit socket envirnoment
+tb_void_t   tb_socket_exit_env(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+#endif

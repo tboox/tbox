@@ -60,7 +60,11 @@ typedef struct __tb_thread_local_t
     // the free function
     tb_thread_local_free_t  free;
 
-    // the private data space for implementation
+    /* the private data space for implementation
+     *
+     * - sizeof(pthread_key_t) for pthread key
+     * - sizeof(DWORD) for windows key
+     */
     tb_byte_t               priv[8];
 
 }tb_thread_local_t, *tb_thread_local_ref_t;
@@ -113,9 +117,10 @@ typedef struct __tb_thread_local_t
  */
 tb_bool_t               tb_thread_local_init(tb_thread_local_ref_t local, tb_thread_local_free_t func);
 
-/*! exit the thread local manually(optional) 
+/*! exit the thread local (optional)
  *
- * @note the thread local will be exited and freed automaticlly after it's thread was returned or tb_exit() was called 
+ * @note this local will be exited automaticlly after tb_exit() was called 
+ *       and we call also manually call this function to exit the thread local in earlier time
  *
  * @param local         the thread local reference
  */
@@ -130,6 +135,8 @@ tb_void_t               tb_thread_local_exit(tb_thread_local_ref_t local);
 tb_pointer_t            tb_thread_local_get(tb_thread_local_ref_t local);
 
 /*! set thead local data to the given key
+ *
+ * @note this data will be freed automaticlly after it's thread was returned 
  *
  * @param local         the thread local reference
  * @param priv          the thread local private data

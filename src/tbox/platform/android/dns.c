@@ -25,14 +25,14 @@
  * includes
  */
 #include "prefix.h"
-#include "../dns.h"
+#include "../impl/dns.h"
 #include "../../network/network.h"
 #include <sys/system_properties.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_bool_t tb_dns_init()
+tb_bool_t tb_dns_init_env()
 {
     // done
     tb_size_t count = 0;
@@ -56,7 +56,7 @@ tb_bool_t tb_dns_init()
     // ok
     return tb_true;
 }
-tb_void_t tb_dns_exit()
+tb_void_t tb_dns_exit_env()
 {
 }
 

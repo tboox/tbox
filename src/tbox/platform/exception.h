@@ -78,19 +78,6 @@ __tb_extern_c_enter__
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * private interfaces
- */
-
-/*! init the exception
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_exception_init(tb_noarg_t);
-
-/// exit the exception 
-tb_void_t           tb_exception_exit(tb_noarg_t);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_leave__

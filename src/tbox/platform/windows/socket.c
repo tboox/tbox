@@ -33,7 +33,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_socket_context_init()
+tb_bool_t tb_socket_init_env()
 {
     // load WSA* interfaces
     tb_ws2_32_ref_t ws2_32 = tb_ws2_32();
@@ -81,7 +81,7 @@ tb_bool_t tb_socket_context_init()
     // ok
     return tb_true;
 }
-tb_void_t tb_socket_context_exit()
+tb_void_t tb_socket_exit_env()
 {
     // exit socket pool
     tb_socket_pool_exit();

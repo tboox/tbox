@@ -21,9 +21,8 @@
  * @ingroup     platform
  *
  */
-#ifndef TB_PLATFORM_DNS_H
-#define TB_PLATFORM_DNS_H
-
+#ifndef TB_PLATFORM_IMPL_DNS_H
+#define TB_PLATFORM_IMPL_DNS_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -39,14 +38,14 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init dns 
+/* init dns envirnoment
  *
  * @return  tb_true or tb_false
  */
-tb_bool_t   tb_dns_init(tb_noarg_t);
+tb_bool_t   tb_dns_init_env(tb_noarg_t);
 
-/// exit dns
-tb_void_t   tb_dns_exit(tb_noarg_t);
+// exit dns envirnoment
+tb_void_t   tb_dns_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

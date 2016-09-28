@@ -25,11 +25,11 @@
  * includes
  */
 #include "prefix.h"
-#include "../dns.h"
 #include "../file.h"
 #include "../../libc/libc.h"
 #include "../../stream/stream.h"
 #include "../../network/network.h"
+#include "../impl/dns.h"
 #include <resolv.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -45,7 +45,7 @@ typedef tb_int_t (*tb_dns_res_ninit_func_t)(res_state);
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_bool_t tb_dns_init()
+tb_bool_t tb_dns_init_env()
 {
     // done
     tb_size_t   count = 0;
@@ -81,7 +81,7 @@ tb_bool_t tb_dns_init()
     // ok
     return tb_true;
 }
-tb_void_t tb_dns_exit()
+tb_void_t tb_dns_exit_env()
 {
 }
 

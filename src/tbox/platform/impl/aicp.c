@@ -17,59 +17,36 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @tlocal      thread_local.c
+ * @file        aicp.c
  * @ingroup     platform
- *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME            "thread_local"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_NAME            "platform_aicp"
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "thread_local.h"
-#include "impl/thread_local.h"
+#include "prefix.h"
+#include "../../asio/impl/prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_POSIX_HAVE_PTHREAD_SETSPECIFIC) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_GETSPECIFIC) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_CREATE) && \
-    defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_DELETE)
-#   include "posix/thread_local.c"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/thread_local.c"
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "../windows/aicp_iocp.c"
+    tb_aicp_ptor_impl_t* tb_aicp_ptor_impl_init(tb_aicp_impl_t* aicp)
+    {
+        return tb_iocp_ptor_init(aicp);
+    }
 #else
-tb_bool_t tb_thread_local_init(tb_thread_local_ref_t local, tb_thread_local_free_t func)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
-{
-    tb_trace_noimpl();
-}
-tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
-{
-    tb_trace_noimpl();
-    return tb_null;
-}
-tb_bool_t tb_thread_local_set(tb_thread_local_ref_t local, tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
+#   include "../../asio/impl/aicp_aiop.c"
+    tb_aicp_ptor_impl_t* tb_aicp_ptor_impl_init(tb_aicp_impl_t* aicp)
+    {
+        return tb_aiop_ptor_init(aicp);
+    }
 #endif
-tb_bool_t tb_thread_local_init_env()
-{
-    return tb_true;
-}
-tb_void_t tb_thread_local_exit_env()
-{
-}
 

@@ -27,7 +27,6 @@
  */
 #include <pthread.h>
 #include "../thread.h"
-#include "../../libc/libc.h"
  
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -75,9 +74,6 @@ tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
 
     // exit it
     pthread_key_delete(*((pthread_key_t*)local->priv));
-
-    // reset it
-    tb_memset(local, 0, sizeof(tb_thread_local_t));
 }
 tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
 {
