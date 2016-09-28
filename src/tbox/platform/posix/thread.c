@@ -105,14 +105,14 @@ tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout, tb_int_t* re
     }
 
     // save the return value
-    if (retval) *retval = (tb_int_t)ret;
+    if (retval) *retval = tb_p2s32(ret);
 
     // ok
     return 1;
 }
 tb_void_t tb_thread_return(tb_int_t value)
 {
-    pthread_exit((tb_pointer_t)(tb_size_t)value);
+    pthread_exit((tb_pointer_t)(tb_long_t)value);
 }
 tb_bool_t tb_thread_suspend(tb_thread_ref_t thread)
 {
