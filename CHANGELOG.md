@@ -16,6 +16,7 @@
 
 * Fix some warning and errors for compiler
 * Fix some thread bugs
+* Fix parse bplist uid type
 
 ## v1.5.3
 
@@ -98,6 +99,7 @@
 
 * 修复一些编译警告和错误
 * 修复一些线相关bug
+* 修复bplist中解析uid类型失败问题
 
 ## v1.5.3
 
