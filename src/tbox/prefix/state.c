@@ -37,12 +37,16 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
     {
     case TB_STATE_OK:                           return "ok";
     case TB_STATE_END:                          return "end";
+    case TB_STATE_DEAD:                         return "dead";
+    case TB_STATE_READY:                        return "ready";
     case TB_STATE_FAILED:                       return "failed";
     case TB_STATE_KILLED:                       return "killed";
     case TB_STATE_PAUSED:                       return "paused";
     case TB_STATE_CLOSED:                       return "closed";
     case TB_STATE_OPENED:                       return "opened";
     case TB_STATE_OPENING:                      return "opening";
+    case TB_STATE_SUSPEND:                      return "suspend";
+    case TB_STATE_RUNNING:                      return "running";
     case TB_STATE_PENDING:                      return "pending";
     case TB_STATE_WAITING:                      return "waiting";
     case TB_STATE_WORKING:                      return "working";
