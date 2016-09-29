@@ -61,7 +61,7 @@ typedef enum __tb_object_bplist_type_e
 ,   TB_OBJECT_BPLIST_TYPE_DATA      = 0x40
 ,   TB_OBJECT_BPLIST_TYPE_STRING    = 0x50
 ,   TB_OBJECT_BPLIST_TYPE_UNICODE   = 0x60
-,   TB_OBJECT_BPLIST_TYPE_UID       = 0x70
+,   TB_OBJECT_BPLIST_TYPE_UID       = 0x80
 ,   TB_OBJECT_BPLIST_TYPE_ARRAY     = 0xA0
 ,   TB_OBJECT_BPLIST_TYPE_SET       = 0xC0
 ,   TB_OBJECT_BPLIST_TYPE_DICT      = 0xD0
@@ -141,8 +141,8 @@ static tb_object_ref_t tb_object_bplist_reader_func_data(tb_object_bplist_reader
     tb_assert_and_check_return_val(reader && reader->stream, tb_null);
 
     // init 
-    tb_byte_t*      data = tb_null;
-    tb_object_ref_t    object = tb_null;
+    tb_byte_t*          data = tb_null;
+    tb_object_ref_t     object = tb_null;
 
     // size is too large?
     if (size == 0x0f)
@@ -332,6 +332,7 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
         {
             switch (type)
             {
+            case TB_OBJECT_BPLIST_TYPE_UID:
             case TB_OBJECT_BPLIST_TYPE_UINT:
                 {
                     // read and init object
@@ -360,6 +361,7 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
         {
             switch (type)
             {
+            case TB_OBJECT_BPLIST_TYPE_UID:
             case TB_OBJECT_BPLIST_TYPE_UINT:
                 {
                     // read and init object
@@ -391,6 +393,44 @@ static tb_object_ref_t tb_object_bplist_reader_func_number(tb_object_bplist_read
 
     // ok?
     return object;
+}
+static tb_object_ref_t tb_object_bplist_reader_func_uid(tb_object_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size)
+{
+    // check
+    tb_assert_and_check_return_val(reader && reader->stream, tb_null);
+
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_object_ref_t uid = tb_null;
+    tb_object_ref_t value = tb_null;
+    do
+    {
+        // read uid value
+        value = tb_object_bplist_reader_func_number(reader, TB_OBJECT_BPLIST_TYPE_UINT, size, item_size);
+        tb_assert_and_check_break(value);
+
+        // init uid object
+        uid = tb_object_dictionary_init(8, tb_false);
+        tb_assert_and_check_break(uid);
+
+        // save this uid value
+        tb_object_dictionary_insert(uid, "CF$UID", value);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit value
+        if (value) tb_object_exit(value);
+        value = tb_null;
+    }
+
+    // ok?
+    return uid;
 }
 static tb_object_ref_t tb_object_bplist_reader_func_date(tb_object_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size)
 {
@@ -584,7 +624,7 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
         // failed?
         tb_check_break(!failed);
 
-        // build array & dictionary items
+        // build array and dictionary items
         for (i = 0; i < object_count; i++)
         {
             tb_object_ref_t object = object_hash[i];
@@ -604,10 +644,9 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
                             {
                                 // goto item data
                                 tb_byte_t const* p = priv + sizeof(tb_uint32_t);
-
                                 // walk items
                                 tb_size_t j = 0;
-                                for (i = 0; j < count; j++)
+                                for (j = 0; j < count; j++)
                                 {
                                     // the item index
                                     tb_size_t item = tb_object_bplist_bits_get(p + j * item_size, item_size);
@@ -643,7 +682,7 @@ static tb_object_ref_t tb_object_bplist_reader_done(tb_stream_ref_t stream)
 
                                 // walk items
                                 tb_size_t j = 0;
-                                for (i = 0; j < count; j++)
+                                for (j = 0; j < count; j++)
                                 {
                                     // the key and val
                                     tb_size_t key = tb_object_bplist_bits_get(p + j * item_size, item_size);
@@ -740,7 +779,7 @@ tb_object_reader_t* tb_object_bplist_reader()
     // hook reader 
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATE,      tb_object_bplist_reader_func_date);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATA,      tb_object_bplist_reader_func_data);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UID,       tb_object_bplist_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UID,       tb_object_bplist_reader_func_uid);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_ARRAY,     tb_object_bplist_reader_func_array);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_STRING,    tb_object_bplist_reader_func_string);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UNICODE,   tb_object_bplist_reader_func_string);

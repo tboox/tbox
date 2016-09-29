@@ -37,7 +37,7 @@ static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_stream_ref_t stream, tb_b
     // writ tab
     if (!deflate) 
     {
-        while (tab--) if (tb_stream_printf(stream, "\t") < 0) return tb_false;
+        while (tab--) if (tb_stream_printf(stream, "    ") < 0) return tb_false;
     }
 
     // ok
