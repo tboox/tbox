@@ -17,18 +17,17 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        coroutine.h
- * @defgroup    coroutine
+ * @file        scheduler.h
+ * @ingroup     coroutine
  *
  */
-#ifndef TB_COROUTINE_H
-#define TB_COROUTINE_H
+#ifndef TB_COROUTINE_SCHEDULER_H
+#define TB_COROUTINE_SCHEDULER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "scheduler.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -39,41 +38,60 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the coroutine ref type
-typedef __tb_typeref__(coroutine);
-
-/// the coroutine function type
-typedef tb_void_t       (*tb_coroutine_func_t)(tb_cpointer_t priv);
+/// the scheduler ref type
+typedef __tb_typeref__(scheduler);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! start coroutine 
+/*! init scheduler with fifo
  *
- * @param scheduler     the scheduler, uses the default scheduler if be null
- * @param func          the coroutine function
- * @param priv          the passed user private data as the argument of function
- * @param stacksize     the stack size
+ * @return              the scheduler 
+ */
+tb_scheduler_ref_t      tb_scheduler_init_with_fifo(tb_noarg_t);
+
+/*! init scheduler with poll (for io)
+ *
+ * @return              the scheduler 
+ */
+tb_scheduler_ref_t      tb_scheduler_init_with_poll(tb_noarg_t);
+
+/*! exit scheduler
+ *
+ * @param scheduler     the scheduler
+ */
+tb_void_t               tb_scheduler_exit(tb_scheduler_ref_t scheduler);
+
+/*! run the scheduler loop
+ *
+ * @param scheduler     the scheduler
+ */
+tb_void_t               tb_scheduler_loop(tb_scheduler_ref_t scheduler);
+
+/*! get the scheduler type
+ *
+ * @param scheduler     the scheduler
+ *
+ * @return              the scheduler type
+ */
+tb_size_t               tb_scheduler_type(tb_scheduler_ref_t scheduler);
+
+/*! get the scheduler of the current coroutine
+ *
+ * @return              the scheduler
+ */
+tb_size_t               tb_scheduler_self(tb_noarg_t);
+
+/*! control the scheduler
+ *
+ * @param scheduler     the scheduler
+ * @param ctrl          the ctrl code
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
+tb_bool_t               tb_scheduler_ctrl(tb_scheduler_ref_t scheduler, tb_size_t ctrl, ...);
 
-/// yield from the current coroutine
-tb_void_t               tb_coroutine_yield(tb_noarg_t);
-
-/*! sleep some times (ms)
- *
- * @param interval      the interval (ms)
- */
-tb_void_t               tb_coroutine_sleep(tb_long_t interval);
-
-/*! get the current coroutine
- *
- * @return              the current coroutine
- */
-tb_coroutine_ref_t      tb_coroutine_self(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -17,63 +17,30 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        coroutine.h
+ * @file        scheduler.h
  * @ingroup     coroutine
  *
  */
+#ifndef TB_COROUTINE_IMPL_SCHEDULER_H
+#define TB_COROUTINE_IMPL_SCHEDULER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "coroutine.h"
-#include "impl/impl.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
+ * extern
  */
-tb_coroutine_ref_t tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
-{
-    tb_trace_noimpl();
-    return tb_null;
-}
-tb_void_t tb_coroutine_exit(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-}
-tb_void_t tb_coroutine_switch(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-}
-tb_size_t tb_coroutine_state(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_size_t tb_coroutine_state_set(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-    return 0;
-}
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-tb_bool_t tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_void_t tb_coroutine_yield()
-{
-    tb_trace_noimpl();
-}
-tb_void_t tb_coroutine_sleep(tb_long_t interval)
-{
-    tb_trace_noimpl();
-}
-tb_coroutine_ref_t tb_coroutine_self()
-{
-    tb_trace_noimpl();
-    return tb_null;
-}
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+#endif

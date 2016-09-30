@@ -18,17 +18,16 @@
  *
  * @author      ruki
  * @file        coroutine.h
- * @defgroup    coroutine
+ * @ingroup     coroutine
  *
  */
-#ifndef TB_COROUTINE_H
-#define TB_COROUTINE_H
+#ifndef TB_COROUTINE_IMPL_COROUTINE_H
+#define TB_COROUTINE_IMPL_COROUTINE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "scheduler.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -36,44 +35,68 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
+ * macros
  */
 
-/// the coroutine ref type
-typedef __tb_typeref__(coroutine);
+// is dead?
+#define tb_coroutine_is_dead(coroutine)         (tb_coroutine_state(coroutine) == TB_STATE_DEAD)
 
-/// the coroutine function type
-typedef tb_void_t       (*tb_coroutine_func_t)(tb_cpointer_t priv);
+// is ready?
+#define tb_coroutine_is_ready(coroutine)        (tb_coroutine_state(coroutine) == TB_STATE_READY)
+
+// is running?
+#define tb_coroutine_is_running(coroutine)      (tb_coroutine_state(coroutine) == TB_STATE_RUNNING)
+
+// is suspend?
+#define tb_coroutine_is_suspend(coroutine)      (tb_coroutine_state(coroutine) == TB_STATE_SUSPEND)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! start coroutine 
+/* init coroutine 
  *
- * @param scheduler     the scheduler, uses the default scheduler if be null
+ * @param scheduler     the scheduler
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
  * @param stacksize     the stack size
  *
- * @return              tb_true or tb_false
+ * @return              the coroutine 
  */
-tb_bool_t               tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
+tb_coroutine_ref_t      tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
-/// yield from the current coroutine
-tb_void_t               tb_coroutine_yield(tb_noarg_t);
-
-/*! sleep some times (ms)
+/* exit coroutine
  *
- * @param interval      the interval (ms)
+ * @param coroutine     the coroutine
  */
-tb_void_t               tb_coroutine_sleep(tb_long_t interval);
+tb_void_t               tb_coroutine_exit(tb_coroutine_ref_t coroutine);
 
-/*! get the current coroutine
+/* switch to the given coroutine
  *
- * @return              the current coroutine
+ * @param coroutine     the coroutine
  */
-tb_coroutine_ref_t      tb_coroutine_self(tb_noarg_t);
+tb_void_t               tb_coroutine_switch(tb_coroutine_ref_t coroutine);
+
+/* get the coroutine state 
+ *
+ * @param coroutine     the coroutine
+ *
+ * @return              the state value
+ */
+tb_size_t               tb_coroutine_state(tb_coroutine_ref_t coroutine);
+
+/* set the coroutine state 
+ *
+ * - TB_STATE_READY
+ * - TB_STATE_SUSPEND
+ * - TB_STATE_RUNNING
+ * - TB_STATE_DEAD
+ *
+ * @param coroutine     the coroutine
+ *
+ * @return              the state value
+ */
+tb_size_t               tb_coroutine_state_set(tb_coroutine_ref_t coroutine);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
