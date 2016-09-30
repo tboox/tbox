@@ -65,7 +65,7 @@ static tb_void_t tb_coroutine_context_func(tb_context_from_t from)
 tb_coroutine_t* tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
 {
     // check
-    tb_assert_and_check_return_val(scheduler && func, tb_false);
+    tb_assert_and_check_return_val(scheduler && func, tb_null);
 
     // done
     tb_bool_t           ok = tb_false;
