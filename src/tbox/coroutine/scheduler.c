@@ -26,33 +26,72 @@
  * includes
  */
 #include "scheduler.h"
+#include "impl/impl.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+
+// the self scheduler local 
+static tb_thread_local_t s_scheduler_self = TB_THREAD_LOCAL_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_scheduler_ref_t tb_scheduler_init_with_fifo()
+tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
 {
-    return tb_null;
+    // check
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)self;
+    tb_assert_and_check_return(scheduler);
+
+    // exit the scheduler
+    if (scheduler->exit) scheduler->exit(scheduler);
 }
-tb_scheduler_ref_t tb_scheduler_init_with_poll()
+tb_void_t tb_scheduler_loop(tb_scheduler_ref_t self)
 {
-    return tb_null;
+    // check
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)self;
+    tb_assert_and_check_return(scheduler && scheduler->loop);
+ 
+    // init self scheduler local
+    if (!tb_thread_local_init(&s_scheduler_self, tb_null)) return ;
+ 
+    // update and overide the current scheduler
+    tb_thread_local_set(&s_scheduler_self, self);
+
+    // run loop
+    scheduler->loop(scheduler);
 }
-tb_void_t tb_scheduler_exit(tb_scheduler_ref_t scheduler)
+tb_size_t tb_scheduler_type(tb_scheduler_ref_t self)
 {
+    // check
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)self;
+    tb_assert_and_check_return_val(scheduler, TB_SCHEDULER_TYPE_NONE);
+
+    // get it
+    return scheduler->type;
 }
-tb_void_t tb_scheduler_loop(tb_scheduler_ref_t scheduler)
+tb_scheduler_ref_t tb_scheduler_self()
 {
+    // get self scheduler on the current thread
+    return (tb_scheduler_ref_t)tb_thread_local_get(&s_scheduler_self);
 }
-tb_size_t tb_scheduler_type(tb_scheduler_ref_t scheduler)
+tb_bool_t tb_scheduler_ctrl(tb_scheduler_ref_t self, tb_size_t ctrl, ...)
 {
-    return 0;
-}
-tb_size_t tb_scheduler_self()
-{
-    return 0;
-}
-tb_bool_t tb_scheduler_ctrl(tb_scheduler_ref_t scheduler, tb_size_t ctrl, ...)
-{
-    return tb_false;
+    // check
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)self;
+    tb_assert_and_check_return_val(scheduler && scheduler->ctrl, tb_false);
+
+    // init args
+    tb_va_list_t args;
+    tb_va_start(args, ctrl);
+
+    // ctrl it
+    tb_bool_t ok = scheduler->ctrl(scheduler, ctrl, args);
+
+    // exit args
+    tb_va_end(args);
+
+    // ok?
+    return ok;
 }

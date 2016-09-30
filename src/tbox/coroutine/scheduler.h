@@ -35,11 +35,38 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the scheduler ctrl
+#define TB_SCHEDULER_CTRL(type, ctrl)           (((type) << 16) | (ctrl))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
 /// the scheduler ref type
 typedef __tb_typeref__(scheduler);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the scheduler type enum
+typedef enum __tb_scheduler_type_e
+{
+    TB_SCHEDULER_TYPE_NONE      = 0
+,   TB_SCHEDULER_TYPE_FIFO      = 1
+,   TB_SCHEDULER_TYPE_POLL      = 2
+
+}tb_scheduler_type_e;
+
+/// the scheduler ctrl enum
+typedef enum __tb_scheduler_ctrl_e
+{
+    TB_SCHEDULER_CTRL_NONE      = 0
+
+}tb_scheduler_ctrl_e;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -81,7 +108,7 @@ tb_size_t               tb_scheduler_type(tb_scheduler_ref_t scheduler);
  *
  * @return              the scheduler
  */
-tb_size_t               tb_scheduler_self(tb_noarg_t);
+tb_scheduler_ref_t      tb_scheduler_self(tb_noarg_t);
 
 /*! control the scheduler
  *

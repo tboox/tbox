@@ -23,57 +23,89 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME            "coroutine"
+#define TB_TRACE_MODULE_DEBUG           (0)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "coroutine.h"
+#include "scheduler.h"
 #include "impl/impl.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
- */
-tb_coroutine_ref_t tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
-{
-    tb_trace_noimpl();
-    return tb_null;
-}
-tb_void_t tb_coroutine_exit(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-}
-tb_void_t tb_coroutine_switch(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-}
-tb_size_t tb_coroutine_state(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-    return 0;
-}
-tb_size_t tb_coroutine_state_set(tb_coroutine_ref_t coroutine)
-{
-    tb_trace_noimpl();
-    return 0;
-}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(scheduler && func, tb_false);
+
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_coroutine_ref_t  coroutine = tb_null;
+    do
+    {
+        // init coroutine
+        coroutine = (tb_coroutine_ref_t)tb_coroutine_init(scheduler, func, priv, stacksize);
+        tb_assert_and_check_break(coroutine);
+
+        // TODO
+        // start it
+        // ...
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // ok?
+    return ok;
 }
 tb_void_t tb_coroutine_yield()
 {
-    tb_trace_noimpl();
+    // get current scheduler
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    if (scheduler)
+    {
+        // check
+        tb_assert(scheduler->yield);
+
+        // get the current coroutine
+        tb_coroutine_t* coroutine = tb_scheduler_running(scheduler);
+        if (coroutine)
+        {
+            // yield the current coroutine
+            scheduler->yield(coroutine);
+        }
+    }
 }
-tb_void_t tb_coroutine_sleep(tb_long_t interval)
+tb_void_t tb_coroutine_sleep(tb_size_t interval)
 {
-    tb_trace_noimpl();
+    // get current scheduler
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    if (scheduler)
+    {
+        // check
+        tb_assert(scheduler->sleep);
+
+        // get the current coroutine
+        tb_coroutine_t* coroutine = tb_scheduler_running(scheduler);
+        if (coroutine)
+        {
+            // sleep some times
+            scheduler->sleep(coroutine, interval);
+        }
+    }
 }
 tb_coroutine_ref_t tb_coroutine_self()
 {
-    tb_trace_noimpl();
-    return tb_null;
+    // get coroutine
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+
+    // get running coroutine
+    return scheduler? (tb_coroutine_ref_t)tb_scheduler_running(scheduler) : tb_null;
 }
 

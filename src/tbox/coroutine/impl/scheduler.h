@@ -28,11 +28,69 @@
  * includes
  */
 #include "prefix.h"
+#include "coroutine.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// get running coroutine
+#define tb_scheduler_running(scheduler)           ((scheduler)->running)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the scheduler type
+typedef struct __tb_scheduler_t
+{   
+    // the scheduler type
+    tb_uint8_t              type;
+
+    // the running coroutine
+    tb_coroutine_t*         running;
+
+    /* yield the given coroutine
+     *
+     * @param coroutine     the yielded coroutine
+     */
+    tb_void_t               (*yield)(tb_coroutine_t* coroutine);
+
+    /* sleep the given coroutine
+     *
+     * @param coroutine     the sleeped coroutine
+     * @param interval      the interval (ms)
+     */
+    tb_void_t               (*sleep)(tb_coroutine_t* coroutine, tb_size_t interval);
+
+    /* control scheduler 
+     *
+     * @param scheduler     the scheduler
+     * @param ctrl          the control code
+     * @param args          the arguments
+     *
+     * @return              tb_true or tb_false
+     */
+    tb_bool_t               (*ctrl)(struct __tb_scheduler_t* scheduler, tb_size_t ctrl, tb_va_list_t args);
+
+    /* run scheduler loop
+     *
+     * @param scheduler     the scheduler
+     */
+    tb_void_t               (*loop)(struct __tb_scheduler_t* scheduler);
+
+    /* exit scheduler
+     *
+     * @param scheduler     the scheduler
+     */
+    tb_void_t               (*exit)(struct __tb_scheduler_t* scheduler);
+
+}tb_scheduler_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

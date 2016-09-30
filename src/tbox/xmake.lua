@@ -171,7 +171,7 @@ target("tbox")
         else
             add_files("platform/arch/context.S") 
         end
-        add_files("coroutine/*.c") 
+        add_files("coroutine/**.c") 
     end
 
     -- add the source files for the deprecated module

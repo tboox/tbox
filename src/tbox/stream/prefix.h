@@ -51,8 +51,8 @@
 typedef enum __tb_stream_mode_e
 {
     TB_STREAM_MODE_NONE     = 0
-,   TB_STREAM_MODE_AIOO     = 1 ///!< for bstream
-,   TB_STREAM_MODE_AICO     = 2 ///!< for astream
+,   TB_STREAM_MODE_AIOO     = 1 ///!< for stream
+,   TB_STREAM_MODE_AICO     = 2 ///!< for async_stream
 
 }tb_stream_mode_e;
 

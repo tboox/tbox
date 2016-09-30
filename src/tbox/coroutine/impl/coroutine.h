@@ -38,17 +38,68 @@ __tb_extern_c_enter__
  * macros
  */
 
+// get coroutine state
+#define tb_coroutine_state(coroutine)               ((coroutine)->state)
+
+// set coroutine state
+#define tb_coroutine_state_set(coroutine, value)    do { ((coroutine)->state) = (value); } while (0)
+
+// get coroutine state c-string
+#define tb_coroutine_state_cstr(coroutine)          tb_state_cstr(((coroutine)->state))
+
+// get scheduler
+#define tb_coroutine_scheduler(coroutine)           ((coroutine)->scheduler)
+
 // is dead?
-#define tb_coroutine_is_dead(coroutine)         (tb_coroutine_state(coroutine) == TB_STATE_DEAD)
+#define tb_coroutine_is_dead(coroutine)             (tb_coroutine_state(coroutine) == TB_STATE_DEAD)
 
 // is ready?
-#define tb_coroutine_is_ready(coroutine)        (tb_coroutine_state(coroutine) == TB_STATE_READY)
+#define tb_coroutine_is_ready(coroutine)            (tb_coroutine_state(coroutine) == TB_STATE_READY)
 
 // is running?
-#define tb_coroutine_is_running(coroutine)      (tb_coroutine_state(coroutine) == TB_STATE_RUNNING)
+#define tb_coroutine_is_running(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_RUNNING)
 
 // is suspend?
-#define tb_coroutine_is_suspend(coroutine)      (tb_coroutine_state(coroutine) == TB_STATE_SUSPEND)
+#define tb_coroutine_is_suspend(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_SUSPEND)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the coroutine type
+typedef struct __tb_coroutine_t
+{
+    // the scheduler
+    tb_scheduler_ref_t      scheduler;
+
+    // the context 
+    tb_context_ref_t        context;
+
+    // the stack base (top)
+    tb_byte_t*              stackbase;
+
+    // the stack size
+    tb_size_t               stacksize;
+
+    /* the state
+     * 
+     * - TB_STATE_READY
+     * - TB_STATE_SUSPEND
+     * - TB_STATE_RUNNING
+     * - TB_STATE_DEAD
+     */
+    tb_size_t               state;
+
+    // the function 
+    tb_coroutine_func_t     func;
+
+    // the user private data
+    tb_cpointer_t           priv;
+
+    // the guard
+    tb_uint16_t             guard;
+
+}tb_coroutine_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -59,44 +110,33 @@ __tb_extern_c_enter__
  * @param scheduler     the scheduler
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
- * @param stacksize     the stack size
+ * @param stacksize     the stack size, uses the default stack size if be zero
  *
  * @return              the coroutine 
  */
-tb_coroutine_ref_t      tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
+tb_coroutine_t*         tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
 /* exit coroutine
  *
  * @param coroutine     the coroutine
  */
-tb_void_t               tb_coroutine_exit(tb_coroutine_ref_t coroutine);
+tb_void_t               tb_coroutine_exit(tb_coroutine_t* coroutine);
 
-/* switch to the given coroutine
- *
- * @param coroutine     the coroutine
- */
-tb_void_t               tb_coroutine_switch(tb_coroutine_ref_t coroutine);
-
-/* get the coroutine state 
+/* jump to the given coroutine
  *
  * @param coroutine     the coroutine
  *
- * @return              the state value
+ * @return              the from coroutine
  */
-tb_size_t               tb_coroutine_state(tb_coroutine_ref_t coroutine);
+tb_coroutine_t*         tb_coroutine_jump(tb_coroutine_t* coroutine);
 
-/* set the coroutine state 
- *
- * - TB_STATE_READY
- * - TB_STATE_SUSPEND
- * - TB_STATE_RUNNING
- * - TB_STATE_DEAD
+#ifdef __tb_debug__
+/* check coroutine
  *
  * @param coroutine     the coroutine
- *
- * @return              the state value
  */
-tb_size_t               tb_coroutine_state_set(tb_coroutine_ref_t coroutine);
+tb_void_t               tb_coroutine_check(tb_coroutine_t* coroutine);
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
