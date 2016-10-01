@@ -43,25 +43,8 @@ tb_bool_t tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t f
     // check
     tb_assert_and_check_return_val(scheduler && func, tb_false);
 
-    // done
-    tb_bool_t           ok = tb_false;
-    tb_coroutine_t*     coroutine = tb_null;
-    do
-    {
-        // init coroutine
-        coroutine = tb_coroutine_init(scheduler, func, priv, stacksize);
-        tb_assert_and_check_break(coroutine);
-
-        // start it
-        if (!tb_scheduler_start((tb_scheduler_t*)scheduler, coroutine)) break;
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // ok?
-    return ok;
+    // start it
+    return tb_scheduler_start((tb_scheduler_t*)scheduler, func, priv, stacksize);
 }
 tb_void_t tb_coroutine_yield()
 {

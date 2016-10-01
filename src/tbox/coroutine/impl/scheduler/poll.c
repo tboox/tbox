@@ -45,38 +45,54 @@ typedef struct __tb_scheduler_poll_t
 static __tb_inline__ tb_scheduler_poll_ref_t tb_scheduler_poll_cast(tb_scheduler_t* scheduler)
 {
     // check
-    tb_assert(scheduler && scheduler->type == TB_SCHEDULER_TYPE_FIFO);
+    tb_assert(scheduler && scheduler->type == TB_SCHEDULER_TYPE_POLL);
 
     // cast it
     return (tb_scheduler_poll_ref_t)scheduler;
 }
-static tb_bool_t tb_scheduler_poll_start(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
+static tb_bool_t tb_scheduler_poll_start(tb_scheduler_t* scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
 {
     // check
     tb_scheduler_poll_ref_t scheduler_poll = tb_scheduler_poll_cast(scheduler);
-    tb_assert_and_check_return_val(scheduler_poll, tb_false);
+    tb_assert(scheduler_poll);
 
-    return tb_false;
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_coroutine_t*     coroutine = tb_null;
+    do
+    {
+        // init coroutine
+        coroutine = tb_coroutine_init((tb_scheduler_ref_t)scheduler, func, priv, stacksize);
+        tb_assert_and_check_break(coroutine);
+
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // ok?
+    return ok;
 }
 static tb_void_t tb_scheduler_poll_yield(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {
     // check
     tb_scheduler_poll_ref_t scheduler_poll = tb_scheduler_poll_cast(scheduler);
-    tb_assert_and_check_return(scheduler_poll);
+    tb_assert(scheduler_poll);
 
 }
 static tb_void_t tb_scheduler_poll_sleep(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_size_t interval)
 {
     // check
     tb_scheduler_poll_ref_t scheduler_poll = tb_scheduler_poll_cast(scheduler);
-    tb_assert_and_check_return(scheduler_poll);
+    tb_assert(scheduler_poll);
 
 }
 static tb_bool_t tb_scheduler_poll_ctrl(tb_scheduler_t* scheduler, tb_size_t ctrl, tb_va_list_t args)
 { 
     // check
     tb_scheduler_poll_ref_t scheduler_poll = tb_scheduler_poll_cast(scheduler);
-    tb_assert_and_check_return_val(scheduler_poll, tb_false);
+    tb_assert(scheduler_poll);
 
     return tb_false;
 }
@@ -84,14 +100,14 @@ static tb_void_t tb_scheduler_poll_loop(tb_scheduler_t* scheduler)
 {
     // check
     tb_scheduler_poll_ref_t scheduler_poll = tb_scheduler_poll_cast(scheduler);
-    tb_assert_and_check_return(scheduler_poll);
+    tb_assert(scheduler_poll);
 
 }
 static tb_void_t tb_scheduler_poll_exit(tb_scheduler_t* scheduler)
 {
     // check
     tb_scheduler_poll_ref_t scheduler_poll = tb_scheduler_poll_cast(scheduler);
-    tb_assert_and_check_return(scheduler_poll);
+    tb_assert(scheduler_poll);
 
     // exit it
     tb_free(scheduler_poll);
@@ -112,7 +128,7 @@ tb_scheduler_ref_t tb_scheduler_init_with_poll()
         tb_assert_and_check_break(scheduler);
 
         // init base
-        scheduler->base.type    = TB_SCHEDULER_TYPE_FIFO;
+        scheduler->base.type    = TB_SCHEDULER_TYPE_POLL;
         scheduler->base.ctrl    = tb_scheduler_poll_ctrl;
         scheduler->base.loop    = tb_scheduler_poll_loop;
         scheduler->base.exit    = tb_scheduler_poll_exit;

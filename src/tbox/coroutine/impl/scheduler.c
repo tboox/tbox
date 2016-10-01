@@ -30,13 +30,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_scheduler_start(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
+tb_bool_t tb_scheduler_start(tb_scheduler_t* scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
 {
     // check
-    tb_assert(scheduler && scheduler->start && coroutine);
+    tb_assert(scheduler && scheduler->start && func);
 
-    // start the coroutine
-    return scheduler->start(scheduler, coroutine);
+    // start the coroutine function
+    return scheduler->start(scheduler, func, priv, stacksize);
 }
 tb_void_t tb_scheduler_yield(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {

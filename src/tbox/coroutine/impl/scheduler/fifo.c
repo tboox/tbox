@@ -50,33 +50,49 @@ static __tb_inline__ tb_scheduler_fifo_ref_t tb_scheduler_fifo_cast(tb_scheduler
     // cast it
     return (tb_scheduler_fifo_ref_t)scheduler;
 }
-static tb_bool_t tb_scheduler_fifo_start(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
+static tb_bool_t tb_scheduler_fifo_start(tb_scheduler_t* scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
 {
     // check
     tb_scheduler_fifo_ref_t scheduler_fifo = tb_scheduler_fifo_cast(scheduler);
-    tb_assert_and_check_return_val(scheduler_fifo, tb_false);
+    tb_assert(scheduler_fifo);
 
-    return tb_false;
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_coroutine_t*     coroutine = tb_null;
+    do
+    {
+        // init coroutine
+        coroutine = tb_coroutine_init((tb_scheduler_ref_t)scheduler, func, priv, stacksize);
+        tb_assert_and_check_break(coroutine);
+
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // ok?
+    return ok;
 }
 static tb_void_t tb_scheduler_fifo_yield(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {
     // check
     tb_scheduler_fifo_ref_t scheduler_fifo = tb_scheduler_fifo_cast(scheduler);
-    tb_assert_and_check_return(scheduler_fifo);
+    tb_assert(scheduler_fifo);
 
 }
 static tb_void_t tb_scheduler_fifo_sleep(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_size_t interval)
 {
     // check
     tb_scheduler_fifo_ref_t scheduler_fifo = tb_scheduler_fifo_cast(scheduler);
-    tb_assert_and_check_return(scheduler_fifo);
+    tb_assert(scheduler_fifo);
 
 }
 static tb_bool_t tb_scheduler_fifo_ctrl(tb_scheduler_t* scheduler, tb_size_t ctrl, tb_va_list_t args)
 { 
     // check
     tb_scheduler_fifo_ref_t scheduler_fifo = tb_scheduler_fifo_cast(scheduler);
-    tb_assert_and_check_return_val(scheduler_fifo, tb_false);
+    tb_assert(scheduler_fifo);
 
     return tb_false;
 }
@@ -84,14 +100,14 @@ static tb_void_t tb_scheduler_fifo_loop(tb_scheduler_t* scheduler)
 {
     // check
     tb_scheduler_fifo_ref_t scheduler_fifo = tb_scheduler_fifo_cast(scheduler);
-    tb_assert_and_check_return(scheduler_fifo);
+    tb_assert(scheduler_fifo);
 
 }
 static tb_void_t tb_scheduler_fifo_exit(tb_scheduler_t* scheduler)
 {
     // check
     tb_scheduler_fifo_ref_t scheduler_fifo = tb_scheduler_fifo_cast(scheduler);
-    tb_assert_and_check_return(scheduler_fifo);
+    tb_assert(scheduler_fifo);
 
     // exit it
     tb_free(scheduler_fifo);

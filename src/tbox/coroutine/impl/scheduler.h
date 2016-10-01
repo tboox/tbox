@@ -55,14 +55,16 @@ typedef struct __tb_scheduler_t
     // the running coroutine
     tb_coroutine_t*         running;
 
-    /* start the given coroutine
+    /* start the given coroutine function
      *
-     * @param scheduler     the scheduler
-     * @param coroutine     the coroutine
+     * @param scheduler     the scheduler, uses the default scheduler if be null
+     * @param func          the coroutine function
+     * @param priv          the passed user private data as the argument of function
+     * @param stacksize     the stack size
      *
      * @return              tb_true or tb_false
      */
-    tb_bool_t               (*start)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+    tb_bool_t               (*start)(struct __tb_scheduler_t* scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
     /* yield the given coroutine
      *
@@ -107,14 +109,16 @@ typedef struct __tb_scheduler_t
  * interfaces
  */
 
-/* start the coroutine 
+/* start the coroutine function 
  *
- * @param scheduler         the scheduler
- * @param coroutine         the coroutine
+ * @param scheduler         the scheduler, uses the default scheduler if be null
+ * @param func              the coroutine function
+ * @param priv              the passed user private data as the argument of function
+ * @param stacksize         the stack size
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_scheduler_start(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+tb_bool_t                   tb_scheduler_start(tb_scheduler_t* scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
 /* yield the given coroutine
  *
