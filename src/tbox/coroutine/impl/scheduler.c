@@ -25,9 +25,33 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "scheduler.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_bool_t tb_scheduler_ready(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
+{
+    // check
+    tb_assert(scheduler && scheduler->ready && coroutine);
+
+    // ready the coroutine
+    return scheduler->ready(scheduler, coroutine);
+}
+tb_void_t tb_scheduler_yield(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
+{
+    // check
+    tb_assert(scheduler && scheduler->yield && coroutine);
+
+    // yield the coroutine
+    scheduler->yield(scheduler, coroutine);
+}
+tb_void_t tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_size_t interval)
+{
+    // check
+    tb_assert(scheduler && scheduler->sleep && coroutine);
+
+    // sleep the coroutine
+    scheduler->sleep(scheduler, coroutine, interval);
+}
 

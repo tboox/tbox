@@ -55,18 +55,29 @@ typedef struct __tb_scheduler_t
     // the running coroutine
     tb_coroutine_t*         running;
 
+    /* ready the given coroutine
+     *
+     * @param scheduler     the scheduler
+     * @param coroutine     the coroutine
+     *
+     * @return              tb_true or tb_false
+     */
+    tb_bool_t               (*ready)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+
     /* yield the given coroutine
      *
-     * @param coroutine     the yielded coroutine
+     * @param scheduler     the scheduler
+     * @param coroutine     the coroutine
      */
-    tb_void_t               (*yield)(tb_coroutine_t* coroutine);
+    tb_void_t               (*yield)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
 
     /* sleep the given coroutine
      *
-     * @param coroutine     the sleeped coroutine
+     * @param scheduler     the scheduler
+     * @param coroutine     the coroutine
      * @param interval      the interval (ms)
      */
-    tb_void_t               (*sleep)(tb_coroutine_t* coroutine, tb_size_t interval);
+    tb_void_t               (*sleep)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_size_t interval);
 
     /* control scheduler 
      *
@@ -95,6 +106,30 @@ typedef struct __tb_scheduler_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+
+/* ready the coroutine 
+ *
+ * @param scheduler         the scheduler
+ * @param coroutine         the coroutine
+ *
+ * @return                  tb_true or tb_false
+ */
+tb_bool_t                   tb_scheduler_ready(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+
+/* yield the given coroutine
+ *
+ * @param scheduler         the scheduler
+ * @param coroutine         the coroutine
+ */
+tb_void_t                   tb_scheduler_yield(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+
+/* sleep the given coroutine
+ *
+ * @param scheduler         the scheduler
+ * @param coroutine         the coroutine
+ * @param interval          the interval (ms)
+ */
+tb_void_t                   tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_size_t interval);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

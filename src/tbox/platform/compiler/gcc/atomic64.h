@@ -69,7 +69,7 @@ static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_add_sync(tb_atomic64_t* a, 
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_sub_sync(tb_atomic64_t* a, tb_hong_t v)
 {
-    return __sync_fetch_and_sub(a, v);
+    return __sync_fetch_and_sub_8(a, v);
 }
 #if !(defined(TB_CONFIG_OS_IOS) && (TB_ARCH_ARM_VERSION < 7))
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_xor_sync(tb_atomic64_t* a, tb_hong_t v)

@@ -45,16 +45,15 @@ tb_bool_t tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t f
 
     // done
     tb_bool_t           ok = tb_false;
-    tb_coroutine_ref_t  coroutine = tb_null;
+    tb_coroutine_t*     coroutine = tb_null;
     do
     {
         // init coroutine
-        coroutine = (tb_coroutine_ref_t)tb_coroutine_init(scheduler, func, priv, stacksize);
+        coroutine = tb_coroutine_init(scheduler, func, priv, stacksize);
         tb_assert_and_check_break(coroutine);
 
-        // TODO
-        // start it
-        // ...
+        // ready it
+        if (!tb_scheduler_ready((tb_scheduler_t*)scheduler, coroutine)) break;
 
         // ok
         ok = tb_true;
@@ -70,15 +69,12 @@ tb_void_t tb_coroutine_yield()
     tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
     if (scheduler)
     {
-        // check
-        tb_assert(scheduler->yield);
-
         // get the current coroutine
         tb_coroutine_t* coroutine = tb_scheduler_running(scheduler);
         if (coroutine)
         {
             // yield the current coroutine
-            scheduler->yield(coroutine);
+            tb_scheduler_yield(scheduler, coroutine);
         }
     }
 }
@@ -88,15 +84,12 @@ tb_void_t tb_coroutine_sleep(tb_size_t interval)
     tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
     if (scheduler)
     {
-        // check
-        tb_assert(scheduler->sleep);
-
         // get the current coroutine
         tb_coroutine_t* coroutine = tb_scheduler_running(scheduler);
         if (coroutine)
         {
             // sleep some times
-            scheduler->sleep(coroutine, interval);
+            tb_scheduler_sleep(scheduler, coroutine, interval);
         }
     }
 }
