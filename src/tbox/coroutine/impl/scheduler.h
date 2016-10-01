@@ -50,19 +50,19 @@ __tb_extern_c_enter__
 typedef struct __tb_scheduler_t
 {   
     // the scheduler type
-    tb_uint8_t              type;
+    tb_size_t               type;
 
     // the running coroutine
     tb_coroutine_t*         running;
 
-    /* ready the given coroutine
+    /* start the given coroutine
      *
      * @param scheduler     the scheduler
      * @param coroutine     the coroutine
      *
      * @return              tb_true or tb_false
      */
-    tb_bool_t               (*ready)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+    tb_bool_t               (*start)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
 
     /* yield the given coroutine
      *
@@ -107,14 +107,14 @@ typedef struct __tb_scheduler_t
  * interfaces
  */
 
-/* ready the coroutine 
+/* start the coroutine 
  *
  * @param scheduler         the scheduler
  * @param coroutine         the coroutine
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_scheduler_ready(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+tb_bool_t                   tb_scheduler_start(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
 
 /* yield the given coroutine
  *

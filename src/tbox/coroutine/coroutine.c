@@ -52,8 +52,8 @@ tb_bool_t tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t f
         coroutine = tb_coroutine_init(scheduler, func, priv, stacksize);
         tb_assert_and_check_break(coroutine);
 
-        // ready it
-        if (!tb_scheduler_ready((tb_scheduler_t*)scheduler, coroutine)) break;
+        // start it
+        if (!tb_scheduler_start((tb_scheduler_t*)scheduler, coroutine)) break;
 
         // ok
         ok = tb_true;

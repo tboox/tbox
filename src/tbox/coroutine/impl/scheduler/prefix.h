@@ -17,21 +17,18 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        scheduler_poll.c
- * @ingroup     coroutine
+ * @file        prefix.h
  *
  */
+#ifndef TB_COROUTINE_IMPL_SCHEDULER_PREFIX_H
+#define TB_COROUTINE_IMPL_SCHEDULER_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
+#include "../scheduler.h"
+#include "../coroutine.h"
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_scheduler_ref_t tb_scheduler_init_with_poll()
-{
-    return tb_null;
-}
 
+#endif
