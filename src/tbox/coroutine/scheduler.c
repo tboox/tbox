@@ -43,19 +43,26 @@
 static tb_thread_local_t s_scheduler_self = TB_THREAD_LOCAL_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
-static tb_bool_t tb_scheduler_free(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_void_t tb_scheduler_free(tb_single_list_entry_head_ref_t coroutines)
 {
     // check
-    tb_coroutine_t* coroutine = (tb_coroutine_t*)item;
-    tb_assert_and_check_return_val(coroutine, tb_false);
+    tb_assert(coroutines);
 
-    // exit coroutine 
-    tb_coroutine_exit(coroutine);
+    // free all coroutines
+    while (tb_single_list_entry_size(coroutines))
+    {
+        // get the next entry from head
+        tb_single_list_entry_ref_t entry = tb_single_list_entry_head(coroutines);
+        tb_assert(entry);
 
-    // continue 
-    return tb_true;
+        // remove it from the ready coroutines
+        tb_single_list_entry_remove_head(coroutines);
+
+        // exit this coroutine
+        tb_coroutine_exit((tb_coroutine_t*)tb_single_list_entry(coroutines, entry));
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -114,10 +121,10 @@ tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
     tb_assert(!tb_single_list_entry_size(&scheduler->coroutines_ready));
 
     // free all dead coroutines 
-    tb_walk_all(tb_single_list_entry_itor(&scheduler->coroutines_dead), tb_scheduler_free, tb_null);
+    tb_scheduler_free(&scheduler->coroutines_dead);
 
     // free all ready coroutines 
-    tb_walk_all(tb_single_list_entry_itor(&scheduler->coroutines_ready), tb_scheduler_free, tb_null);
+    tb_scheduler_free(&scheduler->coroutines_ready);
 
     // exit dead coroutines
     tb_single_list_entry_exit(&scheduler->coroutines_dead);
