@@ -49,59 +49,20 @@ __tb_extern_c_enter__
 // the scheduler type
 typedef struct __tb_scheduler_t
 {   
-    // the scheduler type
-    tb_size_t               type;
+    /* the original coroutine (in main loop)
+     *
+     * coroutine->scheduler == (tb_scheduler_ref_t)coroutine
+     */
+    tb_coroutine_t              original;
 
     // the running coroutine
-    tb_coroutine_t*         running;
+    tb_coroutine_t*             running;
 
-    /* start the given coroutine function
-     *
-     * @param scheduler     the scheduler, uses the default scheduler if be null
-     * @param func          the coroutine function
-     * @param priv          the passed user private data as the argument of function
-     * @param stacksize     the stack size
-     *
-     * @return              tb_true or tb_false
-     */
-    tb_bool_t               (*start)(struct __tb_scheduler_t* scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
+    // the dead coroutines
+    tb_single_list_entry_head_t coroutines_dead;
 
-    /* yield the given coroutine
-     *
-     * @param scheduler     the scheduler
-     * @param coroutine     the coroutine
-     */
-    tb_void_t               (*yield)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
-
-    /* sleep the given coroutine
-     *
-     * @param scheduler     the scheduler
-     * @param coroutine     the coroutine
-     * @param interval      the interval (ms)
-     */
-    tb_void_t               (*sleep)(struct __tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_size_t interval);
-
-    /* control scheduler 
-     *
-     * @param scheduler     the scheduler
-     * @param ctrl          the control code
-     * @param args          the arguments
-     *
-     * @return              tb_true or tb_false
-     */
-    tb_bool_t               (*ctrl)(struct __tb_scheduler_t* scheduler, tb_size_t ctrl, tb_va_list_t args);
-
-    /* run scheduler loop
-     *
-     * @param scheduler     the scheduler
-     */
-    tb_void_t               (*loop)(struct __tb_scheduler_t* scheduler);
-
-    /* exit scheduler
-     *
-     * @param scheduler     the scheduler
-     */
-    tb_void_t               (*exit)(struct __tb_scheduler_t* scheduler);
+    // the ready coroutines
+    tb_single_list_entry_head_t coroutines_ready;
 
 }tb_scheduler_t;
 
@@ -120,20 +81,33 @@ typedef struct __tb_scheduler_t
  */
 tb_bool_t                   tb_scheduler_start(tb_scheduler_t* scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
-/* yield the given coroutine
+/* yield the current coroutine
  *
  * @param scheduler         the scheduler
- * @param coroutine         the coroutine
  */
-tb_void_t                   tb_scheduler_yield(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+tb_void_t                   tb_scheduler_yield(tb_scheduler_t* scheduler);
 
-/* sleep the given coroutine
+/* finish the current coroutine
  *
  * @param scheduler         the scheduler
- * @param coroutine         the coroutine
+ */
+tb_void_t                   tb_scheduler_finish(tb_scheduler_t* scheduler);
+
+/* sleep the current coroutine
+ *
+ * @param scheduler         the scheduler
  * @param interval          the interval (ms)
  */
-tb_void_t                   tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_size_t interval);
+tb_void_t                   tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval);
+
+/* switch to the given coroutine
+ *
+ * @param scheduler         the scheduler
+ * @param coroutine         the coroutine
+ *
+ * @return                  the from-coroutine
+ */
+tb_coroutine_t*             tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

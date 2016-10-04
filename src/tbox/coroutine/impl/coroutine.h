@@ -59,8 +59,8 @@ __tb_extern_c_enter__
 // is running?
 #define tb_coroutine_is_running(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_RUNNING)
 
-// is suspend?
-#define tb_coroutine_is_suspend(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_SUSPEND)
+// is original?
+#define tb_coroutine_is_original(coroutine)         ((coroutine)->scheduler == (tb_scheduler_ref_t)(coroutine))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -84,7 +84,6 @@ typedef struct __tb_coroutine_t
     /* the state
      * 
      * - TB_STATE_READY
-     * - TB_STATE_SUSPEND
      * - TB_STATE_RUNNING
      * - TB_STATE_DEAD
      */
@@ -95,6 +94,9 @@ typedef struct __tb_coroutine_t
 
     // the user private data
     tb_cpointer_t           priv;
+
+    // the single list entry
+    tb_single_list_entry_t  entry;
 
     // the guard
     tb_uint16_t             guard;
@@ -116,19 +118,22 @@ typedef struct __tb_coroutine_t
  */
 tb_coroutine_t*         tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
+/* reinit the given coroutine 
+ *
+ * @param coroutine     the coroutine
+ * @param func          the coroutine function
+ * @param priv          the passed user private data as the argument of function
+ * @param stacksize     the stack size, uses the default stack size if be zero
+ *
+ * @return              the coroutine
+ */
+tb_coroutine_t*         tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
+
 /* exit coroutine
  *
  * @param coroutine     the coroutine
  */
 tb_void_t               tb_coroutine_exit(tb_coroutine_t* coroutine);
-
-/* jump to the given coroutine
- *
- * @param coroutine     the coroutine
- *
- * @return              the from coroutine
- */
-tb_coroutine_t*         tb_coroutine_jump(tb_coroutine_t* coroutine);
 
 #ifdef __tb_debug__
 /* check coroutine

@@ -51,7 +51,7 @@ typedef tb_void_t       (*tb_coroutine_func_t)(tb_cpointer_t priv);
 
 /*! start coroutine 
  *
- * @param scheduler     the scheduler, uses the default scheduler if be null
+ * @param scheduler     the scheduler, uses the current scheduler if be null
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
  * @param stacksize     the stack size

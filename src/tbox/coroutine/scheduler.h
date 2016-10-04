@@ -35,13 +35,6 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/// the scheduler ctrl
-#define TB_SCHEDULER_CTRL(type, ctrl)           (((type) << 16) | (ctrl))
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -49,40 +42,14 @@ __tb_extern_c_enter__
 typedef __tb_typeref__(scheduler);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-/// the scheduler type enum
-typedef enum __tb_scheduler_type_e
-{
-    TB_SCHEDULER_TYPE_NONE      = 0
-,   TB_SCHEDULER_TYPE_FIFO      = 1
-,   TB_SCHEDULER_TYPE_POLL      = 2
-
-}tb_scheduler_type_e;
-
-/// the scheduler ctrl enum
-typedef enum __tb_scheduler_ctrl_e
-{
-    TB_SCHEDULER_CTRL_NONE      = 0
-
-}tb_scheduler_ctrl_e;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init scheduler with fifo
+/*! init scheduler 
  *
  * @return              the scheduler 
  */
-tb_scheduler_ref_t      tb_scheduler_init_with_fifo(tb_noarg_t);
-
-/*! init scheduler with poll (for io)
- *
- * @return              the scheduler 
- */
-tb_scheduler_ref_t      tb_scheduler_init_with_poll(tb_noarg_t);
+tb_scheduler_ref_t      tb_scheduler_init(tb_noarg_t);
 
 /*! exit scheduler
  *
@@ -96,29 +63,11 @@ tb_void_t               tb_scheduler_exit(tb_scheduler_ref_t scheduler);
  */
 tb_void_t               tb_scheduler_loop(tb_scheduler_ref_t scheduler);
 
-/*! get the scheduler type
- *
- * @param scheduler     the scheduler
- *
- * @return              the scheduler type
- */
-tb_size_t               tb_scheduler_type(tb_scheduler_ref_t scheduler);
-
 /*! get the scheduler of the current coroutine
  *
  * @return              the scheduler
  */
 tb_scheduler_ref_t      tb_scheduler_self(tb_noarg_t);
-
-/*! control the scheduler
- *
- * @param scheduler     the scheduler
- * @param ctrl          the ctrl code
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_scheduler_ctrl(tb_scheduler_ref_t scheduler, tb_size_t ctrl, ...);
-
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

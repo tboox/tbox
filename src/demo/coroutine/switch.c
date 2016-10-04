@@ -7,9 +7,6 @@
  * macros
  */
 
-// the stack size
-#define STACK       (1024)
-
 // the switch count
 #define COUNT       (10000000)
 
@@ -18,8 +15,18 @@
  */ 
 static tb_void_t tb_demo_coroutine_switch_test_func(tb_cpointer_t priv)
 {
-    // loop
+    // the count
     tb_size_t count = (tb_size_t)priv;
+    if (count == 10)
+    {
+        // start coroutines
+        tb_coroutine_start(tb_null, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)5, 0);
+        tb_coroutine_start(tb_null, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)15, 0);
+        tb_coroutine_start(tb_null, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)25, 0);
+        tb_coroutine_start(tb_null, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)35, 0);
+    }
+
+    // loop
     while (count--)
     {
         // trace
@@ -32,14 +39,14 @@ static tb_void_t tb_demo_coroutine_switch_test_func(tb_cpointer_t priv)
 static tb_void_t tb_demo_coroutine_switch_test()
 {
     // init scheduler
-    tb_scheduler_ref_t scheduler = tb_scheduler_init_with_fifo();
+    tb_scheduler_ref_t scheduler = tb_scheduler_init();
     if (scheduler)
     {
-        // start coroutine
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, STACK);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, STACK);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, STACK);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, STACK);
+        // start coroutines
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, (tb_cpointer_t)10, 0);
 
         // run scheduler
         tb_scheduler_loop(scheduler);
@@ -61,12 +68,12 @@ static tb_void_t tb_demo_coroutine_switch_pref_func(tb_cpointer_t priv)
 static tb_void_t tb_demo_coroutine_switch_pref()
 {
     // init scheduler
-    tb_scheduler_ref_t scheduler = tb_scheduler_init_with_fifo();
+    tb_scheduler_ref_t scheduler = tb_scheduler_init();
     if (scheduler)
     {
         // start coroutine
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_pref_func, (tb_cpointer_t)(COUNT >> 1), STACK);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_pref_func, (tb_cpointer_t)(COUNT >> 1), STACK);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
 
         // init the start time
         tb_hong_t startime = tb_mclock();
