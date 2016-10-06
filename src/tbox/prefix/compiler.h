@@ -162,6 +162,13 @@
 #       ifdef __cplusplus
 #           pragma clang diagnostic ignored         "-Wextern-c-compat"
 #       endif
+        /* suppress warning (must be placed in the front)
+         *
+         * in old version clang:
+         *
+         * unknown warning group '-Wnullability-completeness', ignored [-Werror,-Wunknown-pragmas]
+         */
+#       pragma clang diagnostic ignored             "-Wunknown-pragmas" 
 
         /* suppress warning
          *
@@ -169,14 +176,6 @@
          * pointer is missing a nullability type specifier (_Nonnull, _Nullable, or _Null_unspecified)
          */
 #       pragma clang diagnostic ignored             "-Wnullability-completeness" 
-
-        /* suppress warning
-         *
-         * in old version clang:
-         *
-         * unknown warning group '-Wnullability-completeness', ignored [-Werror,-Wunknown-pragmas]
-         */
-#       pragma clang diagnostic ignored             "-Wunknown-pragmas" 
 #   endif
 
 // watcom c/c++ 
