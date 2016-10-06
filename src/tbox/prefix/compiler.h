@@ -158,10 +158,16 @@
 #           undef TB_COMPILER_VERSION_STRING
 #           define TB_COMPILER_VERSION_STRING       __clang_version__
 #       endif
-        // ignore warning: empty struct has size 0 in C, size 1 in C++
+        // suppress warning: empty struct has size 0 in C, size 1 in C++
 #       ifdef __cplusplus
 #           pragma clang diagnostic ignored         "-Wextern-c-compat"
 #       endif
+        /* suppress warning
+         *
+         * signal.h
+         * pointer is missing a nullability type specifier (_Nonnull, _Nullable, or _Null_unspecified)
+         */
+#       pragma clang diagnostic ignored             "-Wnullability-completeness" 
 #   endif
 
 // watcom c/c++ 
