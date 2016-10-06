@@ -54,19 +54,19 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
     // ok
     return (tb_semaphore_ref_t)semaphore;
 }
-tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
+tb_void_t tb_semaphore_exit(tb_semaphore_ref_t self)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
+    tb_atomic_t* semaphore = (tb_atomic_t*)self;
     tb_assert_and_check_return(semaphore);
 
     // free it
     tb_free(semaphore);
 }
-tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
+tb_bool_t tb_semaphore_post(tb_semaphore_ref_t self, tb_size_t post)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
+    tb_atomic_t* semaphore = (tb_atomic_t*)self;
     tb_assert_and_check_return_val(semaphore && post, tb_false);
 
     // post it
@@ -75,19 +75,19 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
     // ok
     return value >= 0? tb_true : tb_false;
 }
-tb_long_t tb_semaphore_value(tb_semaphore_ref_t semaphore)
+tb_long_t tb_semaphore_value(tb_semaphore_ref_t self)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
+    tb_atomic_t* semaphore = (tb_atomic_t*)self;
     tb_assert_and_check_return_val(semaphore, tb_false);
 
     // get value
     return (tb_long_t)tb_atomic_get(semaphore);
 }
-tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
+tb_long_t tb_semaphore_wait(tb_semaphore_ref_t self, tb_long_t timeout)
 {
     // check
-    tb_atomic_t* semaphore = (tb_atomic_t*)semaphore;
+    tb_atomic_t* semaphore = (tb_atomic_t*)self;
     tb_assert_and_check_return_val(semaphore, -1);
 
     // init

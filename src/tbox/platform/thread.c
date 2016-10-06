@@ -28,6 +28,7 @@
 #include "atomic.h"
 #include "time.h"
 #include "thread_local.h"
+#include "../utils/utils.h"
 #include "impl/thread_local.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +110,7 @@ static tb_thread_retval_t tb_thread_func(tb_pointer_t priv)
 #else
 tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
 {
+    tb_used(tb_thread_func);
     tb_trace_noimpl();
     return tb_null;
 }
