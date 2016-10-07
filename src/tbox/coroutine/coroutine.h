@@ -60,8 +60,20 @@ typedef tb_void_t       (*tb_coroutine_func_t)(tb_cpointer_t priv);
  */
 tb_bool_t               tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
-/// yield the current coroutine
-tb_void_t               tb_coroutine_yield(tb_noarg_t);
+/*! yield the current coroutine
+ * 
+ * @return              tb_true(yield ok) or tb_false(yield failed, no more coroutines)
+ */
+tb_bool_t               tb_coroutine_yield(tb_noarg_t);
+
+/*! resume the given coroutine (suspended)
+ *
+ * @param coroutine     the suspended coroutine
+ */
+tb_void_t               tb_coroutine_resume(tb_coroutine_ref_t coroutine);
+
+/// suspend the current coroutine
+tb_void_t               tb_coroutine_suspend(tb_noarg_t);
 
 /*! sleep some times (ms)
  *

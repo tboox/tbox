@@ -59,10 +59,13 @@ typedef struct __tb_scheduler_t
     tb_coroutine_t*             running;
 
     // the dead coroutines
-    tb_single_list_entry_head_t coroutines_dead;
+    tb_list_entry_head_t        coroutines_dead;
 
     // the ready coroutines
-    tb_single_list_entry_head_t coroutines_ready;
+    tb_list_entry_head_t        coroutines_ready;
+
+    // the suspend coroutines
+    tb_list_entry_head_t        coroutines_suspend;
 
 }tb_scheduler_t;
 
@@ -84,8 +87,23 @@ tb_bool_t                   tb_scheduler_start(tb_scheduler_t* scheduler, tb_cor
 /* yield the current coroutine
  *
  * @param scheduler         the scheduler
+ *
+ * @return                  tb_true(yield ok) or tb_false(yield failed, no more coroutines)
  */
-tb_void_t                   tb_scheduler_yield(tb_scheduler_t* scheduler);
+tb_bool_t                   tb_scheduler_yield(tb_scheduler_t* scheduler);
+
+/*! resume the given coroutine (suspended)
+ *
+ * @param scheduler         the scheduler
+ * @param coroutine         the suspended coroutine
+ */
+tb_void_t                   tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+
+/*! suspend the current coroutine
+ *
+ * @param scheduler         the scheduler
+ */
+tb_void_t                   tb_scheduler_suspend(tb_scheduler_t* scheduler);
 
 /* finish the current coroutine
  *

@@ -45,23 +45,23 @@ static tb_thread_local_t s_scheduler_self = TB_THREAD_LOCAL_INIT;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_void_t tb_scheduler_free(tb_single_list_entry_head_ref_t coroutines)
+static tb_void_t tb_scheduler_free(tb_list_entry_head_ref_t coroutines)
 {
     // check
     tb_assert(coroutines);
 
     // free all coroutines
-    while (tb_single_list_entry_size(coroutines))
+    while (tb_list_entry_size(coroutines))
     {
         // get the next entry from head
-        tb_single_list_entry_ref_t entry = tb_single_list_entry_head(coroutines);
+        tb_list_entry_ref_t entry = tb_list_entry_head(coroutines);
         tb_assert(entry);
 
         // remove it from the ready coroutines
-        tb_single_list_entry_remove_head(coroutines);
+        tb_list_entry_remove_head(coroutines);
 
         // exit this coroutine
-        tb_coroutine_exit((tb_coroutine_t*)tb_single_list_entry(coroutines, entry));
+        tb_coroutine_exit((tb_coroutine_t*)tb_list_entry(coroutines, entry));
     }
 }
 
@@ -80,10 +80,13 @@ tb_scheduler_ref_t tb_scheduler_init()
         tb_assert_and_check_break(scheduler);
 
         // init dead coroutines
-        tb_single_list_entry_init(&scheduler->coroutines_dead, tb_coroutine_t, entry, tb_null);
+        tb_list_entry_init(&scheduler->coroutines_dead, tb_coroutine_t, entry, tb_null);
 
         // init ready coroutines
-        tb_single_list_entry_init(&scheduler->coroutines_ready, tb_coroutine_t, entry, tb_null);
+        tb_list_entry_init(&scheduler->coroutines_ready, tb_coroutine_t, entry, tb_null);
+
+        // init suspend coroutines
+        tb_list_entry_init(&scheduler->coroutines_suspend, tb_coroutine_t, entry, tb_null);
 
         // init original coroutine
         scheduler->original.scheduler = (tb_scheduler_ref_t)scheduler;
@@ -118,7 +121,7 @@ tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
     scheduler->running = tb_null;
 
     // check ready coroutines
-    tb_assert(!tb_single_list_entry_size(&scheduler->coroutines_ready));
+    tb_assert(!tb_list_entry_size(&scheduler->coroutines_ready));
 
     // free all dead coroutines 
     tb_scheduler_free(&scheduler->coroutines_dead);
@@ -126,11 +129,17 @@ tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
     // free all ready coroutines 
     tb_scheduler_free(&scheduler->coroutines_ready);
 
+    // free all suspend coroutines 
+    tb_scheduler_free(&scheduler->coroutines_suspend);
+
     // exit dead coroutines
-    tb_single_list_entry_exit(&scheduler->coroutines_dead);
+    tb_list_entry_exit(&scheduler->coroutines_dead);
 
     // exit ready coroutines
-    tb_single_list_entry_exit(&scheduler->coroutines_ready);
+    tb_list_entry_exit(&scheduler->coroutines_ready);
+
+    // exit suspend coroutines
+    tb_list_entry_exit(&scheduler->coroutines_suspend);
 
     // exit the scheduler
     tb_free(scheduler);
@@ -148,20 +157,20 @@ tb_void_t tb_scheduler_loop(tb_scheduler_ref_t self)
     tb_thread_local_set(&s_scheduler_self, self);
 
     // schedule all ready coroutines
-    while (tb_single_list_entry_size(&scheduler->coroutines_ready)) 
+    while (tb_list_entry_size(&scheduler->coroutines_ready)) 
     {
         // get the next entry from head
-        tb_single_list_entry_ref_t entry = tb_single_list_entry_head(&scheduler->coroutines_ready);
+        tb_list_entry_ref_t entry = tb_list_entry_head(&scheduler->coroutines_ready);
         tb_assert(entry);
 
         // remove it from the ready coroutines
-        tb_single_list_entry_remove_head(&scheduler->coroutines_ready);
+        tb_list_entry_remove_head(&scheduler->coroutines_ready);
 
         // switch to the next coroutine 
-        tb_scheduler_switch(scheduler, (tb_coroutine_t*)tb_single_list_entry(&scheduler->coroutines_ready, entry));
+        tb_scheduler_switch(scheduler, (tb_coroutine_t*)tb_list_entry(&scheduler->coroutines_ready, entry));
 
         // trace
-        tb_trace_d("[loop]: ready %lu", tb_single_list_entry_size(&scheduler->coroutines_ready));
+        tb_trace_d("[loop]: ready %lu", tb_list_entry_size(&scheduler->coroutines_ready));
     }
 }
 tb_scheduler_ref_t tb_scheduler_self()

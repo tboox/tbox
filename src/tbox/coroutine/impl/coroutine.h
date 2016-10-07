@@ -59,6 +59,9 @@ __tb_extern_c_enter__
 // is running?
 #define tb_coroutine_is_running(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_RUNNING)
 
+// is suspend?
+#define tb_coroutine_is_suspend(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_SUSPEND)
+
 // is original?
 #define tb_coroutine_is_original(coroutine)         ((coroutine)->scheduler == (tb_scheduler_ref_t)(coroutine))
 
@@ -85,6 +88,7 @@ typedef struct __tb_coroutine_t
      * 
      * - TB_STATE_READY
      * - TB_STATE_RUNNING
+     * - TB_STATE_SUSPEND
      * - TB_STATE_DEAD
      */
     tb_size_t               state;
@@ -95,8 +99,8 @@ typedef struct __tb_coroutine_t
     // the user private data
     tb_cpointer_t           priv;
 
-    // the single list entry
-    tb_single_list_entry_t  entry;
+    // the list entry
+    tb_list_entry_t         entry;
 
     // the guard
     tb_uint16_t             guard;
