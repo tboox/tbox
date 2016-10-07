@@ -17,17 +17,17 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        scheduler.h
+ * @file        scheduler_io.h
  * @ingroup     coroutine
  *
  */
-#ifndef TB_COROUTINE_SCHEDULER_H
-#define TB_COROUTINE_SCHEDULER_H
+#ifndef TB_COROUTINE_SCHEDULER_IO_H
+#define TB_COROUTINE_SCHEDULER_IO_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "scheduler.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -35,45 +35,18 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-/// the scheduler ref type
-typedef __tb_typeref__(scheduler);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init scheduler 
+/*! init io scheduler 
  *
  * @return              the scheduler 
  */
-tb_scheduler_ref_t      tb_scheduler_init(tb_noarg_t);
+tb_scheduler_ref_t      tb_scheduler_io_init(tb_noarg_t);
 
-/*! init scheduler with io
- *
- * @return              the scheduler 
+/*! stop the current io scheduler 
  */
-tb_scheduler_ref_t      tb_scheduler_init_with_io(tb_noarg_t);
-
-/*! exit scheduler
- *
- * @param scheduler     the scheduler
- */
-tb_void_t               tb_scheduler_exit(tb_scheduler_ref_t scheduler);
-
-/*! run the scheduler loop
- *
- * @param scheduler     the scheduler
- */
-tb_void_t               tb_scheduler_loop(tb_scheduler_ref_t scheduler);
-
-/*! get the scheduler of the current coroutine
- *
- * @return              the scheduler
- */
-tb_scheduler_ref_t      tb_scheduler_self(tb_noarg_t);
+tb_void_t               tb_scheduler_io_stop(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

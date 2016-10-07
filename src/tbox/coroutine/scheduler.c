@@ -120,8 +120,9 @@ tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
     // clear running
     scheduler->running = tb_null;
 
-    // check ready coroutines
+    // check coroutines
     tb_assert(!tb_list_entry_size(&scheduler->coroutines_ready));
+    tb_assert(!tb_list_entry_size(&scheduler->coroutines_suspend));
 
     // free all dead coroutines 
     tb_scheduler_free(&scheduler->coroutines_dead);
