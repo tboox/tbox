@@ -122,10 +122,8 @@ tb_void_t                   tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_siz
  *
  * @param scheduler         the scheduler
  * @param coroutine         the coroutine
- *
- * @return                  the from-coroutine
  */
-tb_coroutine_t*             tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+tb_void_t                   tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

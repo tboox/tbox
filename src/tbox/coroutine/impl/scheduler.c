@@ -227,26 +227,28 @@ tb_bool_t tb_scheduler_yield(tb_scheduler_t* scheduler)
     // trace
     tb_trace_d("yield coroutine(%p)", scheduler->running);
 
-    // no more ready coroutines? return it directly and continue to run this coroutine
-    if (!tb_list_entry_size(&scheduler->coroutines_ready))
+    // exists other ready coroutines?
+    if (tb_list_entry_size(&scheduler->coroutines_ready))
     {
-        // trace
-        tb_trace_d("continue to run current coroutine(%p)", tb_coroutine_self());
-        return tb_false;
+        // make the running coroutine as ready
+        tb_scheduler_make_ready(scheduler, scheduler->running);
+
+        // get the next coroutine 
+        tb_coroutine_t* coroutine = tb_scheduler_next_ready(scheduler);
+        tb_assert(coroutine);
+
+        // switch to the next coroutine
+        tb_scheduler_switch(scheduler, coroutine);
+
+        // ok
+        return tb_true;
     }
 
-    // make the running coroutine as ready
-    tb_scheduler_make_ready(scheduler, scheduler->running);
+    // trace
+    tb_trace_d("continue to run current coroutine(%p)", tb_coroutine_self());
 
-    // get the next coroutine 
-    tb_coroutine_t* coroutine = tb_scheduler_next_ready(scheduler);
-    tb_assert(coroutine);
-
-    // switch to the next coroutine
-    tb_scheduler_switch(scheduler, coroutine);
-
-    // ok
-    return tb_true;
+    // no more ready coroutines? return it directly and continue to run this coroutine
+    return tb_false;
 }
 tb_void_t tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {
@@ -309,7 +311,7 @@ tb_void_t tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval)
     // sleep the coroutine
     // TODO
 }
-tb_coroutine_t* tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
+tb_void_t tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {
     // check
     tb_assert(scheduler && scheduler->running);
@@ -339,7 +341,4 @@ tb_coroutine_t* tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* c
     // check it
     tb_coroutine_check(coroutine_from);
 #endif
-
-    // return the from-coroutine
-    return coroutine_from;
 }
