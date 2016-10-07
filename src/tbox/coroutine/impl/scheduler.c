@@ -221,8 +221,8 @@ tb_bool_t tb_scheduler_yield(tb_scheduler_t* scheduler)
 {
     // check
     tb_assert(scheduler && scheduler->running);
-    tb_assert(scheduler->running == tb_coroutine_self());
     tb_assert(tb_coroutine_is_running(scheduler->running));
+    tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
     // trace
     tb_trace_d("yield coroutine(%p)", scheduler->running);
@@ -273,8 +273,8 @@ tb_void_t tb_scheduler_suspend(tb_scheduler_t* scheduler)
 {
     // check
     tb_assert(scheduler && scheduler->running);
-    tb_assert(scheduler->running == tb_coroutine_self());
     tb_assert(tb_coroutine_is_running(scheduler->running));
+    tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
     // trace
     tb_trace_d("suspend coroutine(%p)", scheduler->running);
@@ -289,8 +289,8 @@ tb_void_t tb_scheduler_finish(tb_scheduler_t* scheduler)
 {
     // check
     tb_assert(scheduler && scheduler->running);
-    tb_assert(scheduler->running == tb_coroutine_self());
     tb_assert(tb_coroutine_is_running(scheduler->running));
+    tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
     // trace
     tb_trace_d("finish coroutine(%p)", scheduler->running);
@@ -305,8 +305,8 @@ tb_void_t tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval)
 {
     // check
     tb_assert(scheduler && scheduler->running);
-    tb_assert(scheduler->running == tb_coroutine_self());
     tb_assert(tb_coroutine_is_running(scheduler->running));
+    tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
     // sleep the coroutine
     // TODO
