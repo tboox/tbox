@@ -538,7 +538,6 @@ tb_stream_ref_t tb_stream_init_filter_from_charset(tb_stream_ref_t stream, tb_si
     return impl;
 }
 #endif
-#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
 tb_stream_ref_t tb_stream_init_filter_from_chunked(tb_stream_ref_t stream, tb_bool_t dechunked)
 {
     // check
@@ -577,4 +576,3 @@ tb_stream_ref_t tb_stream_init_filter_from_chunked(tb_stream_ref_t stream, tb_bo
     // ok
     return impl;
 }
-#endif

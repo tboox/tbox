@@ -43,11 +43,11 @@ option("smallest")
     set_category("option")
     set_description("Enable the smallest compile mode and disable all modules.")
     add_rbindings("info", "deprecated")
-    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "network", "charset", "database")
+    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "network", "charset", "database", "coroutine"}) do
+for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine"}) do
     option(module)
         set_default(true)
         set_showmenu(true)
@@ -89,7 +89,7 @@ target("tbox")
     add_options("info", "float", "wchar", "exception", "deprecated")
 
     -- add modules
-    add_options("xml", "zip", "asio", "hash", "regex", "coroutine", "object", "network", "charset", "database")
+    add_options("xml", "zip", "asio", "hash", "regex", "coroutine", "object", "charset", "database")
 
     -- add the common source files
     add_files("*.c") 
@@ -100,7 +100,8 @@ target("tbox")
     add_files("prefix/**.c") 
     add_files("memory/**.c") 
     add_files("string/**.c") 
-    add_files("stream/**.c|**/charset.c|**/zip.c|**async_**.c|transfer_pool.c|impl/stream/http.c|impl/stream/sock.c|impl/filter/chunked.c") 
+    add_files("stream/**.c|**/charset.c|**/zip.c|**async_**.c|transfer_pool.c") 
+    add_files("network/**.c|impl/ssl/*.c") 
     add_files("algorithm/**.c") 
     add_files("container/**.c|element/obj.c") 
     add_files("libm/libm.c") 
@@ -109,7 +110,8 @@ target("tbox")
     add_files("libm/isqrti.c") 
     add_files("libm/isqrti64.c") 
     add_files("libm/idivi8.c") 
-    add_files("platform/*.c|impl/aicp.c|impl/aiop.c|impl/aioo.c|impl/dns.c|socket.c|context.c|exception.c")
+    add_files("asio/aioo.c", "asio/aiop.c") 
+    add_files("platform/*.c|context.c|exception.c", "platform/impl/*.c|aicp.c")
 
     -- add the source files for the float type
     if is_option("float") then add_files("libm/*.c") end
@@ -129,26 +131,6 @@ target("tbox")
         if is_option("deprecated") then
             add_files("hash/deprecated/*.c") 
         end
-    end
-
-    -- add the source files for the network module
-    if is_option("network") then
-        add_files("asio/aioo.c") 
-        add_files("asio/aiop.c") 
-        add_files("platform/impl/dns.c") 
-        add_files("platform/impl/aioo.c") 
-        add_files("platform/impl/aiop.c") 
-        add_files("platform/socket.c") 
-        add_files("stream/impl/stream/http.c") 
-        add_files("stream/impl/stream/sock.c") 
-        add_files("stream/impl/filter/chunked.c") 
-        add_files("network/**.c|impl/ssl/*.c") 
-    else
-        add_files("network/url.c") 
-        add_files("network/ipv4.c") 
-        add_files("network/ipv6.c") 
-        add_files("network/ipaddr.c") 
-        add_files("network/hwaddr.c") 
     end
 
     -- add the source files for the asio module
@@ -238,10 +220,7 @@ target("tbox")
 
     -- add the source for the android 
     if is_os("android") then
-        add_files("platform/android/*.c|dns.c")
-        if is_option("network") then
-            add_files("platform/android/dns.c")
-        end
+        add_files("platform/android/*.c")
     end
 
     -- add the interfaces for libc

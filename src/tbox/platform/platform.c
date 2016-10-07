@@ -44,6 +44,12 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
     if (!tb_android_init_env(priv)) return tb_false;
 #endif
 
+    // init socket envirnoment
+    if (!tb_socket_init_env()) return tb_false;
+
+    // init dns envirnoment
+    if (!tb_dns_init_env()) return tb_false;
+
     // init thread local envirnoment
     if (!tb_thread_local_init_env()) return tb_false;
 
@@ -57,14 +63,6 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
     if (!tb_thread_store_init_env()) return tb_false;
 #endif
 
-#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
-    // init socket envirnoment
-    if (!tb_socket_init_env()) return tb_false;
-
-    // init dns envirnoment
-    if (!tb_dns_init_env()) return tb_false;
-#endif
-
     // spak ctime
     tb_cache_time_spak();
 
@@ -73,14 +71,6 @@ tb_bool_t tb_platform_init(tb_handle_t priv)
 }
 tb_void_t tb_platform_exit()
 {
-#ifdef TB_CONFIG_MODULE_HAVE_NETWORK
-    // exit dns envirnoment
-    tb_dns_exit_env();
-
-    // exit socket envirnoment
-    tb_socket_exit_env();
-#endif
-
 #ifdef TB_CONFIG_API_HAVE_DEPRECATED
     // exit thread store envirnoment
     tb_thread_store_exit_env();
@@ -93,6 +83,12 @@ tb_void_t tb_platform_exit()
 
     // exit thread local envirnoment
     tb_thread_local_exit_env();
+
+    // exit dns envirnoment
+    tb_dns_exit_env();
+
+    // exit socket envirnoment
+    tb_socket_exit_env();
 
     // exit android envirnoment
 #ifdef TB_CONFIG_OS_ANDROID

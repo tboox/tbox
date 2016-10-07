@@ -41,6 +41,7 @@ target("demo")
     add_files("algorithm/*.c") 
     add_files("stream/stream.c") 
     add_files("stream/stream/*.c") 
+    add_files("network/**.c") 
 
     -- add the source files for the hash module
     if is_option("hash") then
@@ -73,11 +74,6 @@ target("demo")
     -- add the source files for the regex module
     if is_option("regex") then
         add_files("regex/*.c")
-    end
-
-    -- add the source files for the network module
-    if is_option("network") then
-        add_files("network/**.c") 
     end
 
     -- add the source files for the asio module
