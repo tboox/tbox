@@ -59,11 +59,6 @@ static tb_void_t tb_scheduler_make_dead(tb_scheduler_t* scheduler, tb_coroutine_
     // cannot be original coroutine
     tb_assert(!tb_coroutine_is_original(coroutine));
 
-#ifdef __tb_debug__
-    // check it
-    tb_coroutine_check(coroutine);
-#endif
-
     // mark this coroutine as dead
     tb_coroutine_state_set(coroutine, TB_STATE_DEAD);
 
@@ -320,6 +315,11 @@ tb_void_t tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* corouti
     // the current running coroutine
     tb_coroutine_t* running = scheduler->running;
 
+#ifdef __tb_debug__
+    // check it
+    tb_coroutine_check(running);
+#endif
+
     // mark the given coroutine as running
     tb_coroutine_state_set(coroutine, TB_STATE_RUNNING);
     scheduler->running = coroutine;
@@ -336,9 +336,4 @@ tb_void_t tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* corouti
 
     // update the context
     coroutine_from->context = from.context;
-
-#ifdef __tb_debug__
-    // check it
-    tb_coroutine_check(coroutine_from);
-#endif
 }
