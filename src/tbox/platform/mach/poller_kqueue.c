@@ -346,24 +346,26 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // limit 
     events_count = tb_min(events_count, poller->maxn);
 
-    // sync
-    tb_size_t i = 0;
-    tb_size_t wait = 0;
+    // handle events 
+    tb_size_t       i = 0;
+    tb_size_t       wait = 0;
+    struct kevent*  e = tb_null;
+    tb_socket_ref_t pair = poller->pair[1];
     for (i = 0; i < events_count; i++)
     {
         // the kevents 
-        struct kevent* e = poller->events + i;
+        e = poller->events + i;
 
         // the socket
         tb_socket_ref_t sock = tb_fd2sock(e->ident);
         tb_assert(sock);
 
         // spak?
-        if (sock == poller->pair[1] && e->filter == EVFILT_READ) 
+        if (sock == pair && e->filter == EVFILT_READ) 
         {
             // read spak
             tb_char_t spak = '\0';
-            if (1 != tb_socket_recv(poller->pair[1], (tb_byte_t*)&spak, 1)) return -1;
+            if (1 != tb_socket_recv(pair, (tb_byte_t*)&spak, 1)) return -1;
 
             // killed?
             if (spak == 'k') return -1;
@@ -373,7 +375,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         }
 
         // skip spak
-        tb_check_continue(sock != poller->pair[1]);
+        tb_check_continue(sock != pair);
 
         // init events 
         tb_size_t events = TB_POLLER_EVENT_NONE;

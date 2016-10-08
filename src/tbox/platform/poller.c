@@ -33,11 +33,11 @@
 #   include "posix/poller_select.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
     && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
-#   include "linux/poller_epoller.c"
+#   include "linux/poller_epoll.c"
 #elif defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/poller_kqueue.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_POLL)
-#   include "posix/poller_poller.c"
+#   include "posix/poller_poll.c"
 #else
 tb_poller_ref_t tb_poller_init(tb_size_t maxn)
 {
