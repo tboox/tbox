@@ -71,6 +71,18 @@ typedef enum __tb_socket_ctrl_e
 
 }tb_socket_ctrl_e;
 
+/// the socket event enum, only for sock
+typedef enum __tb_socket_event_e
+{
+    TB_SOCKET_EVENT_NONE                = 0x0000
+,   TB_SOCKET_EVENT_RECV                = 0x0001
+,   TB_SOCKET_EVENT_SEND                = 0x0002
+,   TB_SOCKET_EVENT_CONN                = TB_SOCKET_EVENT_SEND
+,   TB_SOCKET_EVENT_ACPT                = TB_SOCKET_EVENT_RECV
+,   TB_SOCKET_EVENT_ALL                 = TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND
+
+}tb_socket_event_e;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -259,6 +271,16 @@ tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr,
  * @return          the real size or -1
  */
 tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
+
+/*! wait socket events
+ *
+ * @param sock      the sock 
+ * @param events    the socket events
+ * @param timeout   the timeout, infinity: -1
+ *
+ * @return          > 0: the aioe code, 0: timeout, -1: failed
+ */
+tb_long_t           tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

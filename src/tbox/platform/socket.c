@@ -145,3 +145,15 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
     return -1;
 }
 #endif
+
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "posix/socket_select.c"
+#elif defined(TB_CONFIG_POSIX_HAVE_POLL)
+#   include "posix/socket_poll.c"
+#else
+tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+{
+    tb_trace_noimpl();
+    return -1;
+}
+#endif
