@@ -37,7 +37,7 @@
  * types
  */
 
-// the poll poll type
+// the poller poll type
 typedef struct __tb_poller_poll_t
 {
     // the pair sockets for spak, kill ..
