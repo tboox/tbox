@@ -51,6 +51,9 @@ typedef struct __tb_poller_kqueue_t
     // the maxn
     tb_size_t               maxn;
 
+    // the user private data
+    tb_cpointer_t           priv;
+
     // the pair sockets for spak, kill ..
     tb_socket_ref_t         pair[2];
 
@@ -91,7 +94,7 @@ static tb_bool_t tb_poller_change(tb_poller_kqueue_ref_t poller, struct kevent* 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_poller_ref_t tb_poller_init(tb_size_t maxn)
+tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(maxn, tb_null);
@@ -111,6 +114,9 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn)
 
         // init maxn
         poller->maxn = maxn;
+
+        // init user private data
+        poller->priv = priv;
 
         // init pair sockets
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
@@ -170,6 +176,15 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     // recreate a new kqueue
     poller->kqfd = kqueue();
     tb_assert(poller->kqfd > 0);
+}
+tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
+{
+    // check
+    tb_poller_kqueue_ref_t poller = (tb_poller_kqueue_ref_t)self;
+    tb_assert_and_check_return_val(poller, tb_null);
+
+    // get the user private data
+    return poller->priv;
 }
 tb_void_t tb_poller_kill(tb_poller_ref_t self)
 {
@@ -364,7 +379,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
         // call event function
-        func(sock, events, e->udata);
+        func(self, sock, events, e->udata);
     }
 
     // ok

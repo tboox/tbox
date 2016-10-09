@@ -51,12 +51,6 @@ typedef __tb_typeref__(scheduler);
  */
 tb_scheduler_ref_t      tb_scheduler_init(tb_noarg_t);
 
-/*! init scheduler with io
- *
- * @return              the scheduler 
- */
-tb_scheduler_ref_t      tb_scheduler_init_with_io(tb_noarg_t);
-
 /*! exit scheduler
  *
  * @param scheduler     the scheduler

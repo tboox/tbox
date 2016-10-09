@@ -17,17 +17,17 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        coroutine_io.h
+ * @file        scheduler_io.h
  * @ingroup     coroutine
  *
  */
-#ifndef TB_COROUTINE_COROUTINE_IO_H
-#define TB_COROUTINE_COROUTINE_IO_H
+#ifndef TB_COROUTINE_IMPL_SCHEDULER_IO_H
+#define TB_COROUTINE_IMPL_SCHEDULER_IO_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "coroutine.h"
+#include "scheduler.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -35,18 +35,39 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * macros
+ */
+    
+// get self io scheduler
+#define tb_scheduler_io_self()      ((tb_scheduler_io_ref_t)tb_thread_local_get(&s_scheduler_io_self))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
  */
 
-/*! wait io events 
- *
- * @param sock          the socket
- * @param events        the waited events
- * @param timeout       the timeout, infinity: -1
- *
- * @return              > 0: the events, 0: timeout, -1: failed
+// the io scheduler type
+typedef struct __tb_scheduler_io_t
+{
+    // the maximum concurrent number
+    tb_size_t           maxn;
+
+    // is stopped?
+    tb_bool_t           stop;
+
+    // the scheduler 
+    tb_scheduler_t*     scheduler;
+
+    // the poller
+    tb_poller_ref_t     poller;
+
+}tb_scheduler_io_t, *tb_scheduler_io_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
  */
-tb_long_t               tb_coroutine_io_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+
+// the self io scheduler local 
+extern tb_thread_local_t s_scheduler_io_self;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

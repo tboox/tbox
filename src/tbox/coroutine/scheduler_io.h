@@ -40,9 +40,11 @@ __tb_extern_c_enter__
 
 /*! init io scheduler 
  *
+ * @param maxn          the maximum concurrent number  
+ *
  * @return              the scheduler 
  */
-tb_scheduler_ref_t      tb_scheduler_io_init(tb_noarg_t);
+tb_scheduler_ref_t      tb_scheduler_io_init(tb_size_t maxn);
 
 /*! stop the current io scheduler 
  */

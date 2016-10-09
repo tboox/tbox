@@ -60,6 +60,9 @@ typedef struct __tb_poller_object_t
 // the poller select type
 typedef struct __tb_poller_select_t
 {
+    // the user private data
+    tb_cpointer_t           priv;
+
     // the pair sockets for spak, kill ..
     tb_socket_ref_t         pair[2];
 
@@ -78,7 +81,7 @@ typedef struct __tb_poller_select_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_poller_ref_t tb_poller_init(tb_size_t maxn)
+tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(maxn, tb_null);
@@ -95,6 +98,9 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn)
         // init objects
         poller->objects = tb_hash_map_init(tb_align8(tb_isqrti((tb_uint32_t)maxn) + 1), tb_element_ptr(tb_null, tb_null), tb_element_mem(sizeof(tb_poller_object_t), tb_null, tb_null));
         tb_assert_and_check_break(poller->objects);
+
+        // init user private data
+        poller->priv = priv;
 
         // init fds
         FD_ZERO(&poller->rfds);
@@ -161,6 +167,15 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
 
     // spak it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
+}
+tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
+{
+    // check
+    tb_poller_select_ref_t poller = (tb_poller_select_ref_t)self;
+    tb_assert_and_check_return_val(poller, tb_null);
+
+    // get the user private data
+    return poller->priv;
 }
 tb_void_t tb_poller_kill(tb_poller_ref_t self)
 {
@@ -347,7 +362,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             }
 
             // call event function
-            func(sock, events, object->priv);
+            func(self, sock, events, object->priv);
         }
     }
 

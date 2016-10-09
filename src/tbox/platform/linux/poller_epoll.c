@@ -41,6 +41,9 @@ typedef struct __tb_poller_epoll_t
     // the maxn
     tb_size_t               maxn;
 
+    // the user private data
+    tb_cpointer_t           priv;
+
     // the pair sockets for spak, kill ..
     tb_socket_ref_t         pair[2];
 
@@ -64,14 +67,10 @@ typedef struct __tb_poller_epoll_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_void_t tb_poller_privhash_set(tb_poller_epoll_ref_t poller, tb_socket_ref_t sock, tb_cpointer_t priv)
+static tb_void_t tb_poller_privhash_set(tb_poller_epoll_ref_t poller, tb_long_t fd, tb_cpointer_t priv)
 {
     // check
-    tb_assert(poller && sock);
-
-    // the socket fd
-    tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(fd > 0 && fd < TB_MAXS32);
+    tb_assert(poller && fd > 0 && fd < TB_MAXS32);
 
     // not null?
     if (priv)
@@ -104,25 +103,19 @@ static tb_void_t tb_poller_privhash_set(tb_poller_epoll_ref_t poller, tb_socket_
         poller->privhash[fd] = priv;
     }
 }
-static __tb_inline__ tb_cpointer_t tb_poller_privhash_get(tb_poller_epoll_ref_t poller, tb_socket_ref_t sock)
+static __tb_inline__ tb_cpointer_t tb_poller_privhash_get(tb_poller_epoll_ref_t poller, tb_long_t fd)
 {
     // check
-    tb_assert(poller && poller->privhash && sock);
-
-    // the socket fd
-    tb_long_t fd = tb_sock2fd(sock);
+    tb_assert(poller && poller->privhash);
     tb_assert(fd > 0 && fd < TB_MAXS32);
 
     // get the user private data
     return fd < poller->privhash_size? poller->privhash[fd] : tb_null;
 }
-static __tb_inline__ tb_void_t tb_poller_privhash_del(tb_poller_epoll_ref_t poller, tb_socket_ref_t sock)
+static __tb_inline__ tb_void_t tb_poller_privhash_del(tb_poller_epoll_ref_t poller, tb_long_t fd)
 {
     // check
-    tb_assert(poller && poller->privhash && sock);
-
-    // the socket fd
-    tb_long_t fd = tb_sock2fd(sock);
+    tb_assert(poller && poller->privhash);
     tb_assert(fd > 0 && fd < TB_MAXS32);
 
     // remove the user private data
@@ -132,7 +125,7 @@ static __tb_inline__ tb_void_t tb_poller_privhash_del(tb_poller_epoll_ref_t poll
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_poller_ref_t tb_poller_init(tb_size_t maxn)
+tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return_val(maxn, tb_null);
@@ -152,6 +145,9 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn)
 
         // init maxn
         poller->maxn = maxn;
+
+        // init user private data
+        poller->priv = priv;
 
         // init pair sockets
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
@@ -217,6 +213,15 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     poller->epfd = epoll_create(poller->maxn);
     tb_assert(poller->epfd > 0);
 }
+tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
+{
+    // check
+    tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
+    tb_assert_and_check_return_val(poller, tb_null);
+
+    // get the user private data
+    return poller->priv;
+}
 tb_void_t tb_poller_kill(tb_poller_ref_t self)
 {
     // check
@@ -269,7 +274,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
     // bind user private data to socket
-    tb_poller_privhash_set(poller, sock, priv);
+    tb_poller_privhash_set(poller, e.data.fd, priv);
 
     // add socket and events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_ADD, e.data.fd, &e) < 0)
@@ -291,8 +296,9 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     tb_assert_and_check_return_val(poller && poller->epfd > 0 && sock, tb_false);
 
     // remove socket and events
-    struct epoll_event e = {0};
-    if (epoll_ctl(poller->epfd, EPOLL_CTL_DEL, tb_sock2fd(sock), &e) < 0)
+    struct epoll_event  e = {0};
+    tb_long_t           fd = tb_sock2fd(sock);
+    if (epoll_ctl(poller->epfd, EPOLL_CTL_DEL, fd, &e) < 0)
     {
         // trace
         tb_trace_e("remove socket(%p) failed, errno: %d", sock, errno);
@@ -302,7 +308,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     }
 
     // remove user private data from this socket
-    tb_poller_privhash_del(poller, sock);
+    tb_poller_privhash_del(poller, fd);
     
     // ok
     return tb_true;
@@ -329,7 +335,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
     // modify user private data to socket
-    tb_poller_privhash_set(poller, sock, priv);
+    tb_poller_privhash_set(poller, e.data.fd, priv);
 
     // modify events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_MOD, e.data.fd, &e) < 0) 
@@ -401,7 +407,8 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         tb_size_t epoll_events = e->events;
 
         // the socket
-        tb_socket_ref_t sock = tb_fd2sock(e->data.fd);
+        tb_long_t       fd = e->data.fd;
+        tb_socket_ref_t sock = tb_fd2sock(fd);
 
         // spak?
         if (sock == pair && (epoll_events & EPOLLIN)) 
@@ -428,7 +435,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
         // call event function
-        func(sock, events, tb_poller_privhash_get(poller, sock));
+        func(self, sock, events, tb_poller_privhash_get(poller, fd));
     }
 
     // ok

@@ -59,11 +59,12 @@ typedef __tb_typeref__(poller);
 
 /*! the poller event func type
  *
+ * @param poller    the poller
  * @param sock      the socket
  * @param events    the poller events
  * @param priv      the user private data for this socket
  */
-typedef tb_void_t   (*tb_poller_event_func_t)(tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv);
+typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -72,10 +73,11 @@ typedef tb_void_t   (*tb_poller_event_func_t)(tb_socket_ref_t sock, tb_size_t ev
 /*! init poller
  *
  * @param maxn      the maximum number of concurrent sockets
+ * @param priv      the user private data 
  *
  * @param poller    the poller
  */
-tb_poller_ref_t     tb_poller_init(tb_size_t maxn);
+tb_poller_ref_t     tb_poller_init(tb_size_t maxn, tb_cpointer_t priv);
 
 /*! exit poller
  *
@@ -88,6 +90,14 @@ tb_void_t           tb_poller_exit(tb_poller_ref_t poller);
  * @param poller    the poller
  */
 tb_void_t           tb_poller_clear(tb_poller_ref_t poller);
+
+/*! get the user private data
+ *
+ * @param poller    the poller
+ *
+ * @return          the user private data
+ */
+tb_cpointer_t       tb_poller_priv(tb_poller_ref_t poller);
 
 /*! kill all waited events, tb_poller_wait() will return -1
  *

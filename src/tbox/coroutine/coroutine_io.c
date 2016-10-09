@@ -32,13 +32,38 @@
  * includes
  */
 #include "coroutine.h"
+#include "impl/impl.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_coroutine_io_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+tb_long_t tb_coroutine_io_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
-    tb_trace_noimpl();
+    // get the current io scheduler
+    tb_scheduler_io_ref_t scheduler_io = tb_scheduler_io_self();
+    tb_assert_and_check_return_val(scheduler_io && scheduler_io->poller, -1);
+
+    // get the current scheduler
+    tb_scheduler_t* scheduler = scheduler_io->scheduler;
+    tb_assert(scheduler);
+
+    // get the current coroutine
+    tb_coroutine_t* coroutine = tb_scheduler_running(scheduler);
+    tb_assert(coroutine);
+
+    // insert socket to poller for waiting events
+    if (!tb_poller_insert(scheduler_io->poller, sock, events, coroutine))
+    {
+        // trace
+        tb_trace_e("failed to insert sock(%p) to poller on coroutine(%p)!", sock, coroutine);
+
+        // failed
+        return tb_false;
+    }
+
+    // suspend the current coroutine 
+    tb_scheduler_suspend(scheduler);
+
     return 0;
 }

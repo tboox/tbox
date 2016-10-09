@@ -29,5 +29,6 @@
 #include "prefix.h"
 #include "coroutine.h"
 #include "scheduler.h"
+#include "scheduler_io.h"
 
 #endif
