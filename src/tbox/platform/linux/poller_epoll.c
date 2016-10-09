@@ -260,6 +260,9 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     if (events & TB_POLLER_EVENT_CLEAR) e.events |= EPOLLET;
 #ifdef EPOLLONESHOT 
     if (events & TB_POLLER_EVENT_ONESHOT) e.events |= EPOLLONESHOT;
+#else
+    // oneshot is not supported now
+    tb_assertf(!(events & TB_POLLER_EVENT_ONESHOT), "cannot insert events with oneshot, not supported!");
 #endif
 
     // save fd
@@ -317,6 +320,9 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     if (events & TB_POLLER_EVENT_CLEAR) e.events |= EPOLLET;
 #ifdef EPOLLONESHOT 
     if (events & TB_POLLER_EVENT_ONESHOT) e.events |= EPOLLONESHOT;
+#else
+    // oneshot is not supported now
+    tb_assertf(!(events & TB_POLLER_EVENT_ONESHOT), "cannot insert events with oneshot, not supported!");
 #endif
 
     // save fd

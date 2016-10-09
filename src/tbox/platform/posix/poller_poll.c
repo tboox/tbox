@@ -275,6 +275,9 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_poller_poll_ref_t poller = (tb_poller_poll_ref_t)self;
     tb_assert_and_check_return_val(poller && poller->pfds && sock, tb_false);
 
+    // oneshot is not supported now
+    tb_assertf(!(events & TB_POLLER_EVENT_ONESHOT), "cannot insert events with oneshot, not supported!");
+
     // init events
     struct pollfd pfd = {0};
     if (events & TB_POLLER_EVENT_RECV) pfd.events |= POLLIN;
@@ -316,6 +319,9 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // check
     tb_poller_poll_ref_t poller = (tb_poller_poll_ref_t)self;
     tb_assert_and_check_return_val(poller && poller->pfds && sock, tb_false);
+
+    // oneshot is not supported now
+    tb_assertf(!(events & TB_POLLER_EVENT_ONESHOT), "cannot insert events with oneshot, not supported!");
 
     // modify events, TODO uses binary search
     tb_value_t tuple[2];
