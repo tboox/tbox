@@ -45,7 +45,7 @@
  * types
  */
 
-// the kqueue poll type
+// the kqueue poller type
 typedef struct __tb_poller_kqueue_t
 {
     // the maxn
@@ -115,6 +115,9 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn)
         // init pair sockets
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
 
+        // insert pair socket first
+        if (!tb_poller_insert((tb_poller_ref_t)poller, poller->pair[1], TB_POLLER_EVENT_RECV, tb_null)) break;  
+
         // ok
         ok = tb_true;
 
@@ -175,19 +178,7 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     tb_assert_and_check_return(poller);
 
     // kill it
-    if (poller->pair[0]) 
-    {
-        // post: 'k'
-        tb_long_t ok = tb_socket_send(poller->pair[0], (tb_byte_t const*)"k", 1);
-        if (ok != 1)
-        {
-            // trace
-            tb_trace_e("kill: failed!");
-
-            // abort it
-            tb_assert(0);
-        }
-    }
+    if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"k", 1);
 }
 tb_void_t tb_poller_spak(tb_poller_ref_t self)
 {
@@ -196,19 +187,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
     tb_assert_and_check_return(poller);
 
     // post it
-    if (poller->pair[0]) 
-    {
-        // post: 'p'
-        tb_long_t ok = tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
-        if (ok != 1)
-        {
-            // trace
-            tb_trace_e("spak: failed!");
-
-            // abort it
-            tb_assert(0);
-        }
-    }
+    if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 }
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {

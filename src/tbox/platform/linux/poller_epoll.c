@@ -35,7 +35,7 @@
  * types
  */
 
-// the epoll poll type
+// the epoll poller type
 typedef struct __tb_poller_epoll_t
 {
     // the maxn
@@ -116,6 +116,18 @@ static __tb_inline__ tb_cpointer_t tb_poller_privhash_get(tb_poller_epoll_ref_t 
     // get the user private data
     return fd < poller->privhash_size? poller->privhash[fd] : tb_null;
 }
+static __tb_inline__ tb_void_t tb_poller_privhash_del(tb_poller_epoll_ref_t poller, tb_socket_ref_t sock)
+{
+    // check
+    tb_assert(poller && poller->privhash && sock);
+
+    // the socket fd
+    tb_long_t fd = tb_sock2fd(sock);
+    tb_assert(fd > 0 && fd < TB_MAXS32);
+
+    // remove the user private data
+    if (fd < poller->privhash_size) poller->privhash[fd] = tb_null;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -143,6 +155,9 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn)
 
         // init pair sockets
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
+
+        // insert pair socket first
+        if (!tb_poller_insert((tb_poller_ref_t)poller, poller->pair[1], TB_POLLER_EVENT_RECV, tb_null)) break;  
 
         // ok
         ok = tb_true;
@@ -209,19 +224,7 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     tb_assert_and_check_return(poller);
 
     // kill it
-    if (poller->pair[0]) 
-    {
-        // post: 'k'
-        tb_long_t ok = tb_socket_send(poller->pair[0], (tb_byte_t const*)"k", 1);
-        if (ok != 1)
-        {
-            // trace
-            tb_trace_e("kill: failed!");
-
-            // abort it
-            tb_assert(0);
-        }
-    }
+    if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"k", 1);
 }
 tb_void_t tb_poller_spak(tb_poller_ref_t self)
 {
@@ -230,19 +233,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
     tb_assert_and_check_return(poller);
 
     // post it
-    if (poller->pair[0]) 
-    {
-        // post: 'p'
-        tb_long_t ok = tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
-        if (ok != 1)
-        {
-            // trace
-            tb_trace_e("spak: failed!");
-
-            // abort it
-            tb_assert(0);
-        }
-    }
+    if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 }
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {
@@ -274,7 +265,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // save fd
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
-    // bind priv to fd
+    // bind user private data to socket
     tb_poller_privhash_set(poller, sock, priv);
 
     // add socket and events
@@ -307,6 +298,9 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
         return tb_false;
     }
 
+    // remove user private data from this socket
+    tb_poller_privhash_del(poller, sock);
+    
     // ok
     return tb_true;
 }
@@ -328,7 +322,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // save fd
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
-    // bind priv to fd
+    // modify user private data to socket
     tb_poller_privhash_set(poller, sock, priv);
 
     // modify events
