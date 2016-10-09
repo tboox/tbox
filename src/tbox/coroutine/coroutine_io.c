@@ -52,6 +52,8 @@ tb_long_t tb_coroutine_io_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t
     tb_coroutine_t* coroutine = tb_scheduler_running(scheduler);
     tb_assert(coroutine);
 
+    // TODO timeout and oneshot, clear ...
+
     // insert socket to poller for waiting events
     if (!tb_poller_insert(scheduler_io->poller, sock, events, coroutine))
     {
@@ -62,8 +64,6 @@ tb_long_t tb_coroutine_io_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t
         return tb_false;
     }
 
-    // suspend the current coroutine 
-    tb_scheduler_suspend(scheduler);
-
-    return 0;
+    // suspend the current coroutine and return the waited result
+    return (tb_long_t)tb_scheduler_suspend(scheduler);
 }

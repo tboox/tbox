@@ -54,25 +54,23 @@ tb_bool_t tb_coroutine_yield()
     // yield the current coroutine
     return scheduler? tb_scheduler_yield(scheduler) : tb_false;
 }
-tb_void_t tb_coroutine_resume(tb_coroutine_ref_t coroutine)
+tb_void_t tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // get current scheduler
     tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
     if (scheduler)
     {
         // resume the given coroutine
-        tb_scheduler_resume(scheduler, (tb_coroutine_t*)coroutine);
+        tb_scheduler_resume(scheduler, (tb_coroutine_t*)coroutine, priv);
     }
 }
-tb_void_t tb_coroutine_suspend()
+tb_cpointer_t tb_coroutine_suspend()
 {
     // get current scheduler
     tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
-    if (scheduler)
-    {
-        // suspend the current coroutine
-        tb_scheduler_suspend(scheduler);
-    }
+
+    // suspend the current coroutine
+    return scheduler? tb_scheduler_suspend(scheduler) : tb_null;
 }
 tb_void_t tb_coroutine_sleep(tb_size_t interval)
 {

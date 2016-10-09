@@ -96,14 +96,17 @@ tb_bool_t                   tb_scheduler_yield(tb_scheduler_t* scheduler);
  *
  * @param scheduler         the scheduler
  * @param coroutine         the suspended coroutine
+ * @param priv              the user private data as the return value of suspend()
  */
-tb_void_t                   tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+tb_void_t                   tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv);
 
 /*! suspend the current coroutine
  *
  * @param scheduler         the scheduler
+ *
+ * @return                  the user private data from resume(priv)
  */
-tb_void_t                   tb_scheduler_suspend(tb_scheduler_t* scheduler);
+tb_cpointer_t               tb_scheduler_suspend(tb_scheduler_t* scheduler);
 
 /* finish the current coroutine
  *

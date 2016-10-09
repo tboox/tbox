@@ -96,8 +96,11 @@ typedef struct __tb_coroutine_t
     // the function 
     tb_coroutine_func_t     func;
 
-    // the user private data
-    tb_cpointer_t           priv;
+    // the user private data as the argument of function
+    tb_cpointer_t           func_priv;
+
+    // the user private data as the argument of resume() and the return value of suspend()
+    tb_cpointer_t           resumed_priv;
 
     // the list entry
     tb_list_entry_t         entry;

@@ -58,8 +58,8 @@ static tb_void_t tb_scheduler_io_wait(tb_poller_ref_t poller, tb_socket_ref_t so
     // remove this socket from poller
     tb_poller_remove(poller, sock);
 
-    // resume the coroutine of this socket
-    tb_scheduler_resume(scheduler, (tb_coroutine_t*)priv);
+    // resume the coroutine of this socket and pass the events to suspend()
+    tb_scheduler_resume(scheduler, (tb_coroutine_t*)priv, (tb_cpointer_t)events);
 }
 static tb_void_t tb_scheduler_io_exit(tb_scheduler_io_ref_t scheduler_io)
 {

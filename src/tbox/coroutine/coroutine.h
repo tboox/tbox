@@ -70,11 +70,15 @@ tb_bool_t               tb_coroutine_yield(tb_noarg_t);
 /*! resume the given coroutine (suspended)
  *
  * @param coroutine     the suspended coroutine
+ * @param priv          the user private data as the return value of suspend()
  */
-tb_void_t               tb_coroutine_resume(tb_coroutine_ref_t coroutine);
+tb_void_t               tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv);
 
-/// suspend the current coroutine
-tb_void_t               tb_coroutine_suspend(tb_noarg_t);
+/*! suspend the current coroutine
+ *
+ * @return              the user private data from resume(priv)
+ */
+tb_cpointer_t           tb_coroutine_suspend(tb_noarg_t);
 
 /*! sleep some times (ms)
  *

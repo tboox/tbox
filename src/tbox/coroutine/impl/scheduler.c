@@ -245,7 +245,7 @@ tb_bool_t tb_scheduler_yield(tb_scheduler_t* scheduler)
     // no more ready coroutines? return it directly and continue to run this coroutine
     return tb_false;
 }
-tb_void_t tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
+tb_void_t tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv)
 {
     // check
     tb_assert(scheduler && coroutine);
@@ -260,11 +260,14 @@ tb_void_t tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* corouti
         // remove it from the suspend coroutines
         tb_list_entry_remove(&scheduler->coroutines_suspend, &coroutine->entry);
 
+        // pass the user private data
+        coroutine->resumed_priv = priv;
+
         // make it as ready
         tb_scheduler_make_ready(scheduler, coroutine);
     }
 }
-tb_void_t tb_scheduler_suspend(tb_scheduler_t* scheduler)
+tb_cpointer_t tb_scheduler_suspend(tb_scheduler_t* scheduler)
 {
     // check
     tb_assert(scheduler && scheduler->running);
@@ -274,11 +277,20 @@ tb_void_t tb_scheduler_suspend(tb_scheduler_t* scheduler)
     // trace
     tb_trace_d("suspend coroutine(%p)", scheduler->running);
 
+    // clear the resumed private data first
+    scheduler->running->resumed_priv = tb_null;
+
     // make the running coroutine as suspend
     tb_scheduler_make_suspend(scheduler, scheduler->running);
 
     // switch to next coroutine 
     tb_scheduler_switch_next(scheduler);
+
+    // check
+    tb_assert(scheduler->running);
+
+    // return the user private data from resume(priv)
+    return scheduler->running->resumed_priv;
 }
 tb_void_t tb_scheduler_finish(tb_scheduler_t* scheduler)
 {
