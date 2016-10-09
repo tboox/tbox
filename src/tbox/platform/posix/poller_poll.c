@@ -264,7 +264,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {
     // all supported events 
-    tb_size_t events_supported = TB_POLLER_EVENT_ALL;
+    tb_size_t events_supported = TB_POLLER_EVENT_EALL;
 
     // is supported?
     return (events_supported & events) == events;

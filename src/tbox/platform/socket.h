@@ -79,7 +79,7 @@ typedef enum __tb_socket_event_e
 ,   TB_SOCKET_EVENT_SEND                = 0x0002
 ,   TB_SOCKET_EVENT_CONN                = TB_SOCKET_EVENT_SEND
 ,   TB_SOCKET_EVENT_ACPT                = TB_SOCKET_EVENT_RECV
-,   TB_SOCKET_EVENT_ALL                 = TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND
+,   TB_SOCKET_EVENT_EALL                = TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND
 
 }tb_socket_event_e;
 

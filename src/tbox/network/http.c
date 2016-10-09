@@ -967,14 +967,14 @@ tb_bool_t tb_http_bread(tb_http_ref_t http, tb_byte_t* data, tb_size_t size)
         else if (!real)
         {
             // wait
-            tb_long_t e = tb_http_wait(http, TB_AIOE_CODE_RECV, impl->option.timeout);
+            tb_long_t e = tb_http_wait(http, TB_SOCKET_EVENT_RECV, impl->option.timeout);
             tb_assert_and_check_break(e >= 0);
 
             // timeout?
             tb_check_break(e);
 
             // has read?
-            tb_assert_and_check_break(e & TB_AIOE_CODE_RECV);
+            tb_assert_and_check_break(e & TB_SOCKET_EVENT_RECV);
         }
         else break;
     }

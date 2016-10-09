@@ -179,7 +179,7 @@ static tb_bool_t tb_stream_sock_impl_open(tb_stream_ref_t stream)
                     &&  !tb_stream_is_killed(stream))
             {
                 // wait it
-                real = tb_aioo_wait(impl->sock, TB_AIOE_CODE_CONN, tb_stream_timeout(stream));
+                real = tb_socket_wait(impl->sock, TB_SOCKET_EVENT_CONN, tb_stream_timeout(stream));
                 tb_check_break(real > 0);
             }
 
@@ -374,7 +374,7 @@ static tb_long_t tb_stream_sock_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
                 tb_check_return_val(real >= 0, -1);
 
                 // peer closed?
-                if (!real && impl->wait > 0 && (impl->wait & TB_AIOE_CODE_RECV)) return -1;
+                if (!real && impl->wait > 0 && (impl->wait & TB_SOCKET_EVENT_RECV)) return -1;
 
                 // clear wait
                 if (real > 0) impl->wait = 0;
@@ -393,7 +393,7 @@ static tb_long_t tb_stream_sock_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
             tb_check_return_val(real >= 0, -1);
 
             // peer closed?
-            if (!real && impl->wait > 0 && (impl->wait & TB_AIOE_CODE_RECV)) return -1;
+            if (!real && impl->wait > 0 && (impl->wait & TB_SOCKET_EVENT_RECV)) return -1;
 
             // clear wait
             if (real > 0) impl->wait = 0;
@@ -461,7 +461,7 @@ static tb_long_t tb_stream_sock_impl_writ(tb_stream_ref_t stream, tb_byte_t cons
                 tb_check_return_val(real >= 0, -1);
 
                 // peer closed?
-                if (!real && impl->wait > 0 && (impl->wait & TB_AIOE_CODE_SEND)) return -1;
+                if (!real && impl->wait > 0 && (impl->wait & TB_SOCKET_EVENT_SEND)) return -1;
 
                 // clear wait
                 if (real > 0) impl->wait = 0;
@@ -528,7 +528,7 @@ static tb_long_t tb_stream_sock_impl_wait(tb_stream_ref_t stream, tb_size_t wait
 #endif
     {
         // wait 
-        impl->wait = tb_aioo_wait(impl->sock, wait, timeout);
+        impl->wait = tb_socket_wait(impl->sock, wait, timeout);
     }
 
     // trace

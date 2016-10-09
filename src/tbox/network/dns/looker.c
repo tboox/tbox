@@ -44,14 +44,14 @@
  * macros
  */
 
-// the dns impl timeout
+// the dns looker timeout
 #define TB_DNS_LOOKER_TIMEOUT   (5000)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 
-// the dns impl step enum
+// the dns looker step enum
 typedef enum __tb_dns_looker_step_e
 {
     TB_DNS_LOOKER_STEP_NONE     = 0
@@ -61,8 +61,8 @@ typedef enum __tb_dns_looker_step_e
 
 }tb_dns_looker_step_e;
 
-// the dns impl type
-typedef struct __tb_dns_looker_impl_t
+// the dns looker type
+typedef struct __tb_dns_looker_t
 {
     // the name
     tb_static_string_t      name;
@@ -97,21 +97,21 @@ typedef struct __tb_dns_looker_impl_t
     // the data
     tb_byte_t               data[TB_DNS_NAME_MAXN + TB_DNS_RPKT_MAXN];
 
-}tb_dns_looker_impl_t;
+}tb_dns_looker_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_dns_looker_reqt(tb_dns_looker_impl_t* impl)
+static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 {
     // check
-    tb_check_return_val(!(impl->step & TB_DNS_LOOKER_STEP_REQT), 1);
+    tb_check_return_val(!(looker->step & TB_DNS_LOOKER_STEP_REQT), 1);
     
     // format it first if the request is null
-    if (!tb_static_buffer_size(&impl->rpkt))
+    if (!tb_static_buffer_size(&looker->rpkt))
     {
         // check size
-        tb_assert_and_check_return_val(!impl->size, -1);
+        tb_assert_and_check_return_val(!looker->size, -1);
 
         // format query
         tb_static_stream_t  stream;
@@ -178,7 +178,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_impl_t* impl)
         // set questions, see as tb_dns_question_t
         // name + question1 + question2 + ...
         tb_static_stream_writ_u8(&stream, '.');
-        p = (tb_byte_t*)tb_static_stream_writ_cstr(&stream, tb_static_string_cstr(&impl->name));
+        p = (tb_byte_t*)tb_static_stream_writ_cstr(&stream, tb_static_string_cstr(&looker->name));
 
         // only one question now.
         tb_static_stream_writ_u16_be(&stream, 1);      // we are requesting the ipv4 address
@@ -192,49 +192,49 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_impl_t* impl)
         tb_assert_and_check_return_val(size, -1);
 
         // copy
-        tb_static_buffer_memncpy(&impl->rpkt, rpkt, size);
+        tb_static_buffer_memncpy(&looker->rpkt, rpkt, size);
     }
 
     // data && size
-    tb_byte_t const*    data = tb_static_buffer_data(&impl->rpkt);
-    tb_size_t           size = tb_static_buffer_size(&impl->rpkt);
+    tb_byte_t const*    data = tb_static_buffer_data(&looker->rpkt);
+    tb_size_t           size = tb_static_buffer_size(&looker->rpkt);
 
     // check
-    tb_assert_and_check_return_val(data && size && impl->size < size, -1);
+    tb_assert_and_check_return_val(data && size && looker->size < size, -1);
 
     // try get addr from the dns list
     tb_ipaddr_ref_t addr = tb_null;
-    if (impl->maxn && impl->itor && impl->itor <= impl->maxn)
-        addr = &impl->list[impl->itor - 1];
+    if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
+        addr = &looker->list[looker->itor - 1];
 
     // check
     tb_assert_and_check_return_val(addr && !tb_ipaddr_is_empty(addr), -1);
 
     // family have been changed? reinit socket
-    if (tb_ipaddr_family(addr) != impl->family)
+    if (tb_ipaddr_family(addr) != looker->family)
     {
         // exit the previous socket
-        if (impl->sock) tb_socket_exit(impl->sock);
+        if (looker->sock) tb_socket_exit(looker->sock);
 
         // init a new socket for the family
-        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, tb_ipaddr_family(addr));
-        tb_assert_and_check_return_val(impl->sock, -1);
+        looker->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, tb_ipaddr_family(addr));
+        tb_assert_and_check_return_val(looker->sock, -1);
 
         // update the new family
-        impl->family = (tb_uint8_t)tb_ipaddr_family(addr);
+        looker->family = (tb_uint8_t)tb_ipaddr_family(addr);
     }
 
     // need wait if no data
-    impl->step &= ~TB_DNS_LOOKER_STEP_NEVT;
+    looker->step &= ~TB_DNS_LOOKER_STEP_NEVT;
 
     // trace
     tb_trace_d("request: try %{ipaddr}", addr);
 
     // send request
-    while (impl->size < size)
+    while (looker->size < size)
     {
         // writ data
-        tb_long_t writ = tb_socket_usend(impl->sock, addr, data + impl->size, size - impl->size);
+        tb_long_t writ = tb_socket_usend(looker->sock, addr, data + looker->size, size - looker->size);
         //tb_trace_d("writ: %d", writ);
         tb_assert_and_check_return_val(writ >= 0, -1);
 
@@ -242,37 +242,37 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_impl_t* impl)
         if (!writ)
         {
             // abort?
-            tb_check_return_val(!impl->size && !impl->tryn, -1);
+            tb_check_return_val(!looker->size && !looker->tryn, -1);
 
             // tryn++
-            impl->tryn++;
+            looker->tryn++;
 
             // continue
             return 0;
         }
-        else impl->tryn = 0;
+        else looker->tryn = 0;
 
         // update size
-        impl->size += writ;
+        looker->size += writ;
     }
 
     // finish it
-    impl->step |= TB_DNS_LOOKER_STEP_REQT;
-    impl->tryn = 0;
+    looker->step |= TB_DNS_LOOKER_STEP_REQT;
+    looker->tryn = 0;
 
     // reset rpkt
-    impl->size = 0;
-    tb_static_buffer_clear(&impl->rpkt);
+    looker->size = 0;
+    tb_static_buffer_clear(&looker->rpkt);
 
     // ok
     tb_trace_d("request: ok");
     return 1;
 }
-static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_impl_t* impl, tb_ipaddr_ref_t addr)
+static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipaddr_ref_t addr)
 {
     // the rpkt and size
-    tb_byte_t const*    rpkt = tb_static_buffer_data(&impl->rpkt);
-    tb_size_t           size = tb_static_buffer_size(&impl->rpkt);
+    tb_byte_t const*    rpkt = tb_static_buffer_data(&looker->rpkt);
+    tb_size_t           size = tb_static_buffer_size(&looker->rpkt);
     tb_assert_and_check_return_val(rpkt && size >= TB_DNS_HEADER_SIZE, tb_false);
 
     // init stream
@@ -471,20 +471,20 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_impl_t* impl, tb_ipaddr_r
     // ok
     return tb_true;
 }
-static tb_long_t tb_dns_looker_resp(tb_dns_looker_impl_t* impl, tb_ipaddr_ref_t addr)
+static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipaddr_ref_t addr)
 {
     // check
-    tb_check_return_val(!(impl->step & TB_DNS_LOOKER_STEP_RESP), 1);
+    tb_check_return_val(!(looker->step & TB_DNS_LOOKER_STEP_RESP), 1);
 
     // need wait if no data
-    impl->step &= ~TB_DNS_LOOKER_STEP_NEVT;
+    looker->step &= ~TB_DNS_LOOKER_STEP_NEVT;
 
     // recv response data
     tb_byte_t rpkt[4096];
     while (1)
     {
         // read data
-        tb_long_t read = tb_socket_urecv(impl->sock, tb_null, rpkt, 4096);
+        tb_long_t read = tb_socket_urecv(looker->sock, tb_null, rpkt, 4096);
         //tb_trace_d("read %d", read);
         tb_assert_and_check_return_val(read >= 0, -1);
 
@@ -492,39 +492,39 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_impl_t* impl, tb_ipaddr_ref_t 
         if (!read)
         {
             // end? read x, read 0
-            tb_check_break(!tb_static_buffer_size(&impl->rpkt));
+            tb_check_break(!tb_static_buffer_size(&looker->rpkt));
     
             // abort? read 0, read 0
-            tb_check_return_val(!impl->tryn, -1);
+            tb_check_return_val(!looker->tryn, -1);
             
             // tryn++
-            impl->tryn++;
+            looker->tryn++;
 
             // continue 
             return 0;
         }
-        else impl->tryn = 0;
+        else looker->tryn = 0;
 
         // copy data
-        tb_static_buffer_memncat(&impl->rpkt, rpkt, read);
+        tb_static_buffer_memncat(&looker->rpkt, rpkt, read);
     }
 
     // done
-    if (!tb_dns_looker_resp_done(impl, addr)) return -1;
+    if (!tb_dns_looker_resp_done(looker, addr)) return -1;
 
     // check
-    tb_assert_and_check_return_val(tb_static_string_size(&impl->name) && !tb_ipaddr_ip_is_empty(addr), -1);
+    tb_assert_and_check_return_val(tb_static_string_size(&looker->name) && !tb_ipaddr_ip_is_empty(addr), -1);
 
     // save address to cache
-    tb_dns_cache_set(tb_static_string_cstr(&impl->name), addr);
+    tb_dns_cache_set(tb_static_string_cstr(&looker->name), addr);
 
     // finish it
-    impl->step |= TB_DNS_LOOKER_STEP_RESP;
-    impl->tryn = 0;
+    looker->step |= TB_DNS_LOOKER_STEP_RESP;
+    looker->tryn = 0;
 
     // reset rpkt
-    impl->size = 0;
-    tb_static_buffer_clear(&impl->rpkt);
+    looker->size = 0;
+    tb_static_buffer_clear(&looker->rpkt);
 
     // ok
     tb_trace_d("response: ok");
@@ -543,37 +543,37 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
     tb_assert(!tb_ipaddr_ip_cstr_set(tb_null, name, TB_IPADDR_FAMILY_NONE));
 
     // done
-    tb_bool_t               ok = tb_false;
-    tb_dns_looker_impl_t*   impl = tb_null;
+    tb_bool_t           ok = tb_false;
+    tb_dns_looker_t*    looker = tb_null;
     do
     {
-        // make impl
-        impl = tb_malloc0_type(tb_dns_looker_impl_t);
-        tb_assert_and_check_return_val(impl, tb_null);
+        // make looker
+        looker = tb_malloc0_type(tb_dns_looker_t);
+        tb_assert_and_check_return_val(looker, tb_null);
 
         // dump server
 //      tb_dns_server_dump();
 
         // get the dns server list
-        impl->maxn = tb_dns_server_get(impl->list);
-        tb_check_break(impl->maxn && impl->maxn <= tb_arrayn(impl->list));
+        looker->maxn = tb_dns_server_get(looker->list);
+        tb_check_break(looker->maxn && looker->maxn <= tb_arrayn(looker->list));
 
         // init name
-        if (!tb_static_string_init(&impl->name, (tb_char_t*)impl->data, TB_DNS_NAME_MAXN)) break;
-        tb_static_string_cstrcpy(&impl->name, name);
+        if (!tb_static_string_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) break;
+        tb_static_string_cstrcpy(&looker->name, name);
 
         // init rpkt
-        if (!tb_static_buffer_init(&impl->rpkt, impl->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) break;
+        if (!tb_static_buffer_init(&looker->rpkt, looker->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) break;
 
         // init family
-        impl->family = TB_IPADDR_FAMILY_IPV4;
+        looker->family = TB_IPADDR_FAMILY_IPV4;
 
         // init sock
-        impl->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, impl->family);
-        tb_assert_and_check_break(impl->sock);
+        looker->sock = tb_socket_init(TB_SOCKET_TYPE_UDP, looker->family);
+        tb_assert_and_check_break(looker->sock);
 
         // init itor
-        impl->itor = 1;
+        looker->itor = 1;
 
         // ok
         ok = tb_true;
@@ -584,29 +584,29 @@ tb_dns_looker_ref_t tb_dns_looker_init(tb_char_t const* name)
     if (!ok)
     {
         // exit it
-        if (impl) tb_dns_looker_exit((tb_dns_looker_ref_t)impl);
-        impl = tb_null;
+        if (looker) tb_dns_looker_exit((tb_dns_looker_ref_t)looker);
+        looker = tb_null;
     }
 
     // ok?
-    return (tb_dns_looker_ref_t)impl;
+    return (tb_dns_looker_ref_t)looker;
 }
-tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t looker, tb_ipaddr_ref_t addr)
+tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t self, tb_ipaddr_ref_t addr)
 {
     // check
-    tb_dns_looker_impl_t* impl = (tb_dns_looker_impl_t*)looker;
-    tb_assert_and_check_return_val(impl && addr, -1);
+    tb_dns_looker_t* looker = (tb_dns_looker_t*)self;
+    tb_assert_and_check_return_val(looker && addr, -1);
 
     // init 
     tb_long_t r = -1;
     do
     {
         // request
-        r = tb_dns_looker_reqt(impl);
+        r = tb_dns_looker_reqt(looker);
         tb_check_break(r > 0);
             
         // response
-        r = tb_dns_looker_resp(impl, addr);
+        r = tb_dns_looker_resp(looker, addr);
         tb_check_break(r > 0);
 
     } while (0);
@@ -615,18 +615,18 @@ tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t looker, tb_ipaddr_ref_t addr)
     if (r < 0)
     {
         // next
-        if (impl->itor + 1 <= impl->maxn) impl->itor++;
-        else impl->itor = 0;
+        if (looker->itor + 1 <= looker->maxn) looker->itor++;
+        else looker->itor = 0;
 
         // has next?
-        if (impl->itor)
+        if (looker->itor)
         {
             // reset step, no event now, need not wait
-            impl->step = TB_DNS_LOOKER_STEP_NONE | TB_DNS_LOOKER_STEP_NEVT;
+            looker->step = TB_DNS_LOOKER_STEP_NONE | TB_DNS_LOOKER_STEP_NEVT;
 
             // reset rpkt
-            impl->size = 0;
-            tb_static_buffer_clear(&impl->rpkt);
+            looker->size = 0;
+            tb_static_buffer_clear(&looker->rpkt);
 
             // continue 
             r = 0;
@@ -636,18 +636,18 @@ tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t looker, tb_ipaddr_ref_t addr)
     // ok?
     return r;
 }
-tb_long_t tb_dns_looker_wait(tb_dns_looker_ref_t looker, tb_long_t timeout)
+tb_long_t tb_dns_looker_wait(tb_dns_looker_ref_t self, tb_long_t timeout)
 {
     // check
-    tb_dns_looker_impl_t* impl = (tb_dns_looker_impl_t*)looker;
-    tb_assert_and_check_return_val(impl && impl->sock, -1);
+    tb_dns_looker_t* looker = (tb_dns_looker_t*)self;
+    tb_assert_and_check_return_val(looker && looker->sock, -1);
 
     // has asio event?
-    tb_size_t e = TB_AIOE_CODE_NONE;
-    if (!(impl->step & TB_DNS_LOOKER_STEP_NEVT))
+    tb_size_t e = TB_SOCKET_EVENT_NONE;
+    if (!(looker->step & TB_DNS_LOOKER_STEP_NEVT))
     {
-        if (!(impl->step & TB_DNS_LOOKER_STEP_REQT)) e = TB_AIOE_CODE_SEND;
-        else if (!(impl->step & TB_DNS_LOOKER_STEP_RESP)) e = TB_AIOE_CODE_RECV;
+        if (!(looker->step & TB_DNS_LOOKER_STEP_REQT)) e = TB_SOCKET_EVENT_SEND;
+        else if (!(looker->step & TB_DNS_LOOKER_STEP_RESP)) e = TB_SOCKET_EVENT_RECV;
     }
 
     // need wait?
@@ -655,7 +655,7 @@ tb_long_t tb_dns_looker_wait(tb_dns_looker_ref_t looker, tb_long_t timeout)
     if (e)
     {
         // wait
-        r = tb_aioo_wait(impl->sock, e, timeout);
+        r = tb_socket_wait(looker->sock, e, timeout);
 
         // fail or timeout?
         tb_check_return_val(r > 0, r);
@@ -664,18 +664,18 @@ tb_long_t tb_dns_looker_wait(tb_dns_looker_ref_t looker, tb_long_t timeout)
     // ok?
     return r;
 }
-tb_void_t tb_dns_looker_exit(tb_dns_looker_ref_t looker)
+tb_void_t tb_dns_looker_exit(tb_dns_looker_ref_t self)
 {
-    // the impl
-    tb_dns_looker_impl_t* impl = (tb_dns_looker_impl_t*)looker;
-    if (impl)
+    // the looker
+    tb_dns_looker_t* looker = (tb_dns_looker_t*)self;
+    if (looker)
     {
         // exit sock
-        if (impl->sock) tb_socket_exit(impl->sock);
-        impl->sock = tb_null;
+        if (looker->sock) tb_socket_exit(looker->sock);
+        looker->sock = tb_null;
 
         // exit it
-        tb_free(impl);
+        tb_free(looker);
     }
 }
 tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_ipaddr_ref_t addr)

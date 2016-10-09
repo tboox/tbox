@@ -110,7 +110,6 @@ target("tbox")
     add_files("libm/isqrti.c") 
     add_files("libm/isqrti64.c") 
     add_files("libm/idivi8.c") 
-    add_files("asio/aioo.c", "asio/aiop.c") 
     add_files("platform/*.c|context.c|exception.c", "platform/impl/*.c|aicp.c")
 
     -- add the source files for the float type
@@ -135,10 +134,7 @@ target("tbox")
 
     -- add the source files for the asio module
     if is_option("asio") then 
-        add_files("asio/aico.c")
-        add_files("asio/aicp.c")
-        add_files("asio/http.c")
-        add_files("asio/dns.c")
+        add_files("asio/*.c|ssl.c")
         add_files("stream/**async_**.c")
         add_files("stream/transfer_pool.c")
         add_files("platform/impl/aicp.c")

@@ -137,7 +137,7 @@ static tb_int_t tb_ssl_func_read(tb_pointer_t priv, tb_byte_t* data, size_t size
     // ok? clear wait
     if (real > 0) impl->lwait = 0;
     // peer closed?
-    else if (!real && impl->lwait > 0 && (impl->lwait & TB_AIOE_CODE_RECV)) real = POLARSSL_ERR_NET_CONN_RESET;
+    else if (!real && impl->lwait > 0 && (impl->lwait & TB_SOCKET_EVENT_RECV)) real = POLARSSL_ERR_NET_CONN_RESET;
     // no data? continue to read it
     else if (!real) real = POLARSSL_ERR_NET_WANT_READ;
     // failed?
@@ -161,7 +161,7 @@ static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, size_
     // ok? clear wait
     if (real > 0) impl->lwait = 0;
     // peer closed?
-    else if (!real && impl->lwait > 0 && (impl->lwait & TB_AIOE_CODE_SEND)) real = POLARSSL_ERR_NET_CONN_RESET;
+    else if (!real && impl->lwait > 0 && (impl->lwait & TB_SOCKET_EVENT_SEND)) real = POLARSSL_ERR_NET_CONN_RESET;
     // no data? continue to writ
     else if (!real) real = POLARSSL_ERR_NET_WANT_WRITE;
     // failed?
@@ -317,7 +317,7 @@ tb_bool_t tb_ssl_open(tb_ssl_ref_t ssl)
     while (!(ok = tb_ssl_open_try(ssl)))
     {
         // wait it
-        ok = tb_ssl_wait(ssl, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, impl->timeout);
+        ok = tb_ssl_wait(ssl, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, impl->timeout);
         tb_check_break(ok > 0);
     }
 
@@ -426,7 +426,7 @@ tb_bool_t tb_ssl_clos(tb_ssl_ref_t ssl)
     while (!(ok = tb_ssl_clos_try(ssl)))
     {
         // wait it
-        ok = tb_ssl_wait(ssl, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, impl->timeout);
+        ok = tb_ssl_wait(ssl, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, impl->timeout);
         tb_check_break(ok > 0);
     }
 
@@ -631,11 +631,11 @@ tb_long_t tb_ssl_wait(tb_ssl_ref_t ssl, tb_size_t code, tb_long_t timeout)
     {
         // wait read
     case TB_STATE_SOCK_SSL_WANT_READ:
-        code = TB_AIOE_CODE_RECV;
+        code = TB_SOCKET_EVENT_RECV;
         break;
         // wait writ
     case TB_STATE_SOCK_SSL_WANT_WRIT:
-        code = TB_AIOE_CODE_SEND;
+        code = TB_SOCKET_EVENT_SEND;
         break;
         // ok, wait it
     case TB_STATE_OK:

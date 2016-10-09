@@ -31,6 +31,7 @@
 #include "../network/url.h"
 #include "../asio/asio.h"
 #include "../memory/memory.h"
+#include "../platform/socket.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -72,10 +73,10 @@ typedef enum __tb_stream_type_e
 /// the stream wait enum
 typedef enum __tb_stream_wait_e
 {
-    TB_STREAM_WAIT_NONE     = TB_AIOE_CODE_NONE
-,   TB_STREAM_WAIT_READ     = TB_AIOE_CODE_RECV
-,   TB_STREAM_WAIT_WRIT     = TB_AIOE_CODE_SEND
-,   TB_STREAM_WAIT_EALL     = TB_AIOE_CODE_EALL
+    TB_STREAM_WAIT_NONE     = TB_SOCKET_EVENT_NONE
+,   TB_STREAM_WAIT_READ     = TB_SOCKET_EVENT_RECV
+,   TB_STREAM_WAIT_WRIT     = TB_SOCKET_EVENT_SEND
+,   TB_STREAM_WAIT_EALL     = TB_SOCKET_EVENT_EALL
 
 }tb_stream_wait_e;
 

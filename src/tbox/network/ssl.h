@@ -144,7 +144,7 @@ tb_bool_t           tb_ssl_open(tb_ssl_ref_t ssl);
     while (!(ok = tb_ssl_open_try(handle)))
     {
         // wait it
-        ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, timeout);
+        ok = tb_ssl_wait(handle, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, timeout);
         tb_check_break(ok > 0);
     }
 
@@ -173,7 +173,7 @@ tb_bool_t           tb_ssl_clos(tb_ssl_ref_t ssl);
     while (!(ok = tb_ssl_clos_try(handle)))
     {
         // wait it
-        ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, timeout);
+        ok = tb_ssl_wait(handle, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, timeout);
         tb_check_break(ok > 0);
     }
 

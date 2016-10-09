@@ -225,7 +225,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
                 tb_check_break_state(!writ, fail, tb_true);
      
                 // wait
-                real = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
+                real = tb_socket_wait(sock, TB_SOCKET_EVENT_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
 
                 // fail or timeout?
                 tb_check_break_state(real > 0, fail, tb_true);
@@ -256,7 +256,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
                 tb_check_break(!read);
 
                 // wait
-                r = tb_aioo_wait(sock, TB_AIOE_CODE_RECV, TB_DNS_SERVER_TEST_TIMEOUT);
+                r = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, TB_DNS_SERVER_TEST_TIMEOUT);
 
                 // trace
                 tb_trace_d("wait %d", r);

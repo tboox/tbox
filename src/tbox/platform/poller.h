@@ -50,7 +50,7 @@ typedef enum __tb_poller_event_e
 ,   TB_POLLER_EVENT_CLEAR       = 0x0010 //!< edge trigger. after the event is retrieved by the user, its state is reset
 ,   TB_POLLER_EVENT_ONESHOT     = 0x0020 //!< causes the event to return only the first occurrence of the filter being triggered
 
-,   TB_POLLER_EVENT_ALL         = TB_SOCKET_EVENT_ALL
+,   TB_POLLER_EVENT_EALL        = TB_SOCKET_EVENT_EALL
 
 }tb_poller_event_e;
 

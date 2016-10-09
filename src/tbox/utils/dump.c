@@ -104,14 +104,14 @@ tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
             else if (!real)
             {
                 // wait
-                tb_long_t e = tb_stream_wait(stream, TB_AIOE_CODE_RECV, tb_stream_timeout(stream));
+                tb_long_t e = tb_stream_wait(stream, TB_SOCKET_EVENT_RECV, tb_stream_timeout(stream));
                 tb_assert_and_check_break(e >= 0);
 
                 // timeout?
                 tb_check_break(e);
 
                 // has read?
-                tb_assert_and_check_break(e & TB_AIOE_CODE_RECV);
+                tb_assert_and_check_break(e & TB_SOCKET_EVENT_RECV);
             }
             else break;
         }

@@ -99,14 +99,14 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
             {
                 // wait
                 tb_trace_i("wait");
-                tb_long_t e = tb_http_wait(http, TB_AIOE_CODE_RECV, timeout);
+                tb_long_t e = tb_http_wait(http, TB_SOCKET_EVENT_RECV, timeout);
                 tb_assert_and_check_break(e >= 0);
 
                 // timeout?
                 tb_check_break(e);
 
                 // has read?
-                tb_assert_and_check_break(e & TB_AIOE_CODE_RECV);
+                tb_assert_and_check_break(e & TB_SOCKET_EVENT_RECV);
             }
             else break;
 
