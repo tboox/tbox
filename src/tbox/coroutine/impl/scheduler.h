@@ -46,6 +46,9 @@ __tb_extern_c_enter__
  * types
  */
 
+// the io scheduler type
+struct __tb_scheduler_io_t;
+
 // the scheduler type
 typedef struct __tb_scheduler_t
 {   
@@ -57,6 +60,9 @@ typedef struct __tb_scheduler_t
 
     // the running coroutine
     tb_coroutine_t*             running;
+
+    // the io scheduler
+    struct __tb_scheduler_io_t* scheduler_io;
 
     // the dead coroutines
     tb_list_entry_head_t        coroutines_dead;
@@ -96,7 +102,7 @@ tb_bool_t                   tb_scheduler_yield(tb_scheduler_t* scheduler);
  *
  * @param scheduler         the scheduler
  * @param coroutine         the suspended coroutine
- * @param priv              the user private data as the return value of suspend()
+ * @param priv              the user private data as the return value of suspend() or sleep()
  */
 tb_void_t                   tb_scheduler_resume(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv);
 
@@ -118,8 +124,10 @@ tb_void_t                   tb_scheduler_finish(tb_scheduler_t* scheduler);
  *
  * @param scheduler         the scheduler
  * @param interval          the interval (ms)
+ *
+ * @return                  the user private data from resume(priv)
  */
-tb_void_t                   tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval);
+tb_cpointer_t               tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval);
 
 /* switch to the given coroutine
  *
@@ -127,6 +135,17 @@ tb_void_t                   tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_siz
  * @param coroutine         the coroutine
  */
 tb_void_t                   tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine);
+
+/*! wait io events 
+ *
+ * @param scheduler         the scheduler
+ * @param sock              the socket
+ * @param events            the waited events
+ * @param timeout           the timeout, infinity: -1
+ *
+ * @return                  > 0: the events, 0: timeout, -1: failed
+ */
+tb_long_t                   tb_scheduler_wait(tb_scheduler_t* scheduler, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

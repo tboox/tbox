@@ -28,8 +28,6 @@
  * includes
  */
 #include "scheduler.h"
-#include "scheduler_io.h"
-#include "coroutine_io.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -70,7 +68,7 @@ tb_bool_t               tb_coroutine_yield(tb_noarg_t);
 /*! resume the given coroutine (suspended)
  *
  * @param coroutine     the suspended coroutine
- * @param priv          the user private data as the return value of suspend()
+ * @param priv          the user private data as the return value of suspend() or sleep()
  */
 tb_void_t               tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv);
 
@@ -83,8 +81,20 @@ tb_cpointer_t           tb_coroutine_suspend(tb_noarg_t);
 /*! sleep some times (ms)
  *
  * @param interval      the interval (ms)
+ *
+ * @return              the user private data from resume(priv)
  */
-tb_void_t               tb_coroutine_sleep(tb_size_t interval);
+tb_cpointer_t           tb_coroutine_sleep(tb_size_t interval);
+
+/*! wait io events 
+ *
+ * @param sock          the socket
+ * @param events        the waited events
+ * @param timeout       the timeout, infinity: -1
+ *
+ * @return              > 0: the events, 0: timeout, -1: failed
+ */
+tb_long_t               tb_coroutine_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
 /*! get the current coroutine
  *

@@ -35,22 +35,12 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-    
-// get self io scheduler
-#define tb_scheduler_io_self()      ((tb_scheduler_io_ref_t)tb_thread_local_get(&s_scheduler_io_self))
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
 // the io scheduler type
 typedef struct __tb_scheduler_io_t
 {
-    // the maximum concurrent number
-    tb_size_t           maxn;
-
     // is stopped?
     tb_bool_t           stop;
 
@@ -63,11 +53,46 @@ typedef struct __tb_scheduler_io_t
 }tb_scheduler_io_t, *tb_scheduler_io_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * globals
+ * interfaces
  */
 
-// the self io scheduler local 
-extern tb_thread_local_t s_scheduler_io_self;
+/*! init io scheduler 
+ *
+ * @return                  the io scheduler 
+ */
+tb_scheduler_io_ref_t       tb_scheduler_io_init(tb_scheduler_t* scheduler);
+
+/*! exit io scheduler 
+ *
+ * @param scheduler_io      the io scheduler
+ */
+tb_void_t                   tb_scheduler_io_exit(tb_scheduler_io_ref_t scheduler_io);
+
+/*! stop the current io scheduler 
+ *
+ * @param scheduler_io      the io scheduler
+ */
+tb_void_t                   tb_scheduler_io_stop(tb_scheduler_io_ref_t scheduler_io);
+
+/* sleep the current coroutine
+ *
+ * @param scheduler_io      the io scheduler
+ * @param interval          the interval (ms)
+ *
+ * @return                  the user private data from resume(priv)
+ */
+tb_cpointer_t               tb_scheduler_io_sleep(tb_scheduler_io_ref_t scheduler_io, tb_size_t interval);
+
+/*! wait io events 
+ *
+ * @param scheduler_io      the io scheduler
+ * @param sock              the socket
+ * @param events            the waited events
+ * @param timeout           the timeout, infinity: -1
+ *
+ * @return                  > 0: the events, 0: timeout, -1: failed
+ */
+tb_long_t                   tb_scheduler_io_wait(tb_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

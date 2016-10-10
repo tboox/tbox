@@ -38,13 +38,8 @@
 
 // setjmp
 #ifdef TB_CONFIG_LIBC_HAVE_SETJMP
-#   if defined(TB_COMPILER_IS_GCC)
-#       define tb_setjmp(buf)           __builtin_setjmp(buf)
-#       define tb_longjmp(buf, val)     __builtin_longjmp(buf, val)
-#   else
-#       define tb_setjmp(buf)           setjmp(buf)
-#       define tb_longjmp(buf, val)     longjmp(buf, val)
-#   endif
+#   define tb_setjmp(buf)               setjmp(buf)
+#   define tb_longjmp(buf, val)         longjmp(buf, val)
 #else
 #   undef tb_setjmp
 #   undef tb_longjmp

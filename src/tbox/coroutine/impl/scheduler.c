@@ -33,6 +33,7 @@
  */
 #include "scheduler.h"
 #include "coroutine.h"
+#include "scheduler_io.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -48,6 +49,18 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static __tb_inline__ tb_bool_t tb_scheduler_need_io(tb_scheduler_t* scheduler)
+{
+    // check
+    tb_assert(scheduler);
+
+    // init io scheduler first
+    if (!scheduler->scheduler_io) scheduler->scheduler_io = tb_scheduler_io_init(scheduler);
+    tb_assert(scheduler->scheduler_io);
+
+    // ok?
+    return scheduler->scheduler_io != tb_null;
+}
 static tb_void_t tb_scheduler_make_dead(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {
     // check
@@ -308,15 +321,18 @@ tb_void_t tb_scheduler_finish(tb_scheduler_t* scheduler)
     // switch to next coroutine 
     tb_scheduler_switch_next(scheduler);
 }
-tb_void_t tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval)
+tb_cpointer_t tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval)
 {
     // check
     tb_assert(scheduler && scheduler->running);
     tb_assert(tb_coroutine_is_running(scheduler->running));
     tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
-    // sleep the coroutine
-    // TODO
+    // need io scheduler
+    if (!tb_scheduler_need_io(scheduler)) return tb_null;
+
+    // sleep it
+    return tb_scheduler_io_sleep(scheduler->scheduler_io, interval);
 }
 tb_void_t tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {
@@ -348,4 +364,17 @@ tb_void_t tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* corouti
 
     // update the context
     coroutine_from->context = from.context;
+}
+tb_long_t tb_scheduler_wait(tb_scheduler_t* scheduler, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+{
+    // check
+    tb_assert(scheduler && scheduler->running);
+    tb_assert(tb_coroutine_is_running(scheduler->running));
+    tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
+
+    // need io scheduler
+    if (!tb_scheduler_need_io(scheduler)) return -1;
+
+    // sleep it
+    return tb_scheduler_io_wait(scheduler->scheduler_io, sock, events, timeout);
 }

@@ -117,6 +117,10 @@ tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
     tb_scheduler_t* scheduler = (tb_scheduler_t*)self;
     tb_assert_and_check_return(scheduler);
 
+    // exit io scheduler first
+    if (scheduler->scheduler_io) tb_scheduler_io_exit(scheduler->scheduler_io);
+    scheduler->scheduler_io = tb_null;
+
     // clear running
     scheduler->running = tb_null;
 

@@ -72,15 +72,21 @@ tb_cpointer_t tb_coroutine_suspend()
     // suspend the current coroutine
     return scheduler? tb_scheduler_suspend(scheduler) : tb_null;
 }
-tb_void_t tb_coroutine_sleep(tb_size_t interval)
+tb_cpointer_t tb_coroutine_sleep(tb_size_t interval)
 {
     // get current scheduler
     tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
-    if (scheduler)
-    {
-        // sleep some times
-        tb_scheduler_sleep(scheduler, interval);
-    }
+
+    // sleep the current coroutine
+    return scheduler? tb_scheduler_sleep(scheduler, interval) : tb_null;
+}
+tb_long_t tb_coroutine_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+{
+    // get current scheduler
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+
+    // wait events
+    return scheduler? tb_scheduler_wait(scheduler, sock, events, timeout) : -1;
 }
 tb_coroutine_ref_t tb_coroutine_self()
 {
