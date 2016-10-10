@@ -1751,11 +1751,11 @@ static tb_aicp_ptor_impl_t* tb_aiop_ptor_init(tb_aicp_impl_t* aicp)
         tb_assert_and_check_break(impl->list);
 
         // init timer and using cache time
-        impl->timer = tb_timer_init((aicp->maxn >> 4) + 16, tb_true);
+        impl->timer = tb_timer_init(aicp->maxn >> 8, tb_true);
         tb_assert_and_check_break(impl->timer);
 
         // init ltimer and using cache time
-        impl->ltimer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
+        impl->ltimer = tb_ltimer_init(aicp->maxn >> 8, TB_LTIMER_TICK_S, tb_true);
         tb_assert_and_check_break(impl->ltimer);
 
         // init the killing list lock

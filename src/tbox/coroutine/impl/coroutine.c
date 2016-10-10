@@ -169,6 +169,7 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
         // remake coroutine
         if (stacksize > coroutine->stacksize)
             coroutine = (tb_coroutine_t*)tb_ralloc_bytes(coroutine, sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
+        else stacksize = coroutine->stacksize;
         tb_assert_and_check_break(coroutine && coroutine->scheduler);
 
         // init stack

@@ -63,12 +63,12 @@ tb_timer_ref_t      tb_timer(tb_noarg_t);
 
 /*! init timer
  *
- * @param maxn      the timer maxn
+ * @param grow      the timer grow
  * @param ctime     using ctime?
  *
  * @return          the timer
  */
-tb_timer_ref_t      tb_timer_init(tb_size_t maxn, tb_bool_t ctime);
+tb_timer_ref_t      tb_timer_init(tb_size_t grow, tb_bool_t ctime);
 
 /*! exit timer
  *

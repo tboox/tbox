@@ -66,13 +66,13 @@ typedef __tb_typeref__(ltimer_task);
  *
  * lower tick and limit range, but faster
  * 
- * @param maxn          the timer maxn
+ * @param grow          the timer grow
  * @param tick          the timer tick
  * @param ctime         using ctime?
  *
  * @return              the timer
  */
-tb_ltimer_ref_t         tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime);
+tb_ltimer_ref_t         tb_ltimer_init(tb_size_t grow, tb_size_t tick, tb_bool_t ctime);
 
 /*! exit timer
  *

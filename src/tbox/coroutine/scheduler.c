@@ -117,6 +117,9 @@ tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
     tb_scheduler_t* scheduler = (tb_scheduler_t*)self;
     tb_assert_and_check_return(scheduler);
 
+    // must be stopped
+    tb_assert(scheduler->stopped);
+
     // exit io scheduler first
     if (scheduler->scheduler_io) tb_scheduler_io_exit(scheduler->scheduler_io);
     scheduler->scheduler_io = tb_null;
@@ -149,6 +152,18 @@ tb_void_t tb_scheduler_exit(tb_scheduler_ref_t self)
     // exit the scheduler
     tb_free(scheduler);
 }
+tb_void_t tb_scheduler_kill(tb_scheduler_ref_t self)
+{
+    // check
+    tb_scheduler_t* scheduler = (tb_scheduler_t*)self;
+    tb_assert_and_check_return(scheduler);
+
+    // stop it
+    scheduler->stopped = tb_true;
+
+    // kill the io scheduler
+    if (scheduler->scheduler_io) tb_scheduler_io_kill(scheduler->scheduler_io);
+}
 tb_void_t tb_scheduler_loop(tb_scheduler_ref_t self)
 {
     // check
@@ -177,6 +192,9 @@ tb_void_t tb_scheduler_loop(tb_scheduler_ref_t self)
         // trace
         tb_trace_d("[loop]: ready %lu", tb_list_entry_size(&scheduler->coroutines_ready));
     }
+
+    // stop it
+    scheduler->stopped = tb_true;
 }
 tb_scheduler_ref_t tb_scheduler_self()
 {

@@ -55,7 +55,7 @@
 typedef struct __tb_ltimer_task_t
 {
     // the func
-    tb_ltimer_task_func_t        func;
+    tb_ltimer_task_func_t       func;
 
     // the priv
     tb_cpointer_t               priv;
@@ -99,8 +99,8 @@ typedef struct __tb_ltimer_task_t
  */
 typedef struct __tb_ltimer_t
 {
-    // the maxn
-    tb_size_t                   maxn;
+    // the grow
+    tb_size_t                   grow;
 
     // is stoped?
     tb_atomic_t                 stop;
@@ -169,25 +169,33 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* timer_
             timer->btime = tb_ltimer_now(timer);
             timer->wbase = 0;
         }
+
+        // trace
         tb_trace_d("add: btime: %lld, wbase: %lu", timer->btime, timer->wbase);
 
         // the timer difference
         tb_hong_t tdiff = timer_task->when - timer->btime;
         tb_assert_and_check_break(tdiff >= 0);
+
+        // trace
         tb_trace_d("add: tdiff: %lld", tdiff);
 
         // the wheel difference
         tb_size_t wdiff = (tb_size_t)(tdiff / timer->tick);
         tb_assert_and_check_break(wdiff < TB_LTIMER_WHEEL_MAXN);
+
+        // trace
         tb_trace_d("add: wdiff: %lu", wdiff);
 
         // the wheel index
         tb_size_t windx = (timer->wbase + wdiff) & (TB_LTIMER_WHEEL_MAXN - 1);
+
+        // trace
         tb_trace_d("add: windx: %lu", windx);
 
         // the wheel list
         tb_vector_ref_t wlist = timer->wheel[windx];
-        if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_element_ptr(tb_null, tb_null));
+        if (!wlist) wlist = timer->wheel[windx] = tb_vector_init(timer->grow, tb_element_ptr(tb_null, tb_null));
         tb_assert_and_check_break(wlist);
 
         // save the wheel index
@@ -312,7 +320,7 @@ static tb_void_t tb_ltimer_expired_list_exit(tb_element_ref_t element, tb_pointe
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_ltimer_ref_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
+tb_ltimer_ref_t tb_ltimer_init(tb_size_t grow, tb_size_t tick, tb_bool_t ctime)
 {
     // check
     tb_assert_and_check_return_val(tick >= TB_LTIMER_TICK_100MS, tb_null);
@@ -327,7 +335,7 @@ tb_ltimer_ref_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
         tb_assert_and_check_break(timer);
 
         // init timer
-        timer->maxn     = tb_max(maxn, 16);
+        timer->grow     = tb_max(grow, 16);
         timer->ctime    = ctime;
         timer->tick     = tick;
         timer->btime    = tb_ltimer_now(timer);
@@ -336,7 +344,7 @@ tb_ltimer_ref_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
         if (!tb_spinlock_init(&timer->lock)) break;
 
         // init pool
-        timer->pool         = tb_fixed_pool_init(tb_null, (maxn >> 4) + 16, sizeof(tb_ltimer_task_t), tb_null, tb_null, tb_null);
+        timer->pool         = tb_fixed_pool_init(tb_null, timer->grow, sizeof(tb_ltimer_task_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(timer->pool);
 
         // init the expired tasks

@@ -57,6 +57,12 @@ tb_scheduler_ref_t      tb_scheduler_init(tb_noarg_t);
  */
 tb_void_t               tb_scheduler_exit(tb_scheduler_ref_t scheduler);
 
+/* kill the scheduler 
+ *
+ * @param scheduler     the scheduler
+ */
+tb_void_t               tb_scheduler_kill(tb_scheduler_ref_t scheduler);
+
 /*! run the scheduler loop
  *
  * @param scheduler     the scheduler

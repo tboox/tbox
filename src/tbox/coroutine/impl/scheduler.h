@@ -39,8 +39,14 @@ __tb_extern_c_enter__
  * macros
  */
 
-// get running coroutine
-#define tb_scheduler_running(scheduler)           ((scheduler)->running)
+// get the running coroutine
+#define tb_scheduler_running(scheduler)             ((scheduler)->running)
+
+// get the ready coroutines count
+#define tb_scheduler_ready_count(scheduler)         tb_list_entry_size(&(scheduler)->coroutines_ready)
+
+// get the suspended coroutines count
+#define tb_scheduler_suspend_count(scheduler)       tb_list_entry_size(&(scheduler)->coroutines_suspend)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -57,6 +63,9 @@ typedef struct __tb_scheduler_t
      * coroutine->scheduler == (tb_scheduler_ref_t)coroutine
      */
     tb_coroutine_t              original;
+
+    // is stopped
+    tb_bool_t                   stopped;
 
     // the running coroutine
     tb_coroutine_t*             running;

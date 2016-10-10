@@ -173,6 +173,9 @@ tb_bool_t tb_scheduler_start(tb_scheduler_t* scheduler, tb_coroutine_func_t func
         if (!scheduler) scheduler = (tb_scheduler_t*)tb_scheduler_self();
         tb_assert_and_check_break(scheduler);
 
+        // have been stopped? do not continue to start new coroutines
+        tb_check_break(!scheduler->stopped);
+
         // reuses dead coroutines in init function
         if (tb_list_entry_size(&scheduler->coroutines_dead))
         {
@@ -287,6 +290,9 @@ tb_cpointer_t tb_scheduler_suspend(tb_scheduler_t* scheduler)
     tb_assert(tb_coroutine_is_running(scheduler->running));
     tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
+    // have been stopped? return it directly
+    tb_check_return_val(!scheduler->stopped, tb_null);
+
     // trace
     tb_trace_d("suspend coroutine(%p)", scheduler->running);
 
@@ -328,6 +334,9 @@ tb_cpointer_t tb_scheduler_sleep(tb_scheduler_t* scheduler, tb_size_t interval)
     tb_assert(tb_coroutine_is_running(scheduler->running));
     tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
+    // have been stopped? return it directly
+    tb_check_return_val(!scheduler->stopped, tb_null);
+
     // need io scheduler
     if (!tb_scheduler_need_io(scheduler)) return tb_null;
 
@@ -343,11 +352,6 @@ tb_void_t tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* corouti
     // the current running coroutine
     tb_coroutine_t* running = scheduler->running;
 
-#ifdef __tb_debug__
-    // check it
-    tb_coroutine_check(running);
-#endif
-
     // mark the given coroutine as running
     tb_coroutine_state_set(coroutine, TB_STATE_RUNNING);
     scheduler->running = coroutine;
@@ -362,6 +366,11 @@ tb_void_t tb_scheduler_switch(tb_scheduler_t* scheduler, tb_coroutine_t* corouti
     tb_coroutine_t* coroutine_from = (tb_coroutine_t*)from.priv;
     tb_assert(coroutine_from && from.context);
 
+#ifdef __tb_debug__
+    // check it
+    tb_coroutine_check(coroutine_from);
+#endif
+
     // update the context
     coroutine_from->context = from.context;
 }
@@ -371,6 +380,9 @@ tb_long_t tb_scheduler_wait(tb_scheduler_t* scheduler, tb_socket_ref_t sock, tb_
     tb_assert(scheduler && scheduler->running);
     tb_assert(tb_coroutine_is_running(scheduler->running));
     tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
+
+    // have been stopped? return it directly
+    tb_check_return_val(!scheduler->stopped, -1);
 
     // need io scheduler
     if (!tb_scheduler_need_io(scheduler)) return -1;

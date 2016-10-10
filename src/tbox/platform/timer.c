@@ -70,8 +70,8 @@ typedef struct __tb_timer_task_t
 /// the timer type
 typedef struct __tb_timer_t
 {
-    // the maxn
-    tb_size_t                   maxn;
+    // the grow
+    tb_size_t                   grow;
 
     // is stoped?
     tb_atomic_t                 stop;
@@ -210,7 +210,7 @@ tb_timer_ref_t tb_timer()
 {
     return (tb_timer_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_TIMER, tb_timer_instance_init, tb_timer_instance_exit, tb_timer_instance_kill, tb_null);
 }
-tb_timer_ref_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
+tb_timer_ref_t tb_timer_init(tb_size_t grow, tb_bool_t ctime)
 {
     // done
     tb_bool_t   ok = tb_false;
@@ -225,18 +225,18 @@ tb_timer_ref_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
         tb_element_t element = tb_element_ptr(tb_null, tb_null); element.comp = tb_timer_comp_by_when;
 
         // init timer
-        timer->maxn         = tb_max(maxn, 16);
+        timer->grow         = tb_max(grow, 16);
         timer->ctime        = ctime;
 
         // init lock
         if (!tb_spinlock_init(&timer->lock)) break;
 
         // init pool
-        timer->pool         = tb_fixed_pool_init(tb_null, (maxn >> 4) + 16, sizeof(tb_timer_task_t), tb_null, tb_null, tb_null);
+        timer->pool         = tb_fixed_pool_init(tb_null, timer->grow, sizeof(tb_timer_task_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(timer->pool);
         
         // init heap
-        timer->heap         = tb_heap_init((maxn >> 2) + 16, element);
+        timer->heap         = tb_heap_init(timer->grow, element);
         tb_assert_and_check_break(timer->heap);
 
         // register lock profiler

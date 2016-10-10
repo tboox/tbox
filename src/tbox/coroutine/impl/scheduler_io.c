@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "scheduler_io"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -35,28 +35,51 @@
 #include "coroutine.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the ltimer grow
+#ifdef __tb_small__
+#   define TB_SCHEDULER_IO_LTIMER_GROW      (64)
+#else
+#   define TB_SCHEDULER_IO_LTIMER_GROW      (4096)
+#endif
+
+// the timer grow
+#define TB_SCHEDULER_IO_TIMER_GROW          (TB_SCHEDULER_IO_LTIMER_GROW >> 4)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_void_t tb_scheduler_io_timer(tb_bool_t killed, tb_cpointer_t priv)
+{
+    // check
+    tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
+    tb_assert(coroutine);
+
+    // trace
+    tb_trace_d("coroutine(%p): timer %s", coroutine, killed? "killed" : "finished");
+
+    // resume the coroutine of this timer task
+    tb_scheduler_resume((tb_scheduler_t*)tb_coroutine_scheduler(coroutine), coroutine, tb_null);
+}
 static tb_void_t tb_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
     // check
-    tb_assert(poller && sock && priv);
+    tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
+    tb_assert(coroutine && poller && sock && priv);
 
-    // get scheduler
-    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_poller_priv(poller);
-    tb_assert(scheduler);
-
-    // remove this socket from poller
-    tb_poller_remove(poller, sock);
+    // trace
+    tb_trace_d("coroutine(%p): socket: %p, events %s", coroutine, sock, events);
 
     // resume the coroutine of this socket and pass the events to suspend()
-    tb_scheduler_resume(scheduler, (tb_coroutine_t*)priv, (tb_cpointer_t)events);
+    tb_scheduler_resume((tb_scheduler_t*)tb_coroutine_scheduler(coroutine), coroutine, (tb_cpointer_t)events);
 }
 static tb_void_t tb_scheduler_io_loop(tb_cpointer_t priv)
 {
     // check
     tb_scheduler_io_ref_t scheduler_io = (tb_scheduler_io_ref_t)priv;
-    tb_assert_and_check_return(scheduler_io);
+    tb_assert_and_check_return(scheduler_io && scheduler_io->timer && scheduler_io->ltimer);
 
     // the scheduler
     tb_scheduler_t* scheduler = scheduler_io->scheduler;
@@ -67,17 +90,34 @@ static tb_void_t tb_scheduler_io_loop(tb_cpointer_t priv)
     tb_assert_and_check_return(poller);
 
     // loop
-    while (!scheduler_io->stop)
+    while (!scheduler->stopped)
     {
         // finish all other ready coroutines first
         while (tb_scheduler_yield(scheduler)) {}
 
-        // TODO timer
+        // no more suspended coroutines? loop end
+        tb_check_break(tb_scheduler_suspend_count(scheduler));
 
+        // the delay
+        tb_size_t delay = tb_timer_delay(scheduler_io->timer);
+
+        // the ldelay
+        tb_size_t ldelay = tb_ltimer_delay(scheduler_io->ltimer);
+
+        // trace
+        tb_trace_d("loop: wait %lu ms ..", tb_min(delay, ldelay));
 
         // no more ready coroutines? wait io events and timers
-        if (tb_poller_wait(poller, tb_scheduler_io_events, -1) < 0) break;
+        if (tb_poller_wait(poller, tb_scheduler_io_events, tb_min(delay, ldelay)) < 0) break;
 
+        // spak ctime
+        tb_cache_time_spak();
+
+        // spak timer
+        if (!tb_timer_spak(scheduler_io->timer)) break;
+
+        // spak ltimer
+        if (!tb_ltimer_spak(scheduler_io->ltimer)) break;
     }
 }
 
@@ -98,9 +138,17 @@ tb_scheduler_io_ref_t tb_scheduler_io_init(tb_scheduler_t* scheduler)
         // save scheduler
         scheduler_io->scheduler = (tb_scheduler_t*)scheduler;
 
+        // init timer and using cache time
+        scheduler_io->timer = tb_timer_init(TB_SCHEDULER_IO_TIMER_GROW, tb_true);
+        tb_assert_and_check_break(scheduler_io->timer);
+
+        // init ltimer and using cache time
+        scheduler_io->ltimer = tb_ltimer_init(TB_SCHEDULER_IO_LTIMER_GROW, TB_LTIMER_TICK_S, tb_true);
+        tb_assert_and_check_break(scheduler_io->ltimer);
+
         // TODO maxfd
         // init poller
-        scheduler_io->poller = tb_poller_init(0, scheduler_io->scheduler);
+        scheduler_io->poller = tb_poller_init(16, tb_null);
         tb_assert_and_check_break(scheduler_io->poller);
 
         // start the io loop coroutine
@@ -127,12 +175,17 @@ tb_void_t tb_scheduler_io_exit(tb_scheduler_io_ref_t scheduler_io)
     // check
     tb_assert_and_check_return(scheduler_io);
 
-    // must be stopped
-    tb_assert(scheduler_io->stop);
-
     // exit poller
     if (scheduler_io->poller) tb_poller_exit(scheduler_io->poller);
     scheduler_io->poller = tb_null;
+
+    // exit timer
+    if (scheduler_io->timer) tb_timer_exit(scheduler_io->timer);
+    scheduler_io->timer = tb_null;
+
+    // exit ltimer
+    if (scheduler_io->ltimer) tb_ltimer_exit(scheduler_io->ltimer);
+    scheduler_io->ltimer = tb_null;
 
     // clear scheduler
     scheduler_io->scheduler = tb_null;
@@ -140,35 +193,64 @@ tb_void_t tb_scheduler_io_exit(tb_scheduler_io_ref_t scheduler_io)
     // exit it
     tb_free(scheduler_io);
 }
-tb_void_t tb_scheduler_io_stop(tb_scheduler_io_ref_t scheduler_io)
+tb_void_t tb_scheduler_io_kill(tb_scheduler_io_ref_t scheduler_io)
 {
     // check
     tb_assert_and_check_return(scheduler_io);
 
-    // stop it
-    scheduler_io->stop = tb_true;
+    // trace
+    tb_trace_d("kill: ..");
+
+    // kill timer
+    if (scheduler_io->timer) tb_timer_kill(scheduler_io->timer);
+
+    // kill ltimer
+    if (scheduler_io->ltimer) tb_ltimer_kill(scheduler_io->ltimer);
 
     // kill poller
     if (scheduler_io->poller) tb_poller_kill(scheduler_io->poller);
 }
 tb_cpointer_t tb_scheduler_io_sleep(tb_scheduler_io_ref_t scheduler_io, tb_size_t interval)
 {
-    return tb_null;
+    // check
+    tb_assert_and_check_return_val(scheduler_io && scheduler_io->poller && scheduler_io->scheduler, tb_null);
+
+    // get the current coroutine
+    tb_coroutine_t* coroutine = tb_scheduler_running(scheduler_io->scheduler);
+    tb_assert(coroutine);
+
+    // trace
+    tb_trace_d("coroutine(%p): sleep %lu ms ..", coroutine, interval);
+
+    // high-precision interval?
+    if (interval % 1000)
+    {
+        // post task to timer
+        tb_timer_task_post(scheduler_io->timer, interval, tb_false, tb_scheduler_io_timer, coroutine);
+    }
+    // low-precision interval?
+    else
+    {
+        // post task to ltimer (faster)
+        tb_ltimer_task_post(scheduler_io->ltimer, interval, tb_false, tb_scheduler_io_timer, coroutine);
+    }
+
+    // suspend it
+    return tb_scheduler_suspend(scheduler_io->scheduler);
 }
 tb_long_t tb_scheduler_io_wait(tb_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
     // check
-    tb_assert_and_check_return_val(scheduler_io && scheduler_io->poller, -1);
-
-    // get the current scheduler
-    tb_scheduler_t* scheduler = scheduler_io->scheduler;
-    tb_assert(scheduler);
+    tb_assert_and_check_return_val(scheduler_io && scheduler_io->poller && scheduler_io->scheduler, -1);
 
     // get the current coroutine
-    tb_coroutine_t* coroutine = tb_scheduler_running(scheduler);
+    tb_coroutine_t* coroutine = tb_scheduler_running(scheduler_io->scheduler);
     tb_assert(coroutine);
 
-    // TODO timeout and oneshot, clear ...
+    // trace
+    tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
+
+    // TODO oneshot, clear ...
 
     // insert socket to poller for waiting events
     if (!tb_poller_insert(scheduler_io->poller, sock, events, coroutine))
@@ -180,6 +262,29 @@ tb_long_t tb_scheduler_io_wait(tb_scheduler_io_ref_t scheduler_io, tb_socket_ref
         return tb_false;
     }
 
+    // exists timeout?
+    if (timeout > 0)
+    {
+        // high-precision interval?
+        if (timeout % 1000)
+        {
+            // post task to timer
+            tb_timer_task_post(scheduler_io->timer, timeout, tb_false, tb_scheduler_io_timer, coroutine);
+        }
+        // low-precision interval?
+        else
+        {
+            // post task to ltimer (faster)
+            tb_ltimer_task_post(scheduler_io->ltimer, timeout, tb_false, tb_scheduler_io_timer, coroutine);
+        }
+    }
+
     // suspend the current coroutine and return the waited result
-    return (tb_long_t)tb_scheduler_suspend(scheduler);
+    tb_long_t results = (tb_long_t)tb_scheduler_suspend(scheduler_io->scheduler);
+
+    // remove this socket from poller
+    tb_poller_remove(scheduler_io->poller, sock);
+
+    // return the results
+    return results;
 }

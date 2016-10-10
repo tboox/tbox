@@ -50,6 +50,12 @@ typedef struct __tb_scheduler_io_t
     // the poller
     tb_poller_ref_t     poller;
 
+    // the timer
+    tb_timer_ref_t      timer;
+
+    // the low-precision timer (faster)
+    tb_ltimer_ref_t     ltimer;
+
 }tb_scheduler_io_t, *tb_scheduler_io_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -68,11 +74,11 @@ tb_scheduler_io_ref_t       tb_scheduler_io_init(tb_scheduler_t* scheduler);
  */
 tb_void_t                   tb_scheduler_io_exit(tb_scheduler_io_ref_t scheduler_io);
 
-/*! stop the current io scheduler 
+/*! kill the current io scheduler 
  *
  * @param scheduler_io      the io scheduler
  */
-tb_void_t                   tb_scheduler_io_stop(tb_scheduler_io_ref_t scheduler_io);
+tb_void_t                   tb_scheduler_io_kill(tb_scheduler_io_ref_t scheduler_io);
 
 /* sleep the current coroutine
  *
