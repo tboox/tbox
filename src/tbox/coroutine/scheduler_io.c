@@ -105,8 +105,11 @@ static tb_void_t tb_scheduler_io_loop(tb_cpointer_t priv)
         // finish all other ready coroutines first
         while (tb_scheduler_yield(scheduler)) {}
 
+        // TODO timer
+
+
         // no more ready coroutines? wait io events and timers
-        tb_poller_wait(poller, tb_scheduler_io_wait, -1);
+        if (tb_poller_wait(poller, tb_scheduler_io_wait, -1) < 0) break;
 
         // stop?
         tb_check_break(!scheduler_io->stop);
