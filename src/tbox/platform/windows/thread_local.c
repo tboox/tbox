@@ -71,6 +71,9 @@ static tb_bool_t tb_thread_local_once(tb_cpointer_t priv)
     tb_single_list_entry_insert_tail(&g_thread_local_list, &local->entry);
     tb_spinlock_leave(&g_thread_local_lock);
 
+    // init ok
+    local->inited = tb_true;
+
     // ok
     return tb_true;
 }
@@ -102,6 +105,9 @@ tb_bool_t tb_thread_local_has(tb_thread_local_ref_t local)
     // check
     tb_assert(local);
 
+    // have been not initialized?
+    tb_check_return_val(local->inited, tb_false);
+
     // get it
     return TlsGetValue(((DWORD*)local->priv)[1]) != tb_null;
 }
@@ -110,6 +116,9 @@ tb_pointer_t tb_thread_local_get(tb_thread_local_ref_t local)
     // check
     tb_assert(local);
 
+    // have been not initialized?
+    tb_check_return_val(local->inited, tb_null);
+
     // get it
     return TlsGetValue(((DWORD*)local->priv)[0]);
 }
@@ -117,6 +126,9 @@ tb_bool_t tb_thread_local_set(tb_thread_local_ref_t local, tb_cpointer_t priv)
 {
     // check
     tb_assert(local);
+
+    // have been not initialized?
+    tb_assert_and_check_return_val(local->inited, tb_false);
 
     // free the previous data first
     if (local->free && tb_thread_local_has(local))

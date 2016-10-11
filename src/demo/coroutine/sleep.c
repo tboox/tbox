@@ -19,7 +19,7 @@ static tb_void_t tb_demo_coroutine_sleep_func(tb_cpointer_t priv)
         tb_hong_t time = tb_mclock();
 
         // sleep it
-        tb_coroutine_sleep(interval);
+        tb_msleep(interval);
 
         // update the interval time
         time = tb_mclock() - time;

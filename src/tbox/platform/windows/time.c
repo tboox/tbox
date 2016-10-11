@@ -26,6 +26,9 @@
  */
 #include "prefix.h"
 #include "../time.h"
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -37,11 +40,22 @@ tb_void_t tb_usleep(tb_size_t us)
 }
 tb_void_t tb_msleep(tb_size_t ms)
 {
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to sleep in coroutine
+    if (tb_coroutine_self())
+    {
+        // sleep it
+        tb_coroutine_sleep(ms);
+        return ;
+    }
+#endif
+
+    // sleep it
     Sleep((DWORD)ms);
 }
 tb_void_t tb_sleep(tb_size_t s)
 {
-    Sleep((DWORD)s * 1000);
+    tb_msleep(s * 1000);
 }
 tb_hong_t tb_mclock()
 {

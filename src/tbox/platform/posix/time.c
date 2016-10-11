@@ -30,6 +30,9 @@
 #include <time.h>
 #include <stdio.h>
 #include <sys/time.h>
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -42,6 +45,17 @@ tb_void_t tb_usleep(tb_size_t us)
 
 tb_void_t tb_msleep(tb_size_t ms)
 {
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to sleep in coroutine
+    if (tb_coroutine_self())
+    {
+        // sleep it
+        tb_coroutine_sleep(ms);
+        return ;
+    }
+#endif
+
+    // sleep it
     tb_usleep(ms * 1000);
 }
 
@@ -49,21 +63,18 @@ tb_void_t tb_sleep(tb_size_t s)
 {
     tb_msleep(s * 1000);
 }
-
 tb_hong_t tb_mclock()
 {
     tb_timeval_t tv = {0};
     if (!tb_gettimeofday(&tv, tb_null)) return -1;
     return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
-
 tb_hong_t tb_uclock()
 {
     tb_timeval_t tv = {0};
     if (!tb_gettimeofday(&tv, tb_null)) return -1;
     return ((tb_hong_t)tv.tv_sec * 1000000 + tv.tv_usec);
 }
-
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
     // gettimeofday

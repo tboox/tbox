@@ -195,9 +195,12 @@ tb_void_t tb_scheduler_loop(tb_scheduler_ref_t self)
 
     // stop it
     scheduler->stopped = tb_true;
+ 
+    // clear the current scheduler
+    tb_thread_local_set(&s_scheduler_self, tb_null);
 }
 tb_scheduler_ref_t tb_scheduler_self()
-{
+{ 
     // get self scheduler on the current thread
     return (tb_scheduler_ref_t)tb_thread_local_get(&s_scheduler_self);
 }

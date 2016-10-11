@@ -75,6 +75,23 @@ static tb_void_t tb_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t 
     // resume the coroutine of this socket and pass the events to suspend()
     tb_scheduler_resume((tb_scheduler_t*)tb_coroutine_scheduler(coroutine), coroutine, (tb_cpointer_t)events);
 }
+static tb_bool_t tb_scheduler_io_timer_spak(tb_scheduler_io_ref_t scheduler_io)
+{
+    // check
+    tb_assert(scheduler_io && scheduler_io->timer && scheduler_io->ltimer);
+
+    // spak ctime
+    tb_cache_time_spak();
+
+    // spak timer
+    if (!tb_timer_spak(scheduler_io->timer)) return tb_false;
+
+    // spak ltimer
+    if (!tb_ltimer_spak(scheduler_io->ltimer)) return tb_false;
+
+    // pk
+    return tb_true;
+}
 static tb_void_t tb_scheduler_io_loop(tb_cpointer_t priv)
 {
     // check
@@ -93,7 +110,11 @@ static tb_void_t tb_scheduler_io_loop(tb_cpointer_t priv)
     while (!scheduler->stopped)
     {
         // finish all other ready coroutines first
-        while (tb_scheduler_yield(scheduler)) {}
+        while (tb_scheduler_yield(scheduler)) 
+        {
+            // spar timer
+            if (!tb_scheduler_io_timer_spak(scheduler_io)) break;
+        }
 
         // no more suspended coroutines? loop end
         tb_check_break(tb_scheduler_suspend_count(scheduler));
@@ -110,14 +131,8 @@ static tb_void_t tb_scheduler_io_loop(tb_cpointer_t priv)
         // no more ready coroutines? wait io events and timers
         if (tb_poller_wait(poller, tb_scheduler_io_events, tb_min(delay, ldelay)) < 0) break;
 
-        // spak ctime
-        tb_cache_time_spak();
-
-        // spak timer
-        if (!tb_timer_spak(scheduler_io->timer)) break;
-
-        // spak ltimer
-        if (!tb_ltimer_spak(scheduler_io->ltimer)) break;
+        // spar timer
+        if (!tb_scheduler_io_timer_spak(scheduler_io)) break;
     }
 }
 
