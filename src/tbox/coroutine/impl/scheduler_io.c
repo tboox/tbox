@@ -70,7 +70,7 @@ static tb_void_t tb_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t 
     tb_assert(coroutine && poller && sock && priv);
 
     // trace
-    tb_trace_d("coroutine(%p): socket: %p, events %s", coroutine, sock, events);
+    tb_trace_d("coroutine(%p): socket: %p, events %lu", coroutine, sock, events);
 
     // resume the coroutine of this socket and pass the events to suspend()
     tb_scheduler_resume((tb_scheduler_t*)tb_coroutine_scheduler(coroutine), coroutine, (tb_cpointer_t)events);

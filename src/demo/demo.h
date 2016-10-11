@@ -202,8 +202,14 @@ TB_DEMO_MAIN_DECL(algorithm_find);
 TB_DEMO_MAIN_DECL(algorithm_sort);
 
 // coroutine
+TB_DEMO_MAIN_DECL(coroutine_nest);
 TB_DEMO_MAIN_DECL(coroutine_sleep);
 TB_DEMO_MAIN_DECL(coroutine_switch);
+TB_DEMO_MAIN_DECL(coroutine_echo_client);
+TB_DEMO_MAIN_DECL(coroutine_echo_server);
+TB_DEMO_MAIN_DECL(coroutine_file_client);
+TB_DEMO_MAIN_DECL(coroutine_file_server);
+TB_DEMO_MAIN_DECL(coroutine_http_server);
 
 #endif
 
