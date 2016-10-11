@@ -27,12 +27,25 @@
  */
 #include "../sched.h"
 #include <sched.h>
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_sched_yield()
 {
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to yield in coroutine
+    if (tb_coroutine_self())
+    {
+        // yield it
+        return tb_coroutine_yield();
+    }
+#endif
+
+    // yield it in thread
     return !sched_yield()? tb_true : tb_false;
 }
 
