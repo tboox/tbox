@@ -53,6 +53,9 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
             // read it
             tb_long_t real = tb_socket_recv(sock, data, sizeof(data));
 
+            // trace
+            tb_trace_i("recv: %ld from: %p", real, sock);
+
             // has data?
             if (real > 0)
             {

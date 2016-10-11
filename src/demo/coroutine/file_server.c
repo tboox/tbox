@@ -27,6 +27,9 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
     tb_char_t const* filepath = tuple[0].cstr;
     tb_assert_and_check_return(filepath);
 
+    // trace
+    tb_trace_i("sending %s ..", filepath);
+
     // init file
     tb_file_ref_t file = tb_file_init(filepath, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
     tb_assert_and_check_return(file);
@@ -39,6 +42,9 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
     {
         // send it
         tb_long_t real = tb_socket_sendf(sock, file, send, size - send);
+
+        // trace
+        tb_trace_i("send: %ld to %p", real, sock);
 
         // has data?
         if (real > 0)
