@@ -47,7 +47,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
     while (send < size)
     {
         // send it
-        tb_long_t real = tb_socket_sendf(sock, file, send, size - send);
+        tb_hong_t real = tb_socket_sendf(sock, file, send, size - send);
 
         // trace
         tb_trace_d("[%p]: send: %ld", sock, real);
