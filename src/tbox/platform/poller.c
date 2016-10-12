@@ -39,7 +39,7 @@
 #elif defined(TB_CONFIG_POSIX_HAVE_POLL)
 #   include "posix/poller_poll.c"
 #else
-tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
+tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
 {
     tb_trace_noimpl();
     return tb_null;

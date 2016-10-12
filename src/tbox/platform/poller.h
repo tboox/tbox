@@ -72,12 +72,11 @@ typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_socket_
 
 /*! init poller
  *
- * @param maxn      the maximum number of concurrent sockets
  * @param priv      the user private data 
  *
  * @param poller    the poller
  */
-tb_poller_ref_t     tb_poller_init(tb_size_t maxn, tb_cpointer_t priv);
+tb_poller_ref_t     tb_poller_init(tb_cpointer_t priv);
 
 /*! exit poller
  *

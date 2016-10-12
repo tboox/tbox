@@ -81,11 +81,8 @@ typedef struct __tb_poller_select_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
+tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
 {
-    // check
-    tb_assert_and_check_return_val(maxn, tb_null);
-
     // done
     tb_bool_t               ok = tb_false;
     tb_poller_select_ref_t  poller = tb_null;
@@ -96,7 +93,7 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
         tb_assert_and_check_break(poller);
 
         // init objects
-        poller->objects = tb_hash_map_init(tb_align8(tb_isqrti((tb_uint32_t)maxn) + 1), tb_element_ptr(tb_null, tb_null), tb_element_mem(sizeof(tb_poller_object_t), tb_null, tb_null));
+        poller->objects = tb_hash_map_init(tb_align8(tb_isqrti(FD_SETSIZE) + 1), tb_element_ptr(tb_null, tb_null), tb_element_mem(sizeof(tb_poller_object_t), tb_null, tb_null));
         tb_assert_and_check_break(poller->objects);
 
         // init user private data

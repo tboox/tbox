@@ -202,9 +202,8 @@ tb_scheduler_io_ref_t tb_scheduler_io_init(tb_scheduler_t* scheduler)
         scheduler_io->ltimer = tb_ltimer_init(TB_SCHEDULER_IO_LTIMER_GROW, TB_LTIMER_TICK_S, tb_true);
         tb_assert_and_check_break(scheduler_io->ltimer);
 
-        // TODO maxfd
         // init poller
-        scheduler_io->poller = tb_poller_init(10000, tb_null);
+        scheduler_io->poller = tb_poller_init(tb_null);
         tb_assert_and_check_break(scheduler_io->poller);
 
         // start the io loop coroutine

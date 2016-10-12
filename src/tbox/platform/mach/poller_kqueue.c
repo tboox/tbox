@@ -28,6 +28,9 @@
 #include <sys/event.h>
 #include <sys/time.h>
 #include <unistd.h>
+#ifdef TB_CONFIG_POSIX_HAVE_GETRLIMIT
+#   include <sys/resource.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -77,6 +80,27 @@ typedef struct __tb_poller_kqueue_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_size_t tb_poller_maxfds()
+{
+    // attempt to get it from getdtablesize
+    tb_size_t maxfds = 0;
+#ifdef TB_CONFIG_POSIX_HAVE_GETDTABLESIZE
+    if (!maxfds) maxfds = getdtablesize();
+#endif
+
+    // attempt to get it from getrlimit
+#ifdef TB_CONFIG_POSIX_HAVE_GETRLIMIT
+	struct rlimit rl;
+    if (!maxfds && !getrlimit(RLIMIT_NOFILE, &rl))
+        maxfds = rl.rlim_cur;
+#endif
+
+    // attempt to get it from sysconf
+    if (!maxfds) maxfds = sysconf(_SC_OPEN_MAX);
+
+    // ok?
+    return maxfds;
+}
 static tb_bool_t tb_poller_change(tb_poller_kqueue_ref_t poller, struct kevent* events, tb_size_t count)
 {
     // check
@@ -165,11 +189,8 @@ static __tb_inline__ tb_void_t tb_poller_hash_del(tb_poller_kqueue_ref_t poller,
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
+tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
 {
-    // check
-    tb_assert_and_check_return_val(maxn, tb_null);
-
     // done
     tb_bool_t               ok = tb_false;
     tb_poller_kqueue_ref_t  poller = tb_null;
@@ -184,7 +205,8 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
         tb_assert_and_check_break(poller->kqfd > 0);
 
         // init maxn
-        poller->maxn = maxn;
+        poller->maxn = tb_poller_maxfds();
+        tb_assert_and_check_break(poller->maxn);
 
         // init user private data
         poller->priv = priv;

@@ -170,11 +170,8 @@ static __tb_inline__ tb_void_t tb_poller_hash_del(tb_poller_poll_ref_t poller, t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
+tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
 {
-    // check
-    tb_assert_and_check_return_val(maxn, tb_null);
-
     // done
     tb_bool_t               ok = tb_false;
     tb_poller_poll_ref_t    poller = tb_null;
@@ -185,7 +182,7 @@ tb_poller_ref_t tb_poller_init(tb_size_t maxn, tb_cpointer_t priv)
         tb_assert_and_check_break(poller);
 
         // init poll
-        poller->pfds = tb_vector_init(tb_align8((maxn >> 3) + 1), tb_element_mem(sizeof(struct pollfd), tb_null, tb_null));
+        poller->pfds = tb_vector_init(0, tb_element_mem(sizeof(struct pollfd), tb_null, tb_null));
         tb_assert_and_check_break(poller->pfds);
 
         // init user private data
