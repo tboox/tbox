@@ -70,7 +70,7 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
 #endif
 
     // trace
-    tb_trace_d("entry: %p from coroutine(%p)", coroutine, coroutine_from);
+    tb_trace_d("entry: %p stack: %p - %p from coroutine(%p)", coroutine, coroutine->stackbase - coroutine->stacksize, coroutine->stackbase, coroutine_from);
 
     // call the coroutine function
     coroutine->func(coroutine->func_priv);
@@ -165,6 +165,14 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
     {
         // init stack size
         if (!stacksize) stacksize = TB_COROUTINE_STACK_DEFSIZE;
+
+#ifdef __tb_debug__
+        // patch debug stack size for (assert, trace ..)
+        stacksize += TB_COROUTINE_STACK_DBGSIZE;
+
+        // check coroutine
+        tb_coroutine_check(coroutine);
+#endif
 
         // remake coroutine
         if (stacksize > coroutine->stacksize)

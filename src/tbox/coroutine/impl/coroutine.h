@@ -102,6 +102,9 @@ typedef struct __tb_coroutine_t
     // the user private data as the argument of resume() and the return value of suspend()
     tb_cpointer_t           resumed_priv;
 
+    // the private data for io
+    tb_cpointer_t           io_priv[3];
+
     // the list entry
     tb_list_entry_t         entry;
 

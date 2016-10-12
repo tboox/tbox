@@ -1,4 +1,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME            "file_client"
+#define TB_TRACE_MODULE_DEBUG           (0)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */ 
 #include "../demo.h"
@@ -28,7 +34,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
         tb_ipaddr_set(&addr, "127.0.0.1", 9090, TB_IPADDR_FAMILY_IPV4);
 
         // trace
-        tb_trace_i("connecting %{ipaddr} ..", &addr);
+        tb_trace_d("[%p]: connecting %{ipaddr} ..", sock, &addr);
 
         // connect socket
         tb_long_t ok;
@@ -42,19 +48,20 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
         tb_check_break(ok > 0);
 
         // trace
-        tb_trace_i("recving %lu ..", (tb_size_t)priv);
+        tb_trace_d("[%p]: recving ..", sock);
 
         // recv data
-        tb_byte_t   data[8192];
-        tb_hize_t   recv = 0;
-        tb_long_t   wait = 0;
+        tb_byte_t data[8192];
+        tb_hize_t recv = 0;
+        tb_long_t wait = 0;
+        tb_hong_t time = tb_mclock();
         while (1)
         {
             // read it
             tb_long_t real = tb_socket_recv(sock, data, sizeof(data));
 
             // trace
-            tb_trace_i("recv: %ld from: %p", real, sock);
+            tb_trace_d("[%p]: recv: %ld", sock, real);
 
             // has data?
             if (real > 0)
@@ -74,7 +81,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
         }
 
         // trace
-        tb_trace_i("recv %llu bytes.", recv);
+        tb_trace_i("[%p]: recv %llu bytes %lld ms", sock, recv, tb_mclock() - time);
 
     } while (0);
 
@@ -103,7 +110,7 @@ tb_int_t tb_demo_coroutine_file_client_main(tb_int_t argc, tb_char_t** argv)
         for (i = 0; i < count; i++)
         {
             // start it
-            tb_coroutine_start(scheduler, tb_demo_coroutine_pull, (tb_cpointer_t)i, 0);
+            tb_coroutine_start(scheduler, tb_demo_coroutine_pull, tb_null, 0);
         }
 
         // run scheduler

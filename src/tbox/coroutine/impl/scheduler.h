@@ -48,6 +48,9 @@ __tb_extern_c_enter__
 // get the suspended coroutines count
 #define tb_scheduler_suspend_count(scheduler)       tb_list_entry_size(&(scheduler)->coroutines_suspend)
 
+// get the io scheduler
+#define tb_scheduler_io(scheduler)                  ((scheduler)->scheduler_io)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
