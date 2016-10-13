@@ -44,14 +44,14 @@
  * macros
  */
 
-// the heap grow
+// the self grow
 #ifdef __tb_small__ 
 #   define TB_HEAP_GROW             (128)
 #else
 #   define TB_HEAP_GROW             (256)
 #endif
 
-// the heap maxn
+// the self maxn
 #ifdef __tb_small__
 #   define TB_HEAP_MAXN             (1 << 16)
 #else
@@ -69,8 +69,8 @@
  * types
  */
 
-// the heap impl type
-typedef struct __tb_heap_impl_t
+// the self type
+typedef struct __tb_heap_t
 {
     // the itor
     tb_iterator_t           itor;
@@ -90,18 +90,18 @@ typedef struct __tb_heap_impl_t
     // the element
     tb_element_t            element;
 
-}tb_heap_impl_t;
+}tb_heap_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 #if TB_HEAP_CHECK_ENABLE
-static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
+static tb_void_t tb_heap_check(tb_heap_t* heap)
 {
     // init
-    tb_byte_t*  data = impl->data;
-    tb_size_t   tail = impl->size;
-    tb_size_t   step = impl->element.size;
+    tb_byte_t*  data = heap->data;
+    tb_size_t   tail = heap->size;
+    tb_size_t   step = heap->element.size;
     tb_size_t   parent = 0;
 
     // done
@@ -112,13 +112,13 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
         tb_check_break(lchild < tail);
 
         // the parent data
-        tb_pointer_t parent_data = impl->element.data(&impl->element, data + parent * step);
+        tb_pointer_t parent_data = heap->element.data(&heap->element, data + parent * step);
 
         // check?
-        if (impl->element.comp(&impl->element, impl->element.data(&impl->element, data + lchild * step), parent_data) < 0) 
+        if (heap->element.comp(&heap->element, heap->element.data(&heap->element, data + lchild * step), parent_data) < 0) 
         {
-            // dump heap
-            tb_heap_dump((tb_heap_ref_t)impl);
+            // dump self
+            tb_heap_dump((tb_heap_ref_t)heap);
 
             // abort
             tb_assertf(0, "lchild[%lu]: invalid, parent: %lu, tail: %lu", lchild, parent, tail);
@@ -129,10 +129,10 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
         tb_check_break(rchild < tail);
 
         // check?
-        if (impl->element.comp(&impl->element, impl->element.data(&impl->element, data + rchild * step), parent_data) < 0) 
+        if (heap->element.comp(&heap->element, heap->element.data(&heap->element, data + rchild * step), parent_data) < 0) 
         {
-            // dump heap
-            tb_heap_dump((tb_heap_ref_t)impl);
+            // dump self
+            tb_heap_dump((tb_heap_ref_t)heap);
 
             // abort
             tb_assertf(0, "rchild[%lu]: invalid, parent: %lu, tail: %lu", rchild, parent, tail);
@@ -140,7 +140,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
     }
 }
 #endif
-/*! shift up the heap
+/*! shift up the self
  *
  * <pre>
  *
@@ -170,25 +170,25 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* impl)
  *                  10        6
  * </pre>
  */
-static tb_pointer_t tb_heap_shift_up(tb_heap_impl_t* impl, tb_size_t hole, tb_cpointer_t data)
+static tb_pointer_t tb_heap_shift_up(tb_heap_t* heap, tb_size_t hole, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return_val(impl && impl->data, tb_null);
+    tb_assert_and_check_return_val(heap && heap->data, tb_null);
 
     // the element function
-    tb_element_comp_func_t func_comp = impl->element.comp;
-    tb_element_data_func_t func_data = impl->element.data;
+    tb_element_comp_func_t func_comp = heap->element.comp;
+    tb_element_data_func_t func_data = heap->element.data;
     tb_assert(func_comp && func_data);
 
     // (hole - 1) / 2: the parent node of the hole
     tb_size_t   parent = 0;
-    tb_byte_t*  head = impl->data;
-    tb_size_t   step = impl->element.size;
+    tb_byte_t*  head = heap->data;
+    tb_size_t   step = heap->element.size;
     switch (step)
     {
     case sizeof(tb_size_t):
         {
-            for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->element, func_data(&impl->element, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+            for (parent = (hole - 1) >> 1; hole && (func_comp(&heap->element, func_data(&heap->element, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
             {
                 // move item: parent => hole
                 *((tb_size_t*)(head + hole * step)) = *((tb_size_t*)(head + parent * step));
@@ -199,7 +199,7 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_impl_t* impl, tb_size_t hole, tb_cp
         }
         break;
     default:
-        for (parent = (hole - 1) >> 1; hole && (func_comp(&impl->element, func_data(&impl->element, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+        for (parent = (hole - 1) >> 1; hole && (func_comp(&heap->element, func_data(&heap->element, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
         {
             // move item: parent => hole
             tb_memcpy(head + hole * step, head + parent * step, step);
@@ -213,7 +213,7 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_impl_t* impl, tb_size_t hole, tb_cp
     // ok?
     return head + hole * step;
 }
-/*! shift down the heap
+/*! shift down the self
  *
  * <pre>
  * 
@@ -258,20 +258,20 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_impl_t* impl, tb_size_t hole, tb_cp
  * 
  * </pre>
  */
-static tb_pointer_t tb_heap_shift_down(tb_heap_impl_t* impl, tb_size_t hole, tb_cpointer_t data)
+static tb_pointer_t tb_heap_shift_down(tb_heap_t* heap, tb_size_t hole, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return_val(impl && impl->data, tb_null);
+    tb_assert_and_check_return_val(heap && heap->data, tb_null);
 
     // init element
-    tb_element_comp_func_t func_comp = impl->element.comp;
-    tb_element_data_func_t func_data = impl->element.data;
+    tb_element_comp_func_t func_comp = heap->element.comp;
+    tb_element_data_func_t func_data = heap->element.data;
     tb_assert(func_comp && func_data);
 
     // 2 * hole + 1: the left child node of hole
-    tb_size_t       step = impl->element.size;
-    tb_byte_t*      head = impl->data;
-    tb_byte_t*      tail = head + impl->size * step;
+    tb_size_t       step = heap->element.size;
+    tb_byte_t*      head = heap->data;
+    tb_byte_t*      tail = head + heap->size * step;
     tb_byte_t*      phole = head + hole * step;
     tb_byte_t*      lchild = head + ((hole << 1) + 1) * step;
     tb_pointer_t    data_lchild = tb_null;
@@ -283,15 +283,15 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_impl_t* impl, tb_size_t hole, tb_
             for (; lchild < tail; lchild = head + (((lchild - head) << 1) + step))
             {   
                 // the smaller child node
-                data_lchild = func_data(&impl->element, lchild);
-                if (lchild + step < tail && func_comp(&impl->element, data_lchild, (data_rchild = func_data(&impl->element, lchild + step))) > 0) 
+                data_lchild = func_data(&heap->element, lchild);
+                if (lchild + step < tail && func_comp(&heap->element, data_lchild, (data_rchild = func_data(&heap->element, lchild + step))) > 0) 
                 {
                     lchild += step;
                     data_lchild = data_rchild;
                 }
 
                 // end?
-                if (func_comp(&impl->element, data_lchild, data) >= 0) break;
+                if (func_comp(&heap->element, data_lchild, data) >= 0) break;
 
                 // the smaller child node => hole
                 *((tb_size_t*)phole) = *((tb_size_t*)lchild);
@@ -306,15 +306,15 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_impl_t* impl, tb_size_t hole, tb_
             for (; lchild < tail; lchild = head + (((lchild - head) << 1) + step))
             {   
                 // the smaller child node
-                data_lchild = func_data(&impl->element, lchild);
-                if (lchild + step < tail && func_comp(&impl->element, data_lchild, (data_rchild = func_data(&impl->element, lchild + step))) > 0) 
+                data_lchild = func_data(&heap->element, lchild);
+                if (lchild + step < tail && func_comp(&heap->element, data_lchild, (data_rchild = func_data(&heap->element, lchild + step))) > 0) 
                 {
                     lchild += step;
                     data_lchild = data_rchild;
                 }
 
                 // end?
-                if (func_comp(&impl->element, data_lchild, data) >= 0) break;
+                if (func_comp(&heap->element, data_lchild, data) >= 0) break;
 
                 // the smaller child node => hole
                 tb_memcpy(phole, lchild, step);
@@ -332,17 +332,17 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_impl_t* impl, tb_size_t hole, tb_
 static tb_size_t tb_heap_itor_size(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap, 0);
 
     // size
-    return impl->size;
+    return heap->size;
 }
 static tb_size_t tb_heap_itor_head(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap, 0);
 
     // head
     return 0;
@@ -350,27 +350,27 @@ static tb_size_t tb_heap_itor_head(tb_iterator_ref_t iterator)
 static tb_size_t tb_heap_itor_last(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap, 0);
 
     // last
-    return impl->size? impl->size - 1 : 0;
+    return heap->size? heap->size - 1 : 0;
 }
 static tb_size_t tb_heap_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap, 0);
 
     // tail
-    return impl->size;
+    return heap->size;
 }
 static tb_size_t tb_heap_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
-    tb_assert_and_check_return_val(itor < impl->size, impl->size);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap, 0);
+    tb_assert_and_check_return_val(itor < heap->size, heap->size);
 
     // next
     return itor + 1;
@@ -378,9 +378,9 @@ static tb_size_t tb_heap_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 static tb_size_t tb_heap_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl, 0);
-    tb_assert_and_check_return_val(itor && itor < impl->size, 0);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap, 0);
+    tb_assert_and_check_return_val(itor && itor < heap->size, 0);
 
     // prev
     return itor - 1;
@@ -388,56 +388,56 @@ static tb_size_t tb_heap_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 static tb_pointer_t tb_heap_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && itor < impl->size, tb_null);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap && itor < heap->size, tb_null);
     
     // data
-    return impl->element.data(&impl->element, impl->data + itor * iterator->step);
+    return heap->element.data(&heap->element, heap->data + itor * iterator->step);
 }
 static tb_void_t tb_heap_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return(impl);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return(heap);
 
     // copy
-    impl->element.copy(&impl->element, impl->data + itor * iterator->step, item);
+    heap->element.copy(&heap->element, heap->data + itor * iterator->step, item);
 }
 static tb_long_t tb_heap_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return_val(impl && impl->element.comp, 0);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return_val(heap && heap->element.comp, 0);
 
     // comp
-    return impl->element.comp(&impl->element, litem, ritem);
+    return heap->element.comp(&heap->element, litem, ritem);
 }
 static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)iterator;
-    tb_assert_and_check_return(impl && impl->data && impl->size && itor < impl->size);
+    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_assert_and_check_return(heap && heap->data && heap->size && itor < heap->size);
 
     // check the element function
-    tb_assert(impl->element.comp && impl->element.data);
+    tb_assert(heap->element.comp && heap->element.data);
 
     // the step
-    tb_size_t step = impl->element.size;
+    tb_size_t step = heap->element.size;
     tb_assert(step);
 
     // free the item first
-    if (impl->element.free) impl->element.free(&impl->element, impl->data + itor * step);
+    if (heap->element.free) heap->element.free(&heap->element, heap->data + itor * step);
 
     // the removed item is not the last item?
-    if (itor != impl->size - 1)
+    if (itor != heap->size - 1)
     {
         // the last and parent
-        tb_pointer_t last = impl->data + (impl->size - 1) * step;
-        tb_pointer_t parent = impl->data + ((itor - 1) >> 1) * step;
+        tb_pointer_t last = heap->data + (heap->size - 1) * step;
+        tb_pointer_t parent = heap->data + ((itor - 1) >> 1) * step;
 
         // the last and parent data
-        tb_pointer_t data_last = impl->element.data(&impl->element, last);
-        tb_pointer_t data_parent = impl->element.data(&impl->element, parent);
+        tb_pointer_t data_last = heap->element.data(&heap->element, last);
+        tb_pointer_t data_parent = heap->element.data(&heap->element, parent);
 
         /* we might need to shift it upward if it is less than its parent, 
          * or downward if it is greater than one or both its children. 
@@ -446,13 +446,13 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
          * it can't need to shift both up and down.
          */
         tb_pointer_t hole = tb_null;
-        if (itor && impl->element.comp(&impl->element, data_parent, data_last) > 0) 
+        if (itor && heap->element.comp(&heap->element, data_parent, data_last) > 0) 
         {
-            // shift up the heap from the given hole
-            hole = tb_heap_shift_up(impl, itor, data_last);
+            // shift up the self from the given hole
+            hole = tb_heap_shift_up(heap, itor, data_last);
         }
-        // shift down the heap from the given hole
-        else hole = tb_heap_shift_down(impl, itor, data_last);
+        // shift down the self from the given hole
+        else hole = tb_heap_shift_down(heap, itor, data_last);
         tb_assert(hole);
 
         // copy the last data to the hole
@@ -460,11 +460,11 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
     }
 
     // size--
-    impl->size--;
+    heap->size--;
 
     // check
 #if TB_HEAP_CHECK_ENABLE
-    tb_heap_check(impl);
+    tb_heap_check(heap);
 #endif
 }
 
@@ -477,42 +477,42 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_element_t element)
     tb_assert_and_check_return_val(element.size && element.data && element.dupl && element.repl, tb_null);
 
     // done
-    tb_bool_t       ok = tb_false;
-    tb_heap_impl_t* impl = tb_null;
+    tb_bool_t   ok = tb_false;
+    tb_heap_t*  heap = tb_null;
     do
     {
         // using the default grow
         if (!grow) grow = TB_HEAP_GROW;
 
-        // make impl
-        impl = tb_malloc0_type(tb_heap_impl_t);
-        tb_assert_and_check_break(impl);
+        // make heap
+        heap = tb_malloc0_type(tb_heap_t);
+        tb_assert_and_check_break(heap);
 
-        // init impl
-        impl->size      = 0;
-        impl->grow      = grow;
-        impl->maxn      = grow;
-        impl->element   = element;
-        tb_assert_and_check_break(impl->maxn < TB_HEAP_MAXN);
+        // init heap
+        heap->size      = 0;
+        heap->grow      = grow;
+        heap->maxn      = grow;
+        heap->element   = element;
+        tb_assert_and_check_break(heap->maxn < TB_HEAP_MAXN);
 
         // init iterator
-        impl->itor.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
-        impl->itor.priv     = tb_null;
-        impl->itor.step     = element.size;
-        impl->itor.size     = tb_heap_itor_size;
-        impl->itor.head     = tb_heap_itor_head;
-        impl->itor.last     = tb_heap_itor_last;
-        impl->itor.tail     = tb_heap_itor_tail;
-        impl->itor.prev     = tb_heap_itor_prev;
-        impl->itor.next     = tb_heap_itor_next;
-        impl->itor.item     = tb_heap_itor_item;
-        impl->itor.copy     = tb_heap_itor_copy;
-        impl->itor.comp     = tb_heap_itor_comp;
-        impl->itor.remove   = tb_heap_itor_remove;
+        heap->itor.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
+        heap->itor.priv     = tb_null;
+        heap->itor.step     = element.size;
+        heap->itor.size     = tb_heap_itor_size;
+        heap->itor.head     = tb_heap_itor_head;
+        heap->itor.last     = tb_heap_itor_last;
+        heap->itor.tail     = tb_heap_itor_tail;
+        heap->itor.prev     = tb_heap_itor_prev;
+        heap->itor.next     = tb_heap_itor_next;
+        heap->itor.item     = tb_heap_itor_item;
+        heap->itor.copy     = tb_heap_itor_copy;
+        heap->itor.comp     = tb_heap_itor_comp;
+        heap->itor.remove   = tb_heap_itor_remove;
 
         // make data
-        impl->data = (tb_byte_t*)tb_nalloc0(impl->maxn, element.size);
-        tb_assert_and_check_break(impl->data);
+        heap->data = (tb_byte_t*)tb_nalloc0(heap->maxn, element.size);
+        tb_assert_and_check_break(heap->data);
 
         // ok
         ok = tb_true;
@@ -523,133 +523,133 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_element_t element)
     if (!ok)
     {
         // exit it
-        if (impl) tb_heap_exit((tb_heap_ref_t)impl);
-        impl = tb_null;
+        if (heap) tb_heap_exit((tb_heap_ref_t)heap);
+        heap = tb_null;
     }
 
     // ok?
-    return (tb_heap_ref_t)impl;
+    return (tb_heap_ref_t)heap;
 }
-tb_void_t tb_heap_exit(tb_heap_ref_t heap)
+tb_void_t tb_heap_exit(tb_heap_ref_t self)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
-    tb_assert_and_check_return(impl);
+    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_assert_and_check_return(heap);
 
     // clear data
-    tb_heap_clear(heap);
+    tb_heap_clear(self);
 
     // free data
-    if (impl->data) tb_free(impl->data);
-    impl->data = tb_null;
+    if (heap->data) tb_free(heap->data);
+    heap->data = tb_null;
 
     // free it
-    tb_free(impl);
+    tb_free(heap);
 }
-tb_void_t tb_heap_clear(tb_heap_ref_t heap)
+tb_void_t tb_heap_clear(tb_heap_ref_t self)
 {   
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
-    tb_assert_and_check_return(impl);
+    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_assert_and_check_return(heap);
 
     // free data
-    if (impl->element.nfree)
-        impl->element.nfree(&impl->element, impl->data, impl->size);
+    if (heap->element.nfree)
+        heap->element.nfree(&heap->element, heap->data, heap->size);
 
     // reset size 
-    impl->size = 0;
+    heap->size = 0;
 }
-tb_size_t tb_heap_size(tb_heap_ref_t heap)
+tb_size_t tb_heap_size(tb_heap_ref_t self)
 {
     // check
-    tb_heap_impl_t const* impl = (tb_heap_impl_t const*)heap;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_heap_t const* heap = (tb_heap_t const*)self;
+    tb_assert_and_check_return_val(heap, 0);
 
     // size
-    return impl->size;
+    return heap->size;
 }
-tb_size_t tb_heap_maxn(tb_heap_ref_t heap)
+tb_size_t tb_heap_maxn(tb_heap_ref_t self)
 {
     // check
-    tb_heap_impl_t const* impl = (tb_heap_impl_t const*)heap;
-    tb_assert_and_check_return_val(impl, 0);
+    tb_heap_t const* heap = (tb_heap_t const*)self;
+    tb_assert_and_check_return_val(heap, 0);
 
     // maxn
-    return impl->maxn;
+    return heap->maxn;
 }
-tb_pointer_t tb_heap_top(tb_heap_ref_t heap)
+tb_pointer_t tb_heap_top(tb_heap_ref_t self)
 {
-    return tb_iterator_item(heap, tb_iterator_head(heap));
+    return tb_iterator_item(self, tb_iterator_head(self));
 }
-tb_void_t tb_heap_put(tb_heap_ref_t heap, tb_cpointer_t data)
+tb_void_t tb_heap_put(tb_heap_ref_t self, tb_cpointer_t data)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
-    tb_assert_and_check_return(impl && impl->element.dupl && impl->data);
+    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_assert_and_check_return(heap && heap->element.dupl && heap->data);
 
     // no enough? grow it
-    if (impl->size == impl->maxn)
+    if (heap->size == heap->maxn)
     {
         // the maxn
-        tb_size_t maxn = tb_align4(impl->maxn + impl->grow);
+        tb_size_t maxn = tb_align4(heap->maxn + heap->grow);
         tb_assert_and_check_return(maxn < TB_HEAP_MAXN);
 
         // realloc data
-        impl->data = (tb_byte_t*)tb_ralloc(impl->data, maxn * impl->element.size);
-        tb_assert_and_check_return(impl->data);
+        heap->data = (tb_byte_t*)tb_ralloc(heap->data, maxn * heap->element.size);
+        tb_assert_and_check_return(heap->data);
 
         // must be align by 4-bytes
-        tb_assert_and_check_return(!(((tb_size_t)(impl->data)) & 3));
+        tb_assert_and_check_return(!(((tb_size_t)(heap->data)) & 3));
 
         // clear the grow data
-        tb_memset(impl->data + impl->size * impl->element.size, 0, (maxn - impl->maxn) * impl->element.size);
+        tb_memset(heap->data + heap->size * heap->element.size, 0, (maxn - heap->maxn) * heap->element.size);
 
         // save maxn
-        impl->maxn = maxn;
+        heap->maxn = maxn;
     }
 
     // check
-    tb_assert_and_check_return(impl->size < impl->maxn);
+    tb_assert_and_check_return(heap->size < heap->maxn);
     
-    // shift up the heap from the tail hole
-    tb_pointer_t hole = tb_heap_shift_up(impl, impl->size, data);
+    // shift up the self from the tail hole
+    tb_pointer_t hole = tb_heap_shift_up(heap, heap->size, data);
     tb_assert(hole);
         
     // save data to the hole
-    if (hole) impl->element.dupl(&impl->element, hole, data);
+    if (hole) heap->element.dupl(&heap->element, hole, data);
 
     // update the size
-    impl->size++;
+    heap->size++;
 
     // check
 #if TB_HEAP_CHECK_ENABLE
-    tb_heap_check(impl);
+    tb_heap_check(heap);
 #endif
 }
-tb_void_t tb_heap_pop(tb_heap_ref_t heap)
+tb_void_t tb_heap_pop(tb_heap_ref_t self)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
-    tb_assert_and_check_return(impl && impl->data && impl->size);
+    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_assert_and_check_return(heap && heap->data && heap->size);
 
     // free the top item first
-    if (impl->element.free) impl->element.free(&impl->element, impl->data);
+    if (heap->element.free) heap->element.free(&heap->element, heap->data);
 
     // the last item is not in top 
-    if (impl->size > 1)
+    if (heap->size > 1)
     {
         // check the element function
-        tb_assert(impl->element.data);
+        tb_assert(heap->element.data);
 
         // the step
-        tb_size_t step = impl->element.size;
+        tb_size_t step = heap->element.size;
         tb_assert(step);
 
         // the last 
-        tb_pointer_t last = impl->data + (impl->size - 1) * step;
+        tb_pointer_t last = heap->data + (heap->size - 1) * step;
 
-        // shift down the heap from the top hole
-        tb_pointer_t hole = tb_heap_shift_down(impl, 0, impl->element.data(&impl->element, last));
+        // shift down the self from the top hole
+        tb_pointer_t hole = tb_heap_shift_down(heap, 0, heap->element.data(&heap->element, last));
         tb_assert(hole);
 
         // copy the last data to the hole
@@ -657,38 +657,38 @@ tb_void_t tb_heap_pop(tb_heap_ref_t heap)
     }
 
     // update the size
-    impl->size--;
+    heap->size--;
 
     // check
 #if TB_HEAP_CHECK_ENABLE
-    tb_heap_check(impl);
+    tb_heap_check(heap);
 #endif
 }
-tb_void_t tb_heap_remove(tb_heap_ref_t heap, tb_size_t itor)
+tb_void_t tb_heap_remove(tb_heap_ref_t self, tb_size_t itor)
 {
-    tb_heap_itor_remove(heap, itor);
+    tb_heap_itor_remove(self, itor);
 }
 #ifdef __tb_debug__
-tb_void_t tb_heap_dump(tb_heap_ref_t heap)
+tb_void_t tb_heap_dump(tb_heap_ref_t self)
 {
     // check
-    tb_heap_impl_t* impl = (tb_heap_impl_t*)heap;
-    tb_assert_and_check_return(impl);
+    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_assert_and_check_return(heap);
 
     // trace
-    tb_trace_i("heap: size: %lu", tb_heap_size(heap));
+    tb_trace_i("self: size: %lu", tb_heap_size(self));
 
     // done
     tb_char_t cstr[4096];
-    tb_for_all (tb_pointer_t, data, heap)
+    tb_for_all (tb_pointer_t, data, self)
     {
         // trace
-        if (impl->element.cstr) 
+        if (heap->element.cstr) 
         {
 #if TB_HEAP_CHECK_ENABLE
-            tb_trace_i("    [%lu]: %s", data_itor, impl->element.cstr(&impl->element, data, cstr, sizeof(cstr)));
+            tb_trace_i("    [%lu]: %s", data_itor, heap->element.cstr(&heap->element, data, cstr, sizeof(cstr)));
 #else
-            tb_trace_i("    %s", impl->element.cstr(&impl->element, data, cstr, sizeof(cstr)));
+            tb_trace_i("    %s", heap->element.cstr(&heap->element, data, cstr, sizeof(cstr)));
 #endif
         }
         else

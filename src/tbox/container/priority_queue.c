@@ -33,41 +33,41 @@ tb_priority_queue_ref_t tb_priority_queue_init(tb_size_t grow, tb_element_t elem
 {
     return (tb_priority_queue_ref_t)tb_heap_init(grow, element);
 }
-tb_void_t tb_priority_queue_exit(tb_priority_queue_ref_t queue)
+tb_void_t tb_priority_queue_exit(tb_priority_queue_ref_t self)
 {
-    tb_heap_exit((tb_heap_ref_t)queue);
+    tb_heap_exit((tb_heap_ref_t)self);
 }
-tb_void_t tb_priority_queue_clear(tb_priority_queue_ref_t queue)
+tb_void_t tb_priority_queue_clear(tb_priority_queue_ref_t self)
 {
-    tb_heap_clear((tb_heap_ref_t)queue);
+    tb_heap_clear((tb_heap_ref_t)self);
 }
-tb_size_t tb_priority_queue_size(tb_priority_queue_ref_t queue)
+tb_size_t tb_priority_queue_size(tb_priority_queue_ref_t self)
 {
-    return tb_heap_size((tb_heap_ref_t)queue);
+    return tb_heap_size((tb_heap_ref_t)self);
 }
-tb_size_t tb_priority_queue_maxn(tb_priority_queue_ref_t queue)
+tb_size_t tb_priority_queue_maxn(tb_priority_queue_ref_t self)
 {
-    return tb_heap_maxn((tb_heap_ref_t)queue);
+    return tb_heap_maxn((tb_heap_ref_t)self);
 }
-tb_pointer_t tb_priority_queue_get(tb_priority_queue_ref_t queue)
+tb_pointer_t tb_priority_queue_get(tb_priority_queue_ref_t self)
 {
-    return tb_heap_top((tb_heap_ref_t)queue);
+    return tb_heap_top((tb_heap_ref_t)self);
 }
-tb_void_t tb_priority_queue_put(tb_priority_queue_ref_t queue, tb_cpointer_t data)
+tb_void_t tb_priority_queue_put(tb_priority_queue_ref_t self, tb_cpointer_t data)
 {
-    tb_heap_put((tb_heap_ref_t)queue, data);
+    tb_heap_put((tb_heap_ref_t)self, data);
 }
-tb_void_t tb_priority_queue_pop(tb_priority_queue_ref_t queue)
+tb_void_t tb_priority_queue_pop(tb_priority_queue_ref_t self)
 {
-    tb_heap_pop((tb_heap_ref_t)queue);
+    tb_heap_pop((tb_heap_ref_t)self);
 }
-tb_void_t tb_priority_queue_remove(tb_priority_queue_ref_t queue, tb_size_t itor)
+tb_void_t tb_priority_queue_remove(tb_priority_queue_ref_t self, tb_size_t itor)
 {
-    tb_heap_remove((tb_heap_ref_t)queue, itor);
+    tb_heap_remove((tb_heap_ref_t)self, itor);
 }
 #ifdef __tb_debug__
-tb_void_t tb_priority_queue_dump(tb_priority_queue_ref_t queue)
+tb_void_t tb_priority_queue_dump(tb_priority_queue_ref_t self)
 {
-    tb_heap_dump((tb_heap_ref_t)queue);
+    tb_heap_dump((tb_heap_ref_t)self);
 }
 #endif

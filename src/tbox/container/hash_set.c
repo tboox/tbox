@@ -75,42 +75,42 @@ tb_hash_set_ref_t tb_hash_set_init(tb_size_t bucket_size, tb_element_t element)
     // ok?
     return (tb_hash_set_ref_t)hash_set;
 }
-tb_void_t tb_hash_set_exit(tb_hash_set_ref_t hash_set)
+tb_void_t tb_hash_set_exit(tb_hash_set_ref_t self)
 {
-    tb_hash_map_exit((tb_hash_map_ref_t)hash_set);
+    tb_hash_map_exit((tb_hash_map_ref_t)self);
 }
-tb_void_t tb_hash_set_clear(tb_hash_set_ref_t hash_set)
+tb_void_t tb_hash_set_clear(tb_hash_set_ref_t self)
 {
-    tb_hash_map_clear((tb_hash_map_ref_t)hash_set);
+    tb_hash_map_clear((tb_hash_map_ref_t)self);
 }
-tb_bool_t tb_hash_set_get(tb_hash_set_ref_t hash_set, tb_cpointer_t data)
+tb_bool_t tb_hash_set_get(tb_hash_set_ref_t self, tb_cpointer_t data)
 {
-    return tb_p2b(tb_hash_map_get((tb_hash_map_ref_t)hash_set, data));
+    return tb_p2b(tb_hash_map_get((tb_hash_map_ref_t)self, data));
 }
-tb_size_t tb_hash_set_find(tb_hash_set_ref_t hash_set, tb_cpointer_t data)
+tb_size_t tb_hash_set_find(tb_hash_set_ref_t self, tb_cpointer_t data)
 {
-    return tb_hash_map_find((tb_hash_map_ref_t)hash_set, data);
+    return tb_hash_map_find((tb_hash_map_ref_t)self, data);
 }
-tb_size_t tb_hash_set_insert(tb_hash_set_ref_t hash_set, tb_cpointer_t data)
+tb_size_t tb_hash_set_insert(tb_hash_set_ref_t self, tb_cpointer_t data)
 {
-    return tb_hash_map_insert((tb_hash_map_ref_t)hash_set, data, tb_b2p(tb_true));
+    return tb_hash_map_insert((tb_hash_map_ref_t)self, data, tb_b2p(tb_true));
 }
-tb_void_t tb_hash_set_remove(tb_hash_set_ref_t hash_set, tb_cpointer_t data)
+tb_void_t tb_hash_set_remove(tb_hash_set_ref_t self, tb_cpointer_t data)
 {
-    tb_hash_map_remove((tb_hash_map_ref_t)hash_set, data);
+    tb_hash_map_remove((tb_hash_map_ref_t)self, data);
 }
-tb_size_t tb_hash_set_size(tb_hash_set_ref_t hash_set)
+tb_size_t tb_hash_set_size(tb_hash_set_ref_t self)
 {
-    return tb_hash_map_size((tb_hash_map_ref_t)hash_set);
+    return tb_hash_map_size((tb_hash_map_ref_t)self);
 }
-tb_size_t tb_hash_set_maxn(tb_hash_set_ref_t hash_set)
+tb_size_t tb_hash_set_maxn(tb_hash_set_ref_t self)
 {
-    return tb_hash_map_maxn((tb_hash_map_ref_t)hash_set);
+    return tb_hash_map_maxn((tb_hash_map_ref_t)self);
 }
 #ifdef __tb_debug__
-tb_void_t tb_hash_set_dump(tb_hash_set_ref_t hash_set)
+tb_void_t tb_hash_set_dump(tb_hash_set_ref_t self)
 {
-    tb_hash_map_dump((tb_hash_map_ref_t)hash_set);
+    tb_hash_map_dump((tb_hash_map_ref_t)self);
 }
 #endif
 
