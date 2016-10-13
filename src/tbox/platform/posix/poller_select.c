@@ -62,6 +62,10 @@ typedef struct __tb_poller_select_t
     fd_set                  rfds;
     fd_set                  wfds;
 
+    // the copied fds
+    fd_set                  rfdc;
+    fd_set                  wfdc;
+
     // the user private data hash (socket => priv)
     tb_hash_map_ref_t       hash;
 
@@ -91,6 +95,8 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         // init fds
         FD_ZERO(&poller->rfds);
         FD_ZERO(&poller->wfds);
+        FD_ZERO(&poller->rfdc);
+        FD_ZERO(&poller->wfdc);
 
         // init pair sockets
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
@@ -133,6 +139,8 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // clear fds
     FD_ZERO(&poller->rfds);
     FD_ZERO(&poller->wfds);
+    FD_ZERO(&poller->rfdc);
+    FD_ZERO(&poller->wfdc);
 
     // free it
     tb_free(poller);
@@ -147,6 +155,8 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     poller->sfdm = 0;
     FD_ZERO(&poller->rfds);
     FD_ZERO(&poller->wfds);
+    FD_ZERO(&poller->rfdc);
+    FD_ZERO(&poller->wfdc);
 
     // clear hash
     if (poller->hash) tb_hash_map_clear(poller->hash);
@@ -268,11 +278,15 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     tb_hong_t time = tb_mclock();
     while (!wait && !stop && (timeout < 0 || tb_mclock() < time + timeout))
     {
+        // copy fds
+        tb_memcpy(&poller->rfdc, &poller->rfds, sizeof(fd_set));
+        tb_memcpy(&poller->wfdc, &poller->wfds, sizeof(fd_set));
+
         // wait
 #ifdef TB_CONFIG_OS_WINDOWS
-        tb_long_t sfdn = tb_ws2_32()->select((tb_int_t) poller->sfdm + 1, &poller->rfds, &poller->wfds, tb_null, timeout >= 0? &t : tb_null);
+        tb_long_t sfdn = tb_ws2_32()->select((tb_int_t) poller->sfdm + 1, &poller->rfdc, &poller->wfdc, tb_null, timeout >= 0? &t : tb_null);
 #else
-        tb_long_t sfdn = select(poller->sfdm + 1, &poller->rfds, &poller->wfds, tb_null, timeout >= 0? &t : tb_null);
+        tb_long_t sfdn = select(poller->sfdm + 1, &poller->rfdc, &poller->wfdc, tb_null, timeout >= 0? &t : tb_null);
 #endif
         tb_assert_and_check_return_val(sfdn >= 0, -1);
 
@@ -290,7 +304,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             tb_assert_and_check_return_val(sock, -1);
 
             // spak?
-            if (sock == poller->pair[1] && FD_ISSET(tb_sock2fd(poller->pair[1]), &poller->rfds))
+            if (sock == poller->pair[1] && FD_ISSET(tb_sock2fd(poller->pair[1]), &poller->rfdc))
             {
                 // read spak
                 tb_char_t spak = '\0';
@@ -313,8 +327,8 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             // init events
             tb_long_t fd = tb_sock2fd(sock);
             tb_size_t events = TB_POLLER_EVENT_NONE;
-            if (FD_ISSET(fd, &poller->rfds)) events |= TB_POLLER_EVENT_RECV;
-            if (FD_ISSET(fd, &poller->wfds)) events |= TB_POLLER_EVENT_SEND;
+            if (FD_ISSET(fd, &poller->rfdc)) events |= TB_POLLER_EVENT_RECV;
+            if (FD_ISSET(fd, &poller->wfdc)) events |= TB_POLLER_EVENT_SEND;
 
             // exists events?
             if (events)
