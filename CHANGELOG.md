@@ -6,11 +6,17 @@
 
 * Add switch context interface into platform module
 * Support make command
+* Add coroutine module
+* Add some server examples using coroutine
+* Add switch context interfaces
+* Add io poller interfaces(with epoll, poll, kqueue, select) instead of aiop
 
 ### Changes
 
 * Optimize and rewrite thread local store module
 * Modify thread interfaces 
+* Mark the asio module as deprecated
+* Optimize exception interfaces
 
 ### Bugs fixed
 
@@ -89,11 +95,17 @@
 
 * 添加切换context上下文接口
 * 支持make进行编译
+* 新增协程模块，提供更加易用的高性能并发编程模式
+* 新增基于协程的各种服务器开发实例
+* 针对平台库，新增上下文切换接口
+* 新增poller轮询器接口，实现对epoll,poll,kqueue,select的封装，逐步取代老的aiop接口
 
 ### 改进
 
 * 优化和重构线程局部存储TLS模块
 * 修改部分线程接口
+* asio模块被标记为废弃接口，下个版本将会被移除，逐步使用协程模式来实现异步io开发
+* 优化异常捕获接口
 
 ### Bugs修复
 
