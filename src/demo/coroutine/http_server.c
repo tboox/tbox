@@ -68,7 +68,7 @@ static tb_char_t    g_roordir[TB_PATH_MAXN];
 static tb_bool_t tb_demo_http_session_init(tb_demo_http_session_ref_t session, tb_socket_ref_t sock)
 {
     // check
-    tb_assert_and_check_return(session && sock);
+    tb_assert(session && sock);
 
     // init session
     tb_memset(session, 0, sizeof(tb_demo_http_session_t));
@@ -82,7 +82,7 @@ static tb_bool_t tb_demo_http_session_init(tb_demo_http_session_ref_t session, t
 static tb_void_t tb_demo_http_session_exit(tb_demo_http_session_ref_t session)
 {
     // check
-    tb_assert_and_check_return(session);
+    tb_assert(session);
 
     // exit socket
     if (session->sock) tb_socket_exit(session->sock);
