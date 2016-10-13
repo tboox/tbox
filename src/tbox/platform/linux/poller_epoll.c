@@ -458,6 +458,9 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 
         // call event function
         func(self, sock, events, tb_poller_hash_get(poller, fd));
+
+        // update the events count
+        wait++;
     }
 
     // ok

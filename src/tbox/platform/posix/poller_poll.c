@@ -319,9 +319,6 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // bind user private data to socket
     tb_poller_hash_set(poller, sock, priv);
 
-    // spak it
-    if (poller->pair[0] && events) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
-
     // ok
     return tb_true;
 }
@@ -336,9 +333,6 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
 
     // remove user private data from this socket
     tb_poller_hash_del(poller, sock);
-
-    // spak it
-    if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 
     // ok
     return tb_true;
@@ -360,9 +354,6 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
 
     // modify user private data to socket
     tb_poller_hash_set(poller, sock, priv);
-
-    // spak it
-    if (poller->pair[0] && events) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 
     // ok
     return tb_true;
@@ -439,6 +430,9 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 
             // call event function
             func(self, sock, events, tb_poller_hash_get(poller, sock));
+
+            // update the events count
+            wait++;
         }
     }
 
