@@ -165,15 +165,15 @@ static tb_long_t tb_stream_data_impl_wait(tb_stream_ref_t stream, tb_size_t wait
     tb_assert_and_check_return_val(impl && impl->head <= impl->data + impl->size, -1);
 
     // wait 
-    tb_long_t aioe = 0;
+    tb_long_t events = 0;
     if (!tb_stream_beof((tb_stream_ref_t)stream))
     {
-        if (wait & TB_STREAM_WAIT_READ) aioe |= TB_STREAM_WAIT_READ;
-        if (wait & TB_STREAM_WAIT_WRIT) aioe |= TB_STREAM_WAIT_WRIT;
+        if (wait & TB_STREAM_WAIT_READ) events |= TB_STREAM_WAIT_READ;
+        if (wait & TB_STREAM_WAIT_WRIT) events |= TB_STREAM_WAIT_WRIT;
     }
 
     // ok?
-    return aioe;
+    return events;
 }
 static tb_bool_t tb_stream_data_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
 {

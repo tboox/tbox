@@ -821,7 +821,7 @@ tb_void_t tb_http_exit(tb_http_ref_t http)
     // free it
     tb_free(impl);
 }
-tb_long_t tb_http_wait(tb_http_ref_t http, tb_size_t aioe, tb_long_t timeout)
+tb_long_t tb_http_wait(tb_http_ref_t http, tb_size_t events, tb_long_t timeout)
 {
     // check
     tb_http_impl_t* impl = (tb_http_impl_t*)http;
@@ -831,7 +831,7 @@ tb_long_t tb_http_wait(tb_http_ref_t http, tb_size_t aioe, tb_long_t timeout)
     tb_assert_and_check_return_val(impl->bopened, -1);
 
     // wait it
-    tb_long_t wait = tb_stream_wait(impl->stream, aioe, timeout);
+    tb_long_t wait = tb_stream_wait(impl->stream, events, timeout);
 
     // failed? save state
     if (wait < 0 && !impl->status.state) impl->status.state = tb_stream_state(impl->stream);

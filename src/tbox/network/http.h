@@ -336,12 +336,12 @@ tb_void_t               tb_http_kill(tb_http_ref_t http);
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param http          the http 
- * @param aioe          the aioe
+ * @param events          the events
  * @param timeout       the timeout value, return immediately if 0, infinity if -1
  *
  * @return              the event type, return 0 if timeout, return -1 if error
  */
-tb_long_t               tb_http_wait(tb_http_ref_t http, tb_size_t aioe, tb_long_t timeout);
+tb_long_t               tb_http_wait(tb_http_ref_t http, tb_size_t events, tb_long_t timeout);
 
 /*! open the http
  *

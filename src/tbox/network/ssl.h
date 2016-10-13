@@ -73,7 +73,7 @@ typedef tb_long_t   (*tb_ssl_func_writ_t)(tb_cpointer_t priv, tb_byte_t const* d
 /*! the ssl wait func type 
  *
  * @param priv      the priv data for context
- * @param code      the aioe code
+ * @param code      the events code
  * @param timeout   the timeout
  *
  * @return          the real code, no event: 0, failed or closed: -1
@@ -208,7 +208,7 @@ tb_long_t           tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size
 /*! wait ssl data
  *
  * @param ssl       the ssl handle
- * @param code      the aioe code
+ * @param code      the events code
  * @param timeout   the timeout
  *
  * @return          the real code, no event: 0, failed or closed: -1
