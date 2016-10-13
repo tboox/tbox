@@ -408,7 +408,10 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
         // send the response 
         if (!tb_demo_http_session_resp_send(&session)) break;
 
-    } while (0);
+        // trace
+        tb_trace_d("ok!");
+
+    } while (session.keep_alive);
 
     // exit session
     tb_demo_http_session_exit(&session);
