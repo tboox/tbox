@@ -49,6 +49,9 @@ typedef struct __tb_poller_poll_t
     // the poll fds
     tb_vector_ref_t         pfds;
 
+    // the copied poll fds
+    tb_vector_ref_t         cfds;
+
     // the user private data hash (socket => priv)
     tb_cpointer_t*          hash;
 
@@ -181,9 +184,13 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         poller = tb_malloc0_type(tb_poller_poll_t);
         tb_assert_and_check_break(poller);
 
-        // init poll
+        // init poll fds
         poller->pfds = tb_vector_init(0, tb_element_mem(sizeof(struct pollfd), tb_null, tb_null));
         tb_assert_and_check_break(poller->pfds);
+
+        // init copied poll fds
+        poller->cfds = tb_vector_init(0, tb_element_mem(sizeof(struct pollfd), tb_null, tb_null));
+        tb_assert_and_check_break(poller->cfds);
 
         // init user private data
         poller->priv = priv;
@@ -231,6 +238,10 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     if (poller->pfds) tb_vector_exit(poller->pfds);
     poller->pfds = tb_null;
 
+    // close cfds
+    if (poller->cfds) tb_vector_exit(poller->cfds);
+    poller->cfds = tb_null;
+
     // free it
     tb_free(poller);
 }
@@ -245,6 +256,9 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
 
     // clear pfds
     if (poller->pfds) tb_vector_clear(poller->pfds);
+
+    // clear cfds
+    if (poller->cfds) tb_vector_clear(poller->cfds);
 
     // spak it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
@@ -357,7 +371,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 {
     // check
     tb_poller_poll_ref_t poller = (tb_poller_poll_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->pfds && func, -1);
+    tb_assert_and_check_return_val(poller && poller->pfds && poller->cfds && func, -1);
 
     // loop
     tb_long_t wait = 0;
@@ -371,11 +385,18 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         tb_assert_and_check_return_val(pfds && pfdm, -1);
 
         // wait
-        tb_long_t cfdn = poll(pfds, pfdm, timeout);
-        tb_assert_and_check_return_val(cfdn >= 0, -1);
+        tb_long_t pfdn = poll(pfds, pfdm, timeout);
+        tb_assert_and_check_return_val(pfdn >= 0, -1);
 
         // timeout?
-        tb_check_return_val(cfdn, 0);
+        tb_check_return_val(pfdn, 0);
+
+        // copy fds
+        tb_vector_copy(poller->cfds, poller->pfds);
+
+        // walk the copied fds
+        pfds = (struct pollfd*)tb_vector_data(poller->cfds);
+        pfdm = tb_vector_size(poller->cfds);
 
         // sync
         tb_size_t i = 0;
