@@ -7,8 +7,11 @@
  * macros
  */ 
 
+// port
+#define TB_DEMO_PORT        (9090)
+
 // timeout
-#define TIMEOUT     (-1)
+#define TB_DEMO_TIMEOUT     (-1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -39,7 +42,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
         else if (!real && !wait)
         {
             // wait it
-            wait = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, TIMEOUT);
+            wait = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
             tb_assert_and_check_break(wait >= 0);
         }
         // failed or end?
@@ -64,11 +67,11 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 
         // bind socket
         tb_ipaddr_t addr;
-        tb_ipaddr_set(&addr, tb_null, 9090, TB_IPADDR_FAMILY_IPV4);
+        tb_ipaddr_set(&addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
         if (!tb_socket_bind(sock, &addr)) break;
 
         // listen socket
-        if (!tb_socket_listen(sock, 20)) break;
+        if (!tb_socket_listen(sock, 1000)) break;
 
         // trace
         tb_trace_i("listening ..");

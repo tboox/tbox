@@ -312,8 +312,9 @@ tb_long_t tb_scheduler_io_wait(tb_scheduler_io_ref_t scheduler_io, tb_socket_ref
     // trace
     tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
 
-    // TODO oneshot, clear ...
-    events |= TB_POLLER_EVENT_CLEAR;
+    // enable edge-trigger mode if be supported
+    if (tb_poller_support(scheduler_io->poller, TB_POLLER_EVENT_CLEAR))
+        events |= TB_POLLER_EVENT_CLEAR;
 
     // insert socket to poller for waiting events
     if (!tb_poller_insert(scheduler_io->poller, sock, events, coroutine))

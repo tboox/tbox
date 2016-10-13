@@ -7,8 +7,11 @@
  * macros
  */ 
 
+// port
+#define TB_DEMO_PORT        (9090)
+
 // timeout
-#define TIMEOUT     (-1)
+#define TB_DEMO_TIMEOUT     (-1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -25,7 +28,7 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 
         // init address
         tb_ipaddr_t addr;
-        tb_ipaddr_set(&addr, "127.0.0.1", 9090, TB_IPADDR_FAMILY_IPV4);
+        tb_ipaddr_set(&addr, "127.0.0.1", TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
 
         // trace
         tb_trace_i("connecting %{ipaddr} ..", &addr);
@@ -35,7 +38,7 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
         while (!(ok = tb_socket_connect(sock, &addr))) 
         {
             // wait it
-            if (tb_socket_wait(sock, TB_SOCKET_EVENT_CONN, TIMEOUT) <= 0) break;
+            if (tb_socket_wait(sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT) <= 0) break;
         }
 
         // connect ok?
@@ -67,7 +70,7 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
             else if (!real && !wait)
             {
                 // wait it
-                wait = tb_socket_wait(sock, TB_SOCKET_EVENT_SEND, TIMEOUT);
+                wait = tb_socket_wait(sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
                 tb_assert_and_check_break(wait >= 0);
             }
             // failed or end?

@@ -13,15 +13,18 @@
  * macros
  */ 
 
+// port
+#define TB_DEMO_PORT    (9090)
+
 // timeout
-#define TIMEOUT     (-1)
+#define TB_DEMO_TIMEOUT  (-1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */ 
 
 // the file path
-static tb_char_t    g_filepath[8192];
+static tb_char_t    g_filepath[TB_PATH_MAXN];
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -62,7 +65,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
         else if (!real && !wait)
         {
             // wait it
-            wait = tb_socket_wait(sock, TB_SOCKET_EVENT_SEND, TIMEOUT);
+            wait = tb_socket_wait(sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
             tb_assert_and_check_break(wait >= 0);
         }
         // failed or end?
@@ -90,11 +93,11 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 
         // bind socket
         tb_ipaddr_t addr;
-        tb_ipaddr_set(&addr, tb_null, 9090, TB_IPADDR_FAMILY_IPV4);
+        tb_ipaddr_set(&addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
         if (!tb_socket_bind(sock, &addr)) break;
 
         // listen socket
-        if (!tb_socket_listen(sock, 20)) break;
+        if (!tb_socket_listen(sock, 1000)) break;
 
         // trace
         tb_trace_i("listening ..");
@@ -103,12 +106,17 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
         while (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1) > 0)
         {
             // accept client sockets
+            tb_size_t       count = 0;
             tb_socket_ref_t client = tb_null;
             while ((client = tb_socket_accept(sock, tb_null)))
             {
                 // start client connection
                 if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
+                count++;
             }
+
+            // trace
+            tb_trace_i("listened %lu", count);
         }
 
     } while (0);
@@ -117,7 +125,6 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
     if (sock) tb_socket_exit(sock);
     sock = tb_null;
 }
-
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main

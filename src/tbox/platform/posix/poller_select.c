@@ -195,7 +195,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {
     // all supported events 
-    tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_ONESHOT;
+    static tb_size_t events_supported = TB_POLLER_EVENT_EALL;
 
     // is supported?
     return (events_supported & events) == events;
@@ -341,22 +341,6 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             tb_size_t events = TB_POLLER_EVENT_NONE;
             if (FD_ISSET(fd, &poller->rfds)) events |= TB_POLLER_EVENT_RECV;
             if (FD_ISSET(fd, &poller->wfds)) events |= TB_POLLER_EVENT_SEND;
-                
-            // exists events?
-            if (events) 
-            {
-                // oneshot? clear it
-                if (object->events & TB_POLLER_EVENT_ONESHOT)
-                {
-                    // clear object
-                    object->events  = TB_POLLER_EVENT_NONE;
-                    object->priv    = tb_null;
-
-                    // clear events
-                    FD_CLR(fd, &poller->rfds);
-                    FD_CLR(fd, &poller->wfds);
-                }
-            }
 
             // call event function
             func(self, sock, events, object->priv);
