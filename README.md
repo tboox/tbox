@@ -33,10 +33,13 @@ If you want to know more, please refer to:
 - Implements transfer pool (asio) for multi-stream
 - Implements the static buffer stream for parsing data
 
-#### The asynchronous io library
+#### The coroutine library 
 
-- Supports reactor and proactor mode
-- Uses epoll, poll, select, kqueue and iocp os system api
+- Provides high-performance coroutine switch(1000w switchs: 200ms on mac pro）
+- Supports arm, arm64, x86, x86_64 ..
+- Provides channel interfaces
+- Supports io socket and stream operation in coroutine
+- Provides some io servers (http ..) using coroutine
 
 #### The database library
 
@@ -82,6 +85,8 @@ If you want to know more, please refer to:
 - Implements atomic and atomic64 operation
 - Implements spinlock, mutex, event, semaphore, thread and thread pool 
 - Implements file, socket operation
+- Implements poller using epoll, poll, select, kqueue ...
+- Implements switch context interfaces for coroutine
 
 #### The charset library
 
@@ -128,9 +133,12 @@ If you want to know more, please refer to:
 - Implements some string hash algorithms (.e.g bkdr, fnv32, fnv64, sdbm, djb2, rshash, aphash ...)
 - Implements uuid generator
 
+#### The asynchronous io library (deprecated)
+
+- Please uses coroutine to implement asio programming
+
 ## Todolist
 
-- Add coroutine module 
 - Add server module
 - Reconstruction xml module
 - Add more algorithms and container
@@ -279,10 +287,13 @@ TBOX是一个用c语言实现的跨平台开发库。
 - `transfer_pool`：传输池，基于asio，维护大量并发的传输，可以用于实现爬虫、批量下载等等。
 - `static_stream`：针对静态数据buffer优化的静态流，用于轻量快速的数据解析。
 
-#### asio库
+#### 协程库
 
-- 支持reactor和proactor两种模型，针对不同平台，采用epoll/poll/select/kqueue/iocp接口，最大化异步操作的性能。
-- 并且对http、ssl、dns也提供了纯异步模式的实现。基于此库完全可以很方便的写出一个高性能的小型服务器。
+- 快速高效的协程切换支持（本机macosx测试，1000w次切换，只需200ms）
+- 提供跨平台支持，核心切换算法参考boost，并且对其进行重写和优化，目前支持架构：x86, x86_64, arm, arm64
+- 提供channel协程间数据通信支持，基于生产、消费者模型
+- socket、stream都模块原生支持协程，并且可在线程和协程间进行无缝切换
+- 提供http、file等基于协程的简单服务器实例，只需几百行代码，就可以从socket开始写个高性能io服务器，代码逻辑比异步回调模式更加清晰
 
 #### 数据库
 
@@ -351,6 +362,8 @@ TBOX是一个用c语言实现的跨平台开发库。
 - 提供event、mutex、semaphore、spinlock等事件、互斥、信号量、自旋锁操作
 - 提供获取函数堆栈信息的接口，方便调试和错误定位
 - 提供跨平台动态库加载接口（如果系统支持的话）
+- 提供io轮询器，针对epoll, poll, select, kqueue进行跨平台封装
+- 提供跨平台上下文切换接口，主要用于协程实现，切换效率非常高（本机macosx测试，1000w次切换，只需50ms）
 
 #### 压缩库
 
@@ -378,9 +391,12 @@ TBOX是一个用c语言实现的跨平台开发库。
 - 支持全局、多行、大小写不敏感等模式
 - 使用pcre, pcre2和posix正则库
 
+#### asio库 (已废弃)
+
+- 请使用协程来进行异步io编程
+
 ## 后续任务
 
-- 添加协程模块以及服务器模块支持
 - 重构xml模块
 - 添加更多的容器和算法
 - 优化更多的libc接口
