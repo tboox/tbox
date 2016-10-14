@@ -26,9 +26,9 @@
  * includes
  */
 #include "dump.h"
-#include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../stream/stream.h"
+#include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation

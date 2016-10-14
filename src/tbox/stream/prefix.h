@@ -29,7 +29,6 @@
 #include "../prefix.h"
 #include "../libc/libc.h"
 #include "../network/url.h"
-#include "../asio/asio.h"
 #include "../memory/memory.h"
 #include "../platform/socket.h"
 

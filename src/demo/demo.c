@@ -65,7 +65,7 @@ static tb_demo_t g_demo[] =
 #endif
 
     // asio
-#ifdef TB_CONFIG_MODULE_HAVE_ASIO
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
 ,   TB_DEMO_MAIN_ITEM(asio_dns)
 ,   TB_DEMO_MAIN_ITEM(asio_http)
 ,   TB_DEMO_MAIN_ITEM(asio_httpd)
@@ -130,7 +130,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(stream_cache)
 ,   TB_DEMO_MAIN_ITEM(stream_charset)
 ,   TB_DEMO_MAIN_ITEM(stream_zip)
-#ifdef TB_CONFIG_MODULE_HAVE_ASIO
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
 ,   TB_DEMO_MAIN_ITEM(stream_transfer_pool)
 ,   TB_DEMO_MAIN_ITEM(stream_async_transfer)
 ,   TB_DEMO_MAIN_ITEM(stream_async_stream_null)

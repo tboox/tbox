@@ -47,7 +47,7 @@ option("smallest")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine"}) do
+for _, module in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "database", "coroutine"}) do
     option(module)
         set_default(true)
         set_showmenu(true)
@@ -89,7 +89,7 @@ target("tbox")
     add_options("info", "float", "wchar", "exception", "deprecated")
 
     -- add modules
-    add_options("xml", "zip", "asio", "hash", "regex", "coroutine", "object", "charset", "database")
+    add_options("xml", "zip", "hash", "regex", "coroutine", "object", "charset", "database")
 
     -- add the common source files
     add_files("*.c") 
@@ -100,7 +100,7 @@ target("tbox")
     add_files("prefix/**.c") 
     add_files("memory/**.c") 
     add_files("string/**.c") 
-    add_files("stream/**.c|**/charset.c|**/zip.c|**async_**.c|transfer_pool.c") 
+    add_files("stream/**.c|**/charset.c|**/zip.c|deprecated/**.c") 
     add_files("network/**.c|impl/ssl/*.c") 
     add_files("algorithm/**.c") 
     add_files("container/**.c|element/obj.c") 
@@ -110,7 +110,7 @@ target("tbox")
     add_files("libm/isqrti.c") 
     add_files("libm/isqrti64.c") 
     add_files("libm/idivi8.c") 
-    add_files("platform/*.c|context.c|exception.c", "platform/impl/*.c|aicp.c")
+    add_files("platform/*.c|context.c|exception.c", "platform/impl/*.c")
 
     -- add the source files for the float type
     if is_option("float") then add_files("libm/*.c") end
@@ -133,12 +133,14 @@ target("tbox")
     end
 
     -- add the source files for the asio module
-    if is_option("asio") then 
-        add_files("asio/*.c|ssl.c")
-        add_files("stream/**async_**.c")
-        add_files("stream/transfer_pool.c")
-        add_files("platform/impl/aicp.c")
-        if is_option("openssl", "polarssl") then add_files("asio/ssl.c") end
+    if is_option("deprecated") then 
+        add_files("asio/deprecated/*.c|ssl.c")
+        add_files("stream/deprecated/**async_**.c")
+        add_files("stream/deprecated/transfer_pool.c")
+        add_files("platform/deprecated/aicp.c")
+        add_files("platform/deprecated/aioo.c")
+        add_files("platform/deprecated/aiop.c")
+        if is_option("openssl", "polarssl") then add_files("asio/deprecated/ssl.c") end
     end
 
     -- add the source files for the coroutine module

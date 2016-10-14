@@ -28,58 +28,34 @@
  * includes
  */
 #include "prefix.h"
-#include "async_stream.h"
-#include "static_stream.h"
-#include "transfer.h"
-#include "transfer_pool.h"
 #include "filter.h"
+#include "transfer.h"
+#include "static_stream.h"
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
+#   include "deprecated/deprecated.h"
+#endif
 
 /*!architecture
  *
  *
  * <pre>   
- *                             wait - loop
- *                              | 
- *                              |                                          - data
- *                            [aioo]                                       |
- *                      ----- stream -------- stream ----------------------- file
- *                      |                        |                         |
- *                      |                        |                         - sock 
- *                      |                        |                         |
- *                      |                        |                         - http
- *                      |                        |           - charset
- *                      |                        |          |
- *                      |                        - filter - |- chunked 
- *  transfer ---------  |                                   |        
- *                      |                                   |- cache
- *                      |                                   |
- *                      |                                    - zip
- *                      |
- *                      ----- stream                
+ *                               
+ *                                - data
+ *                               |
+ *  stream ---------------------  - file
+ *     |                         |
+ *     |                          - sock 
+ *     |                         |
+ *     |                          - http
+ *     |           - charset
+ *     |          |
+ *     - filter - |- chunked 
+ *                |        
+ *                |- cache
+ *                |
+ *                 - zip
+ *                      
  *                                                            
- *                                                                        - loop
- *                                                                 [asio] |
- *                                                                  aicp -| loop
- *                                                                   |    |
- *                                                                   |    - ...                                  - data
- *                                                                 [aico]                                        |
- *                                            -------------------- async_stream -------- async_stream ------------ file
- *                                            |                                       |                          |
- *                                            |                                       |                          - sock
- *                            ----------------                                        |                          |
- *                            |                                                       |                          - http
- *                 -----  transfer                                                    |           - charset
- *                |           |                                                       |          |
- *                |           ----------------                                        - filter - |- chunked 
- *                |                           |                                            |     |        
- *  transfer_pool  -----  transfer            |                                            |     |- cache
- *                |                           |                                            |     |
- *                |                           |                                            |      - zip    
- *                |                           |                                            |
- *                 -----   ...                |                                            |
- *                                            |                                         static_stream - [data, size]
- *                                            |                                     
- *                                            -------------------- async_stream
  * url: 
  * data://base64
  * file://path or unix path: e.g. /root/xxxx/file

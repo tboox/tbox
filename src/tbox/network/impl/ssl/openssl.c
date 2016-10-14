@@ -29,7 +29,6 @@
  */
 #include "prefix.h"
 #include "openssl/openssl.h"
-#include "../../../asio/asio.h"
 #include "../../../utils/utils.h"
 #include "../../../platform/platform.h"
 
@@ -180,7 +179,7 @@ static tb_long_t tb_ssl_sock_wait(tb_cpointer_t priv, tb_size_t code, tb_long_t 
     tb_assert_and_check_return_val(priv, -1);
 
     // wait it
-    return tb_aioo_wait((tb_socket_ref_t)priv, code, timeout);
+    return tb_socket_wait((tb_socket_ref_t)priv, code, timeout);
 }
 static tb_int_t tb_ssl_bio_method_init(BIO* bio)
 {

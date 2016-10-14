@@ -26,7 +26,6 @@
  */
 #include "static_stream.h"
 #include "stream.h"
-#include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../memory/memory.h"

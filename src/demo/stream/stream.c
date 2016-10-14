@@ -305,7 +305,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                 tb_hong_t           save = 0;
                 tb_demo_context_t   context = {0}; 
                 context.verbose     = verbose;
-                if ((save = tb_transfer_done(istream, ostream, limitrate, tb_demo_stream_save_func, &context)) < 0) break;
+                if ((save = tb_transfer(istream, ostream, limitrate, tb_demo_stream_save_func, &context)) < 0) break;
             }
             else tb_option_help(option);
         }
