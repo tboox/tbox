@@ -31,36 +31,36 @@
  */
 
 // the http stream type
-typedef struct __tb_stream_http_impl_t
+typedef struct __tb_stream_http_t
 {
     // the http 
     tb_http_ref_t         http;
 
-}tb_stream_http_impl_t;
+}tb_stream_http_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_stream_http_impl_t* tb_stream_http_impl_cast(tb_stream_ref_t stream)
+static __tb_inline__ tb_stream_http_t* tb_stream_http_cast(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream && tb_stream_type(stream) == TB_STREAM_TYPE_HTTP, tb_null);
 
     // ok?
-    return (tb_stream_http_impl_t*)stream;
+    return (tb_stream_http_t*)stream;
 }
-static tb_bool_t tb_stream_http_impl_open(tb_stream_ref_t stream)
+static tb_bool_t tb_stream_http_open(tb_stream_ref_t stream)
 {
     // check
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->http, tb_false);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    tb_assert_and_check_return_val(stream_http && stream_http->http, tb_false);
 
     // the http status
-    tb_http_status_t const* status = tb_http_status(impl->http);
+    tb_http_status_t const* status = tb_http_status(stream_http->http);
     tb_assert_and_check_return_val(status, tb_false);
 
     // open it
-    tb_bool_t ok = tb_http_open(impl->http);
+    tb_bool_t ok = tb_http_open(stream_http->http);
 
     // save state
     tb_stream_state_set(stream, ok? TB_STATE_OK : status->state);
@@ -68,33 +68,33 @@ static tb_bool_t tb_stream_http_impl_open(tb_stream_ref_t stream)
     // ok?
     return ok;
 }
-static tb_bool_t tb_stream_http_impl_clos(tb_stream_ref_t stream)
+static tb_bool_t tb_stream_http_clos(tb_stream_ref_t stream)
 {
     // check
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->http, tb_false);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    tb_assert_and_check_return_val(stream_http && stream_http->http, tb_false);
 
     // close it
-    return tb_http_clos(impl->http);
+    return tb_http_clos(stream_http->http);
 }
-static tb_void_t tb_stream_http_impl_exit(tb_stream_ref_t stream)
+static tb_void_t tb_stream_http_exit(tb_stream_ref_t stream)
 {
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    if (impl && impl->http) tb_http_exit(impl->http);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    if (stream_http && stream_http->http) tb_http_exit(stream_http->http);
 }
-static tb_void_t tb_stream_http_impl_kill(tb_stream_ref_t stream)
+static tb_void_t tb_stream_http_kill(tb_stream_ref_t stream)
 {
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    if (impl && impl->http) tb_http_kill(impl->http);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    if (stream_http && stream_http->http) tb_http_kill(stream_http->http);
 }
-static tb_long_t tb_stream_http_impl_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_stream_http_read(tb_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->http, -1);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    tb_assert_and_check_return_val(stream_http && stream_http->http, -1);
 
     // the http status
-    tb_http_status_t const* status = tb_http_status(impl->http);
+    tb_http_status_t const* status = tb_http_status(stream_http->http);
     tb_assert_and_check_return_val(status, -1);
 
     // check
@@ -102,7 +102,7 @@ static tb_long_t tb_stream_http_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
     tb_check_return_val(size, 0);
 
     // read data
-    tb_long_t ok = tb_http_read(impl->http, data, size);
+    tb_long_t ok = tb_http_read(stream_http->http, data, size);
 
     // save state
     tb_stream_state_set(stream, ok >= 0? TB_STATE_OK : status->state);
@@ -110,27 +110,27 @@ static tb_long_t tb_stream_http_impl_read(tb_stream_ref_t stream, tb_byte_t* dat
     // ok?
     return ok;
 }
-static tb_bool_t tb_stream_http_impl_seek(tb_stream_ref_t stream, tb_hize_t offset)
+static tb_bool_t tb_stream_http_seek(tb_stream_ref_t stream, tb_hize_t offset)
 {
     // check
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->http, tb_false);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    tb_assert_and_check_return_val(stream_http && stream_http->http, tb_false);
 
     // seek
-    return tb_http_seek(impl->http, offset);
+    return tb_http_seek(stream_http->http, offset);
 }
-static tb_long_t tb_stream_http_impl_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_stream_http_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
 {
     // check
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->http, -1);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    tb_assert_and_check_return_val(stream_http && stream_http->http, -1);
 
     // the http status
-    tb_http_status_t const* status = tb_http_status(impl->http);
+    tb_http_status_t const* status = tb_http_status(stream_http->http);
     tb_assert_and_check_return_val(status, -1);
 
     // wait
-    tb_long_t ok = tb_http_wait(impl->http, wait, timeout);
+    tb_long_t ok = tb_http_wait(stream_http->http, wait, timeout);
 
     // save state
     tb_stream_state_set(stream, ok >= 0? TB_STATE_OK : status->state);
@@ -138,11 +138,11 @@ static tb_long_t tb_stream_http_impl_wait(tb_stream_ref_t stream, tb_size_t wait
     // ok?
     return ok;
 }
-static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
-    tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-    tb_assert_and_check_return_val(impl && impl->http, tb_false);
+    tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+    tb_assert_and_check_return_val(stream_http && stream_http->http, tb_false);
 
     // done
     switch (ctrl)
@@ -154,7 +154,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(psize, tb_false);
 
             // status
-            tb_http_status_t const* status = tb_http_status(impl->http);
+            tb_http_status_t const* status = tb_http_status(stream_http->http);
             tb_assert_and_check_return_val(status, 0);
 
             // get size
@@ -168,7 +168,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(url, tb_false);
         
             // set url
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_URL, url);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_URL, url);
         }
         break;
     case TB_STREAM_CTRL_GET_URL:
@@ -178,7 +178,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(purl, tb_false);
     
             // get url
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_URL, purl);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_URL, purl);
         }
         break;
     case TB_STREAM_CTRL_SET_HOST:
@@ -188,7 +188,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(host, tb_false);
     
             // set host
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_HOST, host);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_HOST, host);
         }
         break;
     case TB_STREAM_CTRL_GET_HOST:
@@ -198,7 +198,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(phost, tb_false); 
 
             // get host
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_HOST, phost);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_HOST, phost);
         }
         break;
     case TB_STREAM_CTRL_SET_PORT:
@@ -208,7 +208,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(port, tb_false);
     
             // set port
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_PORT, port);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_PORT, port);
         }
         break;
     case TB_STREAM_CTRL_GET_PORT:
@@ -218,7 +218,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pport, tb_false);
     
             // get port
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_PORT, pport);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_PORT, pport);
         }
         break;
     case TB_STREAM_CTRL_SET_PATH:
@@ -228,7 +228,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(path, tb_false);
     
             // set path
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_PATH, path);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_PATH, path);
         }
         break;
     case TB_STREAM_CTRL_GET_PATH:
@@ -238,7 +238,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(ppath, tb_false);
     
             // get path
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_PATH, ppath);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_PATH, ppath);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_METHOD:
@@ -247,7 +247,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
     
             // set method
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_METHOD, method);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_METHOD, method);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_METHOD:
@@ -257,7 +257,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pmethod, tb_false);
     
             // get method
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_METHOD, pmethod);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_METHOD, pmethod);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_HEAD:
@@ -271,7 +271,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(val, tb_false);
     
             // set head
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_HEAD, key, val);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_HEAD, key, val);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_HEAD:
@@ -285,7 +285,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pval, tb_false);
     
             // get head
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_HEAD, key, pval);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_HEAD, key, pval);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC:
@@ -294,7 +294,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_http_head_func_t head_func = (tb_http_head_func_t)tb_va_arg(args, tb_http_head_func_t);
 
             // set head_func
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_HEAD_FUNC, head_func);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_HEAD_FUNC, head_func);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_HEAD_FUNC:
@@ -304,7 +304,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(phead_func, tb_false);
 
             // get head_func
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_HEAD_FUNC, phead_func);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_HEAD_FUNC, phead_func);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_HEAD_PRIV:
@@ -313,7 +313,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_pointer_t head_priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
 
             // set head_priv
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_HEAD_PRIV, head_priv);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_HEAD_PRIV, head_priv);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_HEAD_PRIV:
@@ -323,14 +323,14 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(phead_priv, tb_false);
 
             // get head_priv
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_HEAD_PRIV, phead_priv);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_HEAD_PRIV, phead_priv);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_RANGE:
         {
             tb_hize_t bof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
             tb_hize_t eof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_RANGE, bof, eof);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_RANGE, bof, eof);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_RANGE:
@@ -344,7 +344,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(peof, tb_false);
 
             // ok
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_RANGE, pbof, peof);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_RANGE, pbof, peof);
         }
         break;
     case TB_STREAM_CTRL_SET_SSL:
@@ -353,7 +353,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
     
             // set ssl
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_SSL, bssl);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_SSL, bssl);
         }
         break;
     case TB_STREAM_CTRL_GET_SSL:
@@ -363,7 +363,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pssl, tb_false);
     
             // get ssl
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_SSL, pssl);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_SSL, pssl);
         }
         break;
     case TB_STREAM_CTRL_SET_TIMEOUT:
@@ -373,7 +373,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(timeout, tb_false);
     
             // set timeout
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_TIMEOUT, timeout);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_TIMEOUT, timeout);
         }
         break;
     case TB_STREAM_CTRL_GET_TIMEOUT:
@@ -383,7 +383,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(ptimeout, tb_false);
     
             // get timeout
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_POST_URL:
@@ -393,7 +393,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(url, tb_false);
             
             // set url
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_POST_URL, url);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_POST_URL, url);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_POST_URL:
@@ -403,7 +403,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(purl, tb_false);
 
             // get url
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_POST_URL, purl);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_POST_URL, purl);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_POST_DATA:
@@ -415,7 +415,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_size_t           size = (tb_size_t)tb_va_arg(args, tb_size_t);
 
             // set data and size
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_POST_DATA, data, size);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_POST_DATA, data, size);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_POST_DATA:
@@ -426,7 +426,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pdata && psize, tb_false);
 
             // get post data and size
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_POST_DATA, pdata, psize);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_POST_DATA, pdata, psize);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_POST_FUNC:
@@ -435,7 +435,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_http_post_func_t func = (tb_http_post_func_t)tb_va_arg(args, tb_http_post_func_t);
 
             // set post func
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_POST_FUNC, func);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_POST_FUNC, func);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_POST_FUNC:
@@ -445,7 +445,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pfunc, tb_false);
 
             // get post func
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_POST_FUNC, pfunc);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_POST_FUNC, pfunc);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_POST_PRIV:
@@ -454,7 +454,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_cpointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
 
             // set post priv
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_POST_PRIV, priv);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_POST_PRIV, priv);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_POST_PRIV:
@@ -464,7 +464,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(ppriv, tb_false);
 
             // get post priv
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_POST_PRIV, ppriv);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_POST_PRIV, ppriv);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_POST_LRATE:
@@ -473,7 +473,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_size_t lrate = (tb_size_t)tb_va_arg(args, tb_size_t);
 
             // set post lrate
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_POST_LRATE, lrate);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_POST_LRATE, lrate);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_POST_LRATE:
@@ -483,7 +483,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(plrate, tb_false);
 
             // get post lrate
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_POST_LRATE, plrate);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_POST_LRATE, plrate);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP:
@@ -492,7 +492,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_bool_t bunzip = (tb_bool_t)tb_va_arg(args, tb_bool_t);
 
             // set bunzip
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_AUTO_UNZIP, bunzip);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_AUTO_UNZIP, bunzip);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_AUTO_UNZIP:
@@ -502,7 +502,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pbunzip, tb_false);
 
             // get bunzip
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_AUTO_UNZIP, pbunzip);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_AUTO_UNZIP, pbunzip);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_REDIRECT:
@@ -511,7 +511,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_size_t redirect = (tb_size_t)tb_va_arg(args, tb_size_t);
 
             // set redirect
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_REDIRECT, redirect);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_REDIRECT, redirect);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_REDIRECT:
@@ -521,7 +521,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(predirect, tb_false);
 
             // get redirect
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_REDIRECT, predirect);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_REDIRECT, predirect);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_VERSION:
@@ -530,7 +530,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_size_t version = (tb_size_t)tb_va_arg(args, tb_size_t);
 
             // set version
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_VERSION, version);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_VERSION, version);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_VERSION:
@@ -540,7 +540,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pversion, tb_false);
 
             // get version
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_VERSION, pversion);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_VERSION, pversion);
         }
         break;
     case TB_STREAM_CTRL_HTTP_SET_COOKIES:
@@ -549,7 +549,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_cookies_ref_t cookies = (tb_cookies_ref_t)tb_va_arg(args, tb_cookies_ref_t);
 
             // set cookies
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_SET_COOKIES, cookies);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_COOKIES, cookies);
         }
         break;
     case TB_STREAM_CTRL_HTTP_GET_COOKIES:
@@ -559,7 +559,7 @@ static tb_bool_t tb_stream_http_impl_ctrl(tb_stream_ref_t stream, tb_size_t ctrl
             tb_assert_and_check_return_val(pcookies, tb_false);
 
             // get version
-            return tb_http_ctrl(impl->http, TB_HTTP_OPTION_GET_COOKIES, pcookies);
+            return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_COOKIES, pcookies);
         }
         break;
     default:
@@ -580,27 +580,27 @@ tb_stream_ref_t tb_stream_init_http()
     {
         // init stream
         stream = tb_stream_init(    TB_STREAM_TYPE_HTTP
-                                ,   sizeof(tb_stream_http_impl_t)
+                                ,   sizeof(tb_stream_http_t)
                                 ,   0
-                                ,   tb_stream_http_impl_open
-                                ,   tb_stream_http_impl_clos
-                                ,   tb_stream_http_impl_exit
-                                ,   tb_stream_http_impl_ctrl
-                                ,   tb_stream_http_impl_wait
-                                ,   tb_stream_http_impl_read
+                                ,   tb_stream_http_open
+                                ,   tb_stream_http_clos
+                                ,   tb_stream_http_exit
+                                ,   tb_stream_http_ctrl
+                                ,   tb_stream_http_wait
+                                ,   tb_stream_http_read
                                 ,   tb_null
-                                ,   tb_stream_http_impl_seek
+                                ,   tb_stream_http_seek
                                 ,   tb_null
-                                ,   tb_stream_http_impl_kill);
+                                ,   tb_stream_http_kill);
         tb_assert_and_check_break(stream);
 
-        // init the stream impl
-        tb_stream_http_impl_t* impl = tb_stream_http_impl_cast(stream);
-        tb_assert_and_check_break(impl);
+        // init the http stream
+        tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
+        tb_assert_and_check_break(stream_http);
     
         // init http
-        impl->http = tb_http_init();
-        tb_assert_and_check_break(impl->http);
+        stream_http->http = tb_http_init();
+        tb_assert_and_check_break(stream_http->http);
     
         // ok
         ok = tb_true;

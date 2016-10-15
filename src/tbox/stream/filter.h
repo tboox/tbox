@@ -46,7 +46,7 @@ __tb_extern_c_enter__
  */
 
 /// the filter type enum
-typedef enum __tb_stream_filter_type_e
+typedef enum __tb_filter_type_e
 {
     TB_STREAM_FILTER_TYPE_NONE      = 0
 ,   TB_STREAM_FILTER_TYPE_ZIP       = 1
@@ -54,10 +54,10 @@ typedef enum __tb_stream_filter_type_e
 ,   TB_STREAM_FILTER_TYPE_CHARSET   = 3
 ,   TB_STREAM_FILTER_TYPE_CHUNKED   = 4
 
-}tb_stream_filter_type_e;
+}tb_filter_type_e;
 
 /// the filter ctrl enum
-typedef enum __tb_stream_filter_ctrl_e
+typedef enum __tb_filter_ctrl_e
 {
     TB_STREAM_FILTER_CTRL_NONE                  = 0
 
@@ -71,10 +71,10 @@ typedef enum __tb_stream_filter_ctrl_e
 ,   TB_STREAM_FILTER_CTRL_CHARSET_SET_FTYPE     = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_CHARSET, 3)
 ,   TB_STREAM_FILTER_CTRL_CHARSET_SET_TTYPE     = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_CHARSET, 4)
 
-}tb_stream_filter_ctrl_e;
+}tb_filter_ctrl_e;
 
-/// the stream filter ref type
-typedef __tb_typeref__(stream_filter);
+/// the filter ref type
+typedef __tb_typeref__(filter);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -87,7 +87,7 @@ typedef __tb_typeref__(stream_filter);
  *
  * @return              the filter
  */
-tb_stream_filter_ref_t  tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t action);
+tb_filter_ref_t         tb_filter_init_from_zip(tb_size_t algo, tb_size_t action);
 
 /*! init filter from charset
  *
@@ -96,7 +96,7 @@ tb_stream_filter_ref_t  tb_stream_filter_init_from_zip(tb_size_t algo, tb_size_t
  *
  * @return              the filter
  */
-tb_stream_filter_ref_t  tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t to);
+tb_filter_ref_t         tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
 
 /*! init filter from chunked
  *
@@ -104,7 +104,7 @@ tb_stream_filter_ref_t  tb_stream_filter_init_from_charset(tb_size_t fr, tb_size
  *
  * @return              the filter
  */
-tb_stream_filter_ref_t  tb_stream_filter_init_from_chunked(tb_bool_t dechunked);
+tb_filter_ref_t         tb_filter_init_from_chunked(tb_bool_t dechunked);
 
 /*! init filter from cache
  *
@@ -112,13 +112,13 @@ tb_stream_filter_ref_t  tb_stream_filter_init_from_chunked(tb_bool_t dechunked);
  *
  * @return              the filter
  */
-tb_stream_filter_ref_t  tb_stream_filter_init_from_cache(tb_size_t size);
+tb_filter_ref_t         tb_filter_init_from_cache(tb_size_t size);
 
 /*! exit filter
  *
  * @param filter        the filter
  */
-tb_void_t               tb_stream_filter_exit(tb_stream_filter_ref_t filter);
+tb_void_t               tb_filter_exit(tb_filter_ref_t filter);
 
 /*! open filter
  *
@@ -126,13 +126,13 @@ tb_void_t               tb_stream_filter_exit(tb_stream_filter_ref_t filter);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_filter_open(tb_stream_filter_ref_t filter);
+tb_bool_t               tb_filter_open(tb_filter_ref_t filter);
 
 /*! clos filter
  *
  * @param filter        the filter
  */
-tb_void_t               tb_stream_filter_clos(tb_stream_filter_ref_t filter);
+tb_void_t               tb_filter_clos(tb_filter_ref_t filter);
 
 /*! ctrl filter
  *
@@ -141,7 +141,7 @@ tb_void_t               tb_stream_filter_clos(tb_stream_filter_ref_t filter);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_filter_ctrl(tb_stream_filter_ref_t filter, tb_size_t ctrl, ...);
+tb_bool_t               tb_filter_ctrl(tb_filter_ref_t filter, tb_size_t ctrl, ...);
 
 /*! is eof for the filter input data, but the output maybe exists the left data and need flush it
  *
@@ -149,14 +149,14 @@ tb_bool_t               tb_stream_filter_ctrl(tb_stream_filter_ref_t filter, tb_
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_filter_beof(tb_stream_filter_ref_t filter);
+tb_bool_t               tb_filter_beof(tb_filter_ref_t filter);
 
 /*! limit the input size for filter
  *
  * @param filter        the filter
  * @param limit         the input limit size
  */
-tb_void_t               tb_stream_filter_limit(tb_stream_filter_ref_t filter, tb_hong_t limit);
+tb_void_t               tb_filter_limit(tb_filter_ref_t filter, tb_hong_t limit);
 
 /*! push data to the filter input data
  *
@@ -164,7 +164,7 @@ tb_void_t               tb_stream_filter_limit(tb_stream_filter_ref_t filter, tb
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stream_filter_push(tb_stream_filter_ref_t filter, tb_byte_t const* data, tb_size_t size);
+tb_bool_t               tb_filter_push(tb_filter_ref_t filter, tb_byte_t const* data, tb_size_t size);
 
 /*! spak filter
  *
@@ -177,7 +177,7 @@ tb_bool_t               tb_stream_filter_push(tb_stream_filter_ref_t filter, tb_
  *
  * @return              > 0: the output size, 0: continue, -1: end
  */
-tb_long_t               tb_stream_filter_spak(tb_stream_filter_ref_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync);
+tb_long_t               tb_filter_spak(tb_filter_ref_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync);
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////

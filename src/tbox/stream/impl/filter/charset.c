@@ -31,10 +31,10 @@
  */
 
 // the charset filter type
-typedef struct __tb_stream_filter_charset_t
+typedef struct __tb_filter_charset_t
 {
     // the filter base
-    tb_stream_filter_impl_t     base;
+    tb_filter_t     base;
 
     // the from type
     tb_size_t                   ftype;
@@ -42,21 +42,21 @@ typedef struct __tb_stream_filter_charset_t
     // the to type
     tb_size_t                   ttype;
 
-}tb_stream_filter_charset_t;
+}tb_filter_charset_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_stream_filter_charset_t* tb_stream_filter_charset_cast(tb_stream_filter_impl_t* filter)
+static __tb_inline__ tb_filter_charset_t* tb_filter_charset_cast(tb_filter_t* filter)
 {
     // check
     tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHARSET, tb_null);
-    return (tb_stream_filter_charset_t*)filter;
+    return (tb_filter_charset_t*)filter;
 }
-static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_impl_t* filter, tb_static_stream_ref_t istream, tb_static_stream_ref_t ostream, tb_long_t sync)
+static tb_long_t tb_filter_charset_spak(tb_filter_t* filter, tb_static_stream_ref_t istream, tb_static_stream_ref_t ostream, tb_long_t sync)
 {
     // check
-    tb_stream_filter_charset_t* cfilter = tb_stream_filter_charset_cast(filter);
+    tb_filter_charset_t* cfilter = tb_filter_charset_cast(filter);
     tb_assert_and_check_return_val(cfilter && TB_CHARSET_TYPE_OK(cfilter->ftype) && TB_CHARSET_TYPE_OK(cfilter->ttype) && istream && ostream, -1);
 
     // spak it
@@ -68,10 +68,10 @@ static tb_long_t tb_stream_filter_charset_spak(tb_stream_filter_impl_t* filter, 
     // ok?
     return real;
 }
-static tb_bool_t tb_stream_filter_charset_ctrl(tb_stream_filter_impl_t* filter, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_filter_charset_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_va_list_t args)
 {
     // check
-    tb_stream_filter_charset_t* cfilter = tb_stream_filter_charset_cast(filter);
+    tb_filter_charset_t* cfilter = tb_filter_charset_cast(filter);
     tb_assert_and_check_return_val(cfilter && ctrl, tb_false);
 
     // ctrl
@@ -126,21 +126,21 @@ static tb_bool_t tb_stream_filter_charset_ctrl(tb_stream_filter_impl_t* filter, 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_stream_filter_ref_t tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_t to)
+tb_filter_ref_t tb_filter_init_from_charset(tb_size_t fr, tb_size_t to)
 {
     // done
     tb_bool_t                       ok = tb_false;
-    tb_stream_filter_charset_t*     filter = tb_null;
+    tb_filter_charset_t*     filter = tb_null;
     do
     {
         // make filter
-        filter = tb_malloc0_type(tb_stream_filter_charset_t);
+        filter = tb_malloc0_type(tb_filter_charset_t);
         tb_assert_and_check_break(filter);
 
         // init filter 
-        if (!tb_stream_filter_impl_init((tb_stream_filter_impl_t*)filter, TB_STREAM_FILTER_TYPE_CHARSET)) break;
-        filter->base.spak = tb_stream_filter_charset_spak;
-        filter->base.ctrl = tb_stream_filter_charset_ctrl;
+        if (!tb_filter_init((tb_filter_t*)filter, TB_STREAM_FILTER_TYPE_CHARSET)) break;
+        filter->base.spak = tb_filter_charset_spak;
+        filter->base.ctrl = tb_filter_charset_ctrl;
 
         // init the from and to charset
         filter->ftype = fr;
@@ -155,11 +155,11 @@ tb_stream_filter_ref_t tb_stream_filter_init_from_charset(tb_size_t fr, tb_size_
     if (!ok)
     {
         // exit filter
-        tb_stream_filter_exit((tb_stream_filter_ref_t)filter);
+        tb_filter_exit((tb_filter_ref_t)filter);
         filter = tb_null;
     }
 
     // ok?
-    return (tb_stream_filter_ref_t)filter;
+    return (tb_filter_ref_t)filter;
 }
 

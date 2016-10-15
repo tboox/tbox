@@ -26,84 +26,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../../filter.h"
-#include "../../static_stream.h"
-#include "../../../memory/memory.h"
+#include "../prefix.h"
+#include "../filter.h"
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the filter impl type
-typedef struct __tb_stream_filter_impl_t
-{
-    // the type
-    tb_size_t           type;
-
-    // the input is eof?
-    tb_bool_t           beof;
-
-    // is opened?
-    tb_bool_t           bopened;
-
-    // the input limit size 
-    tb_hong_t           limit;
-    
-    // the input offset 
-    tb_hize_t           offset;
-
-    // the input data
-    tb_buffer_t         idata;
-
-    // the output data 
-    tb_queue_buffer_t   odata;
-
-    // the open
-    tb_bool_t           (*open)(struct __tb_stream_filter_impl_t* impl);
-
-    // the clos
-    tb_void_t           (*clos)(struct __tb_stream_filter_impl_t* impl);
-
-    // the spak
-    tb_long_t           (*spak)(struct __tb_stream_filter_impl_t* impl, tb_static_stream_ref_t istream, tb_static_stream_ref_t ostream, tb_long_t sync);
-
-    // the ctrl
-    tb_bool_t           (*ctrl)(struct __tb_stream_filter_impl_t* impl, tb_size_t ctrl, tb_va_list_t args);
-
-    // the exit
-    tb_void_t           (*exit)(struct __tb_stream_filter_impl_t* impl);
-
-}tb_stream_filter_impl_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-static __tb_inline__ tb_bool_t tb_stream_filter_impl_init(tb_stream_filter_impl_t* impl, tb_size_t type)
-{
-    // check
-    tb_assert_and_check_return_val(impl, tb_false);
-    
-    // init type
-    impl->type = type;
-
-    // init the input eof
-    impl->beof = tb_false;
-
-    // init input limit size
-    impl->limit = -1;
-
-    // init the input offset
-    impl->offset = 0;
-
-    // init idata
-    if (!tb_buffer_init(&impl->idata)) return tb_false;
-
-    // init odata
-    if (!tb_queue_buffer_init(&impl->odata, 8192)) return tb_false;
-
-    // ok
-    return tb_true;
-}
 
 #endif
