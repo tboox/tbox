@@ -50,7 +50,7 @@ typedef struct __tb_filter_charset_t
 static __tb_inline__ tb_filter_charset_t* tb_filter_charset_cast(tb_filter_t* filter)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHARSET, tb_null);
+    tb_assert_and_check_return_val(filter && filter->type == TB_FILTER_TYPE_CHARSET, tb_null);
     return (tb_filter_charset_t*)filter;
 }
 static tb_long_t tb_filter_charset_spak(tb_filter_t* filter, tb_static_stream_ref_t istream, tb_static_stream_ref_t ostream, tb_long_t sync)
@@ -77,7 +77,7 @@ static tb_bool_t tb_filter_charset_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_
     // ctrl
     switch (ctrl)
     {
-    case TB_STREAM_FILTER_CTRL_CHARSET_GET_FTYPE:
+    case TB_FILTER_CTRL_CHARSET_GET_FTYPE:
         {
             // the pftype
             tb_size_t* pftype = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -89,7 +89,7 @@ static tb_bool_t tb_filter_charset_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_
             // ok
             return tb_true;
         }
-    case TB_STREAM_FILTER_CTRL_CHARSET_SET_FTYPE:
+    case TB_FILTER_CTRL_CHARSET_SET_FTYPE:
         {
             // set ftype
             cfilter->ftype = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -97,7 +97,7 @@ static tb_bool_t tb_filter_charset_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_
             // ok
             return tb_true;
         }
-    case TB_STREAM_FILTER_CTRL_CHARSET_GET_TTYPE:
+    case TB_FILTER_CTRL_CHARSET_GET_TTYPE:
         {
             // the pttype
             tb_size_t* pttype = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -109,7 +109,7 @@ static tb_bool_t tb_filter_charset_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_
             // ok
             return tb_true;
         }
-    case TB_STREAM_FILTER_CTRL_CHARSET_SET_TTYPE:
+    case TB_FILTER_CTRL_CHARSET_SET_TTYPE:
         {
             // set ttype
             cfilter->ttype = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -138,7 +138,7 @@ tb_filter_ref_t tb_filter_init_from_charset(tb_size_t fr, tb_size_t to)
         tb_assert_and_check_break(filter);
 
         // init filter 
-        if (!tb_filter_init((tb_filter_t*)filter, TB_STREAM_FILTER_TYPE_CHARSET)) break;
+        if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CHARSET)) break;
         filter->base.spak = tb_filter_charset_spak;
         filter->base.ctrl = tb_filter_charset_ctrl;
 

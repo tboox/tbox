@@ -21,8 +21,8 @@
  * @defgroup    stream
  *
  */
-#ifndef TB_STREAM_FILTER_H
-#define TB_STREAM_FILTER_H
+#ifndef TB_FILTER_H
+#define TB_FILTER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -33,8 +33,8 @@
  * macros
  */
 
-/// the stream filter ctrl
-#define TB_STREAM_FILTER_CTRL(type, ctrl)               (((type) << 16) | (ctrl))
+/// the filter ctrl
+#define TB_FILTER_CTRL(type, ctrl)               (((type) << 16) | (ctrl))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -48,28 +48,28 @@ __tb_extern_c_enter__
 /// the filter type enum
 typedef enum __tb_filter_type_e
 {
-    TB_STREAM_FILTER_TYPE_NONE      = 0
-,   TB_STREAM_FILTER_TYPE_ZIP       = 1
-,   TB_STREAM_FILTER_TYPE_CACHE     = 2
-,   TB_STREAM_FILTER_TYPE_CHARSET   = 3
-,   TB_STREAM_FILTER_TYPE_CHUNKED   = 4
+    TB_FILTER_TYPE_NONE      = 0
+,   TB_FILTER_TYPE_ZIP       = 1
+,   TB_FILTER_TYPE_CACHE     = 2
+,   TB_FILTER_TYPE_CHARSET   = 3
+,   TB_FILTER_TYPE_CHUNKED   = 4
 
 }tb_filter_type_e;
 
 /// the filter ctrl enum
 typedef enum __tb_filter_ctrl_e
 {
-    TB_STREAM_FILTER_CTRL_NONE                  = 0
+    TB_FILTER_CTRL_NONE                  = 0
 
-,   TB_STREAM_FILTER_CTRL_ZIP_GET_ALGO          = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 1)
-,   TB_STREAM_FILTER_CTRL_ZIP_GET_ACTION        = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 2)
-,   TB_STREAM_FILTER_CTRL_ZIP_SET_ALGO          = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 3)
-,   TB_STREAM_FILTER_CTRL_ZIP_SET_ACTION        = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_ZIP, 4)
+,   TB_FILTER_CTRL_ZIP_GET_ALGO          = TB_FILTER_CTRL(TB_FILTER_TYPE_ZIP, 1)
+,   TB_FILTER_CTRL_ZIP_GET_ACTION        = TB_FILTER_CTRL(TB_FILTER_TYPE_ZIP, 2)
+,   TB_FILTER_CTRL_ZIP_SET_ALGO          = TB_FILTER_CTRL(TB_FILTER_TYPE_ZIP, 3)
+,   TB_FILTER_CTRL_ZIP_SET_ACTION        = TB_FILTER_CTRL(TB_FILTER_TYPE_ZIP, 4)
 
-,   TB_STREAM_FILTER_CTRL_CHARSET_GET_FTYPE     = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_CHARSET, 1)
-,   TB_STREAM_FILTER_CTRL_CHARSET_GET_TTYPE     = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_CHARSET, 2)
-,   TB_STREAM_FILTER_CTRL_CHARSET_SET_FTYPE     = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_CHARSET, 3)
-,   TB_STREAM_FILTER_CTRL_CHARSET_SET_TTYPE     = TB_STREAM_FILTER_CTRL(TB_STREAM_FILTER_TYPE_CHARSET, 4)
+,   TB_FILTER_CTRL_CHARSET_GET_FTYPE     = TB_FILTER_CTRL(TB_FILTER_TYPE_CHARSET, 1)
+,   TB_FILTER_CTRL_CHARSET_GET_TTYPE     = TB_FILTER_CTRL(TB_FILTER_TYPE_CHARSET, 2)
+,   TB_FILTER_CTRL_CHARSET_SET_FTYPE     = TB_FILTER_CTRL(TB_FILTER_TYPE_CHARSET, 3)
+,   TB_FILTER_CTRL_CHARSET_SET_TTYPE     = TB_FILTER_CTRL(TB_FILTER_TYPE_CHARSET, 4)
 
 }tb_filter_ctrl_e;
 

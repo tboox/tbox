@@ -400,12 +400,12 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
                             if (!tb_stream_ctrl(impl->fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, impl->istream)) break;
 
                             // the filter
-                            tb_stream_filter_ref_t filter = tb_null;
+                            tb_filter_ref_t filter = tb_null;
                             if (!tb_stream_ctrl(impl->fstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                             tb_assert_and_check_break(filter);
 
                             // ctrl filter
-                            if (!tb_stream_filter_ctrl(filter, TB_STREAM_FILTER_CTRL_CHARSET_SET_FTYPE, charset)) break;
+                            if (!tb_filter_ctrl(filter, TB_FILTER_CTRL_CHARSET_SET_FTYPE, charset)) break;
                         }
 
                         // open the filter stream

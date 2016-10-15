@@ -58,7 +58,7 @@ typedef struct __tb_filter_chunked_t
 static __tb_inline__ tb_filter_chunked_t* tb_filter_chunked_cast(tb_filter_t* filter)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_CHUNKED, tb_null);
+    tb_assert_and_check_return_val(filter && filter->type == TB_FILTER_TYPE_CHUNKED, tb_null);
     return (tb_filter_chunked_t*)filter;
 }
 /* chunked_data
@@ -251,7 +251,7 @@ tb_filter_ref_t tb_filter_init_from_chunked(tb_bool_t dechunked)
         tb_assert_and_check_break(filter);
 
         // init filter 
-        if (!tb_filter_init((tb_filter_t*)filter, TB_STREAM_FILTER_TYPE_CHUNKED)) break;
+        if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CHUNKED)) break;
         filter->base.spak = tb_filter_chunked_spak;
         filter->base.clos = tb_filter_chunked_clos;
         filter->base.exit = tb_filter_chunked_exit;

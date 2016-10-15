@@ -35,7 +35,7 @@ If you want to know more, please refer to:
 
 #### The coroutine library 
 
-- Provides high-performance coroutine switch(1000w switchs: 200ms on mac pro）
+- Provides high-performance coroutine switch(refer to [benchbox](https://github.com/waruqi/benchbox))
 - Supports arm, arm64, x86, x86_64 ..
 - Provides channel interfaces
 - Supports io socket and stream operation in coroutine
@@ -289,7 +289,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 #### 协程库
 
-- 快速高效的协程切换支持（本机macosx测试，1000w次切换，只需200ms）
+- 快速高效的协程切换支持（具体性能参考：[benchbox](https://github.com/waruqi/benchbox)）
 - 提供跨平台支持，核心切换算法参考boost，并且对其进行重写和优化，目前支持架构：x86, x86_64, arm, arm64
 - 提供channel协程间数据通信支持，基于生产、消费者模型
 - socket、stream都模块原生支持协程，并且可在线程和协程间进行无缝切换
@@ -363,7 +363,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 - 提供获取函数堆栈信息的接口，方便调试和错误定位
 - 提供跨平台动态库加载接口（如果系统支持的话）
 - 提供io轮询器，针对epoll, poll, select, kqueue进行跨平台封装
-- 提供跨平台上下文切换接口，主要用于协程实现，切换效率非常高（本机macosx测试，1000w次切换，只需50ms）
+- 提供跨平台上下文切换接口，主要用于协程实现，切换效率非常高
 
 #### 压缩库
 

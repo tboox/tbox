@@ -776,12 +776,12 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
                 if (p < e)
                 {
                     // the filter
-                    tb_stream_filter_ref_t filter = tb_null;
+                    tb_filter_ref_t filter = tb_null;
                     if (!tb_async_stream_ctrl(impl->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 
                     // push data
-                    if (!tb_stream_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
+                    if (!tb_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
                     p = e;
                 }
 
@@ -808,21 +808,21 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_async_stream_ref_t stream, tb_si
                 tb_assert_and_check_break(impl->zstream);
 
                 // the filter
-                tb_stream_filter_ref_t filter = tb_null;
+                tb_filter_ref_t filter = tb_null;
                 if (!tb_async_stream_ctrl(impl->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                 tb_assert_and_check_break(filter);
 
                 // ctrl filter
-                if (!tb_stream_filter_ctrl(filter, TB_STREAM_FILTER_CTRL_ZIP_SET_ALGO, impl->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE)) break;
+                if (!tb_filter_ctrl(filter, TB_FILTER_CTRL_ZIP_SET_ALGO, impl->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE)) break;
 
                 // limit the filter input size
-                if (impl->status.content_size > 0) tb_stream_filter_limit(filter, impl->status.content_size);
+                if (impl->status.content_size > 0) tb_filter_limit(filter, impl->status.content_size);
 
                 // push the left data to filter
                 if (p < e)
                 {
                     // push data
-                    if (!tb_stream_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
+                    if (!tb_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
                     p = e;
                 }
 

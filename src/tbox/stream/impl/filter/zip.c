@@ -54,7 +54,7 @@ typedef struct __tb_filter_zip_t
 static __tb_inline__ tb_filter_zip_t* tb_filter_zip_cast(tb_filter_t* filter)
 {
     // check
-    tb_assert_and_check_return_val(filter && filter->type == TB_STREAM_FILTER_TYPE_ZIP, tb_null);
+    tb_assert_and_check_return_val(filter && filter->type == TB_FILTER_TYPE_ZIP, tb_null);
     return (tb_filter_zip_t*)filter;
 }
 static tb_bool_t tb_filter_zip_open(tb_filter_t* filter)
@@ -108,7 +108,7 @@ static tb_bool_t tb_filter_zip_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_va_l
     // ctrl
     switch (ctrl)
     {
-    case TB_STREAM_FILTER_CTRL_ZIP_GET_ALGO:
+    case TB_FILTER_CTRL_ZIP_GET_ALGO:
         {
             // the palgo
             tb_size_t* palgo = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -120,7 +120,7 @@ static tb_bool_t tb_filter_zip_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_va_l
             // ok
             return tb_true;
         }
-    case TB_STREAM_FILTER_CTRL_ZIP_SET_ALGO:
+    case TB_FILTER_CTRL_ZIP_SET_ALGO:
         {
             // set algo
             zfilter->algo = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -128,7 +128,7 @@ static tb_bool_t tb_filter_zip_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_va_l
             // ok
             return tb_true;
         }
-    case TB_STREAM_FILTER_CTRL_ZIP_GET_ACTION:
+    case TB_FILTER_CTRL_ZIP_GET_ACTION:
         {
             // the paction
             tb_size_t* paction = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -140,7 +140,7 @@ static tb_bool_t tb_filter_zip_ctrl(tb_filter_t* filter, tb_size_t ctrl, tb_va_l
             // ok
             return tb_true;
         }
-    case TB_STREAM_FILTER_CTRL_ZIP_SET_ACTION:
+    case TB_FILTER_CTRL_ZIP_SET_ACTION:
         {
             // set action
             zfilter->action = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -169,7 +169,7 @@ tb_filter_ref_t tb_filter_init_from_zip(tb_size_t algo, tb_size_t action)
         tb_assert_and_check_break(filter);
 
         // init filter 
-        if (!tb_filter_init((tb_filter_t*)filter, TB_STREAM_FILTER_TYPE_ZIP)) break;
+        if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_ZIP)) break;
         filter->base.open   = tb_filter_zip_open;
         filter->base.clos   = tb_filter_zip_clos;
         filter->base.spak   = tb_filter_zip_spak;
