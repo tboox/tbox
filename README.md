@@ -29,15 +29,16 @@ If you want to know more, please refer to:
 
 - Supports file, data, http and socket source
 - Supports the stream filter for gzip, charset and...
-- Implements transfer for two stream
-- Implements transfer pool (asio) for multi-stream
+- Implements stream transfer
 - Implements the static buffer stream for parsing data
+- Supports coroutine and implements asynchronous operation
 
 #### The coroutine library 
 
 - Provides high-performance coroutine switch(refer to [benchbox](https://github.com/waruqi/benchbox))
 - Supports arm, arm64, x86, x86_64 ..
 - Provides channel interfaces
+- Provides semaphore and lock interfaces
 - Supports io socket and stream operation in coroutine
 - Provides some io servers (http ..) using coroutine
 
@@ -279,12 +280,10 @@ TBOX是一个用c语言实现的跨平台开发库。
 针对http、file、socket、data等流数据，实现统一接口进行读写，并且支持: 阻塞、非阻塞、异步 三种读写模式。
 支持中间增加多层filter流进行流过滤，实现边读取，内部边进行解压、编码转换、加密等操作，极大的减少了内存使用。 
 
-主要提供以下特性：
+主要提供以下模块：
 
-- `stream`：通用非阻塞流，用于一般的单独io处理。
-- `async_stream`：利用asio实现的纯异步流，基于回调模式，可同时处理大量并发io。
-- `transfer`：传输器，维护两路流的传输，对`async_stream`的使用进行更上层的封装，用其可以很方便的实现下载、上传、复制等io传输操作。
-- `transfer_pool`：传输池，基于asio，维护大量并发的传输，可以用于实现爬虫、批量下载等等。
+- `stream`：通用非阻塞流，用于一般的单独io处理，同时支持协程以实现异步传输。
+- `transfer`：流传输器，维护两路流的传输。
 - `static_stream`：针对静态数据buffer优化的静态流，用于轻量快速的数据解析。
 
 #### 协程库
@@ -292,6 +291,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 - 快速高效的协程切换支持（具体性能参考：[benchbox](https://github.com/waruqi/benchbox)）
 - 提供跨平台支持，核心切换算法参考boost，并且对其进行重写和优化，目前支持架构：x86, x86_64, arm, arm64
 - 提供channel协程间数据通信支持，基于生产、消费者模型
+- 提供信号量、协程锁支持
 - socket、stream都模块原生支持协程，并且可在线程和协程间进行无缝切换
 - 提供http、file等基于协程的简单服务器实例，只需几百行代码，就可以从socket开始写个高性能io服务器，代码逻辑比异步回调模式更加清晰
 
