@@ -65,25 +65,25 @@ typedef struct __tb_co_scheduler_t
      *
      * coroutine->scheduler == (tb_co_scheduler_ref_t)coroutine
      */
-    tb_coroutine_t              original;
+    tb_coroutine_t                  original;
 
     // is stopped
-    tb_bool_t                   stopped;
+    tb_bool_t                       stopped;
 
     // the running coroutine
-    tb_coroutine_t*             running;
+    tb_coroutine_t*                 running;
 
     // the io scheduler
-    struct __tb_co_scheduler_io_t* scheduler_io;
+    struct __tb_co_scheduler_io_t*  scheduler_io;
 
     // the dead coroutines
-    tb_list_entry_head_t        coroutines_dead;
+    tb_list_entry_head_t            coroutines_dead;
 
     // the ready coroutines
-    tb_list_entry_head_t        coroutines_ready;
+    tb_list_entry_head_t            coroutines_ready;
 
     // the suspend coroutines
-    tb_list_entry_head_t        coroutines_suspend;
+    tb_list_entry_head_t            coroutines_suspend;
 
 }tb_co_scheduler_t;
 

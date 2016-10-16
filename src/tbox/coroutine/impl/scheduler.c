@@ -277,7 +277,7 @@ tb_void_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* c
         tb_list_entry_remove(&scheduler->coroutines_suspend, &coroutine->entry);
 
         // pass the user private data
-        coroutine->resumed_priv = priv;
+        coroutine->suspend_retval = priv;
 
         // make it as ready
         tb_co_scheduler_make_ready(scheduler, coroutine);
@@ -297,7 +297,7 @@ tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler)
     tb_trace_d("suspend coroutine(%p)", scheduler->running);
 
     // clear the resumed private data first
-    scheduler->running->resumed_priv = tb_null;
+    scheduler->running->suspend_retval = tb_null;
 
     // make the running coroutine as suspend
     tb_co_scheduler_make_suspend(scheduler, scheduler->running);
@@ -309,7 +309,7 @@ tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler)
     tb_assert(scheduler->running);
 
     // return the user private data from resume(priv)
-    return scheduler->running->resumed_priv;
+    return scheduler->running->suspend_retval;
 }
 tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
 {

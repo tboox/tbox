@@ -62,7 +62,7 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
 
     // get the current coroutine
     tb_coroutine_t* coroutine = (tb_coroutine_t*)tb_coroutine_self();
-    tb_assert(coroutine && coroutine->func);
+    tb_assert(coroutine && coroutine->rs.func.func);
 
 #ifdef __tb_debug__
     // check it
@@ -73,7 +73,7 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
     tb_trace_d("entry: %p stack: %p - %p from coroutine(%p)", coroutine, coroutine->stackbase - coroutine->stacksize, coroutine->stackbase, coroutine_from);
 
     // call the coroutine function
-    coroutine->func(coroutine->func_priv);
+    coroutine->rs.func.func(coroutine->rs.func.priv);
 
     // finish the current coroutine and switch to the other coroutine
     tb_co_scheduler_finish((tb_co_scheduler_t*)tb_co_scheduler_self());
@@ -125,8 +125,8 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
         tb_bits_set_u16_ne(coroutine->stackbase, TB_COROUTINE_STACK_GUARD);
 
         // init function and user private data
-        coroutine->func      = func;
-        coroutine->func_priv = priv;
+        coroutine->rs.func.func = func;
+        coroutine->rs.func.priv = priv;
 
         // init state
         coroutine->state = TB_STATE_READY;
@@ -189,8 +189,8 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
         tb_bits_set_u16_ne(coroutine->stackbase, TB_COROUTINE_STACK_GUARD);
 
         // init function and user private data
-        coroutine->func         = func;
-        coroutine->func_priv    = priv;
+        coroutine->rs.func.func = func;
+        coroutine->rs.func.priv = priv;
 
         // init state
         coroutine->state = TB_STATE_READY;

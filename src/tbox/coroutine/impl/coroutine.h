@@ -69,20 +69,46 @@ __tb_extern_c_enter__
  * types
  */
 
+// the coroutine function type
+typedef struct __tb_coroutine_rs_func_t
+{
+    // the function 
+    tb_coroutine_func_t             func;
+
+    // the user private data as the argument of function
+    tb_cpointer_t                   priv;
+
+}tb_coroutine_rs_func_t;
+
+// the coroutine wait type
+typedef struct __tb_coroutine_rs_wait_t
+{
+    /* the timer task pointer for ltimer or timer
+     *
+     * for ltimer:  task
+     * for timer:   task & 0x1
+     */
+    tb_cpointer_t                   task;
+
+    // the socket
+    tb_socket_ref_t                 sock;
+
+}tb_coroutine_rs_wait_t;
+
 // the coroutine type
 typedef struct __tb_coroutine_t
 {
     // the scheduler
-    tb_co_scheduler_ref_t      scheduler;
+    tb_co_scheduler_ref_t           scheduler;
 
     // the context 
-    tb_context_ref_t        context;
+    tb_context_ref_t                context;
 
     // the stack base (top)
-    tb_byte_t*              stackbase;
+    tb_byte_t*                      stackbase;
 
     // the stack size
-    tb_size_t               stacksize;
+    tb_size_t                       stacksize;
 
     /* the state
      * 
@@ -91,25 +117,33 @@ typedef struct __tb_coroutine_t
      * - TB_STATE_SUSPEND
      * - TB_STATE_DEAD
      */
-    tb_size_t               state;
-
-    // the function 
-    tb_coroutine_func_t     func;
-
-    // the user private data as the argument of function
-    tb_cpointer_t           func_priv;
+    tb_size_t                       state;
 
     // the user private data as the argument of resume() and the return value of suspend()
-    tb_cpointer_t           resumed_priv;
+    tb_cpointer_t                   suspend_retval;
 
-    // the private data for io
-    tb_cpointer_t           io_priv[3];
+    // the passed private data between resume() and suspend()
+    union 
+    {
+        // the function
+        tb_coroutine_rs_func_t      func;
 
-    // the list entry
-    tb_list_entry_t         entry;
+        // the arguments for wait()
+        tb_coroutine_rs_wait_t      waiting;
+
+        // the list entry
+        tb_list_entry_t             entry;
+
+        // the single entry
+        tb_single_list_entry_t      single_entry;
+
+    }                               rs;
+
+    // the list entry for ready, suspend and dead lists
+    tb_list_entry_t                 entry;
 
     // the guard
-    tb_uint16_t             guard;
+    tb_uint16_t                     guard;
 
 }tb_coroutine_t;
 

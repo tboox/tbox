@@ -45,7 +45,7 @@ typedef struct __tb_co_scheduler_io_t
     tb_bool_t           stop;
 
     // the scheduler 
-    tb_co_scheduler_t*     scheduler;
+    tb_co_scheduler_t*  scheduler;
 
     // the poller
     tb_poller_ref_t     poller;
