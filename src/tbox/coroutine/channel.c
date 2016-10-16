@@ -34,7 +34,6 @@
 #include "channel.h"
 #include "coroutine.h"
 #include "scheduler.h"
-#include "../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -43,12 +42,21 @@
 // the coroutine channel type
 typedef struct __tb_co_channel_t
 {
+    // the queue
+    tb_circle_queue_ref_t   queue;
+
+    // the send semaphore 
+    tb_co_semaphore_ref_t   send;
+
+    // the recv semaphore 
+    tb_co_semaphore_ref_t   recv;
+
 }tb_co_channel_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_co_channel_ref_t tb_co_channel_init()
+tb_co_channel_ref_t tb_co_channel_init(tb_size_t size, tb_element_t element)
 {
     // done
     tb_bool_t           ok = tb_false;
@@ -58,6 +66,18 @@ tb_co_channel_ref_t tb_co_channel_init()
         // make channel
         channel = tb_malloc0_type(tb_co_channel_t);
         tb_assert_and_check_break(channel);
+
+        // init queue
+        channel->queue = tb_circle_queue_init(size, element);
+        tb_assert_and_check_break(channel->queue);
+
+        // init send semaphore
+        channel->send = tb_co_semaphore_init(0);
+        tb_assert_and_check_break(channel->send);
+
+        // init recv semaphore
+        channel->recv = tb_co_semaphore_init(0);
+        tb_assert_and_check_break(channel->recv);
 
         // ok
         ok = tb_true;
@@ -81,7 +101,67 @@ tb_void_t tb_co_channel_exit(tb_co_channel_ref_t self)
     tb_co_channel_t* channel = (tb_co_channel_t*)self;
     tb_assert_and_check_return(channel);
 
+    // exit queue
+    if (channel->queue) tb_circle_queue_exit(channel->queue);
+    channel->queue = tb_null;
+
+    // exit send semaphore
+    if (channel->send) tb_co_semaphore_exit(channel->send);
+    channel->send = tb_null;
+
+    // exit recv semaphore
+    if (channel->recv) tb_co_semaphore_exit(channel->recv);
+    channel->recv = tb_null;
+
     // exit the channel
     tb_free(channel);
+}
+tb_void_t tb_co_channel_send(tb_co_channel_ref_t self, tb_cpointer_t data)
+{
+    // check
+    tb_co_channel_t* channel = (tb_co_channel_t*)self;
+    tb_assert_and_check_return(channel && channel->queue && channel->send && channel->recv);
+
+    // send data into channel
+    if (!tb_circle_queue_full(channel->queue))
+    {
+        // put data
+        tb_circle_queue_put(channel->queue, data);
+
+        // notify to recv more data
+        tb_co_semaphore_post(channel->recv, 1);
+    }
+    // full?
+    else
+    {
+        // wait send
+        tb_co_semaphore_wait(channel->send, -1);
+    }
+}
+tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
+{
+    // check
+    tb_co_channel_t* channel = (tb_co_channel_t*)self;
+    tb_assert_and_check_return_val(channel && channel->queue && channel->send && channel->recv, tb_null);
+
+    // recv data from channel
+    tb_pointer_t data = tb_null;
+    if (!tb_circle_queue_null(channel->queue))
+    {
+        // get data
+        data = tb_circle_queue_get(channel->queue);
+
+        // notify to send more data
+        tb_co_semaphore_post(channel->send, 1);
+    }
+    // null?
+    else
+    {
+        // wait recv
+        tb_co_semaphore_wait(channel->recv, -1);
+    }
+
+    // get data
+    return data;
 }
 

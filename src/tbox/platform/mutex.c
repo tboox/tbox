@@ -38,8 +38,8 @@
 tb_mutex_ref_t tb_mutex_init()
 {
     // done
-    tb_bool_t       ok = tb_false;
-    tb_spinlock_ref_t  lock = tb_null;
+    tb_bool_t           ok = tb_false;
+    tb_spinlock_ref_t   lock = tb_null;
     do
     {
         // make lock

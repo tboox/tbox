@@ -66,15 +66,15 @@ tb_void_t               tb_co_semaphore_exit(tb_co_semaphore_ref_t semaphore);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_co_semaphore_post(tb_co_semaphore_ref_t semaphore, tb_size_t post);
+tb_void_t               tb_co_semaphore_post(tb_co_semaphore_ref_t semaphore, tb_size_t post);
 
 /*! the semaphore value
  * 
  * @param semaphore     the semaphore 
  *
- * @return              >= 0: the semaphore value, -1: failed
+ * @return              the semaphore value
  */
-tb_long_t               tb_co_semaphore_value(tb_co_semaphore_ref_t semaphore);
+tb_size_t               tb_co_semaphore_value(tb_co_semaphore_ref_t semaphore);
 
 /*! wait semaphore
  * 

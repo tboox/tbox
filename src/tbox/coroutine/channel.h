@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -47,15 +48,37 @@ typedef __tb_typeref__(co_channel);
 
 /*! init channel 
  *
+ * @param size          the buffer size
+ * @param element       the data element
+ *
  * @return              the channel 
  */
-tb_co_channel_ref_t     tb_co_channel_init(tb_noarg_t);
+tb_co_channel_ref_t     tb_co_channel_init(tb_size_t size, tb_element_t element);
 
 /*! exit channel
  *
  * @param channel       the channel
  */
 tb_void_t               tb_co_channel_exit(tb_co_channel_ref_t channel);
+
+/*! send data into channel
+ *
+ * the current coroutine will be suspend if this channel is full 
+ *
+ * @param channel       the channel
+ * @param data          the channel data
+ */
+tb_void_t               tb_co_channel_send(tb_co_channel_ref_t channel, tb_cpointer_t data);
+
+/*! recv data from channel
+ *
+ * the current coroutine will be suspend if no data
+ *
+ * @param channel       the channel
+ *
+ * @return              the channel data
+ */
+tb_pointer_t            tb_co_channel_recv(tb_co_channel_ref_t channel);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

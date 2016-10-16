@@ -32,65 +32,33 @@
  * includes
  */
 #include "lock.h"
-#include "coroutine.h"
-#include "scheduler.h"
-#include "../container/container.h"
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the coroutine lock type
-typedef struct __tb_co_lock_t
-{
-}tb_co_lock_t;
+#include "semaphore.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_co_lock_ref_t tb_co_lock_init()
 {
-    // done
-    tb_bool_t       ok = tb_false;
-    tb_co_lock_t*   lock = tb_null;
-    do
-    {
-        // make lock
-        lock = tb_malloc0_type(tb_co_lock_t);
-        tb_assert_and_check_break(lock);
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed?
-    if (!ok)
-    {
-        // exit it
-        if (lock) tb_co_lock_exit((tb_co_lock_ref_t)lock);
-        lock = tb_null;
-    }
-
-    // ok?
-    return (tb_co_lock_ref_t)lock;
+    // init lock
+    return (tb_co_lock_ref_t)tb_co_semaphore_init(1);
 }
 tb_void_t tb_co_lock_exit(tb_co_lock_ref_t self)
 {
-    // check
-    tb_co_lock_t* lock = (tb_co_lock_t*)self;
-    tb_assert_and_check_return(lock);
-
-    // exit the lock
-    tb_free(lock);
+    // exit lock
+    tb_co_semaphore_exit((tb_co_semaphore_ref_t)self);
 }
-tb_void_t tb_co_lock_enter(tb_co_lock_ref_t lock)
+tb_void_t tb_co_lock_enter(tb_co_lock_ref_t self)
 {
+    // enter lock
+    tb_co_semaphore_wait((tb_co_semaphore_ref_t)self, -1);
 }
-tb_bool_t tb_co_lock_enter_try(tb_co_lock_ref_t lock)
+tb_bool_t tb_co_lock_enter_try(tb_co_lock_ref_t self)
 {
-    return tb_false;
+    // try to enter lock
+    return tb_co_semaphore_wait((tb_co_semaphore_ref_t)self, 0) > 0;
 }
-tb_void_t tb_co_lock_leave(tb_co_lock_ref_t lock)
+tb_void_t tb_co_lock_leave(tb_co_lock_ref_t self)
 {
+    // leave lock
+    tb_co_semaphore_post((tb_co_semaphore_ref_t)self, 1);
 }

@@ -275,6 +275,9 @@ tb_cpointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb
     // check
     tb_assert_and_check_return_val(scheduler_io && scheduler_io->poller && scheduler_io->scheduler, tb_null);
 
+    // no sleep?
+    tb_check_return_val(interval, tb_null);
+
     // get the current coroutine
     tb_coroutine_t* coroutine = tb_co_scheduler_running(scheduler_io->scheduler);
     tb_assert(coroutine);

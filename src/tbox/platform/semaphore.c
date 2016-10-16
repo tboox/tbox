@@ -42,14 +42,14 @@
     && defined(TB_CONFIG_SYSTEMV_HAVE_SEMTIMEDOP)
 #   include "systemv/semaphore.c"
 #else 
-tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
+tb_semaphore_ref_t tb_semaphore_init(tb_size_t value)
 {
     // make
     tb_atomic_t* semaphore = tb_malloc0_type(tb_atomic_t);
     tb_assert_and_check_return_val(semaphore, tb_null);
 
     // init
-    *semaphore = init;
+    *semaphore = value;
 
     // ok
     return (tb_semaphore_ref_t)semaphore;
