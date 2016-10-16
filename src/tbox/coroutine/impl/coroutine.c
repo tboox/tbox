@@ -76,13 +76,13 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
     coroutine->func(coroutine->func_priv);
 
     // finish the current coroutine and switch to the other coroutine
-    tb_scheduler_finish((tb_scheduler_t*)tb_scheduler_self());
+    tb_co_scheduler_finish((tb_co_scheduler_t*)tb_co_scheduler_self());
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_coroutine_t* tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
+tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
 {
     // check
     tb_assert_and_check_return_val(scheduler && func, tb_null);

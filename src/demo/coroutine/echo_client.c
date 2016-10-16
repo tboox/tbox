@@ -102,7 +102,7 @@ tb_int_t tb_demo_coroutine_echo_client_main(tb_int_t argc, tb_char_t** argv)
     tb_size_t count = tb_atoi(argv[1]);
 
     // init scheduler
-    tb_scheduler_ref_t scheduler = tb_scheduler_init();
+    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
         // start echo
@@ -114,10 +114,10 @@ tb_int_t tb_demo_coroutine_echo_client_main(tb_int_t argc, tb_char_t** argv)
         }
 
         // run scheduler
-        tb_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler);
 
         // exit scheduler
-        tb_scheduler_exit(scheduler);
+        tb_co_scheduler_exit(scheduler);
     }
 
     // end

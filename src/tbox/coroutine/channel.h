@@ -38,8 +38,8 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the channel ref type
-typedef __tb_typeref__(channel);
+/// the coroutine channel ref type
+typedef __tb_typeref__(co_channel);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -49,13 +49,13 @@ typedef __tb_typeref__(channel);
  *
  * @return              the channel 
  */
-tb_channel_ref_t        tb_channel_init(tb_noarg_t);
+tb_co_channel_ref_t     tb_co_channel_init(tb_noarg_t);
 
 /*! exit channel
  *
  * @param channel       the channel
  */
-tb_void_t               tb_channel_exit(tb_channel_ref_t channel);
+tb_void_t               tb_co_channel_exit(tb_co_channel_ref_t channel);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

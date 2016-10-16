@@ -63,7 +63,7 @@ __tb_extern_c_enter__
 #define tb_coroutine_is_suspend(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_SUSPEND)
 
 // is original?
-#define tb_coroutine_is_original(coroutine)         ((coroutine)->scheduler == (tb_scheduler_ref_t)(coroutine))
+#define tb_coroutine_is_original(coroutine)         ((coroutine)->scheduler == (tb_co_scheduler_ref_t)(coroutine))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -73,7 +73,7 @@ __tb_extern_c_enter__
 typedef struct __tb_coroutine_t
 {
     // the scheduler
-    tb_scheduler_ref_t      scheduler;
+    tb_co_scheduler_ref_t      scheduler;
 
     // the context 
     tb_context_ref_t        context;
@@ -126,7 +126,7 @@ typedef struct __tb_coroutine_t
  *
  * @return              the coroutine 
  */
-tb_coroutine_t*         tb_coroutine_init(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
+tb_coroutine_t*         tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
 /* reinit the given coroutine 
  *

@@ -18,11 +18,11 @@
  *
  * @author      ruki
  * @file        semaphore.h
- * @ingroup     platform
+ * @ingroup     coroutine
  *
  */
-#ifndef TB_PLATFORM_SEMAPHORE_H
-#define TB_PLATFORM_SEMAPHORE_H
+#ifndef TB_COROUTINE_SEMAPHORE_H
+#define TB_COROUTINE_SEMAPHORE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -35,53 +35,59 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the coroutine semaphore ref type
+typedef __tb_typeref__(co_semaphore);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 /*! init semaphore
  *
- * @param value     the initial semaphore value
+ * @param value         the initial semaphore value
  * 
- * @return          the semaphore 
+ * @return              the semaphore 
  */
-tb_semaphore_ref_t  tb_semaphore_init(tb_size_t value);
+tb_co_semaphore_ref_t   tb_co_semaphore_init(tb_size_t value);
 
 /*! exit semaphore
  * 
- * @return          the semaphore 
+ * @return              the semaphore 
  */
-tb_void_t           tb_semaphore_exit(tb_semaphore_ref_t semaphore);
+tb_void_t               tb_co_semaphore_exit(tb_co_semaphore_ref_t semaphore);
 
 /*! post semaphore
  * 
- * @param semaphore the semaphore 
- * @param post      the post semaphore value
+ * @param semaphore     the semaphore 
+ * @param post          the post semaphore value
  *
- * @return          tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t           tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post);
+tb_bool_t               tb_co_semaphore_post(tb_co_semaphore_ref_t semaphore, tb_size_t post);
 
 /*! the semaphore value
  * 
- * @param semaphore the semaphore 
+ * @param semaphore     the semaphore 
  *
- * @return          >= 0: the semaphore value, -1: failed
+ * @return              >= 0: the semaphore value, -1: failed
  */
-tb_long_t           tb_semaphore_value(tb_semaphore_ref_t semaphore);
+tb_long_t               tb_co_semaphore_value(tb_co_semaphore_ref_t semaphore);
 
 /*! wait semaphore
  * 
- * @param semaphore the semaphore 
- * @param timeout   the timeout
+ * @param semaphore     the semaphore 
+ * @param timeout       the timeout
  *
- * @return          ok: 1, timeout: 0, fail: -1
+ * @return              ok: 1, timeout: 0, fail: -1
  */
-tb_long_t           tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout);
+tb_long_t               tb_co_semaphore_wait(tb_co_semaphore_ref_t semaphore, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_leave__
 
-    
 #endif

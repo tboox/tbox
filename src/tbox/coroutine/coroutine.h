@@ -27,8 +27,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "scheduler.h"
+#include "lock.h"
 #include "channel.h"
+#include "semaphore.h"
+#include "scheduler.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -58,7 +60,7 @@ typedef tb_void_t       (*tb_coroutine_func_t)(tb_cpointer_t priv);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
+tb_bool_t               tb_coroutine_start(tb_co_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
 /*! yield the current coroutine
  * 

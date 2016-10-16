@@ -38,62 +38,62 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_coroutine_start(tb_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
+tb_bool_t tb_coroutine_start(tb_co_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize)
 {
     // check
     tb_assert_and_check_return_val(func, tb_false);
 
     // start it
-    return tb_scheduler_start((tb_scheduler_t*)scheduler, func, priv, stacksize);
+    return tb_co_scheduler_start((tb_co_scheduler_t*)scheduler, func, priv, stacksize);
 }
 tb_bool_t tb_coroutine_yield()
 {
     // get current scheduler
-    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
 
     // yield the current coroutine
-    return scheduler? tb_scheduler_yield(scheduler) : tb_false;
+    return scheduler? tb_co_scheduler_yield(scheduler) : tb_false;
 }
 tb_void_t tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // get current scheduler
-    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
     if (scheduler)
     {
         // resume the given coroutine
-        tb_scheduler_resume(scheduler, (tb_coroutine_t*)coroutine, priv);
+        tb_co_scheduler_resume(scheduler, (tb_coroutine_t*)coroutine, priv);
     }
 }
 tb_cpointer_t tb_coroutine_suspend()
 {
     // get current scheduler
-    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
 
     // suspend the current coroutine
-    return scheduler? tb_scheduler_suspend(scheduler) : tb_null;
+    return scheduler? tb_co_scheduler_suspend(scheduler) : tb_null;
 }
 tb_cpointer_t tb_coroutine_sleep(tb_size_t interval)
 {
     // get current scheduler
-    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
 
     // sleep the current coroutine
-    return scheduler? tb_scheduler_sleep(scheduler, interval) : tb_null;
+    return scheduler? tb_co_scheduler_sleep(scheduler, interval) : tb_null;
 }
 tb_long_t tb_coroutine_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
     // get current scheduler
-    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
 
     // wait events
-    return scheduler? tb_scheduler_wait(scheduler, sock, events, timeout) : -1;
+    return scheduler? tb_co_scheduler_wait(scheduler, sock, events, timeout) : -1;
 }
 tb_coroutine_ref_t tb_coroutine_self()
 {
     // get coroutine
-    tb_scheduler_t* scheduler = (tb_scheduler_t*)tb_scheduler_self();
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
 
     // get running coroutine
-    return scheduler? (tb_coroutine_ref_t)tb_scheduler_running(scheduler) : tb_null;
+    return scheduler? (tb_coroutine_ref_t)tb_co_scheduler_running(scheduler) : tb_null;
 }
 

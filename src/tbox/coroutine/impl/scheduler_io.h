@@ -39,13 +39,13 @@ __tb_extern_c_enter__
  */
 
 // the io scheduler type
-typedef struct __tb_scheduler_io_t
+typedef struct __tb_co_scheduler_io_t
 {
     // is stopped?
     tb_bool_t           stop;
 
     // the scheduler 
-    tb_scheduler_t*     scheduler;
+    tb_co_scheduler_t*     scheduler;
 
     // the poller
     tb_poller_ref_t     poller;
@@ -56,7 +56,7 @@ typedef struct __tb_scheduler_io_t
     // the low-precision timer (faster)
     tb_ltimer_ref_t     ltimer;
 
-}tb_scheduler_io_t, *tb_scheduler_io_ref_t;
+}tb_co_scheduler_io_t, *tb_co_scheduler_io_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -66,19 +66,19 @@ typedef struct __tb_scheduler_io_t
  *
  * @return                  the io scheduler 
  */
-tb_scheduler_io_ref_t       tb_scheduler_io_init(tb_scheduler_t* scheduler);
+tb_co_scheduler_io_ref_t       tb_co_scheduler_io_init(tb_co_scheduler_t* scheduler);
 
 /*! exit io scheduler 
  *
  * @param scheduler_io      the io scheduler
  */
-tb_void_t                   tb_scheduler_io_exit(tb_scheduler_io_ref_t scheduler_io);
+tb_void_t                   tb_co_scheduler_io_exit(tb_co_scheduler_io_ref_t scheduler_io);
 
 /*! kill the current io scheduler 
  *
  * @param scheduler_io      the io scheduler
  */
-tb_void_t                   tb_scheduler_io_kill(tb_scheduler_io_ref_t scheduler_io);
+tb_void_t                   tb_co_scheduler_io_kill(tb_co_scheduler_io_ref_t scheduler_io);
 
 /* sleep the current coroutine
  *
@@ -87,7 +87,7 @@ tb_void_t                   tb_scheduler_io_kill(tb_scheduler_io_ref_t scheduler
  *
  * @return                  the user private data from resume(priv)
  */
-tb_cpointer_t               tb_scheduler_io_sleep(tb_scheduler_io_ref_t scheduler_io, tb_size_t interval);
+tb_cpointer_t               tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_size_t interval);
 
 /*! wait io events 
  *
@@ -98,7 +98,7 @@ tb_cpointer_t               tb_scheduler_io_sleep(tb_scheduler_io_ref_t schedule
  *
  * @return                  > 0: the events, 0: timeout, -1: failed
  */
-tb_long_t                   tb_scheduler_io_wait(tb_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+tb_long_t                   tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

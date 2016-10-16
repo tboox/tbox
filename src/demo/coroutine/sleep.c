@@ -35,7 +35,7 @@ static tb_void_t tb_demo_coroutine_sleep_func(tb_cpointer_t priv)
 tb_int_t tb_demo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler
-    tb_scheduler_ref_t scheduler = tb_scheduler_init();
+    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
         // start coroutines
@@ -45,10 +45,10 @@ tb_int_t tb_demo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
         tb_coroutine_start(scheduler, tb_demo_coroutine_sleep_func, (tb_cpointer_t)100, 0);
 
         // run scheduler
-        tb_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler);
 
         // exit scheduler
-        tb_scheduler_exit(scheduler);
+        tb_co_scheduler_exit(scheduler);
     }
     return 0;
 }

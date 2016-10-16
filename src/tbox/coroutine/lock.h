@@ -17,71 +17,69 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        channel.h
+ * @file        lock.h
  * @ingroup     coroutine
  *
  */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME            "channel"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#ifndef TB_COROUTINE_LOCK_H
+#define TB_COROUTINE_LOCK_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "channel.h"
-#include "coroutine.h"
-#include "scheduler.h"
-#include "../container/container.h"
+#include "prefix.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the coroutine channel type
-typedef struct __tb_co_channel_t
-{
-}tb_co_channel_t;
+/// the coroutine lock ref type
+typedef __tb_typeref__(co_lock);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
-tb_co_channel_ref_t tb_co_channel_init()
-{
-    // done
-    tb_bool_t           ok = tb_false;
-    tb_co_channel_t*    channel = tb_null;
-    do
-    {
-        // make channel
-        channel = tb_malloc0_type(tb_co_channel_t);
-        tb_assert_and_check_break(channel);
 
-        // ok
-        ok = tb_true;
+/*! init lock 
+ *
+ * @return              the lock 
+ */
+tb_co_lock_ref_t        tb_co_lock_init(tb_noarg_t);
 
-    } while (0);
+/*! exit lock
+ *
+ * @param lock          the lock
+ */
+tb_void_t               tb_co_lock_exit(tb_co_lock_ref_t lock);
 
-    // failed?
-    if (!ok)
-    {
-        // exit it
-        if (channel) tb_co_channel_exit((tb_co_channel_ref_t)channel);
-        channel = tb_null;
-    }
+/*! enter lock
+ *
+ * @param lock          the lock
+ */
+tb_void_t               tb_co_lock_enter(tb_co_lock_ref_t lock);
 
-    // ok?
-    return (tb_co_channel_ref_t)channel;
-}
-tb_void_t tb_co_channel_exit(tb_co_channel_ref_t self)
-{
-    // check
-    tb_co_channel_t* channel = (tb_co_channel_t*)self;
-    tb_assert_and_check_return(channel);
+/*! try to enter lock
+ *
+ * @param lock          the lock
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_co_lock_enter_try(tb_co_lock_ref_t lock);
 
-    // exit the channel
-    tb_free(channel);
-}
+/*! leave lock
+ *
+ * @param lock          the lock
+ */
+tb_void_t               tb_co_lock_leave(tb_co_lock_ref_t lock);
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+#endif

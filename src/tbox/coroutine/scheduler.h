@@ -38,8 +38,8 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the scheduler ref type
-typedef __tb_typeref__(scheduler);
+/// the coroutine scheduler ref type
+typedef __tb_typeref__(co_scheduler);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -49,31 +49,31 @@ typedef __tb_typeref__(scheduler);
  *
  * @return              the scheduler 
  */
-tb_scheduler_ref_t      tb_scheduler_init(tb_noarg_t);
+tb_co_scheduler_ref_t   tb_co_scheduler_init(tb_noarg_t);
 
 /*! exit scheduler
  *
  * @param scheduler     the scheduler
  */
-tb_void_t               tb_scheduler_exit(tb_scheduler_ref_t scheduler);
+tb_void_t               tb_co_scheduler_exit(tb_co_scheduler_ref_t scheduler);
 
 /* kill the scheduler 
  *
  * @param scheduler     the scheduler
  */
-tb_void_t               tb_scheduler_kill(tb_scheduler_ref_t scheduler);
+tb_void_t               tb_co_scheduler_kill(tb_co_scheduler_ref_t scheduler);
 
 /*! run the scheduler loop
  *
  * @param scheduler     the scheduler
  */
-tb_void_t               tb_scheduler_loop(tb_scheduler_ref_t scheduler);
+tb_void_t               tb_co_scheduler_loop(tb_co_scheduler_ref_t scheduler);
 
 /*! get the scheduler of the current coroutine
  *
  * @return              the scheduler
  */
-tb_scheduler_ref_t      tb_scheduler_self(tb_noarg_t);
+tb_co_scheduler_ref_t   tb_co_scheduler_self(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
