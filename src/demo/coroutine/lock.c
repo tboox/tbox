@@ -13,7 +13,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_coroutine_channel_test_func(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_lock_test_func(tb_cpointer_t priv)
 {
     // loop
     tb_size_t count = (tb_size_t)priv;
@@ -26,15 +26,15 @@ static tb_void_t tb_demo_coroutine_channel_test_func(tb_cpointer_t priv)
         tb_coroutine_yield();
     }
 }
-static tb_void_t tb_demo_coroutine_channel_test()
+static tb_void_t tb_demo_coroutine_lock_test()
 {
     // init scheduler
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
         // start coroutines
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_func, (tb_cpointer_t)10, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_func, (tb_cpointer_t)10, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_lock_test_func, (tb_cpointer_t)10, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_lock_test_func, (tb_cpointer_t)10, 0);
 
         // run scheduler
         tb_co_scheduler_loop(scheduler);
@@ -43,7 +43,7 @@ static tb_void_t tb_demo_coroutine_channel_test()
         tb_co_scheduler_exit(scheduler);
     }
 }
-static tb_void_t tb_demo_coroutine_channel_pref_func(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_lock_pref_func(tb_cpointer_t priv)
 {
     // loop
     tb_size_t count = (tb_size_t)priv;
@@ -53,15 +53,15 @@ static tb_void_t tb_demo_coroutine_channel_pref_func(tb_cpointer_t priv)
         tb_coroutine_yield();
     }
 }
-static tb_void_t tb_demo_coroutine_channel_pref()
+static tb_void_t tb_demo_coroutine_lock_pref()
 {
     // init scheduler
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
         // start coroutine
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_lock_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_lock_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
 
         // init the start time
         tb_hong_t startime = tb_mclock();
@@ -83,9 +83,9 @@ static tb_void_t tb_demo_coroutine_channel_pref()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_coroutine_channel_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_coroutine_lock_main(tb_int_t argc, tb_char_t** argv)
 {
-    tb_demo_coroutine_channel_test();
-    tb_demo_coroutine_channel_pref();
+    tb_demo_coroutine_lock_test();
+    tb_demo_coroutine_lock_pref();
     return 0;
 }
