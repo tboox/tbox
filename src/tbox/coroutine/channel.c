@@ -68,7 +68,7 @@ tb_co_channel_ref_t tb_co_channel_init(tb_size_t size, tb_element_t element)
         tb_assert_and_check_break(channel);
 
         // init queue
-        channel->queue = tb_circle_queue_init(size, element);
+        channel->queue = tb_circle_queue_init(1 + size, element);
         tb_assert_and_check_break(channel->queue);
 
         // init send semaphore

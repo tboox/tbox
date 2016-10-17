@@ -37,9 +37,9 @@
  * macros
  */
 #ifdef __tb_small__
-#   define TB_CIRCLE_QUEUE_SIZE_DEFAULT            (255)
+#   define TB_CIRCLE_QUEUE_SIZE_DEFAULT            (256)
 #else
-#   define TB_CIRCLE_QUEUE_SIZE_DEFAULT            (65535)
+#   define TB_CIRCLE_QUEUE_SIZE_DEFAULT            (65536)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +63,9 @@ typedef struct __tb_circle_queue_t
 
     // the maxn
     tb_size_t               maxn;
+
+    // the size
+    tb_size_t               size;
 
     // the element
     tb_element_t            element;
@@ -115,7 +118,7 @@ static tb_size_t tb_circle_queue_itor_next(tb_iterator_ref_t iterator, tb_size_t
     tb_assert_and_check_return_val(queue, 0);
 
     // next
-    return ((itor + 1) & (queue->maxn - 1));
+    return (itor + 1) % queue->maxn;
 }
 static tb_size_t tb_circle_queue_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
@@ -124,7 +127,7 @@ static tb_size_t tb_circle_queue_itor_prev(tb_iterator_ref_t iterator, tb_size_t
     tb_assert_and_check_return_val(queue, 0);
 
     // prev
-    return ((itor + queue->maxn - 1) & (queue->maxn - 1));
+    return (itor + queue->maxn - 1) % queue->maxn;
 }
 static tb_pointer_t tb_circle_queue_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
@@ -175,9 +178,8 @@ tb_circle_queue_ref_t tb_circle_queue_init(tb_size_t maxn, tb_element_t element)
         if (!maxn) maxn = TB_CIRCLE_QUEUE_SIZE_DEFAULT;
 
         // init queue
-        queue->maxn      = tb_align_pow2(maxn + 1); // + tail
+        queue->maxn      = maxn;
         queue->element   = element;
-        tb_assert_and_check_break(tb_ispow2(queue->maxn));
 
         // init iterator
         queue->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_MUTABLE;
@@ -235,30 +237,31 @@ tb_void_t tb_circle_queue_clear(tb_circle_queue_ref_t self)
     
     // clear it
     while (!tb_circle_queue_null(self)) tb_circle_queue_pop(self);
-
-    // reset head and tail
     queue->head = 0;
     queue->tail = 0;
+    queue->size = 0;
 }
 tb_void_t tb_circle_queue_put(tb_circle_queue_ref_t self, tb_cpointer_t data)
 {   
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
-    tb_assert_and_check_return(queue && !tb_circle_queue_full(self));
+    tb_assert_and_check_return(queue && queue->size < queue->maxn);
 
     // put it
     queue->element.dupl(&queue->element, queue->data + queue->tail * queue->element.size, data);
-    queue->tail = ((queue->tail + 1) & (queue->maxn - 1));
+    queue->tail = (queue->tail + 1) % queue->maxn;
+    queue->size++;
 }
 tb_void_t tb_circle_queue_pop(tb_circle_queue_ref_t self)
 {   
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
-    tb_assert_and_check_return(queue && !tb_circle_queue_null(self));
+    tb_assert_and_check_return(queue && queue->size);
 
     // pop it
     if (queue->element.free) queue->element.free(&queue->element, queue->data + queue->head * queue->element.size);
-    queue->head = ((queue->head + 1) & (queue->maxn - 1));
+    queue->head = (queue->head + 1) % queue->maxn;
+    queue->size--;
 }
 tb_pointer_t tb_circle_queue_get(tb_circle_queue_ref_t self)
 {
@@ -282,7 +285,7 @@ tb_size_t tb_circle_queue_size(tb_circle_queue_ref_t self)
     tb_assert_and_check_return_val(queue, 0);
 
     // the size
-    return ((queue->tail + queue->maxn - queue->head) & (queue->maxn - 1));
+    return queue->size;
 }
 tb_size_t tb_circle_queue_maxn(tb_circle_queue_ref_t self)
 {   
@@ -291,7 +294,7 @@ tb_size_t tb_circle_queue_maxn(tb_circle_queue_ref_t self)
     tb_assert_and_check_return_val(queue, 0);
 
     // the maxn
-    return (queue->maxn? queue->maxn - 1 : 0);
+    return queue->maxn;
 }
 tb_bool_t tb_circle_queue_full(tb_circle_queue_ref_t self)
 {   
@@ -300,7 +303,7 @@ tb_bool_t tb_circle_queue_full(tb_circle_queue_ref_t self)
     tb_assert_and_check_return_val(queue, tb_true);
 
     // is full?
-    return (queue->head == ((queue->tail + 1) & (queue->maxn - 1)));
+    return queue->size == queue->maxn;
 }
 tb_bool_t tb_circle_queue_null(tb_circle_queue_ref_t self)
 {   
@@ -309,7 +312,7 @@ tb_bool_t tb_circle_queue_null(tb_circle_queue_ref_t self)
     tb_assert_and_check_return_val(queue, tb_true);
 
     // is null?
-    return (queue->head == queue->tail);
+    return !queue->size;
 }
 #ifdef __tb_debug__
 tb_void_t tb_circle_queue_dump(tb_circle_queue_ref_t self)
