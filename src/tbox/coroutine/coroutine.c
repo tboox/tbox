@@ -72,7 +72,7 @@ tb_cpointer_t tb_coroutine_suspend()
     // suspend the current coroutine
     return scheduler? tb_co_scheduler_suspend(scheduler) : tb_null;
 }
-tb_cpointer_t tb_coroutine_sleep(tb_size_t interval)
+tb_cpointer_t tb_coroutine_sleep(tb_long_t interval)
 {
     // get current scheduler
     tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();

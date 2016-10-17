@@ -327,7 +327,7 @@ tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
     // switch to next coroutine 
     tb_co_scheduler_switch_next(scheduler);
 }
-tb_cpointer_t tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_size_t interval)
+tb_cpointer_t tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_long_t interval)
 {
     // check
     tb_assert(scheduler && scheduler->running);

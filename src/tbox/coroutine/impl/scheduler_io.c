@@ -270,7 +270,7 @@ tb_void_t tb_co_scheduler_io_kill(tb_co_scheduler_io_ref_t scheduler_io)
     // kill poller
     if (scheduler_io->poller) tb_poller_kill(scheduler_io->poller);
 }
-tb_cpointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_size_t interval)
+tb_cpointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_long_t interval)
 {
     // check
     tb_assert_and_check_return_val(scheduler_io && scheduler_io->poller && scheduler_io->scheduler, tb_null);
@@ -283,19 +283,23 @@ tb_cpointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb
     tb_assert(coroutine);
 
     // trace
-    tb_trace_d("coroutine(%p): sleep %lu ms ..", coroutine, interval);
+    tb_trace_d("coroutine(%p): sleep %ld ms ..", coroutine, interval);
 
-    // high-precision interval?
-    if (interval % 1000)
+    // infinity?
+    if (interval > 0)
     {
-        // post task to timer
-        tb_timer_task_post(scheduler_io->timer, interval, tb_false, tb_co_scheduler_io_timeout, coroutine);
-    }
-    // low-precision interval?
-    else
-    {
-        // post task to ltimer (faster)
-        tb_ltimer_task_post(scheduler_io->ltimer, interval, tb_false, tb_co_scheduler_io_timeout, coroutine);
+        // high-precision interval?
+        if (interval % 1000)
+        {
+            // post task to timer
+            tb_timer_task_post(scheduler_io->timer, interval, tb_false, tb_co_scheduler_io_timeout, coroutine);
+        }
+        // low-precision interval?
+        else
+        {
+            // post task to ltimer (faster)
+            tb_ltimer_task_post(scheduler_io->ltimer, interval, tb_false, tb_co_scheduler_io_timeout, coroutine);
+        }
     }
 
     // clear the timer task 

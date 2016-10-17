@@ -13,70 +13,40 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_coroutine_semaphore_test_func(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_semaphore_wait_func(tb_cpointer_t priv)
 {
+    // check
+    tb_co_semaphore_ref_t semaphore = (tb_co_semaphore_ref_t)priv;
+    tb_assert(semaphore);
+
     // loop
-    tb_size_t count = (tb_size_t)priv;
-    while (count--)
+    while (1)
+    {
+        // wait it
+        tb_long_t ok = tb_co_semaphore_wait(semaphore, -1);
+        tb_assert_and_check_break(ok > 0);
+ 
+        // trace
+        tb_trace_i("[coroutine: %p]: wait ok", tb_coroutine_self());
+    }
+}
+static tb_void_t tb_demo_coroutine_semaphore_post_func(tb_cpointer_t priv)
+{
+    // check
+    tb_co_semaphore_ref_t semaphore = (tb_co_semaphore_ref_t)priv;
+    tb_assert(semaphore);
+
+    // loop
+    while (1)
     {
         // trace
-        tb_trace_i("[coroutine: %p]: %lu", tb_coroutine_self(), count);
+        tb_trace_i("[coroutine: %p]: post", tb_coroutine_self());
 
-        // yield
-        tb_coroutine_yield();
-    }
-}
-static tb_void_t tb_demo_coroutine_semaphore_test()
-{
-    // init scheduler
-    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
-    if (scheduler)
-    {
-        // start coroutines
-        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_test_func, (tb_cpointer_t)10, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_test_func, (tb_cpointer_t)10, 0);
-
-        // run scheduler
-        tb_co_scheduler_loop(scheduler);
-
-        // exit scheduler
-        tb_co_scheduler_exit(scheduler);
-    }
-}
-static tb_void_t tb_demo_coroutine_semaphore_pref_func(tb_cpointer_t priv)
-{
-    // loop
-    tb_size_t count = (tb_size_t)priv;
-    while (count--)
-    {
-        // yield
-        tb_coroutine_yield();
-    }
-}
-static tb_void_t tb_demo_coroutine_semaphore_pref()
-{
-    // init scheduler
-    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
-    if (scheduler)
-    {
-        // start coroutine
-        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
-
-        // init the start time
-        tb_hong_t startime = tb_mclock();
-
-        // run scheduler
-        tb_co_scheduler_loop(scheduler);
-
-        // computing time
-        tb_hong_t duration = tb_mclock() - startime;
-
-        // trace
-        tb_trace_i("%d switches in %lld ms, %lld switches per second", COUNT, duration, (((tb_hong_t)1000 * COUNT) / duration));
-
-        // exit scheduler
-        tb_co_scheduler_exit(scheduler);
+        // post it
+        tb_co_semaphore_post(semaphore, 2);
+ 
+        // wait some time
+        tb_msleep(1000);
     }
 }
 
@@ -85,7 +55,29 @@ static tb_void_t tb_demo_coroutine_semaphore_pref()
  */ 
 tb_int_t tb_demo_coroutine_semaphore_main(tb_int_t argc, tb_char_t** argv)
 {
-    tb_demo_coroutine_semaphore_test();
-    tb_demo_coroutine_semaphore_pref();
+    // init scheduler
+    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
+    if (scheduler)
+    {
+        // init semaphore
+        tb_co_semaphore_ref_t semaphore = tb_co_semaphore_init(0);
+        tb_assert(semaphore);
+
+        // start coroutines
+        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_wait_func, semaphore, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_wait_func, semaphore, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_wait_func, semaphore, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_wait_func, semaphore, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_post_func, semaphore, 0);
+
+        // run scheduler
+        tb_co_scheduler_loop(scheduler);
+
+        // exit semaphore 
+        tb_co_semaphore_exit(semaphore);
+
+        // exit scheduler
+        tb_co_scheduler_exit(scheduler);
+    }
     return 0;
 }

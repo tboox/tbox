@@ -135,11 +135,11 @@ tb_void_t                   tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
 /* sleep the current coroutine
  *
  * @param scheduler         the scheduler
- * @param interval          the interval (ms)
+ * @param interval          the interval (ms), infinity: -1
  *
  * @return                  the user private data from resume(priv)
  */
-tb_cpointer_t               tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_size_t interval);
+tb_cpointer_t               tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_long_t interval);
 
 /* switch to the given coroutine
  *

@@ -83,11 +83,11 @@ tb_cpointer_t           tb_coroutine_suspend(tb_noarg_t);
 
 /*! sleep some times (ms)
  *
- * @param interval      the interval (ms)
+ * @param interval      the interval (ms), infinity: -1
  *
  * @return              the user private data from resume(priv)
  */
-tb_cpointer_t           tb_coroutine_sleep(tb_size_t interval);
+tb_cpointer_t           tb_coroutine_sleep(tb_long_t interval);
 
 /*! wait io events 
  *

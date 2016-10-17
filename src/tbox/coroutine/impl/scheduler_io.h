@@ -83,11 +83,11 @@ tb_void_t                   tb_co_scheduler_io_kill(tb_co_scheduler_io_ref_t sch
 /* sleep the current coroutine
  *
  * @param scheduler_io      the io scheduler
- * @param interval          the interval (ms)
+ * @param interval          the interval (ms), infinity: -1
  *
  * @return                  the user private data from resume(priv)
  */
-tb_cpointer_t               tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_size_t interval);
+tb_cpointer_t               tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_long_t interval);
 
 /*! wait io events 
  *

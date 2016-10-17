@@ -128,6 +128,9 @@ tb_void_t tb_co_channel_send(tb_co_channel_ref_t self, tb_cpointer_t data)
         // put data
         tb_circle_queue_put(channel->queue, data);
 
+        // TODO
+        // pop
+
         // notify to recv more data
         tb_co_semaphore_post(channel->recv, 1);
     }
@@ -135,7 +138,8 @@ tb_void_t tb_co_channel_send(tb_co_channel_ref_t self, tb_cpointer_t data)
     else
     {
         // wait send
-        tb_co_semaphore_wait(channel->send, -1);
+        tb_long_t ok = tb_co_semaphore_wait(channel->send, -1);
+        tb_assert_and_check_return(ok > 0);
     }
 }
 tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
@@ -151,6 +155,9 @@ tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
         // get data
         data = tb_circle_queue_get(channel->queue);
 
+        // TODO
+        // pop
+
         // notify to send more data
         tb_co_semaphore_post(channel->send, 1);
     }
@@ -158,7 +165,8 @@ tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
     else
     {
         // wait recv
-        tb_co_semaphore_wait(channel->recv, -1);
+        tb_long_t ok = tb_co_semaphore_wait(channel->recv, -1);
+        tb_assert_and_check_return_val(ok > 0, tb_null);
     }
 
     // get data
