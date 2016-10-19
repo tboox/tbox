@@ -45,6 +45,12 @@ typedef struct __tb_co_channel_t
     // the queue
     tb_circle_queue_ref_t   queue;
 
+    // the channel size
+    tb_size_t               size;
+   
+    // the first data is dirty?
+    tb_bool_t               dirty;
+
     // the send semaphore 
     tb_co_semaphore_ref_t   send;
 
@@ -67,12 +73,18 @@ tb_co_channel_ref_t tb_co_channel_init(tb_size_t size, tb_element_t element)
         channel = tb_malloc0_type(tb_co_channel_t);
         tb_assert_and_check_break(channel);
 
-        // init queue
-        channel->queue = tb_circle_queue_init(1 + size, element);
+        // init queue 
+        channel->queue = tb_circle_queue_init(size? size : 1, element);
         tb_assert_and_check_break(channel->queue);
 
+        // save the channel size
+        channel->size = size;
+
+        // init dirty
+        channel->dirty = tb_false;
+
         // init send semaphore
-        channel->send = tb_co_semaphore_init(0);
+        channel->send = tb_co_semaphore_init(size);
         tb_assert_and_check_break(channel->send);
 
         // init recv semaphore
@@ -122,25 +134,58 @@ tb_void_t tb_co_channel_send(tb_co_channel_ref_t self, tb_cpointer_t data)
     tb_co_channel_t* channel = (tb_co_channel_t*)self;
     tb_assert_and_check_return(channel && channel->queue && channel->send && channel->recv);
 
-    // send data into channel
-    if (!tb_circle_queue_full(channel->queue))
+    // done
+    do
     {
-        // put data
-        tb_circle_queue_put(channel->queue, data);
+        // exists dirty data?
+        if (channel->dirty)
+        {
+            // check
+            tb_assert(!tb_circle_queue_null(channel->queue));
 
-        // TODO
-        // pop
+            // trace
+            tb_trace_d("send[%p]: clear dirty", tb_coroutine_self());
 
-        // notify to recv more data
-        tb_co_semaphore_post(channel->recv, 1);
-    }
-    // full?
-    else
-    {
-        // wait send
-        tb_long_t ok = tb_co_semaphore_wait(channel->send, -1);
-        tb_assert_and_check_return(ok > 0);
-    }
+            // pop the dirty data first
+            tb_circle_queue_pop(channel->queue);
+            channel->dirty = tb_false;
+        }
+
+        // put data into queue if be not full
+        tb_bool_t is_full = tb_circle_queue_full(channel->queue);
+        if (!is_full)
+        {
+            // trace
+            tb_trace_d("send[%p]: put data(%p)", tb_coroutine_self(), data);
+
+            // put data
+            tb_circle_queue_put(channel->queue, data);
+
+            // notify to recv data
+            tb_co_semaphore_post(channel->recv, 1);
+        }
+
+        // wait it if be full or no buffer
+        if (is_full || !channel->size)
+        {
+            // trace
+            tb_trace_d("send[%p]: wait(%lu) ..", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+
+            // wait send
+            tb_long_t ok = tb_co_semaphore_wait(channel->send, -1);
+            tb_assert_and_check_return(ok > 0);
+ 
+            // trace
+            tb_trace_d("send[%p]: wait(%lu) ok", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+        }
+
+        // send ok?
+        tb_check_break(is_full);
+
+    } while (1);
+ 
+    // trace
+    tb_trace_d("send[%p]: ok", tb_coroutine_self());
 }
 tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
 {
@@ -148,26 +193,62 @@ tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
     tb_co_channel_t* channel = (tb_co_channel_t*)self;
     tb_assert_and_check_return_val(channel && channel->queue && channel->send && channel->recv, tb_null);
 
-    // recv data from channel
+    // done
     tb_pointer_t data = tb_null;
-    if (!tb_circle_queue_null(channel->queue))
+    do
     {
-        // get data
-        data = tb_circle_queue_get(channel->queue);
+        // exists dirty data?
+        if (channel->dirty)
+        {
+            // check
+            tb_assert(!tb_circle_queue_null(channel->queue));
 
-        // TODO
-        // pop
+            // trace
+            tb_trace_d("recv[%p]: clear dirty", tb_coroutine_self());
 
-        // notify to send more data
-        tb_co_semaphore_post(channel->send, 1);
-    }
-    // null?
-    else
-    {
-        // wait recv
-        tb_long_t ok = tb_co_semaphore_wait(channel->recv, -1);
-        tb_assert_and_check_return_val(ok > 0, tb_null);
-    }
+            // pop the dirty data first
+            tb_circle_queue_pop(channel->queue);
+            channel->dirty = tb_false;
+        }
+
+        // recv data from channel if be not null
+        tb_bool_t is_null = tb_circle_queue_null(channel->queue);
+        if (!is_null)
+        {
+            // get data
+            data = tb_circle_queue_get(channel->queue);
+
+            // trace
+            tb_trace_d("recv[%p]: get data(%p)", tb_coroutine_self(), data);
+
+            // mark it as dirty and pop it delay
+            channel->dirty = tb_true;
+
+            // notify to send data
+            tb_co_semaphore_post(channel->send, 1);
+
+            // recv ok
+            break;
+        }
+
+        // wait it if be null or no buffer
+        if (is_null || !channel->size)
+        {
+            // trace
+            tb_trace_d("recv[%p]: wait(%p) ..", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+
+            // wait recv
+            tb_long_t ok = tb_co_semaphore_wait(channel->recv, -1);
+            tb_assert_and_check_return_val(ok > 0, tb_null);
+
+            // trace
+            tb_trace_d("recv[%p]: wait(%p) ok", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+        }
+
+    } while (1);
+ 
+    // trace
+    tb_trace_d("recv[%p]: ok", tb_coroutine_self());
 
     // get data
     return data;

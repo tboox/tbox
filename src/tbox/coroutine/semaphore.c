@@ -95,7 +95,6 @@ tb_void_t tb_co_semaphore_exit(tb_co_semaphore_ref_t self)
     tb_assert_and_check_return(semaphore);
 
     // check semaphore value and waiting coroutines
-    tb_assert(!semaphore->value);
     tb_assert(!tb_single_list_entry_size(&semaphore->waiting));
 
     // exit waiting coroutines
@@ -150,6 +149,7 @@ tb_long_t tb_co_semaphore_wait(tb_co_semaphore_ref_t self, tb_long_t timeout)
     // check
     tb_co_semaphore_t* semaphore = (tb_co_semaphore_t*)self;
     tb_assert_and_check_return_val(semaphore, -1);
+
 
     // attempt to get the semaphore value
     tb_long_t ok = 1;

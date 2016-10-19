@@ -119,8 +119,8 @@ typedef struct __tb_coroutine_t
      */
     tb_size_t                       state;
 
-    // the user private data as the argument of resume() and the return value of suspend()
-    tb_cpointer_t                   suspend_retval;
+    // the passed user private data between priv = resume(priv) and priv = suspend(priv)
+    tb_cpointer_t                   rs_priv;
 
     // the passed private data between resume() and suspend()
     union 

@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "scheduler_io"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -309,7 +309,7 @@ tb_cpointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb
     coroutine->rs.waiting.sock = tb_null;
 
     // suspend it
-    return tb_co_scheduler_suspend(scheduler_io->scheduler);
+    return tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);
 }
 tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
@@ -371,5 +371,5 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     coroutine->rs.waiting.sock = sock;
 
     // suspend the current coroutine and return the waited result
-    return (tb_long_t)tb_co_scheduler_suspend(scheduler_io->scheduler);
+    return (tb_long_t)tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);
 }

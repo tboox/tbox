@@ -82,7 +82,7 @@ static tb_size_t tb_circle_queue_itor_size(tb_iterator_ref_t iterator)
     tb_assert_and_check_return_val(queue, 0);
 
     // the size
-    return ((queue->tail + queue->maxn - queue->head) & (queue->maxn - 1));
+    return queue->size;
 }
 static tb_size_t tb_circle_queue_itor_head(tb_iterator_ref_t iterator)
 {
@@ -100,7 +100,7 @@ static tb_size_t tb_circle_queue_itor_last(tb_iterator_ref_t iterator)
     tb_assert_and_check_return_val(queue, 0);
 
     // last
-    return ((queue->tail + queue->maxn - 1) & (queue->maxn - 1));
+    return (queue->tail + queue->maxn - 1) % queue->maxn;
 }
 static tb_size_t tb_circle_queue_itor_tail(tb_iterator_ref_t iterator)
 {
@@ -177,8 +177,8 @@ tb_circle_queue_ref_t tb_circle_queue_init(tb_size_t maxn, tb_element_t element)
         // using the default maxn
         if (!maxn) maxn = TB_CIRCLE_QUEUE_SIZE_DEFAULT;
 
-        // init queue
-        queue->maxn      = maxn;
+        // init queue, + tail
+        queue->maxn      = maxn + 1;
         queue->element   = element;
 
         // init iterator
@@ -303,7 +303,7 @@ tb_bool_t tb_circle_queue_full(tb_circle_queue_ref_t self)
     tb_assert_and_check_return_val(queue, tb_true);
 
     // is full?
-    return queue->size == queue->maxn;
+    return (queue->size + 1) == queue->maxn;
 }
 tb_bool_t tb_circle_queue_null(tb_circle_queue_ref_t self)
 {   

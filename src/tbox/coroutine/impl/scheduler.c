@@ -261,7 +261,7 @@ tb_bool_t tb_co_scheduler_yield(tb_co_scheduler_t* scheduler)
     // no more ready coroutines? return it directly and continue to run this coroutine
     return tb_false;
 }
-tb_void_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv)
+tb_cpointer_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv)
 {
     // check
     tb_assert(scheduler && coroutine);
@@ -271,19 +271,26 @@ tb_void_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* c
     tb_trace_d("resume coroutine(%p)", coroutine);
 
     // this coroutine is suspended?
+    tb_cpointer_t retval = tb_null;
     if (tb_coroutine_is_suspend(coroutine))
     {
         // remove it from the suspend coroutines
         tb_list_entry_remove(&scheduler->coroutines_suspend, &coroutine->entry);
 
-        // pass the user private data
-        coroutine->suspend_retval = priv;
+        // get the passed private data from suspend(priv)
+        retval = coroutine->rs_priv;
+
+        // pass the user private data to suspend()
+        coroutine->rs_priv = priv;
 
         // make it as ready
         tb_co_scheduler_make_ready(scheduler, coroutine);
     }
+
+    // return it
+    return retval;
 }
-tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler)
+tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t priv)
 {
     // check
     tb_assert(scheduler && scheduler->running);
@@ -296,8 +303,8 @@ tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler)
     // trace
     tb_trace_d("suspend coroutine(%p)", scheduler->running);
 
-    // clear the resumed private data first
-    scheduler->running->suspend_retval = tb_null;
+    // pass the private data to resume() first
+    scheduler->running->rs_priv = priv;
 
     // make the running coroutine as suspend
     tb_co_scheduler_make_suspend(scheduler, scheduler->running);
@@ -309,7 +316,7 @@ tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler)
     tb_assert(scheduler->running);
 
     // return the user private data from resume(priv)
-    return scheduler->running->suspend_retval;
+    return scheduler->running->rs_priv;
 }
 tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
 {
