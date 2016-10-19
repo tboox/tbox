@@ -46,12 +46,6 @@ typedef struct __tb_co_channel_t
     // the queue
     tb_circle_queue_ref_t           queue;
 
-    // the send semaphore 
-    tb_co_semaphore_ref_t           send;
-
-    // the recv semaphore 
-    tb_co_semaphore_ref_t           recv;
-
     // the waiting send coroutines 
     tb_single_list_entry_head_t     waiting_send;
 
@@ -63,10 +57,88 @@ typedef struct __tb_co_channel_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_pointer_t tb_co_channel_send_resume(tb_co_channel_t* channel)
+{
+    // check
+    tb_assert(channel);
+
+    // resume the first waiting send coroutine and recv data
+    tb_pointer_t data = tb_null;
+    if (tb_single_list_entry_size(&channel->waiting_send))
+    {
+        // get the next entry from head
+        tb_single_list_entry_ref_t entry = tb_single_list_entry_head(&channel->waiting_send);
+        tb_assert(entry);
+
+        // remove it from the waiting send coroutines
+        tb_single_list_entry_remove_head(&channel->waiting_send);
+
+        // get the waiting send coroutine
+        tb_coroutine_ref_t waiting = (tb_coroutine_ref_t)tb_single_list_entry(&channel->waiting_send, entry);
+
+        // resume this coroutine and recv data
+        data = tb_coroutine_resume(waiting, tb_null);
+    }
+
+    // ok?
+    return data;
+}
+static tb_void_t tb_co_channel_recv_resume(tb_co_channel_t* channel)
+{
+    // check
+    tb_assert(channel);
+
+    // resume the first waiting recv coroutine 
+    if (tb_single_list_entry_size(&channel->waiting_recv))
+    {
+        // get the next entry from head
+        tb_single_list_entry_ref_t entry = tb_single_list_entry_head(&channel->waiting_recv);
+        tb_assert(entry);
+
+        // remove it from the waiting recv coroutines
+        tb_single_list_entry_remove_head(&channel->waiting_recv);
+
+        // get the waiting recv coroutine
+        tb_coroutine_ref_t waiting = (tb_coroutine_ref_t)tb_single_list_entry(&channel->waiting_recv, entry);
+
+        // resume this coroutine 
+        tb_coroutine_resume(waiting, tb_null);
+    }
+}
+static tb_void_t tb_co_channel_send_suspend(tb_co_channel_t* channel, tb_cpointer_t data)
+{
+    // check
+    tb_assert(channel);
+
+    // get the running coroutine 
+    tb_coroutine_t* running = (tb_coroutine_t*)tb_coroutine_self();
+    tb_assert(running);
+
+    // save this coroutine to the waiting send coroutines
+    tb_single_list_entry_insert_tail(&channel->waiting_send, &running->rs.single_entry);
+
+    // send data and wait it
+    tb_coroutine_suspend(data);
+}
+static tb_void_t tb_co_channel_recv_suspend(tb_co_channel_t* channel)
+{
+    // check
+    tb_assert(channel);
+
+    // get the running coroutine 
+    tb_coroutine_t* running = (tb_coroutine_t*)tb_coroutine_self();
+    tb_assert(running);
+
+    // save this coroutine to the waiting recv coroutines
+    tb_single_list_entry_insert_tail(&channel->waiting_recv, &running->rs.single_entry);
+
+    // wait data
+    tb_coroutine_suspend(tb_null);
+}
 static tb_void_t tb_co_channel_send_buffer(tb_co_channel_t* channel, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(channel && channel->queue && channel->send && channel->recv);
+    tb_assert_and_check_return(channel && channel->queue);
 
     // done
     do
@@ -81,7 +153,7 @@ static tb_void_t tb_co_channel_send_buffer(tb_co_channel_t* channel, tb_cpointer
             tb_circle_queue_put(channel->queue, data);
 
             // notify to recv data
-            tb_co_semaphore_post(channel->recv, 1);
+            tb_co_channel_recv_resume(channel);
 
             // send ok
             break;
@@ -90,14 +162,13 @@ static tb_void_t tb_co_channel_send_buffer(tb_co_channel_t* channel, tb_cpointer
         else
         {
             // trace
-            tb_trace_d("send[%p]: wait(%lu) ..", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+            tb_trace_d("send[%p]: wait ..", tb_coroutine_self());
 
             // wait send
-            tb_long_t ok = tb_co_semaphore_wait(channel->send, -1);
-            tb_assert_and_check_return(ok > 0);
+            tb_co_channel_send_suspend(channel, tb_null);
  
             // trace
-            tb_trace_d("send[%p]: wait(%lu) ok", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+            tb_trace_d("send[%p]: wait ok", tb_coroutine_self());
         }
 
     } while (1);
@@ -108,7 +179,7 @@ static tb_void_t tb_co_channel_send_buffer(tb_co_channel_t* channel, tb_cpointer
 static tb_pointer_t tb_co_channel_recv_buffer(tb_co_channel_t* channel)
 {
     // check
-    tb_assert_and_check_return_val(channel && channel->queue && channel->send && channel->recv, tb_null);
+    tb_assert_and_check_return_val(channel && channel->queue, tb_null);
 
     // done
     tb_pointer_t data = tb_null;
@@ -127,7 +198,7 @@ static tb_pointer_t tb_co_channel_recv_buffer(tb_co_channel_t* channel)
             tb_trace_d("recv[%p]: get data(%p)", tb_coroutine_self(), data);
 
             // notify to send data
-            tb_co_semaphore_post(channel->send, 1);
+            tb_co_channel_send_resume(channel);
 
             // recv ok
             break;
@@ -136,14 +207,13 @@ static tb_pointer_t tb_co_channel_recv_buffer(tb_co_channel_t* channel)
         else
         {
             // trace
-            tb_trace_d("recv[%p]: wait(%p) ..", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+            tb_trace_d("recv[%p]: wait ..", tb_coroutine_self());
 
             // wait recv
-            tb_long_t ok = tb_co_semaphore_wait(channel->recv, -1);
-            tb_assert_and_check_return_val(ok > 0, tb_null);
+            tb_co_channel_recv_suspend(channel);
 
             // trace
-            tb_trace_d("recv[%p]: wait(%p) ok", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
+            tb_trace_d("recv[%p]: wait ok", tb_coroutine_self());
         }
 
     } while (1);
@@ -157,75 +227,34 @@ static tb_pointer_t tb_co_channel_recv_buffer(tb_co_channel_t* channel)
 static tb_void_t tb_co_channel_send_buffer0(tb_co_channel_t* channel, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(channel);
+    tb_assert(channel);
 
-    // resume the first waiting recv coroutine 
-    if (tb_single_list_entry_size(&channel->waiting_recv))
-    {
-        // get the next entry from head
-        tb_single_list_entry_ref_t entry = tb_single_list_entry_head(&channel->waiting_recv);
-        tb_assert(entry);
-
-        // remove it from the waiting recv coroutines
-        tb_single_list_entry_remove_head(&channel->waiting_recv);
-
-        // get the waiting recv coroutine
-        tb_coroutine_ref_t waiting = (tb_coroutine_ref_t)tb_single_list_entry(&channel->waiting_recv, entry);
-
-        // resume this coroutine 
-        tb_coroutine_resume(waiting, tb_null);
-    }
-
-    // get the running coroutine 
-    tb_coroutine_t* running = (tb_coroutine_t*)tb_coroutine_self();
-    tb_assert(running);
-
-    // save this coroutine to the waiting send coroutines
-    tb_single_list_entry_insert_tail(&channel->waiting_send, &running->rs.single_entry);
+    // resume one waiting recv coroutine 
+    tb_co_channel_recv_resume(channel);
 
     // send data and wait it
-    tb_coroutine_suspend(data);
+    tb_co_channel_send_suspend(channel, data);
 }
 static tb_pointer_t tb_co_channel_recv_buffer0(tb_co_channel_t* channel)
 {
     // check
-    tb_assert_and_check_return_val(channel, tb_null);
+    tb_assert(channel);
 
     // done
     tb_pointer_t data = tb_null;
     do
     {
         // resume the first waiting send coroutine and recv data
-        if (tb_single_list_entry_size(&channel->waiting_send))
+        if ((data = tb_co_channel_send_resume(channel)))
         {
-            // get the next entry from head
-            tb_single_list_entry_ref_t entry = tb_single_list_entry_head(&channel->waiting_send);
-            tb_assert(entry);
-
-            // remove it from the waiting send coroutines
-            tb_single_list_entry_remove_head(&channel->waiting_send);
-
-            // get the waiting send coroutine
-            tb_coroutine_ref_t waiting = (tb_coroutine_ref_t)tb_single_list_entry(&channel->waiting_send, entry);
-
-            // resume this coroutine and recv data
-            data = tb_coroutine_resume(waiting, tb_null);
-
             // recv ok
             break;
         }
         // no data?
         else
         {
-            // get the running coroutine 
-            tb_coroutine_t* running = (tb_coroutine_t*)tb_coroutine_self();
-            tb_assert(running);
-
-            // save this coroutine to the waiting recv coroutines
-            tb_single_list_entry_insert_tail(&channel->waiting_recv, &running->rs.single_entry);
-
             // wait data
-            tb_coroutine_suspend(tb_null);
+            tb_co_channel_recv_suspend(channel);
         }
 
     } while (1);
@@ -248,29 +277,18 @@ tb_co_channel_ref_t tb_co_channel_init(tb_size_t size)
         channel = tb_malloc0_type(tb_co_channel_t);
         tb_assert_and_check_break(channel);
 
+        // init waiting send coroutines
+        tb_single_list_entry_init(&channel->waiting_send, tb_coroutine_t, rs.single_entry, tb_null);
+
+        // init waiting recv coroutines
+        tb_single_list_entry_init(&channel->waiting_recv, tb_coroutine_t, rs.single_entry, tb_null);
+
         // with buffer?
         if (size)
         {
             // init queue 
             channel->queue = tb_circle_queue_init(size, tb_element_ptr(tb_null, tb_null));
             tb_assert_and_check_break(channel->queue);
-
-            // init send semaphore
-            channel->send = tb_co_semaphore_init(0);
-            tb_assert_and_check_break(channel->send);
-
-            // init recv semaphore
-            channel->recv = tb_co_semaphore_init(0);
-            tb_assert_and_check_break(channel->recv);
-        }
-        // no buffer
-        else
-        {
-            // init waiting send coroutines
-            tb_single_list_entry_init(&channel->waiting_send, tb_coroutine_t, rs.single_entry, tb_null);
-
-            // init waiting recv coroutines
-            tb_single_list_entry_init(&channel->waiting_recv, tb_coroutine_t, rs.single_entry, tb_null);
         }
 
         // ok
@@ -298,14 +316,6 @@ tb_void_t tb_co_channel_exit(tb_co_channel_ref_t self)
     // exit queue
     if (channel->queue) tb_circle_queue_exit(channel->queue);
     channel->queue = tb_null;
-
-    // exit send semaphore
-    if (channel->send) tb_co_semaphore_exit(channel->send);
-    channel->send = tb_null;
-
-    // exit recv semaphore
-    if (channel->recv) tb_co_semaphore_exit(channel->recv);
-    channel->recv = tb_null;
 
     // check waiting coroutines
     tb_assert(!tb_single_list_entry_size(&channel->waiting_send));
