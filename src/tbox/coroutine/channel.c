@@ -40,11 +40,34 @@
  * types
  */
 
+/* the channel queue type
+ *
+ * we do not use tb_circle_queue_t because it is too heavy
+ */
+typedef struct __tb_co_channel_queue_t
+{
+    // the data
+    tb_cpointer_t*                  data;
+    
+    // the head
+    tb_size_t                       head;
+
+    // the tail
+    tb_size_t                       tail;
+
+    // the maxn
+    tb_size_t                       maxn;
+
+    // the size
+    tb_size_t                       size;
+
+}tb_co_channel_queue_t;
+
 // the coroutine channel type
 typedef struct __tb_co_channel_t
 {
     // the queue
-    tb_circle_queue_ref_t           queue;
+    tb_co_channel_queue_t           queue;
 
     // the waiting send coroutines 
     tb_single_list_entry_head_t     waiting_send;
@@ -138,19 +161,21 @@ static tb_void_t tb_co_channel_recv_suspend(tb_co_channel_t* channel)
 static tb_void_t tb_co_channel_send_buffer(tb_co_channel_t* channel, tb_cpointer_t data)
 {
     // check
-    tb_assert_and_check_return(channel && channel->queue);
+    tb_assert_and_check_return(channel && channel->queue.data);
 
     // done
     do
     {
         // put data into queue if be not full
-        if (!tb_circle_queue_full(channel->queue))
+        if (channel->queue.size + 1 < channel->queue.maxn)
         {
             // trace
             tb_trace_d("send[%p]: put data(%p)", tb_coroutine_self(), data);
 
             // put data
-            tb_circle_queue_put(channel->queue, data);
+            channel->queue.data[channel->queue.tail] = data;
+            channel->queue.tail = (channel->queue.tail + 1) % channel->queue.maxn;
+            channel->queue.size++;
 
             // notify to recv data
             tb_co_channel_recv_resume(channel);
@@ -179,20 +204,21 @@ static tb_void_t tb_co_channel_send_buffer(tb_co_channel_t* channel, tb_cpointer
 static tb_pointer_t tb_co_channel_recv_buffer(tb_co_channel_t* channel)
 {
     // check
-    tb_assert_and_check_return_val(channel && channel->queue, tb_null);
+    tb_assert_and_check_return_val(channel && channel->queue.data, tb_null);
 
     // done
     tb_pointer_t data = tb_null;
     do
     {
         // recv data from channel if be not null
-        if (!tb_circle_queue_null(channel->queue))
+        if (channel->queue.size)
         {
             // get data
-            data = tb_circle_queue_get(channel->queue);
+            data = (tb_pointer_t)channel->queue.data[channel->queue.head];
 
             // pop data
-            tb_circle_queue_pop(channel->queue);
+            channel->queue.head = (channel->queue.head + 1) % channel->queue.maxn;
+            channel->queue.size--;
 
             // trace
             tb_trace_d("recv[%p]: get data(%p)", tb_coroutine_self(), data);
@@ -286,9 +312,12 @@ tb_co_channel_ref_t tb_co_channel_init(tb_size_t size)
         // with buffer?
         if (size)
         {
-            // init queue 
-            channel->queue = tb_circle_queue_init(size, tb_element_ptr(tb_null, tb_null));
-            tb_assert_and_check_break(channel->queue);
+            // init maxn, + tail
+            channel->queue.maxn = size + 1;
+
+            // make data
+            channel->queue.data = tb_nalloc_type(channel->queue.maxn, tb_cpointer_t);
+            tb_assert_and_check_break(channel->queue.data);
         }
 
         // ok
@@ -314,8 +343,9 @@ tb_void_t tb_co_channel_exit(tb_co_channel_ref_t self)
     tb_assert_and_check_return(channel);
 
     // exit queue
-    if (channel->queue) tb_circle_queue_exit(channel->queue);
-    channel->queue = tb_null;
+    if (channel->queue.data) tb_free(channel->queue.data);
+    channel->queue.data = tb_null;
+    channel->queue.size = 0;
 
     // check waiting coroutines
     tb_assert(!tb_single_list_entry_size(&channel->waiting_send));
@@ -335,7 +365,7 @@ tb_void_t tb_co_channel_send(tb_co_channel_ref_t self, tb_cpointer_t data)
     tb_assert_and_check_return(channel);
 
     // send it
-    if (channel->queue) tb_co_channel_send_buffer(channel, data);
+    if (channel->queue.data) tb_co_channel_send_buffer(channel, data);
     else tb_co_channel_send_buffer0(channel, data);
 }
 tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
@@ -345,6 +375,6 @@ tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
     tb_assert_and_check_return_val(channel, tb_null);
 
     // recv it
-    return channel->queue? tb_co_channel_recv_buffer(channel) : tb_co_channel_recv_buffer0(channel);
+    return channel->queue.data? tb_co_channel_recv_buffer(channel) : tb_co_channel_recv_buffer0(channel);
 }
 
