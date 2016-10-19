@@ -75,7 +75,7 @@ tb_bool_t               tb_coroutine_yield(tb_noarg_t);
  *
  * @return              the user private data from suspend(priv)
  */
-tb_cpointer_t           tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv);
+tb_pointer_t            tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv);
 
 /*! suspend the current coroutine
  *
@@ -83,7 +83,7 @@ tb_cpointer_t           tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpo
  *
  * @return              the user private data from resume(priv)
  */
-tb_cpointer_t           tb_coroutine_suspend(tb_cpointer_t priv);
+tb_pointer_t            tb_coroutine_suspend(tb_cpointer_t priv);
 
 /*! sleep some times (ms)
  *
@@ -91,7 +91,7 @@ tb_cpointer_t           tb_coroutine_suspend(tb_cpointer_t priv);
  *
  * @return              the user private data from resume(priv)
  */
-tb_cpointer_t           tb_coroutine_sleep(tb_long_t interval);
+tb_pointer_t            tb_coroutine_sleep(tb_long_t interval);
 
 /*! wait io events 
  *

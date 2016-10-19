@@ -54,7 +54,7 @@ tb_bool_t tb_coroutine_yield()
     // yield the current coroutine
     return scheduler? tb_co_scheduler_yield(scheduler) : tb_false;
 }
-tb_cpointer_t tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv)
+tb_pointer_t tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // get current scheduler
     tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
@@ -62,7 +62,7 @@ tb_cpointer_t tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t pr
     // resume the given coroutine
     return scheduler? tb_co_scheduler_resume(scheduler, (tb_coroutine_t*)coroutine, priv) : tb_null;
 }
-tb_cpointer_t tb_coroutine_suspend(tb_cpointer_t priv)
+tb_pointer_t tb_coroutine_suspend(tb_cpointer_t priv)
 {
     // get current scheduler
     tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
@@ -70,7 +70,7 @@ tb_cpointer_t tb_coroutine_suspend(tb_cpointer_t priv)
     // suspend the current coroutine
     return scheduler? tb_co_scheduler_suspend(scheduler, priv) : tb_null;
 }
-tb_cpointer_t tb_coroutine_sleep(tb_long_t interval)
+tb_pointer_t tb_coroutine_sleep(tb_long_t interval)
 {
     // get current scheduler
     tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();

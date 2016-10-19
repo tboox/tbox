@@ -261,7 +261,7 @@ tb_bool_t tb_co_scheduler_yield(tb_co_scheduler_t* scheduler)
     // no more ready coroutines? return it directly and continue to run this coroutine
     return tb_false;
 }
-tb_cpointer_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv)
+tb_pointer_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv)
 {
     // check
     tb_assert(scheduler && coroutine);
@@ -271,14 +271,14 @@ tb_cpointer_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_
     tb_trace_d("resume coroutine(%p)", coroutine);
 
     // this coroutine is suspended?
-    tb_cpointer_t retval = tb_null;
+    tb_pointer_t retval = tb_null;
     if (tb_coroutine_is_suspend(coroutine))
     {
         // remove it from the suspend coroutines
         tb_list_entry_remove(&scheduler->coroutines_suspend, &coroutine->entry);
 
         // get the passed private data from suspend(priv)
-        retval = coroutine->rs_priv;
+        retval = (tb_pointer_t)coroutine->rs_priv;
 
         // pass the user private data to suspend()
         coroutine->rs_priv = priv;
@@ -290,7 +290,7 @@ tb_cpointer_t tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_
     // return it
     return retval;
 }
-tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t priv)
+tb_pointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t priv)
 {
     // check
     tb_assert(scheduler && scheduler->running);
@@ -316,7 +316,7 @@ tb_cpointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_
     tb_assert(scheduler->running);
 
     // return the user private data from resume(priv)
-    return scheduler->running->rs_priv;
+    return (tb_pointer_t)scheduler->running->rs_priv;
 }
 tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
 {
@@ -334,7 +334,7 @@ tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
     // switch to next coroutine 
     tb_co_scheduler_switch_next(scheduler);
 }
-tb_cpointer_t tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_long_t interval)
+tb_pointer_t tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_long_t interval)
 {
     // check
     tb_assert(scheduler && scheduler->running);

@@ -118,7 +118,7 @@ tb_bool_t                   tb_co_scheduler_yield(tb_co_scheduler_t* scheduler);
  *
  * @return                  the user private data from suspend(priv)
  */
-tb_cpointer_t               tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv);
+tb_pointer_t                tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv);
 
 /*! suspend the current coroutine
  *
@@ -127,7 +127,7 @@ tb_cpointer_t               tb_co_scheduler_resume(tb_co_scheduler_t* scheduler,
  *
  * @return                  the user private data from resume(priv)
  */
-tb_cpointer_t               tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t priv);
+tb_pointer_t                tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t priv);
 
 /* finish the current coroutine
  *
@@ -142,7 +142,7 @@ tb_void_t                   tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
  *
  * @return                  the user private data from resume(priv)
  */
-tb_cpointer_t               tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_long_t interval);
+tb_pointer_t                tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_long_t interval);
 
 /* switch to the given coroutine
  *

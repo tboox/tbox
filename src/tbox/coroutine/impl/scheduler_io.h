@@ -87,7 +87,7 @@ tb_void_t                   tb_co_scheduler_io_kill(tb_co_scheduler_io_ref_t sch
  *
  * @return                  the user private data from resume(priv)
  */
-tb_cpointer_t               tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_long_t interval);
+tb_pointer_t                tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_long_t interval);
 
 /*! wait io events 
  *

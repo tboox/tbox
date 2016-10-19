@@ -49,11 +49,10 @@ typedef __tb_typeref__(co_channel);
 /*! init channel 
  *
  * @param size          the buffer size, 0: no buffer
- * @param element       the data element
  *
  * @return              the channel 
  */
-tb_co_channel_ref_t     tb_co_channel_init(tb_size_t size, tb_element_t element);
+tb_co_channel_ref_t     tb_co_channel_init(tb_size_t size);
 
 /*! exit channel
  *

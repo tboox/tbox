@@ -13,7 +13,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_coroutine_channel_send_func(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_channel_test_send(tb_cpointer_t priv)
 {
     // check
     tb_co_channel_ref_t channel = (tb_co_channel_ref_t)priv;
@@ -32,7 +32,7 @@ static tb_void_t tb_demo_coroutine_channel_send_func(tb_cpointer_t priv)
         tb_trace_i("[coroutine: %p]: send: %lu ok", tb_coroutine_self(), count);
     }
 }
-static tb_void_t tb_demo_coroutine_channel_recv_func(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_channel_test_recv(tb_cpointer_t priv)
 {
     // check
     tb_co_channel_ref_t channel = (tb_co_channel_ref_t)priv;
@@ -61,16 +61,16 @@ static tb_void_t tb_demo_coroutine_channel_test(tb_size_t size)
     if (scheduler)
     {
         // init channel
-        tb_co_channel_ref_t channel = tb_co_channel_init(size, tb_element_size());
+        tb_co_channel_ref_t channel = tb_co_channel_init(size);
         tb_assert(channel);
 
         // start coroutines
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_send, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_send, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_send, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_recv, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_recv, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_recv, channel, 0);
 
         // run scheduler
         tb_co_scheduler_loop(scheduler);
@@ -82,15 +82,23 @@ static tb_void_t tb_demo_coroutine_channel_test(tb_size_t size)
         tb_co_scheduler_exit(scheduler);
     }
 }
-static tb_void_t tb_demo_coroutine_channel_perf_func(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_channel_perf_send(tb_cpointer_t priv)
 {
+    // check
+    tb_co_channel_ref_t channel = (tb_co_channel_ref_t)priv;
+
     // loop
-    tb_size_t count = (tb_size_t)priv;
-    while (count--)
-    {
-        // yield
-        tb_coroutine_yield();
-    }
+    tb_size_t count = COUNT >> 1;
+    while (count--) tb_co_channel_send(channel, (tb_cpointer_t)count);
+}
+static tb_void_t tb_demo_coroutine_channel_perf_recv(tb_cpointer_t priv)
+{
+    // check
+    tb_co_channel_ref_t channel = (tb_co_channel_ref_t)priv;
+
+    // loop
+    tb_size_t count = COUNT >> 1;
+    while (count--) tb_co_channel_recv(channel);
 }
 static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
 {
@@ -101,9 +109,13 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
+        // init channel
+        tb_co_channel_ref_t channel = tb_co_channel_init(size);
+        tb_assert(channel);
+
         // start coroutine
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_perf_func, (tb_cpointer_t)(COUNT >> 1), 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_perf_func, (tb_cpointer_t)(COUNT >> 1), 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_perf_send, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_perf_recv, channel, 0);
 
         // init the start time
         tb_hong_t startime = tb_mclock();
@@ -113,6 +125,9 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
 
         // computing time
         tb_hong_t duration = tb_mclock() - startime;
+
+        // exit channel 
+        tb_co_channel_exit(channel);
 
         // trace
         tb_trace_i("%d switches in %lld ms, %lld switches per second", COUNT, duration, (((tb_hong_t)1000 * COUNT) / duration));
@@ -127,7 +142,7 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
  */ 
 tb_int_t tb_demo_coroutine_channel_main(tb_int_t argc, tb_char_t** argv)
 {
-//    tb_demo_coroutine_channel_test(0);
+    tb_demo_coroutine_channel_test(0);
     tb_demo_coroutine_channel_test(1);
     tb_demo_coroutine_channel_test(5);
 
