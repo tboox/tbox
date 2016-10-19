@@ -74,7 +74,7 @@ tb_co_channel_ref_t tb_co_channel_init(tb_size_t size, tb_element_t element)
         tb_assert_and_check_break(channel);
 
         // init queue 
-        channel->queue = tb_circle_queue_init(size? size : 1, element);
+        channel->queue = tb_circle_queue_init(size, element);
         tb_assert_and_check_break(channel->queue);
 
         // save the channel size
@@ -84,7 +84,7 @@ tb_co_channel_ref_t tb_co_channel_init(tb_size_t size, tb_element_t element)
         channel->dirty = tb_false;
 
         // init send semaphore
-        channel->send = tb_co_semaphore_init(size);
+        channel->send = tb_co_semaphore_init(0);
         tb_assert_and_check_break(channel->send);
 
         // init recv semaphore
@@ -163,10 +163,12 @@ tb_void_t tb_co_channel_send(tb_co_channel_ref_t self, tb_cpointer_t data)
 
             // notify to recv data
             tb_co_semaphore_post(channel->recv, 1);
-        }
 
-        // wait it if be full or no buffer
-        if (is_full || !channel->size)
+            // send ok
+            break;
+        }
+        // wait it if be full
+        else
         {
             // trace
             tb_trace_d("send[%p]: wait(%lu) ..", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
@@ -178,9 +180,6 @@ tb_void_t tb_co_channel_send(tb_co_channel_ref_t self, tb_cpointer_t data)
             // trace
             tb_trace_d("send[%p]: wait(%lu) ok", tb_coroutine_self(), tb_co_semaphore_value(channel->send));
         }
-
-        // send ok?
-        tb_check_break(is_full);
 
     } while (1);
  
@@ -230,9 +229,8 @@ tb_pointer_t tb_co_channel_recv(tb_co_channel_ref_t self)
             // recv ok
             break;
         }
-
-        // wait it if be null or no buffer
-        if (is_null || !channel->size)
+        // wait it if be null
+        else
         {
             // trace
             tb_trace_d("recv[%p]: wait(%p) ..", tb_coroutine_self(), tb_co_semaphore_value(channel->send));

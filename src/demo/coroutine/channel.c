@@ -66,11 +66,11 @@ static tb_void_t tb_demo_coroutine_channel_test(tb_size_t size)
 
         // start coroutines
         tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
-//        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
-//        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_send_func, channel, 0);
         tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
-//        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
-//        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_channel_recv_func, channel, 0);
 
         // run scheduler
         tb_co_scheduler_loop(scheduler);
@@ -127,7 +127,7 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
  */ 
 tb_int_t tb_demo_coroutine_channel_main(tb_int_t argc, tb_char_t** argv)
 {
-    tb_demo_coroutine_channel_test(0);
+//    tb_demo_coroutine_channel_test(0);
     tb_demo_coroutine_channel_test(1);
     tb_demo_coroutine_channel_test(5);
 
