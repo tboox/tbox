@@ -88,7 +88,7 @@ static tb_void_t tb_demo_coroutine_channel_perf_send(tb_cpointer_t priv)
     tb_co_channel_ref_t channel = (tb_co_channel_ref_t)priv;
 
     // loop
-    tb_size_t count = COUNT >> 1;
+    tb_size_t count = COUNT;
     while (count--) tb_co_channel_send(channel, (tb_cpointer_t)count);
 }
 static tb_void_t tb_demo_coroutine_channel_perf_recv(tb_cpointer_t priv)
@@ -97,7 +97,7 @@ static tb_void_t tb_demo_coroutine_channel_perf_recv(tb_cpointer_t priv)
     tb_co_channel_ref_t channel = (tb_co_channel_ref_t)priv;
 
     // loop
-    tb_size_t count = COUNT >> 1;
+    tb_size_t count = COUNT;
     while (count--) tb_co_channel_recv(channel);
 }
 static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
@@ -130,7 +130,7 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
         tb_co_channel_exit(channel);
 
         // trace
-        tb_trace_i("%d switches in %lld ms, %lld switches per second", COUNT, duration, (((tb_hong_t)1000 * COUNT) / duration));
+        tb_trace_i("%d passes in %lld ms, %lld passes per second", COUNT, duration, (((tb_hong_t)1000 * COUNT) / duration));
 
         // exit scheduler
         tb_co_scheduler_exit(scheduler);
