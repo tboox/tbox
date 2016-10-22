@@ -44,9 +44,6 @@
 // the default stack size
 #define TB_COROUTINE_STACK_DEFSIZE          (8192 << 1)
 
-// the debuginfo stack size
-#define TB_COROUTINE_STACK_DBGSIZE          (8192)
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -97,7 +94,7 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
 
 #ifdef __tb_debug__
         // patch debug stack size for (assert, trace ..)
-        stacksize += TB_COROUTINE_STACK_DBGSIZE;
+        stacksize <<= 1;
 #endif
 
         /* make coroutine
@@ -168,7 +165,7 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
 
 #ifdef __tb_debug__
         // patch debug stack size for (assert, trace ..)
-        stacksize += TB_COROUTINE_STACK_DBGSIZE;
+        stacksize <<= 1;
 
         // check coroutine
         tb_coroutine_check(coroutine);

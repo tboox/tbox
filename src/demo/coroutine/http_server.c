@@ -60,7 +60,7 @@ typedef struct __tb_demo_http_session_t
  */ 
 
 // the root directory
-static tb_char_t    g_roordir[TB_PATH_MAXN];
+static tb_char_t    g_rootdir[TB_PATH_MAXN];
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -395,7 +395,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
         if (session.method == TB_HTTP_METHOD_GET)
         {
             // make full path
-            tb_long_t size = tb_snprintf((tb_char_t*)session.data, sizeof(session.data) - 1, "%s%s%s", g_roordir, session.path[0] != '/'? "/" : "", session.path);
+            tb_long_t size = tb_snprintf((tb_char_t*)session.data, sizeof(session.data) - 1, "%s%s%s", g_rootdir, session.path[0] != '/'? "/" : "", session.path);
             if (size > 0) session.data[size] = 0;
 
             // init file
@@ -467,11 +467,11 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 tb_int_t tb_demo_coroutine_http_server_main(tb_int_t argc, tb_char_t** argv)
 {
     // init the root directory
-    if (argv[1]) tb_strlcpy(g_roordir, argv[1], sizeof(g_roordir));
-    else tb_directory_current(g_roordir, sizeof(g_roordir));
+    if (argv[1]) tb_strlcpy(g_rootdir, argv[1], sizeof(g_rootdir));
+    else tb_directory_current(g_rootdir, sizeof(g_rootdir));
 
     // trace
-    tb_trace_i("rootdir: %s", g_roordir);
+    tb_trace_i("rootdir: %s", g_rootdir);
 
     // init scheduler
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();

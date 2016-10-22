@@ -97,6 +97,15 @@ typedef struct __tb_url_t
  */
 tb_bool_t           tb_url_init(tb_url_ref_t url);
 
+/*! init url from c-string
+ *
+ * @param url       the url
+ * @param cstr      the url c-string
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_url_init_from_cstr(tb_url_ref_t url, tb_char_t const* cstr);
+
 /*! exit url
  *
  * @param url       the url

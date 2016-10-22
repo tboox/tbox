@@ -208,6 +208,10 @@ tb_bool_t tb_url_init(tb_url_ref_t url)
     // ok
     return ok;
 }
+tb_bool_t tb_url_init_from_cstr(tb_url_ref_t url, tb_char_t const* cstr)
+{
+    return tb_url_init(url) && tb_url_cstr_set(url, cstr);
+}
 tb_void_t tb_url_exit(tb_url_ref_t url)
 {
     if (url)

@@ -104,8 +104,6 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
         // is high-precision timer?
         tb_size_t is_timer = (tb_size_t)(task) & 0x1;
 
-        tb_trace_i("%p", task);
-
         // check
         tb_assert((tb_size_t)task & (tb_size_t)~0x1);
 
