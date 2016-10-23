@@ -153,7 +153,6 @@ TB_DEMO_MAIN_DECL(network_ipaddr);
 TB_DEMO_MAIN_DECL(network_hwaddr);
 TB_DEMO_MAIN_DECL(network_http);
 TB_DEMO_MAIN_DECL(network_whois);
-TB_DEMO_MAIN_DECL(network_spider);
 TB_DEMO_MAIN_DECL(network_cookies);
 TB_DEMO_MAIN_DECL(network_impl_date);
 

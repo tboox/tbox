@@ -681,7 +681,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
             }
 
             // check
-            tb_assert_and_check_break(read == size);
+            tb_assert_pass_and_check_break(read == size);
         }
 
         // close stream

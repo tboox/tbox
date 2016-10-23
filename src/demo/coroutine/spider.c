@@ -14,8 +14,8 @@
  */ 
 
 // the timeout
-#define TB_DEMO_TIMEOUT             (-1)
-//#define TB_DEMO_TIMEOUT             (15000)
+//#define TB_DEMO_TIMEOUT             (-1)
+#define TB_DEMO_TIMEOUT             (15000)
 
 // the limit rate, 256KB/s
 #define TB_DEMO_LIMITRATE           (0)
@@ -334,7 +334,7 @@ static tb_char_t const* tb_demo_spider_parser_read(tb_demo_spider_parser_ref_t p
                             tb_size_t protocol = tb_url_protocol_probe(tb_string_cstr(&attr->data));
 
                             // http?
-                            if(protocol == TB_URL_PROTOCOL_HTTP)
+                            if (protocol == TB_URL_PROTOCOL_HTTP)
                             {
                                 // save url
                                 ok = tb_url_cstr_set(&parser->url, tb_string_cstr(&attr->data));

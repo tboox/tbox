@@ -166,7 +166,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(network_hwaddr)
 ,   TB_DEMO_MAIN_ITEM(network_http)
 ,   TB_DEMO_MAIN_ITEM(network_whois)
-,   TB_DEMO_MAIN_ITEM(network_spider)
 ,   TB_DEMO_MAIN_ITEM(network_cookies)
 ,   TB_DEMO_MAIN_ITEM(network_impl_date)
 
