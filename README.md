@@ -77,8 +77,12 @@ If you want to know more, please refer to:
 
 #### The network library
 
-- Implements dns(cached), ssl(openssl and polarssl), http and cookies
-- Supports asynchronous io mode for dns, ssl and http using the asio and stream library
+- Implements dns(cached)
+- Implements ssl(openssl, polarssl, mbedtls)
+- Implements http
+- Implements cookies
+- Supports ipv4, ipv6
+- Supports coroutine
 
 #### The platform library
 
@@ -328,7 +332,12 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 #### 网络库
 
-- 实现http、cookies、dns解析与缓存、ipv4、url的封装。
+- 实现http客户端模块
+- 实现cookies
+- 实现dns解析与缓存
+- 实现ssl(支持openssl, polarssl, mbedtls)
+- 支持ipv4、ipv6
+- 支持通过协程实现异步模式
 
 #### 数学运算库
 

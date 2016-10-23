@@ -69,7 +69,7 @@ typedef struct __tb_ssl_t
     tb_ssl_func_wait_t  wait;
 
     // the priv data
-    tb_cpointer_t        priv;
+    tb_cpointer_t       priv;
 
 }tb_ssl_t;
 
@@ -121,7 +121,7 @@ static tb_handle_t tb_ssl_library_load()
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
 static tb_int_t tb_ssl_verify(tb_int_t ok, X509_STORE_CTX* ctx)
 {
@@ -173,13 +173,13 @@ static tb_long_t tb_ssl_sock_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_
     // send it
     return tb_socket_send((tb_socket_ref_t)priv, data, size);
 }
-static tb_long_t tb_ssl_sock_wait(tb_cpointer_t priv, tb_size_t code, tb_long_t timeout)
+static tb_long_t tb_ssl_sock_wait(tb_cpointer_t priv, tb_size_t events, tb_long_t timeout)
 {
     // check
     tb_assert_and_check_return_val(priv, -1);
 
     // wait it
-    return tb_socket_wait((tb_socket_ref_t)priv, code, timeout);
+    return tb_socket_wait((tb_socket_ref_t)priv, events, timeout);
 }
 static tb_int_t tb_ssl_bio_method_init(BIO* bio)
 {
@@ -352,13 +352,13 @@ static tb_int_t tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size)
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
 tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
 {
     // done
-    tb_bool_t       ok = tb_false;
-    tb_ssl_t*  ssl = tb_null;
+    tb_bool_t   ok = tb_false;
+    tb_ssl_t*   ssl = tb_null;
     do
     {
         // load openssl library
@@ -787,7 +787,7 @@ tb_long_t tb_ssl_writ(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
     // ok
     return real;
 }
-tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t code, tb_long_t timeout)
+tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t events, tb_long_t timeout)
 {
     // the ssl
     tb_ssl_t* ssl = (tb_ssl_t*)self;
@@ -798,11 +798,11 @@ tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t code, tb_long_t timeout)
     {
         // wait read
     case TB_STATE_SOCK_SSL_WANT_READ:
-        code = TB_SOCKET_EVENT_RECV;
+        events = TB_SOCKET_EVENT_RECV;
         break;
         // wait writ
     case TB_STATE_SOCK_SSL_WANT_WRIT:
-        code = TB_SOCKET_EVENT_SEND;
+        events = TB_SOCKET_EVENT_SEND;
         break;
         // ok, wait it
     case TB_STATE_OK:
@@ -813,10 +813,10 @@ tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t code, tb_long_t timeout)
     }
 
     // trace
-    tb_trace_d("wait: %lu: ..", code);
+    tb_trace_d("wait: %lu: ..", events);
 
     // wait it
-    ssl->lwait = ssl->wait(ssl->priv, code, timeout);
+    ssl->lwait = ssl->wait(ssl->priv, events, timeout);
 
     // timeout or failed? save state
     if (ssl->lwait < 0) ssl->state = TB_STATE_SOCK_SSL_WAIT_FAILED;

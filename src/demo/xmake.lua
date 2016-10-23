@@ -25,7 +25,7 @@ target("demo")
     add_links("tbox")
 
     -- add packages
-    add_packages("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "base")
+    add_packages("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "mbedtls", "base")
 
     -- add the source files
     add_files("*.c") 

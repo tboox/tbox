@@ -91,26 +91,26 @@ typedef __tb_typeref__(ssl);
  *
  * @param bserver   is server endpoint?
  *
- * @return          the ssl handle 
+ * @return          the ssl 
  */
 tb_ssl_ref_t        tb_ssl_init(tb_bool_t bserver);
 
 /*! exit ssl
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  */
 tb_void_t           tb_ssl_exit(tb_ssl_ref_t ssl);
 
 /*! set ssl bio sock
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  * @param sock      the sock handle, non-blocking 
  */
 tb_void_t           tb_ssl_set_bio_sock(tb_ssl_ref_t ssl, tb_socket_ref_t sock);
 
 /*! set ssl bio read and writ func 
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  * @param read      the read func
  * @param writ      the writ func
  * #param wait      the wait func only for tb_ssl_open and tb_ssl_wait
@@ -120,7 +120,7 @@ tb_void_t           tb_ssl_set_bio_func(tb_ssl_ref_t ssl, tb_ssl_func_read_t rea
 
 /*! set ssl timeout for opening
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  * @param timeout   the timeout
  */
 tb_void_t           tb_ssl_set_timeout(tb_ssl_ref_t ssl, tb_long_t timeout);
@@ -129,7 +129,7 @@ tb_void_t           tb_ssl_set_timeout(tb_ssl_ref_t ssl, tb_long_t timeout);
  *
  * @note need wait func
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  *
  * @return          tb_true or tb_false
  */
@@ -150,7 +150,7 @@ tb_bool_t           tb_ssl_open(tb_ssl_ref_t ssl);
 
  * @endcode
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  *
  * @return          ok: 1, continue: 0, failed: -1
  */
@@ -158,7 +158,7 @@ tb_long_t           tb_ssl_open_try(tb_ssl_ref_t ssl);
 
 /*! clos ssl 
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  *
  * @return          tb_true or tb_false
  */
@@ -179,7 +179,7 @@ tb_bool_t           tb_ssl_clos(tb_ssl_ref_t ssl);
 
  * @endcode
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  *
  * @return          ok: 1, continue: 0, failed: -1
  */
@@ -187,7 +187,7 @@ tb_long_t           tb_ssl_clos_try(tb_ssl_ref_t ssl);
 
 /*! read ssl data
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  * @param data      the data
  * @param size      the size
  *
@@ -197,7 +197,7 @@ tb_long_t           tb_ssl_read(tb_ssl_ref_t ssl, tb_byte_t* data, tb_size_t siz
 
 /*! writ ssl data
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  * @param data      the data
  * @param size      the size
  *
@@ -207,17 +207,17 @@ tb_long_t           tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size
 
 /*! wait ssl data
  *
- * @param ssl       the ssl handle
- * @param code      the events code
+ * @param ssl       the ssl
+ * @param events    the events 
  * @param timeout   the timeout
  *
- * @return          the real code, no event: 0, failed or closed: -1
+ * @return          the real events, no event: 0, failed or closed: -1
  */
-tb_long_t           tb_ssl_wait(tb_ssl_ref_t ssl, tb_size_t code, tb_long_t timeout);
+tb_long_t           tb_ssl_wait(tb_ssl_ref_t ssl, tb_size_t events, tb_long_t timeout);
 
 /*! the ssl state see the stream ssl state
  *
- * @param ssl       the ssl handle
+ * @param ssl       the ssl
  *
  * @return          the ssl state
  */

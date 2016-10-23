@@ -44,7 +44,7 @@ option("smallest")
     set_description("Enable the smallest compile mode and disable all modules.")
     add_rbindings("info", "deprecated")
     add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database")
-    add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre")
+    add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
 
 -- add modules
 for _, module in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "database", "coroutine"}) do
@@ -83,7 +83,7 @@ target("tbox")
     add_headers("../(tbox/utils/impl/*.h)")
 
     -- add packages
-    add_packages("zlib", "mysql", "sqlite3", "openssl", "polarssl", "pcre2", "pcre", "base")
+    add_packages("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre", "base")
 
     -- add options
     add_options("info", "float", "wchar", "exception", "deprecated")
@@ -140,7 +140,7 @@ target("tbox")
         add_files("platform/deprecated/aicp.c")
         add_files("platform/deprecated/aioo.c")
         add_files("platform/deprecated/aiop.c")
-        if is_option("openssl", "polarssl") then add_files("asio/deprecated/ssl.c") end
+        if is_option("openssl", "polarssl", "mbedtls") then add_files("asio/deprecated/ssl.c") end
     end
 
     -- add the source files for the coroutine module
@@ -202,7 +202,8 @@ target("tbox")
     end
 
     -- add the source files for the ssl package
-    if is_option("polarssl") then add_files("network/impl/ssl/polarssl.c") 
+    if is_option("mbedtls") then add_files("network/impl/ssl/mbedtls.c")
+    elseif is_option("polarssl") then add_files("network/impl/ssl/polarssl.c") 
     elseif is_option("openssl") then add_files("network/impl/ssl/openssl.c") end
 
     -- add the source for the windows 

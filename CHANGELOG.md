@@ -10,6 +10,7 @@
 * Add some server examples using coroutine
 * Add switch context interfaces
 * Add io poller interfaces(with epoll, poll, kqueue, select) instead of aiop
+* Support mbedtls 
 
 ### Changes
 
@@ -99,6 +100,7 @@
 * 新增基于协程的各种服务器开发实例
 * 针对平台库，新增上下文切换接口
 * 新增poller轮询器接口，实现对epoll,poll,kqueue,select的封装，逐步取代老的aiop接口
+* 支持mbedtls
 
 ### 改进
 
