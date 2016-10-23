@@ -333,7 +333,7 @@ tb_bool_t tb_stream_is_opened(tb_stream_ref_t self)
 
     // the state
     tb_size_t state = tb_atomic_get(&stream->istate);
-
+    
     // is opened?
     return (TB_STATE_OPENED == state || TB_STATE_KILLING == state)? tb_true : tb_false;
 }

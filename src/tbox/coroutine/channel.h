@@ -42,6 +42,13 @@ __tb_extern_c_enter__
 /// the coroutine channel ref type
 typedef __tb_typeref__(co_channel);
 
+/*! the free function type
+ *
+ * @param data          the channel data
+ * @param priv          the user private data
+ */
+typedef tb_void_t       (*tb_co_channel_free_func_t)(tb_pointer_t data, tb_cpointer_t priv);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -49,10 +56,12 @@ typedef __tb_typeref__(co_channel);
 /*! init channel 
  *
  * @param size          the buffer size, 0: no buffer
+ * @param free          the free function
+ * @param priv          the user private data
  *
  * @return              the channel 
  */
-tb_co_channel_ref_t     tb_co_channel_init(tb_size_t size);
+tb_co_channel_ref_t     tb_co_channel_init(tb_size_t size, tb_co_channel_free_func_t free, tb_cpointer_t priv);
 
 /*! exit channel
  *
@@ -78,6 +87,28 @@ tb_void_t               tb_co_channel_send(tb_co_channel_ref_t channel, tb_cpoin
  * @return              the channel data
  */
 tb_pointer_t            tb_co_channel_recv(tb_co_channel_ref_t channel);
+
+/*! try sending data into channel only with buffer
+ *
+ * the current coroutine will be suspend if this channel is full 
+ *
+ * @param channel       the channel
+ * @param data          the channel data
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_co_channel_send_try(tb_co_channel_ref_t channel, tb_cpointer_t data);
+
+/*! try recving data from channel only with buffer
+ *
+ * the current coroutine will be suspend if no data
+ *
+ * @param channel       the channel
+ * @param pdata         the channel data pointer
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_co_channel_recv_try(tb_co_channel_ref_t channel, tb_pointer_t* pdata);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

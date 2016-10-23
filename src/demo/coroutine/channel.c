@@ -61,7 +61,7 @@ static tb_void_t tb_demo_coroutine_channel_test(tb_size_t size)
     if (scheduler)
     {
         // init channel
-        tb_co_channel_ref_t channel = tb_co_channel_init(size);
+        tb_co_channel_ref_t channel = tb_co_channel_init(size, tb_null, 0);
         tb_assert(channel);
 
         // start coroutines
@@ -110,7 +110,7 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
     if (scheduler)
     {
         // init channel
-        tb_co_channel_ref_t channel = tb_co_channel_init(size);
+        tb_co_channel_ref_t channel = tb_co_channel_init(size, tb_null, 0);
         tb_assert(channel);
 
         // start coroutine

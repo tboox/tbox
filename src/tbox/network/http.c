@@ -12,7 +12,7 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with TBox; 
- * If not, see <a href="impl://www.gnu.org/licenses/"> impl://www.gnu.org/licenses/</a>
+ * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
@@ -50,8 +50,8 @@
  * types
  */
 
-// the http impl type
-typedef struct __tb_http_impl_t
+// the http type
+typedef struct __tb_http_t
 {
     // the option
     tb_http_option_t    option;
@@ -83,15 +83,15 @@ typedef struct __tb_http_impl_t
     // the cookies
     tb_string_t         cookies;
 
-}tb_http_impl_t;
+}tb_http_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_http_connect(tb_http_impl_t* impl)
+static tb_bool_t tb_http_connect(tb_http_t* http)
 {
     // check
-    tb_assert_and_check_return_val(impl && impl->stream, tb_false);
+    tb_assert_and_check_return_val(http && http->stream, tb_false);
     
     // done
     tb_bool_t ok = tb_false;
@@ -100,30 +100,30 @@ static tb_bool_t tb_http_connect(tb_http_impl_t* impl)
         // the host is changed?
         tb_bool_t           host_changed = tb_true;
         tb_char_t const*    host_old = tb_null;
-        tb_char_t const*    host_new = tb_url_host(&impl->option.url);
-        tb_stream_ctrl(impl->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
+        tb_char_t const*    host_new = tb_url_host(&http->option.url);
+        tb_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
         if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
 
         // trace
         tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
 
         // ctrl stream
-        if (!tb_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_URL, tb_url_cstr(&impl->option.url))) break;
-        if (!tb_stream_ctrl(impl->stream, TB_STREAM_CTRL_SET_TIMEOUT, impl->option.timeout)) break;
+        if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_cstr(&http->option.url))) break;
+        if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
         // dump option
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
-        tb_http_option_dump(&impl->option);
+        tb_http_option_dump(&http->option);
 #endif
         
         // trace
         tb_trace_d("connect: ..");
 
         // clear status
-        tb_http_status_cler(&impl->status, host_changed);
+        tb_http_status_cler(&http->status, host_changed);
 
         // open stream
-        if (!tb_stream_open(impl->stream)) break;
+        if (!tb_stream_open(http->stream)) break;
 
         // trace
         tb_trace_d("connect: ok");
@@ -135,7 +135,7 @@ static tb_bool_t tb_http_connect(tb_http_impl_t* impl)
 
 
     // failed? save state
-    if (!ok) impl->status.state = tb_stream_state(impl->stream);
+    if (!ok) http->status.state = tb_stream_state(http->stream);
 
     // ok?
     return ok;
@@ -143,23 +143,23 @@ static tb_bool_t tb_http_connect(tb_http_impl_t* impl)
 static tb_bool_t tb_http_request_post(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_cpointer_t priv)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)priv;
-    tb_assert_and_check_return_val(impl && impl->stream, tb_false);
+    tb_http_t* http = (tb_http_t*)priv;
+    tb_assert_and_check_return_val(http && http->stream, tb_false);
 
     // trace
     tb_trace_d("post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_state_cstr(state));
 
     // done func
-    if (impl->option.post_func && !impl->option.post_func(state, offset, size, save, rate, impl->option.post_priv)) 
+    if (http->option.post_func && !http->option.post_func(state, offset, size, save, rate, http->option.post_priv)) 
         return tb_false;
 
     // ok?
     return tb_true;
 }
-static tb_bool_t tb_http_request(tb_http_impl_t* impl)
+static tb_bool_t tb_http_request(tb_http_t* http)
 {
     // check
-    tb_assert_and_check_return_val(impl && impl->stream, tb_false);
+    tb_assert_and_check_return_val(http && http->stream, tb_false);
 
     // done
     tb_bool_t           ok = tb_false;
@@ -168,7 +168,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
     do
     {
         // clear line data
-        tb_string_clear(&impl->request);
+        tb_string_clear(&http->request);
 
         // init the head value
         tb_char_t           data[8192];
@@ -176,72 +176,72 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         if (!tb_static_string_init(&value, data, sizeof(data))) break;
 
         // init method
-        tb_char_t const* method = tb_http_method_cstr(impl->option.method);
+        tb_char_t const* method = tb_http_method_cstr(http->option.method);
         tb_assert_and_check_break(method);
 
         // init path
-        tb_char_t const* path = tb_url_path(&impl->option.url);
+        tb_char_t const* path = tb_url_path(&http->option.url);
         tb_assert_and_check_break(path);
 
         // init args
-        tb_char_t const* args = tb_url_args(&impl->option.url);
+        tb_char_t const* args = tb_url_args(&http->option.url);
 
         // init host
-        tb_char_t const* host = tb_url_host(&impl->option.url);
+        tb_char_t const* host = tb_url_host(&http->option.url);
         tb_assert_and_check_break(host);
-        tb_hash_map_insert(impl->head, "Host", host);
+        tb_hash_map_insert(http->head, "Host", host);
 
         // init accept
-        tb_hash_map_insert(impl->head, "Accept", "*/*");
+        tb_hash_map_insert(http->head, "Accept", "*/*");
 
         // init connection
-        tb_hash_map_insert(impl->head, "Connection", impl->status.balived? "keep-alive" : "close");
+        tb_hash_map_insert(http->head, "Connection", http->status.balived? "keep-alive" : "close");
 
         // init cookies
         tb_bool_t cookie = tb_false;
-        if (impl->option.cookies)
+        if (http->option.cookies)
         {
             // set cookie
-            if (tb_cookies_get(impl->option.cookies, host, path, tb_url_ssl(&impl->option.url), &impl->cookies))
+            if (tb_cookies_get(http->option.cookies, host, path, tb_url_ssl(&http->option.url), &http->cookies))
             {
-                tb_hash_map_insert(impl->head, "Cookie", tb_string_cstr(&impl->cookies));
+                tb_hash_map_insert(http->head, "Cookie", tb_string_cstr(&http->cookies));
                 cookie = tb_true;
             }
         }
 
         // no cookie? remove it
-        if (!cookie) tb_hash_map_remove(impl->head, "Cookie");
+        if (!cookie) tb_hash_map_remove(http->head, "Cookie");
 
         // init range
-        if (impl->option.range.bof && impl->option.range.eof >= impl->option.range.bof)
-            tb_static_string_cstrfcpy(&value, "bytes=%llu-%llu", impl->option.range.bof, impl->option.range.eof);
-        else if (impl->option.range.bof && !impl->option.range.eof)
-            tb_static_string_cstrfcpy(&value, "bytes=%llu-", impl->option.range.bof);
-        else if (!impl->option.range.bof && impl->option.range.eof)
-            tb_static_string_cstrfcpy(&value, "bytes=0-%llu", impl->option.range.eof);
-        else if (impl->option.range.bof > impl->option.range.eof)
+        if (http->option.range.bof && http->option.range.eof >= http->option.range.bof)
+            tb_static_string_cstrfcpy(&value, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
+        else if (http->option.range.bof && !http->option.range.eof)
+            tb_static_string_cstrfcpy(&value, "bytes=%llu-", http->option.range.bof);
+        else if (!http->option.range.bof && http->option.range.eof)
+            tb_static_string_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
+        else if (http->option.range.bof > http->option.range.eof)
         {
-            impl->status.state = TB_STATE_HTTP_RANGE_INVALID;
+            http->status.state = TB_STATE_HTTP_RANGE_INVALID;
             break;
         }
 
         // update range
         if (tb_static_string_size(&value)) 
-            tb_hash_map_insert(impl->head, "Range", tb_static_string_cstr(&value));
+            tb_hash_map_insert(http->head, "Range", tb_static_string_cstr(&value));
         // remove range
-        else tb_hash_map_remove(impl->head, "Range");
+        else tb_hash_map_remove(http->head, "Range");
 
         // init post
-        if (impl->option.method == TB_HTTP_METHOD_POST)
+        if (http->option.method == TB_HTTP_METHOD_POST)
         {
             // done
             tb_bool_t post_ok = tb_false;
             do
             {
                 // init pstream
-                tb_char_t const* url = tb_url_cstr(&impl->option.post_url);
-                if (impl->option.post_data && impl->option.post_size)
-                    pstream = tb_stream_init_from_data(impl->option.post_data, impl->option.post_size);
+                tb_char_t const* url = tb_url_cstr(&http->option.post_url);
+                if (http->option.post_data && http->option.post_size)
+                    pstream = tb_stream_init_from_data(http->option.post_data, http->option.post_size);
                 else if (url) pstream = tb_stream_init_from_url(url);
                 tb_assert_and_check_break(pstream);
 
@@ -254,7 +254,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
 
                 // append post size
                 tb_static_string_cstrfcpy(&value, "%lld", post_size);
-                tb_hash_map_insert(impl->head, "Content-Length", tb_static_string_cstr(&value));
+                tb_hash_map_insert(http->head, "Content-Length", tb_static_string_cstr(&value));
 
                 // ok
                 post_ok = tb_true;
@@ -264,16 +264,16 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             // init post failed?
             if (!post_ok) 
             {
-                impl->status.state = TB_STATE_HTTP_POST_FAILED;
+                http->status.state = TB_STATE_HTTP_POST_FAILED;
                 break;
             }
         }
         // remove post
-        else tb_hash_map_remove(impl->head, "Content-Length");
+        else tb_hash_map_remove(http->head, "Content-Length");
 
         // replace the custom head 
-        tb_char_t const* head_data = (tb_char_t const*)tb_buffer_data(&impl->option.head_data);
-        tb_char_t const* head_tail = head_data + tb_buffer_size(&impl->option.head_data);
+        tb_char_t const* head_data = (tb_char_t const*)tb_buffer_data(&http->option.head_data);
+        tb_char_t const* head_tail = head_data + tb_buffer_size(&http->option.head_data);
         while (head_data < head_tail)
         {
             // the name and data
@@ -282,7 +282,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
             tb_check_break(data < head_tail);
 
             // replace it
-            tb_hash_map_insert(impl->head, name, data);
+            tb_hash_map_insert(http->head, name, data);
 
             // next
             head_data = data + tb_strlen(data) + 1;
@@ -292,75 +292,75 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
         tb_static_string_exit(&value);
 
         // check head
-        tb_assert_and_check_break(tb_hash_map_size(impl->head));
+        tb_assert_and_check_break(tb_hash_map_size(http->head));
 
         // append method
-        tb_string_cstrcat(&impl->request, method);
+        tb_string_cstrcat(&http->request, method);
 
         // append ' '
-        tb_string_chrcat(&impl->request, ' ');
+        tb_string_chrcat(&http->request, ' ');
 
         // encode path
         tb_url_encode2(path, tb_strlen(path), data, sizeof(data) - 1);
         path = data;
 
         // append path
-        tb_string_cstrcat(&impl->request, path);
+        tb_string_cstrcat(&http->request, path);
 
         // append args if exists
         if (args) 
         {
             // append '?'
-            tb_string_chrcat(&impl->request, '?');
+            tb_string_chrcat(&http->request, '?');
 
             // encode args
             tb_url_encode2(args, tb_strlen(args), data, sizeof(data) - 1);
             args = data;
 
             // append args
-            tb_string_cstrcat(&impl->request, args);
+            tb_string_cstrcat(&http->request, args);
         }
 
         // append ' '
-        tb_string_chrcat(&impl->request, ' ');
+        tb_string_chrcat(&http->request, ' ');
 
         // append version, HTTP/1.1
-        tb_string_cstrfcat(&impl->request, "HTTP/1.%1u\r\n", impl->status.balived? impl->status.version : impl->option.version);
+        tb_string_cstrfcat(&http->request, "HTTP/1.%1u\r\n", http->status.balived? http->status.version : http->option.version);
 
         // append key: value
-        tb_for_all (tb_hash_map_item_ref_t, item, impl->head)
+        tb_for_all (tb_hash_map_item_ref_t, item, http->head)
         {
             if (item && item->name && item->data) 
-                tb_string_cstrfcat(&impl->request, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
+                tb_string_cstrfcat(&http->request, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
         }
 
         // append end
-        tb_string_cstrcat(&impl->request, "\r\n");
+        tb_string_cstrcat(&http->request, "\r\n");
 
         // the request data and size
-        tb_char_t const*    request_data = tb_string_cstr(&impl->request);
-        tb_size_t           request_size = tb_string_size(&impl->request);
+        tb_char_t const*    request_data = tb_string_cstr(&http->request);
+        tb_size_t           request_size = tb_string_size(&http->request);
         tb_assert_and_check_break(request_data && request_size);
         
         // trace
         tb_trace_d("request[%lu]:\n%s", request_size, request_data);
 
         // writ request
-        if (!tb_stream_bwrit(impl->stream, (tb_byte_t const*)request_data, request_size)) break;
+        if (!tb_stream_bwrit(http->stream, (tb_byte_t const*)request_data, request_size)) break;
 
         // writ post
-        if (impl->option.method == TB_HTTP_METHOD_POST)
+        if (http->option.method == TB_HTTP_METHOD_POST)
         {
             // post stream
-            if (tb_transfer(pstream, impl->stream, impl->option.post_lrate, tb_http_request_post, impl) != post_size)
+            if (tb_transfer(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
             {
-                impl->status.state = TB_STATE_HTTP_POST_FAILED;
+                http->status.state = TB_STATE_HTTP_POST_FAILED;
                 break;
             }
         }
 
         // sync request
-        if (!tb_stream_sync(impl->stream, tb_false)) break;
+        if (!tb_stream_sync(http->stream, tb_false)) break;
     
         // ok
         ok = tb_true;
@@ -368,7 +368,7 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
     while (0);
 
     // failed?
-    if (!ok && !impl->status.state) impl->status.state = TB_STATE_HTTP_REQUEST_FAILED;
+    if (!ok && !http->status.state) http->status.state = TB_STATE_HTTP_REQUEST_FAILED;
 
     // exit pstream
     if (pstream) tb_stream_exit(pstream);
@@ -389,10 +389,10 @@ static tb_bool_t tb_http_request(tb_http_impl_t* impl)
  * Connection: close
  * Content-Type: application/x-shockwave-flash
  */
-static tb_bool_t tb_http_response_done(tb_http_impl_t* impl, tb_char_t const* line, tb_size_t indx)
+static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, tb_size_t indx)
 {
     // check
-    tb_assert_and_check_return_val(impl && impl->sstream && line, tb_false);
+    tb_assert_and_check_return_val(http && http->sstream && line, tb_false);
 
     // the first line? 
     tb_char_t const* p = line;
@@ -412,30 +412,30 @@ static tb_bool_t tb_http_response_done(tb_http_impl_t* impl, tb_char_t const* li
 
         // parse version
         tb_assert_and_check_return_val((*p - '0') < 2, tb_false);
-        impl->status.version = *p - '0';
+        http->status.version = *p - '0';
     
         // seek to the http code
         p++; while (tb_isspace(*p)) p++;
 
         // parse code
         tb_assert_and_check_return_val(*p && tb_isdigit(*p), tb_false);
-        impl->status.code = tb_stou32(p);
+        http->status.code = tb_stou32(p);
 
         // save state
-        if (impl->status.code == 200 || impl->status.code == 206)
-            impl->status.state = TB_STATE_OK;
-        else if (impl->status.code == 204)
-            impl->status.state = TB_STATE_HTTP_RESPONSE_204;
-        else if (impl->status.code >= 300 && impl->status.code <= 307)
-            impl->status.state = TB_STATE_HTTP_RESPONSE_300 + (impl->status.code - 300);
-        else if (impl->status.code >= 400 && impl->status.code <= 416)
-            impl->status.state = TB_STATE_HTTP_RESPONSE_400 + (impl->status.code - 400);
-        else if (impl->status.code >= 500 && impl->status.code <= 507)
-            impl->status.state = TB_STATE_HTTP_RESPONSE_500 + (impl->status.code - 500);
-        else impl->status.state = TB_STATE_HTTP_RESPONSE_UNK;
+        if (http->status.code == 200 || http->status.code == 206)
+            http->status.state = TB_STATE_OK;
+        else if (http->status.code == 204)
+            http->status.state = TB_STATE_HTTP_RESPONSE_204;
+        else if (http->status.code >= 300 && http->status.code <= 307)
+            http->status.state = TB_STATE_HTTP_RESPONSE_300 + (http->status.code - 300);
+        else if (http->status.code >= 400 && http->status.code <= 416)
+            http->status.state = TB_STATE_HTTP_RESPONSE_400 + (http->status.code - 400);
+        else if (http->status.code >= 500 && http->status.code <= 507)
+            http->status.state = TB_STATE_HTTP_RESPONSE_500 + (http->status.code - 500);
+        else http->status.state = TB_STATE_HTTP_RESPONSE_UNK;
 
         // check state code: 4xx & 5xx
-        if (impl->status.code >= 400 && impl->status.code < 600) return tb_false;
+        if (http->status.code >= 400 && http->status.code < 600) return tb_false;
     }
     // key: value?
     else
@@ -451,9 +451,9 @@ static tb_bool_t tb_http_response_done(tb_http_impl_t* impl, tb_char_t const* li
         // parse content size
         if (!tb_strnicmp(line, "Content-Length", 14))
         {
-            impl->status.content_size = tb_stou64(p);
-            if (impl->status.document_size < 0) 
-                impl->status.document_size = impl->status.content_size;
+            http->status.content_size = tb_stou64(p);
+            if (http->status.document_size < 0) 
+                http->status.document_size = http->status.content_size;
         }
         // parse content range: "bytes $from-$to/$document_size"
         else if (!tb_strnicmp(line, "Content-Range", 13))
@@ -471,84 +471,84 @@ static tb_bool_t tb_http_response_done(tb_http_impl_t* impl, tb_char_t const* li
                 if (*p && *p++ == '/') document_size = tb_stou64(p);
             }
             // no stream, be able to seek
-            impl->status.bseeked = 1;
-            impl->status.document_size = document_size;
-            if (impl->status.content_size < 0) 
+            http->status.bseeked = 1;
+            http->status.document_size = document_size;
+            if (http->status.content_size < 0) 
             {
-                if (from && to > from) impl->status.content_size = to - from;
-                else if (!from && to) impl->status.content_size = to;
-                else if (from && !to && document_size > from) impl->status.content_size = document_size - from;
-                else impl->status.content_size = document_size;
+                if (from && to > from) http->status.content_size = to - from;
+                else if (!from && to) http->status.content_size = to;
+                else if (from && !to && document_size > from) http->status.content_size = document_size - from;
+                else http->status.content_size = document_size;
             }
         }
         // parse accept-ranges: "bytes "
         else if (!tb_strnicmp(line, "Accept-Ranges", 13))
         {
             // no stream, be able to seek
-            impl->status.bseeked = 1;
+            http->status.bseeked = 1;
         }
         // parse content type
         else if (!tb_strnicmp(line, "Content-Type", 12)) 
         {
-            tb_string_cstrcpy(&impl->status.content_type, p);
-            tb_assert_and_check_return_val(tb_string_size(&impl->status.content_type), tb_false);
+            tb_string_cstrcpy(&http->status.content_type, p);
+            tb_assert_and_check_return_val(tb_string_size(&http->status.content_type), tb_false);
         }
         // parse transfer encoding
         else if (!tb_strnicmp(line, "Transfer-Encoding", 17))
         {
-            if (!tb_stricmp(p, "chunked")) impl->status.bchunked = 1;
+            if (!tb_stricmp(p, "chunked")) http->status.bchunked = 1;
         }
         // parse content encoding
         else if (!tb_strnicmp(line, "Content-Encoding", 16))
         {
-            if (!tb_stricmp(p, "gzip")) impl->status.bgzip = 1;
-            else if (!tb_stricmp(p, "deflate")) impl->status.bdeflate = 1;
+            if (!tb_stricmp(p, "gzip")) http->status.bgzip = 1;
+            else if (!tb_stricmp(p, "deflate")) http->status.bdeflate = 1;
         }
         // parse location
         else if (!tb_strnicmp(line, "Location", 8)) 
         {
             // redirect? check code: 301 - 307
-            tb_assert_and_check_return_val(impl->status.code > 300 && impl->status.code < 308, tb_false);
+            tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 308, tb_false);
 
             // save location
-            tb_string_cstrcpy(&impl->status.location, p);
+            tb_string_cstrcpy(&http->status.location, p);
         }
         // parse connection
         else if (!tb_strnicmp(line, "Connection", 10))
         {
             // keep alive?
-            impl->status.balived = !tb_stricmp(p, "close")? 0 : 1;
+            http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
 
             // ctrl stream for sock
-            if (!tb_stream_ctrl(impl->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, impl->status.balived? tb_true : tb_false)) return tb_false;
+            if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
         }
         // parse cookies
-        else if (impl->option.cookies && !tb_strnicmp(line, "Set-Cookie", 10))
+        else if (http->option.cookies && !tb_strnicmp(line, "Set-Cookie", 10))
         {
             // the host
             tb_char_t const* host = tb_null;
-            tb_http_ctrl((tb_http_ref_t)impl, TB_HTTP_OPTION_GET_HOST, &host);
+            tb_http_ctrl((tb_http_ref_t)http, TB_HTTP_OPTION_GET_HOST, &host);
 
             // the path
             tb_char_t const* path = tb_null;
-            tb_http_ctrl((tb_http_ref_t)impl, TB_HTTP_OPTION_GET_PATH, &path);
+            tb_http_ctrl((tb_http_ref_t)http, TB_HTTP_OPTION_GET_PATH, &path);
 
             // is ssl?
             tb_bool_t bssl = tb_false;
-            tb_http_ctrl((tb_http_ref_t)impl, TB_HTTP_OPTION_GET_SSL, &bssl);
+            tb_http_ctrl((tb_http_ref_t)http, TB_HTTP_OPTION_GET_SSL, &bssl);
                 
             // set cookies
-            tb_cookies_set(impl->option.cookies, host, path, bssl, p);
+            tb_cookies_set(http->option.cookies, host, path, bssl, p);
         }
     }
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_http_response(tb_http_impl_t* impl)
+static tb_bool_t tb_http_response(tb_http_t* http)
 {
     // check
-    tb_assert_and_check_return_val(impl && impl->stream, tb_false);
+    tb_assert_and_check_return_val(http && http->stream, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
@@ -558,75 +558,75 @@ static tb_bool_t tb_http_response(tb_http_impl_t* impl)
         tb_char_t line[8192];
         tb_long_t real = 0;
         tb_size_t indx = 0;
-        while ((real = tb_stream_bread_line(impl->stream, line, sizeof(line) - 1)) >= 0)
+        while ((real = tb_stream_bread_line(http->stream, line, sizeof(line) - 1)) >= 0)
         {
             // trace
             tb_trace_d("response: %s", line);
  
             // do callback
-            if (impl->option.head_func && !impl->option.head_func(line, impl->option.head_priv)) break;
+            if (http->option.head_func && !http->option.head_func(line, http->option.head_priv)) break;
             
             // end?
             if (!real)
             {
                 // switch to cstream if chunked
-                if (impl->status.bchunked)
+                if (http->status.bchunked)
                 {
                     // init cstream
-                    if (impl->cstream)
+                    if (http->cstream)
                     {
-                        if (!tb_stream_ctrl(impl->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, impl->stream)) break;
+                        if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
                     }
-                    else impl->cstream = tb_stream_init_filter_from_chunked(impl->stream, tb_true);
-                    tb_assert_and_check_break(impl->cstream);
+                    else http->cstream = tb_stream_init_filter_from_chunked(http->stream, tb_true);
+                    tb_assert_and_check_break(http->cstream);
 
                     // open cstream, need not async
-                    if (!tb_stream_open(impl->cstream)) break;
+                    if (!tb_stream_open(http->cstream)) break;
 
                     // using cstream
-                    impl->stream = impl->cstream;
+                    http->stream = http->cstream;
 
                     // disable seek
-                    impl->status.bseeked = 0;
+                    http->status.bseeked = 0;
                 }
 
                 // switch to zstream if gzip or deflate
-                if (impl->option.bunzip && (impl->status.bgzip || impl->status.bdeflate))
+                if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
                 {
 #if defined(TB_CONFIG_PACKAGE_HAVE_ZLIB) && defined(TB_CONFIG_MODULE_HAVE_ZIP)
                     // init zstream
-                    if (impl->zstream)
+                    if (http->zstream)
                     {
-                        if (!tb_stream_ctrl(impl->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, impl->stream)) break;
+                        if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
                     }
-                    else impl->zstream = tb_stream_init_filter_from_zip(impl->stream, impl->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
-                    tb_assert_and_check_break(impl->zstream);
+                    else http->zstream = tb_stream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+                    tb_assert_and_check_break(http->zstream);
 
                     // the filter
                     tb_filter_ref_t filter = tb_null;
-                    if (!tb_stream_ctrl(impl->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+                    if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
                     tb_assert_and_check_break(filter);
 
                     // ctrl filter
-                    if (!tb_filter_ctrl(filter, TB_FILTER_CTRL_ZIP_SET_ALGO, impl->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE)) break;
+                    if (!tb_filter_ctrl(filter, TB_FILTER_CTRL_ZIP_SET_ALGO, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE)) break;
 
                     // limit the filter input size
-                    if (impl->status.content_size > 0) tb_filter_limit(filter, impl->status.content_size);
+                    if (http->status.content_size > 0) tb_filter_limit(filter, http->status.content_size);
 
                     // open zstream, need not async
-                    if (!tb_stream_open(impl->zstream)) break;
+                    if (!tb_stream_open(http->zstream)) break;
 
                     // using zstream
-                    impl->stream = impl->zstream;
+                    http->stream = http->zstream;
 
                     // disable seek
-                    impl->status.bseeked = 0;
+                    http->status.bseeked = 0;
 #else
                     // trace
                     tb_trace_w("gzip is not supported now! please enable it from config if you need it.");
 
                     // not supported
-                    impl->status.state = TB_STATE_HTTP_GZIP_NOT_SUPPORTED;
+                    http->status.state = TB_STATE_HTTP_GZIP_NOT_SUPPORTED;
                     break;
 #endif
                 }
@@ -636,7 +636,7 @@ static tb_bool_t tb_http_response(tb_http_impl_t* impl)
 
                 // dump status
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
-                tb_http_status_dump(&impl->status);
+                tb_http_status_dump(&http->status);
 #endif
 
                 // ok
@@ -645,7 +645,7 @@ static tb_bool_t tb_http_response(tb_http_impl_t* impl)
             }
 
             // done it
-            if (!tb_http_response_done(impl, line, indx++)) break;
+            if (!tb_http_response_done(http, line, indx++)) break;
         }
 
     } while (0);
@@ -653,28 +653,28 @@ static tb_bool_t tb_http_response(tb_http_impl_t* impl)
     // ok?
     return ok;
 }
-static tb_bool_t tb_http_redirect(tb_http_impl_t* impl)
+static tb_bool_t tb_http_redirect(tb_http_t* http)
 {
     // check
-    tb_assert_and_check_return_val(impl && impl->stream, tb_false);
+    tb_assert_and_check_return_val(http && http->stream, tb_false);
 
     // done
     tb_size_t i = 0;
-    for (i = 0; i < impl->option.redirect && tb_string_size(&impl->status.location); i++)
+    for (i = 0; i < http->option.redirect && tb_string_size(&http->status.location); i++)
     {
         // read the redirect content
-        if (impl->status.content_size > 0)
+        if (http->status.content_size > 0)
         {
             tb_byte_t data[TB_STREAM_BLOCK_MAXN];
             tb_hize_t read = 0;
-            tb_hize_t size = impl->status.content_size;
+            tb_hize_t size = http->status.content_size;
             while (read < size) 
             {
                 // the need
                 tb_size_t need = (tb_size_t)tb_min(size - read, (tb_hize_t)TB_STREAM_BLOCK_MAXN);
 
                 // read it
-                if (!tb_stream_bread(impl->stream, data, need)) break;
+                if (!tb_stream_bread(http->stream, data, need)) break;
 
                 // save size
                 read += need;
@@ -685,39 +685,39 @@ static tb_bool_t tb_http_redirect(tb_http_impl_t* impl)
         }
 
         // close stream
-        if (impl->stream && !tb_stream_clos(impl->stream)) break;
+        if (http->stream && !tb_stream_clos(http->stream)) break;
 
         // switch to sstream
-        impl->stream = impl->sstream;
+        http->stream = http->sstream;
 
         // done location url
-        tb_char_t const* location = tb_string_cstr(&impl->status.location);
+        tb_char_t const* location = tb_string_cstr(&http->status.location);
         tb_assert_and_check_break(location);
 
         // trace
         tb_trace_d("redirect: %s", location);
 
         // only path?
-        if (tb_url_protocol_probe(location) == TB_URL_PROTOCOL_FILE) tb_url_path_set(&impl->option.url, location);
+        if (tb_url_protocol_probe(location) == TB_URL_PROTOCOL_FILE) tb_url_path_set(&http->option.url, location);
         // full url?
         else
         {
             // set url
-            if (!tb_url_cstr_set(&impl->option.url, location)) break;
+            if (!tb_url_cstr_set(&http->option.url, location)) break;
         }
 
         // connect it
-        if (!tb_http_connect(impl)) break;
+        if (!tb_http_connect(http)) break;
 
         // request it
-        if (!tb_http_request(impl)) break;
+        if (!tb_http_request(http)) break;
 
         // response it
-        if (!tb_http_response(impl)) break;
+        if (!tb_http_response(http)) break;
     }
 
     // ok?
-    return (i < impl->option.redirect && tb_string_size(&impl->status.location))? tb_false : tb_true;
+    return (i < http->option.redirect && tb_string_size(&http->status.location))? tb_false : tb_true;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -727,32 +727,32 @@ tb_http_ref_t tb_http_init()
 {
     // done
     tb_bool_t           ok = tb_false;
-    tb_http_impl_t*     impl = tb_null;
+    tb_http_t*     http = tb_null;
     do
     {
-        // make impl
-        impl = tb_malloc0_type(tb_http_impl_t);
-        tb_assert_and_check_break(impl);
+        // make http
+        http = tb_malloc0_type(tb_http_t);
+        tb_assert_and_check_break(http);
 
         // init stream
-        impl->stream = impl->sstream = tb_stream_init_sock();
-        tb_assert_and_check_break(impl->stream);
+        http->stream = http->sstream = tb_stream_init_sock();
+        tb_assert_and_check_break(http->stream);
 
         // init head
-        impl->head = tb_hash_map_init(8, tb_element_str(tb_false), tb_element_str(tb_false));
-        tb_assert_and_check_break(impl->head);
+        http->head = tb_hash_map_init(8, tb_element_str(tb_false), tb_element_str(tb_false));
+        tb_assert_and_check_break(http->head);
 
         // init request data
-        if (!tb_string_init(&impl->request)) break;
+        if (!tb_string_init(&http->request)) break;
 
         // init cookies data
-        if (!tb_string_init(&impl->cookies)) break;
+        if (!tb_string_init(&http->cookies)) break;
 
         // init option
-        if (!tb_http_option_init(&impl->option)) break;
+        if (!tb_http_option_init(&http->option)) break;
 
         // init status
-        if (!tb_http_status_init(&impl->status)) break;
+        if (!tb_http_status_init(&http->status)) break;
 
         // ok
         ok = tb_true;
@@ -762,168 +762,187 @@ tb_http_ref_t tb_http_init()
     // failed?
     if (!ok)
     {
-        if (impl) tb_http_exit((tb_http_ref_t)impl);
-        impl = tb_null;
+        if (http) tb_http_exit((tb_http_ref_t)http);
+        http = tb_null;
     }
 
     // ok?
-    return (tb_http_ref_t)impl;
+    return (tb_http_ref_t)http;
 }
-tb_void_t tb_http_kill(tb_http_ref_t http)
+tb_void_t tb_http_kill(tb_http_ref_t self)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return(impl);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return(http);
 
     // kill stream
-    if (impl->stream) tb_stream_kill(impl->stream);
+    if (http->stream) tb_stream_kill(http->stream);
 }
-tb_void_t tb_http_exit(tb_http_ref_t http)
+tb_void_t tb_http_exit(tb_http_ref_t self)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return(impl);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return(http);
 
     // close it
-    tb_http_clos(http);
+    tb_http_clos(self);
 
     // exit zstream
-    if (impl->zstream) tb_stream_exit(impl->zstream);
-    impl->zstream = tb_null;
+    if (http->zstream) tb_stream_exit(http->zstream);
+    http->zstream = tb_null;
 
     // exit cstream
-    if (impl->cstream) tb_stream_exit(impl->cstream);
-    impl->cstream = tb_null;
+    if (http->cstream) tb_stream_exit(http->cstream);
+    http->cstream = tb_null;
 
     // exit sstream
-    if (impl->sstream) tb_stream_exit(impl->sstream);
-    impl->sstream = tb_null;
+    if (http->sstream) tb_stream_exit(http->sstream);
+    http->sstream = tb_null;
 
     // exit stream
-    impl->stream = tb_null;
+    http->stream = tb_null;
     
     // exit status
-    tb_http_status_exit(&impl->status);
+    tb_http_status_exit(&http->status);
 
     // exit option
-    tb_http_option_exit(&impl->option);
+    tb_http_option_exit(&http->option);
 
     // exit cookies data
-    tb_string_exit(&impl->cookies);
+    tb_string_exit(&http->cookies);
 
     // exit request data
-    tb_string_exit(&impl->request);
+    tb_string_exit(&http->request);
 
     // exit head
-    if (impl->head) tb_hash_map_exit(impl->head);
-    impl->head = tb_null;
+    if (http->head) tb_hash_map_exit(http->head);
+    http->head = tb_null;
 
     // free it
-    tb_free(impl);
+    tb_free(http);
 }
-tb_long_t tb_http_wait(tb_http_ref_t http, tb_size_t events, tb_long_t timeout)
+tb_long_t tb_http_wait(tb_http_ref_t self, tb_size_t events, tb_long_t timeout)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl && impl->stream, -1);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http && http->stream, -1);
 
     // opened?
-    tb_assert_and_check_return_val(impl->bopened, -1);
+    tb_assert_and_check_return_val(http->bopened, -1);
 
     // wait it
-    tb_long_t wait = tb_stream_wait(impl->stream, events, timeout);
+    tb_long_t wait = tb_stream_wait(http->stream, events, timeout);
 
     // failed? save state
-    if (wait < 0 && !impl->status.state) impl->status.state = tb_stream_state(impl->stream);
+    if (wait < 0 && !http->status.state) http->status.state = tb_stream_state(http->stream);
 
     // ok?
     return wait;
 }
-tb_bool_t tb_http_open(tb_http_ref_t http)
+tb_bool_t tb_http_open(tb_http_ref_t self)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl, tb_false);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http, tb_false);
     
     // opened?
-    tb_assert_and_check_return_val(!impl->bopened, tb_false);
+    tb_assert_and_check_return_val(!http->bopened, tb_false);
 
-    // connect it
-    if (!tb_http_connect(impl)) return tb_false;
+    // done
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // connect it
+        if (!tb_http_connect(http)) break;
 
-    // request it
-    if (!tb_http_request(impl)) return tb_false;
+        // request it
+        if (!tb_http_request(http)) break;
 
-    // response it
-    if (!tb_http_response(impl)) return tb_false;
+        // response it
+        if (!tb_http_response(http)) break;
 
-    // redirect it
-    if (!tb_http_redirect(impl)) return tb_false;
+        // redirect it
+        if (!tb_http_redirect(http)) break;
 
-    // opened
-    impl->bopened = tb_true;
+        // ok
+        ok = tb_true;
 
-    // ok
-    return tb_true;
+    } while (0);
+
+    // failed? close it
+    if (!ok) 
+    {
+        // close stream
+        if (http->stream) tb_stream_clos(http->stream);
+
+        // switch to sstream
+        http->stream = http->sstream;
+    }
+
+    // is opened?
+    http->bopened = ok;
+
+    // ok?
+    return ok;
 }
-tb_bool_t tb_http_clos(tb_http_ref_t http)
+tb_bool_t tb_http_clos(tb_http_ref_t self)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl, tb_false);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http, tb_false);
     
     // opened?
-    tb_check_return_val(impl->bopened, tb_true);
+    tb_check_return_val(http->bopened, tb_true);
 
     // close stream
-    if (impl->stream && !tb_stream_clos(impl->stream)) return tb_false;
+    if (http->stream && !tb_stream_clos(http->stream)) return tb_false;
 
     // switch to sstream
-    impl->stream = impl->sstream;
+    http->stream = http->sstream;
 
     // clear opened
-    impl->bopened = tb_false;
+    http->bopened = tb_false;
 
     // ok
     return tb_true;
 }
-tb_bool_t tb_http_seek(tb_http_ref_t http, tb_hize_t offset)
+tb_bool_t tb_http_seek(tb_http_ref_t self, tb_hize_t offset)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl, tb_false);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http, tb_false);
 
     // opened?
-    tb_assert_and_check_return_val(impl->bopened, tb_false);
+    tb_assert_and_check_return_val(http->bopened, tb_false);
 
     // seeked?
-    tb_check_return_val(impl->status.bseeked, tb_false);
+    tb_check_return_val(http->status.bseeked, tb_false);
 
     // done
     tb_bool_t ok = tb_false;
     do
     {
         // close stream
-        if (impl->stream && !tb_stream_clos(impl->stream)) break;
+        if (http->stream && !tb_stream_clos(http->stream)) break;
 
         // switch to sstream
-        impl->stream = impl->sstream;
+        http->stream = http->sstream;
 
         // trace
         tb_trace_d("seek: %llu", offset);
 
         // set range
-        impl->option.range.bof = offset;
-        impl->option.range.eof = impl->status.document_size > 0? impl->status.document_size - 1 : 0;
+        http->option.range.bof = offset;
+        http->option.range.eof = http->status.document_size > 0? http->status.document_size - 1 : 0;
 
         // connect it
-        if (!tb_http_connect(impl)) break;
+        if (!tb_http_connect(http)) break;
 
         // request it
-        if (!tb_http_request(impl)) break;
+        if (!tb_http_request(http)) break;
 
         // response it
-        if (!tb_http_response(impl)) break;
+        if (!tb_http_response(http)) break;
 
         // ok
         ok = tb_true;
@@ -933,33 +952,33 @@ tb_bool_t tb_http_seek(tb_http_ref_t http, tb_hize_t offset)
     // ok?
     return ok;
 }
-tb_long_t tb_http_read(tb_http_ref_t http, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_http_read(tb_http_ref_t self, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl && impl->stream, -1);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http && http->stream, -1);
 
     // opened?
-    tb_assert_and_check_return_val(impl->bopened, -1);
+    tb_assert_and_check_return_val(http->bopened, -1);
 
     // read
-    return tb_stream_read(impl->stream, data, size);
+    return tb_stream_read(http->stream, data, size);
 }
-tb_bool_t tb_http_bread(tb_http_ref_t http, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_http_bread(tb_http_ref_t self, tb_byte_t* data, tb_size_t size)
 {   
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl && impl->stream, tb_false);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http && http->stream, tb_false);
 
     // opened?
-    tb_assert_and_check_return_val(impl->bopened, tb_false);
+    tb_assert_and_check_return_val(http->bopened, tb_false);
 
     // read
     tb_size_t read = 0;
     while (read < size)
     {
         // read data
-        tb_long_t real = tb_stream_read(impl->stream, data + read, size - read);
+        tb_long_t real = tb_stream_read(http->stream, data + read, size - read);
 
         // update size
         if (real > 0) read += real;
@@ -967,7 +986,7 @@ tb_bool_t tb_http_bread(tb_http_ref_t http, tb_byte_t* data, tb_size_t size)
         else if (!real)
         {
             // wait
-            tb_long_t e = tb_http_wait(http, TB_SOCKET_EVENT_RECV, impl->option.timeout);
+            tb_long_t e = tb_http_wait(self, TB_SOCKET_EVENT_RECV, http->option.timeout);
             tb_assert_and_check_break(e >= 0);
 
             // timeout?
@@ -982,14 +1001,14 @@ tb_bool_t tb_http_bread(tb_http_ref_t http, tb_byte_t* data, tb_size_t size)
     // ok?
     return read == size? tb_true : tb_false;
 }
-tb_bool_t tb_http_ctrl(tb_http_ref_t http, tb_size_t option, ...)
+tb_bool_t tb_http_ctrl(tb_http_ref_t self, tb_size_t option, ...)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl && option, tb_false);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http && option, tb_false);
 
     // check
-    if (TB_HTTP_OPTION_CODE_IS_SET(option) && impl->bopened)
+    if (TB_HTTP_OPTION_CODE_IS_SET(option) && http->bopened)
     {
         // abort
         tb_assert(0);
@@ -1001,7 +1020,7 @@ tb_bool_t tb_http_ctrl(tb_http_ref_t http, tb_size_t option, ...)
     tb_va_start(args, option);
 
     // done
-    tb_bool_t ok = tb_http_option_ctrl(&impl->option, option, args);
+    tb_bool_t ok = tb_http_option_ctrl(&http->option, option, args);
 
     // exit args
     tb_va_end(args);
@@ -1009,13 +1028,13 @@ tb_bool_t tb_http_ctrl(tb_http_ref_t http, tb_size_t option, ...)
     // ok?
     return ok;
 }
-tb_http_status_t const* tb_http_status(tb_http_ref_t http)
+tb_http_status_t const* tb_http_status(tb_http_ref_t self)
 {
     // check
-    tb_http_impl_t* impl = (tb_http_impl_t*)http;
-    tb_assert_and_check_return_val(impl, tb_null);
+    tb_http_t* http = (tb_http_t*)self;
+    tb_assert_and_check_return_val(http, tb_null);
 
     // the status
-    return &impl->status;
+    return &http->status;
 }
 
