@@ -22,7 +22,7 @@
  *
  */
 #define TB_TRACE_MODULE_NAME            "polarssl"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -194,25 +194,26 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         entropy_init(&ssl->entropy);
 
         // init ssl ctr_drbg context
-        tb_long_t r = 0;
-        if ((r = ctr_drbg_init(&ssl->ctr_drbg, entropy_func, &ssl->entropy, tb_null, 0)))
+        tb_long_t error = 0;
+        if ((error = ctr_drbg_init(&ssl->ctr_drbg, entropy_func, &ssl->entropy, tb_null, 0)))
         {
-            tb_ssl_error("init ctr_drbg failed", r);
+            tb_ssl_error("init ctr_drbg failed", error);
             break;
         }
 
 #ifdef POLARSSL_CERTS_C
-        if ((r = x509_crt_parse(&ssl->x509_crt, (tb_byte_t const*)test_ca_list, tb_strlen(test_ca_list))))
+        // init ssl ca certificate
+        if ((error = x509_crt_parse(&ssl->x509_crt, (tb_byte_t const*)test_ca_list, tb_strlen(test_ca_list))))
         {
-            tb_ssl_error("parse x509_crt failed", r);
+            tb_ssl_error("parse x509_crt failed", error);
             break;
         }
 #endif
 
         // init ssl context
-        if ((r = ssl_init(&ssl->ssl)))
+        if ((error = ssl_init(&ssl->ssl)))
         {
-            tb_ssl_error("init ssl failed", r);
+            tb_ssl_error("init ssl failed", error);
             break;
         }
 
@@ -344,36 +345,36 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
         }
 
         // done handshake
-        tb_long_t r = ssl_handshake(&ssl->ssl);
+        tb_long_t error = ssl_handshake(&ssl->ssl);
         
         // trace
-        tb_trace_d("open: handshake: %ld", r);
+        tb_trace_d("open: handshake: %ld", error);
 
         // ok?
-        if (!r) ok = 1;
+        if (!error) ok = 1;
         // peer closed
-        else if (r == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY || r == POLARSSL_ERR_NET_CONN_RESET)
+        else if (error == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY || error == POLARSSL_ERR_NET_CONN_RESET)
         {
-            tb_trace_d("open: handshake: closed: %ld", r);
+            tb_trace_d("open: handshake: closed: %ld", error);
             ssl->state = TB_STATE_CLOSED;
         }
         // continue to wait it?
-        else if (r == POLARSSL_ERR_NET_WANT_READ || r == POLARSSL_ERR_NET_WANT_WRITE)
+        else if (error == POLARSSL_ERR_NET_WANT_READ || error == POLARSSL_ERR_NET_WANT_WRITE)
         {
             // trace
-            tb_trace_d("open: handshake: wait: %s: ..", r == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
+            tb_trace_d("open: handshake: wait: %s: ..", error == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
 
             // continue it
             ok = 0;
 
             // save state
-            ssl->state = (r == POLARSSL_ERR_NET_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
+            ssl->state = (error == POLARSSL_ERR_NET_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
         }
         // failed?
         else
         {
             // trace
-            tb_ssl_error("open: handshake: failed", r);
+            tb_ssl_error("open: handshake: failed", error);
 
             // save state
             ssl->state = TB_STATE_SOCK_SSL_FAILED;
@@ -386,14 +387,14 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
     {
         // done ssl verify
 #if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__) 
-        tb_long_t r = 0;
-        if ((r = ssl_get_verify_result(&ssl->ssl)))
+        tb_long_t error = 0;
+        if ((error = ssl_get_verify_result(&ssl->ssl)))
         {
-            if ((r & BADCERT_EXPIRED)) tb_trace_d("server certificate has expired");
-            if ((r & BADCERT_REVOKED)) tb_trace_d("server certificate has been revoked");
-            if ((r & BADCERT_CN_MISMATCH)) tb_trace_d("cn mismatch");
-            if ((r & BADCERT_NOT_TRUSTED)) tb_trace_d("self-signed or not signed by a trusted ca");
-            tb_ssl_error("verify: failed", r);
+            if ((error & BADCERT_EXPIRED)) tb_trace_d("server certificate has expired");
+            if ((error & BADCERT_REVOKED)) tb_trace_d("server certificate has been revoked");
+            if ((error & BADCERT_CN_MISMATCH)) tb_trace_d("cn mismatch");
+            if ((error & BADCERT_NOT_TRUSTED)) tb_trace_d("self-signed or not signed by a trusted ca");
+            tb_ssl_error("verify: failed", error);
         }
 #endif
 
@@ -453,30 +454,30 @@ tb_long_t tb_ssl_clos_try(tb_ssl_ref_t self)
         }
 
         // done close notify
-        tb_long_t r = ssl_close_notify(&ssl->ssl);
+        tb_long_t error = ssl_close_notify(&ssl->ssl);
 
         // trace
-        tb_trace_d("clos: close_notify: %ld", r);
+        tb_trace_d("clos: close_notify: %ld", error);
 
         // ok?
-        if (!r) ok = 1;
+        if (!error) ok = 1;
         // continue to wait it?
-        else if (r == POLARSSL_ERR_NET_WANT_READ || r == POLARSSL_ERR_NET_WANT_WRITE)
+        else if (error == POLARSSL_ERR_NET_WANT_READ || error == POLARSSL_ERR_NET_WANT_WRITE)
         {
             // trace
-            tb_trace_d("clos: close_notify: wait: %s: ..", r == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
+            tb_trace_d("clos: close_notify: wait: %s: ..", error == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
 
             // continue it
             ok = 0;
 
             // save state
-            ssl->state = (r == POLARSSL_ERR_NET_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
+            ssl->state = (error == POLARSSL_ERR_NET_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
         }
         // failed?
         else
         {
             // trace
-            tb_ssl_error("clos: close_notify: failed", r);
+            tb_ssl_error("clos: close_notify: failed", error);
 
             // save state
             ssl->state = TB_STATE_SOCK_SSL_FAILED;
