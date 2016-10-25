@@ -57,7 +57,7 @@ tb_int_t tb_demo_coroutine_lock_main(tb_int_t argc, tb_char_t** argv)
         tb_co_lock_exit(lock);
 
         // run scheduler
-        tb_co_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler, tb_true);
 
         // exit scheduler
         tb_co_scheduler_exit(scheduler);

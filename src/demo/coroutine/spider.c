@@ -586,7 +586,7 @@ tb_int_t tb_demo_coroutine_spider_main(tb_int_t argc, tb_char_t** argv)
         }
 
         // run scheduler
-        tb_co_scheduler_loop(spider->scheduler);
+        tb_co_scheduler_loop(spider->scheduler, tb_true);
 
     } while (0);
 

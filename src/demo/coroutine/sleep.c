@@ -45,7 +45,7 @@ tb_int_t tb_demo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
         tb_coroutine_start(scheduler, tb_demo_coroutine_sleep_func, (tb_cpointer_t)100, 0);
 
         // run scheduler
-        tb_co_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler, tb_true);
 
         // exit scheduler
         tb_co_scheduler_exit(scheduler);

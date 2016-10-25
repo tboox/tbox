@@ -114,7 +114,7 @@ tb_int_t tb_demo_coroutine_echo_client_main(tb_int_t argc, tb_char_t** argv)
         }
 
         // run scheduler
-        tb_co_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler, tb_true);
 
         // exit scheduler
         tb_co_scheduler_exit(scheduler);

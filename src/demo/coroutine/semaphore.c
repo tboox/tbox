@@ -64,7 +64,7 @@ tb_int_t tb_demo_coroutine_semaphore_main(tb_int_t argc, tb_char_t** argv)
         tb_coroutine_start(scheduler, tb_demo_coroutine_semaphore_post_func, semaphore, 0);
 
         // run scheduler
-        tb_co_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler, tb_true);
 
         // exit semaphore 
         tb_co_semaphore_exit(semaphore);

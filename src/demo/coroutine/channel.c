@@ -73,7 +73,7 @@ static tb_void_t tb_demo_coroutine_channel_test(tb_size_t size)
         tb_coroutine_start(scheduler, tb_demo_coroutine_channel_test_recv, channel, 0);
 
         // run scheduler
-        tb_co_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler, tb_true);
 
         // exit channel 
         tb_co_channel_exit(channel);
@@ -121,7 +121,7 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
         tb_hong_t startime = tb_mclock();
 
         // run scheduler
-        tb_co_scheduler_loop(scheduler);
+        tb_co_scheduler_loop(scheduler, tb_true);
 
         // computing time
         tb_hong_t duration = tb_mclock() - startime;
