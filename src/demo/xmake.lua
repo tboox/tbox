@@ -57,8 +57,11 @@ target("demo")
 
     -- add the source files for the coroutine module
     if is_option("coroutine") then
-        add_files("coroutine/*.c") 
+        add_files("coroutine/*.c|spider.c") 
         add_files("platform/context.c") 
+        if is_option("xml") then
+            add_files("coroutine/spider.c") 
+        end
     end
 
     -- add the source files for the exception module
