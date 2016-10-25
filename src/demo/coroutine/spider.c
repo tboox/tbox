@@ -468,7 +468,7 @@ static tb_void_t tb_demo_spider_page_grab(tb_cpointer_t priv)
     while (1)
     {
         // recv url
-        iurl = tb_co_channel_recv(spider->urls);
+        iurl = (tb_char_t const*)tb_co_channel_recv(spider->urls);
         tb_check_break(iurl); 
 
         // trace
