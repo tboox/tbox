@@ -117,20 +117,18 @@ static tb_size_t tb_list_itor_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_list_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_list_t* list = (tb_list_t*)iterator;
-    tb_assert(list && itor);
+    tb_assert(itor);
 
     // next
-    return (tb_size_t)tb_list_entry_next(&list->head, (tb_list_entry_t*)itor);
+    return (tb_size_t)tb_list_entry_next((tb_list_entry_t*)itor);
 }
 static tb_size_t tb_list_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_list_t* list = (tb_list_t*)iterator;
-    tb_assert(list && itor);
+    tb_assert(itor);
 
     // prev
-    return (tb_size_t)tb_list_entry_prev(&list->head, (tb_list_entry_t*)itor);
+    return (tb_size_t)tb_list_entry_prev((tb_list_entry_t*)itor);
 }
 static tb_pointer_t tb_list_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
@@ -380,7 +378,7 @@ tb_size_t tb_list_remove(tb_list_ref_t self, tb_size_t itor)
     tb_assert_and_check_return_val(node, tb_iterator_tail(self));
 
     // the next node
-    tb_list_entry_ref_t next = tb_list_entry_next(&list->head, node);
+    tb_list_entry_ref_t next = tb_list_entry_next(node);
 
     // remove node
     tb_list_entry_remove(&list->head, node);

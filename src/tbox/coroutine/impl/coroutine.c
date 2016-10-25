@@ -125,9 +125,6 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
         coroutine->rs.func.func = func;
         coroutine->rs.func.priv = priv;
 
-        // init state
-        coroutine->state = TB_STATE_READY;
-
         // make context
         coroutine->context = tb_context_make(coroutine->stackbase - stacksize, stacksize, tb_coroutine_entry);
         tb_assert_and_check_break(coroutine->context);
@@ -189,9 +186,6 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
         coroutine->rs.func.func = func;
         coroutine->rs.func.priv = priv;
 
-        // init state
-        coroutine->state = TB_STATE_READY;
-
         // make context
         coroutine->context = tb_context_make(coroutine->stackbase - stacksize, stacksize, tb_coroutine_entry);
         tb_assert_and_check_break(coroutine->context);
@@ -222,9 +216,6 @@ tb_void_t tb_coroutine_exit(tb_coroutine_t* coroutine)
     // check it
     tb_coroutine_check(coroutine);
 #endif
-
-    // check state: must be dead now
-    tb_assertf(tb_coroutine_is_dead(coroutine), "this coroutine state(%s) is invalid!", tb_coroutine_state_cstr(coroutine));
 
     // exit it
     tb_free(coroutine);

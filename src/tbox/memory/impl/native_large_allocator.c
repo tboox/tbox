@@ -164,7 +164,7 @@ static tb_void_t tb_native_large_allocator_check_prev(tb_native_large_allocator_
     if (!tb_list_entry_is_null(&allocator->data_list))
     {
         // the prev entry
-        tb_list_entry_ref_t data_prev = tb_list_entry_prev(&allocator->data_list, (tb_list_entry_ref_t)&data_head->entry);
+        tb_list_entry_ref_t data_prev = tb_list_entry_prev((tb_list_entry_ref_t)&data_head->entry);
         tb_assert_and_check_return(data_prev);
 
         // not tail entry
@@ -183,7 +183,7 @@ static tb_void_t tb_native_large_allocator_check_next(tb_native_large_allocator_
     if (!tb_list_entry_is_null(&allocator->data_list))
     {
         // the next entry
-        tb_list_entry_ref_t data_next = tb_list_entry_next(&allocator->data_list, (tb_list_entry_ref_t)&data_head->entry);
+        tb_list_entry_ref_t data_next = tb_list_entry_next((tb_list_entry_ref_t)&data_head->entry);
         tb_assert_and_check_return(data_next);
 
         // not tail entry

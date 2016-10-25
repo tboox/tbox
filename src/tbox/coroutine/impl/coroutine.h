@@ -38,29 +38,8 @@ __tb_extern_c_enter__
  * macros
  */
 
-// get coroutine state
-#define tb_coroutine_state(coroutine)               ((coroutine)->state)
-
-// set coroutine state
-#define tb_coroutine_state_set(coroutine, value)    do { ((coroutine)->state) = (value); } while (0)
-
-// get coroutine state c-string
-#define tb_coroutine_state_cstr(coroutine)          tb_state_cstr(((coroutine)->state))
-
 // get scheduler
 #define tb_coroutine_scheduler(coroutine)           ((coroutine)->scheduler)
-
-// is dead?
-#define tb_coroutine_is_dead(coroutine)             (tb_coroutine_state(coroutine) == TB_STATE_DEAD)
-
-// is ready?
-#define tb_coroutine_is_ready(coroutine)            (tb_coroutine_state(coroutine) == TB_STATE_READY)
-
-// is running?
-#define tb_coroutine_is_running(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_RUNNING)
-
-// is suspend?
-#define tb_coroutine_is_suspend(coroutine)          (tb_coroutine_state(coroutine) == TB_STATE_SUSPEND)
 
 // is original?
 #define tb_coroutine_is_original(coroutine)         ((coroutine)->scheduler == (tb_co_scheduler_ref_t)(coroutine))
@@ -98,6 +77,12 @@ typedef struct __tb_coroutine_rs_wait_t
 // the coroutine type
 typedef struct __tb_coroutine_t
 {
+    /* the list entry for ready, suspend and dead lists
+     *
+     * be placed in the head for optimization
+     */
+    tb_list_entry_t                 entry;
+
     // the scheduler
     tb_co_scheduler_ref_t           scheduler;
 
@@ -109,15 +94,6 @@ typedef struct __tb_coroutine_t
 
     // the stack size
     tb_size_t                       stacksize;
-
-    /* the state
-     * 
-     * - TB_STATE_READY
-     * - TB_STATE_RUNNING
-     * - TB_STATE_SUSPEND
-     * - TB_STATE_DEAD
-     */
-    tb_size_t                       state;
 
     // the passed user private data between priv = resume(priv) and priv = suspend(priv)
     tb_cpointer_t                   rs_priv;
@@ -138,9 +114,6 @@ typedef struct __tb_coroutine_t
         tb_single_list_entry_t      single_entry;
 
     }                               rs;
-
-    // the list entry for ready, suspend and dead lists
-    tb_list_entry_t                 entry;
 
     // the guard
     tb_uint16_t                     guard;

@@ -79,7 +79,12 @@ typedef struct __tb_co_scheduler_t
     // the dead coroutines
     tb_list_entry_head_t            coroutines_dead;
 
-    // the ready coroutines
+    /* the ready coroutines
+     * 
+     * ready: head -> ready -> .. -> running -> .. -> ready -> ..->
+     *         |                                                   |
+     *          ---------------------------<-----------------------
+     */
     tb_list_entry_head_t            coroutines_ready;
 
     // the suspend coroutines
