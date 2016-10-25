@@ -222,7 +222,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(coroutine_nest)
 ,   TB_DEMO_MAIN_ITEM(coroutine_lock)
 ,   TB_DEMO_MAIN_ITEM(coroutine_sleep)
-,   TB_DEMO_MAIN_ITEM(coroutine_spider)
 ,   TB_DEMO_MAIN_ITEM(coroutine_switch)
 ,   TB_DEMO_MAIN_ITEM(coroutine_channel)
 ,   TB_DEMO_MAIN_ITEM(coroutine_semaphore)
@@ -231,6 +230,9 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(coroutine_file_server)
 ,   TB_DEMO_MAIN_ITEM(coroutine_file_client)
 ,   TB_DEMO_MAIN_ITEM(coroutine_http_server)
+#   ifdef TB_CONFIG_MODULE_HAVE_XML
+,   TB_DEMO_MAIN_ITEM(coroutine_spider)
+#   endif
 #endif
 };
 
