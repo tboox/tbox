@@ -101,11 +101,15 @@ tb_context_make proc frame
     add rcx, rdx
     mov [rax + 24], rcx
 
+    ; init fiber-storage to zero
+    xor rcx, rcx
+    mov [rax], rcx
+
     ; init context.retval(saved) = a writeable space (unused)
     ;
     ; it will write context (unused) and priv (unused) when jump to a new context function entry first
     ;;
-    lea rcx, [rax + 152]
+    lea rcx, [rax + 128]
     mov [rax + 96], rcx
 
     ; context.end = the address of label __end
@@ -245,3 +249,5 @@ tb_context_jump proc frame
 tb_context_jump endp 
 
 end
+
+
