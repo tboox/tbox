@@ -66,9 +66,6 @@ static tb_void_t tb_co_scheduler_make_dead(tb_co_scheduler_t* scheduler, tb_coro
     // check
     tb_assert(scheduler && coroutine);
 
-    // trace
-    tb_trace_d("dead coroutine(%p)", coroutine);
-
     // cannot be original coroutine
     tb_assert(!tb_coroutine_is_original(coroutine));
 
@@ -82,9 +79,6 @@ static tb_void_t tb_co_scheduler_make_ready(tb_co_scheduler_t* scheduler, tb_cor
 {
     // check
     tb_assert(scheduler && coroutine);
-
-    // trace
-    tb_trace_d("ready coroutine(%p)", coroutine);
 
     // insert this coroutine to ready coroutines 
     if (__tb_unlikely__(tb_coroutine_is_original(scheduler->running)))
@@ -102,9 +96,6 @@ static tb_void_t tb_co_scheduler_make_suspend(tb_co_scheduler_t* scheduler, tb_c
 {
     // check
     tb_assert(scheduler && coroutine);
-
-    // trace
-    tb_trace_d("suspend coroutine(%p)", coroutine);
 
     // cannot be original coroutine
     tb_assert(!tb_coroutine_is_original(coroutine));

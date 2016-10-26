@@ -86,13 +86,13 @@ typedef struct __tb_co_channel_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_pointer_t tb_co_channel_send_resume(tb_co_channel_t* channel)
+static tb_bool_t tb_co_channel_send_resume(tb_co_channel_t* channel, tb_pointer_t* pdata)
 {
     // check
     tb_assert(channel);
 
     // resume the first waiting send coroutine and recv data
-    tb_pointer_t data = tb_null;
+    tb_bool_t ok = tb_false;
     if (tb_single_list_entry_size(&channel->waiting_send))
     {
         // get the next entry from head
@@ -106,11 +106,17 @@ static tb_pointer_t tb_co_channel_send_resume(tb_co_channel_t* channel)
         tb_coroutine_ref_t waiting = (tb_coroutine_ref_t)tb_single_list_entry(&channel->waiting_send, entry);
 
         // resume this coroutine and recv data
-        data = tb_coroutine_resume(waiting, tb_null);
+        tb_pointer_t data = tb_coroutine_resume(waiting, tb_null);
+
+        // save data
+        if (pdata) *pdata = data;
+
+        // ok
+        ok = tb_true;
     }
 
     // ok?
-    return data;
+    return ok;
 }
 static tb_void_t tb_co_channel_recv_resume(tb_co_channel_t* channel)
 {
@@ -230,7 +236,7 @@ static tb_pointer_t tb_co_channel_recv_buffer(tb_co_channel_t* channel)
             tb_trace_d("recv[%p]: get data(%p)", tb_coroutine_self(), data);
 
             // notify to send data
-            tb_co_channel_send_resume(channel);
+            tb_co_channel_send_resume(channel, tb_null);
 
             // recv ok
             break;
@@ -301,7 +307,7 @@ static tb_bool_t tb_co_channel_recv_buffer_try(tb_co_channel_t* channel, tb_poin
         tb_trace_d("recv[%p]: get data(%p)", tb_coroutine_self(), *pdata);
 
         // notify to send data
-        tb_co_channel_send_resume(channel);
+        tb_co_channel_send_resume(channel, tb_null);
 
         // recv ok
         return tb_true;
@@ -331,7 +337,7 @@ static tb_pointer_t tb_co_channel_recv_buffer0(tb_co_channel_t* channel)
     do
     {
         // resume the first waiting send coroutine and recv data
-        if ((data = tb_co_channel_send_resume(channel)))
+        if (tb_co_channel_send_resume(channel, &data))
         {
             // recv ok
             break;
