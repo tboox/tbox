@@ -14,7 +14,7 @@
 #define TB_DEMO_TIMEOUT     (-1)
 
 // the cpu-core count
-#define TB_DEMO_CPU         (1)
+#define TB_DEMO_CPU         (4)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
