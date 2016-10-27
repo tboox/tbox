@@ -48,30 +48,35 @@ __tb_extern_c_enter__
  *
  * @return          the aiop
  */
+__tb_deprecated__
 tb_aiop_ref_t       tb_aiop_init(tb_size_t maxn);
 
 /*! exit the aiop
  *
  * @param aiop      the aiop
  */
+__tb_deprecated__
 tb_void_t           tb_aiop_exit(tb_aiop_ref_t aiop);
 
 /*! cler the aiop
  *
  * @param aiop      the aiop
  */
+__tb_deprecated__
 tb_void_t           tb_aiop_cler(tb_aiop_ref_t aiop);
 
 /*! kill the aiop
  *
  * @param aiop      the aiop
  */
+__tb_deprecated__
 tb_void_t           tb_aiop_kill(tb_aiop_ref_t aiop);
 
 /*! spak the aiop, break the wait
  *
  * @param aiop      the aiop
  */
+__tb_deprecated__
 tb_void_t           tb_aiop_spak(tb_aiop_ref_t aiop);
 
 /*! the aioe code is supported for the aiop?
@@ -80,6 +85,7 @@ tb_void_t           tb_aiop_spak(tb_aiop_ref_t aiop);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aiop_have(tb_aiop_ref_t aiop, tb_size_t code);
 
 /*! addo the aioo
@@ -91,6 +97,7 @@ tb_bool_t           tb_aiop_have(tb_aiop_ref_t aiop, tb_size_t code);
  *
  * @return          the aioo
  */
+__tb_deprecated__
 tb_aioo_ref_t       tb_aiop_addo(tb_aiop_ref_t aiop, tb_socket_ref_t sock, tb_size_t code, tb_cpointer_t priv);
 
 /*! delo the aioo
@@ -99,6 +106,7 @@ tb_aioo_ref_t       tb_aiop_addo(tb_aiop_ref_t aiop, tb_socket_ref_t sock, tb_si
  * @param aioo      the aioo
  *
  */
+__tb_deprecated__
 tb_void_t           tb_aiop_delo(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo);
 
 /*! post the aioe 
@@ -108,6 +116,7 @@ tb_void_t           tb_aiop_delo(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_ref_t aioe);
 
 /*! set the aioe
@@ -119,6 +128,7 @@ tb_bool_t           tb_aiop_post(tb_aiop_ref_t aiop, tb_aioe_ref_t aioe);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aiop_sete(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo, tb_size_t code, tb_cpointer_t priv);
 
 /*! wait the asio objects in the pool
@@ -133,6 +143,7 @@ tb_bool_t           tb_aiop_sete(tb_aiop_ref_t aiop, tb_aioo_ref_t aioo, tb_size
  *
  * @return          > 0: the aioe list size, 0: timeout, -1: failed
  */
+__tb_deprecated__
 tb_long_t           tb_aiop_wait(tb_aiop_ref_t aiop, tb_aioe_ref_t list, tb_size_t maxn, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -53,6 +53,7 @@ __tb_extern_c_enter__
  *
  * @return          the aicp
  */
+__tb_deprecated__
 tb_aicp_ref_t       tb_aicp(tb_noarg_t);
 
 /*! init the aicp
@@ -61,6 +62,7 @@ tb_aicp_ref_t       tb_aicp(tb_noarg_t);
  *
  * @return          the aicp
  */
+__tb_deprecated__
 tb_aicp_ref_t       tb_aicp_init(tb_size_t maxn);
 
 /*! exit the aicp
@@ -69,6 +71,7 @@ tb_aicp_ref_t       tb_aicp_init(tb_size_t maxn);
  *
  * @return          tb_true or tb_false
  */     
+__tb_deprecated__
 tb_bool_t           tb_aicp_exit(tb_aicp_ref_t aicp);
 
 /*! the aico maxn
@@ -77,6 +80,7 @@ tb_bool_t           tb_aicp_exit(tb_aicp_ref_t aicp);
  *
  * @return          the aico maxn 
  */     
+__tb_deprecated__
 tb_size_t           tb_aicp_maxn(tb_aicp_ref_t aicp);
 
 /*! post the aice 
@@ -86,6 +90,7 @@ tb_size_t           tb_aicp_maxn(tb_aicp_ref_t aicp);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_ref_t aice __tb_debug_decl__);
 
 /*! post the aice 
@@ -96,6 +101,7 @@ tb_bool_t           tb_aicp_post_(tb_aicp_ref_t aicp, tb_aice_ref_t aice __tb_de
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_aice_ref_t aice __tb_debug_decl__);
 
 /*! loop aicp for the external thread
@@ -109,6 +115,7 @@ tb_bool_t           tb_aicp_post_after_(tb_aicp_ref_t aicp, tb_size_t delay, tb_
  *
  * @param aicp      the aicp
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_loop(tb_aicp_ref_t aicp);
 
 /*! loop aicp util ... for the external thread
@@ -127,18 +134,21 @@ tb_void_t           tb_aicp_loop(tb_aicp_ref_t aicp);
  *
  * @param aicp      the aicp
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_loop_util(tb_aicp_ref_t aicp, tb_bool_t (*stop)(tb_cpointer_t priv), tb_cpointer_t priv);
 
 /*! kill loop
  *
  * @param aicp      the aicp
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_kill(tb_aicp_ref_t aicp);
 
 /*! kill all and cannot continue to post it, but not kill loop
  *
  * @param aicp      the aicp
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_kill_all(tb_aicp_ref_t aicp);
 
 /*! wait all exiting
@@ -148,6 +158,7 @@ tb_void_t           tb_aicp_kill_all(tb_aicp_ref_t aicp);
  * 
  * @return          ok: > 0, timeout: 0, failed: -1
  */
+__tb_deprecated__
 tb_long_t           tb_aicp_wait_all(tb_aicp_ref_t aicp, tb_long_t timeout);
 
 /*! the spak time
@@ -156,6 +167,7 @@ tb_long_t           tb_aicp_wait_all(tb_aicp_ref_t aicp, tb_long_t timeout);
  *
  * @return          the time
  */
+__tb_deprecated__
 tb_hong_t           tb_aicp_time(tb_aicp_ref_t aicp);
 
 /* //////////////////////////////////////////////////////////////////////////////////////

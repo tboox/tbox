@@ -108,12 +108,14 @@ typedef tb_bool_t   (*tb_aicp_ssl_task_func_t)(tb_aicp_ssl_ref_t ssl, tb_size_t 
  *
  * @return          the ssl
  */
+__tb_deprecated__
 tb_aicp_ssl_ref_t   tb_aicp_ssl_init(tb_aicp_ref_t aicp, tb_bool_t bserver);
 
 /*! kill the ssl
  *
  * @param ssl       the ssl
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_ssl_kill(tb_aicp_ssl_ref_t ssl);
 
 /*! exit the ssl
@@ -122,6 +124,7 @@ tb_void_t           tb_aicp_ssl_kill(tb_aicp_ssl_ref_t ssl);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_exit(tb_aicp_ssl_ref_t ssl);
 
 /*! set the ssl aico
@@ -129,6 +132,7 @@ tb_bool_t           tb_aicp_ssl_exit(tb_aicp_ssl_ref_t ssl);
  * @param ssl       the ssl
  * @param aico      the aico
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_ssl_set_aico(tb_aicp_ssl_ref_t ssl, tb_aico_ref_t aico);
 
 /*! set the ssl timeout
@@ -136,6 +140,7 @@ tb_void_t           tb_aicp_ssl_set_aico(tb_aicp_ssl_ref_t ssl, tb_aico_ref_t ai
  * @param ssl       the ssl
  * @param timeout   the ssl timeout, using the default timeout if be zero
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_ssl_set_timeout(tb_aicp_ssl_ref_t ssl, tb_long_t timeout);
 
 /*! open the ssl 
@@ -146,6 +151,7 @@ tb_void_t           tb_aicp_ssl_set_timeout(tb_aicp_ssl_ref_t ssl, tb_long_t tim
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_open(tb_aicp_ssl_ref_t ssl, tb_aicp_ssl_open_func_t func, tb_cpointer_t priv);
 
 /*! close the ssl
@@ -156,6 +162,7 @@ tb_bool_t           tb_aicp_ssl_open(tb_aicp_ssl_ref_t ssl, tb_aicp_ssl_open_fun
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_clos(tb_aicp_ssl_ref_t ssl, tb_aicp_ssl_clos_func_t func, tb_cpointer_t priv);
 
 /*! try closing the ssl
@@ -164,6 +171,7 @@ tb_bool_t           tb_aicp_ssl_clos(tb_aicp_ssl_ref_t ssl, tb_aicp_ssl_clos_fun
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_clos_try(tb_aicp_ssl_ref_t ssl);
 
 /*! read the ssl
@@ -176,6 +184,7 @@ tb_bool_t           tb_aicp_ssl_clos_try(tb_aicp_ssl_ref_t ssl);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_read(tb_aicp_ssl_ref_t ssl, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
 
 /*! writ the ssl
@@ -188,6 +197,7 @@ tb_bool_t           tb_aicp_ssl_read(tb_aicp_ssl_ref_t ssl, tb_byte_t* data, tb_
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_writ(tb_aicp_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
 
 /*! read the ssl after the delay time
@@ -201,6 +211,7 @@ tb_bool_t           tb_aicp_ssl_writ(tb_aicp_ssl_ref_t ssl, tb_byte_t const* dat
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_read_after(tb_aicp_ssl_ref_t ssl, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
 
 /*! writ the ssl after the delay time
@@ -214,6 +225,7 @@ tb_bool_t           tb_aicp_ssl_read_after(tb_aicp_ssl_ref_t ssl, tb_size_t dela
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_writ_after(tb_aicp_ssl_ref_t ssl, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
 
 /*! task the ssl
@@ -225,6 +237,7 @@ tb_bool_t           tb_aicp_ssl_writ_after(tb_aicp_ssl_ref_t ssl, tb_size_t dela
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_task(tb_aicp_ssl_ref_t ssl, tb_size_t delay, tb_aicp_ssl_task_func_t func, tb_cpointer_t priv);
 
 /*! open and read the ssl, open it first if not opened 
@@ -237,6 +250,7 @@ tb_bool_t           tb_aicp_ssl_task(tb_aicp_ssl_ref_t ssl, tb_size_t delay, tb_
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_open_read(tb_aicp_ssl_ref_t ssl, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_cpointer_t priv);
 
 /*! open and writ the ssl, open it first if not opened 
@@ -249,6 +263,7 @@ tb_bool_t           tb_aicp_ssl_open_read(tb_aicp_ssl_ref_t ssl, tb_byte_t* data
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_ssl_open_writ(tb_aicp_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_cpointer_t priv);
 
 /*! the ssl aicp
@@ -257,6 +272,7 @@ tb_bool_t           tb_aicp_ssl_open_writ(tb_aicp_ssl_ref_t ssl, tb_byte_t const
  *
  * @return          the aicp
  */
+__tb_deprecated__
 tb_aicp_ref_t       tb_aicp_ssl_aicp(tb_aicp_ssl_ref_t ssl);
 
 

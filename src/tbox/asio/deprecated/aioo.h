@@ -44,6 +44,7 @@ __tb_extern_c_enter__
  *
  * @return          the socket
  */
+__tb_deprecated__
 tb_socket_ref_t     tb_aioo_sock(tb_aioo_ref_t aioo);
 
 /*! wait the aioo
@@ -57,6 +58,7 @@ tb_socket_ref_t     tb_aioo_sock(tb_aioo_ref_t aioo);
  *
  * @return          > 0: the aioe code, 0: timeout, -1: failed
  */
+__tb_deprecated__
 tb_long_t           tb_aioo_wait(tb_socket_ref_t sock, tb_size_t code, tb_long_t timeout);
 
 

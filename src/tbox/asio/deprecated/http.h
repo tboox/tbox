@@ -107,12 +107,14 @@ typedef tb_bool_t   (*tb_aicp_http_task_func_t)(tb_aicp_http_ref_t http, tb_size
  *
  * @return          the http 
  */
+__tb_deprecated__
 tb_aicp_http_ref_t  tb_aicp_http_init(tb_aicp_ref_t aicp);
 
 /*! kill the http
  *
  * @param http      the http
  */
+__tb_deprecated__
 tb_void_t           tb_aicp_http_kill(tb_aicp_http_ref_t http);
 
 /*! exit the http
@@ -121,6 +123,7 @@ tb_void_t           tb_aicp_http_kill(tb_aicp_http_ref_t http);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_exit(tb_aicp_http_ref_t http);
 
 /*! open the http 
@@ -131,6 +134,7 @@ tb_bool_t           tb_aicp_http_exit(tb_aicp_http_ref_t http);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_open(tb_aicp_http_ref_t http, tb_aicp_http_open_func_t func, tb_cpointer_t priv);
 
 /*! close the http
@@ -141,6 +145,7 @@ tb_bool_t           tb_aicp_http_open(tb_aicp_http_ref_t http, tb_aicp_http_open
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_clos(tb_aicp_http_ref_t http, tb_aicp_http_clos_func_t func, tb_cpointer_t priv);
 
 /*! try closing the http
@@ -149,6 +154,7 @@ tb_bool_t           tb_aicp_http_clos(tb_aicp_http_ref_t http, tb_aicp_http_clos
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_clos_try(tb_aicp_http_ref_t http);
 
 /*! read the http
@@ -160,6 +166,7 @@ tb_bool_t           tb_aicp_http_clos_try(tb_aicp_http_ref_t http);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_read(tb_aicp_http_ref_t http, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv);
 
 /*! read the http after the delay time
@@ -172,6 +179,7 @@ tb_bool_t           tb_aicp_http_read(tb_aicp_http_ref_t http, tb_size_t size, t
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_read_after(tb_aicp_http_ref_t http, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv);
 
 /*! seek the http
@@ -183,6 +191,7 @@ tb_bool_t           tb_aicp_http_read_after(tb_aicp_http_ref_t http, tb_size_t d
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_seek(tb_aicp_http_ref_t http, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv);
 
 /*! task the http
@@ -194,6 +203,7 @@ tb_bool_t           tb_aicp_http_seek(tb_aicp_http_ref_t http, tb_hize_t offset,
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_task(tb_aicp_http_ref_t http, tb_size_t delay, tb_aicp_http_task_func_t func, tb_cpointer_t priv);
 
 /*! open and read the http, open it first if not opened 
@@ -205,6 +215,7 @@ tb_bool_t           tb_aicp_http_task(tb_aicp_http_ref_t http, tb_size_t delay, 
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_open_read(tb_aicp_http_ref_t http, tb_size_t size, tb_aicp_http_read_func_t func, tb_cpointer_t priv);
 
 /*! open and seek the http, open it first if not opened 
@@ -216,6 +227,7 @@ tb_bool_t           tb_aicp_http_open_read(tb_aicp_http_ref_t http, tb_size_t si
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_open_seek(tb_aicp_http_ref_t http, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_cpointer_t priv);
 
 /*! the http aicp
@@ -224,6 +236,7 @@ tb_bool_t           tb_aicp_http_open_seek(tb_aicp_http_ref_t http, tb_hize_t of
  *
  * @return          the aicp
  */
+__tb_deprecated__
 tb_aicp_ref_t       tb_aicp_http_aicp(tb_aicp_http_ref_t http);
 
 /*! ctrl the http option
@@ -233,6 +246,7 @@ tb_aicp_ref_t       tb_aicp_http_aicp(tb_aicp_http_ref_t http);
  *
  * @return          tb_true or tb_false
  */
+__tb_deprecated__
 tb_bool_t           tb_aicp_http_ctrl(tb_aicp_http_ref_t http, tb_size_t option, ...);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
