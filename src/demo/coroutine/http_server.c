@@ -7,11 +7,14 @@
  * macros
  */ 
 
-// port
+// the port
 #define TB_DEMO_PORT        (8080)
 
-// timeout
+// the timeout
 #define TB_DEMO_TIMEOUT     (-1)
+
+// the cpu-core count
+#define TB_DEMO_CPU         (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -60,7 +63,13 @@ typedef struct __tb_demo_http_session_t
  */ 
 
 // the root directory
-static tb_char_t    g_rootdir[TB_PATH_MAXN];
+static tb_char_t        g_rootdir[TB_PATH_MAXN];
+
+// only send data for testing?
+static tb_bool_t        g_onlydata = tb_false;
+
+// the lock for listener
+static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -178,7 +187,7 @@ static tb_char_t const* tb_demo_http_session_code_cstr(tb_size_t code)
     // ok?
     return cstr;
 }
-static tb_bool_t tb_demo_http_session_resp_send(tb_demo_http_session_ref_t session)
+static tb_bool_t tb_demo_http_session_resp_send(tb_demo_http_session_ref_t session, tb_char_t const* cstr)
 {
     // check
     tb_assert_and_check_return_val(session && session->sock, tb_false);
@@ -192,11 +201,13 @@ static tb_bool_t tb_demo_http_session_resp_send(tb_demo_http_session_ref_t sessi
                                     "Content-Length: %llu\r\n"
                                     "Connection: %s\r\n"
                                     "\r\n"
+                                    "%s"
                                 ,   session->code
                                 ,   tb_demo_http_session_code_cstr(session->code)
                                 ,   TB_VERSION_SHORT_STRING
-                                ,   session->file? tb_file_size(session->file) : 0
-                                ,   session->keep_alive? "keep-alive" : "close");
+                                ,   session->file? tb_file_size(session->file) : (cstr? tb_strlen(cstr) : 0)
+                                ,   session->keep_alive? "keep-alive" : "close"
+                                ,   cstr? cstr : "");
     tb_assert_and_check_return_val(size > 0, tb_false);
 
     // end
@@ -391,22 +402,32 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
         // trace
         tb_trace_d("path: %s", session.path);
 
-        // get file?
+        // get file or data?
+        tb_char_t const* data = tb_null;
         if (session.method == TB_HTTP_METHOD_GET)
         {
-            // make full path
-            tb_long_t size = tb_snprintf((tb_char_t*)session.data, sizeof(session.data) - 1, "%s%s%s", g_rootdir, session.path[0] != '/'? "/" : "", session.path);
-            if (size > 0) session.data[size] = 0;
+            // only send data?
+            if (g_onlydata) data = g_rootdir;
+            else
+            {
+                // make full path
+                tb_long_t size = tb_snprintf((tb_char_t*)session.data, sizeof(session.data) - 1, "%s%s%s", g_rootdir, session.path[0] != '/'? "/" : "", session.path);
+                if (size > 0) session.data[size] = 0;
 
-            // init file
-            session.file = tb_file_init((tb_char_t*)session.data, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
+                // init file
+                session.file = tb_file_init((tb_char_t*)session.data, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
 
-            // not found?
-            if (!session.file) session.code = TB_HTTP_CODE_NOT_FOUND;
+                // not found?
+                if (!session.file) session.code = TB_HTTP_CODE_NOT_FOUND;
+            }
         }
 
         // send the response 
-        if (!tb_demo_http_session_resp_send(&session)) break;
+        if (!tb_demo_http_session_resp_send(&session, data)) break;
+
+        // exit file
+        if (session.file) tb_file_exit(session.file);
+        session.file = tb_null;
 
         // trace
         tb_trace_d("ok!");
@@ -419,6 +440,71 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
 static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 {
     // done
+    tb_socket_ref_t sock = (tb_socket_ref_t)priv;
+    do
+    {
+        // try to enter 
+        if (!tb_spinlock_enter_try(&g_lock)) 
+        {
+            // yield coroutine with 1s
+            tb_sleep(1);
+            continue ;
+        }
+
+        // trace
+        tb_trace_i("[%#x]: listening %lu ..", tb_thread_self(), TB_DEMO_PORT);
+
+        // wait accept events
+        tb_long_t events = tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1);
+
+        // leave 
+        tb_spinlock_leave(&g_lock);
+
+        // listen ok?
+        if (events > 0)
+        {
+            // accept client sockets
+            tb_size_t       count = 0;
+            tb_socket_ref_t client = tb_null;
+            while ((client = tb_socket_accept(sock, tb_null)))
+            {
+                // start client connection
+                if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
+                count++;
+            }
+
+            // trace
+            tb_trace_d("[%#x]: listened %lu", tb_thread_self(), count);
+
+            // yield coroutine with 1s and wait other threads
+            tb_sleep(1);
+        }
+
+    } while (1);
+}
+static tb_int_t tb_demo_coroutine_worker(tb_cpointer_t priv)
+{
+    // init scheduler
+    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
+    if (scheduler)
+    {
+        // start coroutines
+        tb_coroutine_start(scheduler, tb_demo_coroutine_listen, priv, 0);
+
+        // run scheduler, enable exclusive mode if be only one cpu
+        tb_co_scheduler_loop(scheduler, TB_DEMO_CPU == 1);
+
+        // exit scheduler
+        tb_co_scheduler_exit(scheduler);
+    }
+    return 0;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t tb_demo_coroutine_http_server_main(tb_int_t argc, tb_char_t** argv)
+{
     tb_socket_ref_t sock = tb_null;
     do
     {
@@ -434,57 +520,31 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
         // listen socket
         if (!tb_socket_listen(sock, 1000)) break;
 
+        // init the root directory
+        if (argv[1]) tb_strlcpy(g_rootdir, argv[1], sizeof(g_rootdir));
+        else tb_directory_current(g_rootdir, sizeof(g_rootdir));
+
+        // only data?
+        if (!tb_file_info(g_rootdir, tb_null)) g_onlydata = tb_true;
+
         // trace
-        tb_trace_i("listening %lu ..", TB_DEMO_PORT);
+        tb_trace_i("%s: %s", g_onlydata? "data" : "rootdir", g_rootdir);
 
-        // wait accept events
-        while (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1) > 0)
-        {
-            // accept client sockets
-            tb_size_t       count = 0;
-            tb_socket_ref_t client = tb_null;
-            while ((client = tb_socket_accept(sock, tb_null)))
-            {
-                // start client connection
-                if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
-                count++;
-            }
+#if TB_DEMO_CPU > 1
+        // start workers for multi-threads
+        tb_size_t count = TB_DEMO_CPU - 1;
+        while (count--) tb_thread_init(tb_null, tb_demo_coroutine_worker, sock, 0);
+#endif
 
-            // trace
-            tb_trace_d("listened %lu", count);
-        }
+        // start worker
+        tb_demo_coroutine_worker(sock);
 
     } while (0);
 
     // exit socket
     if (sock) tb_socket_exit(sock);
     sock = tb_null;
-}
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * main
- */ 
-tb_int_t tb_demo_coroutine_http_server_main(tb_int_t argc, tb_char_t** argv)
-{
-    // init the root directory
-    if (argv[1]) tb_strlcpy(g_rootdir, argv[1], sizeof(g_rootdir));
-    else tb_directory_current(g_rootdir, sizeof(g_rootdir));
-
-    // trace
-    tb_trace_i("rootdir: %s", g_rootdir);
-
-    // init scheduler
-    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
-    if (scheduler)
-    {
-        // start coroutines
-        tb_coroutine_start(scheduler, tb_demo_coroutine_listen, tb_null, 0);
-
-        // run scheduler
-        tb_co_scheduler_loop(scheduler, tb_true);
-
-        // exit scheduler
-        tb_co_scheduler_exit(scheduler);
-    }
+    // ok
     return 0;
 }
