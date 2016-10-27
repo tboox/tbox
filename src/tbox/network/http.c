@@ -698,12 +698,19 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
         tb_trace_d("redirect: %s", location);
 
         // only path?
-        if (tb_url_protocol_probe(location) == TB_URL_PROTOCOL_FILE) tb_url_path_set(&http->option.url, location);
-        // full url?
-        else
+        tb_size_t protocol = tb_url_protocol_probe(location);
+        if (protocol == TB_URL_PROTOCOL_FILE) tb_url_path_set(&http->option.url, location);
+        // full http url?
+        else if (protocol == TB_URL_PROTOCOL_HTTP)
         {
             // set url
             if (!tb_url_cstr_set(&http->option.url, location)) break;
+        }
+        else 
+        {
+            // trace
+            tb_trace_e("unsupported protocol for location %s", location);
+            break;
         }
 
         // connect it
