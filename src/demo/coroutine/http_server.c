@@ -16,6 +16,9 @@
 // the cpu-core count
 #define TB_DEMO_CPU         (4)
 
+// the stack size
+#define TB_DEMO_STACKSIZE   (8192 << 2)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */ 
@@ -191,7 +194,7 @@ static tb_bool_t tb_demo_http_session_resp_send(tb_demo_http_session_ref_t sessi
 
     // make the response header
     tb_long_t size = tb_snprintf(   (tb_char_t*)session->data
-                                ,   sizeof(session->data) -1
+                                ,   sizeof(session->data)
                                 ,   "HTTP/1.1 %lu %s\r\n"
                                     "Server: %s\r\n"
                                     "Content-Type: text/html\r\n"
@@ -408,7 +411,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
             else
             {
                 // make full path
-                tb_long_t size = tb_snprintf((tb_char_t*)session.data, sizeof(session.data) - 1, "%s%s%s", g_rootdir, session.path[0] != '/'? "/" : "", session.path);
+                tb_long_t size = tb_snprintf((tb_char_t*)session.data, sizeof(session.data), "%s%s%s", g_rootdir, session.path[0] != '/'? "/" : "", session.path);
                 if (size > 0) session.data[size] = 0;
 
                 // init file
@@ -446,7 +449,7 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
         while ((client = tb_socket_accept(sock, tb_null)))
         {
             // start client connection
-            if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
+            if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, TB_DEMO_STACKSIZE)) break;
             count++;
         }
 
