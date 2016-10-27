@@ -642,7 +642,7 @@ tb_bool_t tb_stream_clos(tb_stream_ref_t self)
     tb_check_return_val(tb_stream_is_opened(self), tb_true);
 
     // flush writed data first
-    if (stream->bwrited && !tb_stream_sync(self, tb_true)) return tb_false;
+    if (stream->bwrited) tb_stream_sync(self, tb_true);
 
     // has close?
     if (stream->clos && !stream->clos(self)) return tb_false;
