@@ -68,9 +68,6 @@ static tb_char_t        g_rootdir[TB_PATH_MAXN];
 // only send data for testing?
 static tb_bool_t        g_onlydata = tb_false;
 
-// the lock for listener
-static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
@@ -441,46 +438,21 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 {
     // done
     tb_socket_ref_t sock = (tb_socket_ref_t)priv;
-    do
+    while (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1) > 0)
     {
-        // try to enter 
-        if (!tb_spinlock_enter_try(&g_lock)) 
+        // accept client sockets
+        tb_size_t       count = 0;
+        tb_socket_ref_t client = tb_null;
+        while ((client = tb_socket_accept(sock, tb_null)))
         {
-            // yield coroutine with 1s
-            tb_sleep(1);
-            continue ;
+            // start client connection
+            if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
+            count++;
         }
 
         // trace
-        tb_trace_i("[%#x]: listening %lu ..", tb_thread_self(), TB_DEMO_PORT);
-
-        // wait accept events
-        tb_long_t events = tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1);
-
-        // leave 
-        tb_spinlock_leave(&g_lock);
-
-        // listen ok?
-        if (events > 0)
-        {
-            // accept client sockets
-            tb_size_t       count = 0;
-            tb_socket_ref_t client = tb_null;
-            while ((client = tb_socket_accept(sock, tb_null)))
-            {
-                // start client connection
-                if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
-                count++;
-            }
-
-            // trace
-            tb_trace_d("[%#x]: listened %lu", tb_thread_self(), count);
-
-            // yield coroutine with 1s and wait other threads
-            tb_sleep(1);
-        }
-
-    } while (1);
+        tb_trace_d("[%#x]: listened %lu", tb_thread_self(), count);
+    }
 }
 static tb_int_t tb_demo_coroutine_worker(tb_cpointer_t priv)
 {
