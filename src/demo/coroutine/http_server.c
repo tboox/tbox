@@ -79,11 +79,15 @@ static tb_bool_t tb_demo_http_session_init(tb_demo_http_session_ref_t session, t
     // check
     tb_assert(session && sock);
 
-    // init session
-    tb_memset(session, 0, sizeof(tb_demo_http_session_t));
-
-    // init socket
-    session->sock = sock;
+    // init 
+    session->sock           = sock;
+    session->file           = tb_null;
+    session->line_size      = 0;
+    session->line_index     = 0;
+    session->keep_alive     = tb_false;
+    session->code           = TB_HTTP_CODE_OK;
+    session->method         = TB_HTTP_METHOD_GET;
+    session->content_size   = 0;
 
     // ok
     return tb_true;
@@ -95,9 +99,11 @@ static tb_void_t tb_demo_http_session_exit(tb_demo_http_session_ref_t session)
 
     // exit socket
     if (session->sock) tb_socket_exit(session->sock);
+    session->sock = tb_null;
 
     // exit file
     if (session->file) tb_file_exit(session->file);
+    session->file = tb_null;
 }
 static tb_bool_t tb_demo_http_session_data_send(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
 {

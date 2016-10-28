@@ -156,7 +156,7 @@ static tb_void_t tb_co_scheduler_io_loop(tb_cpointer_t priv)
         // finish all other ready coroutines first
         while (tb_co_scheduler_yield(scheduler)) 
         {
-            // spar timer
+            // spak timer
             if (!tb_co_scheduler_io_timer_spak(scheduler_io)) break;
         }
 
