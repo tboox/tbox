@@ -2,15 +2,18 @@
 
 ## master (unreleased)
 
+## v1.6.0
+
 ### New features
 
-* Add switch context interface into platform module
-* Support make command
-* Add coroutine module
-* Add some server examples using coroutine
-* Add switch context interfaces
-* Add io poller interfaces(with epoll, poll, kqueue, select) instead of aiop
-* Support mbedtls 
+* Support make command and compile directly without xmake
+* Add switch context interfaces into platform module
+* Add coroutine module (supports i386, x86_64, arm, arm64 ..)
+* Add simple http server demo using coroutine
+* Add simple spider using coroutine
+* Add io poller interfaces(with epoll, poll, kqueue, select)
+* Support mbedtls ssl library
+* All io modules(stream, socket, http, ..) support coroutine mode
 
 ### Changes
 
@@ -92,15 +95,17 @@
 
 ## master (开发中)
 
+## v1.6.0
+
 ### 新特性
 
-* 添加切换context上下文接口
-* 支持make进行编译
-* 新增协程模块，提供更加易用的高性能并发编程模式
-* 新增基于协程的各种服务器开发实例
-* 针对平台库，新增上下文切换接口
-* 新增poller轮询器接口，实现对epoll,poll,kqueue,select的封装，逐步取代老的aiop接口
-* 支持mbedtls
+* 支持make进行直接编译（会去自动下载xmake进行构建）
+* 在平台库中，添加切换context上下文接口（参考boost.context实现原理进行重写，并对部分架构进行优化）
+* 新增跨平台协程模块（支持i386, x86_64, arm, arm64），提供更加易用的高性能并发编程模式
+* 新增基于协程的各种服务器开发实例（包括：简单轻量的http服务器，爬虫。。）
+* 新增poller轮询器接口，实现对epoll, poll, kqueue, select的封装，逐步取代老的aiop接口
+* 新增mbedtls ssl库接口支持，目前已支持：openssl, polarssl, mbedtls
+* tbox所有stream, socket, http, dns, ssl 等io相关操作，原生支持协程模式，并且可以在线程和协程间随意切换
 
 ### 改进
 
