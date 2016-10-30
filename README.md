@@ -35,7 +35,7 @@ If you want to know more, please refer to:
 
 #### The coroutine library 
 
-- Provides high-performance coroutine switch(refer to [reports](https://github.com/waruqi/benchbox/wiki/switch))
+- Provides high-performance coroutine switch(refer to [reports](http://tboox.org/2016/10/28/benchbox-coroutine/))
 - Supports arm, arm64, x86, x86_64 ..
 - Provides channel interfaces
 - Provides semaphore and lock interfaces
@@ -292,7 +292,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 #### 协程库
 
-- 快速高效的协程切换支持（具体性能参考：[基准测试报告](https://github.com/waruqi/benchbox/wiki/switch)）
+- 快速高效的协程切换支持（具体性能参考：[基准测试报告](http://tboox.org/cn/2016/10/28/benchbox-coroutine/)）
 - 提供跨平台支持，核心切换算法参考boost，并且对其进行重写和优化，目前支持架构：x86, x86_64, arm, arm64
 - 提供channel协程间数据通信支持，基于生产、消费者模型
 - 提供信号量、协程锁支持
