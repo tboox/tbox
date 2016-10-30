@@ -14,6 +14,7 @@
 * Add io poller interfaces(with epoll, poll, kqueue, select)
 * Support mbedtls ssl library
 * All io modules(stream, socket, http, ..) support coroutine mode
+* Provide lock, semaphone and channel for coroutine
 
 ### Changes
 
@@ -106,6 +107,7 @@
 * 新增poller轮询器接口，实现对epoll, poll, kqueue, select的封装，逐步取代老的aiop接口
 * 新增mbedtls ssl库接口支持，目前已支持：openssl, polarssl, mbedtls
 * tbox所有stream, socket, http, dns, ssl 等io相关操作，原生支持协程模式，并且可以在线程和协程间随意切换
+* 为协程提供lock, semaphone, channel模块
 
 ### 改进
 
