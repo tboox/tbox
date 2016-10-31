@@ -29,6 +29,9 @@
 #include "interface/interface.h"
 #include "socket_pool.h"
 #include "../posix/sockaddr.h"
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -569,6 +572,12 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_false);
+
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to cancel waiting from coroutine first
+    if (tb_coroutine_self())
+        tb_coroutine_wait(sock, TB_SOCKET_EVENT_NONE, 0);
+#endif
 
     // close it
     tb_bool_t ok = !tb_ws2_32()->closesocket(tb_sock2fd(sock))? tb_true : tb_false;

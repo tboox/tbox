@@ -43,6 +43,9 @@
 #ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
 #   include <sys/sendfile.h>
 #endif
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -478,6 +481,12 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 
     // trace
     tb_trace_d("clos: %p", sock);
+
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to cancel waiting from coroutine first
+    if (tb_coroutine_self())
+        tb_coroutine_wait(sock, TB_SOCKET_EVENT_NONE, 0);
+#endif
 
     // close it
     tb_bool_t ok = !close(tb_sock2fd(sock));

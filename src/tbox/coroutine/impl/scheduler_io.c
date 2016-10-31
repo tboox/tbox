@@ -51,56 +51,16 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv)
+static tb_void_t tb_co_scheduler_io_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv)
 {
-    // check
-    tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
-    tb_assert(coroutine);
-
-    // get scheduler
-    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_coroutine_scheduler(coroutine);
-    tb_assert(scheduler);
-
-    // get io scheduler
-    tb_co_scheduler_io_ref_t scheduler_io = tb_co_scheduler_io(scheduler);
-    tb_assert(scheduler_io && scheduler_io->poller);
-
-    // trace
-    tb_trace_d("coroutine(%p): timer %s", coroutine, killed? "killed" : "timeout");
-
-    // remove this socket from poller
-    tb_socket_ref_t sock = (tb_socket_ref_t)coroutine->rs.waiting.sock;
-    if (sock) 
-    {
-        // remove it
-        tb_poller_remove(scheduler_io->poller, sock);
-        coroutine->rs.waiting.sock = tb_null;
-    }
-
-    // resume the coroutine of this timer task
-    tb_co_scheduler_resume(scheduler, coroutine, tb_null);
-}
-static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
-{
-    // check
-    tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
-    tb_assert(coroutine && poller && sock && priv);
-
-    // get scheduler
-    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_coroutine_scheduler(coroutine);
-    tb_assert(scheduler);
-
-    // get io scheduler
-    tb_co_scheduler_io_ref_t scheduler_io = tb_co_scheduler_io(scheduler);
-    tb_assert(scheduler_io && scheduler_io->poller);
-
-    // trace
-    tb_trace_d("coroutine(%p): socket: %p, events %lu", coroutine, sock, events);
-
     // exists the timer task? remove it
     tb_cpointer_t task = coroutine->rs.waiting.task;
     if (task) 
     {
+        // get io scheduler
+        tb_co_scheduler_io_ref_t scheduler_io = tb_co_scheduler_io(scheduler);
+        tb_assert(scheduler_io && scheduler_io->poller);
+
         // is high-precision timer?
         tb_size_t is_timer = (tb_size_t)(task) & 0x1;
 
@@ -113,11 +73,40 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
         coroutine->rs.waiting.task = tb_null;
     }
 
-    // remove this socket from poller
-    tb_poller_remove(scheduler_io->poller, sock);
+    // resume the coroutine
+    tb_co_scheduler_resume(scheduler, coroutine, priv);
+}
+static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv)
+{
+    // check
+    tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
+    tb_assert(coroutine);
 
-    // resume the coroutine of this socket and pass the events to suspend()
-    tb_co_scheduler_resume(scheduler, coroutine, (tb_cpointer_t)events);
+    // get scheduler
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_coroutine_scheduler(coroutine);
+    tb_assert(scheduler);
+
+    // trace
+    tb_trace_d("coroutine(%p): timer %s", coroutine, killed? "killed" : "timeout");
+
+    // resume the coroutine 
+    tb_co_scheduler_io_resume(scheduler, coroutine, tb_null);
+}
+static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+{
+    // check
+    tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
+    tb_assert(coroutine && poller && sock && priv);
+
+    // get scheduler
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_coroutine_scheduler(coroutine);
+    tb_assert(scheduler);
+
+    // trace
+    tb_trace_d("coroutine(%p): socket: %p, events %lu", coroutine, sock, events);
+
+    // resume the coroutine and pass the events to suspend()
+    tb_co_scheduler_io_resume(scheduler, coroutine, (tb_cpointer_t)events);
 }
 static tb_bool_t tb_co_scheduler_io_timer_spak(tb_co_scheduler_io_ref_t scheduler_io)
 {
@@ -300,19 +289,13 @@ tb_pointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_
         }
     }
 
-    // clear the timer task 
-    coroutine->rs.waiting.task = tb_null;
-
-    // clear the socket data
-    coroutine->rs.waiting.sock = tb_null;
-
     // suspend it
     return tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);
 }
 tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
     // check
-    tb_assert_and_check_return_val(scheduler_io && scheduler_io->poller && scheduler_io->scheduler, -1);
+    tb_assert_and_check_return_val(scheduler_io && sock && scheduler_io->poller && scheduler_io->scheduler, -1);
 
     // get the current coroutine
     tb_coroutine_t* coroutine = tb_co_scheduler_running(scheduler_io->scheduler);
@@ -321,18 +304,62 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     // trace
     tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
 
+    // no events? remove the this socket from poller
+    tb_socket_ref_t sock_prev = coroutine->rs.waiting.sock;
+    if (!events && sock_prev == sock)
+    {
+        // remove the previous socket first if exists
+        if (!tb_poller_remove(scheduler_io->poller, sock))
+        {
+            // trace
+            tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock, coroutine);
+
+            // failed
+            return -1;
+        }
+
+        // remove ok
+        return 0;
+    }
+
     // enable edge-trigger mode if be supported
     if (tb_poller_support(scheduler_io->poller, TB_POLLER_EVENT_CLEAR))
         events |= TB_POLLER_EVENT_CLEAR;
 
-    // insert socket to poller for waiting events
-    if (!tb_poller_insert(scheduler_io->poller, sock, events, coroutine))
+    // exists this socket? only modify events 
+    if (sock_prev == sock)
     {
-        // trace
-        tb_trace_e("failed to insert sock(%p) to poller on coroutine(%p)!", sock, coroutine);
+        // modify socket from poller for waiting events
+        if (!tb_poller_modify(scheduler_io->poller, sock, events, coroutine))
+        {
+            // trace
+            tb_trace_e("failed to modify sock(%p) to poller on coroutine(%p)!", sock, coroutine);
 
-        // failed
-        return tb_false;
+            // failed
+            return -1;
+        }
+    }
+    else
+    {
+        // remove the previous socket first if exists
+        if (sock_prev && !tb_poller_remove(scheduler_io->poller, sock_prev))
+        {
+            // trace
+            tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock_prev, coroutine);
+
+            // failed
+            return -1;
+        }
+
+        // insert socket to poller for waiting events
+        if (!tb_poller_insert(scheduler_io->poller, sock, events, coroutine))
+        {
+            // trace
+            tb_trace_e("failed to insert sock(%p) to poller on coroutine(%p)!", sock, coroutine);
+
+            // failed
+            return -1;
+        }
     }
 
     // exists timeout?

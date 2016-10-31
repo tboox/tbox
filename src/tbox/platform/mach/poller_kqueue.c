@@ -337,11 +337,14 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
         EV_SET(&e[n], fd, EVFILT_WRITE, adde, NOTE_EOF, 0, (tb_pointer_t)priv); n++;
     }
 
-    // save events to socket
-    tb_poller_hash_set(poller, sock, events);
-
     // change it
-    return n? tb_poller_change(poller, e, n) : tb_true;
+    tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
+    
+    // save events to socket
+    if (ok) tb_poller_hash_set(poller, sock, events);
+
+    // ok?
+    return ok;
 }
 tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
 {
@@ -367,11 +370,14 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
         n++;
     }
 
-    // remove events from socket
-    tb_poller_hash_del(poller, sock);
-
     // change it
-    return n? tb_poller_change(poller, e, n) : tb_true;
+    tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
+
+    // remove events from socket
+    if (ok) tb_poller_hash_del(poller, sock);
+
+    // ok?
+    return ok;
 }
 tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
@@ -416,11 +422,14 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
         n++;
     }
 
-    // save events to socket
-    tb_poller_hash_set(poller, sock, events);
-
     // change it
-    return n? tb_poller_change(poller, e, n) : tb_true;
+    tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
+
+    // save events to socket
+    if (ok) tb_poller_hash_set(poller, sock, events);
+
+    // ok?
+    return ok;
 }
 tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)
 {

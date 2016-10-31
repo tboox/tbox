@@ -66,7 +66,7 @@ typedef struct __tb_co_scheduler_io_t
  *
  * @return                  the io scheduler 
  */
-tb_co_scheduler_io_ref_t       tb_co_scheduler_io_init(tb_co_scheduler_t* scheduler);
+tb_co_scheduler_io_ref_t    tb_co_scheduler_io_init(tb_co_scheduler_t* scheduler);
 
 /*! exit io scheduler 
  *

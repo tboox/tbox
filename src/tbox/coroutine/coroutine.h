@@ -96,7 +96,7 @@ tb_pointer_t            tb_coroutine_sleep(tb_long_t interval);
 /*! wait io events 
  *
  * @param sock          the socket
- * @param events        the waited events
+ * @param events        the waited events, will remove this socket from io scheduler if be TB_SOCKET_EVENT_NONE
  * @param timeout       the timeout, infinity: -1
  *
  * @return              > 0: the events, 0: timeout, -1: failed
