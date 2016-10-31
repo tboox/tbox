@@ -445,7 +445,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
 }
 static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 {
-    // done
+    // TODO: fix thundering herd issues
     tb_socket_ref_t sock = (tb_socket_ref_t)priv;
     while (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1) > 0)
     {
