@@ -72,6 +72,15 @@ typedef struct __tb_coroutine_rs_wait_t
     // the socket
     tb_socket_ref_t                 sock;
 
+    // the waiting events
+    tb_uint16_t                     events          : 6;
+
+    // the cached events
+    tb_uint16_t                     events_cache    : 6;
+
+    // is waiting?
+    tb_uint16_t                     waiting         : 1;
+
 }tb_coroutine_rs_wait_t;
 
 // the coroutine type

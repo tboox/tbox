@@ -59,7 +59,7 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
 
     // get the current coroutine
     tb_coroutine_t* coroutine = (tb_coroutine_t*)tb_coroutine_self();
-    tb_assert(coroutine && coroutine->rs.func.func);
+    tb_assert(coroutine);
 
 #ifdef __tb_debug__
     // check it
@@ -69,8 +69,16 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
     // trace
     tb_trace_d("entry: %p stack: %p - %p from coroutine(%p)", coroutine, coroutine->stackbase - coroutine->stacksize, coroutine->stackbase, coroutine_from);
 
+    // get function and private data
+    tb_coroutine_func_t func = coroutine->rs.func.func;
+    tb_coroutine_func_t priv = coroutine->rs.func.priv;
+    tb_assert(func);
+
+    // reset rs data first for waiting io
+    tb_memset(&coroutine->rs, 0, sizeof(coroutine->rs));
+
     // call the coroutine function
-    coroutine->rs.func.func(coroutine->rs.func.priv);
+    func(priv);
 
     // finish the current coroutine and switch to the other coroutine
     tb_co_scheduler_finish((tb_co_scheduler_t*)tb_co_scheduler_self());
