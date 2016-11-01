@@ -4,6 +4,10 @@
 
 ## v1.6.0
 
+### Changes
+
+* Optimize io scheduler for coroutine, cache events for poller
+
 ### New features
 
 * Support make command and compile directly without xmake
@@ -95,6 +99,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 为协程优化io调度器，缓存poller轮询等待，减少频繁重复调用epoll_ctl, kevent等系统接口
 
 ## v1.6.0
 
