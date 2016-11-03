@@ -158,7 +158,7 @@ tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
 {
     if (symbols) free(symbols);
 }
-#else
+#elif 0
 tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {
     // check
@@ -196,5 +196,20 @@ tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
 {
     // exit symbols
     if (symbols) free(symbols);
+}
+#else
+tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
+tb_char_t const* tb_backtrace_symbols_name(tb_handle_t symbols, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
+tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
+{
+    tb_trace_noimpl();
 }
 #endif
