@@ -37,4 +37,6 @@
 #   include "arm64/context.S"
 #elif defined(TB_ARCH_ARM)
 #   include "arm/context.S"
+#elif defined(TB_ARCH_MIPS)
+#   include "mips/context.S"
 #endif

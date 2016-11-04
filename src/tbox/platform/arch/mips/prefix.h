@@ -17,28 +17,16 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        prefix.S
+ * @file        prefix.h
  *
  */
+#ifndef TB_PLATFORM_ARCH_MIPS_PREFIX_H
+#define TB_PLATFORM_ARCH_MIPS_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "config.h"
-#include "arch.h"
-#include "cpu.h"
-#include "endian.h"
-#include "compiler.h"
-#include "cache.h"
-#if defined(TB_ARCH_x86)
-#   include "x86/prefix.S"
-#elif defined(TB_ARCH_x64)
-#   include "x64/prefix.S"
-#elif defined(TB_ARCH_ARM64)
-#   include "arm64/prefix.S"
-#elif defined(TB_ARCH_ARM)
-#   include "arm/prefix.S"
-#elif defined(TB_ARCH_MIPS)
-#   include "mips/prefix.S"
-#endif
+#include "../prefix.h"
 
+
+#endif
