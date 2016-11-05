@@ -71,7 +71,7 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
 
     // get function and private data
     tb_coroutine_func_t func = coroutine->rs.func.func;
-    tb_coroutine_func_t priv = coroutine->rs.func.priv;
+    tb_cpointer_t       priv = coroutine->rs.func.priv;
     tb_assert(func);
 
     // reset rs data first for waiting io
