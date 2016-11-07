@@ -39,7 +39,7 @@
  * interfaces 
  */
 
-#ifdef TB_CONFIG_LIBC_HAVE_MBSTOWCS
+#if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
 tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // set local locale
@@ -58,7 +58,7 @@ tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
     // ok
     return n;
 }
-#else
+#elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
 tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // check
@@ -74,5 +74,11 @@ tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 
     // ok?
     return r >= 0? r : -1;
+}
+#else
+tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
+{
+    tb_trace_noimpl();
+    return -1;
 }
 #endif
