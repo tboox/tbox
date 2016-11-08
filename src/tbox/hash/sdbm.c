@@ -48,5 +48,5 @@ tb_size_t tb_sdbm_make_from_cstr(tb_char_t const* cstr, tb_size_t seed)
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_sdbm_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_sdbm_make((tb_byte_t const*)cstr, tb_strlen(cstr) + 1, seed);
 }

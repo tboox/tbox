@@ -131,7 +131,7 @@ tb_uint16_t tb_crc16_make_from_cstr(tb_char_t const* cstr, tb_uint16_t seed)
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_crc16_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_crc16_make((tb_byte_t const*)cstr, tb_strlen(cstr) + 1, seed);
 }
 tb_uint16_t tb_crc16_ccitt_make(tb_byte_t const* data, tb_size_t size, tb_uint16_t seed)
 {
@@ -155,5 +155,5 @@ tb_uint16_t tb_crc16_ccitt_make_from_cstr(tb_char_t const* cstr, tb_uint16_t see
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_crc16_ccitt_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_crc16_ccitt_make((tb_byte_t const*)cstr, tb_strlen(cstr) + 1, seed);
 }

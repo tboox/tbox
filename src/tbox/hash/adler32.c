@@ -150,5 +150,5 @@ tb_uint32_t tb_adler32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed)
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_adler32_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_adler32_make((tb_byte_t const*)cstr, tb_strlen(cstr) + 1, seed);
 }

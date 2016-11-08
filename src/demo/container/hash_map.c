@@ -122,7 +122,7 @@ static tb_void_t tb_hash_map_test_s2i_perf()
     tb_hong_t t = tb_mclock();
     while (n--) 
     {
-        tb_long_t r = tb_snprintf(s, sizeof(s) - 1, "%x", tb_random_range(0, TB_MAXU32)); 
+        tb_long_t r = tb_snprintf(s, sizeof(s) - 1, "%ld", tb_random_value()); 
         s[r] = '\0'; 
         tb_hash_map_test_insert_s2i(hash, s); 
         tb_hash_map_test_get_s2i(hash, s);
@@ -213,7 +213,7 @@ static tb_void_t tb_hash_map_test_i2s_perf()
     tb_hong_t t = tb_mclock();
     while (n--) 
     {
-        tb_size_t i = tb_random_range(0, TB_MAXU32);
+        tb_size_t i = tb_random_value();
         tb_hash_map_test_insert_i2s(hash, i); 
         tb_hash_map_test_get_i2s(hash, i);
     }
@@ -346,7 +346,7 @@ static tb_void_t tb_hash_map_test_m2m_perf()
     tb_hong_t t = tb_mclock();
     while (n--) 
     {
-        tb_uint32_t i = (tb_uint32_t)tb_random_range(0, TB_MAXU32);
+        tb_uint32_t i = (tb_uint32_t)tb_random_value();
         tb_hash_map_test_insert_m2m(hash, i); 
         tb_hash_map_test_get_m2m(hash, i);
     }
@@ -435,7 +435,7 @@ static tb_void_t tb_hash_map_test_i2i_perf()
     tb_hong_t t = tb_mclock();
     while (n--) 
     {
-        tb_size_t i = tb_random_range(0, TB_MAXU32);
+        tb_size_t i = tb_random_value();
         tb_hash_map_test_insert_i2i(hash, i); 
         tb_hash_map_test_get_i2i(hash, i);
     }
@@ -525,7 +525,7 @@ static tb_void_t tb_hash_map_test_i2t_perf()
     tb_hong_t t = tb_mclock();
     while (n--) 
     {
-        tb_size_t i = tb_random_range(0, TB_MAXU32);
+        tb_size_t i = tb_random_value();
         tb_hash_map_test_insert_i2t(hash, i); 
         tb_hash_map_test_get_i2t(hash, i);
     }
@@ -565,7 +565,7 @@ static tb_void_t tb_hash_map_test_walk_perf()
     __tb_volatile__ tb_size_t n = 100000;
     while (n--) 
     {
-        tb_size_t i = tb_random_range(0, TB_MAXU32);
+        tb_size_t i = tb_random_value();
         tb_hash_map_test_insert_i2i(hash, i); 
         tb_hash_map_test_get_i2i(hash, i);
     }

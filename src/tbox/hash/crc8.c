@@ -84,6 +84,6 @@ tb_uint8_t tb_crc8_make_from_cstr(tb_char_t const* cstr, tb_uint8_t seed)
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_crc8_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_crc8_make((tb_byte_t const*)cstr, tb_strlen(cstr) + 1, seed);
 }
 

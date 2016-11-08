@@ -62,7 +62,7 @@ tb_uint64_t tb_fnv64_make_from_cstr(tb_char_t const* cstr, tb_uint64_t seed)
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_fnv64_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_fnv64_make((tb_byte_t const*)cstr, tb_strlen(cstr) + 1, seed);
 }
 tb_uint64_t tb_fnv64_1a_make(tb_byte_t const* data, tb_size_t size, tb_uint64_t seed)
 {
@@ -88,5 +88,5 @@ tb_uint64_t tb_fnv64_1a_make_from_cstr(tb_char_t const* cstr, tb_uint64_t seed)
     tb_assert_and_check_return_val(cstr, 0);
 
     // make it
-    return tb_fnv64_1a_make((tb_byte_t const*)cstr, tb_strlen(cstr), seed);
+    return tb_fnv64_1a_make((tb_byte_t const*)cstr, tb_strlen(cstr) + 1, seed);
 }

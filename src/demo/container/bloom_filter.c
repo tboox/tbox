@@ -210,7 +210,7 @@ static tb_void_t tb_demo_test_uint32_h(tb_size_t index)
         for (i = 0; i < count; i++)
         {
             // the value
-            tb_long_t value = tb_random_range(0, TB_MAXU32);
+            tb_long_t value = tb_random_value();
 
             // set value to filter
             if (!tb_bloom_filter_set(filter, (tb_cpointer_t)value))

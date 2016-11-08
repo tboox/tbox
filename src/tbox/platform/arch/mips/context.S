@@ -168,8 +168,8 @@ function tb_context_jump, export=1
     // TODO a1 = a2
     // return from-context(context: a0, priv: a1) from jump 
     sw $a0, ($t0)
-//    sw $a1, 4($t0)
-    sw $a2, 4($t0)
+    sw $a1, 4($t0)
+//    sw $a2, 4($t0)
 
     // pass old-context(context: a0, priv: a1) arguments to the context function
     move $a1, $a2 

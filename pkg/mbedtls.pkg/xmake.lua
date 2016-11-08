@@ -25,3 +25,5 @@ option("mbedtls")
     -- add include directories
     add_includedirs("inc/$(plat)", "inc")
 
+    -- add c functions
+    add_cfuncs("mbedtls_ssl_setup")

@@ -831,7 +831,7 @@ static tb_void_t tb_list_walk_perf()
 
     // make list
     __tb_volatile__ tb_size_t n = 100000;
-    while (n--) tb_list_insert_tail(list, (tb_pointer_t)(tb_size_t)tb_random_range(0, TB_MAXU32)); 
+    while (n--) tb_list_insert_tail(list, (tb_pointer_t)(tb_size_t)tb_random_value()); 
 
     // done
     tb_hong_t t = tb_mclock();
