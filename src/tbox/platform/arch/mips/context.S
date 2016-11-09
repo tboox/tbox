@@ -40,14 +40,14 @@
  *                          
  *                                ------------------------------------
  *                               |                                   \|/
- *                               |       __end  func             retval(from)     function arguments        
- *             ----------------------------------------------------------------------------------------
- *            |  s7  |  fp  |  retval  |  ra  |  pc  |  gp  | context |  priv  |  (a0-a4)  |  padding  |
- *             ----------------------------------------------------------------------------------------
- *            28     32     36         40     44     48     52        56       60          76          80 (16-align)
- *                                                                             |                                 
- *                                                                             |                               
- *                                                                   sp when jump to function
+ *                               |       __end  func             retval(from)          function arguments        
+ *             -----------------------------------------------------------------------------------------------------
+ *            |  s7  |  fp  |  retval  |  ra  |  pc  |  gp  | context |  priv  | padding |   (a0-a3)    |  padding  |
+ *             -----------------------------------------------------------------------------------------------------
+ *            28     32     36         40     44     48     52        56       60        64          
+ *                                                                                       |(16-align)                                 
+ *                                                                                       |                               
+ *                                                                             sp when jump to function
  *
  *
  * @param stackdata     the stack data (a0)
@@ -66,6 +66,9 @@ function tb_context_make, export=1
     // save the stack top to v0
     addu $v0, $a0, $a1
 
+    // reserve space for arguments(a0-a3) of context-function
+    addiu $v0, $v0, -32
+
     // 16-align of the stack top address 
     move $v1, $v0
     li $v0, -16
@@ -73,9 +76,9 @@ function tb_context_make, export=1
 
     /* reserve space for context-data on context-stack
      *
-     * 80 = align8(76)
+     * 64 = align8(60)
      */
-    addiu $v0, $v0, -80
+    addiu $v0, $v0, -64
 
     // context.pc = func
     sw $a2, 44($v0)
@@ -99,9 +102,6 @@ function tb_context_make, export=1
 
 __end:
 
-    // restore global pointer
-//    lw $gp, 0($sp)
-
     // allocate stack frame space and save return address
     addiu $sp, $sp, -32
     sw $ra, 28($sp)
@@ -124,7 +124,7 @@ endfunc
 function tb_context_jump, export=1
 
     # reserve stack space first
-    addiu $sp, $sp, -80
+    addiu $sp, $sp, -64
 
     // save registers and construct the current context
     sw $s0, ($sp)
@@ -163,13 +163,11 @@ function tb_context_jump, export=1
     lw $gp, 48($sp)     // load gp
 
     // restore stack space
-    addiu $sp, $sp, 80
+    addiu $sp, $sp, 64
 
-    // TODO a1 = a2
     // return from-context(context: a0, priv: a1) from jump 
     sw $a0, ($t0)
-    sw $a1, 4($t0)
-//    sw $a2, 4($t0)
+    sw $a2, 4($t0)
 
     // pass old-context(context: a0, priv: a1) arguments to the context function
     move $a1, $a2 

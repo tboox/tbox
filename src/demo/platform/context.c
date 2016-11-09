@@ -72,7 +72,8 @@ static tb_void_t tb_demo_platform_context_test()
     // make context2
     contexts[2] = tb_context_make(stacks2, sizeof(stacks2), tb_demo_platform_context_test_func2);
 
-    // trace
+    contexts[0] = (tb_context_ref_t)1;
+
     tb_trace_i("test: enter");
 
     // switch to func1

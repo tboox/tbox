@@ -43,7 +43,7 @@ option("smallest")
     set_category("option")
     set_description("Enable the smallest compile mode and disable all modules.")
     add_rbindings("info", "deprecated")
-    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database")
+    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
 
 -- add modules
