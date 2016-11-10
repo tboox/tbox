@@ -6,17 +6,17 @@
 
 * Support coroutine context switch for mips
 
-## v1.6.0
-
 ### Changes
 
 * Optimize io scheduler for coroutine, cache events for poller
+
+## v1.6.0
 
 ### New features
 
 * Support make command and compile directly without xmake
 * Add switch context interfaces into platform module
-* Add coroutine module (supports i386, x86_64, arm, arm64 ..)
+* Add coroutine module (supports i386, x86_64, arm, arm64, mips ..)
 * Add simple http server demo using coroutine
 * Add simple spider using coroutine
 * Add io poller interfaces(with epoll, poll, kqueue, select)
@@ -118,7 +118,7 @@
 
 * 支持make进行直接编译（会去自动下载xmake进行构建）
 * 在平台库中，添加切换context上下文接口（参考boost.context实现原理进行重写，并对部分架构进行优化）
-* 新增跨平台协程模块（支持i386, x86_64, arm, arm64），提供更加易用的高性能并发编程模式
+* 新增跨平台协程模块（支持i386, x86_64, arm, arm64, mips），提供更加易用的高性能并发编程模式
 * 新增基于协程的各种服务器开发实例（包括：简单轻量的http服务器，爬虫。。）
 * 新增poller轮询器接口，实现对epoll, poll, kqueue, select的封装，逐步取代老的aiop接口
 * 新增mbedtls ssl库接口支持，目前已支持：openssl, polarssl, mbedtls

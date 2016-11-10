@@ -388,7 +388,6 @@ static tb_void_t tb_single_list_str_test()
     // done
     tb_single_list_ref_t    list = tb_null;
     tb_size_t               i;
-    tb_size_t               j;
     do
     {
         // init list
@@ -400,16 +399,16 @@ static tb_void_t tb_single_list_str_test()
         tb_trace_i("insert:");
 
         // insert head
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
         i = tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
 
         // insert tail
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
@@ -421,7 +420,7 @@ static tb_void_t tb_single_list_str_test()
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
-        j = tb_single_list_insert_tail(list, "FFFFFFFFFF");
+        tb_single_list_insert_tail(list, "FFFFFFFFFF");
 
         // insert next
         tb_single_list_insert_next(list, i, "0000000000");
@@ -442,13 +441,6 @@ static tb_void_t tb_single_list_str_test()
         tb_single_list_insert_head(list, "1111111111");
         tb_single_list_insert_head(list, "0000000000");
 
-        // insert tail
-        tb_single_list_insert_tail(list, "5555555555");
-        tb_single_list_insert_tail(list, "6666666666");
-        tb_single_list_insert_tail(list, "7777777777");
-        tb_single_list_insert_tail(list, "8888888888");
-        tb_single_list_insert_tail(list, "9999999999");
-
         // dump
         tb_single_list_str_dump(list);
 
@@ -464,16 +456,16 @@ static tb_void_t tb_single_list_str_test()
         tb_single_list_remove_head(list);
 
         // remove
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);    
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);    
 
         // dump
         tb_single_list_str_dump(list);
@@ -527,7 +519,6 @@ static tb_void_t tb_single_list_mem_test()
     // done
     tb_single_list_ref_t    list = tb_null;
     tb_size_t               i;
-    tb_size_t               j;
     do
     {
         // init list
@@ -539,16 +530,16 @@ static tb_void_t tb_single_list_mem_test()
         tb_trace_i("insert:");
 
         // insert head
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
-        tb_single_list_insert_head(list, "AAAAAAAAAA");
         i = tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
+        tb_single_list_insert_head(list, "AAAAAAAAAA");
 
         // insert tail
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
@@ -560,7 +551,7 @@ static tb_void_t tb_single_list_mem_test()
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
         tb_single_list_insert_tail(list, "FFFFFFFFFF");
-        j = tb_single_list_insert_tail(list, "FFFFFFFFFF");
+        tb_single_list_insert_tail(list, "FFFFFFFFFF");
 
         // insert next
         tb_single_list_insert_next(list, i, "0000000000");
@@ -581,13 +572,6 @@ static tb_void_t tb_single_list_mem_test()
         tb_single_list_insert_head(list, "1111111111");
         tb_single_list_insert_head(list, "0000000000");
 
-        // insert tail
-        tb_single_list_insert_tail(list, "5555555555");
-        tb_single_list_insert_tail(list, "6666666666");
-        tb_single_list_insert_tail(list, "7777777777");
-        tb_single_list_insert_tail(list, "8888888888");
-        tb_single_list_insert_tail(list, "9999999999");
-
         // dump
         tb_single_list_mem_dump(list);
 
@@ -603,16 +587,16 @@ static tb_void_t tb_single_list_mem_test()
         tb_single_list_remove_head(list);
 
         // remove
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);
-        tb_single_list_remove_next(list, j);    
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);
+        tb_single_list_remove_next(list, i);    
 
         // dump
         tb_single_list_mem_dump(list);
