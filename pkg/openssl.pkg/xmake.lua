@@ -25,3 +25,5 @@ option("openssl")
     -- add include directories
     add_includedirs("inc/$(plat)", "inc")
  
+    -- add c functions
+    add_cfuncs("SSL_new")

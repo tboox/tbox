@@ -25,4 +25,5 @@ option("sqlite3")
     -- add include directories
     add_includedirs("inc/$(plat)", "inc")
 
-
+    -- add c functions
+    add_cfuncs("sqlite3_open_v2")
