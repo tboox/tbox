@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* Support coroutine context switch for mips
+
 ## v1.6.0
 
 ### Changes
@@ -99,6 +103,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* 针对协程上下文切换，支持mips架构
 
 ### 改进
 
