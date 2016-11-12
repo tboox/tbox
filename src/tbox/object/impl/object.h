@@ -17,18 +17,40 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
+ * @file        object.h
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_IMPL_H
-#define TB_OBJECT_IMPL_H
+#ifndef TB_OBJECT_IMPL_OBJECT_H
+#define TB_OBJECT_IMPL_OBJECT_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "object.h"
-#include "reader/reader.h"
-#include "writer/writer.h"
+#include "prefix.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/* init object envirnoment
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_object_init_env(tb_noarg_t);
+
+// exit object envirnoment
+tb_void_t           tb_object_exit_env(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
+

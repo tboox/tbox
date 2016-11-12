@@ -17,18 +17,17 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
- * @ingroup     object
+ * @file        prefix.h
  *
  */
-#ifndef TB_OBJECT_IMPL_H
-#define TB_OBJECT_IMPL_H
+#ifndef TB_OBJECT_DEPRECATED_PREFIX_H
+#define TB_OBJECT_DEPRECATED_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "object.h"
-#include "reader/reader.h"
-#include "writer/writer.h"
+#include "../prefix.h"
+
+
 
 #endif
