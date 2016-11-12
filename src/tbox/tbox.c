@@ -26,6 +26,7 @@
  */
 #include "tbox.h"
 #include "libm/impl/impl.h"
+#include "math/impl/impl.h"
 #include "object/impl/impl.h"
 #include "memory/impl/impl.h"
 #include "network/impl/impl.h"
@@ -177,8 +178,8 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
     // init libc 
     if (!tb_libc_init()) return tb_false;
 
-    // init math
-    if (!tb_math_init()) return tb_false;
+    // init math envirnoment
+    if (!tb_math_init_env()) return tb_false;
 
     // init libm envirnoment
     if (!tb_libm_init_env()) return tb_false;
@@ -219,8 +220,8 @@ tb_void_t tb_exit()
     // exit libm envirnoment
     tb_libm_exit_env();
      
-    // exit math
-    tb_math_exit();
+    // exit math envirnoment
+    tb_math_exit_env();
     
     // exit libc
     tb_libc_exit();

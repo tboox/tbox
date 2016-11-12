@@ -17,52 +17,39 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        math.c
- * @ingroup     math
+ * @file        math.h
  *
  */
+#ifndef TB_MATH_IMPL_MATH_H
+#define TB_MATH_IMPL_MATH_H
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "math.h"
-#include "../libc/libc.h"
+#include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
+ * extern
  */
-static tb_long_t tb_math_printf_format_fixed(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
-{
-    // check
-    tb_assert_and_check_return_val(cstr && maxn, -1);
+__tb_extern_c_enter__
 
-    // the fixed
-    tb_fixed_t fixed = (tb_fixed_t)tb_p2s32(object);
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 
-    // format
-#ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%f", tb_fixed_to_float(fixed));
-    if (size >= 0) cstr[size] = '\0';
-#else
-    tb_long_t size = tb_snprintf(cstr, maxn - 1, "%ld", tb_fixed_to_long(fixed));
-    if (size >= 0) cstr[size] = '\0';
+/* init math envirnoment 
+ *
+ * @return      tb_true or tb_false
+ */
+tb_bool_t       tb_math_init_env(tb_noarg_t);
+
+// exit math envirnoment
+tb_void_t       tb_math_exit_env(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
 #endif
-
-    // ok?
-    return size;
-}
-    
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_bool_t tb_math_init()
-{
-    // register printf("%{fixed}", fixed);
-    tb_printf_object_register("fixed", tb_math_printf_format_fixed);
-
-    // ok
-    return tb_true;
-}
-tb_void_t tb_math_exit()
-{
-}
 
