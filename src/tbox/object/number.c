@@ -41,7 +41,7 @@
 typedef struct __tb_oc_number_t
 {
     // the object base
-    tb_oc_object_t         base;
+    tb_oc_object_t      base;
 
     // the number type
     tb_size_t           type;
@@ -185,8 +185,8 @@ static tb_void_t tb_oc_number_clear(tb_oc_object_ref_t object)
 static tb_oc_number_t* tb_oc_number_init_base()
 {
     // done
-    tb_bool_t               ok = tb_false;
-    tb_oc_number_t*     number = tb_null;
+    tb_bool_t       ok = tb_false;
+    tb_oc_number_t* number = tb_null;
     do
     {
         // make number

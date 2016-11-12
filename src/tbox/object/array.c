@@ -42,7 +42,7 @@
 typedef struct __tb_oc_array_t
 {
     // the object base
-    tb_oc_object_t         base;
+    tb_oc_object_t      base;
 
     // the vector
     tb_vector_ref_t     vector;
@@ -109,7 +109,7 @@ static tb_void_t tb_oc_array_clear(tb_oc_object_ref_t object)
 static tb_oc_array_t* tb_oc_array_init_base()
 {
     // done
-    tb_bool_t           ok = tb_false;
+    tb_bool_t       ok = tb_false;
     tb_oc_array_t*  array = tb_null;
     do
     {
@@ -148,7 +148,7 @@ static tb_oc_array_t* tb_oc_array_init_base()
 tb_oc_object_ref_t tb_oc_array_init(tb_size_t grow, tb_bool_t incr)
 {
     // done
-    tb_bool_t           ok = tb_false;
+    tb_bool_t       ok = tb_false;
     tb_oc_array_t*  array = tb_null;
     do
     {

@@ -65,7 +65,7 @@ typedef enum __tb_oc_number_type_e
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_uint8(tb_uint8_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_uint8(tb_uint8_t value);
 
 /*! init number from sint8
  *
@@ -73,7 +73,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_uint8(tb_uint8_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_sint8(tb_sint8_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_sint8(tb_sint8_t value);
 
 /*! init number from uint16
  *
@@ -81,7 +81,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_sint8(tb_sint8_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_uint16(tb_uint16_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_uint16(tb_uint16_t value);
 
 /*! init number from sint16
  *
@@ -89,7 +89,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_uint16(tb_uint16_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_sint16(tb_sint16_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_sint16(tb_sint16_t value);
 
 /*! init number from uint32
  *
@@ -97,7 +97,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_sint16(tb_sint16_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_uint32(tb_uint32_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_uint32(tb_uint32_t value);
 
 /*! init number from sint32
  *
@@ -105,7 +105,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_uint32(tb_uint32_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_sint32(tb_sint32_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_sint32(tb_sint32_t value);
 
 /*! init number from uint64
  *
@@ -113,7 +113,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_sint32(tb_sint32_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_uint64(tb_uint64_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_uint64(tb_uint64_t value);
 
 /*! init number from sint64
  *
@@ -121,7 +121,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_uint64(tb_uint64_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_sint64(tb_sint64_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_sint64(tb_sint64_t value);
 
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 /*! init number from float
@@ -130,7 +130,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_sint64(tb_sint64_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_float(tb_float_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_float(tb_float_t value);
 
 /*! init number from double
  *
@@ -138,7 +138,7 @@ tb_oc_object_ref_t     tb_oc_number_init_from_float(tb_float_t value);
  *
  * @return          the number object
  */
-tb_oc_object_ref_t     tb_oc_number_init_from_double(tb_double_t value);
+tb_oc_object_ref_t  tb_oc_number_init_from_double(tb_double_t value);
 #endif
 
 /*! the number type

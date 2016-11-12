@@ -39,9 +39,9 @@
  * macros
  */
 #ifdef __tb_small__
-#   define TB_OBJECT_DICTIONARY_SIZE_DEFAULT           TB_OBJECT_DICTIONARY_SIZE_MICRO
+#   define TB_OC_DICTIONARY_SIZE_DEFAULT           TB_OC_DICTIONARY_SIZE_MICRO
 #else
-#   define TB_OBJECT_DICTIONARY_SIZE_DEFAULT           TB_OBJECT_DICTIONARY_SIZE_SMALL
+#   define TB_OC_DICTIONARY_SIZE_DEFAULT           TB_OC_DICTIONARY_SIZE_SMALL
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@
 typedef struct __tb_oc_dictionary_t
 {
     // the object base
-    tb_oc_object_t         base;
+    tb_oc_object_t      base;
 
     // the capacity size
     tb_size_t           size;
@@ -126,8 +126,8 @@ static tb_void_t tb_oc_dictionary_clear(tb_oc_object_ref_t object)
 static tb_oc_dictionary_t* tb_oc_dictionary_init_base()
 {
     // done
-    tb_bool_t                   ok = tb_false;
-    tb_oc_dictionary_t*     dictionary = tb_null;
+    tb_bool_t           ok = tb_false;
+    tb_oc_dictionary_t* dictionary = tb_null;
     do
     {
         // make dictionary
@@ -165,7 +165,7 @@ static tb_oc_dictionary_t* tb_oc_dictionary_init_base()
 tb_oc_object_ref_t tb_oc_dictionary_init(tb_size_t size, tb_bool_t incr)
 {
     // done
-    tb_bool_t               ok = tb_false;
+    tb_bool_t           ok = tb_false;
     tb_oc_dictionary_t* dictionary = tb_null;
     do
     {
@@ -174,7 +174,7 @@ tb_oc_object_ref_t tb_oc_dictionary_init(tb_size_t size, tb_bool_t incr)
         tb_assert_and_check_break(dictionary);
 
         // using the default size
-        if (!size) size = TB_OBJECT_DICTIONARY_SIZE_DEFAULT;
+        if (!size) size = TB_OC_DICTIONARY_SIZE_DEFAULT;
 
         // init
         dictionary->size = size;

@@ -42,19 +42,19 @@ __tb_extern_c_enter__
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_oc_object_date_init_reader(tb_noarg_t);
+tb_bool_t           tb_oc_date_init_reader(tb_noarg_t);
 
 /*! init date writer
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_oc_object_date_init_writer(tb_noarg_t);
+tb_bool_t           tb_oc_date_init_writer(tb_noarg_t);
 
 /*! init date from now
  *
  * @return          the date object
  */
-tb_oc_object_ref_t     tb_oc_object_date_init_from_now(tb_noarg_t);
+tb_oc_object_ref_t  tb_oc_date_init_from_now(tb_noarg_t);
 
 /*! init date from time
  *
@@ -62,7 +62,7 @@ tb_oc_object_ref_t     tb_oc_object_date_init_from_now(tb_noarg_t);
  *
  * @return          the date object
  */
-tb_oc_object_ref_t     tb_oc_object_date_init_from_time(tb_time_t time);
+tb_oc_object_ref_t  tb_oc_date_init_from_time(tb_time_t time);
 
 /*! the date time
  *
@@ -70,7 +70,7 @@ tb_oc_object_ref_t     tb_oc_object_date_init_from_time(tb_time_t time);
  *
  * @return          the date time
  */
-tb_time_t           tb_oc_object_date_time(tb_oc_object_ref_t date);
+tb_time_t           tb_oc_date_time(tb_oc_object_ref_t date);
 
 /*! set the date time
  *
@@ -79,7 +79,7 @@ tb_time_t           tb_oc_object_date_time(tb_oc_object_ref_t date);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_oc_object_date_time_set(tb_oc_object_ref_t date, tb_time_t time);
+tb_bool_t           tb_oc_date_time_set(tb_oc_object_ref_t date, tb_time_t time);
 
 /*! set the date time for now
  *
@@ -87,7 +87,7 @@ tb_bool_t           tb_oc_object_date_time_set(tb_oc_object_ref_t date, tb_time_
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_oc_object_date_time_set_now(tb_oc_object_ref_t date);
+tb_bool_t           tb_oc_date_time_set_now(tb_oc_object_ref_t date);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

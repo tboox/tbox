@@ -45,7 +45,7 @@ __tb_extern_c_enter__
  *
  * @return          the data object
  */
-tb_oc_object_ref_t     tb_oc_data_init_from_url(tb_char_t const* url);
+tb_oc_object_ref_t  tb_oc_data_init_from_url(tb_char_t const* url);
 
 /*! init data from data
  *
@@ -54,7 +54,7 @@ tb_oc_object_ref_t     tb_oc_data_init_from_url(tb_char_t const* url);
  *
  * @return          the data object
  */
-tb_oc_object_ref_t     tb_oc_data_init_from_data(tb_pointer_t data, tb_size_t size);
+tb_oc_object_ref_t  tb_oc_data_init_from_data(tb_pointer_t data, tb_size_t size);
 
 /*! init data from buffer
  *
@@ -62,7 +62,7 @@ tb_oc_object_ref_t     tb_oc_data_init_from_data(tb_pointer_t data, tb_size_t si
  *
  * @return          the data object
  */
-tb_oc_object_ref_t     tb_oc_data_init_from_buffer(tb_buffer_ref_t buffer);
+tb_oc_object_ref_t  tb_oc_data_init_from_buffer(tb_buffer_ref_t buffer);
 
 /*! get the data 
  *

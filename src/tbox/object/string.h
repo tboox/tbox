@@ -44,7 +44,7 @@ __tb_extern_c_enter__
  *
  * @return          the string object
  */
-tb_oc_object_ref_t     tb_oc_string_init_from_cstr(tb_char_t const* cstr);
+tb_oc_object_ref_t  tb_oc_string_init_from_cstr(tb_char_t const* cstr);
 
 /*! init string from string
  *
@@ -52,7 +52,7 @@ tb_oc_object_ref_t     tb_oc_string_init_from_cstr(tb_char_t const* cstr);
  *
  * @return          the string object
  */
-tb_oc_object_ref_t     tb_oc_string_init_from_str(tb_string_ref_t str);
+tb_oc_object_ref_t  tb_oc_string_init_from_str(tb_string_ref_t str);
 
 /*! the c-string
  *

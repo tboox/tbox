@@ -37,9 +37,9 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_OBJECT_DICTIONARY_SIZE_MICRO                (64)
-#define TB_OBJECT_DICTIONARY_SIZE_SMALL                (256)
-#define TB_OBJECT_DICTIONARY_SIZE_LARGE                (65536)
+#define TB_OC_DICTIONARY_SIZE_MICRO                (64)
+#define TB_OC_DICTIONARY_SIZE_SMALL                (256)
+#define TB_OC_DICTIONARY_SIZE_LARGE                (65536)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -49,10 +49,10 @@ __tb_extern_c_enter__
 typedef struct __tb_oc_dictionary_item_t
 {
     /// the key
-    tb_char_t const*        key;
+    tb_char_t const*    key;
 
     /// the value
-    tb_oc_object_ref_t         val;
+    tb_oc_object_ref_t  val;
 
 }tb_oc_dictionary_item_t;
 
@@ -90,7 +90,7 @@ typedef struct __tb_oc_dictionary_item_t
  *
  * @return              the dictionary object
  */
-tb_oc_object_ref_t         tb_oc_dictionary_init(tb_size_t size, tb_bool_t incr);
+tb_oc_object_ref_t      tb_oc_dictionary_init(tb_size_t size, tb_bool_t incr);
 
 /*! the dictionary size
  *
@@ -135,7 +135,7 @@ tb_iterator_ref_t       tb_oc_dictionary_itor(tb_oc_object_ref_t dictionary);
  *
  * @return              the dictionary value
  */
-tb_oc_object_ref_t         tb_oc_dictionary_value(tb_oc_object_ref_t dictionary, tb_char_t const* key);
+tb_oc_object_ref_t      tb_oc_dictionary_value(tb_oc_object_ref_t dictionary, tb_char_t const* key);
 
 /*! insert dictionary item
  *

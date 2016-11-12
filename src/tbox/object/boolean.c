@@ -41,7 +41,7 @@
 typedef struct __tb_oc_boolean_t
 {
     // the object base
-    tb_oc_object_t         base;
+    tb_oc_object_t      base;
 
     // the boolean value
     tb_bool_t           value;

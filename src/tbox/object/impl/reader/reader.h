@@ -21,8 +21,8 @@
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_READER_H
-#define TB_OBJECT_READER_H
+#ifndef TB_OBJECT_IMPL_READER_H
+#define TB_OBJECT_IMPL_READER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -44,34 +44,34 @@ __tb_extern_c_enter__
 
 /*! set object reader
  *
- * @param format    the reader format
- * @param reader    the reader
+ * @param format        the reader format
+ * @param reader        the reader
  *
- * @return          tb_true or tb_false
+ * @return              tb_true or tb_false
  */
-tb_bool_t           tb_oc_object_reader_set(tb_size_t format, tb_oc_object_reader_t* reader);
+tb_bool_t               tb_oc_reader_set(tb_size_t format, tb_oc_reader_t* reader);
 
 /*! get object reader
  *
- * @param format    the reader format
+ * @param format        the reader format
  *
- * @return          the object reader
+ * @return              the object reader
  */
-tb_oc_object_reader_t* tb_oc_object_reader_get(tb_size_t format);
+tb_oc_reader_t*         tb_oc_reader_get(tb_size_t format);
 
 /*! remove object reader
  *
- * @param format    the reader format
+ * @param format        the reader format
  */
-tb_void_t           tb_oc_object_reader_remove(tb_size_t format);
+tb_void_t               tb_oc_reader_remove(tb_size_t format);
 
 /*! done reader
  *
- * @param stream    the stream
+ * @param stream        the stream
  *
- * @return          the object
+ * @return              the object
  */
-tb_oc_object_ref_t     tb_oc_object_reader_done(tb_stream_ref_t stream);
+tb_oc_object_ref_t     tb_oc_reader_done(tb_stream_ref_t stream);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

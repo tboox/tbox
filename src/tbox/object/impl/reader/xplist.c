@@ -48,14 +48,14 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_date(tb_oc_object_xplist_reader_t* reader, tb_size_t event)
+static tb_oc_object_ref_t tb_oc_xplist_reader_func_date(tb_oc_xplist_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-        return tb_oc_object_date_init_from_time(0);
+        return tb_oc_date_init_from_time(0);
 
     // done
     tb_bool_t       leave = tb_false;
@@ -74,7 +74,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_date(tb_oc_object_xpli
                 if (!tb_stricmp(name, "date"))
                 {
                     // empty?
-                    if (!date) date = tb_oc_object_date_init_from_time(0);
+                    if (!date) date = tb_oc_date_init_from_time(0);
 
                     // leave it
                     leave = tb_true;
@@ -133,7 +133,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_date(tb_oc_object_xpli
                 tb_assert_and_check_break_state(time >= 0, leave, tb_true);
 
                 // date
-                date = tb_oc_object_date_init_from_time(time);
+                date = tb_oc_date_init_from_time(time);
             }
             break;
         default:
@@ -144,7 +144,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_date(tb_oc_object_xpli
     // ok?
     return date;
 }
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_data(tb_oc_object_xplist_reader_t* reader, tb_size_t event)
+static tb_oc_object_ref_t tb_oc_xplist_reader_func_data(tb_oc_xplist_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -221,7 +221,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_data(tb_oc_object_xpli
     // ok?
     return data;
 }
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_array(tb_oc_object_xplist_reader_t* reader, tb_size_t event)
+static tb_oc_object_ref_t tb_oc_xplist_reader_func_array(tb_oc_xplist_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -249,7 +249,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_array(tb_oc_object_xpl
                 tb_trace_d("item: %s", name);
 
                 // func
-                tb_oc_object_xplist_reader_func_t func = tb_oc_object_xplist_reader_func(name);
+                tb_oc_xplist_reader_func_t func = tb_oc_xplist_reader_func(name);
                 tb_assert_and_check_break_state(func, ok, -1);
 
                 // read
@@ -285,7 +285,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_array(tb_oc_object_xpl
     // ok?
     return array;
 }
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_string(tb_oc_object_xplist_reader_t* reader, tb_size_t event)
+static tb_oc_object_ref_t tb_oc_xplist_reader_func_string(tb_oc_xplist_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -338,7 +338,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_string(tb_oc_object_xp
     // ok?
     return string;
 }
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_number(tb_oc_object_xplist_reader_t* reader, tb_size_t event)
+static tb_oc_object_ref_t tb_oc_xplist_reader_func_number(tb_oc_xplist_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -400,7 +400,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_number(tb_oc_object_xp
     // ok?
     return number;
 }
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_boolean(tb_oc_object_xplist_reader_t* reader, tb_size_t event)
+static tb_oc_object_ref_t tb_oc_xplist_reader_func_boolean(tb_oc_xplist_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
@@ -419,14 +419,14 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_boolean(tb_oc_object_x
     // ok?
     return (tb_oc_object_ref_t)tb_oc_boolean_init(val);
 }
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_dictionary(tb_oc_object_xplist_reader_t* reader, tb_size_t event)
+static tb_oc_object_ref_t tb_oc_xplist_reader_func_dictionary(tb_oc_xplist_reader_t* reader, tb_size_t event)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-        return tb_oc_dictionary_init(TB_OBJECT_DICTIONARY_SIZE_MICRO, tb_false);
+        return tb_oc_dictionary_init(TB_OC_DICTIONARY_SIZE_MICRO, tb_false);
 
     // init key name
     tb_static_string_t  kname;
@@ -457,7 +457,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_dictionary(tb_oc_objec
                 else if (!key)
                 {
                     // func
-                    tb_oc_object_xplist_reader_func_t func = tb_oc_object_xplist_reader_func(name);
+                    tb_oc_xplist_reader_func_t func = tb_oc_xplist_reader_func(name);
                     tb_assert_and_check_break_state(func, ok, -1);
 
                     // read
@@ -517,10 +517,10 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_func_dictionary(tb_oc_objec
     // ok?
     return dictionary;
 }
-static tb_oc_object_ref_t tb_oc_object_xplist_reader_done(tb_stream_ref_t stream)
+static tb_oc_object_ref_t tb_oc_xplist_reader_done(tb_stream_ref_t stream)
 {
     // init reader 
-    tb_oc_object_xplist_reader_t reader = {0};
+    tb_oc_xplist_reader_t reader = {0};
     reader.reader = tb_xml_reader_init();
     tb_assert_and_check_return_val(reader.reader, tb_null);
 
@@ -546,7 +546,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_done(tb_stream_ref_t stream
                     if (tb_stricmp(name, "plist"))
                     {
                         // func
-                        tb_oc_object_xplist_reader_func_t func = tb_oc_object_xplist_reader_func(name);
+                        tb_oc_xplist_reader_func_t func = tb_oc_xplist_reader_func(name);
                         tb_assert_and_check_break_state(func, leave, tb_true);
 
                         // read
@@ -566,7 +566,7 @@ static tb_oc_object_ref_t tb_oc_object_xplist_reader_done(tb_stream_ref_t stream
     // ok?
     return object;
 }
-static tb_size_t tb_oc_object_xplist_reader_probe(tb_stream_ref_t stream)
+static tb_size_t tb_oc_xplist_reader_probe(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, 0);
@@ -594,40 +594,40 @@ static tb_size_t tb_oc_object_xplist_reader_probe(tb_stream_ref_t stream)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_oc_object_reader_t* tb_oc_object_xplist_reader()
+tb_oc_reader_t* tb_oc_xplist_reader()
 {
     // the reader
-    static tb_oc_object_reader_t s_reader = {0};
+    static tb_oc_reader_t s_reader = {0};
 
     // init reader
-    s_reader.read   = tb_oc_object_xplist_reader_done;
-    s_reader.probe  = tb_oc_object_xplist_reader_probe;
+    s_reader.read   = tb_oc_xplist_reader_done;
+    s_reader.probe  = tb_oc_xplist_reader_probe;
 
     // init hooker
     s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_str(tb_false), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
-    tb_hash_map_insert(s_reader.hooker, "date", tb_oc_object_xplist_reader_func_date);
-    tb_hash_map_insert(s_reader.hooker, "data", tb_oc_object_xplist_reader_func_data);
-    tb_hash_map_insert(s_reader.hooker, "array", tb_oc_object_xplist_reader_func_array);
-    tb_hash_map_insert(s_reader.hooker, "string", tb_oc_object_xplist_reader_func_string);
-    tb_hash_map_insert(s_reader.hooker, "integer", tb_oc_object_xplist_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, "real", tb_oc_object_xplist_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, "true", tb_oc_object_xplist_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, "false", tb_oc_object_xplist_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, "dict", tb_oc_object_xplist_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, "date", tb_oc_xplist_reader_func_date);
+    tb_hash_map_insert(s_reader.hooker, "data", tb_oc_xplist_reader_func_data);
+    tb_hash_map_insert(s_reader.hooker, "array", tb_oc_xplist_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, "string", tb_oc_xplist_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, "integer", tb_oc_xplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, "real", tb_oc_xplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, "true", tb_oc_xplist_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, "false", tb_oc_xplist_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, "dict", tb_oc_xplist_reader_func_dictionary);
 
     // ok
     return &s_reader;
 }
-tb_bool_t tb_oc_object_xplist_reader_hook(tb_char_t const* type, tb_oc_object_xplist_reader_func_t func)
+tb_bool_t tb_oc_xplist_reader_hook(tb_char_t const* type, tb_oc_xplist_reader_func_t func)
 {
     // check
     tb_assert_and_check_return_val(type && func, tb_false);
 
     // the reader
-    tb_oc_object_reader_t* reader = tb_oc_object_reader_get(TB_OBJECT_FORMAT_XPLIST);
+    tb_oc_reader_t* reader = tb_oc_reader_get(TB_OBJECT_FORMAT_XPLIST);
     tb_assert_and_check_return_val(reader && reader->hooker, tb_false);
 
     // hook it
@@ -636,16 +636,16 @@ tb_bool_t tb_oc_object_xplist_reader_hook(tb_char_t const* type, tb_oc_object_xp
     // ok
     return tb_true;
 }
-tb_oc_object_xplist_reader_func_t tb_oc_object_xplist_reader_func(tb_char_t const* type)
+tb_oc_xplist_reader_func_t tb_oc_xplist_reader_func(tb_char_t const* type)
 {
     // check
     tb_assert_and_check_return_val(type, tb_null);
 
     // the reader
-    tb_oc_object_reader_t* reader = tb_oc_object_reader_get(TB_OBJECT_FORMAT_XPLIST);
+    tb_oc_reader_t* reader = tb_oc_reader_get(TB_OBJECT_FORMAT_XPLIST);
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
-    return (tb_oc_object_xplist_reader_func_t)tb_hash_map_get(reader->hooker, type);
+    return (tb_oc_xplist_reader_func_t)tb_hash_map_get(reader->hooker, type);
 }
 

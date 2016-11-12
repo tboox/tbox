@@ -42,7 +42,7 @@
 typedef struct __tb_oc_data_t
 {
     // the object base
-    tb_oc_object_t     base;
+    tb_oc_object_t  base;
 
     // the data buffer
     tb_buffer_t     buffer;
@@ -81,7 +81,7 @@ static tb_void_t tb_oc_data_clear(tb_oc_object_ref_t object)
 static tb_oc_data_t* tb_oc_data_init_base()
 {
     // done
-    tb_bool_t           ok = tb_false;
+    tb_bool_t       ok = tb_false;
     tb_oc_data_t*   data = tb_null;
     do
     {

@@ -48,7 +48,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_null(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_null(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
@@ -56,15 +56,15 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_null(tb_oc_object_bin_rea
     // ok
     return tb_oc_null_init();
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_date(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_date(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // ok
-    return tb_oc_object_date_init_from_time((tb_time_t)size);
+    return tb_oc_date_init_from_time((tb_time_t)size);
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_data(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_data(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
@@ -100,7 +100,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_data(tb_oc_object_bin_rea
     // ok?
     return object;
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_array(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_array(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
@@ -120,7 +120,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_array(tb_oc_object_bin_re
         // the type & size
         tb_size_t               type = 0;
         tb_uint64_t             size = 0;
-        tb_oc_object_reader_bin_type_size(reader->stream, &type, &size);
+        tb_oc_reader_bin_type_size(reader->stream, &type, &size);
 
         // trace
         tb_trace_d("item: type: %lu, size: %llu", type, size);
@@ -144,7 +144,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_array(tb_oc_object_bin_re
         else
         {
             // the reader func
-            tb_oc_object_bin_reader_func_t func = tb_oc_object_bin_reader_func(type);
+            tb_oc_bin_reader_func_t func = tb_oc_bin_reader_func(type);
             tb_assert_and_check_break(func);
 
             // read it
@@ -171,7 +171,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_array(tb_oc_object_bin_re
     // ok?
     return array;
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_string(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_string(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
@@ -207,7 +207,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_string(tb_oc_object_bin_r
     // ok?
     return string;
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_number(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_number(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
@@ -300,7 +300,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_number(tb_oc_object_bin_r
     // ok?
     return number;
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_boolean(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_boolean(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
@@ -308,13 +308,13 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_boolean(tb_oc_object_bin_
     // ok?
     return tb_oc_boolean_init(size? tb_true : tb_false);
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_func_dictionary(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
+static tb_oc_object_ref_t tb_oc_bin_reader_func_dictionary(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // empty?
-    if (!size) return tb_oc_dictionary_init(TB_OBJECT_DICTIONARY_SIZE_MICRO, tb_false);
+    if (!size) return tb_oc_dictionary_init(TB_OC_DICTIONARY_SIZE_MICRO, tb_false);
 
     // init dictionary
     tb_oc_object_ref_t dictionary = tb_oc_dictionary_init(0, tb_false);
@@ -332,7 +332,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_dictionary(tb_oc_object_b
             // the type & size
             tb_size_t               type = 0;
             tb_uint64_t             size = 0;
-            tb_oc_object_reader_bin_type_size(reader->stream, &type, &size);
+            tb_oc_reader_bin_type_size(reader->stream, &type, &size);
 
             // trace
             tb_trace_d("key: type: %lu, size: %llu", type, size);
@@ -355,7 +355,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_dictionary(tb_oc_object_b
                 tb_assert_and_check_break(type == TB_OBJECT_TYPE_STRING);
 
                 // the reader func
-                tb_oc_object_bin_reader_func_t func = tb_oc_object_bin_reader_func(type);
+                tb_oc_bin_reader_func_t func = tb_oc_bin_reader_func(type);
                 tb_assert_and_check_break(func);
 
                 // read it
@@ -382,7 +382,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_dictionary(tb_oc_object_b
             // the type & size
             tb_size_t               type = 0;
             tb_uint64_t             size = 0;
-            tb_oc_object_reader_bin_type_size(reader->stream, &type, &size);
+            tb_oc_reader_bin_type_size(reader->stream, &type, &size);
 
             // trace
             tb_trace_d("val: type: %lu, size: %llu", type, size);
@@ -405,7 +405,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_dictionary(tb_oc_object_b
             else
             {
                 // the reader func
-                tb_oc_object_bin_reader_func_t func = tb_oc_object_bin_reader_func(type);
+                tb_oc_bin_reader_func_t func = tb_oc_bin_reader_func(type);
                 tb_assert_and_check_break(func);
 
                 // read it
@@ -434,7 +434,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_func_dictionary(tb_oc_object_b
     // ok?
     return dictionary;
 }
-static tb_oc_object_ref_t tb_oc_object_bin_reader_done(tb_stream_ref_t stream)
+static tb_oc_object_ref_t tb_oc_bin_reader_done(tb_stream_ref_t stream)
 {
     // read bin header
     tb_byte_t data[32] = {0};
@@ -445,7 +445,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_done(tb_stream_ref_t stream)
 
     // init
     tb_oc_object_ref_t            object = tb_null;
-    tb_oc_object_bin_reader_t  reader = {0};
+    tb_oc_bin_reader_t  reader = {0};
 
     // init reader
     reader.stream           = stream;
@@ -455,13 +455,13 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_done(tb_stream_ref_t stream)
     // the type & size
     tb_size_t               type = 0;
     tb_uint64_t             size = 0;
-    tb_oc_object_reader_bin_type_size(stream, &type, &size);
+    tb_oc_reader_bin_type_size(stream, &type, &size);
 
     // trace
     tb_trace_d("root: type: %lu, size: %llu", type, size);
 
     // the func
-    tb_oc_object_bin_reader_func_t func = tb_oc_object_bin_reader_func(type);
+    tb_oc_bin_reader_func_t func = tb_oc_bin_reader_func(type);
 
     // check
     tb_assert(func);
@@ -475,7 +475,7 @@ static tb_oc_object_ref_t tb_oc_object_bin_reader_done(tb_stream_ref_t stream)
     // ok?
     return object;
 }
-static tb_size_t tb_oc_object_bin_reader_probe(tb_stream_ref_t stream)
+static tb_size_t tb_oc_bin_reader_probe(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, 0);
@@ -492,39 +492,39 @@ static tb_size_t tb_oc_object_bin_reader_probe(tb_stream_ref_t stream)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_oc_object_reader_t* tb_oc_object_bin_reader()
+tb_oc_reader_t* tb_oc_bin_reader()
 {
     // the reader
-    static tb_oc_object_reader_t s_reader = {0};
+    static tb_oc_reader_t s_reader = {0};
 
     // init reader
-    s_reader.read   = tb_oc_object_bin_reader_done;
-    s_reader.probe  = tb_oc_object_bin_reader_probe;
+    s_reader.read   = tb_oc_bin_reader_done;
+    s_reader.probe  = tb_oc_bin_reader_probe;
 
     // init hooker
     s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_oc_object_bin_reader_func_null);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_oc_object_bin_reader_func_date);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_oc_object_bin_reader_func_data);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_oc_object_bin_reader_func_array);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_STRING, tb_oc_object_bin_reader_func_string);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NUMBER, tb_oc_object_bin_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_BOOLEAN, tb_oc_object_bin_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DICTIONARY, tb_oc_object_bin_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_oc_bin_reader_func_null);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_oc_bin_reader_func_date);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_oc_bin_reader_func_data);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_oc_bin_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_STRING, tb_oc_bin_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NUMBER, tb_oc_bin_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_BOOLEAN, tb_oc_bin_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DICTIONARY, tb_oc_bin_reader_func_dictionary);
 
     // ok
     return &s_reader;
 }
-tb_bool_t tb_oc_object_bin_reader_hook(tb_size_t type, tb_oc_object_bin_reader_func_t func)
+tb_bool_t tb_oc_bin_reader_hook(tb_size_t type, tb_oc_bin_reader_func_t func)
 {
     // check
     tb_assert_and_check_return_val(type && func, tb_false);
 
     // the reader
-    tb_oc_object_reader_t* reader = tb_oc_object_reader_get(TB_OBJECT_FORMAT_BIN);
+    tb_oc_reader_t* reader = tb_oc_reader_get(TB_OBJECT_FORMAT_BIN);
     tb_assert_and_check_return_val(reader && reader->hooker, tb_false);
 
     // hook it
@@ -533,16 +533,16 @@ tb_bool_t tb_oc_object_bin_reader_hook(tb_size_t type, tb_oc_object_bin_reader_f
     // ok
     return tb_true;
 }
-tb_oc_object_bin_reader_func_t tb_oc_object_bin_reader_func(tb_size_t type)
+tb_oc_bin_reader_func_t tb_oc_bin_reader_func(tb_size_t type)
 {
     // check
     tb_assert_and_check_return_val(type, tb_null);
 
     // the reader
-    tb_oc_object_reader_t* reader = tb_oc_object_reader_get(TB_OBJECT_FORMAT_BIN);
+    tb_oc_reader_t* reader = tb_oc_reader_get(TB_OBJECT_FORMAT_BIN);
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
     // the func
-    return (tb_oc_object_bin_reader_func_t)tb_hash_map_get(reader->hooker, (tb_pointer_t)type);
+    return (tb_oc_bin_reader_func_t)tb_hash_map_get(reader->hooker, (tb_pointer_t)type);
 }
 

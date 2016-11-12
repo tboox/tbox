@@ -45,7 +45,7 @@ __tb_extern_c_enter__
  *
  * @return          the array object
  */
-tb_oc_object_ref_t     tb_oc_array_init(tb_size_t grow, tb_bool_t incr);
+tb_oc_object_ref_t  tb_oc_array_init(tb_size_t grow, tb_bool_t incr);
 
 /*! the array size
  *
@@ -62,7 +62,7 @@ tb_size_t           tb_oc_array_size(tb_oc_object_ref_t array);
  *
  * @return          the array item
  */
-tb_oc_object_ref_t     tb_oc_array_item(tb_oc_object_ref_t array, tb_size_t index);
+tb_oc_object_ref_t  tb_oc_array_item(tb_oc_object_ref_t array, tb_size_t index);
 
 /*! set the array incr
  *

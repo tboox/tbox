@@ -48,7 +48,7 @@
  */
 
 // the object reader type
-typedef struct __tb_oc_object_reader_t
+typedef struct __tb_oc_reader_t
 {
     /// the hooker
     tb_hash_map_ref_t           hooker;
@@ -59,10 +59,10 @@ typedef struct __tb_oc_object_reader_t
     /// read it
     tb_oc_object_ref_t          (*read)(tb_stream_ref_t stream);
 
-}tb_oc_object_reader_t;
+}tb_oc_reader_t;
 
 // the object writer type
-typedef struct __tb_oc_object_writer_t
+typedef struct __tb_oc_writer_t
 {
     /// the hooker
     tb_hash_map_ref_t           hooker;
@@ -70,6 +70,6 @@ typedef struct __tb_oc_object_writer_t
     /// writ it
     tb_long_t                   (*writ)(tb_stream_ref_t stream, tb_oc_object_ref_t object, tb_bool_t deflate);
 
-}tb_oc_object_writer_t;
+}tb_oc_writer_t;
 
 #endif

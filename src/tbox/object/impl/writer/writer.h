@@ -49,7 +49,7 @@ __tb_extern_c_enter__
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_oc_object_writer_set(tb_size_t format, tb_oc_object_writer_t* writer);
+tb_bool_t           tb_oc_writer_set(tb_size_t format, tb_oc_writer_t* writer);
 
 /*! get object writer
  *
@@ -57,13 +57,13 @@ tb_bool_t           tb_oc_object_writer_set(tb_size_t format, tb_oc_object_write
  *
  * @return          the object writer
  */
-tb_oc_object_writer_t* tb_oc_object_writer_get(tb_size_t format);
+tb_oc_writer_t* tb_oc_writer_get(tb_size_t format);
 
 /*! remove object writer
  *
  * @param format    the writer format
  */
-tb_void_t           tb_oc_object_writer_remove(tb_size_t format);
+tb_void_t           tb_oc_writer_remove(tb_size_t format);
 
 /*! done writer
  *
@@ -73,7 +73,7 @@ tb_void_t           tb_oc_object_writer_remove(tb_size_t format);
  *
  * @return          the writed size, failed: -1
  */
-tb_long_t           tb_oc_object_writer_done(tb_oc_object_ref_t object, tb_stream_ref_t stream, tb_size_t format);
+tb_long_t           tb_oc_writer_done(tb_oc_object_ref_t object, tb_stream_ref_t stream, tb_size_t format);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

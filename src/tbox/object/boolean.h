@@ -44,19 +44,19 @@ __tb_extern_c_enter__
  *
  * @return          the boolean object
  */
-tb_oc_object_ref_t     tb_oc_boolean_init(tb_bool_t value);
+tb_oc_object_ref_t  tb_oc_boolean_init(tb_bool_t value);
 
 /*! the boolean value: true
  *
  * @return          the boolean object
  */
-tb_oc_object_ref_t     tb_oc_boolean_true(tb_noarg_t);
+tb_oc_object_ref_t  tb_oc_boolean_true(tb_noarg_t);
 
 /*! the boolean value: false
  *
  * @return          the boolean object
  */
-tb_oc_object_ref_t     tb_oc_boolean_false(tb_noarg_t);
+tb_oc_object_ref_t  tb_oc_boolean_false(tb_noarg_t);
 
 /*! the boolean value
  *

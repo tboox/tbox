@@ -38,43 +38,43 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the xplist reader type
-typedef struct __tb_oc_object_xplist_reader_t
+// the xplist reader type
+typedef struct __tb_oc_xplist_reader_t
 {
-    /// the xplist reader
+    // the xplist reader
     tb_xml_reader_ref_t         reader;
 
-}tb_oc_object_xplist_reader_t;
+}tb_oc_xplist_reader_t;
 
-/// the xplist reader func type
-typedef tb_oc_object_ref_t         (*tb_oc_object_xplist_reader_func_t)(tb_oc_object_xplist_reader_t* reader, tb_size_t event);
+// the xplist reader func type
+typedef tb_oc_object_ref_t      (*tb_oc_xplist_reader_func_t)(tb_oc_xplist_reader_t* reader, tb_size_t event);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the xplist object reader
+/* the xplist object reader
  *
  * @return                      the xplist object reader
  */
-tb_oc_object_reader_t*             tb_oc_object_xplist_reader(tb_noarg_t);
+tb_oc_reader_t*          tb_oc_xplist_reader(tb_noarg_t);
 
-/*! hook the xplist reader
+/* hook the xplist reader
  *
  * @param type                  the object type name
  * @param func                  the reader func
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_oc_object_xplist_reader_hook(tb_char_t const* type, tb_oc_object_xplist_reader_func_t func);
+tb_bool_t                       tb_oc_xplist_reader_hook(tb_char_t const* type, tb_oc_xplist_reader_func_t func);
 
-/*! the xplist reader func
+/* the xplist reader func
  *
  * @param type                  the object type name
  *
  * @return                      the object reader func
  */
-tb_oc_object_xplist_reader_func_t  tb_oc_object_xplist_reader_func(tb_char_t const* type);
+tb_oc_xplist_reader_func_t  tb_oc_xplist_reader_func(tb_char_t const* type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

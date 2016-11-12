@@ -200,7 +200,7 @@ tb_option_ref_t tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_
 
         // init option
         impl->opts = opts;
-        impl->list = tb_oc_dictionary_init(TB_OBJECT_DICTIONARY_SIZE_MICRO, tb_false);
+        impl->list = tb_oc_dictionary_init(TB_OC_DICTIONARY_SIZE_MICRO, tb_false);
         tb_assert_and_check_break(impl->list);
 
         // init name

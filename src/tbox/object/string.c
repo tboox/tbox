@@ -49,7 +49,7 @@
 typedef struct __tb_oc_string_t
 {
     // the object base
-    tb_oc_object_t         base;
+    tb_oc_object_t      base;
 
     // the string
     tb_string_t         str;
@@ -95,8 +95,8 @@ static tb_void_t tb_oc_string_clear(tb_oc_object_ref_t object)
 static tb_oc_string_t* tb_oc_string_init_base()
 {
     // done
-    tb_bool_t            ok = tb_false;
-    tb_oc_string_t*  string = tb_null;
+    tb_bool_t       ok = tb_false;
+    tb_oc_string_t* string = tb_null;
     do
     {
         // make string
@@ -134,7 +134,7 @@ static tb_oc_string_t* tb_oc_string_init_base()
 tb_oc_object_ref_t tb_oc_string_init_from_cstr(tb_char_t const* cstr)
 {
     // done
-    tb_bool_t           ok = tb_false;
+    tb_bool_t       ok = tb_false;
     tb_oc_string_t* string = tb_null;
     do
     {
@@ -167,7 +167,7 @@ tb_oc_object_ref_t tb_oc_string_init_from_cstr(tb_char_t const* cstr)
 tb_oc_object_ref_t tb_oc_string_init_from_str(tb_string_ref_t str)
 {
     // done
-    tb_bool_t           ok = tb_false;
+    tb_bool_t       ok = tb_false;
     tb_oc_string_t* string = tb_null;
     do
     {

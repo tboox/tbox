@@ -117,7 +117,7 @@ tb_oc_object_ref_t tb_oc_object_data(tb_oc_object_ref_t object, tb_size_t format
     tb_assert_and_check_return_val(object, tb_null);
 
     // done
-    tb_oc_object_ref_t     odata = tb_null;
+    tb_oc_object_ref_t  odata = tb_null;
     tb_size_t           maxn = TB_STREAM_BLOCK_MAXN;
     tb_byte_t*          data = tb_null;
     do
@@ -152,7 +152,7 @@ tb_oc_object_ref_t tb_oc_object_seek(tb_oc_object_ref_t object, tb_char_t const*
     tb_check_return_val(path, object);
 
     // done
-    tb_oc_object_ref_t     root = object;
+    tb_oc_object_ref_t  root = object;
     tb_char_t const*    p = path;
     tb_char_t const*    e = path + tb_strlen(path);
     while (p < e && object)
@@ -299,7 +299,7 @@ tb_oc_object_ref_t tb_oc_object_read(tb_stream_ref_t stream)
     tb_assert_and_check_return_val(stream, tb_null);
 
     // done reader
-    return tb_oc_object_reader_done(stream);
+    return tb_oc_reader_done(stream);
 }
 tb_oc_object_ref_t tb_oc_object_read_from_url(tb_char_t const* url)
 {
@@ -354,7 +354,7 @@ tb_long_t tb_oc_object_writ(tb_oc_object_ref_t object, tb_stream_ref_t stream, t
 #endif
 
     // writ it
-    return tb_oc_object_writer_done(object, stream, format);
+    return tb_oc_writer_done(object, stream, format);
 }
 tb_long_t tb_oc_object_writ_to_url(tb_oc_object_ref_t object, tb_char_t const* url, tb_size_t format)
 {
