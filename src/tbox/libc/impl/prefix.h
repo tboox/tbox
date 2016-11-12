@@ -17,20 +17,15 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        libc.h
- * @defgroup    libc
+ * @file        prefix.h
  *
  */
-#ifndef TB_LIBC_H
-#define TB_LIBC_H
+#ifndef TB_LIBC_IMPL_PREFIX_H
+#define TB_LIBC_IMPL_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "misc/misc.h"
-#include "stdio/stdio.h"
-#include "stdlib/stdlib.h"
-#include "string/string.h"
+#include "../prefix.h"
 
 #endif

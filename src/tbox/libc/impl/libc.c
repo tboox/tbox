@@ -25,15 +25,16 @@
  * includes
  */
 #include "libc.h"
+#include "../stdio/printf_object.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_libc_init()
+tb_bool_t tb_libc_init_env()
 {
     return tb_true;
 }
-tb_void_t tb_libc_exit()
+tb_void_t tb_libc_exit_env()
 {
     // exit the printf format 
     tb_printf_object_exit();

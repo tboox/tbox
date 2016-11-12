@@ -18,19 +18,16 @@
  *
  * @author      ruki
  * @file        libc.h
- * @defgroup    libc
+ * @ingroup     libc
  *
  */
-#ifndef TB_LIBC_H
-#define TB_LIBC_H
+#ifndef TB_LIBC_IMPL_H
+#define TB_LIBC_IMPL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "misc/misc.h"
-#include "stdio/stdio.h"
-#include "stdlib/stdlib.h"
-#include "string/string.h"
+#include "libc.h"
+
 
 #endif

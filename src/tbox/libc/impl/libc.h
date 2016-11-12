@@ -18,19 +18,39 @@
  *
  * @author      ruki
  * @file        libc.h
- * @defgroup    libc
+ * @ingroup     libc
  *
  */
-#ifndef TB_LIBC_H
-#define TB_LIBC_H
+#ifndef TB_LIBC_IMPL_LIBC_H
+#define TB_LIBC_IMPL_LIBC_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "misc/misc.h"
-#include "stdio/stdio.h"
-#include "stdlib/stdlib.h"
-#include "string/string.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/* init libc envirnoment
+ *
+ * @return  tb_true or tb_false
+ */
+tb_bool_t   tb_libc_init_env(tb_noarg_t);
+
+/* exit libc envirnoment
+ */
+tb_void_t   tb_libc_exit_env(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
