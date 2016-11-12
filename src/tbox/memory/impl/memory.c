@@ -18,7 +18,7 @@
  *
  * @author      ruki
  * @file        memory.c
- * @defgroup    memory
+ * @ingroup     memory
  *
  */
 
@@ -32,8 +32,8 @@
  * includes
  */
 #include "memory.h"
-#include "allocator.h"
-#include "../platform/platform.h"
+#include "../memory.h"
+#include "../../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -45,7 +45,7 @@ __tb_extern_c__ extern tb_allocator_ref_t   g_allocator;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_memory_init(tb_allocator_ref_t allocator)
+tb_bool_t tb_memory_init_env(tb_allocator_ref_t allocator)
 {
     // done
     tb_bool_t ok = tb_false;
@@ -71,12 +71,12 @@ tb_bool_t tb_memory_init(tb_allocator_ref_t allocator)
     } while (0);
 
     // failed? exit it
-    if (!ok) tb_memory_exit();
+    if (!ok) tb_memory_exit_env();
     
     // ok?
     return ok;
 }
-tb_void_t tb_memory_exit()
+tb_void_t tb_memory_exit_env()
 {
     // exit the native memory
     tb_native_memory_exit();

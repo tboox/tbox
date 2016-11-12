@@ -17,19 +17,42 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
+ * @file        memory.h
+ * @ingroup     memory
  *
  */
-#ifndef TB_MEMORY_IMPL_H
-#define TB_MEMORY_IMPL_H
+#ifndef TB_MEMORY_IMPL_MEMORY_H
+#define TB_MEMORY_IMPL_MEMORY_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "memory.h"
-#include "native_large_allocator.h"
-#include "static_large_allocator.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/* init memory envirnoment
+ *
+ * @param allocator     the allocator
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_memory_init_env(tb_allocator_ref_t allocator);
+
+// exit memory envirnoment
+tb_void_t               tb_memory_exit_env(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
+

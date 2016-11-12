@@ -41,11 +41,6 @@
 #include "default_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_enter__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * description
  */
 
@@ -102,26 +97,6 @@ __tb_extern_c_enter__
  *
  * </pre>
  */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/*! init memory
- *
- * @param allocator     the allocator
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_memory_init(tb_allocator_ref_t allocator);
-
-/// exit memory
-tb_void_t               tb_memory_exit(tb_noarg_t);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
 
 #endif
 

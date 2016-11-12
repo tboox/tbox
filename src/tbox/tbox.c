@@ -27,6 +27,7 @@
 #include "tbox.h"
 #include "libm/impl/impl.h"
 #include "object/impl/impl.h"
+#include "memory/impl/impl.h"
 #include "network/impl/impl.h"
 #include "platform/impl/impl.h"
 
@@ -167,8 +168,8 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
     // init singleton
     if (!tb_singleton_init()) return tb_false;
 
-    // init memory
-    if (!tb_memory_init(allocator)) return tb_false;
+    // init memory envirnoment
+    if (!tb_memory_init_env(allocator)) return tb_false;
 
     // init platform envirnoment
     if (!tb_platform_init_env(priv)) return tb_false;
@@ -230,8 +231,8 @@ tb_void_t tb_exit()
     // exit singleton
     tb_singleton_exit();
 
-    // exit memory
-    tb_memory_exit();
+    // exit memory envirnoment
+    tb_memory_exit_env();
 
     // trace
     tb_trace_d("exit: ok");

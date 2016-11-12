@@ -17,19 +17,43 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
+ * @file        platform.h
+ * @ingroup     platform
  *
  */
-#ifndef TB_MEMORY_IMPL_H
-#define TB_MEMORY_IMPL_H
+#ifndef TB_PLATFORM_IMPL_PLATFORM_H
+#define TB_PLATFORM_IMPL_PLATFORM_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "memory.h"
-#include "native_large_allocator.h"
-#include "static_large_allocator.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init the platform envirnoment
+ *
+ * @param priv      the platform private data
+ *                  pass JavaVM* jvm for android
+ *                  pass tb_null for other platform
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_platform_init_env(tb_handle_t priv);
+
+/// exit the platform envirnoment
+tb_void_t           tb_platform_exit_env(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif

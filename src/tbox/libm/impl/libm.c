@@ -17,19 +17,23 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
+ * @file        libm.c
+ * @ingroup     libm
  *
  */
-#ifndef TB_MEMORY_IMPL_H
-#define TB_MEMORY_IMPL_H
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "memory.h"
-#include "native_large_allocator.h"
-#include "static_large_allocator.h"
+#include "libm.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_bool_t tb_libm_init_env()
+{
+    return tb_true;
+}
+tb_void_t tb_libm_exit_env()
+{
+}
 
-#endif

@@ -17,19 +17,15 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
+ * @file        prefix.h
  *
  */
-#ifndef TB_MEMORY_IMPL_H
-#define TB_MEMORY_IMPL_H
+#ifndef TB_LIBM_IMPL_PREFIX_H
+#define TB_LIBM_IMPL_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "memory.h"
-#include "native_large_allocator.h"
-#include "static_large_allocator.h"
-
+#include "../prefix.h"
 
 #endif
