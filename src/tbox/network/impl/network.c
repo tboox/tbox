@@ -18,7 +18,7 @@
  *
  * @author      ruki
  * @file        network.c
- * @defgroup    network
+ * @ingroup     network
  *
  */
 
@@ -26,7 +26,8 @@
  * includes
  */
 #include "network.h"
-#include "../libc/libc.h"
+#include "../network.h"
+#include "../../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -91,7 +92,7 @@ static tb_long_t tb_network_printf_format_hwaddr(tb_cpointer_t object, tb_char_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_network_init()
+tb_bool_t tb_network_init_env()
 {
     // init dns server
     if (!tb_dns_server_init()) return tb_false;
@@ -114,7 +115,7 @@ tb_bool_t tb_network_init()
     // ok
     return tb_true;
 }
-tb_void_t tb_network_exit()
+tb_void_t tb_network_exit_env()
 {
     // exit dns cache
     tb_dns_cache_exit();

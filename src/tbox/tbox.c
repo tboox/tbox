@@ -26,6 +26,7 @@
  */
 #include "tbox.h"
 #include "object/impl/impl.h"
+#include "network/impl/impl.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -179,8 +180,8 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
     // init libm
     if (!tb_libm_init()) return tb_false;
 
-    // init network 
-    if (!tb_network_init()) return tb_false;
+    // init network envirnoment
+    if (!tb_network_init_env()) return tb_false;
 
     // init object envirnoment
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
@@ -209,8 +210,8 @@ tb_void_t tb_exit()
     tb_object_exit_env();
 #endif
     
-    // exit network
-    tb_network_exit();
+    // exit network envirnoment
+    tb_network_exit_env();
      
     // exit libm
     tb_libm_exit();

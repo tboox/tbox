@@ -18,24 +18,16 @@
  *
  * @author      ruki
  * @file        network.h
- * @defgroup    network
+ * @ingroup     network
  *
  */
-#ifndef TB_NETWORK_H
-#define TB_NETWORK_H
+#ifndef TB_NETWORK_IMPL_H
+#define TB_NETWORK_IMPL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "ssl.h"
-#include "url.h"
-#include "ipv4.h"
-#include "ipv6.h"
-#include "ipaddr.h"
-#include "hwaddr.h"
-#include "http.h"
-#include "cookies.h"
-#include "dns/dns.h"
+#include "network.h"
+
 
 #endif

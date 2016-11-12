@@ -18,24 +18,38 @@
  *
  * @author      ruki
  * @file        network.h
- * @defgroup    network
+ * @ingroup     network
  *
  */
-#ifndef TB_NETWORK_H
-#define TB_NETWORK_H
+#ifndef TB_NETWORK_IMPL_NETWORK_H
+#define TB_NETWORK_IMPL_NETWORK_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "ssl.h"
-#include "url.h"
-#include "ipv4.h"
-#include "ipv6.h"
-#include "ipaddr.h"
-#include "hwaddr.h"
-#include "http.h"
-#include "cookies.h"
-#include "dns/dns.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init network envirnoment
+ *
+ * @return      tb_true or tb_false
+ */
+tb_bool_t       tb_network_init_env(tb_noarg_t);
+
+/// exit network envirnoment
+tb_void_t       tb_network_exit_env(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
