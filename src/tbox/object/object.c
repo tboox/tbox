@@ -37,49 +37,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_object_init_env()
-{
-    // set reader
-    if (!tb_object_reader_set(TB_OBJECT_FORMAT_BIN, tb_object_bin_reader())) return tb_false;
-    if (!tb_object_reader_set(TB_OBJECT_FORMAT_JSON, tb_object_json_reader())) return tb_false;
-    if (!tb_object_reader_set(TB_OBJECT_FORMAT_BPLIST, tb_object_bplist_reader())) return tb_false;
- 
-    // set writer
-    if (!tb_object_writer_set(TB_OBJECT_FORMAT_BIN, tb_object_bin_writer())) return tb_false;
-    if (!tb_object_writer_set(TB_OBJECT_FORMAT_JSON, tb_object_json_writer())) return tb_false;
-    if (!tb_object_writer_set(TB_OBJECT_FORMAT_BPLIST, tb_object_bplist_writer())) return tb_false;
-
-    // for xml
-#ifdef TB_CONFIG_MODULE_HAVE_XML
-    if (!tb_object_reader_set(TB_OBJECT_FORMAT_XML, tb_object_xml_reader())) return tb_false;
-    if (!tb_object_writer_set(TB_OBJECT_FORMAT_XML, tb_object_xml_writer())) return tb_false;
-    if (!tb_object_reader_set(TB_OBJECT_FORMAT_XPLIST, tb_object_xplist_reader())) return tb_false;
-    if (!tb_object_writer_set(TB_OBJECT_FORMAT_XPLIST, tb_object_xplist_writer())) return tb_false;
-#endif
-
-    // ok
-    return tb_true;
-}
-tb_void_t tb_object_exit_env()
-{
-    // exit reader
-    tb_object_reader_remove(TB_OBJECT_FORMAT_BIN);
-    tb_object_reader_remove(TB_OBJECT_FORMAT_JSON);
-    tb_object_reader_remove(TB_OBJECT_FORMAT_BPLIST);
-
-    // exit writer
-    tb_object_writer_remove(TB_OBJECT_FORMAT_BIN);
-    tb_object_writer_remove(TB_OBJECT_FORMAT_JSON);
-    tb_object_writer_remove(TB_OBJECT_FORMAT_BPLIST);
-
-    // for xml
-#ifdef TB_CONFIG_MODULE_HAVE_XML
-    tb_object_reader_remove(TB_OBJECT_FORMAT_XML);
-    tb_object_writer_remove(TB_OBJECT_FORMAT_XML);
-    tb_object_reader_remove(TB_OBJECT_FORMAT_XPLIST);
-    tb_object_writer_remove(TB_OBJECT_FORMAT_XPLIST);
-#endif
-}
 tb_bool_t tb_object_init(tb_object_ref_t object, tb_size_t flag, tb_size_t type)
 {
     // check

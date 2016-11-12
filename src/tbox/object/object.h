@@ -46,15 +46,6 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init object context
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_object_init_env(tb_noarg_t);
-
-/// exit object context
-tb_void_t           tb_object_exit_env(tb_noarg_t);
-
 /*! init object
  *
  * @param object    the object
