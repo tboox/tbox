@@ -39,63 +39,63 @@
  */
 
 // the data type
-typedef struct __tb_object_data_t
+typedef struct __tb_oc_data_t
 {
     // the object base
-    tb_object_t     base;
+    tb_oc_object_t     base;
 
     // the data buffer
     tb_buffer_t     buffer;
 
-}tb_object_data_t;
+}tb_oc_data_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_object_data_t* tb_object_data_cast(tb_object_ref_t object)
+static __tb_inline__ tb_oc_data_t* tb_oc_data_cast(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DATA, tb_null);
 
     // cast
-    return (tb_object_data_t*)object;
+    return (tb_oc_data_t*)object;
 }
-static tb_object_ref_t tb_object_data_copy(tb_object_ref_t object)
+static tb_oc_object_ref_t tb_oc_data_copy(tb_oc_object_ref_t object)
 {
-    return tb_object_data_init_from_data(tb_object_data_getp(object), tb_object_data_size(object));
+    return tb_oc_data_init_from_data(tb_oc_data_getp(object), tb_oc_data_size(object));
 }
-static tb_void_t tb_object_data_exit(tb_object_ref_t object)
+static tb_void_t tb_oc_data_exit(tb_oc_object_ref_t object)
 {
-    tb_object_data_t* data = tb_object_data_cast(object);
+    tb_oc_data_t* data = tb_oc_data_cast(object);
     if (data) 
     {
         tb_buffer_exit(&data->buffer);
         tb_free(data);
     }
 }
-static tb_void_t tb_object_data_clear(tb_object_ref_t object)
+static tb_void_t tb_oc_data_clear(tb_oc_object_ref_t object)
 {
-    tb_object_data_t* data = tb_object_data_cast(object);
+    tb_oc_data_t* data = tb_oc_data_cast(object);
     if (data) tb_buffer_clear(&data->buffer);
 }
-static tb_object_data_t* tb_object_data_init_base()
+static tb_oc_data_t* tb_oc_data_init_base()
 {
     // done
     tb_bool_t           ok = tb_false;
-    tb_object_data_t*   data = tb_null;
+    tb_oc_data_t*   data = tb_null;
     do
     {
         // make data
-        data = tb_malloc0_type(tb_object_data_t);
+        data = tb_malloc0_type(tb_oc_data_t);
         tb_assert_and_check_break(data);
 
         // init data
-        if (!tb_object_init((tb_object_ref_t)data, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA)) break;
+        if (!tb_oc_object_init((tb_oc_object_ref_t)data, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA)) break;
 
         // init base
-        data->base.copy     = tb_object_data_copy;
-        data->base.exit     = tb_object_data_exit;
-        data->base.clear    = tb_object_data_clear;
+        data->base.copy     = tb_oc_data_copy;
+        data->base.exit     = tb_oc_data_exit;
+        data->base.clear    = tb_oc_data_clear;
         
         // ok
         ok = tb_true;
@@ -106,7 +106,7 @@ static tb_object_data_t* tb_object_data_init_base()
     if (!ok)
     {
         // exit it
-        if (data) tb_object_exit((tb_object_ref_t)data);
+        if (data) tb_oc_object_exit((tb_oc_object_ref_t)data);
         data = tb_null;
     }
 
@@ -117,7 +117,7 @@ static tb_object_data_t* tb_object_data_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_ref_t tb_object_data_init_from_url(tb_char_t const* url)
+tb_oc_object_ref_t tb_oc_data_init_from_url(tb_char_t const* url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);
@@ -127,7 +127,7 @@ tb_object_ref_t tb_object_data_init_from_url(tb_char_t const* url)
     tb_assert_and_check_return_val(stream, tb_null);
 
     // make stream
-    tb_object_ref_t object = tb_null;
+    tb_oc_object_ref_t object = tb_null;
     if (tb_stream_open(stream))
     {
         // read all data
@@ -136,7 +136,7 @@ tb_object_ref_t tb_object_data_init_from_url(tb_char_t const* url)
         if (data)
         {
             // make object
-            object = tb_object_data_init_from_data(data, size);
+            object = tb_oc_data_init_from_data(data, size);
 
             // exit data
             tb_free(data);
@@ -149,16 +149,16 @@ tb_object_ref_t tb_object_data_init_from_url(tb_char_t const* url)
     // ok?
     return object;
 }
-tb_object_ref_t tb_object_data_init_from_data(tb_pointer_t addr, tb_size_t size)
+tb_oc_object_ref_t tb_oc_data_init_from_data(tb_pointer_t addr, tb_size_t size)
 {
     // make
-    tb_object_data_t* data = tb_object_data_init_base();
+    tb_oc_data_t* data = tb_oc_data_init_base();
     tb_assert_and_check_return_val(data, tb_null);
 
     // init buffer
     if (!tb_buffer_init(&data->buffer))
     {
-        tb_object_data_exit((tb_object_ref_t)data);
+        tb_oc_data_exit((tb_oc_object_ref_t)data);
         return tb_null;
     }
 
@@ -166,18 +166,18 @@ tb_object_ref_t tb_object_data_init_from_data(tb_pointer_t addr, tb_size_t size)
     if (addr && size) tb_buffer_memncpy(&data->buffer, (tb_byte_t const*)addr, size);
 
     // ok
-    return (tb_object_ref_t)data;
+    return (tb_oc_object_ref_t)data;
 }
-tb_object_ref_t tb_object_data_init_from_buffer(tb_buffer_ref_t pbuf)
+tb_oc_object_ref_t tb_oc_data_init_from_buffer(tb_buffer_ref_t pbuf)
 {   
     // make
-    tb_object_data_t* data = tb_object_data_init_base();
+    tb_oc_data_t* data = tb_oc_data_init_base();
     tb_assert_and_check_return_val(data, tb_null);
 
     // init buffer
     if (!tb_buffer_init(&data->buffer))
     {
-        tb_object_data_exit((tb_object_ref_t)data);
+        tb_oc_data_exit((tb_oc_object_ref_t)data);
         return tb_null;
     }
 
@@ -185,21 +185,21 @@ tb_object_ref_t tb_object_data_init_from_buffer(tb_buffer_ref_t pbuf)
     if (pbuf) tb_buffer_memcpy(&data->buffer, pbuf);
 
     // ok
-    return (tb_object_ref_t)data;
+    return (tb_oc_object_ref_t)data;
 }
-tb_pointer_t tb_object_data_getp(tb_object_ref_t object)
+tb_pointer_t tb_oc_data_getp(tb_oc_object_ref_t object)
 {
     // check
-    tb_object_data_t* data = tb_object_data_cast(object);
+    tb_oc_data_t* data = tb_oc_data_cast(object);
     tb_assert_and_check_return_val(data, tb_null);
 
     // data
     return tb_buffer_data(&data->buffer);
 }
-tb_bool_t tb_object_data_setp(tb_object_ref_t object, tb_pointer_t addr, tb_size_t size)
+tb_bool_t tb_oc_data_setp(tb_oc_object_ref_t object, tb_pointer_t addr, tb_size_t size)
 {
     // check
-    tb_object_data_t* data = tb_object_data_cast(object);
+    tb_oc_data_t* data = tb_oc_data_cast(object);
     tb_assert_and_check_return_val(data && addr, tb_false);
 
     // data
@@ -208,29 +208,29 @@ tb_bool_t tb_object_data_setp(tb_object_ref_t object, tb_pointer_t addr, tb_size
     // ok
     return tb_true;
 }
-tb_size_t tb_object_data_size(tb_object_ref_t object)
+tb_size_t tb_oc_data_size(tb_oc_object_ref_t object)
 {
     // check
-    tb_object_data_t* data = tb_object_data_cast(object);
+    tb_oc_data_t* data = tb_oc_data_cast(object);
     tb_assert_and_check_return_val(data, 0);
 
     // data
     return tb_buffer_size(&data->buffer);
 }
-tb_buffer_ref_t tb_object_data_buffer(tb_object_ref_t object)
+tb_buffer_ref_t tb_oc_data_buffer(tb_oc_object_ref_t object)
 {
     // check
-    tb_object_data_t* data = tb_object_data_cast(object);
+    tb_oc_data_t* data = tb_oc_data_cast(object);
     tb_assert_and_check_return_val(data, tb_null);
 
     // buffer
     return &data->buffer;
 }
-tb_bool_t tb_object_data_writ_to_url(tb_object_ref_t object, tb_char_t const* url)
+tb_bool_t tb_oc_data_writ_to_url(tb_oc_object_ref_t object, tb_char_t const* url)
 {
     // check
-    tb_object_data_t* data = tb_object_data_cast(object);
-    tb_assert_and_check_return_val(data && tb_object_data_getp((tb_object_ref_t)data) && url, tb_false);
+    tb_oc_data_t* data = tb_oc_data_cast(object);
+    tb_assert_and_check_return_val(data && tb_oc_data_getp((tb_oc_object_ref_t)data) && url, tb_false);
 
     // make stream
     tb_stream_ref_t stream = tb_stream_init_from_url(url);
@@ -245,7 +245,7 @@ tb_bool_t tb_object_data_writ_to_url(tb_object_ref_t object, tb_char_t const* ur
     if (tb_stream_open(stream))
     {
         // writ stream
-        if (tb_stream_bwrit(stream, (tb_byte_t const*)tb_object_data_getp((tb_object_ref_t)data), tb_object_data_size((tb_object_ref_t)data))) ok = tb_true;
+        if (tb_stream_bwrit(stream, (tb_byte_t const*)tb_oc_data_getp((tb_oc_object_ref_t)data), tb_oc_data_size((tb_oc_object_ref_t)data))) ok = tb_true;
     }
 
     // exit stream

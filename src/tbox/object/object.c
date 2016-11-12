@@ -37,13 +37,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_object_init(tb_object_ref_t object, tb_size_t flag, tb_size_t type)
+tb_bool_t tb_oc_object_init(tb_oc_object_ref_t object, tb_size_t flag, tb_size_t type)
 {
     // check
     tb_assert_and_check_return_val(object, tb_false);
 
     // init
-    tb_memset(object, 0, sizeof(tb_object_t));
+    tb_memset(object, 0, sizeof(tb_oc_object_t));
     object->flag = (tb_uint8_t)flag;
     object->type = (tb_uint16_t)type;
     object->refn = 1;
@@ -51,7 +51,7 @@ tb_bool_t tb_object_init(tb_object_ref_t object, tb_size_t flag, tb_size_t type)
     // ok
     return tb_true;
 }
-tb_void_t tb_object_exit(tb_object_ref_t object)
+tb_void_t tb_oc_object_exit(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return(object);
@@ -68,7 +68,7 @@ tb_void_t tb_object_exit(tb_object_ref_t object)
     // exit it?
     if (!object->refn && object->exit) object->exit(object);
 }
-tb_void_t tb_object_clear(tb_object_ref_t object)
+tb_void_t tb_oc_object_clear(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return(object);
@@ -79,7 +79,7 @@ tb_void_t tb_object_clear(tb_object_ref_t object)
     // clear
     if (object->clear) object->clear(object);
 }
-tb_void_t tb_object_setp(tb_object_ref_t object, tb_cpointer_t priv)
+tb_void_t tb_oc_object_setp(tb_oc_object_ref_t object, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return(object);
@@ -87,7 +87,7 @@ tb_void_t tb_object_setp(tb_object_ref_t object, tb_cpointer_t priv)
     // set it
     object->priv = priv;
 }
-tb_cpointer_t tb_object_getp(tb_object_ref_t object)
+tb_cpointer_t tb_oc_object_getp(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object, tb_null);
@@ -95,7 +95,7 @@ tb_cpointer_t tb_object_getp(tb_object_ref_t object)
     // get it
     return object->priv;
 }
-tb_object_ref_t tb_object_copy(tb_object_ref_t object)
+tb_oc_object_ref_t tb_oc_object_copy(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->copy, tb_null);
@@ -103,7 +103,7 @@ tb_object_ref_t tb_object_copy(tb_object_ref_t object)
     // copy
     return object->copy(object);
 }
-tb_size_t tb_object_type(tb_object_ref_t object)
+tb_size_t tb_oc_object_type(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object, TB_OBJECT_TYPE_NONE);
@@ -111,13 +111,13 @@ tb_size_t tb_object_type(tb_object_ref_t object)
     // the object type
     return object->type;
 }
-tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
+tb_oc_object_ref_t tb_oc_object_data(tb_oc_object_ref_t object, tb_size_t format)
 {   
     // check
     tb_assert_and_check_return_val(object, tb_null);
 
     // done
-    tb_object_ref_t     odata = tb_null;
+    tb_oc_object_ref_t     odata = tb_null;
     tb_size_t           maxn = TB_STREAM_BLOCK_MAXN;
     tb_byte_t*          data = tb_null;
     do
@@ -127,10 +127,10 @@ tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
         tb_assert_and_check_break(data);
 
         // writ object to data
-        tb_long_t size = tb_object_writ_to_data(object, data, maxn, format);
+        tb_long_t size = tb_oc_object_writ_to_data(object, data, maxn, format);
     
         // ok? make the data object
-        if (size >= 0) odata = tb_object_data_init_from_data(data, size);
+        if (size >= 0) odata = tb_oc_data_init_from_data(data, size);
         // failed? grow it
         else maxn <<= 1;
 
@@ -143,7 +143,7 @@ tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
     // ok?
     return odata;
 }
-tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb_bool_t bmacro)
+tb_oc_object_ref_t tb_oc_object_seek(tb_oc_object_ref_t object, tb_char_t const* path, tb_bool_t bmacro)
 {
     // check
     tb_assert_and_check_return_val(object, tb_null);
@@ -152,7 +152,7 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
     tb_check_return_val(path, object);
 
     // done
-    tb_object_ref_t     root = object;
+    tb_oc_object_ref_t     root = object;
     tb_char_t const*    p = path;
     tb_char_t const*    e = path + tb_strlen(path);
     while (p < e && object)
@@ -163,7 +163,7 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
         case '.':
             {
                 // check
-                tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_DICTIONARY, tb_null);
+                tb_assert_and_check_return_val(tb_oc_object_type(object) == TB_OBJECT_TYPE_DICTIONARY, tb_null);
 
                 // skip
                 p++;
@@ -182,13 +182,13 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
                 tb_trace_d("key: %s", key);
             
                 // the value
-                object = tb_object_dictionary_value(object, key);
+                object = tb_oc_dictionary_value(object, key);
             }
             break;
         case '[':
             {
                 // check
-                tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_ARRAY, tb_null);
+                tb_assert_and_check_return_val(tb_oc_object_type(object) == TB_OBJECT_TYPE_ARRAY, tb_null);
 
                 // skip
                 p++;
@@ -204,10 +204,10 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
 
                 // check
                 tb_size_t i = tb_atoi(index);
-                tb_assert_and_check_return_val(i < tb_object_array_size(object), tb_null);
+                tb_assert_and_check_return_val(i < tb_oc_array_size(object), tb_null);
 
                 // the value
-                object = tb_object_array_item(object, i);
+                object = tb_oc_array_item(object, i);
             }
             break;
         case ']':
@@ -219,33 +219,33 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
         // is macro? done it if be enabled
         if (    object
             &&  bmacro
-            &&  tb_object_type(object) == TB_OBJECT_TYPE_STRING
-            &&  tb_object_string_size(object)
-            &&  tb_object_string_cstr(object)[0] == '$')
+            &&  tb_oc_object_type(object) == TB_OBJECT_TYPE_STRING
+            &&  tb_oc_string_size(object)
+            &&  tb_oc_string_cstr(object)[0] == '$')
         {
             // the next path
-            path = tb_object_string_cstr(object) + 1;
+            path = tb_oc_string_cstr(object) + 1;
 
             // continue to seek it
-            object = tb_object_seek(root, path, bmacro);
+            object = tb_oc_object_seek(root, path, bmacro);
         }
     }
 
     // ok?
     return object;
 }
-tb_object_ref_t tb_object_dump(tb_object_ref_t object, tb_size_t format)
+tb_oc_object_ref_t tb_oc_object_dump(tb_oc_object_ref_t object, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object, tb_null);
 
     // data
-    tb_object_ref_t odata = tb_object_data(object, format);
+    tb_oc_object_ref_t odata = tb_oc_object_data(object, format);
     if (odata)
     {
         // the data and size 
-        tb_byte_t const*    data = (tb_byte_t const*)tb_object_data_getp(odata);
-        tb_size_t           size = tb_object_data_size(odata);
+        tb_byte_t const*    data = (tb_byte_t const*)tb_oc_data_getp(odata);
+        tb_size_t           size = tb_oc_data_size(odata);
         if (data && size)
         {
             // done
@@ -268,13 +268,13 @@ tb_object_ref_t tb_object_dump(tb_object_ref_t object, tb_size_t format)
         }
 
         // exit data
-        tb_object_exit(odata);
+        tb_oc_object_exit(odata);
     }
 
     // the object
     return object;
 }
-tb_size_t tb_object_refn(tb_object_ref_t object)
+tb_size_t tb_oc_object_refn(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object, 0);
@@ -282,7 +282,7 @@ tb_size_t tb_object_refn(tb_object_ref_t object)
     // get it
     return object->refn;
 }
-tb_void_t tb_object_retain(tb_object_ref_t object)
+tb_void_t tb_oc_object_retain(tb_oc_object_ref_t object)
 {
     // check
     tb_assert_and_check_return(object);
@@ -293,28 +293,28 @@ tb_void_t tb_object_retain(tb_object_ref_t object)
     // refn++
     object->refn++;
 }
-tb_object_ref_t tb_object_read(tb_stream_ref_t stream)
+tb_oc_object_ref_t tb_oc_object_read(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
 
     // done reader
-    return tb_object_reader_done(stream);
+    return tb_oc_object_reader_done(stream);
 }
-tb_object_ref_t tb_object_read_from_url(tb_char_t const* url)
+tb_oc_object_ref_t tb_oc_object_read_from_url(tb_char_t const* url)
 {
     // check
     tb_assert_and_check_return_val(url, tb_null);
 
     // init
-    tb_object_ref_t object = tb_null;
+    tb_oc_object_ref_t object = tb_null;
 
     // make stream
     tb_stream_ref_t stream = tb_stream_init_from_url(url);
     tb_assert_and_check_return_val(stream, tb_null);
 
     // read object
-    if (tb_stream_open(stream)) object = tb_object_read(stream);
+    if (tb_stream_open(stream)) object = tb_oc_object_read(stream);
 
     // exit stream
     tb_stream_exit(stream);
@@ -322,20 +322,20 @@ tb_object_ref_t tb_object_read_from_url(tb_char_t const* url)
     // ok?
     return object;
 }
-tb_object_ref_t tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
+tb_oc_object_ref_t tb_oc_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(data && size, tb_null);
 
     // init
-    tb_object_ref_t object = tb_null;
+    tb_oc_object_ref_t object = tb_null;
 
     // make stream
     tb_stream_ref_t stream = tb_stream_init_from_data(data, size);
     tb_assert_and_check_return_val(stream, tb_null);
 
     // read object
-    if (tb_stream_open(stream)) object = tb_object_read(stream);
+    if (tb_stream_open(stream)) object = tb_oc_object_read(stream);
 
     // exit stream
     tb_stream_exit(stream);
@@ -343,7 +343,7 @@ tb_object_ref_t tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
     // ok?
     return object;
 }
-tb_long_t tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
+tb_long_t tb_oc_object_writ(tb_oc_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
@@ -354,9 +354,9 @@ tb_long_t tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size
 #endif
 
     // writ it
-    return tb_object_writer_done(object, stream, format);
+    return tb_oc_object_writer_done(object, stream, format);
 }
-tb_long_t tb_object_writ_to_url(tb_object_ref_t object, tb_char_t const* url, tb_size_t format)
+tb_long_t tb_oc_object_writ_to_url(tb_oc_object_ref_t object, tb_char_t const* url, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object && url, -1);
@@ -371,7 +371,7 @@ tb_long_t tb_object_writ_to_url(tb_object_ref_t object, tb_char_t const* url, tb
             tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_BINARY | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
         // open and writ stream
-        if (tb_stream_open(stream)) writ = tb_object_writ(object, stream, format);
+        if (tb_stream_open(stream)) writ = tb_oc_object_writ(object, stream, format);
 
         // exit stream
         tb_stream_exit(stream);
@@ -380,7 +380,7 @@ tb_long_t tb_object_writ_to_url(tb_object_ref_t object, tb_char_t const* url, tb
     // ok?
     return writ;
 }
-tb_long_t tb_object_writ_to_data(tb_object_ref_t object, tb_byte_t* data, tb_size_t size, tb_size_t format)
+tb_long_t tb_oc_object_writ_to_data(tb_oc_object_ref_t object, tb_byte_t* data, tb_size_t size, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object && data && size, -1);
@@ -391,7 +391,7 @@ tb_long_t tb_object_writ_to_data(tb_object_ref_t object, tb_byte_t* data, tb_siz
     if (stream)
     {
         // open and writ stream
-        if (tb_stream_open(stream)) writ = tb_object_writ(object, stream, format);
+        if (tb_stream_open(stream)) writ = tb_oc_object_writ(object, stream, format);
 
         // exit stream
         tb_stream_exit(stream);

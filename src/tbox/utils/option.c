@@ -52,7 +52,7 @@ typedef struct tb_option_impl_t
     tb_option_item_t const*     opts;
 
     // the option list
-    tb_object_ref_t             list;
+    tb_oc_object_ref_t             list;
 
 }tb_option_impl_t;
 
@@ -200,7 +200,7 @@ tb_option_ref_t tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_
 
         // init option
         impl->opts = opts;
-        impl->list = tb_object_dictionary_init(TB_OBJECT_DICTIONARY_SIZE_MICRO, tb_false);
+        impl->list = tb_oc_dictionary_init(TB_OBJECT_DICTIONARY_SIZE_MICRO, tb_false);
         tb_assert_and_check_break(impl->list);
 
         // init name
@@ -235,7 +235,7 @@ tb_void_t tb_option_exit(tb_option_ref_t option)
         tb_string_exit(&impl->help);
 
         // exit list
-        if (impl->list) tb_object_exit(impl->list);
+        if (impl->list) tb_oc_object_exit(impl->list);
         impl->list = tb_null;
 
         // exit option
@@ -249,7 +249,7 @@ tb_bool_t tb_option_find(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, tb_false);
 
     // find it
-    return tb_object_dictionary_value(impl->list, name)? tb_true : tb_false;
+    return tb_oc_dictionary_value(impl->list, name)? tb_true : tb_false;
 }
 tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** argv)
 {
@@ -294,27 +294,27 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                 if (!val == !(find->mode == TB_OPTION_MODE_KEY_VAL))
                 {
                     // has value?
-                    tb_object_ref_t object = tb_null;
+                    tb_oc_object_ref_t object = tb_null;
                     if (val)
                     {
                         // init the value object
                         switch (find->type)
                         {
                         case TB_OPTION_TYPE_CSTR:
-                            object = tb_object_string_init_from_cstr(val);
+                            object = tb_oc_string_init_from_cstr(val);
                             break;
                         case TB_OPTION_TYPE_INTEGER:
                             tb_assert_and_check_return_val(tb_option_is_integer(val), tb_false);
-                            object = tb_object_number_init_from_sint64(tb_atoll(val));
+                            object = tb_oc_number_init_from_sint64(tb_atoll(val));
                             break;
                         case TB_OPTION_TYPE_BOOL:
                             tb_assert_and_check_return_val(tb_option_is_bool(val), tb_false);
-                            object = tb_object_boolean_init(!tb_stricmp(val, "y")? tb_true : tb_false);
+                            object = tb_oc_boolean_init(!tb_stricmp(val, "y")? tb_true : tb_false);
                             break;
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                         case TB_OPTION_TYPE_FLOAT:
                             tb_assert_and_check_return_val(tb_option_is_float(val), tb_false);
-                            object = tb_object_number_init_from_double(tb_atof(val));
+                            object = tb_oc_number_init_from_double(tb_atof(val));
                             break;
 #endif
                         default:
@@ -328,19 +328,19 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                         tb_assert_and_check_return_val(find->type == TB_OPTION_TYPE_BOOL, tb_false);
 
                         // key => true
-                        object = tb_object_boolean_init(tb_true);
+                        object = tb_oc_boolean_init(tb_true);
                     }
 
                     // add the value object
                     if (object)
                     {
-                        tb_object_dictionary_insert(impl->list, key, object);
+                        tb_oc_dictionary_insert(impl->list, key, object);
                         if (tb_isalpha(find->sname)) 
                         {
                             tb_char_t ch[2] = {0};
                             ch[0] = find->sname;
-                            tb_object_dictionary_insert(impl->list, ch, object);
-                            tb_object_retain(object);
+                            tb_oc_dictionary_insert(impl->list, ch, object);
+                            tb_oc_object_retain(object);
                         }
                     }
                 }
@@ -405,27 +405,27 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                 if (!val == !(find->mode == TB_OPTION_MODE_KEY_VAL))
                 {
                     // has value?
-                    tb_object_ref_t object = tb_null;
+                    tb_oc_object_ref_t object = tb_null;
                     if (val)
                     {
                         // add value
                         switch (find->type)
                         {
                         case TB_OPTION_TYPE_CSTR:
-                            object = tb_object_string_init_from_cstr(val);
+                            object = tb_oc_string_init_from_cstr(val);
                             break;
                         case TB_OPTION_TYPE_INTEGER:
                             tb_assert_and_check_return_val(tb_option_is_integer(val), tb_false);
-                            object = tb_object_number_init_from_sint64(tb_atoll(val));
+                            object = tb_oc_number_init_from_sint64(tb_atoll(val));
                             break;
                         case TB_OPTION_TYPE_BOOL:
                             tb_assert_and_check_return_val(tb_option_is_bool(val), tb_false);
-                            object = tb_object_boolean_init(!tb_stricmp(val, "y")? tb_true : tb_false);
+                            object = tb_oc_boolean_init(!tb_stricmp(val, "y")? tb_true : tb_false);
                             break;
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                         case TB_OPTION_TYPE_FLOAT:
                             tb_assert_and_check_return_val(tb_option_is_float(val), tb_false);
-                            object = tb_object_number_init_from_double(tb_atof(val));
+                            object = tb_oc_number_init_from_double(tb_atof(val));
                             break;
 #endif
                         default:
@@ -439,17 +439,17 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                         tb_assert_and_check_return_val(find->type == TB_OPTION_TYPE_BOOL, tb_false);
 
                         // key => true
-                        object = tb_object_boolean_init(tb_true);
+                        object = tb_oc_boolean_init(tb_true);
                     }
 
                     // add the value object 
                     if (object)
                     {
-                        tb_object_dictionary_insert(impl->list, key, object);
+                        tb_oc_dictionary_insert(impl->list, key, object);
                         if (find->lname)
                         {
-                            tb_object_dictionary_insert(impl->list, find->lname, object);
-                            tb_object_retain(object);
+                            tb_oc_dictionary_insert(impl->list, find->lname, object);
+                            tb_oc_object_retain(object);
                         }
                     }
                 }
@@ -499,20 +499,20 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                 switch (item->type)
                 {
                 case TB_OPTION_TYPE_CSTR:
-                    tb_object_dictionary_insert(impl->list, item->lname, tb_object_string_init_from_cstr(p));
+                    tb_oc_dictionary_insert(impl->list, item->lname, tb_oc_string_init_from_cstr(p));
                     break;
                 case TB_OPTION_TYPE_INTEGER:
                     tb_assert_and_check_return_val(tb_option_is_integer(p), tb_false);
-                    tb_object_dictionary_insert(impl->list, item->lname, tb_object_number_init_from_sint64(tb_atoll(p)));
+                    tb_oc_dictionary_insert(impl->list, item->lname, tb_oc_number_init_from_sint64(tb_atoll(p)));
                     break;
                 case TB_OPTION_TYPE_BOOL:
                     tb_assert_and_check_return_val(tb_option_is_bool(p), tb_false);
-                    tb_object_dictionary_insert(impl->list, item->lname, tb_object_boolean_init(!tb_stricmp(p, "y")? tb_true : tb_false));
+                    tb_oc_dictionary_insert(impl->list, item->lname, tb_oc_boolean_init(!tb_stricmp(p, "y")? tb_true : tb_false));
                     break;
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                 case TB_OPTION_TYPE_FLOAT:
                     tb_assert_and_check_return_val(tb_option_is_float(p), tb_false);
-                    tb_object_dictionary_insert(impl->list, item->lname, tb_object_number_init_from_double(tb_atof(p)));
+                    tb_oc_dictionary_insert(impl->list, item->lname, tb_oc_number_init_from_double(tb_atof(p)));
                     break;
 #endif
                 default:
@@ -537,20 +537,20 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                 switch (last->type)
                 {
                 case TB_OPTION_TYPE_CSTR:
-                    tb_object_dictionary_insert(impl->list, name, tb_object_string_init_from_cstr(p));
+                    tb_oc_dictionary_insert(impl->list, name, tb_oc_string_init_from_cstr(p));
                     break;
                 case TB_OPTION_TYPE_INTEGER:
                     tb_assert_and_check_return_val(tb_option_is_integer(p), tb_false);
-                    tb_object_dictionary_insert(impl->list, name, tb_object_number_init_from_sint64(tb_atoll(p)));
+                    tb_oc_dictionary_insert(impl->list, name, tb_oc_number_init_from_sint64(tb_atoll(p)));
                     break;
                 case TB_OPTION_TYPE_BOOL:
                     tb_assert_and_check_return_val(tb_option_is_bool(p), tb_false);
-                    tb_object_dictionary_insert(impl->list, name, tb_object_boolean_init(!tb_stricmp(p, "y")? tb_true : tb_false));
+                    tb_oc_dictionary_insert(impl->list, name, tb_oc_boolean_init(!tb_stricmp(p, "y")? tb_true : tb_false));
                     break;
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                 case TB_OPTION_TYPE_FLOAT:
                     tb_assert_and_check_return_val(tb_option_is_float(p), tb_false);
-                    tb_object_dictionary_insert(impl->list, name, tb_object_number_init_from_double(tb_atof(p)));
+                    tb_oc_dictionary_insert(impl->list, name, tb_oc_number_init_from_double(tb_atof(p)));
                     break;
 #endif
                 default:
@@ -574,7 +574,7 @@ tb_void_t tb_option_dump(tb_option_ref_t option)
     tb_assert_and_check_return(impl && impl->list);
 
     // dump 
-    tb_object_dump(impl->list, TB_OBJECT_FORMAT_JSON);
+    tb_oc_object_dump(impl->list, TB_OBJECT_FORMAT_JSON);
 }
 tb_void_t tb_option_help(tb_option_ref_t option)
 {
@@ -832,12 +832,12 @@ tb_char_t const* tb_option_item_cstr(tb_option_ref_t option, tb_char_t const* na
     tb_assert_and_check_return_val(impl && impl->list && name, tb_null);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, tb_null);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_STRING, tb_null);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_STRING, tb_null);
 
     // the option item value
-    return tb_object_string_size(item)? tb_object_string_cstr(item) : tb_null;
+    return tb_oc_string_size(item)? tb_oc_string_cstr(item) : tb_null;
 }
 tb_bool_t tb_option_item_bool(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -846,12 +846,12 @@ tb_bool_t tb_option_item_bool(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, tb_false);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, tb_false);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_BOOLEAN, tb_false);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_BOOLEAN, tb_false);
 
     // the option item value
-    return tb_object_boolean_bool(item);
+    return tb_oc_boolean_bool(item);
 }
 tb_uint8_t tb_option_item_uint8(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -860,12 +860,12 @@ tb_uint8_t tb_option_item_uint8(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_uint8(item);
+    return tb_oc_number_uint8(item);
 }
 tb_sint8_t tb_option_item_sint8(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -874,12 +874,12 @@ tb_sint8_t tb_option_item_sint8(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_sint8(item);
+    return tb_oc_number_sint8(item);
 }
 tb_uint16_t tb_option_item_uint16(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -888,12 +888,12 @@ tb_uint16_t tb_option_item_uint16(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_uint16(item);
+    return tb_oc_number_uint16(item);
 }
 tb_sint16_t tb_option_item_sint16(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -902,12 +902,12 @@ tb_sint16_t tb_option_item_sint16(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_sint16(item);
+    return tb_oc_number_sint16(item);
 }
 tb_uint32_t tb_option_item_uint32(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -916,12 +916,12 @@ tb_uint32_t tb_option_item_uint32(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_uint32(item);
+    return tb_oc_number_uint32(item);
 }
 tb_sint32_t tb_option_item_sint32(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -930,12 +930,12 @@ tb_sint32_t tb_option_item_sint32(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_sint32(item);
+    return tb_oc_number_sint32(item);
 }
 tb_uint64_t tb_option_item_uint64(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -944,12 +944,12 @@ tb_uint64_t tb_option_item_uint64(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_uint64(item);
+    return tb_oc_number_uint64(item);
 }
 tb_sint64_t tb_option_item_sint64(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -958,12 +958,12 @@ tb_sint64_t tb_option_item_sint64(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_sint64(item);
+    return tb_oc_number_sint64(item);
 }
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_float_t tb_option_item_float(tb_option_ref_t option, tb_char_t const* name)
@@ -973,12 +973,12 @@ tb_float_t tb_option_item_float(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_float(item);
+    return tb_oc_number_float(item);
 }
 tb_double_t tb_option_item_double(tb_option_ref_t option, tb_char_t const* name)
 {
@@ -987,11 +987,11 @@ tb_double_t tb_option_item_double(tb_option_ref_t option, tb_char_t const* name)
     tb_assert_and_check_return_val(impl && impl->list && name, 0);
 
     // the option item
-    tb_object_ref_t item = tb_object_dictionary_value(impl->list, name);
+    tb_oc_object_ref_t item = tb_oc_dictionary_value(impl->list, name);
     tb_check_return_val(item, 0);
-    tb_assert_and_check_return_val(tb_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
+    tb_assert_and_check_return_val(tb_oc_object_type(item) == TB_OBJECT_TYPE_NUMBER, 0);
 
     // the option item value
-    return tb_object_number_double(item);
+    return tb_oc_number_double(item);
 }
 #endif

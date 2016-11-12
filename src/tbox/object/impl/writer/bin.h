@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  */
 
 /// the object bin writer type
-typedef struct __tb_object_bin_writer_t
+typedef struct __tb_oc_object_bin_writer_t
 {
     /// the stream
     tb_stream_ref_t             stream;
@@ -59,10 +59,10 @@ typedef struct __tb_object_bin_writer_t
     /// the encoder maxn
     tb_size_t                   maxn;
 
-}tb_object_bin_writer_t;
+}tb_oc_object_bin_writer_t;
 
 /// the bin writer func type
-typedef tb_bool_t               (*tb_object_bin_writer_func_t)(tb_object_bin_writer_t* writer, tb_object_ref_t object);
+typedef tb_bool_t               (*tb_oc_object_bin_writer_func_t)(tb_oc_object_bin_writer_t* writer, tb_oc_object_ref_t object);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -72,7 +72,7 @@ typedef tb_bool_t               (*tb_object_bin_writer_func_t)(tb_object_bin_wri
  *
  * @return                      the bin object writer
  */
-tb_object_writer_t*             tb_object_bin_writer(tb_noarg_t);
+tb_oc_object_writer_t*             tb_oc_object_bin_writer(tb_noarg_t);
 
 /*! hook the bin writer
  *
@@ -81,7 +81,7 @@ tb_object_writer_t*             tb_object_bin_writer(tb_noarg_t);
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_bin_writer_hook(tb_size_t type, tb_object_bin_writer_func_t func);
+tb_bool_t                       tb_oc_object_bin_writer_hook(tb_size_t type, tb_oc_object_bin_writer_func_t func);
 
 /*! the bin writer func
  *
@@ -89,7 +89,7 @@ tb_bool_t                       tb_object_bin_writer_hook(tb_size_t type, tb_obj
  *
  * @return                      the object writer func
  */
-tb_object_bin_writer_func_t     tb_object_bin_writer_func(tb_size_t type);
+tb_oc_object_bin_writer_func_t     tb_oc_object_bin_writer_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

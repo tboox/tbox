@@ -190,7 +190,7 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
 
     // init object envirnoment
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
-    if (!tb_object_init_env()) return tb_false;
+    if (!tb_oc_object_init_env()) return tb_false;
 #endif
 
     // check version
@@ -212,7 +212,7 @@ tb_void_t tb_exit()
 
     // exit object
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
-    tb_object_exit_env();
+    tb_oc_object_exit_env();
 #endif
     
     // exit network envirnoment

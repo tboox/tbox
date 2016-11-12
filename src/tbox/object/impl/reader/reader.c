@@ -32,19 +32,19 @@
  */
 
 // the object reader
-static tb_object_reader_t*  g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_null};
+static tb_oc_object_reader_t*  g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_null};
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader)
+tb_bool_t tb_oc_object_reader_set(tb_size_t format, tb_oc_object_reader_t* reader)
 {
     // check
     format &= 0x00ff;
     tb_assert_and_check_return_val(reader && (format < tb_arrayn(g_reader)), tb_false);
 
     // exit the older reader if exists
-    tb_object_reader_remove(format);
+    tb_oc_object_reader_remove(format);
 
     // set
     g_reader[format] = reader;
@@ -52,7 +52,7 @@ tb_bool_t tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader)
     // ok
     return tb_true;
 }
-tb_void_t tb_object_reader_remove(tb_size_t format)
+tb_void_t tb_oc_object_reader_remove(tb_size_t format)
 {
     // check
     format &= 0x00ff;
@@ -69,7 +69,7 @@ tb_void_t tb_object_reader_remove(tb_size_t format)
         g_reader[format] = tb_null;
     }
 }
-tb_object_reader_t* tb_object_reader_get(tb_size_t format)
+tb_oc_object_reader_t* tb_oc_object_reader_get(tb_size_t format)
 {
     // check
     format &= 0x00ff;
@@ -78,7 +78,7 @@ tb_object_reader_t* tb_object_reader_get(tb_size_t format)
     // ok
     return g_reader[format];
 }
-tb_object_ref_t tb_object_reader_done(tb_stream_ref_t stream)
+tb_oc_object_ref_t tb_oc_object_reader_done(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
@@ -91,7 +91,7 @@ tb_object_ref_t tb_object_reader_done(tb_stream_ref_t stream)
     for (i = 0; i < n && m < 100; i++)
     {
         // the reader
-        tb_object_reader_t* reader = g_reader[i];
+        tb_oc_object_reader_t* reader = g_reader[i];
         if (reader && reader->probe)
         {
             // the probe score

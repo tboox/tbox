@@ -48,7 +48,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_object_ref_t tb_object_json_reader_func_null(tb_object_json_reader_t* reader, tb_char_t type)
+static tb_oc_object_ref_t tb_oc_object_json_reader_func_null(tb_oc_object_json_reader_t* reader, tb_char_t type)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream, tb_null);
@@ -59,7 +59,7 @@ static tb_object_ref_t tb_object_json_reader_func_null(tb_object_json_reader_t* 
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
     // done 
-    tb_object_ref_t null = tb_null;
+    tb_oc_object_ref_t null = tb_null;
     do
     {
         // append character
@@ -98,7 +98,7 @@ static tb_object_ref_t tb_object_json_reader_func_null(tb_object_json_reader_t* 
         tb_trace_d("null: %s", tb_static_string_cstr(&data));
 
         // null?
-        if (!tb_stricmp(tb_static_string_cstr(&data), "null")) null = tb_object_null_init();
+        if (!tb_stricmp(tb_static_string_cstr(&data), "null")) null = tb_oc_null_init();
 
     } while (0);
 
@@ -108,13 +108,13 @@ static tb_object_ref_t tb_object_json_reader_func_null(tb_object_json_reader_t* 
     // ok?
     return null;
 }
-static tb_object_ref_t tb_object_json_reader_func_array(tb_object_json_reader_t* reader, tb_char_t type)
+static tb_oc_object_ref_t tb_oc_object_json_reader_func_array(tb_oc_object_json_reader_t* reader, tb_char_t type)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && type == '[', tb_null);
 
     // init array
-    tb_object_ref_t array = tb_object_array_init(TB_OBJECT_JSON_READER_ARRAY_GROW, tb_false);
+    tb_oc_object_ref_t array = tb_oc_array_init(TB_OBJECT_JSON_READER_ARRAY_GROW, tb_false);
     tb_assert_and_check_return_val(array, tb_null);
 
     // done
@@ -131,15 +131,15 @@ static tb_object_ref_t tb_object_json_reader_func_array(tb_object_json_reader_t*
         else if (!tb_isspace(ch) && ch != ',')
         {
             // the func
-            tb_object_json_reader_func_t func = tb_object_json_reader_func(ch);
+            tb_oc_object_json_reader_func_t func = tb_oc_object_json_reader_func(ch);
             tb_assert_and_check_break_state(func, ok, tb_false);
 
             // read item
-            tb_object_ref_t item = func(reader, ch);
+            tb_oc_object_ref_t item = func(reader, ch);
             tb_assert_and_check_break_state(item, ok, tb_false);
 
             // append item
-            tb_object_array_append(array, item);
+            tb_oc_array_append(array, item);
         }
     }
 
@@ -147,14 +147,14 @@ static tb_object_ref_t tb_object_json_reader_func_array(tb_object_json_reader_t*
     if (!ok)
     {
         // exit it
-        if (array) tb_object_exit(array);
+        if (array) tb_oc_object_exit(array);
         array = tb_null;
     }
 
     // ok?
     return array;
 }
-static tb_object_ref_t tb_object_json_reader_func_string(tb_object_json_reader_t* reader, tb_char_t type)
+static tb_oc_object_ref_t tb_oc_object_json_reader_func_string(tb_oc_object_json_reader_t* reader, tb_char_t type)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && (type == '\"' || type == '\''), tb_null);
@@ -218,7 +218,7 @@ static tb_object_ref_t tb_object_json_reader_func_string(tb_object_json_reader_t
     }
 
     // init string
-    tb_object_ref_t string = tb_object_string_init_from_cstr(tb_string_cstr(&data));
+    tb_oc_object_ref_t string = tb_oc_string_init_from_cstr(tb_string_cstr(&data));
 
     // trace
     tb_trace_d("string: %s", tb_string_cstr(&data));
@@ -229,7 +229,7 @@ static tb_object_ref_t tb_object_json_reader_func_string(tb_object_json_reader_t
     // ok?
     return string;
 }
-static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t* reader, tb_char_t type)
+static tb_oc_object_ref_t tb_oc_object_json_reader_func_number(tb_oc_object_json_reader_t* reader, tb_char_t type)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream, tb_null);
@@ -240,7 +240,7 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
     // done
-    tb_object_ref_t number = tb_null;
+    tb_oc_object_ref_t number = tb_null;
     do
     {
         // append character
@@ -291,20 +291,20 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
 
         // init number 
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-        if (bf) number = tb_object_number_init_from_float(tb_stof(tb_static_string_cstr(&data)));
+        if (bf) number = tb_oc_number_init_from_float(tb_stof(tb_static_string_cstr(&data)));
 #else
         if (bf) tb_trace_noimpl();
 #endif
         else if (bs) 
         {
             tb_sint64_t value = tb_stoi64(tb_static_string_cstr(&data));
-            tb_size_t   bytes = tb_object_need_bytes(-value);
+            tb_size_t   bytes = tb_oc_object_need_bytes(-value);
             switch (bytes)
             {
-            case 1: number = tb_object_number_init_from_sint8((tb_sint8_t)value); break;
-            case 2: number = tb_object_number_init_from_sint16((tb_sint16_t)value); break;
-            case 4: number = tb_object_number_init_from_sint32((tb_sint32_t)value); break;
-            case 8: number = tb_object_number_init_from_sint64((tb_sint64_t)value); break;
+            case 1: number = tb_oc_number_init_from_sint8((tb_sint8_t)value); break;
+            case 2: number = tb_oc_number_init_from_sint16((tb_sint16_t)value); break;
+            case 4: number = tb_oc_number_init_from_sint32((tb_sint32_t)value); break;
+            case 8: number = tb_oc_number_init_from_sint64((tb_sint64_t)value); break;
             default: break;
             }
             
@@ -312,13 +312,13 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
         else 
         {
             tb_uint64_t value = tb_stou64(tb_static_string_cstr(&data));
-            tb_size_t   bytes = tb_object_need_bytes(value);
+            tb_size_t   bytes = tb_oc_object_need_bytes(value);
             switch (bytes)
             {
-            case 1: number = tb_object_number_init_from_uint8((tb_uint8_t)value); break;
-            case 2: number = tb_object_number_init_from_uint16((tb_uint16_t)value); break;
-            case 4: number = tb_object_number_init_from_uint32((tb_uint32_t)value); break;
-            case 8: number = tb_object_number_init_from_uint64((tb_uint64_t)value); break;
+            case 1: number = tb_oc_number_init_from_uint8((tb_uint8_t)value); break;
+            case 2: number = tb_oc_number_init_from_uint16((tb_uint16_t)value); break;
+            case 4: number = tb_oc_number_init_from_uint32((tb_uint32_t)value); break;
+            case 8: number = tb_oc_number_init_from_uint64((tb_uint64_t)value); break;
             default: break;
             }
         }
@@ -331,7 +331,7 @@ static tb_object_ref_t tb_object_json_reader_func_number(tb_object_json_reader_t
     // ok?
     return number;
 }
-static tb_object_ref_t tb_object_json_reader_func_boolean(tb_object_json_reader_t* reader, tb_char_t type)
+static tb_oc_object_ref_t tb_oc_object_json_reader_func_boolean(tb_oc_object_json_reader_t* reader, tb_char_t type)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream, tb_null);
@@ -342,7 +342,7 @@ static tb_object_ref_t tb_object_json_reader_func_boolean(tb_object_json_reader_
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
     // done 
-    tb_object_ref_t boolean = tb_null;
+    tb_oc_object_ref_t boolean = tb_null;
     do
     {
         // append character
@@ -381,9 +381,9 @@ static tb_object_ref_t tb_object_json_reader_func_boolean(tb_object_json_reader_
         tb_trace_d("boolean: %s", tb_static_string_cstr(&data));
 
         // true?
-        if (!tb_stricmp(tb_static_string_cstr(&data), "true")) boolean = tb_object_boolean_init(tb_true);
+        if (!tb_stricmp(tb_static_string_cstr(&data), "true")) boolean = tb_oc_boolean_init(tb_true);
         // false?
-        else if (!tb_stricmp(tb_static_string_cstr(&data), "false")) boolean = tb_object_boolean_init(tb_false);
+        else if (!tb_stricmp(tb_static_string_cstr(&data), "false")) boolean = tb_oc_boolean_init(tb_false);
 
     } while (0);
 
@@ -393,7 +393,7 @@ static tb_object_ref_t tb_object_json_reader_func_boolean(tb_object_json_reader_
     // ok?
     return boolean;
 }
-static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_reader_t* reader, tb_char_t type)
+static tb_oc_object_ref_t tb_oc_object_json_reader_func_dictionary(tb_oc_object_json_reader_t* reader, tb_char_t type)
 {
     // check
     tb_assert_and_check_return_val(reader && reader->stream && type == '{', tb_null);
@@ -404,7 +404,7 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
     if (!tb_static_string_init(&kname, kdata, 8192)) return tb_null;
 
     // init dictionary
-    tb_object_ref_t dictionary = tb_object_dictionary_init(0, tb_false);
+    tb_oc_object_ref_t dictionary = tb_oc_dictionary_init(0, tb_false);
     tb_assert_and_check_return_val(dictionary, tb_null);
 
     // walk
@@ -439,15 +439,15 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
                 tb_trace_d("key: %s", tb_static_string_cstr(&kname));
 
                 // the func
-                tb_object_json_reader_func_t func = tb_object_json_reader_func(ch);
+                tb_oc_object_json_reader_func_t func = tb_oc_object_json_reader_func(ch);
                 tb_assert_and_check_break_state(func, ok, tb_false);
 
                 // read val
-                tb_object_ref_t val = func(reader, ch);
+                tb_oc_object_ref_t val = func(reader, ch);
                 tb_assert_and_check_break_state(val, ok, tb_false);
 
                 // set key => val
-                tb_object_dictionary_insert(dictionary, tb_static_string_cstr(&kname), val);
+                tb_oc_dictionary_insert(dictionary, tb_static_string_cstr(&kname), val);
 
                 // reset key
                 bstr = 0;
@@ -461,7 +461,7 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
     if (!ok)
     {
         // exit it
-        if (dictionary) tb_object_exit(dictionary);
+        if (dictionary) tb_oc_object_exit(dictionary);
         dictionary = tb_null;
     }
 
@@ -471,13 +471,13 @@ static tb_object_ref_t tb_object_json_reader_func_dictionary(tb_object_json_read
     // ok?
     return dictionary;
 }
-static tb_object_ref_t tb_object_json_reader_done(tb_stream_ref_t stream)
+static tb_oc_object_ref_t tb_oc_object_json_reader_done(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);
 
     // init reader
-    tb_object_json_reader_t reader = {0};
+    tb_oc_object_json_reader_t reader = {0};
     reader.stream = stream;
 
     // skip spaces
@@ -492,13 +492,13 @@ static tb_object_ref_t tb_object_json_reader_done(tb_stream_ref_t stream)
     tb_check_return_val(tb_stream_left(stream), tb_null);
 
     // the func
-    tb_object_json_reader_func_t func = tb_object_json_reader_func(type);
+    tb_oc_object_json_reader_func_t func = tb_oc_object_json_reader_func(type);
     tb_assert_and_check_return_val(func, tb_null);
 
     // read it
     return func(&reader, type);
 }
-static tb_size_t tb_object_json_reader_probe(tb_stream_ref_t stream)
+static tb_size_t tb_oc_object_json_reader_probe(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, 0);
@@ -532,56 +532,56 @@ static tb_size_t tb_object_json_reader_probe(tb_stream_ref_t stream)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_reader_t* tb_object_json_reader()
+tb_oc_object_reader_t* tb_oc_object_json_reader()
 {
     // the reader
-    static tb_object_reader_t s_reader = {0};
+    static tb_oc_object_reader_t s_reader = {0};
 
     // init reader
-    s_reader.read   = tb_object_json_reader_done;
-    s_reader.probe  = tb_object_json_reader_probe;
+    s_reader.read   = tb_oc_object_json_reader_done;
+    s_reader.probe  = tb_oc_object_json_reader_probe;
 
     // init hooker
     s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint8(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'n', tb_object_json_reader_func_null);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'N', tb_object_json_reader_func_null);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'[', tb_object_json_reader_func_array);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'\'', tb_object_json_reader_func_string);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'\"', tb_object_json_reader_func_string);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'0', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'1', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'2', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'3', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'4', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'5', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'6', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'7', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'8', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'9', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'.', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'-', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'+', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'e', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'E', tb_object_json_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'t', tb_object_json_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'T', tb_object_json_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'f', tb_object_json_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'F', tb_object_json_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'{', tb_object_json_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'n', tb_oc_object_json_reader_func_null);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'N', tb_oc_object_json_reader_func_null);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'[', tb_oc_object_json_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'\'', tb_oc_object_json_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'\"', tb_oc_object_json_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'0', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'1', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'2', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'3', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'4', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'5', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'6', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'7', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'8', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'9', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'.', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'-', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'+', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'e', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'E', tb_oc_object_json_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'t', tb_oc_object_json_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'T', tb_oc_object_json_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'f', tb_oc_object_json_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'F', tb_oc_object_json_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'{', tb_oc_object_json_reader_func_dictionary);
 
     // ok
     return &s_reader;
 }
-tb_bool_t tb_object_json_reader_hook(tb_char_t type, tb_object_json_reader_func_t func)
+tb_bool_t tb_oc_object_json_reader_hook(tb_char_t type, tb_oc_object_json_reader_func_t func)
 {
     // check
     tb_assert_and_check_return_val(type && func, tb_false);
 
     // the reader
-    tb_object_reader_t* reader = tb_object_reader_get(TB_OBJECT_FORMAT_JSON);
+    tb_oc_object_reader_t* reader = tb_oc_object_reader_get(TB_OBJECT_FORMAT_JSON);
     tb_assert_and_check_return_val(reader && reader->hooker, tb_false);
 
     // hook it
@@ -590,16 +590,16 @@ tb_bool_t tb_object_json_reader_hook(tb_char_t type, tb_object_json_reader_func_
     // ok
     return tb_true;
 }
-tb_object_json_reader_func_t tb_object_json_reader_func(tb_char_t type)
+tb_oc_object_json_reader_func_t tb_oc_object_json_reader_func(tb_char_t type)
 {
     // check
     tb_assert_and_check_return_val(type, tb_null);
 
     // the reader
-    tb_object_reader_t* reader = tb_object_reader_get(TB_OBJECT_FORMAT_JSON);
+    tb_oc_object_reader_t* reader = tb_oc_object_reader_get(TB_OBJECT_FORMAT_JSON);
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
  
     // the func
-    return (tb_object_json_reader_func_t)tb_hash_map_get(reader->hooker, (tb_pointer_t)(tb_size_t)type);
+    return (tb_oc_object_json_reader_func_t)tb_hash_map_get(reader->hooker, (tb_pointer_t)(tb_size_t)type);
 }
 

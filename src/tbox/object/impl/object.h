@@ -42,10 +42,10 @@ __tb_extern_c_enter__
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_object_init_env(tb_noarg_t);
+tb_bool_t           tb_oc_object_init_env(tb_noarg_t);
 
 // exit object envirnoment
-tb_void_t           tb_object_exit_env(tb_noarg_t);
+tb_void_t           tb_oc_object_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -39,15 +39,15 @@ __tb_extern_c_enter__
  */
 
 /// the bplist reader type
-typedef struct __tb_object_bplist_reader_t
+typedef struct __tb_oc_object_bplist_reader_t
 {
     /// the stream
     tb_stream_ref_t             stream;
 
-}tb_object_bplist_reader_t;
+}tb_oc_object_bplist_reader_t;
 
 /// the bplist reader func type
-typedef tb_object_ref_t         (*tb_object_bplist_reader_func_t)(tb_object_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size);
+typedef tb_oc_object_ref_t         (*tb_oc_object_bplist_reader_func_t)(tb_oc_object_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -57,7 +57,7 @@ typedef tb_object_ref_t         (*tb_object_bplist_reader_func_t)(tb_object_bpli
  *
  * @return                      the bplist object reader
  */
-tb_object_reader_t*             tb_object_bplist_reader(tb_noarg_t);
+tb_oc_object_reader_t*             tb_oc_object_bplist_reader(tb_noarg_t);
 
 /*! hook the bplist reader
  *
@@ -66,7 +66,7 @@ tb_object_reader_t*             tb_object_bplist_reader(tb_noarg_t);
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_bplist_reader_hook(tb_size_t type, tb_object_bplist_reader_func_t func);
+tb_bool_t                       tb_oc_object_bplist_reader_hook(tb_size_t type, tb_oc_object_bplist_reader_func_t func);
 
 /*! the bplist reader func
  *
@@ -74,7 +74,7 @@ tb_bool_t                       tb_object_bplist_reader_hook(tb_size_t type, tb_
  *
  * @return                      the object reader func
  */
-tb_object_bplist_reader_func_t  tb_object_bplist_reader_func(tb_size_t type);
+tb_oc_object_bplist_reader_func_t  tb_oc_object_bplist_reader_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

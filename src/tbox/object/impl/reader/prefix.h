@@ -32,7 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_void_t tb_object_reader_bin_type_size(tb_stream_ref_t stream, tb_size_t* ptype, tb_uint64_t* psize)
+static __tb_inline__ tb_void_t tb_oc_object_reader_bin_type_size(tb_stream_ref_t stream, tb_size_t* ptype, tb_uint64_t* psize)
 {
     // check
     tb_assert_and_check_return(stream);

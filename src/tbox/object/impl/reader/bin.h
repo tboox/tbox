@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  */
 
 /// the bin reader type
-typedef struct __tb_object_bin_reader_t
+typedef struct __tb_oc_object_bin_reader_t
 {
     /// the stream
     tb_stream_ref_t             stream;
@@ -47,10 +47,10 @@ typedef struct __tb_object_bin_reader_t
     /// the object list
     tb_vector_ref_t             list;
 
-}tb_object_bin_reader_t;
+}tb_oc_object_bin_reader_t;
 
 /// the bin reader func type
-typedef tb_object_ref_t         (*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
+typedef tb_oc_object_ref_t         (*tb_oc_object_bin_reader_func_t)(tb_oc_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -60,7 +60,7 @@ typedef tb_object_ref_t         (*tb_object_bin_reader_func_t)(tb_object_bin_rea
  *
  * @return                      the bin object reader
  */
-tb_object_reader_t*             tb_object_bin_reader(tb_noarg_t);
+tb_oc_object_reader_t*             tb_oc_object_bin_reader(tb_noarg_t);
 
 /*! hook the bin reader
  *
@@ -69,7 +69,7 @@ tb_object_reader_t*             tb_object_bin_reader(tb_noarg_t);
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_bin_reader_hook(tb_size_t type, tb_object_bin_reader_func_t func);
+tb_bool_t                       tb_oc_object_bin_reader_hook(tb_size_t type, tb_oc_object_bin_reader_func_t func);
 
 /*! the bin reader func
  *
@@ -77,7 +77,7 @@ tb_bool_t                       tb_object_bin_reader_hook(tb_size_t type, tb_obj
  *
  * @return                      the object reader func
  */
-tb_object_bin_reader_func_t     tb_object_bin_reader_func(tb_size_t type);
+tb_oc_object_bin_reader_func_t     tb_oc_object_bin_reader_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

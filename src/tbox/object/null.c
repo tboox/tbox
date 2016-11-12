@@ -36,7 +36,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_object_ref_t tb_object_null_copy(tb_object_ref_t object)
+static tb_oc_object_ref_t tb_oc_null_copy(tb_oc_object_ref_t object)
 {
     return object;
 }
@@ -46,13 +46,13 @@ static tb_object_ref_t tb_object_null_copy(tb_object_ref_t object)
  */
 
 // null
-static tb_object_t const g_null = 
+static tb_oc_object_t const g_null = 
 {
     TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
 ,   TB_OBJECT_TYPE_NULL
 ,   1
 ,   tb_null
-,   tb_object_null_copy
+,   tb_oc_null_copy
 ,   tb_null
 ,   tb_null
 
@@ -61,8 +61,8 @@ static tb_object_t const g_null =
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_ref_t tb_object_null_init()
+tb_oc_object_ref_t tb_oc_null_init()
 {
-    return (tb_object_ref_t)&g_null;
+    return (tb_oc_object_ref_t)&g_null;
 }
 

@@ -29,16 +29,47 @@
  */
 #include "../prefix.h"
 #include "../object.h"
+#include "../../stream/stream.h"
 #include "../../charset/charset.h"
+#include "../../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
 // need bytes
-#define tb_object_need_bytes(x)     \
+#define tb_oc_object_need_bytes(x)     \
                                     (((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
                                     (((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
                                     (((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8)))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the object reader type
+typedef struct __tb_oc_object_reader_t
+{
+    /// the hooker
+    tb_hash_map_ref_t           hooker;
+
+    /// probe format
+    tb_size_t                   (*probe)(tb_stream_ref_t stream);
+
+    /// read it
+    tb_oc_object_ref_t          (*read)(tb_stream_ref_t stream);
+
+}tb_oc_object_reader_t;
+
+// the object writer type
+typedef struct __tb_oc_object_writer_t
+{
+    /// the hooker
+    tb_hash_map_ref_t           hooker;
+
+    /// writ it
+    tb_long_t                   (*writ)(tb_stream_ref_t stream, tb_oc_object_ref_t object, tb_bool_t deflate);
+
+}tb_oc_object_writer_t;
 
 #endif

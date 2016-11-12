@@ -32,19 +32,19 @@
  */
 
 // the object writer
-static tb_object_writer_t*  g_writer[TB_OBJECT_FORMAT_MAXN] = {tb_null};
+static tb_oc_object_writer_t*  g_writer[TB_OBJECT_FORMAT_MAXN] = {tb_null};
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_object_writer_set(tb_size_t format, tb_object_writer_t* writer)
+tb_bool_t tb_oc_object_writer_set(tb_size_t format, tb_oc_object_writer_t* writer)
 {
     // check
     format &= 0x00ff;
     tb_assert_and_check_return_val(writer && (format < tb_arrayn(g_writer)), tb_false);
 
     // exit the older writer if exists
-    tb_object_writer_remove(format);
+    tb_oc_object_writer_remove(format);
 
     // set
     g_writer[format] = writer;
@@ -52,7 +52,7 @@ tb_bool_t tb_object_writer_set(tb_size_t format, tb_object_writer_t* writer)
     // ok
     return tb_true;
 }
-tb_void_t tb_object_writer_remove(tb_size_t format)
+tb_void_t tb_oc_object_writer_remove(tb_size_t format)
 {
     // check
     format &= 0x00ff;
@@ -69,7 +69,7 @@ tb_void_t tb_object_writer_remove(tb_size_t format)
         g_writer[format] = tb_null;
     }
 }
-tb_object_writer_t* tb_object_writer_get(tb_size_t format)
+tb_oc_object_writer_t* tb_oc_object_writer_get(tb_size_t format)
 {
     // check
     format &= 0x00ff;
@@ -78,13 +78,13 @@ tb_object_writer_t* tb_object_writer_get(tb_size_t format)
     // ok
     return g_writer[format];
 }
-tb_long_t tb_object_writer_done(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
+tb_long_t tb_oc_object_writer_done(tb_oc_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
 
     // the writer
-    tb_object_writer_t* writer = tb_object_writer_get(format);
+    tb_oc_object_writer_t* writer = tb_oc_object_writer_get(format);
     tb_assert_and_check_return_val(writer && writer->writ, -1);
 
     // writ it

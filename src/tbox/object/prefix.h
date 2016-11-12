@@ -29,15 +29,13 @@
  */
 #include "../prefix.h"
 #include "../xml/xml.h"
-#include "../stream/stream.h"
-#include "../container/container.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
 /// the object type enum
-typedef enum __tb_object_type_e
+typedef enum __tb_oc_object_type_e
 {
     TB_OBJECT_TYPE_NONE         = 0
 ,   TB_OBJECT_TYPE_DATA         = 1
@@ -50,19 +48,19 @@ typedef enum __tb_object_type_e
 ,   TB_OBJECT_TYPE_NULL         = 8
 ,   TB_OBJECT_TYPE_USER         = 9 //!< the user defined type, ...
 
-}tb_object_type_e;
+}tb_oc_object_type_e;
 
 /// the object flag enum
-typedef enum __tb_object_flag_e
+typedef enum __tb_oc_object_flag_e
 {
     TB_OBJECT_FLAG_NONE         = 0
 ,   TB_OBJECT_FLAG_READONLY     = 1
 ,   TB_OBJECT_FLAG_SINGLETON    = 2
 
-}tb_object_flag_e;
+}tb_oc_object_flag_e;
 
 /// the object format enum
-typedef enum __tb_object_format_e
+typedef enum __tb_oc_object_format_e
 {
     TB_OBJECT_FORMAT_NONE       = 0x0000    //!< none
 ,   TB_OBJECT_FORMAT_BIN        = 0x0001    //!< the tbox binary format
@@ -73,60 +71,32 @@ typedef enum __tb_object_format_e
 ,   TB_OBJECT_FORMAT_MAXN       = 0x000f    //!< the format maxn
 ,   TB_OBJECT_FORMAT_DEFLATE    = 0x0100    //!< deflate?
 
-}tb_object_format_e;
+}tb_oc_object_format_e;
 
 /// the object type
-typedef struct __tb_object_t
+typedef struct __tb_oc_object_t
 {
     /// the object flag
-    tb_uint8_t              flag;
+    tb_uint8_t                  flag;
 
     /// the object type
-    tb_uint16_t             type;
+    tb_uint16_t                 type;
 
     /// the object reference count
-    tb_size_t               refn;
+    tb_size_t                   refn;
 
     /// the object private data
-    tb_cpointer_t           priv;
+    tb_cpointer_t               priv;
 
     /// the copy func
-    struct __tb_object_t*   (*copy)(struct __tb_object_t* object);
+    struct __tb_oc_object_t*    (*copy)(struct __tb_oc_object_t* object);
 
     /// the clear func
-    tb_void_t               (*clear)(struct __tb_object_t* object);
+    tb_void_t                   (*clear)(struct __tb_oc_object_t* object);
 
     /// the exit func
-    tb_void_t               (*exit)(struct __tb_object_t* object);
+    tb_void_t                   (*exit)(struct __tb_oc_object_t* object);
 
-}tb_object_t;
-
-/// the object ref type
-typedef tb_object_t*        tb_object_ref_t;
-
-/// the object reader type
-typedef struct __tb_object_reader_t
-{
-    /// the hooker
-    tb_hash_map_ref_t       hooker;
-
-    /// probe format
-    tb_size_t               (*probe)(tb_stream_ref_t stream);
-
-    /// read it
-    tb_object_ref_t         (*read)(tb_stream_ref_t stream);
-
-}tb_object_reader_t;
-
-/// the object writer type
-typedef struct __tb_object_writer_t
-{
-    /// the hooker
-    tb_hash_map_ref_t       hooker;
-
-    /// writ it
-    tb_long_t               (*writ)(tb_stream_ref_t stream, tb_object_ref_t object, tb_bool_t deflate);
-
-}tb_object_writer_t;
+}tb_oc_object_t, *tb_oc_object_ref_t;
 
 #endif

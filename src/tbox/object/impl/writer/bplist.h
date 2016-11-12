@@ -39,15 +39,15 @@ __tb_extern_c_enter__
  */
 
 /// the object bplist writer type
-typedef struct __tb_object_bplist_writer_t
+typedef struct __tb_oc_object_bplist_writer_t
 {
     /// the stream
     tb_stream_ref_t              stream;
 
-}tb_object_bplist_writer_t;
+}tb_oc_object_bplist_writer_t;
 
 /// the bplist writer func type
-typedef tb_bool_t               (*tb_object_bplist_writer_func_t)(tb_object_bplist_writer_t* writer, tb_object_ref_t object, tb_size_t item_size);
+typedef tb_bool_t               (*tb_oc_object_bplist_writer_func_t)(tb_oc_object_bplist_writer_t* writer, tb_oc_object_ref_t object, tb_size_t item_size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -57,7 +57,7 @@ typedef tb_bool_t               (*tb_object_bplist_writer_func_t)(tb_object_bpli
  *
  * @return                      the bplist object writer
  */
-tb_object_writer_t*             tb_object_bplist_writer(tb_noarg_t);
+tb_oc_object_writer_t*             tb_oc_object_bplist_writer(tb_noarg_t);
 
 /*! hook the bplist writer
  *
@@ -66,7 +66,7 @@ tb_object_writer_t*             tb_object_bplist_writer(tb_noarg_t);
  *
  * @return                      tb_true or tb_false
  */
-tb_bool_t                       tb_object_bplist_writer_hook(tb_size_t type, tb_object_bplist_writer_func_t func);
+tb_bool_t                       tb_oc_object_bplist_writer_hook(tb_size_t type, tb_oc_object_bplist_writer_func_t func);
 
 /*! the bplist writer func
  *
@@ -74,7 +74,7 @@ tb_bool_t                       tb_object_bplist_writer_hook(tb_size_t type, tb_
  *
  * @return                      the object writer func
  */
-tb_object_bplist_writer_func_t  tb_object_bplist_writer_func(tb_size_t type);
+tb_oc_object_bplist_writer_func_t  tb_oc_object_bplist_writer_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
