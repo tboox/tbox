@@ -124,8 +124,8 @@ target("tbox")
     -- add the source files for the hash module
     if is_option("hash") then
         add_files("hash/*.c") 
-        if is_arch("arm.*") then
-            add_files("hash/impl/crc32_arm.S")
+        if not is_plat("windows") then
+            add_files("hash/arch/crc32.S")
         end
         if is_option("deprecated") then
             add_files("hash/deprecated/*.c") 

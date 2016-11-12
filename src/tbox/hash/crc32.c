@@ -26,8 +26,12 @@
  * includes
  */
 #include "crc32.h"
-#if defined(TB_ARCH_ARM)
-#   include "impl/crc32_arm.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+#if defined(TB_ARCH_ARM) && !defined(TB_ARCH_ARM64)
+tb_uint32_t tb_crc32_make_asm(tb_uint32_t crc32, tb_byte_t const* data, tb_size_t size, tb_uint32_t const table[]);
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -131,6 +135,24 @@ tb_uint32_t const g_crc32_le_table[] =
 };
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_uint32_t tb_crc32_make_impl(tb_uint32_t crc32, tb_byte_t const* data, tb_size_t size, tb_uint32_t const table[])
+{
+    // done
+#if defined(TB_ARCH_ARM) && !defined(TB_ARCH_ARM64)
+    crc32 = tb_crc32_make_asm(crc32, data, size, (tb_uint32_t const*)table);
+#else
+    tb_byte_t const*    ie = data + size;
+    tb_uint32_t const*  pt = (tb_uint32_t const*)table;
+    while (data < ie) crc32 = pt[((tb_uint8_t)crc32) ^ *data++] ^ (crc32 >> 8);
+#endif
+
+    // ok
+    return crc32;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 
@@ -139,20 +161,8 @@ tb_uint32_t tb_crc32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t see
     // check
     tb_assert_and_check_return_val(data, 0);
 
-    // init value
-    tb_uint32_t crc = seed;
-
-    // done
-#ifdef tb_crc32_make_opt
-    crc = tb_crc32_make_opt(crc, data, size, (tb_uint32_t const*)g_crc32_table);
-#else
-    tb_byte_t const*    ie = data + size;
-    tb_uint32_t const*  pt = (tb_uint32_t const*)g_crc32_table;
-    while (data < ie) crc = pt[((tb_uint8_t)crc) ^ *data++] ^ (crc >> 8);
-#endif
-
-    // ok?
-    return crc;
+    // calculate it
+    return tb_crc32_make_impl(seed, data, size, g_crc32_table);
 }
 tb_uint32_t tb_crc32_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed)
 {
@@ -167,20 +177,8 @@ tb_uint32_t tb_crc32_le_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t 
     // check
     tb_assert_and_check_return_val(data, 0);
 
-    // init value
-    tb_uint32_t crc = seed;
-
-    // done
-#ifdef tb_crc32_make_opt
-    crc = tb_crc32_make_opt(crc, data, size, (tb_uint32_t const*)g_crc32_le_table);
-#else
-    tb_byte_t const*    ie = data + size;
-    tb_uint32_t const*  pt = (tb_uint32_t const*)g_crc32_le_table;
-    while (data < ie) crc = pt[((tb_uint8_t)crc) ^ *data++] ^ (crc >> 8);
-#endif
-
-    // ok?
-    return crc;
+    // calculate it
+    return tb_crc32_make_impl(seed, data, size, g_crc32_le_table);
 }
 tb_uint32_t tb_crc32_le_make_from_cstr(tb_char_t const* cstr, tb_uint32_t seed)
 {

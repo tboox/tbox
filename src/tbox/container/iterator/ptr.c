@@ -107,7 +107,7 @@ tb_iterator_ref_t tb_iterator_make_for_ptr(tb_array_iterator_ref_t iterator, tb_
     iterator->base.item     = tb_iterator_ptr_item;
     iterator->base.copy     = tb_iterator_ptr_copy;
     iterator->base.comp     = tb_iterator_ptr_comp;
-    iterator->items      = items;
+    iterator->items         = items;
     iterator->count         = count;
 
     // ok

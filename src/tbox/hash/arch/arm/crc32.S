@@ -17,19 +17,13 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        crc_arm.S
+ * @file        crc32.S
  *
  */
-/* //////////////////////////////////////////////////////////////////////////////////////
- * includes
- */
-#include "../../prefix/prefix.S"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifndef TB_ARCH_ARM64
-
 /* tb_uint32_t tb_crc32_make_asm(tb_uint32_t crc, tb_byte_t const* data, tb_size_t size, tb_uint32_t const* table);
  * 
  * @param crc   r0
@@ -258,4 +252,3 @@ label end
 
 endfunc
 
-#endif

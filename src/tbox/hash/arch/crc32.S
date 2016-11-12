@@ -17,29 +17,17 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        crc32_arm.h
+ * @file        crc32.S
  *
  */
-#ifndef TB_HASH_IMPL_CRC32_ARM_H
-#define TB_HASH_IMPL_CRC32_ARM_H
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../../prefix/prefix.S"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
+ * implementation
  */
-#ifndef TB_ARCH_ARM64
-#   define tb_crc32_make_opt(crc, ib, in, table)  tb_crc32_make_asm(crc, ib, in, table)
+#if defined(TB_ARCH_ARM) && !defined(TB_ARCH_ARM64)
+#   include "arm/crc32.S"
 #endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_uint32_t tb_crc32_make_asm(tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in, tb_uint32_t const* table);
-
-
-#endif
-

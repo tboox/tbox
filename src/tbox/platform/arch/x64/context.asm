@@ -60,7 +60,7 @@ extern _exit:proc
 ;                                                                              |         |
 ;                                                                              |      16-align
 ;                                                                              |
-;                                                                    esp when jump to function
+;                                                                    rsp when jump to function
 ;
 ;
 ; @param stackdata     the stack data (rcx)
@@ -220,14 +220,14 @@ tb_context_jump proc frame
     mov [rax], r9
     mov [rax + 8], r8
 
-    ; pass old-context(ecx(context: r9, priv: r8)) arguments to the context function
+    ; pass old-context(rcx(context: r9, priv: r8)) arguments to the context function
     ;
     ; tb_context_from_t from;
     ; func(from)
     ;
-    ; lea ecx, address of from
-    ; ecx.context = r9
-    ; ecx.priv = r8
+    ; lea rcx, address of from
+    ; rcx.context = r9
+    ; rcx.priv = r8
     ; call func
     ;;
     mov rcx, rax
@@ -241,7 +241,7 @@ tb_context_jump proc frame
     ;              -----------------------------------------------------------------
     ;             0         8 arguments 
     ;             |         |
-    ;            esp     16-align 
+    ;            rsp     16-align 
     ;           (now)
     ;;
     jmp r10
