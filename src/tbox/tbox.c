@@ -25,8 +25,10 @@
  * includes
  */
 #include "tbox.h"
+#include "libm/impl/impl.h"
 #include "object/impl/impl.h"
 #include "network/impl/impl.h"
+#include "platform/impl/impl.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -168,8 +170,8 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
     // init memory
     if (!tb_memory_init(allocator)) return tb_false;
 
-    // init platform
-    if (!tb_platform_init(priv)) return tb_false;
+    // init platform envirnoment
+    if (!tb_platform_init_env(priv)) return tb_false;
 
     // init libc 
     if (!tb_libc_init()) return tb_false;
@@ -177,8 +179,8 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
     // init math
     if (!tb_math_init()) return tb_false;
 
-    // init libm
-    if (!tb_libm_init()) return tb_false;
+    // init libm envirnoment
+    if (!tb_libm_init_env()) return tb_false;
 
     // init network envirnoment
     if (!tb_network_init_env()) return tb_false;
@@ -213,8 +215,8 @@ tb_void_t tb_exit()
     // exit network envirnoment
     tb_network_exit_env();
      
-    // exit libm
-    tb_libm_exit();
+    // exit libm envirnoment
+    tb_libm_exit_env();
      
     // exit math
     tb_math_exit();
@@ -222,8 +224,8 @@ tb_void_t tb_exit()
     // exit libc
     tb_libc_exit();
     
-    // exit platform
-    tb_platform_exit();
+    // exit platform envirnoment
+    tb_platform_exit_env();
     
     // exit singleton
     tb_singleton_exit();

@@ -30,6 +30,7 @@
 #include "socket.h"
 #include "exception.h"
 #include "thread_local.h"
+#include "platform.h"
 
 
 #endif

@@ -80,10 +80,10 @@ __tb_extern_c_enter__
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_platform_init(tb_handle_t priv);
+tb_bool_t           tb_platform_init_env(tb_handle_t priv);
 
 /// exit the platform 
-tb_void_t           tb_platform_exit(tb_noarg_t);
+tb_void_t           tb_platform_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
