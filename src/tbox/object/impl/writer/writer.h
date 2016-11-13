@@ -21,8 +21,8 @@
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_WRITER_H
-#define TB_OBJECT_WRITER_H
+#ifndef TB_OBJECT_IMPL_WRITER_H
+#define TB_OBJECT_IMPL_WRITER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -57,7 +57,7 @@ tb_bool_t           tb_oc_writer_set(tb_size_t format, tb_oc_writer_t* writer);
  *
  * @return          the object writer
  */
-tb_oc_writer_t* tb_oc_writer_get(tb_size_t format);
+tb_oc_writer_t*     tb_oc_writer_get(tb_size_t format);
 
 /*! remove object writer
  *

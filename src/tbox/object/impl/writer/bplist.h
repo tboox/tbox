@@ -57,7 +57,7 @@ typedef tb_bool_t               (*tb_oc_bplist_writer_func_t)(tb_oc_bplist_write
  *
  * @return                      the bplist object writer
  */
-tb_oc_writer_t*             tb_oc_bplist_writer(tb_noarg_t);
+tb_oc_writer_t*                 tb_oc_bplist_writer(tb_noarg_t);
 
 /*! hook the bplist writer
  *

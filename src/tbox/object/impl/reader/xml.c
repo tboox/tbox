@@ -25,7 +25,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME        "object_reader_xml"
+#define TB_TRACE_MODULE_NAME        "oc_reader_xml"
 #define TB_TRACE_MODULE_DEBUG       (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -40,9 +40,9 @@
 
 // the array grow
 #ifdef __tb_small__
-#   define TB_OBJECT_XML_READER_ARRAY_GROW          (64)
+#   define TB_OC_XML_READER_ARRAY_GROW          (64)
 #else
-#   define TB_OBJECT_XML_READER_ARRAY_GROW          (256)
+#   define TB_OC_XML_READER_ARRAY_GROW          (256)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -237,10 +237,10 @@ static tb_oc_object_ref_t tb_oc_xml_reader_func_array(tb_oc_xml_reader_t* reader
 
     // empty?
     if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-        return tb_oc_array_init(TB_OBJECT_XML_READER_ARRAY_GROW, tb_false);
+        return tb_oc_array_init(TB_OC_XML_READER_ARRAY_GROW, tb_false);
 
     // init array
-    tb_oc_object_ref_t array = tb_oc_array_init(TB_OBJECT_XML_READER_ARRAY_GROW, tb_false);
+    tb_oc_object_ref_t array = tb_oc_array_init(TB_OC_XML_READER_ARRAY_GROW, tb_false);
     tb_assert_and_check_return_val(array, tb_null);
 
     // done

@@ -57,7 +57,7 @@ typedef tb_oc_object_ref_t      (*tb_oc_xplist_reader_func_t)(tb_oc_xplist_reade
  *
  * @return                      the xplist object reader
  */
-tb_oc_reader_t*          tb_oc_xplist_reader(tb_noarg_t);
+tb_oc_reader_t*                 tb_oc_xplist_reader(tb_noarg_t);
 
 /* hook the xplist reader
  *
@@ -74,7 +74,7 @@ tb_bool_t                       tb_oc_xplist_reader_hook(tb_char_t const* type, 
  *
  * @return                      the object reader func
  */
-tb_oc_xplist_reader_func_t  tb_oc_xplist_reader_func(tb_char_t const* type);
+tb_oc_xplist_reader_func_t      tb_oc_xplist_reader_func(tb_char_t const* type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

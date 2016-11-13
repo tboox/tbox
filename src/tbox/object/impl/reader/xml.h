@@ -47,7 +47,7 @@ typedef struct __tb_oc_xml_reader_t
 }tb_oc_xml_reader_t;
 
 /// the xml reader func type
-typedef tb_oc_object_ref_t         (*tb_oc_xml_reader_func_t)(tb_oc_xml_reader_t* reader, tb_size_t event);
+typedef tb_oc_object_ref_t     (*tb_oc_xml_reader_func_t)(tb_oc_xml_reader_t* reader, tb_size_t event);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -57,7 +57,7 @@ typedef tb_oc_object_ref_t         (*tb_oc_xml_reader_func_t)(tb_oc_xml_reader_t
  *
  * @return                      the xml object reader
  */
-tb_oc_reader_t*             tb_oc_xml_reader(tb_noarg_t);
+tb_oc_reader_t*                 tb_oc_xml_reader(tb_noarg_t);
 
 /*! hook the xml reader
  *
@@ -74,7 +74,7 @@ tb_bool_t                       tb_oc_xml_reader_hook(tb_char_t const* type, tb_
  *
  * @return                      the object reader func
  */
-tb_oc_xml_reader_func_t     tb_oc_xml_reader_func(tb_char_t const* type);
+tb_oc_xml_reader_func_t         tb_oc_xml_reader_func(tb_char_t const* type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

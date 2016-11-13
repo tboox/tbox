@@ -25,7 +25,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME        "object_reader_bin"
+#define TB_TRACE_MODULE_NAME        "oc_reader_bin"
 #define TB_TRACE_MODULE_DEBUG       (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -40,9 +40,9 @@
 
 // the array grow
 #ifdef __tb_small__
-#   define TB_OBJECT_BIN_READER_ARRAY_GROW          (64)
+#   define TB_OC_BIN_READER_ARRAY_GROW          (64)
 #else
-#   define TB_OBJECT_BIN_READER_ARRAY_GROW          (256)
+#   define TB_OC_BIN_READER_ARRAY_GROW          (256)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -106,10 +106,10 @@ static tb_oc_object_ref_t tb_oc_bin_reader_func_array(tb_oc_bin_reader_t* reader
     tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
     // empty?
-    if (!size) return tb_oc_array_init(TB_OBJECT_BIN_READER_ARRAY_GROW, tb_false);
+    if (!size) return tb_oc_array_init(TB_OC_BIN_READER_ARRAY_GROW, tb_false);
 
     // init array
-    tb_oc_object_ref_t array = tb_oc_array_init(TB_OBJECT_BIN_READER_ARRAY_GROW, tb_false);
+    tb_oc_object_ref_t array = tb_oc_array_init(TB_OC_BIN_READER_ARRAY_GROW, tb_false);
     tb_assert_and_check_return_val(array, tb_null);
 
     // walk
@@ -216,8 +216,8 @@ static tb_oc_object_ref_t tb_oc_bin_reader_func_number(tb_oc_bin_reader_t* reade
     tb_size_t number_type = (tb_size_t)size;
 
     // read number
-    tb_value_t      value;
-    tb_oc_object_ref_t number = tb_null;
+    tb_value_t          value;
+    tb_oc_object_ref_t  number = tb_null;
     switch (number_type)
     {
     case TB_NUMBER_TYPE_UINT64:

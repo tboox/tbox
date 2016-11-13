@@ -25,7 +25,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME        "object_reader_bplist"
+#define TB_TRACE_MODULE_NAME        "oc_reader_bplist"
 #define TB_TRACE_MODULE_DEBUG       (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -40,9 +40,9 @@
 
 // the array grow
 #ifdef __tb_small__
-#   define TB_OBJECT_BPLIST_READER_ARRAY_GROW           (64)
+#   define TB_OC_BPLIST_READER_ARRAY_GROW           (64)
 #else
-#   define TB_OBJECT_BPLIST_READER_ARRAY_GROW           (256)
+#   define TB_OC_BPLIST_READER_ARRAY_GROW           (256)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -52,20 +52,20 @@
 // the bplist type enum
 typedef enum __tb_oc_bplist_type_e
 {
-    TB_OBJECT_BPLIST_TYPE_NONE      = 0x00
-,   TB_OBJECT_BPLIST_TYPE_FALSE     = 0x08
-,   TB_OBJECT_BPLIST_TYPE_TRUE      = 0x09
-,   TB_OBJECT_BPLIST_TYPE_UINT      = 0x10
-,   TB_OBJECT_BPLIST_TYPE_REAL      = 0x20
-,   TB_OBJECT_BPLIST_TYPE_DATE      = 0x30
-,   TB_OBJECT_BPLIST_TYPE_DATA      = 0x40
-,   TB_OBJECT_BPLIST_TYPE_STRING    = 0x50
-,   TB_OBJECT_BPLIST_TYPE_UNICODE   = 0x60
-,   TB_OBJECT_BPLIST_TYPE_UID       = 0x80
-,   TB_OBJECT_BPLIST_TYPE_ARRAY     = 0xA0
-,   TB_OBJECT_BPLIST_TYPE_SET       = 0xC0
-,   TB_OBJECT_BPLIST_TYPE_DICT      = 0xD0
-,   TB_OBJECT_BPLIST_TYPE_MASK      = 0xF0
+    TB_OC_BPLIST_TYPE_NONE      = 0x00
+,   TB_OC_BPLIST_TYPE_FALSE     = 0x08
+,   TB_OC_BPLIST_TYPE_TRUE      = 0x09
+,   TB_OC_BPLIST_TYPE_UINT      = 0x10
+,   TB_OC_BPLIST_TYPE_REAL      = 0x20
+,   TB_OC_BPLIST_TYPE_DATE      = 0x30
+,   TB_OC_BPLIST_TYPE_DATA      = 0x40
+,   TB_OC_BPLIST_TYPE_STRING    = 0x50
+,   TB_OC_BPLIST_TYPE_UNICODE   = 0x60
+,   TB_OC_BPLIST_TYPE_UID       = 0x80
+,   TB_OC_BPLIST_TYPE_ARRAY     = 0xA0
+,   TB_OC_BPLIST_TYPE_SET       = 0xC0
+,   TB_OC_BPLIST_TYPE_DICT      = 0xD0
+,   TB_OC_BPLIST_TYPE_MASK      = 0xF0
 
 }tb_oc_bplist_type_e;
 
@@ -226,7 +226,7 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_string(tb_oc_bplist_reader_t*
     // read
     switch (type)
     {
-    case TB_OBJECT_BPLIST_TYPE_STRING:
+    case TB_OC_BPLIST_TYPE_STRING:
         {
             // size is too large?
             if (size == 0x0f)
@@ -253,7 +253,7 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_string(tb_oc_bplist_reader_t*
             object = tb_oc_string_init_from_cstr(utf8);
         }
         break;
-    case TB_OBJECT_BPLIST_TYPE_UNICODE:
+    case TB_OC_BPLIST_TYPE_UNICODE:
         {
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
             // size is too large?
@@ -310,8 +310,8 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_number(tb_oc_bplist_reader_t*
     size = (tb_size_t)1 << size;
 
     // done
-    tb_value_t      value;
-    tb_oc_object_ref_t object = tb_null;
+    tb_value_t          value;
+    tb_oc_object_ref_t  object = tb_null;
     switch (size)
     {
     case 1:
@@ -332,15 +332,15 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_number(tb_oc_bplist_reader_t*
         {
             switch (type)
             {
-            case TB_OBJECT_BPLIST_TYPE_UID:
-            case TB_OBJECT_BPLIST_TYPE_UINT:
+            case TB_OC_BPLIST_TYPE_UID:
+            case TB_OC_BPLIST_TYPE_UINT:
                 {
                     // read and init object
                     if (tb_stream_bread_u32_be(reader->stream, &value.u32))
                         object = tb_oc_number_init_from_uint32(value.u32);
                 }
                 break;
-            case TB_OBJECT_BPLIST_TYPE_REAL:
+            case TB_OC_BPLIST_TYPE_REAL:
                 {
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                     // read and init object
@@ -361,15 +361,15 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_number(tb_oc_bplist_reader_t*
         {
             switch (type)
             {
-            case TB_OBJECT_BPLIST_TYPE_UID:
-            case TB_OBJECT_BPLIST_TYPE_UINT:
+            case TB_OC_BPLIST_TYPE_UID:
+            case TB_OC_BPLIST_TYPE_UINT:
                 {
                     // read and init object
                     if (tb_stream_bread_u64_be(reader->stream, &value.u64))
                         object = tb_oc_number_init_from_uint64(value.u64);
                 }
                 break;
-            case TB_OBJECT_BPLIST_TYPE_REAL:
+            case TB_OC_BPLIST_TYPE_REAL:
                 {
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
                     // read and init object
@@ -406,7 +406,7 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_uid(tb_oc_bplist_reader_t* re
     do
     {
         // read uid value
-        value = tb_oc_bplist_reader_func_number(reader, TB_OBJECT_BPLIST_TYPE_UINT, size, item_size);
+        value = tb_oc_bplist_reader_func_number(reader, TB_OC_BPLIST_TYPE_UINT, size, item_size);
         tb_assert_and_check_break(value);
 
         // init uid object
@@ -438,7 +438,7 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_date(tb_oc_bplist_reader_t* r
     tb_assert_and_check_return_val(reader && reader->stream, tb_null);
 
     // the date data
-    tb_oc_object_ref_t data = tb_oc_bplist_reader_func_number(reader, TB_OBJECT_BPLIST_TYPE_REAL, size, item_size);
+    tb_oc_object_ref_t data = tb_oc_bplist_reader_func_number(reader, TB_OC_BPLIST_TYPE_REAL, size, item_size);
     tb_assert_and_check_return_val(data, tb_null);
 
     // init date
@@ -458,10 +458,10 @@ static tb_oc_object_ref_t tb_oc_bplist_reader_func_boolean(tb_oc_bplist_reader_t
     // read 
     switch (size)
     {
-    case TB_OBJECT_BPLIST_TYPE_TRUE:
+    case TB_OC_BPLIST_TYPE_TRUE:
         object = tb_oc_boolean_init(tb_true);
         break;
-    case TB_OBJECT_BPLIST_TYPE_FALSE:
+    case TB_OC_BPLIST_TYPE_FALSE:
         object = tb_oc_boolean_init(tb_false);
         break;
     default:
@@ -777,17 +777,17 @@ tb_oc_reader_t* tb_oc_bplist_reader()
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
     // hook reader 
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATE,      tb_oc_bplist_reader_func_date);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DATA,      tb_oc_bplist_reader_func_data);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UID,       tb_oc_bplist_reader_func_uid);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_ARRAY,     tb_oc_bplist_reader_func_array);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_STRING,    tb_oc_bplist_reader_func_string);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UNICODE,   tb_oc_bplist_reader_func_string);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_UINT,      tb_oc_bplist_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_REAL,      tb_oc_bplist_reader_func_number);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_NONE,      tb_oc_bplist_reader_func_boolean);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_SET,       tb_oc_bplist_reader_func_dictionary);
-    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_BPLIST_TYPE_DICT,      tb_oc_bplist_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_DATE,      tb_oc_bplist_reader_func_date);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_DATA,      tb_oc_bplist_reader_func_data);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_UID,       tb_oc_bplist_reader_func_uid);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_ARRAY,     tb_oc_bplist_reader_func_array);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_STRING,    tb_oc_bplist_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_UNICODE,   tb_oc_bplist_reader_func_string);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_UINT,      tb_oc_bplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_REAL,      tb_oc_bplist_reader_func_number);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_NONE,      tb_oc_bplist_reader_func_boolean);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_SET,       tb_oc_bplist_reader_func_dictionary);
+    tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OC_BPLIST_TYPE_DICT,      tb_oc_bplist_reader_func_dictionary);
 
     // ok
     return &s_reader;

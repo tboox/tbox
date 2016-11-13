@@ -47,7 +47,7 @@ typedef struct __tb_oc_json_reader_t
 }tb_oc_json_reader_t;
 
 /// the json reader func type
-typedef tb_oc_object_ref_t            (*tb_oc_json_reader_func_t)(tb_oc_json_reader_t* reader, tb_char_t type);
+typedef tb_oc_object_ref_t      (*tb_oc_json_reader_func_t)(tb_oc_json_reader_t* reader, tb_char_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -57,7 +57,7 @@ typedef tb_oc_object_ref_t            (*tb_oc_json_reader_func_t)(tb_oc_json_rea
  *
  * @return                      the json object reader
  */
-tb_oc_reader_t*             tb_oc_json_reader(tb_noarg_t);
+tb_oc_reader_t*                 tb_oc_json_reader(tb_noarg_t);
 
 /*! hook the json reader
  *
@@ -74,7 +74,7 @@ tb_bool_t                       tb_oc_json_reader_hook(tb_char_t type, tb_oc_jso
  *
  * @return                      the object reader func
  */
-tb_oc_json_reader_func_t    tb_oc_json_reader_func(tb_char_t type);
+tb_oc_json_reader_func_t        tb_oc_json_reader_func(tb_char_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -60,7 +60,7 @@ typedef tb_bool_t               (*tb_oc_xplist_writer_func_t)(tb_oc_xplist_write
  *
  * @return                      the xplist object writer
  */
-tb_oc_writer_t*             tb_oc_xplist_writer(tb_noarg_t);
+tb_oc_writer_t*                 tb_oc_xplist_writer(tb_noarg_t);
 
 /*! hook the xplist writer
  *
@@ -77,7 +77,7 @@ tb_bool_t                       tb_oc_xplist_writer_hook(tb_size_t type, tb_oc_x
  *
  * @return                      the object writer func
  */
-tb_oc_xplist_writer_func_t  tb_oc_xplist_writer_func(tb_size_t type);
+tb_oc_xplist_writer_func_t      tb_oc_xplist_writer_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -60,7 +60,7 @@ typedef tb_bool_t               (*tb_oc_json_writer_func_t)(tb_oc_json_writer_t*
  *
  * @return                      the json object writer
  */
-tb_oc_writer_t*             tb_oc_json_writer(tb_noarg_t);
+tb_oc_writer_t*                 tb_oc_json_writer(tb_noarg_t);
 
 /*! hook the json writer
  *
@@ -77,7 +77,7 @@ tb_bool_t                       tb_oc_json_writer_hook(tb_size_t type, tb_oc_jso
  *
  * @return                      the object writer func
  */
-tb_oc_json_writer_func_t    tb_oc_json_writer_func(tb_size_t type);
+tb_oc_json_writer_func_t        tb_oc_json_writer_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

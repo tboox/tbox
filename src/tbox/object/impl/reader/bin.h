@@ -50,17 +50,17 @@ typedef struct __tb_oc_bin_reader_t
 }tb_oc_bin_reader_t;
 
 /// the bin reader func type
-typedef tb_oc_object_ref_t         (*tb_oc_bin_reader_func_t)(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
+typedef tb_oc_object_ref_t     (*tb_oc_bin_reader_func_t)(tb_oc_bin_reader_t* reader, tb_size_t type, tb_uint64_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the bin object reader
+/*! the bin reader
  *
  * @return                      the bin object reader
  */
-tb_oc_reader_t*             tb_oc_bin_reader(tb_noarg_t);
+tb_oc_reader_t*                 tb_oc_bin_reader(tb_noarg_t);
 
 /*! hook the bin reader
  *
@@ -77,7 +77,7 @@ tb_bool_t                       tb_oc_bin_reader_hook(tb_size_t type, tb_oc_bin_
  *
  * @return                      the object reader func
  */
-tb_oc_bin_reader_func_t     tb_oc_bin_reader_func(tb_size_t type);
+tb_oc_bin_reader_func_t         tb_oc_bin_reader_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

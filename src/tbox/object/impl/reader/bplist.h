@@ -47,17 +47,17 @@ typedef struct __tb_oc_bplist_reader_t
 }tb_oc_bplist_reader_t;
 
 /// the bplist reader func type
-typedef tb_oc_object_ref_t         (*tb_oc_bplist_reader_func_t)(tb_oc_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size);
+typedef tb_oc_object_ref_t      (*tb_oc_bplist_reader_func_t)(tb_oc_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! the bplist object reader
+/*! the bplist reader
  *
  * @return                      the bplist object reader
  */
-tb_oc_reader_t*             tb_oc_bplist_reader(tb_noarg_t);
+tb_oc_reader_t*                 tb_oc_bplist_reader(tb_noarg_t);
 
 /*! hook the bplist reader
  *
@@ -74,7 +74,7 @@ tb_bool_t                       tb_oc_bplist_reader_hook(tb_size_t type, tb_oc_b
  *
  * @return                      the object reader func
  */
-tb_oc_bplist_reader_func_t  tb_oc_bplist_reader_func(tb_size_t type);
+tb_oc_bplist_reader_func_t      tb_oc_bplist_reader_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

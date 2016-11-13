@@ -60,7 +60,7 @@ typedef tb_bool_t               (*tb_oc_xml_writer_func_t)(tb_oc_xml_writer_t* w
  *
  * @return                      the xml object writer
  */
-tb_oc_writer_t*             tb_oc_xml_writer(tb_noarg_t);
+tb_oc_writer_t*                 tb_oc_xml_writer(tb_noarg_t);
 
 /*! hook the xml writer
  *
@@ -77,7 +77,7 @@ tb_bool_t                       tb_oc_xml_writer_hook(tb_size_t type, tb_oc_xml_
  *
  * @return                      the object writer func
  */
-tb_oc_xml_writer_func_t     tb_oc_xml_writer_func(tb_size_t type);
+tb_oc_xml_writer_func_t         tb_oc_xml_writer_func(tb_size_t type);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
