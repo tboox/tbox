@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        date.h
+ * @file        dictionary.h
  * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_DATE_H
-#define TB_OBJECT_DATE_H
+#ifndef TB_OBJECT_DEPRECATED_DICTIONARY_H
+#define TB_OBJECT_DEPRECATED_DICTIONARY_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -30,57 +30,37 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * macros
  */
-__tb_extern_c_enter__
+#define TB_OBJECT_DICTIONARY_SIZE_MICRO                (64)
+#define TB_OBJECT_DICTIONARY_SIZE_SMALL                (256)
+#define TB_OBJECT_DICTIONARY_SIZE_LARGE                (65536)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the dictionary item type
+typedef struct __tb_object_dictionary_item_t
+{
+    /// the key
+    tb_char_t const*    key;
+
+    /// the value
+    tb_object_ref_t     val;
+
+}tb_object_dictionary_item_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
-/*! init date from now
- *
- * @return          the date object
- */
-tb_object_ref_t     tb_oc_date_init_from_now(tb_noarg_t);
-
-/*! init date from time
- *
- * @param           the date time
- *
- * @return          the date object
- */
-tb_object_ref_t     tb_oc_date_init_from_time(tb_time_t time);
-
-/*! the date time
- *
- * @param           the date object
- *
- * @return          the date time
- */
-tb_time_t           tb_oc_date_time(tb_object_ref_t date);
-
-/*! set the date time
- *
- * @param           the date object
- * @param           the date time
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_oc_date_time_set(tb_object_ref_t date, tb_time_t time);
-
-/*! set the date time for now
- *
- * @param           the date object
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_oc_date_time_set_now(tb_object_ref_t date);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
+#define tb_object_dictionary_init       tb_oc_dictionary_init
+#define tb_object_dictionary_size       tb_oc_dictionary_size
+#define tb_object_dictionary_incr       tb_oc_dictionary_incr
+#define tb_object_dictionary_itor       tb_oc_dictionary_itor
+#define tb_object_dictionary_value      tb_oc_dictionary_value
+#define tb_object_dictionary_insert     tb_oc_dictionary_insert
+#define tb_object_dictionary_remove     tb_oc_dictionary_remove
 
 #endif
 

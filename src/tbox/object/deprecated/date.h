@@ -17,23 +17,29 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        deprecated.h
+ * @file        date.h
+ * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_DEPRECATED_H
-#define TB_OBJECT_DEPRECATED_H
+#ifndef TB_OBJECT_DEPRECATED_DATE_H
+#define TB_OBJECT_DEPRECATED_DATE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "null.h"
-#include "data.h"
-#include "date.h"
-#include "array.h"
-#include "string.h"
-#include "number.h"
-#include "boolean.h"
-#include "dictionary.h"
+#include "prefix.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+#define tb_object_date_init_from_now    tb_oc_date_init_from_now
+#define tb_object_date_init_from_time   tb_oc_date_init_from_time
+#define tb_object_date_time             tb_oc_date_time
+#define tb_object_date_time_set         tb_oc_date_time_set
+#define tb_object_date_time_set_now     tb_oc_date_time_set_now
+
 
 
 #endif
+

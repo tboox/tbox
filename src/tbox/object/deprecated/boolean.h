@@ -17,23 +17,27 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        deprecated.h
+ * @file        boolean.h
+ * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_DEPRECATED_H
-#define TB_OBJECT_DEPRECATED_H
+#ifndef TB_OBJECT_DEPRECATED_BOOLEAN_H
+#define TB_OBJECT_DEPRECATED_BOOLEAN_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "null.h"
-#include "data.h"
-#include "date.h"
-#include "array.h"
-#include "string.h"
-#include "number.h"
-#include "boolean.h"
-#include "dictionary.h"
+#include "prefix.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+#define tb_object_boolean_init      tb_oc_boolean_init
+#define tb_object_boolean_true      tb_oc_boolean_true
+#define tb_object_boolean_false     tb_oc_boolean_false
+#define tb_object_boolean_bool      tb_oc_boolean_bool
 
 
 #endif
+

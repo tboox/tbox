@@ -17,23 +17,27 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        deprecated.h
+ * @file        string.h
+ * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_DEPRECATED_H
-#define TB_OBJECT_DEPRECATED_H
+#ifndef TB_OBJECT_DEPRECATED_STRING_H
+#define TB_OBJECT_DEPRECATED_STRING_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "null.h"
-#include "data.h"
-#include "date.h"
-#include "array.h"
-#include "string.h"
-#include "number.h"
-#include "boolean.h"
-#include "dictionary.h"
+#include "prefix.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+#define tb_object_string_init_from_cstr tb_oc_string_init_from_cstr
+#define tb_object_string_init_from_str  tb_oc_string_init_from_str
+#define tb_object_string_cstr           tb_oc_string_cstr
+#define tb_object_string_cstr_set       tb_oc_string_cstr_set
+#define tb_object_string_size           tb_oc_string_size
 
 #endif
+

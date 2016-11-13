@@ -17,23 +17,24 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        deprecated.h
+ * @file        null.h
+ * @ingroup     object
  *
  */
-#ifndef TB_OBJECT_DEPRECATED_H
-#define TB_OBJECT_DEPRECATED_H
+#ifndef TB_OBJECT_DEPRECATED_NULL_H
+#define TB_OBJECT_DEPRECATED_NULL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "null.h"
-#include "data.h"
-#include "date.h"
-#include "array.h"
-#include "string.h"
-#include "number.h"
-#include "boolean.h"
-#include "dictionary.h"
+#include "prefix.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+#define tb_object_null_init     tb_oc_null_init
 
 
 #endif
+
