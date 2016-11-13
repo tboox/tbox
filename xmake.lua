@@ -127,16 +127,8 @@ if is_plat("windows") then
     add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
 end
 
--- add option: demo
-option("demo")
-    set_default(true)
-    set_showmenu(true)
-    set_category("option")
-    set_description("Enable or disable the demo module")
-
 -- add package directories
 add_packagedirs("pkg") 
 
--- add projects
-add_subdirs("src/tbox") 
-if is_option("demo") then add_subdirs("src/demo") end
+-- add project sources
+add_subdirs("src") 
