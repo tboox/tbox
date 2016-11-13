@@ -59,6 +59,11 @@ static tb_void_t tb_demo_platform_context_test_func2(tb_context_from_t from)
     // switch to the main function
     tb_context_jump(contexts[0], tb_null);
 }
+static tb_context_from_t test()
+{
+    tb_context_from_t from = {0};
+    return from;
+}
 static tb_void_t tb_demo_platform_context_test()
 { 
     // the stacks
@@ -66,14 +71,15 @@ static tb_void_t tb_demo_platform_context_test()
     static tb_byte_t        stacks1[8192];
     static tb_byte_t        stacks2[8192];
 
+    test();
+
     // make context1
     contexts[1] = tb_context_make(stacks1, sizeof(stacks1), tb_demo_platform_context_test_func1);
 
     // make context2
     contexts[2] = tb_context_make(stacks2, sizeof(stacks2), tb_demo_platform_context_test_func2);
 
-    contexts[0] = (tb_context_ref_t)1;
-
+    // trace
     tb_trace_i("test: enter");
 
     // switch to func1
