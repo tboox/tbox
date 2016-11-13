@@ -73,7 +73,7 @@ tb_void_t           tb_oc_writer_remove(tb_size_t format);
  *
  * @return          the writed size, failed: -1
  */
-tb_long_t           tb_oc_writer_done(tb_oc_object_ref_t object, tb_stream_ref_t stream, tb_size_t format);
+tb_long_t           tb_oc_writer_done(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

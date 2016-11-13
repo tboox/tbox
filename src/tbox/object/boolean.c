@@ -25,7 +25,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME        "object_boolean"
+#define TB_TRACE_MODULE_NAME        "oc_boolean"
 #define TB_TRACE_MODULE_DEBUG       (0)
  
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@
 typedef struct __tb_oc_boolean_t
 {
     // the object base
-    tb_oc_object_t      base;
+    tb_object_t      base;
 
     // the boolean value
     tb_bool_t           value;
@@ -51,7 +51,7 @@ typedef struct __tb_oc_boolean_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_oc_boolean_t* tb_oc_boolean_cast(tb_oc_object_ref_t object)
+static __tb_inline__ tb_oc_boolean_t* tb_oc_boolean_cast(tb_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_BOOLEAN, tb_null);
@@ -60,7 +60,7 @@ static __tb_inline__ tb_oc_boolean_t* tb_oc_boolean_cast(tb_oc_object_ref_t obje
     return (tb_oc_boolean_t*)object;
 }
 
-static tb_oc_object_ref_t tb_oc_boolean_copy(tb_oc_object_ref_t object)
+static tb_object_ref_t tb_oc_boolean_copy(tb_object_ref_t object)
 {
     // check
     tb_oc_boolean_t* boolean = (tb_oc_boolean_t*)object;
@@ -109,19 +109,19 @@ static tb_oc_boolean_t const g_boolean_false =
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_oc_object_ref_t tb_oc_boolean_init(tb_bool_t value)
+tb_object_ref_t tb_oc_boolean_init(tb_bool_t value)
 {
     return value? tb_oc_boolean_true() : tb_oc_boolean_false();
 }
-tb_oc_object_ref_t tb_oc_boolean_true()
+tb_object_ref_t tb_oc_boolean_true()
 {
-    return (tb_oc_object_ref_t)&g_boolean_true;
+    return (tb_object_ref_t)&g_boolean_true;
 }
-tb_oc_object_ref_t tb_oc_boolean_false()
+tb_object_ref_t tb_oc_boolean_false()
 {
-    return (tb_oc_object_ref_t)&g_boolean_false;
+    return (tb_object_ref_t)&g_boolean_false;
 }
-tb_bool_t tb_oc_boolean_bool(tb_oc_object_ref_t object)
+tb_bool_t tb_oc_boolean_bool(tb_object_ref_t object)
 {
     tb_oc_boolean_t* boolean = tb_oc_boolean_cast(object);
     tb_assert_and_check_return_val(boolean, tb_false);

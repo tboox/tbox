@@ -57,7 +57,7 @@ static __tb_inline__ tb_bool_t tb_oc_writer_bin_type_size(tb_stream_ref_t stream
     tb_assert_and_check_return_val(stream && type <= 0xff, tb_false);
 
     // byte for size < 64bits
-    tb_size_t sizeb = tb_oc_object_need_bytes(size);
+    tb_size_t sizeb = tb_object_need_bytes(size);
     tb_assert_and_check_return_val(sizeb <= 8, tb_false);
 
     // flag for size

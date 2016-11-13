@@ -38,7 +38,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_oc_object_init_env()
+tb_bool_t tb_object_init_env()
 {
     // register reader
     if (!tb_oc_reader_set(TB_OBJECT_FORMAT_BIN, tb_oc_bin_reader())) return tb_false;
@@ -61,7 +61,7 @@ tb_bool_t tb_oc_object_init_env()
     // ok
     return tb_true;
 }
-tb_void_t tb_oc_object_exit_env()
+tb_void_t tb_object_exit_env()
 {
     // remove reader
     tb_oc_reader_remove(TB_OBJECT_FORMAT_BIN);

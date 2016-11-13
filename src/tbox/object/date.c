@@ -25,7 +25,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME        "object_date"
+#define TB_TRACE_MODULE_NAME        "oc_date"
 #define TB_TRACE_MODULE_DEBUG       (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@
 typedef struct __tb_oc_date_t
 {
     // the object base
-    tb_oc_object_t      base;
+    tb_object_t         base;
 
     // the date time
     tb_time_t           time;
@@ -52,7 +52,7 @@ typedef struct __tb_oc_date_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_oc_date_t* tb_oc_date_cast(tb_oc_object_ref_t object)
+static __tb_inline__ tb_oc_date_t* tb_oc_date_cast(tb_object_ref_t object)
 {
     // check
     tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_DATE, tb_null);
@@ -60,15 +60,15 @@ static __tb_inline__ tb_oc_date_t* tb_oc_date_cast(tb_oc_object_ref_t object)
     // cast
     return (tb_oc_date_t*)object;
 }
-static tb_oc_object_ref_t tb_oc_date_copy(tb_oc_object_ref_t object)
+static tb_object_ref_t tb_oc_date_copy(tb_object_ref_t object)
 {
     return tb_oc_date_init_from_time(tb_oc_date_time(object));
 }
-static tb_void_t tb_oc_date_exit(tb_oc_object_ref_t object)
+static tb_void_t tb_oc_date_exit(tb_object_ref_t object)
 {
     if (object) tb_free(object);
 }
-static tb_void_t tb_oc_date_clear(tb_oc_object_ref_t object)
+static tb_void_t tb_oc_date_clear(tb_object_ref_t object)
 {
     tb_oc_date_t* date = tb_oc_date_cast(object);
     if (date) date->time = 0;
@@ -85,7 +85,7 @@ static tb_oc_date_t* tb_oc_date_init_base()
         tb_assert_and_check_break(date);
 
         // init date
-        if (!tb_oc_object_init((tb_oc_object_ref_t)date, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE)) break;
+        if (!tb_object_init((tb_object_ref_t)date, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE)) break;
 
         // init base
         date->base.copy     = tb_oc_date_copy;
@@ -101,7 +101,7 @@ static tb_oc_date_t* tb_oc_date_init_base()
     if (!ok)
     {
         // exit it
-        if (date) tb_oc_object_exit((tb_oc_object_ref_t)date);
+        if (date) tb_object_exit((tb_object_ref_t)date);
         date = tb_null;
     }
 
@@ -111,7 +111,7 @@ static tb_oc_date_t* tb_oc_date_init_base()
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_oc_object_ref_t tb_oc_date_init_from_now()
+tb_object_ref_t tb_oc_date_init_from_now()
 {
     // make
     tb_oc_date_t* date = tb_oc_date_init_base();
@@ -121,9 +121,9 @@ tb_oc_object_ref_t tb_oc_date_init_from_now()
     date->time = tb_time();
 
     // ok
-    return (tb_oc_object_ref_t)date;
+    return (tb_object_ref_t)date;
 }
-tb_oc_object_ref_t tb_oc_date_init_from_time(tb_time_t time)
+tb_object_ref_t tb_oc_date_init_from_time(tb_time_t time)
 {
     // make
     tb_oc_date_t* date = tb_oc_date_init_base();
@@ -133,9 +133,9 @@ tb_oc_object_ref_t tb_oc_date_init_from_time(tb_time_t time)
     if (time > 0) date->time = time;
 
     // ok
-    return (tb_oc_object_ref_t)date;
+    return (tb_object_ref_t)date;
 }
-tb_time_t tb_oc_date_time(tb_oc_object_ref_t object)
+tb_time_t tb_oc_date_time(tb_object_ref_t object)
 {
     // check
     tb_oc_date_t* date = tb_oc_date_cast(object);
@@ -144,7 +144,7 @@ tb_time_t tb_oc_date_time(tb_oc_object_ref_t object)
     // time
     return date->time;
 }
-tb_bool_t tb_oc_date_time_set(tb_oc_object_ref_t object, tb_time_t time)
+tb_bool_t tb_oc_date_time_set(tb_object_ref_t object, tb_time_t time)
 {
     // check
     tb_oc_date_t* date = tb_oc_date_cast(object);
@@ -156,7 +156,7 @@ tb_bool_t tb_oc_date_time_set(tb_oc_object_ref_t object, tb_time_t time)
     // ok
     return tb_true;
 }
-tb_bool_t tb_oc_date_time_set_now(tb_oc_object_ref_t object)
+tb_bool_t tb_oc_date_time_set_now(tb_object_ref_t object)
 {
     // check
     tb_oc_date_t* date = tb_oc_date_cast(object);

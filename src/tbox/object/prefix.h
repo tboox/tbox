@@ -35,7 +35,7 @@
  */
 
 /// the object type enum
-typedef enum __tb_oc_object_type_e
+typedef enum __tb_object_type_e
 {
     TB_OBJECT_TYPE_NONE         = 0
 ,   TB_OBJECT_TYPE_DATA         = 1
@@ -48,19 +48,19 @@ typedef enum __tb_oc_object_type_e
 ,   TB_OBJECT_TYPE_NULL         = 8
 ,   TB_OBJECT_TYPE_USER         = 9 //!< the user defined type, ...
 
-}tb_oc_object_type_e;
+}tb_object_type_e;
 
 /// the object flag enum
-typedef enum __tb_oc_object_flag_e
+typedef enum __tb_object_flag_e
 {
     TB_OBJECT_FLAG_NONE         = 0
 ,   TB_OBJECT_FLAG_READONLY     = 1
 ,   TB_OBJECT_FLAG_SINGLETON    = 2
 
-}tb_oc_object_flag_e;
+}tb_object_flag_e;
 
 /// the object format enum
-typedef enum __tb_oc_object_format_e
+typedef enum __tb_object_format_e
 {
     TB_OBJECT_FORMAT_NONE       = 0x0000    //!< none
 ,   TB_OBJECT_FORMAT_BIN        = 0x0001    //!< the tbox binary format
@@ -71,10 +71,10 @@ typedef enum __tb_oc_object_format_e
 ,   TB_OBJECT_FORMAT_MAXN       = 0x000f    //!< the format maxn
 ,   TB_OBJECT_FORMAT_DEFLATE    = 0x0100    //!< deflate?
 
-}tb_oc_object_format_e;
+}tb_object_format_e;
 
 /// the object type
-typedef struct __tb_oc_object_t
+typedef struct __tb_object_t
 {
     /// the object flag
     tb_uint8_t                  flag;
@@ -89,14 +89,14 @@ typedef struct __tb_oc_object_t
     tb_cpointer_t               priv;
 
     /// the copy func
-    struct __tb_oc_object_t*    (*copy)(struct __tb_oc_object_t* object);
+    struct __tb_object_t*    (*copy)(struct __tb_object_t* object);
 
     /// the clear func
-    tb_void_t                   (*clear)(struct __tb_oc_object_t* object);
+    tb_void_t                   (*clear)(struct __tb_object_t* object);
 
     /// the exit func
-    tb_void_t                   (*exit)(struct __tb_oc_object_t* object);
+    tb_void_t                   (*exit)(struct __tb_object_t* object);
 
-}tb_oc_object_t, *tb_oc_object_ref_t;
+}tb_object_t, *tb_object_ref_t;
 
 #endif

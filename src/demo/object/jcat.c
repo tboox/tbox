@@ -66,20 +66,20 @@ tb_int_t tb_demo_object_jcat_main(tb_int_t argc, tb_char_t** argv)
             if (tb_option_find(option, "file"))
             {
                 // load object
-                tb_oc_object_ref_t root = tb_oc_object_read_from_url(tb_option_item_cstr(option, "file"));
+                tb_object_ref_t root = tb_object_read_from_url(tb_option_item_cstr(option, "file"));
                 if (root)
                 {
                     // done filter
-                    tb_oc_object_ref_t object = root;
+                    tb_object_ref_t object = root;
                     if (tb_option_find(option, "filter")) 
-                        object = tb_oc_object_seek(root, tb_option_item_cstr(option, "filter"), tb_true);
+                        object = tb_object_seek(root, tb_option_item_cstr(option, "filter"), tb_true);
 
                     // dump object
                     if (object) 
                     {
                         // done
                         tb_char_t info[8192] = {0};
-                        tb_long_t size = tb_oc_object_writ_to_data(object, (tb_byte_t*)info, sizeof(info), TB_OBJECT_FORMAT_JSON | TB_OBJECT_FORMAT_DEFLATE);
+                        tb_long_t size = tb_object_writ_to_data(object, (tb_byte_t*)info, sizeof(info), TB_OBJECT_FORMAT_JSON | TB_OBJECT_FORMAT_DEFLATE);
                         if (size > 0)
                         {
                             // strip string: ""
@@ -96,7 +96,7 @@ tb_int_t tb_demo_object_jcat_main(tb_int_t argc, tb_char_t** argv)
                     }
 
                     // exit object
-                    tb_oc_object_exit(root);
+                    tb_object_exit(root);
                 }
             }
             else tb_option_help(option);

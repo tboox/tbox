@@ -78,7 +78,7 @@ tb_oc_reader_t* tb_oc_reader_get(tb_size_t format)
     // ok
     return g_reader[format];
 }
-tb_oc_object_ref_t tb_oc_reader_done(tb_stream_ref_t stream)
+tb_object_ref_t tb_oc_reader_done(tb_stream_ref_t stream)
 {
     // check
     tb_assert_and_check_return_val(stream, tb_null);

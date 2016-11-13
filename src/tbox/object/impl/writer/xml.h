@@ -50,7 +50,7 @@ typedef struct __tb_oc_xml_writer_t
 }tb_oc_xml_writer_t;
 
 /// the xml writer func type
-typedef tb_bool_t               (*tb_oc_xml_writer_func_t)(tb_oc_xml_writer_t* writer, tb_oc_object_ref_t object, tb_size_t level);
+typedef tb_bool_t               (*tb_oc_xml_writer_func_t)(tb_oc_xml_writer_t* writer, tb_object_ref_t object, tb_size_t level);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

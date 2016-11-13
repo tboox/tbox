@@ -47,7 +47,7 @@ typedef struct __tb_oc_bplist_reader_t
 }tb_oc_bplist_reader_t;
 
 /// the bplist reader func type
-typedef tb_oc_object_ref_t      (*tb_oc_bplist_reader_func_t)(tb_oc_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size);
+typedef tb_object_ref_t         (*tb_oc_bplist_reader_func_t)(tb_oc_bplist_reader_t* reader, tb_size_t type, tb_size_t size, tb_size_t item_size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
