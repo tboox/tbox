@@ -5,10 +5,12 @@
 ### New features
 
 * Support coroutine context switch for mips
+* Add `__tb_thread_local__` keyword macro
 
 ### Changes
 
 * Optimize io scheduler for coroutine, cache events for poller
+* Add c11 _Static_assert
 
 ## v1.6.0
 
@@ -107,10 +109,12 @@
 ### 新特性
 
 * 针对协程上下文切换，支持mips架构
+* 添加`__tb_thread_local__`关键字宏
 
 ### 改进
 
 * 为协程优化io调度器，缓存poller轮询等待，减少频繁重复调用epoll_ctl, kevent等系统接口
+* 添加对c11关键字_Static_assert的支持
 
 ## v1.6.0
 

@@ -113,7 +113,7 @@
 #endif
 
 // like
-#if defined(TB_COMPILER_IS_GCC) && __GNUC__ > 2
+#if defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BT(2, 0)
 #   define __tb_likely__(x)                     __builtin_expect((x), 1)
 #   define __tb_unlikely__(x)                   __builtin_expect((x), 0)
 #else
@@ -179,7 +179,7 @@
 #   define __tb_export__         
 #endif
 
-#if defined(TB_COMPILER_IS_GCC) && __GNUC__ >= 3
+#if defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BE(3, 0)
 #   define __tb_deprecated__                    __attribute__((deprecated))
 #elif defined(TB_COMPILER_IS_MSVC) && defined(_MSC_VER) && _MSC_VER >= 1300
 #   define __tb_deprecated__                    __declspec(deprecated)
@@ -213,6 +213,19 @@
 #   define __tb_no_sanitize_address__                       __attribute__((no_sanitize_address))
 #else
 #   define __tb_no_sanitize_address__
+#endif
+
+// thread local
+#if __tb_has_feature__(c_thread_local)
+#   define __tb_thread_local__                              _Thread_local
+#elif defined(TB_COMPILER_IS_GCC) 
+#   if TB_COMPILER_VERSION_BE(4, 9)
+#       define __tb_thread_local__                          _Thread_local
+#   else
+#       define __tb_thread_local__                          __thread
+#   endif
+#elif defined(TB_COMPILER_IS_MSVC) || defined(TB_COMPILER_IS_BORLAND)
+#   define __tb_thread_local__                              __declspec(thread)
 #endif
 
 /*! the type reference keyword for defining tb_xxxx_ref_t
