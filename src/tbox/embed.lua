@@ -1,0 +1,111 @@
+-- add target
+target("tbox")
+
+    -- make as a static library
+    set_kind("static")
+
+    -- add defines
+    add_defines("__tb_prefix__=\"tbox\"")
+
+    -- set the auto-generated config.h
+    set_config_h("$(buildir)/tbox/tbox.config.h")
+    set_config_h_prefix("TB_CONFIG")
+
+    -- set the object files directory
+    set_objectdir("$(buildir)/.objs")
+
+    -- add includes directory
+    add_includedirs("$(buildir)")
+    add_includedirs("$(buildir)/tbox")
+
+    -- add the header files for installing
+    add_headers("../(tbox/**.h)|**/impl/**.h")
+    add_headers("../(tbox/prefix/**/prefix.S)")
+    add_headers("../(tbox/math/impl/*.h)")
+    add_headers("../(tbox/utils/impl/*.h)")
+
+    -- add packages
+    add_packages("base")
+
+    -- add options
+    add_options("float", "wchar")
+
+    -- add the source files
+    add_files("tbox.c") 
+    add_files("libc/string/memset.c") 
+    add_files("libc/string/memmov.c") 
+    add_files("libc/string/memcpy.c") 
+    add_files("libc/string/strdup.c") 
+    add_files("libc/string/strlen.c") 
+    add_files("libc/string/strnlen.c") 
+    add_files("libc/string/strcmp.c") 
+    add_files("libc/string/strncmp.c") 
+    add_files("libc/string/stricmp.c") 
+    add_files("libc/string/strnicmp.c") 
+    add_files("libc/string/strlcpy.c") 
+    add_files("libc/string/strncpy.c") 
+    add_files("libc/stdio/vsnprintf.c") 
+    add_files("libc/stdio/snprintf.c") 
+    add_files("libc/stdio/printf.c") 
+    add_files("libc/stdio/printf_object.c") 
+    add_files("libc/impl/libc.c") 
+    add_files("libm/impl/libm.c") 
+    add_files("libm/ilog2i.c") 
+    add_files("libm/isinf.c") 
+    add_files("libm/isinff.c") 
+    add_files("libm/isnan.c") 
+    add_files("libm/isnanf.c") 
+    add_files("libm/isqrti.c") 
+    add_files("libm/sqrtf.c") 
+    add_files("math/impl/math.c") 
+    add_files("utils/used.c") 
+    add_files("utils/trace.c") 
+    add_files("utils/bits.c") 
+    add_files("utils/singleton.c") 
+    add_files("memory/allocator.c") 
+    add_files("memory/static_allocator.c") 
+    add_files("memory/fixed_pool.c") 
+    add_files("memory/impl/static_fixed_pool.c") 
+    add_files("memory/impl/static_large_allocator.c") 
+    add_files("memory/impl/memory.c") 
+    add_files("stream/static_stream.c") 
+    add_files("network/ipv6.c") 
+    add_files("network/ipv4.c") 
+    add_files("network/ipaddr.c") 
+    add_files("network/hwaddr.c") 
+    add_files("network/dns/*.c") 
+    add_files("network/impl/network.c") 
+    add_files("container/vector.c") 
+    add_files("container/iterator.c") 
+    add_files("container/iterator/*.c") 
+    add_files("container/hash_map.c") 
+    add_files("container/list.c") 
+    add_files("container/list_entry.c") 
+    add_files("container/single_list_entry.c") 
+    add_files("container/element/*.c") 
+    add_files("platform/file.c") 
+    add_files("platform/page.c") 
+    add_files("platform/path.c") 
+    add_files("platform/time.c") 
+    add_files("platform/print.c") 
+    add_files("platform/socket.c") 
+    add_files("platform/thread.c") 
+    add_files("platform/thread_local.c") 
+    add_files("platform/sched.c") 
+    add_files("platform/ifaddrs.c") 
+    add_files("platform/directory.c") 
+    add_files("platform/environment.c") 
+    add_files("platform/impl/platform.c") 
+    add_files("algorithm/sort.c") 
+    add_files("algorithm/walk.c") 
+    add_files("algorithm/remove_if.c") 
+    add_files("algorithm/find.c") 
+    add_files("algorithm/binary_find.c") 
+    add_files("string/string.c") 
+    add_files("hash/sdbm.c") 
+    add_files("hash/sha.c") 
+    add_files("hash/md5.c") 
+    add_files("hash/fnv32.c") 
+
+    -- check interfaces
+    check_interfaces()
