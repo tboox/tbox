@@ -32,4 +32,6 @@ target("demo")
     add_files("libc/stdlib.c") 
     add_files("utils/bits.c") 
     add_files("other/test.c") 
+    add_files("container/list_entry.c") 
+    add_files("container/single_list_entry.c") 
 

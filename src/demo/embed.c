@@ -40,6 +40,10 @@ static tb_demo_t g_demo[] =
 
     // other
 ,   TB_DEMO_MAIN_ITEM(other_test)
+
+    // container
+,   TB_DEMO_MAIN_ITEM(container_list_entry)
+,   TB_DEMO_MAIN_ITEM(container_single_list_entry)
 };
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -96,5 +100,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
     tb_exit();
 
     // ok?
-    return 0;
+    return ok;
 }

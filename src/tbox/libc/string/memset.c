@@ -83,7 +83,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 }
 #endif
 
-#ifndef TB_LIBC_STRING_IMPL_MEMSET_U16
+#if !defined(TB_LIBC_STRING_IMPL_MEMSET_U16) && !defined(TB_CONFIG_EMBED_ENABLE)
 static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
     // check
@@ -120,7 +120,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
 }
 #endif
 
-#ifndef TB_LIBC_STRING_IMPL_MEMSET_U24
+#if !defined(TB_LIBC_STRING_IMPL_MEMSET_U24) && !defined(TB_CONFIG_EMBED_ENABLE)
 static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
     // check
@@ -159,7 +159,7 @@ static tb_pointer_t tb_memset_u24_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
 }
 #endif
 
-#ifndef TB_LIBC_STRING_IMPL_MEMSET_U32
+#if !defined(TB_LIBC_STRING_IMPL_MEMSET_U32) && !defined(TB_CONFIG_EMBED_ENABLE)
 static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t n)
 {
     // check
@@ -196,7 +196,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
 }
 #endif
 
-#ifndef TB_LIBC_STRING_IMPL_MEMSET_U64
+#if !defined(TB_LIBC_STRING_IMPL_MEMSET_U64) && !defined(TB_CONFIG_EMBED_ENABLE)
 static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
 {
     // check
@@ -260,6 +260,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_byte_t c, tb_size_t n)
     // done
     return tb_memset_impl(s, c, n);
 }
+#ifndef TB_CONFIG_EMBED_ENABLE
 tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_uint16_t c, tb_size_t n)
 {
     // check
@@ -339,3 +340,4 @@ tb_pointer_t tb_memset_u64(tb_pointer_t s, tb_uint64_t c, tb_size_t n)
     // done
     return tb_memset_u64_impl(s, c, n);
 }
+#endif

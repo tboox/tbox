@@ -47,6 +47,13 @@ typedef enum __tb_singleton_type_e
     /// the static allocator
 ,   TB_SINGLETON_TYPE_STATIC_ALLOCATOR      = 1
 
+#ifdef TB_CONFIG_EMBED_ENABLE
+
+    /// the user defined type
+,   TB_SINGLETON_TYPE_USER                  = 2
+
+#else
+
     /// the lock profiler type
 ,   TB_SINGLETON_TYPE_LOCK_PROFILER         = 2
 
@@ -59,7 +66,7 @@ typedef enum __tb_singleton_type_e
     /// the ltimer type
 ,   TB_SINGLETON_TYPE_LTIMER                = 5
 
-    /// the aicp type
+    /// the aicp type, TODO deprecated
 ,   TB_SINGLETON_TYPE_AICP                  = 6
 
     /// the openssl library type
@@ -83,11 +90,15 @@ typedef enum __tb_singleton_type_e
     /// the user defined type
 ,   TB_SINGLETON_TYPE_USER                  = 13
 
+#endif
+
     /// the max count of the singleton type
-#ifdef __tb_small__
-,   TB_SINGLETON_TYPE_MAXN                  = 32
+#if defined(__tb_small__)
+,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 8
+#elif defined(TB_CONFIG_EMBED_ENABLE)
+,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 2
 #else
-,   TB_SINGLETON_TYPE_MAXN                  = 128
+,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 64
 #endif
 
 }tb_singleton_type_e;
