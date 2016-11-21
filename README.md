@@ -17,6 +17,13 @@ It supports the following platforms:
 - Android
 - iOS
 
+And it provides many compiling options using [xmake](http://www.xmake.io):
+
+* Release: Disable debug information, assertion, memory checking and enable optimization.
+* Debug: Enable debug information, assertion, memory checking and disable optimization.
+* Smallest: Disable all extensional modules and enable space optimization.
+* Embed: compiling micro library (~64K) for the embed system.
+
 If you want to know more, please refer to:
 
 * [Documents](https://github.com/waruqi/tbox/wiki/documents)
@@ -270,6 +277,13 @@ TBOX是一个用c语言实现的跨平台开发库。
 - Linux
 - Android
 - iOS
+
+通过[xmake](http://www.xmake.io/cn)支持各种编译模式：
+
+* Release: 正式版编译，禁用调试信息、断言，各种检测机制，启用编译器优化
+* Debug: 调试模式，默认启用详细调试信息、断言、内存越界检测、内存泄漏、锁竞争分析等检测机制
+* Smallest: 最小化编译，默认禁用所有扩展模块，启用编译器最小化优化
+* Embed: 针对嵌入式平台，仅仅编译tbox微内核，仅提供最基础的跨平台接口（内置轻量libc接口实现）
 
 如果你想了解更多，请参考：
 
