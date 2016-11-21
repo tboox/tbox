@@ -52,6 +52,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+#ifndef TB_CONFIG_EMBED_ENABLE
 tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
 {
     // check
@@ -122,6 +123,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
     // ok
     return q - path;
 }
+#endif
 tb_bool_t tb_path_is_absolute(tb_char_t const* path)
 {
     // check
@@ -149,6 +151,16 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
 
     // trace
     tb_trace_d("path: %s", path);
+
+#ifdef TB_CONFIG_EMBED_ENABLE
+
+    // the path is absolute?
+    if (tb_path_is_absolute(path)) return path;
+
+    // trace
+    tb_trace_e("absolute to %s to %s failed!", path, root);
+    return tb_null;
+#else
 
     // the path is absolute?
     if (tb_path_is_absolute(path))
@@ -260,7 +272,9 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     
     // ok?
     return data;
+#endif
 }
+#ifndef TB_CONFIG_EMBED_ENABLE
 tb_char_t const* tb_path_relative(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
     return tb_path_relative_to(tb_null, path, data, maxn);
@@ -410,3 +424,4 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     // ok?
     return data;
 }
+#endif

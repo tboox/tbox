@@ -49,6 +49,7 @@ typedef tb_pointer_t    tb_thread_retval_t;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+#ifndef TB_CONFIG_EMBED_ENABLE
 static tb_bool_t tb_thread_local_free(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
     // the local
@@ -66,6 +67,8 @@ static tb_bool_t tb_thread_local_free(tb_iterator_ref_t iterator, tb_pointer_t i
     // ok
     return tb_true;
 }
+#endif
+
 #ifdef TB_CONFIG_OS_WINDOWS
 static tb_thread_retval_t __tb_stdcall__ tb_thread_func(tb_pointer_t priv)
 #else
@@ -87,8 +90,10 @@ static tb_thread_retval_t tb_thread_func(tb_pointer_t priv)
         // call the thread function
         retval = (tb_thread_retval_t)(tb_size_t)func(args[1].ptr);
 
+#ifndef TB_CONFIG_EMBED_ENABLE
         // free all thread local data on the current thread
         tb_thread_local_walk(tb_thread_local_free, tb_null);
+#endif
 
     } while (0);
 

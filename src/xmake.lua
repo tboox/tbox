@@ -25,6 +25,7 @@ option("info")
     set_category("option")
     set_description("Enable or disable to get some info, .e.g version ..")
     add_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
+    add_defines_h_if_ok("$(prefix)_INFO_TRACE_MORE")
 
 -- option: exception
 option("exception")

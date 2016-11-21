@@ -281,6 +281,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
                 // trace
                 tb_trace_d("scope_id: %u", temp.scope_id);
             }
+#ifndef TB_CONFIG_EMBED_ENABLE
             // is interface name?
             else 
             {
@@ -300,6 +301,10 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
                 // clear the scope id 
                 else temp.scope_id = 0;
             }
+#else
+            // clear the scope id 
+            else temp.scope_id = 0;
+#endif
 
             // end    
             break;

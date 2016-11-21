@@ -28,7 +28,7 @@ target("demo")
     add_packages("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "mbedtls", "base")
 
     -- add the source files
-    add_files("*.c") 
+    add_files("demo.c") 
     add_files("libc/*.c") 
     add_files("libm/integer.c") 
     add_files("math/random.c") 

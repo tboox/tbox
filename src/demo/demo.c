@@ -252,40 +252,25 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
     if (!tb_init(tb_null, tb_null)) return 0;
 #endif
 
-    // init
+    // find the main func from the first argument
     tb_int_t            ok = 0;
     tb_char_t const*    name = tb_null;
-
-    // find the main func from the .demo file
-    if (!name)
+    if (argc > 1 && argv[1])
     {
-        // init file
-        tb_file_ref_t file = tb_file_init(".demo", TB_FILE_MODE_RO);
-        if (file)
+        tb_size_t i = 0;
+        tb_size_t n = tb_arrayn(g_demo);
+        for (i = 0; i < n; i++)
         {
-            // read line
-            tb_char_t line[8192] = {0};
-            if (tb_file_read(file, (tb_byte_t*)line, sizeof(line) - 1))
+            // find it?
+            if (g_demo[i].name && !tb_stricmp(g_demo[i].name, argv[1]))
             {
-                tb_size_t i = 0;
-                tb_size_t n = tb_arrayn(g_demo);
-                for (i = 0; i < n; i++)
-                {
-                    // find it?
-                    if (g_demo[i].name && !tb_strnicmp(g_demo[i].name, line, tb_strlen(g_demo[i].name)))
-                    {
-                        // save name
-                        name = g_demo[i].name;
+                // save name
+                name = g_demo[i].name;
 
-                        // done main
-                        ok = g_demo[i].main(argc, argv);
-                        break;
-                    }
-                }
+                // done main
+                ok = g_demo[i].main(argc - 1, argv + 1);
+                break;
             }
-
-            // exit file
-            tb_file_exit(file);
         }
     }
 

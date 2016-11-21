@@ -19,6 +19,10 @@ script:
   - xmake f -m debug
   - xmake -r
   - xmake c
+  - xmake f --embed=y 
+  - xmake -r
+  - xmake f --embed=y --smallest=y -m debug
+  - xmake
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake m package -p iphoneos;
       xmake m package -p iphoneos -f "-m debug";

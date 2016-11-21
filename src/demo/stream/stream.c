@@ -334,6 +334,62 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
 #else
 tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
 {
+    // done
+    tb_stream_ref_t istream = tb_null;
+    tb_stream_ref_t ostream = tb_null;
+    do
+    {
+        // init istream
+        istream = tb_stream_init_from_url(argv[1]);
+        tb_assert_and_check_break(istream);
+
+        // init ostream
+        ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+
+        // writ data
+        tb_byte_t data[TB_STREAM_BLOCK_MAXN];
+        tb_hize_t writ = 0;
+        tb_hize_t left = tb_stream_left(istream);
+        do
+        {
+            // read data
+            tb_long_t real = tb_stream_read(istream, data, TB_STREAM_BLOCK_MAXN);
+            if (real > 0)
+            {
+                // writ data
+                if (!tb_stream_bwrit(ostream, data, real)) break;
+
+                // save writ
+                writ += real;
+            }
+            else if (!real) 
+            {
+                // wait
+                tb_long_t wait = tb_stream_wait(istream, TB_STREAM_WAIT_READ, tb_stream_timeout(istream));
+                tb_assert_and_check_break(wait >= 0);
+
+                // timeout?
+                tb_check_break(wait);
+
+                // has writ?
+                tb_assert_and_check_break(wait & TB_STREAM_WAIT_READ);
+            }
+            else break;
+
+            // is end?
+            if (writ >= left) break;
+
+        } while(1);
+
+    } while (0);
+
+    // exit istream
+    if (istream) tb_stream_exit(istream);
+    istream = tb_null;
+
+    // exit ostream
+    if (ostream) tb_stream_exit(ostream);
+    ostream = tb_null;
     return 0;
 }
 #endif

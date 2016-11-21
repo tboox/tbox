@@ -155,6 +155,90 @@ tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size
     // writ it
     return write(tb_file2fd(file), data, size);
 }
+tb_bool_t tb_file_sync(tb_file_ref_t file)
+{
+    // check
+    tb_assert_and_check_return_val(file, tb_false);
+
+    // sync
+#ifdef TB_CONFIG_POSIX_HAVE_FDATASYNC
+    return !fdatasync(tb_file2fd(file))? tb_true : tb_false;
+#else
+    return !fsync(tb_file2fd(file))? tb_true : tb_false;
+#endif
+}
+tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
+{
+    // check
+    tb_assert_and_check_return_val(file, -1);
+
+    // seek
+    return lseek(tb_file2fd(file), offset, mode);
+}
+tb_hong_t tb_file_offset(tb_file_ref_t file)
+{
+    // check
+    tb_assert_and_check_return_val(file, -1);
+
+    // the offset
+    return tb_file_seek(file, (tb_hong_t)0, TB_FILE_SEEK_CUR);
+}
+tb_hize_t tb_file_size(tb_file_ref_t file)
+{
+    // check
+    tb_assert_and_check_return_val(file, 0);
+
+    // the file size
+    tb_hize_t size = 0;
+    struct stat st = {0};
+    if (!fstat(tb_file2fd(file), &st))
+        size = st.st_size;
+
+    // ok?
+    return size;
+}
+tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
+{
+    // check
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the full path
+    tb_char_t full[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // exists?
+    tb_check_return_val(!access(path, F_OK), tb_false);
+
+    // get info
+    if (info)
+    {
+        // init info
+        tb_memset(info, 0, sizeof(tb_file_info_t));
+
+        // get stat
+        struct stat st = {0};
+        if (!stat(path, &st))
+        {
+            // file type
+            if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIRECTORY;
+            else info->type = TB_FILE_TYPE_FILE;
+
+            // file size
+            info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
+
+            // the last access time
+            info->atime = (tb_time_t)st.st_atime;
+
+            // the last modify time
+            info->mtime = (tb_time_t)st.st_mtime;
+        }
+    }
+
+    // ok
+    return tb_true;
+}
+#ifndef TB_CONFIG_EMBED_ENABLE
 tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {
     // check
@@ -313,89 +397,6 @@ tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
     return real;
 #endif
 }
-tb_bool_t tb_file_sync(tb_file_ref_t file)
-{
-    // check
-    tb_assert_and_check_return_val(file, tb_false);
-
-    // sync
-#ifdef TB_CONFIG_POSIX_HAVE_FDATASYNC
-    return !fdatasync(tb_file2fd(file))? tb_true : tb_false;
-#else
-    return !fsync(tb_file2fd(file))? tb_true : tb_false;
-#endif
-}
-tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
-{
-    // check
-    tb_assert_and_check_return_val(file, -1);
-
-    // seek
-    return lseek(tb_file2fd(file), offset, mode);
-}
-tb_hong_t tb_file_offset(tb_file_ref_t file)
-{
-    // check
-    tb_assert_and_check_return_val(file, -1);
-
-    // the offset
-    return tb_file_seek(file, (tb_hong_t)0, TB_FILE_SEEK_CUR);
-}
-tb_hize_t tb_file_size(tb_file_ref_t file)
-{
-    // check
-    tb_assert_and_check_return_val(file, 0);
-
-    // the file size
-    tb_hize_t size = 0;
-    struct stat st = {0};
-    if (!fstat(tb_file2fd(file), &st))
-        size = st.st_size;
-
-    // ok?
-    return size;
-}
-tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
-{
-    // check
-    tb_assert_and_check_return_val(path, tb_false);
-
-    // the full path
-    tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_absolute(path, full, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(path, tb_false);
-
-    // exists?
-    tb_check_return_val(!access(path, F_OK), tb_false);
-
-    // get info
-    if (info)
-    {
-        // init info
-        tb_memset(info, 0, sizeof(tb_file_info_t));
-
-        // get stat
-        struct stat st = {0};
-        if (!stat(path, &st))
-        {
-            // file type
-            if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIRECTORY;
-            else info->type = TB_FILE_TYPE_FILE;
-
-            // file size
-            info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
-
-            // the last access time
-            info->atime = (tb_time_t)st.st_atime;
-
-            // the last modify time
-            info->mtime = (tb_time_t)st.st_mtime;
-        }
-    }
-
-    // ok
-    return tb_true;
-}
 tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 {
     // check
@@ -494,3 +495,4 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     // symlink
     return !symlink(path, dest)? tb_true : tb_false;
 }
+#endif

@@ -130,6 +130,7 @@ static tb_int_t tb_skip_atoi(tb_char_t const** s)
 }
 static tb_char_t* tb_printf_object(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_cpointer_t object)
 {
+#ifndef TB_CONFIG_EMBED_ENABLE
     // find the object func
     tb_printf_object_func_t func = tb_printf_object_find(e.object);
     if (func)
@@ -157,7 +158,12 @@ static tb_char_t* tb_printf_object(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
         if (pb < pe) *pb++ = 'l';
         if (pb < pe) *pb++ = 'l';
     }
+#else
+    if (pb < pe) *pb++ = '%';
+    if (pb < pe) *pb++ = '{';
+#endif
 
+    // ok?
     return pb;
 }
 static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_char_t const* s)
@@ -926,6 +932,9 @@ get_qualifier:
 #endif
     case '{':
         {
+#ifdef TB_CONFIG_EMBED_ENABLE 
+            e->type = TB_PRINTF_TYPE_OBJECT;
+#else
             // get the object name
             ++p;
             tb_size_t indx = 0;
@@ -935,6 +944,7 @@ get_qualifier:
 
             // save the object type
             e->type = *p == '}'? TB_PRINTF_TYPE_OBJECT : TB_PRINTF_TYPE_INVALID;
+#endif
         }
         break;
     default:

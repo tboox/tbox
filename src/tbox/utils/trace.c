@@ -34,10 +34,14 @@
  */
 
 // the trace line maxn
-#ifdef __tb_small__
-#   define TB_TRACE_LINE_MAXN       (8192)
+#ifdef TB_CONFIG_EMBED_ENABLE
+#       define TB_TRACE_LINE_MAXN       (256)
 #else
-#   define TB_TRACE_LINE_MAXN       (8192 << 1)
+#   ifdef __tb_small__
+#       define TB_TRACE_LINE_MAXN       (8192)
+#   else
+#       define TB_TRACE_LINE_MAXN       (8192 << 1)
+#   endif
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -47,11 +51,13 @@
 // the mode
 static tb_size_t        g_mode = TB_TRACE_MODE_PRINT;
 
+#ifndef TB_CONFIG_EMBED_ENABLE
 // the file
 static tb_file_ref_t    g_file = tb_null;
 
 // the file is referenced?
 static tb_bool_t        g_bref = tb_false;
+#endif
 
 // the line
 static tb_char_t        g_line[TB_TRACE_LINE_MAXN];
@@ -79,9 +85,11 @@ tb_void_t tb_trace_exit()
     g_mode = TB_TRACE_MODE_PRINT;
 
     // clear file
+#ifndef TB_CONFIG_EMBED_ENABLE
     if (g_file && !g_bref) tb_file_exit(g_file);
     g_file = tb_null;
     g_bref = tb_false;
+#endif
 
     // leave
     tb_spinlock_leave(&g_lock);
@@ -117,6 +125,7 @@ tb_bool_t tb_trace_mode_set(tb_size_t mode)
     // ok
     return tb_true;
 }
+#ifndef TB_CONFIG_EMBED_ENABLE
 tb_handle_t tb_trace_file()
 {
     // enter
@@ -176,6 +185,7 @@ tb_bool_t tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend)
     // ok?
     return ok;
 }
+#endif
 tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, tb_va_list_t args)
 {
     // check
@@ -195,6 +205,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
         tb_char_t*      e = g_line + sizeof(g_line);
 
         // print prefix to file
+#ifndef TB_CONFIG_EMBED_ENABLE
         if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
         {
             // print time to file
@@ -205,6 +216,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
             // print self to file
             if (p < e) p += tb_snprintf(p, e - p, "[%lx]: ", tb_thread_self());
         }
+#endif
 
         // append prefix
         tb_char_t*      b = p;
@@ -224,6 +236,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
         if (g_mode & TB_TRACE_MODE_PRINT) tb_print(b);
 
         // print it to file
+#ifndef TB_CONFIG_EMBED_ENABLE
         if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
         {
             // done
@@ -239,6 +252,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
                 writ += real;
             }
         }
+#endif
 
     } while (0);
 
@@ -291,6 +305,7 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
         if (g_mode & TB_TRACE_MODE_PRINT) tb_print(g_line);
 
         // print it to file
+#ifndef TB_CONFIG_EMBED_ENABLE
         if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
         {
             // done
@@ -306,6 +321,7 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
                 writ += real;
             }
         }
+#endif
 
         // exit
         tb_va_end(l);
@@ -324,7 +340,9 @@ tb_void_t tb_trace_sync()
     if (g_mode & TB_TRACE_MODE_PRINT) tb_print_sync();
 
     // sync it to file
+#ifndef TB_CONFIG_EMBED_ENABLE
     if ((g_mode & TB_TRACE_MODE_FILE) && g_file) tb_file_sync(g_file);
+#endif
 
     // leave
     tb_spinlock_leave(&g_lock);
