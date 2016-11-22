@@ -26,177 +26,110 @@
  * includes
  */
 #include "dump.h"
-#include "../libc/libc.h"
 #include "../stream/stream.h"
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_void_t tb_dump_data(tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return(data && size);
 
-    // init stream
-    tb_stream_ref_t stream = tb_stream_init_from_data(data, size);
-    if (stream)
-    {
-        // open stream
-        if (tb_stream_open(stream))
-        {
-            // dump stream
-            tb_dump_data_from_stream(stream);
-        }
-    
-        // exit stream
-        tb_stream_exit(stream);
-    }
-}
-tb_void_t tb_dump_data_from_url(tb_char_t const* url)
-{
-    // check
-    tb_assert_and_check_return(url);
-
-    // init stream
-    tb_stream_ref_t stream = tb_stream_init_from_url(url);
-    if (stream)
-    {
-        // open stream
-        if (tb_stream_open(stream))
-        {
-            // dump stream
-            tb_dump_data_from_stream(stream);
-        }
-    
-        // exit stream
-        tb_stream_exit(stream);
-    }
-}
-tb_void_t tb_dump_data_from_stream(tb_stream_ref_t stream)
-{
-    // check
-    tb_assert_and_check_return(stream);
-
-    // init 
-    tb_size_t offset = 0;
-
     // dump head
     tb_trace_i("");
 
-    // done
-    tb_char_t info[8192];
-    while (!tb_stream_beof(stream))
+    // walk
+    tb_size_t           i = 0;
+    tb_size_t           n = 147;
+    tb_byte_t const*    p = data;
+    tb_byte_t const*    e = data + size;
+    tb_char_t           info[8192];
+    while (p < e)
     {
-        // read line
-        tb_size_t i = 0;
-        tb_size_t n = 147;
-        tb_long_t read = 0;
-        tb_byte_t line[0x20];
-        while (read < 0x20)
-        {
-            // read data
-            tb_long_t real = tb_stream_read(stream, line + read, 0x20 - read);
-            // has data?
-            if (real > 0) read += real;
-            // no data?
-            else if (!real)
-            {
-                // wait
-                tb_long_t e = tb_stream_wait(stream, TB_SOCKET_EVENT_RECV, tb_stream_timeout(stream));
-                tb_assert_and_check_break(e >= 0);
-
-                // timeout?
-                tb_check_break(e);
-
-                // has read?
-                tb_assert_and_check_break(e & TB_SOCKET_EVENT_RECV);
-            }
-            else break;
-        }
-
         // full line?
-        tb_char_t* p = info;
-        tb_char_t* e = info + sizeof(info);
-        if (read == 0x20)
+        tb_char_t* q = info;
+        tb_char_t* d = info + sizeof(info);
+        if (p + 0x20 <= e)
         {
             // dump offset
-            if (p < e) p += tb_snprintf(p, e - p, "%08X ", offset);
+            if (q < d) q += tb_snprintf(q, d - q, "%08X ", p - data);
 
             // dump data
             for (i = 0; i < 0x20; i++)
             {
-                if (!(i & 3) && p < e) p += tb_snprintf(p, e - p, " ");
-                if (p < e) p += tb_snprintf(p, e - p, " %02X", line[i]);
+                if (!(i & 3) && q < d) q += tb_snprintf(q, d - q, " ");
+                if (q < d) q += tb_snprintf(q, d - q, " %02X", p[i]);
             }
 
             // dump spaces
-            if (p < e) p += tb_snprintf(p, e - p, "  ");
+            if (q < d) q += tb_snprintf(q, d - q, "  ");
 
             // dump characters
             for (i = 0; i < 0x20; i++)
             {
-                if (p < e) p += tb_snprintf(p, e - p, "%c", tb_isgraph(line[i])? line[i] : '.');
+                if (q < d) q += tb_snprintf(q, d - q, "%c", tb_isgraph(p[i])? p[i] : '.');
             }
 
             // dump it
-            if (p < e)
+            if (q < d)
             {
                 // end
-                *p = '\0';
+                *q = '\0';
 
                 // trace
                 tb_trace_i("%s", info);
             }
 
-            // update offset
-            offset += 0x20;
+            // update p
+            p += 0x20;
         }
         // has left?
-        else if (read)
+        else if (p < e)
         {
             // init padding
             tb_size_t padding = n - 0x20;
 
             // dump offset
-            if (p < e) p += tb_snprintf(p, e - p, "%08X ", offset); 
+            if (q < d) q += tb_snprintf(q, d - q, "%08X ", p - data); 
             if (padding >= 9) padding -= 9;
 
             // dump data
-            for (i = 0; i < read; i++)
+            tb_size_t left = e - p;
+            for (i = 0; i < left; i++)
             {
                 if (!(i & 3)) 
                 {
-                    if (p < e) p += tb_snprintf(p, e - p, " ");
+                    if (q < d) q += tb_snprintf(q, d - q, " ");
                     if (padding) padding--;
                 }
 
-                if (p < e) p += tb_snprintf(p, e - p, " %02X", line[i]);
+                if (q < d) q += tb_snprintf(q, d - q, " %02X", p[i]);
                 if (padding >= 3) padding -= 3;
             }
 
             // dump spaces
-            while (padding--) if (p < e) p += tb_snprintf(p, e - p, " ");
+            while (padding--) if (q < d) q += tb_snprintf(q, d - q, " ");
                 
             // dump characters
-            for (i = 0; i < read; i++)
+            for (i = 0; i < left; i++)
             {
-                if (p < e) p += tb_snprintf(p, e - p, "%c", tb_isgraph(line[i])? line[i] : '.');
+                if (q < d) q += tb_snprintf(q, d - q, "%c", tb_isgraph(p[i])? p[i] : '.');
             }
 
             // dump it
-            if (p < e)
+            if (q < d)
             {
                 // end
-                *p = '\0';
+                *q = '\0';
 
                 // trace
                 tb_trace_i("%s", info);
             }
 
-            // update offset
-            offset += read;
+            // update p
+            p += left;
         }
         // end
         else break;

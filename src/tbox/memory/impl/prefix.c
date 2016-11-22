@@ -30,109 +30,6 @@
  * implementation
  */
 #ifdef __tb_debug__
-static tb_void_t tb_pool_data_dump_data(tb_byte_t const* data, tb_size_t size)
-{
-    // check
-    tb_assert_and_check_return(data && size);
-
-    // dump head
-    tb_trace_i("");
-
-    // walk
-    tb_size_t           i = 0;
-    tb_size_t           n = 147;
-    tb_byte_t const*    p = data;
-    tb_byte_t const*    e = data + size;
-    tb_char_t           info[8192];
-    while (p < e)
-    {
-        // full line?
-        tb_char_t* q = info;
-        tb_char_t* d = info + sizeof(info);
-        if (p + 0x20 <= e)
-        {
-            // dump offset
-            if (q < d) q += tb_snprintf(q, d - q, "%08X ", p - data);
-
-            // dump data
-            for (i = 0; i < 0x20; i++)
-            {
-                if (!(i & 3) && q < d) q += tb_snprintf(q, d - q, " ");
-                if (q < d) q += tb_snprintf(q, d - q, " %02X", p[i]);
-            }
-
-            // dump spaces
-            if (q < d) q += tb_snprintf(q, d - q, "  ");
-
-            // dump characters
-            for (i = 0; i < 0x20; i++)
-            {
-                if (q < d) q += tb_snprintf(q, d - q, "%c", tb_isgraph(p[i])? p[i] : '.');
-            }
-
-            // dump it
-            if (q < d)
-            {
-                // end
-                *q = '\0';
-
-                // trace
-                tb_trace_i("%s", info);
-            }
-
-            // update p
-            p += 0x20;
-        }
-        // has left?
-        else if (p < e)
-        {
-            // init padding
-            tb_size_t padding = n - 0x20;
-
-            // dump offset
-            if (q < d) q += tb_snprintf(q, d - q, "%08X ", p - data); 
-            if (padding >= 9) padding -= 9;
-
-            // dump data
-            tb_size_t left = e - p;
-            for (i = 0; i < left; i++)
-            {
-                if (!(i & 3)) 
-                {
-                    if (q < d) q += tb_snprintf(q, d - q, " ");
-                    if (padding) padding--;
-                }
-
-                if (q < d) q += tb_snprintf(q, d - q, " %02X", p[i]);
-                if (padding >= 3) padding -= 3;
-            }
-
-            // dump spaces
-            while (padding--) if (q < d) q += tb_snprintf(q, d - q, " ");
-                
-            // dump characters
-            for (i = 0; i < left; i++)
-            {
-                if (q < d) q += tb_snprintf(q, d - q, "%c", tb_isgraph(p[i])? p[i] : '.');
-            }
-
-            // dump it
-            if (q < d)
-            {
-                // end
-                *q = '\0';
-
-                // trace
-                tb_trace_i("%s", info);
-            }
-
-            // update p
-            p += left;
-        }
-        // end
-        else break;
-    }
-}
 __tb_no_sanitize_address__ tb_size_t tb_pool_data_size(tb_cpointer_t data)
 {
     // check
@@ -205,7 +102,7 @@ tb_void_t tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t con
 
                 // dump it
                 tb_trace_i("%sdata: first %lu-bytes:", prefix? prefix : "", dump_size);
-                tb_pool_data_dump_data((tb_byte_t const*)data, dump_size);
+                tb_dump_data((tb_byte_t const*)data, dump_size);
 
                 // dump the last 256-bytes data 
                 if (data_size > dump_size)
@@ -218,7 +115,7 @@ tb_void_t tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t con
 
                     // dump it
                     tb_trace_i("%sdata: last %lu-bytes:", prefix? prefix : "", dump_size);
-                    tb_pool_data_dump_data(data_last, dump_size);
+                    tb_dump_data(data_last, dump_size);
                 }
             }
         }
@@ -242,11 +139,11 @@ tb_void_t tb_pool_data_dump(tb_cpointer_t data, tb_bool_t verbose, tb_char_t con
         {
             // dump the data head
             tb_trace_i("%sdata: invalid head:", prefix? prefix : "");
-            tb_pool_data_dump_data((tb_byte_t const*)data_head, sizeof(tb_pool_data_head_t));
+            tb_dump_data((tb_byte_t const*)data_head, sizeof(tb_pool_data_head_t));
 
             // dump the first 256-bytes data 
             tb_trace_i("%sdata: first %lu-bytes:", prefix? prefix : "", data_limit);
-            tb_pool_data_dump_data((tb_byte_t const*)data, data_limit);
+            tb_dump_data((tb_byte_t const*)data, data_limit);
         }
 
     } while (0);

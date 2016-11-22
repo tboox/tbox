@@ -45,18 +45,6 @@ __tb_extern_c_enter__
  */
 tb_void_t           tb_dump_data(tb_byte_t const* data, tb_size_t size);
 
-/*! dump data from url
- *
- * @param url       the url
- */
-tb_void_t           tb_dump_data_from_url(tb_char_t const* url);
-
-/*! dump data from stream
- *
- * @param stream    the stream
- */
-tb_void_t           tb_dump_data_from_stream(tb_stream_ref_t stream);
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

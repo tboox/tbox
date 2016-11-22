@@ -21,18 +21,6 @@ typedef struct __tb_demo_entry_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * comparer
  */
-static tb_long_t tb_demo_entry_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
-{
-    // check
-    tb_assert(litem && ritem);
-
-    // the data
-    tb_size_t ldata = ((tb_demo_entry_t*)litem)->data;
-    tb_size_t rdata = ((tb_demo_entry_t*)ritem)->data;
-
-    // comp
-    return (ldata > rdata? -1 : (ldata < rdata? 1 : 0));
-}
 static tb_void_t tb_demo_entry_copy(tb_pointer_t litem, tb_pointer_t ritem)
 {
     // check
@@ -116,19 +104,6 @@ tb_int_t tb_demo_container_single_list_entry_main(tb_int_t argc, tb_char_t** arg
     tb_for_all_if(tb_demo_entry_t*, item2, tb_single_list_entry_itor(&list), item2)
     {
         tb_trace_i("%lu", item2->data);
-    }
-
-    // trace
-    tb_trace_i("");
-
-    // sort entries
-    tb_sort_all(tb_single_list_entry_itor(&list), tb_demo_entry_comp);
-
-    // walk it
-    tb_trace_i("sort: %lu", tb_single_list_entry_size(&list));
-    tb_for_all_if(tb_demo_entry_t*, item4, tb_single_list_entry_itor(&list), item4)
-    {
-        tb_trace_i("%lu", item4->data);
     }
 
     // trace

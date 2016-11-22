@@ -50,7 +50,7 @@ option("embed")
     set_category("option")
     set_description("Compile for the embed system.")
     add_defines_h_if_ok("$(prefix)_EMBED_ENABLE")
-    add_rbindings("info", "deprecated")
+    add_rbindings("info", "deprecated", "float")
     add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
 

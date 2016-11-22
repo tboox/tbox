@@ -93,10 +93,10 @@ typedef enum __tb_singleton_type_e
 #endif
 
     /// the max count of the singleton type
-#if defined(__tb_small__)
-,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 8
-#elif defined(TB_CONFIG_EMBED_ENABLE)
+#if defined(TB_CONFIG_EMBED_ENABLE)
 ,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 2
+#elif defined(__tb_small__)
+,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 8
 #else
 ,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 64
 #endif

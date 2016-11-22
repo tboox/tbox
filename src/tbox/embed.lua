@@ -28,13 +28,14 @@ target("tbox")
     add_packages("base")
 
     -- add options
-    add_options("float", "wchar", "embed")
+    add_options("info", "float", "wchar", "embed", "deprecated")
 
     -- add the source files
     add_files("tbox.c") 
     add_files("libc/string/memset.c") 
     add_files("libc/string/memmov.c") 
     add_files("libc/string/memcpy.c") 
+    add_files("libc/string/strstr.c") 
     add_files("libc/string/strdup.c") 
     add_files("libc/string/strlen.c") 
     add_files("libc/string/strnlen.c") 
@@ -49,10 +50,6 @@ target("tbox")
     add_files("libc/stdio/printf.c") 
     add_files("libc/stdlib/stdlib.c") 
     add_files("libc/impl/libc.c") 
-    add_files("libm/isinf.c") 
-    add_files("libm/isinff.c") 
-    add_files("libm/isnan.c") 
-    add_files("libm/isnanf.c") 
     add_files("libm/impl/libm.c") 
     add_files("math/impl/math.c") 
     add_files("utils/used.c") 
@@ -78,17 +75,23 @@ target("tbox")
     add_files("platform/thread.c") 
     add_files("platform/socket.c") 
     add_files("platform/impl/platform.c") 
-    add_files("algorithm/sort.c") 
-    add_files("algorithm/find.c") 
-    add_files("algorithm/quick_sort.c") 
     add_files("container/iterator.c") 
     add_files("container/list_entry.c") 
     add_files("container/single_list_entry.c") 
 
     -- add the source files for debug mode
     if is_mode("debug") then
+        add_files("utils/dump.c") 
         add_files("memory/impl/prefix.c") 
         add_files("platform/backtrace.c") 
+    end
+
+    -- add the source files for float 
+    if is_option("float") then
+        add_files("libm/isinf.c") 
+        add_files("libm/isinff.c") 
+        add_files("libm/isnan.c") 
+        add_files("libm/isnanf.c") 
     end
 
     -- check interfaces
