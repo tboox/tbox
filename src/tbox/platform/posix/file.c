@@ -238,7 +238,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
     // ok
     return tb_true;
 }
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
 tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {
     // check

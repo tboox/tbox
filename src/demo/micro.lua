@@ -28,7 +28,7 @@ target("demo")
     add_packages("base")
 
     -- add the source files
-    add_files("embed.c") 
+    add_files("micro.c") 
     add_files("libc/stdlib.c") 
     add_files("utils/bits.c") 
     add_files("other/test.c") 

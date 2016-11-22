@@ -50,12 +50,12 @@ tb_bool_t tb_platform_init_env(tb_handle_t priv)
     if (!tb_socket_init_env()) return tb_false;
 
     // init dns envirnoment
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     if (!tb_dns_init_env()) return tb_false;
 #endif
 
     // init thread local envirnoment
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     if (!tb_thread_local_init_env()) return tb_false;
 #endif
 
@@ -85,12 +85,12 @@ tb_void_t tb_platform_exit_env()
 #endif
 
     // exit thread local envirnoment
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     tb_thread_local_exit_env();
 #endif
 
     // exit dns envirnoment
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     tb_dns_exit_env();
 #endif
 

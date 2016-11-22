@@ -130,7 +130,7 @@ static tb_int_t tb_skip_atoi(tb_char_t const** s)
 }
 static tb_char_t* tb_printf_object(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_cpointer_t object)
 {
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     // find the object func
     tb_printf_object_func_t func = tb_printf_object_find(e.object);
     if (func)
@@ -932,7 +932,7 @@ get_qualifier:
 #endif
     case '{':
         {
-#ifdef TB_CONFIG_EMBED_ENABLE 
+#ifdef TB_CONFIG_MICRO_ENABLE 
             e->type = TB_PRINTF_TYPE_OBJECT;
 #else
             // get the object name

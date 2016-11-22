@@ -40,7 +40,7 @@ __tb_extern_c_enter__
 
 // enable lock profiler
 #undef TB_LOCK_PROFILER_ENABLE
-#if defined(__tb_debug__) && !defined(TB_CONFIG_EMBED_ENABLE)
+#if defined(__tb_debug__) && !defined(TB_CONFIG_MICRO_ENABLE)
 #   define TB_LOCK_PROFILER_ENABLE
 #endif
 

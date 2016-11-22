@@ -135,7 +135,7 @@ typedef __tb_pool_data_aligned__ struct __tb_static_large_allocator_t
     tb_static_large_data_head_t*    data_tail;
 
     // the data pred
-#ifdef TB_CONFIG_EMBED_ENABLE
+#ifdef TB_CONFIG_MICRO_ENABLE
     tb_static_large_data_pred_t     data_pred[1];
 #else
     tb_static_large_data_pred_t     data_pred[10];
@@ -220,7 +220,7 @@ static tb_void_t tb_static_large_allocator_check_next(tb_static_large_allocator_
  */
 static __tb_inline__ tb_size_t tb_static_large_allocator_pred_index(tb_static_large_allocator_ref_t allocator, tb_size_t space)
 {
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     // the size
     tb_size_t size = sizeof(tb_static_large_data_head_t) + space;
     tb_assert(!(size & (allocator->page_size - 1)));

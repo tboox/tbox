@@ -32,7 +32,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
 static tb_long_t tb_network_printf_format_ipv4(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
@@ -96,7 +96,7 @@ static tb_long_t tb_network_printf_format_hwaddr(tb_cpointer_t object, tb_char_t
  */
 tb_bool_t tb_network_init_env()
 {
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     // init dns server
     if (!tb_dns_server_init()) return tb_false;
 
@@ -121,7 +121,7 @@ tb_bool_t tb_network_init_env()
 }
 tb_void_t tb_network_exit_env()
 {
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     // exit dns cache
     tb_dns_cache_exit();
 

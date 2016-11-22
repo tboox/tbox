@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
 static tb_long_t tb_math_printf_format_fixed(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
@@ -58,7 +58,7 @@ static tb_long_t tb_math_printf_format_fixed(tb_cpointer_t object, tb_char_t* cs
  */
 tb_bool_t tb_math_init_env()
 {
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     // register printf("%{fixed}", fixed);
     tb_printf_object_register("fixed", tb_math_printf_format_fixed);
 #endif

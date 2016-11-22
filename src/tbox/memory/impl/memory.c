@@ -58,7 +58,7 @@ tb_bool_t tb_memory_init_env(tb_allocator_ref_t allocator)
         if (!tb_native_memory_init()) break;
 
         // init the allocator
-#if defined(TB_CONFIG_EMBED_ENABLE) || \
+#if defined(TB_CONFIG_MICRO_ENABLE) || \
         (defined(__tb_small__) && !defined(__tb_debug__))
         g_allocator = allocator? allocator : tb_native_allocator();
 #else

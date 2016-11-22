@@ -36,7 +36,7 @@ tb_bool_t tb_libc_init_env()
 }
 tb_void_t tb_libc_exit_env()
 {
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
     // exit the printf format 
     tb_printf_object_exit();
 #endif

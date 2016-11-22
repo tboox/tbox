@@ -47,7 +47,7 @@ typedef enum __tb_singleton_type_e
     /// the static allocator
 ,   TB_SINGLETON_TYPE_STATIC_ALLOCATOR      = 1
 
-#ifdef TB_CONFIG_EMBED_ENABLE
+#ifdef TB_CONFIG_MICRO_ENABLE
 
     /// the user defined type
 ,   TB_SINGLETON_TYPE_USER                  = 2
@@ -93,7 +93,7 @@ typedef enum __tb_singleton_type_e
 #endif
 
     /// the max count of the singleton type
-#if defined(TB_CONFIG_EMBED_ENABLE)
+#if defined(TB_CONFIG_MICRO_ENABLE)
 ,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 2
 #elif defined(__tb_small__)
 ,   TB_SINGLETON_TYPE_MAXN                  = TB_SINGLETON_TYPE_USER + 8

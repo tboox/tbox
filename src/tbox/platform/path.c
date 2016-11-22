@@ -52,7 +52,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
 tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
 {
     // check
@@ -152,7 +152,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     // trace
     tb_trace_d("path: %s", path);
 
-#ifdef TB_CONFIG_EMBED_ENABLE
+#ifdef TB_CONFIG_MICRO_ENABLE
 
     // the path is absolute?
     if (tb_path_is_absolute(path)) return path;
@@ -274,7 +274,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     return data;
 #endif
 }
-#ifndef TB_CONFIG_EMBED_ENABLE
+#ifndef TB_CONFIG_MICRO_ENABLE
 tb_char_t const* tb_path_relative(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
     return tb_path_relative_to(tb_null, path, data, maxn);

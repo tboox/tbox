@@ -43,13 +43,13 @@ option("deprecated")
     set_description("Enable or disable the deprecated interfaces.")
     add_defines_h_if_ok("$(prefix)_API_HAVE_DEPRECATED")
 
--- option: embed
-option("embed")
+-- option: micro
+option("micro")
     set_default(false)
     set_showmenu(true)
     set_category("option")
-    set_description("Compile for the embed system.")
-    add_defines_h_if_ok("$(prefix)_EMBED_ENABLE")
+    set_description("Compile micro core library for the embed system.")
+    add_defines_h_if_ok("$(prefix)_MICRO_ENABLE")
     add_rbindings("info", "deprecated", "float")
     add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
@@ -181,7 +181,7 @@ function check_interfaces()
 end
 
 -- add project directories
-add_subfiles(format("tbox/%s.lua", ifelse(is_option("embed"), "embed", "xmake"))) 
+add_subfiles(format("tbox/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
 if is_option("demo") then 
-    add_subfiles(format("demo/%s.lua", ifelse(is_option("embed"), "embed", "xmake"))) 
+    add_subfiles(format("demo/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
 end

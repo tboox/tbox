@@ -47,7 +47,7 @@ tb_void_t tb_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb
     // readonly?
     tb_assert_and_check_return(!(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_READONLY));
 
-#ifdef TB_CONFIG_EMBED_ENABLE
+#ifdef TB_CONFIG_MICRO_ENABLE
     // random access iterator?
     tb_assert_and_check_return(tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS);
 
