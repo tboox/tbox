@@ -41,6 +41,9 @@ static tb_demo_t g_demo[] =
     // other
 ,   TB_DEMO_MAIN_ITEM(other_test)
 
+    // platform
+,   TB_DEMO_MAIN_ITEM(platform_addrinfo)
+
     // container
 ,   TB_DEMO_MAIN_ITEM(container_list_entry)
 ,   TB_DEMO_MAIN_ITEM(container_single_list_entry)

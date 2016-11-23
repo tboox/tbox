@@ -169,6 +169,7 @@ TB_DEMO_MAIN_DECL(platform_process);
 TB_DEMO_MAIN_DECL(platform_barrier);
 TB_DEMO_MAIN_DECL(platform_atomic64);
 TB_DEMO_MAIN_DECL(platform_ifaddrs);
+TB_DEMO_MAIN_DECL(platform_addrinfo);
 TB_DEMO_MAIN_DECL(platform_hostname);
 TB_DEMO_MAIN_DECL(platform_processor);
 TB_DEMO_MAIN_DECL(platform_backtrace);
