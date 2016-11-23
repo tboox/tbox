@@ -44,8 +44,5 @@
 #include "murmur.h"
 #include "adler32.h"
 #include "blizzard.h"
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-#   include "deprecated/deprecated.h"
-#endif
 
 #endif

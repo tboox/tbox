@@ -27,6 +27,5 @@
  * includes
  */
 #include "prefix.h"
-#include "thread_store.h"
 
 #endif

@@ -69,9 +69,6 @@ target("tbox")
         if not is_plat("windows") then
             add_files("hash/arch/crc32.S")
         end
-        if is_option("deprecated") then
-            add_files("hash/deprecated/*.c") 
-        end
     end
 
     -- add the source files for the asio module
@@ -94,11 +91,6 @@ target("tbox")
             add_files("platform/arch/context.S") 
         end
         add_files("coroutine/**.c") 
-    end
-
-    -- add the source files for the deprecated module
-    if is_option("deprecated") then
-        add_files("platform/deprecated/thread_store.c") 
     end
 
     -- add the source files for the exception module

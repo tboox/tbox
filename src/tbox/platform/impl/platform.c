@@ -64,21 +64,11 @@ tb_bool_t tb_platform_init_env(tb_handle_t priv)
     if (!tb_exception_init_env()) return tb_false;
 #endif
 
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-    // init thread store envirnoment
-    if (!tb_thread_store_init_env()) return tb_false;
-#endif
-
     // ok
     return tb_true;
 }
 tb_void_t tb_platform_exit_env()
 {
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-    // exit thread store envirnoment
-    tb_thread_store_exit_env();
-#endif
-
     // exit exception envirnoment
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
     tb_exception_exit_env();

@@ -12,6 +12,7 @@
 
 * Optimize io scheduler for coroutine, cache events for poller
 * Add c11 _Static_assert
+* Remove some deprecated interfaces for hash and platform
 
 ## v1.6.0
 
@@ -117,6 +118,7 @@
 
 * 为协程优化io调度器，缓存poller轮询等待，减少频繁重复调用epoll_ctl, kevent等系统接口
 * 添加对c11关键字_Static_assert的支持
+* 针对hash和platform模块，移除一些废弃的接口
 
 ## v1.6.0
 
