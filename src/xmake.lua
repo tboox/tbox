@@ -175,6 +175,7 @@ function check_interfaces()
     add_cfuncs("posix", nil,        "sys/wait.h",                       "waitpid")
     add_cfuncs("posix", nil,        "unistd.h",                         "getdtablesize")
     add_cfuncs("posix", nil,        "sys/resource.h",                   "getrlimit")
+    add_cfuncs("posix", nil,        "netdb.h",                          "getaddrinfo", "gethostbyname")
 
     -- add the interfaces for systemv
     add_cfuncs("systemv", nil,      {"sys/sem.h", "sys/ipc.h"},         "semget", "semtimedop")

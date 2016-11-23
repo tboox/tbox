@@ -17,51 +17,22 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        platform.h
- * @defgroup    platform
- *
+ * @file        addrinfo.c
+ * @ingroup     platform
  */
-#ifndef TB_PLATFORM_H
-#define TB_PLATFORM_H
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME                "addrinfo"
+#define TB_TRACE_MODULE_DEBUG               (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "page.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "mutex.h"
-#include "event.h"
-#include "timer.h"
-#include "print.h"
-#include "ltimer.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "memory.h"
-#include "poller.h"
-#include "context.h"
-#include "ifaddrs.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
 #include "addrinfo.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "hostname.h"
-#include "processor.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-#include "cache_time.h"
-#include "environment.h"
-#include "thread_pool.h"
-#include "thread_local.h"
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-#   include "deprecated/deprecated.h"
-#endif
 
-#endif
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+
