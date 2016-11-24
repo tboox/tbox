@@ -95,5 +95,17 @@ target("tbox")
         add_files("libm/isnanf.c") 
     end
 
+    -- add the source for the windows 
+    if is_os("windows") then
+        add_files("libc/stdlib/mbstowcs.c")
+        add_files("platform/dynamic.c")
+        add_files("platform/windows/interface/ws2_32.c")
+        add_files("platform/windows/interface/mswsock.c")
+        if is_mode("debug") then
+            add_files("platform/windows/interface/dbghelp.c")
+            add_files("platform/windows/interface/kernel32.c")
+        end
+    end
+
     -- check interfaces
     check_interfaces()

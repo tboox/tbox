@@ -24,16 +24,13 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include "sockaddr.h"
+#include "interface/interface.h"
+#include "../posix/sockaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-#if defined(TB_ADDRINFO_ADDR_IMPL) \
-    && defined(TB_CONFIG_POSIX_HAVE_GETADDRINFO)
+#ifdef TB_ADDRINFO_ADDR_IMPL
 static __tb_inline__ tb_int_t tb_addrinfo_ai_family(tb_ipaddr_ref_t addr)
 {
     // get the ai family for getaddrinfo 
@@ -47,18 +44,8 @@ static __tb_inline__ tb_int_t tb_addrinfo_ai_family(tb_ipaddr_ref_t addr)
         return AF_UNSPEC;
     }
 }
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-#ifdef TB_ADDRINFO_ADDR_IMPL
-tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
+tb_bool_t tb_addrinfo_addr_impl_1(tb_char_t const* name, tb_ipaddr_ref_t addr)
 {
-    // check
-    tb_assert_and_check_return_val(name && addr, tb_false);
-
-#if defined(TB_CONFIG_POSIX_HAVE_GETADDRINFO)
     // done
     tb_bool_t           ok = tb_false;
     struct addrinfo*    answer = tb_null;
@@ -75,7 +62,7 @@ tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
         if (port) tb_snprintf(service, sizeof(service), "%u", port);
 
         // get address info
-        if (getaddrinfo(name, port? service : tb_null, &hints, &answer)) break;
+        if (tb_ws2_32()->getaddrinfo(name, port? service : tb_null, &hints, &answer)) break;
         tb_assert_and_check_break(answer && answer->ai_addr);
 
         // save address
@@ -89,14 +76,14 @@ tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
 
     // ok?
     return ok;
-
-#elif defined(TB_CONFIG_POSIX_HAVE_GETHOSTBYNAME)
-
+}
+tb_bool_t tb_addrinfo_addr_impl_2(tb_char_t const* name, tb_ipaddr_ref_t addr)
+{
     // not support ipv6
     tb_assert_and_check_return_val(tb_ipaddr_family(addr) != TB_IPADDR_FAMILY_IPV6, tb_false);
 
     // get first host address
-    struct hostent* hostaddr = gethostbyname(name);
+    struct hostent* hostaddr = tb_ws2_32()->gethostbyname(name);
     tb_check_return_val(hostaddr && hostaddr->h_addr && hostaddr->h_addrtype == AF_INET, tb_false);
 
     // save family
@@ -111,29 +98,22 @@ tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
 
     // ok
     return tb_true;
-#else
-    tb_trace_noimpl();
-    return tb_false;
-#endif
 }
 #endif
 
 #ifdef TB_ADDRINFO_NAME_IMPL
-tb_char_t const* tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn)
+tb_char_t const* tb_addrinfo_name_impl_1(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn)
 {
-    // check
-    tb_assert_and_check_return_val(addr && name && maxn, tb_null);
-
-#if defined(TB_CONFIG_POSIX_HAVE_GETNAMEINFO)
     // load socket address
     struct sockaddr_storage saddr;
     socklen_t saddrlen = (socklen_t)tb_sockaddr_load(&saddr, addr);
     tb_assert_and_check_return_val(saddrlen, tb_null);
 
     // get host name from address
-    return !getnameinfo((struct sockaddr const*)&saddr, saddrlen, name, maxn, tb_null, 0, NI_NAMEREQD)? name : tb_null;
-#elif defined(TB_CONFIG_POSIX_HAVE_GETHOSTBYNAME)
-
+    return !tb_ws2_32()->getnameinfo((struct sockaddr const*)&saddr, saddrlen, name, maxn, tb_null, 0, NI_NAMEREQD)? name : tb_null;
+}
+tb_char_t const* tb_addrinfo_name_impl_2(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn)
+{
     // done
     struct hostent* hostaddr = tb_null;
     switch (tb_ipaddr_family(addr))
@@ -145,7 +125,7 @@ tb_char_t const* tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size
             ipaddr.s_addr = tb_ipaddr_ip_is_any(addr)? INADDR_ANY : addr->u.ipv4.u32;
 
             // get host name from address
-            hostaddr = gethostbyaddr((tb_char_t const*)&ipaddr, sizeof(ipaddr), AF_INET);
+            hostaddr = tb_ws2_32()->gethostbyaddr((tb_char_t const*)&ipaddr, sizeof(ipaddr), AF_INET);
         }
         break;
     case TB_IPADDR_FAMILY_IPV6:
@@ -159,7 +139,7 @@ tb_char_t const* tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size
             else tb_memcpy(ipaddr.s6_addr, addr->u.ipv6.addr.u8, sizeof(ipaddr.s6_addr));
 
             // get host name from address
-            hostaddr = gethostbyaddr((tb_char_t const*)&ipaddr, sizeof(ipaddr), AF_INET6);
+            hostaddr = tb_ws2_32()->gethostbyaddr((tb_char_t const*)&ipaddr, sizeof(ipaddr), AF_INET6);
         }
         break;
     default:
@@ -172,10 +152,44 @@ tb_char_t const* tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size
 
     // ok?
     return name;
-#else
+}
+#endif
+
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+#ifdef TB_ADDRINFO_ADDR_IMPL
+tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
+{
+    // check
+    tb_assert_and_check_return_val(name && addr, tb_false);
+
+    // get address info using getaddrinfo
+    if (tb_ws2_32()->getaddrinfo) return tb_addrinfo_addr_impl_1(name, addr);
+    // get address info using gethostbyname
+    else if (tb_ws2_32()->gethostbyname) return tb_addrinfo_addr_impl_2(name, addr);
+
+    // not implemented
+    tb_trace_noimpl();
+    return tb_false;
+}
+#endif
+
+#ifdef TB_ADDRINFO_NAME_IMPL
+tb_char_t const* tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(addr && name && maxn, tb_null);
+
+    // get name info using getnameinfo
+    if (tb_ws2_32()->getnameinfo) return tb_addrinfo_name_impl_1(addr, name, maxn);
+    // get name info using gethostbyaddr
+    else if (tb_ws2_32()->gethostbyaddr) return tb_addrinfo_name_impl_2(addr, name, maxn);
+
+    // not implemented
     tb_trace_noimpl();
     return tb_null;
-#endif
 }
 #endif
 

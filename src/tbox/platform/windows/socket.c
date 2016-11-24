@@ -78,16 +78,20 @@ tb_bool_t tb_socket_init_env()
         return tb_false;
     }
 
+#ifndef TB_CONFIG_MICRO_ENABLE
     // init socket pool
     if (!tb_socket_pool_init()) return tb_false;
+#endif
 
     // ok
     return tb_true;
 }
 tb_void_t tb_socket_exit_env()
 {
+#ifndef TB_CONFIG_MICRO_ENABLE
     // exit socket pool
     tb_socket_pool_exit();
+#endif
 
     // exit socket context
     tb_ws2_32()->WSACleanup();
@@ -634,82 +638,6 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
     // error
     return -1;
 }
-tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
-{
-    // check
-    tb_assert_and_check_return_val(sock && list && size, -1);
-
-    // walk read
-    tb_size_t i = 0;
-    tb_size_t read = 0;
-    for (i = 0; i < size; i++)
-    {
-        // the data & size
-        tb_byte_t*  data = list[i].data;
-        tb_size_t   need = list[i].size;
-        tb_check_break(data && need);
-
-        // read it
-        tb_long_t real = tb_socket_recv(sock, data, need);
-
-        // full? next it
-        if (real == need)
-        {
-            read += real;
-            continue ;
-        }
-
-        // failed?
-        tb_check_return_val(real >= 0, -1);
-
-        // ok?
-        if (real > 0) read += real;
-
-        // end
-        break;
-    }
-
-    // ok?
-    return read;
-}
-tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
-{
-    // check
-    tb_assert_and_check_return_val(sock && list && size, -1);
-
-    // walk writ
-    tb_size_t i = 0;
-    tb_size_t writ = 0;
-    for (i = 0; i < size; i++)
-    {
-        // the data & size
-        tb_byte_t*  data = list[i].data;
-        tb_size_t   need = list[i].size;
-        tb_check_break(data && need);
-
-        // writ it
-        tb_long_t real = tb_socket_send(sock, data, need);
-
-        // full? next it
-        if (real == need)
-        {
-            writ += real;
-            continue ;
-        }
-
-        // failed?
-        tb_check_return_val(real >= 0, -1);
-
-        // ok?
-        if (real > 0) writ += real;
-
-        // end
-        break;
-    }
-
-    // ok?
-    return writ;
-}
 tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
 {
     // check
@@ -789,6 +717,83 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
 
     // error
     return -1;
+}
+#ifndef TB_CONFIG_MICRO_ENABLE
+tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(sock && list && size, -1);
+
+    // walk read
+    tb_size_t i = 0;
+    tb_size_t read = 0;
+    for (i = 0; i < size; i++)
+    {
+        // the data & size
+        tb_byte_t*  data = list[i].data;
+        tb_size_t   need = list[i].size;
+        tb_check_break(data && need);
+
+        // read it
+        tb_long_t real = tb_socket_recv(sock, data, need);
+
+        // full? next it
+        if (real == need)
+        {
+            read += real;
+            continue ;
+        }
+
+        // failed?
+        tb_check_return_val(real >= 0, -1);
+
+        // ok?
+        if (real > 0) read += real;
+
+        // end
+        break;
+    }
+
+    // ok?
+    return read;
+}
+tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(sock && list && size, -1);
+
+    // walk writ
+    tb_size_t i = 0;
+    tb_size_t writ = 0;
+    for (i = 0; i < size; i++)
+    {
+        // the data & size
+        tb_byte_t*  data = list[i].data;
+        tb_size_t   need = list[i].size;
+        tb_check_break(data && need);
+
+        // writ it
+        tb_long_t real = tb_socket_send(sock, data, need);
+
+        // full? next it
+        if (real == need)
+        {
+            writ += real;
+            continue ;
+        }
+
+        // failed?
+        tb_check_return_val(real >= 0, -1);
+
+        // ok?
+        if (real > 0) writ += real;
+
+        // end
+        break;
+    }
+
+    // ok?
+    return writ;
 }
 tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
@@ -877,4 +882,4 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
     // ok?
     return writ;
 }
-
+#endif

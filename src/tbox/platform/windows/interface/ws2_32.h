@@ -115,6 +115,18 @@ typedef tb_int_t (WSAAPI* tb_ws2_32_gethostname_t)(tb_char_t* name, tb_int_t nam
 // the __WSAFDIsSet func type
 typedef tb_int_t (WSAAPI* tb_ws2_32___WSAFDIsSet_t)(SOCKET fd, fd_set* set);
 
+// the getaddrinfo func type
+typedef tb_int_t (WSAAPI* tb_ws2_32_getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, ADDRINFOA *pHints, PADDRINFOA *ppResult);
+
+// the getnameinfo func type
+typedef tb_int_t (WSAAPI* tb_ws2_32_getnameinfo_t)(const struct sockaddr FAR *sa, socklen_t salen, tb_char_t FAR *host, DWORD hostlen, tb_char_t FAR *serv, DWORD servlen, tb_int_t flags);
+
+// the gethostbyname func type
+typedef struct hostent* (WSAAPI* tb_ws2_32_gethostbyname_t)(tb_char_t const* name);
+
+// the gethostbyaddr func type
+typedef struct hostent* (WSAAPI* tb_ws2_32_gethostbyaddr_t)(tb_char_t const* addr, tb_int_t len, tb_int_t type);
+
 // the ws2_32 interfaces type
 typedef struct __tb_ws2_32_t
 {
@@ -192,7 +204,19 @@ typedef struct __tb_ws2_32_t
     
     // gethostname
     tb_ws2_32_gethostname_t         gethostname;
+  
+    // getaddrinfo
+    tb_ws2_32_getaddrinfo_t         getaddrinfo;
+  
+    // getnameinfo
+    tb_ws2_32_getnameinfo_t         getnameinfo;
  
+    // gethostbyname
+    tb_ws2_32_gethostbyname_t       gethostbyname;
+  
+    // gethostbyaddr
+    tb_ws2_32_gethostbyaddr_t       gethostbyaddr;
+  
     // __WSAFDIsSet
     tb_ws2_32___WSAFDIsSet_t        __WSAFDIsSet;
 
