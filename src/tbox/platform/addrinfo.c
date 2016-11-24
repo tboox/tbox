@@ -31,6 +31,7 @@
  * includes
  */
 #include "addrinfo.h"
+#include "../network/network.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -47,6 +48,13 @@
 #else
 tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
 {
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // attempt to get address using dns looker
+    if (tb_ipaddr_family(addr) != TB_IPADDR_FAMILY_IPV6 && tb_dns_looker_done(name, addr))
+        return tb_true;
+#endif
+
+    // not implemented
     tb_trace_noimpl();
     return tb_false;
 }

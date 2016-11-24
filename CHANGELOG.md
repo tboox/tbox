@@ -7,6 +7,7 @@
 * Support coroutine context switch for mips
 * Add `__tb_thread_local__` keyword macro
 * Add `--micro=y|n` option to compiling micro library (~64K) for the embed system
+* Add `tb_addrinfo_addr` and `tb_addrinfo_name` interfaces
 
 ### Changes
 
@@ -113,6 +114,7 @@
 * 针对协程上下文切换，支持mips架构
 * 添加`__tb_thread_local__`关键字宏
 * 添加 `--micro=y|n` 选项，实现极小编译，针对嵌入式平台，编译tbox微内核(~64K) 
+* 添加 `tb_addrinfo_addr` and `tb_addrinfo_name` 接口
 
 ### 改进
 

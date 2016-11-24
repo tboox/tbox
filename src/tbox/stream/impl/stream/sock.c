@@ -134,7 +134,7 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
     {
         // look ip 
         tb_ipaddr_t ip_addr;
-        if (!tb_dns_looker_done(tb_url_host(url), &ip_addr)) 
+        if (!tb_addrinfo_addr(tb_url_host(url), &ip_addr)) 
         {
             // failed
             tb_stream_state_set(stream, TB_STATE_SOCK_DNS_FAILED);

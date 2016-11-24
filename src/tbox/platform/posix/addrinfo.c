@@ -58,6 +58,12 @@ tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
     // check
     tb_assert_and_check_return_val(name && addr, tb_false);
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // attempt to get address using dns looker
+    if (tb_ipaddr_family(addr) != TB_IPADDR_FAMILY_IPV6 && tb_dns_looker_done(name, addr))
+        return tb_true;
+#endif
+
 #if defined(TB_CONFIG_POSIX_HAVE_GETADDRINFO)
     // done
     tb_bool_t           ok = tb_false;
