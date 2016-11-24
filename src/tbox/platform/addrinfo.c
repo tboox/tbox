@@ -35,14 +35,29 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+#if defined(TB_CONFIG_POSIX_HAVE_GETADDRINFO) || \
+    defined(TB_CONFIG_POSIX_HAVE_GETHOSTBYNAME)
+#   define TB_ADDRINFO_ADDR_IMPL
+#   include "posix/addrinfo.c"
+#   undef TB_ADDRINFO_ADDR_IMPL
+#else
 tb_bool_t tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_char_t const* tb_addrinfo_name(tb_ipaddr_ref_t ipaddr, tb_char_t* name, tb_size_t maxn)
+#endif
+
+#if defined(TB_CONFIG_POSIX_HAVE_GETNAMEINFO) || \
+    defined(TB_CONFIG_POSIX_HAVE_GETHOSTBYADDR)
+#   define TB_ADDRINFO_NAME_IMPL
+#   include "posix/addrinfo.c"
+#   undef TB_ADDRINFO_NAME_IMPL
+#else
+tb_char_t const* tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn)
 {
     tb_trace_noimpl();
     return tb_null;
 }
+#endif
 

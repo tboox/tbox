@@ -537,50 +537,6 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
     // error
     return -1;
 }
-tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
-{
-    // check
-    tb_assert_and_check_return_val(sock && list && size, -1);
-
-    // check iovec
-    tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
-    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
-
-    // read it
-    tb_long_t real = readv(tb_sock2fd(sock), (struct iovec const*)list, size);
-
-    // ok?
-    if (real >= 0) return real;
-
-    // continue?
-    if (errno == EINTR || errno == EAGAIN) return 0;
-
-    // error
-    return -1;
-}
-tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
-{
-    // check
-    tb_assert_and_check_return_val(sock && list && size, -1);
-
-    // check iovec
-    tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
-    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
-
-    // writ it
-    tb_long_t real = writev(tb_sock2fd(sock), (struct iovec const*)list, size);
-
-    // ok?
-    if (real >= 0) return real;
-
-    // continue?
-    if (errno == EINTR || errno == EAGAIN) return 0;
-
-    // error
-    return -1;
-}
 tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
 {
     // check
@@ -687,6 +643,51 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
     // error
     return -1;
 }
+#ifndef TB_CONFIG_MICRO_ENABLE
+tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(sock && list && size, -1);
+
+    // check iovec
+    tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
+
+    // read it
+    tb_long_t real = readv(tb_sock2fd(sock), (struct iovec const*)list, size);
+
+    // ok?
+    if (real >= 0) return real;
+
+    // continue?
+    if (errno == EINTR || errno == EAGAIN) return 0;
+
+    // error
+    return -1;
+}
+tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(sock && list && size, -1);
+
+    // check iovec
+    tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
+    tb_assert(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base));
+    tb_assert(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len));
+
+    // writ it
+    tb_long_t real = writev(tb_sock2fd(sock), (struct iovec const*)list, size);
+
+    // ok?
+    if (real >= 0) return real;
+
+    // continue?
+    if (errno == EINTR || errno == EAGAIN) return 0;
+
+    // error
+    return -1;
+}
 tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
     // check
@@ -755,3 +756,4 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
     // error
     return -1;
 }
+#endif

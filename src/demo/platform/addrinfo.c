@@ -27,7 +27,6 @@ static tb_void_t tb_demo_addrinfo_test(tb_char_t const* name)
 tb_int_t tb_demo_platform_addrinfo_main(tb_int_t argc, tb_char_t** argv)
 {
     // test address
-    tb_demo_addrinfo_test("localhost");
-    tb_demo_addrinfo_test("www.tboox.org");
+    tb_demo_addrinfo_test(argv[1]);
     return 0;
 }

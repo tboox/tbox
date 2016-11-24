@@ -81,7 +81,7 @@ tb_bool_t           tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr
  *
  * @return          the host name or tb_null 
  */
-tb_char_t const*    tb_addrinfo_name(tb_ipaddr_ref_t ipaddr, tb_char_t* name, tb_size_t maxn);
+tb_char_t const*    tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
