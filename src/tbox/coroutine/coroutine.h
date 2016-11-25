@@ -31,6 +31,7 @@
 #include "channel.h"
 #include "semaphore.h"
 #include "scheduler.h"
+#include "stackless/coroutine.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
