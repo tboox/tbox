@@ -42,56 +42,57 @@
     tb_lo_coroutine_enter(co);
     for (i = 0; i < 100; i++)
     {
-        tb_lo_coroutine_yield(co);
+        tb_lo_coroutine_yield();
     }
-    tb_lo_coroutine_leave(co);
+    tb_lo_coroutine_leave();
 
 
     // after expanding
-    { tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(co);
+    { tb_lo_coroutine_ref_t co__ = co; tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(co);
     for (i = 0; i < 100; i++)
     {
         lo_yield_flag__ = 0;
-        tb_lo_core_record(co);
+        tb_lo_core_record(co__);
         if (lo_yield_flag__ == 0)
             return ; 
     }
-    tb_lo_core_exit(co); lo_yield_flag__ = 0; return ; }
+    tb_lo_core_exit(co__); lo_yield_flag__ = 0; return ; }
 
 
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
     { 
+        tb_lo_coroutine_ref_t co__ = co;
         tb_int_t lo_yield_flag__ = 1; 
-        switch (tb_lo_core(co)->branch) 
+        switch (tb_lo_core(co__)->branch) 
         {
         case 0:;
             for (i = 0; i < 100; i++)
             {
                 lo_yield_flag__ = 0;
-                tb_lo_core(co)->branch = __tb_line__; case __tb_line__:;
+                tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
                 if (lo_yield_flag__ == 0)
                     return ; 
             }
         } 
-        tb_lo_core(co)->branch = 0;
-        tb_lo_core(co)->state = TB_STATE_END; 
+        tb_lo_core(co__)->branch = 0;
+        tb_lo_core(co__)->state = TB_STATE_END; 
         lo_yield_flag__ = 0;  
         return ; 
     }
 
  * @endcode
  */
-#define tb_lo_coroutine_enter(co)   { tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(co)
-#define tb_lo_coroutine_yield(co) \
+#define tb_lo_coroutine_enter(co)   { tb_lo_coroutine_ref_t co__ = (co); tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(co__)
+#define tb_lo_coroutine_yield() \
 do \
 { \
     lo_yield_flag__ = 0; \
-    tb_lo_core_record(co); \
+    tb_lo_core_record(co__); \
     if (lo_yield_flag__ == 0) \
         return ; \
     \
 } while(0)
-#define tb_lo_coroutine_leave(co)   tb_lo_core_exit(co); lo_yield_flag__ = 0; return ; }
+#define tb_lo_coroutine_leave()     tb_lo_core_exit(co__); lo_yield_flag__ = 0; return ; }
 
 /*! suspend coroutine
  *
@@ -103,51 +104,60 @@ do \
     tb_lo_coroutine_enter(co);
     for (i = 0; i < 100; i++)
     {
-        tb_lo_coroutine_yield(co);
-        tb_lo_coroutine_suspend(co);
+        tb_lo_coroutine_yield();
+        tb_lo_coroutine_suspend();
     }
-    tb_lo_coroutine_leave(co);
+    tb_lo_coroutine_leave();
 
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
     { 
+        tb_lo_coroutine_ref_t co__ = co;
         tb_int_t lo_yield_flag__ = 1; 
-        switch (tb_lo_core(co)->branch) 
+        switch (tb_lo_core(co__)->branch) 
         {
         case 0:;
             for (i = 0; i < 100; i++)
             {
                 lo_yield_flag__ = 0;
-                tb_lo_core(co)->branch = __tb_line__; case __tb_line__:;
+                tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
                 if (lo_yield_flag__ == 0)
                     return ; 
 
                 // suspend coroutine
-                tb_lo_core(co)->state = TB_STATE_SUSPEND;
-                tb_lo_core(co)->branch = __tb_line__; case __tb_line__:;
-                if (tb_lo_core(co)->state == TB_STATE_SUSPEND)
+                tb_lo_core(co__)->state = TB_STATE_SUSPEND;
+                tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
+                if (tb_lo_core(co__)->state == TB_STATE_SUSPEND)
                     return ; 
             }
         } 
         lo_yield_flag__ = 0;  
-        tb_lo_core(co)->branch = 0;
-        tb_lo_core_state_set(co, TB_STATE_END); 
+        tb_lo_core(co__)->branch = 0;
+        tb_lo_core_state_set(co__, TB_STATE_END); 
         return ; 
     }
 
  * @endcode
  */
-#define tb_lo_coroutine_suspend(co) \
+#define tb_lo_coroutine_suspend() \
 do \
 { \
-    tb_lo_core_state_set(co, TB_STATE_SUSPEND); \
-    tb_lo_core_record(co); \
-    if (tb_lo_core_state(co) == TB_STATE_SUSPEND) \
+    tb_lo_core_state_set(co__, TB_STATE_SUSPEND); \
+    tb_lo_core_record(co__); \
+    if (tb_lo_core_state(co__) == TB_STATE_SUSPEND) \
         return ; \
     \
 } while(0)
 
 /// resume coroutine
-#define tb_lo_coroutine_resume(co)      tb_lo_core_state_set(co, TB_STATE_READY)
+#define tb_lo_coroutine_resume()        tb_lo_core_state_set(co__, TB_STATE_READY)
+
+// TODO
+/// start coroutine
+//#define tb_lo_coroutine_start(scheduler, func, priv) tb_lo_scheduler_start((scheduler)? (scheduler) : tb_lo_coroutine_scheduler(co__), func, priv)
+#define tb_lo_coroutine_start(scheduler, func, priv) tb_lo_scheduler_start(scheduler, func, priv)
+
+/// the self coroutine
+#define tb_lo_coroutine_self()          (co__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -155,32 +165,16 @@ do \
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-/// the stackless coroutine ref type
-typedef __tb_typeref__(lo_coroutine);
-
-/*! the coroutine function type
- * 
- * @param self          the coroutine self
- * @param priv          the user private data from start(.., priv)
- */
-typedef tb_void_t       (*tb_lo_coroutine_func_t)(tb_lo_coroutine_ref_t self, tb_cpointer_t priv);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! start coroutine 
+/*! get the scheduler of coroutine
  *
- * @param scheduler     the scheduler, uses the current scheduler if be null
- * @param func          the coroutine function
- * @param priv          the passed user private data as the argument of function
+ * @param coroutine     the coroutine 
  *
- * @return              tb_true or tb_false
+ * @return              the scheduler
  */
-tb_bool_t               tb_lo_coroutine_start(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
+tb_lo_scheduler_ref_t   tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t coroutine);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

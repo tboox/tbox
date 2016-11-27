@@ -80,7 +80,6 @@ target("tbox")
     add_files("container/list_entry.c") 
     add_files("container/single_list_entry.c") 
     add_files("coroutine/stackless/*.c") 
-    add_files("coroutine/impl/stackless/*.c") 
 
     -- add the source files for debug mode
     if is_mode("debug") then

@@ -45,7 +45,7 @@ static tb_void_t tb_demo_coroutine_switch_test()
         tb_co_scheduler_exit(scheduler);
     }
 }
-static tb_void_t tb_demo_coroutine_switch_pref_func(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_switch_perf_func(tb_cpointer_t priv)
 {
     // loop
     tb_size_t count = (tb_size_t)priv;
@@ -55,15 +55,15 @@ static tb_void_t tb_demo_coroutine_switch_pref_func(tb_cpointer_t priv)
         tb_coroutine_yield();
     }
 }
-static tb_void_t tb_demo_coroutine_switch_pref()
+static tb_void_t tb_demo_coroutine_switch_perf()
 {
     // init scheduler
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
         // start coroutine
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_pref_func, (tb_cpointer_t)(COUNT >> 1), 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_perf_func, (tb_cpointer_t)(COUNT >> 1), 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_switch_perf_func, (tb_cpointer_t)(COUNT >> 1), 0);
 
         // init the start time
         tb_hong_t startime = tb_mclock();
@@ -88,6 +88,6 @@ static tb_void_t tb_demo_coroutine_switch_pref()
 tb_int_t tb_demo_coroutine_switch_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_demo_coroutine_switch_test();
-    tb_demo_coroutine_switch_pref();
+    tb_demo_coroutine_switch_perf();
     return 0;
 }

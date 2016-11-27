@@ -43,6 +43,9 @@ typedef struct __tb_lo_scheduler_t
     // is stopped
     tb_bool_t                       stopped;
 
+    // the running coroutine
+    tb_lo_coroutine_t*              running;
+
     // the dead coroutines
     tb_list_entry_head_t            coroutines_dead;
 

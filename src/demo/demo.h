@@ -215,6 +215,9 @@ TB_DEMO_MAIN_DECL(coroutine_file_client);
 TB_DEMO_MAIN_DECL(coroutine_file_server);
 TB_DEMO_MAIN_DECL(coroutine_http_server);
 
+// stackless coroutine
+TB_DEMO_MAIN_DECL(lo_coroutine_switch);
+
 #endif
 
 

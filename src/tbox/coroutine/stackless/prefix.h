@@ -28,5 +28,22 @@
  */
 #include "../prefix.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the stackless coroutine ref type
+typedef __tb_typeref__(lo_coroutine);
+
+/// the stackless scheduler ref type
+typedef __tb_typeref__(lo_scheduler);
+
+/*! the coroutine function type
+ * 
+ * @param coroutine     the coroutine self
+ * @param priv          the user private data from start(.., priv)
+ */
+typedef tb_void_t       (*tb_lo_coroutine_func_t)(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv);
+
 
 #endif

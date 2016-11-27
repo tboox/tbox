@@ -33,9 +33,10 @@
  */
 #include "coroutine.h"
 #include "scheduler.h"
+#include "../impl/impl.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
 tb_lo_coroutine_t* tb_lo_coroutine_init(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv)
 {
@@ -84,7 +85,7 @@ tb_bool_t tb_lo_coroutine_reinit(tb_lo_coroutine_t* coroutine, tb_lo_coroutine_f
 {
     // check
     tb_assert_and_check_return_val(coroutine && func, tb_false);
-    tb_assert_and_check_return_val(coroutine->scheduler && tb_lo_core_state(coroutine) == TB_STATE_DEAD, tb_false);
+    tb_assert_and_check_return_val(coroutine->scheduler && tb_lo_core_state(coroutine) == TB_STATE_END, tb_false);
 
     // init core
     tb_lo_core_init(&coroutine->core);
@@ -99,12 +100,25 @@ tb_bool_t tb_lo_coroutine_reinit(tb_lo_coroutine_t* coroutine, tb_lo_coroutine_f
 tb_void_t tb_lo_coroutine_exit(tb_lo_coroutine_t* coroutine)
 {
     // check
-    tb_assert_and_check_return(coroutine && tb_lo_core_state(coroutine) == TB_STATE_DEAD);
+    tb_assert_and_check_return(coroutine && tb_lo_core_state(coroutine) == TB_STATE_END);
 
     // trace
     tb_trace_d("exit: %p", coroutine);
 
     // exit it
     tb_free(coroutine);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * public implementation
+ */
+tb_lo_scheduler_ref_t tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t self)
+{
+    // check
+    tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
+    tb_assert_and_check_return_val(coroutine, tb_null);
+
+    // get scheduler 
+    return coroutine->scheduler;
 }
 

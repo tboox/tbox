@@ -235,6 +235,9 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(coroutine_spider)
 #   endif
 #endif
+
+    // stackless coroutine
+,   TB_DEMO_MAIN_ITEM(lo_coroutine_switch)
 };
 
 /* //////////////////////////////////////////////////////////////////////////////////////
