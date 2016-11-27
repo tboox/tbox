@@ -121,4 +121,8 @@ tb_lo_scheduler_ref_t tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t self)
     // get scheduler 
     return coroutine->scheduler;
 }
+tb_bool_t tb_lo_coroutine_start(tb_lo_scheduler_ref_t self, tb_lo_coroutine_func_t func, tb_cpointer_t priv)
+{
+    return tb_lo_scheduler_start(self, func, priv);
+}
 

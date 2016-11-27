@@ -30,6 +30,13 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the self scheduler
+#define tb_lo_scheduler_self()          tb_lo_coroutine_scheduler(co__)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_enter__
@@ -61,16 +68,6 @@ tb_void_t               tb_lo_scheduler_kill(tb_lo_scheduler_ref_t scheduler);
  * @param scheduler     the scheduler
  */
 tb_void_t               tb_lo_scheduler_loop(tb_lo_scheduler_ref_t scheduler);
-
-/*! start coroutine 
- *
- * @param scheduler     the scheduler
- * @param func          the coroutine function
- * @param priv          the passed user private data as the argument of function
- *
- * @return              tb_true or tb_false
- */
-tb_bool_t               tb_lo_scheduler_start(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

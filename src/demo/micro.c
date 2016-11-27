@@ -49,6 +49,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(container_single_list_entry)
  
     // stackless coroutine
+,   TB_DEMO_MAIN_ITEM(lo_coroutine_nest)
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_switch)
 };
 

@@ -151,11 +151,6 @@ do \
 /// resume coroutine
 #define tb_lo_coroutine_resume()        tb_lo_core_state_set(co__, TB_STATE_READY)
 
-// TODO
-/// start coroutine
-//#define tb_lo_coroutine_start(scheduler, func, priv) tb_lo_scheduler_start((scheduler)? (scheduler) : tb_lo_coroutine_scheduler(co__), func, priv)
-#define tb_lo_coroutine_start(scheduler, func, priv) tb_lo_scheduler_start(scheduler, func, priv)
-
 /// the self coroutine
 #define tb_lo_coroutine_self()          (co__)
 
@@ -175,6 +170,16 @@ __tb_extern_c_enter__
  * @return              the scheduler
  */
 tb_lo_scheduler_ref_t   tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t coroutine);
+
+/*! start coroutine 
+ *
+ * @param scheduler     the scheduler (can not be null)
+ * @param func          the coroutine function
+ * @param priv          the passed user private data as the argument of function
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_lo_coroutine_start(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

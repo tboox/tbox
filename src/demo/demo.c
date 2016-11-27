@@ -237,6 +237,7 @@ static tb_demo_t g_demo[] =
 #endif
 
     // stackless coroutine
+,   TB_DEMO_MAIN_ITEM(lo_coroutine_nest)
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_switch)
 };
 

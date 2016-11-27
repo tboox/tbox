@@ -13,7 +13,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_coroutine_switch_test_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
+static tb_void_t tb_demo_lo_coroutine_switch_test_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
     tb_size_t* count = (tb_size_t*)priv;
@@ -35,7 +35,7 @@ static tb_void_t tb_demo_coroutine_switch_test_func(tb_lo_coroutine_ref_t corout
     // leave coroutine
     tb_lo_coroutine_leave();
 }
-static tb_void_t tb_demo_coroutine_switch_test()
+static tb_void_t tb_demo_lo_coroutine_switch_test()
 {
     // init scheduler
     tb_lo_scheduler_ref_t scheduler = tb_lo_scheduler_init();
@@ -43,11 +43,10 @@ static tb_void_t tb_demo_coroutine_switch_test()
     {
         // start coroutines
         tb_size_t counts[] = {10, 10, 10, 10};
-        tb_trace_i("%p", &counts[0]);
-        tb_lo_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, &counts[0]);
-        tb_lo_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, &counts[1]);
-        tb_lo_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, &counts[2]);
-        tb_lo_coroutine_start(scheduler, tb_demo_coroutine_switch_test_func, &counts[3]);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_switch_test_func, &counts[0]);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_switch_test_func, &counts[1]);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_switch_test_func, &counts[2]);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_switch_test_func, &counts[3]);
 
         // run scheduler
         tb_lo_scheduler_loop(scheduler);
@@ -56,7 +55,7 @@ static tb_void_t tb_demo_coroutine_switch_test()
         tb_lo_scheduler_exit(scheduler);
     }
 }
-static tb_void_t tb_demo_coroutine_switch_perf_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
+static tb_void_t tb_demo_lo_coroutine_switch_perf_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
     tb_size_t* count = (tb_size_t*)priv;
@@ -75,7 +74,7 @@ static tb_void_t tb_demo_coroutine_switch_perf_func(tb_lo_coroutine_ref_t corout
     // leave coroutine
     tb_lo_coroutine_leave();
 }
-static tb_void_t tb_demo_coroutine_switch_perf()
+static tb_void_t tb_demo_lo_coroutine_switch_perf()
 {
     // init scheduler
     tb_lo_scheduler_ref_t scheduler = tb_lo_scheduler_init();
@@ -83,8 +82,8 @@ static tb_void_t tb_demo_coroutine_switch_perf()
     {
         // start coroutine
         tb_size_t counts[] = {COUNT >> 1, COUNT >> 1};
-        tb_lo_coroutine_start(scheduler, tb_demo_coroutine_switch_perf_func, &counts[0]);
-        tb_lo_coroutine_start(scheduler, tb_demo_coroutine_switch_perf_func, &counts[1]);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_switch_perf_func, &counts[0]);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_switch_perf_func, &counts[1]);
 
         // init the start time
         tb_hong_t startime = tb_mclock();
@@ -108,7 +107,7 @@ static tb_void_t tb_demo_coroutine_switch_perf()
  */ 
 tb_int_t tb_demo_lo_coroutine_switch_main(tb_int_t argc, tb_char_t** argv)
 {
-    tb_demo_coroutine_switch_test();
-    tb_demo_coroutine_switch_perf();
+    tb_demo_lo_coroutine_switch_test();
+    tb_demo_lo_coroutine_switch_perf();
     return 0;
 }
