@@ -29,6 +29,22 @@
 #include "coroutine.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// get the running coroutine
+#define tb_lo_scheduler_running(scheduler)             ((scheduler)->running)
+
+// get the ready coroutines count
+#define tb_lo_scheduler_ready_count(scheduler)         tb_list_entry_size(&(scheduler)->coroutines_ready)
+
+// get the suspended coroutines count
+#define tb_lo_scheduler_suspend_count(scheduler)       tb_list_entry_size(&(scheduler)->coroutines_suspend)
+
+// get the io scheduler
+#define tb_lo_scheduler_io(scheduler)                  ((scheduler)->scheduler_io)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_enter__
@@ -36,6 +52,9 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
+
+// the io scheduler type
+struct __tb_lo_scheduler_io_t;
 
 /// the stackless coroutine scheduler type
 typedef struct __tb_lo_scheduler_t
@@ -45,6 +64,9 @@ typedef struct __tb_lo_scheduler_t
 
     // the running coroutine
     tb_lo_coroutine_t*              running;
+
+    // the io scheduler
+    struct __tb_lo_scheduler_io_t*  scheduler_io;
 
     // the dead coroutines
     tb_list_entry_head_t            coroutines_dead;

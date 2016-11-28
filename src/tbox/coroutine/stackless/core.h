@@ -70,7 +70,7 @@
 #define tb_lo_core_state(co)                (tb_lo_core(co)->state)
 
 // set core state
-#define tb_lo_core_state_set(co, state)     tb_lo_core(co)->state = (state)
+#define tb_lo_core_state_set(co, val)       tb_lo_core(co)->state = (val)
 
 #ifdef TB_COMPILER_IS_GCC
 /*

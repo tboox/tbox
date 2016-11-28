@@ -75,11 +75,13 @@ target("tbox")
     add_files("platform/thread.c") 
     add_files("platform/socket.c") 
     add_files("platform/addrinfo.c") 
+    add_files("platform/poller.c") 
     add_files("platform/impl/platform.c") 
     add_files("container/iterator.c") 
     add_files("container/list_entry.c") 
     add_files("container/single_list_entry.c") 
     add_files("coroutine/stackless/*.c") 
+    add_files("coroutine/impl/stackless/*.c") 
 
     -- add the source files for debug mode
     if is_mode("debug") then

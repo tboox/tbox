@@ -34,6 +34,9 @@
  * macros
  */
 
+/// the self coroutine
+#define tb_lo_coroutine_self()          (co__)
+
 /*! enter and leave coroutine 
  *
  * @code
@@ -82,7 +85,7 @@
 
  * @endcode
  */
-#define tb_lo_coroutine_enter(co)   { tb_lo_coroutine_ref_t co__ = (co); tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(co__)
+#define tb_lo_coroutine_enter(co)   { tb_lo_coroutine_ref_t co__ = (co); tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(tb_lo_coroutine_self())
 #define tb_lo_coroutine_yield() \
 do \
 { \
@@ -92,7 +95,7 @@ do \
         return ; \
     \
 } while(0)
-#define tb_lo_coroutine_leave()     tb_lo_core_exit(co__); lo_yield_flag__ = 0; return ; }
+#define tb_lo_coroutine_leave()     tb_lo_core_exit(tb_lo_coroutine_self()); lo_yield_flag__ = 0; return ; }
 
 /*! suspend current coroutine
  *
@@ -141,15 +144,22 @@ do \
 #define tb_lo_coroutine_suspend() \
 do \
 { \
-    tb_lo_core_state_set(co__, TB_STATE_SUSPEND); \
-    tb_lo_core_record(co__); \
-    if (tb_lo_core_state(co__) == TB_STATE_SUSPEND) \
+    tb_used(&lo_yield_flag__); \
+    tb_lo_core_state_set(tb_lo_coroutine_self(), TB_STATE_SUSPEND); \
+    tb_lo_core_record(tb_lo_coroutine_self()); \
+    if (tb_lo_core_state(tb_lo_coroutine_self()) == TB_STATE_SUSPEND) \
         return ; \
     \
 } while(0)
 
-/// the self coroutine
-#define tb_lo_coroutine_self()          (co__)
+// sleep some time
+#define tb_lo_coroutine_sleep(interval) \
+do \
+{ \
+    tb_lo_coroutine_sleep_(tb_lo_coroutine_self(), interval); \
+    tb_lo_coroutine_suspend(); \
+    \
+} while(0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -157,16 +167,27 @@ do \
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
+ * private interfaces
  */
 
-/*! get the scheduler of coroutine
+/* get the scheduler of coroutine
  *
  * @param coroutine     the coroutine 
  *
  * @return              the scheduler
  */
-tb_lo_scheduler_ref_t   tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t coroutine);
+tb_lo_scheduler_ref_t   tb_lo_coroutine_scheduler_(tb_lo_coroutine_ref_t coroutine);
+
+/* sleep the current coroutine
+ *
+ * @param coroutine     the coroutine 
+ * @param interval      the interval (ms), infinity: -1
+ */
+tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, tb_long_t interval);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 
 /*! start coroutine 
  *

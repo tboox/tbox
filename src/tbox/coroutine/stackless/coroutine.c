@@ -108,24 +108,41 @@ tb_void_t tb_lo_coroutine_exit(tb_lo_coroutine_t* coroutine)
     // exit it
     tb_free(coroutine);
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * public implementation
- */
-tb_lo_scheduler_ref_t tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t self)
+tb_lo_scheduler_ref_t tb_lo_coroutine_scheduler_(tb_lo_coroutine_ref_t self)
 {
     // check
     tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
-    tb_assert_and_check_return_val(coroutine, tb_null);
+    tb_assert(coroutine);
 
     // get scheduler 
     return coroutine->scheduler;
 }
+tb_void_t tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t self, tb_long_t interval)
+{
+    // check
+    tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
+    tb_assert(coroutine);
+
+    // get scheduler
+    tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
+    tb_assert(scheduler);
+    
+    // init io scheduler first
+    if (!scheduler->scheduler_io) scheduler->scheduler_io = tb_lo_scheduler_io_init(scheduler);
+    tb_assert(scheduler->scheduler_io);
+
+    // sleep it
+    tb_lo_scheduler_io_sleep(scheduler->scheduler_io, interval);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * public implementation
+ */
 tb_bool_t tb_lo_coroutine_start(tb_lo_scheduler_ref_t self, tb_lo_coroutine_func_t func, tb_cpointer_t priv)
 {
     return tb_lo_scheduler_start((tb_lo_scheduler_t*)self, func, priv);
 }
 tb_void_t tb_lo_coroutine_resume(tb_lo_coroutine_ref_t self)
 {
-    tb_lo_scheduler_resume((tb_lo_scheduler_t*)tb_lo_coroutine_scheduler(self), (tb_lo_coroutine_t*)self);
+    tb_lo_scheduler_resume((tb_lo_scheduler_t*)tb_lo_coroutine_scheduler_(self), (tb_lo_coroutine_t*)self);
 }

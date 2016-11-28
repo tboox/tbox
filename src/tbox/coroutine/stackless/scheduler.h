@@ -34,7 +34,7 @@
  */
 
 /// the self scheduler
-#define tb_lo_scheduler_self()          tb_lo_coroutine_scheduler(co__)
+#define tb_lo_scheduler_self()          tb_lo_coroutine_scheduler_(co__)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

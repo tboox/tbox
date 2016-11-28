@@ -173,7 +173,7 @@ static tb_void_t tb_co_scheduler_io_loop(tb_cpointer_t priv)
         // no more ready coroutines? wait io events and timers
         if (tb_poller_wait(poller, tb_co_scheduler_io_events, tb_min(delay, ldelay)) < 0) break;
 
-        // spar timer
+        // spak timer
         if (!tb_co_scheduler_io_timer_spak(scheduler_io)) break;
     }
 }

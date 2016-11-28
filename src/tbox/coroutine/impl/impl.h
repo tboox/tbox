@@ -32,5 +32,6 @@
 #include "scheduler_io.h"
 #include "stackless/coroutine.h"
 #include "stackless/scheduler.h"
+#include "stackless/scheduler_io.h"
 
 #endif
