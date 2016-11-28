@@ -34,7 +34,7 @@
  * macros
  */
 
-/*!
+/*! enter and leave coroutine 
  *
  * @code
  *
@@ -94,7 +94,7 @@ do \
 } while(0)
 #define tb_lo_coroutine_leave()     tb_lo_core_exit(co__); lo_yield_flag__ = 0; return ; }
 
-/*! suspend coroutine
+/*! suspend current coroutine
  *
  * the scheduler will move this coroutine to the suspended coroutines after the function be returned
  *
@@ -148,9 +148,6 @@ do \
     \
 } while(0)
 
-/// resume coroutine
-#define tb_lo_coroutine_resume()        tb_lo_core_state_set(co__, TB_STATE_READY)
-
 /// the self coroutine
 #define tb_lo_coroutine_self()          (co__)
 
@@ -173,13 +170,69 @@ tb_lo_scheduler_ref_t   tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t coroutin
 
 /*! start coroutine 
  *
- * @param scheduler     the scheduler (can not be null)
+ * @code
+    static tb_void_t switchtask(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
+    {
+        // get count pointer (@note only allow non-status local variables)
+        tb_size_t* count = (tb_size_t*)priv;
+
+        // enter coroutine
+        tb_lo_coroutine_enter(coroutine);
+
+        // @note can not define local variables here
+        // ...
+
+        // loop
+        while ((*count)--)
+        {
+            // yield
+            tb_lo_coroutine_yield();
+        }
+
+        // leave coroutine
+        tb_lo_coroutine_leave();
+    }
+
+    tb_int_t main (tb_int_t argc, tb_char_t** argv)
+    {
+        // init tbox
+        if (!tb_init(tb_null, tb_null)) return -1;
+
+        // init scheduler
+        tb_lo_scheduler_ref_t scheduler = tb_lo_scheduler_init();
+        if (scheduler)
+        {
+            // start coroutine
+            tb_size_t counts[] = {100, 100};
+            tb_lo_coroutine_start(scheduler, switchtask, &counts[0]);
+            tb_lo_coroutine_start(scheduler, switchtask, &counts[1]);
+
+            // run scheduler
+            tb_lo_scheduler_loop(scheduler);
+
+            // exit scheduler
+            tb_lo_scheduler_exit(scheduler);
+        }
+
+        // exit tbox
+        tb_exit();
+    }
+
+ * @endcode
+ *
+ * @param scheduler     the scheduler (can not be null, we can get scheduler of the current coroutine from tb_lo_scheduler_self())
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_lo_coroutine_start(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
+
+/*! resume the given coroutine
+ *
+ * @param coroutine     the coroutine 
+ */
+tb_void_t               tb_lo_coroutine_resume(tb_lo_coroutine_ref_t coroutine);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

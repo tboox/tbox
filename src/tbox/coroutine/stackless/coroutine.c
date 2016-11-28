@@ -123,6 +123,9 @@ tb_lo_scheduler_ref_t tb_lo_coroutine_scheduler(tb_lo_coroutine_ref_t self)
 }
 tb_bool_t tb_lo_coroutine_start(tb_lo_scheduler_ref_t self, tb_lo_coroutine_func_t func, tb_cpointer_t priv)
 {
-    return tb_lo_scheduler_start(self, func, priv);
+    return tb_lo_scheduler_start((tb_lo_scheduler_t*)self, func, priv);
 }
-
+tb_void_t tb_lo_coroutine_resume(tb_lo_coroutine_ref_t self)
+{
+    tb_lo_scheduler_resume((tb_lo_scheduler_t*)tb_lo_coroutine_scheduler(self), (tb_lo_coroutine_t*)self);
+}

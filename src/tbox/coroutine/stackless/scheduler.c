@@ -90,6 +90,7 @@ static tb_void_t tb_lo_scheduler_make_dead(tb_lo_scheduler_t* scheduler, tb_lo_c
 {
     // check
     tb_assert(scheduler && coroutine);
+    tb_assert(tb_lo_core_state(coroutine) == TB_STATE_END);
 
     // trace
     tb_trace_d("finish coroutine(%p)", coroutine);
@@ -99,6 +100,21 @@ static tb_void_t tb_lo_scheduler_make_dead(tb_lo_scheduler_t* scheduler, tb_lo_c
 
     // append this coroutine to dead coroutines
     tb_list_entry_insert_tail(&scheduler->coroutines_dead, &coroutine->entry);
+}
+static tb_void_t tb_lo_scheduler_make_suspend(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t* coroutine)
+{
+    // check
+    tb_assert(scheduler && coroutine);
+    tb_assert(tb_lo_core_state(coroutine) == TB_STATE_READY);
+
+    // trace
+    tb_trace_d("suspend coroutine(%p)", coroutine);
+
+    // remove this coroutine from the ready coroutines
+    tb_list_entry_remove(&scheduler->coroutines_ready, &coroutine->entry);
+
+    // append this coroutine to suspend coroutines
+    tb_list_entry_insert_tail(&scheduler->coroutines_suspend, &coroutine->entry);
 }
 static __tb_inline__ tb_lo_coroutine_t* tb_lo_scheduler_next_ready(tb_lo_scheduler_t* scheduler)
 {
@@ -120,6 +136,7 @@ static tb_void_t tb_lo_scheduler_switch(tb_lo_scheduler_t* scheduler, tb_lo_coro
 {
     // check
     tb_assert(scheduler && coroutine && coroutine->func);
+    tb_assert(tb_lo_core_state(coroutine) == TB_STATE_READY);
 
     // trace
     tb_trace_d("switch to coroutine(%p) from coroutine(%p)", coroutine, scheduler->running);
@@ -130,9 +147,86 @@ static tb_void_t tb_lo_scheduler_switch(tb_lo_scheduler_t* scheduler, tb_lo_coro
     // call the coroutine function
     coroutine->func((tb_lo_coroutine_ref_t)coroutine, coroutine->priv);
 }
+tb_bool_t tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv)
+{
+    // check
+    tb_assert(scheduler && func);
+
+    // done
+    tb_bool_t           ok = tb_false;
+    tb_lo_coroutine_t*  coroutine = tb_null;
+    do
+    {
+        // trace
+        tb_trace_d("start ..");
+
+        // have been stopped? do not continue to start new coroutines
+        tb_check_break(!scheduler->stopped);
+
+        // reuses dead coroutines in init function
+        if (tb_list_entry_size(&scheduler->coroutines_dead))
+        {
+            // get the next entry from head
+            tb_list_entry_ref_t entry = tb_list_entry_head(&scheduler->coroutines_dead);
+            tb_assert_and_check_break(entry);
+
+            // remove it from the ready coroutines
+            tb_list_entry_remove_head(&scheduler->coroutines_dead);
+
+            // get the dead coroutine
+            coroutine = (tb_lo_coroutine_t*)tb_list_entry(&scheduler->coroutines_dead, entry);
+
+            // reinit this coroutine
+            tb_lo_coroutine_reinit(coroutine, func, priv);
+        }
+
+        // init coroutine
+        if (!coroutine) coroutine = tb_lo_coroutine_init((tb_lo_scheduler_ref_t)scheduler, func, priv);
+        tb_assert_and_check_break(coroutine);
+
+        // ready coroutine
+        tb_lo_scheduler_make_ready(scheduler, coroutine);
+
+        // the dead coroutines is too much? free some coroutines
+        while (tb_list_entry_size(&scheduler->coroutines_dead) > TB_SCHEDULER_DEAD_CACHE_MAXN)
+        {
+            // get the next entry from head
+            tb_list_entry_ref_t entry = tb_list_entry_head(&scheduler->coroutines_dead);
+            tb_assert(entry);
+
+            // remove it from the ready coroutines
+            tb_list_entry_remove_head(&scheduler->coroutines_dead);
+
+            // exit this coroutine
+            tb_lo_coroutine_exit((tb_lo_coroutine_t*)tb_list_entry(&scheduler->coroutines_dead, entry));
+        }
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // trace
+    tb_trace_d("start %s", ok? "ok" : "no");
+
+    // ok?
+    return ok;
+}
+tb_void_t tb_lo_scheduler_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t* coroutine)
+{
+    // check
+    tb_assert(scheduler && coroutine);
+    tb_assert(tb_lo_core_state(coroutine) == TB_STATE_SUSPEND);
+
+    // remove it from the suspend coroutines
+    tb_list_entry_remove(&scheduler->coroutines_suspend, &coroutine->entry);
+
+    // make it as ready
+    tb_lo_scheduler_make_ready(scheduler, coroutine);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * public implementation
  */
 tb_lo_scheduler_ref_t tb_lo_scheduler_init()
 {
@@ -238,8 +332,9 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self)
             // mark this coroutine as dead if the running coroutine have been finished
             if (state == TB_STATE_END)
                 tb_lo_scheduler_make_dead(scheduler, scheduler->running);
-
-            // TODO suspend
+            // suspend the running coroutine 
+            else if (state == TB_STATE_SUSPEND)
+                tb_lo_scheduler_make_suspend(scheduler, scheduler->running);
         }
             
         // switch to it if the next coroutine (may be running coroutine) is ready
@@ -249,71 +344,5 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self)
 
     // stop it
     scheduler->stopped = tb_true;
-}
-tb_bool_t tb_lo_scheduler_start(tb_lo_scheduler_ref_t self, tb_lo_coroutine_func_t func, tb_cpointer_t priv)
-{
-    // check
-    tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)self;
-    tb_assert(scheduler && func);
-
-    // done
-    tb_bool_t           ok = tb_false;
-    tb_lo_coroutine_t*  coroutine = tb_null;
-    do
-    {
-        // trace
-        tb_trace_d("start ..");
-
-        // have been stopped? do not continue to start new coroutines
-        tb_check_break(!scheduler->stopped);
-
-        // reuses dead coroutines in init function
-        if (tb_list_entry_size(&scheduler->coroutines_dead))
-        {
-            // get the next entry from head
-            tb_list_entry_ref_t entry = tb_list_entry_head(&scheduler->coroutines_dead);
-            tb_assert_and_check_break(entry);
-
-            // remove it from the ready coroutines
-            tb_list_entry_remove_head(&scheduler->coroutines_dead);
-
-            // get the dead coroutine
-            coroutine = (tb_lo_coroutine_t*)tb_list_entry(&scheduler->coroutines_dead, entry);
-
-            // reinit this coroutine
-            tb_lo_coroutine_reinit(coroutine, func, priv);
-        }
-
-        // init coroutine
-        if (!coroutine) coroutine = tb_lo_coroutine_init((tb_lo_scheduler_ref_t)scheduler, func, priv);
-        tb_assert_and_check_break(coroutine);
-
-        // ready coroutine
-        tb_lo_scheduler_make_ready(scheduler, coroutine);
-
-        // the dead coroutines is too much? free some coroutines
-        while (tb_list_entry_size(&scheduler->coroutines_dead) > TB_SCHEDULER_DEAD_CACHE_MAXN)
-        {
-            // get the next entry from head
-            tb_list_entry_ref_t entry = tb_list_entry_head(&scheduler->coroutines_dead);
-            tb_assert(entry);
-
-            // remove it from the ready coroutines
-            tb_list_entry_remove_head(&scheduler->coroutines_dead);
-
-            // exit this coroutine
-            tb_lo_coroutine_exit((tb_lo_coroutine_t*)tb_list_entry(&scheduler->coroutines_dead, entry));
-        }
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // trace
-    tb_trace_d("start %s", ok? "ok" : "no");
-
-    // ok?
-    return ok;
 }
 

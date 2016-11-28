@@ -68,13 +68,20 @@ typedef struct __tb_lo_scheduler_t
 
 /*! start coroutine 
  *
- * @param scheduler     the scheduler (can not be null)
+ * @param scheduler     the scheduler 
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_lo_scheduler_start(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
+
+/*! resume the given coroutine
+ *
+ * @param scheduler     the scheduler
+ * @param coroutine     the coroutine 
+ */
+tb_void_t               tb_lo_scheduler_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t* coroutine);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
