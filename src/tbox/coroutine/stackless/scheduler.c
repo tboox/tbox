@@ -227,6 +227,7 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self)
 
         // get the next ready coroutine
         tb_lo_coroutine_t* coroutine_next = tb_lo_scheduler_next_ready(scheduler);
+        tb_assert(coroutine_next);
 
         // process the running coroutine
         if (scheduler->running)
@@ -241,8 +242,8 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self)
             // TODO suspend
         }
             
-        // switch to the next coroutine if exists
-        if (coroutine_next != scheduler->running)
+        // switch to it if the next coroutine (may be running coroutine) is ready
+        if (tb_lo_core_state(coroutine_next) == TB_STATE_READY)
             tb_lo_scheduler_switch(scheduler, coroutine_next);
     }
 
