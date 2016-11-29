@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "scheduler_io"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -38,8 +38,38 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_void_t tb_lo_scheduler_io_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t* coroutine, tb_size_t events)
+{
+    // clear waiting state
+    coroutine->rs.wait.waiting = 0;
+
+    // return events 
+    coroutine->rs.wait.events_result = (tb_sint16_t)events;
+
+    // resume the coroutine
+    tb_lo_scheduler_resume(scheduler, coroutine);
+}
 static tb_void_t tb_lo_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
+    // check
+    tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)priv;
+    tb_assert(coroutine && poller && sock && priv);
+
+    // get scheduler
+    tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
+    tb_assert(scheduler);
+
+    // trace
+    tb_trace_d("coroutine(%p): socket: %p, events %lu", coroutine, sock, events);
+
+    // waiting now?
+    if (coroutine->rs.wait.waiting)
+    {
+        // resume the coroutine and pass the events to suspend()
+        tb_lo_scheduler_io_resume(scheduler, coroutine, events);
+    }
+    // cache this events
+    else coroutine->rs.wait.events_cache = events;
 }
 static tb_void_t tb_lo_scheduler_io_loop(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
@@ -97,7 +127,7 @@ tb_lo_scheduler_io_ref_t tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler)
         tb_assert_and_check_break(scheduler_io->poller);
 
         // start the io loop coroutine
-        if (!tb_lo_coroutine_start((tb_lo_scheduler_ref_t)scheduler, tb_lo_scheduler_io_loop, scheduler_io)) break;
+        if (!tb_lo_coroutine_start((tb_lo_scheduler_ref_t)scheduler, tb_lo_scheduler_io_loop, scheduler_io, tb_null)) break;
 
         // ok
         ok = tb_true;
@@ -146,11 +176,10 @@ tb_void_t tb_lo_scheduler_io_sleep(tb_lo_scheduler_io_ref_t scheduler_io, tb_lon
     // TODO
     tb_trace_noimpl();
 }
-#if 0
-tb_long_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
     // check
-    tb_assert_and_check_return_val(scheduler_io && sock && scheduler_io->poller && scheduler_io->scheduler, -1);
+    tb_assert(scheduler_io && sock && scheduler_io->poller && scheduler_io->scheduler);
 
     // get the current coroutine
     tb_lo_coroutine_t* coroutine = tb_lo_scheduler_running(scheduler_io->scheduler);
@@ -160,7 +189,7 @@ tb_long_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
     tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
 
     // no events? remove the this socket from poller
-    tb_socket_ref_t sock_prev = coroutine->rs.waiting.sock;
+    tb_socket_ref_t sock_prev = coroutine->rs.wait.sock;
     if (!events && sock_prev == sock)
     {
         // remove the previous socket first if exists
@@ -170,11 +199,13 @@ tb_long_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock, coroutine);
 
             // failed
-            return -1;
+            coroutine->rs.wait.events_result = -1;
+            return tb_false;
         }
 
         // remove ok
-        return 0;
+        coroutine->rs.wait.events_result = 0;
+        return tb_false;
     }
 
     // enable edge-trigger mode if be supported
@@ -185,12 +216,12 @@ tb_long_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
     if (sock_prev == sock)
     {
         // return the cached events directly if the waiting events exists cache
-        tb_size_t events_prev   = coroutine->rs.waiting.events;
-        tb_size_t events_cache  = coroutine->rs.waiting.events_cache;
+        tb_size_t events_prev   = coroutine->rs.wait.events;
+        tb_size_t events_cache  = coroutine->rs.wait.events_cache;
         if (events_cache && (events_prev & events))
         {
             // clear cache events
-            coroutine->rs.waiting.events_cache &= ~events;
+            coroutine->rs.wait.events_cache &= ~events;
 
             // return the cached events
             return events_cache & events;
@@ -203,7 +234,8 @@ tb_long_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             tb_trace_e("failed to modify sock(%p) to poller on coroutine(%p)!", sock, coroutine);
 
             // failed
-            return -1;
+            coroutine->rs.wait.events_result = -1;
+            return tb_false;
         }
     }
     else
@@ -215,7 +247,8 @@ tb_long_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock_prev, coroutine);
 
             // failed
-            return -1;
+            coroutine->rs.wait.events_result = -1;
+            return tb_false;
         }
 
         // insert socket to poller for waiting events
@@ -225,21 +258,22 @@ tb_long_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             tb_trace_e("failed to insert sock(%p) to poller on coroutine(%p)!", sock, coroutine);
 
             // failed
-            return -1;
+            coroutine->rs.wait.events_result = -1;
+            return tb_false;
         }
     }
 
     // save the socket to coroutine for the timer function
-    coroutine->rs.waiting.sock = sock;
+    coroutine->rs.wait.sock = sock;
 
     // save waiting events to coroutine
-    coroutine->rs.waiting.events        = (tb_uint16_t)events;
-    coroutine->rs.waiting.events_cache  = 0;
+    coroutine->rs.wait.events        = (tb_uint16_t)events;
+    coroutine->rs.wait.events_cache  = 0;
+    coroutine->rs.wait.events_result = 0;
 
     // mark as waiting state
-    coroutine->rs.waiting.waiting       = 1;
+    coroutine->rs.wait.waiting       = 1;
 
-    // suspend the current coroutine and return the waited result
-    return (tb_long_t)tb_lo_scheduler_suspend(scheduler_io->scheduler, tb_null);
+    // suspend it
+    return tb_true;
 }
-#endif

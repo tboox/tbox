@@ -54,7 +54,7 @@
 static tb_void_t tb_co_scheduler_io_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv)
 {
     // exists the timer task? remove it
-    tb_cpointer_t task = coroutine->rs.waiting.task;
+    tb_cpointer_t task = coroutine->rs.wait.task;
     if (task) 
     {
         // get io scheduler
@@ -70,11 +70,11 @@ static tb_void_t tb_co_scheduler_io_resume(tb_co_scheduler_t* scheduler, tb_coro
         // remove the timer task
         if (__tb_unlikely__(is_timer)) tb_timer_task_exit(scheduler_io->timer, (tb_timer_task_ref_t)((tb_size_t)task & (tb_size_t)~0x1));
         else tb_ltimer_task_exit(scheduler_io->ltimer, (tb_ltimer_task_ref_t)task);
-        coroutine->rs.waiting.task = tb_null;
+        coroutine->rs.wait.task = tb_null;
     }
 
     // clear waiting state
-    coroutine->rs.waiting.waiting = 0;
+    coroutine->rs.wait.waiting = 0;
 
     // resume the coroutine
     tb_co_scheduler_resume(scheduler, coroutine, priv);
@@ -109,13 +109,13 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
     tb_trace_d("coroutine(%p): socket: %p, events %lu", coroutine, sock, events);
 
     // waiting now?
-    if (coroutine->rs.waiting.waiting)
+    if (coroutine->rs.wait.waiting)
     {
         // resume the coroutine and pass the events to suspend()
         tb_co_scheduler_io_resume(scheduler, coroutine, (tb_cpointer_t)events);
     }
     // cache this events
-    else coroutine->rs.waiting.events_cache = events;
+    else coroutine->rs.wait.events_cache = events;
 }
 static tb_bool_t tb_co_scheduler_io_timer_spak(tb_co_scheduler_io_ref_t scheduler_io)
 {
@@ -314,7 +314,7 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
 
     // no events? remove the this socket from poller
-    tb_socket_ref_t sock_prev = coroutine->rs.waiting.sock;
+    tb_socket_ref_t sock_prev = coroutine->rs.wait.sock;
     if (!events && sock_prev == sock)
     {
         // remove the previous socket first if exists
@@ -339,12 +339,12 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     if (sock_prev == sock)
     {
         // return the cached events directly if the waiting events exists cache
-        tb_size_t events_prev   = coroutine->rs.waiting.events;
-        tb_size_t events_cache  = coroutine->rs.waiting.events_cache;
+        tb_size_t events_prev   = coroutine->rs.wait.events;
+        tb_size_t events_cache  = coroutine->rs.wait.events_cache;
         if (events_cache && (events_prev & events))
         {
             // clear cache events
-            coroutine->rs.waiting.events_cache &= ~events;
+            coroutine->rs.wait.events_cache &= ~events;
 
             // return the cached events
             return events_cache & events;
@@ -411,17 +411,17 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     tb_assert(!((tb_size_t)(task) & 0x1));
 
     // save the timer task to coroutine
-    coroutine->rs.waiting.task = (is_ltimer || !task)? task : (tb_cpointer_t)((tb_size_t)(task) | 0x1);
+    coroutine->rs.wait.task = (is_ltimer || !task)? task : (tb_cpointer_t)((tb_size_t)(task) | 0x1);
 
     // save the socket to coroutine for the timer function
-    coroutine->rs.waiting.sock = sock;
+    coroutine->rs.wait.sock = sock;
 
     // save waiting events to coroutine
-    coroutine->rs.waiting.events        = (tb_uint16_t)events;
-    coroutine->rs.waiting.events_cache  = 0;
+    coroutine->rs.wait.events        = (tb_uint16_t)events;
+    coroutine->rs.wait.events_cache  = 0;
 
     // mark as waiting state
-    coroutine->rs.waiting.waiting       = 1;
+    coroutine->rs.wait.waiting       = 1;
 
     // suspend the current coroutine and return the waited result
     return (tb_long_t)tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);

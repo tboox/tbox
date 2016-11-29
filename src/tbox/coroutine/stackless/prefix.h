@@ -45,5 +45,11 @@ typedef __tb_typeref__(lo_scheduler);
  */
 typedef tb_void_t       (*tb_lo_coroutine_func_t)(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv);
 
+/*! the user private data free function type
+ * 
+ * @param priv          the user private data from start(.., priv)
+ */
+typedef tb_void_t       (*tb_lo_coroutine_free_t)(tb_cpointer_t priv);
+
 
 #endif

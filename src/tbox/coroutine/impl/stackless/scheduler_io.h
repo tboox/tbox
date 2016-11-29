@@ -56,19 +56,19 @@ typedef struct __tb_lo_scheduler_io_t
  * interfaces
  */
 
-/*! init io scheduler 
+/* init io scheduler 
  *
  * @return                  the io scheduler 
  */
 tb_lo_scheduler_io_ref_t    tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler);
 
-/*! exit io scheduler 
+/* exit io scheduler 
  *
  * @param scheduler_io      the io scheduler
  */
 tb_void_t                   tb_lo_scheduler_io_exit(tb_lo_scheduler_io_ref_t scheduler_io);
 
-/*! kill the current io scheduler 
+/* kill the current io scheduler 
  *
  * @param scheduler_io      the io scheduler
  */
@@ -81,16 +81,16 @@ tb_void_t                   tb_lo_scheduler_io_kill(tb_lo_scheduler_io_ref_t sch
  */
 tb_void_t                   tb_lo_scheduler_io_sleep(tb_lo_scheduler_io_ref_t scheduler_io, tb_long_t interval);
 
-/*! wait io events 
+/* wait io events 
  *
  * @param scheduler_io      the io scheduler
  * @param sock              the socket
  * @param events            the waited events
  * @param timeout           the timeout, infinity: -1
  *
- * @return                  > 0: the events, 0: timeout, -1: failed
+ * @return                  suspend coroutine if be tb_true
  */
-tb_long_t                   tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+tb_bool_t                   tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

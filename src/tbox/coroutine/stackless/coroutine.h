@@ -161,6 +161,20 @@ do \
     \
 } while(0)
 
+// wait socket events
+#define tb_lo_coroutine_wait(sock, events, interval) \
+do \
+{ \
+    if (tb_lo_coroutine_wait_(tb_lo_coroutine_self(), sock, events, interval)) \
+    { \
+        tb_lo_coroutine_suspend(); \
+    } \
+    \
+} while(0)
+
+// get socket events after waiting
+#define tb_lo_coroutine_events()    tb_lo_coroutine_events_(tb_lo_coroutine_self())
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
@@ -184,6 +198,25 @@ tb_lo_scheduler_ref_t   tb_lo_coroutine_scheduler_(tb_lo_coroutine_ref_t corouti
  * @param interval      the interval (ms), infinity: -1
  */
 tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, tb_long_t interval);
+
+/* wait io events 
+ *
+ * @param coroutine     the coroutine 
+ * @param sock          the socket
+ * @param events        the waited events
+ * @param timeout       the timeout, infinity: -1
+ *
+ * @return              suspend coroutine if be tb_true
+ */
+tb_bool_t               tb_lo_coroutine_wait_(tb_lo_coroutine_ref_t coroutine, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+
+/* get the events after waiting socket
+ *
+ * @param coroutine     the coroutine 
+ *
+ * @return              events: > 0, failed: -1, timeout: 0
+ */
+tb_long_t               tb_lo_coroutine_events_(tb_lo_coroutine_ref_t coroutine);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -225,8 +258,8 @@ tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, 
         {
             // start coroutine
             tb_size_t counts[] = {100, 100};
-            tb_lo_coroutine_start(scheduler, switchtask, &counts[0]);
-            tb_lo_coroutine_start(scheduler, switchtask, &counts[1]);
+            tb_lo_coroutine_start(scheduler, switchtask, &counts[0], tb_null);
+            tb_lo_coroutine_start(scheduler, switchtask, &counts[1], tb_null);
 
             // run scheduler
             tb_lo_scheduler_loop(scheduler);
@@ -244,10 +277,11 @@ tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, 
  * @param scheduler     the scheduler (can not be null, we can get scheduler of the current coroutine from tb_lo_scheduler_self())
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
+ * @param free          the user private free function
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_lo_coroutine_start(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_lo_coroutine_start(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv, tb_lo_coroutine_free_t free);
 
 /*! resume the given coroutine
  *

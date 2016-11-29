@@ -219,6 +219,8 @@ TB_DEMO_MAIN_DECL(coroutine_http_server);
 TB_DEMO_MAIN_DECL(lo_coroutine_nest);
 TB_DEMO_MAIN_DECL(lo_coroutine_sleep);
 TB_DEMO_MAIN_DECL(lo_coroutine_switch);
+TB_DEMO_MAIN_DECL(lo_coroutine_echo_client);
+TB_DEMO_MAIN_DECL(lo_coroutine_echo_server);
 
 #endif
 

@@ -114,7 +114,7 @@ typedef struct __tb_coroutine_t
         tb_coroutine_rs_func_t      func;
 
         // the arguments for wait()
-        tb_coroutine_rs_wait_t      waiting;
+        tb_coroutine_rs_wait_t      wait;
 
         // the list entry
         tb_list_entry_t             entry;

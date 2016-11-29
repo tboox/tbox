@@ -37,6 +37,26 @@ __tb_extern_c_enter__
  * types
  */
 
+// the coroutine wait type
+typedef struct __tb_lo_coroutine_rs_wait_t
+{
+    // the socket
+    tb_socket_ref_t                 sock;
+
+    // the waiting events
+    tb_sint16_t                     events          : 6;
+
+    // the cached events
+    tb_sint16_t                     events_cache    : 6;
+
+    // the cached events
+    tb_sint16_t                     events_result   : 6;
+
+    // is waiting?
+    tb_sint16_t                     waiting         : 1;
+
+}tb_lo_coroutine_rs_wait_t;
+
 /// the stackless coroutine type
 typedef struct __tb_lo_coroutine_t
 {
@@ -52,8 +72,19 @@ typedef struct __tb_lo_coroutine_t
     // the user private data of the coroutine function
     tb_cpointer_t               priv;
 
+    // the user private data free function
+    tb_lo_coroutine_free_t      free;
+
     // the scheduler
     tb_lo_scheduler_ref_t       scheduler;
+
+    // the passed private data between resume() and suspend()
+    union 
+    {
+        // the arguments for wait()
+        tb_lo_coroutine_rs_wait_t   wait;
+
+    }                               rs;
 
 }tb_lo_coroutine_t;
 
@@ -66,20 +97,22 @@ typedef struct __tb_lo_coroutine_t
  * @param scheduler     the scheduler
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
+ * @param free          the user private data free function
  *
  * @return              the coroutine 
  */
-tb_lo_coroutine_t*      tb_lo_coroutine_init(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
+tb_lo_coroutine_t*      tb_lo_coroutine_init(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv, tb_lo_coroutine_free_t free);
 
 /* reinit the given coroutine 
  *
  * @param coroutine     the coroutine
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
+ * @param free          the user private data free function
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_lo_coroutine_reinit(tb_lo_coroutine_t* coroutine, tb_lo_coroutine_func_t func, tb_cpointer_t priv);
+tb_bool_t               tb_lo_coroutine_reinit(tb_lo_coroutine_t* coroutine, tb_lo_coroutine_func_t func, tb_cpointer_t priv, tb_lo_coroutine_free_t free);
 
 /* exit coroutine
  *

@@ -74,6 +74,9 @@ static tb_void_t tb_lo_scheduler_make_ready(tb_lo_scheduler_t* scheduler, tb_lo_
     // check
     tb_assert(scheduler && coroutine);
 
+    // mark ready state
+    tb_lo_core_state_set(coroutine, TB_STATE_READY);
+
     // insert this coroutine to ready coroutines 
     if (scheduler->running)
     { 
@@ -95,6 +98,9 @@ static tb_void_t tb_lo_scheduler_make_dead(tb_lo_scheduler_t* scheduler, tb_lo_c
     // trace
     tb_trace_d("finish coroutine(%p)", coroutine);
 
+    // free the user private data first
+    if (coroutine->free) coroutine->free(coroutine->priv);
+
     // remove this coroutine from the ready coroutines
     tb_list_entry_remove(&scheduler->coroutines_ready, &coroutine->entry);
 
@@ -105,7 +111,7 @@ static tb_void_t tb_lo_scheduler_make_suspend(tb_lo_scheduler_t* scheduler, tb_l
 {
     // check
     tb_assert(scheduler && coroutine);
-    tb_assert(tb_lo_core_state(coroutine) == TB_STATE_READY);
+    tb_assert(tb_lo_core_state(coroutine) == TB_STATE_SUSPEND);
 
     // trace
     tb_trace_d("suspend coroutine(%p)", coroutine);
@@ -147,7 +153,7 @@ static tb_void_t tb_lo_scheduler_switch(tb_lo_scheduler_t* scheduler, tb_lo_coro
     // call the coroutine function
     coroutine->func((tb_lo_coroutine_ref_t)coroutine, coroutine->priv);
 }
-tb_bool_t tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv)
+tb_bool_t tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv, tb_lo_coroutine_free_t free)
 {
     // check
     tb_assert(scheduler && func);
@@ -177,11 +183,11 @@ tb_bool_t tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_fu
             coroutine = (tb_lo_coroutine_t*)tb_list_entry(&scheduler->coroutines_dead, entry);
 
             // reinit this coroutine
-            tb_lo_coroutine_reinit(coroutine, func, priv);
+            tb_lo_coroutine_reinit(coroutine, func, priv, free);
         }
 
         // init coroutine
-        if (!coroutine) coroutine = tb_lo_coroutine_init((tb_lo_scheduler_ref_t)scheduler, func, priv);
+        if (!coroutine) coroutine = tb_lo_coroutine_init((tb_lo_scheduler_ref_t)scheduler, func, priv, free);
         tb_assert_and_check_break(coroutine);
 
         // ready coroutine
@@ -273,6 +279,10 @@ tb_void_t tb_lo_scheduler_exit(tb_lo_scheduler_ref_t self)
     // must be stopped
     tb_assert(scheduler->stopped);
     
+    // exit io scheduler first 
+    if (scheduler->scheduler_io) tb_lo_scheduler_io_exit(scheduler->scheduler_io);
+    scheduler->scheduler_io = tb_null;
+
     // check coroutines
     tb_assert(!tb_list_entry_size(&scheduler->coroutines_ready));
     tb_assert(!tb_list_entry_size(&scheduler->coroutines_suspend));

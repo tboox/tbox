@@ -4,31 +4,48 @@
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */ 
+
+// the sleep local type
+typedef struct __tb_demo_lo_sleep_local_t
+{
+    // the interval 
+    tb_size_t       interval;
+
+    // the count 
+    tb_size_t       count;
+
+    // the time
+    tb_hong_t       time;
+
+}tb_demo_lo_sleep_local_t, *tb_demo_lo_sleep_local_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
 static tb_void_t tb_demo_lo_coroutine_sleep_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
-    // the interval
-    tb_size_t interval = (tb_size_t)priv;
+    // the local
+    tb_demo_lo_sleep_local_ref_t local = (tb_demo_lo_sleep_local_ref_t)priv;
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine);
 
     // loop
-    tb_size_t count = 10;
-    while (count--)
+    while (local->count--)
     {
         // get the start time
-        tb_hong_t time = tb_mclock();
+        local->time = tb_mclock();
 
         // sleep it
-        tb_lo_coroutine_sleep(interval);
+        tb_lo_coroutine_sleep(local->interval);
 
         // update the interval time
-        time = tb_mclock() - time;
+        local->time = tb_mclock() - local->time;
 
         // trace
-        tb_trace_i("[coroutine: %lu]: count: %lu, interval: %lld ms", interval, count, time);
+        tb_trace_i("[coroutine: %lu]: count: %lu, interval: %lld ms", local->interval, local->count, local->time);
     }
 
     // leave coroutine
@@ -45,10 +62,17 @@ tb_int_t tb_demo_lo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start coroutines
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, (tb_cpointer_t)1000);
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, (tb_cpointer_t)2000);
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, (tb_cpointer_t)10);
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, (tb_cpointer_t)100);
+        tb_demo_lo_sleep_local_t locals[] = 
+        {
+            {1000,  10}
+        ,   {2000,  10}
+        ,   {10,    10}
+        ,   {100,   10}
+        };
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[0], tb_null);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[1], tb_null);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[2], tb_null);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[3], tb_null);
 
         // run scheduler
         tb_lo_scheduler_loop(scheduler);
