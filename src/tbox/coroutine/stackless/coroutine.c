@@ -162,6 +162,23 @@ tb_long_t tb_lo_coroutine_events_(tb_lo_coroutine_ref_t self)
     // get events
     return coroutine->rs.wait.events;
 }
+tb_void_t tb_lo_coroutine_pass_free_(tb_cpointer_t priv)
+{
+    if (priv) tb_free(priv);
+}
+tb_pointer_t tb_lo_coroutine_pass1_make_(tb_size_t type_size, tb_cpointer_t value, tb_size_t offset, tb_size_t size)
+{
+    // check
+    tb_assert(type_size && value && offset + size <= type_size);
+
+    // make data
+    tb_byte_t* data = tb_malloc0(type_size);
+    if (data) tb_memcpy(data + offset, value, size);
+
+    // ok?
+    return data;
+}
+
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * public implementation

@@ -57,52 +57,17 @@ typedef struct __tb_demo_lo_listen_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_lo_local_exit(tb_cpointer_t priv)
-{
-    // exit client
-    if (priv) tb_free(priv);
-}
-static tb_demo_lo_client_ref_t tb_demo_lo_client_init(tb_socket_ref_t sock)
-{
-    // done
-    tb_bool_t               ok = tb_false;
-    tb_demo_lo_client_ref_t client = tb_null;
-    do
-    {
-        // make client
-        client = tb_malloc0_type(tb_demo_lo_client_t);
-        tb_assert_and_check_break(client);
-
-        // init socket
-        client->sock = sock;
-        client->size = sizeof(client->data) - 1;
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed?
-    if (!ok)
-    {
-        // free it
-        if (client) tb_free(client);
-        client = tb_null;
-    }
-
-    // ok?
-    return client;
-}
 static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
     tb_demo_lo_client_ref_t client = (tb_demo_lo_client_ref_t)priv;
-    tb_assert_and_check_return(client);
+    tb_assert(client);
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine);
 
     // read data
+    client->size = sizeof(client->data) - 1;
     while (client->read < client->size)
     {
         // read it
@@ -141,7 +106,7 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
 {
     // check
     tb_demo_lo_listen_ref_t listen = (tb_demo_lo_listen_ref_t)priv;
-    tb_assert_and_check_return(listen);
+    tb_assert(listen);
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine);
@@ -176,7 +141,7 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
                 while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
                 {
                     // start client connection
-                    if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_demo_lo_client_init(listen->client), tb_demo_lo_local_exit)) break;
+                    if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_lo_client_t, sock, listen->client))) break;
                 }
             }
         }
@@ -201,7 +166,7 @@ tb_int_t tb_demo_lo_coroutine_echo_server_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start listening
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_listen, tb_malloc0_type(tb_demo_lo_listen_t), tb_demo_lo_local_exit);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_listen, tb_lo_coroutine_pass(tb_demo_lo_listen_t));
 
         // run scheduler
         tb_lo_scheduler_loop(scheduler);

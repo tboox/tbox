@@ -29,6 +29,7 @@
  */
 #include "core.h"
 #include "scheduler.h"
+#include "../../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -152,7 +153,7 @@ do \
     \
 } while(0)
 
-// sleep some time
+/// sleep some time
 #define tb_lo_coroutine_sleep(interval) \
 do \
 { \
@@ -161,7 +162,7 @@ do \
     \
 } while(0)
 
-// wait socket events
+/// wait socket events
 #define tb_lo_coroutine_wait(sock, events, interval) \
 do \
 { \
@@ -172,8 +173,61 @@ do \
     \
 } while(0)
 
-// get socket events after waiting
+/// get socket events after waiting
 #define tb_lo_coroutine_events()    tb_lo_coroutine_events_(tb_lo_coroutine_self())
+
+/*! pass the user private data 
+ *
+ * @code
+ 
+    // start coroutine 
+    tb_lo_coroutine_start(scheduler, coroutine_func, tb_lo_coroutine_pass(tb_xxxx_priv_t));
+
+ * @endcode
+ *
+ * =>
+ *
+ * @code
+ 
+    // start coroutine
+    tb_lo_coroutine_start(scheduler, coroutine_func, tb_malloc0_type(tb_xxxx_priv_t), tb_lo_coroutine_pass_free_);
+
+ * @endcode
+ */
+#define tb_lo_coroutine_pass(type)  tb_malloc0_type(type), tb_lo_coroutine_pass_free_
+
+/*! pass the user private data and init one member
+ *
+ * @code
+ 
+    typedef struct __tb_xxxx_priv_t
+    {
+        tb_size_t   member;
+        tb_size_t   others;
+
+    }tb_xxxx_priv_t;
+ 
+    // start coroutine 
+    tb_lo_coroutine_start(scheduler, coroutine_func, tb_lo_coroutine_pass1(tb_xxxx_priv_t, member, value));
+
+ * @endcode
+ *
+ * =>
+ *
+ * @code
+ 
+    tb_xxxx_priv_t* priv = tb_malloc0_type(tb_xxxx_priv_t);
+    if (priv)
+    {
+        priv->member = value;
+    }
+ 
+    // start coroutine
+    tb_lo_coroutine_start(scheduler, coroutine_func, priv, tb_lo_coroutine_pass_free_);
+
+ * @endcode
+ */
+#define tb_lo_coroutine_pass1(type, member, value)  tb_lo_coroutine_pass1_make_(sizeof(type), &value, tb_offsetof(type, member), sizeof(value)), tb_lo_coroutine_pass_free_
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -217,6 +271,25 @@ tb_bool_t               tb_lo_coroutine_wait_(tb_lo_coroutine_ref_t coroutine, t
  * @return              events: > 0, failed: -1, timeout: 0
  */
 tb_long_t               tb_lo_coroutine_events_(tb_lo_coroutine_ref_t coroutine);
+
+/* free the user private data for pass()
+ *
+ * @note only be a wrapper of free() for tb_lo_coroutine_pass()
+ *
+ * @param priv          the user private data
+ */
+tb_void_t               tb_lo_coroutine_pass_free_(tb_cpointer_t priv);
+
+/* make the user private data for pass1()
+ *
+ * @param type_size     the data type size
+ * @param value         the value pointer
+ * @param offset        the member offset
+ * @param size          the value size
+ *
+ * @return              the user private data
+ */
+tb_pointer_t            tb_lo_coroutine_pass1_make_(tb_size_t type_size, tb_cpointer_t value, tb_size_t offset, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

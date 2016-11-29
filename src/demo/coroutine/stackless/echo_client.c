@@ -53,7 +53,7 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
 {
     // check
     tb_demo_lo_client_ref_t client = (tb_demo_lo_client_ref_t)priv;
-    tb_assert_and_check_return(client);
+    tb_assert(client);
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine);
@@ -132,11 +132,6 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
     // leave coroutine
     tb_lo_coroutine_leave();
 }
-static tb_void_t tb_demo_lo_local_exit(tb_cpointer_t priv)
-{
-    // exit client
-    if (priv) tb_free(priv);
-}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
@@ -157,7 +152,7 @@ tb_int_t tb_demo_lo_coroutine_echo_client_main(tb_int_t argc, tb_char_t** argv)
         while (count--)
         {
             // start it
-            tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_echo, tb_malloc0_type(tb_demo_lo_client_t), tb_demo_lo_local_exit);
+            tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_echo, tb_lo_coroutine_pass(tb_demo_lo_client_t));
         }
 
         // run scheduler

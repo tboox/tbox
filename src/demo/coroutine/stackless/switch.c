@@ -17,7 +17,7 @@ static tb_void_t tb_demo_lo_coroutine_switch_test_func(tb_lo_coroutine_ref_t cor
 {
     // check
     tb_size_t* count = (tb_size_t*)priv;
-    tb_assert_and_check_return(count);
+    tb_assert(count);
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine);
@@ -59,7 +59,7 @@ static tb_void_t tb_demo_lo_coroutine_switch_perf_func(tb_lo_coroutine_ref_t cor
 {
     // check
     tb_size_t* count = (tb_size_t*)priv;
-    tb_assert_and_check_return(count);
+    tb_assert(count);
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine);

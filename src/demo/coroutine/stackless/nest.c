@@ -10,7 +10,7 @@ static tb_void_t tb_demo_lo_coroutine_nest_func(tb_lo_coroutine_ref_t coroutine,
 {
     // check
     tb_size_t* count = (tb_size_t*)priv;
-    tb_assert_and_check_return(count);
+    tb_assert(count);
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine);
