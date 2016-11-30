@@ -44,6 +44,9 @@ typedef struct __tb_demo_lo_client_t
     // connect ok?
     tb_long_t           ok;
 
+    // the id
+    tb_size_t           id;
+
 }tb_demo_lo_client_t, *tb_demo_lo_client_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -85,10 +88,10 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
         tb_check_break(client->ok > 0);
 
         // trace
-        tb_trace_i("sending %p ..", client);
+        tb_trace_i("sending %lu ..", client->id);
 
         // make data
-        tb_snprintf(client->data, sizeof(client->data), "hello: %p", client);
+        tb_snprintf(client->data, sizeof(client->data), "hello: %lu", client->id);
 
         // send data
         client->size = tb_strlen(client->data) + 1;
@@ -149,10 +152,11 @@ tb_int_t tb_demo_lo_coroutine_echo_client_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start echo
-        while (count--)
+        tb_size_t i = 0;
+        for (i = 0; i < count; i++)
         {
             // start it
-            tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_echo, tb_lo_coroutine_pass(tb_demo_lo_client_t));
+            tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_echo, tb_lo_coroutine_pass1(tb_demo_lo_client_t, id, i));
         }
 
         // run scheduler

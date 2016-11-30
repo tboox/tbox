@@ -160,7 +160,7 @@ tb_long_t tb_lo_coroutine_events_(tb_lo_coroutine_ref_t self)
     tb_assert(coroutine);
 
     // get events
-    return coroutine->rs.wait.events;
+    return coroutine->rs.wait.events_result;
 }
 tb_void_t tb_lo_coroutine_pass_free_(tb_cpointer_t priv)
 {
