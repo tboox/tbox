@@ -56,6 +56,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_echo_client)
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_file_server)
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_file_client)
+,   TB_DEMO_MAIN_ITEM(lo_coroutine_http_server)
 
 };
 
