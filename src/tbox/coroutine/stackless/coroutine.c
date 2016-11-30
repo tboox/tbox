@@ -172,7 +172,7 @@ tb_pointer_t tb_lo_coroutine_pass1_make_(tb_size_t type_size, tb_cpointer_t valu
     tb_assert(type_size && value && offset + size <= type_size);
 
     // make data
-    tb_byte_t* data = tb_malloc0(type_size);
+    tb_byte_t* data = tb_malloc0_bytes(type_size);
     if (data) tb_memcpy(data + offset, value, size);
 
     // ok?
