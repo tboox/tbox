@@ -6,24 +6,29 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+static tb_void_t tb_demo_coroutine_nest_next(tb_size_t start, tb_size_t end)
+{
+    // loop
+    for (; start < end; start++)
+    {
+        // trace
+        tb_trace_i("[coroutine: %p]:   %lu", tb_coroutine_self(), start);
+
+        // yield
+        tb_coroutine_yield();
+    }
+}
 static tb_void_t tb_demo_coroutine_nest_func(tb_cpointer_t priv)
 {
-    // the count
-    tb_size_t count = (tb_size_t)priv;
-    if (count == 10)
-    {
-        // start coroutines
-        tb_coroutine_start(tb_null, tb_demo_coroutine_nest_func, (tb_cpointer_t)5, 0);
-        tb_coroutine_start(tb_null, tb_demo_coroutine_nest_func, (tb_cpointer_t)15, 0);
-        tb_coroutine_start(tb_null, tb_demo_coroutine_nest_func, (tb_cpointer_t)25, 0);
-        tb_coroutine_start(tb_null, tb_demo_coroutine_nest_func, (tb_cpointer_t)35, 0);
-    }
-
     // loop
+    tb_size_t count = (tb_size_t)priv;
     while (count--)
     {
         // trace
         tb_trace_i("[coroutine: %p]: %lu", tb_coroutine_self(), count);
+
+        // call next level function
+        tb_demo_coroutine_nest_next(count * 10, count * 10 + 5);
 
         // yield
         tb_coroutine_yield();
@@ -40,8 +45,6 @@ tb_int_t tb_demo_coroutine_nest_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start coroutines
-        tb_coroutine_start(scheduler, tb_demo_coroutine_nest_func, (tb_cpointer_t)10, 0);
-        tb_coroutine_start(scheduler, tb_demo_coroutine_nest_func, (tb_cpointer_t)10, 0);
         tb_coroutine_start(scheduler, tb_demo_coroutine_nest_func, (tb_cpointer_t)10, 0);
         tb_coroutine_start(scheduler, tb_demo_coroutine_nest_func, (tb_cpointer_t)10, 0);
 
