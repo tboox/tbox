@@ -2,7 +2,7 @@
 
 [![Build Status](https://api.travis-ci.org/waruqi/tbox.svg)](https://travis-ci.org/waruqi/tbox) [![Build status](https://ci.appveyor.com/api/projects/status/n6q15h2978vmgkww?svg=true)](https://ci.appveyor.com/project/waruqi/tbox) [![codecov](https://codecov.io/gh/waruqi/tbox/branch/master/graph/badge.svg)](https://codecov.io/gh/waruqi/tbox) [![Join the chat at https://gitter.im/waruqi/tboox](https://badges.gitter.im/waruqi/tboox.svg)](https://gitter.im/waruqi/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![donate](http://tboox.org/static/img/donate.svg)](http://tboox.org/donation/)
 
-## Introduction ([中文介绍](#中文介绍))
+## Introduction ([中文](#中文))
 
 TBOX is a glib-like cross-platform C library that is simple to use yet powerful in nature.
 
@@ -262,7 +262,7 @@ Please install xmake first: [xmake](https://github.com/waruqi/xmake)
 * Homepage：[TBOOX Open Source Project](http://www.tboox.org/cn)
 * Community：[TBOOX Open Source Community](http://www.tboox.org/forum)
 
-<h1 id="中文介绍"></h1>
+<h1 id="中文"></h1>
 
 ## 简介
 

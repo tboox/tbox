@@ -1,4 +1,4 @@
-# Changelog
+# Changelog  ([中文](#中文))
 
 ## master (unreleased)
 
@@ -104,6 +104,8 @@
 
 * Fix some bugs for android
 * Fix seek bug for stream
+
+<h1 id="中文"></h1>
 
 # 更新日志
 
