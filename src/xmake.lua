@@ -37,7 +37,7 @@ option("exception")
 
 -- option: deprecated
 option("deprecated")
-    set_default(true)
+    set_default(false)
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the deprecated interfaces.")
