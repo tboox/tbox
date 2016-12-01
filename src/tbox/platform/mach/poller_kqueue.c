@@ -515,6 +515,10 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         if ((e->flags & EV_ERROR) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND))) 
             events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
+        // connection closed for the edge trigger?
+        if (e->flags & EV_EOF) 
+            events |= TB_POLLER_EVENT_EOF;
+
         // call event function
         func(self, sock, events, e->udata);
 

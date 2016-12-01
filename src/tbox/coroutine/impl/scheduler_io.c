@@ -111,6 +111,14 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
     // waiting now?
     if (coroutine->rs.wait.waiting)
     {
+        // eof for edge trigger?
+        if (events & TB_POLLER_EVENT_EOF)
+        {
+            // cache this eof as next recv/send event
+            events &= ~TB_POLLER_EVENT_EOF;
+            coroutine->rs.wait.events_cache |= coroutine->rs.wait.events;
+        }
+
         // resume the coroutine and pass the events to suspend()
         tb_co_scheduler_io_resume(scheduler, coroutine, (tb_cpointer_t)events);
     }
