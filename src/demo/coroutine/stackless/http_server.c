@@ -321,7 +321,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
 
                 // wait ok
                 session->locals.wait = tb_lo_coroutine_events();
-                tb_assert_and_check_break(wait >= 0);
+                tb_assert_and_check_break(session->locals.wait >= 0);
             }
             // failed or end?
             else break;
