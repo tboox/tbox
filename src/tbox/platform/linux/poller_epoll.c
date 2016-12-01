@@ -456,6 +456,11 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         if (epoll_events & (EPOLLHUP | EPOLLERR) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND))) 
             events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
+#ifdef EPOLLRDHUP
+        // connection closed for the edge trigger?
+        if (epoll_events & EPOLLRDHUP) events |= TB_POLLER_EVENT_EOF;
+#endif
+
         // call event function
         func(self, sock, events, tb_poller_hash_get(poller, fd));
 
