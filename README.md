@@ -48,6 +48,7 @@ If you want to know more, please refer to:
 - Provides semaphore and lock interfaces
 - Supports io socket and stream operation in coroutine
 - Provides some io servers (http ..) using coroutine
+- Provides stackfull and stackless coroutines
 
 #### The database library
 
@@ -314,6 +315,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 - 提供信号量、协程锁支持
 - socket、stream都模块原生支持协程，并且可在线程和协程间进行无缝切换
 - 提供http、file等基于协程的简单服务器实例，只需几百行代码，就可以从socket开始写个高性能io服务器，代码逻辑比异步回调模式更加清晰
+- 同时提供stackfull, stackless两种协程模式支持，stackless协程更加的轻量（每个协程只占用几十个bytes），切换更快（会牺牲部分易用性）
 
 #### 数据库
 
