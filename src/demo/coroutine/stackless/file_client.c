@@ -63,78 +63,76 @@ static tb_void_t tb_demo_lo_coroutine_pull(tb_lo_coroutine_ref_t coroutine, tb_c
     tb_assert(client);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // done
-    do
+    tb_lo_coroutine_enter(coroutine)
     {
-        // init socket
-        client->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
-        tb_assert_and_check_break(client->sock);
-
-        // init address
-        tb_ipaddr_set(&client->addr, "127.0.0.1", TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
-
-        // trace
-        tb_trace_d("[%p]: connecting %{ipaddr} ..", client->sock, &client->addr);
-
-        // connect socket
-        while (!(client->ok = tb_socket_connect(client->sock, &client->addr))) 
+        // done
+        do
         {
-            // wait it
-            tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
-            
-            // wait failed?
-            if (tb_lo_coroutine_events() <= 0) break;
-        }
+            // init socket
+            client->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
+            tb_assert_and_check_break(client->sock);
 
-        // connect ok?
-        tb_check_break(client->ok > 0);
-
-        // trace
-        tb_trace_d("[%p]: recving ..", client->sock);
-
-        // recv data
-        client->time = tb_mclock();
-        while (1)
-        {
-            // read it
-            client->real = tb_socket_recv(client->sock, client->data, sizeof(client->data));
+            // init address
+            tb_ipaddr_set(&client->addr, "127.0.0.1", TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
 
             // trace
-            tb_trace_d("[%p]: recv: %ld", client->sock, client->real);
+            tb_trace_d("[%p]: connecting %{ipaddr} ..", client->sock, &client->addr);
 
-            // has data?
-            if (client->real > 0)
-            {
-                client->recv += client->real;
-                client->wait = 0;
-            }
-            // no data? wait it
-            else if (!client->real && !client->wait)
+            // connect socket
+            while (!(client->ok = tb_socket_connect(client->sock, &client->addr))) 
             {
                 // wait it
-                tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
-
-                // wait ok
-                client->wait = tb_lo_coroutine_events();
-                tb_assert_and_check_break(client->wait >= 0);
+                tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
+                
+                // wait failed?
+                if (tb_lo_coroutine_events() <= 0) break;
             }
-            // failed or end?
-            else break;
-        }
 
-        // trace
-        tb_trace_i("[%p]: recv %llu bytes %lld ms", client->sock, client->recv, tb_mclock() - client->time);
+            // connect ok?
+            tb_check_break(client->ok > 0);
 
-    } while (0);
+            // trace
+            tb_trace_d("[%p]: recving ..", client->sock);
 
-    // exit socket
-    if (client->sock) tb_socket_exit(client->sock);
-    client->sock = tb_null;
+            // recv data
+            client->time = tb_mclock();
+            while (1)
+            {
+                // read it
+                client->real = tb_socket_recv(client->sock, client->data, sizeof(client->data));
 
-    // leave coroutine
-    tb_lo_coroutine_leave();
+                // trace
+                tb_trace_d("[%p]: recv: %ld", client->sock, client->real);
+
+                // has data?
+                if (client->real > 0)
+                {
+                    client->recv += client->real;
+                    client->wait = 0;
+                }
+                // no data? wait it
+                else if (!client->real && !client->wait)
+                {
+                    // wait it
+                    tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+
+                    // wait ok
+                    client->wait = tb_lo_coroutine_events();
+                    tb_assert_and_check_break(client->wait >= 0);
+                }
+                // failed or end?
+                else break;
+            }
+
+            // trace
+            tb_trace_i("[%p]: recv %llu bytes %lld ms", client->sock, client->recv, tb_mclock() - client->time);
+
+        } while (0);
+
+        // exit socket
+        if (client->sock) tb_socket_exit(client->sock);
+        client->sock = tb_null;
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

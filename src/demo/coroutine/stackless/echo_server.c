@@ -64,43 +64,41 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
     tb_assert(client);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // read data
-    client->size = sizeof(client->data) - 1;
-    while (client->read < client->size)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // read it
-        client->real = tb_socket_recv(client->sock, (tb_byte_t*)client->data + client->read, client->size - client->read);
-
-        // has data?
-        if (client->real > 0) 
+        // read data
+        client->size = sizeof(client->data) - 1;
+        while (client->read < client->size)
         {
-            client->read += client->real;
-            client->wait = 0;
-        }
-        // no data? wait it
-        else if (!client->real && !client->wait)
-        {
-            // wait it
-            tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+            // read it
+            client->real = tb_socket_recv(client->sock, (tb_byte_t*)client->data + client->read, client->size - client->read);
 
-            // wait ok
-            client->wait = tb_lo_coroutine_events();
-            tb_assert_and_check_break(client->wait >= 0);
+            // has data?
+            if (client->real > 0) 
+            {
+                client->read += client->real;
+                client->wait = 0;
+            }
+            // no data? wait it
+            else if (!client->real && !client->wait)
+            {
+                // wait it
+                tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+
+                // wait ok
+                client->wait = tb_lo_coroutine_events();
+                tb_assert_and_check_break(client->wait >= 0);
+            }
+            // failed or end?
+            else break;
         }
-        // failed or end?
-        else break;
+
+        // trace
+        tb_trace_i("echo: %s", client->data);
+
+        // exit socket
+        tb_socket_exit(client->sock);
     }
-
-    // trace
-    tb_trace_i("echo: %s", client->data);
-
-    // exit socket
-    tb_socket_exit(client->sock);
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
 static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
@@ -109,51 +107,49 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
     tb_assert(listen);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // done
-    do
+    tb_lo_coroutine_enter(coroutine)
     {
-        // init socket
-        listen->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
-        tb_assert_and_check_break(listen->sock);
-
-        // bind socket
-        tb_ipaddr_set(&listen->addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
-        if (!tb_socket_bind(listen->sock, &listen->addr)) break;
-
-        // listen socket
-        if (!tb_socket_listen(listen->sock, 1000)) break;
-
-        // trace
-        tb_trace_i("listening ..");
-
-        // loop
-        while (1)
+        // done
+        do
         {
-            // wait accept events
-            tb_lo_coroutine_wait(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+            // init socket
+            listen->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
+            tb_assert_and_check_break(listen->sock);
 
-            // wait ok
-            if (tb_lo_coroutine_events() > 0)
+            // bind socket
+            tb_ipaddr_set(&listen->addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
+            if (!tb_socket_bind(listen->sock, &listen->addr)) break;
+
+            // listen socket
+            if (!tb_socket_listen(listen->sock, 1000)) break;
+
+            // trace
+            tb_trace_i("listening ..");
+
+            // loop
+            while (1)
             {
-                // accept client sockets
-                while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
+                // wait accept events
+                tb_lo_coroutine_wait(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+
+                // wait ok
+                if (tb_lo_coroutine_events() > 0)
                 {
-                    // start client connection
-                    if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_lo_client_t, sock, listen->client))) break;
+                    // accept client sockets
+                    while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
+                    {
+                        // start client connection
+                        if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_lo_client_t, sock, listen->client))) break;
+                    }
                 }
             }
-        }
 
-    } while (0);
+        } while (0);
 
-    // exit socket
-    if (listen->sock) tb_socket_exit(listen->sock);
-    listen->sock = tb_null;
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
+        // exit socket
+        if (listen->sock) tb_socket_exit(listen->sock);
+        listen->sock = tb_null;
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

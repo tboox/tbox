@@ -30,26 +30,24 @@ static tb_void_t tb_demo_lo_coroutine_sleep_func(tb_lo_coroutine_ref_t coroutine
     tb_demo_lo_sleep_local_ref_t local = (tb_demo_lo_sleep_local_ref_t)priv;
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // loop
-    while (local->count--)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // get the start time
-        local->time = tb_mclock();
+        // loop
+        while (local->count--)
+        {
+            // get the start time
+            local->time = tb_mclock();
 
-        // sleep it
-        tb_lo_coroutine_sleep(local->interval);
+            // sleep it
+            tb_lo_coroutine_sleep(local->interval);
 
-        // update the interval time
-        local->time = tb_mclock() - local->time;
+            // update the interval time
+            local->time = tb_mclock() - local->time;
 
-        // trace
-        tb_trace_i("[coroutine: %lu]: count: %lu, interval: %lld ms", local->interval, local->count, local->time);
+            // trace
+            tb_trace_i("[coroutine: %lu]: count: %lu, interval: %lld ms", local->interval, local->count, local->time);
+        }
     }
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

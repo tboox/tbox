@@ -288,128 +288,95 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
     tb_assert(session);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // done
-    do
+    tb_lo_coroutine_enter(coroutine)
     {
-        // init session
-        if (!tb_demo_http_session_init(session)) break;
-
-        // read data
-        session->locals.ok = 0;
-        session->locals.wait = 0;
-        while (!session->locals.ok)
+        // done
+        do
         {
-            // read it
-            session->locals.real = tb_socket_recv(session->sock, session->data, sizeof(session->data));
+            // init session
+            if (!tb_demo_http_session_init(session)) break;
 
-            // has data?
-            if (session->locals.real > 0) 
+            // read data
+            session->locals.ok = 0;
+            session->locals.wait = 0;
+            while (!session->locals.ok)
             {
-                // get the header line
-                session->locals.ok = tb_demo_http_session_head_line(session, session->data, (tb_size_t)session->locals.real);
+                // read it
+                session->locals.real = tb_socket_recv(session->sock, session->data, sizeof(session->data));
 
-                // clear wait events
-                session->locals.wait = 0;
+                // has data?
+                if (session->locals.real > 0) 
+                {
+                    // get the header line
+                    session->locals.ok = tb_demo_http_session_head_line(session, session->data, (tb_size_t)session->locals.real);
+
+                    // clear wait events
+                    session->locals.wait = 0;
+                }
+                // no data? wait it
+                else if (!session->locals.real && !session->locals.wait)
+                {
+                    // wait it
+                    tb_lo_coroutine_wait(session->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+
+                    // wait ok
+                    session->locals.wait = tb_lo_coroutine_events();
+                    tb_assert_and_check_break(session->locals.wait >= 0);
+                }
+                // failed or end?
+                else break;
             }
-            // no data? wait it
-            else if (!session->locals.real && !session->locals.wait)
+            tb_check_break(session->locals.ok > 0);
+
+            // trace
+            tb_trace_d("path: %s", session->path);
+
+            // get file or cstr?
+            session->locals.cstr = tb_null;
+            if (session->method == TB_HTTP_METHOD_GET)
             {
-                // wait it
-                tb_lo_coroutine_wait(session->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+                // only send data?
+                if (g_onlydata) session->locals.cstr = g_rootdir;
+                else
+                {
+                    // make full path
+                    session->locals.real = tb_snprintf((tb_char_t*)session->data, sizeof(session->data), "%s%s%s", g_rootdir, session->path[0] != '/'? "/" : "", session->path);
+                    if (session->locals.real > 0) session->data[session->locals.real] = 0;
 
-                // wait ok
-                session->locals.wait = tb_lo_coroutine_events();
-                tb_assert_and_check_break(session->locals.wait >= 0);
+                    // init file
+                    session->file = tb_file_init((tb_char_t*)session->data, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
+
+                    // not found?
+                    if (!session->file) session->code = TB_HTTP_CODE_NOT_FOUND;
+                }
             }
-            // failed or end?
-            else break;
-        }
-        tb_check_break(session->locals.ok > 0);
 
-        // trace
-        tb_trace_d("path: %s", session->path);
+            // make the response header
+            session->locals.size = tb_snprintf(     (tb_char_t*)session->data
+                                                ,   sizeof(session->data)
+                                                ,   "HTTP/1.1 %lu %s\r\n"
+                                                    "Server: %s\r\n"
+                                                    "Content-Type: text/html\r\n"
+                                                    "Content-Length: %llu\r\n"
+                                                    "Connection: %s\r\n"
+                                                    "\r\n"
+                                                    "%s"
+                                                ,   session->code
+                                                ,   tb_demo_http_session_code_cstr(session->code)
+                                                ,   TB_VERSION_SHORT_STRING
+                                                ,   session->file? tb_file_size(session->file) : (session->locals.cstr? tb_strlen(session->locals.cstr) : 0)
+                                                ,   session->keep_alive? "keep-alive" : "close"
+                                                ,   session->locals.cstr? session->locals.cstr : "");
+            // end
+            session->data[session->locals.size] = 0;
 
-        // get file or cstr?
-        session->locals.cstr = tb_null;
-        if (session->method == TB_HTTP_METHOD_GET)
-        {
-            // only send data?
-            if (g_onlydata) session->locals.cstr = g_rootdir;
-            else
-            {
-                // make full path
-                session->locals.real = tb_snprintf((tb_char_t*)session->data, sizeof(session->data), "%s%s%s", g_rootdir, session->path[0] != '/'? "/" : "", session->path);
-                if (session->locals.real > 0) session->data[session->locals.real] = 0;
-
-                // init file
-                session->file = tb_file_init((tb_char_t*)session->data, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
-
-                // not found?
-                if (!session->file) session->code = TB_HTTP_CODE_NOT_FOUND;
-            }
-        }
-
-        // make the response header
-        session->locals.size = tb_snprintf(     (tb_char_t*)session->data
-                                            ,   sizeof(session->data)
-                                            ,   "HTTP/1.1 %lu %s\r\n"
-                                                "Server: %s\r\n"
-                                                "Content-Type: text/html\r\n"
-                                                "Content-Length: %llu\r\n"
-                                                "Connection: %s\r\n"
-                                                "\r\n"
-                                                "%s"
-                                            ,   session->code
-                                            ,   tb_demo_http_session_code_cstr(session->code)
-                                            ,   TB_VERSION_SHORT_STRING
-                                            ,   session->file? tb_file_size(session->file) : (session->locals.cstr? tb_strlen(session->locals.cstr) : 0)
-                                            ,   session->keep_alive? "keep-alive" : "close"
-                                            ,   session->locals.cstr? session->locals.cstr : "");
-        // end
-        session->data[session->locals.size] = 0;
-
-        // send data
-        session->locals.send = 0;
-        session->locals.wait = 0;
-        while (session->locals.send < session->locals.size)
-        {
-            // send it
-            session->locals.real = tb_socket_send(session->sock, session->data + session->locals.send, (tb_size_t)(session->locals.size - session->locals.send));
-
-            // has data?
-            if (session->locals.real > 0) 
-            {
-                session->locals.send += session->locals.real;
-                session->locals.wait = 0;
-            }
-            // no data? wait it
-            else if (!session->locals.real && !session->locals.wait)
-            {
-                // wait it
-                tb_lo_coroutine_wait(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
-
-                // wait ok
-                session->locals.wait = tb_lo_coroutine_events();
-                tb_assert_and_check_break(session->locals.wait >= 0);
-            }
-            // failed or end?
-            else break;
-        }
-        tb_check_break(session->locals.send == session->locals.size);
-
-        // send file
-        if (session->file)
-        {
             // send data
             session->locals.send = 0;
             session->locals.wait = 0;
-            session->locals.size = tb_file_size(session->file);
             while (session->locals.send < session->locals.size)
             {
                 // send it
-                session->locals.real = tb_socket_sendf(session->sock, session->file, session->locals.send, session->locals.size - session->locals.send);
+                session->locals.real = tb_socket_send(session->sock, session->data + session->locals.send, (tb_size_t)(session->locals.size - session->locals.send));
 
                 // has data?
                 if (session->locals.real > 0) 
@@ -431,22 +398,53 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
                 else break;
             }
             tb_check_break(session->locals.send == session->locals.size);
-        }
 
-        // exit file
-        if (session->file) tb_file_exit(session->file);
-        session->file = tb_null;
+            // send file
+            if (session->file)
+            {
+                // send data
+                session->locals.send = 0;
+                session->locals.wait = 0;
+                session->locals.size = tb_file_size(session->file);
+                while (session->locals.send < session->locals.size)
+                {
+                    // send it
+                    session->locals.real = tb_socket_sendf(session->sock, session->file, session->locals.send, session->locals.size - session->locals.send);
 
-        // trace
-        tb_trace_d("ok!");
+                    // has data?
+                    if (session->locals.real > 0) 
+                    {
+                        session->locals.send += session->locals.real;
+                        session->locals.wait = 0;
+                    }
+                    // no data? wait it
+                    else if (!session->locals.real && !session->locals.wait)
+                    {
+                        // wait it
+                        tb_lo_coroutine_wait(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
-    } while (session->keep_alive);
+                        // wait ok
+                        session->locals.wait = tb_lo_coroutine_events();
+                        tb_assert_and_check_break(session->locals.wait >= 0);
+                    }
+                    // failed or end?
+                    else break;
+                }
+                tb_check_break(session->locals.send == session->locals.size);
+            }
 
-    // exit session
-    tb_demo_http_session_exit(session);
- 
-    // leave coroutine
-    tb_lo_coroutine_leave();
+            // exit file
+            if (session->file) tb_file_exit(session->file);
+            session->file = tb_null;
+
+            // trace
+            tb_trace_d("ok!");
+
+        } while (session->keep_alive);
+
+        // exit session
+        tb_demo_http_session_exit(session);
+    } 
 }
 static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
@@ -455,51 +453,49 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
     tb_assert(listen);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // done
-    do
+    tb_lo_coroutine_enter(coroutine)
     {
-        // init socket
-        listen->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
-        tb_assert_and_check_break(listen->sock);
-
-        // bind socket
-        tb_ipaddr_set(&listen->addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
-        if (!tb_socket_bind(listen->sock, &listen->addr)) break;
-
-        // listen socket
-        if (!tb_socket_listen(listen->sock, 1000)) break;
-
-        // trace
-        tb_trace_i("listening ..");
-
-        // loop
-        while (1)
+        // done
+        do
         {
-            // wait accept events
-            tb_lo_coroutine_wait(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+            // init socket
+            listen->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
+            tb_assert_and_check_break(listen->sock);
 
-            // wait ok
-            if (tb_lo_coroutine_events() > 0)
+            // bind socket
+            tb_ipaddr_set(&listen->addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
+            if (!tb_socket_bind(listen->sock, &listen->addr)) break;
+
+            // listen socket
+            if (!tb_socket_listen(listen->sock, 1000)) break;
+
+            // trace
+            tb_trace_i("listening ..");
+
+            // loop
+            while (1)
             {
-                // accept client sockets
-                while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
+                // wait accept events
+                tb_lo_coroutine_wait(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+
+                // wait ok
+                if (tb_lo_coroutine_events() > 0)
                 {
-                    // start client connection
-                    if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_http_session_t, sock, listen->client))) break;
+                    // accept client sockets
+                    while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
+                    {
+                        // start client connection
+                        if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_http_session_t, sock, listen->client))) break;
+                    }
                 }
             }
-        }
 
-    } while (0);
+        } while (0);
 
-    // exit socket
-    if (listen->sock) tb_socket_exit(listen->sock);
-    listen->sock = tb_null;
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
+        // exit socket
+        if (listen->sock) tb_socket_exit(listen->sock);
+        listen->sock = tb_null;
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

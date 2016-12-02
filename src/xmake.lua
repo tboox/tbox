@@ -56,7 +56,7 @@ option("micro")
 
 -- option: smallest
 option("smallest")
-    set_default(false)
+    set_default(true)
     set_showmenu(true)
     set_category("option")
     set_description("Enable the smallest compile mode and disable all modules.")

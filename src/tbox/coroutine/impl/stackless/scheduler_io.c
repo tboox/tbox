@@ -90,27 +90,25 @@ static tb_void_t tb_lo_scheduler_io_loop(tb_lo_coroutine_ref_t coroutine, tb_cpo
     tb_assert(scheduler);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // loop
-    while (!scheduler->stopped)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // finish all other ready coroutines first
-        while (tb_lo_scheduler_ready_count(scheduler) > 1)
-            tb_lo_coroutine_yield();
+        // loop
+        while (!scheduler->stopped)
+        {
+            // finish all other ready coroutines first
+            while (tb_lo_scheduler_ready_count(scheduler) > 1)
+                tb_lo_coroutine_yield();
 
-        // no more suspended coroutines? loop end
-        tb_check_break(tb_lo_scheduler_suspend_count(scheduler));
+            // no more suspended coroutines? loop end
+            tb_check_break(tb_lo_scheduler_suspend_count(scheduler));
 
-        // trace
-        tb_trace_d("loop: wait 1000 ms ..");
+            // trace
+            tb_trace_d("loop: wait 1000 ms ..");
 
-        // no more ready coroutines? wait io events and timers (TODO)
-        if (tb_poller_wait(scheduler_io->poller, tb_lo_scheduler_io_events, 1000) < 0) break;
+            // no more ready coroutines? wait io events and timers (TODO)
+            if (tb_poller_wait(scheduler_io->poller, tb_lo_scheduler_io_events, 1000) < 0) break;
+        }
     }
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

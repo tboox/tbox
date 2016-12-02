@@ -20,20 +20,18 @@ static tb_void_t tb_demo_lo_coroutine_switch_test_func(tb_lo_coroutine_ref_t cor
     tb_assert(count);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // loop
-    while ((*count)--)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // trace
-        tb_trace_i("[coroutine: %p]: %lu", tb_lo_coroutine_self(), *count);
+        // loop
+        while ((*count)--)
+        {
+            // trace
+            tb_trace_i("[coroutine: %p]: %lu", tb_lo_coroutine_self(), *count);
 
-        // yield
-        tb_lo_coroutine_yield();
+            // yield
+            tb_lo_coroutine_yield();
+        }
     }
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
 static tb_void_t tb_demo_lo_coroutine_switch_test()
 {
@@ -62,17 +60,15 @@ static tb_void_t tb_demo_lo_coroutine_switch_perf_func(tb_lo_coroutine_ref_t cor
     tb_assert(count);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // loop
-    while ((*count)--)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // yield
-        tb_lo_coroutine_yield();
+        // loop
+        while ((*count)--)
+        {
+            // yield
+            tb_lo_coroutine_yield();
+        }
     }
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
 static tb_void_t tb_demo_lo_coroutine_switch_perf()
 {

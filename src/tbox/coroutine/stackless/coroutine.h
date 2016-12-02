@@ -38,55 +38,71 @@
 /// the self coroutine
 #define tb_lo_coroutine_self()          (co__)
 
-/*! enter and leave coroutine 
+/* enter coroutine
  *
  * @code
  *
     // before
-    tb_lo_coroutine_enter(co);
-    for (i = 0; i < 100; i++)
+    tb_lo_coroutine_enter(co)
     {
-        tb_lo_coroutine_yield();
+        for (i = 0; i < 100; i++)
+        {
+            tb_lo_coroutine_yield();
+        }
     }
-    tb_lo_coroutine_leave();
-
-
-    // after expanding
-    { tb_lo_coroutine_ref_t co__ = co; tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(co);
-    for (i = 0; i < 100; i++)
-    {
-        lo_yield_flag__ = 0;
-        tb_lo_core_record(co__);
-        if (lo_yield_flag__ == 0)
-            return ; 
-    }
-    tb_lo_core_exit(co__); lo_yield_flag__ = 0; return ; }
-
 
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
-    { 
-        tb_lo_coroutine_ref_t co__ = co;
-        tb_int_t lo_yield_flag__ = 1; 
+    tb_lo_coroutine_ref_t co__ = co;
+    tb_int_t lo_yield_flag__ = 1; 
+    for (; lo_yield_flag__; tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
         switch (tb_lo_core(co__)->branch) 
+            case 0:
+                {
+                    for (i = 0; i < 100; i++)
+                    {
+                        lo_yield_flag__ = 0;
+                        tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
+                        if (lo_yield_flag__ == 0)
+                            return ; 
+                    }
+                } 
+
+    // or ..
+
+    // after expanding again for gcc label (init: branch = tb_null, state = TB_STATE_READY)
+    tb_lo_coroutine_ref_t co__ = co;
+    tb_int_t lo_yield_flag__ = 1; 
+    for (; lo_yield_flag__; tb_lo_core(co__)->branch = tb_null, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
+        if (tb_lo_core(co)->branch) 
+        { 
+            goto *(tb_lo_core(co)->branch);
+        } 
+        else
         {
-        case 0:;
             for (i = 0; i < 100; i++)
             {
                 lo_yield_flag__ = 0;
-                tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
+                do 
+                { 
+                    __tb_mconcat_ex__(__tb_lo_core_label, __tb_line__): 
+                    tb_lo_core(co)->branch = &&__tb_mconcat_ex__(__tb_lo_core_label, __tb_line__); 
+                    
+                } while(0)
+
                 if (lo_yield_flag__ == 0)
                     return ; 
             }
-        } 
-        tb_lo_core(co__)->branch = 0;
-        tb_lo_core(co__)->state = TB_STATE_END; 
-        lo_yield_flag__ = 0;  
-        return ; 
-    }
+        }
 
  * @endcode
  */
-#define tb_lo_coroutine_enter(co)   { tb_lo_coroutine_ref_t co__ = (co); tb_int_t lo_yield_flag__ = 1; tb_lo_core_resume(tb_lo_coroutine_self())
+#define tb_lo_coroutine_enter(co) \
+    tb_lo_coroutine_ref_t co__ = (co); \
+    tb_int_t lo_yield_flag__ = 1; \
+    for (; lo_yield_flag__; tb_lo_core_exit(tb_lo_coroutine_self()), lo_yield_flag__ = 0) \
+        tb_lo_core_resume(tb_lo_coroutine_self())
+
+/// yield coroutine
 #define tb_lo_coroutine_yield() \
 do \
 { \
@@ -96,7 +112,6 @@ do \
         return ; \
     \
 } while(0)
-#define tb_lo_coroutine_leave()     tb_lo_core_exit(tb_lo_coroutine_self()); lo_yield_flag__ = 0; return ; }
 
 /*! suspend current coroutine
  *
@@ -105,41 +120,36 @@ do \
  * @code
  *
     // before
-    tb_lo_coroutine_enter(co);
-    for (i = 0; i < 100; i++)
+    tb_lo_coroutine_enter(co)
     {
-        tb_lo_coroutine_yield();
-        tb_lo_coroutine_suspend();
+        for (i = 0; i < 100; i++)
+        {
+            tb_lo_coroutine_yield();
+            tb_lo_coroutine_suspend();
+        }
     }
-    tb_lo_coroutine_leave();
 
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
-    { 
-        tb_lo_coroutine_ref_t co__ = co;
-        tb_int_t lo_yield_flag__ = 1; 
+    tb_lo_coroutine_ref_t co__ = co;
+    tb_int_t lo_yield_flag__ = 1; 
+    for (; lo_yield_flag__; tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
         switch (tb_lo_core(co__)->branch) 
-        {
-        case 0:;
-            for (i = 0; i < 100; i++)
+            case 0:
             {
-                lo_yield_flag__ = 0;
-                tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
-                if (lo_yield_flag__ == 0)
-                    return ; 
+                for (i = 0; i < 100; i++)
+                {
+                    lo_yield_flag__ = 0;
+                    tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
+                    if (lo_yield_flag__ == 0)
+                        return ; 
 
-                // suspend coroutine
-                tb_lo_core(co__)->state = TB_STATE_SUSPEND;
-                tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
-                if (tb_lo_core(co__)->state == TB_STATE_SUSPEND)
-                    return ; 
-            }
-        } 
-        lo_yield_flag__ = 0;  
-        tb_lo_core(co__)->branch = 0;
-        tb_lo_core_state_set(co__, TB_STATE_END); 
-        return ; 
-    }
-
+                    // suspend coroutine
+                    tb_lo_core(co__)->state = TB_STATE_SUSPEND;
+                    tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
+                    if (tb_lo_core(co__)->state == TB_STATE_SUSPEND)
+                        return ; 
+                }
+            } 
  * @endcode
  */
 #define tb_lo_coroutine_suspend() \

@@ -6,24 +6,24 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+#if 0
 static tb_void_t tb_demo_lo_coroutine_nest_next(tb_lo_coroutine_ref_t coroutine, tb_size_t start, tb_size_t end)
 {
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // loop
-    for (; start < end; start++)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // trace
-        tb_trace_i("[coroutine: %p]:   %lu", tb_lo_coroutine_self(), start);
+        // loop
+        for (; start < end; start++)
+        {
+            // trace
+            tb_trace_i("[coroutine: %p]:   %lu", tb_lo_coroutine_self(), start);
 
-        // yield
-        tb_lo_coroutine_yield();
+            // yield
+            tb_lo_coroutine_yield();
+        }
     }
- 
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
+#endif
 static tb_void_t tb_demo_lo_coroutine_nest_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
@@ -31,23 +31,21 @@ static tb_void_t tb_demo_lo_coroutine_nest_func(tb_lo_coroutine_ref_t coroutine,
     tb_assert(count);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // loop
-    while ((*count)--)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // trace
-        tb_trace_i("[coroutine: %p]: %lu", tb_lo_coroutine_self(), *count);
+        // loop
+        while ((*count)--)
+        {
+            // trace
+            tb_trace_i("[coroutine: %p]: %lu", tb_lo_coroutine_self(), *count);
 
-        // call next level function
-        tb_demo_lo_coroutine_nest_next(coroutine, *count * 10, *count * 10 + 5);
+            // call next level function
+//            tb_demo_lo_coroutine_nest_next(coroutine, *count * 10, *count * 10 + 5);
 
-        // yield
-        tb_lo_coroutine_yield();
+            // yield
+            tb_lo_coroutine_yield();
+        }
     }
- 
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -70,5 +68,6 @@ tb_int_t tb_demo_lo_coroutine_nest_main(tb_int_t argc, tb_char_t** argv)
         // exit scheduler
         tb_lo_scheduler_exit(scheduler);
     }
+
     return 0;
 }

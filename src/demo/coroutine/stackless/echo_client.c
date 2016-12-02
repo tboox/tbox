@@ -59,81 +59,79 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
     tb_assert(client);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // done
-    do
+    tb_lo_coroutine_enter(coroutine) 
     {
-        // init socket
-        client->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
-        tb_assert_and_check_break(client->sock);
-
-        // init address
-        tb_ipaddr_set(&client->addr, "127.0.0.1", TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
-
-        // trace
-        tb_trace_i("connecting %{ipaddr} ..", &client->addr);
-
-        // connect socket
-        while (!(client->ok = tb_socket_connect(client->sock, &client->addr))) 
+        // done
+        do
         {
-            // wait it
-            tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
-            
-            // wait failed?
-            if (tb_lo_coroutine_events() <= 0) break;
-        }
+            // init socket
+            client->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
+            tb_assert_and_check_break(client->sock);
 
-        // connect ok?
-        tb_check_break(client->ok > 0);
+            // init address
+            tb_ipaddr_set(&client->addr, "127.0.0.1", TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
 
-        // trace
-        tb_trace_i("sending %lu ..", client->id);
+            // trace
+            tb_trace_i("connecting %{ipaddr} ..", &client->addr);
 
-        // make data
-        tb_snprintf(client->data, sizeof(client->data), "hello: %lu", client->id);
-
-        // send data
-        client->size = tb_strlen(client->data) + 1;
-        while (client->send < client->size)
-        {
-            // read it
-            client->real = tb_socket_send(client->sock, (tb_byte_t*)client->data + client->send, client->size - client->send);
-
-            // has data?
-            if (client->real > 0)
-            {
-                client->send += client->real;
-                client->wait = 0;
-            }
-            // no data? wait it
-            else if (!client->real && !client->wait)
+            // connect socket
+            while (!(client->ok = tb_socket_connect(client->sock, &client->addr))) 
             {
                 // wait it
-                tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
-
-                // wait ok
-                client->wait = tb_lo_coroutine_events();
-                tb_assert_and_check_break(client->wait >= 0);
+                tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
+                
+                // wait failed?
+                if (tb_lo_coroutine_events() <= 0) break;
             }
-            // failed or end?
-            else break;
-        }
 
-        // ok?
-        tb_assert_and_check_break(client->send == client->size);
+            // connect ok?
+            tb_check_break(client->ok > 0);
 
-        // trace
-        tb_trace_i("send ok!");
+            // trace
+            tb_trace_i("sending %lu ..", client->id);
 
-    } while (0);
+            // make data
+            tb_snprintf(client->data, sizeof(client->data), "hello: %lu", client->id);
 
-    // exit socket
-    if (client->sock) tb_socket_exit(client->sock);
-    client->sock = tb_null;
- 
-    // leave coroutine
-    tb_lo_coroutine_leave();
+            // send data
+            client->size = tb_strlen(client->data) + 1;
+            while (client->send < client->size)
+            {
+                // read it
+                client->real = tb_socket_send(client->sock, (tb_byte_t*)client->data + client->send, client->size - client->send);
+
+                // has data?
+                if (client->real > 0)
+                {
+                    client->send += client->real;
+                    client->wait = 0;
+                }
+                // no data? wait it
+                else if (!client->real && !client->wait)
+                {
+                    // wait it
+                    tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
+
+                    // wait ok
+                    client->wait = tb_lo_coroutine_events();
+                    tb_assert_and_check_break(client->wait >= 0);
+                }
+                // failed or end?
+                else break;
+            }
+
+            // ok?
+            tb_assert_and_check_break(client->send == client->size);
+
+            // trace
+            tb_trace_i("send ok!");
+
+        } while (0);
+
+        // exit socket
+        if (client->sock) tb_socket_exit(client->sock);
+        client->sock = tb_null;
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

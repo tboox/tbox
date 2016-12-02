@@ -80,57 +80,55 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
     tb_assert(client);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // trace
-    tb_trace_d("[%p]: sending %s ..", client->sock, g_filepath);
-
-    // init file
-    client->file = tb_file_init(g_filepath, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
-    tb_assert(client->file);
-
-    // send data
-    client->size = tb_file_size(client->file);
-    client->time = tb_mclock();
-    while (client->send < client->size)
+    tb_lo_coroutine_enter(coroutine)
     {
-        // send it
-        client->real = tb_socket_sendf(client->sock, client->file, client->send, client->size - client->send);
+        // trace
+        tb_trace_d("[%p]: sending %s ..", client->sock, g_filepath);
+
+        // init file
+        client->file = tb_file_init(g_filepath, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
+        tb_assert(client->file);
+
+        // send data
+        client->size = tb_file_size(client->file);
+        client->time = tb_mclock();
+        while (client->send < client->size)
+        {
+            // send it
+            client->real = tb_socket_sendf(client->sock, client->file, client->send, client->size - client->send);
+
+            // trace
+            tb_trace_d("[%p]: send: %ld", client->sock, client->real);
+
+            // has data?
+            if (client->real > 0)
+            {
+                client->send += client->real;
+                client->wait = 0;
+            }
+            // no data? wait it
+            else if (!client->real && !client->wait)
+            {
+                // wait it
+                tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
+
+                // wait ok
+                client->wait = tb_lo_coroutine_events();
+                tb_assert_and_check_break(client->wait >= 0);
+            }
+            // failed or end?
+            else break;
+        }
 
         // trace
-        tb_trace_d("[%p]: send: %ld", client->sock, client->real);
+        tb_trace_i("[%p]: send: %lld bytes %lld ms", client->sock, client->send, tb_mclock() - client->time);
 
-        // has data?
-        if (client->real > 0)
-        {
-            client->send += client->real;
-            client->wait = 0;
-        }
-        // no data? wait it
-        else if (!client->real && !client->wait)
-        {
-            // wait it
-            tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
+        // exit file
+        tb_file_exit(client->file);
 
-            // wait ok
-            client->wait = tb_lo_coroutine_events();
-            tb_assert_and_check_break(client->wait >= 0);
-        }
-        // failed or end?
-        else break;
+        // exit socket
+        tb_socket_exit(client->sock);
     }
-
-    // trace
-    tb_trace_i("[%p]: send: %lld bytes %lld ms", client->sock, client->send, tb_mclock() - client->time);
-
-    // exit file
-    tb_file_exit(client->file);
-
-    // exit socket
-    tb_socket_exit(client->sock);
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
 }
 static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
@@ -139,51 +137,49 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
     tb_assert(listen);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine);
-
-    // done
-    do
+    tb_lo_coroutine_enter(coroutine)
     {
-        // init socket
-        listen->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
-        tb_assert_and_check_break(listen->sock);
-
-        // bind socket
-        tb_ipaddr_set(&listen->addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
-        if (!tb_socket_bind(listen->sock, &listen->addr)) break;
-
-        // listen socket
-        if (!tb_socket_listen(listen->sock, 1000)) break;
-
-        // trace
-        tb_trace_i("listening ..");
-
-        // loop
-        while (1)
+        // done
+        do
         {
-            // wait accept events
-            tb_lo_coroutine_wait(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+            // init socket
+            listen->sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
+            tb_assert_and_check_break(listen->sock);
 
-            // wait ok
-            if (tb_lo_coroutine_events() > 0)
+            // bind socket
+            tb_ipaddr_set(&listen->addr, tb_null, TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
+            if (!tb_socket_bind(listen->sock, &listen->addr)) break;
+
+            // listen socket
+            if (!tb_socket_listen(listen->sock, 1000)) break;
+
+            // trace
+            tb_trace_i("listening ..");
+
+            // loop
+            while (1)
             {
-                // accept client sockets
-                while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
+                // wait accept events
+                tb_lo_coroutine_wait(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+
+                // wait ok
+                if (tb_lo_coroutine_events() > 0)
                 {
-                    // start client connection
-                    if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_lo_client_t, sock, listen->client))) break;
+                    // accept client sockets
+                    while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
+                    {
+                        // start client connection
+                        if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_lo_client_t, sock, listen->client))) break;
+                    }
                 }
             }
-        }
 
-    } while (0);
+        } while (0);
 
-    // exit socket
-    if (listen->sock) tb_socket_exit(listen->sock);
-    listen->sock = tb_null;
-
-    // leave coroutine
-    tb_lo_coroutine_leave();
+        // exit socket
+        if (listen->sock) tb_socket_exit(listen->sock);
+        listen->sock = tb_null;
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

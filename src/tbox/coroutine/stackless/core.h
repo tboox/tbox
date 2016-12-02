@@ -89,14 +89,11 @@
  */
 #   define tb_lo_core_init(co)      tb_lo_core(co)->branch = tb_null; tb_lo_core(co)->state = TB_STATE_READY
 #   define tb_lo_core_resume(co) \
-    do \
+    if (tb_lo_core(co)->branch) \
     { \
-        if (tb_lo_core(co)->branch) \
-        { \
-            goto *(tb_lo_core(co)->branch); \
-        } \
-        \
-    } while(0)
+        goto *(tb_lo_core(co)->branch); \
+    } \
+    else
 
 #   define tb_lo_core_record(co) \
     do \
@@ -106,7 +103,7 @@
         \
     } while(0)
 
-#   define tb_lo_core_exit(co)      tb_lo_core(co)->branch = tb_null; tb_lo_core(co)->state = TB_STATE_END
+#   define tb_lo_core_exit(co)      tb_lo_core(co)->branch = tb_null, tb_lo_core(co)->state = TB_STATE_END
 
 #else
 
@@ -130,11 +127,10 @@
  * WARNING! the implementation using switch() does not work if an
  * core_set() is done within another switch() statement!
  */
-#   define tb_lo_core_init(co)   tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_READY
-#   define tb_lo_core_resume(co) switch (tb_lo_core(co)->branch) { case 0:
-#   define tb_lo_core_record(co) tb_lo_core(co)->branch = (tb_uint16_t)__tb_line__; case __tb_line__:
-#   define tb_lo_core_exit(co)   } tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_END
-
+#   define tb_lo_core_init(co)      tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_READY
+#   define tb_lo_core_resume(co)    switch (tb_lo_core(co)->branch) case 0:
+#   define tb_lo_core_record(co)    tb_lo_core(co)->branch = (tb_uint16_t)__tb_line__; case __tb_line__:
+#   define tb_lo_core_exit(co)      tb_lo_core(co)->branch = 0, tb_lo_core(co)->state = TB_STATE_END
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
