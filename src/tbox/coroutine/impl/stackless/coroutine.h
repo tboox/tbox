@@ -41,19 +41,19 @@ __tb_extern_c_enter__
 typedef struct __tb_lo_coroutine_rs_wait_t
 {
     // the socket
-    tb_socket_ref_t                 sock;
+    tb_socket_ref_t             sock;
 
     // the waiting events
-    tb_sint16_t                     events          : 6;
+    tb_sint32_t                 events          : 6;
 
     // the cached events
-    tb_sint16_t                     events_cache    : 6;
+    tb_sint32_t                 events_cache    : 6;
 
-    // the cached events
-    tb_sint16_t                     events_result   : 6;
+    // the events result (may be -1)
+    tb_sint32_t                 events_result   : 6;
 
     // is waiting?
-    tb_sint16_t                     waiting         : 1;
+    tb_sint32_t                 waiting         : 1;
 
 }tb_lo_coroutine_rs_wait_t;
 

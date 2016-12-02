@@ -96,6 +96,9 @@ tb_bool_t tb_lo_coroutine_reinit(tb_lo_coroutine_t* coroutine, tb_lo_coroutine_f
     coroutine->priv = priv;
     coroutine->free = free;
 
+    // init rs data
+    tb_memset(&coroutine->rs, 0, sizeof(coroutine->rs));
+
     // ok
     return tb_true;
 }

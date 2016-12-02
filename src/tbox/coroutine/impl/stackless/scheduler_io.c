@@ -44,7 +44,7 @@ static tb_void_t tb_lo_scheduler_io_resume(tb_lo_scheduler_t* scheduler, tb_lo_c
     coroutine->rs.wait.waiting = 0;
 
     // return events 
-    coroutine->rs.wait.events_result = (tb_sint16_t)events;
+    coroutine->rs.wait.events_result = (tb_sint32_t)events;
 
     // resume the coroutine
     tb_lo_scheduler_resume(scheduler, coroutine);
@@ -276,7 +276,7 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
     coroutine->rs.wait.sock = sock;
 
     // save waiting events to coroutine
-    coroutine->rs.wait.events        = (tb_uint16_t)events;
+    coroutine->rs.wait.events        = (tb_sint32_t)events;
     coroutine->rs.wait.events_cache  = 0;
     coroutine->rs.wait.events_result = 0;
 
