@@ -232,7 +232,8 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             coroutine->rs.wait.events_cache &= ~events;
 
             // return the cached events
-            return events_cache & events;
+            coroutine->rs.wait.events_result = events_cache & events;
+            return tb_false;
         }
 
         // modify socket from poller for waiting events if the waiting events has been changed 
