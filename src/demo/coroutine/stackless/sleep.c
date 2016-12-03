@@ -38,7 +38,6 @@ static tb_void_t tb_demo_lo_coroutine_sleep_func(tb_lo_coroutine_ref_t coroutine
             // get the start time
             local->time = tb_mclock();
 
-
             // sleep it
             tb_lo_coroutine_sleep(local->interval);
 

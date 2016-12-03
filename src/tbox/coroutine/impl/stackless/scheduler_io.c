@@ -111,6 +111,44 @@ static tb_void_t tb_lo_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
     // cache this events
     else coroutine->rs.wait.events_cache = events;
 }
+#ifndef TB_CONFIG_MICRO_ENABLE
+static tb_bool_t tb_lo_scheduler_io_timer_spak(tb_lo_scheduler_io_ref_t scheduler_io)
+{
+    // check
+    tb_assert(scheduler_io && scheduler_io->timer && scheduler_io->ltimer);
+
+    // spak ctime
+    tb_cache_time_spak();
+
+    // spak timer
+    if (!tb_timer_spak(scheduler_io->timer)) return tb_false;
+
+    // spak ltimer
+    if (!tb_ltimer_spak(scheduler_io->ltimer)) return tb_false;
+
+    // pk
+    return tb_true;
+}
+static tb_long_t tb_lo_scheduler_io_timer_delay(tb_lo_scheduler_io_ref_t scheduler_io)
+{
+    // check
+    tb_assert(scheduler_io && scheduler_io->timer && scheduler_io->ltimer);
+
+    // the delay
+    tb_size_t delay = tb_timer_delay(scheduler_io->timer);
+
+    // the ldelay
+    tb_size_t ldelay = tb_ltimer_delay(scheduler_io->ltimer);
+
+    // return the timer delay
+    return tb_min(delay, ldelay);
+}
+#else
+static __tb_inline__ tb_long_t tb_lo_scheduler_io_timer_delay(tb_lo_scheduler_io_ref_t scheduler_io)
+{
+    return 1000;
+}
+#endif
 static tb_void_t tb_lo_scheduler_io_loop(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
@@ -129,16 +167,29 @@ static tb_void_t tb_lo_scheduler_io_loop(tb_lo_coroutine_ref_t coroutine, tb_cpo
         {
             // finish all other ready coroutines first
             while (tb_lo_scheduler_ready_count(scheduler) > 1)
+            {
+                // yield it
                 tb_lo_coroutine_yield();
+ 
+#ifndef TB_CONFIG_MICRO_ENABLE
+                // spak timer
+                if (!tb_lo_scheduler_io_timer_spak(scheduler_io)) break;
+#endif
+            }
 
             // no more suspended coroutines? loop end
             tb_check_break(tb_lo_scheduler_suspend_count(scheduler));
 
             // trace
-            tb_trace_d("loop: wait 1000 ms ..");
+            tb_trace_d("loop: wait %s ms ..", tb_lo_scheduler_io_timer_delay(scheduler_io));
 
             // no more ready coroutines? wait io events and timers (TODO)
-            if (tb_poller_wait(scheduler_io->poller, tb_lo_scheduler_io_events, 1000) < 0) break;
+            if (tb_poller_wait(scheduler_io->poller, tb_lo_scheduler_io_events, tb_lo_scheduler_io_timer_delay(scheduler_io)) < 0) break;
+ 
+#ifndef TB_CONFIG_MICRO_ENABLE
+            // spak timer
+            if (!tb_lo_scheduler_io_timer_spak(scheduler_io)) break;
+#endif
         }
     }
 }
