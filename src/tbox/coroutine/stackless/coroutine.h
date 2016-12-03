@@ -54,7 +54,8 @@
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
     tb_lo_coroutine_ref_t co__ = co;
     tb_int_t lo_yield_flag__ = 1; 
-    for (; lo_yield_flag__; tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
+    for (tb_lo_core(co__)->level++; lo_yield_flag__; 
+        tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, tb_lo_core(co__)->level--, lo_yield_flag__ = 0)
         switch (tb_lo_core(co__)->branch) 
             case 0:
                 {
@@ -72,7 +73,8 @@
     // after expanding again for gcc label (init: branch = tb_null, state = TB_STATE_READY)
     tb_lo_coroutine_ref_t co__ = co;
     tb_int_t lo_yield_flag__ = 1; 
-    for (; lo_yield_flag__; tb_lo_core(co__)->branch = tb_null, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
+    for (tb_lo_core(co__)->level++; lo_yield_flag__; 
+        tb_lo_core(co__)->branch = tb_null, tb_lo_core(co__)->state = TB_STATE_END, tb_lo_core(co__)->level--, lo_yield_flag__ = 0)
         if (tb_lo_core(co)->branch) 
         { 
             goto *(tb_lo_core(co)->branch);
@@ -99,7 +101,7 @@
 #define tb_lo_coroutine_enter(co) \
     tb_lo_coroutine_ref_t co__ = (co); \
     tb_int_t lo_yield_flag__ = 1; \
-    for (; lo_yield_flag__; tb_lo_core_exit(tb_lo_coroutine_self()), lo_yield_flag__ = 0) \
+    for (tb_lo_core_level_inc(tb_lo_coroutine_self()); lo_yield_flag__; tb_lo_core_exit(tb_lo_coroutine_self()), lo_yield_flag__ = 0) \
         tb_lo_core_resume(tb_lo_coroutine_self())
 
 /// yield coroutine
@@ -132,7 +134,8 @@ do \
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
     tb_lo_coroutine_ref_t co__ = co;
     tb_int_t lo_yield_flag__ = 1; 
-    for (; lo_yield_flag__; tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
+    for (tb_lo_core(co__)->level++; lo_yield_flag__; 
+        tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, tb_lo_core(co__)->level--, lo_yield_flag__ = 0)
         switch (tb_lo_core(co__)->branch) 
             case 0:
             {
@@ -162,6 +165,83 @@ do \
         return ; \
     \
 } while(0)
+
+/*! fork child coroutine
+ *
+ * @code
+ *
+    // the child coroutine
+    static tb_xxx_child_coroutine(tb_lo_coroutine_ref_t co)
+    {
+        tb_lo_coroutine_enter(co)
+        {
+            for (i = 0; i < 100; i++)
+            {
+                tb_lo_coroutine_yield();
+            } 
+        }
+    }
+
+    // enter coroutine (parent)
+    tb_lo_coroutine_enter(co)    
+    {
+        // fork a child coroutine
+        tb_lo_coroutine_fork()
+        {
+            // call child coroutine 
+            tb_xxx_child_coroutine(co);
+        }
+    }
+
+    // after expanding again (init: branch = 0, state = TB_STATE_READY)
+    tb_lo_coroutine_ref_t co__ = co;
+    tb_int_t lo_yield_flag__ = 1; 
+    for (tb_lo_core(co__)->level++; lo_yield_flag__; 
+        tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, tb_lo_core(co__)->level--, lo_yield_flag__ = 0)
+        switch (tb_lo_core(co__)->branch) 
+            case 0:
+            {
+                for (;; lo_yield_flag__--)
+                    if (lo_yield_flag__ == 0) 
+                    {
+                        if (tb_lo_core(co__)->state == TB_STATE_END) 
+                        { 
+                            tb_lo_core(co__)->state = TB_STATE_READY;
+                            break; 
+                        }
+                        else
+                        {
+                            tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
+                            if (lo_yield_flag__ == 0) return ;
+                            else lo_yield_flag__ = 2;
+                        }
+                    }
+                    else
+                    {
+                        // call child coroutine 
+                        tb_xxx_child_coroutine(co);
+                    }
+            } 
+ * @endcode
+ */
+#define tb_lo_coroutine_fork() \
+for (;; lo_yield_flag__--) \
+    if (lo_yield_flag__ == 0) \
+    { \
+        if (tb_lo_core_state(tb_lo_coroutine_self()) == TB_STATE_END) \
+        { \
+            tb_lo_core_state_set(tb_lo_coroutine_self(), TB_STATE_READY); \
+            break; \
+        } \
+        else \
+        { \
+            tb_lo_core_record(tb_lo_coroutine_self()); \
+            if (lo_yield_flag__ == 0) return ; \
+            else lo_yield_flag__ = 2; \
+        } \
+    } \
+    else 
+
 
 /// sleep some time
 #define tb_lo_coroutine_sleep(interval) \

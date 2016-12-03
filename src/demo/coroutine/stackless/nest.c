@@ -4,43 +4,65 @@
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */ 
+
+// the nest type
+typedef struct __tb_demo_lo_nest_t
+{
+    // the count
+    tb_size_t           count;
+
+    // the start
+    tb_size_t           start;
+
+    // the end
+    tb_size_t           end;
+
+}tb_demo_lo_nest_t, *tb_demo_lo_nest_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-#if 0
-static tb_void_t tb_demo_lo_coroutine_nest_next(tb_lo_coroutine_ref_t coroutine, tb_size_t start, tb_size_t end)
+static tb_void_t tb_demo_lo_coroutine_nest_next(tb_lo_coroutine_ref_t coroutine, tb_demo_lo_nest_ref_t nest)
 {
     // enter coroutine
     tb_lo_coroutine_enter(coroutine)
     {
         // loop
-        for (; start < end; start++)
+        nest->start = nest->count * 10;
+        nest->end   = nest->count * 10 + 5;
+        for (; nest->start < nest->end; nest->start++)
         {
             // trace
-            tb_trace_i("[coroutine: %p]:   %lu", tb_lo_coroutine_self(), start);
+            tb_trace_i("[coroutine: %p]:   %lu", tb_lo_coroutine_self(), nest->start);
 
             // yield
             tb_lo_coroutine_yield();
         }
     }
 }
-#endif
 static tb_void_t tb_demo_lo_coroutine_nest_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
-    tb_size_t* count = (tb_size_t*)priv;
-    tb_assert(count);
+    tb_demo_lo_nest_ref_t nest = (tb_demo_lo_nest_ref_t)priv;
+    tb_assert(nest);
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine)
     {
         // loop
-        while ((*count)--)
+        while (nest->count--)
         {
             // trace
-            tb_trace_i("[coroutine: %p]: %lu", tb_lo_coroutine_self(), *count);
+            tb_trace_i("[coroutine: %p]: %lu", tb_lo_coroutine_self(), nest->count);
 
-            // call next level function
-//            tb_demo_lo_coroutine_nest_next(coroutine, *count * 10, *count * 10 + 5);
+            // fork child coroutine
+            tb_lo_coroutine_fork()
+            {
+                // call next level function
+                tb_demo_lo_coroutine_nest_next(coroutine, nest);
+            }
 
             // yield
             tb_lo_coroutine_yield();
@@ -58,9 +80,9 @@ tb_int_t tb_demo_lo_coroutine_nest_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start coroutines
-        tb_size_t counts[] = {10, 10};
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_nest_func, &counts[0], tb_null);
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_nest_func, &counts[1], tb_null);
+        tb_size_t count = 10;
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_nest_func, tb_lo_coroutine_pass1(tb_demo_lo_nest_t, count, count));
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_nest_func, tb_lo_coroutine_pass1(tb_demo_lo_nest_t, count, count));
 
         // run scheduler
         tb_lo_scheduler_loop(scheduler);

@@ -339,8 +339,8 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self)
             // get the state of running coroutine
             tb_size_t state = tb_lo_core_state(scheduler->running);
 
-            // mark this coroutine as dead if the running coroutine have been finished
-            if (state == TB_STATE_END)
+            // mark this coroutine as dead if the running coroutine(root level) have been finished
+            if (state == TB_STATE_END && !tb_lo_core_level(scheduler->running))
                 tb_lo_scheduler_make_dead(scheduler, scheduler->running);
             // suspend the running coroutine 
             else if (state == TB_STATE_SUSPEND)
