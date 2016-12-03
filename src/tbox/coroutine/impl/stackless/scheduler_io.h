@@ -50,6 +50,14 @@ typedef struct __tb_lo_scheduler_io_t
     // the poller
     tb_poller_ref_t     poller;
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // the timer
+    tb_timer_ref_t      timer;
+
+    // the low-precision timer (faster)
+    tb_ltimer_ref_t     ltimer;
+#endif
+
 }tb_lo_scheduler_io_t, *tb_lo_scheduler_io_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

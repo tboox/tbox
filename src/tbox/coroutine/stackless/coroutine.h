@@ -167,8 +167,11 @@ do \
 #define tb_lo_coroutine_sleep(interval) \
 do \
 { \
-    tb_lo_coroutine_sleep_(tb_lo_coroutine_self(), interval); \
-    tb_lo_coroutine_suspend(); \
+    if (interval) \
+    { \
+        tb_lo_coroutine_sleep_(tb_lo_coroutine_self(), interval); \
+        tb_lo_coroutine_suspend(); \
+    } \
     \
 } while(0)
 

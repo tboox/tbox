@@ -36,6 +36,20 @@
 #include "../../stackless/coroutine.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the ltimer grow
+#ifdef __tb_small__
+#   define TB_SCHEDULER_IO_LTIMER_GROW      (64)
+#else
+#   define TB_SCHEDULER_IO_LTIMER_GROW      (4096)
+#endif
+
+// the timer grow
+#define TB_SCHEDULER_IO_TIMER_GROW          (TB_SCHEDULER_IO_LTIMER_GROW >> 4)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 static tb_void_t tb_lo_scheduler_io_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t* coroutine, tb_size_t events)
@@ -49,6 +63,24 @@ static tb_void_t tb_lo_scheduler_io_resume(tb_lo_scheduler_t* scheduler, tb_lo_c
     // resume the coroutine
     tb_lo_scheduler_resume(scheduler, coroutine);
 }
+#ifndef TB_CONFIG_MICRO_ENABLE
+static tb_void_t tb_lo_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv)
+{
+    // check
+    tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)priv;
+    tb_assert(coroutine);
+
+    // get scheduler
+    tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
+    tb_assert(scheduler);
+
+    // trace
+    tb_trace_d("coroutine(%p): timer %s", coroutine, killed? "killed" : "timeout");
+
+    // resume the coroutine 
+    tb_lo_scheduler_io_resume(scheduler, coroutine, TB_POLLER_EVENT_NONE);
+}
+#endif
 static tb_void_t tb_lo_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
     // check
@@ -132,6 +164,16 @@ tb_lo_scheduler_io_ref_t tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler)
         scheduler_io->poller = tb_poller_init(tb_null);
         tb_assert_and_check_break(scheduler_io->poller);
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+        // init timer and using cache time
+        scheduler_io->timer = tb_timer_init(TB_SCHEDULER_IO_TIMER_GROW, tb_true);
+        tb_assert_and_check_break(scheduler_io->timer);
+
+        // init ltimer and using cache time
+        scheduler_io->ltimer = tb_ltimer_init(TB_SCHEDULER_IO_LTIMER_GROW, TB_LTIMER_TICK_S, tb_true);
+        tb_assert_and_check_break(scheduler_io->ltimer);
+#endif
+
         // start the io loop coroutine
         if (!tb_lo_coroutine_start((tb_lo_scheduler_ref_t)scheduler, tb_lo_scheduler_io_loop, scheduler_io, tb_null)) break;
 
@@ -160,6 +202,16 @@ tb_void_t tb_lo_scheduler_io_exit(tb_lo_scheduler_io_ref_t scheduler_io)
     if (scheduler_io->poller) tb_poller_exit(scheduler_io->poller);
     scheduler_io->poller = tb_null;
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // exit timer
+    if (scheduler_io->timer) tb_timer_exit(scheduler_io->timer);
+    scheduler_io->timer = tb_null;
+
+    // exit ltimer
+    if (scheduler_io->ltimer) tb_ltimer_exit(scheduler_io->ltimer);
+    scheduler_io->ltimer = tb_null;
+#endif
+
     // clear scheduler
     scheduler_io->scheduler = tb_null;
 
@@ -174,13 +226,50 @@ tb_void_t tb_lo_scheduler_io_kill(tb_lo_scheduler_io_ref_t scheduler_io)
     // trace
     tb_trace_d("kill: ..");
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // kill timer
+    if (scheduler_io->timer) tb_timer_kill(scheduler_io->timer);
+
+    // kill ltimer
+    if (scheduler_io->ltimer) tb_ltimer_kill(scheduler_io->ltimer);
+#endif
+
     // kill poller
     if (scheduler_io->poller) tb_poller_kill(scheduler_io->poller);
 }
 tb_void_t tb_lo_scheduler_io_sleep(tb_lo_scheduler_io_ref_t scheduler_io, tb_long_t interval)
 {
-    // TODO
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // check
+    tb_assert_and_check_return(scheduler_io && scheduler_io->poller && scheduler_io->scheduler);
+
+    // get the current coroutine
+    tb_lo_coroutine_t* coroutine = tb_lo_scheduler_running(scheduler_io->scheduler);
+    tb_assert(coroutine);
+
+    // trace
+    tb_trace_d("coroutine(%p): sleep %ld ms ..", coroutine, interval);
+
+    // infinity?
+    if (interval > 0)
+    {
+        // high-precision interval?
+        if (interval % 1000)
+        {
+            // post task to timer
+            tb_timer_task_post(scheduler_io->timer, interval, tb_false, tb_lo_scheduler_io_timeout, coroutine);
+        }
+        // low-precision interval?
+        else
+        {
+            // post task to ltimer (faster)
+            tb_ltimer_task_post(scheduler_io->ltimer, interval, tb_false, tb_lo_scheduler_io_timeout, coroutine);
+        }
+    }
+#else
+    // not impl
     tb_trace_noimpl();
+#endif
 }
 tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
@@ -269,6 +358,38 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             return tb_false;
         }
     }
+
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // exists timeout?
+    tb_cpointer_t   task = tb_null;
+    tb_bool_t       is_ltimer = tb_false;
+    if (timeout >= 0)
+    {
+        // high-precision interval?
+        if (timeout % 1000)
+        {
+            // init task for timer
+            task = tb_timer_task_init(scheduler_io->timer, timeout, tb_false, tb_lo_scheduler_io_timeout, coroutine);
+            tb_assert_and_check_return_val(task, tb_false);
+        }
+        // low-precision interval?
+        else
+        {
+            // init task for ltimer (faster)
+            task = tb_ltimer_task_init(scheduler_io->ltimer, timeout, tb_false, tb_lo_scheduler_io_timeout, coroutine);
+            tb_assert_and_check_return_val(task, tb_false);
+
+            // mark as low-precision timer
+            is_ltimer = tb_true;
+        }
+    }
+
+    // check
+    tb_assert(!((tb_size_t)(task) & 0x1));
+
+    // save the timer task to coroutine
+    coroutine->rs.wait.task = (is_ltimer || !task)? task : (tb_cpointer_t)((tb_size_t)(task) | 0x1);
+#endif
 
     // save the socket to coroutine for the timer function
     coroutine->rs.wait.sock = sock;
