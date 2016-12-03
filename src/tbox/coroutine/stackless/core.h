@@ -72,15 +72,6 @@
 // set core state
 #define tb_lo_core_state_set(co, val)       tb_lo_core(co)->state = (val)
 
-// get core level
-#define tb_lo_core_level(co)                (tb_lo_core(co)->level)
-
-// increase core level
-#define tb_lo_core_level_inc(co)            tb_lo_core(co)->level++
-
-// decrease core level
-#define tb_lo_core_level_dec(co)            tb_lo_core(co)->level--
-
 #ifdef TB_COMPILER_IS_GCC
 /*
  * Implementation of local continuations based on the "Labels as
@@ -96,7 +87,7 @@
  * For more information, see the GCC documentation:
  * http://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html
  */
-#   define tb_lo_core_init(co)      tb_lo_core(co)->branch = tb_null; tb_lo_core(co)->state = TB_STATE_READY; tb_lo_core(co)->level = 0
+#   define tb_lo_core_init(co)      tb_lo_core(co)->branch = tb_null; tb_lo_core(co)->state = TB_STATE_READY
 #   define tb_lo_core_resume(co) \
     if (tb_lo_core(co)->branch) \
     { \
@@ -112,7 +103,7 @@
         \
     } while(0)
 
-#   define tb_lo_core_exit(co)      tb_lo_core(co)->branch = tb_null, tb_lo_core(co)->state = TB_STATE_END, tb_lo_core_level_dec(co)
+#   define tb_lo_core_exit(co)      tb_lo_core(co)->branch = tb_null, tb_lo_core(co)->state = TB_STATE_END
 
 #else
 
@@ -136,40 +127,28 @@
  * WARNING! the implementation using switch() does not work if an
  * core_set() is done within another switch() statement!
  */
-#   define tb_lo_core_init(co)      tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_READY; tb_lo_core(co)->level = 0
-#   define tb_lo_core_resume(co)    switch (tb_lo_core(co)->branch) case 0:
-#   define tb_lo_core_record(co)    tb_lo_core(co)->branch = (tb_uint16_t)__tb_line__; case __tb_line__:
-#   define tb_lo_core_exit(co)      tb_lo_core(co)->branch = 0, tb_lo_core(co)->state = TB_STATE_END, tb_lo_core_level_dec(co)
+#   define tb_lo_core_init(co)              tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_READY 
+#   define tb_lo_core_resume(co)            switch (tb_lo_core(co)->branch) case 0:
+#   define tb_lo_core_record(co)            tb_lo_core(co)->branch = (tb_uint16_t)__tb_line__; case __tb_line__:
+#   define tb_lo_core_exit(co)              tb_lo_core(co)->branch = 0, tb_lo_core(co)->state = TB_STATE_END 
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the stackless coroutine core type
+// the core branch type
 #ifdef TB_COMPILER_IS_GCC
-typedef struct __tb_lo_core_t
-{
-    // the code branch
-    tb_pointer_t        branch;
-
-    /* the state
-     *
-     * TB_STATE_READY
-     * TB_STATE_SUSPEND
-     * TB_STATE_END
-     */
-    tb_uint8_t          state;
-
-    // the level of child coroutines (root: 1)
-    tb_uint8_t          level;
-
-}tb_lo_core_t, *tb_lo_core_ref_t;
+typedef tb_pointer_t        tb_lo_core_branch_t;
 #else
+typedef tb_uint16_t         tb_lo_core_branch_t;
+#endif
+
+// the stackless coroutine core type
 typedef struct __tb_lo_core_t
 {
     // the code branch
-    tb_uint16_t         branch;
+    tb_lo_core_branch_t     branch;
 
     /* the state
      *
@@ -177,12 +156,9 @@ typedef struct __tb_lo_core_t
      * TB_STATE_SUSPEND
      * TB_STATE_END
      */
-    tb_uint8_t          state;
-
-    // the level of child coroutines (root: 1)
-    tb_uint8_t          level;
+    tb_uint8_t              state;
 
 }tb_lo_core_t, *tb_lo_core_ref_t;
-#endif
+
 
 #endif

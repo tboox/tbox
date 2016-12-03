@@ -24,6 +24,7 @@ typedef struct __tb_demo_lo_nest_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+#if 0
 static tb_void_t tb_demo_lo_coroutine_nest_next(tb_lo_coroutine_ref_t coroutine, tb_demo_lo_nest_ref_t nest)
 {
     // enter coroutine
@@ -37,11 +38,24 @@ static tb_void_t tb_demo_lo_coroutine_nest_next(tb_lo_coroutine_ref_t coroutine,
             // trace
             tb_trace_i("[coroutine: %p]:   %lu", tb_lo_coroutine_self(), nest->start);
 
+            // trace
+            tb_trace_i("yield: 1");
+
             // yield
             tb_lo_coroutine_yield();
+
+            // trace
+            tb_trace_i("yield: 2");
+
+            // yield
+            tb_lo_coroutine_yield();
+
+            // trace
+            tb_trace_i("yield: 3");
         }
     }
 }
+#endif
 static tb_void_t tb_demo_lo_coroutine_nest_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
@@ -57,12 +71,15 @@ static tb_void_t tb_demo_lo_coroutine_nest_func(tb_lo_coroutine_ref_t coroutine,
             // trace
             tb_trace_i("[coroutine: %p]: %lu", tb_lo_coroutine_self(), nest->count);
 
+#if 0
+            // TODO need implementation
             // fork child coroutine
             tb_lo_coroutine_fork()
             {
                 // call next level function
                 tb_demo_lo_coroutine_nest_next(coroutine, nest);
             }
+#endif
 
             // yield
             tb_lo_coroutine_yield();
