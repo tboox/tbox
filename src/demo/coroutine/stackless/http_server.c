@@ -66,7 +66,7 @@ typedef struct __tb_demo_http_session_t
         tb_long_t       wait;
 
         // the real size
-        tb_hong_t       real;
+        tb_long_t       real;
 
         // the send c-string
         tb_char_t*      cstr;
@@ -155,6 +155,52 @@ static tb_char_t const* tb_demo_http_session_code_cstr(tb_size_t code)
 
     // ok?
     return cstr;
+}
+static tb_long_t tb_demo_http_session_data_send(tb_demo_http_session_ref_t session)
+{
+    // done
+    while (session->locals.send < session->locals.size)
+    {
+        // send it
+        tb_long_t real = tb_socket_send(session->sock, session->data + session->locals.send, (tb_size_t)(session->locals.size - session->locals.send));
+
+        // has data?
+        if (real > 0) 
+        {
+            session->locals.send += real;
+            session->locals.wait = 0;
+        }
+        // no data? wait it
+        else if (!real && !session->locals.wait) return 0;
+        // failed or end?
+        else break;
+    }
+
+    // ok?
+    return session->locals.send < session->locals.size? -1 : 1;
+}
+static tb_long_t tb_demo_http_session_file_send(tb_demo_http_session_ref_t session)
+{
+    // done
+    while (session->locals.send < session->locals.size)
+    {
+        // send it
+        tb_hong_t real = tb_socket_sendf(session->sock, session->file, session->locals.send, session->locals.size - session->locals.send);
+
+        // has data?
+        if (real > 0) 
+        {
+            session->locals.send += real;
+            session->locals.wait = 0;
+        }
+        // no data? wait it
+        else if (!real && !session->locals.wait) return 0;
+        // failed or end?
+        else break;
+    }
+
+    // ok?
+    return session->locals.send < session->locals.size? -1 : 1;
 }
 static tb_void_t tb_demo_http_session_head_parse(tb_demo_http_session_ref_t session)
 {
@@ -281,6 +327,40 @@ static tb_long_t tb_demo_http_session_head_line(tb_demo_http_session_ref_t sessi
     // ok?
     return ok;
 }
+static tb_long_t tb_demo_http_session_head_recv(tb_demo_http_session_ref_t session)
+{
+    // check
+    tb_assert_and_check_return_val(session && session->sock, -1);
+
+    // read data
+    tb_long_t ok = 0;
+    while (!ok)
+    {
+        // read it
+        tb_long_t real = tb_socket_recv(session->sock, session->data, sizeof(session->data));
+
+        // has data?
+        if (real > 0) 
+        {
+            // get the header line
+            ok = tb_demo_http_session_head_line(session, session->data, real);
+
+            // clear wait events
+            session->locals.wait = 0;
+        }
+        // no data? wait it
+        else if (!real && !session->locals.wait) break;
+        // failed or end?
+        else 
+        {
+            ok = -1;
+            break;
+        }
+    }
+
+    // ok?
+    return ok;
+}
 static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
@@ -297,34 +377,15 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
             if (!tb_demo_http_session_init(session)) break;
 
             // read data
-            session->locals.ok = 0;
             session->locals.wait = 0;
-            while (!session->locals.ok)
+            while (!(session->locals.ok = tb_demo_http_session_head_recv(session)))
             {
-                // read it
-                session->locals.real = tb_socket_recv(session->sock, session->data, sizeof(session->data));
+                // wait it
+                tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
 
-                // has data?
-                if (session->locals.real > 0) 
-                {
-                    // get the header line
-                    session->locals.ok = tb_demo_http_session_head_line(session, session->data, (tb_size_t)session->locals.real);
-
-                    // clear wait events
-                    session->locals.wait = 0;
-                }
-                // no data? wait it
-                else if (!session->locals.real && !session->locals.wait)
-                {
-                    // wait it
-                    tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
-
-                    // wait ok
-                    session->locals.wait = tb_lo_coroutine_events();
-                    tb_assert_and_check_break(session->locals.wait >= 0);
-                }
-                // failed or end?
-                else break;
+                // wait ok
+                session->locals.wait = tb_lo_coroutine_events();
+                tb_assert_and_check_break(session->locals.wait >= 0);
             }
             tb_check_break(session->locals.ok > 0);
 
@@ -373,31 +434,16 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
             // send data
             session->locals.send = 0;
             session->locals.wait = 0;
-            while (session->locals.send < session->locals.size)
+            while (!(session->locals.ok = tb_demo_http_session_data_send(session)))
             {
-                // send it
-                session->locals.real = tb_socket_send(session->sock, session->data + session->locals.send, (tb_size_t)(session->locals.size - session->locals.send));
+                // wait it
+                tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
-                // has data?
-                if (session->locals.real > 0) 
-                {
-                    session->locals.send += session->locals.real;
-                    session->locals.wait = 0;
-                }
-                // no data? wait it
-                else if (!session->locals.real && !session->locals.wait)
-                {
-                    // wait it
-                    tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
-
-                    // wait ok
-                    session->locals.wait = tb_lo_coroutine_events();
-                    tb_assert_and_check_break(session->locals.wait >= 0);
-                }
-                // failed or end?
-                else break;
+                // wait ok
+                session->locals.wait = tb_lo_coroutine_events();
+                tb_assert_and_check_break(session->locals.wait >= 0);
             }
-            tb_check_break(session->locals.send == session->locals.size);
+            tb_check_break(session->locals.ok > 0);
 
             // send file
             if (session->file)
@@ -406,36 +452,21 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
                 session->locals.send = 0;
                 session->locals.wait = 0;
                 session->locals.size = tb_file_size(session->file);
-                while (session->locals.send < session->locals.size)
+                while (!(session->locals.ok = tb_demo_http_session_file_send(session)))
                 {
-                    // send it
-                    session->locals.real = tb_socket_sendf(session->sock, session->file, session->locals.send, session->locals.size - session->locals.send);
+                    // wait it
+                    tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
-                    // has data?
-                    if (session->locals.real > 0) 
-                    {
-                        session->locals.send += session->locals.real;
-                        session->locals.wait = 0;
-                    }
-                    // no data? wait it
-                    else if (!session->locals.real && !session->locals.wait)
-                    {
-                        // wait it
-                        tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
-
-                        // wait ok
-                        session->locals.wait = tb_lo_coroutine_events();
-                        tb_assert_and_check_break(session->locals.wait >= 0);
-                    }
-                    // failed or end?
-                    else break;
+                    // wait ok
+                    session->locals.wait = tb_lo_coroutine_events();
+                    tb_assert_and_check_break(session->locals.wait >= 0);
                 }
-                tb_check_break(session->locals.send == session->locals.size);
-            }
+                tb_check_break(session->locals.ok > 0);
 
-            // exit file
-            if (session->file) tb_file_exit(session->file);
-            session->file = tb_null;
+                // exit file
+                tb_file_exit(session->file);
+                session->file = tb_null;
+            }
 
             // trace
             tb_trace_d("ok!");
