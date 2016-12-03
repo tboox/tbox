@@ -129,8 +129,13 @@
  */
 #   define tb_lo_core_init(co)              tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_READY 
 #   define tb_lo_core_resume(co)            switch (tb_lo_core(co)->branch) case 0:
-#   define tb_lo_core_record(co)            tb_lo_core(co)->branch = (tb_uint16_t)__tb_line__; case __tb_line__:
+#   define tb_lo_core_record_(co, label)    tb_lo_core(co)->branch = (tb_uint16_t)label; case label:
 #   define tb_lo_core_exit(co)              tb_lo_core(co)->branch = 0, tb_lo_core(co)->state = TB_STATE_END 
+#   ifdef TB_COMPILER_IS_MSVC
+#       define tb_lo_core_record(co)        tb_lo_core_record_(co, __COUNTER__ + 1)
+#   else
+#       define tb_lo_core_record(co)        tb_lo_core_record_(co, __tb_line__)
+#   endif
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
