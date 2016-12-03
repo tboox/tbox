@@ -139,7 +139,7 @@ tb_void_t tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t self, tb_long_t interval)
     // sleep it
     tb_lo_scheduler_io_sleep(scheduler->scheduler_io, interval);
 }
-tb_bool_t tb_lo_coroutine_wait_(tb_lo_coroutine_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
     // check
     tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
@@ -181,7 +181,6 @@ tb_pointer_t tb_lo_coroutine_pass1_make_(tb_size_t type_size, tb_cpointer_t valu
     // ok?
     return data;
 }
-
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * public implementation

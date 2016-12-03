@@ -17,19 +17,20 @@
  * Copyright (C) 2009 - 2017, ruki All rights reserved.
  *
  * @author      ruki
- * @file        impl.h
+ * @file        stackless.h
+ * @ingroup     coroutine
  *
  */
-#ifndef TB_COROUTINE_IMPL_H
-#define TB_COROUTINE_IMPL_H
+#ifndef TB_COROUTINE_STACKLESS_H
+#define TB_COROUTINE_STACKLESS_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
 #include "coroutine.h"
 #include "scheduler.h"
-#include "scheduler_io.h"
-#include "stackless/stackless.h"
+#include "semaphore.h"
+#include "lock.h"
+
 
 #endif

@@ -580,7 +580,7 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
     // attempt to cancel waiting from coroutine first
     if (tb_coroutine_self())
-        tb_coroutine_wait(sock, TB_SOCKET_EVENT_NONE, 0);
+        tb_coroutine_waitio(sock, TB_SOCKET_EVENT_NONE, 0);
 #endif
 
     // close it

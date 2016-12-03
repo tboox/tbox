@@ -21,8 +21,8 @@
  * @ingroup     coroutine
  *
  */
-#ifndef TB_COROUTINE_STACKLESS_H
-#define TB_COROUTINE_STACKLESS_H
+#ifndef TB_COROUTINE_STACKLESS_COROUTINE_H
+#define TB_COROUTINE_STACKLESS_COROUTINE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -172,19 +172,33 @@ do \
     \
 } while(0)
 
-/// wait socket events
-#define tb_lo_coroutine_wait(sock, events, interval) \
+/// wait io socket events
+#define tb_lo_coroutine_waitio(sock, events, interval) \
 do \
 { \
-    if (tb_lo_coroutine_wait_(tb_lo_coroutine_self(), sock, events, interval)) \
+    if (tb_lo_coroutine_waitio_(tb_lo_coroutine_self(), sock, events, interval)) \
     { \
         tb_lo_coroutine_suspend(); \
     } \
     \
 } while(0)
 
+/// wait until coroutine be true
+#define tb_lo_coroutine_wait_until(cond) \
+do \
+{ \
+    tb_used(&lo_yield_flag__); \
+    tb_lo_core_record(tb_lo_coroutine_self()); \
+    if (!(cond)) \
+        return ; \
+    \
+} while(0)
+
+/// wait while coroutine be true
+#define tb_lo_coroutine_wait_while(pt, cond)    tb_lo_coroutine_wait_until(!(cond))
+
 /// get socket events after waiting
-#define tb_lo_coroutine_events()    tb_lo_coroutine_events_(tb_lo_coroutine_self())
+#define tb_lo_coroutine_events()                tb_lo_coroutine_events_(tb_lo_coroutine_self())
 
 /*! pass the user private data 
  *
@@ -237,7 +251,7 @@ do \
 
  * @endcode
  */
-#define tb_lo_coroutine_pass1(type, member, value)  tb_lo_coroutine_pass1_make_(sizeof(type), &value, tb_offsetof(type, member), sizeof(value)), tb_lo_coroutine_pass_free_
+#define tb_lo_coroutine_pass1(type, member, value)  tb_lo_coroutine_pass1_make_(sizeof(type), &(value), tb_offsetof(type, member), tb_memsizeof(type, member)), tb_lo_coroutine_pass_free_
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -272,7 +286,7 @@ tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, 
  *
  * @return              suspend coroutine if be tb_true
  */
-tb_bool_t               tb_lo_coroutine_wait_(tb_lo_coroutine_ref_t coroutine, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
 /* get the events after waiting socket
  *
@@ -300,6 +314,20 @@ tb_void_t               tb_lo_coroutine_pass_free_(tb_cpointer_t priv);
  * @return              the user private data
  */
 tb_pointer_t            tb_lo_coroutine_pass1_make_(tb_size_t type_size, tb_cpointer_t value, tb_size_t offset, tb_size_t size);
+
+/* make the user private data for pass2()
+ *
+ * @param type_size     the data type size
+ * @param value1        the value1 pointer
+ * @param offset1       the member1 offset
+ * @param size1         the value1 size
+ * @param value2        the value2 pointer
+ * @param offset2       the member2 offset
+ * @param size2         the value2 size
+ *
+ * @return              the user private data
+ */
+tb_pointer_t            tb_lo_coroutine_pass2_make_(tb_size_t type_size, tb_cpointer_t value1, tb_size_t offset1, tb_size_t size1, tb_cpointer_t value2, tb_size_t offset2, tb_size_t size2);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

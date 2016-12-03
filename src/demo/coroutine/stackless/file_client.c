@@ -82,7 +82,7 @@ static tb_void_t tb_demo_lo_coroutine_pull(tb_lo_coroutine_ref_t coroutine, tb_c
             while (!(client->ok = tb_socket_connect(client->sock, &client->addr))) 
             {
                 // wait it
-                tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
+                tb_lo_coroutine_waitio(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
                 
                 // wait failed?
                 if (tb_lo_coroutine_events() <= 0) break;
@@ -114,7 +114,7 @@ static tb_void_t tb_demo_lo_coroutine_pull(tb_lo_coroutine_ref_t coroutine, tb_c
                 else if (!client->real && !client->wait)
                 {
                     // wait it
-                    tb_lo_coroutine_wait(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+                    tb_lo_coroutine_waitio(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
 
                     // wait ok
                     client->wait = tb_lo_coroutine_events();

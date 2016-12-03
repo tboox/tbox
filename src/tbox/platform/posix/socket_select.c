@@ -56,7 +56,7 @@ tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeo
     if (tb_coroutine_self())
     {
         // wait it
-        return tb_coroutine_wait(sock, events, timeout);
+        return tb_coroutine_waitio(sock, events, timeout);
     }
 #endif
 

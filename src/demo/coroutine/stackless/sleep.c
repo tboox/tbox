@@ -8,7 +8,7 @@
  */ 
 
 // the sleep local type
-typedef struct __tb_demo_lo_sleep_local_t
+typedef struct __tb_demo_lo_sleep_t
 {
     // the interval 
     tb_size_t       interval;
@@ -19,7 +19,7 @@ typedef struct __tb_demo_lo_sleep_local_t
     // the time
     tb_hong_t       time;
 
-}tb_demo_lo_sleep_local_t, *tb_demo_lo_sleep_local_ref_t;
+}tb_demo_lo_sleep_t, *tb_demo_lo_sleep_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -27,7 +27,7 @@ typedef struct __tb_demo_lo_sleep_local_t
 static tb_void_t tb_demo_lo_coroutine_sleep_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // the local
-    tb_demo_lo_sleep_local_ref_t local = (tb_demo_lo_sleep_local_ref_t)priv;
+    tb_demo_lo_sleep_ref_t local = (tb_demo_lo_sleep_ref_t)priv;
 
     // enter coroutine
     tb_lo_coroutine_enter(coroutine)
@@ -60,17 +60,17 @@ tb_int_t tb_demo_lo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start coroutines
-        tb_demo_lo_sleep_local_t locals[] = 
+        tb_demo_lo_sleep_t sleeps[] = 
         {
             {1000,  10}
         ,   {2000,  10}
         ,   {10,    10}
         ,   {100,   10}
         };
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[0], tb_null);
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[1], tb_null);
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[2], tb_null);
-        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &locals[3], tb_null);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &sleeps[0], tb_null);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &sleeps[1], tb_null);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &sleeps[2], tb_null);
+        tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_sleep_func, &sleeps[3], tb_null);
 
         // run scheduler
         tb_lo_scheduler_loop(scheduler);

@@ -20,8 +20,8 @@
  * @file        coroutine.h
  *
  */
-#ifndef TB_COROUTINE_IMPL_STACKLESS_H
-#define TB_COROUTINE_IMPL_STACKLESS_H
+#ifndef TB_COROUTINE_IMPL_STACKLESS_COROUTINE_H
+#define TB_COROUTINE_IMPL_STACKLESS_COROUTINE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

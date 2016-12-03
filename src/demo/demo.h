@@ -217,6 +217,7 @@ TB_DEMO_MAIN_DECL(coroutine_http_server);
 
 // stackless coroutine
 TB_DEMO_MAIN_DECL(lo_coroutine_nest);
+TB_DEMO_MAIN_DECL(lo_coroutine_lock);
 TB_DEMO_MAIN_DECL(lo_coroutine_sleep);
 TB_DEMO_MAIN_DECL(lo_coroutine_switch);
 TB_DEMO_MAIN_DECL(lo_coroutine_echo_server);
