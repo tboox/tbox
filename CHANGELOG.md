@@ -9,6 +9,7 @@
 * Add `--micro=y|n` option to compiling micro library (~64K) for the embed system
 * Add `tb_addrinfo_addr` and `tb_addrinfo_name` interfaces
 * Add stackless coroutine
+* Add semaphone and lock for the stackless coroutine
 
 ### Changes
 
@@ -119,6 +120,7 @@
 * 添加 `--micro=y|n` 选项，实现极小编译，针对嵌入式平台，编译tbox微内核(~64K) 
 * 添加 `tb_addrinfo_addr` and `tb_addrinfo_name` 接口
 * 添加stackless协程，更加轻量的协程支持，每个协程只占用几十个bytes，同时支持io调度
+* 针对stackless协程，增加lock和semaphone支持
 
 ### 改进
 

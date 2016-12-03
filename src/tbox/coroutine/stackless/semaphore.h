@@ -59,7 +59,13 @@
  * @param sem           the semaphore pointer
  * @param post          the post semaphore value
  */
-#define tb_lo_semaphore_post(sem, post)     (sem)->value += (post)
+#define tb_lo_semaphore_post(sem, post)     \
+do \
+{ \
+    (sem)->value += (post); \
+    tb_lo_coroutine_yield(); \
+ \
+} while (0)
 
 /*! wait semaphore
  * 
