@@ -181,7 +181,7 @@ static tb_void_t tb_lo_scheduler_io_loop(tb_lo_coroutine_ref_t coroutine, tb_cpo
             tb_check_break(tb_lo_scheduler_suspend_count(scheduler));
 
             // trace
-            tb_trace_d("loop: wait %s ms ..", tb_lo_scheduler_io_timer_delay(scheduler_io));
+            tb_trace_d("loop: wait %ld ms ..", tb_lo_scheduler_io_timer_delay(scheduler_io));
 
             // no more ready coroutines? wait io events and timers (TODO)
             if (tb_poller_wait(scheduler_io->poller, tb_lo_scheduler_io_events, tb_lo_scheduler_io_timer_delay(scheduler_io)) < 0) break;
