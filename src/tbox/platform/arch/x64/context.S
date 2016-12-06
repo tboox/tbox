@@ -22,13 +22,13 @@
  */
 
 /*
- * This implementation borrows heavily from Oliver Kowalke's context
- * implementation in asm (boost.context).
- *
- *          Copyright Oliver Kowalke 2009.
- * Distributed under the Boost Software License, Version 1.0.
- *    (See copy at http://www.boost.org/LICENSE_1_0.txt)
- * 
+            Copyright Oliver Kowalke 2009.
+   Distributed under the Boost Software License, Version 1.0.
+      (See accompanying file LICENSE_1_0.txt or copy at
+            http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+/*
  * Boost Software License - Version 1.0 - August 17th, 2003
  *
  * Permission is hereby granted, free of charge, to any person or organization
@@ -53,7 +53,6 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
