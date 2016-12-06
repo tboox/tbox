@@ -104,9 +104,9 @@ target("tbox")
         add_files("platform/dynamic.c")
         add_files("platform/windows/interface/ws2_32.c")
         add_files("platform/windows/interface/mswsock.c")
+        add_files("platform/windows/interface/kernel32.c")
         if is_mode("debug") then
             add_files("platform/windows/interface/dbghelp.c")
-            add_files("platform/windows/interface/kernel32.c")
         end
     end
 
