@@ -46,6 +46,17 @@
  * types
  */
 
+// the poller private data type
+typedef struct __tb_poller_data_t
+{
+    // the socket
+    tb_socket_ref_t         sock;
+
+    // the user private data 
+    tb_cpointer_t           priv;
+
+}tb_poller_data_t, *tb_poller_data_ref_t;
+
 // the poller select type
 typedef struct __tb_poller_select_t
 {
@@ -66,10 +77,76 @@ typedef struct __tb_poller_select_t
     fd_set                  rfdc;
     fd_set                  wfdc;
 
-    // the user private data hash (socket => priv)
-    tb_hash_map_ref_t       hash;
+    // the socket count
+    tb_size_t               count;
+
+    /* the user private data list
+     *
+     * do not use hash_map because it is too heavy in micro mode 
+     */
+    tb_poller_data_ref_t    list;
+
+    // the user private data list size
+    tb_size_t               list_size;
 
 }tb_poller_select_t, *tb_poller_select_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_void_t tb_poller_list_set(tb_poller_select_ref_t poller, tb_socket_ref_t sock, tb_cpointer_t priv)
+{
+    // check
+    tb_assert(poller && sock);
+
+    // not null?
+    if (priv)
+    {
+        // no list? init it first
+        if (!poller->list)
+        {
+            // init hash
+            poller->list = tb_nalloc0_type(FD_SETSIZE, tb_poller_data_t);
+            tb_assert_and_check_return(poller->list);
+        }
+
+        // insert or update the user private data to the list in the increasing order (TODO binary search)
+        tb_size_t i = 0;
+        tb_size_t n = poller->list_size;
+        for (i = 0; i < n; i++) if (sock <= poller->list[i].sock) break;
+
+        // update the private data
+        if (i < n && sock == poller->list[i].sock) poller->list[i].priv = priv;
+        else
+        {
+            // insert the private data
+            if (i < n) tb_memmov(poller->list + i + 1, poller->list + i, (n - i) * sizeof(tb_poller_data_t));
+            poller->list[i].sock = sock;
+            poller->list[i].priv = priv;
+        }
+
+        // update the list size
+        poller->list_size++;
+    }
+}
+static tb_void_t tb_poller_list_del(tb_poller_select_ref_t poller, tb_socket_ref_t sock)
+{
+    // check
+    tb_assert(poller && sock);
+
+    // exists list?
+    if (poller->list)
+    {
+        // remove the user private data from the list (TODO binary search)
+        tb_size_t i = 0;
+        tb_size_t n = poller->list_size;
+        for (i = 0; i < n; i++) if (sock == poller->list[i].sock) break;
+        if (i + 1 < n) tb_memmov(poller->list + i, poller->list + i + 1, (n - i - 1) * sizeof(tb_poller_data_t));
+
+        // update the list size
+        poller->list_size--;
+    }
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -84,10 +161,6 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         // make poller
         poller = tb_malloc0_type(tb_poller_select_t);
         tb_assert_and_check_break(poller);
-
-        // init hash
-        poller->hash = tb_hash_map_init(tb_align8(tb_isqrti(FD_SETSIZE) + 1), tb_element_ptr(tb_null, tb_null), tb_element_ptr(tb_null, tb_null));
-        tb_assert_and_check_break(poller->hash);
 
         // init user private data
         poller->priv = priv;
@@ -132,9 +205,10 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     poller->pair[0] = tb_null;
     poller->pair[1] = tb_null;
 
-    // exit hash
-    if (poller->hash) tb_hash_map_exit(poller->hash);
-    poller->hash = tb_null;
+    // exit list
+    if (poller->list) tb_free(poller->list);
+    poller->list        = tb_null;
+    poller->list_size   = 0;
 
     // clear fds
     FD_ZERO(&poller->rfds);
@@ -158,8 +232,8 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     FD_ZERO(&poller->rfdc);
     FD_ZERO(&poller->wfdc);
 
-    // clear hash
-    if (poller->hash) tb_hash_map_clear(poller->hash);
+    // clear list
+    poller->list_size = 0;
 
     // spak it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
@@ -203,10 +277,10 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
 {
     // check
     tb_poller_select_ref_t poller = (tb_poller_select_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->hash && sock, tb_false);
+    tb_assert_and_check_return_val(poller && sock, tb_false);
 
     // check size
-    tb_assert_and_check_return_val(tb_hash_map_size(poller->hash) < FD_SETSIZE, tb_false);
+    tb_assert_and_check_return_val(poller->count < FD_SETSIZE, tb_false);
 
     // save fd
     tb_long_t fd = tb_sock2fd(sock);
@@ -215,7 +289,10 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     if (events & TB_POLLER_EVENT_SEND) FD_SET(fd, &poller->wfds);
 
     // bind user private data to socket
-    tb_hash_map_insert(poller->hash, sock, priv);
+    tb_poller_list_set(poller, sock, priv);
+
+    // update socket count
+    poller->count++;
 
     // ok
     return tb_true;
@@ -224,7 +301,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
 {
     // check
     tb_poller_select_ref_t poller = (tb_poller_select_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->hash && sock, tb_false);
+    tb_assert_and_check_return_val(poller && sock, tb_false);
 
     // remove fds
     tb_long_t fd = tb_sock2fd(sock);
@@ -232,7 +309,10 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     FD_CLR(fd, &poller->wfds);
 
     // remove user private data from this socket
-    tb_hash_map_remove(poller->hash, sock);
+    tb_poller_list_del(poller, sock);
+
+    // update socket count
+    poller->count--;
 
     // ok
     return tb_true;
@@ -241,7 +321,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
 {
     // check
     tb_poller_select_ref_t poller = (tb_poller_select_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->hash && sock, tb_false);
+    tb_assert_and_check_return_val(poller && sock, tb_false);
 
     // modify events
     tb_long_t fd = tb_sock2fd(sock);
@@ -249,7 +329,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     if (events & TB_POLLER_EVENT_SEND) FD_SET(fd, &poller->wfds); else FD_CLR(fd, &poller->wfds);
 
     // modify user private data to socket
-    tb_hash_map_insert(poller->hash, sock, priv);
+    tb_poller_list_set(poller, sock, priv);
 
     // ok
     return tb_true;
@@ -258,7 +338,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 {
     // check
     tb_poller_select_ref_t poller = (tb_poller_select_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->hash && func, -1);
+    tb_assert_and_check_return_val(poller && poller->list && func, -1);
 
     // init time
     struct timeval t = {0};
@@ -293,14 +373,16 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         // timeout?
         tb_check_return_val(sfdn, 0);
         
-        // sync
-        tb_for_all_if (tb_hash_map_item_ref_t, item, poller->hash, item)
+        // dispatch events
+        tb_size_t i = 0;
+        tb_size_t n = poller->list_size;
+        for (i = 0; i < n; i++)
         {
             // end?
             tb_check_break(wait >= 0);
 
             // the sock
-            tb_socket_ref_t sock = (tb_socket_ref_t)item->name;
+            tb_socket_ref_t sock = (tb_socket_ref_t)poller->list[i].sock;
             tb_assert_and_check_return_val(sock, -1);
 
             // spak?
@@ -334,7 +416,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             if (events)
             {
                 // call event function
-                func(self, sock, events, item->data);
+                func(self, sock, events, poller->list[i].priv);
 
                 // update the events count
                 wait++;

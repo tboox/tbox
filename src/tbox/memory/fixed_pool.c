@@ -219,7 +219,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_t* pool)
         // check
         tb_assert_and_check_break(pool->slot_count < pool->slot_space);
 
-        // insert the slot to the slot list in the increasing order
+        // insert the slot to the slot list in the increasing order (TODO binary search)
         tb_size_t i = 0;
         tb_size_t n = pool->slot_count;
         for (i = 0; i < n; i++) if (slot <= pool->slot_list[i]) break;

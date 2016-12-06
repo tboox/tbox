@@ -61,7 +61,7 @@
 tb_uint32_t tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t seed)
 {
 #ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
-    return adler32(seed, data, size);
+    return adler32(seed, data, (tb_uint_t)size);
 #else
     // split adler-32 into component sums 
     tb_uint32_t adler = seed;

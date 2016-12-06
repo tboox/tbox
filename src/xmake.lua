@@ -149,6 +149,7 @@ function check_interfaces()
 
     -- add the interfaces for posix
     add_cfuncs("posix", nil,        {"sys/poll.h", "sys/socket.h"},     "poll")
+    add_cfuncs("posix", nil,        {"sys/select.h"},                   "select")
     add_cfuncs("posix", nil,        "pthread.h",                        "pthread_mutex_init",
                                                                         "pthread_create", 
                                                                         "pthread_setspecific", 

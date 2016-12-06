@@ -110,7 +110,7 @@ tb_char_t const* tb_addrinfo_name_impl_1(tb_ipaddr_ref_t addr, tb_char_t* name, 
     tb_assert_and_check_return_val(saddrlen, tb_null);
 
     // get host name from address
-    return !tb_ws2_32()->getnameinfo((struct sockaddr const*)&saddr, saddrlen, name, maxn, tb_null, 0, NI_NAMEREQD)? name : tb_null;
+    return !tb_ws2_32()->getnameinfo((struct sockaddr const*)&saddr, saddrlen, name, (DWORD)maxn, tb_null, 0, NI_NAMEREQD)? name : tb_null;
 }
 tb_char_t const* tb_addrinfo_name_impl_2(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn)
 {
