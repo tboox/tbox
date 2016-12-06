@@ -22,7 +22,7 @@
 ;;
 
 ;;
-;; This implementation borrows heavily from Oliver Kowalke's coroutines
+;; This implementation borrows heavily from Oliver Kowalke's context
 ; implementation in asm (boost.context).
 ;
 ;          Copyright Oliver Kowalke 2009.
