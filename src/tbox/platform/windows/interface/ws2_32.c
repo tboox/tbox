@@ -68,6 +68,7 @@ static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance, tb_cpointer_t pri
     TB_INTERFACE_LOAD(ws2_32, closesocket);
     TB_INTERFACE_LOAD(ws2_32, gethostname);
     TB_INTERFACE_LOAD(ws2_32, getaddrinfo);
+    TB_INTERFACE_LOAD(ws2_32, freeaddrinfo);
     TB_INTERFACE_LOAD(ws2_32, getnameinfo);
     TB_INTERFACE_LOAD(ws2_32, gethostbyname);
     TB_INTERFACE_LOAD(ws2_32, gethostbyaddr);

@@ -71,7 +71,7 @@ tb_bool_t tb_addrinfo_addr_impl_1(tb_char_t const* name, tb_ipaddr_ref_t addr)
     } while (0);
 
     // exit answer
-    if (answer) freeaddrinfo(answer);
+    if (answer) tb_ws2_32()->freeaddrinfo(answer);
     answer = tb_null;
 
     // ok?
