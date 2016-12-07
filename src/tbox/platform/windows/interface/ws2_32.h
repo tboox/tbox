@@ -212,7 +212,7 @@ typedef struct __tb_ws2_32_t
     tb_ws2_32_getaddrinfo_t         getaddrinfo;
    
     // freeaddrinfo
-    tb_ws2_32_getaddrinfo_t         freeaddrinfo;
+    tb_ws2_32_freeaddrinfo_t        freeaddrinfo;
   
     // getnameinfo
     tb_ws2_32_getnameinfo_t         getnameinfo;
