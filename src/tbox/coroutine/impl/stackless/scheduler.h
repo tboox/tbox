@@ -88,7 +88,7 @@ typedef struct __tb_lo_scheduler_t
  * interfaces
  */
 
-/*! start coroutine 
+/* start coroutine 
  *
  * @param scheduler     the scheduler 
  * @param func          the coroutine function
@@ -99,12 +99,18 @@ typedef struct __tb_lo_scheduler_t
  */
 tb_bool_t               tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv, tb_lo_coroutine_free_t free);
 
-/*! resume the given coroutine
+/* resume the given coroutine
  *
  * @param scheduler     the scheduler
  * @param coroutine     the coroutine 
  */
 tb_void_t               tb_lo_scheduler_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t* coroutine);
+
+/* get the current scheduler
+ *
+ * @return              the scheduler
+ */
+tb_lo_scheduler_ref_t   tb_lo_scheduler_self_(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

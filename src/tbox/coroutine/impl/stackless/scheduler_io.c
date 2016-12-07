@@ -325,7 +325,7 @@ tb_void_t tb_lo_scheduler_io_sleep(tb_lo_scheduler_io_ref_t scheduler_io, tb_lon
 tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
     // check
-    tb_assert(scheduler_io && sock && scheduler_io->poller && scheduler_io->scheduler);
+    tb_assert(scheduler_io && sock && scheduler_io->poller && scheduler_io->scheduler && events);
 
     // get the current coroutine
     tb_lo_coroutine_t* coroutine = tb_lo_scheduler_running(scheduler_io->scheduler);
@@ -334,31 +334,12 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
     // trace
     tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
 
-    // no events? remove the this socket from poller
-    tb_socket_ref_t sock_prev = coroutine->rs.wait.sock;
-    if (!events && sock_prev == sock)
-    {
-        // remove the previous socket first if exists
-        if (!tb_poller_remove(scheduler_io->poller, sock))
-        {
-            // trace
-            tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock, coroutine);
-
-            // failed
-            coroutine->rs.wait.events_result = -1;
-            return tb_false;
-        }
-
-        // remove ok
-        coroutine->rs.wait.events_result = 0;
-        return tb_false;
-    }
-
     // enable edge-trigger mode if be supported
     if (tb_poller_support(scheduler_io->poller, TB_POLLER_EVENT_CLEAR))
         events |= TB_POLLER_EVENT_CLEAR;
 
     // exists this socket? only modify events 
+    tb_socket_ref_t sock_prev = coroutine->rs.wait.sock;
     if (sock_prev == sock)
     {
         // return the cached events directly if the waiting events exists cache
@@ -455,4 +436,46 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
 
     // suspend it
     return tb_true;
+}
+tb_bool_t tb_lo_scheduler_io_cancel(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock)
+{
+    // check
+    tb_assert(scheduler_io && sock && scheduler_io->poller && scheduler_io->scheduler);
+
+    // get the current coroutine
+    tb_lo_coroutine_t* coroutine = tb_lo_scheduler_running(scheduler_io->scheduler);
+    tb_check_return_val(coroutine, tb_false);
+
+    // trace
+    tb_trace_d("coroutine(%p): cancel socket(%p) ..", coroutine, sock);
+
+    // remove the this socket from poller
+    if (coroutine->rs.wait.sock == sock)
+    {
+        // remove the previous socket first if exists
+        if (!tb_poller_remove(scheduler_io->poller, sock))
+        {
+            // trace
+            tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock, coroutine);
+
+            // failed
+            coroutine->rs.wait.events_result = -1;
+            return tb_false;
+        }
+
+        // remove ok
+        coroutine->rs.wait.events_result = 0;
+        return tb_true;
+    }
+
+    // no this socket
+    return tb_false;
+}
+tb_lo_scheduler_io_ref_t tb_lo_scheduler_io_self()
+{
+    // get the current scheduler
+    tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)tb_lo_scheduler_self_();
+   
+    // get the current io scheduler
+    return scheduler? (tb_lo_scheduler_io_ref_t)scheduler->scheduler_io : tb_null;
 }

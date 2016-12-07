@@ -47,7 +47,7 @@ static tb_void_t tb_demo_lo_coroutine_switch_test()
         tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_switch_test_func, &counts[3], tb_null);
 
         // run scheduler
-        tb_lo_scheduler_loop(scheduler);
+        tb_lo_scheduler_loop(scheduler, tb_true);
 
         // exit scheduler
         tb_lo_scheduler_exit(scheduler);
@@ -85,7 +85,7 @@ static tb_void_t tb_demo_lo_coroutine_switch_perf()
         tb_hong_t startime = tb_mclock();
 
         // run scheduler
-        tb_lo_scheduler_loop(scheduler);
+        tb_lo_scheduler_loop(scheduler, tb_true);
 
         // computing time
         tb_hong_t duration = tb_mclock() - startime;

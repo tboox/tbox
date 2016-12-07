@@ -31,6 +31,7 @@
 #include "../posix/sockaddr.h"
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 #   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -579,8 +580,9 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
     // attempt to cancel waiting from coroutine first
-    if (tb_coroutine_self())
-        tb_coroutine_waitio(sock, TB_SOCKET_EVENT_NONE, 0);
+    tb_pointer_t scheduler_io = tb_null;
+    if ((scheduler_io = tb_co_scheduler_io_self()) && tb_co_scheduler_io_cancel(scheduler_io, sock)) {}
+    else if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel(scheduler_io, sock)) {}
 #endif
 
     // close it

@@ -100,6 +100,21 @@ tb_void_t                   tb_lo_scheduler_io_sleep(tb_lo_scheduler_io_ref_t sc
  */
 tb_bool_t                   tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 
+/*! cancel io events for the given socket 
+ *
+ * @param scheduler_io      the io scheduler
+ * @param sock              the socket
+ *
+ * return                   tb_true or tb_false
+ */
+tb_bool_t                   tb_lo_scheduler_io_cancel(tb_lo_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock);
+
+/* get the current io scheduler
+ *
+ * @return                  the io scheduler
+ */
+tb_lo_scheduler_io_ref_t    tb_lo_scheduler_io_self(tb_noarg_t);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

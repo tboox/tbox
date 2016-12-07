@@ -205,7 +205,7 @@ tb_int_t tb_demo_lo_coroutine_file_server_main(tb_int_t argc, tb_char_t** argv)
         tb_lo_coroutine_start(scheduler, tb_demo_lo_coroutine_listen, tb_lo_coroutine_pass(tb_demo_lo_listen_t));
 
         // run scheduler
-        tb_lo_scheduler_loop(scheduler);
+        tb_lo_scheduler_loop(scheduler, tb_true);
 
         // exit scheduler
         tb_lo_scheduler_exit(scheduler);

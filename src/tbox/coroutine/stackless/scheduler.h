@@ -66,8 +66,10 @@ tb_void_t               tb_lo_scheduler_kill(tb_lo_scheduler_ref_t scheduler);
 /*! run the scheduler loop
  *
  * @param scheduler     the scheduler
+ * @param exclusive     enable exclusive mode, we need ensure only one loop() be called at the same time, 
+ *                      but it will be faster using thr global scheduler instead of TLS storage
  */
-tb_void_t               tb_lo_scheduler_loop(tb_lo_scheduler_ref_t scheduler);
+tb_void_t               tb_lo_scheduler_loop(tb_lo_scheduler_ref_t scheduler, tb_bool_t exclusive);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

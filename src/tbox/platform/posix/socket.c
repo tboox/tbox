@@ -45,6 +45,7 @@
 #endif
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 #   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -480,12 +481,13 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     tb_assert_and_check_return_val(sock, tb_false);
 
     // trace
-    tb_trace_d("clos: %p", sock);
+    tb_trace_d("close: %p", sock);
 
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
     // attempt to cancel waiting from coroutine first
-    if (tb_coroutine_self())
-        tb_coroutine_waitio(sock, TB_SOCKET_EVENT_NONE, 0);
+    tb_pointer_t scheduler_io = tb_null;
+    if ((scheduler_io = tb_co_scheduler_io_self()) && tb_co_scheduler_io_cancel(scheduler_io, sock)) {}
+    else if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel(scheduler_io, sock)) {}
 #endif
 
     // close it
@@ -495,7 +497,7 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     if (!ok)
     {
         // trace
-        tb_trace_e("clos: %p failed, errno: %d", sock, errno);
+        tb_trace_e("close: %p failed, errno: %d", sock, errno);
     }
 
     // ok?

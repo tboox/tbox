@@ -48,6 +48,18 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+
+#ifndef TB_CONFIG_MICRO_ENABLE
+// the self scheduler local 
+static tb_thread_local_t        s_scheduler_self = TB_THREAD_LOCAL_INIT;
+#endif
+
+// the global scheduler for the exclusive mode
+static tb_lo_scheduler_t*       s_scheduler_self_ex = tb_null;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 static tb_void_t tb_lo_scheduler_free(tb_list_entry_head_ref_t coroutines)
@@ -156,7 +168,7 @@ static tb_void_t tb_lo_scheduler_switch(tb_lo_scheduler_t* scheduler, tb_lo_coro
 tb_bool_t tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv, tb_lo_coroutine_free_t free)
 {
     // check
-    tb_assert(scheduler && func);
+    tb_assert(func);
 
     // done
     tb_bool_t           ok = tb_false;
@@ -165,6 +177,10 @@ tb_bool_t tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_fu
     {
         // trace
         tb_trace_d("start ..");
+
+        // get the current scheduler
+        if (!scheduler) scheduler = (tb_lo_scheduler_t*)tb_lo_scheduler_self_();
+        tb_assert_and_check_break(scheduler);
 
         // have been stopped? do not continue to start new coroutines
         tb_check_break(!scheduler->stopped);
@@ -229,6 +245,15 @@ tb_void_t tb_lo_scheduler_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t
 
     // make it as ready
     tb_lo_scheduler_make_ready(scheduler, coroutine);
+}
+tb_lo_scheduler_ref_t tb_lo_scheduler_self_()
+{ 
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // get self scheduler on the current thread
+    return (tb_lo_scheduler_ref_t)(s_scheduler_self_ex? s_scheduler_self_ex : tb_thread_local_get(&s_scheduler_self));
+#else
+    return (tb_lo_scheduler_ref_t)s_scheduler_self_ex;
+#endif
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -317,11 +342,30 @@ tb_void_t tb_lo_scheduler_kill(tb_lo_scheduler_ref_t self)
     // stop it
     scheduler->stopped = tb_true;
 }
-tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self)
+tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
 {
     // check
     tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)self;
     tb_assert_and_check_return(scheduler);
+
+    // is exclusive mode?
+    if (exclusive) s_scheduler_self_ex = scheduler;
+#ifndef TB_CONFIG_MICRO_ENABLE
+    else
+    {
+        // init self scheduler local
+        if (!tb_thread_local_init(&s_scheduler_self, tb_null)) return ;
+     
+        // update and overide the current scheduler
+        tb_thread_local_set(&s_scheduler_self, self);
+    }
+#else
+    else
+    {
+        // trace
+        tb_trace_e("non-exclusive is not suspported in micro mode!");
+    }
+#endif
 
     // schedule all ready coroutines
     while (tb_list_entry_size(&scheduler->coroutines_ready) && !scheduler->stopped) 
@@ -354,5 +398,15 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self)
 
     // stop it
     scheduler->stopped = tb_true;
+ 
+    // is exclusive mode?
+    if (exclusive) s_scheduler_self_ex = tb_null;
+#ifndef TB_CONFIG_MICRO_ENABLE
+    else
+    {
+        // clear the current scheduler
+        tb_thread_local_set(&s_scheduler_self, tb_null);
+    }
+#endif
 }
 
