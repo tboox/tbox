@@ -28,7 +28,7 @@ target("tbox")
     add_packages("base")
 
     -- add options
-    add_options("info", "float", "wchar", "micro", "deprecated")
+    add_options("info", "float", "wchar", "micro", "coroutine", "deprecated")
 
     -- add the source files
     add_files("tbox.c") 
@@ -80,8 +80,6 @@ target("tbox")
     add_files("container/iterator.c") 
     add_files("container/list_entry.c") 
     add_files("container/single_list_entry.c") 
-    add_files("coroutine/stackless/*.c") 
-    add_files("coroutine/impl/stackless/*.c") 
 
     -- add the source files for debug mode
     if is_mode("debug") then
@@ -108,6 +106,12 @@ target("tbox")
         if is_mode("debug") then
             add_files("platform/windows/interface/dbghelp.c")
         end
+    end
+
+    -- add the source files for coroutine
+    if is_option("coroutine") then
+        add_files("coroutine/stackless/*.c") 
+        add_files("coroutine/impl/stackless/*.c") 
     end
 
     -- check interfaces

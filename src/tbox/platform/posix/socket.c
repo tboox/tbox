@@ -486,8 +486,11 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
     // attempt to cancel waiting from coroutine first
     tb_pointer_t scheduler_io = tb_null;
+#   ifndef TB_CONFIG_MICRO_ENABLE
     if ((scheduler_io = tb_co_scheduler_io_self()) && tb_co_scheduler_io_cancel(scheduler_io, sock)) {}
-    else if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel(scheduler_io, sock)) {}
+    else
+#   endif
+    if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel(scheduler_io, sock)) {}
 #endif
 
     // close it

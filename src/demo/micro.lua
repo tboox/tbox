@@ -35,5 +35,9 @@ target("demo")
     add_files("platform/addrinfo.c") 
     add_files("container/list_entry.c") 
     add_files("container/single_list_entry.c") 
-    add_files("coroutine/stackless/*.c") 
+
+    -- add the source files for coroutine
+    if is_option("coroutine") then
+        add_files("coroutine/stackless/*.c") 
+    end
 

@@ -26,7 +26,8 @@
  */
 #include "prefix.h"
 #include "../time.h"
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
 #   include "../../coroutine/coroutine.h"
 #endif
 
@@ -40,7 +41,8 @@ tb_void_t tb_usleep(tb_size_t us)
 }
 tb_void_t tb_msleep(tb_size_t ms)
 {
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to sleep in coroutine
     if (tb_coroutine_self())
     {

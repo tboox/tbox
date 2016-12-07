@@ -48,6 +48,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(container_list_entry)
 ,   TB_DEMO_MAIN_ITEM(container_single_list_entry)
  
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
     // stackless coroutine
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_nest)
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_lock)
@@ -58,6 +59,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_file_server)
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_file_client)
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_http_server)
+#endif
 
 };
 

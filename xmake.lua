@@ -73,8 +73,8 @@ if is_mode("release", "profile") then
 
     end
 
-    -- smallest?
-    if is_option("smallest") then
+    -- smallest or micro?
+    if is_option("smallest", "micro") then
  
         -- enable smallest optimization
         set_optimize("smallest")
@@ -87,8 +87,8 @@ if is_mode("release", "profile") then
     add_vectorexts("sse2", "sse3", "ssse3", "mmx")
 end
 
--- smallest?
-if is_option("smallest") then
+-- smallest or micro?
+if is_option("smallest", "micro") then
 
     -- add defines for small
     add_defines("__tb_small__")

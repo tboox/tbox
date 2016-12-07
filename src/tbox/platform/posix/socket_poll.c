@@ -27,7 +27,8 @@
 #include "prefix.h"
 #include <sys/poll.h>
 #include <sys/socket.h>
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
 #   include "../../coroutine/coroutine.h"
 #endif
 
@@ -39,7 +40,8 @@ tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeo
     // check
     tb_assert_and_check_return_val(sock, -1);
 
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine
     if (tb_coroutine_self())
     {
