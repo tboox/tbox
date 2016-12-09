@@ -427,11 +427,18 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     if (ifile) tb_file_exit(ifile);
     if (ofile) tb_file_exit(ofile);
 
+    /* attempt to copy file directly if sendfile failed 
+     *
+     * sendfile() supports regular file only after "since Linux 2.6.33".
+     */
+    if (!ok && ifile && ofile)
+        ok = tb_transfer_url(path, dest, 0, tb_null, tb_null) >= 0;
+
     // ok?
     return ok;
 #else
     // copy it
-    return tb_transfer_url(path, dest, 0, tb_null, tb_null) >= 0? tb_true : tb_false;
+    return tb_transfer_url(path, dest, 0, tb_null, tb_null) >= 0;
 #endif
 }
 tb_bool_t tb_file_create(tb_char_t const* path)
