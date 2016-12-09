@@ -25,3 +25,5 @@ option("polarssl")
     -- add include directories
     add_includedirs("inc/$(plat)", "inc")
 
+    -- add c functions
+    add_cfuncs("ssl_init")
