@@ -29,8 +29,7 @@
  */
 #include "prefix.h"
 #include "../libm/libm.h"
-#if defined(TB_COMPILER_IS_GCC) \
-    && TB_COMPILER_VERSION_BE(4, 1)
+#if defined(TB_COMPILER_IS_GCC)
 #   include "impl/bits_gcc.h"
 #endif
 #if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
