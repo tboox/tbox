@@ -1,6 +1,6 @@
 # 一个用c语言实现的跨平台开发库
 
-[![Build Status](https://api.travis-ci.org/waruqi/tbox.svg)](https://travis-ci.org/waruqi/tbox) [![Build status](https://ci.appveyor.com/api/projects/status/n6q15h2978vmgkww?svg=true)](https://ci.appveyor.com/project/waruqi/tbox) [![codecov](https://codecov.io/gh/waruqi/tbox/branch/master/graph/badge.svg)](https://codecov.io/gh/waruqi/tbox) [![Join the chat at https://gitter.im/waruqi/tboox](https://badges.gitter.im/waruqi/tboox.svg)](https://gitter.im/waruqi/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![donate](http://tboox.org/static/img/donate.svg)](http://tboox.org/donation/)
+[![Build Status](https://api.travis-ci.org/tboox/tbox.svg)](https://travis-ci.org/tboox/tbox) [![Build status](https://ci.appveyor.com/api/projects/status/n6q15h2978vmgkww?svg=true)](https://ci.appveyor.com/project/tboox/tbox) [![codecov](https://codecov.io/gh/tboox/tbox/branch/master/graph/badge.svg)](https://codecov.io/gh/tboox/tbox) [![Join the chat at https://gitter.im/waruqi/tboox](https://badges.gitter.im/waruqi/tboox.svg)](https://gitter.im/waruqi/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![donate](http://tboox.org/static/img/donate.svg)](http://tboox.org/donation/)
 
 ## 简介
 
