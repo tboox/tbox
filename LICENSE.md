@@ -202,7 +202,7 @@
    limitations under the License.
 
 -------------------------------------------------------------------------------
-SUBCOMPONENTS:
+## SUBCOMPONENTS
 
 The TBOX project contains subcomponents with separate copyright
 notices and license terms. Your use of the source code for the these
@@ -237,12 +237,14 @@ DEALINGS IN THE SOFTWARE.
 
 For src/tbox/platform/arch/{arm,arm64,mips,x86,x64}/context.{S,asm}:
 
+```
 /*
             Copyright Oliver Kowalke 2009.
    Distributed under the Boost Software License, Version 1.0.
       (See accompanying file LICENSE_1_0.txt or copy at
             http://www.boost.org/LICENSE_1_0.txt)
 */
+```
 
 
 #### ZLib License
@@ -270,7 +272,9 @@ Mark Adler
 
 For src/tbox/hash/adler32.c:
 
+```
 /* adler32.c -- compute the Adler-32 checksum of a data stream
  * Copyright (C) 1995-2011, 2016 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
+```
