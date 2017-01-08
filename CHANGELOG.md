@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Modify license to Apache License 2.0
+
 ## v1.6.1
 
 ### New features
@@ -114,6 +118,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 修改license，使用更加宽松的Apache License 2.0
 
 ## v1.6.1
 
