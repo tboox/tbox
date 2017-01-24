@@ -7,10 +7,9 @@ platform:
   - Win64
 
 before_build:
-  - cmd: git clone --branch=dev https://github.com/waruqi/xmake.git waruqi\xmake
-  - cmd: cd waruqi\xmake
-  - cmd: call install.bat noinput
-  - cmd: cd ..\..
+  - cmd: curl -fsSL https://github.com/tboox/xmake/releases/download/v2.0.5/xmake-v2.0.5.exe -o xmake-installer.exe
+  - cmd: xmake-installer.exe /S 
+  - cmd: xmake --version
 
 build_script:
   - cmd: xmake
