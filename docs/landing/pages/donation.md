@@ -23,9 +23,9 @@ If you would like to support the development of tbox, welcome to donate to us.
 
 ## Supporters
 
-|| 2016.08.05 || tbox || [蔡克伦](https://github.com/caikelun) || wechat || ¥1 ||
-|| 2016.01.29 || tbox || [Evgeny Kulikov](mailto:xak@list.ru) || paypal || $2 ||
-|| 2016.01.29 || tbox || 建忠 || alipay || ¥20.16 ||
+| 2016.08.05 | [蔡克伦](https://github.com/caikelun) | wechat | ¥1     |
+| 2016.01.29 | [Evgeny Kulikov](mailto:xak@list.ru)  | paypal | $2     |
+| 2016.01.29 | 建忠                                  | alipay | ¥20.16 |
 
 
 
