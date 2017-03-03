@@ -5,6 +5,7 @@
 ### Changes
 
 * Modify license to Apache License 2.0
+* Rename `--smallest=y|n` option to `--small=y|n`
 
 ## v1.6.1
 
@@ -122,6 +123,7 @@
 ### 改进
 
 * 修改license，使用更加宽松的Apache License 2.0
+* 重命名`--smallest=y|n`选项到`--small=y|n`
 
 ## v1.6.1
 

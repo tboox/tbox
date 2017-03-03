@@ -21,7 +21,7 @@ script:
   - xmake c
   - xmake f --micro=y 
   - xmake -r
-  - xmake f --micro=y --smallest=y -m debug
+  - xmake f --small=y -m debug
   - xmake
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       xmake m package -p iphoneos;

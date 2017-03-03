@@ -54,12 +54,12 @@ option("micro")
     add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
 
--- option: smallest
-option("smallest")
+-- option: small
+option("small")
     set_default(true)
     set_showmenu(true)
     set_category("option")
-    set_description("Enable the smallest compile mode and disable all modules.")
+    set_description("Enable the small compile mode and disable all modules.")
     add_rbindings("info", "deprecated")
     add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")

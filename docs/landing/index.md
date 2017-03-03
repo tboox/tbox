@@ -24,7 +24,7 @@ And it provides many compiling options using [xmake](http://www.xmake.io):
 
 * Release: Disable debug information, assertion, memory checking and enable optimization.
 * Debug: Enable debug information, assertion, memory checking and disable optimization.
-* Smallest: Disable all extensional modules and enable space optimization.
+* Small: Disable all extensional modules and enable space optimization.
 * Micro: compiling micro library (~64K) for the embed system.
 
 If you want to know more, please refer to:
