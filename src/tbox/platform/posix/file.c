@@ -219,8 +219,13 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         tb_memset(info, 0, sizeof(tb_file_info_t));
 
         // get stat
+#ifdef TB_CONFIG_POSIX_HAVE_STAT64
+        struct stat64 st = {0};
+        if (!stat64(path, &st))
+#else
         struct stat st = {0};
         if (!stat(path, &st))
+#endif
         {
             // file type
             if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIRECTORY;
