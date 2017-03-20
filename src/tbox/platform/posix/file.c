@@ -82,9 +82,8 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     tb_size_t modes = 0;
     if (mode & TB_FILE_MODE_CREAT) 
     {
-        //if ((mode & TB_FILE_MODE_RO) | (mode & TB_FILE_MODE_RW)) modes |= S_IREAD;
-        //if ((mode & TB_FILE_MODE_WO) | (mode & TB_FILE_MODE_RW)) modes |= S_IWRITE;
-        modes = 0777;
+        // 0644: -rw-r--r-- 
+        modes = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
     }
 
     // open it
@@ -101,8 +100,8 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
             *t = *p;
             if (*p == '/')
             {
-                // make directory if not exists
-                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU | S_IRWXG | S_IRWXO);
+                // make directory if not exists (0644: -rw-r--r--)
+                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
                 // skip repeat '/'
                 while (*p && *p == '/') p++;
