@@ -176,8 +176,8 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
-    // make it
-    tb_bool_t ok = !mkdir(path, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)? tb_true : tb_false;
+    // make it (0755: drwxr-xr-x)
+    tb_bool_t ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO)? tb_true : tb_false;
     if (!ok)
     {
         // make directory

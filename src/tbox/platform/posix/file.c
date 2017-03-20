@@ -100,8 +100,8 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
             *t = *p;
             if (*p == '/')
             {
-                // make directory if not exists (0644: -rw-r--r--)
-                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+                // make directory if not exists (0755: drwxr-xr-x)
+                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU | S_IRWXG | S_IRWXO);
 
                 // skip repeat '/'
                 while (*p && *p == '/') p++;
