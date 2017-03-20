@@ -8,6 +8,10 @@
 * Rename `--smallest=y|n` option to `--small=y|n`
 * Support stat64
 
+### Bugs fixed
+
+* Fix create file mode to 0644
+
 ## v1.6.1
 
 ### New features
@@ -126,6 +130,10 @@
 * 修改license，使用更加宽松的Apache License 2.0
 * 重命名`--smallest=y|n`选项到`--small=y|n`
 * 使用`stat64`支持大文件信息获取
+
+### Bugs修复
+
+* 修复创建文件权限不对问题
 
 ## v1.6.1
 
