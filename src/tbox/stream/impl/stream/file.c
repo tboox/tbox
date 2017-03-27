@@ -87,7 +87,7 @@ static tb_bool_t tb_stream_file_open(tb_stream_ref_t stream)
     if (!stream_file->file)
     {
         // save state
-        tb_stream_state_set(stream, tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS);
+        tb_stream_state_set(stream, tb_syserror_state());
         return tb_false;
     }
 
