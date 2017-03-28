@@ -38,6 +38,9 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <errno.h>
+#ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
+#   include <copyfile.h>
+#endif
 #ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
 #   include <sys/sendfile.h>
 #endif
@@ -408,7 +411,9 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
 
-#ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
+#if defined(TB_CONFIG_POSIX_HAVE_COPYFILE)
+    return !copyfile(path, dest, 0, COPYFILE_ALL);
+#elif defined(TB_CONFIG_POSIX_HAVE_SENDFILE)
     // copy it using sendfile
     tb_bool_t       ok = tb_false;
     tb_file_ref_t   ifile = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);

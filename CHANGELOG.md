@@ -7,6 +7,7 @@
 * Modify license to Apache License 2.0
 * Rename `--smallest=y|n` option to `--small=y|n`
 * Support stat64
+* Improve copy speed and fix permissions for `tb_file_copy`
 
 ### Bugs fixed
 
@@ -26,7 +27,7 @@
 ### Changes
 
 * Optimize io scheduler for coroutine, cache events for poller
-* Add c11 _Static_assert
+* Add c11 `_Static_assert`
 * Remove some deprecated interfaces for hash and platform
 
 ## v1.6.0
@@ -130,6 +131,7 @@
 * 修改license，使用更加宽松的Apache License 2.0
 * 重命名`--smallest=y|n`选项到`--small=y|n`
 * 使用`stat64`支持大文件信息获取
+* 改进`tb_file_copy`，更加快速的文件copy，并且修复copy后文件权限丢失问题
 
 ### Bugs修复
 
@@ -149,7 +151,7 @@
 ### 改进
 
 * 为协程优化io调度器，缓存poller轮询等待，减少频繁重复调用epoll_ctl, kevent等系统接口
-* 添加对c11关键字_Static_assert的支持
+* 添加对c11关键字`_Static_assert`的支持
 * 针对hash和platform模块，移除一些废弃的接口
 
 ## v1.6.0
@@ -264,9 +266,9 @@
 
 ### 改进
 
-* 重建整个makefile架构，采用*.pkg依赖包模式模块化对第三方库的依赖，降低耦合
+* 重建整个makefile架构，采用`*.pkg`依赖包模式模块化对第三方库的依赖，降低耦合
 * 默认编译配置可以自动探测当前平台支持的依赖包，注：所有依赖包都是可选的，如果要最小化编译，可以完全禁用
-* 编译生成的所有库和头文件，也都安装成独立*.pkg格式，方便集成到其他开发平台，也方便copy
+* 编译生成的所有库和头文件，也都安装成独立`*.pkg`格式，方便集成到其他开发平台，也方便copy
 * 增强object路径解析接口，支持json, xml宏路径解析，并增加实用json解析工具：jcat
 * 实现通用ipaddr结构，统一接口，全面支持ipv6/ipv4，stream/http的url也完全支持ipv6格式解析
 * 重命名hash为`hash_map`，并新增`hash_set`容器
