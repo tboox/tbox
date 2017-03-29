@@ -228,6 +228,19 @@ tb_hong_t tb_transfer_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_
     tb_stream_ref_t     ostream = tb_null;
     do
     {
+        // copy file to file? 
+        if (    tb_url_protocol_probe(iurl) == TB_URL_PROTOCOL_FILE
+            &&  tb_url_protocol_probe(ourl) == TB_URL_PROTOCOL_FILE)
+        {
+            // copy it directly
+            tb_file_info_t info;
+            if (tb_file_copy(iurl, ourl) && tb_file_info(ourl, &info))
+                size = info.size;
+
+            // end
+            break;
+        }
+
         // init istream
         istream = tb_stream_init_from_url(iurl);
         tb_assert_and_check_break(istream);
