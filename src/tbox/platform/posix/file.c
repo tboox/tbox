@@ -466,6 +466,11 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
             lseek(ifd, 0, SEEK_SET);
             lseek(ofd, 0, SEEK_SET);
         }
+        else
+        {
+            ok = tb_true;
+            break;
+        }
 #endif
 
         // copy file using `read` and `write`
