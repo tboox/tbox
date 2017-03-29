@@ -13,7 +13,7 @@ tb_int_t tb_demo_stream_charset_main(tb_int_t argc, tb_char_t** argv)
     tb_stream_ref_t istream = tb_stream_init_from_url(argv[1]);
 
     // init ostream
-    tb_stream_ref_t ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+    tb_stream_ref_t ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
     // filter istream or ostream?
     tb_stream_ref_t iostream = istream;

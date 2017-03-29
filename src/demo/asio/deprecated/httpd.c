@@ -423,7 +423,7 @@ static tb_bool_t tb_demo_httpd_session_reqt_done(tb_demo_httpd_session_t* sessio
             tb_trace_d("reqt_done[%p]: full path: %s", session->aico, full);
             
             // init file
-            session->file = tb_file_init(full, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY | TB_FILE_MODE_ASIO);
+            session->file = tb_file_init(full, TB_FILE_MODE_RO | TB_FILE_MODE_ASIO);
             tb_check_break_state(session->file, session->code, TB_HTTP_CODE_NOT_FOUND);
 
             // send the file

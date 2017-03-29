@@ -259,7 +259,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(context.file);
 
         // open file aico
-        if (!tb_aico_open_file_from_path(context.file, argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+        if (!tb_aico_open_file_from_path(context.file, argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
 
         // init conn timeout
         tb_aico_timeout_set(context.sock, TB_AICO_TIMEOUT_CONN, 10000);

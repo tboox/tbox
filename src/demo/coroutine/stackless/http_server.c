@@ -405,7 +405,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
                     if (session->locals.real > 0) session->data[session->locals.real] = 0;
 
                     // init file
-                    session->file = tb_file_init((tb_char_t*)session->data, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
+                    session->file = tb_file_init((tb_char_t*)session->data, TB_FILE_MODE_RO);
 
                     // not found?
                     if (!session->file) session->code = TB_HTTP_CODE_NOT_FOUND;

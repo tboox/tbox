@@ -264,7 +264,7 @@ tb_stream_ref_t tb_stream_init_file()
     if (stream_file)
     {
         // init it
-        stream_file->mode      = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+        stream_file->mode      = TB_FILE_MODE_RO;
         stream_file->bstream   = tb_false;
         stream_file->read      = 0;
     }

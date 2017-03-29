@@ -64,7 +64,7 @@ tb_void_t tb_random_reset(tb_bool_t pseudo)
 
 #ifndef TB_CONFIG_OS_WINDOWS
         // attempt to read seed from /dev/urandom
-        tb_file_ref_t file = tb_file_init("/dev/urandom", TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
+        tb_file_ref_t file = tb_file_init("/dev/urandom", TB_FILE_MODE_RO);
         if (file)
         {
             // read seed

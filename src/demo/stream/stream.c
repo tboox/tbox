@@ -270,7 +270,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                     tb_char_t const* path = tb_option_item_cstr(option, "more0");
 
                     // init
-                    ostream = tb_stream_init_from_file(path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+                    ostream = tb_stream_init_from_file(path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
                     // print verbose info
                     if (verbose) tb_printf("save: %s\n", path);
@@ -289,7 +289,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                     else break;
 
                     // init file
-                    ostream = tb_stream_init_from_file(path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+                    ostream = tb_stream_init_from_file(path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
                     // print verbose info
                     if (verbose) tb_printf("save: %s\n", path);
@@ -344,7 +344,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(istream);
 
         // init ostream
-        ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+        ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
         // writ data
         tb_byte_t data[TB_STREAM_BLOCK_MAXN];

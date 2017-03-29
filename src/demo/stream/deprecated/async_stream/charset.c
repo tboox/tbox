@@ -41,7 +41,7 @@ tb_int_t tb_demo_stream_async_stream_charset_main(tb_int_t argc, tb_char_t** arg
         tb_assert_and_check_break(istream);
 
         // init ostream
-        ostream = tb_async_stream_init_from_file(tb_aicp(), argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+        ostream = tb_async_stream_init_from_file(tb_aicp(), argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
         tb_assert_and_check_break(ostream);
 
         // filter istream or ostream?

@@ -175,7 +175,7 @@ tb_bool_t tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend)
     if (g_file && !g_bref) tb_file_exit(g_file);
 
     // set the file
-    g_file = tb_file_init(path, TB_FILE_MODE_RW | TB_FILE_MODE_BINARY | TB_FILE_MODE_CREAT | (bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC));
+    g_file = tb_file_init(path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | (bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC));
     g_bref = tb_false;
 
     // ok?

@@ -600,7 +600,7 @@ tb_async_stream_ref_t tb_async_stream_init_file(tb_aicp_ref_t aicp)
     if (impl)
     {
         // init mode
-        impl->mode      = TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+        impl->mode      = TB_FILE_MODE_RO;
         impl->bstream   = tb_false;
     }
 

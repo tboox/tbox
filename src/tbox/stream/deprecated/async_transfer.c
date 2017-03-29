@@ -883,7 +883,7 @@ tb_bool_t tb_async_transfer_init_ostream_from_url(tb_async_transfer_ref_t transf
         if (tb_async_stream_type(impl->ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_async_stream_ctrl(impl->ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) return tb_false;
+            if (!tb_async_stream_ctrl(impl->ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) return tb_false;
         }
 
         // init owner

@@ -176,7 +176,7 @@ tb_hong_t tb_transfer_to_url(tb_stream_ref_t istream, tb_char_t const* ourl, tb_
         if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
         }
 
         // save stream
@@ -253,7 +253,7 @@ tb_hong_t tb_transfer_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_
         if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
         }
 
         // open istream
@@ -362,7 +362,7 @@ tb_hong_t tb_transfer_data_to_url(tb_byte_t const* idata, tb_size_t isize, tb_ch
         if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+            if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
         }
 
         // save stream

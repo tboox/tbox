@@ -86,7 +86,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
         tb_trace_d("[%p]: sending %s ..", client->sock, g_filepath);
 
         // init file
-        client->file = tb_file_init(g_filepath, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
+        client->file = tb_file_init(g_filepath, TB_FILE_MODE_RO);
         tb_assert(client->file);
 
         // send data

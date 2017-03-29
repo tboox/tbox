@@ -110,7 +110,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_ref_t stream, tb_size
             tb_char_t const* path = tb_option_item_cstr(context->option, "more0");
 
             // init
-            context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_ref_t)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+            context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_ref_t)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
             // print verbose info
             if (context->verbose) tb_printf("save: %s: ..\n", path);
@@ -130,7 +130,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_async_stream_ref_t stream, tb_size
                 tb_strcat(path, name);
 
                 // init file
-                context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_ref_t)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+                context->ostream = tb_async_stream_init_from_file(tb_async_stream_aicp((tb_async_stream_ref_t)stream), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
                 // print verbose info
                 if (context->verbose) tb_printf("save: %s: ..\n", path);

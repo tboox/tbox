@@ -154,7 +154,7 @@ tb_bool_t tb_xml_writer_open(tb_xml_writer_ref_t writer, tb_bool_t bformat, tb_s
         if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE) 
         {
             // ctrl mode
-            if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+            if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
         }
 
         // open the reader stream if be not opened
