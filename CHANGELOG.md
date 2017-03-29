@@ -8,6 +8,7 @@
 * Rename `--smallest=y|n` option to `--small=y|n`
 * Support stat64
 * Improve copy speed and fix permissions for `tb_file_copy`
+* Improve path operation for posix platform
 
 ### Bugs fixed
 
@@ -132,6 +133,7 @@
 * 重命名`--smallest=y|n`选项到`--small=y|n`
 * 使用`stat64`支持大文件信息获取
 * 改进`tb_file_copy`，更加快速的文件copy，并且修复copy后文件权限丢失问题
+* 改进posix平台下的路径操作
 
 ### Bugs修复
 
