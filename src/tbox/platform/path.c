@@ -427,3 +427,31 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     return data;
 }
 #endif
+tb_char_t const* tb_path_directory(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(path && data && maxn, tb_null);
+
+    // find the last path separator
+    tb_size_t n = tb_strlen(path);
+    tb_char_t const* p = path + n - 1;
+    while (p >= path && *p)
+    {
+        // found
+        if (tb_path_is_separator(*p))
+        {
+            n = p - path;
+            if (n < maxn)
+            {
+                tb_strncpy(data, path, n);
+                data[n] = '\0';
+                return data;
+            }
+            else return tb_null;
+        }
+        p--;
+    }
+
+    // end
+    return ".";
+}

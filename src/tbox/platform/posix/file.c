@@ -29,7 +29,7 @@
 #include "prefix.h"
 #include "../file.h"
 #include "../path.h"
-#include "../../stream/stream.h"
+#include "../directory.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -93,27 +93,10 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     tb_long_t fd = open(path, flags, modes);
     if (fd < 0 && (mode & TB_FILE_MODE_CREAT))
     {
-        // make directory
-        tb_char_t           temp[TB_PATH_MAXN] = {0};
-        tb_char_t const*    p = path;
-        tb_char_t*          t = temp;
-        tb_char_t const*    e = temp + TB_PATH_MAXN - 1;
-        for (; t < e && *p; t++) 
-        {
-            *t = *p;
-            if (*p == '/')
-            {
-                // make directory if not exists (0755: drwxr-xr-x)
-                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU | S_IRWXG | S_IRWXO);
-
-                // skip repeat '/'
-                while (*p && *p == '/') p++;
-            }
-            else p++;
-        }
-
-        // open it again
-        fd = open(path, flags, modes);
+        // open it again after creating the file directory
+        tb_char_t dir[TB_PATH_MAXN];
+        if (tb_directory_create(tb_path_directory(path, dir, sizeof(dir))))
+            fd = open(path, flags, modes);
     }
  
     // trace
@@ -406,45 +389,97 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
 
-#if defined(TB_CONFIG_POSIX_HAVE_COPYFILE)
+#ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
     return !copyfile(path, dest, 0, COPYFILE_ALL);
-#elif defined(TB_CONFIG_POSIX_HAVE_SENDFILE)
-    // copy it using sendfile
-    tb_bool_t       ok = tb_false;
-    tb_file_ref_t   ifile = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY);
-    tb_file_ref_t   ofile = tb_file_init(dest, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
-    if (ifile && ofile)
+#else
+    tb_int_t    ifd = -1;
+    tb_int_t    ofd = -1;
+    tb_bool_t   ok = tb_false;
+    do
     {
-        // writ
-        tb_hize_t writ = 0;
-        tb_hize_t size = tb_file_size(ifile);
+        // get stat.st_mode first
+#ifdef TB_CONFIG_POSIX_HAVE_STAT64
+        struct stat64 st = {0};
+        if (stat64(path, &st)) break;
+#else
+        struct stat st = {0};
+        if (stat(path, &st)) break;
+#endif
+
+        // get the absolute source path
+        tb_char_t data[8192];
+        path = tb_path_absolute(path, data, sizeof(data));
+        tb_assert_and_check_break(path);
+
+        // open source file
+        ifd = open(path, O_RDONLY);
+        tb_check_break(ifd >= 0);
+
+        // get the absolute source path
+        dest = tb_path_absolute(dest, data, sizeof(data));
+        tb_assert_and_check_break(dest);
+
+        // open destinate file and copy file mode
+        ofd = open(dest, O_RDWR | O_CREAT | O_TRUNC, st.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+        tb_check_break(ofd >= 0);
+
+        // get file size
+        tb_hize_t size = tb_file_size(tb_fd2file(ifd));
+
+        // init write size
+        tb_hize_t writ = 0; 
+       
+        // attempt to copy file using `sendfile`
+#ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
         while (writ < size)
         {
-            tb_long_t real = tb_file_writf(ofile, ifile, writ, size - writ);
+            off_t seek = writ;
+            tb_hong_t real = sendfile(ofd, ifd, &seek, (size_t)(size - writ));
             if (real > 0) writ += real;
             else break;
         }
 
-        // ok
-        if (writ == size) ok = tb_true;
-    }
-        
-    // exit file
-    if (ifile) tb_file_exit(ifile);
-    if (ofile) tb_file_exit(ofile);
+        /* attempt to copy file directly if sendfile failed 
+         *
+         * sendfile() supports regular file only after "since Linux 2.6.33".
+         */
+        if (writ != size) 
+        {
+            lseek(ifd, 0, SEEK_SET);
+            lseek(ofd, 0, SEEK_SET);
+        }
+#endif
 
-    /* attempt to copy file directly if sendfile failed 
-     *
-     * sendfile() supports regular file only after "since Linux 2.6.33".
-     */
-    if (!ok && ifile && ofile)
-        ok = tb_transfer_url(path, dest, 0, tb_null, tb_null) >= 0;
+        // copy file using `read` and `write`
+        writ = 0;
+        while (writ < size)
+        {
+            // read some data
+            tb_int_t real = read(ifd, data, (size_t)tb_min(size - writ, sizeof(data)));
+            if (real > 0)
+            {
+                real = write(ofd, data, real);
+                if (real > 0) writ += real;
+                else break;
+            }
+            else break;
+        }
+
+        // ok?
+        ok = (writ == size);
+
+    } while (0);
+
+    // close source file
+    if (ifd >= 0) close(ifd);
+    ifd = -1;
+
+    // close destinate file
+    if (ofd >= 0) close(ofd);
+    ofd = -1;
 
     // ok?
     return ok;
-#else
-    // copy it
-    return tb_transfer_url(path, dest, 0, tb_null, tb_null) >= 0;
 #endif
 }
 tb_bool_t tb_file_create(tb_char_t const* path)

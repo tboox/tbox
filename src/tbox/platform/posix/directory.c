@@ -171,18 +171,13 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
-    // the absolute path
-    tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_absolute(path, full, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(path, tb_false);
-
     // make it (0755: drwxr-xr-x)
     tb_bool_t ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO)? tb_true : tb_false;
     if (!ok)
     {
         // make directory
         tb_char_t           temp[TB_PATH_MAXN] = {0};
-        tb_char_t const*    p = full;
+        tb_char_t const*    p = path;
         tb_char_t*          t = temp;
         tb_char_t const*    e = temp + TB_PATH_MAXN - 1;
         for (; t < e && *p; t++) 
@@ -208,11 +203,6 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 }
 tb_bool_t tb_directory_remove(tb_char_t const* path)
 {
-    // the absolute path
-    tb_char_t full[TB_PATH_MAXN];
-    path = tb_path_absolute(path, full, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(path, tb_false);
-
     // walk remove
     tb_directory_walk_impl(path, tb_true, tb_false, tb_directory_walk_remove, tb_null);
 
@@ -273,29 +263,9 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
     tb_file_info_t info = {0};
     if (tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
         tb_directory_walk_impl(path, recursion, prefix, func, priv);
-    else
-    {
-        // the absolute path
-        tb_char_t full[TB_PATH_MAXN];
-        path = tb_path_absolute(path, full, TB_PATH_MAXN);
-        tb_assert_and_check_return(path);
-
-        // walk
-        tb_directory_walk_impl(path, recursion, prefix, func, priv);
-    }
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
-    // the absolute path
-    tb_char_t full0[TB_PATH_MAXN];
-    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(path, tb_false);
-
-    // the dest path
-    tb_char_t full1[TB_PATH_MAXN];
-    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(dest, tb_false);
-
     // walk copy
     tb_value_t tuple[3];
     tuple[0].cstr = dest;
