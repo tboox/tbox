@@ -390,7 +390,18 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_assert_and_check_return_val(path && dest, tb_false);
 
 #ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
-    return !copyfile(path, dest, 0, COPYFILE_ALL);
+    // attempt to copy it directly
+    if (!copyfile(path, dest, 0, COPYFILE_ALL)) return tb_true;
+    else
+    {
+        // attempt to copy it again after creating directory
+        tb_char_t dir[TB_PATH_MAXN];
+        if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
+            return !copyfile(path, dest, 0, COPYFILE_ALL);
+    }
+
+    // failed
+    return tb_false;
 #else
     tb_int_t    ifd = -1;
     tb_int_t    ofd = -1;
@@ -421,6 +432,13 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 
         // open destinate file and copy file mode
         ofd = open(dest, O_RDWR | O_CREAT | O_TRUNC, st.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+        if (ofd < 0)
+        {
+            // attempt to open it again after creating directory
+            tb_char_t dir[TB_PATH_MAXN];
+            if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
+                ofd = open(dest, O_RDWR | O_CREAT | O_TRUNC, st.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+        }
         tb_check_break(ofd >= 0);
 
         // get file size
