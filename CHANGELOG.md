@@ -13,6 +13,7 @@
 ### Bugs fixed
 
 * Fix create file mode to 0644
+* Fix file and directory path bug
 
 ## v1.6.1
 
@@ -138,6 +139,7 @@
 ### Bugs修复
 
 * 修复创建文件权限不对问题
+* 修复文件和目录路径问题
 
 ## v1.6.1
 
