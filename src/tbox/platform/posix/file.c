@@ -189,6 +189,11 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
+    // the full path (need translate "~/")
+    tb_char_t full[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
     // exists?
     tb_check_return_val(!access(path, F_OK), tb_false);
 
@@ -390,6 +395,17 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_assert_and_check_return_val(path && dest, tb_false);
 
 #ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
+
+    // the full path
+    tb_char_t full0[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the dest path
+    tb_char_t full1[TB_PATH_MAXN];
+    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(dest, tb_false);
+
     // attempt to copy it directly
     if (!copyfile(path, dest, 0, COPYFILE_ALL)) return tb_true;
     else
@@ -408,6 +424,11 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_bool_t   ok = tb_false;
     do
     {
+        // get the absolute source path
+        tb_char_t data[8192];
+        path = tb_path_absolute(path, data, sizeof(data));
+        tb_assert_and_check_break(path);
+
         // get stat.st_mode first
 #ifdef TB_CONFIG_POSIX_HAVE_STAT64
         struct stat64 st = {0};
@@ -416,11 +437,6 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
         struct stat st = {0};
         if (stat(path, &st)) break;
 #endif
-
-        // get the absolute source path
-        tb_char_t data[8192];
-        path = tb_path_absolute(path, data, sizeof(data));
-        tb_assert_and_check_break(path);
 
         // open source file
         ifd = open(path, O_RDONLY);
@@ -522,6 +538,11 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
+    // the full path
+    tb_char_t full[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
     // remove it
     return !remove(path)? tb_true : tb_false;
 }
@@ -530,6 +551,16 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
 
+    // the full path
+    tb_char_t full0[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the dest path
+    tb_char_t full1[TB_PATH_MAXN];
+    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(dest, tb_false);
+
     // rename
     return !rename(path, dest)? tb_true : tb_false;
 }
@@ -537,6 +568,16 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 {
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
+
+    // the full path
+    tb_char_t full0[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the dest path
+    tb_char_t full1[TB_PATH_MAXN];
+    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(dest, tb_false);
 
     // symlink
     return !symlink(path, dest)? tb_true : tb_false;

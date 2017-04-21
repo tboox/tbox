@@ -294,9 +294,9 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
     // check
     tb_assert_and_check_return(path && func);
 
-    // exists?
+    // walk it directly if rootdir is relative path
     tb_file_info_t info = {0};
-    if (tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
+    if (!tb_path_is_absolute(path) && tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
     {
         tb_wchar_t path_w[TB_PATH_MAXN];
         if (tb_atow(path_w, path, tb_arrayn(path_w)) != -1)
@@ -304,7 +304,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
     }
     else
     {
-        // the absolute path
+        // the absolute path (translate "~/")
         tb_wchar_t full_w[TB_PATH_MAXN];
         if (tb_path_absolute_w(path, full_w, TB_PATH_MAXN))
             tb_directory_walk_impl(full_w, recursion, prefix, func, priv);
