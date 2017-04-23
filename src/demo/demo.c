@@ -162,6 +162,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(network_url)
 ,   TB_DEMO_MAIN_ITEM(network_ipv4)
 ,   TB_DEMO_MAIN_ITEM(network_ipv6)
+,   TB_DEMO_MAIN_ITEM(network_ping)
 ,   TB_DEMO_MAIN_ITEM(network_ipaddr)
 ,   TB_DEMO_MAIN_ITEM(network_hwaddr)
 ,   TB_DEMO_MAIN_ITEM(network_http)

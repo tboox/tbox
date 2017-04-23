@@ -51,6 +51,42 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_int_t tb_socket_type(tb_size_t type)
+{
+    // get socket type
+    switch ((type >> 8) << 8)
+    {
+    case TB_SOCKET_TYPE_SOCK_STREAM:
+        return SOCK_STREAM;
+    case TB_SOCKET_TYPE_SOCK_DGRAM: 
+        return SOCK_DGRAM;
+    case TB_SOCKET_TYPE_SOCK_RAW: 
+        return SOCK_RAW;
+    }
+
+    // failed
+    return -1;
+}
+static tb_int_t tb_socket_proto(tb_size_t type, tb_size_t family)
+{
+    // get protocal type
+    switch (type & 0xff)
+    {
+    case TB_SOCKET_TYPE_IPPROTO_TCP:
+        return IPPROTO_TCP;
+    case TB_SOCKET_TYPE_IPPROTO_UDP: 
+        return IPPROTO_UDP;
+    case TB_SOCKET_TYPE_IPPROTO_ICMP: 
+        return family == TB_IPADDR_FAMILY_IPV6? IPPROTO_ICMPV6 : IPPROTO_ICMP;
+    }
+
+    // failed
+    return -1;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_socket_init_env()
@@ -77,19 +113,9 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
     do
     {
         // init socket type and protocol
-        tb_int_t t = 0;
-        tb_int_t p = 0;
-        if (type == TB_SOCKET_TYPE_TCP)
-        {
-            t = SOCK_STREAM;
-            p = IPPROTO_TCP;
-        }
-        else if(type == TB_SOCKET_TYPE_UDP)
-        {
-            t = SOCK_DGRAM;
-            p = IPPROTO_UDP;
-        }
-        else break;
+        tb_int_t t = tb_socket_type(type);
+        tb_int_t p = tb_socket_proto(type, family);
+        tb_assert_and_check_break(t >= 0 && p >= 0);
 
         // init socket family
         tb_int_t f = (family == TB_IPADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
@@ -117,23 +143,14 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
     // check
     tb_assert_and_check_return_val(type && pair, tb_false);
 
-    // init type
-    tb_int_t t = 0;
-    switch (type)
-    {
-    case TB_SOCKET_TYPE_TCP:
-        t = SOCK_STREAM;
-        break;
-    case TB_SOCKET_TYPE_UDP:
-        t = SOCK_DGRAM;
-        break;
-    default:
-        return tb_false;
-    }
+    // init socket type and protocol
+    tb_int_t t = tb_socket_type(type);
+    tb_int_t p = tb_socket_proto(type, TB_IPADDR_FAMILY_NONE);
+    tb_assert_and_check_return_val(t >= 0 && p >= 0, tb_false);
 
     // make pair
     tb_int_t fd[2] = {0};
-    if (socketpair(AF_LOCAL, t, 0, fd) == -1) return tb_false;
+    if (socketpair(AF_LOCAL, t, p, fd) == -1) return tb_false;
 
     // non-block
     fcntl(fd[0], F_SETFL, fcntl(fd[0], F_GETFL) | O_NONBLOCK);

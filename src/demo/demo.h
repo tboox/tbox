@@ -151,6 +151,7 @@ TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_ipv6);
+TB_DEMO_MAIN_DECL(network_ping);
 TB_DEMO_MAIN_DECL(network_ipaddr);
 TB_DEMO_MAIN_DECL(network_hwaddr);
 TB_DEMO_MAIN_DECL(network_http);

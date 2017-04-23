@@ -346,6 +346,12 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
         // init ostream
         ostream = tb_stream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
+        // open istream
+        if (!tb_stream_open(istream)) break;
+
+        // open ostream
+        if (!tb_stream_open(ostream)) break;
+
         // writ data
         tb_byte_t data[TB_STREAM_BLOCK_MAXN];
         tb_hize_t writ = 0;
