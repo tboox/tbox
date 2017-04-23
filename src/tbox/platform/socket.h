@@ -62,11 +62,12 @@ typedef enum __tb_socket_type_e
     // socket for udp
 ,   TB_SOCKET_TYPE_UDP                  = TB_SOCKET_TYPE_SOCK_DGRAM  | TB_SOCKET_TYPE_IPPROTO_UDP
 
-    // socket for icmp, need root permission on linux/macOS
-#ifdef TB_CONFIG_OS_WINDOWS
-,   TB_SOCKET_TYPE_ICMP                 = TB_SOCKET_TYPE_SOCK_RAW  | TB_SOCKET_TYPE_IPPROTO_ICMP
-#else
+#ifdef TB_CONFIG_OS_MACOSX
+    // socket for icmp, only need user permission on macOS
 ,   TB_SOCKET_TYPE_ICMP                 = TB_SOCKET_TYPE_SOCK_DGRAM  | TB_SOCKET_TYPE_IPPROTO_ICMP
+#else
+    // socket for icmp, need root permission on linux/macOS
+,   TB_SOCKET_TYPE_ICMP                 = TB_SOCKET_TYPE_SOCK_RAW    | TB_SOCKET_TYPE_IPPROTO_ICMP
 #endif
 
 }tb_socket_type_e;
