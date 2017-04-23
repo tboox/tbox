@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* Add ping demo for network
+
 ### Changes
 
 * Modify license to Apache License 2.0
@@ -9,6 +13,7 @@
 * Support stat64
 * Improve copy speed and fix permissions for `tb_file_copy`
 * Improve path operation for posix platform
+* Improve socket interfaces and support icmp
 
 ### Bugs fixed
 
@@ -128,6 +133,10 @@
 
 ## master (开发中)
 
+### 新特性
+
+* 增加ping测试程序
+
 ### 改进
 
 * 修改license，使用更加宽松的Apache License 2.0
@@ -135,6 +144,7 @@
 * 使用`stat64`支持大文件信息获取
 * 改进`tb_file_copy`，更加快速的文件copy，并且修复copy后文件权限丢失问题
 * 改进posix平台下的路径操作
+* 改进socket初始化接口，支持icmp协议
 
 ### Bugs修复
 
