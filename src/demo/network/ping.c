@@ -220,7 +220,7 @@ tb_int_t tb_demo_network_ping_main(tb_int_t argc, tb_char_t** argv)
     if (sock)
     {
         // trace
-        tb_trace_i("PING %{ipv4}: %d data bytes", tb_ipaddr_ipv4(&addr), sizeof(tb_icmp_echo_request_t));
+        tb_trace_i("PING %s (%{ipv4}): %d data bytes", argv[1], tb_ipaddr_ipv4(&addr), sizeof(tb_icmp_echo_request_t));
 
         // send ping
         tb_uint16_t i = 0;
