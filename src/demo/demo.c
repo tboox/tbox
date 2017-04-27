@@ -288,26 +288,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
         }
     }
 
-    // find the main func from the first argument
-    if (!name && argc > 1 && argv[1])
-    {
-        tb_size_t i = 0;
-        tb_size_t n = tb_arrayn(g_demo);
-        for (i = 0; i < n; i++)
-        {
-            // find it?
-            if (g_demo[i].name && !tb_stricmp(g_demo[i].name, argv[1]))
-            {
-                // save name
-                name = g_demo[i].name;
-
-                // done main
-                ok = g_demo[i].main(argc - 1, argv + 1);
-                break;
-            }
-        }
-    }
-
     // no this demo? help it
     if (!name)
     {
