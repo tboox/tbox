@@ -19,6 +19,7 @@
 
 * Fix create file mode to 0644
 * Fix file and directory path bug
+* Fix remove directory with dead symbol link failed
 
 ## v1.6.1
 
@@ -150,6 +151,7 @@
 
 * 修复创建文件权限不对问题
 * 修复文件和目录路径问题
+* 修复无法移除带有无效软链的目录问题
 
 ## v1.6.1
 

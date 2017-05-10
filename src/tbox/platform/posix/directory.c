@@ -46,18 +46,8 @@ static tb_bool_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
     // check
     tb_assert_and_check_return_val(path && info, tb_false);
 
-    // remove
-    switch (info->type)
-    {
-    case TB_FILE_TYPE_FILE:
-        tb_file_remove(path);
-        break;
-    case TB_FILE_TYPE_DIRECTORY:
-        remove(path);
-        break;
-    default:
-        break;
-    }
+    // remove file, directory and dead symbol link (info->type is none, file not exists)
+    remove(path);
 
     // continue
     return tb_true;
@@ -137,22 +127,21 @@ static tb_bool_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursi
                 tb_long_t n = tb_snprintf(temp, 4095, "%s%s%s", path, path[last] == '/'? "" : "/", name);
                 if (n >= 0) temp[n] = '\0';
 
-                // the file info
+                // get the file info (file maybe not exists, dead symbol link)
                 tb_file_info_t info = {0};
-                if (tb_file_info(temp, &info))
-                {
-                    // do callback
-                    if (prefix) ok = func(temp, &info, priv);
-                    tb_check_break(ok);
+                tb_file_info(temp, &info);
 
-                    // walk to the next directory
-                    if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) ok = tb_directory_walk_impl(temp, recursion, prefix, func, priv);
-                    tb_check_break(ok);
-    
-                    // do callback
-                    if (!prefix) ok = func(temp, &info, priv);
-                    tb_check_break(ok);
-                }
+                // do callback
+                if (prefix) ok = func(temp, &info, priv);
+                tb_check_break(ok);
+
+                // walk to the next directory
+                if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) ok = tb_directory_walk_impl(temp, recursion, prefix, func, priv);
+                tb_check_break(ok);
+
+                // do callback
+                if (!prefix) ok = func(temp, &info, priv);
+                tb_check_break(ok);
             }
         }
 
