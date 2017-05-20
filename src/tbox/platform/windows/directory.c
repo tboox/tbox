@@ -330,6 +330,12 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_directory_walk(path, tb_true, tb_true, tb_directory_walk_copy, tuple);
 
     // ok?
-    return tuple[2].b;
-}
+    tb_bool_t ok = tuple[2].b;
 
+    // copy empty directory?
+    if (ok && !tb_file_info(dest, tb_null)) 
+        return tb_directory_create(dest);
+
+    // ok?
+    return ok;
+}
