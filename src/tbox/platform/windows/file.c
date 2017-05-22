@@ -462,7 +462,7 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
     // remove readonly first
     DWORD attrs = GetFileAttributesW(full);
     if (attrs & FILE_ATTRIBUTE_READONLY)
-        SetFileAttributesW(full, mode & ~FILE_ATTRIBUTE_READONLY);
+        SetFileAttributesW(full, attrs & ~FILE_ATTRIBUTE_READONLY);
 
     // remove it
     return DeleteFileW(full)? tb_true : tb_false;
