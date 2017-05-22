@@ -459,7 +459,12 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
-    // remote it
+    // remove readonly first
+    DWORD attrs = GetFileAttributesW(full);
+    if (attrs & FILE_ATTRIBUTE_READONLY)
+        SetFileAttributesW(full, mode & ~FILE_ATTRIBUTE_READONLY);
+
+    // remove it
     return DeleteFileW(full)? tb_true : tb_false;
 }
 tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
