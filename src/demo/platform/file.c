@@ -200,8 +200,8 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
     if (ofile) tb_file_exit(ofile);
 
 #else
-    // copy
-    tb_file_copy(argv[1], argv[2]);
+    // remove
+    tb_file_remove(argv[1]);
 #endif
 
     return 0;
