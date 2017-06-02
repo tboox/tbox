@@ -59,14 +59,17 @@ tb_hong_t tb_cache_time_spak()
 }
 tb_hong_t tb_cache_time_mclock()
 {
-    return (tb_hong_t)tb_atomic64_get(&g_time);
+    tb_hong_t t;
+    if (!(t = (tb_hong_t)tb_atomic64_get(&g_time)))
+        t = tb_cache_time_spak();
+    return t;
 }
 tb_hong_t tb_cache_time_sclock()
 {
-    return (tb_hong_t)tb_atomic64_get(&g_time) / 1000;
+    return tb_cache_time_mclock() / 1000;
 }
 tb_time_t tb_cache_time()
 {
-    return (tb_time_t)tb_atomic64_get(&g_time) / 1000;
+    return (tb_time_t)tb_cache_time_sclock();
 }
 

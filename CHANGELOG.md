@@ -21,6 +21,7 @@
 * Fix file and directory path bug
 * Fix remove directory with dead symbol link failed
 * Fix remove readonly file failed
+* [#34](https://github.com/tboox/tbox/issues/34): Fix cache time and coroutine sleep bug
 
 ## v1.6.1
 
@@ -154,6 +155,7 @@
 * 修复文件和目录路径问题
 * 修复无法移除带有无效软链的目录问题
 * 修复无法移除只读文件问题
+* [#34](https://github.com/tboox/tbox/issues/34): 修复缓存时间和协程sleep不准问题
 
 ## v1.6.1
 
