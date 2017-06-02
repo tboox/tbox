@@ -143,14 +143,13 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
     // check
     tb_assert_and_check_return_val(type && pair, tb_false);
 
-    // init socket type and protocol
+    // init socket type 
     tb_int_t t = tb_socket_type(type);
-    tb_int_t p = tb_socket_proto(type, TB_IPADDR_FAMILY_NONE);
-    tb_assert_and_check_return_val(t >= 0 && p >= 0, tb_false);
+    tb_assert_and_check_return_val(t >= 0, tb_false);
 
-    // make pair
+    // make pair (protocol must be 0)
     tb_int_t fd[2] = {0};
-    if (socketpair(AF_LOCAL, t, p, fd) == -1) return tb_false;
+    if (socketpair(AF_LOCAL, t, 0, fd) == -1) return tb_false;
 
     // non-block
     fcntl(fd[0], F_SETFL, fcntl(fd[0], F_GETFL) | O_NONBLOCK);
