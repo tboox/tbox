@@ -286,7 +286,13 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     struct epoll_event e = {0};
     if (events & TB_POLLER_EVENT_RECV) e.events |= EPOLLIN;
     if (events & TB_POLLER_EVENT_SEND) e.events |= EPOLLOUT;
-    if (events & TB_POLLER_EVENT_CLEAR) e.events |= EPOLLET;
+    if (events & TB_POLLER_EVENT_CLEAR)
+    {
+        e.events |= EPOLLET;
+#ifdef EPOLLRDHUP
+        e.events |= EPOLLRDHUP;
+#endif
+    }
 #ifdef EPOLLONESHOT 
     if (events & TB_POLLER_EVENT_ONESHOT) e.events |= EPOLLONESHOT;
 #else
@@ -347,7 +353,13 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     struct epoll_event e = {0};
     if (events & TB_POLLER_EVENT_RECV) e.events |= EPOLLIN;
     if (events & TB_POLLER_EVENT_SEND) e.events |= EPOLLOUT;
-    if (events & TB_POLLER_EVENT_CLEAR) e.events |= EPOLLET;
+    if (events & TB_POLLER_EVENT_CLEAR) 
+    {
+        e.events |= EPOLLET;
+#ifdef EPOLLRDHUP
+        e.events |= EPOLLRDHUP;
+#endif
+    }
 #ifdef EPOLLONESHOT 
     if (events & TB_POLLER_EVENT_ONESHOT) e.events |= EPOLLONESHOT;
 #else
