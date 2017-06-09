@@ -257,9 +257,9 @@ Please install xmake first: [xmake](https://github.com/waruqi/xmake)
         return 0;
     }
 
-#### Contacts
+## Contacts
 
 * Email：[waruqi@gmail.com](mailto:waruqi@gmail.com)
-* Homepage：[TBOOX Open Source Project](http://www.tboox.org/cn)
-* Community：[TBOOX Open Source Community](http://www.tboox.org/forum)
+* Homepage：[tboox.org](http://www.tboox.org)
+* Community：[tboox@community](https://github.com/tboox/community/issues)
 

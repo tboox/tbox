@@ -263,11 +263,11 @@ TBOX是一个用c语言实现的跨平台开发库。
         return 0;
     }
 
-#### 联系方式
+## 联系方式
 
 * 邮箱：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * 主页：[TBOOX开源工程](http://www.tboox.org/cn)
-* 社区：[TBOOX开源社区](http://www.tboox.org/forum)
+* 社区：[TBOOX开源社区](https://github.com/tboox/community/issues)
 * QQ群：343118190
 * 微信公众号：tboox-os
 
