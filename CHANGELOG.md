@@ -22,6 +22,7 @@
 * Fix remove directory with dead symbol link failed
 * Fix remove readonly file failed
 * [#34](https://github.com/tboox/tbox/issues/34): Fix cache time and coroutine sleep bug
+* [#35](https://github.com/tboox/tbox/issues/35): Fix epoll bug with the edge trigger mode
 
 ## v1.6.1
 
@@ -156,6 +157,7 @@
 * 修复无法移除带有无效软链的目录问题
 * 修复无法移除只读文件问题
 * [#34](https://github.com/tboox/tbox/issues/34): 修复缓存时间和协程sleep不准问题
+* [#35](https://github.com/tboox/tbox/issues/35): 修复epoll边缘触发模式下，centos上检测连接关闭失效问题
 
 ## v1.6.1
 
