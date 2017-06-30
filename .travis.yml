@@ -1,4 +1,4 @@
-sudo: required
+sudo: false
 language: C
 os:
   - linux
@@ -8,9 +8,9 @@ compiler:
   - clang
 
 install:
-  - git clone --branch=dev https://github.com/waruqi/xmake.git waruqi/xmake --depth 1
-  - cd ./waruqi/xmake
-  - sudo ./install
+  - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
+  - cd ./tboox/xmake
+  - ./scripts/get.sh __local__
   - cd -
 
 script:
