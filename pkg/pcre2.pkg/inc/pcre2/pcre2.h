@@ -81,7 +81,7 @@ typedef unsigned short      uint16_t;
 typedef unsigned int        uint32_t;
 typedef signed __int64      int64_t;
 typedef unsigned __int64    uint64_t;
-typedef uint32_t            size_t;
+//typedef uint32_t            size_t;
 
 #define INT8_MIN     ((int8_t)_I8_MIN)
 #define INT8_MAX     _I8_MAX
