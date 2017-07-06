@@ -1,6 +1,37 @@
-# 一个用c语言实现的跨平台开发库
+<div align="center">
+  <h1>tbox</h1>
 
-[![Build Status](https://api.travis-ci.org/tboox/tbox.svg)](https://travis-ci.org/tboox/tbox) [![Build status](https://ci.appveyor.com/api/projects/status/0pbnea6d059odbe8/branch/master?svg=true)](https://ci.appveyor.com/project/waruqi/tbox/branch/master) [![codecov](https://codecov.io/gh/tboox/tbox/branch/master/graph/badge.svg)](https://codecov.io/gh/tboox/tbox) [![Join the chat at https://gitter.im/tboox/tboox](https://badges.gitter.im/tboox/tboox.svg)](https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![donate](http://tboox.org/static/img/donate.svg)](http://tboox.org/donation/)
+  <div>
+    <a href="https://travis-ci.org/tboox/tbox">
+      <img src="https://img.shields.io/travis/tboox/tbox/master.svg?style=flat-square" alt="travis-ci" />
+    </a>
+    <a href="https://ci.appveyor.com/project/waruqi/tbox/branch/master">
+      <img src="https://img.shields.io/appveyor/ci/waruqi/tbox/master.svg?style=flat-square" alt="appveyor-ci" />
+    </a>
+    <a href="https://codecov.io/gh/tboox/tbox">
+      <img src="https://img.shields.io/codecov/c/github/tboox/tbox/master.svg?style=flat-square" alt="Coverage" />
+    </a>
+    <a href="https://github.com/tboox/tbox/releases">
+      <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
+    </a>
+    <a href="https://github.com/tboox/tbox/releases">
+      <img src="https://img.shields.io/github/downloads/tboox/tbox/total.svg?style=flat-square" alt="Downloads" />
+    </a>
+  </div>
+  <div>
+    <a href="https://github.com/tboox/tbox/blob/master/LICENSE.md">
+      <img src="https://img.shields.io/github/license/tboox/tbox.svg?colorB=f48041&style=flat-square" alt="license" />
+    </a>
+    <a href="https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
+      <img src="https://img.shields.io/gitter/room/tboox/tboox.svg?style=flat-square&colorB=96c312" alt="Gitter" />
+    </a>
+    <a href="http://tboox.org/cn/donation/">
+      <img src="http://tboox.org/static/img/donate.svg" alt="Donate" />
+    </a>
+  </div>
+
+  <p>一个用c语言实现的跨平台开发库</p>
+</div>
 
 ## 简介
 
