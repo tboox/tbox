@@ -12,10 +12,11 @@ target("demo")
     add_defines("__tb_prefix__=\"demo\"")
 
     -- set the object files directory
-    set_objectdir("$(buildir)/.objs")
+    set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
+    set_targetdir("$(buildir)/$(mode)/$(arch)")
 
     -- add links directory
-    add_linkdirs("$(buildir)")
+    add_linkdirs("$(buildir)/$(mode)/$(arch)")
 
     -- add includes directory
     add_includedirs("$(buildir)")

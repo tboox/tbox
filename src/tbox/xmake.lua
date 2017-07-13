@@ -12,7 +12,8 @@ target("tbox")
     set_config_h_prefix("TB_CONFIG")
 
     -- set the object files directory
-    set_objectdir("$(buildir)/.objs")
+    set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
+    set_targetdir("$(buildir)/$(mode)/$(arch)")
 
     -- add includes directory
     add_includedirs("$(buildir)")
