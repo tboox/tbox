@@ -8,7 +8,7 @@ option("demo")
 -- option: wchar
 option("wchar")
     add_ctypes("wchar_t")
-    add_defines_h_if_ok("$(prefix)_TYPE_HAVE_WCHAR")
+    add_defines_h("$(prefix)_TYPE_HAVE_WCHAR")
 
 -- option: float
 option("float")
@@ -16,7 +16,7 @@ option("float")
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the float type")
-    add_defines_h_if_ok("$(prefix)_TYPE_HAVE_FLOAT")
+    add_defines_h("$(prefix)_TYPE_HAVE_FLOAT")
 
 -- option: info
 option("info")
@@ -24,8 +24,8 @@ option("info")
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable to get some info, .e.g version ..")
-    add_defines_h_if_ok("$(prefix)_INFO_HAVE_VERSION")
-    add_defines_h_if_ok("$(prefix)_INFO_TRACE_MORE")
+    add_defines_h("$(prefix)_INFO_HAVE_VERSION")
+    add_defines_h("$(prefix)_INFO_TRACE_MORE")
 
 -- option: exception
 option("exception")
@@ -33,7 +33,7 @@ option("exception")
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the exception.")
-    add_defines_h_if_ok("$(prefix)_EXCEPTION_ENABLE")
+    add_defines_h("$(prefix)_EXCEPTION_ENABLE")
 
 -- option: deprecated
 option("deprecated")
@@ -41,7 +41,7 @@ option("deprecated")
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the deprecated interfaces.")
-    add_defines_h_if_ok("$(prefix)_API_HAVE_DEPRECATED")
+    add_defines_h("$(prefix)_API_HAVE_DEPRECATED")
 
 -- option: micro
 option("micro")
@@ -49,7 +49,7 @@ option("micro")
     set_showmenu(true)
     set_category("option")
     set_description("Compile micro core library for the embed system.")
-    add_defines_h_if_ok("$(prefix)_MICRO_ENABLE")
+    add_defines_h("$(prefix)_MICRO_ENABLE")
     add_rbindings("info", "deprecated", "float")
     add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
@@ -65,13 +65,37 @@ option("small")
     add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
 
 -- add modules
-for _, module in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "database", "coroutine"}) do
-    option(module)
+for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "database", "coroutine"}) do
+    option(name)
         set_default(true)
         set_showmenu(true)
         set_category("module")
-        set_description(format("The %s module", module))
-        add_defines_h_if_ok(format("$(prefix)_MODULE_HAVE_%s", module:upper()))
+        set_description(format("The %s module", name))
+        add_defines_h(format("$(prefix)_MODULE_HAVE_%s", name:upper()))
+end
+
+-- the base package
+option("base")
+    set_default(true)
+    if is_os("windows") then add_links("ws2_32") 
+    elseif is_os("android") then add_links("m", "c") 
+    else add_links("pthread", "dl", "m", "c") end
+
+-- add packages
+for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre"}) do
+    option(name)
+        set_showmenu(true)
+        set_category("package")
+        set_description(format("The %s package", name))
+        on_check(function (option)
+            import("lib.detect.find_package")
+            local package = find_package(name)
+            if package then
+                option:enable(true)
+                option:add(package)
+                option:add("defines_h", format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
+            end
+        end)
 end
 
 -- check interfaces

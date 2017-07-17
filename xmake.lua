@@ -2,7 +2,7 @@
 set_project("tbox")
 
 -- version
-set_version("1.6.2")
+set_version("2.1.5")
 
 -- set warning all as error
 set_warnings("all", "error")
@@ -122,9 +122,6 @@ if is_plat("windows") then
     -- no msvcrt.lib
     add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
 end
-
--- add package directories
-add_packagedirs("pkg") 
 
 -- add project sources
 add_subdirs("src") 

@@ -32,7 +32,7 @@
  */
 #include "adler32.h"
 #ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
-#   include "zlib/zlib.h"
+#   include <zlib.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
