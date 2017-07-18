@@ -5,6 +5,21 @@ option("demo")
     set_category("option")
     set_description("Enable or disable the demo module")
 
+-- option: micro
+option("micro")
+    set_default(false)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Compile micro core library for the embed system.")
+    add_defines_h("$(prefix)_MICRO_ENABLE")
+
+-- option: small
+option("small")
+    set_default(true)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Enable the small compile mode and disable all modules.")
+
 -- option: wchar
 option("wchar")
     add_ctypes("wchar_t")
@@ -16,7 +31,13 @@ option("float")
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the float type")
+    add_deps("micro")
     add_defines_h("$(prefix)_TYPE_HAVE_FLOAT")
+    after_check(function (option)
+        if option:dep("micro"):enabled() then
+            option:enable(false)
+        end
+    end)
 
 -- option: info
 option("info")
@@ -24,8 +45,14 @@ option("info")
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable to get some info, .e.g version ..")
+    add_deps("small", "micro")
     add_defines_h("$(prefix)_INFO_HAVE_VERSION")
     add_defines_h("$(prefix)_INFO_TRACE_MORE")
+    after_check(function (option)
+        if option:dep("small"):enabled() or option:dep("micro"):enabled() then
+            option:enable(false)
+        end
+    end)
 
 -- option: exception
 option("exception")
@@ -43,27 +70,6 @@ option("deprecated")
     set_description("Enable or disable the deprecated interfaces.")
     add_defines_h("$(prefix)_API_HAVE_DEPRECATED")
 
--- option: micro
-option("micro")
-    set_default(false)
-    set_showmenu(true)
-    set_category("option")
-    set_description("Compile micro core library for the embed system.")
-    add_defines_h("$(prefix)_MICRO_ENABLE")
-    add_rbindings("info", "deprecated", "float")
-    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
-    add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
-
--- option: small
-option("small")
-    set_default(true)
-    set_showmenu(true)
-    set_category("option")
-    set_description("Enable the small compile mode and disable all modules.")
-    add_rbindings("info", "deprecated")
-    add_rbindings("xml", "zip", "asio", "hash", "regex", "object", "charset", "database", "coroutine")
-    add_rbindings("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
-
 -- add modules
 for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "database", "coroutine"}) do
     option(name)
@@ -71,7 +77,13 @@ for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "data
         set_showmenu(true)
         set_category("module")
         set_description(format("The %s module", name))
+        add_deps("small", "micro")
         add_defines_h(format("$(prefix)_MODULE_HAVE_%s", name:upper()))
+        after_check(function (option)
+            if option:dep("small"):enabled() or option:dep("micro"):enabled() then
+                option:enable(false)
+            end
+        end)
 end
 
 -- the base package
@@ -87,13 +99,16 @@ for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedt
         set_showmenu(true)
         set_category("package")
         set_description(format("The %s package", name))
+        add_deps("small", "micro")
         on_check(function (option)
             import("lib.detect.find_package")
-            local package = find_package(name)
-            if package then
-                option:enable(true)
-                option:add(package)
-                option:add("defines_h", format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
+            if not option:dep("small"):enabled() and not option:dep("micro"):enabled() then
+                local package = find_package(name)
+                if package then
+                    option:enable(true)
+                    option:add(package)
+                    option:add("defines_h", format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
+                end
             end
         end)
 end
