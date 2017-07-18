@@ -207,8 +207,8 @@ function check_interfaces()
     add_cfuncs("systemv", nil,      {"sys/sem.h", "sys/ipc.h"},         "semget", "semtimedop")
 end
 
--- add project directories
-add_subfiles(format("tbox/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
+-- include project directories
+includes(format("tbox/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
 if is_option("demo") then 
-    add_subfiles(format("demo/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
+    includes(format("demo/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
 end
