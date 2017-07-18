@@ -15,16 +15,6 @@ target("demo")
     set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
     set_targetdir("$(buildir)/$(mode)/$(arch)")
 
-    -- add links directory
-    add_linkdirs("$(buildir)/$(mode)/$(arch)")
-
-    -- add includes directory
-    add_includedirs("$(buildir)")
-    add_includedirs("$(buildir)/tbox")
-
-    -- add links
-    add_links("tbox")
-
     -- add packages
     add_packages("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "mbedtls", "base")
 

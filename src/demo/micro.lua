@@ -12,22 +12,13 @@ target("demo")
     add_defines("__tb_prefix__=\"demo\"")
 
     -- set the object files directory
-    set_objectdir("$(buildir)/.objs")
-
-    -- add links directory
-    add_linkdirs("$(buildir)")
-
-    -- add includes directory
-    add_includedirs("$(buildir)")
-    add_includedirs("$(buildir)/tbox")
-
-    -- add links
-    add_links("tbox")
+    set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
+    set_targetdir("$(buildir)/$(mode)/$(arch)")
 
     -- add packages
     add_packages("base")
 
-    -- add the source files
+    -- add the source file
     add_files("micro.c") 
     add_files("libc/stdlib.c") 
     add_files("utils/bits.c") 
