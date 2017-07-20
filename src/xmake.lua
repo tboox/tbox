@@ -100,15 +100,11 @@ for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedt
         set_category("package")
         set_description(format("The %s package", name))
         add_deps("small", "micro")
-        on_check(function (option)
+        add_defines_h(format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
+        before_check(function (option)
             import("lib.detect.find_package")
             if not option:dep("small"):enabled() and not option:dep("micro"):enabled() then
-                local package = find_package(name)
-                if package then
-                    option:enable(true)
-                    option:add(package)
-                    option:add("defines_h", format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
-                end
+                option:add(find_package(name))
             end
         end)
 end
