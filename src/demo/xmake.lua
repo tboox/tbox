@@ -16,7 +16,7 @@ target("demo")
     set_targetdir("$(buildir)/$(mode)/$(arch)")
 
     -- add packages
-    add_packages("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "mbedtls", "base")
+    add_options("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "mbedtls", "base")
 
     -- add the source files
     add_files("demo.c") 

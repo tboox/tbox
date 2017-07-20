@@ -26,7 +26,7 @@ target("tbox")
     add_headers("../(tbox/utils/impl/*.h)")
 
     -- add packages
-    add_packages("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre", "base")
+    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre", "base")
 
     -- add options
     add_options("info", "float", "wchar", "exception", "deprecated")
