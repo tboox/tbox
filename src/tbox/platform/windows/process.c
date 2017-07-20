@@ -75,14 +75,24 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             tb_char_t const* p = tb_null;
             while ((p = *argv++)) 
             {
-                tb_string_chrcat(&args, '\"');
+                // has space?
+                tb_bool_t has_space = !!tb_strchr(p, ' ');
+
+                // patch '\"'
+                if (has_space) tb_string_chrcat(&args, '\"');
+
+                // add argument
                 while ((ch = *p))
                 {
                     if (ch == '\"' || ch == '\'' || ch == '\\') tb_string_chrcat(&args, '\\');
                     tb_string_chrcat(&args, ch);
                     p++;
                 }
-                tb_string_chrcat(&args, '\"');
+
+                // patch '\"'
+                if (has_space) tb_string_chrcat(&args, '\"');
+                
+                // add space 
                 tb_string_chrcat(&args, ' ');
             }
         }
