@@ -84,7 +84,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
                 // add argument
                 while ((ch = *p))
                 {
-                    if (ch == '\"' || ch == '\'' || ch == '\\') tb_string_chrcat(&args, '\\');
+                    if (ch == '\"') tb_string_chrcat(&args, '\\');
                     tb_string_chrcat(&args, ch);
                     p++;
                 }
