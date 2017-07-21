@@ -104,7 +104,7 @@ for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedt
         before_check(function (option)
             import("lib.detect.find_package")
             if not option:dep("small"):enabled() and not option:dep("micro"):enabled() then
-                option:add(find_package(name))
+                option:add(find_package(name, {packagedirs = path.join(os.projectdir(), "pkg")}))
             end
         end)
 end
