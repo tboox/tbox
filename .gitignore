@@ -18,6 +18,8 @@
 *.gcov
 *.gcda
 *.gcno
+*.gch
+*.gch.d
 *.stackdump
 *.manifest
 .ccache
