@@ -8,8 +8,7 @@ target("tbox")
     add_defines("__tb_prefix__=\"tbox\"")
 
     -- set the auto-generated config.h
-    set_config_h("$(buildir)/tbox/tbox.config.h")
-    set_config_h_prefix("TB_CONFIG")
+    set_config_header("$(buildir)/tbox/tbox.config.h", {prefix = "TB_CONFIG"})
 
     -- set the object files directory
     set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")

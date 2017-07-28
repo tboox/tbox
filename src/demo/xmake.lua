@@ -15,6 +15,9 @@ target("demo")
     set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
     set_targetdir("$(buildir)/$(mode)/$(arch)")
 
+    -- set precompiled header
+    set_precompiled_header("demo.h")
+
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "mbedtls", "base")
 
