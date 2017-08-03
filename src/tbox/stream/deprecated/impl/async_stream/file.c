@@ -221,7 +221,7 @@ static tb_bool_t tb_async_stream_file_impl_open(tb_async_stream_ref_t stream, tb
             tb_trace_e("open %s: failed", url);
 
             // save state
-            state = tb_file_info(url, tb_null)? TB_STATE_FILE_OPEN_FAILED : TB_STATE_FILE_NOT_EXISTS;
+            state = tb_syserror_state();
             break;
         }
 
