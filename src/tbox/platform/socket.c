@@ -56,7 +56,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
     tb_trace_noimpl();
     return tb_null;
 }
-tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
+tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
 {
     tb_trace_noimpl();
     return tb_false;
