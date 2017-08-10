@@ -7,7 +7,7 @@ platform:
   - Win64
 
 before_build:
-  - ps: Invoke-Expression (Invoke-Webrequest 'http://xmake.io/get.ps1' -UseBasicParsing).Content
+  - ps: Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/tboox/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
   - cmd: xmake --version
 
 build_script:
