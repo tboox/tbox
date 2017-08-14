@@ -10,10 +10,6 @@ target("tbox")
     -- set the auto-generated config.h
     set_config_header("$(buildir)/tbox/tbox.config.h", {prefix = "TB_CONFIG"})
 
-    -- set the object files directory
-    set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
-    set_targetdir("$(buildir)/$(mode)/$(arch)")
-
     -- add includes directory
     add_includedirs("$(buildir)")
     add_includedirs("$(buildir)/tbox")
@@ -25,7 +21,7 @@ target("tbox")
     add_headers("../(tbox/utils/impl/*.h)")
 
     -- add packages
-    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre", "base")
+    add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
 
     -- add options
     add_options("info", "float", "wchar", "exception", "deprecated")

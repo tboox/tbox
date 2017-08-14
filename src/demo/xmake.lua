@@ -11,12 +11,8 @@ target("demo")
     -- add defines
     add_defines("__tb_prefix__=\"demo\"")
 
-    -- set the object files directory
-    set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
-    set_targetdir("$(buildir)/$(mode)/$(arch)")
-
-    -- add packages
-    add_options("zlib", "mysql", "sqlite3", "pcre", "pcre2", "openssl", "polarssl", "mbedtls", "base")
+    -- add options
+    add_options("base")
 
     -- add the source files
     add_files("demo.c") 

@@ -2,7 +2,7 @@
 set_project("tbox")
 
 -- version
-set_version("2.1.5")
+set_version("2.1.6")
 
 -- set warning all as error
 set_warnings("all", "error")
@@ -17,6 +17,10 @@ add_defines_h("_GNU_SOURCE=1", "_REENTRANT")
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
+
+-- set the object files directory
+set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
+set_targetdir("$(buildir)/$(mode)/$(arch)")
 
 -- the debug or check or coverage mode
 if is_mode("debug", "check", "coverage") then
