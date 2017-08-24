@@ -45,6 +45,9 @@
 #define TB_VERSION_ALTER            TB_CONFIG_VERSION_ALTER
 
 /// the build version
+#ifndef TB_CONFIG_VERSION_BUILD
+#   define TB_CONFIG_VERSION_BUILD  0
+#endif
 #define TB_VERSION_BUILD            TB_CONFIG_VERSION_BUILD
 
 /// the build version string
