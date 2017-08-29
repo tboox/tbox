@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.6.2
+
 ### New features
 
 * Add ping demo for network
@@ -136,6 +138,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.6.2
 
 ### 新特性
 
