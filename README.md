@@ -12,9 +12,6 @@
       <img src="https://img.shields.io/codecov/c/github/tboox/tbox/master.svg?style=flat-square" alt="Coverage" />
     </a>
     <a href="https://github.com/tboox/tbox/releases">
-      <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
-    </a>
-    <a href="https://github.com/tboox/tbox/releases">
       <img src="https://img.shields.io/github/downloads/tboox/tbox/total.svg?style=flat-square" alt="Downloads" />
     </a>
   </div>
@@ -24,6 +21,12 @@
     </a>
     <a href="https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
       <img src="https://img.shields.io/gitter/room/tboox/tboox.svg?style=flat-square&colorB=96c312" alt="Gitter" />
+    </a>
+    <a href="https://t.me/joinchat/F2dIAw5iTkDUMwCQ_8CStw">
+      <img src="https://img.shields.io/badge/chat-on%20telegram-blue.svg?style=flat-square" alt="Telegram" />
+    </a>
+    <a href="https://tboox.bearychat.com/signup/98bf6970b9f889d6ae3fbc3d50ee8a36">
+      <img src="https://img.shields.io/badge/chat-on%20bearychat-brightgreen.svg?style=flat-square" alt="Telegram" />
     </a>
     <a href="http://tboox.org/donation/">
       <img src="https://img.shields.io/badge/donate-us-orange.svg?style=flat-square" alt="Donate" />
