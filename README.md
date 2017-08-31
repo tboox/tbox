@@ -12,7 +12,7 @@
       <img src="https://img.shields.io/codecov/c/github/tboox/tbox/master.svg?style=flat-square" alt="Coverage" />
     </a>
     <a href="https://github.com/tboox/tbox/releases">
-      <img src="https://img.shields.io/github/downloads/tboox/tbox/total.svg?style=flat-square" alt="Downloads" />
+      <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
     </a>
   </div>
   <div>
