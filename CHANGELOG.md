@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Move docs directory to tbox-docs repo
+
 ## v1.6.2
 
 ### New features
@@ -138,6 +142,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 移除docs目录，放置到独立tbox-docs仓库，减少tbox.zip包大小
 
 ## v1.6.2
 
