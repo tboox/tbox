@@ -6,6 +6,10 @@
 
 * Move docs directory to tbox-docs repo
 
+### Bugs fixed
+
+* Fix the charset problem of envirnoment variables
+
 ## v1.6.2
 
 ### New features
@@ -146,6 +150,10 @@
 ### 改进
 
 * 移除docs目录，放置到独立tbox-docs仓库，减少tbox.zip包大小
+
+### Bugs修复
+
+* 修复windows环境变量的中文编码问题
 
 ## v1.6.2
 
