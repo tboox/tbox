@@ -9,6 +9,7 @@
 ### Bugs fixed
 
 * Fix the charset problem of envirnoment variables
+* Fix process exit bug
 
 ## v1.6.2
 
@@ -154,6 +155,7 @@
 ### Bugs修复
 
 * 修复windows环境变量的中文编码问题
+* 修复后台进程退出问题
 
 ## v1.6.2
 
