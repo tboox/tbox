@@ -102,15 +102,9 @@ for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedt
         add_deps("small", "micro")
         add_defines_h(format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
         before_check(function (option)
-            import("core.project.config")
             import("lib.detect.find_package")
-            if config.get(name) or (not option:dep("small"):enabled() and not option:dep("micro"):enabled()) then
-                local info = find_package(name, {packagedirs = path.join(os.projectdir(), "pkg")})
-                if info then
-                    option:add(info)
-                else
-                    option:enable(false, {force = true})
-                end
+            if not option:dep("small"):enabled() and not option:dep("micro"):enabled() then
+                option:add(find_package(name, {packagedirs = path.join(os.projectdir(), "pkg")}))
             end
         end)
 end
