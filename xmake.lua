@@ -62,10 +62,6 @@ if is_mode("release", "profile") then
         -- strip all symbols
         set_strip("all")
 
-        -- fomit the frame pointer
-        add_cxflags("-fomit-frame-pointer")
-        add_mxflags("-fomit-frame-pointer")
-
     -- the profile mode
     else
     
@@ -87,9 +83,6 @@ if is_mode("release", "profile") then
         -- enable fastest optimization
         set_optimize("fastest")
     end
-
-    -- attempt to add vector extensions 
-    add_vectorexts("sse2", "sse3", "ssse3", "mmx")
 end
 
 -- small or micro?

@@ -37,8 +37,8 @@
 tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 {
     // done
-    tb_bool_t           ok = tb_false;
-    sem_t*              semaphore = tb_null;
+    tb_bool_t   ok = tb_false;
+    sem_t*      semaphore = tb_null;
     do
     {
         // make semaphore
