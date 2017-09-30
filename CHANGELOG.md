@@ -10,6 +10,7 @@
 
 * Fix the charset problem of envirnoment variables
 * Fix process exit bug
+* Fix setenv empty value crash 
 
 ## v1.6.2
 
@@ -156,6 +157,7 @@
 
 * 修复windows环境变量的中文编码问题
 * 修复后台进程退出问题
+* 修复设置环境变量值为空时的崩溃问题
 
 ## v1.6.2
 
