@@ -31,3 +31,4 @@ cscope.*
 gmon.out
 tags
 Doxyfile
+.vscode
