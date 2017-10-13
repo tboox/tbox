@@ -63,9 +63,10 @@ And it provides many compiling options using [xmake](http://www.xmake.io):
 
 If you want to know more, please refer to:
 
-* [Documents](https://github.com/waruqi/tbox/wiki/documents)
-* [Github](https://github.com/waruqi/tbox)
 * [HomePage](http://tboox.org)
+* [Documents](https://github.com/tboox/tbox/wiki/documents)
+* [Github](https://github.com/tboox/tbox)
+* [Gitee](https://gitee.com/tboox/tbox)
 
 ## Features
 
