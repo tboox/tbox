@@ -5,6 +5,7 @@
 ### Changes
 
 * Move docs directory to tbox-docs repo
+* Support tinyc compiler
 
 ### Bugs fixed
 
@@ -153,6 +154,7 @@
 ### 改进
 
 * 移除docs目录，放置到独立tbox-docs仓库，减少tbox.zip包大小
+* 支持tinyc编译器
 
 ### Bugs修复
 
