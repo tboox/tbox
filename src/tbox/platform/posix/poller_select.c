@@ -340,7 +340,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 {
     // check
     tb_poller_select_ref_t poller = (tb_poller_select_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->list && func, -1);
+    tb_assert_and_check_return_val(poller && func, -1);
 
     // init time
     struct timeval t = {0};
@@ -382,6 +382,9 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         {
             // end?
             tb_check_break(wait >= 0);
+
+            // check
+            tb_assert_and_check_return_val(poller->list, -1);
 
             // the sock
             tb_socket_ref_t sock = (tb_socket_ref_t)poller->list[i].sock;

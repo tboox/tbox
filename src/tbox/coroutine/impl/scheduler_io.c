@@ -291,6 +291,9 @@ tb_pointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_
     // trace
     tb_trace_d("coroutine(%p): sleep %ld ms ..", coroutine, interval);
 
+    // clear waiting task first
+    coroutine->rs.wait.task = tb_null;
+
     // infinity?
     if (interval > 0)
     {
