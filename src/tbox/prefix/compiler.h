@@ -88,6 +88,21 @@
 #       error Unknown Intel C++ Compiler Version
 #   endif
 
+// tiny c
+#elif defined(__TINYC__)
+#   define TB_COMPILER_IS_TINYC
+#   define TB_COMPILER_VERSION_BT(major, minor)     (__TINYC__ > ((major) * 100 + (minor)))
+#   define TB_COMPILER_VERSION_BE(major, minor)     (__TINYC__ >= ((major) * 100 + (minor)))
+#   define TB_COMPILER_VERSION_EQ(major, minor)     (__TINYC__ == ((major) * 100 + (minor)))
+#   define TB_COMPILER_VERSION_LT(major, minor)     (__TINYC__ < ((major) * 100 + (minor)))
+#   define TB_COMPILER_VERSION_LE(major, minor)     (__TINYC__ <= ((major) * 100 + (minor)))
+#   define TB_COMPILER_STRING                       "tiny c"
+#   if (__TINYC__ == 926)
+#       define TB_COMPILER_VERSION_STRING           "tiny c 0.9.26"
+#   else
+#       error Unknown Tiny C Compiler Version
+#   endif
+
 // borland c++
 #elif defined(__BORLANDC__)
 #   define TB_COMPILER_IS_BORLAND

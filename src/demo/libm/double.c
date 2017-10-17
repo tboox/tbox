@@ -371,13 +371,13 @@ static tb_double_t tb_double_test_angle[360] =
 
 };
 
-static tb_double_t tb_double_test_arc[5][5] = 
+static tb_double_t tb_double_test_arc[5][4] = 
 {
-    {TB_INF, 0.000000, 0.000000, 0.000000, 0.000000}
-,   {TB_INF, 1.000000, 0.500000, 0.333333, 0.250000}
-,   {TB_INF, 2.000000, 1.000000, 0.666667, 0.500000}
-,   {TB_INF, 3.000000, 1.500000, 1.000000, 0.750000}
-,   {TB_INF, 4.000000, 2.000000, 1.333333, 1.000000}
+    {0.000000, 0.000000, 0.000000, 0.000000}
+,   {1.000000, 0.500000, 0.333333, 0.250000}
+,   {2.000000, 1.000000, 0.666667, 0.500000}
+,   {3.000000, 1.500000, 1.000000, 0.750000}
+,   {4.000000, 2.000000, 1.333333, 1.000000}
 
 };
 
@@ -708,7 +708,7 @@ static tb_void_t tb_double_test_asin()
     {
         for (i = 0; i < 5; i++)
         {
-            for (j = 0; j < 5; j++)
+            for (j = 0; j < 4; j++)
             {
                 a = tb_double_test_arc[i][j];
                 r = tb_asin(a);
@@ -720,7 +720,7 @@ static tb_void_t tb_double_test_asin()
 
     for (i = 0; i < 5; i++)
     {
-        for (j = 0; j < 5; j++)
+        for (j = 0; j < 4; j++)
         {
             a = tb_double_test_arc[i][j];
             r = tb_asin(a);

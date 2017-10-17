@@ -371,13 +371,13 @@ static tb_float_t tb_float_test_angle[360] =
 
 };
 
-static tb_float_t tb_float_test_arc[5][5] = 
+static tb_float_t tb_float_test_arc[5][4] = 
 {
-    {(tb_float_t)TB_INF, 0.000000f, 0.000000f, 0.000000f, 0.000000f}
-,   {(tb_float_t)TB_INF, 1.000000f, 0.500000f, 0.333333f, 0.250000f}
-,   {(tb_float_t)TB_INF, 2.000000f, 1.000000f, 0.666667f, 0.500000f}
-,   {(tb_float_t)TB_INF, 3.000000f, 1.500000f, 1.000000f, 0.750000f}
-,   {(tb_float_t)TB_INF, 4.000000f, 2.000000f, 1.333333f, 1.000000f}
+    {0.000000f, 0.000000f, 0.000000f, 0.000000f}
+,   {1.000000f, 0.500000f, 0.333333f, 0.250000f}
+,   {2.000000f, 1.000000f, 0.666667f, 0.500000f}
+,   {3.000000f, 1.500000f, 1.000000f, 0.750000f}
+,   {4.000000f, 2.000000f, 1.333333f, 1.000000f}
 
 };
 
@@ -707,7 +707,7 @@ static tb_void_t tb_float_test_asin()
     {
         for (i = 0; i < 5; i++)
         {
-            for (j = 0; j < 5; j++)
+            for (j = 0; j < 4; j++)
             {
                 a = tb_float_test_arc[i][j];
                 r = tb_asinf(a);
@@ -719,7 +719,7 @@ static tb_void_t tb_float_test_asin()
 
     for (i = 0; i < 5; i++)
     {
-        for (j = 0; j < 5; j++)
+        for (j = 0; j < 4; j++)
         {
             a = tb_float_test_arc[i][j];
             r = tb_asinf(a);

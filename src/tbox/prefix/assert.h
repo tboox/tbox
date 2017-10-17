@@ -54,7 +54,7 @@ __tb_extern_c_enter__
 
 // assert
 #ifdef __tb_debug__
-#   if defined(TB_COMPILER_IS_GCC)
+#   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
 #       define tb_assertf(x, fmt, arg...)                                   do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); tb_trace_sync(); tb_abort(); } } while(0)
 #       define tb_assertf_and_check_abort(x, fmt, arg...)                   tb_assertf(x, fmt, ##arg)
 #       define tb_assertf_and_check_return(x, fmt, arg...)                  tb_assertf(x, fmt, ##arg)
@@ -80,7 +80,7 @@ __tb_extern_c_enter__
 #       define tb_assertf_and_check_continue                               
 #   endif
 #else
-#   if defined(TB_COMPILER_IS_GCC)
+#   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
 #       define tb_assertf(x, fmt, arg...)                             
 #       define tb_assertf_and_check_abort(x, fmt, arg...)                   tb_check_abort(x)
 #       define tb_assertf_and_check_return(x, fmt, arg...)                  tb_check_return(x)
@@ -129,7 +129,7 @@ __tb_extern_c_enter__
 
 // assert and pass code, not abort it
 #ifdef __tb_debug__
-#   if defined(TB_COMPILER_IS_GCC)
+#   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
 #       define tb_assertf_pass_return(x, fmt, arg...)                           do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); tb_trace_sync(); return ; } } while(0)
 #       define tb_assertf_pass_return_val(x, v, fmt, arg...)                    do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); tb_trace_sync(); return (v); } } while(0)
 #       define tb_assertf_pass_goto(x, b, fmt, arg...)                          do { if (!(x)) {tb_trace_a("expr[%s]: " fmt, #x, ##arg); tb_assert_backtrace_dump(); tb_trace_sync(); goto b; } } while(0)
@@ -167,7 +167,7 @@ __tb_extern_c_enter__
 #       define tb_assertf_pass_and_check_continue                                
 #   endif
 #else
-#   if defined(TB_COMPILER_IS_GCC)
+#   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
 #       define tb_assertf_pass_return(x, fmt, arg...)                            
 #       define tb_assertf_pass_return_val(x, v, fmt, arg...)                     
 #       define tb_assertf_pass_goto(x, b, fmt, arg...)                           

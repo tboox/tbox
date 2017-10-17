@@ -157,6 +157,19 @@
     || defined(__mips__)
 #   define TB_ARCH_MIPS
 #   define TB_ARCH_STRING                   "mips"
+#elif defined(TB_COMPILER_IS_TINYC)
+#   if defined(TCC_TARGET_I386)
+#       define TB_ARCH_x86
+#       define TB_ARCH_STRING               "i386"
+#   elif defined(TCC_TARGET_X86_64)
+#       define TB_ARCH_x64
+#       define TB_ARCH_STRING               "x86_64"
+#   elif defined(TCC_TARGET_ARM)
+#       define TB_ARCH_ARM
+#       define TB_ARCH_STRING               "arm"
+#   else
+#       error unknown arch for tiny c, please define target like -DTCC_TARGET_I386
+#   endif
 #else
 //#     define TB_ARCH_SPARC
 //#     define TB_ARCH_PPC
@@ -184,13 +197,13 @@
 #endif
 
 // vfp
-#if defined(__VFP_FP__)
+#if defined(__VFP_FP__) || (defined(TB_COMPILER_IS_TINYC) && defined(TCC_ARM_VFP))
 #   define TB_ARCH_VFP
 #   define TB_ARCH_STRING_4                 "_vfp"
 #endif
 
 // elf
-#if defined(__ELF__)
+#if defined(__ELF__) || (defined(TB_COMPILER_IS_TINYC) && !defined(TCC_ARM_PE))
 #   define TB_ARCH_ELF
 #   define TB_ARCH_STRING_5                 "_elf"
 #endif

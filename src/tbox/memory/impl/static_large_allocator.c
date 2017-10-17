@@ -53,6 +53,14 @@ typedef __tb_pool_data_aligned__ struct __tb_static_large_data_head_t
     // is free?
     tb_uint32_t                     bfree : 1;
 
+    /* patch 4 bytes for align(8) for tinycc/x86_64
+     * 
+     * __tb_aligned__(8) struct doesn't seem to work 
+     */
+#if defined(TB_COMPILER_IS_TINYC) && defined(TB_CPU_BIT64)
+    tb_uint32_t                     padding;
+#endif
+
     // the data head base
     tb_byte_t                       base[sizeof(tb_pool_data_head_t)];
 
