@@ -31,6 +31,11 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -94,5 +99,10 @@ tb_size_t           tb_element_hash_data(tb_byte_t const* data, tb_size_t size, 
  * @return          the hash value
  */
 tb_size_t           tb_element_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t index);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
