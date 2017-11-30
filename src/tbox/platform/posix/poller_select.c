@@ -125,10 +125,10 @@ static tb_void_t tb_poller_list_set(tb_poller_select_ref_t poller, tb_socket_ref
             if (i < n) tb_memmov(poller->list + i + 1, poller->list + i, (n - i) * sizeof(tb_poller_data_t));
             poller->list[i].sock = sock;
             poller->list[i].priv = priv;
-        }
 
-        // update the list size
-        poller->list_size++;
+            // update the list size
+            poller->list_size++;
+        }
     }
 }
 static tb_void_t tb_poller_list_del(tb_poller_select_ref_t poller, tb_socket_ref_t sock)
