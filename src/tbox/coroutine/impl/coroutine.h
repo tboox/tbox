@@ -118,9 +118,6 @@ typedef struct __tb_coroutine_t
         // the arguments for wait()
         tb_coroutine_rs_wait_t      wait;
 
-        // the list entry
-        tb_list_entry_t             entry;
-
         // the single entry
         tb_single_list_entry_t      single_entry;
 

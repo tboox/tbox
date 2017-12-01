@@ -330,6 +330,9 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     if (tb_poller_support(scheduler_io->poller, TB_POLLER_EVENT_CLEAR))
         events |= TB_POLLER_EVENT_CLEAR;
 
+    // @note avoid to write rs.single_entry (channel/suspend) and erase rs.wait.{sock, events, events_cache}
+    tb_assert_static(sizeof(tb_single_list_entry_t) <= tb_offsetof(tb_coroutine_rs_wait_t, sock));
+
     // exists this socket? only modify events 
     tb_socket_ref_t sock_prev = coroutine->rs.wait.sock;
     if (sock_prev == sock)
