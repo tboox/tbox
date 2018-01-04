@@ -377,7 +377,7 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         ssl->timeout = 30000;
 
         // init ctx
-        ssl->ctx = SSL_CTX_new(SSLv3_method());
+        ssl->ctx = SSL_CTX_new(SSLv23_method());
         tb_assert_and_check_break(ssl->ctx);
         
         // make ssl
