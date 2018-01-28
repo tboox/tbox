@@ -13,6 +13,7 @@
 * Fix process exit bug
 * Fix setenv empty value crash 
 * Fix coroutine.sleep bug
+* Fix windows root path bug 
 
 ## v1.6.2
 
@@ -162,6 +163,7 @@
 * 修复后台进程退出问题
 * 修复设置环境变量值为空时的崩溃问题
 * 修复协程sleep超时覆写数据的bug
+* 修复windows根路径问题
 
 ## v1.6.2
 
