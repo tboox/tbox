@@ -138,7 +138,7 @@
 #   else 
 #       error unknown arm arch version
 #   endif
-#   if !defined(TB_ARCH_ARM64) && (defined(__arm64) || defined(__arm64__) || (defined(__aarch64__) && __aarch64__)
+#   if !defined(TB_ARCH_ARM64) && (defined(__arm64) || defined(__arm64__) || (defined(__aarch64__) && __aarch64__))
 #       define TB_ARCH_ARM64
 #       ifndef TB_ARCH_STRING
 #           define TB_ARCH_STRING           "arm64"
