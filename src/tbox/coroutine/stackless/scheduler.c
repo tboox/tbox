@@ -55,11 +55,15 @@
 
 #ifndef TB_CONFIG_MICRO_ENABLE
 // the self scheduler local 
-static tb_thread_local_t        s_scheduler_self = TB_THREAD_LOCAL_INIT;
+static tb_thread_local_t                        s_scheduler_self = TB_THREAD_LOCAL_INIT;
 #endif
 
 // the global scheduler for the exclusive mode
-static tb_lo_scheduler_t*       s_scheduler_self_ex = tb_null;
+#ifdef __tb_thread_local__
+static __tb_thread_local__ tb_lo_scheduler_t*   s_scheduler_self_ex = tb_null;
+#else
+static tb_lo_scheduler_t*                       s_scheduler_self_ex = tb_null;
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -250,11 +254,11 @@ tb_void_t tb_lo_scheduler_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t
 }
 tb_lo_scheduler_ref_t tb_lo_scheduler_self_()
 { 
-#ifndef TB_CONFIG_MICRO_ENABLE
     // get self scheduler on the current thread
-    return (tb_lo_scheduler_ref_t)(s_scheduler_self_ex? s_scheduler_self_ex : tb_thread_local_get(&s_scheduler_self));
-#else
+#if defined(TB_CONFIG_MICRO_ENABLE) || defined(__tb_thread_local__)
     return (tb_lo_scheduler_ref_t)s_scheduler_self_ex;
+#else
+    return (tb_lo_scheduler_ref_t)(s_scheduler_self_ex? s_scheduler_self_ex : tb_thread_local_get(&s_scheduler_self));
 #endif
 }
 
@@ -350,9 +354,12 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
     tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)self;
     tb_assert_and_check_return(scheduler);
 
+#ifdef __tb_thread_local__
+    s_scheduler_self_ex = scheduler;
+#else
     // is exclusive mode?
     if (exclusive) s_scheduler_self_ex = scheduler;
-#ifndef TB_CONFIG_MICRO_ENABLE
+#   ifndef TB_CONFIG_MICRO_ENABLE
     else
     {
         // init self scheduler local
@@ -361,12 +368,13 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
         // update and overide the current scheduler
         tb_thread_local_set(&s_scheduler_self, self);
     }
-#else
+#   else
     else
     {
         // trace
         tb_trace_e("non-exclusive is not suspported in micro mode!");
     }
+#   endif
 #endif
 
     // schedule all ready coroutines
@@ -401,14 +409,18 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
     // stop it
     scheduler->stopped = tb_true;
  
+#ifdef __tb_thread_local__
+    s_scheduler_self_ex = tb_null;
+#else
     // is exclusive mode?
     if (exclusive) s_scheduler_self_ex = tb_null;
-#ifndef TB_CONFIG_MICRO_ENABLE
+#   ifndef TB_CONFIG_MICRO_ENABLE
     else
     {
         // clear the current scheduler
         tb_thread_local_set(&s_scheduler_self, tb_null);
     }
+#   endif
 #endif
 }
 
