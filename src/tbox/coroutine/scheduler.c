@@ -43,14 +43,14 @@
 
 // the self scheduler local 
 #ifndef __tb_thread_local__
-static tb_thread_local_t                        s_scheduler_self = TB_THREAD_LOCAL_INIT;
+static tb_thread_local_t                        g_scheduler_self = TB_THREAD_LOCAL_INIT;
 #endif
 
 // the global scheduler for the exclusive mode
 #ifdef __tb_thread_local__
-static __tb_thread_local__ tb_co_scheduler_t*   s_scheduler_self_ex = tb_null;
+static __tb_thread_local__ tb_co_scheduler_t*   g_scheduler_self_ex = tb_null;
 #else
-static tb_co_scheduler_t*                       s_scheduler_self_ex = tb_null;
+static tb_co_scheduler_t*                       g_scheduler_self_ex = tb_null;
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -181,17 +181,17 @@ tb_void_t tb_co_scheduler_loop(tb_co_scheduler_ref_t self, tb_bool_t exclusive)
     tb_assert_and_check_return(scheduler);
 
 #ifdef __tb_thread_local__
-    s_scheduler_self_ex = scheduler;
+    g_scheduler_self_ex = scheduler;
 #else
     // is exclusive mode?
-    if (exclusive) s_scheduler_self_ex = scheduler;
+    if (exclusive) g_scheduler_self_ex = scheduler;
     else
     {
         // init self scheduler local
-        if (!tb_thread_local_init(&s_scheduler_self, tb_null)) return ;
+        if (!tb_thread_local_init(&g_scheduler_self, tb_null)) return ;
      
         // update and overide the current scheduler
-        tb_thread_local_set(&s_scheduler_self, self);
+        tb_thread_local_set(&g_scheduler_self, self);
     }
 #endif
 
@@ -216,14 +216,14 @@ tb_void_t tb_co_scheduler_loop(tb_co_scheduler_ref_t self, tb_bool_t exclusive)
     scheduler->stopped = tb_true;
  
 #ifdef __tb_thread_local__
-    s_scheduler_self_ex = tb_null;
+    g_scheduler_self_ex = tb_null;
 #else
     // is exclusive mode?
-    if (exclusive) s_scheduler_self_ex = tb_null;
+    if (exclusive) g_scheduler_self_ex = tb_null;
     else
     {
         // clear the current scheduler
-        tb_thread_local_set(&s_scheduler_self, tb_null);
+        tb_thread_local_set(&g_scheduler_self, tb_null);
     }
 #endif
 }
@@ -231,8 +231,8 @@ tb_co_scheduler_ref_t tb_co_scheduler_self()
 { 
     // get self scheduler on the current thread
 #ifdef __tb_thread_local__
-    return (tb_co_scheduler_ref_t)s_scheduler_self_ex;
+    return (tb_co_scheduler_ref_t)g_scheduler_self_ex;
 #else
-    return (tb_co_scheduler_ref_t)(s_scheduler_self_ex? s_scheduler_self_ex : tb_thread_local_get(&s_scheduler_self));
+    return (tb_co_scheduler_ref_t)(g_scheduler_self_ex? g_scheduler_self_ex : tb_thread_local_get(&g_scheduler_self));
 #endif
 }
