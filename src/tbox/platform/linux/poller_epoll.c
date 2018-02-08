@@ -43,9 +43,6 @@
 // the epoll poller type
 typedef struct __tb_poller_epoll_t
 {
-    // the poller base
-    tb_poller_t             base;
-
     // the maxn
     tb_size_t               maxn;
 
@@ -63,6 +60,9 @@ typedef struct __tb_poller_epoll_t
 
     // the events count
     tb_size_t               events_count;
+
+    // the socket data
+    tb_sockdata_t           sockdata;
     
 }tb_poller_epoll_t, *tb_poller_epoll_ref_t;
 
@@ -106,7 +106,7 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         tb_assert_and_check_break(poller);
 
         // init socket data
-        tb_poller_sock_data_init(&poller->base);
+        tb_sockdata_init(&poller->sockdata);
 
         // init maxn
         poller->maxn = tb_poller_maxfds();
@@ -163,7 +163,7 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     poller->epfd = 0;
 
     // exit socket data
-    tb_poller_sock_data_exit(&poller->base);
+    tb_sockdata_exit(&poller->sockdata);
 
     // free it
     tb_free(poller);
@@ -175,7 +175,7 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     tb_assert_and_check_return(poller);
 
     // clear socket data
-    tb_poller_sock_data_clear(&poller->base);
+    tb_sockdata_clear(&poller->sockdata);
 
     // close the previous epoll fd first
     if (poller->epfd > 0) close(poller->epfd);
@@ -251,7 +251,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
     // bind user private data to socket
-    tb_poller_sock_data_insert(&poller->base, sock, priv);
+    tb_sockdata_insert(&poller->sockdata, sock, priv);
 
     // add socket and events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_ADD, e.data.fd, &e) < 0)
@@ -285,7 +285,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     }
 
     // remove user private data from this socket
-    tb_poller_sock_data_remove(&poller->base, sock);
+    tb_sockdata_remove(&poller->sockdata, sock);
     
     // ok
     return tb_true;
@@ -318,7 +318,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
     // modify user private data to socket
-    tb_poller_sock_data_insert(&poller->base, sock, priv);
+    tb_sockdata_insert(&poller->sockdata, sock, priv);
 
     // modify events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_MOD, e.data.fd, &e) < 0) 
@@ -423,7 +423,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 #endif
 
         // call event function
-        func(self, sock, events, tb_poller_sock_data(&poller->base, sock));
+        func(self, sock, events, tb_sockdata_get(&poller->sockdata, sock));
 
         // update the events count
         wait++;

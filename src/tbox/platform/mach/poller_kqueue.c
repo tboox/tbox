@@ -53,9 +53,6 @@
 // the kqueue poller type
 typedef struct __tb_poller_kqueue_t
 {
-    // the poller base
-    tb_poller_t             base;
-
     // the maxn
     tb_size_t               maxn;
 
@@ -74,6 +71,9 @@ typedef struct __tb_poller_kqueue_t
     // the events count
     tb_size_t               events_count;
    
+    // the socket data
+    tb_sockdata_t           sockdata;
+
 }tb_poller_kqueue_t, *tb_poller_kqueue_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         tb_assert_and_check_break(poller);
 
         // init socket data
-        tb_poller_sock_data_init(&poller->base);
+        tb_sockdata_init(&poller->sockdata);
 
         // init kqueue
         poller->kqfd = kqueue();
@@ -193,7 +193,7 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     poller->kqfd = 0;
 
     // exit socket data
-    tb_poller_sock_data_exit(&poller->base);
+    tb_sockdata_exit(&poller->sockdata);
 
     // free it
     tb_free(poller);
@@ -205,7 +205,7 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     tb_assert_and_check_return(poller);
 
     // clear socket data
-    tb_poller_sock_data_clear(&poller->base);
+    tb_sockdata_clear(&poller->sockdata);
 
     // close the previous kqueue fd first
     if (poller->kqfd > 0) close(poller->kqfd);
@@ -277,7 +277,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
     
     // save events to socket
-    if (ok) tb_poller_sock_data_insert(&poller->base, sock, (tb_cpointer_t)events);
+    if (ok) tb_sockdata_insert(&poller->sockdata, sock, (tb_cpointer_t)events);
 
     // ok?
     return ok;
@@ -289,7 +289,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     tb_assert_and_check_return_val(poller && poller->kqfd > 0 && sock, tb_false);
 
     // get the previous events
-    tb_size_t events = (tb_size_t)tb_poller_sock_data(&poller->base, sock);
+    tb_size_t events = (tb_size_t)tb_sockdata_get(&poller->sockdata, sock);
 
     // remove this socket and events
     struct kevent   e[2];
@@ -310,7 +310,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
 
     // remove events from socket
-    if (ok) tb_poller_sock_data_remove(&poller->base, sock);
+    if (ok) tb_sockdata_remove(&poller->sockdata, sock);
 
     // ok?
     return ok;
@@ -322,7 +322,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_assert_and_check_return_val(poller && poller->kqfd > 0 && sock, tb_false);
 
     // get the previous events
-    tb_size_t events_old = (tb_size_t)tb_poller_sock_data(&poller->base, sock);
+    tb_size_t events_old = (tb_size_t)tb_sockdata_get(&poller->sockdata, sock);
 
     // change
     tb_size_t adde = events & ~events_old;
@@ -362,7 +362,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
 
     // save events to socket
-    if (ok) tb_poller_sock_data_insert(&poller->base, sock, (tb_cpointer_t)events);
+    if (ok) tb_sockdata_insert(&poller->sockdata, sock, (tb_cpointer_t)events);
 
     // ok?
     return ok;

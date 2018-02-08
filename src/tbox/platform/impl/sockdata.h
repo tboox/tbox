@@ -19,12 +19,12 @@
  * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        poller.h
+ * @file        sockdata.h
  * @ingroup     platform
  *
  */
-#ifndef TB_PLATFORM_IMPL_POLLER_H
-#define TB_PLATFORM_IMPL_POLLER_H
+#ifndef TB_PLATFORM_IMPL_SOCKDATA_H
+#define TB_PLATFORM_IMPL_SOCKDATA_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -40,8 +40,8 @@ __tb_extern_c_enter__
  * types
  */
 
-// the poller type
-typedef struct __tb_poller_t
+// the socket data type
+typedef struct __tb_sockdata_t
 {
     // the socket data (sock => priv)
     tb_cpointer_t*          data;
@@ -49,57 +49,57 @@ typedef struct __tb_poller_t
     // the socket data maximum count
     tb_size_t               maxn;
     
-}tb_poller_t;
+}tb_sockdata_t, *tb_sockdata_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/* init socket data for poller
+/* init socket data
  *
- * @param poller    the poller
+ * @param sockdata  the sockdata
  */
-tb_void_t           tb_poller_sock_data_init(tb_poller_t* poller);
+tb_void_t           tb_sockdata_init(tb_sockdata_ref_t sockdata);
 
-/* exit socket data in poller
+/* exit socket data 
  *
- * @param poller    the poller
+ * @param sockdata  the sockdata
  */
-tb_void_t           tb_poller_sock_data_exit(tb_poller_t* poller);
+tb_void_t           tb_sockdata_exit(tb_sockdata_ref_t sockdata);
 
-/* clear socket data in poller
+/* clear socket data 
  *
- * @param poller    the poller
+ * @param sockdata  the sockdata
  */
-tb_void_t           tb_poller_sock_data_clear(tb_poller_t* poller);
+tb_void_t           tb_sockdata_clear(tb_sockdata_ref_t sockdata);
 
-/* insert socket data to poller
+/* insert socket data 
  *
- * @param poller    the poller
+ * @param sockdata  the sockdata
  * @param sock      the socket
  * @param priv      the socket private data
  */
-tb_void_t           tb_poller_sock_data_insert(tb_poller_t* poller, tb_socket_ref_t sock, tb_cpointer_t priv);
+tb_void_t           tb_sockdata_insert(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, tb_cpointer_t priv);
 
-/* remove socket data from poller
+/* remove socket data 
  *
- * @param poller    the poller
+ * @param sockdata  the sockdata
  * @param sock      the socket
  */
-tb_void_t           tb_poller_sock_data_remove(tb_poller_t* poller, tb_socket_ref_t sock);
+tb_void_t           tb_sockdata_remove(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline implementation
  */
-static __tb_inline__ tb_cpointer_t tb_poller_sock_data(tb_poller_t* poller, tb_socket_ref_t sock)
+static __tb_inline__ tb_cpointer_t tb_sockdata_get(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock)
 {
     // check
     tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(poller && poller->data);
+    tb_assert(sockdata && sockdata->data);
     tb_assert(fd > 0 && fd < TB_MAXS32);
 
     // get the socket private data
-    return fd < poller->maxn? poller->data[fd] : tb_null;
+    return fd < sockdata->maxn? sockdata->data[fd] : tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

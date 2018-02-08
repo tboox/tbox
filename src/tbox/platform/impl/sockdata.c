@@ -19,90 +19,90 @@
  * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        poller.c
+ * @file        sockdata.c
  * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "poller.h"
+#include "sockdata.h"
 #include "../../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_poller_sock_data_init(tb_poller_t* poller)
+tb_void_t tb_sockdata_init(tb_sockdata_ref_t sockdata)
 {
     // check
-    tb_assert(poller);
+    tb_assert(sockdata);
 
     // init it
-    poller->data = tb_null;
-    poller->maxn = 0;
+    sockdata->data = tb_null;
+    sockdata->maxn = 0;
 }
-tb_void_t tb_poller_sock_data_exit(tb_poller_t* poller)
+tb_void_t tb_sockdata_exit(tb_sockdata_ref_t sockdata)
 {
     // check
-    tb_assert(poller);
+    tb_assert(sockdata);
 
     // exit socket data
-    if (poller->data) tb_free(poller->data);
-    poller->data = tb_null;
-    poller->maxn = 0;
+    if (sockdata->data) tb_free(sockdata->data);
+    sockdata->data = tb_null;
+    sockdata->maxn = 0;
 }
-tb_void_t tb_poller_sock_data_clear(tb_poller_t* poller)
+tb_void_t tb_sockdata_clear(tb_sockdata_ref_t sockdata)
 {
     // check
-    tb_assert(poller);
+    tb_assert(sockdata);
 
     // clear data
-    if (poller->data) tb_memset(poller->data, 0, poller->maxn * sizeof(tb_cpointer_t));
+    if (sockdata->data) tb_memset(sockdata->data, 0, sockdata->maxn * sizeof(tb_cpointer_t));
 }
-tb_void_t tb_poller_sock_data_insert(tb_poller_t* poller, tb_socket_ref_t sock, tb_cpointer_t priv)
+tb_void_t tb_sockdata_insert(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, tb_cpointer_t priv)
 {
     // check
     tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(poller && fd > 0 && fd < TB_MAXS32);
+    tb_assert(sockdata && fd > 0 && fd < TB_MAXS32);
 
     // not null?
     if (priv)
     {
         // no data? init it first
         tb_size_t need = fd + 1;
-        if (!poller->data)
+        if (!sockdata->data)
         {
             // init data
-            poller->data = tb_nalloc0_type(need, tb_cpointer_t);
-            tb_assert_and_check_return(poller->data);
+            sockdata->data = tb_nalloc0_type(need, tb_cpointer_t);
+            tb_assert_and_check_return(sockdata->data);
 
             // init data size
-            poller->maxn = need;
+            sockdata->maxn = need;
         }
-        else if (need > poller->maxn)
+        else if (need > sockdata->maxn)
         {
             // grow data
-            poller->data = (tb_cpointer_t*)tb_ralloc(poller->data, need * sizeof(tb_cpointer_t));
-            tb_assert_and_check_return(poller->data);
+            sockdata->data = (tb_cpointer_t*)tb_ralloc(sockdata->data, need * sizeof(tb_cpointer_t));
+            tb_assert_and_check_return(sockdata->data);
 
             // init growed space
-            tb_memset(poller->data + poller->maxn, 0, (need - poller->maxn) * sizeof(tb_cpointer_t));
+            tb_memset(sockdata->data + sockdata->maxn, 0, (need - sockdata->maxn) * sizeof(tb_cpointer_t));
 
             // grow data size
-            poller->maxn = need;
+            sockdata->maxn = need;
         }
 
         // save the socket private data
-        poller->data[fd] = priv;
+        sockdata->data[fd] = priv;
     }
 }
-tb_void_t tb_poller_sock_data_remove(tb_poller_t* poller, tb_socket_ref_t sock)
+tb_void_t tb_sockdata_remove(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock)
 {
     // check
     tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(poller && poller->data);
+    tb_assert(sockdata && sockdata->data);
     tb_assert(fd > 0 && fd < TB_MAXS32);
 
     // remove the socket private data
-    if (fd < poller->maxn) poller->data[fd] = tb_null;
+    if (fd < sockdata->maxn) sockdata->data[fd] = tb_null;
 }
