@@ -30,6 +30,7 @@
  */
 #include "dns.h"
 #include "socket.h"
+#include "poller.h"
 #include "exception.h"
 #include "thread_local.h"
 #include "platform.h"

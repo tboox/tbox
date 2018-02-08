@@ -53,6 +53,9 @@
 // the kqueue poller type
 typedef struct __tb_poller_kqueue_t
 {
+    // the poller base
+    tb_poller_t             base;
+
     // the maxn
     tb_size_t               maxn;
 
@@ -70,13 +73,7 @@ typedef struct __tb_poller_kqueue_t
 
     // the events count
     tb_size_t               events_count;
-    
-    // the events hash (socket => events)
-    tb_size_t*              hash;
-
-    // the events hash size
-    tb_size_t               hash_size;
-    
+   
 }tb_poller_kqueue_t, *tb_poller_kqueue_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -122,70 +119,6 @@ static tb_bool_t tb_poller_change(tb_poller_kqueue_ref_t poller, struct kevent* 
     // ok
     return tb_true;
 }
-static tb_void_t tb_poller_hash_set(tb_poller_kqueue_ref_t poller, tb_socket_ref_t sock, tb_size_t events)
-{
-    // check
-    tb_assert(poller && sock);
-
-    // the socket fd
-    tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(fd > 0 && fd < TB_MAXS32);
-
-    // not empty events?
-    if (events)
-    {
-        // no hash? init it first
-        tb_size_t need = fd + 1;
-        if (!poller->hash)
-        {
-            // init hash
-            poller->hash = tb_nalloc0_type(need, tb_size_t);
-            tb_assert_and_check_return(poller->hash);
-
-            // init hash size
-            poller->hash_size = need;
-        }
-        else if (need > poller->hash_size)
-        {
-            // grow hash
-            poller->hash = (tb_size_t*)tb_ralloc(poller->hash, need * sizeof(tb_size_t));
-            tb_assert_and_check_return(poller->hash);
-
-            // init growed space
-            tb_memset(poller->hash + poller->hash_size, 0, (need - poller->hash_size) * sizeof(tb_size_t));
-
-            // grow hash size
-            poller->hash_size = need;
-        }
-
-        // save events
-        poller->hash[fd] = events;
-    }
-}
-static __tb_inline__ tb_size_t tb_poller_hash_get(tb_poller_kqueue_ref_t poller, tb_socket_ref_t sock)
-{
-    // check
-    tb_assert(poller && poller->hash && sock);
-
-    // the socket fd
-    tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(fd > 0 && fd < TB_MAXS32);
-
-    // get the user private data
-    return fd < poller->hash_size? poller->hash[fd] : 0;
-}
-static __tb_inline__ tb_void_t tb_poller_hash_del(tb_poller_kqueue_ref_t poller, tb_socket_ref_t sock)
-{
-    // check
-    tb_assert(poller && poller->hash && sock);
-
-    // the socket fd
-    tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(fd > 0 && fd < TB_MAXS32);
-
-    // remove the user private data
-    if (fd < poller->hash_size) poller->hash[fd] = 0;
-}
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -201,6 +134,9 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         // make poller
         poller = tb_malloc0_type(tb_poller_kqueue_t);
         tb_assert_and_check_break(poller);
+
+        // init socket data
+        tb_poller_sock_data_init(&poller->base);
 
         // init kqueue
         poller->kqfd = kqueue();
@@ -247,11 +183,6 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     poller->pair[0] = tb_null;
     poller->pair[1] = tb_null;
 
-    // exit hash
-    if (poller->hash) tb_free(poller->hash);
-    poller->hash        = tb_null;
-    poller->hash_size   = 0;
-
     // exit events
     if (poller->events) tb_free(poller->events);
     poller->events = tb_null;
@@ -260,6 +191,9 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // close kqfd
     if (poller->kqfd > 0) close(poller->kqfd);
     poller->kqfd = 0;
+
+    // exit socket data
+    tb_poller_sock_data_exit(&poller->base);
 
     // free it
     tb_free(poller);
@@ -270,8 +204,8 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     tb_poller_kqueue_ref_t poller = (tb_poller_kqueue_ref_t)self;
     tb_assert_and_check_return(poller);
 
-    // clear hash
-    if (poller->hash) tb_memset(poller->hash, 0, poller->hash_size * sizeof(tb_size_t));
+    // clear socket data
+    tb_poller_sock_data_clear(&poller->base);
 
     // close the previous kqueue fd first
     if (poller->kqfd > 0) close(poller->kqfd);
@@ -343,7 +277,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
     
     // save events to socket
-    if (ok) tb_poller_hash_set(poller, sock, events);
+    if (ok) tb_poller_sock_data_insert(&poller->base, sock, (tb_cpointer_t)events);
 
     // ok?
     return ok;
@@ -355,7 +289,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     tb_assert_and_check_return_val(poller && poller->kqfd > 0 && sock, tb_false);
 
     // get the previous events
-    tb_size_t events = tb_poller_hash_get(poller, sock);
+    tb_size_t events = (tb_size_t)tb_poller_sock_data(&poller->base, sock);
 
     // remove this socket and events
     struct kevent   e[2];
@@ -376,7 +310,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
 
     // remove events from socket
-    if (ok) tb_poller_hash_del(poller, sock);
+    if (ok) tb_poller_sock_data_remove(&poller->base, sock);
 
     // ok?
     return ok;
@@ -388,7 +322,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_assert_and_check_return_val(poller && poller->kqfd > 0 && sock, tb_false);
 
     // get the previous events
-    tb_size_t events_old = tb_poller_hash_get(poller, sock);
+    tb_size_t events_old = (tb_size_t)tb_poller_sock_data(&poller->base, sock);
 
     // change
     tb_size_t adde = events & ~events_old;
@@ -428,7 +362,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
 
     // save events to socket
-    if (ok) tb_poller_hash_set(poller, sock, events);
+    if (ok) tb_poller_sock_data_insert(&poller->base, sock, (tb_cpointer_t)events);
 
     // ok?
     return ok;

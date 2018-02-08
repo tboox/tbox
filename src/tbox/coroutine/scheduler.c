@@ -42,7 +42,9 @@
  */
 
 // the self scheduler local 
+#ifndef __tb_thread_local__
 static tb_thread_local_t                        s_scheduler_self = TB_THREAD_LOCAL_INIT;
+#endif
 
 // the global scheduler for the exclusive mode
 #ifdef __tb_thread_local__

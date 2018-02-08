@@ -41,7 +41,6 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
         // no data? wait it
         else if (!real && !wait)
         {
-            tb_trace_i("wait ..");
             // wait it
             wait = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
             tb_assert_and_check_break(wait >= 0);

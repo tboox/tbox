@@ -107,7 +107,7 @@ static tb_void_t tb_poller_list_set(tb_poller_select_ref_t poller, tb_socket_ref
         // no list? init it first
         if (!poller->list)
         {
-            // init hash
+            // init list
             poller->list = tb_nalloc0_type(FD_SETSIZE, tb_poller_data_t);
             tb_assert_and_check_return(poller->list);
         }

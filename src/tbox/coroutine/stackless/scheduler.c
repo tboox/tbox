@@ -53,7 +53,7 @@
  * globals
  */
 
-#ifndef TB_CONFIG_MICRO_ENABLE
+#if !defined(TB_CONFIG_MICRO_ENABLE) && !defined(__tb_thread_local__)
 // the self scheduler local 
 static tb_thread_local_t                        s_scheduler_self = TB_THREAD_LOCAL_INIT;
 #endif
