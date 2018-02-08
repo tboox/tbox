@@ -8,8 +8,7 @@ target("tbox")
     add_defines("__tb_prefix__=\"tbox\"")
 
     -- set the auto-generated config.h
-    set_config_h("$(buildir)/tbox/tbox.config.h")
-    set_config_h_prefix("TB_CONFIG")
+    set_config_header("$(buildir)/tbox/tbox.config.h", {prefix = "TB_CONFIG"})
 
     -- set the object files directory
     set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
@@ -77,6 +76,7 @@ target("tbox")
     add_files("platform/socket.c") 
     add_files("platform/addrinfo.c") 
     add_files("platform/poller.c") 
+    add_files("platform/impl/sockdata.c") 
     add_files("platform/impl/platform.c") 
     add_files("container/iterator.c") 
     add_files("container/list_entry.c") 

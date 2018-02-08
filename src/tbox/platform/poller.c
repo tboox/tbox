@@ -33,7 +33,11 @@
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   include "posix/poller_select.c"
+#   ifdef TB_CONFIG_MICRO_ENABLE
+#       include "posix/poller_select.c"
+#   else
+#       include "posix/poller_select.c"
+#   endif
 #elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
     && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
 #   include "linux/poller_epoll.c"

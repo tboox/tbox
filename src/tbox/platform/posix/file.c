@@ -93,10 +93,12 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     tb_long_t fd = open(path, flags, modes);
     if (fd < 0 && (mode & TB_FILE_MODE_CREAT))
     {
+#ifndef TB_CONFIG_MICRO_ENABLE
         // open it again after creating the file directory
         tb_char_t dir[TB_PATH_MAXN];
         if (tb_directory_create(tb_path_directory(path, dir, sizeof(dir))))
             fd = open(path, flags, modes);
+#endif
     }
  
     // trace
