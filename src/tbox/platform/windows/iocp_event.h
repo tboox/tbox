@@ -253,6 +253,28 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_event_t
  * interfaces
  */
 
+/* init an iocp event from the given socket in local thread
+ *
+ * @param sock              the socket 
+ *
+ * @return                  the iocp event
+ */
+tb_iocp_event_ref_t         tb_iocp_event_init(tb_socket_ref_t sock);
+
+/* exit iocp event for the given socket in local thread
+ *
+ * @param sock              the socket 
+ */
+tb_void_t                   tb_iocp_event_exit(tb_socket_ref_t sock);
+
+/* get iocp event from the given socket in local thread
+ *
+ * @param sock              the socket 
+ *
+ * @return                  the iocp event
+ */
+tb_iocp_event_ref_t         tb_iocp_event_get(tb_socket_ref_t sock);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
