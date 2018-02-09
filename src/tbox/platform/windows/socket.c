@@ -29,6 +29,7 @@
 #include "prefix.h"
 #include "../socket.h"
 #include "interface/interface.h"
+#include "iocp_event.h"
 #include "socket_pool.h"
 #include "../posix/sockaddr.h"
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE

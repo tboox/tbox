@@ -19,46 +19,18 @@
  * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        sockdata_iocp.h
+ * @file        iocp_event.c
  * @ingroup     platform
- *
  */
-#ifndef TB_PLATFORM_WINDOWS_SOCKDATA_IOCP_H
-#define TB_PLATFORM_WINDOWS_SOCKDATA_IOCP_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../sockdata.h"
+#include "iocp_event.h"
+#include "../../libc/libc.h"
+#include "../impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_enter__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
+ * implementation
  */
 
-// the iocp socket data type
-typedef struct __tb_sockdata_iocp_t
-{
-    // the socket data (sock => priv)
-    tb_cpointer_t*          data;
-
-    // the socket data maximum count
-    tb_size_t               maxn;
-    
-}tb_sockdata_iocp_t, *tb_sockdata_iocp_ref_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
-
-#endif

@@ -138,8 +138,8 @@ target("tbox")
 
     -- add the source for the windows 
     if is_os("windows") then
+        add_files("platform/windows/iocp_event.c")
         add_files("platform/windows/socket_pool.c")
-        add_files("platform/windows/sockdata_iocp.c")
         add_files("platform/windows/interface/*.c")
     end
 
