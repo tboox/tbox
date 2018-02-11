@@ -56,6 +56,9 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
             object = tb_malloc0_type(tb_iocp_object_t);
             tb_assert_and_check_break(object);
 
+            // save socket
+            object->sock = sock;
+
             // save object
             tb_sockdata_insert(sockdata, sock, (tb_cpointer_t)object);
         }

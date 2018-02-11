@@ -241,6 +241,9 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     // the overlapped data
     OVERLAPPED                      olap;
 
+    // the socket
+    tb_socket_ref_t                 sock;
+
     // the user private data
     tb_cpointer_t                   priv;
 
