@@ -101,11 +101,10 @@ static __tb_inline__ tb_cpointer_t tb_sockdata_get(tb_sockdata_ref_t sockdata, t
 {
     // check
     tb_long_t fd = tb_sock2fd(sock);
-    tb_assert(sockdata && sockdata->data);
-    tb_assert(fd > 0 && fd < TB_MAXS32);
+    tb_assert(sockdata && fd > 0 && fd < TB_MAXS32);
 
     // get the socket private data
-    return fd < sockdata->maxn? sockdata->data[fd] : tb_null;
+    return (sockdata->data && fd < sockdata->maxn)? sockdata->data[fd] : tb_null;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -19,81 +19,74 @@
  * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        iocp_event.c
+ * @file        iocp_object.c
  * @ingroup     platform
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "iocp_event.h"
+#include "iocp_object.h"
 #include "../../libc/libc.h"
 #include "../impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
- */
-static tb_void_t tb_iocp_event_clear(tb_iocp_event_ref_t event)
-{
-    // TODO
-}
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_iocp_event_ref_t tb_iocp_event_init(tb_socket_ref_t sock)
+tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
 
-    // get or new event 
-    tb_bool_t ok = tb_false;
-    tb_iocp_event_ref_t event = tb_null;
+    // get or new object 
+    tb_iocp_object_ref_t object = tb_null;
     do
     { 
         // get the local socket data
         tb_sockdata_ref_t sockdata = tb_sockdata();
         tb_assert_and_check_break(sockdata);
 
-        // attempt to get event first if exists
-        event = (tb_iocp_event_ref_t)tb_sockdata_get(sockdata, sock);
+        // attempt to get object first if exists
+        object = (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock);
 
-        // clear the previous data if exists
-        if (event) tb_iocp_event_clear(event);
-        else
+        // new an object if not exists
+        if (!object) 
         {
-            // make event
-            event = tb_malloc0_type(tb_iocp_event_t);
-            tb_assert_and_check_break(event);
+            // make object
+            object = tb_malloc0_type(tb_iocp_object_t);
+            tb_assert_and_check_break(object);
 
-            // save event
-            tb_sockdata_insert(sockdata, sock, (tb_cpointer_t)event);
+            // save object
+            tb_sockdata_insert(sockdata, sock, (tb_cpointer_t)object);
         }
-
-        // ok
-        ok = tb_true;
 
     } while (0);
 
     // done
-    return event;
+    return object;
 }
-tb_void_t tb_iocp_event_exit(tb_socket_ref_t sock)
+tb_iocp_object_ref_t tb_iocp_object_get(tb_socket_ref_t sock)
 {
-    tb_iocp_event_ref_t event = tb_iocp_event_get(sock);
-    if (event)
+    return (tb_iocp_object_ref_t)tb_sockdata_get(tb_sockdata(), sock);
+}
+tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
+{
+    tb_iocp_object_ref_t object = tb_iocp_object_get(sock);
+    if (object)
     {
-        // remove this event from the local socket data
+        // remove this object from the local socket data
         tb_sockdata_remove(tb_sockdata(), sock);
 
-        // clear and free the event data
-        tb_iocp_event_clear(event);
+        // clear and free the object data
+        tb_iocp_object_clear(object);
 
-        // free event
-        tb_free(event);
+        // free object
+        tb_free(object);
     }
 }
-tb_iocp_event_ref_t tb_iocp_event_get(tb_socket_ref_t sock)
+tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
 {
-    return (tb_iocp_event_ref_t)tb_sockdata_get(tb_sockdata(), sock);
+    // clear object code and state
+    object->code  = TB_IOCP_OBJECT_CODE_NONE;
+    object->state = TB_IOCP_OBJECT_STATE_NONE;
 }

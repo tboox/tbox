@@ -103,6 +103,9 @@ typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(LPWCH lpszEnvironm
 // the SetHandleInformation func type
 typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(HANDLE hObject, DWORD dwMask, DWORD dwFlags);
 
+// the CreateIoCompletionPort func type
+typedef HANDLE (WINAPI* tb_kernel32_CreateIoCompletionPort_t)(HANDLE FileHandle, HANDLE ExistingCompletionPort, ULONG_PTR CompletionKey, DWORD NumberOfConcurrentThreads);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -114,6 +117,9 @@ typedef struct __tb_kernel32_t
 
     // GetFileSizeEx
     tb_kernel32_GetFileSizeEx_t                 GetFileSizeEx;
+
+    // CreateIoCompletionPort
+    tb_kernel32_CreateIoCompletionPort_t        CreateIoCompletionPort;
 
     // GetQueuedCompletionStatusEx
     tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;

@@ -20,7 +20,6 @@
  *
  * @author      ruki
  * @file        socket.c
- *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +28,7 @@
 #include "prefix.h"
 #include "../socket.h"
 #include "interface/interface.h"
-#include "iocp_event.h"
+#include "iocp_object.h"
 #include "socket_pool.h"
 #include "../posix/sockaddr.h"
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
@@ -422,6 +421,16 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     tb_assert_and_check_return_val(sock && addr, -1);
     tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
+    // attempt to get connection object from the iocp looper, @note only init object once in every thread
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object && object->code == TB_IOCP_OBJECT_CODE_CONN && object->state == TB_IOCP_OBJECT_STATE_FINISHED)
+    {
+        // @note conn.addr and conn.result cannot be cleared
+        tb_iocp_object_clear(object);
+        if (tb_ipaddr_is_equal(&object->u.conn.addr, addr))
+            return object->u.conn.result;
+    }
+
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
@@ -440,7 +449,19 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     if (e == WSAEISCONN) return 1;
 
     // continue?
-    if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS) return 0;
+    if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS) 
+    {
+        // save connection object for waiting it in iocp
+        if (object)
+        {
+            tb_iocp_object_clear(object);
+            object->code          = TB_IOCP_OBJECT_CODE_CONN;
+            object->state         = TB_IOCP_OBJECT_STATE_PENDING;
+            object->u.conn.addr   = *addr;
+            object->u.conn.result = 0;
+        }
+        return 0;
+    }
 
     // error
     return -1;
@@ -610,6 +631,9 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
         // trace
         tb_trace_e("clos: %p failed, errno: %d", sock, GetLastError());
     }
+
+    // remove iocp object for this socket if exists
+    tb_iocp_object_remove(sock);
 
     // ok?
     return ok;

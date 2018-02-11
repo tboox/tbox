@@ -19,12 +19,12 @@
  * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        iocp_event.h
+ * @file        iocp_object.h
  * @ingroup     platform
  *
  */
-#ifndef TB_PLATFORM_WINDOWS_IOCP_EVENT_H
-#define TB_PLATFORM_WINDOWS_IOCP_EVENT_H
+#ifndef TB_PLATFORM_WINDOWS_IOCP_OBJECT_H
+#define TB_PLATFORM_WINDOWS_IOCP_OBJECT_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -40,45 +40,56 @@ __tb_extern_c_enter__
  * types
  */
 
-// the iocp event code enum
-typedef enum __tb_iocp_event_code_e
+// the iocp object code enum
+typedef enum __tb_iocp_object_code_e
 {
-    TB_IOCP_EVENT_CODE_NONE   = 0
+    TB_IOCP_OBJECT_CODE_NONE   = 0
+,   TB_IOCP_OBJECT_CODE_ACPT   = 1       //!< accept it
+,   TB_IOCP_OBJECT_CODE_CONN   = 2       //!< connect to the host address
+,   TB_IOCP_OBJECT_CODE_RECV   = 3       //!< recv data for tcp
+,   TB_IOCP_OBJECT_CODE_SEND   = 4       //!< send data for tcp
+,   TB_IOCP_OBJECT_CODE_URECV  = 5       //!< recv data for udp
+,   TB_IOCP_OBJECT_CODE_USEND  = 6       //!< send data for udp
+,   TB_IOCP_OBJECT_CODE_RECVV  = 7       //!< recv iovec data for tcp
+,   TB_IOCP_OBJECT_CODE_SENDV  = 8       //!< send iovec data for tcp
+,   TB_IOCP_OBJECT_CODE_URECVV = 9       //!< recv iovec data for udp
+,   TB_IOCP_OBJECT_CODE_USENDV = 10      //!< send iovec data for udp
+,   TB_IOCP_OBJECT_CODE_SENDF  = 11      //!< maybe return TB_STATE_NOT_SUPPORTED
 
-,   TB_IOCP_EVENT_CODE_ACPT   = 1     //!< accept it
-,   TB_IOCP_EVENT_CODE_CONN   = 2     //!< connect to the host address
-,   TB_IOCP_EVENT_CODE_RECV   = 3     //!< recv data for tcp
-,   TB_IOCP_EVENT_CODE_SEND   = 4     //!< send data for tcp
-,   TB_IOCP_EVENT_CODE_URECV  = 5     //!< recv data for udp
-,   TB_IOCP_EVENT_CODE_USEND  = 6     //!< send data for udp
-,   TB_IOCP_EVENT_CODE_RECVV  = 7     //!< recv iovec data for tcp
-,   TB_IOCP_EVENT_CODE_SENDV  = 8     //!< send iovec data for tcp
-,   TB_IOCP_EVENT_CODE_URECVV = 9     //!< recv iovec data for udp
-,   TB_IOCP_EVENT_CODE_USENDV = 10    //!< send iovec data for udp
-,   TB_IOCP_EVENT_CODE_SENDF  = 11    //!< maybe return TB_STATE_NOT_SUPPORTED
+,   TB_IOCP_OBJECT_CODE_MAXN   = 12
 
-,   TB_IOCP_EVENT_CODE_MAXN   = 12
+}tb_iocp_object_code_e;
 
-}tb_iocp_event_code_e;
+// the iocp object state enum
+typedef enum __tb_iocp_object_state_e
+{
+    TB_IOCP_OBJECT_STATE_NONE        = 0
+,   TB_IOCP_OBJECT_STATE_PENDING     = 1 //!< pending, need wait it in poller
+,   TB_IOCP_OBJECT_STATE_FINISHED    = 2 //!< finish waiting and we can get results
 
-// the accept iocp event type
-typedef struct __tb_iocp_event_acpt_t
+} tb_iocp_object_state_t;
+
+// the accept iocp object type
+typedef struct __tb_iocp_object_acpt_t
 {
     // the client address
     tb_ipaddr_t                     addr;
     
-}tb_iocp_event_acpt_t;
+}tb_iocp_object_acpt_t;
 
-// the connection iocp event type
-typedef struct __tb_iocp_event_conn_t
+// the connection iocp object type
+typedef struct __tb_iocp_object_conn_t
 {
     // the connected address
     tb_ipaddr_t                     addr;
 
-}tb_iocp_event_conn_t;
+    // connect result?
+    tb_long_t                       result;
 
-// the recv iocp event type, base: tb_iovec_t
-typedef struct __tb_iocp_event_recv_t
+}tb_iocp_object_conn_t;
+
+// the recv iocp object type, base: tb_iovec_t
+typedef struct __tb_iocp_object_recv_t
 {
     // the data size for (tb_iovec_t*)->size
     tb_iovec_size_t                 size;
@@ -89,10 +100,10 @@ typedef struct __tb_iocp_event_recv_t
     // the data real
     tb_size_t                       real;
 
-}tb_iocp_event_recv_t;
+}tb_iocp_object_recv_t;
 
-// the send iocp event type, base: tb_iovec_t
-typedef struct __tb_iocp_event_send_t
+// the send iocp object type, base: tb_iovec_t
+typedef struct __tb_iocp_object_send_t
 {
     // the data size for (tb_iovec_t*)->size
     tb_iovec_size_t                 size;
@@ -103,10 +114,10 @@ typedef struct __tb_iocp_event_send_t
     // the data real
     tb_size_t                       real;
 
-}tb_iocp_event_send_t;
+}tb_iocp_object_send_t;
 
-// the urecv iocp event type, base: tb_iovec_t
-typedef struct __tb_iocp_event_urecv_t
+// the urecv iocp object type, base: tb_iovec_t
+typedef struct __tb_iocp_object_urecv_t
 {
     // the data size for (tb_iovec_t*)->size
     tb_iovec_size_t                 size;
@@ -120,10 +131,10 @@ typedef struct __tb_iocp_event_urecv_t
     // the addr
     tb_ipaddr_t                     addr;
 
-}tb_iocp_event_urecv_t;
+}tb_iocp_object_urecv_t;
 
-// the usend iocp event type, base: tb_iovec_t
-typedef struct __tb_iocp_event_usend_t
+// the usend iocp object type, base: tb_iovec_t
+typedef struct __tb_iocp_object_usend_t
 {
     // the data size for (tb_iovec_t*)->size
     tb_iovec_size_t                 size;
@@ -137,10 +148,10 @@ typedef struct __tb_iocp_event_usend_t
     // the peer addr
     tb_ipaddr_t                     addr;
 
-}tb_iocp_event_usend_t;
+}tb_iocp_object_usend_t;
 
-// the recvv iocp event type
-typedef struct __tb_iocp_event_recvv_t
+// the recvv iocp object type
+typedef struct __tb_iocp_object_recvv_t
 {
     // the recv list
     tb_iovec_t const*               list;
@@ -151,10 +162,10 @@ typedef struct __tb_iocp_event_recvv_t
     // the data real
     tb_size_t                       real;
 
-}tb_iocp_event_recvv_t;
+}tb_iocp_object_recvv_t;
 
-// the sendv iocp event type
-typedef struct __tb_iocp_event_sendv_t
+// the sendv iocp object type
+typedef struct __tb_iocp_object_sendv_t
 {
     // the send list
     tb_iovec_t const*               list;
@@ -165,10 +176,10 @@ typedef struct __tb_iocp_event_sendv_t
     // the data real
     tb_size_t                       real;
 
-}tb_iocp_event_sendv_t;
+}tb_iocp_object_sendv_t;
 
-// the urecvv iocp event type
-typedef struct __tb_iocp_event_urecvv_t
+// the urecvv iocp object type
+typedef struct __tb_iocp_object_urecvv_t
 {
     // the recv list
     tb_iovec_t const*               list;
@@ -182,10 +193,10 @@ typedef struct __tb_iocp_event_urecvv_t
     // the peer addr
     tb_ipaddr_t                     addr;
 
-}tb_iocp_event_urecvv_t;
+}tb_iocp_object_urecvv_t;
 
-// the usendv iocp event type
-typedef struct __tb_iocp_event_usendv_t
+// the usendv iocp object type
+typedef struct __tb_iocp_object_usendv_t
 {
     // the send list
     tb_iovec_t const*               list;
@@ -199,10 +210,10 @@ typedef struct __tb_iocp_event_usendv_t
     // the addr
     tb_ipaddr_t                     addr;
 
-}tb_iocp_event_usendv_t;
+}tb_iocp_object_usendv_t;
 
-// the sendfile iocp event type
-typedef struct __tb_iocp_event_sendf_t
+// the sendfile iocp object type
+typedef struct __tb_iocp_object_sendf_t
 {
     // the file
     tb_file_ref_t                   file;
@@ -216,64 +227,78 @@ typedef struct __tb_iocp_event_sendf_t
     // the seek
     tb_hize_t                       seek;
 
-}tb_iocp_event_sendf_t;
+}tb_iocp_object_sendf_t;
 
-// the iocp event type
-typedef __tb_cpu_aligned__ struct __tb_iocp_event_t
+// the iocp object type
+typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
 {
-    // the event code
+    // the object code
     tb_uint8_t                      code;
+
+    // the object state
+    tb_uint8_t                      state;
 
     // the overlapped data
     OVERLAPPED                      olap;
 
-    /* the events 
+    // the user private data
+    tb_cpointer_t                   priv;
+
+    /* the objects 
      *
      * tb_iovec_t must be aligned by cpu-bytes for WSABUF
      */
     __tb_cpu_aligned__ union
     {
-        tb_iocp_event_acpt_t        acpt;
-        tb_iocp_event_conn_t        conn;
-        tb_iocp_event_recv_t        recv;
-        tb_iocp_event_send_t        send;
-        tb_iocp_event_urecv_t       urecv;
-        tb_iocp_event_usend_t       usend;
-        tb_iocp_event_recvv_t       recvv;
-        tb_iocp_event_sendv_t       sendv;
-        tb_iocp_event_urecvv_t      urecvv;
-        tb_iocp_event_usendv_t      usendv;
-        tb_iocp_event_sendf_t       sendf;
+        tb_iocp_object_acpt_t        acpt;
+        tb_iocp_object_conn_t        conn;
+        tb_iocp_object_recv_t        recv;
+        tb_iocp_object_send_t        send;
+        tb_iocp_object_urecv_t       urecv;
+        tb_iocp_object_usend_t       usend;
+        tb_iocp_object_recvv_t       recvv;
+        tb_iocp_object_sendv_t       sendv;
+        tb_iocp_object_urecvv_t      urecvv;
+        tb_iocp_object_usendv_t      usendv;
+        tb_iocp_object_sendf_t       sendf;
 
     } u;
 
-}tb_iocp_event_t, *tb_iocp_event_ref_t;
+}tb_iocp_object_t, *tb_iocp_object_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/* init an iocp event from the given socket in local thread
+/* get or new an iocp object from the given socket in local thread
+ *
+ * @note only init object once in every thread
  *
  * @param sock              the socket 
  *
- * @return                  the iocp event
+ * @return                  the iocp object
  */
-tb_iocp_event_ref_t         tb_iocp_event_init(tb_socket_ref_t sock);
+tb_iocp_object_ref_t         tb_iocp_object_get_or_new(tb_socket_ref_t sock);
 
-/* exit iocp event for the given socket in local thread
+/* get iocp object from the given socket in local thread
  *
  * @param sock              the socket 
+ *
+ * @return                  the iocp object
  */
-tb_void_t                   tb_iocp_event_exit(tb_socket_ref_t sock);
+tb_iocp_object_ref_t         tb_iocp_object_get(tb_socket_ref_t sock);
 
-/* get iocp event from the given socket in local thread
+/* remove iocp object for the given socket in local thread
  *
  * @param sock              the socket 
- *
- * @return                  the iocp event
  */
-tb_iocp_event_ref_t         tb_iocp_event_get(tb_socket_ref_t sock);
+tb_void_t                   tb_iocp_object_remove(tb_socket_ref_t sock);
+
+/* clear iocp object for the given socket in local thread
+ *
+ * @param object             the object 
+ */
+tb_void_t                   tb_iocp_object_clear(tb_iocp_object_ref_t object);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
