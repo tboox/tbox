@@ -73,9 +73,6 @@ typedef BOOL (WINAPI* tb_kernel32_SetEnvironmentVariableW_t)(LPCWSTR lpName, LPC
 // the CreateProcessW func type
 typedef BOOL (WINAPI* tb_kernel32_CreateProcessW_t)(LPCWSTR lpApplicationName, LPCWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFO lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 
-// the CloseHandle func type
-typedef BOOL (WINAPI* tb_kernel32_CloseHandle_t)(HANDLE hObject);
-
 // the WaitForSingleObject func type
 typedef DWORD (WINAPI* tb_kernel32_WaitForSingleObject_t)(HANDLE hHandle, DWORD dwMilliseconds);
 
@@ -103,23 +100,14 @@ typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(LPWCH lpszEnvironm
 // the SetHandleInformation func type
 typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(HANDLE hObject, DWORD dwMask, DWORD dwFlags);
 
-// the CreateIoCompletionPort func type
-typedef HANDLE (WINAPI* tb_kernel32_CreateIoCompletionPort_t)(HANDLE FileHandle, HANDLE ExistingCompletionPort, ULONG_PTR CompletionKey, DWORD NumberOfConcurrentThreads);
-
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
-    // CancelIoEx
-//    tb_kernel32_CancelIoEx_t                    CancelIoEx;
-
     // CaptureStackBackTrace
     tb_kernel32_RtlCaptureStackBackTrace_t      RtlCaptureStackBackTrace;
 
     // GetFileSizeEx
     tb_kernel32_GetFileSizeEx_t                 GetFileSizeEx;
-
-    // CreateIoCompletionPort
-    tb_kernel32_CreateIoCompletionPort_t        CreateIoCompletionPort;
 
     // GetQueuedCompletionStatusEx
     tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
@@ -135,9 +123,6 @@ typedef struct __tb_kernel32_t
 
     // CreateProcessW
     tb_kernel32_CreateProcessW_t                CreateProcessW;
-
-    // CloseHandle
-    tb_kernel32_CloseHandle_t                   CloseHandle;
 
     // WaitForSingleObject
     tb_kernel32_WaitForSingleObject_t           WaitForSingleObject;

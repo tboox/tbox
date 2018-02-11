@@ -54,9 +54,6 @@ typedef struct __tb_iocp_func_t
     // the GetAcceptExSockaddrs func
     tb_mswsock_GetAcceptExSockaddrs_t           GetAcceptExSockaddrs;
 
-    // the CreateIoCompletionPort func
-    tb_kernel32_CreateIoCompletionPort_t        CreateIoCompletionPort;
- 
     // the GetQueuedCompletionStatusEx func
     tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
  
@@ -214,7 +211,6 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         poller->func.DisconnectEx                = tb_mswsock()->DisconnectEx;
         poller->func.TransmitFile                = tb_mswsock()->TransmitFile;
         poller->func.GetAcceptExSockaddrs        = tb_mswsock()->GetAcceptExSockaddrs;
-        poller->func.CreateIoCompletionPort      = tb_kernel32()->CreateIoCompletionPort;
         poller->func.GetQueuedCompletionStatusEx = tb_kernel32()->GetQueuedCompletionStatusEx;
         poller->func.WSAGetLastError             = tb_ws2_32()->WSAGetLastError;
         poller->func.WSASend                     = tb_ws2_32()->WSASend;
@@ -222,7 +218,6 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         poller->func.WSASendTo                   = tb_ws2_32()->WSASendTo;
         poller->func.WSARecvFrom                 = tb_ws2_32()->WSARecvFrom;
         poller->func.bind                        = tb_ws2_32()->bind;
-        tb_assert_and_check_break(poller->func.CreateIoCompletionPort);
         tb_assert_and_check_break(poller->func.AcceptEx);
         tb_assert_and_check_break(poller->func.ConnectEx);
         tb_assert_and_check_break(poller->func.WSAGetLastError);
@@ -233,7 +228,7 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         tb_assert_and_check_break(poller->func.bind);
 
         // init port
-        poller->port = poller->func.CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);
+        poller->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);
         tb_assert_and_check_break(poller->port && poller->port != INVALID_HANDLE_VALUE);
 
         // ok
@@ -324,7 +319,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     object->priv = priv;
 
     // bind this socket and object to port
-    HANDLE port = poller->func.CreateIoCompletionPort((HANDLE)tb_sock2fd(sock), poller->port, (ULONG_PTR)object, 0);
+    HANDLE port = CreateIoCompletionPort((HANDLE)tb_sock2fd(sock), poller->port, (ULONG_PTR)object, 0);
     if (port != poller->port)
     {
         // trace
