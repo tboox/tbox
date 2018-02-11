@@ -27,6 +27,7 @@
  */
 #include "prefix.h"
 #include "iocp_object.h"
+#include "../posix/sockaddr.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
 #include "interface/interface.h"
@@ -96,10 +97,98 @@ typedef struct __tb_poller_iocp_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_bool_t tb_poller_iocp_insert_event_conn(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object)
+{
+    // check
+    tb_assert_and_check_return_val(object && object->code == TB_IOCP_OBJECT_CODE_CONN && object->state == TB_IOCP_OBJECT_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("insert connection event for socket(%p): %{ipaddr}: ..", sock, &object->u.conn.addr);
+
+    // post a connection event 
+    tb_bool_t ok = tb_false;
+    tb_bool_t init_ok = tb_false;
+    tb_bool_t ConnectEx_ok = tb_false;
+    do
+    {
+        // init olap
+        tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
+
+        // load local address
+        tb_size_t               laddr_size = 0;
+        struct sockaddr_storage laddr_data = {0};
+        tb_ipaddr_t             laddr;
+        if (!tb_ipaddr_set(&laddr, tb_null, 0, (tb_uint8_t)tb_ipaddr_family(&object->u.conn.addr))) break;
+        if (!(laddr_size = tb_sockaddr_load(&laddr_data, &laddr))) break;
+
+        // bind it first for ConnectEx
+        if (SOCKET_ERROR == poller->func.bind((SOCKET)tb_sock2fd(sock), (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size)) 
+        {
+            // trace
+            tb_trace_e("connect[%p]: bind failed, error: %u", sock, GetLastError());
+            break;
+        }
+        init_ok = tb_true;
+
+        // load client address
+        tb_size_t               caddr_size = 0;
+        struct sockaddr_storage caddr_data = {0};
+        if (!(caddr_size = tb_sockaddr_load(&caddr_data, &object->u.conn.addr))) break;
+
+        // do ConnectEx
+        DWORD real = 0;
+        ConnectEx_ok = poller->func.ConnectEx(  (SOCKET)tb_sock2fd(sock)
+                                            ,   (struct sockaddr const*)&caddr_data
+                                            ,   (tb_int_t)caddr_size
+                                            ,   tb_null
+                                            ,   0
+                                            ,   &real
+                                            ,   (LPOVERLAPPED)&object->olap)? tb_true : tb_false;
+        tb_trace_d("connect[%p]: ConnectEx: %d, error: %d", sock, ConnectEx_ok, poller->func.WSAGetLastError());
+        tb_check_break(ConnectEx_ok);
+
+        // connected, post result directly
+        object->state = TB_IOCP_OBJECT_STATE_FINISHED;
+        object->u.conn.result = 1;
+        if (!PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) break;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // ConnectEx failed?
+    if (init_ok && !ConnectEx_ok)
+    {
+        // pending? continue it
+        if (WSA_IO_PENDING == poller->func.WSAGetLastError()) 
+            ok = tb_true;
+        // failed?
+        else
+        {
+            // connect failed
+            object->state = TB_IOCP_OBJECT_STATE_FINISHED;
+            object->u.conn.result = -1;
+            if (PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) ok = tb_true;
+
+            // trace
+            tb_trace_d("connect[%p]: ConnectEx: unknown error: %d", sock, poller->func.WSAGetLastError());
+        }
+    }
+
+    // ok?
+    return ok;
+}
 static tb_bool_t tb_poller_iocp_insert_events(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
-    tb_trace_d("insert events");
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(events, tb_false);
+
+    // insert connection event
+    if (events & TB_POLLER_EVENT_CONN && !tb_poller_iocp_insert_event_conn(poller, sock, object)) return tb_false;
+
+    // ok
+    return tb_true;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
