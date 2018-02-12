@@ -144,10 +144,10 @@ tb_bool_t           tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2]);
  */
 tb_bool_t           tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...);
 
-/*! connect socket
+/*! connect the given client address
  *
  * @param sock      the socket 
- * @param addr      the address
+ * @param addr      the client address
  *
  * @return          ok: 1, continue: 0; failed: -1
  */

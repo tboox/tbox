@@ -232,12 +232,6 @@ typedef struct __tb_iocp_object_sendf_t
 // the iocp object type
 typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
 {
-    // the object code
-    tb_uint8_t                      code;
-
-    // the object state
-    tb_uint8_t                      state;
-
     // the overlapped data
     OVERLAPPED                      olap;
 
@@ -253,19 +247,25 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
      */
     __tb_cpu_aligned__ union
     {
-        tb_iocp_object_acpt_t        acpt;
-        tb_iocp_object_conn_t        conn;
-        tb_iocp_object_recv_t        recv;
-        tb_iocp_object_send_t        send;
-        tb_iocp_object_urecv_t       urecv;
-        tb_iocp_object_usend_t       usend;
-        tb_iocp_object_recvv_t       recvv;
-        tb_iocp_object_sendv_t       sendv;
-        tb_iocp_object_urecvv_t      urecvv;
-        tb_iocp_object_usendv_t      usendv;
-        tb_iocp_object_sendf_t       sendf;
+        tb_iocp_object_acpt_t       acpt;
+        tb_iocp_object_conn_t       conn;
+        tb_iocp_object_recv_t       recv;
+        tb_iocp_object_send_t       send;
+        tb_iocp_object_urecv_t      urecv;
+        tb_iocp_object_usend_t      usend;
+        tb_iocp_object_recvv_t      recvv;
+        tb_iocp_object_sendv_t      sendv;
+        tb_iocp_object_urecvv_t     urecvv;
+        tb_iocp_object_usendv_t     usendv;
+        tb_iocp_object_sendf_t      sendf;
 
     } u;
+
+    // the object code
+    tb_uint8_t                      code;
+
+    // the object state
+    tb_uint8_t                      state;
 
 }tb_iocp_object_t, *tb_iocp_object_ref_t;
 
@@ -297,11 +297,14 @@ tb_iocp_object_ref_t         tb_iocp_object_get(tb_socket_ref_t sock);
  */
 tb_void_t                   tb_iocp_object_remove(tb_socket_ref_t sock);
 
-/* clear iocp object for the given socket in local thread
+/* connect the given client address
  *
- * @param object             the object 
+ * @param object            the iocp object 
+ * @param addr              the client address
+ *
+ * @return                  ok: 1, continue: 0; failed: -1
  */
-tb_void_t                   tb_iocp_object_clear(tb_iocp_object_ref_t object);
+tb_long_t                   tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

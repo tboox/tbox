@@ -111,6 +111,11 @@ static tb_bool_t tb_poller_iocp_event_insert_conn(tb_poller_iocp_ref_t poller, t
         // init olap
         tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
 
+        // load client address
+        tb_size_t               caddr_size = 0;
+        struct sockaddr_storage caddr_data = {0};
+        if (!(caddr_size = tb_sockaddr_load(&caddr_data, &object->u.conn.addr))) break;
+
         // load local address
         tb_size_t               laddr_size = 0;
         struct sockaddr_storage laddr_data = {0};
@@ -127,12 +132,10 @@ static tb_bool_t tb_poller_iocp_event_insert_conn(tb_poller_iocp_ref_t poller, t
         }
         init_ok = tb_true;
 
-        // load client address
-        tb_size_t               caddr_size = 0;
-        struct sockaddr_storage caddr_data = {0};
-        if (!(caddr_size = tb_sockaddr_load(&caddr_data, &object->u.conn.addr))) break;
-
-        // do ConnectEx
+        /* do ConnectEx
+         *
+         * @note this socket have been bound to local address in tb_socket_connect()
+         */
         DWORD real = 0;
         ConnectEx_ok = poller->func.ConnectEx(  (SOCKET)tb_sock2fd(sock)
                                             ,   (struct sockaddr const*)&caddr_data
@@ -160,16 +163,12 @@ static tb_bool_t tb_poller_iocp_event_insert_conn(tb_poller_iocp_ref_t poller, t
         // pending? continue it
         if (WSA_IO_PENDING == poller->func.WSAGetLastError()) 
             ok = tb_true;
-        // failed?
+        // already connected or failed?
         else
         {
-            // connect failed
             object->state = TB_IOCP_OBJECT_STATE_FINISHED;
-            object->u.conn.result = -1;
+            object->u.conn.result = poller->func.WSAGetLastError() == WSAEISCONN? 1 : -1;
             if (PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) ok = tb_true;
-
-            // trace
-            tb_trace_d("connect[%p]: ConnectEx: unknown error: %d", sock, poller->func.WSAGetLastError());
         }
     }
 
@@ -212,7 +211,7 @@ static tb_long_t tb_poller_iocp_event_spak_conn(tb_poller_iocp_ref_t poller, tb_
     // done
     switch (error)
     {
-        // ok or pending?
+        // ok?
     case ERROR_SUCCESS:
         object->u.conn.result = 1;
         break;
@@ -318,6 +317,7 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     tb_iocp_object_ref_t    object = tb_null;
     LPOVERLAPPED            olap = tb_null;
     BOOL                    wait = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
+    tb_trace_d("%d %p %p", wait, object, olap);
     tb_assert_and_check_return_val(object && olap, -1);
 
     // the last error

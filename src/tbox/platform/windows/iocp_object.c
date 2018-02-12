@@ -31,6 +31,16 @@
 #include "../impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
+{
+    // clear object code and state
+    object->code  = TB_IOCP_OBJECT_CODE_NONE;
+    object->state = TB_IOCP_OBJECT_STATE_NONE;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
@@ -87,9 +97,27 @@ tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
         tb_free(object);
     }
 }
-tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
+tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr)
 {
-    // clear object code and state
-    object->code  = TB_IOCP_OBJECT_CODE_NONE;
-    object->state = TB_IOCP_OBJECT_STATE_NONE;
+    // check
+    tb_assert_and_check_return_val(object && addr, -1);
+
+    // attempt to get the connection result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_CONN && object->state == TB_IOCP_OBJECT_STATE_FINISHED)
+    {
+        // @note conn.addr and conn.result cannot be cleared
+        tb_iocp_object_clear(object);
+        if (tb_ipaddr_is_equal(&object->u.conn.addr, addr))
+            return object->u.conn.result;
+    }
+
+    // clear the previous object data first
+    tb_iocp_object_clear(object);
+
+    // post a connection event to wait it
+    object->code          = TB_IOCP_OBJECT_CODE_CONN;
+    object->state         = TB_IOCP_OBJECT_STATE_PENDING;
+    object->u.conn.addr   = *addr;
+    object->u.conn.result = 0;
+    return 0;
 }
