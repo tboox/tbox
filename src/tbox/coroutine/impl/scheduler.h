@@ -127,7 +127,7 @@ tb_bool_t                   tb_co_scheduler_yield(tb_co_scheduler_t* scheduler);
  */
 tb_pointer_t                tb_co_scheduler_resume(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine, tb_cpointer_t priv);
 
-/*! suspend the current coroutine
+/* suspend the current coroutine
  *
  * @param scheduler         the scheduler
  * @param priv              the user private data as the return value of resume() 
@@ -158,7 +158,7 @@ tb_pointer_t                tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, 
  */
 tb_void_t                   tb_co_scheduler_switch(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine);
 
-/*! wait io events 
+/* wait io events 
  *
  * @param scheduler         the scheduler
  * @param sock              the socket

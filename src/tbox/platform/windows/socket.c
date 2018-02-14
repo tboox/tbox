@@ -612,7 +612,7 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     if (!ok)
     {
         // trace
-        tb_trace_e("clos: %p failed, errno: %d", sock, GetLastError());
+        tb_trace_e("close: %p failed, errno: %d", sock, GetLastError());
     }
 
     // remove iocp object for this socket if exists

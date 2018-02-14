@@ -29,6 +29,10 @@
 #include "iocp_object.h"
 #include "../../libc/libc.h"
 #include "../impl/sockdata.h"
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -38,6 +42,17 @@ static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
     // clear object code and state
     object->code  = TB_IOCP_OBJECT_CODE_NONE;
     object->state = TB_IOCP_OBJECT_STATE_NONE;
+}
+static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
+{
+    // we only enable iocp in coroutine
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   ifdef TB_CONFIG_MICRO_ENABLE
+    return (tb_lo_scheduler_self_())? tb_sockdata() : tb_null;
+#   else
+    return (tb_co_scheduler_self() || tb_lo_scheduler_self_())? tb_sockdata() : tb_null;
+#   endif
+#endif
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -53,8 +68,8 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
     do
     { 
         // get the local socket data
-        tb_sockdata_ref_t sockdata = tb_sockdata();
-        tb_assert_and_check_break(sockdata);
+        tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata();
+        tb_check_break(sockdata);
 
         // attempt to get object first if exists
         object = (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock);
@@ -80,15 +95,21 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
 }
 tb_iocp_object_ref_t tb_iocp_object_get(tb_socket_ref_t sock)
 {
-    return (tb_iocp_object_ref_t)tb_sockdata_get(tb_sockdata(), sock);
+    tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata();
+    return sockdata? (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock) : tb_null;
 }
 tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
 {
-    tb_iocp_object_ref_t object = tb_iocp_object_get(sock);
+    // get the local socket data
+    tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata();
+    tb_check_return(sockdata);
+
+    // get iocp object
+    tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock);
     if (object)
     {
         // remove this object from the local socket data
-        tb_sockdata_remove(tb_sockdata(), sock);
+        tb_sockdata_remove(sockdata, sock);
 
         // clear and free the object data
         tb_iocp_object_clear(object);

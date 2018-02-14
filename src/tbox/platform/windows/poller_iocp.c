@@ -317,7 +317,6 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     tb_iocp_object_ref_t    object = tb_null;
     LPOVERLAPPED            olap = tb_null;
     BOOL                    wait = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
-    tb_trace_d("%d %p %p", wait, object, olap);
     tb_assert_and_check_return_val(object && olap, -1);
 
     // the last error

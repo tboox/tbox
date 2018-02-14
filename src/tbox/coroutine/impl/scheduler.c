@@ -51,18 +51,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static __tb_inline__ tb_bool_t tb_co_scheduler_need_io(tb_co_scheduler_t* scheduler)
-{
-    // check
-    tb_assert(scheduler);
-
-    // init io scheduler first
-    if (!scheduler->scheduler_io) scheduler->scheduler_io = tb_co_scheduler_io_init(scheduler);
-    tb_assert(scheduler->scheduler_io);
-
-    // ok?
-    return scheduler->scheduler_io != tb_null;
-}
 static tb_void_t tb_co_scheduler_make_dead(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine)
 {
     // check
@@ -331,7 +319,7 @@ tb_pointer_t tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, tb_long_t inter
     tb_check_return_val(!scheduler->stopped, tb_null);
 
     // need io scheduler
-    if (!tb_co_scheduler_need_io(scheduler)) return tb_null;
+    if (!tb_co_scheduler_io_need(scheduler)) return tb_null;
 
     // sleep it
     return tb_co_scheduler_io_sleep(scheduler->scheduler_io, interval);
@@ -376,7 +364,7 @@ tb_long_t tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_socket_ref_t soc
     tb_check_return_val(!scheduler->stopped, -1);
 
     // need io scheduler
-    if (!tb_co_scheduler_need_io(scheduler)) return -1;
+    if (!tb_co_scheduler_io_need(scheduler)) return -1;
 
     // sleep it
     return tb_co_scheduler_io_wait(scheduler->scheduler_io, sock, events, timeout);

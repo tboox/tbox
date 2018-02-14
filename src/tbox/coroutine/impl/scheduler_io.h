@@ -64,7 +64,9 @@ typedef struct __tb_co_scheduler_io_t
  * interfaces
  */
 
-/*! init io scheduler 
+/* init io scheduler 
+ *
+ * @param scheduler         the scheduler
  *
  * @return                  the io scheduler 
  */
@@ -76,7 +78,17 @@ tb_co_scheduler_io_ref_t    tb_co_scheduler_io_init(tb_co_scheduler_t* scheduler
  */
 tb_void_t                   tb_co_scheduler_io_exit(tb_co_scheduler_io_ref_t scheduler_io);
 
-/*! kill the current io scheduler 
+/* need io scheduler
+ *
+ * ensure the io scheduler has been initialized
+ *
+ * @param scheduler         the scheduler, get self scheduler if be null
+ *
+ * @return                  the io scheduler 
+ */
+tb_co_scheduler_io_ref_t    tb_co_scheduler_io_need(tb_co_scheduler_t* scheduler);
+
+/* kill the current io scheduler 
  *
  * @param scheduler_io      the io scheduler
  */
