@@ -648,6 +648,10 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
     tb_assert_and_check_return_val(sock && data, -1);
     tb_check_return_val(size, 0);
 
+    // attempt to use iocp object to send data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_send(object, data, size);
+
     // recv
     tb_long_t real = tb_ws2_32()->send(tb_sock2fd(sock), (tb_char_t const*)data, (tb_int_t)size, 0);
 

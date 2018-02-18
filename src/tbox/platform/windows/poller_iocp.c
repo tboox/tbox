@@ -144,6 +144,8 @@ static tb_bool_t tb_poller_iocp_event_insert_conn(tb_poller_iocp_ref_t poller, t
                                             ,   0
                                             ,   &real
                                             ,   (LPOVERLAPPED)&object->olap)? tb_true : tb_false;
+
+        // trace
         tb_trace_d("connecting[%p]: ConnectEx: %d, lasterror: %d", sock, ConnectEx_ok, poller->func.WSAGetLastError());
         tb_check_break(ConnectEx_ok);
 
@@ -175,13 +177,53 @@ static tb_bool_t tb_poller_iocp_event_insert_conn(tb_poller_iocp_ref_t poller, t
     // ok?
     return ok;
 }
+static tb_bool_t tb_poller_iocp_event_insert_send(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object)
+{
+    // check
+    tb_assert_and_check_return_val(object && object->code == TB_IOCP_OBJECT_CODE_SEND && object->state == TB_IOCP_OBJECT_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("insert send event for socket(%p): %lu bytes ..", sock, &object->u.send.size);
+
+    // do send
+    tb_long_t ok = poller->func.WSASend((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.send, 1, tb_null, 0, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("sending[%p]: WSASend: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) return tb_true;
+
+    // error?
+    if (ok == SOCKET_ERROR)
+    {
+        object->state = TB_IOCP_OBJECT_STATE_FINISHED;
+        object->u.send.result = -1;
+        if (PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) return tb_true;
+    }
+
+    // failed
+    return tb_false;
+}
 static tb_bool_t tb_poller_iocp_event_insert(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
     tb_assert_and_check_return_val(events, tb_false);
 
+    // trace
+    tb_trace_d("insert events(%lx) for socket(%p), code: %u ..", events, sock, object->code);
+
     // insert connection event
-    if (events & TB_POLLER_EVENT_CONN && !tb_poller_iocp_event_insert_conn(poller, sock, object)) return tb_false;
+    if (events & TB_POLLER_EVENT_CONN)
+    {
+        if (object->code == TB_IOCP_OBJECT_CODE_CONN && !tb_poller_iocp_event_insert_conn(poller, sock, object)) return tb_false;
+    }
+
+    // insert send event
+    if (events & TB_POLLER_EVENT_SEND) 
+    {
+        if (object->code == TB_IOCP_OBJECT_CODE_SEND && !tb_poller_iocp_event_insert_send(poller, sock, object)) return tb_false;
+    }
 
     // ok
     return tb_true;
@@ -342,6 +384,11 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
     tb_poller_iocp_ref_t    poller = tb_null;
     do
     {
+        // check iovec
+        tb_assert_static(sizeof(tb_iovec_t) == sizeof(WSABUF));
+        tb_assert_and_check_break(tb_memberof_eq(tb_iovec_t, data, WSABUF, buf));
+        tb_assert_and_check_break(tb_memberof_eq(tb_iovec_t, size, WSABUF, len));
+
         // make poller
         poller = tb_malloc0_type(tb_poller_iocp_t);
         tb_assert_and_check_break(poller);

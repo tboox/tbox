@@ -83,7 +83,7 @@ typedef struct __tb_iocp_object_conn_t
     // the connected address
     tb_ipaddr_t                     addr;
 
-    // connect result?
+    // the result
     tb_long_t                       result;
 
 }tb_iocp_object_conn_t;
@@ -97,8 +97,8 @@ typedef struct __tb_iocp_object_recv_t
     // the recv data for (tb_iovec_t*)->data
     tb_byte_t*                      data;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
 }tb_iocp_object_recv_t;
 
@@ -111,8 +111,8 @@ typedef struct __tb_iocp_object_send_t
     // the send data for (tb_iovec_t*)->data
     tb_byte_t const*                data;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
 }tb_iocp_object_send_t;
 
@@ -125,8 +125,8 @@ typedef struct __tb_iocp_object_urecv_t
     // the recv data for (tb_iovec_t*)->data
     tb_byte_t*                      data;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
     // the addr
     tb_ipaddr_t                     addr;
@@ -142,8 +142,8 @@ typedef struct __tb_iocp_object_usend_t
     // the send data for (tb_iovec_t*)->data
     tb_byte_t const*                data;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
     // the peer addr
     tb_ipaddr_t                     addr;
@@ -159,8 +159,8 @@ typedef struct __tb_iocp_object_recvv_t
     // the list size
     tb_size_t                       size;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
 }tb_iocp_object_recvv_t;
 
@@ -173,8 +173,8 @@ typedef struct __tb_iocp_object_sendv_t
     // the list size
     tb_size_t                       size;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
 }tb_iocp_object_sendv_t;
 
@@ -187,8 +187,8 @@ typedef struct __tb_iocp_object_urecvv_t
     // the list size
     tb_size_t                       size;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
     // the peer addr
     tb_ipaddr_t                     addr;
@@ -204,8 +204,8 @@ typedef struct __tb_iocp_object_usendv_t
     // the list size
     tb_size_t                       size;
 
-    // the data real
-    tb_size_t                       real;
+    // the result
+    tb_long_t                       result;
 
     // the addr
     tb_ipaddr_t                     addr;
@@ -305,6 +305,16 @@ tb_void_t                   tb_iocp_object_remove(tb_socket_ref_t sock);
  * @return                  ok: 1, continue: 0; failed: -1
  */
 tb_long_t                   tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr);
+
+/* connect the given client address
+ *
+ * @param object            the iocp object 
+ * @param data              the data
+ * @param size              the size
+ *
+ * @return                  ok: 1, continue: 0; failed: -1
+ */
+tb_long_t                   tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
