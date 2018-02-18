@@ -31,7 +31,6 @@
 #include "prefix.h"
 #include "zip/zip.h"
 #include "xml/xml.h"
-#include "asio/asio.h"
 #include "libm/libm.h"
 #include "libc/libc.h"
 #include "math/math.h"

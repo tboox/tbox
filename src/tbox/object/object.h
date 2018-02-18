@@ -38,9 +38,6 @@
 #include "number.h"
 #include "boolean.h"
 #include "dictionary.h"
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-#   include "deprecated/deprecated.h"
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

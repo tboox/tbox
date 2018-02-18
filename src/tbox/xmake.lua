@@ -24,7 +24,7 @@ target("tbox")
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
 
     -- add options
-    add_options("info", "float", "wchar", "exception", "deprecated")
+    add_options("info", "float", "wchar", "exception")
 
     -- add modules
     add_options("xml", "zip", "hash", "regex", "coroutine", "object", "charset", "database")
@@ -38,7 +38,7 @@ target("tbox")
     add_files("prefix/**.c") 
     add_files("memory/**.c") 
     add_files("string/**.c") 
-    add_files("stream/**.c|**/charset.c|**/zip.c|deprecated/**.c") 
+    add_files("stream/**.c|**/charset.c|**/zip.c") 
     add_files("network/**.c|impl/ssl/*.c") 
     add_files("algorithm/**.c") 
     add_files("container/**.c|element/obj.c") 
@@ -65,17 +65,6 @@ target("tbox")
         if not is_plat("windows") then
             add_files("hash/arch/crc32.S")
         end
-    end
-
-    -- add the source files for the asio module
-    if is_option("deprecated") then 
-        add_files("asio/deprecated/*.c|ssl.c")
-        add_files("stream/deprecated/**async_**.c")
-        add_files("stream/deprecated/transfer_pool.c")
-        add_files("platform/deprecated/aicp.c")
-        add_files("platform/deprecated/aioo.c")
-        add_files("platform/deprecated/aiop.c")
-        if is_option("openssl", "polarssl", "mbedtls") then add_files("asio/deprecated/ssl.c") end
     end
 
     -- add the source files for the coroutine module

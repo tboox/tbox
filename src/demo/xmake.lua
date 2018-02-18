@@ -66,15 +66,6 @@ target("demo")
         add_files("regex/*.c")
     end
 
-    -- add the source files for the asio module
-    if is_option("deprecated") then
-        add_files("asio/deprecated/*.c")
-        add_files("stream/deprecated/async_stream.c")
-        add_files("stream/deprecated/transfer_pool.c")
-        add_files("stream/deprecated/async_transfer.c")
-        add_files("stream/deprecated/async_stream/*.c")
-    end
-
     -- add the source files for the object module
     if is_option("object") then
         add_files("utils/option.c")

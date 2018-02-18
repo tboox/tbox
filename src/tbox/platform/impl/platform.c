@@ -32,7 +32,6 @@
 #include "../exception.h"
 #include "../cache_time.h"
 #include "../../network/network.h"
-#include "../deprecated/deprecated.h"
 #ifdef TB_CONFIG_OS_ANDROID
 #   include "../android/android.h"
 #endif

@@ -73,11 +73,6 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     if (mode & TB_FILE_MODE_DIRECT) flags |= O_DIRECT;
 #endif
 
-    // for native aio aicp
-#if defined(TB_CONFIG_ASIO_HAVE_NAIO)
-    if (mode & TB_FILE_MODE_ASIO) flags |= O_DIRECT;
-#endif
-
     // noblock
     flags |= O_NONBLOCK;
 

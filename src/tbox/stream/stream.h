@@ -33,9 +33,6 @@
 #include "filter.h"
 #include "transfer.h"
 #include "static_stream.h"
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-#   include "deprecated/deprecated.h"
-#endif
 
 /*!architecture
  *

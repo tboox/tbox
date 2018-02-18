@@ -64,17 +64,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(regex)
 #endif
 
-    // asio
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-,   TB_DEMO_MAIN_ITEM(asio_dns)
-,   TB_DEMO_MAIN_ITEM(asio_http)
-,   TB_DEMO_MAIN_ITEM(asio_httpd)
-,   TB_DEMO_MAIN_ITEM(asio_aiopc)
-,   TB_DEMO_MAIN_ITEM(asio_aiopd)
-,   TB_DEMO_MAIN_ITEM(asio_aicpc)
-,   TB_DEMO_MAIN_ITEM(asio_aicpd)
-#endif
-
     // math
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 ,   TB_DEMO_MAIN_ITEM(math_fixed)
@@ -130,15 +119,6 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(stream_cache)
 ,   TB_DEMO_MAIN_ITEM(stream_charset)
 ,   TB_DEMO_MAIN_ITEM(stream_zip)
-#ifdef TB_CONFIG_API_HAVE_DEPRECATED
-,   TB_DEMO_MAIN_ITEM(stream_transfer_pool)
-,   TB_DEMO_MAIN_ITEM(stream_async_transfer)
-,   TB_DEMO_MAIN_ITEM(stream_async_stream_null)
-,   TB_DEMO_MAIN_ITEM(stream_async_stream_cache)
-,   TB_DEMO_MAIN_ITEM(stream_async_stream)
-,   TB_DEMO_MAIN_ITEM(stream_async_stream_charset)
-,   TB_DEMO_MAIN_ITEM(stream_async_stream_zip)
-#endif
 
     // string
 ,   TB_DEMO_MAIN_ITEM(string_string)

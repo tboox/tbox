@@ -43,7 +43,7 @@
 
 TBOX is a glib-like cross-platform C library that is simple to use yet powerful in nature.
 
-The project focuses on making C development easier and provides many modules (.e.g stream, asio, regex, container, algorithm ...), 
+The project focuses on making C development easier and provides many modules (.e.g stream, coroutine, regex, container, algorithm ...), 
 so that any developer can quickly pick it up and enjoy the productivity boost when developing in C language.
 
 It supports the following platforms:
@@ -183,18 +183,6 @@ If you want to know more, please refer to:
 - Implements crc32, adler32, md5 and sha1 hash algorithm
 - Implements some string hash algorithms (.e.g bkdr, fnv32, fnv64, sdbm, djb2, rshash, aphash ...)
 - Implements uuid generator
-
-#### The asynchronous io library (deprecated)
-
-- Please uses coroutine to implement asio programming
-
-## Todolist
-
-- Add server module
-- Reconstruction xml module
-- Add more algorithms and container
-- Optimizes more libc interfaces 
-- Implements more libm interfaces and not wrap it only
 
 ## Projects
 

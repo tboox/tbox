@@ -28,7 +28,7 @@ target("tbox")
     add_packages("base")
 
     -- add options
-    add_options("info", "float", "wchar", "micro", "coroutine", "deprecated")
+    add_options("info", "float", "wchar", "micro", "coroutine")
 
     -- add the source files
     add_files("tbox.c") 
