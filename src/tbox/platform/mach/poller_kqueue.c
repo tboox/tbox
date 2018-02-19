@@ -214,6 +214,10 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     poller->kqfd = kqueue();
     tb_assert(poller->kqfd > 0);
 }
+tb_size_t tb_poller_type(tb_poller_ref_t poller)
+{
+    return TB_POLLER_TYPE_KQUEUE;
+}
 tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
 {
     // check
@@ -324,7 +328,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // get the previous events
     tb_size_t events_old = (tb_size_t)tb_sockdata_get(&poller->sockdata, sock);
 
-    // change
+    // get changed events
     tb_size_t adde = events & ~events_old;
     tb_size_t dele = ~events & events_old;
 

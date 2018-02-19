@@ -460,6 +460,10 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     // TODO
     tb_trace_d("tb_poller_clear");
 }
+tb_size_t tb_poller_type(tb_poller_ref_t poller)
+{
+    return TB_POLLER_TYPE_IOCP;
+}
 tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
 {
     // check
@@ -542,7 +546,20 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // TODO
     tb_trace_d("tb_poller_modify");
 
-    // ok
+    // get iocp object for this socket, @note only init event once in every thread
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    tb_assert_and_check_return_val(object, tb_false);
+
+    // get the previous events
+    tb_size_t events_old = 0;// object->events_old TODO and wait multi-events buffer args issues
+
+    // get changed events
+    tb_size_t adde = events & ~events_old;
+    tb_size_t dele = ~events & events_old;
+
+    // insert and remove events
+    if (adde) return tb_poller_iocp_event_insert(poller, sock, object, adde);
+    if (dele) return tb_poller_iocp_event_remove(poller, sock, object, dele);
     return tb_true;
 }
 tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)

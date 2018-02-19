@@ -184,6 +184,10 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     poller->epfd = epoll_create(poller->maxn);
     tb_assert(poller->epfd > 0);
 }
+tb_size_t tb_poller_type(tb_poller_ref_t poller)
+{
+    return TB_POLLER_TYPE_EPOLL;
+}
 tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
 {
     // check

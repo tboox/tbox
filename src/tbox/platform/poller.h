@@ -40,6 +40,18 @@ __tb_extern_c_enter__
  * types
  */
 
+/// the poller type enum
+typedef enum __tb_poller_type_e
+{
+    TB_POLLER_TYPE_NONE         = 0
+,   TB_POLLER_TYPE_IOCP         = 1
+,   TB_POLLER_TYPE_POLL         = 2
+,   TB_POLLER_TYPE_EPOLL        = 3
+,   TB_POLLER_TYPE_KQUEUE       = 4
+,   TB_POLLER_TYPE_SELECT       = 5
+
+}tb_poller_type_e;
+
 /// the poller event enum, only for sock
 typedef enum __tb_poller_event_e
 {
@@ -98,6 +110,14 @@ tb_void_t           tb_poller_exit(tb_poller_ref_t poller);
  * @param poller    the poller
  */
 tb_void_t           tb_poller_clear(tb_poller_ref_t poller);
+
+/*! get the poller type
+ *
+ * @param poller    the poller
+ *
+ * @return          the poller type
+ */
+tb_size_t           tb_poller_type(tb_poller_ref_t poller);
 
 /*! get the user private data
  *

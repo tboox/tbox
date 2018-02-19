@@ -240,6 +240,10 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
     // spak it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 }
+tb_size_t tb_poller_type(tb_poller_ref_t poller)
+{
+    return TB_POLLER_TYPE_SELECT;
+}
 tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
 {
     // check
