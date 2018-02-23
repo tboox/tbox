@@ -41,7 +41,7 @@ static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
 {
     // clear object code and state
     object->code  = TB_IOCP_OBJECT_CODE_NONE;
-    object->state = TB_IOCP_OBJECT_STATE_NONE;
+    object->state = TB_STATE_OK;
 }
 static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
 {
@@ -81,6 +81,9 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
             object = tb_malloc0_type(tb_iocp_object_t);
             tb_assert_and_check_break(object);
 
+            // init object
+            tb_iocp_object_clear(object);
+
             // save socket
             object->sock = sock;
 
@@ -108,6 +111,9 @@ tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
     tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock);
     if (object)
     {
+        // check state
+        tb_assert(object->state == TB_STATE_OK || object->state == TB_STATE_FINISHED);
+
         // remove this object from the local socket data
         tb_sockdata_remove(sockdata, sock);
 
@@ -124,7 +130,7 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     tb_assert_and_check_return_val(object && addr, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_CONN && object->state == TB_IOCP_OBJECT_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_CONN && object->state == TB_STATE_FINISHED)
     {
         /* clear the previous object data first
          *
@@ -135,12 +141,12 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
             return object->u.conn.result;
     }
 
-    // clear the previous object data first
-    tb_iocp_object_clear(object);
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
 
     // post a connection event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_CONN;
-    object->state         = TB_IOCP_OBJECT_STATE_PENDING;
+    object->state         = TB_STATE_PENDING;
     object->u.conn.addr   = *addr;
     object->u.conn.result = 0;
     return 0;
@@ -151,19 +157,19 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     tb_assert_and_check_return_val(object && data, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_SEND && object->state == TB_IOCP_OBJECT_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_SEND && object->state == TB_STATE_FINISHED)
     {
         // clear the previous object data first, but the result cannot be cleared
         tb_iocp_object_clear(object);
         return object->u.send.result;
     }
 
-    // clear the previous object data first
-    tb_iocp_object_clear(object);
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
 
     // post a send event to wait it
     object->code        = TB_IOCP_OBJECT_CODE_SEND;
-    object->state       = TB_IOCP_OBJECT_STATE_PENDING;
+    object->state       = TB_STATE_PENDING;
     object->u.send.data = data;
     object->u.send.size = (tb_iovec_size_t)size;
     return 0;

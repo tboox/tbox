@@ -60,15 +60,6 @@ typedef enum __tb_iocp_object_code_e
 
 }tb_iocp_object_code_e;
 
-// the iocp object state enum
-typedef enum __tb_iocp_object_state_e
-{
-    TB_IOCP_OBJECT_STATE_NONE        = 0
-,   TB_IOCP_OBJECT_STATE_PENDING     = 1 //!< pending, need wait it in poller
-,   TB_IOCP_OBJECT_STATE_FINISHED    = 2 //!< finish waiting and we can get results
-
-} tb_iocp_object_state_t;
-
 // the accept iocp object type
 typedef struct __tb_iocp_object_acpt_t
 {
@@ -264,7 +255,13 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     // the object code
     tb_uint8_t                      code;
 
-    // the object state
+    /* the object state
+     *
+     * TB_STATE_OK
+     * TB_STATE_PENDING
+     * TB_STATE_WAITING
+     * TB_STATE_FINISHED
+     */
     tb_uint8_t                      state;
 
 }tb_iocp_object_t, *tb_iocp_object_ref_t;
