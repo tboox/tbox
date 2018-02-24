@@ -121,6 +121,32 @@ tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
         tb_free(object);
     }
 }
+tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr)
+{
+    // check
+    tb_assert_and_check_return_val(object, tb_null);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_ACPT && object->state == TB_STATE_FINISHED)
+    {
+        /* clear the previous object data first
+         *
+         * @note acpt.addr and acpt.result cannot be cleared
+         */
+        tb_iocp_object_clear(object);
+        if (addr) tb_ipaddr_copy(addr, &object->u.acpt.addr);
+        return object->u.acpt.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // post a accept event to wait it
+    object->code          = TB_IOCP_OBJECT_CODE_ACPT;
+    object->state         = TB_STATE_PENDING;
+    object->u.acpt.result = tb_null;
+    return 0;
+}
 tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr)
 {
     // check

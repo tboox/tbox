@@ -500,6 +500,10 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     // check
     tb_assert_and_check_return_val(sock, tb_null);
 
+    // attempt to use iocp object to accept if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_accept(object, addr);
+
     // done
     tb_bool_t       ok = tb_false;
     tb_socket_ref_t acpt = tb_null;

@@ -94,6 +94,83 @@ typedef struct __tb_poller_iocp_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    // check
+    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("post accept event for socket(%p) ..", sock);
+
+    // post a connection event 
+    tb_bool_t ok = tb_false;
+    tb_bool_t init_ok = tb_false;
+    tb_bool_t AcceptEx_ok = tb_false;
+    do
+    {
+        // init olap
+        tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
+
+        // TODO free
+        // make address buffer
+        if (!object->u.acpt.buffer) object->u.acpt.buffer = tb_malloc0(((sizeof(struct sockaddr_storage)) << 1));
+        tb_assert_and_check_break(object->u.acpt.buffer);
+
+        // make accept socket
+        object->u.acpt.result = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4); // TODO free and family
+        tb_assert_and_check_break(object->u.acpt.result);
+        init_ok = tb_true;
+
+        /* do AcceptEx
+         *
+         * @note this socket have been bound to local address in tb_socket_connect()
+         */
+        DWORD real = 0;
+        AcceptEx_ok = poller->func.AcceptEx(    (SOCKET)tb_sock2fd(sock)
+                                            ,   (SOCKET)tb_sock2fd(object->u.acpt.result)
+                                            ,   (tb_byte_t*)object->u.acpt.buffer
+                                            ,   0
+                                            ,   sizeof(struct sockaddr_storage)
+                                            ,   sizeof(struct sockaddr_storage)
+                                            ,   &real
+                                            ,   (LPOVERLAPPED)&object->olap)? tb_true : tb_false;
+
+        // trace
+        tb_trace_d("accepting[%p]: AcceptEx: %d, lasterror: %d", sock, AcceptEx_ok, poller->func.WSAGetLastError());
+        tb_check_break(AcceptEx_ok);
+
+        // TODO handle result, and conn, send
+        // accepted?
+        object->state = TB_STATE_FINISHED;
+        if (!PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) break;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // AcceptEx failed?
+    if (!ok)
+    {
+        // pending? continue it
+        if (init_ok && WSA_IO_PENDING == poller->func.WSAGetLastError()) 
+        {
+            ok = tb_true;
+            object->state = TB_STATE_WAITING;
+        }
+        // failed?
+        else
+        {
+            // TODO handle result
+            object->state = TB_STATE_FINISHED;
+            if (PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) ok = tb_true;
+        }
+    }
+
+    // ok?
+    return ok;
+}
 static tb_bool_t tb_poller_iocp_event_post_conn(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -220,7 +297,7 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     static tb_bool_t (*s_post[])(tb_poller_iocp_ref_t , tb_socket_ref_t, tb_iocp_object_ref_t, tb_size_t ) = 
     {
         tb_null
-    ,   tb_null // acpt
+    ,   tb_poller_iocp_event_post_acpt // acpt
     ,   tb_poller_iocp_event_post_conn
     ,   tb_null // recv
     ,   tb_poller_iocp_event_post_send

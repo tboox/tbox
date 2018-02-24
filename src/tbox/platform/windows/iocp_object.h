@@ -65,6 +65,12 @@ typedef struct __tb_iocp_object_acpt_t
 {
     // the client address
     tb_ipaddr_t                     addr;
+
+    // the result socket
+    tb_socket_ref_t                 result;
+
+    // the accept address buffer, sizeof(struct sockaddr_storage)) * 2
+    tb_pointer_t                    buffer;
     
 }tb_iocp_object_acpt_t;
 
@@ -293,6 +299,15 @@ tb_iocp_object_ref_t         tb_iocp_object_get(tb_socket_ref_t sock);
  * @param sock              the socket 
  */
 tb_void_t                   tb_iocp_object_remove(tb_socket_ref_t sock);
+
+/*! accept socket
+ *
+ * @param object            the iocp object 
+ * @param addr              the client address
+ *
+ * @return                  the client socket 
+ */
+tb_socket_ref_t             tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr);
 
 /* connect the given client address
  *
