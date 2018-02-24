@@ -422,7 +422,7 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     tb_iocp_object_ref_t    object = tb_null;
     LPOVERLAPPED            olap = tb_null;
     BOOL                    wait = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
-    tb_assert_and_check_return_val(object && olap, -1);
+    tb_assert_and_check_return_val(object && object->sock && olap, -1);
 
     // the last error
     tb_size_t error = (tb_size_t)GetLastError();
@@ -577,12 +577,18 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     object->priv = priv;
 
     // bind this socket and object to port
-    HANDLE port = CreateIoCompletionPort((HANDLE)tb_sock2fd(sock), poller->port, (ULONG_PTR)object, 0);
-    if (port != poller->port)
+    if (!object->sock) 
     {
-        // trace
-        tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), sock);
-        return tb_false;
+        HANDLE port = CreateIoCompletionPort((HANDLE)tb_sock2fd(sock), poller->port, (ULONG_PTR)object, 0);
+        if (port != poller->port)
+        {
+            // trace
+            tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), sock);
+            return tb_false;
+        }
+
+        // bind ok
+        object->sock = sock;
     }
 
     // post events
@@ -590,11 +596,6 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
 }
 tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
 {
-    // check
-    tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
-    tb_assert_and_check_return_val(poller && sock, tb_false);
-
-    // ok
     return tb_true;
 }
 tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
@@ -605,7 +606,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
 
     // get iocp object for this socket, @note only init event once in every thread
     tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
-    tb_assert_and_check_return_val(object, tb_false);
+    tb_assert_and_check_return_val(object && object->sock, tb_false);
 
     // save the user private data
     object->priv = priv;

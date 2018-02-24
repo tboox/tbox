@@ -57,6 +57,7 @@ static tb_void_t tb_sockdata_local_free(tb_cpointer_t priv)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+// TODO leak and micro issues
 tb_sockdata_ref_t tb_sockdata()
 {
 #ifndef TB_CONFIG_MICRO_ENABLE

@@ -84,9 +84,6 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
             // init object
             tb_iocp_object_clear(object);
 
-            // save socket
-            object->sock = sock;
-
             // save object
             tb_sockdata_insert(sockdata, sock, (tb_cpointer_t)object);
         }

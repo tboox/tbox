@@ -96,6 +96,10 @@ tb_void_t tb_thread_local_exit(tb_thread_local_ref_t local)
     // check
     tb_assert(local);
 
+    // free the previous data first
+    if (local->free && tb_thread_local_has(local))
+        local->free(tb_thread_local_get(local));
+
     // exit it
     pthread_key_delete(((pthread_key_t*)local->priv)[0]);
     pthread_key_delete(((pthread_key_t*)local->priv)[1]);
