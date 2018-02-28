@@ -6,6 +6,7 @@
 
 * Move docs directory to tbox-docs repo
 * Support tinyc compiler
+* Remove deprecated module (asio), please use coroutine module
 
 ### Bugs fixed
 
@@ -14,6 +15,7 @@
 * Fix setenv empty value crash 
 * Fix coroutine.sleep bug
 * Fix windows root path bug 
+* Fix thread local memory leak
 
 ## v1.6.2
 
@@ -156,6 +158,7 @@
 
 * 移除docs目录，放置到独立tbox-docs仓库，减少tbox.zip包大小
 * 支持tinyc编译器
+* 移除被废弃的模块（asio模块，先用coroutine代替）
 
 ### Bugs修复
 
@@ -164,6 +167,7 @@
 * 修复设置环境变量值为空时的崩溃问题
 * 修复协程sleep超时覆写数据的bug
 * 修复windows根路径问题
+* 修复tls线程存储内存泄露问题
 
 ## v1.6.2
 

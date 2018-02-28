@@ -16,11 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        socket.c
- *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -29,6 +28,7 @@
 #include "prefix.h"
 #include "../socket.h"
 #include "interface/interface.h"
+#include "iocp_object.h"
 #include "socket_pool.h"
 #include "../posix/sockaddr.h"
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
@@ -421,6 +421,10 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     tb_assert_and_check_return_val(sock && addr, -1);
     tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
+    // attempt to use iocp object to connect if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_connect(object, addr);
+
     // load addr
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
@@ -439,7 +443,8 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     if (e == WSAEISCONN) return 1;
 
     // continue?
-    if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS) return 0;
+    if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS) 
+        return 0;
 
     // error
     return -1;
@@ -494,6 +499,10 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
+
+    // attempt to use iocp object to accept if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_accept(object, addr);
 
     // done
     tb_bool_t       ok = tb_false;
@@ -607,8 +616,11 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     if (!ok)
     {
         // trace
-        tb_trace_e("clos: %p failed, errno: %d", sock, GetLastError());
+        tb_trace_e("close: %p failed, errno: %d", sock, GetLastError());
     }
+
+    // remove iocp object for this socket if exists
+    tb_iocp_object_remove(sock);
 
     // ok?
     return ok;
@@ -639,6 +651,10 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
     // check
     tb_assert_and_check_return_val(sock && data, -1);
     tb_check_return_val(size, 0);
+
+    // attempt to use iocp object to send data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_send(object, data, size);
 
     // recv
     tb_long_t real = tb_ws2_32()->send(tb_sock2fd(sock), (tb_char_t const*)data, (tb_int_t)size, 0);

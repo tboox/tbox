@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        coroutine.h
@@ -135,8 +135,7 @@ tb_void_t tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t self, tb_long_t interval)
     tb_assert(scheduler);
     
     // init io scheduler first
-    if (!scheduler->scheduler_io) scheduler->scheduler_io = tb_lo_scheduler_io_init(scheduler);
-    tb_assert(scheduler->scheduler_io);
+    if (!tb_lo_scheduler_io_need(scheduler)) return ;
 
     // sleep it
     tb_lo_scheduler_io_sleep(scheduler->scheduler_io, interval);
@@ -150,10 +149,9 @@ tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_socket_ref_t so
     // get scheduler
     tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
     tb_assert(scheduler);
-    
+   
     // init io scheduler first
-    if (!scheduler->scheduler_io) scheduler->scheduler_io = tb_lo_scheduler_io_init(scheduler);
-    tb_assert(scheduler->scheduler_io);
+    if (!tb_lo_scheduler_io_need(scheduler)) return tb_false;
 
     // wait it
     return tb_lo_scheduler_io_wait(scheduler->scheduler_io, sock, events, timeout);

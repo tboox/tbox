@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        scheduler_io.c
@@ -259,6 +259,21 @@ tb_void_t tb_co_scheduler_io_exit(tb_co_scheduler_io_ref_t scheduler_io)
     // exit it
     tb_free(scheduler_io);
 }
+tb_co_scheduler_io_ref_t tb_co_scheduler_io_need(tb_co_scheduler_t* scheduler)
+{
+    // get the current scheduler
+    if (!scheduler) scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
+    if (scheduler)
+    {
+        // init io scheduler first
+        if (!scheduler->scheduler_io) scheduler->scheduler_io = tb_co_scheduler_io_init(scheduler);
+        tb_assert(scheduler->scheduler_io);
+
+        // get the current io scheduler
+        return (tb_co_scheduler_io_ref_t)scheduler->scheduler_io;
+    }
+    return tb_null;
+}
 tb_void_t tb_co_scheduler_io_kill(tb_co_scheduler_io_ref_t scheduler_io)
 {
     // check
@@ -323,11 +338,15 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     tb_coroutine_t* coroutine = tb_co_scheduler_running(scheduler_io->scheduler);
     tb_assert(coroutine);
 
+    // get the poller
+    tb_poller_ref_t poller = scheduler_io->poller;
+    tb_assert(poller);
+
     // trace
     tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
 
     // enable edge-trigger mode if be supported
-    if (tb_poller_support(scheduler_io->poller, TB_POLLER_EVENT_CLEAR))
+    if (tb_poller_support(poller, TB_POLLER_EVENT_CLEAR))
         events |= TB_POLLER_EVENT_CLEAR;
 
     // @note avoid to write rs.single_entry (channel/suspend) and erase rs.wait.{sock, events, events_cache}
@@ -350,7 +369,7 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
         }
 
         // modify socket from poller for waiting events if the waiting events has been changed 
-        if (events_prev != events && !tb_poller_modify(scheduler_io->poller, sock, events, coroutine))
+        if ((events_prev != events || tb_poller_type(poller) == TB_POLLER_TYPE_IOCP) && !tb_poller_modify(poller, sock, events, coroutine))
         {
             // trace
             tb_trace_e("failed to modify sock(%p) to poller on coroutine(%p)!", sock, coroutine);
@@ -362,7 +381,7 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     else
     {
         // remove the previous socket first if exists
-        if (sock_prev && !tb_poller_remove(scheduler_io->poller, sock_prev))
+        if (sock_prev && !tb_poller_remove(poller, sock_prev))
         {
             // trace
             tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock_prev, coroutine);
@@ -372,7 +391,7 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
         }
 
         // insert socket to poller for waiting events
-        if (!tb_poller_insert(scheduler_io->poller, sock, events, coroutine))
+        if (!tb_poller_insert(poller, sock, events, coroutine))
         {
             // trace
             tb_trace_e("failed to insert sock(%p) to poller on coroutine(%p)!", sock, coroutine);
@@ -461,7 +480,7 @@ tb_co_scheduler_io_ref_t tb_co_scheduler_io_self()
 {
     // get the current scheduler
     tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
-   
+
     // get the current io scheduler
     return scheduler? (tb_co_scheduler_io_ref_t)scheduler->scheduler_io : tb_null;
 }

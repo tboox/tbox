@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        scheduler_io.h
@@ -68,6 +68,8 @@ typedef struct __tb_lo_scheduler_io_t
 
 /* init io scheduler 
  *
+ * @param scheduler         the scheduler
+ *
  * @return                  the io scheduler 
  */
 tb_lo_scheduler_io_ref_t    tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler);
@@ -77,6 +79,16 @@ tb_lo_scheduler_io_ref_t    tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler
  * @param scheduler_io      the io scheduler
  */
 tb_void_t                   tb_lo_scheduler_io_exit(tb_lo_scheduler_io_ref_t scheduler_io);
+
+/* need io scheduler 
+ *
+ * ensure the io scheduler has been initialized
+ *
+ * @param scheduler         the scheduler
+ *
+ * @return                  the io scheduler 
+ */
+tb_lo_scheduler_io_ref_t    tb_lo_scheduler_io_need(tb_lo_scheduler_t* scheduler);
 
 /* kill the current io scheduler 
  *

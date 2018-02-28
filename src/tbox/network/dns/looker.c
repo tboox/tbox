@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        looker.c
@@ -643,7 +643,7 @@ tb_long_t tb_dns_looker_wait(tb_dns_looker_ref_t self, tb_long_t timeout)
     tb_dns_looker_t* looker = (tb_dns_looker_t*)self;
     tb_assert_and_check_return_val(looker && looker->sock, -1);
 
-    // has asio event?
+    // has io event?
     tb_size_t e = TB_SOCKET_EVENT_NONE;
     if (!(looker->step & TB_DNS_LOOKER_STEP_NEVT))
     {

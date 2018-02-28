@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        socket.h
@@ -101,7 +101,7 @@ typedef enum __tb_socket_event_e
     TB_SOCKET_EVENT_NONE                = 0x0000
 ,   TB_SOCKET_EVENT_RECV                = 0x0001
 ,   TB_SOCKET_EVENT_SEND                = 0x0002
-,   TB_SOCKET_EVENT_CONN                = TB_SOCKET_EVENT_SEND
+,   TB_SOCKET_EVENT_CONN                = TB_SOCKET_EVENT_SEND 
 ,   TB_SOCKET_EVENT_ACPT                = TB_SOCKET_EVENT_RECV
 ,   TB_SOCKET_EVENT_EALL                = TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND
 
@@ -144,10 +144,10 @@ tb_bool_t           tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2]);
  */
 tb_bool_t           tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...);
 
-/*! connect socket
+/*! connect the given client address
  *
  * @param sock      the socket 
- * @param addr      the address
+ * @param addr      the client address
  *
  * @return          ok: 1, continue: 0; failed: -1
  */

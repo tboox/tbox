@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        tbox.h
@@ -31,7 +31,6 @@
 #include "prefix.h"
 #include "zip/zip.h"
 #include "xml/xml.h"
-#include "asio/asio.h"
 #include "libm/libm.h"
 #include "libc/libc.h"
 #include "math/math.h"

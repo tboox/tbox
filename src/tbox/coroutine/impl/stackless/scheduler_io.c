@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        scheduler_io.c
@@ -271,6 +271,21 @@ tb_void_t tb_lo_scheduler_io_exit(tb_lo_scheduler_io_ref_t scheduler_io)
     // exit it
     tb_free(scheduler_io);
 }
+tb_lo_scheduler_io_ref_t tb_lo_scheduler_io_need(tb_lo_scheduler_t* scheduler)
+{
+    // get the current scheduler
+    if (!scheduler) scheduler = (tb_lo_scheduler_t*)tb_lo_scheduler_self_();
+    if (scheduler)
+    {
+        // init io scheduler first
+        if (!scheduler->scheduler_io) scheduler->scheduler_io = tb_lo_scheduler_io_init(scheduler);
+        tb_assert(scheduler->scheduler_io);
+
+        // get the current io scheduler
+        return (tb_lo_scheduler_io_ref_t)scheduler->scheduler_io;
+    }
+    return tb_null;
+}
 tb_void_t tb_lo_scheduler_io_kill(tb_lo_scheduler_io_ref_t scheduler_io)
 {
     // check
@@ -477,7 +492,8 @@ tb_lo_scheduler_io_ref_t tb_lo_scheduler_io_self()
 {
     // get the current scheduler
     tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)tb_lo_scheduler_self_();
-   
+
     // get the current io scheduler
     return scheduler? (tb_lo_scheduler_io_ref_t)scheduler->scheduler_io : tb_null;
 }
+

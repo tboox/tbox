@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        poller_select.c
@@ -107,7 +107,7 @@ static tb_void_t tb_poller_list_set(tb_poller_select_ref_t poller, tb_socket_ref
         // no list? init it first
         if (!poller->list)
         {
-            // init hash
+            // init list
             poller->list = tb_nalloc0_type(FD_SETSIZE, tb_poller_data_t);
             tb_assert_and_check_return(poller->list);
         }
@@ -239,6 +239,10 @@ tb_void_t tb_poller_clear(tb_poller_ref_t self)
 
     // spak it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
+}
+tb_size_t tb_poller_type(tb_poller_ref_t poller)
+{
+    return TB_POLLER_TYPE_SELECT;
 }
 tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
 {

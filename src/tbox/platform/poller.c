@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        poller.c
@@ -24,15 +24,27 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME            "poller"
+#define TB_TRACE_MODULE_DEBUG           (1)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "poller.h"
+#include "impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   include "posix/poller_select.c"
+#   ifdef TB_CONFIG_MICRO_ENABLE
+#       include "posix/poller_select.c"
+#   else
+#       include "posix/poller_select.c"
+//#       include "windows/poller_iocp.c"
+#   endif
 #elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
     && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
 #   include "linux/poller_epoll.c"

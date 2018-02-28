@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        file.c
@@ -73,11 +73,6 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     if (mode & TB_FILE_MODE_DIRECT) flags |= O_DIRECT;
 #endif
 
-    // for native aio aicp
-#if defined(TB_CONFIG_ASIO_HAVE_NAIO)
-    if (mode & TB_FILE_MODE_ASIO) flags |= O_DIRECT;
-#endif
-
     // noblock
     flags |= O_NONBLOCK;
 
@@ -93,10 +88,12 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     tb_long_t fd = open(path, flags, modes);
     if (fd < 0 && (mode & TB_FILE_MODE_CREAT))
     {
+#ifndef TB_CONFIG_MICRO_ENABLE
         // open it again after creating the file directory
         tb_char_t dir[TB_PATH_MAXN];
         if (tb_directory_create(tb_path_directory(path, dir, sizeof(dir))))
             fd = open(path, flags, modes);
+#endif
     }
  
     // trace

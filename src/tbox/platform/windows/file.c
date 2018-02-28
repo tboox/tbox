@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        file.c
@@ -90,7 +90,6 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
     // init attr
     DWORD attr = FILE_ATTRIBUTE_NORMAL;
-    if (mode & TB_FILE_MODE_ASIO) attr |= FILE_FLAG_OVERLAPPED;
     if (mode & TB_FILE_MODE_DIRECT) attr |= FILE_FLAG_NO_BUFFERING;
 
     // init file

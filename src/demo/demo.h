@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Copyright (C) 2009 - 2017, TBOOX Open Source Group.
+ * Copyright (C) 2009 - 2018, TBOOX Open Source Group.
  *
  * @author      ruki
  * @file        demo.h
@@ -66,15 +66,6 @@ TB_DEMO_MAIN_DECL(libc_wcstombs);
 TB_DEMO_MAIN_DECL(libm_float);
 TB_DEMO_MAIN_DECL(libm_double);
 TB_DEMO_MAIN_DECL(libm_integer);
-
-// asio
-TB_DEMO_MAIN_DECL(asio_dns);
-TB_DEMO_MAIN_DECL(asio_http);
-TB_DEMO_MAIN_DECL(asio_httpd);
-TB_DEMO_MAIN_DECL(asio_aiopc);
-TB_DEMO_MAIN_DECL(asio_aiopd);
-TB_DEMO_MAIN_DECL(asio_aicpc);
-TB_DEMO_MAIN_DECL(asio_aicpd);
 
 // math
 TB_DEMO_MAIN_DECL(math_fixed);
