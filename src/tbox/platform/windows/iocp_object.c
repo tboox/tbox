@@ -193,6 +193,29 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     object->u.conn.result = 0;
     return 0;
 }
+tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && data && size, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_RECV && object->state == TB_STATE_FINISHED)
+    {
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        return object->u.recv.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // post a recv event to wait it
+    object->code        = TB_IOCP_OBJECT_CODE_RECV;
+    object->state       = TB_STATE_PENDING;
+    object->u.recv.data = data;
+    object->u.recv.size = (tb_iovec_size_t)size;
+    return 0;
+}
 tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size)
 {
     // check

@@ -260,6 +260,34 @@ static tb_bool_t tb_poller_iocp_event_post_conn(tb_poller_iocp_ref_t poller, tb_
     // ok?
     return ok;
 }
+static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    // check
+    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("insert recv event for socket(%p): %lu bytes ..", sock, &object->u.recv.size);
+
+    // do recv
+    DWORD flag = 0;
+    tb_long_t ok = poller->func.WSARecv((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.recv, 1, tb_null, &flag, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("recving[%p]: WSARecv: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
+    {
+        object->state = TB_STATE_WAITING;
+        return tb_true;
+    }
+
+    // error? finished
+    object->state = TB_STATE_FINISHED;
+    object->u.recv.result = -1;
+    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+}
 static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -304,7 +332,7 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
         tb_null
     ,   tb_poller_iocp_event_post_acpt // acpt
     ,   tb_poller_iocp_event_post_conn
-    ,   tb_null // recv
+    ,   tb_poller_iocp_event_post_recv
     ,   tb_poller_iocp_event_post_send
     ,   tb_null // urecv
     ,   tb_null // usend

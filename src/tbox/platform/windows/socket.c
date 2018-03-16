@@ -631,6 +631,10 @@ tb_long_t tb_socket_recv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
     tb_assert_and_check_return_val(sock && data, -1);
     tb_check_return_val(size, 0);
 
+    // attempt to use iocp object to recv data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_recv(object, data, size);
+
     // recv
     tb_long_t real = tb_ws2_32()->recv(tb_sock2fd(sock), (tb_char_t*)data, (tb_int_t)size, 0);
 

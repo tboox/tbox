@@ -318,6 +318,16 @@ tb_socket_ref_t             tb_iocp_object_accept(tb_iocp_object_ref_t object, t
  */
 tb_long_t                   tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr);
 
+/* recv the socket data for tcp
+ *
+ * @param object            the iocp object 
+ * @param data              the data
+ * @param size              the size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_size_t size);
+
 /* connect the given client address
  *
  * @param object            the iocp object 
