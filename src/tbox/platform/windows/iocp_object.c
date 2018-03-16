@@ -39,6 +39,13 @@
  */
 static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
 {
+    // free the previous buffer
+    if (object->code == TB_IOCP_OBJECT_CODE_ACPT && object->u.acpt.buffer)
+    {
+        tb_free(object->u.acpt.buffer);
+        object->u.acpt.buffer = tb_null;
+    }
+
     // clear object code and state
     object->code  = TB_IOCP_OBJECT_CODE_NONE;
     object->state = TB_STATE_OK;
@@ -126,20 +133,26 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
     // check
     tb_assert_and_check_return_val(object, tb_null);
 
+    // always be accept, need not clear object each time
+    tb_assert(object->code == TB_IOCP_OBJECT_CODE_NONE || object->code == TB_IOCP_OBJECT_CODE_ACPT);
+
     // attempt to get the result if be finished
     if (object->code == TB_IOCP_OBJECT_CODE_ACPT && object->state == TB_STATE_FINISHED)
     {
-        /* clear the previous object data first
-         *
-         * @note acpt.addr and acpt.result cannot be cleared
-         */
-        tb_iocp_object_clear(object);
+        // trace
+        tb_trace_d("accept(%p): state: %s, result: %p", object->sock, tb_state_cstr(object->state), object->u.acpt.result);
+
+        // get result
+        object->state = TB_STATE_OK;
         if (addr) tb_ipaddr_copy(addr, &object->u.acpt.addr);
         return object->u.acpt.result;
     }
 
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, tb_null);
+
+    // trace
+    tb_trace_d("accept(%p): pending ..", object->sock);
 
     // post a accept event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_ACPT;
@@ -155,6 +168,9 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     // attempt to get the result if be finished
     if (object->code == TB_IOCP_OBJECT_CODE_CONN && object->state == TB_STATE_FINISHED)
     {
+        // trace
+        tb_trace_d("connect(%p): %{ipaddr}, state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.conn.result);
+
         /* clear the previous object data first
          *
          * @note conn.addr and conn.result cannot be cleared
@@ -166,6 +182,9 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
 
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("connect(%p): %{ipaddr}, pending ..", object->sock, addr);
 
     // post a connection event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_CONN;

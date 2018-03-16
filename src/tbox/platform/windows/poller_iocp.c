@@ -112,13 +112,12 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
         // init olap
         tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
 
-        // TODO free
         // make address buffer
         if (!object->u.acpt.buffer) object->u.acpt.buffer = tb_malloc0(((sizeof(struct sockaddr_storage)) << 1));
         tb_assert_and_check_break(object->u.acpt.buffer);
 
         // make accept socket
-        object->u.acpt.result = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4); // TODO free and family
+        object->u.acpt.result = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4); // TODO family
         tb_assert_and_check_break(object->u.acpt.result);
         init_ok = tb_true;
 
@@ -140,8 +139,7 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
         tb_trace_d("accepting[%p]: AcceptEx: %d, lasterror: %d", sock, AcceptEx_ok, poller->func.WSAGetLastError());
         tb_check_break(AcceptEx_ok);
 
-        // TODO handle result, and conn, send
-        // accepted?
+        // accepted? finished
         object->state = TB_STATE_FINISHED;
         if (!PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) break;
 
@@ -162,7 +160,11 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
         // failed?
         else
         {
-            // TODO handle result
+            // free result socket
+            if (object->u.acpt.result) tb_socket_exit(object->u.acpt.result);
+            object->u.acpt.result = tb_null;
+
+            // finished
             object->state = TB_STATE_FINISHED;
             if (PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) ok = tb_true;
         }
@@ -290,8 +292,11 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     // check
     tb_assert_and_check_return_val(events, tb_false);
 
+    // TODO
+    if (object->state == TB_STATE_OK) return tb_true;
+
     // trace
-    tb_trace_d("post events(%lx) for socket(%p), code: %u ..", events, sock, object->code);
+    tb_trace_d("post events(%lx) for socket(%p), code: %u, state: %s ..", events, sock, object->code, tb_state_cstr(object->state));
 
     // init post
     static tb_bool_t (*s_post[])(tb_poller_iocp_ref_t , tb_socket_ref_t, tb_iocp_object_ref_t, tb_size_t ) = 
@@ -339,6 +344,9 @@ static tb_size_t tb_poller_iocp_event_from_code(tb_size_t code)
 }
 static tb_long_t tb_poller_iocp_event_spak_conn(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object, tb_size_t real, tb_size_t error)
 {
+    // have been finished?
+    tb_check_return_val(object->state != TB_STATE_FINISHED, 1);
+
     // done
     switch (error)
     {
@@ -379,11 +387,74 @@ static tb_long_t tb_poller_iocp_event_spak_conn(tb_poller_iocp_ref_t poller, tb_
 }
 static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object, tb_size_t real, tb_size_t error)
 {
-    tb_trace_d("tb_poller_iocp_event_spak_acpt");
-    return -1;
+    // done
+    switch (error)
+    {
+        // ok or pending?
+    case ERROR_SUCCESS:
+    case WAIT_TIMEOUT:
+    case ERROR_IO_PENDING:
+        {
+            // update the accept context, otherwise shutdown and getsockname will be failed
+            SOCKET acpt = (SOCKET)tb_sock2fd(object->sock);
+            tb_long_t update_ok = setsockopt(tb_sock2fd(object->u.acpt.result), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
+            tb_assert(!update_ok); tb_used(update_ok);
+      
+            // get accept socket addresses
+            INT                         server_size = 0;
+            INT                         client_size = 0;
+            struct sockaddr_storage*    server_addr = tb_null;
+            struct sockaddr_storage*    client_addr = tb_null;
+            if (poller->func.GetAcceptExSockaddrs)
+            {
+                // check
+                tb_assert(object->u.acpt.buffer);
+
+                // get server and client addresses
+                poller->func.GetAcceptExSockaddrs(  (tb_byte_t*)object->u.acpt.buffer
+                                                ,   0
+                                                ,   sizeof(struct sockaddr_storage)
+                                                ,   sizeof(struct sockaddr_storage)
+                                                ,   (LPSOCKADDR*)&server_addr
+                                                ,   &server_size
+                                                ,   (LPSOCKADDR*)&client_addr
+                                                ,   &client_size);
+
+                // exists client address?
+                if (client_addr)
+                {
+                    // save address
+                    tb_sockaddr_save(&object->u.acpt.addr, client_addr);
+
+                    // trace
+                    tb_trace_d("accept(%p): client address: %{ipaddr}", object->sock, &object->u.acpt.addr);
+                }
+            }
+        }
+        break;
+        // canceled? timeout?
+    case WSAEINTR:
+    case ERROR_OPERATION_ABORTED:
+        if (object->u.acpt.result) tb_socket_exit(object->u.acpt.result);
+        object->u.acpt.result = tb_null;
+        break;
+        // unknown error
+    default:
+        // trace
+        tb_trace_e("accept(%p): unknown error: %u", object->sock, error);
+        if (object->u.acpt.result) tb_socket_exit(object->u.acpt.result);
+        object->u.acpt.result = tb_null;
+        break;
+    }
+
+    // ok
+    return 1;
 }
 static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object, tb_size_t real, tb_size_t error)
 {
+    // have been finished?
+    tb_check_return_val(object->state != TB_STATE_FINISHED, 1);
+
     // ok?
     if (real)
     {
@@ -441,15 +512,8 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
 }
 static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_iocp_object_ref_t object, tb_size_t real, tb_size_t error)
 {
-    // have been finished? spark it directly
-    if (object->state == TB_STATE_FINISHED) 
-    {
-        func((tb_poller_ref_t)poller, object->sock, tb_poller_iocp_event_from_code(object->code), object->priv);
-        return 1;
-    }
-
     // check
-    tb_assert_and_check_return_val(object->state == TB_STATE_WAITING, -1);
+    tb_assert_and_check_return_val(object->state == TB_STATE_WAITING || object->state == TB_STATE_FINISHED, -1);
 
     // init spak
     static tb_long_t (*s_spak[])(tb_poller_iocp_ref_t , tb_iocp_object_ref_t, tb_size_t , tb_size_t ) = 
@@ -470,7 +534,7 @@ static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_polle
     tb_assert_and_check_return_val(object->code < tb_arrayn(s_spak), -1);
 
     // trace
-    tb_trace_d("spak[%p]: code %u ..", object->sock, object->code);
+    tb_trace_d("spak[%p]: code %u, state: %s ..", object->sock, object->code, tb_state_cstr(object->state));
 
     // spark event
     tb_long_t ok = (s_spak[object->code])? s_spak[object->code](poller, object, real, error) : -1;
@@ -499,16 +563,18 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     tb_iocp_object_ref_t    object = tb_null;
     LPOVERLAPPED            olap = tb_null;
     BOOL                    wait = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
-    tb_assert_and_check_return_val(object && object->sock && olap, -1);
 
     // the last error
     tb_size_t error = (tb_size_t)GetLastError();
 
-    // trace
-    tb_trace_d("wait[%p]: %d, real: %u, lasterror: %lu", object->sock, wait, real, error);
-
     // timeout?
     if (!wait && error == WAIT_TIMEOUT) return 0;
+
+    // check
+    tb_assert_and_check_return_val(object && object->sock && olap, -1);
+
+    // trace
+    tb_trace_d("wait[%p]: %d, real: %u, lasterror: %lu", object->sock, wait, real, error);
 
     // spark the events
     return tb_poller_iocp_event_spak(poller, func, object, real, error);
