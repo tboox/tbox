@@ -506,18 +506,17 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
             // loop
             while (1)
             {
-                // wait accept events
-                tb_lo_coroutine_waitio(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
-
-                // wait ok
-                if (tb_lo_coroutine_events() > 0)
+                // accept client sockets
+                if ((listen->client = tb_socket_accept(listen->sock, tb_null)))
                 {
-                    // accept client sockets
-                    while ((listen->client = tb_socket_accept(listen->sock, tb_null)))
-                    {
-                        // start client connection
-                        if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_http_session_t, sock, listen->client))) break;
-                    }
+                    // start client connection
+                    if (!tb_lo_coroutine_start(tb_lo_scheduler_self(), tb_demo_lo_coroutine_client, tb_lo_coroutine_pass1(tb_demo_http_session_t, sock, listen->client))) break;
+                }
+                else
+                {
+                    // wait accept events
+                    tb_lo_coroutine_waitio(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+                    if (tb_lo_coroutine_events() <= 0) break;
                 }
             }
 

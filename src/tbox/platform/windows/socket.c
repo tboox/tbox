@@ -684,6 +684,10 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
     tb_mswsock_TransmitFile_t pTransmitFile = tb_mswsock()->TransmitFile;
     tb_assert_and_check_return_val(pTransmitFile, -1);
 
+    // attempt to use iocp object to send file data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_sendf(object, file, offset, size);
+
     // transmit it
     OVERLAPPED  olap = {0}; olap.Offset = (DWORD)offset;
     tb_hong_t   real = pTransmitFile((SOCKET)sock - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);

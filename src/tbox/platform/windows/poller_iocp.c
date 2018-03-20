@@ -315,6 +315,32 @@ static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_
     object->u.send.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
 }
+static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    // check
+    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
+    tb_assert_and_check_return_val(poller->func.TransmitFile, tb_false);
+
+    // trace
+    tb_trace_d("insert sendfile event for socket(%p): %lu bytes ..", sock, &object->u.sendf.size);
+
+    // do send file
+    tb_long_t ok = poller->func.TransmitFile((SOCKET)tb_sock2fd(sock), (HANDLE)object->u.sendf.file, (DWORD)object->u.sendf.size, (1 << 16), (LPOVERLAPPED)&object->olap, tb_null, 0);
+    tb_trace_d("sending[%p]: TransmitFile: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
+    {
+        object->state = TB_STATE_WAITING;
+        return tb_true;
+    }
+
+    // error? finished
+    object->state = TB_STATE_FINISHED;
+    object->u.sendf.result = -1;
+    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+}
 static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -340,7 +366,7 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     ,   tb_null // sendv
     ,   tb_null // urecvv
     ,   tb_null // usendv
-    ,   tb_null // sendf
+    ,   tb_poller_iocp_event_post_sendf // sendf
     };
     tb_assert_and_check_return_val(object->code < tb_arrayn(s_post), tb_false);
 
@@ -497,8 +523,9 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_usend_t, result));
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_urecvv_t, result));
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_usendv_t, result));
+        tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_sendf_t, result));
 
-        // save the result size
+        // save the result size, @note: hack the result offset 
         object->u.recv.result = real;
         return 1;
     }

@@ -102,22 +102,22 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
         // trace
         tb_trace_i("listening ..");
 
-        // wait accept events
-        while (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1) > 0)
+        // accept client sockets
+        tb_size_t       count = 0;
+        tb_socket_ref_t client = tb_null;
+        while (1)
         {
-            // accept client sockets
-            tb_size_t       count = 0;
-            tb_socket_ref_t client = tb_null;
-            while ((client = tb_socket_accept(sock, tb_null)))
+            // accept and start client connection
+            if ((client = tb_socket_accept(sock, tb_null)))
             {
-                // start client connection
                 if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
                 count++;
             }
-
-            // trace
-            tb_trace_i("listened %lu", count);
+            else if (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1) <= 0) break;
         }
+
+        // trace
+        tb_trace_i("listened %lu", count);
 
     } while (0);
 

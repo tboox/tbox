@@ -241,7 +241,7 @@ tb_long_t           tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list
  */
 tb_long_t           tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size);
 
-/*! sendf the socket data
+/*! send file data 
  * 
  * @param sock      the socket 
  * @param file      the file

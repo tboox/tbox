@@ -239,3 +239,27 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     object->u.send.size = (tb_iovec_size_t)size;
     return 0;
 }
+tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && file, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_SENDF && object->state == TB_STATE_FINISHED)
+    {
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        return object->u.sendf.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // post a send event to wait it
+    object->code           = TB_IOCP_OBJECT_CODE_SENDF;
+    object->state          = TB_STATE_PENDING;
+    object->u.sendf.file   = file;
+    object->u.sendf.size   = size;
+    object->u.sendf.offset = offset;
+    return 0;
+}

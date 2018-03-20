@@ -95,7 +95,7 @@ typedef struct __tb_iocp_object_recv_t
     tb_byte_t*                      data;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
 }tb_iocp_object_recv_t;
 
@@ -109,7 +109,7 @@ typedef struct __tb_iocp_object_send_t
     tb_byte_t const*                data;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
 }tb_iocp_object_send_t;
 
@@ -123,7 +123,7 @@ typedef struct __tb_iocp_object_urecv_t
     tb_byte_t*                      data;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
     // the addr
     tb_ipaddr_t                     addr;
@@ -140,7 +140,7 @@ typedef struct __tb_iocp_object_usend_t
     tb_byte_t const*                data;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
     // the peer addr
     tb_ipaddr_t                     addr;
@@ -157,7 +157,7 @@ typedef struct __tb_iocp_object_recvv_t
     tb_size_t                       size;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
 }tb_iocp_object_recvv_t;
 
@@ -171,7 +171,7 @@ typedef struct __tb_iocp_object_sendv_t
     tb_size_t                       size;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
 }tb_iocp_object_sendv_t;
 
@@ -185,7 +185,7 @@ typedef struct __tb_iocp_object_urecvv_t
     tb_size_t                       size;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
     // the peer addr
     tb_ipaddr_t                     addr;
@@ -202,27 +202,48 @@ typedef struct __tb_iocp_object_usendv_t
     tb_size_t                       size;
 
     // the result
-    tb_long_t                       result;
+    tb_long_t                       result;  //<! at same position for all iorw objects
 
     // the addr
     tb_ipaddr_t                     addr;
 
 }tb_iocp_object_usendv_t;
 
-// the sendfile iocp object type
+/* the sendfile iocp object type
+ *
+ * @note hack result struct member offset for hacking the same result offset for the other iocp object
+ *
+ * see poller_iocp.c: tb_poller_iocp_event_spak_iorw()
+ */
 typedef struct __tb_iocp_object_sendf_t
 {
+#if TB_CPU_BIT64
+
     // the file
     tb_file_ref_t                   file;
-
-    // the real
-    tb_size_t                       real;
 
     // the size
     tb_hize_t                       size;
 
-    // the seek
-    tb_hize_t                       seek;
+    // the result
+    tb_long_t                       result;  //<! at same position for all iorw objects
+
+    // the offset
+    tb_hize_t                       offset;
+#else
+
+    // the size
+    tb_hize_t                       size;
+
+    // the result
+    tb_long_t                       result;  //<! at same position for all iorw objects
+
+    // the file
+    tb_file_ref_t                   file;
+
+    // the offset
+    tb_hize_t                       offset;
+#endif
 
 }tb_iocp_object_sendf_t;
 
@@ -334,9 +355,20 @@ tb_long_t                   tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_
  * @param data              the data
  * @param size              the size
  *
- * @return                  ok: 1, continue: 0; failed: -1
+ * @return                  the real size or -1
  */
 tb_long_t                   tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size);
+
+/*! send file data 
+ * 
+ * @param object            the iocp object 
+ * @param file              the file 
+ * @param offset            the offset
+ * @param size              the size
+ *
+ * @return                  the real size or -1
+ */
+tb_hong_t                   tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
