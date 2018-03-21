@@ -2,7 +2,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "file_client"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -64,7 +64,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
             tb_long_t real = tb_socket_recv(sock, data, sizeof(data));
 
             // trace
-            tb_trace_d("[%p]: recv: %ld", sock, real);
+            tb_trace_d("[%p]: recv: %ld, total: %lu", sock, real, recv + (real > 0? real : 0));
 
             // has data?
             if (real > 0)

@@ -101,7 +101,7 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
 
     // trace
-    tb_trace_d("post accept event for socket(%p) ..", sock);
+    tb_trace_d("post accept(%p) event: ..", sock);
 
     // post a connection event 
     tb_bool_t ok = tb_false;
@@ -180,7 +180,7 @@ static tb_bool_t tb_poller_iocp_event_post_conn(tb_poller_iocp_ref_t poller, tb_
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
 
     // trace
-    tb_trace_d("post connection event for socket(%p): %{ipaddr}: ..", sock, &object->u.conn.addr);
+    tb_trace_d("post connect(%p, %{ipaddr}) event: ..", sock, &object->u.conn.addr);
 
     // post a connection event 
     tb_bool_t ok = tb_false;
@@ -267,7 +267,7 @@ static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
 
     // trace
-    tb_trace_d("insert recv event for socket(%p): %lu bytes ..", sock, &object->u.recv.size);
+    tb_trace_d("post recv(%p, %lu) event: ..", sock, object->u.recv.size);
 
     // do recv
     DWORD flag = 0;
@@ -295,7 +295,7 @@ static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
 
     // trace
-    tb_trace_d("insert send event for socket(%p): %lu bytes ..", sock, &object->u.send.size);
+    tb_trace_d("post send(%p, %lu) event: ..", sock, object->u.send.size);
 
     // do send
     tb_long_t ok = poller->func.WSASend((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.send, 1, tb_null, 0, (LPOVERLAPPED)&object->olap, tb_null);
@@ -323,7 +323,7 @@ static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb
     tb_assert_and_check_return_val(poller->func.TransmitFile, tb_false);
 
     // trace
-    tb_trace_d("insert sendfile event for socket(%p): %lu bytes ..", sock, &object->u.sendf.size);
+    tb_trace_d("post sendfile(%p, %lu) event: ..", sock, object->u.sendf.size);
 
     // do send file
     tb_long_t ok = poller->func.TransmitFile((SOCKET)tb_sock2fd(sock), (HANDLE)object->u.sendf.file, (DWORD)object->u.sendf.size, (1 << 16), (LPOVERLAPPED)&object->olap, tb_null, 0);
@@ -533,21 +533,18 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
     // error? 
     switch (error)
     {       
-        // ok?
+        // connection closed?
     case ERROR_SUCCESS:
-        object->u.recv.result = 1;
-        break;
-        // pending?
     case WAIT_TIMEOUT:
     case ERROR_IO_PENDING:
-        object->u.recv.result = 0;
+        object->u.recv.result = -1;
         break;
        // canceled? timeout 
     case WSAEINTR:
     case ERROR_OPERATION_ABORTED:
         object->u.recv.result = 0;
         break;
-        // closed?
+        // connection reset?
     case WSAECONNRESET:
     case ERROR_HANDLE_EOF:
     case ERROR_NETNAME_DELETED:
@@ -558,7 +555,7 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
     default:
         // trace
         tb_trace_e("iorw(%p): code: %u, unknown error: %lu", object->sock, object->code, error);
-        object->u.conn.result = -1;
+        object->u.recv.result = -1;
         break;
     }
 

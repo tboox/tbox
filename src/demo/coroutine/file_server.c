@@ -2,7 +2,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "file_server"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -53,7 +53,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
         tb_hong_t real = tb_socket_sendf(sock, file, send, size - send);
 
         // trace
-        tb_trace_d("[%p]: send: %ld", sock, real);
+        tb_trace_d("[%p]: send: %lld, total: %llu", sock, real, send + (real > 0? real : 0));
 
         // has data?
         if (real > 0)

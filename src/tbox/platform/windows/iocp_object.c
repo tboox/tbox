@@ -201,6 +201,9 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
     // attempt to get the result if be finished
     if (object->code == TB_IOCP_OBJECT_CODE_RECV && object->state == TB_STATE_FINISHED)
     {
+        // trace
+        tb_trace_d("recv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.recv.result);
+
         // clear the previous object data first, but the result cannot be cleared
         tb_iocp_object_clear(object);
         return object->u.recv.result;
@@ -208,6 +211,9 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
 
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("recv(%p, %lu): pending ..", object->sock, size);
 
     // post a recv event to wait it
     object->code        = TB_IOCP_OBJECT_CODE_RECV;
@@ -224,6 +230,9 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     // attempt to get the result if be finished
     if (object->code == TB_IOCP_OBJECT_CODE_SEND && object->state == TB_STATE_FINISHED)
     {
+        // trace
+        tb_trace_d("send(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.send.result);
+
         // clear the previous object data first, but the result cannot be cleared
         tb_iocp_object_clear(object);
         return object->u.send.result;
@@ -231,6 +240,9 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
 
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("send(%p, %lu): pending ..", object->sock, size);
 
     // post a send event to wait it
     object->code        = TB_IOCP_OBJECT_CODE_SEND;
@@ -247,6 +259,9 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     // attempt to get the result if be finished
     if (object->code == TB_IOCP_OBJECT_CODE_SENDF && object->state == TB_STATE_FINISHED)
     {
+        // trace
+        tb_trace_d("sendfile(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.sendf.result);
+
         // clear the previous object data first, but the result cannot be cleared
         tb_iocp_object_clear(object);
         return object->u.sendf.result;
@@ -254,6 +269,9 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
 
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("sendfile(%p, %llu at %llu): pending ..", object->sock, size, offset);
 
     // post a send event to wait it
     object->code           = TB_IOCP_OBJECT_CODE_SENDF;
