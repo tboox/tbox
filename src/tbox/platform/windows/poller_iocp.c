@@ -113,8 +113,8 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
         tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
 
         // make address buffer
-        if (!object->u.acpt.buffer) object->u.acpt.buffer = tb_malloc0(((sizeof(struct sockaddr_storage)) << 1));
-        tb_assert_and_check_break(object->u.acpt.buffer);
+        if (!object->buffer) object->buffer = tb_malloc0(((sizeof(struct sockaddr_storage)) << 1));
+        tb_assert_and_check_break(object->buffer);
 
         // make accept socket
         object->u.acpt.result = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4); // TODO family
@@ -128,7 +128,7 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
         DWORD real = 0;
         AcceptEx_ok = poller->func.AcceptEx(    (SOCKET)tb_sock2fd(sock)
                                             ,   (SOCKET)tb_sock2fd(object->u.acpt.result)
-                                            ,   (tb_byte_t*)object->u.acpt.buffer
+                                            ,   (tb_byte_t*)object->buffer
                                             ,   0
                                             ,   sizeof(struct sockaddr_storage)
                                             ,   sizeof(struct sockaddr_storage)
@@ -315,6 +315,77 @@ static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_
     object->u.send.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
 }
+static tb_bool_t tb_poller_iocp_event_post_urecv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    // check
+    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("post urecv(%p, %lu) event: ..", sock, object->u.urecv.size);
+
+    // make buffer for address, size and flags
+    if (!object->buffer) object->buffer = tb_malloc0(sizeof(struct sockaddr_storage) + sizeof(tb_int_t) + sizeof(DWORD));
+    tb_assert_and_check_return_val(object->buffer, tb_false);
+
+    // init size
+    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage));
+    *psize = sizeof(struct sockaddr_storage);
+
+    // init flag
+    DWORD* pflag = (DWORD*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
+    *pflag = 0;
+
+    // do urecv
+    tb_long_t ok = poller->func.WSARecvFrom((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.urecv, 1, tb_null, pflag, (struct sockaddr*)object->buffer, psize, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("urecving[%p]: WSARecvFrom: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
+    {
+        object->state = TB_STATE_WAITING;
+        return tb_true;
+    }
+
+    // error? finished
+    object->state = TB_STATE_FINISHED;
+    object->u.urecv.result = -1;
+    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+}
+static tb_bool_t tb_poller_iocp_event_post_usend(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    // check
+    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("post usend(%p, %{ipaddr}, %lu) event: ..", sock, &object->u.usend.addr, object->u.usend.size);
+
+    // load addr
+    tb_size_t               n = 0;
+	struct sockaddr_storage d = {0};
+    if (!(n = tb_sockaddr_load(&d, &object->u.usend.addr))) return tb_false;
+
+    // do usend
+    tb_long_t ok = poller->func.WSASendTo((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.usend, 1, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("usending[%p]: WSASendTo: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
+    {
+        object->state = TB_STATE_WAITING;
+        return tb_true;
+    }
+
+    // error? finished
+    object->state = TB_STATE_FINISHED;
+    object->u.usend.result = -1;
+    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+}
 static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -346,8 +417,8 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     // check
     tb_assert_and_check_return_val(events, tb_false);
 
-    // TODO
-    if (object->state == TB_STATE_OK) return tb_true;
+    // no pending event? return it directly
+    tb_check_return_val(object->state != TB_STATE_OK, tb_true);
 
     // trace
     tb_trace_d("post events(%lx) for socket(%p), code: %u, state: %s ..", events, sock, object->code, tb_state_cstr(object->state));
@@ -356,12 +427,12 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     static tb_bool_t (*s_post[])(tb_poller_iocp_ref_t , tb_socket_ref_t, tb_iocp_object_ref_t, tb_size_t ) = 
     {
         tb_null
-    ,   tb_poller_iocp_event_post_acpt // acpt
+    ,   tb_poller_iocp_event_post_acpt 
     ,   tb_poller_iocp_event_post_conn
     ,   tb_poller_iocp_event_post_recv
     ,   tb_poller_iocp_event_post_send
-    ,   tb_null // urecv
-    ,   tb_null // usend
+    ,   tb_poller_iocp_event_post_urecv 
+    ,   tb_poller_iocp_event_post_usend 
     ,   tb_null // recvv
     ,   tb_null // sendv
     ,   tb_null // urecvv
@@ -462,10 +533,10 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
             if (poller->func.GetAcceptExSockaddrs)
             {
                 // check
-                tb_assert(object->u.acpt.buffer);
+                tb_assert(object->buffer);
 
                 // get server and client addresses
-                poller->func.GetAcceptExSockaddrs(  (tb_byte_t*)object->u.acpt.buffer
+                poller->func.GetAcceptExSockaddrs(  (tb_byte_t*)object->buffer
                                                 ,   0
                                                 ,   sizeof(struct sockaddr_storage)
                                                 ,   sizeof(struct sockaddr_storage)
@@ -515,6 +586,17 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
         // trace
         tb_trace_d("iorw(%p): code: %u, real: %lu", object->sock, object->code, real);
 
+        // save address for urecv or urecvv
+        if (object->code == TB_IOCP_OBJECT_CODE_URECV || object->code == TB_IOCP_OBJECT_CODE_URECVV)
+        {
+            // the address
+            struct sockaddr_storage* addr = (struct sockaddr_storage*)object->buffer;
+            tb_assert_and_check_return_val(addr, -1);
+
+            // save address
+            tb_sockaddr_save(object->code == TB_IOCP_OBJECT_CODE_URECV? &object->u.urecv.addr : &object->u.urecvv.addr, addr);
+        }
+
         // check struct member offset for hacking the same result offset for the other iocp object
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_send_t, result));
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_recvv_t, result));
@@ -524,6 +606,7 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_urecvv_t, result));
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_usendv_t, result));
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_sendf_t, result));
+
 
         // save the result size, @note: hack the result offset 
         object->u.recv.result = real;

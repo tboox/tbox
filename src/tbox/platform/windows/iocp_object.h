@@ -69,9 +69,6 @@ typedef struct __tb_iocp_object_acpt_t
     // the result socket
     tb_socket_ref_t                 result;
 
-    // the accept address buffer, sizeof(struct sockaddr_storage)) * 2
-    tb_pointer_t                    buffer;
-    
 }tb_iocp_object_acpt_t;
 
 // the connection iocp object type
@@ -259,6 +256,13 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     // the user private data
     tb_cpointer_t                   priv;
 
+    /* the private buffer for iocp poller
+     *
+     * acpt: sizeof(struct sockaddr_storage)) * 2
+     * urecv and recvv: sizeof(struct sockaddr_storage)) + sizeof(tb_int_t) + sizeof(DWORD)
+     */
+    tb_pointer_t                    buffer;
+
     /* the objects 
      *
      * tb_iovec_t must be aligned by cpu-bytes for WSABUF
@@ -305,7 +309,7 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
  *
  * @return                  the iocp object
  */
-tb_iocp_object_ref_t         tb_iocp_object_get_or_new(tb_socket_ref_t sock);
+tb_iocp_object_ref_t        tb_iocp_object_get_or_new(tb_socket_ref_t sock);
 
 /* get iocp object from the given socket in local thread
  *
@@ -313,7 +317,7 @@ tb_iocp_object_ref_t         tb_iocp_object_get_or_new(tb_socket_ref_t sock);
  *
  * @return                  the iocp object
  */
-tb_iocp_object_ref_t         tb_iocp_object_get(tb_socket_ref_t sock);
+tb_iocp_object_ref_t        tb_iocp_object_get(tb_socket_ref_t sock);
 
 /* remove iocp object for the given socket in local thread
  *
@@ -359,7 +363,29 @@ tb_long_t                   tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_
  */
 tb_long_t                   tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size);
 
-/*! send file data 
+/* recv the socket data for udp
+ *
+ * @param object            the iocp object 
+ * @param addr              the peer address(output)
+ * @param data              the data
+ * @param size              the size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size);
+
+/* send the socket data for udp
+ *
+ * @param object            the iocp object 
+ * @param addr              the address
+ * @param data              the data
+ * @param size              the size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size);
+   
+/* send file data 
  * 
  * @param object            the iocp object 
  * @param file              the file 

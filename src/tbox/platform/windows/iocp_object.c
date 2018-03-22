@@ -39,11 +39,11 @@
  */
 static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
 {
-    // free the previous buffer
-    if (object->code == TB_IOCP_OBJECT_CODE_ACPT && object->u.acpt.buffer)
+    // free the private buffer for iocp
+    if (object->buffer)
     {
-        tb_free(object->u.acpt.buffer);
-        object->u.acpt.buffer = tb_null;
+        tb_free(object->buffer);
+        object->buffer = tb_null;
     }
 
     // clear object code and state
@@ -184,7 +184,7 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
 
     // trace
-    tb_trace_d("connect(%p): %{ipaddr}, pending ..", object->sock, addr);
+    tb_trace_d("connect(%p, %{ipaddr}): pending ..", object->sock, addr);
 
     // post a connection event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_CONN;
@@ -249,6 +249,66 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     object->state       = TB_STATE_PENDING;
     object->u.send.data = data;
     object->u.send.size = (tb_iovec_size_t)size;
+    return 0;
+}
+tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && addr && data && size, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_URECV && object->state == TB_STATE_FINISHED)
+    {
+        // trace
+        tb_trace_d("urecv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.urecv.result);
+
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        if (addr) tb_ipaddr_copy(addr, &object->u.urecv.addr);
+        return object->u.urecv.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("urecv(%p, %lu): pending ..", object->sock, size);
+
+    // post a urecv event to wait it
+    object->code         = TB_IOCP_OBJECT_CODE_URECV;
+    object->state        = TB_STATE_PENDING;
+    object->u.urecv.data = data;
+    object->u.urecv.size = (tb_iovec_size_t)size;
+    return 0;
+}
+tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && addr && data, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_USEND && object->state == TB_STATE_FINISHED)
+    {
+        // trace
+        tb_trace_d("usend(%p, %{ipaddr}): state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.usend.result);
+
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        return object->u.usend.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("usend(%p, %{ipaddr}, %lu): pending ..", object->sock, addr, size);
+
+    // post a usend event to wait it
+    object->code         = TB_IOCP_OBJECT_CODE_USEND;
+    object->state        = TB_STATE_PENDING;
+    object->u.usend.addr = *addr;
+    object->u.usend.data = data;
+    object->u.usend.size = (tb_iovec_size_t)size;
     return 0;
 }
 tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)

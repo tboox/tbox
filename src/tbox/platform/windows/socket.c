@@ -712,6 +712,10 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t*
     // no size?
     tb_check_return_val(size, 0);
 
+    // attempt to use iocp object to urecv data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_urecv(object, addr, data, size);
+
     // recv
 	struct sockaddr_storage d = {0};
     tb_int_t                n = sizeof(d);
@@ -741,6 +745,10 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
 
     // no size?
     tb_check_return_val(size, 0);
+
+    // attempt to use iocp object to usend data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_usend(object, addr, data, size);
 
     // load addr
     tb_size_t               n = 0;
