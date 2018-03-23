@@ -404,6 +404,28 @@ tb_long_t                   tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb
  * @return                  the real size or -1
  */
 tb_long_t                   tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size);
+
+/*! urecvv the socket data for udp
+ * 
+ * @param object            the iocp object 
+ * @param addr              the peer address(output)
+ * @param list              the iovec list
+ * @param size              the iovec size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
+
+/*! usendv the socket data for udp
+ * 
+ * @param object            the iocp object 
+ * @param addr              the addr
+ * @param list              the iovec list
+ * @param size              the iovec size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
    
 /* send file data 
  * 

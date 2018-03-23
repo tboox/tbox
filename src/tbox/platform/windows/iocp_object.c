@@ -400,4 +400,64 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     object->u.sendv.size = (tb_iovec_size_t)size;
     return 0;
 }
+tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && list && size, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_URECVV && object->state == TB_STATE_FINISHED)
+    {
+        // trace
+        tb_trace_d("urecvv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.urecvv.result);
+
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        if (addr) tb_ipaddr_copy(addr, &object->u.urecvv.addr);
+        return object->u.urecvv.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("urecvv(%p, %lu): pending ..", object->sock, size);
+
+    // post a urecvv event to wait it
+    object->code          = TB_IOCP_OBJECT_CODE_URECVV;
+    object->state         = TB_STATE_PENDING;
+    object->u.urecvv.list = list;
+    object->u.urecvv.size = (tb_iovec_size_t)size;
+    return 0;
+}
+tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && addr && list, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_USENDV && object->state == TB_STATE_FINISHED)
+    {
+        // trace
+        tb_trace_d("usendv(%p, %{ipaddr}): state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.usendv.result);
+
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        return object->u.usendv.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("usendv(%p, %{ipaddr}, %lu): pending ..", object->sock, addr, size);
+
+    // post a usendv event to wait it
+    object->code          = TB_IOCP_OBJECT_CODE_USENDV;
+    object->state         = TB_STATE_PENDING;
+    object->u.usendv.addr = *addr;
+    object->u.usendv.list = list;
+    object->u.usendv.size = (tb_iovec_size_t)size;
+    return 0;
+}
 #endif

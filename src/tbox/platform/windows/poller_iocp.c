@@ -468,6 +468,77 @@ static tb_bool_t tb_poller_iocp_event_post_sendv(tb_poller_iocp_ref_t poller, tb
     object->u.sendv.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
 }
+static tb_bool_t tb_poller_iocp_event_post_urecvv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    // check
+    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("post urecvv(%p, %lu) event: ..", sock, object->u.urecvv.size);
+
+    // make buffer for address, size and flags
+    if (!object->buffer) object->buffer = tb_malloc0(sizeof(struct sockaddr_storage) + sizeof(tb_int_t) + sizeof(DWORD));
+    tb_assert_and_check_return_val(object->buffer, tb_false);
+
+    // init size
+    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage));
+    *psize = sizeof(struct sockaddr_storage);
+
+    // init flag
+    DWORD* pflag = (DWORD*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
+    *pflag = 0;
+
+    // do urecvv
+    tb_long_t ok = poller->func.WSARecvFrom((SOCKET)tb_sock2fd(sock), (WSABUF*)object->u.urecvv.list, (DWORD)object->u.urecvv.size, tb_null, pflag, (struct sockaddr*)object->buffer, psize, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("urecving[%p]: WSARecvFrom: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
+    {
+        object->state = TB_STATE_WAITING;
+        return tb_true;
+    }
+
+    // error? finished
+    object->state = TB_STATE_FINISHED;
+    object->u.urecvv.result = -1;
+    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+}
+static tb_bool_t tb_poller_iocp_event_post_usendv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    // check
+    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
+
+    // trace
+    tb_trace_d("post usendv(%p, %{ipaddr}, %lu) event: ..", sock, &object->u.usendv.addr, object->u.usendv.size);
+
+    // load addr
+    tb_size_t               n = 0;
+	struct sockaddr_storage d = {0};
+    if (!(n = tb_sockaddr_load(&d, &object->u.usendv.addr))) return tb_false;
+
+    // do usendv
+    tb_long_t ok = poller->func.WSASendTo((SOCKET)tb_sock2fd(sock), (WSABUF*)object->u.usendv.list, (DWORD)object->u.usendv.size, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("usending[%p]: WSASendTo: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
+    {
+        object->state = TB_STATE_WAITING;
+        return tb_true;
+    }
+
+    // error? finished
+    object->state = TB_STATE_FINISHED;
+    object->u.usendv.result = -1;
+    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+}
 #endif
 static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -493,13 +564,13 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
 #ifndef TB_CONFIG_MICRO_ENABLE
     ,   tb_poller_iocp_event_post_recvv
     ,   tb_poller_iocp_event_post_sendv
-    ,   tb_null // urecvv
-    ,   tb_null // usendv
+    ,   tb_poller_iocp_event_post_urecvv
+    ,   tb_poller_iocp_event_post_usendv
 #else
-    ,   tb_null // recvv
-    ,   tb_null // sendv
-    ,   tb_null // urecvv
-    ,   tb_null // usendv
+    ,   tb_null 
+    ,   tb_null 
+    ,   tb_null
+    ,   tb_null 
 #endif
     ,   tb_poller_iocp_event_post_sendf 
     };
