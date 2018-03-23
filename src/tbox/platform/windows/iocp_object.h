@@ -363,6 +363,26 @@ tb_long_t                   tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_
  */
 tb_long_t                   tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size);
 
+/*! recvv the socket data for tcp
+ * 
+ * @param object            the iocp object 
+ * @param list              the iovec list
+ * @param size              the iovec size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size);
+
+/*! sendv the socket data for tcp
+ * 
+ * @param object            the iocp object 
+ * @param list              the iovec list
+ * @param size              the iovec size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size);
+
 /* recv the socket data for udp
  *
  * @param object            the iocp object 

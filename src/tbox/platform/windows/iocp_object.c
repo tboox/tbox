@@ -341,3 +341,63 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     object->u.sendf.offset = offset;
     return 0;
 }
+#ifndef TB_CONFIG_MICRO_ENABLE
+tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && list && size, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_RECVV && object->state == TB_STATE_FINISHED)
+    {
+        // trace
+        tb_trace_d("recvv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.recvv.result);
+
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        return object->u.recvv.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("recvv(%p, %lu): pending ..", object->sock, size);
+
+    // post a recvv event to wait it
+    object->code         = TB_IOCP_OBJECT_CODE_RECVV;
+    object->state        = TB_STATE_PENDING;
+    object->u.recvv.list = list;
+    object->u.recvv.size = (tb_iovec_size_t)size;
+    return 0;
+}
+tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size)
+{
+    // check
+    tb_assert_and_check_return_val(object && list && size, -1);
+
+    // attempt to get the result if be finished
+    if (object->code == TB_IOCP_OBJECT_CODE_SENDV && object->state == TB_STATE_FINISHED)
+    {
+        // trace
+        tb_trace_d("sendv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.sendv.result);
+
+        // clear the previous object data first, but the result cannot be cleared
+        tb_iocp_object_clear(object);
+        return object->u.sendv.result;
+    }
+
+    // check state
+    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+
+    // trace
+    tb_trace_d("sendv(%p, %lu): pending ..", object->sock, size);
+
+    // post a sendv event to wait it
+    object->code         = TB_IOCP_OBJECT_CODE_SENDV;
+    object->state        = TB_STATE_PENDING;
+    object->u.sendv.list = list;
+    object->u.sendv.size = (tb_iovec_size_t)size;
+    return 0;
+}
+#endif

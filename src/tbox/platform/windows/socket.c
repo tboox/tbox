@@ -773,6 +773,10 @@ tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
     // check
     tb_assert_and_check_return_val(sock && list && size, -1);
 
+    // attempt to use iocp object to recv data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_recvv(object, list, size);
+
     // walk read
     tb_size_t i = 0;
     tb_size_t read = 0;
@@ -810,6 +814,10 @@ tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
 {
     // check
     tb_assert_and_check_return_val(sock && list && size, -1);
+
+    // attempt to use iocp object to send data if exists
+    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+    if (object) return tb_iocp_object_sendv(object, list, size);
 
     // walk writ
     tb_size_t i = 0;
