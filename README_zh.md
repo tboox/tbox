@@ -19,14 +19,14 @@
     <a href="https://github.com/tboox/tbox/blob/master/LICENSE.md">
       <img src="https://img.shields.io/github/license/tboox/tbox.svg?colorB=f48041&style=flat-square" alt="license" />
     </a>
+    <a href="https://www.reddit.com/r/tboox/">
+      <img src="https://img.shields.io/badge/chat-on%20reddit-ff3f34.svg?style=flat-square" alt="Reddit" />
+    </a>
     <a href="https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
       <img src="https://img.shields.io/gitter/room/tboox/tboox.svg?style=flat-square&colorB=96c312" alt="Gitter" />
     </a>
     <a href="https://t.me/joinchat/F2dIAw5iTkDUMwCQ_8CStw">
       <img src="https://img.shields.io/badge/chat-on%20telegram-blue.svg?style=flat-square" alt="Telegram" />
-    </a>
-    <a href="https://tboox.bearychat.com/signup/98bf6970b9f889d6ae3fbc3d50ee8a36">
-      <img src="https://img.shields.io/badge/chat-on%20bearychat-brightgreen.svg?style=flat-square" alt="Bearychat" />
     </a>
     <a href="https://jq.qq.com/?_wv=1027&k=5hpwWFv">
       <img src="https://img.shields.io/badge/chat-on%20QQ-ff69b4.svg?style=flat-square" alt="QQ" />
@@ -294,7 +294,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 * 邮箱：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * 主页：[TBOOX开源工程](http://www.tboox.org/cn)
-* 社区：[TBOOX开源社区](https://github.com/tboox/community/issues)
+* 社区：[Reddit论坛](https://www.reddit.com/r/tboox/)
 * QQ群：343118190
 * 微信公众号：tboox-os
 
