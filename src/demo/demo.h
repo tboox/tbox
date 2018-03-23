@@ -198,6 +198,7 @@ TB_DEMO_MAIN_DECL(algorithm_sort);
 // coroutine
 TB_DEMO_MAIN_DECL(coroutine_nest);
 TB_DEMO_MAIN_DECL(coroutine_lock);
+TB_DEMO_MAIN_DECL(coroutine_ping);
 TB_DEMO_MAIN_DECL(coroutine_sleep);
 TB_DEMO_MAIN_DECL(coroutine_spider);
 TB_DEMO_MAIN_DECL(coroutine_switch);

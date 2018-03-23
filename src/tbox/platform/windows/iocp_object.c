@@ -254,7 +254,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
 tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(object && addr && data && size, -1);
+    tb_assert_and_check_return_val(object && data && size, -1);
 
     // attempt to get the result if be finished
     if (object->code == TB_IOCP_OBJECT_CODE_URECV && object->state == TB_STATE_FINISHED)

@@ -1,6 +1,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */
+ */ 
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -205,30 +205,20 @@ static tb_bool_t tb_ping_recv(tb_socket_ref_t sock, tb_uint16_t seq)
     // ok
     return tb_true;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * main
- */ 
-tb_int_t tb_demo_network_ping_main(tb_int_t argc, tb_char_t** argv)
+static tb_void_t tb_demo_coroutine_ping(tb_cpointer_t priv)
 {
-    // check
-    tb_assert_and_check_return_val(argc == 2 && argv[1], -1);
-
-    // init addr
-    tb_ipaddr_t addr;
-    if (!tb_dns_looker_done(argv[1], &addr)) return -1;
+    // get address
+    tb_ipaddr_ref_t addr = (tb_ipaddr_ref_t)priv;
+    tb_assert_and_check_return(addr);
 
     // init socket 
     tb_socket_ref_t sock = tb_socket_init(TB_SOCKET_TYPE_ICMP, TB_IPADDR_FAMILY_IPV4);
     if (sock)
     {
-        // trace
-        tb_trace_i("PING %s (%{ipv4}): %d data bytes", argv[1], tb_ipaddr_ipv4(&addr), sizeof(tb_icmp_echo_request_t));
-
         // send ping
         tb_uint16_t i = 0;
         tb_uint16_t n = 10;
-        while (i < n && tb_ping_send(sock, &addr, i))
+        while (i < n && tb_ping_send(sock, addr, i))
         {
             // recv ping
             if (!tb_ping_recv(sock, i)) break;
@@ -241,6 +231,42 @@ tb_int_t tb_demo_network_ping_main(tb_int_t argc, tb_char_t** argv)
         // exit socket
         tb_socket_exit(sock);
     }
+}
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t tb_demo_coroutine_ping_main(tb_int_t argc, tb_char_t** argv)
+{
+    // check
+    tb_assert_and_check_return_val(argc == 2 && argv[1], -1);
+
+    // init addr
+    tb_ipaddr_t addr;
+    if (!tb_dns_looker_done(argv[1], &addr)) return -1;
+
+    // trace
+    tb_trace_i("PING %s (%{ipv4}): %d data bytes", argv[1], tb_ipaddr_ipv4(&addr), sizeof(tb_icmp_echo_request_t));
+
+    // init scheduler
+    tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
+    if (scheduler)
+    {
+        // start ping
+        tb_size_t n = 10; 
+        while (n--)
+        {
+            // start it
+            tb_coroutine_start(scheduler, tb_demo_coroutine_ping, &addr, 0);
+        }
+
+        // run scheduler
+        tb_co_scheduler_loop(scheduler, tb_true);
+
+        // exit scheduler
+        tb_co_scheduler_exit(scheduler);
+    }
+
+    // end
     return 0;
 }

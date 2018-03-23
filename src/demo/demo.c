@@ -203,6 +203,7 @@ static tb_demo_t g_demo[] =
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 ,   TB_DEMO_MAIN_ITEM(coroutine_nest)
 ,   TB_DEMO_MAIN_ITEM(coroutine_lock)
+,   TB_DEMO_MAIN_ITEM(coroutine_ping)
 ,   TB_DEMO_MAIN_ITEM(coroutine_sleep)
 ,   TB_DEMO_MAIN_ITEM(coroutine_switch)
 ,   TB_DEMO_MAIN_ITEM(coroutine_channel)
